@@ -1,5 +1,11 @@
 Revision history for JSON-YY
 
+0.08  2026-09-15
+    - new bool option and -bool flag decode JSON booleans as JSON::PP::Boolean
+    - boolean objects encode as true/false
+    - new exportable is_bool, true and false
+    - fix -flag imports ignored when encode_json/decode_json are also listed
+
 0.07  2026-08-11
     - security: fix encoder heap overflow; tied-hash and deep-nesting crashes
     - fix thread-clone double free; latin-1 now encodes as utf-8

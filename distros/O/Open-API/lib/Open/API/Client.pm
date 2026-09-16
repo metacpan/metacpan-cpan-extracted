@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Open::API;   # loads the shared XS
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 1;
 
@@ -46,6 +46,8 @@ response schema gets C<error> and C<errors> set.
 
 =head1 CONSTRUCTOR
 
+=head2 new
+
     Open::API::Client->new(%opts);
 
 C<api> (an L<Open::API>) or C<spec> (anything L<Open::API/new> accepts) is
@@ -66,6 +68,18 @@ parameter is missing or a value fails its schema.
 =head2 api
 
 The underlying L<Open::API> object.
+
+=head2 can
+
+    my $code = $client->can('getPet');
+
+C<UNIVERSAL::can> for a real method, and for an C<operationId> a coderef that
+calls it:
+
+    $client->can('getPet')->(petId => 42);
+
+So a client answers truthfully about the methods it has, including the ones
+the document gave it rather than the class.
 
 =head1 AUTHOR
 

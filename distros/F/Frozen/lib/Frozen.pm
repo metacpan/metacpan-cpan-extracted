@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Frozen', $VERSION);
@@ -21,7 +21,7 @@ Frozen - an immutable container that survives a fork
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -137,8 +137,8 @@ the sharing claim does not apply to it.
 
 At freeze: blessed references, code references, globs, filehandles, references
 to scalars, cycles, structures deeper than 256, strings flagged UTF-8 whose
-bytes are not valid UTF-8, NVs that do not fit a double (pass C<< lossy_nv =>
-1 >> to narrow them), and anything over 2 GiB. Each names the path to the
+bytes are not valid UTF-8, NVs a double cannot hold at all (pass C<< lossy_nv
+=> 1 >> to accept them), and anything over 2 GiB. Each names the path to the
 offending value.
 
 At open: a block that is not Frozen's, one written on the other endianness -
@@ -169,8 +169,28 @@ Both builders take the same options.
 C<< flat => '.' >> builds an index over joined paths, which is what makes
 C<get> one probe instead of one per segment.
 
-C<< lossy_nv => 1 >> accepts an NV that does not fit a double, narrowing it
-instead of refusing it.
+A scalar is stored as the kind Perl says it B<is> - string, then integer, then
+float - and never as one of the conversions cached on it along the way.
+Reading a number as a string caches that string, and comparing a float against
+an integer caches the truncated integer, but neither changed the value: C<1.5>
+compared against C<1> is stored as C<1.5>, and C<5> that something printed is
+stored as C<5>. C<'007'> is stored as its digits, because a string used as a
+number is still a string, and storing C<7> would be what the user sees
+changing on the way through.
+
+C<< lossy_nv => 1 >> accepts the two NVs a double cannot hold: one past
+C<DBL_MAX>, which is stored as an infinity, and a non-zero one under the
+smallest denormal, which is stored as a zero.
+
+A block holds an IEEE double. On a perl built C<-Duselongdouble> or
+C<-Dusequadmath> the NV is wider than that, so storing one rounds to the
+nearest double, and C<0.1> is kept to a double's precision rather than the
+NV's. That is the format, not an error, and it is not what C<lossy_nv>
+governs: refusing it would refuse C<0.1> outright on those perls. What is
+refused without the flag is a narrowing that destroys the value rather than
+its tail - a finite NV that would come back as an infinity, a non-zero one
+that would come back as zero. An NV that is already infinite, and a NaN, are
+stored as they are.
 
 C<< stringify => 1 >> stores every defined non-reference scalar as its string
 form, so C<5> is kept as C<"5"> and a string read answers for it. It is for a

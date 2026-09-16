@@ -1,0 +1,40 @@
+Physics-Balls
+
+Balls of one size on a flat surface with friction: walls they bounce off, nose
+points they rattle against, gates they drop through. An event-based analytic
+engine in C, perl-free, with an XS door and a versioned C ABI (include/pb_abi.h)
+so another module can roll balls with no Perl frame in between. It knows
+nothing about any game; a pool or snooker adapter describes its table, sends a
+strike as integers, and reads back the contacts in order, the rest layout, the
+balls that dropped, and the trajectory as segments a client plays back.
+
+The same inputs give the same doubles on every platform that keeps IEEE
+arithmetic honest. The build turns off fused multiply-adds for that reason, and
+the fixtures under t/ were recorded by the JavaScript prototype the engine was
+transliterated from.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+A C compiler is needed. ExtUtils::Depends installs the ABI header.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Physics::Balls
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

@@ -19,6 +19,7 @@ t/animated.t
 t/animated_bar.t
 t/animated_line.t
 t/animated_pie.t
+t/animated_snippet.t
 t/bar.t
 t/comment-spelling.t
 t/cover.t

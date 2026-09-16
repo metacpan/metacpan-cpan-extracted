@@ -55,3 +55,8 @@ Revision history for Perl extension Apache::AuthNetLDAP.
 
 0.32 Mon Sep 14 2026
         - add provides section to META.json for indexing
+
+0.33 Mon Sep 14 2026
+  	- use ExtUtils::MakeMaker to generate META.json and META.yml
+	- update MANIFEST
+	- require IO::Socket::SSL

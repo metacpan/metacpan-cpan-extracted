@@ -1,10 +1,10 @@
 {
-   "abstract" : "Lookup an obituary",
+   "abstract" : "Lookup an obituary in the ODT/Rootsweb/funeral-notices database",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "open_source"
    ],
@@ -68,15 +68,23 @@
       },
       "test" : {
          "requires" : {
+            "Errno" : "0",
             "File::Temp" : "0",
             "FindBin" : "0",
+            "IPC::Run3" : "0",
             "IPC::System::Simple" : "0",
+            "POSIX" : "0",
             "Test::Carp" : "0",
             "Test::DescribeMe" : "0",
             "Test::HTTPStatus" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
+            "Test::RequiresInternet" : "0",
+            "Test::Returns" : "0",
+            "Test::Which" : "0",
             "YAML::XS" : "0"
          }
       }
@@ -85,8 +93,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Genealogy-Obituary-Lookup@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Genealogy-Obituary-Lookup/issues",
-         "x_url" : "https://github.com/nigelhorne/Genealogy-Obituary-Lookup/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Obituary-Lookup",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Obituary-Lookup"
       },
       "homepage" : "https://metacpan.org/pod/Genealogy::Obituary::Lookup",
       "repository" : {
@@ -96,6 +104,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-Obituary-Lookup"
       }
    },
-   "version" : "0.20",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

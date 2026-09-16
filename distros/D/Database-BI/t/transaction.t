@@ -352,10 +352,17 @@ subtest 'Transaction 4: Join pipeline -> filter -> export consistency' => sub {
 		'Phase 5: exported CSV column count matches left+right-join_key';
 
 	# ------------------------------------------------------------------
-	# Phase 5b: column ordering integrity -- left columns first.
+	# Phase 5b: all expected columns present in merged header.
+	# Database::Join returns columns sorted alphabetically; left-first
+	# ordering is not guaranteed.
 	# ------------------------------------------------------------------
 	my ($header_line) = split /\r?\n/, $export_body;
-	like $header_line, qr/\Aid,item,region,quantity/, 'Phase 5b: left columns precede right columns in merged header';
+	my %header_cols = map { $_ => 1 } split /,/, $header_line;
+	ok $header_cols{id},          'Phase 5b: left column "id" present in merged header';
+	ok $header_cols{item},        'Phase 5b: join column "item" present in merged header';
+	ok $header_cols{region},      'Phase 5b: left column "region" present in merged header';
+	ok $header_cols{quantity},    'Phase 5b: left column "quantity" present in merged header';
+	ok $header_cols{price_each},  'Phase 5b: right column "price_each" present in merged header';
 };
 
 # ======================================================================
@@ -1335,7 +1342,7 @@ subtest 'Transaction 20: Graph UI polish, date-sort JS, and numeric Y-axis filte
 			'Phase 1: isDateVal exclusion helper present');
 
 	SKIP: {
-		eval { require HTML::D3 } or skip 'HTML::D3 not available', 7;
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 9;
 
 		# Phase 2: /graph renders via the TT layout with the snippet embedded.
 		$t->get_ok('/graph?l=table:sales&x=product&y=amount')
@@ -1349,7 +1356,12 @@ subtest 'Transaction 20: Graph UI polish, date-sort JS, and numeric Y-axis filte
 			->content_like(qr/d3\.v7/,
 				'Phase 2: D3.js v7 loaded via CDN script tag')
 			->content_like(qr/biExportSVG|Export SVG/,
-				'Phase 2: SVG export button present');
+				'Phase 2: SVG export button present')
+			# Phase 2a: animated initial draw (HTML::D3 >= 0.13 animated => 1).
+			->content_like(qr/stroke-dashoffset/,
+				'Phase 2a: stroke-dashoffset animation emitted by HTML::D3')
+			->content_like(qr/initialDrawDone/,
+				'Phase 2a: initialDrawDone guard present -- zoom redraws not animated');
 	}
 };
 
@@ -1426,6 +1438,19 @@ subtest 'Transaction 22: Graph button disabled when no numeric column' => sub {
 	# The initGraphBtn IIFE is also present in the source.
 	$t->content_like(qr/initGraphBtn/,
 		'Phase 3: initGraphBtn IIFE present (greys out btn-graph on load)');
+
+	# Regression guard: buildYSelect iterates tHead.cells (which includes the
+	# injected sel-th at idx=0) and reads r.cells[idx] to get the matching
+	# data cell.  Both thead and tbody are shifted identically by injectSelCol,
+	# so no additional SEL offset is needed.  Using r.cells[idx + SEL] would
+	# double-correct, reading one column to the right of the examined header
+	# and producing wrong Y-axis options (e.g. "Description" shown as numeric
+	# because Debit values were tested against it).
+	my $body = $t->tx->res->body;
+	my ($build_y_body) = ($body =~ /function buildYSelect\b(.*?)return ySel\.options\.length/s);
+	ok(defined $build_y_body && $build_y_body !~ /idx\s*\+\s*SEL/,
+		'Phase 3: buildYSelect uses r.cells[idx] not r.cells[idx+SEL] (column-alignment guard)');
+
 
 	# Phase 4: single-numeric-column auto-fill.  Upload a CSV with one numeric
 	# column and one text column; the Y-axis dropdown must be hidden and the
@@ -1540,6 +1565,392 @@ subtest 'Transaction 23: Reference lines on line graph' => sub {
 				'Phase 6: ref_min_y is negative (accounting negatives below 0)')
 			->content_like(qr/Math\.min\(0,\s*d3\.min/,
 				'Phase 6: y-domain extends below 0 so negatives are visible');
+	}
+};
+
+# ---------------------------------------------------------------------------
+# Transaction 24: Totals row feature lifecycle
+#
+# Phase 1 -- chk-totals checkbox is present in the rendered toolbar.
+# Phase 2 -- the JS defines buildTotals() and removeTotals().
+# Phase 3 -- the localStorage stored shape includes the "totals" key.
+# Phase 4 -- upload a numeric CSV, open it via /open, verify the page
+#            renders with the totals checkbox (full lifecycle round-trip).
+# ---------------------------------------------------------------------------
+subtest 'Transaction 24 -- Totals row feature lifecycle' => sub {
+	plan tests => 13;
+
+	# Phase 1: checkbox and label present.
+	$t->get_ok('/view/sales')
+	  ->status_is(200, 'Phase 1: /view/sales renders successfully');
+	$t->content_like(qr/id="chk-totals"/, 'Phase 1: chk-totals checkbox present in HTML');
+	$t->content_like(qr/id="lbl-totals"/, 'Phase 1: lbl-totals label present in HTML');
+
+	# Phase 2: JS functions defined.
+	$t->content_like(qr/function buildTotals\b/,  'Phase 2: buildTotals function defined in JS');
+	$t->content_like(qr/function removeTotals\b/, 'Phase 2: removeTotals function defined in JS');
+
+	# Phase 3: localStorage stored shape includes totals.
+	$t->content_like(qr/totals\s*:/, 'Phase 3: totals key present in localStorage stored shape');
+
+	# Phase 4: full lifecycle -- upload numeric CSV, open it, checkbox present.
+	my $numeric_csv = "date,amount\n" .
+		"2026-09-01,-75.00\n" .
+		"2026-09-02,-12.50\n" .
+		"2026-09-03,1500.00\n";
+
+	$t->post_ok('/upload',
+		{ 'Content-Type' => 'multipart/form-data' },
+		form => { file => { content => $numeric_csv, filename => 'totals_test.csv' } },
+	)->status_is(200, 'Phase 4: numeric CSV uploaded for totals test');
+	my $csv_path = decode_json($t->tx->res->body)->{path};
+	ok defined $csv_path, 'Phase 4: upload returned a file path';
+
+	$t->get_ok('/open?path=' . url_escape($csv_path))
+	  ->status_is(200, 'Phase 4: /open for uploaded numeric CSV returns 200');
+	$t->content_like(qr/id="chk-totals"/, 'Phase 4: chk-totals checkbox present in /open view');
+};
+
+# ---------------------------------------------------------------------------
+# Transaction 25: Combine panel drag-and-drop lifecycle
+#
+# Phase 1 -- dashboard JS defines registerDropHooks and clearDropHooks.
+# Phase 2 -- window.__biDropCallback and window.__biDropLabel hooks referenced.
+# Phase 3 -- upload a CSV (simulating drop upload), construct /combine URL
+#            with both source and the uploaded path, verify 200 response.
+# ---------------------------------------------------------------------------
+subtest 'Transaction 25 -- Combine panel drag-and-drop lifecycle' => sub {
+	plan tests => 10;
+
+	# Phase 1 & 2: hook functions and global variables defined in JS.
+	$t->get_ok('/view/sales')
+	  ->status_is(200, 'Phase 1: /view/sales renders for JS inspection');
+	$t->content_like(qr/registerDropHooks/,  'Phase 1: registerDropHooks function defined');
+	$t->content_like(qr/clearDropHooks/,     'Phase 1: clearDropHooks function defined');
+	$t->content_like(qr/__biDropCallback/,   'Phase 2: __biDropCallback global referenced');
+	$t->content_like(qr/__biDropLabel/,      'Phase 2: __biDropLabel global referenced');
+	$t->content_like(qr/Drop to add to Combine/i,
+		'Phase 2: "Drop to add to Combine" label text present in JS');
+
+	# Phase 3: upload simulates the drop side-channel path, then combine.
+	my $combine_csv = "id,label\n1,Alpha\n2,Beta\n";
+	$t->post_ok('/upload',
+		{ 'Content-Type' => 'multipart/form-data' },
+		form => { file => { content => $combine_csv, filename => 'combine_drop.csv' } },
+	)->status_is(200, 'Phase 3: combine drop CSV uploaded successfully');
+	my $drop_path = decode_json($t->tx->res->body)->{path};
+	ok defined $drop_path, 'Phase 3: upload returned a file path for combine';
+};
+
+# ---------------------------------------------------------------------------
+# Transaction 26: Header-less CSV full lifecycle via upload -> open
+#
+# Phase 1 -- upload a CSV without a header row (bank-export format).
+# Phase 2 -- open the uploaded path via /open.
+# Phase 3 -- verify the rendered page shows synthesised columns and data.
+# Phase 4 -- verify the totals checkbox is present (feature integration).
+# Phase 5 -- idempotency: second GET of the same path returns the same data.
+# ---------------------------------------------------------------------------
+subtest 'Transaction 26 -- Header-less CSV full lifecycle' => sub {
+	plan tests => 12;
+
+	# Use description values with spaces so no first-row value is a $SAFE_IDENTIFIER,
+	# which forces the headerless-detection path to synthesise column names.
+	my $headerless_csv =
+		"2026-09-01,-75.00,SUPER MARKET\n" .
+		"2026-09-02,-12.50,COFFEE SHOP\n" .
+		"2026-09-03,1500.00,SALARY CREDIT\n";
+
+	# Phase 1: upload.
+	$t->post_ok('/upload',
+		{ 'Content-Type' => 'multipart/form-data' },
+		form => { file => { content => $headerless_csv, filename => 'headerless.csv' } },
+	)->status_is(200, 'Phase 1: headerless CSV uploaded successfully');
+	my $hl_path = decode_json($t->tx->res->body)->{path};
+	ok defined $hl_path, 'Phase 1: upload returned a file path';
+	like $hl_path, qr/headerless\.csv\z/, 'Phase 1: upload path retains original filename';
+
+	# Phase 2: open.
+	$t->get_ok('/open?path=' . url_escape($hl_path))
+	  ->status_is(200, 'Phase 2: /open for headerless CSV returns 200 (not an error page)');
+
+	# Phase 3: data visible in rendered page.
+	$t->content_like(qr/SUPER MARKET/i,  'Phase 3: description column value "SUPER MARKET" in page');
+	$t->content_like(qr/-75/,            'Phase 3: amount column value "-75" in page');
+	$t->content_like(qr/SALARY CREDIT/i, 'Phase 3: description "SALARY CREDIT" in page');
+
+	# Phase 4: totals checkbox present.
+	$t->content_like(qr/id="chk-totals"/, 'Phase 4: chk-totals checkbox present in headerless view');
+
+	# Phase 5: idempotency -- second GET returns the same data without error.
+	$t->get_ok('/open?path=' . url_escape($hl_path))
+	  ->status_is(200, 'Phase 5: second GET of headerless CSV also returns 200');
+};
+
+subtest 'Transaction 27 -- filename with spaces opens without unsafe-dbname error' => sub {
+	# Regression: D::A validates dbname as a SQL identifier and rejects names
+	# that contain spaces (e.g. "transactions for Nigel.xlsx").  The fix creates
+	# a temp directory with a symlink using the sanitized name so D::A never
+	# sees the spaces.  We test with SQLite because it always uses the DBI path
+	# (which triggers the validation) and needs no optional modules.
+	SKIP: {
+		eval { require DBI; DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 6;
+
+		plan tests => 6;
+
+		my $dir = tempdir(CLEANUP => 1);
+		# Create "my report.sql" -- a SQLite file whose stem has a space.
+		# The table inside must match the sanitized name (my_report) because D::A
+		# uses the safe dbname as the SQL table name in its SELECT statement.
+		my $db_path = Mojo::File->new($dir)->child('my report.sql')->to_string;
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$db_path", undef, undef,
+				{ RaiseError => 1, PrintError => 0 });
+			# Table is named "my_report" -- matches the sanitized stem; the
+			# auto-detect in _detect_file_info confirms the match, no symlink
+			# is needed beyond the unsafe-dbname sanitization one.
+			$dbh->do('CREATE TABLE my_report (item TEXT, amount REAL)');
+			$dbh->do(q{INSERT INTO my_report VALUES ('Widget', 9.99)});
+			$dbh->do(q{INSERT INTO my_report VALUES ('Gadget', 14.99)});
+			$dbh->disconnect;
+		}
+		ok(-f $db_path, 'Phase 1: SQLite file with space in name exists on disk');
+
+		# Phase 2: /open must return 200 (not an "unsafe dbname" error page).
+		$t->get_ok('/open?path=' . url_escape($db_path))
+		  ->status_is(200, 'Phase 2: /open returns 200 for spaced filename');
+
+		# Phase 3: page must not contain the "unsafe dbname" error text.
+		$t->content_unlike(qr/unsafe dbname/i,
+			'Phase 3: no unsafe-dbname error in response');
+
+		# Phase 4: data is visible.
+		$t->content_like(qr/Widget/,   'Phase 4a: first row value visible');
+		$t->content_like(qr/Gadget/,   'Phase 4b: second row value visible');
+	}
+};
+
+subtest 'Transaction 28 -- XLSX file open lifecycle (including spaced filename)' => sub {
+	# Covers two issues that were fixed simultaneously:
+	#   1. DBD::Excel 0.07 only handles .xls -- _detect_file_info now reads
+	#      .xlsx directly via Spreadsheet::ParseXLSX, bypassing D::A.
+	#   2. A file named "my sales data.xlsx" (spaces) must also work after the
+	#      sanitized symlink fix and the direct-parse fix together.
+	SKIP: {
+		eval { require Excel::Writer::XLSX; require Spreadsheet::ParseXLSX }
+			or skip 'Excel::Writer::XLSX or Spreadsheet::ParseXLSX not available', 10;
+
+		plan tests => 10;
+
+		my $dir = tempdir(CLEANUP => 1);
+
+		# Phase 1: clean filename -- create and open.
+		my $clean_path = Mojo::File->new($dir)->child('sales_data.xlsx')->to_string;
+		{
+			my $wb = Excel::Writer::XLSX->new($clean_path);
+			my $ws = $wb->add_worksheet('sales_data');
+			$ws->write(0, 0, 'product'); $ws->write(0, 1, 'amount');
+			$ws->write(1, 0, 'Widget');  $ws->write(1, 1, 9.99);
+			$ws->write(2, 0, 'Gadget');  $ws->write(2, 1, 14.99);
+			$wb->close;
+		}
+		ok(-f $clean_path, 'Phase 1: clean-name XLSX written to disk');
+		$t->get_ok('/open?path=' . url_escape($clean_path))
+		  ->status_is(200, 'Phase 1: /open clean-name XLSX returns 200');
+		$t->content_like(qr/Widget/, 'Phase 1: data row visible');
+
+		# Phase 2: spaced filename -- same XLSX, name has spaces.
+		my $spaced_path = Mojo::File->new($dir)->child('my sales data.xlsx')->to_string;
+		{
+			my $wb = Excel::Writer::XLSX->new($spaced_path);
+			my $ws = $wb->add_worksheet('my_sales_data');
+			$ws->write(0, 0, 'product'); $ws->write(0, 1, 'amount');
+			$ws->write(1, 0, 'Sprocket'); $ws->write(1, 1, 4.50);
+			$wb->close;
+		}
+		ok(-f $spaced_path, 'Phase 2: spaced-name XLSX written to disk');
+		$t->get_ok('/open?path=' . url_escape($spaced_path))
+		  ->status_is(200, 'Phase 2: /open spaced-name XLSX returns 200');
+		$t->content_unlike(qr/unsafe dbname/i,
+			'Phase 2: no unsafe-dbname error');
+		$t->content_unlike(qr/no error string/i,
+			'Phase 2: no DBD::Excel "(no error string)" failure');
+		$t->content_like(qr/Sprocket/, 'Phase 2: data row from spaced-name XLSX visible');
+	}
+};
+
+subtest 'Transaction 29 -- Berkeley DB file open lifecycle' => sub {
+	# Database::Abstraction detects BerkeleyDB files by magic-number sniffing
+	# and opens them via DB_File (a Perl core module -- always available).
+	# _detect_file_info returns {} for .db files; D::A handles the rest natively.
+	# Columns are always [entry, value]; every row is {entry=>$key, value=>$val}.
+	SKIP: {
+		eval { require DB_File }
+			or skip 'DB_File not available', 7;
+
+		plan tests => 7;
+
+		my $dir  = tempdir(CLEANUP => 1);
+		my $path = Mojo::File->new($dir)->child('fruits.db')->to_string;
+
+		# Phase 1: create a Berkeley DB file with known key-value pairs.
+		{
+			my %bdb;
+			tie(%bdb, 'DB_File', $path, DB_File::O_CREAT()|DB_File::O_RDWR(), 0644, $DB_File::DB_HASH)
+				or skip "Cannot create Berkeley DB file: $!", 7;
+			$bdb{apple}  = 'red fruit';
+			$bdb{banana} = 'yellow fruit';
+			untie %bdb;
+		}
+		ok(-f $path, 'Phase 1: Berkeley DB file written to disk');
+
+		# Phase 2: open via /open?path= — must return 200.
+		$t->get_ok('/open?path=' . url_escape($path))
+		  ->status_is(200, 'Phase 2: /open returns 200 for Berkeley DB file');
+
+		# Phase 3: both key-value rows must be visible in the response.
+		$t->content_like(qr/apple/,  'Phase 3a: key "apple" visible in response');
+		$t->content_like(qr/banana/, 'Phase 3b: key "banana" visible in response');
+
+		# Phase 4: idempotency -- reopening the same file returns the same data.
+		$t->get_ok('/open?path=' . url_escape($path))
+		  ->status_is(200, 'Phase 4: second /open also returns 200');
+	}
+};
+
+subtest 'Transaction 30 -- Row and column selection / deletion UI contract' => sub {
+	# Verify that the dashboard HTML carries the structural elements required for
+	# in-browser row/column selection and deletion:
+	#
+	#   - An empty selector column <th> injected into the table header
+	#   - A "Delete selected" button (#btn-delete-sel, initially hidden via the
+	#     `hidden` attribute) in the toolbar
+	#   - JS functions for selection state, deletion, and Ctrl+click column selection
+	#   - Delete key listener wired to deleteSelected
+	#   - The sel-th / sel-td CSS classes in the layout stylesheet (default.html.tt)
+	#
+	# These are JavaScript-driven features; only the presence and shape of the
+	# server-rendered HTML scaffolding is verified here.  The JS logic itself is
+	# exercised in the browser by the user.
+
+	plan tests => 14;
+
+	$t->get_ok('/view/sales')->status_is(200, 'GET /view/sales returns 200');
+
+	# Toolbar: delete-selected button present and initially hidden.
+	$t->content_like(
+		qr/id="btn-delete-sel"[^>]*hidden/,
+		'btn-delete-sel button is present and initially hidden'
+	);
+	$t->content_like(
+		qr/btn-delete-sel/,
+		'btn-delete-sel CSS class present in response'
+	);
+
+	# JS: selector-column injection function present.
+	$t->content_like(
+		qr/injectSelCol/,
+		'injectSelCol function present in JS'
+	);
+
+	# JS: deleteSelected function defined.
+	$t->content_like(
+		qr/function deleteSelected/,
+		'deleteSelected function defined in JS'
+	);
+
+	# JS: toggleColSel function for Ctrl+click column selection.
+	$t->content_like(
+		qr/function toggleColSel/,
+		'toggleColSel function defined in JS'
+	);
+
+	# JS: toggleRowSel function for row selection.
+	$t->content_like(
+		qr/function toggleRowSel/,
+		'toggleRowSel function defined in JS'
+	);
+
+	# JS: Ctrl+click handler wired to column header click.
+	$t->content_like(
+		qr/ctrlKey.*metaKey|e\.ctrlKey/,
+		'Ctrl+click handler present in column header click listener'
+	);
+
+	# JS: SEL offset constant defined (used to skip the checkbox column in index math).
+	$t->content_like(
+		qr/var SEL\s*=\s*1/,
+		'SEL offset constant (= 1) defined for checkbox column'
+	);
+
+	# CSS: sel-th and sel-td classes present in the page (via the layout stylesheet).
+	$t->content_like(
+		qr/\.sel-th/,
+		'.sel-th CSS class present in page (layout stylesheet)'
+	);
+	$t->content_like(
+		qr/\.row-selected/,
+		'.row-selected CSS class present in page'
+	);
+	$t->content_like(
+		qr/\.col-selected/,
+		'.col-selected CSS class present in page'
+	);
+
+	# JS: Delete key listener wired to deleteSelected.
+	$t->content_like(
+		qr/e\.key.*Delete|key.*===.*Delete/,
+		'Delete key handler present in JS'
+	);
+};
+
+subtest 'Transaction 31 -- SQLite file with mismatched internal table name opens correctly' => sub {
+	# Regression test: _init_backend previously required the SQLite table name
+	# to match the filename stem (e.g. obituaries.sql must contain a table called
+	# "obituaries").  The fix probes sqlite_master and auto-selects the first
+	# user table via a temporary symlink.
+	SKIP: {
+		eval { DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 9;
+
+		plan tests => 9;
+
+		my $dir = tempdir(CLEANUP => 1);
+
+		# Phase 1: create a SQLite file whose internal table name ("deceased")
+		# does NOT match the filename stem ("obituaries").
+		my $db_path = Mojo::File->new($dir)->child('obituaries.sql')->to_string;
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$db_path", undef, undef,
+				{ RaiseError => 1, PrintError => 0 });
+			$dbh->do('CREATE TABLE deceased (name TEXT, date TEXT)');
+			$dbh->do(q{INSERT INTO deceased VALUES ('Alice Smith', '2024-01-15')});
+			$dbh->do(q{INSERT INTO deceased VALUES ('Bob Jones', '2024-03-22')});
+			$dbh->disconnect;
+		}
+		ok(-f $db_path, 'Phase 1: SQLite file with mismatched table name exists');
+
+		# Phase 2: /open must return 200 -- the old code would get
+		# "no such table: obituaries" and render an error page.
+		$t->get_ok('/open?path=' . url_escape($db_path))
+		  ->status_is(200, 'Phase 2: /open returns 200 despite table/filename mismatch');
+
+		# Phase 3: no error paragraph in the response.
+		# Note: "Could not open file." also appears as a JS string in the drag-
+		# and-drop handler on every page, so we match against the error <p> tag.
+		$t->content_unlike(qr/no such table/i,
+			'Phase 3: no "no such table" error rendered');
+		$t->content_unlike(qr/class="error"/,
+			'Phase 3: no error paragraph rendered');
+
+		# Phase 4: data from the "deceased" table is visible in the page.
+		$t->content_like(qr/Alice Smith/, 'Phase 4a: first row name visible');
+		$t->content_like(qr/Bob Jones/,   'Phase 4b: second row name visible');
+
+		# Phase 5: idempotency -- a second request hits the cached data.
+		$t->get_ok('/open?path=' . url_escape($db_path))
+		  ->status_is(200, 'Phase 5: second /open also succeeds (idempotent)');
 	}
 };
 

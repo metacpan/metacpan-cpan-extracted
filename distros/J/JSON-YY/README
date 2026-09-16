@@ -52,10 +52,21 @@ FUNCTIONAL API
         "decode_json" for medium/large documents. Modification attempts
         croak.
 
-    When imported via qw(), these compile to custom ops via
-    XS::Parse::Keyword, bypassing normal function dispatch. Keywords are
-    lexically scoped. The "-flag" import style installs pre-configured
-    closures instead (not compiled as keywords).
+    is_bool $value
+        Returns true if $value is a recognized boolean object
+        ("JSON::PP::Boolean", "boolean", "Types::Serialiser::BooleanBase",
+        "JSON::XS::Boolean") or, on perl 5.36 and later, a core boolean such
+        as "!!1".
+
+    true, false
+        Return $JSON::PP::true and $JSON::PP::false singleton boolean
+        objects.
+
+    When imported via qw(), "encode_json", "decode_json" and
+    "decode_json_ro" compile to custom ops via XS::Parse::Keyword, bypassing
+    normal function dispatch. Keywords are lexically scoped. The "-flag"
+    import style installs pre-configured closures instead (not compiled as
+    keywords).
 
 OO API
         my $coder = JSON::YY->new(utf8 => 1, pretty => 1);
@@ -64,7 +75,7 @@ OO API
     new(%options)
         Create a new encoder/decoder. Options: "utf8", "pretty",
         "canonical", "allow_nonref", "allow_unknown", "allow_blessed",
-        "convert_blessed", "max_depth". ("canonical" is accepted for
+        "convert_blessed", "max_depth", "bool". ("canonical" is accepted for
         JSON::XS compatibility but is currently a no-op; see "LIMITATIONS".)
 
         By default "allow_nonref" is on and every other flag is off, so a
@@ -87,8 +98,14 @@ OO API
         materialization). Can then use Doc API keywords on the result.
 
     utf8, pretty, canonical, allow_nonref, allow_unknown, allow_blessed,
-    convert_blessed
+    convert_blessed, bool
         Boolean setters, return $self for chaining.
+
+        "bool" (alias "boolean", "boolean_object") enables decoding JSON
+        "true" and "false" as "JSON::PP::Boolean" objects (compatible with
+        JSON::PP, JSON::XS, and Cpanel::JSON::XS) instead of the default 1/0
+        Perl scalars. The import form is "use JSON::YY -utf8, -bool": like
+        any "-flag", "-bool" on its own leaves "utf8" off.
 
         "convert_blessed" calls a blessed object's "TO_JSON" method when the
         class has one; when it does not, encoding falls back to the
@@ -433,12 +450,16 @@ LIMITATIONS
         a document that deep -- but if you construct documents by unbounded
         repeated nesting, serialise rather than clone or compare them.
 
-    *   JSON "true"/"false" decode to the Perl scalars 1/0 (correct in
-        boolean context), not to overloaded boolean objects. To encode a
-        JSON boolean, pass a scalar ref ("\1" for true, "\0" for false) or
-        use "jbool" in the Doc API. Consequently
-        "encode_json(decode_json('[true,false]'))" yields "[1,0]", not
-        "[true,false]".
+    *   By default, JSON "true"/"false" decode to the Perl scalars 1/0
+        (correct in boolean context), not to overloaded boolean objects. To
+        decode JSON booleans as "JSON::PP::Boolean" objects, enable "bool =>
+        1" on the coder ("JSON::YY->new(bool => 1)") or use "use JSON::YY
+        -utf8, -bool". To encode a JSON boolean, pass a boolean object
+        ("JSON::PP::Boolean", "boolean.pm", "Types::Serialiser"), a scalar
+        ref ("\1" for true, "\0" for false), or use "jbool" in the Doc API.
+        Under default settings, "encode_json(decode_json('[true,false]'))"
+        yields "[1,0]", not "[true,false]"; with "-bool" or "bool => 1", it
+        round-trips as "[true,false]".
 
 COOKBOOK
   Read config, modify, write back

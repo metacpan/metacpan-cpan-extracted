@@ -1,0 +1,111 @@
+#!perl
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config bundling no_ignore_case);
+
+use Game::Dominoes;
+use Game::Dominoes::Bot;
+use Game::Dominoes::Terminal;
+
+my %opt = (players => 2, seat => 1, level => [], variant => 'all_fives');
+
+GetOptions(
+	'players=i'   => \$opt{players},
+	'seat=i'      => \$opt{seat},
+	'hotseat'     => \$opt{hotseat},
+	'bot-vs-bot'  => \$opt{botonly},
+	'level=i@'    => $opt{level},
+	'target=i'    => \$opt{target},
+	'scale=i'     => \$opt{scale},
+	'variant=s'   => \$opt{variant},
+	'seed=s'      => \$opt{seed},
+	'reserve=i'   => \$opt{reserve},
+	'ascii'       => \$opt{ascii},
+	'compact'     => \$opt{compact},
+	'width=i'     => \$opt{width},
+	'colour!'     => \$opt{colour},
+	'color!'      => \$opt{colour},
+	'version'     => \$opt{version},
+	'help|h|?'    => \$opt{help},
+) or usage(2);
+
+usage(0) if $opt{help};
+
+if ($opt{version}) {
+	print "dominoes (Game::Dominoes) $Game::Dominoes::VERSION\n";
+	exit 0;
+}
+
+die "--players must be 2, 3 or 4\n" unless $opt{players} =~ /\A[234]\z/;
+die "--seat must be a seat from 1 to $opt{players}\n"
+	unless $opt{seat} >= 1 && $opt{seat} <= $opt{players};
+
+my $seed = defined $opt{seed}
+	? substr(($opt{seed} x 32), 0, 32)
+	: pack('N8', map { int rand 2**32 } 1 .. 8);
+
+my $game = Game::Dominoes->new(
+	seed    => $seed,
+	players => $opt{players},
+	variant => $opt{variant},
+	(defined $opt{target}  ? (target  => $opt{target})  : ()),
+	(defined $opt{scale}   ? (scale   => $opt{scale})   : ()),
+	(defined $opt{reserve} ? (reserve => $opt{reserve}) : ()),
+);
+
+my @bot_seats =
+	  $opt{hotseat} ? ()
+	: $opt{botonly} ? ($game->seats)
+	:                 (grep { $_ != $opt{seat} } $game->seats);
+
+my @levels = @{ $opt{level} };
+my %bots;
+my $i = 0;
+for my $seat (@bot_seats) {
+	my $level = $levels[$i] // $levels[-1] // 3;
+	$bots{$seat} = Game::Dominoes::Bot->new(level => $level, seed => $seat * 7919);
+	$i++;
+}
+
+my $result = Game::Dominoes::Terminal->new(
+	game => $game,
+	bots => \%bots,
+	(defined $opt{colour} ? (colour => $opt{colour}) : ()),
+	($opt{ascii} ? (ascii => 1) : ()),
+	($opt{compact} ? (compact => 1) : ()),
+	(defined $opt{width} ? (width => $opt{width}) : ()),
+)->start;
+
+exit($result ? 0 : 1);
+
+sub usage {
+	my ($status) = @_;
+	print <<'USAGE';
+dominoes - draw dominoes with All Fives scoring
+
+  dominoes [options]
+
+  --players=N      2, 3 or 4 (default 2)
+  --seat=N         which seat the human takes (default 1)
+  --hotseat        every seat is a person, with a hand-over between turns
+  --bot-vs-bot     nobody is a person
+  --level=N        bot level 1 to 5, repeatable, one per bot seat
+  --target=N       default 250 at two seats, 200 at three or four
+  --scale=N        divide every score, for the cribbage board variation
+                   (use --scale=5 --target=61 together, never one alone)
+  --variant=S      all_fives, draw or block
+  --reserve=N      tiles at the back of the boneyard nobody may draw
+  --seed=S         reproduce a game exactly
+  --ascii          plain ASCII only
+  --compact        tiles as [6|4] on one line instead of drawn
+  --width=N        what the drawn table may use before it wraps (default 80)
+  --colour         force colour on or off (--nocolour)
+  --version        print the version
+  --help           this
+
+  Arms are L and R along the main line, U and D off the spinner.
+USAGE
+	exit $status;
+}

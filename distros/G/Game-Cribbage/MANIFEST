@@ -37,6 +37,7 @@ t/12-player-hand-coverage.t
 t/13-play-coverage.t
 t/14-round-hands-coverage.t
 t/15-cribbage-coverage.t
+t/16-fixes-0.15.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

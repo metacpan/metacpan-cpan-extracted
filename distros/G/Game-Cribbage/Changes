@@ -1,5 +1,14 @@
 Revision history for Game-Cribbage
 
+0.15    2026-09-13
+        - FIXES: a card that makes exactly 31 is playable; cannot_play_a_card and next_play refused it.
+        - FIXES: play_card returns an Error for a card not held or already played, instead of dying.
+        - FIXES: Score missed a run of face cards given in ascending order.
+        - FIXES: Score counted a flush the starter completed; a crib flush needs all five.
+        - FIXES: identify_worst_cards returned all six cards when no four scored.
+        - FIXES: his heels (a jack turned as the starter) pegs two, not one.
+        - Deck->from_order installs a deck in a given order of card ids.
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

@@ -51,6 +51,14 @@ typedef void (*fz_leaf_fn)(void *ud, const char **segs, const uint32_t *lens,
  * either. FZ_F_LOSSY_NV is 1, so a caller that used to pass 1 means what it
  * always meant.
  *
+ * FZ_F_LOSSY_NV accepts an NV a double cannot hold: one past DBL_MAX, stored
+ * as an infinity, and a non-zero one under the smallest denormal, stored as a
+ * zero. It does NOT govern rounding. A block holds a double, so on a perl
+ * whose NV is wider - uselongdouble, usequadmath - every NV rounds on the way
+ * in, with or without this flag; refusing that would refuse 0.1 on those
+ * perls. Before 0.07 the flag governed rounding too, and without it those
+ * perls refused nearly every NV they were given.
+ *
  * FZ_F_STRINGIFY stores every defined non-reference scalar as its STRING
  * form, whatever Perl thinks it is. A reader that returns text - a
  * translation catalogue, a config of labels - otherwise has to bridge the

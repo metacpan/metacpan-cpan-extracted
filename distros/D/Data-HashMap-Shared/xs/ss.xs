@@ -5,23 +5,23 @@ SV*
 new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0, UV file_mode = 0600)
     CODE:
         CK_U32(max_entries, "max_entries", "Data::HashMap::Shared::SS"); CK_U32(lru_max, "lru_max", "Data::HashMap::Shared::SS"); CK_U32(ttl_default, "ttl_default", "Data::HashMap::Shared::SS"); CK_U32(lru_skip, "lru_skip", "Data::HashMap::Shared::SS");
-        char errbuf[SHM_ERR_BUFLEN]; const char* path = SHM_PATH_ARG(path_sv, "path", "Data::HashMap::Shared::SS"); ShmHandle* map = shm_ss_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, (mode_t)file_mode, errbuf);
+        char errbuf[SHM_ERR_BUFLEN]; const char* path = SHM_WRITE_PATH_ARG(path_sv, "path", "Data::HashMap::Shared::SS", "new"); ShmHandle* map = shm_ss_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, (mode_t)file_mode, errbuf);
         if (!map) croak("Data::HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
-        CK_MAX_SIZE(map, "Data::HashMap::Shared::SS");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+        CK_MAX_SIZE(map, "Data::HashMap::Shared::SS", RETVAL);
     OUTPUT:
         RETVAL
 
 SV*
 new_sharded(char* class, SV* path_prefix_sv, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0, UV arena_cap = 0, UV file_mode = 0600)
     CODE:
-        const char* path_prefix = SHM_PATH_ARG(path_prefix_sv, "path prefix", "Data::HashMap::Shared::SS");
+        const char* path_prefix = SHM_WRITE_PATH_ARG(path_prefix_sv, "path prefix", "Data::HashMap::Shared::SS", "new_sharded");
         CK_U32(max_entries, "max_entries", "Data::HashMap::Shared::SS"); CK_U32(lru_max, "lru_max", "Data::HashMap::Shared::SS"); CK_U32(ttl_default, "ttl_default", "Data::HashMap::Shared::SS"); CK_U32(lru_skip, "lru_skip", "Data::HashMap::Shared::SS");
         CK_U32(num_shards, "num_shards", "Data::HashMap::Shared::SS");
         char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_ss_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, (mode_t)file_mode, errbuf);
         if (!map) croak("Data::HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
-        CK_MAX_SIZE(map, "Data::HashMap::Shared::SS");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+        CK_MAX_SIZE(map, "Data::HashMap::Shared::SS", RETVAL);
     OUTPUT:
         RETVAL
 
@@ -34,8 +34,8 @@ new_memfd(char* class, SV* name_sv, UV max_entries, UV lru_max = 0, UV ttl_defau
         CK_U32(max_entries, "max_entries", "Data::HashMap::Shared::SS"); CK_U32(lru_max, "lru_max", "Data::HashMap::Shared::SS"); CK_U32(ttl_default, "ttl_default", "Data::HashMap::Shared::SS"); CK_U32(lru_skip, "lru_skip", "Data::HashMap::Shared::SS");
         ShmHandle* map = shm_ss_create_memfd(name, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, (uint64_t)arena_cap, errbuf);
         if (!map) croak("Data::HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
-        CK_MAX_SIZE(map, "Data::HashMap::Shared::SS");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+        CK_MAX_SIZE(map, "Data::HashMap::Shared::SS", RETVAL);
     OUTPUT:
         RETVAL
 
@@ -43,10 +43,11 @@ SV*
 new_from_fd(char* class, int fd)
     CODE:
         char errbuf[SHM_ERR_BUFLEN];
+        SHM_TAINT_CHECK("Data::HashMap::Shared::SS->new_from_fd");
         ShmHandle* map = shm_ss_open_fd(fd, errbuf);
         if (!map) croak("Data::HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
-        CK_MAX_SIZE(map, "Data::HashMap::Shared::SS");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+        CK_MAX_SIZE(map, "Data::HashMap::Shared::SS", RETVAL);
     OUTPUT:
         RETVAL
 
@@ -66,7 +67,7 @@ void
 freeze(SV* self_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS->freeze: cannot freeze a read-only handle");
+        if (h->readonly || shm_is_fully_sealed(h)) croak("Data::HashMap::Shared::SS->freeze: map is frozen (read-only)");
         if (shm_freeze(h) != 0) croak("Data::HashMap::Shared::SS->freeze: msync: %s", strerror(errno));
         shm_mark_readonly(h);
 
@@ -74,7 +75,7 @@ UV
 frozen(SV* self_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)((h->shard_handles ? h->shard_handles[0]->hdr->sealed : h->hdr->sealed) ? 1 : 0);
+        RETVAL = (UV)shm_is_sealed(h);
     OUTPUT:
         RETVAL
 
@@ -116,6 +117,7 @@ put(SV* self_sv, SV* key_sv, SV* value)
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         EXTRACT_STR_KEY(key_sv);
+        SHM_COPY_IF_MAGICAL(key_sv, _kstr, _klen);
         EXTRACT_STR_VAL(value);
         REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         RETVAL = shm_ss_put(h, _kstr, (uint32_t)_klen, _kutf8, _vstr, (uint32_t)_vlen, _vutf8);
@@ -129,36 +131,52 @@ set_multi(SV* self_sv, ...)
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         if ((items - 1) % 2 != 0) croak("set_multi requires even number of arguments (key, value pairs)");
         uint32_t count = 0;
+        /* Value first (copied if get-magical), key last: reading the key may run
+         * the value's FETCH.  A key's FETCH or overload that rewrites a plain
+         * value scalar can still dangle _vs. */
         if (h->shard_handles) {
             for (int i = 1; i < items; i += 2) {
-                /* Both key and value are PV args and only one can be captured
-                 * last: resolve the value first, capture the key last, and use
-                 * SvPV (not SvPV_nomg) so overload dispatch still runs.  A key
-                 * whose own overload mutates the value scalar can still dangle
-                 * _vs; closing that would need a copy. */
                 STRLEN _vl; const char *_vs = SvPV(ST(i+1), _vl);
                 bool _vu = SvUTF8(ST(i+1)) ? 1 : 0;
+                if (_vl > SHM_MAX_STR_LEN) croak("value too long (max 1GB)");
+                SHM_COPY_IF_MAGICAL(ST(i+1), _vs, _vl);
                 REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
                 STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
                 bool _ku = SvUTF8(ST(i)) ? 1 : 0;
-                REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
                 if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
-                if (_vl > SHM_MAX_STR_LEN) croak("value too long (max 1GB)");
+                REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
                 count += shm_ss_put(h, _ks, (uint32_t)_kl, _ku, _vs, (uint32_t)_vl, _vu);
             }
         } else {
-            WRSEQ_GUARD(h);
-            for (int i = 1; i < items; i += 2) {
-                STRLEN _vl; const char *_vs = SvPV(ST(i+1), _vl);
-                bool _vu = SvUTF8(ST(i+1)) ? 1 : 0;
-                if (_vl > SHM_MAX_STR_LEN) croak("value too long (max 1GB)");
-                REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-                STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
-                bool _ku = SvUTF8(ST(i)) ? 1 : 0;
-                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
-                REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-                count += shm_ss_put_inner(h, _ks, (uint32_t)_kl, _ku, _vs, (uint32_t)_vl, _vu, SHM_TTL_USE_DEFAULT);
+            /* Materialize every argument before the lock: SvPV runs a tied
+             * FETCH or overload, which must not run under the write lock, or a
+             * callback that re-enters this map self-deadlocks it.  Both key and
+             * value are copied if get-magical (each is held past later FETCHes
+             * here); a plain scalar is held by pointer, as the single-key path
+             * does. */
+            int _n = (items - 1) / 2;
+            const char **_ks, **_vs; STRLEN *_kl, *_vl; bool *_ku, *_vu;
+            Newx(_ks, _n ? _n : 1, const char *); SAVEFREEPV(_ks);
+            Newx(_kl, _n ? _n : 1, STRLEN);       SAVEFREEPV(_kl);
+            Newx(_ku, _n ? _n : 1, bool);         SAVEFREEPV(_ku);
+            Newx(_vs, _n ? _n : 1, const char *); SAVEFREEPV(_vs);
+            Newx(_vl, _n ? _n : 1, STRLEN);       SAVEFREEPV(_vl);
+            Newx(_vu, _n ? _n : 1, bool);         SAVEFREEPV(_vu);
+            for (int i = 1, j = 0; i < items; i += 2, j++) {
+                STRLEN _l; const char *_p;
+                _p = SvPV(ST(i+1), _l);
+                if (_l > SHM_MAX_STR_LEN) croak("value too long (max 1GB)");
+                SHM_COPY_IF_MAGICAL(ST(i+1), _p, _l);
+                _vs[j] = _p; _vl[j] = _l; _vu[j] = SvUTF8(ST(i+1)) ? 1 : 0;
+                _p = SvPV(ST(i), _l);
+                if (_l > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
+                SHM_COPY_IF_MAGICAL(ST(i), _p, _l);
+                _ks[j] = _p; _kl[j] = _l; _ku[j] = SvUTF8(ST(i)) ? 1 : 0;
             }
+            REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+            WRSEQ_GUARD(h);
+            for (int j = 0; j < _n; j++)
+                count += shm_ss_put_inner(h, _ks[j], (uint32_t)_kl[j], _ku[j], _vs[j], (uint32_t)_vl[j], _vu[j], SHM_TTL_USE_DEFAULT);
         }
         RETVAL = count;
     OUTPUT:
@@ -179,14 +197,21 @@ remove_multi(SV* self_sv, ...)
                 count += shm_ss_remove(h, _ks, (uint32_t)_kl, _ku);
             }
         } else {
-            WRSEQ_GUARD(h);
-            for (int i = 1; i < items; i++) {
-                STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
-                bool _ku = SvUTF8(ST(i)) ? 1 : 0;
-                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
-                REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-                count += shm_ss_remove_inner(h, _ks, (uint32_t)_kl, _ku);
+            int _n = items - 1;
+            const char **_ks; STRLEN *_kl; bool *_ku;
+            Newx(_ks, _n ? _n : 1, const char *); SAVEFREEPV(_ks);
+            Newx(_kl, _n ? _n : 1, STRLEN);       SAVEFREEPV(_kl);
+            Newx(_ku, _n ? _n : 1, bool);         SAVEFREEPV(_ku);
+            for (int i = 1, j = 0; i < items; i++, j++) {
+                STRLEN _l; const char *_p = SvPV(ST(i), _l);
+                if (_l > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
+                SHM_COPY_IF_MAGICAL(ST(i), _p, _l);
+                _ks[j] = _p; _kl[j] = _l; _ku[j] = SvUTF8(ST(i)) ? 1 : 0;
             }
+            REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+            WRSEQ_GUARD(h);
+            for (int j = 0; j < _n; j++)
+                count += shm_ss_remove_inner(h, _ks[j], (uint32_t)_kl[j], _ku[j]);
             if (count) shm_ss_maybe_shrink(h);
         }
         RETVAL = count;
@@ -220,16 +245,25 @@ get_multi(SV* self_sv, ...)
             char *arena = h->arena;
             uint64_t arena_cap = h->hdr->arena_cap;
             uint32_t now = h->expires_at ? shm_now() : 0;
+            /* Materialize the keys before the lock: SvPV runs a tied FETCH or
+             * overload, which must not run under the read lock, or a key that
+             * re-enters this map with a write self-deadlocks it.  A magical key
+             * is copied; a plain one is held by pointer. */
+            const char **keys; STRLEN *klens; bool *kutf8;
+            Newx(keys,  nkeys, const char *); SAVEFREEPV(keys);
+            Newx(klens, nkeys, STRLEN);       SAVEFREEPV(klens);
+            Newx(kutf8, nkeys, bool);         SAVEFREEPV(kutf8);
+            for (int i = 0; i < nkeys; i++) {
+                STRLEN _l; const char *_p = SvPV(ST(i + 1), _l);
+                if (_l > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
+                SHM_COPY_IF_MAGICAL(ST(i + 1), _p, _l);
+                keys[i] = _p; klens[i] = _l; kutf8[i] = SvUTF8(ST(i + 1)) ? 1 : 0;
+            }
+            REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
             RDLOCK_GUARD(h);
             uint32_t mask = hdr->table_cap - 1;
             for (int i = 0; i < nkeys; i++) {
-                STRLEN _kl; const char *_ks = SvPV(ST(i + 1), _kl);
-                bool _ku = SvUTF8(ST(i + 1)) ? 1 : 0;
-                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
-                /* The hoisted hdr/nodes/states/arena survive this magic:
-                 * RDLOCK_GUARD holds a lock and shm_close_map defers the free
-                 * while lock_depth > 0. */
-                REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+                const char *_ks = keys[i]; STRLEN _kl = klens[i]; bool _ku = kutf8[i];
                 uint32_t hash = shm_hash_string(_ks, (uint32_t)_kl);
                 uint32_t pos = hash & mask;
                 uint8_t tag = SHM_MAKE_TAG(hash);
@@ -255,10 +289,8 @@ get_multi(SV* self_sv, ...)
                     if (SHM_UNPACK_UTF8(nodes[vidx].val_len)) SvUTF8_on(sv);
                     mPUSHs(sv);
                 } else PUSHs(&PL_sv_undef);
-                /* Prefetch next key's probe start */
                 if (i + 1 < nkeys) {
-                    STRLEN nkl; const char *nks = SvPV(ST(i + 2), nkl);
-                    uint32_t nh = shm_hash_string(nks, (uint32_t)nkl);
+                    uint32_t nh = shm_hash_string(keys[i + 1], (uint32_t)klens[i + 1]);
                     __builtin_prefetch(&states[nh & mask], 0, 0);
                 }
             }
@@ -297,7 +329,7 @@ stats(SV* self_sv)
         hv_store(hv, "recoveries", 10, newSVuv(shm_ss_stat_recoveries(h)), 0);
         hv_store(hv, "max_size", 8, newSVuv(shm_ss_max_size(h)), 0);
         hv_store(hv, "ttl", 3, newSVuv(shm_ss_ttl(h)), 0);
-        hv_store(hv, "frozen", 6, newSVuv((UV)((h->shard_handles ? h->shard_handles[0]->hdr->sealed : h->hdr->sealed) ? 1 : 0)), 0);
+        hv_store(hv, "frozen", 6, newSVuv((UV)shm_is_sealed(h)), 0);
         hv_store(hv, "readonly", 8, newSVuv((UV)(h->readonly ? 1 : 0)), 0);
         RETVAL = newRV_noinc((SV*)hv);
     OUTPUT:
@@ -333,6 +365,7 @@ put_ttl(SV* self_sv, SV* key_sv, SV* value, UV ttl_sec)
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         CK_U32(ttl_sec, "ttl", "Data::HashMap::Shared::SS");
         EXTRACT_STR_KEY(key_sv);
+        SHM_COPY_IF_MAGICAL(key_sv, _kstr, _klen);
         EXTRACT_STR_VAL(value);
         REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         REQUIRE_TTL(h);
@@ -553,6 +586,7 @@ get_or_set(SV* self_sv, SV* key_sv, SV* default_sv)
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         EXTRACT_STR_KEY(key_sv);
+        SHM_COPY_IF_MAGICAL(key_sv, _kstr, _klen);
         const char *out_str; uint32_t out_len; bool out_utf8;
         EXTRACT_STR_VAL(default_sv);
         REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
@@ -658,6 +692,7 @@ drain(SV* self_sv, UV limit)
         {
             UV avail = (UV)shm_ss_size(h);
             if (limit > avail) limit = avail;
+            if (limit > UINT32_MAX) limit = UINT32_MAX;
         }
         if (limit == 0) XSRETURN_EMPTY;
         shm_ss_drain_entry *entries;
@@ -668,7 +703,7 @@ drain(SV* self_sv, UV limit)
         uint32_t n = shm_ss_drain(h, (uint32_t)limit, entries, &buf, &buf_cap);
         if (buf) SAVEDESTRUCTOR_X(shm_free_cleanup, buf);
 
-        EXTEND(SP, n * 2);
+        EXTEND(SP, (SSize_t)n * 2);
         for (uint32_t i = 0; i < n; i++) {
             SV *ksv = newSVpvn(buf + entries[i].key_off, entries[i].key_len);
             if (entries[i].key_utf8) SvUTF8_on(ksv);
@@ -754,6 +789,15 @@ stat_recoveries(SV* self_sv)
         RETVAL
 
 UV
+compact(SV* self_sv)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+        if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
+        RETVAL = (UV)shm_ss_compact(h);
+    OUTPUT:
+        RETVAL
+
+UV
 arena_used(SV* self_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
@@ -775,6 +819,7 @@ add(SV* self_sv, SV* key_sv, SV* val_sv)
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         EXTRACT_STR_KEY(key_sv);
+        SHM_COPY_IF_MAGICAL(key_sv, _kstr, _klen);
         EXTRACT_STR_VAL(val_sv);
         REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         RETVAL = shm_ss_add(h, _kstr, (uint32_t)_klen, _kutf8, _vstr, (uint32_t)_vlen, _vutf8);
@@ -788,6 +833,7 @@ add_ttl(SV* self_sv, SV* key_sv, SV* val_sv, UV ttl_sec)
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         CK_U32(ttl_sec, "ttl", "Data::HashMap::Shared::SS");
         EXTRACT_STR_KEY(key_sv);
+        SHM_COPY_IF_MAGICAL(key_sv, _kstr, _klen);
         EXTRACT_STR_VAL(val_sv);
         REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         REQUIRE_TTL(h);
@@ -802,6 +848,7 @@ update(SV* self_sv, SV* key_sv, SV* val_sv)
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         EXTRACT_STR_KEY(key_sv);
+        SHM_COPY_IF_MAGICAL(key_sv, _kstr, _klen);
         EXTRACT_STR_VAL(val_sv);
         REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         RETVAL = shm_ss_update(h, _kstr, (uint32_t)_klen, _kutf8, _vstr, (uint32_t)_vlen, _vutf8);
@@ -815,6 +862,7 @@ update_ttl(SV* self_sv, SV* key_sv, SV* val_sv, UV ttl_sec)
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         CK_U32(ttl_sec, "ttl", "Data::HashMap::Shared::SS");
         EXTRACT_STR_KEY(key_sv);
+        SHM_COPY_IF_MAGICAL(key_sv, _kstr, _klen);
         EXTRACT_STR_VAL(val_sv);
         REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         REQUIRE_TTL(h);
@@ -828,6 +876,7 @@ swap(SV* self_sv, SV* key_sv, SV* val_sv)
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         EXTRACT_STR_KEY(key_sv);
+        SHM_COPY_IF_MAGICAL(key_sv, _kstr, _klen);
         EXTRACT_STR_VAL(val_sv);
         const char *out_s; uint32_t out_l; bool out_u;
         REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
@@ -844,6 +893,7 @@ cas(SV* self_sv, SV* key_sv, SV* expected_sv, SV* desired_sv)
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         EXTRACT_STR_KEY(key_sv);
+        SHM_COPY_IF_MAGICAL(key_sv, _kstr, _klen);
         EXTRACT_STR_EXPECTED_DESIRED(expected_sv, desired_sv);
         REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         RETVAL = shm_ss_cas(h, _kstr, (uint32_t)_klen, _kutf8,
@@ -857,6 +907,7 @@ cas_take(SV* self_sv, SV* key_sv, SV* expected_sv)
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         if (h->readonly || shm_is_sealed(h)) croak("Data::HashMap::Shared::SS: map is frozen (read-only)");
         EXTRACT_STR_KEY(key_sv);
+        SHM_COPY_IF_MAGICAL(key_sv, _kstr, _klen);
         EXTRACT_STR_EXPECTED(expected_sv);
         const char *out_s; uint32_t out_l; bool out_u;
         REEXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
@@ -878,12 +929,16 @@ bool
 unlink(SV* self_or_class, ...)
     CODE:
         if (sv_isobject(self_or_class) && sv_derived_from(self_or_class, "Data::HashMap::Shared::SS")) {
-            ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
-            if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::SS object");
+            EXTRACT_MAP("Data::HashMap::Shared::SS", self_or_class);
+            if (h->path) {
+                SHM_TAINT_CHECK("Data::HashMap::Shared::SS->unlink");
+                REEXTRACT_MAP("Data::HashMap::Shared::SS", self_or_class);
+            }
             RETVAL = shm_unlink_sharded(h);
         } else {
             if (items < 2) croak("Usage: Data::HashMap::Shared::SS->unlink($path)");
-            RETVAL = shm_unlink_path(shm_path_arg(aTHX_ ST(1), "path", "Data::HashMap::Shared::SS"));
+            SvGETMAGIC(ST(1));
+            RETVAL = shm_unlink_path(shm_write_path_arg(aTHX_ ST(1), "path", "Data::HashMap::Shared::SS", "Data::HashMap::Shared::SS->unlink"));
         }
     OUTPUT:
         RETVAL

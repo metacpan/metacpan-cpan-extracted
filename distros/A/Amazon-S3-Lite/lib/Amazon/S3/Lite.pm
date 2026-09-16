@@ -8,7 +8,6 @@ use Amazon::S3::Lite::Credentials;
 use Amazon::S3::Lite::Logger;
 use Amazon::S3::Lite::Constants qw(:booleans);
 use Carp qw(croak);
-use Carp::Always;
 use Data::Dumper;
 use Digest::MD5 qw(md5_base64 md5);
 use English qw(-no_match_vars);
@@ -23,7 +22,7 @@ use JSON::PP;
 use Role::Tiny::With;
 with 'Amazon::S3::Lite::Policies';
 
-our $VERSION = '1.3.1';
+our $VERSION = '1.3.2';
 
 ########################################################################
 sub new {
@@ -38,6 +37,7 @@ sub new {
   $self->{secure}  //= $TRUE;
   $self->{timeout} //= 30;
   $self->{region}  //= 'us-east-1';
+  $self->{last_status} = q{};
 
   $self->_init_logger;
   $self->_init_credentials;
@@ -173,6 +173,7 @@ sub ua          { return $_[0]->{ua} }
 sub region      { return $_[0]->{region} }
 sub host        { return $_[0]->{host} }
 sub credentials { return $_[0]->{credentials} }
+sub last_status { return $_[0]->{last_status} }
 
 ########################################################################
 # Build a fresh signer from current credentials.
@@ -222,8 +223,13 @@ sub _endpoint {
   # everywhere and avoids SSL cert issues with dotted bucket names)
   my $url = "$scheme://$host";
 
-  $url .= "/$bucket"              if defined $bucket && length $bucket;
-  $url .= '/' . _encode_key($key) if defined $key    && length $key;
+  if ( defined $bucket && length $bucket ) {
+    $url .= "/$bucket";
+  }
+
+  if ( defined $key && length $key ) {
+    $url .= q{/} . _encode_key($key);
+  }
 
   return $url;
 }
@@ -235,7 +241,7 @@ sub _encode_key {
 ########################################################################
   my ($key) = @_;
 
-  return join '/', map { uri_escape_utf8( $_, '^A-Za-z0-9\-._~' ) }
+  return join q{/}, map { uri_escape_utf8( $_, '^A-Za-z0-9\-._~' ) }
     split m{/}, $key, -1;
 }
 
@@ -248,6 +254,8 @@ sub _request {
   $headers //= {};
   $content //= q{};
   $extra   //= {};
+
+  $self->{last_status} = q{};
 
   my $content_is_coderef = ref $content eq 'CODE';
 
@@ -278,6 +286,8 @@ sub _request {
 
   $self->logger->debug( sprintf 'Response: %s %s', $response->{status}, $response->{reason} );
 
+  $self->{last_status} = $response->{status};
+
   return $response;
 }
 
@@ -293,8 +303,11 @@ sub head_object {
 ########################################################################
   my ( $self, $bucket, $key ) = @_;
 
-  croak 'bucket is required' if !defined $bucket || !length $bucket;
-  croak 'key is required'    if !defined $key    || !length $key;
+  croak 'bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  croak 'key is required'
+    if !defined $key || !length $key;
 
   my $url      = $self->_endpoint( $bucket, $key );
   my $response = $self->_request( 'HEAD', $url );
@@ -316,7 +329,10 @@ sub _extract_object_metadata {
   my ( $self, $headers ) = @_;
 
   my $etag = $headers->{etag};
-  $etag =~ s/\A"|"\z//gxsm if defined $etag;
+
+  if ( defined $etag ) {
+    $etag =~ s/\A"|"\z//gxsm;
+  }
 
   # Collect x-amz-meta-* headers, stripping the prefix from the key
   my %metadata;
@@ -350,13 +366,19 @@ sub get_object {
 ########################################################################
   my ( $self, $bucket, $key, %options ) = @_;
 
-  croak 'bucket is required' if !defined $bucket || !length $bucket;
-  croak 'key is required'    if !defined $key    || !length $key;
+  croak 'bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  croak 'key is required'
+    if !defined $key || !length $key;
 
   my $url = $self->_endpoint( $bucket, $key );
 
   my %headers;
-  $headers{Range} = $options{range} if defined $options{range};
+
+  if ( defined $options{range} ) {
+    $headers{Range} = $options{range};
+  }
 
   my $filename = $options{filename};
   my $extra    = {};
@@ -365,7 +387,7 @@ sub get_object {
     # Open the destination file before making the request so we catch
     # permission errors early, before network round-trip
     open my $fh, '>', $filename
-      or croak "cannot open '$filename' for writing: $!";
+      or croak "cannot open '$filename' for writing: $OS_ERROR";
 
     $extra->{data_callback} = sub {
       my ($data) = @_;
@@ -415,8 +437,11 @@ sub delete_object {
 ########################################################################
   my ( $self, $bucket, $key, %options ) = @_;
 
-  croak 'bucket is required' if !defined $bucket || !length $bucket;
-  croak 'key is required'    if !defined $key    || !length $key;
+  croak 'bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  croak 'key is required'
+    if !defined $key || !length $key;
 
   my $url = $self->_endpoint( $bucket, $key );
 
@@ -424,7 +449,7 @@ sub delete_object {
     $url .= '?versionId=' . uri_escape_utf8( $options{version_id} );
   }
 
-  my $response = $self->_request( 'DELETE', $url );
+  my $response = $self->_request( 'DELETE', $url, $options{headers} );
 
   $self->_croak_on_error( $response, 'delete_object' );
 
@@ -455,7 +480,9 @@ sub create_bucket {
   my $url    = $self->_endpoint($bucket);
   my %headers;
 
-  $headers{'x-amz-acl'} = $options{acl} if $options{acl};
+  if ( $options{acl} ) {
+    $headers{'x-amz-acl'} = $options{acl};
+  }
 
   my $content = q{};
 
@@ -645,9 +672,14 @@ sub put_object {
 ########################################################################
   my ( $self, $bucket, $key, $data, %options ) = @_;
 
-  croak 'bucket is required' if !defined $bucket || !length $bucket;
-  croak 'key is required'    if !defined $key    || !length $key;
-  croak 'data is required'   if !defined $data;
+  croak 'bucket is required'
+    if !defined $bucket || !length $bucket;
+
+  croak 'key is required'
+    if !defined $key || !length $key;
+
+  croak 'data is required'
+    if !defined $data;
 
   my $url = $self->_endpoint( $bucket, $key );
 
@@ -667,6 +699,16 @@ sub put_object {
     }
   }
 
+  # support custom headers
+  if ( $options{headers} ) {
+    if ( reftype( $options{headers} ) eq 'HASH' ) {
+      %headers = ( %headers, %{ $options{headers} } );
+    }
+    else {
+      croak "ERROR: headers must be a hash ref\n";
+    }
+  }
+
   my $body;
 
   if ( openhandle($data) || ( blessed($data) && $data->can('read') ) ) {
@@ -676,10 +718,14 @@ sub put_object {
     # Try to stat the handle for real files; suppress warning on
     # in-memory handles (IO::Scalar etc.) that have no underlying fd
     if ( !defined $content_length ) {
-      my $fd = eval { fileno($data) };
+      my $fd = eval { return fileno $data };
+
       if ( defined $fd && $fd >= 0 ) {
         my @st = stat $data;
-        $content_length = $st[7] if @st && defined $st[7];
+
+        if ( @st && defined $st[7] ) {
+          $content_length = $st[7];
+        }
       }
     }
 
@@ -690,10 +736,14 @@ sub put_object {
 
     # Wrap filehandle in a code ref for HTTP::Tiny streaming
     my $chunk_size = 1024 * 64;  # 64KB chunks
+
     $body = sub {
       my $buf;
-      my $n = read( $data, $buf, $chunk_size );
-      return $buf if $n;
+      my $n = read $data, $buf, $chunk_size;
+
+      return $buf
+        if $n;
+
       return q{};
     };
   }
@@ -715,7 +765,10 @@ sub put_object {
   $self->_croak_on_error( $response, 'put_object' );
 
   my $etag = $response->{headers}{etag};
-  $etag =~ s/\A"|"\z//gxsm if defined $etag;
+
+  if ( defined $etag ) {
+    $etag =~ s/\A"|"\z//gxsm;
+  }
 
   return $etag;
 }
@@ -1322,7 +1375,8 @@ sub _croak_on_error {
 ########################################################################
   my ( $self, $response, $context ) = @_;
 
-  return if _is_success($response);
+  return
+    if _is_success($response);
 
   my ( $status, $reason ) = @{$response}{qw(status reason)};
 

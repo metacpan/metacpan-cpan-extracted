@@ -79,26 +79,12 @@ static SV *oa_conv_schema(pTHX_ oa_norm *N, SV *schema, int depth,
  * after conversion the key holds a number in a document that still declares
  * 3.0. Reading a bare 1 as `true` would make the second pass eat its own
  * output. */
-static int oa_sv_is_json_bool(pTHX_ SV *sv) {
-    SV *rv;
-    PERL_UNUSED_CONTEXT;
-    if (!sv || !SvROK(sv)) return 0;
-    rv = SvRV(sv);
-    return !(SvTYPE(rv) == SVt_PVHV || SvTYPE(rv) == SVt_PVAV
-             || SvTYPE(rv) == SVt_PVCV);
-}
 
 /* Truth of a JSON boolean, or of a bare scalar. Used for `nullable`, which is
  * not a 2020-12 keyword at all and so is always consumed whatever its form. */
-static int oa_sv_truthy(pTHX_ SV *sv) {
-    if (!sv || !SvOK(sv)) return 0;
-    if (SvROK(sv)) {
-        SV *rv = SvRV(sv);
-        if (SvTYPE(rv) == SVt_PVHV || SvTYPE(rv) == SVt_PVAV) return 1;
-        return SvTRUE(rv) ? 1 : 0;
-    }
-    return SvTRUE(sv) ? 1 : 0;
-}
+/* oa_sv_truthy and oa_sv_is_json_bool now live in oa_compile.h, which is
+ * included first: every document-sourced boolean has to be read through them,
+ * and most of those reads are in the compiler. */
 
 /* ---- small copy helpers ---------------------------------------------------- */
 
@@ -118,17 +104,22 @@ static HV *oa_conv_copy_hv(pTHX_ HV *src) {
 typedef SV *(*oa_conv_fn)(pTHX_ oa_norm *N, SV *);
 
 /* Apply `fn` to every value of a keyed map (paths, components.responses, ...). */
+/* `dst` is mortal while it is being filled: the conversion below it can croak
+ * on an unresolvable $ref, and until the container is attached to its parent
+ * nothing else owns it. The caller gets a counted reference, so the mortal
+ * copy expiring later is harmless. */
 static SV *oa_conv_map(pTHX_ oa_norm *N, SV *map, oa_conv_fn fn) {
     HV *src = oa_hv_of(map), *dst;
     HE *he;
     if (!src) return newSVsv(map);
     dst = newHV();
+    sv_2mortal((SV *)dst);
     hv_iterinit(src);
     while ((he = hv_iternext(src))) {
         I32 kl; const char *k = hv_iterkey(he, &kl);
         (void)hv_store(dst, k, kl, fn(aTHX_ N, hv_iterval(src, he)), 0);
     }
-    return newRV_noinc((SV *)dst);
+    return newRV_inc((SV *)dst);
 }
 
 /* A list of schemas: allOf / anyOf / oneOf / prefixItems / tuple items. */
@@ -162,37 +153,14 @@ static SV *oa_conv_schema_map(pTHX_ oa_norm *N, SV *map, int depth) {
     return newRV_noinc((SV *)dst);
 }
 
-/* ---- the schema keyword tables --------------------------------------------- */
-
-static int oa_kw_in(const char *k, STRLEN l, const char *const *set) {
-    int i;
-    for (i = 0; set[i]; i++)
-        if (strlen(set[i]) == l && memEQ(k, set[i], l)) return 1;
-    return 0;
-}
-
-/* keywords whose value is a single Schema Object */
-static int oa_kw_schema(const char *k, STRLEN l) {
-    static const char *const s[] = {
-        "additionalProperties", "not", "if", "then", "else", "propertyNames",
-        "contains", "unevaluatedItems", "unevaluatedProperties", "contentSchema",
-        NULL
-    };
-    return oa_kw_in(k, l, s);
-}
-/* keywords whose value is a map of Schema Objects */
-static int oa_kw_schema_map(const char *k, STRLEN l) {
-    static const char *const s[] = {
-        "properties", "patternProperties", "$defs", "definitions",
-        "dependentSchemas", NULL
-    };
-    return oa_kw_in(k, l, s);
-}
-/* keywords whose value is a list of Schema Objects */
-static int oa_kw_schema_list(const char *k, STRLEN l) {
-    static const char *const s[] = { "allOf", "anyOf", "oneOf", "prefixItems", NULL };
-    return oa_kw_in(k, l, s);
-}
+/* ---- the schema keyword tables --------------------------------------------- *
+ *
+ * oa_kw_in and the three classifiers now live in oa_compile.h, which is
+ * included first: the readOnly/writeOnly projection runs at compile time and
+ * has to walk exactly the same positions this converter does. One copy, so
+ * the two cannot drift into disagreeing about where a Schema Object can
+ * appear - which is the property that keeps either of them from rewriting a
+ * key called `properties` that is really user JSON inside an `example`. */
 
 /* Under 3.0, keywords beside a `$ref` are ignored. These are pure annotations
  * that cannot change a verdict - JSON::Schema::Fast treats every one of them as
@@ -506,11 +474,50 @@ static SV *oa_conv_schema(pTHX_ oa_norm *N, SV *schema, int depth,
     /* discriminator: expandable in either version */
     dh = disc ? oa_hv_of(disc) : NULL;
     pn = dh ? oa_get(aTHX_ dh, "propertyName") : NULL;
+    /* The XML Object is an annotation - nothing here serializes XML - but its
+     * `namespace` is constrained, and a relative namespace is a document bug
+     * whoever DOES serialize from this spec will inherit. */
+    {
+        SV *xml = oa_get(aTHX_ src, "xml");
+        HV *xh = xml ? oa_hv_of(xml) : NULL;
+        SV *ns = xh ? oa_get(aTHX_ xh, "namespace") : NULL;
+        if (ns && !oa_looks_like_url(aTHX_ ns)) {
+            STRLEN nl2; const char *np = SvPV_const(ns, nl2);
+            croak("Open::API: xml namespace '%.*s' is not an absolute URI",
+                  (int)nl2, np);
+        }
+    }
+
+    /* `propertyName` is REQUIRED. Without it there is nothing to switch on and
+     * the expansion below silently does nothing, so a document that means to
+     * discriminate validates against the bare composite instead - accepting
+     * every branch, which is the opposite of what it asked for. */
+    if (dh && (!pn || SvROK(pn)))
+        croak("Open::API: a discriminator has no 'propertyName' "
+              "(it is required)");
     if (pn && !SvROK(pn)) {
         STRLEN pl;
         (void)SvPV_const(pn, pl);   /* force POK: SvPVX/SvCUR are used below */
         if (pl) expand = oa_disc_entries(aTHX_ N, src, dh, nm, nml,
                                          &dkeys, &drefs, &from_union);
+        /* "legal only when using one of the composite keywords oneOf, anyOf,
+         * allOf" - but the specification's OWN inheritance example puts a
+         * discriminator on a base that carries none of them, and finds the
+         * children by their allOf $ref back to it.
+         *
+         * So the refusal is narrowed to the case both readings condemn: an
+         * INLINE schema (nm == NULL) with no composite keyword and nothing
+         * inheriting from it. A NAMED component in that state is left alone
+         * deliberately - it is a base another document may extend, and
+         * t/30-discriminator.t pins it as "a childless base is left as an
+         * annotation". An inline schema can never be inherited from by
+         * anything, so there its discriminator is provably inert. */
+        if (!expand && !nm && !oa_get(aTHX_ src, "oneOf")
+                           && !oa_get(aTHX_ src, "anyOf")
+                           && !oa_get(aTHX_ src, "allOf"))
+            croak("Open::API: discriminator '%.*s' selects nothing: it is "
+                  "inline, beside no oneOf, anyOf or allOf, so nothing can "
+                  "inherit from it", (int)pl, SvPVX_const(pn));
     }
 
     dst = newHV();
@@ -743,20 +750,265 @@ static SV *oa_conv_schema(pTHX_ oa_norm *N, SV *schema, int depth,
 /* A Media Type Object: { schema: S, example: V, examples: {...} }. The
  * `example`/`examples` here are Example Objects, not schema keywords - they are
  * copied, not converted. */
+/* Both are defined below, and both are needed above their definitions: media
+ * converts an `examples` map, and the deref-only helpers sit beside the
+ * section lists rather than beside oa_deref_object. Static, to match. */
+static HV *oa_deref_object(pTHX_ oa_norm *N, HV *src, const char *const *sections);
+static SV *oa_conv_example(pTHX_ oa_norm *N, SV *e);
+
 static SV *oa_conv_media(pTHX_ oa_norm *N, SV *media) {
     HV *mh = oa_hv_of(media), *mc;
-    SV *schema;
+    SV *schema, *examples;
     if (!mh) return newSVsv(media);
-    schema = oa_get(aTHX_ mh, "schema");
-    if (!schema) return newSVsv(media);
+    /* `example` and `examples` are mutually exclusive on a Media Type Object.
+     * This is the MEDIA TYPE's example (an Example Object), not the schema
+     * keyword the 3.0 converter rewrites - those are different fields at
+     * different levels and only this one has the exclusion. */
+    if (oa_get(aTHX_ mh, "example") && oa_get(aTHX_ mh, "examples"))
+        croak("Open::API: a media type declares both 'example' and "
+              "'examples', which are mutually exclusive");
+    schema   = oa_get(aTHX_ mh, "schema");
+    examples = oa_get(aTHX_ mh, "examples");
+    if (!schema && !examples) return newSVsv(media);
     mc = oa_conv_copy_hv(aTHX_ mh);
-    (void)hv_stores(mc, "schema", oa_conv_schema(aTHX_ N, schema, 0, NULL, 0));
-    return newRV_noinc((SV *)mc);
+    sv_2mortal((SV *)mc);
+    if (schema)
+        (void)hv_stores(mc, "schema", oa_conv_schema(aTHX_ N, schema, 0, NULL, 0));
+    /* each entry may be a $ref in place of the Example Object */
+    if (examples)
+        (void)hv_stores(mc, "examples", oa_conv_map(aTHX_ N, examples, oa_conv_example));
+    return newRV_inc((SV *)mc);
 }
 
-/* a `content` map: { "application/json": <Media Type Object>, ... } */
+/* a `content` map: { "application/json": <Media Type Object>, ... }
+ *
+ * The Encoding Object is checked HERE rather than in oa_conv_media, because
+ * both of its rules are about the media type - and the media type is the map
+ * KEY, which the per-value converter never sees. */
 static SV *oa_conv_content(pTHX_ oa_norm *N, SV *content) {
+    HV *ch = oa_hv_of(content);
+    if (ch) {
+        HE *he;
+        hv_iterinit(ch);
+        while ((he = hv_iternext(ch))) {
+            I32 kl; const char *k = hv_iterkey(he, &kl);
+            HV *mh = oa_hv_of(hv_iterval(ch, he));
+            HV *enc = mh ? oa_hv_of(oa_get(aTHX_ mh, "encoding")) : NULL;
+            HV *props;
+            HE *ehe;
+            if (!enc) continue;
+            /* "MAY only be used in a Media Type Object whose media type is
+             * multipart or application/x-www-form-urlencoded". Anywhere else
+             * it is inert, and an inert encoding is a silently unenforced
+             * contentType or set of part headers. */
+            if (!oa_ctype_is_form(k, (STRLEN)kl)
+                && !oa_ctype_is_multipart(k, (STRLEN)kl))
+                croak("Open::API: '%.*s' declares an 'encoding', which is only "
+                      "legal for multipart or x-www-form-urlencoded",
+                      (int)kl, k);
+            /* "The key, being the property name, MUST exist in the schema as a
+             * property." A key that names nothing encodes nothing. */
+            props = oa_hv_of(oa_get(aTHX_ mh, "schema"));
+            props = props ? oa_hv_of(oa_get(aTHX_ props, "properties")) : NULL;
+            if (!props) continue;   /* no properties to check against */
+            hv_iterinit(enc);
+            while ((ehe = hv_iternext(enc))) {
+                I32 el; const char *e = hv_iterkey(ehe, &el);
+                if (!hv_exists(props, e, el))
+                    croak("Open::API: encoding '%.*s' on '%.*s' names no "
+                          "property in the schema", (int)el, e, (int)kl, k);
+            }
+        }
+    }
     return oa_conv_map(aTHX_ N, content, oa_conv_media);
+}
+
+/* ---- component references --------------------------------------------------
+ *
+ * A `$ref` used IN PLACE OF a parameter, header, requestBody or response
+ * object is legal and common OpenAPI:
+ *
+ *     parameters:
+ *       - $ref: '#/components/parameters/PageSize'
+ *
+ * and until now nothing here resolved one. Only schema refs were handled, by
+ * the `#/components/schemas/X` -> `#/$defs/X` rewrite. Left alone, such an
+ * object reaches the compiler as a hash with neither `in` nor `content`, and
+ * the two failures do not look alike: a parameter CROAKS the whole document on
+ * its absent `in`, while a requestBody or response returns early on its absent
+ * `content` and is left silently unvalidated and silently optional.
+ *
+ * So they are inlined here, before anything compiles.
+ *
+ * Resolution is against the SOURCE document (N->doc). oa_normalize converts
+ * paths before components, so a target read from either is the raw one, and
+ * the spliced-in object then goes through exactly the conversion it would have
+ * had written inline. That is also what makes the pass idempotent: an inlined
+ * object carries no `$ref`, so a second pass finds nothing to do.
+ *
+ * A ref that does not resolve - a remote document, a deeper JSON pointer, a
+ * name that is not there - is left EXACTLY as it was, so it fails the way it
+ * does today rather than being quietly dropped. A chain is followed to a fixed
+ * depth, which makes a cycle terminate with the ref still in place, and so
+ * refused by the compiler rather than able to hang it. */
+
+#define OA_COMP_MAX_HOPS 8
+
+static const char *const oa_sec_param[] = { "parameters", "headers", NULL };
+static const char *const oa_sec_body[]  = { "requestBodies", NULL };
+static const char *const oa_sec_resp[]  = { "responses", NULL };
+/* 3.1 only: 3.0 has no components.pathItems, so a 3.0 path-item $ref names
+ * something outside this document and is refused like any other reference we
+ * cannot follow - loudly, where it used to make the path silently vanish. */
+static const char *const oa_sec_pathitem[] = { "pathItems", NULL };
+/* An Example, a Security Scheme and a Callback may each be written as a $ref
+ * in place of the object. Nothing inlined them, so the reference survived
+ * into ->spec: the mock generator found no `value` on an example and fell
+ * through to generation, and a referenced security scheme reached the
+ * compiler with no `type` and refused the document. */
+static const char *const oa_sec_example[]  = { "examples", NULL };
+static const char *const oa_sec_scheme[]   = { "securitySchemes", NULL };
+static const char *const oa_sec_callback[] = { "callbacks", NULL };
+static const char *const oa_sec_link[]     = { "links", NULL };
+
+/* deref-only: these carry nothing this normaliser needs to convert, they just
+ * have to stop being a reference */
+static SV *oa_conv_deref_only(pTHX_ oa_norm *N, SV *sv,
+                              const char *const *sections) {
+    HV *h = oa_hv_of(sv), *c;
+    if (!h) return newSVsv(sv);
+    c = oa_deref_object(aTHX_ N, h, sections);
+    return c ? newRV_noinc((SV *)c) : newSVsv(sv);
+}
+static SV *oa_conv_example(pTHX_ oa_norm *N, SV *e) {
+    HV *eh = oa_hv_of(e);
+    /* `value` embeds the example, `externalValue` points at it. Declaring
+     * both says two different things about one example. */
+    if (eh && oa_get(aTHX_ eh, "value") && oa_get(aTHX_ eh, "externalValue"))
+        croak("Open::API: an example declares both 'value' and "
+              "'externalValue', which are mutually exclusive");
+    return oa_conv_deref_only(aTHX_ N, e, oa_sec_example);
+}
+
+/* A Header Object is a Parameter Object without `name` and `in` - the name is
+ * the key it is filed under and the location is implicit. Declaring either
+ * says the header is something it cannot be.
+ *
+ * oa_conv_param is defined below and static, so it needs declaring here. */
+static SV *oa_conv_param(pTHX_ oa_norm *N, SV *p);
+
+static SV *oa_conv_header(pTHX_ oa_norm *N, SV *hv) {
+    HV *hh = oa_hv_of(hv);
+    SV *st;
+    if (hh && (oa_get(aTHX_ hh, "name") || oa_get(aTHX_ hh, "in")))
+        croak("Open::API: a header object declares 'name' or 'in'; a header "
+              "takes its name from its key and is always in the header");
+    /* A header is serialized the way a parameter `in: header` is, and `simple`
+     * is the only style defined for that location. Another style would be
+     * read by nobody: the value still arrives simple-encoded. */
+    st = hh ? oa_get(aTHX_ hh, "style") : NULL;
+    if (st && !SvROK(st)) {
+        STRLEN sl; const char *sp = SvPV_const(st, sl);
+        if (!(sl == 6 && memEQ(sp, "simple", 6)))
+            croak("Open::API: a header declares style '%.*s'; 'simple' is the "
+                  "only style defined for a header", (int)sl, sp);
+    }
+    return oa_conv_param(aTHX_ N, hv);
+}
+static SV *oa_conv_scheme(pTHX_ oa_norm *N, SV *s) {
+    return oa_conv_deref_only(aTHX_ N, s, oa_sec_scheme);
+}
+static SV *oa_conv_link(pTHX_ oa_norm *N, SV *l) {
+    return oa_conv_deref_only(aTHX_ N, l, oa_sec_link);
+}
+
+/* "#/components/<section>/<name>" -> the raw component object, borrowed, or
+ * NULL when the ref is not a local reference into one of `sections`. */
+static SV *oa_component_target(pTHX_ oa_norm *N, SV *ref,
+                               const char *const *sections) {
+    static const char pfx[] = "#/components/";
+    const STRLEN pfxl = sizeof(pfx) - 1;
+    STRLEN l, sl, nl;
+    const char *p, *sec, *slash, *nm;
+    HV *comp, *bucket;
+    SV **e;
+    int i, hit = -1;
+
+    if (!ref || SvROK(ref) || !SvOK(ref)) return NULL;
+    p = SvPV_const(ref, l);
+    if (l <= pfxl || !memEQ(p, pfx, pfxl)) return NULL;
+
+    sec   = p + pfxl;
+    slash = (const char *)memchr(sec, '/', l - pfxl);
+    if (!slash) return NULL;
+    sl = (STRLEN)(slash - sec);
+    nm = slash + 1;
+    nl = l - pfxl - sl - 1;
+    /* A deeper pointer addresses something inside a component, which is not a
+     * whole object and is not ours to inline. */
+    if (!nl || memchr(nm, '/', nl)) return NULL;
+
+    for (i = 0; sections[i]; i++) {
+        STRLEN wl = (STRLEN)strlen(sections[i]);
+        if (wl == sl && memEQ(sec, sections[i], sl)) { hit = i; break; }
+    }
+    if (hit < 0) return NULL;
+
+    comp   = N->doc ? oa_hv_of(oa_get(aTHX_ N->doc, "components")) : NULL;
+    bucket = comp ? oa_hv_of(oa_get(aTHX_ comp, sections[hit])) : NULL;
+    e      = bucket ? hv_fetch(bucket, nm, (I32)nl, 0) : NULL;
+    return (e && *e && oa_hv_of(*e)) ? *e : NULL;
+}
+
+/* Follow a component reference to the object it names and return a copy the
+ * caller owns, or NULL when there was nothing to follow. Any siblings the
+ * reference itself carried win over the target's: 3.1 allows `summary` and
+ * `description` beside a `$ref` precisely so a caller can retitle one. */
+static HV *oa_deref_object(pTHX_ oa_norm *N, HV *src,
+                           const char *const *sections) {
+    HV *cur = src, *out;
+    HE *he;
+    int hops;
+
+    for (hops = 0; hops < OA_COMP_MAX_HOPS; hops++) {
+        SV *ref = oa_get(aTHX_ cur, "$ref");
+        SV *t;
+        HV *target;
+        if (!ref) break;
+        t = oa_component_target(aTHX_ N, ref, sections);
+        if (!t) break;
+        target = oa_hv_of(t);
+        if (!target || target == cur) break;
+        cur = target;
+    }
+    /* A `$ref` still here is one we could not follow: a name that is not in
+     * components, a pointer into another section, a remote document, a deeper
+     * JSON pointer, or a chain that outran OA_COMP_MAX_HOPS. Refuse it.
+     *
+     * This used to be left in place on the theory that it would "fail the way
+     * it does today". That holds only for a PARAMETER, where oa_compile_params
+     * croaks on the absent `in`. A requestBody or response has no such
+     * backstop: oa_compile_body reads `required` off the leftover stub (absent,
+     * so 0) and returns on the absent `content`, and oa_compile_responses skips
+     * the row - so the body was neither validated NOR required, silently. That
+     * is the very failure this file's $ref support was added to remove. */
+    {
+        SV *left = oa_get(aTHX_ cur, "$ref");
+        if (left) {
+            STRLEN rl; const char *rp = SvPV_const(left, rl);
+            croak("Open::API: cannot resolve $ref '%.*s'", (int)rl, rp);
+        }
+    }
+    if (cur == src) return NULL;
+
+    out = oa_conv_copy_hv(aTHX_ cur);
+    hv_iterinit(src);
+    while ((he = hv_iternext(src))) {
+        I32 kl; const char *k = hv_iterkey(he, &kl);
+        if (kl == 4 && memEQ(k, "$ref", 4)) continue;
+        (void)hv_store(out, k, kl, newSVsv(hv_iterval(src, he)), 0);
+    }
+    return out;
 }
 
 /* A Parameter or Header Object: `schema`, or `content` holding one. */
@@ -764,10 +1016,18 @@ static SV *oa_conv_param(pTHX_ oa_norm *N, SV *p) {
     HV *ph = oa_hv_of(p), *pc;
     SV *schema, *content;
     if (!ph) return newSVsv(p);
+    pc = oa_deref_object(aTHX_ N, ph, oa_sec_param);
+    if (pc) ph = pc;                 /* resolved, and pc is already our copy */
+    /* `example` and `examples` are mutually exclusive here too, for the same
+     * reason they are on a Media Type Object */
+    if (oa_get(aTHX_ ph, "example") && oa_get(aTHX_ ph, "examples"))
+        croak("Open::API: a parameter declares both 'example' and "
+              "'examples', which are mutually exclusive");
     schema  = oa_get(aTHX_ ph, "schema");
     content = oa_get(aTHX_ ph, "content");
-    if (!schema && !content) return newSVsv(p);
-    pc = oa_conv_copy_hv(aTHX_ ph);
+    if (!schema && !content)
+        return pc ? newRV_noinc((SV *)pc) : newSVsv(p);
+    if (!pc) pc = oa_conv_copy_hv(aTHX_ ph);
     if (schema)  (void)hv_stores(pc, "schema",
                                  oa_conv_schema(aTHX_ N, schema, 0, NULL, 0));
     if (content) (void)hv_stores(pc, "content", oa_conv_content(aTHX_ N, content));
@@ -779,61 +1039,100 @@ static SV *oa_conv_param_list(pTHX_ oa_norm *N, SV *params) {
     SSize_t i, n;
     if (!src) return newSVsv(params);
     dst = newAV();
+    sv_2mortal((SV *)dst);            /* see oa_conv_map: oa_conv_param croaks */
     n = av_len(src) + 1;
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(src, i, 0);
         av_push(dst, (e && *e) ? oa_conv_param(aTHX_ N, *e) : newSV(0));
     }
-    return newRV_noinc((SV *)dst);
+    return newRV_inc((SV *)dst);
 }
 
 static SV *oa_conv_body(pTHX_ oa_norm *N, SV *rb) {
     HV *h = oa_hv_of(rb), *c;
     SV *content;
     if (!h) return newSVsv(rb);
+    c = oa_deref_object(aTHX_ N, h, oa_sec_body);
+    if (c) h = c;
     content = oa_get(aTHX_ h, "content");
-    if (!content) return newSVsv(rb);
-    c = oa_conv_copy_hv(aTHX_ h);
+    if (!content)
+        return c ? newRV_noinc((SV *)c) : newSVsv(rb);
+    if (!c) c = oa_conv_copy_hv(aTHX_ h);
     (void)hv_stores(c, "content", oa_conv_content(aTHX_ N, content));
     return newRV_noinc((SV *)c);
 }
 
 static SV *oa_conv_response(pTHX_ oa_norm *N, SV *r) {
     HV *h = oa_hv_of(r), *c;
-    SV *content, *hdrs;
+    SV *content, *hdrs, *links;
     if (!h) return newSVsv(r);
+    c = oa_deref_object(aTHX_ N, h, oa_sec_resp);
+    if (c) h = c;
     content = oa_get(aTHX_ h, "content");
     hdrs    = oa_get(aTHX_ h, "headers");
-    if (!content && !hdrs) return newSVsv(r);
-    c = oa_conv_copy_hv(aTHX_ h);
+    links   = oa_get(aTHX_ h, "links");
+    if (!content && !hdrs && !links)
+        return c ? newRV_noinc((SV *)c) : newSVsv(r);
+    if (!c) c = oa_conv_copy_hv(aTHX_ h);
     if (content) (void)hv_stores(c, "content", oa_conv_content(aTHX_ N, content));
     if (hdrs)    (void)hv_stores(c, "headers",
-                                 oa_conv_map(aTHX_ N, hdrs, oa_conv_param));
+                                 oa_conv_map(aTHX_ N, hdrs, oa_conv_header));
+    if (links)   (void)hv_stores(c, "links",
+                                 oa_conv_map(aTHX_ N, links, oa_conv_link));
     return newRV_noinc((SV *)c);
+}
+
+/* A Callback Object is a map of runtime expression => Path Item, so its
+ * contents are converted exactly like a path: a 3.0 schema inside a callback
+ * is a 3.0 schema, and ->spec must not end up holding two dialects at once.
+ * Declared ahead of oa_conv_path_item, which is defined below and already
+ * calls back into oa_conv_operation. */
+static SV *oa_conv_path_item(pTHX_ oa_norm *N, SV *item);
+
+static SV *oa_conv_callback(pTHX_ oa_norm *N, SV *cb) {
+    HV *h = oa_hv_of(cb), *d;
+    if (!h) return newSVsv(cb);
+    d = oa_deref_object(aTHX_ N, h, oa_sec_callback);
+    return oa_conv_map(aTHX_ N, d ? sv_2mortal(newRV_noinc((SV *)d))
+                                  : cb, oa_conv_path_item);
 }
 
 static SV *oa_conv_operation(pTHX_ oa_norm *N, SV *op) {
     HV *h = oa_hv_of(op), *c;
-    SV *params, *rb, *resps;
+    SV *params, *rb, *resps, *cbs;
     if (!h) return newSVsv(op);
     params = oa_get(aTHX_ h, "parameters");
     rb     = oa_get(aTHX_ h, "requestBody");
     resps  = oa_get(aTHX_ h, "responses");
-    if (!params && !rb && !resps) return newSVsv(op);
+    cbs    = oa_get(aTHX_ h, "callbacks");
+    if (!params && !rb && !resps && !cbs) return newSVsv(op);
     c = oa_conv_copy_hv(aTHX_ h);
+    /* mortal while it is filled: unlike oa_conv_param and friends, the
+     * container exists BEFORE the conversions that can croak on a $ref we
+     * cannot resolve, so nothing else would own it on the way out. */
+    sv_2mortal((SV *)c);
     if (params) (void)hv_stores(c, "parameters",  oa_conv_param_list(aTHX_ N, params));
     if (rb)     (void)hv_stores(c, "requestBody", oa_conv_body(aTHX_ N, rb));
     if (resps)  (void)hv_stores(c, "responses",
                                 oa_conv_map(aTHX_ N, resps, oa_conv_response));
-    return newRV_noinc((SV *)c);
+    if (cbs)    (void)hv_stores(c, "callbacks",
+                                oa_conv_map(aTHX_ N, cbs, oa_conv_callback));
+    return newRV_inc((SV *)c);
 }
 
+/* A path item, which may itself BE a `$ref` (legal in 3.0 and 3.1, and common
+ * in split documents). Nothing inlined it before, so the item kept its `$ref`
+ * and carried no method keys: oa_compile found no operations and registered no
+ * route, and a legally-specified path simply 404'd with nothing to report. */
 static SV *oa_conv_path_item(pTHX_ oa_norm *N, SV *item) {
-    HV *h = oa_hv_of(item), *c;
+    HV *h = oa_hv_of(item), *c, *d;
     SV *params;
     int m;
     if (!h) return newSVsv(item);
-    c = oa_conv_copy_hv(aTHX_ h);
+    d = oa_deref_object(aTHX_ N, h, oa_sec_pathitem);
+    if (d) h = d;
+    c = d ? d : oa_conv_copy_hv(aTHX_ h);
+    sv_2mortal((SV *)c);              /* see oa_conv_operation */
     params = oa_get(aTHX_ h, "parameters");
     if (params) (void)hv_stores(c, "parameters", oa_conv_param_list(aTHX_ N, params));
     for (m = 0; oa_methods[m]; m++) {
@@ -841,7 +1140,7 @@ static SV *oa_conv_path_item(pTHX_ oa_norm *N, SV *item) {
         if (op) (void)hv_store(c, oa_methods[m], (I32)strlen(oa_methods[m]),
                                oa_conv_operation(aTHX_ N, op), 0);
     }
-    return newRV_noinc((SV *)c);
+    return newRV_inc((SV *)c);
 }
 
 /* components.schemas is the one place a schema has a name, and the name is what
@@ -876,6 +1175,16 @@ static SV *oa_conv_components(pTHX_ oa_norm *N, SV *comp) {
         (void)hv_stores(c, "requestBodies", oa_conv_map(aTHX_ N, v, oa_conv_body));
     if ((v = oa_get(aTHX_ h, "responses")))
         (void)hv_stores(c, "responses", oa_conv_map(aTHX_ N, v, oa_conv_response));
+    if ((v = oa_get(aTHX_ h, "pathItems")))
+        (void)hv_stores(c, "pathItems", oa_conv_map(aTHX_ N, v, oa_conv_path_item));
+    if ((v = oa_get(aTHX_ h, "examples")))
+        (void)hv_stores(c, "examples", oa_conv_map(aTHX_ N, v, oa_conv_example));
+    if ((v = oa_get(aTHX_ h, "securitySchemes")))
+        (void)hv_stores(c, "securitySchemes", oa_conv_map(aTHX_ N, v, oa_conv_scheme));
+    if ((v = oa_get(aTHX_ h, "callbacks")))
+        (void)hv_stores(c, "callbacks", oa_conv_map(aTHX_ N, v, oa_conv_callback));
+    if ((v = oa_get(aTHX_ h, "links")))
+        (void)hv_stores(c, "links", oa_conv_map(aTHX_ N, v, oa_conv_link));
     return newRV_noinc((SV *)c);
 }
 
@@ -892,6 +1201,13 @@ static SV *oa_normalize(pTHX_ SV *doc, int v30) {
     c = oa_conv_copy_hv(aTHX_ h);
     if ((v = oa_get(aTHX_ h, "paths")))
         (void)hv_stores(c, "paths", oa_conv_map(aTHX_ &N, v, oa_conv_path_item));
+    /* 3.1 webhooks are path items too. They are calls the API SENDS, so they
+     * are deliberately not routed - compiling them to zero routes is correct.
+     * What was wrong is that they were skipped entirely, so a 3.0-shaped
+     * schema inside one was never converted and a $ref inside one was never
+     * resolved, leaving ->spec holding two dialects at once. */
+    if ((v = oa_get(aTHX_ h, "webhooks")))
+        (void)hv_stores(c, "webhooks", oa_conv_map(aTHX_ &N, v, oa_conv_path_item));
     if ((v = oa_get(aTHX_ h, "components")))
         (void)hv_stores(c, "components", oa_conv_components(aTHX_ &N, v));
     if (N.kids) SvREFCNT_dec((SV *)N.kids);

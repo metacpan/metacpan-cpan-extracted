@@ -168,6 +168,10 @@ C<size> climbing while C<keys> stays flat means the slice is losing ground:
 Giving the map a C<$max_size> instead makes eviction reclaim the slots for you
 and needs no timer at all.
 
+When clients choose the subjects, hash them under a secret first, and keep the
+file in a directory only your processes can write to: see
+L<Data::HashMap::Shared/SECURITY> on keys chosen to collide and on planted maps.
+
 Full example: F<eg/rate_limiter.pl>.
 
 =head2 Atomic state machine (compare-and-swap)
@@ -225,9 +229,10 @@ beyond it evict least-recently-used.
 =item * B<$ttl> -- default per-entry TTL in seconds (0 = none). Set for caches /
 windows; combine with C<$max_size> for a bounded TTL cache.
 
-=item * B<$lru_skip> -- LRU promotion-skip percentage (0-99, default 0). Leave at
-0; raise only if profiling shows write-lock contention from LRU promotions on a
-Zipfian workload. See L<Data::HashMap::Shared/Constructor>.
+=item * B<$lru_skip> -- LRU promotion-skip rate (0-99, default 0; a power-of-two
+step, so a value below 50 is a no-op). Leave at 0; raise only if profiling shows
+write-lock contention from LRU promotions on a Zipfian workload.
+See L<Data::HashMap::Shared/Constructor>.
 
 =item * B<$arena_cap> -- string-storage bytes (0 = C<max(max_entries*128, 4096)>).
 Set explicitly when a few large string keys/values would otherwise exhaust the

@@ -4,7 +4,7 @@
       "vividsnow"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "perl_5"
    ],
@@ -43,6 +43,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vividsnow/perl5-data-heap-shared/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vividsnow/perl5-data-heap-shared.git",
+         "web" : "https://github.com/vividsnow/perl5-data-heap-shared"
+      }
+   },
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

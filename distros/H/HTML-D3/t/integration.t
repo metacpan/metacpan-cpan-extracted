@@ -678,11 +678,10 @@ subtest 'pie chart methods share consistent D3 structure' => sub {
 	my $anim_html     = $chart->render_animated_pie_chart(\@SIMPLE_DATA);
 	my $snip_html     = $chart->render_pie_chart_snippet(\@SIMPLE_DATA)->{html};
 
-	# All three must use the same fundamental D3 pie primitives.
+	# Full-page pie methods share the same D3 primitives and colour scheme.
 	for my $pair (
 		['render_pie_chart',          $pie_html],
 		['render_animated_pie_chart', $anim_html],
-		['render_pie_chart_snippet',  $snip_html],
 	) {
 		my ($name, $html) = @$pair;
 		like($html, qr/d3\.pie\(\)/,          "$name: d3.pie() present");
@@ -692,9 +691,17 @@ subtest 'pie chart methods share consistent D3 structure' => sub {
 		like($html, qr/d3\.sum/,               "$name: d3.sum computes total for percentages");
 	}
 
-	# Static and snippet must NOT have animation artefacts.
+	# render_pie_chart_snippet uses the same primitives but a richer API
+	# (opts: animated, donut, sort_slices, max_slices, legend, color_scheme).
+	like($snip_html, qr/d3\.pie\(\)/,         'render_pie_chart_snippet: d3.pie() present');
+	like($snip_html, qr/d3\.arc\(\)/,          'render_pie_chart_snippet: d3.arc() present');
+	like($snip_html, qr/d3\.schemeTableau10/, 'render_pie_chart_snippet: default scheme is tableau10');
+	like($snip_html, qr/d3\.scaleOrdinal/,    'render_pie_chart_snippet: d3.scaleOrdinal present');
+	like($snip_html, qr/d3\.sum/,              'render_pie_chart_snippet: d3.sum present');
+
+	# Static full-page and plain snippet must NOT have animation artefacts.
 	unlike($pie_html,  qr/attrTween/, 'render_pie_chart: no attrTween in static version');
-	unlike($snip_html, qr/attrTween/, 'render_pie_chart_snippet: no attrTween in snippet');
+	unlike($snip_html, qr/attrTween/, 'render_pie_chart_snippet: no attrTween without animated flag');
 
 	# Animated must have both tween and fade-in.
 	like($anim_html, qr/attrTween/,              'render_animated_pie_chart: attrTween present');

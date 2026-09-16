@@ -81,6 +81,36 @@
       border-bottom: 1px solid #e4e8f0;
     }
 
+    tfoot tr {
+      background: #1e3060;
+      color: #fff;
+    }
+    tfoot td {
+      padding: 0.6rem 1rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .totals-sum { font-variant-numeric: tabular-nums; }
+
+    .lbl-totals {
+      flex-shrink: 0;
+      align-self: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid #888;
+      border-radius: 6px;
+      background: transparent;
+      color: #444;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .lbl-totals:hover { background: #f0f0f0; }
+    .lbl-totals input[type="checkbox"] { cursor: pointer; accent-color: #2c3e7a; }
+
     .empty-state {
       text-align: center;
       color: #888;
@@ -95,6 +125,16 @@
       padding: 0.75rem 1rem;
       border-radius: 4px;
       margin-bottom: 1.25rem;
+    }
+    .hint {
+      background: #eaf4fb;
+      border-left: 4px solid #2980b9;
+      color: #1a5276;
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      margin-top: -0.75rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.93em;
     }
 
     .back-link {
@@ -165,6 +205,56 @@
       color: #fff;
     }
     .btn-dedup--active:hover { background: #3a50a0; }
+
+    /* Row/column selection checkbox column */
+    .sel-th, .sel-td {
+      width: 2.2rem;
+      min-width: 2.2rem;
+      padding: 0.4rem 0.5rem;
+      text-align: center;
+      cursor: default;
+      user-select: none;
+    }
+    .sel-th { background: #2c3e7a; }
+    .sel-td { border-bottom: 1px solid #e4e8f0; }
+    .sel-th input[type="checkbox"],
+    .sel-td input[type="checkbox"] {
+      cursor: pointer;
+      accent-color: #c0392b;
+      width: 1rem;
+      height: 1rem;
+      vertical-align: middle;
+    }
+
+    /* Selected row highlight */
+    tbody tr.row-selected > td,
+    tbody tr.row-selected > .sel-td {
+      background: #fdf0f0 !important;
+      outline: 1px solid #e07070;
+      outline-offset: -1px;
+    }
+
+    /* Selected column highlight — body cells */
+    tbody td.col-selected,
+    tfoot td.col-selected {
+      background: rgba(192, 57, 43, 0.08) !important;
+      outline: 1px solid #e07070;
+      outline-offset: -1px;
+    }
+
+    /* Delete-selected toolbar button — destructive red accent */
+    .btn-delete-sel {
+      flex-shrink: 0;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid #c0392b;
+      border-radius: 6px;
+      background: transparent;
+      color: #c0392b;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-delete-sel:hover { background: #fdecea; }
 
     /* "Combine data" button — same shape as Merge, teal accent */
     .btn-combine {
@@ -1023,6 +1113,10 @@
     var overlayTxt = document.getElementById('drop-overlay-text');
     var homeZone  = document.getElementById('home-drop-zone');
     var dragDepth = 0;
+    var errorTimer = null;
+
+    // Max upload size in bytes -- must match $MAX_UPLOAD_MIB in Dashboard.pm
+    var MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
 
     function hasFiles(dt) {
       if (!dt || !dt.types) return false;
@@ -1040,8 +1134,20 @@
     }
 
     function hideOverlay() {
+      clearTimeout(errorTimer);
+      errorTimer = null;
       overlay.classList.remove('active', 'loading');
       if (homeZone) homeZone.classList.remove('drag-active');
+    }
+
+    // Show an error in the overlay for 3 seconds, then hide it.
+    // Uses a cancellable timer so stale dragleave events cannot dismiss it early.
+    function showError(msg) {
+      clearTimeout(errorTimer);
+      overlay.classList.remove('loading');
+      overlayTxt.textContent = msg;
+      overlay.classList.add('active');
+      errorTimer = setTimeout(hideOverlay, 3000);
     }
 
     document.addEventListener('dragenter', function (e) {
@@ -1051,6 +1157,9 @@
 
     document.addEventListener('dragleave', function (e) {
       if (!hasFiles(e.dataTransfer)) return;
+      // Ignore stale dragleave events that fire after a drop while an
+      // error message is being displayed (errorTimer is set in that case).
+      if (errorTimer) return;
       if (--dragDepth <= 0) { dragDepth = 0; hideOverlay(); }
     });
 
@@ -1093,12 +1202,25 @@
 
       var fd = new FormData();
       fd.append('file', file);
+      // Capture size before fetch so the catch handler can use it even when
+      // the server closes the connection before sending a response (TypeError).
+      var fileSize = file.size;
 
       fetch('/upload', { method: 'POST', body: fd })
         .then(function (r) {
           if (!r.ok) {
+            // Try to extract the server's JSON error message.  If the response
+            // is not JSON (e.g. a proxy returned an HTML 413 page), the parse
+            // fails -- fall back to a human-readable message based on the HTTP
+            // status so the user sees something more useful than "Could not
+            // open file."
             return r.json().then(function (d) {
               return Promise.reject(d.error || ('HTTP ' + r.status));
+            }, function () {
+              var msg = r.status === 413
+                ? 'File too large to upload (limit: 50 MB)'
+                : 'Upload failed (HTTP ' + r.status + ')';
+              return Promise.reject(msg);
             });
           }
           return r.json();
@@ -1112,10 +1234,20 @@
           }
         })
         .catch(function (err) {
-          hideOverlay();
-          overlayTxt.textContent = (typeof err === 'string') ? err : 'Could not open file.';
-          overlay.classList.add('active');
-          setTimeout(hideOverlay, 3000);
+          // err is a string when we rejected with a message above.
+          // When fetch itself fails (e.g. the server closed the TCP connection
+          // mid-upload because the body was too large), err is a TypeError and
+          // r.status is never available.  Detect that case via the captured
+          // fileSize and show a useful message instead of the generic fallback.
+          var msg;
+          if (typeof err === 'string') {
+            msg = err;
+          } else if (fileSize > MAX_UPLOAD_BYTES) {
+            msg = 'File too large to upload (limit: 50 MB)';
+          } else {
+            msg = 'Could not open file.';
+          }
+          showError(msg);
         });
     });
   }());

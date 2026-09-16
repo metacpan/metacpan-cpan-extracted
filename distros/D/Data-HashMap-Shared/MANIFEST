@@ -100,6 +100,26 @@ t/56-error-paths.t
 t/57-variant-guards.t
 t/58-overwrite-evicts.t
 t/59-scan-cursor.t
+t/60-arena-class-drift.t
+t/61-own-pid-lock-recovery.t
+t/62-lock-bookkeeping-heals.t
+t/63-slotless-slot-recovery.t
+t/64-arena-reset-key-window.t
+t/65-arena-compaction.t
+t/66-compaction-keeps-free-space.t
+t/67-constructor-warning-leak.t
+t/68-lock-free-read-own-pid-ghost.t
+t/69-threads-own-pid-live-holder.t
+t/70-cross-map-lock-recovery.t
+t/71-clear-crash-window.t
+t/72-compaction-after-clear.t
+t/73-compaction-skip-is-lossless.t
+t/74-freeze-finishes-partial-set.t
+t/75-taint-paths.t
+t/76-tied-arguments.t
+t/77-numeric-edges.t
+t/78-large-freelist-firstfit.t
+t/79-reentrant-batch-arg.t
 t/pod_synopsis.t
 t/version_check.t
 typemap
@@ -115,16 +135,21 @@ xs/si32.xs
 xs/ss.xs
 xt/asan.t
 xt/cloexec_exec.t
+xt/compact_cost.t
+xt/compact_crash.t
+xt/compact_crash_gdb.t
 xt/concurrent_open.t
 xt/crash_recovery.t
 xt/destroy_during_call.t
 xt/eacces.t
 xt/edge-cases.t
 xt/eg_runs.t
+xt/fallback_constants.t
 xt/fd_leak.t
 xt/fd_validation.t
 xt/fork_live.t
 xt/freeze_deferred_seal.t
+xt/freeze_flush_failure.t
 xt/invalid_args.t
 xt/kwalitee.t
 xt/lru-ttl.t
@@ -149,6 +174,7 @@ xt/valgrind.t
 xt/valgrind_mp.t
 xt/value_update_tear.t
 xt/writer_crash_recovery.t
+xt/wrlock_threads.t
 xxhash.h
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

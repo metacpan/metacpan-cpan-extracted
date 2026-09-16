@@ -40,6 +40,7 @@ int main(int argc, char **argv) {
         alarm(20);
         int64_t out = 0;
         (void)deq_try_pop_front(h, &out);
+        if (__atomic_load_n(&h->hdr->stat_recoveries, __ATOMIC_RELAXED) != 1) return 5;
     } else {
         /* Orphaned WRITING slot blocks the next pusher's claim. */
         __atomic_store_n(&h->ctl[0], (1ULL << 2) | DEQ_SLOT_WRITING, __ATOMIC_RELEASE);
@@ -47,6 +48,7 @@ int main(int argc, char **argv) {
         alarm(20);
         int64_t v = 7;
         if (!deq_try_push_back(h, &v, sizeof v)) return 4;   /* must succeed after reclaim */
+        if (__atomic_load_n(&h->hdr->stat_recoveries, __ATOMIC_RELAXED) != 1) return 6;
     }
     alarm(0);
     return 0;

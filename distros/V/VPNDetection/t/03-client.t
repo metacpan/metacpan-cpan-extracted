@@ -19,14 +19,16 @@ subtest 'a batch honors the per-call concurrency, measured as peak in flight' =>
     # either way.
     my $origin = VPNDetectionTest::Origin->new(sub {
         my ($c) = @_;
-        my $ip = substr $c->req->url->path->to_string, 1;
-        VPNDetectionTest::Origin::slow_json($c, { ip => $ip, is_vpn => \0 }, 0.05);
+        VPNDetectionTest::Origin::slow_json($c, VPNDetectionTest::Origin::batch_body($c), 0.05);
     });
-    my @addresses = map { "9.9.9.$_" } 1 .. 12;
+    # Enough addresses for nine chunks of the batch endpoint's 1000, so a
+    # concurrency of six has something to bound: one request per chunk, and only
+    # the chunks overlap.
+    my @addresses = map { sprintf '9.%d.%d.%d', 1 + int($_ / 65536), int($_ / 256) % 256, $_ % 256 } 0 .. 8000;
 
     my $client = VPNDetection->new(base_url => $origin->url, cache_size => 0, concurrency => 2);
     $client->lookup_batch(\@addresses, concurrency => 6);
-    is($origin->count, scalar @addresses, 'every address was asked for');
+    is($origin->count, 9, 'one request per chunk of 1000');
     is($origin->peak_in_flight, 6, 'the per-call ceiling was reached and not exceeded');
 
     $origin->reset;
@@ -306,7 +308,7 @@ subtest 'my_ip classifies the calling address and is never cached' => sub {
     is($origin->count, 2, 'a second call goes to the network again');
 };
 
-subtest 'my_account reports the plan and the usage, and is never cached' => sub {
+subtest 'my_entitlement reports the plan and the usage, and is never cached' => sub {
     # The whole point is what has been spent, so a cached answer is a wrong one
     # within seconds of the next request.
     my $body = {
@@ -327,12 +329,12 @@ subtest 'my_account reports the plan and the usage, and is never cached' => sub 
     };
     my $origin = VPNDetectionTest::Origin->new(sub {
         my ($c) = @_;
-        is($c->req->url->path->to_string, '/api/v1/account/me', 'asked for the account route');
+        is($c->req->url->path->to_string, '/api/v1/entitlement', 'asked for the account route');
         $c->render(json => $body);
     });
     my $client = VPNDetection->new(base_url => $origin->url);
 
-    my $account = $client->my_account;
+    my $account = $client->my_entitlement;
     is($account->{plan}{key},     'max',     'reports the plan');
     is($account->{plan}{tier},    'max',     'and the field tier');
     is($account->{usage}{requests}, 580,     'and what has been spent');
@@ -341,18 +343,18 @@ subtest 'my_account reports the plan and the usage, and is never cached' => sub 
     is($account->{usage}{hard_limit}, undef, 'a null hard limit stays null');
     is_deeply($account->{apikey}{allowed_cidrs}, [], 'an empty allowlist means unrestricted');
 
-    $client->my_account;
+    $client->my_entitlement;
     is($origin->count, 2, 'a second call goes to the network again');
 };
 
-subtest 'my_account surfaces an unauthorized key' => sub {
+subtest 'my_entitlement surfaces an unauthorized key' => sub {
     # Unlike a lookup there is no useful unauthenticated answer.
     my $origin = VPNDetectionTest::Origin->new(sub {
         shift->render(json => { error => 'invalid API key' }, status => 401);
     });
     my $client = VPNDetection->new(base_url => $origin->url, retries => 0);
 
-    eval { $client->my_account };
+    eval { $client->my_entitlement };
     isa_ok($@, 'VPNDetection::Error', 'refused');
     is($@->kind, 'unauthorized', 'and says why');
 };

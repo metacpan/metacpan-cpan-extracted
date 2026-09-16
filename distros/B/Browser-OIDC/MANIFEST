@@ -8,3 +8,4 @@ META.yml
 README
 dist.json
 lib/Browser/OIDC.pm
+lib/Browser/OIDC/TokenResponse.pm

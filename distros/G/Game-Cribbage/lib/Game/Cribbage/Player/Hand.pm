@@ -108,7 +108,7 @@ sub calculate_score {
 	$self->score(Game::Cribbage::Score->new(with_starter => $starter, cards => \@cards));
 	if ($self->crib && scalar @{$self->crib}) {
 		@cards = (@{$self->crib}, ($starter ? $self->starter : ()));
-		$self->crib_score(Game::Cribbage::Score->new(with_starter => $starter, cards => \@cards));
+		$self->crib_score(Game::Cribbage::Score->new(with_starter => $starter, crib => 1, cards => \@cards));
 	}
 	return $self->score->total_score + ($self->crib_score ? $self->crib_score->total_score : 0);
 }
@@ -144,8 +144,10 @@ sub identify_worst_cards {
 
 	my @index = 0 .. 5;
 	my @cards = @{$self->cards};
+	# -1, not 0: a hand where no four cards score at all must still pick
+	# four to keep, or the "worst" two come back as all six.
 	my %best = (
-		score => 0,
+		score => -1,
 		cards => []
 	);
 	forcomb {
@@ -240,7 +242,7 @@ Game::Cribbage::Player::Hand - a player's hand of cards within a hands cycle
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 

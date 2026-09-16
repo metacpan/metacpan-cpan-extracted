@@ -4,7 +4,7 @@
       "vividsnow"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150014",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "perl_5"
    ],
@@ -54,55 +54,55 @@
    "provides" : {
       "EV::WebKit" : {
          "file" : "lib/EV/WebKit.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::Auth" : {
          "file" : "lib/EV/WebKit.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::Client" : {
          "file" : "lib/EV/WebKit/Client.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::Client::Element" : {
          "file" : "lib/EV/WebKit/Client/Element.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::Control" : {
          "file" : "lib/EV/WebKit/Control.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::Dialog" : {
          "file" : "lib/EV/WebKit.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::Download" : {
          "file" : "lib/EV/WebKit.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::Element" : {
          "file" : "lib/EV/WebKit/Element.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::FileChooser" : {
          "file" : "lib/EV/WebKit.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::Fingerprint" : {
          "file" : "lib/EV/WebKit/Fingerprint.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::Policy" : {
          "file" : "lib/EV/WebKit.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::Protocol" : {
          "file" : "lib/EV/WebKit/Protocol.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::WebKit::UserContent" : {
          "file" : "lib/EV/WebKit.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -116,6 +116,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-webkit"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

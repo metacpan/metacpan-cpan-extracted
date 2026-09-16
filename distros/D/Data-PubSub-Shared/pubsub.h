@@ -221,7 +221,7 @@ static inline int pubsub_pid_is_zombie(uint32_t pid) {
     return rp[1] == ' ' && rp[2] == 'Z';
 }
 static inline int pubsub_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (pid == 0) return 0; /* no owner recorded, treat as dead */
     if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
     return !pubsub_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }

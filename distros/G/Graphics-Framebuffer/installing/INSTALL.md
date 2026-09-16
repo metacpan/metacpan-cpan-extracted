@@ -18,7 +18,7 @@
 
    * Mario Roy has an excellent tutorial on enabling the Framebuffer on a CentOS system (which is a RedHat style Linux distribution).  This may be helpful on other distributions as well:
 
-      [Mario Roy's Explation of enabling the Framebuffer on CentOS](https://github.com/marioroy/mce-examples/tree/master/framebuffer)
+      [Mario Roy's Explanation of enabling the Framebuffer on CentOS](https://github.com/marioroy/mce-examples/tree/master/framebuffer)
 
    * Raspberry PI Users!  Change the settings to use a 24/32 bit framebuffer.  The PI defaults to 16 bit color and this module is much faster using 24/32 bit color mode.  This module's 16 bit mode is a hack layered on top of the 24/32 bit routines, so more CPU time is involved in conversion, and will thus be slower in 16 bit mode.
 
@@ -104,7 +104,7 @@
 
    You can change "3840x2160" to any sane resolution you wish.
 
-   Using the EFI install means no need to fiddle with Grub.  VirtualBox already has a framebuffer for EFI.  Just make sure that you install the extensions (and re-install everytime the Kernel is updated)
+   Using the EFI install means no need to fiddle with Grub.  VirtualBox already has a framebuffer for EFI.  Just make sure that you install the extensions (and re-install the extensions every time the Kernel is updated)
 
 ![Divider](../pics/pink.jpg?raw=true "Divider")
 
@@ -216,12 +216,8 @@ PERL_DL_NONLAZY=1 "/usr/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-
 ![GFB C Splash](../pics/CSplash.png?raw=true "GFB C Splash")
 
 ```
-t/01-splash.t .. skipped: Tests cannot run within X-Windows/Wayland
-Files=1, Tests=0,  1 wallclock secs ( 0.00 usr +  0.01 sys =  0.01 CPU)
-Result: NOTESTS
-```
 
-### _\[sudo\]_ make install (expected output)
+### sudo make install (expected output)
 
 ```
 Manifying 3 pod documents

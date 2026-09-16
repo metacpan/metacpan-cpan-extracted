@@ -3,13 +3,38 @@ package JSON::YY;
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('JSON::YY', $VERSION);
 
-our @EXPORT_OK = qw(encode_json decode_json decode_json_ro);
+our @EXPORT_OK = qw(encode_json decode_json decode_json_ro is_bool true false);
+
+# JSON::PP assigns $JSON::PP::true/false when it loads, so load it before
+# handing them out: loaded later, it would replace the objects already given.
+sub true  { require JSON::PP; $JSON::PP::true }
+sub false { require JSON::PP; $JSON::PP::false }
+
+sub is_bool {
+    my ($val) = @_;
+    return 0 unless defined $val;
+    if (Scalar::Util::blessed($val)) {
+        return 1 if eval {
+            $val->isa('JSON::PP::Boolean')
+            || $val->isa('boolean')
+            || $val->isa('Types::Serialiser::BooleanBase')
+            || $val->isa('Types::Serialiser::Boolean')
+            || $val->isa('JSON::XS::Boolean')
+        };
+    }
+    if (defined &builtin::is_bool) {
+        no if $] >= 5.036, warnings => 'experimental::builtin';
+        return 1 if builtin::is_bool($val);
+    }
+    return 0;
+}
 
 my @DOC_KEYWORDS = qw(jdoc jget jgetp jset jdel jhas jclone jencode
                        jstr jnum jbool jnull jarr jobj jtype jlen jkeys jdecode
@@ -32,6 +57,12 @@ sub _checked_max_depth {
     $self->_set_max_depth($val);
 }
 
+sub _checked_bool {
+    my ($self, $val) = @_;
+    require JSON::PP if $val;
+    $self->_set_bool($val);
+}
+
 my %SETTERS = (
     utf8            => \&_set_utf8,
     pretty          => \&_set_pretty,
@@ -41,6 +72,9 @@ my %SETTERS = (
     allow_blessed   => \&_set_allow_blessed,
     convert_blessed => \&_set_convert_blessed,
     max_depth       => \&_checked_max_depth,
+    bool            => \&_checked_bool,
+    boolean         => \&_checked_bool,
+    boolean_object  => \&_checked_bool,
 );
 
 sub import {
@@ -84,6 +118,7 @@ sub import {
         for my $e (@exports) {
             Carp::croak("'$e' is not exported by JSON::YY")
                 unless grep { $_ eq $e } @EXPORT_OK;
+            next if @flags && ($e eq 'encode_json' || $e eq 'decode_json');
             *{"${caller}::$e"} = \&{$e};
             # also enable keyword for exported functions
             $^H{"JSON::YY/$e"} = 1;
@@ -100,6 +135,9 @@ sub allow_unknown   { $_[0]->_set_allow_unknown($_[1] // 1);   $_[0] }
 sub allow_blessed   { $_[0]->_set_allow_blessed($_[1] // 1);   $_[0] }
 sub convert_blessed { $_[0]->_set_convert_blessed($_[1] // 1); $_[0] }
 sub max_depth       { $_[0]->_checked_max_depth($_[1]);        $_[0] }
+sub bool            { $_[0]->_checked_bool($_[1] // 1);        $_[0] }
+*boolean        = \&bool;
+*boolean_object = \&bool;
 
 # wrap XS new to accept keyword args
 {
@@ -218,9 +256,20 @@ Decode to a deeply readonly structure with zero-copy strings. String SVs
 point directly into yyjson's parsed buffer. Faster than C<decode_json>
 for medium/large documents. Modification attempts croak.
 
+=item is_bool $value
+
+Returns true if C<$value> is a recognized boolean object (C<JSON::PP::Boolean>,
+C<boolean>, C<Types::Serialiser::BooleanBase>, C<JSON::XS::Boolean>) or, on
+perl 5.36 and later, a core boolean such as C<!!1>.
+
+=item true, false
+
+Return C<$JSON::PP::true> and C<$JSON::PP::false> singleton boolean objects.
+
 =back
 
-When imported via C<qw()>, these compile to custom ops via
+When imported via C<qw()>, C<encode_json>, C<decode_json> and
+C<decode_json_ro> compile to custom ops via
 L<XS::Parse::Keyword>, bypassing normal function dispatch. Keywords
 are lexically scoped. The C<-flag> import style installs pre-configured
 closures instead (not compiled as keywords).
@@ -236,7 +285,7 @@ closures instead (not compiled as keywords).
 
 Create a new encoder/decoder. Options: C<utf8>, C<pretty>, C<canonical>,
 C<allow_nonref>, C<allow_unknown>, C<allow_blessed>, C<convert_blessed>,
-C<max_depth>. (C<canonical> is accepted for L<JSON::XS> compatibility but is
+C<max_depth>, C<bool>. (C<canonical> is accepted for L<JSON::XS> compatibility but is
 currently a no-op; see L</LIMITATIONS>.)
 
 By default C<allow_nonref> is on and every other flag is off, so a fresh coder
@@ -261,9 +310,15 @@ Decode from JSON string.
 Decode to a C<JSON::YY::Doc> handle (mutable document, no Perl
 materialization). Can then use Doc API keywords on the result.
 
-=item utf8, pretty, canonical, allow_nonref, allow_unknown, allow_blessed, convert_blessed
+=item utf8, pretty, canonical, allow_nonref, allow_unknown, allow_blessed, convert_blessed, bool
 
 Boolean setters, return C<$self> for chaining.
+
+C<bool> (alias C<boolean>, C<boolean_object>) enables decoding JSON C<true>
+and C<false> as C<JSON::PP::Boolean> objects (compatible with L<JSON::PP>,
+L<JSON::XS>, and L<Cpanel::JSON::XS>) instead of the default C<1>/C<0> Perl
+scalars. The import form is C<use JSON::YY -utf8, -bool>: like any C<-flag>,
+C<-bool> on its own leaves C<utf8> off.
 
 C<convert_blessed> calls a blessed object's C<TO_JSON> method when the class
 has one; when it does not, encoding falls back to the C<allow_blessed>
@@ -712,11 +767,15 @@ Reaching that takes a deliberate loop -- neither parsed JSON nor a JSON Pointer
 can build a document that deep -- but if you construct documents by unbounded
 repeated nesting, serialise rather than clone or compare them.
 
-=item * JSON C<true>/C<false> decode to the Perl scalars C<1>/C<0> (correct in
-boolean context), not to overloaded boolean objects. To B<encode> a JSON
-boolean, pass a scalar ref (C<\1> for true, C<\0> for false) or use C<jbool> in
-the Doc API. Consequently C<encode_json(decode_json('[true,false]'))> yields
-C<[1,0]>, not C<[true,false]>.
+=item * By default, JSON C<true>/C<false> decode to the Perl scalars C<1>/C<0>
+(correct in boolean context), not to overloaded boolean objects. To decode JSON
+booleans as C<JSON::PP::Boolean> objects, enable C<< bool => 1 >> on the coder
+(C<< JSON::YY->new(bool => 1) >>) or use C<use JSON::YY -utf8, -bool>.
+To B<encode> a JSON boolean, pass a boolean object (C<JSON::PP::Boolean>,
+C<boolean.pm>, C<Types::Serialiser>), a scalar ref (C<\1> for true, C<\0> for false), or use C<jbool>
+in the Doc API. Under default settings,
+C<encode_json(decode_json('[true,false]'))> yields C<[1,0]>, not C<[true,false]>;
+with C<-bool> or C<< bool => 1 >>, it round-trips as C<[true,false]>.
 
 =back
 

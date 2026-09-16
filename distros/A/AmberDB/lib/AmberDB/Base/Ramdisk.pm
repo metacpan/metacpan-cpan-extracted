@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use Cwd qw(abs_path);
 use Digest::MD5 qw(md5_hex);
 
-our $VERSION = '5.25.1';
+our $VERSION = '5.25.2';
 
 my $CREATED = '2026-08-11';
 
@@ -63,12 +63,11 @@ sub _normalize_ramdisk_tier {
 # Resolves root directory for ramdisk storage (typically mounted as tmpfs / APFS / ImDisk)
 sub ramdisk_dir {
     my ($self) = @_;
-    if ( length( $self->path('ramdisk_dir') // '' ) ) {
-        return $self->path('ramdisk_dir');
-    }
-    my $ramdisk_dir = ( ( $self->path('dbase_dir') || "." ) . "/ramdisk" );
-    $self->path( ramdisk_dir => $ramdisk_dir );
-    return $ramdisk_dir;
+    my $rdir = $self->path('ramdisk_dir');
+    return $rdir if length $rdir;
+    $rdir = ( $self->path('dbase_dir') || "." ) . "/ramdisk";
+    $self->path( ramdisk_dir => $rdir );
+    return $rdir;
 }
 
 # Backwards compatibility path accessors
@@ -92,44 +91,73 @@ sub ramdisk_session_dir {
     return $self->{_path}->{session_dir} || $self->path('session_dir') || ( ( $self->path('dbase_dir') || "." ) . "/session" );
 }
 
-# $bool = $adb->ramdisk_is_mounted();
+# ($bool, $desc, $active_rdir, $sys) = $adb->ramdisk_is_mounted([$force | %opts]);
 # Returns 1 if RAM-disk is mounted and ready, 0 otherwise.
+# In list context, returns ($is_mounted, $mount_desc, $active_ramdisk_dir, $sys_info).
+# Supports cached status; pass force => 1 (or 1) to re-verify mount.
 # ------------------------------------------------
 sub ramdisk_is_mounted {
-    my ($self) = @_;
-    return 1 if $ENV{AMBERDB_TEST_RAMDISK};
-    if ( !defined $self->{_cfg}->{ramdisk_mounted} ) {
-        my $info = $self->ramdisk_setup();
-        $self->{_cfg}->{ramdisk_mounted} = $info->{is_mounted} ? 1 : 0;
+    my ( $self, @args ) = @_;
+
+    my %opts;
+    if ( @args == 1 ) {
+        if ( ref( $args[0] ) eq 'HASH' ) {
+            %opts = %{ $args[0] };
+        }
+        else {
+            $opts{force} = $args[0] ? 1 : 0;
+        }
     }
-    return $self->{_cfg}->{ramdisk_mounted} ? 1 : 0;
-}
+    elsif ( @args % 2 == 0 && @args > 0 ) {
+        %opts = @args;
+    }
 
-# my $info = $adb->ramdisk_setup([$tableid]);
-# Returns diagnostics, script paths, configured size, and RAM-disk mount status for Linux (tmpfs), macOS (APFS), and Windows (ImDisk).
-# If optional $tableid is provided, verifies mount and preloads/ensures the table on RAM-disk.
-# ------------------------------------------------
-sub ramdisk_setup {
-    my ( $self, $tableid ) = @_;
+    my $force     = $opts{force} ? 1 : 0;
+    my $dbase_dir = $self->path('dbase_dir') || ".";
 
-    my $ramdisk_dir = ( length( $self->path('ramdisk_dir') // '' ) )
-      ? $self->path('ramdisk_dir')
-      : ( ( $self->path('dbase_dir') || "." ) . "/ramdisk" );
+    # Candidate RAM-disk directory resolution
+    my $ramdisk_dir = $opts{ramdisk_dir};
+    if ( !defined $ramdisk_dir || !length $ramdisk_dir ) {
+        my $configured = $self->path('ramdisk_dir');
+        if ( length $configured && $configured ne $dbase_dir ) {
+            $ramdisk_dir = $configured;
+        }
+        else {
+            $ramdisk_dir = "$dbase_dir/ramdisk";
+        }
+    }
     $ramdisk_dir =~ s{[\\/]+$}{};
 
-    my $disk_size   = $self->config('ramdisk_size') // '512M';
+    # System and helper scripts detection
+    my $os        = ( $^O eq 'MSWin32' || $^O eq 'msys' || $^O eq 'cygwin' ) ? 'windows'
+                  : ( $^O eq 'darwin' )                                      ? 'macos'
+                  : 'linux';
+    my $bin_dir   = "$dbase_dir/../bin";
+    my $helper_pl = "$bin_dir/amberdb_setup.pl";
+    my $disk_size = $self->config('ramdisk_size') // '512M';
+    my $sys       = {
+        os           => $os,
+        script_pl    => $helper_pl,
+        script_bat   => "$bin_dir/setup_windows.bat",
+        script_ps1   => "$bin_dir/setup_windows.ps1",
+        script_sh    => $os eq 'macos' ? "$bin_dir/setup_macos.sh" : "$bin_dir/setup_linux.sh",
+        instructions => $os eq 'windows'
+          ? "Run as Administrator: perl $helper_pl --action=ramdisk --start --size $disk_size"
+          : "Run with sudo: sudo perl $helper_pl --action=ramdisk --start --size $disk_size",
+    };
 
-    my $is_win      = ( $^O eq 'MSWin32' || $^O eq 'msys' || $^O eq 'cygwin' );
-    my $is_mac      = ( $^O eq 'darwin' );
+    # Return cached mount status unless force is requested or candidate ramdisk_dir has changed
+    if ( !$force && ( my $cached = $self->get_cache( 'ramdisk', 'mount' ) ) ) {
+        if ( ( $cached->{ramdisk_dir} // '' ) eq $ramdisk_dir && defined $cached->{is_mounted} ) {
+            my $active_dir = $cached->{is_mounted} ? $ramdisk_dir : '';
+            return wantarray
+              ? ( $cached->{is_mounted}, $cached->{mount_desc}, $active_dir, $cached->{sys} || $sys )
+              : $cached->{is_mounted};
+        }
+    }
 
-    my $bin_dir     = ( $self->path('dbase_dir') || "." ) . "/../bin";
-    my $helper_pl   = "$bin_dir/amberdb_setup.pl";
-    my $helper_bat  = "$bin_dir/setup_windows.bat";
-    my $helper_ps1  = "$bin_dir/setup_windows.ps1";
-    my $helper_sh   = $is_mac ? "$bin_dir/setup_macos.sh" : "$bin_dir/setup_linux.sh";
-
-    my $is_mounted  = 0;
-    my $mount_desc  = "Local Storage (No RAM-disk active)";
+    my $is_mounted = 0;
+    my $mount_desc = "Local Storage (No RAM-disk active)";
 
     # Pure-Perl Linux kernel mount table verification (zero subprocess overhead)
     my $_is_linux_tmpfs = sub {
@@ -166,15 +194,15 @@ sub ramdisk_setup {
         my $target = eval { readlink($ramdisk_dir) } // '';
         $target =~ s{[\\/]+$}{};
 
-        if ( $is_win && ( $target =~ /^[a-zA-Z]:/ || $target =~ m{^/[a-zA-Z]/} ) ) {
+        if ( $os eq 'windows' && ( $target =~ /^[a-zA-Z]:/ || $target =~ m{^/[a-zA-Z]/} ) ) {
             $is_mounted = 1;
             $mount_desc = "Linked RAM-Disk ($ramdisk_dir -> $target)";
         }
-        elsif ( $is_mac && $target =~ m{^/Volumes/AmberDB_RAM} ) {
+        elsif ( $os eq 'macos' && $target =~ m{^/Volumes/} ) {
             $is_mounted = 1;
             $mount_desc = "Linked APFS RAM-Disk ($ramdisk_dir -> $target)";
         }
-        elsif ( !$is_win && !$is_mac ) {
+        elsif ( $os eq 'linux' ) {
             if ( $_is_linux_tmpfs->( $target || $ramdisk_dir ) ) {
                 $is_mounted = 1;
                 $mount_desc = "Linked tmpfs ($ramdisk_dir -> $target)";
@@ -186,43 +214,127 @@ sub ramdisk_setup {
         }
     }
     # 3. Windows: Direct R: Drive Path
-    elsif ( $is_win && ( $ramdisk_dir =~ /^[rR]:/i || $ramdisk_dir =~ m{^/[rR]/}i ) && -d $ramdisk_dir ) {
+    elsif ( $os eq 'windows' && ( $ramdisk_dir =~ /^[rR]:/i || $ramdisk_dir =~ m{^/[rR]/}i ) && -d $ramdisk_dir ) {
         $is_mounted = 1;
         $mount_desc = "ImDisk RAM-Disk on R: (Windows)";
     }
-    # 4. macOS: Direct /Volumes/AmberDB_RAM Path
-    elsif ( $is_mac && $ramdisk_dir =~ m{^/Volumes/AmberDB_RAM} && -d $ramdisk_dir ) {
+    # 4. macOS: Direct /Volumes/<Name> Path
+    elsif ( $os eq 'macos' && $ramdisk_dir =~ m{^/Volumes/} && -d $ramdisk_dir ) {
         $is_mounted = 1;
-        $mount_desc = "APFS RAM-Disk on /Volumes/AmberDB_RAM (macOS)";
+        $mount_desc = "APFS RAM-Disk on $ramdisk_dir (macOS)";
     }
     # 5. Linux: Direct tmpfs/ramfs Mount or /dev/shm Path
-    elsif ( !$is_win && !$is_mac && -d $ramdisk_dir ) {
+    elsif ( $os eq 'linux' && -d $ramdisk_dir ) {
         if ( $_is_linux_tmpfs->($ramdisk_dir) ) {
             $is_mounted = 1;
             $mount_desc = "tmpfs mountpoint on $ramdisk_dir (Linux)";
         }
     }
 
+    $self->set_cache(
+        'ramdisk', 'mount',
+        {
+            ramdisk_dir => $ramdisk_dir,
+            is_mounted  => $is_mounted ? 1 : 0,
+            mount_desc  => $mount_desc,
+            sys         => $sys,
+        }
+    );
+    $self->config( ramdisk_mounted => $is_mounted ? 1 : 0 );
+
+    my $active_dir = $is_mounted ? $ramdisk_dir : '';
+    return wantarray
+      ? ( $is_mounted ? 1 : 0, $mount_desc, $active_dir, $sys )
+      : ( $is_mounted ? 1 : 0 );
+}
+
+# my $info = $adb->ramdisk_setup([$tableid], [%opts]);
+# Returns diagnostics, script paths, configured size, and RAM-disk mount status for Linux (tmpfs), macOS (APFS), and Windows (ImDisk).
+# If optional $tableid is provided, verifies mount and preloads/ensures the table on RAM-disk.
+# ------------------------------------------------
+sub ramdisk_setup {
+    my ( $self, @args ) = @_;
+
+    my $tableid;
+    my %opts;
+
+    if ( @args == 1 && ref( $args[0] ) eq 'HASH' ) {
+        %opts = %{ $args[0] };
+    }
+    elsif ( @args % 2 != 0 ) {
+        $tableid = shift @args;
+        %opts    = @args;
+    }
+    elsif ( @args ) {
+        %opts = @args;
+    }
+
+    my ( $is_mounted, $mount_desc, $ramdisk_dir, $sys ) = $self->ramdisk_is_mounted(%opts);
+
     my ( $tbl_dir, $schema_dir, $conf_dir ) = ( '', '', '' );
 
     # Populate and create RAM-disk paths ONLY if RAM-disk is confirmed mounted
-    if ($is_mounted) {
-        $tbl_dir    = ( length( $self->path('table_rdir') // '' ) )  ? $self->path('table_rdir')  : "$ramdisk_dir/table";
-        $schema_dir = ( length( $self->path('schema_rdir') // '' ) ) ? $self->path('schema_rdir') : "$ramdisk_dir/schema";
-        $conf_dir   = ( length( $self->path('conf_rdir') // '' ) )   ? $self->path('conf_rdir')   : "$ramdisk_dir/config";
+    if ($ramdisk_dir) {
+        my $cur_tbl_rdir = $self->path('table_rdir');
+        if ( defined $opts{table_rdir} && length $opts{table_rdir} ) {
+            $tbl_dir = $opts{table_rdir};
+        }
+        elsif ( length $cur_tbl_rdir && $cur_tbl_rdir ne ( $self->path('table_dir') || ( ( $self->path('dbase_dir') || "." ) . "/table" ) ) ) {
+            $tbl_dir = $cur_tbl_rdir;
+        }
+        else {
+            $tbl_dir = "$ramdisk_dir/table";
+        }
 
-        $self->{_path}->{ramdisk_dir} = $ramdisk_dir;
-        $self->{_path}->{table_rdir}  = $tbl_dir;
-        $self->{_path}->{schema_rdir} = $schema_dir;
-        $self->{_path}->{conf_rdir}   = $conf_dir;
+        my $cur_schema_rdir = $self->path('schema_rdir');
+        if ( defined $opts{schema_rdir} && length $opts{schema_rdir} ) {
+            $schema_dir = $opts{schema_rdir};
+        }
+        elsif ( length $cur_schema_rdir && $cur_schema_rdir ne ( $self->path('schema_dir') || ( ( $self->path('dbase_dir') || "." ) . "/schema" ) ) ) {
+            $schema_dir = $cur_schema_rdir;
+        }
+        else {
+            $schema_dir = "$ramdisk_dir/schema";
+        }
 
-        # Repoint lock_dir and session_dir to RAM-disk
-        $self->{_path}->{lock_dir}    = "$ramdisk_dir/lock";
-        $self->{_path}->{session_dir} = "$ramdisk_dir/session";
+        my $cur_conf_rdir = $self->path('conf_rdir');
+        if ( defined $opts{conf_rdir} && length $opts{conf_rdir} ) {
+            $conf_dir = $opts{conf_rdir};
+        }
+        elsif ( length $cur_conf_rdir && $cur_conf_rdir ne ( $self->path('conf_dir') || ( ( $self->path('dbase_dir') || "." ) . "/config" ) ) ) {
+            $conf_dir = $cur_conf_rdir;
+        }
+        else {
+            $conf_dir = "$ramdisk_dir/config";
+        }
 
-        for my $dir ( $tbl_dir, $schema_dir, $conf_dir, $self->{_path}->{lock_dir}, $self->{_path}->{session_dir} ) {
+        $self->path(
+            ramdisk_dir => $ramdisk_dir,
+            table_rdir  => $tbl_dir,
+            schema_rdir => $schema_dir,
+            conf_rdir   => $conf_dir,
+            lock_dir    => "$ramdisk_dir/lock",
+            session_dir => "$ramdisk_dir/session",
+        );
+
+        for my $dir ( $tbl_dir, $schema_dir, $conf_dir, "$ramdisk_dir/lock", "$ramdisk_dir/session" ) {
             $self->make_path($dir);
         }
+    }
+    else {
+        my $dbase_dir = $self->path('dbase_dir') || ".";
+        $tbl_dir    = $self->path('table_dir')   || "$dbase_dir/table";
+        $schema_dir = $self->path('schema_dir')  || "$dbase_dir/schema";
+        $conf_dir   = $self->path('conf_dir')    || "$dbase_dir/config";
+
+        $self->path(
+            ramdisk_dir => $dbase_dir,
+            table_rdir  => $tbl_dir,
+            schema_rdir => $schema_dir,
+            conf_rdir   => $conf_dir,
+            lock_dir    => $self->path('lock_dir')    || "$dbase_dir/lock",
+            session_dir => $self->path('session_dir') || "$dbase_dir/session",
+        );
     }
 
     my $tbl_res = '';
@@ -230,13 +342,14 @@ sub ramdisk_setup {
         $tbl_res = $self->ramdisk_ensure($tableid) // '';
     }
 
+    my $disk_size = $self->config('ramdisk_size') // '512M';
     return {
-        os           => $^O,
+        os           => $sys->{os},
         table        => $tbl_res,
-        ramdisk_dir  => $ramdisk_dir,
+        ramdisk_dir  => $self->path('ramdisk_dir'),
         table_dir    => $tbl_dir,
-        lock_dir     => $self->{_path}->{lock_dir},
-        session_dir  => $self->{_path}->{session_dir},
+        lock_dir     => $self->path('lock_dir'),
+        session_dir  => $self->path('session_dir'),
         schema_dir   => $schema_dir,
         conf_dir     => $conf_dir,
         tbl_dir      => $tbl_dir,
@@ -246,13 +359,11 @@ sub ramdisk_setup {
         ramdisk_size => $disk_size,
         is_mounted   => $is_mounted,
         mount_desc   => $mount_desc,
-        script_pl    => $helper_pl,
-        script_bat   => $helper_bat,
-        script_ps1   => $helper_ps1,
-        script_sh    => $helper_sh,
-        instructions => $is_win
-          ? "Run as Administrator: perl $helper_pl --action=ramdisk --start --size $disk_size"
-          : "Run with sudo: sudo perl $helper_pl --action=ramdisk --start --size $disk_size",
+        script_pl    => $sys->{script_pl},
+        script_bat   => $sys->{script_bat},
+        script_ps1   => $sys->{script_ps1},
+        script_sh    => $sys->{script_sh},
+        instructions => $sys->{instructions},
     };
 }
 

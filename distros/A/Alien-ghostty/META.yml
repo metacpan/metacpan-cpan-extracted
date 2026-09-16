@@ -1,0 +1,54 @@
+---
+abstract: "Find or build libghostty-vt, Ghostty's terminal emulation library"
+author:
+  - vividsnow
+build_requires:
+  Alien::Build::MM: '2.60'
+  Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+  Archive::Tar: '0'
+  Digest::SHA: '0'
+  HTTP::Tiny: '0.056'
+  IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  Test::Alien: '0'
+  Test::More: '0.98'
+  URI: '0'
+configure_requires:
+  Alien::Build: '2.60'
+  Alien::Build::MM: '2.60'
+  ExtUtils::CBuilder: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-ghostty
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Base: '2.60'
+  Alien::Build: '0.25'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/vividsnow/perl5-alien-ghostty/issues
+  repository: https://github.com/vividsnow/perl5-alien-ghostty.git
+version: '0.01'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.84'
+  requires:
+    share:
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      Archive::Tar: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

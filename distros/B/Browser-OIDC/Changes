@@ -1,5 +1,12 @@
 Revision history for Browser-OIDC
 
+0.002     2026-09-15 13:11:47+0200
+          - Add TokenResponse class
+          - Use a lot more of the Open ID Connect configuration
+          - Add display, prompt, nonce and max_age arguments
+          - Add issuer, claims_supported and scopes_supported methods
+          - Add jwks method
+
 0.001     2026-09-03 16:12:02+0200
           - Initial release to an unsuspecting world
 

@@ -1,0 +1,23 @@
+Crypt-SelfCertificate
+=====================
+
+Generate random self-signed SSL certificates in memory.
+
+    use Crypt::SelfCertificate qw(generate_certificates);
+    my $certs = generate_certificates(10);
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make install
+
+On Windows with Strawberry Perl, use `dmake` or `gmake` instead of `make`.
+
+DEPENDENCIES
+
+    IO::Socket::SSL
+
+LICENSE
+
+Same terms as Perl itself.

@@ -1,0 +1,39 @@
+---
+# Run: fuzz-harness-generator -r t/conf/search.yml
+
+module: Genealogy::Obituary::Lookup
+function: search
+
+config:
+  dedup: 1
+  test_empty: 1
+  test_non_ascii: 0
+  test_nuls: 0
+  test_undef: 0
+
+new:
+
+input:
+  last:
+    type: string
+    min: 1
+    max: 100
+    matches: "^[\\w\\-]+$"  # Allow hyphens in surnames
+  first:
+    type: string
+    optional: true
+    min: 1
+    max: 100
+  middle:
+    type: string
+    optional: true
+    min: 1
+    max: 100
+  age:
+    type: integer
+    optional: true
+    min: 0
+    max: 120
+
+output:
+  type: hashref

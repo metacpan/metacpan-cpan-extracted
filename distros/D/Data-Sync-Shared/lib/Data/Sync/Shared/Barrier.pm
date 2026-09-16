@@ -1,7 +1,7 @@
 package Data::Sync::Shared::Barrier;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use Data::Sync::Shared ();
 1;
 

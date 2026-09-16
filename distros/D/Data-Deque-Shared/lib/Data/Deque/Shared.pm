@@ -1,7 +1,7 @@
 package Data::Deque::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 require XSLoader;
 XSLoader::load('Data::Deque::Shared', $VERSION);
 
@@ -156,9 +156,9 @@ timeout; C<pop_*_wait> return the value, or C<undef> on timeout.
 
 C<stats()> returns: C<size>, C<capacity>, C<pushes>, C<pops>,
 C<waits>, C<timeouts>, C<recoveries>, C<mmap_size>.
-C<recoveries> counts slots that drain force-skipped because a pusher
-crashed (or stalled > 2s) between winning the cursor CAS and
-publishing the value.
+C<recoveries> counts slots force-recovered (by drain, pop, or push)
+because a peer crashed (or stalled > 2s) between claiming and
+publishing or releasing a slot.
 
 =head1 SECURITY
 

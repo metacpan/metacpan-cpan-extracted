@@ -4,7 +4,7 @@
       "Leon Timmermans <fawaka@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.051",
+   "generated_by" : "App::ModuleBuildTiny version 0.052",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.051"
+            "App::ModuleBuildTiny" : "0.052"
          }
       },
       "runtime" : {
@@ -37,6 +37,7 @@
             "MIME::Base64" : "0",
             "experimental" : "0",
             "perl" : "5.020",
+            "strict" : "0",
             "warnings" : "0"
          }
       }
@@ -44,7 +45,11 @@
    "provides" : {
       "Browser::OIDC" : {
          "file" : "lib/Browser/OIDC.pm",
-         "version" : "0.001"
+         "version" : "0.002"
+      },
+      "Browser::OIDC::TokenResponse" : {
+         "file" : "lib/Browser/OIDC/TokenResponse.pm",
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -58,7 +63,7 @@
          "web" : "https://github.com/Leont/browser-oidc"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_generated_by_perl" : "v5.44.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

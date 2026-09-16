@@ -3,6 +3,7 @@ package OrePAN2::S3::Indexer;
 use strict;
 use warnings;
 
+use Carp;
 use Cwd qw(getcwd);
 use Log::Log4perl;
 use Data::Dumper;
@@ -56,10 +57,25 @@ sub new {
   return $self;
 }
 
-sub get_logger      { return $_[0]->{logger} // Log::Log4perl->get_logger }
-sub get_author_path { return $_[0]->{author_path} }
-sub get_s3          { return $_[0]->{s3} }
-sub get_bucket_name { return $_[0]->{bucket_name} }
-sub get_config      { return $_[0]->{config} }
+sub get_logger            { return $_[0]->{logger} // Log::Log4perl->get_logger }
+sub get_author_path       { return $_[0]->{author_path} }
+sub get_s3                { return $_[0]->{s3} }
+sub get_bucket_name       { return $_[0]->{bucket_name} }
+sub get_config            { return $_[0]->{config} }
+sub get_dryrun            { return $_[0]->{dryrun} }
+sub get_save_index        { return $_[0]->{save_index} }
+sub get_update_site_index { return $_[0]->{update_save_index} }
+
+########################################################################
+sub AUTOLOAD { ## no critic
+########################################################################
+  our $AUTOLOAD;
+
+  return if $AUTOLOAD =~ /DESTROY/;
+
+  carp "You've probably injected a role that is calling a method you don't support ($AUTOLOAD)\n";
+
+  return;
+}
 
 1;

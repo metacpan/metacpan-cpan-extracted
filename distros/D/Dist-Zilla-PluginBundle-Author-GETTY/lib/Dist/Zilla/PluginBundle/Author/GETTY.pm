@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.321';
+our $VERSION = '0.322';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -23,7 +23,7 @@ sub bundle_config {
 
   $self->configure;
 
-  return $self->plugins->@*;
+  return @{ $self->plugins };
 }
 
 
@@ -58,8 +58,9 @@ has authority => (
   lazy    => 1,
   default => sub {
     my $self = shift;
-    return 'cpan:'.$self->payload->{authority} if $self->payload->{authority};
-    return 'cpan:'.$self->author;
+    my $id = $self->payload->{authority} || $self->author;
+    $id =~ s/\Acpan://i;
+    return 'cpan:'.$id;
   },
 );
 
@@ -720,7 +721,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.321
+version 0.322
 
 =head1 SYNOPSIS
 
@@ -778,7 +779,7 @@ In default configuration it is equivalent to:
 
   [Authority]
   :version = 1.009
-  authority = cpan:GETTY ; or cpan:$authority if set
+  authority = cpan:GETTY ; cpan:$author, or cpan:$authority if set
   do_munging = 0
   do_metadata = 1
 
@@ -864,7 +865,9 @@ with ETHER as the authority:
   [@Author::GETTY]
   authority = ETHER
 
-If not set, defaults to the C<author> value.
+The value may be given either bare (C<ETHER>) or with the C<cpan:> prefix
+(C<cpan:ETHER>); both produce the same C<cpan:ETHER> authority, so the
+prefix is never doubled. If not set, defaults to the C<author> value.
 
 =head2 deprecated
 
@@ -1184,7 +1187,7 @@ A minimal workflow for a pure-Perl dist (no system libraries required):
           run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
         - name: perl -V
           run: perl -V
-        - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+        - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
 
 =head2 Alien / XS distributions (system libraries)
 
@@ -1201,7 +1204,7 @@ before the shared action, and a second job that forces a vendored build:
         - name: Fix safe.directory
           run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
         - run: apt-get update && apt-get install -y libfoo-dev pkg-config
-        - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+        - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
 
     share-build:
       runs-on: ubuntu-latest
@@ -1212,7 +1215,7 @@ before the shared action, and a second job that forces a vendored build:
         - name: Fix safe.directory
           run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
         - run: apt-get update && apt-get install -y cmake build-essential
-        - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+        - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
           with:
             install-type: share
 
@@ -1226,7 +1229,7 @@ Forgejo instance, reference it with a fully-qualified URL so the action is
 always fetched from GitHub regardless of the instance's
 C<DEFAULT_ACTIONS_URL> setting:
 
-  - uses: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+  - uses: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
 
 Alternatively, set C<DEFAULT_ACTIONS_URL = https://github.com> in the
 Forgejo C<app.ini> and use the short form as on GitHub.
@@ -1247,7 +1250,7 @@ push a minimal probe workflow and watch the job log:
         image: perl:5.40-bookworm
       steps:
         - uses: https://github.com/actions/checkout@v4
-        - uses: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+        - uses: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
 
 If the action step fails to resolve (Forgejo does not yet support cross-repo
 composite actions via subdirectory paths in all configurations), the fallback

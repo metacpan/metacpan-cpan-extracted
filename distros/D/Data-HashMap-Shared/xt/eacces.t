@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use Fcntl qw(:mode);
 
 plan skip_all => 'root can bypass permissions' if $> == 0;
 

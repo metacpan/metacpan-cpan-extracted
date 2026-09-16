@@ -17,12 +17,37 @@ my $corpus = VPNDetectionTest::corpus();
 my %routes;
 my $origin = VPNDetectionTest::Origin->new(sub {
     my ($c) = @_;
-    my $route = $routes{ $c->req->url->path->to_string };
+    my $path = $c->req->url->path->to_string;
+    return $c->render(json => batch_answer($c->req->json)) if $path eq '/batch';
+    my $route = $routes{$path};
     return $c->render(json => { error => 'not a valid IP address' }, status => 400)
         unless $route;
     $c->res->headers->header($_ => $route->{headers}{$_}) for keys %{ $route->{headers} || {} };
     $c->render(json => $route->{body}, status => $route->{status} || 200);
 });
+
+# A POST /batch is answered the way the API answers one: every address the table
+# knows is a result if its route is a 200 and an entry error otherwise, and an
+# unknown address is the 400 the API gives a string that is not one. One call
+# however many addresses, which is what the request counts measure.
+sub batch_answer {
+    my ($body) = @_;
+    my $ips = ref $body eq 'HASH' && ref $body->{ips} eq 'ARRAY' ? $body->{ips} : [];
+    my (%results, %errors);
+    for my $ip (@$ips) {
+        my $route = $routes{"/$ip"};
+        if (!$route) {
+            $errors{$ip} = { status => 400, error => 'not a valid IP address' };
+        }
+        elsif (($route->{status} || 200) == 200) {
+            $results{$ip} = $route->{body};
+        }
+        else {
+            $errors{$ip} = { status => $route->{status}, error => $route->{body}{error} };
+        }
+    }
+    return { results => \%results, errors => \%errors };
+}
 
 sub client {
     return VPNDetection->new(base_url => $origin->url, @_);
@@ -128,6 +153,7 @@ subtest 'one bad address does not lose the rest of the batch' => sub {
     is_deeply([sort keys %$answers], [sort @{ $case->{expect}{keys} }], 'every address is keyed');
     for my $ip (@{ $case->{expect}{errorKeys} }) {
         isa_ok($answers->{$ip}, 'VPNDetection::Error', "$ip carries its error");
+        is($answers->{$ip}->kind, $case->{expect}{errorKinds}{$ip}, "$ip is $case->{expect}{errorKinds}{$ip}");
     }
     is($answers->{'1.1.1.1'}->is_vpn, 0, 'the good address still answered');
 };
@@ -139,6 +165,36 @@ subtest 'a cache hit issues no second request' => sub {
     $client->lookup_batch($case->{input}) for 1 .. $case->{repeat};
 
     is($origin->count, $case->{expect}{httpRequests}, 'the second batch was served from cache');
+};
+
+subtest 'a large batch is sent in chunks of a thousand' => sub {
+    my $case = VPNDetectionTest::batch_case('chunks-of-one-thousand');
+    serve(map { +{ ip => $_, body => { ip => $_, is_vpn => \0 } } } @{ $case->{input} });
+    my $answers = client(cache_size => 0)->lookup_batch($case->{input});
+
+    is(scalar keys %$answers, $case->{expect}{keyCount}, 'every address is keyed once');
+    is($origin->count, $case->{expect}{httpRequests}, 'one request per chunk of 1000');
+    is($answers->{$_}->ip, $_, "$_ answered for itself") for @{ $case->{input} }[0, 999, 1000];
+};
+
+# A per-entry failure carries no headers, so its 429 can only be a spent
+# allowance, and a 500 is the server's; neither is retried per entry, because
+# retries belong to the call and the call succeeded.
+subtest 'an entry error is classified by its status' => sub {
+    my $case = VPNDetectionTest::batch_case('an-entry-error-is-classified-by-its-status');
+    serve(
+        { ip => '1.1.1.1', body => { ip => '1.1.1.1', is_vpn => \0 } },
+        { ip => '8.8.8.8', status => 429, body => { error => 'request allowance exceeded; raise or remove your overage limit' } },
+        { ip => '9.9.9.9', status => 500, body => { error => 'lookup failed' } },
+    );
+    my $answers = client(retries => 3)->lookup_batch($case->{input});
+
+    is_deeply([sort keys %$answers], [sort @{ $case->{expect}{keys} }], 'every address is keyed');
+    for my $ip (sort keys %{ $case->{expect}{errorKinds} }) {
+        isa_ok($answers->{$ip}, 'VPNDetection::Error', "$ip carries its error");
+        is($answers->{$ip}->kind, $case->{expect}{errorKinds}{$ip}, "$ip is $case->{expect}{errorKinds}{$ip}");
+    }
+    is($origin->count, $case->{expect}{httpRequests}, 'the call was made once and no entry was retried');
 };
 
 subtest 'two clients never share a cached answer' => sub {

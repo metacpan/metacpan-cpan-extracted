@@ -60,4 +60,21 @@ is( lst("pre" . (shm_ss_keys $m)),
     is_deeply( \%cseen, { b => "1", c => "2" }, 'cursor_next keyword loop yields all pairs' );
 }
 
+# The POD's keyword-syntax promises.
+{
+    ok !eval q{ 0 and shm_ss_put($m, 'x', 'y'); 1 }, 'a multi-argument keyword refuses parentheses';
+    like $@, qr/^Expected ','/, '  ... when the code is compiled';
+    # With one following item, the parenthesized 2-arg keyword takes it as the
+    # second argument and dies at run time (the POD's documented failure).
+    ok !eval q{ my @r = (shm_ss_get($m, 'x'), 1); 1 },
+        'a parenthesized keyword with a trailing item swallows it and dies at run time';
+    like $@, qr/^Usage: Data::HashMap::Shared::SS::get\(/, '  ... with the method usage message';
+    is shm_ss_size($m), (shm_ss_size $m), 'a one-argument keyword takes either form';
+    {
+        no Data::HashMap::Shared::SS;
+        ok !eval q{ shm_ss_size $m; 1 }, 'no Data::HashMap::Shared::SS switches the keywords off';
+    }
+    ok eval q{ shm_ss_size $m; 1 }, '  ... for the enclosing scope only' or diag $@;
+}
+
 done_testing;

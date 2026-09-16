@@ -1,0 +1,87 @@
+{
+   "abstract" : "Find or build libghostty-vt, Ghostty's terminal emulation library",
+   "author" : [
+      "vividsnow"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-ghostty",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build::MM" : "2.60",
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
+            "Archive::Tar" : "0",
+            "Digest::SHA" : "0",
+            "HTTP::Tiny" : "0.056",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "2.60",
+            "Alien::Build::MM" : "2.60",
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "2.60",
+            "Alien::Build" : "0.25",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Alien" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vividsnow/perl5-alien-ghostty/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vividsnow/perl5-alien-ghostty.git",
+         "web" : "https://github.com/vividsnow/perl5-alien-ghostty"
+      }
+   },
+   "version" : "0.01",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.84",
+      "requires" : {
+         "share" : {
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
+            "Archive::Tar" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

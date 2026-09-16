@@ -70,8 +70,8 @@ t/80-input-geometry.t
 t/81-close.t
 t/82-navigate.t
 t/83-handlers.t
-t/84-protocol.t
 t/84-client-lifecycle.t
+t/84-protocol.t
 t/85-control.t
 t/86-control-events.t
 t/87-control-elements.t

@@ -1,7 +1,7 @@
 package Data::Sync::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Data::Sync::Shared', $VERSION);
@@ -22,7 +22,7 @@ XSLoader::load('Data::Sync::Shared', $VERSION);
 # Guard objects -- auto-release on scope exit
 
 package Data::Sync::Shared::RWLock::Guard {
-    our $VERSION = '0.08';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.09';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         # Only the process that took the lock may release it: after fork the
         # child inherits the guard object, and its global destruction would
@@ -46,7 +46,7 @@ sub Data::Sync::Shared::RWLock::wrlock_guard {
 }
 
 package Data::Sync::Shared::Condvar::Guard {
-    our $VERSION = '0.08';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.09';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         # Only the process that took the mutex may release it -- see the note
         # on RWLock::Guard::DESTROY.
@@ -100,7 +100,7 @@ sub Data::Sync::Shared::Semaphore::acquire_guard {
 }
 
 package Data::Sync::Shared::Semaphore::Guard {
-    our $VERSION = '0.08';   # indexable package: PAUSE needs a version here too
+    our $VERSION = '0.09';   # indexable package: PAUSE needs a version here too
     sub DESTROY {
         # Only the process that took the permits may release them: a forked
         # child's global destruction would otherwise release permits it never

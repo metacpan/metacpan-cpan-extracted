@@ -3,15 +3,22 @@
 use strict;
 use warnings;
 
+use App::perlvars ();
 use Test::More import => [qw( done_testing subtest )];
 use Test::Script qw(
     script_compiles
     script_fails
     script_runs
     script_stderr_like
+    script_stdout_like
 );
 
 script_compiles('script/perlvars');
+
+subtest 'version' => sub {
+    script_runs( [ 'script/perlvars', '--version' ] );
+    script_stdout_like(qr{\Aperlvars \Q$App::perlvars::VERSION\E$});
+};
 
 subtest 'file not found' => sub {
     script_fails( [ 'script/perlvars', 'Moose' ], { exit => 1 } );

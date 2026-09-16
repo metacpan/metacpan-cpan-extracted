@@ -1,4 +1,4 @@
-# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Claude Code — commit: skills/, agents/, rules/, hooks/, settings.json
 # Ignore: local overrides, credentials, session data
 
 # Tracked: shared config & extensibility
@@ -10,6 +10,8 @@
 !.claude/agents/**
 !.claude/skills/
 !.claude/skills/**
+!.claude/rules/
+!.claude/rules/**
 !.claude/hooks/
 !.claude/hooks/**
 

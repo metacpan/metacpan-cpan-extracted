@@ -276,7 +276,10 @@ is $resp, 'world', 'got response';
     my $ecli = Data::ReqRep::Shared::Client->new($epath);
     $ecli->req_eventfd_set($req_efd);  # set request notification fd
     $ecli->eventfd_set($rep_efd);      # set reply notification fd
-    is $ecli->req_fileno, $req_efd, 'client req_fileno matches set fd';
+    # The handle keeps its own duplicate: $req_efd stays owned by $esrv, which
+    # would otherwise be closed twice when both handles are destroyed.
+    ok $ecli->req_fileno >= 0 && $ecli->req_fileno != $req_efd,
+        'client holds its own duplicate of the set fd';
 
     my $eid = $ecli->send("efd_test");
     ok defined $eid, 'eventfd test: send ok';

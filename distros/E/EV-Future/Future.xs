@@ -42,22 +42,47 @@ static void evf_handle_attach(pTHX_ evf_handle *h, void *ctx) {
     h->refcnt++; /* the context's reference */
 }
 
+static int evf_handle_mg_free(pTHX_ SV *sv, MAGIC *mg) {
+    PERL_UNUSED_ARG(sv);
+    if (mg->mg_ptr) {
+        evf_handle *h = (evf_handle *)mg->mg_ptr;
+        mg->mg_ptr = NULL;
+        evf_handle_dec(aTHX_ h);
+    }
+    return 0;
+}
+
+static MGVTBL evf_handle_vtbl = {
+    NULL, /* get */
+    NULL, /* set */
+    NULL, /* len */
+    NULL, /* clear */
+    evf_handle_mg_free, /* free */
+    NULL, /* copy */
+    NULL, /* dup */
+#ifdef MGf_LOCAL
+    NULL, /* local */
+#endif
+};
+
 static SV *evf_handle_wrap(pTHX_ evf_handle *h) {
-    SV *sv = newSViv(PTR2IV(h));
+    SV *sv = newSViv(0);
     SV *rv = newRV_noinc(sv);
     sv_bless(rv, gv_stashpv("EV::Future::Handle", GV_ADD));
+    sv_magicext(sv, NULL, PERL_MAGIC_ext, &evf_handle_vtbl, (const char *)h, 0);
     SvREADONLY_on(sv);
     return rv; /* does not increment: evf_handle_new already counted this */
 }
 
-/* The one place a method turns its invocant back into a cell. Anything that is
-   not a reference to an integer is not one of ours - a subclass built on a
-   hashref, or the class name from a class-method call - so refuse it rather
-   than treat a foreign body as a pointer. A zeroed payload (already destroyed)
-   comes back as NULL too, which every caller must tolerate. */
+/* The one place a method turns its invocant back into a cell. Uses
+   mg_findext to look up our PERL_MAGIC_ext attached with evf_handle_vtbl.
+   A forged, unblessed, or foreign invocant carries no such magic and returns
+   NULL, which every caller safely tolerates. */
 static evf_handle *evf_handle_from_sv(pTHX_ SV *self) {
-    if (!SvROK(self) || !SvIOK(SvRV(self))) return NULL;
-    return INT2PTR(evf_handle *, SvIV(SvRV(self)));
+    if (!self || !SvROK(self)) return NULL;
+    MAGIC *mg = mg_findext(SvRV(self), PERL_MAGIC_ext, &evf_handle_vtbl);
+    if (!mg) return NULL;
+    return (evf_handle *)mg->mg_ptr;
 }
 
 typedef struct {
@@ -179,7 +204,7 @@ typedef struct {
 
 static evf_handle *parallel_start(pTHX_ AV *list, SV *worker, SV *final_cb, int unsafe, int want_handle);
 static evf_handle *series_start(pTHX_ AV *list, SV *worker, SV *final_cb, int unsafe, int want_handle);
-static evf_handle *plimit_start(pTHX_ AV *list, SV *worker, IV limit, SV *final_cb, int unsafe, int want_handle);
+static evf_handle *plimit_start(pTHX_ AV *list, SV *worker, SV *limit_sv, SV *final_cb, int unsafe, int want_handle);
 
 static void parallel_cleanup(pTHX_ parallel_ctx **ctx_ptr) {
     if (!ctx_ptr || !*ctx_ptr) return;
@@ -279,7 +304,9 @@ static void series_cleanup(pTHX_ series_ctx **ctx_ptr) {
 
     if (ctx->current_cv) {
         CvXSUBANY(ctx->current_cv).any_ptr = NULL;
-        SvREFCNT_dec((SV*)ctx->current_cv);
+        CV *cv = ctx->current_cv;
+        ctx->current_cv = NULL;
+        SvREFCNT_dec((SV*)cv);
     }
     if (ctx->tasks) SvREFCNT_dec((SV*)ctx->tasks);
     if (ctx->final_cb) SvREFCNT_dec(ctx->final_cb);
@@ -683,13 +710,16 @@ static void race_task_done(pTHX_ CV *cv) {
         SvREFCNT_inc(cb);
         sv_2mortal(cb);
 
+        /* race_cleanup frees the losers, whose DESTROY may free an arg */
+        for (I32 i = 0; i < items; i++) SAVEFREESV(SvREFCNT_inc_simple_NN(ST(i)));
+
+        race_cleanup(aTHX_ &ctx);
+
         PUSHMARK(SP);
         for (I32 i = 0; i < items; i++) {
             XPUSHs(sv_mortalcopy(ST(i)));
         }
         PUTBACK;
-
-        race_cleanup(aTHX_ &ctx);
 
         call_sv(cb, G_DISCARD | G_VOID);
 
@@ -892,7 +922,7 @@ static evf_handle *series_start(pTHX_ AV *list, SV *worker, SV *final_cb, int un
     return h;
 }
 
-static evf_handle *plimit_start(pTHX_ AV *list, SV *worker, IV limit, SV *final_cb, int unsafe, int want_handle) {
+static evf_handle *plimit_start(pTHX_ AV *list, SV *worker, SV *limit_sv, SV *final_cb, int unsafe, int want_handle) {
     I32 len = av_len(list) + 1;
     if (len <= 0) {
         if (IS_PVCV(final_cb)) {
@@ -910,8 +940,15 @@ static evf_handle *plimit_start(pTHX_ AV *list, SV *worker, IV limit, SV *final_
         return want_handle ? evf_handle_new(aTHX_ NULL, EVF_KIND_PLIMIT) : NULL;
     }
 
-    if (limit < 1) limit = 1;
-    if (limit > len) limit = len;
+    IV limit;
+    NV limit_nv = SvNV(limit_sv);
+    if (!(limit_nv >= 1.0)) {
+        limit = 1;
+    } else if (limit_nv >= (NV)len) {
+        limit = (IV)len;
+    } else {
+        limit = (IV)limit_nv;
+    }
 
     ENTER;
 
@@ -1124,13 +1161,13 @@ series_map(list, worker, final_cb, ...)
         }
 
 void
-parallel_limit(list, limit, final_cb, ...)
+parallel_limit(list, limit_sv, final_cb, ...)
     AV *list
-    IV limit
+    SV *limit_sv
     SV *final_cb
     CODE:
         int unsafe = (items > 3 && SvTRUE(ST(3)));
-        evf_handle *h = plimit_start(aTHX_ list, NULL, limit, final_cb, unsafe,
+        evf_handle *h = plimit_start(aTHX_ list, NULL, limit_sv, final_cb, unsafe,
                                      GIMME_V != G_VOID);
         if (h) {
             ST(0) = sv_2mortal(evf_handle_wrap(aTHX_ h));
@@ -1138,16 +1175,16 @@ parallel_limit(list, limit, final_cb, ...)
         }
 
 void
-parallel_map_limit(list, worker, limit, final_cb, ...)
+parallel_map_limit(list, worker, limit_sv, final_cb, ...)
     AV *list
     SV *worker
-    IV limit
+    SV *limit_sv
     SV *final_cb
     CODE:
         int unsafe = (items > 4 && SvTRUE(ST(4)));
         if (!IS_PVCV(worker))
             croak("EV::Future::parallel_map_limit: worker must be a code reference");
-        evf_handle *h = plimit_start(aTHX_ list, worker, limit, final_cb, unsafe,
+        evf_handle *h = plimit_start(aTHX_ list, worker, limit_sv, final_cb, unsafe,
                                      GIMME_V != G_VOID);
         if (h) {
             ST(0) = sv_2mortal(evf_handle_wrap(aTHX_ h));
@@ -1181,7 +1218,7 @@ race(tasks, final_cb, ...)
                             evf_handle_new(aTHX_ NULL, EVF_KIND_RACE)));
                 XSRETURN(1);
             }
-            return;
+            XSRETURN_EMPTY;
         }
 
         ENTER;
@@ -1301,11 +1338,13 @@ void
 DESTROY(self)
     SV *self
     CODE:
-        evf_handle *h = evf_handle_from_sv(aTHX_ self);
-        if (h) {
-            evf_handle_dec(aTHX_ h);
-            /* Zero the payload so a hand-written second DESTROY is inert. */
-            SvIV_set(SvRV(self), 0);
+        if (self && SvROK(self)) {
+            MAGIC *mg = mg_findext(SvRV(self), PERL_MAGIC_ext, &evf_handle_vtbl);
+            if (mg && mg->mg_ptr) {
+                evf_handle *h = (evf_handle *)mg->mg_ptr;
+                mg->mg_ptr = NULL;
+                evf_handle_dec(aTHX_ h);
+            }
         }
 
 void

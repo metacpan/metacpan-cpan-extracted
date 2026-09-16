@@ -1,0 +1,67 @@
+---
+abstract: DarkPAN::Indexer
+author:
+  - 'Rob Lauer <rclauer@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+  JSON: '4.10'
+  Path::Tiny: '0.150'
+  Test::Output: '1.036'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DarkPAN-Indexer
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  DarkPAN::Indexer:
+    file: lib/DarkPAN/Indexer.pm
+    version: v1.0.2
+  DarkPAN::Indexer::CLI:
+    file: lib/DarkPAN/Indexer/CLI.pm
+    version: v1.0.2
+  DarkPAN::Indexer::Format:
+    file: lib/DarkPAN/Indexer/Format.pm
+    version: '0'
+  DarkPAN::Indexer::Format::SQLite:
+    file: lib/DarkPAN/Indexer/Format/SQLite.pm
+    version: '0'
+  DarkPAN::Indexer::Storage:
+    file: lib/DarkPAN/Indexer/Storage.pm
+    version: '0'
+  DarkPAN::Indexer::Storage::Filesystem:
+    file: lib/DarkPAN/Indexer/Storage/Filesystem.pm
+    version: '0'
+  DarkPAN::Indexer::Storage::S3:
+    file: lib/DarkPAN/Indexer/Storage/S3.pm
+    version: '0'
+requires:
+  Amazon::Credentials: v2.0.0
+  Amazon::S3::Lite: v1.3.0
+  Amazon::S3::Lite::Lock: '0'
+  CLI::Simple: v2.2.2
+  CLI::Simple::Constants: v2.2.2
+  CLI::Simple::Utils: v2.2.2
+  Class::Accessor::Fast: '0.51'
+  DBD::SQLite: '0'
+  DBI: '1.647'
+  Dist::Metadata: '0'
+  JSON: '4.10'
+  Role::Tiny: '2.002004'
+  Role::Tiny::With: '2.002004'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/rlauer6/DarkPAN-Indexer/issues
+  homepage: https://github.com/rlauer6/DarkPAN-Indexer
+  repository: https://github.com/rlauer6/DarkPAN-Indexer
+version: v1.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

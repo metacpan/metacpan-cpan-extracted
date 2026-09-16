@@ -8,9 +8,9 @@ use Log::ger;
 use Perinci::Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-12-21'; # DATE
+our $DATE = '2026-09-16'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 our %SPEC;
 
@@ -26,6 +26,17 @@ our %argspec0plus_files = (
         schema => ['array*' => of => 'filename*'],
         req => 1,
         pos => 0,
+        slurpy => 1,
+    },
+);
+
+our %argspec1plus_files = (
+    files => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'file',
+        schema => ['array*' => of => 'filename*'],
+        req => 1,
+        pos => 1,
         slurpy => 1,
     },
 );
@@ -108,6 +119,14 @@ our %argspecopt_quality__def40 = (
         schema => ['int*', between=>[0,100]],
         default => 40,
         cmdline_aliases => {q=>{}},
+    },
+);
+
+our %argspecopt_overwrite = (
+    overwrite => {
+        summary => 'Whether to overwrite existing output files',
+        schema => 'bool',
+        cmdline_aliases => {O=>{}},
     },
 );
 
@@ -249,6 +268,7 @@ sub downsize_image {
 
         if ($skip_whatsapp) {
             require Regexp::Pattern::Filename::Type::Image::WhatsApp;
+            no warnings 'once';
             if ($file =~ $Regexp::Pattern::Filename::Type::Image::WhatsApp::RE{filename_type_image_whatsapp}{pat}) {
                 log_info "Filename '%s' looks like a WhatsApp image, skip downsizing due to --skip-whatsapp option is in effect", $file;
                 next FILE;
@@ -314,6 +334,136 @@ sub downsize_image {
                 unlink $file;
             }
             $num_success++;
+        }
+    }
+
+    $num_success == 0 ? [500, "All files failed"] : [200];
+}
+
+$SPEC{resize_image} = {
+    v => 1.1,
+    summary => 'Resize images',
+    description => <<'MARKDOWN',
+
+This utility is a shortcut for <prog:magick> utility as follow:
+
+    % magick INPUT.PNG -resize SIZE_NOTATION OUTPUT.newxsize.PNG
+
+It offers convenience: automatic output file naming (specify new dimension in
+filename), non-overwrite default with overwrite option, support multiple files.
+
+MARKDOWN
+    args => {
+        size_notation => {
+            schema => 'str*',
+            req => 1,
+            cmdline_aliases => {s=>{}},
+        },
+        %argspec0plus_files,
+        %argspecs_delete,
+        %argspecopt_overwrite,
+    },
+    args_rels => \%args_rels,
+    deps => {
+        prog => 'magick',
+    },
+    examples => [
+        {
+            summary => 'Change all images to 512px width',
+            src => '[[prog]] 512 *.jpg',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
+};
+sub resize_image {
+    require File::Temp;
+    require Image::Size;
+    require IPC::System::Options;
+    require Perinci::Object;
+
+    my %args = @_;
+
+    my $magick_path = File::Which::which("magick");
+    my $size_notation = $args{size_notation};
+
+    return [412, "Cannot find magick in path"] unless defined $magick_path;
+
+    my $envres = Perinci::Object::envresmulti();
+    my ($num_files, $num_success) = (0, 0);
+    my $trash;
+  FILE:
+    for my $file (@{$args{files}}) {
+        log_info "Processing file %s ...", $file;
+        $num_files++;
+
+        unless (-f $file) {
+            log_error "No such file %s, skipped", $file;
+            next FILE;
+        }
+
+        my ($width, $height, $fmt) = Image::Size::imgsize($file);
+        unless ($width) {
+            log_error "Filename '%s' is not image (%s), skipped", $file, $fmt;
+            next FILE;
+        }
+
+        my ($tmpfh, $tmp_file) = File::Temp::tempfile("tmpimgXXXXXXXXX", DIR => ".");
+
+        my @magick_args = (
+            $file,
+            '-resize', $size_notation,
+            $tmp_file,
+        );
+
+        IPC::System::Options::system({log=>1}, $magick_path, @magick_args);
+        if ($?) {
+            $envres->add_result(500, "Failed: $!", {item_id=>$file});
+            unlink $tmp_file;
+            next FILE;
+        }
+
+        my ($out_width, $out_height, $out_fmt) = Image::Size::imgsize($tmp_file);
+        unless ($out_width) {
+            log_error "Can't produce image output at '%s', skipped", $tmp_file;
+            unlink $tmp_file;
+            next FILE;
+        }
+
+        my ($base, $ext) = $file =~ /^(.*?)(?:\.(\w+))?$/;
+        $ext //= "";
+        my $out_file = "$base.${out_width}x${out_height}.$ext";
+        if (-f $out_file) {
+            if ($args{overwrite}) {
+                log_debug "Overwriting $out_file ...";
+            } else {
+                $envres->add_result(409, "Not overwriting existing file $out_file", {item_id=>$file});
+                unlink $tmp_file;
+                next FILE;
+            }
+        }
+
+        log_debug "Renaming %s to %s ...", $tmp_file, $out_file;
+        rename $tmp_file, $out_file or do {
+                $envres->add_result(409, "Not overwriting existing file $out_file", {item_id=>$file});
+                unlink $tmp_file;
+                next FILE;
+        };
+
+        $envres->add_result(200, "OK", {item_id=>$file});
+        $num_success++;
+
+        if ($args{trash_original}) {
+            require File::Trash::FreeDesktop;
+            $trash //= File::Trash::FreeDesktop->new;
+            log_info "Trashing original file %s ...", $file;
+            # will die upon failure, currently we don't trap
+            $trash->trash($file);
+        } elsif ($args{delete_original}) {
+            # currently we ignore the result of deletion
+            log_info "Deleting original file %s ...", $file;
+            unlink $file;
         }
     }
 
@@ -518,7 +668,7 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.024 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2024-12-21.
+This document describes version 0.025 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2026-09-16.
 
 =head1 DESCRIPTION
 
@@ -549,6 +699,8 @@ This distribution includes the following CLI utilities related to ImageMagick:
 =item 11. L<jpg2png>
 
 =item 12. L<png2jpg>
+
+=item 13. L<resize-image>
 
 =back
 
@@ -918,6 +1070,71 @@ that contains extra information, much like how HTTP response headers provide add
 
 Return value:  (any)
 
+
+
+=head2 resize_image
+
+Usage:
+
+ resize_image(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Resize images.
+
+This utility is a shortcut for L<magick> utility as follow:
+
+ % magick INPUT.PNG -resize SIZE_NOTATION OUTPUT.newxsize.PNG
+
+It offers convenience: automatic output file naming (specify new dimension in
+filename), non-overwrite default with overwrite option, support multiple files.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<delete_original> => I<bool>
+
+Delete (unlink) the original file after downsizing.
+
+See also the C<trash_original> option.
+
+=item * B<files>* => I<array[filename]>
+
+(No description)
+
+=item * B<overwrite> => I<bool>
+
+Whether to overwrite existing output files.
+
+=item * B<size_notation>* => I<str>
+
+(No description)
+
+=item * B<trash_original> => I<bool>
+
+Trash the original file after downsizing.
+
+This option uses the L<File::Trash::FreeDesktop> module to do the trashing.
+Compared to deletion, with this option you can still restore the trashed
+original files from the Trash directory.
+
+See also the C<delete_original> option.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
 =head1 FAQ
 
 =head2 I got error message "attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426."
@@ -935,6 +1152,12 @@ Source repository is at L<https://github.com/perlancar/perl-App-ImageMagickUtils
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar (on netbook-dell-xps13)
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 =head1 CONTRIBUTING
 
@@ -956,7 +1179,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

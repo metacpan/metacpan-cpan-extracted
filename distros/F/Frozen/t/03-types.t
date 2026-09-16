@@ -75,6 +75,23 @@ SKIP: {
        'it was stored as the string, which is what the user sees');
 }
 
+# ---- the typing rule: the PUBLIC flags decide -----------------------------
+#
+# A private flag says only that a cached conversion sits in that slot, and the
+# conversion may be lossy: comparing 1.5 against an integer leaves the
+# truncated 1 in its IV slot under pIOK alone. Dispatching on that stores 1
+# and calls it an integer, which is a change of value nobody asked for.
+
+{
+    my $n   = 1.5;
+    my $cmp = ($n == 1);               # $n is now NOK and pIOK, with IV 1
+    my $fz  = Frozen->attach(Frozen->freeze({ v => $n }));
+    my $h   = $fz->child($fz->root, 'v');
+    is($fz->kind($h), 'num',
+       'an NV that has been compared with an integer is still a num');
+    cmp_ok($fz->value($h), '==', 1.5, 'and it kept the value it was given');
+}
+
 # ---- booleans -------------------------------------------------------------
 #
 # Three spellings are in the wild and all three must land on the same two
@@ -120,19 +137,30 @@ SKIP: {
 
 # ---- long doubles ---------------------------------------------------------
 #
-# An NV wider than a double does not round-trip. Refusing is the default; the
-# opt-in has to be explicit, because silent narrowing in a format whose whole
-# promise is fidelity is the wrong default.
+# A block holds a double, so on a perl whose NV is wider - uselongdouble,
+# usequadmath - storing one rounds. Rounding to the nearest double is the
+# format, and refusing it would refuse 0.1 on those perls. What is refused is
+# a narrowing that destroys the value rather than its tail: a finite NV that
+# comes back as an infinity, and a non-zero one that comes back as zero.
 
 SKIP: {
-    skip 'NV is a double here, so nothing can fail to fit', 2
+    skip 'NV is a double here, so no narrowing can happen', 4
         unless $Config{nvsize} > 8;
-    my $wide = 1 + 2 ** -60;           # needs more than 53 bits of mantissa
-    skip 'this NV fits a double after all', 2 if (0 + sprintf('%.17g', $wide)) == $wide;
-    eval { Frozen->freeze({ v => $wide }); 1 };
-    like($@, qr/does not fit a double/, 'a wide NV is refused by default');
-    my $b = eval { Frozen->freeze({ v => $wide }, lossy_nv => 1) };
-    ok(defined $b, 'and lossy_nv => 1 accepts it') or diag $@;
+
+    my $huge = 2 ** 2000;              # past DBL_MAX, inside a long double
+    my $tiny = 2 ** -2000;             # under the smallest double denormal
+    skip 'this NV is wider than a double but has its exponent range', 4
+        unless $huge + $huge != $huge && $tiny != 0;
+
+    eval { Frozen->freeze({ v => $huge }); 1 };
+    like($@, qr/too large for a double/, 'an NV past DBL_MAX is refused by default');
+    ok(defined eval { Frozen->freeze({ v => $huge }, lossy_nv => 1) },
+       'and lossy_nv => 1 stores it as an infinity') or diag $@;
+
+    eval { Frozen->freeze({ v => $tiny }); 1 };
+    like($@, qr/too small for a double/, 'an NV under DBL_MIN is refused by default');
+    ok(defined eval { Frozen->freeze({ v => $tiny }, lossy_nv => 1) },
+       'and lossy_nv => 1 stores it as a zero') or diag $@;
 }
 
 # ---- stringify: a reader that only wants text --------------------------------
@@ -179,31 +207,28 @@ SKIP: {
         'the two blocks are not the same bytes');
 }
 
-# ---- what a block records is the SV's CURRENT form ---------------------------
+# ---- a cached conversion does not change the block ---------------------------
 #
-# Not new to stringify, and not really Frozen's doing: asking an IV for its
-# string caches that string on the SV, so the SV is afterwards both an
-# integer and a string, and freeze stores whichever it checks first - which
-# is the string. `print $h->{n}` has the same effect.
-#
-# So two freezes of "the same data" can differ if anything looked at a value
-# in between. Worth knowing before anyone treats the bytes as a checksum of
-# a Perl structure; they are a faithful record of the SVs as they were.
+# Asking an IV for its string caches that string on the SV, and reading it
+# back is the ordinary way a program uses its own data. Neither changes what
+# the value is, so neither may change the bytes: two freezes of untouched
+# data have to agree however that data was read in between, or the block
+# records the order someone looked at the structure rather than the
+# structure.
 {
     my $d = { n => 5 };
     my $before = Frozen->freeze($d);
     my $strd   = Frozen->freeze($d, stringify => 1);
     my $after  = Frozen->freeze($d);
 
-    isnt($before, $after,
-        'a freeze after a stringify differs, because SvPV cached a string');
-    is($after, $strd, '...and now matches the stringified one');
+    is($after, $before, 'a freeze after a stringify gives the same bytes');
+    isnt($strd, $before, 'while stringify => 1 gives its own');
 
     my $e = { n => 5 };
     my $plain = Frozen->freeze($e);
     my $str   = "$e->{n}";                 # nothing to do with Frozen
-    isnt(Frozen->freeze($e), $plain,
-        'and plain Perl stringification does exactly the same thing');
+    is(Frozen->freeze($e), $plain,
+       'and plain Perl stringification leaves it alone too');
 }
 
 done_testing;

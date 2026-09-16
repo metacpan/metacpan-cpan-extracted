@@ -14,6 +14,9 @@ my $t = Test::Mojo->new('Database::BI');
 subtest 'Home page' => sub {
 	$t->get_ok('/')->status_is(200)->content_like(qr/Choose a Database/i);
 	$t->get_ok('/')->content_like(qr/Browse filesystem/i);
+	# Regression guard: the Browse card must have a path text input.
+	# Previously the field was removed without any test catching it.
+	$t->get_ok('/')->content_like(qr/id="bi-path-input"/, 'home page has path input field');
 };
 
 # ---------------------------------------------------------------------------

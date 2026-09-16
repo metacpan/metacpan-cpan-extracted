@@ -61,7 +61,7 @@ capacity(self)
   PREINIT:
     EXTRACT_DEQ(self);
   CODE:
-    RETVAL = (UV)h->hdr->capacity;
+    RETVAL = (UV)h->capacity;
   OUTPUT:
     RETVAL
 
@@ -81,7 +81,7 @@ is_full(self)
   PREINIT:
     EXTRACT_DEQ(self);
   CODE:
-    RETVAL = deq_size(h) >= h->hdr->capacity;
+    RETVAL = deq_size(h) >= h->capacity;
   OUTPUT:
     RETVAL
 
@@ -208,7 +208,7 @@ stats(self)
     HV *hv = newHV();
     DeqHeader *hdr = h->hdr;
     hv_store(hv, "size", 4, newSVuv((UV)deq_size(h)), 0);
-    hv_store(hv, "capacity", 8, newSVuv((UV)hdr->capacity), 0);
+    hv_store(hv, "capacity", 8, newSVuv((UV)h->capacity), 0);
     hv_store(hv, "pushes", 6, newSVuv((UV)__atomic_load_n(&hdr->stat_pushes, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "pops", 4, newSVuv((UV)__atomic_load_n(&hdr->stat_pops, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "waits", 5, newSVuv((UV)__atomic_load_n(&hdr->stat_waits, __ATOMIC_RELAXED)), 0);

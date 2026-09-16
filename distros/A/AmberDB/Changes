@@ -1,5 +1,36 @@
 Revision history for AmberDB
 
+5.25.2  2026-09-11
+        - [CONNECTION PROFILE & SHADOW CRYPTOGRAPHY ARCHITECTURE]
+          * Decentralized connection profile abstraction ($adb->{_connect}) managing database, username, password, and session token.
+          * Introduced Unix shadow format standard: sha256$<16_hex_salt>$<hex_digest> via Digest::SHA for one-way password protection.
+          * Self-securing auto-elevation: plain-text passwords written to connect.pl are automatically upgraded to salted SHA-256 shadow hashes upon connection, and plain-text passwords are purged from disk.
+          * Full backwards compatibility: empty/undef password and shadow grant passwordless access for local application layers (web, local workers).
+          * Automated connect.pl bootstrapping per database store under $dbase_dir/config/connect.pl with canonical system profiles (admin, web, cli).
+          * Session management encapsulation: delegated 4-digit token generation, session persistence, collision avoidance, and cleanup from CLI directly to AmberDB::Base (connect(), disconnect(), generate_token(), session_file()).
+          * User management API: added user_add(), user_passwd(), user_del(), user_list(), and user_verify() to AmberDB::Base.
+          * CLI Integration: added amberdb connect /path/to/dir <database> <user> <pass> and user management console (amberdb user list/add/passwd/del).
+          * Enforced actor username as 'cli' in bin/amberdb_cli.pl: all CLI sessions and commands strictly operate under the 'cli' client profile regardless of incoming username parameters.
+
+        - [RAM-DISK ARCHITECTURE & MOUNT MANAGEMENT REFACTORING]
+          * Centralized candidate RAM-disk directory resolution and OS detection inside ramdisk_is_mounted().
+          * Standardized platform detection across AmberDB::Base::Ramdisk to canonical 'windows', 'macos', or 'linux'.
+          * Generalized macOS APFS/HFS+ volume detection to match any mounted volume under /Volumes/ (e.g. /Volumes/AmberDB_RAM, /Volumes/eticaretim, /Volumes/<User>).
+          * Implemented encapsulated RAM-disk mount status caching with get_cache()/set_cache('ramdisk', 'mount') and support for force => 1 re-verification.
+          * Cleaned up ramdisk_setup() to cleanly fall back to dbase_dir and physical directories when unmounted, while dynamically repointing and creating table_rdir, schema_rdir, conf_rdir, lock_dir, and session_dir on the RAM-disk when mounted.
+          * Flexible argument parsing in ramdisk_setup() supporting ($tableid, %opts), (%opts), and hashref options.
+          * Automatically invoke ramdisk_setup() inside set_datadir() when changing database root directory.
+
+        - [CLI SESSION COLLISION AVOIDANCE & CODEBASE CLEANUP]
+          * Added collision prevention loop in bin/amberdb_cli.pl generate_token() checking existing session files in both project local (.amberdb/session/sess_$token) and active database session_dir (cli_$token).
+          * Removed redundant if ($adb) checks and legacy candidate search arrays in CLI session handlers.
+          * Upgraded version string to 5.25.2 across all 25 modules in lib/.
+
+        - [TRANSACTION UNDO JOURNAL BASE64 STANDARDIZATION]
+          * Standardized transaction undo logs (dbstore/journal/txn_*) to strictly encode raw database before-images with Base64 (MIME::Base64).
+          * Eliminated legacy string regex escaping ($safe_enc/$safe_dec) and index Hex conversions (unpack/pack "H*").
+          * Unified transaction rollback with RAM-disk Tier 4 (sync_ramdisk) Base64 payload specification for 100% binary safety.
+
 5.25.1  2026-09-11
         - [JOURNAL & TRANSACTION STANDARDIZATION] Extensionless Uniform Journaling:
           * Standardized all transaction undo logs and RAM-disk write-behind queues under $dbase_dir/journal/ ($adb->journal_dir()).

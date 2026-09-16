@@ -76,9 +76,15 @@ is($api->operation('nope'), undef, 'unknown operationId is undef');
     );
     my $err;
 
-    eval { Open::API->new(spec => { %base,
-        paths => { '/a' => { get => { responses => {} } } } }) } or $err = $@;
-    like($err, qr/has no operationId/, 'missing operationId croaks');
+    # operationId is OPTIONAL per the specification, so an operation without
+    # one still compiles and is reachable: the dispatch key is derived as
+    # <method>_<path>, the same rule plan_maat_mcp/01 names for MCP tools.
+    # This used to croak, which refused a valid document.
+    my $derived = eval { Open::API->new(spec => { %base,
+        paths => { '/a' => { get => { responses => {} } } } }) };
+    ok($derived, 'an operation without an operationId still compiles') or diag $@;
+    is_deeply([ map { $_->{operationId} } @{ $derived->operations } ], ['get_a'],
+              '...under a derived <method>_<path> key');
 
     undef $err;
     eval { Open::API->new(spec => { %base, paths => {

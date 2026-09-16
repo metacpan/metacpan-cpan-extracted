@@ -39,19 +39,292 @@ static int oa_fetch_init(pTHX) {
 
 /* ---- percent-encoding ------------------------------------------------------- */
 
-static void oa_pct_encode_into(pTHX_ SV *out, const char *p, STRLEN l) {
+/* RFC 3986 gen-delims + sub-delims. Passed through unencoded only for a query
+ * parameter declared allowReserved, and only for its VALUE - a name is always
+ * encoded, or the pair separators stop meaning anything. */
+static int oa_is_reserved(U8 c) {
+    return c == ':' || c == '/' || c == '?' || c == '#' || c == '['
+        || c == ']' || c == '@' || c == '!' || c == '$' || c == '&'
+        || c == '\'' || c == '(' || c == ')' || c == '*' || c == '+'
+        || c == ',' || c == ';' || c == '=';
+}
+
+static void oa_pct_encode_res(pTHX_ SV *out, const char *p, STRLEN l,
+                              int reserved) {
     static const char hex[] = "0123456789ABCDEF";
     STRLEN i;
     for (i = 0; i < l; i++) {
         U8 c = (U8)p[i];
         if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
             || (c >= '0' && c <= '9') || c == '-' || c == '.'
-            || c == '_' || c == '~') {
+            || c == '_' || c == '~'
+            || (reserved && oa_is_reserved(c))) {
             sv_catpvn(out, (const char *)&c, 1);
         } else {
             char b[3];
             b[0] = '%'; b[1] = hex[c >> 4]; b[2] = hex[c & 15];
             sv_catpvn(out, b, 3);
+        }
+    }
+}
+
+/* the ordinary encoding: nothing reserved passes through */
+static void oa_pct_encode_into(pTHX_ SV *out, const char *p, STRLEN l) {
+    oa_pct_encode_res(aTHX_ out, p, l, 0);
+}
+
+/* ---- style-aware serialization ----------------------------------------------
+ *
+ * The mirror of oa_style_path and oa_parse_query on the way OUT. Without it the
+ * builder handed whatever it was given to SvPV, so an arrayref or hashref in a
+ * path segment stringified to `ARRAY(0x...)` and went on the wire, and `style`
+ * was ignored everywhere: a matrix parameter emitted a bare value with no
+ * `;name=`, a spaceDelimited list emitted repeat keys. The client built URLs
+ * this library's own server would refuse.
+ *
+ * Structural characters (the `;` `.` `,` `=` a style is MADE of) are written
+ * literally; only the values around them are encoded. That is why each piece is
+ * encoded on its own rather than the finished string being encoded at the end.
+ */
+
+/* An object's members in a stable order. Perl randomises hash order, so
+ * serializing one straight out of the hash produces a DIFFERENT URL each run -
+ * the same defect the router had. Sorted, so a URL is reproducible; object
+ * members carry no meaningful order, so the server rebuilds the same value
+ * whatever the order. */
+static AV *oa_cli_sorted_keys(pTHX_ HV *h) {
+    AV *keys = (AV *)sv_2mortal((SV *)newAV());
+    HE *he;
+    SSize_t i;
+    hv_iterinit(h);
+    while ((he = hv_iternext(h))) {
+        I32 kl; const char *kp = hv_iterkey(he, &kl);
+        av_push(keys, newSVpvn(kp, (STRLEN)kl));
+    }
+    for (i = 1; i <= av_len(keys); i++) {      /* insertion sort: few members */
+        SV **cur = av_fetch(keys, i, 0);
+        SV *c = cur && *cur ? SvREFCNT_inc(*cur) : NULL;
+        SSize_t j = i - 1;
+        if (!c) continue;
+        while (j >= 0) {
+            SV **prev = av_fetch(keys, j, 0);
+            if (!prev || !*prev || sv_cmp(*prev, c) <= 0) break;
+            (void)av_store(keys, j + 1, SvREFCNT_inc(*prev));
+            j--;
+        }
+        (void)av_store(keys, j + 1, c);
+    }
+    return keys;
+}
+
+/* one value, encoded */
+static void oa_cli_val(pTHX_ SV *out, SV *v, int reserved) {
+    STRLEN l;
+    const char *p;
+    if (!v || !SvOK(v)) return;
+    p = SvPV_const(v, l);
+    oa_pct_encode_res(aTHX_ out, p, l, reserved);
+}
+
+/* Serialize `val` for a PATH segment per pp->style. `out` already ends at the
+ * '/' this segment follows. */
+static void oa_cli_ser_path(pTHX_ oa_param *pp, SV *val, SV *out) {
+    STRLEN nl; const char *np = SvPV_const(pp->name, nl);
+    AV *av = oa_av_of(val);
+    HV *hv = (!av && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV)
+           ? (HV *)SvRV(val) : NULL;
+    const char *pfx = pp->style == OA_ST_LABEL  ? "."
+                    : pp->style == OA_ST_MATRIX ? ";" : "";
+    /* the separator BETWEEN elements once exploded */
+    const char *esep = pp->style == OA_ST_LABEL  ? "."
+                     : pp->style == OA_ST_MATRIX ? ";" : ",";
+
+    if (*pfx) sv_catpv(out, pfx);
+
+    if (!av && !hv) {                                   /* a scalar */
+        if (pp->style == OA_ST_MATRIX) {
+            /* `;name=value`, and `;name` alone when the value is empty */
+            STRLEN vl; const char *vp = SvPV_const(val, vl);
+            oa_pct_encode_into(aTHX_ out, np, nl);
+            if (vl) { sv_catpvs(out, "="); oa_cli_val(aTHX_ out, val, 0); }
+        } else {
+            oa_cli_val(aTHX_ out, val, 0);
+        }
+        return;
+    }
+
+    if (av) {
+        SSize_t i, n = av_len(av) + 1;
+        /* matrix, not exploded, prefixes the name ONCE: `;name=a,b` */
+        if (pp->style == OA_ST_MATRIX && !pp->explode) {
+            oa_pct_encode_into(aTHX_ out, np, nl);
+            sv_catpvs(out, "=");
+        }
+        for (i = 0; i < n; i++) {
+            SV **e = av_fetch(av, i, 0);
+            if (i) {
+                /* label and simple keep a comma unless exploded; matrix
+                 * exploded repeats `;name=` per element */
+                if (pp->explode) sv_catpv(out, esep);
+                else             sv_catpvs(out, ",");
+            }
+            if (pp->style == OA_ST_MATRIX && pp->explode) {
+                if (i) { /* the `;` was written above */ }
+                oa_pct_encode_into(aTHX_ out, np, nl);
+                sv_catpvs(out, "=");
+            }
+            if (e && *e) oa_cli_val(aTHX_ out, *e, 0);
+        }
+        return;
+    }
+
+    {   /* an object */
+        AV *keys = oa_cli_sorted_keys(aTHX_ hv);
+        SSize_t i, n = av_len(keys) + 1;
+        if (pp->style == OA_ST_MATRIX && !pp->explode) {
+            oa_pct_encode_into(aTHX_ out, np, nl);
+            sv_catpvs(out, "=");
+        }
+        for (i = 0; i < n; i++) {
+            SV **k = av_fetch(keys, i, 0);
+            SV **v;
+            STRLEN kl; const char *kp;
+            if (!k || !*k) continue;
+            kp = SvPV_const(*k, kl);
+            v = hv_fetch(hv, kp, (I32)kl, 0);
+            if (i) {
+                if (pp->explode) sv_catpv(out, esep);
+                else             sv_catpvs(out, ",");
+            }
+            /* exploded names each MEMBER with `=`; not exploded, the members
+             * are just more comma-separated pieces. sv_catpv, not sv_catpvs:
+             * the _s form is a macro over a string LITERAL. */
+            oa_pct_encode_into(aTHX_ out, kp, kl);
+            sv_catpv(out, pp->explode ? "=" : ",");
+            if (v && *v) oa_cli_val(aTHX_ out, *v, 0);
+        }
+    }
+}
+
+/* Serialize `val` as QUERY pieces per pp->style, appending to `url`. */
+static void oa_cli_ser_query(pTHX_ oa_param *pp, SV *val, SV *url, int *first) {
+    STRLEN nl; const char *np = SvPV_const(pp->name, nl);
+    AV *av = oa_av_of(val);
+    HV *hv = (!av && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV)
+           ? (HV *)SvRV(val) : NULL;
+    int res = pp->allow_reserved;
+    const char *dsep = pp->style == OA_ST_SPACE ? "%20"
+                     : pp->style == OA_ST_PIPE  ? "|" : ",";
+
+    if (!av && !hv) {                                   /* a scalar */
+        sv_catpvn(url, *first ? "?" : "&", 1); *first = 0;
+        oa_pct_encode_into(aTHX_ url, np, nl);
+        sv_catpvs(url, "=");
+        oa_cli_val(aTHX_ url, val, res);
+        return;
+    }
+
+    if (av) {
+        SSize_t i, n = av_len(av) + 1;
+        /* form + explode repeats the key; every other query style joins the
+         * elements into ONE value with its own delimiter */
+        if (pp->style == OA_ST_FORM && pp->explode) {
+            for (i = 0; i < n; i++) {
+                SV **e = av_fetch(av, i, 0);
+                if (!e || !*e || !SvOK(*e)) continue;
+                sv_catpvn(url, *first ? "?" : "&", 1); *first = 0;
+                oa_pct_encode_into(aTHX_ url, np, nl);
+                sv_catpvs(url, "=");
+                oa_cli_val(aTHX_ url, *e, res);
+            }
+            return;
+        }
+        sv_catpvn(url, *first ? "?" : "&", 1); *first = 0;
+        oa_pct_encode_into(aTHX_ url, np, nl);
+        sv_catpvs(url, "=");
+        for (i = 0; i < n; i++) {
+            SV **e = av_fetch(av, i, 0);
+            if (i) sv_catpv(url, dsep);
+            if (e && *e) oa_cli_val(aTHX_ url, *e, res);
+        }
+        return;
+    }
+
+    {   /* an object */
+        AV *keys = oa_cli_sorted_keys(aTHX_ hv);
+        SSize_t i, n = av_len(keys) + 1;
+        int one_value = !(pp->style == OA_ST_DEEP
+                          || (pp->style == OA_ST_FORM && pp->explode));
+        if (one_value) {
+            sv_catpvn(url, *first ? "?" : "&", 1); *first = 0;
+            oa_pct_encode_into(aTHX_ url, np, nl);
+            sv_catpvs(url, "=");
+        }
+        for (i = 0; i < n; i++) {
+            SV **k = av_fetch(keys, i, 0);
+            SV **v;
+            STRLEN kl; const char *kp;
+            if (!k || !*k) continue;
+            kp = SvPV_const(*k, kl);
+            v = hv_fetch(hv, kp, (I32)kl, 0);
+            if (one_value) {
+                if (i) sv_catpv(url, dsep);
+                oa_pct_encode_into(aTHX_ url, kp, kl);
+                sv_catpv(url, dsep);
+                if (v && *v) oa_cli_val(aTHX_ url, *v, res);
+                continue;
+            }
+            sv_catpvn(url, *first ? "?" : "&", 1); *first = 0;
+            if (pp->style == OA_ST_DEEP) {
+                /* `name[member]=value` - the brackets are structural */
+                oa_pct_encode_into(aTHX_ url, np, nl);
+                sv_catpvs(url, "[");
+                oa_pct_encode_into(aTHX_ url, kp, kl);
+                sv_catpvs(url, "]");
+            } else {
+                /* form + explode: the MEMBER is the key */
+                oa_pct_encode_into(aTHX_ url, kp, kl);
+            }
+            sv_catpvs(url, "=");
+            if (v && *v) oa_cli_val(aTHX_ url, *v, res);
+        }
+    }
+}
+
+/* A header or cookie value. Neither is percent-encoded - the server splits
+ * them but does not decode - so this joins the pieces literally rather than
+ * going through oa_cli_val. Both locations are comma separated: a header is
+ * `simple` by definition, and a cookie is `form`, whose non-exploded list is
+ * also a comma. Without this an arrayref reached SvPV and the request carried
+ * `X-H: ARRAY(0x...)`, which was verified going out over a socket. */
+static void oa_cli_ser_flat(pTHX_ oa_param *pp, SV *val, SV *out) {
+    AV *av = oa_av_of(val);
+    HV *hv = (!av && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV)
+           ? (HV *)SvRV(val) : NULL;
+    if (!av && !hv) { sv_catsv(out, val); return; }
+    if (av) {
+        SSize_t i, n = av_len(av) + 1;
+        for (i = 0; i < n; i++) {
+            SV **e = av_fetch(av, i, 0);
+            if (i) sv_catpvs(out, ",");
+            if (e && *e && SvOK(*e)) sv_catsv(out, *e);
+        }
+        return;
+    }
+    {
+        AV *keys = oa_cli_sorted_keys(aTHX_ hv);
+        SSize_t i, n = av_len(keys) + 1;
+        for (i = 0; i < n; i++) {
+            SV **k = av_fetch(keys, i, 0);
+            SV **v;
+            STRLEN kl; const char *kp;
+            if (!k || !*k) continue;
+            kp = SvPV_const(*k, kl);
+            v = hv_fetch(hv, kp, (I32)kl, 0);
+            if (i) sv_catpvs(out, ",");
+            sv_catpvn(out, kp, kl);
+            sv_catpv(out, pp->explode ? "=" : ",");
+            if (v && *v && SvOK(*v)) sv_catsv(out, *v);
         }
     }
 }
@@ -196,6 +469,13 @@ static SV *oa_cli_map(pTHX_ int ok, int status, AV *headers, SV *body,
             if (rl == sl && memEQ(rp, sbuf, sl))
                 { handle = c->op->resps[ri].handle; break; }
         }
+        if (!handle) {   /* a range key: 2XX, 4XX, ... (same order as the server) */
+            for (ri = 0; ri < c->op->nresps; ri++) {
+                STRLEN rl; const char *rp = SvPV_const(c->op->resps[ri].status, rl);
+                if (oa_status_covers(rp, rl, sbuf, sl))
+                    { handle = c->op->resps[ri].handle; break; }
+            }
+        }
         if (!handle) {
             for (ri = 0; ri < c->op->nresps; ri++) {
                 STRLEN rl; const char *rp = SvPV_const(c->op->resps[ri].status, rl);
@@ -271,6 +551,267 @@ static SV *oa_cli_basic(pTHX_ SV *cred) {
     return out;
 }
 
+/* An apiKey credential selected from the op's security requirements, to be
+ * attached as a header, a query pair or a cookie. Named rather than anonymous
+ * because oa_cli_url below takes the query ones as an argument. */
+typedef struct oa_cli_sec { SV *name; SV *val; } oa_cli_sec;
+
+/* The request URL: base + interpolated path + query. Split out of
+ * oa_cli_call so the same construction can be inspected without firing a
+ * request - a client's serialization rules (allowReserved) are otherwise
+ * observable only by standing up a real server. `sec_q`/`nsec_q` carry
+ * apiKey-in-query credentials; pass 0 for none. Mortal. */
+static SV *oa_cli_url(pTHX_ oa_op *o, HV *params, SV *base,
+                      const oa_cli_sec *sec_q, int nsec_q) {
+    SV *url = sv_2mortal(newSVpvs(""));
+    int i;
+
+    if (base && SvOK(base)) {
+        STRLEN bl; const char *bpv = SvPV_const(base, bl);
+        while (bl && bpv[bl - 1] == '/') bl--;
+        sv_catpvn(url, bpv, bl);
+    }
+    for (i = 0; i < o->nsegs; i++) {
+        sv_catpvs(url, "/");
+        if (o->segs[i].lit) {
+            sv_catsv(url, o->segs[i].lit);
+        } else {
+            STRLEN nl; const char *np = SvPV_const(o->segs[i].pname, nl);
+            SV **v = hv_fetch(params, np, (I32)nl, 0);
+            SV *w;
+            oa_param *decl = NULL;
+            int k;
+            /* declared path params were checked by the caller, but a template
+             * var the spec never declared as a parameter reaches here
+             * unchecked */
+            if (!v || !*v || !SvOK(*v))
+                croak("Open::API::Client: %s: missing required path parameter "
+                      "'%.*s'", SvPV_nolen(o->op_id), (int)nl, np);
+            w = *v;
+            for (k = 0; k < o->nparams[OA_IN_PATH]; k++)
+                if (sv_eq(o->params[OA_IN_PATH][k].name, o->segs[i].pname)) {
+                    decl = &o->params[OA_IN_PATH][k];
+                    w = oa_cli_wire(aTHX_ decl, *v);
+                    break;
+                }
+            /* Always fully encoded: a reserved character in a path segment
+             * changes the SHAPE of the path, so allowReserved does not reach
+             * here even when a path parameter declares it. The style's own
+             * structural characters are written by the serializer and are not
+             * encoded - they ARE the shape. */
+            if (decl) {
+                oa_cli_ser_path(aTHX_ decl, w, url);
+            } else {
+                STRLEN vl; const char *vp = SvPV_const(w, vl);
+                oa_pct_encode_into(aTHX_ url, vp, vl);
+            }
+        }
+    }
+    if (!o->nsegs) sv_catpvs(url, "/");
+    {
+        int first = 1;
+        for (i = 0; i < o->nparams[OA_IN_QUERY]; i++) {
+            oa_param *pp = &o->params[OA_IN_QUERY][i];
+            STRLEN nl; const char *np = SvPV_const(pp->name, nl);
+            SV **v = hv_fetch(params, np, (I32)nl, 0);
+            int structured;
+            if (!v || !*v || !SvOK(*v)) continue;
+            /* a content parameter's arrayref is its DOCUMENT, not a list to
+             * serialize per style: it goes through oa_cli_wire as one value */
+            structured = !pp->ctype && SvROK(*v)
+                       && (SvTYPE(SvRV(*v)) == SVt_PVAV
+                           || SvTYPE(SvRV(*v)) == SVt_PVHV);
+            if (structured) {
+                oa_cli_ser_query(aTHX_ pp, *v, url, &first);
+            } else {
+                SV *w = oa_cli_wire(aTHX_ pp, *v);
+                STRLEN vl; const char *vp = SvPV_const(w, vl);
+                sv_catpvn(url, first ? "?" : "&", 1); first = 0;
+                oa_pct_encode_into(aTHX_ url, np, nl);
+                sv_catpvs(url, "=");
+                oa_pct_encode_res(aTHX_ url, vp, vl, pp->allow_reserved);
+            }
+        }
+        for (i = 0; i < nsec_q; i++) {          /* apiKey-in-query schemes */
+            STRLEN nl2, vl2;
+            const char *np2 = SvPV_const(sec_q[i].name, nl2);
+            const char *vp2 = SvPV_const(sec_q[i].val, vl2);
+            sv_catpvn(url, first ? "?" : "&", 1); first = 0;
+            oa_pct_encode_into(aTHX_ url, np2, nl2);
+            sv_catpvs(url, "=");
+            oa_pct_encode_into(aTHX_ url, vp2, vl2);
+        }
+    }
+    return url;
+}
+
+/* ---- the request body, per the media type the operation DECLARES ------------
+ *
+ * The builder used to JSON-encode whatever it was handed and label it
+ * `application/json`, whatever the document said. An operation declaring only
+ * `application/x-www-form-urlencoded` therefore sent JSON under the wrong
+ * Content-Type, and this library's OWN server answered 415: a client and a
+ * server generated from one document could not talk to each other.
+ *
+ * Split out of oa_cli_call so `_request_body` can expose it, the way
+ * oa_cli_url is exposed as `_request_url`. Untestable otherwise: a body that
+ * only exists inside a live request cannot be asserted against.
+ */
+
+/* Which declared body to send. JSON when the operation declares it - the
+ * safest default and what callers already relied on - then form, then
+ * multipart, then whatever is first. */
+static oa_body *oa_cli_pick_body(oa_op *o) {
+    int i;
+    oa_body *form = NULL, *multi = NULL, *any = NULL;
+    for (i = 0; i < o->nbodies; i++) {
+        oa_body *b = &o->bodies[i];
+        if (b->kind == OA_MT_JSON) return b;
+        if (!form  && b->kind == OA_MT_FORM)      form  = b;
+        if (!multi && b->kind == OA_MT_MULTIPART) multi = b;
+        if (!any) any = b;
+    }
+    return form ? form : multi ? multi : any;
+}
+
+/* `a=1&b=2`, with an array member repeated unless its Encoding says otherwise.
+ * Members are sorted for the same reason the URL builder sorts them: hash
+ * order is randomised and a body that changes between runs is not one a test
+ * or a signature can rely on. */
+static SV *oa_cli_form_encode(pTHX_ oa_op *o, SV *val) {
+    SV *out = sv_2mortal(newSVpvs(""));
+    HV *hv;
+    AV *keys;
+    SSize_t i, n;
+    int first = 1;
+    if (!val || !SvROK(val) || SvTYPE(SvRV(val)) != SVt_PVHV)
+        croak("Open::API::Client: %s: a form body wants a hashref",
+              SvPV_nolen(o->op_id));
+    hv = (HV *)SvRV(val);
+    keys = oa_cli_sorted_keys(aTHX_ hv);
+    n = av_len(keys) + 1;
+    for (i = 0; i < n; i++) {
+        SV **k = av_fetch(keys, i, 0);
+        SV **v;
+        STRLEN kl; const char *kp;
+        AV *av;
+        if (!k || !*k) continue;
+        kp = SvPV_const(*k, kl);
+        v = hv_fetch(hv, kp, (I32)kl, 0);
+        if (!v || !*v || !SvOK(*v)) continue;
+        av = oa_av_of(*v);
+        if (av) {
+            SSize_t j, m = av_len(av) + 1;
+            for (j = 0; j < m; j++) {
+                SV **e = av_fetch(av, j, 0);
+                if (!e || !*e || !SvOK(*e)) continue;
+                if (!first) sv_catpvs(out, "&");
+                first = 0;
+                oa_pct_encode_into(aTHX_ out, kp, kl);
+                sv_catpvs(out, "=");
+                oa_cli_val(aTHX_ out, *e, 0);
+            }
+            continue;
+        }
+        if (!first) sv_catpvs(out, "&");
+        first = 0;
+        oa_pct_encode_into(aTHX_ out, kp, kl);
+        sv_catpvs(out, "=");
+        oa_cli_val(aTHX_ out, *v, 0);
+    }
+    return out;
+}
+
+/* multipart/form-data. The boundary is fixed rather than random: this library
+ * sends no binary parts of its own, a body that differs run to run cannot be
+ * asserted, and the value is checked against the payload below. */
+static SV *oa_cli_multipart_encode(pTHX_ oa_op *o, SV *val, const char *bnd) {
+    SV *out = sv_2mortal(newSVpvs(""));
+    HV *hv;
+    AV *keys;
+    SSize_t i, n;
+    if (!val || !SvROK(val) || SvTYPE(SvRV(val)) != SVt_PVHV)
+        croak("Open::API::Client: %s: a multipart body wants a hashref",
+              SvPV_nolen(o->op_id));
+    hv = (HV *)SvRV(val);
+    keys = oa_cli_sorted_keys(aTHX_ hv);
+    n = av_len(keys) + 1;
+    for (i = 0; i < n; i++) {
+        SV **k = av_fetch(keys, i, 0);
+        SV **v;
+        STRLEN kl, vl; const char *kp, *vp;
+        if (!k || !*k) continue;
+        kp = SvPV_const(*k, kl);
+        v = hv_fetch(hv, kp, (I32)kl, 0);
+        if (!v || !*v || !SvOK(*v)) continue;
+        /* a boundary that appears inside a part would end it early */
+        vp = SvPV_const(*v, vl);
+        if (vl && ninstr(vp, vp + vl, bnd, bnd + strlen(bnd)))
+            croak("Open::API::Client: %s: a multipart value contains the "
+                  "boundary", SvPV_nolen(o->op_id));
+        sv_catpvs(out, "--"); sv_catpv(out, bnd); sv_catpvs(out, "\r\n");
+        sv_catpvs(out, "Content-Disposition: form-data; name=\"");
+        sv_catpvn(out, kp, kl);
+        sv_catpvs(out, "\"\r\n\r\n");
+        sv_catpvn(out, vp, vl);
+        sv_catpvs(out, "\r\n");
+    }
+    sv_catpvs(out, "--"); sv_catpv(out, bnd); sv_catpvs(out, "--\r\n");
+    return out;
+}
+
+#define OA_CLI_BOUNDARY "OpenAPIClientBoundary1"
+
+/* Returns a mortal body SV, or NULL when the operation sends none. *ctype is
+ * set to a mortal Content-Type SV whenever a body is returned. */
+static SV *oa_cli_build_body(pTHX_ oa_op *o, HV *params, SV **ctype) {
+    SV **bv = hv_fetchs(params, "body", 0);
+    SV *bsv = (bv && *bv && SvOK(*bv)) ? *bv : NULL;
+    oa_body *b;
+    SV *out;
+
+    *ctype = NULL;
+    if (!o->nbodies) return NULL;
+    if (!bsv) {
+        if (o->body_required)
+            croak("Open::API::Client: %s: missing required body",
+                  SvPV_nolen(o->op_id));
+        return NULL;
+    }
+    b = oa_cli_pick_body(o);
+    if (!b) return NULL;
+
+    /* the declared schema still decides, whatever the media type */
+    if (b->handle && !JSF->is_valid(aTHX_ b->handle, bsv))
+        oa_cli_bad(aTHX_ o, "body", NULL, bsv, b->handle);
+
+    if (b->kind == OA_MT_FORM) {
+        out = oa_cli_form_encode(aTHX_ o, bsv);
+        *ctype = sv_2mortal(newSVpvs("application/x-www-form-urlencoded"));
+        return out;
+    }
+    if (b->kind == OA_MT_MULTIPART) {
+        out = oa_cli_multipart_encode(aTHX_ o, bsv, OA_CLI_BOUNDARY);
+        *ctype = sv_2mortal(newSVpvs("multipart/form-data; boundary="
+                                     OA_CLI_BOUNDARY));
+        return out;
+    }
+    if (b->kind == OA_MT_JSON) {
+        out = oa_json_encode(aTHX_ bsv);
+        if (!out) croak("Open::API::Client: %s: could not encode body",
+                        SvPV_nolen(o->op_id));
+        *ctype = sv_2mortal(newSVsv(b->ctype));
+        return out;
+    }
+    /* opaque: send what the caller gave, under the declared type */
+    if (SvROK(bsv))
+        croak("Open::API::Client: %s: %" SVf " wants a plain string body",
+              SvPV_nolen(o->op_id), SVfARG(b->ctype));
+    out = sv_2mortal(newSVsv(bsv));
+    *ctype = sv_2mortal(newSVsv(b->ctype));
+    return out;
+}
+
 /* Build and fire one call. params is the flat name => value HV. Returns the
  * request future (+1). */
 static SV *oa_cli_call(pTHX_ HV *self, SV *op_id, HV *params) {
@@ -293,7 +834,7 @@ static SV *oa_cli_call(pTHX_ HV *self, SV *op_id, HV *params) {
     SV *csrf_cookie_name = NULL;   /* set when transparent CSRF is enabled */
     /* security attachments, selected from the op's requirements below */
     SV *sec_auth = NULL;                                   /* Authorization */
-    struct { SV *name; SV *val; } sec_h[8], sec_q[8], sec_c[8];
+    oa_cli_sec sec_h[8], sec_q[8], sec_c[8];
     int nsec_h = 0, nsec_q = 0, nsec_c = 0;
 
     if (!api_sv || !SvROK(api_sv))
@@ -378,104 +919,21 @@ static SV *oa_cli_call(pTHX_ HV *self, SV *op_id, HV *params) {
     }
 
     /* ---- body ---- */
-    if (o->nbodies) {
-        SV **bv = hv_fetchs(params, "body", 0);
-        SV *bsv = (bv && *bv && SvOK(*bv)) ? *bv : NULL;
-        oa_body *jb = NULL;
-        for (i = 0; i < o->nbodies; i++)
-            if (o->bodies[i].handle) { jb = &o->bodies[i]; break; }
-        if (!bsv) {
-            if (o->body_required)
-                croak("Open::API::Client: %s: missing required body",
-                      SvPV_nolen(o->op_id));
-        } else if (jb) {
-            if (!JSF->is_valid(aTHX_ jb->handle, bsv))
-                oa_cli_bad(aTHX_ o, "body", NULL, bsv, jb->handle);
-            bodyjson = oa_json_encode(aTHX_ bsv);    /* mortal */
-            if (!bodyjson)
-                croak("Open::API::Client: %s: could not encode body",
-                      SvPV_nolen(o->op_id));
+    {
+        SV *bctype = NULL;
+        bodyjson = oa_cli_build_body(aTHX_ o, params, &bctype);
+        if (bodyjson && bctype) {
+            STRLEN ctl;
+            const char *ctp = SvPV_const(bctype, ctl);
             bp = SvPV_const(bodyjson, blen);
             hdrs[nh].name = "Content-Type"; hdrs[nh].nlen = 12;
-            hdrs[nh].val  = "application/json"; hdrs[nh].vlen = 16;
+            hdrs[nh].val  = ctp;            hdrs[nh].vlen = ctl;
             nh++;
         }
     }
 
     /* ---- URL: base + interpolated path + query ---- */
-    url = sv_2mortal(newSVpvs(""));
-    if (base && SvOK(base)) {
-        STRLEN bl; const char *bpv = SvPV_const(base, bl);
-        while (bl && bpv[bl - 1] == '/') bl--;
-        sv_catpvn(url, bpv, bl);
-    }
-    for (i = 0; i < o->nsegs; i++) {
-        sv_catpvs(url, "/");
-        if (o->segs[i].lit) {
-            sv_catsv(url, o->segs[i].lit);
-        } else {
-            STRLEN nl; const char *np = SvPV_const(o->segs[i].pname, nl);
-            SV **v = hv_fetch(params, np, (I32)nl, 0);
-            STRLEN vl; const char *vp;
-            SV *w;
-            int k;
-            /* declared path params were checked above, but a template var the
-             * spec never declared as a parameter reaches here unchecked */
-            if (!v || !*v || !SvOK(*v))
-                croak("Open::API::Client: %s: missing required path parameter "
-                      "'%.*s'", SvPV_nolen(o->op_id), (int)nl, np);
-            w = *v;
-            for (k = 0; k < o->nparams[OA_IN_PATH]; k++)
-                if (sv_eq(o->params[OA_IN_PATH][k].name, o->segs[i].pname)) {
-                    w = oa_cli_wire(aTHX_ &o->params[OA_IN_PATH][k], *v);
-                    break;
-                }
-            vp = SvPV_const(w, vl);
-            oa_pct_encode_into(aTHX_ url, vp, vl);
-        }
-    }
-    if (!o->nsegs) sv_catpvs(url, "/");
-    {
-        int first = 1;
-        for (i = 0; i < o->nparams[OA_IN_QUERY]; i++) {
-            oa_param *pp = &o->params[OA_IN_QUERY][i];
-            STRLEN nl; const char *np = SvPV_const(pp->name, nl);
-            SV **v = hv_fetch(params, np, (I32)nl, 0);
-            AV *multi;
-            if (!v || !*v || !SvOK(*v)) continue;
-            /* a content parameter's arrayref is its document, not repeat keys */
-            multi = pp->ctype ? NULL : oa_av_of(*v);
-            if (multi) {
-                SSize_t j, n = av_len(multi) + 1;
-                for (j = 0; j < n; j++) {
-                    SV **e = av_fetch(multi, j, 0);
-                    STRLEN vl; const char *vp;
-                    if (!e || !*e || !SvOK(*e)) continue;
-                    sv_catpvn(url, first ? "?" : "&", 1); first = 0;
-                    oa_pct_encode_into(aTHX_ url, np, nl);
-                    sv_catpvs(url, "=");
-                    vp = SvPV_const(*e, vl);
-                    oa_pct_encode_into(aTHX_ url, vp, vl);
-                }
-            } else {
-                SV *w = oa_cli_wire(aTHX_ pp, *v);
-                STRLEN vl; const char *vp = SvPV_const(w, vl);
-                sv_catpvn(url, first ? "?" : "&", 1); first = 0;
-                oa_pct_encode_into(aTHX_ url, np, nl);
-                sv_catpvs(url, "=");
-                oa_pct_encode_into(aTHX_ url, vp, vl);
-            }
-        }
-        for (i = 0; i < nsec_q; i++) {          /* apiKey-in-query schemes */
-            STRLEN nl2, vl2;
-            const char *np2 = SvPV_const(sec_q[i].name, nl2);
-            const char *vp2 = SvPV_const(sec_q[i].val, vl2);
-            sv_catpvn(url, first ? "?" : "&", 1); first = 0;
-            oa_pct_encode_into(aTHX_ url, np2, nl2);
-            sv_catpvs(url, "=");
-            oa_pct_encode_into(aTHX_ url, vp2, vl2);
-        }
-    }
+    url = oa_cli_url(aTHX_ o, params, base, sec_q, nsec_q);
 
     /* ---- headers + cookies ---- */
     for (i = 0; i < o->nparams[OA_IN_HEADER] && nh < 31; i++) {
@@ -484,7 +942,16 @@ static SV *oa_cli_call(pTHX_ HV *self, SV *op_id, HV *params) {
         SV **v = hv_fetch(params, np, (I32)nl, 0);
         if (v && *v && SvOK(*v)) {
             SV *w = oa_cli_wire(aTHX_ pp, *v);
-            STRLEN vl; const char *vp = SvPV_const(w, vl);
+            STRLEN vl; const char *vp;
+            /* a list or object header is joined, not stringified: SvPV on a
+             * reference puts `ARRAY(0x...)` on the wire */
+            if (SvROK(w) && (SvTYPE(SvRV(w)) == SVt_PVAV
+                             || SvTYPE(SvRV(w)) == SVt_PVHV)) {
+                SV *flat = sv_2mortal(newSVpvs(""));
+                oa_cli_ser_flat(aTHX_ pp, w, flat);
+                w = flat;
+            }
+            vp = SvPV_const(w, vl);
             hdrs[nh].name = np; hdrs[nh].nlen = nl;
             hdrs[nh].val  = vp; hdrs[nh].vlen = vl;
             nh++;
@@ -499,7 +966,14 @@ static SV *oa_cli_call(pTHX_ HV *self, SV *op_id, HV *params) {
             else sv_catpvs(cookie, "; ");
             sv_catpvn(cookie, np, nl);
             sv_catpvs(cookie, "=");
-            sv_catsv(cookie, oa_cli_wire(aTHX_ pp, *v));
+            {   /* same reference trap as the header loop above */
+                SV *w = oa_cli_wire(aTHX_ pp, *v);
+                if (SvROK(w) && (SvTYPE(SvRV(w)) == SVt_PVAV
+                                 || SvTYPE(SvRV(w)) == SVt_PVHV))
+                    oa_cli_ser_flat(aTHX_ pp, w, cookie);
+                else
+                    sv_catsv(cookie, w);
+            }
         }
     }
     for (i = 0; i < nsec_c; i++) {              /* apiKey-in-cookie schemes */

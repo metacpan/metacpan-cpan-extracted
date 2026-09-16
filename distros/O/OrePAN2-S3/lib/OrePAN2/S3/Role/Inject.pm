@@ -3,8 +3,10 @@ package OrePAN2::S3::Role::Inject;
 use strict;
 use warnings;
 
+use Carp;
 use CLI::Simple::Constants qw(:booleans);
 use CLI::Simple::Utils qw(slurp);
+use Data::Dumper;
 use English qw(-no_match_vars);
 use File::Basename qw(basename);
 use File::Temp qw(tempfile);
@@ -14,31 +16,16 @@ use Role::Tiny;
 use Readonly;
 Readonly::Scalar our $PACKAGE_INDEX => '02packages.details.txt.gz';
 
+our $VERSION = '2.1.1';
+
 ########################################################################
 sub cmd_inject {
 ########################################################################
   my ($self) = @_;
 
-  my ($file) = $self->get_args;
-  $file //= $self->get_distribution;
+  $self->cmd_upload;
 
-  die "ERROR: no file specified\n" if !$file;
-  die "ERROR: $file not found\n"   if !-e $file;
-
-  my $config = $self->get_config;
-  my $prefix = $config->{AWS}{prefix};
-  my $base   = basename($file);
-
-  my $tarball_key = sprintf '%s/authors/id/%s/%s', $prefix, $self->get_author_path, $base;
-
-  my $content = slurp($file);
-  $self->get_s3->put_object( $self->get_bucket_name, $tarball_key, $content, content_type => 'application/gzip', );
-
-  $self->get_logger->info( sprintf 'uploaded %s to %s', $base, $tarball_key );
-
-  return $SUCCESS if $self->get_upload_only;
-
-  return $self->_index_tarball($file);
+  return $self->_index_tarball( $self->get_distribution ) ? $SUCCESS : $FAILURE;
 }
 
 ########################################################################
@@ -51,21 +38,33 @@ sub _index_tarball {
 
   $basename //= basename($file);
 
-  my $provides   = $self->scan_provides($file);
+  my $provides = $self->scan_provides($file);
+
+  if ( !$provides ) {
+    $self->get_logger->error( sprintf 'ERROR: tarball %s does not provide anything!' . $file );
+    return $FALSE;
+  }
+
   my $index_path = sprintf '%s/%s', $self->get_author_path, $basename;
 
-  $self->update_index(
+  return $self->update_index(
     sub {
       my ($index) = @_;
+
       for my $package ( sort keys %{$provides} ) {
         my $version = $provides->{$package}{version};
-        $index->add_index( $package, $version, $index_path );
-        $self->get_logger->info( sprintf 'indexed %s %s', $package, $version // 'undef' );
+        if ( $index->add_index( $package, $version, $index_path ) ) {
+          $self->get_logger->info( sprintf 'indexed %s %s', $package, $version // 'undef' );
+        }
+        else {
+          $self->get_logger->error( sprintf '"%s" was not indexed!', $package );
+          return $FALSE;
+        }
       }
+
+      return $TRUE;
     }
   );
-
-  return $SUCCESS;
 }
 
 ########################################################################
@@ -80,29 +79,32 @@ sub scan_provides {
   $tar->read($file);
 
   # find the top-level prefix, e.g. "CPAN-Maker-1.8.2"
-  my ($entry) = grep { $_->name =~ m{/META\.(?:json|yml|yaml)$}xsm } $tar->get_files;
+  my ($entry) = grep { $_->name =~ m{META\.(?:json|yml|yaml)$}xsm } $tar->get_files;
 
   if ( !$entry ) {
-    $self->get_logger->warn("no META file found in $file");
-    return {};
+    $self->get_logger->warn( sprintf 'ERROR: no META file found in %s', $file );
+    return;
   }
 
-  my ($prefix) = ( split m{/}xsm, $entry->name )[0];
+  $self->get_logger->debug( sprintf 'entry: %s', $entry->name );
 
-  for my $metafile (qw(META.json META.yml META.yaml)) {
-    my $content = eval { $tar->get_content("$prefix/$metafile") };
-    next if !$content;
+  my $meta = eval {
+    my $name    = $entry->prefix ? sprintf( q{%s/%s}, $entry->prefix, $entry->name ) : $entry->name;
+    my $content = eval { $tar->get_content($name); };
+    return CPAN::Meta->load_string($content);
+  };
 
-    my $meta = eval { CPAN::Meta->load_string($content) };
-    next if !$meta || $EVAL_ERROR;
-
-    return $meta->{provides} if $meta->{provides};
-  }
+  return $meta->{provides}
+    if $meta && $meta->{provides};
 
   # Should not happen - injecting tarballs we create with CPAN::Maker
-  $self->get_logger->warn("META found but no provides in $file");
+  if ( !$meta ) {
+    $self->get_logger->error( sprintf 'ERROR: META found but no provides in %s', $file );
+    return;
+  }
 
-  return {};
+  $self->get_logger->error( sprintf 'ERROR: could not load metadata from %s in %s', $entry->name, $file );
+  return;
 }
 
 ########################################################################
@@ -141,7 +143,8 @@ sub update_index {
   $index->load($index_file);
   unlink $index_file;
 
-  $code->($index);
+  return
+    if !$code->($index);
 
   my $gz_content;
 
@@ -153,11 +156,33 @@ sub update_index {
   $gz->close;
 
   my $index_key = sprintf '%s/modules/02packages.details.txt.gz', $prefix;
-  $self->get_s3->put_object( $self->get_bucket_name, $index_key, $gz_content, content_type => 'application/gzip', );
 
-  $self->get_logger->info( sprintf 'updated index at %s', $index_key );
+  if ( !$self->get_dryrun ) {
+    $self->get_s3->put_object( $self->get_bucket_name, $index_key, $gz_content, content_type => 'application/gzip', );
+  }
 
-  return;
+  $self->get_logger->info( sprintf 'updated package index: %s%s', $index_key, $self->get_dryrun ? ' (dryrun)' : q{} );
+
+  if ( $self->get_update_site_index ) {
+    $self->get_logger->info( sprintf 'creating site index...%s', $self->get_dryrun ? '(dryrun)' : q{} );
+
+    if ( !$self->get_dryrun ) {
+      $self->cmd_create_site_index;
+    }
+  }
+
+  if ( $self->get_save_index || $self->get_dryrun ) {
+    $self->get_logger->info('writing local copy of 02packages.details.txt.gz');
+
+    open my $fh, '>', '02packages.details.txt.gz'
+      or die "ERROR: could not open 02packages.details.txt.gz for writing\n$OS_ERROR";
+
+    print {$fh} $gz_content;
+
+    close $fh;
+  }
+
+  return $TRUE;
 }
 
 1;

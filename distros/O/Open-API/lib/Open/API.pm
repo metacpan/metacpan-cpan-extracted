@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 require XSLoader;
 XSLoader::load('Open::API', $VERSION);
@@ -25,7 +25,7 @@ Open::API - OpenAPI 3.0 and 3.1 server and client
 
 =head1 VERSION
 
-Version 0.11
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -189,6 +189,19 @@ content).
 
 =back
 
+    my $api = Open::API->new(spec => $spec, servers => 1);
+
+C<servers> is optional and off by default. With it, the path prefix carried by
+the first Server Object's URL is stripped before routing, and any
+C<{variable}> in that URL is expanded from its declared default - so a
+document whose server is C<https://host/api/v1> answers C<GET /api/v1/pets>
+for a path written C</pets>.
+
+It is off by default deliberately. An application that already mounts itself
+so that C<PATH_INFO> arrives without the prefix would start seeing every
+request miss, and a routing change of that shape shows up as a silent 404
+rather than an error. Turn it on when the server sees the prefix.
+
 Compilation walks C<paths> once: every operation needs a unique
 C<operationId> (it is the dispatch key), path templates are pre-split,
 path-item and operation C<parameters> are merged (operation wins), and every
@@ -267,6 +280,37 @@ be lowercased by the caller; cookies are parsed from the C<cookie> header when
 the operation declares cookie parameters. For framework adapters - together
 with L</match> this is the complete integration surface, everything heavy
 stays in C.
+
+=head2 validate_env
+
+    my ($ok, $result) = $api->validate_env($opId, $env, \%captures, $body);
+
+L</validate_request> for a PSGI environment, and the same answer:
+C<(1, \%params)> or C<(0, \@errors)>. The difference is where the work
+happens. The header hash is built in C from C<$env>, and only for the headers
+this operation actually declares, so a document with two header parameters
+does not pay for the forty a browser sent.
+
+C<\%captures> are the raw path captures L</match> returned; C<$body> is the
+request body, already read. Both may be omitted.
+
+=head2 check_op_security
+
+    my $denied = $api->check_op_security($opId, $env, \%checkers);
+
+Weigh a request against the C<security> the document requires of an operation.
+C<\%checkers> maps a scheme name to a coderef, called as
+
+    $checker->($credential, $env, $opId, \@scopes)
+
+and returning true to admit the request. The credential is extracted per the
+scheme's own declaration, so a checker is handed the token rather than the
+header it arrived in.
+
+Returns C<undef> when the request may proceed, or a PSGI triplet to answer
+with. Requirements are an OR of ANDs: one satisfied alternative admits the
+request, and an operation's own C<security> replaces the document-level one
+rather than adding to it.
 
 =head2 check_response
 
@@ -409,6 +453,38 @@ and whether it is C<validated>), and C<secured>.
 This is the compiled table, not the document: a status the document
 declares without a schema does not appear, because nothing will be
 checked for it.
+
+=head2 operation_doc
+
+    my $doc = $api->operation_doc('getPet');
+
+What the document B<says> about an operation, as opposed to what the validator
+made of it: C<operationId>, C<method>, C<path>, C<summary>, C<description>,
+C<tags>, C<deprecated>, and any C<x-> extension keys the operation carried.
+C<undef> for an unknown id.
+
+L</operation_info> is the companion. That one reports what will be checked;
+this one reports what the operation was described as.
+
+=head2 operation_schema
+
+    my $schema = $api->operation_schema('getPet');
+
+Every input an operation declares, as one JSON Schema object: a property per
+parameter under its own name, plus C<body> for a JSON request body, with the
+required ones listed in C<required>. C<undef> for an unknown id.
+
+OpenAPI 3.1 schemas are JSON Schema 2020-12, and L</spec> is 3.1-shaped
+whatever the source declared, so the result needs no translation and compiles
+as it stands:
+
+    my $v = JSON::Schema::Fast->compile($api->operation_schema('getPet'));
+
+C<$ref>s into C<components.schemas> are rewritten to C<$defs>, and only the
+schemas this operation can actually reach are carried, so one operation does
+not drag the whole document along with it. A parameter named C<body> would
+collide with the request body, so it is carried as C<param_body> and says so
+in its description.
 
 =head1 ERRORS
 

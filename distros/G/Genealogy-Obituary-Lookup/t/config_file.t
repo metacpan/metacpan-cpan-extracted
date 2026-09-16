@@ -3,9 +3,11 @@
 use strict;
 use warnings;
 
+use Errno qw(ENOENT);
 use Test::Most;
 use File::Spec;
 use File::Temp qw/tempfile tempdir/;
+use POSIX qw(strerror);	# Import the strerror function
 use YAML::XS qw/DumpFile/;
 
 use_ok('Genealogy::Obituary::Lookup');
@@ -40,9 +42,10 @@ subtest 'Environment test' => sub {
 };
 
 # Nonexistent config file dies
+my $mess = strerror(ENOENT);
 throws_ok {
-	Genealogy::Obituary::Lookup->new(config_file => '/nonexistent/path/to/config.yml', config_dirs => ['']);
-} qr/Can't load configuration from/, 'Throws error for nonexistent config file';
+	Genealogy::Obituary::Lookup->new(config_file => '/nonexistent/path/to/config.yml');
+} qr/\Q$mess\E/, 'Dies with non-existent config file';
 
 # Malformed config file (not a hashref)
 my ($badfh, $badfile) = tempfile();
@@ -58,9 +61,21 @@ my $nofield_file = File::Spec->catdir($tempdir, 'nokey.yml');
 DumpFile($nofield_file, {
 	NotTheClass => { directory => $tempdir }
 });
-$obj = Genealogy::Obituary::Lookup->new(config_file => $nofield_file, config_dirs => ['']);
-ok($obj, 'Object created with config that lacks class key');
-like($obj->{directory}, qr/lib.Genealogy.Obituary.Lookup.data$/, 'Falls back to default if class key missing (uses directory directly)');
+
+# Auto-discovery of the data directory only succeeds when it has been built.
+# Under blib/ before `make` completes the database build, the path is absent.
+my $has_data_dir = do {
+	(my $base = $INC{'Genealogy/Obituary/Lookup.pm'} // '') =~ s/\.pm$//;
+	$base && -d File::Spec->catdir($base, 'data');
+};
+
+SKIP: {
+	skip 'module-relative data/ not present (run `make` first)', 2
+		unless $has_data_dir;
+	$obj = Genealogy::Obituary::Lookup->new(config_file => $nofield_file, config_dirs => ['']);
+	ok($obj, 'Object created with config that lacks class key');
+	like($obj->{directory}, qr/lib.Genealogy.Obituary.Lookup.data$/, 'Falls back to default if class key missing (uses directory directly)');
+}
 
 # Directory in config file does not exist
 my $bad_dir_file = File::Spec->catdir($tempdir, 'baddir.yml');

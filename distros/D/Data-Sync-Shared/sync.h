@@ -186,7 +186,7 @@ static inline int sync_pid_is_zombie(uint32_t pid) {
     return rp[1] == ' ' && rp[2] == 'Z';
 }
 static inline int sync_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (pid == 0) return 0; /* no owner recorded, treat as dead */
     if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
     return !sync_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
@@ -699,7 +699,7 @@ static inline void sync_rwlock_wrlock(SyncHandle *h) {
      * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
      * of the Dekker handshake. */
     for (;;) {
-        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_RELAXED);  /* snapshot BEFORE scan */
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
         if (!sync_rwlock_readers_busy(h))
             return;                                    /* exclusive: value held + every rdepth 0 */
         /* Wait for a reader to release (drain_seq bump) or time out to re-scan
@@ -808,7 +808,7 @@ static inline int sync_rwlock_wrlock_timed(SyncHandle *h, double timeout) {
     /* Phase 2: we own `value`; drain existing readers, bounded by the deadline.
      * On a deadline give-up we must release the writer word we hold. */
     for (;;) {
-        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_RELAXED);
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);
         if (!sync_rwlock_readers_busy(h))
             return 1;                                  /* exclusive */
         struct timespec *pts = (struct timespec *)&sync_lock_timeout;

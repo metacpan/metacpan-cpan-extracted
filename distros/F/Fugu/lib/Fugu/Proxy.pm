@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package Fugu::Proxy;
-our $VERSION = '0.5.0';
+our $VERSION = '0.5.1';
 
 use v5.34;
 use warnings;
@@ -475,7 +475,7 @@ sub _stream_file ( $self, $socket, $path, $size )
 }
 
 package Fugu::Proxy::Cache;
-our $VERSION = '0.5.0';
+our $VERSION = '0.5.1';
 
 use File::Basename qw(dirname);
 use Fugu::File;
@@ -708,7 +708,7 @@ sub walk ( $self, $dir, $callback )
 }
 
 package Fugu::Proxy::Meta;
-our $VERSION = '0.5.0';
+our $VERSION = '0.5.1';
 
 # Fugu::Proxy::Meta - the metadata of the cached files, in memory.
 #

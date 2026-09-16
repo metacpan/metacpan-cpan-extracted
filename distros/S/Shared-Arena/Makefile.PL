@@ -7,77 +7,27 @@ use ExtUtils::Depends;
 use File::Find ();
 use File::Spec;
 
-# Arena.xs sits at the top of the dist and the build is the plain
-# single-extension one MakeMaker defaults to. An XSMULTI build from
-# lib/Shared/Arena.xs writes its linker export list to lib/Shared/Arena.def,
-# while the import-library rule Strawberry adds for MinGW reads $(EXPORT_LIST),
-# which is always $(BASEEXT).def in the top directory - the two names never met
-# and dlltool failed the build.
-
 my $LIBS   = '';
 my $DEFINE = '';
 
-# ---- Shared::Arena as an ABI PROVIDER ------------------------------------- *
-#
-# sa_abi.h publishes the region, the ring and the cursor so a consumer's XS can
-# use them with no Perl frame at all - which is the point, since a consumer
-# paying a method call per record would be slower than the pipe it is replacing.
-# ExtUtils::Depends installs the header and records the include path;
-# Shared::Arena::_abi_ptr hands over the table's address at runtime.
-#
-# Provider only: this dist consumes nobody's ABI and has no runtime
-# prerequisites.
-#
-# NO set_inc. What EU::Depends records there is handed to every consumer, and a
-# provider's own build-tree paths are meaningless once installed: '-I.' in a
-# consumer's compile line means the CONSUMER's directory, and '-Iinclude' means
-# a directory that is very likely not there. A consumer needs exactly one path -
-# the installed header's - and EU::Depends derives that from CORE by itself.
-# ---- and a CONSUMER of Frozen ---------------------------------------------- *
-#
-# Shared::Arena::Frozen stores a structure that is read WHERE IT LIES rather
-# than rebuilt on every read, and Frozen is the format and the reader. Named as
-# a dependency here so that EU::Depends puts the installed fz_abi.h on the
-# compile line, and so that a consumer of THIS dist inherits the same path.
-#
-# A hard prerequisite, not an optional one. A tenant that appears or does not
-# depending on what else is installed is a tenant whose absence is discovered
-# in production, and the arena's own ABI would have to grow a conditional hole.
 my $pkg = ExtUtils::Depends->new('Shared::Arena', 'Frozen');
 $pkg->install('include/sa_abi.h');
 mkdir 'Install' unless -d 'Install';
 $pkg->save_config('Install/Files.pm');
 
 my %dep = $pkg->get_makefile_vars;
-# EU::Depends hands back an empty LIBS/LDFROM that would clobber MakeMaker's
-# defaults, and an INC of its own. This dist sets INC itself below - but the
-# dependency's include path is in that INC and is the only way to find
-# fz_abi.h, so keep it and merge it rather than dropping it on the floor.
 my $dep_inc = $dep{INC} || '';
 delete @dep{qw(LIBS LDFROM INC)};
 
-# Its PM map REPLACES MakeMaker's auto-detected one, so everything under lib/
-# has to be re-added by hand or it silently stops being installed.
 File::Find::find(sub {
     return unless -f && /\.pm\z/;
     (my $rel = $File::Find::name) =~ s{^lib/}{};
     $dep{PM}{$File::Find::name} = "\$(INST_LIB)/$rel";
 }, 'lib');
 
-# ---- probe: a 64-bit compare-and-swap that LINKS -------------------------- *
-#
-# The region's high-water mark and the ring's sequence are 64-bit words advanced
-# with __sync or __atomic. On a 32-bit x86 target the 64-bit __sync builtins
-# need -march=i586 or better, and without it they do not fail to COMPILE - they
-# fail to LINK, or worse, resolve to a libgcc call that is not there until
-# dlopen. So the probe builds and links a program, and a probe that only
-# compiled would pass here and fail in the field.
 sub probe {
     my ($name, $body, $libs) = @_;
     my $b   = eval { ExtUtils::CBuilder->new(quiet => 1) } or return 0;
-    # NOT "sa_probe_$$_$name.c" - $$_ interpolates as ${$_}, a dereference of
-    # $_, and the error it gives names a SCALAR reference rather than the pid
-    # you thought you were asking for.
     my $src = File::Spec->catfile(File::Spec->tmpdir(),
                                   'sa_probe_' . $$ . "_$name.c");
     open my $fh, '>', $src or return 0;
@@ -112,23 +62,11 @@ if (probe('cas64', $cas64)) {
     print "64-bit atomics: yes.\n";
 }
 else {
-    # Not fatal: every caller fails open with no atomics, and that is a tested
-    # path rather than a new one. But say so, because a region that always
-    # refuses is a confusing thing to debug from the outside.
     print "64-bit atomics: NO - Shared::Arena will refuse to create a region "
         . "on this build. See the ATOMICS section of the POD.\n";
     $DEFINE .= ' -DSA_NO_ATOMICS';
 }
 
-# ---- probe: pthread_atfork ------------------------------------------------ *
-#
-# The publish path needs to know its own pid, and getpid stopped being cached in
-# glibc 2.25 - so caching it here is worth a syscall per record. A cache is only
-# safe with something to invalidate it on fork, and pthread_atfork is that.
-# glibc moved it from libpthread into libc in 2.34, so try bare first.
-#
-# Missing is not fatal: without it sa_getpid calls the real thing every time,
-# which is what it did before and is always correct.
 if ($^O ne 'MSWin32') {
     my $atfork = <<'C';
 #include <pthread.h>
@@ -149,11 +87,6 @@ C
     }
 }
 
-# ---- probe: shm_open, and whether it needs -lrt --------------------------- *
-#
-# glibc before 2.34 keeps shm_open in librt; from 2.34 it is folded into libc.
-# macOS and the BSDs have no librt at all, so link it only when a probe needs
-# it. Windows uses CreateFileMapping and never gets here.
 if ($^O ne 'MSWin32') {
     my $shm = <<'C';
 #include <sys/mman.h>
@@ -174,11 +107,6 @@ C
     }
 }
 
-# ---- probe: log(), for sizing a bloom filter ------------------------------ *
-#
-# Sizing a filter from an expected item count and a false-positive rate is two
-# logarithms. glibc keeps them in libm; macOS and the BSDs fold them into libc.
-# Link it only where a probe says it is needed.
 {
     my $logp = <<'C';
 #include <math.h>
@@ -198,10 +126,6 @@ C
     }
 }
 
-# MakeMaker maps Arena.xs -> Arena.c and rescans neither the INCLUDEd xs/
-# fragments nor the C headers, so name both: regenerate Arena.c when a fragment
-# changes, and rebuild the object when a header does. The globs run at CONFIGURE
-# time - re-run Makefile.PL after adding a file.
 my $xs_deps = join ' ', glob('xs/*.xs');
 my $h_deps  = join ' ', glob('include/*.h'), glob('include/sa/*.h');
 
@@ -218,19 +142,13 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::CBuilder'  => '0',
         'ExtUtils::Depends'   => '0.404',
-        # Read at CONFIGURE time, because EU::Depends resolves the dependency's
-        # installed include path while this file runs.
-        'Frozen'              => '0.04',
+        'Frozen'              => '0.07',
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',
     },
     PREREQ_PM => {
-        # The Frozen tenant reads a structure in place through Frozen's ABI
-        # table. 0.04 is the version that publishes `borrow`, which is the
-        # entry that reads a block without copying it - and copying it is the
-        # thing the arena exists to avoid.
-        'Frozen' => '0.04',
+        'Frozen' => '0.07',
     },
     XS     => { 'Arena.xs' => 'Arena.c' },
     OBJECT => 'Arena$(OBJ_EXT)',

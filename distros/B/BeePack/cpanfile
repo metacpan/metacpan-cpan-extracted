@@ -1,5 +1,5 @@
 
-requires 'CDB::TinyCDB', '0.05';
+requires 'CDB_File', '1.05';
 requires 'Data::MessagePack', '0.48';
 requires 'Moo', '1.006001';
 requires 'File::Temp', '0.2304';

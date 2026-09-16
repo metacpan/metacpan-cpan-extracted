@@ -1,5 +1,9 @@
 Revision history for Data-CountingBloomFilter-Shared
 
+0.03      2026-09-15
+          - Recover a lock left ownerless by a corrupt file instead of hanging.
+          - Fix a writer stall on ARM64 after readers release.
+
 0.02      2026-08-11
           - Frozen read-only mode: freeze() seals a file-backed structure;
             new_readonly() maps it O_RDONLY and queries it lock-free.

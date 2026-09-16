@@ -1,0 +1,170 @@
+use alienfile;
+use File::Basename ();
+use File::Path ();
+use File::Spec;
+
+require File::Spec->catfile(File::Basename::dirname(__FILE__), qw(inc Alien ghostty Zig.pm));
+
+my $SOURCE_URL = 'https://github.com/ghostty-org/ghostty/releases/download/tip/libghostty-vt-source.tar.gz';
+
+my $SYS_LIBS = $^O eq 'linux' ? ' -lrt' : '';
+
+meta->around_hook(probe => sub {
+    my $orig = shift;
+    ($ENV{ALIEN_INSTALL_TYPE} // '') eq 'system' ? $orig->(@_) : 'share';
+});
+
+{
+    my $pc_cflags = `pkg-config --cflags libghostty-vt 2>/dev/null`;
+    my $pc_libs   = `pkg-config --libs libghostty-vt 2>/dev/null`;
+    chomp($pc_cflags, $pc_libs) if defined $pc_libs;
+
+    plugin 'Probe::CBuilder' => (
+        cflags  => ($pc_libs ? $pc_cflags : ''),
+        libs    => ($pc_libs ? $pc_libs : '-lghostty-vt'),
+        version => qr/^ghostty-vt version (\S+)/m,
+        program => <<'C',
+#include <stdio.h>
+#include <string.h>
+#include <ghostty/vt.h>
+
+static bool da(GhosttyTerminal t, void *u, GhosttyDeviceAttributes *out) {
+    (void)t; (void)u; out->primary.num_features = 0; return true;
+}
+
+static bool size(GhosttyTerminal t, void *u, GhosttySizeReportSize *out) {
+    (void)t; (void)u; out->cell_width = 0; return true;
+}
+
+int main(void) {
+    GhosttyTerminal term = NULL;
+    GhosttyFormatter fmt = NULL;
+    GhosttyFormatterTerminalOptions opts;
+    GhosttySelection sel;
+    GhosttyPoint point;
+    GhosttyTerminalModeConfig mode;
+    GhosttyString version;
+    uint8_t *buf = NULL;
+    size_t len = 0, consumed = 0, scrollback = 0;
+
+    if (ghostty_terminal_new(NULL, &term, 80, 24) != GHOSTTY_SUCCESS)
+        return 1;
+    ghostty_terminal_set(term, GHOSTTY_TERMINAL_OPT_DEVICE_ATTRIBUTES, (const void *)da);
+    ghostty_terminal_set(term, GHOSTTY_TERMINAL_OPT_SIZE, (const void *)size);
+    ghostty_terminal_set(term, GHOSTTY_TERMINAL_OPT_SCROLLBACK_MAX_LINES, &scrollback);
+    ghostty_terminal_vt_write(term, (const uint8_t *)"x", 1);
+    ghostty_terminal_vt_write_until_ground(term, (const uint8_t *)"y", 1, &consumed);
+    if (ghostty_terminal_resize(term, 100, 30, 8, 16) != GHOSTTY_SUCCESS)
+        return 1;
+    ghostty_terminal_reset(term);
+    mode.mode = ghostty_mode_new(25, false);
+    if (ghostty_terminal_get(term, GHOSTTY_TERMINAL_DATA_MODE, &mode) != GHOSTTY_SUCCESS)
+        return 1;
+    ghostty_terminal_get(term, GHOSTTY_TERMINAL_DATA_SCROLLBACK_ROWS, &scrollback);
+    memset(&sel, 0, sizeof sel);
+    sel.size = sizeof sel;
+    sel.start.size = sel.end.size = sizeof sel.start;
+    memset(&point, 0, sizeof point);
+    point.tag = GHOSTTY_POINT_TAG_ACTIVE;
+    if (ghostty_terminal_grid_ref(term, point, &sel.start) != GHOSTTY_SUCCESS
+        || ghostty_terminal_grid_ref(term, point, &sel.end) != GHOSTTY_SUCCESS)
+        return 1;
+    memset(&opts, 0, sizeof opts);
+    opts.size = sizeof opts;
+    opts.extra.size = sizeof opts.extra;
+    opts.extra.screen.size = sizeof opts.extra.screen;
+    opts.emit = GHOSTTY_FORMATTER_FORMAT_PLAIN;
+    opts.selection = &sel;
+    if (ghostty_formatter_terminal_new(NULL, &fmt, term, opts) != GHOSTTY_SUCCESS)
+        return 1;
+    if (ghostty_formatter_format_alloc(fmt, NULL, &buf, &len) != GHOSTTY_SUCCESS)
+        return 1;
+    ghostty_free(NULL, buf, len);
+    ghostty_formatter_free(fmt);
+    ghostty_terminal_free(term);
+    if (ghostty_build_info(GHOSTTY_BUILD_INFO_VERSION_STRING, &version) != GHOSTTY_SUCCESS)
+        return 1;
+    printf("ghostty-vt version %.*s\n", (int)version.len, (const char *)version.ptr);
+    return 0;
+}
+C
+    );
+}
+
+share {
+    meta->prop->{destdir} = 1;
+
+    my $source = $ENV{ALIEN_GHOSTTY_SOURCE};
+    if (defined $source && length $source) {
+        unless ($source =~ m{^[a-z][a-z0-9+.-]*://}i) {
+            (my $path = File::Spec->rel2abs($source)) =~ s{([^A-Za-z0-9/._~-])}{sprintf '%%%02X', ord $1}ge;
+            $source = "file://$path";
+        }
+        start_url $source;
+    } else {
+        start_url $SOURCE_URL;
+    }
+
+    plugin 'Download';
+    plugin 'Extract' => 'tar.gz';
+
+    build [
+        sub {
+            my ($build) = @_;
+            my $zig_dir = File::Spec->catdir($build->install_prop->{root}, 'zig');
+            my $zig = Alien::ghostty::Zig::find_or_fetch(
+                dir     => $zig_dir,
+                network => $build->meta_prop->{network},
+                log     => sub { $build->log(@_) },
+            );
+
+            open my $src_fh, '<', 'VERSION' or die "Alien::ghostty: no VERSION in the source\n";
+            chomp(my $source_version = <$src_fh>);
+            $build->install_prop->{ghostty_version} = $source_version;
+            my ($commit) = $source_version =~ /\+([0-9a-f]+)$/;
+            my ($lib_version) = do { local $/; open my $fh, '<', 'build.zig' or die $!; <$fh> }
+                =~ /^const lib_version = "([^"]+)";/m;
+            (my $app_version = $source_version) =~ s/-?\+/+/;
+            undef $app_version unless $app_version =~ /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
+
+            my $prefix = $build->install_prop->{prefix};
+            my @cmd = (
+                $zig, 'build',
+                '-Demit-lib-vt=true',
+                '-Demit-xcframework=false',
+                '-Doptimize=ReleaseFast',
+                '-Dcpu=baseline',
+                ($app_version ? "-Dversion-string=$app_version" : ()),
+                ($lib_version && $commit ? "-Dlib-version-string=$lib_version+$commit" : ()),
+                '--prefix', $prefix,
+                '--cache-dir', '.zig-cache',
+                '--global-cache-dir', '.zig-cache',
+                '--summary', 'failures',
+            );
+            $build->log("+ @cmd");
+            system(@cmd) == 0
+                or die "Alien::ghostty: zig build failed (wait status $?)\n";
+            File::Path::remove_tree('.zig-cache');
+            File::Path::remove_tree($zig_dir) if index($zig, $zig_dir) == 0;
+
+            my $pc = ($ENV{DESTDIR} // '') . "$prefix/share/pkgconfig/libghostty-vt.pc";
+            open my $pc_fh, '<', $pc or die "Alien::ghostty: $pc not installed\n";
+            my ($version) = join('', <$pc_fh>) =~ /^Version:\s*(\S+)/m
+                or die "Alien::ghostty: no Version in $pc\n";
+            $build->install_prop->{libghostty_vt_version} = $version;
+        },
+    ];
+
+    plugin 'Gather::IsolateDynamic';
+
+    gather sub {
+        my ($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+        $build->runtime_prop->{version}         = $build->install_prop->{libghostty_vt_version};
+        $build->runtime_prop->{ghostty_version} = $build->install_prop->{ghostty_version};
+        $build->runtime_prop->{cflags}          = "-I$prefix/include -DGHOSTTY_STATIC";
+        $build->runtime_prop->{cflags_static}   = "-I$prefix/include -DGHOSTTY_STATIC";
+        $build->runtime_prop->{libs}            = "-L$prefix/lib -lghostty-vt$SYS_LIBS";
+        $build->runtime_prop->{libs_static}     = "-L$prefix/lib -lghostty-vt$SYS_LIBS";
+    };
+};

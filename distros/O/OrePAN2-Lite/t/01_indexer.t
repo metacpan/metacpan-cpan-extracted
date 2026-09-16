@@ -1,0 +1,61 @@
+use strict;
+use warnings;
+use utf8;
+
+use lib 't/lib';
+
+use Test::More;
+use Local::Util qw( slurp slurp_gz );
+use File::Temp  qw( tempdir );
+use File::Path  qw( mkpath );
+use File::Copy  qw( copy );
+use Path::Tiny  qw();
+
+use OrePAN2::Indexer ();
+
+# Ported from OrePAN2 0.54 t/01_indexer.t. The OrePAN2::Lite Indexer API
+# is unchanged (new(directory=>..., simple=>...), make_index,
+# make_index(no_compress=>1)), so this drops in as-is. It exercises the
+# .tar.gz scan -> 02packages path, which is exactly what the Moo removal
+# and the Archive::Extract -> Archive::Tar swap must not break.
+
+subtest 'gz' => sub {
+    my $tmpdir = Path::Tiny->tempdir( CLEANUP => 1 );
+
+    mkpath "$tmpdir/authors/id/M/MI/MIYAGAWA/";
+
+    copy 't/dat/Acme-YakiniQ-0.01.tar.gz', "$tmpdir/authors/id/M/MI/MIYAGAWA";
+
+    my $orepan = OrePAN2::Indexer->new(
+        directory => $tmpdir,
+        simple    => 1,
+    );
+    $orepan->make_index();
+
+    my $content = slurp_gz("$tmpdir/modules/02packages.details.txt.gz");
+    note $content;
+    like $content,
+        qr{Acme::YakiniQ\s+0.01\s+M/MI/MIYAGAWA/Acme-YakiniQ-0.01.tar.gz};
+    unlike $content, qr{Line\-Count}, 'simple format';
+};
+
+subtest 'txt' => sub {
+    my $tmpdir = tempdir( CLEANUP => 1 );
+
+    mkpath "$tmpdir/authors/id/M/MI/MIYAGAWA/";
+
+    copy 't/dat/Acme-YakiniQ-0.01.tar.gz', "$tmpdir/authors/id/M/MI/MIYAGAWA";
+
+    my $orepan = OrePAN2::Indexer->new(
+        directory => $tmpdir,
+    );
+    $orepan->make_index( no_compress => 1 );
+
+    my $content = slurp("$tmpdir/modules/02packages.details.txt");
+    note $content;
+    like $content,
+        qr{Acme::YakiniQ\s+0.01\s+M/MI/MIYAGAWA/Acme-YakiniQ-0.01.tar.gz};
+    like $content, qr{Line\-Count}, 'not simple format';
+};
+
+done_testing;

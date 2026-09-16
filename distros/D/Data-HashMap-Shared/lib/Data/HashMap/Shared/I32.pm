@@ -2,7 +2,7 @@ package Data::HashMap::Shared::I32;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 my @KEYWORDS = qw(
     put get remove exists incr decr incr_by max min size keys values

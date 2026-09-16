@@ -1,5 +1,8 @@
 Revision history for Data::BitSet::Shared
 
+0.07  2026-09-15
+    - count, any and none ignore bits past the capacity in a corrupt file.
+
 0.06  2026-08-12
     - Recover a file left behind by an interrupted create instead of leaving the
       path unopenable.

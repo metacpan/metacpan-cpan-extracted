@@ -176,7 +176,8 @@ DESCRIPTION
     timeout.
 
     "push_wait_multi" pushes all values, blocking if the queue is full.
-    $timeout is seconds (-1 = infinite, 0 = try once).
+    $timeout is seconds (-1 = infinite, 0 = try once) and bounds the whole
+    call: once it has run out, each remaining value gets one try.
 
    Status
         my $n   = $q->size;         # approximate under concurrent access

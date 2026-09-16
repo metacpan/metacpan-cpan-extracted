@@ -1,0 +1,116 @@
+Mon Sep 14 14:17:59 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.2]:
+	* VERSION: bump
+	* README.md: generated
+	* release-notes.md: updated
+	* release-notes/release-notes-1.0.2.md: new
+	* build-mirrors: new
+	* lib/DarkPAN/Indexer/CLI.pm.in: new
+	* lib/DarkPAN/Indexer/Format.pm.in: new
+	* lib/DarkPAN/Indexer/Format/SQLite.pm.in: renamed
+	* lib/DarkPAN/Indexer/Role/Indexer.pm.in: deleted
+	* lib/DarkPAN/Indexer/Role/Utils.pm.in: deleted
+	* lib/DarkPAN/Indexer/Storage.pm.in: new
+	* lib/DarkPAN/Indexer/Storage/Filesystem.pm.in: new
+	* lib/DarkPAN/Indexer/Storage/S3.pm.in: new
+	* lib/DarkPAN/Resolver/SQLite.pm.in: deleted
+	* share/Foo-1.0.0.tar.gz: new
+	* share/Foo-1.0.1.tar.gz: new
+	* t/02-storage-filesystem.t: new
+	* t/03-update-index.t: new
+	* t/04-update-index-failure.t: new
+	* t/05-update-index-missing-index.t: new
+	* test-requires.skip: new
+	* .includes/update.mk: updated by CPAN::Maker::Bootstrapper
+	* Makefile: likewise
+	* bin/darkpan-indexer.in: DarkPAN::Indexer::CLI
+	* buildspec.yml
+	- added sample distribution tarballs (Foo*.tar.gz)
+	- added t/dat/Acme-YakiniQ-0.01.tar.gz sample
+	* deps.mk: generated
+	* lib/DarkPAN/Indexer.pm.in
+	- moved CLI components to DarkPAN::Indexer::CLI
+	- essentially a new class
+	- added POD
+	(_load_config): support open handle
+	* lib/DarkPAN/Indexer/Format/SQLite.pm.in
+	- refactored from Loader.pm.in
+	* requires
+	- +Amazon::Credentials, Amazon::S3::Lite::Lock, Class::Accessor::Fast, JSON
+	* cpanfile: likewise
+	* suggests:
+	- YAML::Tiny
+	* .includes/bootstrap.mk: new
+	* test-requires: +Test::Output, Path::Tiny
+
+Thu Sep 10 16:24:35 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.1]:
+	* VERSION: bump
+	* release-notes.md: new
+	* release-notes/release-notes-1.0.1.md: new
+	* lib/DarkPAN/Indexer/Role/Indexer.pm.in: renamed
+	* lib/DarkPAN/Indexer/Role/Loader.pm.in: renamed
+	* lib/DarkPAN/Indexer/Role/Utils.pm.in: new
+	* requires
+	- remove signatures, experimental, perl 5.24
+	* cpanfile: likewise
+	* deps.mk: generated
+	* lib/DarkPAN/Indexer.pm.in
+	- rename roles
+	* lib/DarkPAN/Indexer/Role/Indexer.pm.in
+	* lib/DarkPAN/Indexer/Role/Loader.pm.in
+	(load_database)
+	- add s3 argument
+	- only create backup if create flag set
+	- pass s3 to update_database
+	(update_database)
+	- accept s3
+	- remove spring from do statement
+	* lib/DarkPAN/Resolver/SQLite.pm.in
+	- remove experimental, perl 5.24
+	- compose in DarkPAN::Indexer::Role::Utils
+	(new)
+	- remove signature
+	- refactored to use _connect()
+	(_connect): new
+	(get_s3): new
+	(DESTROY): new
+	(resolve)
+	- remove signature
+	- {database}, not {db}
+
+Wed Sep 09 14:45:41  Rob Lauer  rclauer@gmail.com
+
+	[1.0.0]:
+	* .gitignore: new
+	* .includes/bash-completion.mk: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/local.mk: new
+	* .includes/modulino.mk: new
+	* .includes/perl.mk: new
+	* .includes/release-notes.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* .includes/version.mk: new
+	* ChangeLog: new
+	* Makefile: new
+	* README.md: new
+	* VERSION: new
+	* bin/darkpan-indexer.in: new
+	* buildspec.yml: new
+	* config.mk: new
+	* cpanfile: new
+	* deps.mk: new
+	* lib/DarkPAN/Indexer.pm.in: new
+	* lib/DarkPAN/Resolver/SQLite.pm.in: new
+	* lib/DarkPAN/Role/Indexer.pm.in: new
+	* lib/DarkPAN/Role/Loader.pm.in: new
+	* project.mk: new
+	* recommends: new
+	* requires: new
+	* suggests: new
+	* t/00-darkpan-indexer.t: new
+	* test-requires: new

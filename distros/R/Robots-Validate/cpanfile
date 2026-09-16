@@ -66,7 +66,7 @@ on 'configure' => sub {
 
 on 'configure' => sub {
   suggests "HTTP::Tiny" => "0.096";
-  suggests "JQ::Lite" => "2.49";
+  suggests "JQ::Lite" => "2.51";
   suggests "String::Util" => "1.36";
 };
 

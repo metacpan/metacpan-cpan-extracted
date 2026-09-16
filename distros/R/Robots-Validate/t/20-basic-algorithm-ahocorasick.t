@@ -1,6 +1,6 @@
 #!perl
 
-use Devel::Hide qw( Aho::Corasick::XS );
+use Devel::Hide qw( Algorithm::AhoCorasick::XS );
 
 use Test2::V0;
 use Test2::Tools::Exception qw( dies );
@@ -16,7 +16,7 @@ use Net::DNS::Resolver::Mock;
 use Robots::Validate;
 
 subtest 'sanity checks' => sub {
-    like dies { require "Aho::Corasick::XS" }, qr/\ACan't locate Aho::Corasick::XS/;
+    like dies { require "Algorithm::AhoCorasick::XS" }, qr/\ACan't locate Algorithm::AhoCorasick::XS/;
 };
 
 my $res = Net::DNS::Resolver::Mock->new;

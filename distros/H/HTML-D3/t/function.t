@@ -490,7 +490,7 @@ subtest 'render_pie_chart_snippet - return structure' => sub {
 	my $fragment = $chart->render_pie_chart_snippet(\@SIMPLE_DATA);
 
 	returns_ok($fragment, { type => 'hashref' }, 'returns a hashref');
-	is($fragment->{svg_id}, 'chart', 'svg_id is "chart"');
+	is($fragment->{svg_id}, 'pie_chart', 'svg_id is "pie_chart"');
 	ok(defined($fragment->{html}), 'html key is present');
 	returns_ok($fragment->{html}, { type => 'string' }, 'html value is a string');
 };
@@ -503,13 +503,138 @@ subtest 'render_pie_chart_snippet - fragment must not contain page-shell element
 	unlike($html, qr/<head/i,                     'no <head> element in fragment');
 	unlike($html, qr/<body/i,                     'no <body> element in fragment');
 	unlike($html, qr{https://d3js\.org/d3\.v7},   'no D3 CDN tag — caller loads D3');
-	like($html,   qr/<svg id="chart"/,             'SVG element present');
+	like($html,   qr/<svg id="pie_chart"/,         'SVG element has id="pie_chart"');
 	like($html,   qr/d3\.pie\(\)/,                 'd3.pie() present in fragment');
 };
 
 subtest 'render_pie_chart_snippet - no circular references in returned hashref' => sub {
 	my $fragment = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA);
 	memory_cycle_ok($fragment, 'returned hashref has no circular references');
+};
+
+subtest 'render_pie_chart_snippet - default colour scheme is tableau10 not category10' => sub {
+	# The snippet intentionally diverges from the full-page methods (which use
+	# schemeCategory10) to provide a visually distinct default palette.
+	my $html = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA)->{html};
+
+	# The selected scheme appears as SCHEMES['<name>'] in the const color = ... line.
+	like($html, qr/SCHEMES\['tableau10'\]/, 'tableau10 key used in scaleOrdinal call');
+};
+
+subtest 'render_pie_chart_snippet - animated => 1 enables attrTween fan animation' => sub {
+	# 0.14 feature: slices fan in from arc-length 0 using attrTween +
+	# d3.easeBackOut.overshoot, with a staggered 800 ms transition per slice.
+	# Respects prefers-reduced-motion; guarded by initialDrawDone so that
+	# subsequent redraws never re-animate.
+	my $html = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA, { animated => 1 })->{html};
+
+	like($html, qr/attrTween/,              'attrTween fan animation present');
+	like($html, qr/initialDrawDone/,        'initialDrawDone guard prevents re-animation');
+	like($html, qr/prefers-reduced-motion/, 'prefers-reduced-motion guard present');
+};
+
+subtest 'render_pie_chart_snippet - animated => 0 omits all animation code' => sub {
+	# Passing animated => 0 must produce the same non-animated output as the default.
+	my $html = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA, { animated => 0 })->{html};
+
+	unlike($html, qr/attrTween/,       'no attrTween when animated => 0');
+	unlike($html, qr/initialDrawDone/, 'no initialDrawDone guard when animated => 0');
+};
+
+subtest 'render_pie_chart_snippet - donut => 1 sets a non-zero inner radius' => sub {
+	# A non-zero innerRadius on the arc generator converts the pie into a donut.
+	my $html = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA, { donut => 1 })->{html};
+
+	like($html, qr/innerRadius/, 'innerRadius set in arc generator for donut mode');
+};
+
+subtest 'render_pie_chart_snippet - sort_slices => value sorts descending by value' => sub {
+	# When sort_slices is 'value', slices must appear in the JSON binding with the
+	# highest value first so that larger slices are always rendered before smaller ones.
+	my @unsorted = (['Low', 10], ['High', 90], ['Mid', 50]);
+	my $html = HTML::D3->new()->render_pie_chart_snippet(
+		\@unsorted, { sort_slices => 'value' }
+	)->{html};
+
+	my $high_pos = index($html, '"label":"High"');
+	my $low_pos  = index($html, '"label":"Low"');
+	ok($high_pos != -1,          '"High" slice present in data JSON');
+	ok($low_pos  != -1,          '"Low" slice present in data JSON');
+	ok($high_pos < $low_pos,     'highest-value slice appears before lowest in sorted JSON');
+};
+
+subtest 'render_pie_chart_snippet - max_slices collapses tail into Other slice' => sub {
+	# max_slices => N keeps the top (N-1) slices by value and merges the rest into
+	# a synthetic "Other" slice, so the chart never shows more than N wedges.
+	my @many = (['A', 50], ['B', 30], ['C', 20], ['D', 10], ['E', 5]);
+	my $html  = HTML::D3->new()->render_pie_chart_snippet(\@many, { max_slices => 3 })->{html};
+
+	my @labels = ($html =~ /"label":"([^"]+)"/g);
+	is(scalar @labels, 3,                 'exactly 3 slices in JSON after collapse');
+	ok((grep { $_ eq 'Other' } @labels), '"Other" synthetic slice present');
+};
+
+subtest 'render_pie_chart_snippet - zero-value slice silently omitted' => sub {
+	# A zero-value slice contributes nothing to the pie; including it would leave a
+	# zero-angle wedge that is invisible but still iterates D3 arc path generation.
+	my $html = HTML::D3->new()->render_pie_chart_snippet(
+		[['Zero', 0], ['Pos', 50]]
+	)->{html};
+
+	unlike($html, qr/"label":"Zero"/, 'zero-value slice omitted from JSON data binding');
+};
+
+subtest 'render_pie_chart_snippet - negative value converted to absolute value' => sub {
+	# Negative values are silently converted to their absolute counterpart; the
+	# sign carries no meaning in a proportion chart.
+	my $html = HTML::D3->new()->render_pie_chart_snippet(
+		[['Neg', -20], ['Pos', 80]]
+	)->{html};
+
+	like($html, qr/"value":20/, 'negative value stored as its absolute value in JSON');
+};
+
+subtest 'render_pie_chart_snippet - legend => 0 suppresses legend panel' => sub {
+	# By default the snippet renders an HTML legend panel with colour swatches beside
+	# the SVG.  Passing legend => 0 must omit the legend div and the D3 JS that
+	# populates it.  The CSS class definitions (.bi-pie-legend etc.) remain in the
+	# <style> block regardless -- only the functional elements are suppressed.
+	my $html_legend    = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA)->{html};
+	my $html_no_legend = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA, { legend => 0 })->{html};
+
+	like($html_legend, qr/selectAll\(".bi-pie-legend-entry"\)/,
+		'default output includes legend-entry JS (.selectAll call)');
+	unlike($html_no_legend, qr/selectAll\(".bi-pie-legend-entry"\)/,
+		'legend => 0 suppresses D3 JS that populates legend entries');
+	unlike($html_no_legend, qr/id="pie_chart_legend"/,
+		'legend => 0 suppresses the legend container div');
+};
+
+subtest 'render_pie_chart_snippet - color_scheme => category10 selects schemeCategory10' => sub {
+	# The SCHEMES JS object maps scheme name strings to D3 colour arrays; the Perl
+	# colour_scheme opt is interpolated as the lookup key in the scaleOrdinal call.
+	my $html = HTML::D3->new()->render_pie_chart_snippet(
+		\@SIMPLE_DATA, { color_scheme => 'category10' }
+	)->{html};
+
+	like($html, qr/SCHEMES\['category10'\]/, 'category10 key used in scaleOrdinal call');
+};
+
+subtest 'render_pie_chart_snippet - extra tooltip data from optional third element' => sub {
+	# An optional HashRef third element per data point is serialised as d.extra
+	# and appended as additional rows in the mouseover tooltip.
+	my @with_extra = (['Apples', 40, { Origin => 'NZ' }], ['Oranges', 30]);
+	my $html = HTML::D3->new()->render_pie_chart_snippet(\@with_extra)->{html};
+
+	like($html, qr/"extra":\{/, '"extra" object present in D3 data JSON');
+	like($html, qr/Origin/,     'extra key "Origin" serialised into JSON');
+};
+
+subtest 'render_pie_chart_snippet - no circular references with opts' => sub {
+	my $fragment = HTML::D3->new()->render_pie_chart_snippet(
+		\@SIMPLE_DATA, { animated => 1, donut => 1, legend => 1 }
+	);
+	memory_cycle_ok($fragment, 'snippet hashref with combined opts has no circular references');
 };
 
 # ---------------------------------------------------------------------------
@@ -686,6 +811,38 @@ subtest 'render_zoomable_line_chart_snippet - no circular references' => sub {
 	memory_cycle_ok($fragment, 'zoomable snippet hashref has no circular references');
 };
 
+subtest 'render_zoomable_line_chart_snippet - animated => 1 enables stroke-dashoffset draw animation' => sub {
+	# 0.13 feature: the line traces itself left-to-right on the initial page load.
+	# Subsequent zoom/reset redraws must NOT re-animate (guarded by initialDrawDone).
+	# The animation must be skipped entirely when prefers-reduced-motion is set.
+	my $html = HTML::D3->new(width => 800, height => 600)
+	                   ->render_zoomable_line_chart_snippet(\@SIMPLE_DATA, { animated => 1 })
+	                   ->{html};
+
+	like($html, qr/stroke-dashoffset/,      'stroke-dashoffset animation present');
+	like($html, qr/d3\.easeLinear/,         'd3.easeLinear easing used for line draw');
+	like($html, qr/initialDrawDone/,        'initialDrawDone guard prevents re-animation on zoom/reset');
+	like($html, qr/prefers-reduced-motion/, 'prefers-reduced-motion media-query guard present');
+
+	diag('animated zoomable HTML length: ' . length($html)) if $ENV{TEST_VERBOSE};
+};
+
+subtest 'render_zoomable_line_chart_snippet - animated => 0 omits animation code' => sub {
+	# animated => 0 must be identical in effect to omitting the opts argument entirely
+	# (backward-compatible: no new keys injected into the non-animated output).
+	my $html_no_opts  = HTML::D3->new()->render_zoomable_line_chart_snippet(\@SIMPLE_DATA)->{html};
+	my $html_anim_off = HTML::D3->new()->render_zoomable_line_chart_snippet(\@SIMPLE_DATA, { animated => 0 })->{html};
+
+	unlike($html_no_opts,  qr/stroke-dashoffset/, 'no stroke-dashoffset when opts omitted');
+	unlike($html_anim_off, qr/stroke-dashoffset/, 'no stroke-dashoffset when animated => 0');
+	unlike($html_anim_off, qr/initialDrawDone/,   'no initialDrawDone guard when animated => 0');
+};
+
+subtest 'render_zoomable_line_chart_snippet - animated => 1 no circular references' => sub {
+	my $fragment = HTML::D3->new()->render_zoomable_line_chart_snippet(\@SIMPLE_DATA, { animated => 1 });
+	memory_cycle_ok($fragment, 'animated zoomable hashref has no circular references');
+};
+
 # ---------------------------------------------------------------------------
 # Multi-series methods
 # All four share the same data shape and the same "array of hashes" validation.
@@ -760,11 +917,11 @@ subtest 'render_multi_series_line_chart_with_interactive_legends' => sub {
 
 	returns_ok($html, { type => 'string' }, 'returns a string scalar');
 	like($html, qr/<!DOCTYPE html>/i,  'contains DOCTYPE');
-	like($html, qr/isVisible/,         'visibility-toggle variable present');
+	like($html, qr/isVisible/,    'visibility-toggle variable present');
 	# The legend click handler must toggle opacity based on current visibility.
 	like($html, qr/isVisible\s*\?\s*0\s*:\s*1/, 'opacity toggled based on isVisible');
-	like($html, qr/\.legend\s*\{/,              'legend CSS class defined in stylesheet');
-	unlike($html, qr{</b>},                     'raw </b> absent');
+	like($html, qr/\.legend\s*\{/, 'legend CSS class defined in stylesheet');
+	unlike($html, qr{</b>}, 'raw </b> absent');
 };
 
 # ---------------------------------------------------------------------------

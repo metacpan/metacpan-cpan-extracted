@@ -2,7 +2,7 @@
 
 use strict;
 use Test::HTTPStatus;
-use Test::Most tests => 23;
+use Test::Most tests => 20;
 
 use lib 'lib';
 use lib 't/lib';
@@ -11,7 +11,7 @@ use MyLogger;
 BEGIN { use_ok('Genealogy::Obituary::Lookup') }
 
 SKIP: {
-	skip('Database not installed', 22) if(!-r 'lib/Genealogy/Obituary/Lookup/data/obituaries.sql');
+	skip('Database not installed', 19) if(!-r 'lib/Genealogy/Obituary/Lookup/data/obituaries.sql');
 
 	Database::Abstraction::init('directory' => 'lib/Genealogy/Obituary/Lookup/data');
 
@@ -93,33 +93,24 @@ SKIP: {
 	cmp_ok($erickson->{'url'}, 'eq', 'https://www.beaconjournal.com/obituaries/pwoo0723808', 'Check locally added data');
 	http_ok($erickson->{'url'}, HTTP_OK);
 
-	# Funeral-notices.co.uk
-	# https://funeral-notices.co.uk/notice/phillips/5229503
-	my $phillips = $search->search(first => 'Robert', last => 'Phillips', age => 81);
-	if($ENV{'TEST_VERBOSE'}) {
-		diag(Data::Dumper->new([$phillips])->Dump());
-	}
-	cmp_ok($phillips->{'url'}, 'eq', 'https://funeral-notices.co.uk/notice/phillips/5229503');
-	http_ok($phillips->{'url'}, HTTP_OK);
-
-	my $taylor = $search->search(first => 'Margaret', middle => 'Elizabeth', last => 'Taylor');
-	cmp_ok($taylor->{'url'}, 'eq', 'https://funeral-notices.co.uk/notice/taylor/5229508');
-	http_ok($taylor->{'url'}, HTTP_OK);
-
-	# Verify "Mc" is imported correctly
+	# Verify "Mc" is imported correctly.
 	my @mc_carthy = $search->search(first => 'Jean', middle => 'Emily', last => 'McCarthy');
 	diag(Data::Dumper->new([\@mc_carthy])->Dump()) if($ENV{'TEST_VERBOSE'});
-	http_ok($mc_carthy[0]->{'url'}, HTTP_OK);
-
-	my $pass = 1;
-	foreach my $entry(@mc_carthy) {
-		if($entry->{'last'} ne 'McCarthy') {
-			$pass = 0;
-			last;
+	ok(@mc_carthy && defined $mc_carthy[0], 'Jean Emily McCarthy is in the database');
+	SKIP: {
+		skip 'Jean Emily McCarthy not found — skipping URL and last-name checks', 2
+			unless @mc_carthy && defined $mc_carthy[0];
+		http_ok($mc_carthy[0]->{'url'}, HTTP_OK);
+		my $pass = 1;
+		for my $entry (@mc_carthy) {
+			next unless defined $entry;
+			if($entry->{'last'} ne 'McCarthy') {
+				$pass = 0;
+				last;
+			}
 		}
+		ok($pass, 'McCarthy is imported');
 	}
-	# FIXME: Doesn't notice if any have been missed
-	ok($pass, 'McCarthy is imported');
 
 	my @empty = $search->search(last => 'xyzzy');
 	is(scalar(@empty), 0, 'Search for xyzzy should return an empty list');

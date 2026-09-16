@@ -37,6 +37,9 @@ my $TOTAL   = $KIDS * $PER_KID;
 # A reader that gathered a tail whose parts were not all committed would show up
 # here as a short record or a mixed one, and both are checked below.
 my $FILL    = $ENV{SA_SPAN} ? 600 : 40;
+# How often a child gives the processor up mid-loop, so that the children
+# interleave on a host that cannot run them at once. See the loop below.
+my $YIELD   = int($PER_KID / 8) || 1;
 
 my $a = Shared::Arena->create(size => 2 * 1024 * 1024);
 my $r = $a->ring('storm', slots => 256, slot_size => 128);
@@ -74,6 +77,15 @@ for my $kid (1 .. $KIDS) {
                                   sprintf('%02d:%05d:', $kid, $i) . ('.' x $FILL));
             $first = $seq if !$first && $seq > 0;
             $last  = $seq if $seq > 0;
+            # Hand the processor over a few times on the way through. On a box
+            # with fewer processors than children the storm is otherwise not a
+            # storm: a child runs its whole loop inside one timeslice, so the
+            # children publish one after another and no two of them are ever
+            # writing the ring in the same span. A publisher stopped between
+            # taking a sequence and committing it, while the others lap the
+            # ring past it, is the case the seqlock and the hole handling are
+            # there for, and it only happens if they are interleaved.
+            select undef, undef, undef, 0.0002 if $i % $YIELD == 0;
         }
         $a->poke('ranges', ($kid - 1) * 40, sprintf('%020d%020d', $first, $last));
         # _exit, not exit: the parent's END blocks and its test plan must not
@@ -167,26 +179,52 @@ is($rs{published}, $TOTAL,
            'and it never claimed to have passed more than exists');
 }
 
-cmp_ok($cs{lapped}, '>', 0,
-       'and the reader really was overtaken - otherwise this test proved '
-     . 'nothing about lapping under contention');
+# One reader against eight publishers will be overtaken on any host anyone
+# runs this on, but BEING overtaken is the scheduler's doing and not something
+# the ring promises. What holds either way is that nothing went missing
+# quietly: a record is delivered or it is counted lost, never neither.
+ok($cs{lapped} > 0 || $cs{delivered} == $TOTAL,
+   'the reader was overtaken, or it kept up and missed nothing');
 
 is($out_of_order, 0,
    'no publisher\'s records were delivered out of the order it wrote them');
 
-# WERE THE PUBLISHERS CONCURRENT? Sequences come from one atomic in the order
-# they were handed out, so two children whose first-to-last ranges overlap were
-# publishing at the same time, whatever the reader was doing. That is the fact
-# to assert. Counting how many children the READER saw records from is not:
-# it depends on the parent getting scheduled during the storm, and on a
+# WHAT THE CHILDREN'S SEQUENCE RANGES PROVE, AND WHAT THEY ONLY REPORT.
+#
+# Each child left the first and last sequence the ring handed it. Two different
+# kinds of fact live in those numbers and the difference is the whole point:
+#
+#   - A child was handed $PER_KID sequences by one atomic, in increasing order
+#     and shared with nobody, so its range must be at least that wide. That is
+#     the ring's promise and it holds however the children were scheduled.
+#     Asserted.
+#   - Whether two children's ranges OVERLAP is the host's scheduling. Where
+#     there are fewer processors than children and the whole storm is shorter
+#     than a timeslice, each child runs to the end before the next one starts
+#     and no two ranges overlap - which says nothing about the ring. 0.06
+#     failed here on such a box. Reported, not asserted.
+#
+# Counting how many children the READER saw records from is the same trap one
+# step further out: it needs the parent scheduled mid-storm, and on a
 # two-processor smoker with eight children spinning it was not - it drained
 # once, at the end, and saw one ring's worth of the last child's tail. That
-# failed 0.02 on that box while the ring itself had done nothing wrong.
+# failed 0.02 on that box while the ring had done nothing wrong either.
 {
     # two fixed-width fields, not a regex: there is no separator between them
     my @range = map { my $s = $a->peek('ranges', $_ * 40, 40);
                       $s =~ /^\d{40}$/ ? [ substr($s, 0, 20) + 0, substr($s, 20, 20) + 0 ]
                                        : [ 0, 0 ] } 0 .. $KIDS - 1;
+    my @wrote = grep { $_->[0] } @range;
+    is(scalar @wrote, $KIDS,
+       "all $KIDS children published and reported the sequences they were given");
+
+    my $narrow = grep { $_->[1] - $_->[0] < $PER_KID - 1 } @wrote;
+    is($narrow, 0,
+       "each child's range spans the $PER_KID sequences it was handed, so no "
+     . 'two publishers were given the same one')
+        or diag 'a range narrower than the records it covers means the sequence '
+              . 'counter handed one number to two publishers';
+
     my $overlapping = 0;
     for my $i (0 .. $KIDS - 1) {
         for my $j ($i + 1 .. $KIDS - 1) {
@@ -196,14 +234,11 @@ is($out_of_order, 0,
             $overlapping++ if $a1 <= $b2 && $a2 <= $b1;
         }
     }
-    cmp_ok($overlapping, '>=', 1,
-           'at least two children were handed sequences in the same span, so the '
-         . 'publishers really were concurrent')
-        or diag 'no two ranges overlap: the children ran one after another and '
-              . 'this run did not test contention';
     diag sprintf 'delivered %d of %d, lapped %d, from %d of %d children; %d pairs of '
-               . 'children overlapped in time',
-         $cs{delivered}, $TOTAL, $cs{lapped}, scalar keys %by_kid, $KIDS, $overlapping;
+               . 'children overlapped in time%s',
+         $cs{delivered}, $TOTAL, $cs{lapped}, scalar keys %by_kid, $KIDS, $overlapping,
+         $overlapping ? '' : ' (this host ran them one after another, so this run '
+                           . 'tested the ring but not contention)';
 }
 
 # Sequences are handed out by one atomic, so no two publishers can ever have

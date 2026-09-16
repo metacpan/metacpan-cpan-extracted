@@ -19,7 +19,7 @@ SKIP: {
 	my $search = new_ok('Genealogy::Obituary::Lookup' => [ directory => 'lib/Genealogy/Obituary/Lookup/data' ]);
 
 	does_croak_that_matches(sub { my @empty = $search->search(); }, qr/^Usage: .*last/);
-	does_carp_that_matches(sub { my @empty = $search->search(last => undef); }, qr/^Value for 'last' is mandatory/);
-	does_carp_that_matches(sub { my @empty = $search->search({ last => undef }); }, qr/^Value for 'last' is mandatory/);
+	does_croak_that_matches(sub { my @empty = $search->search(last => undef); }, qr/^Value for 'last' is mandatory/);
+	does_croak_that_matches(sub { my @empty = $search->search({ last => undef }); }, qr/^Value for 'last' is mandatory/);
 	done_testing();
 }

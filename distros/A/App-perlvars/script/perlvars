@@ -16,10 +16,16 @@ my ( $opt, $usage ) = describe_options(
         'verbose-help', 'print verbose usage message and exit',
         { shortcircuit => 1 }
     ],
+    [ 'version', 'print version and exit', { shortcircuit => 1 } ],
 );
 
 if ( $opt->help ) {
     say( $usage->text );
+    exit;
+}
+
+if ( $opt->version ) {
+    say "perlvars $App::perlvars::VERSION";
     exit;
 }
 
@@ -70,7 +76,7 @@ perlvars - A command line utility for detecting unused Perl variables
 
 =head1 VERSION
 
-version 0.000006
+version 0.000007
 
 =head1 SYNOPSIS
 

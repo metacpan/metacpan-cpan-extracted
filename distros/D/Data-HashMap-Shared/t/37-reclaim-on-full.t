@@ -219,16 +219,25 @@ for my $i (0 .. $#cases) {
     $m->put('z' x 300, 'y' x 5000);
     cmp_ok $size - $m->size, '<=', 1, 'a long key with an oversize value costs at most one entry';
 
-    # the other direction: a class smaller than every block present is equally
-    # unsatisfiable, because blocks are never split either.  The arena is tiled
-    # exactly by eight 1024-byte blocks, so no bump remainder serves the request.
+    # the other direction: a class smaller than every block present.  Blocks are
+    # never split, and this arena is tiled exactly by eight 1024-byte blocks, so
+    # neither a free block nor a bump remainder can serve it.  That was a dead
+    # end until the arena learned to compact: the block the first attempt evicts
+    # is reclaimed by the next insert, which then fits.
     my $s = Data::HashMap::Shared::SS->new("$dir/small.shm", 1000, 900, 0, 0, 16 + 8 * 1024);
     my $j = 0;
     while ($s->put("b$j", 'b' x 1000)) { last if ++$j > 40 }
-    my ($fails, $ev2) = (0, $s->stats->{evictions});
-    for (1 .. 4) { $fails++ unless $s->put("s$_", 'a' x 100) }
-    is $fails, 4, 'a request in a class no entry holds fails, smaller than every block present';
-    is $s->stats->{evictions} - $ev2, 4, '  ... each failure having evicted one entry blindly';
+    my ($ev2, $used2) = ($s->stats->{evictions}, $s->arena_used);
+    ok !$s->put('s1', 'a' x 100), 'a request in a class no entry holds fails the first time';
+    is $s->stats->{evictions} - $ev2, 1, '  ... having evicted one entry blindly';
+    ok $s->put('s2', 'a' x 100), '  ... and the next insert compacts that block free and fits';
+    cmp_ok $s->arena_used, '<', $used2, '  ... which is the reclaim, visible in arena_used';
+    ok $s->put('s3', 'a' x 100), '  ... as do further inserts of the same class';
+    is $s->stats->{evictions} - $ev2, 1, '  ... without evicting a second time';
+    is $s->get('s2'), 'a' x 100, '  ... storing the value intact';
+    my $larges = grep { ($s->get("b$_") // '') eq 'b' x 1000 } 0 .. 40;
+    my $smalls = grep { ($s->get("s$_") // '') eq 'a' x 100 } 1 .. 3;
+    is $larges + $smalls, $s->size, '  ... and every entry present reads back its own value';
 
     # an insert whose arena-backed key is stored, then whose value evicts and
     # still fails, costs two entries and releases the key block again

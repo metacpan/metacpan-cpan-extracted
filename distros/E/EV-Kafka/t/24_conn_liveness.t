@@ -12,14 +12,15 @@ use EV::Kafka;
 #   L2  auto_reconnect keeps retrying after a SYNCHRONOUS connect failure
 #   L5  SASL config errors ("unsupported mechanism", "username required")
 #       disconnect instead of wedging the state machine
-#   L9  undef/empty SASL credentials are stored as NULL, not ""
+#   L9  undef/empty SASL credentials are stored as NULL, not "", without a
+#       warning; tied ones are fetched
 #   L6  acks=0 produce callbacks fire (empty success = handed to socket)
 #   L10 reconnect uses capped exponential backoff with jitter, first retry
 #       still exactly reconnect_delay_ms
 #
 # Mock-broker pattern as in t/20-t/23 — no live broker needed.
 
-plan tests => 15;
+plan tests => 20;
 
 sub i16 { pack 'n', $_[0] }
 sub i32 { pack 'N', $_[0] }
@@ -140,13 +141,46 @@ for my $case (
     my ($err, $disconnected);
     $conn->on_error(sub { $err = $_[0]; });
     $conn->on_disconnect(sub { $disconnected++; EV::break });
-    $conn->sasl($mech, $user, $pass);
+    my @warn;
+    { local $SIG{__WARN__} = sub { push @warn, @_ }; $conn->sasl($mech, $user, $pass) }
+    is "@warn", '', "L9: $mech sasl() does not warn";
     $conn->connect('127.0.0.1', $port, 5.0);
     my $safety = EV::timer 4, 0, sub { diag "L5 case $mech timed out"; EV::break };
     EV::run;
 
     like $err, qr/^\Q$expect\E/, "L5: $mech config error surfaces";
     is $disconnected, 1, "L5: $mech config error disconnects the conn";
+    $conn->DESTROY;
+}
+
+# --- L9: tied SASL credentials are fetched, not taken for undef ------------
+{
+    package TiedCred;
+    sub TIESCALAR { my ($c, $v) = @_; bless \$v, $c }
+    sub FETCH { ${ $_[0] } }
+}
+{
+    my ($port, $broker) = mock_broker(respond => { 17 => $sasl_handshake_body });
+    my $conn = EV::Kafka::Conn::_new('EV::Kafka::Conn', undef);
+    my $err;
+    $conn->on_error(sub { $err = $_[0]; EV::break });
+    $conn->on_disconnect(sub { EV::break });
+    tie my $user, 'TiedCred', 'u';
+    tie my $pass, 'TiedCred', 'p';
+    $conn->sasl('SCRAM-SHA-256', $user, $pass);
+    $conn->connect('127.0.0.1', $port, 5.0);
+    my $safety = EV::timer 1, 0, sub { EV::break };
+    EV::run;
+    unlike $err // '', qr/username required/, 'L9: tied SASL credentials reach SCRAM';
+    $conn->DESTROY;
+}
+
+# --- L9: sasl(undef) turns SASL off without a warning -----------------------
+{
+    my $conn = EV::Kafka::Conn::_new('EV::Kafka::Conn', undef);
+    my @warn;
+    { local $SIG{__WARN__} = sub { push @warn, @_ }; $conn->sasl(undef) }
+    is "@warn", '', 'L9: sasl(undef) does not warn';
     $conn->DESTROY;
 }
 

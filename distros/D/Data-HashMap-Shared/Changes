@@ -1,5 +1,14 @@
 Revision history for Data-HashMap-Shared
 
+0.21      2026-09-15
+          - Builds on older toolchains (compilers defaulting to C89, glibc
+            before 2.27, no kernel headers) and now requires 64-bit pointers.
+          - New: compact() reclaims arena space on demand.
+          - Many correctness and concurrency fixes across the arena, freeze,
+            locking and tied-argument paths, plus taint-mode support and
+            faster, leaner reads on TTL and large maps.
+          - Re-measure benchmarks; correct the docs and SECURITY.
+
 0.20      2026-09-07
           - Inserts now reclaim expired slots and evict on a full arena,
             overwrites included; pop, shift and drain without an LRU sweep the

@@ -4089,18 +4089,27 @@ tls(EV::Kafka::Conn self, int enable, const char *ca_file = NULL, int skip_verif
     }
 
 void
-sasl(EV::Kafka::Conn self, const char *mechanism, const char *username = NULL, const char *password = NULL)
+sasl(EV::Kafka::Conn self, SV *mechanism_sv, SV *username_sv = NULL, SV *password_sv = NULL)
     CODE:
     {
         KF_REQUIRE_CONN(self);
         if (self->sasl_mechanism) { Safefree(self->sasl_mechanism); self->sasl_mechanism = NULL; }
         if (self->sasl_username) { Safefree(self->sasl_username); self->sasl_username = NULL; }
         if (self->sasl_password) { Safefree(self->sasl_password); self->sasl_password = NULL; }
-        if (SvOK(ST(1))) {
-            self->sasl_mechanism = savepv(mechanism);
-            /* undef arrives as "" through the typemap — store NULL instead. */
-            if (username && *username) self->sasl_username = savepv(username);
-            if (password && *password) self->sasl_password = savepv(password);
+        SvGETMAGIC(mechanism_sv);
+        if (SvOK(mechanism_sv)) {
+            STRLEN mlen;
+            self->sasl_mechanism = savepv(SvPV_nomg(mechanism_sv, mlen));
+            if (username_sv && (SvGETMAGIC(username_sv), SvOK(username_sv))) {
+                STRLEN len;
+                const char *u = SvPV_nomg(username_sv, len);
+                if (len) self->sasl_username = savepv(u);
+            }
+            if (password_sv && (SvGETMAGIC(password_sv), SvOK(password_sv))) {
+                STRLEN len;
+                const char *p = SvPV_nomg(password_sv, len);
+                if (len) self->sasl_password = savepv(p);
+            }
         }
     }
 

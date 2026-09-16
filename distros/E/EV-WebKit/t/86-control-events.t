@@ -99,4 +99,27 @@ ok($close, 'quit over the wire broadcasts a close event before the sockets go');
         or diag('the browser holds the chained handlers, and one of them captures the browser strongly: a cycle');
 }
 
+# 6) A pre-existing handler that dies must not cost the clients their event:
+#    the browser runs these inside eval, so Control has to broadcast first
+{
+    my $b_seq = EV::WebKit->new(window => [100,80], ephemeral => 1);
+    my @order;
+    $b_seq->on_navigate(sub { push @order, 'prev_nav'; die "user nav\n" });
+    $b_seq->on_console(sub { push @order, 'prev_con'; die "user con\n" });
+    my $ctl_path = "$dir/seq.sock";
+    my $ctl_seq = EV::WebKit::Control->listen($b_seq, path => $ctl_path);
+    my $cl_seq = TCTL->new($ctl_path);
+    $cl_seq->pump(1); # swallow hello
+    eval { $b_seq->on_navigate->('about:blank#6') };
+    eval { $b_seq->on_console->('test') };
+    is_deeply(\@order, ['prev_nav', 'prev_con'], 'prev handlers were called');
+    my $nav_ev = $cl_seq->wait_event('navigate', 5);
+    ok($nav_ev && $nav_ev->{uri} eq 'about:blank#6', 'navigate broadcast despite a dying handler');
+    my $con_ev = $cl_seq->wait_event('console', 5);
+    ok($con_ev && $con_ev->{text} eq 'test', 'console broadcast despite a dying handler');
+    $cl_seq->close;
+    $ctl_seq->close;
+    $b_seq->quit;
+}
+
 done_testing;

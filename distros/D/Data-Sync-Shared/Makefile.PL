@@ -33,5 +33,14 @@ WriteMakefile(
     INC               => '-I.',
     XS                => { 'Shared.xs' => 'Shared.c' },
     OBJECT            => 'Shared$(OBJ_EXT)',
+    META_MERGE        => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => { type => 'git',
+                url => 'https://github.com/vividsnow/perl5-data-sync-shared.git',
+                web => 'https://github.com/vividsnow/perl5-data-sync-shared' },
+            bugtracker => { web => 'https://github.com/vividsnow/perl5-data-sync-shared/issues' },
+        },
+    },
     clean             => { FILES => "*.bs *.o ppport.h Shared.c" },
 );

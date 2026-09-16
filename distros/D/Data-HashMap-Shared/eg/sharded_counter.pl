@@ -35,4 +35,4 @@ $total += $counters->get($_) // 0 for @keys;
 printf "%d workers x %d incrs over %d sharded keys => total %d (expected %d)\n",
     $workers, $per_worker, scalar @keys, $total, $workers * $per_worker;
 
-unlink glob "$prefix.*";   # remove all shard backing files
+$counters->unlink;   # removes every shard's backing file

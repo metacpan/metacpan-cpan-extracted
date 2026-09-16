@@ -1,0 +1,12 @@
+claude: true
+prompt: |
+  Drain the BeePack karr board. BeePack is a primitive MsgPack-based key-value
+  store (CDB container, MsgPack values) for exchanging compact files with
+  low-memory microcontrollers — one Moo class (lib/BeePack.pm) plus the bee CLI
+  (bin/bee). Delegate behavior-relevant code (the CDB+MsgPack model, the
+  readonly/tempfile open modes, nil_exists, the set_*/set_type surface, save's
+  reopen workaround, and bin/bee) to the beepack-worker agent, tests in t/ to
+  beepack-test-writer, and pre-release audits to beepack-release-checker; follow
+  .claude/rules/beepack-rules.md. bin/bee's command-line type dispatch mirrors
+  set_type, so a new value type is a paired edit in both files. Never release —
+  the version in the tree is the next release, and dzil release bumps and tags it.

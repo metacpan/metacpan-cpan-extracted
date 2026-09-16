@@ -5,8 +5,9 @@ use warnings;
 use Carp qw(croak cluck);
 use Fcntl qw(:flock);
 use IO::Handle;
+use MIME::Base64 qw(encode_base64 decode_base64);
 
-our $VERSION = '5.25.1';
+our $VERSION = '5.25.2';
 
 my $CREATED = '2026-08-11';
 
@@ -270,6 +271,7 @@ sub transact_rollback {
 # $adb->_txn_log( $type, $tableid, $file_path, $key, $action, $old_val );
 # ------------------------------------------------
 # Appends one undo-log entry to the journal file.
+# Encodes raw database value ($old_val) with Base64 for 100% binary safety.
 # Flushes buffer and optionally calls sync (fsync) for durability.
 # Noop if no active transaction.
 # ------------------------------------------------
@@ -284,25 +286,14 @@ sub _txn_log {
     $file_path //= '';
     $key       //= '';
     $action    //= 'put';
-    $old_val   //= '__NULL__';
+
+    my $b64 = ( !defined $old_val || $old_val eq '__NULL__' )
+        ? '__NULL__'
+        : encode_base64( $old_val, '' );
 
     my $ts = $self->_txn_timestamp();
 
-    my $safe_enc = sub {
-        my ($s) = @_;
-        return "" unless defined $s && length($s);
-        $s =~ s/\\/\\\\/g;
-        $s =~ s/\n/\\n/g;
-        $s =~ s/\r/\\r/g;
-        $s =~ s/\x1e/\\e/g;
-        return $s;
-    };
-
-    my $val_safe = ( $type eq 'recs' && $old_val ne '__NULL__' )
-        ? $safe_enc->($old_val)
-        : "$old_val";
-
-    print $fh join( $TXN_SEP, $ts, $type, $tableid, $file_path, $key, $action, $val_safe ), "\n";
+    print $fh join( $TXN_SEP, $ts, $type, $tableid, $file_path, $key, $action, $b64 ), "\n";
 
     $fh->flush;
     if ( $self->config('txn_sync') ) {
@@ -316,8 +307,9 @@ sub _txn_log {
 # $adb->_txn_apply_rollback($txn_file);
 # ------------------------------------------------
 # Reads journal in reverse order (LIFO), applies generic undo operations:
-# - recs  (add -> delete, edit/del -> restore old raw record)
-# - index (add -> delete key, edit/del -> restore binary buffer from Hex)
+# Decodes Base64 payloads directly to raw binary octets and restores to DB_File.
+# - recs  (add -> delete, edit/del -> restore raw record from Base64)
+# - index (add -> delete key, edit/del -> restore binary buffer from Base64)
 # Independent of business logic, indexes, junk, or ramdisk configurations.
 # Clears caches for all affected tables after rollback.
 # ------------------------------------------------
@@ -344,16 +336,9 @@ sub _txn_apply_rollback {
     my %affected_tables;
     my %open_files;
 
-    my $safe_dec = sub {
-        my ($s) = @_;
-        return "" unless defined $s && length($s);
-        $s =~ s/\\([nre\\])/$1 eq 'n' ? "\n" : $1 eq 'r' ? "\r" : $1 eq 'e' ? "\x1e" : "\\"/eg;
-        return $s;
-    };
-
     foreach my $line ( reverse @lines ) {
         chomp $line;
-        my ( $ts, $type, $tableid, $file_path, $key, $action, $old_val ) = split /\x1e/, $line, 7;
+        my ( $ts, $type, $tableid, $file_path, $key, $action, $b64 ) = split /\x1e/, $line, 7;
         next unless defined $file_path && defined $key;
         $affected_tables{$tableid} = 1 if $tableid;
 
@@ -366,23 +351,12 @@ sub _txn_apply_rollback {
         my $is_unq = ( $file_path =~ /\.unq$/ ) ? 1 : 0;
         my $k = ( $type eq 'recs' || $is_unq ) ? $self->utf_encode("$key") : "$key";
 
-        if ( $type eq 'recs' ) {
-            if ( $action eq 'add' || $old_val eq '__NULL__' ) {
-                $db->del($k);
-            }
-            else {
-                $old_val = $safe_dec->($old_val);
-                $db->put( $k, $self->utf_encode($old_val) );
-            }
+        if ( $action eq 'add' || !defined $b64 || $b64 eq '__NULL__' ) {
+            $db->del($k);
         }
-        elsif ( $type eq 'index' ) {
-            if ( $action eq 'add' || $old_val eq '__NULL__' ) {
-                $db->del($k);
-            }
-            else {
-                my $raw_bin = pack( "H*", $old_val );
-                $db->put( $k, $raw_bin );
-            }
+        else {
+            my $raw_val = decode_base64($b64);
+            $db->put( $k, $raw_val );
         }
     }
 
@@ -508,7 +482,7 @@ AmberDB::Transact - ACID-compliant transactions with Strict Two-Phase Locking (S
 =head1 DESCRIPTION
 
 C<AmberDB::Transact> provides ACID-compliant transaction undo logging, Strict Two-Phase Locking (Strict 2PL), and automated LIFO rollback for C<AmberDB>.
-It records binary undo journal entries (C<journal/txn_*>) using ASCII record separators (0x1E) for atomic operations across base database files (C<.db>), soft-delete archives (C<.del>), user audit histories (C<.aut>), and all associated index files (C<.inx>, C<.src>, C<.fld>, C<.fac>, C<.slg>).
+It records binary undo journal entries (C<journal/txn_*>) using ASCII record separators (0x1E) and Base64-encoded raw database payloads for atomic operations across base database files (C<.db>), soft-delete archives (C<.del>), user audit histories (C<.aut>), and all associated index files (C<.inx>, C<.src>, C<.fld>, C<.fac>, C<.slg>).
 
 Transactions maintain process ownership via exclusive non-blocking C<flock> on journal files, hold record-level write locks throughout the transaction lifecycle, and guarantee crash durability through C<IO::Handle> buffer flushing, optional filesystem sync (C<txn_sync =E<gt> 1>), and automated orphaned journal recovery (C<transact_recover>).
 

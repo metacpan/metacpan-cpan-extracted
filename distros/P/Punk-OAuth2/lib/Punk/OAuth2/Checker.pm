@@ -6,7 +6,7 @@ use warnings;
 use Punk::OAuth2;
 use Punk::OAuth2::JWKS;
 use Crypt::JWS::Key;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 1;
 
@@ -95,6 +95,17 @@ credential itself and, on denial, returns a 401 (C<invalid_token>) or
 403 (C<insufficient_scope>) with an RFC 6750 C<WWW-Authenticate> header.
 C<scopes> lists the required scopes; C<scheme> names the stash slot
 (default C<oauth>); C<realm> sets the challenge realm.
+
+C<resource_metadata> adds RFC 9728's parameter of the same name to the
+challenge, pointing at the protected resource metadata document that names the
+authorization servers to use. Without it a client that has never seen this API
+has only the realm, which is a display string and not an address. Left unset,
+the header is byte for byte what it was.
+
+	under '/api' => Punk::OAuth2::Checker->guard($jwt,
+		realm => 'books-api',
+		resource_metadata =>
+			'https://books.example/.well-known/oauth-protected-resource');
 
 On success the claims land in C<< $c->stash->{auth}{$scheme} >>; on
 failure the reason is in C<< $c->stash->{'punk.oauth2.error'} >>.

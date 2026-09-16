@@ -1,0 +1,24 @@
+bin/darkpan-indexer
+ChangeLog
+lib/DarkPAN/Indexer.pm
+lib/DarkPAN/Indexer/CLI.pm
+lib/DarkPAN/Indexer/Format.pm
+lib/DarkPAN/Indexer/Format/SQLite.pm
+lib/DarkPAN/Indexer/Storage.pm
+lib/DarkPAN/Indexer/Storage/Filesystem.pm
+lib/DarkPAN/Indexer/Storage/S3.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+share/Foo-1.0.0.tar.gz
+share/Foo-1.0.1.tar.gz
+share/README.md
+t/00-darkpan-indexer.t
+t/02-storage-filesystem.t
+t/03-update-index.t
+t/04-update-index-failure.t
+t/05-update-index-missing-index.t
+t/06-cli.t
+t/dat/Acme-YakiniQ-0.01.tar.gz
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

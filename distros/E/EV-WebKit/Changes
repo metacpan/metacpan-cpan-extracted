@@ -1,5 +1,10 @@
 Revision history for EV-WebKit
 
+0.04  2026-09-15
+        - Control listen replaces a dangling socket symlink instead of croaking
+        - a dying on_* handler no longer blocks Control's broadcast
+        - a dying ev-mode error callback warns instead of reaching $EV::DIED
+
 0.03  2026-09-02
         - windows-chrome is now Chrome 150, macos-safari and iphone-safari
           Safari 26.0; pixel-chrome stays on Chrome 131

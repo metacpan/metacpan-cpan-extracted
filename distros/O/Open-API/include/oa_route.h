@@ -56,24 +56,58 @@ static oa_op *oa_route(pTHX_ oa_api *a, const char *method, STRLEN ml,
     STRLEN k;
 
     if (!t) return NULL;
+
+    /* A server URL's path prefix, when the caller opted in. Stripped BEFORE
+     * the split: oa_segs_fit compares segment counts, so a prefix left in
+     * place makes every count wrong by its depth. Every surface routes
+     * through here - the Plack app, the match XSUB and the C ABI - so they
+     * cannot disagree about it. */
+    if (a->prefix) {
+        STRLEN xl; const char *xp = SvPV_const(a->prefix, xl);
+        if (pl >= xl && memEQ(path, xp, xl) && (pl == xl || path[xl] == '/')) {
+            path += xl;
+            pl   -= xl;
+        }
+    }
+
     if (ml >= sizeof m) return NULL;
     for (k = 0; k < ml; k++) m[k] = (char)toLOWER((U8)method[k]);
 
     nsegs = oa_split_path(path, pl, segs, OA_MAXSEGS);
     if (nsegs < 0) return NULL;
 
+    /* t->order, not 0..n: the table is in `paths` hash order, which perl
+     * randomises, so an unordered scan routes a request that two templates
+     * both fit to a different operation between runs. See oa_order_routes. */
     for (i = 0; i < t->n; i++) {
-        oa_op *o = &t->ops[i];
+        oa_op *o = &t->ops[t->order ? t->order[i] : i];
         STRLEN oml; const char *omp = SvPV_const(o->method, oml);
+        oa_pseg osegs[OA_MAXSEGS];
+        oa_pseg *use = segs;
+        int unum = nsegs;
         if (oml != ml || memNE(omp, m, ml)) continue;
-        if (!oa_segs_fit(aTHX_ o, segs, nsegs)) continue;
+        /* An operation (or its path item) may carry its own server prefix,
+         * which is more specific than the document's. Only such an operation
+         * pays for a second split, and the strip is tolerant in the same way
+         * the document-level one is: a path that already lacks the prefix
+         * still matches. */
+        if (o->prefix) {
+            STRLEN xl; const char *xp = SvPV_const(o->prefix, xl);
+            if (pl >= xl && memEQ(path, xp, xl)
+                && (pl == xl || path[xl] == '/')) {
+                unum = oa_split_path(path + xl, pl - xl, osegs, OA_MAXSEGS);
+                if (unum < 0) continue;
+                use = osegs;
+            }
+        }
+        if (!oa_segs_fit(aTHX_ o, use, unum)) continue;
         if (captures) {
             int s;
             for (s = 0; s < o->nsegs; s++) {
                 if (o->segs[s].pname) {
                     STRLEN nl; const char *np = SvPV_const(o->segs[s].pname, nl);
                     (void)hv_store(captures, np, (I32)nl,
-                                   newSVpvn(segs[s].p, segs[s].l), 0);
+                                   newSVpvn(use[s].p, use[s].l), 0);
                 }
             }
         }
@@ -82,7 +116,7 @@ static oa_op *oa_route(pTHX_ oa_api *a, const char *method, STRLEN ml,
 
     if (allow) {           /* any other method on this path? -> 405 material */
         for (i = 0; i < t->n; i++) {
-            oa_op *o = &t->ops[i];
+            oa_op *o = &t->ops[t->order ? t->order[i] : i];
             if (oa_segs_fit(aTHX_ o, segs, nsegs)) {
                 STRLEN oml; const char *omp = SvPV_const(o->method, oml);
                 SV *up = newSVpvn(omp, oml);

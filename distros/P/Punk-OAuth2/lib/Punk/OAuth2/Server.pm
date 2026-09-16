@@ -7,7 +7,7 @@ use warnings;
 use Punk::OAuth2;
 use Punk::OAuth2::Server::Store;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 1;
 
@@ -34,7 +34,7 @@ authorization server with OpenID Connect flavouring, implemented in XS,
 mounted by the C<oauth2_server> keyword.
 
 It serves C</authorize>, C</token>, C</revoke>, C</introspect>,
-C</jwks.json> and the RFC 8414 metadata documents. You supply two hooks
+C</jwks.json>, C</register> and the RFC 8414 metadata documents. You supply two hooks
 - how to authenticate a user and, optionally, how to ask them for
 consent - plus a store. Everything else, the whole protocol, is here.
 
@@ -63,9 +63,13 @@ croaks.
 
 =item C<issuer> (required)
 
-The issuer URL. It goes in the C<iss> and C<aud> of every access token
-and in the metadata, and it is what a resource server checks, so it has
-to be the URL clients actually reach.
+The issuer URL. It goes in the C<iss> of every access token and in the
+metadata, and it is what a resource server checks, so it has to be the URL
+clients actually reach.
+
+It is also the C<aud> of a token requested without an RFC 8707 C<resource>.
+When a resource I<is> requested, the audience is that resource instead, which
+is what lets one resource server refuse a token minted for another.
 
 =item C<store> (required)
 
@@ -87,6 +91,30 @@ Optional. Called as C<< ($c, $client, \@scopes) >> with the client row
 and the requested scopes split on spaces. Return true to approve, false
 to deny, or a reference to render a consent page. An approval is
 recorded, so returning users are not asked again for that client.
+
+=item C<claims>
+
+Optional. Called as C<< ($c, $client, $user_id, \@scopes) >> at
+C</authorize>, after the user has been authenticated and has consented.
+Return a hashref of B<private> claims to add to the access token, or
+false for none.
+
+	claims => sub {
+		my ($c, $client, $user_id, $scopes) = @_;
+		return { acme_project => $c->session->{project} };
+	},
+
+It runs once, where the user and the client are both known and the user
+has just approved, and what it returns is bound to the authorization
+code - so a token minted from that code carries what was approved, a
+refresh carries it forward unchanged, and the token request cannot
+influence it. A request is the client talking; a claim it could set
+would be a claim the user never agreed to.
+
+A private claim never overwrites a registered one. C<iss>, C<sub>,
+C<aud>, C<exp>, C<iat>, C<jti>, C<client_id> and C<scope> are the
+protocol's, and a hook that could move any of them would be a way
+around the audience and expiry checks rather than an addition to them.
 
 =item C<key>
 
@@ -273,12 +301,36 @@ to validate access tokens.
 
 	$server->metadata($c);
 
-The RFC 8414 authorization server metadata: the issuer, the five
-endpoint URLs built from the issuer and C<prefix>, and the supported
-grant types, response types, PKCE methods and signing algorithms. The
+The RFC 8414 authorization server metadata: the issuer, the endpoint URLs
+built from the issuer and C<prefix> (including the C<registration_endpoint>,
+which is how a client with no C<client_id> finds its way to one), and the
+supported grant types, response types, PKCE methods and signing algorithms. The
 plugin serves it at both
 C</.well-known/oauth-authorization-server> and
 C</.well-known/openid-configuration>.
+
+=head2 register
+
+	POST /oauth/register
+
+RFC 7591 dynamic client registration, for a client that has no C<client_id>
+and no way of being handed one out of band. That is how a connector living
+inside somebody else's product reaches a server nobody configured it for.
+
+Takes a JSON body with C<redirect_uris> (required), and optionally
+C<client_name> and C<scope>. Answers 201 with the issued C<client_id>.
+
+What it creates is deliberately narrow. The client is B<public> and is issued
+no secret, because a secret handed out over an open endpoint protects nothing.
+It receives the authorization code and refresh grants only:
+C<client_credentials> is a confidential-client grant, and granting it here
+would let anyone mint tokens in their own right simply by asking. Redirect
+URIs must be C<https>, or plain C<http> on C<localhost> or C<127.0.0.1>, which
+is how a native client receives its code.
+
+The endpoint is open by construction. Mount it behind whatever per-address
+quota the surrounding application already uses; this distribution does not
+invent one, because the application owns that policy.
 
 =head2 prefix
 
@@ -323,10 +375,10 @@ authentication - is refused to one outright, with C<invalid_client>
 
 =head1 WHAT A CLIENT MAY ASK FOR
 
-Two things come out of the request rather than the registration: the
-C<grant_type> is a field in the token request body, and C<scope> is a
-query parameter on the authorization request. Neither is the client's
-to choose. Both are checked against the client's own row:
+Three things come out of the request rather than the registration: the
+C<grant_type> is a field in the token request body, and C<scope> and
+C<resource> are parameters on the authorization request. None of them is
+the client's to choose. All are checked against the client's own row:
 
 =over 4
 
@@ -348,11 +400,22 @@ token is redeemed, so that narrowing a registration takes effect on
 credentials that were issued before it. A request that names no scope
 asks for nothing and is always allowed.
 
+=item *
+
+Every RFC 8707 C<resource> must be one of the client's registered
+C<resources>, or the request is C<invalid_target> - at C</authorize>, and
+again at C</token>, where a request may narrow to a resource the code was
+issued for but can never reach past it. A client that registered no
+C<resources> may ask for none. This is what binds a token's C<aud> to a
+particular resource server instead of to the issuer, so a token minted for
+one is refused by another.
+
 =back
 
-Both lists are B<deny by default>, exactly as C<redirect_uris> is: a
-client with no registered C<scopes> gets no scope, and one with no
-registered C<grant_types> can use no grant. L<Punk::OAuth2::Server::Store>
+All three lists are B<deny by default>, exactly as C<redirect_uris> is: a
+client with no registered C<scopes> gets no scope, one with no registered
+C<grant_types> can use no grant, and one with no registered C<resources>
+can name no resource. L<Punk::OAuth2::Server::Store>
 defaults C<grant_types> to C<authorization_code refresh_token> at
 registration when you do not say otherwise, so the list to think about
 in practice is C<scopes>.

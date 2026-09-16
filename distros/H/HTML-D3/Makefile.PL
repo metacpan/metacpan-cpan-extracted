@@ -19,14 +19,24 @@ WriteMakefile(
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 		? ('LICENSE'=> 'gpl_2')
 		: ()),
-	META_MERGE => {
-		optional_features => {
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64,
+	}, META_MERGE => {
+		prereqs => {
+			runtime => {
+				recommends => {
+					# 'Params::Validate::Strict' => 0,
+					'Test::HTML::T5' => 0,
+				},
+			},
+		}, optional_features => {
 			html_testing => {
 				description => 'Test the HTML output',
-				prereqs => { runtime => { recommends => { 'Test::HTML::T5' => 0 } } },
+				prereqs => {
+					runtime => { recommends => { 'Test::HTML::T5' => 0 } }
+				},
 			},
-		},
-		resources => {
+		}, resources => {
 			repository => {
 				type => 'git',
 				url => 'https://github.com/nigelhorne/HTML-D3.git',
@@ -40,7 +50,6 @@ WriteMakefile(
 			}
 		},
 	}, PREREQ_PM => {
-		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'JSON::MaybeXS' => 0,	# Required for encoding data to JSON
 		'Object::Configure' => 0.24,
 		'Params::Get' => 0,
@@ -59,8 +68,9 @@ WriteMakefile(
 		'Test::Returns' => 0,
 		'Test::Warnings' => 0,
 		'Test::Without::Module' => 0,
-	}, dist => $dist,
-		clean => {
+	},
+	dist => $dist,
+	clean => {
 		FILES => 'HTML-D3-*',
 	},
 );

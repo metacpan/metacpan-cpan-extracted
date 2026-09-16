@@ -8,32 +8,39 @@ use Amazon::S3::Lite;
 use Carp;
 use CLI::Simple::Utils qw(choose);
 use CLI::Simple::Constants qw(:booleans);
+use Cwd qw(abs_path);
 use Data::Dumper;
 use English qw(-no_match_vars);
 use Encode qw(encode_utf8);
-use File::Basename qw(basename);
+use File::Basename qw(basename dirname);
 use File::ShareDir qw(dist_dir);
-use File::Temp qw(tempfile);
+use File::Copy;
+use File::Temp qw(tempfile tempdir);
 use JSON;
 use List::Util qw(pairs);
-use Scalar::Util qw(openhandle);
+use Scalar::Util qw(openhandle reftype);
 
 use Readonly;
 
-Readonly::Scalar our $PACKAGE_INDEX  => '02packages.details.txt.gz';
-Readonly::Scalar our $DEFAULT_CONFIG => sprintf '%s/%s', $ENV{HOME} // q{}, '/.orepan2-s3.json';
-Readonly::Scalar our $METACPAN_URL   => 'https://metacpan.org/pod';
-Readonly::Scalar our $AUTHOR_PATH    => 'D/DU/DUMMY';
+Readonly::Scalar our $PACKAGES_DETAILS_INDEX => '02packages.details.txt.gz';
+Readonly::Scalar our $DEFAULT_CONFIG         => sprintf '%s/%s', $ENV{HOME} // q{}, '/.orepan2-s3.json';
+Readonly::Scalar our $METACPAN_URL           => 'https://metacpan.org/pod';
+Readonly::Scalar our $AUTHOR_PATH            => 'D/DU/DUMMY';
 
 use Role::Tiny::With;
 
 with 'OrePAN2::S3::Role::Inject';
 with 'OrePAN2::S3::Role::Delete';
+with 'OrePAN2::S3::Role::Upload';
 with 'OrePAN2::S3::Role::UploadArtifacts';
 
 use parent qw(CLI::Simple);
 
-our $VERSION = '1.2.3';
+our $VERSION   = '2.1.1';
+our $GIT_SHA   = '7f6970e14718af2b93d4ee2b2e6487c1c879944d';
+our $GIT_DIRTY = '7f6970e14718af2b93d4ee2b2e6487c1c879944d';
+
+our %DOC_INDEX;
 
 __PACKAGE__->use_log4perl( level => 'info' );
 
@@ -99,19 +106,27 @@ sub fetch_config {
 ########################################################################
   my ( $self, $profile_name ) = @_;
 
-  $profile_name //= $self->get_profile_name // 'default';
+  return $self->get_config
+    if $self->get_config;
 
   my $file = $self->get_config_file;
 
-  die "no config file specified\n"
+  croak "ERROR: no config file specified\n"
     if !$file;
+
+  $file = abs_path($file);
 
   die "$file not found\n"
     if !-e $file;
 
+  $profile_name //= $self->get_profile_name // 'default';
+  $self->get_logger->debug( sprintf 'using profile: "%s" from: "%s"', $profile_name, $file );
+
+  $self->set_config_file($file);
+
   my $config = eval { return JSON->new->decode( scalar slurp_file($file) ); };
 
-  die "could not read config file ($file)\n$EVAL_ERROR"
+  croak "ERROR: could not read config file ($file)\n$EVAL_ERROR"
     if !$config || $EVAL_ERROR;
 
   if ( $config->{$profile_name} && ref $config->{$profile_name} ) {
@@ -127,6 +142,16 @@ sub fetch_config {
   $self->set_config($config);
 
   return $config;
+}
+
+########################################################################
+sub has_packages_version_index {
+########################################################################
+  my ($self) = @_;
+
+  my $config = $self->get_config;
+
+  return $config->{packages_version_index};
 }
 
 ########################################################################
@@ -152,6 +177,36 @@ sub init_s3 {
 }
 
 ########################################################################
+sub cmd_download_version_index {
+########################################################################
+  my ($self) = @_;
+
+  my $packages_index = $self->has_packages_version_index;
+
+  die "ERROR: no 'packages_version_index' defined in configuration\n"
+    if !$packages_index;
+
+  require DarkPAN::Indexer;
+
+  my $indexer = DarkPAN::Indexer->new( config => $self->get_config );
+
+  my $database = $indexer->get_storage->retrieve_index($packages_index);
+
+  die sprintf "ERROR: could not download %s\n%s", $packages_index, $EVAL_ERROR
+    if $EVAL_ERROR;
+
+  my $packages_db = basename( $packages_index, '.gz' );
+  move $database, $packages_db;
+
+  if ( -e $packages_db ) {
+    print {*STDOUT} "$packages_db\n";
+    return $SUCCESS;
+  }
+
+  die sprintf "ERROR: could not move %s => %s\n", $database, $packages_db;
+}
+
+########################################################################
 sub fetch_orepan_index {
 ########################################################################
   my ($self) = @_;
@@ -160,11 +215,12 @@ sub fetch_orepan_index {
     'XXXXXX',
     SUFFIX => '.gz',
     UNLINK => $FALSE,
+    DIR    => '/tmp',
   );
 
   my $config = $self->get_config;
 
-  my $key = sprintf '%s/modules/%s', $config->{AWS}{prefix}, $PACKAGE_INDEX;
+  my $key = sprintf '%s/modules/%s', $config->{AWS}{prefix}, $PACKAGES_DETAILS_INDEX;
   $self->get_s3->get_object( $self->get_bucket_name, $key, filename => $filename );
 
   return $filename;
@@ -175,29 +231,81 @@ sub cmd_invalidate_index {
 ########################################################################
   my ($self) = @_;
 
-  warn "Not implemented yet\n";
+  my (@paths) = $self->get_args;
+
+  my $rsp = eval { $self->_invalidate_index(@paths); };
+
+  if ( !$rsp || $EVAL_ERROR ) {
+    print {*STDERR} $EVAL_ERROR;
+    return $FAILURE;
+  }
+
+  print {*STDOUT} JSON->new->pretty->encode($rsp);
 
   return $SUCCESS;
 }
 
 ########################################################################
+sub _invalidate_index {
+########################################################################
+  my ( $self, @invalidation_paths ) = @_;
+
+  my $config = $self->get_config;
+
+  my $distribution_id = $config->{CloudFront}{DistributionId};
+
+  croak "ERROR: no CloudFront configuration found\n"
+    if !$distribution_id;
+
+  eval { require Amazon::API::CloudFront; };
+
+  croak "ERROR: install Amazon::API::CloudFront\n"
+    if $EVAL_ERROR;
+
+  push @invalidation_paths, @{ $config->{CloudFront}{InvalidationPaths} // [] };
+  push @invalidation_paths, '/index.html', '/docs/*', '/orepan2/modules/02packages.details.txt.gz';
+
+  my $packages_index = $self->has_packages_version_index;
+
+  if ($packages_index) {
+    push @invalidation_paths, "/$packages_index";
+  }
+
+  my $invalidation_batch = $self->create_invalidation_batch( $distribution_id, \@invalidation_paths );
+
+  local $ENV{AWS_PROFILE} = $self->get_profile // $config->{AWS}{profile};
+
+  my $cf = Amazon::API::CloudFront->new;
+
+  return $cf->CreateInvalidation($invalidation_batch);
+}
+
+########################################################################
 sub create_invalidation_batch {
 ########################################################################
-  my (%args) = @_;
+  my ( $self, $distribution_id, $items, $reference ) = @_;
 
-  local $LIST_SEPARATOR = q{};
+  if ( !$reference ) {
+    require Data::UUID;
+    $reference = Data::UUID->new->create_str;
+  }
 
-  my @now = localtime;
+  croak "ERROR: items missing\n"
+    if !$items;
 
-  my $caller_reference = $args{CallerReference} || "@now";
+  croak "ERROR: items must be an array\n"
+    if !ref $items || reftype($items) ne 'ARRAY';
+
+  croak "ERROR: no items to invalidate\n"
+    if !@{$items};
 
   my $invalidation_batch = {
-    DistributionId    => $args{DistributionId},
+    DistributionId    => $distribution_id,
     InvalidationBatch => {
-      CallerReference => $caller_reference,
+      CallerReference => $reference,
       Paths           => {
-        Items    => $args{Items},
-        Quantity => scalar @{ $args{Items} },
+        Items    => $items,
+        Quantity => scalar @{$items},
       }
     }
   };
@@ -215,7 +323,12 @@ sub _upload_html {
 
   my $content = ref $file ? ${$file} : slurp_file($file);
   my $encoded = encode_utf8($content);
+
   $self->get_s3->put_object( $self->get_bucket_name, $key, $encoded, content_type => 'text/html', );
+
+  $self->get_logger->info( sprintf 'adding %s to document index', $key );
+
+  $DOC_INDEX{$key} = q{/} . $key;
 
   return;
 }
@@ -233,42 +346,85 @@ sub _packages_for_archive {
 }
 
 ########################################################################
-sub update_index {
-########################################################################
-  my ( $self, $code ) = @_;
-
-  require IO::Compress::Gzip;
-  require OrePAN2::Index;
-
-  my $config = $self->get_config;
-  my $prefix = $config->{AWS}{prefix};
-
-  my $index_file = $self->fetch_orepan_index;
-  my $index      = OrePAN2::Index->new;
-  $index->load($index_file);
-  unlink $index_file;
-
-  $code->($index);
-
-  my $gz_content;
-  my $gz = IO::Compress::Gzip->new( \$gz_content ) or die "gzip failed\n";
-  $gz->print( $index->as_string );
-  $gz->close;
-
-  my $index_key = sprintf '%s/modules/02packages.details.txt.gz', $prefix;
-  $self->get_s3->put_object( $self->get_bucket_name, $index_key, $gz_content, content_type => 'application/gzip', );
-
-  $self->get_logger->info( sprintf 'updated index at %s', $index_key );
-
-  return;
-}
-
-########################################################################
 # COMMANDS
 ########################################################################
 
 ########################################################################
-sub cmd_upload_index {
+sub cmd_list_packages {
+########################################################################
+  my ($self) = @_;
+
+  my $s3 = $self->get_s3;
+
+  my $config = $self->get_config;
+
+  my $prefix = $config->{AWS}{prefix};
+  my $path   = sprintf '%s/authors/id/%s', $prefix, $self->get_author_path;
+
+  my @objects = $s3->list_all_objects_v2( $self->get_bucket_name, prefix => $path );
+
+  my %packages;
+
+  foreach my $o (@objects) {
+    my $key = $o->{key};
+
+    if ( my ($package_prefix) = $key =~ /^(.*?)[-]([\d.]+)[.]tar[.]gz$/xsm ) {
+      $packages{$1} //= [];
+      push @{ $packages{$1} }, $2;
+    }
+  }
+
+  return $SUCCESS
+    if !keys %packages;
+
+  my $has_ascii_table = eval {
+    require Text::ASCIITable; ## scandeps: suggests
+    1;
+  };
+
+  if ( !$has_ascii_table || $self->get_format eq 'json' ) {
+    print {*STDOUT} JSON->new->pretty->encode( \%packages );
+    return $SUCCESS;
+  }
+
+  my $has_pager = $self->_has_pager;
+
+  my $t = Text::ASCIITable->new( { headingText => sprintf 'DarkPAN: https://%s/%s', $self->get_bucket_name, $prefix } );
+  $t->setCols( 'Packages', 'Versions' );
+
+  foreach my $p ( sort keys %packages ) {
+    $t->addRow( basename($p), join "\n", sort @{ $packages{$p} } );
+  }
+
+  print {*STDOUT} $t;
+
+  return $SUCCESS;
+}
+
+########################################################################
+sub _has_pager {
+########################################################################
+  my ($self) = @_;
+
+  return eval {
+    return
+      if !$self->get_cli_pager;
+
+    require IO::Interactive;
+
+    return
+      if !IO::Interactive::is_interactive
+
+      require IO::Pager;
+
+    IO::Pager->new(*STDOUT);
+
+    1;
+  };
+}
+
+########################################################################
+sub cmd_upload_site_index {
 ########################################################################
   my ( $self, $index ) = @_;
 
@@ -328,7 +484,7 @@ sub cmd_create_docs {
     $distribution = basename($distribution);
 
     if ( $distribution !~ /^http/xsm ) {
-      $distribution = sprintf 'D/DU/DUMMY/%s', $distribution;
+      $distribution = sprintf '%s/%s', $self->get_author_path, $distribution;
     }
 
     my $orepan_url = $self->get_url // $self->get_config->{url};
@@ -346,7 +502,12 @@ sub cmd_create_docs {
   my $module_name = $key_prefix;
   $module_name =~ s/\-/::/gxsm;
 
-  my $file = $dpu->extract_module( $distribution, $module_name );
+  my $file   = $dpu->extract_module( $distribution, $module_name );
+  my $readme = $dpu->extract_file( sprintf '%s-%s/README.md', $key_prefix, $version );
+
+  my $changelog = $dpu->extract_file( sprintf '%s-%s/Changes', $key_prefix, $version );
+  $changelog //= $dpu->extract_file( sprintf '%s-%s/CHANGES',   $key_prefix, $version );
+  $changelog //= $dpu->extract_file( sprintf '%s-%s/ChangeLog', $key_prefix, $version );
 
   if ( $self->get_upload ) {
     if ($file) {
@@ -358,36 +519,26 @@ sub cmd_create_docs {
         distribution => basename($distribution),
       );
     }
-  }
-  else {
-    open my $fh, '>', "$key_prefix.html"
-      or die "could not open $key_prefix.html for writing\n";
 
-    print {$fh} $file;
-
-    close $fh;
-  }
-
-  my $readme = $dpu->extract_file( sprintf '%s-%s/README.md', $key_prefix, $version );
-
-  if ( $self->get_upload && $readme ) {
-    $self->upload_html(
-      name     => 'README.html',
-      markdown => $readme,
-      prefix   => $key_prefix,
-      wrap     => $TRUE,
-    );
-  }
-  elsif ($readme) {
-    open my $fh, '>', 'README.html'
-      or die "could not open README.html for writing\n";
-
-    print {$fh} $readme;
-
-    close $fh;
+    if ($readme) {
+      $self->upload_html(
+        name     => 'README.html',
+        markdown => $readme,
+        prefix   => $key_prefix,
+        wrap     => $TRUE,
+      );
+    }
   }
 
-  return 0;
+  my $tar = Archive::Tar->new;
+
+  $tar->add_data( 'README.md',      $readme    // q{} );
+  $tar->add_data( "$key_prefix.pm", $file      // q{} );
+  $tar->add_data( 'ChangeLog',      $changelog // q{} );
+
+  $tar->write( 'docs.tar.gz', $TRUE );
+
+  return $SUCCESS;
 }
 
 ########################################################################
@@ -458,16 +609,12 @@ sub look_for_object {
 ########################################################################
   my ( $self, $prefix, $name ) = @_;
 
-  my $key = sprintf 'docs/%s/%s', $prefix, $name;
+  $DOC_INDEX{ sprintf 'docs/%s/%s', $prefix, $name };
 
-  return sprintf '/docs/%s/%s', $prefix, $name
-    if $self->get_s3->head_object( $self->get_bucket_name, $key );
-
-  return;
 }
 
 ########################################################################
-sub cmd_create_index {
+sub cmd_create_site_index {
 ########################################################################
   my ($self) = @_;
 
@@ -509,12 +656,12 @@ sub cmd_create_index {
   my %pod_links;
 
   foreach my $distribution ( keys %{$repo} ) {
-    $self->get_logger->info( 'distribution: ' . $distribution );
+    $self->get_logger->debug( 'distribution: ' . $distribution );
 
     my ($distribution_name) = DarkPAN::Utils::parse_distribution_path($distribution);
 
     if ( !$distribution_name ) {
-      warn "WARN: could not get distribution name from $distribution\n";
+      $self->get_logger->warn("WARN: could not get distribution name from $distribution");
       next;
     }
 
@@ -567,15 +714,18 @@ sub cmd_create_index {
   $template->process( \$text, $params, \$output )
     or die $template->error();
 
-  if ( $self->get_upload ) {
-    $self->_upload_html( \$output, 'index.html' );
-    $self->get_logger->debug($output);
-  }
-  else {
-    $self->send_output($output);
+  return $self->send_output($output)
+    if !$self->get_upload;
+
+  $self->_upload_html( \$output, 'index.html' );
+
+  $self->get_logger->debug($output);
+
+  if ( $self->get_config->{CloudFront}{DistributionId} && $self->get_invalidate_index ) {
+    $self->_invalidate_index;
   }
 
-  return 0;
+  return $SUCCESS;
 }
 
 ########################################################################
@@ -602,7 +752,7 @@ sub send_output {
 
   $outfile && close $fh;
 
-  return 0;
+  return $SUCCESS;
 }
 
 ########################################################################
@@ -637,12 +787,17 @@ sub cmd_download_orepan_index {
 
   my $filename = eval { return $self->fetch_orepan_index(); };
 
-  die "ERROR: Could not download $PACKAGE_INDEX\n$EVAL_ERROR"
+  die "ERROR: Could not download $PACKAGES_DETAILS_INDEX\n$EVAL_ERROR"
     if !$filename || !-s "$filename";
 
-  rename $filename, $PACKAGE_INDEX;
+  print {*STDERR} "copying $filename => $PACKAGES_DETAILS_INDEX\n";
 
-  print {*STDOUT} $PACKAGE_INDEX . "\n";
+  copy $filename, $PACKAGES_DETAILS_INDEX
+    or die "ERROR: could not copy $filename -> $PACKAGES_DETAILS_INDEX\n";
+
+  unlink $filename;
+
+  print {*STDOUT} $PACKAGES_DETAILS_INDEX . "\n";
 
   return;
 }
@@ -654,7 +809,7 @@ sub init {
 
   my $config = $self->fetch_config;
 
-  my $profile = $config->{AWS}->{profile};
+  my $profile = $self->get_profile // $config->{AWS}{profile};
 
   my $dist = __PACKAGE__;
   $dist =~ s/::/-/xsmg;
@@ -669,10 +824,29 @@ sub init {
 
   $self->init_s3;
 
-  my $author_path = $config->{author_path} // $AUTHOR_PATH;
-  $self->set_author_path($author_path);
+  $self->_init_doc_index;
+
+  $self->set_author_path( $config->{author_path} // $AUTHOR_PATH );
 
   $self->fetch_template;
+
+  return;
+}
+
+########################################################################
+sub _init_doc_index {
+########################################################################
+  my ($self) = @_;
+
+  my $s3 = $self->get_s3;
+
+  my $bucket_name = $self->get_bucket_name;
+
+  my (@object_list) = $s3->list_all_objects_v2( $bucket_name, prefix => 'docs/' );
+
+  foreach (@object_list) {
+    $DOC_INDEX{ $_->{key} } = q{/} . $_->{key};
+  }
 
   return;
 }
@@ -686,17 +860,37 @@ sub fetch_template {
 
   my $index = $self->get_config->{index} // {};
 
+  my $config_dir = dirname( $self->get_config_file );
+
   # see if the index is set in the config file...
   if ( !$template && $index->{template} ) {
     $template = $index->{template};
-    $template = $template =~ /^\//xsm ? $template : sprintf '%s/%s', $self->get_dist_dir, $template;
+  }
+  else {
+    $template = 'default';
   }
 
-  my $index_template = $template eq 'default' ? slurp_file(*DATA) : slurp_file($template);
+  $self->get_logger->debug( sprintf 'using index template: "%s"', $template ne 'default' ? $template : '__DATA__' );
+  my $bucket_name = $self->get_bucket_name;
 
-  $index_template =~ s/\n\n=pod.*$/\n/xsm;
+  if ( $template =~ m{\As3://(.*)$}xsm ) {
+    my $key    = $1;
+    my $object = eval { $self->get_s3->get_object( $bucket_name, $key ); };
 
-  $self->set_template($index_template);
+    croak sprintf "ERROR: could not retrieve %s from %s\n%s", $key, $bucket_name, $OS_ERROR
+      if !$object || $EVAL_ERROR;
+
+    $self->set_template( $object->{content} );
+
+    $self->get_logger->debug( sprintf 'successfully loaded index template: "%s" from "%s"', $key, $bucket_name );
+  }
+  else {
+    $template = $template =~ /^\//xsm ? $template : sprintf '%s/%s', $config_dir, $template;
+    my $index_template = $template eq 'default' ? slurp_file(*DATA) : slurp_file($template);
+    $index_template =~ s/\n\n=pod.*$/\n/xsm;
+
+    $self->set_template($index_template);
+  }
 
   return;
 }
@@ -728,41 +922,58 @@ sub main {
   my $cli = OrePAN2::S3->new(
     option_specs => [
       qw(
-        help|h
         bucket-name|b=s
+        cli-pager!
         config-file|c=s
+        delete-all
+        dirty-check!
+        distribution|d=s
+        dryrun
+        force|f
+        format=s
+        help|h
+        invalidate-index!
         output|o=s
-        profile|p=s
         profile-name|n=s
+        profile|p=s
+        save-index
         template|t=s
         url|U=s
-        distribution|d=s
-        upload|u
-        upload-only|U
+        update-site-index!
+        upload
       )
     ],
     default_options => {
-      config_file  => $DEFAULT_CONFIG,
-      profile_name => 'default',
-      profile      => $ENV{AWS_PROFILE}
+      config_file       => $DEFAULT_CONFIG,
+      cli_pager         => $TRUE,
+      profile_name      => 'default',
+      profile           => $ENV{AWS_PROFILE},
+      dirty_check       => $TRUE,
+      invalidate_index  => $TRUE,
+      update_site_index => $TRUE,
+      format            => 'json',
     },
     extra_options => [qw(config credentials template author_path s3 dist_dir)],
     commands      => {
-      'create'        => \&cmd_create_index,
-      'create-docs'   => \&cmd_create_docs,
-      'create-index'  => \&cmd_create_index,
-      'delete'        => \&cmd_delete,
-      'download'      => \&cmd_download_orepan_index,
-      'dump-template' => sub {
+      'create-docs'            => \&cmd_create_docs,
+      'create-site-index'      => \&cmd_create_site_index,
+      'delete'                 => \&cmd_delete,
+      'download-index'         => \&cmd_download_orepan_index,
+      'download-version-index' => \&cmd_download_version_index,
+      'dump-template'          => sub {
         print {*STDOUT} shift->get_template;
         return 0;
       },
       'inject'           => \&cmd_inject,
       'invalidate-index' => \&cmd_invalidate_index,
+      'list-packages'    => \&cmd_list_packages,
       'show'             => \&cmd_show_orepan_index,
-      'upload'           => \&cmd_upload_index,
+      'upload'           => \&cmd_upload,
+      'upload-index'     => \&cmd_upload_site_index,
       'upload-artifacts' => \&cmd_upload_artifacts,
     },
+    alias         => { commands => { add => 'upload' } },
+    abbreviations => $TRUE,
   );
 
   return $cli->run();
@@ -824,103 +1035,334 @@ __DATA__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
- OrePAN2::S3 - Manage a DarkPAN CPAN mirror on Amazon S3
+OrePAN2::S3 - Manage a DarkPAN CPAN mirror on Amazon S3
 
 =head1 SYNOPSIS
 
-  # via the bash wrapper (recommended)
+  # Upload a distribution to DarkPAN without indexing
+  orepan2-s3 upload My-Dist-1.0.tar.gz
+  # or using the alias
   orepan2-s3 add My-Dist-1.0.tar.gz
-  orepan2-s3 index
 
-  # or directly via the modulino
-  orepan2-s3-index create --upload
+  # Upload AND index a new distribution
+  orepan2-s3 inject My-App-1.0.0.tar.gz
 
-  # add and index a new distribution
-  orepan2-s3-index inject My-App-1.0.0.tar.gz
+  # Regenerate the DarkPAN home page and upload it
+  orepan2-s3 --upload create-site-index
 
-  # upload artifacts listed in config file
-  orepan2-s3-index upload-artifacts
+  # ...or upload an already-generated index.html on its own
+  orepan2-s3 upload-index
+
+  # Upload custom artifacts specified in config
+  orepan2-s3 upload-artifacts
 
 =head1 DESCRIPTION
 
-This class is used to add distributions to your own DarkPAN
-repository housed on Amazon's S3 storage. It leverages L<OrePAN2> to
-create and maintain your own DarkPAN repository. You can read more
-about setting up a DarkPAN on Amazon using S3 + Cloudfront
-L<here|https://github.com/rlauer6/OrePAN2-S3/blob/master/README.md>.
+C<OrePAN2::S3> provides a command-line interface for creating and
+maintaining an S3-backed DarkPAN repository, including distribution
+publishing, incremental package-index maintenance, documentation and
+site generation, deletion, and optional CloudFront integration.
 
-You can read more about creating a secure static website using Amazon
-S3 L<here|https://blog.tbcdevelopmentgroup.com/2025-02-18-post.html>.
+=head1 FEATURES
+
+=over 4
+
+=item *
+
+Upload and inject Perl distributions into an S3-backed DarkPAN.
+
+=item *
+
+Maintain C<02packages.details.txt.gz> incrementally when distributions
+are added or removed.
+
+=item *
+
+Delete individual distribution versions, or multiple matching versions,
+without rebuilding the entire repository index.
+
+=item *
+
+Generate and publish a customizable HTML index for the repository.
+
+=item *
+
+Extract POD, README, and changelog documentation from distributions and
+publish generated documentation to S3.
+
+=item *
+
+Publish additional static assets used by the DarkPAN site.
+
+=item *
+
+Optionally use CloudFront and automatically invalidate cached repository
+content after updates.
+
+=item *
+
+Support multiple repository profiles, AWS profiles, configurable author
+paths, and custom index templates.
+
+=item *
+
+Inspect and download the current package index and list distributions
+stored in the repository.
+
+=item *
+
+Protect uploads from dirty builds, with explicit override and dry-run
+support for administrative operations.
+
+=back
 
 =head1 USAGE
 
- orepan2-s3 options command
-
-Perl script for maintaining a DarkPAN mirror using S3 + CloudFront.
-
-I<NOTE: C<orepan2-s3> is the bash script that calls this Perl class
-that doubles as a modulino.  The documentation here refers to the
-script (not the class)>.
+  orepan2-s3 [options] command [args]
 
 =head2 Options
 
- -h, --help           Display this help message
- -b, --bucket-name    Overrides bucket in configuration
- -c, --config-file    Name of the configuration file (default: ~/.orepan2-s3.json)
- -o, --output         Name of the output file
- -p, --profile        Your AWS profile if not provided in configuration
- -n, --profile-name   Name of a profile inside the config file
- -t, --template       Name of a template that will be used as the index.html page
- -d, --distribution   Path to distribution tarball
- -u, --upload         Upload files after processing (for create-index, create-docs)
- -U, --url            Cloudfront URL
+Both commands and options may be abbreviated to any unique prefix.
+Boolean options marked C<[negatable]> accept a C<--no-> form (for
+example C<--no-invalidate-index>).
+
+=over 4
+
+=item -h, --help
+
+Display this help message.
+
+=item -b, --bucket-name I<name>
+
+S3 bucket name. Overrides the C<AWS.bucket> config value.
+
+=item -c, --config-file I<path>
+
+Path to the configuration file. Default: F<~/.orepan2-s3.json>.
+
+=item -d, --distribution I<path>
+
+Path to the target distribution tarball when adding a new distribution.
+
+Tarball name or tarball prefix when deleting distributions. Examples:
+
+ orepan2-s3 --distribution workdir/Foo-Bar-1.2.3.tar.gz add
+
+ orepan2-s3 --distribution Foo-Bar-1.2.3.tar.gz delete
+
+ orepan2-s3 --distribution Foo-Bar delete
+
+=item -n, --profile-name I<name>
+
+Configuration profile section name inside the config file. Default: C<default>.
+
+=item -p, --profile I<name>
+
+AWS/IAM profile name. Default: C<$AWS_PROFILE>.
+
+=item -t, --template I<path>
+
+Path to a custom L<Template::Toolkit> template for F<index.html>.
+
+=item -o, --output I<path>
+
+Output path for commands that write a file locally.
+
+=item -U, --url I<url>
+
+Base URL of the DarkPAN, used by C<create-docs> when retrieving a
+distribution remotely. May also be set as the C<url> key in the
+configuration profile.
+
+=item --format I<format>
+
+Output format for informational commands (e.g. C<list-packages>).
+Default: C<json>.
+
+=item --dirty-check [negatable]
+
+Check the distribution's C<$GIT_DIRTY> global before uploading and abort if
+it is dirty. Enabled by default; use C<--no-dirty-check> (or C<--force>) to
+override.
+
+=item --force
+
+Force upload of an uncommitted (dirty) distribution.
+
+=item --invalidate-index [negatable]
+
+Invalidate CloudFront paths after creating the site index. Enabled by
+default; use C<--no-invalidate-index> to skip invalidation.
+
+=item --update-site-index [negatable]
+
+Update the site index after commands that modify the package index. Enabled by default.
+
+=item --save-index
+
+Save the F<02packages.details.txt.gz> file to the current directory.
+
+=item --upload
+
+Upload the index after creating it.
+
+=item --delete-all
+
+When a C<delete> matches multiple objects, remove all of them instead of
+aborting.
+
+=item --dryrun
+
+Report what would be done without making any changes.
+
+=item --cli-pager [negatable]
+
+Page long output. Enabled by default; use C<--no-cli-pager> to disable.
+
+=back
 
 =head2 Commands
 
-=over 5
+=over 4
 
-=item * create - Create a new F<index.html> from the mirror's manifest file.
+=item * B<upload> (alias: B<add>)
 
-=item * delete - Delete a distribution from repo and reindex
+Uploads the specified distribution tarball to S3 under the configured
+author path (C<D/DU/DUMMY> by default).
 
-=item * download - Download the mirror's manifest file (F<02packages.details.txt.gz>).
+  orepan2-s3 upload My-Package-1.0.0.tar.gz
 
-=item * inject - Uploads a tarball and adds to the DarkPAN index
+If you want to upload B<and> index a distribution in a single step, use the
+C<inject> command instead.
 
-=item * show - Print the manifest file to STDOUT or a file.
+The C<upload> command will check the main module to see if there is a
+C<$GIT_DIRTY> global variable defined that indicates whether the
+distribution has been committed. If the distribution is uncommitted
+the upload function will abort with an error message by default. Use
+C<--no-dirty-check> or C<--force> to upload a dirty distribution.
 
-=item * dump-template - Outputs the default index.html template.
+I<Note:>
 
-=item * create-docs - parse distribution looking for a README.md and/or pod
+When using the C<CPAN::Maker::Bootstrapper> framework the
+distribution status is automatically set in the C<Makefile> so your
+module can include it as a global.
 
-=item * invalidate-index - I<not currently implemented>
+ GIT_DIRTY := $(shell $(GIT) describe --always --dirty --abbrev=40 2>/dev/null || echo 'unknown')
 
-=item * upload - Upload the index.html file to the mirror's root.
+...then in your module:
 
-=item * upload-artifacts - Uploads the files listed in the C<index: files:> section of the config file.
+ our $GIT_DIRTY = '51eb002566044d5af4c65ceff35848d3e462fbc8-dirty';
+
+=item * B<inject>
+
+Uploads the distribution tarball to S3 B<and> updates the package details index (C<02packages.details.txt.gz>).
+
+  orepan2-s3 inject My-Package-1.0.0.tar.gz
+
+=item * B<upload-index>
+
+Uploads an HTML file as the DarkPAN's root index.html; defaults to the
+local index.html.
+
+=item * B<upload-artifacts>
+
+Uploads additional non-package artifacts defined in the C<index: files:> section of your configuration file.
+
+=item * B<delete>
+
+ orepan2-s3 delete My-Package-1.0.0.tar.gz
+ orepan2-s3 delete My-Package
+ orepan2-s3 -d My-Package-1.0.0.tar.gz delete
+
+Removes one or more distributions from the DarkPAN and updates the
+indexes accordingly. The distribution may be given as a positional
+argument or with C<--distribution>. In a single run this command:
+
+=over 4
+
+=item * deletes the distribution tarball(s) from C<< <prefix>/authors/id/<author_path>/ >>;
+
+=item * deletes the associated documentation tree under C<docs/> (the C<create-docs> output), if present;
+
+=item * regenerates C<02packages.details.txt.gz>, removing the packages that belonged to the deleted distribution(s), and uploads it;
+
+=item * unless C<--no-update-site-index> is given, regenerates and uploads the HTML site index (F<index.html>); and
+
+=item * unless C<--no-invalidate-index> is given, invalidates the relevant CloudFront paths.
+
+=item * deletes records from a packages version index if one is defined in your configuraton
 
 =back
 
-=head2 Notes
+If the argument ends in C<.tar.gz> it is treated as an exact
+distribution filename. If the referenced object no longer exists in the
+bucket a warning is issued and only the documentation is removed.
 
-=over 5
+If the argument does B<not> end in C<.tar.gz> it is treated as a name
+prefix and may match several objects (for example every version of a
+distribution). When more than one object matches you must pass
+C<--delete-all>, and you will be prompted to confirm before anything is
+removed:
 
-=item The preferred way of using this utility is through the bash wrapper.
+ orepan2-s3 delete --delete-all My-Package
 
-I<The following commands are available only through the C<orepan2-s3>
-bash wrapper, not the modulino directly:>
+Use C<--dryrun> to see exactly which objects, docs, and index entries
+would be removed without modifying the bucket.
 
-=over 5
+I<Note:> the package index, site index, and CloudFront invalidation are
+all updated automatically by default. You do not normally need to run
+C<create-site-index> after a delete; pass C<--no-update-site-index>
+and/or C<--no-invalidate-index> if you want to suppress those steps.
 
-=item * add {file} - inject a tarball into the repository and re-index
+=item * B<create-docs>
 
-=item * delete {file} - remove a distribution and re-index
+Extracts documentation (POD, C<README.md>, and changelog content) from a
+distribution and creates a local C<docs.tar.gz> archive. When C<--upload>
+is specified, the POD and README are converted to HTML and uploaded to S3.
 
-=item * invalidate - invalidate the CloudFront cache
+=item * B<create-site-index>
 
-=back
+Generates the DarkPAN site's F<index.html>. By default the generated HTML
+is written to C<STDOUT> (or C<--output>). When C<--upload> is specified,
+the index is uploaded to the S3 bucket. If CloudFront is configured and
+invalidation is enabled, the configured paths are invalidated after upload.
+
+=item * B<invalidate-index>
+
+Invalidates CloudFront cache paths associated with package indices and
+documentation.
+
+=item * B<download-index>
+
+Downloads the F<02packages.details.txt.gz> file.
+
+=item * B<download-version-index>
+
+Downloads the packages version index to the current directory if one
+is defined in the configuration. This index is typically SQLite database that
+is used with the L<DarkPAN::Resolver::SQLite> resolver.
+
+=item * B<dump-template>
+
+Prints the default L<Template::Toolkit> index template to C<STDOUT>. Use this
+as a starting point for a custom template referenced by C<index: template:> in
+your configuration file.
+
+  orepan2-s3 dump-template > my-index.tt
+
+=item * B<list-packages>
+
+Lists the distributions currently stored in the DarkPAN, grouped by
+distribution name and version.
+
+=item * B<show>
+
+Displays the contents of the current package index
+(F<02packages.details.txt.gz>).
 
 =back
 
@@ -946,6 +1388,7 @@ S3 repository. The format should look something like this:
       },
       "bedrock" : {
           "author_path": "D/DU/DUMMY",
+          "url" : "https://cpan.openbedrock.net/orepan2",
           "index" : {
               "template" : "/path/to/template",
               "files": {
@@ -960,9 +1403,8 @@ S3 repository. The format should look something like this:
           },
           "CloudFront" : {
               "DistributionId" : "E2JKLMNOPQRXYZ",
-              "InvalidationPaths" : [],
-              "url" : "https://cpan.openbedrock.net/orepan2"
-          }
+              "InvalidationPaths" : []
+         }
       }
   }
 
@@ -976,12 +1418,12 @@ of the profile.
 
 =item author_path 
 
-Overrides default C<D/DU/DUMMY>. For a personal DarkPAN you should
-place all modules in one path.
+Overrides the default C<D/DU/DUMMY> author path. For a personal DarkPAN you should
+all ldistributions in one path.
 
 =item index
 
-This section allows you to create custom template for the DarkPAN home page.
+This section allows you to specify a custom template for the DarkPAN home page.
 
 =over 10
 
@@ -990,10 +1432,9 @@ This section allows you to create custom template for the DarkPAN home page.
 The name of a template file that will be parsed and uploaded as
 F</index.html>. If you do not provide a template file a default
 template is used. The default template is a L<Template::Toolkit> style
-template. To see the default template use the C<dump-template> command
-to the F<orepan2-s3-index> script.
+template. To see the default template use the C<dump-template> command:
 
- orepan2-s3-index dump-template
+ orepan2-s3 dump-template
 
 The templating process is provided with these variables:
 
@@ -1006,9 +1447,8 @@ returns a version of the module name suitable for use as unique CSS id.
 
 =item repo
 
-A hash of key value pairs where the key is the name of a DarkPAN
-distribution and value is an array or arrays. Each array is of the
-form:
+A hash where each key is a DarkPAN distribution name and each value is
+an array of two-element arrays. Each inner array contains:
 
  [0] => Perl module name
  [1] => Module version
@@ -1079,22 +1519,21 @@ CloudFront distribution id
 
 =item InvalidationPaths
 
-C<OrePAN2::S3> is designed to work with CloudFront + Amazon
-S3. CloudFront is a CDN and will read content from your S3 bucket when
-clients make HTTP requests. CloudFront will cache content to avoid
-costly reads to the S3 bucket. If you change some of the static assets
-(like the index page) you may want to invalidate the cache to see
-your new assets. You could wait until the cache is updated (the
-default time is 24 hours)...but why?  The script will automatically
-invalidate the cache for you if you tell it what assets to invalidate
-when you add a new distribution.
+C<OrePAN2::S3> can optionally use CloudFront in front of the S3-backed
+DarkPAN. Because CloudFront caches objects, changes made in S3 may not
+be immediately visible to clients, depending on the caching behavior
+of your CloudFront distribution.
 
-An array of additional paths to invalidate when adding new distributions.
+When repository content changes, C<OrePAN2::S3> can automatically
+invalidate the configured CloudFront paths so clients receive the
+updated content.
 
-I<Note: There is no additional charge for adding additional
-paths. Each invalidation batch is considered as one billing unit by
-AWS. However, keep in mind you get 1000 invalidation paths for free
-each month. Thereafter each path costs $0.005 per path.>
+C<InvalidationPaths> is an array of additional CloudFront paths to
+include whenever an invalidation is performed.
+
+I<Note: CloudFront invalidation pricing is controlled by AWS and may
+change. See the current AWS CloudFront pricing documentation for
+details.>
 
 =back
 
@@ -1102,7 +1541,7 @@ each month. Thereafter each path costs $0.005 per path.>
 
 This section contains key/value pairs where the key is the name of a
 variable that will be exposed to your template and the values
-are a two element array that contains a regular expression and
+are a two-element array that contains a regular expression and
 possible regexp flags. The script will use the regexp to filter your
 distributions and add them to a hash whose name is the key you
 provided.
@@ -1142,6 +1581,24 @@ Example:
      <hr>
 
 =back
+
+=head1 ROLES CONSUMED
+
+=over 4
+
+=item * L<OrePAN2::S3::Role::Inject>
+
+=item * L<OrePAN2::S3::Role::Delete>
+
+=item * L<OrePAN2::S3::Role::Upload>
+
+=item * L<OrePAN2::S3::Role::UploadArtifacts>
+
+=back
+
+=head1 VERSION
+
+This documentation refers to version 2.1.1.
 
 =head1 AUTHOR
 

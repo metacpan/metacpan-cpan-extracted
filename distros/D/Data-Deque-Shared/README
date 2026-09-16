@@ -128,9 +128,9 @@ METHODS
 
 STATS
     stats() returns: "size", "capacity", "pushes", "pops", "waits",
-    "timeouts", "recoveries", "mmap_size". "recoveries" counts slots that
-    drain force-skipped because a pusher crashed (or stalled > 2s) between
-    winning the cursor CAS and publishing the value.
+    "timeouts", "recoveries", "mmap_size". "recoveries" counts slots
+    force-recovered (by drain, pop, or push) because a peer crashed (or
+    stalled > 2s) between claiming and publishing or releasing a slot.
 
 SECURITY
     Backing files are created with mode 0600 (owner-only) by default, so only

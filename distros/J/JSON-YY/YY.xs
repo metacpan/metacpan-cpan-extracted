@@ -29,6 +29,7 @@
 #define F_ALLOW_UNKNOWN   0x10
 #define F_ALLOW_BLESSED   0x20
 #define F_CONVERT_BLESSED 0x40
+#define F_BOOL            0x80
 
 #define MAX_DEPTH_DEFAULT 512
 
@@ -278,7 +279,13 @@ doc_too_deep(pTHX_ yyjson_doc *doc, U32 limit) {
 /* The materialisers return NULL when the depth budget runs out rather than
    croaking mid-build, so the caller drops the partial structure with one
    SvREFCNT_dec. */
-static SV * yyjson_val_to_sv(pTHX_ yyjson_val *val, U32 budget);
+typedef struct {
+    U32 flags;
+    SV *bool_true;
+    SV *bool_false;
+} json_yy_decode_ctx_t;
+
+static SV * yyjson_val_to_sv(pTHX_ yyjson_val *val, U32 budget, const json_yy_decode_ctx_t *ctx);
 static SV * yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv, U32 budget);
 static yyjson_mut_val * sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv,
                                           json_yy_t *self, U32 depth);
@@ -1451,13 +1458,63 @@ new_sv_zerocopy(pTHX_ const char *str, size_t len, SV *doc_sv) {
 
 /* ---- DECODE: yyjson value -> Perl SV ---- */
 
+/* Decoded booleans are copies of $JSON::PP::true/false, as in JSON::PP; only
+   an undefined one is filled in, never a value the caller set. */
 static SV *
-yyjson_val_to_sv(pTHX_ yyjson_val *val, U32 budget) {
+get_bool_sv(pTHX_ bool val) {
+    SV *sv = get_sv(val ? "JSON::PP::true" : "JSON::PP::false", GV_ADD);
+    if (!SvOK(sv)) {
+        SV *rv = newRV_noinc(newSViv(val ? 1 : 0));
+        sv_bless(rv, gv_stashpv("JSON::PP::Boolean", GV_ADD));
+        sv_setsv(sv, rv);
+        SvREFCNT_dec(rv);
+    }
+    return sv;
+}
+
+static inline bool
+bool_class(const char *name, STRLEN len) {
+    switch (len) {
+        case 7:  return memEQ(name, "boolean", 7);
+        case 17: return memEQ(name, "JSON::PP::Boolean", 17)
+                     || memEQ(name, "JSON::XS::Boolean", 17);
+        case 26: return memEQ(name, "Types::Serialiser::Boolean", 26);
+        case 30: return memEQ(name, "Types::Serialiser::BooleanBase", 30);
+    }
+    return FALSE;
+}
+
+/* sv_derived_from would re-run get-magic on a tied element */
+static bool
+is_bool_obj(pTHX_ SV *deref) {
+    AV *isa = mro_get_linear_isa(SvSTASH(deref));
+    SV **svp = AvARRAY(isa);
+    SSize_t i;
+    for (i = 0; i <= AvFILLp(isa); i++) {
+        STRLEN len;
+        const char *name = SvPV_const(svp[i], len);
+        if (bool_class(name, len))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static inline bool
+bool_obj_is_true(pTHX_ SV *sv, SV *deref) {
+    if (SvTYPE(deref) < SVt_PVAV)
+        return SvTRUE_nomg(deref);
+    return SvTRUE_nomg(sv);
+}
+
+static SV *
+yyjson_val_to_sv(pTHX_ yyjson_val *val, U32 budget, const json_yy_decode_ctx_t *ctx) {
     switch (yyjson_get_type(val)) {
         case YYJSON_TYPE_NULL:
             return SvREFCNT_inc_simple_NN(&PL_sv_undef);
 
         case YYJSON_TYPE_BOOL:
+            if (ctx && (ctx->flags & F_BOOL))
+                return newSVsv(yyjson_get_bool(val) ? ctx->bool_true : ctx->bool_false);
             return yyjson_get_bool(val)
                 ? SvREFCNT_inc_simple_NN(&PL_sv_yes)
                 : SvREFCNT_inc_simple_NN(&PL_sv_no);
@@ -1485,7 +1542,7 @@ yyjson_val_to_sv(pTHX_ yyjson_val *val, U32 budget) {
             size_t idx, max;
             yyjson_val *item;
             yyjson_arr_foreach(val, idx, max, item) {
-                SV *item_sv = yyjson_val_to_sv(aTHX_ item, budget - 1);
+                SV *item_sv = yyjson_val_to_sv(aTHX_ item, budget - 1, ctx);
                 if (!item_sv) { SvREFCNT_dec(rv); return NULL; }
                 av_push(av, item_sv);
             }
@@ -1504,7 +1561,7 @@ yyjson_val_to_sv(pTHX_ yyjson_val *val, U32 budget) {
             yyjson_obj_foreach(val, idx, max, key, value) {
                 const char *kstr = yyjson_get_str(key);
                 STRLEN klen = (STRLEN)yyjson_get_len(key);
-                SV *val_sv = yyjson_val_to_sv(aTHX_ value, budget - 1);
+                SV *val_sv = yyjson_val_to_sv(aTHX_ value, budget - 1, ctx);
                 if (!val_sv) { SvREFCNT_dec(rv); return NULL; }
                 if (!is_ascii(kstr, klen))
                     hv_store(hv, kstr, -(I32)klen, val_sv, 0);
@@ -1992,6 +2049,14 @@ direct_encode_sv(pTHX_ SV *buf, SV *sv, U32 depth, json_yy_t *self) {
         SV *deref = SvRV(sv);
 
         if (SvOBJECT(deref)) {
+            if (is_bool_obj(aTHX_ deref)) {
+                if (bool_obj_is_true(aTHX_ sv, deref))
+                    buf_cat_mem(aTHX_ buf, "true", 4);
+                else
+                    buf_cat_mem(aTHX_ buf, "false", 5);
+                return;
+            }
+
             /* convert_blessed applies only if the class has a TO_JSON;
                otherwise fall through to allow_blessed, as JSON::XS does */
             if ((self->flags & F_CONVERT_BLESSED) &&
@@ -2142,6 +2207,12 @@ sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv, json_yy_t *self, U32 depth) 
 
         /* check for blessed objects */
         if (SvOBJECT(deref)) {
+            if (is_bool_obj(aTHX_ deref)) {
+                return bool_obj_is_true(aTHX_ sv, deref)
+                    ? yyjson_mut_bool(doc, 1)
+                    : yyjson_mut_bool(doc, 0);
+            }
+
             /* convert_blessed: call TO_JSON, if the class has one (see
                direct_encode_sv) */
             if ((self->flags & F_CONVERT_BLESSED) &&
@@ -2292,7 +2363,7 @@ pp_decode_json_impl(pTHX) {
         croak("JSON decode error: empty document");
     }
 
-    SV *result = yyjson_val_to_sv(aTHX_ root, MAX_DEPTH_DEFAULT);
+    SV *result = yyjson_val_to_sv(aTHX_ root, MAX_DEPTH_DEFAULT, NULL);
     yyjson_doc_free(doc);
     if (!result)
         croak("JSON decode error: maximum nesting depth exceeded");
@@ -2683,6 +2754,12 @@ CODE:
     self->max_depth = val;
 }
 
+void
+_set_bool(SV *self_sv, int val)
+CODE:
+    if (val) get_self(aTHX_ self_sv)->flags |= F_BOOL;
+    else     get_self(aTHX_ self_sv)->flags &= ~F_BOOL;
+
 SV *
 decode(SV *self_sv, SV *json_sv)
 CODE:
@@ -2718,7 +2795,17 @@ CODE:
         }
     }
 
-    RETVAL = yyjson_val_to_sv(aTHX_ root, self->max_depth);
+    json_yy_decode_ctx_t ctx;
+    ctx.flags = self->flags;
+    if (self->flags & F_BOOL) {
+        ctx.bool_true = get_bool_sv(aTHX_ 1);
+        ctx.bool_false = get_bool_sv(aTHX_ 0);
+    } else {
+        ctx.bool_true = NULL;
+        ctx.bool_false = NULL;
+    }
+
+    RETVAL = yyjson_val_to_sv(aTHX_ root, self->max_depth, &ctx);
     yyjson_doc_free(doc);
     if (!RETVAL)
         croak("JSON decode error: maximum nesting depth exceeded");
@@ -2854,7 +2941,7 @@ CODE:
         croak("JSON decode error: empty document");
     }
 
-    RETVAL = yyjson_val_to_sv(aTHX_ root, MAX_DEPTH_DEFAULT);
+    RETVAL = yyjson_val_to_sv(aTHX_ root, MAX_DEPTH_DEFAULT, NULL);
     yyjson_doc_free(doc);
     if (!RETVAL)
         croak("JSON decode error: maximum nesting depth exceeded");

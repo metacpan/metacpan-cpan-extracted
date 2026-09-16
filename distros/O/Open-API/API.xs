@@ -23,6 +23,7 @@ static const frj_abi *oa_frj(pTHX);   /* defined below; used by the headers */
 
 #include "oa_compile.h"   /* needs the JSF table above */
 #include "oa_normalize.h" /* 3.0 -> 3.1 + discriminator (needs oa_get/oa_methods) */
+#include "oa_tools.h"     /* the document's own schema and prose per operation */
 #include "oa_route.h"
 #include "oa_validate.h"
 #include "oa_plack.h"
@@ -246,19 +247,179 @@ static SV *oa_load_spec(pTHX_ SV *spec) {
 static int oa_check_version(pTHX_ SV *doc) {
     HV *h; SV **v;
     STRLEN l; const char *p;
+    int ver;
     if (!doc || !SvROK(doc) || SvTYPE(SvRV(doc)) != SVt_PVHV)
         croak("Open::API: spec did not decode to an object/hashref");
     h = (HV *)SvRV(doc);
     v = hv_fetchs(h, "openapi", 0);
     if (!v || !*v || !SvOK(*v))
         croak("Open::API: spec has no 'openapi' version field");
+    /* The version is settled FIRST: the License identifier/url exclusion is a
+     * 3.1 rule, so the checks below need to know which dialect this is. */
     p = SvPV_const(*v, l);
-    if (l >= 3 && memEQ(p, "3.", 2) && (l == 3 || p[3] == '.')) {
-        if (p[2] == '1') return OA_V31;
-        if (p[2] == '0') return OA_V30;
+    if (!(l >= 3 && memEQ(p, "3.", 2) && (l == 3 || p[3] == '.')
+          && (p[2] == '1' || p[2] == '0')))
+        croak("Open::API supports OpenAPI 3.0 and 3.1 (got %.*s)", (int)l, p);
+    ver = (p[2] == '1') ? OA_V31 : OA_V30;
+
+    /* `info` is REQUIRED, and so are its own `title` and `version`. Nothing
+     * here reads them, but a document without them is not an OpenAPI
+     * document, and accepting it means a typo in the top-level shape passes
+     * silently - which is the whole class of bug this validator exists to
+     * stop for requests. */
+    {
+        SV **iv = hv_fetchs(h, "info", 0);
+        HV *info;
+        SV *lic;
+        if (!iv || !*iv || !SvROK(*iv) || SvTYPE(SvRV(*iv)) != SVt_PVHV)
+            croak("Open::API: spec has no 'info' object (it is required)");
+        info = (HV *)SvRV(*iv);
+        if (!oa_get(aTHX_ info, "title"))
+            croak("Open::API: info has no 'title' (it is required)");
+        if (!oa_get(aTHX_ info, "version"))
+            croak("Open::API: info has no 'version' (it is required)");
+        lic = oa_get(aTHX_ info, "license");
+        if (lic && oa_hv_of(lic)) {
+            HV *lh = (HV *)SvRV(lic);
+            if (!oa_get(aTHX_ lh, "name"))
+                croak("Open::API: info.license has no 'name' (it is required)");
+            /* 3.1 added `identifier`, and it excludes `url` */
+            if (ver == OA_V31 && oa_get(aTHX_ lh, "identifier")
+                              && oa_get(aTHX_ lh, "url"))
+                croak("Open::API: info.license declares both 'identifier' and "
+                      "'url', which are mutually exclusive");
+        }
+        /* Contact `email` and `url` are both constrained by the
+         * specification. Neither is read here, but a contact address nobody
+         * can write to is the same class of typo as a missing title. */
+        {
+            SV *con = oa_get(aTHX_ info, "contact");
+            if (con && oa_hv_of(con)) {
+                HV *ch = (HV *)SvRV(con);
+                SV *em = oa_get(aTHX_ ch, "email");
+                SV *cu = oa_get(aTHX_ ch, "url");
+                if (em && !oa_looks_like_email(aTHX_ em))
+                    croak("Open::API: info.contact.email is not in the format "
+                          "of an email address");
+                if (cu && !oa_looks_like_url(aTHX_ cu))
+                    croak("Open::API: info.contact.url is not in the format of "
+                          "a URL");
+            }
+        }
     }
-    croak("Open::API supports OpenAPI 3.0 and 3.1 (got %.*s)", (int)l, p);
-    return OA_V31;   /* not reached */
+
+    /* External Documentation at the document root. The operation-level and
+     * tag-level positions are checked where those are walked. */
+    oa_ext_docs_ok(aTHX_ oa_get(aTHX_ h, "externalDocs"), "the document");
+
+    /* Every Tag Object requires a name, and the names in the list MUST be
+     * unique - two tags of the same name describe one tag twice. */
+    {
+        AV *tags = oa_av_of(oa_get(aTHX_ h, "tags"));
+        SSize_t i, n = tags ? av_len(tags) + 1 : 0;
+        HV *seen = n ? (HV *)sv_2mortal((SV *)newHV()) : NULL;
+        for (i = 0; i < n; i++) {
+            SV **e = av_fetch(tags, i, 0);
+            HV *t = (e && *e) ? oa_hv_of(*e) : NULL;
+            SV *nm, *xd;
+            STRLEN tl; const char *tp;
+            if (!t) continue;
+            nm = oa_get(aTHX_ t, "name");
+            if (!nm) croak("Open::API: a tag has no 'name' (it is required)");
+            tp = SvPV_const(nm, tl);
+            if (hv_exists(seen, tp, (I32)tl))
+                croak("Open::API: tag '%.*s' is declared more than once; tag "
+                      "names must be unique", (int)tl, tp);
+            (void)hv_store(seen, tp, (I32)tl, newSViv(1), 0);
+            xd = oa_get(aTHX_ t, "externalDocs");
+            if (xd && oa_hv_of(xd) && !oa_get(aTHX_ (HV *)SvRV(xd), "url"))
+                croak("Open::API: tag '%.*s': externalDocs has no 'url' "
+                      "(it is required)", (int)tl, tp);
+        }
+    }
+
+    /* A Server Variable requires a `default`, and when it declares an `enum`
+     * the default has to be one of the values - a default outside its own
+     * enumeration describes a server nobody can reach. */
+    {
+        AV *srv = oa_av_of(oa_get(aTHX_ h, "servers"));
+        SSize_t i, n = srv ? av_len(srv) + 1 : 0;
+        for (i = 0; i < n; i++) {
+            SV **e = av_fetch(srv, i, 0);
+            HV *s = (e && *e) ? oa_hv_of(*e) : NULL;
+            HV *vars;
+            HE *vhe;
+            /* `url` is the one REQUIRED field of a Server Object, and with
+             * servers => 1 it is what the prefix is taken from. */
+            if (s && !oa_get(aTHX_ s, "url"))
+                croak("Open::API: a server has no 'url' (it is required)");
+            vars = s ? oa_hv_of(oa_get(aTHX_ s, "variables")) : NULL;
+            if (!vars) continue;
+            hv_iterinit(vars);
+            while ((vhe = hv_iternext(vars))) {
+                I32 vkl; const char *vk = hv_iterkey(vhe, &vkl);
+                HV *vh = oa_hv_of(hv_iterval(vars, vhe));
+                SV *def = vh ? oa_get(aTHX_ vh, "default") : NULL;
+                AV *en  = vh ? oa_av_of(oa_get(aTHX_ vh, "enum")) : NULL;
+                if (!vh) continue;
+                if (!def)
+                    croak("Open::API: server variable '%.*s' has no 'default' "
+                          "(it is required)", (int)vkl, vk);
+                if (en) {
+                    SSize_t j, m = av_len(en) + 1;
+                    int found = 0;
+                    for (j = 0; j < m && !found; j++) {
+                        SV **ev = av_fetch(en, j, 0);
+                        if (ev && *ev && sv_eq(*ev, def)) found = 1;
+                    }
+                    if (!found)
+                        croak("Open::API: server variable '%.*s': its default "
+                              "is not one of its enum values", (int)vkl, vk);
+                }
+            }
+        }
+    }
+
+    /* Components keys are drawn from a fixed alphabet. A key outside it
+     * cannot be named by a $ref, so the component is unreachable. */
+    {
+        static const char *const sections[] = {
+            "schemas", "responses", "parameters", "examples", "requestBodies",
+            "headers", "securitySchemes", "links", "callbacks", "pathItems",
+            NULL
+        };
+        HV *comp = oa_hv_of(oa_get(aTHX_ h, "components"));
+        int si;
+        for (si = 0; comp && sections[si]; si++) {
+            HV *sec = oa_hv_of(oa_get(aTHX_ comp, sections[si]));
+            HE *she;
+            if (!sec) continue;
+            hv_iterinit(sec);
+            while ((she = hv_iternext(sec))) {
+                I32 kl; const char *k = hv_iterkey(she, &kl);
+                if (!oa_key_ok(k, (STRLEN)kl))
+                    croak("Open::API: components.%s key '%.*s' is not a legal "
+                          "component name", sections[si], (int)kl, k);
+            }
+        }
+    }
+    /* jsonSchemaDialect names the dialect every Schema Object in the document
+     * is written against. A 3.1 Schema Object IS JSON Schema 2020-12, which
+     * is what this build validates, so a document declaring any other dialect
+     * cannot be validated here - and validating it as 2020-12 anyway, which
+     * is what happened before, is worse than saying so. */
+    {
+        static const char std[] = "https://json-schema.org/draft/2020-12/schema";
+        SV **dv = hv_fetchs(h, "jsonSchemaDialect", 0);
+        if (dv && *dv && SvOK(*dv)) {
+            STRLEN dl;
+            const char *dp = SvPV_const(*dv, dl);
+            if (!(dl == sizeof(std) - 1 && memEQ(dp, std, sizeof(std) - 1)))
+                croak("Open::API: jsonSchemaDialect '%.*s' is not supported; "
+                      "this build validates JSON Schema 2020-12", (int)dl, dp);
+        }
+    }
+    return ver;
 }
 
 /* Construct a compiled Open::API from a spec argument (shared by
@@ -269,7 +430,7 @@ static int oa_check_version(pTHX_ SV *doc) {
  * deals in one schema dialect: a 3.0 document is up-converted to 3.1 shape, and
  * in either version a `discriminator` is expanded into the 2020-12 constructs
  * that express it. See oa_normalize.h. */
-static SV *oa_new_from_spec(pTHX_ const char *cls, SV *spec) {
+static SV *oa_new_from_spec(pTHX_ const char *cls, SV *spec, int servers) {
     SV *doc = oa_load_spec(aTHX_ spec);
     oa_api *a;
     doc = sv_2mortal(oa_normalize(aTHX_ doc,
@@ -277,6 +438,8 @@ static SV *oa_new_from_spec(pTHX_ const char *cls, SV *spec) {
     a = oa_api_new(aTHX);
     if (!a) croak("Open::API: out of memory");
     a->spec = newSVsv(doc);
+    a->want_servers = servers ? 1 : 0;
+    if (servers) oa_set_server_prefix(aTHX_ a);
     oa_compile(aTHX_ a);
     return sv_bless(newRV_noinc(newSViv(PTR2IV(a))), gv_stashpv(cls, GV_ADD));
 }
@@ -313,7 +476,7 @@ static void oa_plack_set(pTHX_ HV *cfg, const char *k, STRLEN kl, SV *v) {
             croak("Open::API::Plack: 'api' must be an Open::API");
         (void)hv_stores(cfg, "api", newSVsv(v));
     } else if (kl == 4 && memEQ(k, "spec", 4)) {
-        (void)hv_stores(cfg, "api", oa_new_from_spec(aTHX_ "Open::API", v));
+        (void)hv_stores(cfg, "api", oa_new_from_spec(aTHX_ "Open::API", v, 0));
     } else if ((kl == 8 && memEQ(k, "handlers", 8))
             || (kl == 8 && memEQ(k, "security", 8))) {
         HV *src = oa_hv_of(v), *dst;
@@ -471,14 +634,18 @@ new(class, ...)
         const char *cls = (SvROK(class) && SvOBJECT(SvRV(class)))
                         ? HvNAME(SvSTASH(SvRV(class))) : SvPV_nolen(class);
         SV *spec = NULL;
+        int servers = 0;
         int i;
         if (!JSF) croak("Open::API: JSON::Schema::Fast C ABI unavailable");
         for (i = 1; i + 1 < items; i += 2) {
             STRLEN kl; const char *k = SvPV_const(ST(i), kl);
             if (kl == 4 && memEQ(k, "spec", 4)) spec = ST(i + 1);
+            /* opt-in: strip the first server URL's path prefix when routing */
+            else if (kl == 7 && memEQ(k, "servers", 7))
+                servers = SvTRUE(ST(i + 1)) ? 1 : 0;
         }
         if (!spec) croak("Open::API->new: a 'spec' is required");
-        RETVAL = oa_new_from_spec(aTHX_ cls, spec);
+        RETVAL = oa_new_from_spec(aTHX_ cls, spec, servers);
     }
     OUTPUT:
         RETVAL
@@ -841,6 +1008,8 @@ operation_info(self, op_id)
                                 newSViv(o->params[loc][i].required));
                 (void)hv_stores(p, "schema",
                                 newSViv(o->params[loc][i].handle ? 1 : 0));
+                (void)hv_stores(p, "deprecated",
+                                newSViv(o->params[loc][i].deprecated));
                 av_push(av, newRV_noinc((SV *)p));
             }
         }
@@ -869,6 +1038,40 @@ operation_info(self, op_id)
         (void)hv_stores(out, "responses", newRV_noinc((SV *)av));
         (void)hv_stores(out, "secured", newSViv(o->nsec ? 1 : 0));
         RETVAL = newRV_noinc((SV *)out);
+    }
+    OUTPUT:
+        RETVAL
+
+# What the document SAYS about an operation, as against what the validator
+# made of it: summary, description, tags, deprecated and any x- extensions.
+# Returns undef for an unknown operationId. Phrased that way on purpose: in
+# XS a comment starting "# undef" IS an #undef directive, and cpp was running
+# it. Never start one of these with a directive keyword.
+SV *
+operation_doc(self, op_id)
+        SV *self
+        SV *op_id
+    CODE:
+    {
+        oa_api *a = oa_api_of(aTHX_ self);
+        SV *r = oa_tools_doc(aTHX_ a, op_id);
+        RETVAL = r ? r : newSV(0);
+    }
+    OUTPUT:
+        RETVAL
+
+# Every input an operation declares, as one JSON Schema object: a property per
+# parameter, plus `body` for a JSON request body. undef for an unknown
+# operationId. 3.1 schemas are 2020-12 already, so this compiles as it stands.
+SV *
+operation_schema(self, op_id)
+        SV *self
+        SV *op_id
+    CODE:
+    {
+        oa_api *a = oa_api_of(aTHX_ self);
+        SV *r = oa_tools_schema(aTHX_ a, op_id);
+        RETVAL = r ? r : newSV(0);
     }
     OUTPUT:
         RETVAL
@@ -1422,6 +1625,75 @@ DESTROY(self)
 
 MODULE = Open::API        PACKAGE = Open::API::Client
 
+# The URL this client would build for an operation, without firing it. A
+# client's serialization rules - allowReserved above all - are otherwise
+# observable only by standing up a real server, which a compliance case must
+# not do. No security credentials are attached: this inspects serialization,
+# not authentication.
+#
+# In the Client package deliberately: `self` is a client HV, not an Open::API.
+# It first landed beside _param_check, which is Open::API's, where it compiled
+# perfectly and simply did not exist as a client method - a silent miss.
+SV *
+_request_url(self, op_id, params)
+        SV *self
+        SV *op_id
+        SV *params
+    CODE:
+    {
+        SV *api_sv;
+        oa_api *a;
+        oa_op *o;
+        if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+            croak("Open::API::Client: not a client");
+        api_sv = oa_cli_get(aTHX_ (HV *)SvRV(self), "api");
+        if (!api_sv || !SvROK(api_sv))
+            croak("Open::API::Client: no api on this client");
+        a = (oa_api *)INT2PTR(void *, SvIV(SvRV(api_sv)));
+        o = oa_op_by_id(aTHX_ a, op_id);
+        if (!o) croak("Open::API::Client: unknown operationId '%" SVf "'",
+                      SVfARG(op_id));
+        if (!params || !SvROK(params) || SvTYPE(SvRV(params)) != SVt_PVHV)
+            croak("Open::API::Client: _request_url wants a params hashref");
+        RETVAL = newSVsv(oa_cli_url(aTHX_ o, (HV *)SvRV(params),
+                                    oa_cli_get(aTHX_ (HV *)SvRV(self), "base_url"),
+                                    NULL, 0));
+    }
+    OUTPUT:
+        RETVAL
+
+# ($body, $content_type) for what this client WOULD send. The body half of
+# _request_url: a body that exists only inside a live request cannot be
+# asserted against, and the builder used to label everything application/json.
+void
+_request_body(self, op_id, params)
+        SV *self
+        SV *op_id
+        SV *params
+    PPCODE:
+    {
+        SV *api_sv;
+        oa_api *a;
+        oa_op *o;
+        SV *body, *ctype = NULL;
+        if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+            croak("Open::API::Client: not a client");
+        api_sv = oa_cli_get(aTHX_ (HV *)SvRV(self), "api");
+        if (!api_sv || !SvROK(api_sv))
+            croak("Open::API::Client: no api on this client");
+        a = (oa_api *)INT2PTR(void *, SvIV(SvRV(api_sv)));
+        o = oa_op_by_id(aTHX_ a, op_id);
+        if (!o) croak("Open::API::Client: unknown operationId '%" SVf "'",
+                      SVfARG(op_id));
+        if (!params || !SvROK(params) || SvTYPE(SvRV(params)) != SVt_PVHV)
+            croak("Open::API::Client: _request_body wants a params hashref");
+        body = oa_cli_build_body(aTHX_ o, (HV *)SvRV(params), &ctype);
+        if (!body) XSRETURN_EMPTY;
+        EXTEND(SP, 2);
+        PUSHs(sv_2mortal(newSVsv(body)));
+        PUSHs(ctype ? sv_2mortal(newSVsv(ctype)) : &PL_sv_undef);
+    }
+
 # Open::API::Client->new(api => $api | spec => ..., base_url => ...,
 # validate => 0|1, %ua_opts). Remaining pairs (timeout, tls_verify,
 # pool_size, loop, ...) are passed to Fetch's ua_new on first use.
@@ -1463,7 +1735,7 @@ new(class, ...)
             (void)hv_stores(self, "api", newSVsv(api));
         } else if (spec) {
             (void)hv_stores(self, "api",
-                            oa_new_from_spec(aTHX_ "Open::API", spec));
+                            oa_new_from_spec(aTHX_ "Open::API", spec, 0));
         } else {
             croak("Open::API::Client->new: give 'api' or 'spec'");
         }

@@ -83,7 +83,7 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
 	NAME		=> 'Genealogy::Obituary::Lookup',
-	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
 	VERSION_FROM	=> 'lib/Genealogy/Obituary/Lookup.pm',	# finds $VERSION in the module
 	ABSTRACT_FROM	=> 'lib/Genealogy/Obituary/Lookup.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
@@ -97,14 +97,22 @@ WriteMakefile(
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, TEST_REQUIRES => {
+		'Errno' => 0,
 		'FindBin' => 0,
 		'File::Temp' => 0,
+		'IPC::Run3' => 0,
+		'POSIX' => 0,
 		'Test::Carp' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::HTTPStatus' => 0,
+		'Test::Memory::Cycle' => 0,
+		'Test::Mockingbird' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Needs' => 0,
-		'Test::HTTPStatus' => 0,
+		'Test::RequiresInternet' => 0,
+		'Test::Returns' => 0,
+		'Test::Which' => 0,
 		# 'Test::Kwalitee' => 0,
 		'IPC::System::Simple' => 0,
 		'YAML::XS' => 0
@@ -131,9 +139,8 @@ WriteMakefile(
 				# license    => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
 				mailto => 'bug-Genealogy-Obituary-Lookup@rt.cpan.org',
-				url => 'https://github.com/nigelhorne/Genealogy-Obituary-Lookup/issues',
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Obituary-Lookup',
-				web => 'https://github.com/nigelhorne/Genealogy-Obituary-Lookup/issues'
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Obituary-Lookup',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Obituary-Lookup',
 			}
 		},
 	},

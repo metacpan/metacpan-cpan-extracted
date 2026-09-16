@@ -1,0 +1,30 @@
+---
+abstract: 'Generate random self-signed SSL certificates in memory'
+author:
+  - 'Ryan Scott'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-SelfCertificate
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  IO::Socket::SSL: '2.000'
+  MIME::Base64: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

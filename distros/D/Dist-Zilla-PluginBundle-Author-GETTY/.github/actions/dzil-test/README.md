@@ -23,13 +23,13 @@ keep your matrix and your `apt-get`/`brew` steps; only the dzil part is shared:
 steps:
   - uses: actions/checkout@v4
   - run: apt-get update && apt-get install -y libgit2-dev pkg-config   # per-dist
-  - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+  - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
 ```
 
 Alien dist forcing a vendored build:
 
 ```yaml
-  - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+  - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
     with:
       install-type: share          # -> ALIEN_INSTALL_TYPE=share
 ```
@@ -49,7 +49,7 @@ fully-qualified URL so Forgejo fetches it from GitHub regardless of the
 instance's `DEFAULT_ACTIONS_URL` setting:
 
 ```yaml
-- uses: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+- uses: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
 ```
 
 Forgejo reads `.github/workflows/` as well as `.forgejo/workflows/`, so the
@@ -68,7 +68,7 @@ jobs:
       image: perl:5.40-bookworm
     steps:
       - uses: https://github.com/actions/checkout@v4
-      - uses: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+      - uses: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
 ```
 
 If the action step fails to resolve (cross-repo composite actions via
@@ -86,5 +86,6 @@ local reference:
   fetches itself, not your distribution source.
 - `dzil install` is intentionally **not** run here; if an Alien dist needs the
   artifact installed before tests, add that step in the caller.
-- `@main` gives every dist CI changes immediately. Once stable, pin to a tag
-  (`@v1`) for reproducibility.
+- `@v1` is the recommended pin: the tag tracks the action's stable major line,
+  so CI is reproducible and only moves forward for compatible changes. Use
+  `@main` instead if you want every change the moment it lands.

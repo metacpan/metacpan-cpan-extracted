@@ -1,7 +1,7 @@
 [%- WRAPPER 'web/en/layouts/default.html.tt' -%]
 
 [%- IF back_url -%]
-<p class="back-link"><a href="[% back_url | html %]">&larr; [% back_label || 'Back' | html %]</a></p>
+<p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a></p>
 [%- ELSE -%]
 <p class="back-link"><a href="/">&larr; Choose another database</a></p>
 [%- END -%]
@@ -28,11 +28,16 @@
   <button class="btn-export-open" id="btn-export-open" type="button">&#x2193; Export&hellip;</button>
   <button class="btn-refresh" id="btn-refresh" type="button"
           title="Reload the data from disc - use this after the source file has changed">&#x21BB; Refresh</button>
+  <button class="btn-delete-sel" id="btn-delete-sel" type="button" hidden
+          title="Remove the selected rows and/or columns from this view">&#x1F5D1; Delete selected</button>
   <button class="btn-graph" id="btn-graph" type="button"
           title="Plot the current data as a line chart - choose the X and Y axes">&#x1F4C8; Line graph&hellip;</button>
   [%- END -%]
   <button class="btn-dedup[% IF dedup %] btn-dedup--active[% END %]" id="btn-dedup" type="button"
           title="Remove duplicate rows from the view and from any export">[% IF dedup %]Show duplicates[% ELSE %]Hide duplicates[% END %]</button>
+  <label class="lbl-totals" id="lbl-totals" title="Show a totals row at the bottom of the table — sums any numeric column">
+    <input type="checkbox" id="chk-totals"> Totals
+  </label>
   <button class="btn-add-db" id="btn-add-db" type="button" title="Combine this table with another data file, or narrow down the rows you see by applying conditions">&#x2295; Merge data&hellip;</button>
   <button class="btn-combine" id="btn-combine" type="button" title="Stack rows from another data file beneath these rows, using a unified set of columns and leaving blanks where a column does not exist in a given file">&#x229E; Combine data&hellip;</button>
 </div>
@@ -274,14 +279,43 @@ function parseAccounting(v) {
 }
 
 (function () {
-  var table = document.getElementById('bi-table');
+  var table     = document.getElementById('bi-table');
   if (!table) return;
+  var chkTotals = document.getElementById('chk-totals');
 
-  var headers    = Array.from(table.querySelectorAll('thead th'));
+  // SEL = 1: the checkbox column we inject is always cell 0 in each row, so
+  // every data-column DOM cell index = headers-array index + SEL.
+  var SEL = 1;
+
+  // Inject the checkbox selector column into every existing row.
+  (function injectSelCol() {
+    var theadRow = table.querySelector('thead tr');
+    var selTh = document.createElement('th');
+    selTh.className = 'sel-th';
+    theadRow.insertBefore(selTh, theadRow.firstChild);
+
+    Array.from(table.querySelectorAll('tbody tr')).forEach(function (tr) {
+      var selTd = document.createElement('td');
+      selTd.className = 'sel-td';
+      var chk = document.createElement('input');
+      chk.type = 'checkbox';
+      chk.className = 'row-chk';
+      chk.title = 'Select this row';
+      selTd.appendChild(chk);
+      tr.insertBefore(selTd, tr.firstChild);
+    });
+  }());
+
+  var headers    = Array.from(table.querySelectorAll('thead th:not(.sel-th)'));
   var dragSrcIdx = null;
   var sortColIdx = -1;
   var sortAsc    = true;
   var STORE_KEY  = 'bi:' + (table.dataset.table || '');
+
+  // --- Selection state ---
+  var selectedRows = new Set();  // Set of <tr> elements
+  var selectedCols = new Set();  // Set of header indices (into headers[])
+  var btnDel = document.getElementById('btn-delete-sel');
 
   // --- Persistence ---
 
@@ -295,9 +329,144 @@ function parseAccounting(v) {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         columns: headers.map(function (h) { return h.textContent.trim(); }),
         sortCol: sortColIdx >= 0 ? headers[sortColIdx].textContent.trim() : null,
-        sortAsc: sortAsc
+        sortAsc: sortAsc,
+        totals:  chkTotals ? chkTotals.checked : false
       }));
     } catch (e) {}
+  }
+
+  // --- Totals row ---
+
+  // Builds (or rebuilds) a <tfoot> row with the sum of each all-numeric column.
+  // Non-numeric columns are left blank; the first non-numeric cell shows "Total".
+  // moveCol() operates on table.rows (which includes tfoot), so cell reordering
+  // keeps the totals aligned automatically without requiring a rebuild on drag.
+  function buildTotals() {
+    var tbody  = table.tBodies[0];
+    var rows   = Array.from(tbody.rows);
+    var tfoot  = table.tFoot || table.createTFoot();
+    while (tfoot.firstChild) tfoot.removeChild(tfoot.firstChild);
+    var tr = tfoot.insertRow();
+    // Placeholder cell for the selector column
+    tr.insertCell().className = 'sel-td';
+    headers.forEach(function (h, i) {
+      var td   = tr.insertCell();
+      var vals = rows.map(function (r) {
+        return r.cells[i + SEL] ? r.cells[i + SEL].textContent.trim() : '';
+      }).filter(function (v) { return v !== ''; });
+      var isDate = vals.length > 0 && vals.every(function (v) {
+        return /^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v);
+      });
+      var numeric = !isDate && vals.length > 0 && vals.every(function (v) {
+        return !isNaN(parseAccounting(v));
+      });
+      if (numeric) {
+        var sum    = vals.reduce(function (acc, v) { return acc + parseAccounting(v); }, 0);
+        var hasDec = vals.some(function (v) { return /\.\d+/.test(v.replace(/[^0-9.]/g, '')); });
+        td.textContent = hasDec ? sum.toFixed(2) : String(Math.round(sum));
+        td.className   = 'totals-sum';
+      }
+      // Re-apply col-selected highlight to tfoot cells when totals are rebuilt
+      if (selectedCols.has(i)) td.classList.add('col-selected');
+    });
+  }
+
+  function removeTotals() {
+    if (table.tFoot) table.deleteTFoot();
+  }
+
+  // --- Selection helpers ---
+
+  function updateDeleteBtn() {
+    if (!btnDel) return;
+    var rCount = selectedRows.size;
+    var cCount = selectedCols.size;
+    if (rCount + cCount === 0) {
+      btnDel.hidden = true;
+      return;
+    }
+    btnDel.hidden = false;
+    var parts = [];
+    if (rCount) parts.push(rCount + ' row' + (rCount > 1 ? 's' : ''));
+    if (cCount) parts.push(cCount + ' column' + (cCount > 1 ? 's' : ''));
+    btnDel.title = 'Remove ' + parts.join(' and ') + ' from this view';
+  }
+
+  function setColHighlight(idx, on) {
+    // Apply or remove col-selected class on body/foot cells only (not the header).
+    Array.from(table.querySelectorAll('tbody tr, tfoot tr')).forEach(function (row) {
+      var cell = row.cells[idx + SEL];
+      if (cell) on ? cell.classList.add('col-selected') : cell.classList.remove('col-selected');
+    });
+  }
+
+  function toggleColSel(idx) {
+    if (selectedCols.has(idx)) {
+      selectedCols.delete(idx);
+      setColHighlight(idx, false);
+    } else {
+      selectedCols.add(idx);
+      setColHighlight(idx, true);
+    }
+    updateDeleteBtn();
+  }
+
+  function toggleRowSel(tr, checked) {
+    var chk = tr.querySelector('.row-chk');
+    if (chk) chk.checked = checked;
+    if (checked) {
+      selectedRows.add(tr);
+      tr.classList.add('row-selected');
+    } else {
+      selectedRows.delete(tr);
+      tr.classList.remove('row-selected');
+    }
+    updateDeleteBtn();
+  }
+
+  function deleteSelected() {
+    // Delete rows first (simpler — just remove the <tr> from the DOM).
+    selectedRows.forEach(function (tr) { tr.parentNode.removeChild(tr); });
+    selectedRows.clear();
+
+    // Delete columns in descending index order so earlier indices stay valid.
+    var colsDesc = Array.from(selectedCols).sort(function (a, b) { return b - a; });
+    colsDesc.forEach(function (idx) {
+      // Remove the <th> from thead.
+      var th = headers[idx];
+      if (th && th.parentNode) th.parentNode.removeChild(th);
+      headers.splice(idx, 1);
+
+      // Adjust the sorted column index.
+      if      (sortColIdx === idx)   sortColIdx = -1;
+      else if (sortColIdx > idx)     sortColIdx--;
+
+      // Remove the corresponding <td> from every tbody row and the tfoot.
+      Array.from(table.querySelectorAll('tbody tr, tfoot tr')).forEach(function (row) {
+        var cell = row.cells[idx + SEL];
+        if (cell) row.removeChild(cell);
+      });
+    });
+    selectedCols.clear();
+
+    // Reset aria-sort on remaining headers.
+    headers.forEach(function (h, i) {
+      h.setAttribute('aria-sort', i === sortColIdx ? (sortAsc ? 'ascending' : 'descending') : 'none');
+    });
+
+    // Update only the leading text node inside .record-count (join chips follow it).
+    var countEl = document.querySelector('.record-count');
+    if (countEl) {
+      var remaining = table.querySelectorAll('tbody tr').length;
+      // Walk child nodes to find the first Text node (the "N records" part).
+      var textNode = null;
+      countEl.childNodes.forEach(function (n) { if (!textNode && n.nodeType === Node.TEXT_NODE) textNode = n; });
+      if (textNode) textNode.textContent = remaining + ' record' + (remaining !== 1 ? 's' : '');
+    }
+
+    if (chkTotals && chkTotals.checked) buildTotals();
+    saveState();
+    updateDeleteBtn();
   }
 
   // --- Column helpers ---
@@ -305,10 +474,13 @@ function parseAccounting(v) {
   function colIndex(th) { return headers.indexOf(th); }
 
   function moveCol(from, to) {
+    // `from` and `to` are indices into headers[] (data columns only).
+    // Each data column lives at DOM cell index + SEL to account for the
+    // selector checkbox column at position 0.
     Array.from(table.rows).forEach(function (row) {
       var cells  = Array.from(row.children);
-      var moving = cells[from];
-      var target = cells[to];
+      var moving = cells[from + SEL];
+      var target = cells[to   + SEL];
       if (!moving || !target) return;
       row.insertBefore(moving, from < to ? target.nextSibling : target);
     });
@@ -317,6 +489,15 @@ function parseAccounting(v) {
     if      (sortColIdx === from)                                  sortColIdx = to;
     else if (from < to && sortColIdx > from && sortColIdx <= to)   sortColIdx--;
     else if (from > to && sortColIdx >= to  && sortColIdx <  from) sortColIdx++;
+    // Remap selectedCols indices after the move
+    var newSel = new Set();
+    selectedCols.forEach(function (idx) {
+      if      (idx === from)                              newSel.add(to);
+      else if (from < to && idx > from && idx <= to)     newSel.add(idx - 1);
+      else if (from > to && idx >= to  && idx <  from)   newSel.add(idx + 1);
+      else                                                newSel.add(idx);
+    });
+    selectedCols = newSel;
   }
 
   // --- Sort ---
@@ -341,7 +522,7 @@ function parseAccounting(v) {
     var tbody    = table.tBodies[0];
     var rows     = Array.from(tbody.rows);
     var nonEmpty = rows.map(function (r) {
-      return r.cells[idx] ? r.cells[idx].textContent.trim() : '';
+      return r.cells[idx + SEL] ? r.cells[idx + SEL].textContent.trim() : '';
     }).filter(function (v) { return v !== ''; });
 
     // Detect date columns: every non-empty value must match a known date pattern.
@@ -364,8 +545,8 @@ function parseAccounting(v) {
     });
 
     rows.sort(function (a, b) {
-      var av  = a.cells[idx] ? a.cells[idx].textContent.trim() : '';
-      var bv  = b.cells[idx] ? b.cells[idx].textContent.trim() : '';
+      var av  = a.cells[idx + SEL] ? a.cells[idx + SEL].textContent.trim() : '';
+      var bv  = b.cells[idx + SEL] ? b.cells[idx + SEL].textContent.trim() : '';
       var cmp;
       if (isDate) {
         var ak = biDateKey(av, monthFirst), bk = biDateKey(bv, monthFirst);
@@ -419,14 +600,32 @@ function parseAccounting(v) {
         sortByCol(sortColIdx, sortAsc);
       }
     }
+
+    if (state.totals && chkTotals) {
+      chkTotals.checked = true;
+      buildTotals();
+    }
   }());
+
+  if (chkTotals) {
+    chkTotals.addEventListener('change', function () {
+      if (chkTotals.checked) buildTotals(); else removeTotals();
+      saveState();
+    });
+  }
 
   // --- Event listeners ---
 
+  // Column header: plain click = sort; Ctrl+click = toggle column selection.
   headers.forEach(function (th) {
-    th.addEventListener('click', function () {
+    th.addEventListener('click', function (e) {
       if (dragSrcIdx !== null) return;
       var idx = colIndex(th);
+      if (e.ctrlKey || e.metaKey) {
+        // Ctrl/Cmd+click: select/deselect the column (does not sort).
+        toggleColSel(idx);
+        return;
+      }
       if (sortColIdx === idx) { sortAsc = !sortAsc; }
       else { sortColIdx = idx; sortAsc = true; }
       sortByCol(sortColIdx, sortAsc);
@@ -465,6 +664,41 @@ function parseAccounting(v) {
       }
       headers.forEach(function (h) { h.classList.remove('drag-over'); });
     });
+  });
+
+  // Row checkboxes: toggle row selection.
+  table.addEventListener('change', function (e) {
+    var chk = e.target;
+    if (!chk.classList.contains('row-chk')) return;
+    var tr = chk.closest('tr');
+    if (tr) toggleRowSel(tr, chk.checked);
+  });
+
+  // Delete button: remove selected rows and columns.
+  if (btnDel) {
+    btnDel.addEventListener('click', function () {
+      if (selectedRows.size + selectedCols.size === 0) return;
+      deleteSelected();
+    });
+  }
+
+  // Delete key removes selected rows/columns without needing the button.
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Delete') return;
+    if (selectedRows.size + selectedCols.size === 0) return;
+    // Suppress if focus is inside a text-editable element (but not a checkbox).
+    var el  = document.activeElement;
+    var tag = el && el.tagName;
+    if (tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (tag === 'INPUT' && el.type !== 'checkbox' && el.type !== 'radio') return;
+    e.preventDefault();
+    deleteSelected();
+  });
+
+  // Add a title hint to data column headers indicating Ctrl+click selects.
+  headers.forEach(function (th) {
+    th.title = (th.title ? th.title + '\n' : '') +
+               'Click to sort | Ctrl+click to select column';
   });
 }());
 
@@ -806,6 +1040,32 @@ function parseAccounting(v) {
     btnDo.disabled = !combineSpec;
   }
 
+  // Set the path input and combineSpec from an uploaded file path.
+  function applyPath(path) {
+    tblSel.value  = '';
+    pathInp.value = path;
+    combineSpec   = 'path:' + path;
+    checkApply();
+  }
+
+  // Register global drop hooks so the existing overlay uploads to /upload and
+  // then populates the path input instead of navigating away.
+  function registerDropHooks() {
+    window.__biDropLabel    = function () { return 'Drop to add to Combine'; };
+    window.__biDropCallback = function (data) {
+      if (!data || !data.url) return;
+      var path = '';
+      try { path = new URL(data.url, location.origin).searchParams.get('path') || ''; }
+      catch (e) {}
+      if (path) { applyPath(path); btnDo.click(); }
+    };
+  }
+
+  function clearDropHooks() {
+    window.__biDropLabel    = null;
+    window.__biDropCallback = null;
+  }
+
   tblSel.addEventListener('change', function () {
     combineSpec   = this.value ? this.value : '';
     pathInp.value = '';
@@ -839,8 +1099,9 @@ function parseAccounting(v) {
       joinPanel.hidden    = true;
       if (btnMerge) btnMerge.disabled = false;
     }
-    panel.hidden         = false;
-    btnCombine.disabled  = true;
+    panel.hidden        = false;
+    btnCombine.disabled = true;
+    registerDropHooks();
   });
 
   btnCancel.addEventListener('click', function () {
@@ -850,6 +1111,7 @@ function parseAccounting(v) {
     pathInp.value       = '';
     combineSpec         = '';
     checkApply();
+    clearDropHooks();
   });
 }());
 </script>

@@ -56,12 +56,12 @@ if ($^O ne 'linux') { # Some people will still try
       colored(['white on_red'],' Graphics::Framebuffer should not be installed from within Wayland/X-Windows!  '),"\n",
       colored(['white on_red'],' you should install it from the console itself, and not a console window.      '),"\n",
       colored(['white on_red'],' ' x 79),"\n",
-      colored(['black on_yellow'],' ' x 79),"\n",
-      colored(['black on_yellow'],' If you insist on installing from within X-Windows, please keep in mind that   '),"\n",
-      colored(['black on_yellow'],' the tests will fail, as they will be unable to draw to the screen, since      '),"\n",
-      colored(['black on_yellow'],' Waylan/X-Windows is using it.  Thus the tests will run in emulation mode only.'),"\n",
-      colored(['black on_yellow'],' ' x 79), "\n\n";
-    $pmt = ExtUtils::MakeMaker::prompt('Do you wish to install anyway?  ','Y');
+#      colored(['black on_yellow'],' ' x 79),"\n",
+      colored(['black on_yellow'],' If you insist on installing from within X-Windows, the tests will attempt to  '),"\n",
+      colored(['black on_yellow'],' install a viewer with mpplay or mplayer using a simulated framebuffer of      '),"\n",
+      colored(['black on_yellow'],' 1024x720x32                                                                   '),"\n\n",
+#      colored(['black on_yellow'],' ' x 79), "\n\n";
+    $pmt = 'Y'; # ExtUtils::MakeMaker::prompt('Do you wish to install anyway?  ','Y');
 } elsif (no_framebuffer()) {
     print 
       colored(['white on_red'],' Your system does not appear to have a framebuffer device!  This is required '),"\n",
@@ -130,15 +130,15 @@ print colored(['bright_green'],"Added\n");
 if ($meta =~ /^(.*?)\n/s) {
     print colored(['bright_yellow'],'   Is this a threaded Perl?'), ' ... ';
     if ($Config{'useithreads'}) {
-        print colored(['bright_green'],'YES')," Leaving thread support\n";
+        print colored(['bright_green'],'YES')," Leaving thread support as-is\n";
     } else {
-		$template =~ s/use threads/# use threads/gs;
+		$template =~ s/use threads/# use threads/gs; # Removes both threads and threads::shared
         print colored(['red'],'NO')," Removing thread support\n";
     }
     print colored(['bright_yellow'],'         Inserting versions'), ' ... ';
     my ($version, $date, $email) = split(/\:/, $1 );
     my ($month, $day, $year) = split(/ |, /,$date);
-	my $manver = qq{# VERSION\n\n   Version $version ($date)\n\n   \!\[Divider\]\(pics/pink.jpg?raw=true "Divider"\)\n\n# THANKS};
+	my $manver = qq{# VERSION\n\n   Version $version ($date)\n\n   \!\[Pink Divider\]\(pics/pink.jpg?raw=true "Pink Divider"\)\n\n# THANKS};
 
 	$manual   =~ s/\# VERSION.*?\# THANKS/$manver/gs;
     $template =~ s/\#\# VERSION \#\#/$version/sg;
@@ -255,7 +255,7 @@ my $mm = WriteMakefile(
     VERSION_FROM       => 'lib/Graphics/Framebuffer.pm',
     ABSTRACT_FROM      => 'lib/Graphics/Framebuffer.pm',
     PL_FILES           => {},
-    MIN_PERL_VERSION   => '5.20.0', # 5.6 (5.006) is considered slow and unstable.  Upgrade
+    MIN_PERL_VERSION   => '5.20.0',
     CONFIGURE_REQUIRES => { # Added all Inline variants to this stage
         'Inline'              => '0.53',
         'Inline::C'           => '0.53',
@@ -282,6 +282,10 @@ my $mm = WriteMakefile(
         'Inline'         => '0.53',
         'Inline::C'      => '0.53',
     },
+    EXE_FILES     => ['bin/gfb_viewer.pl'],
+    INSTALLSCRIPT => '/usr/local/bin',
+    INSTALLBIN    => '/usr/local/bin',
+
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
     clean => {FILES    => 'Graphics-Framebuffer* _Inline* examples/_Inline* *.inl *log *bak *old'},
 );
@@ -299,14 +303,20 @@ sub no_framebuffer {
     my $os = `uname`;
     chomp($os);
     if ($os eq 'Linux') {
-    foreach my $device (0 .. 31) {
-        foreach my $prefix (qw( /dev/fb /dev/fb/ /dev/graphics/fb/ )) {
-            if (-e "$prefix$device") {
-                $fb_absent = FALSE;
-                print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_green'],'FOUND'), ' - ', colored(['cyan'],"$prefix$device"),"\n";
+       if (exists($ENV{'DISPLAY'}) or exists($ENV{'WAYLAND_DISPLAY'})) {
+            print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_green'],'FOUND'), ' - ', colored(['cyan'],"Running in X11 or Wayland, will use/dev/shm/gfb_viewer"),"\n";
+            $fb_absent = FALSE;
+        } else {
+            print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_yellow'],'Searching for /dev/fb*'),"\n";
+            foreach my $device (0 .. 31) {
+                foreach my $prefix (qw( /dev/fb /dev/fb/ /dev/graphics/fb/ )) {
+                    if (-e "$prefix$device") {
+                        $fb_absent = FALSE;
+                        print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_green'],'FOUND'), ' - ', colored(['cyan'],"$prefix$device"),"\n";
+                    }
+                }
             }
         }
-    }
     }
     if ($fb_absent) {
         print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_red'],'NOT FOUND'),"\n";

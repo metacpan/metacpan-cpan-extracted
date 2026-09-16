@@ -120,26 +120,67 @@ static const char *POX_SCHEMA[] = {
   "CREATE TABLE IF NOT EXISTS oauth2_clients ("
     "client_id TEXT PRIMARY KEY, secret_digest TEXT, name TEXT, "
     "redirect_uris TEXT, grant_types TEXT, scopes TEXT, "
-    "auth_method TEXT, is_public INTEGER DEFAULT 0, created INTEGER)",
+    "auth_method TEXT, is_public INTEGER DEFAULT 0, created INTEGER, "
+    "resources TEXT)",
   "CREATE TABLE IF NOT EXISTS oauth2_codes ("
     "code_digest TEXT PRIMARY KEY, client_id TEXT, user_id TEXT, "
     "redirect_uri TEXT, scope TEXT, nonce TEXT, code_challenge TEXT, "
-    "expires INTEGER)",
+    "resource TEXT, claims TEXT, expires INTEGER)",
   "CREATE TABLE IF NOT EXISTS oauth2_refresh ("
     "token_digest TEXT PRIMARY KEY, family_id TEXT, client_id TEXT, "
-    "user_id TEXT, scope TEXT, expires INTEGER, rotated_to TEXT, "
-    "revoked INTEGER DEFAULT 0)",
+    "user_id TEXT, scope TEXT, resource TEXT, claims TEXT, "
+    "expires INTEGER, rotated_to TEXT, revoked INTEGER DEFAULT 0)",
   "CREATE TABLE IF NOT EXISTS oauth2_consents ("
     "user_id TEXT, client_id TEXT, scopes TEXT, created INTEGER, "
     "PRIMARY KEY (user_id, client_id))",
   NULL
 };
 
+/* The columns above reach a database that already exists only through these.
+ *
+ * CREATE TABLE IF NOT EXISTS does nothing to a table that is already there, so
+ * a store built before RFC 8707 support would keep its old columns and every
+ * insert naming `resource` would fail at runtime rather than at upgrade. Each
+ * of these is expected to fail on a database that already has the column,
+ * which is why they run through pox_dbi_try and not pox_dbi_do. */
+static const char *POX_MIGRATE[] = {
+  "ALTER TABLE oauth2_clients ADD COLUMN resources TEXT",
+  "ALTER TABLE oauth2_codes ADD COLUMN resource TEXT",
+  "ALTER TABLE oauth2_refresh ADD COLUMN resource TEXT",
+  "ALTER TABLE oauth2_codes ADD COLUMN claims TEXT",
+  "ALTER TABLE oauth2_refresh ADD COLUMN claims TEXT",
+  NULL
+};
+
+/* $dbh->do($sql) where failure is the expected case and not an error.
+ *
+ * pox_dbi_do croaks on a failed statement, which is right for a write that
+ * must land. An ALTER TABLE adding a column that is already there is a
+ * different thing: it fails on every run after the first, by design. */
+static void pox_dbi_try(pTHX_ SV *dbh, const char *sql) {
+  dSP; int count;
+  ENTER; SAVETMPS; PUSHMARK(SP);
+  EXTEND(SP, 3);
+  PUSHs(dbh);
+  PUSHs(sv_2mortal(newSVpv(sql, 0)));
+  PUSHs(&PL_sv_undef);
+  PUTBACK;
+  count = call_method("do", G_SCALAR | G_EVAL);
+  SPAGAIN;
+  if (count > 0) (void)POPs;
+  PUTBACK; FREETMPS; LEAVE;
+  /* Swallowed deliberately: leaving $@ set would surface this attempt as
+   * somebody else's error the next time anything checked it. */
+  sv_setpvs(ERRSV, "");
+}
+
 static void pox_store_migrate(pTHX_ SV *self) {
   SV *dbh = pox_store_dbh(aTHX_ self);
   int i;
   for (i = 0; POX_SCHEMA[i]; i++)
     (void)pox_dbi_do(aTHX_ dbh, POX_SCHEMA[i], NULL, 0);
+  for (i = 0; POX_MIGRATE[i]; i++)
+    pox_dbi_try(aTHX_ dbh, POX_MIGRATE[i]);
 }
 
 /* Row field as a mortal SV (borrowed from the row), or NULL. */

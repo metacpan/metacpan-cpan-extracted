@@ -47,6 +47,8 @@ new(class, ...)
             (void)hv_stores(self, "authenticate", newSVsv(*v));
         if ((v = hv_fetchs(opts, "consent", 0)) && SvOK(*v))
             (void)hv_stores(self, "consent", newSVsv(*v));
+        if ((v = hv_fetchs(opts, "claims", 0)) && SvOK(*v))
+            (void)hv_stores(self, "claims", newSVsv(*v));
 
         /* the signing key: a supplied Crypt::JWS::Key, or a fresh one */
         if ((v = hv_fetchs(opts, "key", 0)) && SvOK(*v)
@@ -135,6 +137,15 @@ metadata(self, c)
         SV *c
     CODE:
         RETVAL = pox_srv_metadata(aTHX_ self, c);
+    OUTPUT:
+        RETVAL
+
+SV *
+register(self, c)
+        SV *self
+        SV *c
+    CODE:
+        RETVAL = pox_srv_register(aTHX_ self, c);
     OUTPUT:
         RETVAL
 

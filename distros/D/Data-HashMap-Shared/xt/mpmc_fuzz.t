@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 use POSIX qw(_exit);
-use Time::HiRes qw(time);
 
 use Data::HashMap::Shared::II;
 

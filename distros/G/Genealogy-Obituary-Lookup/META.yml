@@ -1,23 +1,31 @@
 ---
-abstract: 'Lookup an obituary'
+abstract: 'Lookup an obituary in the ODT/Rootsweb/funeral-notices database'
 author:
-  - 'Nigel Horne <njh@bandsman.co.uk>'
+  - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
+  Errno: '0'
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
   FindBin: '0'
+  IPC::Run3: '0'
   IPC::System::Simple: '0'
+  POSIX: '0'
   Test::Carp: '0'
   Test::DescribeMe: '0'
   Test::HTTPStatus: '0'
+  Test::Memory::Cycle: '0'
+  Test::Mockingbird: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
+  Test::RequiresInternet: '0'
+  Test::Returns: '0'
+  Test::Which: '0'
   YAML::XS: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -61,8 +69,8 @@ requires:
   constant: '0'
   perl: '5.006002'
 resources:
-  bugtracker: https://github.com/nigelhorne/Genealogy-Obituary-Lookup/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Obituary-Lookup
   homepage: https://metacpan.org/pod/Genealogy::Obituary::Lookup
   repository: git://github.com/nigelhorne/Genealogy-Obituary-Lookup.git
-version: '0.20'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,6 +1,19 @@
 Revision history for Shared::Arena
 
-0.05	2026-09-11
+0.07	2026-09-16
+        - FIXES a smoker FAIL in t/08-mpsc.t. It asserted that two children's
+          sequence ranges overlapped, which is the host's scheduling and not
+          the ring's promise: where the storm is shorter than a timeslice the
+          children run one after another. It now asserts what the sequence
+          counter guarantees - every child published and was handed a range at
+          least as wide as its records - and reports the overlap. The children
+          give the processor up a few times mid-loop so that they interleave
+          on a host that cannot run them at once.
+        - t/08-mpsc.t no longer requires the reader to have been lapped, which
+          is the same kind of guess; it requires that nothing went missing
+          quietly.
+
+0.05	2026-09-15
         - FIXES the build on a C89 compiler, gcc 4.2.1 on the FreeBSD 9 smoker,
           which refused 0.03 and 0.04 with "redefinition of typedef": four
           tenants typedef-named their struct where the ABI header forward

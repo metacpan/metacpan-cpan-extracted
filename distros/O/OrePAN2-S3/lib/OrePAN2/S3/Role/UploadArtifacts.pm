@@ -6,6 +6,7 @@ use warnings;
 use CLI::Simple::Constants qw(:booleans);
 use CLI::Simple::Utils qw(slurp);
 use Digest::MD5 qw(md5_base64);
+use File::Basename qw(dirname);
 
 use Role::Tiny;
 
@@ -24,12 +25,14 @@ sub cmd_upload_artifacts {
     return $SUCCESS;
   }
 
+  my $config_dir = dirname( $self->get_config_file );
+
   my $config_dirty = $FALSE;
 
   for my $src ( sort keys %{$files} ) {
     my $entry = $files->{$src};
 
-    my $path = $src !~ /^\//xsm ? $src : sprintf '%s/%s', $self->get_dist_dir, $src;
+    my $path = $src =~ /^\//xsm ? $src : sprintf '%s/%s', $config_dir, $src;
 
     my $dest = ref $entry ? $entry->{dest} : $entry;
 

@@ -2,6 +2,7 @@
 
 [% IF error %]
 <p class="error">[% error | html %]</p>
+[% IF hint %]<p class="hint">[% hint | html %]</p>[% END %]
 [% END %]
 
 [%- IF back_url %]
@@ -23,7 +24,7 @@
 [% ELSE %]
 <p class="empty-state">
   No data files found in the <code>data/</code> directory.<br>
-  Add a <code>.csv</code>, <code>.psv</code>, <code>.xml</code> or <code>.sql</code> file there and restart, or drop a file below.
+  Add a <code>.csv</code>, <code>.psv</code>, <code>.xml</code>, <code>.sql</code>, <code>.db</code> or <code>.xlsx</code> file there and restart, or drop a file below.
 </p>
 [% END %]
 
@@ -33,7 +34,7 @@
 <div class="home-drop-zone" id="home-drop-zone" aria-label="Drop a database file here to open it">
   <span class="home-drop-zone-icon" aria-hidden="true">&#x1F4C2;</span>
   <span>Drop a database file to open it</span>
-  <span class="home-drop-hint">CSV &middot; PSV &middot; XML &middot; SQLite (.sql)</span>
+  <span class="home-drop-hint">CSV &middot; PSV &middot; XML &middot; SQLite (.sql) &middot; Berkeley DB (.db) &middot; XLSX</span>
 </div>
 
 <div class="home-action-cards">
@@ -41,8 +42,17 @@
   <div class="action-card">
     <span class="action-card-icon" aria-hidden="true">&#128269;</span>
     <h2 class="action-card-title">Browse your files</h2>
-    <p class="action-card-desc">Navigate your folders to find and open a data file stored on this computer.</p>
-    <a href="/browse" class="btn-action">Browse filesystem&hellip;</a>
+    <p class="action-card-desc">Type a path directly, or navigate your folders to find a data file.</p>
+    <form action="/open" method="GET" class="action-url-form">
+      <input type="text" name="path" id="bi-path-input"
+             placeholder="/path/to/file.csv"
+             required autocomplete="off" class="action-url-input"
+             aria-label="File path">
+      <div class="action-url-row">
+        <button type="submit" class="btn-action">Open</button>
+        <a href="/browse" class="btn-action">Browse filesystem&hellip;</a>
+      </div>
+    </form>
   </div>
 
   <div class="action-card">

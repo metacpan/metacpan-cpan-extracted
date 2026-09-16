@@ -1,0 +1,9 @@
+Revision history for Crypt-JWT-Tiny
+
+0.002     2026-09-15 16:48:49+02:00 Europe/Brussels
+          - Handle full media types in typ field
+          - Correctly handle offset=0 in relative_exp/relative_nbf
+          - Reject incorrectly sized MACs early
+
+0.001     2026-09-15 13:35:29+02:00 Europe/Brussels
+          - Initial release

@@ -1,20 +1,25 @@
 package Database::BI;
 
+# FIXME: Don't use Spreadsheet::ParseXLXS files when
+#	Database::Abstraction is fixed
+
 use Mojo::Base 'Mojolicious', -strict, -signatures;
 
 use Carp	qw(croak);
+use CHI		();
 use File::Spec	();
 use Readonly;
 
 use Database::BI::Model::DataSource;
 
-our $VERSION = '0.005.2';
+our $VERSION = '0.006.0';
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
-Readonly my $DEFAULT_DATA_DIR => 'data';
-Readonly my $DEFAULT_PLATFORM => 'web';
-Readonly my $DEFAULT_LANGUAGE => 'en';
+Readonly my $DEFAULT_DATA_DIR     => 'data';
+Readonly my $DEFAULT_PLATFORM     => 'web';
+Readonly my $DEFAULT_LANGUAGE     => 'en';
+Readonly my $DEFAULT_CACHE_TTL_URL => '15 min';
 
 # Transport-layer upload size cap (bytes).  Mojolicious enforces this before
 # the request body is read into memory, so an oversized upload never reaches
@@ -28,7 +33,7 @@ Database::BI - Web-based Business Intelligence viewer for flat data files
 
 =head1 VERSION
 
-0.005.2
+0.006.0
 
 =head1 DESCRIPTION
 
@@ -269,12 +274,17 @@ exist, the controller automatically falls back to the default language.  To
 add German support: (1) create C<templates/web/de/>, (2) copy and translate
 the C<.html.tt> files from C<templates/web/en/>, then (3) set the config.
 
-=item B<Supported data file extensions are: csv, db, sql, xml, psv>
+=item B<Supported data file extensions are: csv, db, sql, xml, psv, xlsx>
 
 The application calls C<Database::Abstraction> which recognises exactly these
-five extensions.  A file called C<inventory.sqlite> is B<not> recognised -- it
-must be renamed to C<inventory.sql>.  A file called C<data.xlsx> (Excel) is
-also not supported; export it as CSV first.
+extensions.  A file called C<inventory.sqlite> is B<not> recognised -- it
+must be renamed to C<inventory.sql>.  Excel C<.xlsx> files are supported
+directly via C<DBD::Excel>; each worksheet becomes a separate table.
+
+URLs will work.
+For example enter
+L<https://worldpopulationreview.com/country-rankings/immigration-by-country>
+into the C<Import from a web page> field on the dashboard.
 
 =item B<The open_table helper lowercases the table name>
 
@@ -365,16 +375,30 @@ sub startup ($self) {
 	# The directory=> option overrides the default so open_file and upload_file
 	# can open tables from arbitrary filesystem paths.
 	#
-	# Phase 2: swap Database::BI::Model::DataSource for Database::Join here;
-	# the controller and all templates are untouched.
+	# Joins are handled by Database::Join in the controller pipeline;
+	# open_table returns a single DataSource per table.
 	my $data_dir = $self->home->child($self->config->{data_dir})->to_string;
+
+	# In-process CHI cache: shared across all requests in the same worker process.
+	# The Memory driver needs no external services and works out of the box.
+	# Set global => 1 so the same namespace is reused across multiple open_table
+	# calls within one process rather than creating separate isolated caches.
+	my $cache_conf    = $self->config->{cache} // {};
+	my $cache_ttl_url = $cache_conf->{ttl_url} // $DEFAULT_CACHE_TTL_URL;
+	my $chi = CHI->new(
+		driver    => $cache_conf->{driver} // 'Memory',
+		global    => 1,
+		namespace => 'Database::BI',
+	);
 
 	$self->helper(open_table => sub($c, $table, %opts) {
 		# URL mode: fetch a remote HTML table directly via Database::Abstraction's
 		# URL backend (LWP::UserAgent + HTML::TableExtract).
 		if (exists $opts{url}) {
 			return Database::BI::Model::DataSource->new(
-				url => $opts{url},
+				url           => $opts{url},
+				cache         => $chi,
+				cache_ttl_url => $cache_ttl_url,
 				exists $opts{html_table_index}
 					? (html_table_index => $opts{html_table_index})
 					: (),
@@ -382,8 +406,10 @@ sub startup ($self) {
 		}
 		my $dir = exists $opts{directory} ? $opts{directory} : $data_dir;
 		Database::BI::Model::DataSource->new(
-			directory => $dir,
-			table     => $table,
+			directory     => $dir,
+			table         => $table,
+			cache         => $chi,
+			cache_ttl_url => $cache_ttl_url,
 		);
 	});
 

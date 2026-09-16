@@ -1,0 +1,69 @@
+# t/compliance/expected-fail.txt: requirements from the OpenAPI specification
+# that this build is known not to meet, one case id per line with the reason.
+#
+# IT IS EMPTY, over 104 cases. That is load-bearing rather than decorative:
+# with nothing listed, ANY case that stops meeting its requirement fails the
+# run immediately, because run.t treats an unlisted failure as an error.
+#
+# The rules run.t enforces:
+#
+#   * a case that is NOT listed and does not meet its requirement FAILS, so a
+#     gap can never be silent;
+#   * a case that IS listed and now meets its requirement FAILS too, naming
+#     itself, so this list only ever shrinks.
+#
+# To add an entry: `<id>  <reason>`, one per line. A reason says what is
+# missing, not merely that something is - a future reader has to be able to
+# tell a deliberate limitation from an outstanding bug. Nothing goes in here
+# on the strength of an assumption: list a case only after watching it fail,
+# by a case that probes the feature rather than asserting a verdict.
+#
+# HISTORY, because an empty file otherwise looks like one nobody wrote.
+# The catalogue began at 78 cases with 18 gaps; all 18 were fixed. It was then
+# EXTENDED to 104, into the areas it had barely touched - security scheme
+# structure, media type, responses, the Info/License/Tag objects, servers at
+# other levels, path templating, links - and that found 18 more. All 18 of
+# those were fixed too. Thirty-six entries have been removed from this file
+# and not one of them was excused.
+#
+# The second eighteen had a common cause worth recording: Open::API validated
+# REQUESTS and did very little to validate the DOCUMENT. It now refuses one
+# that omits a REQUIRED field or breaks a mutual exclusion the specification
+# states - Info title/version, License name, the 3.1 identifier/url exclusion,
+# Tag name, Response description, a media type's example/examples pair, an
+# oauth2 scheme's flows and each flow's scopes and URLs, openIdConnectUrl,
+# scopes on a scheme that may not carry them, two paths differing only in
+# their template variable names, and a Link naming an operationId nothing
+# declares. THAT IS A BEHAVIOUR CHANGE: documents that compiled before may now
+# be refused. Each was already invalid; it just used to load.
+#
+# Three removals changed the case, or the world around it, as well as the
+# code, and are recorded so the numbers are not read as more than they are:
+#
+#   openapi/servers, openapi/server-variables
+#       run with `Open::API->new(spec => ..., servers => 1)`. That option is
+#       OFF by default - honouring a server URL's path prefix re-routes an
+#       application that already mounts so PATH_INFO arrives without it, and
+#       that shows up as a silent 404 - so these measure what this build CAN
+#       do, not what it does when told not to. A document with a server prefix
+#       does not route out of the box.
+#
+#   parameter/allowReserved
+#       a client-side serialization rule, and the URL the client builds was
+#       unreachable from Perl. Rather than weaken the case until it passed -
+#       which was done once and reverted - the URL builder was split out of
+#       oa_cli_call and Open::API::Client::_request_url now exposes it.
+#
+#   mediatype/example-xor-examples
+#       t/spec/mock.json deliberately declared both, to pin the mock
+#       generator's precedence, and t/27 asserted it. The exclusion is
+#       normative, so the fixture was corrected and the assertion narrowed.
+#       The cost: example-beats-examples can now only arise in a document the
+#       specification forbids, so that step of the documented precedence is
+#       unreachable for valid input.
+#
+# One case was WITHDRAWN rather than listed: callback/expression-shape, which
+# asserted that a callback key which is not a runtime expression is refused. I
+# could not satisfy myself the specification makes a malformed key a document
+# error in those words, and a catalogue must not contain requirements its
+# author cannot point at in the text.

@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguWeb::Config;
-our $VERSION = '0.6.1';
+our $VERSION = '0.6.2';
 
 use App::FuguWeb;
 use App::FuguWeb::Manual;
@@ -1208,7 +1208,7 @@ sub _fail ( $self, $reason, $message )
 }
 
 package App::FuguWeb::Config::Group;
-our $VERSION = '0.6.1';
+our $VERSION = '0.6.2';
 
 # App::FuguWeb::Config::Group - one group of the manual index.
 #

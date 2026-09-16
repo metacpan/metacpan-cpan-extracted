@@ -81,4 +81,18 @@ sub slow_json {
     Mojo::IOLoop->timer($delay || 0.05 => sub { $c->render(json => $body) });
 }
 
+# The answer a batch gets from an origin that has nothing to say about any
+# address: every address in the body, answered with `is_vpn`. A POST /batch
+# carries its addresses in the body rather than the path, so this is where they
+# are read.
+sub batch_body {
+    my ($c, $is_vpn) = @_;
+    my $json = $c->req->json;
+    my $ips = ref $json eq 'HASH' && ref $json->{ips} eq 'ARRAY' ? $json->{ips} : [];
+    return {
+        results => { map { $_ => { ip => $_, is_vpn => $is_vpn ? \1 : \0 } } @$ips },
+        errors => {},
+    };
+}
+
 1;

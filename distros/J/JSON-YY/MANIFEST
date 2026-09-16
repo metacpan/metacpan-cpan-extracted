@@ -46,6 +46,7 @@ t/26_scalar_typing.t
 t/27_blessed.t
 t/28_depth.t
 t/29_api_polish.t
+t/30_boolean.t
 xt/leak.t
 YY.xs
 yyjson.c

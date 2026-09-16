@@ -216,16 +216,6 @@ static SV *oa_map_result(pTHX_ SV *res) {
 /* defined below, with the rest of the response-finalization helpers */
 static AV *oa_resp_headers(pTHX_ SV *resp);
 
-/* case-insensitive equality (the response-finalization section has the same
- * comparison as oa_ci_eq; this one is needed before it) */
-static int oa_ci_eq_fwd(const char *a, STRLEN al, const char *b, STRLEN bl) {
-    STRLEN i;
-    if (al != bl) return 0;
-    for (i = 0; i < al; i++)
-        if (toLOWER((U8)a[i]) != toLOWER((U8)b[i])) return 0;
-    return 1;
-}
-
 typedef struct oa_rvcfg {
     int  mode;         /* OA_RV_*                                        */
     SV  *report;       /* coderef for report mode (borrowed), or NULL    */
@@ -240,7 +230,7 @@ static SV *oa_hdr_get(pTHX_ AV *ha, const char *name, STRLEN nl) {
         SV **k = av_fetch(ha, i, 0);
         if (k && *k) {
             STRLEN kl; const char *kp = SvPV_const(*k, kl);
-            if (oa_ci_eq_fwd(kp, kl, name, nl)) {
+            if (oa_ci_eq(kp, kl, name, nl)) {
                 SV **v = av_fetch(ha, i + 1, 0);
                 return (v && *v && SvOK(*v)) ? *v : NULL;
             }
@@ -260,6 +250,10 @@ static SV *oa_resp_handle(pTHX_ oa_op *o, int status) {
     for (i = 0; i < o->nresps; i++) {
         STRLEN rl; const char *rp = SvPV_const(o->resps[i].status, rl);
         if (rl == sl && memEQ(rp, sbuf, sl)) return o->resps[i].handle;
+    }
+    for (i = 0; i < o->nresps; i++) {         /* a range key: 2XX, 4XX, ... */
+        STRLEN rl; const char *rp = SvPV_const(o->resps[i].status, rl);
+        if (oa_status_covers(rp, rl, sbuf, sl)) return o->resps[i].handle;
     }
     for (i = 0; i < o->nresps; i++) {
         STRLEN rl; const char *rp = SvPV_const(o->resps[i].status, rl);
@@ -316,13 +310,53 @@ static SV *oa_check_response_cfg(pTHX_ oa_op *o, SV *trip, const oa_rvcfg *rv,
     status = (int)SvIV(*st);
     ha = oa_resp_headers(aTHX_ trip);
 
+    /* `errs` is created up front, and every skip below jumps to `verdict`
+     * rather than returning. The declared HEADERS are checked FIRST, above
+     * the body skip rules, because those rules return early for a non-JSON,
+     * oversized or streaming body - which is exactly when a Location or an
+     * X-Rate-Limit header still has to be right. Returning from a skip would
+     * throw away findings already made. */
+    errs = (AV *)sv_2mortal((SV *)newAV());
+
+    /* 0. declared response headers, by status (exact, range, then default) */
+    if (o->nrhdrs) {
+        char sbuf[8];
+        STRLEN sl = (STRLEN)my_snprintf(sbuf, sizeof sbuf, "%d", status);
+        int hi, seen_any = 0;
+        for (hi = 0; hi < o->nrhdrs; hi++) {
+            STRLEN rl; const char *rp = SvPV_const(o->rhdrs[hi].status, rl);
+            oa_param *pp;
+            SV *hv_;
+            STRLEN nl; const char *np;
+            if (!(rl == sl && memEQ(rp, sbuf, sl))
+                && !oa_status_covers(rp, rl, sbuf, sl)
+                && !(rl == 7 && memEQ(rp, "default", 7)))
+                continue;
+            seen_any = 1;
+            pp = &o->rhdrs[hi].p;
+            np = SvPV_const(pp->name, nl);
+            hv_ = oa_hdr_get(aTHX_ ha, np, nl);
+            if (!hv_ || !SvOK(hv_)) {
+                if (pp->required) {
+                    o->rv.hdr_missing++;
+                    oa_err_push(aTHX_ errs, "response", pp->name, "required",
+                                "missing required response header");
+                }
+                continue;
+            }
+            if (!oa_check_param(aTHX_ pp, hv_, errs, "response"))
+                o->rv.hdr_invalid++;
+        }
+        if (seen_any) o->rv.hdr_checked++;
+    }
+
     /* 1. not a declared JSON content type */
     {
         SV *ct = oa_hdr_get(aTHX_ ha, "content-type", 12);
         STRLEN ctl; const char *ctp;
-        if (!ct) { o->rv.skip_ctype++; return NULL; }
+        if (!ct) { o->rv.skip_ctype++; goto verdict; }
         ctp = SvPV_const(ct, ctl);
-        if (!oa_ctype_is_json(ctp, ctl)) { o->rv.skip_ctype++; return NULL; }
+        if (!oa_ctype_is_json(ctp, ctl)) { o->rv.skip_ctype++; goto verdict; }
     }
 
     /* 2. Content-Length absent or over the cap. Only with a cap set: without
@@ -332,7 +366,7 @@ static SV *oa_check_response_cfg(pTHX_ oa_op *o, SV *trip, const oa_rvcfg *rv,
         cl = oa_hdr_get(aTHX_ ha, "content-length", 14);
         if (!cl || !looks_like_number(cl) || SvIV(cl) > rv->max_body) {
             o->rv.skip_size++;
-            return NULL;
+            goto verdict;
         }
     }
 
@@ -341,25 +375,27 @@ static SV *oa_check_response_cfg(pTHX_ oa_op *o, SV *trip, const oa_rvcfg *rv,
     bd = av_fetch(tv, 2, 0);
     if (!bd || !*bd || !SvROK(*bd) || SvTYPE(SvRV(*bd)) != SVt_PVAV) {
         o->rv.skip_body++;
-        return NULL;
+        goto verdict;
     }
     ba = (AV *)SvRV(*bd);
     b0 = av_fetch(ba, 0, 0);
     if (!b0 || !*b0 || !SvOK(*b0) || SvROK(*b0)) {
         o->rv.skip_body++;
-        return NULL;
+        goto verdict;
     }
 
     /* 4. the status declares no schema */
     handle = oa_resp_handle(aTHX_ o, status);
-    if (!handle) { o->rv.skip_schema++; return NULL; }
+    if (!handle) { o->rv.skip_schema++; goto verdict; }
 
     data = oa_body_decode(aTHX_ *b0);
-    if (!data) { o->rv.skip_decode++; return NULL; }
+    if (!data) { o->rv.skip_decode++; goto verdict; }
 
-    errs = (AV *)sv_2mortal((SV *)newAV());
     o->rv.checked++;
-    if (JSF->validate(aTHX_ handle, data, errs)) return NULL;
+    (void)JSF->validate(aTHX_ handle, data, errs);
+
+verdict:
+    if (av_len(errs) < 0) return NULL;      /* nothing found, body or header */
 
     o->rv.violations++;
     for (j = 0; j <= av_len(errs); j++) {
@@ -450,15 +486,6 @@ static AV *oa_resp_headers(pTHX_ SV *resp) {
 static void oa_hdr_push(pTHX_ AV *ha, const char *name, SV *val) {
     av_push(ha, newSVpv(name, 0));
     av_push(ha, newSVsv(val));
-}
-
-/* case-insensitive equality */
-static int oa_ci_eq(const char *a, STRLEN al, const char *b, STRLEN bl) {
-    STRLEN i;
-    if (al != bl) return 0;
-    for (i = 0; i < al; i++)
-        if (toLOWER((U8)a[i]) != toLOWER((U8)b[i])) return 0;
-    return 1;
 }
 
 /* join an AV of strings with ", " (mortal SV), NULL when empty */
@@ -740,7 +767,10 @@ static SV *oa_check_request_ctype(pTHX_ oa_op *o, HV *env) {
     rp = SvPV_const(ct, rl);
     for (i = 0; i < o->nbodies; i++) {
         STRLEN dl; const char *dp = SvPV_const(o->bodies[i].ctype, dl);
-        if (oa_media_eq(rp, rl, dp, dl)) { match = 1; break; }
+        /* oa_ctype_matches, not oa_media_eq: a declared range has to admit the
+         * types it covers here too, or the 415 gate refuses a body that
+         * oa_body_for would have accepted. */
+        if (oa_ctype_matches(dp, dl, rp, rl)) { match = 1; break; }
     }
     return match ? NULL : oa_error_msg(aTHX_ 415, "unsupported media type");
 }
@@ -928,6 +958,15 @@ static SV *oa_sec_extract(pTHX_ oa_scheme *s, HV *env) {
             return sv_2mortal(newSVpvn(ap + wl, al - wl));
         dec = oa_b64_decode(aTHX_ ap + wl, al - wl);
         return dec ? sv_2mortal(dec) : NULL;
+    }
+    case OA_SEC_OTHER: {
+        /* A scheme this library cannot settle: hand the checker whatever the
+         * request carried and let it decide. Something truthy has to come
+         * back even when there is no header, or the alternative could never
+         * be satisfied - mutualTLS carries no credential in the request, it
+         * is settled by the transport. */
+        SV *az = oa_env_get(aTHX_ env, "HTTP_AUTHORIZATION");
+        return (az && SvOK(az)) ? sv_mortalcopy(az) : sv_2mortal(newSViv(1));
     }
     }
     return NULL;

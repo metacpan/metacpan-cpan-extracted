@@ -1,0 +1,34 @@
+Changes
+Codec.xs
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+bench/codec.pl
+ignore.txt
+include/sc/sc_abi_impl.h
+include/sc/sc_codec.h
+include/sc/sc_format.h
+include/sc_abi.h
+lib/Struct/Codec.pm
+t/00-load.t
+t/10-encode.t
+t/12-decode.t
+t/14-corrupt.t
+t/16-leak.t
+t/20-abi.t
+t/22-refcounts.t
+t/24-boundaries.t
+t/25-wide-nv.t
+t/26-random.t
+t/28-processes.t
+t/30-encode-to.t
+t/32-kinds.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xs/abi.xs
+xt/boilerplate.t
+xt/implicit-sys.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

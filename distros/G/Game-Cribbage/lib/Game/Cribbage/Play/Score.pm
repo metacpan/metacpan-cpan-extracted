@@ -15,7 +15,7 @@ has scores => (
 			fifteen => 2,
 			go => 1,
 			pegged => 1,
-			flipped => 1
+			flipped => 2
 		}
 	}
 );
@@ -57,7 +57,7 @@ Game::Cribbage::Play::Score - score object for a single card play
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 
@@ -91,7 +91,7 @@ Built automatically; do not set manually.
 	#   fifteen => 2,
 	#   go      => 1,
 	#   pegged  => 1,
-	#   flipped => 1,
+	#   flipped => 2,
 	# }
 
 =head2 total_score

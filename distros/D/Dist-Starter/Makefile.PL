@@ -70,9 +70,13 @@ if ( caller() ) {
   ExtUtils::MakeMaker::CPANfile->import;
 
   require File::ShareDir::Install;
-  no warnings qw( once );
-  $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
-  File::ShareDir::Install::install_share( dist => 'share' );
+  {
+    no warnings qw( once );
+    $File::ShareDir::Install::INCLUDE_DOTFILES = 1
+  }
+  my $share_dir = 'share';
+  mkdir $share_dir unless -d $share_dir;
+  File::ShareDir::Install::install_share( dist => $share_dir );
 
   local @INC = ( @INC, '.' ) if $] >= 5.026;
   can_load( modules => { MY => 0 } )

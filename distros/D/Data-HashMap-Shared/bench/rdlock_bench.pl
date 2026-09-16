@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
-# Focused incr_by benchmark: measures the lock-free fast path that is hottest
-# in the bidder workload. Runs single-process and multi-process variants.
+# incr_by on existing keys: the read-lock fast path (an atomic add, no write lock).
+# Runs single-process and multi-process variants.
 
 use strict;
 use warnings;
@@ -56,7 +56,7 @@ sub bench_incr_by {
     my ($n_workers) = @_;
     my $tmp = File::Temp::tempnam(File::Temp::tempdir(CLEANUP => 1), 'bench');
     my $m = Data::HashMap::Shared::SI->new($tmp . ".shm", 100_000);
-    # Pre-populate keys to exercise the existing-key lock-free fast path
+    # Pre-populate keys so every incr_by takes the existing-key fast path
     $m->put("k$_", 0) for 1 .. $key_range;
     my $end = time + $duration;
     run_workers(sprintf('SI incr_by (%d procs)', $n_workers), $n_workers, sub {
@@ -73,7 +73,7 @@ sub bench_incr_by {
     });
 }
 
-print "Benchmark: incr_by on existing key (lock-free fast path)\n";
+print "Benchmark: incr_by on existing key (read-lock fast path)\n";
 print "Duration: ${duration}s, key range: $key_range\n\n";
 bench_incr_by(1);
 bench_incr_by(4);

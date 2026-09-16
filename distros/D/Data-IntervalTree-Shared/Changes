@@ -1,5 +1,9 @@
 Revision history for Data-IntervalTree-Shared
 
+0.03      2026-09-15
+          - Recover a lock left ownerless by a corrupt file instead of hanging.
+          - Fix a writer stall on ARM64 after readers release.
+
 0.02      2026-08-12
           - Recover a file left behind by an interrupted create instead of
             leaving the path unopenable.

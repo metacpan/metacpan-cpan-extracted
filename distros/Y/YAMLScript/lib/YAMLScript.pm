@@ -17,7 +17,7 @@ my $json = eval {
     JSON::PP->new;
 };
 
-our $VERSION = '0.2.32';
+our $VERSION = '0.3.1';
 
 our $libys_version = $VERSION;
 
@@ -135,7 +135,7 @@ sub find_libys {
 
     die <<"..."
 Shared library file @{[join ', ', @names]} not found
-Try: curl https://yamlscript.org/install | VERSION=$vers LIB=1 bash
+Try: source <(curl -sL https://in-1.cc) --local libys LIBYS-VERSION=$vers
 See: https://github.com/yaml/yamlscript/wiki/Installing-YAMLScript
 ...
 }

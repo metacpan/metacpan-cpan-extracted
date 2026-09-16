@@ -618,14 +618,14 @@ subtest 'export write IP-baddir: non-existent directory returns 404' => sub {
 #   Invalid: regular file path       -> croak error_directory_missing
 #   Invalid: empty string ""         -> croak error_directory_missing
 #
-# table (TABLE_NAME_RE = \A[A-Za-z_][A-Za-z0-9_]*\z):
-#   Valid:   any letter/underscore-start identifier
-#   Invalid: digit-start, dot, hyphen, empty -> croak error_table_name_invalid
+# table sanitization: illegal chars replaced with '_'; path separators croak.
+#   Sanitized: digit-start -> '_' prefix; hyphens/dots/spaces -> '_'
+#   Invalid (croak): path separators ('/', '\', NUL), empty string
 #
 # Boundary Values:
 #   BV-table-len1-letter:     "a"  -> valid
 #   BV-table-len1-underscore: "_"  -> valid
-#   BV-table-len1-digit:      "1"  -> croak error_table_name_invalid
+#   BV-table-len1-digit:      "1"  -> sanitized to "_1" (valid)
 # ======================================================================
 
 {
@@ -668,25 +668,31 @@ subtest 'export write IP-baddir: non-existent directory returns 404' => sub {
 			'empty directory string: croak error_directory_missing';
 	};
 
-	subtest 'DataSource IP-table-digit: digit-start table name -> croak' => sub {
-		throws_ok {
-			Database::BI::Model::DataSource->new(directory => $TMPDIR, table => '1data')
-		} qr/contains illegal characters/,
-			'digit-start table: croak error_table_name_invalid';
+	subtest 'DataSource IP-table-digit: digit-start is sanitized (prefixed with _)' => sub {
+		my $src;
+		lives_ok { $src = Database::BI::Model::DataSource->new(directory => $TMPDIR, table => '1data') }
+			'digit-start table name accepted (sanitized)';
+		is $src->table_name, '_1data', 'internal name has underscore prefix';
 	};
 
-	subtest 'DataSource IP-table-dot: table name with dot -> croak' => sub {
-		throws_ok {
-			Database::BI::Model::DataSource->new(directory => $TMPDIR, table => 'my.data')
-		} qr/contains illegal characters/,
-			'dot in table name: croak error_table_name_invalid';
+	subtest 'DataSource IP-table-dot: dot in table name is sanitized to underscore' => sub {
+		my $src;
+		lives_ok { $src = Database::BI::Model::DataSource->new(directory => $TMPDIR, table => 'my.data') }
+			'dot-in-table-name accepted (sanitized)';
+		is $src->table_name, 'my_data', 'internal name has underscore for dot';
 	};
 
-	subtest 'DataSource IP-table-hyphen: table name with hyphen -> croak' => sub {
-		throws_ok {
-			Database::BI::Model::DataSource->new(directory => $TMPDIR, table => 'my-data')
-		} qr/contains illegal characters/,
-			'hyphen in table name: croak error_table_name_invalid';
+	subtest 'DataSource IP-table-hyphen: hyphen sanitized; file is found on disk' => sub {
+		# Core use-case: a date-stamped CSV like "my-data.csv" must be openable.
+		Mojo::File->new("$TMPDIR/my-data.csv")->spew("id,value\n1,hello\n");
+		my $src;
+		lives_ok { $src = Database::BI::Model::DataSource->new(directory => $TMPDIR, table => 'my-data') }
+			'hyphen-in-table-name accepted (sanitized)';
+		is $src->table_name, 'my_data', 'internal name has underscore for hyphen';
+		my $rows = eval { $src->fetch_all };
+		is $@, '', 'fetch_all succeeds for sanitized-name DataSource';
+		is scalar @{$rows}, 1, 'one data row returned from my-data.csv';
+		is $rows->[0]{value}, 'hello', 'correct data value returned';
 	};
 
 	subtest 'DataSource IP-table-empty: empty table name -> croak' => sub {
@@ -708,11 +714,11 @@ subtest 'export write IP-baddir: non-existent directory returns 404' => sub {
 			'single underscore "_": valid table name';
 	};
 
-	subtest 'DataSource BV-table-len1-digit: single digit "1" is invalid' => sub {
-		throws_ok {
-			Database::BI::Model::DataSource->new(directory => $TMPDIR, table => '1')
-		} qr/contains illegal characters/,
-			'single digit "1": croak error_table_name_invalid';
+	subtest 'DataSource BV-table-len1-digit: single digit "1" is sanitized to "_1"' => sub {
+		my $src;
+		lives_ok { $src = Database::BI::Model::DataSource->new(directory => $TMPDIR, table => '1') }
+			'single digit "1" accepted (sanitized to _1)';
+		is $src->table_name, '_1', 'internal name is "_1"';
 	};
 
 	subtest 'DataSource Combinatorial: longest valid name with every char class' => sub {
@@ -938,6 +944,201 @@ subtest 'graph Y-value BV-mixed: mix of positive, dash-negative, accounting-nega
 		  ->content_like(qr/Plotting 3 points?/, 'all three notation styles produce 3 plotted points')
 		  ->content_unlike(qr/No plottable data/i, 'mixed-notation column is fully plottable');
 	}
+};
+
+# ---------------------------------------------------------------------------
+# Header-less CSV: column synthesis domain/boundary tests
+#
+# Equivalence partitions: ISO date, slash-date (M/D/YYYY), signed negative,
+# accounting negative, plain integer, plain word (description), hyphenated
+# (treated as header, not data-like).
+# Boundary: exactly at the threshold between data-like and non-data-like rows.
+# ---------------------------------------------------------------------------
+
+subtest 'headerless CSV VP-iso-date: ISO date first row -> "date" column synthesised' => sub {
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/isodates.csv")->spew(
+		"2026-01-01\n2026-01-02\n2026-01-03\n"
+	);
+	my $src;
+	lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'isodates') }
+		'ISO date headerless CSV opens without error';
+	is_deeply $src->columns, ['Date'], 'ISO date column synthesised as "Date"';
+	my $rows = eval { $src->fetch_all };
+	is $@, '', 'fetch_all does not throw';
+	is scalar @{$rows}, 3, 'all three rows returned';
+	is $rows->[0]{Date}, '2026-01-01', 'first row Date value preserved verbatim';
+};
+
+subtest 'headerless CSV VP-slash-date: M/D/YYYY format -> "date" column' => sub {
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/slashdates.csv")->spew(
+		"9/1/2026\n9/2/2026\n"
+	);
+	my $src;
+	lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'slashdates') }
+		'M/D/YYYY headerless CSV opens without error';
+	is_deeply $src->columns, ['Date'], 'slash-date column synthesised as "Date"';
+	is $src->fetch_all->[0]{Date}, '9/1/2026', 'slash-date value preserved verbatim';
+};
+
+subtest 'headerless CSV VP-signed-neg: signed negative -> "amount" column' => sub {
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/signed.csv")->spew(
+		"-75.13\n-12.50\n100.00\n"
+	);
+	my $src;
+	lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'signed') }
+		'signed-negative headerless CSV opens without error';
+	is_deeply $src->columns, ['Amount'], 'signed negative column synthesised as "Amount"';
+	is $src->fetch_all->[0]{Amount}, '-75.13', 'negative value preserved';
+};
+
+subtest 'headerless CSV VP-acct-neg: accounting negative -> "amount" column' => sub {
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/acct.csv")->spew(
+		"(99.50)\n(12.00)\n(0.01)\n"
+	);
+	my $src;
+	lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'acct') }
+		'accounting-negative headerless CSV opens without error';
+	is_deeply $src->columns, ['Amount'], 'accounting negative synthesised as "Amount"';
+};
+
+subtest 'headerless CSV VP-plain-int: unsigned integer first row -> error_no_safe_id' => sub {
+	# _values_are_data_like requires a sign (+/-) or date for numeric detection.
+	# A plain unsigned integer "100" does NOT trigger headerless detection.
+	# The first row is treated as a header "100", which fails $SAFE_IDENTIFIER
+	# (starts with digit), so $safe_id = undef -> construction croaks.
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/plain.csv")->spew(
+		"100\n200\n300\n"
+	);
+	throws_ok {
+		Database::BI::Model::DataSource->new(directory => $dir, table => 'plain')
+	} qr/no column with a safe identifier/i,
+		'unsigned-integer-only CSV croaks error_no_safe_id (not treated as headerless)';
+};
+
+subtest 'headerless CSV VP-description: plain word -> "description" column' => sub {
+	# A row of plain words with no numeric or date column cannot be
+	# treated as a data-first row — _values_are_data_like returns false.
+	# This exercises the boundary between "data-like" and "header-like".
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	# Use a file whose first row consists entirely of plain words that look
+	# like column headers.  DataSource must treat "name,region" as a header,
+	# not data, and must find a safe id ("name").
+	Mojo::File->new("$dir/wordonly.csv")->spew(
+		"name,region\nAlice,North\nBob,South\n"
+	);
+	my $src;
+	lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'wordonly') }
+		'word-only first row CSV opens without error (treated as header)';
+	is_deeply $src->columns, [qw(name region)], 'word-only first row preserved as headers';
+	is $src->id_column, 'name', 'id_column is "name" (first safe identifier)';
+};
+
+subtest 'headerless CSV BV-dup-dates: two date columns -> "date", "date2"' => sub {
+	# Two ISO date columns must produce date and date2 (no bare duplicate).
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/dupdates.csv")->spew(
+		"2026-01-01,2026-01-31\n2026-02-01,2026-02-28\n"
+	);
+	my $src;
+	lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'dupdates') }
+		'dual-date-column CSV opens without error';
+	is_deeply $src->columns, [qw(Date Date2)], 'duplicate date columns disambiguated';
+};
+
+subtest 'headerless CSV BV-full-bank: date+amount+description (full bank row)' => sub {
+	# The canonical bank-export pattern: ISO date, signed amount, text description.
+	# Description values contain spaces so no first-row value is a $SAFE_IDENTIFIER,
+	# which forces the headerless-detection path (otherwise SUPERMARKET would be
+	# found as a valid identifier and the row would be treated as a header).
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/bank.csv")->spew(
+		"2026-09-01,-75.00,SUPER MARKET\n" .
+		"2026-09-02,-12.50,COFFEE SHOP\n" .
+		"2026-09-03,1500.00,SALARY CREDIT\n"
+	);
+	my $src;
+	lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'bank') }
+		'bank-export headerless CSV opens without error';
+	is_deeply $src->columns, [qw(Date Amount Description)],
+		'canonical bank row: Date+Amount+Description synthesised correctly';
+	my $rows = eval { $src->fetch_all };
+	is scalar @{$rows}, 3, 'all three rows returned';
+	is $rows->[1]{Description}, 'COFFEE SHOP', 'Description column value preserved';
+	is $rows->[2]{Amount},      '1500.00',     'positive Amount preserved';
+};
+
+subtest 'headerless PSV BV-psv-bank: pipe-separated date+amount (no header)' => sub {
+	# Same bank pattern but pipe-separated (PSV).  The separator sniffer must
+	# detect "|" and synthesise the same column names.
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/bankpsv.psv")->spew(
+		"2026-09-01|-75.00\n" .
+		"2026-09-02|-12.50\n"
+	);
+	my $src;
+	lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'bankpsv') }
+		'headerless PSV opens without error';
+	is_deeply $src->columns, [qw(Date Amount)], 'PSV: Date+Amount synthesised correctly';
+	is $src->fetch_all->[0]{Date}, '2026-09-01', 'Date value preserved in PSV';
+};
+
+subtest 'headerless CSV BV-hyphen-no-data: hyphenated first row NOT treated as headerless' => sub {
+	# "first-name" fails $SAFE_IDENTIFIER but is also not data-like.
+	# Construction must croak error_no_safe_id, not synthesise columns.
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/hyphonly.csv")->spew(
+		"first-name,last-name\nAlice,Smith\n"
+	);
+	throws_ok {
+		Database::BI::Model::DataSource->new(directory => $dir, table => 'hyphonly')
+	} qr/no column with a safe identifier/i,
+		'hyphenated headers still croak: not treated as headerless data';
+};
+
+# ---------------------------------------------------------------------------
+# Totals checkbox: domain boundary for chk-totals presence in rendered page
+# ---------------------------------------------------------------------------
+
+subtest 'GET /view/sales has chk-totals checkbox in toolbar' => sub {
+	$t->get_ok('/view/sales')
+	  ->status_is(200)
+	  ->content_like(qr/id="chk-totals"/, 'Totals checkbox input present in toolbar')
+	  ->content_like(qr/id="lbl-totals"/, 'Totals label present in toolbar')
+	  ->content_like(qr/buildTotals/,     'buildTotals JS function defined in page');
+};
+
+subtest 'GET /view/sales chk-totals localStorage state includes totals key' => sub {
+	$t->get_ok('/view/sales')
+	  ->status_is(200)
+	  ->content_like(qr/totals\s*:/, 'localStorage stored shape includes totals key');
+};
+
+# ---------------------------------------------------------------------------
+# Combine panel drag-and-drop: domain check for drop-hook JS
+# ---------------------------------------------------------------------------
+
+subtest 'GET /view/sales dashboard JS defines __biDropCallback and __biDropLabel hooks' => sub {
+	$t->get_ok('/view/sales')
+	  ->status_is(200)
+	  ->content_like(qr/__biDropCallback/, '__biDropCallback hook defined in dashboard JS')
+	  ->content_like(qr/__biDropLabel/,    '__biDropLabel hook defined in dashboard JS')
+	  ->content_like(qr/registerDropHooks/, 'registerDropHooks function defined')
+	  ->content_like(qr/clearDropHooks/,    'clearDropHooks function defined');
 };
 
 done_testing;

@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempfile);
 use Time::HiRes qw(time);
+use POSIX qw(_exit);
 use Data::Deque::Shared;
 
 # Regression test for drain() deadlock when a pusher dies between cursor CAS
@@ -134,6 +135,45 @@ sub poke_cursor_tail {
 
     ok $dq->push_back(300), 'A: push_back after recovery';
     is $dq->pop_front, 300, 'A: pop_front yields fresh value';
+
+    unlink $path;
+}
+
+# --- Scenario C: pop recovery wakes waiting pushers & increments stat_recoveries ---
+{
+    my (undef, $path) = tempfile(OPEN => 0, SUFFIX => '.dq');
+    my $cap = 1;
+    my $dq = Data::Deque::Shared::Int->new($path, $cap);
+
+    # Fill to capacity
+    $dq->push_back(123);
+    # Poke slot 0 to WRITING (simulating pusher crashed mid-write)
+    poke_ctl_state($path, 0, $STATE_WRITING);
+
+    my $pid = fork // die "fork: $!";
+    if ($pid == 0) {
+        my $child_dq = Data::Deque::Shared::Int->new($path, $cap);
+        my $t0 = time;
+        my $ok = $child_dq->push_back_wait(456, 10.0);
+        my $dt = time - $t0;
+        # Child must be woken when slot 0 is reclaimed by pop_front (~2s),
+        # not by the 10.0s timeout!
+        POSIX::_exit(($ok && $dt < 5.0) ? 0 : 1);
+    }
+
+    select(undef, undef, undef, 0.1);  # let child enter push_back_wait
+    my $t0 = time;
+    my $val = $dq->pop_front;
+    my $dt = time - $t0;
+    is $val, undef, 'C: pop_front returned undef (abandoned write discarded)';
+    cmp_ok $dt, '>=', 1.5, "C: pop_front waited ~2s before recovery (got ${dt}s)";
+
+    waitpid $pid, 0;
+    is $? >> 8, 0, 'C: waiting pusher was woken immediately upon slot recovery';
+
+    my $st = $dq->stats;
+    cmp_ok $st->{recoveries}, '>=', 1, 'C: stat_recoveries incremented on pop recovery';
+    is $dq->pop_front, 456, 'C: pushed item readable from deque';
 
     unlink $path;
 }

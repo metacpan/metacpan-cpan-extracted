@@ -46,4 +46,28 @@ use Data::BitSet::Shared;
     ok !$b->any, "any=false on empty";
 }
 
+# Padding bits in the last word do not affect count/any/none
+{
+    use File::Temp qw(tempfile);
+    my ($fh, $filename) = tempfile(UNLINK => 1);
+    close $fh;
+    my $b = Data::BitSet::Shared->new($filename, 10);
+    is $b->count, 0, "initial count=0";
+    # Poke a padding bit (bit 15) directly into the file
+    open my $f, '+<:raw', $filename or die $!;
+    seek $f, 128, 0; # data_off = 128
+    my $w;
+    read $f, $w, 8;
+    my $val = unpack('Q', $w);
+    $val |= (1 << 15); # bit 15 >= cap (10)
+    seek $f, 128, 0;
+    print $f pack('Q', $val);
+    close $f;
+    # Re-open and verify count / any ignore the padding bit
+    my $b2 = Data::BitSet::Shared->new($filename, 10);
+    is $b2->count, 0, "count ignores padding bits beyond capacity";
+    ok !$b2->any, "any ignores padding bits beyond capacity";
+    ok $b2->none, "none ignores padding bits beyond capacity";
+}
+
 done_testing;

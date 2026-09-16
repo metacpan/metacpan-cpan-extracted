@@ -184,4 +184,74 @@ for my $v (@variants) {
     }
 }
 
+# A key_off in the reserved prefix (< SHM_ARENA_MIN_ALLOC = 16) must be treated
+# as invalid/miss across all paths as well.
+{
+    my $dir4 = tempdir(CLEANUP => 1);
+    my $path = "$dir4/reserved.hm";
+    my $KEY3 = 'a-key-well-over-the-inline-limit';
+    { my $m = Data::HashMap::Shared::SS->new($path, 64); $m->put($KEY3, 'value'); $m->sync }
+
+    open my $f3, '+<:raw', $path or die $!;
+    my $d = do { local $/; <$f3> };
+    my ($node_size)  = unpack 'L', substr($d, 12, 4);
+    my ($cap)        = unpack 'L', substr($d, 20, 4);
+    my ($nodes_off)  = unpack 'Q', substr($d, 40, 8);
+    my ($states_off) = unpack 'Q', substr($d, 48, 8);
+    my $slot;
+    for my $i (0 .. $cap - 1) {
+        $slot = $i, last if unpack('C', substr($d, $states_off + $i, 1)) >= 2;
+    }
+    ok defined $slot, 'reserved prefix test: located the live slot';
+    seek $f3, $nodes_off + $slot * $node_size, 0 or die $!;
+    print $f3 pack 'L', 4;  # 4 < SHM_ARENA_MIN_ALLOC (16)
+    close $f3 or die $!;
+
+    for my $op (qw(get exists remove keys values each cursor to_hash drain)) {
+        my $pid = fork // die "fork: $!";
+        unless ($pid) {
+            my $m = Data::HashMap::Shared::SS->new($path, 64);
+            if    ($op eq 'get')     { POSIX::_exit(defined $m->get($KEY3) ? 1 : 0) }
+            elsif ($op eq 'exists')  { POSIX::_exit($m->exists($KEY3) ? 1 : 0) }
+            elsif ($op eq 'remove')  { $m->remove($KEY3) }
+            elsif ($op eq 'keys')    { my @k = $m->keys }
+            elsif ($op eq 'values')  { my @v = $m->values }
+            elsif ($op eq 'each')    { while (my ($k, $v) = $m->each) { } }
+            elsif ($op eq 'cursor')  { my $c = $m->cursor; while (my ($k, $v) = $c->next) { } }
+            elsif ($op eq 'to_hash') { my $h = $m->to_hash }
+            elsif ($op eq 'drain')   { my @d = $m->drain(10) }
+            POSIX::_exit(0);
+        }
+        waitpid $pid, 0;
+        is($?, 0, "$op() safely handles key_off in reserved prefix (< 16)")
+            or diag sprintf('child died with status %d', $?);
+    }
+
+    # The read of a reserved-prefix offset delivers an empty string, not the
+    # bytes it points at: this is what the < 16 guard adds over the upper-bound
+    # check, which alone would return the prefix bytes (a sub-16 offset is still
+    # inside the mapping, so no crash distinguishes the two).  A fresh map, since
+    # the drain above empties the shared one (remove misses the poisoned key).
+    my $rpath = "$dir4/reserved-read.hm";
+    { my $m = Data::HashMap::Shared::SS->new($rpath, 64); $m->put($KEY3, 'value'); $m->sync }
+    open my $rf, '+<:raw', $rpath or die $!;
+    my $rd = do { local $/; <$rf> };
+    my ($rns) = unpack 'L', substr($rd, 12, 4);
+    my ($rcap) = unpack 'L', substr($rd, 20, 4);
+    my ($rno) = unpack 'Q', substr($rd, 40, 8);
+    my ($rso) = unpack 'Q', substr($rd, 48, 8);
+    my $rslot;
+    for my $i (0 .. $rcap - 1) {
+        $rslot = $i, last if unpack('C', substr($rd, $rso + $i, 1)) >= 2;
+    }
+    seek $rf, $rno + $rslot * $rns, 0 or die $!;
+    print $rf pack 'L', 4;
+    close $rf or die $!;
+    my $ro = Data::HashMap::Shared::SS->new($rpath, 64);
+    my @k = $ro->keys;
+    is scalar @k, 1, 'the poisoned slot is still iterated';
+    is $k[0], '', '  ... and its key reads as empty, not the reserved-prefix bytes';
+    ok exists $ro->to_hash->{''}, 'to_hash keys the poisoned slot empty too';
+}
+
 done_testing;

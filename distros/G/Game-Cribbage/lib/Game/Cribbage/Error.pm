@@ -19,7 +19,7 @@ Game::Cribbage::Error - error object returned by game operations
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 

@@ -540,7 +540,7 @@ CONSTRUCTOR
 
         The profile's identity headers (User-Agent + "Sec-CH-UA") are forced
         over the curl target's defaults, so even a Windows profile is
-        coherent on the (macOS-built) "chrome131" target -- Windows and
+        coherent on the (macOS-built) "chrome150" target -- Windows and
         macOS Chrome share the same TLS/HTTP2, so only the header values
         differ. WebKit is told to accept the proxy's self-signed cert
         (set_tls_errors_policy('ignore')); this is safe because the

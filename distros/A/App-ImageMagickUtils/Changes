@@ -1,13 +1,27 @@
+0.025   2026-09-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLI: resize-image.
+
+
 0.024   2024-12-21  Released-By: PERLANCAR; Urgency: medium
 
         - Rename module Regexp::Pattern::Filename::{,Type::}*.
 
 
-0.023   2024-11-20  Released-By: PERLANCAR; Urgency: low
+0.023.1 2024-11-20  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.
 
         - [doc] Add FAQ item.
+
+        - UPDATE: rename release 0.023 -> 0.023.1 due to conflict.
+
+
+0.023   2024-08-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Math::Image::CalcResized (0.006).
 
 
 0.022   2024-01-15  Released-By: PERLANCAR; Urgency: medium

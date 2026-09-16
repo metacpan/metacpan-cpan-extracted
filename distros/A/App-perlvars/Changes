@@ -1,5 +1,8 @@
 Revision history for App-perlvars
 
+0.000007  2026-09-15 20:55:39Z
+    - Add a --version flag to perlvars (GH#38) (Olaf Alders)
+
 0.000006  2024-09-16 16:33:54Z
     - Revert obviated portions of PR #12 (GH#18) (Håkon Hægland)
 

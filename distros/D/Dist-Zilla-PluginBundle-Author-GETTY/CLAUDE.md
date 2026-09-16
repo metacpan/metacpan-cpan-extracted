@@ -1,19 +1,21 @@
 # CLAUDE.md
 
-## Shared CI
+This repo is the `[@Author::GETTY]` plugin bundle itself — the release/CI machinery every
+other GETTY dist inherits, dogfooded on its own source via `[Bootstrap::lib]`.
 
-- This repo hosts the composite action `.github/actions/dzil-test` that every
-  `[@Author::GETTY]` dist's workflow consumes via
-  `uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main`.
-  It is the single source of truth for the dzil CI mechanics.
-- The action installs deps with **`dzil listdeps --author`** (not plain
-  `listdeps`). The `--author` flag pulls develop-phase author-test deps like
-  `Test::Pod` that `[PodSyntaxTests]` registers. **Never fake `Test::Pod` (or
-  other author-test deps) into a dist's cpanfile `on test`** — that hack is
-  what this setup removes.
-- The bundle's own `.github/workflows/ci.yml` dogfoods the action via the local
-  path `./.github/actions/dzil-test`.
+## Delegation
 
-## Git Commits
+Delegate behavior-relevant code to the right agent instead of touching it yourself —
+principle and lanes are in `.claude/rules/dist-zilla-pluginbundle-author-getty-rules.md`.
 
-- **NEVER prefix commit subjects with `[@Author::*]` or similar bundle/plugin tags.** Describe the change directly. Example: `add [GitHub::CreateRelease] when GitHub integration is active`, NOT `[@Author::GETTY] add ...`. Plugin/module names inside the message body (e.g. `[GitHub::CreateRelease]`) are fine — only the leading `[@Author::*]` namespace prefix is forbidden. Out of ~117 commits in this repo, only 1 had such a prefix (a Claude mistake).
+| Task | Agent |
+|---|---|
+| Implement / refactor / debug the bundle, subsection, GiteaMeta, the CI action | `dist-zilla-pluginbundle-author-getty-worker` (default) |
+| Write/extend tests | `dist-zilla-pluginbundle-author-getty-test-writer` |
+| Pre-release audit | `dist-zilla-pluginbundle-author-getty-release-checker` |
+
+The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main
+agent delegates rather than loading them. Architecture, the shared `dzil-test` CI action
+(`dzil listdeps --author`, no faked `Test::Pod`), and the commit-message convention live
+in `.claude/skills/dist-zilla-pluginbundle-author-getty-core/` and the rules file — not
+here.

@@ -298,40 +298,35 @@ subtest 'GET /view/<letter-start> still works (normal tables)' => sub {
 };
 
 # ---------------------------------------------------------------------------
-# Section 5: open_file with digit-leading filename -- regression test
+# Section 5: open_file with formerly-problematic filenames
 #
-# Bug: upload_file accepts "1data.csv" (extension valid), but when a user
-# later opens it via GET /open, the derived table name "1data" fails
-# DataSource's TABLE_NAME_RE.  The open_table call was OUTSIDE the eval in
-# open_file, so the croak propagated as a Mojolicious 500 Internal Server Error.
-#
-# Fix: open_table is now inside the same eval as fetch_all in open_file, so
-# the croak is caught and the friendly error page (200) is rendered instead.
+# Originally these produced 500 (open_table outside eval).  Then open_table
+# moved inside eval and they produced a friendly error page.  As of 0.006.x,
+# DataSource sanitizes illegal characters in table names (hyphens, dots,
+# digits-at-start -> underscores/prefix), so these files now open successfully.
 # ---------------------------------------------------------------------------
 
-subtest 'GET /open with digit-leading filename renders friendly error (regression: was 500)' => sub {
-	# Create a valid CSV file with a digit-leading stem in the temp dir.
+subtest 'GET /open with digit-leading filename succeeds (stem sanitized to _1data)' => sub {
 	my $path = Mojo::File->new($TMPDIR)->child('1data.csv');
 	$path->spew("id,name\n1,Widget\n");
 
 	$t->get_ok('/open?path=' . url_escape($path->to_string))
 	  ->status_is(200)
-	  ->content_like(qr/Could not open/i,
-	      'friendly error message rendered for digit-leading table name');
-	diag "Regression: was 500 before open_table was wrapped in eval" if $ENV{TEST_VERBOSE};
+	  ->content_like(qr/Widget/,
+	      'CSV data is rendered: digit-leading filename opens successfully after sanitization');
+	diag "Previously produced friendly error; now sanitized and opened" if $ENV{TEST_VERBOSE};
 };
 
-subtest 'GET /open with double-extension filename renders friendly error (not 500)' => sub {
-	# "file.php.csv" passes upload extension check (last ext is .csv) but the
-	# table stem "file.php" contains a dot -> fails DataSource regex -> croak.
-	# With the fix the croak is caught and a 200 error page is rendered.
+subtest 'GET /open with double-extension filename succeeds (stem sanitized to file_php)' => sub {
+	# "file.php.csv": stem = "file.php", sanitized internal name = "file_php",
+	# dbname stays "file.php" so D::A finds the actual file on disk.
 	my $path = Mojo::File->new($TMPDIR)->child('file.php.csv');
 	$path->spew("id,label\n1,safe\n");
 
 	$t->get_ok('/open?path=' . url_escape($path->to_string))
 	  ->status_is(200)
-	  ->content_like(qr/Could not open/i,
-	      'friendly error rendered for dot-in-stem table name');
+	  ->content_like(qr/safe/,
+	      'CSV data is rendered: double-extension filename opens successfully after sanitization');
 };
 
 # ---------------------------------------------------------------------------
@@ -535,31 +530,40 @@ subtest 'DataSource::new -- hostile directory arguments croak correctly' => sub 
 	} qr/does not exist or is not readable/i, 'croak for empty directory';
 };
 
-subtest 'DataSource::new -- hostile table name arguments croak correctly' => sub {
+subtest 'DataSource::new -- table name sanitization and remaining croak cases' => sub {
 	require Database::BI::Model::DataSource;
 	my $dir = $t->app->home->child('data')->to_string;
 
-	# Digit-leading name.
-	throws_ok {
-		Database::BI::Model::DataSource->new(directory => $dir, table => '1data')
-	} qr/contains illegal characters/i, 'croak for digit-leading table name';
+	# Digit-leading name: sanitized to _1data (underscore prefix), not rejected.
+	{
+		my $src;
+		lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => '1data') }
+			'digit-leading table name is sanitized, not rejected';
+		is $src->table_name, '_1data', 'sanitized: digit-leading name prefixed with underscore';
+	}
 
-	# Name containing a dot.
-	throws_ok {
-		Database::BI::Model::DataSource->new(directory => $dir, table => 'file.php')
-	} qr/contains illegal characters/i, 'croak for table name with dot';
+	# Dot: sanitized to file_php.
+	{
+		my $src;
+		lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'file.php') }
+			'dot-in-table-name is sanitized, not rejected';
+		is $src->table_name, 'file_php', 'sanitized: dot replaced with underscore';
+	}
 
-	# Name with shell metacharacters.
-	throws_ok {
-		Database::BI::Model::DataSource->new(directory => $dir, table => 'name;ls')
-	} qr/contains illegal characters/i, 'croak for table name with semicolon';
+	# Semicolons: sanitized to name_ls.
+	{
+		my $src;
+		lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'name;ls') }
+			'semicolon-in-table-name is sanitized, not rejected';
+		is $src->table_name, 'name_ls', 'sanitized: semicolon replaced with underscore';
+	}
 
-	# Name with path separator.
+	# Path separators still croak (security: prevent directory traversal via dbname).
 	throws_ok {
 		Database::BI::Model::DataSource->new(directory => $dir, table => '../../../etc/passwd')
 	} qr/contains illegal characters/i, 'croak for path-traversal as table name';
 
-	# Empty table name.
+	# Empty table name still croaks.
 	throws_ok {
 		Database::BI::Model::DataSource->new(directory => $dir, table => '')
 	} qr/contains illegal characters/i, 'croak for empty table name';
@@ -574,4 +578,186 @@ subtest 'DataSource::new -- undef required arguments croak' => sub {
 	} qr/./, 'croak for no arguments at all';
 };
 
-done_testing;
+# ---------------------------------------------------------------------------
+# Header-less CSV detection: hostile and boundary inputs
+# ---------------------------------------------------------------------------
+
+subtest 'DataSource -- headerless CSV: single amount column' => sub {
+	# A one-column file where the only value is a number.  Must synthesise
+	# "amount" as the single column name and return all rows.
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/onecol.csv")->spew(
+		"-10.00\n-20.00\n30.00\n"
+	);
+	my $src;
+	lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'onecol') }
+		'single-amount-column CSV accepted without error';
+	is_deeply $src->columns, ['Amount'], 'single synthesized column: Amount';
+	is $src->id_column, 'Amount',        'id_column is Amount';
+	my $rows = eval { $src->fetch_all };
+	is $@, '', 'fetch_all does not throw';
+	is scalar @{$rows}, 3, 'all three rows returned';
+	is $rows->[2]{Amount}, '30.00', 'third row Amount correct';
+};
+
+subtest 'DataSource -- headerless CSV: many numeric columns -> amount2, amount3 ...' => sub {
+	# Three numeric columns must be disambiguated as amount, amount2, amount3.
+	# At least one value in the first row must be signed so _values_are_data_like
+	# fires; positive-only decimals ("100.00") are not signed and don't trigger it.
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/multiamt.csv")->spew(
+		"-100.00,200.00,300.00\n-400.00,500.00,600.00\n"
+	);
+	my $src;
+	lives_ok { $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'multiamt') }
+		'three-amount-column CSV accepted';
+	is_deeply $src->columns, [qw(Amount Amount2 Amount3)],
+		'three numeric cols synthesised as Amount, Amount2, Amount3';
+	my $rows = eval { $src->fetch_all };
+	is scalar @{$rows}, 2,        'two rows returned';
+	is $rows->[0]{Amount2}, '200.00', 'Amount2 on row 1 correct';
+};
+
+subtest 'DataSource -- headerless CSV: hyphenated names NOT treated as headerless' => sub {
+	# "first-name" fails $SAFE_IDENTIFIER but looks like a header (no date/number).
+	# _values_are_data_like must return false; croak error_no_safe_id as before.
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/hyphdr.csv")->spew(
+		"first-name,last-name\nAlice,Smith\n"
+	);
+	throws_ok {
+		Database::BI::Model::DataSource->new(directory => $dir, table => 'hyphdr')
+	} qr/no column with a safe identifier/i,
+		'hyphenated-header CSV still croaks error_no_safe_id (not treated as headerless)';
+};
+
+subtest 'DataSource -- headerless CSV via HTTP: /open returns 200 with data' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/bank-export.csv")->spew(
+		"2026-09-01,-75.00,SUPERMARKET\n" .
+		"2026-09-02,-12.50,COFFEE SHOP\n"
+	);
+	use Mojo::Util qw(url_escape);
+	my $path = "$dir/bank-export.csv";
+	$t->get_ok('/open?path=' . url_escape($path))
+	  ->status_is(200, 'headerless CSV opens successfully via /open')
+	  ->content_like(qr/SUPERMARKET/i, 'description column value appears in rendered page')
+	  ->content_like(qr/-75/,           'amount value appears in rendered page');
+};
+
+# ---------------------------------------------------------------------------
+# Section 15: Empty and near-empty file handling
+#
+# Strategy: verify that 0-byte files and files containing only a newline are
+# handled gracefully — no crash, no 500, no misleading "no safe identifier"
+# error.  The expected behaviour is an empty table view (200 OK, "No records
+# found") rather than an error page, for both CSV and PSV.
+#
+# A file with a blank first line is effectively empty: _detect_file_info
+# returns the _file_is_empty sentinel (same path as a 0-byte file), so
+# _init_backend skips Database::Abstraction entirely and fetch_all returns [].
+# ---------------------------------------------------------------------------
+
+# 0-byte CSV via DataSource constructor
+subtest 'DataSource -- 0-byte CSV: fetch_all returns [] without croak' => sub {
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/emptysrc.csv")->spew('');
+	my $src;
+	lives_ok {
+		$src = Database::BI::Model::DataSource->new(directory => $dir, table => 'emptysrc');
+	} '0-byte CSV: constructor succeeds';
+	my $rows = $src->fetch_all;
+	is_deeply $rows, [], '0-byte CSV: fetch_all returns []';
+};
+
+# 0-byte PSV via DataSource constructor
+subtest 'DataSource -- 0-byte PSV: fetch_all returns [] without croak' => sub {
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/emptypsv.psv")->spew('');
+	my $src;
+	lives_ok {
+		$src = Database::BI::Model::DataSource->new(directory => $dir, table => 'emptypsv');
+	} '0-byte PSV: constructor succeeds';
+	my $rows = $src->fetch_all;
+	is_deeply $rows, [], '0-byte PSV: fetch_all returns []';
+};
+
+# Newline-only CSV via DataSource constructor
+subtest 'DataSource -- newline-only CSV: fetch_all returns [] without croak' => sub {
+	# A file containing exactly "\n" has a blank first line.  After chomp the
+	# line is "", yielding zero column names.  This must be treated as an empty
+	# file (returning []), not as "no safe identifier" (which would croak).
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/newlinecsv.csv")->spew("\n");
+	my $src;
+	lives_ok {
+		$src = Database::BI::Model::DataSource->new(directory => $dir, table => 'newlinecsv');
+	} 'newline-only CSV: constructor succeeds (no croak)';
+	my $rows = $src->fetch_all;
+	is_deeply $rows, [], 'newline-only CSV: fetch_all returns []';
+};
+
+# Newline-only PSV via DataSource constructor
+subtest 'DataSource -- newline-only PSV: fetch_all returns [] without croak' => sub {
+	require Database::BI::Model::DataSource;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/newlinepsv.psv")->spew("\n");
+	my $src;
+	lives_ok {
+		$src = Database::BI::Model::DataSource->new(directory => $dir, table => 'newlinepsv');
+	} 'newline-only PSV: constructor succeeds (no croak)';
+	my $rows = $src->fetch_all;
+	is_deeply $rows, [], 'newline-only PSV: fetch_all returns []';
+};
+
+# 0-byte CSV via HTTP /open endpoint
+subtest 'HTTP -- 0-byte CSV via /open: 200 with empty-table message' => sub {
+	my $dir  = tempdir(CLEANUP => 1);
+	my $path = "$dir/emptyhttp.csv";
+	Mojo::File->new($path)->spew('');
+	$t->get_ok('/open?path=' . url_escape($path))
+	  ->status_is(200, '0-byte CSV: /open returns 200')
+	  ->content_like(qr/No records found/i, '0-byte CSV: empty-state message present');
+};
+
+# 0-byte PSV via HTTP /open endpoint
+subtest 'HTTP -- 0-byte PSV via /open: 200 with empty-table message' => sub {
+	my $dir  = tempdir(CLEANUP => 1);
+	my $path = "$dir/emptyhttppsv.psv";
+	Mojo::File->new($path)->spew('');
+	$t->get_ok('/open?path=' . url_escape($path))
+	  ->status_is(200, '0-byte PSV: /open returns 200')
+	  ->content_like(qr/No records found/i, '0-byte PSV: empty-state message present');
+};
+
+# Newline-only CSV via HTTP /open endpoint
+subtest 'HTTP -- newline-only CSV via /open: 200 with empty-table message' => sub {
+	# Regression guard: before the _file_is_empty fix, a blank first line caused
+	# _init_backend to croak "no safe identifier", and the controller rendered a
+	# 200 error page — but the error message was confusing for what is simply an
+	# empty file.  After the fix, the response is a clean empty-table view.
+	my $dir  = tempdir(CLEANUP => 1);
+	my $path = "$dir/nlcsv.csv";
+	Mojo::File->new($path)->spew("\n");
+	$t->get_ok('/open?path=' . url_escape($path))
+	  ->status_is(200, 'newline-only CSV: /open returns 200')
+	  ->content_like(qr/No records found/i, 'newline-only CSV: empty-state message present');
+};
+
+# Newline-only PSV via HTTP /open endpoint
+subtest 'HTTP -- newline-only PSV via /open: 200 with empty-table message' => sub {
+	my $dir  = tempdir(CLEANUP => 1);
+	my $path = "$dir/nlpsv.psv";
+	Mojo::File->new($path)->spew("\n");
+	$t->get_ok('/open?path=' . url_escape($path))
+	  ->status_is(200, 'newline-only PSV: /open returns 200')
+	  ->content_like(qr/No records found/i, 'newline-only PSV: empty-state message present');
+};
+
+done_testing();

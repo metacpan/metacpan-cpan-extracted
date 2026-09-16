@@ -1,0 +1,15 @@
+# What is not shipped. REGEXES, not globs - ExtUtils::Manifest matches these
+# with m//, so `*.o` is not a pattern that means anything here.
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib$
+^MYMETA\.
+^Install/
+\.o$
+\.bs$
+^Codec\.c$
+^Struct-Codec-
+\.tar\.gz$
+^\.git
+~$

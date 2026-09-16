@@ -1,0 +1,123 @@
+JSON-Schema-Test-Suite, draft2020-12, a fifteen-file subset
+===========================================================
+
+VENDORED, NOT AUTHORED HERE. These files are copied verbatim from
+
+    https://github.com/json-schema-org/JSON-Schema-Test-Suite
+    tests/draft2020-12/{allOf,anyOf,oneOf,ref,defs,if-then-else,required,
+                        properties,type,enum,prefixItems,items,
+                        exclusiveMinimum,exclusiveMaximum,content}.json
+
+fetched 14 September 2026. LICENSE beside them is the suite's own (MIT,
+Copyright (c) 2012 Julian Berman) and must travel with them. Do not edit the
+.json files: they are an external oracle, and the value of an oracle is that
+nobody here gets to adjust it. To update, re-fetch from the URL above.
+
+Why these, and why at all
+-------------------------
+
+A 3.1 Schema Object IS JSON Schema 2020-12, so this suite is the executable
+conformance suite OpenAPI itself does not publish. But validating schemas is
+JSON::Schema::Fast's job, not this distribution's, and running the whole suite
+here would mostly re-test JSF.
+
+What IS this distribution's job, and what these files test, is that
+**normalisation does not corrupt the schema on the way through**. Open::API
+rewrites schemas at document level before anything is compiled:
+
+  * `#/components/schemas/X` is rewritten to `#/$defs/X`
+  * `readOnly`/`writeOnly` are projected into two direction-specific variants
+  * `discriminator` is expanded into 2020-12 constructs and APPENDED TO allOf
+  * a 3.0 document is converted wholesale (nullable, exclusive bounds, tuple
+    items, format byte/binary, example)
+
+Every file here is chosen because it speaks to one of those rewrites, and
+run.t records which beside each. A vendored suite that exercises nothing this
+code does to schemas would only be re-testing JSF.
+
+  allOf            discriminator is expanded and APPENDED to allOf
+  anyOf            3.0 nullable beside a $ref becomes anyOf
+  oneOf            discriminator selects among oneOf branches
+  ref              component refs are rewritten into $defs
+  defs             components.schemas IS the compiled $defs
+  if-then-else     discriminator expands INTO if/then
+  required         readOnly/writeOnly projection rewrites required
+  properties       discriminator injects a guard property
+  type             3.0 nullable becomes a type union
+  enum             3.0 nullable adds a null enum member
+  prefixItems      3.0 tuple items becomes prefixItems
+  items            ...and the trailing items schema with it
+  exclusiveMin/Max 3.0 boolean bounds become numeric
+  content          3.0 format byte/binary becomes contentEncoding
+
+A bug in the rewriting shows up here as a schema that stops meaning what it
+meant.
+
+How they are run
+----------------
+
+t/compliance/run.t turns each group into an OpenAPI document - the group's
+schema becomes a request body schema - and POSTs each test's `data`, requiring
+the accept/reject verdict the suite states.
+
+Each group runs in THREE placements, because each exercises a different part
+of the pipeline:
+
+  inline      the schema sits in the media type object. The validator is
+              handed it essentially untouched, so this says normalisation did
+              not damage a schema it merely copied. It proves the least: this
+              placement was green on arrival and told us almost nothing.
+  referenced  the schema sits in components.schemas and the body refs it. THIS
+              is the placement that exercises the components -> $defs rewrite,
+              and it is where the interesting failures live.
+  3.0 twin    the same schema in a 3.0 document AND a 3.1 one, required to
+              give the SAME verdict. See below - this is the only honest way
+              the suite can speak to the 3.0 conversion at all.
+
+A correction worth recording. Several files above (type, enum, items,
+exclusiveMinimum, exclusiveMaximum, content) were first admitted on the
+grounds that they test the 3.0 conversion. That was overstated: the suite is a
+2020-12 suite and cannot supply a 3.0 SPELLING, so it can never check the
+conversion by verdict - and run in a 3.1 document, as they first were, those
+conversions do not fire at all. What the suite CAN check is that converting
+does not change what a schema MEANS, which is what the twin asserts: in a 3.0
+document the converter walks every schema, so a rewrite that corrupts one
+shows up as the twins parting company.
+
+What is skipped, and why
+------------------------
+
+A group is skipped when its schema is not expressible as an OpenAPI Schema
+Object, by a rule stated in run.t rather than by picking out what fails:
+
+  * `$id`, `$anchor`, `$dynamicRef`, `$dynamicAnchor`, `$recursiveRef` - these
+    describe schema IDENTITY and resolution scope. An OpenAPI document has one
+    schema namespace, `#/components/schemas`, and no way to say any of this.
+  * a `$ref` that is not a local fragment (remote, URN, or file URI) - there is
+    no second document to resolve it against.
+
+The REFERENCED placement skips one more class, for a different reason:
+
+  * a schema holding a root-anchored pointer into itself (`#/$defs/x`,
+    `#/properties/foo`, `#/prefixItems/0`). In the suite the schema IS the
+    resource root so those resolve; as a component it sits at
+    #/components/schemas/S and the same pointer means the DOCUMENT root.
+    Refusing that is correct rather than a bug - the properly spelled
+    `#/components/schemas/S/$defs/x` binds, checked by hand - so the group is
+    not expressible in that placement. It is the suite's own lesson, "naive
+    replacement of $ref with its destination is not correct".
+
+The 3.0 TWIN skips two further classes:
+
+  * a schema using a 2020-12 keyword a 3.0 document cannot carry ($defs,
+    prefixItems, const, contentEncoding, if/then/else, dependent*,
+    unevaluated*). Not expressible in that dialect, so there is no twin.
+  * a schema with assertions sitting beside a `$ref`. 3.0 DELIBERATELY ignores
+    those and this build strips them for that reason; 2020-12 applies them. The
+    dialects disagree on purpose, so the twin cannot ask them to match. This
+    rule currently matches nothing - every such group also carries $defs, so
+    the rule above catches it first - but it encodes the real difference and
+    the vendored files can be updated from upstream.
+
+All four skip counts are reported by run.t. If any grows, something started
+refusing schemas it used to accept.

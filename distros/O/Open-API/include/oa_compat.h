@@ -5,6 +5,16 @@
  * perl.h / XSUB.h and before any other oa_ header, so the definitions are in
  * scope for the C-closure callbacks throughout the core. */
 
+/* SVfARG is 5.10. On 5.8 the `%" SVf` formats take the SV pointer itself, so
+ * the argument wrapper is a cast and nothing more. Defined FIRST because the
+ * croak_sv shim below uses it: without this, 5.8 compiles `SVfARG(...)` as an
+ * implicit declaration - a warning, then a shared object carrying an
+ * undefined symbol, and a failure only when that path is first taken. Found
+ * by the docker matrix; every newer perl has the macro and said nothing. */
+#ifndef SVfARG
+#  define SVfARG(p) ((void *)(p))
+#endif
+
 /* XS_INTERNAL / XS_EXTERNAL (and XSPROTO) arrived in perl's XSUB.h at 5.16.
  * The core's C-closure callbacks and the ABI in oa_abi.h are declared with
  * XS_INTERNAL, so on 5.8 - 5.14 they otherwise fail to compile

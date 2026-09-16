@@ -425,14 +425,14 @@ subtest 'use_ramdisk => 3 (Volatile RAM-Disk Tier 3 & TTL)' => sub {
     ok( $adb->insert_id( 'session_store', 102, 'token_xyz', 'user_456' ), 'Record 102 inserted' );
 
     # Verify physical disk has ZERO files
-    my $phys_db = File::Spec->catfile( $tmp, 'tables', 'session_store.db' );
-    ok( !-e $phys_db, 'Zero physical disk files: tables/session_store.db does NOT exist' );
-    ok( !-e File::Spec->catfile( $tmp, 'tables', 'session_store.inx' ), 'Zero physical disk index files' );
+    my $phys_db = File::Spec->catfile( $tmp, 'table', 'session_store.db' );
+    ok( !-e $phys_db, 'Zero physical disk files: table/session_store.db does NOT exist' );
+    ok( !-e File::Spec->catfile( $tmp, 'table', 'session_store.inx' ), 'Zero physical disk index files' );
 
     # Verify RAM-disk contains the .db file
-    my $ram_db = File::Spec->catfile( $ramdisk_dir, 'tables', 'session_store.db' );
+    my $ram_db = File::Spec->catfile( $ramdisk_dir, 'table', 'session_store.db' );
     ok( -e $ram_db, 'RAM-disk contains session_store.db' );
-    ok( !-e File::Spec->catfile( $ramdisk_dir, 'tables', 'session_store.inx' ), 'RAM-disk has NO index files' );
+    ok( !-e File::Spec->catfile( $ramdisk_dir, 'table', 'session_store.inx' ), 'RAM-disk has NO index files' );
 
     # 4. Read records from Tier 3
     my @rec101 = $adb->read_id( 'session_store', 101 );
@@ -457,7 +457,7 @@ subtest 'use_ramdisk => 3 (Volatile RAM-Disk Tier 3 & TTL)' => sub {
     $adb->table_attr( 'temp_cache', use_ramdisk => 3, ramdisk_ttl => 5 );
     ok( $adb->insert_id( 'temp_cache', 1, 'temp_val' ), 'temp_cache record inserted' );
 
-    my $temp_db = File::Spec->catfile( $ramdisk_dir, 'tables', 'temp_cache.db' );
+    my $temp_db = File::Spec->catfile( $ramdisk_dir, 'table', 'temp_cache.db' );
     ok( -e $temp_db, 'temp_cache.db exists in RAM-disk' );
 
     # Simulate expiration by setting mtime back in time (> 5s ago)
@@ -471,7 +471,7 @@ subtest 'use_ramdisk => 3 (Volatile RAM-Disk Tier 3 & TTL)' => sub {
     # 8. Sliding Expiration
     $adb->table_attr( 'sliding_cache', use_ramdisk => 3, ramdisk_ttl => 60 );
     ok( $adb->insert_id( 'sliding_cache', 1, 'slide_data' ), 'sliding_cache record inserted' );
-    my $slide_db = File::Spec->catfile( $ramdisk_dir, 'tables', 'sliding_cache.db' );
+    my $slide_db = File::Spec->catfile( $ramdisk_dir, 'table', 'sliding_cache.db' );
 
     # Backdate mtime slightly (25 seconds ago, < 60s TTL)
     utime( time() - 25, time() - 25, $slide_db );

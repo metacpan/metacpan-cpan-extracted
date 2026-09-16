@@ -23,6 +23,15 @@ no_leaks_ok {
     my $c = JSON::YY->new(utf8 => 1);
     $c->decode('{"x":1}');
 } 'OO decode no leak';
+no_leaks_ok {
+    my $c = JSON::YY->new(bool => 1);
+    $c->decode('{"x":true,"y":false}');
+} 'OO decode with bool no leak';
+no_leaks_ok {
+    my $c = JSON::YY->new(bool => 1);
+    my $d = $c->decode('{"x":true,"y":false}');
+    $c->encode($d);
+} 'OO decode+encode with bool no leak';
 
 # Doc API
 no_leaks_ok { my $d = jdoc '{"a":1}' } 'jdoc no leak';

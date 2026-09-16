@@ -54,7 +54,7 @@ Same answer `lookup` would give for that address, and the same cost against your
 ### Your plan and usage
 
 ```perl
-my $acct = $client->my_account;
+my $acct = $client->my_entitlement;
 print $acct->{plan}{key};          # max
 print $acct->{usage}{requests};    # 580
 print $acct->{usage}{window_end};  # when the allowance resets
@@ -62,11 +62,11 @@ print $acct->{usage}{window_end};  # when the allowance resets
 
 Usage counts against the anniversary of your subscription, not the calendar month and not the billing period, and it is the same number a lookup is gated on. `hard_limit` is `undef` on an uncapped plan, which is not the same as zero.
 
-`my_ip` returns a `VPNDetection::Result` like `lookup` does; `my_account` returns the decoded hashref. `my_ip_p` and `my_account_p` are the non-blocking forms.
+`my_ip` returns a `VPNDetection::Result` like `lookup` does; `my_entitlement` returns the decoded hashref. `my_ip_p` and `my_entitlement_p` are the non-blocking forms.
 
 ### Batch lookup
 
-You can do batch lookups with a list, which parallelizes requests for you efficiently:
+Look up many addresses at once. Bogons and cached answers are handled locally, and everything else goes to the batch endpoint in chunks of up to 1000 addresses, in parallel:
 
 ```perl
 my $answers = $client->lookup_batch(['45.83.91.1', '8.8.8.8', '1.1.1.1']);
@@ -81,12 +81,12 @@ for my $ip (keys %$answers) {
 }
 ```
 
-Results are keyed by address, so duplicates in your list collapse into a single request and one address failing never loses the rest. Perl hashes carry no insertion order, so iterate your own list when order matters.
+Results are keyed by address, so duplicates in your list collapse into a single entry and one address failing never loses the rest: it carries its error as its value, with the status the API would have given that address on its own. Perl hashes carry no insertion order, so iterate your own list when order matters.
 
-Concurrency and other variables are configurable per-call:
+How many chunks are in flight at once, and how many times a failed chunk is retried, are configurable per call:
 
 ```perl
-my $answers = $client->lookup_batch(\@many_ips, concurrency => 32, retries => 4);
+my $answers = $client->lookup_batch(\@many_ips, concurrency => 4, retries => 4);
 ```
 
 ### Caching

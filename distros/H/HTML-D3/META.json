@@ -33,12 +33,11 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64",
             "JSON::MaybeXS" : "0",
             "Object::Configure" : "0.24",
             "Params::Get" : "0",
@@ -62,6 +61,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.12",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

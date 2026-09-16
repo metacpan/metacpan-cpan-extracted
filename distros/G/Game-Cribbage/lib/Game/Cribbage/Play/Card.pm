@@ -28,7 +28,7 @@ Game::Cribbage::Play::Card - a card as it appears within a play sequence
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 

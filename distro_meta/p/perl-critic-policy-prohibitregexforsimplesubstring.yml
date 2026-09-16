@@ -1,0 +1,4 @@
+---
+distro: perl-critic-policy-prohibitregexforsimplesubstring
+version: 1.001
+author_path: T/TE/TEODESIAN/perl-critic-policy-prohibitregexforsimplesubstring-1.001.tar.gz

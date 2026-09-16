@@ -1,6 +1,6 @@
 package EV::WebKit;
 use v5.10; use strict; use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Glib::Object::Introspection;
 use Glib::IO;   # Gio bindings: Cancellable, MemoryInputStream
@@ -3700,7 +3700,9 @@ sub set_cookie {
     my @hold = $self->_native_hold;   # keep natives alive until this add_cookie's native side finishes (UAF on teardown otherwise -- see _native_hold)
     # same GI async-ready-callback retention as _call_js (see there) -- weaken.
     weaken(my $wself = $self);
+    my $done = 0;
     $hold[0]->get_cookie_manager->add_cookie($c, $cancel, sub {
+        return if $done; $done = 1;
         $timer->stop;
         my $ok = eval { $hold[0]->get_cookie_manager->add_cookie_finish($_[1]); 1 };   # captured session, NOT $self->{session} (deleted by quit)
         _release_natives_later(\@hold);   # drop the keep-alive on a clean tick (never synchronously here -- see _release_natives_later)
@@ -3727,7 +3729,9 @@ sub cookies {
     my $timer  = EV::timer($self->{timeout}, 0, sub { $cancel->cancel });   # watchdog: bound a stuck op (cancel -> completion resolves 'timeout')
     my @hold = $self->_native_hold;   # keep natives alive until this get_cookies' native side finishes (UAF on teardown otherwise -- see _native_hold)
     weaken(my $wself = $self);
+    my $done = 0;
     $hold[0]->get_cookie_manager->get_cookies($uri, $cancel, sub {
+        return if $done; $done = 1;
         $timer->stop;
         # get_cookies_finish returns a single arrayref of Soup::Cookie objects,
         # NOT a flattened list -- must deref, not `my @c = ...finish(...)`. Use
@@ -3766,10 +3770,12 @@ sub clear_cookies {
     my $cancel = Glib::IO::Cancellable->new;
     my $timer  = EV::timer($self->{timeout}, 0, sub { $cancel->cancel });   # watchdog: bound a stuck op (cancel -> completion resolves 'timeout')
     weaken(my $wself = $self);
+    my $done = 0;
     # WebKit::WebsiteDataTypes is a GFlags type: Glib::Object::Introspection
     # marshals flags as an arrayref of nick strings, not a bare string.
     # 0 timespan = clear everything (not just data since some cutoff).
     $wdm->clear(['cookies'], 0, $cancel, sub {
+        return if $done; $done = 1;
         $timer->stop;
         my $ok = eval { $wdm->clear_finish($_[1]); 1 };
         # Release the captures -- GI never lets go of this closure, so what it
@@ -3826,7 +3832,9 @@ sub save_cookies {
     for my $uri (@$uris) {
         my $cancel = Glib::IO::Cancellable->new;
         push @cancels, $cancel;
+        my $done = 0;
         $hold[0]->get_cookie_manager->get_cookies($uri, $cancel, sub {
+            return if $done; $done = 1;
             my $list = eval { $hold[0]->get_cookie_manager->get_cookies_finish($_[1]) };   # captured session, NOT $self->{session} (deleted by quit)
             # A snapshot is all-or-nothing on purpose: writing a file that is
             # silently missing one URI's cookies is worse than not writing one.
@@ -3997,6 +4005,9 @@ sub _teardown {
     $self->{_pdf_queue} = []; $self->{_pdf_active} = 0;   # drop un-started pdf jobs (their cbs are owed below via {_ops}); an active PrintOperation's stray completion is a _defer no-op after this
     $self->{_pdf_timers} = {};                            # disarm every pdf watchdog (queued and active)
     delete $self->{_pdf_pump_timer};                      # and the queue's own continuation tick (nothing left to pump)
+    if (my $nw = delete $self->{_nav_waiters}) {          # disarm every navigation waiter watchdog
+        $_->{timer}->stop for grep { $_->{timer} } values %$nw;
+    }
     if (my $p = delete $self->{pending}) {                # a still-pending nav is owed an answer too (not via _defer, which now no-ops)
         $p->[1]->stop if $p->[1];
         push @owed, $p->[0] if $p->[0];
@@ -4080,7 +4091,7 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::UserContent;
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     # Handle for one injected user script or stylesheet. Holds a WEAK ref to the
     # browser (so a dangling handle never keeps the instance alive) plus the id
     # of its native in the browser's per-kind registry. remove() is idempotent:
@@ -4107,7 +4118,7 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::Dialog;
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     # lightweight wrapper around a WebKitScriptDialog, valid only for the
     # duration of the script-dialog signal handler that receives it.
     sub _new    { bless { d => $_[1] }, $_[0] }
@@ -4138,7 +4149,7 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::FileChooser;
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     # lightweight wrapper around a WebKitFileChooserRequest, valid only for the
     # duration of the run-file-chooser handler that receives it.
     sub _new { bless { r => $_[1] }, $_[0] }
@@ -4172,7 +4183,7 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::Auth;
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     # A WebKitAuthenticationRequest, valid only for the duration of the
     # on_authenticate handler that receives it.
     sub _new { bless { r => $_[1] }, $_[0] }
@@ -4214,7 +4225,7 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::Download;
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     # A download in progress. Unlike Dialog/FileChooser this OUTLIVES the signal
     # that created it: WebKit reports progress and completion later, so the
     # object is retained by the browser until it finishes or fails.
@@ -4383,7 +4394,7 @@ sub DESTROY { my $self = shift; $self->{_destroying} = 1; eval { $self->quit } }
 
 {
     package EV::WebKit::Policy;
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     # lightweight wrapper around a WebKit(Navigation|Response)PolicyDecision,
     # valid only for the duration of the decide-policy signal handler that
     # receives it.
@@ -4926,7 +4937,7 @@ ships and a profile must not claim a browser its TLS cannot back.
 
 The profile's identity headers (User-Agent + C<Sec-CH-UA>) are forced over the
 curl target's defaults, so even a Windows profile is coherent on the (macOS-built)
-C<chrome131> target -- Windows and macOS Chrome share the same TLS/HTTP2, so only
+C<chrome150> target -- Windows and macOS Chrome share the same TLS/HTTP2, so only
 the header values differ. WebKit is told to accept the proxy's self-signed cert
 (C<set_tls_errors_policy('ignore')>); this is safe because the browser-to-proxy
 hop is localhost and the proxy re-verifies the real origin upstream. WebKitGTK 6.0

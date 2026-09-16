@@ -1,0 +1,32 @@
+Changes
+MANIFEST
+Makefile.PL
+bin/backgammon
+lib/Game/Backgammon.pm
+lib/Game/Backgammon/Board.pm
+lib/Game/Backgammon/Bot.pm
+lib/Game/Backgammon/Dice.pm
+lib/Game/Backgammon/Error.pm
+lib/Game/Backgammon/Move.pm
+lib/Game/Backgammon/Notation.pm
+lib/Game/Backgammon/Result.pm
+lib/Game/Backgammon/Rules.pm
+lib/Game/Backgammon/Shots.pm
+lib/Game/Backgammon/Terminal.pm
+lib/Game/Backgammon/Turn.pm
+t/00-load.t
+t/01-board.t
+t/02-notation.t
+t/03-encapsulation.t
+t/04-legal-turns.t
+t/05-dice.t
+t/06-rules-game.t
+t/07-shots.t
+t/08-bot.t
+t/09-no-io.t
+t/10-terminal.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

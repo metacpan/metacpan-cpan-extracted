@@ -217,14 +217,16 @@ subtest 'DataSource::new path-B: directory missing -> croak' => sub {
 		'path B: missing directory -> croak error_directory_missing';
 };
 
-subtest 'DataSource::new path-C: table name invalid -> croak' => sub {
+subtest 'DataSource::new path-C: table name with path separator -> croak' => sub {
+	# Hyphens/dots/digits are now sanitized to underscores.
+	# Only path-separator characters trigger error_table_name_invalid.
 	throws_ok {
 		Database::BI::Model::DataSource->new(
 			directory => $TMPDIR,
-			table     => '1invalid',
+			table     => 'a/invalid',
 		)
 	} qr/contains illegal characters/,
-		'path C: digit-start table -> croak error_table_name_invalid';
+		'path C: path-separator in table name -> croak error_table_name_invalid';
 };
 
 subtest 'DataSource::new path-D: unsafe CSV column names' => sub {
@@ -374,6 +376,52 @@ subtest '_detect_file_info path-K2: file_size absent for non-CSV/PSV (empty hash
 	# Non-CSV/PSV tables (SQLite, XML) return {} with no file_size key.
 	my $result = $DETECT->($TMPDIR, 'no_such_table_xyz');
 	ok !exists $result->{file_size}, 'path K2: no file_size in empty hashref';
+};
+
+# Paths L-N cover header-less CSV/PSV detection added so that bank exports
+# with no header row (first line is data) are opened transparently.
+
+subtest '_detect_file_info path-L: header-less CSV (date+amount+desc) -> _headerless_data' => sub {
+	# All three first-row values fail $SAFE_IDENTIFIER; a date and a signed
+	# number trigger _values_are_data_like.  Expect synthesized column names
+	# and a _headerless_data arrayref of pre-parsed rows.
+	Mojo::File->new("$TMPDIR/ltest.csv")->spew(
+		"2026-09-09,-75.13,ACME RESTAURANT\n" .
+		"2026-09-10,-2.25,FRGN FEE\n"
+	);
+	my $result = $DETECT->($TMPDIR, 'ltest');
+	ok  exists  $result->{_headerless_data},         'path L: _headerless_data key present';
+	ok  defined $result->{id},                       'path L: id is defined (synthesized)';
+	is  $result->{id},       'Date',                 'path L: first synthesized id is "Date"';
+	is_deeply $result->{columns}, [qw(Date Amount Description)],
+		'path L: synthesized column names: Date, Amount, Description';
+	is scalar @{ $result->{_headerless_data} }, 2,   'path L: both data rows returned';
+	is $result->{_headerless_data}[0]{Date},   '2026-09-09', 'path L: row 0 Date correct';
+	is $result->{_headerless_data}[0]{Amount}, '-75.13',      'path L: row 0 Amount correct';
+	is $result->{_headerless_data}[1]{Amount}, '-2.25',        'path L: row 1 Amount correct';
+};
+
+subtest '_detect_file_info path-M: header-less PSV (date+amount) -> _headerless_data' => sub {
+	# Same logic applied to pipe-separated files.
+	Mojo::File->new("$TMPDIR/mtest.psv")->spew(
+		"2026-01-15|-99.00\n" .
+		"2026-01-16|-1.50\n"
+	);
+	my $result = $DETECT->($TMPDIR, 'mtest');
+	ok  exists  $result->{_headerless_data},         'path M: _headerless_data key present for PSV';
+	is  $result->{sep_char}, '|',                    'path M: separator correctly detected as pipe';
+	is_deeply $result->{columns}, [qw(Date Amount)], 'path M: two synthesized columns';
+	is scalar @{ $result->{_headerless_data} }, 2,   'path M: two rows returned';
+};
+
+subtest '_detect_file_info path-N: unsafe names that are NOT data-like -> id undef (no headerless)' => sub {
+	# "first-name" and "last-name" fail $SAFE_IDENTIFIER but look like
+	# identifiers (no date/number pattern), so _values_are_data_like is false.
+	# The existing error_no_safe_id path must be preserved.
+	Mojo::File->new("$TMPDIR/ntest.csv")->spew("first-name,last-name\nAlice,Smith\n");
+	my $result = $DETECT->($TMPDIR, 'ntest');
+	ok !exists  $result->{_headerless_data}, 'path N: no _headerless_data for hyphenated headers';
+	ok !defined $result->{id},              'path N: id is undef (all names unsafe, not data-like)';
 };
 
 # ======================================================================

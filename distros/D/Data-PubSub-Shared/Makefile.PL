@@ -55,5 +55,14 @@ WriteMakefile(
     INC               => '-I. ' . join(' ', @xpk_flags),
     XS                => { 'Shared.xs' => 'Shared.c' },
     OBJECT            => 'Shared$(OBJ_EXT)',
+    META_MERGE        => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => { type => 'git',
+                url => 'https://github.com/vividsnow/perl5-data-pubsub-shared.git',
+                web => 'https://github.com/vividsnow/perl5-data-pubsub-shared' },
+            bugtracker => { web => 'https://github.com/vividsnow/perl5-data-pubsub-shared/issues' },
+        },
+    },
     clean             => { FILES => "*.bs *.o ppport.h Shared.c" },
 );

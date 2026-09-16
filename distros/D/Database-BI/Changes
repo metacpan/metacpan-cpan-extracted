@@ -1,5 +1,143 @@
 Revision history for Database-BI
 
+0.006.0	Tue Sep 15 08:03:20 PM EDT 2026
+    [ Enhancements ]
+    - Added a 'home' link on the table display page
+    - XLSX files are now supported directly via DBD::Excel (each worksheet
+      is a separate table).  The upload endpoint, filesystem browser, and
+      drag-and-drop drop zone all accept .xlsx files.  DBD::Excel added to
+      TEST_REQUIRES.
+    - "Combine data" now allows a file to be drag and dropped
+    - Multi-table left joins are now delegated to Database::Join (>= 0.003.0)
+      instead of the bespoke _left_join helper.  Column collision handling
+      (prefixing right-table columns with "label.col" when a name clashes) is
+      provided by Database::Join's new collision_prefix parameter.
+      DataSource now exposes selectall_arrayref() and an improved columns()
+      fallback so that DataSource objects can be passed directly to
+      Database::Join as component databases.
+    - Database::Join added to PREREQ_PM (runtime dependency).
+    - DataSource::new now silently sanitizes table names derived from filenames:
+      characters that are illegal in SQL identifiers (hyphens, dots, spaces,
+      etc.) are replaced with underscores, and a digit-leading stem is prefixed
+      with '_'.  The original filename stem is kept as the dbname so
+      Database::Abstraction still locates the correct file on disk.  This means
+      files like "Transactions-2026-09-08.csv" and "1data.csv" can now be
+      opened via /open without error.  Only path-separator characters ('/', '\',
+      NUL) and the empty string continue to croak error_table_name_invalid.
+    - A "Totals" checkbox in the toolbar appends a summary row to the bottom of
+      any data table.  When checked, every column whose values are all numeric
+      (using the same parseAccounting logic as the sort and graph features, so
+      accounting-notation negatives are handled correctly) shows its sum; date
+      columns (YYYY-MM-DD, M/D/YYYY) are excluded from totalling even though
+      parseFloat can extract a number from them.  Non-numeric columns are left
+      blank.  The checkbox state is persisted in localStorage alongside column
+      order and sort direction, so the totals row reappears automatically on
+      page reload.  The summary row follows column drag-to-reorder automatically
+      because moveCol() operates on all table rows including tfoot.
+    - CSV and PSV files with no header row are now handled automatically.
+      When every value in the first line fails the safe-identifier check,
+      _detect_file_info tests whether any value looks like a date (YYYY-MM-DD,
+      M/D/YYYY) or a signed/accounting-notation number.  If so, the file is
+      treated as header-less: all rows (including the first) are read directly
+      and column names are synthesised from the inferred data types — date
+      values become "Date", numeric/currency values become "Amount", and free
+      text becomes "Description".  Duplicate types are disambiguated with a
+      numeric suffix (Date2, Amount2, ...).  This allows bank and accounting
+      exports such as "Transactions-current.csv" to open without error or any
+      manual renaming of headers.
+    - CHI in-process caching is now active for all data sources.  URL-backed
+      tables (fetched via LWP from a remote web page) are cached for 15 minutes
+      using a TTL-based key, so repeated visits to the same /import URL avoid
+      a network round-trip on every page load.  File-backed tables are cached
+      using a key that encodes the file's mtime, so a changed file naturally
+      produces a cache miss without any explicit invalidation — the stale entry
+      is orphaned and reclaimed when the process restarts or the CHI Memory
+      driver's GC runs.  The cache TTL and driver can be overridden in
+      database_bi.conf via the "cache" key: { driver => 'File', ttl_url => '5 min' }.
+      CHI added to PREREQ_PM and cpanfile.
+    - DataSource::columns() now returns undef for URL-backed tables instead of
+      delegating to Database::Abstraction's columns().  D::A fetches URL data
+      lazily (in _open(), not in new()), so calling _db->columns() after a CHI
+      cache hit (which bypasses _open()) would trigger an unexpected live network
+      request — failing with a non-200 error even when valid cached data was
+      available.  Returning undef lets _get_columns derive column names from the
+      cached data records, which is correct since URL/HTML tables have no
+      canonical column order anyway.
+    - Rows and columns can now be selected and deleted in the virtual table view.
+      A checkbox column is injected at the left edge of every data table;
+      clicking a row's checkbox selects it (turning the row pink) and Ctrl+click
+      on any column header selects the column (highlighting all its cells in red).
+      A "Delete selected" button appears in the toolbar as soon as any rows or
+      columns are selected; clicking it removes them from the in-browser view
+      without touching the underlying file.  Row selection supports a
+      select-all/deselect-all checkbox in the header.  The record count in the
+      toolbar is updated after deletion.  Sorting, drag-to-reorder, and the
+      Totals row all continue to work correctly after deletions.
+    - Line graphs now animate on initial page load (requires HTML::D3 >= 0.13).
+      The line draws left-to-right via a stroke-dashoffset transition (1200 ms,
+      easeLinear); data-point circles fade in after the line finishes (300 ms
+      fade, 1200 ms delay).  Zoom and reset redraws are not animated — a
+      per-page initialDrawDone flag ensures the effect fires only once.
+      When the viewer's OS has prefers-reduced-motion enabled the animation
+      is skipped entirely and the chart appears instantly.
+      HTML::D3 minimum version bumped to 0.13 in PREREQ_PM and cpanfile.
+
+    [ Bug Fixes ]
+    - When attempting to drag and drop a file larger than MAX_UPLOAD_BYTES,
+      a better error message is displayed which stays on the screen for
+      3 seconds
+    - CSV and PSV files whose first line is blank (e.g. a file containing only
+      a single newline character) are now treated as empty files rather than
+      croaking "no column with a safe identifier name".  _detect_file_info now
+      returns the _file_is_empty sentinel when the parsed first line yields
+      zero column names, causing _init_backend to skip Database::Abstraction
+      entirely and fetch_all to return [].  The /open endpoint renders the
+      standard empty-table view ("No records found") instead of an error page.
+      Tests added to t/edge_cases.t.
+    - Files whose names contain spaces (e.g. "transactions for Nigel.xlsx")
+      now open correctly.  Database::Abstraction validates its dbname argument
+      as a SQL identifier and rejected names with spaces with an "unsafe dbname"
+      error at fetch time.  DataSource::_init_backend now creates a temporary
+      directory with a symlink using the sanitized name whenever the raw
+      filename stem contains illegal SQL characters, so D::A sees only the
+      safe name.  Regression test added as Transaction 27.
+    - The "Line graph..." toolbar button was silently broken: clicking it did
+      nothing.  buildYSelect() referenced SEL from the table-management IIFE
+      where it was declared, but the graph-panel IIFE lives in a separate
+      <script> block and cannot access that scope.  The ReferenceError thrown
+      during initGraphBtn() prevented the click listener from ever being
+      registered.  Fixed by removing the cross-IIFE reference entirely:
+      buildYSelect() now uses r.cells[idx] instead of r.cells[idx + SEL],
+      because Array.from(tHead.rows[0].cells) already includes the injected
+      sel-th at position 0, so both the header and data arrays are shifted
+      identically and no additional offset is needed.  A regression test in
+      Transaction 22 verifies that buildYSelect does not reintroduce
+      the idx+SEL double-offset.
+    - The Y-axis dropdown in the "Line graph..." panel was listing non-numeric
+      columns (e.g. Description) as valid Y-axis choices, and omitting the
+      correct numeric ones (e.g. Balance).  Root cause: buildYSelect() used
+      r.cells[idx + SEL] where idx came from headers.forEach() over
+      tHead.rows[0].cells.  Because injectSelCol shifts both thead (sel-th)
+      and tbody (checkbox) by one position, the header and data arrays are
+      already aligned; adding SEL read one cell to the right of the header
+      under test, causing every column's numeric check to be evaluated against
+      the data of the column to its right.  Fix: changed to r.cells[idx].
+    - Spreadsheet::ParseXLSX added to PREREQ_PM.  DBD::Excel 0.07 only
+      handles .xls (its source skips .xlsx files entirely); DataSource now
+      reads .xlsx directly via Spreadsheet::ParseXLSX in _detect_file_info,
+      bypassing D::A the same way headerless CSV files do.
+      Excel::Writer::XLSX added to TEST_REQUIRES for fixture creation.
+      Transaction 28 covers XLSX open lifecycle including spaced filenames.
+    - Synthesised column headers for header-less CSV/PSV files are now
+      capitalised (Date, Amount, Description) so they display correctly as
+      table headers in the browser.
+    - Berkeley DB files (.db extension) can now be opened via /view/:table,
+      /open, and the filesystem browser.  Database::Abstraction detects the
+      BerkeleyDB magic bytes automatically and opens the file via DB_File
+      (a Perl core module).  No code change was required in Database::BI;
+      the existing @SUPPORTED_EXT and _detect_file_info already handled .db
+      files correctly.  Transaction 29 confirms the end-to-end lifecycle.
+
 0.005.2 Fri Sep 11 06:08:10 AM EDT 2026
     [ Bug Fixes ]
     - Fixed SIGABRT crash (DBI XS assertion failure) in t/edge_cases.t on

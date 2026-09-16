@@ -6,6 +6,8 @@ use EV::MakeMaker qw(ev_args);
 # with the explicit 'provides' entries: a stale hardcoded version there is a
 # non-increasing version to PAUSE, which can refuse to index the release.
 my $version = MM->parse_version('lib/EV/Future.pm');
+die "Could not parse version from lib/EV/Future.pm\n"
+    if !defined $version || $version eq 'undef';
 
 WriteMakefile(ev_args(
     NAME              => 'EV::Future',
@@ -30,18 +32,19 @@ WriteMakefile(ev_args(
     AUTHOR            => 'vividsnow',
     LICENSE           => 'perl_5',
     MIN_PERL_VERSION  => '5.014000',
-    PM                => { 'lib/EV/Future.pm' => '$(INST_LIB)/EV/Future.pm' },
+    PM                => {
+        'lib/EV/Future.pm'         => '$(INST_LIB)/EV/Future.pm',
+        'lib/EV/Future/Handle.pod' => '$(INST_LIB)/EV/Future/Handle.pod',
+    },
     OBJECT            => '$(O_FILES)',
     META_MERGE => {
         'meta-spec' => { version => 2 },
-        # EV::Future::Handle is a public, documented class (see the
-        # EV::Future::Handle section of EV::Future's POD: cancel, pending,
-        # active) whose methods live in Future.xs. lib/EV/Future.pm carries the
-        # package stanza, its $VERSION and its documentation, so that is the
-        # file both entries point at; Future.xs has neither a package statement
-        # nor POD, so naming it left indexers pointing at a file with nothing
-        # to read. Listed explicitly, alongside the main package, so a deep vs.
-        # shallow META_MERGE of 'provides' can't drop either entry.
+        # EV::Future::Handle is a public class (documented in
+        # lib/EV/Future/Handle.pod) whose methods live in Future.xs.
+        # lib/EV/Future.pm carries its package stanza and $VERSION, so that is
+        # the file both entries point at; Future.xs has neither a package
+        # statement nor POD. Listed explicitly, alongside the main package, so
+        # a deep vs. shallow META_MERGE of 'provides' can't drop either entry.
         provides => {
             'EV::Future' => {
                 file    => 'lib/EV/Future.pm',

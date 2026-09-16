@@ -215,12 +215,17 @@ defaults:
     add German support: (1) create `templates/web/de/`, (2) copy and translate
     the `.html.tt` files from `templates/web/en/`, then (3) set the config.
 
-- **Supported data file extensions are: csv, db, sql, xml, psv**
+- **Supported data file extensions are: csv, db, sql, xml, psv, xlsx**
 
     The application calls `Database::Abstraction` which recognises exactly these
-    five extensions.  A file called `inventory.sqlite` is **not** recognised -- it
-    must be renamed to `inventory.sql`.  A file called `data.xlsx` (Excel) is
-    also not supported; export it as CSV first.
+    extensions.  A file called `inventory.sqlite` is **not** recognised -- it
+    must be renamed to `inventory.sql`.  Excel `.xlsx` files are supported
+    directly via `DBD::Excel`; each worksheet becomes a separate table.
+
+    URLs will work.
+    For example enter
+    [https://worldpopulationreview.com/country-rankings/immigration-by-country](https://worldpopulationreview.com/country-rankings/immigration-by-country)
+    into the `Import from a web page` field on the dashboard.
 
 - **The open\_table helper lowercases the table name**
 

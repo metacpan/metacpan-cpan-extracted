@@ -1,36 +1,41 @@
 package BeePack;
-our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Primitive MsgPack based key value storage
-$BeePack::VERSION = '0.103';
+our $VERSION = '0.200';
+
 use Moo;
 use bytes;
-use CDB::TinyCDB;
+use CDB_File;
 use Data::MessagePack;
 use Carp qw( croak );
 
 sub true { Data::MessagePack::true() }
 sub false { Data::MessagePack::false() }
 
-# currently workaround to be reset
-has cdb => (
-  is => 'rw',
-  lazy => 1,
-  builder => 1,
+# CDB_File has no in-place update, so the source of truth is an in-memory
+# buffer of key => raw MsgPack bytes, seeded from the existing file on open
+# and written back out atomically on save.
+has _data => (
+  is => 'lazy',
   init_arg => undef,
-  handles => [qw(
-    keys
-  )],
 );
 
-sub _build_cdb {
+sub _build__data {
   my ( $self ) = @_;
-  return -f $self->filename
-    ? CDB::TinyCDB->open($self->filename, $self->has_tempfile ? (
-        for_update => $self->tempfile
-      ) : ())
-    : $self->readonly
-      ? croak("Can't open non-existing readonly database ".$self->filename)
-      : CDB::TinyCDB->create($self->filename,$self->tempfile);
+  my %data;
+  if ( -f $self->filename ) {
+    tie my %cdb, 'CDB_File', $self->filename
+      or croak("Can't open BeePack ".$self->filename.": ".$!);
+    %data = %cdb;
+    untie %cdb;
+  } elsif ( $self->readonly ) {
+    croak("Can't open non-existing readonly database ".$self->filename);
+  }
+  return \%data;
+}
+
+sub keys {
+  my ( $self ) = @_;
+  return CORE::keys %{$self->_data};
 }
 
 has filename => (
@@ -68,7 +73,7 @@ sub _build_data_messagepack { Data::MessagePack->new->canonical->utf8 }
 sub BUILD {
   my ( $self ) = @_;
   croak("Read/Write opening requires tempfile") if !$self->readonly && !$self->has_tempfile;
-  $self->cdb;
+  $self->_data;
   $self->data_messagepack;
 }
 
@@ -84,7 +89,7 @@ sub open {
 sub set {
   my ( $self, $key, $value ) = @_;
   $self->readonly_check;
-  $self->cdb->put_replace($key,$self->data_messagepack->pack($value));
+  $self->_data->{$key} = $self->data_messagepack->pack($value);
 }
 
 sub readonly_check {
@@ -140,31 +145,34 @@ sub set_nil {
 
 sub exists {
   my ( $self, $key ) = @_;
-  return 0 unless $self->cdb->exists($key);
-  return $self->cdb->exists($key) if $self->nil_exists;
-  my $msgpack = $self->cdb->get($key);
-  my $value = $self->data_messagepack->unpack($msgpack);
+  return 0 unless CORE::exists $self->_data->{$key};
+  return 1 if $self->nil_exists;
+  my $value = $self->data_messagepack->unpack($self->_data->{$key});
   return defined $value ? 1 : 0;
 }
 
 sub get {
   my ( $self, $key ) = @_;
   return undef unless $self->exists($key);
-  return $self->data_messagepack->unpack(scalar $self->cdb->get($key));
+  return $self->data_messagepack->unpack($self->_data->{$key});
 }
 
 sub get_raw {
   my ( $self, $key ) = @_;
-  return scalar $self->cdb->get($key);
+  return $self->_data->{$key};
 }
 
 sub save {
   my ( $self ) = @_;
   croak("Trying to save readonly CDB ".$self->filename) if $self->readonly;
-  $self->cdb->finish( save_changes => 1, reopen => 0 );
-  # Bug in CDB::TinyCDB? reopen => 1 is not reopening
-  $self->cdb(undef);
-  $self->cdb($self->_build_cdb);
+  my $cdb = CDB_File->new($self->filename,$self->tempfile)
+    or croak("Can't create BeePack ".$self->filename.": ".$!);
+  for my $key ( sort CORE::keys %{$self->_data} ) {
+    $cdb->insert($key,$self->_data->{$key});
+  }
+  $cdb->finish;
+  # in-memory buffer stays the source of truth, so the pack is usable for
+  # further reads and writes after save
   return 1;
 }
 
@@ -174,13 +182,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 BeePack - Primitive MsgPack based key value storage
 
 =head1 VERSION
 
-version 0.103
+version 0.200
 
 =head1 SYNOPSIS
 
@@ -248,28 +258,183 @@ implementation will be getting strict on this.
 This distribution includes L<bee>, which is a little tool to read, generate and
 manipulate B<BeePack> from the comandline.
 
+=head2 true
+
+  my $true = BeePack->true;
+
+Returns the MsgPack C<true> boolean singleton (from L<Data::MessagePack>), for
+building booleans inside arrays and hashes passed to L</set>. See L</set_bool>
+to force a single key to a boolean directly.
+
+=head2 false
+
+  my $false = BeePack->false;
+
+Returns the MsgPack C<false> boolean singleton, the counterpart to L</true>.
+
+=head2 filename
+
+The path to the C<.bee> file on disk. Required, and read-only after
+construction. Used both to read the existing file on open and, on L</save>,
+as the destination C<CDB_File> renames the rebuilt file onto.
+
+=head2 tempfile
+
+The path C<CDB_File> uses to build the new file before atomically renaming it
+onto L</filename> on L</save>. Its presence -- not a separate flag -- is what
+switches the pack to read/write mode: give a C<tempfile> (to L</open> or
+C<new>) and L</readonly> defaults to false; leave it out and the pack opens
+read-only. A pack that is not readonly but has no C<tempfile> is rejected at
+construction ("Read/Write opening requires tempfile").
+
+=head2 nil_exists
+
+  BeePack->open('my.bee', undef, nil_exists => 1);
+
+Controls whether a key holding a nil (C<undef>) value counts as existing.
+Defaults to false, so by default L</exists> (and therefore L</get>) treats a
+nil-valued key exactly like an absent one. Set it to true to make L</exists>
+return true for a key that is present in the pack regardless of whether its
+value happens to be nil.
+
+=head2 readonly
+
+Whether the pack refuses writes: every setter and L</save> croak on a
+readonly pack instead of mutating it. Lazily derives to true when no
+L</tempfile> was given and false when one was -- so the normal way to control
+this is by giving or withholding C<tempfile>, not by setting C<readonly>
+directly. It can still be passed explicitly to the constructor (for example,
+to open a pack with a tempfile but keep it read-only); passing it as false
+without a C<tempfile> is rejected at construction instead.
+
+=head2 open
+
+  my $beepack = BeePack->open($filename);                      # read-only
+  my $beepack = BeePack->open($filename, $tempfile);            # read/write
+  my $beepack = BeePack->open($filename, undef, nil_exists=>1); # read-only, nil_exists
+
+Constructor helper: turns the positional C<$filename>/C<$tempfile> pair into
+the matching named constructor arguments and calls C<new>. C<$tempfile> may
+be C<undef> to open read-only while still passing further C<%attr> (such as
+C<nil_exists>) through to C<new>.
+
+=head2 keys
+
+  my @keys = $beepack->keys;
+
+Returns the keys currently in the pack, in whatever order the underlying hash
+buffer yields them -- unlike L</save>, this does not sort.
+
+=head2 set
+
+  $beepack->set( $key => $value );
+
+MsgPack-packs C<$value> exactly as given (however Perl and L<Data::MessagePack>
+currently see its type) and stores it in the in-memory buffer under C<$key>,
+overwriting any existing value for that key. Nothing reaches disk until
+L</save>. Croaks on a L</readonly> pack. Use L</set_integer>, L</set_bool>,
+L</set_string> or L</set_nil> instead when the MsgPack type must be pinned
+regardless of how the Perl scalar happens to be flagged.
+
+=head2 set_type
+
+  $beepack->set_type( $key => $type => $value );
+
+Alternate setter that dispatches on the first character of C<$type> -- the
+same single-letter scheme the C<bee> command line uses (see
+L<bee/DESCRIPTION>): C<i> integer (L</set_integer>), C<b> bool
+(L</set_bool>), C<s> string (L</set_string>), C<n> nil (L</set_nil>;
+C<$value> is ignored), C<a> array (L</set> with C<$value> dereferenced as an
+arrayref), C<h> hash (L</set> with C<$value> dereferenced as a hashref), or
+an empty/undefined C<$type> for a plain L</set>. A new type letter is a
+paired change: add the branch here and the matching branch in C<bee>'s
+command-line dispatch.
+
+=head2 set_integer
+
+  $beepack->set_integer( $key => $value );
+
+Forces C<$value> to a MsgPack integer (Perl's C<0 + $value>) and L</set>s it,
+regardless of how C<$value> is currently represented.
+
+=head2 set_bool
+
+  $beepack->set_bool( $key => $value );
+
+Forces C<$value> to a MsgPack boolean -- L</true> if C<$value> is true in Perl
+terms, L</false> otherwise -- and L</set>s it.
+
+=head2 set_string
+
+  $beepack->set_string( $key => $value );
+
+Forces C<$value> to a MsgPack string (Perl's C<"$value">) and L</set>s it,
+regardless of how C<$value> is currently represented.
+
+=head2 set_nil
+
+  $beepack->set_nil( $key );
+
+Sets C<$key> to a MsgPack nil (C<undef>). See L</nil_exists> for how a
+nil-valued key interacts with L</exists>.
+
+=head2 exists
+
+  my $bool = $beepack->exists( $key );
+
+Returns false when C<$key> is not in the buffer at all. Otherwise, returns
+true unconditionally when L</nil_exists> is set; when it is not, unpacks the
+value and returns true only if that value is defined -- so by default a
+nil-valued key is reported as not existing.
+
+=head2 get
+
+  my $value = $beepack->get( $key );
+
+Returns C<undef> when L</exists> says C<$key> doesn't exist (which, by
+default, includes a key whose stored value is nil -- see L</nil_exists>);
+otherwise unpacks and returns the stored value.
+
+=head2 get_raw
+
+  my $bytes = $beepack->get_raw( $key );
+
+Returns the raw MsgPack-encoded bytes stored for C<$key>, unchanged -- no
+unpack and no L</exists> check -- or C<undef> if the key is absent from the
+buffer. Useful for passing an opaque value (such as a gzipped blob) straight
+through without paying for an unpack/repack round trip.
+
+=head2 save
+
+  $beepack->save;
+
+Rebuilds the on-disk C<.bee> file from the in-memory buffer: since
+L<CDB_File> has no in-place update, this creates a fresh C<CDB_File> at
+L</filename> via L</tempfile>, inserts every buffered key in sorted order (so
+the on-disk file is deterministic regardless of hash iteration order, though
+not necessarily byte-identical across cdb implementations), and finishes it,
+which atomically renames the tempfile onto C<filename>. The in-memory buffer
+remains the source of truth afterwards, so the pack stays usable for further
+L</get>/L</set> calls without reopening. Croaks on a L</readonly> pack.
+
 =head1 SEE ALSO
 
 =head2 L<bee>
 
-=head2 L<CDB::TinyCDB>
+=head2 L<CDB_File>
 
 =head2 L<Data::MessagePack>
 
 =head1 SUPPORT
 
-IRC
+=head2 Issues
 
-  Join #hardware on irc.perl.org. Highlight Getty for fast reaction :).
+Please report bugs and feature requests on GitHub at
+L<https://github.com/cindustries/p5-beepack/issues>.
 
-Repository
+=head1 CONTRIBUTING
 
-  http://github.com/cindustries/perl-beepack
-  Pull request and additional contributors are welcome
-
-Issue Tracker
-
-  http://github.com/cindustries/perl-beepack/issues
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
@@ -277,7 +442,7 @@ Torsten Raudssus <torsten@raudss.us>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Torsten Raudssus.
+This software is copyright (c) 2014-2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

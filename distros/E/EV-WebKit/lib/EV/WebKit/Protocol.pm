@@ -3,7 +3,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # The control protocol's wire codec, and nothing else: no EV, no sockets, no
 # browser. Both the server (EV::WebKit::Control) and the client

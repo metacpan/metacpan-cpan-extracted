@@ -7,7 +7,7 @@ use feature qw( say );
 #<<<
 package Dist::Starter;
 BEGIN {
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 }
 #>>>
 
@@ -138,9 +138,7 @@ sub run {
 
   # CLI step
   # Set defaults
-  unshift @argv, '-T', catdir( dist_dir( 'Dist-Starter' ), qw( templates perl-dist-eummcpf ) );
-  unshift @argv, '-o', rel2abs curdir;
-  readopts @argv;
+  readopts @argv, '-T', catdir( dist_dir( 'Dist-Starter' ), qw( templates perl-dist-eummcpf ) ), '-o', rel2abs curdir;
 
   # Parse command-line
   my $template;

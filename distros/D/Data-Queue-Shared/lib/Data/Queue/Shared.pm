@@ -1,7 +1,7 @@
 package Data::Queue::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Data::Queue::Shared', $VERSION);
@@ -242,7 +242,8 @@ C<pop_wait_multi> blocks until at least one element is available (or timeout),
 then grabs up to C<$n> elements non-blocking. Returns empty list on timeout.
 
 C<push_wait_multi> pushes all values, blocking if the queue is full.
-C<$timeout> is seconds (C<-1> = infinite, C<0> = try once).
+C<$timeout> is seconds (C<-1> = infinite, C<0> = try once) and bounds the
+whole call: once it has run out, each remaining value gets one try.
 
 =head3 Status
 

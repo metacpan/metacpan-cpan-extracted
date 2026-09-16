@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+use 5.010;
+use strict;
+use warnings;
+use Getopt::Long ();
+use Game::Backgammon::Terminal;
+
+my %o = (mode => 'bot', level => 3, seat => 'white', view => '', ascii => 0);
+Getopt::Long::GetOptions(
+    'mode=s'  => \$o{mode},
+    'level=i' => \$o{level},
+    'seat=s'  => \$o{seat},
+    'view=s'  => \$o{view},
+    'ascii'   => \$o{ascii},
+    'colour!' => \my $colour,
+    'help'    => \my $help,
+) or die usage();
+die usage() if $help;
+die usage() unless $o{mode} =~ /\A(?:bot|hotseat|watch)\z/;
+die usage() unless $o{seat} =~ /\A(?:white|black)\z/;
+die usage() unless $o{view} =~ /\A(?:white|black|)\z/;
+die usage() unless $o{level} >= 1 && $o{level} <= 3;
+
+Game::Backgammon::Terminal->new(%o, (defined $colour ? (colour => $colour) : ()))->run;
+
+sub usage {
+    return <<'USAGE';
+backgammon [--mode bot|hotseat|watch] [--level 1-3] [--seat white|black]
+           [--view white|black] [--ascii] [--no-colour]
+
+  bot       play the computer (the default)
+  hotseat   two people at one keyboard
+  watch     the computer against itself
+
+  --view    pin the board to one side's numbering. By default it is drawn
+            from the side on roll, because a turn is written in the mover's
+            own numbers and the board should agree with the list.
+  --ascii   O and X instead of the round checkers.
+
+The board is the usual one: your home board is the bottom right quarter and
+you run into it anticlockwise, the bar is the middle column and the tray the
+one on the right. Pick a turn by its number from the list. q stops.
+USAGE
+}

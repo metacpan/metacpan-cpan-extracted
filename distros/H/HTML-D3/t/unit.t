@@ -139,12 +139,19 @@ my %LEDGER = (
 	# render_pie_chart_snippet
 	'pie-snip: die non-array'                          => 1,
 	'pie-snip: returns hashref'                        => 1,
-	'pie-snip: svg_id is chart'                        => 1,
+	'pie-snip: svg_id is pie_chart'                    => 1,
 	'pie-snip: html is string'                         => 1,
 	'pie-snip: no DOCTYPE'                             => 1,
 	'pie-snip: no html wrapper'                        => 1,
 	'pie-snip: SVG element present'                    => 1,
 	'pie-snip: d3.pie present'                         => 1,
+	'pie-snip: tableau10 default scheme'               => 1,
+	'pie-snip: animated attrTween present'             => 1,
+	'pie-snip: animated initialDrawDone present'       => 1,
+	'pie-snip: animated prefers-reduced-motion'        => 1,
+	'pie-snip: donut innerRadius present'              => 1,
+	'pie-snip: zero slice omitted'                     => 1,
+	'pie-snip: negative value absolutised'             => 1,
 
 	# render_animated_line_chart
 	'anim-line: die non-array'                         => 1,
@@ -194,7 +201,7 @@ my %LEDGER = (
 	'snippet: non-hashref third element ignored'       => 1,
 	'snippet: exactly one extra in data'               => 1,
 
-	# render_zoomable_line_chart_snippet
+	# render_zoomable_line_chart_snippet (plain)
 	'zoom: die non-array'                              => 1,
 	'zoom: returns hashref'                            => 1,
 	'zoom: svg_id is chart'                            => 1,
@@ -211,6 +218,15 @@ my %LEDGER = (
 	'zoom: escaped <\/b> present'                      => 1,
 	'zoom: extra data serialised'                      => 1,
 	'zoom: Object.entries(d.extra) present'            => 1,
+
+	# render_zoomable_line_chart_snippet (animated => 1)
+	'zoom-anim: no stroke-dashoffset when not animated' => 1,
+	'zoom-anim: stroke-dashoffset present'             => 1,
+	'zoom-anim: initialDrawDone guard present'         => 1,
+	'zoom-anim: prefers-reduced-motion check present'  => 1,
+	'zoom-anim: d3.easeLinear present'                 => 1,
+	'zoom-anim: no DOCTYPE (still snippet)'            => 1,
+	'zoom-anim: svg_id unchanged'                      => 1,
 
 	# render_multi_series_line_chart_with_tooltips
 	'ms-tt: die non-array'                             => 1,
@@ -568,14 +584,14 @@ subtest 'render_pie_chart_snippet() -- return structure' => sub {
 	returns_ok($fragment, { type => 'hashref' }, 'return value is a hashref');
 	mark('pie-snip: returns hashref');
 
-	is($fragment->{svg_id}, 'chart', 'svg_id is "chart"');
-	mark('pie-snip: svg_id is chart');
+	is($fragment->{svg_id}, 'pie_chart', 'svg_id is "pie_chart"');
+	mark('pie-snip: svg_id is pie_chart');
 
 	returns_ok($fragment->{html}, { type => 'string' }, 'html value is a string');
 	mark('pie-snip: html is string');
 };
 
-subtest 'render_pie_chart_snippet() -- page-shell absent' => sub {
+subtest 'render_pie_chart_snippet() -- page-shell absent and D3 primitives' => sub {
 	my $html = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA)->{html};
 
 	unlike($html, qr/<!DOCTYPE/i, 'no DOCTYPE in fragment');
@@ -584,11 +600,46 @@ subtest 'render_pie_chart_snippet() -- page-shell absent' => sub {
 	unlike($html, qr/<html/i, 'no <html> element in fragment');
 	mark('pie-snip: no html wrapper');
 
-	like($html, qr/<svg id="$SVG_ID"/, 'SVG element present in fragment');
+	like($html, qr/<svg id="pie_chart"/, 'SVG element present with id="pie_chart"');
 	mark('pie-snip: SVG element present');
 
 	like($html, qr/d3\.pie\(\)/, 'd3.pie() present in fragment');
 	mark('pie-snip: d3.pie present');
+
+	like($html, qr/schemeTableau10/, 'default colour scheme is tableau10');
+	mark('pie-snip: tableau10 default scheme');
+};
+
+subtest 'render_pie_chart_snippet() -- opts: animated => 1' => sub {
+	my $html = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA, { animated => 1 })->{html};
+
+	like($html, qr/attrTween/, 'attrTween present when animated');
+	mark('pie-snip: animated attrTween present');
+
+	like($html, qr/initialDrawDone/, 'initialDrawDone guard present when animated');
+	mark('pie-snip: animated initialDrawDone present');
+
+	like($html, qr/prefers-reduced-motion/, 'prefers-reduced-motion check present when animated');
+	mark('pie-snip: animated prefers-reduced-motion');
+};
+
+subtest 'render_pie_chart_snippet() -- opts: donut => 1' => sub {
+	my $html = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA, { donut => 1 })->{html};
+
+	like($html, qr/innerRadius/, 'innerRadius > 0 present when donut mode');
+	mark('pie-snip: donut innerRadius present');
+};
+
+subtest 'render_pie_chart_snippet() -- zero and negative value normalisation' => sub {
+	my $html = HTML::D3->new()
+		->render_pie_chart_snippet([['Zero', 0], ['Pos', 50]])->{html};
+	unlike($html, qr/"label":"Zero"/, 'zero-value slice omitted from emitted data');
+	mark('pie-snip: zero slice omitted');
+
+	my $html2 = HTML::D3->new()
+		->render_pie_chart_snippet([['Neg', -20], ['Pos', 80]])->{html};
+	like($html2, qr/"value":20/, 'negative value converted to its absolute value');
+	mark('pie-snip: negative value absolutised');
 };
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -871,6 +922,42 @@ subtest 'render_zoomable_line_chart_snippet() -- brush-to-zoom JavaScript featur
 	mark('zoom: escaped <\/b> present');
 
 	diag('zoomable snippet length: ' . length($html)) if $ENV{TEST_VERBOSE};
+};
+
+subtest 'render_zoomable_line_chart_snippet() -- animated => 0 (no animation markup)' => sub {
+	my $html = HTML::D3->new()->render_zoomable_line_chart_snippet(\@SIMPLE_DATA)->{html};
+
+	unlike($html, qr/stroke-dashoffset/, 'stroke-dashoffset absent when animated omitted');
+	mark('zoom-anim: no stroke-dashoffset when not animated');
+};
+
+subtest 'render_zoomable_line_chart_snippet() -- animated => 1' => sub {
+	# When animated => 1, the emitted JS must include the stroke-dashoffset
+	# draw-on technique, the initialDrawDone guard, the prefers-reduced-motion
+	# check, and d3.easeLinear.  Return shape must be unchanged.
+	my $frag = HTML::D3->new(width => 800, height => 600)
+	                   ->render_zoomable_line_chart_snippet(\@SIMPLE_DATA, { animated => 1 });
+	my $html = $frag->{html};
+
+	like($html, qr/stroke-dashoffset/, 'stroke-dashoffset animation technique present');
+	mark('zoom-anim: stroke-dashoffset present');
+
+	like($html, qr/initialDrawDone/, 'initialDrawDone guard present');
+	mark('zoom-anim: initialDrawDone guard present');
+
+	like($html, qr/prefers-reduced-motion/, 'prefers-reduced-motion check present');
+	mark('zoom-anim: prefers-reduced-motion check present');
+
+	like($html, qr/d3\.easeLinear/, 'd3.easeLinear present');
+	mark('zoom-anim: d3.easeLinear present');
+
+	unlike($html, qr/<!DOCTYPE/i, 'fragment still has no DOCTYPE');
+	mark('zoom-anim: no DOCTYPE (still snippet)');
+
+	is($frag->{svg_id}, $SVG_ID, 'svg_id is still "chart" with animated flag');
+	mark('zoom-anim: svg_id unchanged');
+
+	diag('animated zoomable snippet length: ' . length($html)) if $ENV{TEST_VERBOSE};
 };
 
 subtest 'render_zoomable_line_chart_snippet() -- extra tooltip data' => sub {

@@ -1,6 +1,6 @@
 package Database::BI::Controller::Dashboard;
 
-our $VERSION = '0.005.2';
+our $VERSION = '0.006.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -22,7 +22,7 @@ use Sub::Protected;
 
 # File extensions that Database::Abstraction can probe, in probe order.
 # Note: D::A uses ".sql" for SQLite -- NOT ".sqlite".
-Readonly my @SUPPORTED_EXT => qw( csv db sql xml psv );
+Readonly my @SUPPORTED_EXT => qw( csv db sql xml psv xlsx );
 # Use \z (absolute end-of-string) not $ (which permits a trailing \n before \z).
 # A query param decoded from "file.csv%0A" has basename "sales.csv\n"; without \z
 # that passes the extension guard and reaches realpath with an embedded newline.
@@ -55,7 +55,7 @@ Readonly my %MESSAGES => (
 	error_write_failed     => 'Write failed: %s',
 	error_ext_required     => 'Use a .csv, .sql, or .json filename extension',
 	error_upload_none      => 'No file received',
-	error_upload_ext       => 'Unsupported file type. Accepted: CSV, PSV, XML, SQLite (.sql)',
+	error_upload_ext       => 'Unsupported file type. Accepted: CSV, PSV, XML, SQLite (.sql), Berkeley DB (.db), XLSX',
 	error_upload_too_large => 'File too large (maximum %s MiB)',
 	error_path_required    => '"path" parameter is required',
 	error_url_required     => 'Please enter a URL',
@@ -112,7 +112,8 @@ sub _i18n :Protected ($self, $key, @args) {
 # Hostname-based targets (e.g. http://internal.corp.example.com/) are allowed
 # at this layer; block them with egress firewall rules instead.
 sub _is_safe_url {
-	my ($url) = @_;
+	my $url = $_[0];
+
 	return 0 unless $url =~ m{\Ahttps?://([^/:?\[\]#]+)}i;
 	my $host = lc $1;
 
@@ -145,7 +146,7 @@ sub _is_safe_url {
 #          no template directory exists for the resolved language.
 # Exit:    Returns ($platform, $language) -- both guaranteed non-empty strings.
 sub _resolve_template :Protected ($self) {
-	my $conf         = $self->app->config;
+	my $conf         = $self->app->config();
 	my $cfg_platform = $conf->{platform} // 'web';
 	my $cfg_language = $conf->{language} // 'en';
 
@@ -198,7 +199,7 @@ sub _detect_platform ($user_agent, $fallback) {
 # Side Effects: filesystem stats for template directories;
 #               temporarily sets $ENV{HTTP_ACCEPT_LANGUAGE} with local().
 sub _resolve_language :Protected ($self, $platform, $default) {
-	my $accept = $self->req->headers->accept_language // '';
+	my $accept = $self->req->headers->accept_language() // '';
 	return $default unless $accept;
 
 	# Discover supported languages from template directories so CGI::Lingua
@@ -268,8 +269,7 @@ sub _open_spec :Protected ($self, $spec) {
 		return () unless grep { -f $data_dir->child("$table.$_") } @SUPPORTED_EXT;
 		my $src = eval { $self->open_table($table, directory => $data_dir->to_string) };
 		return ($src, $table) if $src && !$@;
-	}
-	elsif ($spec =~ /\Apath:(.+)\z/) {
+	} elsif ($spec =~ /\Apath:(.+)\z/) {
 		my $file = eval { Mojo::File->new($1)->realpath };
 		if (defined $file && -f $file && $file->basename =~ $EXT_RE) {
 			my $dir = $file->dirname->to_string;
@@ -277,8 +277,7 @@ sub _open_spec :Protected ($self, $spec) {
 			my $src = eval { $self->open_table($table, directory => $dir) };
 			return ($src, $file->basename) if $src && !$@;
 		}
-	}
-	elsif ($spec =~ $URL_SPEC_RE) {
+	} elsif($spec =~ $URL_SPEC_RE) {
 		my $url = $1;
 		return () unless _is_safe_url($url);
 		my $src = eval { $self->open_table('', url => $url) };
@@ -294,9 +293,9 @@ sub _open_spec :Protected ($self, $spec) {
 # Entry:   $spec is a "table:name" or "path:/abs" string.
 # Exit:    Returns a URL string beginning with '/'.
 sub _spec_to_url :Protected ($self, $spec) {
-	return "/view/$1"                         if $spec =~ /\Atable:([A-Za-z0-9_]+)\z/;
-	return '/open?path=' . url_escape($1)     if $spec =~ /\Apath:(.+)\z/;
-	return '/import?url=' . url_escape($1)    if $spec =~ $URL_SPEC_RE;
+	return "/view/$1" if $spec =~ /\Atable:([A-Za-z0-9_]+)\z/;
+	return '/open?path=' . url_escape($1) if $spec =~ /\Apath:(.+)\z/;
+	return '/import?url=' . url_escape($1) if $spec =~ $URL_SPEC_RE;
 	return '/';
 }
 
@@ -423,58 +422,6 @@ sub _dedup_records {
 		push @out, $row unless $seen{$key}++;
 	}
 	return \@out;
-}
-
-# _left_join($left_recs, $left_cols, $left_key,
-#            $right_recs, $right_cols, $right_key, $right_label)
-#   -> (\@merged_records, \@merged_columns)
-#
-# Purpose: Perform a single in-memory left join.  Every left row is kept.
-#          Right-table columns are appended for rows that match on the join key.
-#          Unmatched rows receive undef for right-table columns.
-#          If a right column name collides with a left column (other than the
-#          join key itself), the right column is prefixed with "$right_label.".
-# Entry:   All arrayref args non-undef; key strings non-empty; $right_label is
-#          a display label used for collision-prefix (not for SQL quoting).
-# Exit:    Returns (\@merged, \@column_list).
-# Side Effects: None; allocates new record hashrefs.
-sub _left_join {
-	my ($left_recs, $left_cols, $left_key,
-	    $right_recs, $right_cols, $right_key, $right_label) = @_;
-
-	# Build a lookup hash from join key to first matching right row.
-	my %right_idx;
-	for my $row (@$right_recs) {
-		my $k = $row->{$right_key} // '';
-		$right_idx{$k} //= $row;
-	}
-
-	# Map right column names: drop the join key (redundant), prefix collisions.
-	my %left_set = map { $_ => 1 } @$left_cols;
-	my (@add_cols, %col_map);
-	for my $col (grep { $_ ne $right_key } @$right_cols) {
-		my $out = $left_set{$col} ? "${right_label}.${col}" : $col;
-		$col_map{$col} = $out;
-		push @add_cols, $out;
-	}
-
-	# Precompute [$right_col, $mapped_col] pairs once before the merge loop.
-	# Without this, "grep { $_ ne $right_key } @$right_cols" would run on
-	# every left row -- O(N_left * R) grep iterations for R right columns.
-	# Precomputing reduces that to a single O(R) pass.
-	my @rcols = map { [$_, $col_map{$_}] }
-	            grep { $_ ne $right_key } @$right_cols;
-
-	my @merged;
-	for my $left_row (@$left_recs) {
-		my $k         = $left_row->{$left_key} // '';
-		my $right_row = $right_idx{$k} // {};
-		my %row       = %$left_row;
-		$row{ $_->[1] } = $right_row->{ $_->[0] } for @rcols;
-		push @merged, \%row;
-	}
-
-	return (\@merged, [@$left_cols, @add_cols]);
 }
 
 # _combine_tables(\@sources) -> (\@merged_records, \@merged_columns)
@@ -638,8 +585,8 @@ sub _write_sqlite_db :Protected ($self, $records, $columns) {
 # _run_export_pipeline($self) -> ($records, \@columns, $left_label) or ()
 #
 # Purpose: Shared join+filter pipeline executed by both export_data (GET, download)
-#          and export_write (POST, filesystem write).  Opens the left table, applies
-#          all join steps, then applies all filter specs.
+#          and export_write (POST, filesystem write).  Opens the left table, chains
+#          any Database::Join steps, fetches the merged result, then applies filters.
 # Entry:   Reads "l=", "j=" (repeatable), and "f=" (repeatable) query/body params.
 # Exit:    On success: ($filtered_arrayref, \@column_names, $left_label_string).
 #          On failure: empty list (left table not found / fetch error).
@@ -649,31 +596,37 @@ sub _run_export_pipeline :Protected ($self) {
 	my ($left_src, $left_label) = $self->_open_spec($left_spec);
 	return () unless $left_src;
 
-	my $left_recs = eval { $left_src->fetch_all };
-	return () if $@;
-	$left_recs //= [];
-
-	my @columns = _get_columns($left_src, $left_recs);
-	my $records  = $left_recs;
-
+	# Build the join chain lazily: each Database::Join wraps the previous source
+	# and a new right DataSource.  No data is fetched until after the loop.
+	my $src = $left_src;
 	for my $jspec (@{ $self->every_param('j') }) {
 		my ($right_spec, $left_key, $right_key) = split /\|/, $jspec, 3;
 		next unless defined $right_spec && defined $left_key && defined $right_key;
-		my %col_set = map { $_ => 1 } @columns;
-		next unless $col_set{$left_key};
+
+		my $cur_cols = $src->columns;
+		next unless $cur_cols;
+		next unless +{ map { $_ => 1 } @$cur_cols }->{$left_key};
+
 		my ($right_src, $right_label) = $self->_open_spec($right_spec);
 		next unless $right_src;
-		my $right_recs = eval { $right_src->fetch_all } // [];
-		next if $@;
-		my @right_cols = _get_columns($right_src, $right_recs);
-		my %right_set  = map { $_ => 1 } @right_cols;
-		next unless $right_set{$right_key};
-		($records, my $new_cols) = _left_join(
-			$records, \@columns, $left_key,
-			$right_recs, \@right_cols, $right_key, $right_label,
+
+		my $right_cols = $right_src->columns;
+		next unless $right_cols;
+		next unless +{ map { $_ => 1 } @$right_cols }->{$right_key};
+
+		require Database::Join;
+		$src = Database::Join->new(
+			databases        => [$src, $right_src],
+			join_column      => $left_key,
+			($left_key ne $right_key ? (join_map         => {1 => $right_key})   : ()),
+			($right_label             ? (collision_prefix => {1 => $right_label}) : ()),
 		);
-		@columns = @$new_cols;
 	}
+
+	my $records = eval { $src->selectall_arrayref };
+	return () if $@;
+	$records //= [];
+	my @columns = _get_columns($src, $records);
 
 	# Combine (vertical stack) with any c= sources.  Runs after joins so a join
 	# result can itself be stacked with another table in a single pipeline.
@@ -1110,6 +1063,14 @@ sub open_file ($self) {
 	my ($source, $records);
 	eval { $source = $self->open_table($table, directory => $dir->to_string); $records = $source->fetch_all };
 	if ($@) {
+		# Provide a SQLite-specific hint when the error looks like a table-name
+		# mismatch or a missing-tables failure so the user knows what to do.
+		my $hint;
+		if ($filename =~ /\.(?:sql|db)\z/i) {
+			$hint = 'SQLite files must contain at least one user-defined table. '
+				. 'The table name inside the database does not need to match the '
+				. 'filename — the application auto-detects and uses the first table found.';
+		}
 		return $self->render(
 			template   => "$platform/$language/home",
 			handler    => 'tt',
@@ -1117,6 +1078,7 @@ sub open_file ($self) {
 			tables     => [],
 			title      => 'Error',
 			error      => $self->_i18n('error_file_open', $filename, $@),
+			hint       => $hint,
 			back_url   => $back,
 			back_label => 'Back to browser',
 		);
@@ -1388,7 +1350,38 @@ sub join_tables ($self) {
 	my ($left_src, $left_label) = $self->_open_spec($left_spec);
 	return $self->reply->not_found unless $left_src;
 
-	my $left_recs = eval { $left_src->fetch_all };
+	my @join_specs = @{ $self->every_param('j') };
+	my @summaries;
+
+	# Build the join chain: each step wraps the previous source in a
+	# Database::Join.  Data is not fetched until after the loop.
+	my $src = $left_src;
+	for my $jspec (@join_specs) {
+		my ($right_spec, $left_key, $right_key) = split /\|/, $jspec, 3;
+		next unless defined $right_spec && defined $left_key && defined $right_key;
+
+		my $cur_cols = $src->columns;
+		next unless $cur_cols;
+		next unless +{ map { $_ => 1 } @$cur_cols }->{$left_key};
+
+		my ($right_src, $right_label) = $self->_open_spec($right_spec);
+		next unless $right_src;
+
+		my $right_cols = $right_src->columns;
+		next unless $right_cols;
+		next unless +{ map { $_ => 1 } @$right_cols }->{$right_key};
+
+		require Database::Join;
+		$src = Database::Join->new(
+			databases        => [$src, $right_src],
+			join_column      => $left_key,
+			($left_key ne $right_key ? (join_map         => {1 => $right_key})   : ()),
+			($right_label             ? (collision_prefix => {1 => $right_label}) : ()),
+		);
+		push @summaries, { label => $right_label, left_key => $left_key, right_key => $right_key };
+	}
+
+	my $records = eval { $src->selectall_arrayref };
 	if ($@) {
 		return $self->render(
 			template => "$platform/$language/home",
@@ -1399,37 +1392,8 @@ sub join_tables ($self) {
 			error    => $self->_i18n('error_table_open', $left_label, $@),
 		);
 	}
-	$left_recs //= [];
-
-	my @left_cols = _get_columns($left_src, $left_recs);
-	my @join_specs = @{ $self->every_param('j') };
-
-	my ($records, @columns, @summaries) = ($left_recs, @left_cols);
-
-	for my $jspec (@join_specs) {
-		my ($right_spec, $left_key, $right_key) = split /\|/, $jspec, 3;
-		next unless defined $right_spec && defined $left_key && defined $right_key;
-
-		# O(1) hash-set probe instead of O(C) grep for each join step.
-		my %col_set = map { $_ => 1 } @columns;
-		next unless $col_set{$left_key};
-
-		my ($right_src, $right_label) = $self->_open_spec($right_spec);
-		next unless $right_src;
-
-		my $right_recs = eval { $right_src->fetch_all } // [];
-		next if $@;
-		my @right_cols = _get_columns($right_src, $right_recs);
-		my %right_set  = map { $_ => 1 } @right_cols;
-		next unless $right_set{$right_key};
-
-		($records, my $new_cols) = _left_join(
-			$records, \@columns, $left_key,
-			$right_recs, \@right_cols, $right_key, $right_label,
-		);
-		@columns = @$new_cols;
-		push @summaries, { label => $right_label, left_key => $left_key, right_key => $right_key };
-	}
+	$records //= [];
+	my @columns = _get_columns($src, $records);
 
 	my ($filtered, $filter_specs, $filters_json) = $self->_apply_filters($records);
 	my $dedup = $self->param('d') ? 1 : 0;
@@ -2083,7 +2047,7 @@ sub graph_view ($self) {
 	require HTML::D3;
 	my $title   = "$y_col vs $x_col";
 	my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580)
-		->render_zoomable_line_chart_snippet(\@pairs);
+		->render_zoomable_line_chart_snippet(\@pairs, { animated => 1 });
 
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
@@ -2409,10 +2373,9 @@ are not interchangeable.
 
 =item *
 
-The in-memory left join in C<_left_join> holds both the left and right result
-sets in RAM simultaneously.  For files with millions of rows, replace the
-C<open_table> helper in C<Database::BI> with a C<Database::Join> backend
-without changing this controller.
+Multi-table joins are delegated to C<Database::Join>.  All component tables
+are fetched into memory before the merge; this is not suitable for very large
+result sets.  C<Database::Join> operates in-memory only.
 
 =item *
 

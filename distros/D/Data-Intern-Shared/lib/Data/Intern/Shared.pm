@@ -1,7 +1,7 @@
 package Data::Intern::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::Intern::Shared', $VERSION);
 

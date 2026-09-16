@@ -1,5 +1,42 @@
 Revision history for Punk-OAuth2
 
+0.08    2026-09-15
+        - FIX: a consent hook that returned a RESPONSE (a consent screen,
+          rather than an approve or deny) had that response freed while
+          the caller still held it. It was mortalised on the way out of
+          the authorize handler and mortalised again by the XSUB's own
+          RETVAL, so one owned reference carried two decrements. The
+          symptom is a SIGSEGV in the host application's cleanup, on a
+          poisoned pointer, with no frame from this distribution in the
+          stack. Nothing exercised it: no test here configured a consent
+          hook at all, and every authenticate hook returned a plain
+          string. t/50-hook-refs.t now drives both reference branches.
+        - RFC 8707 resource indicators. /authorize and /token take a
+          repeatable `resource`, checked against the client's registered
+          `resources` (deny by default, as redirect_uris already is),
+          carried on the code and on the refresh token, and minted into
+          `aud`, so a token for one resource server is refused by another.
+          A request naming no resource is unchanged: `aud` is the issuer.
+        - RFC 7591 dynamic client registration at POST /register,
+          advertised as `registration_endpoint`. Creates a public client
+          with no secret, the code and refresh grants only, and https or
+          loopback redirect URIs. Mount it behind the application's own
+          per-address quota.
+        - Checker->guard takes `resource_metadata`, adding RFC 9728's
+          parameter to the WWW-Authenticate challenge so a client can find
+          out where to authenticate. Unset, the header does not change.
+        - The token endpoint's form parser keeps a repeated parameter
+          instead of overwriting it, matching Punk's own query parser.
+        - A `claims` hook on the authorization server, for private claims
+          on the access token. It runs at /authorize with the client, the
+          user and the scopes, and what it returns is bound to the code,
+          so a token carries what the user approved and a token request
+          cannot influence it. A refresh carries them forward. A private
+          claim never overwrites a registered one.
+        - Store: `resources` on clients, `resource` and `claims` on codes
+          and refresh tokens, added to an existing database by ALTER
+          TABLE at migrate.
+
 0.07    2026-08-24
         - Require Fetch 0.19 for the io_uring cancelled deadline crash.
         - Gate fetch_abi on the version this dist calls, not the header's.

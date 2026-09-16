@@ -24,8 +24,12 @@ sub data_of { file_json_decode(body_of($_[0])) }
 {
     my $t = $api->synthesize('withExample');
     is($t->[0], 200, 'lowest declared 2xx by default');
+    # `example` and `examples` are mutually exclusive on a Media Type Object,
+    # so a document carrying both is refused at load and the two can no longer
+    # be compared here. What remains testable, and is what this asserts, is
+    # that a media `example` is preferred over generating from the schema.
     is_deeply(data_of($t), { id => 42, name => 'example-wins' },
-        'the media example wins over examples and schema');
+        'the media example is preferred over generating from the schema');
     my %h = @{ $t->[1] };
     is($h{'Content-Type'}, 'application/json', 'content type declared');
     is($h{'Content-Length'}, length(body_of($t)), 'content length measured');

@@ -1,0 +1,158 @@
+#!perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long qw/GetOptions/;
+use Game::Checkers;
+use Game::Checkers::Bot;
+use Game::Checkers::Terminal;
+
+my %option = (
+	level => [],
+	side => 'black',
+	ascii => 0,
+	seed => 0,
+);
+
+GetOptions(
+	\%option,
+	'level=i@',
+	'side=s',
+	'hotseat',
+	'bot-vs-bot',
+	'fen=s',
+	'load=s',
+	'replay=s',
+	'seed=i',
+	'ascii',
+	'colour!',
+	'analyse',
+	'version',
+	'help'
+) or usage(2);
+
+usage(0) if $option{help};
+
+if ($option{version}) {
+	print "checkers, Game::Checkers $Game::Checkers::VERSION\n";
+	exit 0;
+}
+
+my @level = @{$option{level}};
+push @level, 3 while @level < 2;
+die "level must be 1 to 5\n" if grep { $_ < 1 || $_ > 5 } @level;
+
+my $game = build_game();
+
+if ($option{analyse}) {
+	analyse($game);
+	exit 0;
+}
+
+if (my $file = $option{replay}) {
+	replay(read_pdn($file));
+	exit 0;
+}
+
+my $human = $option{hotseat} ? 'both'
+	: $option{'bot-vs-bot'} ? 'none'
+	: side();
+
+my $terminal = Game::Checkers::Terminal->new(
+	game => $game,
+	human => $human,
+	($human eq 'both' ? () : (
+		bot => Game::Checkers::Bot->new(level => $level[0], seed => $option{seed})
+	)),
+	ascii => $option{ascii},
+	(defined $option{colour} ? (colour => $option{colour}) : ())
+);
+
+my $result = $terminal->start;
+exit 0 unless $result;
+exit 0 if $result->is_draw || $human eq 'both' || $human eq 'none';
+exit(($result->winner eq $human) ? 0 : 1);
+
+sub side {
+	my $side = lc $option{side};
+	return $side if $side eq 'black' || $side eq 'white';
+	return int(rand 2) ? 'black' : 'white' if $side eq 'random';
+	die "side must be black, white or random\n";
+}
+
+sub build_game {
+	return Game::Checkers->from_pdn(read_pdn($option{load})) if $option{load};
+	return Game::Checkers->new($option{fen} ? (fen => $option{fen}) : ());
+}
+
+sub read_pdn {
+	my ($file) = @_;
+	open my $handle, '<', $file or die "cannot read $file: $!\n";
+	my $pdn = do { local $/; <$handle> };
+	close $handle;
+	return $pdn;
+}
+
+sub analyse {
+	my ($game) = @_;
+	my $bot = Game::Checkers::Bot->new(level => $level[0], seed => $option{seed});
+	my $move = $bot->choose($game);
+	unless ($move) {
+		print 'no move: ', ($game->result ? $game->result->stringify : 'no legal move'), "\n";
+		return;
+	}
+	my $search = $bot->last_search;
+	printf "move %s\nscore %s\ndepth %d\nnodes %d\nline %s\n",
+		$move->notation,
+		defined $search->{score} ? $search->{score} : 'forced',
+		$search->{depth},
+		$search->{nodes},
+		join ' ', @{$search->{pv}};
+	return;
+}
+
+sub replay {
+	my ($pdn) = @_;
+	my $whole = Game::Checkers->from_pdn($pdn);
+	my $game = Game::Checkers->new(fen => $whole->fen);
+	my $terminal = Game::Checkers::Terminal->new(
+		game => $game,
+		human => 'both',
+		ascii => $option{ascii},
+		(defined $option{colour} ? (colour => $option{colour}) : ())
+	);
+	for my $move (@{$whole->history}) {
+		$terminal->render;
+		$terminal->read_line('Press enter for ' . $move->coord_notation . ' ');
+		$game->move($move->notation);
+	}
+	$terminal->render;
+	return;
+}
+
+sub usage {
+	my ($status) = @_;
+	print <<'USAGE';
+checkers [options]
+
+  --level N          the strength of the bot, 1 to 5, 3 by default. Give it
+                     twice with --bot-vs-bot for one level a side.
+  --side SIDE        black, white or random. Black moves first.
+  --hotseat          two people at one keyboard, no bot.
+  --bot-vs-bot       watch two bots play.
+  --fen STRING       start from a position instead of the opening.
+  --load FILE        read a PDN game and play on from the end of it.
+  --replay FILE      step through a PDN game, one move a keypress.
+  --analyse          print the bot's move for the position and stop.
+  --seed N           the seed the bot varies its easy levels with.
+  --ascii            letters instead of the draughts symbols.
+  --no-colour        no ANSI colour. NO_COLOR in the environment does the same.
+  --version, --help
+
+At the prompt, a move is its squares, read off the edge of the board: a3-b4 to
+slide, c3xe5xg7 to jump. Type help for the rest of the commands.
+USAGE
+	exit $status;
+}

@@ -1,0 +1,4 @@
+---
+distro: perl-critic-policy-prohibitleadingzeros
+version: 1.000
+author_path: T/TE/TEODESIAN/perl-critic-policy-prohibitleadingzeros-1.000.tar.gz

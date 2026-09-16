@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Mojo::Date;
+use Mojo::Headers;
 use Scalar::Util ();
 
 use overload
@@ -11,7 +12,7 @@ use overload
     'bool' => sub { 1 },
     fallback => 1;
 
-our $VERSION = '2.1.0';
+our $VERSION = '3.1.0';
 
 my %RETRYABLE = (rate_limited => 1, server_error => 1, network => 1);
 
@@ -59,6 +60,14 @@ sub from_response {
     return $class->new(kind => 'bad_request', message => $message, status => $status)
         if $status < 500;
     return $class->new(kind => 'server_error', message => $message, status => $status);
+}
+
+# A per-entry failure inside a successful batch: the status the single lookup
+# would have answered, and its message, with no headers at all - so a 429 here
+# is a spent allowance, which is the only kind the API puts in an entry.
+sub from_entry {
+    my ($class, $status, $message) = @_;
+    return $class->from_response($status, Mojo::Headers->new, { error => $message });
 }
 
 # Anything a promise can reject with becomes one of these. Mojo::UserAgent

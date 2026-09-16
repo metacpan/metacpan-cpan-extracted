@@ -1,0 +1,12 @@
+Revision history for Struct::Codec
+
+0.02	2026-09-16
+        - A float on a perl built -Duselongdouble or -Dusequadmath kept only
+          what a double holds. Such a value now goes out as decimal digits
+          under tag 0x38, and comes back the number it was. A perl whose NV
+          is a double writes the same bytes as before.
+        - t/25-wide-nv.t.
+
+0.01	2026-09-12
+        - First version.
+

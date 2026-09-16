@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   XS::Parse::Keyword::Builder: '0.40'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150014'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,42 +23,42 @@ no_index:
 provides:
   Data::HashMap::Shared:
     file: lib/Data/HashMap/Shared.pm
-    version: '0.20'
+    version: '0.21'
   Data::HashMap::Shared::I16:
     file: lib/Data/HashMap/Shared/I16.pm
-    version: '0.20'
+    version: '0.21'
   Data::HashMap::Shared::I16S:
     file: lib/Data/HashMap/Shared/I16S.pm
-    version: '0.20'
+    version: '0.21'
   Data::HashMap::Shared::I32:
     file: lib/Data/HashMap/Shared/I32.pm
-    version: '0.20'
+    version: '0.21'
   Data::HashMap::Shared::I32S:
     file: lib/Data/HashMap/Shared/I32S.pm
-    version: '0.20'
+    version: '0.21'
   Data::HashMap::Shared::II:
     file: lib/Data/HashMap/Shared/II.pm
-    version: '0.20'
+    version: '0.21'
   Data::HashMap::Shared::IS:
     file: lib/Data/HashMap/Shared/IS.pm
-    version: '0.20'
+    version: '0.21'
   Data::HashMap::Shared::SI:
     file: lib/Data/HashMap/Shared/SI.pm
-    version: '0.20'
+    version: '0.21'
   Data::HashMap::Shared::SI16:
     file: lib/Data/HashMap/Shared/SI16.pm
-    version: '0.20'
+    version: '0.21'
   Data::HashMap::Shared::SI32:
     file: lib/Data/HashMap/Shared/SI32.pm
-    version: '0.20'
+    version: '0.21'
   Data::HashMap::Shared::SS:
     file: lib/Data/HashMap/Shared/SS.pm
-    version: '0.20'
+    version: '0.21'
 requires:
   XS::Parse::Keyword: '0.40'
   perl: '5.022'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-data-hashmap-shared/issues
   repository: https://github.com/vividsnow/perl5-data-hashmap-shared.git
-version: '0.20'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

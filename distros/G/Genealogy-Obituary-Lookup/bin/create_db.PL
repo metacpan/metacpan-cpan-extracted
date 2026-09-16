@@ -1,262 +1,293 @@
 #!/usr/bin/env perl
 
-# Create SQLite3 from https://sites.rootsweb.com/~obituary/,
-#	https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit and
-#	https://www.funeral-notices.co.uk
+# Build obituaries.sql from:
+#   https://wayback.archive-it.org  (mlarchives mirror, pages 1-18 only)
+#   https://www.freelists.org/list/obitdailytimes
+#   https://www.funeral-notices.co.uk
+#   __DATA__ section (locally curated records)
 #
-# -f:	force a build, otherwise it won't build on CPAN smokers or if the
-#	database is less than a day old
-
-# If mlarchives starts to fail to download, try looking at bin/ml_from_cache
+# -f    Force rebuild even if the file is less than a day old or we are
+#       running on a CI smoker.
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
+use Carp qw(confess croak);
 use Data::Dumper;
 use DBI;
-# use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use File::HomeDir;
 use File::Slurp;
 use File::Spec;
 use HTML::Entities;
 use HTTP::Cache::Transparent;
+use Lingua::EN::NameCase qw(nc);
 use LWP::ConnCache;
 use LWP::UserAgent::WithCache;
-use Lingua::EN::NameCase qw(nc);
+use Readonly;
 use Text::CSV;
 use Try::Tiny;
-use autodie qw(:all);
+use URI::Escape qw(uri_escape);
 
-sub freelists($$);
-sub mlarchives($$);
-sub queue($$$$$$$$$);
-sub flush($);
-sub normalise_name($);
-
+# Suppress non-fatal "uninitialized" warnings from HTML parsers; fatal-ise
+# them if they occur inside our own business logic.
 BEGIN {
 	$SIG{__WARN__} = sub {
-		my $warning = shift;
-		if(($warning =~ /^Use of uninitialized value/) ||
-		   ($warning =~ /isn't numeric in numeric eq /i)) {
-			die $warning;
+		my $w = shift;
+		if($w =~ /^Use of uninitialized value/ || $w =~ /isn't numeric in numeric eq /i) {
+			die $w;
 		}
-		warn $warning;
-	}
+		warn $w;
+	};
 }
 
-my %normalised;
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+Readonly::Scalar my $QUEUE_FLUSH_THRESHOLD => 10_000;	# Rows before mid-run flush
+Readonly::Scalar my $HTTP_TIMEOUT          => 60;
+Readonly::Scalar my $CACHE_NO_UPDATE       => 60 * 60 * 24 * 7 * 31;	# ~1 month; archive never changes
+Readonly::Scalar my $CACHE_MAX_AGE         => 30 * 24;
+Readonly::Scalar my $DB_CACHE_PAGES        => -65536;	# 64 MB page cache for SQLite
+
+my %normalised;	# Cache of normalise_name() results to reduce Lingua::EN::NameCase calls
 my $force_flag;
-my $dir = 'lib/Genealogy/Obituary/Lookup/data';
+my $dir  = 'lib/Genealogy/Obituary/Lookup/data';
 my $bdir = File::Spec->catdir('blib', $dir);
 
+# ---------------------------------------------------------------------------
+# Guard: skip download on CI smokers unless -f is passed
+# ---------------------------------------------------------------------------
 if(defined($ARGV[0]) && ($ARGV[0] eq '-f')) {
 	$force_flag++;
 } elsif($ENV{'AUTOMATED_TESTING'}) {
-	if(!-d $dir) {
-		mkdir $dir, 0755;
-	}
-	exit(0);
+	mkdir $dir, 0755 unless -d $dir;
+	exit 0;
 }
 
-if(!-d $dir) {
-	mkdir $dir, 0755;
-}
+mkdir $dir, 0755 unless -d $dir;
 
 my $filename = File::Spec->catdir($dir, 'obituaries.sql');
 
 if(-r $filename) {
-	# Don't bother building if the current file is less than a day old
-	if(((-s $filename) > 0) && (-M $filename < 1) && !$force_flag) {
+	# Skip rebuild if the file is fresh (less than a day old) and not forced
+	if((-s $filename) > 0 && (-M $filename < 1) && !$force_flag) {
 		exit;
 	}
 	unlink $filename;
 }
 
+# ---------------------------------------------------------------------------
+# HTTP cache setup
+# ---------------------------------------------------------------------------
 my $cache_dir = $ENV{'CACHE_DIR'} || $ENV{'CACHEDIR'};
 if($cache_dir) {
-	mkdir $cache_dir, 0700 if(!-d $cache_dir);
+	mkdir $cache_dir, 0700 unless -d $cache_dir;
 	$cache_dir = File::Spec->catfile($cache_dir, 'http-cache-transparent');
 } else {
-	$cache_dir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
+	$cache_dir = File::Spec->catfile(
+		File::HomeDir->my_home(), '.cache', 'http-cache-transparent'
+	);
 }
 
 HTTP::Cache::Transparent::init({
 	BasePath => $cache_dir,
-	Verbose => 0,
-	NoUpdate => 60 * 60 * 24 * 7 * 31,	# The archive never changes
-	MaxAge => 30 * 24
+	Verbose  => 0,
+	NoUpdate => $CACHE_NO_UPDATE,
+	MaxAge   => $CACHE_MAX_AGE,
 }) || die "$0: $cache_dir: $!";
 
 print "This will take some time. It'd be best to go and make yourself a cup of tea.\n";
 
-my $ua = $force_flag ? LWP::UserAgent->new(timeout => 60, keep_alive => 1) : LWP::UserAgent::WithCache->new(timeout => 60, keep_alive => 1);
-# my $ua = LWP::UserAgent->new(timeout => 60, keep_alive => 1);
+my $ua = $force_flag
+	? LWP::UserAgent->new(timeout => $HTTP_TIMEOUT, keep_alive => 1)
+	: LWP::UserAgent::WithCache->new(timeout => $HTTP_TIMEOUT, keep_alive => 1);
 $ua->env_proxy(1);
-$ua->agent('Mozilla/5.0');
+$ua->agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36');
 $ua->conn_cache()->total_capacity(undef);
 $Lingua::EN::NameCase::POSTNOMINAL = 0;
 
-# print '"last","first","maiden","age","place","newspapername","newspaperdate","tag"', "\n";
+# ---------------------------------------------------------------------------
+# Database setup
+# ---------------------------------------------------------------------------
+my $dbh = DBI->connect(
+	"dbi:SQLite:dbname=$filename",
+	undef, undef,
+	{ RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' }
+) || die "$filename: $!";
 
-my $dbh = DBI->connect("dbi:SQLite:dbname=$filename", undef, undef, { RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' });
-die "$filename: $!" if(!defined($dbh));
-
-$dbh->do('PRAGMA cache_size = -65536');	# 64MB
+$dbh->do("PRAGMA cache_size = $DB_CACHE_PAGES");
 $dbh->do('PRAGMA journal_mode = OFF');
-$dbh->do('CREATE TABLE obituaries(first VARCHAR NOT NULL, middle VARCHAR, last VARCHAR NOT NULL, maiden VARCHAR, age INTEGER, place VARCHAR, newspaper VARCHAR NOT NULL, date DATE NOT NULL, source CHAR NOT NULL, page VARCHAR NOT NULL)');
+$dbh->do(
+	'CREATE TABLE obituaries('
+	. 'first VARCHAR NOT NULL, middle VARCHAR, last VARCHAR NOT NULL,'
+	. ' maiden VARCHAR, age INTEGER, place VARCHAR,'
+	. ' newspaper VARCHAR NOT NULL, date DATE NOT NULL,'
+	. ' source CHAR NOT NULL, page VARCHAR NOT NULL)'
+);
 
 my @queue;
 
-# Entries on funeral-notices.co.uk
-
+# ---------------------------------------------------------------------------
+# funeral-notices.co.uk — list of (surname => page_id) pairs
+# ---------------------------------------------------------------------------
 my %notices;
-my $url = 'https://www.nigelhorne.com/downloads/obt.txt';
-my $response = $ua->get($url);
-my $data;
-if($response->is_success()) {
-	$data = $response->decoded_content();
+my $fn_list_url = 'https://www.nigelhorne.com/downloads/obt.txt';
+my $fn_response = $ua->get($fn_list_url);
+my $fn_data;
+if($fn_response->is_success()) {
+	$fn_data = $fn_response->decoded_content();
 } else {
-	die "$url: ", $response->status_line();
+	die "$fn_list_url: ", $fn_response->status_line();
 }
 
-# Parse the downloaded file
-$data =~ s/\r//g;
-foreach my $line (split/^/ms, $data) {
+$fn_data =~ s/\r//g;
+for my $line (split /^/ms, $fn_data) {
 	chomp $line;
-	if($line =~ /^'(.+)' => (\d+),$/) {
+	next if $line =~ /^\s*$/;	# skip blank lines
+	if($line =~ /^'(.+)' => (\d+),?$/) {
 		$notices{$1} = $2;
 	} else {
-		die "$url: can't parse $line";
+		die "$fn_list_url: can't parse line: $line";
 	}
 }
 
-# funeral_notices('taylor', 5229508);
 while(my($last, $page) = each %notices) {
 	funeral_notices($last, $page);
 }
 
-# use Data::Dumper;
-# die Data::Dumper->new([\@queue])->Dump();
-
-data();
+# ---------------------------------------------------------------------------
+# Locally curated records from __DATA__
+# ---------------------------------------------------------------------------
+import_data();
 flush($dbh);
 
+# ---------------------------------------------------------------------------
+# mlarchives — Wayback Machine mirror of the Rootsweb ODT archive
+# ---------------------------------------------------------------------------
 if($ENV{'MLARCHIVE_DIR'} || $ENV{'MLARCHIVEDIR'}) {
-	if(mlarchives($ua, 'other')) {
-		flush($dbh)
-	}
+	flush($dbh) if mlarchives($ua, 'other');
 }
 
 print ' ' x 78, "\r";
 
 my $page = 1;
 while(mlarchives($ua, $page)) {
-	flush($dbh) if(scalar(@queue) > 10_000);
+	flush($dbh) if scalar(@queue) > $QUEUE_FLUSH_THRESHOLD;
 	$page++;
-};
-
-print ' ' x 78, "\r";
-
-flush($dbh);
-
-my $issue = 9;
-while(freelists($ua, 'v25no' . sprintf('%03d', $issue))) {
-	flush($dbh) if(scalar(@queue) > 10_000);
-	$issue++;
 }
 
+print ' ' x 78, "\r";
+flush($dbh);
+
+# ---------------------------------------------------------------------------
+# freelists.org — Obituary Daily Times volumes 25–31
+# ---------------------------------------------------------------------------
+my $issue = 9;
+while(freelists($ua, 'v25no' . sprintf('%03d', $issue))) {
+	flush($dbh) if scalar(@queue) > $QUEUE_FLUSH_THRESHOLD;
+	$issue++;
+}
 flush($dbh);
 
 $issue = 1;
 while(freelists($ua, 'v26no' . sprintf('%03d', $issue))) {
-	flush($dbh) if(scalar(@queue) > 10_000);
+	flush($dbh) if scalar(@queue) > $QUEUE_FLUSH_THRESHOLD;
 	$issue++;
-	if($issue == 52) {
-		$issue++;	# https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-v26no052 doesn't exist
-	}
+	$issue++ if $issue == 52;	# v26no052 does not exist on the server
 }
-
 flush($dbh);
 
-foreach my $volume(27, 28, 29, 30) {
+foreach my $volume (27, 28, 29, 30, 31) {
 	$issue = 1;
 	while(freelists($ua, "v${volume}no" . sprintf('%03d', $issue))) {
-		flush($dbh) if(scalar(@queue) > 10_000);
+		flush($dbh) if scalar(@queue) > $QUEUE_FLUSH_THRESHOLD;
 		$issue++;
 	}
-
 	flush($dbh);
 }
 
 print "\n";
-
 flush($dbh);
 
+# ---------------------------------------------------------------------------
+# Finalise the database
+# ---------------------------------------------------------------------------
 $dbh->commit();
 $dbh->prepare('CREATE INDEX name_index ON obituaries(first, last)')->execute();
 $dbh->prepare('CREATE INDEX name_age_index ON obituaries(first, last, age)')->execute();
 $dbh->do('pragma optimize');
 $dbh->disconnect();
 
+# Symlink into blib so the installed copy matches the built one
 if(-d $bdir) {
 	my $bfilename = File::Spec->catdir($bdir, 'obituaries.sql');
-	unlink($bfilename) if(-e $bfilename);
+	unlink($bfilename) if -e $bfilename;
 	link $filename, $bfilename;
 }
 
-# Import the data section
-sub data
+# ===========================================================================
+# Subroutines
+# ===========================================================================
+
+# Import the locally curated data embedded in the __DATA__ section.
+# Each row is CSV: first, middle, last, maiden, age, place, date, url
+sub import_data
 {
 	local $| = 1;
 	printf "%-70s\r", '<DATA>';
 
 	my $parser = Text::CSV->new();
 	while(<DATA>) {
-		$parser->parse($_);
+		next unless $parser->parse($_);
 		my ($first, $middle, $last, $maiden, $age, $place, $date, $url) = $parser->fields();
-		# printf "%-70s\r", $url;
-		# $first, $last, $maiden, $age, $place, $date, $newspaper, $source, $page;
 		queue($first, normalise_name($last), $maiden, $age, $place, $date, 'L', 'L', $url);
 	}
 }
 
-sub mlarchives($$) {
-	my @lines;
-	my $ua = shift;
+# Fetch and parse one page (or a local file) from the mlarchives Wayback mirror.
+# Returns 1 if more pages may follow, 0 if we should stop paging.
+sub mlarchives
+{
+	my $ua   = shift;
 	my $page = shift;
 
-	# my $url = "https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
-	# Ancestry has removed the archives.
-	# The first 17 pages are on Wayback machine, but the rest is lost
 	my $url = "https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
 
 	local $| = 1;
-	printf "%-70s\r", $url if($page ne 'other');
+	printf "%-70s\r", $url if $page ne 'other';
 
+	my @lines;
 	if($ENV{'MLARCHIVEDIR'}) {
-		if($page eq 'other') {
-			$url = File::Spec->catfile($ENV{'MLARCHIVEDIR'}, 'other');
-			return 0 if(!-r $url);
-			printf "%-70s\r", $url;
-			@lines = read_file($url);
-		} else {
-			@lines = read_file(File::Spec->catfile($ENV{'MLARCHIVEDIR'}, "emails?listname=gen-obit&page=$page"));
-		}
+		my $base = File::Spec->canonpath($ENV{'MLARCHIVEDIR'});
+		croak "MLARCHIVEDIR '$base' must be an absolute path"
+			unless File::Spec->file_name_is_absolute($base);
+		my $local = ($page eq 'other')
+			? File::Spec->catfile($base, 'other')
+			: File::Spec->catfile($base, "emails?listname=gen-obit&page=$page");
+		croak "MLARCHIVEDIR path escapes base directory: $local"
+			unless index(File::Spec->canonpath($local), $base) == 0;
+		return 0 unless -r $local;
+		printf "%-70s\r", $local if $page eq 'other';
+		@lines = read_file($local);
 	} elsif($ENV{'MLARCHIVE_DIR'}) {
-		if($page eq 'other') {
-			$url = File::Spec->catfile($ENV{'MLARCHIVE_DIR'}, 'other');
-			return 0 if(!-r $url);
-			printf "%-70s\r", $url;
-			@lines = read_file($url);
-		} else {
-			@lines = read_file(File::Spec->catfile($ENV{'MLARCHIVE_DIR'}, "emails?listname=gen-obit&page=$page"));
-		}
+		my $base = File::Spec->canonpath($ENV{'MLARCHIVE_DIR'});
+		croak "MLARCHIVE_DIR '$base' must be an absolute path"
+			unless File::Spec->file_name_is_absolute($base);
+		my $local = ($page eq 'other')
+			? File::Spec->catfile($base, 'other')
+			: File::Spec->catfile($base, "emails?listname=gen-obit&page=$page");
+		croak "MLARCHIVE_DIR path escapes base directory: $local"
+			unless index(File::Spec->canonpath($local), $base) == 0;
+		return 0 unless -r $local;
+		printf "%-70s\r", $local if $page eq 'other';
+		@lines = read_file($local);
 	} else {
 		my $response = $ua->get($url);
-
-		my $data;
 		if($response->is_success) {
-			$data = $response->decoded_content();
+			my $data = $response->decoded_content();
+			$data =~ s/\r//g;
+			@lines = split(/$/ms, $data);
 		} else {
 			if($response->status_line() ne '404 Not Found') {
 				print STDERR "You may need to run bin/ml_from_cache\n";
@@ -264,288 +295,276 @@ sub mlarchives($$) {
 			}
 			return 0;
 		}
-
-		# mlarchive data is much easier to parse because it's nicely all on one line
-		$data =~ s/\r//g;
-		@lines = split(/$/ms, $data);
 	}
 
 	$| = 0;
 
-	# -1 => header, 0 => post-preamble, 1 => post
-	my $stage = -1;
+	# State machine: -1=header, 0=post-preamble, 1=post-content
+	my $stage     = -1;
+	my $last_line = undef;
+	my $rc        = undef;
 
-	my $last_line;
-	my $rc;
-	# my $entries = 0;
-
-	while(my $line = shift(@lines)) {
-		# LAST NAME, First Name (MAIDEN); Age; Place of Death; Newspaper Name; Newspaper date; tagname
-
+	while(my $line = shift @lines) {
 		chomp $line;
-		next if(length($line) == 0);
-		next if((defined($last_line)) && ($line eq $last_line));
-		if(($line =~ /The Obituary Daily Times \(ODT\) is/) ||
-		   ($line =~ /To unsubscribe from this mailing list, please send a message/)) {
+		next unless length $line;
+		next if defined($last_line) && $line eq $last_line;
+
+		if($line =~ /The Obituary Daily Times \(ODT\) is/ ||
+		   $line =~ /To unsubscribe from this mailing list, please send a message/) {
 			$stage = 0;
 			next;
 		}
-		last if($line =~ /^RootsWeb is funded and supported/);
+		last if $line =~ /^RootsWeb is funded and supported/;
 		$last_line = $line;
 
 		$line =~ s/^\n//;
-		# print "$stage: $line\n";
+
 		if($line =~ /^------/) {
 			if($stage == -1) {
 				if($line =~ /No Results/) {
-					# Last page
-					return 0
+					return 0;
 				}
 				if($line =~ /This page has not been archived here/) {
-					# End of Wayback's archive
-					die;	# Debugging
-					return 0
+					# Wayback Machine reached the end of its archive
+					return 0;
 				}
-				# Introduction to a post about to start
 				$stage = 0;
 			} elsif($stage == 0) {
-				# Post contents about to start
 				$stage = 1;
 			} else {
-				# Introduction to a post about to start
 				$stage = 0;
 			}
-			next
+			next;
 		} elsif($line =~ /^Obituary Results/) {
-			# Contents about to start
 			$stage = 1;
-			next
+			next;
 		} elsif($stage == -1) {
 			if($line =~ /^LAST NAME/) {
-				# The ----- probably didn't start a line
-				# e.g. https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=41
-				$stage = 0
+				$stage = 0;
 			} elsif($line =~ /Re: \[GEN-OBIT\]/) {
-				# It's a reply to a post, not an actual post
-				# e.g. https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=46
-				return 1
+				return 1;	# Reply thread, not an actual post
 			} elsif($line =~ /No Results/) {
-				# Last page
-				return 0
+				return 0;
 			} elsif($line =~ /This page has not been archived here/) {
-				# End of Wayback's archive
-				return 0
+				return 0;
 			}
-			# if($line =~ /Obituary Daily Times (v\d.+)$/) {
-				# print "$1\n" unless($1 =~ /strong>/);
-			# }
 		}
-		next unless($stage == 1);
 
-		if($line =~ /<\/p>.+/) {
-			$stage = -1;
-			next;
-		}
-		if($line =~ /^LAST NAME/) {
-			# a whole entry is unparsable
-			# e.g. https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=3
-			next;
-		}
-		next if($line =~ /^\s/);
+		next unless $stage == 1;
+		$line =~ s/^<[^>]*>//;		# strip leading HTML tag (e.g. <li>) injected by Wayback Machine
+		next unless length $line;
+		next if $line =~ /<\/p>.+/;
+		next if $line =~ /^LAST NAME/;	# Unparsable header inside content
+		next if $line =~ /^\s/;
+
 		$line =~ s/&nbsp;/ /g;
 		$line = decode_entities($line);
-		$line =~ s/'/''/g;
+		$line =~ s/<[^>]*>//g;	# strip residual HTML tags injected by Wayback Machine
+		$line =~ s/\s+$//;	# trim trailing whitespace left by stripping
+		# Note: no s/'/''/g needed — values go through DBI placeholders in flush()
+
+		# Every ODT entry contains semicolons; prose lines (moderator notes,
+		# HTTP headers, plain URLs) never do — skip them before parsing.
+		next unless index($line, ';') >= 0;
+
 		my ($name, $age, $place, $newspaper, $date, $tag) = split(/;\s?/, $line);
+
 		if(defined($age) && ($age =~ /D/)) {
-			# Handle emails?listname=gen-obit&page=33
-			#	HAGEN, Anton Oliver; Crosby ND&gt;Great Falls MT; Great Falls MT; GFTrib; 2013-4-15; ndvivi
+			# Handle format anomaly: page=33 has location before newspaper
 			my $unknown;
 			($name, $place, $newspaper, $unknown, $date, $tag) = split(/;\s?/, $line);
+			$age = undef;
 		}
 
-		if((!defined($tag)) || ($tag eq '')) {
-			warn "$url: no tag in '$line'";
+		# Colon used instead of semicolon after age (e.g. "65: City ST>City2 ST").
+		# Extract the numeric age and shift the fused place into the place field.
+		if(defined($age) && $age =~ /^(\d+):\s*(.+)$/) {
+			($age, $place, $newspaper, $date, $tag) = ($1, $2, $place, $newspaper, $date);
 		}
-		# print "$page: $tag\n";
 
-		# print __LINE__, ": $page: '$line' ", Data::Dumper->new([split(/;\s?/, $line)])->Dump();
-		next unless(defined($name));
-		my ($last, $first) = split(',\s', $name);
-		next unless(defined($last));
-		next unless(defined($first));
+		# Age field contains a place name — the submitter omitted the age.
+		# Ages never contain spaces; re-parse shifting fields left.
+		if(defined($age) && $age =~ /[ >]/) {
+			($place, $newspaper, $date, $tag) = ($age, $place, $newspaper, $date);
+			$age = undef;
+		}
+
+		# Handle multi-line entries: long ODT records sometimes wrap across
+		# lines in the original email.  Consume continuation lines until $date
+		# is populated, stopping at a new ODT entry (ALL-CAPS surname) or a
+		# section delimiter.
+		while((!defined($date) || $date eq '') && @lines
+				&& $lines[0] !~ /^[A-Z]{2}[A-Z\-]*,[ \t]/
+				&& $lines[0] !~ /^-{6}/) {
+			my $cont = shift @lines;
+			chomp $cont;
+			next unless length $cont;
+			$line = "$line $cont";
+			($name, $age, $place, $newspaper, $date, $tag) = split(/;\s?/, $line);
+		}
+
+		# Some entries split the tag onto the next line (e.g. page 135).
+		# ODT tags are short lowercase alphanumeric codes; peek and consume
+		# only if the next line matches that shape, so we don't eat a real entry.
+		if((!defined($tag) || $tag eq '') && @lines && $lines[0] =~ /^\s*([a-z]\w{0,9})\s*$/) {
+			$tag = $1;
+			shift @lines;
+		}
+
+		# Trim trailing whitespace from all parsed fields.
+		for my $f ($age, $place, $newspaper, $date, $tag) {
+			$f =~ s/\s+$// if defined $f;
+		}
+
+		# Silently skip lines that aren't in ODT "SURNAME, First; ..." format.
+		# Prose text (moderator announcements, URLs, etc.) reaches stage 1 on
+		# some pages but has no comma-separated name and no semicolons.
+		next unless defined $name;
+		my ($last, $first) = split(/,\s/, $name);
+		next unless defined($last) && defined($first);
 
 		my $maiden;
-		if($first) {
-			if($first =~ /(.+)\s\((.+)\)$/) {
-				$first = normalise_name($1);
-				$maiden = normalise_name($2);
-			} else {
-				$first = normalise_name($first);
-			}
+		if($first =~ /(.+)\s\((.+)\)$/) {
+			$first  = normalise_name($1);
+			$maiden = normalise_name($2);
+		} else {
+			$first = normalise_name($first);
 		}
-		# $age //= '';
 
-		# print "$line->>>>>>>>>>\n";
 		if($last =~ /^[A-Z]/) {
 			queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, 'M', $page);
-			# $entries++;
 		}
-		# $maiden ||= '';
-		# print "\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
 		$rc = 1;
 	}
-	die "\nCouldn't parse $url" if(!defined($rc));
-	# print "\n\t$entries\n";
+
+	die "\nCouldn't parse $url: no valid entries found" unless defined $rc;
 	return 1;
 }
 
-sub freelists($$) {
-	my $ua = shift;
+# Fetch and parse one issue of the Obituary Daily Times from freelists.org.
+# Returns 1 if the issue existed, 0 if we should stop.
+sub freelists
+{
+	my $ua   = shift;
 	my $page = shift;
-	my $url = "https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-$page";
+	my $url  = "https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-$page";
 
-	$| = 1;
+	local $| = 1;
 	printf "%-70s\r", $url;
 	$| = 0;
 
 	my $response = $ua->get($url);
-
-	my $data;
-	if($response->is_success) {
-		$data = $response->decoded_content();
-	} else {
-		if($response->status_line() ne '404 Not Found') {
-			die "\n$url: ", $response->status_line();
-		}
-		return 0;
+	unless($response->is_success) {
+		my $status = $response->status_line();
+		return 0 if $status eq '404 Not Found';
+		return 0 if $status eq '403 Forbidden';	# Freelists erroneously returns this sometimes
+		die "\n$url: $status";
 	}
 
-	# print $data;
-	# exit;
-
-	# my @lines = split(/<br>|<br \/>/ms, $data);
+	my $data = $response->decoded_content();
 	$data =~ s/<br>/\n/g;
 	$data =~ s/<br ?\/>/\n/g;
 	$data =~ s/\n\n+/\n/g;
-	my @lines = split(/\n/ms, $data);
+	my @lines = split /\n/ms, $data;
 
-	my $rc;
-
+	my $rc    = undef;
 	my $stage = 0;
-	while(my $line = shift(@lines)) {
-		# LAST NAME, First Name (MAIDEN); Age; Place of Death; Newspaper Name; Newspaper date; tagname
-		# print "$stage: $line\n";
+
+	while(my $line = shift @lines) {
 		$line =~ s/^\n//;
-		next if($line eq '');
-		if($line =~ /\-\-\-\-\-\-\-\-/) {
+		next if $line eq '';
+
+		if($line =~ /\-{8}/) {
 			$stage++;
-			last if($stage >= 3);
+			last if $stage >= 3;
 			$line =~ s/^.*\-+//;
-			next if($line eq '');
-			next if($line eq '<br/>');
+			next if $line eq '' || $line eq '<br/>';
 		}
-		next if($stage != 2);
+
+		next if $stage != 2;
+
 		$line =~ s/&nbsp;/ /g;
 		$line =~ s/\x{a0}/ /g;
 		$line = decode_entities($line);
-		$line =~ s/'/''/g;
-		my ($name, $age, $place, $newspaper, $date, $tag) = split(/;\s?/, $line);
-		if((!defined($tag)) || ($tag eq '')) {
-			# Handle when the information is split across more
-			# than one line ("cont" means "continuation")
-			my $cont = shift(@lines);
+		# Note: no s/'/''/g needed — values go through DBI placeholders in flush()
 
-			# print __LINE__, ": continuation '$cont'\n";
+		my ($name, $age, $place, $newspaper, $date, $tag) = split(/;\s?/, $line);
+
+		unless(defined($tag) && $tag ne '') {
+			# Entry may span two lines — peek at the continuation
+			my $cont = shift @lines;
+			last if !defined($cont) || $cont =~ /^\-{8}/;
 			$cont =~ s/^\n//;
-			last if($cont =~ /^\-\-\-\-\-\-\-\-/);
 			$cont =~ s/&nbsp;/ /g;
 			$cont =~ s/\x{a0}/ /g;
 			$cont =~ s/&gt;/>/g;
-			$line =~ s/&quot;/"/g;
+			$cont =~ s/&quot;/"/g;
 			$line .= $cont;
-			# print __LINE__, ": line '$line'\n";
 			($name, $age, $place, $newspaper, $date, $tag) = split(/;\s?/, $line);
 		}
-		# print __LINE__, ": $line: ($stage): $name, $age, $place, $newspaper, $date, $tag\n";
-		# use Data::Dumper;
-		# print __LINE__, ": $page ", Data::Dumper->new([split(/;\s?/, $line)])->Dump();
-		next unless(defined($name));
-		my ($last, $first) = split(',\s', $name);
-		next unless(defined($last));
-		next unless(defined($first));
 
-		# Parsing completely broken
-		# e.g. https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-v25no010
-		# print __LINE__, "\n";
-		last unless(defined($newspaper));
-		# print __LINE__, "\n";
+		next unless defined $name;
+		my ($last, $first) = split(/,\s/, $name);
+		next unless defined($last) && defined($first);
+
+		# Parsing is completely broken for some issues — stop at first sign of it
+		last unless defined $newspaper;
 
 		my $maiden;
-		if($first) {
-			if($first =~ /(.+)\s\((.+)\)$/) {
-				$first = normalise_name($1);
-				$maiden = normalise_name($2);
-			} else {
-				$first = normalise_name($first);
-			}
+		if($first =~ /(.+)\s\((.+)\)$/) {
+			$first  = normalise_name($1);
+			$maiden = normalise_name($2);
+		} else {
+			$first = normalise_name($first);
 		}
-		# $age //= '';
 
-		# print "$line:\n",
-			# "\t\"$last\",\"$first\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
-			# "\t\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if(defined($maiden) && ($last =~ /^[A-Z]/));
-		queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, 'F', $page) if($last =~ /^[A-Z]/);
+		if($last =~ /^[A-Z]/) {
+			queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, 'F', $page);
+		}
 		$rc = 1;
 	}
-	die "Couldn't parse $url (stage == $stage)" if(!defined($rc));
+
+	die "Couldn't parse $url (stage=$stage, no valid entries found)" unless defined $rc;
 	return 1;
 }
 
-# Entries on funeral-notices.co.uk
+# Scrape a single funeral-notices.co.uk notice page.
 sub funeral_notices
 {
-	my($last, $page) = @_;
+	my ($last, $page) = @_;
 
-	# URL of the page to scrape
-	my $url = "https://funeral-notices.co.uk/notice/$last/$page";
+	my $url      = 'https://funeral-notices.co.uk/notice/' . uri_escape($last) . "/$page";
+	my $real_last = $last;
 
-	my $real_last = $last;	# For scrape searching
-
-	# Fetch the webpage
 	my $response = $ua->get($url);
-	die 'Failed to fetch the webpage: ', $response->status_line() unless $response->is_success();
+	die "Failed to fetch $url: ", $response->status_line() unless $response->is_success();
 	my $content = $response->decoded_content();
 
 	my $maiden;
 	if($last =~ /(.+)\+(.+)/) {
-		$last = $1;
+		$last      = $1;
 		$real_last = $last;
-		$maiden = normalise_name($2);
-		# print "$1 <=> $2 ($maiden/$last)\n";
+		$maiden    = normalise_name($2);
 		if($maiden eq 'Dr') {
 			undef $maiden;
 		} elsif($last eq 'mc') {
-			$last = "Mc$maiden";
+			$last      = "Mc$maiden";
 			$real_last = "MC $maiden";
 			undef $maiden;
 		}
-		# print "$last\n";
 	}
-	if($last eq 'oneill') {
-		$real_last = "O'Neill";
-	}
-	if($content =~ /"Click here to view the tribute page for (.+?) $real_last.*?"/is) {
+	$real_last = "O'Neill" if $last eq 'oneill';
+
+	if($content =~ /"Click here to view the tribute page for (.+?) \Q$real_last\E.*?"/is) {
 		my $first = $1;
 		my ($place, $age, $newspaper, $date);
-		if($content =~ /aged (\d+) years/is) {
-			$age = $1;
-		} elsif($content =~ /aged (\d+)[\.\s]/is) {
-			$age = $1;
-		} elsif($content =~ /data-age="(\d+)"/is) {
+
+		if($content =~ /aged (\d+) years/is || $content =~ /aged (\d+)[\.\s]/is || $content =~ /data-age="(\d+)"/is) {
 			$age = $1;
 		} else {
 			warn "Can't find age in $url";
 		}
+
 		if(($content =~ /passed away at (.+?)\s+on\s+\d/is) && ($1 ne 'home')) {
 			$place = $1;
 		} elsif($content =~ /<h2>(.+)<span><span class="age_container">/is) {
@@ -553,187 +572,130 @@ sub funeral_notices
 		} else {
 			die "Can't find location in $url";
 		}
-		$place =~ s/'/''/g;	# E.g. St Augustine's
+		# No s/'/''/g — DBI placeholder handles quoting
 		$place .= ', United Kingdom';
+
 		if($content =~ /published in:<\/span> (.+)<\/h2>/is) {
-			if($1 =~ /funeral-notices.co.uk\./) {
-				$newspaper = $url;
-			} else {
-				$newspaper = $1;
-			}
+			$newspaper = $1 =~ /funeral-notices\.co\.uk\./ ? $url : $1;
 		} else {
 			die "Can't find publisher in $url";
 		}
 		$newspaper =~ s/\.$//;
+		$newspaper =~ s/\s*<span.+<\/span>//;
+
 		if($content =~ /Published: <\/span><span>([\d\/]+)/s) {
 			$date = $1;
+			# funeral-notices.co.uk returns DD/MM/YYYY; convert to ISO YYYY-MM-DD
+			if($date =~ m{^(\d{1,2})/(\d{1,2})/(\d{4})$}) {
+				$date = sprintf('%04d-%02d-%02d', $3, $2, $1);
+			}
 		} else {
 			die "Can't find date in $url";
 		}
+
 		$last = normalise_name($last);
-		queue($first, $last, $maiden, $age, $place, $date, $newspaper, 'L', $url) if($last =~ /^[A-Z]/);
-		# print Data::Dumper->new([\@queue])->Dump();
+		queue($first, $last, $maiden, $age, $place, $date, $newspaper, 'L', $url)
+			if $last =~ /^[A-Z]/;
 	} elsif($content !~ /By request this notice has been.+removed from our site/is) {
-		die "Can't parse $url";
+		die "Can't parse $url (real_last=$real_last)";
 	}
 }
 
-sub queue($$$$$$$$$)
+# Validate and enqueue one obituary record.
+# Drops records whose date does not begin with a 4-digit year.
+# Invalid ages (non-numeric, negative) are silently omitted; the record is kept.
+sub queue
 {
 	my ($first, $last, $maiden, $age, $place, $date, $newspaper, $source, $page) = @_;
 
-	# print Data::Dumper->new([\@_])->Dump();
+	die "Invalid source '$source' (must be M, F, or L)"
+		unless $source =~ /^[MFL]$/;
 
-	# Ensure source is valid and date is defined and starts with a digit
-	die $source unless $source =~ /^[MFL]$/;
-	return unless defined $date && $date =~ /^\d/;
+	# Require a 4-digit year prefix — rejects merged/garbled lines like date='68'.
+	return unless defined($date) && $date =~ /^\d{4}/;
 
-	# Build columns hash with mandatory fields
 	my %columns = (
-		first => $first,
-		last => $last,
-		date => $date,
+		first     => $first,
+		last      => $last,
+		date      => $date,
 		newspaper => $newspaper,
-		place => $place,
-		source => $source,
-		page => $page
+		place     => $place,
+		source    => $source,
+		page      => $page,
 	);
 
-	# Add age if it's a valid positive integer
-	# if(defined($age) && ($age ne '')) {
-		# return if($age =~ /\D/);
-		# $age =~ s/\s+//g;
-		# $columns{'age'} = $age;
-	# }
-	if(defined($age)) {
+	if(defined $age) {
 		$age =~ s/\s+//g;
-		if($age =~ /\D/) {
-			print STDERR Data::Dumper->new([\@_])->Dump();
-			warn "Invalid age '$age'";
-			return;
-		}
-		$columns{age} = $age if(length($age));
+		# Invalid ages (non-numeric like 'infant', negative like '-91') are
+		# silently omitted — the record is still useful without an age.
+		$columns{age} = $age if length($age) && $age =~ /^\d+$/;
 	}
 
-	# Add maiden name if provided
 	$columns{maiden} = $maiden if $maiden;
 
-	# Add entry to queue
 	push @queue, \%columns;
 }
 
-sub flush($)
+# Write all queued records to the database, deduplicating first.
+# Uses parameterised INSERT to prevent SQL injection from scraped values.
+sub flush
 {
 	my $dbh = shift;
 
-	# Remove duplicates
-	my @deduped;
-	my %seen;
+	return unless @queue;
 
+	# Deduplicate by building a canonical key from all significant fields
+	my (%seen, @deduped);
 	while(my $item = pop @queue) {
-		# my $first = $item->{'first'};
-		# if(!defined($first)) {
-			# $item->{'first'} = '';
-		# }
-		my $maiden = $item->{'maiden'};
-		if(!defined($maiden)) {
-			$item->{'maiden'} = '';
-		}
-		my $age = $item->{'age'};
-		if(!defined($age)) {
-			$item->{'age'} = '';
-		}
-		# use Data::Dumper;
-		# print Data::Dumper->new([$item])->Dump();
-		my $k = join('|', @$item{qw /first last maiden age place date newspaper source page/ });
-		# if(!defined($first)) {
-			# delete $item->{'first'};
-		# }
-		if(!defined($maiden)) {
-			delete $item->{'maiden'};
-		}
-		if($item->{'age'} eq '') {
-			delete $item->{'age'};
-		}
-		unless($seen{$k}) {
-			push @deduped, $item;
-			$seen{$k} = 1;
-		} else {
-			# print "$k\n";
-		}
+		my $key = join '|', map { $item->{$_} // '' }
+			qw(first last maiden age place date newspaper source page);
+		push @deduped, $item unless $seen{$key}++;
 	}
-	undef @queue;	# Make sure Perl really frees all memory
-	undef %seen;
+	@queue = ();
 
-	my $query;
+	return unless @deduped;
 
-	while(my $row = pop @deduped) {
-		if(!defined($query)) {
-			$query = 'INSERT INTO obituaries(first, middle, last, maiden, age, place, date, newspaper, source, page) VALUES (';
-		} else {
-			$query .= ',(';
-		}
-		my %columns = %{$row};
-
-		if($columns{'first'}) {
-			if($columns{'first'} =~ /(.+)\s+(.+)/) {
-				# Has a middle name
-				$query .= "'$1','$2',";
-			} else {
-				$query .= "'" . $columns{'first'} . "',NULL,";
-			}
-		} else {
-			$query .= 'NULL,NULL,';
-		}
-		$query .= "'" . $columns{'last'} . "',";
-		if($columns{'maiden'} && ($columns{'maiden'} ne ' ')) {
-			$query .= "'" . $columns{'maiden'} . "',";
-		} else {
-			$query .= 'NULL,';
-		}
-		if($columns{'age'}) {
-			$query .= $columns{'age'} . ',';
-		} else {
-			$query .= 'NULL,';
-		}
-		if($columns{'place'} && ($columns{'place'} ne '')) {
-			$query .= "'" . $columns{'place'} . "',";
-		} else {
-			$query .= 'NULL,';
-		}
-		if($columns{'date'}) {
-			$query .= "'" . $columns{'date'} . "',";
-		} else {
-			$query .= 'NULL,';
-		}
-		my $source = $columns{'source'};
-		# Ensure source is valid
-		die $source unless $source =~ /^[MFL]$/;
-		$query .= "'" . $columns{'newspaper'} . "','" . $columns{'source'} . "','" . $columns{'page'} . "')";
-	}
-
-	undef @deduped;	# Make sure Perl really frees all memory
-	# $| = 1;
-	# printf "%-70s\n", $query;
-	# $| = 0;
+	# Parameterised INSERT — DBI handles all escaping, no manual quoting needed
+	my $sth = $dbh->prepare(
+		'INSERT INTO obituaries'
+		. '(first, middle, last, maiden, age, place, date, newspaper, source, page)'
+		. ' VALUES (?,?,?,?,?,?,?,?,?,?)'
+	);
 
 	try {
-		$dbh->do($query);
+		for my $row (@deduped) {
+			my ($first, $middle);
+			if($row->{'first'} && $row->{'first'} =~ /^(.+)\s+(.+)$/) {
+				($first, $middle) = ($1, $2);
+			} else {
+				$first = $row->{'first'} || undef;
+			}
+
+			$sth->execute(
+				$first,
+				$middle,
+				$row->{'last'},
+				($row->{'maiden'} && $row->{'maiden'} ne ' ') ? $row->{'maiden'} : undef,
+				$row->{'age'}   || undef,
+				($row->{'place'} && length($row->{'place'})) ? $row->{'place'} : undef,
+				$row->{'date'},
+				$row->{'newspaper'},
+				$row->{'source'},
+				$row->{'page'},
+			);
+		}
 	} catch {
-		my @call_details = caller(0);
-		die "\nError in insert ($query) called from line ",
-			$call_details[2], ': ', $dbh->errstr();
+		confess "Error in obituaries INSERT: $_";
 	};
 }
 
-# Reduce the very large number of calls to Lingua::EN::NameCase
-sub normalise_name($)
+# Normalise a name to title case, caching results to avoid repeated calls to
+# Lingua::EN::NameCase (which is expensive on large datasets).
+sub normalise_name
 {
 	my $name = shift;
-	$name =~ s/\"//g;
-
-	# Get the lowercased key and return existing normalised value if present
-	return $normalised{lc($name)} ||= nc($name);
+	$name =~ s/"//g;
+	return $normalised{lc($name)} //= nc($name);
 }
 
 # "first","middle","last","maiden","age","place","date","url"

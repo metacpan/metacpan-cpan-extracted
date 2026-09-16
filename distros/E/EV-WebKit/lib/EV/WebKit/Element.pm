@@ -1,7 +1,7 @@
 package EV::WebKit::Element;
 use v5.10; use strict; use warnings;
 use Carp ();
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # $frame is a web-process frame id when this element was found through a frame
 # the main-frame script cannot reach; undef is the ordinary main-frame case.

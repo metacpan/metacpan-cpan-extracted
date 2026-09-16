@@ -5,15 +5,16 @@ NAME
 SYNOPSIS
 
      my $oidc = Browser::OIDC->new($base_url);
-     $oidc->get_token(
+     my $token = $oidc->get_token(
              client_id => 'me',
-             pkce      => 1,
              scope     => [ 'email' ],
      );
 
 DESCRIPTION
 
-    This module will open a browser for you to log in
+    This module will open a browser for you to log into some OIDC provider,
+    and will temporarily run a webserver on localhost to receive the
+    redirect with the results from your browser.
 
 METHODS
 
@@ -21,28 +22,31 @@ METHODS
 
      my $oidc = Browser::OIDC->new($base_url);
 
-    This creates a new
+    This creates a new Browser::OIDC object. This will fetch the
+    configuration for the given $base_url.
 
  get_token
 
      $oidc->get_token(%options);
 
+    This fetches OIDC tokens from the endpoint. Note though that this
+    module only fetches the tokens, it will not perform any decoding or
+    verification on them.
+
+    It takes the following options:
+
     client_id
 
-      The client identifier. Technically optional but practically required.
+      The client identifier. Mandatory.
 
     client_secret
 
       The client secret, if any.
 
-    pkce
-
-      If true this will enable Proof Key for Code Exchange (PKCE)
-
     scope
 
-      This list will be the scopes of the request. The values are generally
-      service specific.
+      This list will be the scopes of the request. 'openid' is
+      automatically added to this list so does not need to be given.
 
     message
 
@@ -51,13 +55,58 @@ METHODS
 
     message_type
 
-      The content type of the message.
+      The content type of the message e.g. text/plain or text/html.
+
+    display
+
+      ASCII string value that specifies how the Authorization Server
+      displays the authentication and consent user interface pages to the
+      End-User. The defined values are: page, popup, touch, and wap.
+
+    prompt
+
+      Case-sensitive list of ASCII string values that specifies whether the
+      Authorization Server prompts the End-User for reauthentication and
+      consent. The defined values are: none, login, consent, and
+      select_account.
+
+    max_age
+
+      Maximum Authentication Age. Specifies the allowable elapsed time in
+      seconds since the last time the End-User was actively authenticated
+      by the OP. Note that max_age=0 is equivalent to prompt=login.
+
+    login_hint
+
+      Hint to the Authorization Server about the login identifier the
+      End-User might use to log in (if necessary).
+
+    nonce
+
+ issuer
+
+     $oidc->issuer;
+
+    This returns the issuer. This should match the iss values in the
+    tokens.
+
+ claims_supported
+
+     $oidc->claims_supported;
+
+    This returns the list of supported claims.
+
+ scopes_supported
+
+     $oidc->scopes_supported;
+
+    This returns the list of supported scopes.
 
 TODO
 
     Open ID Connect and OAuth2 are large standards, so far only a tiny
-    fraction is implemented. Feel free to request specific features if you
-    need them.
+    fraction is implemented here. Feel free to request specific features if
+    you need them. Patches are welcome.
 
 AUTHOR
 

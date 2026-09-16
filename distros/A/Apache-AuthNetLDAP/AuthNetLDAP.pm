@@ -15,7 +15,7 @@ require Exporter;
 @EXPORT = qw(
 	
 );
-$VERSION = '0.32';
+$VERSION = '0.33';
 
 # required libraries
 require Apache2::Const;
@@ -210,23 +210,22 @@ Apache::AuthNetLDAP - mod_perl2 module that uses the Net::LDAP module for user a
  AuthType Basic
 
  #only set the next two if you need to bind as a user for searching
- #PerlSetVar BindDN "uid=user1,ou=people,o=acme.com" #optional
- #PerlSetVar BindPWD "password" #optional
+ #PerlSetVar BindDN "uid=user1,ou=people,o=acme.com" 	#optional
+ #PerlSetVar BindPWD "password" 	#optional
  PerlSetVar BaseDN "ou=people,o=acme.com"
  PerlSetVar LDAPServer ldap.acme.com
  PerlSetVar LDAPPort 389
  #PerlSetVar UIDAttr uid
  PerlSetVar UIDAttr mail
  #PerlSetVar AlternatePWAttribute alternateAttribute
- #PerlSetVar SearchScope base | one | sub # default is sub
- #PerlSetVar LDAPFilter "(&(course=CSA)(class=A))" #optional
+ #PerlSetVar SearchScope base | one | sub 	# default is sub
+ #PerlSetVar LDAPFilter "(&(course=CSA)(class=A))" 	#optional
 
  # Set if you want to encrypt communication with LDAP server
  # and avoid sending clear text passwords over the network
  PerlSetVar UseStartTLS yes | no
- #PerlSetVar TLSCertVerify require | optional | none # default: require
- ## One of the following variables is required, if TLSCertVerify is 'require' or 'optional'
- #PerlSetVar TLSCAfile "path to CA cert"
+ #PerlSetVar TLSCertVerify require | optional | none 	# default: require
+ #PerlSetVar TLSCAfile "path to CA cert" 	#required, if TLSCertVerify is 'require' or 'optional'
  
  # Set if you want to allow an alternate method of authentication
  PerlSetVar AllowAlternateAuth yes | no
@@ -361,19 +360,21 @@ Then in your httpd.conf file or .htaccess file, in either a <Directory> or <Loca
  AuthType Basic
 
  #only set the next two if you need to bind as a user for searching
- #PerlSetVar BindDN "uid=user1,ou=people,o=acme.com" #optional
- #PerlSetVar BindPWD "password" #optional
+ #PerlSetVar BindDN "uid=user1,ou=people,o=acme.com" 	#optional
+ #PerlSetVar BindPWD "password" 	#optional
  PerlSetVar BaseDN "ou=people,o=acme.com"
  PerlSetVar LDAPServer ldap.acme.com
  PerlSetVar LDAPPort 389
  PerlSetVar UIDAttr uid
- PerlSetVar UseStartTLS yes # Assuming you installed IO::Socket::SSL, etc.
+ PerlSetVar UseStartTLS yes 	# Assuming you installed IO::Socket::SSL, etc.
+ #PerlSetVar TLSCertVerify require | optional | none 	# default: require
+ #PerlSetVar TLSCAfile "path to CA cert" 	#required, if TLSCertVerify is 'require' or 'optional'
  
  # Set if you want base or one level scope for search:
- PerlSetVar SearchScope one # default is sub
+ PerlSetVar SearchScope one 	# default is sub
 
  # Set if you want to limit access to a subset of users:
- #PerlSetVar LDAPFilter "(&(course=CSA)(class=A))" #optional
+ #PerlSetVar LDAPFilter "(&(course=CSA)(class=A))" 	#optional
 
  # Set if you want to allow an alternate method of authentication
  PerlSetVar AllowAlternateAuth yes | no

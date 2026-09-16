@@ -1,5 +1,8 @@
 Revision history for Data::Heap::Shared
 
+0.09      2026-09-15
+          - Recover a lock left ownerless by a corrupt file instead of hanging.
+
 0.08      2026-08-12
           - Recover a file left behind by an interrupted create instead of
             leaving the path unopenable.

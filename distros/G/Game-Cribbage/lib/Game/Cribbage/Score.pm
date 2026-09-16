@@ -41,6 +41,11 @@ has with_starter => (
 	isa => Bool
 );
 
+has crib => (
+	is => 'ro',
+	isa => Bool
+);
+
 sub BUILD {
 	my ($self, $params) = @_;
 	my $starter = $self->cards->[-1];
@@ -70,6 +75,10 @@ sub calculate_nob {
 sub calculate_run {
 	my ($self, @cards) = @_;
 
+	# By run value, not pip value: J, Q and K are all worth ten, so the
+	# caller's sort leaves them in whatever order they arrived, and a run
+	# is only found when each card is one below the last.
+	@cards = sort { $b->run_value <=> $a->run_value } @cards;
 	my @values = map { $_->run_value } @cards;
 	
 	my %map;
@@ -106,18 +115,22 @@ sub calculate_run {
 }
 
 sub calculate_flush {
-	my ($self, @cards) = @_;
-	my %map;
-	push @{$map{$_->suit}}, $_ for (@cards);
-	for (keys %map) {
-		my $c = scalar @{$map{$_}};
-		if ($c == 4) {
-			push @{$self->four_flush}, $map{$_};
-		} elsif ($c == 5) {
-			push @{$self->five_flush}, $map{$_};
-		}
-	}
+	my ($self) = @_;
 
+	# A flush is the four cards in the HAND sharing a suit; the starter can
+	# only extend it to five. Four of a suit made up with the starter is
+	# nothing, and a crib flush needs all five.
+	my @all = @{$self->cards};
+	my $starter = $self->with_starter ? pop @all : undef;
+	return unless @all == 4;
+	my $suit = $all[0]->suit;
+	return if grep { $_->suit ne $suit } @all;
+
+	if ($starter && $starter->suit eq $suit) {
+		push @{$self->five_flush}, [@all, $starter];
+	} elsif (!$self->crib) {
+		push @{$self->four_flush}, [@all];
+	}
 }
 
 sub calculate_fifteen {
@@ -174,7 +187,7 @@ Game::Cribbage::Score - hand scoring calculator
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 
@@ -293,6 +306,13 @@ starter card.  When true, nobs scoring is applied.
 
 	$score->with_starter;
 
+=head2 crib
+
+Readonly boolean; set when the cards are a crib, whose flush must include
+the starter.
+
+	$score->crib;
+
 =head1 FUNCTIONS
 
 =head2 calculate_nob
@@ -311,10 +331,11 @@ run-values and stores them in C<run>.
 
 =head2 calculate_flush
 
-Detects four-card or five-card flushes and populates C<four_flush> or
-C<five_flush> accordingly.
+Detects a flush: the four hand cards of one suit (C<four_flush>), or those
+four and the starter (C<five_flush>).  The starter never makes up a four,
+and a crib (C<crib> set) only scores the five.
 
-	$score->calculate_flush(@cards);
+	$score->calculate_flush();
 
 =head2 calculate_fifteen
 

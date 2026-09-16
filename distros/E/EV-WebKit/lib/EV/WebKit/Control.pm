@@ -17,7 +17,7 @@ use Scalar::Util qw(weaken);
 use constant MAX_CLIENT_BACKLOG => 64 * 1024 * 1024;
 use EV::WebKit::Protocol;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # A control server for a RUNNING EV::WebKit instance: another process can drive
 # the browser this one opened.
@@ -138,14 +138,14 @@ sub listen {
     # arbitrary JavaScript in this browser and read every cookie it holds. So
     # refuse to put it anywhere the world can reach.
     my ($dir) = $path =~ m{^(.*)/[^/]+$};
-    $dir = '.' unless defined $dir && length $dir;
+    $dir = defined $dir ? (length $dir ? $dir : '/') : '.';
     my @st = stat $dir or Carp::croak("listen: cannot stat '$dir': $!");
     Carp::croak("listen: refusing to listen in a world-writable directory ('$dir')")
         if ($st[2] & 0002) && !($st[2] & 01000);   # world-writable and not sticky
 
     # A leftover socket file from a crashed process is ordinary; a LIVE one means
     # somebody else already owns this path. Tell them apart by connecting.
-    if (-e $path) {
+    if (-e $path || -l $path) {
         if (IO::Socket::UNIX->new(Peer => $path)) {
             Carp::croak("listen: '$path' is already served by a live process");
         }
@@ -206,39 +206,43 @@ sub _wire_events {
 
     my $prev_nav = $b->on_navigate;
     $b->on_navigate(sub {
+        if (my $s = $ws) {
+            # Every element handle belongs to the page that just went away: the
+            # registry's epoch changed, so they are all stale by definition. Freeing
+            # them here is what keeps the handle table from growing without bound --
+            # see _hold.
+            $s->_release_all_handles;
+            $s->_broadcast(navigate => { uri => $_[0] });
+        }
         $prev_nav->(@_) if $prev_nav;
-        my $s = $ws or return;
-        # Every element handle belongs to the page that just went away: the
-        # registry's epoch changed, so they are all stale by definition. Freeing
-        # them here is what keeps the handle table from growing without bound --
-        # see _hold.
-        $s->_release_all_handles;
-        $s->_broadcast(navigate => { uri => $_[0] });
     });
 
     my $prev_load = $b->on_load;
     $b->on_load(sub {
-        $prev_load->(@_) if $prev_load;
         my ($s, $br) = ($ws, $wb);
-        return unless $s && $br;
-        $s->_broadcast(load => {
-            uri   => scalar eval { $br->uri },
-            title => scalar eval { $br->title },
-        });
+        if ($s && $br) {
+            $s->_broadcast(load => {
+                uri   => scalar eval { $br->uri },
+                title => scalar eval { $br->title },
+            });
+        }
+        $prev_load->(@_) if $prev_load;
     });
 
     my $prev_con = $b->on_console;
     $b->on_console(sub {
+        if (my $s = $ws) {
+            $s->_broadcast(console => { text => $_[0] });
+        }
         $prev_con->(@_) if $prev_con;
-        my $s = $ws or return;
-        $s->_broadcast(console => { text => $_[0] });
     });
 
     my $prev_err = $b->on_error;
     $b->on_error(sub {
+        if (my $s = $ws) {
+            $s->_broadcast(error => { error => $_[0] });
+        }
         $prev_err->(@_) if $prev_err;
-        my $s = $ws or return;
-        $s->_broadcast(error => { error => $_[0] });
     });
 
     # The HUMAN closing the window. (A client's quit over the wire does not come

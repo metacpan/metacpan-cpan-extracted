@@ -1,5 +1,39 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.14	Tue Sep 15 09:12:17 PM EDT 2026
+	[ Enhancements ]
+	- render_pie_chart_snippet: major upgrade. Now accepts an optional second
+	  argument \%opts with six keys:
+	  - animated (bool, default 0): fan slices in from arc-length 0 using
+	    attrTween / d3.easeBackOut.overshoot(1.2) with 800 ms staggered
+	    transitions; legend fades in after; respects prefers-reduced-motion
+	  - donut (bool, default 0): inner radius 38% of outer; total sum shown
+	    in the centre hole
+	  - sort_slices ('value'|'label'|'none', default 'none'): sort order
+	  - max_slices (int, default 0): collapse tail into an "Other" slice
+	  - legend (bool, default 1): HTML legend panel with colour swatches
+	  - color_scheme (string, default 'tableau10'): supports tableau10,
+	    category10, set2, set3, paired
+	  Negative values are silently converted to their absolute value; zero-
+	  value slices are silently omitted. Optional \%extra hashref per data
+	  point is shown as additional rows in the hover tooltip.
+	  svg_id changes from 'chart' to 'pie_chart' for namespace clarity.
+	  (Breaking change in svg_id value; all other behaviour is backward-
+	  compatible when opts are omitted.)
+
+0.13	Tue Sep 15 06:05:45 PM EDT 2026
+	[ Enhancements ]
+	- render_zoomable_line_chart_snippet: accept an optional second argument
+	  { animated => 1 } to animate the initial line draw on page load.
+	  The line traces itself left-to-right via stroke-dashoffset / d3.easeLinear
+	  (1200 ms); data-point circles then fade in from opacity 0 over 300 ms
+	  (after a 1200 ms delay so they appear only once the line reaches them).
+	  Subsequent zoom and reset redraws are never animated.
+	  Respects prefers-reduced-motion: when the user has requested reduced
+	  motion the chart draws immediately at full opacity.
+	  Omitting the second argument or passing { animated => 0 } gives the
+	  existing behaviour unchanged (backward-compatible).
+
 0.12	Sun Sep 13 08:14:05 AM EDT 2026
 	[ Enhancements ]
 	- Added render_animated_bar_chart(): bar chart with on-load grow animation —

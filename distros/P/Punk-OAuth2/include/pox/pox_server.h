@@ -69,6 +69,31 @@ static SV *pox_req_body(pTHX_ SV *c) {
 }
 
 /* Parse an x-www-form-urlencoded body into a fresh HV (mortal). */
+/* Store one decoded pair, keeping repeats.
+ *
+ * RFC 8707 makes `resource` repeatable, and the old body of this simply
+ * overwrote: resource=A&resource=B arrived as B alone, with A silently gone.
+ * A second occurrence promotes the value to an arrayref, which is exactly what
+ * Punk's own query parser does, so a handler reading either side of this
+ * server sees one convention rather than two. */
+static void pox_form_add(pTHX_ HV *out, SV *key, SV *val) {
+  HE *he = hv_fetch_ent(out, key, 0, 0);
+  if (he) {
+    SV *have = HeVAL(he);
+    AV *list;
+    if (SvROK(have) && SvTYPE(SvRV(have)) == SVt_PVAV)
+      list = (AV *)SvRV(have);
+    else {
+      list = newAV();
+      av_push(list, newSVsv(have));
+      (void)hv_store_ent(out, key, newRV_noinc((SV *)list), 0);
+    }
+    av_push(list, SvREFCNT_inc(val));
+    return;
+  }
+  (void)hv_store_ent(out, key, SvREFCNT_inc(val), 0);
+}
+
 static HV *pox_parse_form(pTHX_ SV *bodysv) {
   HV *out = newHV();
   STRLEN n;
@@ -86,7 +111,7 @@ static HV *pox_parse_form(pTHX_ SV *bodysv) {
         STRLEN vlen = have_eq ? i - eq - 1 : 0;
         SV *kd = pox_urldecode(aTHX_ s + kstart, klen);
         SV *vd = pox_urldecode(aTHX_ vp, vlen);
-        (void)hv_store_ent(out, kd, SvREFCNT_inc(vd), 0);
+        pox_form_add(aTHX_ out, kd, vd);
       }
       kstart = i + 1; have_eq = 0;
     }
@@ -188,7 +213,7 @@ static SV *pox_store_call(pTHX_ SV *store, const char *meth,
 
 /* Mint a JWT access token (Crypt::JWS::sign) with the standard claims. */
 static SV *pox_mint_at(pTHX_ HV *srv, SV *client_id, SV *user_id,
-                       const char *scope) {
+                       const char *scope, AV *resources, SV *extra) {
   HV *claims = newHV();
   IV now = (IV)time(NULL);
   IV ttl = pox_hv_iv(aTHX_ srv, "at_ttl", 600);
@@ -201,12 +226,55 @@ static SV *pox_mint_at(pTHX_ HV *srv, SV *client_id, SV *user_id,
   (void)hv_stores(claims, "sub",
                   user_id && SvOK(user_id) ? newSVsv(user_id)
                                            : newSVsv(client_id));
-  (void)hv_stores(claims, "aud", newSVsv(pox_srv_get(aTHX_ srv, "issuer")));
+  /* RFC 8707: the audience is what this token may be spent on.
+   *
+   * Bound to the requested resource when the grant named one, so a token
+   * minted for one resource server is refused by another that checks `aud`.
+   * With no resource it stays the issuer, which is what every token carried
+   * before resource indicators existed, so nothing already deployed moves. */
+  if (resources && av_count(resources) == 1) {
+    SV **e = av_fetch(resources, 0, 0);
+    (void)hv_stores(claims, "aud",
+                    newSVsv((e && *e) ? *e : &PL_sv_undef));
+  }
+  else if (resources && av_count(resources) > 1) {
+    AV *aud = newAV();
+    SSize_t i, n = av_count(resources);
+    for (i = 0; i < n; i++) {
+      SV **e = av_fetch(resources, i, 0);
+      if (e && *e && SvOK(*e)) av_push(aud, newSVsv(*e));
+    }
+    (void)hv_stores(claims, "aud", newRV_noinc((SV *)aud));
+  }
+  else
+    (void)hv_stores(claims, "aud", newSVsv(pox_srv_get(aTHX_ srv, "issuer")));
   (void)hv_stores(claims, "client_id", newSVsv(client_id));
   (void)hv_stores(claims, "exp", newSViv(now + ttl));
   (void)hv_stores(claims, "iat", newSViv(now));
   (void)hv_stores(claims, "jti", newSVsv(jti));
   if (scope && *scope) (void)hv_stores(claims, "scope", newSVpv(scope, 0));
+
+  /* Private claims, merged last but NEVER over a registered one.
+   *
+   * Everything above is the protocol's: the issuer, the subject, the
+   * audience, the expiry. A hook that could overwrite any of them could move
+   * a token's audience to another resource server or push its expiry out,
+   * which would make the hook a way around the checks rather than an addition
+   * to them. So a collision leaves the registered claim standing. */
+  if (extra && SvOK(extra)) {
+    SV *decoded = SvROK(extra) ? extra : pox_decode_json_hash(aTHX_ extra);
+    if (decoded && SvROK(decoded) && SvTYPE(SvRV(decoded)) == SVt_PVHV) {
+      HV *eh = (HV *)SvRV(decoded);
+      HE *he;
+      hv_iterinit(eh);
+      while ((he = hv_iternext(eh))) {
+        I32 kl;
+        const char *k = hv_iterkey(he, &kl);
+        if (hv_exists(claims, k, kl)) continue;
+        (void)hv_store(claims, k, kl, newSVsv(hv_iterval(eh, he)), 0);
+      }
+    }
+  }
 
   /* payload = File::Raw::JSON::file_json_encode(\%claims) */
   {
@@ -367,6 +435,83 @@ static int pox_list_has(pTHX_ AV *av, const char *want, STRLEN wl) {
  * client puts in the request body, so without this a client registered for
  * authorization_code alone can ask for client_credentials and be handed a
  * signed token for it. */
+/* A parameter that may have arrived once or many times, as a mortal AV.
+ *
+ * Both parsers in front of this hand back a plain scalar for a single value
+ * and an arrayref for a repeat, so every caller of a repeatable parameter
+ * goes through here rather than guessing which it got. */
+static AV *pox_sv_list(pTHX_ SV *v) {
+  AV *out;
+  if (!v || !SvOK(v)) return NULL;
+  out = (AV *)sv_2mortal((SV *)newAV());
+  if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVAV) {
+    AV *src = (AV *)SvRV(v);
+    SSize_t i, n = av_count(src);
+    for (i = 0; i < n; i++) {
+      SV **e = av_fetch(src, i, 0);
+      if (e && *e && SvOK(*e)) av_push(out, newSVsv(*e));
+    }
+  }
+  else av_push(out, newSVsv(v));
+  return av_count(out) ? out : NULL;
+}
+
+/* RFC 8707: is every requested resource one this client registered?
+ *
+ * Deny by default, the same rule redirect_uris follows: a client that
+ * registered no resources may ask for none. Without that, any client could
+ * name any resource and be handed a token audienced for it, which is the
+ * whole thing resource indicators exist to prevent. */
+static int pox_resources_ok(pTHX_ HV *client, AV *want) {
+  AV *have;
+  SSize_t i, n;
+  if (!want || !av_count(want)) return 1;    /* asked for nothing */
+  have = pox_client_list(aTHX_ client, "resources", 9);
+  if (!have) return 0;                       /* registered nothing */
+  n = av_count(want);
+  for (i = 0; i < n; i++) {
+    SV **e = av_fetch(want, i, 0);
+    STRLEN wl;
+    const char *wp;
+    if (!e || !*e || !SvOK(*e)) continue;
+    wp = SvPV_const(*e, wl);
+    if (!pox_list_has(aTHX_ have, wp, wl)) return 0;
+  }
+  return 1;
+}
+
+/* A hashref as JSON bytes (mortal), or NULL. The private claims a `claims`
+ * hook returns are stored and carried as JSON, because the columns that hold
+ * them are TEXT and because what is minted has to be exactly what was
+ * approved, not a structure rebuilt later. */
+static SV *pox_claims_json(pTHX_ SV *ref) {
+  dSP; int count; SV *out = NULL;
+  if (!ref || !SvOK(ref) || !SvROK(ref)
+      || SvTYPE(SvRV(ref)) != SVt_PVHV) return NULL;
+  ENTER; SAVETMPS; PUSHMARK(SP);
+  XPUSHs(ref); PUTBACK;
+  count = call_pv("File::Raw::JSON::file_json_encode", G_SCALAR | G_EVAL);
+  SPAGAIN;
+  if (count > 0) { SV *r = POPs; if (!SvTRUE(ERRSV)) out = newSVsv(r); }
+  PUTBACK; FREETMPS; LEAVE;
+  return out ? sv_2mortal(out) : NULL;
+}
+
+/* The space-separated form a resource list is stored and re-read in. */
+static SV *pox_join_list(pTHX_ AV *av) {
+  SV *out = sv_2mortal(newSVpvs(""));
+  SSize_t i, n;
+  if (!av) return out;
+  n = av_count(av);
+  for (i = 0; i < n; i++) {
+    SV **e = av_fetch(av, i, 0);
+    if (!e || !*e || !SvOK(*e)) continue;
+    if (SvCUR(out)) sv_catpvs(out, " ");
+    sv_catsv(out, *e);
+  }
+  return out;
+}
+
 static int pox_grant_ok(pTHX_ HV *client, const char *gt) {
   AV *av = pox_client_list(aTHX_ client, "grant_types", 11);
   return pox_list_has(aTHX_ av, gt, strlen(gt));
@@ -427,7 +572,12 @@ static SV *pox_srv_authorize(pTHX_ SV *self, SV *c) {
   SV *challenge = pox_field(aTHX_ q, "code_challenge");
   SV *method = pox_field(aTHX_ q, "code_challenge_method");
   SV *rtype = pox_field(aTHX_ q, "response_type");
+  /* RFC 8707, repeatable: Punk's query parser hands back a scalar for one
+   * and an arrayref for several, and pox_sv_list flattens that difference. */
+  SV *resource = pox_field(aTHX_ q, "resource");
   SV *iss = pox_srv_get(aTHX_ srv, "issuer");
+  AV *rlist = NULL;
+  SV *claims_json = NULL;
   SV *client, *user_id;
 
   if (!client_id)
@@ -461,6 +611,14 @@ static SV *pox_srv_authorize(pTHX_ SV *self, SV *c) {
                                state, iss);
   if (!pox_client_scope_ok(aTHX_ (HV *)SvRV(client), scope))
     return pox_authorize_error(aTHX_ redirect_uri, "invalid_scope",
+                               state, iss);
+
+  /* The registration decides which resources this client may be audienced
+   * for, exactly as it decides redirect_uris and scopes. Deny by default: a
+   * client that registered none may request none. */
+  rlist = pox_sv_list(aTHX_ resource);
+  if (rlist && !pox_resources_ok(aTHX_ (HV *)SvRV(client), rlist))
+    return pox_authorize_error(aTHX_ redirect_uri, "invalid_target",
                                state, iss);
 
   /* authenticate hook: returns a user id, or a reference (a login
@@ -511,7 +669,16 @@ static SV *pox_srv_authorize(pTHX_ SV *self, SV *c) {
         if (!SvTRUE(ERRSV) && count > 0) r = SvREFCNT_inc(POPs);
         else if (count > 0) (void)POPs;
         PUTBACK; FREETMPS; LEAVE;
-        if (r && SvROK(r)) return sv_2mortal(r);   /* render consent */
+        /* Returned OWNED and not mortalised, exactly as the authenticate
+         * hook's reference branch above does, and as every response helper
+         * here does with newRV_noinc.
+         *
+         * The caller is an `SV *` XSUB, and xsubpp mortalises RETVAL itself.
+         * Mortalising here as well scheduled a second decrement against the
+         * one reference this holds, so the response was freed while the
+         * server that called us still held it - a SIGSEGV in the host's
+         * free_tmps, on a poisoned pointer, nowhere near this line. */
+        if (r && SvROK(r)) return r;               /* render consent */
         if (!r || !SvTRUE(r)) { SvREFCNT_dec(r);
           return pox_authorize_error(aTHX_ redirect_uri, "access_denied",
                                      state, iss); }
@@ -519,6 +686,46 @@ static SV *pox_srv_authorize(pTHX_ SV *self, SV *c) {
         { SV *a[3]; a[0] = user_id; a[1] = client_id;
           a[2] = scope ? scope : sv_2mortal(newSVpvs(""));
           (void)pox_store_call(aTHX_ store, "consent_put", a, 3); }
+      }
+    }
+  }
+
+  /* claims hook (optional): private claims for the access token.
+   *
+   * Called once here, where the user and the client are both known and the
+   * user has just approved, and NOT at token time: the token request is the
+   * client talking, and a claim it could influence then would be a claim the
+   * user never agreed to. What comes back is bound to the code.
+   *
+   * This exists because a resource server usually needs to know something the
+   * standard claims cannot say - which of the user's own credentials this
+   * token acts as, which of their projects it is for. */
+  {
+    SV *hook = pox_srv_get(aTHX_ srv, "claims");
+    if (hook) {
+      dSP; int count; SV *r = NULL;
+      AV *scopes = newAV();
+      sv_2mortal((SV *)scopes);
+      if (scope) {
+        STRLEN sl; const char *sp = SvPV_const(scope, sl);
+        STRLEN a2 = 0, b;
+        for (b = 0; b <= sl; b++)
+          if (b == sl || sp[b] == ' ') {
+            if (b > a2) av_push(scopes, newSVpvn(sp + a2, b - a2));
+            a2 = b + 1;
+          }
+      }
+      ENTER; SAVETMPS; PUSHMARK(SP);
+      XPUSHs(c); XPUSHs(client); XPUSHs(user_id);
+      XPUSHs(sv_2mortal(newRV_inc((SV *)scopes)));
+      PUTBACK;
+      count = call_sv(hook, G_SCALAR | G_EVAL); SPAGAIN;
+      if (!SvTRUE(ERRSV) && count > 0) r = SvREFCNT_inc(POPs);
+      else if (count > 0) (void)POPs;
+      PUTBACK; FREETMPS; LEAVE;
+      if (r) {
+        claims_json = pox_claims_json(aTHX_ r);
+        SvREFCNT_dec(r);
       }
     }
   }
@@ -533,6 +740,12 @@ static SV *pox_srv_authorize(pTHX_ SV *self, SV *c) {
     (void)hv_stores(rec, "redirect_uri", newSVsv(redirect_uri));
     if (scope) (void)hv_stores(rec, "scope", newSVsv(scope));
     if (nonce) (void)hv_stores(rec, "nonce", newSVsv(nonce));
+    /* Bound to the code, so the token exchanged for it cannot name a
+     * resource the user never approved. */
+    if (rlist)
+      (void)hv_stores(rec, "resource", newSVsv(pox_join_list(aTHX_ rlist)));
+    if (claims_json)
+      (void)hv_stores(rec, "claims", newSVsv(claims_json));
     (void)hv_stores(rec, "code_challenge", newSVsv(challenge));
     (void)hv_stores(rec, "expires", newSViv((IV)time(NULL) + 600));
     { SV *a[2]; a[0] = code; a[1] = sv_2mortal(newRV_inc((SV *)rec));
@@ -633,10 +846,11 @@ static HV *pox_client_auth(pTHX_ HV *srv, SV *c, HV *form) {
 /* Build a token response hash (access_token/token_type/expires_in/
  * refresh_token/scope) and issue a rotated refresh token. */
 static SV *pox_token_success(pTHX_ HV *srv, SV *client_id, SV *user_id,
-                             const char *scope, int with_refresh) {
+                             const char *scope, int with_refresh,
+                             AV *resources, SV *extra) {
   SV *store = pox_srv_get(aTHX_ srv, "store");
   HV *resp = newHV();
-  SV *at = pox_mint_at(aTHX_ srv, client_id, user_id, scope);
+  SV *at = pox_mint_at(aTHX_ srv, client_id, user_id, scope, resources, extra);
   IV at_ttl = pox_hv_iv(aTHX_ srv, "at_ttl", 600);
   sv_2mortal((SV *)resp);
   (void)hv_stores(resp, "access_token", newSVsv(at));
@@ -653,6 +867,14 @@ static SV *pox_token_success(pTHX_ HV *srv, SV *client_id, SV *user_id,
     if (user_id && SvOK(user_id))
       (void)hv_stores(rec, "user_id", newSVsv(user_id));
     if (scope && *scope) (void)hv_stores(rec, "scope", newSVpv(scope, 0));
+    /* Carried on the refresh token so a rotation mints for the same
+     * audience. Without it, refreshing would quietly widen a token back to
+     * the issuer. */
+    if (resources && av_count(resources))
+      (void)hv_stores(rec, "resource",
+                      newSVsv(pox_join_list(aTHX_ resources)));
+    if (extra && SvOK(extra) && !SvROK(extra))
+      (void)hv_stores(rec, "claims", newSVsv(extra));
     (void)hv_stores(rec, "expires",
       newSViv((IV)time(NULL) + pox_hv_iv(aTHX_ srv, "rt_ttl", 30*86400)));
     { SV *a[2]; a[0] = rt; a[1] = sv_2mortal(newRV_inc((SV *)rec));
@@ -720,8 +942,29 @@ static SV *pox_srv_token(pTHX_ SV *self, SV *c) {
          * case the registration has been narrowed since */
         if (!pox_client_scope_ok(aTHX_ client, scope))
           return pox_error_json(aTHX_ 400, "invalid_scope", NULL);
-        return pox_token_success(aTHX_ srv, cid, uid,
-                                 scope ? SvPV_nolen(scope) : "", 1);
+        /* RFC 8707: a token request may narrow to a resource the code was
+         * issued for, and may not reach past it. Naming one the code does
+         * not carry is invalid_target, not a quietly wider token. */
+        {
+          AV *granted = pox_client_list(aTHX_ rh, "resource", 8);
+          AV *want = pox_sv_list(aTHX_ pox_field(aTHX_ form, "resource"));
+          if (want) {
+            SSize_t i, n = av_count(want);
+            for (i = 0; i < n; i++) {
+              SV **e = av_fetch(want, i, 0);
+              STRLEN wl;
+              const char *wp;
+              if (!e || !*e || !SvOK(*e)) continue;
+              wp = SvPV_const(*e, wl);
+              if (!granted || !pox_list_has(aTHX_ granted, wp, wl))
+                return pox_error_json(aTHX_ 400, "invalid_target", NULL);
+            }
+          }
+          return pox_token_success(aTHX_ srv, cid, uid,
+                                   scope ? SvPV_nolen(scope) : "", 1,
+                                   want ? want : granted,
+                                   pox_row_get(aTHX_ rh, "claims"));
+        }
       }
     }
 
@@ -765,14 +1008,30 @@ static SV *pox_srv_token(pTHX_ SV *self, SV *c) {
           SV *newrt = pox_random_b64(aTHX_ 32);
           HV *nrec = newHV();
           HV *resp = newHV();
+          /* The audience the original grant was issued for, re-read from the
+           * refresh record rather than from the request, so a rotation can
+           * never widen it. */
+          AV *rres = pox_client_list(aTHX_ rh, "resource", 8);
+          SV *rclaims = pox_row_get(aTHX_ rh, "claims");
           SV *at = pox_mint_at(aTHX_ srv, cid, uid,
-                               scope ? SvPV_nolen(scope) : "");
+                               scope ? SvPV_nolen(scope) : "", rres, rclaims);
           sv_2mortal((SV *)nrec);
           sv_2mortal((SV *)resp);
           (void)hv_stores(nrec, "family_id", newSVsv(family));
           (void)hv_stores(nrec, "client_id", newSVsv(cid));
           if (uid && SvOK(uid)) (void)hv_stores(nrec, "user_id", newSVsv(uid));
           if (scope) (void)hv_stores(nrec, "scope", newSVsv(scope));
+          /* Copied onto the replacement, or the SECOND rotation would mint
+           * for the issuer again: the audience would survive one refresh and
+           * silently widen on the next. */
+          if (rres && av_count(rres))
+            (void)hv_stores(nrec, "resource",
+                            newSVsv(pox_join_list(aTHX_ rres)));
+          /* Copied for the same reason, and with the same failure mode if it
+           * is not: the claims would survive one rotation and vanish on the
+           * next. */
+          if (rclaims && SvOK(rclaims))
+            (void)hv_stores(nrec, "claims", newSVsv(rclaims));
           (void)hv_stores(nrec, "expires",
             newSViv((IV)time(NULL) + pox_hv_iv(aTHX_ srv, "rt_ttl", 30*86400)));
           { SV *a[2]; a[0] = newrt; a[1] = sv_2mortal(newRV_inc((SV *)nrec));
@@ -803,8 +1062,17 @@ static SV *pox_srv_token(pTHX_ SV *self, SV *c) {
         return pox_error_json(aTHX_ 401, "invalid_client", NULL);
       if (!pox_client_scope_ok(aTHX_ client, scope))
         return pox_error_json(aTHX_ 400, "invalid_scope", NULL);
-      return pox_token_success(aTHX_ srv, cid, &PL_sv_undef,
-                               scope ? SvPV_nolen(scope) : "", 0);
+      /* RFC 8707 on this grant: there is no code to have bound a resource
+       * and no user to have approved one, so the registration is the only
+       * authority over what this token may be audienced for. */
+      {
+        AV *want = pox_sv_list(aTHX_ pox_field(aTHX_ form, "resource"));
+        if (want && !pox_resources_ok(aTHX_ client, want))
+          return pox_error_json(aTHX_ 400, "invalid_target", NULL);
+        return pox_token_success(aTHX_ srv, cid, &PL_sv_undef,
+                                 scope ? SvPV_nolen(scope) : "", 0, want,
+                                 NULL);
+      }
     }
 
     return pox_error_json(aTHX_ 400, "unsupported_grant_type", NULL);
@@ -949,6 +1217,123 @@ static SV *pox_srv_jwks(pTHX_ SV *self, SV *c) {
   }
 }
 
+/* Is this a redirect_uri a self-registering client may have?
+ *
+ * https anywhere, or plain http on the loopback names, which is how a native
+ * or command-line client receives its code. OAuth 2.1 forbids http elsewhere,
+ * and since this endpoint is open to anyone, it is the one place that rule has
+ * to be enforced rather than written down. */
+static int pox_reg_uri_ok(pTHX_ const char *u, STRLEN l) {
+  PERL_UNUSED_CONTEXT;
+  if (l > 8 && memEQ(u, "https://", 8)) return 1;
+  if (l >= 16 && memEQ(u, "http://localhost", 16)
+      && (l == 16 || u[16] == '/' || u[16] == ':')) return 1;
+  if (l >= 16 && memEQ(u, "http://127.0.0.1", 16)
+      && (l == 16 || u[16] == '/' || u[16] == ':')) return 1;
+  return 0;
+}
+
+/* POST /register (RFC 7591): dynamic client registration.
+ *
+ * What it is for: an agent that has never met this server cannot be given a
+ * client_id out of band, so it registers itself and gets one. That is how a
+ * connector in somebody else's product reaches an authorization server nobody
+ * configured it for.
+ *
+ * Everything it may register is deliberately narrow. The client is PUBLIC and
+ * gets no secret, because a secret handed out over an open endpoint protects
+ * nothing. It gets the code flow and refresh only: client_credentials is a
+ * confidential-client grant, and issuing it here would let anyone mint tokens
+ * in their own right simply by asking.
+ *
+ * This endpoint is open by construction. Mount it behind whatever per-address
+ * quota the surrounding application already uses; this dist deliberately does
+ * not invent one, because the application owns that policy. */
+static SV *pox_srv_register(pTHX_ SV *self, SV *c) {
+  HV *srv = pox_srv_hv(aTHX_ self);
+  SV *store = pox_srv_get(aTHX_ srv, "store");
+  SV *body = pox_req_body(aTHX_ c);
+  SV *dec = NULL;
+  HV *m, *spec, *out;
+  AV *uris, *grants, *rtypes;
+  SSize_t i, n;
+  SV *client_id;
+
+  if (!body || !SvOK(body) || !SvCUR(body))
+    return pox_error_json(aTHX_ 400, "invalid_client_metadata", NULL);
+  {
+    dSP; int count;
+    ENTER; SAVETMPS; PUSHMARK(SP);
+    XPUSHs(body); PUTBACK;
+    count = call_pv("File::Raw::JSON::file_json_decode", G_SCALAR | G_EVAL);
+    SPAGAIN;
+    if (!SvTRUE(ERRSV) && count > 0) dec = SvREFCNT_inc(POPs);
+    else if (count > 0) (void)POPs;
+    PUTBACK; FREETMPS; LEAVE;
+  }
+  if (!dec || !SvROK(dec) || SvTYPE(SvRV(dec)) != SVt_PVHV) {
+    SvREFCNT_dec(dec);
+    return pox_error_json(aTHX_ 400, "invalid_client_metadata", NULL);
+  }
+  sv_2mortal(dec);
+  m = (HV *)SvRV(dec);
+
+  {
+    SV **ru = hv_fetchs(m, "redirect_uris", 0);
+    if (!ru || !*ru || !SvROK(*ru) || SvTYPE(SvRV(*ru)) != SVt_PVAV)
+      return pox_error_json(aTHX_ 400, "invalid_redirect_uri", NULL);
+    uris = (AV *)SvRV(*ru);
+    n = av_count(uris);
+    if (!n) return pox_error_json(aTHX_ 400, "invalid_redirect_uri", NULL);
+    for (i = 0; i < n; i++) {
+      SV **e = av_fetch(uris, i, 0);
+      STRLEN ul;
+      const char *up;
+      if (!e || !*e || !SvOK(*e))
+        return pox_error_json(aTHX_ 400, "invalid_redirect_uri", NULL);
+      up = SvPV_const(*e, ul);
+      if (!pox_reg_uri_ok(aTHX_ up, ul))
+        return pox_error_json(aTHX_ 400, "invalid_redirect_uri", NULL);
+    }
+  }
+
+  client_id = pox_random_b64(aTHX_ 16);
+  spec = newHV();
+  sv_2mortal((SV *)spec);
+  (void)hv_stores(spec, "client_id", newSVsv(client_id));
+  (void)hv_stores(spec, "redirect_uris", newRV_inc((SV *)uris));
+  (void)hv_stores(spec, "public", newSViv(1));
+  (void)hv_stores(spec, "auth_method", newSVpvs("none"));
+  (void)hv_stores(spec, "grant_types",
+                  newSVpvs("authorization_code refresh_token"));
+  { SV **v = hv_fetchs(m, "client_name", 0);
+    if (v && *v && SvOK(*v)) (void)hv_stores(spec, "name", newSVsv(*v)); }
+  { SV **v = hv_fetchs(m, "scope", 0);
+    if (v && *v && SvOK(*v)) (void)hv_stores(spec, "scopes", newSVsv(*v)); }
+  { SV *a[1];
+    a[0] = sv_2mortal(newRV_inc((SV *)spec));
+    (void)pox_store_call(aTHX_ store, "client_put", a, 1); }
+
+  out = newHV();
+  sv_2mortal((SV *)out);
+  grants = newAV();
+  av_push(grants, newSVpvs("authorization_code"));
+  av_push(grants, newSVpvs("refresh_token"));
+  rtypes = newAV();
+  av_push(rtypes, newSVpvs("code"));
+  (void)hv_stores(out, "client_id", newSVsv(client_id));
+  (void)hv_stores(out, "client_id_issued_at", newSViv((IV)time(NULL)));
+  (void)hv_stores(out, "token_endpoint_auth_method", newSVpvs("none"));
+  (void)hv_stores(out, "grant_types", newRV_noinc((SV *)grants));
+  (void)hv_stores(out, "response_types", newRV_noinc((SV *)rtypes));
+  (void)hv_stores(out, "redirect_uris", newRV_inc((SV *)uris));
+  { SV **v = hv_fetchs(m, "client_name", 0);
+    if (v && *v && SvOK(*v)) (void)hv_stores(out, "client_name", newSVsv(*v)); }
+  { SV **v = hv_fetchs(m, "scope", 0);
+    if (v && *v && SvOK(*v)) (void)hv_stores(out, "scope", newSVsv(*v)); }
+  return pox_json_response(aTHX_ 201, sv_2mortal(newRV_inc((SV *)out)));
+}
+
 /* GET /.well-known metadata (RFC 8414). */
 static SV *pox_srv_metadata(pTHX_ SV *self, SV *c) {
   HV *srv = pox_srv_hv(aTHX_ self);
@@ -971,6 +1356,9 @@ static SV *pox_srv_metadata(pTHX_ SV *self, SV *c) {
   POX_EP("revocation_endpoint", "/revoke");
   POX_EP("introspection_endpoint", "/introspect");
   POX_EP("jwks_uri", "/jwks.json");
+  /* RFC 7591, advertised so a client that has no client_id can find the one
+   * endpoint that will give it one. */
+  POX_EP("registration_endpoint", "/register");
 #undef POX_EP
   av_push(grants, newSVpvs("authorization_code"));
   av_push(grants, newSVpvs("refresh_token"));

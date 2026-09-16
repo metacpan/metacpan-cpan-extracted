@@ -1,5 +1,16 @@
 Revision history for Frozen
 
+0.07    2026-09-16
+        - a scalar's kind is read from the public SV flags, not the private
+          ones. A cached conversion is not a type: 1.5 compared against an
+          integer leaves the truncated 1 in its IV slot, and freeze stored
+          that 1 as an integer. Two freezes of untouched data now agree
+          however the data was read in between.
+        - lossy_nv governs only what a double cannot hold at all: a value
+          past DBL_MAX, or a non-zero one under the smallest denormal.
+          Rounding a wider NV is the format. Without this, every perl built
+          -Duselongdouble refused nearly every NV it was given.
+
 0.06    2026-09-11
         - documents stringify
 

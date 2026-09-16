@@ -6,7 +6,7 @@ use warnings;
 
 use Punk::OAuth2;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 1;
@@ -88,10 +88,16 @@ except C<client_put> (and the other client operations) for provisioning.
 		scopes        => 'read write',
 		auth_method   => 'basic',       # or 'body'
 		public        => 0,
+		resources     => ['https://api.example/mcp'],
 	});
 
 Inserts or replaces a client. C<secret> is digested on the way in; a
 client with no secret is public (PKCE still applies).
+
+C<resources> lists the RFC 8707 resource indicators this client may request a
+token for. It is B<deny by default> like C<redirect_uris>: a client that
+registers none may request none, and a token is audienced for the resource it
+named rather than for the issuer.
 
 C<grant_types> and C<scopes> are enforced, and are B<deny by default> in
 the same way C<redirect_uris> is: what is not listed cannot be asked
@@ -188,7 +194,8 @@ value.
 	    scopes         TEXT,            -- space-separated
 	    auth_method    TEXT,            -- 'basic' or 'body'
 	    is_public      INTEGER DEFAULT 0,
-	    created        INTEGER
+	    created        INTEGER,
+	    resources      TEXT              -- RFC 8707, space-separated or JSON
 	);
 
 	CREATE TABLE oauth2_codes (
@@ -199,6 +206,7 @@ value.
 	    scope          TEXT,
 	    nonce          TEXT,              -- OIDC, may be NULL
 	    code_challenge TEXT,             -- PKCE S256 challenge
+	    resource       TEXT,             -- RFC 8707, what the code is for
 	    expires        INTEGER
 	);
 
@@ -208,6 +216,8 @@ value.
 	    client_id      TEXT,
 	    user_id        TEXT,
 	    scope          TEXT,
+	    resource       TEXT,              -- carried so a rotation cannot
+	                                      -- widen the audience
 	    expires        INTEGER,
 	    rotated_to     TEXT,              -- set once the token is rotated
 	    revoked        INTEGER DEFAULT 0

@@ -1,5 +1,9 @@
 Revision history for Data::Deque::Shared
 
+0.09      2026-09-15
+          - Fix a blocked push_wait missing a slot freed by crash recovery.
+          - The recoveries stat also counts pop and push recoveries.
+
 0.08      2026-08-12
           - Recover a file left behind by an interrupted create instead of
             leaving the path unopenable.

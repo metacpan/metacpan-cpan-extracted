@@ -414,6 +414,7 @@ use Imager::Fountain;                                               #
 use Imager::Font::Wrap;
 use Graphics::Framebuffer::Mouse;                                   # The mouse handler (useless)
 use Graphics::Framebuffer::Splash;                                  # The splash code is here
+use Carp qw(croak);                                                      # For error handling
 
 Imager->preload;                                                    # The Imager documentation says to do this, but doesn't give much of an explanation why.
                                                                     # However, I assume it is to initialize global variables ahead of time so threads behave.
@@ -425,7 +426,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '7.06';
+    our $VERSION   = '8.00';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -513,7 +514,7 @@ use Inline C => <<'C_CODE', 'name' => 'Graphics::Framebuffer', 'VERSION' => $VER
 /* Copyright 2018 - 2026 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  7.06
+   Version:  8.00
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -765,11 +766,83 @@ static void plot_aa_pixel(char *framebuffer,
 
 /* Get framebuffer info and populate global structures, then send them to Perl. */
 void c_get_screen_info(char *fb_file) {
-    int fbfd = open(fb_file, O_RDWR);
-    ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo);
-    ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo);
-    close(fbfd);
+    /* Clear out the finfo and vinfo structures with zeroes first */
+    memset(&finfo, 0, sizeof(finfo));
+    memset(&vinfo, 0, sizeof(vinfo));
 
+    /* Check if the path points to our shared memory emulation file */
+    if (strncmp(fb_file, "/dev/shm", 8) == 0) {
+        /* Default fallback dimensions if reading the .info file fails */
+        unsigned int width  = 1280;
+        unsigned int height = 720;
+        unsigned int bpp    = 32;
+
+        FILE *info_fp = fopen("/dev/shm/gfb_screen.info", "r");
+        if (info_fp != NULL) {
+            /* Check that fscanf matched all 3 fields */
+            if (fscanf(info_fp, "%u %u %u", &width, &height, &bpp) != 3) {
+                /* If corrupted or partial read, reset to safe defaults */
+                width  = 1280;
+                height = 720;
+                bpp    = 32;
+            }
+            fclose(info_fp);
+        }
+
+        /* -------------------------------------------------------------
+         * Populate finfo (struct fb_fix_screeninfo)
+         * ------------------------------------------------------------- */
+        strncpy(finfo.id, "GFB_SHM_EMU", 16);
+        finfo.type        = FB_TYPE_PACKED_PIXELS; /* Standard packed pixel format (0) */
+        finfo.visual      = FB_VISUAL_TRUECOLOR;   /* Truecolor display (2) */
+        finfo.line_length = width * (bpp / 8);     /* Bytes per scanline row */
+        finfo.smem_len    = finfo.line_length * height; /* Total buffer size in bytes */
+        finfo.smem_start  = 0;
+        finfo.accel       = 0;                     /* No hardware acceleration */
+
+        /* -------------------------------------------------------------
+         * Populate vinfo (struct fb_var_screeninfo)
+         * ------------------------------------------------------------- */
+        vinfo.xres           = width;
+        vinfo.yres           = height;
+        vinfo.xres_virtual   = width;
+        vinfo.yres_virtual   = height;
+        vinfo.width          = width;
+        vinfo.height         = height;
+        vinfo.bits_per_pixel = bpp;
+        vinfo.activate       = FB_ACTIVATE_NOW;
+
+        /* Standard channel bitfield layouts */
+        if (bpp == 32) {
+            /* Standard 32-bit ARGB/BGRA layout */
+            vinfo.red.offset     = 16; vinfo.red.length     = 8; vinfo.red.msb_right   = 0;
+            vinfo.green.offset   = 8;  vinfo.green.length   = 8; vinfo.green.msb_right = 0;
+            vinfo.blue.offset    = 0;  vinfo.blue.length    = 8; vinfo.blue.msb_right  = 0;
+            vinfo.transp.offset  = 24; vinfo.transp.length  = 8; vinfo.transp.msb_right = 0;
+        } else if (bpp == 16) {
+            /* Standard RGB565 layout */
+            vinfo.red.offset     = 11; vinfo.red.length     = 5; vinfo.red.msb_right   = 0;
+            vinfo.green.offset   = 5;  vinfo.green.length   = 6; vinfo.green.msb_right = 0;
+            vinfo.blue.offset    = 0;  vinfo.blue.length    = 5; vinfo.blue.msb_right  = 0;
+            vinfo.transp.offset  = 0;  vinfo.transp.length  = 0; vinfo.transp.msb_right = 0;
+        } else {
+            /* Standard 24-bit RGB layout */
+            vinfo.red.offset     = 16; vinfo.red.length     = 8; vinfo.red.msb_right   = 0;
+            vinfo.green.offset   = 8;  vinfo.green.length   = 8; vinfo.green.msb_right = 0;
+            vinfo.blue.offset    = 0;  vinfo.blue.length    = 8; vinfo.blue.msb_right  = 0;
+            vinfo.transp.offset  = 0;  vinfo.transp.length  = 0; vinfo.transp.msb_right = 0;
+        }
+    } else {
+        /* Real hardware node: Query kernel drivers via ioctl */
+        int fbfd = open(fb_file, O_RDWR);
+        if (fbfd >= 0) {
+            ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo);
+            ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo);
+            close(fbfd);
+        }
+    }
+
+    /* Return all values to Perl via the Inline stack */
     Inline_Stack_Vars;
     Inline_Stack_Reset;
 
@@ -810,6 +883,7 @@ void c_get_screen_info(char *fb_file) {
     Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.nonstd)));
     Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.activate)));
     Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.height)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.width)));
     Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.accel_flags)));
     Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.pixclock)));
     Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.left_margin)));
@@ -823,6 +897,21 @@ void c_get_screen_info(char *fb_file) {
     Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.rotate)));
 
     Inline_Stack_Done;
+}
+
+void c_flush_fb(int fbfd, int xoffset, int yoffset) {
+    struct fb_var_screeninfo vinfo_local;
+    if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo_local) == 0) {
+        vinfo_local.xoffset = xoffset;
+        vinfo_local.yoffset = yoffset;
+        /* Trigger pan to kick deferred blitter */
+        if (ioctl(fbfd, FBIOPAN_DISPLAY, &vinfo_local) < 0) {
+            /* If offsets didn't move, bump by 0 with FB_ACTIVATE_NOW */
+            vinfo_local.activate = FB_ACTIVATE_NOW;
+            ioctl(fbfd, FBIOPUT_VSCREENINFO, &vinfo_local);
+        }
+    }
+    ioctl(fbfd, FBIOBLANK, FB_BLANK_UNBLANK);
 }
 
 /* Sets the framebuffer to text mode, which enables the cursor. */
@@ -2719,7 +2808,6 @@ void c_monochrome(char *pixels,
 
 /* END C Section */
 
-
 C_CODE
 
 our @HATCHES    = Imager::Fill->hatches;
@@ -2988,6 +3076,7 @@ sub new {
             'blue'  => 0,
             'alpha' => 255
         },
+        'COLOR_ALPHA' => 255,                                              # Default alpha for colors
 
         'FONT_PATH' => '/usr/share/fonts/truetype/freefont',       # Default fonts path
         'FONT_FACE' => 'FreeSans.ttf',                             # Default font face
@@ -3093,14 +3182,14 @@ sub new {
 
         # Default values
         'GARBAGE'             => FALSE,       # Load extra unneeded FB info if true
-        'VXRES'               => 640,         # Virtual X resolution
-        'VYRES'               => 480,         # Virtual Y resolution
+        'VXRES'               => 1280,        # Virtual X resolution
+        'VYRES'               => 720,         # Virtual Y resolution
         'BITS'                => 32,          # Bits per pixel
         'BYTES'               => 4,           # Bytes per pixel
         'XOFFSET'             => 0,           # Visible screen X offset
         'YOFFSET'             => 0,           # Visible screen Y offset
         'FB_DEVICE'           => undef,       # Framebuffer device name (defined later)
-        'COLOR_ORDER'         => 'RGB',       # Default color Order.  Redefined later to be an integer
+        'COLOR_ORDER'         => 'BGR',       # Default color Order.  Redefined later to be an integer
         'ACCELERATED'         => SOFTWARE,    # Use accelerated graphics
                                               #   0 = PERL     = Pure Perl
                                               #   1 = SOFTWARE = C Accelerated (but still software)
@@ -3240,16 +3329,26 @@ sub new {
         };
         $self = { %{$self}, %{$garbage} };
     } ## end if ($self->{'GARBAGE'})
+    # In Graphics::Framebuffer::new
+    $self->{'VBOX'} = (
+        (-e '/sys/class/dmi/id/product_name' && do {
+            local (@ARGV, $/) = '/sys/class/dmi/id/product_name';
+            my $p = <>; defined $p && $p =~ /VirtualBox/i;
+        }) || ($self->{'fscreeninfo'}->{'id'} =~ /vbox/i) || (`systemd-detect-virt 2>/dev/null` =~ /oracle/i)) ? 1 : 0;
     unless (defined($self->{'FB_DEVICE'})) {                 # We scan for all 32 possible devices at both possible locations
-        foreach my $dev (0 .. 31) {
-            foreach my $prefix (qw(/dev/fb /dev/fb/ /dev/graphics/fb)) {
-                if (-e "$prefix$dev") {
-                    $self->{'FB_DEVICE'} = "$prefix$dev";
-                    last;
-                }
-            } ## end foreach my $prefix (qw(/dev/fb /dev/fb/ /dev/graphics/fb))
-            last if (defined($self->{'FB_DEVICE'}));
-        } ## end foreach my $dev (0 .. 31)
+        if (-e '/dev/shm/gfb_screen') { # Is GFB running in X-Windows with the gfb_screen?  If so, we can use that framebuffer device instead of the real one.  This is a hack, but it works.
+            $self->{'FB_DEVICE'} = '/dev/shm/gfb_screen'; # Detected the GFB viewer
+        } else {
+            foreach my $dev (0 .. 31) {
+                foreach my $prefix (qw(/dev/fb /dev/fb/ /dev/graphics/fb)) {
+                    if (-e "$prefix$dev") {
+                        $self->{'FB_DEVICE'} = "$prefix$dev";
+                        last;
+                    }
+                } ## end foreach my $prefix (qw(/dev/fb /dev/fb/ /dev/graphics/fb))
+                last if (defined($self->{'FB_DEVICE'}));
+            } ## end foreach my $dev (0 .. 31)
+        }
     } ## end unless (defined($self->{'FB_DEVICE'...}))
     $self->{'CONSOLE'} = 1;
     eval {
@@ -3258,9 +3357,7 @@ sub new {
         $self->{'CONSOLE'} += 0;
         $self->{'THIS_CONSOLE'} = $self->{'CONSOLE'};
     };
-    my $has_X = FALSE;
-    $has_X = TRUE if (defined($ENV{'DISPLAY'}) && $self->{'IGNORE_X_WINDOWS'} == FALSE);
-    if ((!$has_X) && defined($self->{'FB_DEVICE'}) && (-e $self->{'FB_DEVICE'}) && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
+    if (defined($self->{'FB_DEVICE'}) and (-e $self->{'FB_DEVICE'}) and open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                          # We have to be in binary mode first
         select($self->{'FB'});
 		$self->{'FB'}->autoflush;
@@ -3317,6 +3414,69 @@ sub new {
                 $self->{'vscreeninfo'}->{'vmode'},
                 $self->{'vscreeninfo'}->{'rotate'},
             ) = (c_get_screen_info($self->{'FB_DEVICE'}));
+        } elsif ($self->{'GFB_VIEWER'}) {    # If we are running inside the GFB viewer, we can get the screen info from the GFB viewer
+            open(my $GVIEW,',', '/dev/shm/gfb_screen_info');
+            my $parameters = <$GVIEW>;
+            close($GVIEW);
+            chomp($parameters);
+            $parameters =~ s/^\s+//;
+            ($self->{'VXRES'}, $self->{'VYRES'}, $self->{'BITS'}) = split(/\s+/, $parameters);
+            $self->{'COLOR_ORDER'} = $self->{ uc($self->{'COLOR_ORDER'}) };                             # Translate the color order
+
+            $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'}      = 8;
+            $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'msb_right'}   = 0;
+            $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'}    = 8;
+            $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'msb_right'} = 0;
+            $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'}     = 8;
+            $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'msb_right'}  = 0;
+            $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'}    = 8;
+            $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'msb_right'} = 0;
+
+            if ($self->{'COLOR_ORDER'} == BGR) {
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 16;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 8;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 0;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
+            } elsif ($self->{'COLOR_ORDER'} == RGB) {
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 0;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 8;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 16;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
+            } elsif ($self->{'COLOR_ORDER'} == BRG) {
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 8;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 16;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 0;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
+            } elsif ($self->{'COLOR_ORDER'} == RBG) {
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 0;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 16;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 8;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
+            } elsif ($self->{'COLOR_ORDER'} == GRB) {
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 8;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 0;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 16;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
+            } elsif ($self->{'COLOR_ORDER'} == GBR) {
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}   = 16;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'} = 0;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}  = 8;
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'} = 24;
+            } ## end elsif ($self->{'COLOR_ORDER'...})
+
+            # Set the resolution.  Either the defaults, or whatever the user passed in.
+
+            $self->{'SCREEN'}                    = chr(0) x ($self->{'VXRES'} * $self->{'VYRES'} * $self->{'BYTES'});                                                                                           # This is the fake framebuffer
+            $self->{'XRES'}                      = $self->{'VXRES'};                                                                                                                                            # Virtual and physical are the same
+            $self->{'YRES'}                      = $self->{'VYRES'};
+            $self->{'XOFFSET'}                   = 0;
+            $self->{'YOFFSET'}                   = 0;
+            $self->{'PIXELS'}                    = (($self->{'XOFFSET'} + $self->{'VXRES'}) * ($self->{'YOFFSET'} + $self->{'VYRES'}));
+            $self->{'SIZE'}                      = $self->{'PIXELS'} * $self->{'BYTES'};
+            $self->{'fscreeninfo'}->{'id'}       = 'Virtual Framebuffer';
+            $self->{'GPU'}                       = $self->{'fscreeninfo'}->{'id'};
+            $self->{'fscreeninfo'}->{'smem_len'} = $self->{'BYTES'} * ($self->{'VXRES'} * $self->{'VYRES'}) if (!defined($self->{'fscreeninfo'}->{'smem_len'}) || $self->{'fscreeninfo'}->{'smem_len'} <= 0);
+            $self->{'BYTES_PER_LINE'}            = int($self->{'fscreeninfo'}->{'smem_len'} / $self->{'VYRES'});
         } else {    # Fallback if not accelerated.  Do it the old way
                     # Make the IOCTL call to get info on the virtual (viewable) screen (Sometimes different than physical)
             (       # This method has the potential for errors
@@ -4876,21 +5036,24 @@ sub drawto {
 } ## end sub drawto
 
 sub _flush_screen {
-    # Since the framebuffer is mappeed as a string device, Perl buffers the output, and this must be flushed.
     my $self = shift;
 
-	if ($self->{'DEVICE'} eq 'EMULATED') {
-		select(STDERR);
-		$| = 1;
-	} elsif (defined($self->{'FB'})) {
-		select($self->{'FB'});
-		$| = 1;
-		$self->{'FB'}->flush();
-		eval {sync $self->{'SCREEN'}, TRUE;};
-		$self->vsync();
-	}
-	$self->{'LAST_FLUSHED'} = time;
-} ## end sub _flush_screen
+    if ($self->{'DEVICE'} eq 'EMULATED') {
+        # Under SHM emulation, MS_ASYNC signals the backing file without blocking execution
+        eval { sync $self->{'SCREEN'}, FALSE; };
+    } else {
+        # Extract the underlying POSIX file descriptor from the open FB handle
+        if (defined $self->{'FB'}) {
+            my $fd = fileno($self->{'FB'});
+            if (defined $fd && $fd >= 0) {
+                c_flush_fb($fd, $self->{'XOFFSET'} || 0, $self->{'YOFFSET'} || 0);
+            }
+        }
+        # Explicitly omit sync() here: calling msync on device mmap memory causes kernel D-state stalls
+    }
+
+    $self->{'LAST_FLUSHED'} = time;
+}
 
 sub _adj_plot {
     # Part of antialiased drawing
@@ -6403,6 +6566,9 @@ Draws a box from point x,y to point xx,yy, either as an outline, if 'filled' is 
 
 sub box {
     my ($self, $params) = @_;
+    if (ref($params) ne 'HASH') {
+        croak("box() requires a hash reference");
+    }
 
     my $x      = int($params->{'x'});
     my $y      = int($params->{'y'});
@@ -9922,7 +10088,7 @@ Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONT
 
 =head1 VERSION
 
-Version 7.06 (Jul 27, 2026)
+Version 8.00 (Sep 15, 2026)
 
 =head1 THANKS
 

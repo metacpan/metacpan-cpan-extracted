@@ -83,7 +83,7 @@ client_put(self, spec)
     CODE:
         SV *dbh = pox_store_dbh(aTHX_ self);
         HV *c;
-        SV *binds[9];
+        SV *binds[10];
         SV *uris, *secret_digest;
         if (!SvROK(spec) || SvTYPE(SvRV(spec)) != SVt_PVHV)
             croak("client_put: expects a hashref");
@@ -126,11 +126,31 @@ client_put(self, spec)
             hv_fetchs(c, "public", 0) && SvTRUE(*hv_fetchs(c, "public", 0))
               ? 1 : 0));
         binds[8] = sv_2mortal(newSViv((IV)time(NULL)));
+        /* RFC 8707: the resources this client may ask a token for. An
+         * arrayref is stored as JSON the way redirect_uris is; a plain
+         * string is stored as given, since pox_client_list reads either. */
+        {
+            SV **rs = hv_fetchs(c, "resources", 0);
+            if (rs && *rs && SvROK(*rs)) {
+                dSP; int count; SV *j = NULL;
+                ENTER; SAVETMPS; PUSHMARK(SP);
+                XPUSHs(*rs); PUTBACK;
+                count = call_pv("File::Raw::JSON::file_json_encode",
+                                G_SCALAR | G_EVAL);
+                SPAGAIN;
+                if (!SvTRUE(ERRSV) && count > 0) j = SvREFCNT_inc(POPs);
+                else if (count > 0) (void)POPs;
+                PUTBACK; FREETMPS; LEAVE;
+                binds[9] = j ? sv_2mortal(j) : &PL_sv_undef;
+            }
+            else binds[9] = (rs && *rs && SvOK(*rs)) ? *rs : &PL_sv_undef;
+        }
         (void)pox_dbi_do(aTHX_ dbh,
             "INSERT OR REPLACE INTO oauth2_clients (client_id, "
             "secret_digest, name, redirect_uris, grant_types, scopes, "
-            "auth_method, is_public, created) VALUES (?,?,?,?,?,?,?,?,?)",
-            binds, 9);
+            "auth_method, is_public, created, resources) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?)",
+            binds, 10);
 
 SV *
 client_get(self, client_id)
@@ -159,7 +179,7 @@ code_put(self, code, rec)
     CODE:
         SV *dbh = pox_store_dbh(aTHX_ self);
         HV *r;
-        SV *binds[7];
+        SV *binds[9];
         if (!SvROK(rec) || SvTYPE(SvRV(rec)) != SVt_PVHV)
             croak("code_put: expects a hashref");
         r = (HV *)SvRV(rec);
@@ -170,16 +190,24 @@ code_put(self, code, rec)
         binds[4] = hv_fetchs(r, "scope", 0) ? *hv_fetchs(r,"scope",0) : &PL_sv_undef;
         binds[5] = hv_fetchs(r, "nonce", 0) ? *hv_fetchs(r,"nonce",0) : &PL_sv_undef;
         binds[6] = hv_fetchs(r, "code_challenge", 0) ? *hv_fetchs(r,"code_challenge",0) : &PL_sv_undef;
+        /* The resource the code was issued for, so the token minted from it
+         * cannot be audienced for anything else. */
+        binds[7] = hv_fetchs(r, "resource", 0) ? *hv_fetchs(r,"resource",0) : &PL_sv_undef;
+        /* Private claims decided at authorize time, as JSON. Bound to the
+         * code so the token minted from it carries what the user approved
+         * and not what the token request asks for. */
+        binds[8] = hv_fetchs(r, "claims", 0) ? *hv_fetchs(r,"claims",0) : &PL_sv_undef;
         {
-            SV *b2[8];
+            SV *b2[10];
             SV **e = hv_fetchs(r, "expires", 0);
             int k;
-            for (k = 0; k < 7; k++) b2[k] = binds[k];
-            b2[7] = e && *e ? *e : sv_2mortal(newSViv((IV)time(NULL) + 300));
+            for (k = 0; k < 9; k++) b2[k] = binds[k];
+            b2[9] = e && *e ? *e : sv_2mortal(newSViv((IV)time(NULL) + 300));
             (void)pox_dbi_do(aTHX_ dbh,
                 "INSERT INTO oauth2_codes (code_digest, client_id, "
                 "user_id, redirect_uri, scope, nonce, code_challenge, "
-                "expires) VALUES (?,?,?,?,?,?,?,?)", b2, 8);
+                "resource, claims, expires) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                b2, 10);
         }
 
 # code_take($code) -> row hashref or undef, deleting it (single use).
@@ -215,7 +243,7 @@ refresh_put(self, token, rec)
     CODE:
         SV *dbh = pox_store_dbh(aTHX_ self);
         HV *r;
-        SV *binds[6];
+        SV *binds[8];
         if (!SvROK(rec) || SvTYPE(SvRV(rec)) != SVt_PVHV)
             croak("refresh_put: expects a hashref");
         r = (HV *)SvRV(rec);
@@ -224,12 +252,19 @@ refresh_put(self, token, rec)
         binds[2] = hv_fetchs(r, "client_id", 0) ? *hv_fetchs(r,"client_id",0) : &PL_sv_undef;
         binds[3] = hv_fetchs(r, "user_id", 0) ? *hv_fetchs(r,"user_id",0) : &PL_sv_undef;
         binds[4] = hv_fetchs(r, "scope", 0) ? *hv_fetchs(r,"scope",0) : &PL_sv_undef;
-        binds[5] = hv_fetchs(r, "expires", 0) ? *hv_fetchs(r,"expires",0)
+        /* Carried so a rotation cannot widen the audience: the new access
+         * token is minted for what the original grant named. */
+        binds[5] = hv_fetchs(r, "resource", 0) ? *hv_fetchs(r,"resource",0) : &PL_sv_undef;
+        /* Carried for the same reason the resource is: a rotation must mint
+         * the same private claims, not drop them. */
+        binds[6] = hv_fetchs(r, "claims", 0) ? *hv_fetchs(r,"claims",0) : &PL_sv_undef;
+        binds[7] = hv_fetchs(r, "expires", 0) ? *hv_fetchs(r,"expires",0)
             : sv_2mortal(newSViv((IV)time(NULL) + 30*86400));
         (void)pox_dbi_do(aTHX_ dbh,
             "INSERT INTO oauth2_refresh (token_digest, family_id, "
-            "client_id, user_id, scope, expires) VALUES (?,?,?,?,?,?)",
-            binds, 6);
+            "client_id, user_id, scope, resource, claims, expires) "
+            "VALUES (?,?,?,?,?,?,?,?)",
+            binds, 8);
 
 SV *
 refresh_take(self, token)

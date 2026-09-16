@@ -85,7 +85,7 @@ known_compatible_distros=(
                         "Red Hat"
                         "Arch"
                         "OpenMandriva"
-                        "Zorin"
+                        "Zorin OS"
                     )
 
 known_arm_compatible_distros=(

@@ -128,4 +128,16 @@ $b->quit;
     $lb->quit;
 }
 
+# 9) listen() replaces a dangling symlink at the socket path
+{
+    my $b3 = EV::WebKit->new(window => [100,80], ephemeral => 1, timeout => 5);
+    my $sym_sock = "$dir/dangling.sock";
+    symlink("$dir/nonexistent_target.sock", $sym_sock) or die $!;
+    ok(-l $sym_sock && !-e $sym_sock, 'dangling symlink created');
+    my $ctl3 = eval { EV::WebKit::Control->listen($b3, path => $sym_sock) };
+    ok($ctl3, 'listen() replaces dangling symlink at socket path') or diag($@);
+    $ctl3->close if $ctl3;
+    $b3->quit;
+}
+
 done_testing;

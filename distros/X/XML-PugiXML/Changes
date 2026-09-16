@@ -1,5 +1,10 @@
 Revision history for XML-PugiXML
 
+0.09  2026-09-15
+    - Fix use-after-free after reassigning the variable holding a document
+    - Fix double free after an explicit DESTROY
+    - Destroyed or uninitialized handles croak instead of crashing
+
 0.08  2026-07-29
     - Fix use-after-free in $doc->select_nodes (results past the first got a
       bogus document handle; ->root segfaulted)

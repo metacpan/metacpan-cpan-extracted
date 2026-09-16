@@ -4,7 +4,7 @@ App::perlvars - CLI tool to detect unused variables in Perl modules
 
 # VERSION
 
-version 0.000006
+version 0.000007
 
 # DESCRIPTION
 

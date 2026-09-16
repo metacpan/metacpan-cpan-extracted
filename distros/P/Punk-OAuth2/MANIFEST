@@ -46,6 +46,10 @@ t/40-server.t
 t/44-capstone.t
 t/45-custom-store.t
 t/46-immortal-refcount.t
+t/47-resource.t
+t/48-register.t
+t/49-claims.t
+t/50-hook-refs.t
 t/lib/MemStore.pm
 t/lib/MockIdP.pm
 t/lib/POSpawn.pm

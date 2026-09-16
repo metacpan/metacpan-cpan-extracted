@@ -1,3 +1,214 @@
+Mon Sep 14 20:38:29 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.1.1]:
+	* VERSION: bump
+	* release-notes.md: updated
+	* release-notes/release-notes-2.1.1.md: new
+	* .includes/bootstrap.mk: added by CPAN::Maker::Bootstrapper
+	* .includes/update.mk: updated by CPAN::Maker::Bootstrapper
+	* Makefile: likewise
+	* builder: likewise
+	* requires
+	- OrePAN2::Lite 2.0.0, DarkPAN::Indexer
+	* cpanfile: likewise
+	* lib/OrePAN2/S3.pm.in
+	- PACKAGE_INDEX => PACKAGES_DETALS_INDEX
+	(has_packages_version_index): new
+	(cmd_download_version_index): new
+	(fetch_config)
+	- croak, not die
+	- log @ debug level
+	(has_packages_version_index): new
+	(_invalidate_index): invalidate packages index if we have one
+	(cmd_download_orepan_index)
+	- PACKAGE_INDEX => PACKAGES_DETALS_INDEX
+	(fetch_template)
+	- log @ debug level
+	(main)
+	- --force|f
+	- +download-version-index command
+	* lib/OrePAN2/S3/Role/Delete.pm.in
+	(cmd_delete)
+	- display number of matches instead of entire list
+	- delete packages from version index
+	(_delete_from_packages_version): new
+
+Thu Aug 20 14:31:22 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.1.0]:
+	* VERSION: bump
+	* release-notes.md: updated
+	* release-notes/release-notes-2.1.0.md: new
+	* .includes/perl.mk: updated by CPAN::Maker::Bootstrapper
+	* builder: likewise
+	* requires: +Data::UUID
+	* suggests
+	- +Amazon::API::CloudFront, +IO::Interactive, ++IO::Pager, +Text::ASCIITable
+	* cpanfile: likewise
+	* lib/OrePAN2/S3.pm.in
+	- pod updates
+	(fetch_config)
+	- log basic config parameters
+	(cmd_invalidate_index)
+	- refactored to use _invalidate_index()
+	(_invalidate_index): new
+	(create_invalidation_batch)
+	- positional args, not a hash
+	- better guards
+	(cmd_list_packages): new
+	(_has_pager): new
+	(cmd_upload_index): renamed cmd_upload_site_index
+	(cmd_create_docs): use get_author_path, don't hard code
+	(cmd_create_index)
+	- invalidate index if we have a distribution id and invalidate_index is true
+	(init): prefer --profile over config
+	(fetch_template)
+	- support s3:// path
+	(main)
+	- added --cli-pager, --delete-all, --dryrun, --format,
+	- added --invalidate-index --save-index --upload-site-index --upload
+	- new commands list-packages
+	- renamed commands download => download-index, create-index => create-site-index
+	* lib/OrePAN2/S3/Indexer.pm.in
+	(get_dryrun): new
+	(get_save_index): new
+	(get_update_site_index): new
+	(AUTOLOAD): new
+	* lib/OrePAN2/S3/Role/Delete.pm.in
+	(cmd_delete)
+	- allow package prefix, distribution filename
+	- support deletion of multiple distributions
+	- verify multi-distribution deletions
+	- delete associated docs
+	- optionally invalidate index after deletions
+	(confirm): new
+	(_delete_docs): new
+	* lib/OrePAN2/S3/Role/Inject.pm.in
+	(_index_tarball): return value from update_index (add_index)
+
+Thu Aug 20 07:31:43 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.1]:
+	* VERSION: bump
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.1.md: new
+	* .includes/bash-completion.mk: updated by CPAN::Maker::Bootstrapper
+	* .includes/git.mk: likewise
+	* .includes/help.mk: likewise
+	* .includes/perl.mk: likewise
+	* .includes/release-notes.mk: likewise
+	* .includes/update.mk: likewise
+	* .includes/version.mk: likewise
+	* .gitignore: likewise
+	* ChangeLog: modified
+	* Makefile: likewise
+	* builder: likewise
+	* .includes/local.mk: added by CPAN::Maker::Bootstrapper
+	* .includes/modulino.mk: likewise
+	* lib/OrePAN2/S3.pm.in
+	- pod updates
+	- + $GIT_SHA, $GIT_DIRTY
+	(cmd_create_index)
+	- log at debug level
+	- minor refactoring
+	(main)
+	- + dirty-check, force options
+	* lib/OrePAN2/S3/Role/Inject.pm.in
+	(cmd_inject)
+	- minor refactor to return result from _index_tarball
+	(_index_tarball)
+	- report error from scan_provides()
+	(scan_provides)
+	- fix META extraction (some tarballs have prefix)
+	* lib/OrePAN2/S3/Role/Upload.pm.in
+	(cmd_upload)
+	- get for uncommitted signal
+	(_check_dirty): new
+
+Sun Aug  2 07:21:51 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.0]:
+	* VERSION: bump major
+	* release-notes.md: new
+	* release-notes/release-notes-2.0.0.md: new
+	* bin/orepan2-s3.in
+	- converted from bash script to modulino
+	* .gitignore: updated by CPAN::Maker::Bootstrapper
+	* .includes/git.mk: likewise
+	* .includes/perl.mk: likewise
+	* .includes/release-notes.mk: likewise
+	* .includes/update.mk: likewise
+	* ChangeLog: modified
+	* Makefile: likewise
+	* README.md: generated
+	* README.md.in
+	- minor corrections
+	- use markdown not POD syntax
+	* builder: likewise
+	* cpanfile: sorted
+	* lib/OrePAN2/S3.pm.in
+	- POD updates
+	- added Upload role
+	(create_docs)
+	- extract ChangeLog, README.md
+	- upload README.md always
+	- create a local tarball containing uploaded artifacts
+	(cmd_download_orepan_index)
+	- use copy not rename
+	(main)
+	- removed --upload, --upload-only options
+	- +upload-index command
+	- upload command is now upload distribution only, not upload the index
+	- inject does a upload and index always now
+	- add is an alias for upload
+	* lib/OrePAN2/S3/Role/Inject.pm.in
+	(cmd_inject)
+	- refactored to use cmd_update
+	* project.mk
+	- deps now autogenerated by cmb into deps.mk
+	- added install target
+	* bin/orepan2-s3-index.in: deleted
+	* deps.mk: new
+	* lib/OrePAN2/S3/Role/Upload.pm.in: new
+	* recommends: new
+	* suggests: new
+
+Thu Jul  2 06:43:59 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.5]:
+	* VERSION: bump
+	* release-notes.md: updated
+	* release-notes/release-notes-1.2.5.md: new
+	* lib/OrePAN2/S3.pm.in
+	(fetch_config)
+	- return if already fetched
+	- set config file to abs_path
+	(fetch_orepan_index)
+	- use /tmp since containers are ro filesystem
+	(_upload_html)
+	- add document to document index
+	(look_for_object): use cache instead of head_object (speed up)
+	(init)
+	- pre-load document index
+	(_init_doc_index): new
+	(fetch_template)
+	- load templates from same directory as config if relative path
+	* lib/OrePAN2/S3/Role/UploadArtifacts.pm.in
+	(upload_artifacts): likewise
+	* requires: bump Amazon::S3::Lite required version to 1.2.3
+	* cpanfile: likewise
+
+Mon Jun 22 14:47:56 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.4]:
+	* VERSION: bump
+	* release-notes.md: updated
+	* release-notes/release-notes-1.2.4.md: new
+	* requires.skip: new
+	* requires
+	- +OrePAN2::Lite, Amazon::S3::Lite 2.0.3, CLI::Simple 2.0.3, -OrePAN::Index
+	* cpanfile: likewise
+
 Fri Jun 12 14:37:29 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.2.3]:

@@ -3,7 +3,8 @@ use warnings;
 
 package MY;
 
-use Module::Loaded qw( is_loaded );
+use File::Spec::Functions qw( catdir rel2abs );
+use Module::Loaded        qw( is_loaded );
 
 # https://metacpan.org/pod/ExtUtils::MM_Any#postamble-(o)
 sub postamble {
@@ -15,6 +16,21 @@ sub postamble {
     if is_loaded 'File::ShareDir::Install';
 
   $make_fragment
+}
+
+# https://metacpan.org/pod/ExtUtils::MM_Any#test_via_harness
+sub test_via_harness {
+  my ( $self, $perl, $tests ) = @_;
+
+  # - This approach makes
+  #   https://github.com/Test-More/test-more/issues/1082
+  #   somehow obsolete
+  # - The order blib/lib, blib/arch, t/lib avoids that a module in t/lib
+  #   accidentally shadows any module under test in blib
+  my $tlib = rel2abs( catdir( qw( t lib ) ) );
+  $perl .= " -I$tlib" if -d $tlib;
+
+  $self->SUPER::test_via_harness( $perl, $tests )
 }
 
 1

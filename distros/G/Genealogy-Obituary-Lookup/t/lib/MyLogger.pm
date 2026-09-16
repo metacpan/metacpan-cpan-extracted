@@ -15,7 +15,15 @@ sub trace {
 	debug(@_);
 }
 
+sub info {
+	debug(@_);
+}
+
 sub warn {
+	debug(@_);
+}
+
+sub error {
 	debug(@_);
 }
 

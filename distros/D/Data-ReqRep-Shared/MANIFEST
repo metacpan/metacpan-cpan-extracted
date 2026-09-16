@@ -34,6 +34,9 @@ t/07_recover.t
 t/pod_synopsis.t
 t/version_check.t
 t/08-foreign-invocant.t
+t/09_provenance.t
+t/10_slot_leak.t
+t/11_hardening.t
 typemap
 xt/arena_fragmentation.t
 xt/asan.t
@@ -46,6 +49,7 @@ xt/destroy_during_call.t
 xt/eg_runs.t
 xt/fd_leak.t
 xt/fd_validation.t
+xt/foreign_owner.t
 xt/graceful_shutdown.t
 xt/invalid_args.t
 xt/kwalitee.t
@@ -57,8 +61,12 @@ xt/lifecycle_int.t
 xt/manifest_vs_git.t
 xt/memfd_seal.t
 xt/mmap_leak.t
+xt/oom_no_loss.t
 xt/pod.t
 xt/pod_coverage.t
+xt/soak.t
+xt/stale_reply.t
+xt/stalled_writer.t
 xt/stress.t
 xt/stress_int.t
 xt/throughput.t

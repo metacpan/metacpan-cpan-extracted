@@ -1,0 +1,52 @@
+{
+   "abstract" : "Perl implementation of the server-side WebForms class for WebForms Core",
+   "author" : [
+      "Elanat"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WFC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.036000"
+         }
+      }
+   },
+	"provides" : {
+	   "WFC" : {
+		  "file" : "lib/WebForms.pm",
+		  "version" : "2.1.1"
+	   },
+	   "WebForms" : {
+		  "file" : "lib/WebForms.pm",
+		  "version" : "2.1.1"
+	   }
+	},
+   "release_status" : "stable",
+   "version" : "v2.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

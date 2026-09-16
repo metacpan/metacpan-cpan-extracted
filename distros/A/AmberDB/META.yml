@@ -52,5 +52,5 @@ requires:
 resources:
   bugtracker: https://github.com/marufcetin/amberdb/issues
   repository: https://github.com/marufcetin/amberdb.git
-version: v5.25.1
+version: v5.25.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,5 +1,32 @@
 Revision history for Robots-Validate:
 
+v0.4.4    2026-09-16 09:19:50+01:00 Europe/London
+  [Enhancements]
+  - Added or updated the robot rules for the following:
+    - BufferLinkPreview
+    - crawl-engine
+    - DataForSeoBot
+    - domainprintbot
+    - FaviconHub
+    - fluid
+    - ListSignalBot
+    - Marginalia Search
+    - NotHere.one Bot
+    - pceuropa-bot
+    - PoweredByBot
+    - SeobilityBot
+    - TinEye
+    - VexelSearchBot
+    - Yahoo Japan
+
+  - Improve handling of blank entries in the rebuild-robots-config utility.
+
+  [Toolchain]
+  - Bump minimum recommended version of JQ::Lite.
+
+  [Tests]
+  - Fixed t/20-basic-algorithm-ahocorasick.t to hide the correct module.
+
 v0.4.3    2026-09-07 14:17:08+01:00 Europe/London
   [Enhancements]
   - Removed uniqstr filter since this already skips duplicate checks.

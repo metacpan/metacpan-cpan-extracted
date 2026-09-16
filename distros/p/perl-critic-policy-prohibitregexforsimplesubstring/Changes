@@ -1,0 +1,10 @@
+Revision history for perl-critic-policy-prohibitregexforsimplesubstring
+
+1.001 2026-09-15 TEODESIAN
+    - /m, /s and /x no longer exempt a pattern: none of them changes a pattern of nothing but literals, and only /i stops index() doing its job
+    - A file under use re '/sx' was exempt in its entirety, since a use re in scope counts as a flag on every match; it is reported now like any other
+
+1.000 2026-09-15 TEODESIAN
+    - Initial Release, forked from Perl::Critic::Policy::Performance::ProhibitRegexForSimpleSubstring 0.01
+    - A literal regex as the first argument of split is not reported: it is the pattern split takes
+    - A configurable 'allow' list of functions and methods whose first argument is exempt the same way

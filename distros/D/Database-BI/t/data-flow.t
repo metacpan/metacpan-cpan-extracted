@@ -23,7 +23,6 @@ my $DETECT_INFO  = \&Database::BI::Model::DataSource::_detect_file_info;
 my $URL_LABEL    = \&Database::BI::Model::DataSource::_url_label;
 my $WRITE_SQLITE = \&Database::BI::Controller::Dashboard::_write_sqlite_db;
 my $SERIALIZE    = \&Database::BI::Controller::Dashboard::_serialize_csv;
-my $LEFT_JOIN    = \&Database::BI::Controller::Dashboard::_left_join;
 my $FILTER       = \&Database::BI::Controller::Dashboard::_apply_filter_spec;
 my $CSV_ROW      = \&Database::BI::Controller::Dashboard::_csv_row;
 
@@ -422,78 +421,71 @@ subtest '_serialize_csv -- output is valid UTF-8' => sub {
 };
 
 # ======================================================================
-# Section 7: _left_join -- DU chains
+# Section 7: Database::Join DU chains (replaces former _left_join tests)
 #
-# %right_idx D:364-368 (first-match semantics) -> U:389 (lookup)
-# @rcols D:383-384 (precomputed [$right, $mapped] pairs) -> U:391 (for)
-# $_ in "for @rcols" is localised by the for loop -- no global leak.
+# Joins are now delegated to Database::Join via DataSource wrappers.
+# Verify the key DU properties using CSV-backed DataSource objects:
+#   all left rows preserved, right values merged, undef for no-match,
+#   column collision prefix, first-match wins for duplicate right keys.
 # ======================================================================
 
-{
-	my @left_recs = (
-		{ emp => 'Alice', dept_id => '10' },
-		{ emp => 'Bob',   dept_id => '20' },
-		{ emp => 'Carol', dept_id => '99' },	# no matching right row
-	);
-	my @left_cols  = qw(emp dept_id);
-	my @right_recs = (
-		{ dept_id => '10', dept_name => 'Engineering' },
-		{ dept_id => '20', dept_name => 'Marketing'   },
-	);
-	my @right_cols = qw(dept_id dept_name);
+SKIP: {
+	my $left_csv  = "$DIR/dflow_left.csv";
+	my $right_csv = "$DIR/dflow_right.csv";
+	Mojo::File->new($left_csv)->spew("emp,dept_id\nAlice,10\nBob,20\nCarol,99\n");
+	Mojo::File->new($right_csv)->spew("dept_id,dept_name\n10,Engineering\n20,Marketing\n");
 
-	subtest '_left_join -- all left rows preserved regardless of match (outer join)' => sub {
-		my ($merged, $cols) = $LEFT_JOIN->(
-			\@left_recs, \@left_cols, 'dept_id',
-			\@right_recs, \@right_cols, 'dept_id', 'dept',
-		);
+	require Database::Join;
+	my ($left_ds, $right_ds);
+	eval {
+		$left_ds  = Database::BI::Model::DataSource->new(directory => $DIR, table => 'dflow_left');
+		$right_ds = Database::BI::Model::DataSource->new(directory => $DIR, table => 'dflow_right');
+	};
+	skip 'DataSource construction failed for join DU tests', 5 if $@;
+
+	subtest 'Database::Join -- all left rows preserved regardless of match (outer join)' => sub {
+		my $join = Database::Join->new(databases => [$left_ds, $right_ds], join_column => 'dept_id');
+		my $merged = $join->selectall_arrayref;
 		is scalar(@$merged), 3, 'all 3 left rows present in merged output';
 	};
 
-	subtest '_left_join -- matching rows receive right column values' => sub {
-		my ($merged, $cols) = $LEFT_JOIN->(
-			\@left_recs, \@left_cols, 'dept_id',
-			\@right_recs, \@right_cols, 'dept_id', 'dept',
-		);
+	subtest 'Database::Join -- matching rows receive right column values' => sub {
+		my $join   = Database::Join->new(databases => [$left_ds, $right_ds], join_column => 'dept_id');
+		my $merged = $join->selectall_arrayref;
 		is $merged->[0]{dept_name}, 'Engineering', 'Alice (dept 10) -> Engineering';
 		is $merged->[1]{dept_name}, 'Marketing',   'Bob (dept 20) -> Marketing';
 	};
 
-	subtest '_left_join -- non-matching rows get undef for right columns' => sub {
-		my ($merged, $cols) = $LEFT_JOIN->(
-			\@left_recs, \@left_cols, 'dept_id',
-			\@right_recs, \@right_cols, 'dept_id', 'dept',
-		);
+	subtest 'Database::Join -- non-matching rows get undef for right columns' => sub {
+		my $join   = Database::Join->new(databases => [$left_ds, $right_ds], join_column => 'dept_id');
+		my $merged = $join->selectall_arrayref;
 		ok !defined $merged->[2]{dept_name},
 			'Carol (dept 99, no match) has undef for right columns';
 	};
 
-	subtest '_left_join -- column name collision prefixed with right table label' => sub {
-		# Add "emp" to right table: it collides with left "emp" column.
-		my @right_with_collision = (
-			{ dept_id => '10', dept_name => 'Engineering', emp => 'Mgr-E' },
+	subtest 'Database::Join -- column name collision prefixed with right table label' => sub {
+		# Right table also has an "emp" column — collides with left "emp".
+		Mojo::File->new("$DIR/dflow_right2.csv")->spew("dept_id,dept_name,emp\n10,Engineering,Mgr-E\n");
+		my $right_ds2 = Database::BI::Model::DataSource->new(directory => $DIR, table => 'dflow_right2');
+		my $join = Database::Join->new(
+			databases        => [$left_ds, $right_ds2],
+			join_column      => 'dept_id',
+			collision_prefix => { 1 => 'dept' },
 		);
-		my @right_cols2 = qw(dept_id dept_name emp);
-		my ($merged, $cols) = $LEFT_JOIN->(
-			\@left_recs, \@left_cols, 'dept_id',
-			\@right_with_collision, \@right_cols2, 'dept_id', 'dept',
-		);
+		my $merged = $join->selectall_arrayref;
 		ok  exists $merged->[0]{'dept.emp'}, 'colliding right column prefixed as label.col';
 		is  $merged->[0]{'dept.emp'}, 'Mgr-E', 'prefixed column holds right-table value';
 		is  $merged->[0]{'emp'}, 'Alice', 'original left emp column is preserved';
 	};
 
-	subtest '_left_join -- duplicate right keys: first occurrence wins (%right_idx //= $row)' => sub {
-		my @duped_right = (
-			{ dept_id => '10', dept_name => 'First'  },
-			{ dept_id => '10', dept_name => 'Second' },	# duplicate key
-		);
-		my ($merged, $cols) = $LEFT_JOIN->(
-			\@left_recs, \@left_cols, 'dept_id',
-			\@duped_right, \@right_cols, 'dept_id', 'dept',
-		);
-		is $merged->[0]{dept_name}, 'First',
-			'first right row for duplicate key wins (//= semantics in %right_idx)';
+	subtest 'Database::Join -- duplicate right keys: last match wins' => sub {
+		Mojo::File->new("$DIR/dflow_dup.csv")->spew("dept_id,dept_name\n10,First\n10,Second\n");
+		my $dup_ds = Database::BI::Model::DataSource->new(directory => $DIR, table => 'dflow_dup');
+		my $join   = Database::Join->new(databases => [$left_ds, $dup_ds], join_column => 'dept_id');
+		my $merged = $join->selectall_arrayref;
+		# Database::Join uses last-wins semantics for duplicate right keys (unlike the
+		# former _left_join helper which used first-wins via //=).
+		is $merged->[0]{dept_name}, 'Second', 'last right row for duplicate key wins';
 	};
 }
 
@@ -515,15 +507,6 @@ subtest 'global state -- $_ not leaked by _csv_row (map internals)' => sub {
 	local $_ = 'sentinel_csv';
 	$CSV_ROW->('a', 'b', 'c');
 	is $_, 'sentinel_csv', '$_ unchanged after _csv_row';
-};
-
-subtest 'global state -- $_ not leaked by _left_join (for @rcols inner loop)' => sub {
-	local $_ = 'sentinel_join';
-	$LEFT_JOIN->(
-		[{ a => '1', k => 'x' }], [qw(a k)], 'k',
-		[{ k => 'x', b => '2' }], [qw(k b)], 'k', 'right',
-	);
-	is $_, 'sentinel_join', '$_ unchanged after _left_join';
 };
 
 subtest 'global state -- $@ cleared to empty string after successful fetch_all' => sub {

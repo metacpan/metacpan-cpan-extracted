@@ -1,0 +1,156 @@
+Mon Sep 14 06:19:15 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.0]:
+	* release-notes.md: new
+	* release-notes/release-notes-2.0.0.md: new
+	* README.md
+	- updated to explain removal of heavy dependencies
+	* VERSION: bump
+	* buildspec.yml
+	- +t/lib/Local/Util.pm
+	- -t/data/auditor/*
+	* .includes/git.mk: updated by CPAN::Maker::Bootstrapper
+	* .gitignore: likewise
+	* .includes/help.mk: likewise
+	* .includes/perl.mk: likewise
+	* .includes/release-notes.mk: likewise
+	* .includes/update.mk: likewise
+	* .includes/version.mk: likewise
+	* .includes/local.mk: likewise
+	* Makefile: likewise
+	* .includes/local.mk: added by CPAN::Maker::Bootstrapper
+        * .includes/bootstrap.mk: likewise
+	* .includes/modulino.mk: new
+	* .includes/bash-completion.mk: new
+	* recommends: new
+	* suggests: new
+	* test-requires.skip: new
+	* deps.mk: generated
+	* requires
+	- -Moo,MetaCPAN::Client,List::Compare,MooX::Options,Try::Tiny,Types::*,namespace::clean
+	- +Role::Tiny, Role::Tiny::With
+	* cpanfile: generated
+	* recommends: +IO::Socket::SSL
+	* test-requires: +Test::Requires::Internet
+	* lib/OrePAN2.pm.in
+	- add $VERSION
+	* lib/OrePAN2/Index.pm.in
+	- use Role::Tiny::With instead of Moo
+	- use Class::Accessor::Fast
+	- some refactoring for PBP
+	(new): new
+	* lib/OrePAN2/Indexer.pm.in
+	- use Class::Accessor::Fast instead of Moo
+	- some refactoring for PBP
+	(new): new
+	(make_index)
+	- remove use of signature
+	- remove metacpan lookup
+	(add_index)
+	- replace Archive::Extract w/Archive::Tar
+	(scan_provides)
+	- PBP refactoring
+	(_maybe_index_from_metacpan): removed
+	(do_metacpan_lookup): removed
+	* lib/OrePAN2/Injector.pm.in
+	- use Class::Accessor::Fast instead of Moo
+	- some refactoring for PBP
+	(new): new
+	(inject): remove use of MetaCPAN::Client replace with HTTP::Tiny
+	(tarpath): replace Archive::Extract with Archive::Tar
+	(inject_from_file)
+	- trap use of SSL if no IO::Socket::SSL available
+	* lib/OrePAN2/Logger.pm.in
+	- use Role::Tiny instead of Moo
+	* lib/OrePAN2/Repository.pm.in
+	- use Class::Accessor::Fast instead of Moo
+	- some PBP refactoring
+	(new): new
+	* lib/OrePAN2/Repository/Cache.pm.in
+	* lib/OrePAN2/Repository.pm.in
+	- use Class::Accessor::Fast instead of Moo
+	- some PBP refactoring
+	(new): new
+	* lib/OrePAN2/Role/HasLogger.pm.in
+	- use Role::Tiny instead of Moo::Role
+	* bin/orepan2-audit.in: deleted
+	* bin/orepan2-gc.in: deleted
+	* bin/orepan2-indexer.in: deleted
+	* bin/orepan2-inject.in: deleted
+	* bin/orepan2-merge-index.in: deleted
+	* lib/OrePAN2/Auditor.pm.in: deleted
+	* lib/OrePAN2/CLI/Indexer.pm.in: deleted
+	* lib/OrePAN2/CLI/Inject.pm.in: deleted
+	* t/00_compile.t: new
+	* t/01_indexer.t: new
+	* t/02_no_index.t: new
+	* t/03_inject.t: new
+	* t/04_repository.t: new
+	* t/06_inject_live.t: new
+	* t/index.t: new
+	* t/07_auditor.t: deleted
+	* t/dat/auditor/cpan/02packages.details.txt: deleted
+	* t/dat/auditor/darkpan/02packages.details.txt: deleted
+
+Mon Jul 20 14:55:47 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.1]:
+	* deps.mk: new
+	* project.mk: new
+	* .gitignore: + *.checked
+	* .includes/git.mk: updated by CPAN::Maker::Bootstrapper
+	* .includes/perl.mk: likewise
+	* .includes/release-notes.mk: likewise
+	* .includes/update.mk: likewise
+	* Makefile: likewise
+	* VERSION: bump
+	* buildspec.yml: '_' => '-'
+
+Mon Jun 22 13:45:29  Rob Lauer  rclauer@gmail.com
+
+	[1.0.0]:
+
+	* .gitignore: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/perl.mk: new
+	* .includes/release-notes.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* .includes/version.mk: new
+	* ChangeLog: new
+	* Makefile: new
+	* README.md: new
+	* VERSION: new
+	* bin/orepan2-audit.in: new
+	* bin/orepan2-gc.in: new
+	* bin/orepan2-indexer.in: new
+	* bin/orepan2-inject.in: new
+	* bin/orepan2-merge-index.in: new
+	* buildspec.yml: new
+	* cpanfile: new
+	* lib/OrePAN2.pm.in: new
+	* lib/OrePAN2/Auditor.pm.in: new
+	* lib/OrePAN2/CLI/Indexer.pm.in: new
+	* lib/OrePAN2/CLI/Inject.pm.in: new
+	* lib/OrePAN2/Index.pm.in: new
+	* lib/OrePAN2/Indexer.pm.in: new
+	* lib/OrePAN2/Injector.pm.in: new
+	* lib/OrePAN2/Lite.pm.in: new
+	* lib/OrePAN2/Logger.pm.in: new
+	* lib/OrePAN2/Repository.pm.in: new
+	* lib/OrePAN2/Repository/Cache.pm.in: new
+	* lib/OrePAN2/Role/HasLogger.pm.in: new
+	* requires.skip: new
+	* requires: new
+	* resources: new
+	* t/00-orepan2-lite.t: new
+	* t/07_auditor.t: new
+	* t/dat/02.packages.details.txt.gz: new
+	* t/dat/02.packages.details.txt: new
+	* t/dat/Acme-Foo-0.01.tar.gz: new
+	* t/dat/Acme-YakiniQ-0.01.tar.gz: new
+	* t/dat/auditor/cpan/02packages.details.txt: new
+	* t/dat/auditor/darkpan/02packages.details.txt: new
+	* t/dat/modules/02.packages.txt: new
+	* test-requires: new

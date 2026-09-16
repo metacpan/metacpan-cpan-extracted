@@ -287,6 +287,7 @@ pop_multi(self, count)
     EXTRACT_HANDLE("Data::Queue::Shared::Int", self);
     int64_t value;
   PPCODE:
+    if (count > h->capacity) count = h->capacity;
     for (UV i = 0; i < count; i++) {
         if (!queue_int_try_pop(h, &value)) break;
         mXPUSHi((IV)value);
@@ -427,6 +428,8 @@ pop_wait_multi(self, count, ...)
   PPCODE:
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
+    if (count > h->capacity) count = h->capacity;
+    if (count == 0) XSRETURN(0);
     /* Block until at least 1 */
     if (!queue_int_pop_wait(h, &value, timeout)) XSRETURN(0);
     mXPUSHi((IV)value);
@@ -444,11 +447,19 @@ push_wait_multi(self, timeout, ...)
     EXTRACT_HANDLE("Data::Queue::Shared::Int", self);
   CODE:
     uint32_t nvalues = items - 2;
+    struct timespec dl, rem;
+    int has_dl = (timeout > 0);
+    if (has_dl) queue_make_deadline(timeout, &dl);
     RETVAL = 0;
     for (uint32_t i = 0; i < nvalues; i++) {
+        double t = timeout;
+        if (has_dl) {
+            t = queue_remaining_time(&dl, &rem)
+                ? (double)rem.tv_sec + (double)rem.tv_nsec * 1e-9 : 0;
+        }
         int64_t v = (int64_t)SvIV(ST(i + 2));
         REEXTRACT_HANDLE("Data::Queue::Shared::Int", self);
-        if (!queue_int_push_wait(h, v, timeout)) break;
+        if (!queue_int_push_wait(h, v, t)) break;
         RETVAL++;
     }
   OUTPUT:
@@ -677,6 +688,7 @@ push_multi(self, ...)
   CODE:
     uint32_t count = items - 1;
     uint32_t pushed = 0;
+    if (count > h->capacity) count = h->capacity;
     /* Extract SV data BEFORE locking: SvPV can run magic (tied/overloaded
      * stringification) that longjmps; doing it under the process-shared
      * mutex would abandon the lock and deadlock peers. Newx+SAVEFREEPV so a
@@ -704,7 +716,11 @@ push_multi(self, ...)
     queue_mutex_lock(h->hdr);
     for (uint32_t i = 0; i < count; i++) {
         int r = queue_str_push_locked(h, args[i].str, LEN32(args[i].len), args[i].utf8);
-        if (r == -2) { queue_mutex_unlock(h->hdr); croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)"); }
+        if (r == -2) {
+            if (pushed) queue_wake_consumers_n(h->hdr, pushed);
+            queue_mutex_unlock(h->hdr);
+            croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
+        }
         if (r != 1) break;
         pushed++;
     }
@@ -974,6 +990,8 @@ pop_wait_multi(self, count, ...)
   PPCODE:
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
+    if (count > h->capacity) count = h->capacity;
+    if (count == 0) XSRETURN(0);
     /* Block until at least 1 */
     {
         int r = queue_str_pop_wait(h, &str, &len, &utf8, timeout);
@@ -1000,14 +1018,22 @@ push_wait_multi(self, timeout, ...)
     EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
   CODE:
     uint32_t nvalues = items - 2;
+    struct timespec dl, rem;
+    int has_dl = (timeout > 0);
+    if (has_dl) queue_make_deadline(timeout, &dl);
     RETVAL = 0;
     for (uint32_t i = 0; i < nvalues; i++) {
+        double t = timeout;
+        if (has_dl) {
+            t = queue_remaining_time(&dl, &rem)
+                ? (double)rem.tv_sec + (double)rem.tv_nsec * 1e-9 : 0;
+        }
         SV *sv = ST(i + 2);
         STRLEN len;
         const char *str = SvPV(sv, len);
         bool utf8 = SvUTF8(sv) ? true : false;
         REEXTRACT_HANDLE("Data::Queue::Shared::Str", self);
-        int r = queue_str_push_wait(h, str, LEN32(len), utf8, timeout);
+        int r = queue_str_push_wait(h, str, LEN32(len), utf8, t);
         if (r == -2) croak("Data::Queue::Shared::Str: string too big (exceeds arena capacity or 2GB limit)");
         if (r != 1) break;
         RETVAL++;

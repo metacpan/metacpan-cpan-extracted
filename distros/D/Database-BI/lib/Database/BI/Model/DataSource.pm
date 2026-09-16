@@ -12,7 +12,7 @@ use Sub::Protected;
 use Params::Validate::Strict qw(validate_strict);
 use Params::Get		();
 
-our $VERSION = '0.005.2';
+our $VERSION = '0.006.0';
 
 =head1 NAME
 
@@ -141,6 +141,7 @@ Readonly our %MESSAGES => (
 	error_url_invalid		=> 'DataSource: URL "%s" must begin with http:// or https://',
 	error_url_fetch			=> 'DataSource: failed to open HTML table at "%s": %s',
 	error_no_safe_id		=> 'DataSource: table "%s" has no column with a safe identifier name (letters, digits, underscore); rename at least one column header',
+	error_no_tables			=> 'DataSource: SQLite file "%s" contains no user-defined tables',
 	warn_empty_result		=> 'DataSource: fetch_all returned no records for table "%s"',
 	warn_data_normalised		=> 'DataSource: result from backend was a hashref; converted to arrayref for table "%s"',
 );
@@ -160,7 +161,7 @@ Readonly my $TABLE_NAME_RE => qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
 # non-alphanumeric characters with underscores.  Falls back to the hostname
 # when the path component is absent or starts with a digit.
 sub _url_label {
-	my ($url) = @_;
+	my $url = $_[0];
 	my ($path) = $url =~ m{https?://[^/?#]+(.*)}i;
 	my @parts  = grep { length } split m{/}, ($path // '');
 	my $last   = @parts ? $parts[-1] : '';
@@ -241,15 +242,17 @@ C<error_directory_missing>.
 
 =item C<table>
 
-Must match C<TABLE_NAME_RE = \A[A-Za-z_][A-Za-z0-9_]*\z>.  The first
-character must be a letter (A-Z, a-z) or underscore; subsequent
-characters may also be digits.
+The bare file stem (no extension).  Characters that are illegal in SQL
+identifiers — hyphens, dots, spaces, etc. — are silently replaced with
+underscores before the name is used internally.  A stem that starts with a
+digit is prefixed with C<_>.  Only a completely empty string croaks.
 
-  Valid partition:   "sales", "_tmp", "report_2024" (letter/underscore start)
-  Invalid partition: "1sales" (digit-start), "my.data" (dot),
-                     "my-data" (hyphen), "" (empty string)
+  Valid partition:   "sales", "_tmp", "report_2024",
+                     "Transactions-2026-09-08" (hyphens sanitized to underscores),
+                     "my.data" (dot sanitized), "1sales" (prefixed to "_1sales")
+  Invalid partition: "" (empty string)
   Boundary values:   "a" (length-1 letter, valid), "_" (length-1 underscore,
-                     valid), "1" (length-1 digit, croaks error_table_name_invalid)
+                     valid), "" (empty string, croaks error_table_name_invalid)
 
 =back
 
@@ -264,6 +267,7 @@ Returns C<$self> (a blessed hashref). Croaks on invalid arguments.
   error_directory_missing     -- supplied directory does not exist / is unreadable
   error_table_name_invalid    -- table name fails the safe-identifier check
   error_backend_init          -- Database::Abstraction subclass could not be instantiated
+  error_no_tables             -- SQLite file opened successfully but contains no user-defined tables
 
 =cut
 
@@ -278,9 +282,11 @@ sub new {
 
 	my $args = validate_strict(
 		schema => {
-			directory => { type => 'string' },
-			table     => { type => 'string' },
-			i18n      => { type => 'object', optional => 1, default => undef, can => 'maketext' },
+			directory     => { type => 'string' },
+			table         => { type => 'string' },
+			i18n          => { type => 'object', optional => 1, default => undef, can => 'maketext' },
+			cache         => { type => 'object', optional => 1, default => undef },
+			cache_ttl_url => { type => 'string', optional => 1, default => '15 min' },
 		},
 		input => $raw,
 	);
@@ -288,14 +294,34 @@ sub new {
 	croak _fmt('error_directory_missing', $args->{directory})
 		unless -d $args->{directory};
 
+	# Reject path-traversal characters first: '/', '\', and NUL are the only
+	# characters that could let _raw_table escape the intended directory when
+	# D::A constructs "$dir/$dbname.$ext".  Everything else is either safe as a
+	# filename component or will be sanitized below.
 	croak _fmt('error_table_name_invalid', $args->{table})
-		unless $args->{table} =~ $TABLE_NAME_RE;
+		if !length($args->{table}) || $args->{table} =~ m{[/\\\x00]};
+
+	# Silently sanitize table names derived from file stems: replace characters
+	# that are illegal in SQL identifiers (hyphens, dots, spaces, etc.) with
+	# underscores.  A leading digit is prefixed with '_'.  The original name is
+	# kept in _raw_table for filesystem lookup (dbname) so the actual file is
+	# still found; the sanitized name is used only as the internal D::A
+	# identifier and ephemeral package name.
+	my $raw_table = $args->{table};
+	(my $safe_table = $raw_table) =~ s/[^A-Za-z0-9_]/_/g;
+	$safe_table = '_' . $safe_table if $safe_table =~ /\A[0-9]/;
+
+	croak _fmt('error_table_name_invalid', $raw_table)
+		unless $safe_table =~ $TABLE_NAME_RE;
 
 	my $self = bless {
-		_directory => $args->{directory},
-		_table     => $args->{table},
-		_i18n      => $args->{i18n},
-		_db        => undef,
+		_directory    => $args->{directory},
+		_table        => $safe_table,
+		_raw_table    => $raw_table,
+		_i18n         => $args->{i18n},
+		_cache        => $args->{cache},
+		_cache_ttl_url => $args->{cache_ttl_url},
+		_db           => undef,
 	}, $class;
 
 	$self->_init_backend();
@@ -320,16 +346,20 @@ sub _new_from_url :Protected {
 	croak _fmt('error_url_invalid', $url)
 		unless $url =~ m{\Ahttps?://}i;
 
+	my $table_idx = $raw->{html_table_index} // 0;
 	my $self = bless {
-		_url   => $url,
-		_table => _url_label($url),
-		_i18n  => $raw->{i18n},
-		_id_col  => undef,
-		_columns => undef,
-		_db      => undef,
+		_url              => $url,
+		_table            => _url_label($url),
+		_i18n             => $raw->{i18n},
+		_cache            => $raw->{cache},
+		_cache_ttl_url    => $raw->{cache_ttl_url} // '15 min',
+		_html_table_index => $table_idx,
+		_id_col           => undef,
+		_columns          => undef,
+		_db               => undef,
 	}, $class;
 
-	$self->_init_url_backend($raw->{html_table_index} // 0);
+	$self->_init_url_backend($table_idx);
 	return $self;
 }
 
@@ -389,9 +419,74 @@ sub _init_url_backend :Protected {
 #      per row, producing a single comma-joined string instead of columns.
 #   2. id defaults to 'entry' — the slurp filter greps on that column; if it
 #      doesn't exist every row is silently discarded.
-# Returns an empty hashref for non-CSV/PSV formats (SQLite, XML, etc.).
+# Returns an empty hashref for non-CSV/PSV/XLSX/SQLite formats (XML, etc.).
+# For SQLite/.db files that can be opened, returns { sqlite_tables => [...] }.
 sub _detect_file_info :Protected {
 	my ($dir, $table) = @_;
+
+	# XLSX: DBD::Excel 0.07 only handles .xls (its source skips files whose
+	# name does not match /\.xls$/i, so .xlsx is silently ignored).  Parse
+	# directly with Spreadsheet::ParseXLSX and return pre-loaded row data so
+	# _init_backend can skip D::A entirely, exactly like the headerless-CSV path.
+	{
+		my $path = File::Spec->catfile($dir, "$table.xlsx");
+		if (-r $path) {
+			my $ok = eval { require Spreadsheet::ParseXLSX; 1 };
+			if ($ok) {
+				my $parser = Spreadsheet::ParseXLSX->new;
+				my $wb     = $parser->parse($path);
+				my $ws     = $wb ? $wb->worksheet(0) : undef;
+
+				unless ($ws) {
+					# Empty workbook or parse failure: sentinel so _init_backend
+					# skips D::A (which would fail with "(no error string)").
+					return { _file_is_empty => 1, file_size => -s $path };
+				}
+
+				my ($rmin, $rmax) = $ws->row_range;
+				my ($cmin, $cmax) = $ws->col_range;
+
+				# No rows at all (blank worksheet).
+				return { _file_is_empty => 1, file_size => -s $path }
+					if $rmax < $rmin;
+
+				# Row 0 = column headers.
+				my @cols;
+				for my $c ($cmin .. $cmax) {
+					my $cell = $ws->get_cell($rmin, $c);
+					push @cols, defined $cell ? ($cell->value // '') : '';
+				}
+				for (@cols) { s/\A[\s"]+//; s/[\s"]+\z// }
+				@cols = grep { length } @cols;
+
+				# No parseable column names.
+				return { _file_is_empty => 1, file_size => -s $path }
+					unless @cols;
+
+				my $safe_re = qr/\A[a-zA-Z_][a-zA-Z0-9_]*\z/;
+				my ($safe_id) = grep { $_ =~ $safe_re } @cols;
+
+				# Data rows.
+				my @rows;
+				for my $r ($rmin + 1 .. $rmax) {
+					my %row;
+					for my $i (0 .. $#cols) {
+						my $cell = $ws->get_cell($r, $cmin + $i);
+						$row{ $cols[$i] } = defined $cell ? ($cell->value // '') : '';
+					}
+					push @rows, \%row;
+				}
+
+				return {
+					columns          => \@cols,
+					id               => $safe_id,
+					_headerless_data => \@rows,
+					file_size        => -s $path,
+				};
+			}
+		}
+	}
+
 	for my $ext (qw(csv psv)) {
 		my $path = File::Spec->catfile($dir, "$table.$ext");
 		next unless -r $path;
@@ -431,6 +526,17 @@ sub _detect_file_info :Protected {
 		for (@cols) { s/\A[\s"]+//; s/[\s"]+\z// }	# strip whitespace and quotes
 		@cols = grep { length } @cols;
 
+		# A blank first line (e.g. a file containing only "\n") produces an
+		# empty column list.  Treat that the same as a 0-byte file: return the
+		# _file_is_empty sentinel so _init_backend skips D::A entirely.
+		# Attempting to construct D::A with id => undef and an empty columns
+		# list would croak error_no_safe_id — misleading for what is effectively
+		# an empty file.
+		if (!@cols) {
+			close $fh;
+			return { _file_is_empty => 1, file_size => -s $path };
+		}
+
 		# Database::Abstraction validates id against $SAFE_IDENTIFIER
 		# (/\A[a-zA-Z_][a-zA-Z0-9_]*\z/) at construction time and uses it as
 		# a row-existence sentinel: every data row must have a defined, non-#
@@ -466,6 +572,41 @@ sub _detect_file_info :Protected {
 				}
 			}
 		}
+		# If no safe identifier was found in the header, check whether the first
+		# row looks like data values rather than column names.  A CSV exported
+		# from a bank or accounting system often has no header row at all — the
+		# first line is already a transaction record.  When that is the case,
+		# synthesize safe column names by inferring the type of each value
+		# (date, amount, description) and pre-read the entire file so
+		# _init_backend can return the rows directly without touching D::A.
+		unless (defined $safe_id) {
+			if (_values_are_data_like(\@cols)) {
+				my @synth = _synthesize_col_names(\@cols);
+				seek $fh, 0, 0;	# rewind: first line is a data row, not a header
+				my @rows;
+				while (defined(my $dline = <$fh>)) {
+					chomp $dline;
+					$dline =~ s/\r\z//;
+					next unless length $dline;
+					my @vals = split /\Q$sep\E/, $dline, scalar @synth;
+					for (@vals) { s/\A[\s"]+//; s/[\s"]+\z// }
+					my %row;
+					for my $i (0 .. $#synth) {
+						$row{ $synth[$i] } = $vals[$i] // '';
+					}
+					push @rows, \%row;
+				}
+				close $fh;
+				return {
+					sep_char         => $sep,
+					id               => $synth[0],
+					columns          => \@synth,
+					_headerless_data => \@rows,
+					file_size        => -s $path,
+				};
+			}
+		}
+
 		close $fh;
 
 		# Return file_size so _init_backend can pass it as max_slurp_size to
@@ -481,7 +622,107 @@ sub _detect_file_info :Protected {
 			file_size => -s $path,
 		};
 	}
+
+	# SQLite / Berkeley DB: peek at sqlite_master to discover the internal table
+	# names.  _init_backend uses this list to auto-select the correct table when
+	# the filename stem (dbname) differs from the table name inside the file —
+	# e.g. obituaries.sql whose internal table is called "deceased".  If the
+	# file is not a valid SQLite database (e.g. a Berkeley DB file) the eval
+	# fails and we return {} so _init_backend/D::A handles it natively.
+	for my $ext (qw(sql db)) {
+		my $path = File::Spec->catfile($dir, "$table.$ext");
+		next unless -r $path;
+		my $tables = eval {
+			require DBI;
+			my $dbh = DBI->connect(
+				"dbi:SQLite:dbname=$path", q{}, q{},
+				{ RaiseError => 1, PrintError => 0, AutoCommit => 1 });
+			my $t = $dbh->selectcol_arrayref(
+				q{SELECT name FROM sqlite_master }
+				. q{WHERE type='table' AND name NOT LIKE 'sqlite_%' }
+				. q{ORDER BY name});
+			$dbh->disconnect;
+			$t;
+		};
+		# defined $tables means the eval succeeded (even an empty list is valid)
+		return { sqlite_tables => ($tables // []), file_size => -s $path }
+			if defined $tables;
+		last;	# file found but not SQLite — do not try the other ext
+	}
 	return {};
+}
+
+# _values_are_data_like( \@vals ) -> bool
+#
+# Return true when the values look like actual data (dates, numbers, free text)
+# rather than column headers.  Used to detect header-less CSV files where the
+# first line is a data row.  At least one value must match a date or numeric
+# pattern — a row of plain hyphenated identifiers (e.g. "First-Name") is NOT
+# considered data-like.
+sub _values_are_data_like {
+	my $vals = $_[0];
+	for my $v (@{$vals}) {
+		return 1 if $v =~ /\A\d{4}-\d{2}-\d{2}\z/;		# YYYY-MM-DD
+		return 1 if $v =~ /\A\d{1,2}\/\d{1,2}\/\d{4}\z/;	# M/D/YYYY or D/M/YYYY
+		return 1 if $v =~ /\A[+\-]\d+(?:\.\d+)?\z/;		# signed numeric (e.g. -75.13)
+		return 1 if $v =~ /\A\(\d+(?:\.\d+)?\)\z/;		# accounting negative (e.g. (75.13))
+	}
+	return 0;
+}
+
+# _synthesize_col_names( \@vals ) -> @names
+#
+# Infer a safe SQL identifier for each positional value by examining its
+# content: ISO dates become "Date", numeric/currency values become "Amount",
+# and free text becomes "Description".  Duplicate types are disambiguated with
+# a numeric suffix (Date, Date2, Date3, ...).
+sub _synthesize_col_names {
+	my $vals = $_[0];
+	my %type_count;
+	my @names;
+	for my $v (@{$vals}) {
+		my $type;
+		if ($v =~ /\A\d{4}-\d{2}-\d{2}\z/ || $v =~ /\A\d{1,2}\/\d{1,2}\/\d{4}\z/) {
+			$type = 'Date';
+		} elsif ($v =~ /\A[+\-]?\d+(?:\.\d+)?\z/ || $v =~ /\A\(\d+(?:\.\d+)?\)\z/) {
+			$type = 'Amount';
+		} else {
+			$type = 'Description';
+		}
+		$type_count{$type}++;
+		push @names, $type_count{$type} == 1 ? $type : $type . $type_count{$type};
+	}
+	return @names;
+}
+
+# _cache_key( $self ) -> $key | undef
+#
+# Purpose: Derive a stable cache key for this DataSource's full result set.
+#          URL tables use a fixed key (TTL handles invalidation).
+#          File tables encode the file's mtime in the key so a changed file
+#          naturally produces a miss — the stale entry is orphaned and evicts
+#          passively when the CHI driver reclaims memory.
+# Entry:   $self->{_cache} must be defined (caller checks this before calling).
+# Exit:    Returns a non-empty string key, or undef when no key is derivable
+#          (no URL, no file path on disk).
+sub _cache_key :Protected {
+	my $self = shift;
+
+	if (defined $self->{_url}) {
+		my $idx = $self->{_html_table_index} // 0;
+		# Include the table index in the key: a different index on the same URL
+		# selects a different table from the page and must not share a cache entry.
+		return 'bi:url:' . $self->{_url} . ':' . $idx;
+	}
+
+	if (defined $self->{_file_path} && -f $self->{_file_path}) {
+		my $mtime = (stat($self->{_file_path}))[9];
+		return defined $mtime
+			? 'bi:file:' . $self->{_file_path} . ':' . $mtime
+			: undef;
+	}
+
+	return undef;
 }
 
 # _init_backend( $self ) -> void
@@ -498,9 +739,10 @@ sub _detect_file_info :Protected {
 # lookups on a primary key.  This stores data as an arrayref instead of a
 # hashref, which the fast-track path in selectall_arrayref returns directly.
 sub _init_backend :Protected {
-	my $self  = shift;
-	my $table = $self->{_table};
-	my $dir   = $self->{_directory};
+	my $self      = shift;
+	my $table     = $self->{_table};     # sanitized: used for pkg name and D::A table param
+	my $raw_table = $self->{_raw_table} // $table;  # original: used for file lookup and dbname
+	my $dir       = $self->{_directory};
 
 	require Database::Abstraction;
 
@@ -511,7 +753,17 @@ sub _init_backend :Protected {
 			unless $pkg->isa('Database::Abstraction');
 	}
 
-	my $info   = _detect_file_info($dir, $table);
+	my $info   = _detect_file_info($dir, $raw_table);
+
+	# Probe for the actual file on disk so _cache_key can compute its mtime.
+	# This runs before the early-return paths so even empty files get a path.
+	for my $e (qw(csv psv sql xml db xlsx xls)) {
+		my $p = File::Spec->catfile($dir, "$raw_table.$e");
+		if (-f $p) {
+			$self->{_file_path} = File::Spec->rel2abs($p);
+			last;
+		}
+	}
 
 	# 0-byte file: skip D::A/DBI entirely.  D::A on an empty file falls through
 	# to DBD::CSV, whose error handling corrupts DBI's Errstr SV and triggers an
@@ -533,16 +785,99 @@ sub _init_backend :Protected {
 	$self->{_id_col}  = $id_col;
 	$self->{_columns} = $info->{columns};	# undef for SQLite/XML
 
+	# Headerless CSV or XLSX: _detect_file_info already pre-loaded all rows.
+	# Store and skip D::A entirely.
+	if ($info->{_headerless_data}) {
+		$self->{_file_data} = $info->{_headerless_data};
+		return;
+	}
+
+	# D::A validates dbname as a SQL identifier and rejects names that contain
+	# spaces or other characters that are illegal in SQL (e.g. "transactions for
+	# Nigel").  This check fires at query time (inside selectall_arrayref) for
+	# the DBI path used by XLSX, SQLite, and XML files — after construction
+	# succeeds — so the error surfaces as error_fetch_failed, not error_backend_init.
+	#
+	# Fix: when the original filename stem was sanitized (raw_table != table),
+	# create a temporary directory with a symlink that uses the safe name.
+	# D::A opens the symlink, sees a space-free dbname, and builds valid SQL.
+	# The temp-dir object is kept in $self so the symlink persists for the full
+	# lifetime of this DataSource instance and is cleaned up automatically when
+	# $self is destroyed.
+	my $dbname = $raw_table;
+	my $da_dir = $dir;
+	if ($raw_table ne $table) {
+		my $safe_ext;
+		for my $e (qw(xlsx xls db sql xml csv psv)) {
+			$safe_ext = $e, last
+				if -f File::Spec->catfile($dir, "$raw_table.$e");
+		}
+		if (defined $safe_ext) {
+			require File::Temp;
+			my $tmp     = File::Temp->newdir(CLEANUP => 1);
+			my $abs_src = File::Spec->rel2abs(
+				File::Spec->catfile($dir, "$raw_table.$safe_ext"));
+			my $link    = File::Spec->catfile("$tmp", "$table.$safe_ext");
+			{
+				no autodie;	# symlink failure gives our message, not autodie's
+				symlink($abs_src, $link)
+					or croak $self->_msg('error_backend_init', $table,
+						"cannot create safe-name symlink for '$raw_table.$safe_ext': $!");
+			}
+			$self->{_tmpdir} = $tmp;	# prevents cleanup until $self is destroyed
+			$dbname = $table;
+			$da_dir = "$tmp";
+		}
+	}
+
+	# SQLite: _detect_file_info probed sqlite_master and returned the internal
+	# table names.  When $dbname (the filename stem or its safe alias) is not
+	# among those names, auto-select the first user table and create a symlink
+	# from <actual_table>.<ext> to the original file so D::A can issue SQL
+	# against the real table name without needing the filename to match.
+	# D::A uses 'dbname' to find the file and 'table' for the SELECT statement,
+	# so both must be set to the actual table name when a mismatch is corrected.
+	my $da_table = $table;	# D::A 'table' param — controls the SQL table name
+	if (exists $info->{sqlite_tables}) {
+		my @tbls = @{ $info->{sqlite_tables} };
+		croak $self->_msg('error_no_tables', $raw_table) unless @tbls;
+		my ($match) = grep { $_ eq $dbname } @tbls;
+		unless (defined $match) {
+			my $actual   = $tbls[0];
+			my ($src_ext) = grep { -f File::Spec->catfile($dir, "$raw_table.$_") }
+				qw(sql db);
+			$src_ext //= 'sql';
+			require File::Temp;
+			my $tmp     = File::Temp->newdir(CLEANUP => 1);
+			my $abs_src = File::Spec->rel2abs(
+				File::Spec->catfile($dir, "$raw_table.$src_ext"));
+			my $link = File::Spec->catfile("$tmp", "$actual.$src_ext");
+			{
+				no autodie;
+				symlink($abs_src, $link)
+					or croak $self->_msg('error_backend_init', $raw_table,
+						"cannot create table-name symlink for '$raw_table.$src_ext': $!");
+			}
+			$self->{_tmpdir} = $tmp;
+			$dbname   = $actual;	# D::A uses this for the filename stem
+			$da_table = $actual;	# D::A uses this for SELECT * FROM <table>
+			$da_dir   = "$tmp";
+		}
+	}
+
 	my $db = eval {
 		$pkg->new({
-			directory      => $dir,
-			table          => $table,
+			directory      => $da_dir,
+			table          => $da_table,
 			# D::A >= 0.41 uses the class-name suffix as dbname, not the table
 			# parameter, so a package like Database::BI::_DB::Orders would look
 			# for Orders.csv on a case-sensitive filesystem even when table =>
 			# 'orders' is passed.  Passing dbname explicitly keeps the filename
 			# stem correct regardless of the package name or D::A version.
-			dbname         => $table,
+			# When the table name was sanitized (spaces, hyphens -> underscores),
+			# $dbname is the safe name so D::A never sees illegal SQL characters,
+			# and D::A finds the file via the symlink in $da_dir.
+			dbname         => $dbname,
 			id             => $id_col,
 			no_entry       => 1,
 			defined($info->{sep_char})  ? (sep_char       => $info->{sep_char})  : (),
@@ -596,14 +931,23 @@ sub table_name {
 
 =head2 columns
 
-Returns an arrayref of column names in file order, or C<undef> when the
-backend does not expose a fixed column order (e.g. SQLite, XML).
+Returns an arrayref of column names in file order, or C<undef> when no order
+is available.  For CSV and PSV files the order comes from the file header.
+For SQLite and XML, falls back to the underlying C<Database::Abstraction>
+object's C<columns()> — useful when a C<DataSource> is passed directly to
+C<Database::Join> as a component database.
 
 =cut
 
 sub columns {
 	my $self = shift;
-	return $self->{_columns};
+	return $self->{_columns} if defined $self->{_columns};
+	# URL-backed tables have no canonical column order; D::A fetches lazily so
+	# calling _db->columns() here would trigger a live network request even when
+	# the data came from the CHI cache.  Return undef and let _get_columns derive
+	# the list from the data records instead.
+	return undef if defined $self->{_url};
+	return $self->{_db} ? $self->{_db}->columns() : undef;
 }
 
 =head2 id_column
@@ -664,12 +1008,66 @@ silent failure.
 
 =cut
 
+=head2 selectall_arrayref
+
+C<Database::Abstraction>-compatible alias that allows a C<DataSource> object
+to be passed directly to C<Database::Join> as a component database.  Passes
+any criteria through to the underlying backend; the BI viewer always calls it
+with no arguments.
+
+=cut
+
+sub selectall_arrayref {
+	my ($self, @args) = @_;
+	return [] if $self->{_file_is_empty};
+	return $self->{_file_data} if $self->{_file_data};
+
+	# Cache only plain unfiltered calls — Database::Join passes no args for the
+	# full table scan; a non-empty @args means a narrowed query whose result must
+	# not be mistaken for the full-table cache entry.
+	my $cache = $self->{_cache};
+	if ($cache && !@args) {
+		my $key = $self->_cache_key;
+		if (defined $key) {
+			my $hit = $cache->get($key);
+			return $hit if defined $hit;
+		}
+	}
+
+	my $data = $self->{_db}->selectall_arrayref(@args);
+
+	if ($cache && !@args && defined $data) {
+		my $key = $self->_cache_key;
+		if (defined $key) {
+			defined $self->{_url}
+				? $cache->set($key, $data, $self->{_cache_ttl_url})
+				: $cache->set($key, $data);
+		}
+	}
+
+	return $data;
+}
+
 sub fetch_all {
 	my $self  = shift;
 	my $table = $self->{_table};
 
 	# 0-byte file: no backend was created; nothing to fetch.
 	return [] if $self->{_file_is_empty};
+
+	# Headerless CSV/XLSX: data was pre-parsed with synthesized column names.
+	return $self->{_file_data} if $self->{_file_data};
+
+	# Cache check: URL tables benefit from avoiding repeated HTTP round-trips;
+	# file tables benefit from skipping disk I/O and CSV/PSV parsing.
+	my $cache = $self->{_cache};
+	if ($cache) {
+		my $key = $self->_cache_key;
+		if (defined $key) {
+			my $hit = $cache->get($key);
+			return $hit if defined $hit;
+		}
+	}
 
 	my $data = eval { $self->{_db}->selectall_hashref() };
 	if ($@) {
@@ -689,6 +1087,18 @@ sub fetch_all {
 
 	if (!@{$data}) {
 		carp $self->_msg('warn_empty_result', $table);
+	}
+
+	# Cache store: URL tables use a TTL so stale pages expire automatically;
+	# file tables encode mtime in the key so a changed file produces a natural
+	# miss without any explicit invalidation.
+	if ($cache) {
+		my $key = $self->_cache_key;
+		if (defined $key) {
+			defined $self->{_url}
+				? $cache->set($key, $data, $self->{_cache_ttl_url})
+				: $cache->set($key, $data);
+		}
 	}
 
 	return $data;
@@ -794,8 +1204,9 @@ Only read operations are supported.  Write-back is not in scope.
 =item *
 
 One C<DataSource> instance corresponds to exactly one table.  Multi-table
-left joins are composed at the controller layer by C<Dashboard::_left_join>;
-C<Database::Join> (Phase 2) is not yet in use.
+joins are now delegated to C<Database::Join> (see L<Database::Join>), which
+accepts C<DataSource> objects directly as component databases via the
+C<selectall_arrayref> and C<columns> methods this class exposes.
 
 =item *
 

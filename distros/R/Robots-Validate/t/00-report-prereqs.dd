@@ -12,7 +12,7 @@ do { my $x = {
                                       },
                         'suggests' => {
                                         'HTTP::Tiny' => '0.096',
-                                        'JQ::Lite' => '2.49',
+                                        'JQ::Lite' => '2.51',
                                         'String::Util' => '1.36'
                                       }
                       },

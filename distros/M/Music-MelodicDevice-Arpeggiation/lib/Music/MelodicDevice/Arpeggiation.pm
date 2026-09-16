@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Apply arpeggiation patterns to groups of notes
 
-our $VERSION = '0.0502';
+our $VERSION = '0.0504';
 
 use Moo;
 use strictures 2;
@@ -64,14 +64,14 @@ sub arp {
     $repeats  ||= $self->repeats;
 
     my $pattern = ref $type eq 'ARRAY' ? $type : $self->_build_pattern($type, $notes);
-    print "Pattern: @$pattern\n" if $self->verbose;
+    print "Repeat: $repeats, Type: $type, Pattern: @$pattern\n" if $self->verbose;
 
     my $pat = Array::Circular->new(@$pattern);
 
     # compute the arp durations
     my $x = $duration * TICKS;
     my $z = sprintf '%0.f', $x / @$pattern;
-    print "Durations: $x, $z\n" if $self->verbose;
+    print "Ticks: $x, Duration: $z\n" if $self->verbose;
     $z = 'd' . $z;
 
     my @arp;
@@ -82,8 +82,10 @@ sub arp {
             $pat->next;
         }
     }
-    print 'Arp: ', ddc(\@arp) if $self->verbose;
-
+    if ($self->verbose) {
+        print 'Notes: ', ddc($notes);
+        print 'Arp: ', ddc(\@arp);
+    }
     return \@arp;
 }
 
@@ -190,7 +192,7 @@ Music::MelodicDevice::Arpeggiation - Apply arpeggiation patterns to groups of no
 
 =head1 VERSION
 
-version 0.0502
+version 0.0504
 
 =head1 SYNOPSIS
 

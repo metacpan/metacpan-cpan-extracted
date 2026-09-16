@@ -20,7 +20,18 @@ ok(-f $cli_path, "amberdb_cli.pl exists at $cli_path");
 
 my $test_tmpdir = tempdir(CLEANUP => 1);
 my $test_dbdir  = File::Spec->catdir($test_tmpdir, "dbstore");
-mkdir $test_dbdir;
+mkdir $test_dbdir unless -d $test_dbdir;
+$test_dbdir = eval { abs_path($test_dbdir) } // $test_dbdir;
+
+sub norm_path {
+    my ($p) = @_;
+    return '' unless defined $p;
+    $p = eval { abs_path($p) } // $p;
+    $p = File::Spec->canonpath($p);
+    $p =~ s{\\}{/}g;
+    $p =~ s{/+$}{};
+    return lc($p);
+}
 
 # ---------------------------------------------------------------------------
 subtest '1. Help screen & default table overview' => sub {
@@ -66,28 +77,28 @@ subtest '3. Dash tolerance & global config update' => sub {
 
     # Connect to get token
     my $out_conn = `"$perl_bin" -Ilib "$cli_path" connect path-dbase_dir="$test_dbdir" format=json`;
-    my $conn = decode_json($out_conn);
-    my $token = $conn->{token};
+    my $conn = eval { decode_json($out_conn) };
+    my $token = $conn ? $conn->{token} : '';
 
     # Update with --cfg-no_write=1 (double dash)
-    my $upd1 = `"$perl_bin" -Ilib "$cli_path" --token=$token --cfg-no_write=1 format=json`;
-    my $data1 = decode_json($upd1);
-    is($data1->{cfg}->{no_write}, 1, "Double dash --cfg-no_write=1 updated");
+    my $upd1 = `"$perl_bin" -Ilib "$cli_path" --token=$token --cfg-no_write=1 format=json 2>&1`;
+    my $data1 = eval { decode_json($upd1) };
+    is(eval { $data1->{cfg}->{no_write} }, 1, "Double dash --cfg-no_write=1 updated") or diag("upd1 output: $upd1");
 
     # Update with -cfg-no_write=0 (single dash)
-    my $upd2 = `"$perl_bin" -Ilib "$cli_path" -token=$token -cfg-no_write=0 format=json`;
-    my $data2 = decode_json($upd2);
-    is($data2->{cfg}->{no_write}, 0, "Single dash -cfg-no_write=0 updated");
+    my $upd2 = `"$perl_bin" -Ilib "$cli_path" -token=$token -cfg-no_write=0 format=json 2>&1`;
+    my $data2 = eval { decode_json($upd2) };
+    is(eval { $data2->{cfg}->{no_write} }, 0, "Single dash -cfg-no_write=0 updated") or diag("upd2 output: $upd2");
 
     # Update with cfg-no_write=1 (no dash)
-    my $upd3 = `"$perl_bin" -Ilib "$cli_path" token=$token cfg-no_write=1 format=json`;
-    my $data3 = decode_json($upd3);
-    is($data3->{cfg}->{no_write}, 1, "No dash cfg-no_write=1 updated");
+    my $upd3 = `"$perl_bin" -Ilib "$cli_path" token=$token cfg-no_write=1 format=json 2>&1`;
+    my $data3 = eval { decode_json($upd3) };
+    is(eval { $data3->{cfg}->{no_write} }, 1, "No dash cfg-no_write=1 updated") or diag("upd3 output: $upd3");
 
     # Clean disconnect
-    my $disc = `"$perl_bin" -Ilib "$cli_path" token=$token disconnect format=json`;
-    my $ddata = decode_json($disc);
-    is($ddata->{status}, 'disconnected', "Disconnected successfully");
+    my $disc = `"$perl_bin" -Ilib "$cli_path" token=$token disconnect format=json 2>&1`;
+    my $ddata = eval { decode_json($disc) };
+    is(eval { $ddata->{status} }, 'disconnected', "Disconnected successfully") or diag("disc output: $disc");
 };
 
 # ---------------------------------------------------------------------------
@@ -310,6 +321,33 @@ subtest '10. Execution elapsed time parameter (time, time=1, --time)' => sub {
     # 5. Output without time has no [Time: ...] line
     my $out_notime = `"$perl_bin" -Ilib "$cli_path" --db="$test_dbdir" read direct_tbl 1 json`;
     unlike($out_notime, qr/\[Time:/, "No time line printed when time option is omitted");
+};
+
+# ---------------------------------------------------------------------------
+subtest '11. Positional connect database directory' => sub {
+    plan tests => 6;
+
+    # 1. Positional connect to custom path
+    my $out_pos = `"$perl_bin" -Ilib "$cli_path" connect "$test_dbdir" format=json`;
+    my $conn_pos = eval { decode_json($out_pos) };
+    is($conn_pos->{status}, 'connected', "Positional connect to path succeeded");
+    my $tok_pos = $conn_pos->{token};
+    ok(defined $tok_pos && $tok_pos =~ /^\d{4}$/, "Positional connect token generated: $tok_pos");
+    is(norm_path($conn_pos->{path}->{dbase_dir}), norm_path($test_dbdir), "Connected data dir matches positional path");
+
+    my $disc_pos = `"$perl_bin" -Ilib "$cli_path" token=$tok_pos disconnect format=json`;
+    my $dd_pos = eval { decode_json($disc_pos) };
+    is($dd_pos->{status}, 'disconnected', "Positional connect disconnected cleanly");
+
+    # 2. Positional connect with 'dbstore'
+    my $out_dbstore = `"$perl_bin" -Ilib "$cli_path" connect dbstore format=json`;
+    my $conn_dbstore = eval { decode_json($out_dbstore) };
+    is($conn_dbstore->{status}, 'connected', "Connect dbstore succeeded");
+    my $tok_db = $conn_dbstore->{token};
+
+    my $disc_db = `"$perl_bin" -Ilib "$cli_path" token=$tok_db disconnect format=json`;
+    my $dd_db = eval { decode_json($disc_db) };
+    is($dd_db->{status}, 'disconnected', "Connect dbstore disconnected cleanly");
 };
 
 done_testing();

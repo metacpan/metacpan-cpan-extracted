@@ -1,5 +1,12 @@
 Release history for Dist-Starter
 
+v0.2.1    2026-09-15T08:25:24Z
+          - Let the test runner provide t/lib if it exists
+          - MY module should be criticized too
+          - Add "# ABSTRACT: ..." source comment to main module
+          - Fix precedence of hard-coded defaults (lower) and rcfile defaults
+            (higher)
+
 v0.2.0    2026-08-13T10:03:22Z
           - Provide options for "license" and "initial version"
           - Refactor "author" info processing

@@ -328,4 +328,85 @@ sub get_pet {
         'with the content type it is declared under');
 }
 
+# ---- range status keys (2XX, 4XX) ------------------------------------------
+#
+# A range key compiles a schema like any other, but nothing ever selected it:
+# the lookup matched the exact decimal and then `default`, so a document
+# written with `2XX` had schemas that were compiled and never applied.
+#
+# The tell is not a wrong verdict, it is NO verdict - the report callback
+# simply never fires - so that is what these assert. A test that only checked
+# the response came back 200 would have passed throughout.
+
+sub drive_ranged {
+    my ($app) = @_;
+    open my $in, '<', \(my $b = '') or die;
+    return $app->({
+        REQUEST_METHOD => 'GET',
+        PATH_INFO      => '/r',
+        QUERY_STRING   => '',
+        'psgi.input'   => $in,
+    });
+}
+
+sub ranged_app {
+    my (%o) = @_;
+    my $body = File::Raw::JSON::file_json_encode($o{body});
+    my $api  = Open::API->new(spec => {
+        openapi => '3.1.0',
+        info    => { title => 'T', version => '1.0.0' },
+        paths   => { '/r' => { get => {
+            operationId => 'ranged',
+            responses   => $o{responses},
+        } } },
+    });
+    return Open::API::Plack->new(
+        api                => $api,
+        validate_responses => { mode => 'report', report => $o{report} },
+        handlers           => { ranged => sub {
+            [ 200, [ 'Content-Type'   => 'application/json',
+                     'Content-Length' => length $body ], [ $body ] ];
+        } },
+    )->to_app;
+}
+
+my $OKSCHEMA = { type => 'object', required => ['ok'],
+                 properties => { ok => { type => 'boolean' } } };
+
+{
+    my @seen;
+    my $app = ranged_app(
+        body      => { wrong => 'shape' },
+        report    => sub { push @seen, [ @_ ] },
+        responses => { '2XX' => { description => 'any success',
+                                  content => { 'application/json' =>
+                                               { schema => $OKSCHEMA } } } },
+    );
+    my $r = drive_ranged($app);
+    is($r->[0], 200, 'report mode delivers the ranged response unchanged');
+    is(scalar @seen, 1, 'a 2XX schema is selected for a 200 and applied')
+        or diag 'the range key compiled but was never matched';
+    is($seen[0][1], 200, '...and is reported against the real status') if @seen;
+}
+
+{
+    # exact beats range: the body satisfies `200` and violates `2XX`, so a
+    # correct precedence produces NO finding at all.
+    my @seen;
+    my $app = ranged_app(
+        body      => { ok => \1 },
+        report    => sub { push @seen, [ @_ ] },
+        responses => {
+            200   => { description => 'exactly 200',
+                       content => { 'application/json' => { schema => $OKSCHEMA } } },
+            '2XX' => { description => 'any success',
+                       content => { 'application/json' => { schema =>
+                           { type => 'object', required => ['nope'],
+                             properties => { nope => { type => 'string' } } } } } },
+        },
+    );
+    drive_ranged($app);
+    is(scalar @seen, 0, 'an exact status wins over a range that covers it');
+}
+
 done_testing();

@@ -27,7 +27,6 @@ our $F;
 
 my $new_x;
 my $new_y;
-my $dev      = 0;     # Framebuffer device
 my $delay    = 3;     # Delay in seconds
 my $noaccel  = FALSE; # Turn on/off C acceleration
 my $nosplash = FALSE; # Turn on/off the splash screen
@@ -36,7 +35,7 @@ my $small    = FALSE; # Force a small screen for debugging core dumps
 my $help     = FALSE; # Shows a brief help screen
 my $man      = FALSE; # Shows the full POD manual
 my $errors   = FALSE; # Show errors
-my $interval = (1/15);
+my $interval = (1/30); # 30 FPS for VirtualBox flushing
 my $show_func;
 
 # Forced flushing has been removed and an automatic flush is triggered if VirtualVox is detected in the module itself.
@@ -46,7 +45,6 @@ GetOptions(
     'man'              => \$man,
     'x=i'              => \$new_x,
     'y=i'              => \$new_y,
-    'dev=i'            => \$dev,
     'noaccel'          => \$noaccel,
     'nosplash'         => \$nosplash,
     'delay=i'          => \$delay,
@@ -80,7 +78,6 @@ our $STAMP = sprintf('%.1', time);
 
 if (defined($new_x)) { # Ignore kernel structure and force a specific resolution
     $F = Graphics::Framebuffer->new(
-        'FB_DEVICE'        => "/dev/fb$dev",
         'SHOW_ERRORS'      => $errors,
         'SIMULATED_X'      => $new_x,
         'SIMULATED_Y'      => $new_y,
@@ -91,7 +88,6 @@ if (defined($new_x)) { # Ignore kernel structure and force a specific resolution
     );
 } else { # Adhere to the kernel structuter for the screen layout (normal usage)
     $F = Graphics::Framebuffer->new(
-        'FB_DEVICE'        => "/dev/fb$dev",
         'SHOW_ERRORS'      => $errors,
         'ACCELERATED'      => !$noaccel,
         'SPLASH'           => 0,
@@ -100,7 +96,6 @@ if (defined($new_x)) { # Ignore kernel structure and force a specific resolution
     );
 }
 
-# $F->{'IS_VBOX'} = FALSE;
 # Trap all means to end, and exit cleanly
 $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { eval { $F->text_mode(); exec('reset'); }; };
 
@@ -341,6 +336,7 @@ if (grep(/Texture|Blit|Rotate|Flipping|Monochrome|Mode Drawing|Animated|Replace/
                 }
             }
         }
+        vbox_flush();
     }
 }
 
@@ -376,7 +372,7 @@ undef($F);             # Destroy the framebuffer object
 exit(0);
 
 sub vbox_flush {
-    if ($F->{'VBOX'} && ($F->{'LAST_FLUSHED'} + $interval) <= time) {
+    if ($F->{'VBOX'} and ($F->{'LAST_FLUSHED'} + $interval) <= time and $F->{'GFB_VIEWER'} == FALSE) { # Only flush if in a real console, not the GUI
         $F->_flush_screen();
     }
 }

@@ -1,5 +1,8 @@
 Revision history for EV::Kafka
 
+0.06  2026-09-15
+    - sasl no longer warns on undef arguments
+
 0.05  2026-07-24
     - Security: fixed a remote crash in fetch decoding, a SCRAM auth
       bypass, and a PBKDF2 DoS

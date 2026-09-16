@@ -5,6 +5,7 @@ use warnings;
 
 #<<<
 package {{main_module}};
+# ABSTRACT: {{abstract}}
 BEGIN {
 our $VERSION = '{{initial_version}}';
 }

@@ -155,15 +155,25 @@ sub poke {
     like $@, qr/reader_slots region missing or out of bounds/, '  ...naming the region';
 }
 
-# ---- 8. a frozen file whose lock word names a LIVE writer ----
+# ---- 8. a frozen file whose lock word names a writer ----
 {
     my $p = path('froz');
     { my $m = Data::HashMap::Shared::II->new($p, 64); $m->put(1, 2); $m->freeze }
-    poke($p, 128, 'L', 0x80000000 | $$);     # wlock held by us -- a live pid
+    my $holder = fork // die "fork: $!";
+    if (!$holder) { exec('sleep', '30') or POSIX::_exit(1) }
+    poke($p, 128, 'L', 0x80000000 | $holder);   # another process, alive
     ok !eval { Data::HashMap::Shared::II->new_readonly($p); 1 },
         'new_readonly refuses a frozen file with a write in flight';
-    like $@, qr/a write is still in flight on this frozen file \(pid $$\); retry/,
+    like $@, qr/a write is still in flight on this frozen file \(pid $holder\); retry/,
         '  ...naming the live holder, not a crashed writer';
+    kill KILL => $holder;
+    waitpid $holder, 0;
+
+    poke($p, 128, 'L', 0x80000000 | $$);        # our own pid, held by no thread of ours
+    ok !eval { Data::HashMap::Shared::II->new_readonly($p); 1 },
+        'new_readonly refuses one whose lock word holds our own pid';
+    like $@, qr/left mid-update by a crashed writer/,
+        '  ...as a crashed writer whose pid we reuse, not one to wait for';
 }
 
 done_testing;

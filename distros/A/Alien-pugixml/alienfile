@@ -1,4 +1,5 @@
 use alienfile;
+use Config;
 
 # Use a system pugixml when one is installed and recent enough; otherwise build
 # from source. 1.8 is the floor XML::PugiXML needs (it references the output
@@ -11,6 +12,8 @@ plugin 'PkgConfig' => (
 );
 
 share {
+    requires 'ExtUtils::CBuilder' => '0.280226';
+
     plugin 'Download' => (
         url     => 'https://github.com/zeux/pugixml/releases/download/v1.16/pugixml-1.16.tar.gz',
         version => qr/pugixml-([0-9.]+)\.tar\.gz$/,
@@ -18,17 +21,56 @@ share {
 
     plugin 'Extract' => 'tar.gz';
 
-    plugin 'Build::CMake';
+    build sub {
+        my ($build) = @_;
+        require ExtUtils::CBuilder;
+        require Path::Tiny;
 
-    build [
-        ['%{cmake}',
-            @{ meta->prop->{plugin_build_cmake}->{args} },
-            '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
-            '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON',
-            '-DBUILD_SHARED_LIBS:BOOL=OFF',
-            '.'
-        ],
-        ['%{make}'],
-        ['%{make}', 'install'],
-    ];
+        # The -std pugixml.cpp is compiled with decides which overloads the library
+        # has (C++11 move, C++17 string_view), so take the newest that works.
+        my $cb = ExtUtils::CBuilder->new;
+        my $obj;
+        for my $std ('-std=c++17', '-std=c++11', '') {
+            $obj = eval {
+                $cb->compile(
+                    'C++'                => 1,
+                    source               => 'src/pugixml.cpp',
+                    extra_compiler_flags => $std,
+                );
+            } and last;
+        }
+        die "failed to compile src/pugixml.cpp\n" unless $obj;
+
+        my $lib = "libpugixml$Config{_a}";
+        $build->system((split ' ', $Config{ar}), 'crs', $lib, $obj) == 0
+            or die "failed to create $lib\n";
+
+        my ($v) = Path::Tiny->new('src/pugixml.hpp')->slurp
+            =~ /^\s*#\s*define\s+PUGIXML_VERSION\s+(\d+)/m
+            or die "PUGIXML_VERSION not found in src/pugixml.hpp\n";
+        my $version = sprintf '%d.%d', $v / 1000, $v % 1000 / 10;
+        $version .= '.' . $v % 10 if $v % 10;
+
+        my $stage   = Path::Tiny->new($build->install_prop->{prefix});
+        my $include = $stage->child('include');
+        my $libdir  = $stage->child('lib');
+        $_->mkpath for $include, $libdir->child('pkgconfig');
+        Path::Tiny->new("src/$_")->copy($include->child($_))
+            for qw( pugixml.hpp pugiconfig.hpp );
+        Path::Tiny->new($lib)->copy($libdir->child($lib));
+
+        my $prefix = $build->runtime_prop->{prefix};
+        $libdir->child('pkgconfig', 'pugixml.pc')->spew(<<"PC");
+prefix=$prefix
+includedir=\${prefix}/include
+libdir=\${prefix}/lib
+
+Name: pugixml
+Description: Light-weight, simple and fast XML parser for C++ with XPath support.
+URL: https://pugixml.org/
+Version: $version
+Cflags: -I\${includedir}
+Libs: -L\${libdir} -lpugixml
+PC
+    };
 };

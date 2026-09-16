@@ -123,8 +123,11 @@ static inline uint64_t bs_count(BsHandle *h) {
     uint64_t total = 0;
     uint32_t nw = h->hdr->num_words;
     uint32_t mw = bs_max_words(h); if (nw > mw) nw = mw;  /* bound against mapping */
+    uint64_t cap = h->hdr->capacity;
     for (uint32_t i = 0; i < nw; i++) {
         uint64_t word = __atomic_load_n(&h->data[i], __ATOMIC_RELAXED);
+        if (i == nw - 1 && (cap % 64))
+            word &= ((uint64_t)1 << (cap % 64)) - 1;
         total += (uint64_t)__builtin_popcountll(word);
     }
     return total;
@@ -133,8 +136,13 @@ static inline uint64_t bs_count(BsHandle *h) {
 static inline int bs_any(BsHandle *h) {
     uint32_t nw = h->hdr->num_words;
     uint32_t mw = bs_max_words(h); if (nw > mw) nw = mw;  /* bound against mapping */
-    for (uint32_t i = 0; i < nw; i++)
-        if (__atomic_load_n(&h->data[i], __ATOMIC_RELAXED)) return 1;
+    uint64_t cap = h->hdr->capacity;
+    for (uint32_t i = 0; i < nw; i++) {
+        uint64_t word = __atomic_load_n(&h->data[i], __ATOMIC_RELAXED);
+        if (i == nw - 1 && (cap % 64))
+            word &= ((uint64_t)1 << (cap % 64)) - 1;
+        if (word) return 1;
+    }
     return 0;
 }
 

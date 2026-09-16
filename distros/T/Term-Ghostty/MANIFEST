@@ -1,0 +1,28 @@
+Changes
+examples/ansi2html.pl
+examples/asciinema_player.pl
+examples/headless_agent.pl
+examples/live_web_monitor.pl
+examples/README.md
+examples/session_recorder.pl
+examples/split_multiplexer.pl
+examples/stream_ground_annotator.pl
+examples/terminal_diff.pl
+examples/terminal_scraper.pl
+examples/tui_test_framework.pl
+Ghostty.xs
+lib/Term/Ghostty.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+ppport.h
+README
+t/00-load.t
+t/01-basic.t
+t/02-format.t
+t/03-callbacks.t
+t/04-memory.t
+t/05-encoding.t
+t/06-threads.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

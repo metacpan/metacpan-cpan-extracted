@@ -1,0 +1,71 @@
+---
+abstract: OrePAN2::Lite
+author:
+  - 'Rob Lauer <rclauer@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+  Test::RequiresInternet: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OrePAN2-Lite
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  OrePAN2:
+    file: lib/OrePAN2.pm
+    version: v2.0.0
+  OrePAN2::Index:
+    file: lib/OrePAN2/Index.pm
+    version: v2.0.0
+  OrePAN2::Indexer:
+    file: lib/OrePAN2/Indexer.pm
+    version: v2.0.0
+  OrePAN2::Injector:
+    file: lib/OrePAN2/Injector.pm
+    version: v2.0.0
+  OrePAN2::Lite:
+    file: lib/OrePAN2/Lite.pm
+    version: v2.0.0
+  OrePAN2::Logger:
+    file: lib/OrePAN2/Logger.pm
+    version: v2.0.0
+  OrePAN2::Repository:
+    file: lib/OrePAN2/Repository.pm
+    version: v2.0.0
+  OrePAN2::Repository::Cache:
+    file: lib/OrePAN2/Repository/Cache.pm
+    version: v2.0.0
+  OrePAN2::Role::HasLogger:
+    file: lib/OrePAN2/Role/HasLogger.pm
+    version: v2.0.0
+recommends:
+  IO::Socket::SSL: '0'
+requires:
+  CPAN::Meta: '2.131560'
+  Class::Accessor::Fast: '0.51'
+  File::pushd: '1.016'
+  HTTP::Tiny: '0.088'
+  IO::File::AtomicChange: '0.08'
+  JSON::PP: '4.16'
+  Parse::LocalDistribution: '0.20'
+  Path::Tiny: '0.150'
+  Role::Tiny: '2.002004'
+  Role::Tiny::With: '2.002004'
+  autodie: '2.37'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/rlauer6/OrePAN2-Lite/issues
+  homepage: https://github.com/rlauer6/OrePAN2-Lite
+  repository: https://github.com/rlauer6/OrePAN2-Lite
+version: v2.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

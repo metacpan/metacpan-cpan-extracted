@@ -7,7 +7,7 @@ use Carp ();
 use Punk::OAuth2 ();            # XS core: the whole flow (_flow_begin,
 use Punk::OAuth2::Provider ();  # _flow_complete, provider object, ...)
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 my %STATE;
 
@@ -160,7 +160,7 @@ sub _mount_server {
     (my $path = $cfg->{path}) =~ s{/\z}{};
 
     # resolve authenticate/consent targets
-    for my $hook (qw(authenticate consent)) {
+    for my $hook (qw(authenticate consent claims)) {
         next unless defined $cfg->{$hook} && ref $cfg->{$hook} ne 'CODE';
         $cfg->{$hook} = $app->_resolve_target($cfg->{$hook},
                                               "oauth2_server $hook");
@@ -179,7 +179,7 @@ sub _mount_server {
         store  => $store,
         prefix => $path,
         (map { defined $cfg->{$_} ? ($_ => $cfg->{$_}) : () }
-             qw(alg at_ttl rt_ttl oidc authenticate consent key)),
+             qw(alg at_ttl rt_ttl oidc authenticate consent claims key)),
     );
     $st->{server_obj} = $server;
 
@@ -189,6 +189,7 @@ sub _mount_server {
     $app->route('POST', "$path/revoke"    => sub { $server->revoke($_[0]) });
     $app->route('POST', "$path/introspect"=> sub { $server->introspect($_[0]) });
     $app->route('GET',  "$path/jwks.json" => sub { $server->jwks($_[0]) });
+    $app->route('POST', "$path/register"  => sub { $server->register($_[0]) });
     $app->route('GET', '/.well-known/oauth-authorization-server'
         => sub { $server->metadata($_[0]) });
     $app->route('GET', '/.well-known/openid-configuration'
@@ -197,7 +198,7 @@ sub _mount_server {
     # client-authenticated token endpoints carry no cookies -> csrf exempt
     if ($app->can('csrf') && $app->{csrf}) {
         eval { $app->csrf(exempt => ["$path/token", "$path/revoke",
-                                     "$path/introspect"]) };
+                                     "$path/introspect", "$path/register"]) };
     }
     return;
 }

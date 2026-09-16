@@ -5,6 +5,7 @@ use warnings;
 
 #<<<
 package Foo::Bar::Baz;
+# ABSTRACT: The great new Foo::Bar::Baz
 BEGIN {
 our $VERSION = 'v0.1.0';
 }

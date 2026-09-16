@@ -11,7 +11,7 @@ use MIME::Base64 ();
 use EV::WebKit::Protocol;
 use EV::WebKit::Client::Element;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # How many undelivered broadcast events to keep when no on_event handler was
 # given. A page produces console output at its own pace and a caller may never
@@ -30,7 +30,7 @@ sub _clean { my $e = shift // ''; $e =~ s/ at \S+ line \d+\.?\s*$//; $e }
 # watcher is collected before it fires.
 sub _defer_err {
     my ($self, $cb, $err) = @_;
-    my $t; $t = EV::timer(0, 0, sub { undef $t; $cb->(undef, $err) });
+    my $t; $t = EV::timer(0, 0, sub { undef $t; _deliver($cb, undef, $err) });
     return;
 }
 

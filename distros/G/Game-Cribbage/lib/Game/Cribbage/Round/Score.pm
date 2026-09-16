@@ -21,7 +21,7 @@ Game::Cribbage::Round::Score - running score tracker for a round
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 

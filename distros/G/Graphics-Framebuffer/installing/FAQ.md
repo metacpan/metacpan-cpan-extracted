@@ -26,7 +26,7 @@
 
 ## Does this work on Darwin/FreeBSD etc?
 
-   Likely not, as the module depends on Linux kernel sources and IOCTL calls to the kernel.  I am making an attempt to see if I can make it work on FreeBSD, but it's an uphill battle.  FreeBSD is like an OS make by Ikea.  Once it's set up to do what you want, it works quite well.  However, gettung to that point is a royal pain in the neck.
+   Likely not, as the module depends on Linux kernel sources and IOCTL calls to the kernel.  I am making an attempt to see if I can make it work on FreeBSD, but it's an uphill battle.  FreeBSD is like an OS make by Ikea.  Once it's set up to do what you want, it works quite well.  However, getting to that point is a royal pain in the neck.
 
 ![Divider](../pics/pink.jpg?raw=true "Divider")
 

@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long ();
+use Digest::SHA ();
+
+use Game::Gin::Terminal;
+
+my %o = (mode => 'bot', level => 2, seat => 'p1');
+Getopt::Long::GetOptions(
+    'mode=s'  => \$o{mode},
+    'level=i' => \$o{level},
+    'seat=s'  => \$o{seat},
+    'seed=s'  => \$o{seed},
+    'ascii'   => \$o{ascii},
+    'colour!' => \$o{colour},
+    'color!'  => \$o{colour},
+    'help'    => \$o{help},
+) or usage(1);
+usage(0) if $o{help};
+
+usage(1, "mode must be bot, hotseat or watch\n")
+    unless $o{mode} =~ /\A(?:bot|hotseat|watch)\z/;
+usage(1, "seat must be p1 or p2\n") unless $o{seat} =~ /\A p[12] \z/x;
+
+my $seed = defined $o{seed} ? Digest::SHA::sha256($o{seed}) : undef;
+
+Game::Gin::Terminal->new(
+    mode  => $o{mode},
+    level => $o{level},
+    seat  => $o{seat},
+    ($o{ascii} ? (ascii => 1) : ()),
+    (defined $o{colour} ? (colour => $o{colour}) : ()),
+)->play(defined $seed ? (seed => $seed) : ());
+
+sub usage {
+    my ($status, $message) = @_;
+    my $fh = $status ? \*STDERR : \*STDOUT;
+    print {$fh} $message if $message;
+    print {$fh} <<'USAGE';
+gin - gin rummy at a prompt
+
+    gin                        play the bot as p1
+    gin --seat p2              play the bot as p2
+    gin --mode hotseat         two people at one keyboard
+    gin --mode watch           two bots, and you read
+    gin --level 1              a weaker opponent (1 or 2)
+    gin --seed tuesday         deal the same game every time
+    gin --ascii                letters instead of the suit pips
+    gin --nocolour             no colour (NO_COLOR does the same)
+
+Your hand is fanned like a hand of cards, with a bracket under each meld
+saying whether it is a set or a run and what the rest of it is costing you.
+
+In a hand: answer y or n for the upcard, d or t to draw or take, and name a
+card to discard it (KH). Add a ! to knock with it (KH!). What the card itself
+says is taken too, so the suit pip and 10H work as well as KH and TH.
+USAGE
+    exit $status;
+}

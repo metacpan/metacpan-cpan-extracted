@@ -1,5 +1,13 @@
 Revision history for Data-Queue-Shared
 
+0.09      2026-09-15
+          - Fix size and is_full misreading while another process pops.
+          - Fix pop_wait_multi(0) taking an element.
+          - push_wait_multi's timeout now bounds the whole call.
+          - Str push_multi wakes consumers before croaking on a too-big value.
+          - Refuse non-regular files and more corrupt headers.
+          - Recover a lock left ownerless by a corrupt file instead of hanging.
+
 0.08      2026-08-12
           - Recover a file left behind by an interrupted create instead of
             leaving the path unopenable.

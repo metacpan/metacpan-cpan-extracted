@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Frozen::View - read a published block without copying it
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 require Shared::Arena;
 
@@ -31,7 +31,7 @@ Shared::Arena::CountMin - how often a key has been seen, in fixed space
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 DESCRIPTION
 

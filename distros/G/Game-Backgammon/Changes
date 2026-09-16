@@ -1,0 +1,38 @@
+Revision history for Game-Backgammon
+
+0.01
+    - Phase 01: the board, the position, the move, the turn and the
+      notation. No play yet: the dice and legal turn generation are
+      phase 02 and the rules are phase 03.
+    - The position is one signed array read through Board::index_for, so
+      exactly one class knows which way round the board is. t/03 greps the
+      tree to keep it that way.
+    - Phase 02: the dice, and the legal turn. Rolls are a pure function of
+      the seed and the roll's number, hashed per roll so the seed proves the
+      past and predicts nothing. The opening roll is really rolled.
+    - legal_turns enumerates every sequence and then filters the set: both
+      dice if any sequence plays both, the larger if only one can be, four
+      on doubles, and the bar before anything else. A forfeit is a turn.
+    - Phase 03: the game. play() takes a turn or its notation and matches it
+      against the legal ones by the multiset of moves, so a turn the rules
+      did not offer cannot be played whatever it claims. Hitting, the bar,
+      bearing off (exact, higher-from-the-highest, and neither), the margin
+      (single, gammon, backgammon) and finishing from outside.
+    - Refusals are RETURNED as Game::Backgammon::Error, never thrown; die is
+      for programmer error only.
+    - Phase 04: the bot. One ply over the legal turns, scoring pip
+      advantage, checkers off and on the bar, made points, the longest
+      prime, an anchor, and blot exposure. Bounded in work and never in a
+      clock, so it is safe inside a transaction: measured at 206 legal
+      turns and 40ms in the worst position seen.
+    - Phase 05: the terminal game draws a board rather than a list of
+      numbers: both halves between their borders, the bar down the middle,
+      the tray on the right, a point taller than five showing its count,
+      round checkers with an --ascii fallback, and colour off a pipe. It is
+      numbered from the side on roll, because a turn is written in the
+      mover's own numbers; --view pins it. The legal turns are laid out
+      across the screen instead of down it, and the screen is cleared
+      between turns only for a person.
+    - Game::Backgammon::Shots computes the hit-probability table by
+      enumerating the 36 rolls, so the published shot table is a test of it
+      rather than its source.

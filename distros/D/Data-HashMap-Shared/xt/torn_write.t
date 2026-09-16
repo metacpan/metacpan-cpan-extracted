@@ -10,9 +10,11 @@ use Time::HiRes qw(time usleep);
 
 use Data::HashMap::Shared::SS;
 
-# 2048 is the table capacity 1024 entries yields, so LRU is exercised on the
-# write path without anything ever being evicted.
-my $m = Data::HashMap::Shared::SS->new_memfd("torn", 1024, 2048);
+# A non-zero max_size routes the write path through the LRU code; the test
+# stores one key, so nothing is evicted.  2047 rather than the table capacity
+# 1024 entries yields (2048) keeps max_size below it, avoiding the constructor's
+# unreachable-LRU-bound warning on stderr.
+my $m = Data::HashMap::Shared::SS->new_memfd("torn", 1024, 2047);
 
 # Alternating values of different length — torn write would produce a
 # truncated or mixed-length result.

@@ -144,10 +144,13 @@ $make_fragment .= join "\n", '', File::ShareDir::Install::postamble( $self )
 EOF
     $share->{ Makefile } = <<"EOF";
 require File::ShareDir::Install;
-  no warnings qw( once );
-  \$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
-  mkdir '$share_dir' unless -d '$share_dir';
-  File::ShareDir::Install::install_share( ${ \( $share_type eq 'dist' ? "$share_type => '$share_dir'" : "$share_type => \$main_module => '$share_dir'" ) } );
+  {
+    no warnings qw( once );
+    \$File::ShareDir::Install::INCLUDE_DOTFILES = 1
+  }
+  my \$share_dir = '$share_dir';
+  mkdir \$share_dir unless -d \$share_dir;
+  File::ShareDir::Install::install_share( ${ \( $share_type eq 'dist' ? "$share_type => \$share_dir" : "$share_type => \$main_module => \$share_dir" ) } );
 EOF
     $share->{ deps }->{ configure } = "requires 'File::ShareDir::Install' => '0';";
     $share->{ deps }->{ runtime }   = "requires 'File::ShareDir::Tiny' => '0';"

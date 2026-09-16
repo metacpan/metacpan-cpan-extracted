@@ -1,5 +1,28 @@
 Change log for Graphics::Framebuffer
 
+8.00   Sep 15, 2026
+
+       Drum-roll... You can now run it within X-Windows!  You are required to
+       run the companion viewer called "gfb_viewer.pl".  It's still a bit
+       quirky thanks to X-Windows/Wayland's event system, but it works.  Run
+       the viewer BEFORE running your script.  Use a different console window
+       to run it.  Close it normally by closing the opened window when done.
+
+       This was such a royal pain and a vast overhaul that it warranted a new
+       version.
+
+       Note, you can also install the module in X-Windows/Wayland and it will
+       open a window for testing.
+
+7.08   Sep 15, 2026
+
+       Added X-Windows-viewer support.
+
+7.07   Sep 8, 2026
+
+       Documentation fixes
+       Small blitting issue fixed.
+
 7.06   Jul 27, 2026
 
        Minor clipping optimizations
@@ -7,12 +30,13 @@ Change log for Graphics::Framebuffer
 
 7.05   Jul 27, 2026
 
-       Removed the HARDWARE acceleration placeholder.  Hardware acceleration is not possible for the
-       framebuffer driver.  No need to keep this useless setting.
+       Removed the HARDWARE acceleration placeholder.  Hardware acceleration
+       is not possible for the framebuffer driver.  No need to keep this
+       useless setting.
 
        *  "HARDWARE" constant removed
-       *  Method "acceleration" clamps acceleration to C mode only allowing PERL and SOFTWARE as a
-          setting
+       *  Method "acceleration" clamps acceleration to C mode only allowing
+          PERL and SOFTWARE as a setting
        *  Method "hardware" completely removed.
 
 7.04   May 29, 2026
@@ -40,7 +64,8 @@ Change log for Graphics::Framebuffer
 
 7.00   April 28, 2026
 
-       Testing improved.  Recognizes environment and behaves accordingly, instead of just dying for everything.
+       Testing improved.  Recognizes environment and behaves accordingly,
+       instead of just dying for everything.
 
        Manual updated and improved.
 

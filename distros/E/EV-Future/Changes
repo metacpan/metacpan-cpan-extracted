@@ -1,5 +1,12 @@
 Revision history for EV-Future
 
+0.07    Tue Sep 15 2026
+        - Forged or Clone::clone'd handles are inert instead of crashing
+        - Fix Inf or huge limits running parallel_limit one task at a time
+        - Fix a crash when a tied done argument cancels a race
+        - active never reads negative
+        - EV::Future::Handle has its own man page
+
 0.06    Wed Jul 29 2026
         - Minimum perl is now 5.14: the XS uses croak_sv, unavailable earlier
         - Fix a stack-use-after-return in parallel_limit when an unsafe-mode

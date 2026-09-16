@@ -1,4 +1,3 @@
-.gitignore
 bench/benchmark.pl
 Changes
 eg/build_document.pl
@@ -21,6 +20,8 @@ t/07-handle-invalidation.t
 t/08-arg-validation.t
 t/09-registry.t
 t/10-threads.t
+t/11-null-safety.t
+t/12-doc-lifetime.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

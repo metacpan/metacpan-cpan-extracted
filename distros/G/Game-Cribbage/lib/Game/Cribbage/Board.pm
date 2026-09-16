@@ -390,7 +390,7 @@ Game::Cribbage::Board - top-level game orchestration object
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 

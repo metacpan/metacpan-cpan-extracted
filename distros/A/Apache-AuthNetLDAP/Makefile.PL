@@ -25,6 +25,7 @@
 	-core		=> [
 		Convert::ASN1 => '',
 		Net::LDAP => '',
+		IO::Socket::SSL => '',
 		Apache2::Const => '',
 		Apache2::Access => '',
 		Apache2::Connection => '',

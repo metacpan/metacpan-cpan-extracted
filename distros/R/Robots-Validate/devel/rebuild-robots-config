@@ -168,12 +168,12 @@ sub process_section($buffer) {
                 if ( $type =~ m[ \A application / (json|octet-stream) \b ]x ) {
 
                     my $query = $fields{Query} //  '.prefixes[] | .ipv4Prefix // .ipv6Prefix';
-                    push @ips, map { trim($_) } grep { !!$_ } $jq->run_query( $res->{content}, $query );
+                    push @ips, grep { !!$_ } map { trim( $_ // "" ) } $jq->run_query( $res->{content}, $query );
 
                 }
                 elsif ( $type eq "text/plain" ) {
 
-                    push @ips, map { trim($_) } grep { !!$_ } split /[\n\r]+/, $res->{content};
+                    push @ips, grep { !!$_ } map { trim( $_ // "" ) } split /[\n\r]+/, $res->{content};
                 }
             }
             else {

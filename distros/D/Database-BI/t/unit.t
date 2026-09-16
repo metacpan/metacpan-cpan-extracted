@@ -72,6 +72,31 @@ my %ledger = (
 	'POST./upload.415'               => 'POST /upload bad ext -> 415 JSON {error}',
 	'GET./graph.accounting'          => 'GET /graph with accounting amounts: 200, negatives plotted',
 	'GET./graph.no_numeric'          => 'GET /graph with all-text Y column: 200 No plottable data',
+
+	# combine_tables action
+	'GET./combine.200'              => 'GET /combine?l=table:sales 200 HTML',
+	'GET./combine.404'              => 'GET /combine (no l=) 404',
+
+	# JSON export format
+	'GET./export.json'              => 'GET /export?l=table:sales&format=json 200 application/json',
+
+	# graph_view additional error paths
+	'GET./graph.400.missing_param'  => 'GET /graph (no x= or y=) -> 400 plain-text',
+	'GET./graph.400.col_not_found'  => 'GET /graph with non-existent column -> 400 plain-text',
+	'GET./graph.404.no_source'      => 'GET /graph (no l=) -> 404 plain-text',
+
+	# clear_uploads action
+	'POST./uploads_clear.200'       => 'POST /uploads/clear 200 JSON {freed, count}',
+
+	# export_write write-failure path
+	'POST./export.write_failed'     => 'POST /export write throws -> 500 JSON {error}',
+
+	# view and open_file error rendering when DataSource backend throws
+	'GET./view.error_table_open'    => 'GET /view/:table when fetch_all dies -> home page with error_table_open',
+	'GET./open.error_file_open'     => 'GET /open when fetch_all dies -> home page with error_file_open',
+
+	# DataSource::selectall_arrayref public method
+	'DataSource.selectall_arrayref' => 'selectall_arrayref() returns arrayref of hashrefs',
 );
 
 # ---------------------------------------------------------------------------
@@ -113,15 +138,15 @@ subtest 'DataSource.new -- non-existent directory croaks error_directory_missing
 };
 
 subtest 'DataSource.new -- invalid table name croaks error_table_name_invalid' => sub {
-	# POD: TABLE_NAME_RE = /\A[A-Za-z_][A-Za-z0-9_]*\z/
-	# A table name with a hyphen or dots must be rejected.
+	# Hyphens, dots, spaces, etc. are now sanitized to underscores.
+	# Only path-separator characters ('/', '\', NUL) and the empty string still croak.
 	throws_ok {
 		Database::BI::Model::DataSource->new(
 			directory => $DATA_DIR,
-			table     => 'bad-table-name!',
+			table     => 'a/b',
 		)
 	} qr/contains illegal characters/,
-	'new() croaks with table-name-invalid message for bad table';
+	'new() croaks with table-name-invalid message for path-separator in table name';
 	delete $ledger{'DataSource.new.table_invalid'};
 };
 
@@ -201,7 +226,14 @@ subtest 'DataSource.fetch_all -- returns arrayref of hashrefs' => sub {
 
 # ---  GET /  ----------------------------------------------------------------
 subtest 'GET / -- home page lists available tables' => sub {
-	$t->get_ok('/')->status_is(200)->content_type_like(qr{text/html});
+	# Status and content-type smoke test.
+	$t->get_ok('/')->status_is(200)->content_type_like(qr{text/html})
+	  # The Browse card must contain a path text input (id="bi-path-input")
+	  # and its form must target /open.  These assertions exist specifically
+	  # to catch the regression where the path input was silently removed
+	  # from home.html.tt without any test failing.
+	  ->content_like(qr/id="bi-path-input"/, 'home page has path input field')
+	  ->content_like(qr/action="\/open"/, 'Browse card form targets /open');
 	delete $ledger{'GET./'};
 };
 
@@ -502,9 +534,9 @@ subtest 'POST /upload -- oversized file returns 413 JSON {error}' => sub {
 };
 
 subtest 'POST /upload -- unsupported extension returns 415 JSON {error}' => sub {
-	# POD: error_upload_ext when extension is not csv/db/sql/xml/psv.
+	# POD: error_upload_ext when extension is not csv/db/sql/xml/psv/xlsx.
 	$t->post_ok('/upload', form => {
-		file => { content => 'some data', filename => 'data.xlsx' },
+		file => { content => 'some data', filename => 'data.docx' },
 	})->status_is(415)
 	  ->json_has('/error');
 	delete $ledger{'POST./upload.415'};
@@ -537,15 +569,172 @@ subtest 'GET /graph -- all-text Y column returns 200 with No plottable data' => 
 };
 
 # ---------------------------------------------------------------------------
+# Additional coverage: combine_tables, JSON export, graph error paths,
+# clear_uploads, export write failure, view/open error rendering,
+# and DataSource::selectall_arrayref.
+# ---------------------------------------------------------------------------
+
+subtest 'DataSource.selectall_arrayref -- returns arrayref of hashrefs' => sub {
+	# selectall_arrayref is the low-level method fetch_all delegates to.
+	# It must return an arrayref (never undef) for a well-formed file.
+	my $ds = Database::BI::Model::DataSource->new(
+		directory => $DATA_DIR,
+		table     => $SALES_TABLE,
+	);
+	my $rows;
+	lives_ok { $rows = $ds->selectall_arrayref } 'selectall_arrayref() lives';
+	isa_ok $rows, 'ARRAY', 'selectall_arrayref() returns an arrayref';
+	if (@$rows) {
+		isa_ok $rows->[0], 'HASH', 'first element is a hashref when rows present';
+	}
+	delete $ledger{'DataSource.selectall_arrayref'};
+};
+
+# ---  GET /view error rendering  --------------------------------------------
+
+subtest 'GET /view/:table -- fetch_all error renders home with error_table_open' => sub {
+	# When the DataSource backend throws during fetch_all, the controller must
+	# catch the exception (inside its eval block) and re-render the home page
+	# with the error_table_open message rather than propagating a 500.
+	mock 'Database::BI::Model::DataSource::fetch_all' => sub {
+		die "Simulated backend failure\n";
+	};
+	$t->get_ok("/view/$SALES_TABLE")
+	  ->status_is(200, 'renders 200 (home page) when fetch_all throws')
+	  ->content_type_like(qr{text/html}, 'response is HTML')
+	  ->content_like(qr/Could not open table/i, 'error_table_open message present');
+	restore_all();
+	delete $ledger{'GET./view.error_table_open'};
+};
+
+# ---  GET /open error rendering  --------------------------------------------
+
+subtest 'GET /open?path= -- fetch_all error renders home with error_file_open' => sub {
+	# open_file wraps open_table+fetch_all in eval; a DataSource throw must
+	# surface as error_file_open on the home page, not as a 500.
+	SKIP: {
+		skip 'data/sales.csv not found', 4 unless -f $SALES_CSV;
+		my $enc = url_escape($SALES_CSV);
+		mock 'Database::BI::Model::DataSource::fetch_all' => sub {
+			die "Simulated read error\n";
+		};
+		$t->get_ok("/open?path=$enc")
+		  ->status_is(200, 'renders 200 (home page) when fetch_all throws')
+		  ->content_type_like(qr{text/html}, 'response is HTML')
+		  ->content_like(qr/Could not open/i, 'error_file_open message present');
+		restore_all();
+	}
+	delete $ledger{'GET./open.error_file_open'};
+};
+
+# ---  GET /combine  ---------------------------------------------------------
+
+subtest 'GET /combine?l=table:sales -- 200 HTML combined view' => sub {
+	# combine_tables with only the left table renders the dashboard template
+	# with all left-table rows (no stacking, no dedup).
+	$t->get_ok("/combine?l=table:$SALES_TABLE")
+	  ->status_is(200, 'combine with left-only returns 200')
+	  ->content_type_like(qr{text/html}, 'response is HTML');
+	delete $ledger{'GET./combine.200'};
+};
+
+subtest 'GET /combine (no l= param) -- 404' => sub {
+	# Without a left-table spec the controller cannot open any source and
+	# must return 404 (Mojolicious reply->not_found).
+	$t->get_ok('/combine')->status_is(404);
+	delete $ledger{'GET./combine.404'};
+};
+
+# ---  GET /export?format=json  ----------------------------------------------
+
+subtest 'GET /export?l=table:sales&format=json -- 200 application/json' => sub {
+	# The JSON export format is documented in the POD alongside csv and sqlite.
+	# Verify it produces a JSON content type and a non-empty body.
+	$t->get_ok("/export?l=table:$SALES_TABLE&format=json")
+	  ->status_is(200, 'JSON export returns 200')
+	  ->content_type_like(qr{application/json}, 'content-type is JSON');
+	delete $ledger{'GET./export.json'};
+};
+
+# ---  GET /graph error paths  -----------------------------------------------
+
+subtest 'GET /graph (no x= or y=) -- 400 Missing x or y column parameter' => sub {
+	# graph_view checks for both x= and y= before opening the data source.
+	# Missing either produces an immediate 400 with a plain-text error.
+	$t->get_ok("/graph?l=table:$SALES_TABLE&x=product")
+	  ->status_is(400, '400 when y= is absent')
+	  ->content_like(qr/Missing x or y column parameter/, 'correct error text');
+	delete $ledger{'GET./graph.400.missing_param'};
+};
+
+subtest 'GET /graph?x=<unknown> -- 400 Column not found' => sub {
+	# If x= or y= names a column that does not exist in the result set,
+	# graph_view returns 400 with "Column not found: <name>".
+	$t->get_ok("/graph?l=table:$SALES_TABLE&x=no_such_col&y=amount")
+	  ->status_is(400, '400 when x= column does not exist')
+	  ->content_like(qr/Column not found/, 'correct error text');
+	delete $ledger{'GET./graph.400.col_not_found'};
+};
+
+subtest 'GET /graph (no l= param) -- 404 Could not open data source' => sub {
+	# Without a left-table spec the pipeline returns undef and graph_view
+	# renders a 404 plain-text response.
+	$t->get_ok('/graph?x=product&y=amount')
+	  ->status_is(404, '404 when no data source supplied')
+	  ->content_like(qr/Could not open data source/, 'correct error text');
+	delete $ledger{'GET./graph.404.no_source'};
+};
+
+# ---  POST /uploads/clear  --------------------------------------------------
+
+subtest 'POST /uploads/clear -- 200 JSON {freed, count}' => sub {
+	# clear_uploads deletes all staging files and returns disk-space accounting.
+	# The response is always 200 regardless of whether any files were present.
+	$t->post_ok('/uploads/clear')
+	  ->status_is(200, 'uploads clear always returns 200')
+	  ->json_has('/freed', 'freed key present')
+	  ->json_has('/count', 'count key present');
+	my $body = $t->tx->res->json;
+	cmp_ok $body->{freed}, '>=', 0, 'freed is non-negative';
+	cmp_ok $body->{count}, '>=', 0, 'count is non-negative';
+	delete $ledger{'POST./uploads_clear.200'};
+};
+
+# ---  POST /export write_failed  --------------------------------------------
+
+subtest 'POST /export -- write failure returns 500 JSON {error}' => sub {
+	# When the filesystem write inside export_write throws (e.g. disk full),
+	# the controller must catch the exception and return 500 with {error}.
+	# We simulate the failure by making the destination directory read-only.
+	my $dir = tempdir(CLEANUP => 1);
+
+	SKIP: {
+		skip 'Cannot simulate write failure as root', 3 unless $> != 0;
+		chmod(0555, $dir) or skip 'Cannot set directory read-only', 3;
+
+		$t->post_ok('/export', form => {
+			l        => "table:$SALES_TABLE",
+			dir      => $dir,
+			filename => 'out.csv',
+		})->status_is(500, '500 when write to read-only dir fails')
+		  ->json_has('/error', 'error key present in JSON response');
+		my $err = $t->tx->res->json('/error');
+		like $err, qr/Write failed/i, 'error message mentions Write failed';
+
+		chmod(0755, $dir);	# restore so CLEANUP can remove the dir
+	}
+	delete $ledger{'POST./export.write_failed'};
+};
+
+# ---------------------------------------------------------------------------
 # Ledger assertion — every documented state must have been exercised.
 # ---------------------------------------------------------------------------
-if (my @untested = sort keys %ledger) {
+if(my @untested = sort keys %ledger) {
 	for my $key (@untested) {
 		fail "Untested documented state: $key ($ledger{$key})";
 	}
-}
-else {
-	pass 'All documented API states covered by the test suite';
+} else {
+	pass('All documented API states covered by the test suite');
 }
 
-done_testing;
+done_testing();

@@ -20,9 +20,9 @@
 
 /* ---- Exception-safe lock guard for rdlock held across Perl API calls ---- */
 
-/* Release the lock, then drop the guard's depth.  A $obj->DESTROY from argument
- * magic during the hold left the free deferred so this could still run on a
- * live handle; perform it now the last lock is gone. */
+/* Release the lock and drop the depth; run a close that was deferred
+ * (pending_close) because a DESTROY arrived while a lock was held, so a free
+ * never lands mid-lock. */
 static void shm_guard_leave(ShmHandle *h) {
     if (--h->lock_depth == 0 && h->pending_close) shm_close_map_now(h);
 }
@@ -39,9 +39,10 @@ static void shm_rdunlock_cleanup(pTHX_ void *ptr) {
     SAVEDESTRUCTOR_X(shm_rdunlock_cleanup, (void*)(handle))
 
 /* ---- Exception-safe guard for a wrlock + seqlock write section ----
- * For batch writes that call SvIV/SvPV on caller SVs under the lock: a die()
- * from a tied or overloaded argument must not abandon the write lock with the
- * seqlock left odd, which self-deadlocks until stale-lock recovery. */
+ * Releases the write lock and closes the seqlock on scope exit, normal or by
+ * die(): a die() that left the seqlock odd would self-deadlock the map until
+ * stale-lock recovery.  Batch writes materialise their arguments before the
+ * lock, so no tied/overloaded magic runs inside the section. */
 static void shm_wrseq_unlock_cleanup(pTHX_ void *ptr) {
     ShmHandle *h = (ShmHandle *)ptr;
     shm_seqlock_write_end(&h->hdr->seq);
@@ -63,13 +64,31 @@ static void shm_free_cleanup(pTHX_ void *ptr) {
 }
 
 /* perl core refuses a filename holding an embedded NUL; the C API would stop at
- * it and act on a shorter path than the caller named -- so unlink($tainted)
- * could remove a different file. */
+ * it and act on a shorter path than the caller named -- so unlink could remove
+ * a different file.  The caller has run get-magic. */
 static const char *shm_path_arg(pTHX_ SV *sv, const char *what, const char *classname) {
     STRLEN len;
-    const char *p = SvPV(sv, len);
+    const char *p = SvPV_nomg(sv, len);
     if (memchr(p, '\0', len))
         croak("%s: %s contains an embedded NUL byte", classname, what);
+    return p;
+}
+
+/* A call that opens a file for writing, creates or removes one obeys taint mode
+ * as core open and sysopen do: tainted data anywhere in the statement so far --
+ * a path, a size, the file mode, a handle opened from tainted input -- is fatal
+ * under -T and a warning under -t.  Use it once every argument has been read.
+ * Reading by a tainted name is allowed. */
+#define SHM_TAINT_CHECK(op) STMT_START { TAINT_PROPER(op); } STMT_END
+
+static const char *shm_write_path_arg(pTHX_ SV *sv, const char *what,
+                                      const char *classname, const char *op) {
+    const char *p = shm_path_arg(aTHX_ sv, what, classname);
+    if (TAINT_get) {
+        /* a -t warning runs Perl code, which may free sv's buffer */
+        p = SvPVX(sv_2mortal(newSVpv(p, 0)));
+        SHM_TAINT_CHECK(op);
+    }
     return p;
 }
 
@@ -84,17 +103,24 @@ static const char *shm_path_arg(pTHX_ SV *sv, const char *what, const char *clas
 
 #define SHM_PATH_ARG(sv, what, classname) \
     (SvGETMAGIC(sv), SvOK(sv) ? shm_path_arg(aTHX_ (sv), (what), (classname)) : NULL)
+#define SHM_WRITE_PATH_ARG(sv, what, classname, method) \
+    (SvGETMAGIC(sv), SvOK(sv) ? shm_write_path_arg(aTHX_ (sv), (what), (classname), classname "->" method) : NULL)
 
 /* An unreachable LRU bound never evicts: the map fills and then refuses every
  * insert, or with a TTL reclaims expired slots instead.  Read it off the map,
- * not the arguments -- attaching ignores those. */
-#define CK_MAX_SIZE(map, classname) \
+ * not the arguments -- attaching ignores those.  A FATAL warning croaks, so
+ * `sv` must already own the handle: SAVEFREESV frees it on that croak, and the
+ * reference taken after the warning cancels the free otherwise. */
+#define CK_MAX_SIZE(map, classname, sv) \
     do { ShmHeader *_mh = (map)->shard_handles ? (map)->shard_handles[0]->hdr : (map)->hdr; \
-         if (_mh->max_size >= _mh->max_table_cap) \
+         if (_mh->max_size >= _mh->max_table_cap) { \
+            SAVEFREESV(sv); \
             Perl_ck_warner(aTHX_ packWARN(WARN_MISC), \
                   "%s: max_size %" UVuf " needs all %" UVuf " slots the map holds; " \
                   "LRU eviction will never trigger", \
-                  classname, (UV)_mh->max_size, (UV)_mh->max_table_cap); } while (0)
+                  classname, (UV)_mh->max_size, (UV)_mh->max_table_cap); \
+            SvREFCNT_inc_simple_void_NN(sv); \
+         } } while (0)
 
 #define EXTRACT_MAP(classname, sv) \
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
@@ -115,6 +141,11 @@ static const char *shm_path_arg(pTHX_ SV *sv, const char *what, const char *clas
     h = INT2PTR(ShmHandle*, SvIV(SvRV(sv))); \
     if (h != h0) croak("%s object replaced or destroyed during the call", classname)
 
+/* Copy a get-magical argument's string when another argument is read after it:
+ * that read may be the same tie's FETCH, which frees or rewrites this buffer. */
+#define SHM_COPY_IF_MAGICAL(sv, str, len) \
+    do { if (SvGMAGICAL(sv)) str = SvPVX(sv_2mortal(newSVpvn(str, len))); } while (0)
+
 #define EXTRACT_STR_KEY(sv) \
     STRLEN _klen; \
     const char* _kstr = SvPV(sv, _klen); \
@@ -134,6 +165,7 @@ static const char *shm_path_arg(pTHX_ SV *sv, const char *what, const char *clas
 
 #define EXTRACT_STR_EXPECTED_DESIRED(esv, dsv) \
     EXTRACT_STR_EXPECTED(esv); \
+    SHM_COPY_IF_MAGICAL(esv, _estr, _elen); \
     STRLEN _dlen; \
     const char* _dstr = SvPV(dsv, _dlen); \
     if (_dlen > SHM_MAX_STR_LEN) croak("desired value too long (max 1GB)"); \

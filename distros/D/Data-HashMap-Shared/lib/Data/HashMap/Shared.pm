@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -75,7 +75,7 @@ multiprocess data sharing on Linux. With opt-in B<LRU eviction> and
 B<per-key TTL> it doubles as a fast cross-process B<cache>; lookups take a
 lock-free seqlock fast path.
 
-B<Linux-only>. Requires 64-bit Perl.
+B<Linux-only>. Requires 64-bit Perl on a little-endian architecture.
 
 =head2 Features
 
@@ -136,8 +136,13 @@ C<II>/C<IS>/C<SI> a signed 64-bit range. A key or value outside the
 variant's range is B<silently truncated> to the low bits (two's
 complement), with no warning: on an C<I16> map, C<< $map->put(70000, ...) >>
 stores under key C<4464> (C<70000 & 0xFFFF>), so C<get(70000)> and
-C<get(4464)> address the same entry. C<incr>/C<decr> wrap the same way
-(C<32767 + 1> becomes C<-32768>). Pick a variant wide enough for your data.
+C<get(4464)> address the same entry. A number beyond the 64-bit range
+saturates first, as Perl's own integer conversion does, and is then truncated
+like any other: C<1e20> is stored as C<-1> and NaN as C<0> at every width;
+C<-1e20> becomes the most negative 64-bit value, which the 16- and 32-bit
+variants store as C<0>.
+C<incr>/C<decr> wrap the same way (C<32767 + 1> becomes C<-32768>). Pick a
+variant wide enough for your data.
 
 =head2 Constructor
 
@@ -161,7 +166,9 @@ C<new_memfd> creates an unlinked memfd-backed map whose file descriptor can be
 passed to another process (via C<SCM_RIGHTS>, C<fork>+C<exec>, or duped+open).
 C<new_from_fd> reopens such a descriptor. The descriptor you pass is
 duplicated (C<F_DUPFD_CLOEXEC>), so it stays yours to close and closing it
-does not disturb the handle. Both require a 64-bit Perl on Linux
+does not disturb the handle. Under taint mode a descriptor number that
+arrived through C<@ARGV> or C<%ENV> is tainted, so untaint it with a pattern
+match first, as for C<open>. Both require a 64-bit Perl on Linux
 (C<memfd_create(2)>).
 
 C<< $map->memfd >> goes the other way: it returns the handle's own descriptor,
@@ -213,8 +220,56 @@ before releasing the old one, so on a full arena it evicts the same way, never
 the entry it is replacing; without C<$max_size> it fails and leaves the entry
 as it was, even when the replacement is the same size as the value it replaces.
 
+Because blocks are never split or merged, freeing any number of small ones can
+never yield a large one. Compaction is what breaks that deadlock: the live
+blocks slide together under the write lock and the free space between them
+becomes one run again, which any class can then be cut from. So a map that has
+freed enough bytes, in the wrong classes, recovers instead of refusing the size
+it now wants -- at the cost of the store that discovered the problem, because
+the slide runs on the B<next> store, where nothing is half-allocated.
+
+What it cannot do is invent space. An arena whose live entries genuinely fill it
+has nothing to gather, and every store of a class it has no block for keeps
+failing; the answer there is a larger C<$arena_cap>, not compaction. Reaching
+that verdict costs a table scan, so a slide that recovers little is followed by
+a geometrically growing wait before another is tried, and one that recovers
+takes the map straight back to compacting on demand.
+
+Compaction reads the whole table and moves every live block, so it is priced
+like a resize rather than a lookup. A block only moves into space that lies
+wholly below it, which is the rule that makes an interrupted compaction safe,
+and it is also the limit on what a slide can do: where every hole is smaller
+than the block sitting above it -- small and large records alternating, say --
+nothing moves and almost nothing is gathered. That costs you the conversion, not
+the space. The holes stay on their class free lists and still serve their own
+class; what you do not get is them merged into a run some other class could use.
+
+One case does cost a little: a block sliding into the front of a larger hole
+leaves the rest of that hole behind it, and since holes are never merged, the
+remainder is now two smaller blocks where there was one. A store of the original
+size can be refused afterwards where it would have fitted before. No space is
+lost, and repeated compaction does not accumulate the effect, but if your
+workload has one size that must always fit, size C<$arena_cap> for it rather
+than relying on a slide to produce it.
+
+The trigger is per handle, not per map: the process whose store was refused is
+the one that compacts on its next store. A map written only by processes that
+store once and exit never reaches that next store, and a long-lived reader
+sharing the map never triggers it either. Call C<< $map->compact >> yourself in
+those designs; it slides immediately, returns the bytes reclaimed, and is the
+right tool whenever you know your own access pattern better than a refused
+store does.
+
+C<arena_used> is the arena's high-water mark, not a count of live bytes.
+Removing entries does not lower it. Three things do: a compaction, C<clear>,
+and the first insert after the map has become empty, which resets the arena
+whole because nothing can still be pointing into it.
+
 Keys and values of 7 bytes or fewer are stored inline and need no arena at all.
-A single key or value may be just under 1 GB; longer ones croak.
+A single key or value may be just under 1 GB; longer ones croak. A handle keeps
+a buffer as large as the largest value it has ever read, until the handle goes
+away: read one enormous value on a long-lived handle and it holds that much
+until you drop it.
 
 Optional C<$ttl> sets a default time-to-live in seconds for all entries.
 Expired entries are reclaimed lazily, by the next B<mutating> access to that key.
@@ -261,8 +316,11 @@ or rebuild.
 
 Optional C<$lru_skip> (0-99, default 0; 100 or more disables skipping, a
 negative value is rejected like any out-of-range size) reduces how often LRU
-promotion reorders the recency list -- higher values skip more. Promotion runs
-only where an operation updates an existing entry under the write lock
+promotion reorders the recency list. The value maps to a power-of-two rate, not
+a smooth percentage: below 50 it promotes on every update (strict LRU, like 0);
+50 promotes one update in two, 90 one in sixteen, 99 one in 128, with flat steps
+between those thresholds. Promotion runs only where an operation updates an
+existing entry under the write lock
 (C<put>/C<incr>/C<get_or_set> on a hit, the update family); C<get>,
 C<get_with_ttl> and C<get_multi> never promote, they set the lock-free accessed
 bit that clock eviction consumes; C<exists> sets neither, so a key probed only
@@ -353,6 +411,11 @@ supported.
 The batch ops (C<set_multi>, C<get_multi>, C<remove_multi>) dispatch each key
 to its shard independently, so on a sharded map a batch is B<not> atomic across
 shards (the "single lock" note in the API below applies to non-sharded maps).
+
+They read every argument before taking a lock, so a tied or overloaded
+argument's magic -- its C<FETCH>, or a stringify or numify overload -- runs
+before the lock. Magic that touches the same map is therefore safe: it
+completes rather than deadlocking on a lock the call is about to take.
 
 C<keys>, C<values>, C<items> and C<to_hash> go the other way: they hold every
 shard's read lock for the whole call, so they alone see a consistent snapshot
@@ -485,6 +548,9 @@ C<$expected> and was atomically replaced with C<$desired>; false if the key is
 missing or expired, the value did not match, or there is no room. See
 L</"String Keys/Values and UTF-8"> for the byte-only comparison rule.
 
+C<add> returns false both when the key is already present and when there is no
+room, so it cannot by itself tell them apart; check C<exists> if that matters.
+
 C<swap> returns the previous value, or C<undef> when the key did not exist -- and
 B<also> C<undef> when there is no room, in which case an existing key keeps its
 old value. It therefore cannot by itself tell a fresh insert from a failure;
@@ -589,13 +655,14 @@ Diagnostics:
 
     my $cap = shm_xx_capacity $map;           # current table capacity (slots)
     my $tb  = shm_xx_tombstones $map;         # tombstone count
-    my $au  = shm_xx_arena_used $map;         # arena high-water mark (0 for int-only)
+    my $au  = shm_xx_arena_used $map;         # arena high-water mark (see Storage)
     my $ac  = shm_xx_arena_cap $map;          # arena total capacity (0 for int-only)
     my $sz  = shm_xx_mmap_size $map;          # backing file size in bytes
     my $ok  = shm_xx_reserve $map, $n;        # pre-grow (false if exceeds max)
     my $ev  = shm_xx_stat_evictions $map;     # cumulative LRU eviction count
     my $ex  = shm_xx_stat_expired $map;       # cumulative TTL expiration count
     my $rc  = shm_xx_stat_recoveries $map;    # cumulative stale lock recovery count
+    my $n   = $map->compact;                 # reclaim the arena, returns bytes (method only)
     my $p   = $map->path;                    # backing file path (method only)
     my $s   = $map->stats;                   # hashref with all diagnostics in one call (not an atomic snapshot)
     # stats keys: size, capacity, max_entries, tombstones, mmap_size,
@@ -607,17 +674,21 @@ eviction, so a TTL cache under capacity pressure reports fewer evictions than
 the inserts that displaced an entry.
 
 C<set_multi>, C<get_multi>, C<remove_multi>, C<get_with_ttl>, C<stats>,
-C<path>, C<sync>, C<unlink>, C<freeze>, C<frozen>, C<readonly> and C<memfd> are
-method-only (no keyword form).
+C<compact>, C<path>, C<sync>, C<unlink>, C<freeze>, C<frozen>, C<readonly> and
+C<memfd> are method-only (no keyword form).
 
 Keywords take their arguments as a list, so a keyword that takes more than one
 argument must be written without parentheses around them:
 
     shm_ii_put $map, $key, $value;            # correct
-    shm_ii_put($map, $key, $value);           # error, usually at compile time
+    shm_ii_put($map, $key, $value);           # wrong
 
-A single-argument keyword accepts either form.  The method call
-C<< $map->put($key, $value) >> is always available if you prefer parentheses.
+The parenthesized form is a compile error unless at least as many items follow
+the call as the keyword still expects; then it takes those items as its
+remaining arguments and dies at run time with a usage message naming the
+underlying method, not the keyword. A single-argument keyword accepts either
+form. The method call C<< $map->put($key, $value) >> is always available if you
+prefer parentheses.
 
 C<keys>, C<values>, C<items>, C<each>, C<get_multi>, C<get_with_ttl>, C<pop>,
 C<shift>, C<drain>, C<flush_expired_partial> and the cursor's C<next> return
@@ -657,16 +728,20 @@ mattered.
 C<freeze> permanently seals a map's contents so it can be shipped and served
 read-only (it works on anonymous and memfd maps too, though only a file can be
 shipped). It takes the write lock and flushes the sealed header to disk, so the
-seal is durable. Afterwards every mutator on that
-handle croaks and the handle itself becomes read-only. A sharded map seals every
-shard file. Freezing is one-way; there is no unfreeze.
+seal is durable. Afterwards every mutator on that handle croaks and the handle
+itself becomes read-only. A sharded map seals every shard file. Freezing is
+one-way; there is no unfreeze. If the flush fails, C<freeze> dies with the
+error: the map is sealed all the same, the handle is not marked read-only, and
+C<sync> retries the flush.
 
 B<Quiesce your writers first.> A mutator tests the seal on entry and takes the
 write lock afterwards, so another process already inside a mutating call when
 C<freeze> runs completes its write after the seal: the sealed file changes once
-more, and a C<new_readonly> reader can observe it. Seal a map only when nothing
-else is writing to it; C<freeze> cannot detect a writer that has passed the
-check but not yet reached the lock.
+more, and a C<new_readonly> reader can observe it -- torn, since only C<get>
+and C<exists> re-read under the seqlock; every other read-only query takes no
+lock on a read-only handle. Seal a map only when nothing else is writing to
+it; C<freeze> cannot detect a writer that has passed the check but not yet
+reached the lock.
 
 On a sharded map this is not one straggling write. Whole-map and batch
 operations -- C<set_multi>, C<remove_multi>, C<clear>, C<drain>, C<pop>,
@@ -692,12 +767,17 @@ older release is simply not frozen and opens read-write exactly as before.
 
 The two modes never mix: opening a frozen file read-write (C<new>,
 C<new_from_fd>) is refused -- open it with C<new_readonly> instead -- and
-C<new_readonly> refuses a file that has not been frozen.
+C<new_readonly> refuses a file that has not been frozen.  A frozen memfd has no
+file for C<new_readonly> to open, so only processes already attached can read
+it.
 
 C<new_readonly> is for a single backing file, and there is no read-only sharded
 constructor, so C<freeze> on a sharded map seals a set that no constructor will
 reopen: C<new_sharded> refuses the frozen shards, and reading it back means
-opening each shard file by name and probing them. Freeze single-file maps.
+opening each shard file by name and probing them. Freeze single-file maps. A
+freezer killed part-way leaves the first shards sealed and the rest not:
+C<freeze> on a handle still open to the set finishes it, as does C<freeze> on
+each unsealed shard opened by name with C<new>.
 
 B<Portability>: a frozen file is a raw memory image. Read it back on the B<same
 architecture> that wrote it (same word size and endianness; the native magic and
@@ -722,28 +802,44 @@ simultaneous handles per map, a handle that cannot claim a slot proceeds
 recovery cannot cover.
 
 The same path validates and rebuilds the LRU doubly-linked list if a
-dead writer left it inconsistent.  C<stat_recoveries> in C<stats> counts stale
-B<write>-lock recoveries; a dead reader drained by a writer is not counted, so
-the counter staying at zero does not mean nothing has been recovered.
+dead writer left it inconsistent.  A writer killed while compacting the arena
+needs no repair: the free lists are cleared before anything moves, and a block
+is relocated only into space that lies wholly below it, so at every instant each
+entry names bytes that are intact and complete.  All that is lost is free space
+the cleared lists held that had not been relisted yet; it comes back only when a
+later compaction slides blocks down over it or ends the arena below it, or when
+the map empties.  A writer killed inside C<clear> is repaired by the next insert.
+C<stat_recoveries> (C<recoveries> in C<stats>) counts stale B<write>-lock
+recoveries; a dead reader drained by a writer is not counted, so the counter
+staying at zero does not mean nothing has been recovered.
 
 Recovery uses C<kill($pid, 0)> for liveness, which cannot tell a reused PID from
 the original -- and the lock word lives in the file, so it lasts as long as the
 file does. Within one running system the risk is small: the holder must die in
 the window it holds the lock B<and> the kernel must reissue that exact PID to a
-long-lived process before the next waiter looks.
+long-lived process before the next waiter looks. A holder that exited but has
+not been reaped is a zombie, which C<kill(0)> reports alive; C</proc> resolves
+it, so recovery is immediate where C</proc> is readable and waits for the
+reaper where it is hidden or absent.
 
 It is B<not> small once the file outlives the PID space that wrote it. A reboot,
 a container restart against a persisted volume, or a copy taken while a writer
 held the lock leaves a lock word naming a PID the new system may already have
-reissued. If it went to a long-lived process, every writer
+reissued. A process using the map that finds its own PID there repairs the
+lock, but if the PID went to any other long-lived process, every writer
 waits on a holder that will never release, unbounded and silent: no error, no
-warning, no timeout; readers wait too when the crash was mid-publish. Nothing in
-the API can break such a lock -- the file has to be recreated. A killed B<reader>
-strands its slot the same way, since that records a PID too, and the read lock
-is held by C<each>, C<keys>, C<values>, C<items> and, without LRU or TTL, by
-C<incr>, C<max> and C<min>. So carry a map across a reboot or a container
-restart only if every process that used it exited cleanly, and copy one only
-while nothing is using it.
+warning, no timeout. So does every call that takes the read lock, listed below,
+and C<get> and C<exists> too when the crash was mid-publish. A process stuck in
+that wait runs no Perl signal handler, since perl defers them until the call
+returns: only a signal that kills the process -- SIGKILL, or one such as
+SIGTERM with no C<%SIG> handler -- ends it. Nothing in the API can break such
+a lock -- the file has to be recreated. A killed B<reader> strands its slot the
+same way, whichever process its PID went to, since that records a PID too. The
+read lock is held by C<each>, C<keys>, C<values>, C<items>, C<to_hash>, C<get_multi>,
+cursors, C<get_with_ttl>, C<ttl_remaining> and, without LRU or TTL, by
+C<incr>, C<decr>, C<incr_by>, C<max> and C<min>. So
+carry a map across a reboot or a container restart only if every process that
+used it exited cleanly, and copy one only while nothing is using it.
 
 B<Limitation>: PID-based recovery assumes all processes share the same
 PID namespace. Cross-container sharing (different PID namespaces) is not
@@ -809,25 +905,26 @@ lookups/s.  (A pass can do more than the operation it is named for: DELETE
 refills the map first.)  The cross-process table further down is already in
 operations per second.  Run C<perl -Mblib bench/vs.pl 25000> to reproduce.
 
-B<Integer key -> integer value> (Shared::II):
+B<< Integer key -> integer value >> (Shared::II):
 
               BerkeleyDB   LMDB   Shared::II
     INSERT          30       44         280
     LOOKUP          38       38         353
     INCREMENT       16       17         247
 
-B<String key -> string value, short> (inline <= 7B, Shared::SS):
+B<< String key -> string value, short >> (inline <= 7B, Shared::SS):
 
               FastMmap   BerkeleyDB   LMDB   SharedMem   Shared::SS
     INSERT        17          30       43        64          189
     LOOKUP        15          35       36       154          220
     DELETE        --          15       19        34          101
 
-B<String key -> string value, long> (~50-100B, Shared::SS):
+B<< String key -> string value, long >> (~50-100B, Shared::SS), measured separately
+on a slower machine, so compare it only within itself:
 
               BerkeleyDB   LMDB   SharedMem   Shared::SS
-    INSERT        26         40        63          196
-    LOOKUP        34         35       136          248
+    INSERT        17         28        46          111
+    LOOKUP        23         25        92          139
 
 B<LRU cache lookup> (25K entries, lock-free clock eviction):
 
@@ -853,7 +950,7 @@ Key takeaways:
 
 =item * B<1.4x> faster than Hash::SharedMem for short string lookups (inline strings, no arena overhead)
 
-=item * B<1.8x> faster than Hash::SharedMem for long string lookups
+=item * B<1.5x> faster than Hash::SharedMem for long string lookups
 
 =item * B<4.4x> faster cross-process reads than LMDB; B<2.5x> faster writes than SharedMem
 
@@ -905,18 +1002,51 @@ to C<new>; the mode is applied when the file is created, and when a file left
 behind by an interrupted create is re-initialized (see L</"Crash Safety">); a
 file already in use keeps its own permissions. The file is opened with
 C<O_NOFOLLOW>, so a symlink planted at the path is refused, and created with
-C<O_EXCL>; the on-disk header is validated when the file is attached. Any
-process you grant write access to a shared mapping is trusted not to corrupt
-its contents while other processes are using it.
+C<O_EXCL>; the on-disk header is validated when the file is attached.
+
+C<new> and C<new_sharded> attach to a valid map already at the path, and
+C<new_readonly> to a frozen one, whoever created it; its owner keeps write
+access. So keep maps in a directory only the processes sharing them can write
+to: in a world-writable one such as F</tmp>, another local user can plant a map
+at a predictable name first, and C<fs.protected_regular> does not stop the
+attach (the exclusive create returns EEXIST before that check, and the attach
+open takes no C<O_CREAT>). Any process you grant write access to a shared
+mapping is trusted not to corrupt its contents while other processes are using
+it, and so is a map file from another party, frozen or not: open only files
+from a source you trust.
+
+Keys are hashed with xxHash (XXH3) and no seed, and a key's slot is the low
+bits of its hash, so anyone can work out which keys share a slot. A party that
+chooses the keys -- the subjects of a rate limiter, say -- can pile them into
+one probe run, and then every operation on a key whose slot falls in the run
+scans it: theirs, anyone else's, and a lookup of a key that is not there. Every
+write scans with the write lock held and the map marked mid-update -- counters
+on an LRU or TTL map included -- so other writers and every lock-free read of
+that map wait for it; a counter on a plain map scans under the read lock, which
+still keeps writers out. 4000 such keys made operations in the run ten to
+thirty times slower here, and the cost grows with their number. Where keys come
+from an untrusted party, pass them through a keyed hash first -- an HMAC under a
+secret, kept as a string key, since cutting it to 16 or 32 bits would instead
+give distinct subjects one key -- so their slots cannot be predicted.
+
+Under taint mode every call that opens a file for writing, creates or removes
+one refuses tainted data, as C<open> and C<sysopen> do (C<-t> makes that a warning):
+C<new> and C<new_sharded> given a path, whether the path, a size or the file
+mode is tainted; C<new_from_fd>, which maps the descriptor read-write; and
+C<unlink> in either form. C<new_readonly> only reads, and an anonymous or memfd
+map names no file, so those accept tainted input. A handle opened from tainted
+input is itself tainted: everything it returns is, and so is any statement
+that calls it, which is what refuses its C<unlink>. Values read through an
+untainted handle are not tainted, unlike input read by core I/O.
 
 Header validation does not extend to the entries themselves. A string offset or
-length that falls outside the arena yields an empty string, a zeroed value or no
-match rather than a read past the mapping, on the write-locked paths as much as
-on the lock-free reads. Only those arena bounds are enforced. The rest of a
-map's per-slot data -- the LRU links above all -- is trusted, so behaviour on a
-corrupted file is undefined: it may return wrong answers, crash, or write
-outside the mapping. Corruption is out of the threat model, not defended
-against.
+length outside the arena's allocatable range yields an empty string, a zeroed
+value or no match rather than a read past the mapping, on the write-locked
+paths as much as on the lock-free reads. Only those arena bounds are enforced.
+The rest of a map's per-slot data -- the LRU links above all -- is trusted, so
+behaviour on a corrupted file is undefined: it may return wrong answers, crash,
+or write outside the mapping. Corruption is out of the threat model, not
+defended against.
 
 A backing file written before 0.16 uses the previous on-disk format and is
 rejected with a version-mismatch error when attached; recreate the map from

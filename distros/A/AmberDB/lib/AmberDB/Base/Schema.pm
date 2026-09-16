@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use File::Spec;
 use parent 'AmberDB::Base';
 
-our $VERSION = '5.25.1';
+our $VERSION = '5.25.2';
 
 my $CREATED = '2026-09-06';
 

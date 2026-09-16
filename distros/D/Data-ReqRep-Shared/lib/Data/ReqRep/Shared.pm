@@ -1,7 +1,7 @@
 package Data::ReqRep::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Data::ReqRep::Shared', $VERSION);
@@ -110,7 +110,8 @@ request path.
 
 Both variants share the same response slot infrastructure, the same
 generation-counter ABA protection, the same eventfd integration, and
-the same crash recovery mechanisms.
+the same response-slot crash recovery. Their request queues differ: see
+L</CRASH SAFETY>.
 
 =head2 Constructors
 
@@ -144,7 +145,7 @@ an integer.
     my $ok = $srv->reply($id, $response);
 
 Writes response and wakes the client. Returns false if the slot was
-cancelled or recycled (generation mismatch).
+cancelled or recycled (generation mismatch), or if C<$id> names no slot.
 
 B<Batch> (Str only):
 
@@ -186,8 +187,12 @@ B<Asynchronous>:
     my $resp = $cli->get_wait($id, $secs);       # blocking
     $cli->cancel($id);                           # abandon request
 
-C<cancel> releases the slot only if the reply hasn't arrived yet. If
-it has (state is READY), cancel is a no-op -- call C<get()> to drain.
+C<cancel> releases the slot only if the reply hasn't arrived yet. If it
+has, cancel is a no-op -- call C<get()> to drain, or the slot stays held
+until the client exits. A reply still being copied in does not delay
+C<cancel>: the responder frees the slot when its copy finishes.
+C<req_wait> and C<get_wait> do the cancel-and-drain for you; only a
+hand-rolled send/cancel loop needs it.
 
 B<Convenience> (Str only):
 
@@ -224,6 +229,9 @@ C<send>/C<reply> do not signal automatically.
     $cli->eventfd;                  # create (maps to reply fd)
     $cli->eventfd_consume;          # drain in callback
     $cli->eventfd_set($fd);         # set inherited fd
+
+The C<*_eventfd_set> methods duplicate the descriptor, as C<new_from_fd>
+does: the one you pass stays yours to close. One that is not open croaks.
 
 For cross-process use, create both eventfds B<before> C<fork()> so
 child inherits the fds:
@@ -318,6 +326,40 @@ halves throughput).
 
 =head1 CRASH SAFETY
 
+Response slots are recovered from dead owners, and the Str request queue
+recovers a mutex held by a dead process. B<The Int request queue is not
+crash-safe>: it is lock-free, and a producer or consumer killed between
+claiming a queue position and publishing its sequence number leaves a hole
+that wedges the queue from that position on. Nothing reclaims it -- C<clear>
+is the only recovery. C<clear> on the Int variant is likewise safe only when
+no peer is mid-enqueue; the Str variant takes the mutex and has no such
+caveat.
+
+Destroying a client with requests still in flight abandons their slots: they
+are held by a live process, so death-based recovery never reclaims them, and
+they stay held until that process exits. Drain or C<cancel> outstanding ids
+before dropping a client in a long-lived process.
+
+A slot's generation counter is 32-bit. It guards against a stale id being
+honoured after the slot is recycled, which it does for any realistic run;
+after 2^32 re-acquisitions of the same slot an ancient id would compare equal
+again.
+
+Recovery tells a dead process from a live one with C<kill($pid, 0)>, so a PID
+reused before recovery runs is taken for the process that died. Until that
+unrelated process exits, a Str queue mutex its predecessor held stays held --
+every Str C<send> and C<recv> blocks -- and a response slot it held is not
+recovered. Linux hands out PIDs in sequence, so this needs the PID space to
+wrap between the death and the next attempt to recover; a larger
+C<kernel.pid_max> makes it rarer.
+
+A responder killed in the few instructions between claiming a reply slot and
+recording its PID leaves that slot held until C<clear>, which gives the PID two
+seconds to appear before reclaiming it. Nothing else can tell it from a
+responder merely descheduled there, and reclaiming a live one would deliver its
+reply to the wrong request. For the same reason C<clear> leaves a slot a live
+responder is still writing into to that responder, which frees it when done.
+
 An interrupted create is recovered too. A creator killed after the backing
 file is sized but before its header is committed leaves a full-size, all-zero
 file. C<new> re-initializes such a file automatically, but only when it is
@@ -329,6 +371,33 @@ by an interrupted create; remove it and retry>. A file left behind by an
 interrupted create never held data, so removing it is safe -- but a file whose
 header was corrupted after the fact reaches the same croak, so confirm it is
 an abandoned create before deleting anything you care about.
+
+=head1 CONTAINERS
+
+Stale-slot and stale-mutex recovery identify peers by PID, and a PID only means
+something inside one PID namespace. A peer attaching from another namespace
+would read live processes as dead -- taking their slots and misdelivering
+replies -- and unrelated local processes as alive, never recovering a real
+casualty. None of that is detectable after the fact, so C<new> refuses it: the
+header records the creating process's PID namespace and the current boot id,
+and attaching from anywhere else croaks.
+
+B<All peers must therefore share a PID namespace> -- C<docker run
+--pid=container:NAME>, or a Kubernetes pod with C<shareProcessNamespace: true>.
+Sharing only the filesystem or the IPC namespace is not enough. The same check
+rejects a file left over from a previous boot, whose recorded PIDs now name
+unrelated processes.
+
+Set C<DATA_REQREP_SHARED_UNSAFE_PIDNS=1> to attach anyway. Only do that if you
+do not depend on recovery -- for example a fixed set of peers that never die
+mid-request -- because the failure mode it re-enables is silent corruption.
+
+For sharing across containers without a shared filesystem, create the segment
+with C<new_memfd> and pass the descriptor over a unix socket with
+C<SCM_RIGHTS>; a memfd crosses namespaces natively. If you use a file, note
+that a container's default C</dev/shm> is often only 64 MB. Under a user
+namespace, C<new>'s ownership checks compare uids I<as mapped in the caller's
+namespace>, so peers need a common id mapping.
 
 =head1 SEE ALSO
 
@@ -370,7 +439,10 @@ when the file is created, and when a file left behind by an interrupted create
 is re-initialized (see L</CRASH SAFETY>); a file already in use keeps its own
 permissions. The file is opened with C<O_NOFOLLOW>, so a symlink planted at
 the path is refused, and created with C<O_EXCL>; the on-disk header is
-validated when the file is attached. Any process you grant write access to a
+validated when the file is attached. Attaching refuses a world-writable file
+owned by another user; share with a group mode such as C<0660> instead. Any
+process that can open the file can hold its lock, so C<new> waits for the lock
+for at most 10 seconds and then croaks. Any process you grant write access to a
 shared mapping is trusted not to corrupt its contents while other processes
 are using it.
 

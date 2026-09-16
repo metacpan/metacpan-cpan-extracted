@@ -9,7 +9,7 @@ use Data::HashMap::Shared::SS;
 # Anchored on the message: croak appends " at t/25-frozen.t line N" to
 # everything raised here, so a bare /frozen|read-only/ matches any exception
 # this file provokes, from any check.
-my $FROZEN = qr/is frozen \(read-only\)|cannot freeze a read-only handle/;
+my $FROZEN = qr/is frozen \(read-only\)/;
 
 # Frozen (read-only) mode: freeze() seals a file-backed map immutable; a consumer
 # opens it with new_readonly (O_RDONLY / PROT_READ) and queries it lock-free.
@@ -359,6 +359,7 @@ like exception(sub { Data::HashMap::Shared::SS->new_readonly($path) }),
                 set_multi    => sub { $m->set_multi($k, $val) },
                 remove_multi => sub { $m->remove_multi($k) },
                 reserve      => sub { $m->reserve(1 << 20) },
+                compact      => sub { $m->compact },
                 flush_expired         => sub { $m->flush_expired },
                 flush_expired_partial => sub { $m->flush_expired_partial(8) },
                 freeze       => sub { $m->freeze },

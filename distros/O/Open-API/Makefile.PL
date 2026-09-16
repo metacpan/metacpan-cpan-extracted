@@ -27,7 +27,16 @@ $pkg->install('include/oa_abi.h');                     # provide oa_abi.h
 mkdir 'Install' unless -d 'Install';
 $pkg->save_config('Install/Files.pm');
 my %dep = $pkg->get_makefile_vars;
-$INC .= ' ' . delete $dep{INC} if $dep{INC};           # merge consumer inc
+# Always REMOVE dep{INC}, then merge it only if it says anything. %dep is
+# spread after `INC => $INC` below, so an INC left in it wins - and on the
+# sibling-directory fallback EU::Depends returns an EMPTY one, which a
+# `delete ... if $dep{INC}` guard never removes because '' is false. The
+# result was a Makefile with `INC = `, and API.xs unable to find oa.h. Same
+# reasoning as the LIBS/LDFROM deletes below, which are unconditional.
+{
+    my $dinc = delete $dep{INC};
+    $INC .= " $dinc" if defined $dinc && length $dinc;  # merge consumer inc
+}
 # EU::Depends returns an empty LIBS/LDFROM that would otherwise clobber
 # MakeMaker's defaults; Open::API links nothing extra, so drop them.
 delete $dep{LIBS};
@@ -85,6 +94,9 @@ my %WriteMakefileArgs = (
             },
         },
     },
+    # the compliance matrix lives in t/compliance/ beside its expected-fail
+    # list, so it needs naming explicitly: the default glob is t/*.t
+    test  => { TESTS => 't/*.t t/compliance/*.t' },
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Open-API-* Install/Files.pm' },

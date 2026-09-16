@@ -1,0 +1,18 @@
+requires 'perl', '5.010';
+
+# The house object system, as in Game::Checkers and Game::Backgammon. The only
+# non-core prerequisite: Digest::SHA is core and is all the deal needs.
+requires 'Object::Proto::Sugar', '0.05';
+
+on test => sub {
+    requires 'Test::More', '0';
+};
+
+on develop => sub {
+    # Without these the author tests SKIP, which is worse than failing: a
+    # skipped check is one nobody notices is not running. t/manifest.t shipped
+    # for three phases while MANIFEST was missing half the distribution.
+    requires 'Test::Pod', '1.22';
+    requires 'Test::Pod::Coverage', '1.08';
+    requires 'Test::CheckManifest', '0.9';
+};

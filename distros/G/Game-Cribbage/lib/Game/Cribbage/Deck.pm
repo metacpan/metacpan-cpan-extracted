@@ -45,6 +45,32 @@ sub shuffle {
 	$_[0];
 }
 
+sub from_order {
+	my ($self, $ids) = @_;
+	die 'from_order wants an arrayref of 52 card ids'
+		unless ref $ids eq 'ARRAY' && @{$ids} == 52;
+	my %card;
+	my $i = 0;
+	for my $suit (qw/H S D C/) {
+		for ('A', 2 .. 10, 'J', 'Q', 'K') {
+			$i++;
+			$card{$i} = Game::Cribbage::Deck::Card->new(
+				suit => $suit,
+				symbol => $_,
+				id => $i
+			);
+		}
+	}
+	my @deck;
+	for (@{$ids}) {
+		my $c = delete $card{$_}
+			or die "from_order: card id $_ is out of range or repeated";
+		push @deck, $c;
+	}
+	$self->deck(\@deck);
+	$self;
+}
+
 sub draw {
 	shift @{$_[0]->deck}
 }
@@ -105,7 +131,7 @@ Game::Cribbage::Deck - deck of cards
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 
@@ -116,6 +142,8 @@ Version 0.12
 	my $deck = Game::Cribbage::Deck->new();
 
 	$deck->shuffle();
+
+	$deck->from_order([1 .. 52]);   # a deck in a known order
 
 	$deck->draw();
 
@@ -147,6 +175,16 @@ Reset the deck to 52 cards. This is just a wrapper around the shuffle function.
 Resets the deck to 52 cards and shuffles them. Each time this function is called it resets the deck property.
 
 	$deck->shuffle;
+
+=head2 from_order
+
+Replace the deck with the 52 cards in the order of the given card ids, the
+first id on top. Ids are the ones C<shuffle> assigns: suit-major hearts,
+spades, diamonds, clubs, ace to king, so 1 is the ace of hearts and 52 the
+king of clubs. A list that is not a permutation of 1 to 52 dies. This is how
+a game dealt from a recorded or seeded order is replayed.
+
+	$deck->from_order(\@ids);
 
 =head2 draw
 

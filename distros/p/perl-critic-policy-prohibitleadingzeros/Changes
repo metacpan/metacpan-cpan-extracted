@@ -1,0 +1,7 @@
+Revision history for perl-critic-policy-prohibitleadingzeros
+
+1.000 2026-09-15 TEODESIAN
+    - Initial Release, forked from Perl::Critic::Policy::Plicease::ProhibitLeadingZeros 0.10
+    - A configurable 'allow' list of functions and methods, added to the built-in one
+    - umask, mkdir, make_path, sysopen and dbmopen allowed by default, beside chmod and mkpath
+    - No more "uninitialized value" warning on a call that ends its block

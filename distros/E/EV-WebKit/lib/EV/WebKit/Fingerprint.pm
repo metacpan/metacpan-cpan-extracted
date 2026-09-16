@@ -1,6 +1,6 @@
 package EV::WebKit::Fingerprint;
 use v5.10; use strict; use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use File::ShareDir ();
 use Carp ();
 use Glib ();
@@ -340,7 +340,7 @@ sub profiles { return sort keys %PRESET }
 # Map each preset to the curl-impersonate target with the matching TLS/HTTP2
 # fingerprint. curl ships only macOS desktop Chrome + Android Chrome, but
 # Windows/macOS Chrome share an identical ClientHello (JA4 is OS-independent), so
-# windows-chrome also uses chrome131 -- the OS lives in override_headers, not the
+# windows-chrome also uses chrome150 -- the OS lives in override_headers, not the
 # TLS. Consumed by EV::WebKit's network_fingerprint wiring.
 my %CURL_TARGET = (
     'windows-chrome'  => 'chrome150',
@@ -356,7 +356,7 @@ sub curl_target { $CURL_TARGET{ $_[0] // '' } }
 # The identity headers (User-Agent + Chrome client hints) a resolved profile
 # should present to origins. The proxy forces these over curl's target defaults
 # so the origin-seen OS/UA matches the JS layer -- e.g. Windows Chrome on the
-# macOS-flavored chrome131 target. Safari profiles (no ua_data) carry just the UA.
+# macOS-flavored chrome150 target. Safari profiles (no ua_data) carry just the UA.
 # Chrome renders navigator.languages as Accept-Language "en-US,en;q=0.9,..." --
 # the first tag unweighted, each later tag q = 1 - 0.1*i (floored at 0.1),
 # formatted without trailing zeros. The proxy no longer forwards WebKit's own
@@ -611,7 +611,7 @@ EV::WebKit::Fingerprint - profile data behind EV::WebKit's fingerprint option
 =head1 DESCRIPTION
 
 The preset device profiles (C<windows-chrome>, C<macos-safari>,
-C<iphone-safari>, C<pixel-chrome>), their validation, and the marshalling that
+C<iphone-safari>, C<windows-firefox>, C<pixel-chrome>), their validation, and the marshalling that
 hands them to the bundled web-process extension. Used by L<EV::WebKit>. You do
 not normally touch it directly: pass C<< fingerprint => >> to
 L<EV::WebKit/new> and read L<EV::WebKit/fingerprint> back, which is also where

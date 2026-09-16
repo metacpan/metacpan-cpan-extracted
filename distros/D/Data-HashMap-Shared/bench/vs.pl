@@ -54,16 +54,6 @@ my $seq = 0;
 sub tmppath { "$TMPDIR/b" . $seq++ }
 sub commify { my $n = reverse $_[0]; $n =~ s/(\d{3})(?=\d)/$1,/g; scalar reverse $n }
 
-sub cleanup_shm {
-    for my $ref (@_) {
-        if (ref $ref eq 'ARRAY') {
-            my ($map_ref, $path) = @$ref;
-            undef $$map_ref;
-            unlink $path if defined $path;
-        }
-    }
-}
-
 sub mk_lmdb {
     my $dir = tmppath();
     mkdir $dir;
@@ -320,9 +310,12 @@ my (@sk, @sv, @lk, @lv);
 for my $i (1 .. $N) {
     push @sk, "k$i";                                # 2-6 bytes (inline)
     push @sv, "v$i";                                # 2-6 bytes (inline)
-    push @lk, sprintf("key_%040d", $i);             # 45 bytes (arena)
+    push @lk, sprintf("key_%040d", $i);             # 44 bytes (arena)
     push @lv, sprintf("val_%040d_%s", $i, "x" x 50); # ~96 bytes (arena)
 }
+# A long entry takes a 64 B key block and a 128 B value block, more than the
+# default arena's 128 B per entry.
+my $LONG_ARENA = $N * 256;
 
 print "\n", "=" x 70, "\n";
 print "STRING KEY -> STRING VALUE — SHORT (inline ≤7B)  ($N entries)\n";
@@ -513,7 +506,7 @@ print "INSERT (long strings)\n";
 print "-" x 70, "\n";
 {
     my %bench;
-    my $p = tmppath(); my $m = Data::HashMap::Shared::SS->new($p, $N);
+    my $p = tmppath(); my $m = Data::HashMap::Shared::SS->new($p, $N, 0, 0, 0, $LONG_ARENA);
     $bench{'Shared::SS'} = sub {
         shm_ss_clear $m;
         for my $i (0 .. $#lk) { shm_ss_put $m, $lk[$i], $lv[$i]; }
@@ -553,7 +546,7 @@ print "LOOKUP (long strings)\n";
 print "-" x 70, "\n";
 {
     my $p = tmppath();
-    my $m = Data::HashMap::Shared::SS->new($p, $N);
+    my $m = Data::HashMap::Shared::SS->new($p, $N, 0, 0, 0, $LONG_ARENA);
     for my $i (0 .. $#lk) { shm_ss_put $m, $lk[$i], $lv[$i]; }
 
     my ($hsm, $hsm_dir);

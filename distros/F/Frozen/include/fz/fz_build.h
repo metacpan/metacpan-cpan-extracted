@@ -136,12 +136,20 @@ static uint32_t fz_emit_u64(pTHX_ fz_builder *B, UV v) {
     return off;
 }
 
+static int fz_is_finite(NV v) {
+    return v == v && (v == 0 || v + v != v);
+}
+
 static uint32_t fz_emit_nv(pTHX_ fz_builder *B, NV v) {
     uint32_t off;
     double d = (double)v;
 
-    if (!(B->flags & FZ_F_LOSSY_NV) && (NV)d != v && v == v)
-        fz_croak(aTHX_ B, "an NV that does not fit a double (pass lossy_nv => 1 to narrow it)");
+    if (!(B->flags & FZ_F_LOSSY_NV) && fz_is_finite(v)) {
+        if (!fz_is_finite((NV)d))
+            fz_croak(aTHX_ B, "an NV too large for a double (pass lossy_nv => 1 to store it as an infinity)");
+        if (d == 0.0 && v != 0)
+            fz_croak(aTHX_ B, "an NV too small for a double (pass lossy_nv => 1 to store it as a zero)");
+    }
     if (!fz_buf_align(&B->buf)) fz_croak(aTHX_ B, "the block would exceed 2 GiB");
     off = (uint32_t)B->buf.len;
     if (!fz_buf_put(&B->buf, &d, sizeof d)) fz_croak(aTHX_ B, "the block would exceed 2 GiB");
@@ -324,6 +332,12 @@ static int fz_is_bool(pTHX_ SV *sv, int *out) {
     return 0;
 }
 
+static uint32_t fz_int_slot(pTHX_ fz_builder *B, SV *sv) {
+    if (SvIsUV(sv) && SvUV(sv) > (UV)IV_MAX)
+        return FZ_SLOT(FZ_T_UINT, fz_emit_u64(aTHX_ B, SvUV(sv)));
+    return FZ_SLOT(FZ_T_INT, fz_emit_i64(aTHX_ B, SvIV(sv)));
+}
+
 static uint32_t fz_emit(pTHX_ fz_builder *B, SV *sv) {
     int b;
 
@@ -382,13 +396,14 @@ static uint32_t fz_emit(pTHX_ fz_builder *B, SV *sv) {
     if ((B->flags & FZ_F_STRINGIFY) && SvOK(sv))
         return FZ_SLOT(FZ_T_STR, fz_emit_str(aTHX_ B, sv));
 
-    if (SvPOKp(sv)) return FZ_SLOT(FZ_T_STR,  fz_emit_str(aTHX_ B, sv));
-    if (SvIOKp(sv)) {
-        if (SvIsUV(sv) && SvUV(sv) > (UV)IV_MAX)
-            return FZ_SLOT(FZ_T_UINT, fz_emit_u64(aTHX_ B, SvUV(sv)));
-        return FZ_SLOT(FZ_T_INT, fz_emit_i64(aTHX_ B, SvIV(sv)));
-    }
+    if (SvPOK(sv)) return FZ_SLOT(FZ_T_STR, fz_emit_str(aTHX_ B, sv));
+    if (SvIOK(sv)) return fz_int_slot(aTHX_ B, sv);
+    if (SvNOK(sv)) return FZ_SLOT(FZ_T_NUM, fz_emit_nv(aTHX_ B, SvNV(sv)));
+
+    if (SvPOKp(sv)) return FZ_SLOT(FZ_T_STR, fz_emit_str(aTHX_ B, sv));
+    if (SvIOKp(sv)) return fz_int_slot(aTHX_ B, sv);
     if (SvNOKp(sv)) return FZ_SLOT(FZ_T_NUM, fz_emit_nv(aTHX_ B, SvNV(sv)));
+
     return FZ_SLOT(FZ_T_STR, fz_emit_str(aTHX_ B, sv));
 }
 

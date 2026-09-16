@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+README
+lib/Crypt/SelfCertificate.pm
+lib/Crypt/SelfCertificate/sample/cert.pem
+lib/Crypt/SelfCertificate/sample/key.pem
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

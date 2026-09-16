@@ -1,5 +1,21 @@
 Revision history for Data-ReqRep-Shared
 
+0.08      2026-09-15
+          - Incompatible on-disk format: recreate existing files.
+          - Refuse attaching across PID namespaces or boots (see CONTAINERS).
+          - Refuse a world-writable file owned by another user.
+          - Fix slot leaks and lost or misdelivered replies when a cancel,
+            timeout, clear or crash recovery raced a reply.
+          - Fix crash recovery losing a slot when the recoverer is killed.
+          - Fix lost wakeups in send_wait and get_wait.
+          - Fix recv_multi, recv_wait_multi and drain losing requests on OOM.
+          - Fix recv_wait_multi(0) taking a request.
+          - Fix a worker killed mid-receive corrupting the next request.
+          - reply returns false for a corrupt id instead of croaking.
+          - new croaks after 10s instead of hanging on a held file lock.
+          - Recover a lock left ownerless by a corrupt file instead of hanging.
+          - eventfd setters keep their own duplicate of the descriptor.
+
 0.07      2026-08-12
           - Fix a client receiving another client's reply. A reply copied its
             payload into the response slot before claiming it, so a cancel and

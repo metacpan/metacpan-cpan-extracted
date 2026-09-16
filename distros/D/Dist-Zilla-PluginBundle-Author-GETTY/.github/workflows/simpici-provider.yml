@@ -1,0 +1,36 @@
+name: simpici-provider
+
+# Build and publish the SimpiCI provider image (see simpici-provider/). Consumers
+# reference it as `provider: ghcr.io/getty/simpici-dzil-provider:main`.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'simpici-provider/**'
+      - '.github/workflows/simpici-provider.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: simpici-provider
+          file: simpici-provider/Containerfile
+          push: true
+          tags: |
+            ghcr.io/getty/simpici-dzil-provider:main
+            ghcr.io/getty/simpici-dzil-provider:${{ github.sha }}

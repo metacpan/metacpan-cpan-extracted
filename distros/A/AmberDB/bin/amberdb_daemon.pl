@@ -255,7 +255,7 @@ sub cmd_status {
 
     # RAM-disk status
     my $setup_info = eval { $adb->ramdisk_setup() } // {};
-    my $is_mounted = $setup_info->{is_mounted} || $adb->config('ramdisk_mounted') || 0;
+    my $is_mounted = $adb->config('ramdisk_mounted') || 0;
     print "RAM-Disk Status  : " . ( $is_mounted ? "MOUNTED (" . ($setup_info->{mount_desc} // 'active') . ")" : "UNMOUNTED" ) . "\n";
     print "RAM-Disk Path    : " . ( $setup_info->{ramdisk_dir} // '-' ) . "\n";
 

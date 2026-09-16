@@ -3,7 +3,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # A remote element. The real EV::WebKit::Element lives in the browser process;
 # this is a handle to it, and the same methods, each one an el.* request.

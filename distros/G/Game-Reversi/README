@@ -1,0 +1,22 @@
+Game-Reversi
+
+Reversi: two players, an 8x8 board, and discs that turn when outflanked.
+
+This is Reversi rather than Othello, and the difference is the opening. Othello
+starts with four discs already on the centre diagonals. Reversi starts empty and
+the players place those four discs themselves, which produces six distinct
+positions rather than one. That opening is the default here, and it is why the
+distribution can carry this name: "Othello" is a registered trademark, Reversi is
+the free ancestor.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+This is free software, licensed under the Artistic License 2.0.

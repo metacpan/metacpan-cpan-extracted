@@ -4,7 +4,7 @@ use 5.014000;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use EV ();
 use base 'Exporter';
@@ -21,17 +21,10 @@ XSLoader::load('EV::Future', $VERSION);
 
     our $VERSION = $EV::Future::VERSION;
 
-    # A handle is a blessed reference to an integer holding a C pointer to a
-    # refcounted cell. Duplicating the Perl object would produce a second owner
-    # of that one cell, and the second DESTROY would free what the first one
-    # already freed. Refuse to be duplicated, by both routes that can do it:
-    #
-    #   * ithread cloning, where CLONE_SKIP makes the copy undef;
-    #   * Storable, which does NOT honour CLONE_SKIP (verified: dclone of a
-    #     handle aborts with a double free), and needs its own hooks. Freezing
-    #     to nothing and thawing to a zeroed payload makes the copy an inert
-    #     dead handle - the same state every handle reaches once its operation
-    #     is over, where cancel does nothing and both counters read 0.
+    # A handle wraps an internal C pointer to a refcounted cell using
+    # PERL_MAGIC_ext. Duplicating the Perl object via thread cloning yields
+    # undef (CLONE_SKIP), while Storable and Clone produce inert dead handles
+    # without duplicating the underlying C cell.
     sub CLONE_SKIP { 1 }
 
     sub STORABLE_freeze { return '' }
@@ -318,18 +311,11 @@ Every method below is safe to call at any time, including on a handle whose
 operation is already over, where C<cancel> does nothing and both counters read
 0.
 
-The object wraps a raw pointer to one refcounted cell, so duplicating it would
-produce a second owner of that cell and, eventually, a double free. Two
-duplication routes are defended against: a thread clone yields C<undef>
-(C<EV::Future::Handle> sets C<CLONE_SKIP>), and a C<Storable> freeze, thaw or
-C<dclone>, which does not honour C<CLONE_SKIP>, yields an inert dead handle
-rather than a second owner.
-
-That is not a general guarantee. A deep cloner that copies the underlying
-scalar directly, bypassing both hooks, still yields a second live owner;
-C<Clone::clone> is one such. Do not copy a handle by any means other than
-assigning the reference itself, and create a handle in, and use it from, one
-interpreter.
+The object wraps an internal C pointer to a refcounted cell using
+C<PERL_MAGIC_ext>. Duplicating the handle via thread cloning yields C<undef>
+(C<EV::Future::Handle> sets C<CLONE_SKIP>), while cloning via C<Storable> or
+C<Clone::clone> yields an inert dead handle without duplicating the underlying C
+cell.
 
 =head2 cancel([$fire])
 

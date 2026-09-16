@@ -1,0 +1,13 @@
+claude: true
+prompt: |
+  Drain the Dist-Zilla-PluginBundle-Author-GETTY karr board. This repo is the
+  [@Author::GETTY] plugin bundle itself — the release/CI machinery every other
+  GETTY dist inherits, dogfooded on its own source via [Bootstrap::lib]. Delegate
+  behavior-relevant code (configure(), the attribute surface, the
+  @Author::GETTY::Docker subsection, GiteaMeta, .github/actions/dzil-test) to the
+  dist-zilla-pluginbundle-author-getty-worker agent, tests to
+  dist-zilla-pluginbundle-author-getty-test-writer, and release audits to
+  dist-zilla-pluginbundle-author-getty-release-checker; follow
+  .claude/rules/dist-zilla-pluginbundle-author-getty-rules.md. Never release —
+  a release here reaches every consuming dist. Cross-repo work is a ticket on the
+  other repo's board (e.g. ../p5-dist-zilla-plugin-docker-api), never a direct edit.

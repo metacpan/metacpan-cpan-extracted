@@ -166,6 +166,17 @@ push @steps, sub {
 };
 
 # --- scroll ---
+# The steps above leave #two, at the bottom of the page, focused, and under load
+# WebKit can still be revealing it when these start; it landed after scroll(y =>
+# 500) once and moved the page to its end. Blur it and wait for scrollY to hold.
+push @steps, sub {
+    $b->script('document.activeElement && document.activeElement.blur();'
+             . 'let last = -1, still = 0;'
+             . 'for (let i = 0; i < 150 && still < 5; i++) {'
+             . '  await new Promise(r => setTimeout(r, 20));'
+             . '  if (window.scrollY === last) still++; else { still = 0; last = window.scrollY }'
+             . '} return 1', sub { $run->() });
+};
 push @steps, sub {
     $b->scroll(y => 500, cb => sub { ($g{abs}) = @_; $run->() });
 };

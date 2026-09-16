@@ -1,0 +1,10 @@
+# SimpiCI provider image for [@Author::GETTY] distributions.
+# Tiny by design: it only WRITES job scripts into $CICD_PROVIDER_OUT. The actual
+# `dzil test` runs later in perl:<ver> containers, not here.
+FROM alpine:3.20
+
+COPY perl-versions /opt/simpici-provider/perl-versions
+COPY emit.sh /usr/local/bin/simpici-provider-emit
+RUN chmod +x /usr/local/bin/simpici-provider-emit
+
+ENTRYPOINT ["/usr/local/bin/simpici-provider-emit"]

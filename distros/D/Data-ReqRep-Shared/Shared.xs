@@ -174,7 +174,9 @@ recv_multi(self, count)
     struct { char *buf; uint32_t len; uint64_t id; bool utf8; } *items_buf = NULL;
     UV n = 0;
     int last_r = 0;
-    int oom = 0;
+    /* An already-consumed message whose copy can't be allocated is still intact
+     * in copy_buf; deliver it from there. Croaking would lose the whole batch. */
+    const char *tail = NULL; uint32_t tail_len = 0; uint64_t tail_id = 0; bool tail_utf8 = 0;
     /* Cap count at the request-queue capacity: the queue can't hold more than
      * req_cap items, so a single recv_multi can't return more than that. This
      * also prevents an unvalidated huge count from overflowing the malloc size
@@ -190,7 +192,7 @@ recv_multi(self, count)
         last_r = reqrep_recv_locked(h, &str, &len, &utf8, &id);
         if (last_r <= 0) break;
         char *c = (char *)malloc(len ? len : 1);
-        if (!c) { oom = 1; break; }
+        if (!c) { tail = str; tail_len = len; tail_id = id; tail_utf8 = utf8; break; }
         if (len) memcpy(c, str, len);
         items_buf[n].buf = c;
         items_buf[n].len = len;
@@ -200,7 +202,7 @@ recv_multi(self, count)
     }
     reqrep_mutex_unlock(h->hdr);
     reqrep_wake_producers(h->hdr);
-    EXTEND(SP, (SSize_t)(2 * n));
+    EXTEND(SP, (SSize_t)(2 * (n + (tail ? 1 : 0))));
     for (UV j = 0; j < n; j++) {
         SV *sv = newSVpvn(items_buf[j].buf, items_buf[j].len);
         if (items_buf[j].utf8) SvUTF8_on(sv);
@@ -209,7 +211,16 @@ recv_multi(self, count)
         free(items_buf[j].buf);
     }
     free(items_buf);
-    if (last_r == -1 || oom) croak("Data::ReqRep::Shared: out of memory");
+    if (tail) {
+        SV *sv = newSVpvn(tail, tail_len);
+        if (tail_utf8) SvUTF8_on(sv);
+        PUSHs(sv_2mortal(sv));
+        PUSHs(sv_2mortal(newSVuv((UV)tail_id)));
+    }
+    /* recv_locked's own -1 leaves its message queued, but every message taken
+     * before it is already on the stack and a croak would lose them. Report
+     * the OOM only when there is nothing to lose. */
+    if (last_r == -1 && n == 0 && !tail) croak("Data::ReqRep::Shared: out of memory");
 
 void
 recv_wait_multi(self, count, ...)
@@ -225,6 +236,8 @@ recv_wait_multi(self, count, ...)
   PPCODE:
     if (items > 2 && (SvGETMAGIC(ST(2)), SvOK(ST(2)))) timeout = SvNV(ST(2));
     REEXTRACT_HANDLE("Data::ReqRep::Shared", self);
+    /* "Up to count": the blocking receive below would otherwise take one. */
+    if (count == 0) XSRETURN(0);
     /* Block until at least 1 */
     int r = reqrep_recv_wait(h, &str, &len, &utf8, &id, timeout);
     if (r == -1) croak("Data::ReqRep::Shared: out of memory");
@@ -239,7 +252,8 @@ recv_wait_multi(self, count, ...)
     struct { char *buf; uint32_t len; uint64_t id; bool utf8; } *items_buf = NULL;
     UV n = 0;
     int last_r2 = 0;
-    int oom = 0;
+    /* See recv_multi: an already-consumed message is delivered from copy_buf. */
+    const char *tail = NULL; uint32_t tail_len = 0; uint64_t tail_id = 0; bool tail_utf8 = 0;
     /* Cap count at req_cap + 1: after the initial blocking recv, the locked loop
      * can drain at most req_cap more items (the queue holds at most req_cap while
      * we hold the mutex). Capping BEFORE the malloc stops an unvalidated huge
@@ -248,14 +262,16 @@ recv_wait_multi(self, count, ...)
     if (count > (UV)h->req_cap + 1) count = (UV)h->req_cap + 1;
     if (count > 1) {
         items_buf = (void *)malloc((size_t)(count - 1) * sizeof(*items_buf));
-        if (!items_buf) croak("Data::ReqRep::Shared: out of memory");
+        /* The first message is already consumed and on the stack: croaking
+         * would unwind and lose it. Return it alone instead of the batch. */
+        if (!items_buf) count = 1;
     }
     reqrep_mutex_lock(h->hdr);
     for (UV i = 1; i < count; i++) {
         last_r2 = reqrep_recv_locked(h, &str, &len, &utf8, &id);
         if (last_r2 <= 0) break;
         char *c = (char *)malloc(len ? len : 1);
-        if (!c) { oom = 1; break; }
+        if (!c) { tail = str; tail_len = len; tail_id = id; tail_utf8 = utf8; break; }
         if (len) memcpy(c, str, len);
         items_buf[n].buf = c;
         items_buf[n].len = len;
@@ -265,7 +281,7 @@ recv_wait_multi(self, count, ...)
     }
     reqrep_mutex_unlock(h->hdr);
     reqrep_wake_producers(h->hdr);
-    EXTEND(SP, (SSize_t)(2 * n));
+    EXTEND(SP, (SSize_t)(2 * (n + (tail ? 1 : 0))));
     for (UV j = 0; j < n; j++) {
         SV *sv = newSVpvn(items_buf[j].buf, items_buf[j].len);
         if (items_buf[j].utf8) SvUTF8_on(sv);
@@ -274,7 +290,15 @@ recv_wait_multi(self, count, ...)
         free(items_buf[j].buf);
     }
     free(items_buf);
-    if (last_r2 == -1 || oom) croak("Data::ReqRep::Shared: out of memory");
+    if (tail) {
+        SV *sv = newSVpvn(tail, tail_len);
+        if (tail_utf8) SvUTF8_on(sv);
+        PUSHs(sv_2mortal(sv));
+        PUSHs(sv_2mortal(newSVuv((UV)tail_id)));
+    }
+    /* Nothing to croak about: the first message is always on the stack, so a
+     * croak here would lose it along with the batch. Stopping early just
+     * returns fewer items. */
 
 void
 drain(self, ...)
@@ -292,7 +316,8 @@ drain(self, ...)
     struct drain_item { char *buf; uint32_t len; uint64_t id; bool utf8; struct drain_item *next; } *drained_head = NULL, *drained_tail = NULL;
     UV drained_n = 0;
     int last_r = 0;
-    int oom = 0;
+    /* See recv_multi: an already-consumed message is delivered from copy_buf. */
+    const char *tail = NULL; uint32_t tail_len = 0; uint64_t tail_id = 0; bool tail_utf8 = 0;
     REEXTRACT_HANDLE("Data::ReqRep::Shared", self);
     reqrep_mutex_lock(h->hdr);
     while (max_count-- > 0) {
@@ -300,7 +325,11 @@ drain(self, ...)
         if (last_r <= 0) break;
         struct drain_item *it = (struct drain_item *)malloc(sizeof(*it));
         char *c = (char *)malloc(len ? len : 1);
-        if (!it || !c) { free(it); free(c); oom = 1; break; }
+        if (!it || !c) {
+            free(it); free(c);
+            tail = str; tail_len = len; tail_id = id; tail_utf8 = utf8;
+            break;
+        }
         if (len) memcpy(c, str, len);
         it->buf = c; it->len = len; it->id = id; it->utf8 = utf8; it->next = NULL;
         if (drained_tail) drained_tail->next = it; else drained_head = it;
@@ -309,7 +338,7 @@ drain(self, ...)
     }
     reqrep_mutex_unlock(h->hdr);
     reqrep_wake_producers(h->hdr);
-    EXTEND(SP, (SSize_t)(2 * drained_n));
+    EXTEND(SP, (SSize_t)(2 * (drained_n + (tail ? 1 : 0))));
     while (drained_head) {
         struct drain_item *it = drained_head; drained_head = it->next;
         SV *sv = newSVpvn(it->buf, it->len);
@@ -319,7 +348,14 @@ drain(self, ...)
         free(it->buf);
         free(it);
     }
-    if (last_r == -1 || oom) croak("Data::ReqRep::Shared: out of memory");
+    if (tail) {
+        SV *sv = newSVpvn(tail, tail_len);
+        if (tail_utf8) SvUTF8_on(sv);
+        PUSHs(sv_2mortal(sv));
+        PUSHs(sv_2mortal(newSVuv((UV)tail_id)));
+    }
+    /* See recv_multi: croak only when there is nothing on the stack to lose. */
+    if (last_r == -1 && drained_n == 0 && !tail) croak("Data::ReqRep::Shared: out of memory");
 
 bool
 reply(self, id, value)
@@ -334,7 +370,8 @@ reply(self, id, value)
     bool utf8 = SvUTF8(value) ? true : false;
     REEXTRACT_HANDLE("Data::ReqRep::Shared", self);
     int r = reqrep_reply(h, (uint64_t)id, str, LEN32(len), utf8);
-    if (r == -1) croak("Data::ReqRep::Shared: invalid slot index");
+    /* An out-of-range id here came out of recv(), i.e. from the request itself:
+     * one bad request must not take down the server. Report it as unanswerable. */
     if (r == -3) croak("Data::ReqRep::Shared: response too long (max %u bytes)", h->resp_data_max);
     RETVAL = (r == 1);
   OUTPUT:
@@ -479,7 +516,8 @@ eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared", self);
   CODE:
-    reqrep_eventfd_set(h, fd);
+    if (reqrep_eventfd_set(h, fd) < 0)
+        croak("Data::ReqRep::Shared: eventfd_set: %s", strerror(errno));
 
 IV
 fileno(self)
@@ -528,7 +566,8 @@ reply_eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared", self);
   CODE:
-    reqrep_reply_eventfd_set(h, fd);
+    if (reqrep_reply_eventfd_set(h, fd) < 0)
+        croak("Data::ReqRep::Shared: reply_eventfd_set: %s", strerror(errno));
 
 IV
 reply_fileno(self)
@@ -917,7 +956,8 @@ eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared::Client", self);
   CODE:
-    reqrep_reply_eventfd_set(h, fd);
+    if (reqrep_reply_eventfd_set(h, fd) < 0)
+        croak("Data::ReqRep::Shared::Client: reply_eventfd_set: %s", strerror(errno));
 
 IV
 fileno(self)
@@ -955,7 +995,8 @@ req_eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared::Client", self);
   CODE:
-    reqrep_eventfd_set(h, fd);
+    if (reqrep_eventfd_set(h, fd) < 0)
+        croak("Data::ReqRep::Shared::Client: eventfd_set: %s", strerror(errno));
 
 IV
 req_fileno(self)
@@ -1078,7 +1119,7 @@ reply(self, id, value)
     EXTRACT_HANDLE("Data::ReqRep::Shared::Int", self);
   CODE:
     int r = reqrep_int_reply(h, (uint64_t)id, (int64_t)value);
-    if (r == -1) croak("Data::ReqRep::Shared::Int: invalid slot index");
+    /* See Data::ReqRep::Shared::reply: an unanswerable id is false, not fatal. */
     RETVAL = (r == 1);
   OUTPUT:
     RETVAL
@@ -1201,7 +1242,8 @@ eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared::Int", self);
   CODE:
-    reqrep_eventfd_set(h, fd);
+    if (reqrep_eventfd_set(h, fd) < 0)
+        croak("Data::ReqRep::Shared::Int: eventfd_set: %s", strerror(errno));
 
 IV
 fileno(self)
@@ -1250,7 +1292,8 @@ reply_eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared::Int", self);
   CODE:
-    reqrep_reply_eventfd_set(h, fd);
+    if (reqrep_reply_eventfd_set(h, fd) < 0)
+        croak("Data::ReqRep::Shared::Int: reply_eventfd_set: %s", strerror(errno));
 
 IV
 reply_fileno(self)
@@ -1549,7 +1592,8 @@ eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared::Int::Client", self);
   CODE:
-    reqrep_reply_eventfd_set(h, fd);
+    if (reqrep_reply_eventfd_set(h, fd) < 0)
+        croak("Data::ReqRep::Shared::Int::Client: reply_eventfd_set: %s", strerror(errno));
 
 IV
 fileno(self)
@@ -1587,7 +1631,8 @@ req_eventfd_set(self, fd)
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared::Int::Client", self);
   CODE:
-    reqrep_eventfd_set(h, fd);
+    if (reqrep_eventfd_set(h, fd) < 0)
+        croak("Data::ReqRep::Shared::Int::Client: eventfd_set: %s", strerror(errno));
 
 IV
 req_fileno(self)

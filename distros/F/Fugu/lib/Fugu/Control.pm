@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package Fugu::Control;
-our $VERSION = '0.5.0';
+our $VERSION = '0.5.1';
 
 use v5.34;
 use warnings;
@@ -531,7 +531,7 @@ sub _log ($self)
 }
 
 package Fugu::Control::Client;
-our $VERSION = '0.5.0';
+our $VERSION = '0.5.1';
 
 use Errno qw(EACCES ENOENT);
 use IO::Socket::UNIX;

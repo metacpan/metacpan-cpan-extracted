@@ -1,5 +1,31 @@
 Revision history for Genealogy::Obituary::Lookup
 
+0.21	Tue Sep 15 09:54:23 AM EDT 2026
+	[ Enhancements ]
+	Added Testing Dashboard
+	Added Fuzz Testing
+	Added v31 for 2026
+	[ Bug Fixes ]
+	search(): croak explicitly on zero args so Test::Carp can intercept it (Params::Get uses confess)
+	t/locales.t: use warnings_exist instead of warnings_like (Carp::carp can emit two warnings)
+	Freelists has started to return 403 instead of 404 on unfound pages
+	Latest Log::Abstraction uses croak rather than carp on warnings
+	bin/create_db.PL: obt.txt trailing comma is now optional
+	bin/create_db.PL: filter Wayback Machine HTML injection in mlarchives stage-1 (strip leading tag rather than skip whole line)
+	bin/create_db.PL: skip prose lines with no semicolons before ODT parsing
+	bin/create_db.PL: strip residual HTML tags and trailing whitespace before field split
+	bin/create_db.PL: handle multi-line ODT entries by consuming continuation lines until date is populated
+	bin/create_db.PL: handle missing age field (place name in age slot) by shifting fields left
+	bin/create_db.PL: handle colon-instead-of-semicolon typo after age field
+	bin/create_db.PL: handle page=33 field-order anomaly (location before newspaper)
+	bin/create_db.PL: handle tag split onto next line (page 135)
+	bin/create_db.PL: tighten date validation to require 4-digit year prefix
+	bin/create_db.PL: invalid ages (non-numeric, negative) silently omitted; record still stored
+	bin/create_db.PL: funeral-notices.co.uk dates converted from DD/MM/YYYY to ISO YYYY-MM-DD before queue()
+	new(): auto-discover data/ only when it exists; accept undef directory without error
+	t/30-basics.t, t/config_file.t: SKIP data-directory tests when running under blib/ before make
+	t/obituaries.t: fix autovivification guard on empty search result
+
 0.20	Sat Sep 20 16:13:10 EDT 2025
 	Handle the location "St. Augustine's"
 	Use Params::Validate::Strict

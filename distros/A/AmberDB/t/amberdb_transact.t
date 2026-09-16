@@ -292,5 +292,52 @@ subtest 'no_transact Tables Do NOT Trigger Rollback on Failure' => sub {
     is( $res2->{status}, 'rollback', 'Transaction with primary failure rolled back' );
 };
 
+# ---------------------------------------------------------------------------
+subtest 'Transaction Journal Base64 Payload Encoding & Complex Binary Rollback' => sub {
+    plan tests => 8;
+
+    # 1. Insert complex record before transaction
+    my $complex_payload = "Line1\nLine2\r\nTab\tSeparated\x1eRecordSep" . " — Türkçe şçöğüİı";
+    my $rid90 = $adb->insert_id( 'test_table', 90, $complex_payload, 'ComplexCat', 999 );
+    is( $rid90, 90, 'Pre-transaction complex record inserted' );
+
+    # 2. Start transaction
+    ok( $adb->transact_start(), 'Transaction started' );
+    my $txn_file = $adb->{_txn}->{file};
+    ok( -e $txn_file, "Active txn file exists on disk: $txn_file" );
+
+    # 3. Modify record within transaction to trigger 'edit' before-image logging
+    $adb->modify_id( 'test_table', 90, 'Modified In Txn', 'ComplexCat', 1000 );
+
+    # Flush filehandle so we can read from disk directly
+    $adb->{_txn}->{fh}->flush;
+
+    open my $jfh, '<', $txn_file or die "Cannot open $txn_file: $!";
+    my @lines = <$jfh>;
+    close $jfh;
+
+    # Locate the edit line for record 90
+    my ($rec_edit_line) = grep { /\brecs\b[^\n]*\b90\b[^\n]*\bedit\b/ } @lines;
+    ok( $rec_edit_line, 'Found recs edit entry in txn journal' );
+
+    chomp $rec_edit_line;
+    my ( $ts, $type, $tableid, $file_path, $key, $action, $b64 ) = split /\x1e/, $rec_edit_line, 7;
+
+    # Verify Base64 format: pure base64 characters only
+    like( $b64, qr/^[A-Za-z0-9+\/]+=*$/, 'Journal entry payload is valid Base64' );
+
+    # Decode and check contents
+    use MIME::Base64 qw(decode_base64);
+    my $decoded_raw = decode_base64($b64);
+    like( $decoded_raw, qr/Line1\nLine2/, 'Base64 decoded raw before-image contains embedded newlines' );
+
+    # 4. Rollback transaction and verify exact payload restoration
+    my $res = $adb->transact_rollback();
+    is( $res->{status}, 'rollback', 'Transaction rolled back cleanly' );
+
+    my @restored = $adb->read_id( 'test_table', 90 );
+    is( $restored[1], $complex_payload, 'Complex payload with newlines/separators/UTF-8 restored 100% intact' );
+};
+
 done_testing();
 

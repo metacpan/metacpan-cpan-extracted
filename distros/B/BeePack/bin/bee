@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: bee
 # ABSTRACT: Small application to handle bee files
+our $VERSION = '0.200';
 
 use strict;
 use warnings;
@@ -64,13 +65,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 bee - Small application to handle bee files
 
 =head1 VERSION
 
-version 0.103
+version 0.200
 
 =head1 SYNOPSIS
 
@@ -111,20 +114,86 @@ version 0.103
     hulk "Bruce Banner" \
     superman "Clark Jerome Kent"
 
+=head1 DESCRIPTION
+
+C<bee> is a small command-line tool, bundled with L<BeePack>, for inspecting
+and manipulating a C<.bee> file directly from the shell. It takes up to three
+leading arguments -- C<bee FILE [KEY [TYPE VALUE...]]> -- and picks its mode
+from how many of them are given:
+
+=over 4
+
+=item C<bee FILE>
+
+No C<KEY>: opens C<FILE> read-only and lists every key in the pack, one per
+line.
+
+=item C<bee FILE KEY>
+
+A C<KEY> but no C<TYPE>: opens C<FILE> read-only and prints the value stored
+under C<KEY> -- arrays and hashes via L<Data::Dumper>, everything else as-is.
+A key that doesn't "exist" (see L<BeePack/nil_exists>; by default this
+includes a nil-valued key) prints nothing.
+
+=item C<bee FILE KEY TYPE VALUE...>
+
+A C<TYPE> as well: opens C<FILE> read/write (through a tempfile), sets C<KEY>
+to C<VALUE...> forced into the MsgPack type named by C<TYPE>, and saves.
+
+=back
+
+C<TYPE> is matched on its first character, mirroring L<BeePack/set_type> --
+adding a new letter here means adding the matching branch there, and vice
+versa.
+
+=head2 n
+
+Nil. Takes no C<VALUE>. Sets C<KEY> to MsgPack nil via
+L<BeePack/set_nil>.
+
+=head2 i
+
+Integer. Takes exactly one C<VALUE>, forced to a MsgPack integer via
+L<BeePack/set_integer>.
+
+=head2 s
+
+String. Takes exactly one C<VALUE>, forced to a MsgPack string via
+L<BeePack/set_string>.
+
+=head2 b
+
+Bool. Takes exactly one C<VALUE>; L<BeePack/set_bool> stores it as MsgPack
+C<true> or C<false> according to whether C<VALUE> is true or false in Perl
+terms (so C<0> and the empty string store as false).
+
+=head2 a
+
+Array. Every remaining C<VALUE> is stored as one MsgPack array.
+
+=head2 h
+
+Hash. Every remaining C<VALUE> is stored as one MsgPack hash -- an even count
+of C<KEY VALUE KEY VALUE ...> pairs is required.
+
+=head2 Storing a numeric-looking value as a string
+
+  $ bee test.bee key s 0042
+
+=head2 Streaming a raw value through a pipe
+
+  $ bee test.bee gzipped_value | gunzip -c
+
 =head1 SUPPORT
 
-IRC
+=head2 Issues
 
-  Join #hardware on irc.perl.org. Highlight Getty for fast reaction :).
+Please report bugs and feature requests on GitHub at
+L<https://github.com/cindustries/p5-beepack/issues>.
 
-Repository
+=head1 CONTRIBUTING
 
-  http://github.com/cindustries/perl-beepack
-  Pull request and additional contributors are welcome
-
-Issue Tracker
-
-  http://github.com/cindustries/perl-beepack/issues
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
@@ -132,7 +201,7 @@ Torsten Raudssus <torsten@raudss.us>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Torsten Raudssus.
+This software is copyright (c) 2014-2026 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

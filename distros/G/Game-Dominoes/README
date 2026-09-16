@@ -1,0 +1,57 @@
+Game-Dominoes
+
+Draw dominoes with All Fives (Muggins) scoring on a double six set, for two to
+four players, as a reusable engine with a terminal game on top.
+
+The engine does no input and no output. It never prints, never reads a handle,
+never sleeps and never calls rand, so a game is a pure function of its seed and
+its moves and replays anywhere. The terminal game lives in
+Game::Dominoes::Terminal and the dominoes script, and nothing in the engine
+loads either.
+
+    dominoes --players=4 --hotseat
+    dominoes --level=3
+    dominoes --bot-vs-bot --seed=abc
+
+The rules are pinned to Pagat's All Fives page as the primary source, because
+dominoes has no single rule book and taking the most popular answer to each
+question separately would produce a ruleset no publication describes, and so
+one with no citable test vectors at all. Where this distribution departs from
+that page, or fills a gap it leaves, the POD says so and says it is a house
+decision.
+
+The bot is handed one seat's view and reads nothing else, and there is a test
+that proves that rather than trusting it.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+	perldoc Game::Dominoes
+
+You can also look for information at:
+
+	RT, CPAN's request tracker (report bugs here)
+		https://rt.cpan.org/NoAuth/Bugs.html?Dist=Game-Dominoes
+
+	Search CPAN
+		https://metacpan.org/release/Game-Dominoes
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

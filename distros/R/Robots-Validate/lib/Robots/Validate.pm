@@ -29,7 +29,7 @@ use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.3';
+our $VERSION = 'v0.4.4';
 
 
 has resolver => (
@@ -601,7 +601,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.4.3
+version v0.4.4
 
 =head1 SYNOPSIS
 

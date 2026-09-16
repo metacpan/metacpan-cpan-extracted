@@ -1,0 +1,30 @@
+---
+abstract: "Headless terminal emulator built on Ghostty's libghostty-vt"
+author:
+  - vividsnow
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+configure_requires:
+  Alien::Base::Wrapper: '1.97'
+  Alien::ghostty: '0.01'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Ghostty
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/vividsnow/perl5-term-ghostty/issues
+  repository: https://github.com/vividsnow/perl5-term-ghostty.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

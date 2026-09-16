@@ -46,7 +46,7 @@ Game::Cribbage::Rounds - collection of rounds for a full cribbage game
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 

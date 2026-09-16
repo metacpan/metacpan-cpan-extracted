@@ -2,8 +2,8 @@ NAME
     App::ImageMagickUtils - Utilities related to ImageMagick
 
 VERSION
-    This document describes version 0.024 of App::ImageMagickUtils (from
-    Perl distribution App-ImageMagickUtils), released on 2024-12-21.
+    This document describes version 0.025 of App::ImageMagickUtils (from
+    Perl distribution App-ImageMagickUtils), released on 2026-09-16.
 
 DESCRIPTION
     This distribution includes the following CLI utilities related to
@@ -21,6 +21,7 @@ DESCRIPTION
     10. img2png
     11. jpg2png
     12. png2jpg
+    13. resize-image
 
 FUNCTIONS
   convert_image_to
@@ -366,6 +367,67 @@ FUNCTIONS
 
     Return value: (any)
 
+  resize_image
+    Usage:
+
+     resize_image(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Resize images.
+
+    This utility is a shortcut for magick utility as follow:
+
+     % magick INPUT.PNG -resize SIZE_NOTATION OUTPUT.newxsize.PNG
+
+    It offers convenience: automatic output file naming (specify new
+    dimension in filename), non-overwrite default with overwrite option,
+    support multiple files.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   delete_original => *bool*
+
+        Delete (unlink) the original file after downsizing.
+
+        See also the "trash_original" option.
+
+    *   files* => *array[filename]*
+
+        (No description)
+
+    *   overwrite => *bool*
+
+        Whether to overwrite existing output files.
+
+    *   size_notation* => *str*
+
+        (No description)
+
+    *   trash_original => *bool*
+
+        Trash the original file after downsizing.
+
+        This option uses the File::Trash::FreeDesktop module to do the
+        trashing. Compared to deletion, with this option you can still
+        restore the trashed original files from the Trash directory.
+
+        See also the "delete_original" option.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
 FAQ
   I got error message "attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426."
     See solutions like described in
@@ -382,6 +444,9 @@ SOURCE
 
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
@@ -400,7 +465,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

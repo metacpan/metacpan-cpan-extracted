@@ -32,6 +32,7 @@ WriteMakefile(
     PREREQ_PM => {
         'XS::Parse::Keyword' => '0.40',
         'Scalar::Util'       => 0,
+        'JSON::PP'           => 0,
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',

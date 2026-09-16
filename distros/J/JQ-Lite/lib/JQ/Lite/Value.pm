@@ -7,6 +7,13 @@ use JSON::PP ();
 use Scalar::Util qw(looks_like_number);
 use B ();
 
+# Older B releases do not expose the public SV flag constants.  The flag
+# values themselves are part of Perl's long-standing SV layout, so retain
+# their historical values when running with one of those releases.
+my $SVf_IOK = B->can('SVf_IOK') ? B::SVf_IOK() : 0x00000100;
+my $SVf_NOK = B->can('SVf_NOK') ? B::SVf_NOK() : 0x00000200;
+my $SVf_POK = B->can('SVf_POK') ? B::SVf_POK() : 0x00000400;
+
 # This module is deliberately internal.  It provides the jq-style value
 # semantics needed by the 3.0 evaluator without changing the compatibility
 # behaviour of the 2.x filters that still live in JQ::Lite::Util.
@@ -24,8 +31,8 @@ sub type_of {
         # the cached PV to SVf_POK during interpolation even though IOK/NOK is
         # still present and JSON::PP continues to encode the scalar as a
         # number. Numeric identity therefore wins for dual-valued scalars.
-        return 'number' if $flags & (B::SVf_IOK() | B::SVf_NOK());
-        return 'string' if $flags & B::SVf_POK();
+        return 'number' if $flags & ($SVf_IOK | $SVf_NOK);
+        return 'string' if $flags & $SVf_POK;
         return 'number' if looks_like_number($value);
     }
     return 'string';

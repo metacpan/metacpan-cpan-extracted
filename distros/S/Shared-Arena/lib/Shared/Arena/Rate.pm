@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Rate - a token bucket per key, shared by every worker
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS
 

@@ -6,9 +6,10 @@ use Encode qw(is_utf8 encode decode);
 use Carp qw(croak cluck);
 use File::Spec;
 use Fcntl qw(:DEFAULT :flock);
+use Digest::SHA qw(sha256_hex);
 use parent qw(AmberDB::Locale AmberDB::Array);
 
-our $VERSION = '5.25.1';
+our $VERSION = '5.25.2';
 my $CREATED = '2014-12-20';
 
 # ------------------------------------------------
@@ -296,6 +297,20 @@ sub set_datadir {
     $self->{_path}->{lock_dir}    = "$dbase_dir/lock";
     $self->{_path}->{session_dir} = "$dbase_dir/session";
 
+    # Auto-load connect.pl if present in datadir, or fallback database name to leaf folder
+    my $conn_file = "$dbase_dir/config/connect.pl";
+    if ( -f $conn_file ) {
+        my $target = ( $conn_file =~ m{^(?:\./|[a-zA-Z]:|/|\\)} ) ? $conn_file : "./$conn_file";
+        my $cfg = do $target;
+        if ( $cfg && ref($cfg) eq 'HASH' && $cfg->{database} ) {
+            $self->{_connect}->{database} = $cfg->{database};
+        }
+    }
+    if ( !defined $self->{_connect}->{database} || !length $self->{_connect}->{database} ) {
+        my ($leaf) = $dbase_dir =~ m{([^/\\\\]+)[/\\\\]*$};
+        $self->{_connect}->{database} = $leaf if defined $leaf && length $leaf;
+    }
+
     unless ( $self->config('test') ) {
         if ( defined $dbase_dir && $dbase_dir ne "." && $dbase_dir ne "" ) {
             for my $dir (
@@ -315,6 +330,7 @@ sub set_datadir {
         }
     }
 
+    $self->ramdisk_setup();
     return 1;
 }
 
@@ -341,6 +357,9 @@ sub config {
 
     # 2. Single scalar argument: getter -> $adb->config('language')
     if ( @args == 1 && !ref( $args[0] ) ) {
+        if ( $args[0] eq 'user' ) {
+            return $self->{_connect}->{username} // $self->{_cfg}->{user} // 'user_system';
+        }
         return $self->{_cfg}->{ $args[0] } // '';
     }
 
@@ -384,6 +403,9 @@ sub config {
         }
         else {
             $self->{_cfg}->{$key} = $val;
+            if ( $key eq 'user' ) {
+                $self->{_connect}->{username} = $val;
+            }
         }
     }
 
@@ -402,7 +424,7 @@ sub path {
 
     # 2. Single scalar argument: getter -> $adb->path('dbase_dir')
     if ( @args == 1 && !ref( $args[0] ) ) {
-        return $self->{_path}->{ $args[0] };
+        return $self->{_path}->{ $args[0] } // '';
     }
 
     # 3. Setter: key-value list or hashref
@@ -427,6 +449,430 @@ sub _invalidate_table_paths {
               if ref( $self->{_table}->{$tbl} ) eq 'HASH';
         }
     }
+}
+
+# ============================================================================
+# AUTHENTICATION & PASSWORD CRYPTOGRAPHY (Salted SHA-256)
+# ============================================================================
+
+# my $shadow = $adb->hash_password($password, [$salt]);
+# ---------------------------------------------------------------------
+sub hash_password {
+    my ( $self, $password, $salt ) = @_;
+    return '' unless defined $password && length $password;
+
+    # 16-character cryptographically secure hex salt
+    $salt //= sprintf( "%08x%08x", int( rand(0xFFFFFFFF) ), int( rand(0xFFFFFFFF) ) );
+
+    my $hash = sha256_hex( $salt . $password );
+    return "sha256\$$salt\$$hash";
+}
+
+# my $ok = $adb->verify_password($password, $stored_shadow);
+# ---------------------------------------------------------------------
+sub verify_password {
+    my ( $self, $password, $stored_shadow ) = @_;
+    # Passwordless allowed if stored shadow is empty or undef
+    return 1 if !defined $stored_shadow || !length $stored_shadow;
+    $password //= '';
+
+    my ( $algo, $salt, $expected ) = split /\$/, $stored_shadow;
+    return 0 unless defined $algo && defined $salt && defined $expected;
+
+    if ( $algo eq 'sha256' ) {
+        my $computed = sha256_hex( $salt . $password );
+        return lc($computed) eq lc($expected) ? 1 : 0;
+    }
+    return $stored_shadow eq $password ? 1 : 0;
+}
+
+# ============================================================================
+# DATABASE CONNECTION & CLIENT AUTH PROFILE (connect.pl)
+# ============================================================================
+
+sub _connect_file {
+    my ($self) = @_;
+    my $conf_dir = $self->path('conf_dir') || ( ( $self->path('dbase_dir') || "." ) . "/config" );
+    return "$conf_dir/connect.pl";
+}
+
+sub _load_connect_config {
+    my ($self) = @_;
+    my $file = $self->_connect_file();
+    return undef unless -f $file;
+
+    my $target = ( $file =~ m{^(?:\./|[a-zA-Z]:|/|\\)} ) ? $file : "./$file";
+    my $data = do $target;
+    return undef unless ref($data) eq 'HASH';
+
+    # Auto-upgrade: if any user entry or top-level entry has plain 'password', hash into 'shadow' and delete 'password'
+    my $modified = 0;
+    if ( defined $data->{password} && length $data->{password} ) {
+        $data->{shadow} = $self->hash_password( delete $data->{password} );
+        $modified = 1;
+    }
+    if ( $data->{users} && ref( $data->{users} ) eq 'HASH' ) {
+        for my $u ( keys %{ $data->{users} } ) {
+            my $u_info = $data->{users}->{$u};
+            next unless ref($u_info) eq 'HASH';
+            if ( defined $u_info->{password} && length $u_info->{password} ) {
+                $u_info->{shadow} = $self->hash_password( delete $u_info->{password} );
+                $modified = 1;
+            }
+        }
+    }
+    if ($modified) {
+        $self->_save_connect_config($data);
+    }
+
+    return $data;
+}
+
+sub _save_connect_config {
+    my ( $self, $data ) = @_;
+    my $file = $self->_connect_file();
+    return unless defined $file && ref($data) eq 'HASH';
+
+    my ($dir) = $file =~ m{^(.+)[/\\][^/\\]+$};
+    $self->make_path($dir) if $dir && !$self->dir_exist($dir);
+
+    require Data::Dumper;
+    local $Data::Dumper::Terse    = 1;
+    local $Data::Dumper::Indent   = 1;
+    local $Data::Dumper::Sortkeys = 1;
+    my $dump = Data::Dumper::Dumper($data);
+    $dump =~ s/^\s+|\s+$//g;
+
+    if ( open my $fh, '>', $file ) {
+        print $fh "# AmberDB Database Connection & Client Auth Profile\n";
+        print $fh "return " . $dump . ";\n";
+        close $fh;
+        return 1;
+    }
+    return 0;
+}
+
+# my $sess_path = $adb->session_file($token);
+# ---------------------------------------------------------------------
+sub session_file {
+    my ( $self, $token ) = @_;
+    return '' unless defined $token && length $token;
+    my $sess_dir = $self->path('session_dir') || ( ( $self->path('dbase_dir') || "." ) . "/session" );
+    return "$sess_dir/cli_$token";
+}
+
+# my $token = $adb->generate_token();
+# ---------------------------------------------------------------------
+sub generate_token {
+    my ($self) = @_;
+    for ( 1 .. 1000 ) {
+        my $token = sprintf( "%04d", int( rand(9000) ) + 1000 );
+        my $sf = $self->session_file($token);
+        next if $sf && -f $sf;
+        my $cf = ".amberdb/session/sess_$token";
+        next if -f $cf;
+        return $token;
+    }
+    return sprintf( "%04d", int( rand(9000) ) + 1000 );
+}
+
+sub _load_session {
+    my ( $self, $token ) = @_;
+    return undef unless defined $token && length $token;
+    my @files = ( $self->session_file($token), ".amberdb/session/sess_$token" );
+
+    for my $sf (@files) {
+        next unless $sf && -f $sf;
+        my $target = ( $sf =~ m{^(?:\./|[a-zA-Z]:|/|\\)} ) ? $sf : "./$sf";
+        my $data = do $target;
+        return $data if ref($data) eq 'HASH';
+
+        if ( open my $fh, '<', $sf ) {
+            local $/;
+            my $raw = <$fh>;
+            close $fh;
+            if ( $raw && $raw =~ /^\s*\{/ ) {
+                require JSON::PP;
+                my $jdata = eval { JSON::PP::decode_json($raw) };
+                return $jdata if $jdata && ref($jdata) eq 'HASH';
+            }
+        }
+    }
+    return undef;
+}
+
+sub _save_session {
+    my ( $self, $token, $data ) = @_;
+    return unless defined $token && length $token;
+    my $sf = $self->session_file($token);
+    return unless $sf;
+
+    my ($dir) = $sf =~ m{^(.+)[/\\][^/\\]+$};
+    $self->make_path($dir) if $dir && !$self->dir_exist($dir);
+
+    require Data::Dumper;
+    local $Data::Dumper::Terse    = 1;
+    local $Data::Dumper::Indent   = 1;
+    local $Data::Dumper::Sortkeys = 1;
+    my $dump = Data::Dumper::Dumper($data);
+    $dump =~ s/^\s+|\s+$//g;
+
+    if ( open my $fh, '>', $sf ) {
+        print $fh "# AmberDB Active CLI Session Token: $token\n";
+        print $fh "return " . $dump . ";\n";
+        close $fh;
+    }
+
+    # Also sync local .amberdb/session/sess_$token
+    my $local_dir = ".amberdb/session";
+    $self->make_path($local_dir) unless -d $local_dir;
+    my $local_file = "$local_dir/sess_$token";
+    if ( open my $lfh, '>', $local_file ) {
+        require JSON::PP;
+        print $lfh JSON::PP::encode_json($data);
+        close $lfh;
+    }
+
+    return 1;
+}
+
+sub _delete_session {
+    my ( $self, $token ) = @_;
+    return unless defined $token && length $token;
+    my $sf = $self->session_file($token);
+    unlink $sf if $sf && -f $sf;
+    my $local_file = ".amberdb/session/sess_$token";
+    unlink $local_file if -f $local_file;
+}
+
+# my $val_or_token = $adb->connect([$key | %args]);
+# ---------------------------------------------------------------------
+sub connect {
+    my ( $self, @args ) = @_;
+
+    # 1. Single scalar argument: attribute getter -> $adb->connect('database')
+    if ( @args == 1 && !ref( $args[0] ) ) {
+        my $k = $args[0];
+        $k = 'database' if $k eq 'dbase' || $k eq 'dbname';
+        $k = 'username' if $k eq 'user'  || $k eq 'usr';
+        $k = 'password' if $k eq 'pass'  || $k eq 'passwd';
+        return $self->{_connect}->{$k} // '';
+    }
+
+    # If called with no args and already connected with valid token, return active token
+    if ( !@args && defined $self->{_connect}->{token} && length $self->{_connect}->{token} ) {
+        return $self->{_connect}->{token};
+    }
+
+    # 2. Connection / Authentication Action -> $adb->connect(%args) or $adb->connect()
+    my %opts = ( @args == 1 && ref( $args[0] ) eq 'HASH' ) ? %{ $args[0] } : @args;
+
+    my $token    = delete $opts{token}    // delete $opts{tok};
+    my $database = delete $opts{database} // delete $opts{dbase} // delete $opts{dbname} // delete $opts{db} // $self->{_connect}->{database};
+    my $username = delete $opts{username} // delete $opts{user}  // delete $opts{usr}    // $self->{_connect}->{username};
+    my $password = delete $opts{password} // delete $opts{pass}  // delete $opts{passwd}  // $self->{_connect}->{password};
+
+    # Sub-case A: Resume session via token
+    if ( defined $token && length $token ) {
+        my $sess = $self->_load_session($token);
+        if ( $sess && ref($sess) eq 'HASH' ) {
+            $self->{_connect}->{token}    = $token;
+            $self->{_connect}->{database} = $sess->{connect}->{database} // $sess->{database} // $self->{_connect}->{database} // '';
+            $self->{_connect}->{username} = $sess->{connect}->{username} // $sess->{username} // $self->{_connect}->{username} // 'user_system';
+            $self->{_connect}->{password} = $sess->{connect}->{password} // $sess->{password} // '';
+            $self->{_cfg}->{user}         = $self->{_connect}->{username};
+            return $token;
+        }
+        return undef;
+    }
+
+    # Sub-case B: Authenticate credentials & generate session token
+    my $connect_cfg = $self->_load_connect_config();
+
+    # Dbase dir leaf name as default database if not specified
+    if ( !defined $database || !length $database ) {
+        if ( $connect_cfg && $connect_cfg->{database} ) {
+            $database = $connect_cfg->{database};
+        }
+        else {
+            my $dbase_dir = $self->path('dbase_dir') || ".";
+            my ($leaf) = $dbase_dir =~ m{([^/\\\\]+)[/\\\\]*$};
+            $database = $leaf // 'amberdb';
+        }
+    }
+
+    $username //= 'cli';
+    $password //= '';
+
+    # Bootstrap connect.pl on first connection if missing or empty
+    if ( !$connect_cfg || !ref($connect_cfg->{users}) || !keys %{ $connect_cfg->{users} } ) {
+        $connect_cfg = {
+            database   => $database,
+            created_at => time(),
+            users      => {
+                $username => {
+                    shadow => ( defined $password && length $password ) ? $self->hash_password($password) : '',
+                    role   => 'admin',
+                },
+                web => {
+                    shadow => '',
+                    role   => 'web',
+                },
+                cli => {
+                    shadow => '',
+                    role   => 'cli',
+                },
+            },
+        };
+        $self->_save_connect_config($connect_cfg);
+    }
+    else {
+        # Check database mismatch if specified
+        if ( $connect_cfg->{database} && $database && lc($connect_cfg->{database}) ne lc($database) ) {
+            croak "[AMBERDB_AUTH_ERROR] Database mismatch: requested '$database' but store is '$connect_cfg->{database}'";
+        }
+        $database = $connect_cfg->{database} if $connect_cfg->{database};
+
+        # Check user
+        my $user_info = $connect_cfg->{users}->{$username};
+        if ( !$user_info ) {
+            croak "[AMBERDB_AUTH_ERROR] User '$username' not authorized for database '$database'";
+        }
+
+        # Auto-upgrade plain text password in connect.pl to shadow if present
+        if ( exists $user_info->{password} && defined $user_info->{password} && length $user_info->{password} ) {
+            my $plain = delete $user_info->{password};
+            $user_info->{shadow} = $self->hash_password($plain);
+            $self->_save_connect_config($connect_cfg);
+        }
+
+        # Password check:
+        # If both shadow and password are empty/missing: passwordless access allowed (local trust / backwards compat)
+        my $shadow = $user_info->{shadow} // '';
+        if ( length $shadow ) {
+            if ( !defined $password || !length $password ) {
+                croak "[AMBERDB_AUTH_ERROR] Password required for user '$username'";
+            }
+            if ( !$self->verify_password( $password, $shadow ) ) {
+                croak "[AMBERDB_AUTH_ERROR] Invalid password for user '$username'";
+            }
+        }
+    }
+
+    # Authentication successful: issue token
+    my $new_token = $self->generate_token();
+    $self->{_connect}->{database} = $database;
+    $self->{_connect}->{username} = $username;
+    $self->{_connect}->{password} = $password;
+    $self->{_connect}->{token}    = $new_token;
+    $self->{_cfg}->{user}         = $username;
+
+    # Save session
+    my $sess_data = {
+        token      => $new_token,
+        created_at => time(),
+        updated_at => time(),
+        connect    => {
+            database => $database,
+            username => $username,
+        },
+        path       => { %{ $self->path() } },
+        cfg        => { %{ $self->config() } },
+    };
+    $self->_save_session( $new_token, $sess_data );
+
+    return $new_token;
+}
+
+sub disconnect {
+    my ( $self, $token ) = @_;
+    $token //= $self->{_connect}->{token};
+    if ( defined $token && length $token ) {
+        $self->_delete_session($token);
+    }
+    $self->{_connect}->{token}    = '';
+    $self->{_connect}->{password} = '';
+    return 1;
+}
+
+# ============================================================================
+# USER MANAGEMENT METHODS (connect.pl API)
+# ============================================================================
+
+sub user_add {
+    my ( $self, $username, $password, %opts ) = @_;
+    croak "Username required" unless defined $username && length $username;
+
+    my $cfg = $self->_load_connect_config() // { database => $self->connect('database') || 'amberdb', users => {} };
+    $cfg->{users} //= {};
+
+    my $shadow = ( defined $password && length $password ) ? $self->hash_password($password) : '';
+    $cfg->{users}->{$username} = {
+        shadow     => $shadow,
+        role       => $opts{role} // 'user',
+        created_at => time(),
+    };
+    $self->_save_connect_config($cfg);
+    return 1;
+}
+
+sub user_passwd {
+    my ( $self, $username, $password ) = @_;
+    croak "Username required" unless defined $username && length $username;
+
+    my $cfg = $self->_load_connect_config();
+    croak "Database connection config not found" unless $cfg && $cfg->{users}->{$username};
+
+    $cfg->{users}->{$username}->{shadow} = ( defined $password && length $password ) ? $self->hash_password($password) : '';
+    $cfg->{users}->{$username}->{updated_at} = time();
+    $self->_save_connect_config($cfg);
+    return 1;
+}
+
+sub user_del {
+    my ( $self, $username ) = @_;
+    croak "Username required" unless defined $username && length $username;
+
+    my $cfg = $self->_load_connect_config();
+    return 0 unless $cfg && exists $cfg->{users}->{$username};
+
+    delete $cfg->{users}->{$username};
+    $self->_save_connect_config($cfg);
+    return 1;
+}
+
+sub user_list {
+    my ($self) = @_;
+    my $cfg = $self->_load_connect_config();
+    return () unless $cfg && ref($cfg->{users}) eq 'HASH';
+
+    my @list;
+    for my $u ( sort keys %{ $cfg->{users} } ) {
+        my $ud = $cfg->{users}->{$u};
+        push @list, {
+            username     => $u,
+            role         => $ud->{role} // 'user',
+            has_password => ( defined $ud->{shadow} && length $ud->{shadow} ) ? 1 : 0,
+            created_at   => $ud->{created_at} // 0,
+        };
+    }
+    return @list;
+}
+
+sub user_verify {
+    my ( $self, $username, $password ) = @_;
+    return 0 unless defined $username && length $username;
+
+    my $cfg = $self->_load_connect_config();
+    return 0 unless $cfg && ref($cfg->{users}) eq 'HASH';
+
+    my $ud = $cfg->{users}->{$username};
+    return 0 unless $ud;
+
+    my $shadow = $ud->{shadow} // '';
+    return 1 if !length($shadow);    # Passwordless allowed
+    return 0 unless defined $password && length $password;
+    return $self->verify_password( $password, $shadow );
 }
 
 # my ($count, @records) = $adb->recs_cutting($offset, $limit, @records);

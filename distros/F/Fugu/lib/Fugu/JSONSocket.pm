@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package Fugu::JSONSocket;
-our $VERSION = '0.5.0';
+our $VERSION = '0.5.1';
 
 use v5.34;
 use warnings;

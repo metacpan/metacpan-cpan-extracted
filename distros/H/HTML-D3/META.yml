@@ -15,7 +15,7 @@ build_requires:
   Test::Warnings: '0'
   Test::Without::Module: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: gpl
@@ -31,11 +31,10 @@ optional_features:
   html_testing:
     description: 'Test the HTML output'
 requires:
-  ExtUtils::MakeMaker: '6.64'
   JSON::MaybeXS: '0'
   Object::Configure: '0.24'
   Params::Get: '0'
   Scalar::Util: '0'
 resources: {}
-version: '0.12'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -120,9 +120,12 @@ sub play_card {
 	if ($self->play->next_to_play ne $hand) {
 		return Game::Cribbage::Error->new( message => 'It is not the turn of ' . $hand );
 	}
-	my $card = ref $card_index ? $card_index : $self->$hand->get($card_index);
-	if (!$card || $card->used) {
-		die 'CARD HAS ALREADY BEEN PLAYED IN THIS ROUND';
+	my $card = ref $card_index ? $self->$hand->match($card_index) : $self->$hand->cards->[$card_index];
+	if (!$card) {
+		return Game::Cribbage::Error->new( message => 'That card is not in the hand of ' . $hand );
+	}
+	if ($card->used) {
+		return Game::Cribbage::Error->new( message => 'That card has already been played this hand' );
 	}
 
 	my $total = $self->play->total;
@@ -148,7 +151,7 @@ sub cannot_play_a_card {
 	my @can_be_played;
 	for (@{$self->$hand->cards}) {
 		next if $_->used;
-		if ( ($current_total + $_->value) < 31 ) {
+		if ( ($current_total + $_->value) <= 31 ) {
 			push @can_be_played, $_;
 		}
 	}
@@ -244,7 +247,7 @@ sub next_play {
 			for (@{$self->$hand->cards}) {
 				next if $_->used;
 				$available_cards = 1;
-				if ( $current_total + $_->value < 31 ) {
+				if ( $current_total + $_->value <= 31 ) {
 					push @can_be_played, $_;
 				}
 			}
@@ -332,7 +335,7 @@ Game::Cribbage::Hands - a single hands cycle within a round
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 
@@ -470,7 +473,9 @@ turn-order checks.  Returns C<($score, $player_string)>.
 
 Plays C<$card_index> (integer or card object) for C<$player>, enforcing
 turn order and the 31-point limit.  Returns a
-L<Game::Cribbage::Play::Score> on success or a L<Game::Cribbage::Error>.
+L<Game::Cribbage::Play::Score> on success or a L<Game::Cribbage::Error>:
+for the wrong turn, for a card the player does not hold, for one already
+played, and for one that would pass 31 (that last with C<over> set).
 
 	my $score = $hands->play_card($player, $card_index);
 

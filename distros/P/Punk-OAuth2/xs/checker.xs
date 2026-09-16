@@ -172,6 +172,9 @@ guard(class, checker, ...)
                 (void)hv_stores(cap, "realm", newSVsv(ST(i + 1)));
             else if (kl == 6 && memEQ(k, "scheme", 6))
                 (void)hv_stores(cap, "scheme", newSVsv(ST(i + 1)));
+            else if (kl == 17 && memEQ(k, "resource_metadata", 17))
+                (void)hv_stores(cap, "resource_metadata",
+                                newSVsv(ST(i + 1)));
         }
         RETVAL = pox_make_closure(aTHX_ pox_guard_cb, (void *)cap);
     OUTPUT:

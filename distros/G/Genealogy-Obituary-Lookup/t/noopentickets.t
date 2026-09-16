@@ -5,24 +5,24 @@ use warnings;
 
 use Test::DescribeMe qw(author);
 use Test::Most tests => 4;
+use Test::RequiresInternet;
 
 use constant URL => 'https://api.github.com/repos/nigelhorne/Genealogy-Obituary-Lookup/issues';
 use constant SITE =>'api.github.com';
 
 RT: {
-	# RT system, deprecated
 	SKIP: {
 		eval 'use WWW::RT::CPAN';	# FIXME: use a REST client
 		if($@) {
 			diag('WWW::RT::CPAN required to check for open tickets');
 			skip('WWW::RT::CPAN required to check for open tickets', 3);
-		} elsif(my @rc = @{WWW::RT::CPAN::list_dist_active_tickets(dist => 'Genealogy-Obituary-Lookup')}) {
+		} elsif(my @rc = @{WWW::RT::CPAN::list_dist_active_tickets(dist => 'CGI-Info')}) {
 			cmp_ok($rc[0], '==', 200);
 			cmp_ok($rc[1], 'eq', 'OK');
 			my @tickets = $rc[2] ? @{$rc[2]} : ();
 
 			foreach my $ticket(@tickets) {
-				diag($ticket->{id}, ': ', $ticket->{title}, ', broken since ', $ticket->{'broken_in'}[0]);
+				diag('RT: ', $ticket->{id}, ': ', $ticket->{title}, ', broken since ', $ticket->{'broken_in'}[0]);
 			}
 			ok(scalar(@tickets) == 0);
 		} else {
@@ -66,7 +66,7 @@ GITHUB: {
 								diag($issue->{'html_url'});
 							}
 						}
-						cmp_ok(scalar(@issues), '==', 0, 'There are no opentickets');
+						cmp_ok(scalar(@issues), '==', 0, 'There are no opentickets on GitHub');
 					} else {
 						diag(URL, ': failed to get data - ignoring');
 						# fail('Failed to get data');

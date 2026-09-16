@@ -1,0 +1,72 @@
+=head1 NAME
+
+EV::Future::Handle - Cancellation and progress handle for EV::Future
+
+=head1 SYNOPSIS
+
+  use EV;
+  use EV::Future;
+
+  my $h = parallel_map(\@items, \&worker, sub { print "done\n" });
+  printf "%d in flight, %d to go\n", $h->active, $h->pending;
+  $h->cancel; # stop dispatching; final_cb will not fire
+
+=head1 DESCRIPTION
+
+The object every primitive in L<EV::Future> returns in non-void context. It is a
+lightweight reference to the operation and owns nothing: destroying the handle
+does not cancel the operation, and the operation ending does not invalidate the
+handle. Every method below is safe to call at any time, including on a handle
+whose operation is already over, where C<cancel> does nothing and both counters
+read 0.
+
+The object wraps an internal C pointer to a refcounted cell using
+C<PERL_MAGIC_ext>. Duplicating the handle via thread cloning yields C<undef>
+(C<EV::Future::Handle> sets C<CLONE_SKIP>), while cloning via C<Storable> or
+C<Clone::clone> yields an inert dead handle without duplicating the underlying C
+cell.
+
+=head1 METHODS
+
+=head2 cancel([$fire])
+
+Stop dispatching. With no argument, or a false one, C<final_cb> never fires;
+with a true C<$fire> it fires exactly once, with no arguments, before C<cancel>
+returns. Idempotent, and a no-op once the operation is over.
+
+=head2 pending
+
+Tasks that have not yet completed, counting both those in flight and those not
+yet dispatched.
+
+=head2 active
+
+Tasks currently in flight. C<parallel> and C<race> report the same value here as
+for C<pending>, because they dispatch every task before returning; C<series>
+always reports 1 while it is running.
+
+=head2 What the counters guarantee
+
+Both read 0 once the operation is over, so C<pending == 0> means it has finished
+or been cancelled. The one exception is an operation abandoned by an escaping
+unsafe-mode exception, whose counters freeze instead.
+
+In unsafe mode, double-calling C<done> corrupts the completion counter, so
+C<pending> under-reports for C<parallel> and C<parallel_limit> for the same
+reason C<final_cb> can fire early. The same double-call can drive the in-flight
+count below zero; C<active> is floored at 0 rather than reporting a negative.
+
+=head1 SEE ALSO
+
+L<EV::Future>
+
+=head1 AUTHOR
+
+vividsnow
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -294,7 +294,7 @@ Game::Cribbage::Round - a full scoring round of cribbage
 
 =head1 VERSION
 
-Version 0.12
+Version 0.15
 
 =cut
 

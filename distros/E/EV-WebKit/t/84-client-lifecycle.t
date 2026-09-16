@@ -230,4 +230,17 @@ alarm $DEADLINE;
 ok(!eval { EV::WebKit::Client->connect($path, on_event => 'not a code ref'); 1 },
    'connect croaks on a non-coderef on_event');
 
+# --- a dying callback in _defer_err is caught by _deliver --------------------
+{
+    my $c = EV::WebKit::Client->connect($path, ev => 1);
+    spin(0.2);
+    my $warned;
+    local $SIG{__WARN__} = sub { $warned = $_[0] if $_[0] =~ /callback died/ };
+    $c->go(*STDIN, sub { die "boom\n" });
+    spin(0.1);
+    ok($warned, '_defer_err caught the dying callback safely via _deliver');
+    like($warned, qr/boom/, '...with the expected error message');
+    $c->disconnect;
+}
+
 done_testing;

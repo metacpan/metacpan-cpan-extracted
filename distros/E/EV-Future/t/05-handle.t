@@ -175,23 +175,26 @@ subtest 'DESTROY refuses invocants it did not create' => sub {
 };
 
 subtest 'a second DESTROY is inert' => sub {
-    my $h = parallel([], sub { });
+    my (@dones, $finished);
+    my $h = parallel([ map { sub { push @dones, shift } } 1 .. 2 ], sub { $finished = 1 });
     isa_ok($h, 'EV::Future::Handle');
+    is($h->pending, 2, 'a live handle reports 2 pending');
 
     $h->DESTROY;
-    is($$h, 0, 'the payload is zeroed by the first DESTROY');
+    is($h->pending, 0, 'pending is 0 after DESTROY');
+    is($h->active, 0, 'active is 0 after DESTROY');
     $h->DESTROY;
     pass('second explicit DESTROY did not double free');
     undef $h;
     pass('implicit DESTROY after the explicit ones did not double free');
+
+    $_->() for @dones;
+    ok($finished, 'destroying the handle did not cancel the operation');
 };
 
-# The handle is a blessed scalar holding a C pointer to one refcounted cell, so
-# anything that duplicates the Perl object creates a second owner and a second
-# free. CLONE_SKIP covers ithread cloning; Storable does not honour CLONE_SKIP
-# and needs its own hooks. Without them this subtest aborts the process with
-# "double free or corruption" (an invalid write in parallel_cleanup under
-# valgrind, from ctx->h dangling after the copy's DESTROY freed the cell).
+# The handle wraps an internal C pointer attached via PERL_MAGIC_ext, so
+# anything that duplicates the Perl object (Storable, Clone) produces an inert
+# dead handle without copying the magic or cell, avoiding double frees.
 subtest 'a handle refuses to be duplicated' => sub {
     is(EV::Future::Handle->CLONE_SKIP, 1, 'CLONE_SKIP is set, so a thread clone yields undef');
 
@@ -204,8 +207,8 @@ subtest 'a handle refuses to be duplicated' => sub {
             my $h = parallel([ (sub { push @dones, shift }) x 2 ], sub { });
             $clone = Storable::dclone($h);
             isa_ok($clone, 'EV::Future::Handle');
-            isnt($$clone, $$h, 'the copy does not carry the original pointer');
-            is($$clone, 0, 'the copy is an inert dead handle');
+            is($clone->pending, 0, 'the copy is an inert dead handle');
+            is($clone->active, 0, 'the copy has 0 active');
         }
 
         $clone->cancel;
@@ -217,6 +220,35 @@ subtest 'a handle refuses to be duplicated' => sub {
         $_->() for @dones;
         pass('the operation completed after both objects went away');
     }
+
+    SKIP: {
+        eval { require Clone; 1 } or skip 'Clone is not available', 4;
+
+        my @dones;
+        my $clone;
+        {
+            my $h = parallel([ (sub { push @dones, shift }) x 2 ], sub { });
+            $clone = Clone::clone($h);
+            isa_ok($clone, 'EV::Future::Handle');
+            is($clone->pending, 0, 'Clone::clone produces an inert dead handle');
+            is($clone->active, 0, 'Clone::clone has 0 active');
+        }
+
+        $clone->cancel;
+        undef $clone;
+        $_->() for @dones;
+        pass('Clone::clone did not double-free on destruction');
+    }
+};
+
+subtest 'forged handle is rejected safely without segfault' => sub {
+    my $forged = bless \(my $x = 12345), 'EV::Future::Handle';
+    is($forged->pending, 0, 'forged handle pending returns 0');
+    is($forged->active, 0, 'forged handle active returns 0');
+    eval { $forged->cancel };
+    ok(!$@, 'forged handle cancel does not die or crash');
+    undef $forged;
+    pass('forged handle destroyed cleanly without crash');
 };
 
 subtest 'cancel stops further dispatch' => sub {
@@ -540,6 +572,60 @@ subtest 'truthy done cancels a series early and zeroes the counts' => sub {
     is($h2->pending, 0, 'pending is zero after an async truthy-done cancellation');
     is($h2->active,  0, 'active is zero after an async truthy-done cancellation');
     @w = ();
+};
+
+subtest 'active clamp floors negative in-flight count in unsafe mode' => sub {
+    my ($h, $a_done, $seen);
+    $h = parallel_limit([
+        sub { $a_done = shift },
+        sub { my $d = shift; $d->(); $d->(); $seen = $h->active },
+        sub { },
+        sub { },
+    ], 1, sub {}, 1); # unsafe mode
+
+    $a_done->();
+    is($seen, 0, 'active read from inside a double-calling task is floored at 0');
+};
+
+subtest 'huge limits dispatch the whole list' => sub {
+    for my $lim (1e20, 'inf' + 0, 2**64, 3) {
+        my @d;
+        parallel_limit([ map { sub { push @d, shift } } 1..3 ], $lim, sub {});
+        is(scalar(@d), 3, "limit $lim dispatches all 3 at once");
+        $_->() for @d;
+    }
+};
+
+subtest 'parallel_limit and parallel_map_limit wide and NV limit handling' => sub {
+    my $ran = 0;
+    parallel_limit([ sub { my $d = shift; $ran++; $d->() } ], 2**35, sub {});
+    is($ran, 1, 'limit > 2**31 runs correctly');
+
+    $ran = 0;
+    parallel_limit([ sub { my $d = shift; $ran++; $d->() } ], 1e12, sub {});
+    is($ran, 1, 'limit as NV 1e12 runs correctly');
+
+    $ran = 0;
+    parallel_limit([ sub { my $d = shift; $ran++; $d->() } ], 0, sub {});
+    is($ran, 1, 'limit 0 clamps to 1');
+
+    $ran = 0;
+    parallel_limit([ sub { my $d = shift; $ran++; $d->() } ], -5, sub {});
+    is($ran, 1, 'negative limit clamps to 1');
+
+    $ran = 0;
+    my $nan = "nan" + 0;
+    parallel_limit([ sub { my $d = shift; $ran++; $d->() } ], $nan, sub {});
+    is($ran, 1, 'NaN limit clamps to 1');
+
+    $ran = 0;
+    my $inf = "inf" + 0;
+    parallel_limit([ sub { my $d = shift; $ran++; $d->() } ], $inf, sub {});
+    is($ran, 1, 'Inf limit clamps to list size');
+
+    my @mapped;
+    parallel_map_limit([10, 20], sub { my ($it, $d) = @_; push @mapped, $it; $d->() }, 2**35, sub {});
+    is_deeply(\@mapped, [10, 20], 'parallel_map_limit wide limit works');
 };
 
 done_testing;

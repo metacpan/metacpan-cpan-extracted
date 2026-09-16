@@ -18,6 +18,16 @@ WriteMakefile(
     INC               => '-I.',
     XS                => { 'Shared.xs' => 'Shared.c' },
     OBJECT            => 'Shared$(OBJ_EXT)',
-    META_MERGE        => { 'meta-spec' => { version => 2 }, dynamic_config => 1 },
+    depend            => { 'Shared$(OBJ_EXT)' => 'heap.h' },
+    META_MERGE        => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 1,
+        resources => {
+            repository => { type => 'git',
+                url => 'https://github.com/vividsnow/perl5-data-heap-shared.git',
+                web => 'https://github.com/vividsnow/perl5-data-heap-shared' },
+            bugtracker => { web => 'https://github.com/vividsnow/perl5-data-heap-shared/issues' },
+        },
+    },
     clean             => { FILES => "*.bs *.o ppport.h Shared.c" },
 );

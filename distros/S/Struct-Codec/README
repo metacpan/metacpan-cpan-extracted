@@ -1,0 +1,33 @@
+Struct-Codec
+
+A Perl structure to bytes and back, with nothing lost: strings stay strings
+and numbers stay numbers, the UTF-8 flag survives, a blessed referent comes
+back blessed into the same class, and references that were shared or cyclic
+are shared or cyclic again. Anything it cannot carry - code, globs, handles,
+regexps, tied things - is refused with an error rather than stringified.
+
+It also publishes a C ABI, so another XS module can encode a value straight
+into memory it owns and decode one straight out, with no Perl frame between.
+Shared::Arena's caches and maps are the first consumer.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Struct::Codec
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under the Artistic License 2.0.

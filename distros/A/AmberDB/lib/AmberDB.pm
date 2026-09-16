@@ -24,7 +24,7 @@ use parent qw(
 our $DB_HASH;
 our $hash_info;
 
-our $VERSION = '5.25.1';
+our $VERSION = '5.25.2';
 my $CREATED = '2005-01-28';
 
 
@@ -41,15 +41,27 @@ sub new {
     }
 
     # Map public input keys to internal private keys
-    $self->{_cfg}  = delete $self->{cfg}  // $self->{_cfg}  // {};
-    $self->{_path} = delete $self->{path} // $self->{_path} // {};
+    $self->{_cfg}     = delete $self->{cfg}     // $self->{_cfg}     // {};
+    $self->{_path}    = delete $self->{path}    // $self->{_path}    // {};
+    $self->{_connect} = delete $self->{connect} // $self->{_connect} // {};
 
     $self->{_dbase} ||= {};
     $self->{_table} ||= {};
     $self->{_cache} ||= {};
     $self->{_auth}  ||= {};
     $self->{_pid}   ||= {};
-    $self->{_cfg}->{user}     ||= "user_system";
+
+    # Normalize connect parameters
+    $self->{_connect}->{database} //= delete $self->{database} // delete $self->{dbase} // delete $self->{dbname};
+    $self->{_connect}->{username} //= delete $self->{username} // delete $self->{user}  // delete $self->{_cfg}->{user} // "user_system";
+    $self->{_connect}->{password} //= delete $self->{password} // delete $self->{pass}  // delete $self->{passwd};
+    $self->{_connect}->{token}    = '';
+    $self->{_connect}->{user}     = '';
+    $self->{_connect}->{pass}     = '';
+    $self->{_connect}->{dbase}    = '';
+    $self->{_connect}->{dbname}   = '';
+
+    $self->{_cfg}->{user}     ||= $self->{_connect}->{username};
     $self->{_cfg}->{language} ||= "gb";
     if ( defined $self->{_cfg}->{use_ramdisk} ) {
         $self->{_cfg}->{use_ramdisk} = $self->_normalize_ramdisk_tier( $self->{_cfg}->{use_ramdisk} );
@@ -98,10 +110,6 @@ sub new {
         $self->{_path}->{$k} = $custom_paths{$k} if defined $custom_paths{$k} && length($custom_paths{$k}) && $k ne 'dbase_dir';
     }
 
-    # Detect RAM-disk mount status and register in configuration
-    my $rd_setup = $self->ramdisk_setup();
-    $self->{_cfg}->{ramdisk_mounted} = $rd_setup->{is_mounted} ? 1 : 0;
-
     # Ensure internal containers exist
     $self->{_db}     ||= {};
     $self->{_dbm}    ||= {};
@@ -119,7 +127,7 @@ sub new {
         @input_keys,
         qw(
             _dbase _table _cache _auth _pid _txn _db _dbm _fd _tie
-            _lock _lastid _error _adb _rdbm_memo say
+            _lock _lastid _error _adb _rdbm_memo say _connect
             _path _cfg db_ext ext date locale slug_max_len _no_txn
             day day_id dayname days hour hour_id minute minute_id
             month month_id monthname months only_time second second_id
@@ -145,6 +153,7 @@ sub new {
     lock_value( %$self, '_lastid' );
     lock_value( %$self, '_path' );
     lock_value( %$self, '_cfg' );
+    lock_value( %$self, '_connect' );
 
     return $self;
 }
@@ -5451,8 +5460,8 @@ sub index_put {
                 my $old_raw;
                 my $ret     = $db->get( $k, $old_raw );
                 my $action  = ( $ret == 0 && defined $old_raw ) ? 'edit' : 'add';
-                my $old_hex = ( $ret == 0 && defined $old_raw ) ? unpack("H*", $old_raw) : '__NULL__';
-                $self->_txn_log( 'index', $tableid, $table_path, $k_orig, $action, $old_hex );
+                my $old_val = ( $ret == 0 && defined $old_raw ) ? $old_raw : '__NULL__';
+                $self->_txn_log( 'index', $tableid, $table_path, $k_orig, $action, $old_val );
             }
 
             my $v_encoded;
@@ -5531,8 +5540,8 @@ sub index_put {
         my $old_raw;
         my $ret     = $db->get( $k, $old_raw );
         my $action  = ( $ret == 0 && defined $old_raw ) ? 'edit' : 'add';
-        my $old_hex = ( $ret == 0 && defined $old_raw ) ? unpack("H*", $old_raw) : '__NULL__';
-        $self->_txn_log( 'index', $tableid, $table_path, $key, $action, $old_hex );
+        my $old_val = ( $ret == 0 && defined $old_raw ) ? $old_raw : '__NULL__';
+        $self->_txn_log( 'index', $tableid, $table_path, $key, $action, $old_val );
     }
 
     $type = lc( $type // '' );
@@ -5635,8 +5644,7 @@ sub index_del {
             my $old_raw;
             my $ret = $db->get( $k, $old_raw );
             if ( $ret == 0 && defined $old_raw ) {
-                my $old_hex = unpack("H*", $old_raw);
-                $self->_txn_log( 'index', $tableid, $table_path, $key, 'del', $old_hex );
+                $self->_txn_log( 'index', $tableid, $table_path, $key, 'del', $old_raw );
             }
         }
 
@@ -5689,8 +5697,7 @@ sub index_del {
             my $old_raw;
             my $ret = $db->get( $k, $old_raw );
             if ( $ret == 0 && defined $old_raw ) {
-                my $old_hex = unpack("H*", $old_raw);
-                $self->_txn_log( 'index', $tableid, $table_path, $k_item, 'del', $old_hex );
+                $self->_txn_log( 'index', $tableid, $table_path, $k_item, 'del', $old_raw );
             }
         }
 

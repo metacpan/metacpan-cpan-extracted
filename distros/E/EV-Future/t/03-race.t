@@ -197,4 +197,32 @@ subtest 'array with holes' => sub {
     ok($finished, 'race with holes fires final_cb');
 };
 
+subtest 'a loser DESTROY freeing the winning arg' => sub {
+    our %res = (a => 'winner-' . ('x' x 200));
+    { package Race::FreeArg; sub new { bless {}, shift } sub DESTROY { delete $main::res{a} } }
+    my ($got, @w);
+    {
+        my $g = Race::FreeArg->new;
+        race([
+            sub { my $d = shift; push @w, EV::timer 0.01, 0, sub { $d->($main::res{a}) } },
+            sub { my $keep = $g },
+        ], sub { $got = shift });
+    }
+    EV::run;
+    is($got, 'winner-' . ('x' x 200), 'final_cb gets the value the loser deleted');
+};
+
+subtest 'a tied done arg whose FETCH cancels' => sub {
+    our $h;
+    { package Race::CancelTie; sub TIESCALAR { bless {}, shift } sub FETCH { $main::h->cancel; 'v' } }
+    tie my $t, 'Race::CancelTie';
+    my (@got, @w);
+    $h = race([
+        sub { my $d = shift; push @w, EV::timer 0.01, 0, sub { $d->($t) } },
+        sub { },
+    ], sub { push @got, @_ });
+    EV::run;
+    is_deeply(\@got, ['v'], 'final_cb fires once with the fetched value');
+};
+
 done_testing;

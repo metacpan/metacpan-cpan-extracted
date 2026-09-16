@@ -202,9 +202,12 @@ static inline int queue_pid_is_zombie(uint32_t pid) {
     return rp[1] == ' ' && rp[2] == 'Z';
 }
 static inline int queue_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (pid == 0) return 0; /* no owner recorded, treat as dead */
     if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
-    return !queue_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
+    if (queue_pid_is_zombie(pid)) return 0; /* zombie -> treat as dead */
+    /* Re-check kill(): if process was reaped during proc scan, ESRCH avoids 2s stall */
+    if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0;
+    return 1;
 }
 
 static const struct timespec queue_lock_timeout = { QUEUE_LOCK_TIMEOUT_SEC, 0 };
@@ -438,6 +441,11 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
             flock(fd, LOCK_UN); close(fd); return NULL;
         }
 
+        if (!S_ISREG(st.st_mode)) {
+            QUEUE_ERR("%s: invalid (not a regular file)", path);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
+
         int is_new = (st.st_size == 0);
 
         if (!is_new && (uint64_t)st.st_size < sizeof(QueueHeader)) {
@@ -470,15 +478,18 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
             int valid = (hdr->magic == QUEUE_MAGIC &&
                          hdr->version == QUEUE_VERSION &&
                          hdr->mode == mode &&
-                         hdr->capacity > 0 &&
+                         hdr->capacity >= 2 &&
                          (hdr->capacity & (hdr->capacity - 1)) == 0 &&
                          hdr->total_size == (uint64_t)st.st_size &&
                          hdr->slots_off == sizeof(QueueHeader) &&
                          hdr->capacity <= (hdr->total_size - hdr->slots_off) / slot_size);
             if (mode == QUEUE_MODE_STR && valid) {
                 uint64_t slots_end = hdr->slots_off + (uint64_t)hdr->capacity * slot_size;
-                valid = (hdr->arena_off >= slots_end &&
-                         hdr->arena_off + hdr->arena_cap <= hdr->total_size);
+                valid = (hdr->arena_cap >= 4096 &&
+                         (hdr->arena_off & 7) == 0 &&
+                         hdr->arena_off >= slots_end &&
+                         hdr->arena_off <= hdr->total_size &&
+                         hdr->arena_cap <= hdr->total_size - hdr->arena_off);
             }
             if (!valid) {
                 /* Recover an abandoned mid-init file: a creator killed
@@ -611,6 +622,11 @@ static QueueHandle *queue_open_fd(int fd, uint32_t mode, char *errbuf) {
         return NULL;
     }
 
+    if (!S_ISREG(st.st_mode)) {
+        QUEUE_ERR("fd %d: invalid (not a regular file)", fd);
+        return NULL;
+    }
+
     if ((uint64_t)st.st_size < sizeof(QueueHeader)) {
         QUEUE_ERR("fd %d: too small (%lld)", fd, (long long)st.st_size);
         return NULL;
@@ -631,15 +647,18 @@ static QueueHandle *queue_open_fd(int fd, uint32_t mode, char *errbuf) {
     int valid = (hdr->magic == QUEUE_MAGIC &&
                  hdr->version == QUEUE_VERSION &&
                  hdr->mode == mode &&
-                 hdr->capacity > 0 &&
+                 hdr->capacity >= 2 &&
                  (hdr->capacity & (hdr->capacity - 1)) == 0 &&
                  hdr->total_size == (uint64_t)st.st_size &&
                  hdr->slots_off == sizeof(QueueHeader) &&
                  hdr->capacity <= (hdr->total_size - hdr->slots_off) / slot_size);
     if (mode == QUEUE_MODE_STR && valid) {
         uint64_t slots_end = hdr->slots_off + (uint64_t)hdr->capacity * slot_size;
-        valid = (hdr->arena_off >= slots_end &&
-                 hdr->arena_off + hdr->arena_cap <= hdr->total_size);
+        valid = (hdr->arena_cap >= 4096 &&
+                 (hdr->arena_off & 7) == 0 &&
+                 hdr->arena_off >= slots_end &&
+                 hdr->arena_off <= hdr->total_size &&
+                 hdr->arena_cap <= hdr->total_size - hdr->arena_off);
     }
     if (!valid) {
         QUEUE_ERR("fd %d: invalid or incompatible queue", fd);
@@ -699,10 +718,11 @@ static inline int queue_##PFX##_try_push(QueueHandle *h, VTYPE value) {       \
     SLOT *slots = (SLOT *)h->slots;                                           \
     uint32_t mask = h->cap_mask;                                              \
     uint64_t pos = __atomic_load_n(&hdr->tail, __ATOMIC_RELAXED);             \
+    int spins = 0;                                                            \
     for (;;) {                                                                \
         SLOT *slot = &slots[pos & mask];                                      \
         STYPE seq = __atomic_load_n(&slot->sequence, __ATOMIC_ACQUIRE);       \
-        DTYPE diff = (DTYPE)seq - (DTYPE)(STYPE)pos;                          \
+        DTYPE diff = (DTYPE)(seq - (STYPE)pos);                               \
         if (diff == 0) {                                                      \
             if (__atomic_compare_exchange_n(&hdr->tail, &pos, pos + 1,        \
                     1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {                 \
@@ -713,11 +733,19 @@ static inline int queue_##PFX##_try_push(QueueHandle *h, VTYPE value) {       \
                 queue_wake_consumers(hdr);                                    \
                 return 1;                                                     \
             }                                                                 \
+            spins = 0;                                                        \
         } else if (diff < 0) {                                                \
             __atomic_add_fetch(&hdr->stat_push_full, 1, __ATOMIC_RELAXED);   \
             return 0;                                                         \
         } else {                                                              \
-            pos = __atomic_load_n(&hdr->tail, __ATOMIC_RELAXED);              \
+            uint64_t next_pos = __atomic_load_n(&hdr->tail, __ATOMIC_RELAXED);\
+            if (next_pos == pos) {                                            \
+                queue_spin_pause();                                           \
+                if (++spins > QUEUE_SPIN_LIMIT) return 0;                     \
+                continue;                                                     \
+            }                                                                 \
+            pos = next_pos;                                                   \
+            spins = 0;                                                        \
         }                                                                     \
     }                                                                         \
 }                                                                             \
@@ -727,10 +755,11 @@ static inline int queue_##PFX##_try_pop(QueueHandle *h, VTYPE *value) {       \
     SLOT *slots = (SLOT *)h->slots;                                           \
     uint32_t mask = h->cap_mask;                                              \
     uint64_t pos = __atomic_load_n(&hdr->head, __ATOMIC_RELAXED);             \
+    int spins = 0;                                                            \
     for (;;) {                                                                \
         SLOT *slot = &slots[pos & mask];                                      \
         STYPE seq = __atomic_load_n(&slot->sequence, __ATOMIC_ACQUIRE);       \
-        DTYPE diff = (DTYPE)seq - (DTYPE)(STYPE)(pos + 1);                    \
+        DTYPE diff = (DTYPE)(seq - (STYPE)(pos + 1));                         \
         if (diff == 0) {                                                      \
             if (__atomic_compare_exchange_n(&hdr->head, &pos, pos + 1,        \
                     1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {                 \
@@ -741,11 +770,19 @@ static inline int queue_##PFX##_try_pop(QueueHandle *h, VTYPE *value) {       \
                 queue_wake_producers(hdr);                                    \
                 return 1;                                                     \
             }                                                                 \
+            spins = 0;                                                        \
         } else if (diff < 0) {                                                \
             __atomic_add_fetch(&hdr->stat_pop_empty, 1, __ATOMIC_RELAXED);   \
             return 0;                                                         \
         } else {                                                              \
-            pos = __atomic_load_n(&hdr->head, __ATOMIC_RELAXED);              \
+            uint64_t next_pos = __atomic_load_n(&hdr->head, __ATOMIC_RELAXED);\
+            if (next_pos == pos) {                                            \
+                queue_spin_pause();                                           \
+                if (++spins > QUEUE_SPIN_LIMIT) return 0;                     \
+                continue;                                                     \
+            }                                                                 \
+            pos = next_pos;                                                   \
+            spins = 0;                                                        \
         }                                                                     \
     }                                                                         \
 }                                                                             \
@@ -826,7 +863,7 @@ static inline int queue_##PFX##_peek(QueueHandle *h, VTYPE *value) {          \
     uint64_t pos = __atomic_load_n(&h->hdr->head, __ATOMIC_ACQUIRE);          \
     SLOT *slot = &slots[pos & h->cap_mask];                                   \
     STYPE seq = __atomic_load_n(&slot->sequence, __ATOMIC_ACQUIRE);           \
-    if ((DTYPE)seq - (DTYPE)(STYPE)(pos + 1) == 0) {                          \
+    if ((DTYPE)(seq - (STYPE)(pos + 1)) == 0) {                               \
         *value = slot->value;                                                 \
         return 1;                                                             \
     }                                                                         \
@@ -836,7 +873,9 @@ static inline int queue_##PFX##_peek(QueueHandle *h, VTYPE *value) {          \
 static inline uint64_t queue_##PFX##_size(QueueHandle *h) {                   \
     uint64_t tail = __atomic_load_n(&h->hdr->tail, __ATOMIC_RELAXED);         \
     uint64_t head = __atomic_load_n(&h->hdr->head, __ATOMIC_RELAXED);         \
-    return tail - head;                                                       \
+    uint64_t diff = tail - head;                                              \
+    if ((int64_t)diff < 0) return 0;                                          \
+    return diff > h->capacity ? h->capacity : diff;                           \
 }                                                                             \
                                                                                \
 static void queue_##PFX##_clear(QueueHandle *h) {                             \
@@ -876,8 +915,8 @@ static inline int queue_str_push_locked(QueueHandle *h, const char *str,
     uint32_t pos = saved_wpos;
     uint64_t skip = alloc;
 
-    if ((uint64_t)pos + alloc > h->arena_cap) {
-        skip += h->arena_cap - pos;
+    if (pos >= h->arena_cap || (uint64_t)pos + alloc > h->arena_cap) {
+        skip += (pos < h->arena_cap) ? (h->arena_cap - pos) : 0;
         pos = 0;
     }
 
@@ -932,24 +971,30 @@ static inline int queue_str_pop_locked(QueueHandle *h, const char **out_str,
     uint32_t idx = (uint32_t)(hdr->head & h->cap_mask);
     QueueStrSlot *slot = &((QueueStrSlot *)h->slots)[idx];
 
+    uint32_t off = slot->arena_off;
     uint32_t len = slot->packed_len & QUEUE_STR_LEN_MASK;
     /* arena_off/len come from the mmap'd slot; a local peer can corrupt the
      * backing file. Bound the record against the arena so a poisoned slot
      * yields an empty payload instead of an out-of-bounds read (CWE-125). */
-    if ((uint64_t)slot->arena_off + len > h->arena_cap) len = 0;
+    if ((uint64_t)off + len > h->arena_cap) len = 0;
     *out_utf8 = (slot->packed_len & QUEUE_STR_UTF8_FLAG) != 0;
 
     if (!queue_ensure_copy_buf(h, len + 1))
         return -1;
     if (len > 0)
-        memcpy(h->copy_buf, h->arena + slot->arena_off, len);
+        memcpy(h->copy_buf, h->arena + off, len);
     h->copy_buf[len] = '\0';
     *out_str = h->copy_buf;
     *out_len = len;
 
-    hdr->arena_used -= slot->arena_skip;
-    if (hdr->arena_used == 0)
+    if (hdr->tail == hdr->head + 1) {
+        hdr->arena_used = 0;
         hdr->arena_wpos = 0;
+    } else if (hdr->arena_used <= slot->arena_skip) {
+        hdr->arena_used = 0;
+    } else {
+        hdr->arena_used -= slot->arena_skip;
+    }
 
     hdr->head++;
     __atomic_add_fetch(&hdr->stat_pop_ok, 1, __ATOMIC_RELAXED);
@@ -1048,7 +1093,9 @@ static inline uint64_t queue_str_size(QueueHandle *h) {
     QueueHeader *hdr = h->hdr;
     uint64_t tail = __atomic_load_n(&hdr->tail, __ATOMIC_RELAXED);
     uint64_t head = __atomic_load_n(&hdr->head, __ATOMIC_RELAXED);
-    return tail - head;  /* unsigned wrap is correct for push_front (head > tail) */
+    uint64_t diff = tail - head;
+    if ((int64_t)diff < 0) return 0;
+    return diff > h->capacity ? h->capacity : diff;
 }
 
 static void queue_str_clear(QueueHandle *h) {
@@ -1082,15 +1129,16 @@ static inline int queue_str_peek(QueueHandle *h, const char **out_str,
     }
     uint32_t idx = (uint32_t)(hdr->head & h->cap_mask);
     QueueStrSlot *slot = &((QueueStrSlot *)h->slots)[idx];
+    uint32_t off = slot->arena_off;
     uint32_t len = slot->packed_len & QUEUE_STR_LEN_MASK;
-    if ((uint64_t)slot->arena_off + len > h->arena_cap) len = 0;
+    if ((uint64_t)off + len > h->arena_cap) len = 0;
     *out_utf8 = (slot->packed_len & QUEUE_STR_UTF8_FLAG) != 0;
     if (!queue_ensure_copy_buf(h, len + 1)) {
         queue_mutex_unlock(hdr);
         return -1;
     }
     if (len > 0)
-        memcpy(h->copy_buf, h->arena + slot->arena_off, len);
+        memcpy(h->copy_buf, h->arena + off, len);
     h->copy_buf[len] = '\0';
     *out_str = h->copy_buf;
     *out_len = len;
@@ -1134,6 +1182,7 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
      * leaving a hole the single-counter model cannot represent, so later
      * wrapping pushes overwrote live elements.) */
     uint32_t cap = (uint32_t)h->arena_cap;
+    if (cap == 0) { queue_mutex_unlock(hdr); return 0; }
     uint32_t pos, skip;
 
     if (hdr->tail == hdr->head) {
@@ -1145,7 +1194,7 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
         hdr->arena_wpos = alloc;
     } else {
         uint32_t rpos = (uint32_t)(((uint64_t)hdr->arena_wpos
-                          + cap - hdr->arena_used) % cap);
+                          + cap - (hdr->arena_used % cap)) % cap);
         if (alloc <= rpos) {
             pos  = rpos - alloc;   /* fits contiguously below the front */
             skip = alloc;
@@ -1231,8 +1280,9 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
     uint32_t idx = (uint32_t)(hdr->tail & h->cap_mask);
     QueueStrSlot *slot = &((QueueStrSlot *)h->slots)[idx];
 
+    uint32_t off = slot->arena_off;
     uint32_t len = slot->packed_len & QUEUE_STR_LEN_MASK;
-    if ((uint64_t)slot->arena_off + len > h->arena_cap) len = 0;
+    if ((uint64_t)off + len > h->arena_cap) len = 0;
     *out_utf8 = (slot->packed_len & QUEUE_STR_UTF8_FLAG) != 0;
 
     if (!queue_ensure_copy_buf(h, len + 1)) {
@@ -1241,7 +1291,7 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
         return -1;
     }
     if (len > 0)
-        memcpy(h->copy_buf, h->arena + slot->arena_off, len);
+        memcpy(h->copy_buf, h->arena + off, len);
     h->copy_buf[len] = '\0';
     *out_str = h->copy_buf;
     *out_len = len;
@@ -1252,12 +1302,16 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
      * the old one minus this slot's skip (its span plus any wrap waste). This
      * holds whether the element was appended (push) or prepended
      * (push_front). */
-    hdr->arena_used -= slot->arena_skip;
-    if (hdr->arena_used == 0 || h->arena_cap == 0)   /* arena_cap==0: corrupt file, avoid % 0 (CWE-369) */
+    if (hdr->tail == hdr->head) {
+        hdr->arena_used = 0;
         hdr->arena_wpos = 0;
-    else
+    } else if (hdr->arena_used <= slot->arena_skip || h->arena_cap == 0) {
+        hdr->arena_used = 0;
+    } else {
+        hdr->arena_used -= slot->arena_skip;
         hdr->arena_wpos = (uint32_t)(((uint64_t)hdr->arena_wpos
-                          + h->arena_cap - slot->arena_skip) % h->arena_cap);
+                          + h->arena_cap - (slot->arena_skip % h->arena_cap)) % h->arena_cap);
+    }
 
     __atomic_add_fetch(&hdr->stat_pop_ok, 1, __ATOMIC_RELAXED);
     queue_mutex_unlock(hdr);

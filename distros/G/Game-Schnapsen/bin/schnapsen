@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long ();
+use Digest::SHA ();
+
+use Game::Schnapsen::Terminal;
+
+my %o = (mode => 'bot', level => 2, seat => 'p1');
+Getopt::Long::GetOptions(
+    'variant=s' => \$o{variant},
+    'mode=s'    => \$o{mode},
+    'level=i'   => \$o{level},
+    'seat=s'    => \$o{seat},
+    'seed=s'    => \$o{seed},
+    'ascii'     => \$o{ascii},
+    'colour!'   => \$o{colour},
+    'color!'    => \$o{colour},
+    'help'      => \$o{help},
+) or usage(1);
+usage(0) if $o{help};
+
+usage(1, "--variant must be schnapsen or sixtysix\n")
+    unless defined $o{variant} && $o{variant} =~ /\A(?:schnapsen|sixtysix)\z/;
+usage(1, "mode must be bot, hotseat or watch\n")
+    unless $o{mode} =~ /\A(?:bot|hotseat|watch)\z/;
+usage(1, "seat must be p1 or p2\n") unless $o{seat} =~ /\A p[12] \z/x;
+
+my $seed = defined $o{seed} ? Digest::SHA::sha256($o{seed}) : undef;
+
+Game::Schnapsen::Terminal->new(
+    variant => $o{variant},
+    mode    => $o{mode},
+    level   => $o{level},
+    seat    => $o{seat},
+    ($o{ascii} ? (ascii => 1) : ()),
+    (defined $o{colour} ? (colour => $o{colour}) : ()),
+)->play(defined $seed ? (seed => $seed) : ());
+
+sub usage {
+    my ($status, $message) = @_;
+    my $fh = $status ? \*STDERR : \*STDOUT;
+    print {$fh} $message if $message;
+    print {$fh} <<'USAGE';
+schnapsen - Schnapsen and Sixty-Six at a prompt
+
+    schnapsen --variant schnapsen     the Austrian game, 20 cards, 7 down to 0
+    schnapsen --variant sixtysix      the German parent, 24 cards, 0 up to 7
+
+    --seat p2              play the bot as p2
+    --mode hotseat         two people at one keyboard
+    --mode watch           two bots, and you read
+    --level 1              a weaker opponent (1 or 2)
+    --seed tuesday         deal the same match every time
+    --ascii                letters instead of the suit pips
+    --nocolour             no colour (NO_COLOR does the same)
+
+--variant has no default, because the two are different games and picking one
+silently would make the other an afterthought. They differ in thirteen places:
+the pack, the card that exchanges for the trump, whether a marriage may be
+declared late, what the last trick is worth, which way the score runs, and more.
+
+At the prompt, name a card to play it: KH, TH, or 10H for the same card. Then
+
+    m H       declare a marriage in hearts, and lead one of the two
+    x         exchange your lowest trump for the turn-up
+    c         close the talon
+    out       claim 66 and end the deal
+    d         draw (sixtysix, where you may close before drawing instead)
+    ?         what is legal right now
+
+Claiming is typed in full. A claim that turns out to be false loses the deal, and
+the screen already shows you your own count, so it is not put a keystroke away
+from anything else.
+USAGE
+    exit $status;
+}

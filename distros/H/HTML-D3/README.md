@@ -4,7 +4,7 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 # VERSION
 
-Version 0.12
+Version 0.14
 
 # SYNOPSIS
 
@@ -43,6 +43,12 @@ The module generates HTML and JavaScript code to render the chart in a web brows
 
 # METHODS
 
+The `=head3 API SPECIFICATION` subsections use [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict)
+schema syntax (`type => 'arrayref'` etc.) as a documentation convention.
+`Params::Validate::Strict` is not a runtime dependency of this module; the
+schemas describe the parameter contract in machine-readable notation and can be
+plumbed into a WAF or test generator if desired.
+
 ## new
 
     my $chart = HTML::D3->new(%args);
@@ -78,8 +84,12 @@ None.
 
 #### Input
 
-    $self : HTML::D3                         -- required
-    $data : ArrayRef[ ArrayRef[Str, Num] ]   -- required; undef dies
+    {
+        data => { type => 'arrayref' },
+    }
+
+    Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
+    non-arrayref dies.
 
 #### Output
 
@@ -113,8 +123,12 @@ None.
 
 #### Input
 
-    $self : HTML::D3                         -- required
-    $data : ArrayRef[ ArrayRef[Str, Num] ]   -- required; undef dies
+    {
+        data => { type => 'arrayref' },
+    }
+
+    Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
+    non-arrayref dies.
 
 #### Output
 
@@ -144,8 +158,12 @@ None.
 
 #### Input
 
-    $self : HTML::D3                         -- required
-    $data : ArrayRef[ ArrayRef[Str, Num] ]   -- required (undef dies)
+    {
+        data => { type => 'arrayref' },
+    }
+
+    Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
+    non-arrayref dies.
 
 #### Output
 
@@ -177,8 +195,12 @@ None.
 
 #### Input
 
-    $self : HTML::D3                         -- required
-    $data : ArrayRef[ ArrayRef[Str, Num] ]   -- required (undef dies)
+    {
+        data => { type => 'arrayref' },
+    }
+
+    Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
+    non-arrayref dies.
 
 #### Output
 
@@ -213,8 +235,12 @@ None.
 
 #### Input
 
-    $self : HTML::D3                         -- required
-    $data : ArrayRef[ ArrayRef[Str, Num] ]   -- required; undef dies
+    {
+        data => { type => 'arrayref' },
+    }
+
+    Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
+    non-arrayref dies.
 
 #### Output
 
@@ -249,8 +275,12 @@ None.
 
 #### Input
 
-    $self : HTML::D3                         -- required
-    $data : ArrayRef[ ArrayRef[Str, Num] ]   -- required; undef dies
+    {
+        data => { type => 'arrayref' },
+    }
+
+    Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
+    non-arrayref dies.
 
 #### Output
 
@@ -259,19 +289,41 @@ None.
 
 ## render\_pie\_chart\_snippet
 
-    my $fragment = $chart->render_pie_chart_snippet($data);
+    my $fragment = $chart->render_pie_chart_snippet(\@slices);
+    my $fragment = $chart->render_pie_chart_snippet(\@slices, \%opts);
+    # $fragment->{svg_id} - always 'pie_chart'
+    # $fragment->{html}   - embeddable fragment; caller must load D3 v7
 
-Generates an embeddable pie chart fragment for use in existing HTML layouts.
-The caller is responsible for loading D3 in the page `<head>`.
-Returns a hashref (not a full HTML document) so it can be spliced into a
-Mojolicious template or similar layout without corrupting the host page structure.
+Generates an embeddable pie or donut chart fragment for use in existing HTML
+layouts.  Returns `{ svg_id => 'pie_chart', html => Str }`.  The
+caller is responsible for loading D3 v7 before embedding the fragment.
 
-- `$data` - An array reference of data points.  Each data point is an
-array reference with two elements: the label (string) and the value (numeric).
+### Data format
+
+Each element of `\@slices` is `[$label, $value]` or `[$label, $value, \%extra]`.
+Negative values are silently converted to their absolute value.  Zero-value
+slices are silently omitted.  `\%extra` key/value pairs are shown as
+additional rows in the hover tooltip.
+
+### Options (`\%opts`)
+
+- `animated` (bool, default 0) - fan slices in from arc-length 0 on
+first render using `attrTween` / `d3.easeBackOut` (800 ms, staggered).
+Respects `prefers-reduced-motion`.
+- `donut` (bool, default 0) - render as a donut chart (inner radius
+38% of outer radius); the total sum appears in the centre hole.
+- `sort_slices` (string, default `'none'`) - `'value'` for
+largest-first, `'label'` for alphabetical, `'none'` for input order.
+- `max_slices` (int, default 0) - when > 0, only the top N-1
+slices are shown individually; the rest are collapsed into an `"Other"` slice.
+- `legend` (bool, default 1) - render an HTML legend panel beside the chart.
+- `color_scheme` (string, default `'tableau10'`) - D3 categorical
+colour scheme.  Supported: `tableau10`, `category10`, `set2`, `set3`,
+`paired`.
 
 ### Errors
 
-- Throws `Data must be an array of arrays` when `$data` is not an ARRAY reference.
+- Throws `Data must be an array of arrays` when `\@slices` is not an ARRAY reference.
 
 ### Side Effects
 
@@ -281,15 +333,23 @@ None.
 
 #### Input
 
-    $self : HTML::D3                         -- required
-    $data : ArrayRef[ ArrayRef[Str, Num] ]   -- required (undef dies)
+    {
+        data => { type => 'arrayref' },
+        opts => { type => 'hashref', optional => 1, default => {} },
+    }
+
+    Each element of C<$data> is C<[ Str, Num ]> or C<[ Str, Num, HashRef ]>;
+    passing C<undef> or a non-arrayref dies.
+    Recognised C<opts> keys: C<animated> (boolean, default C<0>),
+    C<donut> (boolean, default C<0>), C<sort_slices> (string: C<'value'>,
+    C<'label'>, or C<'none'>; default C<'none'>), C<max_slices> (integer,
+    default C<0>), C<legend> (boolean, default C<1>),
+    C<color_scheme> (string, default C<'tableau10'>).
 
 #### Output
 
-    HashRef -- C<{ svg_id =E<gt> 'chart', html =E<gt> Str }>; the html value
-               is an embeddable fragment containing only C<< <svg> >> and
-               C<< <script> >> elements - no DOCTYPE, no page shell, no D3
-               CDN tag (caller's responsibility).
+    HashRef -- C<{ svg_id =E<gt> 'pie_chart', html =E<gt> Str }>;
+               embeddable fragment; no DOCTYPE, no page shell, no D3 CDN tag.
 
 ## render\_line\_chart\_with\_tooltips
 
@@ -318,8 +378,12 @@ None.
 
 #### Input
 
-    $self : HTML::D3                         -- required
-    $data : ArrayRef[ ArrayRef[Str, Num] ]   -- required
+    {
+        data => { type => 'arrayref' },
+    }
+
+    Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
+    non-arrayref dies.
 
 #### Output
 
@@ -359,6 +423,7 @@ Returns a hash reference with:
 ## render\_zoomable\_line\_chart\_snippet
 
     my $fragment = $chart->render_zoomable_line_chart_snippet($data);
+    my $fragment = $chart->render_zoomable_line_chart_snippet($data, { animated => 1 });
     # $fragment->{svg_id} - the id attribute of the <svg> element
     # $fragment->{html}   - embeddable HTML fragment (style + button + svg + script)
 
@@ -371,7 +436,44 @@ the full dataset.
 The caller is responsible for loading D3 in the page `<head`>.
 
 Accepts the same arguments as `render_line_chart_snippet`: an array reference
-of data points, each `[$x, $y]` or `[$x, $y, \%extra]`.
+of data points, each `[$x, $y]` or `[$x, $y, \%extra]`, plus an optional
+second argument `$opts` (hashref).
+
+### Options
+
+- `animated` (boolean, default `0`) - when true, the initial page load
+animates the line drawing left-to-right via the `stroke-dashoffset` technique
+(1200 ms, `d3.easeLinear`), then fades in data-point circles after the line
+finishes (300 ms after a 1200 ms delay).  Respects
+`prefers-reduced-motion`: when the user has requested reduced motion the line
+is drawn immediately at full opacity.  Subsequent zoom and reset redraws are
+never animated regardless of this flag.
+
+### API SPECIFICATION
+
+#### Input
+
+    {
+        data => { type => 'arrayref' },
+        opts => { type => 'hashref', optional => 1, default => {} },
+    }
+
+    Each element of C<$data> is C<[ Str, Num ]> or C<[ Str, Num, HashRef ]>;
+    passing C<undef> or a non-arrayref dies.
+    Recognised C<opts> key: C<animated> (boolean, default C<0>).
+
+#### Output
+
+    HashRef -- C<{ svg_id =E<gt> 'chart', html =E<gt> Str }>;
+               embeddable fragment; no DOCTYPE, no page shell, no D3 CDN tag.
+
+### Errors
+
+Dies with _Data must be an array of arrays_ if `$data` is not an arrayref.
+
+### Side Effects
+
+None.
 
 ## render\_multi\_series\_line\_chart\_with\_tooltips
 
@@ -405,8 +507,13 @@ None.
 
 #### Input
 
-    $self : HTML::D3                                                   -- required
-    $data : ArrayRef[ HashRef{ name: Str, data: ArrayRef[HashRef] } ] -- required
+    {
+        data => { type => 'arrayref' },
+    }
+
+    Each element of C<$data> is a hashref with keys C<name> (string) and
+    C<data> (arrayref of hashrefs with C<label> and C<value> keys);
+    passing C<undef> or a non-arrayref dies.
 
 #### Output
 
@@ -439,8 +546,13 @@ None.
 
 #### Input
 
-    $self : HTML::D3                                                   -- required
-    $data : ArrayRef[ HashRef{ name: Str, data: ArrayRef[HashRef] } ] -- required
+    {
+        data => { type => 'arrayref' },
+    }
+
+    Each element of C<$data> is a hashref with keys C<name> (string) and
+    C<data> (arrayref of hashrefs with C<label> and C<value> keys);
+    passing C<undef> or a non-arrayref dies.
 
 #### Output
 
@@ -473,8 +585,13 @@ None.
 
 #### Input
 
-    $self : HTML::D3                                                   -- required
-    $data : ArrayRef[ HashRef{ name: Str, data: ArrayRef[HashRef] } ] -- required
+    {
+        data => { type => 'arrayref' },
+    }
+
+    Each element of C<$data> is a hashref with keys C<name> (string) and
+    C<data> (arrayref of hashrefs with C<label> and C<value> keys);
+    passing C<undef> or a non-arrayref dies.
 
 #### Output
 
@@ -508,8 +625,13 @@ None.
 
 #### Input
 
-    $self : HTML::D3                                                   -- required
-    $data : ArrayRef[ HashRef{ name: Str, data: ArrayRef[HashRef] } ] -- required
+    {
+        data => { type => 'arrayref' },
+    }
+
+    Each element of C<$data> is a hashref with keys C<name> (string) and
+    C<data> (arrayref of hashrefs with C<label> and C<value> keys);
+    passing C<undef> or a non-arrayref dies.
 
 #### Output
 
@@ -567,7 +689,89 @@ Nigel Horne <njh@nigelhorne.com>
     post "<!DOCTYPE" ⊆ result
     post "d3.scalePoint" ⊆ result ∧ "d3.line()" ⊆ result
 
-## render\_lint\_chart\_with\_tooltips
+## render\_animated\_bar\_chart
+
+    render_animated_bar_chart : HTML::D3 × (ArrayRef | undef) → Str ∪ ⊥
+
+    pre  data = undef              ⇒ die "Data is not optional"
+    pre  ref(data) ≠ 'ARRAY'      ⇒ die "Data must be an array of arrays"
+    post result ∈ Str
+    post "<!DOCTYPE" ⊆ result
+    post ".transition()" ⊆ result ∧ ".delay(" ⊆ result
+
+## render\_animated\_line\_chart
+
+    render_animated_line_chart : HTML::D3 × (ArrayRef | undef) → Str ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'  ⇒ die "Data must be an array of arrays"
+    post result ∈ Str
+    post "<!DOCTYPE" ⊆ result
+    post "stroke-dashoffset" ⊆ result ∧ "d3.easeLinear" ⊆ result
+
+## render\_pie\_chart
+
+    render_pie_chart : HTML::D3 × (ArrayRef | undef) → Str ∪ ⊥
+
+    pre  data = undef              ⇒ die "Data is not optional"
+    pre  ref(data) ≠ 'ARRAY'      ⇒ die "Data must be an array of arrays"
+    post result ∈ Str
+    post "<!DOCTYPE" ⊆ result
+    post "d3.pie()" ⊆ result ∧ "d3.arc()" ⊆ result ∧ "d3.schemeCategory10" ⊆ result
+
+## render\_animated\_pie\_chart
+
+    render_animated_pie_chart : HTML::D3 × (ArrayRef | undef) → Str ∪ ⊥
+
+    pre  data = undef              ⇒ die "Data is not optional"
+    pre  ref(data) ≠ 'ARRAY'      ⇒ die "Data must be an array of arrays"
+    post result ∈ Str
+    post "<!DOCTYPE" ⊆ result
+    post "attrTween" ⊆ result ∧ "d3.interpolate" ⊆ result
+
+## render\_line\_chart\_snippet
+
+    render_line_chart_snippet : HTML::D3 × (ArrayRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'  ⇒ die "Data must be an array of arrays"
+    post result ∈ HashRef
+    post result.svg_id = "chart"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+
+## render\_zoomable\_line\_chart\_snippet
+
+    render_zoomable_line_chart_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'  ⇒ die "Data must be an array of arrays"
+    post result ∈ HashRef
+    post result.svg_id = "chart"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post "d3.brushX()" ⊆ result.html
+    post opts.animated = 1  ⇒  "stroke-dashoffset" ⊆ result.html
+                              ∧ "initialDrawDone" ⊆ result.html
+
+## render\_pie\_chart\_snippet
+
+    render_pie_chart_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'  ⇒ die "Data must be an array of arrays"
+    pre  ∀ d ∈ data . d[1] < 0  ⇒  d[1] := |d[1]|      -- negative → absolute
+    pre  ∀ d ∈ data . d[1] = 0  ⇒  d ∉ result           -- zero → omitted
+    post result ∈ HashRef
+    post result.svg_id = "pie_chart"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post "d3.pie()" ⊆ result.html ∧ "schemeTableau10" ⊆ result.html
+    post opts.animated = 1  ⇒  "attrTween" ⊆ result.html
+                              ∧ "initialDrawDone" ⊆ result.html
+    post opts.donut = 1     ⇒  "innerRadius" ⊆ result.html
+    post opts.max_slices = N ∧ N ≥ 2 ∧ |data| > N
+                            ⇒  |result_slices| = N ∧ "Other" ∈ result_labels
+
+## render\_line\_chart\_with\_tooltips
 
     render_line_chart_with_tooltips : HTML::D3 × (ArrayRef | undef) → Str ∪ ⊥
 

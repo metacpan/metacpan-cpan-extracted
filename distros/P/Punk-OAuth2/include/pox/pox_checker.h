@@ -409,9 +409,17 @@ static HV *pox_stash(pTHX_ SV *c) {
   return (HV *)SvRV(st);
 }
 
-/* RFC 6750 WWW-Authenticate value for a denial. */
+/* RFC 6750 WWW-Authenticate value for a denial, plus RFC 9728's
+ * resource_metadata.
+ *
+ * That parameter is how a client discovers WHERE to authenticate: it points at
+ * the protected resource's metadata document, which names the authorization
+ * servers. Without it a client that has never seen this API has nothing to go
+ * on but the realm, which is a display string. It is emitted only when the
+ * guard was configured with one, so a guard that does not set it produces the
+ * same bytes it always did. */
 static SV *pox_www_authenticate(pTHX_ const char *realm, const char *error,
-                                AV *scopes) {
+                                AV *scopes, const char *rmeta) {
   SV *out = newSVpvs("Bearer realm=\"");
   sv_catpv(out, realm ? realm : "api");
   sv_catpvs(out, "\"");
@@ -430,6 +438,11 @@ static SV *pox_www_authenticate(pTHX_ const char *realm, const char *error,
       }
       sv_catpvs(out, "\"");
     }
+  }
+  if (rmeta && *rmeta) {
+    sv_catpvs(out, ", resource_metadata=\"");
+    sv_catpv(out, rmeta);
+    sv_catpvs(out, "\"");
   }
   return out;
 }
@@ -467,12 +480,12 @@ static SV *pox_do_check(pTHX_ SV *self, SV *cred, SV *c, AV *required) {
 /* The guard body: extract Bearer, invoke the checker coderef, return
  * undef (pass) or an RFC 6750 denial triplet (owned). */
 static SV *pox_do_guard(pTHX_ SV *checker, SV *c, AV *scav,
-                        const char *realm) {
+                        const char *realm, const char *rmeta) {
   SV *cred = pox_bearer(aTHX_ c);
   SV *result = NULL;
 
   if (!cred) {
-    SV *wa = sv_2mortal(pox_www_authenticate(aTHX_ realm, NULL, NULL));
+    SV *wa = sv_2mortal(pox_www_authenticate(aTHX_ realm, NULL, NULL, rmeta));
     AV *hdrs = newAV(), *body = newAV(), *trip = newAV();
     av_push(hdrs, newSVpvs("Content-Type"));
     av_push(hdrs, newSVpvs("application/json"));
@@ -506,7 +519,7 @@ static SV *pox_do_guard(pTHX_ SV *checker, SV *c, AV *scav,
     const char *reason = (er && *er && SvOK(*er))
       ? SvPV_nolen(*er) : "invalid_token";
     int insufficient = strEQ(reason, "insufficient_scope");
-    SV *wa = sv_2mortal(pox_www_authenticate(aTHX_ realm, reason, scav));
+    SV *wa = sv_2mortal(pox_www_authenticate(aTHX_ realm, reason, scav, rmeta));
     AV *hdrs = newAV(), *body = newAV(), *trip = newAV();
     SV *jb = newSVpvs("{\"error\":\"");
     sv_catpv(jb, reason);
@@ -551,10 +564,12 @@ XS_INTERNAL(pox_guard_cb) {
   SV **chk = hv_fetchs(cap, "checker", 0);
   SV **sc  = hv_fetchs(cap, "scopes", 0);
   SV **rl  = hv_fetchs(cap, "realm", 0);
+  SV **rm  = hv_fetchs(cap, "resource_metadata", 0);
   AV *scav = (sc && *sc && SvROK(*sc) && SvTYPE(SvRV(*sc)) == SVt_PVAV)
     ? (AV *)SvRV(*sc) : NULL;
   const char *realm = (rl && *rl && SvOK(*rl)) ? SvPV_nolen(*rl) : "api";
-  SV *r = pox_do_guard(aTHX_ chk ? *chk : &PL_sv_undef, c, scav, realm);
+  const char *rmeta = (rm && *rm && SvOK(*rm)) ? SvPV_nolen(*rm) : NULL;
+  SV *r = pox_do_guard(aTHX_ chk ? *chk : &PL_sv_undef, c, scav, realm, rmeta);
   /* a pass is &PL_sv_undef: borrowed, so never mortalised */
   ST(0) = POX_IMMORTAL(r) ? r : sv_2mortal(r);
   XSRETURN(1);

@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# Pushing again to a branch cancels its older, still-running CI (off for main).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  simpici:
+    permissions:
+      contents: read
+      packages: write
+    uses: Getty/simpici/.github/workflows/simpici.yml@main
+    with:
+      provider: ghcr.io/getty/simpici-dzil-provider:main

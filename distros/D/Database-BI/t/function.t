@@ -139,20 +139,26 @@ subtest 'DataSource::new -- argument validation' => sub {
 		qr/does not exist|not readable/i,
 		'croaks for non-existent directory';
 
-	# Table name with path traversal characters
+	# Table name with path traversal characters (path separators are rejected)
 	throws_ok { $DS->new(directory => $DATA_DIR, table => '../etc/passwd') }
 		qr/illegal characters/i,
 		'croaks for table name with path traversal';
 
-	# Table name with leading digit (not allowed by TABLE_NAME_RE)
-	throws_ok { $DS->new(directory => $DATA_DIR, table => '1bad') }
-		qr/illegal characters/i,
-		'croaks for table name beginning with a digit';
+	# Table name with leading digit: sanitized to _1bad (prepend underscore)
+	{
+		my $src;
+		lives_ok { $src = $DS->new(directory => $DATA_DIR, table => '1bad') }
+			'digit-start table name is sanitized (not rejected)';
+		is $src->table_name, '_1bad', 'sanitized table name has underscore prefix';
+	}
 
-	# Table name with spaces
-	throws_ok { $DS->new(directory => $DATA_DIR, table => 'my table') }
-		qr/illegal characters/i,
-		'croaks for table name containing spaces';
+	# Table name with spaces: sanitized to my_table (spaces -> underscores)
+	{
+		my $src;
+		lives_ok { $src = $DS->new(directory => $DATA_DIR, table => 'my table') }
+			'table name with spaces is sanitized (not rejected)';
+		is $src->table_name, 'my_table', 'sanitized table name has underscores for spaces';
+	}
 
 	# Accept hashref form (Params::Get normalises)
 	my $src2 = eval { $DS->new({ directory => $DATA_DIR, table => $SALES_CSV }) };
@@ -310,6 +316,60 @@ subtest '_detect_file_info -- sniffs separator and column order' => sub {
 		my $info = $fn->($dir, 'allbad');
 		ok exists $info->{columns}, 'columns key present';
 		ok !defined $info->{id},    'id is undef when no safe column exists';
+	};
+
+	# _values_are_data_like: true when first line contains dates/numbers.
+	subtest '_values_are_data_like -- date pattern triggers headerless detection' => sub {
+		my $data_like = \&Database::BI::Model::DataSource::_values_are_data_like;
+		ok  $data_like->(['2026-09-09', '-75.13', 'ACME CO']),
+			'ISO date + signed number -> data-like';
+		ok  $data_like->(['15/09/2026', '100.00', 'Coffee']),
+			'slash-date -> data-like';
+		ok  $data_like->(['foo', '-3.14', 'bar']),
+			'signed number alone -> data-like';
+		ok  $data_like->(['foo', '(99.50)', 'bar']),
+			'accounting-notation negative -> data-like';
+		ok !$data_like->(['first-name', 'last-name', 'email']),
+			'hyphenated identifiers -> NOT data-like';
+		ok !$data_like->(['My Col', 'His Col']),
+			'space-separated words (no date/number) -> NOT data-like';
+	};
+
+	# _synthesize_col_names: infers date / amount / description.
+	subtest '_synthesize_col_names -- type inference and deduplication' => sub {
+		my $synth = \&Database::BI::Model::DataSource::_synthesize_col_names;
+		is_deeply [ $synth->(['2026-09-09', '-75.13', 'ACME CO']) ],
+			[qw(Date Amount Description)],
+			'ISO date + amount + text -> Date, Amount, Description';
+		is_deeply [ $synth->(['15/01/2026', '-10.00', 'Fee']) ],
+			[qw(Date Amount Description)],
+			'slash-date -> Date';
+		is_deeply [ $synth->(['100.00', '200.00', '300.00']) ],
+			[qw(Amount Amount2 Amount3)],
+			'three numeric cols -> Amount, Amount2, Amount3';
+		is_deeply [ $synth->(['2026-01-01', '2026-01-02']) ],
+			[qw(Date Date2)],
+			'two dates -> Date, Date2';
+		is_deeply [ $synth->(['foo bar', 'baz qux']) ],
+			[qw(Description Description2)],
+			'two text cols -> Description, Description2';
+	};
+
+	# Full round-trip: DataSource built on a header-less CSV returns rows with
+	# synthesized keys, bypassing Database::Abstraction entirely.
+	subtest '_detect_file_info -- headerless CSV full fetch round-trip' => sub {
+		# Descriptions contain spaces so no first-row value is a $SAFE_IDENTIFIER,
+		# forcing the headerless-detection path.
+		Mojo::File->new("$dir/bank.csv")->spew(
+			"2026-09-01,-50.00,SUPER MARKET\n" .
+			"2026-09-02,-12.50,COFFEE SHOP\n" .
+			"2026-09-03,1200.00,SALARY CREDIT\n"
+		);
+		my $info = $fn->($dir, 'bank');
+		ok exists $info->{_headerless_data},          'headerless sentinel returned';
+		is scalar @{ $info->{_headerless_data} }, 3,  'all three rows parsed';
+		is $info->{_headerless_data}[2]{Amount}, '1200.00', 'positive Amount on row 3';
+		is $info->{_headerless_data}[0]{Description}, 'SUPER MARKET', 'Description on row 1';
 	};
 
 	# CRLF line endings (Windows exports) must not bleed \r into column names.
@@ -709,76 +769,6 @@ subtest '_csv_row -- newline inside field triggers quoting' => sub {
 };
 
 # ---------------------------------------------------------------------------
-# Subtest: _left_join -- in-memory left join logic
-# ---------------------------------------------------------------------------
-subtest '_left_join -- every left row is preserved' => sub {
-	my $fn = \&Database::BI::Controller::Dashboard::_left_join;
-
-	my $left  = [{ id => 1, name => 'Alice' }, { id => 2, name => 'Bob' }];
-	my $right = [{ uid => 1, dept => 'Eng' }];
-
-	my ($merged, $cols) = $fn->(
-		$left,  [qw(id name)], 'id',
-		$right, [qw(uid dept)], 'uid', 'right',
-	);
-
-	is scalar(@$merged), 2, 'all left rows preserved (including unmatched)';
-	is $merged->[0]{dept}, 'Eng',  'matched row has right-table column';
-	is $merged->[1]{dept}, undef,  'unmatched row has undef for right column';
-};
-
-subtest '_left_join -- join key column is not duplicated' => sub {
-	my $fn = \&Database::BI::Controller::Dashboard::_left_join;
-
-	my $left  = [{ id => 1, x => 'a' }];
-	my $right = [{ id => 1, y => 'b' }];
-
-	my ($merged, $cols) = $fn->(
-		$left,  [qw(id x)], 'id',
-		$right, [qw(id y)], 'id', 'right',
-	);
-
-	# 'id' should appear only once in the merged column list
-	my @id_cols = grep { $_ eq 'id' } @$cols;
-	is scalar(@id_cols), 1, 'join key appears only once in merged columns';
-};
-
-subtest '_left_join -- right column collision gets label prefix' => sub {
-	my $fn = \&Database::BI::Controller::Dashboard::_left_join;
-
-	# Both left and right have a column called "name"
-	my $left  = [{ id => 1, name => 'Alice' }];
-	my $right = [{ key => 1, name => 'HR' }];
-
-	my ($merged, $cols) = $fn->(
-		$left,  [qw(id name)], 'id',
-		$right, [qw(key name)], 'key', 'dept',
-	);
-
-	ok exists($merged->[0]{'dept.name'}),
-		'colliding right column is prefixed with right_label';
-	is $merged->[0]{name},        'Alice', 'original left column name is unchanged';
-	is $merged->[0]{'dept.name'}, 'HR',    'prefixed right column carries correct value';
-};
-
-subtest '_left_join -- multiple matching right rows: first match wins' => sub {
-	my $fn = \&Database::BI::Controller::Dashboard::_left_join;
-
-	my $left  = [{ id => 1 }];
-	my $right = [
-		{ rid => 1, val => 'first'  },
-		{ rid => 1, val => 'second' },
-	];
-
-	my ($merged) = $fn->(
-		$left,  ['id'],        'id',
-		$right, [qw(rid val)], 'rid', 'r',
-	);
-
-	is $merged->[0]{val}, 'first', 'first matching right row wins for duplicate keys';
-};
-
-# ---------------------------------------------------------------------------
 # Subtest: _serialize_csv -- full document output
 # ---------------------------------------------------------------------------
 subtest '_serialize_csv -- produces header + data rows' => sub {
@@ -1044,6 +1034,370 @@ subtest 'graph_view Y-strip -- column with no-dollar accounting parens is numeri
 		  ->status_is(200, 'no-dollar accounting notation recognised as numeric')
 		  ->content_like(qr/-148\b/, '(148.00) plotted as -148');
 	}
+};
+
+# ============================================================================
+# PART 4: DataSource -- _msg, _cache_key, selectall_arrayref
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# Subtest: _msg -- instance-level i18n formatter
+#
+# _msg is the post-construction counterpart of _fmt.  When no i18n object is
+# stored it must delegate to _fmt.  When an i18n object IS stored it must call
+# maketext() on it and return whatever maketext returns.
+# ---------------------------------------------------------------------------
+subtest 'DataSource::_msg -- no i18n object delegates to _fmt' => sub {
+	my $src = $DS->new(directory => $DATA_DIR, table => $SALES_CSV);
+
+	# Call _msg with a known key -- result should match what _fmt returns directly.
+	my $via_msg  = Database::BI::Model::DataSource::_msg($src, 'error_table_required');
+	my $via_fmt  = Database::BI::Model::DataSource::_fmt('error_table_required');
+	is $via_msg, $via_fmt, '_msg without i18n object produces same string as _fmt';
+};
+
+subtest 'DataSource::_msg -- i18n object receives key and args via maketext' => sub {
+	# Build a spy that records every maketext call.
+	my @calls;
+	my $i18n = bless {}, 'MsgSpyI18N';
+	{
+		no strict 'refs';
+		*{'MsgSpyI18N::maketext'} = sub {
+			my ($self, $key, @args) = @_;
+			push @calls, { key => $key, args => \@args };
+			return "TRANSLATED:$key";
+		};
+	}
+
+	# Construct a DataSource with the i18n object, then call _msg directly.
+	my $src = $DS->new(directory => $DATA_DIR, table => $SALES_CSV, i18n => $i18n);
+	my $result = Database::BI::Model::DataSource::_msg($src, 'warn_empty_result', 'sales');
+
+	is $result, 'TRANSLATED:warn_empty_result',
+		'_msg returns the value maketext returned';
+	is scalar(@calls), 1, 'maketext was called exactly once';
+	is $calls[0]{key}, 'warn_empty_result', 'maketext received the correct key';
+	is $calls[0]{args}[0], 'sales', 'maketext received the sprintf arg';
+};
+
+# ---------------------------------------------------------------------------
+# Subtest: _cache_key -- cache-key derivation
+#
+# URL tables get a key that encodes the URL + table index so two different
+# table indices on the same URL produce different cache buckets.
+# File tables encode path + mtime so changing the file produces a natural miss.
+# When neither a URL nor an on-disk file path is set, the key is undef.
+# ---------------------------------------------------------------------------
+subtest 'DataSource::_cache_key -- URL table includes URL and table index in key' => sub {
+	my $fn = \&Database::BI::Model::DataSource::_cache_key;
+
+	# Manufacture a minimal DataSource-shaped object (bless into the real class
+	# so _cache_key is callable as a method on it).
+	my $src = bless {
+		_url              => 'http://example.com/data.html',
+		_html_table_index => 0,
+	}, $DS;
+
+	my $key = $fn->($src);
+	like $key, qr{bi:url:http://example\.com/data\.html:0},
+		'URL cache key contains URL and index 0';
+
+	# A different table index must produce a distinct key.
+	$src->{_html_table_index} = 2;
+	my $key2 = $fn->($src);
+	like $key2, qr{:2\z}, 'URL cache key reflects non-zero table index';
+	isnt $key, $key2, 'different indices produce different cache keys';
+};
+
+subtest 'DataSource::_cache_key -- file table includes path and mtime' => sub {
+	my $fn = \&Database::BI::Model::DataSource::_cache_key;
+
+	# Use a real file so stat() returns a valid mtime.
+	my $path = File::Spec->rel2abs(File::Spec->catfile($DATA_DIR, 'sales.csv'));
+	SKIP: {
+		skip 'data/sales.csv not found', 3 unless -f $path;
+		my $mtime = (stat($path))[9];
+		my $src = bless { _file_path => $path }, $DS;
+		my $key = $fn->($src);
+		like $key, qr{bi:file:}, 'file cache key begins with bi:file:';
+		like $key, qr{\Q$path\E}, 'file cache key contains the full path';
+		like $key, qr{:$mtime\z}, 'file cache key ends with the mtime';
+	}
+};
+
+subtest 'DataSource::_cache_key -- no URL and no file path returns undef' => sub {
+	my $fn = \&Database::BI::Model::DataSource::_cache_key;
+	my $src = bless {}, $DS;
+	is $fn->($src), undef, '_cache_key returns undef when no URL and no _file_path';
+};
+
+subtest 'DataSource::_cache_key -- file path that does not exist returns undef' => sub {
+	my $fn = \&Database::BI::Model::DataSource::_cache_key;
+	my $src = bless { _file_path => '/no/such/file.csv' }, $DS;
+	is $fn->($src), undef,
+		'_cache_key returns undef when _file_path is set but file is missing from disk';
+};
+
+# ---------------------------------------------------------------------------
+# Subtest: selectall_arrayref -- fast-path and delegation
+#
+# Three fast-paths are exercised before the backend delegation:
+#   1. _file_is_empty -- always returns []
+#   2. _file_data     -- returns pre-loaded rows without touching _db
+#   3. Cache hit      -- returns cached rows without touching _db
+# ---------------------------------------------------------------------------
+subtest 'DataSource::selectall_arrayref -- _file_is_empty fast-path returns []' => sub {
+	# Construct a real DataSource then force the empty-file sentinel to verify
+	# the fast-path exits before any backend access.
+	my $src = $DS->new(directory => $DATA_DIR, table => $SALES_CSV);
+	$src->{_file_is_empty} = 1;
+
+	my $result = $src->selectall_arrayref;
+	is_deeply $result, [], 'selectall_arrayref returns [] when _file_is_empty is set';
+};
+
+subtest 'DataSource::selectall_arrayref -- _file_data fast-path returns pre-loaded rows' => sub {
+	my $src = $DS->new(directory => $DATA_DIR, table => $SALES_CSV);
+	my $fake_rows = [{ col => 'val1' }, { col => 'val2' }];
+	$src->{_file_data} = $fake_rows;
+
+	my $result = $src->selectall_arrayref;
+	is $result, $fake_rows,
+		'selectall_arrayref returns _file_data reference unchanged (no copy)';
+};
+
+subtest 'DataSource::selectall_arrayref -- cache hit skips backend, returns cached data' => sub {
+	# Build a minimal CHI-like cache stub.  The real CHI::Driver API has get/set;
+	# we replicate only what selectall_arrayref uses.
+	my %store;
+	my $cache = bless {}, 'FakeCache';
+	{
+		no strict 'refs';
+		*{'FakeCache::get'} = sub { my ($s,$k) = @_; $store{$k} };
+		*{'FakeCache::set'} = sub { my ($s,$k,$v,@r) = @_; $store{$k} = $v };
+	}
+
+	my $src = $DS->new(directory => $DATA_DIR, table => $SALES_CSV);
+	$src->{_cache}     = $cache;
+	$src->{_file_path} = File::Spec->rel2abs(File::Spec->catfile($DATA_DIR, 'sales.csv'));
+
+	# Prime the cache with fake data.
+	my $key        = Database::BI::Model::DataSource::_cache_key($src);
+	my $fake_rows  = [{ id => 'CACHED' }];
+	$store{$key}   = $fake_rows;
+
+	my $result = $src->selectall_arrayref;
+	is $result, $fake_rows, 'selectall_arrayref returns cached data on cache hit';
+};
+
+subtest 'DataSource::selectall_arrayref -- cache miss stores result in cache' => sub {
+	my %store;
+	my $cache = bless {}, 'FakeCache2';
+	{
+		no strict 'refs';
+		*{'FakeCache2::get'} = sub { my ($s,$k) = @_; $store{$k} };
+		*{'FakeCache2::set'} = sub { my ($s,$k,$v,@r) = @_; $store{$k} = $v };
+	}
+
+	my $src = $DS->new(directory => $DATA_DIR, table => $SALES_CSV);
+	$src->{_cache}     = $cache;
+	$src->{_file_path} = File::Spec->rel2abs(File::Spec->catfile($DATA_DIR, 'sales.csv'));
+
+	# Cache is empty -- miss path should call backend, then populate cache.
+	my $result = $src->selectall_arrayref;
+	my $key    = Database::BI::Model::DataSource::_cache_key($src);
+
+	ok defined $store{$key}, 'cache is populated after a cache miss';
+	is $store{$key}, $result, 'cached value is the same reference as the returned rows';
+};
+
+# ============================================================================
+# PART 5: Dashboard -- _dedup_records, _combine_tables, _build_export_url
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# Subtest: _dedup_records -- duplicate removal preserving first-occurrence order
+#
+# Two rows are duplicates iff every column value is identical under string
+# comparison (undef treated as '').  The input arrayref must not be mutated.
+# ---------------------------------------------------------------------------
+subtest '_dedup_records -- removes exact duplicates preserving first occurrence' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_dedup_records;
+	my $cols = [qw(name city)];
+
+	my $r1 = { name => 'Alice', city => 'London' };
+	my $r2 = { name => 'Bob',   city => 'Paris'  };
+	my $r3 = { name => 'Alice', city => 'London' };	# exact dup of r1
+
+	my $result = $fn->([$r1, $r2, $r3], $cols);
+	is scalar(@$result), 2, 'duplicate row is removed';
+	is $result->[0]{name}, 'Alice', 'first occurrence of Alice is kept';
+	is $result->[1]{name}, 'Bob',   'Bob is kept (unique)';
+};
+
+subtest '_dedup_records -- all identical rows collapse to one' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_dedup_records;
+	my $row = { x => 'same', y => 'value' };
+	my $result = $fn->([$row, $row, $row], [qw(x y)]);
+	is scalar(@$result), 1, 'three identical rows collapse to one';
+};
+
+subtest '_dedup_records -- undef field treated as empty string in key' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_dedup_records;
+	my $r1 = { val => undef   };
+	my $r2 = { val => ''      };	# undef and '' must hash identically
+	my $r3 = { val => 'x'     };
+	my $result = $fn->([$r1, $r2, $r3], ['val']);
+	is scalar(@$result), 2,
+		'undef and empty string are treated as the same value (one dedup kept)';
+};
+
+subtest '_dedup_records -- empty input returns empty arrayref' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_dedup_records;
+	my $result = $fn->([], [qw(a b)]);
+	is_deeply $result, [], 'empty input produces empty output';
+};
+
+subtest '_dedup_records -- input arrayref is not mutated' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_dedup_records;
+	my $row = { a => 1 };
+	my $input = [$row, $row];
+	my $before_len = scalar @$input;
+	$fn->($input, ['a']);
+	is scalar(@$input), $before_len, 'original input arrayref length unchanged';
+};
+
+# ---------------------------------------------------------------------------
+# Subtest: _combine_tables -- vertical UNION ALL
+#
+# The merged column list is the first source's columns first, then any new
+# columns from subsequent sources.  Where a source lacks a column, its rows
+# get an empty string for that column.
+# ---------------------------------------------------------------------------
+subtest '_combine_tables -- two sources with identical columns produce all rows' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_combine_tables;
+	my $cols = [qw(id name)];
+	my $src1 = [[ { id => 1, name => 'Alice' } ], $cols];
+	my $src2 = [[ { id => 2, name => 'Bob'   } ], $cols];
+
+	my ($recs, $merged_cols) = $fn->([$src1, $src2]);
+	is scalar(@$recs), 2,                     'both rows present in merged result';
+	is_deeply $merged_cols, [qw(id name)],    'merged column list is unchanged when sources match';
+	is $recs->[0]{name}, 'Alice',             'first row from first source';
+	is $recs->[1]{name}, 'Bob',               'second row from second source';
+};
+
+subtest '_combine_tables -- second source introduces new columns with blanks on first' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_combine_tables;
+	my $src1 = [[ { id => 1, name => 'Alice' } ], [qw(id name)]];
+	my $src2 = [[ { id => 2, city => 'Paris'  } ], [qw(id city)]];
+
+	my ($recs, $cols) = $fn->([$src1, $src2]);
+	# Column order: first source's columns first, then new ones from second source.
+	is $cols->[0], 'id',   'id is first (from first source)';
+	is $cols->[1], 'name', 'name is second (from first source)';
+	is $cols->[2], 'city', 'city is third (introduced by second source)';
+
+	# Row from src1 must have blank city; row from src2 must have blank name.
+	is $recs->[0]{city}, '', 'row from src1 gets empty string for missing city';
+	is $recs->[1]{name}, '', 'row from src2 gets empty string for missing name';
+};
+
+subtest '_combine_tables -- single source returned unchanged (no allocation)' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_combine_tables;
+	my $rows = [{ a => 1 }, { a => 2 }];
+	my $cols = ['a'];
+	my ($recs, $merged_cols) = $fn->([[$rows, $cols]]);
+	is scalar(@$recs), 2,     'single source: all rows present';
+	is_deeply $merged_cols, ['a'], 'single source: column list unchanged';
+};
+
+subtest '_combine_tables -- column order: first source columns precede new columns' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_combine_tables;
+	my $src1 = [[ { x => 1, y => 2 } ], [qw(x y)]];
+	my $src2 = [[ { y => 3, z => 4 } ], [qw(y z)]];
+
+	my ($recs, $cols) = $fn->([$src1, $src2]);
+	is $cols->[0], 'x', 'x from first source is first';
+	is $cols->[1], 'y', 'y (shared) remains in first-source position';
+	is $cols->[2], 'z', 'z introduced by second source is last';
+};
+
+# ---------------------------------------------------------------------------
+# Subtest: _build_export_url -- URL assembly
+#
+# _build_export_url is :Protected and uses $self only for url_escape (imported
+# via Mojo::Util).  Pass a real controller object built from a live transaction.
+# ---------------------------------------------------------------------------
+subtest 'Dashboard::_build_export_url -- minimal call produces /export?l=...' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_build_export_url;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+
+	my $url = $fn->($c, 'table:sales', [], []);
+	like $url, qr{\A/export\?l=},      'URL starts with /export?l=';
+	like $url, qr{table(?:%3A|:)sales}, 'left spec encoded in URL';
+	unlike $url, qr{&j=},              'no join params when join list empty';
+	unlike $url, qr{&f=},              'no filter params when filter list empty';
+	unlike $url, qr{&d=},              'no dedup param when dedup false';
+};
+
+subtest 'Dashboard::_build_export_url -- join specs append &j= params' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_build_export_url;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+
+	my $url = $fn->($c, 'table:sales', ['table:products|id|id'], []);
+	like $url, qr{&j=}, '&j= param present when join list non-empty';
+};
+
+subtest 'Dashboard::_build_export_url -- filter specs append &f= params' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_build_export_url;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+
+	my $url = $fn->($c, 'table:sales', [], ['region:eq:North']);
+	like $url, qr{&f=}, '&f= param present when filter list non-empty';
+};
+
+subtest 'Dashboard::_build_export_url -- dedup flag appends &d=1' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_build_export_url;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+
+	my $url = $fn->($c, 'table:sales', [], [], undef, 1);
+	like $url, qr{&d=1}, '&d=1 present when dedup is true';
+};
+
+subtest 'Dashboard::_build_export_url -- combine specs append &c= params' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_build_export_url;
+	my $tx = $t->ua->build_tx(GET => '/');
+	my $c  = $t->app->build_controller($tx);
+
+	my $url = $fn->($c, 'table:sales', [], [], ['table:products']);
+	like $url, qr{&c=}, '&c= param present when combine list non-empty';
+};
+
+# ---------------------------------------------------------------------------
+# Subtest: _dedup_records memory cycle check
+# ---------------------------------------------------------------------------
+subtest '_dedup_records -- no circular references in output' => sub {
+	my $fn   = \&Database::BI::Controller::Dashboard::_dedup_records;
+	my $rows = [{ a => 1 }, { a => 2 }, { a => 1 }];
+	my $out  = $fn->($rows, ['a']);
+	memory_cycle_ok($out, '_dedup_records output has no circular references');
+};
+
+# ---------------------------------------------------------------------------
+# Subtest: _combine_tables memory cycle check
+# ---------------------------------------------------------------------------
+subtest '_combine_tables -- no circular references in output' => sub {
+	my $fn  = \&Database::BI::Controller::Dashboard::_combine_tables;
+	my ($recs, $cols) = $fn->([
+		[[ { x => 1 } ], ['x']],
+		[[ { y => 2 } ], ['y']],
+	]);
+	memory_cycle_ok($recs, '_combine_tables output records have no circular references');
 };
 
 done_testing();
