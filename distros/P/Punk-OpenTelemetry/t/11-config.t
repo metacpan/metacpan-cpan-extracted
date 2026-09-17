@@ -164,7 +164,13 @@ sub with_env {
     like($line, qr/sampler=traceidratio:0\.05/,
         'the sampler AND its argument - "is it sampling" and "at what rate" '
       . 'are different questions');
-    like($line, qr/propagators=tracecontext,baggage/, 'the propagators');
+    # THE PROPAGATORS ARE NOT IN THE LINE, and the assertion is that they are
+    # not. Printing a setting here says it does something; the automatic
+    # instrumentation reads and injects W3C traceparent only, whatever
+    # OTEL_PROPAGATORS says, so printing the list told an operator the opposite
+    # of the truth in the one line meant to be trustworthy.
+    unlike($line, qr/propagators=/,
+        'the propagators are NOT printed: the instrumentation does not honour them');
     unlike($line, qr/\n/, 'one line, so it does not bury the rest of the boot');
 
     my $off = with_env({ OTEL_SDK_DISABLED => 'true' }, sub { $_[0] });

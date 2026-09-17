@@ -575,6 +575,30 @@ code, pre, .mono { font-family: var(--mono); font-size: var(--fs-sm); }
 .waterfall li.row-error .wf-bar { outline: 2px solid var(--sev-error);
                                   outline-offset: 1px; }
 
+/* The collapse sets the hidden ATTRIBUTE, and the row rule above says
+   display: grid. An author rule beats the browser's own [hidden] rule, so
+   without this line a collapsed subtree stayed exactly where it was. */
+.waterfall li[hidden] { display: none; }
+
+/* A span's attributes, on a row of their own under the span. The bar row is
+   a fixed-height grid and a table inside it would have to fit that height;
+   a sibling row can be as tall as the statement it holds. The tooltip on
+   the bar carries the query text too, which is the path with no script. */
+.wf-more {
+    display: inline-block; width: 1.4em; margin-right: var(--s1);
+    padding: 0; line-height: 1.2; font-size: var(--fs-xs);
+    border: 1px solid var(--line); border-radius: var(--wf-bar-r);
+    background: var(--raised); color: var(--muted); cursor: pointer;
+}
+.wf-more[aria-expanded="true"] { color: var(--ink); }
+.waterfall li.wf-detail {
+    display: block; height: auto; padding: var(--s2) var(--s3);
+    background: var(--raised);
+}
+.wf-attrs { border-collapse: collapse; font-size: var(--fs-xs); }
+.wf-attrs td { padding: 1px var(--s3) 1px 0; vertical-align: top;
+               white-space: pre-wrap; word-break: break-word; }
+
 /* the flamegraph.
 
    `fill` was never set, so every frame painted in the SVG default - black on

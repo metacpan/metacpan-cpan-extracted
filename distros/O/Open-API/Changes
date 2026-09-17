@@ -1,5 +1,10 @@
 Revision history for Open-API
 
+0.14    2026-09-16
+	- A security requirement naming scopes on a scheme that is not
+	  oauth2 or openIdConnect is refused under 3.0 only. 3.1 allows the
+	  array to carry role names; it was refused for both versions.
+
 0.13    2026-09-15
 	- Add a conformance test suite
 	- Many fixes related to that conformance suite

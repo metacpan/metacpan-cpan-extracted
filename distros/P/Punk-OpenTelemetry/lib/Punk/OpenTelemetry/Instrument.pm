@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 # All of it is C (include/otel_semconv.h, otel_instr.h, otel_consume.h +
 # xs/instrument.xs). This file is documentation.
@@ -71,12 +71,41 @@ traceparent>. Without that injection the far side starts a new trace and the
 two halves of a call are never joined, which is the whole reason Fetch grew
 the hook.
 
-=item * B<Database spans>, from C<pk_abi>'s C<on_query> (the shipped
-L<Punk::Model::DBI> backend). The statement text is the B<prepared> one; the
-phase-1 observers do not pass bind values at all, so the literal data cannot
-leak even by accident.
+=item * B<Database spans>, from both paths: C<pk_abi>'s C<on_query> (the
+shipped L<Punk::Model::DBI> backend, and from Punk 0.50 every statement run
+through its handle, not only the six generated methods) and C<dbil_abi>'s
+C<on_exec> (L<DBIx::Loop>, the async backend). The statement text is the
+B<prepared> one; neither observer passes bind values at all, so the literal
+data cannot leak even by accident.
 
 =back
+
+=head1 A CHILD SPAN NEEDS A PARENT
+
+A span started with no parent gets a B<fresh trace id>. Database and client
+spans were started that way, so each became a trace one span long while the
+request that caused it sat in a different trace of its own - a store full of
+single-span traces and no way to see where a request spent its time.
+
+The observers are handed no context, and until C<pk_abi> v5 there was nowhere
+to ask. C<current_of> is the answer: the context of the dispatch frame running
+right now. So a statement, or an outbound call with no caller-set
+C<traceparent>, is a child of the request being served.
+
+=head2 It is never the wrong parent
+
+C<current_of> is saved and restored around the dispatch frame rather than
+merely set, so it is live only while a synchronous frame the dispatcher
+entered is on the stack. A statement issued from a future's continuation, a
+queue job or application boot reads nothing and produces an honest root.
+
+That holds for the async database path too, and for the same reason:
+C<dbil_abi>'s observer fires B<before> the statement runs, synchronously with
+the caller, and a span's parent is fixed at start. The deferred half only needs
+the token back.
+
+Against a Punk older than 0.50 there is no C<current_of>, and these spans are
+roots exactly as they were before. That is a degradation, not a failure.
 
 =head1 STATUS DIFFERS BY SPAN KIND
 

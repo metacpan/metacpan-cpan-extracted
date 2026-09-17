@@ -12,7 +12,7 @@ use Sub::Protected;
 use Params::Validate::Strict qw(validate_strict);
 use Params::Get		();
 
-our $VERSION = '0.006.0';
+our $VERSION = '0.007.0';
 
 =head1 NAME
 
@@ -20,7 +20,7 @@ Database::BI::Model::DataSource - Table-agnostic adapter around Database::Abstra
 
 =head1 VERSION
 
-Version 0.005.2
+0.007.0
 
 =head1 SYNOPSIS
 
@@ -73,6 +73,22 @@ B<Use a custom i18n object to translate error messages:>
         i18n      => My::I18N::Handle->new,
     );
 
+B<Open a remote HTML table from a URL:>
+
+    # Requires LWP::UserAgent::Cached and HTML::TableExtract.
+    # The table is fetched and cached in memory; no file is saved to disk.
+    my $source = Database::BI::Model::DataSource->new(
+        url => 'https://example.com/data-page.html',
+    );
+    my $records = $source->fetch_all;
+
+B<Select a specific table when a page has more than one HTML table:>
+
+    my $source = Database::BI::Model::DataSource->new(
+        url              => 'https://example.com/page.html',
+        html_table_index => 2,   # zero-based: 0 = first table, 2 = third table
+    );
+
 B<Handle errors gracefully:>
 
     my $source = eval {
@@ -120,6 +136,26 @@ returns.  C<DataSource> itself is filter-unaware.
 All user-visible strings and exception messages are keyed through the
 C<%MESSAGES> dictionary and routed via C<_msg()>, making every diagnostic
 replaceable by an i18n object at instantiation time.
+
+=head2 UTF-8 and Encoding
+
+C<DataSource> passes cell values through as Perl character strings exactly
+as L<Database::Abstraction> and the underlying DBI driver return them.
+For CSV and PSV files smaller than 16 KB, L<Text::xSV::Slurp> is used and
+bytes are returned without re-encoding; for larger files the L<DBD::CSV>
+path is used.  In both cases the caller (the controller) is responsible
+for setting the correct C<Content-Type> header.
+
+The C<table> argument and all column names must be B<ASCII-only>
+identifiers.  Full Unicode is supported inside B<cell values> -- the
+restriction applies only to structural metadata (column headers, table
+name), not to the data itself.
+
+URL-backed tables (the C<url =E<gt>> constructor path) are fetched with
+L<LWP::UserAgent::Cached>.  If the remote server declares a charset in
+its HTTP headers or HTML meta tag, L<Database::Abstraction> uses it to
+decode the response body.  If the declaration is absent or wrong, cell
+values may contain raw bytes rather than character strings.
 
 =cut
 
@@ -775,22 +811,30 @@ sub _init_backend :Protected {
 		return;
 	}
 
+	# Headerless CSV or XLSX: _detect_file_info already pre-loaded all rows.
+	# MUST check before error_no_safe_id: XLSX files with all-unsafe column
+	# headers (e.g. "First Name", "Account Number") have id => undef because
+	# none of the headers match the safe-identifier regex, but the data is
+	# pre-loaded and the id column is irrelevant for the direct-data fast path.
+	# Checking error_no_safe_id first would croak spuriously for valid XLSX files.
+	if ($info->{_headerless_data}) {
+		$self->{_id_col}  = $info->{id} // 'entry';
+		$self->{_columns} = $info->{columns};
+		$self->{_file_data} = $info->{_headerless_data};
+		return;
+	}
+
 	# _detect_file_info returns undef for id when every column header contains
 	# characters that are not safe SQL identifiers (spaces, hyphens, etc.).
 	# Falling back to the D::A default ('entry') would silently return 0 rows
 	# since no 'entry' column exists.  Croak with a human-readable message.
+	# This guard applies only to CSV/PSV/SQLite/XML -- headerless and XLSX paths
+	# are handled by the _headerless_data check immediately above.
 	croak $self->_msg('error_no_safe_id', $table)
 		if exists $info->{columns} && !defined $info->{id};
 	my $id_col = $info->{id} // 'entry';
 	$self->{_id_col}  = $id_col;
 	$self->{_columns} = $info->{columns};	# undef for SQLite/XML
-
-	# Headerless CSV or XLSX: _detect_file_info already pre-loaded all rows.
-	# Store and skip D::A entirely.
-	if ($info->{_headerless_data}) {
-		$self->{_file_data} = $info->{_headerless_data};
-		return;
-	}
 
 	# D::A validates dbname as a SQL identifier and rejects names that contain
 	# spaces or other characters that are illegal in SQL (e.g. "transactions for

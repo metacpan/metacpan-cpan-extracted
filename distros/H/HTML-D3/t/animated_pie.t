@@ -5,7 +5,7 @@ use strict;
 
 use HTML::D3;
 use Test::Needs 'Test::HTML::T5';
-use Test::Most tests => 16;
+use Test::Most tests => 19;
 
 Test::HTML::T5->import();
 
@@ -44,3 +44,12 @@ like($html, qr/d3\.interpolate/,          'd3.interpolate used for tween');
 throws_ok {
 	$chart->render_animated_pie_chart('Invalid data');
 } qr/Data must be an array of arrays/, 'Dies on invalid data';
+
+# ── separator option ──────────────────────────────────────────────────────────
+# The separator is interpolated into a JavaScript template literal, not next to
+# static label/value strings.  Verify the JS source contains the right character.
+like($html, qr/d\.data\.label} \/ \$\{d\.data\.value}/, 'Default separator / present in legend JS');
+
+my $colon_html = $chart->render_animated_pie_chart($data, { separator => ':' });
+like($colon_html, qr/d\.data\.label} : \$\{d\.data\.value}/, 'Custom separator : present in legend JS');
+unlike($colon_html, qr/d\.data\.label} \/ /, 'Default separator / absent when overridden');

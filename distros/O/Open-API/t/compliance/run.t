@@ -1383,11 +1383,20 @@ jsonschema_cases(),
   } },
 
 { id => 'security/scopes-empty-for-non-oauth2', section => '4.28 Security Requirement',
-  requirement => 'for a scheme that is not oauth2 or openIdConnect the scope list MUST be empty',
+  requirement => 'under 3.0 a scheme that is not oauth2 or openIdConnect MUST have an empty scope list',
   run => sub {
-      croaks(doc(components => { securitySchemes => {
+      croaks(doc(openapi => '3.0.3',
+                 components => { securitySchemes => {
                      K => { type => 'apiKey', name => 'k', in => 'header' } } },
                  security => [ { K => [ 'read' ] } ]));          # not empty
+  } },
+
+{ id => 'security/roles-allowed-for-non-oauth2', section => '4.28 Security Requirement',
+  requirement => '3.1 relaxed that: the array MAY carry role names for any scheme type',
+  run => sub {
+      loads(doc(components => { securitySchemes => {
+                    K => { type => 'apiKey', name => 'k', in => 'header' } } },
+                security => [ { K => [ 'read' ] } ]));
   } },
 
 { id => 'security/unknown-scheme', section => '4.28 Security Requirement',

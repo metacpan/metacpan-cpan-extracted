@@ -13,7 +13,7 @@ use Test::More;
 use Physics::Balls;
 use Presets;
 
-plan tests => 4;
+plan tests => 6;
 
 sub I { my ($m) = @_; return int($m * 1e5 + 0.5) }
 
@@ -96,4 +96,47 @@ subtest 'a tip 2/5 R above centre rolls at once' => sub {
 		ball => 0, dx => 1_000_000, dy => 0, power => 250, sx => 0, sy => 400);
 	is scalar @{ $out->segments->{0} }, 1, 'one segment from strike to rest';
 	is scalar(grep { $_->[1] eq 'roll' } @{ $out->events }), 0, 'and no slide-to-roll transition';
+};
+
+subtest 'a cushion with e = 1 and no friction reflects three more angles exactly' => sub {
+	plan tests => 3;
+	# Reflection about the cushion's normal: the tangential velocity is kept
+	# and the normal one reversed, whatever the angle of incidence.
+	my $d = Presets::desc('pool');
+	my $world = Physics::Balls::World->from_table(Presets::table('pool'),
+		mu => $d->{mu}, e => { bb => 0.95, c => 1, cf => 0, rc => 1 }, vmax => 8, g => 9.81);
+	for my $deg (15, 45, 75) {
+		my $a = $deg * 3.14159265358979 / 180;
+		my ($dx, $dy) = (int(cos($a) * 1_000_000), -int(sin($a) * 1_000_000));
+		my $out = Physics::Balls->strike($world, layout => [ [0, I(0.6), I(0.45)] ], ball => 0, dx => $dx, dy => $dy, power => 450, sx => 0, sy => 400);
+		my ($hit) = grep { $_->[1] eq 'wall' } @{ $out->events };
+		my $before = seg_ending_at($out->segments->{0}, $hit->[0]);
+		my $after = seg_at_start($out->segments->{0}, $hit->[0]);
+		my $vxb = $before->[4] + $before->[6] * $before->[1];
+		my $vyb = $before->[5] + $before->[7] * $before->[1];
+		ok abs($after->[4] - $vxb) < 1e-9 && abs($after->[5] + $vyb) < 1e-9, "$deg degrees in, $deg degrees out";
+	}
+};
+
+subtest 'a chain of two: the struck ball passes (1+e)/2 of its speed on' => sub {
+	plan tests => 2;
+	# The cue ball hits ball 1 full, which hits ball 2 full. Ball 1 leaves the
+	# first collision at (1+e)/2 v and the second at (1-e)/2 of that; ball 2
+	# takes (1+e)/2 of what ball 1 arrived with. Ball 1 slides between the two
+	# collisions (no roll, having been struck), so its arrival speed is read off
+	# its own segment rather than assumed.
+	my $d = Presets::desc('pool');
+	my $world = Presets::world_built('pool');
+	my $out = Physics::Balls->strike($world,
+		layout => [ [0, I(0.5), I($d->{W} / 2)], [1, I(0.8), I($d->{W} / 2)], [2, I(1.1), I($d->{W} / 2)] ],
+		ball => 0, dx => 1_000_000, dy => 0, power => 700, sx => 0, sy => 400);
+	my @hits = grep { $_->[1] eq 'ball' } @{ $out->events };
+	my $e = $d->{e}{bb};
+	my $second = $hits[1];
+	my $arrive = seg_ending_at($out->segments->{1}, $second->[0]);
+	my $v1 = $arrive->[4] + $arrive->[6] * $arrive->[1];
+	my $after1 = seg_at_start($out->segments->{1}, $second->[0]);
+	my $after2 = seg_at_start($out->segments->{2}, $second->[0]);
+	ok abs($after2->[4] - (1 + $e) / 2 * $v1) < 1e-9, "ball 2 takes (1+e)/2 of ball 1's $v1";
+	ok abs($after1->[4] - (1 - $e) / 2 * $v1) < 1e-9, 'and ball 1 keeps (1-e)/2';
 };

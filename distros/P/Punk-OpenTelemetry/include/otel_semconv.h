@@ -29,6 +29,12 @@
 #define SC_HTTP_METHOD_ORIGINAL "http.request.method_original"
 #define SC_HTTP_ROUTE           "http.route"
 #define SC_HTTP_STATUS          "http.response.status_code"
+
+/* The one metric this dist records by itself. SECONDS, which is what the
+ * conventions name and what OTEL_DEFAULT_BOUNDS is built for - a histogram of
+ * milliseconds against those boundaries puts every web request in the last
+ * bucket. */
+#define SC_HTTP_SERVER_DURATION "http.server.request.duration"
 #define SC_URL_PATH             "url.path"
 #define SC_URL_SCHEME           "url.scheme"
 #define SC_URL_QUERY            "url.query"

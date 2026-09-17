@@ -1,10 +1,11 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings FATAL   => 'all';
-use Test::More tests => 14;
+use Test::More import => [ qw( like ok plan use_ok ) ];
 
 BEGIN {
+    plan tests => 14;
     use_ok('NetAddr::MAC')
       or die "# NetAddr::MAC not available\n";
 }
@@ -42,14 +43,13 @@ BEGIN {
     eval { NetAddr::MAC->new('2001:db8::fe01') };
     like( $@, qr/Invalid MAC format/, 'IPv6 that could be MAC 1a' );
 
-    eval { NetAddr::MAC->new('2001::db8:fe05') };
+    eval { NetAddr::MAC->new('2001:db8:fe05') };
     like( $@, qr/Invalid MAC format/, 'IPv6 that could be MAC 2a' );
 
     eval { NetAddr::MAC->new('2001:db8:fe0a::') };
     like( $@, qr/Invalid MAC format/, 'IPv6 that could be MAC 3a' );
 
-    eval { NetAddr::MAC->new('2001:630:440:163::406') };
+    eval { NetAddr::MAC->new('2001:0db8:fe01:0000:0000:0000:0000:0001') };
     like( $@, qr/Invalid MAC format/, 'IPv6 that could be MAC from Oliver Gorwits' );
-
 
 }

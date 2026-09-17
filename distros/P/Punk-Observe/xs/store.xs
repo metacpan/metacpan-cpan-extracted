@@ -1322,7 +1322,7 @@ post_trace(SV *self, SV *hi_sv, SV *lo_sv, ...)
                 const po_span *sp = &g.w.s[first + i];
                 HV *h = newHV();
                 hv_stores(h, "span_id",  po_u64_to_sv(sp->span_id));
-                hv_stores(h, "parent",   po_u64_to_sv(sp->parent_span_id));
+                hv_stores(h, "parent_span_id", po_u64_to_sv(sp->parent_span_id));
                 hv_stores(h, "depth",    newSViv((IV)tr.depth[i]));
                 hv_stores(h, "name",     po_sym_sv(aTHX_ &g.sym, sp->name_sym));
                 hv_stores(h, "service",  po_sym_sv(aTHX_ &g.sym, sp->service_sym));

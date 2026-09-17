@@ -37,8 +37,9 @@
  *   1 - context accessors, route_pattern_of, on_request/on_response
  *   2 - on_query (the shipped Punk::Model::DBI backend)
  *   3 - on_log (a COPY of every log record, for a logs signal)
- *   4 - on_log_ctx (the same, plus the context, so it can be correlated) */
-#define PK_ABI_VERSION 4
+ *   4 - on_log_ctx (the same, plus the context, so it can be correlated)
+ *   5 - current_of (the context of the dispatch frame running right now) */
+#define PK_ABI_VERSION 5
 
 /* An observer of the start of a request. `c` is the request context - the same
  * one the handler will get, so anything left in its stash is there later.
@@ -204,6 +205,42 @@ typedef struct pk_abi {
      * Prefer this to on_log. A consumer registering both receives every
      * record twice. */
     int (*on_log_ctx)(pTHX_ pk_abi_log_ctx_cb cb, void *ud);
+
+    /* ---- v5 ------------------------------------------------------------- *
+     * The context whose dispatch frame is executing on this worker RIGHT NOW,
+     * or NULL. Borrowed, like every other context here.
+     *
+     * READ THIS BEFORE USING IT. The note on on_log_ctx above refuses a
+     * process-global "current" for correlation, and is right about what it
+     * refuses: a value that OUTLIVES THE FRAME THAT SET IT. A log line can be
+     * emitted from a future's continuation long after its handler returned,
+     * and a global that was merely set and never restored would hand that line
+     * whichever request ran most recently.
+     *
+     * This one is saved and restored around the dispatch frame, never merely
+     * cleared. It is live only while a synchronous frame the dispatcher
+     * entered is on the stack. A statement issued from a continuation, a queue
+     * job, or application boot reads NULL.
+     *
+     * SO THE DEGRADED CASE IS "NO PARENT", NEVER "WRONG PARENT". That is the
+     * whole difference, and it is why this exists where the thing v4 was added
+     * to avoid does not. Anything built on this has to keep that property: a
+     * consumer wanting the context of a line emitted asynchronously still uses
+     * on_log_ctx, which is handed the right one.
+     *
+     * The motivating consumer is on_query, which is given no context and
+     * cannot be given one - the model instance a statement runs through is
+     * cached per application and per pid, and is shared by every request on
+     * the worker. Two consequences worth stating because they are what make it
+     * useful:
+     *
+     *   - The shipped Punk::Model::DBI backend is synchronous. execute blocks,
+     *     inside the frame, so during a statement this is the issuing request
+     *     by construction; no other request can be running here at that
+     *     instant.
+     *   - $c->txn(sub {...}) calls its block from C inside the same frame, so
+     *     a transaction's statements are covered with nothing extra. */
+    SV *(*current_of)(pTHX);
 } pk_abi;
 
 /* How many observers of each kind the dispatcher will hold. Fixed, so

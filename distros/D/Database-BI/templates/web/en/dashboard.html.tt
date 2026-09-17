@@ -1,7 +1,48 @@
 [%- WRAPPER 'web/en/layouts/default.html.tt' -%]
 
+<style>
+  /* Quick-filter bar below the toolbar */
+  .dash-add-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0.4rem 0 0.6rem;
+  }
+  .dash-add-filter select,
+  .dash-add-filter input[type="text"] {
+    padding: 0.25rem 0.45rem;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    font-size: 0.82rem;
+  }
+  .btn-dash-filter-apply {
+    padding: 0.28rem 0.75rem;
+    border: 1px solid #888;
+    border-radius: 6px;
+    background: transparent;
+    color: #444;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .btn-dash-filter-apply:hover { background: #f0f0f0; }
+  /* x-button inside active filter chips */
+  .chip-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #7a5800;
+    font-size: 0.75rem;
+    padding: 0 0 0 0.3em;
+    line-height: 1;
+    vertical-align: middle;
+  }
+  .chip-remove:hover { color: #c00; }
+</style>
+
 [%- IF back_url -%]
-<p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a></p>
+<p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a>[%- IF back2_url -%] &rsaquo; <a href="[% back2_url | html %]">[% back2_label || 'Back' | html %]</a>[%- END -%]</p>
 [%- ELSE -%]
 <p class="back-link"><a href="/">&larr; Choose another database</a></p>
 [%- END -%]
@@ -19,7 +60,7 @@
   [%- IF filter_specs.size -%]
   <span class="filter-chips" id="filter-chip-row">
     [%- FOREACH fs IN filter_specs -%]
-    <span class="filter-chip">[% fs | html %]</span>
+    <span class="filter-chip" data-spec="[% fs | html %]">[% fs | html %]<button class="chip-remove" title="Remove this filter" aria-label="Remove filter">&#x2715;</button></span>
     [%- END -%]
   </span>
   <a class="btn-clear-filters" id="btn-clear-filters" href="#">&#x2715; Clear filters</a>
@@ -32,6 +73,8 @@
           title="Remove the selected rows and/or columns from this view">&#x1F5D1; Delete selected</button>
   <button class="btn-graph" id="btn-graph" type="button"
           title="Plot the current data as a line chart - choose the X and Y axes">&#x1F4C8; Line graph&hellip;</button>
+  <button class="btn-pie" id="btn-pie" type="button"
+          title="Plot the current data as a pie chart - choose the category and value columns">&#x25D4; Pie chart&hellip;</button>
   [%- END -%]
   <button class="btn-dedup[% IF dedup %] btn-dedup--active[% END %]" id="btn-dedup" type="button"
           title="Remove duplicate rows from the view and from any export">[% IF dedup %]Show duplicates[% ELSE %]Hide duplicates[% END %]</button>
@@ -41,6 +84,31 @@
   <button class="btn-add-db" id="btn-add-db" type="button" title="Combine this table with another data file, or narrow down the rows you see by applying conditions">&#x2295; Merge data&hellip;</button>
   <button class="btn-combine" id="btn-combine" type="button" title="Stack rows from another data file beneath these rows, using a unified set of columns and leaving blanks where a column does not exist in a given file">&#x229E; Combine data&hellip;</button>
 </div>
+
+[%- IF left_spec -%]
+<div class="dash-add-filter" id="dash-add-filter">
+  <select id="dash-f-col" aria-label="Column to filter">
+    <option value="">&#x2014; filter column &#x2014;</option>
+    [%- FOREACH col IN columns -%]
+    <option value="[% col | html %]">[% col | html %]</option>
+    [%- END -%]
+  </select>
+  <select id="dash-f-op" aria-label="Filter operator">
+    <option value="eq">equals</option>
+    <option value="ne">not equals</option>
+    <option value="contains">contains</option>
+    <option value="starts">starts with</option>
+    <option value="lt">less than</option>
+    <option value="le">less or equal</option>
+    <option value="gt">greater than</option>
+    <option value="ge">greater or equal</option>
+    <option value="empty">is empty</option>
+    <option value="notempty">is not empty</option>
+  </select>
+  <input type="text" id="dash-f-val" placeholder="value" aria-label="Filter value">
+  <button id="dash-f-apply" class="btn-dash-filter-apply">Apply filter</button>
+</div>
+[%- END -%]
 
 [%- IF left_spec -%]
 <div class="export-panel" id="export-panel"
@@ -235,6 +303,61 @@
         <div class="graph-btn-row">
           <button type="submit" id="btn-do-graph" class="btn-primary" disabled>Plot</button>
           <button type="button" id="btn-cancel-graph" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="graph-panel" id="pie-panel" hidden>
+  <form id="pie-form" method="get" action="/pie">
+    <input type="hidden" name="l" value="[% left_spec | html %]">
+    [%- FOREACH jspec IN current_joins -%]
+    <input type="hidden" name="j" value="[% jspec | html %]">
+    [%- END -%]
+    [%- FOREACH fs IN filter_specs -%]
+    <input type="hidden" name="f" value="[% fs | html %]">
+    [%- END -%]
+    [%- IF dedup -%]
+    <input type="hidden" name="d" value="1">
+    [%- END -%]
+    <input type="hidden" name="back" id="pie-back-inp" value="">
+
+    <h3 class="graph-panel-title">&#x25D4; Pie chart</h3>
+
+    <p class="graph-panel-desc">Choose a category column, then either count rows per category or pick a numeric column to sum.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="pie-cat-sel">Slice by</label>
+        <select id="pie-cat-sel" name="cat" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="pie-val-sel">Value</label>
+        <select id="pie-val-sel" name="val" required>
+          <option value="">&#x2014; select &#x2014;</option>
+          <option value="__count__" style="font-weight:bold">Count (rows)</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="pie-donut-chk" title="Show a hole in the centre of the pie">Donut style</label>
+        <label style="display:flex;align-items:center;gap:0.4rem;padding-top:0.3rem;">
+          <input type="checkbox" id="pie-donut-chk" name="donut" value="1"> Donut
+        </label>
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-pie" class="btn-primary" disabled>Plot</button>
+          <button type="button" id="btn-cancel-pie" class="btn-secondary">Cancel</button>
         </div>
       </div>
     </div>
@@ -982,11 +1105,9 @@ function parseAccounting(v) {
   if (btnClear) {
     btnClear.addEventListener('click', function (e) {
       e.preventDefault();
-      var url = location.href
-        .replace(/[?&]f=[^&]*/g, '')
-        .replace(/\?&/, '?')
-        .replace(/[?&]$/, '');
-      location.href = url;
+      var u = new URL(location.href);
+      u.searchParams.delete('f');
+      location.href = u.toString();
     });
   }
 }());
@@ -1000,6 +1121,41 @@ function parseAccounting(v) {
   var btn = document.getElementById('btn-refresh');
   if (!btn) return;
   btn.addEventListener('click', function () { location.reload(); });
+}());
+
+// Filter bar - per-chip remove and apply-new-filter
+// ---------------------------------------------------------------------------
+(function () {
+  // Remove one active filter chip.
+  document.querySelectorAll('.chip-remove').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var chip = btn.closest('[data-spec]');
+      var spec = chip ? chip.getAttribute('data-spec') : '';
+      if (!spec) return;
+      var u = new URL(location.href);
+      var kept = u.searchParams.getAll('f').filter(function (v) { return v !== spec; });
+      u.searchParams.delete('f');
+      kept.forEach(function (v) { u.searchParams.append('f', v); });
+      location.href = u.toString();
+    });
+  });
+
+  // Apply a new filter condition from the quick-filter bar.
+  var applyBtn = document.getElementById('dash-f-apply');
+  if (applyBtn) {
+    applyBtn.addEventListener('click', function () {
+      var col = document.getElementById('dash-f-col').value;
+      var op  = document.getElementById('dash-f-op').value;
+      var val = document.getElementById('dash-f-val').value;
+      if (!col || !op) return;
+      var u = new URL(location.href);
+      u.searchParams.append('f', col + ':' + op + ':' + val);
+      location.href = u.toString();
+    });
+    document.getElementById('dash-f-val').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') applyBtn.click();
+    });
+  }
 }());
 
 // Dedup button — toggle d=1 in the URL and reload
@@ -1131,7 +1287,7 @@ function parseAccounting(v) {
   var ySel      = document.getElementById('graph-y-sel');
   var backInp   = document.getElementById('graph-back-inp');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'pie-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1221,6 +1377,83 @@ function parseAccounting(v) {
 
   xSel.addEventListener('change', checkPlot);
   ySel.addEventListener('change', checkPlot);
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Pie chart panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-pie');
+  var panel     = document.getElementById('pie-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel = document.getElementById('btn-cancel-pie');
+  var btnDo     = document.getElementById('btn-do-pie');
+  var catSel    = document.getElementById('pie-cat-sel');
+  var valSel    = document.getElementById('pie-val-sel');
+  var backInp   = document.getElementById('pie-back-inp');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  function checkPie() {
+    btnDo.disabled = !(catSel.value && valSel.value);
+  }
+
+  // Rebuild the value select: Count option first (always), then numeric columns.
+  function buildPieValSelect() {
+    var tbl = document.querySelector('table[data-table]') || document.querySelector('table');
+    if (!tbl || !tbl.tHead || !tbl.tBodies[0]) return;
+    var headers = Array.from(tbl.tHead.rows[0].cells);
+    var rows    = Array.from(tbl.tBodies[0].rows);
+    var prev    = valSel.value;
+    while (valSel.options.length > 1) valSel.remove(1);
+    // Count option always appears first, bold to distinguish it from column names.
+    var countOpt = document.createElement('option');
+    countOpt.value = '__count__';
+    countOpt.textContent = 'Count (rows)';
+    countOpt.style.fontWeight = 'bold';
+    if (prev === '__count__') countOpt.selected = true;
+    valSel.appendChild(countOpt);
+    headers.forEach(function (th, idx) {
+      var name  = th.textContent.trim();
+      var vals  = rows.map(function (r) {
+        return r.cells[idx] ? r.cells[idx].textContent.trim() : '';
+      }).filter(function (v) { return v !== ''; });
+      if (vals.length === 0) return;
+      // Exclude date-shaped columns.
+      if (vals.every(function (v) {
+        return /^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v);
+      })) return;
+      // Only show columns whose non-empty values are all numeric.
+      if (!vals.every(function (v) {
+        if (v === '') return true;
+        return !isNaN(parseAccounting(v));
+      })) return;
+      var opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      if (name === prev) opt.selected = true;
+      valSel.appendChild(opt);
+    });
+  }
+
+  btnOpen.addEventListener('click', function () {
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    backInp.value = window.location.href;
+    buildPieValSelect();
+    panel.hidden = !panel.hidden;
+    checkPie();
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  catSel.addEventListener('change', checkPie);
+  valSel.addEventListener('change', checkPie);
 }());
 </script>
 

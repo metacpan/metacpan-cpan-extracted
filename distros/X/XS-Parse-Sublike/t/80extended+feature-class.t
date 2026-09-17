@@ -35,11 +35,23 @@ no warnings 'experimental::class';
    use Sublike::Extended 'method';
 
    class C2 {
-      method f (:$x, :$y) { return "x=$x y=$y" }
+      method self   { return $self }
+
+      # Perl GH #24773 suggests we need to test a few variants
+      method f0p ()         { return "(null)" }
+      method f1p ($x)       { return "[1]=$x" }
+      method f2n (:$x, :$y) { return "x=$x y=$y" }
    }
 
-   is( C2->new->f( x => "third", y => "fourth" ), "x=third y=fourth",
-      'method with extended keyword' );
+   my $o = C2->new;
+   is( $o->self, $o, 'method with extended keyword can see $self' );
+
+   is( $o->f0p(), "(null)",
+      'method with extended keyword and 0 positional params' );
+   is( $o->f1p( "arg" ), "[1]=arg",
+      'method with extended keyword and 1 positional param' );
+   is( $o->f2n( x => "third", y => "fourth" ), "x=third y=fourth",
+      'method with extended keyword and 2 named params' );
 }
 
 done_testing;

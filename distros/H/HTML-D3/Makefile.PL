@@ -53,6 +53,7 @@ WriteMakefile(
 		'JSON::MaybeXS' => 0,	# Required for encoding data to JSON
 		'Object::Configure' => 0.24,
 		'Params::Get' => 0,
+		'Params::Validate::Strict' => 0.39,
 		'Scalar::Util' => 0
 	# }, RECOMMENDED => {
 		# 'Test::HTML::T5' => 0,

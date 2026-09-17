@@ -222,6 +222,16 @@ static IV sa_xop_meth = 0;   /* sites where only the method op was ours */
         sa_xop_miss++;                                 \
         return PL_ppaddr[OP_ENTERSUB](aTHX)
 
+/* After a codec call. Encoding or decoding a value can run Perl (an anonymous
+ * sub is deparsed one way and eval'd the other), which may reallocate the
+ * value stack under `sp` and `mark`. Both are re-derived, and the callee's
+ * marks are balanced so TOPMARK is ours again. */
+#define SA_XOP_RESYNC()                                \
+    do {                                               \
+        SPAGAIN;                                       \
+        mark = PL_stack_base + TOPMARK;                \
+    } while (0)
+
 /* An integer answer goes in the entersub's pad target, which is where the XSUB
  * this replaces put it through dXSTARG. A fresh mortal per call is an
  * allocation and a free that the XSUB never paid. */
@@ -311,11 +321,19 @@ static OP *sa_pp_cache_get(pTHX) {
             if (!c) goto delegate;
             k = SvPV(mark[2], klen);
             /* Stack first where an entry fits, as the XSUB does: a miss
-             * allocates nothing and a hit only what the value needs. */
+             * allocates nothing and a hit only what the value needs. On a
+             * serialised cache the copy is decoded from wherever it landed;
+             * a door that delegated on the flag would give the small-value
+             * win straight back. */
             if (c->pair_max < sizeof buf) {
                 if (sa_cache_get(c, k, (uint32_t)klen, buf,
                                  (uint32_t)c->pair_max, &vlen) != SA_C_HIT)
                     SA_XOP_EMPTY(1);
+                if (c->serialise) {
+                    out = SA_SER_DECODE(buf, vlen);
+                    SA_XOP_RESYNC();
+                    SA_XOP_RETURN(1, out);
+                }
                 SA_XOP_RETURN(1, sv_2mortal(newSVpvn(buf, (STRLEN)vlen)));
             }
             out = sv_2mortal(newSV((STRLEN)c->pair_max + 1));
@@ -323,6 +341,11 @@ static OP *sa_pp_cache_get(pTHX) {
             if (sa_cache_get(c, k, (uint32_t)klen, SvPVX(out),
                              (uint32_t)c->pair_max, &vlen) != SA_C_HIT)
                 SA_XOP_EMPTY(1);
+            if (c->serialise) {
+                out = SA_SER_DECODE(SvPVX(out), vlen);
+                SA_XOP_RESYNC();
+                SA_XOP_RETURN(1, out);
+            }
             SvCUR_set(out, (STRLEN)vlen);
             SvPVX(out)[vlen] = '\0';
             SA_XOP_RETURN(1, out);
@@ -340,9 +363,16 @@ static OP *sa_pp_cache_set(pTHX) {
             STRLEN klen, vlen;
             const char *k, *v;
             int rc;
+            char sbuf[SA_SER_STACK];
             if (!c) goto delegate;
             k = SvPV(mark[2], klen);
-            v = SvPV(mark[3], vlen);
+            if (c->serialise) {
+                vlen = sa_ser_encode(aTHX_ mark[3], c->pair_max, klen, sbuf, &v);
+                SA_XOP_RESYNC();
+                if (!vlen) SA_XOP_RETURN_IV(2, SA_C_TOOBIG);
+            }
+            else
+                v = SvPV(mark[3], vlen);
             rc = sa_cache_set(c, k, (uint32_t)klen, v, (uint32_t)vlen, 0);
             SA_XOP_RETURN_IV(2, rc);
         }
@@ -363,11 +393,17 @@ static OP *sa_pp_map_fetch(pTHX) {
             uint32_t vlen = 0;
             if (!m) goto delegate;
             k = SvPV(mark[2], klen);
-            /* Stack first where a slot fits, as the XSUB does. */
+            /* Stack first where a slot fits, as the XSUB does; decoded from
+             * wherever the copy landed on a serialised map. */
             if (m->pair_max < sizeof buf) {
                 if (sa_hash_fetch(m, k, (uint32_t)klen, buf,
                                   (uint32_t)m->pair_max, &vlen) != SA_H_HIT)
                     SA_XOP_EMPTY(1);
+                if (m->serialise) {
+                    out = SA_SER_DECODE(buf, vlen);
+                    SA_XOP_RESYNC();
+                    SA_XOP_RETURN(1, out);
+                }
                 SA_XOP_RETURN(1, sv_2mortal(newSVpvn(buf, (STRLEN)vlen)));
             }
             out = sv_2mortal(newSV((STRLEN)m->pair_max + 1));
@@ -375,6 +411,11 @@ static OP *sa_pp_map_fetch(pTHX) {
             if (sa_hash_fetch(m, k, (uint32_t)klen, SvPVX(out),
                               (uint32_t)m->pair_max, &vlen) != SA_H_HIT)
                 SA_XOP_EMPTY(1);
+            if (m->serialise) {
+                out = SA_SER_DECODE(SvPVX(out), vlen);
+                SA_XOP_RESYNC();
+                SA_XOP_RETURN(1, out);
+            }
             SvCUR_set(out, (STRLEN)vlen);
             SvPVX(out)[vlen] = '\0';
             SA_XOP_RETURN(1, out);
@@ -392,9 +433,16 @@ static OP *sa_pp_map_store(pTHX) {
             STRLEN klen, vlen;
             const char *k, *v;
             int rc;
+            char sbuf[SA_SER_STACK];
             if (!m) goto delegate;
             k = SvPV(mark[2], klen);
-            v = SvPV(mark[3], vlen);
+            if (m->serialise) {
+                vlen = sa_ser_encode(aTHX_ mark[3], m->pair_max, klen, sbuf, &v);
+                SA_XOP_RESYNC();
+                if (!vlen) SA_XOP_RETURN_IV(2, SA_H_TOOBIG);
+            }
+            else
+                v = SvPV(mark[3], vlen);
             rc = sa_hash_store(m, k, (uint32_t)klen, v, (uint32_t)vlen);
             SA_XOP_RETURN_IV(2, rc);
         }
@@ -402,6 +450,8 @@ static OP *sa_pp_map_store(pTHX) {
     SA_XOP_DELEGATE();
 }
 
+/* A counter is a raw word and cannot also be an encoded value: both incr
+ * widths croak on a serialised map, as the XSUB does. */
 static OP *sa_pp_map_incr(pTHX) {
     dSP;
     {
@@ -412,6 +462,7 @@ static OP *sa_pp_map_incr(pTHX) {
             const char *k;
             uint64_t now = 0;
             if (!m) goto delegate;
+            if (m->serialise) croak(SA_SER_INCR_MSG);
             k = SvPV(mark[2], klen);
             if (sa_hash_incr(m, k, (uint32_t)klen, 1, &now) != SA_H_OK)
                 SA_XOP_RETURN(1, &PL_sv_undef);
@@ -661,6 +712,7 @@ static OP *sa_pp_map_incr_by(pTHX) {
             IV by;
             uint64_t now = 0;
             if (!m) goto delegate;
+            if (m->serialise) croak(SA_SER_INCR_MSG);
             k  = SvPV(mark[2], klen);
             by = SvIV(mark[3]);
             if (sa_hash_incr(m, k, (uint32_t)klen, (int64_t)by, &now) != SA_H_OK)
@@ -685,13 +737,20 @@ static OP *sa_pp_cache_set_ttl(pTHX) {
             const char *k, *v;
             int ms, rc;
             UV ttl;
+            char sbuf[SA_SER_STACK];
             if (!c) goto delegate;
             if (!SvPOK(opt) || SvGMAGICAL(opt)) goto delegate;
             if      (SvCUR(opt) == 3 && memEQ(SvPVX(opt), "ttl", 3))    ms = 0;
             else if (SvCUR(opt) == 6 && memEQ(SvPVX(opt), "ttl_ms", 6)) ms = 1;
             else goto delegate;
             k   = SvPV(mark[2], klen);
-            v   = SvPV(mark[3], vlen);
+            if (c->serialise) {
+                vlen = sa_ser_encode(aTHX_ mark[3], c->pair_max, klen, sbuf, &v);
+                SA_XOP_RESYNC();
+                if (!vlen) SA_XOP_RETURN_IV(4, SA_C_TOOBIG);
+            }
+            else
+                v = SvPV(mark[3], vlen);
             ttl = ms ? SvUV(mark[5]) : (UV)(SvNV(mark[5]) * 1000.0);
             rc  = sa_cache_set(c, k, (uint32_t)klen, v, (uint32_t)vlen,
                                (uint64_t)ttl);
@@ -844,6 +903,9 @@ static OP *sa_pp_map_counter(pTHX) {
             uint32_t vlen = 0;
             uint64_t v;
             if (!m) goto delegate;
+            /* Nothing in a serialised map is a counter, whatever its
+             * length: an eight-byte encoding is not a word. */
+            if (m->serialise) SA_XOP_RETURN(1, &PL_sv_undef);
             k = SvPV(mark[2], klen);
             if (sa_hash_fetch(m, k, (uint32_t)klen, buf, 8, &vlen) != SA_H_HIT
                 || vlen != 8)
@@ -901,18 +963,29 @@ static OP *sa_pp_methdoor_cache_get(pTHX) {
     if (!c) return sa_pp_meth_cache_get(aTHX);
 
     k = SvPV(mark[2], klen);
+    /* EVERY one-argument ->get site runs this door, not sa_pp_cache_get,
+     * because Frozen owns those entersubs: without the serialise branch here
+     * a get through the method form would silently hand back bytes. */
     if (c->pair_max < sizeof buf) {
         hit = sa_cache_get(c, k, (uint32_t)klen, buf, (uint32_t)c->pair_max,
                            &vlen) == SA_C_HIT;
-        if (hit) out = sv_2mortal(newSVpvn(buf, (STRLEN)vlen));
+        if (hit)
+            out = c->serialise ? SA_SER_DECODE(buf, vlen)
+                               : sv_2mortal(newSVpvn(buf, (STRLEN)vlen));
     }
     else {
         out = sv_2mortal(newSV((STRLEN)c->pair_max + 1));
         SvPOK_on(out);
         hit = sa_cache_get(c, k, (uint32_t)klen, SvPVX(out),
                            (uint32_t)c->pair_max, &vlen) == SA_C_HIT;
-        if (hit) { SvCUR_set(out, (STRLEN)vlen); SvPVX(out)[vlen] = '\0'; }
+        if (hit) {
+            if (c->serialise) out = SA_SER_DECODE(SvPVX(out), vlen);
+            else { SvCUR_set(out, (STRLEN)vlen); SvPVX(out)[vlen] = '\0'; }
+        }
     }
+    /* A decode may have run Perl; see SA_XOP_RESYNC. Unconditional, because
+     * it is two loads and the branch would cost the same. */
+    SA_XOP_RESYNC();
 
     {
         OP *was = PL_op;

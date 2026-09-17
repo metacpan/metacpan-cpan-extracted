@@ -260,6 +260,7 @@ t/0928-dashboard-defer.t
 t/0930-query-cache.t
 t/0931-chunk-budget.t
 t/0933-warm.t
+t/0934-alerts-policy.t
 t/lib/POMurmur.pm
 t/lib/PORef.pm
 t/lib/POWire.pm

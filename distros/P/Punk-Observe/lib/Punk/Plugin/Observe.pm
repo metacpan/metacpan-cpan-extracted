@@ -73,7 +73,13 @@ sub register {
     $st->{retain_opts} = _retain($opts);
     $st->{warm_opts}   = _warm($opts, $st->{retain_opts});
     $st->{db}    = _backend($st);
-    $st->{seam}  = { map { $_ => _seam($opts->{$_}) } qw(alerts dashboards) };
+    # The alerts option carries two shapes: a seam (a coderef, or a hashref
+    # with read/write/delete or the static rules) and the POLICY hash
+    # (every, group_wait, repeat_interval). The policy is not a seam, and
+    # taken as one it became a reader that read nothing, so the alerts page
+    # said "No alert rules yet" over a store full of them.
+    $st->{seam}  = { alerts     => _seam(_alerts_policy_only($opts->{alerts}) ? undef : $opts->{alerts}),
+                     dashboards => _seam($opts->{dashboards}) };
     $st->{alerts_opts} = _alerts_opts($opts);
 
     $st->{writable} = _writable($st);
@@ -207,6 +213,16 @@ sub _seam {
     return { read => $v } if ref $v eq 'CODE';
     return $v if ref $v eq 'HASH' && ($v->{read} || $v->{write} || $v->{delete});
     return { read => $v };
+}
+
+# The alerts POLICY hash, as opposed to a seam or static rules: only the
+# three cadence keys, and none of read, write, delete or rules.
+sub _alerts_policy_only {
+    my ($v) = @_;
+    return 0 unless ref $v eq 'HASH' && %$v;
+    return 0 if grep { exists $v->{$_} } qw(read write delete rules silences events);
+    my %policy = map { $_ => 1 } qw(every group_wait repeat_interval);
+    return (grep { !$policy{$_} } keys %$v) ? 0 : 1;
 }
 
 sub _reader {

@@ -27,20 +27,22 @@
       },
       "configure" : {
          "requires" : {
+            "DBIx::Loop" : "0.07",
             "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0",
             "Fetch" : "0.15",
             "File::Raw::JSON" : "0.06",
             "Hyperman" : "0.26",
-            "Punk" : "0.34"
+            "Punk" : "0.50"
          }
       },
       "runtime" : {
          "requires" : {
+            "DBIx::Loop" : "0.07",
             "Fetch" : "0.15",
             "File::Raw::JSON" : "0.06",
             "Hyperman" : "0.26",
-            "Punk" : "0.34",
+            "Punk" : "0.50",
             "perl" : "5.010000"
          }
       },
@@ -51,6 +53,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

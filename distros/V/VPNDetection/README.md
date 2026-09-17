@@ -83,10 +83,10 @@ for my $ip (keys %$answers) {
 
 Results are keyed by address, so duplicates in your list collapse into a single entry and one address failing never loses the rest: it carries its error as its value, with the status the API would have given that address on its own. Perl hashes carry no insertion order, so iterate your own list when order matters.
 
-How many chunks are in flight at once, and how many times a failed chunk is retried, are configurable per call:
+There's no limit on how many addresses you pass. How many chunks are in flight at once, how many times a failed chunk is retried, and how long each attempt may take are configurable per call:
 
 ```perl
-my $answers = $client->lookup_batch(\@many_ips, concurrency => 4, retries => 4);
+my $answers = $client->lookup_batch(\@many_ips, concurrency => 4, retries => 4, timeout => 10);
 ```
 
 ### Caching
@@ -153,6 +153,18 @@ if (my $err = $@) {
 
 Note that `rate_limited` and `quota_exceeded` both arrive as HTTP 429 and are not the same thing. A rate limit is when the API faces extreme traffic bursts and so retrying later works; but a spent quota needs your allowance raised or the window to roll over. The library retries rate limits for you, but not if your quota is exceeded.
 
+### Timeouts and retries
+
+Each attempt gives up after 30 seconds, and a transient failure is retried twice. Both can be changed for the client, and for a single call:
+
+```perl
+my $client = VPNDetection->new(timeout => 10, retries => 4);
+
+my $result = $client->lookup('45.83.91.1', timeout => 2.5, retries => 0);
+```
+
+The timeout is in seconds and applies to each attempt, so a retried call can take longer in total. An attempt that runs out of time fails as a retryable `network` error. A database download isn't bound by it, since a large file takes as long as it takes, so `download` and `download_bytes` refuse a per-call `timeout` rather than quietly ignoring it.
+
 ### Non-blocking use
 
 Every call has a `_p` twin returning a [Mojo::Promise](https://metacpan.org/pod/Mojo::Promise), so the library drops into a Mojolicious application without a worker or a thread:
@@ -186,6 +198,27 @@ my $written = $db->download($id, 'mmdb', "./$id.mmdb");    # streamed to disk
 ```
 
 `download` holds nothing beyond one chunk however large the database is, writes through a neighboring `.part` file so a transfer that dies half way leaves nothing that reads as a whole database, and raises rather than accepts a body that stops early. `download_bytes` holds the **whole file in memory**, and the catalog runs from `cdn_ip_v1` at 10 KB to `resproxy_ip_90d_v1` at 1.79 GB, so use `download` for anything you have not measured.
+
+A format is `csvgz` or `mmdb`, and `VPNDetection::Database::FORMATS` lists them. Anything else is refused before a request is made.
+
+### Sign in with OAuth (device flow)
+
+A program running on the person's own machine can let them sign in with a browser and pick one of their API keys, instead of asking them to paste it:
+
+```perl
+my $client = VPNDetection->new;
+
+my $device = $client->oauth->device_authorization('your-client-id',
+    scope => 'account.read apikeys.read apikeys.reveal');
+print "Open $device->{verification_uri} and enter $device->{user_code}\n";
+
+my $token = $client->oauth->poll_device_token('your-client-id', $device);
+die "no API key came back: none was picked, or it can't be shown again\n"
+    unless defined $token->{apikey};
+my $keyed = VPNDetection->new(api_key => $token->{apikey});
+```
+
+A denied sign-in dies with `VPNDetection::OauthAccessDeniedError` and a code that ran out with `VPNDetection::OauthExpiredTokenError`. Client IDs are issued on request from support@vpndetection.io, and `$client->oauth->revoke('your-client-id', $token->{refresh_token})` signs the machine out again.
 
 ### Absent is not false
 

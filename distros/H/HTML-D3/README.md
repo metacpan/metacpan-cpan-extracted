@@ -4,7 +4,7 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 # VERSION
 
-Version 0.14
+Version 0.15
 
 # SYNOPSIS
 
@@ -45,9 +45,10 @@ The module generates HTML and JavaScript code to render the chart in a web brows
 
 The `=head3 API SPECIFICATION` subsections use [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict)
 schema syntax (`type => 'arrayref'` etc.) as a documentation convention.
-`Params::Validate::Strict` is not a runtime dependency of this module; the
-schemas describe the parameter contract in machine-readable notation and can be
-plumbed into a WAF or test generator if desired.
+The module is also used at runtime in `new()` to validate constructor
+arguments; it is therefore a required runtime dependency.  The schemas describe
+the parameter contract in machine-readable notation and can be plumbed into a
+WAF or test generator if desired.
 
 ## new
 
@@ -85,7 +86,10 @@ None.
 #### Input
 
     {
-        data => { type => 'arrayref' },
+        data => {
+                type => 'arrayref',
+                element_type => [ 'string', 'number' ]
+        }
     }
 
     Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
@@ -211,6 +215,7 @@ None.
 ## render\_pie\_chart
 
     my $html = $chart->render_pie_chart($data);
+    my $html = $chart->render_pie_chart($data, { separator => ':' });
 
 Generates HTML and JavaScript code to render a pie chart.
 Each slice is coloured with `d3.schemeCategory10`; percentage labels appear
@@ -219,6 +224,9 @@ Accepts the following arguments:
 
 - `$data` - An array reference of data points.  Each data point is an
 array reference with two elements: the label (string) and the value (numeric).
+- `%opts` - Optional hashref of options.
+    - `separator` (string, default `'/'`) - Character shown between the
+    label and value in the SVG legend.
 
 Returns a string containing the complete HTML5 document.
 
@@ -236,11 +244,17 @@ None.
 #### Input
 
     {
-        data => { type => 'arrayref' },
+        data => {
+                type => 'arrayref',
+                element_type => [ 'string', 'number' ]
+        },
+        opts => { type => 'hashref', optional => 1, default => {} },
     }
 
     Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
     non-arrayref dies.
+    Recognised C<opts> key: C<separator> (string, default C<'/'>)
+    - character shown between label and value in the SVG legend.
 
 #### Output
 
@@ -251,6 +265,7 @@ None.
 ## render\_animated\_pie\_chart
 
     my $html = $chart->render_animated_pie_chart($data);
+    my $html = $chart->render_animated_pie_chart($data, { separator => ':' });
 
 Generates HTML and JavaScript code to render an animated pie chart where each
 slice fans out from zero angle on page load using `attrTween` and
@@ -259,6 +274,9 @@ Accepts the following arguments:
 
 - `$data` - An array reference of data points.  Each data point is an
 array reference with two elements: the label (string) and the value (numeric).
+- `%opts` - Optional hashref of options.
+    - `separator` (string, default `'/'`) - Character shown between the
+    label and value in the SVG legend.
 
 Returns a string containing the complete HTML5 document.
 
@@ -276,11 +294,17 @@ None.
 #### Input
 
     {
-        data => { type => 'arrayref' },
+        data => {
+                type => 'arrayref',
+                element_type => [ 'string', 'number' ]
+        },
+        opts => { type => 'hashref', optional => 1, default => {} },
     }
 
     Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
     non-arrayref dies.
+    Recognised C<opts> key: C<separator> (string, default C<'/'>)
+    - character shown between label and value in the SVG legend.
 
 #### Output
 
@@ -320,6 +344,9 @@ slices are shown individually; the rest are collapsed into an `"Other"` slice.
 - `color_scheme` (string, default `'tableau10'`) - D3 categorical
 colour scheme.  Supported: `tableau10`, `category10`, `set2`, `set3`,
 `paired`.
+- `separator` (string, default `'/'`) - Character shown between the
+label and value in each legend entry (e.g. `'/'` produces
+`Label / 12.34 (42.0%)`, `':'` produces `Label : 12.34 (42.0%)`).
 
 ### Errors
 
@@ -344,7 +371,9 @@ None.
     C<donut> (boolean, default C<0>), C<sort_slices> (string: C<'value'>,
     C<'label'>, or C<'none'>; default C<'none'>), C<max_slices> (integer,
     default C<0>), C<legend> (boolean, default C<1>),
-    C<color_scheme> (string, default C<'tableau10'>).
+    C<color_scheme> (string, default C<'tableau10'>),
+    C<separator> (string, default C<'/'> - shown between label and value in
+    legend entries).
 
 #### Output
 
@@ -710,23 +739,25 @@ Nigel Horne <njh@nigelhorne.com>
 
 ## render\_pie\_chart
 
-    render_pie_chart : HTML::D3 × (ArrayRef | undef) → Str ∪ ⊥
+    render_pie_chart : HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → Str ∪ ⊥
 
     pre  data = undef              ⇒ die "Data is not optional"
     pre  ref(data) ≠ 'ARRAY'      ⇒ die "Data must be an array of arrays"
     post result ∈ Str
     post "<!DOCTYPE" ⊆ result
     post "d3.pie()" ⊆ result ∧ "d3.arc()" ⊆ result ∧ "d3.schemeCategory10" ⊆ result
+    post opts.separator = S        ⇒  " S " ⊆ result (SVG legend: label S value)
 
 ## render\_animated\_pie\_chart
 
-    render_animated_pie_chart : HTML::D3 × (ArrayRef | undef) → Str ∪ ⊥
+    render_animated_pie_chart : HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → Str ∪ ⊥
 
     pre  data = undef              ⇒ die "Data is not optional"
     pre  ref(data) ≠ 'ARRAY'      ⇒ die "Data must be an array of arrays"
     post result ∈ Str
     post "<!DOCTYPE" ⊆ result
     post "attrTween" ⊆ result ∧ "d3.interpolate" ⊆ result
+    post opts.separator = S        ⇒  " S " ⊆ result (SVG legend: label S value)
 
 ## render\_line\_chart\_snippet
 
@@ -770,6 +801,7 @@ Nigel Horne <njh@nigelhorne.com>
     post opts.donut = 1     ⇒  "innerRadius" ⊆ result.html
     post opts.max_slices = N ∧ N ≥ 2 ∧ |data| > N
                             ⇒  |result_slices| = N ∧ "Other" ∈ result_labels
+    post opts.separator = S ⇒  " S " ⊆ result.html (HTML legend: label S value (pct%))
 
 ## render\_line\_chart\_with\_tooltips
 

@@ -4,6 +4,8 @@ lib/VPNDetection/Bogons.pm
 lib/VPNDetection/Cache.pm
 lib/VPNDetection/Database.pm
 lib/VPNDetection/Error.pm
+lib/VPNDetection/Oauth.pm
+lib/VPNDetection/OauthError.pm
 lib/VPNDetection/Result.pm
 LICENSE
 Makefile.PL
@@ -16,6 +18,7 @@ t/02-conformance.t
 t/03-client.t
 t/04-live.t
 t/05-download.t
+t/06-oauth.t
 t/lib/VPNDetectionTest.pm
 t/lib/VPNDetectionTest/Origin.pm
 testdata/testdata.json

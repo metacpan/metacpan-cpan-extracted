@@ -89,7 +89,7 @@ typedef struct {
     volatile uint32_t magic;      /* published LAST at init                */
     uint32_t          way_size;
     uint32_t          ways;
-    uint32_t          pad;
+    uint32_t          serialise;  /* values are Struct::Codec's encoding   */
     uint64_t          nbuckets;
     uint64_t          ways_off;   /* from the CACHE's base                 */
     uint64_t          hands_off;  /* one CLOCK hand per bucket             */
@@ -114,6 +114,7 @@ struct sa_cache {
     uint32_t       nways;
     uint64_t       nbuckets;
     uint64_t       pair_max;
+    uint32_t       serialise;  /* copied out of the header at bind */
     /* Counted in this process and published in batches: see sa_cache_count. */
     uint64_t       pend_pid;
     uint32_t       pend_hits;
@@ -139,11 +140,14 @@ static uint64_t sa_cache_bytes(uint64_t nbuckets, uint32_t nways,
 /* sa_now_ms moved to sa_time.h, so the map's TTL and this cache read the one
  * shared wall clock rather than each keeping their own. */
 
+/* `serialise` is 0, 1 or SA_SER_ANY; see sa_format.h. */
 static sa_cache *sa_cache_bind(sa_region *arena, sa_reg *e, uint64_t nbuckets,
-                               uint32_t nways, uint32_t way_size, int *err)
+                               uint32_t nways, uint32_t way_size,
+                               int serialise, int *err)
 {
 #if !SA_HAVE_ATOMICS
     (void)arena; (void)e; (void)nbuckets; (void)nways; (void)way_size;
+    (void)serialise;
     if (err) *err = SA_E_NOATOMICS;
     return NULL;
 #else
@@ -171,6 +175,7 @@ static sa_cache *sa_cache_bind(sa_region *arena, sa_reg *e, uint64_t nbuckets,
                        (size_t)sa_cache_bytes(nbuckets, nways, way_size));
                 h->way_size  = way_size;
                 h->ways      = nways;
+                h->serialise = serialise > 0 ? 1u : 0u;
                 h->nbuckets  = nbuckets;
                 h->ways_off  = sa_align_up((uint64_t)sizeof(sa_cache_hdr));
                 h->hands_off = h->ways_off
@@ -198,6 +203,10 @@ static sa_cache *sa_cache_bind(sa_region *arena, sa_reg *e, uint64_t nbuckets,
         if (err) *err = SA_E_NAME;
         return NULL;
     }
+    if (serialise >= 0 && h->serialise != (serialise ? 1u : 0u)) {
+        if (err) *err = SA_E_SHAPE;
+        return NULL;
+    }
 
     c = (sa_cache *)calloc(1, sizeof(sa_cache));
     if (!c) { if (err) *err = SA_E_NOMEM; return NULL; }
@@ -209,6 +218,7 @@ static sa_cache *sa_cache_bind(sa_region *arena, sa_reg *e, uint64_t nbuckets,
     c->nways    = h->ways;
     c->nbuckets = h->nbuckets;
     c->pair_max = sa_cache_capacity(h->way_size);
+    c->serialise = h->serialise;
     return c;
 #endif
 }

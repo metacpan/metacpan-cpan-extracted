@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our (@FLAGS, %MESSAGE);
 
@@ -75,7 +75,7 @@ Physics::Balls::Error - a flagged refusal, returned and never thrown
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

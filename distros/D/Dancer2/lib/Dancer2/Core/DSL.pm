@@ -1,7 +1,7 @@
 # ABSTRACT: Dancer2's Domain Specific Language (DSL)
 
 package Dancer2::Core::DSL;
-$Dancer2::Core::DSL::VERSION = '2.1.0';
+$Dancer2::Core::DSL::VERSION = '2.2.0';
 use Moo;
 use Carp;
 use Path::Tiny ();
@@ -68,7 +68,6 @@ sub dsl_keywords {
         false                => { is_global => 1 },
         flush                => { is_global => 0 },
         forward              => { is_global => 0 },
-        from_dumper          => { is_global => 1 },
         from_json            => { is_global => 1 },
         from_yaml            => { is_global => 1 },
         get                  => { is_global => 1 },
@@ -116,7 +115,6 @@ sub dsl_keywords {
         status               => { is_global => 0 },
         template             => { is_global => 1 },
         to_app               => { is_global => 1 },
-        to_dumper            => { is_global => 1 },
         to_json              => { is_global => 1 },
         to_yaml              => { is_global => 1 },
         true                 => { is_global => 1 },
@@ -145,7 +143,7 @@ sub error   { shift->app->log( error   => @_ ) }
 sub true  {1}
 sub false {0}
 
-sub _path_obj { shift and Path::Tiny::path(@_) }
+sub _path_obj { Path::Tiny::path(@_) }
 sub dirname { shift and _path_obj(@_)->parent->stringify }
 sub path    { shift and _path_obj(@_)->stringify }
 
@@ -508,18 +506,6 @@ sub to_yaml {
     Dancer2::Serializer::YAML::to_yaml(@_);
 }
 
-sub from_dumper {
-    shift; # remove first element
-    require_module('Dancer2::Serializer::Dumper');
-    Dancer2::Serializer::Dumper::from_dumper(@_);
-}
-
-sub to_dumper {
-    shift; # remove first element
-    require_module('Dancer2::Serializer::Dumper');
-    Dancer2::Serializer::Dumper::to_dumper(@_);
-}
-
 1;
 
 __END__
@@ -534,7 +520,7 @@ Dancer2::Core::DSL - Dancer2's Domain Specific Language (DSL)
 
 =head1 VERSION
 
-version 2.1.0
+version 2.2.0
 
 =head1 FUNCTIONS
 

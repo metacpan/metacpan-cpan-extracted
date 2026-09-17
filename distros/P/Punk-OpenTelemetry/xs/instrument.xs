@@ -20,7 +20,8 @@ install(tracer, ...)
     {
         HV *out = newHV();
         int i;
-        int want_server = 1, want_client = 1, want_db = 1;
+        int want_server = 1, want_client = 1, want_db = 1, want_metrics = 1;
+        SV *meter = NULL;
 
         if (!(SvROK(tracer) && SvIOK(SvRV(tracer))))
             croak("Punk::OpenTelemetry::Instrument::install: "
@@ -31,11 +32,23 @@ install(tracer, ...)
             if      (strEQ(k, "server")) want_server = v;
             else if (strEQ(k, "client")) want_client = v;
             else if (strEQ(k, "db"))     want_db = v;
+            else if (strEQ(k, "metrics")) want_metrics = v;
+            /* the meter is an object, not a flag, so it is read before SvTRUE
+             * turns it into one */
+            else if (strEQ(k, "meter")) {
+                SV *mv = ST(i + 1);
+                if (SvROK(mv) && SvIOK(SvRV(mv)) && SvIV(SvRV(mv))) meter = mv;
+            }
         }
         OTEL_TRACER = INT2PTR(otel_tracer *, SvIV(SvRV(tracer)));
         OTEL_INSTR.server = want_server;
         OTEL_INSTR.client = want_client;
-        OTEL_INSTR.db     = want_db;
+        OTEL_INSTR.db      = want_db;
+        OTEL_INSTR.metrics = want_metrics;
+        /* The HTTP duration histogram goes here. Without a meter the
+         * instrumentation records nothing and the clock is never stashed -
+         * a deployment with the metrics signal off pays nothing at all. */
+        OTEL_METER = meter ? INT2PTR(otel_meter *, SvIV(SvRV(meter))) : NULL;
 
         /* ---- Punk: server spans and the shipped DBI backend ------------- */
         {
@@ -45,9 +58,11 @@ install(tracer, ...)
                       && A->on_response(aTHX_ otel_on_response, (void *)A);
                 if (ok) OTEL_PK_INSTALLED = 1;
                 (void)hv_stores(out, "server", newSViv(ok ? 1 : 0));
+                /* the table as `ud`, so the observer can ask current_of
+                 * which request issued the statement (v5) */
                 if (A->abi_version >= 2)
                     OTEL_PK_DB = A->on_query(aTHX_ otel_on_query,
-                                             otel_on_query_done, NULL);
+                                             otel_on_query_done, (void *)A);
                 /* THE LOGS SIGNAL, from the logger the application already
                  * uses. v4 is the version that hands an observer the context,
                  * and without the context a record cannot be correlated - so
@@ -62,6 +77,26 @@ install(tracer, ...)
             /* Reported every time, not only on the call that registered. */
             (void)hv_stores(out, "db_punk", newSViv(OTEL_PK_DB));
             (void)hv_stores(out, "logs",    newSViv(OTEL_PK_LOGS));
+        }
+
+        /* ---- DBIx::Loop: the other database path ------------------------ *
+         * Three comments in this distribution said this was wired up and it
+         * never was. An application on the async model backend had no
+         * database spans at all, and nothing said why. */
+        {
+            const dbil_abi *D = otel_dl(aTHX);
+            if (D && !OTEL_DL_INSTALLED) {
+                OTEL_DL_DB = D->on_exec(aTHX_ otel_dl_start, otel_dl_done,
+                                        (void *)"other_sql");
+                if (OTEL_DL_DB) OTEL_DL_INSTALLED = 1;
+            }
+            (void)hv_stores(out, "db_loop", newSViv(OTEL_DL_DB));
+        }
+        {
+            /* Truthful about the one metric this dist records by itself: it
+             * needs a meter handed in, not merely the signal switched on. */
+            (void)hv_stores(out, "metrics",
+                            newSViv(OTEL_METER && OTEL_INSTR.metrics ? 1 : 0));
         }
 
         /* ---- Fetch: client spans, and the traceparent that makes a trace
@@ -96,6 +131,7 @@ configure(...)
             if      (strEQ(k, "server"))  OTEL_INSTR.server = v;
             else if (strEQ(k, "client"))  OTEL_INSTR.client = v;
             else if (strEQ(k, "db"))      OTEL_INSTR.db = v;
+            else if (strEQ(k, "metrics")) OTEL_INSTR.metrics = v;
             else if (strEQ(k, "enabled")) OTEL_INSTR.enabled = v;
         }
     }
@@ -103,10 +139,11 @@ configure(...)
 void
 config()
     PPCODE:
-        EXTEND(SP, 8);
+        EXTEND(SP, 10);
         mPUSHp("server", 6);   mPUSHi(OTEL_INSTR.server);
         mPUSHp("client", 6);   mPUSHi(OTEL_INSTR.client);
         mPUSHp("db", 2);       mPUSHi(OTEL_INSTR.db);
+        mPUSHp("metrics", 7);  mPUSHi(OTEL_INSTR.metrics);
         mPUSHp("enabled", 7);  mPUSHi(OTEL_INSTR.enabled);
 
 # The recursion guard, reachable from Perl.

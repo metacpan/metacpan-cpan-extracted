@@ -1,5 +1,10 @@
 Revision history for HTTP-API-Core
 
+1.01  2026-09-17
+    - Lower the minimum supported Perl version from 5.20 to 5.10.
+    - Expand CI coverage to Perl 5.10, 5.12, 5.14, 5.16, and 5.18.
+    - Install test prerequisites explicitly in CI for compatibility with older Perl toolchains.
+
 1.00  2026-08-17
     - Declare the documented HTTP::API::Core interfaces stable for the 1.x series.
     - Stabilize constructor/request, response, error, retry, pagination, hooks,

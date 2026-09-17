@@ -6,7 +6,7 @@ use warnings;
 use Punk ();
 use File::Raw::JSON ();
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 1;
 
@@ -113,9 +113,36 @@ returns the stored row.
 
 Deletes and returns the affected row count.
 
+=head1 OBSERVED STATEMENTS
+
+When something has registered a query observer through C<pk_abi>, the
+connection is built with L<Punk::DBI> as its C<RootClass> and B<every>
+statement on that handle is reported - the six methods above, and equally
+anything run through C<< $model->backend->dbh >> directly.
+
+That second half is the point. The six methods are a layer above the handle,
+and an application reaches past them for whatever the filter language cannot
+express: an C<OR>, a C<UNION>, a C<FOR UPDATE>, an upsert. Those statements are
+usually the interesting ones, and while the observer lived on the layer they
+were invisible with nothing to say so.
+
+The observer is handed the statement text and the number of bind values, never
+the values themselves: they are the literal data, and the SQL carries
+placeholders exactly where they would have been.
+
+=head2 What it costs
+
+A sub call per statement, for an application that asked to see its statements.
+With no observer registered the handle is a plain C<DBI::db> and there is no
+wrapper at all.
+
+An application that passes its own C<RootClass> in C<attr> keeps it, and does
+not get the statement observer - the subclass it asked for wins over the one
+this would have installed.
+
 =head1 SEE ALSO
 
-L<Punk::Model>, L<Punk>, L<DBI>.
+L<Punk::Model>, L<Punk>, L<Punk::DBI>, L<DBI>.
 
 =head1 AUTHOR
 

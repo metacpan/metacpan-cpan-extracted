@@ -1,5 +1,13 @@
 Revision history for XS-Parse-Sublike
 
+0.42    2026-09-16
+        [CHANGES]
+         * Use PNf/PNfARG in unit tests to avoid needing to call PadnameSV()
+
+        [BUGFIXES]
+         * Fix for perl 5.45.3 - need to invoke
+           class_method_parse_post_blockstart() during parse time
+
 0.41    2025-12-09
         [CHANGES]
          * Support optional refalias parameters with defaulting expressions

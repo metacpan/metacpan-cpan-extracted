@@ -5,7 +5,7 @@ WriteMakefile(
   VERSION_FROM     => 'lib/HTTP/API/Core.pm',
   ABSTRACT_FROM    => 'lib/HTTP/API/Core.pm',
   LICENSE          => 'perl_5',
-  MIN_PERL_VERSION => '5.020',
+  MIN_PERL_VERSION => '5.010',
   PREREQ_PM => {
     'HTTP::Tiny'    => 0,
     'JSON::PP'      => 0,

@@ -1,7 +1,9 @@
-use strict;
-use warnings;
+#!/usr/bin/env perl
 
-use Test::More tests => 311;
+use strict;
+use warnings FATAL => 'all';
+
+use Test::More import => [qw( done_testing ok subtest use_ok )];
 use Test::Trap;
 
 BEGIN {
@@ -9,9 +11,7 @@ BEGIN {
       or die "# NetAddr::MAC not available\n";
 }
 
-{
-
-    # 10 tests x2
+subtest 'bad MAC validation and exceptions (die_on_error)' => sub {
     my @badmacs = (
         qw(
           1111
@@ -38,13 +38,9 @@ BEGIN {
         ok( $trap->die,
             'mac_is_eui64 croaks if validation fails from ' . $mac );
     }
+};
 
-}
-
-#          mac_is_eui48     mac_is_eui64
-{
-
-    # 10 tests x2
+subtest 'EUI-48 MAC identification' => sub {
     my @eui48macs = (
         '001122334455',      '00-11-22-33-44-55',
         '00:11:22:33:44:55', '0011.2233.4455',
@@ -58,12 +54,9 @@ BEGIN {
         ok( mac_is_eui48($mac),  'eui48 correctly identified from ' . $mac );
         ok( !mac_is_eui64($mac), 'eui64 = false from ' . $mac );
     }
+};
 
-}
-
-{
-
-    # 10 tests x2
+subtest 'EUI-64 MAC identification' => sub {
     my @eui64macs = (
         '0011223344556677',        '00-11-22-33-44-55-66-77',
         '00:11:22:33:44:55:66:77', '0011.2233.4455.6677',
@@ -76,10 +69,9 @@ BEGIN {
         ok( mac_is_eui64($mac),  'eui64 correctly identified from ' . $mac );
         ok( !mac_is_eui48($mac), 'eui48 = false from ' . $mac );
     }
+};
 
-#          mac_is_unicast   mac_is_multicast   mac_is_broadcast
-#          mac_is_vrrp    mac_is_hsrp    mac_is_hsrp2
-
+subtest 'Unicast, multicast, and broadcast identification' => sub {
     my @unicasteui48macs = qw(
       c82a14eeeeee
       001122334455
@@ -129,6 +121,34 @@ BEGIN {
         ok( !mac_is_unicast($mac), 'unicast = false from ' . $mac );
         ok( !mac_is_multicast($mac), 'multicast = false from ' . $mac );
     }
+};
+
+subtest 'VRRP, HSRP, and MSNLB protocol checks' => sub {
+    my @unicasteui48macs = qw(
+      c82a14eeeeee
+      001122334455
+      003344aaccdd
+      00.11.22.33.44.aa
+    );
+
+    my @unicasteui64macs = qw(
+      c82a14eeeeeeeeee
+      0011223344556677
+      00aabbcc223344aa
+      00.bb.cc.aa.55.66
+    );
+
+    my @multicasteui48macs = qw(
+      011122334455
+      013344aaccdd
+      01.11.22.33.44.aa
+    );
+
+    my @multicasteui64macs = qw(
+      0111223344556677
+      01aabbcc223344aa
+      01.bb.cc.aa.55.66
+    );
 
     my @vrrpeui48macs = qw(
       00-00-5E-00-01-12
@@ -144,7 +164,6 @@ BEGIN {
       0000.0C07.AC3B
     );
 
-    # Only MACs with the fifth octet >= 0xF0 (240) should match HSRPv2
     my @hsrp2eui48macs = qw(
       0000.0C9F.F001
       0000.0C9F.FC12
@@ -155,10 +174,9 @@ BEGIN {
       0000.0C9F.FF2A
     );
 
-    # Edge cases for the fifth octet (Cisco style)
-    my $hsrp2_below = '0000.0C9F.EF01'; # 0xEF = 239, should NOT match
-    my $hsrp2_at    = '0000.0C9F.F001'; # 0xF0 = 240, should match
-    my $hsrp2_max   = '0000.0C9F.FFFF'; # 0xFF = 255, should match
+    my $hsrp2_below = '0000.0C9F.EF01';
+    my $hsrp2_at    = '0000.0C9F.F001';
+    my $hsrp2_max   = '0000.0C9F.FFFF';
 
     my @msnlbeui48macs = qw(
       02bf.0C9F.F001
@@ -172,7 +190,7 @@ BEGIN {
         ok( !mac_is_msnlb($mac), 'eui64 is never msnlb from ' . $mac);
     }
 
-    for my $mac ( @unicasteui48macs, @unicasteui48macs ) {
+    for my $mac ( @unicasteui48macs, @multicasteui48macs ) {
         ok( !mac_is_vrrp($mac),  'vrrp  = false from ' . $mac);
         ok( !mac_is_hsrp($mac),  'hsrp  = false from ' . $mac);
         ok( !mac_is_hsrp2($mac), 'hsrp2  = false from ' . $mac);
@@ -200,7 +218,6 @@ BEGIN {
       ok( !mac_is_msnlb($mac), 'msnlb  = false from ' . $mac);
     }
 
-    # Edge case tests for HSRPv2 fifth octet
     ok( !mac_is_hsrp2($hsrp2_below), 'hsrp2 not identified for 0xEF (should be false): ' . $hsrp2_below );
     ok( mac_is_hsrp2($hsrp2_at), 'hsrp2 identified for 0xF0 (should be true): ' . $hsrp2_at );
     ok( mac_is_hsrp2($hsrp2_max), 'hsrp2 identified for 0xFF (should be true): ' . $hsrp2_max );
@@ -211,11 +228,9 @@ BEGIN {
         ok( !mac_is_hsrp($mac), 'hsrp  = false from ' . $mac);
         ok( !mac_is_hsrp2($mac), 'hsrp2  = false from ' . $mac);
     }
-}
+};
 
-#      is_local    is_universal
-{
-
+subtest 'Locally administered and universal address identification' => sub {
     my @localeui48macs = qw(
       02aa.bbcc.2233
       02aabbcc2233
@@ -259,7 +274,6 @@ BEGIN {
         ok( !mac_is_local($mac), 'local = false from ' . $mac );
     }
 
-
     my @vrrp4macs = qw(
       00-00-5E-00-01-00
       00005E.000101
@@ -296,7 +310,6 @@ BEGIN {
         ok( !mac_is_local($mac), 'local = false from ' . $mac );
         ok( mac_is_vrrp($mac), 'correctly ID as vrrp ' . $mac );
     }
+};
 
-}
-
-1
+done_testing();

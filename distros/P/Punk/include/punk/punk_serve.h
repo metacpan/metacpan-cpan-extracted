@@ -64,14 +64,19 @@ static SV *ps_ctx(pTHX_ SV *ctx_class, HV *env, SV *app, SV *match) {
  * element it overwrites, so a dec here is a double free - one that surfaces
  * later in the request as unrelated corruption. The only manual dec is for
  * the store that did not take. */
+/* Every path that needs a context comes through here, built or reused, which
+ * is why pk_abi's current_of is set here and not at the four call sites. The
+ * restore is punk_serve's, on the save stack. */
 static SV *ps_ctx_for(pTHX_ SV **cp, SV *ctx_class, HV *env, SV *app,
                       SV *match) {
     if (*cp) {
         AV *av = (AV *)SvRV(*cp);
         if (!av_store(av, PCX_MATCH, match)) SvREFCNT_dec(match);
+        pk_cur_set(aTHX_ *cp);
         return *cp;
     }
     *cp = sv_2mortal(ps_ctx(aTHX_ ctx_class, env, app, match));
+    pk_cur_set(aTHX_ *cp);
     return *cp;
 }
 
@@ -167,7 +172,7 @@ static int ps_under(const char *path, STRLEN plen, const char *pf, STRLEN pfl) {
         && (plen == pfl || path[pfl] == '/');
 }
 
-static SV *punk_serve(pTHX_ HV *state, HV *env) {
+static SV *ps_serve_one(pTHX_ HV *state, HV *env) {
     SV *router = ps_state(aTHX_ state, "router");
     AV *recs   = ps_state_av(aTHX_ state, "recs");
     AV *apims  = ps_state_av(aTHX_ state, "api_mounts");
@@ -653,6 +658,22 @@ static SV *punk_serve(pTHX_ HV *state, HV *env) {
         if (err != &PL_sv_undef) SvREFCNT_dec(err);
         return out;
     }
+}
+
+/* The dispatch frame, which is what makes pk_abi's current_of safe to read.
+ *
+ * ps_serve_one has nine returns and a croak can leave it by none of them, so
+ * the restore goes on the save stack rather than at the end of the body. The
+ * PREVIOUS value is what goes back, not NULL: a mounted application inside
+ * another one has to leave the outer context where the outer frame will find
+ * it. */
+static SV *punk_serve(pTHX_ HV *state, HV *env) {
+    SV *out;
+    ENTER;
+    SAVEDESTRUCTOR_X(pk_cur_restore, (void *)PK_CURRENT);
+    out = ps_serve_one(aTHX_ state, env);
+    LEAVE;
+    return out;
 }
 
 #endif /* PUNK_SERVE_H */

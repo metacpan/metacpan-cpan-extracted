@@ -637,6 +637,47 @@ subtest 'render_pie_chart_snippet - no circular references with opts' => sub {
 	memory_cycle_ok($fragment, 'snippet hashref with combined opts has no circular references');
 };
 
+subtest 'render_pie_chart - separator default is /' => sub {
+	# The separator is interpolated into a JS template literal.  The literal
+	# string "${d.data.label} / ${d.data.value}" must appear in the JS source.
+	my $html = HTML::D3->new(width => 800, height => 600)->render_pie_chart(\@SIMPLE_DATA);
+	like($html, qr/d\.data\.label} \/ \$\{d\.data\.value}/, 'default separator / in legend JS');
+};
+
+subtest 'render_pie_chart - custom separator appears in legend' => sub {
+	my $html = HTML::D3->new(width => 800, height => 600)
+		->render_pie_chart(\@SIMPLE_DATA, { separator => ':' });
+	like($html,   qr/d\.data\.label} : \$\{d\.data\.value}/, 'custom separator : in legend JS');
+	unlike($html, qr/d\.data\.label} \/ /,                   'default / absent when overridden');
+};
+
+subtest 'render_animated_pie_chart - separator default is /' => sub {
+	my $html = HTML::D3->new(width => 800, height => 600)->render_animated_pie_chart(\@SIMPLE_DATA);
+	like($html, qr/d\.data\.label} \/ \$\{d\.data\.value}/, 'default separator / in animated legend JS');
+};
+
+subtest 'render_animated_pie_chart - custom separator appears in legend' => sub {
+	my $html = HTML::D3->new(width => 800, height => 600)
+		->render_animated_pie_chart(\@SIMPLE_DATA, { separator => ':' });
+	like($html,   qr/d\.data\.label} : \$\{d\.data\.value}/, 'custom separator : in animated legend JS');
+	unlike($html, qr/d\.data\.label} \/ /,                   'default / absent when overridden');
+};
+
+subtest 'render_pie_chart_snippet - separator default is /' => sub {
+	# The separator is interpolated into a JS string concatenation.
+	# The literal ' / ' must appear between d.data.label and fmt() in the source.
+	my $html = HTML::D3->new(width => 800, height => 600)
+		->render_pie_chart_snippet(\@SIMPLE_DATA)->{html};
+	like($html, qr/d\.data\.label \+ ' \/ '/, 'default separator / in snippet legend JS');
+};
+
+subtest 'render_pie_chart_snippet - custom separator appears in legend entry' => sub {
+	my $html = HTML::D3->new(width => 800, height => 600)
+		->render_pie_chart_snippet(\@SIMPLE_DATA, { separator => '|' })->{html};
+	like($html,   qr/d\.data\.label \+ ' \| '/, 'custom separator | in snippet legend JS');
+	unlike($html, qr/d\.data\.label \+ ' \/ '/, 'default / absent when overridden');
+};
+
 # ---------------------------------------------------------------------------
 # render_line_chart_with_tooltips
 # ---------------------------------------------------------------------------

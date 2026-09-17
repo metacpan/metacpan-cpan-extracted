@@ -27,6 +27,10 @@
  *     wedge the ones that did not.
  *  6. C89 declarations at block top. No VLAs, no designated initialisers,
  *     no %zu, no //.
+ *
+ * Two exceptions to rule 1, both named for it: sa_xop.h, which is the doors as
+ * opcodes, and sa_serialise.h, which is a codec and has nothing to do without
+ * an interpreter.
  */
 
 #define PERL_NO_GET_CONTEXT
@@ -53,6 +57,7 @@
 #include "sa/sa_lease.h"   /* one holder at a time, successor on death  */
 #include "sa/sa_scoreboard.h" /* one row per worker, published live      */
 #include "sa/sa_hll.h"     /* how many distinct, in a few kilobytes     */
+#include "sa/sa_serialise.h" /* a value as a structure, via Struct::Codec */
 #include "sa/sa_xop.h"     /* the hot doors as opcodes                  */
 #include "sa_abi.h"
 

@@ -95,4 +95,29 @@ sub batch_body {
     };
 }
 
+# Sends the headers and the start of a body, then nothing, for longer than any
+# bound in the suite: a deadline that stopped the clock at the headers would
+# never fire here.
+sub stall_body {
+    my ($c) = @_;
+    $c->res->headers->content_type('application/json');
+    $c->res->headers->content_length(1024);
+    $c->write('{"ip":');
+}
+
+# The same, except a byte keeps arriving every 20 ms, for 4 s in all, so no
+# single read ever waits long: only a bound on the whole response ends the call.
+sub trickle_body {
+    my ($c) = @_;
+    $c->res->headers->content_type('application/json');
+    $c->res->headers->content_length(200);
+    my $sent = 0;
+    my $timer = Mojo::IOLoop->recurring(0.02 => sub {
+        return if ++$sent > 199;
+        $c->write(' ') if $c->tx;
+    });
+    $c->on(finish => sub { Mojo::IOLoop->remove($timer) });
+    $c->write('{');
+}
+
 1;

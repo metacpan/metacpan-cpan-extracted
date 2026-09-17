@@ -14,7 +14,7 @@ Dancer2::Manual - A guide to building web applications with Dancer2
 
 =head1 VERSION
 
-version 2.1.0
+version 2.2.0
 
 =head1 Introduction to Dancer2: Managing Danceyland
 
@@ -2115,15 +2115,6 @@ data structure:
         my $data = from_yaml($yaml_data);
         # Now, do something with $data...
     };
-
-=head3 C<to_dumper>
-
-Deserializes a string to a L<Data::Dumper>-compatible data structure.
-
-=head3 C<from_dumper>
-
-Takes a data structure produced from L<Data::Dumper> and serializes it
-to a string.
 
 =head2 Hooks
 

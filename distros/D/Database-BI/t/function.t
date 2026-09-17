@@ -1400,4 +1400,236 @@ subtest '_combine_tables -- no circular references in output' => sub {
 	memory_cycle_ok($recs, '_combine_tables output records have no circular references');
 };
 
+# ============================================================================
+# PART 6: Dashboard -- _apply_filters
+#
+# _apply_filters is a :Protected method that reads all ?f= query params,
+# applies _apply_filter_spec in order, and returns three values: the
+# filtered records arrayref, the raw spec strings arrayref, and a
+# script-safe JSON string.  A real controller object is required so that
+# every_param('f') sees the URL params.
+# ============================================================================
+
+subtest '_apply_filters -- no f= params: all records returned, empty structures' => sub {
+	my $fn      = \&Database::BI::Controller::Dashboard::_apply_filters;
+	my $tx      = $t->ua->build_tx(GET => '/');
+	my $c       = $t->app->build_controller($tx);
+	my $records = [{ col => 'a' }, { col => 'b' }];
+
+	my ($filtered, $specs, $json) = $fn->($c, $records);
+	is scalar(@$filtered), 2, 'no filters: both records returned unchanged';
+	is_deeply $specs, [],     'no filters: raw specs arrayref is empty';
+	is $json,  '[]',          'no filters: JSON is an empty array literal';
+};
+
+subtest '_apply_filters -- single f= param narrows records and populates JSON' => sub {
+	my $fn      = \&Database::BI::Controller::Dashboard::_apply_filters;
+	my $tx      = $t->ua->build_tx(GET => '/?f=region:eq:North');
+	my $c       = $t->app->build_controller($tx);
+	my $records = [
+		{ region => 'North', name => 'Alice' },
+		{ region => 'South', name => 'Bob'   },
+	];
+
+	my ($filtered, $specs, $json) = $fn->($c, $records);
+	is scalar(@$filtered),     1,                'single filter keeps one matching row';
+	is $filtered->[0]{name},   'Alice',          'correct row survives the filter';
+	is $specs->[0],            'region:eq:North','raw spec string preserved verbatim';
+	like $json, qr/"col"\s*:\s*"region"/,        'JSON contains the column name';
+	like $json, qr/"op"\s*:\s*"eq"/,             'JSON contains the operator';
+	like $json, qr/"val"\s*:\s*"North"/,         'JSON contains the value';
+};
+
+subtest '_apply_filters -- multiple f= params applied in chain (AND semantics)' => sub {
+	my $fn      = \&Database::BI::Controller::Dashboard::_apply_filters;
+	my $tx      = $t->ua->build_tx(GET => '/?f=region:eq:North&f=score:gt:50');
+	my $c       = $t->app->build_controller($tx);
+	my $records = [
+		{ region => 'North', score => 80 },	# passes both
+		{ region => 'North', score => 30 },	# fails score filter
+		{ region => 'South', score => 90 },	# fails region filter
+	];
+
+	my ($filtered, $specs, $json) = $fn->($c, $records);
+	is scalar(@$filtered),    1,  'two filters combined keep only the one fully-matching row';
+	is $filtered->[0]{score}, 80, 'the surviving row has score 80';
+	is scalar(@$specs),       2,  'two raw spec strings in the returned arrayref';
+};
+
+subtest '_apply_filters -- JSON output escapes </ to prevent script injection' => sub {
+	# A filter value containing "</script>" would close a surrounding <script>
+	# block if embedded verbatim.  The sub must escape "</" to "<\/".
+	use Mojo::Util qw(url_escape);
+	my $fn      = \&Database::BI::Controller::Dashboard::_apply_filters;
+	my $tx      = $t->ua->build_tx(GET => '/?f=col:eq:' . url_escape('</script>'));
+	my $c       = $t->app->build_controller($tx);
+	my $records = [{ col => 'irrelevant' }];
+
+	my (undef, undef, $json) = $fn->($c, $records);
+	unlike $json, qr{</},   'JSON must not contain raw </ sequence';
+	like   $json, qr{<\\/}, 'JSON has </ escaped to <\\/';
+};
+
+subtest '_apply_filters -- malformed spec (no colon) skipped from JSON, records unchanged' => sub {
+	# The guard in _apply_filters is: length($col // '') && defined $op && length $op.
+	# A spec with no colon gives ($col='notaspec', $op=undef) after split -- the
+	# defined($op) check fails, so the spec is not added to @parsed or the JSON.
+	# _apply_filter_spec is also not called, leaving $records unchanged.
+	my $fn      = \&Database::BI::Controller::Dashboard::_apply_filters;
+	my $tx      = $t->ua->build_tx(GET => '/?f=notacolonspec');
+	my $c       = $t->app->build_controller($tx);
+	my $records = [{ x => 1 }, { x => 2 }];
+
+	my ($filtered, $specs, $json) = $fn->($c, $records);
+	is scalar(@$filtered), 2, 'malformed spec: both records pass through';
+	is $json, '[]',           'malformed spec is not added to the JSON array';
+};
+
+# ============================================================================
+# PART 7: pie_view HTTP smoke tests
+#
+# Exercises the two code paths added in 0.007.0:
+#   1. __count__ sentinel -- count rows per category instead of summing a column.
+#   2. Currency detection -- first non-numeric character detected from values.
+#
+# Temp CSV files are used so tests are self-contained and do not touch data/.
+# All subtests guard on HTML::D3 availability (render_pie_chart_snippet).
+# ============================================================================
+
+subtest 'pie_view -- __count__ sentinel counts rows per category' => sub {
+	use Mojo::Util qw(url_escape);
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 3;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'cats.csv');
+		$file->spew("type,amount\nFood,10.00\nFood,20.00\nDrink,5.00\n");
+		my $enc = url_escape($file->to_string);
+		$t->get_ok("/pie?l=path:$enc&cat=type&val=__count__")
+		  ->status_is(200, '__count__ mode renders without error')
+		  ->content_like(qr/Count by type/i, 'chart title includes "Count by type"')
+		  ->content_unlike(qr/No plottable data/, '__count__ produces plottable data');
+	}
+};
+
+subtest 'pie_view -- currency symbol detected and embedded in data-currency attribute' => sub {
+	use Mojo::Util qw(url_escape);
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 2;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'txn.csv');
+		$file->spew("category,amount\nFood,\$10.00\nDrink,\$5.00\n");
+		my $enc = url_escape($file->to_string);
+		$t->get_ok("/pie?l=path:$enc&cat=category&val=amount")
+		  ->status_is(200, 'pie renders with dollar-amount column')
+		  ->content_like(qr/data-currency="\$"/, 'dollar sign detected as currency symbol');
+	}
+};
+
+subtest 'pie_view -- missing cat param returns 400' => sub {
+	$t->get_ok('/pie?l=table:sales&val=amount')
+	  ->status_is(400, 'missing cat param produces 400 Bad Request');
+};
+
+subtest 'pie_view -- missing val param returns 400' => sub {
+	$t->get_ok('/pie?l=table:sales&cat=category')
+	  ->status_is(400, 'missing val param produces 400 Bad Request');
+};
+
+subtest 'pie_view -- accounting-notation negatives parsed as signed values' => sub {
+	use Mojo::Util qw(url_escape);
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 2;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'ledger.csv');
+		$file->spew("category,amount\nIncome,\$1000.00\nExpense,(\$250.00)\n");
+		my $enc = url_escape($file->to_string);
+		$t->get_ok("/pie?l=path:$enc&cat=category&val=amount")
+		  ->status_is(200, 'pie renders despite accounting-notation negative in amount column');
+	}
+};
+
+# ============================================================================
+# PART 8: Database::BI::_evict_old_uploads -- mtime cutoff logic
+#
+# _evict_old_uploads is a plain package-level sub in Database::BI (not a
+# method).  It walks an uploads directory and removes any entry whose mtime
+# is strictly older than the supplied cutoff (time() - max_age_s).
+#
+# Strategy: create directories, set their mtime via utime() to specific
+# values relative to time(), then call the function and verify the expected
+# directories are absent or present.  utime() avoids sleeping in the test.
+# ============================================================================
+
+subtest '_evict_old_uploads -- non-existent directory is a silent no-op' => sub {
+	my $fn = \&Database::BI::_evict_old_uploads;
+	lives_ok { $fn->(Mojo::File->new('/no/such/uploads/dir'), 3600) }
+		'_evict_old_uploads does not croak when uploads directory is absent';
+};
+
+subtest '_evict_old_uploads -- old entry removed, fresh entry preserved' => sub {
+	my $fn      = \&Database::BI::_evict_old_uploads;
+	my $tmp     = File::Temp::tempdir(CLEANUP => 1);
+	my $uploads = Mojo::File->new($tmp)->child('uploads');
+	$uploads->make_path;
+
+	my $old_dir   = $uploads->child('old_session');
+	my $fresh_dir = $uploads->child('fresh_session');
+	$old_dir->make_path;
+	$fresh_dir->make_path;
+
+	# Backdate old_session to 25 hours ago; leave fresh_session at current mtime.
+	my $old_mtime = time() - 25 * 3600;
+	utime($old_mtime, $old_mtime, $old_dir->to_string);
+
+	$fn->($uploads, 24 * 3600);	# max age = 24 h
+
+	ok !-d $old_dir->to_string,   'directory 25 hours old is evicted (older than 24 h max)';
+	ok  -d $fresh_dir->to_string, 'directory with current mtime is preserved';
+};
+
+subtest '_evict_old_uploads -- zero max_age_s evicts entries with past mtime' => sub {
+	# max_age_s=0 sets cutoff=time().  Any entry with mtime < time() is evicted.
+	# We force both directories 1 second into the past via utime so the test is
+	# deterministic without sleeping.
+	my $fn      = \&Database::BI::_evict_old_uploads;
+	my $tmp     = File::Temp::tempdir(CLEANUP => 1);
+	my $uploads = Mojo::File->new($tmp)->child('uploads2');
+	$uploads->make_path;
+
+	my $dir_a = $uploads->child('session_a');
+	my $dir_b = $uploads->child('session_b');
+	$dir_a->make_path;
+	$dir_b->make_path;
+
+	# Set both mtimes 1 second in the past to satisfy mtime < cutoff.
+	my $past = time() - 1;
+	utime($past, $past, $dir_a->to_string);
+	utime($past, $past, $dir_b->to_string);
+
+	$fn->($uploads, 0);
+
+	ok !-d $dir_a->to_string, 'session_a evicted when max_age_s is 0 and mtime is in the past';
+	ok !-d $dir_b->to_string, 'session_b evicted when max_age_s is 0 and mtime is in the past';
+};
+
+subtest '_evict_old_uploads -- stray regular file is also removed when old enough' => sub {
+	# Although .uploads/ normally contains session subdirectories, stray regular
+	# files (e.g. from a failed partial upload) also hit the -f branch.
+	my $fn      = \&Database::BI::_evict_old_uploads;
+	my $tmp     = File::Temp::tempdir(CLEANUP => 1);
+	my $uploads = Mojo::File->new($tmp)->child('uploads3');
+	$uploads->make_path;
+
+	my $stray = $uploads->child('stray.tmp');
+	$stray->spew('orphaned content');
+
+	# Backdate to 2 hours ago with a 1-hour max age.
+	my $old_mtime = time() - 2 * 3600;
+	utime($old_mtime, $old_mtime, $stray->to_string);
+
+	$fn->($uploads, 3600);
+
+	ok !-f $stray->to_string, 'stray file older than max_age_s is removed';
+};
+
 done_testing();

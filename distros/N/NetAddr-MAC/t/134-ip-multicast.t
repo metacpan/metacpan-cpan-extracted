@@ -1,9 +1,9 @@
-#!perl
+#!/usr/bin/env perl
 
 use strict;
-use warnings;
+use warnings FATAL => 'all';
 
-use Test::More tests => 47;
+use Test::More import => [qw( done_testing ok subtest use_ok )];
 
 BEGIN {
     use_ok( 'NetAddr::MAC', qw( :properties ) )
@@ -45,36 +45,47 @@ my @not_ipv6_multicast = qw(
   33-33-00-00-00-01-00-00
 );
 
-for my $mac (@ipv4_multicast) {
-    ok( mac_is_ipv4_multicast($mac),  'ipv4 multicast identified from ' . $mac );
-    ok( !mac_is_ipv6_multicast($mac), 'ipv6 multicast = false from ' . $mac );
-    ok( mac_is_multicast($mac),       'group bit set on ' . $mac );
-}
+subtest 'IPv4 multicast identification and mapping' => sub {
+    for my $mac (@ipv4_multicast) {
+        ok( mac_is_ipv4_multicast($mac),  'ipv4 multicast identified from ' . $mac );
+        ok( !mac_is_ipv6_multicast($mac), 'ipv6 multicast = false from ' . $mac );
+        ok( mac_is_multicast($mac),       'group bit set on ' . $mac );
+    }
+};
 
-for my $mac (@not_ipv4_multicast) {
-    ok( !mac_is_ipv4_multicast($mac), 'ipv4 multicast = false from ' . $mac );
-}
+subtest 'Non-IPv4 multicast checks' => sub {
+    for my $mac (@not_ipv4_multicast) {
+        ok( !mac_is_ipv4_multicast($mac), 'ipv4 multicast = false from ' . $mac );
+    }
+};
 
-for my $mac (@ipv6_multicast) {
-    ok( mac_is_ipv6_multicast($mac),  'ipv6 multicast identified from ' . $mac );
-    ok( !mac_is_ipv4_multicast($mac), 'ipv4 multicast = false from ' . $mac );
-    ok( mac_is_multicast($mac),       'group bit set on ' . $mac );
-}
+subtest 'IPv6 multicast identification' => sub {
+    for my $mac (@ipv6_multicast) {
+        ok( mac_is_ipv6_multicast($mac),  'ipv6 multicast identified from ' . $mac );
+        ok( !mac_is_ipv4_multicast($mac), 'ipv4 multicast = false from ' . $mac );
+        ok( mac_is_multicast($mac),       'group bit set on ' . $mac );
+    }
+};
 
-for my $mac (@not_ipv6_multicast) {
-    ok( !mac_is_ipv6_multicast($mac), 'ipv6 multicast = false from ' . $mac );
-}
+subtest 'Non-IPv6 multicast checks' => sub {
+    for my $mac (@not_ipv6_multicast) {
+        ok( !mac_is_ipv6_multicast($mac), 'ipv6 multicast = false from ' . $mac );
+    }
+};
 
-# object interface
-my $v4 = NetAddr::MAC->new('01:00:5e:00:00:12');
-ok( $v4->is_ipv4_multicast,  'object: 01:00:5e:00:00:12 is ipv4 multicast' );
-ok( !$v4->is_ipv6_multicast, 'object: 01:00:5e:00:00:12 is not ipv6 multicast' );
-ok( !$v4->is_vrrp,           'object: 01:00:5e:00:00:12 is not a vrrp virtual router address' );
+subtest 'Object-oriented multicast and VRRP checks' => sub {
+    my $v4 = NetAddr::MAC->new('01:00:5e:00:00:12');
+    ok( $v4->is_ipv4_multicast,  'object: 01:00:5e:00:00:12 is ipv4 multicast' );
+    ok( !$v4->is_ipv6_multicast, 'object: 01:00:5e:00:00:12 is not ipv6 multicast' );
+    ok( !$v4->is_vrrp,           'object: 01:00:5e:00:00:12 is not a vrrp virtual router address' );
 
-my $v6 = NetAddr::MAC->new('33:33:ff:e8:65:8f');
-ok( $v6->is_ipv6_multicast,  'object: 33:33:ff:e8:65:8f is ipv6 multicast' );
-ok( !$v6->is_ipv4_multicast, 'object: 33:33:ff:e8:65:8f is not ipv4 multicast' );
+    my $v6 = NetAddr::MAC->new('33:33:ff:e8:65:8f');
+    ok( $v6->is_ipv6_multicast,  'object: 33:33:ff:e8:65:8f is ipv6 multicast' );
+    ok( !$v6->is_ipv4_multicast, 'object: 33:33:ff:e8:65:8f is not ipv4 multicast' );
 
-# eui64 is never either
-my $e64 = NetAddr::MAC->new('33:33:00:00:00:01:00:00');
-ok( !$e64->is_ipv6_multicast, 'object: eui64 is never ipv6 multicast' );
+    # eui64 is never either
+    my $e64 = NetAddr::MAC->new('33:33:00:00:00:01:00:00');
+    ok( !$e64->is_ipv6_multicast, 'object: eui64 is never ipv6 multicast' );
+};
+
+done_testing();

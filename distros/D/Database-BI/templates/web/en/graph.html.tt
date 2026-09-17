@@ -47,7 +47,7 @@
   #reset-btn:hover { background: #f0f0f0; }
 </style>
 
-<p class="back-link"><a href="[% back_url | html %]">&larr; [% back_label | html %]</a></p>
+<p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a></p>
 
 <h2 class="graph-title">[% title | html %]</h2>
 

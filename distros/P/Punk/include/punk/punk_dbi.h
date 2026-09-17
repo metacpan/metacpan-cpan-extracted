@@ -147,6 +147,18 @@ static HV *pdbi_slot_for_opts(pTHX_ HV *o) {
                 (void)hv_store_ent(attr, HeSVKEY_force(he),
                                    newSVsv(HeVAL(he)), 0);
         }
+        /* Observed statements. The six methods below are not the only way an
+         * application runs one - it reaches through to this handle for an OR,
+         * a UNION, a FOR UPDATE, an upsert - and those never touch this file.
+         * Punk::DBI wraps the handle instead, so they are seen too.
+         *
+         * Only when somebody is listening, so an uninstrumented application
+         * pays no Perl frame per statement; and never over an application's
+         * own RootClass, which it would be losing to get this. */
+        if (PK_OBS_WANT_QUERY && !hv_exists(attr, "RootClass", 9)) {
+            (void)pk_require_once(aTHX_ "Punk::DBI", TRUE);
+            (void)hv_stores(attr, "RootClass", newSVpvs("Punk::DBI"));
+        }
         attr_rv = sv_2mortal(newRV_noinc((SV *)attr));
 
         (void)pk_require_once(aTHX_ "DBI", TRUE);
@@ -264,28 +276,26 @@ static SV *pdbi_sth(pTHX_ SV *self, SV *sql) {
 
 /* $sth->execute(@bind)
  *
- * `sql` is carried purely for the C ABI's query observers: Punk::Model::DBI
- * is a SECOND database path, entirely separate from DBIx::Loop's, and an
- * application using the default model backend generates no DBIx::Loop traffic
- * at all. Instrumenting only that one would leave a whole class of
- * application with no database events and nothing to say so.
+ * The query observers used to fire HERE, which was the wrong altitude: these
+ * six methods are a layer above the handle, and an application reaching
+ * through to $model->backend->dbh for an OR, a UNION, a FOR UPDATE or an
+ * upsert ran statements no observer could see. Punk::DBI wraps the handle
+ * instead, so this path is covered by Punk::DBI::st::execute along with every
+ * other, and firing again here would report each of these twice.
  *
- * The observer is handed the statement text and the bind COUNT, never the
- * bind values - the same rule DBIx::Loop's observer follows, for the same
- * reason: the values are the literal data and the SQL has placeholders
- * exactly where they would be. */
+ * `sql` stays in the signature: the callers have it, a future observer at
+ * this altitude would want it, and threading it back through eight call sites
+ * later is worse than an unused argument now. */
 static void pdbi_execute_sql(pTHX_ SV *sth, AV *bind, SV *sql) {
     SSize_t n = bind ? av_len(bind) + 1 : 0, i;
     SV **argv = n ? (SV **)safemalloc(sizeof(SV *) * (size_t)n) : NULL;
     SV *r;
-    void *tok = NULL;
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(bind, i, 0);
         argv[i] = (e && *e) ? *e : &PL_sv_undef;
     }
-    if (PK_OBS_WANT_QUERY) tok = pk_obs_query_start(aTHX_ sql, (int)n);
+    PERL_UNUSED_ARG(sql);
     r = pcx_call_meth(aTHX_ sth, "execute", argv, (int)n, 1);
-    if (tok) pk_obs_query_done(aTHX_ tok, r);
     if (argv) safefree(argv);
     if (r) SvREFCNT_dec(r);
 }

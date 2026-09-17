@@ -1,8 +1,8 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings FATAL => 'all';
-use Test::More tests => 15;
+use Test::More import => [ qw( cmp_ok done_testing is like ok subtest use_ok ) ];
 
 BEGIN {
   use_ok('NetAddr::MAC')
@@ -10,47 +10,41 @@ BEGIN {
 }
 
 # just create an object
-{
-
-ok( ! $NetAddr::MAC::errstr, 'initial errstr empty before fcf8aeb721a9');
-my $ret = NetAddr::MAC->new('fcf8aeb721a9');
-ok( $ret, 'return value is true for fcf8aeb721a9' );
-is( ref $ret, 'NetAddr::MAC', 'return value is a NetAddr::MAC object for fcf8aeb721a9' );
-ok( ! $NetAddr::MAC::errstr, 'again errstr empty after fcf8aeb721a9');
-
-}
+subtest 'Successful MAC object creation' => sub {
+    ok( ! $NetAddr::MAC::errstr, 'initial errstr empty before fcf8aeb721a9');
+    my $ret = NetAddr::MAC->new('fcf8aeb721a9');
+    ok( $ret, 'return value is true for fcf8aeb721a9' );
+    is( ref $ret, 'NetAddr::MAC', 'return value is a NetAddr::MAC object for fcf8aeb721a9' );
+    ok( ! $NetAddr::MAC::errstr, 'again errstr empty after fcf8aeb721a9');
+};
 
 # check we return errors properly
-{
-
-ok( ! $NetAddr::MAC::errstr, 'initial errstr empty before 11223344zz55');
-my $ret = NetAddr::MAC->new('11223344zz55');
-ok( ! $ret, 'return value is false for 11223344zz55' );
-ok( $NetAddr::MAC::errstr, 'errstr populated after 11223344zz55');
-like ($NetAddr::MAC::errstr,
-  qr/Invalid MAC format/, 'Bad MAC character for 11223344zz55');
-
-}
+subtest 'Error handling and errstr population' => sub {
+    ok( ! $NetAddr::MAC::errstr, 'initial errstr empty before 11223344zz55');
+    my $ret = NetAddr::MAC->new('11223344zz55');
+    ok( ! $ret, 'return value is false for 11223344zz55' );
+    ok( $NetAddr::MAC::errstr, 'errstr populated after 11223344zz55');
+    like ($NetAddr::MAC::errstr,
+      qr/Invalid MAC format/, 'Bad MAC character for 11223344zz55');
+};
 
 # now create again, make sure things work right
-{
-
-my $ret = NetAddr::MAC->new('742b62803518');
-ok( $ret, 'return value is true for 742b62803518' );
-is( $ret->oui, '74-2B-62', 'oui is 74-2B-62');
-ok( ! $NetAddr::MAC::errstr, 'errstr emptied after 742b62803518');
-
-}
+subtest 'Repeated creation and OUI retrieval' => sub {
+    my $ret = NetAddr::MAC->new('742b62803518');
+    ok( $ret, 'return value is true for 742b62803518' );
+    is( $ret->oui, '74-2B-62', 'oui is 74-2B-62');
+    ok( ! $NetAddr::MAC::errstr, 'errstr emptied after 742b62803518');
+};
 
 # play with priority
-{
+subtest 'Priority parsing and bridge ID formatting' => sub {
+    my $ret = NetAddr::MAC->new('60#742b62803518');
+    ok( $ret, 'return value is true for 60#742b62803518' );
+    cmp_ok( $ret->{priority}, '==', 60, 'internal priority is 60' );
+    is( $ret->as_bridge_id, '60#742b.6280.3518', 'as_bridge_id is correct' );
+};
 
-my $ret = NetAddr::MAC->new('60#742b62803518');
-ok( $ret, 'return value is true for 60#742b62803518' );
-cmp_ok( $ret->{priority}, '==', 60, 'internal priority is 60' );
-is( $ret->as_bridge_id, '60#742b.6280.3518', 'as_bridge_id is correct' );
-
-}
+done_testing();
 
 __END__
 

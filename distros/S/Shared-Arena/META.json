@@ -30,12 +30,14 @@
             "ExtUtils::CBuilder" : "0",
             "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0",
-            "Frozen" : "0.07"
+            "Frozen" : "0.07",
+            "Struct::Codec" : "0.02"
          }
       },
       "runtime" : {
          "requires" : {
             "Frozen" : "0.07",
+            "Struct::Codec" : "0.02",
             "perl" : "5.010"
          }
       },
@@ -46,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

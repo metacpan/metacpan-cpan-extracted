@@ -94,14 +94,27 @@
     <ol>
       {% for s in spans %}
       <li data-depth="{% s.depth %}" data-span="{% s.span_id %}"
+          data-parent="{% s.parent_span_id %}"
           class="{% s.row_class %}">
         <div class="wf-bar kind-{% s.kind_name %}"
              style="--start:{% s.start_pct %}%;--width:{% s.width_pct %}%"
-             title="{% s.service %} {% s.name %} {% s.dur_ms %}"></div>
+             title="{% s.service %} {% s.name %} {% s.dur_ms %}{% if s.query %}&#10;{% s.query %}{% end %}"></div>
         <span class="wf-label" style="padding-left:{% s.indent %}px"
-              >{% if s.service %}<span class="dim">{% s.service %}</span> {% end %}{% s.name %}</span>
+              >{% if s.attrs %}<button type="button" class="wf-more" data-more="{% s.span_id %}"
+                aria-expanded="false" title="attributes">+</button>{% end %}{% if s.service %}<span class="dim">{% s.service %}</span> {% end %}{% s.name %}</span>
         <span class="wf-time mono">{% s.dur_ms %}</span>
       </li>
+      {% if s.attrs %}
+      <li class="wf-detail" data-detail="{% s.span_id %}" hidden>
+        <table class="wf-attrs">
+          <tbody>
+          {% for a in s.attrs %}
+          <tr><td class="mono nowrap">{% a.key %}</td><td class="mono">{% a.value %}</td></tr>
+          {% end %}
+          </tbody>
+        </table>
+      </li>
+      {% end %}
       {% end %}
     </ol>
   </div>

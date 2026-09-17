@@ -30,11 +30,11 @@ no_index:
     - t
 requires:
   IO::Socket::SSL: '2.009'
-  Mojolicious: '9.00'
+  Mojolicious: '9.47'
   perl: '5.022'
 resources:
   bugtracker: https://github.com/internetdata/sdk-perl/issues
   homepage: https://internetdata.io
   repository: https://github.com/internetdata/sdk-perl.git
-version: v1.3.0
+version: v1.5.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

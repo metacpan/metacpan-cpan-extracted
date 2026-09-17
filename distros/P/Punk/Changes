@@ -1,5 +1,21 @@
 Revision history for Punk
 
+0.50    2026-09-16
+        - ADDS: pk_abi v5, current_of - the context of the dispatch frame
+          running now, or NULL. on_query is handed no context and cannot
+          be given one, so a consumer had no way to attribute a statement
+          to the request that issued it. Saved and restored around the
+          frame: a continuation, a queue job or boot reads NULL, so the
+          degraded answer is "no context" and never somebody else's.
+        - ADDS: Punk::DBI, installed as the handle's RootClass when a query
+          observer is registered. on_query fired from the six generated
+          methods, a layer above the handle, so a statement run through
+          $model->backend->dbh was never seen. Now every statement is,
+          whichever way it was asked for. Nothing is installed when nobody
+          is listening, and never over an application's own RootClass.
+        - FIXES: pk_obs_query_start tested SvOK before applying get magic,
+          so a statement text read from a DBI handle arrived empty.
+
 0.49    2026-09-11
         - ADDS: i18n catalogues are held in a Frozen block instead of an
           arena built here. The block holds a tree, so a level and a leaf

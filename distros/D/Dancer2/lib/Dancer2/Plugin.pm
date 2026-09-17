@@ -1,6 +1,6 @@
 package Dancer2::Plugin;
 # ABSTRACT: base class for Dancer2 plugins
-$Dancer2::Plugin::VERSION = '2.1.0';
+$Dancer2::Plugin::VERSION = '2.2.0';
 use strict;
 use warnings;
 
@@ -632,7 +632,7 @@ Dancer2::Plugin - base class for Dancer2 plugins
 
 =head1 VERSION
 
-version 2.1.0
+version 2.2.0
 
 =head1 SYNOPSIS
 

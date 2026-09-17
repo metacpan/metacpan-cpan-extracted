@@ -1,0 +1,6 @@
+2.2.1     2026-09-16 13:36:43+01:00 Europe/London
+
+    [ ENHANCEMENTS ]
+    * Initial release of the Dancer2 Dumper serializer as a standalone
+      distribution, split out from Dancer2 core.
+

@@ -1,5 +1,29 @@
 Revision history for Database-BI
 
+0.007.0	Wed Sep 16 07:33:53 PM EDT 2026
+    [ Enhancements ]
+    - Added pie chart support via the new GET /pie route.  A "Pie chart..."
+      toolbar button opens a panel where the user chooses "Slice by" (the
+      category column to group by) and "Sum of" (the numeric column to
+      aggregate), plus an optional "Donut" toggle.  The controller sums each
+      category using the same accounting-notation handling as the line graph,
+      then delegates rendering to HTML::D3 0.14's new render_pie_chart_snippet
+      (animated, sorted by value, capped at 12 slices with an "Other" tail,
+      legend enabled).  HTML::D3 minimum bumped from 0.13 to 0.14.
+    - Pie and line graph pages now show a two-level breadcrumb
+      ("Home > Back to table") matching the dashboard style.
+    - The table view now has a quick-filter bar below the toolbar.  A column
+      select, operator select (equals, not equals, contains, starts with, less
+      than, less or equal, greater than, greater or equal, is empty, is not
+      empty), and a value input let the user add a filter condition without
+      opening the "Merge data" panel.  Pressing Enter in the value field
+      triggers Apply.  Active filter chips now each have an individual x-remove
+      button to drop a single condition without clearing all filters.
+    [ Bug Fixes ]
+    - Opening the line graph panel after the pie chart panel (or vice versa)
+      now correctly hides the previously open panel.  The graph panel's
+      otherPanels list was missing 'pie-panel'.
+
 0.006.0	Tue Sep 15 08:03:20 PM EDT 2026
     [ Enhancements ]
     - Added a 'home' link on the table display page

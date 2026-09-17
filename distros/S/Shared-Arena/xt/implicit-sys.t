@@ -34,6 +34,17 @@ my $core = File::Spec->catdir($Config{archlibexp}, 'CORE');
 plan skip_all => "no perl headers at $core"
     unless -f File::Spec->catfile($core, 'perl.h');
 
+# sa_serialise.h includes Struct::Codec's sc_abi.h, which the real build finds
+# through ExtUtils::Depends and this compile finds the same way: where the
+# provider's Install::Files says it put the header.
+my $sc_core = eval {
+    require Struct::Codec::Install::Files;
+    no warnings 'once';
+    $Struct::Codec::Install::Files::CORE;
+};
+plan skip_all => 'no Struct::Codec header to compile against'
+    unless defined $sc_core && -f File::Spec->catfile($sc_core, 'sc_abi.h');
+
 my $dir = tempdir(CLEANUP => 1);
 my $c   = File::Spec->catfile($dir, 'implicit.c');
 my $o   = File::Spec->catfile($dir, 'implicit' . ($Config{obj_ext} || '.o'));
@@ -103,7 +114,8 @@ C
 close $fh;
 
 my $cmd = join ' ', $Config{cc}, $Config{ccflags} || (), '-c',
-          '-I.', '-Iinclude', "-I\"$core\"", '-o', "\"$o\"", "\"$c\"";
+          '-I.', '-Iinclude', "-I\"$sc_core\"", "-I\"$core\"",
+          '-o', "\"$o\"", "\"$c\"";
 my $log = `$cmd 2>&1`;
 my $rc  = $?;
 

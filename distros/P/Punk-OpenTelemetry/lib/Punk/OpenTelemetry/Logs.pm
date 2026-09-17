@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 # All of it is C (include/otel_log.h + xs/logger.xs). This file is
 # documentation.

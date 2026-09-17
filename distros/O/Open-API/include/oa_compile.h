@@ -132,6 +132,7 @@ typedef struct oa_ops {
     HV *by_id;                          /* operationId -> IV index */
     oa_scheme *schemes; int nschemes;   /* components.securitySchemes */
     oa_secalt *rootsec; int nrootsec;   /* document-level security */
+    int v30;                            /* the document is OpenAPI 3.0.x */
 } oa_ops;
 
 static void oa_secalts_free(oa_secalt *alts, int n) {
@@ -1411,13 +1412,15 @@ static oa_secalt *oa_compile_security(pTHX_ oa_api *a, oa_ops *t, AV *sec,
                 croak("Open::API: %s references unknown securityScheme '%.*s'",
                       where, (int)kl, k);
             alts[i].items[j].scheme = idx;
-            /* Only oauth2 and openIdConnect may name scopes. For every other
-             * scheme the specification says the list MUST be empty, and a
-             * document asking for scopes on an apiKey is describing something
-             * that cannot happen. */
+            /* Only oauth2 and openIdConnect may name scopes. Under 3.0 the
+             * specification says the list for any other scheme MUST be empty,
+             * and a document asking for scopes on an apiKey is describing
+             * something that cannot happen. 3.1 relaxed that: the array MAY
+             * carry role names, which are not defined or exchanged in-band, so
+             * under 3.1 the list is passed through to the caller untouched. */
             {
                 AV *sc = oa_av_of(scopes);
-                if (sc && av_len(sc) >= 0 && !t->schemes[idx].oauthish)
+                if (t->v30 && sc && av_len(sc) >= 0 && !t->schemes[idx].oauthish)
                     /* "named" matters: a scheme's NAME is free, so one called
                      * "apiKey" can be declared `type: http`, and a message
                      * saying only "scheme 'apiKey'" reads like the type */
@@ -1604,6 +1607,17 @@ static void oa_compile(pTHX_ oa_api *a) {
     if (!t) croak("Open::API: out of memory");
     t->by_id = newHV();
     a->ops   = t;
+
+    /* The normaliser up-converts a 3.0 document's schemas but leaves its
+     * `openapi` string alone, so the version is still readable here - and the
+     * security requirement rules differ between 3.0 and 3.1. The string has
+     * already been checked to be 3.0[.x] or 3.1[.x]. */
+    {
+        SV *ov = oa_get(aTHX_ doc, "openapi");
+        STRLEN ol;
+        const char *op = ov ? SvPV_const(ov, ol) : "";
+        t->v30 = (ov && ol >= 3 && op[2] == '0');
+    }
 
     oa_compile_schemes(aTHX_ a, t);
     {

@@ -8,9 +8,8 @@ use Carp qw(carp);
 use JSON::MaybeXS;
 use Object::Configure;
 use Params::Get;
+use Params::Validate::Strict;
 use Scalar::Util qw(blessed);
-
-# TODO: add animated tooltips to charts with legends
 
 =head1 NAME
 
@@ -18,11 +17,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -63,9 +62,10 @@ The module generates HTML and JavaScript code to render the chart in a web brows
 
 The C<=head3 API SPECIFICATION> subsections use L<Params::Validate::Strict>
 schema syntax (C<< type => 'arrayref' >> etc.) as a documentation convention.
-C<Params::Validate::Strict> is not a runtime dependency of this module; the
-schemas describe the parameter contract in machine-readable notation and can be
-plumbed into a WAF or test generator if desired.
+The module is also used at runtime in C<new()> to validate constructor
+arguments; it is therefore a required runtime dependency.  The schemas describe
+the parameter contract in machine-readable notation and can be plumbed into a
+WAF or test generator if desired.
 
 =head2 new
 
@@ -86,34 +86,46 @@ Accepts the following optional arguments:
 
 =cut
 
-# Constructor to initialize chart properties
 sub new
 {
 	my $class = shift;
 
-	# Handle hash or hashref arguments
-	my $params = Params::Get::get_params(undef, @_) || {};
+	my $params = Params::Validate::Strict::validate_strict({
+		args => Params::Get::get_params(undef, \@_) || {},
+		schema => {
+			height => {
+				type => 'integer',
+				optional => 1,
+				minimum => 1,
+			}, width => {
+				type => 'integer',
+				optional => 1,
+				minimum => 1,
+			}, title => {
+				type => 'string',
+				optional => 1,
+			}
+		}
+	});
 
 	if(!defined($class)) {
 		if((scalar keys %{$params}) > 0) {
-			# Using HTML::D3->new(), not HTML::D3::new()
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
 		}
-		# FIXME: this only works when no arguments are given
+		# When called as HTML::D3::new(undef) with no args, default to the package.
+		# Passing args via ::new() is unsupported and carps above.
 		$class = __PACKAGE__;
 	} elsif(blessed($class)) {
-		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
 	$params = Object::Configure::configure($class, $params);
 
-	# Return the blessed object
 	return bless {
-		width => $params->{width}  || 800,  # Default chart width
-		height => $params->{height} || 600,  # Default chart height
-		title => $params->{title}  || 'Chart',  # Default chart title
+		width  => $params->{width}  || 800,
+		height => $params->{height} || 600,
+		title  => $params->{title}  || 'Chart',
 	}, $class;
 }
 
@@ -151,7 +163,10 @@ None.
 =head4 Input
 
     {
-        data => { type => 'arrayref' },
+        data => {
+		type => 'arrayref',
+		element_type => [ 'string', 'number' ]
+	}
     }
 
     Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
@@ -618,6 +633,7 @@ HTML
 =head2 render_pie_chart
 
     my $html = $chart->render_pie_chart($data);
+    my $html = $chart->render_pie_chart($data, { separator => ':' });
 
 Generates HTML and JavaScript code to render a pie chart.
 Each slice is coloured with C<d3.schemeCategory10>; percentage labels appear
@@ -628,6 +644,15 @@ Accepts the following arguments:
 
 =item * C<$data> - An array reference of data points.  Each data point is an
 array reference with two elements: the label (string) and the value (numeric).
+
+=item * C<%opts> - Optional hashref of options.
+
+=over 8
+
+=item * C<separator> (string, default C<'/'>) - Character shown between the
+label and value in the SVG legend.
+
+=back
 
 =back
 
@@ -652,11 +677,17 @@ None.
 =head4 Input
 
     {
-        data => { type => 'arrayref' },
+        data => {
+		type => 'arrayref',
+		element_type => [ 'string', 'number' ]
+	},
+        opts => { type => 'hashref', optional => 1, default => {} },
     }
 
     Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
     non-arrayref dies.
+    Recognised C<opts> key: C<separator> (string, default C<'/'>)
+    - character shown between label and value in the SVG legend.
 
 =head4 Output
 
@@ -667,10 +698,13 @@ None.
 =cut
 
 sub render_pie_chart {
-	my ($self, $data) = @_;
+	my ($self, $data, $opts) = @_;
+	$opts //= {};
 
 	die 'Data is not optional' if(!defined($data));
 	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+
+	my $separator = $opts->{separator} // '/';
 
 	my $json_data = encode_json([
 		map { { label => $_->[0], value => $_->[1] } } @$data
@@ -748,7 +782,7 @@ sub render_pie_chart {
 	    .attr("x", 20)
 	    .attr("y", (d, i) => i * 22 + 11)
 	    .attr("font-size", "12px")
-	    .text(d => `\${d.data.label}: \${d.data.value}`);
+	    .text(d => `\${d.data.label} $separator \${d.data.value}`);
     </script>
 </body>
 </html>
@@ -760,6 +794,7 @@ HTML
 =head2 render_animated_pie_chart
 
     my $html = $chart->render_animated_pie_chart($data);
+    my $html = $chart->render_animated_pie_chart($data, { separator => ':' });
 
 Generates HTML and JavaScript code to render an animated pie chart where each
 slice fans out from zero angle on page load using C<attrTween> and
@@ -770,6 +805,15 @@ Accepts the following arguments:
 
 =item * C<$data> - An array reference of data points.  Each data point is an
 array reference with two elements: the label (string) and the value (numeric).
+
+=item * C<%opts> - Optional hashref of options.
+
+=over 8
+
+=item * C<separator> (string, default C<'/'>) - Character shown between the
+label and value in the SVG legend.
+
+=back
 
 =back
 
@@ -794,11 +838,17 @@ None.
 =head4 Input
 
     {
-        data => { type => 'arrayref' },
+        data => {
+		type => 'arrayref',
+		element_type => [ 'string', 'number' ]
+	},
+        opts => { type => 'hashref', optional => 1, default => {} },
     }
 
     Each element of C<$data> is C<[ Str, Num ]>; passing C<undef> or a
     non-arrayref dies.
+    Recognised C<opts> key: C<separator> (string, default C<'/'>)
+    - character shown between label and value in the SVG legend.
 
 =head4 Output
 
@@ -808,10 +858,13 @@ None.
 =cut
 
 sub render_animated_pie_chart {
-	my ($self, $data) = @_;
+	my ($self, $data, $opts) = @_;
+	$opts //= {};
 
 	die 'Data is not optional' if(!defined($data));
 	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+
+	my $separator = $opts->{separator} // '/';
 
 	my $json_data = encode_json([
 		map { { label => $_->[0], value => $_->[1] } } @$data
@@ -901,7 +954,7 @@ sub render_animated_pie_chart {
 	    .attr("x", 20)
 	    .attr("y", (d, i) => i * 22 + 11)
 	    .attr("font-size", "12px")
-	    .text(d => `\${d.data.label}: \${d.data.value}`);
+	    .text(d => `\${d.data.label} $separator \${d.data.value}`);
     </script>
 </body>
 </html>
@@ -951,6 +1004,10 @@ slices are shown individually; the rest are collapsed into an C<"Other"> slice.
 colour scheme.  Supported: C<tableau10>, C<category10>, C<set2>, C<set3>,
 C<paired>.
 
+=item * C<separator> (string, default C<'/'>) - Character shown between the
+label and value in each legend entry (e.g. C<'/'> produces
+C<Label / 12.34 (42.0%)>, C<':'> produces C<Label : 12.34 (42.0%)>).
+
 =back
 
 =head3 Errors
@@ -980,7 +1037,9 @@ None.
     C<donut> (boolean, default C<0>), C<sort_slices> (string: C<'value'>,
     C<'label'>, or C<'none'>; default C<'none'>), C<max_slices> (integer,
     default C<0>), C<legend> (boolean, default C<1>),
-    C<color_scheme> (string, default C<'tableau10'>).
+    C<color_scheme> (string, default C<'tableau10'>),
+    C<separator> (string, default C<'/'> - shown between label and value in
+    legend entries).
 
 =head4 Output
 
@@ -1001,6 +1060,7 @@ sub render_pie_chart_snippet {
 	my $max_slices   = int($opts->{max_slices} // 0);
 	my $show_legend  = exists $opts->{legend} ? ($opts->{legend} ? 1 : 0) : 1;
 	my $color_scheme = $opts->{color_scheme} // 'tableau10';
+	my $separator    = $opts->{separator}   // '/';
 
 	# Normalise: absolute values, drop zeros, pull optional extra hashref
 	my @slices;
@@ -1101,7 +1161,7 @@ DONUT
         .html((d, i) => {
             const pct = (d.data.value / total * 100).toFixed(1);
             const sw = '<span class="bi-pie-swatch" style="background:' + color(d.data.label) + '"></span>';
-            return sw + ' ' + d.data.label + ' — ' + fmt(d.data.value) + ' (' + pct + '%)';
+            return sw + ' ' + d.data.label + ' $separator ' + fmt(d.data.value) + ' (' + pct + '%)';
         });
 LEGEND_JS
 
@@ -2676,23 +2736,25 @@ Nigel Horne <njh@nigelhorne.com>
 
 =head2 render_pie_chart
 
-    render_pie_chart : HTML::D3 × (ArrayRef | undef) → Str ∪ ⊥
+    render_pie_chart : HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → Str ∪ ⊥
 
     pre  data = undef              ⇒ die "Data is not optional"
     pre  ref(data) ≠ 'ARRAY'      ⇒ die "Data must be an array of arrays"
     post result ∈ Str
     post "<!DOCTYPE" ⊆ result
     post "d3.pie()" ⊆ result ∧ "d3.arc()" ⊆ result ∧ "d3.schemeCategory10" ⊆ result
+    post opts.separator = S        ⇒  " S " ⊆ result (SVG legend: label S value)
 
 =head2 render_animated_pie_chart
 
-    render_animated_pie_chart : HTML::D3 × (ArrayRef | undef) → Str ∪ ⊥
+    render_animated_pie_chart : HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → Str ∪ ⊥
 
     pre  data = undef              ⇒ die "Data is not optional"
     pre  ref(data) ≠ 'ARRAY'      ⇒ die "Data must be an array of arrays"
     post result ∈ Str
     post "<!DOCTYPE" ⊆ result
     post "attrTween" ⊆ result ∧ "d3.interpolate" ⊆ result
+    post opts.separator = S        ⇒  " S " ⊆ result (SVG legend: label S value)
 
 =head2 render_line_chart_snippet
 
@@ -2736,6 +2798,7 @@ Nigel Horne <njh@nigelhorne.com>
     post opts.donut = 1     ⇒  "innerRadius" ⊆ result.html
     post opts.max_slices = N ∧ N ≥ 2 ∧ |data| > N
                             ⇒  |result_slices| = N ∧ "Other" ∈ result_labels
+    post opts.separator = S ⇒  " S " ⊆ result.html (HTML legend: label S value (pct%))
 
 =head2 render_line_chart_with_tooltips
 

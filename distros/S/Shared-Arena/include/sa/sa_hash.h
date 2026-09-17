@@ -119,6 +119,8 @@ typedef struct {
     volatile uint64_t busy;       /* reads that gave up mid-update          */
     volatile uint64_t full;       /* stores refused for want of room        */
     volatile uint64_t expired;    /* entries collected because they lapsed  */
+    uint32_t          serialise;  /* values are Struct::Codec's encoding    */
+    uint32_t          pad;
     volatile unsigned char locks[SA_LOCK_STRIPES];
 } sa_hash_hdr;
 
@@ -133,6 +135,7 @@ struct sa_hash {
     uint32_t     slot_size;
     uint64_t     nslots;
     uint64_t     pair_max;    /* key + value that fits one slot */
+    uint32_t     serialise;   /* copied out of the header at bind */
 };
 
 #define SA_HSLOT_AT(m, i) \
@@ -151,11 +154,13 @@ static uint64_t sa_hash_bytes(uint64_t nslots, uint32_t slot_size) {
 /* Attach to a map in a carved region, initialising it if nobody has yet. The
  * init race takes the same answer as everywhere else: whoever finds magic unset
  * writes the header and stores magic last, and the rest wait bounded. */
+/* `serialise` is 0, 1 or SA_SER_ANY; see sa_format.h. */
 static sa_hash *sa_hash_bind(sa_region *arena, sa_reg *e,
-                             uint64_t nslots, uint32_t slot_size, int *err)
+                             uint64_t nslots, uint32_t slot_size,
+                             int serialise, int *err)
 {
 #if !SA_HAVE_ATOMICS
-    (void)arena; (void)e; (void)nslots; (void)slot_size;
+    (void)arena; (void)e; (void)nslots; (void)slot_size; (void)serialise;
     if (err) *err = SA_E_NOATOMICS;
     return NULL;
 #else
@@ -183,6 +188,7 @@ static sa_hash *sa_hash_bind(sa_region *arena, sa_reg *e,
                 memset((void *)h, 0, (size_t)sizeof(sa_hash_hdr));
                 h->slot_size = slot_size;
                 h->nslots    = nslots;
+                h->serialise = serialise > 0 ? 1u : 0u;
                 h->slots_off = sa_align_up((uint64_t)sizeof(sa_hash_hdr));
                 sa_at_store32_rel(&h->magic, SA_HASH_MAGIC);
             }
@@ -207,6 +213,10 @@ static sa_hash *sa_hash_bind(sa_region *arena, sa_reg *e,
         if (err) *err = SA_E_NAME;
         return NULL;
     }
+    if (serialise >= 0 && h->serialise != (serialise ? 1u : 0u)) {
+        if (err) *err = SA_E_SHAPE;
+        return NULL;
+    }
 
     m = (sa_hash *)calloc(1, sizeof(sa_hash));
     if (!m) { if (err) *err = SA_E_NOMEM; return NULL; }
@@ -216,6 +226,7 @@ static sa_hash *sa_hash_bind(sa_region *arena, sa_reg *e,
     m->slot_size = h->slot_size;
     m->nslots    = h->nslots;
     m->pair_max  = sa_hash_capacity(h->slot_size);
+    m->serialise = h->serialise;
     return m;
 #endif
 }

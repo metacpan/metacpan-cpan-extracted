@@ -1347,6 +1347,17 @@ static SV *hm_hdrk_lookup(const char *keybuf, size_t klen) {
     return NULL;
 }
 
+/* The two bytes a repeated request header folds with. PSGI joins with the
+ * comma of a list header (RFC 9110 5.3). Cookie is the one request header
+ * whose list is "; " (RFC 6265 4.2.1), and an HTTP/2 client may send each
+ * cookie as its own field (RFC 9113 8.2.3), which browsers do: folded with
+ * a comma the session cookie's value grows a tail and its signature fails
+ * on every request. The same fold serves HTTP/1.1, where a client that
+ * splits Cookie is out of spec but the app is still owed one value. */
+static const char *hm_hdr_join_sep(const char *keybuf, size_t klen) {
+    return (klen == 11 && memcmp(keybuf, "HTTP_COOKIE", 11) == 0) ? "; " : ", ";
+}
+
 static void hm_env_init(pTHX) {
     int i;
     AV *ver;
@@ -1532,14 +1543,14 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
              * app, whose psgi.input is the decoded body with CONTENT_LENGTH */
         } else {
             {
-                /* repeated header: join values with ", " (PSGI) */
+                /* repeated header: join values (hm_hdr_join_sep) */
                 SV *ksv = hm_hdrk_lookup(keybuf, nk + 5);
                 if (ksv) {
                     /* a common header: the shared key SV carries its hash
                      * and its HEK, so no hashing and no HEK churn */
                     HE *he = hv_fetch_ent(env, ksv, 0, 0);
                     if (he) {
-                        sv_catpvs(HeVAL(he), ", ");
+                        sv_catpvn(HeVAL(he), hm_hdr_join_sep(keybuf, nk + 5), 2);
                         sv_catpvn(HeVAL(he), vp, nv);
                     } else {
                         (void)hv_store_ent(env, ksv, newSVpvn(vp, nv), 0);
@@ -1547,7 +1558,7 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
                 } else {
                     SV **old = hv_fetch(env, keybuf, (I32)(nk + 5), 0);
                     if (old) {
-                        sv_catpvs(*old, ", ");
+                        sv_catpvn(*old, hm_hdr_join_sep(keybuf, nk + 5), 2);
                         sv_catpvn(*old, vp, nv);
                     } else {
                         hv_store(env, keybuf, (I32)(nk + 5), newSVpvn(vp, nv), 0);

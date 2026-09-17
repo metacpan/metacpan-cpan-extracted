@@ -59,7 +59,7 @@
             "Exporter" : "0",
             "List::Util" : "0",
             "constant" : "0",
-            "perl" : "v5.10.0",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -74,7 +74,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
-            "perl" : "v5.10.0"
+            "perl" : "5.010"
          }
       }
    },
@@ -90,13 +90,11 @@
          "web" : "https://github.com/djzort/NetAddr-MAC"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_contributors" : [
-      "Dean Hamstead <djzort@cpan.org>",
-      "Dean Hamstead <djzort@fragfest.com.au>",
       "James C Sinclair <james.sinclair@linode.com>",
       "Jon Miner <jon.miner@wisc.edu>",
       "Oliver Gorwits <oliver@cpan.org>"

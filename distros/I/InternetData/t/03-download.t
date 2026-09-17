@@ -140,6 +140,26 @@ subtest 'a truncated transfer fails loudly and leaves nothing behind' => sub {
     like($@->message, qr/ended after 1365 of 4096 bytes/, 'and says how short it stopped');
     ok(!-e $path, 'no short file reads as a whole database');
     ok(!-e "$path.part", 'and no partial file survives either');
+    # Retries are budgeted for the part before any byte reaches the caller.
+    # Repeating a transfer whose bytes were already written would append a second
+    # copy to them, and a doubled file passes every length check there is.
+    is(scalar(grep { $_ eq '/presigned' } $origin->paths), 1, 'a half-written body was not fetched again');
+};
+
+subtest 'object storage failing before the first byte is retried, and the file holds one copy' => sub {
+    my $attempts = 0;
+    my $origin = origin_for(sub {
+        my ($c) = @_;
+        return $c->render(text => '<Error><Code>SlowDown</Code></Error>', status => 503) if $attempts++ < 1;
+        whole_database($c);
+    });
+    my ($dir, $path) = temp_path();
+
+    my $written = eval { client_for($origin, retries => 2)->database->download('bogon_ip_v1', 'csvgz', $path) };
+
+    is(scalar(grep { $_ eq '/presigned' } $origin->paths), 2, 'the 503 was retried');
+    is($written, length $DATABASE, 'the transfer then succeeded');
+    is(-s $path, length $DATABASE, 'with exactly one copy on disk');
 };
 
 subtest 'a database the organization does not license is refused once' => sub {
@@ -184,6 +204,7 @@ subtest 'object storage refusing the link is reported as such' => sub {
         'and names where the refusal came from');
     is($@->kind, 'forbidden', 'still classified on the status');
     is($@->retryable, 0, 'so a dead link is not hammered');
+    is(scalar(grep { $_ eq '/presigned' } $origin->paths), 1, 'and it was asked once');
     ok(!-e "$path.part", 'leaving no partial file');
 };
 

@@ -1,6 +1,6 @@
 package Database::BI::Controller::Dashboard;
 
-our $VERSION = '0.006.0';
+our $VERSION = '0.007.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -137,6 +137,25 @@ sub _is_safe_url {
 	return 0 if ($n & 0xFFFF0000) == 0xA9FE0000;	# 169.254/16 (link-local / metadata)
 	return 0 if ($n & 0xFFC00000) == 0x64400000;	# 100.64/10 (CGNAT)
 	return 1;
+}
+
+# _safe_back_url($url) -> $url | undef
+#
+# Purpose: Sanitise a user-supplied back-link URL before it is passed to the
+#          template and rendered inside an href="" attribute.  Template Toolkit's
+#          | html filter encodes <>&" but does NOT block the javascript: or
+#          data: URI schemes, so a raw param('back') = "javascript:alert(1)"
+#          would be rendered verbatim inside the href and execute on click.
+#
+# Rule:    Only absolute http(s) URLs and root-relative paths (starting with /)
+#          are permitted.  Anything else (javascript:, data:, vbscript:, empty
+#          strings, undef) returns undef so the template renders no href.
+#
+sub _safe_back_url {
+	my ($url) = @_;
+	return undef unless defined $url && length($url);
+	return $url if $url =~ m{\A(?:/(?!/)|https?://)}i;
+	return undef;
 }
 
 # _resolve_template($self) -> ($platform, $language)
@@ -877,6 +896,8 @@ sub view ($self) {
 		filter_specs     => $filter_specs,
 		filters_json     => $filters_json,
 		dedup            => $dedup,
+		back_url         => _safe_back_url($self->param('back2')),
+		back_label       => $self->param('back2_label') // 'Back',
 		export_url       => $self->_build_export_url("table:$table", [], $filter_specs, undef, $dedup),
 	);
 }
@@ -1081,6 +1102,8 @@ sub open_file ($self) {
 			hint       => $hint,
 			back_url   => $back,
 			back_label => 'Back to browser',
+			back2_url  => _safe_back_url($self->param('back2')),
+			back2_label => $self->param('back2_label') // 'Back',
 		);
 	}
 
@@ -1099,6 +1122,8 @@ sub open_file ($self) {
 		title            => $filename,
 		back_url         => $back,
 		back_label       => 'Back to browser',
+		back2_url        => _safe_back_url($self->param('back2')),
+		back2_label      => $self->param('back2_label') // 'Back',
 		file_path        => $file->to_string,
 		left_spec        => $lspec,
 		combine_specs    => [],
@@ -1414,6 +1439,8 @@ sub join_tables ($self) {
 		title            => $title,
 		back_url         => $self->_spec_to_url($left_spec),
 		back_label       => "Back to $left_label",
+		back2_url        => _safe_back_url($self->param('back2')),
+		back2_label      => $self->param('back2_label') // 'Back',
 		left_spec        => $left_spec,
 		combine_specs    => [],
 		current_joins    => \@join_specs,
@@ -1537,6 +1564,8 @@ sub combine_tables ($self) {
 		title            => $title,
 		back_url         => $self->_spec_to_url($left_spec),
 		back_label       => "Back to $left_label",
+		back2_url        => _safe_back_url($self->param('back2')),
+		back2_label      => $self->param('back2_label') // 'Back',
 		left_spec        => $left_spec,
 		combine_specs    => \@combine_specs,
 		current_joins    => [],
@@ -1632,13 +1661,15 @@ C<POST /export> -- Write the current logical view to a chosen filesystem path.
   f=         string   (repeatable) Filter specs.
   dir=       string   Target directory (must exist; resolved via realpath).
   filename=  string   Output filename including extension.  Extension determines
-                      format: C<.csv> -> RFC 4180 CSV; C<.sql> -> SQLite.
+                      format: C<.csv> -> RFC 4180 CSV; C<.sql> -> SQLite;
+                      C<.json> -> JSON array of row objects.
 
 =head4 DOMAIN CONSTRAINTS: filename=
 
-The extension check uses C</\.csv\z/i> (CSV) or C</\.sql\z/i> (SQLite):
-the C</i> flag makes matching case-insensitive, so C<.CSV> and C<.SQL>
-are accepted alongside lowercase forms.  Everything else returns 415.
+The extension check uses C</\.csv\z/i> (CSV), C</\.sql\z/i> (SQLite), or
+C</\.json\z/i> (JSON): the C</i> flag makes matching case-insensitive, so
+C<.CSV>, C<.SQL>, and C<.JSON> are accepted alongside lowercase forms.
+Everything else returns 415.
 
 Path separator characters (C</> and C<\>) in C<filename> are stripped
 first via C<m{([^/\\]+)\z}> -- only the basename is kept, preventing
@@ -1648,12 +1679,12 @@ directory traversal.
 
 =item Valid partitions
 
-C<report.csv>, C<report.sql>, C<REPORT.CSV>, C<report.SQL>.  A
-single-character stem (C<a.csv>) is also valid.
+C<report.csv>, C<report.sql>, C<report.json>, C<REPORT.CSV>, C<report.SQL>.
+A single-character stem (C<a.csv>) is also valid.
 
 =item Invalid partitions (415)
 
-C<report.txt>, C<report.json>, C<report> (no extension), empty string.
+C<report.txt>, C<report> (no extension), empty string.
 
 =back
 
@@ -2005,7 +2036,7 @@ sub clear_uploads ($self) {
 sub graph_view ($self) {
 	my $x_col = $self->param('x') // '';
 	my $y_col = $self->param('y') // '';
-	my $back  = $self->param('back') // '/';
+	my $back  = _safe_back_url($self->param('back')) // '/';
 
 	return $self->render(text => 'Missing x or y column parameter', status => 400)
 		unless length($x_col) && length($y_col);
@@ -2062,6 +2093,92 @@ sub graph_view ($self) {
 		ref_min_y    => $min_y,
 		ref_max_y    => $max_y,
 		ref_avg_y    => sprintf('%.4g', $avg_y),
+	);
+}
+
+sub pie_view ($self) {
+	my $cat_col     = $self->param('cat') // '';
+	my $val_col     = $self->param('val') // '';
+	my $donut       = $self->param('donut') ? 1 : 0;
+	my $back        = _safe_back_url($self->param('back')) // '/';
+	my @filter_specs = $self->every_param('f');
+
+	return $self->render(text => 'Missing cat or val column parameter', status => 400)
+		unless length($cat_col) && length($val_col);
+
+	my ($records, $columns) = $self->_run_export_pipeline;
+	return $self->render(text => 'Could not open data source', status => 404)
+		unless $records;
+
+	my %col_set = map { $_ => 1 } @{$columns};
+	return $self->render(text => "Column not found: $cat_col", status => 400)
+		unless $col_set{$cat_col};
+
+	# '__count__' is the sentinel value sent when the user picks "Count (rows)".
+	# In that mode we count rows per category instead of summing a numeric column.
+	my $count_mode = ($val_col eq '__count__');
+	return $self->render(text => "Column not found: $val_col", status => 400)
+		unless $count_mode || $col_set{$val_col};
+
+	# Detect the currency symbol (e.g. $ £ EUR) from the first non-empty raw
+	# value.  The regex captures the first character that is not a digit,
+	# whitespace, comma, period, hyphen, or open-paren -- that character is
+	# the currency prefix.  Accounting-notation values like ($1,234.56) are
+	# handled by the optional open-paren before the currency character.
+	# Not used in count mode because counts are always plain integers.
+	my $currency_symbol = '';
+	my %totals;
+	for my $row (@{$records}) {
+		my $cat = $row->{$cat_col} // '';
+		next unless length($cat);
+		if ($count_mode) {
+			$totals{$cat}++;
+		} else {
+			my $v = $row->{$val_col} // '';
+			next unless length($v);
+			if (!length($currency_symbol) && $v =~ /\A\s*\(?\s*([^\d\s.,\-\(])/) {
+				$currency_symbol = $1;
+			}
+			# Capture accounting-notation sign before stripping non-numeric chars.
+			my $is_acct_neg = ($v =~ /\A\s*\(/);
+			(my $v_num = $v) =~ s/[^\d.\-]//g;
+			$v_num = "-$v_num" if $is_acct_neg && $v_num =~ /\A\d/;
+			next unless $v_num =~ /\A-?\d+(?:\.\d+)?\z/;
+			$totals{$cat} += $v_num + 0;
+		}
+	}
+
+	return $self->render(
+		text   => 'No plottable data: no rows have valid data in the selected columns.',
+		status => 200,
+	) unless %totals;
+
+	my @slices = map { [$_, $totals{$_}] } sort keys %totals;
+
+	require HTML::D3;
+	my $title   = $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
+	my $snippet = HTML::D3->new(title => $title, width => 600, height => 500)
+		->render_pie_chart_snippet(\@slices, {
+			animated    => 1,
+			donut       => $donut,
+			sort_slices => 'value',
+			max_slices  => 12,
+			legend      => 1,
+		});
+
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler      => 'tt',
+		template     => "$platform/$language/pie",
+		format       => 'html',
+		title        => $title,
+		pie_html        => $snippet->{html},
+		back_url        => $back,
+		back_label      => 'Back to table',
+		slice_count     => scalar @slices,
+		cat_col         => $cat_col,
+		val_col         => $val_col,
+		currency_symbol => $currency_symbol,
 	);
 }
 
@@ -2251,6 +2368,99 @@ column in that row (e.g. C<region>, C<date>).
 
 =cut
 
+=head2 pie_view
+
+C<GET /pie> -- Render a D3.js v7 animated pie chart from the current data
+pipeline.
+
+Each row's category value (C<cat=>) is used as a slice label; the numeric
+value column (C<val=>) is summed per category.  Accounting-notation
+negatives such as C<(1,234.56)> are handled automatically.  Slices are
+sorted by total descending; when there are more than 12 distinct categories
+the smallest ones are collapsed into a single "Other" slice.
+
+Clicking any slice or legend entry navigates back to the table view with
+an C<f=cat:eq:value> filter applied automatically, so the user can drill
+into the data behind a slice without leaving the application.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  l=<spec>    string   Left-table spec (required).  Same syntax as /join.
+  cat=<col>   string   Category column name (required; used as slice labels).
+  val=<col>   string   Numeric value column name (required; values are summed).
+  donut=1     flag     Render as a donut chart with a hole in the centre (optional).
+  back=<url>  string   URL for the "Back to table" breadcrumb link (optional; default "/").
+  f=<spec>    string   Result filter (repeatable; same syntax as /join).
+
+=head4 OUTPUT
+
+  200 text/html   TT-rendered pie chart page containing:
+                  - Two-level breadcrumb (Home > Back to table).
+                  - Export buttons for SVG and PNG (legend is composited in).
+                  - An animated D3.js pie or donut chart with a colour-coded
+                    legend.  Each slice and legend entry is clickable and
+                    navigates to the filtered table view.
+                  - Slice count (e.g. "7 slices").
+
+  200 text/plain  "No plottable data" when every row has a non-numeric or
+                  missing value column (HTTP 200, not 4xx, so the page can
+                  render a friendly message).
+
+  400 text/plain  C<cat=> or C<val=> absent, or named column not found.
+  404 text/plain  Data source could not be opened.
+
+=head4 DOMAIN CONSTRAINTS
+
+  cat=    Any column name that exists in the result set.  Cell values are
+          used verbatim as slice labels.  Empty-string cells are skipped.
+
+  val=    Must be a column whose cells contain numbers (after stripping
+          currency symbols, commas, and handling accounting-notation negatives).
+          Rows where the value is still non-numeric after stripping are skipped.
+          Negative totals are included in the chart (slice values may be negative
+          if the source data contains credits or reversals).
+
+  donut=  Any truthy value (e.g. "1") enables the donut hole.  Absent or
+          "0" renders a solid pie.
+
+=head3 MESSAGES
+
+  Missing cat or val column parameter    C<cat=> or C<val=> query param absent.
+  Column not found: <name>               Named column absent from the result set.
+  Could not open data source             Left-table spec unresolvable or 404.
+  No plottable data: ...                 All rows lack a valid numeric value.
+
+=head3 EXAMPLE
+
+  GET /pie?l=table:sales&cat=region&val=amount&back=/view/sales
+
+Renders a pie chart of total C<amount> per C<region>.  Clicking the
+"North" slice navigates to C</view/sales?f=region:eq:North>.
+
+With a donut hole:
+
+  GET /pie?l=table:sales&cat=region&val=amount&donut=1
+
+=head3 FORMAL SPECIFICATION
+
+  pie_view : Controller x Params -> HTML | Error
+
+  let pipeline = run_export_pipeline(l, j, f, d)
+  let totals   = { cat => sum { val(row) | row in pipeline.records,
+                                           cat(row) != '', num(val(row)) != bot }
+                 | cat in range(cat_col) }
+
+  pre  cat in params /\ val in params     else 400
+  pre  cat in pipeline.cols               else 400
+  pre  val in pipeline.cols               else 400
+  pre  totals != {}                        else 200 "No plottable data"
+  post HTML::D3->render_pie_chart_snippet(slices) embedded in TT layout
+       where slices = sort_desc { |s.value| | s in totals }
+
+=cut
+
 =head2 clear_uploads
 
 C<POST /uploads/clear> -- Delete every file from the C<.uploads/> staging
@@ -2280,9 +2490,17 @@ files deleted.  Both are 0 when the directory is absent or already empty.
 All user-facing routes in C<Database::BI> are handled by this controller.
 See the individual action POD above for per-endpoint documentation.
 
-=head2 Filter operators
+=head2 Filter operators and the quick-filter bar
 
-The C<f=col:op:val> filter spec supports:
+Filters are expressed as C<f=col:op:val> query parameters and are applied
+server-side after all joins.  Multiple C<f=> params are applied in order
+(AND semantics).
+
+The colon separator is split with a limit of 3, so values may themselves
+contain colons (e.g. C<f=sale_date:eq:2025-01-15>, or a time value like
+C<f=start_time:eq:14:30:00>).
+
+B<Supported operators:>
 
   eq        case-insensitive string equality
   ne        case-insensitive string inequality
@@ -2295,8 +2513,23 @@ The C<f=col:op:val> filter spec supports:
   empty     cell is undef or empty string (val ignored)
   notempty  cell is defined and non-empty (val ignored)
 
-The colon separator is split with a limit of 3, so values may themselves
-contain colons (e.g. C<f=sale_date:eq:2025-01-15>).
+B<Quick-filter bar (table view):>
+
+A filter row below the toolbar lets the user pick a column, operator, and
+value and press "Apply filter" (or Enter) to add a condition without
+opening any panel.  The current URL is updated with the new C<f=> param
+and the page reloads; all other URL parameters (joins, dedup, etc.) are
+preserved automatically via the browser C<URL> API.
+
+Active filter chips appear in the toolbar.  Each chip has an individual
+x-button to remove just that condition.  The "x Clear filters" link
+removes all C<f=> params at once.
+
+B<Drill-down from pie chart:>
+
+Clicking a pie slice or legend entry on C</pie> navigates to the table
+view with C<f=cat_col:eq:label> appended, so the user can inspect the
+rows behind any slice without manually typing a filter.
 
 =head1 COMMON PITFALLS
 
@@ -2350,13 +2583,14 @@ or C<like>), the filter is treated as a no-op and B<all rows are returned>.  No
 error is produced.  This is intentional so that future operators can be added
 without breaking existing clients that read a wider response.
 
-=item B<Uploading a file does not clean up automatically>
+=item B<Uploaded files are evicted automatically, but not immediately>
 
 Files uploaded via C<POST /upload> are stored in C<.uploads/> under the
-application's home directory and are B<never deleted automatically>.  They
-accumulate until you manually remove the C<.uploads/> directory.  This is
-intentional for a single-user local tool, but you should be aware of it on
-long-running servers.
+application home directory.  C<Database::BI> evicts upload subdirectories
+whose modification time is older than 24 hours B<on every server startup>.
+Between restarts, files accumulate.  For an immediate full purge (regardless
+of age), post to C<POST /uploads/clear> or click the "Clear upload cache"
+button in the UI.
 
 =item B<Open C<data/> tables by name; open other files by absolute path>
 

@@ -10,6 +10,8 @@ my @modules = qw(
     VPNDetection::Cache
     VPNDetection::Database
     VPNDetection::Error
+    VPNDetection::Oauth
+    VPNDetection::OauthError
     VPNDetection::Result
 );
 
@@ -20,7 +22,9 @@ use_ok($_) for @modules;
 # a test failure rather than a bad release.
 my $version = VPNDetection->VERSION;
 ok($version, "the distribution version is $version");
-for my $module (grep { $_ ne 'VPNDetection::Bogons' } @modules) {
+# The two refusal subclasses live in OauthError.pm, so they are loaded, not used.
+my @packages = (@modules, qw(VPNDetection::OauthAccessDeniedError VPNDetection::OauthExpiredTokenError));
+for my $module (grep { $_ ne 'VPNDetection::Bogons' } @packages) {
     is($module->VERSION, $version, "$module is at $version");
 }
 

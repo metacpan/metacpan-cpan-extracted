@@ -97,6 +97,16 @@ my %ledger = (
 
 	# DataSource::selectall_arrayref public method
 	'DataSource.selectall_arrayref' => 'selectall_arrayref() returns arrayref of hashrefs',
+
+	# pie_view action (added 0.007.0) -- all four documented return paths
+	'GET./pie.200'               => 'GET /pie?l=...&cat=...&val=... 200 HTML pie chart',
+	'GET./pie.400.missing_param' => 'GET /pie missing cat= or val= param -> 400 plain text',
+	'GET./pie.400.col_not_found' => 'GET /pie with unknown cat/val column -> 400 plain text',
+	'GET./pie.404.no_source'     => 'GET /pie (no l=) -> 404 plain text',
+	'GET./pie.200.no_plottable'  => 'GET /pie all-text val column -> 200 No plottable data',
+	'GET./pie.200.count_mode'    => 'GET /pie?val=__count__ -> 200 count-mode chart title',
+	'GET./pie.200.donut'         => 'GET /pie?donut=1 -> 200 HTML donut chart',
+	'GET./pie.200.currency'      => 'GET /pie with $ amounts -> data-currency attribute present',
 );
 
 # ---------------------------------------------------------------------------
@@ -724,6 +734,118 @@ subtest 'POST /export -- write failure returns 500 JSON {error}' => sub {
 		chmod(0755, $dir);	# restore so CLEANUP can remove the dir
 	}
 	delete $ledger{'POST./export.write_failed'};
+};
+
+# ---------------------------------------------------------------------------
+# GET /pie -- pie_view action (added 0.007.0)
+#
+# pie_view has four documented return paths (see POD MESSAGES):
+#   400 -- missing cat= or val= param
+#   400 -- named column not found in result set
+#   404 -- data source could not be opened (no l=)
+#   200 -- happy path: HTML chart (also tests __count__ mode, donut, currency)
+#   200 -- all-text val column: "No plottable data" plain-text body
+# ---------------------------------------------------------------------------
+
+subtest 'GET /pie -- missing cat and val params each return 400' => sub {
+	# POD: "Missing cat or val column parameter" is the message when either
+	# required query param is absent.  Test both absence variants here.
+	$t->get_ok("/pie?l=table:$SALES_TABLE&val=amount")
+	  ->status_is(400, 'missing cat= produces 400')
+	  ->content_like(qr/Missing cat or val column parameter/, 'correct error for missing cat');
+
+	$t->get_ok("/pie?l=table:$SALES_TABLE&cat=region")
+	  ->status_is(400, 'missing val= produces 400')
+	  ->content_like(qr/Missing cat or val column parameter/, 'correct error for missing val');
+
+	delete $ledger{'GET./pie.400.missing_param'};
+};
+
+subtest 'GET /pie?cat=no_such_col -- 400 Column not found' => sub {
+	# POD: "Column not found: <name>" when the named column is absent from
+	# the result set.  Both cat= and val= are checked against the column set.
+	$t->get_ok("/pie?l=table:$SALES_TABLE&cat=no_such_col_xyz&val=amount")
+	  ->status_is(400, 'unknown cat column returns 400')
+	  ->content_like(qr/Column not found/, 'error text matches POD');
+	delete $ledger{'GET./pie.400.col_not_found'};
+};
+
+subtest 'GET /pie (no l= param) -- 404 Could not open data source' => sub {
+	# POD: 404 when _run_export_pipeline cannot open any source.
+	$t->get_ok('/pie?cat=region&val=amount')
+	  ->status_is(404, 'missing l= returns 404')
+	  ->content_like(qr/Could not open data source/, 'error text matches POD');
+	delete $ledger{'GET./pie.404.no_source'};
+};
+
+subtest 'GET /pie -- all-text val column returns 200 No plottable data' => sub {
+	# POD: "No plottable data: ..." when every row in the val column is
+	# non-numeric after stripping.  HTTP 200 (not 4xx) so the page renders
+	# a friendly message rather than an error page.
+	my $dir  = tempdir(CLEANUP => 1);
+	my $file = Mojo::File->new($dir, 'text.csv');
+	$file->spew("region,label\nNorth,Alfa\nSouth,Beta\n");
+	$t->get_ok('/pie?l=path:' . url_escape($file->to_string) . '&cat=region&val=label')
+	  ->status_is(200, 'non-numeric val column returns 200 not 4xx')
+	  ->content_like(qr/No plottable data/i, '"No plottable data" message rendered');
+	delete $ledger{'GET./pie.200.no_plottable'};
+};
+
+subtest 'GET /pie?l=table:sales&cat=region&val=amount -- 200 HTML pie chart' => sub {
+	# Happy-path smoke test: valid cat + numeric val column renders the chart page.
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 2;
+		$t->get_ok("/pie?l=table:$SALES_TABLE&cat=region&val=amount")
+		  ->status_is(200, 'valid pie request returns 200')
+		  ->content_type_like(qr{text/html}, 'response is text/html');
+	}
+	delete $ledger{'GET./pie.200'};
+};
+
+subtest 'GET /pie?val=__count__ -- count mode renders 200 with count-by title' => sub {
+	# POD DOMAIN CONSTRAINTS: the special sentinel value "__count__" causes the
+	# controller to count rows per category instead of summing a numeric column.
+	# The chart title must become "Count by <cat_col>" to reflect the mode.
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 3;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'cats.csv');
+		$file->spew("type,score\nFood,10\nFood,20\nDrink,5\n");
+		$t->get_ok('/pie?l=path:' . url_escape($file->to_string) . '&cat=type&val=__count__')
+		  ->status_is(200, '__count__ mode returns 200')
+		  ->content_type_like(qr{text/html}, 'response is HTML')
+		  ->content_like(qr/Count by type/i, 'chart title says "Count by <cat_col>"');
+	}
+	delete $ledger{'GET./pie.200.count_mode'};
+};
+
+subtest 'GET /pie?donut=1 -- donut chart variant renders 200' => sub {
+	# POD: donut=1 passes through to HTML::D3 as donut => 1.  The page shape
+	# is otherwise identical to a solid pie chart.
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 2;
+		$t->get_ok("/pie?l=table:$SALES_TABLE&cat=region&val=amount&donut=1")
+		  ->status_is(200, 'donut=1 returns 200')
+		  ->content_type_like(qr{text/html}, 'response is HTML');
+	}
+	delete $ledger{'GET./pie.200.donut'};
+};
+
+subtest 'GET /pie -- dollar amounts detected: data-currency="$" in page' => sub {
+	# The controller scans raw cell values for the first non-numeric, non-paren
+	# leading character to detect the currency symbol.  The result is embedded
+	# in a hidden <div id="pie-meta" data-currency="..."> element so the JS
+	# drill-down handler can prepend it to each legend amount.
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 2;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'txn.csv');
+		$file->spew("category,amount\nFood,\$10.00\nDrink,\$5.00\n");
+		$t->get_ok('/pie?l=path:' . url_escape($file->to_string) . '&cat=category&val=amount')
+		  ->status_is(200, 'pie with dollar amounts returns 200')
+		  ->content_like(qr/data-currency="\$"/, 'dollar sign embedded in data-currency attribute');
+	}
+	delete $ledger{'GET./pie.200.currency'};
 };
 
 # ---------------------------------------------------------------------------

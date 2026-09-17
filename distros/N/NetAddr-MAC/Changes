@@ -1,5 +1,9 @@
 NetAddr::MAC - A MAC address object
 
+1.04    2026-09-16
+        - Fix random() to respect die_on_error and update example (GH#16)
+        - Many unit test changes and corrections
+
 1.03    2026-09-14
         - Accept bridge priority on mac_* functions GH#12
         - to_eui64 now returns true when nothing to do GH#15

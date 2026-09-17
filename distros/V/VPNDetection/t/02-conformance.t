@@ -14,11 +14,14 @@ use VPNDetectionTest::Origin;
 # libraries quietly disagreeing about one address.
 my $corpus = VPNDetectionTest::corpus();
 
-my %routes;
+my (%routes, @batch_sizes);
 my $origin = VPNDetectionTest::Origin->new(sub {
     my ($c) = @_;
     my $path = $c->req->url->path->to_string;
-    return $c->render(json => batch_answer($c->req->json)) if $path eq '/batch';
+    if ($path eq '/batch') {
+        push @batch_sizes, scalar @{ $c->req->json->{ips} || [] };
+        return $c->render(json => batch_answer($c->req->json));
+    }
     my $route = $routes{$path};
     return $c->render(json => { error => 'not a valid IP address' }, status => 400)
         unless $route;
@@ -55,6 +58,7 @@ sub client {
 
 sub serve {
     %routes = ();
+    @batch_sizes = ();
     for my $route (@_) {
         $routes{"/$route->{ip}"} = $route;
     }
@@ -175,6 +179,23 @@ subtest 'a large batch is sent in chunks of a thousand' => sub {
     is(scalar keys %$answers, $case->{expect}{keyCount}, 'every address is keyed once');
     is($origin->count, $case->{expect}{httpRequests}, 'one request per chunk of 1000');
     is($answers->{$_}->ip, $_, "$_ answered for itself") for @{ $case->{input} }[0, 999, 1000];
+};
+
+subtest 'an uncapped batch is chunked and answers every address once' => sub {
+    # Chunking to the endpoint's 1000 is the library's job, so a batch has no cap
+    # of its own: never a refusal, and one POST per chunk.
+    my $case = VPNDetectionTest::batch_case('uncapped-input-is-chunked');
+    serve(map { +{ ip => $_, body => { ip => $_, is_vpn => \0 } } } @{ $case->{input} });
+    my $answers = eval { client(cache_size => 0)->lookup_batch($case->{input}) } || {};
+
+    is($@, '', 'the batch is not refused');
+    is_deeply([$origin->paths], [('/batch') x $case->{expect}{httpRequests}], 'one POST per chunk');
+    is_deeply([sort { $a <=> $b } @batch_sizes], [500, 1000, 1000], 'of at most 1000 addresses each');
+    is(scalar keys %$answers, $case->{expect}{keyCount}, 'every address is keyed once');
+    my @answered = grep {
+        ref $answers->{$_} eq 'VPNDetection::Result' && $answers->{$_}->ip eq $_
+    } @{ $case->{input} };
+    is(scalar @answered, $case->{expect}{keyCount}, 'each one answered for itself');
 };
 
 # A per-entry failure carries no headers, so its 429 can only be a spent

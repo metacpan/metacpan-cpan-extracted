@@ -1,5 +1,11 @@
 Revision history for Frozen
 
+0.08    2026-09-16
+        - a perl before 5.36 sets the public string flag when it stringifies
+          a number, so a stringified 5 carries the flags of a numified "5"
+          and freezes as a string there. Documented as a limitation; the
+          test now expects it on those perls.
+
 0.07    2026-09-16
         - a scalar's kind is read from the public SV flags, not the private
           ones. A cached conversion is not a type: 1.5 compared against an

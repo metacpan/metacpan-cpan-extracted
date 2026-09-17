@@ -3,8 +3,11 @@ use warnings;
 
 use lib 't/lib';
 
+use File::Temp ();
 use Mojo::IOLoop;
+use Mojo::UserAgent;
 use Test::More;
+use Time::HiRes ();
 use InternetData;
 use InternetDataTest;
 use InternetDataTest::Origin;
@@ -128,6 +131,176 @@ subtest 'retries are configurable per call' => sub {
     $origin->reset;
     eval { $client->database->list };
     is($origin->count, 1, 'the client default still applies without an override');
+};
+
+for my $body (qw(stall_body trickle_body)) {
+subtest "a per-call timeout below the client one fires on a $body" => sub {
+    my $origin = InternetDataTest::Origin->new(\&{"InternetDataTest::Origin::$body"});
+    my $db = InternetData->new(
+        base_url => $origin->url, api_key => 'k', retries => 0, timeout => 3,
+    )->database;
+    my %calls = (
+        list => sub { $db->list(@_) },
+        metadata => sub { $db->metadata('bogon_ip_v1', @_) },
+        checksums => sub { $db->checksums('bogon_ip_v1', 'mmdb', @_) },
+        downloads => sub { $db->downloads(@_) },
+        download_url => sub { $db->download_url('bogon_ip_v1', 'mmdb', @_) },
+    );
+
+    for my $name (sort keys %calls) {
+        my $started = Time::HiRes::time();
+        my $answer = eval { $calls{$name}->(timeout => 0.25) };
+        my $error = $@;
+        my $elapsed = Time::HiRes::time() - $started;
+
+        ok(!defined $answer, "$name: the call failed");
+        isa_ok($error, 'InternetData::Error', $name);
+        is($error->kind, 'network', "$name: surfaces as a transport failure");
+        is($error->retryable, 1, "$name: and is worth another attempt");
+        cmp_ok($elapsed, '>=', 0.2, "$name: the call waited for it");
+        cmp_ok($elapsed, '<', 1.5, "$name: the call's 0.25s fired, not the client's 3s");
+    }
+
+    # A per-call value left on something the client shares would pass the loop
+    # above and leave every later call on the wrong bound.
+    my $bounded = InternetData->new(base_url => $origin->url, api_key => 'k', retries => 0, timeout => 0.25);
+    my $started = Time::HiRes::time();
+    eval { $bounded->database->list };
+    my $elapsed = Time::HiRes::time() - $started;
+    is(ref $@ && $@->kind, 'network', "without an override the client's own bound fires");
+    cmp_ok($elapsed, '>=', 0.2, 'after waiting for it');
+    cmp_ok($elapsed, '<', 1.5, 'at its 0.25s');
+};
+}
+
+subtest 'a per-call timeout bounds every attempt of that call and nothing after it' => sub {
+    my $origin = InternetDataTest::Origin->new(sub {
+        my ($c) = @_;
+        my $path = $c->req->url->path->to_string;
+        return InternetDataTest::Origin::stall_body($c) if $path eq '/api/v2/database/list';
+        $c->render_later;
+        Mojo::IOLoop->timer(0.5 => sub { $c->render(json => { id => 'bogon_ip_v1' }) });
+    });
+    my $ua = Mojo::UserAgent->new;
+    my $db = InternetData->new(
+        base_url => $origin->url, api_key => 'k', retries => 1, timeout => 3, ua => $ua,
+    )->database;
+
+    my $started = Time::HiRes::time();
+    eval { $db->list(timeout => 0.25) };
+    my $elapsed = Time::HiRes::time() - $started;
+    is($@->kind, 'network', 'the call timed out');
+    is($origin->count, 2, 'once, and once more on the retry');
+    cmp_ok($elapsed, '<', 1.5, "the retry kept the call's bound rather than taking the client's");
+    is($ua->request_timeout, 3, 'the agent is left as the client configured it');
+
+    # Slower than the last call's bound and well inside the client's, so this
+    # fails only if that bound outlived the call it was given to.
+    is($db->metadata('bogon_ip_v1')->{id}, 'bogon_ip_v1',
+        'the next call is bounded by the client again');
+};
+
+subtest "a request started inside another call's window takes its own bound" => sub {
+    my $origin = InternetDataTest::Origin->new(sub { shift->render(json => { databases => [] }) });
+    my $ua = Mojo::UserAgent->new;
+    my $db = InternetData->new(base_url => $origin->url, api_key => 'k', timeout => 3, ua => $ua)->database;
+    my (%bound, $nested);
+    $ua->on(start => sub {
+        my (undef, $tx) = @_;
+        my $path = $tx->req->url->path->to_string;
+        $bound{$path} = $ua->request_timeout;
+        # The bound is swapped around start_p, and Mojo runs a loop tick in there
+        # when the loop is idle. Starting a request from this event puts it inside
+        # that window as deterministically as a retry landing in the tick would.
+        $nested ||= $db->downloads_p if $path eq '/api/v2/database/list';
+    });
+
+    $db->list(timeout => 0.25);
+    $nested->wait;
+
+    is($bound{'/api/v2/database/list'}, 0.25, 'the call took its own bound');
+    is($bound{'/api/v2/database/downloads'}, 3,
+        "and the request started inside its window took the client's, not the call's");
+};
+
+subtest 'a per-call timeout is refused where it cannot work' => sub {
+    my $origin = InternetDataTest::Origin->new(sub { shift->render(json => {}) });
+    my $db = InternetData->new(base_url => $origin->url, api_key => 'k')->database;
+    my $dir = File::Temp->newdir;
+    my $path = $dir->dirname . '/bogon_ip_v1.mmdb';
+
+    for my $bad (-1, 'soon') {
+        eval { $db->list(timeout => $bad) };
+        like($@, qr/timeout must be a number of seconds/, "list refuses timeout => $bad");
+        eval { $db->download_url('bogon_ip_v1', 'mmdb', timeout => $bad) };
+        like($@, qr/timeout must be a number of seconds/, "download_url refuses timeout => $bad");
+    }
+    # A transfer runs as long as the file takes. A bound would cut it off, and
+    # one spent on the link alone would read as bounding a transfer it does not.
+    eval { $db->download('bogon_ip_v1', 'mmdb', $path, timeout => 5) };
+    like($@, qr/unknown option\(s\): timeout/, 'download refuses one outright');
+    eval { $db->download_bytes('bogon_ip_v1', 'mmdb', timeout => 5) };
+    like($@, qr/unknown option\(s\): timeout/, 'and so does download_bytes');
+    is($origin->count, 0, 'and not one request was spent finding out');
+    ok(!-e "$path.part", 'nor was a .part file left behind');
+};
+
+subtest 'a client-wide timeout is refused where it cannot work' => sub {
+    my $origin = InternetDataTest::Origin->new(sub { shift->render(json => { databases => [] }) });
+
+    for my $bad (-1, 'soon') {
+        my $client = eval { InternetData->new(base_url => $origin->url, api_key => 'k', timeout => $bad) };
+        like($@, qr/InternetData->new: timeout must be a number of seconds/, "new refuses timeout => $bad");
+        ok(!$client, "and builds no client for timeout => $bad");
+    }
+    is($origin->count, 0, 'and not one request was spent finding out');
+    # 0 is no bound at all, which is a choice rather than a mistake.
+    is_deeply(InternetData->new(base_url => $origin->url, api_key => 'k', timeout => 0)->database->list,
+        [], 'while timeout => 0 still builds a client that answers');
+};
+
+subtest 'an unpublished format is refused before the network' => sub {
+    my $origin = InternetDataTest::Origin->new(sub {
+        my ($c, $o) = @_;
+        return $c->render(json => { checksums => {} }) if $c->req->url->path->to_string =~ /checksum/;
+        $c->res->headers->location($o->url . '/file');
+        $c->rendered(302);
+    });
+    my $db = InternetData->new(base_url => $origin->url, api_key => 'k')->database;
+    my $dir = File::Temp->newdir;
+    my $path = $dir->dirname . '/bogon_ip_v1.bin';
+
+    is_deeply([InternetData::Database::FORMATS], InternetDataTest::corpus()->{formats},
+        'the formats it takes are the ones the corpus publishes');
+    for my $format ('zip', 'MMDB', 'csv.gz') {
+        for my $call (
+            [checksums => sub { $db->checksums('bogon_ip_v1', $format) }],
+            [download_url => sub { $db->download_url('bogon_ip_v1', $format) }],
+            [download => sub { $db->download('bogon_ip_v1', $format, $path) }],
+            [download_bytes => sub { $db->download_bytes('bogon_ip_v1', $format) }],
+        ) {
+            eval { $call->[1]->() };
+            like($@, qr/'\Q$format\E' is not a published format; expected one of csvgz, mmdb/,
+                "$call->[0] refuses '$format', naming what it takes");
+        }
+    }
+    is($origin->count, 0, 'and not one request was spent finding out');
+    ok(!-e "$path.part", 'nor was a .part file left behind');
+
+    for my $format (InternetData::Database::FORMATS) {
+        $db->checksums('bogon_ip_v1', $format);
+        $db->download_url('bogon_ip_v1', $format);
+    }
+    is($origin->count, 4, 'while every published format still reaches the API');
+};
+
+subtest 'every closed vocabulary is listed at runtime, as the pinned spec publishes it' => sub {
+    # The corpus reads these out of the pinned spec, so a value the spec gains
+    # reddens this after the next re-pin rather than leaving a list quietly short.
+    my $corpus = InternetDataTest::corpus();
+    is_deeply([InternetData::Database::FORMATS], $corpus->{formats}, 'FORMATS');
+    is_deeply([InternetData::Database::STANDINGS], $corpus->{standings}, 'STANDINGS');
+    is_deeply([InternetData::Database::LICENSE_TYPES], $corpus->{license_type}, 'LICENSE_TYPES');
 };
 
 subtest 'a 429 is retried only when it carries Retry-After' => sub {

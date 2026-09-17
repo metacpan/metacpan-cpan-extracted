@@ -117,6 +117,27 @@ subtest 'a truncated transfer fails loudly and leaves nothing behind' => sub {
     like($@->message, qr/ended after 1365 of 4096 bytes/, 'and says how short it stopped');
     ok(!-e $path, 'no short file reads as a whole dataset');
     ok(!-e "$path.part", 'and no partial file survives either');
+    # Retries are budgeted for the part before any byte reaches the caller.
+    # Repeating a transfer whose bytes were already written would append a second
+    # copy to them, and a doubled file passes every length check there is.
+    is(scalar(grep { $_ eq '/dataset' } $origin->paths), 1, 'a half-written body was not fetched again');
+};
+
+subtest 'object storage failing before the first byte is retried, and the file holds one copy' => sub {
+    my $attempts = 0;
+    my $origin = origin_for(sub {
+        my ($c) = @_;
+        return $c->render(text => 'SlowDown', status => 503) if $attempts++ < 1;
+        whole_dataset($c);
+    });
+    my ($dir, $path) = temp_path();
+    my $db = VPNDetection->new(base_url => $origin->url, retries => 2)->database;
+
+    my $written = eval { $db->download('cdn_ip_v1', 'csvgz', $path) };
+
+    is(scalar(grep { $_ eq '/dataset' } $origin->paths), 2, 'the 503 was retried');
+    is($written, length $DATASET, 'the transfer then succeeded');
+    is(-s $path, length $DATASET, 'with exactly one copy on disk');
 };
 
 subtest 'a dataset the organization does not license is refused once' => sub {
@@ -157,6 +178,7 @@ subtest 'object storage refusing the link is reported as such' => sub {
     ok(!defined $written, 'the transfer failed');
     like($@->message, qr/object storage refused the download link with status 403/,
         'and names where the refusal came from');
+    is(scalar(grep { $_ eq '/dataset' } $origin->paths), 1, 'a refusal is not retried');
     ok(!-e "$path.part", 'leaving no partial file');
 };
 
@@ -253,6 +275,31 @@ subtest 'a transfer refuses arguments it cannot use' => sub {
     like($@, qr/expected a format/, 'download_bytes needs a format');
     eval { $db->download_bytes('cdn_ip_v1', 'csvgz', retres => 1) };
     like($@, qr/unknown option/, 'and refuses a typo rather than ignoring it');
+};
+
+subtest 'an unpublished format is refused before the network' => sub {
+    my $origin = origin_for(\&whole_dataset);
+    my ($dir, $path) = temp_path();
+    my $db = VPNDetection->new(base_url => $origin->url, api_key => 'k')->database;
+
+    is_deeply([VPNDetection::Database::FORMATS], ['csvgz', 'mmdb'], 'the published formats are exported');
+    for my $format ('zip', 'MMDB', 'csv.gz') {
+        for my $call (
+            [checksums => sub { $db->checksums('cdn_ip_v1', $format) }],
+            [download_url => sub { $db->download_url('cdn_ip_v1', $format) }],
+            [download => sub { $db->download('cdn_ip_v1', $format, $path) }],
+            [download_bytes => sub { $db->download_bytes('cdn_ip_v1', $format) }],
+        ) {
+            eval { $call->[1]->() };
+            like($@, qr/'\Q$format\E' is not a published format; expected one of csvgz, mmdb/,
+                "$call->[0] refuses '$format', naming what it takes");
+        }
+    }
+    is($origin->count, 0, 'and not one request was spent finding out');
+    ok(!-e "$path.part", 'nor was a .part file left behind');
+
+    $db->download_url('cdn_ip_v1', $_) for VPNDetection::Database::FORMATS;
+    is($origin->count, 2, 'while every published format still reaches the API');
 };
 
 done_testing();

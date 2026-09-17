@@ -1,0 +1,40 @@
+NAME
+
+    App::Pasar - pasar internals
+
+INSTALLATION
+
+    To install this script, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SUPPORT AND DOCUMENTATION
+
+    After installing, you can find documentation for this script with the
+    perldoc command.
+
+        perldoc pasar
+
+    You can also look for information at:
+
+    *   MetaCPAN: <https://metacpan.org/pod/pasar>
+
+    *   The source repository on Codeberg:
+        <https://codeberg.org/mauke/App-Pasar>
+
+    *   The script's bug tracker:
+        <https://codeberg.org/mauke/App-Pasar/issues>
+
+COPYRIGHT & LICENSE
+
+    Copyright 2026 Lukas Mai.
+
+    This module is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License
+    <https://www.gnu.org/licenses/gpl-3.0.html> as published by the Free
+    Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+

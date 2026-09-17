@@ -3,9 +3,9 @@
 requires 'JSON::MaybeXS';   # Required for encoding data to JSON
 requires 'Object::Configure', '0.24';
 requires 'Params::Get';
+requires 'Params::Validate::Strict', '0.39';
 requires 'Scalar::Util';
 recommends 'Test::HTML::T5';
-recommends 'Params::Validate::Strict';  # Schema notation used in API SPECIFICATION POD sections
 
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';

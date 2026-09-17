@@ -10,7 +10,7 @@ my $makefile = do {
 
 like $makefile, qr/ABSTRACT_FROM\s*=>\s*'lib\/HTTP\/API\/Core\.pm'/, 'abstract comes from the main module';
 like $makefile, qr/LICENSE\s*=>\s*'perl_5'/, 'distribution license is declared';
-like $makefile, qr/MIN_PERL_VERSION\s*=>\s*'5\.020'/, 'minimum Perl version is declared';
+like $makefile, qr/MIN_PERL_VERSION\s*=>\s*'5\.010'/, 'minimum Perl version is declared';
 like $makefile, qr{https://github\.com/kawamurashingo/HTTP-API-Core}, 'repository metadata is declared';
 
 open my $manifest_fh, '<', 'MANIFEST' or die "cannot open MANIFEST: $!";

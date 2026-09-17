@@ -341,10 +341,10 @@ static void otel_config_merge(pTHX_ HV *dst, HV *src) {
 /* The boot diagnostic.
  *
  * One line, at info, stating: enabled or disabled, the service name, the
- * protocol, the endpoint, the sampler and its argument, and the propagators.
- * Almost every OpenTelemetry support question is answered by those six facts,
- * and almost no SDK prints them - so the first hour of every investigation is
- * spent establishing what the SDK thought it was doing.
+ * protocol, the endpoint, and the sampler with its argument. Almost every
+ * OpenTelemetry support question is answered by those five facts, and almost
+ * no SDK prints them - so the first hour of every investigation is spent
+ * establishing what the SDK thought it was doing.
  *
  * HEADERS ARE NEVER PRINTED. Not the values, not even truncated: a token with
  * its first eight characters shown is a token in the log. The COUNT is
@@ -380,19 +380,18 @@ static SV *otel_config_diagnostic(pTHX_ HV *cfg) {
         if (arg && SvOK(arg)) sv_catpvf(out, ":%s", SvPV_nolen(arg));
     }
 
-    {
-        AV *av = otel_h_av(aTHX_ cfg, "propagators");
-        if (av) {
-            SSize_t i, n = av_len(av) + 1;
-            sv_catpvs(out, " propagators=");
-            for (i = 0; i < n; i++) {
-                SV **e = av_fetch(av, i, 0);
-                if (!(e && *e)) continue;
-                if (i) sv_catpvs(out, ",");
-                sv_catsv(out, *e);
-            }
-        }
-    }
+    /* THE PROPAGATORS ARE NOT PRINTED, and that is deliberate.
+     *
+     * This line existed to answer "what did the SDK think it was doing", and
+     * printing a setting in it asserts the setting does something. OTEL_PROPAGATORS
+     * is parsed and stored, and the automatic instrumentation then reads and
+     * injects W3C traceparent and nothing else - so an operator reading
+     * `propagators=b3` here would be told the opposite of the truth, in the
+     * one line they are meant to be able to trust.
+     *
+     * B3, Jaeger and Baggage are implemented and reachable through
+     * Punk::OpenTelemetry::Propagate, for a caller doing it by hand. When the
+     * instrumentation honours the list, this comes back. */
 
     /* the count, never the contents */
     h = otel_h_hv(aTHX_ cfg, "headers");

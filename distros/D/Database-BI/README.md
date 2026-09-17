@@ -4,44 +4,75 @@ Database::BI - Web-based Business Intelligence viewer for flat data files
 
 # VERSION
 
-0.005.2
+0.007.0
 
 # DESCRIPTION
 
-`Database::BI` is a self-contained [Mojolicious](https://metacpan.org/pod/Mojolicious) web application that reads arbitrary
-flat data files (CSV, PSV, SQLite, XML, etc.) via [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction)
-and presents them as styled, sortable, reorderable HTML tables.
-It has no persistent database of its own,
-it reads arbitrary data files (CSV, PSV, SQLite, XML etc) presents each file as a styled, sortable, exportable HTML table.
+`Database::BI` is a self-contained [Mojolicious](https://metacpan.org/pod/Mojolicious) web application that reads
+arbitrary flat data files (CSV, PSV, SQLite, XML, XLSX, etc.) via
+[Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction) and presents them as styled, sortable, reorderable
+HTML tables.  It has no persistent database of its own -- it reads your files
+on every request.
 
-Users navigate to pick a file, open the filesystem browser to navigate anywhere on disk, drag-and-drop files to upload, join multiple tables in memory, apply server-side filters, and export results as CSV, SQLite, or JSON.
-A D3.js line graph view plots any numeric column.
+Users navigate to pick a file, open the filesystem browser to navigate anywhere
+on disk, drag-and-drop files to upload, join multiple tables in memory, apply
+server-side filters, and export results as CSV, SQLite, or JSON.  D3.js
+visualisations (line chart, pie chart) are available from the toolbar.
 
 Key features:
 
-- **File picker** - the home page scans `data_dir` and shows a card for
+- **File picker** -- the home page scans `data_dir` and shows a card for
 every supported file.  Recently opened filesystem files appear in a
 "Recently opened" section powered by `localStorage`.
-- **Filesystem browser** - `/browse` lets the user navigate the entire
+- **Filesystem browser** -- `/browse` lets the user navigate the entire
 filesystem and open any supported data file, not just files in `data_dir`.
-- **Column sort and reorder** - clicking a header sorts the table; headers
+- **Column sort and reorder** -- clicking a header sorts the table; headers
 are draggable to reorder.  Both settings are persisted in `localStorage`
 by column name and survive page reloads.
-- **Left join** - the "Merge data / Filter results" panel on any table view
-lets the user join one or more additional tables on a shared key.  Every
-left row is kept; right-table columns are appended for matching rows.
-- **Result filters** - the same panel lets the user add filter conditions
-(column / operator / value) that are applied server-side after all joins.
-Operators: `eq`, `ne`, `contains`, `starts`, `lt`, `le`, `gt`,
-`ge`, `empty`, `notempty`.  Active filters are shown as chips in the
-toolbar with a one-click "Clear" link.
-- **Drag-and-drop upload** - any supported data file can be dropped directly
-onto the application.  On the home page the file is opened immediately;
-when the join panel is open the dropped file populates the right-table
-path field.
-- **Export** - the toolbar on any view offers an export panel that writes
-the current logical view (after joins and filters) to a chosen filesystem
-path as CSV (`.csv`) or SQLite (`.sql`).
+- **Left join** -- the "Merge data" panel on any table view lets the user
+join one or more additional tables on a shared key via [Database::Join](https://metacpan.org/pod/Database%3A%3AJoin).
+Every left row is kept; right-table columns are appended for matching rows.
+Multiple joins can be chained.
+- **Quick-filter bar** -- a column/operator/value row below the toolbar lets
+the user add filter conditions without opening any panel.  Pressing Enter
+applies the filter.  Each active filter chip has an individual remove (x)
+button so conditions can be dropped one at a time.  Operators: `eq`,
+`ne`, `contains`, `starts`, `lt`, `le`, `gt`, `ge`, `empty`,
+`notempty`.  Filters are applied server-side after all joins.
+- **Combine (UNION ALL)** -- the "Combine data" panel stacks rows from a
+second (or further) file beneath the current rows, using a unified column
+set and leaving blanks where a source file lacks a column.
+- **Charts** -- the toolbar offers a line chart ([HTML::D3](https://metacpan.org/pod/HTML%3A%3AD3)
+`render_zoomable_line_chart_snippet`; brush-to-zoom, reference lines for
+min/avg/max) and a pie chart (`render_pie_chart_snippet`; animated,
+sorted by value, capped at 12 slices, click-a-slice to filter the table).
+- **Drag-and-drop upload** -- any supported data file can be dropped directly
+onto the application.  The file is opened immediately; when the "Combine
+data" panel is open the dropped file populates the right-table path field.
+- **Export** -- the toolbar export panel writes the current logical view
+(after joins, filters, and dedup) to a chosen filesystem path as CSV
+(`.csv`), SQLite (`.sql`), or JSON (`.json`).
+- **URL import** -- `/import` fetches an HTML table from any public URL and
+renders it in the browser without saving to disk.
+
+## UTF-8 and Encoding
+
+All file data is returned as Perl character strings.  CSV/PSV files are
+read by [Text::xSV::Slurp](https://metacpan.org/pod/Text%3A%3AxSV%3A%3ASlurp) or [DBD::CSV](https://metacpan.org/pod/DBD%3A%3ACSV), both of which pass bytes
+through without re-encoding; the application serves the resulting page as
+`text/html; charset=UTF-8`, so full Unicode is displayed correctly as
+long as the source file itself is UTF-8.
+
+Filter values (`f=col:op:val`) are decoded from the URL by Mojolicious
+before reaching the controller and are compared against cell values as
+Perl character strings.  Unicode characters in filter values are therefore
+supported transparently.
+
+URL-imported HTML tables are fetched with [LWP::UserAgent::Cached](https://metacpan.org/pod/LWP%3A%3AUserAgent%3A%3ACached);
+[Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction) uses the page's own charset declaration to decode
+the body.  If the remote page declares an incorrect charset, cell values
+may contain mojibake -- this is a limitation of the source data, not the
+application.
 
 # SYNOPSIS
 
@@ -162,6 +193,36 @@ path as CSV (`.csv`) or SQLite (`.sql`).
         c=<spec>               additional table to stack (repeatable)
         f=<col>:<op>:<val>     result filter applied after combining (repeatable)
 
+- `GET /graph`
+
+    Renders a D3.js v7 zoomable line chart of any two columns.  Parameters:
+
+        l=<spec>    left table (required)
+        x=<col>     X-axis column name (required; any type, shown as labels)
+        y=<col>     Y-axis column name (required; must be numeric after stripping
+                    currency symbols and commas; accounting-notation negatives like
+                    (1,234.56) are handled automatically)
+        back=<url>  URL for the "Back to table" link (optional; default "/")
+        j=, f=, d=  pipeline params (same as /join)
+
+- `GET /pie`
+
+    Renders a D3.js v7 animated pie chart grouped by a category column.
+    Clicking a slice or legend entry navigates to the table view filtered to
+    that category.  Parameters:
+
+        l=<spec>    left table (required)
+        cat=<col>   category column to group by (required)
+        val=<col>   numeric column to sum per category (required)
+        donut=1     show a hole in the centre (optional)
+        back=<url>  URL for the "Back to table" link (optional; default "/")
+        f=          result filters applied before aggregating (repeatable)
+
+- `POST /uploads/clear`
+
+    Deletes every file from the `.uploads/` staging directory.  Returns JSON
+    `{ "freed": <bytes`, "count": &lt;n> }>.  No request body is needed.
+
 # CONFIGURATION
 
 Place a `database_bi.conf` file in the application root to override
@@ -239,15 +300,13 @@ defaults:
 - Only read operations on data files are supported.  Write-back (editing
 cell values in the browser and saving them to the data file) is not
 implemented.
-- The left-join engine (`Dashboard::_left_join`) is an in-memory O(n\*m)
-hash join.  It is suitable for BI files that fit comfortably in RAM.
-For very large files, replace the `open_table` helper body with a
-`Database::Join` instance (Phase 2) without changing the controller.
-- On startup, `Database::BI` automatically evicts upload subdirectories whose
-modification time is older than 24 hours.  Uploads created during the current
-or recent server sessions are preserved.  Users may also trigger an immediate
-full purge (regardless of age) via the "Clear upload cache" button, which
-posts to `POST /uploads/clear`.
+- Multi-table left joins are performed in memory by [Database::Join](https://metacpan.org/pod/Database%3A%3AJoin).  All
+component tables are fetched into RAM before the merge; this is not
+suitable for files that do not fit in the process's available memory.
+- Upload staging is managed automatically.  On every server startup,
+`Database::BI` evicts upload subdirectories whose modification time is
+older than 24 hours.  The "Clear upload cache" button (`POST
+/uploads/clear`) triggers an immediate full purge regardless of age.
 - `Sub::Protected`/:Protected enforcement relies on the CHECK compilation
 phase.  When a module is loaded dynamically at test time (e.g. via
 `Test::Mojo-`new(...)>), the CHECK phase has already passed and the

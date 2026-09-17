@@ -7,7 +7,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.49';
+    $VERSION = '0.50';
     require XSLoader;
     XSLoader::load('Punk', $VERSION);
 }
@@ -1288,6 +1288,21 @@ backend generates no DBIx::Loop traffic at all. A consumer wanting to see every
 query an application makes registers with both. Neither is given the bind
 B<values> - only the statement text, which carries placeholders exactly where
 the literal data would have been.
+
+C<current_of> (v5) is the context of the dispatch frame running B<right now>,
+or C<undef>. It exists because C<on_query> is handed no context and cannot be
+given one: the model instance a statement runs through is cached per
+application and per process, and is shared by every request on the worker. With
+it, a telemetry layer can attribute a statement to the request that issued it.
+
+It is saved and restored around the dispatch frame, never merely cleared, and
+that is the whole of its contract: it is live only while a synchronous frame
+the dispatcher entered is on the stack. A statement issued from a future's
+continuation, a queue job, or application boot reads C<undef>. B<So the
+degraded answer is "no context", never somebody else's> - which is why this is
+safe where the process-global C<on_log_ctx> was added to avoid was not. A
+consumer wanting the context of something emitted asynchronously still uses
+C<on_log_ctx>, which is handed the right one.
 
 Registration is B<process-global>, not per application, which is the opposite
 of every other hook here: an app is a compiled artifact and a process may hold

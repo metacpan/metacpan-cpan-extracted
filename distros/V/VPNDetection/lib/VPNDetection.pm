@@ -16,9 +16,10 @@ use VPNDetection::Bogon ();
 use VPNDetection::Cache;
 use VPNDetection::Database;
 use VPNDetection::Error;
+use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.1.0';
+our $VERSION = '3.2.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -47,6 +48,7 @@ sub new {
         base_url => _base_url($args{base_url}),
         concurrency => $concurrency,
         retries => $retries,
+        timeout => defined $args{timeout} ? $args{timeout} : 30,
         cache => $cache_size > 0 ? VPNDetection::Cache->new(
             max => $cache_size,
             ttl => defined $args{cache_ttl} ? $args{cache_ttl} : 3600,
@@ -59,7 +61,7 @@ sub new {
     # here is what stops the database download's 302 being chased into a
     # multi-gigabyte transfer, on a machine whose environment we do not own.
     $self->{ua}->max_redirects(0);
-    $self->{ua}->request_timeout(defined $args{timeout} ? $args{timeout} : 30);
+    $self->{ua}->request_timeout($self->{timeout});
     $self->{ua}->transactor->name("vpndetection-perl/$VERSION");
     return $self;
 }
@@ -83,7 +85,7 @@ sub lookup {
 sub lookup_p {
     my ($self, $ip, %options) = @_;
     Carp::croak('lookup: expected an IP address') if !defined $ip || !length $ip;
-    $self->_check_options('lookup', \%options, 'retries');
+    $self->_check_options('lookup', \%options, 'retries', 'timeout');
 
     return Mojo::Promise->resolve(VPNDetection::Bogon::bogon_result($ip))
         if VPNDetection::Bogon::is_bogon($ip);
@@ -95,7 +97,7 @@ sub lookup_p {
 
     my $url = $self->_url('/' . Mojo::Util::url_escape($ip, '^A-Za-z0-9\-._~:'));
     my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
-    return $self->_retry_p($retries, sub { $self->_json_p($url) })->then(sub {
+    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}) })->then(sub {
         my $result = VPNDetection::Result->from_wire(shift);
         # Only a served answer is cached. Errors never are, and bogons never
         # reach this far.
@@ -115,11 +117,11 @@ sub my_ip {
 
 sub my_ip_p {
     my ($self, %options) = @_;
-    $self->_check_options('my_ip', \%options, 'retries');
+    $self->_check_options('my_ip', \%options, 'retries', 'timeout');
 
     my $url = $self->_url('/myip');
     my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
-    return $self->_retry_p($retries, sub { $self->_json_p($url) })
+    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}) })
         ->then(sub { VPNDetection::Result->from_wire(shift) });
 }
 
@@ -133,11 +135,11 @@ sub my_entitlement {
 
 sub my_entitlement_p {
     my ($self, %options) = @_;
-    $self->_check_options('my_entitlement', \%options, 'retries');
+    $self->_check_options('my_entitlement', \%options, 'retries', 'timeout');
 
     my $url = $self->_url('/api/v1/entitlement');
     my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
-    return $self->_retry_p($retries, sub { $self->_json_p($url) });
+    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}) });
 }
 
 # Classify many addresses concurrently, keyed by address rather than positional,
@@ -152,7 +154,7 @@ sub lookup_batch_p {
     my ($self, $ips, %options) = @_;
     Carp::croak('lookup_batch: expected an array reference of addresses')
         if ref $ips ne 'ARRAY';
-    $self->_check_options('lookup_batch', \%options, 'retries', 'concurrency');
+    $self->_check_options('lookup_batch', \%options, 'retries', 'concurrency', 'timeout');
 
     my $limit = defined $options{concurrency} ? $options{concurrency} : $self->{concurrency};
     Carp::croak('lookup_batch: concurrency must be at least 1') if $limit < 1;
@@ -184,7 +186,7 @@ sub lookup_batch_p {
 
     my $batch = {
         queue => \@queue, answers => \%answers, active => 0, limit => $limit,
-        retries => $retries, promise => Mojo::Promise->new,
+        retries => $retries, timeout => $options{timeout}, promise => Mojo::Promise->new,
     };
     $self->_dispatch($batch);
     return $batch->{promise};
@@ -195,6 +197,12 @@ sub lookup_batch_p {
 sub database {
     my ($self) = @_;
     return VPNDetection::Database->_new($self);
+}
+
+# The OAuth device-flow sign-in, built per call for the same reason.
+sub oauth {
+    my ($self) = @_;
+    return VPNDetection::Oauth->_new($self);
 }
 
 # Keeps exactly `limit` chunks in flight: every answer starts the next one, so a
@@ -212,7 +220,7 @@ sub _dispatch {
     while ($batch->{active} < $batch->{limit} && @{$batch->{queue}}) {
         my $chunk = shift @{$batch->{queue}};
         $batch->{active}++;
-        $self->_lookup_chunk_p($chunk, $batch->{retries})->then(sub {
+        $self->_lookup_chunk_p($chunk, $batch->{retries}, $batch->{timeout})->then(sub {
             my $answers = shift;
             $batch->{answers}{$_} = $answers->{$_} for keys %$answers;
             $self->_settled($batch);
@@ -225,9 +233,9 @@ sub _dispatch {
 # exhausted - becomes every address's error, exactly as it would have been had
 # each been looked up alone. Never rejects: the failure is the value.
 sub _lookup_chunk_p {
-    my ($self, $chunk, $retries) = @_;
+    my ($self, $chunk, $retries, $timeout) = @_;
     my $url = $self->_url('/batch');
-    return $self->_retry_p($retries, sub { $self->_json_p($url, { ips => $chunk }) })->then(
+    return $self->_retry_p($retries, sub { $self->_json_p($url, { ips => $chunk }, $timeout) })->then(
         sub {
             my $body = shift;
             my $results = ref $body->{results} eq 'HASH' ? $body->{results} : {};
@@ -270,23 +278,25 @@ sub _settled {
 }
 
 # Recurses through $self rather than through a self-referential closure, which
-# in Perl would be a reference cycle the interpreter never collects.
+# in Perl would be a reference cycle the interpreter never collects. $may_retry,
+# when given, can veto a retry the error alone would allow.
 sub _retry_p {
-    my ($self, $left, $attempt) = @_;
+    my ($self, $left, $attempt, $may_retry) = @_;
     return $attempt->()->catch(sub {
         my $error = VPNDetection::Error->wrap(shift);
-        die $error if $left <= 0 || !$error->retryable;
+        die $error if $left <= 0 || !$error->retryable || ($may_retry && !$may_retry->());
         # A server-supplied delay is honored with a TIMER, never a sleep: this
         # promise shares an event loop with every other request in the batch, and
         # sleeping here would stall all of them.
         return Mojo::Promise->timer($error->retry_after || 0)
-            ->then(sub { $self->_retry_p($left - 1, $attempt) });
+            ->then(sub { $self->_retry_p($left - 1, $attempt, $may_retry) });
     });
 }
 
+# $timeout is the call's own bound, or undef for the client's.
 sub _json_p {
-    my ($self, $url, $body) = @_;
-    my $sent = defined $body ? $self->_post_p($url, $body) : $self->_get_p($url);
+    my ($self, $url, $body, $timeout) = @_;
+    my $sent = defined $body ? $self->_post_p($url, $body, $timeout) : $self->_get_p($url, $timeout);
     return $sent->then(sub {
         my $res = shift->res;
         die VPNDetection::Error->from_response($res->code, $res->headers, $res->json)
@@ -300,23 +310,17 @@ sub _json_p {
     });
 }
 
-# Mojo::UserAgent rejects with a plain string when the request never got far
-# enough to have a status, which is exactly the transport failure the retry rule
-# treats as worth another attempt.
 sub _get_p {
-    my ($self, $url) = @_;
-    return $self->{ua}->get_p($url => $self->_headers)->catch(sub {
-        die VPNDetection::Error->new(kind => 'network', message => "$_[0]");
-    });
+    my ($self, $url, $timeout) = @_;
+    return $self->_start_p($self->{ua}->build_tx(GET => $url => $self->_headers), $timeout);
 }
 
 # The one request with a body: the batch. Mojo encodes the JSON and sets the
 # content type.
 sub _post_p {
-    my ($self, $url, $body) = @_;
-    return $self->{ua}->post_p($url => $self->_headers => json => $body)->catch(sub {
-        die VPNDetection::Error->new(kind => 'network', message => "$_[0]");
-    });
+    my ($self, $url, $body, $timeout) = @_;
+    my $tx = $self->{ua}->build_tx(POST => $url => $self->_headers => json => $body);
+    return $self->_start_p($tx, $timeout);
 }
 
 # One dataset transfer. Every chunk is handed to $on_chunk and none is kept, so a
@@ -358,7 +362,7 @@ sub _stream_p {
         $on_chunk->($bytes);
     });
 
-    return $self->_start_untimed_p($tx)->then(sub {
+    return $self->_start_p($tx, 0)->then(sub {
         my $res = shift->res;
         die VPNDetection::Error->from_response($res->code, $res->headers, {
             error => 'object storage refused the download link with status ' . $res->code,
@@ -377,14 +381,21 @@ sub _stream_p {
 }
 
 # request_timeout bounds the WHOLE response and Mojo::UserAgent has no
-# per-transaction form of it, so the 30 seconds that is right for a lookup is
-# wrong for a gigabyte. It is lifted only across the hand-over: start_p reaches
-# the agent synchronously, so no other request can be started inside the window.
-sub _start_untimed_p {
-    my ($self, $tx) = @_;
+# per-transaction form of it, yet a call may bring its own bound and a transfer
+# must have none (0): 30 seconds is right for a lookup and wrong for a gigabyte.
+# So it is set only across the hand-over, where start_p arms the timer
+# synchronously - and set EXPLICITLY each time, because Mojo runs a loop tick
+# inside start_p when the loop is idle, and a retry started in that tick would
+# otherwise inherit this call's bound.
+#
+# A rejection is a plain string when the request never got far enough to have a
+# status, which is exactly the transport failure the retry rule treats as worth
+# another attempt.
+sub _start_p {
+    my ($self, $tx, $timeout) = @_;
     my $ua = $self->{ua};
     my $bound = $ua->request_timeout;
-    $ua->request_timeout(0);
+    $ua->request_timeout(defined $timeout ? $timeout : $self->{timeout});
     my $promise = eval { $ua->start_p($tx) };
     my $failed = $@;
     $ua->request_timeout($bound);
@@ -437,6 +448,11 @@ sub _check_options {
     my %allowed = map { $_ => 1 } @allowed;
     my @unknown = sort grep { !$allowed{$_} } keys %$options;
     Carp::croak("VPNDetection::$method: unknown option(s): @unknown") if @unknown;
+    # A negative or non-numeric bound would fire at once and fail the very call
+    # it was meant to protect.
+    my $timeout = $options->{timeout};
+    Carp::croak("VPNDetection::$method: timeout must be a number of seconds, 0 or more")
+        if defined $timeout && !(Scalar::Util::looks_like_number($timeout) && $timeout >= 0);
 }
 
 sub _base_url {
@@ -508,7 +524,9 @@ Attempts after a retryable failure. Defaults to 2, and is overridable per call.
 
 =item timeout
 
-Per-request timeout in seconds. Defaults to 30.
+Per-request timeout in seconds. Defaults to 30, and is overridable per call. It
+bounds each attempt, so a retried call can take longer in total, and it is
+lifted for a dataset transfer.
 
 =item ua
 
@@ -528,7 +546,8 @@ so a shared cache would serve one of them the other's shape.
     my $result = $client->lookup($ip, %options);
 
 Returns a L<VPNDetection::Result>, or dies with a L<VPNDetection::Error>.
-C<retries> is the per-call option.
+C<retries> and C<timeout> are the per-call options, as they are on C<my_ip> and
+C<my_entitlement>.
 
 =head2 my_ip
 
@@ -574,8 +593,12 @@ answer is a wrong one within seconds of the next request.
 
 Returns a hash reference keyed by address. Duplicates in C<@ips> collapse to one
 request, bogons never reach the network, and an address that failed carries its
-L<VPNDetection::Error> as its value instead of failing the batch. C<retries> and
-C<concurrency> are the per-call options.
+L<VPNDetection::Error> as its value instead of failing the batch. C<retries>,
+C<concurrency> and C<timeout> are the per-call options, and the timeout bounds
+each chunk.
+
+There is no cap on how many addresses one call takes: everything not answered
+locally goes out in chunks of up to 1000, the most one request carries.
 
 Perl hashes have no insertion order, so iterate your own list if order matters:
 
@@ -598,10 +621,19 @@ Also exportable, for code with no client to hand:
 
 The licensed dataset downloads. See L<VPNDetection::Database>.
 
+=head2 oauth
+
+    my $device = $client->oauth->device_authorization('your-client-id');
+
+Signs a person in on their own machine with the OAuth device flow, so a program
+can be handed one of their API keys instead of asking for it. See
+L<VPNDetection::Oauth>.
+
 =head1 NON-BLOCKING USE
 
 Every call has a C<_p> twin returning a L<Mojo::Promise>: C<lookup_p>,
-C<lookup_batch_p>, and the same on L<VPNDetection::Database>. The blocking forms
+C<lookup_batch_p>, and the same on L<VPNDetection::Database> and
+L<VPNDetection::Oauth>. The blocking forms
 are those promises plus a C<wait>, so nothing is duplicated and both paths retry,
 cache and short-circuit identically.
 
@@ -615,7 +647,8 @@ blocking forms cannot work and croak saying so. Use the C<_p> forms there.
 
 =head1 SEE ALSO
 
-L<VPNDetection::Result>, L<VPNDetection::Error>, L<VPNDetection::Database>.
+L<VPNDetection::Result>, L<VPNDetection::Error>, L<VPNDetection::Database>,
+L<VPNDetection::Oauth>.
 
 =head1 LICENSE
 

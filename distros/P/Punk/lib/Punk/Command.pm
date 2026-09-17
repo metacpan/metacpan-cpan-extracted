@@ -10,7 +10,7 @@ use File::Basename ();
 use Getopt::Long ();
 use Punk ();
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 # The whole punk command line. bin/punk is two lines - `exit
 # Punk::Command->main(@ARGV)` - and everything else is here: a registry of

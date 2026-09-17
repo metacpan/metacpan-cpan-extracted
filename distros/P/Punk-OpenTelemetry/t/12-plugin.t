@@ -325,8 +325,14 @@ sub state_of { Punk::Plugin::OpenTelemetry->state_for($_[0]) }
         'to the resolved traces endpoint - the signal path is APPENDED to a '
       . 'general endpoint');
     ok(length $opt{body}, 'carrying an encoded body');
-    is($st->{exporter}{stats}{exported}, 1,
-        'and the 200 was counted as an export');
+    # TWO exports, not one: a request now produces a span AND the
+    # http.server.request.duration point, and flush drains every signal that
+    # has something. Before 0.10 the meter was always empty here.
+    is($st->{exporter}{stats}{exported}, 2,
+        'both signals were counted as exports');
+    my @urls = map { $_->[1] } @{ $ua->{calls} };
+    ok(scalar(grep { m{/v1/traces$} } @urls),  '  the traces went');
+    ok(scalar(grep { m{/v1/metrics$} } @urls), '  and the metrics, to their own path');
 }
 
 # ---- a flush with nothing to send sends nothing ------------------------------
@@ -361,8 +367,9 @@ sub state_of { Punk::Plugin::OpenTelemetry->state_for($_[0]) }
     });
     ok(eval { Punk::Plugin::OpenTelemetry::flush($st); 1 },
         'a collector saying 500 does not throw into the application');
-    is($st->{exporter}{stats}{rejected}, 1, 'it is counted as rejected');
-    is($st->{exporter}{stats}{dropped}, 1,
+    # Two signals had something to send and the collector refused both.
+    is($st->{exporter}{stats}{rejected}, 2, 'each is counted as rejected');
+    is($st->{exporter}{stats}{dropped}, 2,
         'and as dropped - a telemetry layer that cannot report its own '
       . 'losses is asking to be trusted for no reason');
 }

@@ -48,11 +48,16 @@ get '/' => sub {
 
 get '/hello/:name' => sub {
     my ($c) = @_;
-    # $c->otel is the tracer. A span started here is a child of the server
-    # span the instrumentation already opened for this request.
+    # $c->otel is the tracer. A MANUAL span is a root unless you give it a
+    # parent - the automatic instrumentation parents itself, a hand-written
+    # span cannot be guessed at - so pass the request's own server span, which
+    # is what $c->otel_span hands back. Leave it out and this span goes into a
+    # trace of its own containing nothing else.
     # `kind` is the OTLP enum as a NUMBER (1 internal, 2 server, 3 client);
     # internal is the default, so this omits it
-    my $span = $c->otel->start('greet');
+    my $parent = $c->otel_span;
+    my $span = $c->otel->start('greet',
+        ($parent ? (parent => $parent->child_of) : ()));
     if ($span) {                     # undef when the trace was not sampled
         $span->attr('greeting.name' => $c->param('name'));
         $span->event('composed');

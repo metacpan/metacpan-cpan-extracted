@@ -197,7 +197,7 @@ static inline int st_pid_is_zombie(uint32_t pid) {
  * recycled PID reports "alive" and the slot is not reclaimed until that
  * process exits.  See "Crash Safety" in the POD. */
 static inline int st_pid_alive(uint32_t pid) {
-    if (pid == 0) return 1; /* no owner recorded, assume alive */
+    if (pid == 0) return 0; /* no owner recorded, treat as dead */
     if (kill((pid_t)pid, 0) == -1 && errno == ESRCH) return 0; /* definitely dead */
     return !st_pid_is_zombie(pid); /* kill() also succeeds for a zombie -> treat as dead */
 }
@@ -452,7 +452,7 @@ static inline void st_rwlock_wrlock(StHandle *h) {
      * The SEQ_CST CAS above + the SEQ_CST rdepth loads below are the writer side
      * of the Dekker handshake. */
     for (;;) {
-        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_RELAXED);  /* snapshot BEFORE scan */
+        uint32_t v = __atomic_load_n(&hdr->drain_seq, __ATOMIC_ACQUIRE);  /* snapshot BEFORE scan */
         int busy = 0;
         /* Visit only OCCUPIED slots via the occupancy bitmap (SEQ_CST: a committed
          * reader's bit -- set in claim, before its rdepth++ -- is ordered before

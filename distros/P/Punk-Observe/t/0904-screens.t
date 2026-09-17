@@ -52,7 +52,8 @@ my $store = Punk::Observe::Store->new(dir => $dir);
               status => ($bad ? 2 : 0),
               trace_hi => 100 + $n, trace_lo => 200 + $n, span_id => 11 + $n * 10,
               parent_id => 10 + $n * 10, severity => 0,
-              attrs => { 'service.name' => 'cards', 'http.route' => '/authorize' } },
+              attrs => { 'service.name' => 'cards', 'http.route' => '/authorize',
+                         'db.query.text' => 'SELECT limit_cents FROM cards WHERE id = ?' } },
             { kind => 2, t => at($base + 900_000), duration => 0,
               body => ($bad ? 'card refused: insufficient funds'
                             : 'checkout complete'),
@@ -261,10 +262,71 @@ my %empty_page = (
     is($one->{spans}[1]{kind_name}, 'client', 'span kind is named for the CSS');
     ok(scalar @{ $one->{flame} }, 'the flamegraph is built');
 
-    # Frames are laid out under their parents rather than all at zero.
-    my @x = map { $_->{x} } @{ $one->{flame} };
-    is(scalar(grep { $_ != 0 } @x) + scalar(grep { $_ == 0 } @x),
-       scalar @x, 'every frame has an x position');
+    # THE ROOT IS IN THE FLAMEGRAPH.
+    #
+    # This used to assert that the count of non-zero x positions plus the
+    # count of zero ones equalled the total, which is true of any list of
+    # numbers whatever. Underneath it the root span was being dropped from
+    # every trace: the store hands back a parent SPAN ID and the view ran it
+    # through the INDEX resolver, so the root became its own parent, assembly
+    # read that as a cycle, and the frame builder skipped it.
+    is(scalar @{ $one->{flame} }, 2,
+       'the flamegraph has a frame for BOTH spans, root included');
+    my ($rootf) = grep { $_->{depth} == 0 } @{ $one->{flame} };
+    ok($rootf, '  with the root among them');
+    is($rootf->{name}, 'POST /checkout', '  and it is the root span');
+    cmp_ok($rootf->{width}, '>', 0, '  drawn with a width');
+    my ($childf) = grep { $_->{depth} == 1 } @{ $one->{flame} };
+    ok($childf, '  and the child sits under it');
+
+    # COLLAPSING NEEDS THE PARENT IN THE MARKUP.
+    #
+    # Rows are emitted chronologically, so a subtree's descendants are only
+    # adjacent when nothing else was running. waterfall.js used to walk the
+    # next rows while their depth was greater, which hides a slice of whatever
+    # was interleaved and leaves the real subtree on screen. It collapses by
+    # identity now, and that needs data-parent on every row.
+    for my $s (@{ $one->{spans} }) {
+        ok(exists $s->{parent_span_id},
+           "span $s->{span_id} carries its parent for the collapse");
+    }
+    my ($child) = grep { $_->{depth} == 1 } @{ $one->{spans} };
+    my ($root)  = grep { $_->{depth} == 0 } @{ $one->{spans} };
+    is($child->{parent_span_id}, $root->{span_id},
+       '  and it is the real parent, not a position in the list');
+    is($root->{parent_span_id}, 0, '  the root names none');
+
+    my $html = render('trace', { %{ page('trace', { trace => $bad->{id} }) } });
+    like($html, qr/data-parent="/, 'the rendered waterfall carries data-parent');
+
+    # THE ATTRIBUTES REACH THE PAGE.
+    #
+    # The view sorted every span's attributes into a list and the template
+    # never read it, so a database span said SELECT and nothing else. Once
+    # the parenting fix put child spans under their request, every trace
+    # was a column of operation names with no way to tell one from another.
+    # Asserted in the HTML, not in the page vars: the vars had it all along.
+    my @ak = map { $_->{key} } @{ $child->{attrs} };
+    is_deeply(\@ak, [ sort @ak ], 'a span carries its attributes, sorted');
+    is($child->{query}, 'SELECT limit_cents FROM cards WHERE id = ?',
+       '  and db.query.text is lifted out as the query');
+    ok(!exists $root->{query}, '  a span with no statement has no query');
+    like($html, qr/data-detail="\Q$child->{span_id}\E"/,
+         'the rendered waterfall has an attribute row for the child');
+    like($html, qr{<td class="mono nowrap">db\.query\.text</td><td class="mono">SELECT limit_cents FROM cards WHERE id = \?</td>},
+         '  holding the statement');
+    like($html, qr{<td class="mono nowrap">http\.route</td><td class="mono">/authorize</td>},
+         '  and the rest of the attributes');
+    like($html, qr/data-more="\Q$child->{span_id}\E"/,
+         '  with a button on the row to open it');
+    like($html, qr/title="cards POST \/authorize [^"]*&#10;SELECT limit_cents FROM cards WHERE id = \?"/,
+         '  and the statement in the bar tooltip, so a hover answers it');
+    unlike($html, qr/title="shop POST \/checkout [^"]*&#10;/,
+           '  while a span with no statement keeps the short tooltip');
+
+    # A span in a cycle has depth -1, and 5 + -1*14 is -9px: the label used to
+    # be dragged out of its own cell.
+    cmp_ok($one->{spans}[0]{indent}, '>=', 0, 'no row is indented off its cell');
 
     my $missing = page('trace', { trace => '999-999' });
     ok(length $missing->{error}, 'a trace that is not there says so');

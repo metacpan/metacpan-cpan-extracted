@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 require XSLoader;
 XSLoader::load('Open::API', $VERSION);
@@ -25,7 +25,7 @@ Open::API - OpenAPI 3.0 and 3.1 server and client
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =head1 SYNOPSIS
 

@@ -13,7 +13,7 @@ use Scalar::Util ();
 use InternetData::Database;
 use InternetData::Error;
 
-our $VERSION = '1.3.0';
+our $VERSION = '1.5.0';
 
 use constant DEFAULT_BASE_URL => 'https://internetdata.io';
 
@@ -26,11 +26,17 @@ sub new {
 
     my $retries = defined $args{retries} ? $args{retries} : 2;
     Carp::croak('InternetData->new: retries cannot be negative') if $retries < 0;
+    # Mojo arms a negative or non-numeric bound as a timer that fires at once, so
+    # every call would fail as a network error after reaching the server.
+    my $timeout = defined $args{timeout} ? $args{timeout} : 30;
+    Carp::croak('InternetData->new: timeout must be a number of seconds, 0 or more')
+        unless Scalar::Util::looks_like_number($timeout) && $timeout >= 0;
 
     my $self = bless {
         api_key => $args{api_key},
         base_url => _base_url($args{base_url}),
         retries => $retries,
+        timeout => $timeout,
         ua => $args{ua} || Mojo::UserAgent->new,
     }, $class;
 
@@ -39,7 +45,7 @@ sub new {
     # here is what stops a download's 302 being chased into a multi-gigabyte
     # transfer, on a machine whose environment we do not own.
     $self->{ua}->max_redirects(0);
-    $self->{ua}->request_timeout(defined $args{timeout} ? $args{timeout} : 30);
+    $self->{ua}->request_timeout($self->{timeout});
     $self->{ua}->transactor->name("internetdata-perl/$VERSION");
     return $self;
 }
@@ -93,7 +99,7 @@ sub _stream_p {
         $on_chunk->($bytes);
     });
 
-    return $self->_start_untimed_p($tx)->then(sub {
+    return $self->_start_p($tx, 0)->then(sub {
         my $res = shift->res;
         # No body to read: the handler above kept nothing that was not a 200,
         # because nothing bounds the size of what a storage host puts in a
@@ -118,14 +124,21 @@ sub _stream_p {
 }
 
 # request_timeout bounds the WHOLE response and Mojo::UserAgent has no
-# per-transaction form of it, so the 30 seconds that is right for a metadata call
-# is wrong for a gigabyte. It is lifted only across the hand-over: start_p reaches
-# the agent synchronously, so no other request can be started inside the window.
-sub _start_untimed_p {
-    my ($self, $tx) = @_;
+# per-transaction form of it, yet a call may bring its own bound and a transfer
+# must have none (0): 30 seconds is right for a metadata call and wrong for a
+# gigabyte. So it is set only across the hand-over, where start_p arms the timer
+# synchronously - and set EXPLICITLY each time, because Mojo runs a loop tick
+# inside start_p when the loop is idle, and a retry started in that tick would
+# otherwise inherit this call's bound.
+#
+# A rejection is a plain string when the request never got far enough to have a
+# status, which is exactly the transport failure the retry rule treats as worth
+# another attempt.
+sub _start_p {
+    my ($self, $tx, $timeout) = @_;
     my $ua = $self->{ua};
     my $bound = $ua->request_timeout;
-    $ua->request_timeout(0);
+    $ua->request_timeout(defined $timeout ? $timeout : $self->{timeout});
     my $promise = eval { $ua->start_p($tx) };
     my $failed = $@;
     $ua->request_timeout($bound);
@@ -138,21 +151,23 @@ sub _start_untimed_p {
 # Recurses through $self rather than through a self-referential closure, which
 # in Perl would be a reference cycle the interpreter never collects.
 sub _retry_p {
-    my ($self, $left, $attempt) = @_;
+    my ($self, $left, $attempt, $may_retry) = @_;
     return $attempt->()->catch(sub {
         my $error = InternetData::Error->wrap(shift);
-        die $error if $left <= 0 || !$error->retryable;
+        # $may_retry, when given, can veto a retry the error alone would allow.
+        die $error if $left <= 0 || !$error->retryable || ($may_retry && !$may_retry->());
         # A server-supplied delay is honored with a TIMER, never a sleep: this
         # promise may share an event loop with a Mojolicious application, and
         # sleeping here would stall every other thing on it.
         return Mojo::Promise->timer($error->retry_after || 0)
-            ->then(sub { $self->_retry_p($left - 1, $attempt) });
+            ->then(sub { $self->_retry_p($left - 1, $attempt, $may_retry) });
     });
 }
 
+# $timeout is the call's own bound, or undef for the client's.
 sub _json_p {
-    my ($self, $url) = @_;
-    return $self->_get_p($url)->then(sub {
+    my ($self, $url, $timeout) = @_;
+    return $self->_get_p($url, $timeout)->then(sub {
         my $res = shift->res;
         die InternetData::Error->from_response($res->code, $res->headers, $res->json)
             unless $res->is_success;
@@ -165,14 +180,9 @@ sub _json_p {
     });
 }
 
-# Mojo::UserAgent rejects with a plain string when the request never got far
-# enough to have a status, which is exactly the transport failure the retry rule
-# treats as worth another attempt.
 sub _get_p {
-    my ($self, $url) = @_;
-    return $self->{ua}->get_p($url => $self->_headers)->catch(sub {
-        die InternetData::Error->new(kind => 'network', message => "$_[0]");
-    });
+    my ($self, $url, $timeout) = @_;
+    return $self->_start_p($self->{ua}->build_tx(GET => $url => $self->_headers), $timeout);
 }
 
 sub _headers {
@@ -221,6 +231,11 @@ sub _check_options {
     my %allowed = map { $_ => 1 } @allowed;
     my @unknown = sort grep { !$allowed{$_} } keys %$options;
     Carp::croak("InternetData::$method: unknown option(s): @unknown") if @unknown;
+    # A negative or non-numeric bound would fire at once and fail the very call
+    # it was meant to protect.
+    my $timeout = $options->{timeout};
+    Carp::croak("InternetData::$method: timeout must be a number of seconds, 0 or more")
+        if defined $timeout && !(Scalar::Util::looks_like_number($timeout) && $timeout >= 0);
 }
 
 sub _base_url {
@@ -265,7 +280,8 @@ without a licence would need.
 
 The seven calls live on L<InternetData::Database>, reached as L</database>.
 Each has a C<_p> twin returning a L<Mojo::Promise> and takes a per-call
-C<retries> option. Failures die with an L<InternetData::Error>.
+C<retries> option, and all but the two transfers a per-call C<timeout>. Failures
+die with an L<InternetData::Error>.
 
 =head2 new
 
@@ -290,8 +306,10 @@ Attempts after a retryable failure. Defaults to 2, and is overridable per call.
 
 =item timeout
 
-Per-request timeout in seconds. Defaults to 30. It is lifted for a file
-transfer, which is not a request whose duration a caller can predict.
+Per-request timeout in seconds. Defaults to 30, and is overridable per call. It
+bounds each attempt, so a retried call can take longer in total, and it is
+lifted for a file transfer, which is not a request whose duration a caller can
+predict.
 
 =item ua
 

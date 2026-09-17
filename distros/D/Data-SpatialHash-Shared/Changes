@@ -1,5 +1,9 @@
 Revision history for Data-SpatialHash-Shared
 
+0.05      2026-09-15
+          - Recover a lock left ownerless by a corrupt file instead of hanging.
+          - Fix a writer stall on ARM64 after readers release.
+
 0.04      2026-08-12
           - Recover a file left behind by an interrupted create instead of
             leaving the path unopenable.

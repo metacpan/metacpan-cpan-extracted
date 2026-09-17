@@ -10,7 +10,7 @@ use File::Spec;
 my $LIBS   = '';
 my $DEFINE = '';
 
-my $pkg = ExtUtils::Depends->new('Shared::Arena', 'Frozen');
+my $pkg = ExtUtils::Depends->new('Shared::Arena', 'Frozen', 'Struct::Codec');
 $pkg->install('include/sa_abi.h');
 mkdir 'Install' unless -d 'Install';
 $pkg->save_config('Install/Files.pm');
@@ -143,12 +143,14 @@ my %WriteMakefileArgs = (
         'ExtUtils::CBuilder'  => '0',
         'ExtUtils::Depends'   => '0.404',
         'Frozen'              => '0.07',
+        'Struct::Codec'       => '0.02',
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',
     },
     PREREQ_PM => {
-        'Frozen' => '0.07',
+        'Frozen'        => '0.07',
+        'Struct::Codec' => '0.02',
     },
     XS     => { 'Arena.xs' => 'Arena.c' },
     OBJECT => 'Arena$(OBJ_EXT)',

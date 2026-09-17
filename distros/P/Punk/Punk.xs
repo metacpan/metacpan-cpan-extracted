@@ -125,6 +125,7 @@ static const frx_abi *punk_frx(pTHX) {
 #include "punk/punk_favicon.h"   /* GET /favicon.ico, frozen at to_app     */
 #include "punk/punk_oamount.h"   /* the `api` mount, boot half (needs static) */
 #include "punk/punk_dbi.h"       /* the shipped DBI model backend           */
+#include "punk/punk_dbiobs.h"    /* Punk::DBI, the observed handle          */
 #include "punk/punk_dbq.h"       /* the query shapes both backends share    */
 #include "punk/punk_model.h"     /* the model tier: DSL, metadata, contract */
 #include "punk/punk_csrf.h"      /* single-use tokens over the session */

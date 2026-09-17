@@ -54,7 +54,7 @@ if (!$bad) {
 }
 
 # Random MAC generation
-my $rand_mac = NetAddr::MAC->random(oui => '00:16:3e');
+my $rand_mac = NetAddr::MAC->random(prefix => '00:16:3e');
 print "\nRandom MAC (EUI-48, OUI 00:16:3e): ", $rand_mac->as_ieee, "\n";
-my $rand_mac64 = NetAddr::MAC->random(oui => '00:16:3e:12', eui64 => 1);
+my $rand_mac64 = NetAddr::MAC->random(prefix => '00:16:3e:12', eui64 => 1);
 print "Random MAC (EUI-64, OUI 00:16:3e:12): ", $rand_mac64->as_ieee, "\n";

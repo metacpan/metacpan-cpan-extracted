@@ -307,4 +307,88 @@ SKIP: {
         'a forked child does NOT inherit the parent accumulated totals');
 }
 
+# ---- the automatic HTTP duration histogram ----------------------------------
+#
+# Claimed by the POD since this distribution was written, and never built.
+#
+# THE ASSERTION THE WHOLE THING TURNS ON is that an UNSAMPLED request records.
+# A trace at 5% is a sample of requests; a duration histogram at 5% is a wrong
+# number. Every other assertion below would pass against an implementation that
+# measured only sampled requests, and that implementation produces a latency
+# graph that is wrong in a way nobody can see from the graph.
+SKIP: {
+    my $have = eval { require Punk; Punk->can('_abi_ptr') ? 1 : 0 };
+    skip 'Punk with pk_abi not installed', 10 unless $have;
+
+    # always_off: not one span will be built.
+    my $t = Punk::OpenTelemetry::Tracer->new(sampler => 'always_off',
+        resource => { 'service.name' => 'm' }, scope_name => 's');
+    my $meter = Punk::OpenTelemetry::Meter->new(
+        resource => { 'service.name' => 'm' }, scope_name => 's');
+    my $r = Punk::OpenTelemetry::Instrument::install($t, meter => $meter);
+    skip 'pk_abi did not register', 10 unless $r->{server};
+    ok($r->{metrics}, 'install reports the metrics point live');
+
+    my $app = eval {
+        package TOtelMetricApp;
+        use Punk;
+        get '/users/:id' => sub { $_[0]->text('u') };
+        package main;
+        TOtelMetricApp->to_app;
+    };
+    skip "could not build the app: $@", 9 unless $app;
+
+    my $served = eval {
+        $app->({ REQUEST_METHOD => 'GET', PATH_INFO => '/users/7' });
+        $app->({ REQUEST_METHOD => 'GET', PATH_INFO => '/nope' });
+        1;
+    };
+    skip "Punk could not serve here: $@", 9 unless $served;
+
+    ok(!$t->drain, 'not one span was built: always_off means always off');
+
+    my $p = $meter->collect;
+    ok($p, 'and the meter recorded ANYWAY - a metric is not sampled');
+    skip 'nothing collected', 7 unless $p;
+
+    my $met = by_name($p, 'http.server.request.duration');
+    ok($met, 'the histogram is there, by its conventional name');
+    skip 'no histogram', 6 unless $met;
+
+    is($met->{unit}, 's',
+       'in SECONDS, which is what the conventions name and what the default '
+     . 'boundaries are built for');
+
+    my @dp = @{ $met->{data_points} || [] };
+    is(scalar @dp, 2, 'one series per distinct attribute set, two requests');
+
+    my ($hit)  = grep { ($_->{attributes}{'http.response.status_code'} // 0) == 200 } @dp;
+    my ($miss) = grep { ($_->{attributes}{'http.response.status_code'} // 0) == 404 } @dp;
+
+    is($hit->{attributes}{'http.route'}, '/users/:id',
+       'http.route is the DECLARED pattern');
+    is($hit->{attributes}{'http.request.method'}, 'GET', 'the method, bounded');
+
+    # THE cardinality rule, and it matters more on a metric than on a span: a
+    # scanner's million 404 paths would be a million SERIES, and the
+    # cardinality cap then drops whatever arrives next.
+    ok(!exists $miss->{attributes}{'http.route'},
+       'a 404 carries NO http.route rather than falling back to the path');
+
+    is_deeply($hit->{explicit_bounds},
+              [ 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5,
+                0.75, 1, 2.5, 5, 7.5, 10 ],
+              'the conventions boundaries, not a round-number guess');
+}
+
+# ---- and the metrics point can be silenced on its own -----------------------
+SKIP: {
+    my $have = eval { require Punk; Punk->can('_abi_ptr') ? 1 : 0 };
+    skip 'Punk with pk_abi not installed', 1 unless $have;
+    Punk::OpenTelemetry::Instrument::configure(metrics => 0);
+    my %c = Punk::OpenTelemetry::Instrument::config();
+    is($c{metrics}, 0, 'the metrics point switches off like the others');
+    Punk::OpenTelemetry::Instrument::configure(metrics => 1);
+}
+
 done_testing;

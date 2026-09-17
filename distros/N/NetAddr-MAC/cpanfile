@@ -5,7 +5,7 @@ requires "Carp" => "0";
 requires "Exporter" => "0";
 requires "List::Util" => "0";
 requires "constant" => "0";
-requires "perl" => "v5.10.0";
+requires "perl" => "5.010";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -21,7 +21,7 @@ on 'test' => sub {
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
   requires "Test::More" => "0";
-  requires "perl" => "v5.10.0";
+  requires "perl" => "5.010";
 };
 
 on 'test' => sub {

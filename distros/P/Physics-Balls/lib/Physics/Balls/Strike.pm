@@ -7,7 +7,7 @@ use Object::Proto::Sugar -types;
 use Physics::Balls::Error;
 use Physics::Balls::Outcome;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has ball => (
 	is => 'ro',
@@ -108,7 +108,7 @@ Physics::Balls::Strike - one shot, as the integers a client sends
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

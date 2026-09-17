@@ -98,6 +98,7 @@ static const pk_abi PK_ABI = {
     pk_obs_add_query,            /* v2 */
     pl_observe,                  /* v3 */
     pl_observe_ctx,              /* v4 */
+    pk_cur_get,                  /* v5 */
 };
 
 #endif /* PK_ABI_IMPL_H */

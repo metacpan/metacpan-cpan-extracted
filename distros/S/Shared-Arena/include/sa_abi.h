@@ -377,7 +377,14 @@ typedef struct sa_abi {
      *
      * `map_fetch` copies into the caller's buffer and answers SA_MAP_*.
      * A value too long for the buffer answers BUSY with *vlen set to what it
-     * would have needed, so a caller can size and retry. */
+     * would have needed, so a caller can size and retry.
+     *
+     * Values are BYTES here whatever the map was made as. A map the Perl side
+     * opened with `serialise => 1` holds Struct::Codec's encoding in every
+     * value, this table hands those bytes over untouched, and a C consumer
+     * writing such a map must encode through sc_abi.h or Perl readers will
+     * croak on the value. `map_incr` on one is a Perl-side refusal only; from
+     * here it is the caller's to avoid. */
     sa_hash *(*map_open)(sa_region *r, const char *name, size_t nlen,
                          uint64_t slots, uint32_t slot_size, int *err);
     void     (*map_release)(sa_hash *m);
@@ -456,7 +463,11 @@ typedef struct sa_abi {
      * hand finds with its reference bit clear.
      *
      * `cache_get` answers SA_MAP_* and treats an expired entry as a miss.
-     * `ttl_ms` of 0 means no deadline. */
+     * `ttl_ms` of 0 means no deadline.
+     *
+     * As for the map: a cache opened from Perl with `serialise => 1` holds
+     * Struct::Codec's encoding in every value, and this table neither encodes
+     * nor decodes. Write one through sc_abi.h or not at all. */
     sa_cache *(*cache_open)(sa_region *r, const char *name, size_t nlen,
                             uint64_t capacity, uint32_t ways,
                             uint32_t entry_size, int *err);

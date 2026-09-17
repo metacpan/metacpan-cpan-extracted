@@ -643,4 +643,238 @@ subtest '/api/stat reflects live filesystem state (no cross-request cache)' => s
 	  ->json_is('/exists', Mojo::JSON->false, 'exists:false after file deleted');
 };
 
+# ===========================================================================
+# SECTION 14: /pie full pipeline
+#
+# Strategy: Verify that the pie_view action correctly reads the l=/cat=/val=
+# pipeline, aggregates values per category, renders HTML with the pie snippet,
+# and embeds the correct data-back-url and data-cat-col metadata used by the
+# drill-down JS.
+# ===========================================================================
+
+subtest '/pie full pipeline: CSV → aggregation → HTML with metadata' => sub {
+	eval { require HTML::D3 }
+		or plan skip_all => 'HTML::D3 not available';
+
+	# The sales table has region (cat) and amount (val) — four distinct regions.
+	$t->get_ok('/pie?l=table:sales&cat=region&val=amount&back=/view/sales')
+	  ->status_is(200)
+	  ->content_like(qr/North/,         'North slice present in pie output')
+	  ->content_like(qr/South/,         'South slice present in pie output')
+	  ->content_like(qr/data-back-url/, 'data-back-url metadata present')
+	  ->content_like(qr|/view/sales|,   'back URL embedded in metadata div');
+
+	# Verify the cat-col attribute so the JS drill-down can apply the correct filter.
+	$t->get_ok('/pie?l=table:sales&cat=region&val=amount&back=/view/sales')
+	  ->status_is(200)
+	  ->content_like(qr/data-cat-col="region"/, 'data-cat-col="region" present for drill-down');
+};
+
+subtest '/pie drillDown JS constructs back2= parameter (not back=)' => sub {
+	eval { require HTML::D3 }
+		or plan skip_all => 'HTML::D3 not available';
+
+	# The JS drillDown() function must append back2= (not back=) so that the
+	# target dashboard page places the pie link at the third breadcrumb level
+	# without conflicting with open_file's hardcoded back_url.
+	$t->get_ok('/pie?l=table:sales&cat=region&val=amount&back=/view/sales')
+	  ->status_is(200)
+	  ->content_like(qr/back2=/,         'drillDown JS uses back2= param (not back=)')
+	  ->content_like(qr/back2_label=/,   'drillDown JS sets back2_label= param')
+	  ->content_unlike(qr/'back='[^']|"back="[^"]/, 'no bare back= param appended by drillDown');
+};
+
+subtest '/pie count mode: __count__ aggregates rows per category' => sub {
+	eval { require HTML::D3 }
+		or plan skip_all => 'HTML::D3 not available';
+
+	# In count mode each category should appear once.  Sales has two North rows
+	# (id 1 and id 5) so the Count by region chart must show North with count 2.
+	$t->get_ok('/pie?l=table:sales&cat=region&val=__count__&back=/view/sales')
+	  ->status_is(200)
+	  ->content_like(qr/Count by region/i, 'count-mode chart title mentions "Count by region"')
+	  ->content_like(qr/North/,            'North category present in count chart');
+};
+
+# ===========================================================================
+# SECTION 15: Three-level breadcrumb integration (back2= / back2_label=)
+#
+# Strategy: Verify that all controller actions (open_file, view, join_tables,
+# combine_tables) correctly read back2=/back2_label= from the URL and pass
+# them to the template as back2_url/back2_label stash vars, producing the
+# third breadcrumb segment "... > Back to pie chart".
+#
+# The pie page URL used as back2 in the tests below is deliberately a plausible
+# value — the exact URL is not reachable from Test::Mojo but the controller only
+# reads it as a string and forwards it into the stash, so any value works.
+# ===========================================================================
+
+# Shared fake pie URL used as the back2 param throughout this section.
+Readonly my $PIE_URL       => '/pie?l=table:sales&cat=region&val=amount';
+Readonly my $PIE_LABEL     => 'Back to pie chart';
+Readonly my $PIE_URL_ENC   => url_escape($PIE_URL);
+Readonly my $PIE_LABEL_ENC => url_escape($PIE_LABEL);
+
+subtest 'open_file: back2=/back2_label= produce third breadcrumb segment' => sub {
+	# When a user drills down from a pie chart into an open_file view,
+	# the breadcrumb must show three levels:
+	#   Home > Back to browser > Back to pie chart
+	#
+	# open_file hardcodes back_url (the "Back to browser" link) and reads
+	# back2 from the URL for the third segment.
+	# Note: the & in the pie URL is HTML-encoded to &amp; in the href attribute,
+	# so we match on just the /pie path prefix to avoid quoting issues.
+	my $enc = url_escape($SALES_CSV);
+	$t->get_ok(
+		"/open?path=$enc"
+		. "&back2=$PIE_URL_ENC"
+		. "&back2_label=$PIE_LABEL_ENC"
+	)->status_is(200)
+	 ->content_like(qr/Back to browser/,        'second breadcrumb: Back to browser present')
+	 ->content_like(qr/Back to pie chart/,       'third breadcrumb: Back to pie chart present')
+	 ->content_like(qr{href="/pie\?},            'pie href begins with /pie? in third link');
+};
+
+subtest 'view: back2=/back2_label= promoted to second breadcrumb (no inherent back link)' => sub {
+	# The view action has no inherent back URL, so it PROMOTES back2 to the
+	# first back-link position.  Result:
+	#   Home > Back to pie chart   (just two levels, not three)
+	$t->get_ok(
+		'/view/sales'
+		. "?back2=$PIE_URL_ENC"
+		. "&back2_label=$PIE_LABEL_ENC"
+	)->status_is(200)
+	 ->content_like(qr/Back to pie chart/,  'promoted back2: Back to pie chart visible')
+	 ->content_like(qr{href="/pie\?},       'pie href present as the promoted back link')
+	 ->content_unlike(qr/Back to browser/,  'no "Back to browser" in view without open_file');
+};
+
+subtest 'join_tables: back2=/back2_label= add third breadcrumb segment' => sub {
+	# join_tables has its own auto-generated back URL ("Back to sales").
+	# With back2 set, the result must be three levels:
+	#   Home > Back to sales > Back to pie chart
+	$t->get_ok(
+		'/join?l=' . url_escape('table:sales')
+		. "&back2=$PIE_URL_ENC"
+		. "&back2_label=$PIE_LABEL_ENC"
+	)->status_is(200)
+	 ->content_like(qr/Back to sales/,     'second breadcrumb: Back to sales present')
+	 ->content_like(qr/Back to pie chart/, 'third breadcrumb: Back to pie chart present')
+	 ->content_like(qr{href="/pie\?},      'pie href present in third link');
+};
+
+subtest 'combine_tables: back2=/back2_label= add third breadcrumb segment' => sub {
+	# combine_tables has its own auto-generated back URL like join_tables.
+	my $tmpdir = tempdir(CLEANUP => 1);
+	Mojo::File->new(File::Spec->catfile($tmpdir, 'extra.csv'))->spurt(
+		"id,product,region,sales_rep,amount,sale_date\n" .
+		"99,Extra,North,Alice Smith,500.00,2025-02-01\n"
+	);
+
+	$t->get_ok(
+		'/combine?l=' . url_escape('table:sales')
+		. '&c=' . url_escape("path:$tmpdir/extra.csv")
+		. "&back2=$PIE_URL_ENC"
+		. "&back2_label=$PIE_LABEL_ENC"
+	)->status_is(200)
+	 ->content_like(qr/Back to pie chart/, 'third breadcrumb: Back to pie chart present')
+	 ->content_like(qr{href="/pie\?},      'pie href present in third link')
+	 ->content_like(qr/Extra/,             'extra row from combined table visible');
+};
+
+subtest 'back2 absent: no third breadcrumb segment rendered' => sub {
+	# Without back2, the template must never emit a spurious third segment.
+	my $enc = url_escape($SALES_CSV);
+	$t->get_ok("/open?path=$enc")
+	  ->status_is(200)
+	  ->content_like(qr/Back to browser/, 'second breadcrumb present as usual')
+	  ->content_unlike(qr/back2/,          'back2 stash key not leaked to HTML');
+};
+
+# ===========================================================================
+# SECTION 16: /graph full pipeline
+#
+# Strategy: Verify graph_view reads x/y columns, strips non-numeric Y values,
+# computes min/max/avg, and renders a D3 chart snippet with the correct title
+# and a back link pointing at the ?back= param.
+# ===========================================================================
+
+subtest '/graph full pipeline: CSV → D3 snippet → HTML with reference lines' => sub {
+	eval { require HTML::D3 }
+		or plan skip_all => 'HTML::D3 not available';
+
+	$t->get_ok(
+		'/graph?l=table:sales&x=sale_date&y=amount&back=/view/sales'
+	)->status_is(200)
+	 ->content_like(qr/amount vs sale_date/i, 'graph title "amount vs sale_date" present')
+	 ->content_like(qr/2025-01-15/,           '2025-01-15 X-label visible in output')
+	 ->content_like(qr/back-link/,            'back-link breadcrumb element present')
+	 ->content_like(qr|/view/sales|,          'back link points at /view/sales');
+};
+
+subtest '/graph: ref_min_y/ref_max_y/ref_avg_y injected correctly' => sub {
+	eval { require HTML::D3 }
+		or plan skip_all => 'HTML::D3 not available';
+
+	# The amounts in sales.csv are: 1250.00, 875.50, 2100.00, 950.00, 1875.00, 725.25
+	# min = 725.25, max = 2100.00
+	$t->get_ok('/graph?l=table:sales&x=sale_date&y=amount&back=/view/sales')
+	  ->status_is(200)
+	  ->content_like(qr/Min.*725/,    'min reference value (725.25) present in page')
+	  ->content_like(qr/Max.*2100/,   'max reference value (2100) present in page');
+};
+
+# ===========================================================================
+# SECTION 17: /combine (UNION ALL) full pipeline
+#
+# Strategy: Stack two custom CSVs with the same column schema.  Verify the
+# combined result contains rows from both sources with no duplicates (unless
+# dedup is on), and that the title includes both source labels.
+# ===========================================================================
+
+subtest '/combine stacks two CSVs vertically (UNION ALL semantics)' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+
+	# Create two CSVs with overlapping schema but distinct rows.
+	Mojo::File->new(File::Spec->catfile($dir, 'dogs.csv'))->spurt(
+		"name,breed\nRex,Labrador\nBuddy,Poodle\n"
+	);
+	Mojo::File->new(File::Spec->catfile($dir, 'cats.csv'))->spurt(
+		"name,breed\nWhiskers,Siamese\nMittens,Tabby\n"
+	);
+
+	my $dogs_spec = url_escape("path:" . File::Spec->catfile($dir, 'dogs.csv'));
+	my $cats_spec = url_escape("path:" . File::Spec->catfile($dir, 'cats.csv'));
+
+	$t->get_ok("/combine?l=$dogs_spec&c=$cats_spec")
+	  ->status_is(200)
+	  ->content_like(qr/Rex/,      'Rex (dogs) present in combined view')
+	  ->content_like(qr/Buddy/,    'Buddy (dogs) present in combined view')
+	  ->content_like(qr/Whiskers/, 'Whiskers (cats) present in combined view')
+	  ->content_like(qr/Mittens/,  'Mittens (cats) present in combined view');
+};
+
+subtest '/combine + filter narrows the stacked result' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+
+	Mojo::File->new(File::Spec->catfile($dir, 'items_a.csv'))->spurt(
+		"sku,category,price\nA1,hardware,10\nA2,software,20\n"
+	);
+	Mojo::File->new(File::Spec->catfile($dir, 'items_b.csv'))->spurt(
+		"sku,category,price\nB1,hardware,30\nB2,services,40\n"
+	);
+
+	my $a_spec = url_escape("path:" . File::Spec->catfile($dir, 'items_a.csv'));
+	my $b_spec = url_escape("path:" . File::Spec->catfile($dir, 'items_b.csv'));
+
+	# Filter to hardware only — A1 and B1 must be present; A2 and B2 must not.
+	$t->get_ok(
+		"/combine?l=$a_spec&c=$b_spec&f=" . url_escape('category:eq:hardware')
+	)->status_is(200)
+	 ->content_like(qr/A1/,        'A1 (hardware) present in filtered combined view')
+	 ->content_like(qr/B1/,        'B1 (hardware) present in filtered combined view')
+	 ->content_unlike(qr/A2/,      'A2 (software) absent from filtered combined view')
+	 ->content_unlike(qr/B2/,      'B2 (services) absent from filtered combined view');
+};
+
 done_testing();

@@ -1,5 +1,31 @@
 Revision history for Punk-OpenTelemetry
 
+0.10    2026-09-16
+        - ADDS: http.server.request.duration, recorded by the SDK itself.
+          Claimed by the POD since this distribution was written and never
+          built. Recorded on EVERY request, including the unsampled ones: a
+          duration histogram over a sample is not a smaller histogram, it is
+          a wrong one. Seconds, the conventions' boundaries, and http.route
+          absent rather than substituted - on a metric that substitution is
+          a million series.
+        - ADDS: a `metrics` switch beside server/client/db, and install()
+          takes the meter. No meter means no clock is even stashed.
+        - ADDS: a database span is a CHILD of the request that issued it.
+          Started with a NULL parent it got a fresh trace id, so every
+          statement was its own trace one span long while the request sat
+          in another. Needs Punk 0.50 (pk_abi v5 current_of); against an
+          older Punk it still roots, as before.
+        - ADDS: an outbound call with no caller-set traceparent is a child
+          of the request being served, instead of a root.
+        - ADDS: DBIx::Loop's statement observer is registered. Three
+          comments here said it was and it never had been; install() now
+          reports db_loop.
+        - FIXES: the boot line printed the configured propagators, which
+          said they did something. The automatic instrumentation reads and
+          injects W3C traceparent only, whatever OTEL_PROPAGATORS says, so
+          the line told an operator the opposite of the truth. Dropped from
+          the banner and documented instead.
+
 0.08    2026-08-27
         - This distribution is now an ExtUtils::Depends PROVIDER
         - otel_proto.h is installed and published

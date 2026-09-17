@@ -1,3 +1,9 @@
+2.57  2026-09-16
+
+  - Keep the value semantics regression test compatible with older JSON::PP
+    releases by enabling allow_nonref when decoding a scalar JSON number.
+  - Bump module version to 2.57.
+
 2.56  2026-09-15
 
   - Restore value classification support on Perl 5.26 and 5.28 by falling

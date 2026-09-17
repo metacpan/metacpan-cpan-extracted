@@ -14,11 +14,14 @@ use strict;
 use warnings;
 use Test::More;
 
-my @src = grep { -f } ('Observe.xs', glob('xs/*.xs'));
+# The headers carry most of the C, so they are read too, not just the XS.
+my @src = grep { -f } ('Observe.xs', glob('xs/*.xs'),
+                       glob('include/punk_observe/*.h'));
 plan skip_all => 'XS sources are not in this tree' unless @src;
 
-# The macros perl 5.32 fixed. SvOK, SvROK and SvTYPE are single-mention and
-# are deliberately not here.
+# SvTRUE was fixed in 5.32, SvIV/SvUV/SvNV only in 5.37.1. SvOK, SvROK and
+# SvTYPE are single-mention and are deliberately not here. TOPs is (*sp) and
+# has no side effect, so this guard deliberately does not flag it.
 my $MULTI = qr/\bSv(?:TRUE(?:_nomg)?|IV|UV|NV|PV(?:byte|utf8)?(?:_nolen)?)\s*\(/;
 
 my $checked = 0;

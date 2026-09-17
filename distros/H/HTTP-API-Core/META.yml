@@ -23,10 +23,10 @@ requires:
   MIME::Base64: '0'
   Scalar::Util: '0'
   Time::HiRes: '0'
-  perl: '5.020'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/kawamurashingo/HTTP-API-Core/issues
   homepage: https://github.com/kawamurashingo/HTTP-API-Core
   repository: https://github.com/kawamurashingo/HTTP-API-Core.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

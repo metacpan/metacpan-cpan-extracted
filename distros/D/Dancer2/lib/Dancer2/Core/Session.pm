@@ -1,6 +1,6 @@
 package Dancer2::Core::Session;
 # ABSTRACT: class to represent any session object
-$Dancer2::Core::Session::VERSION = '2.1.0';
+$Dancer2::Core::Session::VERSION = '2.2.0';
 use Moo;
 use Dancer2::Core::Types;
 use Dancer2::Core::Time;
@@ -68,7 +68,7 @@ Dancer2::Core::Session - class to represent any session object
 
 =head1 VERSION
 
-version 2.1.0
+version 2.2.0
 
 =head1 DESCRIPTION
 

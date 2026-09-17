@@ -15,6 +15,7 @@
 #define OTEL_CONSUME_H
 
 #include "fetch_abi.h"   /* pk_abi.h comes in with otel_instr.h */
+#include "dbil_abi.h"    /* DBIx::Loop's statement observer */
 
 /* A header name compared without regard to case, because HTTP field names
  * are case-insensitive and a caller writing `TraceParent` has set the header
@@ -34,15 +35,16 @@ static int otel_ieq(const char *a, const char *b, STRLEN n) {
 
 static const pk_abi    *OTEL_PK = NULL;
 static const fetch_abi *OTEL_FT = NULL;
-static int OTEL_PK_TRIED = 0, OTEL_FT_TRIED = 0;
-static int OTEL_PK_INSTALLED = 0, OTEL_FT_INSTALLED = 0;
+static const dbil_abi  *OTEL_DL = NULL;
+static int OTEL_PK_TRIED = 0, OTEL_FT_TRIED = 0, OTEL_DL_TRIED = 0;
+static int OTEL_PK_INSTALLED = 0, OTEL_FT_INSTALLED = 0, OTEL_DL_INSTALLED = 0;
 /* What the one-and-only registration actually managed, kept so that a LATER
  * install() reports the same answer. Registration is process-global and
  * happens once; a second application asking what is installed was being told
  * only about the server hook, so a test - or an operator - reading the
  * report from any app but the first saw the logs signal as absent when it was
  * running. */
-static int OTEL_PK_DB = 0, OTEL_PK_LOGS = 0;
+static int OTEL_PK_DB = 0, OTEL_PK_LOGS = 0, OTEL_DL_DB = 0;
 
 /* The shared shape of an optional ABI lookup: require the module, call its
  * _abi_ptr, check the version. A miss is NOT an error - it means that dist is
@@ -96,6 +98,45 @@ static const fetch_abi *otel_ft(pTHX) {
     return OTEL_FT;
 }
 
+static const dbil_abi *otel_dl(pTHX) {
+    if (!OTEL_DL && !OTEL_DL_TRIED) {
+        UV p;
+        OTEL_DL_TRIED = 1;
+        p = otel_abi_ptr(aTHX_ "DBIx::Loop", "DBIx::Loop::_abi_ptr");
+        if (p) {
+            const dbil_abi *a = INT2PTR(const dbil_abi *, p);
+            /* the statement observer is v2 */
+            if (a && a->abi_version >= 2) OTEL_DL = a;
+        }
+    }
+    return OTEL_DL;
+}
+
+/* ---- DBIx::Loop's statements -------------------------------------------- *
+ * The OTHER database path. An application on the async backend generates no
+ * pk_abi query traffic at all, so registering only there left a whole class of
+ * application with no database spans and nothing to say why - which three
+ * comments in this distribution claimed was already handled, and was not.
+ *
+ * dbil_exec is the one place all three of its backends have in common, and it
+ * fires this BEFORE the statement runs, synchronously with the caller. So the
+ * dispatch frame is still on the stack and current_of is the request that
+ * issued it - an async backend is no obstacle to parenting, because a span's
+ * parent is fixed at start and start is never the deferred half. */
+static void *otel_dl_start(pTHX_ int is_query, const char *sql, STRLEN len,
+                           int nbind, void *ud) {
+    PERL_UNUSED_ARG(is_query);
+    return (void *)otel_db_start(aTHX_ otel_pk(aTHX), sql, len, nbind,
+                                 (const char *)ud);
+}
+
+/* Exactly one of res and err is non-NULL; both borrowed. */
+static void otel_dl_done(pTHX_ void *token, SV *res, SV *err, void *ud) {
+    PERL_UNUSED_ARG(res);
+    PERL_UNUSED_ARG(ud);
+    otel_db_end(aTHX_ (otel_span *)token, err ? 0 : 1);
+}
+
 /* ---- the outbound client observer --------------------------------------- *
  * Two jobs, and the second is the one that makes distributed tracing work at
  * all: measure the call, and INJECT the traceparent so the far side continues
@@ -122,12 +163,18 @@ static void *otel_ft_start(pTHX_ const char *method, STRLEN mlen,
      * nothing but itself. The visible effect is a store in which every trace
      * is one span long and no service map edge ever crosses a process.
      *
-     * There is no ambient current span to take instead - two requests are in
-     * flight on one worker at any moment, and a process-global would
-     * attribute one request's calls to the other. So the context comes from
-     * where a caller can actually put it: the header. A caller that has
-     * propagated deliberately gets its context honoured, and its call joined
-     * to its own trace, rather than silently overridden.
+     * A caller that propagated deliberately keeps that precedence: its own
+     * header wins, and its call is joined to its own trace rather than
+     * silently overridden.
+     *
+     * WITH NO HEADER, THE REQUEST BEING SERVED IS THE PARENT. This used to say
+     * there was no ambient current span to take instead - that two requests
+     * are in flight on one worker at any moment and a process-global would
+     * attribute one request's calls to the other. That was true of a global
+     * that outlived its frame. pk_abi v5's current_of does not: it is saved
+     * and restored around the dispatch frame, so a call made from a
+     * continuation or a queue job reads NULL and is still a root. The
+     * degraded answer is no parent, never the wrong one.
      */
     {
         SSize_t i, n = headers ? (av_len(headers) + 1) : 0;
@@ -148,11 +195,18 @@ static void *otel_ft_start(pTHX_ const char *method, STRLEN mlen,
             break;
         }
 
-        s = have ? otel_tracer_start(aTHX_ OTEL_TRACER, in.trace_id, in.span_id,
-                                     (in.flags & OTEL_FLAG_SAMPLED) ? 1 : 0,
-                                     name, OTEL_KIND_CLIENT)
-                 : otel_tracer_start(aTHX_ OTEL_TRACER, NULL, NULL, 0, name,
-                                     OTEL_KIND_CLIENT);
+        if (have)
+            s = otel_tracer_start(aTHX_ OTEL_TRACER, in.trace_id, in.span_id,
+                                  (in.flags & OTEL_FLAG_SAMPLED) ? 1 : 0,
+                                  name, OTEL_KIND_CLIENT);
+        else {
+            otel_span *p = otel_current_span(aTHX_ otel_pk(aTHX));
+            s = otel_tracer_start(aTHX_ OTEL_TRACER,
+                                  p ? p->trace_id : NULL,
+                                  p ? p->span_id  : NULL,
+                                  p ? p->sampled  : 0,
+                                  name, OTEL_KIND_CLIENT);
+        }
     }
     if (!s) return NULL;
 

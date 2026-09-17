@@ -122,8 +122,15 @@ C<edges> is the service graph: C<caller> (a service symbol, or C<*> for the
 synthetic root), C<callee>, C<count>, C<errors> and C<dur_max>.
 
 C<tree> is the assembled tree of the B<first> trace only, one entry per span
-with C<span_id>, C<parent> (an index into C<tree>, or -1) and C<depth>.
+with C<span_id>, C<parent_index> (an index into C<tree>, or -1) and C<depth>.
 C<roots>, C<cycles> and C<orphans> describe that tree.
+
+C<parent_index> is B<not> C<parent> above, and the difference is why it is
+spelled differently. The span spec takes a parent SPAN ID; this hands back a
+position in a list. Both were called C<parent>, and passing one where the other
+was expected made every root its own parent - a cycle, which assembly drops,
+which is how the flamegraph lost the root span of every trace while the
+waterfall beside it looked correct.
 
 C<any_error> and C<dur_max> are the footer statistics a query prunes segments
 on.

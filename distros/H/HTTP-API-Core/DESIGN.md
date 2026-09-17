@@ -1,14 +1,18 @@
 # HTTP::API::Core — Project Direction
 
-This document defines the design direction for `HTTP::API::Core`. New features should be evaluated against these principles so that the distribution stays small, predictable, and useful as a long-lived foundation for Perl API clients.
+This document defines the design direction for `HTTP::API::Core`.
+
+Now that the public API has reached 1.0, new features and changes should be evaluated against these principles so that the distribution remains small, predictable, compatible, and useful as a long-lived foundation for Perl API clients.
 
 ## Goal
 
 > **HTTP::API::Core is a small, dependency-light foundation for building production-quality HTTP API clients in Perl.**
 
-The module does **not** aim to replace `HTTP::Tiny`, LWP, Mojo, Furl, or other HTTP transports. Its job is to provide the reusable layer that API client authors repeatedly need on top of HTTP transport.
+The module does **not** aim to replace `HTTP::Tiny`, LWP, Mojo, Furl, or other HTTP transports.
 
-A typical architecture should look like:
+Its job is to provide the reusable layer that API client authors repeatedly need on top of HTTP transport.
+
+A typical architecture looks like:
 
 ```text
 My::GitHub
@@ -27,6 +31,7 @@ HTTP::API::Core
       +-- lifecycle hooks
       +-- authentication helpers
       +-- observability
+      +-- idempotency
       |
       v
 HTTP transport
@@ -55,13 +60,17 @@ Retry policy, JSON handling, pagination, rate limits, errors, and similar infras
 
 ### Small
 
-Keep the core focused. A feature belongs in the core when it is broadly useful to HTTP API clients rather than specific to one service or protocol.
+Keep the core focused.
+
+A feature belongs in the core when it is broadly useful to HTTP API clients rather than specific to one service or protocol.
 
 Prefer a small composable primitive over a large framework abstraction.
 
 ### Boring
 
-Predictable behavior is a feature. Prefer conventional HTTP semantics and explicit configuration over surprising magic.
+Predictable behavior is a feature.
+
+Prefer conventional HTTP semantics and explicit configuration over surprising magic.
 
 Do not automatically perform actions that can change application semantics. For example, unsafe methods must not be retried by default.
 
@@ -75,51 +84,59 @@ The distribution should remain practical in conservative Perl environments and e
 
 `HTTP::API::Core` is an API-client layer, not an HTTP stack.
 
-The transport boundary should remain replaceable so callers can eventually use transports such as `HTTP::Tiny`, LWP, Mojo::UserAgent, Furl, or a test transport without rewriting API-specific code.
+The transport boundary should remain replaceable so callers can use transports such as `HTTP::Tiny`, LWP, Mojo::UserAgent, Furl, or a test transport without rewriting API-specific code.
 
 ### Production-oriented
 
 Features should account for real operational failure modes:
 
-- timeouts
-- transient transport failures
-- safe retries
-- exponential backoff and jitter
-- rate limits
-- pagination
-- structured errors
-- request IDs and tracing
-- observability
+* timeouts
+* transient transport failures
+* safe retries
+* exponential backoff and jitter
+* rate limits
+* pagination
+* structured errors
+* request IDs and tracing
+* observability
 
 Convenience must not come at the expense of safe failure behavior.
 
 ### Testable
 
-Network behavior should be testable without real network access. Policies such as retry, pagination, rate-limit handling, authentication, and hooks should have deterministic regression tests.
+Network behavior should be testable without real network access.
+
+Policies such as retry, pagination, rate-limit handling, authentication, idempotency, and hooks should have deterministic regression tests.
 
 ### Stable
 
-Once the public API reaches 1.0, downstream API clients should be able to depend on it without being rewritten for minor releases.
+The 1.x public API is intended to remain compatible across minor releases.
 
-Public behavior must be explicitly documented and protected by regression tests. Internal implementation details remain free to evolve.
+Downstream API clients should not need to be rewritten simply because `HTTP::API::Core` receives new features or internal improvements.
+
+Public behavior should be explicitly documented and protected by regression tests.
+
+Internal implementation details remain free to evolve as long as documented public behavior is preserved.
 
 ## Scope
 
-The core is intended to cover reusable API-client infrastructure such as:
+The core covers reusable API-client infrastructure such as:
 
-- base URLs and request construction
-- headers and query parameters
-- JSON request/response handling
-- timeout configuration
-- structured responses and errors
-- retry/backoff/jitter policy
-- rate-limit metadata and retry integration
-- pagination
-- lifecycle hooks
-- common authentication helpers
-- request/response observability
-- idempotency support
-- a documented transport adapter contract
+* base URLs and request construction
+* headers and query parameters
+* JSON request/response handling
+* timeout configuration
+* structured responses and errors
+* retry/backoff/jitter policy
+* rate-limit metadata and retry integration
+* pagination
+* lifecycle hooks
+* common authentication helpers
+* request/response observability
+* idempotency support
+* a documented transport adapter contract
+
+This list describes the intended responsibility of the core, not a requirement that every possible variation of these features must be implemented.
 
 ## Non-goals
 
@@ -127,79 +144,84 @@ The core should **not** become an all-purpose networking framework.
 
 The following are intentionally outside the core unless the project's direction is explicitly reconsidered:
 
-- OpenAPI code generation
-- GraphQL-specific clients
-- complete OAuth flows or token servers
-- WebSocket support
-- HTTP server functionality
-- an async runtime/framework
-- service-specific SDK behavior
+* OpenAPI code generation
+* GraphQL-specific clients
+* complete OAuth flows or token servers
+* WebSocket support
+* HTTP server functionality
+* an async runtime or framework
+* service-specific SDK behavior
 
 These may be implemented by separate distributions built on top of `HTTP::API::Core` where appropriate.
 
-## Roadmap
+## What 1.0 established
 
-The roadmap is directional rather than a promise that every version number must contain exactly the listed feature.
+The 1.0 release established the main API-client foundation and the public interfaces that future 1.x releases should preserve.
 
-### Foundation
+The foundation includes:
 
-- **0.01** — HTTP, JSON, timeout, structured errors
-- **0.02** — retry, exponential backoff, jitter
-- **0.03** — pagination
-- **0.04** — normalized rate-limit handling
-- **0.05** — lifecycle hooks
-- **0.06** — first-class query parameters
+* HTTP request handling
+* JSON request and response handling
+* timeout configuration
+* structured errors
+* retry policy
+* exponential backoff and jitter
+* pagination
+* normalized rate-limit handling
+* lifecycle hooks
+* first-class query parameters
+* common authentication helpers
+* request timing and request-ID observability
+* explicit response-body helpers
+* idempotency support
+* a supported transport adapter contract
 
-### Toward a complete API-client foundation
+These capabilities form the stable baseline of the project.
 
-- **0.07** — common authentication helpers
-  - Bearer token
-  - Basic authentication
-  - API-key header
-  - API-key query parameter
-  - OAuth token acquisition/refresh remains out of scope
+Future development should improve and extend this foundation without unnecessarily expanding the role of the core.
 
-- **0.08** — observability
-  - elapsed request time
-  - request IDs
-  - useful request context for logging/metrics/tracing
+## Compatibility policy
 
-- **0.09** — response ergonomics
-  - clearly documented `json`, `text`, `content`, headers, and status behavior
-  - defined behavior for empty bodies and content types
+Within the 1.x series, documented public APIs should remain backward compatible whenever reasonably possible.
 
-- **0.10** — error model stabilization
-  - stable error categories
-  - response/body access from HTTP errors
-  - compatibility tests for machine-readable behavior
+This includes:
 
-- **0.11** — idempotency support
-  - reusable support for APIs that accept idempotency keys
-  - no service-specific header assumptions in the core
+* constructor behavior
+* `request()` and convenience methods
+* response API
+* error API and error categories
+* retry configuration and behavior
+* pagination interfaces
+* lifecycle hooks
+* query parameter handling
+* rate-limit API
+* authentication helpers
+* idempotency behavior
+* transport adapter contract
 
-- **0.12** — transport adapter contract
-  - document the transport interface as a supported extension point
-  - make alternate transports possible without changing API-specific clients
+Changes to undocumented implementation details do not require compatibility guarantees.
 
-## Criteria for 1.0
+If a public interface must change incompatibly, the change should be deliberate, documented, and reserved for an appropriate major release.
 
-Version 1.0 should be based on API maturity, not feature count.
+Bug fixes may change behavior when the previous behavior was clearly incorrect, unsafe, or inconsistent with documented semantics. Such changes should include regression tests and release notes.
 
-Before 1.0, the following interfaces should be sufficiently mature that we are willing to preserve them across the 1.x series:
+## Development direction
 
-- constructor contract
-- `request()` and convenience methods
-- response API
-- error API and categories
-- retry policy
-- pagination
-- lifecycle hooks
-- query parameters
-- rate-limit API
-- authentication configuration
-- transport adapter contract
+Post-1.0 development should prioritize refinement over feature count.
 
-The project should also have a written public API compatibility policy and regression tests for the promised behavior.
+Good candidates include:
+
+* improving diagnostics and error context
+* supporting additional broadly applicable HTTP API patterns
+* improving interoperability with alternate transports
+* strengthening tests around edge cases
+* improving documentation and examples
+* reducing unnecessary complexity
+* making existing behavior more consistent and predictable
+
+New features should not be added merely because they are convenient for one service.
+
+Where possible, service-specific or protocol-specific behavior should live in modules built on top of `HTTP::API::Core`.
 
 ## Feature decision test
 
@@ -210,9 +232,25 @@ Before adding a feature to the core, ask:
 3. Can its behavior be made predictable and testable?
 4. Can it remain transport-independent?
 5. Can we reasonably support this API for years?
-6. Does it preserve the project's small, boring, dependency-light character?
+6. Can it be added without unnecessarily breaking existing users?
+7. Does it preserve the project's small, boring, dependency-light character?
 
 If several answers are no, the feature probably belongs in an extension or service-specific client instead of the core.
+
+## Changes to existing APIs
+
+Because the project is now past 1.0, changing an existing public API should face a higher bar than adding an internal implementation improvement.
+
+Before changing public behavior, consider:
+
+* whether the problem can be solved without breaking compatibility
+* whether a new optional capability can coexist with the existing API
+* whether the existing behavior is documented
+* whether downstream code is likely to depend on it
+* whether the benefit justifies the compatibility cost
+* whether the change belongs in a future major version instead
+
+Backward compatibility is part of the value of the core.
 
 ## North star
 
@@ -224,4 +262,4 @@ The goal is for a Perl developer to be able to write:
 use HTTP::API::Core;
 ```
 
-and have a dependable foundation for API integration that remains understandable, maintainable, and compatible years later.
+and have a dependable foundation for API integration that remains understandable, maintainable, predictable, and compatible years later.

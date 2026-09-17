@@ -6,7 +6,7 @@ use warnings;
 use Object::Proto::Sugar -types;
 use Physics::Balls::Engine;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has L => (
 	is => 'ro',
@@ -114,7 +114,7 @@ Physics::Balls::World - a surface, its walls, noses and gates, and the constants
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 

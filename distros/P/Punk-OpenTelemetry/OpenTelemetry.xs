@@ -73,15 +73,17 @@ static const frj_abi *otel_frj(pTHX) {
 #include "otel_jaeger.h"    /* uber-trace-id                             */
 #include "otel_baggage.h"   /* W3C Baggage                               */
 
-/* instrumentation (phase 5): the hooks become spans */
-#include "otel_semconv.h"   /* attribute names, pinned; method bounding   */
-#include "otel_instr.h"     /* the server and database observers          */
-#include "otel_consume.h"   /* pk_abi + fetch_abi, both optional          */
-
-/* metrics (phase 6) */
+/* metrics (phase 6). BEFORE the instrumentation, which records the HTTP
+ * duration histogram itself and so needs the meter's types. These need only
+ * the clock and the span, both above. */
 #include "otel_expo.h"      /* the base-2 exponential histogram          */
 #include "otel_metric.h"    /* instruments, points, the cardinality cap  */
 #include "otel_meter.h"     /* views, conflict detection, collection     */
+
+/* instrumentation (phase 5): the hooks become spans, and one metric */
+#include "otel_semconv.h"   /* attribute names, pinned; method bounding   */
+#include "otel_instr.h"     /* the server and database observers          */
+#include "otel_consume.h"   /* pk_abi + fetch_abi, both optional          */
 
 /* logs (phase 7), and the encoders for both other signals */
 #include "otel_log.h"       /* severity, the record queue, the tap       */
@@ -134,15 +136,7 @@ static void otel_on_log(pTHX_ SV *c, const char *level, STRLEN llen, SV *msg,
     /* READ, NEVER TAKEN. otel_unstash_span CLEARS the slot - it is how the
      * response side ends the span - so using it here would end the request's
      * span by logging a line, and the trace would lose its root. */
-    if (c && A) {
-        SV *st = A->stash_of(aTHX_ c);
-        if (st && SvROK(st) && SvTYPE(SvRV(st)) == SVt_PVHV) {
-            SV **e = hv_fetch((HV *)SvRV(st), OTEL_STASH_KEY,
-                              (I32)(sizeof(OTEL_STASH_KEY) - 1), 0);
-            if (e && *e && SvIOK(*e) && SvIV(*e))
-                span = INT2PTR(otel_span *, SvIV(*e));
-        }
-    }
+    span = otel_peek_span(aTHX_ A, c);
 
     lvl = sv_2mortal(newSVpvn(level, llen));
 

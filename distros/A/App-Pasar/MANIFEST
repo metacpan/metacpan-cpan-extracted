@@ -1,0 +1,14 @@
+Changes
+lib/App/Pasar.pm
+Makefile.PL
+Makefile_PL_settings.plx
+Makefile_PL_settings_maint.plx
+MANIFEST			This list of files
+MANIFEST.SKIP
+script/pasar
+t/01-basic.t
+t/data/dummy.asar
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from App::Pasar POD (added by maint/eumm-fixup.pl)

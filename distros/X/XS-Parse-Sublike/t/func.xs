@@ -57,8 +57,8 @@ static void apply_Attribute(pTHX_ struct XPSSignatureParamContext *ctx, SV *attr
 
   AV *av = get_av("main::ATTRIBUTE_APPLIED", GV_ADD);
 
-  av_push(av, newSVpvf("%s%" SVf,
-    ctx->is_named ? ":" : "", PadnameSV(pn)));
+  av_push(av, newSVpvf("%s%" PNf,
+    ctx->is_named ? ":" : "", PNfARG(pn)));
   av_push(av, newSVsv(attrvalue));
 }
 

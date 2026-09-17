@@ -2,10 +2,15 @@
 
 MODULE = Shared::Arena    PACKAGE = Shared::Arena    PREFIX = sar_
 
-# $arena->map($name, slots => N, slot_size => N) -> Shared::Arena::Map
+# $arena->map($name, slots => N, slot_size => N, serialise => 0)
+#     -> Shared::Arena::Map
 #
 # Carves the region if it is not there, binds to it if it is. Every process may
 # call this with the same arguments; exactly one of them does the work.
+#
+# `serialise` is part of the map's SHAPE, kept in the shared header: every
+# process binding it must ask for the same thing, and one that does not is
+# refused as a different slot_size would be.
 SV *
 sar_map(self, name, ...)
         SV *self
@@ -17,7 +22,7 @@ sar_map(self, name, ...)
         const char *nm;
         STRLEN nlen;
         UV slots = 1024, slot_size = 256;
-        int err = SA_E_OK;
+        int err = SA_E_OK, serialise = 0;
         I32 i;
         SV *obj;
     CODE:
@@ -29,6 +34,7 @@ sar_map(self, name, ...)
             const char *o = SvPV_nolen(ST(i));
             if      (strEQ(o, "slots"))     slots     = SvUV(ST(i + 1));
             else if (strEQ(o, "slot_size")) slot_size = SvUV(ST(i + 1));
+            else if (strEQ(o, "serialise")) serialise = SvTRUE(ST(i + 1)) ? 1 : 0;
         }
         if (slots < 2) slots = 2;
         if (sa_hash_capacity((uint32_t)slot_size) == 0)
@@ -40,7 +46,8 @@ sar_map(self, name, ...)
                      SA_T_MAP, &err);
         if (!e) croak("Shared::Arena: the map '%s' %s", nm, sa_strerror(err));
 
-        m = sa_hash_bind(arena, e, (uint64_t)slots, (uint32_t)slot_size, &err);
+        m = sa_hash_bind(arena, e, (uint64_t)slots, (uint32_t)slot_size,
+                         serialise, &err);
         if (!m) croak("Shared::Arena: the map '%s' %s", nm, sa_strerror(err));
 
         obj = newSV(0);
@@ -59,6 +66,10 @@ MODULE = Shared::Arena    PACKAGE = Shared::Arena::Map    PREFIX = sam_
 # $map->store($key, $value, ttl_ms => 5000)  # milliseconds
 #
 # 1 stored / 0 the table is full / -1 the pair does not fit a slot.
+#
+# On a serialised map the value is encoded first, and one whose encoding does
+# not fit is the same -1. A value that cannot be encoded croaks and stores
+# nothing.
 IV
 sam_store(self, key, value, ...)
         SV *self
@@ -70,17 +81,23 @@ sam_store(self, key, value, ...)
         STRLEN klen, vlen;
         uint64_t ttl_ms = 0;
         I32 i;
+        char sbuf[SA_SER_STACK];
     CODE:
         m = SA_SELF(sa_hash, self);
         if (!m) croak("Shared::Arena::Map: this map is released");
         k = SvPV(key, klen);
-        v = SvPV(value, vlen);
+        if (m->serialise)
+            vlen = sa_ser_encode(aTHX_ value, m->pair_max, klen, sbuf, &v);
+        else
+            v = SvPV(value, vlen);
         for (i = 3; i + 1 < items; i += 2) {
             const char *o = SvPV_nolen(ST(i));
             if      (strEQ(o, "ttl"))    ttl_ms = (uint64_t)(SvNV(ST(i + 1)) * 1000.0);
             else if (strEQ(o, "ttl_ms")) ttl_ms = (uint64_t)SvUV(ST(i + 1));
         }
-        RETVAL = sa_hash_store_ttl(m, k, (uint32_t)klen, v, (uint32_t)vlen,
+        RETVAL = (m->serialise && !vlen)
+               ? SA_H_TOOBIG
+               : sa_hash_store_ttl(m, k, (uint32_t)klen, v, (uint32_t)vlen,
                                    ttl_ms);
     OUTPUT:
         RETVAL
@@ -113,10 +130,17 @@ sam_fetch(self, key)
         /* Onto the stack first where a slot fits, so a miss allocates nothing
          * and a hit allocates what the value needs rather than the most a slot
          * could hold. */
+        /* On a serialised map the copy is decoded from wherever it landed,
+         * and the answer goes through ST(0), which is reached from `ax` and
+         * survives a decode that grew the value stack. */
         if (m->pair_max < sizeof buf) {
             rc = sa_hash_fetch(m, k, (uint32_t)klen, buf,
                                (uint32_t)m->pair_max, &vlen);
             if (rc != SA_H_HIT) XSRETURN_EMPTY;
+            if (m->serialise) {
+                ST(0) = SA_SER_DECODE(buf, vlen);
+                XSRETURN(1);
+            }
             XPUSHs(sv_2mortal(newSVpvn(buf, (STRLEN)vlen)));
         }
         else {
@@ -125,6 +149,10 @@ sam_fetch(self, key)
             rc = sa_hash_fetch(m, k, (uint32_t)klen, SvPVX(out),
                                (uint32_t)m->pair_max, &vlen);
             if (rc != SA_H_HIT) XSRETURN_EMPTY;
+            if (m->serialise) {
+                ST(0) = SA_SER_DECODE(SvPVX(out), vlen);
+                XSRETURN(1);
+            }
             SvCUR_set(out, (STRLEN)vlen);
             SvPVX(out)[vlen] = '\0';
             XPUSHs(out);
@@ -169,6 +197,10 @@ sam_delete(self, key)
 
 # Add to a counter, creating it at $by when it is absent. Returns the new
 # value, or undef when the table is full or the entry is not a counter.
+#
+# A counter is a raw word and cannot also be an encoded value, so on a
+# serialised map this croaks rather than planting bytes a fetch would then
+# refuse.
 SV *
 sam_incr(self, key, ...)
         SV *self
@@ -183,6 +215,7 @@ sam_incr(self, key, ...)
     CODE:
         m = SA_SELF(sa_hash, self);
         if (!m) croak("Shared::Arena::Map: this map is released");
+        if (m->serialise) croak(SA_SER_INCR_MSG);
         k = SvPV(key, klen);
         if (items > 2) by = SvIV(ST(2));
         rc = sa_hash_incr(m, k, (uint32_t)klen, (int64_t)by, &now);
@@ -192,6 +225,7 @@ sam_incr(self, key, ...)
         RETVAL
 
 # A counter's value without changing it, or undef when it is not a counter.
+# Nothing in a serialised map is one, whatever its length.
 SV *
 sam_counter(self, key)
         SV *self
@@ -206,6 +240,7 @@ sam_counter(self, key)
     CODE:
         m = SA_SELF(sa_hash, self);
         if (!m) croak("Shared::Arena::Map: this map is released");
+        if (m->serialise) XSRETURN_UNDEF;
         k = SvPV(key, klen);
         if (sa_hash_fetch(m, k, (uint32_t)klen, buf, 8, &vlen) != SA_H_HIT
             || vlen != 8)
@@ -306,3 +341,16 @@ sam_DESTROY(self)
     CODE:
         m = SA_SELF(sa_hash, self);
         if (m) { sa_hash_free(m); sv_setiv(SvRV(self), 0); }
+
+# Whether this map was made with serialise => 1.
+int
+sam_serialised(self)
+        SV *self
+    PREINIT:
+        sa_hash *m;
+    CODE:
+        m = SA_SELF(sa_hash, self);
+        if (!m) croak("Shared::Arena::Map: this map is released");
+        RETVAL = m->serialise ? 1 : 0;
+    OUTPUT:
+        RETVAL

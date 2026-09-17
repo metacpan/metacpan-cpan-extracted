@@ -148,8 +148,9 @@ ok(eval { require Shared::Arena::Install::Files; 1 },
 {
     no warnings 'once';
     my @deps = Shared::Arena::Install::Files::deps();
-    is_deeply(\@deps, ['Frozen'],
-              'and it names Frozen, whose ABI the frozen tenant reads through');
+    is_deeply([sort @deps], ['Frozen', 'Struct::Codec'],
+              'and it names Frozen and Struct::Codec, whose ABIs the frozen '
+            . 'tenant and a serialised map read through');
 
     # Naming the dependency is only half of it. A consumer says
     # ExtUtils::Depends->new($me, 'Shared::Arena') and must come out with

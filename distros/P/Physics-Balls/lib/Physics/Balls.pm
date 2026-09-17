@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Physics::Balls', $VERSION);
@@ -38,7 +38,7 @@ Physics::Balls - balls on a table with friction, walls and pockets
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,9 @@ is the first downward zero of a polynomial found by a fixed number of
 bisections in a fixed order. The same inputs give the same outcome, bit for
 bit, on every platform that keeps IEEE doubles honest, which is why the inputs
 are integers and the build refuses fused multiply-adds.
+
+It is the engine behind the pool, snooker, nine-ball and minigolf at
+L<https://peer2peergames.com>.
 
 =head2 Units
 

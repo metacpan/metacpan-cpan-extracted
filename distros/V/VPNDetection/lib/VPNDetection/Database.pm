@@ -7,7 +7,12 @@ use Carp ();
 
 use VPNDetection::Error;
 
-our $VERSION = '3.1.0';
+our $VERSION = '3.2.0';
+
+# The formats a dataset is published in. Anything else is refused before it
+# reaches the API, whose 400 would cost a round trip and name nothing to act on.
+use constant FORMATS => qw(csvgz mmdb);
+my %FORMAT = map { $_ => 1 } FORMATS;
 
 # The dataset FAMILIES your organization is licensed to download. A license
 # covers a family, while a download names one of its versions, so the ids the
@@ -87,11 +92,11 @@ sub download_url_p {
     my ($self, $id, $format, %options) = @_;
     _assert_dataset('download_url', $id, $format);
     my $client = $self->{client};
-    $client->_check_options('database->download_url', \%options, 'retries');
+    $client->_check_options('database->download_url', \%options, 'retries', 'timeout');
     my $url = $client->_url('/api/v1/database/download', id => $id, format => $format);
     my $retries = defined $options{retries} ? $options{retries} : $client->{retries};
     return $client->_retry_p($retries, sub {
-        $client->_get_p($url)->then(sub {
+        $client->_get_p($url, $options{timeout})->then(sub {
             my $res = shift->res;
             return _location($res) if $res->code == 302;
             # A 2xx here means the user agent followed the redirect and read the
@@ -169,30 +174,43 @@ sub _new {
     return bless { client => $client }, $class;
 }
 
-# The 302 is followed as a SECOND request, and that transfer is issued exactly
-# once: `retries` covers the API call that hands out the link, not a transfer
-# that may have moved gigabytes before it failed.
+# The 302 is followed as a SECOND request. `retries` covers it only until the
+# first byte reaches the caller: object storage failing before that is retried
+# like any 5xx, but a transfer that dies part way is not repeated, or the second
+# copy would append to the bytes already written. A per-call `timeout` is refused
+# rather than spent on the link call alone, where a caller would read it as
+# bounding the transfer, which nothing does.
 sub _transfer_p {
     my ($self, $method, $id, $format, $options, $on_chunk) = @_;
     my $client = $self->{client};
     $client->_check_options("database->$method", $options, 'retries');
-    return $self->download_url_p($id, $format, %$options)
-        ->then(sub { $client->_stream_p(shift, $on_chunk) });
+    my $retries = defined $options->{retries} ? $options->{retries} : $client->{retries};
+    my $delivered = 0;
+    my $count = sub {
+        $delivered += length $_[0];
+        $on_chunk->(@_);
+    };
+    return $self->download_url_p($id, $format, %$options)->then(sub {
+        my $url = shift;
+        return $client->_retry_p($retries, sub { $client->_stream_p($url, $count) }, sub { !$delivered });
+    });
 }
 
 sub _body_p {
     my ($self, $method, $options, $path, @query) = @_;
     my $client = $self->{client};
-    $client->_check_options("database->$method", $options, 'retries');
+    $client->_check_options("database->$method", $options, 'retries', 'timeout');
     my $url = $client->_url($path, @query);
     my $retries = defined $options->{retries} ? $options->{retries} : $client->{retries};
-    return $client->_retry_p($retries, sub { $client->_json_p($url) });
+    return $client->_retry_p($retries, sub { $client->_json_p($url, undef, $options->{timeout}) });
 }
 
 sub _assert_dataset {
     my ($method, $id, $format) = @_;
     Carp::croak("database->$method: expected a dataset id") if !defined $id || !length $id;
     Carp::croak("database->$method: expected a format") if !defined $format || !length $format;
+    Carp::croak("database->$method: '$format' is not a published format; expected one of "
+        . join(', ', FORMATS)) unless $FORMAT{$format};
 }
 
 sub _location {
@@ -238,9 +256,18 @@ Access is granted by contract rather than self-serve, and needs a key carrying
 the C<db.download> scope. Reached through L<VPNDetection/database>.
 
 Every method has a C<_p> twin returning a L<Mojo::Promise>, and every method
-takes a per-call C<retries> option.
+takes a per-call C<retries> option. Every method but the two transfers also
+takes a per-call C<timeout> in seconds, replacing the client's for each attempt
+of that call.
 
 =head1 METHODS
+
+=head2 FORMATS
+
+    my @formats = VPNDetection::Database::FORMATS;    # ('csvgz', 'mmdb')
+
+The formats a dataset is published in. A method taking a C<$format> croaks on
+anything else before it makes a request.
 
 =head2 list
 
@@ -322,8 +349,10 @@ follow it as a second request carrying B<no credential>: the link authorizes
 itself, so forwarding the API key would hand it to a host with no business
 holding it.
 
-That transfer is issued exactly once. C<retries> covers the API call that hands
-out the link, not a transfer that may already have moved gigabytes before it
-failed, and the per-request timeout that bounds a lookup is lifted for it.
+C<retries> covers that transfer only until its first byte reaches you: object
+storage failing before then is retried like any server error, but a transfer
+that dies part way is not repeated, since a second copy would append to the bytes
+already written. The per-request timeout that bounds a lookup is lifted for it,
+which is why C<download> and C<download_bytes> refuse a per-call C<timeout>.
 
 =cut

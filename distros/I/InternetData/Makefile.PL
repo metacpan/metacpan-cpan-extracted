@@ -12,8 +12,10 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.022',
     PREREQ_PM => {
         # The whole HTTP stack, the JSON codec, the event loop and the promises,
-        # from one distribution with no non-core dependencies of its own.
-        'Mojolicious' => '9.00',
+        # from one distribution with no non-core dependencies of its own. Every body
+        # is decoded by Mojo::JSON, which a deeply nested one could exhaust before
+        # 9.47 (CVE-2026-14803).
+        'Mojolicious' => '9.47',
         # Mojolicious makes TLS optional; the API is HTTPS only, so we do not.
         'IO::Socket::SSL' => '2.009',
     },

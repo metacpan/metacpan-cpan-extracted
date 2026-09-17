@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Map - a fixed-capacity map several processes share
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,8 @@ Get one from C<< $arena->map($name) >>. Every process can ask for the same name
 with the same arguments; the first creates it and the rest attach.
 
 Keys and values are both arbitrary bytes. Neither is interpreted, and both may
-contain anything, including NUL. A key must not be empty; a value may be.
+contain anything, including NUL. A key must not be empty; a value may be. A
+map made with C<< serialise => 1 >> is the exception for values; see below.
 
 =head2 It has a fixed size, and does not grow
 
@@ -84,6 +85,39 @@ counts a C<busy>. B<A non-zero C<busy> does not mean a key was missing>: it
 means a fetch gave up on an entry that may well be there. It should be rare
 enough to be interesting.
 
+=head2 Serialised values
+
+    my $map = $arena->map('routes', slots => 4096, serialise => 1);
+
+    $map->store($host, { upstream => $u, weight => 3 });
+    my ($route) = $map->fetch($host);
+
+By default a value is B<bytes>: a reference is stringified going in and comes
+out as C<HASH(0x...)>, and a string's UTF-8 flag does not survive. With
+C<< serialise => 1 >> a value is any Perl structure, encoded through
+L<Struct::Codec> on the way in and decoded on the way out, and what comes back
+is the same structure: strings stay strings and numbers stay numbers, the
+UTF-8 flag survives, a blessed referent is blessed into the same class, and
+references that were shared or cyclic are shared or cyclic again. Every
+process gets its own copy; nothing is read in place, which is what
+L<Shared::Arena::Frozen> is for.
+
+Keys are bytes either way. A value that cannot be encoded, a closure for one,
+croaks with the codec's reason and stores nothing. A value whose encoding does
+not fit a slot is refused exactly as an oversized byte value is, so C<store>
+answers -1 for both. A corrupt slot makes C<fetch> croak rather than hand back
+bytes as if they were a value.
+
+C<incr> croaks on a serialised map and C<counter> answers C<undef>: a counter
+is a raw word and cannot also be an encoded value. C<exists>, C<delete> and
+C<keys> are unchanged.
+
+The flag is part of the map's B<shape>, kept in the shared header beside
+C<slot_size>, because a map one process treats as encoded and another treats
+as bytes is two maps that disagree about every value. Every process must ask
+for the same setting, and one that asks for the other is refused as a
+different C<slot_size> would be.
+
 =head1 METHODS
 
 =head2 store
@@ -94,6 +128,9 @@ enough to be interesting.
 
 1 when stored, 0 when the table is full, -1 when the key is empty or the pair
 does not fit a slot.
+
+On a serialised map C<$value> is any structure, and -1 also answers one whose
+encoding does not fit. A value that cannot be encoded croaks.
 
 A C<ttl> gives the entry a deadline. After it, the key reads as B<absent> from
 every process - C<fetch> returns an empty list and C<exists> returns false -
@@ -126,6 +163,8 @@ The value, or an B<empty list> when the key is not there. Not C<undef>: C<undef>
 is a value a caller may legitimately store, and a door that used it to mean
 absent could not tell the two apart. Use C<exists> to ask the other question.
 
+On a serialised map the structure comes back decoded, a fresh copy each call.
+
 =head2 exists
 
     if ($map->exists($key)) { ... }
@@ -156,12 +195,20 @@ A counter whose TTL has lapsed is treated as gone: the next C<incr> starts it
 fresh at C<$by> rather than adding to the stale value. A window counter and its
 deadline stay consistent without the caller resetting anything.
 
+Croaks on a serialised map.
+
 =head2 counter
 
     my $n = $map->counter($key);
 
 A counter's value without changing it, or C<undef> when the key is absent or
-holds something else.
+holds something else. Always C<undef> on a serialised map.
+
+=head2 serialised
+
+    if ($map->serialised) { ... }
+
+Whether this map was made with C<< serialise => 1 >>.
 
 =head2 keys
 
@@ -188,6 +235,7 @@ is being written.
 =head1 SIZING A MAP
 
     my $map = $arena->map('cache', slots => 4096, slot_size => 512);
+    my $map = $arena->map('routes', slots => 4096, serialise => 1);
 
 C<slots> is the number of entries, and there is no load factor to leave room
 for beyond your own: an open-addressed table slows down as it fills, so leave
@@ -198,7 +246,7 @@ A map costs C<slots * slot_size> bytes for its life, used or not.
 
 =head1 SEE ALSO
 
-L<Shared::Arena>, L<Shared::Arena::Ring>.
+L<Shared::Arena>, L<Shared::Arena::Ring>, L<Struct::Codec>.
 
 =head1 AUTHOR
 

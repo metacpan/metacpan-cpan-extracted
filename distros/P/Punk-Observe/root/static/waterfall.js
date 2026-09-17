@@ -58,17 +58,73 @@
     try { wf.releasePointerCapture(e.pointerId); } catch (x) {}
   });
 
-  /* Subtree collapse: a class on the row, so the CSS does the hiding. */
+  /* Subtree collapse: a class on the row, so the CSS does the hiding.
+   *
+   * BY IDENTITY, NOT BY ADJACENCY. Rows are emitted in (trace, start) order -
+   * chronological - so a subtree's descendants are only next to each other
+   * when nothing else was running. Walking forward while depth is greater
+   * than the clicked row's stops at the first sibling that is not, which
+   * hides a slice of whatever happened to be interleaved and leaves the rest
+   * of the real subtree on screen.
+   *
+   * A row carries data-span and data-parent, so the descendants are the
+   * transitive closure over those - wherever they sit in the list. */
+  /* The attribute row under a span: hidden until its button is pressed. */
+  function detailOf(id) {
+    return wf.querySelector('li[data-detail="' + id + '"]');
+  }
+  function closeDetail(id) {
+    var d = detailOf(id);
+    if (!d) return;
+    d.hidden = true;
+    var b = wf.querySelector('button[data-more="' + id + '"]');
+    if (b) b.setAttribute('aria-expanded', 'false');
+  }
+
   wf.addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('button[data-more]') : null;
+    if (btn) {
+      e.stopPropagation();
+      var d = detailOf(btn.getAttribute('data-more'));
+      if (!d) return;
+      d.hidden = !d.hidden;
+      btn.setAttribute('aria-expanded', d.hidden ? 'false' : 'true');
+      return;
+    }
     var li = e.target.closest ? e.target.closest('li') : null;
     if (!li || dragging) return;
-    var depth = +li.getAttribute('data-depth');
-    var n = li.nextElementSibling;
+    /* An attribute row is not a span and has no subtree. */
+    if (!li.hasAttribute('data-span')) return;
+    /* A row with no depth is in a cycle, or deeper than assembly would
+     * follow. It has no subtree anyone can name, so it does not collapse. */
+    if (+li.getAttribute('data-depth') < 0) return;
+
+    var rows = wf.querySelectorAll('li[data-span]');
+    var kids = {}, i, r, p;
+    for (i = 0; i < rows.length; i++) {
+      r = rows[i];
+      p = r.getAttribute('data-parent');
+      if (!p || p === '0') continue;
+      (kids[p] || (kids[p] = [])).push(r);
+    }
+
     var hide = !li.classList.contains('collapsed');
     li.classList.toggle('collapsed', hide);
-    while (n && +n.getAttribute('data-depth') > depth) {
-      n.hidden = hide;
-      n = n.nextElementSibling;
+
+    var stack = [ li.getAttribute('data-span') ], seen = {};
+    while (stack.length) {
+      var id = stack.pop();
+      if (seen[id]) continue;          /* a cycle must not spin here */
+      seen[id] = 1;
+      var cs = kids[id] || [];
+      for (i = 0; i < cs.length; i++) {
+        cs[i].hidden = hide;
+        /* Its attribute row goes with it, and comes back closed: an
+         * expanded subtree should look as it did before the collapse,
+         * not spring every statement open. */
+        closeDetail(cs[i].getAttribute('data-span'));
+        stack.push(cs[i].getAttribute('data-span'));
+      }
     }
   });
 

@@ -33,5 +33,6 @@ templates/web/en/dashboard.html.tt
 templates/web/en/graph.html.tt
 templates/web/en/home.html.tt
 templates/web/en/layouts/default.html.tt
+templates/web/en/pie.html.tt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -443,7 +443,7 @@ struct pb_outcome *pb_strike(const struct pb_world *W, int n, const struct pb_ba
     struct sim S;
     struct seglist L;
     struct pb_outcome *out;
-    int i, j, k, cue, Tball, bestK, bestI, bestJ, nc, idx;
+    int i, j, k, cue, Tball, bestK, bestI, bestJ, nc, idx, pass, moved;
     double T, bestT, t, dx, dy, wx, wy, hx, hy, s0, sv, sa, lam, nx, ny, ux, uy, len, dl, p, speed, sxf, syf, sl;
     double R = W->R;
 
@@ -525,6 +525,9 @@ struct pb_outcome *pb_strike(const struct pb_world *W, int n, const struct pb_ba
             for (k = 0; k < W->nw; k++) {
                 nx = W->walls[k * 7 + 5]; ny = W->walls[k * 7 + 6];
                 s0 = nx * (S.cx[i] - W->walls[k * 7]) + ny * (S.cy[i] - W->walls[k * 7 + 1]) - R;
+                /* more than a radius beyond the wall's line is its far side, not
+                   inside it: a course has far sides (physics.js says why) */
+                if (s0 < -R) { continue; }
                 sv = nx * S.cvx[i] + ny * S.cvy[i];
                 sa = nx * S.ax[i] + ny * S.ay[i];
                 t = lineRoot(s0, sv, sa, bestT);
@@ -543,6 +546,9 @@ struct pb_outcome *pb_strike(const struct pb_world *W, int n, const struct pb_ba
             for (k = 0; k < W->ng; k++) {
                 nx = W->gates[k * 8 + 5]; ny = W->gates[k * 8 + 6];
                 s0 = -(nx * (S.cx[i] - W->gates[k * 8]) + ny * (S.cy[i] - W->gates[k * 8 + 1]));
+                /* more than a radius beyond a gate's line is not its ball: it
+                   crossed already, or it is across a ring of gates */
+                if (s0 < -R) { continue; }
                 sv = -(nx * S.cvx[i] + ny * S.cvy[i]);
                 sa = -(nx * S.ax[i] + ny * S.ay[i]);
                 t = lineRoot(s0, sv, sa, bestT);
@@ -628,12 +634,34 @@ struct pb_outcome *pb_strike(const struct pb_world *W, int n, const struct pb_ba
         if (S.tnow > PB_MAX_TIME) { out->error = PB_ERR_TIME; break; }
     }
 
+    for (i = 0; i < n; i++) {
+        if (S.mode[i] == SLIDING || S.mode[i] == ROLLING) { closeSeg(&S, &L, i, S.tnow); }
+    }
+    /* settle: a resting pair that crept inside each other is set apart to 2R,
+       each moved half, in a few passes; physics.js says why */
+    for (pass = 0; pass < 8; pass++) {
+        moved = 0;
+        for (i = 0; i < n; i++) {
+            if (S.mode[i] == POCKETED) { continue; }
+            for (j = i + 1; j < n; j++) {
+                if (S.mode[j] == POCKETED) { continue; }
+                dx = S.px0[j] - S.px0[i]; dy = S.py0[j] - S.py0[i];
+                dl = sqrt(dx * dx + dy * dy);
+                if (dl >= 2 * W->R || dl == 0) { continue; }
+                lam = 0.5 * (2 * W->R - dl);
+                S.px0[i] = S.px0[i] - lam * dx / dl; S.py0[i] = S.py0[i] - lam * dy / dl;
+                S.px0[j] = S.px0[j] + lam * dx / dl; S.py0[j] = S.py0[j] + lam * dy / dl;
+                moved = 1;
+            }
+        }
+        if (!moved) { break; }
+    }
+
     /* rest and the regrouped segments */
     out->t = S.tnow; out->n = S.nev;
     out->rest = (struct pb_rest *) calloc(n > 0 ? n : 1, sizeof(struct pb_rest));
     nc = 0;
     for (i = 0; i < n; i++) {
-        if (S.mode[i] == SLIDING || S.mode[i] == ROLLING) { closeSeg(&S, &L, i, S.tnow); }
         if (S.mode[i] != POCKETED && out->rest) {
             out->rest[nc].id = S.ids[i];
             out->rest[nc].x = (long) floor(S.px0[i] * 1e5 + 0.5);

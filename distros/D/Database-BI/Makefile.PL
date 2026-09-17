@@ -30,9 +30,8 @@ WriteMakefile(
 		'File::Spec'		=> '3.40',
 		'File::Temp'		=> '0.22',
 		'List::Util'		=> '1.40',
-		'Scalar::Util'		=> '1.40',
 		'Socket'		=> '2.010',
-		'HTML::D3'	=> 0.13,
+		'HTML::D3'	=> 0.14,
 		'HTML::TableExtract'	=> 0,
 		'LWP::UserAgent'		=> 0,
 		'LWP::UserAgent::Cached'	=> 0,
@@ -45,10 +44,9 @@ WriteMakefile(
 		'Sub::Protected'	=> 0,
 	}, TEST_REQUIRES => {
 		'DBD::CSV' => 0,
-		'DBD::Excel' => 0,
 		'Excel::Writer::XLSX' => 0,
 		'Encode' => 0,
-		'IPC::System::Simple' => 0,
+		'IPC::System::Simple' => 0,	# For autodie (:all)
 		'Test::Memory::Cycle' => 0,
 		'Test::Mockingbird' => 0,
 		'Test::Most' => 0,

@@ -110,11 +110,18 @@ is($m->get(id => 3), undef, 'and the row is gone');
 
 # ---- validation compiled from the field specs -------------------------------
 {
+    # These assert the LOCATION as well as the failure, and that is the
+    # point of them. Matching only qr/validation failed/ passed for years
+    # against a message that had lost every useful part of itself:
+    # pm_validate mortalised the error copy inside the scope it then freed,
+    # so the field was never named and nobody noticed.
     ok($m->meta->{should_validate}, 'constraints turn validation on');
     eval { $m->create({ tag => 'no name' }) };
     like($@, qr/validation failed/, 'create croaks on a missing required field');
+    unlike($@, qr/does not match the field schema/,
+        'and the error is the validator\'s own, not the fallback');
     eval { $m->create({ name => '' }) };
-    like($@, qr/validation failed/, 'create croaks on a minLength violation');
+    like($@, qr{validation failed at /name}, 'a minLength violation names the field');
     my $ok = eval { $m->create({ name => 'delta' }); 1 };
     ok($ok, 'a valid create passes');
 
@@ -122,7 +129,7 @@ is($m->get(id => 3), undef, 'and the row is gone');
     my $up = eval { $m->update({ id => 1, tag => 'z' }); 1 };
     ok($up, 'update does not require the whole row');
     eval { $m->update({ id => 1, name => '' }) };
-    like($@, qr/validation failed/, 'but still validates the changed fields');
+    like($@, qr{validation failed at /name}, 'and an update names it too');
 }
 
 # ---- a model with no constraints does not validate --------------------------

@@ -37,7 +37,7 @@
             "MIME::Base64" : "0",
             "Scalar::Util" : "0",
             "Time::HiRes" : "0",
-            "perl" : "5.020"
+            "perl" : "5.010"
          }
       }
    },
@@ -53,6 +53,6 @@
          "web" : "https://github.com/kawamurashingo/HTTP-API-Core"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -22,7 +22,7 @@ my %module_build_args = (
     "Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "NetAddr-MAC",
-  "dist_version" => "1.03",
+  "dist_version" => "1.04",
   "license" => "mit",
   "module_name" => "NetAddr::MAC",
   "recursive_test_files" => 1,
@@ -31,7 +31,7 @@ my %module_build_args = (
     "Exporter" => 0,
     "List::Util" => 0,
     "constant" => 0,
-    "perl" => "v5.10.0",
+    "perl" => "5.010",
     "strict" => 0,
     "warnings" => 0
   },
@@ -41,7 +41,7 @@ my %module_build_args = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0,
-    "perl" => "v5.10.0"
+    "perl" => "5.010"
   }
 );
 
@@ -55,7 +55,7 @@ my %fallback_build_requires = (
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Trap" => 0,
-  "perl" => "v5.10.0"
+  "perl" => "5.010"
 );
 
 

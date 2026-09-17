@@ -3083,7 +3083,13 @@ static SV *povw_trace_one_sv(pTHX_ SV *class, SV *store, SV *req,
     return out;
 }
 
-/* The span id of a span's parent, or 0 when it has none. */
+/* An INDEX into the tree's span list, resolved to that span's id.
+ *
+ * This is Trace::analyse's convention (parent_index), NOT the store's - the
+ * store hands back a parent SPAN ID under parent_span_id, which needs no
+ * resolving and must not be passed through here. The two were both called
+ * `parent`, and feeding this one the other made every root its own parent.
+ * They have different names now so that cannot be spelled. */
 static SV *povw_parent_id_sv(pTHX_ SV *tree, SV *span) {
     HV *t, *s;
     SV **f;
@@ -3095,7 +3101,7 @@ static SV *povw_parent_id_sv(pTHX_ SV *tree, SV *span) {
     t = (HV *)SvRV(tree);
     s = (HV *)SvRV(span);
 
-    f = hv_fetchs(s, "parent", 0);
+    f = hv_fetchs(s, "parent_index", 0);
     if (!f || !SvOK(*f)) return newSViv(0);
     i = SvIV(*f);
     /* -1 is a ROOT, not an error: a span with no parent in this trace is the

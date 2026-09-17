@@ -92,7 +92,7 @@ my $I = 'Punk::OpenTelemetry::Instrument';
 # ---- the per-point switches -------------------------------------------------
 {
     my %c = config();
-    is_deeply([sort keys %c], [qw(client db enabled server)],
+    is_deeply([sort keys %c], [qw(client db enabled metrics server)],
         'every instrumentation point is individually switchable');
     is($c{server}, 1, 'and on by default');
 
@@ -197,6 +197,131 @@ SKIP: {
         'a 404 carries NO http.route rather than falling back to the path');
     is($miss->{attributes}{'http.response.status_code'}, 404,
         'though it does carry the status');
+}
+
+# ---- the database span belongs to the request that issued it ----------------
+#
+# THE POINT OF THE WHOLE RELEASE. A query span started with a NULL parent gets
+# a fresh trace id, so every statement became a trace one span long while the
+# request that ran it sat in a different trace of its own. Needs pk_abi v5:
+# the observer is handed no context, and current_of is the only way to ask.
+SKIP: {
+    my $have = eval { require Punk; require DBD::SQLite; 1 };
+    skip 'Punk and DBD::SQLite required', 7 unless $have;
+    my $A = eval { Punk::_abi_ptr() } or skip 'no pk_abi', 7;
+
+    my $t = Punk::OpenTelemetry::Tracer->new(sampler => 'always_on',
+        resource => { 'service.name' => 'db' }, scope_name => 's');
+    my $r = install($t);
+    skip 'pk_abi did not register the query observer', 7 unless $r->{db_punk};
+
+    my $app = eval {
+        package TOtelDbApp;
+        use Punk;
+        {
+            package TOtelDbApp::Model::Thing;
+            use Punk::Model;
+            table 'things';
+            field id   => { type => 'integer', primary => 1 };
+            field name => { type => 'string' };
+        }
+        get '/q' => sub {
+            my ($c) = @_;
+            $c->model('Thing')->search({});
+            $c->text('ok');
+        };
+        database dsn => 'dbi:SQLite:dbname=:memory:';
+        model;
+        package main;
+        TOtelDbApp->to_app;
+    };
+    skip "could not build the app: $@", 7 unless $app;
+
+    my $setup = eval {
+        TOtelDbApp::Model::Thing->_instantiate({ dsn => 'dbi:SQLite:dbname=:memory:' })
+            ->backend->dbh->do(
+                'CREATE TABLE things (id INTEGER PRIMARY KEY, name TEXT)');
+        1;
+    };
+    skip "could not create the table: $@", 7 unless $setup;
+
+    $t->drain;                                  # start clean
+    my $served = eval { $app->({ REQUEST_METHOD => 'GET', PATH_INFO => '/q' }); 1 };
+    skip "Punk could not serve here: $@", 7 unless $served;
+
+    my $p = $t->drain or skip 'nothing was recorded', 7;
+    my @spans = @{ $p->{resource_spans}[0]{scope_spans}[0]{spans} };
+
+    my ($server) = grep { $_->{kind} == 2 } @spans;
+    my @db = grep { $_->{kind} == 3 } @spans;
+
+    # Three comments in this dist said DBIx::Loop was instrumented and it
+    # never was. It is now, when the dist is there to instrument.
+    SKIP: {
+        skip 'DBIx::Loop not installed', 1
+            unless eval { require DBIx::Loop; DBIx::Loop->can('_abi_ptr') };
+        ok($r->{db_loop},
+            "install reports db_loop truthfully now that it registers");
+    }
+
+    ok($server, 'the request produced a server span');
+    ok(scalar @db, 'and at least one database span');
+
+    # ONE TRACE, not one per statement.
+    my %traces = map { $_->{trace_id} => 1 } @spans;
+    is(scalar(keys %traces), 1,
+        'every span of the request shares ONE trace id')
+        or diag 'trace ids: ' . join ', ', sort keys %traces;
+
+    is($db[0]{trace_id}, $server->{trace_id},
+        'the database span is in the server span\'s trace');
+    is($db[0]{parent_span_id}, $server->{span_id},
+        'and names the server span as its parent');
+    like($db[0]{attributes}{'db.query.text'} // '', qr/SELECT/i,
+        'carrying the statement text');
+}
+
+# ---- a statement outside any request is still an honest root ----------------
+#
+# current_of is live only inside a dispatch frame. A queue job, a continuation
+# or a boot-time statement has no request to belong to, and the degraded
+# answer has to be "no parent" - never somebody else's.
+SKIP: {
+    my $have = eval { require Punk; require DBD::SQLite; 1 };
+    skip 'Punk and DBD::SQLite required', 2 unless $have;
+
+    my $t = Punk::OpenTelemetry::Tracer->new(sampler => 'always_on',
+        resource => { 'service.name' => 'db2' }, scope_name => 's');
+    my $r = install($t);
+    skip 'no query observer', 2 unless $r->{db_punk};
+
+    # A dsn of its own. The connection pool keys on dsn, user and password,
+    # so a second ':memory:' model silently shares the handle built above -
+    # and the table is already there, which skips the block rather than
+    # running it.
+    require File::Temp;
+    my $file = File::Temp::tmpnam() . '.db';
+    my $ok = eval {
+        package TOtelBare::Model::Thing;
+        use Punk::Model;
+        table 'things';
+        field id => { type => 'integer', primary => 1 };
+        package main;
+        my $m = TOtelBare::Model::Thing->_instantiate(
+            { dsn => "dbi:SQLite:dbname=$file" });
+        $m->backend->dbh->do('CREATE TABLE things (id INTEGER PRIMARY KEY)');
+        1;
+    };
+    skip "could not set up: $@", 2 unless $ok;
+
+    my $p = $t->drain or skip 'nothing recorded', 2;
+    my @db = grep { $_->{kind} == 3 }
+             @{ $p->{resource_spans}[0]{scope_spans}[0]{spans} };
+    ok(scalar @db, 'a statement run outside a request is still observed');
+    ok(!defined $db[0]{parent_span_id} || $db[0]{parent_span_id} eq '',
+        'and is a ROOT: no request to belong to means no parent, not a wrong one')
+        or diag 'parent was ' . ($db[0]{parent_span_id} // 'undef');
+    unlink $file;
 }
 
 done_testing;

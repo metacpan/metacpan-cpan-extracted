@@ -215,20 +215,33 @@ SKIP: {
 # data have to agree however that data was read in between, or the block
 # records the order someone looked at the structure rather than the
 # structure.
+#
+# Before 5.36, perl set the public POK flag when it stringified a number,
+# so a stringified integer carries exactly the flags of a numified string
+# and the POK-wins rule above has to choose the string. 5.36 made that
+# cache private. Those perls get the documented answer instead: the same
+# bytes as stringify => 1.
 {
     my $d = { n => 5 };
     my $before = Frozen->freeze($d);
     my $strd   = Frozen->freeze($d, stringify => 1);
     my $after  = Frozen->freeze($d);
 
-    is($after, $before, 'a freeze after a stringify gives the same bytes');
-    isnt($strd, $before, 'while stringify => 1 gives its own');
+    isnt($strd, $before, 'stringify => 1 gives its own bytes');
 
     my $e = { n => 5 };
     my $plain = Frozen->freeze($e);
     my $str   = "$e->{n}";                 # nothing to do with Frozen
-    is(Frozen->freeze($e), $plain,
-       'and plain Perl stringification leaves it alone too');
+    my $again = Frozen->freeze($e);
+
+    if ($] >= 5.036) {
+        is($after, $before, 'a freeze after a stringify gives the same bytes');
+        is($again, $plain,  'and plain Perl stringification leaves it alone too');
+    }
+    else {
+        is($after, $strd, 'before 5.36 a stringified integer freezes as its string');
+        is($again, $strd, 'whoever did the stringifying');
+    }
 }
 
 done_testing;

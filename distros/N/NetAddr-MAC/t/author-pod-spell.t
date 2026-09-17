@@ -31,7 +31,6 @@ OUI
 Oliver
 Sinclair
 dean
-djzort
 james
 jon
 lib

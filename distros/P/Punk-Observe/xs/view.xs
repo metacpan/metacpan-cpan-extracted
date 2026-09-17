@@ -2590,6 +2590,53 @@ povw__trace_one(SV *class, SV *store, SV *req, SV *from, SV *to, SV *range)
             AV *sa = (sv && SvROK(*sv) && SvTYPE(SvRV(*sv)) == SVt_PVAV)
                        ? (AV *)SvRV(*sv) : NULL;
             SSize_t i, cnt = sa ? av_len(sa) + 1 : 0;
+            HV *attrs_of = newHV();
+
+            /* THE ATTRIBUTES ARE NOT IN THE TREE. Assembly works on the
+             * 64-byte span the seal indexes - ids, times, two symbols - so
+             * a waterfall built from it alone can say SELECT and nothing
+             * more. The records of this trace are read once more, filtered
+             * in the scan on the trace id, and matched to their rows by
+             * span id. `limit` is the span count: the trace has exactly
+             * that many, so the read cannot be cut short. */
+            if (cnt) {
+                SV *rows = NULL;
+                int n;
+                ENTER; SAVETMPS; PUSHMARK(SP);
+                XPUSHs(store);
+                XPUSHs(sv_2mortal(newSVpvs("kind")));     XPUSHs(sv_2mortal(newSViv(3)));
+                XPUSHs(sv_2mortal(newSVpvs("trace_hi"))); XPUSHs(sv_2mortal(po_u64_to_sv(hi)));
+                XPUSHs(sv_2mortal(newSVpvs("trace_lo"))); XPUSHs(sv_2mortal(po_u64_to_sv(lo)));
+                XPUSHs(sv_2mortal(newSVpvs("limit")));    XPUSHs(sv_2mortal(newSViv((IV)cnt)));
+                PUTBACK;
+                n = call_method("rows", G_LIST);
+                SPAGAIN;
+                {
+                    SSize_t k;
+                    for (k = n - 1; k > 0; k--) (void)POPs;
+                    rows = n ? SvREFCNT_inc(POPs) : NULL;
+                }
+                PUTBACK;
+                FREETMPS; LEAVE;
+                SPAGAIN;
+                if (rows && SvROK(rows) && SvTYPE(SvRV(rows)) == SVt_PVAV) {
+                    AV *ra = (AV *)SvRV(rows);
+                    SSize_t k, rn = av_len(ra) + 1;
+                    for (k = 0; k < rn; k++) {
+                        SV **e = av_fetch(ra, k, 0);
+                        SV **id, **at;
+                        STRLEN il;
+                        const char *ip;
+                        if (!e || !SvROK(*e) || SvTYPE(SvRV(*e)) != SVt_PVHV) continue;
+                        id = hv_fetchs((HV *)SvRV(*e), "span_id", 0);
+                        at = hv_fetchs((HV *)SvRV(*e), "attrs", 0);
+                        if (!id || !SvOK(*id) || !at || !SvROK(*at)) continue;
+                        ip = SvPV(*id, il);
+                        (void)hv_store(attrs_of, ip, (I32)il, newSVsv(*at), 0);
+                    }
+                }
+                if (rows) SvREFCNT_dec(rows);
+            }
 
             for (i = 0; i < cnt; i++) {
                 SV **e = av_fetch(sa, i, 0);
@@ -2617,12 +2664,22 @@ povw__trace_one(SV *class, SV *store, SV *req, SV *from, SV *to, SV *range)
 
                 x = hv_fetchs(s, "span_id", 0);
                 hv_stores(o, "span_id", x ? newSVsv(*x) : newSV(0));
+                /* The parent, for collapsing a subtree by IDENTITY. Rows come
+                 * out chronological (store.xs), so a subtree's descendants
+                 * are not adjacent whenever two sibling subtrees overlap in
+                 * time - and walking the next rows while depth is greater
+                 * hides part of somebody else's subtree, or stops at the
+                 * first sibling and hides nothing. */
+                x = hv_fetchs(s, "parent_span_id", 0);
+                hv_stores(o, "parent_span_id", x ? newSVsv(*x) : newSViv(0));
                 x = hv_fetchs(s, "depth", 0);
                 hv_stores(o, "depth", x ? newSVsv(*x) : newSV(0));
                 /* A root span starts at 5 rather than 0: flush against the
                  * cell edge the label touches the panel border and reads as
                  * part of it. */
-                hv_stores(o, "indent", newSViv(5 + depth * 14));
+                /* depth is -1 for a span in a cycle or past PO_TREE_MAX_DEPTH;
+                 * 5 + -1*14 is -9px, which pulls the label out of its cell. */
+                hv_stores(o, "indent", newSViv(depth > 0 ? 5 + depth * 14 : 5));
                 x = hv_fetchs(s, "kind", 0);
                 hv_stores(o, "kind_name",
                           newSVpv(po_span_kind_name(x && SvOK(*x)
@@ -2650,7 +2707,13 @@ povw__trace_one(SV *class, SV *store, SV *req, SV *from, SV *to, SV *range)
 
                 {   /* the attributes, in a stable order */
                     AV *out = newAV();
-                    SV **av = hv_fetchs(s, "attrs", 0);
+                    SV **av = NULL;
+                    x = hv_fetchs(s, "span_id", 0);
+                    if (x && SvOK(*x)) {
+                        STRLEN il;
+                        const char *ip = SvPV(*x, il);
+                        av = hv_fetch(attrs_of, ip, (I32)il, 0);
+                    }
                     if (av && SvROK(*av) && SvTYPE(SvRV(*av)) == SVt_PVHV) {
                         HV *ah = (HV *)SvRV(*av);
                         SSize_t nk = 0, k;
@@ -2686,6 +2749,13 @@ povw__trace_one(SV *class, SV *store, SV *req, SV *from, SV *to, SV *range)
                                       val ? newSVpv(SvPV_nolen(*val), 0)
                                           : newSVpvs(""));
                             av_push(out, newRV_noinc((SV *)pair));
+                            /* The statement, lifted out for the bar's
+                             * tooltip: a database span is named for its
+                             * OPERATION so the name stays a grouping key,
+                             * and a row that says only SELECT answers
+                             * nothing about which one. */
+                            if (val && kl == 13 && !memcmp(kp, "db.query.text", 13))
+                                hv_stores(o, "query", newSVsv(*val));
                         }
                         Safefree(ks);
                     }
@@ -2731,7 +2801,21 @@ povw__trace_one(SV *class, SV *store, SV *req, SV *from, SV *to, SV *range)
                 hv_stores(spec, "trace_lo", po_u64_to_sv(lo));
                 x = hv_fetchs(s, "span_id", 0);
                 hv_stores(spec, "span_id", x ? newSVsv(*x) : newSV(0));
-                hv_stores(spec, "parent", povw_parent_id_sv(aTHX_ tsv, *e));
+                /* The store already gives the parent SPAN ID (store.xs), and
+                 * Flame::build's span spec wants a span id - so this is a
+                 * pass-through and was not.
+                 *
+                 * It ran through povw_parent_id_sv, which converts an INDEX to
+                 * a span id and is written for Trace::analyse's output. Handed
+                 * a span id it did this: the root, whose parent is 0, indexed
+                 * spans[0] - ITSELF - and became its own parent, which
+                 * po_tree_build reads as a cycle and po_flame_add then skips.
+                 * Every child's real 64-bit parent fell outside the array and
+                 * flattened to 0. So the flamegraph lost the root span of
+                 * every trace, while the waterfall above it - which uses the
+                 * store's own depth - looked right. */
+                x = hv_fetchs(s, "parent_span_id", 0);
+                hv_stores(spec, "parent", x ? newSVsv(*x) : newSViv(0));
                 x = hv_fetchs(s, "start", 0);
                 hv_stores(spec, "start", x ? newSVsv(*x) : newSV(0));
                 {
@@ -2751,6 +2835,7 @@ povw__trace_one(SV *class, SV *store, SV *req, SV *from, SV *to, SV *range)
                 hv_stores(spec, "kind", x ? newSVsv(*x) : newSV(0));
                 av_push(specs, newRV_noinc((SV *)spec));
             }
+            SvREFCNT_dec((SV *)attrs_of);
         }
 
         povw_set_iv(aTHX_ v, "span_count", t, "span_count");

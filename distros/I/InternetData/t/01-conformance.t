@@ -152,7 +152,7 @@ my %VISIBILITY = (
         ok($loaded, 'the module under test was located') or return;
         (my $dir = $loaded) =~ s{\.pm\z}{};
 
-        for my $file ($loaded, "$dir/Error.pm") {
+        for my $file ($loaded, "$dir/Database.pm", "$dir/Error.pm") {
             open my $fh, '<', $file or do { fail("cannot read $file: $!"); next };
             my $line = 0;
             my @found;

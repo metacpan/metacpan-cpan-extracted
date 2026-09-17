@@ -760,4 +760,293 @@ subtest 'HTTP -- newline-only PSV via /open: 200 with empty-table message' => su
 	  ->content_like(qr/No records found/i, 'newline-only PSV: empty-state message present');
 };
 
+# ---------------------------------------------------------------------------
+# Section 16: _safe_back_url -- XSS / scheme injection guard
+#
+# Strategy: Verify that the _safe_back_url helper (added to fix the reflected
+# XSS where javascript: URIs passed through | html unchanged and executed on
+# click) correctly allows safe URLs and blocks hostile schemes.
+# ---------------------------------------------------------------------------
+
+Readonly my $SAFE_BACK_URL => \&Database::BI::Controller::Dashboard::_safe_back_url;
+
+subtest '_safe_back_url -- javascript: scheme is blocked' => sub {
+	is $SAFE_BACK_URL->('javascript:alert(1)'),     undef, 'bare javascript: blocked';
+	is $SAFE_BACK_URL->('javascript:void(0)'),      undef, 'javascript:void(0) blocked';
+	is $SAFE_BACK_URL->('JAVASCRIPT:alert(1)'),     undef, 'JAVASCRIPT: (caps) blocked';
+	is $SAFE_BACK_URL->('Javascript:alert(1)'),     undef, 'Javascript: (mixed) blocked';
+};
+
+subtest '_safe_back_url -- data: and vbscript: schemes are blocked' => sub {
+	is $SAFE_BACK_URL->('data:text/html,<h1>XSS'),  undef, 'data: scheme blocked';
+	is $SAFE_BACK_URL->('vbscript:MsgBox(1)'),      undef, 'vbscript: scheme blocked';
+	is $SAFE_BACK_URL->('DATA:text/html,foo'),       undef, 'DATA: (caps) blocked';
+};
+
+subtest '_safe_back_url -- relative paths are allowed' => sub {
+	is $SAFE_BACK_URL->('/view/sales'),              '/view/sales',     'root-relative path allowed';
+	is $SAFE_BACK_URL->('/pie?l=table:sales'),       '/pie?l=table:sales', 'root-relative with query allowed';
+	is $SAFE_BACK_URL->('/open?path=/tmp/f.csv'),    '/open?path=/tmp/f.csv', 'root-relative open path allowed';
+};
+
+subtest '_safe_back_url -- http/https absolute URLs are allowed' => sub {
+	is $SAFE_BACK_URL->('https://example.com/path'), 'https://example.com/path', 'https: allowed';
+	is $SAFE_BACK_URL->('http://example.com/'),      'http://example.com/',      'http: allowed';
+	is $SAFE_BACK_URL->('HTTPS://EXAMPLE.COM/'),     'HTTPS://EXAMPLE.COM/',     'HTTPS (caps) allowed';
+};
+
+subtest '_safe_back_url -- undef, empty, and non-path strings are blocked' => sub {
+	is $SAFE_BACK_URL->(undef),   undef, 'undef blocked';
+	is $SAFE_BACK_URL->(''),      undef, 'empty string blocked';
+	is $SAFE_BACK_URL->('  '),    undef, 'whitespace-only blocked';
+	is $SAFE_BACK_URL->('alert(1)'), undef, 'bare JS expression blocked';
+	is $SAFE_BACK_URL->('//evil.com'), undef, 'protocol-relative URL blocked';
+};
+
+# ---------------------------------------------------------------------------
+# Section 17: HTTP back= and back2= XSS reflected in the rendered page
+#
+# Strategy: Send requests with javascript: payloads in back= (pie, graph) and
+# back2= (dashboard) params.  Verify the rendered HTML does NOT contain the
+# raw javascript: string as an href value -- it must be sanitized away
+# (rendered as "/" fallback or entirely absent from the breadcrumb).
+# ---------------------------------------------------------------------------
+
+subtest 'GET /pie?back=javascript:alert(1) -- javascript: not reflected in href' => sub {
+	eval { require HTML::D3 } or plan skip_all => 'HTML::D3 not available';
+
+	$t->get_ok(
+		'/pie?l=table:sales&cat=region&val=amount'
+		. '&back=' . url_escape('javascript:alert(1)')
+	)->status_is(200)
+	 ->content_unlike(qr{href="javascript:}, 'javascript: not in any href after sanitisation')
+	 ->content_unlike(qr{data-back-url="javascript:}, 'javascript: not in data-back-url attr');
+};
+
+subtest 'GET /graph?back=javascript:alert(1) -- javascript: not reflected in href' => sub {
+	eval { require HTML::D3 } or plan skip_all => 'HTML::D3 not available';
+
+	$t->get_ok(
+		'/graph?l=table:sales&x=sale_date&y=amount'
+		. '&back=' . url_escape('javascript:alert(1)')
+	)->status_is(200)
+	 ->content_unlike(qr{href="javascript:}, 'javascript: not in graph page href');
+};
+
+subtest 'GET /open?back2=javascript:alert(1) -- javascript: not in third breadcrumb' => sub {
+	my $enc = url_escape(File::Spec->rel2abs('data/sales.csv'));
+	$t->get_ok(
+		"/open?path=$enc"
+		. '&back2=' . url_escape('javascript:alert(1)')
+		. '&back2_label=XSS'
+	)->status_is(200)
+	 ->content_unlike(qr{href="javascript:}, 'javascript: blocked from back2 href')
+	 ->content_unlike(qr{href="[^"]*javascript:}, 'no javascript: in any href');
+};
+
+subtest 'GET /view/sales?back2=javascript:alert(1) -- promoted back2 blocked' => sub {
+	# view promotes back2 to back_url; the javascript: scheme must still be blocked
+	$t->get_ok(
+		'/view/sales'
+		. '?back2=' . url_escape('javascript:alert(1)')
+		. '&back2_label=XSS'
+	)->status_is(200)
+	 ->content_unlike(qr{href="javascript:}, 'javascript: not promoted to back href');
+};
+
+subtest 'GET /view/sales?back2=data:text/html,XSS -- data: scheme blocked' => sub {
+	$t->get_ok(
+		'/view/sales'
+		. '?back2=' . url_escape('data:text/html,<b>xss</b>')
+		. '&back2_label=D'
+	)->status_is(200)
+	 ->content_unlike(qr{href="data:}, 'data: URI not reflected in href');
+};
+
+subtest 'GET /open?back2_label=<script> -- label is HTML-encoded by TT | html' => sub {
+	my $enc = url_escape(File::Spec->rel2abs('data/sales.csv'));
+	# Even with a sanitised back2_url, a hostile label must be HTML-encoded.
+	$t->get_ok(
+		"/open?path=$enc"
+		. '&back2=' . url_escape('/view/sales')
+		. '&back2_label=' . url_escape('<script>alert(1)</script>')
+	)->status_is(200)
+	 ->content_unlike(qr{<script>alert},   'raw <script> tag not in label')
+	 ->content_like(qr{&lt;script&gt;|&amp;lt;script&amp;gt;}, 'script tag is HTML-encoded');
+};
+
+subtest 'GET /view/sales?back2=/view/sales -- legitimate relative URL passes through' => sub {
+	$t->get_ok(
+		'/view/sales?back2=' . url_escape('/view/sales') . '&back2_label=Back+to+sales'
+	)->status_is(200)
+	 ->content_like(qr{href="/view/sales"}, 'legitimate relative back2 URL rendered in breadcrumb');
+};
+
+# ---------------------------------------------------------------------------
+# Section 18: graph_view hostile data inputs
+#
+# Strategy: Test what graph_view does when the Y column contains all
+# non-numeric values, all empty values, or extreme numbers.
+# ---------------------------------------------------------------------------
+
+subtest 'GET /graph -- all-text Y column returns "No plottable data"' => sub {
+	eval { require HTML::D3 } or plan skip_all => 'HTML::D3 not available';
+
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/textonly.csv")->spurt(
+		"label,description\nA,hello\nB,world\n"
+	);
+	$t->get_ok(
+		'/graph?l=path:' . url_escape("$dir/textonly.csv") . '&x=label&y=description'
+	)->status_is(200)
+	 ->content_like(qr/No plottable data/i, 'all-text Y column: No plottable data message');
+};
+
+subtest 'GET /graph -- all-empty Y values return "No plottable data"' => sub {
+	eval { require HTML::D3 } or plan skip_all => 'HTML::D3 not available';
+
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/emptyvals.csv")->spurt(
+		"label,score\nA,\nB,\nC,\n"
+	);
+	$t->get_ok(
+		'/graph?l=path:' . url_escape("$dir/emptyvals.csv") . '&x=label&y=score'
+	)->status_is(200)
+	 ->content_like(qr/No plottable data/i, 'all-empty Y values: No plottable data message');
+};
+
+subtest 'GET /graph -- accounting-notation negatives in Y are handled correctly' => sub {
+	eval { require HTML::D3 } or plan skip_all => 'HTML::D3 not available';
+
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/accounting.csv")->spurt(
+		"month,amount\nJan,(1500.00)\nFeb,2000.00\nMar,(500.00)\n"
+	);
+	# The chart must render (not "No plottable data") and the page must not crash.
+	$t->get_ok(
+		'/graph?l=path:' . url_escape("$dir/accounting.csv") . '&x=month&y=amount'
+	)->status_is(200)
+	 ->content_unlike(qr/No plottable data/i, 'accounting negatives are plottable')
+	 ->content_like(qr/Jan/,                  'Jan label appears in graph output');
+};
+
+# ---------------------------------------------------------------------------
+# Section 19: pie_view hostile data inputs
+#
+# Strategy: Category names containing HTML metacharacters must be entity-encoded
+# in the slice output to prevent reflected XSS through data values.
+# ---------------------------------------------------------------------------
+
+subtest 'GET /pie -- XSS payload in category name does not crash the page' => sub {
+	eval { require HTML::D3 } or plan skip_all => 'HTML::D3 not available';
+
+	my $dir = tempdir(CLEANUP => 1);
+	# Category name contains an XSS payload.  HTML::D3 embeds data as JSON inside
+	# a <script> block; the label is rendered via D3's .text() (not innerHTML) so
+	# it does not execute as HTML.  The critical check is that the page loads (200)
+	# and the back-url mechanism does not reflect the payload as an executable href.
+	Mojo::File->new("$dir/xsscat.csv")->spurt(
+		"region,amount\n"
+		. "<script>alert(1)</script>,1000\n"
+		. "North,2000\n"
+	);
+	$t->get_ok(
+		'/pie?l=path:' . url_escape("$dir/xsscat.csv") . '&cat=region&val=amount'
+	)->status_is(200, 'XSS category name: page renders without crash')
+	 ->content_unlike(qr{href="javascript:}, 'javascript: scheme not in any href on XSS-category pie page');
+};
+
+subtest 'GET /pie -- all-zero amounts render pie without crash' => sub {
+	eval { require HTML::D3 } or plan skip_all => 'HTML::D3 not available';
+
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/zeroes.csv")->spurt(
+		"region,amount\nNorth,0\nSouth,0\nEast,0\n"
+	);
+	# D3 pie with all-zero values might render empty; the controller must not crash.
+	$t->get_ok(
+		'/pie?l=path:' . url_escape("$dir/zeroes.csv") . '&cat=region&val=amount'
+	)->status_is(200, 'all-zero amounts: page renders (200 or No plottable data, not 500)');
+};
+
+subtest 'GET /pie -- very long category name does not crash the page' => sub {
+	eval { require HTML::D3 } or plan skip_all => 'HTML::D3 not available';
+
+	my $dir = tempdir(CLEANUP => 1);
+	my $long_name = 'A' x 500;
+	Mojo::File->new("$dir/longcat.csv")->spurt(
+		"region,amount\n${long_name},9999\nNorth,1000\n"
+	);
+	$t->get_ok(
+		'/pie?l=path:' . url_escape("$dir/longcat.csv") . '&cat=region&val=amount'
+	)->status_is(200, '500-char category name: page renders without crash');
+};
+
+# ---------------------------------------------------------------------------
+# Section 20: export_write path traversal -- filename sanitisation
+#
+# Strategy: Confirm the export_write action strips path separators from the
+# filename param so an attacker cannot write to an arbitrary filesystem
+# location by supplying ../../etc/passwd.csv as the filename.
+# ---------------------------------------------------------------------------
+
+subtest 'POST /export -- filename with ../ is sanitized to basename only' => sub {
+	my $out_dir = tempdir(CLEANUP => 1);
+
+	# Attempt to write to ../../evil.csv by supplying a traversal filename.
+	$t->post_ok('/export', form => {
+		l        => 'table:sales',
+		dir      => $out_dir,
+		filename => '../../evil.csv',
+	})->status_is(200)
+	  ->json_has('/saved');
+
+	my $saved = $t->tx->res->json('/saved');
+	# The saved path must be inside $out_dir, not two levels up.
+	like $saved, qr{\Q$out_dir\E}, 'saved path is inside the requested output dir';
+	unlike $saved, qr{\.\.},       'saved path contains no .. components';
+};
+
+subtest 'POST /export -- absolute path as filename is stripped to basename' => sub {
+	my $out_dir = tempdir(CLEANUP => 1);
+	$t->post_ok('/export', form => {
+		l        => 'table:sales',
+		dir      => $out_dir,
+		filename => '/etc/cron.d/payload.csv',
+	})->status_is(200)
+	  ->json_has('/saved');
+
+	my $saved = $t->tx->res->json('/saved');
+	# Must land inside the specified output directory.
+	like $saved, qr{\Q$out_dir\E}, 'absolute-path filename written inside the output dir only';
+};
+
+# ---------------------------------------------------------------------------
+# Section 21: /combine hostile inputs
+#
+# Strategy: Verify graceful degradation when the left source is missing (404)
+# or a combined source is invalid (silently skipped).
+# ---------------------------------------------------------------------------
+
+subtest 'GET /combine -- missing l= param returns 404' => sub {
+	$t->get_ok('/combine')
+	  ->status_is(404, 'combine with no l= param returns 404');
+};
+
+subtest 'GET /combine -- invalid c= spec is silently skipped' => sub {
+	# combine_tables silently skips a c= spec that cannot be opened.
+	# The result must still return 200 with just the left table's data.
+	$t->get_ok(
+		'/combine?l=' . url_escape('table:sales')
+		. '&c=' . url_escape('path:/nonexistent/file.csv')
+	)->status_is(200, 'combine with invalid c= skips bad source gracefully')
+	 ->content_like(qr/Widget A/, 'left table data visible despite bad c= spec');
+};
+
+subtest 'GET /combine -- l= pointing to non-existent file returns 404' => sub {
+	$t->get_ok(
+		'/combine?l=' . url_escape('path:/nonexistent/missing.csv')
+	)->status_is(404, 'combine with non-existent left source returns 404');
+};
+
 done_testing();

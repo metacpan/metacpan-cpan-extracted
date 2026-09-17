@@ -26,6 +26,7 @@ include/sa/sa_peer.h
 include/sa/sa_rate.h
 include/sa/sa_ring.h
 include/sa/sa_scoreboard.h
+include/sa/sa_serialise.h
 include/sa/sa_time.h
 include/sa/sa_wake.h
 include/sa/sa_xop.h
@@ -77,6 +78,7 @@ t/34-cuckoo.t
 t/36-lease.t
 t/38-threads.t
 t/40-scoreboard.t
+t/42-serialise.t
 t/44-hll.t
 t/manifest.t
 t/pod-coverage.t

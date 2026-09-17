@@ -1,18 +1,15 @@
 package Database::BI;
 
-# FIXME: Don't use Spreadsheet::ParseXLXS files when
-#	Database::Abstraction is fixed
-
 use Mojo::Base 'Mojolicious', -strict, -signatures;
 
-use Carp	qw(croak);
-use CHI		();
-use File::Spec	();
+use Carp qw(croak);
+use CHI	();
+use File::Spec ();
 use Readonly;
 
 use Database::BI::Model::DataSource;
 
-our $VERSION = '0.006.0';
+our $VERSION = '0.007.0';
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -33,18 +30,20 @@ Database::BI - Web-based Business Intelligence viewer for flat data files
 
 =head1 VERSION
 
-0.006.0
+0.007.0
 
 =head1 DESCRIPTION
 
-C<Database::BI> is a self-contained L<Mojolicious> web application that reads arbitrary
-flat data files (CSV, PSV, SQLite, XML, etc.) via L<Database::Abstraction>
-and presents them as styled, sortable, reorderable HTML tables.
-It has no persistent database of its own,
-it reads arbitrary data files (CSV, PSV, SQLite, XML etc) presents each file as a styled, sortable, exportable HTML table.
+C<Database::BI> is a self-contained L<Mojolicious> web application that reads
+arbitrary flat data files (CSV, PSV, SQLite, XML, XLSX, etc.) via
+L<Database::Abstraction> and presents them as styled, sortable, reorderable
+HTML tables.  It has no persistent database of its own -- it reads your files
+on every request.
 
-Users navigate to pick a file, open the filesystem browser to navigate anywhere on disk, drag-and-drop files to upload, join multiple tables in memory, apply server-side filters, and export results as CSV, SQLite, or JSON.
-A D3.js line graph view plots any numeric column.
+Users navigate to pick a file, open the filesystem browser to navigate anywhere
+on disk, drag-and-drop files to upload, join multiple tables in memory, apply
+server-side filters, and export results as CSV, SQLite, or JSON.  D3.js
+visualisations (line chart, pie chart) are available from the toolbar.
 
 Key features:
 
@@ -52,49 +51,87 @@ Key features:
 
 =item *
 
-B<File picker> - the home page scans C<data_dir> and shows a card for
+B<File picker> -- the home page scans C<data_dir> and shows a card for
 every supported file.  Recently opened filesystem files appear in a
 "Recently opened" section powered by C<localStorage>.
 
 =item *
 
-B<Filesystem browser> - C</browse> lets the user navigate the entire
+B<Filesystem browser> -- C</browse> lets the user navigate the entire
 filesystem and open any supported data file, not just files in C<data_dir>.
 
 =item *
 
-B<Column sort and reorder> - clicking a header sorts the table; headers
+B<Column sort and reorder> -- clicking a header sorts the table; headers
 are draggable to reorder.  Both settings are persisted in C<localStorage>
 by column name and survive page reloads.
 
 =item *
 
-B<Left join> - the "Merge data / Filter results" panel on any table view
-lets the user join one or more additional tables on a shared key.  Every
-left row is kept; right-table columns are appended for matching rows.
+B<Left join> -- the "Merge data" panel on any table view lets the user
+join one or more additional tables on a shared key via L<Database::Join>.
+Every left row is kept; right-table columns are appended for matching rows.
+Multiple joins can be chained.
 
 =item *
 
-B<Result filters> - the same panel lets the user add filter conditions
-(column / operator / value) that are applied server-side after all joins.
-Operators: C<eq>, C<ne>, C<contains>, C<starts>, C<lt>, C<le>, C<gt>,
-C<ge>, C<empty>, C<notempty>.  Active filters are shown as chips in the
-toolbar with a one-click "Clear" link.
+B<Quick-filter bar> -- a column/operator/value row below the toolbar lets
+the user add filter conditions without opening any panel.  Pressing Enter
+applies the filter.  Each active filter chip has an individual remove (x)
+button so conditions can be dropped one at a time.  Operators: C<eq>,
+C<ne>, C<contains>, C<starts>, C<lt>, C<le>, C<gt>, C<ge>, C<empty>,
+C<notempty>.  Filters are applied server-side after all joins.
 
 =item *
 
-B<Drag-and-drop upload> - any supported data file can be dropped directly
-onto the application.  On the home page the file is opened immediately;
-when the join panel is open the dropped file populates the right-table
-path field.
+B<Combine (UNION ALL)> -- the "Combine data" panel stacks rows from a
+second (or further) file beneath the current rows, using a unified column
+set and leaving blanks where a source file lacks a column.
 
 =item *
 
-B<Export> - the toolbar on any view offers an export panel that writes
-the current logical view (after joins and filters) to a chosen filesystem
-path as CSV (C<.csv>) or SQLite (C<.sql>).
+B<Charts> -- the toolbar offers a line chart (L<HTML::D3>
+C<render_zoomable_line_chart_snippet>; brush-to-zoom, reference lines for
+min/avg/max) and a pie chart (C<render_pie_chart_snippet>; animated,
+sorted by value, capped at 12 slices, click-a-slice to filter the table).
+
+=item *
+
+B<Drag-and-drop upload> -- any supported data file can be dropped directly
+onto the application.  The file is opened immediately; when the "Combine
+data" panel is open the dropped file populates the right-table path field.
+
+=item *
+
+B<Export> -- the toolbar export panel writes the current logical view
+(after joins, filters, and dedup) to a chosen filesystem path as CSV
+(C<.csv>), SQLite (C<.sql>), or JSON (C<.json>).
+
+=item *
+
+B<URL import> -- C</import> fetches an HTML table from any public URL and
+renders it in the browser without saving to disk.
 
 =back
+
+=head2 UTF-8 and Encoding
+
+All file data is returned as Perl character strings.  CSV/PSV files are
+read by L<Text::xSV::Slurp> or L<DBD::CSV>, both of which pass bytes
+through without re-encoding; the application serves the resulting page as
+C<text/html; charset=UTF-8>, so full Unicode is displayed correctly as
+long as the source file itself is UTF-8.
+
+Filter values (C<f=col:op:val>) are decoded from the URL by Mojolicious
+before reaching the controller and are compared against cell values as
+Perl character strings.  Unicode characters in filter values are therefore
+supported transparently.
+
+URL-imported HTML tables are fetched with L<LWP::UserAgent::Cached>;
+L<Database::Abstraction> uses the page's own charset declaration to decode
+the body.  If the remote page declares an incorrect charset, cell values
+may contain mojibake -- this is a limitation of the source data, not the
+application.
 
 =head1 SYNOPSIS
 
@@ -217,6 +254,36 @@ where a source file lacks a column.  Parameters:
   c=<spec>               additional table to stack (repeatable)
   f=<col>:<op>:<val>     result filter applied after combining (repeatable)
 
+=item C<GET /graph>
+
+Renders a D3.js v7 zoomable line chart of any two columns.  Parameters:
+
+  l=<spec>    left table (required)
+  x=<col>     X-axis column name (required; any type, shown as labels)
+  y=<col>     Y-axis column name (required; must be numeric after stripping
+              currency symbols and commas; accounting-notation negatives like
+              (1,234.56) are handled automatically)
+  back=<url>  URL for the "Back to table" link (optional; default "/")
+  j=, f=, d=  pipeline params (same as /join)
+
+=item C<GET /pie>
+
+Renders a D3.js v7 animated pie chart grouped by a category column.
+Clicking a slice or legend entry navigates to the table view filtered to
+that category.  Parameters:
+
+  l=<spec>    left table (required)
+  cat=<col>   category column to group by (required)
+  val=<col>   numeric column to sum per category (required)
+  donut=1     show a hole in the centre (optional)
+  back=<url>  URL for the "Back to table" link (optional; default "/")
+  f=          result filters applied before aggregating (repeatable)
+
+=item C<POST /uploads/clear>
+
+Deletes every file from the C<.uploads/> staging directory.  Returns JSON
+C<{ "freed": <bytes>, "count": <n> }>.  No request body is needed.
+
 =back
 
 =head1 CONFIGURATION
@@ -307,18 +374,16 @@ implemented.
 
 =item *
 
-The left-join engine (C<Dashboard::_left_join>) is an in-memory O(n*m)
-hash join.  It is suitable for BI files that fit comfortably in RAM.
-For very large files, replace the C<open_table> helper body with a
-C<Database::Join> instance (Phase 2) without changing the controller.
+Multi-table left joins are performed in memory by L<Database::Join>.  All
+component tables are fetched into RAM before the merge; this is not
+suitable for files that do not fit in the process's available memory.
 
 =item *
 
-On startup, C<Database::BI> automatically evicts upload subdirectories whose
-modification time is older than 24 hours.  Uploads created during the current
-or recent server sessions are preserved.  Users may also trigger an immediate
-full purge (regardless of age) via the "Clear upload cache" button, which
-posts to C<POST /uploads/clear>.
+Upload staging is managed automatically.  On every server startup,
+C<Database::BI> evicts upload subdirectories whose modification time is
+older than 24 hours.  The "Clear upload cache" button (C<POST
+/uploads/clear>) triggers an immediate full purge regardless of age.
 
 =item *
 
@@ -429,6 +494,7 @@ sub startup ($self) {
 	$r->post('/upload')->to('Dashboard#upload_file');
 	$r->post('/uploads/clear')->to('Dashboard#clear_uploads');
 	$r->get('/graph')->to('Dashboard#graph_view');
+	$r->get('/pie')->to('Dashboard#pie_view');
 
 	# Evict stale upload subdirectories on every startup so the cache cannot
 	# grow unboundedly across server restarts.  Only entries whose mtime is

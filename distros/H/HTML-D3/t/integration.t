@@ -738,4 +738,223 @@ subtest 'on-load drawing animations present in animated chart methods' => sub {
 	like($line_html, qr/\.delay\(1500\)/,           'animated line: circles delayed to after line draw');
 };
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 17. Separator option: cross-method consistency and object independence
+#
+# All three pie chart methods accept an optional separator key (default '/').
+# The separator is interpolated into JavaScript source (template literal for
+# full-page methods; string concatenation for the snippet).  This subtest
+# verifies that:
+#   (a) the default '/' appears in all three methods without any opts;
+#   (b) a custom separator propagates to all three and replaces the default;
+#   (c) two simultaneously-live chart objects with different separators do not
+#       bleed state into each other.
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'separator option propagates consistently across all three pie methods' => sub {
+	my $chart = HTML::D3->new(width => 800, height => 600, title => 'Sep Suite');
+
+	# Default separator '/' must appear in every legend generator.
+	# Full-page: the separator sits in a JS template literal:
+	#   .text(d => `${d.data.label} / ${d.data.value}`)
+	# Snippet: the separator sits in JS string concatenation:
+	#   d.data.label + ' / ' + fmt(...)
+	my $pie_html  = $chart->render_pie_chart(\@SIMPLE_DATA);
+	my $anim_html = $chart->render_animated_pie_chart(\@SIMPLE_DATA);
+	my $snip_html = $chart->render_pie_chart_snippet(\@SIMPLE_DATA)->{html};
+
+	like($pie_html,  qr/d\.data\.label} \/ \$\{d\.data\.value}/, 'pie: default / in SVG legend JS');
+	like($anim_html, qr/d\.data\.label} \/ \$\{d\.data\.value}/, 'animated pie: default / in SVG legend JS');
+	like($snip_html, qr/d\.data\.label \+ ' \/ '/,               'snippet: default / in HTML legend JS');
+
+	# Custom separator '|' must replace the default across all three.
+	my $pie_bar  = $chart->render_pie_chart(\@SIMPLE_DATA,          { separator => '|' });
+	my $anim_bar = $chart->render_animated_pie_chart(\@SIMPLE_DATA, { separator => '|' });
+	my $snip_bar = $chart->render_pie_chart_snippet(\@SIMPLE_DATA,  { separator => '|' })->{html};
+
+	like($pie_bar,  qr/d\.data\.label} \| \$\{d\.data\.value}/, 'pie: custom | in SVG legend JS');
+	like($anim_bar, qr/d\.data\.label} \| \$\{d\.data\.value}/, 'animated pie: custom | in SVG legend JS');
+	like($snip_bar, qr/d\.data\.label \+ ' \| '/,               'snippet: custom | in HTML legend JS');
+
+	unlike($pie_bar,  qr/d\.data\.label} \/ /, 'pie: default / absent when overridden with |');
+	unlike($anim_bar, qr/d\.data\.label} \/ /, 'animated pie: default / absent when overridden');
+	unlike($snip_bar, qr/d\.data\.label \+ ' \/ '/, 'snippet: default / absent when overridden');
+
+	# Object independence: simultaneous objects with different separators must
+	# not leak state into each other's output.
+	my $c1 = HTML::D3->new(width => 800, height => 600, title => 'C1');
+	my $c2 = HTML::D3->new(width => 800, height => 600, title => 'C2');
+
+	my $h1 = $c1->render_pie_chart(\@SIMPLE_DATA, { separator => '/' });
+	my $h2 = $c2->render_pie_chart(\@SIMPLE_DATA, { separator => ':' });
+
+	like($h1,   qr/d\.data\.label} \/ \$\{d\.data\.value}/, 'c1: / separator in output');
+	unlike($h1, qr/d\.data\.label} : /,                     'c1: no : bleed from c2');
+	like($h2,   qr/d\.data\.label} : \$\{d\.data\.value}/, 'c2: : separator in output');
+	unlike($h2, qr/d\.data\.label} \/ /,                    'c2: no / bleed from c1');
+
+	# Snippets must also be independent.
+	my $s1 = $c1->render_pie_chart_snippet(\@SIMPLE_DATA, { separator => '/' })->{html};
+	my $s2 = $c2->render_pie_chart_snippet(\@SIMPLE_DATA, { separator => ':' })->{html};
+
+	like($s1,   qr/d\.data\.label \+ ' \/ '/, 'c1 snippet: / in legend JS');
+	unlike($s1, qr/d\.data\.label \+ ' : '/, 'c1 snippet: no : bleed from c2');
+	like($s2,   qr/d\.data\.label \+ ' : '/, 'c2 snippet: : in legend JS');
+	unlike($s2, qr/d\.data\.label \+ ' \/ '/, 'c2 snippet: no / bleed from c1');
+
+	# The separator opt must not affect any other output: pie/arc/scheme markers
+	# must still be present regardless of which separator is chosen.
+	like($pie_bar, qr/d3\.pie\(\)/,          'custom-sep pie: d3.pie() unaffected');
+	like($anim_bar, qr/attrTween/,           'custom-sep animated pie: attrTween unaffected');
+	like($snip_bar, qr/d3\.schemeTableau10/, 'custom-sep snippet: scheme unaffected');
+
+	diag("pie_bar length: " . length($pie_bar)) if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 18. render_pie_chart_snippet: full opts suite and combined workflows
+#
+# Each opt is exercised in isolation first; then a realistic production
+# workflow combining animated + donut + max_slices + custom separator is
+# run end-to-end to verify the opts do not interfere with each other.
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_pie_chart_snippet opts combine without interference' => sub {
+	my $chart = HTML::D3->new(width => 800, height => 600, title => 'Opts Suite');
+
+	# animated => 1: fan animation markers must all be present.
+	my $anim_html = $chart->render_pie_chart_snippet(\@SIMPLE_DATA, { animated => 1 })->{html};
+	like($anim_html, qr/attrTween/,             'animated: attrTween fan animation present');
+	like($anim_html, qr/initialDrawDone/,        'animated: initialDrawDone guard present');
+	like($anim_html, qr/prefers-reduced-motion/, 'animated: prefers-reduced-motion respected');
+	unlike($anim_html, qr/<!DOCTYPE/i,           'animated: still a fragment, no DOCTYPE');
+
+	# animated => 0 (explicit): no animation artefacts.
+	my $plain_html = $chart->render_pie_chart_snippet(\@SIMPLE_DATA, { animated => 0 })->{html};
+	unlike($plain_html, qr/attrTween/,      'plain: no attrTween');
+	unlike($plain_html, qr/initialDrawDone/, 'plain: no initialDrawDone');
+
+	# donut => 1: innerRadius calculation must appear; fmt(total) shown in centre.
+	my $donut_html = $chart->render_pie_chart_snippet(\@SIMPLE_DATA, { donut => 1 })->{html};
+	like($donut_html, qr/innerRadius/,      'donut: innerRadius present');
+	like($donut_html, qr/radius \* 0\.38/, 'donut: inner radius set to 38% of outer');
+	like($donut_html, qr/fmt\(total\)/,    'donut: total label rendered in centre hole');
+
+	# sort_slices => 'value': highest-value slice first in the embedded JSON array.
+	# SIMPLE_DATA values: January=1000, February=1200, March=950
+	# Descending sort: February(1200), January(1000), March(950)
+	my $sorted_html = $chart->render_pie_chart_snippet(
+		\@SIMPLE_DATA, { sort_slices => 'value' }
+	)->{html};
+	my ($first_label) = ($sorted_html =~ /"label":"([^"]+)"/);
+	is($first_label, 'February', 'sort_slices value: highest-value slice is first in JSON');
+
+	# sort_slices => 'label': alphabetical order (January, February, March → Feb, Jan, Mar).
+	my $alpha_html = $chart->render_pie_chart_snippet(
+		\@SIMPLE_DATA, { sort_slices => 'label' }
+	)->{html};
+	my ($first_alpha) = ($alpha_html =~ /"label":"([^"]+)"/);
+	is($first_alpha, 'February', 'sort_slices label: alphabetically first slice is first');
+
+	# max_slices => 2 with 3-item dataset: top-1 slice + "Other" = 2 slices in JSON.
+	my $max_html = $chart->render_pie_chart_snippet(\@SIMPLE_DATA, { max_slices => 2 })->{html};
+	my @max_labels = ($max_html =~ /"label":"([^"]+)"/g);
+	is(scalar @max_labels, 2,       'max_slices 2: exactly 2 slices in JSON');
+	ok((grep { $_ eq 'Other' } @max_labels), 'max_slices 2: "Other" aggregation slice present');
+
+	# color_scheme => 'set2': the SCHEMES lookup must use 'set2'.
+	my $scheme_html = $chart->render_pie_chart_snippet(
+		\@SIMPLE_DATA, { color_scheme => 'set2' }
+	)->{html};
+	like($scheme_html,   qr/SCHEMES\['set2'\]/,     'color_scheme set2: correct key in SCHEMES lookup');
+	unlike($scheme_html, qr/SCHEMES\['tableau10'\]/, 'color_scheme set2: default tableau10 not used');
+
+	# legend => 0: the D3 legend builder JS and the legend div must both be absent.
+	my $no_leg_html = $chart->render_pie_chart_snippet(\@SIMPLE_DATA, { legend => 0 })->{html};
+	unlike($no_leg_html, qr/selectAll\(".bi-pie-legend-entry"\)/, 'legend => 0: no legend JS');
+	unlike($no_leg_html, qr/id="pie_chart_legend"/,               'legend => 0: no legend div');
+
+	# Combined workflow: animated + donut + max_slices + custom separator.
+	# A production dashboard might use all of these together; they must coexist.
+	my $combo = $chart->render_pie_chart_snippet(
+		\@SIMPLE_DATA,
+		{ animated => 1, donut => 1, max_slices => 2, separator => ':' }
+	)->{html};
+
+	like($combo, qr/attrTween/,              'combo: animation present');
+	like($combo, qr/innerRadius/,            'combo: donut inner radius present');
+	like($combo, qr/d\.data\.label \+ ' : '/, 'combo: custom : separator in legend JS');
+	my @combo_labels = ($combo =~ /"label":"([^"]+)"/g);
+	is(scalar @combo_labels, 2, 'combo: max_slices collapses to 2 slices in JSON');
+	ok((grep { $_ eq 'Other' } @combo_labels), 'combo: "Other" slice present');
+	unlike($combo, qr/<!DOCTYPE/i, 'combo: still a fragment regardless of opts');
+
+	# Verify the combined output still has core D3 structure.
+	like($combo, qr/d3\.pie\(\)/,  'combo: d3.pie() still present');
+	like($combo, qr/d3\.arc\(\)/, 'combo: d3.arc() still present');
+
+	diag("combo output length: " . length($combo)) if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 19. render_zoomable_line_chart_snippet: animated => 1 end-to-end workflow
+#
+# With animated => 1 the snippet adds a stroke-dashoffset initial-draw
+# animation guarded by initialDrawDone so subsequent zoom/reset redraws are
+# never re-animated.  The default (no opts) must produce a plain snippet
+# with no animation markers but full zoom functionality intact.
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_zoomable_line_chart_snippet animated workflow' => sub {
+	my $chart = HTML::D3->new(width => 800, height => 600, title => 'Zoom Anim');
+
+	# Default (omitted opts): no animation markers; zoom must still work.
+	my $plain = $chart->render_zoomable_line_chart_snippet(\@SIMPLE_DATA);
+	my $plain_html = $plain->{html};
+
+	unlike($plain_html, qr/stroke-dashoffset/, 'default: no stroke-dashoffset');
+	unlike($plain_html, qr/initialDrawDone/,    'default: no initialDrawDone guard');
+	like($plain_html,   qr/d3\.brushX\(\)/,     'default: brush-to-zoom present');
+	is($plain->{svg_id}, 'chart',               'default: svg_id is "chart"');
+
+	# Explicit animated => 0: identical to the default.
+	my $explicit_plain_html = $chart->render_zoomable_line_chart_snippet(
+		\@SIMPLE_DATA, { animated => 0 }
+	)->{html};
+	unlike($explicit_plain_html, qr/stroke-dashoffset/, 'explicit 0: no stroke-dashoffset');
+	unlike($explicit_plain_html, qr/initialDrawDone/,   'explicit 0: no initialDrawDone');
+
+	# animated => 1: all animation markers must be present alongside zoom.
+	my $anim = $chart->render_zoomable_line_chart_snippet(\@SIMPLE_DATA, { animated => 1 });
+	my $anim_html = $anim->{html};
+
+	like($anim_html, qr/stroke-dashoffset/,    'animated: stroke-dashoffset draw-on present');
+	like($anim_html, qr/initialDrawDone/,       'animated: initialDrawDone guard present');
+	like($anim_html, qr/prefers-reduced-motion/,'animated: prefers-reduced-motion respected');
+	like($anim_html, qr/d3\.easeLinear/,        'animated: d3.easeLinear easing present');
+	# Zoom must coexist with the draw animation.
+	like($anim_html, qr/d3\.brushX\(\)/,        'animated: brush-to-zoom still present');
+	is($anim->{svg_id}, 'chart',                'animated: svg_id unchanged ("chart")');
+
+	# Fragment isolation: no page-shell elements regardless of animation flag.
+	unlike($anim_html, qr/<!DOCTYPE/i, 'animated: no DOCTYPE');
+	unlike($anim_html, qr/<html/i,     'animated: no <html>');
+	unlike($anim_html, qr/<head/i,     'animated: no <head>');
+	unlike($anim_html, qr/${\$D3_CDN}/, 'animated: no D3 CDN tag (caller loads D3)');
+
+	# Object independence: animated and plain zoomable snippets from separate
+	# objects must not bleed animation state into each other.
+	my $c1 = HTML::D3->new(width => 800, height => 600, title => 'C1');
+	my $c2 = HTML::D3->new(width => 800, height => 600, title => 'C2');
+
+	my $h1 = $c1->render_zoomable_line_chart_snippet(\@SIMPLE_DATA, { animated => 1 })->{html};
+	my $h2 = $c2->render_zoomable_line_chart_snippet(\@SIMPLE_DATA)->{html};
+
+	like($h1,   qr/stroke-dashoffset/, 'c1 animated: stroke-dashoffset present');
+	unlike($h2, qr/stroke-dashoffset/, 'c2 plain: no stroke-dashoffset bleed from c1');
+	like($h2,   qr/d3\.brushX\(\)/,   'c2 plain: zoom still intact');
+
+	diag("anim html length: " . length($anim_html)) if $ENV{TEST_VERBOSE};
+};
+
 done_testing();

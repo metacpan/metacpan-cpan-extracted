@@ -146,7 +146,7 @@ static sa_hash *sa_abi_map_open(sa_region *r, const char *name, size_t nlen,
     e = sa_carve(r, name, nlen, sa_hash_bytes(slots, slot_size),
                  SA_T_MAP, err);
     if (!e) return NULL;
-    return sa_hash_bind(r, e, slots, slot_size, err);
+    return sa_hash_bind(r, e, slots, slot_size, SA_SER_ANY, err);
 }
 
 static void sa_abi_map_counts(const sa_hash *m, sa_map_counts *out) {
@@ -248,7 +248,7 @@ static sa_cache *sa_abi_cache_open(sa_region *r, const char *name, size_t nlen,
     e = sa_carve(r, name, nlen, sa_cache_bytes(nbuckets, ways, entry_size),
                  SA_T_CACHE, err);
     if (!e) return NULL;
-    return sa_cache_bind(r, e, nbuckets, ways, entry_size, err);
+    return sa_cache_bind(r, e, nbuckets, ways, entry_size, SA_SER_ANY, err);
 }
 
 static void sa_abi_cache_counts(sa_cache *c, sa_cache_counts *out) {

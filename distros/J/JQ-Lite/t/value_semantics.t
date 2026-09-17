@@ -15,7 +15,8 @@ is(JQ::Lite::Value::type_of('ten'), 'string', 'classifies strings');
 is(JQ::Lite::Value::type_of([]), 'array', 'classifies arrays');
 is(JQ::Lite::Value::type_of({}), 'object', 'classifies objects');
 
-my $decoded_number = JSON::PP::decode_json('10');
+# Older JSON::PP releases reject scalar documents unless allow_nonref is set.
+my $decoded_number = JSON::PP->new->allow_nonref->decode('10');
 my $stringified_number = "$decoded_number";
 is($stringified_number, '10', 'decoded number is stringified before classification');
 is(JQ::Lite::Value::type_of($decoded_number), 'number',

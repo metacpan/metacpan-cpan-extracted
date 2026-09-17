@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "NetAddr-MAC",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "NetAddr::MAC",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

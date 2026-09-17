@@ -36,6 +36,11 @@ static HV *pk_selftest_event(pTHX_ SV *c, const char *kind) {
     SV *mt = A->match_of(aTHX_ c);
 
     (void)hv_stores(e, "kind",      newSVpv(kind, 0));
+    /* v5. Not "is it set" but "is it THIS ONE": an observer that is handed a
+     * context and a current_of that names a different one is the failure the
+     * member exists to make impossible, and only an identity check sees it. */
+    (void)hv_stores(e, "current_is_c",
+                    newSViv(A->current_of(aTHX) == c ? 1 : 0));
     (void)hv_stores(e, "route",     rp ? newSVsv(rp) : newSV(0));
     (void)hv_stores(e, "operation", op ? newSVsv(op) : newSV(0));
     (void)hv_stores(e, "has_env",   newSViv(en ? 1 : 0));

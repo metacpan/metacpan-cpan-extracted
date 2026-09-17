@@ -21,6 +21,32 @@ static struct { pk_abi_res_cb cb; void *ud; }
 static int PK_OBS_REQ_N = 0;
 static int PK_OBS_RES_N = 0;
 
+/* The context of the dispatch frame running right now, or NULL. Borrowed: the
+ * frame that set it holds a reference for the whole time it is readable.
+ *
+ * Saved and restored around that frame, never merely cleared - which is the
+ * property the v5 note in pk_abi.h turns on. pk_cur_set is what the dispatcher
+ * calls once the context exists; pk_cur_restore is what the save stack calls
+ * on the way out, by either exit. */
+static SV *PK_CURRENT = NULL;
+
+static void pk_cur_set(pTHX_ SV *c) {
+    PERL_UNUSED_CONTEXT;
+    PK_CURRENT = c;
+}
+
+static SV *pk_cur_get(pTHX) {
+    PERL_UNUSED_CONTEXT;
+    return PK_CURRENT;
+}
+
+/* The save-stack destructor. `p` is the value to put back, so a mounted
+ * application inside another restores the outer context rather than NULL. */
+static void pk_cur_restore(pTHX_ void *p) {
+    PERL_UNUSED_CONTEXT;
+    PK_CURRENT = (SV *)p;
+}
+
 /* Registering either kind makes the dispatcher build the context before
  * routing, so a response observer is handed the same context the request
  * observer saw whatever answered the request. One int to test on the hot
@@ -85,8 +111,17 @@ static int pk_obs_add_query(pTHX_ pk_abi_query_cb start,
 static void *pk_obs_query_start(pTHX_ SV *sql, int nbind) {
     pk_obs_qtokens *t;
     STRLEN sl = 0;
-    const char *sp = (sql && SvOK(sql)) ? SvPV_const(sql, sl) : "";
+    const char *sp;
     int i;
+    /* SvOK DOES NOT APPLY GET MAGIC. A statement text read straight out of a
+     * DBI handle - $sth->{Statement} - has no value in it until magic has
+     * run, so testing SvOK first takes the "" branch and hands every observer
+     * an empty statement, while a copy of the same value through a lexical
+     * works. Punk::DBI now forces magic before it gets here, so this is the
+     * belt and not the braces; it stays because the guard is wrong without
+     * it and the next caller will not know that. */
+    if (sql) SvGETMAGIC(sql);
+    sp = (sql && SvOK(sql)) ? SvPV_nomg_const(sql, sl) : "";
     if (!PK_OBS_QRY_N) return NULL;
     Newxz(t, 1, pk_obs_qtokens);
     t->n = PK_OBS_QRY_N;

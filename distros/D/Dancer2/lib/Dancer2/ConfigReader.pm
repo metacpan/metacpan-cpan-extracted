@@ -1,6 +1,6 @@
 # ABSTRACT: Config reader for Dancer2 App
 package Dancer2::ConfigReader;
-$Dancer2::ConfigReader::VERSION = '2.1.0';
+$Dancer2::ConfigReader::VERSION = '2.2.0';
 use Moo;
 
 use Config::Any;
@@ -399,7 +399,7 @@ Dancer2::ConfigReader - Config reader for Dancer2 App
 
 =head1 VERSION
 
-version 2.1.0
+version 2.2.0
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Punk::OpenTelemetry', $VERSION);

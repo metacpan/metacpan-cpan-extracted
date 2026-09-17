@@ -2,7 +2,12 @@
 
 MODULE = Shared::Arena    PACKAGE = Shared::Arena    PREFIX = sar_
 
-# $arena->cache($name, capacity => N, ways => 8, entry_size => N)
+# $arena->cache($name, capacity => N, ways => 8, entry_size => N,
+#               serialise => 0)
+#
+# `serialise` is part of the cache's SHAPE, kept in the shared header: every
+# process binding it must ask for the same thing, and one that does not is
+# refused as a different entry_size would be.
 SV *
 sar_cache(self, name, ...)
         SV *self
@@ -15,7 +20,7 @@ sar_cache(self, name, ...)
         STRLEN nlen;
         UV capacity = 1024, ways = 8, entry = 512;
         uint64_t nbuckets;
-        int err = SA_E_OK;
+        int err = SA_E_OK, serialise = 0;
         I32 i;
         SV *obj;
     CODE:
@@ -28,6 +33,7 @@ sar_cache(self, name, ...)
             if      (strEQ(o, "capacity"))   capacity = SvUV(ST(i + 1));
             else if (strEQ(o, "ways"))       ways     = SvUV(ST(i + 1));
             else if (strEQ(o, "entry_size")) entry    = SvUV(ST(i + 1));
+            else if (strEQ(o, "serialise"))  serialise = SvTRUE(ST(i + 1)) ? 1 : 0;
         }
         if (ways < SA_CACHE_MIN_WAYS) ways = SA_CACHE_MIN_WAYS;
         if (ways > SA_CACHE_MAX_WAYS) ways = SA_CACHE_MAX_WAYS;
@@ -43,7 +49,7 @@ sar_cache(self, name, ...)
         if (!e) croak("Shared::Arena: the cache '%s' %s", nm, sa_strerror(err));
 
         c = sa_cache_bind(arena, e, nbuckets, (uint32_t)ways, (uint32_t)entry,
-                          &err);
+                          serialise, &err);
         if (!c) croak("Shared::Arena: the cache '%s' %s", nm, sa_strerror(err));
 
         obj = newSV(0);
@@ -58,6 +64,10 @@ MODULE = Shared::Arena    PACKAGE = Shared::Arena::Cache    PREFIX = sac_
 
 # 1 when stored, -1 when the pair does not fit an entry. There is no "full":
 # that is the whole difference between this and a map.
+#
+# On a serialised cache the value is encoded first, and one whose encoding
+# does not fit is the same -1. A value that cannot be encoded croaks and stores
+# nothing.
 IV
 sac_set(self, key, value, ...)
         SV *self
@@ -69,11 +79,15 @@ sac_set(self, key, value, ...)
         STRLEN klen, vlen;
         UV ttl = 0;
         I32 i;
+        char sbuf[SA_SER_STACK];
     CODE:
         c = SA_SELF(sa_cache, self);
         if (!c) croak("Shared::Arena::Cache: this cache is released");
         k = SvPV(key, klen);
-        v = SvPV(value, vlen);
+        if (c->serialise)
+            vlen = sa_ser_encode(aTHX_ value, c->pair_max, klen, sbuf, &v);
+        else
+            v = SvPV(value, vlen);
         for (i = 3; i + 1 < items; i += 2) {
             const char *o = SvPV_nolen(ST(i));
             /* seconds, because that is what a caller thinks in; milliseconds
@@ -81,7 +95,9 @@ sac_set(self, key, value, ...)
             if      (strEQ(o, "ttl"))    ttl = (UV)(SvNV(ST(i + 1)) * 1000.0);
             else if (strEQ(o, "ttl_ms")) ttl = SvUV(ST(i + 1));
         }
-        RETVAL = sa_cache_set(c, k, (uint32_t)klen, v, (uint32_t)vlen,
+        RETVAL = (c->serialise && !vlen)
+               ? SA_C_TOOBIG
+               : sa_cache_set(c, k, (uint32_t)klen, v, (uint32_t)vlen,
                               (uint64_t)ttl);
     OUTPUT:
         RETVAL
@@ -108,10 +124,17 @@ sac_get(self, key)
          * nothing and a hit allocates what the value needs rather than the
          * most an entry could hold, which a caller keeping the value would
          * otherwise carry for its life. */
+        /* On a serialised cache the copy is decoded from wherever it landed,
+         * and the answer goes through ST(0), which is reached from `ax` and
+         * survives a decode that grew the value stack. */
         if (c->pair_max < sizeof buf) {
             rc = sa_cache_get(c, k, (uint32_t)klen, buf,
                               (uint32_t)c->pair_max, &vlen);
             if (rc != SA_C_HIT) XSRETURN_EMPTY;
+            if (c->serialise) {
+                ST(0) = SA_SER_DECODE(buf, vlen);
+                XSRETURN(1);
+            }
             XPUSHs(sv_2mortal(newSVpvn(buf, (STRLEN)vlen)));
         }
         else {
@@ -120,6 +143,10 @@ sac_get(self, key)
             rc = sa_cache_get(c, k, (uint32_t)klen, SvPVX(out),
                               (uint32_t)c->pair_max, &vlen);
             if (rc != SA_C_HIT) XSRETURN_EMPTY;
+            if (c->serialise) {
+                ST(0) = SA_SER_DECODE(SvPVX(out), vlen);
+                XSRETURN(1);
+            }
             SvCUR_set(out, (STRLEN)vlen);
             SvPVX(out)[vlen] = '\0';
             XPUSHs(out);
@@ -209,3 +236,48 @@ sac_DESTROY(self)
     CODE:
         c = SA_SELF(sa_cache, self);
         if (c) { sa_cache_free(c); sv_setiv(SvRV(self), 0); }
+
+# Whether this cache was made with serialise => 1.
+int
+sac_serialised(self)
+        SV *self
+    PREINIT:
+        sa_cache *c;
+    CODE:
+        c = SA_SELF(sa_cache, self);
+        if (!c) croak("Shared::Arena::Cache: this cache is released");
+        RETVAL = c->serialise ? 1 : 0;
+    OUTPUT:
+        RETVAL
+
+MODULE = Shared::Arena    PACKAGE = Shared::Arena
+
+BOOT:
+{
+    /* Struct::Codec's table, on the same terms as Frozen's in xs/frozen.xs:
+     * fetched once, `>=` against what this file was compiled with, and a
+     * refusal here rather than a null entry at the first serialised set. The
+     * VALUE call_pv returned, read back after SPAGAIN, and SvUV rather than
+     * SvIV: an address is unsigned. */
+    SV *scp;
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    PUTBACK;
+    call_pv("Struct::Codec::_abi_ptr", G_SCALAR);
+    SPAGAIN;
+    scp = POPs;
+    SA_SC = INT2PTR(const sc_abi *, SvUV(scp));
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    if (!SA_SC)
+        croak("Shared::Arena: Struct::Codec gave no ABI table");
+    if (SA_SC->abi_version < SC_ABI_VERSION)
+        croak("Shared::Arena needs Struct::Codec ABI %d or newer, and the "
+              "Struct::Codec that is installed publishes %d. Upgrade "
+              "Struct::Codec.",
+              (int)SC_ABI_VERSION, (int)SA_SC->abi_version);
+}

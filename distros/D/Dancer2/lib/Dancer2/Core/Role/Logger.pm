@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::Logger;
 # ABSTRACT: Role for logger engines
-$Dancer2::Core::Role::Logger::VERSION = '2.1.0';
+$Dancer2::Core::Role::Logger::VERSION = '2.2.0';
 use Dancer2::Core::Types;
 
 use Moo::Role;
@@ -204,7 +204,7 @@ Dancer2::Core::Role::Logger - Role for logger engines
 
 =head1 VERSION
 
-version 2.1.0
+version 2.2.0
 
 =head1 DESCRIPTION
 
@@ -263,10 +263,6 @@ PID
 
 log level
 
-=item %D
-
-timer
-
 =item %m
 
 message
@@ -296,6 +292,11 @@ timer formatted with a valid time format
 header value
 
 =back
+
+A format character that is not in the list above (whether mistyped or simply
+unsupported) is not fatal: it produces a C<Carp> warning of the form
+C<< %X not supported. >> and the field renders as C<->, leaving the rest of
+the log line intact.
 
 =head2 log_level
 

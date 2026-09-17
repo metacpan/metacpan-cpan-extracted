@@ -61,6 +61,24 @@ _abi_selftest_events()
     OUTPUT:
         RETVAL
 
+# v5 current_of, read THROUGH the table. Returns the context of the dispatch
+# frame running right now, or undef.
+#
+# A copy of the reference, not the context: the test compares what it addresses
+# (refaddr) against the $c its handler was given, which is the only check that
+# tells "the current context" apart from "a current context".
+SV *
+_abi_current()
+    CODE:
+    {
+        const pk_abi *A = INT2PTR(const pk_abi *, PTR2IV(&PK_ABI));
+        SV *c = (A && A->abi_version >= 5) ? A->current_of(aTHX) : NULL;
+        if (!c) XSRETURN_UNDEF;
+        RETVAL = newSVsv(c);
+    }
+    OUTPUT:
+        RETVAL
+
 # v2 on_query: (starts, dones, ok, nbind, sql) since load.
 void
 _abi_selftest_queries()

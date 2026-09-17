@@ -1,0 +1,4 @@
+---
+distro: Perl-Critic-Policy-RegularExpressions-PreventUselessMetacharacterEscapes
+version: 1.000
+author_path: T/TE/TEODESIAN/Perl-Critic-Policy-RegularExpressions-PreventUselessMetacharacterEscapes-1.000.tar.gz

@@ -1,0 +1,15 @@
+# What is not shipped. REGEXES, not globs.
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib$
+^MYMETA\.
+^MANIFEST\.bak$
+^Install/
+\.o$
+\.bs$
+^Balls\.c$
+^Physics-Balls-
+\.tar\.gz$
+^\.git
+~$

@@ -7,7 +7,7 @@ use Punk::OpenTelemetry ();
 use Punk::OpenTelemetry::Encode ();
 use Fetch ();          # the default user agent, constructed from C by name
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 # All of it is C (include/otel_export.h + xs/exporter.xs). The `use` lines
 # above are load-bearing: the XS reaches Fetch and the encoders BY NAME.

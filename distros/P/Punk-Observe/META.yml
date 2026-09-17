@@ -31,5 +31,5 @@ requires:
   Punk::OpenTelemetry: '0.08'
   Punk::Queue: '0.04'
   perl: '5.010000'
-version: '0.07'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

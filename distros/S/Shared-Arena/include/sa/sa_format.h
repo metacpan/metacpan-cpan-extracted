@@ -46,8 +46,12 @@
 /* Bumped to 2 for 0.03: the map's slot layout changed (a per-key `expires`
  * field), so a 0.02 and a 0.03 build sharing one NAMED arena would read each
  * other's map slots at the wrong stride. The layout number is checked at attach
- * exactly so that disagreement FAILS OPEN rather than silently misreading. */
-#define SA_LAYOUT_VERSION 2
+ * exactly so that disagreement FAILS OPEN rather than silently misreading.
+ *
+ * Bumped to 3 for 0.08: the map and cache headers carry a `serialise` flag,
+ * which moves the map's lock stripes. A 0.07 build attaching a 0.08 arena would
+ * lock on the wrong bytes, so it is refused at the door instead. */
+#define SA_LAYOUT_VERSION 3
 #define SA_ENDIAN_PROBE   0x01020304u
 
 #define SA_ALIGN          16            /* every carved region starts here  */
@@ -200,6 +204,14 @@ static uint64_t sa_peers_offset(uint32_t reg_max) {
 #define SA_E_FULL   (-12)
 #define SA_E_NOATOMICS (-13)
 #define SA_E_SHAPE  (-14)
+
+/* What a bind asks about a map's or a cache's values: 0 for opaque bytes, 1 for
+ * Struct::Codec's encoding, and SA_SER_ANY to take whatever the tenant already
+ * is (creating it as bytes). The answer lives in the SHARED tenant header, so a
+ * process asking for the other one is refused with SA_E_SHAPE: a cache one
+ * process treats as encoded and another as bytes is two caches that disagree
+ * about every value. */
+#define SA_SER_ANY (-1)
 
 static const char *sa_strerror(int rc) {
     switch (rc) {

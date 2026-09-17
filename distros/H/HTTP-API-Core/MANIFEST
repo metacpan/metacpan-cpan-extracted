@@ -11,10 +11,14 @@ docs/IDEMPOTENCY.md
 docs/MIGRATION_FROM_HTTP_API_CLIENT.md
 docs/PAGINATION.md
 docs/RATE_LIMIT.md
+docs/REAL_API_EXAMPLES.md
 docs/RELEASING.md
 docs/RESPONSE.md
 docs/RETRY.md
 docs/TRANSPORT.md
+examples/HTTP/API/Core/Example/Cloudflare.pm
+examples/HTTP/API/Core/Example/GitHub.pm
+examples/HTTP/API/Core/Example/Slack.pm
 lib/HTTP/API/Core.pm
 lib/HTTP/API/Core/Auth.pm
 lib/HTTP/API/Core/Error.pm
@@ -37,6 +41,7 @@ t/public-api.t
 t/query.t
 t/rate-limit-contract.t
 t/rate-limit.t
+t/real-api-examples.t
 t/release-metadata.t
 t/release-version.t
 t/response.t

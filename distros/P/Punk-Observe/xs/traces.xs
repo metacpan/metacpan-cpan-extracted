@@ -93,7 +93,7 @@ pot_analyse(SV *specs)
                         for (i = 0; i < t.n; i++) {
                             HV *h = newHV();
                             hv_stores(h, "span_id", po_u64_to_sv(w.s[i].span_id));
-                            hv_stores(h, "parent",  newSViv((IV)t.parent[i]));
+                            hv_stores(h, "parent_index", newSViv((IV)t.parent[i]));
                             hv_stores(h, "depth",   newSViv((IV)t.depth[i]));
                             av_push(tree, newRV_noinc((SV *)h));
                         }

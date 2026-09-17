@@ -152,12 +152,13 @@ static void hm_h2_add_header(pTHX_ HV *env,
             SV *ksv = hm_hdrk_lookup(keybuf, nl + 5);
             if (ksv) {
                 HE *he = hv_fetch_ent(env, ksv, 0, 0);
-                if (he) { sv_catpvs(HeVAL(he), ", ");
+                if (he) { sv_catpvn(HeVAL(he), hm_hdr_join_sep(keybuf, nl + 5), 2);
                           sv_catpvn(HeVAL(he), vl, vlen); }
                 else (void)hv_store_ent(env, ksv, newSVpvn(vl, vlen), 0);
             } else {
                 old = hv_fetch(env, keybuf, (I32)(nl + 5), 0);
-                if (old) { sv_catpvs(*old, ", "); sv_catpvn(*old, vl, vlen); }
+                if (old) { sv_catpvn(*old, hm_hdr_join_sep(keybuf, nl + 5), 2);
+                           sv_catpvn(*old, vl, vlen); }
                 else hv_store(env, keybuf, (I32)(nl + 5), newSVpvn(vl, vlen), 0);
             }
         }

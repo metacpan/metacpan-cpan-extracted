@@ -45,6 +45,10 @@ if ($pid == 0) {
                 return [ 200, [ 'Content-Type' => 'text/plain' ],
                          [ "q=$env->{QUERY_STRING} path=$env->{PATH_INFO}" ] ];
             }
+            if ($p eq '/headers') {
+                return [ 200, [ 'Content-Type' => 'text/plain' ],
+                         [ "cookie=$env->{HTTP_COOKIE} dup=$env->{HTTP_X_DUP}" ] ];
+            }
             if ($p eq '/async') {
                 return Hyperman->timer(0.05)->then(sub {
                     [ 200, [ 'Content-Type' => 'text/plain' ], [ 'async-h2' ] ];
@@ -92,6 +96,21 @@ is(h2('/proto'), 'HTTP/2', 'SERVER_PROTOCOL is HTTP/2 over h2c (prior knowledge)
 is(h2('/query?a=1&b=2'), 'q=a=1&b=2 path=/query', 'path/query split over h2');
 is(h2('/echo', '-d', 'hello=world'), 'echo:hello=world', 'request body over h2');
 is(h2('/async'), 'async-h2', 'Future-returning handler over h2');
+
+# RFC 9113 8.2.3: an h2 client may send each cookie as its own field, and
+# browsers do. The server folds those back with "; " (RFC 6265), while every
+# other repeated header still folds with ", " (PSGI). Folded with a comma the
+# session cookie's value grew a tail and failed its signature on every
+# request, so an app on h2 saw a fresh session each time.
+{
+    my @split = ('-H', "'Cookie: a=1'", '-H', "'Cookie: b=2'",
+                 '-H', "'X-Dup: x'",    '-H', "'X-Dup: y'");
+    is(h2('/headers', @split), 'cookie=a=1; b=2 dup=x, y',
+       'split cookie fields fold with "; ", other repeats with ", " (h2)');
+    my $h1 = `curl -s --http1.1 @split "http://127.0.0.1:$port/headers" 2>/dev/null`;
+    is($h1, 'cookie=a=1; b=2 dup=x, y',
+       'the same fold on HTTP/1.1');
+}
 is(h2('/stream'), 'chunk1;chunk2', 'psgi.streaming (buffered) over h2');
 
 # multiplexing: many streams on one connection (curl reuses the h2 conn),

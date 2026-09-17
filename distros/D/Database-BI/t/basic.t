@@ -435,4 +435,64 @@ subtest 'GET /import -- HTML URL import' => sub {
     }
 };
 
+# ---------------------------------------------------------------------------
+subtest 'GET /api/columns -- spec= parameter branch' => sub {
+	# The "spec=table:name" unified spec mirrors _open_spec's table: branch.
+	$t->get_ok('/api/columns?spec=table:sales')
+	  ->status_is(200)->json_has('/columns');
+
+	# Unknown table via spec still returns 404.
+	$t->get_ok('/api/columns?spec=table:no_such_table_xyz')
+	  ->status_is(404);
+};
+
+# ---------------------------------------------------------------------------
+subtest 'GET /export?format=json -- JSON download' => sub {
+	$t->get_ok('/export?l=' . url_escape('table:sales') . '&format=json')
+	  ->status_is(200)
+	  ->content_type_like(qr{application/json});
+	# Response body must be a valid JSON array.
+	my $rows = $t->tx->res->json;
+	ok(ref($rows) eq 'ARRAY', 'JSON export returns an array');
+};
+
+# ---------------------------------------------------------------------------
+subtest 'GET /combine -- vertical stack (UNION ALL)' => sub {
+	# Single left table with no extra sources: acts like a plain view.
+	$t->get_ok('/combine?l=' . url_escape('table:sales'))
+	  ->status_is(200)->content_like(qr/sales/i);
+
+	# Two identical sources stacked: row count doubles, content still present.
+	$t->get_ok('/combine?l=' . url_escape('table:sales')
+	         . '&c=' . url_escape('table:sales'))
+	  ->status_is(200)->content_like(qr/sales/i);
+
+	# Missing left table returns 404.
+	$t->get_ok('/combine?l=' . url_escape('table:no_such_xyz'))
+	  ->status_is(404);
+};
+
+# ---------------------------------------------------------------------------
+subtest 'POST /uploads/clear -- purge upload cache' => sub {
+	$t->post_ok('/uploads/clear')
+	  ->status_is(200)
+	  ->json_has('/freed')
+	  ->json_has('/count');
+};
+
+# ---------------------------------------------------------------------------
+subtest 'GET /api/stat -- security: non-data-extension file' => sub {
+	# stat_api intentionally returns exists:false for files whose extension is
+	# not in $EXT_RE.  This prevents filesystem oracle attacks (callers cannot
+	# use stat to probe arbitrary files like /etc/passwd).
+	$t->get_ok('/api/stat?path=/etc/passwd')
+	  ->status_is(200)
+	  ->json_is('/exists', 0);
+
+	# Directories also return exists:false for the same reason.
+	$t->get_ok('/api/stat?path=/tmp')
+	  ->status_is(200)
+	  ->json_is('/exists', 0);
+};
+
 done_testing();

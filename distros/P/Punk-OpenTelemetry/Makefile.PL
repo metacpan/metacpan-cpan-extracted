@@ -13,6 +13,7 @@ my @PROVIDERS = (
     [ 'Fetch'           => '../Fetch/include/fetch'    ],  # fetch_abi.h
     [ 'Punk'            => '../Punk/include'           ],  # pk_abi.h
     [ 'Hyperman'        => '../Hyperman/include/hyperman' ], # hm_abi.h
+    [ 'DBIx::Loop'      => '../DBIx-Loop/include'       ],  # dbil_abi.h
 );
 
 my $INC = '-Iinclude';
@@ -21,6 +22,20 @@ my $INC = '-Iinclude';
     if (eval { $dep = ExtUtils::Depends->new('Punk::OpenTelemetry',
                           map { $_->[0] } @PROVIDERS); 1 } && $dep) {
         my %v = $dep->get_makefile_vars;
+        # A SIBLING CHECKOUT COMES FIRST, ahead of whatever is installed.
+        #
+        # Punk's own Makefile.PL has done this for the same reason: otherwise
+        # a development tree compiles against the last INSTALLED header while
+        # declaring a dependency on something newer, and the two never meet.
+        # PREREQ_PM checks a .pm's $VERSION and the C comes from that dist's
+        # Install/ directory, so this can require Punk 0.50 for current_of,
+        # build against 0.49's pk_abi.h, and fail on a struct member the
+        # version it asked for does have. The failure names the member, not
+        # the stale header, which is a long way from the cause.
+        #
+        # With no sibling directories present this adds no paths at all.
+        my @sib = grep { -d $_->[1] } @PROVIDERS;
+        $INC .= join '', map { " -I$_->[1]" } @sib if @sib;
         $INC .= ' ' . $v{INC} if $v{INC};
     }
     else {
@@ -207,8 +222,14 @@ my %WriteMakefileArgs = (
         # 0.20 header will not compile the call. The runtime still checks
         # abi_version, so a process that loaded an older Punk degrades rather
         # than misbehaves.
-        'Punk'                => '0.34',   # provides pk_abi.h
+        'Punk'                => '0.50',   # pk_abi v5: current_of
         'Hyperman'            => '0.26',   # provides hm_abi.h (v4 worker start)
+        # dbil_abi.h, for the DBIx::Loop statement observer. A BUILD
+        # requirement because otel_consume.h includes the header, even though
+        # the table is resolved at runtime and a process without DBIx::Loop
+        # simply has nothing of that kind to instrument. Punk already requires
+        # it, so this costs nothing and is declared rather than inherited.
+        'DBIx::Loop'          => '0.07',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -216,8 +237,9 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         'File::Raw::JSON' => '0.06',   # OTLP/JSON encoding
         'Fetch'           => '0.15',   # the OTLP/HTTP client; h2 trailers for gRPC
-        'Punk'            => '0.34',   # pk_abi v4: the log tap carries the context
+        'Punk'            => '0.50',   # pk_abi v5: a child span can find its parent
         'Hyperman'        => '0.26',   # hm_abi: the post-fork worker hook
+        'DBIx::Loop'      => '0.07',   # dbil_abi v2: the statement observer
     },
     INC    => $INC,
     (length $LIBS ? (LIBS => [$LIBS]) : ()),

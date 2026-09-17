@@ -221,6 +221,11 @@ static int parse(pTHX_
       was_scopestack_ix, PL_scopestack_ix);
 #endif
 
+#if HAVE_PERL_VERSION(5, 45, 3)
+  if(CvIsMETHOD(PL_compcv))
+    class_method_parse_post_blockstart(PL_compcv);
+#endif
+
 #ifdef HAVE_PARSE_SUBSIGNATURE
   OP *sigop = NULL;
   if(!(skip_parts & XS_PARSE_SUBLIKE_PART_SIGNATURE) && (lex_peek_unichar(0) == '(')) {

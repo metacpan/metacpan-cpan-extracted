@@ -6,7 +6,7 @@ use warnings;
 use Carp ();
 use Punk::OpenTelemetry ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 my %STATE;
 
@@ -155,10 +155,16 @@ sub _build {
     # outage never silences them.
     Punk::OpenTelemetry::Logs::install_tap($st->{logs});
 
+    # THE METER GOES IN TOO, so the instrumentation can record the HTTP
+    # duration histogram itself. Handed the object rather than a flag: without
+    # it the instrumentation records nothing and does not even start the
+    # clock, so a deployment with metrics off pays nothing.
     $st->{points} = Punk::OpenTelemetry::Instrument::install($tracer,
-        server => _want($cfg, 'server'),
-        client => _want($cfg, 'client'),
-        db     => _want($cfg, 'db'),
+        server  => _want($cfg, 'server'),
+        client  => _want($cfg, 'client'),
+        db      => _want($cfg, 'db'),
+        metrics => _want($cfg, 'metrics'),
+        ($st->{meter} ? (meter => $st->{meter}) : ()),
     );
     $st->{installed} = 1;
 
@@ -385,11 +391,34 @@ Or entirely from the environment, with no code at all:
 
 =head1 DESCRIPTION
 
-Registering this plugin turns on server, client and database spans, the
-metrics the HTTP conventions ask for, and log records correlated by trace id.
+Registering this plugin turns on server, client and database spans,
+C<http.server.request.duration>, and log records correlated by trace id.
+
+=head2 The one metric, and why it is not sampled
+
+C<http.server.request.duration> is recorded on B<every> request, including the
+ones no span was built for. A trace at 5% is a sample of requests; a duration
+histogram at 5% is a wrong number, so the two signals cannot share a sampling
+decision. What an unsampled request pays is two integers into the stash the
+dispatcher had already built.
+
+Its attributes are C<http.request.method> (canonical, C<_OTHER> for anything
+else), C<http.response.status_code>, and C<http.route> - the declared pattern,
+and B<absent> when there is none. Never C<url.path>: on a metric that
+substitution turns a scanner's million 404 paths into a million series, and the
+cardinality cap then starts dropping whatever arrives next.
+
+The boundaries are the conventions' own, in seconds. Everything else the meter
+records is the application's, through C<< $c->otel_meter >>.
 The instrumentation goes through C ABI observer tables in Punk, Fetch and
 DBIx::Loop, so an instrumented request pays no Perl frame for being
 instrumented, and an unsampled one allocates nothing at all.
+
+One exception, and it is Punk's: from Punk 0.50 the shipped DBI model backend
+takes a handle subclass when a query observer is registered, so that statements
+run through C<< $model->backend->dbh >> are seen and not only the six generated
+methods. That subclass is a sub call per statement, paid only by an application
+that asked to see its statements. See L<Punk::Model::DBI>.
 
 =head1 CONFIGURATION
 
@@ -462,13 +491,31 @@ question and a number answers it without answering anything else.
 =head1 THE BOOT DIAGNOSTIC
 
 One line at info, stating whether it is enabled, the service name, the
-protocol, the endpoint, the sampler and its argument, and the propagators.
-Almost every OpenTelemetry support question is answered by those six facts,
-and almost no SDK prints them.
+protocol, the endpoint, and the sampler with its argument. Almost every
+OpenTelemetry support question is answered by those five facts, and almost no
+SDK prints them.
 
     OpenTelemetry enabled service=checkout protocol=http/protobuf
     endpoint=http://collector:4318 sampler=traceidratio:0.05
-    propagators=tracecontext,baggage
+
+The configured propagators are B<not> in this line. Printing a setting here
+says it does something, and C<OTEL_PROPAGATORS> does not reach the automatic
+instrumentation - see L</PROPAGATION IS W3C ONLY>.
+
+=head1 PROPAGATION IS W3C ONLY
+
+The automatic instrumentation reads one inbound header, C<traceparent>, and
+injects one outbound, C<traceparent>. That is the whole of it, whatever
+C<OTEL_PROPAGATORS> is set to.
+
+B3, Jaeger and Baggage are implemented, tested and reachable - through
+L<Punk::OpenTelemetry::Propagate>'s C<extract> and C<inject> - for a caller
+doing it by hand. No instrumentation point consults them.
+
+C<OTEL_PROPAGATORS> is therefore parsed, validated and stored, and then has no
+effect. That is worth knowing before an afternoon is spent wondering why a B3
+header never joined a trace up, which is why this section exists rather than
+the setting being quietly dropped.
 
 =head1 THE FORK TRAP
 

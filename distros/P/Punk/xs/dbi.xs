@@ -443,3 +443,123 @@ _decode_token(self, tok)
         RETVAL = pdbi_decode_token(aTHX_ tok, "Punk::Model::DBI");
     OUTPUT:
         RETVAL
+
+MODULE = Punk        PACKAGE = Punk::DBI::db
+
+# The database-handle methods DBI implements in its own dispatch rather than
+# through the public prepare/execute pair. A Callbacks hash cannot see these:
+# they reach the inner execute without passing anything a consumer can
+# register on, and a callback runs before the method, so there is no done side
+# to report from. Wrapping is what gives both.
+void
+do(...)
+    ALIAS:
+        selectall_arrayref = 1
+        selectall_hashref  = 2
+        selectcol_arrayref = 3
+        selectrow_array    = 4
+        selectrow_arrayref = 5
+        selectrow_hashref  = 6
+    PPCODE:
+    {
+        const punk_dbiobs_m *m = &PUNK_DBIOBS[ix];
+        void *tok = NULL;
+        I32 flags = ((GIMME_V == G_ARRAY) ? G_ARRAY : G_SCALAR) | G_EVAL;
+        I32 count, i;
+        SV **out = NULL;
+        SV *err = NULL;
+        int nbind = (items > m->bind_from) ? (int)(items - m->bind_from) : 0;
+
+        if (!PUNK_DBIOBS_IN && PK_OBS_WANT_QUERY)
+            tok = pk_obs_query_start(aTHX_
+                      punk_dbiobs_sql(aTHX_ items > 1 ? ST(1) : NULL), nbind);
+
+        ENTER;
+        SAVEDESTRUCTOR_X(punk_dbiobs_leave, INT2PTR(void *, (IV)PUNK_DBIOBS_IN));
+        PUNK_DBIOBS_IN = 1;
+
+        PUSHMARK(SP);
+        EXTEND(SP, items);
+        for (i = 0; i < items; i++) PUSHs(ST(i));
+        PUTBACK;
+        count = call_sv((SV *)punk_dbiobs_super(aTHX_ (int)ix, m->super), flags);
+        SPAGAIN;
+
+        if (count > 0) {
+            Newx(out, count, SV *);
+            for (i = count - 1; i >= 0; i--) out[i] = sv_2mortal(SvREFCNT_inc(POPs));
+        }
+        PUTBACK;
+        LEAVE;                      /* puts PUNK_DBIOBS_IN back */
+
+        if (SvTRUE(ERRSV)) err = sv_2mortal(newSVsv(ERRSV));
+
+        /* Success here is "it ran", not what it returned: these hand back
+         * data, and a query that legitimately matched no rows has not failed.
+         * One that went wrong raised, because RaiseError is this framework's
+         * default, and that is the failure worth reporting. */
+        if (tok) pk_obs_query_done(aTHX_ tok, err ? &PL_sv_no : &PL_sv_yes);
+
+        if (err) { if (out) Safefree(out); croak_sv(err); }
+
+        SP = PL_stack_base + ax - 1;
+        EXTEND(SP, count);
+        for (i = 0; i < count; i++) PUSHs(out[i]);
+        if (out) Safefree(out);
+        PUTBACK;
+        return;
+    }
+
+MODULE = Punk        PACKAGE = Punk::DBI::st
+
+# The path Punk::Model::DBI's own generated methods take, through
+# prepare_cached. `ok` is what DBI's execute returned, which is the contract
+# pk_abi.h states for on_query: a false or absent value is a failure.
+void
+execute(...)
+    PPCODE:
+    {
+        void *tok = NULL;
+        I32 count, i;
+        SV **out = NULL;
+        SV *err = NULL, *r = NULL;
+
+        /* Inside a Punk::DBI::db wrapper this is DBI's own inner execute and
+         * the statement was already reported at the altitude the caller asked
+         * for. */
+        if (!PUNK_DBIOBS_IN && PK_OBS_WANT_QUERY && items > 0)
+            tok = pk_obs_query_start(aTHX_
+                      punk_dbiobs_sql(aTHX_ ST(0)), (int)(items - 1));
+
+        ENTER;
+        SAVEDESTRUCTOR_X(punk_dbiobs_leave, INT2PTR(void *, (IV)PUNK_DBIOBS_IN));
+        PUNK_DBIOBS_IN = 1;
+
+        PUSHMARK(SP);
+        EXTEND(SP, items);
+        for (i = 0; i < items; i++) PUSHs(ST(i));
+        PUTBACK;
+        count = call_sv((SV *)punk_dbiobs_super(aTHX_ 7, "DBI::st::execute"),
+                        G_SCALAR | G_EVAL);
+        SPAGAIN;
+
+        if (count > 0) {
+            Newx(out, count, SV *);
+            for (i = count - 1; i >= 0; i--) out[i] = sv_2mortal(SvREFCNT_inc(POPs));
+            r = out[0];
+        }
+        PUTBACK;
+        LEAVE;
+
+        if (SvTRUE(ERRSV)) err = sv_2mortal(newSVsv(ERRSV));
+        if (tok) pk_obs_query_done(aTHX_ tok, err ? &PL_sv_no : r);
+
+        if (err) { if (out) Safefree(out); croak_sv(err); }
+
+        SP = PL_stack_base + ax - 1;
+        EXTEND(SP, count);
+        for (i = 0; i < count; i++) PUSHs(out[i]);
+        if (out) Safefree(out);
+        PUTBACK;
+        return;
+    }

@@ -1,4 +1,9 @@
 Revision history for Physics::Balls
 
+0.02	2026-09-17
+        - A resting pair that crept inside each other is set apart at the end of a shot
+        - A wall or a gate more than a radius behind a ball is not its contact: a course has far sides
+        - Invariant, no-io and far-side tests
+
 0.01	2026-09-16
         - First version

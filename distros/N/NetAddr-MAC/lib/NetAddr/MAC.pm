@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10;
 package NetAddr::MAC;
-$NetAddr::MAC::VERSION = '1.03';
+$NetAddr::MAC::VERSION = '1.04';
 
 use Carp qw( croak );
 use Exporter 'import';
@@ -250,15 +250,16 @@ sub random {
     # clear the errstr, see also RT96045
     $NetAddr::MAC::errstr = undef;
 
-    # Accept options: oui => ..., eui64 => 1/0
+    # Accept options: prefix => ..., eui64 => 1/0, die_on_error => 1/0
     my %args    = @q % 2 ? ( prefix => shift @q, @q ) : @q;
     my $oui_str = $args{prefix};
+    my $die     = defined $args{die_on_error}
+        ? ( $args{die_on_error} ? 1 : 0 )
+        : ( $NetAddr::MAC::die_on_error ? 1 : 0 );
 
     unless ($oui_str) {
         my $e = q|Please provide an oui prefix|;
-        if ($NetAddr::MAC::die_on_error or $args{_die}) {
-            croak "$e\n";
-        }
+        croak "$e\n" if $die;
         $NetAddr::MAC::errstr = $e;
         return
     }
@@ -268,9 +269,7 @@ sub random {
     my $oui_ints = _oui_to_integers($oui_str, $min, $max);
     unless ($oui_ints) {
         my $e = "Prefix must be between $min and $max octets for ".($eui64 ? 'EUI-64' : 'EUI-48');
-        if ($NetAddr::MAC::die_on_error or $args{_die}) {
-            croak "$e\n";
-        }
+        croak "$e\n" if $die;
         $NetAddr::MAC::errstr = $e;
         return
     }
@@ -282,7 +281,7 @@ sub random {
 
     my $c    = ref($p) || $p;
     my $self = bless {}, $c;
-    $self->_init( mac => $mac_str )
+    $self->_init( mac => $mac_str, die_on_error => $die )
       or return;
 
     return $self
@@ -1116,7 +1115,7 @@ NetAddr::MAC - MAC hardware address functions and object (EUI48 and EUI64)
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -1273,6 +1272,7 @@ Generates a random MAC address using the provided OUI/prefix.
     my $mac = NetAddr::MAC->random( prefix => '00:16:3e:12', eui64 => 1 );
 
 The prefix can be any string format accepted by the module (e.g., colon, dash, dot, or plain hex).
+C<die_on_error> behaves as it does for B<new>.
 You must provide at least 3 octets for EUI-48 (default) or at least 4 for EUI-64 (with C<eui64 =E<gt> 1>).
 You may provide more than the minimum; any missing octets will be filled with random values up to 6 (EUI-48) or 8 (EUI-64) total.
 

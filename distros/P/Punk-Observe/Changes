@@ -1,5 +1,18 @@
 Revision history for Punk-Observe
 
+0.10	2026-09-16
+	- The trace page shows each span's attributes: a + on the row opens a table under it. Assembly works on the indexed 64-byte span, which carries no attributes, so the view read a list that was never filled; the trace's span records are now read once more, filtered on the trace id, and matched by span id.
+	- Fixes: collapsing a subtree set the hidden attribute on rows whose display: grid rule outranked the browser's [hidden] rule, so nothing was hidden. 
+
+0.09	2026-09-16
+	- Fixes: the flamegraph dropped the ROOT SPAN of every trace. The store hands back a parent span id and the trace page ran it through the resolver written for Trace::analyse's parent INDEX, so the root indexed itself, assembly read that as a cycle and the frame builder skipped it. Both were called `parent`; they are `parent_span_id` and `parent_index` now, so the two cannot be confused again. The waterfall beside it was always right, which is why this went unseen.
+	- Fixes: collapsing a subtree in the waterfall hid the wrong rows. Rows are emitted chronologically, so descendants are not adjacent when sibling subtrees overlap in time; it walked forward while depth was greater. Collapse is by parent identity now, and every row carries data-parent.
+	- Fixes: a span in a cycle has depth -1 and was indented -9px, out of its own cell. Clamped, and such a row no longer collapses.
+
+0.08	2026-09-13
+	- Fixes: the alerts policy hash (every, group_wait, repeat_interval) was taken as a rules seam, so the alerts page showed no rules over a store full of them
+	- Adds: t/0934-alerts-policy.t
+
 0.07	2026-09-02
 	- Fixes: the retention cron reads the lease it was granted on perls below 5.32, where SvTRUE(POPs) popped once per mention
 	- Fixes: a log axis asks whether it is safe the same way

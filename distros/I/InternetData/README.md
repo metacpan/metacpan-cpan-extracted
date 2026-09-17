@@ -46,6 +46,8 @@ my $id = $bogon->{versions}[-1]{id};  # bogon_ip_v1, and this is what you downlo
 
 `standing` tells you where you stand against a database, so one you have not bought is still listed and you can see that it exists.
 
+`InternetData::Database::STANDINGS` and `InternetData::Database::LICENSE_TYPES` list every value the two fields take. A family you hold no license for has an undefined `license_type`.
+
 ### Metadata
 
 `metadata` describes one database without transferring it - row count, build date, per-format schema, sample rows and exact sizes - so you can decide whether today's build is worth fetching and budget a transfer before starting it:
@@ -68,13 +70,15 @@ my $bytes = $client->database->download_bytes($id, 'csvgz');
 my $url = $client->database->download_url($id, 'csvgz');
 ```
 
-`download` holds nothing but a single chunk in memory whatever the database weighs. It writes to a neighbouring `.part` file and renames it on completion, and a transfer that stops short of the length the origin declared is an error rather than a short file, so a path that exists is a whole database and a failed refresh cannot destroy the copy already there.
+`download` holds nothing but a single chunk in memory whatever the database weighs. It writes to a neighboring `.part` file and renames it on completion, and a transfer that stops short of the length the origin declared is an error rather than a short file, so a path that exists is a whole database and a failed refresh cannot destroy the copy already there.
 
 `download_bytes` holds the **entire file** in memory. The catalog spans seven orders of magnitude, from `bogon_asn_v1` at 264 bytes to `resproxy_ip_14d_v1` at 5.34 GiB, and a 5.34 GiB database is 5.34 GiB of resident memory here, so reach for it at the small end. `metadata` publishes the size per format without transferring anything, which is how you find out which end you are at.
 
 `download_url` hands back the link rather than the bytes, so you choose how to move the file, hand it to a downloader, or pass it on without passing on your API key. The link is presigned and authorizes itself; it authorizes the START of a transfer, so one already running is not interrupted when it lapses. The client never follows that redirect for you. `download` and `download_bytes` do follow it, and that second request carries no API key: object storage has no business holding your credential.
 
-The per-request timeout that bounds an API call is lifted for a transfer, and a transfer is issued exactly once. `retries` covers the API call that hands out the link, not a transfer that may already have moved gigabytes.
+The per-request timeout that bounds an API call is lifted for a transfer. `retries` covers the transfer only until its first byte reaches you: object storage failing before then is retried like any server error, but a transfer that dies part way is not repeated, since a second copy would append to the bytes already written.
+
+A format is `csvgz` or `mmdb`, and `InternetData::Database::FORMATS` lists them. Anything else is refused before a request is made.
 
 ### Verifying a download
 
@@ -113,12 +117,14 @@ if (my $err = $@) {
 
 Note that `rate_limited` and `quota_exceeded` both arrive as HTTP 429 and are not the same thing. A rate limit is when the API faces extreme traffic bursts and so retrying later works; but a spent quota needs your allowance raised or the window to roll over. The library retries rate limits for you, but not if your quota is exceeded. Nothing else in the 4xx range is retried at all: a misspelled database id is a 404, and asking for it three times gets the same answer three times.
 
-Retries and how many of them are per call as well as per client:
+Each attempt gives up after 30 seconds, and a transient failure is retried twice. Both can be changed for the client, and for a single call:
 
 ```perl
 my $client = InternetData->new(api_key => $key, retries => 4, timeout => 60);
-my $databases = $client->database->list(retries => 0);
+my $databases = $client->database->list(retries => 0, timeout => 5);
 ```
+
+The timeout is in seconds and applies to each attempt, so a retried call can take longer in total. A transfer isn't bound by it, so `download` and `download_bytes` refuse a per-call `timeout` rather than quietly ignoring it.
 
 ### Non-blocking use
 

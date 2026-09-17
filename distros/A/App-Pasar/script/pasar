@@ -1,0 +1,70 @@
+#!perl
+use v5.36;
+use App::Pasar;
+
+close DATA;
+App::Pasar::main @ARGV;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+pasar - extract data from Electron ASAR archive files
+
+=head1 SYNOPSIS
+
+    pasar --list ARCHIVE
+    pasar -l ARCHIVE
+
+    pasar --extract ARCHIVE [DIRECTORY]
+    pasar -x ARCHIVE [DIRECTORY]
+
+    pasar --extract --unpacked=UDIR ARCHIVE [DIRECTORY]
+    pasar -x -u UDIR ARCHIVE [DIRECTORY]
+
+=head1 DESCRIPTION
+
+The C<pasar> utility provides basic support for reading Electron ASAR (Atom
+Shell Archive) files. It can list the contents of an archive and it can extract
+the contents of an archive as a file tree.
+
+The mode of operation must be selected with command-line options. Either
+C<-l>/C<--list> (for listing) or C<-x>/C<--extract> (for extracting) must be
+given.
+
+The first non-option argument is the name of the F<.asar> file to be read. In
+extract mode, an optional second argument can be given to specify the output
+directory; if omitted, it defaults to F<.> (the current working directory). If
+the output directory does not exist, it will be created automatically.
+
+Members of an F<.asar> file can be marked I<unpacked>; they are stored
+externally, not in the archive file. In extract mode, such I<unpacked> files
+are automatically looked up in (and copied from) a directory whose name matches
+the archive file with an F<.unpacked> suffix (if it exists).
+
+For example, if you try to unpack F<foo.asar> and it contains an I<unpacked>
+member named F<bar/baz>, then the file will be automatically looked up in
+F<foo.asar.unpacked/bar/baz>.
+
+You can control this behavior with the C<-u>/C<--unpacked> option. If set to an
+empty string, I<unpacked> files are skipped and ignored during extraction. If
+set to a non-empty string, it is taken to be the source directory in which
+I<unpacked> files should be looked up.
+
+=head1 SEE ALSO
+
+L<Archive::Asar>
+
+=head1 AUTHOR
+
+Lukas Mai, C<< <lmai at web.de> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2026 Lukas Mai.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the L<GNU General Public License|https://www.gnu.org/licenses/gpl-3.0.html>
+as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.

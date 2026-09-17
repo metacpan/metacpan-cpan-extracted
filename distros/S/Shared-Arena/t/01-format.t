@@ -17,7 +17,8 @@ use Shared::Arena ();
 my %L = Shared::Arena::_layout();
 
 is($L{magic}, 0x4E524153, 'the magic is "SARN" read as a native word');
-is($L{layout}, 2, 'layout version 2 (bumped in 0.03: the map slot grew a ttl)');
+is($L{layout}, 3, 'layout version 3 (2 in 0.03: the map slot grew a ttl; '
+                . '3 in 0.08: the map and cache headers grew a serialise flag)');
 
 # The alignment every carve starts on. Sixteen rather than eight because a
 # tenant may want a 16-byte atomic or a vector load, and an arena that hands out

@@ -38,7 +38,7 @@ do { my $x = {
                                       'Exporter' => '0',
                                       'List::Util' => '0',
                                       'constant' => '0',
-                                      'perl' => 'v5.10.0',
+                                      'perl' => '5.010',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -53,7 +53,7 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'perl' => 'v5.10.0'
+                                   'perl' => '5.010'
                                  }
                  }
      };

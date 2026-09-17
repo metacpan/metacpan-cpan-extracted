@@ -1,5 +1,10 @@
 Revision history for Shared::Arena
 
+0.08	2026-09-16
+        - Add serialise => 1 to Cache and Map: a value can now be any Perl structure
+          and comes back as the same structure, through Struct::Codec, which is
+          now a prerequisite. 
+
 0.07	2026-09-16
         - FIXES a smoker FAIL in t/08-mpsc.t. It asserted that two children's
           sequence ranges overlapped, which is the host's scheduling and not

@@ -34,7 +34,8 @@ requires:
   JSON::MaybeXS: '0'
   Object::Configure: '0.24'
   Params::Get: '0'
+  Params::Validate::Strict: '0.39'
   Scalar::Util: '0'
 resources: {}
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

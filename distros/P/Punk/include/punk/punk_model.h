@@ -402,8 +402,17 @@ static void pm_validate(pTHX_ SV *self, SV *cv_sv, SV *data) {
         SV *o = POPs;
         ok = SvTRUE(o);
     }
-    if (errors) errors = sv_2mortal(newSVsv(errors));
+    /* NOT sv_2mortal here. SAVETMPS saved the temps floor above, so the
+     * FREETMPS on the next line frees anything mortalised inside this
+     * scope - including this copy, which is then read below. A freed SV
+     * fails SvROK, the location and message are skipped, and EVERY
+     * validation failure reports the fallback "does not match the field
+     * schema" with no field named. Take a plain reference, leave the
+     * scope, and mortalise into the CALLER's temps where it survives long
+     * enough to be read. */
+    if (errors) errors = newSVsv(errors);
     PUTBACK; FREETMPS; LEAVE;
+    if (errors) sv_2mortal(errors);
     if (ok) return;
     {
         const char *cls = sv_reftype(SvRV(self), 1);

@@ -4,9 +4,10 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Frozen;
+use Struct::Codec;
 
 require XSLoader;
 XSLoader::load('Shared::Arena', $VERSION);
@@ -23,7 +24,7 @@ Shared::Arena - memory two processes can both read, without a syscall
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 
@@ -107,8 +108,11 @@ in one pass, so a status page costs no pipe or socket per worker.
 
 The first nine store B<opaque bytes>, or in the case of the two filters and
 the two sketches no keys at all, so a nested structure has to be flattened going in
-and rebuilt coming out. C<Shared::Arena::Frozen> is the one that does not
-rebuild, and it is the reason L<Frozen> is a prerequisite.
+and rebuilt coming out. A map or a cache made with C<< serialise => 1 >> does
+that flattening itself, through L<Struct::Codec>, and hands back the same
+structure it was given; that is the reason L<Struct::Codec> is a prerequisite.
+C<Shared::Arena::Frozen> is the one that does not rebuild at all, and it is
+the reason L<Frozen> is one.
 C<Shared::Arena::Lease> and C<Shared::Arena::Scoreboard> store no caller data at
 all: the lease holds a pid and a deadline, the scoreboard a row of gauges per
 worker. They are coordination and observability rather than storage.
@@ -207,9 +211,14 @@ call this with the same arguments.
 =head2 map
 
     my $map = $arena->map($name, slots => 4096, slot_size => 512);
+    my $map = $arena->map($name, slots => 4096, serialise => 1);
 
 A L<Shared::Arena::Map> in this arena, created on first use. Every process may
 call this with the same arguments.
+
+With C<< serialise => 1 >> a value is any Perl structure and comes back the
+same structure. The flag is part of the map's shape: every process must ask
+for the same setting, and one that asks for the other is refused.
 
 =head2 bloom
 
@@ -239,9 +248,14 @@ may call this with the same arguments.
 =head2 cache
 
     my $c = $arena->cache($name, capacity => 4096, entry_size => 4096);
+    my $c = $arena->cache($name, capacity => 4096, serialise => 1);
 
 A L<Shared::Arena::Cache> in this arena, created on first use. Every process may
 call this with the same arguments.
+
+With C<< serialise => 1 >> a value is any Perl structure and comes back the
+same structure. The flag is part of the cache's shape: every process must ask
+for the same setting, and one that asks for the other is refused.
 
 =head2 frozen
 

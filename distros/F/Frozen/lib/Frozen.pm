@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Frozen', $VERSION);
@@ -21,7 +21,7 @@ Frozen - an immutable container that survives a fork
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 
@@ -176,7 +176,8 @@ an integer caches the truncated integer, but neither changed the value: C<1.5>
 compared against C<1> is stored as C<1.5>, and C<5> that something printed is
 stored as C<5>. C<'007'> is stored as its digits, because a string used as a
 number is still a string, and storing C<7> would be what the user sees
-changing on the way through.
+changing on the way through. A perl before 5.36 cannot tell the printed C<5>
+from the C<'007'>; see L</LIMITATIONS>.
 
 C<< lossy_nv => 1 >> accepts the two NVs a double cannot hold: one past
 C<DBL_MAX>, which is stored as an infinity, and a non-zero one under the
@@ -589,6 +590,12 @@ block stores a tag, and a tag does not know which spelling it arrived in.
 =item * A block is refused across endianness rather than byteswapped.
 
 =item * Blocks over 2 GiB are refused; the 64-bit offset flag is reserved.
+
+=item * On a perl before 5.36, a number that has been stringified freezes
+as a string. Those perls set the public string flag when they cache the
+digits, which leaves a stringified C<5> with exactly the flags of a numified
+C<"5">, and the string has to win for the sake of C<"007">. Perl 5.36 keeps
+that cache private and the number stays a number.
 
 =back
 
