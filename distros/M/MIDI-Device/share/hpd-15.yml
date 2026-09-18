@@ -1,0 +1,70 @@
+name: "HandSonic HPD-15"
+manufacturer: "Roland"
+port:
+    in: "generic"
+    out: "generic"
+control_change:
+  - number: 0
+    name: "Bank Select"
+  - number: 1
+    name: "Modulation (LFO PITCH knob)"
+  - number: 4
+    name: "Foot Control (Expression pedal or Hi-Hat control pedal position))"
+  - number: 6
+    name: "Data Entry (used with RPNs for Pitch Bend Sensitivity)"
+  - number: 7
+    name: "Volume (Part Level)"
+  - number: 10
+    name: "Panpot (PAN knob)"
+  - number: 11
+    name: "Expression (LEVEL knob)"
+  - number: 12
+    name: "Effect Control 1 (M-FX DEPTH knob)"
+  - number: 16
+    name: "General Purpose Controller 1 (Pad A1 strike position)"
+  - number: 17
+    name: "General Purpose Controller 2 (Pad A5 strike position)"
+  - number: 32
+    name: "Bank Select"
+  - number: 64
+    name: "Hold 1 (ROLL/HOLD button)"
+  - number: 66
+    name: "Sostenuto (Modify Lock)"
+  - number: 67
+    name: "Soft (Modify Clear)"
+  - number: 70
+    name: "Sound Controller 1 (SWEEP knob)"
+  - number: 74
+    name: "Sound Controller 5 (COLOR knob)"
+  - number: 76
+    name: "Sound Controller 7 (LFO RATE knob)"
+  - number: 81
+    name: "General Purpose Controller 6 (D Beam position)"
+  - number: 82
+    name: "General Purpose Controller 7 (Ribbon Controller L position)"
+  - number: 83
+    name: "General Purpose Controller 8 (Ribbon Controller R position)"
+  - number: 91
+    name: "Effect 1 (Reverb Send Level)"
+  - number: 92
+    name: "Effect 2 / Tremolo Depth (LFO FLT/AMP knob)"
+  - number: 94
+    name: "Effect 4 / Celeste Depth (MULTI EFFECTS button)"
+  - number: 100
+    name: "RPN LSB / MSB (Pitch Bend Sensitivity)"
+  - number: 101
+    name: "RPN LSB / MSB (Pitch Bend Sensitivity)"
+  - number: 120
+    name: "All Sounds Off"
+  - number: 121
+    name: "Reset All Controllers"
+  - number: 123
+    name: "All Notes Off"
+  - number: 124
+    name: "Omni Off"
+  - number: 125
+    name: "Omni On"
+  - number: 126
+    name: "Mono"
+  - number: 127
+    name: "Poly"

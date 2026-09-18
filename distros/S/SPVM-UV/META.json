@@ -35,14 +35,21 @@
             "SPVM" : "0.990198",
             "SPVM::Resource::UV" : "0.001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "SPVM::Sys" : "0.581"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM-UV.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-UV"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

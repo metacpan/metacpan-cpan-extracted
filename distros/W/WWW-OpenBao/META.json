@@ -1,7 +1,7 @@
 {
    "abstract" : "HTTP client for OpenBao / HashiCorp Vault API",
    "author" : [
-      "Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>"
+      "Torsten Raudssus <getty@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
@@ -42,6 +42,12 @@
          }
       }
    },
+   "provides" : {
+      "WWW::OpenBao" : {
+         "file" : "lib/WWW/OpenBao.pm",
+         "version" : "0.002"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -54,10 +60,10 @@
          "web" : "https://github.com/Getty/p5-www-openbao"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.036000"
+         "version" : "5.040001"
       },
       "plugins" : [
          {
@@ -88,11 +94,6 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::GETTY/@Filter/MetaYAML",
-            "version" : "6.037"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::License",
-            "name" : "@Author::GETTY/@Filter/License",
             "version" : "6.037"
          },
          {
@@ -146,6 +147,11 @@
             "version" : "6.037"
          },
          {
+            "class" : "Dist::Zilla::Plugin::LicenseFile",
+            "name" : "@Author::GETTY/LicenseFile",
+            "version" : "0.002"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::GETTY/MetaConfig",
             "version" : "6.037"
@@ -159,6 +165,38 @@
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::GETTY/PodSyntaxTests",
             "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
+            "name" : "@Author::GETTY/Test::ChangesHasContent",
+            "version" : "0.011"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.037"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000038",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Author::GETTY/MetaProvides::Package",
+            "version" : "2.004003"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -179,12 +217,12 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.47.3",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::GETTY/Git::CheckFor::CorrectBranch",
-            "version" : "0.014"
+            "version" : "0.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::FromCPANfile",
@@ -322,21 +360,7 @@
                   "global" : 0,
                   "skip_version_provider" : 0
                },
-               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {
-                  "_fallback_version_provider_args" : {},
-                  "fallback_version_provider" : "Git::NextVersion"
-               },
-               "Git::NextVersion" : {
-                  "Dist::Zilla::Plugin::Git::NextVersion" : {
-                     "first_version" : "0.001",
-                     "version_by_branch" : 0,
-                     "version_regexp" : "(?^:^v(.+)$)"
-                  },
-                  "Dist::Zilla::Role::Git::Repo" : {
-                     "git_version" : "2.39.5",
-                     "repo_root" : "."
-                  }
-               }
+               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {}
             },
             "name" : "@Author::GETTY/@Git::VersionManager/RewriteVersion::Transitional",
             "version" : "0.009"
@@ -375,7 +399,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.47.3",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -392,12 +416,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001",
+                  "tag" : "0.002",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.47.3",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -443,12 +467,13 @@
                      "Makefile.PL"
                   ],
                   "allow_dirty_match" : [
+                     "(?^:^bin/)",
                      "(?^:^lib/.*\\.pm$)"
                   ],
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.47.3",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -468,12 +493,17 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.5",
+                  "git_version" : "2.47.3",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::GETTY/Git::Push",
             "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GitHub::CreateRelease",
+            "name" : "@Author::GETTY/GitHub::CreateRelease",
+            "version" : "0.0012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -524,6 +554,11 @@
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
             "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "6.037"
          }
       ],
       "zilla" : {
@@ -535,8 +570,8 @@
       }
    },
    "x_authority" : "cpan:GETTY",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.52",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

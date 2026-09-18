@@ -1,0 +1,96 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::Pax::CLI;
+
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+
+if ( !defined $ENV{HOME} || $ENV{HOME} eq '' ) {
+    if ( defined $ENV{USERPROFILE} && $ENV{USERPROFILE} ne '' ) {
+        $ENV{HOME} = $ENV{USERPROFILE};
+    }
+}
+
+exit Developer::Dashboard::Pax::CLI->run(@ARGV);
+
+__END__
+
+=for comment FULL-POD-DOC START
+
+=head1 NAME
+
+pax - internal PAX compiler/packager front door, vendored into Developer Dashboard
+
+=head1 PURPOSE
+
+Gives C<dashboard pax ...> (and C<d2 pax ...>) direct access to the vendored
+PAX adaptive Perl compiler and standalone-binary packager, so any internal
+tool - most importantly L<Developer::Dashboard::PaxCache> - can reach a
+working C<pax build>/C<pax run> without depending on a separate PAX checkout
+or the caller's shell C<PATH>.
+
+=head1 WHY IT EXISTS
+
+PAX started as a separate sibling project (C<~/projects/pax>). Relying on it
+being separately installed and discoverable on C<PATH> meant the whole
+MD5-cache-then-compile flow in L<Developer::Dashboard::PaxCache> could - and
+did - silently never engage on a machine where C<pax> merely was not on
+C<PATH>, with no error, just permanent interpreted fallback. PAX is now
+vendored into this repository under
+L<Developer::Dashboard::Pax|Developer::Dashboard::Pax> (owner decision,
+2026-09-15), removing that dependency entirely: every machine that has
+Developer Dashboard installed has a working C<pax>.
+
+=head1 WHEN TO USE
+
+Use this file when changing how the internal C<pax> command is staged,
+bootstrapped, or dispatched to the vendored compiler library. The compiler,
+packager, runtime, and diagnostic logic itself live under
+C<lib/Developer/Dashboard/Pax/*> - this script is only the stable front
+door, exactly mirroring PAX's own original C<bin/pax> design.
+
+=head1 HOW TO USE
+
+Users or internal tooling run C<dashboard pax build ...> /
+C<dashboard pax run ...>. The staged helper forwards the request into
+C<Developer::Dashboard::Pax::CLI-E<gt>run(@ARGV)>, which is the same public
+contract PAX's own standalone C<bin/pax> exposed.
+
+=head1 WHAT USES IT
+
+L<Developer::Dashboard::PaxCache> resolves this staged command (never an
+external C<PATH> lookup) when it needs to trigger a background compile.
+Operators can also invoke C<dashboard pax> directly for manual builds.
+
+=head1 EXAMPLES
+
+Example 1:
+
+  dashboard pax build bin/dashboard -o /tmp/dashboard.pax
+
+Compile a Perl entrypoint into a standalone binary using the vendored
+compiler, exactly as the standalone C<pax> command would.
+
+Example 2:
+
+  ~/.developer-dashboard/cli/dd/pax run bin/dashboard version
+
+Run a script through the vendored PAX runtime directly after staging.
+
+Example 3:
+
+  prove -lv t/181-paxcache-coverage.t
+
+Rerun the PaxCache coverage tests, which exercise this staged command's
+resolution path.
+
+=for comment FULL-POD-DOC END
+
+=cut

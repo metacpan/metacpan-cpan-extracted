@@ -12,7 +12,7 @@ use Scalar::Util ();
 use VPNDetection::Error;
 use VPNDetection::OauthError;
 
-our $VERSION = '3.2.0';
+our $VERSION = '3.3.0';
 
 use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code';
 

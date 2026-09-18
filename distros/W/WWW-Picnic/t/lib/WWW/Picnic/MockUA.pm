@@ -209,6 +209,38 @@ sub sample_search_response {
   };
 }
 
+sub sample_categories_response {
+  return {
+    type    => 'MY_STORE',
+    id      => 'my_store',
+    catalog => [
+      {
+        type       => 'CATEGORY',
+        id         => 'cat-1',
+        name       => 'Obst & Gemüse',
+        level      => 0,
+        items      => [],
+        decorators => [],
+      },
+      {
+        type       => 'CATEGORY',
+        id         => 'cat-2',
+        name       => 'Getränke',
+        level      => 0,
+        items      => [],
+        decorators => [],
+      },
+    ],
+  };
+}
+
+sub sample_suggestions_response {
+  return [
+    { id => 'suggestion-1', suggestion => 'haribo',           type => 'SEARCH_TERM' },
+    { id => 'suggestion-2', suggestion => 'haribo goldbären', type => 'SEARCH_TERM' },
+  ];
+}
+
 sub sample_article_response {
   return {
     id                 => 'product-1',

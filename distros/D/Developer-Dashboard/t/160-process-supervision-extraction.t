@@ -57,7 +57,6 @@ my @EXTRACTED = qw(
 # Four resolutions exist for a divergent shared name, and only the first removes it:
 # reconcile, rename, declare-as-interface, or declare-as-defect (DD-669).
 my %MUST_STAY_PER_CLASS = (
-    _now_iso8601 => 'DD-642 decided the localtime/gmtime split deliberately',
     _read_process_state =>
         'INTERFACE: shared _pid_is_running dispatches through this name, so each consumer '
       . 'supplies its own body. Also carries the per-module procfs-trust policy.',
@@ -183,34 +182,19 @@ for my $sub (@MUST_STAY_PER_CLASS) {
 
     # 'new' is a constructor: it differs because they are two classes, not
     # because anything drifted.
-    # _now_iso8601 is declared per-class above, and DD-642 decided that split deliberately
-# rather than by neglect. A reason recorded in a list is a claim; this pins it, so a
-# well-meant "these should surely agree" edit fails here and is sent to the card instead
-# of landing. The population is wider than the two consumers this file owns - Housekeeper
-# and ActionRunner also define _now_iso8601 and both use gmtime - so this asserts the two
-# it is scoped to and names the others rather than implying they are the whole set.
-{
-    my %clock = (
-        'Developer::Dashboard::RuntimeManager'  => 'gmtime',
-        'Developer::Dashboard::CollectorRunner' => 'localtime',
-    );
-    for my $class ( sort keys %clock ) {
-        ( my $path = $class ) =~ s{::}{/}g;
-        my $file = "lib/$path.pm";
-        open my $fh, '<', $file or die "cannot read $file: $!";
-        local $/;
-        my $source = <$fh>;
-        close $fh;
-        my ($body) = $source =~ /^sub _now_iso8601 \{(.*?)^\}/ms;
-        ok( defined $body, "$class defines _now_iso8601" );
-        my $want = $clock{$class};
-        my $other = $want eq 'gmtime' ? 'localtime' : 'gmtime';
-        like( $body, qr/\b\Q$want\E\b/,
-            "${class}::_now_iso8601 still uses $want - the split DD-642 decided, not an oversight" );
-        unlike( $body, qr/\b\Q$other\E\b/,
-            "${class}::_now_iso8601 does not also reach for $other" );
-    }
-}
+    #
+    # _now_iso8601 was RECONCILED, not merely re-pinned (DD-894): it no longer
+    # appears as `sub _now_iso8601 { ... }` in either consumer at all, so it
+    # naturally drops out of the divergent-body comparison below without
+    # needing its own dedicated per-class check here (the check this block
+    # used to run - confirming RuntimeManager's body used gmtime and
+    # CollectorRunner's used localtime - is superseded by
+    # t/191-timeutils-coverage.t, which pins the same UTC/local split as an
+    # explicit tz parameter on the shared Developer::Dashboard::TimeUtils
+    # function both consumers now import). DD-642's decision that the split
+    # itself is deliberate (not a bug to merge away) still holds and is what
+    # TimeUtils.pm's own POD documents; only the MECHANISM of keeping the
+    # split changed, from two divergent bodies to one parameterized one.
 
 my @divergent = sort grep {
         $_ ne 'new' && exists $cr->{$_} && $rm->{$_} ne $cr->{$_}

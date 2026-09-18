@@ -1534,6 +1534,207 @@ YAML
     'multipart/form-data decoding appends charset to contentType=text/plain, for arrays',
   );
 
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /object:
+    post:
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+            encoding:
+              yatta:
+                contentType: text/plain; charset=UTF-8, text/plain
+              yatta2:
+                contentType: application/json, text/html, text/*
+              yatta3:
+                contentType: unimplemented/type1, unimplemented/type2, application/json
+YAML
+
+  $result = $openapi->validate_request(request('POST', 'http://example.com/object',
+    [ 'Content-Type' => 'multipart/form-data' ],
+    [ [ yatta => $yatta_encoded, 'Content-Type' => 'text/plain; charset=Shift_JIS' ] ],
+  ));
+
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        request => {
+          body => {
+            header => [ {
+              'Content-Disposition' => 'form-data; name="yatta"',
+              'Content-Type' => 'text/plain; charset=Shift_JIS',
+            } ],
+            content => { yatta => 'やった' },
+          },
+        },
+      },
+    ],
+    'Content-Type header is used to decode when one of multiple contentTypes is a match (comparing without parameters)',
+  );
+
+  $result = $openapi->validate_request(request('POST', 'http://example.com/object',
+    [ 'Content-Type' => 'multipart/form-data' ],
+    [ [ yatta2 => 'foo', 'Content-Type' => 'text/whargarbl' ] ],
+  ));
+
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        request => {
+          body => {
+            header => [ {
+              'Content-Disposition' => 'form-data; name="yatta2"',
+              'Content-Type' => 'text/whargarbl',
+            } ],
+            content => { yatta2 => 'foo' },
+          },
+        },
+      },
+    ],
+    'Content-Type header is used to decode when one of multiple contentTypes is a match (comparing without wildcards)',
+  );
+
+  $result = $openapi->validate_request(request('POST', 'http://example.com/object',
+    [ 'Content-Type' => 'multipart/form-data' ],
+    [ [ yatta => 'foo', 'Content-Type' => 'application/json' ] ],
+  ));
+
+  cmp_result(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => false,
+        errors => [
+          {
+            instanceLocation => '/request/body/header/0/Content-Type',
+            keywordLocation => jsonp(qw(/paths /object post requestBody content multipart/form-data encoding yatta contentType)),
+            absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /object post requestBody content multipart/form-data encoding yatta contentType)))->to_string,
+            error => 'incorrect Content-Type "application/json"',
+          },
+          {
+            instanceLocation => '/request/body/content/yatta',
+            keywordLocation => jsonp(qw(/paths /object post requestBody content multipart/form-data encoding yatta)),
+            absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /object post requestBody content multipart/form-data encoding yatta)))->to_string,
+            error => re(qr{^could not decode content as application/json: }),
+          },
+        ],
+      },
+      {
+        request => {
+          body => {
+            header => [ {
+              'Content-Disposition' => 'form-data; name="yatta"',
+              'Content-Type' => 'application/json',
+            } ],
+            content => { yatta => 'foo' },
+          },
+        },
+      },
+    ],
+    'Content-Type header is used to decode even when no contentType is a match',
+  );
+
+  $result = $openapi->validate_request(request('POST', 'http://example.com/object',
+    [ 'Content-Type' => 'multipart/form-data' ],
+    [ [ yatta2 => 'foo' ] ],
+  ));
+
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        request => {
+          body => {
+            header => [ { 'Content-Disposition' => 'form-data; name="yatta2"' } ],
+            content => { yatta2 => 'foo' },
+          },
+        },
+      },
+    ],
+    'no Content-Type header: fall back to trying each contentType in sequence; decoding errors are suppressed as long as something worked',
+  );
+
+  $result = $openapi->validate_request(request('POST', 'http://example.com/object',
+    [ 'Content-Type' => 'multipart/form-data' ],
+    [ [ yatta3 => '"foo"' ] ],
+  ));
+
+  is_equal(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      { valid => true },
+      {
+        request => {
+          body => {
+            header => [ { 'Content-Disposition' => 'form-data; name="yatta3"' } ],
+            content => { yatta3 => 'foo' },
+          },
+        },
+      },
+    ],
+    'no Content-Type header: fall back to trying each contentType in sequence; unimplemented errors are suppressed as long as something worked',
+  );
+
+  $result = $openapi->validate_request(request('POST', 'http://example.com/object',
+    [ 'Content-Type' => 'multipart/form-data' ],
+    [ [ yatta3 => 'foo' ] ],
+  ));
+
+  cmp_result(
+    [
+      $result->TO_JSON,
+      $result->data,
+    ],
+    [
+      {
+        valid => false,
+        errors => [
+          {
+            instanceLocation => '/request/body/content/yatta3',
+            keywordLocation => jsonp(qw(/paths /object post requestBody content multipart/form-data encoding yatta3 contentType)),
+            absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /object post requestBody content multipart/form-data encoding yatta3 contentType)))->to_string,
+            error => re(qr{^could not decode content as application/json: }),
+          },
+          {
+            instanceLocation => '/request/body/content/yatta3',
+            keywordLocation => jsonp(qw(/paths /object post requestBody content multipart/form-data encoding yatta3 contentType)),
+            absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /object post requestBody content multipart/form-data encoding yatta3 contentType)))->to_string,
+            error => re(qr{^EXCEPTION: unsupported media types "unimplemented/type1", "unimplemented/type2": add support with JSON::Schema::Modern::Utilities::add_media_type\Q(...)\E}),
+          },
+        ],
+      },
+      {},
+    ],
+    'no Content-Type header: fall back to trying each contentType in sequence; report all errors if none worked',
+  );
+
   disallow_patterns($dancer_pattern);
 
 
@@ -2406,6 +2607,71 @@ subtest 'deserialize_multipart' => sub {
       '/1/1/X-Test' => 'y',
     },
     'JSON pointer locations for body headers',
+  );
+
+
+  foreach my $test (
+    [ 'form-data; name="alpha"', 'alpha' ],
+    [ 'form-data; name=alpha', 'alpha' ],
+    [ 'form-data;bloop=beta;name=alpha', 'alpha' ],
+    [ 'form-data; name="filename=bloop"; filename=blah', 'filename=bloop' ],
+    [ 'form-data; name=";filename=bloop"; filename=blah', ';filename=bloop' ],
+    [ qq{form-data; name="foo\=bar\;baz\x5Cblah\x5C"blo\x5C\x5Cop"}, qq{foo=bar;bazblah"blo\x5Cop} ],
+    [ 'form-data; name=";filename=\""', ';filename="' ],
+    [ 'form-data; blah=bloop', 'part_0' ],
+    [ qq{form-data; name="\xE0\xB2\xA0\x5F\xE0\xB2\xA0"}, 'ಠ_ಠ' ],
+  ) {
+    my ($disposition, $name) = $test->@*;
+    my $body = <<"BODY";
+--iqWxX
+Content-Disposition: $disposition
+
+value
+--iqWxX
+BODY
+
+    $request = Mojo::Message::Request->new
+      ->method('POST')
+      ->url(Mojo::URL->new('http://example.com/foo'))
+      ->version('1.1')
+      ->content(Mojo::Content::MultiPart->new);
+    $request->headers->add('Content-Type' => 'multipart/form-data; boundary=iqWxX');
+    $request->headers->add('Content-Length' => length($body));
+    $request->content->emit(read => $body =~ s/\n\z//r =~ s/\n/\r\n/gr);
+    $request->finish;
+
+    is_equal(
+      [ OpenAPI::Modern::Utilities::deserialize_multipart($request->content) ],
+      [
+        [ { $name => 'value' } ],
+        [ { 'Content-Disposition' => $disposition } ],
+      ],
+      '"Content-Disposition: '.$disposition.'" parses out name as "'.$name.'"',
+    );
+  }
+
+
+  $request = request('POST', 'http://example.com/foo',
+    [ 'Content-Type' => 'multipart/form-data' ],
+    [
+      [ "foo\"bar\x22baz\x5Cbloop" => 'foo' ],
+      [ 'ಠ_ಠ' => 'bar' ],
+    ],
+  );
+
+  is_equal(
+    my $data = [ OpenAPI::Modern::Utilities::deserialize_multipart($request->content) ],
+    [
+      [
+        { "foo\x22bar\x22baz\x5Cbloop" => 'foo' },
+        { 'ಠ_ಠ' => 'bar' },
+      ],
+      [
+        { 'Content-Disposition' => qq{form-data; name="foo\x5C"bar\x5C"baz\x5C\x5Cbloop"} },
+        { 'Content-Disposition' => qq{form-data; name="\xE0\xB2\xA0\x5F\xE0\xB2\xA0"} },
+      ],
+    ],
+    'Content-Disposition headers are constructed correctly, with escaping',
   );
 };
 

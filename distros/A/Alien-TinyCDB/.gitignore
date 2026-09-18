@@ -1,0 +1,22 @@
+Alien-TinyCDB-*
+.build
+*.html
+*.tar.gz
+*.old
+Makefile
+.bash_history
+.env
+_alien/
+
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+.claude/*.local.*
+.claude/local/
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+
+# karr materialized task view -- never commit
+tasks/
+config.yml

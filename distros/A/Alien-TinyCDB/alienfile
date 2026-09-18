@@ -1,0 +1,57 @@
+use alienfile;
+
+# Alien::TinyCDB build recipe (Alien::Build path).
+#
+# Provides Michael Tokarev's TinyCDB (corpit.ru cdb) C library to Perl
+# consumers through cflags / libs / dynamic_libs. Probe for a usable system
+# install first; otherwise fetch upstream and build from source.
+
+# System detection: upstream's `make install` ships a pkg-config file
+# (libcdb.pc), so pkg-config is the honest probe + sys gather. If a usable
+# system TinyCDB is found the share block below is skipped entirely.
+plugin 'PkgConfig' => (
+  pkg_name => 'libcdb',
+);
+
+share {
+
+  # Upstream is fetched at build time, not vendored, and the version is NOT
+  # pinned: pick the newest tinycdb-<version>.tar.gz the directory lists.
+  # This mirrors the previous Alien::Base::ModuleBuild alien_pattern_* keys
+  # (prefix tinycdb-, version ([\d.]+), suffix \.tar\.gz) against alien_repo.
+  start_url 'http://www.corpit.ru/mjt/tinycdb/';
+  plugin 'Download' => (
+    filter  => qr/^tinycdb-[0-9\.]+\.tar\.gz$/,
+    version => qr/^tinycdb-([0-9\.]+)\.tar\.gz$/,
+  );
+  plugin 'Extract' => 'tar.gz';
+
+  # TinyCDB ships a plain hand-written Makefile (no ./configure). Its default
+  # `all: static` target builds only the static libcdb.a plus the cdb binary;
+  # the shared library lives behind the separate `sharedlib` (build) and
+  # `install-sharedlib` (install) targets, which upstream marks GNU CC/LD
+  # specific (-fPIC / -shared). Build and install BOTH the static archive and
+  # the shared object, so that ->libs links libcdb.a and ->dynamic_libs finds
+  # libcdb.so for FFI::Platypus. %s-style prefix is supplied by Alien::Build
+  # as the staging install prefix; never hardcode a path.
+  build [
+    '%{make} prefix=%{.install.prefix} static sharedlib',
+    '%{make} prefix=%{.install.prefix} install install-sharedlib',
+  ];
+
+  # Move the shared libraries into their own dynamic/ directory, keeping
+  # ->libs (static link against libcdb.a) and ->dynamic_libs (the .so, for
+  # FFI) cleanly separate.
+  plugin 'Gather::IsolateDynamic';
+
+  # Gather the consumer flags from the staging prefix. Alien::Base rewrites
+  # the staging prefix to the final dist_dir at runtime (see Alien::Base
+  # _flags relocation), so these stay correct after install.
+  gather sub {
+    my ($build) = @_;
+    my $prefix = $build->runtime_prop->{prefix};
+    $build->runtime_prop->{cflags} = "-I$prefix/include";
+    $build->runtime_prop->{libs}   = "-L$prefix/lib -lcdb";
+  };
+
+};

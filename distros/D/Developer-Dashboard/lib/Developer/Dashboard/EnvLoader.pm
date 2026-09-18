@@ -3,13 +3,14 @@ package Developer::Dashboard::EnvLoader;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
-use Cwd qw(abs_path cwd);
+use Cwd qw(cwd);
 use File::Basename qw(dirname);
 use File::Spec;
 
 use Developer::Dashboard::EnvAudit;
+use Developer::Dashboard::PathIdentity ();
 
 # load_runtime_layers(%args)
 # Loads every participating plain-directory and DD-OOP-LAYER runtime env file
@@ -393,27 +394,26 @@ sub _load_env_pl_file {
 
 # _path_identity($path)
 # Returns a canonical path identity so duplicate files or macOS alias paths do
-# not get loaded twice in the same process.
+# not get loaded twice in the same process. Delegates to
+# Developer::Dashboard::PathIdentity (DD-903) with empty_fallback => 0,
+# preserving this class's historical behavior of returning an empty string
+# as-is when abs_path() itself returns an empty string.
 # Input: filesystem path.
 # Output: canonical or stable path string.
 sub _path_identity {
     my ( $class, $path ) = @_;
-    return '' if !defined $path || $path eq '';
-    my $resolved = eval { abs_path($path) };
-    return defined $resolved ? $resolved : File::Spec->canonpath($path);
+    return Developer::Dashboard::PathIdentity::_path_identity( $path, empty_fallback => 0 );
 }
 
 # _same_or_descendant_path($path, $root)
 # Reports whether one directory path is the same as or nested beneath another.
+# Delegates to Developer::Dashboard::PathIdentity (DD-903) with
+# empty_fallback => 0, matching this class's own _path_identity.
 # Input: candidate path string and root path string.
 # Output: boolean.
 sub _same_or_descendant_path {
     my ( $class, $path, $root ) = @_;
-    return 0 if !defined $path || $path eq '' || !defined $root || $root eq '';
-    my $path_id = $class->_path_identity($path);
-    my $root_id = $class->_path_identity($root);
-    return 1 if $path_id eq $root_id;
-    return index( $path_id, $root_id . '/' ) == 0 ? 1 : 0;
+    return Developer::Dashboard::PathIdentity::_same_or_descendant_path( $path, $root, empty_fallback => 0 );
 }
 
 # _strip_env_comments(%args)

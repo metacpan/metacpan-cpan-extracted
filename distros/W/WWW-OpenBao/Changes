@@ -1,5 +1,13 @@
 Revision history for WWW-OpenBao
 
+0.002     2026-09-18 02:15:17Z
+
+ - secret_exists now propagates a 403 (permission denied) instead of reporting
+   the path as absent; only a real 404 is treated as "does not exist"
+ - add read_secret_metadata to expose the data.metadata block (version,
+   created_time, destroyed) from a KV v2 read; read_secret's return shape is
+   unchanged
+
 0.001     2026-04-25 04:36:23Z
 
  - Initial release extracted from HI::Daemon

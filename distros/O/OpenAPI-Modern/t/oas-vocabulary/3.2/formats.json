@@ -304,6 +304,11 @@
                 "description": "parameter is quoted string with commas and whitespace",
                 "data": "text/plain ; x=\"a, b, c, d\"",
                 "valid": true
+            },
+            {
+                "description": "whitespace is permitted around ;",
+                "data": "text/plain ; charset=\"UTF-8\" ; foo=bar",
+                "valid": true
             }
         ]
     }

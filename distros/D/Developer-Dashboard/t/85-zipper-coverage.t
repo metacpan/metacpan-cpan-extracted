@@ -97,6 +97,28 @@ like( $ac_bare->{html}, qr{>Click Here<},       'acmdx defaults the link label t
 my $ac_empty_singleton = acmdx( code => 'x', singleton => '' );
 unlike( $ac_empty_singleton->{url}{tokenised}, qr{singleton=}, 'acmdx omits an empty singleton from the query' );
 
+# DD-892: acmdx built its html field via sprintf with zero HTML-entity
+# escaping of caller-supplied target/label, letting either value break out
+# of its attribute/content position and inject arbitrary markup - a
+# stored/reflected XSS vector, since acmdx is a public API meant for skill
+# and bookmark page authors whose template data may itself derive from
+# saved page content.
+my $ac_xss_label = acmdx( label => q{</a><script>alert(1)</script>} );
+unlike( $ac_xss_label->{html}, qr{</a><script>}, 'AC-1: acmdx html-entity-escapes a label containing markup - no literal </a><script> reaches the output' );
+like( $ac_xss_label->{html}, qr{&lt;/a&gt;&lt;script&gt;alert\(1\)&lt;/script&gt;}, 'AC-1: the label survives as entity-escaped text, not silently dropped' );
+
+my $ac_xss_target = acmdx( target => q{"><img src=x onerror=alert(1)>} );
+unlike( $ac_xss_target->{html}, qr{<img src=x onerror=alert\(1\)>}, 'AC-2: acmdx html-entity-escapes a target attribute value - it cannot break out of its quotes' );
+like( $ac_xss_target->{html}, qr{target="&quot;&gt;&lt;img src=x onerror=alert\(1\)&gt;"}, 'AC-2: the target attribute stays a single, correctly-quoted attribute value' );
+
+# _escape_html/_escape_html_attr are private (not in @EXPORT) but, like any
+# Perl sub, reachable by fully-qualified name - exercised directly here
+# since acmdx's own call sites never pass undef (they always fall back to
+# a defined default via ||), so the defined-guard's true side needs its
+# own direct test to be genuinely covered rather than annotated away.
+is( Developer::Dashboard::Zipper::_escape_html(undef), '', '_escape_html treats undef as the empty string, not a warning or a crash' );
+is( Developer::Dashboard::Zipper::_escape_html_attr(undef), '', '_escape_html_attr treats undef as the empty string too (delegates to _escape_html)' );
+
 # ---------------------------------------------------------------------------
 # saved_ajax_file_path(): runtime_root required vs supplied.
 # ---------------------------------------------------------------------------
@@ -582,6 +604,22 @@ is( $cmdp[1], 'text', '_cmdp returns the payload type as its trailing tuple valu
     my ( $out, $err ) = ajax_run( jvar => 'root.path', code => 'x' );
     is( $err, undef, 'Ajax skips the saved block for an unrelated source' );
     like( $out, qr/set_chain_value/, 'Ajax uses the plain tokenised path for an unrelated source' );
+}
+
+# DD-848: _pending_ajax_file's own comment claims its path is "deliberately
+# unpredictable (mixing pid and wall-clock time) so two writers can never
+# collide" - false, since $$ is fixed for a process's lifetime and time() has
+# 1-second resolution, so two REAL (unoverridden) calls for the same
+# destination within the same second produced an IDENTICAL staging path,
+# which would silently swap two concurrent ajax handler saves' content.
+# Every other test in this file overrides the function; this one calls the
+# real implementation, which none of them exercise.
+{
+    my @paths = map { Developer::Dashboard::Zipper::_pending_ajax_file('/tmp/dd848-target.pl') } 1 .. 50;
+    my %seen;
+    my @dupes = grep { $seen{$_}++ } @paths;
+    is( scalar(@dupes), 0,
+        'DD-848: 50 real, rapid-fire calls to _pending_ajax_file for the same destination never repeat a staging path' );
 }
 
 done_testing;

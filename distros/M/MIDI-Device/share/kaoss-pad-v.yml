@@ -1,0 +1,28 @@
+name: "Kaoss Pad V"
+manufacturer: "Korg"
+port:
+    in: "KAOSS PAD KPV KPV_CTRL_IN"
+    out: "KAOSS PAD KPV KPV_CTRL_OUT"
+control_change:
+  - number: 0
+    name: "Bank Select"
+  - number: 12
+    name: "Touch pad X direction (first point)"
+  - number: 13
+    name: "Touch pad Y direction (first point)"
+  - number: 14
+    name: "Touch pad X direction (second point)"
+  - number: 15
+    name: "Touch pad Y direction (second point)"
+  - number: 32
+    name: "Bank Select"
+  - number: 92
+    name: "Touch pad ON/OFF (first point)"
+  - number: 93
+    name: "LEVEL fader"
+  - number: 94
+    name: "FX DEPTH knob"
+  - number: 95
+    name: "HOLD button"
+  - number: 96
+    name: "Touch pad ON/OFF (second point)"

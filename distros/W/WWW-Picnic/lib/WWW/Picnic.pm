@@ -1,8 +1,6 @@
 package WWW::Picnic;
-our $VERSION = '0.100';
-our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Library to access Picnic Supermarket API
-
+our $VERSION = '0.101';
 use Moo;
 
 use Carp qw( croak );
@@ -17,6 +15,8 @@ use WWW::Picnic::Result::Cart;
 use WWW::Picnic::Result::DeliverySlots;
 use WWW::Picnic::Result::Search;
 use WWW::Picnic::Result::Article;
+use WWW::Picnic::Result::Categories;
+use WWW::Picnic::Result::Suggestions;
 
 
 has user => (
@@ -95,7 +95,7 @@ has picnic_did => (
 has json => (
   is => 'ro',
   lazy => 1,
-  default => sub { return JSON::MaybeXS->new->utf8 },
+  default => sub { return JSON::MaybeXS->new( utf8 => 1, convert_blessed => 1 ) },
 );
 
 has _auth_cache => (
@@ -275,13 +275,13 @@ sub set_delivery_slot {
 sub get_categories {
   my ( $self, $depth ) = @_;
   $depth //= 0;
-  return $self->request( GET => 'my_store', undef, depth => $depth );
+  return WWW::Picnic::Result::Categories->new( $self->request( GET => 'my_store', undef, depth => $depth ) );
 }
 
 
 sub get_suggestions {
   my ( $self, $term ) = @_;
-  return $self->request( GET => 'suggest', undef, search_term => $term );
+  return WWW::Picnic::Result::Suggestions->new( $self->request( GET => 'suggest', undef, search_term => $term ) );
 }
 
 
@@ -299,7 +299,7 @@ WWW::Picnic - Library to access Picnic Supermarket API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -524,13 +524,14 @@ L<WWW::Picnic::Result::Cart> object.
     my $categories = $picnic->get_categories(2);  # with depth
 
 Get product categories. Optionally specify depth for nested categories.
-Returns raw API response (categories structure varies).
+Returns a L<WWW::Picnic::Result::Categories> object.
 
 =head2 get_suggestions
 
     my $suggestions = $picnic->get_suggestions('app');
 
-Get search suggestions for a partial search term. Returns raw API response.
+Get search suggestions for a partial search term. Returns a
+L<WWW::Picnic::Result::Suggestions> object.
 
 =head1 SUPPORT
 
@@ -538,10 +539,6 @@ Get search suggestions for a partial search term. Returns raw API response.
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-www-picnic/issues>.
-
-=head2 IRC
-
-You can reach Getty on C<irc.perl.org> for questions and support.
 
 =head1 CONTRIBUTING
 
@@ -553,7 +550,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

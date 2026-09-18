@@ -2339,7 +2339,13 @@ print {$broken_indicator} "{broken\n";
 close $broken_indicator;
 
 my @indicator_names = map { $_->{name} } $indicators->list_indicators;
-is_deeply( \@indicator_names, [ 'alpha', 'zulu', 'beta' ], 'list_indicators sorts by priority and skips invalid JSON' );
+# DD-885: beta's priority => 0 is a real, sort-first value (it is the
+# lowest priority any of these three indicators declare), not "unset" -
+# so it now correctly sorts before alpha (priority 1) and zulu
+# (priority 99). This expectation previously encoded the bug this ticket
+# fixed (priority => 0 was silently treated as the 999 default, sorting
+# beta last instead of first).
+is_deeply( \@indicator_names, [ 'beta', 'alpha', 'zulu' ], 'list_indicators sorts by priority and skips invalid JSON' );
 my $synced = $indicators->sync_collectors(
     [
         {
@@ -2657,7 +2663,12 @@ my $plain_paths = Developer::Dashboard::PathRegistry->new( home => $plain_home )
 
     my $prompt_output = $prompt->render( jobs => 3, cwd => File::Spec->catdir( $home, 'named-path' ) );
     like( $prompt_output, qr/🚨NEW/, 'compact prompt includes the renamed missing collector indicator glyph' );
-    like( $prompt_output, qr/✅Z ✅b/, 'compact prompt includes success status glyphs in priority order' );
+    # DD-885: beta (priority => 0) now correctly sorts before zulu
+    # (priority 99) - see the list_indicators fix above for why. No longer
+    # adjacent in the rendered string (a collector-managed indicator with
+    # an intermediate priority now sits between them), so this checks
+    # relative order rather than requiring the two glyphs to be neighbors.
+    like( $prompt_output, qr/✅b.*✅Z/s, 'compact prompt includes success status glyphs in priority order' );
     unlike( $prompt_output, qr/alpha/, 'prompt skips hidden indicators' );
     like( $prompt_output, qr/~\/named-path/, 'prompt shortens home directory to tilde' );
     like( $prompt_output, qr/\(3 jobs\)/, 'prompt appends job suffix' );
@@ -2687,7 +2698,8 @@ my $plain_paths = Developer::Dashboard::PathRegistry->new( home => $plain_home )
     local $ENV{TICKET_REF} = 'DD-4242';
     my $tmux_status = $prompt->render_tmux_status( width => 200 );
     like( $tmux_status, qr/🚨NEW/, 'tmux status formatter includes missing indicator glyphs' );
-    like( $tmux_status, qr/✅Z ✅b/, 'tmux status formatter keeps indicator priority order' );
+    # DD-885: same priority-order fix as the compact prompt case above.
+    like( $tmux_status, qr/✅b.*✅Z/s, 'tmux status formatter keeps indicator priority order' );
     unlike( $tmux_status, qr/\n/, 'tmux status formatter stays on one line when the ticket-session indicator strip fits the available width' );
     like( $prompt->render_tmux_status( width => 4 ), qr/\n/, 'tmux status formatter still emits multiple lines when the available width is too small for the full indicator strip' );
     unlike( $tmux_status, qr/🎫:DD-4242/, 'tmux status formatter leaves ticket context to the prompt or tmux session line' );
@@ -5363,7 +5375,7 @@ SCRIPT
           or diag $error;
         ok( !-e $source, '_overwrite_state_file_in_place removes the consumed collector pending state file after a successful overwrite' );
         is(
-            Developer::Dashboard::CollectorRunner::_slurp($target),
+            Developer::Dashboard::CollectorRunner::slurp_file($target),
             qq({"status":"running"}),
             '_overwrite_state_file_in_place replaces the target collector state payload in place',
         );

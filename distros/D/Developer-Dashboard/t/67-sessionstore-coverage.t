@@ -82,12 +82,12 @@ my $store = Developer::Dashboard::SessionStore->new( paths => $paths );
         '_iso8601_after treats a falsy ttl as a zero-second offset from now',
     );
     is(
-        Developer::Dashboard::SessionStore::_iso8601_to_epoch(undef),
+        Developer::Dashboard::SessionStore::_iso8601_to_epoch( undef, on_error => 'zero' ),
         0,
         '_iso8601_to_epoch returns 0 for an undefined timestamp',
     );
     is(
-        Developer::Dashboard::SessionStore::_iso8601_to_epoch('not-a-timestamp'),
+        Developer::Dashboard::SessionStore::_iso8601_to_epoch( 'not-a-timestamp', on_error => 'zero' ),
         0,
         '_iso8601_to_epoch returns 0 for a timestamp that does not match the ISO-8601 shape',
     );
@@ -414,6 +414,17 @@ for my $case ( [ 'blank', '' ], [ 'zero', '0' ], [ 'missing', undef ] ) {
           if $can_write;
         is( $removed, 0, 'sweep_expired reports zero removals when an expired file cannot be unlinked' );
     }
+}
+
+# DD-850: same shape as DD-848 in Zipper.pm - every other test in this file
+# overrides _pending_session_file; this one calls the real implementation,
+# which none of them exercise.
+{
+    my @paths = map { $store->_pending_session_file('/tmp/dd850-session-target') } 1 .. 50;
+    my %seen;
+    my @dupes = grep { $seen{$_}++ } @paths;
+    is( scalar(@dupes), 0,
+        'DD-850: 50 real, rapid-fire calls to _pending_session_file for the same destination never repeat a staging path' );
 }
 
 done_testing;

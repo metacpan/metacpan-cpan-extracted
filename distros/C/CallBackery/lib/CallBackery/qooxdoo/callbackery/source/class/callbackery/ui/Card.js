@@ -124,7 +124,7 @@ qx.Class.define("callbackery.ui.Card", {
                         font         : 'cardLabel'
                     });
                     if (labelCfg.set) {
-                        ['value','tooltip'].forEach(key => {
+                        ['value','tooltip','toolTipText'].forEach(key => {
                             if (key in labelCfg.set){
                                 labelCfg.set[key] = this.xtr(labelCfg.set[key]).toString();
                             }
@@ -145,7 +145,7 @@ qx.Class.define("callbackery.ui.Card", {
                     var fieldClass = qx.Bootstrap.getByName(className);
                     var field = new fieldClass;
                     if (fieldCfg.set) {
-                        ['placeholder','tooltip'].forEach(key => {
+                        ['placeholder','tooltip','toolTipText'].forEach(key => {
                             if (key in fieldCfg.set){
                                 fieldCfg.set[key] = this.xtr(fieldCfg.set[key]).toString();
                             }

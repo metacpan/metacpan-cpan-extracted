@@ -1,5 +1,14 @@
 Revision history for Hyperman
 
+0.48	2026-09-17
+        - ADDS: a stream handle opened with status 101 on HTTP/1.1 turns
+          the connection into a tunnel. No Connection: close is added,
+          the handler's return value is discarded as the sentinel a
+          detach leaves, and what the peer sends reaches stream_on_data
+          instead of the request parser. Allowed from a synchronous
+          handler, which every other status still is not. It is how a
+          WebSocket runs over TLS, which conn_detach refuses (-3);
+
 0.47	2026-09-17
         - FIX: a repeated request header folded with ", " whatever its
           name, Cookie included. An HTTP/2 client may send each cookie

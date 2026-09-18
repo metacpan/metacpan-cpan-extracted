@@ -196,7 +196,7 @@ dies_like( sub { Developer::Dashboard::RuntimeManager->new( config => $config, f
 dies_like( sub { Developer::Dashboard::RuntimeManager->new( config => $config, files => $files, paths => $paths, runner => $runner ) }, qr/Missing app builder/, 'runtime manager requires app builder' );
 
 is( $manager->_web_process_title( '0.0.0.0', 7890 ), 'dashboard web: 0.0.0.0:7890', 'web process title is predictable' );
-like( Developer::Dashboard::RuntimeManager::_now_iso8601(), qr/^\d{4}-\d{2}-\d{2}T/, 'timestamp helper emits ISO-8601' );
+like( Developer::Dashboard::RuntimeManager::_now_iso8601( tz => 'utc' ), qr/^\d{4}-\d{2}-\d{2}T/, 'timestamp helper emits ISO-8601' );
 is( Developer::Dashboard::RuntimeManager::_portable_signal('TERM'), 15, 'portable signal helper maps TERM to numeric POSIX signal 15' );
 is( Developer::Dashboard::RuntimeManager::_portable_signal('kill'), 9, 'portable signal helper accepts lowercase signal names' );
 is( Developer::Dashboard::RuntimeManager::_portable_signal(2), 2, 'portable signal helper preserves numeric signals' );
@@ -2822,7 +2822,7 @@ END {
             watchdog_last_unexpected_stop_at       => undef,
             watchdog_last_unexpected_stop_at_epoch => undef,
             watchdog_restart_count                 => 1,
-            watchdog_restart_window_started_at     => Developer::Dashboard::RuntimeManager::_now_iso8601(),
+            watchdog_restart_window_started_at     => Developer::Dashboard::RuntimeManager::_now_iso8601( tz => 'utc' ),
             watchdog_restart_window_started_at_epoch => time,
             watchdog_status                        => undef,
         }
@@ -2874,7 +2874,7 @@ END {
     no warnings 'redefine';
     $runner->{started} = [];
     $runner->{loops} = [];
-    my $now = Developer::Dashboard::RuntimeManager::_now_iso8601();
+    my $now = Developer::Dashboard::RuntimeManager::_now_iso8601( tz => 'utc' );
     $collector_store->write_status(
         'alpha.collector',
         {

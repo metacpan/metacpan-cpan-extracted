@@ -1,0 +1,8 @@
+claude: true
+prompt: |
+  You are working on Alien::TinyCDB, an Alien::Base distribution that provides
+  Michael Tokarev's TinyCDB (corpit.ru cdb) C library to Perl. Read
+  .claude/rules/alien-tinycdb-rules.md, then pick the top actionable ticket from
+  the karr board and drive it to review. Delegate behavior-relevant work (the
+  dist.ini alien_* build config, lib/Alien/TinyCDB.pm, t/) to alien-tinycdb-worker.
+  Never run dzil release.

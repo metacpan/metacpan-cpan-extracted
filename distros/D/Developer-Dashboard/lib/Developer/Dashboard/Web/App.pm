@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::App;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Capture::Tiny qw(capture);
 use Digest::SHA qw(sha256_hex);
@@ -18,6 +18,8 @@ use Cwd qw(abs_path cwd);
 
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::Platform qw(command_in_path is_windows);
+use Developer::Dashboard::TextUtils qw(_trim);
+use Developer::Dashboard::HtmlEscape qw(_escape_html _escape_html_attr);
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::Codec qw(decode_payload);
@@ -2212,36 +2214,6 @@ sub _highlight_restore_tokens {
     return $text;
 }
 
-# _escape_html($text)
-# Escapes plain text for safe HTML output in the bookmark editor.
-# Input: raw text.
-# Output: escaped HTML-safe text.
-sub _escape_html {
-    my ($text) = @_;
-    $text = '' if !defined $text;
-    $text =~ s/&/&amp;/g;
-    $text =~ s/</&lt;/g;
-    $text =~ s/>/&gt;/g;
-    return $text;
-}
-
-# _escape_html_attr($value)
-# Escapes one value for safe output inside a quoted HTML attribute.
-# Quotes are what _escape_html deliberately leaves alone, and a quote is
-# exactly what closes an attribute early, so attribute context needs its own
-# escaper: saved bookmark ids reach the route builders with only traversal
-# components rejected, so a quote in an id would otherwise end the attribute
-# and let the rest of the id open a tag.
-# Input: raw value, possibly undefined.
-# Output: escaped value safe between either kind of attribute quote.
-sub _escape_html_attr {
-    my ($value) = @_;
-    $value = _escape_html($value);
-    $value =~ s/"/&quot;/g;
-    $value =~ s/'/&#39;/g;
-    return $value;
-}
-
 # _render_page_html($page, $mode)
 # Renders the browser page view and action URLs for a page.
 # Input: page document object and mode string.
@@ -2879,18 +2851,6 @@ sub _page_with_runtime_state {
         role        => $request_ctx->{role} || '',
     };
     return $page;
-}
-
-# _trim($text)
-# Trims leading and trailing whitespace from text.
-# Input: text string.
-# Output: trimmed string.
-sub _trim {
-    my ($text) = @_;
-    $text = '' if !defined $text;
-    $text =~ s/\A\s+//;
-    $text =~ s/\s+\z//;
-    return $text;
 }
 
 # _login_redirect_target(%args)

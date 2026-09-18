@@ -1,7 +1,11 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
-**** 1.37  [unreleased]
+**** 1.38  Sep 17, 2026
+	Ensure test script can tolerate missing root key.
+
+
+**** 1.37  May 26, 2026
 	Add DNSSEC example script.
 	Add TLS example script.
 

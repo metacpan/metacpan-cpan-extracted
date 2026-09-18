@@ -38,6 +38,13 @@ my $app = <<'APP';
 package WSApp;
 use Punk;
 
+# csrf on, as a real application has it: the handshake arrives as CONNECT,
+# which is not a safe method, and the check has to know it stands in for
+# the GET an upgrade would have been. Without this the whole test passed
+# while every browser websocket on h2 was answered 403 invalid csrf token.
+session secret => 'a secret long enough to sign a cookie with';
+csrf;
+
 websocket '/chat' => sub {
     my ($c, $ws) = @_;
     return unless $ws;
@@ -153,13 +160,13 @@ my $hb = lit(':method', 'CONNECT') . lit(':protocol', 'websocket')
        . lit(':authority', "127.0.0.1:$port");
 syswrite $sock, frame(0x1, 0x4, 1, $hb);
 
-my ($saw_headers, $ws_bytes) = (0, '');
+my ($saw_headers, $hdr_bytes, $ws_bytes) = (0, '', '');
 syswrite $sock, frame(0x0, 0, 1, ws_text('hello'));
 
 for (1 .. 30) {
     my ($type, $flags, $sid, $pay) = read_frame($sock, 5);
     last unless defined $type;
-    $saw_headers = 1 if $type == 0x1 && $sid == 1;
+    if ($type == 0x1 && $sid == 1) { $saw_headers = 1; $hdr_bytes = $pay }
     $ws_bytes .= $pay if $type == 0x0 && $sid == 1;
     last if length $ws_bytes >= 2;
 }
@@ -167,6 +174,10 @@ for (1 .. 30) {
 ok($saw_headers,
    'the route answered the CONNECT stream - a 200, not a 101, because a '
  . 'multiplexed transport has no 101');
+# :status 200 is static table entry 8, sent as the one indexed byte 0x88;
+# a 403 (the csrf refusal) is a literal and starts with something else
+is(sprintf('%02x', ord substr($hdr_bytes, 0, 1)), '88',
+   'and the status is 200, so csrf let the handshake through');
 
 my ($op, $payload) = ws_decode($ws_bytes);
 is($op, 1, 'the reply is a WebSocket text frame, unmasked as a server frame');

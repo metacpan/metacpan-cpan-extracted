@@ -603,6 +603,13 @@ for my $helper ( Developer::Dashboard::InternalCLI::helper_names() ) {
             'helper_content renders the shipped upgrade wrapper body',
         );
     }
+    elsif ( $helper eq 'pax' ) {
+        like(
+            $content,
+            qr/\QDeveloper::Dashboard::Pax::CLI->run(\E\@ARGV\Q)\E/,
+            'helper_content renders the shipped pax dispatch body',
+        );
+    }
     else {
         like(
             $content,

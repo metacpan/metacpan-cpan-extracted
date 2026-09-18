@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempfile);
+use Crypt::Age;
 use Crypt::Age::Header;
 use Crypt::Age::Keys;
 use Crypt::Age::Primitives;
@@ -1309,6 +1310,259 @@ my $no_stanza_msg = 'age header must carry at least one recipient stanza: '
     open my $fh, '<:raw', \$header_text or die "open: $!";
     my $parsed_fh = Crypt::Age::Header->parse_from_fh($fh);
     is(scalar @{$parsed_fh->stanzas}, 1, 'and still parses via parse_from_fh directly');
+}
+
+# CVE-2026-85783 / karr #45: unwrap_file_key tries every identity against
+# every stanza, and each attempt costs an X25519 scalar multiplication, an
+# HKDF and a ChaCha20-Poly1305 open -- before any of the header can be
+# authenticated, since the header MAC key is itself derived from the file key
+# that unwrap_file_key is trying to recover. The stanza count was unbounded,
+# so an attacker-controlled header with N stanzas bought N scalar
+# multiplications per identity tried: measured on 0.003, ~3.9 ms per stanza,
+# linear -- 4000 stanzas (382 KB) cost 15.7 s CPU before the header was even
+# rejected. parse_from_fh now caps the stanza count via max_stanzas (default
+# 128) and enforces it while still reading the header: at the start line of
+# the first stanza over the limit, before that stanza's body, before any
+# later stanza, and therefore before unwrap_file_key ever runs.
+#
+# A "fake" X25519 stanza below is built via ->new rather than ->wrap:
+# BUILD's checks (one argument decoding to 32 bytes; a 32-byte body) are the
+# only thing that has to hold for the parser to count it as a real X25519
+# stanza, and neither check costs a scalar multiplication. That is what keeps
+# these fixtures cheap regardless of how many stanzas they carry -- the cost
+# this ticket is about lives entirely in unwrap_file_key, not in parsing, and
+# these tests are built to demonstrate that unwrap_file_key never even runs.
+{
+    my $fake_x25519_stanza = sub {
+        my ($i) = @_;
+        my $arg  = Crypt::Age::Stanza::encode_base64_no_padding(chr(($i * 7 + 1) % 251) x 32);
+        my $body = chr(($i * 13 + 2) % 251) x 32;
+        return Crypt::Age::Stanza::X25519->new(args => [$arg], body => $body);
+    };
+
+    # Builds header text out of $fake_count fake stanzas followed by an
+    # optional real one, MAC included. Without a file_key the MAC is a
+    # placeholder -- fine for every case below that expects parse_from_fh to
+    # fail before the MAC line is ever reached, which is every case that
+    # does not pass one.
+    my $build_capped_header = sub {
+        my (%args) = @_;
+        my @lines = ('age-encryption.org/v1');
+        push @lines, $fake_x25519_stanza->($_)->to_string for 1 .. $args{fake_count};
+        push @lines, $args{real_stanza}->to_string if $args{real_stanza};
+        my $head_no_mac = join("\n", @lines, '---');
+        my $mac = $args{file_key}
+            ? Crypt::Age::Primitives->compute_header_mac($args{file_key}, $head_no_mac)
+            : ("\x00" x 32);
+        return $head_no_mac . ' ' . Crypt::Age::Stanza::encode_base64_no_padding($mac) . "\n";
+    };
+
+    # 1. The attack is refused: a header shaped like the CPANSec PoC --
+    # version line, then one "-> X25519 <argument>" plus a body line per
+    # stanza, then the MAC footer -- sized for a test suite rather than for
+    # the report's own 4000-stanza reproduction. The boundary being pinned
+    # here does not depend on scale, so 200 stanzas demonstrates it exactly
+    # as well as 4000 does, without the 382 KB or the CPU time.
+    {
+        my $header_text = $build_capped_header->(fake_count => 200);
+        open my $fh, '<:raw', \$header_text or die "open: $!";
+
+        my @warn;
+        my $header = do {
+            local $SIG{__WARN__} = sub { push @warn, $_[0] };
+            eval { Crypt::Age::Header->parse_from_fh($fh) };
+        };
+        my $err = $@;
+
+        ok(!defined $header, 'a 200-stanza header is refused by default');
+        like($err, qr/\bmax_stanzas\b/, 'the message names max_stanzas');
+        like($err, qr/\b128\b/, 'and the configured limit, 128 by default');
+        is_deeply(\@warn, [], 'and nothing warns on the way');
+
+        # Header content is attacker-controlled input. A short, recognizable
+        # fragment -- not the whole 43-character argument -- of the specific
+        # stanza that tripped the limit (the 129th, first over the default
+        # cap) must not appear in the error. Deliberately a fragment and not
+        # the whole value: Perl's own "Can't use string (...) as an ARRAY
+        # ref" truncates an interpolated string at 32 characters, so a "does
+        # the WHOLE value appear" assertion cannot fail even when part of it
+        # actually leaked (see the strict-refs 32-character truncation note).
+        my $offending_arg = $fake_x25519_stanza->(129)->args->[0];
+        my $fragment = substr($offending_arg, 0, 16);
+        unlike($err, qr/\Q$fragment\E/,
+            'and no fragment of the offending stanza leaks into it');
+    }
+
+    # 2. The boundary is exact: 128 is accepted, 129 is not. The counts here
+    # are hardcoded rather than read off Header's own DEFAULT_MAX_STANZAS --
+    # deliberately: this is the test meant to go red the moment somebody
+    # moves the default, not one that quietly tracks it.
+    {
+        my $at_cap   = $build_capped_header->(fake_count => 128);
+        my $over_cap = $build_capped_header->(fake_count => 129);
+
+        open my $fh1, '<:raw', \$at_cap or die "open: $!";
+        my $header1 = eval { Crypt::Age::Header->parse_from_fh($fh1) };
+        is($@, '', '128 stanzas parse without dying');
+        is(scalar @{$header1->stanzas}, 128, 'and all 128 are present');
+
+        open my $fh2, '<:raw', \$over_cap or die "open: $!";
+        my $header2 = eval { Crypt::Age::Header->parse_from_fh($fh2) };
+        ok(!defined $header2, '129 stanzas are refused');
+        like($@, qr/\bmax_stanzas\b/, 'with a message naming max_stanzas');
+        like($@, qr/\b128\b/, 'and the limit it exceeded');
+    }
+
+    # 3. The rejection happens in the parser, before any identity is
+    # consulted and before the rest of the header is read -- the actual
+    # point of the fix: unwrap_file_key's per-(identity, stanza) scalar
+    # multiplication must never run on an over-limit header, not merely run
+    # faster. Two independent, timing-free ways to show that, since wall
+    # clock comparisons are flaky on CI and would not even show the right
+    # thing (the fix is about work skipped entirely, not work done faster).
+    #
+    # a) A spy stands in for Stanza::X25519::unwrap and ::identity_keys --
+    # the two per-attempt operations that do the actual scalar
+    # multiplications (see the diff for this ticket) -- and must see zero
+    # calls, even though the header below carries a stanza a genuinely
+    # matching identity IS supplied for. An uncapped implementation would
+    # call it; calling it at all is exactly the regression this guards.
+    {
+        my ($public, $secret) = Crypt::Age::Keys->generate_keypair;
+        my $file_key = Crypt::Age::Primitives->generate_file_key;
+        my $real_stanza = Crypt::Age::Stanza::X25519->wrap($file_key, $public);
+
+        my $header_text = $build_capped_header->(
+            fake_count  => 128,
+            real_stanza => $real_stanza,
+            file_key    => $file_key,
+        );
+
+        my ($unwrap_calls, $identity_keys_calls) = (0, 0);
+        {
+            no warnings 'redefine';
+            local *Crypt::Age::Stanza::X25519::unwrap = sub {
+                $unwrap_calls++;
+                die "spy: unwrap must not run once max_stanzas rejects the header\n";
+            };
+            local *Crypt::Age::Stanza::X25519::identity_keys = sub {
+                $identity_keys_calls++;
+                die "spy: identity_keys must not run once max_stanzas rejects the header\n";
+            };
+
+            # No payload needed: the rejection happens while parsing the
+            # header, before _decrypt_fh ever gets to the nonce.
+            eval {
+                Crypt::Age->decrypt(ciphertext => $header_text, identities => [$secret]);
+            };
+        }
+        my $err = $@;
+
+        ok(length $err, 'decrypt of a 129-stanza header dies');
+        like($err, qr/\bmax_stanzas\b/, 'refused for the stanza count, not a spy trip');
+        is($unwrap_calls, 0, 'Stanza::X25519::unwrap is never called');
+        is($identity_keys_calls, 0, 'Stanza::X25519::identity_keys is never called');
+
+        # The identity is never even looked at before this croak fires, but
+        # pin it anyway: a short, middle fragment (never the whole value --
+        # again the 32-character truncation trap) of the real secret key
+        # supplied to this same decrypt call must not appear in the error.
+        my $secret_fragment = substr($secret, 20, 16);
+        unlike($err, qr/\Q$secret_fragment\E/,
+            'and no fragment of the identity leaks into it either');
+    }
+
+    # b) The 129th stanza's own start line is garbage that matches neither
+    # the arg-line grammar nor the MAC footer, and nothing at all follows it
+    # -- not a body line, not a MAC line, end of input. If the parser read
+    # that far and tried to make sense of it, the error would name a
+    # different failure (a bad start line, or a handle that ran out looking
+    # for the MAC); getting the stanza-count message instead proves neither
+    # of those code paths ran.
+    {
+        my @lines = ('age-encryption.org/v1');
+        push @lines, $fake_x25519_stanza->($_)->to_string for 1 .. 128;
+        push @lines, 'this is not a stanza line at all, nor the MAC footer';
+        my $header_text = join("\n", @lines) . "\n";
+
+        open my $fh, '<:raw', \$header_text or die "open: $!";
+        my @warn;
+        my $header = do {
+            local $SIG{__WARN__} = sub { push @warn, $_[0] };
+            eval { Crypt::Age::Header->parse_from_fh($fh) };
+        };
+        my $err = $@;
+
+        ok(!defined $header, 'a garbage 129th line still gets the header refused');
+        like($err, qr/\bmax_stanzas\b/, 'refused for the stanza count');
+        unlike($err, qr/Invalid age stanza/,
+            'not because the garbage failed the arg-line grammar -- it was never checked');
+        unlike($err, qr/no valid header MAC line/,
+            'not because the handle ran out looking for the MAC -- it was never looked for');
+        is_deeply(\@warn, [], 'and nothing warns on the way');
+    }
+
+    # 4. max_stanzas actually raises the limit, at both Header entry points.
+    # (Crypt::Age->decrypt / decrypt_file / decrypt_filehandle forwarding the
+    # option through to here is pinned in t/02-encrypt-decrypt.t.)
+    {
+        my ($public, $secret) = Crypt::Age::Keys->generate_keypair;
+        my $file_key = Crypt::Age::Primitives->generate_file_key;
+        my $real_stanza = Crypt::Age::Stanza::X25519->wrap($file_key, $public);
+        my $header_text = $build_capped_header->(
+            fake_count  => 128,
+            real_stanza => $real_stanza,
+            file_key    => $file_key,
+        );
+
+        open my $fh, '<:raw', \$header_text or die "open: $!";
+        my $rejected = eval { Crypt::Age::Header->parse_from_fh($fh) };
+        ok(!defined $rejected, 'the default still refuses this same 129-stanza header');
+
+        open my $fh2, '<:raw', \$header_text or die "open: $!";
+        my $header = eval { Crypt::Age::Header->parse_from_fh($fh2, max_stanzas => 129) };
+        is($@, '', 'max_stanzas => 129 accepts the same 129-stanza header');
+        is(scalar @{$header->stanzas}, 129, 'and all 129 stanzas are present');
+        is($header->unwrap_file_key([$secret]), $file_key,
+            'and the real stanza -- last in the header -- still unwraps correctly');
+
+        # The \$data/\$offset wrapper threads the option through too.
+        my $offset = 0;
+        my $via_parse = eval {
+            Crypt::Age::Header->parse(\$header_text, \$offset, max_stanzas => 129);
+        };
+        is($@, '', 'parse($data, $offset, max_stanzas => 129) accepts it as well');
+        is(scalar @{$via_parse->stanzas}, 129, 'with all 129 stanzas');
+    }
+
+    # max_stanzas itself must be a positive integer -- the documented failure
+    # modes for the option, checked against a tiny header since none of these
+    # cases are about the stanza count.
+    {
+        my $header_text = $build_capped_header->(fake_count => 6);
+
+        for my $case (
+            [0,     'max_stanzas => 0'],
+            [-1,    'max_stanzas => -1'],
+            [undef, 'max_stanzas => undef'],
+            ['abc', "max_stanzas => 'abc'"],
+        ) {
+            my ($value, $label) = @$case;
+            open my $fh, '<:raw', \$header_text or die "open: $!";
+            my $header = eval { Crypt::Age::Header->parse_from_fh($fh, max_stanzas => $value) };
+            ok(!defined $header, "$label is refused");
+            like($@, qr/max_stanzas must be a positive integer/, "$label names the reason");
+        }
+
+        # The positional-argument mistake: parse_from_fh($fh, 300) is an odd
+        # number of trailing elements, not a limit -- refused before it can
+        # silently fall back to the default and reject a legitimate
+        # 300-recipient file while telling the caller nothing about why.
+        open my $fh, '<:raw', \$header_text or die "open: $!";
+        my $header = eval { Crypt::Age::Header->parse_from_fh($fh, 300) };
+        ok(!defined $header, 'a bare positional limit is refused');
+        like($@, qr/named options/, 'and told to use max_stanzas => $n instead');
+    }
 }
 
 done_testing;

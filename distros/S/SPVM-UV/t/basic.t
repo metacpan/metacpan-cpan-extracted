@@ -15,6 +15,12 @@ my $api = SPVM::api();
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
 ok(SPVM::TestCase::UV->test);
+ok(SPVM::TestCase::UV->poll);
+ok(SPVM::TestCase::UV->timer);
+ok(SPVM::TestCase::UV->idle);
+ok(SPVM::TestCase::UV->async);
+ok(SPVM::TestCase::UV->pipe);
+
 
 # Version check
 is($SPVM::UV::VERSION, $api->get_version_string("UV"));

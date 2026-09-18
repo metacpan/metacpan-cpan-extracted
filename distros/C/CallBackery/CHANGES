@@ -1,3 +1,39 @@
+0.61.0 2026-09-18 09:45:59 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - trm() now always crosses the wire as an ARRAY, even with no arguments
+   to substitute. The array is the marker that tells the frontend a string
+   wants translating, and collapsing the no-argument case to a bare string
+   made the most common kind of translatable text look exactly like data.
+
+ - Form field values and string table cells are now run through xtr().
+   Only labels were translated before, so any text a GuiPlugin produced in
+   a getter or a table row stayed in English -- and a trm() WITH arguments
+   was joined with commas, so the user read "Status: %1,migrated" instead
+   of the sentence.
+
+ - A form actionSet may now carry a translatable label. Form.js applied
+   those properties raw while Table.js ran the row actionSet through xtr(),
+   so a form button that changed its own label rendered the untranslated
+   msgid. label, menuLabel and toolTipText are translated in both places
+   now.
+
+ - toolTipText is translated alongside placeholder and label wherever a
+   'set' block is applied (Auto.js, Form.js reconfiguration, Card.js).
+
+ - An argument to trm() may now be a trm() of its own. It stays an object,
+   travels as a nested array and xtr() resolves it before substituting, so
+   a message assembled from a fixed part and a few optional ones stays
+   translatable in every piece instead of needing a msgid per combination.
+   Stringification of a nested message is fixed along with it: the inner
+   s/// reset $1 while the outer one was still running, which left a bare
+   "%2" standing in the result.
+
+ - New trmJoin($sep,@parts) for a message whose number of parts is only
+   known at run time -- a list of warnings, the flags on a table row.
+   join() was the obvious thing to reach for and it stringified every part;
+   the msgid trmJoin builds holds nothing but placeholders and the
+   separator, so all the words stay in the parts.
+
 0.60.1 2026-09-09 22:37:58 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - SECURITY: CallBackery::Plugin::Doc passed the client supplied document

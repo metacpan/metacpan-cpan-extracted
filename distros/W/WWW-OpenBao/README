@@ -1,9 +1,9 @@
 This archive contains the distribution WWW-OpenBao,
-version 0.001:
+version 0.002:
 
   HTTP client for OpenBao / HashiCorp Vault API
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

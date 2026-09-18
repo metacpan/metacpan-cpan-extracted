@@ -283,6 +283,75 @@ sub run_interop_tests {
         is($decrypted, $plaintext, "[$cli_name] decrypt_filehandle output matches CLI-encrypted plaintext");
     }
 
+    # CVE-2026-85783 / karr #45: max_stanzas caps how many recipient stanzas
+    # Crypt::Age::Header::parse_from_fh accepts (default 128), because each
+    # one costs an X25519 scalar multiplication per identity tried before
+    # any of the header can be authenticated -- t/03-header.t and
+    # t/02-encrypt-decrypt.t pin the cap, the exact boundary, and its
+    # determinism without a binary. What only a real binary can show is the
+    # thing the cap is a deliberate trade-off against: measured for this
+    # ticket, `age -R` with 300 recipients writes a 29 KB header without
+    # complaint, and a genuine 301-recipient file it produces decrypts here
+    # correctly in 1.17 s once the cap is explicitly raised. So this file, as
+    # written by the CLI itself rather than crafted by hand, is refused by
+    # default and only readable with an explicit max_stanzas -- documenting
+    # that the cap is this distribution's own deliberate deviation from age,
+    # not a bug or a compatibility gap.
+    #
+    # max_stanzas is given generous headroom above 301 rather than exactly
+    # 301, for a reason found while writing this test rather than assumed:
+    # rage 0.12.1 -- but not age 1.2.1 -- adds one extra randomly-typed
+    # "grease" stanza to every file it writes (anti-fingerprinting padding,
+    # a real age-ecosystem behaviour, not a bug in either implementation), so
+    # a "301-recipient" rage file actually carries 302 stanzas on the wire.
+    # Pinning the raised limit to exactly 301 would make this test flaky
+    # against rage for a reason that has nothing to do with the cap.
+    {
+        my ($public, $secret) = Crypt::Age->generate_keypair;
+        my $plaintext = "max_stanzas cap vs. a genuine many-recipient age file.\n";
+
+        my $recipients_file = "$tmpdir/cap_recipients.txt";
+        open my $rfh, '>', $recipients_file or die $!;
+        for (1 .. 300) {
+            my ($filler_public) = Crypt::Age->generate_keypair;
+            print $rfh "$filler_public\n";
+        }
+        # Our own identity last, so a naive "stop after the first match"
+        # reading of the cap could not accidentally look like success here.
+        print $rfh "$public\n";
+        close $rfh;
+
+        my $plain_file = "$tmpdir/cap_plain.txt";
+        open my $pfh, '>', $plain_file or die $!;
+        print $pfh $plaintext;
+        close $pfh;
+
+        my $enc_file = "$tmpdir/cap.age";
+        my $rc = system(qq{$cli_bin -R "$recipients_file" -o "$enc_file" "$plain_file" 2>"$tmpdir/cap_err"});
+        is($rc, 0, "[$cli_name] CLI writes a 301-recipient file without complaint")
+            or diag(do { open my $e, '<', "$tmpdir/cap_err"; local $/; <$e> });
+
+        open my $fh, '<:raw', $enc_file or die $!;
+        my $encrypted = do { local $/; <$fh> };
+        close $fh;
+
+        my $rejected = eval {
+            Crypt::Age->decrypt(ciphertext => $encrypted, identities => [$secret]);
+        };
+        ok(!defined $rejected,
+            "[$cli_name] Crypt::Age->decrypt refuses the CLI's 301-recipient file by default");
+        like($@, qr/\bmax_stanzas\b/,
+            "[$cli_name] and the refusal names max_stanzas");
+
+        my $decrypted = Crypt::Age->decrypt(
+            ciphertext  => $encrypted,
+            identities  => [$secret],
+            max_stanzas => 350,
+        );
+        is($decrypted, $plaintext,
+            "[$cli_name] max_stanzas => 350 reads the same CLI-produced file correctly");
+    }
+
     # STREAM chunk boundaries against the CLI, both directions. The payload path
     # moved from substr arithmetic to read()/eof(); is_final is now decided by
     # eof(), so these sizes exercise exactly-one-chunk (65536), one byte short of

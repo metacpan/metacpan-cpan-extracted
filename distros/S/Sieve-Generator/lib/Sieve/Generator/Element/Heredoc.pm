@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Element::Heredoc 0.003;
+package Sieve::Generator::Element::Heredoc 0.004;
 # ABSTRACT: a Sieve multiline string (heredoc)
 
 use Moo;
@@ -58,7 +58,7 @@ Sieve::Generator::Element::Heredoc - a Sieve multiline string (heredoc)
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -90,7 +90,7 @@ line, as allowed by RFC 5228.  If set, it renders as C<text: # comment>.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

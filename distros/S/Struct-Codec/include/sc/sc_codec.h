@@ -150,12 +150,38 @@ static NV sc_nv_from_wire(const unsigned char *in) {
  * binary float of that width survives the trip out to decimal and back, which
  * t/25-wide-nv.t asserts directly rather than trusting the arithmetic.
  *
- * The formatter is my_snprintf with NVgf, which is the only spelling correct on
- * all three: NVgf expands to "Lg" or "Qg" for the build, and Perl_my_snprintf
- * routes a "Q" to quadmath_snprintf. Gconvert is NOT used - config.h defines it
- * as a plain "%.*g" even on a quadmath perl, where it would read a __float128
- * through a double conversion, and perl's own sv.c avoids it there for exactly
- * that reason.
+ * Both ends of that trip have to be the RIGHT primitive, and the obvious
+ * spelling of each is wrong on one of the two wide widths. Gconvert is wrong on
+ * both - config.h defines it as a plain "%.*g" even on a quadmath perl, where it
+ * reads a __float128 through a double conversion - and perl's own sv.c goes
+ * around it for that reason. What replaces it:
+ *
+ *   OUT. my_snprintf with the precision written INTO the format string, never
+ *   passed as "%.*". Perl_my_snprintf hands any format ending "Qg" straight to
+ *   quadmath_snprintf with ONE variadic argument (util.c, guarded by
+ *   quadmath_format_valid, which does not reject a "*"), so a "*" there takes
+ *   the precision from a slot nothing was pushed into. 0.03 wrote "%.*" NVgf
+ *   and on the quadmath smokers printed ONE significant digit - a third came
+ *   back 0.3 - while on the 32-bit one the garbage precision overran the buffer
+ *   and perl panicked "my_snprintf buffer overflow". Perl's sv.c builds the
+ *   digits into the format for the same reason; sc_nv_fmt is that, in one line.
+ *
+ *   BACK. strtod's family, not Atof. Atof is perl's own numifier and only
+ *   became correctly rounded in 5.30: before that, on a perl whose NV is a long
+ *   double, my_atof accumulates the digits and scales by a power of ten built
+ *   from repeated squaring (S_mulexp10 in numeric.c), which is a ULP or two out
+ *   at the full width of the NV, so the encoder's own DECIMAL_DIG digits did not
+ *   read back as the number they were printed from. Perl fixed that for itself
+ *   in 5.30 by numifying through strtod (perl RT #41202); every
+ *   -Duselongdouble smoker below it failed eight subtests of t/25-wide-nv.t on
+ *   0.03. A quadmath perl was never affected - my_atof3 has read through
+ *   strtoflt128 since USE_QUADMATH existed - which is why the two widths
+ *   reported different failures from the one tag.
+ *
+ * The radix is always '.' on the wire. my_snprintf formats under the locale
+ * perl would print a number with, so inside "use locale" with a comma radix it
+ * writes 0,333; the stream promises to say the same thing on every machine, and
+ * the reader below parses a '.'.
  *
  * All of this is compiled out where NV is a double, so that encoder is the same
  * function it was before, byte for byte. */
@@ -181,15 +207,69 @@ static NV sc_nv_from_wire(const unsigned char *in) {
  * and compare it against itself, which is always equal and would answer no. */
 static int sc_nv_needs_str(NV nv) {
     volatile double dv;
+    /* NVgf is a bare "g" on a -Duselongdouble build whose Configure found no
+     * long double format, and then there is no way to print the NV at all:
+     * "%g" would read a double out of a long double argument. Narrowing is
+     * wrong, garbage digits are worse, so such a build keeps the 8-byte form.
+     * Perl's own sv.c carries a FIXME for the same hole. Folded at compile
+     * time; every build anyone smokes has the format. */
+    if (sizeof(NVgf) == 2) return 0;
     if (nv != nv) return 0;
     dv = (double)nv;
     return (NV)dv != nv;
+}
+
+/* "%.21Lg" or "%.36Qg", whichever this build is. NV_DIG is a float.h value and
+ * not a token the preprocessor can paste into a literal, so the precision is
+ * printed in; THIS format has no float conversion of its own, which is what
+ * keeps it off quadmath_snprintf's one-argument path. */
+static void sc_nv_fmt(char *fmt, STRLEN cap) {
+    my_snprintf(fmt, cap, "%s%d%s", "%.", (int)(NV_DIG + 3), NVgf);
+}
+
+/* Whatever the locale wrote for a radix becomes a single '.'. In the C locale,
+ * which is where perl keeps LC_NUMERIC unless "use locale" is in effect, there
+ * is nothing to do. A radix is more than one byte in some locales, so the run
+ * is replaced and not the byte, and %g of a finite number has at most one.
+ * Returns the length, which the replacement can shorten. */
+static int sc_nv_radix(char *s, int n) {
+    int i, j = 0;
+    for (i = 0; i < n; i++) {
+        char c = s[i];
+        if (isDIGIT(c) || c == '-' || c == '+' || c == 'e' || c == 'E') continue;
+        for (j = i + 1; j < n; j++) {
+            c = s[j];
+            if (isDIGIT(c) || c == '-' || c == '+' || c == 'e' || c == 'E') break;
+        }
+        s[i] = '.';
+        if (j > i + 1) {
+            Move(s + j, s + i + 1, n - j, char);
+            n -= j - i - 1;
+        }
+        break;
+    }
+    s[n] = '\0';
+    return n;
 }
 
 #else
 
 #define sc_nv_needs_str(nv) (0)
 
+#endif
+
+/* The parser named directly, because Atof is not one below 5.30 (above). Where
+ * a build has no wide parser Atof is still all there is, and it is at least as
+ * wide as the NV - a bare strtod there would narrow, which is the bug 0.02 was
+ * written to fix. Reached on a double perl too, reading a wide perl's stream. */
+#if defined(USE_QUADMATH)
+#  define SC_NV_FROM_STR(s) strtoflt128((s), (char **)NULL)
+#elif defined(USE_LONG_DOUBLE) && defined(HAS_STRTOLD)
+#  define SC_NV_FROM_STR(s) strtold((s), (char **)NULL)
+#elif !SC_NV_WIDE && defined(HAS_STRTOD)
+#  define SC_NV_FROM_STR(s) strtod((s), (char **)NULL)
+#else
+#  define SC_NV_FROM_STR(s) Atof(s)
 #endif
 
 /* ============================================================================
@@ -478,6 +558,13 @@ static void sc_enc_code(pTHX_ sc_enc *e, CV *cv) {
         ENTER;
         SAVETMPS;
         load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("B::Deparse"), NULL);
+        /* load_module runs perl (B::Deparse's own compilation), which can
+         * GROW and so reallocate the argument stack. dSP was taken before it,
+         * so SP may now dangle into the freed old stack; writing args through
+         * it corrupts the heap. It only bites when the load happens to trigger
+         * a realloc, which depends on how deep the stack already is - hence a
+         * crash from inside a test and not from a bare one-line encode. */
+        SPAGAIN;
         PUSHMARK(SP);
         XPUSHs(sv_2mortal(newSVpvs("B::Deparse")));
         PUTBACK;
@@ -697,17 +784,23 @@ static void sc_enc_body(pTHX_ sc_enc *e, SV *sv) {
             /* buf is an array and not a pointer on purpose: it is sized for the
              * widest NV plus a sign, a point, an exponent and the NUL. */
             char buf[SC_NV_STR_MAX + 1];
-            const int digits = (int)(NV_DIG + 3);
-            int blen = my_snprintf(buf, sizeof(buf), "%.*" NVgf, digits, nv);
+            char fmt[16];
+            int blen;
+            sc_nv_fmt(fmt, sizeof(fmt));
+            blen = my_snprintf(buf, sizeof(buf), fmt, nv);
             if (blen > 0 && blen <= SC_NV_STR_MAX) {
+                blen = sc_nv_radix(buf, blen);
                 SC_PUT(e, SC_T_NV_STR);
                 sc_enc_varint(aTHX_ e, (UV)blen);
                 sc_enc_bytes(aTHX_ e, buf, (STRLEN)blen);
                 return;
             }
-            /* Unreachable at any NV width perl builds on; if a future one did
-             * overrun the buffer, the 8-byte form below is still a valid
-             * stream, so fall through rather than write a truncated decimal. */
+            /* Unreachable at any NV width perl builds on: 36 digits is 44 bytes
+             * with the sign, the point and a five-byte exponent. A buffer that
+             * really did not fit never arrives here anyway - my_snprintf croaks
+             * "my_snprintf buffer overflow" rather than returning the length it
+             * wanted - so this covers a formatter that failed and returned
+             * negative, and the 8-byte form below is still a valid stream. */
         }
 #endif
         {
@@ -1319,15 +1412,17 @@ static SV *sc_dec_value(pTHX_ sc_dec *d, SV *into) {
         d->p += SC_NV_BYTES;
         break;
     case SC_T_NV_STR: {
-        /* Decimal digits from a perl whose NV is wider than a double. Read with
-         * Atof, which is perl's own numifier and so is as wide as this perl's NV
-         * is: on a wide perl that returns the value the writer had, and on a
-         * double perl the nearest double, which is the best it could hold.
+        /* Decimal digits from a perl whose NV is wider than a double, read at
+         * this perl's NV width: on a wide perl that returns the value the writer
+         * had, and on a double perl the nearest double, which is the best it
+         * could hold. The parser is named for the build rather than taken from
+         * Atof, which below 5.30 is a ULP or two out at the top of a long double
+         * - see the encoder's note.
          *
-         * Copied out to get the NUL that Atof needs - the stream has no room for
-         * one and must not be written to. A length past the buffer is corrupt
-         * input and is refused, not truncated, so the stack read stays inside
-         * what the varint was checked against. */
+         * Copied out to get the NUL the parser needs - the stream has no room
+         * for one and must not be written to. A length past the buffer is
+         * corrupt input and is refused, not truncated, so the stack read stays
+         * inside what the varint was checked against. */
         UV n = sc_dec_varint(aTHX_ d);
         char buf[SC_NV_STR_MAX + 1];
         if (n > (UV)SC_NV_STR_MAX) sc_dec_croak(aTHX_ d, "float too long");
@@ -1335,7 +1430,7 @@ static SV *sc_dec_value(pTHX_ sc_dec *d, SV *into) {
         Copy(d->p, buf, (STRLEN)n, char);
         buf[n] = '\0';
         d->p += n;
-        sv_setnv(into, Atof(buf));
+        sv_setnv(into, SC_NV_FROM_STR(buf));
         break;
     }
     case SC_T_UNDEF: break;   /* `into` is always a fresh SV, which is undef */

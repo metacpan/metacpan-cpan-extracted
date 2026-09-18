@@ -163,17 +163,19 @@ _hm_detach(env)
         if (rc != 0)
             croak("Punk::WebSocket: detach failed (%d: %s)", rc,
                   rc == -1 ? "connection gone or stale"
-                  /* Not the end of the story, and the message should not
-                   * read as though it were: a multiplexed transport carries
-                   * WebSocket through Extended CONNECT (RFC 8441 on h2, RFC
-                   * 9220 on h3), which needs no descriptor at all. Hyperman
-                   * serves that handshake; wiring it into this ladder is
-                   * still to do. */
+                  /* These two are handled before the ladder reaches here, so
+                   * a live server never shows them: an h2/h3 upgrade is an
+                   * Extended CONNECT that opens a stream handle, and a TLS
+                   * HTTP/1.1 upgrade opens a 101 stream handle (the tunnel).
+                   * Both are above; only an older Hyperman with no such
+                   * handle falls through to a detach that then refuses. */
                 : rc == -2 ? "HTTP/2 streams share one connection, so there "
                              "is no descriptor to hand over; WebSocket over "
-                             "h2 needs Extended CONNECT, which this ladder "
-                             "does not use yet"
-                : rc == -3 ? "TLS cannot be detached"
+                             "h2 uses Extended CONNECT, which needs a Hyperman "
+                             "new enough to open a stream handle"
+                : rc == -3 ? "a TLS session cannot be detached; a websocket "
+                             "over HTTPS needs Hyperman 0.48+, whose 101 "
+                             "stream handle carries it instead"
                 : rc == -4 ? "a response is still draining"
                 : rc == -5 ? "already detached" : "unknown");
         RETVAL = (IV)fd;

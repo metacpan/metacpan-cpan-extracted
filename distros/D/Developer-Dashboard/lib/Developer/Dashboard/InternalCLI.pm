@@ -3,7 +3,7 @@ package Developer::Dashboard::InternalCLI;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
@@ -22,7 +22,7 @@ sub helper_names {
       jq yq tomq propq iniq csvq xmlq
       of open-file workspace file files path paths ps1
       encode decode indicator collector config auth api ask init cpan page action docker serve stop restart log shell doctor housekeeper skills which upgrade
-      complete
+      complete pax
     );
 }
 

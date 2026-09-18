@@ -1,5 +1,11 @@
 Revision history for Shared::Arena
 
+0.09	2026-09-17
+        - FIXES a panic on every DEBUGGING perl: Map's stats reserved ten
+          stack slots with EXTEND(SP, 10) and pushed twelve (six pairs), so
+          t/14 and t/32 aborted after their assertions passed. A non-DEBUGGING
+          perl overran the stack silently. Now reserves twelve.
+
 0.08	2026-09-16
         - Add serialise => 1 to Cache and Map: a value can now be any Perl structure
           and comes back as the same structure, through Struct::Codec, which is

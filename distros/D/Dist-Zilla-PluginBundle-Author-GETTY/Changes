@@ -1,3 +1,17 @@
+0.323     2026-09-18 02:52:39Z
+
+  - SimpiCI provider: the generated `dzil test` job now exports
+    `DZIL_DOCKER_API_SKIP=1`, so a `[@Author::GETTY::Docker]` distribution tests
+    on SimpiCI without `dzil test` trying to reach a container engine and build
+    an image from inside the CI perl container (its precheck would otherwise
+    fail the run). Harmless for a dist without the Docker plugin.
+  - SimpiCI provider: a distribution can restrict the Perl matrix with a
+    `.simpici-perl` file at its root (whitespace-separated versions, `#`
+    comments), overriding the baked-in default. Needed when a dist's
+    `.simpici-apt` requires a Debian release the oldest `perl:<ver>` images no
+    longer serve packages for. Precedence: `.simpici-perl`, then
+    `SIMPICI_PROVIDER_PERL_VERSIONS`, then the default list.
+
 0.322     2026-09-15 20:09:52Z
 
   - SimpiCI provider: a distribution can now ship a `.simpici-apt` file listing

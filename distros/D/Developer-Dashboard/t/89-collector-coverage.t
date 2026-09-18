@@ -28,6 +28,7 @@ BEGIN {
 use lib 'lib';
 
 use Developer::Dashboard::Collector;
+use Developer::Dashboard::FileSlurp;
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::PathRegistry;
 
@@ -380,6 +381,37 @@ sub dies_like {
     seed_collector( $name, 'last_run' => "2026-01-01T00:00:00Z\n" );
     is( $collector->read_output($name)->{last_run}, '2026-01-01T00:00:00Z', 'the last_run marker is read back without its trailing newline' );
 }
+
+# ---------------------------------------------------------------------------
+# DD-859: readfile($alias) - the plain-function wrapper around
+# new_from_all_folders()->read_output($alias).
+# ---------------------------------------------------------------------------
+{
+    my $name = 'readfile-target';
+    seed_collector( $name, 'stdout' => "hello\n", 'stderr' => "warn\n", 'last_run' => "2026-02-02T00:00:00Z\n" );
+
+    my ( $json, $error, $last_run, $returned_collector ) = Developer::Dashboard::Collector::readfile($name);
+    is( $json,      "hello\n",             'DD-859: readfile returns the collector\'s stdout as $json' );
+    is( $error,     "warn\n",              'DD-859: readfile returns the collector\'s stderr as $error' );
+    is( $last_run,  '2026-02-02T00:00:00Z', 'DD-859: readfile returns the trimmed last_run marker' );
+    isa_ok( $returned_collector, 'Developer::Dashboard::Collector', 'DD-859: readfile also returns a usable collector object' );
+    is_deeply(
+        $returned_collector->read_output($name),
+        $collector->read_output($name),
+        'DD-859: the collector object readfile builds resolves the same persisted state as an explicitly constructed one',
+    );
+
+    my ( $missing_json, $missing_error, $missing_last_run ) = Developer::Dashboard::Collector::readfile('no-such-collector');
+    is( $missing_json,     '', 'DD-859 ATDD-2: readfile on a missing collector returns an empty stdout, not a die - matching read_output' );
+    is( $missing_error,    '', 'DD-859 ATDD-2: readfile on a missing collector returns an empty stderr - matching read_output' );
+    is( $missing_last_run, '', 'DD-859 ATDD-2: readfile on a missing collector returns an empty last_run - matching read_output' );
+}
+
+is_deeply(
+    \@Developer::Dashboard::Collector::EXPORT_OK,
+    ['readfile'],
+    'DD-859 ATDD-1: readfile is exported via @EXPORT_OK only, not exported by default',
+);
 
 # An artifact that exists but errors on read leaves the output value undefined.
 # /proc/self/mem is a regular file that reports EIO on a read from offset zero,
@@ -881,7 +913,8 @@ dies_like( sub { $collector->_format_log_entry( name => '' ) }, qr/Missing colle
 {
     my $outside = tempdir( CLEANUP => 1 );
     my $missing = File::Spec->catfile( $outside, 'missing' );
-    is( Developer::Dashboard::Collector::_slurp($missing), '', '_slurp returns an empty string for a missing file' );
+    is( Developer::Dashboard::FileSlurp::slurp_file( $missing, raw => 1, on_missing => 'empty' ),
+        '', 'slurp_file (Collector.pm-shaped call) returns an empty string for a missing file' );
 
     my $file = File::Spec->catfile( $outside, 'unreadable' );
     open my $fh, '>:raw', $file or die "Unable to write $file: $!";
@@ -895,11 +928,13 @@ dies_like( sub { $collector->_format_log_entry( name => '' ) }, qr/Missing colle
             skip 'this process can read a mode-0000 file, so the open failure cannot occur', 1;
         }
 
-    dies_like( sub { Developer::Dashboard::Collector::_slurp($file) }, qr/Unable to read \Q$file\E/, '_slurp dies when an existing file cannot be opened' );
+    dies_like( sub { Developer::Dashboard::FileSlurp::slurp_file( $file, raw => 1, on_missing => 'empty' ) },
+        qr/Unable to read \Q$file\E/, 'slurp_file (Collector.pm-shaped call) dies when an existing file cannot be opened' );
     }
 
     chmod 0600, $file or die "Unable to chmod $file: $!";
-    is( Developer::Dashboard::Collector::_slurp($file), "kept\n", '_slurp reads an existing readable file' );
+    is( Developer::Dashboard::FileSlurp::slurp_file( $file, raw => 1, on_missing => 'empty' ),
+        "kept\n", 'slurp_file (Collector.pm-shaped call) reads an existing readable file' );
 }
 
 # ---------------------------------------------------------------------------
@@ -1001,6 +1036,17 @@ SKIP: {
 {
     dies_like( sub { Developer::Dashboard::Collector->new }, qr/Missing paths registry/, 'new requires a paths registry' );
     isa_ok( Developer::Dashboard::Collector->new_from_all_folders, 'Developer::Dashboard::Collector' );
+}
+
+# DD-850: same shape as DD-848 in Zipper.pm - every other test in this file
+# overrides _pending_path; this one calls the real implementation, which
+# none of them exercise.
+{
+    my @paths = map { $collector->_pending_path('/tmp/dd850-collector-target') } 1 .. 50;
+    my %seen;
+    my @dupes = grep { $seen{$_}++ } @paths;
+    is( scalar(@dupes), 0,
+        'DD-850: 50 real, rapid-fire calls to _pending_path for the same destination never repeat a staging path' );
 }
 
 done_testing;

@@ -1086,7 +1086,7 @@ SH
     my $env_prefix = join ' ',
       map { sprintf q{%s='%s'}, $_->{key}, $_->{value} } (
         { key => 'HOME',                   value => $home },
-        { key => 'PATH',                   value => $fake_bin . ':' . ( $ENV{PATH} || '' ) },
+        { key => 'PATH',                   value => $fake_bin . ':' . _path_hiding_command('perlbrew') },
         { key => 'SHELL',                  value => '/bin/sh' },
         { key => 'DD_INSTALL_OS_OVERRIDE', value => 'alpine' },
         { key => 'FAKE_PERL_MEETS_MIN',    value => '0' },
@@ -1151,6 +1151,46 @@ SH
 }
 
 done_testing;
+
+# Purpose: build a PATH string in which `command -v $command` genuinely
+# fails, for use as a subprocess's PATH when a fixture needs to simulate a
+# tool being absent (not merely shadowed by a fake earlier on PATH).
+# Input: a command name (e.g. 'perlbrew'). Output: a ':'-joined PATH string
+# derived from $ENV{PATH}, with any directory that would resolve that
+# command replaced by a shadow directory lacking it (see
+# _shadow_dir_without). DD-851.
+sub _path_hiding_command {
+    my ($command) = @_;
+    my @dirs = grep { length } split /:/, ( $ENV{PATH} || '' );
+    return join ':', map {
+        my $dir       = $_;
+        my $candidate = File::Spec->catfile( $dir, $command );
+        ( -f $candidate && -x $candidate )
+          ? _shadow_dir_without( $dir, $command )
+          : $dir;
+    } @dirs;
+}
+
+# Purpose: build a throwaway directory that mirrors $dir's contents except
+# for $hidden_command, via symlinks. Real directories on PATH (e.g. /bin)
+# hold both the real command we need to hide and unrelated coreutils
+# (dirname, basename, sh, ...) this test still needs for real; symlinking
+# everything else keeps every other tool reachable while genuinely hiding
+# just the one command from `command -v`.
+# Input: a real directory path and the one entry name to omit. Output: the
+# path of the new shadow directory (falls back to returning $dir unchanged
+# if it cannot be read). DD-851.
+sub _shadow_dir_without {
+    my ( $dir, $hidden_command ) = @_;
+    my $shadow = tempdir( CLEANUP => 1 );
+    opendir( my $dh, $dir ) or return $dir;
+    for my $entry ( readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..' || $entry eq $hidden_command;
+        symlink( File::Spec->catfile( $dir, $entry ), File::Spec->catfile( $shadow, $entry ) );
+    }
+    closedir $dh;
+    return $shadow;
+}
 
 sub _expected_apt_bootstrap_steps {
     my (%args) = @_;

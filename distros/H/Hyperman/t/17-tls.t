@@ -52,6 +52,25 @@ if ($pid == 0) {
                     [ 200, [ 'Content-Type' => 'text/plain' ], [ 'async-tls' ] ];
                 });
             }
+            # A 101 stream handle: the tunnel a WebSocket over TLS rides,
+            # since the socket cannot be detached from under the session.
+            if ($p eq '/tunnel') {
+                Hyperman::_abi_stream_open($env, 101,
+                    [ 'Upgrade' => 'echo', 'Connection' => 'Upgrade' ])
+                    or return [ 500, [ 'Content-Type' => 'text/plain' ],
+                                ['no tunnel'] ];
+                Hyperman::_abi_stream_read();
+                Hyperman::_abi_stream_write("hello-tunnel;");
+                return [ 101, [], [] ];
+            }
+            if ($p eq '/tunnel-rx') {
+                my ($n, $len, $bytes) = Hyperman::_abi_stream_rx();
+                return [ 200, [ 'Content-Type' => 'text/plain' ], [$bytes] ];
+            }
+            if ($p eq '/tunnel-close') {
+                my $r = Hyperman::_abi_stream_close();
+                return [ 200, [ 'Content-Type' => 'text/plain' ], ["close=$r"] ];
+            }
             [ 200, [ 'Content-Type' => 'text/plain' ], [ 'hello-tls' ] ];
         },
         host => '127.0.0.1', port => $port, workers => 1,
@@ -99,6 +118,43 @@ is(https('/async'), 'async-tls', 'Future-returning handler over HTTPS');
     my $out = `curl -sk "https://127.0.0.1:$port/" "https://127.0.0.1:$port/scheme" 2>/dev/null`;
     like($out, qr/hello-tls/,    'keep-alive request 1');
     like($out, qr/https HTTP/,   'keep-alive request 2 on same TLS conn');
+}
+
+# ---- a 101 tunnel over TLS ------------------------------------------------
+#
+# The case the stream seam's 101 exists for: an upgrade the server keeps
+# hold of, because the TLS session's state belongs to it and conn_detach
+# refuses (-3). Bytes go both ways through SSL_write and SSL_read, and the
+# read half sees what the client sent after the 101.
+SKIP: {
+    skip 'IO::Socket::SSL not installed', 6
+        unless eval { require IO::Socket::SSL; 1 };
+    my $t = IO::Socket::SSL->new(PeerAddr => "127.0.0.1:$port",
+                                 SSL_verify_mode => 0, Timeout => 5);
+    ok($t, 'TLS client connected for the tunnel') or skip 'no TLS client', 5;
+    syswrite $t, "GET /tunnel HTTP/1.1\r\nHost: 127.0.0.1\r\n"
+               . "Upgrade: echo\r\nConnection: Upgrade\r\n\r\n";
+    my $got = '';
+    eval {
+        local $SIG{ALRM} = sub { die "timeout\n" };
+        alarm 5;
+        while ($got !~ /hello-tunnel;/) {
+            my $n = sysread($t, my $b, 4096);
+            last unless $n;
+            $got .= $b;
+        }
+        alarm 0;
+    };
+    my ($head, $body) = split /\r\n\r\n/, $got, 2;
+    like($head || '', qr{^HTTP/1\.1 101 }, 'a 101 over TLS');
+    unlike($head || '', qr/Connection: close/i, 'without a Connection: close');
+    is($body, 'hello-tunnel;', 'the first write reached the client through the session');
+    syswrite $t, 'ping-over-tls';
+    Time::HiRes::sleep(0.2);
+    is(https('/tunnel-rx'), 'ping-over-tls',
+       'what the client sent after the 101 reached the read half, decrypted');
+    is(https('/tunnel-close'), 'close=0', 'closing the handle ends the tunnel');
+    close $t;
 }
 
 kill 'TERM', $pid;

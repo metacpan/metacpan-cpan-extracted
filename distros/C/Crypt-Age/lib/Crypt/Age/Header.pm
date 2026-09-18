@@ -1,6 +1,6 @@
 package Crypt::Age::Header;
 # ABSTRACT: age file header parsing and generation
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 use Carp qw(croak);
 use Crypt::Misc qw(slow_eq);
@@ -11,6 +11,13 @@ use namespace::clean;
 
 
 use constant VERSION_LINE => "age-encryption.org/v1";
+
+# The one number in this module that c2sp.org/age does NOT dictate. Its ABNF is
+# "header = v1-line 1*stanza end" -- one or more, with no upper bound -- and
+# neither reference implementation imposes one: age 1.2.1 reads a 50000-stanza
+# header (8.9 s), rage 0.12.1 a 4000-stanza one (5.81 s). See parse_from_fh for
+# why we deviate and how a caller opts out.
+use constant DEFAULT_MAX_STANZAS => 128;
 
 has stanzas => (
     is      => 'ro',
@@ -164,7 +171,57 @@ sub _build__bytes {
 }
 
 sub parse_from_fh {
-    my ($class, $fh) = @_;
+    my ($class, $fh, @opt) = @_;
+
+    # Checked before the hash assignment below, which would otherwise warn
+    # "Odd number of elements in hash assignment" out of this file for a
+    # mistake made one frame up -- the same reasoning as the shape checks in
+    # parse. The mis-call worth catching is parse_from_fh($fh, 300): the limit
+    # passed positionally is silently not a limit, so the default one below
+    # still refuses the caller's 300-recipient file and tells them to pass
+    # max_stanzas, which is exactly what they thought they had done. Nothing is
+    # interpolated: a caller who got the arguments wrong here may have put an
+    # identity in this position.
+    croak 'parse_from_fh takes a filehandle followed by named options: '
+        .'pass max_stanzas => $n rather than a bare value'
+        if @opt % 2;
+    my %opt = @opt;
+
+    # Our own denial-of-service limit, and the only constant here that is not
+    # the format's -- see DEFAULT_MAX_STANZAS above. It exists because the cost
+    # of a header is paid before any of it can be authenticated: the header MAC
+    # key is derived from the file key, which does not exist until a stanza has
+    # been unwrapped, so unwrap_file_key has to try every identity against every
+    # stanza -- an X25519 scalar multiplication, an HKDF and a ChaCha20-Poly1305
+    # open each -- on a header nobody has vouched for. Measured on 0.003, ~3.9
+    # ms per stanza per identity: 98 attacker-controlled bytes buy a scalar
+    # multiplication, 382 KB buy 15.7 s (CVE-2026-85783).
+    #
+    # 128 is a maintainer decision, not a measurement of the format. What the
+    # measurements say is where the room is: the upstream test kit tops out at
+    # three stanzas and real files carry a handful, but `age -R` writes a
+    # 300-recipient file without complaint and a real 301-recipient file from
+    # age 1.2.1 decrypts here correctly in 1.17 s. So this cap deliberately
+    # rejects files a reference implementation produces, which is why it MUST
+    # stay overridable and why the croak below names max_stanzas: a caller who
+    # legitimately has such a file needs to be told how to read it.
+    #
+    # A missing max_stanzas means the default. An explicit undef or 0 is an
+    # error rather than "no limit": 0 read literally means "allow zero stanzas",
+    # which the grammar forbids anyway, so taking it as "allow unbounded" would
+    # invert the most natural reading of the value -- and a security limit that
+    # a falsy value silently switches off is one that disappears exactly when a
+    # caller computes it and the computation goes wrong. A caller who wants
+    # age's unbounded behaviour asks for a number large enough to say so.
+    my $max_stanzas = exists $opt{max_stanzas} ? $opt{max_stanzas}
+                                               : DEFAULT_MAX_STANZAS;
+    croak 'max_stanzas must be a positive integer: it caps how many recipient '
+        .'stanzas this header may carry, and 0 or undef would be a header no '
+        .'identity could ever unwrap, pass a number large enough for the files '
+        .'you read'
+        unless defined $max_stanzas
+            && $max_stanzas =~ m{\A[0-9]+\z}
+            && $max_stanzas > 0;
 
     # make sure to read the whole thing in the correct way
     binmode($fh, ':raw') or croak "binmode: $!";
@@ -203,6 +260,24 @@ sub parse_from_fh {
             last;
         }
         ++$n;
+        # Here rather than on @stanzas after the loop, and before this stanza's
+        # arg line is even matched: the point of the limit is that the work is
+        # never done. Refusing after the fact would still have read the whole
+        # 382 KB header into $bytes and built every stanza object; refusing here
+        # stops at the first line of stanza max+1, so neither the body nor any
+        # of the scalar multiplications that follow it are ever paid for.
+        #
+        # Only $max_stanzas is interpolated, and it is the caller's own value.
+        # $n is not: it is always $max_stanzas + 1 here, so it says nothing the
+        # message does not, and the count comes from the header, which is
+        # attacker-controlled input that this module quotes nowhere.
+        croak 'age header carries more than '.$max_stanzas.' recipient '
+            .'stanzas: every stanza costs an X25519 scalar multiplication per '
+            .'identity before any of the header can be authenticated, so an '
+            .'unbounded header is a denial of service, this limit comes from '
+            .'this implementation and not from the age format, raise it with '
+            .'max_stanzas if the file is a legitimate one'
+            if $n > $max_stanzas;
         # c2sp.org/age, "ABNF definition of file header":
         #
         #     arg-line = "-> " argument *(SP argument) LF
@@ -307,7 +382,7 @@ sub parse_from_fh {
 
 
 sub parse {
-    my ($class, $data_ref, $offset_ref) = @_;
+    my ($class, $data_ref, $offset_ref, @opt) = @_;
 
     # The type test perl's open does not do for us. Everything below assumes a
     # ScalarRef -- the scan dereferences it, and the open maps it into an
@@ -388,7 +463,11 @@ sub parse {
 
     open my $fh, '<:raw', $data_ref or croak "Invalid age input: cannot read";
     seek($fh, $$offset_ref // 0, 0);
-    my $retval = $class->parse_from_fh($fh);
+    # Named options travel on unread and unvalidated: max_stanzas is
+    # parse_from_fh's, and duplicating its check here would be a second place
+    # to keep the message and the default in step. An odd @opt is caught there
+    # too, before it can warn.
+    my $retval = $class->parse_from_fh($fh, @opt);
     $$offset_ref = tell($fh);
     return $retval;
 }
@@ -439,12 +518,36 @@ sub unwrap_file_key {
         # the warnings and changes no outcome -- a list whose entries all fail
         # to unwrap still ends at the croak below.
         next unless defined $identity;
+
+        # Hoisted out of the stanza loop below, where it used to sit in the
+        # same condition as the isa test: it asks about the identity only, so
+        # asking it once per identity rather than once per stanza changes no
+        # outcome. An identity that is not an AGE-SECRET-KEY-1 was already
+        # skipped against every stanza; it is now skipped once.
+        next unless $identity =~ /^AGE-SECRET-KEY-1/i;
+
+        # Built at the first X25519 stanza this identity is tried against, and
+        # then reused for the rest of them. The Bech32 decode and the scalar
+        # multiplication that recovers the identity's own public key depend on
+        # the identity and not on the stanza -- on a header with many stanzas
+        # that was the same work done again per stanza for no reason. Measured
+        # over 500 stanzas and one identity: 3.95 ms per stanza before, 2.71 ms
+        # after, so ~31% of the cost went (the CPANSec report for
+        # CVE-2026-85783 estimates ~36%). The rest is the shared-secret scalar
+        # multiplication, which is per stanza by construction.
+        #
+        # Lazily, not before the loop, because decode_secret_key dies on an
+        # invalid identity: deriving eagerly would move that death earlier, to
+        # a header whose stanzas are all of some other type, where today the
+        # identity is never decoded at all and the call ends in "No matching
+        # identity found". The // keeps the failure exactly where it was.
+        my $identity_keys;
         for my $stanza (@{$self->stanzas}) {
-            if ($stanza->isa('Crypt::Age::Stanza::X25519') && $identity =~ /^AGE-SECRET-KEY-1/i) {
-                my $file_key = $stanza->unwrap($identity);
-                if (defined $file_key && $self->verify_mac($file_key)) {
-                    return $file_key;
-                }
+            next unless $stanza->isa('Crypt::Age::Stanza::X25519');
+            $identity_keys //= Crypt::Age::Stanza::X25519->identity_keys($identity);
+            my $file_key = $stanza->unwrap($identity, $identity_keys);
+            if (defined $file_key && $self->verify_mac($file_key)) {
+                return $file_key;
             }
         }
     }
@@ -468,7 +571,7 @@ Crypt::Age::Header - age file header parsing and generation
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -606,6 +709,7 @@ suitable for writing to the beginning of an age file.
 =head2 parse_from_fh
 
     my $header = Crypt::Age::Header->parse_from_fh($fh);
+    my $header = Crypt::Age::Header->parse_from_fh($fh, max_stanzas => 512);
 
 Parses an age header directly from a filehandle.
 
@@ -616,7 +720,17 @@ Parameters:
 =item * C<$fh> - An open, readable filehandle positioned at the first byte of
 the header
 
+=item * C<max_stanzas> - Optional. The largest number of recipient stanzas this
+header may carry, C<128> by default. A header with more is refused while it is
+being read; see L</THE STANZA LIMIT> below
+
 =back
+
+Any option must be given as a name/value pair. C<parse_from_fh($fh, 300)>, the
+limit passed positionally, is refused with C<"parse_from_fh takes a filehandle
+followed by named options: pass max_stanzas =E<gt> $n rather than a bare value">
+rather than warning about an odd number of hash elements and then silently
+applying the default limit anyway.
 
 Puts the handle into C<:raw> mode and reads it line by line (with C<"\n"> as
 the input record separator) for the duration of the call, so the caller does
@@ -683,6 +797,13 @@ L<Crypt::Age::Stanza::X25519/BUILD>: other than exactly one argument after the
 type, an argument that does not decode to a 32-byte value, or a body that is
 not exactly 32 bytes
 
+=item * the header carries more recipient stanzas than C<max_stanzas> allows,
+C<128> unless the caller says otherwise. Unlike every other entry in this list
+this one is not a violation of the format; see L</THE STANZA LIMIT>
+
+=item * C<max_stanzas> is given as C<undef>, C<0>, a negative number or
+anything that is not a positive integer
+
 =back
 
 The stanza-less header is refused with C<"age header must carry at least one
@@ -714,6 +835,7 @@ interface; see L</parse> for that entry point.
 =head2 parse
 
     my $header = Crypt::Age::Header->parse(\$data, \$offset);
+    my $header = Crypt::Age::Header->parse(\$data, \$offset, max_stanzas => 512);
 
 Parses an age header from encrypted data. This is a C<\$data>/C<\$offset>
 wrapper: it opens a filehandle on C<\$data> and delegates the actual parsing
@@ -726,6 +848,9 @@ Parameters:
 =item * C<\$data> - ScalarRef to the complete age file data
 
 =item * C<\$offset> - ScalarRef to offset, updated to point past the header
+
+=item * C<max_stanzas> - Optional, as in L</parse_from_fh>, which is where it
+is validated and applied. See L</THE STANZA LIMIT>
 
 =back
 
@@ -861,6 +986,13 @@ Tries each identity against each stanza until one successfully unwraps the file
 key and verifies the MAC. Returns the 16-byte file key. Stanzas of other types
 are skipped, so a file that mixes recipient types still decrypts.
 
+The work is therefore identities times stanzas, and none of it can be avoided
+by checking the header MAC first: the MAC key is derived from the file key,
+which is what this method is trying to obtain. Each identity's raw keys are
+derived once, at the first C<X25519> stanza it is tried against, rather than
+once per stanza; the stanza count itself is capped by L</parse_from_fh>, see
+L</THE STANZA LIMIT>.
+
 An C<undef> entry in C<\@identities> is skipped, silently and without warning,
 exactly as any other string that is not an C<AGE-SECRET-KEY-1> identity is: an
 identity that does not match is not an error here, only a list where none of
@@ -872,6 +1004,46 @@ die for a structurally invalid C<X25519> stanza -- L</parse> has already
 rejected the header by then -- but it does propagate the abort that a
 low-order-point ephemeral share triggers, since that is a header failure too and
 not a wrong identity.
+
+=head1 THE STANZA LIMIT
+
+C<max_stanzas> is this distribution's own limit and not the age format's. The
+format's grammar is C<header = v1-line 1*stanza end> -- one or more stanzas,
+with no upper bound -- and neither reference implementation enforces one.
+
+It exists because none of a header can be authenticated before it is paid for.
+The header MAC key is derived from the file key, and the file key does not
+exist until a stanza has been unwrapped, so L</unwrap_file_key> must try every
+identity against every stanza -- an X25519 scalar multiplication, an HKDF and
+a ChaCha20-Poly1305 open for each pair -- on a header nobody has vouched for
+yet. 98 bytes of attacker-controlled header therefore buy a scalar
+multiplication, and the cost is linear in stanzas times identities
+(CVE-2026-85783, fixed in 0.004).
+
+The default is C<128>. That is a maintainer decision rather than a property of
+the format: the upstream test kit tops out at three stanzas and real files
+carry a handful, but C<age -R> writes a 300-recipient file without complaint,
+and such a file decrypts correctly here. B<This limit therefore rejects files
+that a reference implementation produces.> A caller who has one raises the
+limit:
+
+    Crypt::Age->decrypt_file(
+        input       => $many_recipients,
+        output      => $plaintext,
+        identities  => \@identities,
+        max_stanzas => 512,
+    );
+
+C<max_stanzas> must be a positive integer. Omitting it means the default;
+C<undef> and C<0> are errors rather than "no limit", since C<0> read literally
+means "allow zero stanzas" -- which the grammar forbids anyway -- and a limit
+that a falsy value switches off silently is one that disappears exactly when a
+caller computes it and the computation goes wrong. To read headers the way
+C<age> does, pass a number large enough to say so.
+
+The limit is applied while the header is being read, at the start line of the
+first stanza over it, so the rest of the header is never read and none of its
+stanzas are ever tried.
 
 =head1 SEE ALSO
 

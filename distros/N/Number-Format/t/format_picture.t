@@ -27,6 +27,16 @@ $pic = '#';
 is($x->format_picture(1, $pic), ' 1 ',  'one digit 1');
 is($x->format_picture(2, $pic), ' 2 ',  'one digit 2');
 
+# RT#148306: a neg_format with no prefix must not warn
+{
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    my $bare = Number::Format->new(neg_format => 'x');
+    is($bare->format_picture(1234567, '###,###,###'),  '  1,234,567', 'bare pos');
+    is($bare->format_picture(-1234567, '###,###,###'), '  1,234,567', 'bare neg');
+    is_deeply(\@warnings, [], 'no warnings with neg_format "x"');
+}
+
 {
     my @warnings;
     local $SIG{__WARN__} = sub { @warnings = @_ };

@@ -16,22 +16,22 @@ name: Crypt-Age
 provides:
   Crypt::Age:
     file: lib/Crypt/Age.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::Age::Header:
     file: lib/Crypt/Age/Header.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::Age::Keys:
     file: lib/Crypt/Age/Keys.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::Age::Primitives:
     file: lib/Crypt/Age/Primitives.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::Age::Stanza:
     file: lib/Crypt/Age/Stanza.pm
-    version: '0.003'
+    version: '0.004'
   Crypt::Age::Stanza::X25519:
     file: lib/Crypt/Age/Stanza/X25519.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   CryptX: '0.067'
   Moo: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-crypt-age/issues
   homepage: https://github.com/Getty/p5-crypt-age
   repository: https://github.com/Getty/p5-crypt-age.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -315,7 +315,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.003'
+          tag: '0.004'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

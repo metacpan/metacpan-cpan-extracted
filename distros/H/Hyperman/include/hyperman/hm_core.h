@@ -125,6 +125,10 @@ struct hm_conn {
                                    * grown, freed or reused until the
                                    * completion lands            */
     unsigned char detached;       /* app took the socket (see hm_detach) */
+    unsigned char tunnel;         /* a 101 stream handle owns the bytes both
+                                   * ways (hm_stream_open): what the peer
+                                   * sends goes to the handle's read half,
+                                   * never to the request parser         */
     unsigned char accepts_gzip;   /* this request's Accept-Encoding    */
     unsigned char cont_sent;      /* a 100 Continue has gone out for the
                                    * request being read. Per request, and
@@ -2304,7 +2308,11 @@ static void hm_start_stream(pTHX_ int fd, UV id, int status, SV *headers) {
             hm_wb_put(c, "\r\n", 2);
         }
     }
-    hm_wb_put(c, "Connection: close\r\n\r\n", 21);
+    /* A 101 is an upgrade: the caller's own Upgrade and Connection headers
+     * are the response, and "close" would contradict them. The connection
+     * still ends when the handle closes - keepalive is off above. */
+    if (status == 101) hm_wb_put(c, "\r\n", 2);
+    else               hm_wb_put(c, "Connection: close\r\n\r\n", 21);
     hm_flush(aTHX_ c);
 }
 
@@ -2748,6 +2756,37 @@ static void hm_process(pTHX_ hm_conn *c) {
             return;
         }
 
+        /* The app opened a 101 stream handle from inside the handler
+         * (hm_stream_open): the connection is a tunnel now, its bytes
+         * belong to the handle both ways, and the triplet the handler
+         * returned is the same sentinel a detach leaves behind. Parked for
+         * the life of the handle - stream_close unparks it, and the close
+         * that follows (keepalive is off) ends the tunnel. Bytes that came
+         * in with the request are the handle's too, so they are handed
+         * over rather than parsed as a request that will never come. */
+        if (c->tunnel == 2) {
+            size_t consumed = bodystart + body_consumed;
+            c->tunnel = 1;
+            if (env_rv) {
+                hm_access_log(aTHX_ loop, env_rv, 101, -1);
+                SvREFCNT_dec(env_rv);
+            }
+            if (resp) SvREFCNT_dec(resp);
+            memmove(c->rbuf, c->rbuf + consumed, c->rlen - consumed);
+            c->rlen -= consumed;
+            c->req_start = 0;
+            c->nreqs++;
+            loop->requests++;
+            if (c->rlen) {
+                size_t n = c->rlen;
+                c->rlen = 0;
+                if (!hm_stream_deliver(aTHX_ c->fd, c->id, -1, c->rbuf, n, 0)
+                    && loop->conns[c->fd] == c)
+                    c->rlen = n;        /* no read half yet: kept for it */
+            }
+            return;
+        }
+
         size_t consumed = bodystart + body_consumed;
         memmove(c->rbuf, c->rbuf + consumed, c->rlen - consumed);
         c->rlen -= consumed;
@@ -2843,6 +2882,19 @@ static void hm_readable(pTHX_ hm_conn *c) {
         ssize_t n = hm_cread(c, c->rbuf + c->rlen, want);
         if (n > 0) {
             c->rlen += (size_t)n;
+            /* A tunnel (a 101 stream handle): the bytes are the handle's,
+             * not a request. Handed up read by read, so the buffer never
+             * grows toward the ceiling that ends an oversize request. The
+             * callback may close the stream and with it the connection. */
+            if (c->tunnel) {
+                size_t have = c->rlen;
+                c->rlen = 0;
+                if (!hm_stream_deliver(aTHX_ c->fd, c->id, -1, c->rbuf, have, 0)) {
+                    if (loop->conns[c->fd] != c) return;
+                    c->rlen = have;     /* no read half yet: kept for it */
+                }
+                if (loop->conns[c->fd] != c) return;
+            }
             /* A SHORT read means the socket buffer is drained: the kernel
              * handed over everything it had, so the confirming read that
              * would follow can only return EAGAIN. Stopping here removes ONE
@@ -2871,6 +2923,13 @@ static void hm_readable(pTHX_ hm_conn *c) {
                 break;
             }
         } else if (n == 0) {
+            /* The peer half-closed a tunnel: the same thing a zero read
+             * means to a socket owner, told to the handle as fin before
+             * the connection goes and the abort callback says the rest. */
+            if (c->tunnel) {
+                (void)hm_stream_deliver(aTHX_ c->fd, c->id, -1, c->rbuf, 0, 1);
+                if (loop->conns[c->fd] != c) return;
+            }
             hm_close(aTHX_ loop, c);
             return;
         } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -2896,7 +2955,7 @@ static void hm_readable(pTHX_ hm_conn *c) {
         }
     }
     hm_lru_touch(loop, c);
-    hm_process(aTHX_ c);
+    if (!c->tunnel) hm_process(aTHX_ c);   /* a tunnel carries no requests */
     if (loop->conns[c->fd] == c) hm_flush(aTHX_ c);
 }
 

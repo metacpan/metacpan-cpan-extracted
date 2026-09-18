@@ -5,6 +5,9 @@ use Test::More;
 use File::Temp qw(tempfile);
 use Crypt::Age;
 use Crypt::Age::Header;
+use Crypt::Age::Primitives;
+use Crypt::Age::Stanza;
+use Crypt::Age::Stanza::X25519;
 
 # Basic roundtrip
 {
@@ -738,6 +741,103 @@ use Crypt::Age::Header;
         ok(index($flat, $quoted) >= 0,
             'Crypt::Age POD quotes "'.$quoted.'"');
     }
+}
+
+# CVE-2026-85783 / karr #45: max_stanzas is Crypt::Age::Header's cap on how
+# many recipient stanzas a header may carry (default 128; t/03-header.t pins
+# the cap itself, the exact boundary, and the determinism of its rejection).
+# decrypt, decrypt_file and decrypt_filehandle all take the same option and
+# must actually forward it to Header::parse_from_fh rather than quietly
+# keeping their own default -- that forwarding, at all three entry points, is
+# what this block pins.
+{
+    # A "fake" X25519 stanza, built via ->new rather than ->wrap: BUILD's
+    # cheap length checks are all that is needed for the parser to count it
+    # as a real X25519 stanza, so 128 of them cost no scalar multiplication
+    # at all. Only the one real stanza -- last in the header -- does.
+    my $fake_x25519_stanza = sub {
+        my ($i) = @_;
+        my $arg  = Crypt::Age::Stanza::encode_base64_no_padding(chr(($i * 7 + 1) % 251) x 32);
+        my $body = chr(($i * 13 + 2) % 251) x 32;
+        return Crypt::Age::Stanza::X25519->new(args => [$arg], body => $body);
+    };
+
+    my ($public, $secret) = Crypt::Age->generate_keypair;
+    my $file_key    = Crypt::Age::Primitives->generate_file_key;
+    my $real_stanza = Crypt::Age::Stanza::X25519->wrap($file_key, $public);
+
+    my @lines = ('age-encryption.org/v1');
+    push @lines, $fake_x25519_stanza->($_)->to_string for 1 .. 128;
+    push @lines, $real_stanza->to_string;
+    my $head_no_mac = join("\n", @lines, '---');
+    my $mac = Crypt::Age::Primitives->compute_header_mac($file_key, $head_no_mac);
+    my $header_text = $head_no_mac.' '.Crypt::Age::Stanza::encode_base64_no_padding($mac)."\n";
+
+    my $plaintext    = 'max_stanzas propagation check';
+    my $nonce        = Crypt::Age::Primitives->generate_payload_nonce;
+    my $payload_key  = Crypt::Age::Primitives->derive_payload_key($file_key, $nonce);
+    my $payload      = Crypt::Age::Primitives->encrypt_payload($payload_key, $plaintext);
+    my $ciphertext   = "$header_text$nonce$payload";
+
+    # decrypt
+    my $rejected = eval {
+        Crypt::Age->decrypt(ciphertext => $ciphertext, identities => [$secret]);
+    };
+    ok(!defined $rejected, 'decrypt refuses a 129-stanza file by default');
+    like($@, qr/\bmax_stanzas\b/, 'decrypt: the default refusal names max_stanzas');
+
+    my $decrypted = Crypt::Age->decrypt(
+        ciphertext  => $ciphertext,
+        identities  => [$secret],
+        max_stanzas => 129,
+    );
+    is($decrypted, $plaintext, 'decrypt with max_stanzas => 129 recovers the plaintext');
+
+    # decrypt_file
+    my ($enc_fh, $enc_file) = tempfile(UNLINK => 1);
+    binmode $enc_fh, ':raw';
+    print $enc_fh $ciphertext;
+    close $enc_fh;
+
+    my (undef, $out_default) = tempfile(UNLINK => 1);
+    my $file_rejected = eval {
+        Crypt::Age->decrypt_file(input => $enc_file, output => $out_default, identities => [$secret]);
+    };
+    ok(!defined $file_rejected, 'decrypt_file refuses the same file by default');
+    like($@, qr/\bmax_stanzas\b/, 'decrypt_file: the default refusal names max_stanzas');
+
+    my (undef, $out_raised) = tempfile(UNLINK => 1);
+    Crypt::Age->decrypt_file(
+        input       => $enc_file,
+        output      => $out_raised,
+        identities  => [$secret],
+        max_stanzas => 129,
+    );
+    open my $out_fh, '<:raw', $out_raised or die "open($out_raised): $!";
+    my $file_plaintext = do { local $/; <$out_fh> };
+    close $out_fh;
+    is($file_plaintext, $plaintext, 'decrypt_file with max_stanzas => 129 recovers the plaintext');
+
+    # decrypt_filehandle
+    open my $ifh, '<:raw', \$ciphertext or die $!;
+    my $handle_out = '';
+    open my $ofh, '>:raw', \$handle_out or die $!;
+    my $handle_rejected = eval {
+        Crypt::Age->decrypt_filehandle(input => $ifh, output => $ofh, identities => [$secret]);
+    };
+    ok(!defined $handle_rejected, 'decrypt_filehandle refuses the same bytes by default');
+    like($@, qr/\bmax_stanzas\b/, 'decrypt_filehandle: the default refusal names max_stanzas');
+
+    open $ifh, '<:raw', \$ciphertext or die $!;
+    $handle_out = '';
+    open $ofh, '>:raw', \$handle_out or die $!;
+    Crypt::Age->decrypt_filehandle(
+        input       => $ifh,
+        output      => $ofh,
+        identities  => [$secret],
+        max_stanzas => 129,
+    );
+    is($handle_out, $plaintext, 'decrypt_filehandle with max_stanzas => 129 recovers the plaintext');
 }
 
 done_testing;

@@ -46,6 +46,6 @@
          "url" : "https://github.com/robmueller/cache-fastmmap"
       }
    },
-   "version" : "1.63",
+   "version" : "1.65",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

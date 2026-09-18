@@ -43,27 +43,27 @@
    "provides" : {
       "Crypt::Age" : {
          "file" : "lib/Crypt/Age.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Crypt::Age::Header" : {
          "file" : "lib/Crypt/Age/Header.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Crypt::Age::Keys" : {
          "file" : "lib/Crypt/Age/Keys.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Crypt::Age::Primitives" : {
          "file" : "lib/Crypt/Age/Primitives.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Crypt::Age::Stanza" : {
          "file" : "lib/Crypt/Age/Stanza.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Crypt::Age::Stanza::X25519" : {
          "file" : "lib/Crypt/Age/Stanza/X25519.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/Getty/p5-crypt-age"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -434,7 +434,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.003",
+                  "tag" : "0.004",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -589,7 +589,7 @@
    },
    "x_authority" : "cpan:GETTY",
    "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.52",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

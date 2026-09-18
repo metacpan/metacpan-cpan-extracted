@@ -1,0 +1,7 @@
+name: "DX7"
+manufacturer: "Yamaha"
+port:
+    in: "generic"
+    out: "generic"
+control_change:
+    # None! The DX7 predates the widespread use of CC#s.

@@ -18,8 +18,10 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 ppport.h
 README
+t/empty-output.t
 t/gzip-faster.t
 t/index.html.gz
+t/max-size.t
 t/png.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)

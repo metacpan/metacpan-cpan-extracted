@@ -3,7 +3,7 @@ package Developer::Dashboard::Doctor;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use File::Find ();
 use File::Spec;
@@ -322,11 +322,17 @@ sub _bashrc_bootstrap_issue {
 # non-interactive shells.
 # Input: bashrc path string.
 # Output: none. Dies on read or write failures.
+# DD-852: the guard offsets MUST be recomputed after the dashboard lines are
+# removed, not reused from before the removal. When a dashboard line sits
+# BEFORE the guard in the original text, removing it shifts every later byte
+# offset left - reusing the stale offsets then slices into the wrong region
+# of the shortened text, corrupting the guard block itself (its closing
+# "esac" was truncated to "esa" with a stray "c" spliced in elsewhere).
 sub _rewrite_bashrc_dashboard_lines {
     my ( $self, $path ) = @_;
     my $text = $self->_slurp_text_file($path);
-    my ( $guard_start, $guard_end ) = $self->_bash_noninteractive_guard_offsets($text);
-    return if !defined $guard_end;
+    my ( $guard_start_orig, $guard_end_orig ) = $self->_bash_noninteractive_guard_offsets($text);
+    return if !defined $guard_end_orig;
 
     my @dashboard_lines = $self->_dashboard_bashrc_lines($text);
     return if !@dashboard_lines;
@@ -334,6 +340,9 @@ sub _rewrite_bashrc_dashboard_lines {
     for my $line (@dashboard_lines) {
         $text =~ s/^\Q$line\E\n?//mg;
     }
+
+    my ( $guard_start, $guard_end ) = $self->_bash_noninteractive_guard_offsets($text);
+    return if !defined $guard_end;
 
     my $before = substr( $text, 0, $guard_start );
     my $guard  = substr( $text, $guard_start, $guard_end - $guard_start );

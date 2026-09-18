@@ -1,0 +1,9 @@
+\bMakefile$
+\bMakefile\.old$
+\bblib/
+\bpm_to_blib$
+\bMYMETA\.
+\.tar\.gz$
+\bMANIFEST\.bak$
+\.git/
+^\.gitignore$

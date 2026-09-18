@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 1;
 
@@ -53,6 +53,16 @@ which is also where the C<origin> route option is described. The rule
 matters more here than anywhere else in an application: the same-origin
 policy does not cover this request, so nothing but this check stands
 between a page on another site and an authenticated socket.
+
+The same route works on every transport, and the codec above is identical
+on all of them; only the handshake underneath differs. Plaintext HTTP/1.1
+hands the socket over to the worker loop. HTTP/1.1 over TLS cannot - an
+OpenSSL session's state belongs to the server, not the socket - so the
+upgrade opens a 101 stream handle and the frames travel through the TLS
+session; this needs Hyperman 0.48 or newer. HTTP/2 and HTTP/3 have no 101
+at all: the upgrade is an Extended CONNECT (RFC 8441 / RFC 9220) that the
+server accepts by opening a stream, and a browser uses it for every
+WebSocket once the server has advertised the setting.
 
 Frames are decoded in C to RFC 6455, strictly: unmasked client frames,
 fragmented or over-long control frames and reserved opcodes are protocol

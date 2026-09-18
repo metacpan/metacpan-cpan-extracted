@@ -11,9 +11,79 @@ use FindBin qw($Bin);
 # shell alias, so it works in scripts and fresh shells without loading the shell
 # bootstrap. It re-execs its sibling `dashboard` entrypoint with the same
 # arguments so the two commands behave identically.
-my $dashboard = File::Spec->catfile( $Bin, 'dashboard' );
+#
+# DD-924: computed from $Bin here, not inline at the exec site below, because
+# this whole file's body (this line included) is what PAX embeds verbatim
+# into a compiled d2 binary - when THAT binary later runs, $Bin resolves via
+# FindBin to wherever the compiled binary itself physically lives (PaxCache's
+# cache directory), not to this source file's real bin/ directory, so
+# recomputing this path from $Bin at that point silently breaks. Once the
+# correct value is known (on this, the genuinely-interpreted run, where $Bin
+# is accurate), it is baked into an env var by
+# _maybe_exec_self_compiled_d2() before it execs into the compiled binary, so
+# the compiled binary's own re-run of this same line reads that baked value
+# instead of re-deriving a now-wrong one from its own $Bin.
+my $dashboard = $ENV{DEVELOPER_DASHBOARD_D2_DASHBOARD_PATH}
+    || File::Spec->catfile( $Bin, 'dashboard' );
+
+_maybe_exec_self_compiled_d2();
+
 exec { $^X } $^X, $dashboard, @ARGV;
 die "Unable to exec dashboard entrypoint at $dashboard from d2: $!\n";
+
+# _maybe_exec_self_compiled_d2()
+# DD-882 (owner correction, Telegram msg #2001, 2026-09-15): d2 checks
+# whether a fresh PAX-compiled binary is cached for ITS OWN source file
+# (not dashboard's - the two are distinct compile targets sharing PaxCache's
+# md5-of-path keying) and, if so, execs it directly with the original argv,
+# exactly mirroring bin/dashboard's own _maybe_exec_self_compiled_dashboard.
+# Without this, d2 would only ever benefit from a compiled DASHBOARD binary
+# after paying for one extra interpreter hop (d2 -> perl dashboard -> exec);
+# the owner named d2 explicitly and tested it directly, so it gets its own
+# check rather than relying on that indirect path.
+#
+# Shares dashboard's DEVELOPER_DASHBOARD_PAX_SELF_EXECED guard rather than
+# using a second variable, so the two entrypoints' hooks cannot double-fire
+# on each other within one process tree: if dashboard's hook already exec'd
+# a compiled binary (which embeds d2's own re-exec line unchanged, since PAX
+# compiles the whole script body), d2's copy of this same check inside that
+# compiled binary must not re-trigger either.
+#
+# Also skipped under $ENV{HARNESS_ACTIVE} for the identical reason documented
+# on dashboard's own hook: a fresh per-test-block HOME must never trigger a
+# real background compile with zero cache-reuse benefit.
+# Input: none (reads @ARGV, $Bin, %ENV).
+# Output: never returns on a successful self-exec; otherwise returns.
+sub _maybe_exec_self_compiled_d2 {
+    return if $ENV{HARNESS_ACTIVE};
+    if ( !$ENV{DEVELOPER_DASHBOARD_PAX_SELF_EXECED} ) {
+        my $self_path = File::Spec->catfile( $Bin, 'd2' );
+        if ( -f $self_path ) {
+            my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
+            require lib;
+            lib->import($dashboard_lib);
+            require Developer::Dashboard::PathRegistry;
+            require Developer::Dashboard::PaxCache;
+            my $paths = Developer::Dashboard::PathRegistry->new(
+                cwd             => ( eval { require Cwd; Cwd::cwd() } ),
+                home            => $ENV{HOME},
+                workspace_roots => [],
+                project_roots   => [],
+            );
+            my $cache  = Developer::Dashboard::PaxCache->new( paths => $paths );
+            my $cached = $cache->resolve($self_path);
+            if ( defined $cached ) {
+                $ENV{DEVELOPER_DASHBOARD_PAX_SELF_EXECED}   = 1;
+                $ENV{DEVELOPER_DASHBOARD_D2_DASHBOARD_PATH} = $dashboard;
+                exec { $cached } $cached, @ARGV;
+                die "Unable to exec self-compiled d2 binary at $cached: $!\n";
+            }
+        }
+    }
+    delete $ENV{DEVELOPER_DASHBOARD_PAX_SELF_EXECED};
+    delete $ENV{DEVELOPER_DASHBOARD_D2_DASHBOARD_PATH};
+    return;
+}
 
 __END__
 

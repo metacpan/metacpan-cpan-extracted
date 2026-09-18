@@ -33,10 +33,13 @@ $mock_ua->add_response('api/\d+/user$', WWW::Picnic::MockUA::sample_user_respons
 $mock_ua->add_response('cart$', WWW::Picnic::MockUA::sample_cart_response());
 $mock_ua->add_response('cart/clear', WWW::Picnic::MockUA::sample_cart_response());
 $mock_ua->add_response('cart/delivery_slots', WWW::Picnic::MockUA::sample_delivery_slots_response());
-$mock_ua->add_response('search', WWW::Picnic::MockUA::sample_search_response());
+$mock_ua->add_response('search-page-results', WWW::Picnic::MockUA::sample_search_response());
 $mock_ua->add_response('articles/', WWW::Picnic::MockUA::sample_article_response());
 $mock_ua->add_response('cart/add_product', WWW::Picnic::MockUA::sample_cart_response());
 $mock_ua->add_response('cart/remove_product', WWW::Picnic::MockUA::sample_cart_response());
+$mock_ua->add_response('cart/set_delivery_slot', WWW::Picnic::MockUA::sample_cart_response());
+$mock_ua->add_response('my_store', WWW::Picnic::MockUA::sample_categories_response());
+$mock_ua->add_response('suggest', WWW::Picnic::MockUA::sample_suggestions_response());
 
 my $picnic = WWW::Picnic->new(
   user       => $fake_user,
@@ -151,6 +154,30 @@ subtest 'Add to cart' => sub {
 subtest 'Remove from cart' => sub {
   my $cart = $picnic->remove_from_cart('product-1', 1);
   isa_ok($cart, 'WWW::Picnic::Result::Cart');
+};
+
+subtest 'Set delivery slot' => sub {
+  my $cart = $picnic->set_delivery_slot('slot-1');
+  isa_ok($cart, 'WWW::Picnic::Result::Cart');
+  is($cart->id, 'shopping_cart', 'Cart ID');
+  is($cart->total_count, 3, 'Total count');
+};
+
+subtest 'Categories' => sub {
+  my $cats = $picnic->get_categories;
+  isa_ok($cats, 'WWW::Picnic::Result::Categories');
+  is($cats->total_count, 2, 'Number of categories');
+  is(scalar $cats->all_categories, 2, 'all_categories list');
+  is($cats->catalog->[0]{id}, 'cat-1', 'First category ID');
+  is($cats->catalog->[0]{name}, 'Obst & Gemüse', 'First category name');
+};
+
+subtest 'Suggestions' => sub {
+  my $suggestions = $picnic->get_suggestions('har');
+  isa_ok($suggestions, 'WWW::Picnic::Result::Suggestions');
+  is($suggestions->total_count, 2, 'Number of suggestions');
+  is(scalar $suggestions->all_suggestions, 2, 'all_suggestions list');
+  is($suggestions->suggestions->[0]{suggestion}, 'haribo', 'First suggestion text');
 };
 
 subtest 'Result raw access' => sub {

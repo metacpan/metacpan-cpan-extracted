@@ -323,7 +323,7 @@ sam_stats(self)
     PPCODE:
         m = SA_SELF(sa_hash, self);
         if (!m) croak("Shared::Arena::Map: this map is released");
-        EXTEND(SP, 10);
+        EXTEND(SP, 12);          /* six key/value pairs */
         mPUSHp("used", 4);       mPUSHu((UV)sa_at_load64_acq(&m->hdr->used));
         mPUSHp("capacity", 8);   mPUSHu((UV)m->nslots);
         mPUSHp("tombstones", 10);

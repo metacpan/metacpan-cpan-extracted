@@ -15,8 +15,18 @@ set -eu
 
 : "${CICD_PROVIDER_OUT:?must be run by SimpiCI (CICD_PROVIDER_OUT is unset)}"
 
-# Single source of truth for the version matrix; overridable for one run.
-versions="${SIMPICI_PROVIDER_PERL_VERSIONS:-$(cat /opt/simpici-provider/perl-versions)}"
+# Version matrix, most specific wins: a `.simpici-perl` file in the checkout (for
+# a dist that can't run the full range -- e.g. one whose .simpici-apt needs a
+# Debian release the oldest perl:<ver> images no longer serve packages for), else
+# the per-run SIMPICI_PROVIDER_PERL_VERSIONS override, else the baked-in default.
+# `#` starts a comment; whitespace and newlines separate versions.
+if [ -f "${CICD_WORKSPACE:-/workspace}/.simpici-perl" ]; then
+  versions="$(sed 's/#.*//' "${CICD_WORKSPACE:-/workspace}/.simpici-perl")"
+elif [ -n "${SIMPICI_PROVIDER_PERL_VERSIONS:-}" ]; then
+  versions="$SIMPICI_PROVIDER_PERL_VERSIONS"
+else
+  versions="$(cat /opt/simpici-provider/perl-versions)"
+fi
 
 mkdir -p "$CICD_PROVIDER_OUT/lib"
 
@@ -43,6 +53,12 @@ if [ -f .simpici-apt ]; then
     apt-get install -y --no-install-recommends $apt_pkgs
   fi
 fi
+
+# `dzil test` triggers a build, and a dist with [@Author::GETTY::Docker] would
+# otherwise try to reach a container engine and build an image from here -- there
+# is none in a perl:<ver> CI container, so the build would die in its precheck.
+# CI tests the code, not images; skip it. Harmless for a dist without Docker.
+export DZIL_DOCKER_API_SKIP=1
 
 export PERL_CPANM_OPT="${PERL_CPANM_OPT:---mirror https://cpan.metacpan.org --mirror-only}"
 cpanm -nq Dist::Zilla

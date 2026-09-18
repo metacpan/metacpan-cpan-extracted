@@ -1,5 +1,11 @@
 Revision history for Perl module 'Gzip::Faster'
 
+0.23 2026-09-18
+
+* Allow user to limit the size of the gzip file with max_size (vividsnow)
+* Remove stale bytes from empty string (vividsnow)
+* Fix memory leak from gunzip (vividsnow)
+
 0.22 2025-07-17
 
 * Patch for memory leak

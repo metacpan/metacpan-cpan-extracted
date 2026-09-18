@@ -3,7 +3,7 @@ package Developer::Dashboard::Platform;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Exporter 'import';
 use File::Basename qw(basename dirname);
@@ -196,6 +196,17 @@ sub command_argv_for_path {
     my $resolved = ( -f $path ? $path : resolve_runnable_file($path) ) || die "Unable to find runnable file for $path";
     my $lower = lc $resolved;
 
+    # DD-856: an actual shebang line, when present, names the interpreter the
+    # file's author intended - it must be honoured BEFORE any extension-based
+    # guess. Without this check first, a shell script saved with a .pl suffix
+    # (or any other mismatched extension) was silently force-run through the
+    # wrong interpreter by extension alone, producing undefined behaviour
+    # instead of running the script or reporting a clear error.
+    if ( !is_windows() && _has_shebang($resolved) ) {
+        return ( $^X, '-I', _module_lib_root(), $resolved ) if _shebang_uses_perl($resolved);
+        return ($resolved);
+    }
+
     return ( $^X, '-I', _module_lib_root(), $resolved ) if $lower =~ /\.pl\z/;
     if ( $lower =~ /\.py\z/ ) {
         my $venv_python = _find_layer_venv_python($resolved);
@@ -207,8 +218,6 @@ sub command_argv_for_path {
       if $lower =~ /\.go\z/;
     return ( $^X, '-I', _module_lib_root(), '-MDeveloper::Dashboard::Platform', '-e', 'Developer::Dashboard::Platform::_exec_java_source(@ARGV)', $resolved )
       if $lower =~ /\.java\z/;
-    return ( $^X, '-I', _module_lib_root(), $resolved ) if !is_windows() && _shebang_uses_perl($resolved);
-    return ($resolved) if !is_windows() && _has_shebang($resolved);
     return ( _powershell_binary(), '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', $resolved )
       if $lower =~ /\.ps1\z/;
     return ( _cmd_binary(), '/d', '/c', $resolved ) if $lower =~ /\.(?:cmd|bat)\z/;

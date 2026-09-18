@@ -3,17 +3,18 @@ package Developer::Dashboard::ActionRunner;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
 use Digest::SHA qw(sha256_hex);
 use File::Spec;
-use POSIX qw(WNOHANG setsid strftime);
+use POSIX qw(WNOHANG setsid);
 
 use Developer::Dashboard::Codec qw(encode_payload decode_payload);
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::Platform qw(is_windows shell_command_argv);
+use Developer::Dashboard::TimeUtils qw(_now_iso8601);
 
 # new(%args)
 # Constructs an action runner bound to file and path registries.
@@ -134,6 +135,21 @@ sub run_encoded_action {
     );
 }
 
+# DD-881: the cwd-alias fallback below must dispatch ONLY to these no-arg
+# PathRegistry directory getters - never to any other public method
+# (register_named_paths/unregister_named_path mutate state, resolve_dir
+# and others take required arguments), or a config-supplied cwd that
+# merely collides with a method name becomes an arbitrary method call.
+# Mirrors PathRegistry's own %RESOLVABLE_ACCESSOR (DD-870).
+my %RESOLVABLE_ACCESSOR = map { $_ => 1 } qw(
+  home runtime_root home_runtime_root home_runtime_path project_runtime_root
+  state_root state_base_root cache_root home_cache_root logs_root
+  dashboards_root bookmarks bookmarks_root cli_root skills_root
+  collectors_root indicators_root sessions_root temp_root config_root
+  auth_root repo_dashboard_root users_root current_project_root
+  current_working_directory cwd
+);
+
 # run_command_action(%args)
 # Executes a local command action synchronously or in the background.
 # Input: command, cwd, env, timeout_ms, and background options.
@@ -142,7 +158,7 @@ sub run_command_action {
     my ( $self, %args ) = @_;
     my $cmd = $args{command} || die 'Missing command';
     my $cwd = $args{cwd} || cwd();    # uncoverable condition false
-    if ( !File::Spec->file_name_is_absolute($cwd) && $self->{paths}->can($cwd) ) {
+    if ( !File::Spec->file_name_is_absolute($cwd) && $RESOLVABLE_ACCESSOR{$cwd} ) {
         $cwd = $self->{paths}->$cwd();
     }
     die "Action cwd '$cwd' does not exist" if !-d $cwd;
@@ -166,7 +182,7 @@ sub run_command_action {
             return {
                 background => 1,
                 pid        => $started_pid + 0,
-                started_at => _now_iso8601(),
+                started_at => _now_iso8601( tz => "utc" ),
             };
         }
         local $SIG{CHLD} = 'DEFAULT';
@@ -459,17 +475,8 @@ sub _run_command {
         stderr      => $stderr,
         timed_out   => $timed_out ? 1 : 0,
         content_type => 'application/json; charset=utf-8',
-        started_at  => _now_iso8601(),
+        started_at  => _now_iso8601( tz => "utc" ),
     };
-}
-
-# _now_iso8601()
-# Returns the current UTC timestamp in ISO-8601 form.
-# Input: none.
-# Output: timestamp string.
-sub _now_iso8601 {
-    my @t = gmtime();
-    return strftime( '%Y-%m-%dT%H:%M:%SZ', @t );
 }
 
 1;

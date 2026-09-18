@@ -10,6 +10,13 @@
 .claude/skills/getty-perl-moo/SKILL.md
 .claude/skills/getty-perl-release-author-getty/SKILL.md
 .claude/skills/kanban-issues-karr-cli/SKILL.md
+.claude/skills/kanban-issues-karr-cli/references/cards.md
+.claude/skills/kanban-issues-karr-cli/references/claims.md
+.claude/skills/kanban-issues-karr-cli/references/config.md
+.claude/skills/kanban-issues-karr-cli/references/cross-board.md
+.claude/skills/kanban-issues-karr-cli/references/queries.md
+.claude/skills/kanban-issues-karr-cli/references/setup.md
+.claude/skills/kanban-issues-karr-cli/references/storage.md
 .gitignore
 CLAUDE.md
 Changes

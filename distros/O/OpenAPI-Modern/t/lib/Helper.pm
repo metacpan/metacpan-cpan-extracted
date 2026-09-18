@@ -337,7 +337,12 @@ sub _multipart_body ($content_type, $raw_parts) {
     }
 
     if ($content_type eq 'multipart/form-data' and not defined $part->headers->content_disposition) {
-      $name = Mojo::Util::url_escape($name, '"');
+      # RFC7578 §5.1.1: "If non-ASCII field names are unavoidable, form or application creators
+      # SHOULD use UTF-8 uniformly. This will minimize interoperability problems."
+      # RFC9110 §5.6.4: "A sender SHOULD NOT generate a quoted-pair in a quoted-string except where
+      # necessary to quote DQUOTE and backslash octets occurring within that string."
+      $name = Encode::encode('UTF-8', $name, Encode::DIE_ON_ERR | Encode::LEAVE_SRC)
+        =~ s/([\x5C\x22])/\x5C$1/gr;
       $part->headers->content_disposition(qq{form-data; name="$name"});
     }
 
@@ -367,7 +372,7 @@ sub _multipart_body_string ($content_obj) {
 sub get_part_boundaries ($message) {
   if ($TYPE eq 'mojo') {
     return map +(
-      ($_->headers->content_type//'') =~ m{^multipart/(?:[\w-]+); boundary=(.+)\z},
+      ($_->headers->content_type//'') =~ m{^multipart/(?:[\w-]+); boundary=(.+)\z}a,
     ), $message->content->parts->@*;
   }
   elsif ($TYPE eq 'lwp') {
@@ -381,7 +386,7 @@ sub get_part_boundaries ($message) {
     $content->headers->content_type($message->content_type);
     $content->emit(read => $message->content);
     return map +(
-      ($_->headers->content_type//'') =~ m{^multipart/(?:[\w-]+); boundary=(.+)\z},
+      ($_->headers->content_type//'') =~ m{^multipart/(?:[\w-]+); boundary=(.+)\z}a,
     ), $content->parts->@*;
   }
 

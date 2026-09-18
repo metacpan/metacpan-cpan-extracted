@@ -7,7 +7,7 @@ use Exporter 'import';
 use Cwd ();
 use Developer::Dashboard::Handle;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 our @EXPORT = ('d2');
 
@@ -41,7 +41,7 @@ __END__
 Developer::Dashboard - a local home for development work
 
 =head1 VERSION
-4.31
+4.45
 
 =head1 INTRODUCTION
 
@@ -688,8 +688,9 @@ files instead of directories.
 
 =item * Data Query Commands
 
-C<dashboard jq>, C<dashboard yq>, C<dashboard tomq>, and C<dashboard propq>
-parse JSON, YAML, TOML, and Java properties input, then optionally extract a
+C<dashboard jq>, C<dashboard yq>, C<dashboard tomq>, C<dashboard propq>,
+C<dashboard iniq>, C<dashboard csvq>, and C<dashboard xmlq> parse JSON, YAML,
+TOML, Java properties, INI, CSV, and XML input, then optionally extract a
 dotted path and print a scalar or canonical JSON, giving the CLI a small
 data-inspection toolkit that fits naturally into shell workflows.
 C<dashboard tomq> inflates TOML booleans into plain Perl C<1> and C<0>
@@ -700,7 +701,7 @@ depending on backend-specific boolean objects.
 
 Private F<~/.developer-dashboard/cli/dd/> helper files provide the built-in
 command behaviour without installing generic command names into the global
-PATH. Query, open-file, workspace, path, file, and prompt commands keep
+PATH. Query, open-file, workspace, path, file, and C<ps1> commands keep
 dedicated helper bodies, while the remaining built-ins stage thin wrappers
 that hand off to a shared private C<_dashboard-core> runtime.
 
@@ -746,9 +747,13 @@ one runtime.
 
 =item * Update Manager
 
-C<Developer::Dashboard::UpdateManager> runs ordered update scripts and
-restarts validated collector loops when needed, giving the runtime a
-controlled bootstrap and upgrade path.
+C<Developer::Dashboard::UpdateManager> implements ordered update-script
+execution and validated-collector-loop restart, and carries its own unit
+test suite - but it is not currently wired into C<bin/dashboard> or any
+C<share/private-cli/> command. Nothing in the shipped CLI switchboard calls
+it today, so no update scripts run and no collector loops restart through
+this path in the running product; it exists as tested groundwork for a
+bootstrap/upgrade command that is not yet cut over.
 
 =item * Docker Compose Resolver
 
@@ -1285,6 +1290,18 @@ C<dashboard tomq [path] [file]> for TOML
 =item *
 
 C<dashboard propq [path] [file]> for Java properties
+
+=item *
+
+C<dashboard iniq [path] [file]> for INI
+
+=item *
+
+C<dashboard csvq [path] [file]> for CSV
+
+=item *
+
+C<dashboard xmlq [path] [file]> for XML
 
 =back
 

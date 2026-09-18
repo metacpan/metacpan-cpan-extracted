@@ -47,10 +47,11 @@
          "web" : "https://github.com/benkasminbullock/gzip-faster"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_contributors" : [
       "Aristotle Pagaltzis <aristotle@cpan.org>",
-      "zgrim <zgrim@cpan.org>"
+      "zgrim <zgrim@cpan.org>",
+      "vividsnow"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

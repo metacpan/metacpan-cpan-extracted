@@ -13,12 +13,6 @@ int32_t SPVM__UV__Handle__Async__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  SPVM_OBJ* obj_cb = stack[1].oval;
-  
-  if (!obj_cb) {
-    return env->die(env, stack, "$cb must be defined.", __func__, FILE_NAME, __LINE__);
-  }
-  
   uv_async_t* uv_async = env->new_memory_block(env, stack, sizeof(uv_async_t));
   
   SPVM__UV__Handle__HANDLE_DATA* uv_handle_data = env->new_memory_block(env, stack, sizeof(SPVM__UV__Handle__HANDLE_DATA));

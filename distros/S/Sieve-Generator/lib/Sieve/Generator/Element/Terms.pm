@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Element::Terms 0.003;
+package Sieve::Generator::Element::Terms 0.004;
 # ABSTRACT: a sequence of Sieve terms joined by spaces
 
 use Moo;
@@ -49,7 +49,7 @@ Sieve::Generator::Element::Terms - a sequence of Sieve terms joined by spaces
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -75,7 +75,7 @@ spaces when rendered.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

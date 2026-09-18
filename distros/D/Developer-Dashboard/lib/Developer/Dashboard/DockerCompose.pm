@@ -3,7 +3,7 @@ package Developer::Dashboard::DockerCompose;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -11,6 +11,7 @@ use Developer::Dashboard::DirEntries qw(sorted_dir_entries);
 use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
+use File::Temp ();
 
 use Developer::Dashboard::EnvLoader;
 use Developer::Dashboard::JSON qw(json_encode);
@@ -69,8 +70,24 @@ sub resolve {
         service_map  => \%service_map,
     );
 
+    # DD-862: file-gathering must use every ENABLED service, not just the
+    # requested/effective ones - a requested service's own compose file may
+    # declare `depends_on` another configured service, and Docker Compose can
+    # only auto-start that dependency if its definition is present in the
+    # merged -f stack too. Narrowing this to @services silently dropped the
+    # dependency's file whenever it was not itself named on the command line.
+    # @services (the requested/effective set) still governs everything else
+    # below - env resolution, the resolved "services" field - only the FILE
+    # set widens here.
+    my @enabled_services = $self->_discover_enabled_services(
+        project_root => $project_root,
+        service_map  => \%service_map,
+    );
+    my %file_gather_seen;
+    my @file_gather_services = grep { !$file_gather_seen{$_}++ } ( @services, @enabled_services );
+
     my $service_files = $self->_gather_service_files(
-        services     => \@services,
+        services     => \@file_gather_services,
         service_map  => \%service_map,
         project_root => $project_root,
         modes        => \@modes,
@@ -274,8 +291,16 @@ sub _expand_env_path {
     my ( $self, $path ) = @_;
     return $path if !defined $path || $path eq '';
 
-    $path =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/defined $ENV{$1} ? $ENV{$1} : ''/ge;
-    $path =~ s/\$([A-Za-z_][A-Za-z0-9_]*)/defined $ENV{$1} ? $ENV{$1} : ''/ge;
+    # DD-887: a single combined pass over the ORIGINAL string, matching both
+    # ${VAR} and bare $VAR forms in one alternation - never two sequential
+    # passes, which would re-scan the first pass's OUTPUT as input to the
+    # second, letting one env var's own value (if it happens to contain a
+    # "$NAME"-shaped substring) get a second, unintended expansion using a
+    # completely unrelated env var.
+    $path =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\}|\$([A-Za-z_][A-Za-z0-9_]*)/
+        my $name = defined $1 ? $1 : $2;
+        defined $ENV{$name} ? $ENV{$name} : '';
+    /gex;
 
     return $path;
 }
@@ -749,8 +774,9 @@ sub run {
     my $old = cwd();
     chdir $resolved->{project_root} or die "Unable to chdir to $resolved->{project_root}: $!";
     local @ENV{ keys %{ $resolved->{env} } } = values %{ $resolved->{env} } if %{ $resolved->{env} };    # uncoverable branch false the resolved env always carries the DDDC key
+    my $run_command = $self->_materialized_command($resolved);
     my ( $stdout, $stderr, $exit_code ) = capture {
-        system @{ $resolved->{command} };
+        system @{$run_command};
         return $? >> 8;
     };
     chdir $old or die "Unable to restore cwd to $old: $!";    # uncoverable branch true the saved cwd remains valid for the duration of the run
@@ -761,6 +787,56 @@ sub run {
         stderr    => $stderr,
         exit_code => $exit_code,
     };
+}
+
+# _materialized_command($resolved)
+# Pre-merges a resolved multi -f docker compose layer stack into one file via
+# `docker compose ... config`, then returns a command that points at just
+# that one merged file instead of the original -f list.
+# Input: resolution hash ref (as returned by resolve() - files, command).
+# Output: command array ref to run in place of $resolved->{command}. When
+# resolve() named no compose files at all, the original command is returned
+# unchanged - there is nothing to merge.
+#
+# WHY THIS EXISTS (DD-857): the layered runtime stack (~/.developer-dashboard,
+# installed skills, the project's own .developer-dashboard, service/addon/mode
+# overlays) can spread one service's definition across several files. Passing
+# every layer as its own -f flag makes the operational command depend on
+# Compose's own multi-file merge resolving that service correctly on every
+# invocation; materializing once via `config` and running the real command
+# against a single, already-resolved file removes that dependency entirely -
+# whatever Compose would have merged is now sitting in one file before the
+# operational command ever runs, so a service defined only by the combination
+# of several partial layers cannot come out "not found" because one layer
+# happened to be looked up in the wrong place or the wrong order.
+sub _materialized_command {
+    my ( $self, $resolved ) = @_;
+
+    # DD-597 shape: system() below mutates the caller's global $? as a side
+    # effect; without this guard that stays set in the caller's process
+    # (run(), and anything run() is itself called from) after this sub
+    # returns, regardless of the exit code already captured locally below.
+    local $?;
+    my @files = @{ $resolved->{files} };
+    return $resolved->{command} if !@files;
+
+    my @full     = @{ $resolved->{command} };
+    my $prefix_n = 2 + 2 * scalar(@files);    # 'docker' 'compose' then one ('-f',$file) pair per layer
+    my @passthrough = @full[ $prefix_n .. $#full ];
+
+    my ( $merged, $stderr, $exit_code ) = capture {
+        system( @full[ 0 .. ( $prefix_n - 1 ) ], 'config' );
+        return $? >> 8;
+    };
+    die "Unable to materialize merged docker compose config ($exit_code): $stderr" if $exit_code != 0;
+
+    my $tmp_dir  = File::Temp::tempdir( CLEANUP => 1 );
+    my $tmp_file = File::Spec->catfile( $tmp_dir, 'merged-compose.yml' );
+    open my $fh, '>', $tmp_file or die "Unable to write $tmp_file: $!";    # uncoverable branch true a fresh File::Temp::tempdir is always writable on the test host
+    print {$fh} $merged;
+    close $fh or die "Unable to close $tmp_file: $!";    # uncoverable branch true the deferred write failure surfaces only on close, unreproducible on the test host
+
+    return [ 'docker', 'compose', '-f', $tmp_file, @passthrough ];
 }
 
 # _discover_base_files($root)

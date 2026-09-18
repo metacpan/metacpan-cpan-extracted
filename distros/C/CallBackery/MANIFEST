@@ -13,6 +13,7 @@ t/export-qrcode.t
 t/invalidPlugin.t
 t/jsonrpc.t
 t/session_expiry.t
+t/translate.t
 t/callbackery.cfg
 t/lib/CallBackeryTest.pm
 lib/CallBackery/Config.pm

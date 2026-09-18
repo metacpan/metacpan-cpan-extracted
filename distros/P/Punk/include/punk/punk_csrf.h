@@ -346,6 +346,22 @@ static SV *pcf_check(pTHX_ SV *c) {
     if (!method) ml = 3;
     if (pcf_safe_method(m, ml)) return NULL;
 
+    /* An Extended CONNECT (RFC 8441 on HTTP/2, RFC 9220 on HTTP/3) is the
+     * websocket upgrade a multiplexed transport has instead of a GET, and
+     * punk_serve.h routes it as that GET. The GET was never a CSRF target,
+     * so nor is this: the handshake's own origin check is what stands
+     * between a page elsewhere and an authenticated socket, on either
+     * transport. A browser opens every websocket this way once the server
+     * has advertised the setting, so refusing it here refused them all. */
+    if (ml == 7 && memEQ(m, "CONNECT", 7)) {
+        SV *cp = pcf_env_str(aTHX_ c, "psgix.connect_protocol");
+        if (cp) {
+            STRLEN pl;
+            const char *pv = SvPV_const(cp, pl);
+            if (pl == 9 && memEQ(pv, "websocket", 9)) return NULL;
+        }
+    }
+
     /* Not riding on cookies, so not a CSRF target. */
     if (pcf_env_str(aTHX_ c, "HTTP_AUTHORIZATION")) return NULL;
     if (pcf_exempt(aTHX_ cfg, pcf_env_str(aTHX_ c, "PATH_INFO"))) return NULL;

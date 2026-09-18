@@ -121,6 +121,41 @@ my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
 
     my $unknown = eval { $files->resolve_file('definitely-unknown-alias'); 1 } ? '' : $@;
     like( $unknown, qr/Unknown file name 'definitely-unknown-alias'/, 'resolve_file dies for an unknown name' );
+
+    # DD-868: the eight no-arg path getters must still resolve by name.
+    for my $getter (
+        qw(prompt_log collector_log dashboard_log global_config
+        dashboard_index auth_log web_pid web_state)
+      )
+    {
+        my $resolved = eval { $files->resolve_file($getter) };
+        ok( !$@ && defined $resolved && !ref $resolved,
+            "resolve_file('$getter') still resolves to a plain string" );
+    }
+
+    # DD-868: any OTHER public method name must be refused, not dispatched -
+    # 'all_files' takes no required args and is representative of the wider
+    # class of non-getter methods the old fallback let through unchecked.
+    my $all_files_attempt = eval { $files->resolve_file('all_files'); 1 } ? '' : $@;
+    like(
+        $all_files_attempt,
+        qr/Unknown file name 'all_files'/,
+        "resolve_file('all_files') is refused, not dispatched to the real all_files method",
+    );
+
+    # DD-868: mutating/argument-taking methods (new/read/write/remove/etc)
+    # must be refused outright, never reached via the name fallback.
+    for my $unsafe (qw(new paths register_named_files unregister_named_file
+        named_files all_file_aliases locate_files locate_files_under
+        resolve_file read write append touch remove))
+    {
+        my $attempt = eval { $files->resolve_file($unsafe); 1 } ? '' : $@;
+        like(
+            $attempt,
+            qr/Unknown file name '\Q$unsafe\E'/,
+            "resolve_file('$unsafe') is refused, not dispatched",
+        );
+    }
 }
 
 # --- read/write/append/touch/remove happy paths -------------------------------

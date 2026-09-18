@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 
 use Capture::Tiny qw(capture);
+use Cwd qw(cwd);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -195,6 +196,47 @@ close $marker_fh or die "Unable to close marker: $!";
 }
 chdir $home or die "Unable to chdir back to $home: $!";
 
+# DD-844: cd() calls its callback with no eval/guard, so a dying callback
+# used to skip the chdir-back restoration line entirely, leaving the process
+# sitting in the target directory. Asserted in BOTH directions - the cwd
+# must be restored AND the original exception must still propagate, never
+# be swallowed.
+{
+    my $die_target = File::Spec->catdir( $home, 'cd-dies' );
+    make_path($die_target);
+    my $died = eval {
+        Developer::Dashboard::Folder->cd( $die_target, sub { die "boom\n" } );
+        1;
+    };
+    my $err = $@;
+    ok( !$died, 'cd() lets a dying callback\'s exception propagate out of cd() itself' );
+    like( $err, qr/\Aboom\n/, 'and the ORIGINAL exception is not swallowed or replaced' );
+    is( cwd(), $home,
+        'cd() still restores the caller\'s original directory when the callback dies' );
+}
+
+# The stay() escape hatch must keep working even when a LATER die happens -
+# restoration uses whatever $pwd currently holds, not a fixed original value.
+{
+    my $stay_target = File::Spec->catdir( $home, 'cd-stay-dies' );
+    make_path($stay_target);
+    my $stay_dest = File::Spec->catdir( $home, 'cd-stay-dest' );
+    make_path($stay_dest);
+    eval {
+        Developer::Dashboard::Folder->cd(
+            $stay_target,
+            sub {
+                my ($ctx) = @_;
+                $ctx->{stay}->($stay_dest);
+                die "boom-after-stay\n";
+            }
+        );
+    };
+    is( cwd(), $stay_dest,
+        'cd() restores to the stay()-redirected directory, not the original, when the callback dies after calling stay()' );
+}
+chdir $home or die "Unable to chdir back to $home: $!";
+
 # ls() sorts folders before files, breaks ties by name, and reports zero for
 # empty files.
 my $listing = File::Spec->catdir( $home, 'listing' );
@@ -319,6 +361,42 @@ Developer::Dashboard::Folder->configure( paths => $paths );
     is( Developer::Dashboard::Folder::_configured_alias_cache_key($paths),
         Developer::Dashboard::PathRegistry::alias_cache_key($paths),
         'Folder delegates the alias cache key to the shared implementation' );
+}
+
+# DD-878: _resolve_path must not dispatch a caller-supplied alias name to
+# ANY public method the class happens to answer can() true for - only its
+# intended no-arg path getters (home/tmp/dd/bookmarks/configs/postman).
+# 'configure' is a real public Folder method that WIPES %ALIASES when
+# called with no args.
+#
+# Calling Folder->configure directly never reaches this guard at all - Perl
+# resolves an existing method name through normal dispatch and never fires
+# AUTOLOAD, so _resolve_path never even sees 'configure' that way. The
+# guard is exercised by calling _resolve_path directly with a $where value
+# that happens to collide with a real method name - exactly what protects
+# a FUTURE caller (or a bug in AUTOLOAD's own name-extraction) from ever
+# reaching the real configure() through this fallback.
+{
+    local $Developer::Dashboard::Folder::PATHS = undef;
+    Developer::Dashboard::Folder->configure( aliases => { keepme => '/tmp/keepme' } );
+
+    my $resolved = Developer::Dashboard::Folder::_resolve_path( 'Developer::Dashboard::Folder', 'configure' );
+    is( $resolved, undef,
+        'DD-878: _resolve_path("configure") is refused, not dispatched to the real configure() which would silently wipe %ALIASES'
+    );
+    is_deeply(
+        \%Developer::Dashboard::Folder::ALIASES,
+        { keepme => '/tmp/keepme' },
+        'DD-878: the existing alias table survived the refused dispatch attempt untouched'
+    );
+}
+
+# A legitimate, intended alias must still resolve correctly.
+{
+    local $Developer::Dashboard::Folder::PATHS = undef;
+    Developer::Dashboard::Folder->configure;
+    my $home = Developer::Dashboard::Folder->home;
+    is( $home, ( $ENV{HOME} || '' ), 'DD-878: a legitimate getter alias (home) still resolves' );
 }
 
 done_testing;

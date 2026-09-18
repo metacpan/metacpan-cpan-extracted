@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 1;
 
@@ -123,6 +123,14 @@ F<config/punk.yml>.
 C<POST>, C<PUT>, C<PATCH> and C<DELETE>. C<GET>, C<HEAD>, C<OPTIONS> and
 C<TRACE> are not - they are not supposed to change anything, and a token in a
 URL leaks through C<Referer> and browser history.
+
+Nor is a websocket handshake over HTTP/2 or HTTP/3, which arrives as an
+Extended CONNECT (RFC 8441) rather than the GET an upgrade is. It is routed
+as that GET and checked as that GET was: by the handshake's own origin check
+(L<Punk::WebSocket>), which is what stands between a page elsewhere and an
+authenticated socket on either transport. A browser opens every websocket
+this way once the server has advertised the setting, so a CSRF refusal here
+would refuse them all.
 
 A request carrying an C<Authorization> header is skipped: it is authenticated
 by something the browser does not attach automatically, so it is not a CSRF

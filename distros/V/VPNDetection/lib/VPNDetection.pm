@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.2.0';
+our $VERSION = '3.3.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -42,13 +42,18 @@ sub new {
     my $cache_size = defined $args{cache_size} ? $args{cache_size} : 10_000;
     Carp::croak('VPNDetection->new: concurrency must be at least 1') if $concurrency < 1;
     Carp::croak('VPNDetection->new: retries cannot be negative') if $retries < 0;
+    # Mojo arms a negative or non-numeric bound as a timer that fires at once, so
+    # every call would fail as a network error.
+    my $timeout = defined $args{timeout} ? $args{timeout} : 30;
+    Carp::croak('VPNDetection->new: timeout must be a number of seconds, 0 or more')
+        unless Scalar::Util::looks_like_number($timeout) && $timeout >= 0;
 
     my $self = bless {
         api_key => $args{api_key},
         base_url => _base_url($args{base_url}),
         concurrency => $concurrency,
         retries => $retries,
-        timeout => defined $args{timeout} ? $args{timeout} : 30,
+        timeout => $timeout,
         cache => $cache_size > 0 ? VPNDetection::Cache->new(
             max => $cache_size,
             ttl => defined $args{cache_ttl} ? $args{cache_ttl} : 3600,

@@ -319,6 +319,52 @@ STUB
             "Q-107: d2()->" . join( '->', @{$words} ) . "->() invokes exactly `dashboard $dotted`" );
     }
 
+    # DD-739 NAMED-ARGUMENT TRANSLATION. d2()->somecmd(arg1 => 1) is
+    # translation, not execution - hooks already reach the CLI through
+    # run()'s own verbatim shell-out; this is purely a nicer way to spell an
+    # argument list Perl cannot itself tell apart from two positional
+    # strings ('arg1' => 1 and 'arg1', 1 are the same list at runtime, the
+    # fat comma is pure syntax). So the only line that CAN be drawn is arity:
+    # an EVEN-length arg list is treated as complete key/value pairs and
+    # each pair becomes "--$key", $value; an ODD-length list can never be
+    # complete pairs and is passed through verbatim as positional args. Zero
+    # existing callers use the chained/proxy form with any arguments at all
+    # (confirmed: grepped this whole test file and lib/), so this choice
+    # breaks nothing that already exists - run() itself is untouched and
+    # remains the escape hatch for a command that genuinely needs 2+
+    # positional args (its own AC-6/AC-7 block above already covers it).
+    for my $case (
+        [ [ 'somecmd', [ arg1 => 1 ] ],                    'somecmd --arg1 1' ],
+        [ [ 'somecmd', [ arg1 => 1, arg2 => 'x' ] ],        'somecmd --arg1 1 --arg2 x' ],
+    ) {
+        my ( $spec, $expect ) = @{$case};
+        my ( $word, $args ) = @{$spec};
+        $reset->();
+        eval { $handle->$word(@$args)->(); 1 };
+        is_deeply( [ $invocations->() ], [$expect],
+            "DD-739: d2()->$word(" . join( ', ', @$args ) . ")->() invokes `dashboard $expect`" );
+    }
+
+    # THE TERMINATOR'S OWN ARGS ARE TRANSLATED TOO, not just ones supplied at
+    # the bareword call - _execute joins both sources into one list before
+    # translating, so d2()->somecmd->(arg1 => 1) is exactly as valid a way
+    # to write it as d2()->somecmd(arg1 => 1)->().
+    {
+        $reset->();
+        eval { $handle->somecmd->( arg1 => 1 ); 1 };
+        is_deeply( [ $invocations->() ], ['somecmd --arg1 1'],
+            'DD-739: named args supplied at the terminator call are translated too' );
+    }
+
+    # A SINGLE POSITIONAL ARG (odd length) IS NEVER TOUCHED - it cannot be a
+    # complete set of pairs, so it must be a genuine positional argument.
+    {
+        $reset->();
+        eval { $handle->somecmd('onlyone')->(); 1 };
+        is_deeply( [ $invocations->() ], ['somecmd onlyone'],
+            'DD-739: a lone (odd-count) argument is passed through as positional, never translated' );
+    }
+
     # The inert stringification shows what WOULD run, not what was typed. A
     # proxy printed while debugging is worse than useless if it names a command
     # that does not exist - the reader would go looking for soemthing_executable.

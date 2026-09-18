@@ -262,6 +262,38 @@ ok( !$noresolve, 'command_argv_for_path dies when nothing resolves' );
 like( $@, qr/Unable to find runnable file/, 'unresolvable path error surfaced' );
 
 # ---------------------------------------------------------------------------
+# DD-856: a .pl-suffixed file carrying a non-Perl shebang must run through
+# its OWN shebang interpreter, not be force-fed to perl by extension alone.
+# ---------------------------------------------------------------------------
+
+my $shellpl = File::Spec->catfile( $work, 'foo.pl' );
+write_file( $shellpl, "#!/bin/sh\necho bar\nexit;\n" );
+chmod 0755, $shellpl;
+is_deeply(
+    [ command_argv_for_path($shellpl) ],
+    [$shellpl],
+    'DD-856: a .pl file with a #!/bin/sh shebang resolves to itself (run via its own shebang), not through perl',
+);
+
+my $realpl = File::Spec->catfile( $work, 'real.pl' );
+write_file( $realpl, "#!/usr/bin/env perl\nprint qq{ok\\n};\n" );
+chmod 0755, $realpl;
+is_deeply(
+    [ command_argv_for_path($realpl) ],
+    [ $^X, '-I', Developer::Dashboard::Platform::_module_lib_root(), $realpl ],
+    'DD-856: a .pl file with a real perl shebang still resolves through perl (no regression)',
+);
+
+my $noshebangpl = File::Spec->catfile( $work, 'noshebang.pl' );
+write_file( $noshebangpl, "print qq{ok\\n};\n" );
+chmod 0755, $noshebangpl;
+is_deeply(
+    [ command_argv_for_path($noshebangpl) ],
+    [ $^X, '-I', Developer::Dashboard::Platform::_module_lib_root(), $noshebangpl ],
+    'DD-856: a .pl file with no shebang at all still resolves through perl (extension fallback, no regression)',
+);
+
+# ---------------------------------------------------------------------------
 # _shebang_uses_perl : line 173 (open) + 176 (defined first)
 # ---------------------------------------------------------------------------
 my $empty = write_file( File::Spec->catfile( $work, 'empty.txt' ), '' );

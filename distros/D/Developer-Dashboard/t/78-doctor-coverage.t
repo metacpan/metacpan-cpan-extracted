@@ -313,6 +313,43 @@ SKIP: {
 }
 
 # ---------------------------------------------------------------------------
+# DD-852: a dashboard line BEFORE the guard AND another AFTER it (the mixed
+# case _bashrc_bootstrap_issue's own after-guard branch exists to detect and
+# `dashboard doctor --fix` is called to repair) must not corrupt the rewrite.
+# Removing the before-guard line shifts every later byte offset left; reusing
+# guard offsets computed BEFORE that removal then slices the wrong region of
+# the shortened text - manifesting as "substr outside of string"/"Use of
+# uninitialized value" warnings and the after-guard dashboard line never
+# actually being relocated ahead of the guard (the whole point of the
+# rewrite). This uses the case/esac guard form and an extra leading line so
+# the stale offsets land past the shortened text's end, exactly as in the
+# live-reproduced report.
+# ---------------------------------------------------------------------------
+{
+    my $case_guard    = "case \$- in\n    *i*) ;;\n    *) return ;;\nesac";
+    my $before_line   = q{export PERLBREW_HOME="$HOME/perl5/perlbrew"};
+    my $f             = write_file(
+        File::Spec->catfile( $home, 'rewrite-mixed-before-after' ),
+        "$before_line\nsome other line\n$case_guard\n$dashboard_line\n",
+    );
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+    $doctor->_rewrite_bashrc_dashboard_lines($f);
+    is( scalar(@warnings), 0,
+        'DD-852: rewriting a bashrc with a dashboard line both before and after the guard raises no warnings' )
+      or diag("warnings: @warnings");
+
+    my $rewritten  = $doctor->_slurp_text_file($f);
+    my $before_pos = index( $rewritten, 'PERLBREW_HOME' );
+    my $path_pos   = index( $rewritten, 'export PATH=' );
+    my $case_pos   = index( $rewritten, 'case $- in' );
+    ok( $before_pos >= 0 && $path_pos >= 0 && $case_pos >= 0 && $before_pos < $case_pos && $path_pos < $case_pos,
+        'DD-852: both dashboard lines end up ahead of the (correctly relocated) guard, not stranded after it' );
+    like( $rewritten, qr/^esac$/m,
+        'DD-852: the guard block\'s closing esac survives intact' );
+}
+
+# ---------------------------------------------------------------------------
 # _rewrite_bashrc_dashboard_lines with the guard at the very start leaves no
 # leading block, exercising the empty-before branch.
 # ---------------------------------------------------------------------------
@@ -387,6 +424,30 @@ SKIP: {
 
     my $empty = write_file( File::Spec->catfile( $home, 'slurp-empty' ), q{} );
     is( $doctor->_slurp_text_file($empty), q{}, '_slurp_text_file returns an empty string for an empty file' );
+}
+
+# ---------------------------------------------------------------------------
+# _rewrite_bashrc_dashboard_lines returns early, writing nothing, when the
+# guard recomputed AFTER removing dashboard lines comes back undefined - the
+# defensive branch this function exists to take if a future dashboard-line
+# pattern ever overlapped the guard's own text. Forced via mocking since the
+# current fixed set of dashboard-line patterns and the guard's own literal
+# text are structurally disjoint and cannot trigger this from real input.
+# ---------------------------------------------------------------------------
+{
+    my $f = write_file( File::Spec->catfile( $home, 'guard-vanishes-bashrc' ), "$dashboard_line\n$guard_line\n" );
+    my $before = $doctor->_slurp_text_file($f);
+
+    no warnings 'redefine';
+    my $call = 0;
+    local *Developer::Dashboard::Doctor::_bash_noninteractive_guard_offsets = sub {
+        my ( $self, $text ) = @_;
+        $call++;
+        return ( 0, 5 ) if $call == 1;
+        return ( undef, undef );
+    };
+    $doctor->_rewrite_bashrc_dashboard_lines($f);
+    is( $doctor->_slurp_text_file($f), $before, '_rewrite_bashrc_dashboard_lines writes nothing when the recomputed guard is undefined' );
 }
 
 done_testing;

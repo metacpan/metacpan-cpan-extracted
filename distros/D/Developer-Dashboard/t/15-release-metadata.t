@@ -82,7 +82,7 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '4.31', 'repo version bumped to release DD-770..DD-767: host-ready exe-veto, the shared gate-lock premise correction, the checkout-root resolver, the paths-registry constructor extraction, and the empty-environ wall-clock probe fix' );
+is( $version, '4.45', 'repo version bumped at DD-942\'s distro-column gate per owner instruction 2026-09-16 (version bump now happens per-ticket in the distro column, not only at the epic-level VERSION GATE): DD-942 (close Ask.pm\'s pre-existing branch/condition coverage gap)' );
 like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
 {
     my @module_files;
@@ -479,6 +479,27 @@ SKIP: {
     is_deeply( \@tracked, [], 'no sandbox file is tracked in this repository' );
 }
 
+# .claude/ (93KB+ of operator rules) is excluded from the release TARBALL by
+# dist.ini's exclude_match, but that is a claim about the build, not about the
+# git INDEX (DD-673). `git add -f` bypasses .gitignore, so nothing before this
+# assertion would have caught an accidental commit of operator tooling into
+# this project's public history - it would have passed the tarball-exclusion
+# gate (correctly excluded from the build) and every other existing check
+# silently. Distinct from the owner's Q-057 decision, which accepted the risk
+# of .claude/ having no backup - a question about loss, not publication.
+{
+    my $gitignore = _slurp( _repo_path('.gitignore') );
+    like(
+        $gitignore,
+        qr{^\Q.claude/\E$}m,
+        '.claude/ is git-ignored so a stray add cannot commit operator tooling into master',
+    );
+
+    my @tracked = grep { m{^\.claude/} }
+      split /\n/, `git -C @{[ _repo_path() ]} ls-files 2>/dev/null`;
+    is_deeply( \@tracked, [], 'no .claude/ file is tracked in this repository' );
+}
+
     # Untracked-but-not-ignored working directories are the same leak class as
     # the operator files above: GatherDir reads the disk, so .gitignore never
     # protects the tarball. dogfood-output/ in particular holds browser QA
@@ -765,6 +786,27 @@ unlike(
     'main module product manual avoids brittle private-module POD links and stays self-contained',
 );
 
+{
+    # DD-943: t/183-pax-cli-build-run-contract.t creates t/tmp-sow03/ as a
+    # deliberately minimal/POD-less fixture scratch directory and leaves it
+    # on disk after running (gitignored, cleaned only at t/183's own START,
+    # not its end). _perl_doc_paths() must exclude it the same way it
+    # excludes /lib/Developer/Dashboard/Pax and /t/fixtures/, or this test
+    # incorrectly fails whenever t/183 happens to run first in the same
+    # `prove` process.
+    my $stray_dir = _repo_path( 't', 'tmp-sow03', 'dd943-stray' );
+    make_path($stray_dir);
+    my $stray_file = File::Spec->catfile( $stray_dir, 'Fixture.pm' );
+    open my $fh, '>', $stray_file or die "Unable to write $stray_file: $!";
+    print {$fh} "package DD943::Fixture;\n1;\n";
+    close $fh;
+    my @paths = _perl_doc_paths();
+    my ($found) = grep { $_ eq $stray_file } @paths;
+    ok( !$found, 'DD-943: _perl_doc_paths() excludes a stray fixture under t/tmp-sow03/' );
+    require File::Path;
+    File::Path::remove_tree( _repo_path( 't', 'tmp-sow03' ) );
+}
+
 for my $path ( _perl_doc_paths() ) {
     my $content = _slurp($path);
     like( $content, qr/^__END__$/m, "$path keeps Perl POD after __END__" );
@@ -908,6 +950,14 @@ sub _perl_doc_paths {
                 wanted   => sub {
                     return if !-f $_;
                     return if $_ =~ m{/OLD_CODE/};
+                    # DD-943: t/183-pax-cli-build-run-contract.t leaves its
+                    # own deliberately minimal/POD-less scratch fixtures on
+                    # disk under t/tmp-sow03/ after it runs - exclude them
+                    # the same way /lib/Developer/Dashboard/Pax and
+                    # /t/fixtures/ are already excluded elsewhere in this
+                    # file, or this sweep fails whenever t/183 happens to
+                    # run before t/15 in the same prove process.
+                    return if $_ =~ m{/t/tmp-sow03/};
                     return if $_ !~ /\.(?:pm|pl|t)\z/ && $_ !~ m{/share/private-cli/[^/]+\z};
                     push @paths, $File::Find::name;
                 },
@@ -1048,6 +1098,16 @@ sub _repo_search_without_self {
     FILE:
     for my $path ( sort grep { !$seen{$_}++ } @files ) {
         next if $path eq $self;
+        # DD-882: the vendored PAX compiler (lib/Developer/Dashboard/Pax/*)
+        # and its own ported test fixtures/build-artifact scratch dirs carry
+        # third-party source whose own literal strings (e.g. PAX's own
+        # `api-dashboard.page` page-name pattern in an unrelated page-runtime
+        # regex) can coincidentally match this repo-history search without
+        # being a reference to THIS project's own extracted API/SQL
+        # dashboard feature - the thing this check actually exists to catch.
+        next if $path =~ m{/lib/Developer/Dashboard/Pax(?:/|\.pm\z)};
+        next if $path =~ m{/t/fixtures/};
+        next if $path =~ m{/t/tmp-sow03/};
         my $content = _slurp($path);
         my @lines   = split /\n/, $content, -1;
         for my $index ( 0 .. $#lines ) {

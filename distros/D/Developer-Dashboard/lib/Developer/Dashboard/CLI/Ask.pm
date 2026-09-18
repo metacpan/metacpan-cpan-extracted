@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Ask;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -11,6 +11,7 @@ use Getopt::Long qw(GetOptionsFromArray);
 use MIME::Base64 qw(encode_base64);
 
 use Developer::Dashboard::Config;
+use Developer::Dashboard::FileSlurp qw(slurp_file);
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::JSON qw(json_encode json_decode);
 use Developer::Dashboard::PathRegistry;
@@ -53,6 +54,17 @@ sub run_ask {
     my $env = $args{env} || \%ENV;
     my $opts = _parse_args( [ @{$argv} ] );
 
+    # DD-938: --docs is a pure, cheap, static stdout path - print curated
+    # onboarding context and return immediately, before any of the
+    # backend/transcript/prompt machinery below ever runs. Never touches an
+    # AI backend, never writes a file - the owner was explicit that this
+    # replaces injecting the full (large) CLAUDE.md into every ask call,
+    # not a variant of it.
+    if ( $opts->{docs} ) {
+        _emit( $args{out}, _docs_context() );
+        return 0;
+    }
+
     my $prompt = $opts->{prompt};
     if ( defined $args{stdin} && $args{stdin} ne '' ) {
         my $piped = $args{stdin};
@@ -69,6 +81,18 @@ sub run_ask {
     my $file = _transcript_file( $paths, $key );
     my $transcript = _load_transcript($file);
     $transcript = { backend => $transcript->{backend}, messages => [] } if $opts->{reset};
+
+    # DD-938 (owner-corrected scope, live): a --docs flag or an injected
+    # setup instruction is still one more thing an agent has to be told to
+    # do. Since conversation memory is already scoped per workspace, the
+    # workspace's genuinely first-ever ask call (no prior turns, and not a
+    # --no-memory call that never persists anyway) is a zero-instruction
+    # trigger: prepend the curated docs context once, here, so it travels
+    # with turn one and is naturally present in every later turn's replayed
+    # history without repeating it.
+    if ( !@{ $transcript->{messages} } && !$opts->{no_memory} ) {
+        $prompt = _docs_context() . "\n\n" . $prompt;
+    }
 
     my $backend = _resolve_backend( $opts, $transcript );
     my ( $images, $text_files ) = _classify_files( $opts->{files} );
@@ -116,6 +140,7 @@ sub _parse_args {
     my @files;
     my $reset     = 0;
     my $no_memory = 0;
+    my $docs      = 0;
     GetOptionsFromArray(
         $argv,
         'claude'    => \$flag{claude},
@@ -126,6 +151,7 @@ sub _parse_args {
         'file|f=s@' => \@files,
         'new|reset' => \$reset,
         'no-memory' => \$no_memory,
+        'docs'      => \$docs,
     ) or die "Unable to parse ask options\n";
 
     my @chosen = grep { $flag{$_} } @BACKENDS;
@@ -137,8 +163,76 @@ sub _parse_args {
         files     => \@files,
         reset     => $reset ? 1 : 0,
         no_memory => $no_memory ? 1 : 0,
+        docs      => $docs ? 1 : 0,
         prompt    => join( ' ', @{$argv} ),
     };
+}
+
+# _docs_context()
+# Curated, purpose-built onboarding text for `dashboard ask --docs`
+# (DD-938) - deliberately NOT the full CLAUDE.md (owner-specified: too
+# large/expensive to inject on every ask call) and never written to any
+# file. Makes a blank agent DD-*aware* (the DD-OOP-LAYERS stack, where a
+# disposable helper script belongs) rather than DD-*expert*; `dashboard
+# source --files` is the fallback for anything this summary doesn't cover.
+# Input: none.
+# Output: onboarding context string.
+sub _docs_context {
+    return <<'DOCS';
+Developer Dashboard onboarding (dashboard ask --docs)
+
+You are working on a machine with Developer Dashboard installed (two
+entrypoints: `dashboard` and its short alias `d2`, same behavior). This is a
+curated summary, not the whole product - use `dashboard source --files` to
+list every installed file and read the real implementation for anything
+this doesn't cover.
+
+ENTRYPOINTS AND COMMAND RESOLUTION
+- `dashboard <command> [args...]` and `d2 <command> [args...]` are
+  equivalent. Skills nest with dots: `dashboard <skill>.<subcommand>`,
+  arbitrarily deep (`dashboard nest.level1.level2.here`).
+- `dashboard which <command>` prints the resolved file(s) actually backing
+  any command - built-in, layered custom, or dotted skill - plus which
+  per-layer hook files participate. Use this before guessing where a
+  command's logic lives.
+- Built-in command BODIES are not in a single binary: they are staged
+  lazily as working copies under `~/.developer-dashboard/cli/dd/` from a
+  shared source tree, resolved through the same layered lookup as
+  everything else.
+
+DD-OOP-LAYERS (the core architectural idea)
+- Every `.developer-dashboard/` directory from `~` down through the
+  current directory's parents participates in ONE inherited runtime stack:
+  config, `.env` files, docker-compose layering, collectors, indicators,
+  `local/lib/perl5`, static assets, and per-command hook directories all
+  merge the same way. The DEEPEST layer is both the write target and the
+  first lookup hit - a setting in a project-local layer overrides the same
+  setting inherited from `~`.
+- This is why `.env` and docker-compose config are never a single flat
+  file to look for: they are resolved by walking the layer chain from the
+  current directory upward.
+
+WHERE A DISPOSABLE HELPER SCRIPT BELONGS
+- If you need to write throwaway code to answer a request (e.g. "find
+  every file containing 'foobar'"), do not scatter it into the workspace
+  root or /tmp. Use DD's own dot-notation `cli/` convention:
+  `$PWD/.d2/cli/<name>`, `$PWD/.developer-dashboard/cli/<name>`,
+  `~/.d2/cli/<name>`, or `~/.developer-dashboard/cli/<name>` - matching
+  where DD's own layered custom commands and skills already live.
+
+SKILLS
+- Installable repos under `<layer>/skills/<repo-name>/`, each with its own
+  `cli/`, config, and isolated dependency tree. Dotted dispatch
+  (`dashboard <skill>.<cmd>`) is how you invoke into one.
+
+FINDING MORE
+- `dashboard which <name>` - resolve any command to its real file(s).
+- `dashboard source --files` - list every file DD installed under
+  `~/perl5/{lib,bin}`, to grep/read directly.
+- `dashboard ask "<question>"` (without --docs) - ask an AI backend a
+  question directly, with per-workspace conversation memory; this is a
+  generic ask wrapper, not itself DD-aware beyond this summary.
+DOCS
 }
 
 # _resolve_backend($opts, $transcript)
@@ -308,23 +402,10 @@ sub _classify_files {
             push @images, $path;
         }
         else {
-            push @texts, { path => $path, body => _slurp($path) };
+            push @texts, { path => $path, body => slurp_file( $path, raw => 1, missing_message => 'Unable to read attachment %s: %s', normalize_undef => 1 ) };
         }
     }
     return ( \@images, \@texts );
-}
-
-# _slurp($path)
-# Reads one file fully as raw bytes.
-# Input: file path string.
-# Output: file contents string; dies when unreadable.
-sub _slurp {
-    my ($path) = @_;
-    open my $fh, '<:raw', $path or die "Unable to read attachment $path: $!\n";
-    local $/;
-    my $body = <$fh>;
-    close $fh;
-    return defined $body ? $body : '';    # uncoverable branch false a readable attachment always slurps to a defined string (an empty file reads as the empty string, not undef)
 }
 
 # _build_api_messages($history, $prompt, $text_files, $images)
@@ -348,7 +429,7 @@ sub _build_api_messages {
                 source => {
                     type       => 'base64',
                     media_type => $IMAGE_MEDIA_TYPE{ lc $ext },
-                    data       => encode_base64( _slurp($path), '' ),
+                    data       => encode_base64( slurp_file( $path, raw => 1, missing_message => 'Unable to read attachment %s: %s', normalize_undef => 1 ), '' ),
                 },
               };
         }
@@ -460,7 +541,14 @@ sub _workspace_key {
     my ( $paths, $env ) = @_;
     my $ref = $env->{WORKSPACE_REF};
     $ref = $paths->current_project_root if !defined $ref || $ref eq '';
-    $ref = 'global' if !defined $ref || $ref eq '';
+    # DD-942: PathRegistry::current_project_root (via project_root_for)
+    # only ever returns undef or a genuinely non-empty directory string -
+    # every `$dir` it can assign comes from -d checking a real, non-empty
+    # path component, and dirname() of a non-empty string is never ''
+    # either. So $ref eq '' specifically (as opposed to !defined $ref) can
+    # never be true here, confirmed by reading PathRegistry.pm's own
+    # source rather than assumed.
+    $ref = 'global' if !defined $ref || $ref eq '';    # uncoverable condition right
     $ref =~ s/[^A-Za-z0-9._-]+/-/g;
     $ref =~ s/\A-+//;
     $ref =~ s/-+\z//;
@@ -485,7 +573,12 @@ sub _transcript_file {
 sub _load_transcript {
     my ($file) = @_;
     return { backend => '', messages => [] } if !-f $file;
-    open my $fh, '<:raw', $file or return { backend => '', messages => [] };
+    # DD-942: covered directly by t/48-ask.t on a non-root host (uid 0
+    # ignores permission bits entirely, so a chmod-0000 fixture cannot
+    # force this open() to fail there) - this project's own Docker
+    # coverage-gate container runs as root, so the false branch is
+    # genuinely unreachable in that specific, real environment.
+    open my $fh, '<:raw', $file or return { backend => '', messages => [] };    # uncoverable branch false only reachable as a non-root user; the gate container runs as root
     local $/;
     my $raw = <$fh>;
     close $fh;

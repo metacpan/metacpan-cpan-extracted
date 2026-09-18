@@ -141,12 +141,15 @@ write_file( File::Spec->catfile( $home_runner, 'dashboards', 'nav', 'common.tt' 
 write_exec( File::Spec->catfile( $proj_runner, 'cli', 'greet' ), "#!/bin/sh\necho greet-out\n" );
 write_exec( File::Spec->catfile( $proj_runner, 'cli', 'solo' ),  "#!/bin/sh\necho solo-out\n" );
 write_exec( File::Spec->catfile( $proj_runner, 'cli', 'exectest' ), "#!/bin/sh\necho exec-out\n" );
+write_exec( File::Spec->catfile( $proj_runner, 'cli', 'failcmd' ), "#!/bin/sh\necho failcmd-out\nexit 1\n" );
+write_exec( File::Spec->catfile( $proj_runner, 'cli', 'hookfail' ), "#!/bin/sh\necho hookfail-out\n" );
 # greet hooks: a non-runnable file (skipped) plus two runnable hooks, one of
 # which writes to both stdout and stderr.
 write_file( File::Spec->catfile( $proj_runner, 'cli', 'greet.d', '00-skip' ), "not runnable\n" );
 write_exec( File::Spec->catfile( $proj_runner, 'cli', 'greet.d', '01-run' ), "#!/bin/sh\necho hook1-out\necho hook1-err >&2\n" );
 write_exec( File::Spec->catfile( $proj_runner, 'cli', 'greet.d', '02-run' ), "#!/bin/sh\necho hook2-out\n" );
 write_exec( File::Spec->catfile( $proj_runner, 'cli', 'exectest.d', '01-h' ), "#!/bin/sh\necho eh-out\n" );
+write_exec( File::Spec->catfile( $proj_runner, 'cli', 'hookfail.d', '01-fail' ), "#!/bin/sh\necho hook-fail-out\nexit 1\n" );
 
 write_file( File::Spec->catfile( $proj_runner, 'config', 'config.json' ),
     qq|{"indicator":{"icon":"leaf"},"collectors":[{"name":"alpha","interval":20}],"providers":[{"id":"main","title":"Leaf"}]}\n| );
@@ -222,6 +225,22 @@ ok( exists $run->{hooks}{'01-run'}, 'dispatch returns the hook capture map' );
 
 my $run_solo = $disp->dispatch( 'runner', 'solo' );
 like( $run_solo->{stdout}, qr/solo-out/, 'dispatch runs a command that has no hooks (clears last_result)' );
+
+# DD-883: a genuinely-failing command must report its real shifted exit code
+# (1), never the raw wait-status Capture::Tiny's capture() hands back from a
+# bare `system(...)` as its own trailing return value (256 for exit 1).
+my $run_fail = $disp->dispatch( 'runner', 'failcmd' );
+like( $run_fail->{stdout}, qr/failcmd-out/, 'dispatch still captures stdout for a failing command' );
+is( $run_fail->{exit_code}, 1, 'dispatch reports the real exit code for a failing command, not the raw wait-status' );
+
+# DD-883: same defect in the multi-hook execution loop - a failing HOOK's own
+# exit_code (recorded per-hook in execute_hooks' $results{...}) must also be
+# shifted, not the raw wait-status.
+my $hook_fail = quietly( sub { $disp->execute_hooks( 'runner', 'hookfail' ) } );
+my ($hook_entry) = grep { /01-fail/ } keys %{ $hook_fail->{hooks} };
+ok( $hook_entry, 'execute_hooks records the failing hook' );
+is( $hook_fail->{hooks}{$hook_entry}{exit_code}, 1,
+    'execute_hooks reports the real exit code for a failing hook, not the raw wait-status' );
 
 # ---------------------------------------------------------------------------
 # exec_command(): guards plus the exec handoff (faked via the shim).

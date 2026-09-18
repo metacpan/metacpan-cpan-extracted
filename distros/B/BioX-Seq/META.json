@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4234",
    "license" : [
-      "gpl_3"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -40,7 +40,7 @@
    "provides" : {
       "BioX::Seq" : {
          "file" : "lib/BioX/Seq.pm",
-         "version" : "0.008009"
+         "version" : "0.008010"
       },
       "BioX::Seq::Fetch" : {
          "file" : "lib/BioX/Seq/Fetch.pm"
@@ -64,12 +64,12 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.gnu.org/licenses/gpl-3.0.txt"
+         "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "url" : "https://github.com/jvolkening/p5-BioX-Seq"
       }
    },
-   "version" : "0.008009",
+   "version" : "0.008010",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

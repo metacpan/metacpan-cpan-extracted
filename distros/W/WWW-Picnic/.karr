@@ -1,0 +1,10 @@
+claude: true
+prompt: |
+  You are working on WWW::Picnic, the Perl (Moo) client for the Picnic Supermarket
+  API. Read .claude/rules/www-picnic-rules.md, then pick the top actionable ticket
+  from the karr board (`karr board`), claim it, and drive it to review. Delegate
+  behavior-relevant work in lib/WWW/Picnic/ and bin/picnic* to www-picnic-worker;
+  use www-picnic-test-writer for tests and www-picnic-doc-writer for POD. Verify with
+  `prove -lr t` (t/basic.t is a live API test and stays skipped — never set
+  TEST_WWW_PICNIC_USER/PASS). Never run `dzil release`. Stop when nothing actionable
+  remains.

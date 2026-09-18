@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Ring::Cursor - one reader's position in a ring
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
 

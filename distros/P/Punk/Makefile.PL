@@ -132,7 +132,7 @@ my %WriteMakefileArgs = (
         'Markdown::Simple'    => '0.21',
         'Search::Trigram'     => '0.03',
         'DBIx::Loop'          => '0.07',
-        'Frozen'              => '0.07',
+        'Frozen'              => '0.08',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -151,7 +151,7 @@ my %WriteMakefileArgs = (
         'Search::Trigram'      => '0.03',
         'Apophis'              => '0.05',
         'DBIx::Loop'           => '0.07',
-        'Frozen'               => '0.07',
+        'Frozen'               => '0.08',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

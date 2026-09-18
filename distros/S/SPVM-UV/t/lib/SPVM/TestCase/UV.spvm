@@ -1,8 +1,295 @@
 class TestCase::UV {
   use UV;
   use UV::Loop;
+  use Sys;
+  use Sys::Socket::Constant as SOCKET_C;
+  use Sys::IO;
+  use Sys::Socket::Util;
+  use Sys::Ioctl::Constant as IOCTL_C;
+  use Sys::IO::Constant as IO_C;
+  use UV::Constant as UV_C;
+  
   static method test : int () {
     
     return 1;
   }
+  
+  static method poll : int () {
+    
+    # $fd2 -> $fd1
+    {
+      my $loop = UV::Loop->new;
+      
+      my $fd1 = -1;
+      my $fd2 = -1;
+      Sys::Socket::Util->inet_socketpair(\$fd1, \$fd2, SOCKET_C->AF_INET, SOCKET_C->SOCK_STREAM, 0);
+      
+      Fn->defer([$fd1 : int, $fd2 : int] method : void () {
+        Sys::IO->close($fd1);
+        Sys::IO->close($fd2);
+      });
+      
+      Sys::Socket::Util->set_blocking($fd1, 0);
+      Sys::Socket::Util->set_blocking($fd2, 0);
+      
+      my $poll = UV::Handle::Poll->new;
+      $loop->poll_init($poll, $fd1);
+      
+      my $read_data = new_string_len 5;
+      my $read_length_ref = [-1];
+      my $status_ref = [-1];
+      
+      $poll->start([$fd1 : int, $read_data : mutable string, $read_length_ref : int[], $status_ref : int[]] method : void ($poll_handle : UV::Handle::Poll, $status : int, $events : int) {
+        $status_ref->[0] = $status;
+        $read_length_ref->[0] = Sys::Socket->recv($fd1, $read_data, 5, 0);
+        $poll_handle->close_safe;
+      }, UV_C->UV_READABLE | UV_C->UV_WRITABLE);
+      
+      Sys::Socket->send($fd2, "hello", 5, 0);
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($status_ref->[0] == 0) {
+        return 0;
+      }
+      
+      unless ($read_length_ref->[0] == 5 && $read_data eq "hello") {
+        return 0;
+      }
+    }
+    
+    # $fd1 -> $fd2
+    {
+      my $loop = UV::Loop->new;
+      
+      my $fd1 = -1;
+      my $fd2 = -1;
+      Sys::Socket::Util->inet_socketpair(\$fd1, \$fd2, SOCKET_C->AF_INET, SOCKET_C->SOCK_STREAM, 0);
+      
+      Fn->defer([$fd1 : int, $fd2 : int] method : void () {
+        Sys::IO->close($fd1);
+        Sys::IO->close($fd2);
+      });
+      
+      Sys::Socket::Util->set_blocking($fd1, 0);
+      Sys::Socket::Util->set_blocking($fd2, 0);
+      
+      my $poll = UV::Handle::Poll->new;
+      $loop->poll_init($poll, $fd1);
+      
+      my $read_data = new_string_len 5;
+      my $read_length_ref = [-1];
+      my $status_ref = [-1];
+      
+      $poll->start([$fd2 : int, $read_data : mutable string, $read_length_ref : int[], $status_ref : int[]] method : void ($poll_handle : UV::Handle::Poll, $status : int, $events : int) {
+        $status_ref->[0] = $status;
+        $read_length_ref->[0] = Sys::Socket->recv($fd2, $read_data, 5, 0);
+        $poll_handle->close_safe;
+      }, UV_C->UV_READABLE | UV_C->UV_WRITABLE);
+      
+      Sys::Socket->send($fd1, "hello", 5, 0);
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($status_ref->[0] == 0) {
+        return 0;
+      }
+      
+      unless ($read_length_ref->[0] == 5 && $read_data eq "hello") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method timer : int () {
+    
+    my $loop = UV::Loop->new;
+    
+    my $timer = UV::Handle::Timer->new;
+    $loop->timer_init($timer);
+    
+    my $called_count_ref = [0];
+    
+    $timer->start([$called_count_ref : int[]] method : void ($timer_handle : UV::Handle::Timer) {
+      $called_count_ref->[0]++;
+      $timer_handle->close_safe;
+    }, 10, 0);
+    
+    $loop->run(UV_C->UV_RUN_DEFAULT);
+    
+    unless ($called_count_ref->[0] == 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method idle : int () {
+    
+    my $loop = UV::Loop->new;
+    
+    my $idle = UV::Handle::Idle->new;
+    $loop->idle_init($idle);
+    
+    my $called_count_ref = [0];
+    
+    $idle->start([$called_count_ref : int[]] method : void ($idle_handle : UV::Handle::Idle) {
+      $called_count_ref->[0]++;
+      $idle_handle->close_safe;
+    });
+    
+    $loop->run(UV_C->UV_RUN_DEFAULT);
+    
+    unless ($called_count_ref->[0] == 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method async : int () {
+    
+    my $loop = UV::Loop->new;
+    
+    my $async = UV::Handle::Async->new;
+    
+    my $called_count_ref = [0];
+    
+    $loop->async_init($async, [$called_count_ref : int[]] method : void ($async_handle : UV::Handle::Async) {
+      $called_count_ref->[0]++;
+      $async_handle->close_safe;
+    });
+    
+    $async->send;
+    
+    $loop->run(UV_C->UV_RUN_DEFAULT);
+    
+    unless ($called_count_ref->[0] == 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method pipe : int () {
+    
+    # $fd2 -> $fd1
+    {
+      my $loop = UV::Loop->new;
+      
+      my $fd1 = -1;
+      my $fd2 = -1;
+      my $non_blocking = 1;
+      Sys->pipepair(\$fd1, \$fd2, $non_blocking);
+      
+      Fn->defer([$fd1 : int, $fd2 : int] method : void () {
+        Sys::IO->close($fd1);
+        Sys::IO->close($fd2);
+      });
+      
+      my $fd1_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($fd1_pipe, 0);
+      $fd1_pipe->open(Sys::IO->dup($fd1));
+      
+      my $fd2_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($fd2_pipe, 0);
+      $fd2_pipe->open(Sys::IO->dup($fd2));
+      
+      my $read_data = new_string_len 5;
+      my $read_length_ref = [-1];
+      my $status_ref = [-1];
+      
+      my $read_cb = [$fd1_pipe : UV::Handle::Pipe, $read_data : mutable string, $read_length_ref : int[], $status_ref : int[]] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 5 ? 5 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $read_data->[$i] = $buf->[$i];
+          }
+          $read_length_ref->[0] = (int)$nread;
+        }
+        else {
+          $status_ref->[0] = (int)$nread;
+        }
+        $stream->close_safe;
+        $fd1_pipe->close_safe;
+      };
+      weaken $read_cb->{fd1_pipe};
+      
+      $fd1_pipe->read_start($read_data, 5, $read_cb);
+      
+      my $write_req = UV::Request::Write->new;
+      $write_req->write($fd2_pipe, "hello", 5, [$fd2_pipe : UV::Handle::Pipe] method : void ($req : UV::Request::Write, $status : int) {
+        $req->set_write_cb(undef);
+        $fd2_pipe->close_safe;
+      });
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($read_length_ref->[0] == 5 && $read_data eq "hello") {
+        return 0;
+      }
+    }
+    
+    # $fd1 -> $fd2
+    {
+      my $loop = UV::Loop->new;
+      
+      my $fd1 = -1;
+      my $fd2 = -1;
+      my $non_blocking = 1;
+      Sys->pipepair(\$fd1, \$fd2, $non_blocking);
+      
+      Fn->defer([$fd1 : int, $fd2 : int] method : void () {
+        Sys::IO->close($fd1);
+        Sys::IO->close($fd2);
+      });
+      
+      my $fd1_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($fd1_pipe, 0);
+      $fd1_pipe->open(Sys::IO->dup($fd1));
+      
+      my $fd2_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($fd2_pipe, 0);
+      $fd2_pipe->open(Sys::IO->dup($fd2));
+      
+      my $read_data = new_string_len 5;
+      my $read_length_ref = [-1];
+      my $status_ref = [-1];
+      
+      my $read_cb = [$fd2_pipe : UV::Handle::Pipe, $read_data : mutable string, $read_length_ref : int[], $status_ref : int[]] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 5 ? 5 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $read_data->[$i] = $buf->[$i];
+          }
+          $read_length_ref->[0] = (int)$nread;
+        }
+        else {
+          $status_ref->[0] = (int)$nread;
+        }
+        $stream->close_safe;
+        $fd2_pipe->close_safe;
+      };
+      weaken $read_cb->{fd2_pipe};
+      
+      $fd2_pipe->read_start($read_data, 5, $read_cb);
+      
+      my $write_req = UV::Request::Write->new;
+      $write_req->write($fd1_pipe, "hello", 5, [$fd1_pipe : UV::Handle::Pipe] method : void ($req : UV::Request::Write, $status : int) {
+        $req->set_write_cb(undef);
+        $fd1_pipe->close_safe;
+      });
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($read_length_ref->[0] == 5 && $read_data eq "hello") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
 }

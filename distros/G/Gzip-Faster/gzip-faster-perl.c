@@ -40,6 +40,8 @@ typedef struct
     SV * file_name;
     /* User-defined modification time. */
     SV * mod_time;
+    /* Maximum length of the output of unzip, or 0 for no limit. */
+    UV max_size;
     /* Gzip, not deflate or inflate. */
     unsigned int is_gzip : 1;
     /* "Raw" inflate or deflate without adler32 check. */
@@ -360,6 +362,18 @@ gzip_faster (gzip_faster_t * gf)
 
 #define GF_FILE_NAME_MAX 0x400
 
+/* Free the zlib state and any partial output of an unzip which is
+   about to fail. */
+
+static void
+gunzip_fail (gzip_faster_t * gf, SV * plain)
+{
+    inflateEnd (& gf->strm);
+    if (plain) {
+	SvREFCNT_dec (plain);
+    }
+}
+
 /* Decompress "gf->in" (an SV *) and return the decompressed value. */
 
 static SV *
@@ -435,28 +449,34 @@ gunzip_faster (gzip_faster_t * gf)
 	    break;
 
 	case Z_DATA_ERROR:
-	    inflateEnd (& gf->strm);
+	    gunzip_fail (gf, plain);
 	    croak ("Data input to inflate is not in libz format");
 	    break;
 
 	case Z_MEM_ERROR:
-	    inflateEnd (& gf->strm);
+	    gunzip_fail (gf, plain);
 	    croak ("Out of memory during inflate");
 
 	case Z_STREAM_ERROR:
-	    inflateEnd (& gf->strm);
+	    gunzip_fail (gf, plain);
 	    croak ("Internal error in zlib");
 
 	default:
-	    inflateEnd (& gf->strm);
+	    gunzip_fail (gf, plain);
 	    croak ("Unknown status %d from inflate", zlib_status);
 	    break;
 	}
 	have = CHUNK - gf->strm.avail_out;
+	if (gf->user_object && gf->max_size &&
+	    (plain ? SvCUR (plain) : 0) + have > gf->max_size) {
+	    gunzip_fail (gf, plain);
+	    croak ("Uncompressed data exceeds max_size of %" UVuf " bytes",
+		   gf->max_size);
+	}
 	if (! plain) {
 	    /* If the return value is uninitialised, set up a new
 	       one. */
-	    plain = newSVpv ((const char *) gf->out_buffer, have);
+	    plain = newSVpvn ((const char *) gf->out_buffer, have);
 	}
 	else {
 	    /* If the return value was initialised, append the
@@ -467,8 +487,17 @@ gunzip_faster (gzip_faster_t * gf)
     }
     while (gf->strm.avail_out == 0);
     /* Check everything is OK. */
-    check_avail_in (gf);
-    check_zlib_status (zlib_status);
+    if (gf->strm.avail_in != 0) {
+	unsigned int left = gf->strm.avail_in;
+	gunzip_fail (gf, plain);
+	croak ("Zlib did not finish processing the string: %d bytes left",
+	       left);
+    }
+    if (zlib_status != Z_STREAM_END) {
+	gunzip_fail (gf, plain);
+	croak ("Zlib did not come to the end of the string: zlib_status = %d",
+	       zlib_status);
+    }
     /* Clean up. */
     inflateEnd (& gf->strm);
     /* "header.done" is filled by zlib. */
@@ -522,6 +551,7 @@ new_user_object (gzip_faster_t * gf)
 {
     gf->file_name = 0;
     gf->mod_time = 0;
+    gf->max_size = 0;
     gf->is_gzip = 1;
     gf->is_raw = 0;
     gf->user_object = 1;

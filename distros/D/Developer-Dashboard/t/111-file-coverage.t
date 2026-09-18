@@ -360,6 +360,39 @@ chdir $orig_cwd or die "Unable to chdir back to $orig_cwd: $!";
         'File unwraps to paths and delegates the alias cache key' );
 }
 
+# DD-878: _resolve_file must not dispatch a caller-supplied alias name to
+# ANY public method the underlying FileRegistry object happens to answer
+# can() true for - only its intended no-arg path getters. 'paths' is a real
+# public FileRegistry method (returns the PathRegistry object, not a file
+# path) that must NOT be reachable this way.
+{
+    my $paths = Developer::Dashboard::PathRegistry->new( home => tempdir( CLEANUP => 1 ) );
+    my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
+    local $Developer::Dashboard::File::FILES = $files;
+    local %Developer::Dashboard::File::ALIASES        = ();
+    local %Developer::Dashboard::File::CONFIG_ALIASES = ();
+
+    eval { Developer::Dashboard::File->paths };
+    my $error = $@;
+    like(
+        $error,
+        qr/Unknown file 'paths'/,
+        'DD-878: File->paths is refused, not dispatched to FileRegistry->paths (which returns the PathRegistry object, not a file path)'
+    );
+}
+
+# A legitimate, intended alias must still resolve correctly.
+{
+    my $paths = Developer::Dashboard::PathRegistry->new( home => tempdir( CLEANUP => 1 ) );
+    my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
+    local $Developer::Dashboard::File::FILES = $files;
+    local %Developer::Dashboard::File::ALIASES        = ();
+    local %Developer::Dashboard::File::CONFIG_ALIASES = ();
+
+    my $resolved = Developer::Dashboard::File->prompt_log;
+    ok( defined $resolved && length $resolved, 'DD-878: a legitimate getter alias (prompt_log) still resolves' );
+}
+
 done_testing;
 
 __END__

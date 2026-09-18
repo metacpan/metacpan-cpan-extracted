@@ -10,8 +10,20 @@ my $deployer = Module::Build->subclass(
 sub ACTION_deploy {
 
     require CPAN::Uploader;
+    require MetaCPAN::Client;
+    use version;
+
     my $self = shift;
     $self->depends_on("dist");
+
+    # check that this is a newer version
+    my $name = $self->dist_name;
+    my $mpan = MetaCPAN::Client->new();
+    my $existing = $mpan->release($name)->version;
+    if (version->parse($existing) >= version->parse($self->dist_version)) {
+        warn "This version is <= the version on CPAN, aborting nicely\n";
+        return 1;
+    }
 
     my $tarball = $self->dist_dir() . '.tar.gz';
     die "tarball not found"
@@ -26,7 +38,7 @@ SUBCLASS
 
 my $builder = $deployer->new(
     module_name        => 'BioX::Seq',
-    license            => 'GPL_3',
+    license            => 'Perl_5',
     dist_author        => q{Jeremy Volkening <volkening@cpan.org>},
     configure_requires => {
         'Module::Build' => 0,
@@ -50,6 +62,5 @@ my $builder = $deployer->new(
         }
     },
     add_to_cleanup => [ 'BioX-Seq-*' ],
-    create_license => 1,
 );
 $builder->create_build_script;

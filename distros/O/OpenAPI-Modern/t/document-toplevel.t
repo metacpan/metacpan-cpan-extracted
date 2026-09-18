@@ -1,4 +1,5 @@
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
+use utf8;
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
@@ -121,17 +122,19 @@ YAML
     'empty openapi',
   );
 
-  $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => { openapi => 'blah' });
-  is_equal(
-    [ map $_->TO_JSON, $doc->errors ],
-    [
-      {
-        keywordLocation => '',
-        error => 'bad openapi version: "blah"',
-      },
-    ],
-    'bad openapi',
-  );
+  foreach my $version (qw(3.২.1 3.2.২ blah)) {
+    $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => { openapi => $version });
+    is_equal(
+      [ map $_->TO_JSON, $doc->errors ],
+      [
+        {
+          keywordLocation => '',
+          error => 'bad openapi version: "'.$version.'"',
+        },
+      ],
+      'bad openapi version '. $version,
+    );
+  }
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',

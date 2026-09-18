@@ -1,6 +1,6 @@
 package Crypt::Age::Keys;
 # ABSTRACT: Key generation and Bech32 encoding for age encryption
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 use Carp qw(croak);
 use Crypt::PK::X25519;
@@ -263,7 +263,7 @@ Crypt::Age::Keys - Key generation and Bech32 encoding for age encryption
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

@@ -411,9 +411,9 @@ paths:
 YAML
 
   my $response = response(404, [
-    MultipleValuesAsArray => '  one',
-    MultipleValuesAsArray => ' one ',
-    MultipleValuesAsArray => ' three ',
+    MultipleValuesAsArray => 'one',
+    MultipleValuesAsArray => 'one',
+    MultipleValuesAsArray => 'three',
   ]);
   is_equal(
     (my $result = $openapi->validate_response($response,

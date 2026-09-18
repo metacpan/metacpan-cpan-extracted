@@ -142,6 +142,13 @@ OUTPUT:
 	RETVAL
 
 void
+max_size (gf, max_size = 0)
+	Gzip::Faster gf;
+	UV max_size;
+CODE:
+	gf->max_size = max_size;
+
+void
 copy_perl_flags (gf, on_off)
 	Gzip::Faster gf;
 	SV * on_off;

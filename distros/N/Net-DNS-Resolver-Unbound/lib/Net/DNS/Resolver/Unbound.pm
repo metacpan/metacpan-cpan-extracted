@@ -10,7 +10,7 @@ use base qw(Net::DNS::Resolver::Base DynaLoader);
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.37';
+	$VERSION = '1.38';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 

@@ -23,6 +23,12 @@ chdir $home or die "Unable to chdir to $home: $!";
 
 my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
 
+sub dies_like {
+    my ( $code, $pattern, $label ) = @_;
+    my $error = eval { $code->(); 1 } ? '' : $@;
+    like( $error, $pattern, $label );
+}
+
 # --------------------------------------------------------------------------
 # _resolved_home_from_env: HOME, USERPROFILE, HOMEDRIVE/HOMEPATH resolution.
 # --------------------------------------------------------------------------
@@ -822,6 +828,41 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
         'alias_cache_key is empty for an unblessed scalar' );
     is( Developer::Dashboard::PathRegistry::alias_cache_key( {} ), '',
         'alias_cache_key is empty for an unblessed hash reference' );
+}
+
+# --------------------------------------------------------------------------
+# DD-870: resolve_dir's method-name fallback must dispatch ONLY to the
+# allowlisted no-arg path getters, never to any other public method (the
+# constructor, mutators, or plural/hash-returning inventory methods).
+# --------------------------------------------------------------------------
+{
+    my $reg = Developer::Dashboard::PathRegistry->new( home => $home );
+
+    # Non-getter public methods must be refused, not dispatched.
+    for my $bad (
+        qw(all_paths all_path_aliases new new_from_all_folders
+        register_named_paths unregister_named_path named_paths
+        runtime_roots dashboards_roots resolve_dir resolve_any)
+      )
+    {
+        dies_like( sub { $reg->resolve_dir($bad) },
+            qr/Unknown directory name/, "resolve_dir refuses to dispatch to '$bad'" );
+    }
+
+    # All 26 legitimate no-arg path getters must still resolve by name.
+    for my $good (
+        qw(home runtime_root home_runtime_root home_runtime_path
+        project_runtime_root state_root state_base_root cache_root
+        home_cache_root logs_root dashboards_root bookmarks bookmarks_root
+        cli_root skills_root collectors_root indicators_root sessions_root
+        temp_root config_root auth_root repo_dashboard_root users_root
+        current_project_root current_working_directory cwd)
+      )
+    {
+        my $direct   = $reg->$good();
+        my $resolved = $reg->resolve_dir($good);
+        is( $resolved, $direct, "resolve_dir still resolves allowlisted getter '$good'" );
+    }
 }
 
 done_testing;

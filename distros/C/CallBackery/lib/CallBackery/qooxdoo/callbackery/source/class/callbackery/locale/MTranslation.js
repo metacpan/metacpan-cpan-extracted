@@ -30,12 +30,34 @@ qx.Mixin.define("callbackery.locale.MTranslation", {
                 return '';
             }
             if (messageId instanceof Array) {
-                return nlsManager.tr.apply(nlsManager, messageId);
+                return nlsManager.tr.apply(nlsManager, this._xtrArgs(messageId));
             }
             if (messageId instanceof qx.data.Array) {
-                return nlsManager.tr.apply(nlsManager, messageId.toArray());
+                return nlsManager.tr.apply(
+                    nlsManager, this._xtrArgs(messageId.toArray()));
             }
             return nlsManager.tr.apply(nlsManager, arguments);
+        },
+
+        /**
+         * Resolve a backend message's arguments before it is substituted.
+         *
+         * An argument that is an array is a trm() of its own -- a message
+         * built from a fixed part and some optional ones, which is what any
+         * message with a warning or a code appended to it looks like. Each
+         * piece is translated in its own right, then substituted as text.
+         *
+         * @param msg {Array} [msgid, arg, ...] as the backend sent it
+         * @return {Array} the same, with nested messages rendered to text
+         */
+        _xtrArgs: function(msg) {
+            if (msg.length < 2) {
+                return msg;
+            }
+            return msg.map(function(part, i) {
+                return i > 0 && part instanceof Array
+                    ? String(this.xtr(part)) : part;
+            }, this);
         }
     }
 });

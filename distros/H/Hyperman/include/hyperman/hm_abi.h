@@ -205,7 +205,14 @@ typedef struct hm_abi {
      * been sent on it, or - on HTTP/1.1 - the response has not been deferred
      * yet. Deferred means a psgi.streaming coderef or a handler parked on a
      * Future: a synchronous handler's return value would be serialised on
-     * top of the body being streamed. (fd, id, stream_id) is the ticket
+     * top of the body being streamed. A status of 101 is the exception, and
+     * is allowed from a synchronous handler: an upgrade has no body, the
+     * connection becomes a tunnel whose bytes belong to the handle both
+     * ways (stream_on_data is the read half), the handler's return value is
+     * discarded as the sentinel it is, and closing the handle closes the
+     * connection. No Connection: close is added to a 101; the caller's own
+     * Upgrade and Connection headers are the response. This is how a
+     * WebSocket runs over TLS, which conn_detach refuses. (fd, id, stream_id) is the ticket
      * published as psgix.hyperman.stream, which is [fd, generation, -1] on
      * HTTP/1.1 and [fd, generation, stream id] on HTTP/2. It is a separate
      * key from psgix.hyperman.conn, which names an fd an application may

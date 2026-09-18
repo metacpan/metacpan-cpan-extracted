@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Element::IfElse 0.003;
+package Sieve::Generator::Element::IfElse 0.004;
 # ABSTRACT: a Sieve if/elsif/else conditional construct
 
 use Moo;
@@ -90,7 +90,7 @@ Sieve::Generator::Element::IfElse - a Sieve if/elsif/else conditional construct
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -132,7 +132,7 @@ not provided, no C<else> clause is rendered.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

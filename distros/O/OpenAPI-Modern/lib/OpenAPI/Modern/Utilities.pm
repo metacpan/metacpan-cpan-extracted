@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.148';
+our $VERSION = '0.149';
 
 use 5.020;
 use strictures 2;
@@ -42,6 +42,7 @@ our @EXPORT = qw(
 
 our @EXPORT_OK = qw(
   OAS_SCHEMAS
+  MEDIA_RANGE_RE
   add_vocab_and_default_schemas
   add_formats
   convert_request
@@ -51,6 +52,7 @@ our @EXPORT_OK = qw(
   uri_encode_strict
   intersect_types
   coerce_primitive
+  is_header_name
   is_cookie_name
   is_cookie_value
   elem
@@ -66,8 +68,8 @@ our %EXPORT_TAGS = (
 # support the latest point release as soon as possible.
 use constant SUPPORTED_OAD_VERSIONS => [ '3.0.4', '3.1.2', '3.2.0' ];
 
-# in most things, e.g. schemas, we only use major.minor as the version number
-use constant OAS_VERSIONS => [ map s/^\d+\.\d+\K\.\d+\z//r, SUPPORTED_OAD_VERSIONS->@* ];
+# in most things, such as checking for compatibility, we only use major.minor as the version number
+use constant OAS_VERSIONS => [ map s/^\d+\.\d+\K\.\d+\z//ar, SUPPORTED_OAD_VERSIONS->@* ];
 
 # see https://spec.openapis.org/#openapi-specification-schemas for the latest links
 # these are updated automatically at build time via 'update-schemas'
@@ -76,7 +78,7 @@ use constant OAS_VERSIONS => [ map s/^\d+\.\d+\K\.\d+\z//r, SUPPORTED_OAD_VERSIO
 use constant DEFAULT_METASCHEMA => {
   '3.0' => 'https://spec.openapis.org/oas/3.0/schema/2024-10-18',
   '3.1' => 'https://spec.openapis.org/oas/3.1/schema/2025-11-23',
-  '3.2' => 'https://spec.openapis.org/oas/3.2/schema/2025-11-23',
+  '3.2' => 'https://spec.openapis.org/oas/3.2/schema/2026-08-30',
 };
 
 # metaschema for JSON Schemas contained within OpenAPI documents:
@@ -84,7 +86,7 @@ use constant DEFAULT_METASCHEMA => {
 use constant DEFAULT_DIALECT => {
   '3.0' => DEFAULT_METASCHEMA->{'3.0'}.'#/definitions/Schema',
   '3.1' => 'https://spec.openapis.org/oas/3.1/dialect/2024-11-10',
-  '3.2' => 'https://spec.openapis.org/oas/3.2/dialect/2025-09-17',
+  '3.2' => 'https://spec.openapis.org/oas/3.2/dialect/2026-02-26',
 };
 
 # OpenAPI document schema that forces the use of the JSON Schema dialect (no $schema overrides
@@ -92,13 +94,13 @@ use constant DEFAULT_DIALECT => {
 use constant DEFAULT_BASE_METASCHEMA => {
   '3.0' => 'https://spec.openapis.org/oas/3.0/schema/2024-10-18', # same as standard
   '3.1' => 'https://spec.openapis.org/oas/3.1/schema-base/2025-11-23',
-  '3.2' => 'https://spec.openapis.org/oas/3.2/schema-base/2025-11-23',
+  '3.2' => 'https://spec.openapis.org/oas/3.2/schema-base/2026-08-30',
 };
 
 # OpenAPI vocabulary definition
 use constant OAS_VOCABULARY => {
   '3.1' => 'https://spec.openapis.org/oas/3.1/meta/2024-11-10',
-  '3.2' => 'https://spec.openapis.org/oas/3.2/meta/2025-09-17',
+  '3.2' => 'https://spec.openapis.org/oas/3.2/meta/2026-02-26',
 };
 
 # an OpenAPI schema and JSON Schema dialect which prohibit unknown keywords
@@ -136,6 +138,23 @@ use constant OAS_SCHEMAS => {
   }, OAS_VERSIONS->@*
 };
 
+my ($OWS, $TOKEN, $QUOTED_STRING);
+BEGIN {
+  # see RFC9110 §8.3.1: ABNF "OWS": HT SP
+  $OWS = q{[\x09\x20]*};
+
+  # see RFC9110 §5.6.2: ABNF "token" (identical to RFC2616 §2.2 "token")
+  $TOKEN = q{(?a:[[:alnum:]!#$%&'*+.^_`|~-]+)};
+
+  # see RFC9110 §5.6.6: ABNF "quoted-string"
+  # quoted-string  = DQUOTE *( qdtext / quoted-pair ) DQUOTE
+  # qdtext         = HTAB / SP / %x21 / %x23-5B / %x5D-7E / obs-text ; everything but: " \ DEL
+  # quoted-pair    = "\" ( HTAB / SP / VCHAR / obs-text )
+  $QUOTED_STRING = q{"((?:[\x09\x20\x21\x23-\x5B\x5D-\x7E\x80-\xFF]|\x5C[\x09\x20-\x7E\x80-\xFF])*)"};
+}
+
+# note: unanchored!
+use constant MEDIA_RANGE_RE => "$TOKEN/$TOKEN(?:$OWS;$OWS$TOKEN=(?:$TOKEN|$QUOTED_STRING))*";
 
 sub add_vocab_and_default_schemas ($evaluator, $version = OAS_VERSIONS->[-1]) {
   return if ($evaluator->{__openapi_vocabs_loaded}//={})->{$version}++;
@@ -146,7 +165,7 @@ sub add_vocab_and_default_schemas ($evaluator, $version = OAS_VERSIONS->[-1]) {
     my $document = load_cached_document($evaluator, $uri);
 
     # add "latest" alias for each of these documents, mapping to the same document object
-    $evaluator->add_document(($document->canonical_uri =~ s{/\d{4}-\d{2}-\d{2}\z}{}r).'/latest', $document);
+    $evaluator->add_document(($document->canonical_uri =~ s{/\d{4}-\d{2}-\d{2}\z}{}ar).'/latest', $document);
   }
 }
 
@@ -182,14 +201,11 @@ sub add_formats ($evaluator, $version = OAS_VERSIONS->[-1]) {
   $evaluator->add_format_validation(password => +{ type => 'string', sub => sub ($) { 1 } })
     if not $evaluator->_get_format_validation('password');
 
-  my $OWS = q{[\x09\x20]*};
-  my $TOKEN = q{[a-zA-Z0-9!#$%&'*+.^_`|~-]+};
-  my $QUOTED_STRING = q{"(?:[\x09\x20\x21\x23-\x5B\x5D-\x7E\x80-\xFF]|\x5C[\x09\x20-\x7E\x80-\xFF])*"};
   $evaluator->add_format_validation('media-range' => +{
     type => 'string',
     sub => sub ($x) {
-      # see ABNF at RFC9110 Appendix A
-      return 0+!!($x =~ m{^$TOKEN/$TOKEN(?:$OWS;$OWS$TOKEN=(?:$TOKEN|$QUOTED_STRING))*\z});
+      # see RFC9110 §12.5.1: ABNF "media-range", RFC9110 §8.3.1: ABNF "media-type"
+      return 0+!!($x =~ ('^'.MEDIA_RANGE_RE.'\z'));
     },
   }) if not $evaluator->_get_format_validation('media-range');
 }
@@ -208,7 +224,8 @@ sub convert_request ($request) {
   if ($request->isa('HTTP::Request')) {
     $req->method($request->method);
     $req->url(Mojo::URL->new($request->uri));
-    $req->version($request->protocol =~ s{^HTTP/(\d\.\d)\z}{$1}r) if $request->protocol;
+    $req->version($request->protocol =~ s{^HTTP/(\d\.\d)\z}{$1}ar) if $request->protocol;
+    # remember, if you're constructing $body manually, you need to =~ s/\n/\r\n/g;
     my $body = $request->content;
 
     if (match_media_type(scalar $request->content_type, ['multipart/*'])) {
@@ -267,7 +284,7 @@ sub convert_response ($response) {
   my (@headers, $body);
   if ($response->isa('HTTP::Response')) {
     $res->code($response->code);
-    $res->version($response->protocol =~ s{^HTTP/(\d\.\d)\z}{$1}r) if $response->protocol;
+    $res->version($response->protocol =~ s{^HTTP/(\d\.\d)\z}{$1}ar) if $response->protocol;
     @headers = pairs $response->headers->flatten;
     $body = $response->content;
   }
@@ -352,17 +369,24 @@ sub coerce_primitive ($dataref, $types = []) {
   $$dataref = ''.$$dataref, return 1 if elem('string', $types);
 }
 
+
+# RFC9110 §5.1
+# field-name     = token
+sub is_header_name ($name) {
+  !!(defined $name && $name =~ /^$TOKEN\z/);
+}
+
 # RFC6265 §3.1 and §4.2.1
 # cookie-header = "Cookie:" OWS cookie-string OWS
 # cookie-string = cookie-pair *( ";" SP cookie-pair )
 # cookie-pair   = cookie-name "=" cookie-value
-# cookie-name   = token (defined in RFC2616 §2.2)
+# cookie-name   = token                                         ; (defined in RFC2616 §2.2)
 # cookie-value  = *cookie-octet / ( DQUOTE *cookie-octet DQUOTE )
-# cookie-octet  = %x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E ; US-ASCII characters excluding
-#                                   CTLs, whitespace, DQUOTE, comma, semicolon, and backslash
+# cookie-octet  = %x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E  ; US-ASCII characters excluding
+#                                   ; CTLs, whitespace, DQUOTE, comma, semicolon, and backslash
 
 sub is_cookie_name ($name) {
-  !!(defined $name && $name =~ /^[A-Za-z0-9!#\$%&'*+.^_`|~-]+\z/);
+  !!(defined $name && $name =~ /^$TOKEN\z/);
 }
 
 sub is_cookie_value ($value) {
@@ -387,8 +411,7 @@ sub elem ($items, $set) {
 #   for other multipart/*:   [ $value1, $value2, ... ]
 # - headers for each part as an arrayref of objects:
 #   [ { $header1 => $value, $header2 => $value, ... }, { ... }, ... ]
-# Only the top level is operated on; if there are parts nested inside of parts, those parts will be
-# returned without deserialization, so this function will need to be called again on those parts.
+# Operates recursively; parts within parts are also deserialized.
 # Strings are not decoded with charset here, but individual fields' Content-Type are included so
 # that can be done afterwards (or correlated with an encoding object)
 # Based loosely on Mojo::Message::_parse_formdata
@@ -398,6 +421,7 @@ sub deserialize_multipart ($content) {
   my (@content, @headers);
   my $is_form = match_media_type($content->headers->content_type, ['multipart/form-data']);
 
+  my $part_num = 0;
   foreach my $part ($content->parts->@*) {
     my $headers = $part->headers->to_hash('multi');
     $headers = +{ map +($_ => ($headers->{$_}->@* == 1 ? $headers->{$_}[0] : $headers->{$_} )),
@@ -417,10 +441,30 @@ sub deserialize_multipart ($content) {
       my $disposition = $part->headers->content_disposition;
       die 'missing Content-Disposition' if not defined $disposition;
 
-      my ($name) = $disposition =~ /[; ]name="((?:\\"|[^;"])*)"/;
-      $value = { $name => $value };
+      # see ABNF at RFC2183 §2 (RFC6266 does not apply to multipart/form-data bodies)
+      my ($disposition_type) = ($disposition =~ /^($TOKEN)/);
+      next if $disposition_type ne 'form-data';
+
+      pos($disposition) = length $&;
+      my $leftovers = $';
+      my $params = {};
+      while ($disposition =~ /\G$OWS;$OWS($TOKEN)=($TOKEN|$QUOTED_STRING)/g) {
+        my ($param_name, $value, $qs_value) = ($1, $2, $3);    # $QUOTED_STRING contains $3
+        $leftovers = $';
+        # RFC9110 §5.6.4: "The backslash octet ("\") can be used as a single-octet quoting mechanism
+        # within quoted-string and comment constructs. Recipients that process the value of a
+        # quoted-string MUST handle a quoted-pair as if it were replaced by the octet following the
+        # backslash."
+        $params->{$param_name} = Encode::decode('UTF-8',
+          defined $qs_value ? ($qs_value =~ s/\x5C(.)/$1/gr) : $value,
+          Encode::DIE_ON_ERR | Encode::LEAVE_SRC);
+      }
+
+      next if length $leftovers;
+      $value = { $params->{name} // 'part_'.$part_num => $value };
     }
 
+    $part_num++;
     push @content, $value;
     push @headers, $headers;
   }
@@ -457,7 +501,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.148
+version 0.149
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -474,6 +518,7 @@ This class contains common definitions and internal utilities to be used by L<Op
 DEFAULT_DIALECT
 DEFAULT_METASCHEMA
 OAS_SCHEMAS
+MEDIA_RANGE_RE
 OAS_VERSIONS
 OAS_VOCABULARY
 STRICT_DIALECT
@@ -488,6 +533,7 @@ uri_encode
 uri_encode_strict
 intersect_types
 coerce_primitive
+is_header_name
 is_cookie_name
 is_cookie_value
 elem

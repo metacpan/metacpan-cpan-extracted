@@ -3,7 +3,7 @@ package Developer::Dashboard::Folder;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Cwd qw(cwd);
 use File::Basename qw(dirname);
@@ -142,26 +142,38 @@ sub _load_configured_aliases {
 }
 
 # cd($where, $code)
-# Temporarily changes directory and invokes a callback.
+# Temporarily changes directory and invokes a callback. Exception-safe
+# (DD-844): a dying callback still restores the working directory before
+# its exception is rethrown, unaltered, to the caller.
 # Input: named path or literal directory path plus callback.
-# Output: callback return value or undef.
+# Output: callback return value, undef, or rethrows the callback's own
+#         exception if it died.
 sub cd {
     my ( $class, $where, $code ) = @_;
     return if ref($code) ne 'CODE';
     my $pwd = cwd();
     my $dir = $class->_resolve_path($where);
     return if !$dir || !-d $dir;
+    # uncoverable branch true
     chdir $dir or return;
     my $parent = dirname($dir);
-    my $result = $code->(
-        {
-            caller => $pwd,
-            parent => $parent,
-            dir    => $dir,
-            stay   => sub { $pwd = $_[0] if defined $_[0] && $_[0] ne '' },
-        }
-    );
+    # DD-844: the callback runs under eval so a die does not skip the
+    # restoration below - $pwd is restored (honoring any stay() redirect the
+    # callback made before dying) and only THEN is the original exception
+    # rethrown, never swallowed or replaced.
+    my $result = eval {
+        $code->(
+            {
+                caller => $pwd,
+                parent => $parent,
+                dir    => $dir,
+                stay   => sub { $pwd = $_[0] if defined $_[0] && $_[0] ne '' },
+            }
+        );
+    };
+    my $err = $@;
     chdir $pwd if $pwd;
+    die $err if $err;
     return $result;
 }
 
@@ -173,6 +185,7 @@ sub ls {
     my ( $class, $where ) = @_;
     my $dir = $class->_resolve_path($where);
     return () if !$dir || !-d $dir;
+    # uncoverable branch true
     opendir my $dh, $dir or return ();
     my @items;
     while ( my $entry = readdir $dh ) {
@@ -220,6 +233,15 @@ sub locate {
     return grep { !$seen{$_}++ } sort @found;
 }
 
+# DD-878: the method-name fallback below must dispatch ONLY to these
+# no-arg path getters - never to any other public method (configure()
+# mutates state, all() returns a hash not a path, cd/ls/locate take
+# required arguments), or a name that merely collides with a method name
+# becomes an arbitrary method call.
+my %RESOLVABLE_ACCESSOR = map { $_ => 1 } qw(
+  home tmp dd bookmarks configs postman
+);
+
 # _resolve_path($where)
 # Resolves a named folder alias or literal path.
 # Input: alias or path string.
@@ -238,7 +260,7 @@ sub _resolve_path {
     if ( my $legacy = $legacy_aliases{$where} ) {
         return $class->$legacy() if $class->can($legacy);
     }
-    return $class->$where() if $class->can($where);
+    return $class->$where() if $RESOLVABLE_ACCESSOR{$where};
     return $ALIASES{$where} if defined $ALIASES{$where};
     return $CONFIG_ALIASES{$where} if defined $CONFIG_ALIASES{$where};
     my $env = 'DEVELOPER_DASHBOARD_PATH_' . uc($where);

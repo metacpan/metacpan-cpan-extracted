@@ -1,6 +1,6 @@
 use v5.36.0;
 
-package Sieve::Generator::Sugar 0.003;
+package Sieve::Generator::Sugar 0.004;
 # ABSTRACT: constructor functions for building Sieve generator objects
 
 use JSON::MaybeXS ();
@@ -491,7 +491,7 @@ Sieve::Generator::Sugar - constructor functions for building Sieve generator obj
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -711,7 +711,7 @@ name equals the given value, by producing something like C<not string :is
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

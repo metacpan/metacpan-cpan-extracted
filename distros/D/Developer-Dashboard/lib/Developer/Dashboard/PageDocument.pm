@@ -3,9 +3,24 @@ package Developer::Dashboard::PageDocument;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Developer::Dashboard::JSON qw(json_decode json_encode);
+use Developer::Dashboard::TextUtils qw(_trim);
+use Safe ();
+
+# Opcode set permitted inside the Safe compartment _safe_eval_stash_literal
+# uses to parse a legacy STASH body. Deliberately minimal: only what is
+# needed to construct nested hash/array/string/number/undef literals - no
+# variables, no operators, no subroutine calls of any kind (entersub is
+# NOT permitted, which also blocks calling out to any already-compiled sub
+# reachable by name - Safe's opmask only restricts code compiled INSIDE the
+# compartment, so a permitted entersub would let a payload call an
+# arbitrary existing sub with full privileges). DD-896.
+our @STASH_SAFE_OPS = qw(
+  padany const stub null pushmark list lineseq leaveeval scope
+  anonhash anonlist undef rv2gv
+);
 
 our $LEGACY_SEP = ':--------------------------------------------------------------------------------:';
 our @LEGACY_KEYS = ( qw(TITLE ICON BOOKMARK STASH NOTE HTML), map { sprintf 'CODE%d', $_ } 0 .. 1000 );
@@ -55,7 +70,11 @@ sub from_json {
 }
 
 # from_instruction($text)
-# Parses canonical instruction text into a page document.
+# Parses canonical instruction text into a page document. CODE-section keys
+# (CODE0..CODE1000, DD-866) are ordered numerically by the digits after CODE,
+# never lexicographically - PageRuntime::run_code_blocks executes them
+# sequentially against one shared sandpit, so the order returned here IS the
+# execution order.
 # Input: instruction document text string.
 # Output: Developer::Dashboard::PageDocument object.
 sub from_instruction {
@@ -90,7 +109,13 @@ sub from_instruction {
     $meta{icon} = _trim( join( "\n", @{ $sections{ICON} } ) ) if exists $sections{ICON};
 
     my @codes;
-    for my $section ( sort grep { /^CODE\d+$/ } keys %sections ) {
+
+    # DD-866: a plain string `sort` orders "CODE10" ahead of "CODE2" (lexicographic
+    # comparison), which is wrong once a page has ten or more code blocks -
+    # @LEGACY_KEYS already declares CODE0..CODE1000, so multi-digit sections are a
+    # real, in-contract case, not a hypothetical one. Sort numerically on the
+    # digits after CODE instead, so authoring/execution order is preserved.
+    for my $section ( sort { ($a =~ /(\d+)/)[0] <=> ($b =~ /(\d+)/)[0] } grep { /^CODE\d+$/ } keys %sections ) {
         push @codes, {
             id   => $section,
             body => _trim_trailing_newline( join( "\n", @{ $sections{$section} } ) ),
@@ -430,8 +455,27 @@ sub _decode_stash_section {
         return $value if ref($value) eq 'HASH';
         return {};
     }
-    my $hash = eval "+{ $text }";
+    my $hash = _safe_eval_stash_literal($text);
     return ref($hash) eq 'HASH' ? $hash : {};
+}
+
+# _safe_eval_stash_literal($text)
+# Evaluates a legacy STASH body as a restricted Perl data-literal expression
+# inside a Safe compartment (DD-896) - permits only nested hash/array/
+# string/number/undef construction, matching what _legacy_value/
+# _legacy_stash_text serialize. No variables, operators, or subroutine
+# calls of any kind are permitted, so embedded code (system/exec/qx/
+# backticks/calling any other sub) cannot execute.
+# Input: STASH body text (Perl hash-literal-like syntax, no surrounding braces).
+# Output: the evaluated value (expected to be a hash reference), or undef
+# on any parse/compartment error.
+sub _safe_eval_stash_literal {
+    my ($text) = @_;
+    my $compartment = Safe->new;
+    $compartment->permit_only(@STASH_SAFE_OPS);
+    my $result = $compartment->reval( "+{ $text }", 1 );
+    return undef if $@;
+    return $result;
 }
 
 # _parse_legacy_sections($text)
@@ -658,18 +702,6 @@ function ready(options) {
 if (!window.configs) window.configs = {};
 </script>
 JS
-}
-
-# _trim($text)
-# Trims leading and trailing whitespace from a text string.
-# Input: text string.
-# Output: trimmed text string.
-sub _trim {
-    my ($text) = @_;
-    $text = '' if !defined $text;
-    $text =~ s/\A\s+//;
-    $text =~ s/\s+\z//;
-    return $text;
 }
 
 # _trim_trailing_newline($text)

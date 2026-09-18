@@ -46,7 +46,7 @@
       "runtime" : {
          "requires" : {
             "IO::Socket::SSL" : "2.009",
-            "Mojolicious" : "9.00",
+            "Mojolicious" : "9.47",
             "perl" : "5.022"
          }
       },
@@ -68,6 +68,6 @@
          "web" : "https://github.com/vpndetection-io/sdk-perl"
       }
    },
-   "version" : "v3.2.0",
+   "version" : "v3.3.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

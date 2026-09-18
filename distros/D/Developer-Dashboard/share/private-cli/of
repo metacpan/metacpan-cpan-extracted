@@ -24,7 +24,7 @@ of - private open-file helper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard of [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
+  dashboard of [--print] [--line N] [--editor CMD] [--online] <file|scope> [pattern...]
 
 =head1 DESCRIPTION
 
@@ -56,14 +56,16 @@ look up how C<dashboard of> behaves.
 
 =head1 HOW TO USE
 
-Users run C<dashboard of [--print] [--line N] [--editor CMD] E<lt>file|scopeE<gt>
-[pattern ...]>. Direct paths and C<file:line> arguments resolve immediately.
-In scoped mode the first positional argument is the search root or saved alias,
-and every extra positional argument is a case-insensitive regex that must match
-the candidate path. One hit opens or prints that file; multiple hits are
-listed. Perl module names such as C<Developer::Dashboard::CLI::Paths> resolve
-through C<@INC>, and Java class names such as C<javax.jws.WebService> resolve
-through source trees, source archives, or cached Maven source jars.
+Users run C<dashboard of [--print] [--line N] [--editor CMD] [--online]
+E<lt>file|scopeE<gt> [pattern ...]>. Direct paths and C<file:line> arguments
+resolve immediately. In scoped mode the first positional argument is the
+search root or saved alias, and every extra positional argument is a
+case-insensitive regex that must match the candidate path. One hit opens or
+prints that file; multiple hits are listed. Perl module names such as
+C<Developer::Dashboard::CLI::Paths> resolve through C<@INC>, and Java class
+names such as C<javax.jws.WebService> resolve through source trees or local
+source archives entirely offline; pass C<--online> to also search Maven
+Central and download a cached source jar when neither is found locally.
 
 =head1 WHAT USES IT
 
@@ -77,6 +79,7 @@ resolution, Java source lookup, and print-vs-editor behavior.
   dashboard of . "Ok\.js$"
   dashboard of Developer::Dashboard::CLI::Paths
   dashboard of javax.jws.WebService
+  dashboard of --online javax.jws.WebService
   dashboard of --print bookmarks index
 
 =for comment FULL-POD-DOC END

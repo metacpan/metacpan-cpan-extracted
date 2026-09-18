@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Element::Comment 0.003;
+package Sieve::Generator::Element::Comment 0.004;
 # ABSTRACT: a Sieve comment line
 
 use Moo;
@@ -59,7 +59,7 @@ Sieve::Generator::Element::Comment - a Sieve comment line
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -88,7 +88,7 @@ It defaults to C<1>.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

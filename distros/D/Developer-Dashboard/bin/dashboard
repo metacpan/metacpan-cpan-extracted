@@ -41,6 +41,8 @@ my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
 my $switchboard_cwd = eval { cwd() };
 my $switchboard_paths;
 
+_maybe_exec_self_compiled_dashboard();
+
 my $cmd = shift @ARGV || '';
 _load_runtime_env();
 
@@ -74,6 +76,11 @@ if ( $cmd eq 'version' ) {
 
 if ( my @helper_command = _builtin_helper_command($cmd) ) {
     my ( $helper_path, @helper_argv ) = @helper_command;
+    if ( !@helper_argv ) {
+        if ( my $cached = _pax_cached_binary_for( $cmd, $helper_path ) ) {
+            _exec_switchboard_command( $cached, @ARGV );
+        }
+    }
     _exec_switchboard_command( $helper_path, @helper_argv, @ARGV );
 }
 
@@ -423,6 +430,105 @@ sub _skill_dotted_command_parts {
     return ( $skill_name, $skill_command );
 }
 
+# _maybe_exec_self_compiled_dashboard()
+# DD-882 (owner correction, Telegram msg #2001, 2026-09-15): checks whether
+# a fresh PAX-compiled binary is cached for THIS entrypoint's own source
+# file and, if so, execs it directly with the original argv - never blocks
+# on a miss, exactly like every other PaxCache-backed command; a cache miss
+# just falls through to run interpreted, having already triggered a
+# background compile as a side effect of the resolve() call.
+#
+# DD-905 (2026-09-16) temporarily DISABLED the exec side after finding a
+# real PAX-compiled binary of this entrypoint silently corrupted %ENV
+# loading: Developer::Dashboard::EnvLoader's _load_env_file (a plain
+# line-by-line <$fh> read of .env) read the WHOLE file as one "line".
+# DD-922 (2026-09-16) root-caused and fixed THAT defect: the vendored Pax
+# StandaloneRuntime's own _run_script_unit (and its three sibling
+# _run_*_unit dispatchers) localized $/ to slurp ONE JSON metadata file,
+# but that `local $/;` spanned the REST of the sub - including the later
+# `eval $wrapped` that runs the entrypoint's own compiled source. `eval
+# STRING` shares its caller's dynamic scope rather than opening a fresh
+# one, so every real-file read the entrypoint's own code performed (this
+# EnvLoader.pm read included) silently ran in slurp mode too. Fixed by
+# confining each `local $/;` to a bare block around just its own read, so
+# $/ is back to normal before any later `eval` of user/bootstrap source
+# runs. See StandaloneRuntime.pm's own DD-922 comments at each fixed site.
+#
+# DD-930 (2026-09-17) re-DISABLED the exec side again, minutes after DD-922
+# re-enabled it: a REAL self-compiled binary of this entrypoint (run against
+# a project with real .env-adjacent config) now dies with "Can't locate
+# object method 'record' via package '__PAX_RUNTIME_LEGACY_NAMESPACE__::
+# EnvAudit'" - a DIFFERENT, previously-unreachable defect in the vendored
+# Pax CodeUnitCompiler's own narrow special-case handling of EnvLoader.pm's
+# _load_env_pl_file sub (it pattern-matches that sub's source shape and
+# substitutes a custom runtime op whose EnvAudit->record call never
+# resolves in the compiled binary's "legacy namespace"). Never surfaced
+# before DD-922 because self-exec had been off the whole time since DD-905.
+# Re-enable only after DD-930's own root cause is fixed.
+#
+# Guarded by an environment variable so the compiled binary - which embeds
+# this exact same self-check code, since PAX compiles the whole script
+# body - never re-runs the check and never re-execs itself: without the
+# guard, the first real invocation would exec the compiled binary, whose
+# own startup would recompute the identical cache hit and exec itself
+# again, forever. The guard is deleted before falling through to normal
+# dispatch (both on a hit that already exec'd - which never returns here -
+# and on a miss) so a LATER child `dashboard` invocation this same process
+# spawns (a collector, an action) still gets its own independent,
+# unsuppressed self-check rather than inheriting a stale suppression.
+# Also skipped whenever $ENV{HARNESS_ACTIVE} is set (the standard
+# Test::Harness/prove signal, which leaks to any child `dashboard` a test
+# spawns via system()/exec() - see this project's own established lesson on
+# that). Without this, the test suite's habit of using a fresh tempdir HOME
+# per test block turns every one of those blocks into a genuinely new
+# "machine" from PaxCache's per-machine-cache point of view, so each
+# spawns its OWN full real background PAX compile of this ~40-module
+# codebase with zero chance of the cache ever being reused - discovered
+# live when that multiplied into dozens of concurrent real compiles and
+# made t/05-cli-smoke.t alone take 10+ minutes instead of seconds. A real
+# ephemeral/ CI environment has the identical shape (fresh HOME, thrown
+# away after one run), so this is a genuine, not merely test-only,
+# consideration - HARNESS_ACTIVE is the cleanly-available signal for the
+# specific case this project's own suite hits every run.
+# Input: none (reads @ARGV, $Bin, %ENV).
+# Output: never returns on a successful self-exec; otherwise returns.
+sub _maybe_exec_self_compiled_dashboard {
+    return if $ENV{HARNESS_ACTIVE};
+    if ( !$ENV{DEVELOPER_DASHBOARD_PAX_SELF_EXECED} ) {
+        my $self_path = File::Spec->catfile( $Bin, 'dashboard' );
+        if ( -f $self_path ) {
+            require Developer::Dashboard::PaxCache;
+            my $cache = Developer::Dashboard::PaxCache->new( paths => _switchboard_paths() );
+            # DD-930: still resolve() so a background compile stays warm for
+            # whoever fixes the real defect, but never act on a defined hit -
+            # see this sub's own DD-930 comment above for why.
+            $cache->resolve($self_path);
+        }
+    }
+    delete $ENV{DEVELOPER_DASHBOARD_PAX_SELF_EXECED};
+    return;
+}
+
+# _pax_cached_binary_for($cmd, $helper_path)
+# Checks whether a fresh PAX-compiled binary is cached for one staged
+# built-in helper, scoped to an explicit small allowlist (DD-877's proof of
+# concept: 'ps1' only) so a first rollout has a small, reversible blast
+# radius. Never blocks: a cache miss triggers a background compile and
+# returns undef so the caller falls through to the normal interpreted exec.
+# Input: top-level command name string and its resolved staged helper path.
+# Output: cached compiled binary path string, or undef.
+my %PAX_CACHE_ELIGIBLE_COMMANDS = ( ps1 => 1 );
+
+sub _pax_cached_binary_for {
+    my ( $cmd, $helper_path ) = @_;
+    return undef if is_windows();
+    return undef if !$PAX_CACHE_ELIGIBLE_COMMANDS{$cmd};
+    return undef if !defined $helper_path || $helper_path eq '';
+    require Developer::Dashboard::PaxCache;
+    my $cache = Developer::Dashboard::PaxCache->new( paths => _switchboard_paths() );
+    return $cache->resolve($helper_path);
+}
+
 # _exec_switchboard_command($path, @argv)
 # Replaces the current dashboard process with a resolved built-in helper or
 # layered custom command target.
@@ -520,7 +626,6 @@ dashboard - thin command switchboard for Developer Dashboard
 
   dashboard help
   dashboard init
-  dashboard update
   dashboard doctor [--fix]
   dashboard ps1 [--jobs N] [--cwd PATH] [--mode compact|extended] [--color]
   dashboard paths [-o json|table]
@@ -593,8 +698,8 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard action run <page_id> <action_id>
   dashboard docker compose [--addon NAME] [--mode NAME] [--service NAME] [--project DIR] [--dry-run] <compose-args...>
   dashboard docker list [--enabled|--disabled]
-  dashboard docker enable <service>
-  dashboard docker disable <service>
+  dashboard docker enable <service> [service...]
+  dashboard docker disable <service> [service...]
       dashboard serve [logs [-f] [-n N]|workers <N>] [--host HOST] [--port PORT] [--workers N] [--foreground] [--no-editor|--no-endit] [--no-indicators|--no-indicator]
   dashboard stop
   dashboard restart [--host HOST] [--port PORT] [--workers N]

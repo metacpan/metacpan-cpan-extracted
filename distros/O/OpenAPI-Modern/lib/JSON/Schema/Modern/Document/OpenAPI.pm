@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.148';
+our $VERSION = '0.149';
 
 use 5.020;
 use utf8;
@@ -92,6 +92,16 @@ has defaults => (
 );
 
 sub default { $_[0]->defaults->{$_[1]} }
+
+# encoding/contentType value => arrayref of media-types (split by comma)
+has _encoding_contentTypes => (
+  is => 'bare',
+  isa => HashRef[ArrayRef[Str]],
+);
+
+sub encoding_contentTypes ($self, $contentType) {
+  $self->{_encoding_contentTypes}{$contentType};
+}
 
 # we define the sub directly, rather than using an 'around', since our root base class is not
 # Moo::Object, so we never got a BUILDARGS to modify
@@ -208,7 +218,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
         or $json_schema_dialect eq (STRICT_DIALECT->{$self->oas_version}//'');
 
     if ($json_schema_dialect eq DEFAULT_DIALECT->{'3.0'}
-        or $json_schema_dialect eq (DEFAULT_DIALECT->{'3.0'} =~ s/\b\d{4}-\d{2}-\d{2}\b/latest/r)) {
+        or $json_schema_dialect eq (DEFAULT_DIALECT->{'3.0'} =~ s/\b\d{4}-\d{2}-\d{2}\b/latest/ar)) {
       croak '3.0 dialect with a non-3.0 OAD is not currently supported' if $self->oas_version ne '3.0';
 
       $evaluator->add_vocabulary('JSON::Schema::Modern::Vocabulary::OpenAPI_3_0');
@@ -256,7 +266,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
-  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @server_paths, @security_requirements, %tag_operation_paths, @bad_3_0_paths, @references);
+  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @server_paths, @security_requirements, %tag_operation_paths, @bad_3_0_paths, @references, @encodings);
   my $result = $evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
@@ -290,6 +300,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
                   if exists $data->{exclusiveMaximum} and not exists $data->{maximum};
               }
 
+              push @encodings, $state->{data_path} if $entity eq 'encoding';
+
               # "$ref" in path-item is not represented in the schema by a Reference object
               push @references, [ '$ref', $state->{data_path}, Mojo::URL->new($data->{'$ref'})->to_abs($self->canonical_uri), 'path-item' ]
                 if $entity eq 'path-item' and exists $data->{'$ref'};
@@ -315,10 +327,12 @@ sub traverse ($self, $evaluator, $config_override = {}) {
             }
           }
           else {
-            # we only need to special-case path-item, because this is the only entity that is
-            # referenced in the schema without an -or-reference
+            # path-item is the only entity (that is, an object that can be $ref'd in an OpenAPI
+            # document) that is defined in the schema without an -or-reference
             ($entity) = (($schema->{'$ref'} =~ m{#/\$defs/([^/]+?)(?:-or-reference)\z}),
-                         ($schema->{'$ref'} =~ m{#/\$defs/(path-item)\z}));
+                         ($schema->{'$ref'} =~ m{#/\$defs/(path-item|encoding)\z}));
+
+            push @encodings, $state->{data_path} if ($entity//'') eq 'encoding';
 
             push @references, [ '$ref', $state->{data_path}, Mojo::URL->new($data->{'$ref'})->to_abs($self->canonical_uri), 'path-item' ]
               if ($entity//'') eq 'path-item' and exists $data->{'$ref'};
@@ -328,6 +342,9 @@ sub traverse ($self, $evaluator, $config_override = {}) {
               push @references, [ '$ref', $state->{data_path}, Mojo::URL->new($data->{'$ref'})->to_abs($self->canonical_uri), $e ];
             }
           }
+
+          # not $reffable at runtime, so no need to track these
+          undef $entity if ($entity//'') eq 'encoding';
 
           $self->_add_entity_location($state->{data_path}, $entity) if $entity;
 
@@ -416,7 +433,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     # see ABNF at v3.2.0 §4.8.2
     die "invalid path: $path" if substr($path, 0, 1) ne '/'; # schema validation catches this
     ()= E({ %$state, keyword_path => jsonp('/paths', $path) }, 'invalid path template "%s"', $path)
-      if grep !/^(?:\{[^{}]+\}|%[0-9A-Fa-f]{2}|[:@!\$&'()*+,;=A-Za-z0-9._~-]+)+\z/,
+      if grep !/^(?:\{[^{}]+\}|%[[:xdigit:]]{2}|[:@!\$&'()*+,;=[:alnum:]._~-]+)+\z/a,
         split('/', substr($path, 1)); # split by segment, omitting leading /
 
     my %seen_names;
@@ -450,7 +467,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     # see ABNF at v3.2.0 §4.6
     ()= E({ %$state, keyword_path => $server_location.'/url' },
         'invalid server url "%s"', $server->{url}), next
-      if $server->{url} !~ /^(?:\{[^{}]+\}|%[0-9A-Fa-f]{2}|[\x21\x24\x26-\x3B\x3D\x40-\x5B\x5D\x5F\x61-\x7A\x7E\xA0-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}\x{E000}-\x{F8FF}\x{F0000}-\x{FFFFD}\x{100000}-\x{10FFFD}])+\z/;
+      if $server->{url} !~ /^(?:\{[^{}]+\}|%[[:xdigit:]]{2}|[\x21\x24\x26-\x3B\x3D\x40-\x5B\x5D\x5F\x61-\x7A\x7E\xA0-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}\x{E000}-\x{F8FF}\x{F0000}-\x{FFFFD}\x{100000}-\x{10FFFD}])+\z/a;
 
     my $normalized = $server->{url} =~ s/\{[^{}]+\}/\x00/gr;
     my @url_variables = $server->{url} =~ /\{([^{}]+)\}/g;
@@ -541,10 +558,39 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     }
   }
 
+  my %encoding_contentType_index;
+  foreach my $encoding_location (@encodings) {
+    my $encoding_obj = $self->get($encoding_location);
+    next if not exists $encoding_obj->{contentType};
+    next if exists $encoding_contentType_index{$encoding_obj->{contentType}};
+
+    # v3.2.1 §4.15.1.1: "The contentType field is defined by the following ABNF syntax:"
+    # encoding-content-type = media-range *( "," OWS media-range )
+    my $re = OpenAPI::Modern::Utilities::MEDIA_RANGE_RE;
+    my $ct = $encoding_obj->{contentType};
+
+    $ct =~ m/^($re)/gc;
+    my @content_types = $1;
+    if (@content_types) {
+      while ($ct =~ m/\G,[\x09\x20]*($re)/gc) {
+        push @content_types, $1;
+      }
+    }
+
+    if (pos($ct) != length($ct)) {
+      ()= E({ %$state, keyword_path => $encoding_location, keyword => 'contentType' },
+        '"%s" is not a valid media-range', substr($ct, pos($ct)) =~ s/^,[\x09\x20]*//r);
+    }
+    else {
+      $encoding_contentType_index{$encoding_obj->{contentType}} = \@content_types;
+    }
+  }
+
   return $state if $state->{errors}->@*;
 
   $self->{_tags} = (HashRef[json_pointer_type])->({ map +($_ => '/tags/'.$tag_to_index{$_}), keys %tag_to_index });
   $self->{_operation_tags} = (HashRef[ArrayRef[json_pointer_type]])->(\%tag_operation_paths);
+  $self->{_encoding_contentTypes} = \%encoding_contentType_index;
 
   # disregard paths that are not the root of each embedded subschema.
   # Because the callbacks are executed after the keyword has (recursively) finished evaluating,
@@ -782,7 +828,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.148
+version 0.149
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -823,7 +869,7 @@ one of:
 
 =item *
 
-for v3.2 documents: L<https://spec.openapis.org/oas/3.2/schema-base/2025-11-23> (which is a wrapper around L<https://spec.openapis.org/oas/3.2/schema/2025-11-23>), and the L<OpenAPI v3.2.x specification|https://spec.openapis.org/oas/v3.2>
+for v3.2 documents: L<https://spec.openapis.org/oas/3.2/schema-base/2026-08-30> (which is a wrapper around L<https://spec.openapis.org/oas/3.2/schema/2026-08-30>), and the L<OpenAPI v3.2.x specification|https://spec.openapis.org/oas/v3.2>
 
 =item *
 
@@ -831,7 +877,7 @@ for v3.1 documents: L<https://spec.openapis.org/oas/3.1/schema-base/2025-11-23> 
 
 =back
 
-=for Pod::Coverage THAW get_operationId_path
+=for Pod::Coverage THAW get_operationId_path encoding_contentTypes
 
 =head1 CONSTRUCTOR ARGUMENTS
 
@@ -874,12 +920,12 @@ See also L</retrieval_uri>.
 =head2 metaschema_uri
 
 The URI of the schema that describes the OpenAPI document itself. Defaults to
-C<https://spec.openapis.org/oas/3.2/schema/2025-11-23> (or the equivalent for the
+C<https://spec.openapis.org/oas/3.2/schema/2026-08-30> (or the equivalent for the
 L<OpenAPI version|https://spec.openapis.org/oas/latest#fixed-fields> you specify in the document),
 which permits the customization of
 L<C<jsonSchemaDialect>|https://spec.openapis.org/oas/latest#openapi-object>, which defines the
 JSON Schema dialect to use for embedded JSON Schemas (which itself defaults to
-C<https://spec.openapis.org/oas/3.2/dialect/2025-09-17> (or equivalent).
+C<https://spec.openapis.org/oas/3.2/dialect/2026-02-26> (or equivalent).
 
 Note that if you are using custom schemas, both of these schemas described by C<metaschema_uri> and
 by the C<jsonSchemaDialect> keyword should be loaded into the evaluator in advance with

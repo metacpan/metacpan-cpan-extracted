@@ -1,3 +1,13 @@
+0.003 2026-09-18
+  [Requirement Changes]
+    * Require SPVM::Sys 0.581 for tests.
+  [Test Improvement]
+    * Improve tests by using Sys::Util::Socket methods.
+0.002 2026-09-18
+  [Requirement Changes]
+    * Require SPVM::Sys 0.580 for tests.
+  [Test Improvement]
+    * Add UV tests.
 0.001 2026-09-04
   [Changes]
     * First release.

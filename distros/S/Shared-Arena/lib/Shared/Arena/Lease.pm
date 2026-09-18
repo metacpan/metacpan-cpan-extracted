@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Lease - one holder at a time, and a successor when it dies
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
 

@@ -231,6 +231,38 @@ is( $PD->can('_trim_trailing_newline')->(undef), '', '_trim_trailing_newline(und
 is( $PD->can('_html')->(undef),                 '', '_html(undef) is empty string' );
 is( $PD->can('_html')->('<a> & "b"'), '&lt;a&gt; &amp; &quot;b&quot;', '_html escapes the standard entities' );
 
+# ---------------------------------------------------------------------------
+# DD-866: CODE-section ordering must be NUMERIC, not lexicographic. A page
+# with >= 10 code blocks previously sorted "CODE10"/"CODE11" ahead of
+# "CODE2".."CODE9" because the bare `sort` on line 93 compares strings.
+# @LEGACY_KEYS already declares CODE0..CODE1000, so two- and three-digit
+# section numbers are squarely in the module's own contract, not a
+# hypothetical edge case.
+# ---------------------------------------------------------------------------
+{
+    my $text = join "\n", map { ( "=== CODE$_ ===", "step $_" ) } 0 .. 11;
+    my $page = $PD->from_instruction($text);
+    my @ids  = map { $_->{id} } @{ $page->{meta}{codes} };
+    is_deeply(
+        \@ids,
+        [ map { "CODE$_" } 0 .. 11 ],
+        'CODE0..CODE11 resolve in true numeric order, not lexicographic (DD-866)'
+    );
+}
+
+# Single-digit-only regression: CODE0..CODE9 must still come out in order
+# when there is no multi-digit section to expose the lexicographic bug.
+{
+    my $text = join "\n", map { ( "=== CODE$_ ===", "step $_" ) } 0 .. 9;
+    my $page = $PD->from_instruction($text);
+    my @ids  = map { $_->{id} } @{ $page->{meta}{codes} };
+    is_deeply(
+        \@ids,
+        [ map { "CODE$_" } 0 .. 9 ],
+        'CODE0..CODE9 (single-digit only) still resolve in order (DD-866 regression check)'
+    );
+}
+
 is_deeply( \@warnings, [], 'no warnings emitted during the run' )
     or diag( 'warnings: ' . join( ' | ', @warnings ) );
 

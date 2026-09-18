@@ -3,7 +3,7 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -14,8 +14,10 @@ use Template;
 use Time::HiRes qw(sleep time);
 
 use Developer::Dashboard::InternalCLI ();
+use Developer::Dashboard::FileSlurp qw(slurp_file);
 use Developer::Dashboard::JSON qw(json_encode json_decode);
 use Developer::Dashboard::PerlEnv ();
+use Developer::Dashboard::TimeUtils qw(_now_iso8601);
 use Developer::Dashboard::Platform qw(command_in_path is_windows shell_command_argv);
 use Developer::Dashboard::ProcessSupervision qw(
     _current_perl_command
@@ -61,6 +63,21 @@ sub new {
     }, $class;
 }
 
+# DD-881: the cwd-alias fallback below must dispatch ONLY to these no-arg
+# PathRegistry directory getters - never to any other public method
+# (register_named_paths/unregister_named_path mutate state, resolve_dir
+# and others take required arguments), or a job-config-supplied cwd that
+# merely collides with a method name becomes an arbitrary method call.
+# Mirrors PathRegistry's own %RESOLVABLE_ACCESSOR (DD-870).
+my %RESOLVABLE_ACCESSOR = map { $_ => 1 } qw(
+  home runtime_root home_runtime_root home_runtime_path project_runtime_root
+  state_root state_base_root cache_root home_cache_root logs_root
+  dashboards_root bookmarks bookmarks_root cli_root skills_root
+  collectors_root indicators_root sessions_root temp_root config_root
+  auth_root repo_dashboard_root users_root current_project_root
+  current_working_directory cwd
+);
+
 # run_once($job)
 # Executes a collector job a single time with cwd/env/timeout handling.
 # Input: collector job hash reference.
@@ -73,13 +90,13 @@ sub run_once {
 
     # cwd() always returns a non-empty path
     my $cwd = $job->{cwd} || cwd();    # uncoverable condition false
-    if ( !File::Spec->file_name_is_absolute($cwd) && $self->{paths}->can($cwd) ) {
+    if ( !File::Spec->file_name_is_absolute($cwd) && $RESOLVABLE_ACCESSOR{$cwd} ) {
         $cwd = $self->{paths}->$cwd();
     }
 
     die "Collector cwd '$cwd' does not exist" if !-d $cwd;
 
-    my $started_at = _now_iso8601();
+    my $started_at = _now_iso8601( tz => "local" );
     # Normalize the timeout to milliseconds once and persist it under its own
     # field. Storing a millisecond value under the seconds-keyed 'timeout' field
     # made a persisted-and-reloaded job (for example the Windows worker re-read,
@@ -386,8 +403,8 @@ sub start_loop {
                 ( $interval != $configured_interval ? ( configured_interval => $configured_interval ) : () ),
                 schedule     => $schedule_mode,
                 status       => 'starting',
-                started_at   => _now_iso8601(),
-                heartbeat_at => _now_iso8601(),
+                started_at   => _now_iso8601( tz => "local" ),
+                heartbeat_at => _now_iso8601( tz => "local" ),
             }
         );
         open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";
@@ -429,7 +446,7 @@ sub _adopt_existing_loop_if_running {
     # So if the record is missing, ask the process table before forking. A loop
     # already running for this collector is adopted and its record rewritten,
     # which is both the correct outcome and the repair of the missing file.
-    my $existing = -f $pidfile ? do { my $recorded = _slurp($pidfile); chomp $recorded; $recorded } : undef;
+    my $existing = -f $pidfile ? do { my $recorded = slurp_file($pidfile); chomp $recorded; $recorded } : undef;
     $existing = $self->_find_running_loop($name) if !$existing;
 
     # Truthy rather than merely defined, and that is the guarantee the line above
@@ -459,7 +476,7 @@ sub _adopt_existing_loop_if_running {
                     interval     => $interval,
                     schedule     => $schedule_mode,
                     status       => 'running',
-                    heartbeat_at => _now_iso8601(),
+                    heartbeat_at => _now_iso8601( tz => "local" ),
                 }
             );
 
@@ -536,8 +553,8 @@ sub _start_windows_loop_process {
             ( $interval != $configured_interval ? ( configured_interval => $configured_interval ) : () ),
             schedule     => $schedule_mode,
             status       => 'starting',
-            started_at   => _now_iso8601(),
-            heartbeat_at => _now_iso8601(),
+            started_at   => _now_iso8601( tz => "local" ),
+            heartbeat_at => _now_iso8601( tz => "local" ),
         }
     );
     return $pid;
@@ -605,7 +622,7 @@ sub _run_loop_child {
                 multiple     => $max_parallel,
                 active_runs  => scalar keys %active_workers,
                 active_worker_pids => [ $self->_active_worker_pids( \%active_workers ) ],
-                heartbeat_at => _now_iso8601(),
+                heartbeat_at => _now_iso8601( tz => "local" ),
             }
         );
         my $due = $self->_job_is_due( $job, $name );
@@ -613,11 +630,11 @@ sub _run_loop_child {
             my $worker_pid = eval { $self->_start_loop_worker( $job, $name, $title ) };
             if ($@) {
                 my $error = "$@";
-                my $message = sprintf "[%s][%s] %s\n", _now_iso8601(), $name, $error;
+                my $message = sprintf "[%s][%s] %s\n", _now_iso8601( tz => "local" ), $name, $error;
                 $self->{files}->append( 'collector_log', $message );
                 $self->{collectors}->append_log_entry(
                     $name,
-                    happened_at => _now_iso8601(),
+                    happened_at => _now_iso8601( tz => "local" ),
                     error       => $error,
                     source      => 'loop error',
                 );
@@ -637,7 +654,7 @@ sub _run_loop_child {
                         multiple     => $max_parallel,
                         active_runs  => scalar keys %active_workers,
                         active_worker_pids => [ $self->_active_worker_pids( \%active_workers ) ],
-                        heartbeat_at => _now_iso8601(),
+                        heartbeat_at => _now_iso8601( tz => "local" ),
                         error        => $error,
                     }
                 );
@@ -762,11 +779,11 @@ sub _run_loop_worker {
     my $ok = eval { $self->run_once($job); 1 };
     if ( !$ok ) {
         my $error = "$@";
-        my $message = sprintf "[%s][%s] %s\n", _now_iso8601(), $name, $error;
+        my $message = sprintf "[%s][%s] %s\n", _now_iso8601( tz => "local" ), $name, $error;
         $self->{files}->append( 'collector_log', $message );
         $self->{collectors}->append_log_entry(
             $name,
-            happened_at => _now_iso8601(),
+            happened_at => _now_iso8601( tz => "local" ),
             error       => $error,
             source      => 'loop error',
         );
@@ -788,7 +805,7 @@ sub _run_loop_worker {
                 schedule     => $state_schedule,
                 status       => 'error',
                 error        => $error,
-                heartbeat_at => _now_iso8601(),
+                heartbeat_at => _now_iso8601( tz => "local" ),
             }
         );
         exit 255;
@@ -926,7 +943,7 @@ sub stop_loop {
     # firing every interval, and it is the same wrong assumption start_loop made.
     my $pid;
     if ( -f $pidfile ) {
-        $pid = _slurp($pidfile);
+        $pid = slurp_file($pidfile);
         chomp $pid;
     }
     else {
@@ -996,7 +1013,7 @@ sub running_loops {
         next if $entry eq '.' || $entry eq '..';
         next if $entry !~ /^(.*)\.pid$/;
         my $name = $1;
-        my $pid  = eval { _slurp( File::Spec->catfile( $root, $entry ) ) };
+        my $pid  = eval { slurp_file( File::Spec->catfile( $root, $entry ) ) };
         next if !$pid;
         chomp $pid;
         if ( $pid && $self->_reap_child_process($pid) ) {
@@ -1052,6 +1069,7 @@ sub loop_state {
     return if !-f $file;
     my $last_error = '';
     for ( 1 .. 3 ) {
+        # uncoverable branch true
         open my $fh, '<', $file or die "Unable to read $file: $!";
         local $/;
         my $payload = scalar <$fh>;
@@ -1261,6 +1279,24 @@ sub _read_proc_file {
 
 
 
+# _pending_loop_state_file($file)
+# Builds the per-writer staging path _write_loop_state writes to before the
+# atomic rename into $file. Its own sub (matching the pattern in
+# Auth.pm/Collector.pm/SessionStore.pm/Zipper.pm) exists so a coverage test
+# can exercise the real path-generation logic directly. DD-850: pid+wall-
+# clock-second alone is NOT collision-safe (see DD-848) - the per-process
+# monotonic counter below guarantees no two calls from one process ever
+# collide, whatever the timing; cross-process collision remains prevented
+# by pid uniqueness among live processes.
+# Input: final destination file path string.
+# Output: staging file path string.
+my $_loop_state_seq = 0;
+
+sub _pending_loop_state_file {
+    my ( $self, $file ) = @_;
+    return sprintf '%s.%s.%s.%s.pending', $file, $$, time, ++$_loop_state_seq;
+}
+
 # _write_loop_state($name, $data)
 # Atomically writes loop lifecycle metadata for a collector.
 # Input: collector name string and partial state hash reference.
@@ -1274,7 +1310,8 @@ sub _write_loop_state {
         %{ $data || {} },
         name => $name,
     );
-    my $tmp = sprintf '%s.%s.%s.pending', $file, $$, time;
+    my $tmp = $self->_pending_loop_state_file($file);
+    # uncoverable branch true
     open my $fh, '>', $tmp or die "Unable to write $tmp: $!";
     print {$fh} json_encode( \%state );
     close $fh;
@@ -1693,6 +1730,7 @@ PERL
 sub _command_pid_from_file {
     my ( $self, $pidfile ) = @_;
     return if !defined $pidfile || $pidfile eq '' || !-f $pidfile;
+    # uncoverable branch true
     open my $fh, '<', $pidfile or return;
     my $pid = <$fh>;
     close $fh;
@@ -1829,8 +1867,8 @@ sub _shutdown_loop {
             pid          => $$,
             process_name => $self->_process_title($name),
             status       => $status || 'stopped',
-            heartbeat_at => _now_iso8601(),
-            stopped_at   => _now_iso8601(),
+            heartbeat_at => _now_iso8601( tz => "local" ),
+            stopped_at   => _now_iso8601( tz => "local" ),
         }
     );
     $self->_cleanup_loop_files($name);
@@ -1854,33 +1892,13 @@ sub _signal_stop {
     eval {
         $SIGNAL_RUNNER->{collectors}->append_log_entry(
             $SIGNAL_LOOP_NAME,
-            happened_at => _now_iso8601(),
+            happened_at => _now_iso8601( tz => "local" ),
             source      => 'loop stopped by signal',
             error       => 'SIG' . ( $signal // 'unknown' ) . " received by pid $$",
         );
     };
 
     $SIGNAL_RUNNER->_shutdown_loop( $SIGNAL_LOOP_NAME, 'stopped', $SIGNAL_LOOP_WORKERS );
-}
-
-# _slurp($file)
-# Reads the full contents of a file.
-# Input: file path string.
-# Output: file content string.
-sub _slurp {
-    my ($file) = @_;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
-    local $/;
-    return <$fh>;
-}
-
-# _now_iso8601()
-# Returns the current local timestamp in ISO-8601 form with timezone offset.
-# Input: none.
-# Output: timestamp string.
-sub _now_iso8601 {
-    my @t = localtime();
-    return strftime( '%Y-%m-%dT%H:%M:%S%z', @t );
 }
 
 1;

@@ -118,7 +118,16 @@ done_testing;
 
 sub _command_on_path {
     my ($name) = @_;
-    return system( 'sh', '-lc', "command -v $name >/dev/null 2>&1" ) == 0 ? 1 : 0;
+
+    # DD-853: NEVER a login shell (-lc). -l sources ~/.profile -> ~/.bashrc,
+    # and any dash-incompatible line in that chain (e.g. this host's own
+    # `eval "$(SHELL=/bin/sh lesspipe)"`) kills the whole invocation with a
+    # syntax error before the command-v check below ever runs - reporting a
+    # command absent when it genuinely is not. A plain, non-login `sh -c`
+    # needs no profile at all. $name is also passed positionally rather than
+    # interpolated into the command string, so it can never be read as shell
+    # syntax regardless of what a future caller passes.
+    return system( 'sh', '-c', 'command -v "$1" >/dev/null 2>&1', 'sh', $name ) == 0 ? 1 : 0;
 }
 
 sub _docker_available {

@@ -1,5 +1,13 @@
 Revision history for Net-OpenSSH-More
 
+1.03 2026-09-17 TEODESIAN
+    - Honour retry_interval between connection attempts
+    - Stop retrying a credential the far end refused, unless retry_on_auth_failure asks
+    - Forward the master's stderr handle rather than a misspelling of it
+    - Check a cached or adopted connection still reaches its far end before reusing it
+    - Publish the master's control socket for reuse, which the old condition never allowed
+    - Stop the retry diagnostics printing an empty host and warning twice about it
+
 1.02 2026-09-03 TEODESIAN
     - Fix bused DNS resolution logic
 

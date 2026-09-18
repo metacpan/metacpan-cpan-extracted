@@ -46,8 +46,10 @@ require Tie::Hash;
 tie my %th, 'Tie::StdHash'; $th{k} = 'v';
 sub leak_named { 1 }
 # a regexp is compiled on every decode, a tie is magic on a fresh container,
-# a sub by name is a lookup: each is its own allocation path
-my $odd = [ qr/a.b/i, \%th, \&leak_named, \*STDOUT ];
+# a sub by name is a lookup: each is its own allocation path. The codec
+# refuses a regexp below 5.12 (t/32 skips it there for the same reason), so
+# it joins $odd only where it can be encoded at all.
+my $odd = [ ($] >= 5.012 ? (qr/a.b/i) : ()), \%th, \&leak_named, \*STDOUT ];
 my $bytes = struct_encode($big);
 my $trunc = substr($bytes, 0, length($bytes) - 7);
 my $dup   = 'S1' . chr(8) . "\x28\x2A\x02\x02a\x01\x02a\x02";

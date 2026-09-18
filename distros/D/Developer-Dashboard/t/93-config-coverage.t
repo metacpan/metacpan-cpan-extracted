@@ -695,6 +695,56 @@ sub dies_like {
     ok( exists $api_entries{realapi},    '_skill_api_entries keeps a skill with a real api payload' );
     ok( !exists $api_entries{emptyskill}, '_skill_api_entries drops a skill with an empty api payload' );
 
+    # DD-874: api_registry must give the operator's own project-layer key final
+    # say over a co-installed skill's config/api.json fragment naming the same
+    # key - not the other way round. Two cases: a skill silently REPLACING the
+    # operator's secret, and a skill TOMBSTONING (disabling) the operator's key
+    # outright. A skill contributing a genuinely new, non-colliding key must
+    # still come through.
+    {
+        my $project_api = File::Spec->catfile( $paths->config_root, 'api.json' );
+        $config->_write_json_atomic(
+            $project_api,
+            json_encode( { 'ci-bot' => { secret => 'OPERATORSECRET', ajax => ['/ajax/health'] } } )
+        );
+
+        # evilreplace: a skill shipping a DIFFERENT secret for the operator's key.
+        my $evilreplace_dir = File::Spec->catdir( $skills, 'evilreplace', 'config' );
+        make_path($evilreplace_dir);
+        open my $er_fh, '>:raw', File::Spec->catfile( $evilreplace_dir, 'api.json' ) or die $!;
+        print {$er_fh} json_encode( { 'ci-bot' => { secret => 'SKILLSECRET', ajax => ['/ajax/evil'] } } );
+        close $er_fh;
+
+        my $registry = $config->api_registry;
+        is( $registry->{'ci-bot'}{secret}, 'OPERATORSECRET',
+            'DD-874: the operator project-layer secret survives a colliding skill fragment, not replaced by it' );
+
+        remove_tree($evilreplace_dir);
+
+        # eviltombstone: a skill shipping {disabled:true} for the operator's key.
+        my $eviltomb_dir = File::Spec->catdir( $skills, 'eviltombstone', 'config' );
+        make_path($eviltomb_dir);
+        open my $et_fh, '>:raw', File::Spec->catfile( $eviltomb_dir, 'api.json' ) or die $!;
+        print {$et_fh} json_encode( { 'ci-bot' => { disabled => 1 } } );
+        close $et_fh;
+
+        my $registry2 = $config->api_registry;
+        ok( exists $registry2->{'ci-bot'} && !$registry2->{'ci-bot'}{disabled},
+            'DD-874: the operator project-layer key survives a colliding skill tombstone, not disabled by it' );
+        is( $registry2->{'ci-bot'}{secret}, 'OPERATORSECRET',
+            'DD-874: the operator secret is intact after the tombstone attempt too' );
+
+        remove_tree($eviltomb_dir);
+
+        # AC-2: a skill contributing a genuinely new key (no project-layer
+        # collision) must still come through the merged registry.
+        my $registry3 = $config->api_registry;
+        is( $registry3->{client1}{secret}, 's1',
+            'DD-874 AC-2: a skill can still contribute a genuinely new, non-colliding API key' );
+
+        unlink $project_api;
+    }
+
     # 965/966/969: _skill_collectors qualification and skipping.
     my %coll = map { $_->{name} => $_ } $config->_skill_collectors;
     ok( exists $coll{'collskill.bar'}, '_skill_collectors qualifies an unprefixed collector name' );

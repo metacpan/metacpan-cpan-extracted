@@ -10,6 +10,7 @@ use Mojo::UserAgent;
 use Test::More;
 use Time::HiRes ();
 use VPNDetection;
+use VPNDetectionTest;
 use VPNDetectionTest::Origin;
 
 # The Perl-specific surface, as distinct from the shared corpus in
@@ -173,6 +174,23 @@ subtest 'a per-call timeout is refused where it cannot work' => sub {
     ok(!-e "$path.part", 'nor was a .part file left behind');
 };
 
+subtest 'a client-wide timeout is refused where it cannot work' => sub {
+    my $origin = VPNDetectionTest::Origin->new(sub {
+        shift->render(json => { ip => '9.9.9.9', is_vpn => \0 });
+    });
+
+    for my $bad (-1, 'soon') {
+        my $client = eval { VPNDetection->new(base_url => $origin->url, api_key => 'k', timeout => $bad) };
+        like($@, qr/VPNDetection->new: timeout must be a number of seconds/, "new refuses timeout => $bad");
+        ok(!$client, "and builds no client for timeout => $bad");
+    }
+    is($origin->count, 0, 'and not one request was spent finding out');
+    # 0 is no bound at all, which is a choice rather than a mistake.
+    my $unbounded = eval { VPNDetection->new(base_url => $origin->url, api_key => 'k', timeout => 0) };
+    is($@, '', 'while new accepts timeout => 0');
+    is($unbounded && $unbounded->lookup('9.9.9.9')->ip, '9.9.9.9', 'and that client answers');
+};
+
 subtest 'retries are configurable per call' => sub {
     my $origin = VPNDetectionTest::Origin->new(sub {
         shift->render(json => { error => 'lookup failed' }, status => 500);
@@ -321,6 +339,18 @@ subtest 'database responses are unwrapped at the right depth' => sub {
     ok(!exists $databases->[0]{docsGroup}, 'docsGroup is a docs-site slug, not API surface');
     is_deeply($db->downloads, [{ dataset_id => 'vpn_ip_v1' }], 'downloads unwraps downloads');
     is($db->metadata('vpn_ip_v1')->{entries}, 42, 'metadata is the whole document');
+};
+
+subtest 'every closed vocabulary is listed at runtime, as the pinned spec publishes it' => sub {
+    # Read off the properties that use each vocabulary, so a value the spec gains
+    # or drops reddens this on the next re-pin rather than leaving a list quietly short.
+    plan skip_all => 'the distribution does not ship spec/' if VPNDetectionTest::is_distribution();
+    is_deeply([VPNDetection::Database::FORMATS],
+        VPNDetectionTest::spec_enum(qw(components schemas DatabaseFormatSize properties format)), 'FORMATS');
+    is_deeply([VPNDetection::Database::STANDINGS],
+        VPNDetectionTest::spec_enum(qw(components schemas Database properties standing)), 'STANDINGS');
+    is_deeply([VPNDetection::Database::LICENSE_TYPES],
+        VPNDetectionTest::spec_enum(qw(components schemas Database properties license_type)), 'LICENSE_TYPES');
 };
 
 subtest 'absent and false are different values, natively' => sub {

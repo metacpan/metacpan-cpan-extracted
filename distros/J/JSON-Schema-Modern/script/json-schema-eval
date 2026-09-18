@@ -21,6 +21,8 @@ use List::Util 'max';
 use builtin::compat 'blessed';
 use JSON::Schema::Modern;
 
+local $| = 1; # do not buffer stdout
+
 my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   "$0 %o",
   ['help|usage|?|h', 'print usage information and exit', { shortcircuit => 1 } ],
@@ -192,7 +194,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.648
+version 0.650
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

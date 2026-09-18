@@ -36,7 +36,9 @@
  * process that stored it, so an NV that changed in transit is a bug and not a
  * documented trade. A value a double cannot hold exactly is written as its
  * DECIMAL DIGITS instead, under SC_T_NV_STR - see sc_codec.h for why decimal
- * and not the native bytes. A perl whose NV is a double never writes that tag,
+ * and not the native bytes, and for which formatter and which parser are the
+ * correct ones, neither being the obvious one. Those digits use '.' for a radix
+ * whatever the locale says. A perl whose NV is a double never writes that tag,
  * so its streams are byte-for-byte what they always were.
  *
  * ---- TRACK ---------------------------------------------------------------------

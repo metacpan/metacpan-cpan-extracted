@@ -3,7 +3,7 @@ package Developer::Dashboard::FileRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use File::Spec;
 use File::Find ();
@@ -146,6 +146,16 @@ sub locate_files_under {
     return grep { !$seen{$_}++ } sort @found;
 }
 
+# DD-868: the method-name fallback below must dispatch ONLY to these
+# no-arg path getters - never to the class's other public methods (which
+# take required arguments and/or mutate state), or a name typed straight
+# from the CLI (dashboard file resolve/locate) becomes an arbitrary method
+# call on this object.
+my %RESOLVABLE_ACCESSOR = map { $_ => 1 } qw(
+  prompt_log collector_log dashboard_log global_config
+  dashboard_index auth_log web_pid web_state
+);
+
 # resolve_file($name)
 # Resolves a logical file name or absolute path to a concrete file path.
 # Input: logical file name or absolute path string.
@@ -157,7 +167,7 @@ sub resolve_file {
     return $self->{named_files}{$name} if exists $self->{named_files}{$name};
     $self->_load_configured_named_files;
     return $self->{configured_named_files}{$name} if exists $self->{configured_named_files}{$name};
-    return $self->$name() if $self->can($name);
+    return $self->$name() if $RESOLVABLE_ACCESSOR{$name};
 
     die "Unknown file name '$name'";
 }
@@ -182,7 +192,7 @@ sub read {
     my ( $self, $name ) = @_;
     my $file = $self->resolve_file($name);
     return if !-f $file;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
+    open my $fh, '<', $file or die "Unable to read $file: $!";    # uncoverable branch true this process (root, or granted read) cannot be denied read on an existing file it just confirmed with -f
     local $/;
     return <$fh>;
 }

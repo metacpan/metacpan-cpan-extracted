@@ -107,7 +107,13 @@ qx.Class.define('callbackery.data.RemoteTableModel', {
                                 break;
                             case 'string':
                             case 'str':
-                                col[id] = col[id] ? String(col[id]) : '';
+                                // as in the form: an array in a string cell
+                                // is a backend trm(), not data. String() on
+                                // its own joined it with commas.
+                                col[id] = col[id]
+                                    ? String(col[id] instanceof Array
+                                        ? that.xtr(col[id]) : col[id])
+                                    : '';
                                 break;
                             case 'number':
                             case 'num':

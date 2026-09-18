@@ -1,0 +1,57 @@
+name: "EZ-AG"
+manufacturer: "Yamaha"
+port:
+    in: "generic"
+    out: "generic"
+note_on:
+    min: 0
+    max: 127
+control_change:
+  - number: 0
+    name: "Bank Select"
+  - number: 32
+    name: "Bank Select"
+  - number: 7
+    name: "Part Volume"
+  - number: 10
+    name: "Pan"
+  - number: 84
+    name: "Portamento Control"
+  - number: 1
+    name: "Modulation Wheel"
+  - number: 6
+    name: "Data Entry MSB"
+  - number: 38
+    name: "Data Entry LSB"
+  - number: 11
+    name: "Expression"
+  - number: 64
+    name: "Sustain"
+  - number: 71
+    name: "Harmonic Content"
+  - number: 72
+    name: "Release Time"
+  - number: 73
+    name: "Attack Time"
+  - number: 74
+    name: "Brightness"
+  - number: 96
+    name: "RPN Increment"
+  - number: 97
+    name: "RPN Decrement"
+  - number: 100
+    name: "RPN LSB"
+  - number: 101
+    name: "RPN MSB"
+  - number: 120
+    name: "All Sound Off"
+  - number: 121
+    name: "Reset All Controllers"
+  - number: 122
+    name: "Local Control ON/OFF"
+  - number: 123
+    name: "All Notes Off"
+  - number: 124
+    name: "Omni Mode"
+  - number: 125
+    name: "Omni Mode"

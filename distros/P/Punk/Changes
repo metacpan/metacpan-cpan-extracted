@@ -1,5 +1,10 @@
 Revision history for Punk
 
+0.51    2026-09-17
+        - ADDS: websocket routes work over HTTP/1.1 on TLS. 
+        - FIX: csrf refused every websocket handshake over HTTP/2 and
+          HTTP/3 with 403 invalid csrf token. 
+
 0.50    2026-09-16
         - ADDS: pk_abi v5, current_of - the context of the dispatch frame
           running now, or NULL. on_query is handed no context and cannot

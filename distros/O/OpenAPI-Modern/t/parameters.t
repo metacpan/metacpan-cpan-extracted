@@ -2032,7 +2032,7 @@ subtest 'header parameters' => sub {
           instanceLocation => '/response/header/My-Header',
           keywordLocation => $keyword_path,
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
-          error => 'wide character detected in header value: not deserializable',
+          error => 'invalid syntax in header value',
         },
       ],
     },
@@ -2047,9 +2047,7 @@ subtest 'header parameters' => sub {
       [ false, ['0'] ],
       [ true, ['1'] ],
       [ '', [''] ],
-      [ 'i have spaces', [" i have spaces  \t "] ],
-      [ 'foo,bar', [' foo ', ' bar '] ],         # leading/trailing whitespace is removed
-      [ 'foo,  bar', [' foo,  bar '] ],          # for strings, internal ws is not not altered
+      [ 'foo,bar', ['foo', 'bar'] ],             # multiple headers are concatenated with a comma
       [ 'red﹠green', ["red\xef\xb9\xa0green"] ],
     ],
     [
@@ -2057,32 +2055,30 @@ subtest 'header parameters' => sub {
       [ qw(explode content values) ],
       [ false, ['foo'], ['foo'] ],  # a single header is passed as an array iff when array is requested
       [ true,  ['foo'], ['foo'] ],
-      [ false, [ qw(foo bar) ], [' foo, bar '] ],   # split individual values on comma when type=array
-      [ true,  [ qw(foo bar) ], [' foo, bar '] ],
-      [ false, [ qw(foo bar baz) ], [' foo, bar ', ' baz '] ],
-      [ true,  [ qw(foo bar baz) ], [' foo, bar ', ' baz '] ],
-      [ false, [ qw(foo bar) ], [ ' foo ', ' bar ' ] ],  # ""
-      [ false, [ qw(foo bar) ], [ ' foo, bar ' ] ],      # internal OWS is stripped for arrays
+      [ false, [ qw(foo bar) ], ['foo, bar'] ],  # split individual values on comma when type=array
+      [ true,  [ qw(foo bar) ], ['foo, bar'] ],
+      [ false, [ qw(foo bar baz) ], ['foo, bar', 'baz'] ],
+      [ true,  [ qw(foo bar baz) ], ['foo, bar', 'baz'] ],
       [ false, [ 'blue−black', 'blackish﹠green', '100𝑥brown' ],
         [ "blue\xe2\x88\x92black,blackish\xef\xb9\xa0green,100\xf0\x9d\x91\xa5brown" ] ],
       [ true,  [ 'blue−black', 'blackish﹠green', '100𝑥brown' ],
         [ "blue\xe2\x88\x92black,blackish\xef\xb9\xa0green,100\xf0\x9d\x91\xa5brown" ] ],
-      [ false, { qw(R 100 G 200 B 150) }, [' R, 100 ', ' G, 200, B, 150 '] ],
-      [ true,  { qw(R 100 G 200 B 150) }, [' R=100, G=200 ', '  B=150 '] ],
+      [ false, { qw(R 100 G 200 B 150) }, ['R, 100', 'G, 200, B, 150'] ],
+      [ true,  { qw(R 100 G 200 B 150) }, ['R=100, G=200', 'B=150'] ],
 
       [ false, { 'foo=bar' => 'baz', bloop => '' },                [ 'foo=bar,baz,bloop,' ] ],
       [ true,  { foo => 'bar', baz => '', bloop => '', '' => '' }, [ 'foo=bar,baz,bloop,' ] ],
-      [ false, { foo => 'bar=baz', bloop => '' },                  [ 'foo, bar=baz, bloop, ' ] ],
-      [ false, { 'foo=bar' => 'baz', bloop => '' },                [ 'foo=bar, baz, bloop, ' ] ],
-      [ true,  { foo => 'bar', baz => '', bloop => '', '' => '' }, [ 'foo=bar,baz,bloop, ' ] ],
+      [ false, { foo => 'bar=baz', bloop => '' },                  [ 'foo, bar=baz, bloop,' ] ],
+      [ false, { 'foo=bar' => 'baz', bloop => '' },                [ 'foo=bar, baz, bloop,' ] ],
+      [ true,  { foo => 'bar', baz => '', bloop => '', '' => '' }, [ 'foo=bar,baz,bloop,' ] ],
       [ false, { foo => 'bar=baz', bloop => '' },                  [ 'foo,bar=baz,bloop,' ] ],
       [ true,  { foo => '', bar => 'baz', bloop => '', '' => '' }, [ 'foo,bar=baz,bloop,' ] ],
       [ false, { 'foo=bar=baz' => 'bloop' },                       [ 'foo=bar=baz, bloop' ] ],
       [ true,  { foo => 'bar=baz' => bloop => '' },                [ 'foo=bar=baz, bloop' ] ],
-      [ false, { foo => 'bar', baz => '' },                        [ 'foo, bar, baz, ' ] ],
+      [ false, { foo => 'bar', baz => '' },                        [ 'foo, bar, baz,' ] ],
       [ true,  { foo => 'bar', baz => '' },                        [ 'foo=bar, baz' ] ],
-      [ false, { foo => 'bar' },                                   [ ' foo ', ' bar ' ] ],
-      [ false, { foo => 'bar' }, [ ' foo, bar ' ] ],     # internal OWS ws is stripped for objects
+      [ false, { foo => 'bar' },                                   [ 'foo', 'bar' ] ],
+      [ false, { foo => 'bar' }, [ 'foo,  bar' ] ],     # internal OWS ws is stripped for objects
 
       [ false, { 'blue−black', 'yes!', 'blackish﹠green', '¿no?', '100𝑥brown', 'fl¡p' },
         [ "blue\xe2\x88\x92black,yes!,blackish\xef\xb9\xa0green,\xc2\xbfno?,100\xf0\x9d\x91\xa5brown,fl\xc2\xa1p" ] ],
@@ -2116,7 +2112,7 @@ subtest 'header parameters' => sub {
           instanceLocation => '/response/header/My-Header',
           keywordLocation => $keyword_path,
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
-          error => 'wide character detected in header value: not deserializable',
+          error => 'invalid syntax in header value',
         },
       ],
     },
@@ -2492,8 +2488,8 @@ subtest 'cookie parameters' => sub {
     [
       [ qw(style content cookie) ],
       [ 'form', '', 'q=' ],
-      [ 'form', 'red', '  q=red  ' ],
-      [ 'form', '"red"', 'q="red"' ],
+      [ 'form', 'red', 'q=red' ],
+      [ 'form', 'red', 'q="red"' ],           # quotes around value are stripped
       [ 'form', '1', 'q=1&r=2&s=3' ],         # nonsensical if requesting a primitive, but still works
       [ 'form', '3', 'q=1; q=2; q=3' ],       # we take the last one when primitive is requested
       [ 'form', '1', 'q=1; r=2&s=3' ],
@@ -2554,7 +2550,6 @@ subtest 'cookie parameters' => sub {
       [ 'cookie', -42, 'q=-42' ],
       [ 'cookie', '', 'q=' ],
       [ 'cookie', 'red', 'q=red' ],
-      [ 'cookie', 'red', '  q=red  ' ],              # not reversible
       [ 'cookie', '3', 'q=3' ],
       [ 'cookie', '3', 'q=1; q=2; q=3; a=1; b=2' ],  # not reversible
       [ 'cookie', '1', 'q=1; r=2&s=3' ],

@@ -3,7 +3,7 @@ package Developer::Dashboard::PageRuntime;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::DataHelper qw(j je);
@@ -235,7 +235,16 @@ sub _render_templates {
                 ENV    => \%template_env,
                 SYSTEM => $system,
                 env    => \%template_env,
-                func   => sub { return '' },
+                # DD-858: calls a sub as a plain FUNCTION - no implicit
+                # invocant is prepended, unlike method() below. Use this for
+                # a sub written to take its real arguments starting at
+                # position 0; use method() for one written as an instance/
+                # class method expecting the invocant first.
+                func => sub {
+                    my ( $class, $method, @rest ) = @_;
+                    return '' if !$class || !$method || !$class->can($method);
+                    return UNIVERSAL::can( $class, $method )->(@rest);
+                },
                 method => sub {
                     my ( $class, $method, @rest ) = @_;
                     return '' if !$class || !$method || !$class->can($method);

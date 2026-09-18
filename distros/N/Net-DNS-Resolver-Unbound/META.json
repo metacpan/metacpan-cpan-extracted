@@ -4,13 +4,13 @@
       "Dick Franks"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-DNS-Resolver-Unbound",
    "no_index" : {
@@ -55,6 +55,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.37",
-   "x_serialization_backend" : "JSON::PP version 2.27200"
+   "version" : "1.38",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

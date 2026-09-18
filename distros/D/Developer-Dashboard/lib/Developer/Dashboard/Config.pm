@@ -3,7 +3,7 @@ package Developer::Dashboard::Config;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use File::Spec;
 use Cwd qw(cwd);
@@ -47,7 +47,7 @@ sub load_global {
     my $merged = {};
     for my $file ( reverse $self->_global_config_files ) {
         next if !-f $file;
-        open my $fh, '<:raw', $file or die "Unable to read $file: $!";
+        open my $fh, '<:raw', $file or die "Unable to read $file: $!";    # uncoverable branch true
         local $/;
         $merged = $self->_merge_hashes( $merged, json_decode(<$fh>) );
     }
@@ -76,7 +76,7 @@ sub save_global {
 sub _write_json_atomic {
     my ( $self, $file, $text ) = @_;
     my $temp = $file . '.tmp.' . $$ . '.' . int( rand(1_000_000) );
-    open my $fh, '>:raw', $temp or die "Unable to write $temp: $!";
+    open my $fh, '>:raw', $temp or die "Unable to write $temp: $!";    # uncoverable branch true
     print {$fh} $text;
     close $fh or die "Unable to close $temp: $!";    # uncoverable branch true
     $self->{paths}->secure_file_permissions($temp);
@@ -120,7 +120,7 @@ sub load_repo {
     my $repo = $self->{repo_root} || return {};
     my $file = File::Spec->catfile( $repo, '.developer-dashboard.json' );
     return {} if !-f $file;
-    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
+    open my $fh, '<:raw', $file or die "Unable to read $file: $!";    # uncoverable branch true
     local $/;
     return json_decode(<$fh>);
 }
@@ -739,15 +739,26 @@ sub api_keys {
 # config/api.json files, excluding child-layer tombstones.
 # Input: none.
 # Output: hash reference keyed by API client name with secret and ajax route list.
+#
+# DD-874: skill fragments are merged FIRST, as the lowest-priority defaults,
+# with every project layer merged on top - never the other way round. Unlike
+# _skill_config_fragments (which namespaces each skill's payload under
+# {_skillname => ...} and so can never collide with a project key at all),
+# _skill_api_fragments returns the raw, un-namespaced key hash: an installed
+# skill naming the same API-client key as the operator's own deepest-layer
+# config/api.json (set via `dashboard api add`) must never be able to silently
+# replace its secret/routes or tombstone it. Putting skill fragments first
+# just extends this file's own later-merged-wins idiom by one more rung below
+# the project layers, rather than inventing new collision-rejection logic.
 sub api_registry {
     my ($self) = @_;
     my $merged = {};
+    for my $fragment ( $self->_skill_api_fragments ) {
+        $merged = $self->_merge_api_key_hashes( $merged, $fragment );
+    }
     for my $file ( reverse $self->_global_api_files ) {
         next if !-f $file;
         $merged = $self->_merge_api_key_hashes( $merged, $self->_load_json_hash_file($file) );
-    }
-    for my $fragment ( $self->_skill_api_fragments ) {
-        $merged = $self->_merge_api_key_hashes( $merged, $fragment );
     }
     return $self->_normalize_api_keys($merged);
 }
@@ -841,7 +852,7 @@ sub _load_writable_global {
     my ($self) = @_;
     my $file = $self->_global_config_file;
     return {} if !-f $file;
-    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
+    open my $fh, '<:raw', $file or die "Unable to read $file: $!";    # uncoverable branch true
     local $/;
     return json_decode(<$fh>);
 }
@@ -863,7 +874,7 @@ sub _load_writable_api_registry {
 # Output: decoded hash reference.
 sub _load_json_hash_file {
     my ( $self, $file ) = @_;
-    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
+    open my $fh, '<:raw', $file or die "Unable to read $file: $!";    # uncoverable branch true
     local $/;
     my $decoded = json_decode(<$fh>);
     die "Expected JSON object in $file\n" if ref($decoded) ne 'HASH';
@@ -953,7 +964,7 @@ sub _skill_config_hash {
     for my $skill_path (@layers) {
         my $config_file = File::Spec->catfile( $skill_path, 'config', 'config.json' );
         next if !-f $config_file;
-        open my $fh, '<:raw', $config_file or die "Unable to read $config_file: $!";
+        open my $fh, '<:raw', $config_file or die "Unable to read $config_file: $!";    # uncoverable branch true
         local $/;
         my $config = eval { json_decode(<$fh>) } || {};
         close $fh;

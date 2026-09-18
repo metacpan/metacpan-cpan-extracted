@@ -203,7 +203,10 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 if (s.set.filter){
                     s.set.filter = RegExp(s.filter);
                 }
-                ['placeholder','tooltip','label'].forEach(key => {
+                // an allow list rather than 'every array in s.set', since
+                // plenty of qooxdoo properties take a real array (padding,
+                // margin, ...) and xtr would eat them.
+                ['placeholder','tooltip','toolTipText','label'].forEach(key => {
                     if (key in s.set){
                        s.set[key] = this.xtr(s.set[key]);
                     }
@@ -430,6 +433,15 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 var value = data[key];
                 if (relax && !model[setter]) {
                     continue;
+                }
+
+                // A backend trm() arrives as [msgid, arg, ...]. No widget
+                // value is ever a real array -- a selectBox carries a key, a
+                // date an epoch -- so an array here always wants translating.
+                // Without this the String() below joined it with commas and
+                // the user read "Status: %1,migrated".
+                if (value instanceof Array) {
+                    value = String(this.xtr(value));
                 }
 
                 switch(this._typeMap[key])

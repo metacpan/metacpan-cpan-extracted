@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -639,8 +639,8 @@ sub _collector_sync_plan {
 # Output: negative, zero, or positive integer suitable for Perl sort.
 sub _indicator_sort_cmp {
     my ( $self, $left, $right ) = @_;
-    my $left_priority = $left->{priority} || 999;
-    my $right_priority = $right->{priority} || 999;
+    my $left_priority = defined $left->{priority} ? $left->{priority} : 999;
+    my $right_priority = defined $right->{priority} ? $right->{priority} : 999;
     my $priority_cmp = $left_priority <=> $right_priority;
     return $priority_cmp if $priority_cmp;
 

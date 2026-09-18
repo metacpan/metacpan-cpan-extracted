@@ -3,16 +3,18 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
 use IO::Socket::INET;
-use POSIX qw(close setsid strftime);
+use POSIX qw(close setsid);
 use Time::HiRes qw(sleep time);
 
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::CollectorRunner ();
+use Developer::Dashboard::DirEntries qw(sorted_dir_entries);
+use Developer::Dashboard::TimeUtils qw(_now_iso8601);
 use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::JSON qw(json_encode json_decode json_decode_state);
 use Developer::Dashboard::Platform qw(command_in_path is_windows);
@@ -126,7 +128,7 @@ sub start_web {
             pid          => $started_pid,
             port         => $bound_port + 0,
             process_name => $self->_web_process_title( $host, $port ),
-            started_at   => _now_iso8601(),
+            started_at   => _now_iso8601( tz => "utc" ),
             status       => 'running',
             bound_host   => $bound_host,
             workers      => $workers + 0,
@@ -174,7 +176,7 @@ sub _start_web_windows_background {
                 pid          => $listener_pid,
                 port         => $port + 0,
                 process_name => $self->_web_process_title( $host, $port ),
-                started_at   => _now_iso8601(),
+                started_at   => _now_iso8601( tz => "utc" ),
                 status       => 'running',
                 workers      => $workers + 0,
                 ssl          => $ssl + 0,
@@ -943,7 +945,7 @@ sub _collector_stop_fallback_names {
     my $collectors_root = eval { $self->{paths}->collectors_root };
     if ( defined $collectors_root && $collectors_root ne '' && -d $collectors_root ) {
         opendir( my $dh, $collectors_root ) or die "Unable to read $collectors_root: $!";
-        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' && /\.pid\z/ } readdir($dh) ) {
+        for my $entry ( grep { /\.pid\z/ } sorted_dir_entries($dh) ) {
             my ($name) = $entry =~ /\A(.*)\.pid\z/;
             next if !defined $name || $name eq '' || $seen{$name}++;    # uncoverable condition left the readdir entries are pre-filtered to match /\.pid\z/, so the capture is always defined
             push @names, $name;
@@ -1298,7 +1300,7 @@ sub _supervise_one_collector {
     my ( $restart_count, $window_started_at, $window_started_epoch ) =
       $self->_collector_watchdog_window($status);
     my $observed_at_epoch = time;
-    my $observed_at = _now_iso8601();
+    my $observed_at = _now_iso8601( tz => "utc" );
     $restart_count++;
 
     if ( $restart_count > $self->_collector_restart_limit ) {
@@ -1441,7 +1443,7 @@ sub _collector_watchdog_window {
     if ( !defined $window_epoch || $window_epoch !~ /^\d+(?:\.\d+)?$/ || ( $now_epoch - $window_epoch ) > $self->_collector_restart_window_seconds ) {
         $count = 0;
         $window_epoch = $now_epoch;
-        $window_at = _now_iso8601();
+        $window_at = _now_iso8601( tz => "utc" );
     }
     return ( $count, $window_at, $window_epoch );
 }
@@ -1453,7 +1455,7 @@ sub _collector_watchdog_window {
 # Output: true value.
 sub _mark_collector_watchdog_attention {
     my ( $self, $name, $message, %args ) = @_;
-    my $observed_at = $args{observed_at} || _now_iso8601();    # uncoverable condition false _now_iso8601 always returns a truthy timestamp string
+    my $observed_at = $args{observed_at} || _now_iso8601( tz => "utc" );    # uncoverable condition false _now_iso8601 always returns a truthy timestamp string
     my $observed_at_epoch = defined $args{observed_at_epoch} ? $args{observed_at_epoch} : time;
     $self->{collectors}->write_status(
         $name,
@@ -1481,7 +1483,7 @@ sub _mark_collector_watchdog_attention {
 sub _log_collector_watchdog_event {
     my ( $self, $name, $message ) = @_;
     chomp $message if defined $message;    # uncoverable branch false every caller passes a defined watchdog message
-    my $timestamp = _now_iso8601();
+    my $timestamp = _now_iso8601( tz => "utc" );
     $self->{files}->append( 'collector_log', sprintf "[%s][watchdog][%s] %s\n", $timestamp, $name, $message );
     $self->{collectors}->append_log_entry(
         $name,
@@ -1537,7 +1539,7 @@ sub _set_collector_supervisor_targets {
             process_name => $self->_collector_supervisor_process_title,
             status       => $pid ? 'running' : 'starting',
             watched_names => \@targets,
-            updated_at   => _now_iso8601(),
+            updated_at   => _now_iso8601( tz => "utc" ),
         }
     );
     return $pid if $pid;
@@ -1573,8 +1575,8 @@ sub _start_collector_supervisor {
                 pid          => $pid,
                 process_name => $self->_collector_supervisor_process_title,
                 status       => 'running',
-                started_at   => _now_iso8601(),
-                heartbeat_at => _now_iso8601(),
+                started_at   => _now_iso8601( tz => "utc" ),
+                heartbeat_at => _now_iso8601( tz => "utc" ),
             }
         );
         return $pid;
@@ -1593,8 +1595,8 @@ sub _start_collector_supervisor {
                 pid          => $pid,
                 process_name => $self->_collector_supervisor_process_title,
                 status       => 'running',
-                started_at   => _now_iso8601(),
-                heartbeat_at => _now_iso8601(),
+                started_at   => _now_iso8601( tz => "utc" ),
+                heartbeat_at => _now_iso8601( tz => "utc" ),
             }
         );
         return $pid;
@@ -1648,14 +1650,14 @@ sub _run_collector_supervisor_child {
                 pid          => $$,
                 process_name => $self->_collector_supervisor_process_title,
                 status       => 'running',
-                heartbeat_at => _now_iso8601(),
+                heartbeat_at => _now_iso8601( tz => "utc" ),
             }
         );
         eval { $self->_supervise_collectors_once( names => \@targets ) };
         if ($@) {
             my $error = "$@";
             chomp $error;
-            $self->{files}->append( 'collector_log', sprintf "[%s][watchdog] %s\n", _now_iso8601(), $error );
+            $self->{files}->append( 'collector_log', sprintf "[%s][watchdog] %s\n", _now_iso8601( tz => "utc" ), $error );
             $self->_write_collector_supervisor_state(
                 {
                     %{$state},
@@ -1663,7 +1665,7 @@ sub _run_collector_supervisor_child {
                     process_name => $self->_collector_supervisor_process_title,
                     status       => 'error',
                     error        => $error,
-                    heartbeat_at => _now_iso8601(),
+                    heartbeat_at => _now_iso8601( tz => "utc" ),
                 }
             );
         }
@@ -1685,8 +1687,8 @@ sub _shutdown_collector_supervisor {
             pid          => $$,
             process_name => $self->_collector_supervisor_process_title,
             status       => $status || 'stopped',
-            heartbeat_at => _now_iso8601(),
-            stopped_at   => _now_iso8601(),
+            heartbeat_at => _now_iso8601( tz => "utc" ),
+            stopped_at   => _now_iso8601( tz => "utc" ),
         }
     );
     $self->_cleanup_collector_supervisor_files;
@@ -1798,6 +1800,24 @@ sub _collector_supervisor_state {
     return json_decode_state( scalar <$fh> );
 }
 
+# _pending_collector_supervisor_state_file($file)
+# Builds the per-writer staging path _write_collector_supervisor_state writes
+# to before the atomic rename into $file. Its own sub (matching the pattern
+# in Auth.pm/Collector.pm/SessionStore.pm/Zipper.pm) exists so a coverage test
+# can exercise the real path-generation logic directly. DD-850: pid+wall-
+# clock-second alone is NOT collision-safe (see DD-848) - the per-process
+# monotonic counter below guarantees no two calls from one process ever
+# collide, whatever the timing; cross-process collision remains prevented
+# by pid uniqueness among live processes.
+# Input: final destination file path string.
+# Output: staging file path string.
+my $_collector_supervisor_state_seq = 0;
+
+sub _pending_collector_supervisor_state_file {
+    my ( $self, $file ) = @_;
+    return sprintf '%s.%s.%s.%s.pending', $file, $$, time, ++$_collector_supervisor_state_seq;
+}
+
 # _write_collector_supervisor_state($state)
 # Atomically persists the watchdog supervisor state snapshot.
 # Input: state hash reference.
@@ -1805,7 +1825,7 @@ sub _collector_supervisor_state {
 sub _write_collector_supervisor_state {
     my ( $self, $data ) = @_;
     my $file = $self->_collector_supervisor_statefile;
-    my $tmp = sprintf '%s.%s.%s.pending', $file, $$, time;
+    my $tmp = $self->_pending_collector_supervisor_state_file($file);
     open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";    # uncoverable branch true the state root exists and is writable, so the pending-file write cannot fail on the test host
     print {$fh} json_encode( $data || {} );
     close $fh;
@@ -2009,7 +2029,7 @@ sub _shutdown_web {
             %$state,
             pid        => $self->_normalized_process_id($$),
             status     => $final_status,
-            updated_at => _now_iso8601(),
+            updated_at => _now_iso8601( tz => "utc" ),
         }
     );
     POSIX::_exit(0);
@@ -2080,7 +2100,7 @@ sub _run_web_child {
             pid          => $child_pid,
             port         => $bound_port + 0,
             process_name => $self->_web_process_title( $host, $port ),
-            started_at   => _now_iso8601(),
+            started_at   => _now_iso8601( tz => "utc" ),
             status       => 'running',
             bound_host   => $bound_host,
             workers      => $workers + 0,
@@ -2090,7 +2110,7 @@ sub _run_web_child {
 
     eval { $server->serve_daemon($daemon) };
     if ($@) {
-        my $message = sprintf "[%s][web] %s\n", _now_iso8601(), $@;
+        my $message = sprintf "[%s][web] %s\n", _now_iso8601( tz => "utc" ), $@;
         $self->{files}->append( 'dashboard_log', $message );
         $self->_write_web_state(
             {
@@ -2099,7 +2119,7 @@ sub _run_web_child {
                 port       => $bound_port + 0,
                 status     => 'error',
                 error      => "$@",
-                updated_at => _now_iso8601(),
+                updated_at => _now_iso8601( tz => "utc" ),
                 bound_host => $bound_host,
                 workers    => $workers + 0,
             }
@@ -2113,7 +2133,7 @@ sub _run_web_child {
             pid        => $child_pid,
             port       => $bound_port + 0,
             status     => 'stopped',
-            updated_at => _now_iso8601(),
+            updated_at => _now_iso8601( tz => "utc" ),
             bound_host => $bound_host,
             workers    => $workers + 0,
         }
@@ -2263,6 +2283,24 @@ sub _follow_log_file {
     }
 }
 
+# _pending_web_state_file($file)
+# Builds the per-writer staging path _write_web_state writes to before the
+# atomic rename into $file. Its own sub (matching the pattern in
+# Auth.pm/Collector.pm/SessionStore.pm/Zipper.pm) exists so a coverage test
+# can exercise the real path-generation logic directly. DD-850: pid+wall-
+# clock-second alone is NOT collision-safe (see DD-848) - the per-process
+# monotonic counter below guarantees no two calls from one process ever
+# collide, whatever the timing; cross-process collision remains prevented
+# by pid uniqueness among live processes.
+# Input: final destination file path string.
+# Output: staging file path string.
+my $_web_state_seq = 0;
+
+sub _pending_web_state_file {
+    my ( $self, $file ) = @_;
+    return sprintf '%s.%s.%s.%s.pending', $file, $$, time, ++$_web_state_seq;
+}
+
 # _write_web_state($state)
 # Atomically persists the web service state snapshot.
 # Input: state hash reference.
@@ -2274,7 +2312,7 @@ sub _write_web_state {
         $payload = $data;
     }
     my $file = $self->{files}->web_state;
-    my $tmp = sprintf '%s.%s.%s.pending', $file, $$, time;
+    my $tmp = $self->_pending_web_state_file($file);
     open my $fh, '>:raw', $tmp or die "Unable to write $tmp: $!";    # uncoverable branch true the state root exists and is writable, so the pending-file write cannot fail on the test host
     print {$fh} json_encode($payload);
     close $fh;
@@ -3073,7 +3111,7 @@ sub _adopt_web_listener_pid {
 
     $state->{pid} = $listener_pid + 0;
     $state->{status} = 'running';
-    $state->{updated_at} = _now_iso8601();
+    $state->{updated_at} = _now_iso8601( tz => "utc" );
     my $title = $self->_read_process_title($listener_pid);
     $state->{process_name} = $title if defined $title && $title ne '';
     $self->{files}->write( 'web_pid', "$listener_pid\n" );
@@ -3293,15 +3331,6 @@ sub _slurp_proc_file {
     open my $fh, '<', $path or return;    # uncoverable branch true the readability guard above already excluded unreadable proc files
     local $/;
     return scalar <$fh>;
-}
-
-# _now_iso8601()
-# Returns the current UTC timestamp in ISO-8601 form.
-# Input: none.
-# Output: timestamp string.
-sub _now_iso8601 {
-    my @t = gmtime();
-    return strftime( '%Y-%m-%dT%H:%M:%SZ', @t );
 }
 
 1;

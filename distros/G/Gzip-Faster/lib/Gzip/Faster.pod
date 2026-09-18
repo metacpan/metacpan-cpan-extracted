@@ -25,8 +25,8 @@ Gzip::Faster - simple and fast gzip and gunzip
 
 =head1 VERSION
 
-This documents version 0.22 of Gzip::Faster
-corresponding to git commit L<b1e4570195427cb9c7b209542e63e5f4d2b2229a|https://github.com/benkasminbullock/gzip-faster/commit/b1e4570195427cb9c7b209542e63e5f4d2b2229a> made on Thu Jul 17 07:57:33 2025 +0900.
+This documents version 0.23 of Gzip::Faster
+corresponding to git commit L<3ddd14cb6e3eae87e4d6ee8140474a26d39d41d2|https://github.com/benkasminbullock/gzip-faster/commit/3ddd14cb6e3eae87e4d6ee8140474a26d39d41d2> made on Fri Sep 18 15:46:02 2026 +0900.
 
 =head1 DESCRIPTION
 
@@ -45,6 +45,11 @@ format>, which is the same as the gzip format except it has no header
 information. L</deflate_raw> and L</inflate_raw> work with the
 bare-bones version of this format without checksums.
 
+A limitation of the module is that it is designed around the idea of
+keeping the entire input and output in memory, so it is not suitable
+for streaming compressing of huge entities. For these cases I suggest
+piping the stream through the command-line gzip utility.
+
 
 
 
@@ -56,7 +61,8 @@ and L</raw>. A file name can be set and retrieved from the gzip header
 with L</file_name>, and the modification time of the file can be set
 and retrieved with L</mod_time>. The level of compression can be
 altered with L</level>. Perl flags can be copied into the gzip header
-using L</copy_perl_flags>.
+using L</copy_perl_flags>. The size of the output of L</unzip> can be
+limited with L</max_size>.
 
 
 
@@ -155,7 +161,7 @@ If the input value C<$plain> is the undefined value or an empty
 string, it prints a warning (see L</DIAGNOSTICS>) and returns the
 undefined value.
 
-For an example using L</deflate> to write a PNG image file, see L<F<t/png.t>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.22/t/png.t> in the module's tests.
+For an example using L</deflate> to write a PNG image file, see L<F<t/png.t>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.23/t/png.t> in the module's tests.
 
 C<deflate> was added in version 0.16.
 
@@ -219,7 +225,8 @@ and L</raw>. A file name can be set and retrieved from the gzip header
 with L</file_name>, and the modification time of the file can be set
 and retrieved with L</mod_time>. The level of compression can be
 altered with L</level>. Perl flags can be copied into the gzip header
-using L</copy_perl_flags>.
+using L</copy_perl_flags>. The size of the output of L</unzip> can be
+limited with L</max_size>.
 
 
 
@@ -316,7 +323,7 @@ produces output
     Got back file name blash.gz
 
 
-(This example is included as L<F<file-name.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.22/examples/file-name.pl> in the distribution.)
+(This example is included as L<F<file-name.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.23/examples/file-name.pl> in the distribution.)
 
 
 A potential problem is that Gzip::Faster has a hard-coded limit of
@@ -384,6 +391,17 @@ of seconds since the Unix epoch. This only applies to L</gzip_format>
 compression.
 
 C<mod_time> was added in version 0.19.
+
+=head2 max_size
+
+    $gf->max_size (1_000_000);
+
+Limit the output of L</unzip> to a number of bytes. If the
+uncompressed data would be longer, L</unzip> stops and throws a fatal
+error. A value of 0, or no value, removes the limit, which is the
+default. The functions like L</gunzip> are not limited.
+
+C<max_size> was added in version 0.23.
 
 =head1 PERFORMANCE
 
@@ -526,7 +544,7 @@ In L</copy_perl_flags>, only the utf8 flag is implemented. Possible
 other things which could be implemented are the read-only and the
 taint flags.
 
-As of version 0.22, there is no way to read or write the
+As of version 0.23, there is no way to read or write the
 OS, comment, or text fields of the gzip header. The "extra" field of
 the gzip header is co-opted by L</copy_perl_flags>. There is no way to
 set the value of the parameter C<memLevel> which controls how much
@@ -577,6 +595,33 @@ functions from the module using
 
 (Fatal) The data given to L</gunzip>, L</inflate>, L</inflate_raw>, or
 L</unzip> was not in the compressed format.
+
+=item Out of memory during inflate
+
+(Fatal)
+
+=item Internal error in zlib
+
+(Fatal)
+
+=item Unknown status %d from inflate
+
+(Fatal) zlib returned an error code as given which is not one of the
+known options.
+
+=item Uncompressed data exceeds max_size of %d bytes
+
+(Fatal) The user set a non-zero maximum size with L</max_size> and the
+output exceeded that limit.
+
+=item Zlib did not finish processing the string: %d bytes left
+
+(Fatal) zlib failed to process all of the input buffer.
+
+=item Zlib did not come to the end of the string: zlib_status = %d
+
+(Fatal) zlib finished processing for a reason other than coming to the
+end of the string. The status number reported is from zlib.
 
 =item Error opening '$file': $!
 
@@ -633,7 +678,7 @@ and F<lib/Gzip/Faster.pm> in the distribution.
 =head1 INSTALLATION
 
 Installation follows standard Perl methods. Detailed instructions can
-be found in the file L<F<README>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.22/README> in the distribution. The
+be found in the file L<F<README>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.23/README> in the distribution. The
 following are some extra notes for people who get stuck.
 
 Gzip::Faster requires the compression library L</zlib> (also called
@@ -658,14 +703,6 @@ On Ubuntu Linux, you may need to install C<zlib1g-dev> using the
 following command:
 
     sudo apt-get install zlib1g-dev
-
-=head2 Windows
-
-Unfortunately at this time the module doesn't seem to install on
-ActiveState Perl. You can check the current status at
-L<http://code.activestate.com/ppm/Gzip-Faster/>. However, the module
-seems to install without problems on Strawberry Perl, so if you cannot
-install via ActiveState, you could try that instead.
 
 =head1 SEE ALSO
 
@@ -824,7 +861,7 @@ produces output
     #  ###### #          ##########
 
 
-(This example is included as L<F<inflate.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.22/examples/inflate.pl> in the distribution.)
+(This example is included as L<F<inflate.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.23/examples/inflate.pl> in the distribution.)
 
 
 =back
@@ -911,7 +948,7 @@ Ben Bullock, <benkasminbullock@gmail.com>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2014-2025
+2014-2026
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

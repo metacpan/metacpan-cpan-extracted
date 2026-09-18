@@ -9,7 +9,7 @@ use Crypt::Age::Header;
 use namespace::clean;
 
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 sub generate_keypair {
     my ($class) = @_;
@@ -86,7 +86,14 @@ sub decrypt {
     my $output = '';
     open my $ofh, '>:raw', \$output or croak "open on output string: $!";
 
-    $class->_decrypt_fh($ifh, $ofh, $identities);
+    # Forwarded only when the caller actually gave it, so that "not passed"
+    # stays distinguishable from "passed as undef" all the way down: the first
+    # takes Header's default, the second is an error there. Building the pair
+    # here rather than defaulting it means this method names no limit of its
+    # own -- see Crypt::Age::Header/THE STANZA LIMIT for the number and why it
+    # is ours rather than the format's.
+    $class->_decrypt_fh($ifh, $ofh, $identities,
+        exists $args{max_stanzas} ? ( max_stanzas => $args{max_stanzas} ) : ());
 
     return $output;
 }
@@ -172,7 +179,7 @@ sub encrypt_filehandle {
 
 
 sub _decrypt_fh {
-    my ($class, $ifh, $ofh, $identities) = @_;
+    my ($class, $ifh, $ofh, $identities, %opt) = @_;
     binmode($ifh, ':raw') or croak "cannot binmode input filehandle: $!";
     binmode($ofh, ':raw') or croak "cannot binmode output filehandle: $!";
 
@@ -200,8 +207,13 @@ sub _decrypt_fh {
         .'pass at least one identity'
         unless @$identities;
 
-    # Parse header
-    my $header = Crypt::Age::Header->parse_from_fh($ifh);
+    # Parse header. %opt carries max_stanzas when the caller passed one, and is
+    # empty when they did not -- the default lives in Header, in one place, so
+    # this layer never has to name a number. Validation is Header's too: unlike
+    # identities above, a bad max_stanzas cannot leak anything and has one
+    # meaning on both layers, so a second check here would only be a second
+    # message to keep in step.
+    my $header = Crypt::Age::Header->parse_from_fh($ifh, %opt);
 
     # Unwrap file key using identities
     my $file_key = $header->unwrap_file_key($identities);
@@ -227,7 +239,9 @@ sub decrypt_file {
     open my $out_fh, '>:raw', $output
         or croak "Cannot open output file '$output': $!";
 
-    $class->_decrypt_fh($in_fh, $out_fh, $identities);
+    # As in decrypt above: forwarded only when given.
+    $class->_decrypt_fh($in_fh, $out_fh, $identities,
+        exists $args{max_stanzas} ? ( max_stanzas => $args{max_stanzas} ) : ());
 
     close $out_fh or croak "Cannot close output file '$output': $!";
     close $in_fh  or croak "Cannot close input file '$input': $!";
@@ -242,7 +256,9 @@ sub decrypt_filehandle {
     my $out_fh     = $args{output}     // croak "output required";
     my $identities = $args{identities} // croak "identities required";
 
-    $class->_decrypt_fh($in_fh, $out_fh, $identities);
+    # As in decrypt above: forwarded only when given.
+    $class->_decrypt_fh($in_fh, $out_fh, $identities,
+        exists $args{max_stanzas} ? ( max_stanzas => $args{max_stanzas} ) : ());
 
     return 1;
 }
@@ -263,7 +279,7 @@ Crypt::Age - Perl implementation of age encryption (age-encryption.org)
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -432,6 +448,9 @@ Parameters:
 
 =item * C<identities> - ArrayRef of Bech32-encoded secret keys (required)
 
+=item * C<max_stanzas> - Maximum number of recipient stanzas the header may
+carry (optional, C<128> by default)
+
 =back
 
 Returns the decrypted plaintext.
@@ -454,6 +473,15 @@ one successfully unwraps the file key. Dies on the same conditions as
 L</decrypt_file>, except file I/O errors -- this method never opens a file. It
 also rejects a C<ciphertext> holding a code point above C<0xFF> before
 attempting any of that; see below for the exact message.
+
+Because that work is identities times stanzas and has to happen before any of
+the header can be authenticated, a header is refused when it carries more than
+C<max_stanzas> recipient stanzas -- C<128> by default. The limit is this
+distribution's rather than the age format's, and is high enough for any file
+this API produces but low enough to reject some that C<age -R> can write, so
+raise it when you have such a file. C<max_stanzas> is accepted by this method,
+L</decrypt_file> and L</decrypt_filehandle> alike, must be a positive integer,
+and is documented in full under L<Crypt::Age::Header/THE STANZA LIMIT>.
 
 C<ciphertext> must be a B<byte string>, and so is the plaintext this method
 returns. age ciphertext is binary, so read it with C<:raw> and never through
@@ -564,14 +592,18 @@ Parameters:
 
 =item * C<identities> - ArrayRef of Bech32-encoded secret keys (required)
 
+=item * C<max_stanzas> - Maximum number of recipient stanzas the header may
+carry (optional, C<128> by default)
+
 =back
 
 Returns C<1> on success. Dies if a required argument is missing, if
 C<identities> is not a non-empty ArrayRef -- L</decrypt> quotes the two
 messages, one for the shape and one for the empty list -- if the header is
-invalid, if no identity matches any stanza, if the MAC verification fails,
-if payload authentication fails, if C<binmode> fails on either handle, or on
-file I/O errors.
+invalid, if it carries more than C<max_stanzas> recipient stanzas (or if
+C<max_stanzas> itself is not a positive integer), if no identity matches any
+stanza, if the MAC verification fails, if payload authentication fails, if
+C<binmode> fails on either handle, or on file I/O errors.
 
 Reads the input and writes the output in 64 KiB chunks, so memory use does not
 grow with the size of the file. B<This means a failure does not undo what was
@@ -602,6 +634,9 @@ Parameters:
 =item * C<output> - Decrypted output filehandle (required)
 
 =item * C<identities> - ArrayRef of Bech32-encoded secret keys (required)
+
+=item * C<max_stanzas> - Maximum number of recipient stanzas the header may
+carry (optional, C<128> by default)
 
 =back
 

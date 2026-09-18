@@ -17,6 +17,7 @@ is(format_number(1.23456789, 6),   '1.234568',       'six digit rounding');
 is(format_number('1.2300', 7, 1),  '1.2300000',      'extra zeroes');
 is(format_number(.23, 7, 1),       '0.2300000',      'leading zero');
 is(format_number(-100, 7, 1),      '-100.0000000',   'negative with zeros');
+is(format_number(-1e-5, 5),        '-1e-05',         'negative scientific');
 
 #
 # https://rt.cpan.org/Ticket/Display.html?id=40126

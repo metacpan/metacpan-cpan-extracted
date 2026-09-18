@@ -1,0 +1,66 @@
+{
+   "abstract" : "Client for Litport's free proxy snapshot API",
+   "author" : [
+      "Litport <litport@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-Litportnet-FreeProxy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "IO::Socket::SSL" : "1.42",
+            "JSON::PP" : "0",
+            "Net::SSLeay" : "1.49",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "Time::Local" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/litportnet/free-proxy-sdk/issues"
+      },
+      "homepage" : "https://litport.net/free-proxy",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/litportnet/free-proxy-sdk.git",
+         "web" : "https://github.com/litportnet/free-proxy-sdk/tree/main/packages/perl"
+      }
+   },
+   "version" : "0.001",
+   "x_documentation" : "https://litport.net/docs/free-proxy-api",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

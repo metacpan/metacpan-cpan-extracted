@@ -109,7 +109,9 @@ my $reg = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $home )
 # ---------------------------------------------------------------------------
 ok( oc( '_editor_supports_tabs', command => ['vim'] ),            'vim supports tabs' );
 ok( oc( '_editor_supports_tabs', command => ['/usr/bin/nvim'] ), 'path-qualified nvim supports tabs' );
+ok( oc( '_editor_supports_tabs', command => ['view'] ),          'view (vim read-only entrypoint) supports tabs' );
 ok( !oc( '_editor_supports_tabs', command => ['code'] ),         'non-vim editor does not' );
+ok( !oc( '_editor_supports_tabs', command => ['iv'] ),           'the former bogus "iv" pattern no longer matches anything' );
 ok( !oc('_editor_supports_tabs'),                                'missing command yields no tabs' );
 ok( !oc( '_editor_supports_tabs', command => [''] ),             'empty editor name yields no tabs' );
 
@@ -128,6 +130,9 @@ is_deeply( [ oc( '_selection_matches', choices => '0-2', matches => [ 'a', 'b', 
 is_deeply( [ oc( '_selection_matches', choices => '3-2', matches => [ 'a', 'b', 'c' ] ) ], [], 'reversed range rejected' );
 is_deeply( [ oc( '_selection_matches', choices => '1-9', matches => [ 'a', 'b' ] ) ],      [], 'range end beyond size rejected' );
 is_deeply( [ oc( '_selection_matches', choices => '1-2', matches => [ 'a', 'b', 'c' ] ) ], [ 'a', 'b' ], 'valid range selects span' );
+is_deeply( [ oc( '_selection_matches', choices => '1 - 5', matches => [ 'a', 'b', 'c', 'd', 'e', 'f', 'g' ] ) ], [ 'a', 'b', 'c', 'd', 'e' ], 'spaced range "1 - 5" selects the same span as "1-5" (DD-908)' );
+is_deeply( [ oc( '_selection_matches', choices => '1  -  5', matches => [ 'a', 'b', 'c', 'd', 'e', 'f', 'g' ] ) ], [ 'a', 'b', 'c', 'd', 'e' ], 'range with extra internal spaces around the dash still selects the span (DD-908)' );
+is_deeply( [ oc( '_selection_matches', choices => '1 - 2, 4', matches => [ 'a', 'b', 'c', 'd' ] ) ], [ 'a', 'b', 'd' ], 'a spaced range combined with a comma-separated index both resolve (DD-908)' );
 is_deeply( [ oc( '_selection_matches', choices => '0', matches => [ 'a', 'b' ] ) ],        [], 'chunk below one rejected' );
 is_deeply( [ oc( '_selection_matches', choices => '2', matches => [ 'a', 'b', 'c' ] ) ],   [ 'b' ], 'single index selects one' );
 is_deeply( [ oc( '_selection_matches', choices => '1,3', matches => [ 'a', 'b', 'c' ] ) ], [ 'a', 'c' ], 'comma list selects several' );
@@ -138,6 +143,11 @@ is_deeply( [ oc( '_selection_matches', choices => '1,3', matches => [ 'a', 'b', 
 is_deeply( [ oc('_select_open_file_matches') ],                     [],         'no matches selects nothing' );
 is_deeply( [ oc( '_select_open_file_matches', matches => ['solo'] ) ], ['solo'], 'single match returns immediately' );
 {
+    # A pipe with data already written and then closed behaves exactly like
+    # the historical "piped answer" usage (printf '2\n' | dashboard of ...,
+    # t/05-cli-smoke.t) - IO::Select reports it ready immediately (EOF is a
+    # readable event), so this exercises the real, unmocked
+    # _stdin_has_pending_input() as well as the read/EOF path below it.
     my @m;
     capture {
         my $empty = '';
@@ -178,6 +188,85 @@ is_deeply( [ oc( '_select_open_file_matches', matches => ['solo'] ) ], ['solo'],
     };
     like( $err, qr/Invalid file selection 'nope'/, 'invalid selection dies' );
 }
+{
+    # _stdin_has_pending_input() itself: an in-memory scalar-backed handle
+    # (this project's own established way of faking STDIN) reports a
+    # defined but negative fileno, not a real OS descriptor - select()
+    # cannot examine it and would otherwise wait out the full timeout
+    # without ever reporting it ready, however much data it actually
+    # holds, so it is treated as always ready instead.
+    my $empty = '';
+    open my $in, '<', \$empty or die $!;
+    local *STDIN = $in;
+    my $fileno = fileno($in);
+    ok( defined $fileno && $fileno < 0, 'sanity: the scalar-backed test handle has a defined but negative fileno' );
+    is( oc('_stdin_has_pending_input', 5), 1, 'a negative-fileno handle reports ready immediately, no real wait' );
+}
+{
+    # A genuinely closed handle reports an UNDEF fileno (not merely
+    # negative) - the two are different failure shapes of the same guard
+    # and both must short-circuit to "ready" the same way, since neither
+    # can physically block a read.
+    open my $in, '<', \'' or die $!;
+    close $in;
+    local *STDIN = $in;
+    ok( !defined fileno($in), 'sanity: a closed handle has a genuinely undef fileno' );
+    is( oc('_stdin_has_pending_input', 5), 1, 'an undef-fileno handle reports ready immediately, no real wait' );
+}
+{
+    # A real OS file descriptor (a genuine regular file, not an in-memory
+    # scalar handle) exercises the actual select()/IO::Select path this
+    # whole check exists for, rather than the always-ready short-circuits
+    # above. A regular file is always immediately select()-ready regardless
+    # of content, so this must return true fast, never waiting out the
+    # timeout - proving can_read() itself, not just the fileno guard around
+    # it.
+    my $dir = tempdir( CLEANUP => 1 );
+    my $real_file = catfile( $dir, 'real-stdin-fixture.txt' );
+    spew( $real_file, "3\n" );
+    open my $in, '<', $real_file or die $!;
+    local *STDIN = $in;
+    my $fileno = fileno($in);
+    ok( defined $fileno && $fileno >= 0, 'sanity: a real regular-file handle has a genuine non-negative fileno' );
+    my $before = time;
+    my $ready  = oc( '_stdin_has_pending_input', 5 );
+    my $elapsed = time - $before;
+    is( $ready, 1, 'a real file descriptor with content is reported ready via the real select() path' );
+    ok( $elapsed < 3, 'a genuinely ready descriptor does not wait out the timeout' );
+}
+{
+    # The genuine hang case this whole check exists to prevent: a real,
+    # open pipe with nothing written to it and not yet closed - exactly
+    # what a script's inherited-but-silent STDIN looks like. can_read()
+    # must wait out the timeout and report not-ready, never blocking
+    # forever; a short 1-second timeout keeps this fast while still
+    # proving the real wait-then-give-up behavior, not a shortcut.
+    pipe( my $read_end, my $write_end ) or die "pipe failed: $!";
+    local *STDIN = $read_end;
+    my $fileno = fileno($read_end);
+    ok( defined $fileno && $fileno >= 0, 'sanity: the pipe read end has a genuine non-negative fileno' );
+    my $before  = time;
+    my $ready   = oc( '_stdin_has_pending_input', 1 );
+    my $elapsed = time - $before;
+    is( $ready, 0, 'an open pipe with nothing written is reported not ready after the timeout' );
+    ok( $elapsed >= 1, 'the check genuinely waited out the timeout rather than giving up early' );
+    close $write_end;
+}
+{
+    # Explicit "nothing pending" override, since a real open-but-silent pipe
+    # can only be demonstrated by actually waiting out the timeout - forcing
+    # the wrapper directly is the only way to exercise this branch without
+    # slowing the suite down by several real seconds (DD-915: this is the
+    # actual hang case the fix protects against).
+    my @m;
+    my $out = capture {
+        no strict 'refs';
+        local *{"Developer::Dashboard::CLI::OpenFileChooser::_stdin_has_pending_input"} = sub { 0 };
+        @m = oc( '_select_open_file_matches', matches => [ 'x', 'y', 'z' ] );
+    };
+    is_deeply( \@m, [ 'x', 'y', 'z' ], 'no pending input falls back to all matches' );
+    unlike( $out, qr/> /, 'no pending input prints no prompt, never blocks on a read' );
+}
 
 # ---------------------------------------------------------------------------
 # _ordered_scope_matches
@@ -209,6 +298,75 @@ is( oc( '_scope_match_rank', file => 'x.txt' ), 0, 'no patterns yields a zero ra
     my $r3 = oc( '_scope_match_rank', match_path => 'App.pm', patterns => ['App'] );
     my $r4 = oc( '_scope_match_rank', match_path => '/a/b', patterns => [ undef, '', 'a' ] );
     ok( defined $r1 && defined $r2 && defined $r3 && defined $r4, 'rank scoring handles empty, trailing-slash and undef inputs' );
+}
+
+# DD-912: a caller that already compiled its patterns once (as
+# _resolve_open_file_matches does, via _ordered_scope_matches -> _scope_match_rank)
+# must not pay to recompile the same pattern for every candidate file scored.
+{
+    my $compile_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::OpenFile::_compile_open_file_regex = sub {
+        $compile_calls++;
+        return qr/\Q$_[0]\E/i;
+    };
+    my @regexes = map { Developer::Dashboard::CLI::OpenFile::_compile_open_file_regex($_) } ('App');
+    is( $compile_calls, 1, 'compiling the pattern list once records exactly one call' );
+
+    $compile_calls = 0;
+    oc(
+        '_ordered_scope_matches',
+        patterns => ['App'],
+        regexes  => \@regexes,
+        entries  => [
+            { file => 'one/App.pm',   match_path => 'one/App.pm' },
+            { file => 'two/App.pm',   match_path => 'two/App.pm' },
+            { file => 'three/App.pm', match_path => 'three/App.pm' },
+        ],
+    );
+    is( $compile_calls, 0, 'ranking three candidate files with pre-compiled regexes recompiles the pattern zero times' );
+}
+{
+    # DD-917: a cheap literal check (stem exact match, here) resolves this
+    # file's score before the regex branch is ever reached, so - without
+    # pre-compiled regexes - the pattern must NOT be compiled at all.
+    my $compile_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::OpenFile::_compile_open_file_regex = sub {
+        $compile_calls++;
+        return qr/\Q$_[0]\E/i;
+    };
+    oc( '_scope_match_rank', match_path => 'App.pm', patterns => ['App'] );
+    is( $compile_calls, 0, 'a stem-exact match resolves the score without ever compiling the pattern' );
+}
+{
+    # DD-917: a file that does NOT resolve via any of the cheap literal
+    # checks must still fall through to a real regex compile on demand -
+    # laziness must not silently drop the regex path altogether.
+    my $compile_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::OpenFile::_compile_open_file_regex = sub {
+        $compile_calls++;
+        return qr/\Q$_[0]\E/i;
+    };
+    my $rank = oc( '_scope_match_rank', match_path => 'lib/deep/Other.pm', patterns => ['App'] );
+    is( $compile_calls, 1, 'a file with no cheap literal match still gets the pattern compiled once, on demand' );
+    is( $rank, 50, 'and the fallback score reflects no match at all' );
+}
+{
+    # DD-917: when a caller supplies pre-compiled regexes (DD-912) AND the
+    # candidate file needs the regex branch (no cheap literal resolves it
+    # first), the supplied regex is reused - never recompiled.
+    my $compile_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::OpenFile::_compile_open_file_regex = sub {
+        $compile_calls++;
+        return qr/\Q$_[0]\E/i;
+    };
+    my @regexes = ( Developer::Dashboard::CLI::OpenFile::_compile_open_file_regex('App') );
+    $compile_calls = 0;
+    oc( '_scope_match_rank', match_path => 'lib/deep/Other.pm', patterns => ['App'], regexes => \@regexes );
+    is( $compile_calls, 0, 'a pre-compiled regex is reused for the regex branch, never recompiled' );
 }
 
 # ---------------------------------------------------------------------------
@@ -250,6 +408,30 @@ is_deeply( [ oc( '_named_source_matches', paths => $reg ) ], [], 'missing name y
     local @INC = ( $home, catdir( $home, 'plib' ), @INC );
     my @pm = oc( '_named_source_matches', paths => $reg, name => 'My::Mod' );
     ok( ( grep { m{Mod\.pm$} } @pm ), 'Perl module name resolves to a source file' );
+}
+
+# ---------------------------------------------------------------------------
+# _unique_existing_dirs : the shared dedup+existing-directory filter (DD-913)
+# ---------------------------------------------------------------------------
+{
+    my $edir1 = catdir( $home, 'ued_exists_1' );
+    my $edir2 = catdir( $home, 'ued_exists_2' );
+    make_path($edir1);
+    make_path($edir2);
+    my $noexist = catdir( $home, 'ued_noexist' );
+    my $afile   = catfile( $home, 'ued_a_file' );
+    spew( $afile, "not a directory\n" );
+
+    my @filtered = oc(
+        '_unique_existing_dirs',
+        undef, '', $noexist, $afile, $edir1, $edir1, $edir2,
+    );
+    is_deeply(
+        \@filtered,
+        [ $edir1, $edir2 ],
+        '_unique_existing_dirs drops undef/empty/missing/non-directory entries, dedups, preserves order',
+    );
+    is_deeply( [ oc('_unique_existing_dirs') ], [], 'no candidates returns nothing' );
 }
 
 # ---------------------------------------------------------------------------
@@ -323,6 +505,25 @@ like( $@, qr/Missing path registry/, '_java_source_archive_roots requires paths'
     my @r = oc( '_java_source_archive_roots', paths => $reg );
     ok( !( grep { !defined $_ } @r ), 'default archive roots contain no undef entries' );
 }
+{
+    # DD-916: @INC entries can never contain Java source archives, so they
+    # must not survive into the Java-archive search root list even when the
+    # caller passes them through (as _open_file_roots's general-purpose list
+    # does, since it also serves Perl-module lookup).
+    my $wsdir = catdir( $home, 'wsdir' );
+    local $ENV{JAVA_HOME};
+    delete $ENV{JAVA_HOME};
+    local $ENV{JDK_HOME};
+    delete $ENV{JDK_HOME};
+    my ($inc_dir) = grep { -d $_ } @INC;
+    my @r = oc(
+        '_java_source_archive_roots',
+        paths => $reg,
+        roots => [ $inc_dir, $wsdir ],
+    );
+    ok( !( grep { $_ eq $inc_dir } @r ), '@INC entry excluded from Java archive search roots' );
+    ok( ( grep { $_ eq $wsdir } @r ),    'non-@INC root is still retained' );
+}
 
 eval { oc('_candidate_java_source_archives') };
 like( $@, qr/Missing path registry/, '_candidate_java_source_archives requires paths' );
@@ -384,7 +585,7 @@ my $good_relative = catfile( 'com', 'example', 'Foo.java' );
     # An entry name that does not resolve to a member is skipped during extraction.
     my $jar = catfile( $home, 'src-jar.jar' );
     no warnings 'redefine';
-    local *Developer::Dashboard::CLI::OpenFile::_matching_java_archive_entries = sub { return ('missing/Absent.java') };
+    local *Developer::Dashboard::CLI::OpenFileJavaSource::_matching_java_archive_entries = sub { return ('missing/Absent.java') };
     my @z = oc( '_extract_java_sources_from_archive', paths => $reg, archive => $jar, relative => $good_relative );
     is_deeply( \@z, [], 'unresolvable archive entry names are skipped' );
 }
@@ -428,6 +629,52 @@ is_deeply( [ oc( '_java_archive_source_matches', paths => $reg, name => 'com.X.Y
         relative => $good_relative,
     );
     ok( @m, 'local source jar resolves the Java class without downloading' );
+}
+
+# ---------------------------------------------------------------------------
+# _java_archive_source_matches : network opt-in gate (DD-914)
+# ---------------------------------------------------------------------------
+{
+    # No local archive can satisfy this class, and online lookup is NOT
+    # requested (the online arg is simply omitted, matching how a caller
+    # that never passed --online would call this). Network must not be
+    # touched at all - fail loudly if it is.
+    local $ENV{JAVA_HOME};
+    delete $ENV{JAVA_HOME};
+    local $ENV{JDK_HOME};
+    delete $ENV{JDK_HOME};
+    no warnings 'redefine';
+    local *LWP::UserAgent::get = sub { die "network must not be reached without --online\n" };
+    my ( $out, $err, @m ) = capture {
+        oc(
+            '_java_archive_source_matches',
+            paths    => $reg,
+            roots    => [],
+            name     => 'com.example.NoLocalJar',
+            relative => $good_relative,
+        );
+    };
+    is_deeply( \@m, [], 'no matches when offline and no local archive exists' );
+    like( $err, qr/--online/, 'a notice naming --online is printed when network lookup is skipped' );
+}
+{
+    # Same missing-local-archive situation, but online => 1 is passed:
+    # existing network-lookup behavior must be preserved unchanged.
+    local $ENV{JAVA_HOME};
+    delete $ENV{JAVA_HOME};
+    local $ENV{JDK_HOME};
+    delete $ENV{JDK_HOME};
+    no warnings 'redefine';
+    local *LWP::UserAgent::get = sub { HTTP::Response->new( 200, 'OK', [], '{"response":{"docs":[]}}' ) };
+    my @m = oc(
+        '_java_archive_source_matches',
+        paths    => $reg,
+        roots    => [],
+        name     => 'com.example.NoLocalJar',
+        relative => $good_relative,
+        online   => 1,
+    );
+    is_deeply( \@m, [], 'online => 1 still reaches the (mocked) network search, finds nothing here' );
 }
 
 # ---------------------------------------------------------------------------
@@ -503,7 +750,7 @@ is_deeply( [ oc( '_download_java_source_matches', paths => $reg, name => 'com.X'
     write_jar( $good,  { 'com/example/Foo.java' => "class Foo {}\n" } );
     write_jar( $empty, { 'other/Bar.txt'        => "note\n" } );
 
-    local *Developer::Dashboard::CLI::OpenFile::_maven_search_documents = sub {
+    local *Developer::Dashboard::CLI::OpenFileJavaSource::_maven_search_documents = sub {
         return (
             'not-a-hash',
             {},
@@ -513,7 +760,7 @@ is_deeply( [ oc( '_download_java_source_matches', paths => $reg, name => 'com.X'
             { ec => ['-sources.jar'], g => 'g', a => 'good',  v => '1' },
         );
     };
-    local *Developer::Dashboard::CLI::OpenFile::_download_maven_source_jar = sub {
+    local *Developer::Dashboard::CLI::OpenFileJavaSource::_download_maven_source_jar = sub {
         my %args = @_;
         my $doc  = $args{doc};
         return undef  if $doc->{a} eq 'faildl';
@@ -533,6 +780,25 @@ spew( $realfile, "alpha\n" );
 
 eval { oc( '_resolve_open_file_matches', args => ['x'] ) };
 like( $@, qr/Missing path registry/, 'resolve requires a path registry' );
+
+{
+    # _resolve_open_file_matches must thread online => 1 all the way down to
+    # the network-lookup gate (DD-914), not just accept it as a no-op arg.
+    local $ENV{JAVA_HOME};
+    delete $ENV{JAVA_HOME};
+    local $ENV{JDK_HOME};
+    delete $ENV{JDK_HOME};
+    no warnings 'redefine';
+    local *LWP::UserAgent::get = sub { HTTP::Response->new( 200, 'OK', [], '{"response":{"docs":[]}}' ) };
+    my ( $line, @m ) = oc(
+        '_resolve_open_file_matches',
+        paths  => $reg,
+        args   => ['com.example.ThreadedOnline'],
+        online => 1,
+    );
+    is( $line, 0, 'online-threaded resolve returns a zero line when nothing is found' );
+    is_deeply( \@m, [], 'online-threaded resolve reaches the (mocked) network path and still finds nothing here' );
+}
 
 {
     my ( $line, @m ) = oc( '_resolve_open_file_matches', paths => $reg, args => ["$realfile:18"] );
@@ -613,6 +879,14 @@ like( $@, qr/Missing path registry/, 'resolve requires a path registry' );
 eval { run_open_file_command( paths => $reg ) };
 like( $@, qr/^Usage: open-file/, 'run rejects missing arguments' );
 
+# An unrecognized flag must fail loudly, not silently proceed with defaults.
+{
+    my $warn;
+    local $SIG{__WARN__} = sub { $warn .= $_[0] };
+    eval { run_open_file_command( paths => $reg, args => [ '--bogus-option', $realfile ] ) };
+    like( $@, qr/^Usage: open-file/, 'run rejects an unrecognized flag with the usage error' );
+}
+
 # No paths supplied exercises build_path_registry, print mode exits cleanly.
 {
     my $err;
@@ -673,6 +947,18 @@ like( $@, qr/^Usage: open-file/, 'run rejects missing arguments' );
     my $scandir = catdir( $home, 'scan_empty' );
     eval { run_open_file_command( paths => $reg, args => [ '--print', $scandir, 'nomatchzz' ] ) };
     like( $@, qr/^No files found/, 'run rejects unmatched searches' );
+}
+
+# A failed exec (bad editor binary) must not be silently swallowed - it has
+# to die with a clear message naming the failed command, never fall through
+# and let the caller exit 0 as though the editor actually ran (DD-910).
+{
+    eval { oc( '_command_exec', '/nonexistent-editor-binary-xyz', $realfile ) };
+    like(
+        $@,
+        qr{\QUnable to run editor '/nonexistent-editor-binary-xyz'\E},
+        '_command_exec dies naming the failed editor command'
+    );
 }
 
 # Leave the temp tree so File::Temp cleanup can remove it.

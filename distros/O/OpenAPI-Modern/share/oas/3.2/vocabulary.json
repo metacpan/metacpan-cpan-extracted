@@ -1,5 +1,5 @@
 {
-  "$id": "https://spec.openapis.org/oas/3.2/meta/2025-09-17",
+  "$id": "https://spec.openapis.org/oas/3.2/meta/2026-02-26",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "OAS Base Vocabulary",
   "description": "A JSON Schema Vocabulary used in the OpenAPI JSON Schema Dialect",
@@ -42,6 +42,9 @@
           "type": "string"
         }
       },
+      "required": [
+        "propertyName"
+      ],
       "type": "object",
       "unevaluatedProperties": false
     },

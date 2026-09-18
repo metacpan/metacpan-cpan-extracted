@@ -11,7 +11,8 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Test::More' => '0.94',
-                                      'Test::Pod' => '1.41'
+                                      'Test::Pod' => '1.41',
+                                      'strict' => '0'
                                     }
                     },
        'runtime' => {
@@ -22,7 +23,6 @@ do { my $x = {
                                       'base' => '0',
                                       'constant' => '0',
                                       'perl' => '5.012',
-                                      'strict' => '0',
                                       'warnings' => '0'
                                     }
                     },
@@ -33,7 +33,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0.96'
+                                   'Test::More' => '0.96',
+                                   'strict' => '0'
                                  }
                  }
      };

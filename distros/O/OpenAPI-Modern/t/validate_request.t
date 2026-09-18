@@ -2825,7 +2825,7 @@ paths:
 YAML
 
   $request = request('POST', 'http://example.com/foo',
-    [ 'Content-Type' => 'application/schema+json; schema=https://example.com/my_schema/v1' ],
+    [ 'Content-Type' => 'application/schema+json; schema="https://example.com/my_schema/v1"' ],
     '{"a":1,"c":3}');
   is_equal(
     $openapi->validate_request($request)->TO_JSON,
@@ -2844,7 +2844,7 @@ YAML
   );
 
   $request = request('POST', 'http://example.com/foo',
-    [ 'Content-Type' => 'application/schema+json; schema=https://example.com/my_schema/v1' ],
+    [ 'Content-Type' => 'application/schema+json; schema="https://example.com/my_schema/v1"' ],
     '{"a":1,"b":2,"c":3}');
   is_equal(
     $openapi->validate_request($request)->TO_JSON,
@@ -3419,36 +3419,29 @@ paths:
           $ref: 'http://example.com/otherapi#/components/schemas/i_do_not_exist'
 YAML
 
-  my $request = request('GET', 'http://example.com/foo', [ SingleValue => '  mystring  ' ]);
+  my $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsRawString => 'one , two  , three' ]);
   is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
-    'a single header value has its leading and trailing whitespace stripped',
-  );
-
-  $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsRawString => '  one , two  , three  ' ]);
-  is_equal(
-    $openapi->validate_request($request)->TO_JSON,
-    { valid => true },
-    'multiple values in a single header are validated as a string, with only leading and trailing whitespace stripped',
+    'multiple values in a single header are validated as a string',
   );
 
   {
   my $todo = todo 'HTTP::Message::to_psgi fetches all headers as a single concatenated string'
     if elem($::TYPE, [qw(plack catalyst dancer2)]);
   $request = request('GET', 'http://example.com/foo', [
-      MultipleValuesAsString => '  one ',
-      MultipleValuesAsString => ' two  ',
-      MultipleValuesAsString => 'three  ',
+      MultipleValuesAsString => 'one',
+      MultipleValuesAsString => 'two',
+      MultipleValuesAsString => 'three',
     ]);
   is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
-    'multiple headers on separate lines are validated as a string, with leading and trailing whitespace stripped',
+    'multiple headers on separate lines are validated as a string',
   );
   }
 
-  $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsArray => '  one, two, three  ' ]);
+  $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsArray => 'one,  two, three' ]);
   is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
@@ -3459,9 +3452,9 @@ YAML
   my $todo = todo 'HTTP::Message::to_psgi fetches all headers as a single concatenated string'
     if elem($::TYPE, [qw(plack catalyst dancer2)]);
   $request = request('GET', 'http://example.com/foo', [
-    MultipleValuesAsArray => '  one',
-    MultipleValuesAsArray => ' one ',
-    MultipleValuesAsArray => ' three ',
+    MultipleValuesAsArray => 'one',
+    MultipleValuesAsArray => 'one',
+    MultipleValuesAsArray => 'three',
   ]);
   is_equal(
     $openapi->validate_request($request)->TO_JSON,
@@ -3485,10 +3478,10 @@ YAML
   my $todo = todo 'HTTP::Message::to_psgi fetches all headers as a single concatenated string'
     if elem($::TYPE, [qw(plack catalyst dancer2)]);
   $request = request('GET', 'http://example.com/foo', [
-      MultipleValuesAsObjectExplodeFalse => ' R, 100 ',
-      MultipleValuesAsObjectExplodeFalse => ' B, 150,  G , 200 ',
-      MultipleValuesAsObjectExplodeTrue => ' R=100  , B=150 ',
-      MultipleValuesAsObjectExplodeTrue => '  G=200 ',
+      MultipleValuesAsObjectExplodeFalse => 'R, 100',
+      MultipleValuesAsObjectExplodeFalse => 'B, 150,  G , 200',
+      MultipleValuesAsObjectExplodeTrue => 'R=100  , B=150',
+      MultipleValuesAsObjectExplodeTrue => 'G=200',
     ]);
   is_equal(
     $openapi->validate_request($request)->TO_JSON,

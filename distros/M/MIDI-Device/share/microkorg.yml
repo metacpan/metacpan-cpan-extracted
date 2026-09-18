@@ -1,0 +1,101 @@
+name: "microKORG"
+manufacturer: "Korg"
+port:
+    in: "generic"
+    out: "generic"
+note_on:
+    min: 0
+    max: 127
+control_change:
+  - number: 1
+    name: "Modulation Depth (MOD Wheel)"
+  - number: 7
+    name: "Volume (AMP Level)"
+  - number: 10
+    name: "Panpot (AMP Panpot)"
+  - number: 5
+    name: "Portamento"
+  - number: 12
+    name: "MOD FX LFO Speed"
+  - number: 13
+    name: "DELAY Time"
+  - number: 14
+    name: "OSC 1 Control 1"
+  - number: 15
+    name: "OSC 1 Control 2"
+  - number: 18
+    name: "OSC 2 Semitone / Vocoder HPF Level"
+  - number: 19
+    name: "OSC 2 Tune / Vocoder Threshold"
+  - number: 20
+    name: "MIXER OSC 1 Level"
+  - number: 21
+    name: "MIXER OSC 2 Level / Vocoder Inst Level"
+  - number: 22
+    name: "MIXER Noise Level"
+  - number: 23
+    name: "FILTER EG Attack"
+  - number: 24
+    name: "FILTER EG Decay"
+  - number: 25
+    name: "FILTER EG Sustain"
+  - number: 26
+    name: "FILTER EG Release"
+  - number: 27
+    name: "LFO 1 Frequency"
+  - number: 28
+    name: "Virtual PATCH 1 Intensity"
+  - number: 29
+    name: "Virtual PATCH 2 Intensity"
+  - number: 30
+    name: "Virtual PATCH 3 Intensity"
+  - number: 31
+    name: "Virtual PATCH 4 Intensity"
+  - number: 70
+    name: "AMP EG Sustain"
+  - number: 71
+    name: "FILTER Resonance"
+  - number: 72
+    name: "AMP EG Release"
+  - number: 73
+    name: "AMP EG Attack"
+  - number: 74
+    name: "FILTER Cutoff"
+  - number: 75
+    name: "AMP EG Decay"
+  - number: 76
+    name: "LFO 2 Frequency"
+  - number: 77
+    name: "OSC 1 Waveform"
+  - number: 78
+    name: "OSC 2 Waveform"
+  - number: 79
+    name: "FILTER EG Intensity / Vocoder Mod Intensity"
+  - number: 82
+    name: "OSC Modulation (OFF, Ring, Sync, RingSync)"
+  - number: 83
+    name: "FILTER Type / Vocoder Formant Shift"
+  - number: 85
+    name: "FILTER Keyboard Track / Vocoder Envelope Follower Sensitivity"
+  - number: 87
+    name: "LFO 1 Waveform"
+  - number: 88
+    name: "LFO 2 Waveform"
+  - number: 90
+    name: "Sync Control"
+  - number: 92
+    name: "AMP Distortion"
+  - number: 93
+    name: "MOD FX Depth"
+  - number: 94
+    name: "DELAY Depth"
+  - number: 95
+    name: "Timbre Select"
+  - number: 6
+    name: "Data Entry MSB"
+  - number: 98
+    name: "NRPN LSB"
+  - number: 99
+    name: "NRPN MSB"
+  - number: 121
+    name: "Reset All Controllers"

@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-09-10T00:00:00.000Z",
+  "count": 6,
+  "maxAgeMin": 30,
+  "proxies": [
+    {"protocol":"http","host":"8.8.8.8","port":8080,"externalIp":"8.8.8.8","geoCountry":"US","geoRegion":"California","geoCity":"Mountain View","geoTimezone":"America/Los_Angeles","asn":"AS15169","asnOrgName":"Google LLC","anonymity":"elite","https":true,"responseTimeMs":120.4,"responseTimeMedianMs":110.5,"uptime24h":99.5,"uptime7d":98.2,"checks7d":72,"sourcesCount":3,"createdAt":"2026-09-01T00:00:00.000Z","pingAt":"2026-09-09T23:50:00.000Z"},
+    {"protocol":"socks5","host":"1.1.1.1","port":1080,"externalIp":null,"geoCountry":"AU","geoRegion":null,"geoCity":null,"geoTimezone":null,"asn":13335,"asnOrgName":"Cloudflare","anonymity":"anonymous","https":null,"responseTimeMs":300,"responseTimeMedianMs":280,"uptime24h":90,"uptime7d":55,"checks7d":80,"sourcesCount":1,"createdAt":"2026-09-02T00:00:00.000Z","pingAt":"2026-09-09T23:45:00.000Z"},
+    {"protocol":"socks4","host":"45.33.12.7","port":4145,"externalIp":"45.33.12.7","geoCountry":"DE","geoRegion":"Hesse","geoCity":"Frankfurt","geoTimezone":"Europe/Berlin","asn":"AS8560","asnOrgName":"IONOS SE","anonymity":"transparent","https":false,"responseTimeMs":210.9,"responseTimeMedianMs":199.1,"uptime24h":85.4,"uptime7d":40.0,"checks7d":12,"sourcesCount":2,"createdAt":"2026-08-20T00:00:00.000Z","pingAt":"2026-09-09T23:40:00.000Z"},
+    {"protocol":"http","host":"203.0.114.9","port":3128,"externalIp":"203.0.114.9","geoCountry":"jp","geoRegion":"Tokyo","geoCity":null,"geoTimezone":"Asia/Tokyo","asn":"AS2516","asnOrgName":"KDDI","anonymity":"anonymous","https":true,"responseTimeMs":null,"responseTimeMedianMs":null,"uptime24h":72.1,"uptime7d":60.0,"checks7d":55,"sourcesCount":1,"createdAt":"2026-08-15T00:00:00.000Z","pingAt":"2026-09-09T23:55:00.000Z"},
+    {"protocol":"socks5","host":"185.199.108.40","port":1081,"externalIp":"185.199.108.40","geoCountry":"gb","geoRegion":"London","geoCity":"London","geoTimezone":"Europe/London","asn":54113,"asnOrgName":"Fastly","anonymity":"elite","https":true,"responseTimeMs":88.6,"responseTimeMedianMs":80.2,"uptime24h":97.0,"uptime7d":95.5,"checks7d":64,"sourcesCount":4,"createdAt":"2026-07-01T00:00:00.000Z","pingAt":"2026-09-09T23:58:00.000Z"},
+    {"protocol":"http","host":"104.21.4.3","port":80,"externalIp":null,"geoCountry":"us","geoRegion":"Texas","geoCity":"Dallas","geoTimezone":"America/Chicago","asn":"AS13335","asnOrgName":"Cloudflare","anonymity":"unknown","https":false,"responseTimeMs":455.2,"responseTimeMedianMs":440.0,"uptime24h":50.0,"uptime7d":20.0,"checks7d":30,"sourcesCount":1,"createdAt":"2026-09-05T00:00:00.000Z","pingAt":"2026-09-09T23:35:00.000Z"}
+  ]
+}

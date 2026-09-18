@@ -3,7 +3,7 @@
 
 class UV {
   
-  version "0.001";
+  version "0.003";
   
   use Resource::UV;
   use UV::Resource::UV;

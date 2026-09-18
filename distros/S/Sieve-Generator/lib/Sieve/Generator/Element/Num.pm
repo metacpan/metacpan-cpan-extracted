@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Element::Num 0.003;
+package Sieve::Generator::Element::Num 0.004;
 # ABSTRACT: a Sieve numeric literal
 
 use Moo;
@@ -65,7 +65,7 @@ Sieve::Generator::Element::Num - a Sieve numeric literal
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -94,7 +94,7 @@ is appended.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

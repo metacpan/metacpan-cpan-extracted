@@ -11,6 +11,28 @@ my $pod = 'lib/Gzip/Faster.pod';
 my $github = 'github.com/benkasminbullock/gzip-faster';
 my $repo = "https://$github";
 
+# Stop the spew of errors if using Clang (FreeBSD) but don't add the
+# options if not.
+
+# On some Windows with what I assume are ageing gccs the -Wno
+# .. things cause compilation failures as seen here:
+
+# https://matrix.perl-magpie.org/results/7f0e1e90-6cc8-1014-ae5c-7ea4b03d33c9
+
+my $is_clang = ($Config{cc} =~ /clang/i) || 
+               ($Config{ccversion} && $Config{ccversion} =~ /clang/i);
+# On FreeBSD $Config{cc} returns "cc".
+if ($Config{cc} eq 'cc') {
+    my $ccversion = `$Config{cc} --version`;
+    if ($ccversion =~ /clang/) {
+	$is_clang = 1;
+    }
+}
+my $cc_flags = $Config{ccflags};
+if ($is_clang) {
+    $cc_flags = $cc_flags . ' -Wno-compound-token-split-by-macro -Wno-macro-redefined ';
+}
+
 WriteMakefile (
     NAME => 'Gzip::Faster',
     VERSION_FROM => $pm,
@@ -37,11 +59,13 @@ WriteMakefile (
 	x_contributors => [
 	    'Aristotle Pagaltzis <aristotle@cpan.org>',
 	    'zgrim <zgrim@cpan.org>',
+	    'vividsnow',
 	],
     },
     MIN_PERL_VERSION => '5.008001',
     OBJECT => 'Faster.o',
     LIBS => '-lz',
+    CCFLAGS => $cc_flags,
 #    OPTIMIZE => '-Wall -g -O',
 );
 

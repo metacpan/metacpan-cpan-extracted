@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Config ();
 use Developer::Dashboard::DirEntries qw(sorted_dir_entries);
@@ -88,7 +88,7 @@ sub dispatch {
     return {
         stdout    => $hook_stdout . $stdout,
         stderr    => $hook_stderr . $stderr,
-        exit_code => $exit,
+        exit_code => $exit >> 8,
         hooks     => $hook_result->{hooks},
     };
 }
@@ -196,7 +196,7 @@ sub execute_hooks {
             $results{$result_key} = {
                 stdout    => $stdout,
                 stderr    => $stderr,
-                exit_code => $exit,
+                exit_code => $exit >> 8,
             };
             $last_result = {
                 file   => $hook_path,

@@ -50,11 +50,13 @@ Use this file when changing docker helper CLI arguments or the handoff into the 
 =head1 HOW TO USE
 
 Users run C<dashboard docker compose ...>, C<dashboard docker list>, C<dashboard
-docker enable E<lt>serviceE<gt>>, or C<dashboard docker disable
-E<lt>serviceE<gt>>. The staged helper forwards the request into the private
-runtime, which either resolves and C<exec>s the final Docker command, reports
-the effective enabled or disabled state of isolated services, or creates or
-removes the deepest-layer C<disabled.yml> marker for one isolated service.
+docker enable E<lt>serviceE<gt> [service...]>, or C<dashboard docker disable
+E<lt>serviceE<gt> [service...]>. The staged helper forwards the request into the
+private runtime, which either resolves and C<exec>s the final Docker command,
+reports the effective enabled or disabled state of isolated services, or creates
+or removes the deepest-layer C<disabled.yml> marker for one or more isolated
+services in a single invocation - a bad name among good ones does not stop the
+others from being toggled, and is reported per service.
 
 =head1 WHAT USES IT
 
@@ -79,8 +81,10 @@ Example 3:
 
   dashboard docker disable green
   dashboard docker enable green
+  dashboard docker disable green blue purple
+  dashboard docker enable green blue purple
 
-Toggle one isolated service without manually creating or deleting the
+Toggle one or more isolated services without manually creating or deleting the
 F<disabled.yml> marker file.
 
 Example 4:

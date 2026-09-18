@@ -124,6 +124,42 @@ if ($pid == 0) {
                          . "writes=$s[3] fulls=$s[4]" ] ];
             }
 
+            # A 101 from a SYNCHRONOUS handler: the connection becomes a
+            # tunnel whose bytes belong to the handle both ways, and the
+            # triplet returned here is the sentinel the server discards.
+            # What a WebSocket over TLS needs, since detach refuses TLS.
+            if ($p eq '/tunnel') {
+                Hyperman::_abi_stream_open($env, 101,
+                    [ 'Upgrade' => 'echo', 'Connection' => 'Upgrade' ])
+                    or return [ 500, [ 'Content-Type' => 'text/plain' ],
+                                ['no tunnel'] ];
+                Hyperman::_abi_stream_read();
+                Hyperman::_abi_stream_write("hello;");
+                return [ 101, [], [] ];
+            }
+
+            # The same from a deferred response, which is the shape every
+            # other status already needs.
+            if ($p eq '/tunnel-deferred') {
+                return sub {
+                    Hyperman::_abi_stream_open($env, 101,
+                        [ 'Upgrade' => 'echo', 'Connection' => 'Upgrade' ])
+                        or return;
+                    Hyperman::_abi_stream_read();
+                    Hyperman::_abi_stream_write("deferred;");
+                };
+            }
+
+            if ($p eq '/tunnel-rx') {
+                my ($n, $len, $bytes) = Hyperman::_abi_stream_rx();
+                return [ 200, [ 'Content-Type' => 'text/plain' ], [$bytes] ];
+            }
+
+            if ($p eq '/tunnel-close') {
+                my $r = Hyperman::_abi_stream_close();
+                return [ 200, [ 'Content-Type' => 'text/plain' ], ["close=$r"] ];
+            }
+
             return [ 200, [ 'Content-Type' => 'text/plain' ], ["ok:$p"] ];
         },
         host    => '127.0.0.1',
@@ -211,6 +247,61 @@ sub state_now {
 state_now();
 is($st{open},   0, 'no handle is left open after a clean close');
 is($st{aborts}, 0, 'a clean close does not report an abort');
+
+# ---- a 101 tunnel on HTTP/1.1: the seam carries an upgrade both ways -----
+#
+# What a WebSocket over TLS needs and conn_detach cannot give it: a handle
+# opened with a 101 from a SYNCHRONOUS handler, no Connection: close on it,
+# the handler's return value dropped as the sentinel it is, and the bytes the
+# peer sends afterwards reaching the read half instead of the request parser.
+
+# Read until the pattern matches, or EOF, or the timeout; undef pattern reads
+# to EOF.
+sub read_until {
+    my ($s, $re, $timeout) = @_;
+    require IO::Select;
+    my $sel = IO::Select->new($s);
+    my $got = '';
+    my $deadline = Time::HiRes::time() + $timeout;
+    while (!defined $re || $got !~ $re) {
+        my $left = $deadline - Time::HiRes::time();
+        last if $left <= 0 || !$sel->can_read($left);
+        my $n = sysread($s, my $b, 4096);
+        last unless $n;
+        $got .= $b;
+    }
+    return $got;
+}
+
+for my $case (['/tunnel', 'hello;', 'a synchronous handler'],
+              ['/tunnel-deferred', 'deferred;', 'a deferred response']) {
+    my ($path, $first, $how) = @$case;
+    my $t = connect_h1();
+    ok($t, "connected for the tunnel from $how");
+    # "early;" rides in with the request. RFC 6455 forbids a client doing
+    # that before the 101, but the bytes are the handle's either way and
+    # must reach it rather than be parsed as a request that never comes.
+    syswrite $t, "GET $path HTTP/1.1\r\nHost: 127.0.0.1\r\n"
+               . "Upgrade: echo\r\nConnection: Upgrade\r\n\r\nearly;";
+    my $got = read_until($t, qr/\Q$first\E/, 5);
+    my ($head, $body) = split /\r\n\r\n/, $got, 2;
+    like($head || '', qr{^HTTP/1\.1 101 }, "a 101 went out from $how");
+    like($head || '', qr/^Upgrade: echo\r?$/mi, 'with the headers it was given');
+    unlike($head || '', qr/Connection: close/i,
+           'and without the Connection: close a body stream gets');
+    is($body, $first, 'the first write followed the headers raw, unframed');
+    syswrite $t, 'ping-from-client';
+    Time::HiRes::sleep(0.2);
+    is(body_h1('/tunnel-rx'), 'early;ping-from-client',
+       'bytes sent with the request and bytes sent afterwards both reached '
+     . 'the read half, in order');
+    is(body_h1('/tunnel-close'), 'close=0', 'stream_close on the tunnel handle');
+    is(read_until($t, undef, 3), '',
+       'closing the handle closed the connection, with nothing after the body');
+    close $t;
+    state_now();
+    is($st{open}, 0, 'no handle is left open after the tunnel closed');
+}
 
 # ---- abort on HTTP/1.1: a reset, because a clean close cannot say it ------
 #

@@ -1,0 +1,36 @@
+---
+abstract: "Client for Litport's free proxy snapshot API"
+author:
+  - 'Litport <litport@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Litportnet-FreeProxy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '1.42'
+  JSON::PP: '0'
+  Net::SSLeay: '1.49'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Time::Local: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/litportnet/free-proxy-sdk/issues
+  homepage: https://litport.net/free-proxy
+  repository: https://github.com/litportnet/free-proxy-sdk.git
+version: '0.001'
+x_documentation: https://litport.net/docs/free-proxy-api
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,7 +5,7 @@
 Developer::Dashboard - a local home for development work
 
 # VERSION
-4.31
+4.45
 
 # INTRODUCTION
 
@@ -481,8 +481,9 @@ generic package names.
 
 - Data Query Commands
 
-    `dashboard jq`, `dashboard yq`, `dashboard tomq`, and `dashboard propq`
-    parse JSON, YAML, TOML, and Java properties input, then optionally extract a
+    `dashboard jq`, `dashboard yq`, `dashboard tomq`, `dashboard propq`,
+    `dashboard iniq`, `dashboard csvq`, and `dashboard xmlq` parse JSON, YAML,
+    TOML, Java properties, INI, CSV, and XML input, then optionally extract a
     dotted path and print a scalar or canonical JSON, giving the CLI a small
     data-inspection toolkit that fits naturally into shell workflows.
     `dashboard tomq` inflates TOML booleans into plain Perl `1` and `0`
@@ -493,7 +494,7 @@ generic package names.
 
     Private `~/.developer-dashboard/cli/dd/` helper files provide the built-in
     command behaviour without installing generic command names into the global
-    PATH. Query, open-file, workspace, path, file, and prompt commands keep
+    PATH. Query, open-file, workspace, path, file, and `ps1` commands keep
     dedicated helper bodies, while the remaining built-ins stage thin wrappers
     that hand off to a shared private `_dashboard-core` runtime.
 
@@ -539,9 +540,13 @@ generic package names.
 
 - Update Manager
 
-    `Developer::Dashboard::UpdateManager` runs ordered update scripts and
-    restarts validated collector loops when needed, giving the runtime a
-    controlled bootstrap and upgrade path.
+    `Developer::Dashboard::UpdateManager` implements ordered update-script
+    execution and validated-collector-loop restart, and carries its own unit
+    test suite - but it is not currently wired into `bin/dashboard` or any
+    `share/private-cli/` command. Nothing in the shipped CLI switchboard calls
+    it today, so no update scripts run and no collector loops restart through
+    this path in the running product; it exists as tested groundwork for a
+    bootstrap/upgrade command that is not yet cut over.
 
 - Docker Compose Resolver
 
@@ -978,6 +983,9 @@ dotted path or evaluate a Perl expression against the decoded document through
 - `dashboard yq [path] [file]` for YAML
 - `dashboard tomq [path] [file]` for TOML
 - `dashboard propq [path] [file]` for Java properties
+- `dashboard iniq [path] [file]` for INI
+- `dashboard csvq [path] [file]` for CSV
+- `dashboard xmlq [path] [file]` for XML
 
 If the selected value is a hash or array, the command prints canonical JSON.
 If the selected value is a scalar, it prints the scalar plus a trailing

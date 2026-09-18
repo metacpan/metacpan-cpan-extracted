@@ -1,8 +1,6 @@
 package WWW::Picnic::Result::Cart;
-our $VERSION = '0.100';
-our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Picnic shopping cart / order
-
+our $VERSION = '0.101';
 use Moo;
 
 extends 'WWW::Picnic::Result';
@@ -92,7 +90,7 @@ WWW::Picnic::Result::Cart - Picnic shopping cart / order
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -157,10 +155,6 @@ Arrayref of deposit charges (bottles, crates, etc.).
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-www-picnic/issues>.
 
-=head2 IRC
-
-You can reach Getty on C<irc.perl.org> for questions and support.
-
 =head1 CONTRIBUTING
 
 Contributions are welcome! Please fork the repository and submit a pull request.
@@ -171,7 +165,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -129,6 +129,34 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             this.add(action);
         },
 
+        /**
+         * Apply a field's actionSet to the action buttons.
+         *
+         * The label and its friends arrive from the backend as trm() objects
+         * and have to go through xtr() before qooxdoo sees them -- exactly
+         * what Table.js does for a row actionSet. Applying them raw rendered
+         * the untranslated msgid, which is why a form button that changes its
+         * own label had to be avoided until now.
+         *
+         * @param buttonMap {Map} the action buttons by key
+         * @param actionSet {Map} properties to apply, by button key
+         */
+        _applyActionSet: function(buttonMap, actionSet){
+            for (var key in actionSet) {
+                if (!buttonMap[key]) {
+                    console.warn('No buttonMap for key=', key);
+                    continue;
+                }
+                var as = actionSet[key];
+                ['label','menuLabel','toolTipText'].forEach(function(prop){
+                    if (as[prop]) {
+                        as[prop] = this.xtr(as[prop]);
+                    }
+                }, this);
+                buttonMap[key].set(as);
+            }
+        },
+
         _addValidation: function(){
             var rpc = callbackery.data.Server.getInstance();
             var cfg = this._cfg;
@@ -137,14 +165,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             var buttonMap = this._action.getButtonMap();
             cfg.form.forEach(function(s){
                 if (s.actionSet) {
-                    for (var key in s.actionSet) {
-                        if (buttonMap[key]) {
-                            buttonMap[key].set(s.actionSet[key]);
-                        }
-                        else {
-                            console.warn('No buttonMap for key=', key);
-                        }
-                    }
+                    that._applyActionSet(buttonMap, s.actionSet);
                 }
 
                 if (!s.key){
@@ -242,14 +263,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             var buttonMap = this._action.getButtonMap();
             formCfg.forEach(function(s){
                 if (s.actionSet) {
-                    for (var key in s.actionSet) {
-                        if (buttonMap[key]) {
-                            buttonMap[key].set(s.actionSet[key]);
-                        }
-                        else {
-                            console.warn('No buttonMap for key=', key);
-                        }
-                    }
+                    this._applyActionSet(buttonMap, s.actionSet);
                 }
                 if (!s.key){
                     return;
@@ -275,7 +289,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     if ('modelSelection' in s.set){
                         delete s.set.modelSelection; // do NOT change the modelSelection of anything.
                     }
-                    ['placeholder','tooltip','label'].forEach(function(key){
+                    ['placeholder','tooltip','toolTipText','label'].forEach(function(key){
                          if (key in s.set){
                             s.set[key] = this.xtr(s.set[key]);
                         }

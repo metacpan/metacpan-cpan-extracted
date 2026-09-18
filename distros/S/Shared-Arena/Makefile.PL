@@ -143,14 +143,14 @@ my %WriteMakefileArgs = (
         'ExtUtils::CBuilder'  => '0',
         'ExtUtils::Depends'   => '0.404',
         'Frozen'              => '0.07',
-        'Struct::Codec'       => '0.02',
+        'Struct::Codec'       => '0.03',
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',
     },
     PREREQ_PM => {
         'Frozen'        => '0.07',
-        'Struct::Codec' => '0.02',
+        'Struct::Codec' => '0.03',
     },
     XS     => { 'Arena.xs' => 'Arena.c' },
     OBJECT => 'Arena$(OBJ_EXT)',

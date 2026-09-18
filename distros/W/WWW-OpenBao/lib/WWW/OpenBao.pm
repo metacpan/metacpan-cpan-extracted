@@ -1,6 +1,6 @@
 package WWW::OpenBao;
 # ABSTRACT: HTTP client for OpenBao / HashiCorp Vault API
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 use HTTP::Tiny;
 use JSON::MaybeXS;
@@ -44,6 +44,16 @@ sub read_secret {
   return $resp->{data}{data};
 }
 
+# KV v2: read the metadata (version / created_time / destroyed / ...) that
+# rides along the same data/ read. Separate entry point on purpose so
+# read_secret keeps returning the bare data.data hashref consumers depend on.
+sub read_secret_metadata {
+  my ($self, $path) = @_;
+  my $resp = $self->_request('GET', $self->_kv_path($path));
+  return undef unless $resp;
+  return $resp->{data}{metadata};
+}
+
 # KV v2: write secret data
 sub write_secret {
   my ($self, $path, $data) = @_;
@@ -64,11 +74,13 @@ sub list_secrets {
   return $resp->{data}{keys} // [];
 }
 
-# KV v2: check if secret exists without fetching data
+# KV v2: check if secret exists without fetching data. Only a 404 (absent
+# path) is a soft "no"; a 403 (policy forbids a path that may well exist) and
+# any other non-2xx propagate via _request's croak, so callers can tell
+# "not allowed to see" apart from "not there".
 sub secret_exists {
   my ($self, $path) = @_;
-  my $resp = eval { $self->_request('GET', $self->_kv_metadata_path($path)) };
-  return defined $resp;
+  return defined $self->_request('GET', $self->_kv_metadata_path($path));
 }
 
 # Auth: Kubernetes ServiceAccount login
@@ -132,7 +144,7 @@ WWW::OpenBao - HTTP client for OpenBao / HashiCorp Vault API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -146,6 +158,7 @@ version 0.001
 
   $bao->write_secret('app/db', { user => 'app', pass => 'hunter2' });
   my $creds = $bao->read_secret('app/db');
+  my $meta  = $bao->read_secret_metadata('app/db');  # version, created_time, ...
   my $keys  = $bao->list_secrets('app/');
   $bao->delete_secret('app/db');
 
@@ -163,9 +176,10 @@ It is intentionally small — no caching, no lease renewal, no policy
 management. If you need those, reach for a heavier client; if you just want
 to talk to Vault/OpenBao from Perl, this is enough.
 
-All methods C<croak> on non-2xx responses, with the single exception of
-C<read_secret> which returns C<undef> on 404 so callers can treat "secret not
-found" as a soft miss.
+Most methods C<croak> on non-2xx responses. The deliberate exception is a
+C<404>, treated as a soft miss: C<read_secret> and C<read_secret_metadata>
+return C<undef>, C<list_secrets> an empty arrayref, and C<secret_exists> false.
+Every other non-2xx croaks.
 
 =head2 endpoint
 
@@ -186,6 +200,16 @@ Mount path of the KV v2 engine. Defaults to C<secret>.
 Returns the C<data.data> hashref for a KV v2 secret, or C<undef> if the path
 does not exist.
 
+=head2 read_secret_metadata($path)
+
+Returns the C<data.metadata> hashref that KV v2 returns alongside the value on
+the same C<GET .../data/...> read — the C<version> number, C<created_time>,
+C<destroyed> flag and C<custom_metadata> — or C<undef> if the path does not
+exist. This is a separate entry point on purpose: L</read_secret> keeps
+returning the bare C<data.data> hashref, so callers that only want the values
+are unaffected. Note it reads the C<data/> endpoint (the metadata that
+accompanies a value read), not the C<metadata/> version-history endpoint.
+
 =head2 write_secret($path, \%data)
 
 Writes (creates a new version of) a KV v2 secret. Returns the decoded
@@ -203,8 +227,8 @@ if the path is missing.
 
 =head2 secret_exists($path)
 
-True if metadata exists for the given path, false otherwise. Does not fetch
-the secret data.
+True if the given path exists, false if it does not. Does not fetch the secret
+data.
 
 =head2 login_k8s(role => $role, jwt => $jwt)
 
@@ -248,11 +272,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -74,7 +74,7 @@ dies_with($HDR . "\x3F",     qr/unknown tag/, 'and the last reserved one');
 
 # ---- a wide float's decimal digits ------------------------------------------------
 # 0x38 carries a varint length and that many bytes of decimal. The decoder copies
-# them to a fixed stack buffer to get the NUL that Atof needs, so a length past
+# them to a fixed stack buffer to get the NUL the parser needs, so a length past
 # that buffer has to be refused before the copy and not clamped to fit it.
 dies_with($HDR . "\x38\x40" . ('9' x 0x40), qr/float too long/, 'a float decimal past the buffer');
 dies_with($HDR . "\x38\xFF\x7F", qr/float too long/, 'and an absurd length');

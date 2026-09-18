@@ -1553,6 +1553,29 @@ my $docker_enable = _run("$perl -I'$lib' '$dashboard' docker enable green");
 like( $docker_enable, qr/"service"\s*:\s*"green"/, 'dashboard docker enable reports the toggled service name' );
 like( $docker_enable, qr/"disabled"\s*:\s*0/, 'dashboard docker enable reports the service as enabled' );
 ok( !-f File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ), 'dashboard docker enable removes the disabled marker from the home docker root' );
+
+# DD-919: multiple service names in one invocation.
+my $docker_disable_multi = _run("$perl -I'$lib' '$dashboard' docker disable green blue");
+like( $docker_disable_multi, qr/"service"\s*:\s*"green"/, 'dashboard docker disable with multiple names reports the first toggled service' );
+like( $docker_disable_multi, qr/"service"\s*:\s*"blue"/,  'dashboard docker disable with multiple names reports the second toggled service' );
+ok( -f File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ), 'dashboard docker disable with multiple names disables the first service' );
+ok( -f File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'blue',  'disabled.yml' ), 'dashboard docker disable with multiple names disables the second service' );
+my $docker_enable_multi = _run("$perl -I'$lib' '$dashboard' docker enable green blue");
+like( $docker_enable_multi, qr/"service"\s*:\s*"green"/, 'dashboard docker enable with multiple names reports the first toggled service' );
+like( $docker_enable_multi, qr/"service"\s*:\s*"blue"/,  'dashboard docker enable with multiple names reports the second toggled service' );
+ok( !-f File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ), 'dashboard docker enable with multiple names enables the first service' );
+ok( !-f File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'blue',  'disabled.yml' ), 'dashboard docker enable with multiple names enables the second service' );
+my ( $docker_partial_stdout, $docker_partial_stderr, $docker_partial_exit ) = capture {
+    system 'sh', '-c', "$perl -I'$lib' '$dashboard' docker disable green ../escape";
+    return $? >> 8;
+};
+my $docker_disable_partial = decode( 'UTF-8', $docker_partial_stdout . $docker_partial_stderr );
+ok( $docker_partial_exit != 0, 'dashboard docker disable with a bad name among good ones exits non-zero' );
+like( $docker_disable_partial, qr/"service"\s*:\s*"green"/, 'dashboard docker disable with a bad name among good ones still reports the good one' );
+like( $docker_disable_partial, qr/escape/, 'dashboard docker disable with a bad name among good ones reports an error for the bad one' );
+ok( -f File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ), 'dashboard docker disable with a bad name among good ones still disables the good one' );
+_run("$perl -I'$lib' '$dashboard' docker enable green");
+ok( !-f File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ), 'green is re-enabled after the partial-failure test so later assertions see its expected default state' );
 my $docker_blue_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'blue' );
 make_path($docker_blue_root);
 open my $docker_blue_fh, '>', File::Spec->catfile( $docker_blue_root, 'compose.yml' )

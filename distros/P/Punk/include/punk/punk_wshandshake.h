@@ -399,6 +399,47 @@ static SV *punk_ws_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
         return pw_empty(aTHX_ 200);
     }
 
+    /* HTTP/1.1 over TLS: the socket cannot be handed over, because the TLS
+     * session's state belongs to the server and conn_detach refuses it (-3).
+     * The upgrade rides a 101 stream handle instead - the same seam the
+     * Extended CONNECT path uses, opened with the 101 and its handshake
+     * headers rather than a 200, so the RFC 6455 codec above it is again
+     * the same one. Plaintext HTTP/1.1 detaches below: the fd handoff is
+     * cheaper and there is no session to strand. Needs Hyperman 0.48+, whose
+     * stream handle turns a 101 into a tunnel; an older one returns no handle
+     * here and the request falls through to the detach that has always
+     * refused it. */
+    {
+        STRLEN hl;
+        const char *https = pw_env(aTHX_ envh, "HTTPS", &hl);
+        if (https && hl) {
+            const hm_abi *A = NULL;
+            void *loop = NULL, *h = NULL;
+            AV *hdrs = newAV();
+            av_push(hdrs, newSVpvs("Upgrade"));
+            av_push(hdrs, newSVpvs("websocket"));
+            av_push(hdrs, newSVpvs("Connection"));
+            av_push(hdrs, newSVpvs("Upgrade"));
+            av_push(hdrs, newSVpvs("Sec-WebSocket-Accept"));
+            av_push(hdrs, newSVpv(accept, 0));
+            if (protocol) {
+                av_push(hdrs, newSVpvs("Sec-WebSocket-Protocol"));
+                av_push(hdrs, newSVsv(protocol));
+            }
+            h = punk_hm_stream_open(aTHX_ envh, &A, &loop, 101, hdrs);
+            SvREFCNT_dec((SV *)hdrs);
+            if (h) {
+                SV *ws, *argv[2];
+                argv[0] = sv_2mortal(newSViv(PTR2IV(h)));
+                argv[1] = attach_rv;
+                ws = pw_class_call(aTHX_ "_attach_stream", argv, 2);
+                pw_run_handler(aTHX_ code, c, ws ? ws : &PL_sv_undef);
+                if (ws) SvREFCNT_dec(ws);
+                return pw_empty(aTHX_ 101);
+            }
+        }
+    }
+
     /* Hyperman: detach the socket and drive it on the worker loop. */
     x = hv_fetchs(envh, "psgix.hyperman.conn", 0);
     if (x && *x && SvTRUE(*x)) {

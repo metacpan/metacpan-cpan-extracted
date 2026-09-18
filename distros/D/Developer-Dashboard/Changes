@@ -1,3 +1,193 @@
+4.45  2026-09-18
+
+  - DD-942: closed Ask.pm's pre-existing branch/condition coverage gap
+    (confirmed present before DD-938 touched the file: 99.2/89.4/77.7/100.0
+    stmt/branch/cond/sub). Added 52 new regression subtests to t/48-ask.t,
+    calling private helpers directly via $M->can() where run_ask's public
+    interface cannot reach a specific internal branch. Result:
+    100.0/98.5/96.8/100.0. Two residual lines are genuine Devel::Cover
+    tooling limitations, filed separately as DD-944. Also caught and fixed
+    a genuine regression mid-gate (t/168-permission-assertion-guards.t)
+    from an incorrect uid-based SKIP guard, rewritten to match this
+    project's established probe-then-restore permission-test pattern.
+
+4.44  2026-09-18
+
+  - DD-937: reviewed the Tira board-engine upgrade 5.131 -> 5.150 (19
+    releases). Nothing new to declare (tira.policy.undeclared confirmed
+    empty). Adopted two genuinely useful additions into how this project
+    reads its own board: `d2 tira.police.explain --ref REF --rule RULE`
+    (prints a rule's exact computation rather than only its final verdict,
+    verified live against DD-667's own long-standing card-duration
+    finding) and the `checklist-idle` "standing" label exemption for a
+    container card meant to stay open indefinitely. Findings recorded in
+    docs/tira-upgrade-review.md. Documentation-only, no product code
+    changed.
+
+4.43  2026-09-18
+
+  - DD-943: fixed t/15-release-metadata.t's _perl_doc_paths() incorrectly
+    scanning t/183-pax-cli-build-run-contract.t's leftover scratch fixtures
+    under t/tmp-sow03/ (deliberately minimal-POD test inputs for the PAX
+    build pipeline, never cleaned up at the end of that test's own run) -
+    causing ~25 spurious POD-completeness failures whenever t/183 happened
+    to run before t/15 in the same prove process. Added the same exclusion
+    pattern already used elsewhere in the same file. Confirmed pre-existing
+    (present in CI before DD-933 landed, not caused by it).
+
+4.42  2026-09-17
+
+  - DD-933: generalized DD-931's finding - CodeUnitCompiler.pm's
+    dependency-discovery pass walks literal source text to decide a
+    compiled entrypoint's compiled_packages closure, so a class referenced
+    only inside a sub body the compiler special-cases (substituted
+    wholesale with a runtime op) is invisible to it and never gets a
+    __PAX_RUNTIME_LEGACY_NAMESPACE__ alias installed for some entrypoints.
+    Confirmed the same gap hits JSON (~53 call sites) and SeedSync (4 call
+    sites) in StandaloneRuntime.pm, called via the legacy-namespace alias
+    from inside other special-cased ops. Fixed by requiring both classes
+    directly at file-load time and calling them by their real package
+    names, same convention already shipped for EnvAudit in DD-931. New
+    test t/198 proves genuine RED-then-GREEN by invoking the real op
+    dispatcher directly. Verified against a real Docker container with a
+    clean-master baseline comparison: zero regressions.
+
+4.41  2026-09-17
+
+  - DD-934: fixed a compiled bin/dashboard entrypoint crash on ANY
+    subcommand with a trailing argv token ("Can't use string as a HASH
+    ref"). StandaloneRuntime.pm's _run_cli_router_unit called
+    _prime_command_result_env with only ($cmd, @ARGV), silently dropping
+    the $main_gate_results positional argument the function's own
+    signature expects - the first argv token filled that slot instead of
+    a hashref, crashing the moment any argument followed the command name.
+    Fixed by passing an explicit {} at the call site. This blocked safely
+    re-enabling self-exec, since almost every real invocation carries at
+    least one argument. Verified RED-then-GREEN against a real compiled
+    binary.
+
+4.40  2026-09-17
+
+  - DD-938: dashboard ask is now a Developer Dashboard expert by default.
+    `dashboard ask --docs` prints a curated onboarding summary (DD-OOP-LAYERS,
+    .env/docker-compose conventions, where a disposable helper script
+    belongs) directly to stdout - never the full CLAUDE.md, never a new
+    file. `dashboard source --files` lists every file installed under
+    ~/perl5/{lib,bin} as a fallback deep-dive reference. A workspace's
+    genuinely first-ever `dashboard ask <question>` call (empty transcript,
+    not --no-memory) silently prepends the --docs context to that turn's
+    prompt - no flag, no injected instruction line - and every later turn
+    sees it already in replayed history. Also fixed a t/196 numeric-prefix
+    collision with a pre-existing test file (renamed to t/197) and three
+    POD gaps surfaced by the release-metadata gate.
+
+4.39  2026-09-17
+
+  - DD-935: fixed a pathological per-character substr() loop in
+    CodeUnitCompiler.pm's own _extract_sub_body/_extract_sub_source
+    (the compiler self-compiling its own ~13,000-line source was the
+    dominant cost of a pax build - 4.5+ minutes for one file vs ~4
+    minutes for the other 112 combined). Replaced with a \G-anchored
+    regex scan: 1.4s -> 0.0005s per extraction call, verified
+    repeatedly in isolation. Also dropped the launcher's cc flag from
+    -O2 to -O0. A second, separate contributor to full-pipeline
+    compile time was found during verification and filed as DD-939.
+
+4.38  2026-09-17
+
+  - DD-936: PaxCache::resolve() no longer spawns a new background pax
+    build by default - owner-specified opt-in via DD_PAX=on, after
+    observing pax build burn ~66% CPU for 90+ seconds per invocation
+    merely from running dashboard/d2 init. Gate scoped to only the
+    spawn-a-new-compile path (not cache-hit reporting), after an
+    earlier blanket-gate version was found to break bin/d2's own
+    self-exec feature and corrected the same day (Q-167).
+
+4.37  2026-09-17
+
+  - DD-931: require Developer::Dashboard::EnvAudit directly (instead of
+    the never-populated __PAX_RUNTIME_LEGACY_NAMESPACE__ alias) in both
+    of Pax's env-loading runtime ops, root-causing DD-930's mitigation.
+    Verified against a real compiled binary: EnvAudit string-table
+    references go from 0 (crash) to 51 (clean run). bin/dashboard's
+    self-exec-on-cache-hit guard stays DISABLED - genuine end-to-end
+    verification surfaced three further, independent defects (DD-932,
+    DD-933, DD-934), each filed separately.
+
+4.36  2026-09-17
+
+  - DD-924: d2's self-compiled binary resolved $Bin to the pax cache
+    directory it physically ran from, not the original bin/ source
+    directory, breaking its own exec-into-dashboard fallback with
+    "Can't open perl script". Fixed by baking the correct path into an
+    env var on the genuinely-interpreted first run, before self-exec.
+
+4.35  2026-09-17
+
+  - DD-922: root-caused and fixed StandaloneRuntime's file-read corruption
+    (a `local $/;` spanning too far, leaking into a later `eval` of the
+    entrypoint's own compiled source via eval STRING's shared dynamic
+    scope). Re-enabled bin/dashboard's self-exec-on-cache-hit - and DD-930
+    (same day) found a second, independent defect in the same area and
+    disabled it again; see that entry.
+  - DD-923: fixed a UTF-8 double-encoding defect in CodeUnitCompiler.pm
+    that corrupted literal non-ASCII characters (e.g. dashboard ps1's
+    status icons) in PAX-compiled binaries.
+  - DD-930: bin/dashboard's self-exec-on-cache-hit disabled again, hours
+    after DD-922 re-enabled it - a second, independent PAX-compiler defect
+    (EnvAudit->record failing inside the compiled binary's own legacy
+    namespace) was found the moment the exec path was genuinely exercised
+    against real project config for the first time since DD-905.
+
+4.34  2026-09-17
+
+  - DD-917: OpenFile.pm's _scope_match_rank compiled/resolved every pattern's
+    regex unconditionally at the top of its per-pattern loop, even though two
+    cheaper checks (exact basename match, prefix match) are tried first and
+    often decide the score without ever needing it. Resolved lazily instead,
+    only at the point of use.
+
+4.33  2026-09-16
+
+  - DD-918: lib/Developer/Dashboard/CLI/OpenFile.pm was 823 lines, exceeding
+    this project's 500-line-per-module guideline. Extracted the Java-class
+    resolution machinery (archive extraction, Maven Central search/download,
+    the --online network gate) into OpenFileJavaSource.pm, the interactive
+    multi-match chooser into OpenFileChooser.pm, and shared dedup helpers
+    into OpenFileUtil.pm. All moved subs are re-exported into OpenFile.pm's
+    own namespace so existing callers and t/98-cli-openfile-coverage.t need
+    no behavior change.
+
+4.32  2026-09-15
+
+  - DD-868/DD-870/DD-878: FileRegistry::resolve_file, PathRegistry::resolve_dir,
+    File::_resolve_file and Folder::_resolve_path all fell back to dispatching
+    a caller-supplied alias name to ANY method the resolved object/class
+    answered can() true for. Replaced with a compile-time allowlist of the
+    intended no-arg path getters in each.
+  - DD-874: Config.pm's api_registry merged the operator's own deepest-writable
+    api.json layer BEFORE a skill's bundled key fragments, so an installed
+    skill could silently replace or tombstone an operator-set API key. Skill
+    fragments now merge first (lowest priority), the operator's own layer
+    last (highest).
+  - DD-877: added Developer::Dashboard::PaxCache, an MD5-keyed, non-blocking
+    PAX compile cache - a cache miss runs interpreted immediately and
+    triggers at most one detached background compile per source file, with
+    an O_CREAT|O_EXCL lock guarding against overlapping invocations spawning
+    duplicate compiles. Wired into dashboard ps1 as a proof of concept.
+  - DD-871/872/875/876: researched PAX (a sibling adaptive Perl compiler)
+    compiling this codebase - confirmed clean on glibc/Debian with a
+    measured ~36x runtime speedup, found and reported two PAX bugs upstream
+    (an objcopy long-option ambiguity on newer binutils, a hardcoded ELF
+    output width ignoring the target architecture), and confirmed PAX has no
+    macOS Mach-O build path at all (hardcoded ELF-only, zero platform
+    branching) - a real, immediate blocker for any Mac user.
+  - DD-866/867/869/873: corrected drifted architecture-overview POD in
+    Developer::Dashboard.pm (an inactive UpdateManager module described as
+    wired-in when it is intentional dormant groundwork; Data Query Commands
+    listing 4 shipped formats instead of all 7; "prompt commands" phrasing
+    inconsistent with the file's own established "ps1 commands" wording).
+
 4.31  2026-09-11
 
   - DD-770: .claude/tools/host-ready's foreign-process detector matched on

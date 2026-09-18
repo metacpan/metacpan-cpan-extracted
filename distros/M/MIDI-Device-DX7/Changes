@@ -1,0 +1,7 @@
+Revision history for MIDI-Device
+
+0.0101 2026-09-17 12:02:54
+  - Improve the documentation.
+
+0.0100 2026-09-17 11:50:18
+  - Mint with Dist::Zilla.

@@ -1,6 +1,29 @@
 Revision history for Struct::Codec
 
-0.02	2026-09-16
+0.04	2026-09-18
+        - A float on a perl built -Duselongdouble below 5.30 came back a ULP
+          or two out: the digits were read with Atof, which is perl's own
+          numifier and was not correctly rounded until 5.30 (perl RT #41202).
+          The decoder names strtold, strtoflt128 or strtod for the build.
+        - Those digits now use '.' for a radix whatever the locale is.
+        - t/25-wide-nv.t asserts the digit count on the bytes, and no longer
+          uses perl's numifier as an oracle on a perl whose numifier is the
+          thing at fault.
+
+0.03	2026-09-17
+        - FIXES a heap corruption when encoding an anonymous sub. The
+          deparser is loaded with load_module, which runs perl and can
+          reallocate the argument stack; the stack pointer taken before it
+          was then stale, and pushing the deparse arguments through it wrote
+          to freed memory. It surfaced only when the load triggered a
+          realloc, so it depended on how deep the stack already was: a bare
+          encode was usually fine and a sub encoded from inside a larger
+          program crashed at destruction. SPAGAIN after the load. Seen as a
+          SIGABRT/SIGSEGV in t/32-kinds.t on threaded 5.18.
+        - t/16-leak.t built its probe list with a regexp unconditionally,
+          which the codec refuses below 5.12, so the file died there on
+          5.10. The regexp joins the list only where it can be encoded, as
+          t/32 already skips it.
         - A float on a perl built -Duselongdouble or -Dusequadmath kept only
           what a double holds. Such a value now goes out as decimal digits
           under tag 0x38, and comes back the number it was. A perl whose NV

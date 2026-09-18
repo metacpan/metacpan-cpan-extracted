@@ -6,7 +6,7 @@
               |_|                                       
 
 
-This is the README for Gzip::Faster version 0.22.
+This is the README for Gzip::Faster version 0.23.
 
 Gzip::Faster is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -41,6 +41,11 @@ format", which is the same as the gzip format except it has no header
 information. "deflate_raw" and "inflate_raw" work with the
 bare-bones version of this format without checksums.
 
+A limitation of the module is that it is designed around the idea of
+keeping the entire input and output in memory, so it is not suitable
+for streaming compressing of huge entities. For these cases I suggest
+piping the stream through the command-line gzip utility.
+
 If you need to control the compression beyond what is offered by
 "gzip" and "gunzip", create a Gzip::Faster object using "new",
 and compress and uncompress using the "zip" and "unzip"
@@ -49,7 +54,8 @@ and "raw". A file name can be set and retrieved from the gzip header
 with "file_name", and the modification time of the file can be set
 and retrieved with "mod_time". The level of compression can be
 altered with "level". Perl flags can be copied into the gzip header
-using "copy_perl_flags".
+using "copy_perl_flags". The size of the output of "unzip" can be
+limited with "max_size".
 
 -----------------------------------------------------------------------------
 
@@ -81,11 +87,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Gzip::Faster
 
-To install the module from the source file, Gzip-Faster-0.22.tar.gz, follow
+To install the module from the source file, Gzip-Faster-0.23.tar.gz, follow
 this sequence of commands:
 
-    tar xfz Gzip-Faster-0.22.tar.gz
-    cd Gzip-Faster-0.22
+    tar xfz Gzip-Faster-0.23.tar.gz
+    cd Gzip-Faster-0.23
     perl Makefile.PL
     make
     make install
@@ -110,6 +116,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Jul 17 07:57:54 2025.
+This README was written on Fri Sep 18 15:46:33 2026.
 
 -----------------------------------------------------------------------------

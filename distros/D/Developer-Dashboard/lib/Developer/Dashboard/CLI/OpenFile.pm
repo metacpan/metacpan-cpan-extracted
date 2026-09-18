@@ -3,25 +3,33 @@ package Developer::Dashboard::CLI::OpenFile;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
-use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use Cwd qw(cwd);
-use Digest::MD5 qw(md5_hex);
 use Exporter 'import';
 use File::Find ();
-use File::Path qw(make_path);
 use File::Spec;
 use Getopt::Long qw(GetOptionsFromArray);
-use JSON::XS qw(decode_json);
-use LWP::UserAgent;
-use URI::Escape qw(uri_escape_utf8);
 
+use Developer::Dashboard::CLI::OpenFileChooser qw(_default_editor _editor_supports_tabs _select_open_file_matches _stdin_has_pending_input _selection_matches);
+use Developer::Dashboard::CLI::OpenFileJavaSource qw(
+    _java_archive_source_matches
+    _candidate_java_source_archives
+    _java_source_archive_roots
+    _extract_java_sources_from_archive
+    _matching_java_archive_entries
+    _contained_cache_path
+    _cached_archive_source_path
+    _download_java_source_matches
+    _maven_search_documents
+    _download_maven_source_jar
+);
+use Developer::Dashboard::CLI::OpenFileUtil qw(_unique_matches _unique_existing_dirs);
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
 
-our @EXPORT_OK = qw(run_open_file_command build_path_registry);
+our @EXPORT_OK = qw(run_open_file_command build_path_registry _unique_matches _unique_existing_dirs);
 
 # build_path_registry()
 # Builds the lightweight path registry used by standalone CLI commands.
@@ -42,23 +50,29 @@ sub run_open_file_command {
     my (%args) = @_;
     my $paths = $args{paths} || build_path_registry();    # uncoverable condition false build_path_registry always returns a blessed registry object
     my @argv  = @{ $args{args} || [] };
-    my $print = 0;
-    my $line  = 0;
+    my $print  = 0;
+    my $line   = 0;
     my $editor = '';
+    my $online = 0;
 
-    GetOptionsFromArray(
+    my $options_ok = GetOptionsFromArray(
         \@argv,
         'print!'   => \$print,
         'line=i'   => \$line,
         'editor=s' => \$editor,
+        'online!'  => \$online,
     );
 
-    die "Usage: open-file [--print] [--line N] [--editor CMD] <file|scope> [pattern...]\n"
+    die "Usage: open-file [--print] [--line N] [--editor CMD] [--online] <file|scope> [pattern...]\n"
+      if !$options_ok;
+
+    die "Usage: open-file [--print] [--line N] [--editor CMD] [--online] <file|scope> [pattern...]\n"
       if !@argv;
 
     my ( $line_override, @matches ) = _resolve_open_file_matches(
-        paths => $paths,
-        args  => \@argv,
+        paths  => $paths,
+        args   => \@argv,
+        online => $online,
     );
     $line ||= $line_override || 0;
 
@@ -79,104 +93,16 @@ sub run_open_file_command {
     _command_exec(@command);
 }
 
-# _default_editor($editor)
-# Resolves the editor command used for interactive open-file execution.
-# Input: optional explicit editor command string.
-# Output: editor command string, defaulting to the user's editor or vim.
-sub _default_editor {
-    my ($editor) = @_;
-    return $editor || $ENV{VISUAL} || $ENV{EDITOR} || 'vim';
-}
-
-# _editor_supports_tabs(%args)
-# Detects whether the resolved editor command should receive the older vim tab-open switch.
-# Input: command array reference where the first entry is the executable name.
-# Output: true when the editor is one of the vim-family commands that support -p.
-sub _editor_supports_tabs {
-    my (%args) = @_;
-    my $command = $args{command} || [];
-    my $editor  = $command->[0] || '';
-    return 0 if $editor eq '';
-    $editor =~ s{.*[\\/]}{};
-    return $editor =~ /\A(?:vim|nvim|vi|gvim|iv)\z/i ? 1 : 0;
-}
-
-# _select_open_file_matches(%args)
-# Resolves the final open-file match list using the older numbered chooser flow.
-# Input: hash containing an array reference of matched file path strings.
-# Output: one or more selected file path strings, defaulting to all matches when no choice is entered.
-sub _select_open_file_matches {
-    my (%args) = @_;
-    my $matches = $args{matches} || [];
-    my @matches = _unique_matches(@$matches);
-
-    return if !@matches;
-    return @matches if @matches == 1;
-
-    for my $index ( 0 .. $#matches ) {
-        print( $index + 1, ": $matches[$index]\n" );
-    }
-    print '> ';
-
-    my $selection = <STDIN>;
-    return @matches if !defined $selection;
-
-    chomp $selection;
-    my @chosen = _selection_matches(
-        choices => $selection,
-        matches => \@matches,
-    );
-
-    return @chosen if @chosen;
-    return @matches if $selection eq '';    # uncoverable branch true a blank selection always yields chosen matches above, so this reblank guard is only reached for non-empty invalid input
-    die "Invalid file selection '$selection'\n";
-}
-
-# _selection_matches(%args)
-# Parses one older chooser string into the selected open-file matches.
-# Input: choice string plus array reference of matched file path strings.
-# Output: zero or more selected file path strings.
-sub _selection_matches {
-    my (%args) = @_;
-    my $choices = defined $args{choices} ? $args{choices} : '';
-    my $matches = $args{matches} || [];
-    return @$matches if $choices eq '' && @$matches;
-
-    if ( $choices =~ /^\d+(?:\s*-\s*\d+)?(?:[\s,]+\d+(?:\s*-\s*\d+)?)*$/ ) {
-        my @chosen;
-        for my $chunk ( grep { $_ ne '' } split /[,\s]+/, $choices ) {
-            if ( $chunk =~ /^(\d+)-(\d+)$/ ) {
-                my ( $start, $end ) = ( $1, $2 );
-                return if $start < 1 || $end < $start || $end > @$matches;
-                push @chosen, @$matches[ $start - 1 .. $end - 1 ];
-                next;
-            }
-            return if $chunk < 1 || $chunk > @$matches;
-            push @chosen, $matches->[ $chunk - 1 ];
-        }
-        return @chosen;
-    }
-
-    return;
-}
-
-# _unique_matches(@matches)
-# Deduplicates resolved open-file matches while preserving their original order.
-# Input: list of matched file path strings.
-# Output: ordered list of unique file path strings.
-sub _unique_matches {
-    my (@matches) = @_;
-    my %seen;
-    return grep { defined && $_ ne '' && !$seen{$_}++ } @matches;
-}
-
 # _ordered_scope_matches(%args)
 # Orders recursive scope-search matches so exact helper/script names sort before broader substring matches.
-# Input: pattern array reference plus discovered file path array reference.
+# Input: pattern array reference, optional pre-compiled regex array reference (DD-912 - same order as
+# patterns, so a caller that already compiled its patterns once does not pay to recompile them once per
+# candidate file), plus discovered file path array reference.
 # Output: ordered unique file path strings ranked by basename/stem relevance and original discovery order.
 sub _ordered_scope_matches {
     my (%args) = @_;
     my @patterns = @{ $args{patterns} || [] };
+    my @regexes  = @{ $args{regexes} || [] };
     my @entries  = @{ $args{entries} || [] };
     @entries = map { { file => $_, match_path => $_ } } _unique_matches( @{ $args{files} || [] } )
       if !@entries;
@@ -189,6 +115,7 @@ sub _ordered_scope_matches {
                 file      => $entries[$index]{file},
                 match_path => $entries[$index]{match_path},
                 patterns => \@patterns,
+                regexes  => \@regexes,
             ),
             index => $index,
         };
@@ -201,24 +128,42 @@ sub _ordered_scope_matches {
       } @ranked;    # uncoverable branch true : entries carry unique indexes, so this tiebreaker is never 0 and the comparator never returns 0
 }
 
+# _resolved_scope_match_regex($regexes, $index, $pattern)
+# Resolves the regex for one scope-match ranking pattern: the caller's pre-compiled
+# regex at this index if one was supplied (DD-912), otherwise compiles the pattern
+# itself so direct callers (tests, or any caller with only raw pattern strings) keep
+# working unchanged.
+# Input: pre-compiled regex array reference, pattern index, and the pattern string.
+# Output: compiled regex object.
+sub _resolved_scope_match_regex {
+    my ( $regexes, $index, $pattern ) = @_;
+    # uncoverable condition false _compile_open_file_regex only returns undef for an undef/empty pattern, already excluded by _scope_match_rank before this is called
+    return $regexes->[$index] || _compile_open_file_regex($pattern);
+}
+
 # _scope_match_rank(%args)
 # Scores one recursive scope-search file so exact basename hits outrank partial path matches.
-# Input: file path string plus the active pattern array reference.
+# Input: file path string, the active pattern array reference, and an optional pre-compiled regex array
+# reference (DD-912) in the same order as patterns - when the regex at a given index is missing, this
+# compiles that one pattern itself so direct callers (tests, or any caller with only raw pattern strings)
+# keep working unchanged.
 # Output: numeric rank where lower values are stronger matches.
 sub _scope_match_rank {
     my (%args) = @_;
     my $file       = $args{file}       || '';
     my $match_path = $args{match_path} || $file;
     my @patterns   = @{ $args{patterns} || [] };
+    my @regexes    = @{ $args{regexes} || [] };
     my ($basename) = $match_path =~ m{([^/\\]+)$};
     $basename ||= $match_path;
     my $stem = $basename;
     $stem =~ s{\.[^.]+$}{};
 
     my $rank = 0;
-    for my $pattern (@patterns) {
+    for my $index ( 0 .. $#patterns ) {
+        my $pattern = $patterns[$index];
         next if !defined $pattern || $pattern eq '';
-        my $regex = _compile_open_file_regex($pattern);
+        my $regex;    # DD-917: resolved lazily below, only if a cheaper check does not already decide the score
         my $score = 50;
         my @components = grep { $_ ne '' } split m{[\\/]+}, $match_path;
 
@@ -231,12 +176,24 @@ sub _scope_match_rank {
         elsif ( $basename =~ /\A(?:$pattern)/i ) {
             $score = 2;
         }
-        elsif ( $basename =~ $regex ) {
+        elsif (
+            do {
+                # uncoverable condition left (DD-917) $regex is freshly declared undef on every loop iteration and nothing sets it before this point, so the already-resolved side of ||= is never taken
+                # uncoverable condition false (DD-917) _resolved_scope_match_regex never returns a falsy value, so $regex is never falsy after this line
+                $regex ||= _resolved_scope_match_regex( \@regexes, $index, $pattern );
+                $basename =~ $regex;
+            }
+          )
+        {
             $score = 3;
         }
         elsif ( grep { $_ =~ /\A(?:$pattern)\z/i } @components ) {
             $score = 4;
         }
+
+        # $regex is always already resolved by the elsif above by the time this branch is
+        # reached - the if/elsif chain visits that branch first on every path that reaches
+        # this one, so there is no remaining case where $regex could still be undef here.
         elsif ( $match_path =~ $regex ) {
             $score = 5;
         }
@@ -253,8 +210,9 @@ sub _scope_match_rank {
 # Output: list containing optional line number and matched file path strings.
 sub _resolve_open_file_matches {
     my (%args) = @_;
-    my $paths = $args{paths} || die 'Missing path registry';
-    my @argv  = @{ $args{args} || [] };
+    my $paths  = $args{paths} || die 'Missing path registry';
+    my @argv   = @{ $args{args} || [] };
+    my $online = $args{online} || 0;
     my ( $files, $config ) = _open_file_registries( paths => $paths );
 
     my $first = shift @argv;
@@ -278,8 +236,9 @@ sub _resolve_open_file_matches {
 
     if ( defined $first ) {
         my @named_matches = _named_source_matches(
-            paths => $paths,
-            name  => $first,
+            paths  => $paths,
+            name   => $first,
+            online => $online,
         );
         return ( $line, @named_matches ) if @named_matches;
     }
@@ -329,6 +288,7 @@ sub _resolve_open_file_matches {
 
     my @files = _ordered_scope_matches(
         patterns => \@patterns,
+        regexes  => \@regexes,
         entries  => \@entries,
     );
     return ( $line, @files );
@@ -370,8 +330,9 @@ sub _scope_relative_path_match {
 # Output: sorted list of matching file path strings.
 sub _named_source_matches {
     my (%args) = @_;
-    my $paths = $args{paths} || die 'Missing path registry';
-    my $name  = $args{name}  || return;
+    my $paths  = $args{paths} || die 'Missing path registry';
+    my $name   = $args{name}  || return;
+    my $online = $args{online} || 0;
 
     my @roots = _open_file_roots( paths => $paths );
     my @matches;
@@ -398,11 +359,13 @@ sub _named_source_matches {
             roots    => \@roots,
             name     => $name,
             relative => $relative,
+            online   => $online,
           );
     }
 
     return _unique_matches(@matches);
 }
+
 
 # _open_file_roots(%args)
 # Builds the ordered root list used for module/class source resolution.
@@ -419,8 +382,7 @@ sub _open_file_roots {
         @INC,
     );
 
-    my %seen;
-    return grep { defined && $_ ne '' && -d $_ && !$seen{$_}++ } @roots;
+    return _unique_existing_dirs(@roots);
 }
 
 # _existing_named_files(%args)
@@ -460,277 +422,6 @@ sub _compile_open_file_regex {
     return $regex;
 }
 
-# _java_archive_source_matches(%args)
-# Resolves Java source files from local or downloaded source archives when no live .java file exists.
-# Input: path registry object, root array reference, class name string, and relative Java source path string.
-# Output: ordered list of extracted Java source file paths.
-sub _java_archive_source_matches {
-    my (%args) = @_;
-    my $paths    = $args{paths}    || die 'Missing path registry';
-    my $roots    = $args{roots}    || [];
-    my $name     = $args{name}     || return;
-    my $relative = $args{relative} || return;
-
-    my @matches;
-    for my $archive ( _candidate_java_source_archives( paths => $paths, roots => $roots ) ) {
-        push @matches,
-          _extract_java_sources_from_archive(
-            paths    => $paths,
-            archive  => $archive,
-            relative => $relative,
-          );
-    }
-    if ( !@matches ) {
-        push @matches,
-          _download_java_source_matches(
-            paths    => $paths,
-            name     => $name,
-            relative => $relative,
-          );
-    }
-    return _unique_matches(@matches);
-}
-
-# _candidate_java_source_archives(%args)
-# Builds the ordered archive list used for Java source lookup outside direct filesystem source trees.
-# Input: path registry object plus the root array reference already searched for plain files.
-# Output: ordered list of candidate archive file paths.
-sub _candidate_java_source_archives {
-    my (%args) = @_;
-    my $paths = $args{paths} || die 'Missing path registry';
-    my $roots = $args{roots} || [];
-    my @archives;
-    my %seen;
-
-    for my $root ( _java_source_archive_roots( paths => $paths, roots => $roots ) ) {
-        File::Find::find(
-            {
-                no_chdir => 1,
-                wanted   => sub {
-                    return if !-f $_;
-                    my $path = $File::Find::name;
-                    return if $path !~ /(?:-sources\.jar|-src\.jar|src\.zip|source\.zip|\.war|\.jar)\z/i;
-                    return if $seen{$path}++;
-                    push @archives, $path;
-                },
-            },
-            $root,
-        );
-    }
-
-    return @archives;
-}
-
-# _java_source_archive_roots(%args)
-# Returns the filesystem roots that can contain Java source archives for open-file lookup.
-# Input: path registry object plus the current open-file roots array reference.
-# Output: ordered list of existing directory path strings.
-sub _java_source_archive_roots {
-    my (%args) = @_;
-    my $paths = $args{paths} || die 'Missing path registry';
-    my $roots = $args{roots} || [];
-    my @candidates = (
-        @$roots,
-        File::Spec->catdir( $paths->home, '.m2', 'repository' ),
-        File::Spec->catdir( $paths->home, '.gradle', 'caches' ),
-        grep { defined && $_ ne '' } ( $ENV{JAVA_HOME}, $ENV{JDK_HOME} ),
-    );
-
-    my %seen;
-    return grep { defined && $_ ne '' && -d $_ && !$seen{$_}++ } @candidates;
-}
-
-# _extract_java_sources_from_archive(%args)
-# Extracts matching Java source members from one zip-like archive into the dashboard cache tree.
-# Input: path registry object, archive file path string, and relative Java source path string.
-# Output: ordered list of extracted source file path strings.
-sub _extract_java_sources_from_archive {
-    my (%args) = @_;
-    my $paths    = $args{paths}    || die 'Missing path registry';
-    my $archive  = $args{archive}  || return;
-    my $relative = $args{relative} || return;
-    my $zip      = Archive::Zip->new();
-    return if $zip->read($archive) != AZ_OK;
-
-    my @matches;
-    for my $entry ( _matching_java_archive_entries( zip => $zip, relative => $relative ) ) {
-        my $member = $zip->memberNamed($entry) || next;
-
-        # An archive member names its own destination, and archives reaching
-        # here are third-party artifacts, so a member whose name climbs out of
-        # the cache tree is dropped rather than written. Skipping keeps a
-        # poisoned member from also denying the archive's legitimate members.
-        my $target = _cached_archive_source_path(
-            paths   => $paths,
-            archive => $archive,
-            entry   => $entry,
-        ) or next;
-        my ( $volume, $directories ) = File::Spec->splitpath($target);
-        make_path( File::Spec->catpath( $volume, $directories, '' ) );
-        open my $fh, '>', $target or die "Unable to write $target: $!";    # uncoverable branch true the target parent directory is created immediately above so the write cannot fail on the test host
-
-        # contents() returns ($contents, $status) in list context, which print
-        # imposes, so the member body must be taken in scalar context or the
-        # status code is appended to every extracted source file.
-        my ($contents) = $member->contents;
-        print {$fh} $contents;
-        close $fh;
-        push @matches, $target;
-    }
-
-    return @matches;
-}
-
-# _matching_java_archive_entries(%args)
-# Finds archive member names whose trailing path matches one requested Java source path.
-# Input: Archive::Zip object and relative Java source path string.
-# Output: ordered list of matching archive member path strings.
-sub _matching_java_archive_entries {
-    my (%args) = @_;
-    my $zip      = $args{zip}      || return;
-    my $relative = $args{relative} || return;
-    my $suffix   = $relative;
-    $suffix =~ s{\\}{/}g;
-
-    my @entries;
-    for my $member ( $zip->members ) {
-        my $name = $member->fileName || next;
-        next if $name !~ /(?:\A|\/)\Q$suffix\E\z/;
-        push @entries, $name;
-    }
-
-    return @entries;
-}
-
-# _contained_cache_path($root, @segments)
-# Resolves untrusted path segments below one cache root and refuses any result
-# that escapes it. Segments arrive from archive member names and from remote
-# Maven search documents, so a parent-directory run in them would otherwise
-# steer a write to any location the user can reach. Resolution is lexical and
-# never consults the filesystem, so the decision cannot change between the
-# check and the write that follows it.
-# Input: intended root directory path string plus untrusted path segments.
-# Output: contained path string, or undef when the segments escape the root.
-sub _contained_cache_path {
-    my ( $root, @segments ) = @_;
-    my @resolved;
-
-    for my $part ( grep { $_ !~ m{\A\.?\z} } map { split m{[\\/]+}, $_ } @segments ) {
-        if ( $part eq '..' ) {
-            return if !@resolved;
-            pop @resolved;
-            next;
-        }
-        push @resolved, $part;
-    }
-
-    return if !@resolved;
-    return File::Spec->catfile( $root, @resolved );
-}
-
-# _cached_archive_source_path(%args)
-# Builds the stable cache location used for one extracted Java source member.
-# Input: path registry object, archive file path string, and archive member path string.
-# Output: extracted source file path string, or undef when the member escapes the cache.
-sub _cached_archive_source_path {
-    my (%args) = @_;
-    my $paths   = $args{paths}   || die 'Missing path registry';
-    my $archive = $args{archive} || die 'Missing archive path';
-    my $entry   = $args{entry}   || die 'Missing archive entry';
-    my $digest  = md5_hex( join "\0", $archive, $entry );
-
-    return _contained_cache_path(
-        File::Spec->catdir( $paths->cache_root, 'open-file', 'java-sources', $digest ),
-        $entry,
-    );
-}
-
-# _download_java_source_matches(%args)
-# Downloads Maven source jars when local archive lookup cannot satisfy the requested Java class.
-# Input: path registry object, fully qualified class name string, and relative Java source path string.
-# Output: ordered list of extracted Java source file path strings.
-sub _download_java_source_matches {
-    my (%args) = @_;
-    my $paths    = $args{paths}    || die 'Missing path registry';
-    my $name     = $args{name}     || return;
-    my $relative = $args{relative} || return;
-
-    my @matches;
-    for my $doc ( _maven_search_documents($name) ) {
-        next if ref($doc) ne 'HASH';
-        next if !grep { defined && $_ eq '-sources.jar' } @{ $doc->{ec} || [] };
-        my $archive = _download_maven_source_jar( paths => $paths, doc => $doc ) or next;
-        push @matches,
-          _extract_java_sources_from_archive(
-            paths    => $paths,
-            archive  => $archive,
-            relative => $relative,
-          );
-        last if @matches;
-    }
-
-    return @matches;
-}
-
-# _maven_search_documents($name)
-# Queries Maven Central for one fully qualified Java class name.
-# Input: fully qualified Java class name string.
-# Output: ordered list of Maven search document hash references.
-sub _maven_search_documents {
-    my ($name) = @_;
-    return if !defined $name || $name eq '';
-
-    my $query = uri_escape_utf8(qq{fc:"$name"});
-    my $url   = "https://search.maven.org/solrsearch/select?q=$query&rows=20&wt=json";
-    my $ua    = LWP::UserAgent->new( timeout => 10 );
-    my $res   = $ua->get($url);
-    return if !$res->is_success;
-
-    my $payload = eval { decode_json( $res->decoded_content ) };
-    return if !$payload || ref($payload) ne 'HASH';
-    return @{ $payload->{response}{docs} || [] };
-}
-
-# _download_maven_source_jar(%args)
-# Downloads one Maven Central source jar into the dashboard cache tree when it is missing.
-# Input: path registry object and one Maven search document hash reference.
-# Output: local source-jar path string or undef on failure.
-sub _download_maven_source_jar {
-    my (%args) = @_;
-    my $paths = $args{paths} || die 'Missing path registry';
-    my $doc   = $args{doc}   || return;
-    return if ref($doc) ne 'HASH';
-    return if !defined $doc->{g} || !defined $doc->{a} || !defined $doc->{v};
-
-    my $group_path = join '/', split /\./, $doc->{g};
-    my $file       = "$doc->{a}-$doc->{v}-sources.jar";
-
-    # The coordinates come from a remote search response, so the mirror target
-    # is contained the same way an archive member name is: refuse before any
-    # directory is created or any transfer is started.
-    my $target = _contained_cache_path(
-        File::Spec->catdir( $paths->cache_root, 'open-file', 'maven-sources' ),
-        $group_path,
-        $doc->{a},
-        $doc->{v},
-        $file,
-    ) or return;
-    return $target if -f $target;
-
-    my ( $volume, $directories ) = File::Spec->splitpath($target);
-    make_path( File::Spec->catpath( $volume, $directories, '' ) );
-
-    my $url = join '/',
-      'https://repo1.maven.org/maven2',
-      $group_path,
-      $doc->{a},
-      $doc->{v},
-      $file;
-    my $ua  = LWP::UserAgent->new( timeout => 20 );
-    my $res = $ua->mirror( $url, $target );
-    return if !$res->is_success && $res->code != 304;
-    return -f $target ? $target : undef;
-}
 
 # _command_exit($code)
 # Wraps process exit so tests can override it and exercise command flow in-process.
@@ -743,11 +434,21 @@ sub _command_exit {
 
 # _command_exec(@command)
 # Wraps process exec so tests can override it and inspect the final editor command.
+# A failed exec() returns false rather than dying, so without this check a
+# missing or unexecutable editor binary would fall through silently and the
+# whole command would exit 0 as though the editor had actually run (DD-910).
 # Input: shell command array.
 # Output: never returns during normal command execution.
 sub _command_exec {
     my (@command) = @_;
     exec { $command[0] } @command;
+
+    # Reached only when exec() fails to replace the process image, and
+    # proven reachable by t/98-cli-openfile-coverage.t's own passing
+    # assertion - but the exec() op boundary is structurally invisible to
+    # this coverage instrument, matching the documented fork/exec pattern
+    # already annotated the same way in PaxCache.pm.
+    die "Unable to run editor '$command[0]': $!\n";    # uncoverable statement
 }
 
 1;
@@ -796,9 +497,12 @@ existing relative file path inside the resolved scope. In that exact-file case,
 the helper opens the scoped file directly instead of falling back to regex
 search. A single hit opens or prints that file, while multiple hits are ranked
 and shown as a chooser or plain list. Perl module lookup maps C<Foo::Bar> to
-C<Foo/Bar.pm>; Java lookup maps dotted class names to C<.java> source files,
-source archives, or cached Maven source jars before the helper decides whether
-to print the path or exec the configured editor.
+C<Foo/Bar.pm>; Java lookup maps dotted class names to C<.java> source files or
+local source archives entirely offline. When neither is found, the helper
+prints a notice and stops rather than reaching the network - pass C<--online>
+to let it fall through to a Maven Central search and download a source jar
+into the dashboard cache (DD-914) before deciding whether to print the path
+or exec the configured editor.
 
 =head1 WHAT USES IT
 
@@ -815,6 +519,7 @@ print-vs-editor flows.
   dashboard of foobar 456.txt
   dashboard of . "Ok\.js$"
   dashboard open-file javax.jws.WebService
+  dashboard open-file --online javax.jws.WebService
   dashboard of Developer::Dashboard::CLI::Paths
   dashboard open-file --print bookmarks index
 

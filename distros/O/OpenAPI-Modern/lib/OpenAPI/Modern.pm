@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.147-13-g412f0804
+package OpenAPI::Modern; # git description: v0.148-15-g2ca84e60
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.148';
+our $VERSION = '0.149';
 
 use 5.020;
 use utf8;
@@ -29,7 +29,7 @@ use Feature::Compat::Try;
 use Encode 2.89 ();
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Utilities qw(jsonp unjsonp canonical_uri E abort is_equal true false get_type is_type jsonp_set jsonp_get jsonp_elements decode_media_type match_media_type);
-use OpenAPI::Modern::Utilities qw(add_vocab_and_default_schemas add_formats convert_request convert_response uri_decode intersect_types coerce_primitive uri_encode uri_encode_strict is_cookie_name is_cookie_value elem deserialize_multipart);
+use OpenAPI::Modern::Utilities qw(add_vocab_and_default_schemas add_formats convert_request convert_response uri_decode intersect_types coerce_primitive uri_encode uri_encode_strict is_header_name is_cookie_name is_cookie_value elem deserialize_multipart);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::TypeTiny 0.002002;
 use Types::Standard qw(InstanceOf Bool);
@@ -985,8 +985,8 @@ sub _deserialize_header_parameter ($self, $state, $header_obj, $header_name, $he
     if not blessed($headers) or not $headers->isa('Mojo::Headers');
 
   # temporary, until the ABNF is enforced in the OAD schema
-  return E($state, 'non-ascii character detected in header name: not deserializable')
-    if $header_name =~ /[^\x00-\x7F]/;
+  return E($state, 'invalid character detected in header name')
+    if not is_header_name($header_name);
 
   if (not $headers->every_header($header_name)->@*) {
     return E({ %$state, keyword => 'required' }, 'missing header: %s', $header_name)
@@ -994,9 +994,15 @@ sub _deserialize_header_parameter ($self, $state, $header_obj, $header_name, $he
     return;
   }
 
+  # RFC9110 §5.5:
+  # field-value    = *field-content
+  # field-content  = field-vchar [ 1*( SP / HTAB / field-vchar ) field-vchar ]
+  # field-vchar    = VCHAR / obs-text
+  # obs-text       = %x80-FF
   return E({ %$state, data_path => jsonp($state->{data_path}, $header_name) },
-      'wide character detected in header value: not deserializable')
-    if any { /[^\x00-\xFF]/ } $headers->every_header($header_name)->@*;
+      'invalid syntax in header value')
+    if any { !/^(?:[\x21-\x7E\x80-\xFF](?:[\x09\x20-\x7E\x80-\xFF]+[\x21-\x7E\x80-\xFF])?)*\z/ }
+      $headers->every_header($header_name)->@*;
 
   # validate as a single comma-concatenated string, presumably to be decoded
   return $self->_deserialize_content(\ $headers->header($header_name),
@@ -1021,8 +1027,7 @@ sub _deserialize_header_parameter ($self, $state, $header_obj, $header_name, $he
 
   return $self->_deserialize_style(
     # , and = delimiters are not percent-encoded
-    Mojo::Util::url_escape(join(',',
-        map s/^\s*//r =~ s/\s*\z//r, $headers->every_header($header_name)->@*),
+    Mojo::Util::url_escape(join(',', $headers->every_header($header_name)->@*),
       '^A-Za-z0-9\-._~:/?#[\]@!$&\'()*+,;='),  # unreserved and reserved
     { %$state, data_path => jsonp($state->{data_path}, $header_name) },
     in => 'header',
@@ -1050,8 +1055,8 @@ sub _deserialize_cookie_parameter ($self, $state, $param_obj, $headers) {
 
   my $error_count = $state->{errors}->@*;
 
-  # parse into individual cookie parameters as per RFC6265 §4.2.1
-  my $data = $cookie->[0] =~ s/^[\x09\x20]*|[\x09\x20]*\z//gr;
+  # parse into individual cookie parameters as per RFC6265 (see ABNF in OpenAPI::Modern::Utilities)
+  my $data = $cookie->[0];
   my @pairs = map [ split /=/, $_, 2 ], split /; /, $data;
 
   if (my @missing_values = grep !defined $_->[1], @pairs) {
@@ -1070,6 +1075,8 @@ sub _deserialize_cookie_parameter ($self, $state, $param_obj, $headers) {
   }
 
   return if $state->{errors}->@* > $error_count;
+
+  map { $_->[1] =~ s/^"//; $_->[1] =~ s/"\z// } @pairs;
 
   if (exists $param_obj->{content}) {
     my $data = ((grep +($_->[0] eq $param_obj->{name}), @pairs)[-1]//[])->[1];
@@ -1221,7 +1228,7 @@ sub _deserialize_style ($self, $data, $state, %opt) {
       if length $prefix and $data !~ s/^$prefix//;
 
     my $delimiter =
-        $style eq 'simple' && $strip_internal_ws ? ',(?:%20)?'
+        $style eq 'simple' && $strip_internal_ws ? ',(?:%09|%20)*'
       : !$explode ? ','
       : $style eq 'simple' ? ','
       : $style eq 'matrix' ? ';'
@@ -1904,6 +1911,8 @@ sub _decode_content_element ($self, $element_ref, $headers, $name, $schema_state
   # type (e.g. as or from a nested json structure), and skip the decoding step
   goto RECURSE if not is_type('string', $element_ref->$*);
 
+  my @content_types;  # we will try to decode with these type(s)
+
   # v3.2.0 §4.15.1.2: "[These fields] SHALL be ignored if the media type is not
   # application/x-www-form-urlencoded or multipart/form-data."
   if ($encoding_state->{is_form} and $encoding_obj
@@ -1937,17 +1946,21 @@ sub _decode_content_element ($self, $element_ref, $headers, $name, $schema_state
     my $local_state;    # used for media-type decoding
 
     # prefer Content-Type over encoding/contentType
-    if (defined($content_type = ($headers//{})->{'Content-Type'})) {
+    if (defined(($headers//{})->{'Content-Type'})) {
       ()= E({ %$encoding_state, data_path => $encoding_state->{header_path}.'/Content-Type',
             keyword_path => $encoding_state->{keyword_path}.'/contentType',
             recommended_response => [ 415 ] },
           'incorrect Content-Type "%s"', $headers->{'Content-Type'})
         if defined(($encoding_obj//{})->{contentType})
-          and not match_media_type($content_type, [$encoding_obj->{contentType}]);
+          and not match_media_type($headers->{'Content-Type'},
+            $encoding_state->{document}->encoding_contentTypes($encoding_obj->{contentType}));
+
+      @content_types = $headers->{'Content-Type'};
       $local_state = $encoding_state;
     }
-    elsif (defined($content_type = ($encoding_obj//{})->{contentType})) {
-      # TODO: split contentType by comma and try each of them to see which decodes successfully
+    elsif (defined(($encoding_obj//{})->{contentType})) {
+      # no way to determine which media-type is the correct one; we will try them all
+      @content_types = $encoding_state->{document}->encoding_contentTypes($encoding_obj->{contentType})->@*;
       $local_state = { %$encoding_state, keyword_path => $encoding_state->{keyword_path}.'/contentType' };
     }
     elsif (ref $schema eq 'HASH') {
@@ -1955,7 +1968,7 @@ sub _decode_content_element ($self, $element_ref, $headers, $name, $schema_state
       # determined by the default values documented for the Encoding Object."
       $local_state = { %$schema_state };  # ends in /schema iff at root
       my @types = $self->_type_in_schema($schema, { %$local_state });
-      $content_type =
+      @content_types =
           @types == 6 || elem([qw(null boolean number)], \@types) ? 'application/octet-stream'
         : elem([qw(object array)], \@types) ? 'application/json'
         : exists(($schema//{})->{contentEncoding}) ? 'application/octet-stream' : 'text/plain';
@@ -1973,19 +1986,37 @@ sub _decode_content_element ($self, $element_ref, $headers, $name, $schema_state
       return;
     }
 
-    $content_type .= '; charset='.$encoding_state->{charset}
-      if fc($content_type) eq 'text/plain' and exists $encoding_state->{charset};
+    my (@errors, @unsupported);
+    foreach my $ct (@content_types) {
+      try {
+        $ct .= '; charset='.$encoding_state->{charset}
+          if fc($ct) eq 'text/plain' and exists $encoding_state->{charset};
 
-    try {
-      $element_decoded_ref = decode_media_type($content_type, $element_ref);
+        $element_decoded_ref = decode_media_type($ct, $element_ref);
+
+        if (defined $element_decoded_ref) {
+          $content_type = $ct;
+          last;
+        }
+        else {
+          push @unsupported, $ct;
+        }
+      }
+      catch ($e) {
+        ()= E({ %$local_state, errors => \@errors },
+          'could not decode content as %s: %s', $ct, $e =~ s/^(.*)\n/$1/r);
+      }
     }
-    catch ($e) {
-      return E($local_state, 'could not decode content as %s: %s', $content_type, $e =~ s/^(.*)\n/$1/r);
-    }
+
+    push $local_state->{errors}->@*, @errors if not defined $content_type and @errors;
 
     # don't fail, and use the original data, if the schema would pass on any input
-    abort($local_state, 'EXCEPTION: unsupported media type "%s": add support with JSON::Schema::Modern::Utilities::add_media_type(...)', $content_type)
-      if not $element_decoded_ref and defined $schema and not (ref $schema eq 'HASH' ? !keys %$schema : $schema);
+    abort($local_state, 'EXCEPTION: unsupported media type%s %s: add support with JSON::Schema::Modern::Utilities::add_media_type(...)',
+        @unsupported > 1 ? 's' : '', join(', ', map '"'.$_.'"', @unsupported))
+      if not defined $content_type and @unsupported
+        and defined $schema and not (ref $schema eq 'HASH' ? !keys %$schema : $schema);
+
+    return if @errors;
   }
 
   $element_ref->$* = $element_decoded_ref->$* if $element_decoded_ref;
@@ -2415,7 +2446,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.148
+version 0.149
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

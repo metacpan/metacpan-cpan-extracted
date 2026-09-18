@@ -1614,4 +1614,73 @@ YAML
   );
 };
 
+subtest 'encoding contentTypes' => sub {
+  # contentType string => string that is reported in the error
+  my %bad_content_types = (
+    'text/a,' => '',
+    'text/b,x' => 'x',
+    'text/c,charset=UTF-8' => 'charset=UTF-8',
+    'text/d; x=a,b,c,d' => 'b,c,d',
+    'text/e; x=a b c d' => ' b c d',
+  );
+
+  # contentType string => cached contentTypes after splitting on ,
+  my %good_content_types = (
+    '*/*' => [ '*/*' ],
+    'text/*' => [ 'text/*' ],
+    'text/plain' => [ 'text/plain' ],
+    'image/jpg, image/*' => [ 'image/jpg', 'image/*' ],
+    'text/plain; charset=UTF-8' => [ 'text/plain; charset=UTF-8' ],
+    'text/plain ; x="a"' => [ 'text/plain ; x="a"' ],
+    'text/plain ; x="a,b,c,d"' => [ 'text/plain ; x="a,b,c,d"' ],
+    'text/plain, application/json, image/*' => [ 'text/plain', 'application/json', 'image/*' ],
+    'text/plain ; x="a",text/html; y=b' => [ 'text/plain ; x="a"', 'text/html; y=b' ],
+    'text/plain ; x="a, b, c, d", text/html; y="l,m,n,o"' => [ 'text/plain ; x="a, b, c, d"', 'text/html; y="l,m,n,o"' ],
+  );
+
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => my $schema = {
+      openapi => OAD_VERSION,
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+      },
+      components => { mediaTypes => { my_media_type => { prefixEncoding => [
+        map +{ contentType => $_ }, sort keys %bad_content_types,
+      ] } } },
+    },
+  );
+
+  my $idx = 0;
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      map +{
+        keywordLocation => '/components/mediaTypes/my_media_type/prefixEncoding/'.$idx.'/contentType',
+        absoluteKeywordLocation => str('http://localhost:1234/api#/components/mediaTypes/my_media_type/prefixEncoding/'.$idx++.'/contentType'),
+        error => '"'.$bad_content_types{$_}.'" is not a valid media-range',
+      }, sort keys %bad_content_types,
+    ],
+    'invalid contentType strings are detected',
+  );
+
+
+  $schema->{components}{mediaTypes}{my_media_type}{prefixEncoding} =
+    [ map +{ contentType => $_ }, (sort keys %good_content_types) ];
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => $schema,
+  );
+
+  is_equal([ map $_->TO_JSON, $doc->errors ], [], 'no errors with good contentTypes');
+
+  is_equal(
+    $doc->{_encoding_contentTypes},
+    \%good_content_types,
+    'all valid contentTypes were extracted and cached',
+  );
+};
+
 done_testing;

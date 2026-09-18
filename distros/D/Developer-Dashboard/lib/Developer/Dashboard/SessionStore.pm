@@ -3,13 +3,15 @@ package Developer::Dashboard::SessionStore;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Crypt::URandom qw(urandom);
 use File::Spec;
 use POSIX qw(strftime);
 
+use Developer::Dashboard::IsoTimestamp qw(_iso8601_to_epoch);
 use Developer::Dashboard::JSON qw(json_encode json_decode);
+use Developer::Dashboard::TimeUtils qw(_now_iso8601);
 
 # new(%args)
 # Constructs the file-backed session store.
@@ -43,9 +45,9 @@ sub create {
         username    => $username,
         role        => $role,
         remote_addr => $args{remote_addr} || '',
-        created_at  => _now_iso8601(),
+        created_at  => _now_iso8601( tz => "utc" ),
         expires_at  => _iso8601_after($ttl),
-        updated_at  => _now_iso8601(),
+        updated_at  => _now_iso8601( tz => "utc" ),
     };
     my $file = $self->_session_file($session_id);
     # DD-600: write to a per-writer temp file with an unpredictable name and
@@ -65,14 +67,18 @@ sub create {
 # Builds the per-writer staging path create() writes to before the atomic
 # rename into $file. Its own sub (rather than an inline sprintf) exists so a
 # coverage test can override it to a fixed, predictable path when it needs to
-# pre-stage that exact location to force a write failure - the real path is
-# deliberately unpredictable (mixing pid and wall-clock time) so two writers
-# can never collide on it.
+# pre-stage that exact location to force a write failure. DD-850: pid+wall-
+# clock-second alone is NOT collision-safe (see DD-848) - the per-process
+# monotonic counter below guarantees no two calls from one process ever
+# collide, whatever the timing; cross-process collision remains prevented
+# by pid uniqueness among live processes.
 # Input: final destination file path string.
 # Output: staging file path string.
+my $_pending_session_file_seq = 0;
+
 sub _pending_session_file {
     my ( $self, $file ) = @_;
-    return sprintf '%s.%s.%s.pending', $file, $$, time;
+    return sprintf '%s.%s.%s.%s.pending', $file, $$, time, ++$_pending_session_file_seq;
 }
 
 # get($session_id)
@@ -120,7 +126,7 @@ sub from_cookie {
     # returns 0 for undef/''/'0'/malformed input, which compares as long
     # expired. A missing expiry must fail CLOSED the same way a malformed
     # one already does, never be treated as "never expires".
-    if ( _iso8601_to_epoch( $session->{expires_at} ) <= time ) {
+    if ( _iso8601_to_epoch( $session->{expires_at}, on_error => 'zero' ) <= time ) {
         $self->delete( $session->{session_id} );
         return;
     }
@@ -203,19 +209,10 @@ sub sweep_expired {
         # through to the epoch comparison below, which already collects a
         # malformed value correctly (_iso8601_to_epoch returns 0 for it).
         my $expires_at = $record->{expires_at};
-        next if _iso8601_to_epoch($expires_at) > $now;
+        next if _iso8601_to_epoch( $expires_at, on_error => 'zero' ) > $now;
         $removed++ if $args{dry_run} || unlink $file;
     }
     return $removed;
-}
-
-# _now_iso8601()
-# Returns the current UTC timestamp in ISO-8601 form.
-# Input: none.
-# Output: timestamp string.
-sub _now_iso8601 {
-    my @t = gmtime();
-    return strftime( '%Y-%m-%dT%H:%M:%SZ', @t );
 }
 
 # _iso8601_after($seconds)
@@ -227,17 +224,6 @@ sub _iso8601_after {
     my $epoch = time + ( $seconds || 0 );
     my @t = gmtime($epoch);
     return strftime( '%Y-%m-%dT%H:%M:%SZ', @t );
-}
-
-# _iso8601_to_epoch($text)
-# Converts an ISO-8601 UTC timestamp to epoch seconds.
-# Input: timestamp string.
-# Output: epoch integer.
-sub _iso8601_to_epoch {
-    my ($text) = @_;
-    return 0 if !defined $text || $text !~ /\A(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z\z/;
-    require Time::Local;
-    return Time::Local::timegm( $6, $5, $4, $3, $2 - 1, $1 );
 }
 
 1;

@@ -97,8 +97,8 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-UV.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-UV',
       },
     },
     no_index => {
@@ -119,6 +119,9 @@ WriteMakefile(
     %configure_requires_and_prereq_pm,
     'SPVM::Resource::UV' => '0.001',
   },
+  TEST_REQUIRES => {
+    'SPVM::Sys' => '0.581',
+  }
 );
 
 package MY {

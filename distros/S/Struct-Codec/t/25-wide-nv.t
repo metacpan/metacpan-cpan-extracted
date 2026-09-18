@@ -109,6 +109,13 @@ my $NV_STR = 0x38;   # decimal digits
 # derivation here would claim 21 digits for a 36-digit NV and fail a value the
 # codec handles correctly. If the precision were ever a digit short this fails
 # with a clearer reason than a random structure comparing unequal.
+#
+# Read back through the DECODER and not through perl's own numifier. Below 5.30
+# Atof is a ULP or two out at the full width of a long double (perl RT #41202,
+# fixed there by numifying through strtod), so `0 + $digits` is not an oracle on
+# such a perl - it was two of the eight subtests every -Duselongdouble smoker
+# below 5.30 failed on 0.03. Where perl does numify through strtod the stronger
+# claim is made as well.
 {
     my $seen = 0;
     for my $f (0.1, 1/3, 1/7, 1e300, 5e-324, 123456789.123456789) {
@@ -117,10 +124,28 @@ my $NV_STR = 0x38;   # decimal digits
         $seen++;
         my $digits = substr($b, 5);
         like($digits, qr/^-?[0-9][0-9.]*(?:[eE][-+]?[0-9]+)?$/, "$f went out as plain decimal");
-        ok(0 + $digits == $f, "...and those digits read back as $f");
+        ok(struct_decode($b) == $f, "...and those digits read back as $f");
+        ok(0 + $digits == $f, "...and perl itself reads them back as it too")
+            if $] >= 5.030;
     }
     if ($WIDE) { ok($seen, "$seen of those needed the decimal form") }
     else       { is($seen, 0, 'a double perl needed the decimal form for none of them') }
+}
+
+# ---- and enough of them ---------------------------------------------------------------
+# A floor on the digit count, which is not DECIMAL_DIG derived a second time:
+# seventeen is what a plain double already needs, so a value a double could not
+# hold must beat it. 0.03 wrote ONE significant digit on a quadmath perl - the
+# precision went to quadmath_snprintf through a "%.*" it was never handed - and
+# a third came back 0.3, which every assertion above catches only as a number
+# that is not the one that went in.
+if ($WIDE) {
+    for my $f (0.1, 1/3, 1/7) {
+        my $b = struct_encode($f);
+        next unless unpack('C', substr($b, 3, 1)) == $NV_STR;
+        cmp_ok((substr($b, 5) =~ tr/0-9//), '>=', 17,
+               "$f went out with enough digits to be itself");
+    }
 }
 
 # ---- a stream from the other kind of perl --------------------------------------------
@@ -156,9 +181,17 @@ my $NV_STR = 0x38;   # decimal digits
         cmp_ok(abs($got - 0.1), '<', 1e-18, "a $n-digit tenth from another perl is a tenth here");
     }
 
-    ok(struct_decode($mk->('1e300')) == 1e300, 'an exponent form decodes');
-    ok(struct_decode($mk->('-1.7976931348623157e+308')) == -1.7976931348623157e308,
-       'and a signed exponent at the top of a double');
+    # Near enough, not equal: the number on the right is built by the perl
+    # reading this file, and below 5.30 that is Atof, which turns 1e300 into
+    # 1.0000000000000006e+300 where the decoder - like the 8-byte form, and like
+    # perl from 5.30 - gives 1.0000000000000001e+300. A decoder that misread an
+    # exponent would be out by a power of ten and not by a few ULP.
+    for my $d ('1e300', '-1.7976931348623157e+308') {
+        my $want = 0 + $d;
+        my $got  = struct_decode($mk->($d));
+        cmp_ok(abs($got - $want), '<', abs($want) * 1e-13,
+               "the exponent form $d decodes");
+    }
 
     # The longest the encoder can write is 63 bytes, and 63 must be accepted:
     # the refusal in t/14-corrupt.t starts at 64.

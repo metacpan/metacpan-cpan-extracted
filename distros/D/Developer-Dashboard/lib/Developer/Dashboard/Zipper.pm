@@ -3,7 +3,7 @@ package Developer::Dashboard::Zipper;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use Exporter 'import';
 use File::Basename qw(dirname);
@@ -13,6 +13,7 @@ use Scalar::Util qw(blessed);
 use URI::Escape qw(uri_escape);
 
 use Developer::Dashboard::Codec qw(encode_payload decode_payload);
+use Developer::Dashboard::HtmlEscape qw(_escape_html _escape_html_attr);
 use Developer::Dashboard::PathRegistry ();
 
 our @EXPORT = qw(zip unzip _cmdx _cmdp __cmdx acmdx Ajax);
@@ -62,7 +63,12 @@ sub acmdx {
         token   => $token,
         url     => { tokenised => $url, app => $args{app} || $url },
         forward => [ $path => { token => $token->{raw}, type => $type } ],
-        html    => sprintf( q{<a href="%s" target="%s">%s</a>}, $url, ( $args{target} || '_blank' ), ( $args{label} || 'Click Here' ) ),    # uncoverable condition false
+        html    => sprintf(
+            q{<a href="%s" target="%s">%s</a>},
+            _escape_html_attr($url),
+            _escape_html_attr( $args{target} || '_blank' ),
+            _escape_html( $args{label} || 'Click Here' ),    # uncoverable condition false
+        ),
     };
 }
 
@@ -70,6 +76,14 @@ sub acmdx {
 # Prints a older config-binding script for an encoded ajax endpoint.
 # Input: jvar, type, optional file/singleton names, and optional code values.
 # Output: hide marker string.
+# DD-895: $path (the jvar substring after the first '.') and the ajax url
+# are both JS STRING content in the emitted <script> tag, so both go
+# through _js_single_quote before interpolation - matching how
+# $args{singleton} was already correctly handled two lines away. $root
+# (the jvar substring before the first '.') stays unescaped by design: it
+# is interpolated as a bare JS identifier/property-access expression
+# (e.g. `window` or `someObj`), not as string content, so JS-string
+# escaping would be the wrong treatment for it.
 sub Ajax {
     my %args = @_;
     die "jvar is required" if !$args{jvar};
@@ -102,7 +116,8 @@ sub Ajax {
                 );
                 my ( $root, $path ) = split /\./, $args{jvar}, 2;
                 $path ||= '';
-                print sprintf qq{<script>set_chain_value(%s,'%s','%s')</script>}, $root, $path, $saved->{url};
+                print sprintf qq{<script>set_chain_value(%s,'%s','%s')</script>}, $root,
+                  _js_single_quote($path), _js_single_quote( $saved->{url} );
                 print sprintf qq{<script>dashboard_ajax_singleton_cleanup('%s')</script>}, _js_single_quote( $args{singleton} )
                   if defined $args{singleton} && $args{singleton} ne '';
                 return 'HIDE-THIS';
@@ -115,12 +130,14 @@ sub Ajax {
     );
     my ( $root, $path ) = split /\./, $args{jvar}, 2;
     $path ||= '';
-    print sprintf qq{<script>set_chain_value(%s,'%s','%s')</script>}, $root, $path, $ajax->{url}{tokenised};
+    print sprintf qq{<script>set_chain_value(%s,'%s','%s')</script>}, $root,
+      _js_single_quote($path), _js_single_quote( $ajax->{url}{tokenised} );
     return 'HIDE-THIS';
 }
 
 # _js_single_quote($text)
-# Escapes one scalar so it is safe inside a single-quoted JavaScript string literal.
+# Escapes one scalar so it is safe inside a single-quoted JavaScript string
+# literal that is itself written directly into an inline <script> element.
 # Input: plain scalar string.
 # Output: escaped string.
 sub _js_single_quote {
@@ -128,6 +145,20 @@ sub _js_single_quote {
     $text = '' if !defined $text;
     $text =~ s/\\/\\\\/g;
     $text =~ s/'/\\'/g;
+
+    # DD-895: JS-quote-escaping alone is not enough for text that ends up
+    # inside an inline <script> element's own text content (as opposed to
+    # an external .js file or an event-handler attribute) - the HTML
+    # tokenizer looks for the literal case-insensitive sequence "</script"
+    # ANYWHERE in a script element's raw text, independent of and before
+    # any JS parsing, so a JS string literal containing that text still
+    # closes the surrounding tag even once every quote is correctly
+    # escaped. Escaping every "</" as "<\/" is a harmless, always-valid JS
+    # string escape (a backslash before a literal forward slash is just
+    # that slash) that also breaks the "</script" sequence the HTML parser
+    # is looking for, whatever text follows it.
+    $text =~ s{</}{<\\/}g;
+
     return $text;
 }
 
@@ -249,13 +280,20 @@ sub _saved_ajax_url_and_store {
 # before the atomic rename into $path. Its own sub (rather than an inline
 # sprintf) exists so a coverage test can override it to a fixed, predictable
 # path when it needs to pre-stage that exact location to force a write
-# failure - the real path is deliberately unpredictable (mixing pid and
-# wall-clock time) so two writers can never collide on it.
+# failure. DD-848: pid+wall-clock-second alone is NOT collision-safe - $$ is
+# fixed for a process's lifetime and time() has 1-second resolution, so two
+# real calls for the SAME destination within the same second used to produce
+# an identical path, silently swapping two concurrent saves' content. The
+# per-process monotonic counter below guarantees no two calls from one
+# process ever collide, whatever the timing; cross-process collision remains
+# impossible via pid, since two live processes never share one.
 # Input: final destination file path string.
 # Output: staging file path string.
+my $_pending_ajax_seq = 0;
+
 sub _pending_ajax_file {
     my ($path) = @_;
-    return sprintf '%s.%s.%s.pending', $path, $$, time;
+    return sprintf '%s.%s.%s.%s.pending', $path, $$, time, ++$_pending_ajax_seq;
 }
 
 # _validate_saved_ajax_file($file)

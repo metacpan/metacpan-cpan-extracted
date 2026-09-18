@@ -1,6 +1,6 @@
 package Crypt::Age::Stanza::X25519;
 # ABSTRACT: X25519 recipient stanza for age encryption
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 use Carp qw(croak);
 use Crypt::Age::Keys;
@@ -104,7 +104,7 @@ sub wrap {
 }
 
 
-sub unwrap {
+sub identity_keys {
     my ($self, $identity_secret_key) = @_;
 
     # Decode identity secret key (Bech32 -> raw bytes)
@@ -113,7 +113,28 @@ sub unwrap {
     # Get recipient's public key from identity
     my $pk = Crypt::PK::X25519->new;
     $pk->import_key_raw($identity_private, 'private');
-    my $recipient_public = $pk->export_key_raw('public');
+
+    return {
+        private => $identity_private,
+        public  => $pk->export_key_raw('public'),
+    };
+}
+
+
+sub unwrap {
+    my ($self, $identity_secret_key, $identity_keys) = @_;
+
+    # Deriving the identity's public key costs a scalar multiplication, and
+    # neither it nor the Bech32 decode depends on this stanza -- so the caller
+    # is allowed to do it once per identity and hand the result down, which is
+    # what Header::unwrap_file_key does for a header with many stanzas
+    # (CVE-2026-85783). Falling back to deriving it here keeps the documented
+    # one-argument call in the SYNOPSIS working, and keeps an invalid Bech32
+    # identity failing at exactly the point it always did: on the first X25519
+    # stanza the identity is tried against, not earlier.
+    $identity_keys //= $self->identity_keys($identity_secret_key);
+    my $identity_private = $identity_keys->{private};
+    my $recipient_public = $identity_keys->{public};
 
     # Decode ephemeral public key from stanza args
     my $ephemeral_public = Crypt::Age::Stanza::decode_base64_no_padding($self->args->[0]);
@@ -162,7 +183,7 @@ Crypt::Age::Stanza::X25519 - X25519 recipient stanza for age encryption
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -252,9 +273,27 @@ recipient's public key, derives a wrapping key, and wraps the file key.
 
 Returns a L<Crypt::Age::Stanza::X25519> object.
 
+=head2 identity_keys
+
+    my $keys = Crypt::Age::Stanza::X25519->identity_keys($identity_secret_key);
+
+Turns a Bech32-encoded identity into the two raw values L</unwrap> needs from
+it: a HashRef with C<private>, the 32 secret bytes, and C<public>, the identity's
+own X25519 public key -- which is the recipient key the wrapping key is salted
+with, so it is named for that role inside L</unwrap>.
+
+Neither value depends on any stanza, and deriving C<public> is itself a scalar
+multiplication, so this exists to be called once per identity rather than once
+per stanza; see L</unwrap> and L<Crypt::Age::Header/unwrap_file_key>. Uses no
+part of the invocant, so it reads as a class method.
+
+Dies exactly as L<Crypt::Age::Keys/decode_secret_key> does, and quotes no part
+of the identity.
+
 =head2 unwrap
 
     my $file_key = $stanza->unwrap($identity_secret_key);
+    my $file_key = $stanza->unwrap($identity_secret_key, $identity_keys);
 
 Attempts to unwrap the file key using an identity.
 
@@ -264,10 +303,22 @@ Parameters:
 
 =item * C<$identity_secret_key> - Bech32-encoded secret key (C<AGE-SECRET-KEY-1...>)
 
+=item * C<$identity_keys> - Optional. What L</identity_keys> returned for that
+same identity. Passing it skips the Bech32 decode and the scalar multiplication
+that recover the identity's raw keys, neither of which depends on this stanza.
+When it is given, C<$identity_secret_key> is not looked at
+
 =back
 
 Performs key exchange with the ephemeral public key from the stanza, derives
 the wrapping key, and attempts to unwrap the file key.
+
+A caller trying one identity against many stanzas should derive the identity's
+keys once and pass them in -- that is why the second parameter exists, and
+L<Crypt::Age::Header/unwrap_file_key> does it. Omitting it derives them here
+instead, so the one-argument call above is unchanged, and an identity that is
+not valid Bech32 still dies at the first stanza it is tried against rather
+than earlier.
 
 Returns the 16-byte file key on success, or C<undef> when the AEAD
 authentication fails, which means this identity is not the one the stanza was

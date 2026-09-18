@@ -1,5 +1,18 @@
 Revision history for Number-Format
 
+1.79      2026-09-17 07:27:17-04:00 America/New_York
+  - document that format_bytes inherits the object's format_number settings,
+    including decimal_fill for trailing zeroes (RT#125400)
+  - document that format_price follows the locale's monetary sign rules and
+    does not consult NEG_FORMAT (RT#124862)
+  - documentation no longer claims that assigning to the exported :vars
+    variables affects the functional interface; that has been broken since
+    v1.60 in 2008 (RT#73717)
+  - format_number keeps the sign on tiny negative numbers that fall back to
+    scientific notation (RT#77643, thanks gsullivan)
+  - format_picture no longer warns about an uninitialized value when
+    neg_format has no prefix, like "x" (RT#148306)
+
 1.78      2026-09-13 10:43:09-07:00 America/Los_Angeles
   - just making the previous release become a stable release
 

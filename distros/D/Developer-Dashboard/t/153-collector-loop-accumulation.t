@@ -8,6 +8,7 @@ use Test::More;
 use File::Spec;
 use File::Temp qw(tempdir);
 use Time::HiRes ();
+use POSIX qw(WNOHANG);
 
 use lib 'lib';
 use lib 't/lib';
@@ -34,13 +35,65 @@ local $ENV{HOME} = $home;
 local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = tempdir( CLEANUP => 1 );
 chdir $home or die "Unable to chdir to $home: $!";
 
-my $paths  = Developer::Dashboard::PathRegistry->new( home => $home );
-my $runner = Developer::Dashboard::CollectorRunner->new(
-    collectors => Developer::Dashboard::Collector->new( paths => $paths ),
+my $paths      = Developer::Dashboard::PathRegistry->new( home => $home );
+my $collectors = Developer::Dashboard::Collector->new( paths => $paths );
+my $runner     = Developer::Dashboard::CollectorRunner->new(
+    collectors => $collectors,
     files      => Developer::Dashboard::FileRegistry->new( paths => $paths ),
     indicators => Developer::Dashboard::IndicatorStore->new( paths => $paths ),
     paths      => $paths,
 );
+
+# DD-803: t/153's own loop log lives under DEVELOPER_DASHBOARD_STATE_ROOT, which
+# line 34 (below) makes an unconditional CLEANUP tempdir - DD_KEEP_PROBE_HOME
+# preserves HOME only, which does not contain it, so a run reproducing the race
+# with that knob alone finds nothing. supervisor_liveness() below reads the log
+# directly while the state root is still live, before anything can clean it up.
+#
+# Purpose: determine, RIGHT NOW rather than from an earlier door-check, whether
+#          $pid is a genuinely live supervisor for $name - and if not, whether
+#          that absence is DD-543's known signal-based race (a named, expected
+#          hazard this file must not fail on) or something else (which is NOT
+#          this hazard and must not be silently swallowed).
+# Input:   supervisor pid, collector name.
+# Output:  { alive => bool, reason => string or undef }. reason is always set
+#          when alive is false, naming DD-543 only when the evidence supports it.
+sub supervisor_liveness {
+    my ( $pid, $name ) = @_;
+
+    # This test is the supervisor's own parent (start_loop is a plain fork();
+    # setsid does not reparent), so a WNOHANG waitpid on it yields the kernel's
+    # own termination status rather than a guess from the process table.
+    my $reaped = waitpid( $pid, WNOHANG );
+    if ( $reaped == $pid ) {
+        my $signal = $? & 127;
+        if ($signal) {
+            my $log         = $collectors->read_log($name);
+            my $handler_ran = $log =~ /SIG\S+ received by pid \Q$pid\E/;
+            return {
+                alive => 0,
+                reason => $handler_ran
+                ? "DD-543: pid $pid was signalled (signal $signal) and its handler ran - see the collector log"
+                : "DD-543: pid $pid was signalled (signal $signal) before its handler could run - an unnamed window",
+            };
+        }
+        return {
+            alive  => 0,
+            reason => 'pid ' . $pid . ' exited on its own (status ' . ( $? >> 8 ) . '), not a DD-543 signal race',
+        };
+    }
+
+    # Not yet reaped by this waitpid call: read the table directly, the same
+    # instrument the file already trusted before this fix.
+    my $title = eval { $runner->_read_process_title($pid) } // '';
+    if ( $title =~ /defunct/ ) {
+        return { alive => 0, reason => "DD-543: pid $pid is a zombie (title '$title'), not yet reaped" };
+    }
+    if ( $title !~ /\Q$name\E/ ) {
+        return { alive => 0, reason => "pid ${pid}'s title no longer names this collector (title '$title')" };
+    }
+    return { alive => 1, reason => undef };
+}
 
 # Unique per run, so a supervisor surviving an earlier run of this same file can
 # never be adopted in place of this run's. The first version used a fixed name and
@@ -121,24 +174,31 @@ my $pidfile = $runner->_pidfile($name);
 ok( -f $pidfile, 'the first start left a pidfile' );
 unlink $pidfile or die "Unable to remove $pidfile: $!";
 
-# PRECONDITION, not an assertion. Everything below needs the first supervisor to
-# still be running. Under batch load it exits and is left unreaped - a zombie with
-# a table entry and a title of "[dashboard colle] <defunct>" - which is DD-543 and
-# not this card's fault. Asserting through a failed precondition produced a red
-# file for a defect it does not own, which is how a test file stops being read.
-my $title_now = $runner->_read_process_title($first) // '';
-plan skip_all => "the supervisor exited before the scenario could run (title '$title_now') - that is DD-543, not this card"
-  if $title_now !~ /\Q$name\E/ || $title_now =~ /defunct/;
-
+# DD-803: the door-check this comment used to describe read the title once,
+# before start_loop, and skipped the WHOLE FILE (plan skip_all) on that one
+# reading - a check that could pass at that instant and still be stale by the
+# time the assertion below actually ran, since start_loop's own work spans real
+# wall-clock time in which a sibling test's inherited END block can SIGTERM this
+# supervisor (DD-543). That gap is exactly why the guard did not fire: it looked
+# before the zombie existed. Re-checking liveness RIGHT HERE, immediately before
+# the assertions that depend on it, closes that gap - and skipping only THESE
+# two assertions (never the whole file) keeps every other scenario in this file
+# asserted even when this one hazard bites.
 my $second = $runner->start_loop($job);
 
-my @alive = live_supervisors($name);
-is( scalar @alive, 1,
-    'starting a singleton collector whose pidfile has been lost does not add a second supervisor' )
-  or diag( _why_not( $first, $pidfile ) );
+my $liveness = supervisor_liveness( $first, $name );
+SKIP: {
+    skip "DD-543: first supervisor is gone before the assertion could run - $liveness->{reason}", 2
+      if !$liveness->{alive};
 
-is( $second, $first,
-    'the second start adopts the supervisor that is already running rather than reporting a new one' );
+    my @alive = live_supervisors($name);
+    is( scalar @alive, 1,
+        'starting a singleton collector whose pidfile has been lost does not add a second supervisor' )
+      or diag( _why_not( $first, $pidfile ) );
+
+    is( $second, $first,
+        'the second start adopts the supervisor that is already running rather than reporting a new one' );
+}
 
 # The pidfile repair is asserted on DD-543, not here. It holds every time in
 # isolation and fails every time in a batch, with the loop state gone too - the
@@ -156,6 +216,96 @@ is( $second, $first,
 #
 # Keeping them here would have made this file red for a reason it does not own,
 # which is how a test file stops being read.
+
+# DD-803, AC-1/AC-2/AC-3: supervisor_liveness() forces the exact interleaving
+# the door-check above could only wait for - a supervisor SIGTERM'd in the
+# window between the liveness check and the assertion that depends on it -
+# rather than hoping an in-suite race reproduces it. Both directions of
+# supervisor_liveness() are exercised directly: a supervisor killed in that
+# window must SKIP (never fail) with a DD-543-naming reason, and a healthy one
+# must still make the scenario RUN, so a fix that widens the skip to cover
+# every case (removing the test, which DD-797 forbids) would be caught here.
+{
+    my $forced_name = "interleave-probe-$$";
+    my $forced_job  = { name => $forced_name, interval => 3600, mode => 'singleton', command => 'true' };
+
+    for my $stale ( live_supervisors($forced_name) ) {
+        kill 'TERM', $stale;
+    }
+    Time::HiRes::sleep(0.2) if live_supervisors($forced_name);
+
+    # AC-1: force the race. Kill the supervisor RIGHT HERE - the exact window
+    # between a liveness reading and the assertion that trusts it - rather than
+    # waiting for a sibling test's END block to do it under load.
+    my $forced_pid = $runner->start_loop($forced_job);
+    ok( $forced_pid, 'AC-1 setup: the probe collector starts and reports a supervisor pid' );
+    ok( wait_for_managed_loop( $runner, $forced_pid, $forced_name ),
+        'AC-1 setup: the probe supervisor is recognised before the forced kill' );
+
+    # KILL, not TERM: the supervisor installs its own SIGTERM handler
+    # (_signal_stop) for an orderly shutdown, so a plain TERM here is caught
+    # and exits 0 - a real, benign path, correctly reported by
+    # supervisor_liveness() as "exited on its own", but NOT DD-543's shape.
+    # DD-543's own hazard is a signal the handler never gets a chance to run
+    # for (uncatchable, or delivered before installation) - KILL forces
+    # exactly that, uncatchably, matching the AC-3/1d30eda path this card's
+    # own key_details name.
+    kill 'KILL', $forced_pid;
+
+    # kill() only sends the signal; it does not block until the target has
+    # actually processed it and exited. Poll briefly rather than asserting the
+    # very next instruction - the interleaving this card fixes is exactly this
+    # kind of real wall-clock gap, and a flat "check once immediately" here
+    # would reintroduce the same door-check shape on the FORCING side of the
+    # test, this time against a signal that is virtually instant but not
+    # actually synchronous.
+    my $forced_liveness;
+    for ( 1 .. 50 ) {
+        $forced_liveness = supervisor_liveness( $forced_pid, $forced_name );
+        last if !$forced_liveness->{alive};
+        Time::HiRes::sleep(0.1);
+    }
+    ok( !$forced_liveness->{alive}, 'AC-1: a supervisor killed in the check-to-use window is detected as not alive' );
+    like(
+        $forced_liveness->{reason},
+        qr/\ADD-543:/,
+        'AC-3: the forced-kill case is named as DD-543, distinguishing it from a supervisor that never started'
+    ) if defined $forced_liveness->{reason};
+
+  SKIP: {
+        skip "DD-543: forced for AC-1 - $forced_liveness->{reason}", 1 if !$forced_liveness->{alive};
+        fail('AC-1 regression: the forced-kill scenario must SKIP, not reach a real assertion');
+    }
+
+    # AC-2, the negative control: a supervisor that is genuinely alive at the
+    # assertion must still make the assertion RUN. A fix that turns every check
+    # into a skip (e.g. always reporting alive => 0) would pass AC-1 vacuously
+    # and fail here, which is the "test aimed at an empty set" failure this
+    # card's own key_details warn against.
+    my $healthy_liveness = supervisor_liveness( $forced_pid, $forced_name );
+    ok( !$healthy_liveness->{alive}, 'sanity: the already-killed probe is still reported dead (no double-reap surprise)' );
+
+    my $second_forced_name = "interleave-healthy-$$";
+    my $second_forced_job  = { name => $second_forced_name, interval => 3600, mode => 'singleton', command => 'true' };
+    for my $stale ( live_supervisors($second_forced_name) ) {
+        kill 'TERM', $stale;
+    }
+    Time::HiRes::sleep(0.2) if live_supervisors($second_forced_name);
+
+    my $healthy_pid = $runner->start_loop($second_forced_job);
+    ok( $healthy_pid, 'AC-2 setup: a second probe collector starts' );
+    ok( wait_for_managed_loop( $runner, $healthy_pid, $second_forced_name ),
+        'AC-2 setup: the healthy probe supervisor is recognised' );
+
+    my $control = supervisor_liveness( $healthy_pid, $second_forced_name );
+    ok( $control->{alive}, 'AC-2: a supervisor left alive at the assertion is reported alive, not skipped' );
+  SKIP: {
+        skip "AC-2 regression: supervisor_liveness incorrectly reported not-alive", 1 if !$control->{alive};
+        pass('AC-2: the assertion that depends on liveness actually runs when the supervisor is healthy');
+    }
+
+    kill 'TERM', $healthy_pid;
+}
 
 # Leave nothing behind whatever the assertions did.
 END {

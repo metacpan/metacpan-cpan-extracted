@@ -1,0 +1,75 @@
+name: "Volca Drum"
+manufacturer: "Korg"
+port:
+    in: "generic"
+    out: "generic"
+note_on:
+  - 60 # part 1
+  - 62 # part 2
+  - 64 # part 3
+  - 65 # part 4
+  - 67 # part 5
+  - 69 # part 6
+control_change:
+  - number: 10
+    name: "Pan"
+  - number: 14
+    name: "Sound Source Select - Layer 1"
+  - number: 15
+    name: "Sound Source Select - Layer 2"
+  - number: 16
+    name: "Sound Source Select - Both"
+  - number: 17
+    name: "Level / Gain - Layer 1"
+  - number: 18
+    name: "Level / Gain - Layer 2"
+  - number: 19
+    name: "Level / Gain - Both"
+  - number: 20
+    name: "EG Attack Time - Layer 1"
+  - number: 21
+    name: "EG Attack Time - Layer 2"
+  - number: 22
+    name: "EG Attack Time - Both"
+  - number: 23
+    name: "EG Release Time - Layer 1"
+  - number: 24
+    name: "EG Release Time - Layer 2"
+  - number: 25
+    name: "EG Release Time - Both"
+  - number: 26
+    name: "Pitch - Layer 1"
+  - number: 27
+    name: "Pitch - Layer 2"
+  - number: 28
+    name: "Pitch - Both"
+  - number: 29
+    name: "Pitch Modulation Amount - Layer 1"
+  - number: 30
+    name: "Pitch Modulation Amount - Layer 2"
+  - number: 31
+    name: "Pitch Modulation Amount - Both"
+  - number: 46
+    name: "Pitch Modulation Rate - Layer 1"
+  - number: 47
+    name: "Pitch Modulation Rate - Layer 2"
+  - number: 48
+    name: "Pitch Modulation Rate - Both"
+  - number: 49
+    name: "Bit Reduction"
+  - number: 50
+    name: "Wave Folder Amount"
+  - number: 51
+    name: "Overdrive Gain"
+  - number: 52
+    name: "Dry Gain"
+  - number: 103
+    name: "Waveguide Send"
+  - number: 116
+    name: "Waveguide Model"
+  - number: 117
+    name: "Decay"
+  - number: 118
+    name: "Body"
+  - number: 119
+    name: "Tune"

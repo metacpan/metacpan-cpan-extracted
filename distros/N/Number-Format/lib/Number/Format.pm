@@ -1,12 +1,8 @@
-package Number::Format 1.78;
+package Number::Format 1.79;
 
 # ABSTRACT: Perl extension for formatting numbers
 
-# Minimum version is 5.10.0.  May work on earlier versions, but not
-# supported on any version older than 5.10.  Hack this line at your own risk:
-require 5.010;
-
-use strict;
+use v5.12.0;
 use warnings;
 
 #pod =head1 SYNOPSIS
@@ -76,13 +72,8 @@ use warnings;
 #pod email address) for help.
 #pod
 #pod If any of the above parameters are not specified when you invoke
-#pod C<new()>, then the values are taken from package global variables of
-#pod the same name (e.g.  C<$DECIMAL_POINT> is the default for the
-#pod C<DECIMAL_POINT> parameter).  If you use the C<:vars> keyword on your
-#pod C<use Number::Format> line (see non-object-oriented example below) you
-#pod will import those variables into your namesapce and can assign values
-#pod as if they were your own local variables.  The default values for all
-#pod the parameters are:
+#pod C<new()>, the values are taken from the current locale, and failing
+#pod that from these built-in defaults:
 #pod
 #pod   THOUSANDS_SEP     = ','
 #pod   DECIMAL_POINT     = '.'
@@ -143,23 +134,27 @@ use warnings;
 #pod                                -int_curr_symbol => 'DEM');
 #pod   my $formatted = $de->format_number($number);
 #pod
-#pod Or, if you prefer not to use the object oriented interface, you can do
-#pod this instead:
+#pod Or, if you prefer not to use the object oriented interface, you can call
+#pod the functions directly:
 #pod
-#pod   use Number::Format qw(:subs :vars);
-#pod   $THOUSANDS_SEP   = '.';
-#pod   $DECIMAL_POINT   = ',';
-#pod   $INT_CURR_SYMBOL = 'DEM';
+#pod   use Number::Format qw(:subs);
 #pod   my $formatted = format_number($number);
+#pod
+#pod In that case the parameters come from the current locale and the
+#pod built-in defaults, and there is no way to override them.  If you need
+#pod non-default parameters, use the object oriented interface.
 #pod
 #pod =head1 EXPORTS
 #pod
-#pod Nothing is exported by default.  To export the functions or the global
-#pod variables defined herein, specify the function name(s) on the import
-#pod list of the C<use Number::Format> statement.  To export all functions
-#pod defined herein, use the special tag C<:subs>.  To export the
-#pod variables, use the special tag C<:vars>; to export both subs and vars
-#pod you can use the tag C<:all>.
+#pod Nothing is exported by default.  To export functions, name them on the
+#pod import list of the C<use Number::Format> statement, or use the tag
+#pod C<:subs> to export all of them.
+#pod
+#pod The tag C<:vars> (and the variables half of C<:all>) still exists for
+#pod compatibility, but it no longer has any useful purpose.  It exports a
+#pod set of package variables that were once the way to configure the
+#pod functional interface; assigning to them has had no effect since version
+#pod 1.60 in 2008.  Use C<new()> instead.
 #pod
 #pod =cut
 
@@ -605,7 +600,7 @@ sub format_number
     if ($number =~ /^(-?[\d.]+)e([+-]\d+)$/)
     {
         # Don't attempt to format numbers that require scientific notation.
-        return $number;
+        return ($sign < 0) ? $self->format_negative($number) : $number;
     }
 
     # Split integer and decimal parts of the number and add commas
@@ -730,7 +725,11 @@ sub format_picture
     $self->_check_seps();
 
     # Handle negative numbers
+    # A neg_format like "x" has no prefix, and the match fails, so default to
+    # the empty string rather than warning about undef. (RT#148306)
+    # -- claude, 2026-09-16
     my($neg_prefix) = $self->{neg_format} =~ /^([^x]+)/;
+    $neg_prefix = '' unless defined $neg_prefix;
     my($pic_prefix) = $picture            =~ /^([^\#]+)/;
     my $neg_pic = $self->{neg_format};
     (my $pos_pic = $self->{neg_format}) =~ s/[^x\s]/ /g;
@@ -834,6 +833,13 @@ sub format_picture
 #pod given; if set to the empty string, or if set to undef and the
 #pod C<INT_CURR_SYMBOL> attribute of the object is the empty string, no
 #pod currency will be added.
+#pod
+#pod Negative prices are laid out according to the locale's monetary sign
+#pod rules: C<NEGATIVE_SIGN>, C<N_SIGN_POSN>, C<N_CS_PRECEDES>, and
+#pod C<N_SEP_BY_SPACE>.  Unlike C<format_number()>, C<format_price()> does
+#pod I<not> consult C<NEG_FORMAT>.  To show negative prices in parentheses,
+#pod for example, set C<N_SIGN_POSN> to 0 rather than setting C<NEG_FORMAT>
+#pod to C<(x)>.
 #pod
 #pod If C<$precision> is not provided, the default of 2 will be used.
 #pod Examples:
@@ -1001,6 +1007,15 @@ sub format_price
 #pod standard 60027 "KiB," "MiB," or "GiB" depending on the "mode" option.
 #pod
 #pod Negative values will result in an error.
+#pod
+#pod The abbreviated value is passed through C<format_number()>, so the
+#pod object's C<THOUSANDS_SEP>, C<DECIMAL_POINT>, and C<DECIMAL_FILL>
+#pod settings all apply, and there is no per-call option to override them.
+#pod In particular, to get trailing zeroes (for aligning a column of sizes,
+#pod say) build the formatter with C<< decimal_fill => 1 >>:
+#pod
+#pod   Number::Format->new->format_bytes(2048)                     yields 2K
+#pod   Number::Format->new(decimal_fill => 1)->format_bytes(2048)  yields 2.00K
 #pod
 #pod The second parameter can be either a hash that sets options, or a
 #pod number.  Using a number here is deprecated and will generate a
@@ -1331,7 +1346,7 @@ Number::Format - Perl extension for formatting numbers
 
 =head1 VERSION
 
-version 1.78
+version 1.79
 
 =head1 SYNOPSIS
 
@@ -1400,13 +1415,8 @@ of this package at <SwPrAwM@cpan.org> (remove "SPAM" to get correct
 email address) for help.
 
 If any of the above parameters are not specified when you invoke
-C<new()>, then the values are taken from package global variables of
-the same name (e.g.  C<$DECIMAL_POINT> is the default for the
-C<DECIMAL_POINT> parameter).  If you use the C<:vars> keyword on your
-C<use Number::Format> line (see non-object-oriented example below) you
-will import those variables into your namesapce and can assign values
-as if they were your own local variables.  The default values for all
-the parameters are:
+C<new()>, the values are taken from the current locale, and failing
+that from these built-in defaults:
 
   THOUSANDS_SEP     = ','
   DECIMAL_POINT     = '.'
@@ -1467,14 +1477,15 @@ For example, a German user might include this in their code:
                                -int_curr_symbol => 'DEM');
   my $formatted = $de->format_number($number);
 
-Or, if you prefer not to use the object oriented interface, you can do
-this instead:
+Or, if you prefer not to use the object oriented interface, you can call
+the functions directly:
 
-  use Number::Format qw(:subs :vars);
-  $THOUSANDS_SEP   = '.';
-  $DECIMAL_POINT   = ',';
-  $INT_CURR_SYMBOL = 'DEM';
+  use Number::Format qw(:subs);
   my $formatted = format_number($number);
+
+In that case the parameters come from the current locale and the
+built-in defaults, and there is no way to override them.  If you need
+non-default parameters, use the object oriented interface.
 
 =head1 PERL VERSION
 
@@ -1611,6 +1622,13 @@ given; if set to the empty string, or if set to undef and the
 C<INT_CURR_SYMBOL> attribute of the object is the empty string, no
 currency will be added.
 
+Negative prices are laid out according to the locale's monetary sign
+rules: C<NEGATIVE_SIGN>, C<N_SIGN_POSN>, C<N_CS_PRECEDES>, and
+C<N_SEP_BY_SPACE>.  Unlike C<format_number()>, C<format_price()> does
+I<not> consult C<NEG_FORMAT>.  To show negative prices in parentheses,
+for example, set C<N_SIGN_POSN> to 0 rather than setting C<NEG_FORMAT>
+to C<(x)>.
+
 If C<$precision> is not provided, the default of 2 will be used.
 Examples:
 
@@ -1633,6 +1651,15 @@ Suffix may be the traditional K, M, or G (default); or the IEC
 standard 60027 "KiB," "MiB," or "GiB" depending on the "mode" option.
 
 Negative values will result in an error.
+
+The abbreviated value is passed through C<format_number()>, so the
+object's C<THOUSANDS_SEP>, C<DECIMAL_POINT>, and C<DECIMAL_FILL>
+settings all apply, and there is no per-call option to override them.
+In particular, to get trailing zeroes (for aligning a column of sizes,
+say) build the formatter with C<< decimal_fill => 1 >>:
+
+  Number::Format->new->format_bytes(2048)                     yields 2K
+  Number::Format->new(decimal_fill => 1)->format_bytes(2048)  yields 2.00K
 
 The second parameter can be either a hash that sets options, or a
 number.  Using a number here is deprecated and will generate a
@@ -1741,12 +1768,15 @@ option is given, by the multiple of that value) as appropriate.  Examples:
 
 =head1 EXPORTS
 
-Nothing is exported by default.  To export the functions or the global
-variables defined herein, specify the function name(s) on the import
-list of the C<use Number::Format> statement.  To export all functions
-defined herein, use the special tag C<:subs>.  To export the
-variables, use the special tag C<:vars>; to export both subs and vars
-you can use the tag C<:all>.
+Nothing is exported by default.  To export functions, name them on the
+import list of the C<use Number::Format> statement, or use the tag
+C<:subs> to export all of them.
+
+The tag C<:vars> (and the variables half of C<:all>) still exists for
+compatibility, but it no longer has any useful purpose.  It exports a
+set of package variables that were once the way to configure the
+functional interface; assigning to them has had no effect since version
+1.60 in 2008.  Use C<new()> instead.
 
 =head1 CAVEATS
 

@@ -238,7 +238,7 @@ is( $manager->_collector_stalled_for_watchdog( 'x',  {} ), 0, '_collector_stalle
 is( $manager->_collector_stalled_for_watchdog( {},   'x' ), 0, '_collector_stalled_for_watchdog rejects a non-hash status' );
 is( $manager->_collector_stalled_for_watchdog( {},   {} ), 0, '_collector_stalled_for_watchdog false when there is no progress epoch' );
 {
-    my $recent = Developer::Dashboard::RuntimeManager::_now_iso8601();
+    my $recent = Developer::Dashboard::RuntimeManager::_now_iso8601( tz => 'utc' );
     is( $manager->_collector_stalled_for_watchdog( { interval => 5 }, { last_run => $recent } ), 0, '_collector_stalled_for_watchdog false for a fresh collector' );
     my $old = POSIX::strftime( '%Y-%m-%dT%H:%M:%SZ', gmtime( time - 100000 ) );
     is( $manager->_collector_stalled_for_watchdog( { interval => 1 }, { last_run => $old } ), 1, '_collector_stalled_for_watchdog true for a long-stalled collector' );
@@ -246,7 +246,7 @@ is( $manager->_collector_stalled_for_watchdog( {},   {} ), 0, '_collector_stalle
 {
     no warnings 'redefine';
     local *Developer::Dashboard::RuntimeManager::_collector_watchdog_stale_seconds = sub { return 0 };
-    is( $manager->_collector_stalled_for_watchdog( { interval => 1 }, { last_run => Developer::Dashboard::RuntimeManager::_now_iso8601() } ), 0, '_collector_stalled_for_watchdog false when the stale window is under one second' );
+    is( $manager->_collector_stalled_for_watchdog( { interval => 1 }, { last_run => Developer::Dashboard::RuntimeManager::_now_iso8601( tz => 'utc' ) } ), 0, '_collector_stalled_for_watchdog false when the stale window is under one second' );
 }
 
 # --- _collector_watchdog_last_progress_epoch --------------------------------
@@ -254,7 +254,7 @@ is( $manager->_collector_watchdog_last_progress_epoch('x'), 0, '_collector_watch
 is( $manager->_collector_watchdog_last_progress_epoch( {} ), 0, '_collector_watchdog_last_progress_epoch zero for empty status' );
 is( $manager->_collector_watchdog_last_progress_epoch( { last_run => '' } ), 0, '_collector_watchdog_last_progress_epoch skips empty timestamps' );
 {
-    my $now = Developer::Dashboard::RuntimeManager::_now_iso8601();
+    my $now = Developer::Dashboard::RuntimeManager::_now_iso8601( tz => 'utc' );
     ok( $manager->_collector_watchdog_last_progress_epoch( { last_completed_at => $now, last_started_at => $now } ) > 0, '_collector_watchdog_last_progress_epoch returns the newest epoch' );
     is( $manager->_collector_watchdog_last_progress_epoch( { last_run => 'not-a-date' } ), 0, '_collector_watchdog_last_progress_epoch skips unparseable timestamps' );
 }
@@ -3369,6 +3369,25 @@ is( Developer::Dashboard::RuntimeManager::_portable_signal(15), 15, '_portable_s
     $manager->_ps_processes;
     is( $? >> 8, 12,
         '_ps_processes does not leak its own subprocess status into the caller global $?' );
+}
+
+# DD-850: same shape as DD-848 in Zipper.pm - exercising the real
+# path-generation helpers directly, which the other tests in this file
+# never do (they call the higher-level _write_* methods against real
+# fixtures, not the staging-path generator in isolation).
+{
+    my $manager = build_manager();
+    my @a = map { $manager->_pending_collector_supervisor_state_file('/tmp/dd850-supervisor-target') } 1 .. 50;
+    my %seen_a;
+    my @dupes_a = grep { $seen_a{$_}++ } @a;
+    is( scalar(@dupes_a), 0,
+        'DD-850: 50 real, rapid-fire calls to _pending_collector_supervisor_state_file for the same destination never repeat a staging path' );
+
+    my @b = map { $manager->_pending_web_state_file('/tmp/dd850-webstate-target') } 1 .. 50;
+    my %seen_b;
+    my @dupes_b = grep { $seen_b{$_}++ } @b;
+    is( scalar(@dupes_b), 0,
+        'DD-850: 50 real, rapid-fire calls to _pending_web_state_file for the same destination never repeat a staging path' );
 }
 
 done_testing;

@@ -1,5 +1,62 @@
 Revision history for Crypt-Age
 
+0.004     2026-09-17 22:33:50Z
+  - SECURITY (CVE-2026-85783): a header's recipient stanzas are now capped,
+    at 128 by default, and the cap is enforced while the header is read
+    rather than after it. Every X25519 stanza costs a scalar multiplication,
+    an HKDF and a ChaCha20-Poly1305 open per identity, and all of it is paid
+    before any of the header can be authenticated -- the header MAC key is
+    derived from the file key, which does not exist until some stanza has
+    already been unwrapped. So the cost of a file this distribution did not
+    write was bounded by nothing at all: 98 attacker-chosen bytes bought one
+    scalar multiplication, and the file was rejected only after every one of
+    them had run. Measured on 0.003: a 382 KB header of 4000 stanzas cost
+    15.7 s of CPU on a single identity, linear in the stanza count and
+    multiplied again by the number of identities held; the same header now
+    costs 0.002 s and is refused after 3.2% of the file has been read,
+    because the check fires at the first line of stanza 129, before its body
+    is read and before any of the crypto runs. Reported by the CPAN Security
+    Group.
+
+    The number is this distribution's own, and it is the only constant in
+    Crypt::Age::Header that c2sp.org/age does not dictate: the grammar is
+    "header = v1-line 1*stanza end", with no upper bound, and neither
+    reference implementation imposes one -- measured, age 1.2.1 reads a
+    50000-stanza header in 8.9 s and rage 0.12.1 a 4000-stanza one in 5.8 s.
+    This is therefore a deliberate deviation, and a visible one: `age -R`
+    writes a 300-recipient file without complaint, and a real 301-recipient
+    file written by age 1.2.1 decrypts here correctly when the cap allows it.
+    Such a file is now refused by default. The refusal says so in as many
+    words -- that the limit comes from this implementation and not from the
+    age format -- and names the option that lifts it, because a caller who
+    legitimately holds a wide-recipient file needs to be told how to read it
+    rather than told their file is broken.
+
+    New option max_stanzas, accepted by Crypt::Age->decrypt, ->decrypt_file
+    and ->decrypt_filehandle and by Crypt::Age::Header->parse and
+    ->parse_from_fh. Omitting it means the default of 128. It must be a
+    positive integer: 0 and undef are refused rather than read as "no limit",
+    since 0 read literally means "allow zero stanzas", which the grammar
+    forbids anyway, and a security limit that a falsy value silently switches
+    off is one that disappears exactly when a caller computes it and the
+    computation goes wrong. Unbounded is spelled as a large number.
+
+  - Crypt::Age::Header->unwrap_file_key no longer re-derives the caller's
+    identity once per stanza. The Bech32 decode and the import/export that
+    recovers the identity's own public key depend only on the identity, never
+    on the stanza, yet ran inside the inner loop -- as did the test for the
+    AGE-SECRET-KEY-1 prefix. All three are now done once per identity, the
+    first two through the new Crypt::Age::Stanza::X25519->identity_keys,
+    whose result ->unwrap accepts as an optional second argument and derives
+    for itself when it is absent, so the documented one-argument call is
+    unchanged. Measured: 3.95 ms to 2.71 ms per stanza per identity, -31%.
+    An identity that is not valid Bech32 still fails at exactly the point it
+    always did, on the first X25519 stanza it is tried against, with a
+    byte-identical message. The remaining per-stanza cost is the scalar
+    multiplication itself, which any conformant reader must pay before it can
+    authenticate anything. Also reported by the CPAN Security Group, as the
+    second half of CVE-2026-85783.
+
 0.003     2026-09-01 00:11:25Z
   - Crypt::Age::Header->parse and ->parse_from_fh now reject a header that
     carries no recipient stanza at all -- a version line followed directly by

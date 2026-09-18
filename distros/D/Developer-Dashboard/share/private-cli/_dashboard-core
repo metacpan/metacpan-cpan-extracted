@@ -903,25 +903,26 @@ elsif ( $cmd eq 'docker' ) {
         exec @{ $result->{command} };
         die "Unable to exec docker compose: $!";
     }
-    if ( $sub eq 'disable' ) {
-        my $service = shift @ARGV || die "Usage: dashboard docker disable <service>\n";
-        die "Usage: dashboard docker disable <service>\n" if @ARGV;
-        print json_encode(
-            $docker->disable_service(
-                service => $service,
-            )
-        );
-        exit 0;
-    }
-    if ( $sub eq 'enable' ) {
-        my $service = shift @ARGV || die "Usage: dashboard docker enable <service>\n";
-        die "Usage: dashboard docker enable <service>\n" if @ARGV;
-        print json_encode(
-            $docker->enable_service(
-                service => $service,
-            )
-        );
-        exit 0;
+    if ( $sub eq 'disable' || $sub eq 'enable' ) {
+        # DD-919: accepts one or more service names, toggling each independently
+        # so a bad name among good ones is reported per-service instead of
+        # aborting the whole call; single-service is the size-1 case of the loop.
+        die "Usage: dashboard docker $sub <service> [service...]\n" if !@ARGV;
+        my $toggle = $sub eq 'disable' ? 'disable_service' : 'enable_service';
+        my @results;
+        my $failed = 0;
+        for my $service (@ARGV) {
+            my $result = eval { $docker->$toggle( service => $service ) };
+            if ($@) {
+                ( my $message = $@ ) =~ s/\n\z//;
+                push @results, { service => $service, error => $message };
+                $failed = 1;
+                next;
+            }
+            push @results, $result;
+        }
+        print json_encode( @results == 1 ? $results[0] : \@results );
+        exit( $failed ? 2 : 0 );
     }
     if ( $sub eq 'list' ) {
         my $enabled_only  = 0;

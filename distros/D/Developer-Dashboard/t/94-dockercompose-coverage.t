@@ -164,6 +164,31 @@ my ( $docker, $paths ) = build_docker( $home, $repo );
     ok( grep( { $_ eq 'orange' } @{ $resolved->{services} } ), 'auto-discovers skill service orange' );
 }
 
+# ---- DD-862: naming ONE service must not drop another enabled service's ---
+# ---- compose file - a depends_on target needs its file in the merge too --
+{
+    my $old = getcwd();
+    chdir $repo or die $!;
+    my $resolved = $docker->resolve( args => ['up'], services => ['purple'] );
+    chdir $old or die $!;
+    ok(
+        grep( { m{config/docker/green/} } @{ $resolved->{files} } ),
+        'DD-862: requesting only "purple" still includes enabled service "green"\'s compose file'
+    );
+    ok(
+        grep( { m{config/docker/purple/compose\.yml$} } @{ $resolved->{files} } ),
+        'DD-862: the explicitly requested service "purple" is still included'
+    );
+    ok(
+        !grep( { m{config/docker/blue/compose\.yml$} } @{ $resolved->{files} } ),
+        'DD-862: a DISABLED service ("blue") is still excluded even though file-gathering now uses the full enabled set'
+    );
+    is_deeply(
+        $resolved->{services}, ['purple'],
+        'DD-862: the resolved "services" field (used for env resolution/passthrough) still reflects only what was actually requested'
+    );
+}
+
 # ---- run() with a harmless docker stub on PATH ----------------------------
 my $stubbin = File::Spec->catdir( $home, 'stubbin' );
 make_path($stubbin);
@@ -189,6 +214,107 @@ chmod 0755, File::Spec->catfile( $stubbin, 'docker' );
     is( $? >> 8, 12, 'run does not leak its own subprocess status into the caller global $?' );
 
     chdir $old or die $!;
+}
+
+# ---------------------------------------------------------------------------
+# DD-857: run() pre-materializes multiple -f layers via `docker compose
+# ... config` into one temp file, then runs the real command against just
+# that file - so the operational command never depends on Compose's own
+# multi-file merge resolving a service correctly, only on `config` having
+# already done so once, up front.
+# ---------------------------------------------------------------------------
+my $logbin = File::Spec->catdir( $home, 'logbin' );
+make_path($logbin);
+my $invocation_log = File::Spec->catfile( $home, 'docker-invocations.log' );
+mkfile(
+    File::Spec->catfile( $logbin, 'docker' ), <<"STUB" );
+#!/bin/sh
+printf '%s\\n' "\$*" >> '$invocation_log'
+last=''
+for a in "\$\@"; do last="\$a"; done
+if [ "\$last" = 'config' ]; then
+  printf 'services:\\n  merged-marker:\\n    image: stub\\n'
+fi
+exit 0
+STUB
+chmod 0755, File::Spec->catfile( $logbin, 'docker' );
+
+{
+    unlink $invocation_log if -e $invocation_log;
+    my $old = getcwd();
+    chdir $repo or die $!;
+    local $ENV{PATH} = "$logbin:$ENV{PATH}";
+    my $result = $docker->run(
+        addons   => ['mailhog'],
+        args     => [ 'config', 'app' ],
+        modes    => ['dev'],
+        services => ['worker'],
+    );
+    chdir $old or die $!;
+
+    is( $result->{exit_code}, 0, 'run with multiple layers still succeeds' );
+
+    open my $log_fh, '<', $invocation_log or die "Unable to read $invocation_log: $!";
+    my @lines = <$log_fh>;
+    close $log_fh;
+    chomp @lines;
+
+    ok( scalar(@lines) >= 2, 'run invokes docker at least twice: once to materialize, once to execute' )
+      or diag( explain \@lines );
+    like( $lines[0], qr/(?:^| )config$/, 'first invocation is the materialize-via-config call' );
+    ok( ( grep { /-f / } $lines[0] ), 'the materialize call carries the original multi -f layers' )
+      or diag( explain \@lines );
+
+    my $final_call = $lines[-1];
+    my @f_flags = ( $final_call =~ /-f (\S+)/g );
+    is( scalar(@f_flags), 1, 'the executed call passes exactly one -f, pointing at the merged file' )
+      or diag( explain \@lines );
+    ok( -f $f_flags[0], 'the single -f file the executed call names actually exists on disk' );
+    my $merged_content = do { local ( @ARGV, $/ ) = $f_flags[0]; <> };
+    like( $merged_content, qr/merged-marker/, 'the merged file holds the materialized config, not a raw layer file' );
+    like( $final_call, qr/ app$/, 'the executed call still carries the original passthrough args (app)' );
+}
+
+# run() when resolve() names zero compose files - materialization is skipped
+# and the original (file-less) command runs directly. Uses its OWN fresh,
+# isolated home - the shared $home above has home-layer docker services
+# (green/blue/purple) that resolve() auto-discovers for ANY repo beneath it,
+# so it can never itself produce a zero-files resolution.
+{
+    unlink $invocation_log if -e $invocation_log;
+    my $empty_home = tempdir( CLEANUP => 1 );
+    my $empty_repo = File::Spec->catdir( $empty_home, 'projects', 'empty-repo' );
+    make_path( File::Spec->catdir( $empty_repo, '.git' ) );
+    my ( $empty_docker, undef ) = build_docker( $empty_home, $empty_repo );
+
+    my $old = getcwd();
+    chdir $empty_repo or die $!;
+    local $ENV{HOME} = $empty_home;
+    local $ENV{PATH} = "$logbin:$ENV{PATH}";
+    my $result = $empty_docker->run( args => ['ps'] );
+    chdir $old or die $!;
+
+    is( $result->{exit_code}, 0, 'run with zero compose files still succeeds' );
+    open my $log_fh, '<', $invocation_log or die "Unable to read $invocation_log: $!";
+    my @lines = <$log_fh>;
+    close $log_fh;
+    is( scalar(@lines), 1, 'run with zero files invokes docker exactly once - no materialize step' );
+}
+
+# run() dies with the merge's own stderr when the materialize-via-config call
+# itself fails (the real command never runs).
+{
+    my $failbin = File::Spec->catdir( $home, 'failbin' );
+    make_path($failbin);
+    mkfile( File::Spec->catfile( $failbin, 'docker' ), "#!/bin/sh\necho 'boom: bad compose file' >&2\nexit 3\n" );
+    chmod 0755, File::Spec->catfile( $failbin, 'docker' );
+
+    my $old = getcwd();
+    chdir $repo or die $!;
+    local $ENV{PATH} = "$failbin:$ENV{PATH}";
+    my $err = eval { $docker->run( addons => ['mailhog'], args => ['config'], modes => ['dev'] ); 1 } ? '' : $@;
+    chdir $old or die $!;
+    like( $err, qr/Unable to materialize merged docker compose config \(3\): boom: bad compose file/, 'run dies with the materialize command\'s own exit code and stderr when config itself fails' );
 }
 
 # run() with a chdir target that does not exist -> chdir failure die path.
@@ -462,6 +588,29 @@ JSON
     is( $docker->_expand_env_path('$DDDC_TEST_VAR/x'),      'value/x', 'expand_env_path expands bare var' );
     is( $docker->_expand_env_path('${DDDC_MISSING_VAR}a'),  'a',       'expand_env_path collapses undefined braced var' );
     is( $docker->_expand_env_path('$DDDC_MISSING_VAR/a'),   '/a',      'expand_env_path collapses undefined bare var' );
+
+    # DD-887: expansion must run as a single pass over the ORIGINAL string,
+    # never re-scanning an already-substituted value for further
+    # placeholders. Without this, one env var's value containing a
+    # "$NAME"-shaped substring gets a second, unintended expansion using a
+    # completely unrelated env var.
+    local $ENV{DDDC_OUTER_VAR} = '$DDDC_INNER_VAR/tail';
+    local $ENV{DDDC_INNER_VAR} = 'unexpected';
+    is(
+        $docker->_expand_env_path('${DDDC_OUTER_VAR}'),
+        '$DDDC_INNER_VAR/tail',
+        'AC-1: expand_env_path does not re-expand a substituted value - the literal $DDDC_INNER_VAR text inside DDDC_OUTER_VAR survives unexpanded, not silently replaced with DDDC_INNER_VAR\'s own value',
+    );
+    is(
+        $docker->_expand_env_path('${DDDC_TEST_VAR}/x'),
+        'value/x',
+        'AC-2: ordinary single-level expansion (no embedded $ pattern) is unaffected by the single-pass fix',
+    );
+    is(
+        $docker->_expand_env_path('${DDDC_MISSING_VAR}/x'),
+        '/x',
+        'AC-3: an undefined env var still expands to empty string under the single-pass fix',
+    );
 
     # _skill_docker_env_key with undef / empty / junk.
     is( $docker->_skill_docker_env_key(undef), undef, 'env key undef' );

@@ -24,6 +24,13 @@ use Developer::Dashboard::RuntimeManager ();
 {
     package Local::MethodHelper;
     sub greet { return "greeted-$_[1]"; }
+
+    # DD-858: a sub written to be called as a plain FUNCTION - it expects its
+    # first argument to be the real value, not an implicit class invocant.
+    # Calling it via method() (which prepends the class as $_[0]) and via
+    # func() (which does not) must produce visibly different results, or the
+    # two helpers would be indistinguishable.
+    sub shout { return "shouted-$_[0]"; }
 }
 
 # A fake IO::Select used to drive the post-exit drain loop deterministically.
@@ -251,6 +258,19 @@ sub write_file {
     my $method_page = Developer::Dashboard::PageDocument->new( id => 'method-page', state => {}, layout => { body => $method_body } );
     $runtime->_render_templates( page => $method_page, runtime_context => { a => 1 }, source => 'saved' );
     like( $method_page->{layout}{body}, qr/greeted-X/, '_render_templates method() helper calls valid class methods and skips invalid ones' );
+
+    # DD-858: func() helper - calls a sub as a plain function (no implicit
+    # invocant), distinct from method()'s implicit-invocant call, across the
+    # same validation branches.
+    my $func_body =
+        '[% func("Local::MethodHelper","shout","X") %]'
+      . '[% func("","shout") %]'
+      . '[% func("Local::MethodHelper","") %]'
+      . '[% func("Local::MethodHelper","no_such_sub") %]';
+    my $func_page = Developer::Dashboard::PageDocument->new( id => 'func-page', state => {}, layout => { body => $func_body } );
+    $runtime->_render_templates( page => $func_page, runtime_context => { a => 1 }, source => 'saved' );
+    like( $func_page->{layout}{body}, qr/shouted-X/, '_render_templates func() helper calls valid subs as plain functions and skips invalid ones' );
+    unlike( $func_page->{layout}{body}, qr/Local::MethodHelper/, 'func() never prepends the class as an implicit invocant, unlike method()' );
 
     # eval() helper with a truthy source and no runtime context (L224 left, L223 right).
     my $eval_page = Developer::Dashboard::PageDocument->new( id => 'eval-page', state => {}, layout => { body => 'A[% eval("print q{INLINE};") %]B' } );

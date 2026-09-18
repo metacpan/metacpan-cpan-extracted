@@ -3,7 +3,7 @@ package Developer::Dashboard::File;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
 use File::Spec;
 use Scalar::Util qw(blessed);
@@ -63,6 +63,7 @@ sub read {
     my ( $class, $file ) = @_;
     my $path = $class->_resolve_file($file);
     return if !defined $path || !-f $path;
+    # uncoverable branch true
     open my $fh, '<', $path or die "Unable to read $path: $!";
     local $/;
     return <$fh>;
@@ -175,6 +176,16 @@ sub _load_configured_aliases {
 }
 
 # _resolve_file($where)
+# DD-878: the method-name fallback below must dispatch ONLY to these
+# no-arg path getters on the underlying FileRegistry object - never to any
+# other public method (which may take required arguments, mutate state, or
+# return a value that is not a file path at all, like `paths`), or a name
+# that merely collides with a method name becomes an arbitrary method call.
+my %RESOLVABLE_ACCESSOR = map { $_ => 1 } qw(
+  prompt_log collector_log dashboard_log global_config
+  dashboard_index auth_log web_pid web_state
+);
+
 # Resolves a named file alias or literal path.
 # Input: alias or path string.
 # Output: file path string or undef.
@@ -185,7 +196,7 @@ sub _resolve_file {
     _files_obj();
     _load_configured_aliases();
     my $files = blessed($FILES) ? $FILES : undef;
-    return $files->$where() if $files && $files->can($where);
+    return $files->$where() if $files && $RESOLVABLE_ACCESSOR{$where};
     return $ALIASES{$where} if defined $ALIASES{$where};
     return $CONFIG_ALIASES{$where} if defined $CONFIG_ALIASES{$where};
     my $env = 'DEVELOPER_DASHBOARD_FILE_' . uc($where);

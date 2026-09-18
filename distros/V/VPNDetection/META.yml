@@ -32,11 +32,11 @@ no_index:
     - t
 requires:
   IO::Socket::SSL: '2.009'
-  Mojolicious: '9.00'
+  Mojolicious: '9.47'
   perl: '5.022'
 resources:
   bugtracker: https://github.com/vpndetection-io/sdk-perl/issues
   homepage: https://vpndetection.io
   repository: https://github.com/vpndetection-io/sdk-perl.git
-version: v3.2.0
+version: v3.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

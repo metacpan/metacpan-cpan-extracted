@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::CLI::Source ();
+
+# main(@ARGV)
+# Runs the source helper for Developer Dashboard.
+# Input: command-line arguments from @ARGV.
+# Output: prints installed file paths and exits (DD-938).
+exit( Developer::Dashboard::CLI::Source::run_source_command( command => 'source', args => \@ARGV ) );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+source - private runtime installed-file listing helper for Developer Dashboard (DD-938)
+
+=head1 SYNOPSIS
+
+  dashboard source --files
+
+=head1 DESCRIPTION
+
+This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
+main C<dashboard> command can list every file Developer Dashboard installed
+under C<~/perl5/{lib,bin}>, as a fallback reference for an agent digging
+deeper than C<dashboard ask --docs>'s curated onboarding summary covers,
+without bloating the public switchboard.
+
+=head1 PURPOSE
+
+Thin wrapper that delegates straight into
+C<Developer::Dashboard::CLI::Source::run_source_command>, so the real
+listing logic has exactly one implementation shared between the staged CLI
+command and its own test coverage.
+
+=head1 WHY IT EXISTS
+
+C<dashboard ask --docs> is a short, curated summary - cheap to inject on
+every call, but necessarily incomplete. C<dashboard source --files> answers
+"what is actually installed, and where?" so an agent can read the real,
+current implementation directly rather than rely only on the summary.
+
+=head1 WHEN TO USE
+
+Whenever the curated C<--docs> onboarding context does not cover something
+specific an agent needs to know about Developer Dashboard's own
+implementation.
+
+=head1 HOW TO USE
+
+  dashboard source --files
+
+Lists every file under C<~/perl5/lib> and C<~/perl5/bin>, one per line,
+sorted. Run it directly as C<dashboard source --files> (or C<d2 source
+--files>) from anywhere on a machine with Developer Dashboard installed;
+C<--files> is required and no other flags exist. Pipe the output into
+C<grep> or C<Read> individual paths to inspect the real, current
+implementation of any command or module.
+
+=head1 WHAT USES IT
+
+The public C<dashboard> switchboard resolves and stages this file; an agent
+or user runs it directly as C<dashboard source --files>.
+
+=for comment FULL-POD-DOC START
+
+=head1 EXAMPLES
+
+Example 1:
+
+  dashboard source --files
+
+List every file Developer Dashboard installed on this machine, for an agent
+that needs to grep/Read the real implementation beyond the curated
+C<dashboard ask --docs> summary.
+
+=for comment FULL-POD-DOC END
+
+=cut

@@ -1,4 +1,4 @@
-package Sieve::Generator 0.003;
+package Sieve::Generator 0.004;
 # ABSTRACT: generate Sieve email filter scripts
 
 use v5.36.0;
@@ -55,7 +55,7 @@ Sieve::Generator - generate Sieve email filter scripts
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -102,6 +102,12 @@ ship, this software B<may> begin to require it for any reason, and there is
 no promise that patches will be accepted to lower the minimum required perl.
 
 =head1 AUTHOR
+
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
 
 Ricardo Signes <rjbs@semiotic.systems>
 

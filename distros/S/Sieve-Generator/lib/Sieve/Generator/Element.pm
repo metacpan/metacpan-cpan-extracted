@@ -1,5 +1,5 @@
 use v5.36.0;
-package Sieve::Generator::Element 0.003;
+package Sieve::Generator::Element 0.004;
 # ABSTRACT: role for objects that render as Sieve code
 
 use Moo::Role;
@@ -65,7 +65,7 @@ Sieve::Generator::Element - role for objects that render as Sieve code
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -110,7 +110,7 @@ matching nodes, so all matches at any depth are returned.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

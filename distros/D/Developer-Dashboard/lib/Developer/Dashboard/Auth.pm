@@ -3,16 +3,17 @@ package Developer::Dashboard::Auth;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
 
+use Crypt::URandom qw(urandom);
 use Fcntl qw(:mode);
 use Digest::SHA qw(sha256_hex hmac_sha256);
 use File::Spec;
-use POSIX qw(strftime);
 use Socket qw(AF_INET AF_INET6 SOCK_STREAM getaddrinfo inet_ntoa inet_ntop unpack_sockaddr_in unpack_sockaddr_in6);
 use String::Compare::ConstantTime ();
 
 use Developer::Dashboard::JSON qw(json_encode json_decode);
+use Developer::Dashboard::TimeUtils qw(_now_iso8601);
 
 # Work factor for the PBKDF2-HMAC-SHA256 helper-password scheme. This is the
 # iteration count new helper passwords are stretched with; it is also recorded
@@ -90,7 +91,17 @@ sub add_user {
       if $username !~ /\A[A-Za-z0-9_.-]{1,64}\z/;
     die 'Password must be at least 8 characters long'
       if length($password) < 8;
-    my $salt       = sha256_hex( join ':', $$, time, rand(), $username );
+    # 256 bits straight from the operating system's CSPRNG. This used to hash
+    # the pid, the wall-clock second, rand() and the username together, the
+    # exact CVE-2026-13577 construction (DD-452/453) already fixed for
+    # SessionStore.pm's session ids: every term but rand() is attacker-
+    # observable, and rand() is drand48 seeded with thirty-two bits - and
+    # inside this project's own container deployment $$ is always 1,
+    # contributing zero entropy at all (DD-900). Crypt::URandom is imported
+    # at compile time on purpose - there is deliberately no fallback,
+    # because a SILENT fallback to weak material is the vulnerability
+    # itself, not the remedy for it.
+    my $salt       = unpack 'H*', urandom(32);
     my $iterations = $PBKDF2_ITERATIONS;
     my $record     = {
         username        => $username,
@@ -99,7 +110,7 @@ sub add_user {
         password_scheme => $PBKDF2_SCHEME,
         iterations      => $iterations,
         password_hash   => _pbkdf2_hmac_sha256_hex( $password, $salt, $iterations ),
-        updated_at      => _now_iso8601(),
+        updated_at      => _now_iso8601( tz => "utc" ),
     };
     my $file = $self->_user_file($username);
     # DD-599: write to a per-writer temp file with an unpredictable name and
@@ -119,14 +130,18 @@ sub add_user {
 # Builds the per-writer staging path add_user writes to before the atomic
 # rename into $file. Its own sub (rather than an inline sprintf) exists so a
 # coverage test can override it to a fixed, predictable path when it needs to
-# pre-stage that exact location to force a write failure - the real path is
-# deliberately unpredictable (mixing pid and wall-clock time) so two writers
-# can never collide on it.
+# pre-stage that exact location to force a write failure. DD-850: pid+wall-
+# clock-second alone is NOT collision-safe (see DD-848) - the per-process
+# monotonic counter below guarantees no two calls from one process ever
+# collide, whatever the timing; cross-process collision remains prevented
+# by pid uniqueness among live processes.
 # Input: final destination file path string.
 # Output: staging file path string.
+my $_pending_user_file_seq = 0;
+
 sub _pending_user_file {
     my ( $self, $file ) = @_;
-    return sprintf '%s.%s.%s.pending', $file, $$, time;
+    return sprintf '%s.%s.%s.%s.pending', $file, $$, time, ++$_pending_user_file_seq;
 }
 
 # verify_user(%args)
@@ -491,15 +506,6 @@ sub _secure_compare {
     my ( $left, $right ) = @_;
     return 0 if !defined $left || !defined $right;
     return String::Compare::ConstantTime::equals( $left, $right ) ? 1 : 0;
-}
-
-# _now_iso8601()
-# Returns the current UTC timestamp in ISO-8601 form.
-# Input: none.
-# Output: timestamp string.
-sub _now_iso8601 {
-    my @t = gmtime();
-    return strftime( '%Y-%m-%dT%H:%M:%SZ', @t );
 }
 
 1;

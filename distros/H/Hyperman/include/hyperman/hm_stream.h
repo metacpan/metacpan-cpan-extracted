@@ -273,8 +273,24 @@ static void *hm_stream_open(pTHX_ void *vl, int fd, UV id, int64_t sid,
          * coderef, or a handler parked on a Future. A synchronous handler's
          * return value is still coming, and it would be serialised on top of
          * the body being streamed here; refusing is the only honest answer,
-         * and it is one the caller can act on. */
-        if (!c->awaiting) return NULL;
+         * and it is one the caller can act on.
+         *
+         * Except for a 101. An upgrade has no body for a return value to
+         * land on top of: the connection becomes a tunnel (c->tunnel),
+         * hm_process drops what the handler returns exactly as it drops the
+         * sentinel a detach leaves, and what the peer sends from here on
+         * goes to the handle's read half. That is what lets a WebSocket run
+         * over TLS, which conn_detach refuses. */
+        if (!c->awaiting && status != 101) return NULL;
+        if (status == 101) {
+            /* Parked before the headers go out: keepalive is off, and a
+             * flush on a connection that is neither keeping alive nor
+             * parked closes it as soon as it drains. 2 marks a tunnel
+             * opened inside the handler, whose request is still on the
+             * parser's plate; hm_process finishes with it and makes it 1. */
+            c->tunnel = c->awaiting ? 1 : 2;
+            c->awaiting = 1;
+        }
         hm_start_stream(aTHX_ fd, id, status, headers);
     }
     if (loop->conns[fd] != c) return NULL;        /* the flush closed it    */
@@ -392,10 +408,25 @@ static int hm_stream_on_drain(pTHX_ void *h, hm_abi_stream_cb cb, void *ud) {
 
 static int hm_stream_on_data(pTHX_ void *h, hm_abi_stream_data_cb cb, void *ud) {
     hm_stream *s = hm_stream_of(h);
-    PERL_UNUSED_CONTEXT;
     if (!s) return HM_ABI_STREAM_STALE;
     s->data_cb = cb;
     s->data_ud = ud;
+    /* A settled HTTP/1.1 tunnel (tunnel == 1) may already hold bytes the
+     * peer sent before the read half was registered - which is the norm on
+     * the deferred path, where the request line is already consumed and only
+     * the post-upgrade payload is left in rbuf. Hand them over now rather
+     * than wait for the peer to send again. NOT tunnel == 2: there the
+     * request headers are still in rbuf, and hm_process delivers the
+     * leftover once it has stripped them. Cleared first - the callback may
+     * close the stream, and with it the connection. */
+    if (cb && s->kind == HM_STREAM_H1 && !s->dead) {
+        hm_conn *c = hm_stream_conn(s);
+        if (c && c->tunnel == 1 && c->rlen) {
+            size_t n = c->rlen;
+            c->rlen = 0;
+            cb(aTHX_ (void *)s, c->rbuf, n, 0, ud);
+        }
+    }
     return HM_ABI_STREAM_OK;
 }
 

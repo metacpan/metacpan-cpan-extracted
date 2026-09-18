@@ -3,16 +3,33 @@ package Developer::Dashboard::Collector;
 use strict;
 use warnings;
 
-our $VERSION = '4.31';
+our $VERSION = '4.45';
+
+use Exporter qw(import);
+our @EXPORT_OK = qw(readfile);
 
 use Fcntl qw(:flock);
 use File::Spec;
-use POSIX qw(strftime);
 use Time::HiRes qw(time);
-use Time::Local qw(timegm);
 
+use Developer::Dashboard::FileSlurp qw(slurp_file);
+use Developer::Dashboard::IsoTimestamp ();
 use Developer::Dashboard::JSON qw(json_encode json_decode json_decode_state);
 use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
+use Developer::Dashboard::TimeUtils qw(_now_iso8601);
+
+# readfile($alias)
+# Plain-function convenience wrapper around new_from_all_folders()->read_output($alias),
+# for callers that want a collector's latest output without holding onto the
+# object themselves.
+# Input: collector name string.
+# Output: list of ( stdout, stderr, last_run, collector object ).
+sub readfile {
+    my ($alias) = @_;
+    my $collector = __PACKAGE__->new_from_all_folders;
+    my ( $stdout, $stderr, $last_run ) = @{ $collector->read_output($alias) }{qw(stdout stderr last_run)};
+    return ( $stdout, $stderr, $last_run, $collector );
+}
 
 # new(%args)
 # Constructs the collector storage manager.
@@ -104,7 +121,7 @@ sub write_result {
     $self->_atomic_write_text( $paths->{stderr}, defined $result{stderr} ? $result{stderr} : '' );
     $self->_atomic_write_text( $paths->{combined}, ( defined $result{stdout} ? $result{stdout} : '' ) . ( defined $result{stderr} ? $result{stderr} : '' ) );
 
-    my $timestamp = _now_iso8601();
+    my $timestamp = _now_iso8601( tz => "local" );
     $self->_atomic_write_text( $paths->{last_run}, $timestamp . "\n" );
 
     my $written = $self->update_status(
@@ -250,7 +267,7 @@ sub mark_stopped {
                 %{$existing},
                 running     => 0,
                 active_runs => 0,
-                stopped_at  => _now_iso8601(),
+                stopped_at  => _now_iso8601( tz => "local" ),
             };
         }
     );
@@ -347,7 +364,7 @@ sub rotate_log {
     return $self->_with_log_lock(
         $paths,
         sub {
-            my $original = _slurp( $paths->{log} );
+            my $original = slurp_file( $paths->{log}, raw => 1, on_missing => 'empty' );
             my $rotated = $self->_apply_log_rotation(
                 $name,
                 $original,
@@ -392,7 +409,7 @@ sub read_log {
     my ( $self, $name ) = @_;
     die 'Missing collector name' if !defined $name || $name eq '';
     for my $file ( $self->_collector_file_candidates( $name, 'log' ) ) {
-        return _slurp($file) if -f $file;
+        return slurp_file( $file, raw => 1, on_missing => 'empty' ) if -f $file;
     }
     return $self->_render_latest_log_entry($name);
 }
@@ -449,7 +466,7 @@ sub _collector_file_candidates {
 sub _first_existing_text_file {
     my ( $self, $name, $filename ) = @_;
     for my $file ( $self->_collector_file_candidates( $name, $filename ) ) {
-        return _slurp($file) if -f $file;
+        return slurp_file( $file, raw => 1, on_missing => 'empty' ) if -f $file;
     }
     return '';
 }
@@ -683,21 +700,14 @@ sub _entry_timestamp_epoch {
 # _iso8601_to_epoch($timestamp)
 # Converts one dashboard ISO-8601 timestamp string into epoch seconds.
 # Input: timestamp string in YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DDTHH:MM:SS+HHMM form.
-# Output: UTC epoch integer.
+# Output: UTC epoch integer. Dies on anything unparseable (DD-904).
 sub _iso8601_to_epoch {
     my ( $self, $timestamp ) = @_;
-    my ( $year, $month, $day, $hour, $minute, $second, $zone ) =
-      $timestamp =~ /\A(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(Z|[+-]\d{4}|[+-]\d{2}:\d{2})\z/;
-    die "Unsupported collector log timestamp $timestamp\n" if !defined $zone;
-
-    my $offset_seconds = 0;
-    if ( $zone ne 'Z' ) {
-        my ( $sign, $offset_hour, $offset_minute ) = $zone =~ /\A([+-])(\d{2}):?(\d{2})\z/;
-        $offset_seconds = ( $offset_hour * 3600 ) + ( $offset_minute * 60 );
-        $offset_seconds *= -1 if $sign eq '-';
-    }
-
-    return timegm( $second, $minute, $hour, $day, $month - 1, $year ) - $offset_seconds;
+    my $epoch = eval {
+        Developer::Dashboard::IsoTimestamp::_iso8601_to_epoch( $timestamp, on_error => 'die' );
+    };
+    die "Unsupported collector log timestamp $timestamp\n" if $@;
+    return $epoch;
 }
 
 # _with_trailing_newline($text)
@@ -728,13 +738,19 @@ sub _atomic_write_json {
 # one worker truncate and then rename away another worker's staged file, which
 # both lost that worker's output and made its rename fail, so the run died before
 # the active-run counter could be decremented and the collector stayed reported
-# as running forever. The process id plus the high-resolution timestamp is the
-# same uniquifier the other lock-free atomic writers in this distribution use.
+# as running forever. The process id plus wall-clock time is the same uniquifier
+# the other lock-free atomic writers in this distribution use - but pid+time
+# ALONE is not collision-safe within one process (DD-850, see DD-848): $$ is
+# fixed for the process's life and time() has 1-second resolution, so the
+# monotonic counter below is what actually guarantees no two calls from this
+# process ever collide, regardless of timing.
 # Input: target file path string.
 # Output: pending temporary file path string.
+my $_pending_path_seq = 0;
+
 sub _pending_path {
     my ( $self, $file ) = @_;
-    return sprintf '%s.%s.%s.pending', $file, $$, time;
+    return sprintf '%s.%s.%s.%s.pending', $file, $$, time, ++$_pending_path_seq;
 }
 
 # _atomic_write_text($file, $text)
@@ -769,27 +785,6 @@ sub _read_status_file {
     return;
 }
 
-# _slurp($file)
-# Reads an entire file or returns an empty string when missing.
-# Input: file path string.
-# Output: file content string.
-sub _slurp {
-    my ($file) = @_;
-    return '' if !-f $file;
-    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
-    local $/;
-    return scalar <$fh>;
-}
-
-# _now_iso8601()
-# Returns the current local timestamp in ISO-8601 form with timezone offset.
-# Input: none.
-# Output: timestamp string.
-sub _now_iso8601 {
-    my @t = localtime();
-    return strftime( '%Y-%m-%dT%H:%M:%S%z', @t );
-}
-
 1;
 
 __END__
@@ -803,6 +798,9 @@ Developer::Dashboard::Collector - file-backed collector storage
   my $collector = Developer::Dashboard::Collector->new(paths => $paths);
   $collector->write_job('sample', { name => 'sample', command => 'true' });
 
+  use Developer::Dashboard::Collector qw(readfile);
+  my ( $stdout, $stderr, $last_run, $collector ) = readfile('sample');
+
 =head1 DESCRIPTION
 
 This module owns the on-disk storage model for collector job definitions,
@@ -815,6 +813,13 @@ and stays parsable by the next rotation pass.
 =head1 METHODS
 
 =head2 new, collector_paths, write_job, read_job, write_result, write_status, read_status, read_output, collector_exists, append_log_entry, rotate_log, read_log, inspect_collector, list_collectors
+
+=head2 readfile
+
+Exportable plain function (not a method), available via C<@EXPORT_OK>. Wraps
+C<< __PACKAGE__->new_from_all_folders->read_output($alias) >> for a caller
+that wants one collector's latest output without holding onto the collector
+object itself. Still returns the object as its fourth value.
 
 Construct and manage collector storage.
 

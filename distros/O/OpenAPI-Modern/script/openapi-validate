@@ -34,7 +34,7 @@ my ($opt, $usage) = Getopt::Long::Descriptive::describe_options(
   ['dump-identifiers', 'print a list of all identifiers found in the schema'],
   ['with-defaults', 'include list of defaults for missing data'],
   ['upgrade:s', 'upgrade to the target version (default value: '.OAS_VERSIONS->[-1].')'],
-  ['metaschema-uri=s', 'override the URI of the metaschema to use for validation (e.g. "https://spec.openapis.org/oas/3.2/schema-base/2025-11-23")'],
+  ['metaschema-uri=s', 'override the URI of the metaschema to use for validation (e.g. "https://spec.openapis.org/oas/3.2/schema-base/2026-08-30")'],
   [],
 );
 
@@ -161,7 +161,7 @@ openapi-validate - A command-line interface to OpenAPI document validation
 
 =head1 VERSION
 
-version 0.148
+version 0.149
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
