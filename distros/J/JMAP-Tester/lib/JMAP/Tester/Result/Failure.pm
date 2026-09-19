@@ -1,6 +1,6 @@
 use v5.20.0;
 
-package JMAP::Tester::Result::Failure 0.112;
+package JMAP::Tester::Result::Failure 0.113;
 # ABSTRACT: what you get when your JMAP request utterly fails
 
 use Moo;
@@ -70,7 +70,7 @@ JMAP::Tester::Result::Failure - what you get when your JMAP request utterly fail
 
 =head1 VERSION
 
-version 0.112
+version 0.113
 
 =head1 OVERVIEW
 

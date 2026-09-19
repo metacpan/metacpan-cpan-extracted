@@ -26,6 +26,7 @@ no_index:
     - test-data
     - xt
 requires:
+  File::Spec: '0'
   Getopt::Long::Descriptive: '0'
   Moo: '0'
   PPI::Document: '0'
@@ -40,7 +41,7 @@ resources:
   bugtracker: https://github.com/perl-ide/App-perlvars/issues
   homepage: https://github.com/perl-ide/App-perlvars
   repository: https://github.com/perl-ide/App-perlvars.git
-version: '0.000007'
+version: '0.000008'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -130,14 +131,6 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/InstallGuide'
       version: '1.200014'
     -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: requires
-      name: '@Author::OALDERS/Modules for use with tidyall'
-      version: '6.039'
-    -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::OALDERS/ExecDir'
       version: '6.039'
@@ -206,10 +199,6 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Synopsis
       name: '@Author::OALDERS/Test::Synopsis'
       version: '2.000007'
-    -
-      class: Dist::Zilla::Plugin::Test::TidyAll
-      name: '@Author::OALDERS/Test::TidyAll'
-      version: '0.04'
     -
       class: Dist::Zilla::Plugin::Test::Version
       name: '@Author::OALDERS/Test::Version'
@@ -471,7 +460,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000007
+          tag: v0.000008
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -542,6 +531,10 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
+      version: '6.039'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: PruneFiles
       version: '6.039'
     -
       class: Dist::Zilla::Plugin::FinderCode

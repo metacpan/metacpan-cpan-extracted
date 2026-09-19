@@ -1,5 +1,14 @@
 Revision history for Physics::Balls
 
+0.04	2026-09-18
+        - A kind may give a body its radius, mass, friction multiplier, a sweep radius against its own kind and a speed above which it is down: for example a bowling ball among pins
+        - A shot may carry a release roll off its line, the hook
+
+0.03	2026-09-18
+        - A ball may curve, by its kind: a chain of parabolas turned at capped segment boundaries, no trigonometry
+        - A shot may carry an adjust: the surface under the struck ball changes once it crosses a line
+        - ABI 2 by append: world_new_ex and strike_ex with size-prefixed structs; the v1 structs and entry points frozen as wrappers
+
 0.02	2026-09-17
         - A resting pair that crept inside each other is set apart at the end of a shot
         - A wall or a gate more than a radius behind a ball is not its contact: a course has far sides

@@ -88,11 +88,11 @@
    "provides" : {
       "Net::OpenSSH::More" : {
          "file" : "lib/Net/OpenSSH/More.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Net::OpenSSH::More::Linux" : {
          "file" : "lib/Net/OpenSSH/More/Linux.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -107,7 +107,7 @@
          "web" : "https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_contributors" : [
       "Andy Baugh <andy@troglodyne.net>"
    ],

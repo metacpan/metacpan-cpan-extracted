@@ -28,8 +28,7 @@ do { my $x = {
        'runtime' => {
                       'conflicts' => {
                                        'Module::Pluggable' => '== 6.2',
-                                       'Role::Tiny' => '== 2.000007',
-                                       'YAML' => '== 1.16'
+                                       'Role::Tiny' => '== 2.000007'
                                      },
                       'recommends' => {
                                         'CGI::Deurl::XS' => '0',
@@ -47,7 +46,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'Attribute::Handlers' => '0',
-                                      'CLI::Osprey' => '0',
+                                      'CLI::Osprey' => '0.09',
                                       'Carp' => '0',
                                       'Clone' => '0',
                                       'Config::Any' => '0',
@@ -92,7 +91,7 @@ do { my $x = {
                                       'Type::Tiny' => '1.000006',
                                       'Types::Standard' => '0',
                                       'URI::Escape' => '0',
-                                      'YAML' => '0.86',
+                                      'YAML' => '1.30',
                                       'parent' => '0',
                                       'perl' => '5.014'
                                     },

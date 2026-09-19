@@ -21,6 +21,7 @@ my @files = (
     't/decode-header-value.t',
     't/everywhere-logfile-child.pl',
     't/everywhere-logfile.t',
+    't/http-tiny.t',
     't/pretty.t',
     't/test-data/content-regex.html',
     't/test-data/file-upload.html',

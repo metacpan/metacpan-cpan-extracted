@@ -319,6 +319,17 @@ sar_drained(self)
         if (!r || !r->map.base) croak("Shared::Arena: this region is released");
         sa_wake_drained(r);
 
+# The pid as the library sees it. It is cached, and the cache is dropped by a
+# pthread_atfork child handler; a handler that linked but never runs leaves
+# every child answering as its parent, and every fork test failing at once
+# with nothing naming the cause. t/06-fork.t compares this with $$ in a child.
+UV
+sar__pid()
+    CODE:
+        RETVAL = (UV)sa_getpid();
+    OUTPUT:
+        RETVAL
+
 # The two knobs a crash test needs, and nothing else has any use for.
 #
 # `stall_us` widens the window between reserving a record and committing it, so

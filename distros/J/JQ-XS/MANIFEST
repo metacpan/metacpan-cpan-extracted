@@ -5,9 +5,16 @@ MANIFEST
 MANIFEST.SKIP
 ppport.h
 README
+THIRD-PARTY-LICENSES
 typemap
 XS.xs
-t/JQ-XS.t
 lib/JQ/XS.pm
+t/boolean-overload.t
+t/embedded-jq.t
+t/features.t
+t/JQ-XS.t
+vendor/build-jq.pl
+vendor/jq-1.8.2.tar.gz
+vendor/jq-1.8.2.tar.gz.sha256
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

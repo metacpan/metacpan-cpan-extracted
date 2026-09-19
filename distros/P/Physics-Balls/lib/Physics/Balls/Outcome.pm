@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 has t => (
 	is => 'ro',
@@ -47,10 +47,27 @@ has energy => (
 	default => []
 );
 
+has down => (
+	is => 'ro',
+	isa => ArrayRef,
+	default => []
+);
+
+has peak => (
+	is => 'ro',
+	isa => HashRef,
+	default => {}
+);
+
 has shot => (
 	is => 'ro',
 	isa => HashRef,
 	default => {}
+);
+
+has kinded => (
+	is => 'ro',
+	default => 0
 );
 
 sub message {
@@ -58,7 +75,14 @@ sub message {
 	return '' unless $self->error;
 	return $self->error eq 'events' ? 'the engine gave up after 5000 events'
 		: $self->error eq 'time' ? 'the engine gave up after 40 seconds of simulated time'
+		: $self->error eq 'turns' ? 'the engine gave up after 20000 turns of curving balls'
 		: 'the engine failed: ' . $self->error;
+}
+
+sub adjusted_at {
+	my ($self) = @_;
+	for my $e (@{ $self->events }) { return $e->[0] if $e->[1] eq 'adjust' }
+	return;
 }
 
 sub first {
@@ -82,9 +106,20 @@ sub potted {
 	return;
 }
 
+sub downed {
+	my ($self, $id) = @_;
+	for my $d (@{ $self->down }) { return $d if $d->[0] == $id }
+	return;
+}
+
+sub peak_of {
+	my ($self, $id) = @_;
+	return $self->peak->{$id};
+}
+
 sub contacts {
 	my ($self) = @_;
-	return [ grep { $_->[1] ne 'roll' && $_->[1] ne 'stop' } @{ $self->events } ];
+	return [ grep { $_->[1] ne 'roll' && $_->[1] ne 'stop' && $_->[1] ne 'adjust' && $_->[1] ne 'down' } @{ $self->events } ];
 }
 
 sub to_payload {
@@ -95,6 +130,7 @@ sub to_payload {
 		error => $self->error,
 		events => $self->events, rest => $self->rest, holed => $self->holed,
 		segments => $self->segments,
+		$self->kinded ? (down => $self->down, peak => $self->peak) : (),
 	};
 }
 
@@ -110,7 +146,7 @@ Physics::Balls::Outcome - what a strike did
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -124,11 +160,19 @@ Version 0.02
 
 The record of one shot. C<events> is every event in time order as
 C<[t, kind, a, b]>: C<roll> and C<stop> for one ball, C<ball> for two, C<wall>
-and C<nose> with the wall or nose index, C<pot> with the pocket number. A rules
-module reads first contact, cushions after contact and pots in order straight
-off it. C<segments> is the trajectory a client plays back, per ball id, each
+and C<nose> with the wall or nose index, C<pot> with the pocket number, and
+C<adjust> for the struck ball when the shot carried one. A rules module reads
+first contact, cushions after contact and pots in order straight off it.
+C<down> (0.04) is every body that passed its kind's C<vfall> and left play,
+C<[id, x, y, t]> in time order, where it lay in hundredths of a millimetre
+and when; such a body is in neither C<rest> nor C<holed>. C<peak> is every
+body's peak speed over the shot, by id, in metres per second: the number a
+pinfall rule reads.
+C<segments> is the trajectory a client plays back, per ball id, each
 C<[t0, dur, px, py, vx, vy, ax, ay]> in metres and seconds, so a position at
-time C<t> within a segment is C<p0 + v (t - t0) + a (t - t0)^2 / 2>.
+time C<t> within a segment is C<p0 + v (t - t0) + a (t - t0)^2 / 2>. A curving
+ball's trajectory is many short segments; a client plays them exactly as it
+plays a straight ball's, because each one is still that parabola.
 
 =head1 ATTRIBUTES
 
@@ -155,8 +199,20 @@ error is still returned so a caller can see how far it got.
 
 =head2 energy
 
-Per unit mass after the strike and after every event, when the strike was
-traced; else empty.
+Mass-weighted (per unit mass when every body is the default kind), after the
+strike and after every event, when the strike was traced; else empty.
+
+=head2 down
+
+=head2 peak
+
+As described above.
+
+=head2 kinded
+
+True when the world the shot was played on declares a kind with a size, a
+mass, a friction or a down threshold of its own; then C<to_payload> carries
+C<down> and C<peak>.
 
 =head2 shot
 
@@ -167,6 +223,11 @@ The shot that produced this.
 =head2 message
 
 A sentence for C<error>, or the empty string.
+
+=head2 adjusted_at
+
+The time the struck ball crossed the shot's adjust line, or undef when the
+shot carried no adjust or the ball never reached the line.
 
 =head2 first
 
@@ -185,13 +246,27 @@ The wall and nose events for a ball.
 
 The C<[id, pocket, t]> row, or undef.
 
+=head2 downed
+
+    my $d = $out->downed($id);
+
+The C<[id, x, y, t]> row of a body that went down, or undef.
+
+=head2 peak_of
+
+    my $v = $out->peak_of($id);
+
+A body's peak speed over the shot.
+
 =head2 contacts
 
-The events that are contacts, without the roll and stop transitions.
+The events that are contacts, without the roll, stop, adjust and down
+transitions.
 
 =head2 to_payload
 
 The hash a game stores and a client plays back: C<engine>, C<t>, C<n>,
-C<error>, C<events>, C<rest>, C<holed>, C<segments>.
+C<error>, C<events>, C<rest>, C<holed>, C<segments>, and C<down> and C<peak>
+when the world is C<kinded>; a pool payload is what it always was.
 
 =cut

@@ -16,6 +16,7 @@ our %ERRORS = (
         'Deadlock found when trying to get locking service lock; try releasing locks and restarting lock acquisition',
         'Lock wait timeout exceeded; try restarting transaction',
         'Service lock wait timeout exceeded',
+        'Table definition has changed, please retry transaction',
         'WSREP detected deadlock/conflict and aborted the transaction. Try restarting the transaction',
     ],
     connection => [
@@ -25,10 +26,13 @@ our %ERRORS = (
         "Host 'example.com' is blocked because of many connection errors; unblock with 'mysqladmin flush-hosts'",
         "Can't connect to local MySQL server through socket '/var/mysql/mysql.sock' (38)",
         "Can't connect to MySQL server on 'host_name' (111)",
+        'Not enough connections on writer to handle your request',
         'Got an error reading communication packets',
         'Got an error writing communication packets',
         'Got timeout reading communication packets',
         'Got timeout writing communication packets',
+        'Got packets out of order',
+        "Couldn't uncompress communication packet",
         'Turning off AutoCommit failed',
     ],
     shutdown => [
@@ -40,6 +44,7 @@ our %ERRORS = (
         'Running in read-only mode',
         'Forwarded connection on Writer terminated; try restarting transaction',
         'Internal write forwarding error',
+        'Failed to send write forwarding request to writer',
     ],
     duplicate_value => [
         "Duplicate entry '12345' for key 'PRIMARY'",

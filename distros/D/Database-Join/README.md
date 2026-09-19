@@ -4,7 +4,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 # VERSION
 
-Version 0.003.0
+Version 0.004.0
 
 # SYNOPSIS
 
@@ -98,16 +98,39 @@ Version 0.003.0
     # Returns all 'tier' values (list context)
     my @tiers = $join->tier();
 
+**SQLite join backend for large datasets**
+
+    # 'auto' (default): switches to SQLite automatically above the threshold
+    my $join = Database::Join->new(
+        databases      => [ $customers, $loyalty ],
+        join_column    => 'entry',
+        backend        => 'auto',          # default
+        max_array_rows => 50_000,          # use SQLite when combined rows > 50,000
+    );
+
+    # Always use SQLite -- useful when you know the data is large
+    my $join = Database::Join->new(
+        databases   => [ $customers, $loyalty ],
+        join_column => 'entry',
+        backend     => 'sqlite',
+        tmpdir      => '/fast/nvme/tmp',   # optional: faster temp disk
+    );
+
+    # Always use the original in-memory path
+    my $join = Database::Join->new(
+        databases   => [ $customers, $loyalty ],
+        join_column => 'entry',
+        backend     => 'array',
+    );
+
 # DESCRIPTION
 
 `Database::Join` merges two or more [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction) objects into a
 single logical, read-only view.  Each component database is queried
 independently through its own `Database::Abstraction` interface.  The results
-are combined in Perl memory using a shared key column (`join_column`).
-In effect,
-this means that you can view data from more than one database using an intuitive,
-non-SQL,
-interface.
+are combined using a shared key column (`join_column`).
+In effect, this means that you can view data from more than one database using
+an intuitive, non-SQL interface.
 
 The module exposes the same read-only API as `Database::Abstraction`:
 `selectall_arrayref`, `selectall_array`, `fetchrow_hashref`, `count`,
@@ -117,6 +140,16 @@ involved.
 
 Think of it as a virtual database table that is assembled on demand from
 several real tables, one per component database.
+
+**Join backends**
+
+By default (`backend => 'auto'`), `Database::Join` first checks the
+combined source row count.  For small datasets (up to `max_array_rows`,
+default 10,000 rows) it merges entirely in Perl memory.  For larger datasets it
+automatically spills source rows into a temporary SQLite database and executes
+a single SQL JOIN there, keeping peak RAM to roughly one times the source data
+size instead of three.  You can also force either path unconditionally with
+`backend => 'sqlite'` or `backend => 'array'`.
 
 ## Join semantics
 
@@ -170,10 +203,18 @@ preserve both values under distinct names instead.
 
 # LIMITATIONS
 
-- In-memory join only
+- Memory usage (array backend)
 
-    All matching rows from every component database are fetched into memory before
-    the merge.  This is not suitable for very large result sets.
+    When `backend` is `'array'` (or `'auto'` and the dataset is small), all
+    matching rows are fetched into Perl memory.  Peak RAM is roughly three times
+    the source data size.  For large datasets use `backend => 'sqlite'`, or
+    leave `backend => 'auto'` and set `max_array_rows` appropriately.
+
+- SQLite backend writes temporary files
+
+    When the SQLite path is active, a temporary `.db` file is created in
+    `tmpdir` for every query call.  The file is removed when the call returns.
+    The directory must be writable and have sufficient free space.
 
 - No chained builder or raw SQL
 
@@ -256,6 +297,45 @@ preserve both values under distinct names instead.
     `notes` as `right.notes` so both values survive, or use `remove_columns`
     (or `remove_column`) to drop the unwanted duplicate entirely.
 
+- Mutating the filters hashref after construction has no effect
+
+    `Database::Join` deep-copies the `filters` hashref (and any `filter`
+    passed to `add_database`) at the moment of construction.  The original hashref
+    you passed in is never stored.  If you later modify it -- for example, to
+    tighten or loosen a filter criterion -- the joined view is _not_ affected.
+    Construct a new `Database::Join` object, or use a component
+    `Database::Abstraction` that supports dynamic filter modification.
+
+- auto mode may always use the array path for some DAs
+
+    `backend => 'auto'` counts rows cheaply only when each component database
+    either implements `dbi_source()` (SQLite-backed) or directly defines a
+    `count()` method in its own package.  A DA that merely _inherits_ `count()`
+    from `Database::Abstraction` is treated as uncountable, because the parent
+    class `count()` expects a key argument and behaves differently from a
+    "return total row count" function.  In that case `Database::Join`
+    conservatively uses the array path for the whole query, even if the dataset is
+    large.  To opt in to the SQLite path for such a DA, either add your own
+    `count()` override that returns the total row count, implement `dbi_source()`,
+    or use `backend => 'sqlite'` unconditionally.
+
+- dbi\_source() zero-copy path is skipped when query-time criteria apply
+
+    When a component database implements `dbi_source()` but the current query
+    includes criteria for columns in that database, `Database::Join` cannot use
+    the zero-copy ATTACH path (doing so would require generating a `WHERE` clause
+    inside the attached database, which is not supported in this version).  The
+    database is queried normally via `selectall_arrayref` and rows are spilled
+    into the temporary SQLite file instead.
+
+- Temp file directory must be writable and have free space
+
+    When the SQLite path is active, a temporary `.db` file is created in
+    `tmpdir` (default: `File::Spec->tmpdir()`) for every query call.
+    If the directory is not writable, or the filesystem is full, the call will
+    `croak` with `error_sqlite_connect`.  Check permissions and free space if
+    you see that error.
+
 # METHODS
 
 ## new
@@ -270,6 +350,9 @@ preserve both values under distinct names instead.
         filters          => { 1 => { score => { '>' => 60 } } },
         collision_prefix => { 1 => 'right' },
         remove_columns   => [ 'email', 'internal_id' ],
+        backend          => 'auto',        # 'auto' | 'sqlite' | 'array'
+        max_array_rows   => 10_000,        # threshold for 'auto' mode
+        tmpdir           => '/tmp',        # directory for temp SQLite file
         logger           => $log,
         i18n             => $locale,
     );
@@ -360,6 +443,35 @@ to calling `remove_column` once per name after construction.
                       # DOMAIN -- EP invalid: join_column itself => croak remove_join_col.
                       # DOMAIN -- BVA:        [] empty arrayref is a safe no-op.
 
+    backend        => { type => 'string',   optional => 1, default => 'auto',
+                        enum => ['array', 'sqlite', 'auto'] }
+                      # Controls which join strategy is used.
+                      #   'auto'   -- (default) use 'array' when combined source row count
+                      #              <= max_array_rows, 'sqlite' otherwise.
+                      #   'sqlite' -- always spill to a temporary SQLite database.
+                      #   'array'  -- always use the in-memory merge path.
+                      #
+                      # DOMAIN -- EP valid:   'array', 'sqlite', or 'auto' (case-sensitive).
+                      # DOMAIN -- EP invalid: any other string => croak error_invalid_backend.
+                      # DOMAIN -- Default:    'auto'.
+
+    max_array_rows => { type => 'integer',  optional => 1, default => 10_000 }
+                      # Row-count threshold for 'auto' mode.  When the combined
+                      # source row count exceeds this value, the SQLite path is used.
+                      # Ignored when backend is 'array' or 'sqlite'.
+                      #
+                      # DOMAIN -- EP valid:   any non-negative integer.
+                      # DOMAIN -- BVA:        0 means always use SQLite (all counts exceed 0).
+                      # DOMAIN -- Default:    10,000.
+
+    tmpdir         => { type => 'string',   optional => 1 }
+                      # Directory for the per-call temporary SQLite database file.
+                      # The file is created securely by File::Temp and removed when
+                      # the query completes.  Ignored when backend is 'array'.
+                      #
+                      # DOMAIN -- EP valid:   any writable directory path string.
+                      # DOMAIN -- EP absent:  uses File::Spec->tmpdir() (system temp dir).
+
     logger         => { type => 'object',   optional => 1 }
                       # Logger object propagated to all component databases.
 
@@ -403,6 +515,8 @@ to calling `remove_column` once per name after construction.
     error_no_databases     -- databases arrayref was empty
     error_invalid_db       -- an element of databases is not a D::A subclass
     error_join_col_missing -- join_column (or its join_map alias) not found in a database
+    error_invalid_backend  -- backend value is not 'array', 'sqlite', or 'auto'
+    error_sqlite_connect   -- temporary SQLite database could not be created (backend='sqlite'/'auto')
 
 ## join\_map - joining on differently-named columns
 
@@ -580,6 +694,117 @@ Use the full published name as the criterion key:
 collision column entirely, pass the prefixed name:
 
     $join->remove_column('products.product');
+
+## backend - SQLite join backend for large datasets
+
+`Database::Join` can merge component databases in two different ways,
+controlled by the `backend` constructor parameter.
+
+- `backend => 'array'` -- in-memory merge (original behaviour)
+
+    All matching rows are fetched from every component database into Perl hashes
+    and merged there.  Simple and fast for small and medium datasets.  Peak RAM
+    is roughly three times the combined source data size (one copy per database
+    plus one merged copy).
+
+- `backend => 'sqlite'` -- SQL JOIN via a temporary file
+
+    `Database::Join` creates a temporary SQLite database file, spills source
+    rows into it (one table per component database), then executes a single SQL
+    `JOIN` statement.  Peak RAM drops to roughly one times the source data size.
+    The temporary file is created securely by `File::Temp` and removed
+    automatically when the query call returns, even if an error occurs.
+
+    Requires `DBD::SQLite >= 1.70` (`FULL OUTER JOIN` support was added in
+    SQLite 3.39.0; DBD::SQLite 1.70 ships SQLite 3.39.2).
+
+- `backend => 'auto'` (default)
+
+    `Database::Join` counts the total rows from all component databases cheaply
+    \-- without fetching them -- and then decides:
+
+    - If the combined count is less than or equal to `max_array_rows` (default
+    10,000), use the array path.
+    - If the combined count exceeds `max_array_rows`, use the SQLite path.
+
+    For counting to work without fetching, each component database must either
+    implement the `dbi_source()` interface (for SQLite-backed sources, where a
+    `COUNT(*)` SQL query is issued directly), or directly define a `count()`
+    method in its own package -- not just inherit one from a parent class.  If
+    neither is available for a particular database, `Database::Join` plays it
+    safe and uses the array path for the whole query without fetching any rows.
+
+**Choosing max\_array\_rows**
+
+The default of 10,000 is a reasonable starting point.  Adjust it to match
+your hardware and typical row width.  For wide rows (many columns or long
+strings) you may want a lower threshold; for narrow rows you can raise it.
+
+**Temporary file location (tmpdir)**
+
+When the SQLite path is active, the temporary `.db` file is created in the
+directory given by `tmpdir`.  If `tmpdir` is not specified,
+`File::Spec->tmpdir()` is used (usually `/tmp` on Unix, or the value of
+the `TEMP` or `TMP` environment variable on Windows).
+
+To use a different directory -- for example a RAM-backed filesystem or a
+faster local disk:
+
+    my $join = Database::Join->new(
+        databases      => [ $db1, $db2 ],
+        join_column    => 'entry',
+        backend        => 'sqlite',
+        tmpdir         => '/dev/shm',     # Linux RAM disk
+    );
+
+**Zero-copy ATTACH (`dbi_source()` interface)**
+
+Normally, when the SQLite path is active, rows from each component database
+are fetched one by one and inserted into the temporary SQLite file.  This is
+efficient but does involve INSERT overhead.
+
+If a component database is itself SQLite-backed and implements a
+`dbi_source()` method, `Database::Join` can skip the row-by-row copy
+entirely and instead use `ATTACH DATABASE` to link the source file directly
+to the temporary join connection.  This is the zero-copy path and is
+significantly faster for large SQLite sources.
+
+The `dbi_source()` method must return a hashref with two keys:
+
+- `dbh`
+
+    A connected `DBD::SQLite` database handle (`DBI` connection object).
+
+- `table`
+
+    The name of the table in that database that holds the source rows.
+
+Example implementation:
+
+    package My::SQLiteDatabase;
+    use parent 'Database::Abstraction';
+
+    sub dbi_source {
+        my ($self) = @_;
+        return {
+            dbh   => $self->{_dbh},      # connected DBD::SQLite handle
+            table => $self->{_table},    # table name in that database
+        };
+    }
+
+    1;
+
+The zero-copy ATTACH path is only used when there are no query-time criteria
+for that database in the current call.  When criteria exist, the database is
+queried via `selectall_arrayref` as usual and the resulting rows are inserted
+into the temporary file.
+
+**Result identity**
+
+Both the array path and the SQLite path produce identical results for any
+given query.  You can switch between them freely without changing callers.
+The `collision_prefix` column renaming, `join_map` key translation, and all
+three join types (left, inner, outer) work identically on both paths.
 
 ## selectall\_arrayref
 
@@ -1151,6 +1376,39 @@ will `croak` with a clear error message rather than being silently ignored.
     else:
         delegate directly to the owning database
 
+# ENCODING
+
+All text that passes through `Database::Join` at the Perl layer (column names,
+criteria values, merged row values) is treated as opaque strings.
+`Database::Join` does not inspect, encode, or transform string content.
+
+- Column names
+
+    Column names are plain ASCII strings as returned by `Database::Abstraction::columns()`.
+    Non-ASCII column names are accepted but not tested; behaviour depends on the
+    underlying DA and database driver.
+
+- Criteria values and row data
+
+    Values are passed verbatim between callers and component DAs.  Full UTF-8 is
+    safe as long as the underlying `Database::Abstraction` objects and their
+    database drivers handle UTF-8 correctly.  `Database::Join` neither encodes
+    nor decodes any value.
+
+- SQLite backend
+
+    When the SQLite path is active, values are inserted into the temporary SQLite
+    database via DBI placeholders (never string interpolation), so binary-safe
+    round-tripping depends on `DBD::SQLite`'s character encoding settings.
+    By default `DBD::SQLite` operates in UTF-8 mode, which is correct for text
+    data.  Binary blobs are not explicitly tested.
+
+- i18n messages
+
+    All internal error and warning messages route through the `i18n` object
+    (if one is supplied) via a `translate($key, @args)` call.  The translation
+    dictionary controls the final encoding of those strings.
+
 # MESSAGES
 
 The following messages can be produced by `Database::Join`.  All messages
@@ -1218,6 +1476,24 @@ can be localised by supplying an `i18n` object to `new`.
     **Fix:** Use the Perl-level query methods instead.  Raw SQL cannot span
     heterogeneous database backends.
 
+- `error_invalid_backend`
+
+    **When:** The `backend` parameter passed to `new` is not one of `'array'`,
+    `'sqlite'`, or `'auto'`.
+
+    **Fix:** Use exactly one of those three strings.  The check is case-sensitive;
+    `'SQLite'` or `'Auto'` will not be accepted.
+
+- `error_sqlite_connect`
+
+    **When:** The SQLite join backend fails to open the temporary SQLite database
+    file.  Common causes: the `tmpdir` directory is not writable, the filesystem
+    has no free space, or `DBD::SQLite` is not installed.
+
+    **Fix:** Check that the directory given by `tmpdir` (or the system temp
+    directory if `tmpdir` was not set) is writable and has sufficient free space.
+    Verify that `DBD::SQLite` 1.70 or later is installed.
+
 # REPOSITORY
 
 [https://github.com/nigelhorne/Database-Join](https://github.com/nigelhorne/Database-Join)
@@ -1269,22 +1545,56 @@ architectural guarantees, not run-time checks.
     parameterised queries).  Preventing XSS or header injection is the
     responsibility of the CGI or web layer that renders the output.
 
-- Taint-mode compatible
+- Taint-mode compatible (array path)
 
-    `Database::Join` contains no `system()`, `exec()`, backtick, `open(PIPE)`,
-    or `eval STRING` calls.  It neither opens files nor constructs shell commands.
-    The AUTOLOAD regex `/::(\w+)$/`  produces an _untainted_ capture, so the
-    column name used for dispatch is clean under `-T`.  Criteria values are
-    passed verbatim to component `Database::Abstraction` objects; those objects
-    are responsible for handling tainted values at the SQL parameterisation layer.
+    The array merge path contains no `system()`, `exec()`, backtick,
+    `open(PIPE)`, or `eval STRING` calls.  It neither opens files nor constructs
+    shell commands.  The AUTOLOAD regex `/ :: (\w++) \z /x` uses a possessive
+    quantifier (`\w++`) and a strict end-of-string anchor (`\z`) and produces
+    an _untainted_ capture, so the column name used for dispatch is clean under
+    `-T`.  Criteria values are passed verbatim to component `Database::Abstraction`
+    objects; those objects are responsible for handling tainted values at the SQL
+    parameterisation layer.
 
-- Operator hashref aliasing
+- SQLite backend: column names are quoted, values are parametrised
+
+    When the SQLite path is active, `Database::Join` generates SQL internally.
+    All column and table names are double-quoted (SQL identifier quoting) before
+    being embedded in statement strings.  All row values are passed to SQLite
+    exclusively through DBI prepared statement placeholders -- never by string
+    interpolation.  A hostile value in a source row therefore cannot inject SQL
+    into the temporary database.
+
+    The temporary SQLite file is created by `File::Temp` using a securely random,
+    unpredictable filename.  No `system()` or shell command is used to create or
+    remove it.  The connection is made with `DBI->connect(..., { RaiseError => 1,
+    PrintError => 0 })` and is closed before the method returns.  Column names
+    in the generated SQL come from `columns()`, which is produced by
+    `Database::Abstraction` at construction time -- they are not derived from
+    caller-supplied criteria values.
+
+- Operator hashref broadcast copy
 
     When the same join-key criterion (an operator hashref such as
-    `{ '>' => 'A' }`) is broadcast to multiple component databases, all of
-    them receive a reference to the _same_ hashref.  A malicious component
-    database that mutates the hashref's contents could affect what subsequent
-    databases receive.  Component databases are assumed to be trusted.
+    `{ '>' => 'A' }`) is broadcast to multiple component databases, each
+    database receives its own _shallow copy_ of the hashref.  A component database
+    that mutates the hashref's contents at the top level cannot affect what
+    subsequent databases receive.
+
+- collision\_prefix value type guard
+
+    `_build_col_index` rejects any `collision_prefix` value that is a reference
+    (hashref, arrayref, coderef, etc.) with an immediate `croak`.  A reference
+    value would stringify to `"HASH(0x...)"`, leaking a heap address into every
+    column name, `columns()` listing, and merged row returned to the caller.  The
+    guard fires before any column name is constructed.
+
+- Filter deep-copy isolation
+
+    The `filters` constructor parameter and the `filter` option of
+    `add_database()` are _deep-copied_ at the point of use.  The caller's
+    original hashrefs are never stored; post-construction mutation of those
+    hashrefs cannot widen or bypass the configured row-security constraints.
 
 ## What the caller is responsible for
 
@@ -1332,13 +1642,16 @@ Z calculus schemas for the key invariants and operations.
 Unicode is used throughout this section as required by Z notation.
 
     ─── Database_Join ─────────────────────────────────────────────────
-    dbs        : seq DATABASE_ABSTRACTION
-    join_col   : NAME
-    join_type  : {left, inner, outer}
-    join_map   : ℕ ⇸ NAME
-    filters    : ℕ ⇸ CRITERIA
-    col_db     : NAME ⇸ ℕ
-    removed    : ℙ NAME
+    dbs            : seq DATABASE_ABSTRACTION
+    join_col       : NAME
+    join_type      : {left, inner, outer}
+    join_map       : ℕ ⇸ NAME
+    filters        : ℕ ⇸ CRITERIA
+    col_db         : NAME ⇸ ℕ
+    removed        : ℙ NAME
+    backend        : {array, sqlite, auto}
+    max_array_rows : ℕ
+    tmpdir         : PATH
     ───────────────────────────────────────────────────────────────────
     #dbs ≥ 1
     dom join_map ⊆ 0 ‥ (#dbs - 1)
@@ -1352,21 +1665,27 @@ Unicode is used throughout this section as required by Z notation.
 
     ─── Init ──────────────────────────────────────────────────────────
     ΔDatabase_Join
-    dbs?       : seq DATABASE_ABSTRACTION
-    join_col?  : NAME
-    join_type? : {left, inner, outer}
-    join_map?  : ℕ ⇸ NAME
-    filters?   : ℕ ⇸ CRITERIA
-    removed?   : ℙ NAME
+    dbs?           : seq DATABASE_ABSTRACTION
+    join_col?      : NAME
+    join_type?     : {left, inner, outer}
+    join_map?      : ℕ ⇸ NAME
+    filters?       : ℕ ⇸ CRITERIA
+    removed?       : ℙ NAME
+    backend?       : {array, sqlite, auto}   -- default auto
+    max_array_rows? : ℕ                      -- default 10000
+    tmpdir?        : PATH                    -- default File::Spec->tmpdir
     ───────────────────────────────────────────────────────────────────
     #dbs? ≥ 1
-    dbs'      = dbs?
-    join_col' = join_col?
-    join_type'= join_type?
-    join_map' = join_map?
-    filters'  = filters?
-    col_db'   = buildColIndex(dbs?, join_col?, join_map?)
-    removed'  = removed?
+    dbs'           = dbs?
+    join_col'      = join_col?
+    join_type'     = join_type?
+    join_map'      = join_map?
+    filters'       = filters?
+    col_db'        = buildColIndex(dbs?, join_col?, join_map?)
+    removed'       = removed?
+    backend'       = backend?
+    max_array_rows' = max_array_rows?
+    tmpdir'        = tmpdir?
 
     ─── SelectAllArrayref ─────────────────────────────────────────────
     ΞDatabase_Join        -- state unchanged
@@ -1548,6 +1867,45 @@ Unicode is used throughout this section as required by Z notation.
     post: let rows = _joined_query(criteria)
           wantarray  => result = { r : rows • r(col) }
           !wantarray => result = rows(0)(col)  (or undef if rows is empty)
+
+## backend
+
+    ─── BackendDispatch ───────────────────────────────────────────────
+    backend        : {array, sqlite, auto}
+    max_array_rows : ℕ
+    ───────────────────────────────────────────────────────────────────
+
+    -- row_count(db): cheaply count rows in a component database.
+    -- Uses dbi_source() COUNT(*) SQL for SQLite-backed sources,
+    -- or the DA's own count() method when defined in its own package.
+    -- Returns ⊥ (bottom / unknown) when neither is available.
+    row_count(db) ==
+        if (db has dbi_source() returning a SQLite dbh)
+        then SELECT COUNT(*) FROM source_table
+        else if (defined &{ref(db) ^ "::count"})
+        then db.count()
+        else ⊥
+
+    -- Combined row count across all component databases.
+    -- If any database returns ⊥, total is ⊥ (cannot determine).
+    total_count ==
+        if ∀ i : 0 ‥ #dbs-1 • row_count(dbs i) ≠ ⊥
+        then Σ { i : 0 ‥ #dbs-1 • row_count(dbs i) }
+        else ⊥
+
+    -- Dispatch rule for _joined_query:
+    use_sqlite(C) ==
+        backend = 'sqlite'
+        ∨ (backend = 'auto' ∧ total_count ≠ ⊥ ∧ total_count > max_array_rows)
+
+    _joined_query(C) ==
+        if use_sqlite(C)
+        then _sqlite_join(C)
+        else _joined_query_array(C)
+
+    -- Result identity invariant: both paths return identical rows.
+    ∀ C : CRITERIA •
+        _sqlite_join(C) = _joined_query_array(C)
 
 # AUTHOR
 

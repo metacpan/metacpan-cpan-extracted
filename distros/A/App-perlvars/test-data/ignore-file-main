@@ -1,0 +1,2 @@
+main = $unused_in_named
+main = qr/^\$unused_in_anon$/

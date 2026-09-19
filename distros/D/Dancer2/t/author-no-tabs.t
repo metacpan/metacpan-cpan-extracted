@@ -227,6 +227,7 @@ my @files = (
     't/integration/hooks/engine.t',
     't/integration/serializer/json.t',
     't/integration/serializer/mutable.t',
+    't/integration/serializer/yaml.t',
     't/integration/session/lifecycle.t',
     't/integration/template/autopage.t',
     't/integration/template/rendering.t',

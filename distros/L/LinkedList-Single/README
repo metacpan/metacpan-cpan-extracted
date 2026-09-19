@@ -1,0 +1,49 @@
+
+This archive contains two versions of the LinkedList manager:
+
+    v1  Uses a single object to iterate the list.
+    v2  Uses separate List, Cursor, and Fragment objects.
+
+v1 runs on any perl v5.24 and later; v2 requires v5.40 or later.
+
+If you have any choice whatever use v2.
+
+The ./version directory has distributions for v5.24 and v5.40. At
+runtime the Makfile.PL will determine which of the releases is 
+appropriate for the installed perl. At that point you get the 
+older release with v1 code forever (<v5.40) or the newer one with both 
+v1 and v2.
+
+Unmodified code with
+
+    use LinkedList::Single;
+    
+will get v1 by default. To use the v2 code add a v2 argument:
+
+    use LinkedList::Single qw( v2 );
+
+and you'll get the new version (or a fatal exception if you aren't
+running perl v5.40 or later).
+
+The v2 module comes with added tests in "t/v2-30-BIG_LIST". Not
+surprisingly, these don't run by default. To see how your copy
+of Perl behaves with larger lists:
+
+    export BIG_LIST=1;
+    prove t/v2-30*;
+
+or 
+    export BIG_LIST=1;
+    prove -r t;
+
+The list sizes can be adujsted by exporging LIST_SIZE=N, with
+defaults of 2**16 to 2**24 depending on the tests. Run with 
+"perl -d" they use 8 nodes to illustrate what is going on with
+the test. These will all run in a few minutes on a fairly recent
+ThinkPad.
+
+Feedback on the v2 module is always appreciated.
+
+Thanks again to Paul Evans for maintaing Object::Pad.
+
+Happy listing.

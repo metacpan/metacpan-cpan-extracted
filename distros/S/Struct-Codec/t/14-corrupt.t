@@ -56,7 +56,13 @@ dies_with(struct_encode(5) . 'x', qr/trailing bytes/, 'a byte after the value');
 dies_with(struct_encode([1]) . "\x00", qr/trailing bytes/, 'even a zero');
 
 # ---- integers ------------------------------------------------------------------
-dies_with($HDR . "\x20" . ("\x80" x 10) . "\x01", qr/integer too long/, q{an eleven-byte varint});
+# Ten varint bytes carry 70 bits and an eleventh is refused for its LENGTH -
+# but only where a UV is 64 bits. On a 32-bit one the shift passes the width of
+# a UV at the sixth byte, so the width rule gets there first and the eleventh
+# byte is never reached; the stream is refused either way.
+dies_with($HDR . "\x20" . ("\x80" x 10) . "\x01",
+          $Config{uvsize} == 8 ? qr/integer too long/ : qr/integer too wide/,
+          q{an eleven-byte varint});
 dies_with($HDR . "\x20" . ("\xFF" x 9) . "\x7F", qr/integer too wide/, 'bits past the 64th')
     if $Config{uvsize} == 8;
 dies_with($HDR . "\x21" . ("\xFF" x 9) . "\x01", qr/negative integer too wide/, 'a negative past IV_MIN')
@@ -67,6 +73,20 @@ dies_with($HDR . "\x61\xFF",        qr/malformed UTF-8/, 'a utf8 string that is 
 dies_with($HDR . "\x27\x02\xC3\x28", qr/malformed UTF-8/, 'a long one too');
 dies_with($HDR . "\x28\x2A\x01\x03\xFF\x01", qr/malformed UTF-8/, 'and a utf8 key');
 dies_with($HDR . "\x26\xFF\xFF\x7F", qr/truncated/, 'a length longer than the input');
+
+# ---- a key of length zero that claims to be UTF-8 -----------------------------------
+# A length of zero and a utf8 flag together are a pair perl's string routines
+# read as "no length given, find the end yourself". hv_common sizes the buffer
+# for its utf8-to-bytes downgrade from the zero it was handed and then copies
+# the run utf8_to_bytes measures for itself, which runs on into the rest of the
+# stream: nine bytes into a one-byte allocation. So the decoder drops the flag
+# at length zero - the empty string is the same key either way - and the key
+# here has to be the empty string and nothing that follows it.
+{
+    my $v = 'x' x 40;
+    my $h = struct_decode($HDR . "\x28\x2A\x01" . "\x01" . "\x26" . varint(length $v) . $v);
+    is_deeply($h, { '' => $v }, 'a zero-length UTF-8 hash key is the empty string');
+}
 
 # ---- tags -----------------------------------------------------------------------------
 dies_with($HDR . "\x39",     qr/unknown tag/, 'a reserved tag');
@@ -143,7 +163,11 @@ dies_with($HDR . "\x28\x34" . key(''), qr/empty glob name/, 'a glob with no name
 dies_with($HDR . "\x28\x35Z\x01", qr/unknown filehandle mode/, 'a filehandle mode outside the alphabet');
 dies_with($HDR . "\x28\x35<\xFF\x01", qr/cannot reopen descriptor 255: .* at byte/,
           'a descriptor nothing is open on');
-dies_with($HDR . "\x28\x35<" . ("\xFF" x 9) . "\x01", qr/descriptor too large/, 'a descriptor wider than an int');
+# 0xFFFFFFFF: past INT_MAX and so refused as a descriptor, but inside a UV on a
+# 32-bit perl too. Nine \xFF bytes would be refused there as an integer too wide
+# before the descriptor rule was ever reached, and it is the descriptor rule
+# this is about.
+dies_with($HDR . "\x28\x35<\xFF\xFF\xFF\xFF\x0F", qr/descriptor too large/, 'a descriptor wider than an int');
 dies_with($HDR . "\x28\x35<", qr/truncated/, 'a filehandle missing its descriptor');
 dies_with($HDR . "\x36<\x01", qr/referent without a reference/, 'a bare FD_IO');
 
@@ -202,7 +226,7 @@ ok(eval { struct_decode($HDR . ("\x28\x2B\x01" x 2000) . "\x05"); 1 }, 'while 20
 # the parent asserts the exit status. Skipped where fork is emulated with
 # threads, where a child's exit ends the file.
 SKIP: {
-    skip 'fork is POSIX-only here', 4 if $^O eq 'MSWin32';
+    skip 'fork is POSIX-only here', 5 if $^O eq 'MSWin32';
     require POSIX;
 
     my $s = [1, 'two'];
@@ -261,6 +285,20 @@ SKIP: {
         return 0;
     });
     is($structured, 0, '20,000 random tag sequences never crashed');
+
+    # The overrun above is a WRITE past a one-byte allocation, and a plain
+    # build runs on without a word: only an allocator that checks says
+    # anything, and what it says is an abort. So the fixtures run in a child
+    # and the assertion is the exit status, as it is for the loops above. The
+    # three tails are the three cases - a run that downgrades, one that is
+    # already bytes, and the mixed one a smoker found.
+    my $empty_key = $run->(sub {
+        for my $tail ('363c012f302f363c01a837106d61696e3a3a78', '41' x 40, 'c3a9' x 20) {
+            eval { my $x = struct_decode(pack 'H*', '53310828' . '2a01' . '01' . $tail); 1 };
+        }
+        return 0;
+    });
+    is($empty_key, 0, 'a zero-length UTF-8 key never reads or writes past the key');
 
     my $after = $run->(sub {
         my $d = { fine => [1, 2, 3] };

@@ -10,7 +10,7 @@ our @EXPORT = qw( alien_diag );
 our @EXPORT_OK = @EXPORT;
 
 # ABSTRACT: Print out standard diagnostic for Aliens in the test step.
-our $VERSION = '2.87'; # VERSION
+our $VERSION = '2.88'; # VERSION
 
 
 my @default_scalar_properties = qw(
@@ -106,7 +106,7 @@ Test::Alien::Diag - Print out standard diagnostic for Aliens in the test step.
 
 =head1 VERSION
 
-version 2.87
+version 2.88
 
 =head1 SYNOPSIS
 

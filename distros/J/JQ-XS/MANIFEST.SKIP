@@ -87,5 +87,12 @@
 # CI configuration, likewise repo-only.
 ^\.github/
 
-# Release tarballs built by "make dist".
+# Release tarballs built by "make dist".  Anchored on purpose: the vendored jq
+# release tarball under vendor/ is shipped, and must not be skipped.
 ^JQ-XS-.*\.tar\.gz$
+
+# Where the vendored jq is unpacked and built.
+^\.jq-build/
+
+# What the XS build generates in the source root.
+^XS\.(?:c|o|bs)$

@@ -34,6 +34,26 @@ is_deeply($gz->{chains}{A}{residues}{6}, $plain->{chains}{A}{residues}{6},
 is($gz->{id}, '9XYZ', 'the header is read through the decompression too');
 is($gz->{title}, $plain->{title}, 'including the title');
 
+# The reader underneath, which takes a plain file as well as a gzipped one and
+# either the whole of it or the first so many bytes.  Both forms are used: the
+# whole file is how a .gz is read, and the first 8 kB is how a file whose name
+# says nothing has its format sniffed.  Asked directly because nothing else
+# reaches the whole-file form on a file that is not gzipped, and a reader that
+# quietly returned nothing there would show up as an empty structure much later.
+{
+	my $whole = Chem::Structure::Parser::_slurp_maybe_gzipped("$data/mini.pdb", undef);
+	my $head  = Chem::Structure::Parser::_slurp_maybe_gzipped("$data/mini.pdb", 64);
+	my $bytes = do { open my $fh, '<:raw', "$data/mini.pdb" or die $!; local $/; <$fh> };
+	is($whole, $bytes, 'a plain file with no limit is read whole');
+	is(length $head, 64, 'and with a limit it stops there');
+	is($head, substr($bytes, 0, 64), 'having read the front of the file');
+	is(Chem::Structure::Parser::_slurp_maybe_gzipped("$dir/mini.pdb.gz", undef), $bytes,
+		'and the gzipped copy of it comes back byte for byte the same');
+	my $gzhead = Chem::Structure::Parser::_slurp_maybe_gzipped("$dir/mini.pdb.gz", 64);
+	is(substr($gzhead, 0, 64), substr($bytes, 0, 64),
+		'a limited read of a gzipped file stops at the first block past the limit');
+}
+
 # the id falls back to the file name with both suffixes taken off
 {
 	IO::Compress::Gzip::gzip("$data/bare.pdb" => "$dir/1abc.ent.gz") or die;
@@ -60,8 +80,11 @@ is($gz->{title}, $plain->{title}, 'including the title');
 	is($i->{chains}{A}{sequence}, 'A', 'and read correctly');
 }
 
-# a truncated gzip stream, which is a real thing to find in a download
-# directory, must not come back as an empty structure with no complaint
+# A truncated gzip stream, which is a real thing to find in a download
+# directory, is an error and not a short file.  IO::Uncompress::Gunzip's read()
+# returns a negative number rather than undef for it, so the loop that reads the
+# archive used to take it for the 0 that means end of stream: half of
+# mini.pdb.gz came back as a structure with no atoms in it and nothing said so.
 {
 	open my $in, '<:raw', "$dir/mini.pdb.gz" or die $!;
 	my $bytes = do { local $/; <$in> };
@@ -69,9 +92,10 @@ is($gz->{title}, $plain->{title}, 'including the title');
 	open my $out, '>:raw', "$dir/cut.pdb.gz" or die $!;
 	print {$out} substr($bytes, 0, int(length($bytes) / 2));
 	close $out;
-	my $i = eval { structure_info("$dir/cut.pdb.gz") };
-	ok(!$i || $i->{stats}{n_atoms} < $plain->{stats}{n_atoms},
-		'a truncated gzip either dies or gives back less than the whole file, never a silent full read');
+	throws_ok { structure_info("$dir/cut.pdb.gz") } qr/Can't read from .*cut\.pdb\.gz/,
+		'a truncated gzip dies rather than coming back as a short file';
+	throws_ok { structure_info("$dir/cut.pdb.gz") } qr/unexpected end of file/,
+		'and says what the decompressor said was wrong with it';
 }
 
 done_testing();

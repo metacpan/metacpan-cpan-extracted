@@ -1,5 +1,16 @@
 Revision history for Shared::Arena
 
+0.10	2026-09-19
+        - FIXES six files failing at once on the FreeBSD 5.14 and 5.16 smokers:
+          Makefile.PL's pthread_atfork probe only linked, and FreeBSD's libc
+          stub links and never runs without libthr, so a child kept its
+          parent's cached pid. The probe now forks and requires the child
+          handler to have run, linking -lpthread where that is what it takes.
+          t/06-fork.t asserts it first, through a _pid probe.
+        - FIXES the ABI selftest (step 25) on 32-bit Linux: the HyperLogLog
+          estimates compared unequal under x87 excess precision. Now volatile.
+        - FIXES t/32-map-ttl.t on a perl without 64-bit integers: pack 'Q'.
+
 0.09	2026-09-17
         - FIXES a panic on every DEBUGGING perl: Map's stats reserved ten
           stack slots with EXTEND(SP, 10) and pushed twelve (six pairs), so

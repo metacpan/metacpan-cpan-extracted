@@ -1,7 +1,7 @@
 use v5.14.0;
 use warnings;
 
-package JMAP::Tester::UA::LWP 0.112;
+package JMAP::Tester::UA::LWP 0.113;
 
 use Moo;
 with 'JMAP::Tester::Role::UA';
@@ -107,7 +107,7 @@ JMAP::Tester::UA::LWP
 
 =head1 VERSION
 
-version 0.112
+version 0.113
 
 =head1 PERL VERSION
 

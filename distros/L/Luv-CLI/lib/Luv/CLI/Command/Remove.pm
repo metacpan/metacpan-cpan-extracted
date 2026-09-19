@@ -74,7 +74,7 @@ Luv::CLI::Command::Remove - remove a library dependency
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -84,9 +84,9 @@ version 0.002
 
 =head1 DESCRIPTION
 
-Deletes the vendored directory for each named dependency and removes
-its entry from C<luv.json>. Accepts one or more library names in a
-single invocation. With C<--all> (or C<-a>), removes every dependency
+Deletes the vendored directory for each named library dependency and removes
+its entry from C<luv.json>. Accepts one or more library dependency names in a
+single invocation. With C<--all> (or C<-a>), removes every library dependency
 instead of requiring names.
 
 =head1 NAME

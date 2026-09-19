@@ -1,8 +1,14 @@
-JQ-XS version 1.01
+JQ-XS version 2.02
 ==================
 
 JQ::XS is a clean object-oriented Perl wrapper for libjq, the C library
 behind the jq command-line JSON query language.
+
+From version 2.00 the jq engine is embedded: the distribution ships an
+upstream jq release tarball under vendor/, compiles it during "make" and links
+it statically, so the module does not use the libjq the operating system
+packages and behaves the same way everywhere.  JQ::XS::jq_version() reports
+which jq is compiled in.
 
 FEATURES
 
@@ -13,6 +19,12 @@ FEATURES
   - Comprehensive error handling with Perl exceptions
   - Support for complex nested data structures
   - Multiple output values per input
+  - Named and positional arguments, as jq's --arg/--argjson/--args
+  - jq's output formatting: -c, --indent, --tab, -S, -a, -C, -r
+  - The debug, stderr and input/inputs builtins, served from Perl
+  - halt and halt_error, with the exit code and message they carry
+  - A switch that refuses filters loading modules from disk
+  - A known jq version on every platform, with no libjq dependency
 
 SYNOPSIS
 
@@ -36,21 +48,38 @@ DEPENDENCIES
 This module requires:
 
   - Perl 5.26.3 or higher
-  - libjq 1.6 or compatible
-  - A C compiler (gcc)
+  - A C compiler, make, and a POSIX shell
+  - JSON::PP
 
-On Red Hat/CentOS systems, install with:
-  yum install jq-devel
+No jq or libjq package is needed, at build time or at run time.  The jq under
+vendor/ is compiled as part of "make": its release tarball is self-contained,
+so nothing beyond a compiler is required -- no autoconf, automake, flex, bison
+or python -- and the oniguruma bundled inside it is built too, so the regex
+builtins (test, match, capture, sub, gsub, scan, splits) work without an
+external library.  Building it adds a few seconds to "make".
 
-On Debian/Ubuntu systems, install with:
-  apt-get install libjq-dev
+To link the libjq the operating system packages instead, configure with:
+
+   perl Makefile.PL JQ_SYSTEM=1
+
+That restores the pre-2.00 behaviour and needs jq-devel (Red Hat, in the
+powertools/crb repository) or libjq-dev (Debian).  JQ::XS::jq_version() then
+returns undef, and the filter semantics are whatever that libjq implements.
+
+Everything the XS calls has been in libjq since jq 1.5 except one function,
+jq_set_stderr_cb, which jq 1.7 added; Makefile.PL link-probes for it and says
+so if it is absent, in which case set_stderr_cb() croaks and the "stderr"
+builtin cannot be served.  JQ::XS::features() reports what a given build can
+do.  Note also that the jq 1.6 which RHEL 8 and Debian 11 ship corrupts its
+own heap in jq_teardown after a filter calls halt_error, aborting the process
+when the object is freed -- one more reason the embedded build is the default.
 
 BUILDING PACKAGES
 
 An RPM spec file is provided in rpm/perl-JQ-XS.spec and Debian packaging in
 debian/.  To build a .deb from a source checkout:
 
-   apt-get build-dep .        # or: apt-get install libjq-dev libjson-pp-perl
+   apt-get build-dep .        # or: apt-get install libjson-pp-perl perl-xs-dev
    perl Makefile.PL
    make deb
 
@@ -63,7 +92,7 @@ can be overridden:
 
 To build an RPM from a source checkout:
 
-   dnf builddep rpm/perl-JQ-XS.spec   # jq-devel is in powertools/crb
+   dnf builddep rpm/perl-JQ-XS.spec
    perl Makefile.PL
    make rpm
 
@@ -96,10 +125,78 @@ two suites do not produce the same filename.
 
 METHODS
 
-  new($program)       - Compile a jq filter program
-  process($data)      - Process Perl data through the filter
-  process_json($text) - Process JSON text through the filter
-  program()           - Get the source of the compiled program
+  new($program, %opts)       - Compile a jq filter program
+  process($data)             - Process Perl data through the filter
+  process_json($text, %opts) - Process JSON text through the filter
+  program()                  - Get the source of the compiled program
+
+  set_output(%opts)          - How process_json formats its output
+  output_options()           - Read those options back
+
+  halted()                   - Did the last run end in halt/halt_error?
+  exit_code()                - The code it halted with
+  error_message()            - The message halt_error carried
+  die_on_halt_error($bool)   - Make halt_error a Perl exception
+
+  set_debug_cb(\&code)       - Perl behind the debug builtin
+  set_stderr_cb(\&code)      - Perl behind the stderr builtin
+  set_inputs($src)           - Perl behind the input/inputs builtins
+
+  library_paths(\@dirs)      - Where include/import look for modules
+  attr($name)                - Read a jq attribute
+  set_attr($name, $value)    - Write one
+  flags($flags)              - Execution flags for each run
+  dump_disassembly($indent)  - Print the compiled bytecode
+
+new() takes vars, args, allow_includes, library_paths, attrs, flags,
+die_on_halt_error, debug, stderr, inputs, and the output options above.
+See "perldoc JQ::XS" for all of them.
+
+FUNCTIONS
+
+  jq_version()               - The embedded jq version, or undef under
+                               JQ_SYSTEM=1
+  parse_json($text)          - Parse one JSON value with jq's parser
+  parse_json_stream($text)   - Parse a run of concatenated JSON values
+  to_json($data, %opts)      - Serialize with jq's printer
+  set_colors($spec)          - Colors for "color" output, in JQ_COLORS format
+
+RESTRICTING MODULE LOADING
+
+A jq program can pull definitions in from .jq files on disk with include or
+import, which is worth thinking about if the programs being compiled come
+from somewhere untrusted.  allow_includes => 0 rejects any program containing
+one of those directives, at compile time, before jq looks at the filesystem:
+
+  my $jq = JQ::XS->new($untrusted, allow_includes => 0);
+
+library_paths sets where modules are looked for, as jq's -L does, but it
+cannot by itself stop a program from loading anything: jq searches the current
+directory when a directive names no search path, and a directive carrying
+{search:...} does not consult the library paths at all.
+
+UPGRADING THE EMBEDDED JQ
+
+The vendored tarball is the only record of which jq this is: its name carries
+the version, and the build, the test suite and the release workflow all read
+the version back out of the filename.  Nothing repeats it, so there is nothing
+to keep in sync.  To move to a new jq:
+
+   1. Download the release tarball and its checksum from
+      https://github.com/jqlang/jq/releases, drop the tarball in vendor/ and
+      delete the old one -- the build refuses to guess between two.  Copy the
+      matching line out of the release's sha256sum.txt into
+      vendor/jq-<version>.tar.gz.sha256; the build refuses to unpack a
+      tarball that does not match it.  The line keeps upstream's bare
+      filename, so "sha256sum -c" on it wants to be run from inside vendor/.
+   2. Update the two vendor/ lines in MANIFEST.
+   3. Refresh THIRD-PARTY-LICENSES from the new tarball's COPYING and
+      vendor/oniguruma/COPYING, and check debian/copyright still describes
+      what the tarball contains.
+   4. make jq_clean && perl Makefile.PL && make && make test
+
+t/embedded-jq.t asserts that the jq compiled in is the one vendored, so a
+tarball swapped without a rebuild fails the test suite rather than shipping.
 
 COPYRIGHT AND LICENSE
 

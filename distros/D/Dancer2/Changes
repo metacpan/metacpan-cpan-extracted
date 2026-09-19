@@ -1,3 +1,26 @@
+2.2.1     2026-09-18 21:12:29-04:00 America/New_York
+
+    [ SECURITY ]
+    * PR #1838: Serializer::YAML refuses blessed objects and code in
+      request bodies; raise min YAML version to 1.30 (David Precious)
+    * PR #1839: Serializer::YAML also zeroes $YAML::UseCode, which
+      otherwise reopens the code eval (David Precious)
+
+    [ BUG FIXES ]
+    * GH #1840: Specify min version of CLI::Osprey needed (Jason A. Crome)
+
+    [ ENHANCEMENTS ]
+    * None
+
+    [ DOCUMENTATION ]
+    * None
+
+    [ DEPRECATED ]
+    * None
+
+    [ MISC ]
+    * None
+
 2.2.0     2026-09-16 07:58:19-04:00 America/New_York
 
     [ SECURITY ]

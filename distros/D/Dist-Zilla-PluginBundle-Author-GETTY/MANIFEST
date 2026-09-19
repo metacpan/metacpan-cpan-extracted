@@ -21,7 +21,6 @@
 .github/workflows/ci.yml
 .github/workflows/simpici-provider.yml
 .gitignore
-.karr
 CLAUDE.md
 Changes
 LICENSE
@@ -53,6 +52,7 @@ t/gitea_autodetect.t
 t/giteameta.t
 t/github_autodetect.t
 t/irc_user.t
+t/karr_exclusion_build.t
 t/license_file.t
 t/post_release_commit.t
 t/readme_exclusion.t

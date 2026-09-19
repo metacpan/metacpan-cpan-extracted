@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.323';
+our $VERSION = '0.324';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -424,6 +424,7 @@ sub effective_gather_exclude_filename {
 
   my @exclude = @{ $self->gather_exclude_filename };
   push @exclude, 'README.md' unless $self->include_readme;
+  push @exclude, '.karr' unless $self->no_cpan;
 
   my %seen;
   return [ grep { !$seen{$_}++ } @exclude ];
@@ -721,7 +722,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.323
+version 0.324
 
 =head1 SYNOPSIS
 
@@ -835,6 +836,12 @@ excluding I<root> or I<prefix>:
   gather_include_untracked = 0
   gather_exclude_filename = dir/skip
   gather_exclude_match = ^local_
+
+F<.karr> — the tracked config file for the karr autonomous-loop prompt, not
+the kanban board state itself (that lives in C<refs/karr/*>) — is also
+excluded from the gathered distribution files for CPAN releases (the
+default, C<no_cpan = 0>). Set C<no_cpan = 1> to keep it in the built
+distribution.
 
 It also combines on request with L<Dist::Zilla::Plugin::Alien>, you can set
 all parameter of the Alien plugin here, just by preceeding with I<alien_>, the
@@ -996,6 +1003,10 @@ avoids awkward rendering on sites like MetaCPAN.
 Set this attribute to 1 if you explicitly want to ship F<README.md> in the
 distribution.
 
+F<.karr> is also excluded from the gathered distribution files, independently
+of this attribute, whenever this is a CPAN release (C<no_cpan = 0>, the
+default). Set C<no_cpan = 1> to have it included in the built distribution.
+
 =head2 generate_license
 
 By default this bundle expects F<LICENSE> to be a committed file in the
@@ -1090,9 +1101,10 @@ the current maintainer is looking for someone to take over the module.
 =head2 alien_build
 
 Set to 1 for distributions that use L<Alien::Build> to provide a C library.
-This automatically sets B<no_makemaker> to 1 and adds
-L<Dist::Zilla::Plugin::AlienBuild>, which generates a C<Makefile.PL> driven
-by C<Alien::Build::MM>. Ship an C<alienfile> in the distribution root to
+This adds L<Dist::Zilla::Plugin::AlienBuild>, which generates a C<Makefile.PL>
+driven by C<Alien::Build::MM> — B<no_makemaker> is left at its default (0),
+since C<Alien::Build::MM> munges the MakeMaker-generated C<Makefile.PL>
+rather than replacing it. Ship an C<alienfile> in the distribution root to
 describe how to probe for or build the library.
 
   [@Author::GETTY]

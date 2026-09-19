@@ -1,5 +1,12 @@
 Revision history for Luv-CLI
 
+0.003     2026-09-18 13:21:56-04:00 America/New_York
+    - Documentation: added POD to all modules and commands
+    - Documentation: configured pod-coverage.t with trustme exemptions
+      for App::Cmd command methods
+    - Documentation: added UTF-8 encoding declaration to fix POD
+      parsing of non-ASCII characters
+
 0.002     2026-09-11 02:15:47-04:00 America/New_York
     - `luv add` and `luv remove` accept multiple libraries in a single
       invocation

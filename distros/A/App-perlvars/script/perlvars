@@ -10,6 +10,10 @@ use Getopt::Long::Descriptive qw( describe_options );
 my ( $opt, $usage ) = describe_options(
     'perlvars %o file',
     [ 'ignore-file|i=s', 'A file containing an ignore list', ],
+    [
+        'scripts',
+        'Also lint package-less files (e.g. .t and .pl scripts) by wrapping them in a synthetic package',
+    ],
     [],
     [ 'help', 'print usage message and exit', { shortcircuit => 1 } ],
     [
@@ -40,7 +44,9 @@ unless (@files) {
 }
 
 my $vars = App::perlvars->new(
-    $opt->ignore_file ? ( ignore_file => $opt->ignore_file ) : () );
+    ( $opt->ignore_file ? ( ignore_file  => $opt->ignore_file ) : () ),
+    ( $opt->scripts     ? ( lint_scripts => 1 )                 : () ),
+);
 
 for my $file (@files) {
     say $file;
@@ -76,7 +82,7 @@ perlvars - A command line utility for detecting unused Perl variables
 
 =head1 VERSION
 
-version 0.000007
+version 0.000008
 
 =head1 SYNOPSIS
 
@@ -93,6 +99,11 @@ file.
 
 See the documentation for L<App::perlvars> for the format of the ignore file.
 
+By default, files with no C<package> declaration (most C<.t> and C<.pl>
+scripts) are skipped. Pass C<--scripts> to lint those too.
+
+    perlvars --scripts t/some-test.t script/some-tool.pl
+
 If you'd like to check every .pm file in your lib directory, you can try
 something like:
 
@@ -102,9 +113,60 @@ something like:
 
 This script (which is based heavily on the code in
 L<Code::TidyAll::Plugin::Test::Vars>) is a wrapper around L<Test::Vars>, which
-tries to find unused variables in your Perl code. Please note that since
-L<Test::Vars> only finds unused variables contained within packages, code which
-does not have an explicit package name will not be checked.
+tries to find unused variables in your Perl code. Because L<Test::Vars> only
+finds unused variables contained within packages, code without an explicit
+C<package> declaration is skipped by default.
+
+Pass C<--scripts> to also lint package-less files (such as most C<.t> and
+C<.pl> scripts). With that flag, C<perlvars> wraps their contents in a
+synthetic package and subroutine before analysis, so their variables are
+checked too; reported line numbers refer to the original file. This is opt-in
+because it turns on linting for files that were never linted before, which can
+surface pre-existing findings, and because wrapping executes the file's
+compile-time code (see below).
+
+Wrapping the body in a subroutine means the file's runtime statements are not
+executed during analysis (a C<.t> script's tests do not actually run), but
+B<compile-time> code still does: L<Test::Vars> C<require>s the wrapped file, so
+its C<use> statements and C<BEGIN> blocks are executed as the file is compiled.
+Only pass C<--scripts> for files you trust, exactly as you would before running
+them.
+
+A package-less file that cannot be compiled in isolation is skipped silently
+(no analysis, no error) even when C<--scripts> is given. This includes files
+that locate a sibling library at runtime (for example via L<FindBin> and C<use
+lib>) and files that C<use> a module which is not installed in the environment
+C<perlvars> runs in. A file that contains a C<#line> directive is likewise not
+analyzed, because the directive changes the filename L<Test::Vars> attributes
+subroutines to.
+
+=head1 USING perlvars WITH precious
+
+L<precious|https://github.com/houseabsolute/precious> is a code quality tool
+that runs multiple linters and tidiers from a single configuration. You can add
+C<perlvars> as a lint command in your C<precious.toml>:
+
+    [commands.perlvars]
+    type    = "lint"
+    include = ["**/*.pm"]
+    cmd     = ["perlvars"]
+    ok-exit-codes = [0]
+    # perlvars exits 255 (not 1) when it finds unused/single-use variables.
+    lint-failure-exit-codes = [255]
+
+The C<lint-failure-exit-codes> setting is important: C<perlvars> exits with
+C<255> (not C<1>) when it finds unused or single-use variables, so precious
+needs to be told to treat C<255> as a lint failure rather than an error.
+
+To also lint your C<.t> and C<.pl> scripts, add C<--scripts> to C<cmd> and
+widen C<include> to match them:
+
+    [commands.perlvars]
+    type    = "lint"
+    include = ["**/*.pm", "**/*.t", "**/*.pl"]
+    cmd     = ["perlvars", "--scripts"]
+    ok-exit-codes = [0]
+    lint-failure-exit-codes = [255]
 
 =head1 CAVEATS
 
@@ -112,6 +174,18 @@ As noted above, there are some serious limitations to this script, due to the
 way that L<Test::Vars> works. You're strongly encouraged to consider using
 L<Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter> if that's a
 possibility for you.
+
+Package-less files (such as most C<.t> and C<.pl> scripts) are supported when
+you pass C<--scripts>: C<perlvars> wraps their contents in a synthetic package
+and subroutine before analysis. Only variables that L<Test::Vars> can detect
+are reported -- in practice, lexicals inside named or anonymous subroutines
+(including the anonymous subs passed to C<subtest> and similar). File-scope
+(top-level) lexicals are B<not> reported, matching how L<Test::Vars> already
+ignores file-scope lexicals in a file that declares a package. Because these
+findings are reported against the C<main> package, an ignore file uses C<main>
+as the package name to suppress a variable in a package-less file (for example,
+C<< main = $wanted >>). The caveats below apply to files that B<do> declare a
+package.
 
 Your code needs an explicit package name.
 

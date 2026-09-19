@@ -160,4 +160,32 @@ throws_ok { structure_info($file, model => 'two') } qr/model must be/,
 	'a model that is not a number dies';
 lives_ok  { structure_info($file, model => 'all') } "model => 'all' is allowed";
 
+#--------
+# a view asked for in second place, which is the one call form that is not a
+# file and an option list.  The two cannot be confused: an option list has an
+# odd number of elements after the file name, a view leaves an even one.
+#--------
+{
+	my $d = structure_info($file, 'dssp');
+	is(ref $d, 'HASH', "structure_info(\$file, 'dssp') returns the view itself");
+	ok(!exists $d->{chains}, 'and not the structure it came out of');
+	is_deeply($d, structure_info($file)->{features}{dssp},
+		'and it is the same hash the features hold');
+	is_deeply(structure_info($file, 'dssp', hydrogens => 0),
+	          structure_info($file, hydrogens => 0)->{features}{dssp},
+		'the options after a view are the reader\'s, and are obeyed');
+	throws_ok { structure_info($file, 'nosuch') } qr/'nosuch' is not a view/,
+		'a name that is not a view dies and says what the views are';
+	throws_ok { structure_info($file, 'nosuch') } qr/dssp/,
+		'... which today is dssp';
+	throws_ok { structure_info($file, 'hydrogens') } qr/did you mean an option/,
+		'and an option name in that place is told what it should have been';
+	throws_ok { structure_info($file, 'dssp', features => 0) }
+		qr/needs the features/,
+		'a view of a file read without the features is refused, not empty';
+	my $on = structure_info($file, dssp => 1);
+	is($on->{dssp}, $on->{features}{dssp}, 'dssp => 1 leaves the view at {dssp}');
+	ok(!exists structure_info($file)->{dssp}, 'and without it there is no such key');
+}
+
 done_testing();

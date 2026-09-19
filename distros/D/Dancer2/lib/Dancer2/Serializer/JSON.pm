@@ -1,6 +1,6 @@
 package Dancer2::Serializer::JSON;
 # ABSTRACT: Serializer for handling JSON data
-$Dancer2::Serializer::JSON::VERSION = '2.2.0';
+$Dancer2::Serializer::JSON::VERSION = '2.2.1';
 use Moo;
 use Ref::Util qw< is_plain_arrayref is_plain_hashref >;
 use JSON::MaybeXS ();
@@ -143,7 +143,7 @@ Dancer2::Serializer::JSON - Serializer for handling JSON data
 
 =head1 VERSION
 
-version 2.2.0
+version 2.2.1
 
 =head1 DESCRIPTION
 

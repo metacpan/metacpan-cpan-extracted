@@ -3,6 +3,7 @@ package WWW::Salesforce;
 use strict;
 use warnings;
 
+use Carp ();
 use LWP::UserAgent ();
 use SOAP::Lite ();    # ( +trace => 'all', readable => 1, );#, outputxml => 1, );
 use DateTime ();
@@ -13,14 +14,14 @@ use WWW::Salesforce::Constants;
 use WWW::Salesforce::Deserializer;
 use WWW::Salesforce::Serializer;
 
-our $VERSION = '0.400';
+our $VERSION = '0.401';
 
-our $SF_PROXY       = 'https://login.salesforce.com/services/Soap/u/64.0';
+our $SF_PROXY       = 'https://login.salesforce.com/services/Soap/u/67.0';
 our $SF_URI         = 'urn:partner.soap.sforce.com';
 our $SF_PREFIX      = 'sforce';
 our $SF_SOBJECT_URI = 'urn:sobject.partner.soap.sforce.com';
 our $SF_URIM        = 'http://soap.sforce.com/2006/04/metadata';
-our $SF_APIVERSION  = '64.0';
+our $SF_APIVERSION  = '67.0';
 # set webproxy if firewall blocks port 443 to SF_PROXY
 our $WEB_PROXY  = ''; # e.g., http://my.proxy.com:8080
 
@@ -31,45 +32,54 @@ our $WEB_PROXY  = ''; # e.g., http://my.proxy.com:8080
 
 WWW::Salesforce - This class provides a simple SOAP client for Salesforce.com.
 
-=head1 WARNING
+=head1 WARNING - BREAKING CHANGES
 
-B<NOTE:> As of version C<65.0> of the Salesforce APIs, the SOAP login method will no longer
-exist. Also, the login method for SOAP will be removed after the B<Summer ’27 release>. Read about
-this change here: L<https://help.salesforce.com/s/articleView?id=005132110&type=1>.
+Salesforce is removing both the SOAP login method and the OAuth2 username-password flow
+for authentication. This module will continue to support these methods until they are
+removed from Salesforce. However, you should consider using the OAuth2 Client
+Credentials flow now. The OAuth2 Client Credentials flow is the recommended method
+for authenticating with Salesforce
+
+See the
+L<Salesforce OAuth2 Client Credentials Flow|https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_oauth_client_credentials_flow.htm&type=5>
+documentation for more information on how to set up a connected app and use the OAuth2
+Client Credentials flow.
+
+SOAP and OAuth2 username-password flows will continue to work until they are removed
+from Salesforce. The SOAP method will be removed after the B<Summer '27 release> and
+the OAuth2 username-password flow will be removed on February 20th, 2027.
+
+=over 4
+
+=item *
+
+L<OAuth 2.0 Client Credentials Flow|https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_oauth_client_credentials_flow.htm&type=5>
+
+=item *
+
+L<OAuth 2.0 Username-Password Flow|https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_oauth_username_password_flow.htm&type=5>
+
+=item *
+
+L<SOAP Login|https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_login.htm>
+
+=back
 
 =head1 SYNOPSIS
 
-    use v5.26;
-    use Syntax::Keyword::Try;
+    use v5.16;
+    use Feature::Compat::Try;
     use WWW::Salesforce ();
 
+    # OAuth2 Client Credentials flow
     try {
         my $sforce = WWW::Salesforce->login(
-            serverurl => 'https://test.my.salesforce.com',
-            version => '64.0', # must be a string
-            type => 'soap',
-            username => 'foo',
-            password => 'password' . 'pass_token'
-        );
-        my $res = $sforce->query(query => 'select Id, Name from Account');
-        say "Found this many: ", $res->valueof('//queryResponse/result/size');
-        my @records = $res->valueof('//queryResponse/result/records');
-        say $records[0];
-    }
-    catch ($e) {
-        # log or whatever. we'll just die for example
-        die "Could not perform an action: $e";
-    }
-
-    try {
-        my $sforce = WWW::Salesforce->login(
-            serverurl => 'https://test.my.salesforce.com',
-            version => '64.0', # must be a string
-            type => 'oauth2-usernamepassword',
-            client_id => 'abc2134asdgkljag',
-            client_secret => 'axyalaskjag234qdf',
-            username => 'foo',
-            password => 'password' . 'pass_token'
+            serverurl => 'https://MYSALESFORCEDOMAIN.salesforce.com',
+            version => '67.0', # must be a string
+            oauth2 => {
+                client_id => 'abc2134asdgkljag',
+                client_secret => 'axyalaskjag234qdf',
+            },
         );
         my $res = $sforce->query(query => 'select Id, Name from Account');
         say "Found this many: ", $res->valueof('//queryResponse/result/size');
@@ -95,28 +105,45 @@ Given that L<WWW::Salesforce> doesn't have attributes in the traditional
 sense, the following arguments, rather than attributes, can be passed
 into the constructor.
 
-=head2 client_id
+=head3 client_id
 
-  my $sforce = WWW::Salesforce->new(client_id => 'abc123xyz12398', ...);
-  my $sforce = WWW::Salesforce->new(clientid => 'abc123xyz12398', ...);
-  my $sforce = WWW::Salesforce->new(clientId => 'abc123xyz12398', ...);
+  my $sforce = WWW::Salesforce->new(oauth2 => { client_id => 'abc123xyz12398', ...});
+  my $sforce = WWW::Salesforce->new(oauth2 => { clientid => 'abc123xyz12398', ...});
+  my $sforce = WWW::Salesforce->new(oauth2 => { clientId => 'abc123xyz12398', ...});
 
 The C<client_id> or C<clientid> or C<clientId> is the consumer key of
 the connected app. To access the consumer key, from the B<App Manager>, find the
 connected app and select B<View> from the dropdown. Then click B<Manage Consumer Details>.
 You're sometimes prompted to verify your identity before you can view the consumer key.
 
-=head2 client_secret
+This value is required when using the OAuth2 flows to authenticate with Salesforce.
 
-  my $sforce = WWW::Salesforce->new(client_secret => 'abc123xyz12398', ...);
-  my $sforce = WWW::Salesforce->new(clientsecret => 'abc123xyz12398', ...);
-  my $sforce = WWW::Salesforce->new(clientSecret => 'abc123xyz12398', ...);
+=head3 client_secret
+
+  my $sforce = WWW::Salesforce->new(oauth2 => { client_secret => 'abc123xyz12398', ...});
+  my $sforce = WWW::Salesforce->new(oauth2 => { clientsecret => 'abc123xyz12398', ...});
+  my $sforce = WWW::Salesforce->new(oauth2 => { clientSecret => 'abc123xyz12398', ...});
 
 The C<client_secret> or C<clientsecret> or C<clientSecret> is the consumer
 secret of the connected app. To access the consumer secret, from the B<App Manager>,
 find the connected app and select B<View> from the dropdown. Then click
 B<Manage Consumer Details>. You're sometimes prompted to verify your identity
 before you can view the consumer secret.
+
+This value is required when using the OAuth2 flows to authenticate with Salesforce.
+
+=head2 oauth2
+
+  my $sforce = WWW::Salesforce->new(
+    oauth2 => {
+        client_id => 'abc123xyz12398',
+        client_secret => 'abc123xyz12398',
+    },
+  );
+
+The C<oauth2> argument is a hash reference that contains the
+C<client_id> and C<client_secret> for your Salesforce connected app.
+This is required for OAuth2 authentication flows.
 
 =head2 password
 
@@ -125,6 +152,9 @@ before you can view the consumer secret.
 
 The C<password> or C<pass> is a combination of your Salesforce password and your user's
 L<Security Token|https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_concepts_security.htm>.
+
+This value is required when using the SOAP or OAuth2 Username-Password flows
+to authenticate with Salesforce.
 
 =head2 serverurl
 
@@ -138,40 +168,31 @@ The C<serverurl> (or C<serverUrl>, C<instanceurl>, C<instanceUrl>) is used as yo
 to login to Salesforce. The default value here is C<https://login.salesforce.com>.
 All you need is the base URL here.
 
-=head2 type
-
-  my $sforce = WWW::Salesforce->new(type => 'soap', ...);
-  my $sforce = WWW::Salesforce->new(
-    type => 'oauth2-usernamepassword',
-    client_id => 'abc2134asdgkljag',
-    client_secret => 'axyalaskjag234qdf',
-    ...
-  );
-
-B<NOTE:> As of version C<65.0> of the Salesforce APIs, the SOAP login method will no longer
-exist. Also, the login method for SOAP will be removed after the B<Summer ’27 release>. Read about
-this change here: L<https://help.salesforce.com/s/articleView?id=005132110&type=1>.
 
 Given that our tried and true method of logging in with the
 L<SOAP login|https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_login.htm>
-method is going away, we are now providing you with an option of how to login.
+method is going away, we are now providing you with other options of how to login.
 
 The default login C<type> will still be C<soap> for now. However, you can get ahead of things by setting your
-login C<type> to C<oauth2-suernamepassword>. The
-L<OAuth 2.0 Username-Password Flow|https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_oauth_username_password_flow.htm&type=5>
-will work largely the same way as the old SOAP login, but you'll need to provide a client from your Salesforce
-instance's C<App Manager>. Login to the Salesforce front-end and go to B<Setup> -> B<App Manager>.
+login C<type> to C<oauth2-clientcredentials>. The C<oauth2-clientcredentials>
+method will work largely the same way as the old SOAP login, but you'll need to provide a client from your
+Salesforce instance's C<App Manager>, you'll also need to provide an I<Integration User> on your client
+application. That integration user is the user every API call will act as after login. Login to the
+Salesforce front-end and go to B<Setup> -> B<App Manager>.
 
 =head2 username
 
   my $sforce = WWW::Salesforce->new(username => 'foo@bar.com', ...);
   my $sforce = WWW::Salesforce->new(user => 'foo@bar.com', ...);
 
-When you login to Salesforce, your C<username> or C<user> is necessary.
+When you login to Salesforce, your C<username> or C<user> is only necessary if you are
+using the C<soap> or C<oauth2-usernamepassword> login mechanisms.
+
+This value is required when using the SOAP or OAuth2 Username-Password flows to authenticate with Salesforce.
 
 =head2 version
 
-  my $sforce = WWW::Salesforce->new(version => '64.0');
+  my $sforce = WWW::Salesforce->new(version => '67.0');
 
 Salesforce makes changes to their API and luckily for us, they version those changes.
 You can choose which API version you want to use by passing this argument. However, it
@@ -187,15 +208,19 @@ second constructor named login.
 =head2 new
 
   my $sforce = WWW::Salesforce->new(
-    username => 'foo@bar.com',
-    password => 'password' . 'security_token',
-    serverurl => 'https://login.salesforce.com',
-    version => '64.0'
+    serverurl => 'https://MYSALESFORCEDOMAIN.salesforce.com',
+    version => '67.0',
+    oauth2 => {
+        client_id => 'your_client_id',
+        client_secret => 'your_client_secret',
+    },
   );
 
-When you create a new instance, the L<WWW::Salesforce/username> and L<WWW::Salesforce/password>
-arguments are required. The others are not required. After construction, these items are
-not mutable.
+When you create a new instance, the L<WWW::Salesforce/client_id> and the L<WWW::Salesforce/client_secret>
+are required on any of the OAuth2 scopes. The L<WWW::Salesforce/username> and L<WWW::Salesforce/password>
+arguments are required for SOAP or the OAuth2 Username-Password flows.
+
+The others are not required. After construction, these items are not mutable.
 
 =cut
 
@@ -205,21 +230,147 @@ sub new { return shift->login(@_); }
 =head2 login
 
   my $sforce = WWW::Salesforce->login(
-    username => 'foo@bar.com',
-    password => 'password' . 'security_token',
-    serverurl => 'https://login.salesforce.com',
-    version => '64.0'
+    serverurl => 'https://MYSALESFORCEDOMAIN.salesforce.com',
+    version => '67.0',
+    oauth2 => {
+        client_id => 'your_client_id',
+        client_secret => 'your_client_secret',
+    },
   );
 
-When you create a new instance, the L<WWW::Salesforce/username> and L<WWW::Salesforce/password>
-arguments are required. The others are not required. After construction, these items are
-not mutable.
+When you create a new instance, the L<WWW::Salesforce/client_id> and the L<WWW::Salesforce/client_secret>
+arguments are required on any of the OAuth2 flows.
 
 =cut
 
-sub login {
-    my $class = shift;
-    my (%params) = @_;
+# hidden, private function to get a stringified version
+sub _coerce_version {
+    my $version = shift;
+    return $SF_APIVERSION unless defined($version);
+    return $SF_APIVERSION unless length($version);
+    if ($version =~ /^\d+$/) {
+        # if they provided a version like 67, coerce it to 67.0
+        return $version . '.0';
+    }
+    if ($version =~ /^\d+\.\d+$/) {
+        # if they provided a version like 67.0, just return it
+        return $version . '';
+    }
+    # If they provided anything else, return the default version.
+    # This is a bit of a hack, but it works for now.
+    return $SF_APIVERSION;
+}
+
+# hidden, private method to login via OAuth2 flows
+sub _login_oauth2 {
+    my $self = shift;
+
+    # the URL is the same for both OAuth2 flows
+    my $url = URI->new($self->{sf_serverurl});
+    $url->path('/services/oauth2/token');
+
+    # the user agent and potential proxy is also the same for both flows
+    my $ua = LWP::UserAgent->new(timeout => 5);
+    if ($WEB_PROXY) {
+        $ua->proxy(https => $WEB_PROXY);
+    }
+
+    my $data = {
+        'client_id' => $self->{sf_oauth2}{client_id},
+        'client_secret' => $self->{sf_oauth2}{client_secret},
+    };
+
+    if ($self->{sf_type} eq 'oauth2-usernamepassword') {
+        $data->{'username'} = $self->{sf_user};
+        $data->{'password'} = $self->{sf_pass};
+        $data->{'format'} = 'json';
+        $data->{'grant_type'} = 'password';
+    } elsif ($self->{sf_type} eq 'oauth2-clientcredentials') {
+        $data->{'grant_type'} = 'client_credentials';
+    }
+
+    my $response = $ua->post($url->as_string(), $data);
+    unless (defined($response)) {
+        die("Unable to connect to Salesforce.");
+    }
+    my $result = JSON::MaybeXS::decode_json($response->decoded_content);
+    unless($response->is_success) {
+        # use Data::Dumper::Concise qw(Dumper);
+        # print Dumper($result);
+        die(join(': ', $response->status_line, $result->{error}, $result->{error_description}));
+    }
+    # we have a successful login. Let's grab some bits we need for later SOAP use
+    my $uri = URI->new($result->{id});
+    my ($org_id, $uid) = grep {defined($_) && length($_)} split('/', $uri->path() =~ s{^/id/}{}r);
+    unless(defined($org_id) && length($org_id) && defined($uid) && length($uid)) {
+        die('Unable to determine our org and user id from the login response.');
+    }
+    $self->{sf_uid} = $uid;
+    $self->{sf_sid} = $result->{access_token};
+    my $inst_url = URI->new($result->{instance_url});
+    $inst_url->path('/services/Soap/u/' . $self->{sf_version} . '/' . substr($org_id, 0, 15));
+    $self->{sf_serverurl} = $inst_url->as_string;
+    $inst_url->path('/services/Soap/m/' . $self->{sf_version} . '/' . substr($org_id, 0, 15));
+    $self->{'sf_metadataServerUrl'} = $inst_url->as_string;
+}
+
+# hidden, private method to login via SOAP
+sub _login_soap {
+    my $self = shift;
+
+    if ($self->{sf_version} > 64.0) {
+        warn "Salesforce doesn't use SOAP login on versions greater than 64.0";
+        $self->{sf_version} = '64.0';
+    }
+    my $url = URI->new($self->{sf_serverurl});
+    # set the default SOAP path
+    $url->path('/services/Soap/u/' . $self->{sf_version});
+    $self->{sf_serverurl} = $url->as_string;
+    my $client = $self->_get_client();
+    my $r      = $client->login(
+        SOAP::Data->name('username' => $self->{'sf_user'}),
+        SOAP::Data->name('password' => $self->{'sf_pass'})
+    );
+    unless ($r) {
+        die sprintf("could not login, user %s, pass %s",
+            $self->{'sf_user'}, $self->{'sf_pass'});
+    }
+    # print Dumper($r);
+    if ($r->fault()) {
+        die($r->faultstring());
+    }
+    $self->{'sf_sid'}       = $r->valueof('//loginResponse/result/sessionId');
+    $self->{'sf_uid'}       = $r->valueof('//loginResponse/result/userId');
+    $self->{'sf_serverurl'} = $r->valueof('//loginResponse/result/serverUrl');
+    $self->{'sf_metadataServerUrl'}
+        = $r->valueof('//loginResponse/result/metadataServerUrl');
+}
+
+# hidden, private function to normalize and extract parameters from the constructors
+sub _params {
+    my %params = ();
+    if ( @_ == 1 && ref $_[0] ) {
+        %params = eval { %{ $_[0] } }; # try shallow copy
+        Carp::croak("Argument could not be dereferenced as a hash") if $@;
+    } elsif ( @_ % 2 == 0 ) {
+        %params = @_;
+    } else {
+        Carp::croak("Arguments must be a hash or a hash reference");
+    }
+
+    my @allowed_types = ('soap', 'oauth2-usernamepassword', 'oauth2-clientcredentials');
+
+    if (defined($params{oauth2}) && ref($params{oauth2}) eq 'HASH') {
+        # if the type isn't defined, we'll set it to 'oauth2-clientcredentials'
+        # we assume that if they're passing this in, we are in oauth2 mode
+        # and we assume they want the current standard, not the soon to be
+        # deprecated flows.
+        $params{type} //= 'oauth2-clientcredentials';
+        $params{oauth2}{type} //= 'oauth2-clientcredentials';
+
+    } else {
+        $params{oauth2} = {};
+    }
 
     # allow multiple spellings of the server url
     my $url = $params{serverurl}
@@ -228,133 +379,67 @@ sub login {
         // $params{instanceUrl}
         // $params{url}
         // $SF_PROXY;
-    my $version = $params{version}
-        // $SF_APIVERSION;
-    my $user = $params{username}
+    my $version = _coerce_version($params{version});
+    my $user = $params{oauth2}{user}
+        // $params{oauth2}{username}
+        // $params{username}
         // $params{user};
-    my $pass = $params{password}
+    my $pass = $params{oauth2}{pass}
+        // $params{oauth2}{password}
+        // $params{password}
         // $params{pass};
-    my $type = $params{type}
+    my $type = $params{oauth2}{type}
+        // $params{type}
         // 'soap';
-    my $client_id = $params{clientid}
+    my $client_id = $params{oauth2}{clientid}
+        // $params{oauth2}{clientId}
+        // $params{oauth2}{client_id}
+        // $params{clientid}
         // $params{clientId}
         // $params{client_id};
-    my $client_secret = $params{clientsecret}
+    my $client_secret = $params{oauth2}{clientsecret}
+        // $params{oauth2}{clientSecret}
+        // $params{oauth2}{client_secret}
+        // $params{clientsecret}
         // $params{clientSecret}
         // $params{client_secret};
 
-    # A login method is required. coerce to 'soap' for default
-    unless (defined($type) && length($type)) {
-        # if they provided an invalid version, just use 'soap'
-        $type = 'soap';
-    }
-    $type = lc($type);
-    if ($type ne 'soap' && $type ne 'oauth2-usernamepassword') {
-        $type = 'soap';
-    }
-    # All login methods require a version... coerce it to a usable value
-    unless (defined($version) && $version =~ /^\d\d+\.\d$/) {
-        # if they provided an invalid version, just use the current
-        $version = '64.0';
-    }
-    # All login methods at this point require a username and password
-    unless (defined($user) && length($user)) {
-        die("WWW::Salesforce::login() requires a username");
-    }
-    unless (defined($pass) && length($pass)) {
-        die("WWW::Salesforce::login() requires a password");
-    }
-    # All login methods require a URL
-    unless (defined($url) && length($url)) {
-        die("WWW::Salesforce::login() requires an instanceUrl");
-    }
-
-    # get the login type
-    print('Current version : ', $version, "\n");
-
     $url = URI->new($url);
-    # set the default SOAP path
-    $url->path('/services/Soap/u/' . $version);
+    # A login method is required. coerce to 'soap' for default
+    $type = lc($type);
+    unless (grep { $_ eq $type } @allowed_types) {
+        $type = 'soap';
+    }
 
-    my $self = {
-        sf_user      => $user,
-        sf_pass      => $pass,
+    # this is the shape we ultimately want.
+    return {
         sf_serverurl => $url->as_string(),
-        sf_version   => $version,
-        sf_clientId  => $client_id,
-        sf_clientSec => $client_secret,
-        sf_sid       => undef,
-        sf_uid       => undef,
+        sf_version => $version,
+        sf_user => $user,
+        sf_pass => $pass,
+        sf_type => $type,
+        sf_oauth2 => {
+            client_id => $client_id,
+            client_secret => $client_secret,
+        },
+        sf_sid => undef,
+        sf_uid => undef,
         sf_metadataServerUrl => undef,
     };
+}
+
+
+sub login {
+    my $class = shift;
+
+    my $self = _params(@_);
     bless $self, $class;
 
-    # now we have an object. let's login
-    if ($type eq 'oauth2-usernamepassword') {
-        unless (defined($self->{sf_clientId}) && length($self->{sf_clientId})) {
-            # client Id required
-            die("WWW::Salesforce::login() requires a client_id for this type.");
-        }
-        unless (defined($self->{sf_clientSec}) && length($self->{sf_clientSec})) {
-            # client Id required
-            die("WWW::Salesforce::login() requires a client_secret for this type.");
-        }
-        $url->path('/services/oauth2/token');
-        my $ua = LWP::UserAgent->new(timeout => 5);
-        if ($WEB_PROXY) {
-            $ua->proxy(https => $WEB_PROXY);
-        }
-        my $data = {
-            'grant_type' => 'password',
-            'client_id' => $self->{sf_clientId},
-            'client_secret' => $self->{sf_clientSec},
-            'username' => $self->{sf_user},
-            'password' => $self->{sf_pass},
-            'format' => 'json',
-        };
-        my $response = $ua->post($url->as_string(), $data);
-        unless (defined($response)) {
-            die("Unable to connect to Salesforce.");
-        }
-        my $result = JSON::MaybeXS::decode_json($response->decoded_content);
-        unless($response->is_success) {
-            # print Dumper($result);
-            die(join(': ', $response->status_line, $result->{error}, $result->{error_description}));
-        }
-        # we have a successful login. Let's grab some bits we need for later SOAP use
-        my $uri = URI->new($result->{id});
-        my ($org_id, $uid) = grep {defined($_) && length($_)} split('/', $uri->path() =~ s{^/id/}{}r);
-        unless(defined($org_id) && length($org_id) && defined($uid) && length($uid)) {
-            die('Unable to determine our org and user id from the login response.');
-        }
-        $self->{sf_uid} = $uid;
-        $self->{sf_sid} = $result->{access_token};
-        my $inst_url = URI->new($result->{instance_url});
-        $inst_url->path('/services/Soap/u/' . $self->{sf_version} . '/' . substr($org_id, 0, 15));
-        $self->{sf_serverurl} = $inst_url->as_string;
-        $inst_url->path('/services/Soap/m/' . $self->{sf_version} . '/' . substr($org_id, 0, 15));
-        $self->{'sf_metadataServerUrl'} = $inst_url->as_string;
-
+    if ($self->{sf_type} eq 'soap') {
+        # SOAP-specific initialization can go here
+        $self->_login_soap();
     } else {
-        my $client = $self->_get_client();
-        my $r      = $client->login(
-            SOAP::Data->name('username' => $self->{'sf_user'}),
-            SOAP::Data->name('password' => $self->{'sf_pass'})
-        );
-        unless ($r) {
-            die sprintf("could not login, user %s, pass %s",
-                $self->{'sf_user'}, $self->{'sf_pass'});
-        }
-        # print Dumper($r);
-        if ($r->fault()) {
-            die($r->faultstring());
-        }
-
-        $self->{'sf_sid'}       = $r->valueof('//loginResponse/result/sessionId');
-        $self->{'sf_uid'}       = $r->valueof('//loginResponse/result/userId');
-        $self->{'sf_serverurl'} = $r->valueof('//loginResponse/result/serverUrl');
-        $self->{'sf_metadataServerUrl'}
-            = $r->valueof('//loginResponse/result/metadataServerUrl');
+        $self->_login_oauth2();
     }
 
     # we have our login stuff cached for use, let's return our object
@@ -858,7 +943,13 @@ sub getUpdated {
         die "could not call method $method";
     }
     if ( $r->fault() ) {
-        die( $r->faultstring() );
+        # ---- LOCAL PATCH (Rapita) --------------------------------------
+        # Append faultdetail for a usable error message. Carried forward
+        # from the vendored copy; not fixed upstream as of 0.400.
+        my $s = $r->faultstring();
+        $s .= $r->faultdetail() if ($r->faultdetail());
+        die( $s );
+        # ---- END LOCAL PATCH -------------------------------------------
     }
     return $r;
 }
@@ -964,14 +1055,26 @@ sub query {
         'QueryOptions' => \SOAP::Header->name('batchSize' => $in{'limit'}))
         ->prefix($SF_PREFIX)->uri($SF_URI);
     my $client = $self->_get_client();
-    my $r      = $client->query(SOAP::Data->type('string' => $in{'query'}),
+
+    # ---- LOCAL PATCH (Rapita) ------------------------------------------
+    # Name the argument 'queryString' to match the partner WSDL instead of
+    # sending an unnamed xsd:string. Carried forward from the 0.25-era
+    # vendored copy; not fixed upstream as of 0.400.
+    my $r      = $client->query(SOAP::Data->name('queryString' => $in{'query'}),
         $limit, $self->_get_session_header());
+    # ---- END LOCAL PATCH -----------------------------------------------
 
     unless ($r) {
         die "could not query " . $in{'query'};
     }
     if ($r->fault()) {
-        die($r->faultstring());
+        # ---- LOCAL PATCH (Rapita) --------------------------------------
+        # Append faultdetail: Salesforce puts the useful part of a query
+        # error (row/column of a MALFORMED_QUERY) there, not in faultstring.
+        my $s = $r->faultstring();
+        $s .= $r->faultdetail() if ($r->faultdetail());
+        die($s);
+        # ---- END LOCAL PATCH -------------------------------------------
     }
     return $r;
 }
@@ -1357,6 +1460,68 @@ sub update {
     if ( $r->fault() ) {
         die( $r->faultstring() );
     }
+
+    # ---- LOCAL PATCH (Rapita) ------------------------------------------
+    # Inspect the update result, not just the SOAP envelope: a per-record
+    # failure comes back as a *successful* SOAP response carrying
+    # success=false, so $r->fault() above does not catch it. Upstream 0.400
+    # does not check this at all.
+    #
+    # This replaces the older two-test version carried over from the
+    # vendored copy, which had two defects:
+    #
+    #   my $errs = $r->valueof('//updateResponse/result/errors');
+    #   if ($errs) { die("Errors $errs->{message} ") }
+    #   my $success = $r->valueof('//updateResponse/result/success');
+    #   if (not $success) { die("Not success: $success") }
+    #
+    #   1. `not $success` never fired: valueof() returns the *string*
+    #      'false', which is true in Perl. Dead code.
+    #   2. Both used valueof() in scalar context, which returns the first
+    #      matching node in the whole document. On a multi-record update
+    #      that paired the first record's success flag with some other
+    #      record's error, so a batch where record 1 succeeded and record 2
+    #      failed read as success=true while reporting record 2's error.
+    #
+    # Iterate the results instead, pair each error with its own record, and
+    # include statusCode and field name - usually the part that says why
+    # Salesforce rejected the write.
+    my @results = $r->valueof('//updateResponse/result');
+    my @problems;
+    for my $i ( 0 .. $#results ) {
+        my $res = $results[$i];
+        next if ( ( $res->{success} // '' ) eq 'true' );
+        my $errs = $res->{errors};
+        my @e =
+              ref($errs) eq 'ARRAY' ? @$errs
+            : defined($errs)        ? ($errs)
+            :                         ();
+        push @problems, sprintf(
+            'record %d: %s',
+            $i + 1,
+            (
+                @e
+                ? join( '; ',
+                    map {
+                        join( ' ',
+                            grep { defined && length }
+                                $_->{statusCode},
+                            $_->{message},
+                            ( $_->{fields} ? "($_->{fields})" : () ) )
+                    } @e )
+                : 'failed with no error detail'
+            )
+        );
+    }
+    if (@problems) {
+        die 'update failed for '
+            . scalar(@problems) . ' of '
+            . scalar(@results)
+            . ' record(s): '
+            . join( ' | ', @problems ) . "\n";
+    }
+    # ---- END LOCAL PATCH -----------------------------------------------
+
     return $r;
 }
 

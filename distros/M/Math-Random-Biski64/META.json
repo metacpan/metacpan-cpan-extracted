@@ -1,0 +1,71 @@
+{
+   "abstract" : "Fast 64-bit PRNG with guaranteed minimum 2^64 period",
+   "author" : [
+      "Scott Baker <https://www.perturb.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-Random-Biski64",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "optional_features" : {
+      "Windows" : {
+         "description" : "Windows CSPRNG support",
+         "prereqs" : {
+            "runtime" : {
+               "recommends" : {
+                  "Win32::API" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.012000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bakers/perl-Math-Random-Biski64/issues"
+      },
+      "homepage" : "https://github.com/bakers/perl-Math-Random-Biski64",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bakers/perl-Math-Random-Biski64.git",
+         "web" : "https://github.com/bakers/perl-Math-Random-Biski64"
+      }
+   },
+   "version" : "v0.2.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

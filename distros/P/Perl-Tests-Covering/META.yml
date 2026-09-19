@@ -1,0 +1,78 @@
+---
+abstract: 'Which tests run the file you just changed, from coverage kept on disk.'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  FindBin::libs: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::Tools::Exception: '0'
+  Test2::Tools::Warnings: '0'
+  Test2::V1: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Tests-Covering
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  Perl::Tests::Covering:
+    file: lib/Perl/Tests/Covering.pm
+    version: '0.002'
+  Perl::Tests::Covering::Recorder:
+    file: lib/Perl/Tests/Covering/Recorder.pm
+    version: '0.002'
+requires:
+  Carp: '0'
+  Cpanel::JSON::XS: '0'
+  Cwd: '0'
+  Devel::Cover::DB: '0'
+  Devel::Cover::DB::IO: '0'
+  Digest::MD5: '0'
+  Digest::SHA: '0'
+  Exporter: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Slurper: '0'
+  File::Slurper::Temp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  IO::Compress::Gzip: '0'
+  IO::Uncompress::Gunzip: '0'
+  List::Util: '0'
+  POSIX: '0'
+  PPI: '0'
+  Pod::Usage: '0'
+  Readonly: '0'
+  TAP::Parser::SourceHandler::Perl: '0'
+  Text::ParseWords: '0'
+  constant: '0'
+  parent: '0'
+  perl: '5.014'
+  re: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Troglodyne-Internet-Widgets/perl-tests-covering/issues
+  homepage: https://github.com/Troglodyne-Internet-Widgets/perl-tests-covering
+  repository: https://github.com/Troglodyne-Internet-Widgets/perl-tests-covering.git
+version: '0.002'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

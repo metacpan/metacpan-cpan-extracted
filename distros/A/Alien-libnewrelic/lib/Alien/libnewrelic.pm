@@ -6,7 +6,7 @@ use 5.014;
 use base qw( Alien::Base );
 
 # ABSTRACT: Alien to download and install libnewrelic
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 
@@ -27,7 +27,7 @@ Alien::libnewrelic - Alien to download and install libnewrelic
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

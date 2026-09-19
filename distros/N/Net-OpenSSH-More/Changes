@@ -1,5 +1,8 @@
 Revision history for Net-OpenSSH-More
 
+1.04 2026-09-18 TEODESIAN
+    - Fix test failure due to inability to open a port
+
 1.03 2026-09-17 TEODESIAN
     - Honour retry_interval between connection attempts
     - Stop retrying a credential the far end refused, unless retry_on_auth_failure asks

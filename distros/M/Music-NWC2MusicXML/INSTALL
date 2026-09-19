@@ -1,0 +1,41 @@
+INSTALLATION
+
+Standard CPAN-style installation:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Or via cpanm (preferred):
+
+    cpanm .
+
+DEPENDENCIES
+
+  Compress::Zlib
+  Readonly
+  Params::Validate
+  Params::Get
+  File::Path
+  Getopt::Long
+  Pod::Usage
+
+TEST DEPENDENCIES
+
+  Test::More (0.98+)
+  Test::Exception
+
+CORPUS TEST FILES
+
+To run the corpus tests in t/10-nwc.t, place your reference .nwc files in:
+
+    t/corpus/Pilgrim.nwc
+    t/corpus/y2k.nwc
+
+These files are not distributed with the module.  The corpus tests are
+automatically skipped if the files are absent.
+
+PERL VERSION
+
+Perl 5.36 or later is required.

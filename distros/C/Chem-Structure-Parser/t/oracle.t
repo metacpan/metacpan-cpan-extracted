@@ -164,7 +164,8 @@ sub compare {
 		note("gemmi would not read $name; skipped");
 		return;
 	}
-	my $info = structure_info($file);
+	# features => 0: this compares atoms against gemmi and nothing else
+	my $info = structure_info($file, features => 0);
 	my $us   = ours($info);
 	# gemmi reads the atom name out of _atom_site.label_atom_id, so an mmCIF
 	# written with the auth_* names alone -- which t/data/quirks.cif is, on

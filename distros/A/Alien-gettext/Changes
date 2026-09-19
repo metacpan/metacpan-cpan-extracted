@@ -1,35 +1,13 @@
-==================================================
-Changes from 1740-12-04 00:00:00 +0000 to present.
-==================================================
+Revision history for Alien-gettext
 
-------------------------------------------
-version 0.001 at 2014-09-18 22:37:56 +0000
-------------------------------------------
+0.002     2026-09-19 02:53:52Z
+    - Update dist config to current @Author::GETTY standards
+    - Add msgmerge to the provided gettext tools
 
-  Change: 93e846ec750ed1b627ce408a7998b0d0fbdaf208
-  Author: Torsten Raudssus <torsten@raudss.us>
-  Date : 2014-09-19 00:37:46 +0000
+0.001     2014-09-18 22:37:56Z
+    - Initial release
+    - Install the GNU gettext command-line utilities via Alien::Base,
+      using a system gettext or building it from the GNU FTP source
+    - Tools reached through bin_dir: msgfmt, xgettext, msgcmp, msgcomm,
+      msgfilter, msgexec, msguniq, msginit, msgunfmt, msgconv
 
-    A little bit updating 
-
-  Change: 55b5c24b78ddd9f5b95f30fa1a6736c11964e94c
-  Author: Torsten Raudssus <torsten@raudss.us>
-  Date : 2013-03-02 22:04:07 +0000
-
-    Switched to author bundle alien integration 
-
-  Change: 3f3cc7221b0ed2cabe25f5e3abe6cd7e702e1b3e
-  Author: Torsten Raudssus <torsten@raudss.us>
-  Date : 2013-02-26 23:32:30 +0000
-
-    Base setup, sadly doesnt work :( 
-
-  Change: a4e7253ecd4aaca23f3a4ccea019409acc818540
-  Author: Torsten Raudssus <torsten@raudss.us>
-  Date : 2013-02-26 22:39:36 +0000
-
-    initial commit 
-
-================
-End of releases.
-================

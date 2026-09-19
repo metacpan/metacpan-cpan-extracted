@@ -1,5 +1,9 @@
 Revision history for JMAP-Tester
 
+0.113     2026-09-18 09:21:53-04:00 America/New_York
+        - the (weird, mostly obsolete) ->login method is unbroken; it was not
+          updated for the diagnostic_dumper changes in 0.110
+
 0.112     2026-08-03 13:04:57-04:00 America/New_York
         - tweak formatting of bullet lists in Manual
 

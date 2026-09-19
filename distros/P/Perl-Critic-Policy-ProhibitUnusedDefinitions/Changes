@@ -1,5 +1,18 @@
 Revision history for Perl-Critic-Policy-ProhibitUnusedDefinitions
 
+0.004 2026-09-18 TEODESIAN
+    - Keep each file's uses resolved in the cache, with a digest of the
+      definitions they were resolved against.  While no definition changes,
+      only the changed files are resolved again.
+    - Compress the cache with gzip, and on each write remove the cache of any
+      distribution whose root is gone, such as a deleted checkout.
+
+0.003 2026-09-18 TEODESIAN
+    - Keep the index of each distribution on disk between runs, as JSON, and
+      parse again only the files whose stat changed.  An editor that starts
+      a new process for every check, such as PerlNavigator, no longer parses
+      the whole distribution each time.  New parameters: cache, cache_dir.
+
 0.002 2026-09-14 TEODESIAN
     - Fix issue with not detecting interpolated sub calls
 

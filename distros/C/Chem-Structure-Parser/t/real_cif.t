@@ -185,7 +185,9 @@ sub adds_up {
 		my ($read, $paired, @bad, @differ, @note) = (0, 0);
 		for my $f (@files) {
 			my $name = join '/', (split m{/}, $f)[-2, -1];
-			my $info = eval { structure_info($f) };
+			# features => 0 throughout: this file is about the two readers
+			# agreeing, and the surface is five times the cost of the read
+			my $info = eval { structure_info($f, features => 0) };
 			if (!$info) { push @bad, "$name: $@"; next }
 			if (my $why = adds_up($info, $name)) { push @bad, "$name: $why"; next }
 			unless ($info->{stats}{n_atoms} && @{ $info->{chain_order} }) {
@@ -195,7 +197,7 @@ sub adds_up {
 			$read++;
 
 			my $twin = twin($f) or next;
-			my $pdb  = eval { structure_info($twin) } or next;
+			my $pdb  = eval { structure_info($twin, features => 0) } or next;
 			$paired++;
 
 			# What is asserted of a pair is what cannot legitimately differ
@@ -360,11 +362,11 @@ sub to_cif {
 		my ($checked, @bad) = (0);
 		for my $file (@files) {
 			my $name = (split m{/}, $file)[-1];
-			my $pdb = eval { structure_info($file) };
+			my $pdb = eval { structure_info($file, features => 0) };
 			unless ($pdb) { push @bad, "$name: reading it as PDB: $@"; next }
 			next unless $pdb->{stats}{n_atoms};
 
-			my $cif = eval { structure_info_string(to_cif($file)) };
+			my $cif = eval { structure_info_string(to_cif($file), features => 0) };
 			unless ($cif) { push @bad, "$name: reading it as mmCIF: $@"; next }
 			is($cif->{format}, 'mmcif', "$name: the converted text reads as mmCIF")
 				if $checked == 0;

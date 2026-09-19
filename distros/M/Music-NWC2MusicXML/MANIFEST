@@ -1,0 +1,37 @@
+bin/nwc2musicxml
+Changes
+cpanfile
+INSTALL
+lib/Music/NWC2MusicXML.pm
+lib/Music/NWC2MusicXML/Diagnostics.pm
+lib/Music/NWC2MusicXML/Event.pm
+lib/Music/NWC2MusicXML/MusicXML.pm
+lib/Music/NWC2MusicXML/NWC.pm
+lib/Music/NWC2MusicXML/Parser.pm
+lib/Music/NWC2MusicXML/Score.pm
+lib/Music/NWC2MusicXML/Staff.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/10-nwc.t
+t/20-parser.t
+t/30-musicxml.t
+t/40-input.t
+t/50-events.t
+t/cgi_security.t
+t/data-flow.t
+t/domain.t
+t/edge_cases.t
+t/function.t
+t/input/Pilgrim.nwc
+t/integration.t
+t/locales.t
+t/mutant_killers.t
+t/path.t
+t/transaction.t
+t/unit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

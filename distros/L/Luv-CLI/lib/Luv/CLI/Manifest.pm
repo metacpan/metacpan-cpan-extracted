@@ -139,7 +139,7 @@ Luv::CLI::Manifest - reads and writes a luv project's luv.json manifest
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,80 @@
+#!/bin/bash
+########################################################################
+
+typeset -rx base0=$( basename $0 );
+typeset -rx  dir0=$( dirname  $0 );
+
+# bin_d is absolute path
+
+typeset -rx  bin_d=$( cd $dir0; pwd -L );
+typeset -rx test_d=$( dirname $bin_d );
+typeset -rx root_d=$( dirname $test_d );
+typeset -rx  lib_d=( $root_d/{,/t}/lib/ );
+
+########################################################################
+# utility subs
+########################################################################
+
+fatal()
+{
+    IFS=' ';
+    echo -e "Fatal $base0: $*";
+    exit -1;
+}
+
+find-pm()
+{
+    find "${lib_d[@]}" -type f -name '*pm' 
+}
+
+find-perly()
+{
+    find \
+    $root_d/* -path "*/t" -prune -o -print -type f -name '*[*~]'   |
+    xargs file                                                     |
+    grep -E ':\s+Perl script'                                      |
+    cut -d ':' -f1
+}
+
+find-bash()
+{
+    find \
+    $root_d/* -path "*/t" -prune -o -print -type f -name '*[*~]'   |
+    xargs file                                                     |
+    grep -E ':\s+Bourne-Again'                                     |
+    cut -d ':' -f1
+}
+
+install-test()
+{
+    cd $test_d;
+
+    test=${1:?Bogus install-test: false test name};
+    find=${2:?Bogus install-tset: false find handler};
+
+    echo "Test: '$test' w/ '$find'";
+
+    rel=../$( basename $bin_d )/$test;
+
+    rm -rf  $test   || fatal "Failed cleanup $test, $?";
+    mkdir   $test   || fatal "Failed mkdir $test, $?";
+    cd      $test   || fatal "Failed cd $test, $?";
+
+    [[ -e $rel ]]   || fatal "Non-existant: $rel";
+
+    $find           |
+    tee /dev/tty    |
+    while read i
+    do
+        j=$(echo "$i" | tr '/' '~').t;
+        ln -fsv $rel ./$j;
+    done
+}
+
+########################################################################
+
+install-test '01-pm_t'      'find-pm';
+install-test '02-perl_t'    'find-perly';
+install-test '03-bash_t'    'find-bash';
+
+exit 0;

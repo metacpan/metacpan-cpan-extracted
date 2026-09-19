@@ -1,0 +1,103 @@
+#!/usr/bin/env perl
+# PODNAME: mcp-picnic
+# ABSTRACT: MCP Server for Picnic Supermarket
+
+use strict;
+use warnings;
+use MCP::Picnic;
+
+MCP::Picnic->run_stdio;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mcp-picnic - MCP Server for Picnic Supermarket
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  # Set environment variables
+  export PICNIC_USER="your@email.de"
+  export PICNIC_PASS="your-password"
+  export PICNIC_COUNTRY="de"  # or "nl"
+
+  # Run the MCP server
+  mcp-picnic
+
+=head1 DESCRIPTION
+
+This script starts an MCP (Model Context Protocol) server for the Picnic
+Supermarket API. It communicates via stdio and is designed to be used with
+AI assistants like Claude Desktop.
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item PICNIC_USER
+
+Your Picnic account email address. Required.
+
+=item PICNIC_PASS
+
+Your Picnic account password. Required.
+
+=item PICNIC_COUNTRY
+
+Country code for your Picnic account: C<de> (Germany) or C<nl> (Netherlands).
+Defaults to C<de>.
+
+=back
+
+=head1 CLAUDE DESKTOP CONFIGURATION
+
+Add this to your Claude Desktop MCP configuration:
+
+  {
+    "mcpServers": {
+      "picnic": {
+        "command": "mcp-picnic",
+        "env": {
+          "PICNIC_USER": "your@email.de",
+          "PICNIC_PASS": "your-password",
+          "PICNIC_COUNTRY": "de"
+        }
+      }
+    }
+  }
+
+=head1 SEE ALSO
+
+L<MCP::Picnic>, L<WWW::Picnic>
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-mcp-picnic/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

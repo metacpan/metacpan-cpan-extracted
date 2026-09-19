@@ -1,5 +1,9 @@
 Revision history for Alien-libnewrelic
 
+0.09      2026-09-19 03:42:15 -0600
+  - Patch libnewrelic to fix build with newer glibc that adds
+    const-correct overloads for memchr/strchr/strrchr/strstr (gh#15)
+
 0.08      2022-08-25 04:26:29 -0600
   - Patch libnewrelic for use oldptr after realloc
     (based on https://github.com/newrelic/c-sdk/pull/34) (gh#13)

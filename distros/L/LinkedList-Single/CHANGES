@@ -1,0 +1,86 @@
+- Fri Sep 18 15:11:14 EDT 2026
+
+Been a while, eh?
+
+* Convert my own hack format to MD.
+
+* Refactor v2 using Object::Pad with separate list, iterator, fragment
+  classes with LinkedList::Single defaulting to v1, a single 'v2' argument
+  uses the new module. Please see the POD in lib/LinkedList/Single/v2.pm
+  for a description of the new module.
+
+* From here forward the v1 module will not be modified.
+
+- Fri Jan 26 09:29:50 CST 2018
+
+*Up Perl to supported version (v5.24).
+
+*Add Single.old for versions prior to supported (5.12).
+
+*Remove iterative deletion of nodes as Perl error fixed.
+
+*Fix bug in clone that allows non-object list handler.
+
+*Added "map" to process list contents into an array of 
+  processed contents, one arrayref per node.
+
+*Minor test improvements.
+
+
+- Tue Dec 13 00:34:32 CST 2011
+
+*Add Test::Deep to Makefile.PL
+
+- Sun Nov 13 16:18:20 CST 2011
+
+*Add new_head, new_root to allow installing a 
+  user-defined head or root node.
+
+*Main use of new_root is installing an object,
+  which allows attaching arbitrary attributes to
+  the root node.
+
+*Main use of new_head is adding 'bookmarks' into
+  an existing list as new lists. For example, 
+  Lists that start at specific letters of an
+  alphabatized list. 
+
+
+- Fri Oct 21 18:18:26 CDT 2011
+
+*use perl v5.12; drop use strict.
+
+*v5.12 avoids memory leak issues in DESTROY
+  so the cleanup now uses "$node = $node->[0]"
+  to sweep up the list rather than the slower
+  @$node = @{ $node->[0] }.
+
+*Add "new_head"; inserts a new head node
+  into an existing list and cleans up whatever
+  was there. Main use is adding skip-chains
+  or other entry points to the middle of an
+  existing list:
+
+     $listh->new->new_head( $existing_node );
+
+
+  including POD and tests.
+
+0.99.11 Tue Oct 18 20:07:41 CDT 2011
+
+*splice needed help: it needs to return a linked list
+  and take a replacement. 
+
+0.99.10 Wed Jun 30 16:28:49 EDT 2010
+
+*Replaced 'data' with 'node_data'.
+*Minor cleanups to splice, tests.
+
+0.99.9 Thu Apr  1 10:59:40 EDT 2010
+
+*Accessing the root node now uses the same format
+  as head node: $listh->root or $listh->root_node.
+
+*Minor clenaups to splice method (not user visible).
+
+*Update POD.

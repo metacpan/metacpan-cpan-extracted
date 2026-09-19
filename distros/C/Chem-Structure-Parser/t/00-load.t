@@ -15,9 +15,13 @@ ok(defined &Chem::Structure::Parser::_parse_cif_file,   'XS _parse_cif_file is b
 ok(defined &Chem::Structure::Parser::_parse_cif_string, 'XS _parse_cif_string is bootstrapped');
 
 for my $f (qw(
-	structure_info structure_info_string pdb_info cif_info
+	structure_info structure_info_string
 	structure_atoms structure_residues structure_ligands structure_sequences
-	chain_sequence structure_summary is_single_ion aa3to1 aa1to3 res1 res_type formats h
+	chain_sequence structure_summary is_single_ion
+	structure_features structure_sasa structure_pi_stacking structure_disulfides
+	structure_base_pairs structure_base_stacks structure_contacts structure_hbonds
+	structure_dssp
+	aa3to1 aa1to3 res1 res_type formats h
 )) {
 	can_ok('Chem::Structure::Parser', $f);
 	ok(defined &{"main::$f"}, "$f is exported into the caller");

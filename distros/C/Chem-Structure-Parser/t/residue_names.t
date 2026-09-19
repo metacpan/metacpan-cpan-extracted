@@ -35,22 +35,83 @@ is(aa3to1('PYL'), 'O', 'aa3to1: PYL is O (pyrrolysine)');
 is(aa3to1('UNK'), 'X', 'aa3to1: UNK is X');
 
 #--------
-# modified residues map to the residue they were made from.  A structure
-# solved with selenomethionine has the same sequence as one without it, and
-# an X every seventh position is no use to anyone.
+# The whole table, name by name.
+#
+# Modified residues map to the residue they were made from: a structure solved
+# with selenomethionine has the same sequence as one without it, and an X every
+# seventh position is no use to anyone.  Every name the switch in Parser.xs
+# knows is written out here rather than a sample of them, because a switch is
+# exactly the shape where a name is dropped or given the wrong letter by a
+# careless edit and nothing else notices -- the parse of a structure that
+# happens not to contain it says the same thing either way.
+#
+# Checked against gemmi 0.7.5's find_tabulated_residue().one_letter_code on
+# 2026-09-15: of the 150 names below, gemmi's built-in table carries 119 and
+# agrees about 116 of them.  It disagrees about three, and each is a judgement
+# rather than a mistake on either side:
+#
+#   ORN, DAB  gemmi maps both to alanine; here they are X.  Ornithine and
+#             2,4-diaminobutyrate are neither alanine nor one of the twenty,
+#             and a sequence that calls them A is a sequence that has lost them.
+#   5MU       gemmi calls it a U; here it is a T.  It is ribothymidine, the T
+#             of the TPsiC loop of tRNA, which is where it is nearly always
+#             found.
+#
+# The remaining 31 are names gemmi's table does not carry at all, most of them
+# the spellings AMBER and CHARMM use (HID, HIE, HIP, HSD, HSE, HSP, CYX) and
+# the pre-v3 nucleotide names (ADE, CYT, GUA, THY, URI).
 #--------
-my %MODIFIED = (
-	MSE => 'M', FME => 'M',            # selenomethionine, formylmethionine
-	SEP => 'S', TPO => 'T', PTR => 'Y',# phosphoserine/threonine/tyrosine
-	CSO => 'C', CME => 'C', OCS => 'C',
-	MLY => 'K', KCX => 'K', LLP => 'K',
-	HYP => 'P', PCA => 'E', CGU => 'E',
-	HSD => 'H', HSE => 'H', HIP => 'H',# the names force fields use
-	SAR => 'G', ABA => 'A', NLE => 'L',
-	DAL => 'A', DPN => 'F', DTY => 'Y',# D-amino acids
-	CIR => 'R',                        # citrulline
+my %AMINO = (
+	'ALA' => 'A', 'ARG' => 'R', 'ASN' => 'N', 'ASP' => 'D', 'CYS' => 'C', 'GLN' => 'Q',
+	'GLU' => 'E', 'GLY' => 'G', 'HIS' => 'H', 'ILE' => 'I', 'LEU' => 'L', 'LYS' => 'K',
+	'MET' => 'M', 'PHE' => 'F', 'PRO' => 'P', 'SER' => 'S', 'THR' => 'T', 'TRP' => 'W',
+	'TYR' => 'Y', 'VAL' => 'V', 'ASX' => 'B', 'GLX' => 'Z', 'XLE' => 'J', 'SEC' => 'U',
+	'PYL' => 'O', 'UNK' => 'X', 'XAA' => 'X', 'MSE' => 'M', 'MHO' => 'M', 'FME' => 'M',
+	'CXM' => 'M', 'SME' => 'M', 'MED' => 'M', 'CSO' => 'C', 'CSD' => 'C', 'CSS' => 'C',
+	'CSX' => 'C', 'CSW' => 'C', 'CME' => 'C', 'CMT' => 'C', 'CYX' => 'C', 'CAS' => 'C',
+	'CAF' => 'C', 'OCS' => 'C', 'SMC' => 'C', 'SNC' => 'C', 'YCM' => 'C', 'SEP' => 'S',
+	'SAC' => 'S', 'TPO' => 'T', 'PTR' => 'Y', 'TYS' => 'Y', 'TYI' => 'Y', 'TYQ' => 'Y',
+	'TPQ' => 'Y', 'PAQ' => 'Y', 'STY' => 'Y', 'IYR' => 'Y', 'KCX' => 'K', 'LLP' => 'K',
+	'MLY' => 'K', 'MLZ' => 'K', 'M3L' => 'K', 'ALY' => 'K', 'LYZ' => 'K', 'HYP' => 'P',
+	'HY3' => 'P', 'PCA' => 'E', 'CGU' => 'E', 'GMA' => 'E', 'HIC' => 'H', 'HID' => 'H',
+	'HIE' => 'H', 'HIP' => 'H', 'HSD' => 'H', 'HSE' => 'H', 'HSP' => 'H', 'MHS' => 'H',
+	'NEP' => 'H', 'AIB' => 'A', 'ABA' => 'A', 'ALM' => 'A', 'AYA' => 'A', 'BAL' => 'A',
+	'SAR' => 'G', 'MLE' => 'L', 'NLE' => 'L', 'MVA' => 'V', 'CIR' => 'R', 'ORN' => 'X',
+	'DAB' => 'X', 'TRO' => 'W', 'PHI' => 'F', 'PHL' => 'F', 'MEA' => 'F', 'DAL' => 'A',
+	'DAR' => 'R', 'DSG' => 'N', 'DAS' => 'D', 'DCY' => 'C', 'DGN' => 'Q', 'DGL' => 'E',
+	'DHI' => 'H', 'DIL' => 'I', 'DLE' => 'L', 'DLY' => 'K', 'DPN' => 'F', 'DPR' => 'P',
+	'DSN' => 'S', 'DTH' => 'T', 'DTR' => 'W', 'DTY' => 'Y', 'DVA' => 'V', 'DIV' => 'V',
 );
-is(aa3to1($_), $MODIFIED{$_}, "aa3to1: $_ maps to its parent $MODIFIED{$_}") for sort keys %MODIFIED;
+# the nucleotides, DNA and RNA, under every spelling the archive has used
+my %NUCLEIC = (
+	'DA'  => 'A', 'DC'  => 'C', 'DG'  => 'G', 'DT'  => 'T', 'DU'  => 'U', 'DI'  => 'I',
+	'A'   => 'A', 'C'   => 'C', 'G'   => 'G', 'T'   => 'T', 'U'   => 'U', 'I'   => 'I',
+	'N'   => 'N', 'ADE' => 'A', 'CYT' => 'C', 'GUA' => 'G', 'THY' => 'T', 'URI' => 'U',
+	'PSU' => 'U', 'H2U' => 'U', '4SU' => 'U', '5MU' => 'T', '5MC' => 'C', 'OMC' => 'C',
+	'1MA' => 'A', '2MG' => 'G', '7MG' => 'G', '1MG' => 'G', 'M2G' => 'G', 'OMG' => 'G',
+);
+my @WATER = qw(HOH WAT DOD H2O SOL TIP);
+
+is(scalar keys %AMINO, 114, 'the amino acid half of the table is all of it');
+is(scalar keys %NUCLEIC, 30, 'and so is the nucleic half');
+for my $n (sort keys %AMINO) {
+	is(aa3to1($n), $AMINO{$n}, "aa3to1: $n is $AMINO{$n}");
+	is(res_type($n), 'amino_acid', "res_type: $n is an amino acid");
+}
+for my $n (sort keys %NUCLEIC) {
+	is(res1($n), $NUCLEIC{$n}, "res1: $n is $NUCLEIC{$n}");
+	is(res_type($n), 'nucleotide', "res_type: $n is a nucleotide");
+	is(aa3to1($n), '', "aa3to1: $n is not an amino acid");
+}
+for my $n (@WATER) {
+	is(res_type($n), 'water', "res_type: $n is water");
+	is(res1($n), '', "res1: $n has no single-letter code");
+}
+# every amino acid answers res1() the same way it answers aa3to1(): the two
+# read one table, and the whole point of that is that they cannot disagree
+is_deeply([ map { res1($_) } sort keys %AMINO ],
+          [ map { aa3to1($_) } sort keys %AMINO ],
+	'res1 and aa3to1 give the same letter for every amino acid in the table');
 
 #--------
 # things that are not amino acids

@@ -1,5 +1,118 @@
 Revision history for Perl extension JQ::XS.
 
+2.02
+	- Stop warning when another JSON module is loaded alongside JQ::XS.
+	  Cpanel::JSON::XS installs the JSON::PP::Boolean operators itself,
+	  and JSON::XS does the same through Types::Serialiser, so the
+	  unconditional "use JSON::PP::Boolean" redefined their operators
+	  ("Subroutine JSON::PP::Boolean::(0+ redefined", three times) when
+	  JQ::XS was loaded second, and left the boolean class loaded
+	  without its parent when it was loaded first, which made
+	  Cpanel::JSON::XS read an undefined $JSON::PP::VERSION.  JQ::XS now
+	  loads JSON::PP, and only when nothing else has already overloaded
+	  JSON::PP::Boolean.  Both warnings are gated on $^W, so they only
+	  showed under -w.  JSON::PP was already a prerequisite.
+
+2.01
+	- No change to the module itself.  Fixes the release workflow's
+	  smoke test on RHEL 9 and 10, where blib.pm ships in a separate
+	  perl-blib package that the build dependencies do not install:
+	  the test now puts blib/lib and blib/arch on @INC itself rather
+	  than loading blib.
+
+2.00
+	- Embed jq: the distribution now ships an upstream jq release tarball
+	  under vendor/, compiles it during "make" and links it statically.
+	  The module no longer uses the libjq the operating system packages,
+	  has no libjq dependency at build or run time, and behaves the same
+	  way on every platform.  The jq bundled with this release is 1.8.2.
+	- The bundled oniguruma is built too, so the regex builtins (test,
+	  match, capture, sub, gsub, scan, splits) no longer depend on the
+	  distribution having built libjq with regex support.
+	- JQ::XS::jq_version() returns the embedded jq version.
+	- "perl Makefile.PL JQ_SYSTEM=1" links the OS libjq instead, as
+	  before; jq_version() then returns undef.
+	- Filter semantics change with the jq version.  Going from the jq 1.6
+	  that most distributions still ship to 1.8.2, note in particular:
+	  index/1, indices/1 and rindex/1 count code points rather than bytes
+	  (utf8bytelength gives the old behaviour); tonumber rejects strings
+	  with leading or trailing whitespace (trim removes it); ltrimstr and
+	  rtrimstr error on non-string input; limit/2 errors on a negative
+	  count; last(empty) yields nothing, like first(empty); and the
+	  precedence of "as" bindings against unary and binary operators
+	  changed.  jq's own NEWS.md, in the vendored tarball, has the rest.
+	- Number literals keep their precision, which jq gained in 1.7, so
+	  process_json() round-trips values that do not fit a double.
+	- Record the licenses of the vendored code in THIRD-PARTY-LICENSES.
+
+	  Considerably more of libjq is exposed as well.  All of the following
+	  is new; everything that worked in 1.01 still works unchanged.
+
+	- Named and positional arguments, through new()'s "vars" and "args"
+	  options: what jq's --arg, --argjson and --args pass.  $ARGS is now
+	  defined in every program, with .named and .positional as in jq.
+	- Output formatting for process_json(), as new() options, as
+	  set_output(), or per call: "pretty", "indent", "tab", "sort_keys",
+	  "ascii", "color" and "raw", matching jq's -c, --indent, --tab, -S,
+	  -a, -C and -r.  The default is unchanged (jq's compact -c).
+	- halt and halt_error are no longer silent: halted(), exit_code() and
+	  error_message() report what the last run halted with, and
+	  die_on_halt_error() turns a halt_error into a Perl exception.
+	- The debug, stderr, input and inputs builtins can be served from
+	  Perl, through new()'s "debug", "stderr" and "inputs" options or
+	  set_debug_cb(), set_stderr_cb() and set_inputs().  libjq leaves
+	  these unconnected, so until now debug and stderr discarded their
+	  input and inputs produced nothing.
+	- allow_includes => 0 refuses a program containing include or import,
+	  for callers compiling filters they did not write.  Decided from the
+	  program text before jq touches the filesystem, and exact rather than
+	  a heuristic: jq's grammar only accepts those directives in the
+	  program prologue, so legal programs that use the words elsewhere --
+	  {include: 1}, .foo.include -- still compile.  One shape is treated
+	  conservatively: jq 1.7 made a backslash at the end of a comment line
+	  continue the comment, so it and jq 1.6 disagree about whether an
+	  include on the following line is a directive.  Both readings are
+	  checked and either one is enough to refuse the program, so the
+	  switch cannot be the lenient one on whichever libjq is linked.
+	- library_paths() and new()'s "library_paths" option set jq's module
+	  search path (its -L).  Note that this restricts where modules are
+	  found, not whether they are loaded: jq searches the current
+	  directory for a directive that names no search path of its own, and
+	  a directive carrying {search:...} does not consult the search path
+	  at all.  allow_includes is what stops loading outright.
+	- attr(), set_attr() and new()'s "attrs" option read and write jq
+	  attributes (JQ_LIBRARY_PATH, JQ_ORIGIN, PROGRAM_ORIGIN).
+	- flags() feeds jq_start(), so the JQ_DEBUG_TRACE constants the module
+	  has always exported now do something.  dump_disassembly() writes the
+	  compiled bytecode to stdout, as jq --debug-dump-disasm does.
+	- parse_json(), parse_json_stream() and to_json() expose jq's own JSON
+	  parser and printer.  parse_json_stream() reads a run of concatenated
+	  values, which is what the jq command line consumes from a pipe.
+	- set_colors() sets the colors "color" output uses, in the format of
+	  jq's JQ_COLORS.  It is a global setting inside libjq rather than a
+	  per-object one.
+	- features() reports what a given build can do, which under
+	  JQ_SYSTEM=1 depends on the libjq that was linked.
+	- Reentering process() from a callback is refused rather than left to
+	  corrupt the jq_state, and an exception thrown by a callback reaches
+	  the caller instead of unwinding through libjq's C frames.
+	- Makefile.PL link-probes the OS libjq for jq_set_stderr_cb, which jq
+	  1.7 added and the jq 1.6 that RHEL 8 and Debian 11 ship does not
+	  have.  Without the probe the module would not load at all under
+	  JQ_SYSTEM=1 on those distributions; now the build says so,
+	  set_stderr_cb() croaks, and features() reports stderr_cb as false.
+	  Nothing else the XS calls postdates jq 1.5.
+	- Two further defences against defects in that jq 1.6, which a
+	  JQ_SYSTEM=1 build can still meet:
+	  * The callback slots in a new jq_state are cleared explicitly.  jq
+	    1.6's jq_init() mallocs the state without initialising them, so a
+	    state allocated over a freed one inherited its input callback -- a
+	    pointer into a JQ::XS object that no longer existed.
+	  * JQ_LIBRARY_PATH is always set, because jq 1.6's jq_get_lib_dirs()
+	    passes the attribute to jv_array_concat without checking it, and
+	    the failed assertion aborted the process while any program
+	    containing an include was being compiled.
+
 1.01
 	- Packaging only; no changes to the module itself
 	- Version the Debian packages +debNuM rather than ~debNuM, matching

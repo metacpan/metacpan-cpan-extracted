@@ -1,0 +1,86 @@
+#!/bin/bash
+########################################################################
+base0=$( basename $0 );
+ dir0=$(  dirname $0 );
+
+ bin_d=$( cd $dir0; pwd -L );
+test_d=$( dirname $bin_d );
+  jobs=$(( $( grep MHz /proc/cpuinfo | wc -l ) + 1 ));
+
+########################################################################
+# utility subs
+
+fatal()
+{
+    IFS=' ';
+    echo -e "Failed $base0: $*";
+    exit -1;
+}
+
+########################################################################
+# do the deed
+
+prefix=${1:-'d'};
+
+# stable last-run timestamp for the .prove file.
+# used in generic tests to avoid re-testing unmodified code.
+
+last="$(stat .prove | grep '^Modify:' | cut -d':' -f2-4)";
+LAST_PROVE=$(date --date="$last" +'%s');
+
+# unmount t/cc_data before running generic tests.
+
+
+for i in $( cd $test_d/cc_data; pwd -P )
+do
+    grep "$i" /proc/self/mounts || continue;
+    umount $i   || fatal "Failed umount: $i, $?";
+done
+
+case "$prefix"
+in
+    d*)
+        prove=( prove --state=save 't/[1-9]*' );
+        ;;
+    r*)
+        # skip newer-than-.prove check in 01_t.
+        # then drop down to running qa.
+
+        export LAST_PROVE=0;
+        ;&
+    q*)
+        for i in $( cd $test_d/cc_data; pwd -P )
+        do
+            # unmount t/cc_data before running generic tests.
+
+            grep "$i" /proc/self/mounts || continue;
+            umount $i   || fatal "Failed umount: $i, $?";
+        done
+
+        $bin_d/install-generic-tests;
+
+        prove=( 
+            prove --state=save              't/00*'     '&&'
+            prove --state=save --jobs=$jobs 't/0[1-9]*' '&&'
+            prove --state=save              't/[1-9]*'  ''
+        );
+        ;;
+    *)
+        fatal "Unknown tag type: $prefix";
+    ;;
+esac
+
+date=$(date +'%Y%m%d.%H%M%S');
+host=$( hostname --short    );
+ msg="pass prove w/ $prefix at $date on $host";
+ tag="$prefix/$date.$host";
+
+export PERL5LIB="$PWD/Dancer2/lib:$PWD/lib";
+export LAST_PROVE;
+
+IFS=' ';
+
+( eval "${prove[*]}" )          &&
+git tag -a "$tag" -m "$msg"     &&
+git push                        &&
+git push --tag                  ;

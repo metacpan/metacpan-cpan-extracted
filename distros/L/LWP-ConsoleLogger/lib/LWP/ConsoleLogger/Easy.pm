@@ -3,14 +3,22 @@ package LWP::ConsoleLogger::Easy;
 use strict;
 use warnings;
 
-our $VERSION = '1.000002';
+our $VERSION = '1.000003';
 
+use Class::Method::Modifiers  ();
+use Hash::Util::FieldHash     qw( fieldhash );
+use HTTP::Headers             ();
 use HTTP::Request             ();
 use HTTP::Response            ();
 use LWP::ConsoleLogger        ();
 use Module::Load::Conditional qw( can_load );
+use Ref::Util                 qw( is_plain_arrayref is_ref );
 use Sub::Exporter -setup => { exports => ['debug_ua'] };
 use String::Trim qw( trim );
+use URI          ();
+
+fieldhash my %http_tiny_loggers;
+my $http_tiny_wrapped;
 
 my %VERBOSITY = (
     dump_content => 8,
@@ -93,6 +101,10 @@ sub add_ua_handlers {
         );
         return;
     }
+    if ( $ua->isa('HTTP::Tiny') ) {
+        _instrument_http_tiny( $ua, $console_logger );
+        return;
+    }
 
     $ua->add_handler(
         'response_done',
@@ -102,6 +114,188 @@ sub add_ua_handlers {
         'request_send',
         sub { $console_logger->request_callback(@_) }
     );
+}
+
+sub _instrument_http_tiny {
+    my $ua             = shift;
+    my $console_logger = shift;
+
+    push @{ $http_tiny_loggers{$ua} ||= [] }, $console_logger;
+
+    return if $http_tiny_wrapped;
+    $http_tiny_wrapped = 1;
+
+    Class::Method::Modifiers::install_modifier(
+        'HTTP::Tiny', 'around', 'request',
+        sub {
+            my $orig = shift;
+            my $self = shift;
+            my ( $method, $url, $args ) = @_;
+
+            my $console_loggers
+                = is_ref($self) ? $http_tiny_loggers{$self} : undef;
+            return $self->$orig(@_) unless $console_loggers;
+
+            # Logging must never break the caller: any die while translating
+            # the request or running the request_callback is caught here so
+            # the real HTTP call still happens below.  Seed $request with a
+            # minimal object first so that, even if the richer translation
+            # below dies, the response can still be logged against a valid
+            # request rather than being discarded too.
+            my $request = HTTP::Request->new( $method, $url );
+            eval {
+                $request = _http_tiny_request_object(
+                    $self, $method, $url,
+                    $args
+                );
+                $_->request_callback( $request, $self )
+                    for @{$console_loggers};
+                1;
+            } or do {
+                warn
+                    "LWP::ConsoleLogger: HTTP::Tiny request logging failed: $@";
+            };
+
+            # Always perform the real request and always return its response,
+            # even if logging blew up above.
+            my $response = $self->$orig(@_);
+
+            # Likewise, never let response translation or the response_callback
+            # discard an already-completed HTTP response. $request is always a
+            # valid object here (seeded above), even if the richer translation
+            # died, so the response is still logged against a real request.
+            eval {
+                my $res = _http_tiny_response_object( $response, $request );
+                $_->response_callback( $res, $self ) for @{$console_loggers};
+                1;
+            } or do {
+                warn
+                    "LWP::ConsoleLogger: HTTP::Tiny response logging failed: $@";
+            };
+
+            return $response;
+        }
+    );
+}
+
+sub _copy_headers {
+    my $headers = shift;
+    my $hashref = shift;
+
+    return unless $hashref;
+
+    foreach my $name ( keys %{$hashref} ) {
+        my $val = $hashref->{$name};
+        $headers->push_header(
+            $name,
+            is_plain_arrayref($val) ? @{$val} : $val
+        );
+    }
+    return;
+}
+
+sub _http_tiny_request_object {
+    my $self   = shift;
+    my $method = shift;
+    my $url    = shift;
+    my $args   = shift;
+    $args ||= {};
+
+    my $headers = HTTP::Headers->new;
+
+    # HTTP::Tiny merges default_headers first, then per-request headers, with
+    # the per-request value winning (last-wins) rather than being appended.
+    # Merge both sources into one hash so a duplicated name produces a single
+    # overriding row, then copy once. Header names are compared
+    # case-insensitively (as HTTP::Tiny and HTTP::Headers both treat them) so
+    # that e.g. a default "Content-Type" and a per-request "content-type"
+    # collapse to one value instead of two appended rows. Arrayref values (a
+    # single header carrying multiple values) are preserved.
+    my %merged;    # lc name => [ display name => value ]
+    foreach my $source ( $self->default_headers, $args->{headers} ) {
+        next unless $source;
+        $merged{ lc $_ } = [ $_ => $source->{$_} ] for keys %{$source};
+    }
+    my %clean = map { @{$_} } values %merged;
+    _copy_headers( $headers, \%clean );
+
+    # HTTP::Tiny synthesizes a Host header at send time.
+    unless ( defined $headers->header('Host') ) {
+        my $uri  = URI->new($url);
+        my $host = eval { $uri->host };
+        $host = "[$host]" if defined $host && $host =~ /:/;
+        if ( defined $host ) {
+            my %default_port = ( http => 80, https => 443 );
+            my $scheme       = lc( $uri->scheme // q{} );
+            my $port         = eval { $uri->port };
+            if (   defined $port
+                && defined $default_port{$scheme}
+                && $port != $default_port{$scheme} ) {
+                $host .= ":$port";
+            }
+            $headers->header( Host => $host );
+        }
+    }
+
+    # HTTP::Tiny synthesizes a User-Agent header from its agent attribute.
+    if ( defined $self->agent
+        && !defined $headers->header('User-Agent') ) {
+        $headers->header( 'User-Agent' => $self->agent );
+    }
+
+    my $content = $args->{content};
+
+    # A coderef content is a streaming body we cannot capture.
+    $content = undef if is_ref($content);
+
+    my $request = HTTP::Request->new( $method, $url, $headers, $content );
+
+    if ( defined $content ) {
+
+        # HTTP::Tiny computes Content-Length internally, so it is absent from
+        # the request options.  Supply it so the body params get logged.  Use
+        # a byte length (not a character length) to match what HTTP::Tiny
+        # actually sends on the wire.
+        if ( !defined $request->header('Content-Length') ) {
+            my $length = do { use bytes; length $content };
+            $request->header( 'Content-Length' => $length );
+        }
+
+        # HTTP::Tiny defaults raw content to application/octet-stream when no
+        # Content-Type is supplied; _log_params/_log_text rely on it.
+        if ( !defined $request->header('Content-Type') ) {
+            $request->header( 'Content-Type' => 'application/octet-stream' );
+        }
+    }
+
+    elsif ( ( $method eq 'POST' || $method eq 'PUT' )
+        && !is_ref( $args->{content} )
+        && !defined $request->header('Content-Length') ) {
+
+        # HTTP::Tiny sends an explicit zero length for empty POST and PUT
+        # requests so that servers do not wait for a body. A coderef body is
+        # excluded: HTTP::Tiny streams it with chunked transfer-encoding
+        # rather than a zero Content-Length.
+        $request->header( 'Content-Length' => 0 );
+    }
+    return $request;
+}
+
+sub _http_tiny_response_object {
+    my $response = shift;
+    my $request  = shift;
+
+    my $headers = HTTP::Headers->new;
+    _copy_headers( $headers, $response->{headers} );
+
+    my $res = HTTP::Response->new(
+        $response->{status}, $response->{reason},
+        $headers,            $response->{content},
+    );
+    $res->protocol( $response->{protocol} ) if $response->{protocol};
+    $res->request($request);
+
+    return $res;
 }
 
 1;
@@ -116,7 +310,7 @@ LWP::ConsoleLogger::Easy - Easy LWP tracing and debugging
 
 =head1 VERSION
 
-version 1.000002
+version 1.000003
 
 =head1 SYNOPSIS
 
@@ -169,7 +363,16 @@ may tweak to your heart's desire.
     $ua->get(...);
 
 C<$ua> may be one of several user-agents, including C<LWP::UserAgent>,
-C<Mojo::UserAgent>, and C<WWW::Mechanize>.
+C<Mojo::UserAgent>, C<HTTP::Tiny>, and C<WWW::Mechanize>.
+
+When C<$ua> is an L<HTTP::Tiny> object, be aware of a few limitations that
+the L<LWP::UserAgent> and L<Mojo::UserAgent> paths do not share: redirect
+chains are collapsed so only the final response is logged, C<< $ua->mirror >>
+streams the body to a file so the body and text tables are empty, and some
+transport-layer headers (for example C<Connection>, or an C<Authorization>
+header synthesized from C<userinfo> in the URL) are reconstructed on a
+best-effort basis and may not match what goes out on the wire. See
+L<LWP::ConsoleLogger::Everywhere/CAVEATS> for the full list.
 
 You can provide a verbosity level of 0 or more.  (Currently 0 - 8 supported.)
 This will turn up the verbosity on your output gradually.  A verbosity of 0

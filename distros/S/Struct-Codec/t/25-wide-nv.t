@@ -186,11 +186,19 @@ if ($WIDE) {
     # 1.0000000000000006e+300 where the decoder - like the 8-byte form, and like
     # perl from 5.30 - gives 1.0000000000000001e+300. A decoder that misread an
     # exponent would be out by a power of ten and not by a few ULP.
-    for my $d ('1e300', '-1.7976931348623157e+308') {
-        my $want = 0 + $d;
-        my $got  = struct_decode($mk->($d));
-        cmp_ok(abs($got - $want), '<', abs($want) * 1e-13,
-               "the exponent form $d decodes");
+    #
+    # The right-hand side cannot be `0 + $d`. Below 5.30 a perl numifies a
+    # string with its own Atof, and at the top of the range that overflows:
+    # -1.7976931348623157e+308 becomes -Inf, and an infinity compares against
+    # nothing - both sides of the difference are Inf and the assertion is
+    # neither true nor false. So the exponent is divided out and the MANTISSA,
+    # a number every perl reads, is what is named. A decoder out by a power of
+    # ten still fails this.
+    for my $d (['1e300', 1, 1e300], ['-1.7976931348623157e+308', -1.7976931348623157, 1e308]) {
+        my ($str, $mant, $scale) = @$d;
+        my $got = struct_decode($mk->($str)) / $scale;
+        cmp_ok(abs($got - $mant), '<', abs($mant) * 1e-13,
+               "the exponent form $str decodes");
     }
 
     # The longest the encoder can write is 63 bytes, and 63 must be accepted:

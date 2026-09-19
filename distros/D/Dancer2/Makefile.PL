@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Dancer2",
   "PREREQ_PM" => {
     "Attribute::Handlers" => 0,
-    "CLI::Osprey" => 0,
+    "CLI::Osprey" => "0.09",
     "Carp" => 0,
     "Clone" => 0,
     "Config::Any" => 0,
@@ -75,7 +75,7 @@ my %WriteMakefileArgs = (
     "Type::Tiny" => "1.000006",
     "Types::Standard" => 0,
     "URI::Escape" => 0,
-    "YAML" => "0.86",
+    "YAML" => "1.30",
     "parent" => 0
   },
   "TEST_REQUIRES" => {
@@ -94,7 +94,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => "0.92"
   },
-  "VERSION" => "2.2.0",
+  "VERSION" => "2.2.1",
   "test" => {
     "TESTS" => "t/*.t t/classes/Dancer2-Core-Factory/*.t t/classes/Dancer2-Core-Hook/*.t t/classes/Dancer2-Core-Request/*.t t/classes/Dancer2-Core-Response-Delayed/*.t t/classes/Dancer2-Core-Response/*.t t/classes/Dancer2-Core-Role-Engine/*.t t/classes/Dancer2-Core-Role-Handler/*.t t/classes/Dancer2-Core-Role-HasConfig/*.t t/classes/Dancer2-Core-Role-HasEnvironment/*.t t/classes/Dancer2-Core-Role-HasLocation/*.t t/classes/Dancer2-Core-Role-Serializer/*.t t/classes/Dancer2-Core-Role-StandardResponses/*.t t/classes/Dancer2-Core-Route/*.t t/classes/Dancer2-Core-Runner/*.t t/classes/Dancer2-Core/*.t t/classes/Dancer2/*.t t/dsl/*.t t/e2e/cli/*.t t/examples/*.t t/integration/dispatch/*.t t/integration/error/*.t t/integration/handler/*.t t/integration/hooks/*.t t/integration/serializer/*.t t/integration/session/*.t t/integration/template/*.t t/issues/*.t t/issues/gh-1013/*.t t/issues/gh-1046/*.t t/issues/gh-1216/*.t t/issues/gh-1226/*.t t/issues/gh-1230/*.t t/issues/gh-1449/*.t t/issues/gh-1621/*.t t/issues/gh-1664/*.t t/issues/gh-1712/*.t t/issues/gh-639/fails/*.t t/issues/gh-639/succeeds/*.t t/issues/gh-650/*.t t/issues/gh-975/*.t t/issues/memleak/*.t t/plugin2/*.t t/plugin2/app_dsl_cb/*.t t/roles/*.t t/route-pod-coverage/*.t t/scope_problems/*.t t/unit/configreader/*.t t/unit/core/*.t t/unit/logger/*.t"
   }
@@ -103,7 +103,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Attribute::Handlers" => 0,
-  "CLI::Osprey" => 0,
+  "CLI::Osprey" => "0.09",
   "Capture::Tiny" => "0.12",
   "Carp" => 0,
   "Clone" => 0,
@@ -159,7 +159,7 @@ my %FallbackPrereqs = (
   "Type::Tiny" => "1.000006",
   "Types::Standard" => 0,
   "URI::Escape" => 0,
-  "YAML" => "0.86",
+  "YAML" => "1.30",
   "parent" => 0
 );
 

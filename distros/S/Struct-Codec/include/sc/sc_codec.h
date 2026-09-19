@@ -954,8 +954,20 @@ static void sc_dec_register(pTHX_ sc_dec *d, STRLEN off, SV *sv, int isref) {
 }
 
 /* A key or class name: *p points INSIDE the input and the caller copies.
- * rule 4: utf8 is validated, and only at a non-zero length, because at zero
- * is_utf8_string takes strlen and reads past the buffer. */
+ *
+ * rule 4: utf8 is validated, and only at a non-zero length. At zero the flag is
+ * DROPPED and not merely left unchecked, because a zero length and a utf8 flag
+ * together are a pair perl's string routines read as "no length given, find the
+ * end yourself". is_utf8_string takes strlen there; hv_common is worse. It
+ * sizes the buffer for the utf8-to-bytes downgrade from the length IT WAS GIVEN
+ * - one byte for a zero-length key - and then copies the run utf8_to_bytes
+ * measures for itself, which starts at the key and ends at the first byte that
+ * cannot continue the string. Those bytes are the rest of the stream: a key of
+ * length zero with the flag set wrote nine bytes into a one-byte allocation.
+ * Nothing in a plain build says a word. The quadmath smoker aborted inside
+ * free(), and under ASan it is a heap-buffer-overflow in memcpy under
+ * Perl_hv_common. The empty string is the same key with the flag or without it,
+ * so dropping it loses nothing. */
 static void sc_dec_key(pTHX_ sc_dec *d, const char **p, STRLEN *n, int *utf8) {
     UV v = sc_dec_varint(aTHX_ d);
     *utf8 = (int)(v & 1);
@@ -963,7 +975,8 @@ static void sc_dec_key(pTHX_ sc_dec *d, const char **p, STRLEN *n, int *utf8) {
     SC_NEED(d, v);
     *p = (const char *)d->p;
     *n = (STRLEN)v;
-    if (*utf8 && v && !is_utf8_string(d->p, (STRLEN)v))
+    if (!v) *utf8 = 0;
+    else if (*utf8 && !is_utf8_string(d->p, (STRLEN)v))
         sc_dec_croak(aTHX_ d, "malformed UTF-8");
     d->p += v;
 }

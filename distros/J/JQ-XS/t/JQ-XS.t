@@ -3,11 +3,11 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 45;
+use Test::More;
 use JSON::PP ();
 use Data::Dumper;
 
-use JQ::XS qw(JQ_DEBUG_TRACE JQ_DEBUG_TRACE_DETAIL JQ_DEBUG_TRACE_ALL);
+use JQ::XS qw(JQ_DEBUG_TRACE JQ_DEBUG_TRACE_DETAIL JQ_DEBUG_TRACE_ALL jq_version);
 BEGIN { use_ok('JQ::XS'); }
 
 # Test constants
@@ -179,3 +179,47 @@ is_deeply(
   'nested booleans roundtrip as JSON::PP::Boolean'
 );
 
+# --- Which jq is this? ---
+
+# undef when built against the OS libjq (JQ_SYSTEM=1), a version otherwise.
+my $jqv = jq_version();
+if (defined $jqv) {
+  like($jqv, qr/^\d+\.\d+/, "jq_version() looks like a version ($jqv)");
+}
+else {
+  pass('jq_version() is undef, so this is a JQ_SYSTEM=1 build');
+}
+
+# --- Regex builtins ---
+#
+# These need oniguruma.  A jq built without it compiles and links perfectly
+# happily and only fails here, at runtime, so this is the coverage that proves
+# the bundled oniguruma actually made it into the module.
+
+$jq = JQ::XS->new('test("^a")');
+is_deeply([$jq->process('ant')], [JSON::PP::true],  'test() matches');
+is_deeply([$jq->process('bee')], [JSON::PP::false], 'test() does not match');
+
+$jq = JQ::XS->new('[.[] | select(test("^a"))]');
+is_deeply(
+  [$jq->process(['ant', 'bee', 'ape'])],
+  [['ant', 'ape']],
+  'select() with test() filters an array',
+);
+
+$jq = JQ::XS->new('sub("-"; "+")');
+is_deeply([$jq->process('a-b-c')], ['a+b-c'], 'sub() replaces the first match');
+
+$jq = JQ::XS->new('gsub("-"; "+")');
+is_deeply([$jq->process('a-b-c')], ['a+b+c'], 'gsub() replaces every match');
+
+$jq = JQ::XS->new('capture("(?<year>[0-9]{4})") | .year');
+is_deeply([$jq->process('2026-09-09')], ['2026'], 'capture() names a group');
+
+$jq = JQ::XS->new('[splits(",")]');
+is_deeply([$jq->process('a,b,c')], [['a', 'b', 'c']], 'splits() splits on a regex');
+
+$jq = JQ::XS->new('[match("a"; "g").offset]');
+is_deeply([$jq->process('banana')], [[1, 3, 5]], 'match() reports offsets');
+
+done_testing();

@@ -25,8 +25,14 @@ File::Find::find(sub {
     $dep{PM}{$File::Find::name} = "\$(INST_LIB)/$rel";
 }, 'lib');
 
+# Compile and link a probe, and with `run` set, RUN it and require exit 0.
+# Linking proves a symbol exists; only running proves it does what its name
+# says. FreeBSD's libc exports a pthread_atfork that links cleanly and does
+# nothing at all unless libthr is loaded, and a perl built without -lpthread
+# does not load it: the fork handler never ran, every child kept its parent's
+# cached pid, and six test files failed at once on the 5.14 and 5.16 smokers.
 sub probe {
-    my ($name, $body, $libs) = @_;
+    my ($name, $body, $libs, $run) = @_;
     my $b   = eval { ExtUtils::CBuilder->new(quiet => 1) } or return 0;
     my $src = File::Spec->catfile(File::Spec->tmpdir(),
                                   'sa_probe_' . $$ . "_$name.c");
@@ -37,8 +43,9 @@ sub probe {
         my $obj = $b->compile(source => $src);
         my ($exe) = $b->link_executable(objects => [$obj],
                                         extra_linker_flags => $libs || '');
+        my $rc = $run ? system($exe) : 0;
         unlink $obj, $exe;
-        1;
+        $rc == 0;
     };
     unlink $src;
     return $ok ? 1 : 0;
@@ -68,22 +75,38 @@ else {
 }
 
 if ($^O ne 'MSWin32') {
+    # Registers a child handler, forks, and exits 0 only if the CHILD saw it
+    # run. A stub that links and never fires fails this and not the link.
     my $atfork = <<'C';
 #include <pthread.h>
-static void child(void) { }
-int main(void) { return pthread_atfork(0, 0, child); }
+#include <unistd.h>
+#include <sys/wait.h>
+static volatile int ran = 0;
+static void child(void) { ran = 1; }
+int main(void) {
+    pid_t p;
+    int st = 0;
+    if (pthread_atfork(0, 0, child) != 0) return 1;
+    p = fork();
+    if (p < 0) return 1;
+    if (p == 0) _exit(ran ? 0 : 2);
+    if (waitpid(p, &st, 0) != p) return 1;
+    return (WIFEXITED(st) && WEXITSTATUS(st) == 0) ? 0 : 3;
+}
 C
-    if (probe('atfork', $atfork)) {
+    if (probe('atfork', $atfork, '', 1)) {
         $DEFINE .= ' -DSA_HAVE_ATFORK';
-        print "pthread_atfork: in libc.\n";
+        print "pthread_atfork: in libc, and its child handler runs.\n";
     }
-    elsif (probe('atforkp', $atfork, '-lpthread')) {
+    elsif (probe('atforkp', $atfork, '-lpthread', 1)) {
         $LIBS   .= ' -lpthread';
         $DEFINE .= ' -DSA_HAVE_ATFORK';
-        print "pthread_atfork: needs -lpthread: linking it.\n";
+        print "pthread_atfork: needs -lpthread for its handler to run: "
+            . "linking it.\n";
     }
     else {
-        print "pthread_atfork: NOT FOUND - getpid will not be cached.\n";
+        print "pthread_atfork: absent, or its child handler never runs - "
+            . "getpid will not be cached.\n";
     }
 }
 
@@ -143,14 +166,14 @@ my %WriteMakefileArgs = (
         'ExtUtils::CBuilder'  => '0',
         'ExtUtils::Depends'   => '0.404',
         'Frozen'              => '0.07',
-        'Struct::Codec'       => '0.03',
+        'Struct::Codec'       => '0.05',
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',
     },
     PREREQ_PM => {
         'Frozen'        => '0.07',
-        'Struct::Codec' => '0.03',
+        'Struct::Codec' => '0.05',
     },
     XS     => { 'Arena.xs' => 'Arena.c' },
     OBJECT => 'Arena$(OBJ_EXT)',

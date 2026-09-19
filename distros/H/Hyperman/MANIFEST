@@ -79,6 +79,7 @@ t/45-quic-handshake.t
 t/46-quic-tokens.t
 t/47-http3.t
 t/48-extended-connect.t
+t/49-tunnel-backends.t
 t/lib/HMTest.pm
 t/manifest.t
 t/pod-coverage.t

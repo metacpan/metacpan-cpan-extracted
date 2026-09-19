@@ -72,6 +72,29 @@ my $file = "$data/nmr.pdb";
 }
 
 #--------
+# the same rule for a file with no MODEL records, which is one model and it is
+# model 1.  The parse lists no model numbers for such a file, so the fall-back
+# used to skip it: model => 2 of a crystal structure -- which is most of the
+# archive -- came back with no atoms and no chains and said nothing about it.
+#--------
+{
+	for my $stem (qw(mini.pdb mini.cif)) {
+		my $i = structure_info("$data/$stem", model => 2);
+		ok($i->{stats}{n_atoms} > 0, "$stem: model => 2 of a one-model file reads it anyway");
+		is($i->{model}, 1, "$stem: and says the model it read was 1");
+	}
+	# 0 is a model number rather than a mistake, and a file that has no model 0
+	# falls back like any other
+	my $i = structure_info("$data/mini.pdb", model => 0);
+	is($i->{model}, 1, 'model => 0 is accepted and falls back too');
+	# what the fall-back must not do is re-read a structure that something else
+	# emptied: the model asked for is there, and nothing was skipped for it
+	my $z = structure_info("$data/mini.pdb", chains => ['Z']);
+	is($z->{stats}{n_atoms}, 0, 'a chain filter that matches nothing still gives nothing');
+	is($z->{model}, 1, 'and the model it was read under is unchanged');
+}
+
+#--------
 # models numbered from something other than 1.  An ensemble whose models are
 # numbered 0 and 5 has no model 1, and the default must not come back empty.
 #--------

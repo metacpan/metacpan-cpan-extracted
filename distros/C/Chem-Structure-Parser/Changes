@@ -1,6 +1,455 @@
 Revision history for Chem-Structure-Parser
 
 
+0.03 2026-09-18 CDT
+
+ - new: structure_rmsd(), how far apart two copies of a molecule are.  Takes
+   file names, structures structure_info() already returned, or any mix of the
+   two, and compares every one of them with every other: two give the RMSD in
+   angstrom, more than two give the matrix.  A file read with model => 'all'
+   counts as one structure per model, so an NMR ensemble is compared against
+   itself in one call --
+
+       my $r = structure_rmsd('2ll7.ent.pdb', model => 'all');
+       printf '%.2f', $r->{rmsd}[0][1];        # 3.61 A, models 1 and 2
+
+   Atoms are paired on the identity the file gives them -- chain, residue,
+   atom name -- so two models of an ensemble pair exactly and two files of the
+   same protein pair over whatever they share; nothing is aligned and nothing
+   is guessed.  chains reads only some of them, chain_map says what a chain of
+   the later structures is called in the first, and match => 'order' pairs the
+   nth atom of each instead.  select => 'heavy', 'backbone' or 'ca' narrows
+   what takes part, fit => 0 measures the two where they lie rather than
+   superposing them first, min_atoms is where "too few to mean anything" is
+   drawn, and detail => 1 returns the rotation and translation as well as the
+   number.
+
+   The superposition is Theobald's quaternion characteristic polynomial, after
+   qcprot.c and Biopython's Bio/PDB/qcprot.py.  The deviation is not read off
+   the eigenvalue the way QCP's whole point is that it can be: that subtracts
+   two numbers which agree in as many figures as the two structures do, and two
+   structures being nearly the same is the ordinary case -- models 24 and 25 of
+   1JM4 have identical coordinates and gemmi 0.7.5, which takes that route,
+   answers 8.6e-07 A for them where this answers 0.  Forming the rotation and
+   measuring with it costs one pass more over the paired atoms and has no
+   cancellation in it.  Against gemmi's superpose_positions over 5,598
+   superpositions -- every pair of models of the 40 NMR entries in the first
+   two thousand files of PDBbind v2020 -- the largest relative difference is
+   5.65e-12, and against Biopython's SVDSuperimposer the two agree to every
+   figure either prints.
+
+   All of it is in C, for the reason the rest of the per-atom work is: over
+   2L6J, 20 models of 1,841 atoms and 190 pairs, 0.05 s against 1.19 s for the
+   same matrix written in Perl with the same arithmetic, and half the working
+   memory.  benchmark.pl measures it and notes.txt records it.
+
+ - structure.info.pl gains --rmsd, the matrix of every structure named on the
+   command line against every other, and --select to say which atoms take
+   part.  One NMR entry on its own compares its own models, because a file
+   with more than one counts as one structure per model.
+
+ - t/data gains ensemble.pdb and ensemble.cif, four models of chain B of 1K9R
+   as deposited: an ensemble whose models really differ, which nmr.pdb's three
+   do not -- they are one tripeptide moved a whole angstrom along x, and a
+   rigid move superposes onto itself exactly and says nothing about the fit.
+   t/rmsd.t is the new test file and carries gemmi's answer for every pair of
+   them, under each of the four selections, so that the comparison runs on a
+   machine with no Python on it.
+
+ - new: the rest of the physical properties, all computed by structure_info()
+   on the way past and reachable through $info->{features} or the functions
+   named below.  Each is a translation of somebody else's implementation and is
+   tested against it rather than against itself.
+
+   - shape: the gyration tensor, its principal moments, and the asphericity,
+     acylindricity and relative shape anisotropy built from them, after
+     mdtraj's geometry/shape.py.  Agrees with it to eight figures.
+
+   - interface: each chain's surface with the other chains taken away, and so
+     what the chains bury between them -- $f->{sasa}{buried}, and sasa_alone
+     and buried on every chain.  One more surface calculation per chain, each
+     touching only that chain's atoms, so all of them together cost about what
+     the first one cost.  interface => 0 turns it off.
+
+   - torsion angles: phi, psi, omega and chi1 to chi5 on every residue, in
+     degrees, after mdtraj's compute_phi and its relatives.  Every one of them
+     is gathered onto its chain as well, as $chain->{torsions}{phi} and its
+     relatives: one array per angle, parallel to the chain's residue_order,
+     with an undef where a residue has no such angle.  That is the form a
+     Ramachandran plot or a rotamer census wants, and it is the same option --
+     dihedrals => 0 leaves it off with the angles themselves.
+
+   - new: structure_contacts(), which residues touch which, after mdtraj's
+     compute_contacts() with its closest-heavy scheme; n_contacts on every
+     residue.  Cross-chain and neighbouring pairs are reported as well as the
+     ones mdtraj's `all' considers.
+
+   - new: structure_hbonds(), the backbone hydrogen bonds by Kabsch and
+     Sander's electrostatic energy, after mdtraj's kabsch_sander().  The amide
+     hydrogen is placed rather than read, so it works on a crystal structure
+     that has none.  Exact: the same bonds and the same energies to 4e-5
+     kcal/mol over 1A42, 1A22, 1AHW and 3AU6.
+
+   - secondary structure: ss and ss_simple on every residue, the Kabsch-Sander
+     dictionary.  This is mdtraj's compute_dssp() letter for letter -- its
+     dssp.cpp (itself DSSP 2.2.0, ported by Robert T. McGibbon) transcribed
+     function for function, on a hydrogen bond table built to mdtraj's rules
+     rather than to this module's, computing in the float32 and the nanometre
+     mdtraj computes in because the assignment turns on two comparisons against
+     constants and one bond either way is worth several residues' letters.
+     t/features.t demands equality on every residue of every structure in
+     t/data rather than bounding a disagreement.
+
+     Measured over every tenth entry of PDBbind v2020 -- 1,011 of the 1,012
+     read, the other being a file mdtraj will not open -- the two give the same
+     letter for all 619,067 residues that have a backbone.
+
+   - new: structure_dssp(), the same assignment read the other way round --
+     chain id, then DSSP letter, then the positions in that chain's
+     residue_order of the residues that have it.  That is the shape to take a
+     whole fold in at once, where ss on each residue is the shape to read while
+     walking them.  structure_info($file, 'dssp') reads a file and hands back
+     just that hash, and structure_info($file, dssp => 1) leaves it at
+     $info->{dssp} alongside everything else.
+
+     A plain string in second place to structure_info() is new, and names a
+     view: the file is read, the view is taken out of it, and the rest is
+     thrown away.  It cannot be confused with an option -- a file name followed
+     by an even number of arguments was never anything but a mistake before.
+
+   - half-sphere exposure: hse_up and hse_down on every standard amino acid
+     residue, after Biopython's HSExposureCB.  Exact.
+
+   - nucleic acid torsions: alpha, beta, gamma, delta, epsilon, zeta and the
+     glycosidic chi on every nucleotide, plus nu, the five torsions of the
+     sugar ring, all in degrees.  The atoms of each are the IUPAC-IUB (1983)
+     definitions; the angles agree with mdtraj's compute_dihedrals and gemmi's
+     calculate_dihedral over the same four atoms to 1.9e-4 degrees, which is
+     mdtraj's float32 coordinates, and to the rounding of the frozen file
+     against gemmi.  alpha, epsilon and zeta span two residues and are not
+     measured across a chain break: the two must be joined by a phosphodiester
+     bond first, which is gemmi's are_connected() test at 2.4 A, and
+     phosphodiester_bond is the option that sets it.
+
+   - the sugar pucker: pucker_phase, pucker_amplitude and the envelope name
+     pucker on every nucleotide, by Altona and Sundaralingam's (1972)
+     pseudorotation equations, and glycosidic, which says whether the base is
+     anti or syn.  This is the number that tells an A-form helix from a B-form
+     one, and it does: every ribose of the new rna.pdb is C3'-endo and every
+     deoxyribose of the new duplex.pdb is in the southern half of the cycle.
+
+   - the two numbers a nucleic acid sequence answers: gc_fraction and
+     purine_fraction on the structure and on every DNA or RNA chain, with
+     base_counts, n_gc and nucleotide_length beside them.  Which letters count
+     is Bio.SeqUtils.gc_fraction()'s default, so an ambiguous base is in
+     neither half of the fraction rather than counted as something it is not.
+
+   - new: structure_base_pairs(), the Watson-Crick and wobble base pairs the
+     coordinates show, with the hydrogen bonds, the centroid separation, the
+     plane angle and the stagger each was found by, and base_pair on both of
+     the residues.  Three pair types, numbered as Saenger (1984) numbers them:
+     19 for G-C, 20 for A-U and A-T, 28 for the G-U wobble and the G-T that is
+     the same pair in DNA.
+
+     This is the one property in the module with no reference implementation to
+     compare against -- mdtraj, gemmi and Biopython all stop short of base
+     pairing -- so it is measured against the annotation the wwPDB deposits
+     with the entry, which is 3DNA's.  Over the forty archive entries that
+     carry an _ndb_struct_na_base_pair loop it finds all 1354 of the annotated
+     pairs that are between two unmodified bases and misses none.  Eleven of
+     the eighteen it does not see have a modified base on one side and seven
+     are pairs with a crystallographic symmetry mate; two are found that the
+     annotation does not list, and both are argued in the documentation rather
+     than tuned away.  base_pair_hbond and base_pair_stagger move the two
+     thresholds; base_pairs => 0 skips the work.
+
+   - new: structure_base_stacks(), how stacked every nearby pair of
+     nucleobases is, on the three variables the RNA literature scores stacking
+     with -- d0 between the two bases' centres of mass, the overlap angle
+     omega, and Xi between the two bases' normals -- and as one score from
+     -100% to 100% built out of them.  base_stack goes onto both residues, as
+     base_pair does, and says which end of the pair each of them is, because
+     omega is measured from the 5' base and is not the same number read the
+     other way round.
+
+     The definition and every constant are Condon, D E; Kennedy, S D; Mort,
+     B C; Kierzek, R; Yildirim, I; Turner, D H (2015) "Stacking in RNA: NMR of
+     Four Tetramers Benchmark Molecular Dynamics", J Chem Theory Comput
+     11(6):2729-2742, section 2.4, and the implementation its numbers came out
+     of, which is the same authors' PDB_stacker.  Figure 4 of the paper works
+     the three variables on residues 13 and 14 of 157D and reports 4.5 A,
+     40.7 degrees and 17.3 degrees; this answers 4.5286, 40.7402 and 17.3071,
+     and t/stacking.t holds it there against the new t/data/aform.pdb, which
+     is those residues as deposited.  That one pair also settles the three
+     places where the paper's text and its authors' code disagree -- how
+     equation 10 is read, whether guanine's N2 is in its centre of mass, and
+     whether the distance knee is 3.5 A or 4 -- each of which is marked in
+     Parser.xs with the measurement that decides it.
+
+     Every base the module names is covered, DNA and RNA and the modified
+     spellings alike: a PSU is measured as a uridine and a 7MG as a guanosine,
+     through four sets of atoms serving the six letters A, C, G, I, T and U.
+     A base missing one of the atoms its entry names is in no pair rather than
+     measured wrong.  base_stack_distance and base_stack_omega move the two
+     cutoffs; base_stacks => 0 skips the work.
+
+ - a torsion angle and a Kabsch-Sander amide hydrogen are no longer measured
+   across a chain break.  mdtraj takes the residue before this one to be
+   whichever came before it in the file and computes a phi, or places a
+   hydrogen, across whatever gap is there; here the two must be peptide-bonded
+   first, at the 1.8 A Biopython's PPBuilder uses.  Four collinear atoms get no
+   torsion either, rather than the zero atan2(0, 0) returns.
+
+ - t/data gains ss.pdb, fold.pdb and sheet.pdb, with their mmCIF twins: five
+   cysteines of 1AHW, two of them bonded and one not; sixty consecutive residues
+   of 1A42 that hold an alpha helix, a 3-10 helix and the turns and bends around
+   them; and sixty of 1H1V that hold, when read on their own, every one of the
+   eight DSSP letters -- the two strands of a ladder, an isolated bridge, and
+   the pi helix, which is the one letter a structure has to be looked for to
+   find.  Without the second the hydrogen bonds would have had almost nothing in
+   t/data to be tested on, and without the third the beta half of the secondary
+   structure -- the bridges, the ladders and the bulges between them, which is
+   most of the code -- would have had nothing at all.
+
+ - and rna.pdb, duplex.pdb and wobble.pdb, likewise with their twins: six
+   nucleotides of 1MSY's GUAA tetraloop, which is where the riboses are, four
+   base pairs of 1BNA, the Drew-Dickerson dodecamer, which is where B-form DNA
+   is, and twelve nucleotides of 1MSY's lower helix, which is where the wobble
+   is.  bases.pdb is a single DNA strand and has no O2' in it, so without the
+   first two the nucleic acid torsions would have been tested on half of what
+   they say; the third holds all three of the pair types base_pairs() looks for
+   and one that it has to leave alone.
+
+ - structure.info.pl gains --ss, one row per disulfide with what the file
+   declares beside it.
+
+ - structure_info() computes the physical properties on the way past and
+   leaves them in $info->{features}, so most callers never name
+   structure_features() at all.  This is not free: reading goes from about
+   214,000 atoms a second to about 19,500, eleven times the cost, nearly all of
+   it the solvent-accessible surface at 960 sphere points per atom.  With
+   sasa => 0 everything else together is 2.7x the read, and interface => 0
+   alone takes the whole thing from 10.9x to 7.1x.
+   features => 0 is the way back to the old speed,
+   and is what to reach for when reading a directory for its headers or its
+   sequences.  atoms => 0 turns them off on its own rather than dying, so
+   structure_sequences($file, atoms => 0) still works.
+
+ - with no options, structure_features(), structure_sasa(),
+   structure_pi_stacking() and structure_disulfides() hand back what the read
+   already computed rather than walking the structure a second time.  Name any
+   option and they compute again with it in force.
+
+ - new: structure_disulfides(), and $features->{disulfides} -- the disulfide
+   bonds the coordinates show, as against $info->{ssbond}, which is what the
+   depositor said.  Each bond is also written onto both of its residues, as
+   {disulfide}.  The rule is mdtraj's: a cysteine with an SG and no HG, paired
+   with another under 3.0 A, so a cysteine whose thiol hydrogen was modelled is
+   reduced and holds no bond.  disulfide_distance moves the cutoff.
+
+   The two answers agree on every entry with disulfides in a 60-entry spread of
+   PDBbind, and their bond lengths agree to the two decimals SSBOND is written
+   in.  Over a wider sweep they agree on 21 of 22: 1A4K is a Fab that is in the
+   file twice, and its SSBOND records cover one copy while its coordinates show
+   both.
+
+   The comparison is against mdtraj's rule and not against mdtraj's function.
+   Topology.create_disulfide_bonds() is handed the angstrom positions its PDB
+   reader parsed and compares them with 0.3, meaning nanometres, so it tests
+   for an SG-SG separation under 0.3 A and finds nothing on any file -- on
+   1A4K, 8 pairs under 0.3 nm and 0 under 0.3 A.  The SG-SG bonds that do turn
+   up in its topology come from the file's own CONECT records.
+
+ - fixed: a structure whose atom records have unreadable coordinate columns was
+   mistaken for one read with atoms => 0 and died where it should have carried
+   on.  The two are told apart by the atom names the residues list, not by the
+   positions that came back.
+
+ - new: structure_features(), the physical properties of a structure in one
+   call -- solvent-accessible surface, radius of gyration, molecular weight,
+   centroid and centre of mass, mean Kyte-Doolittle hydropathy, the aromatic
+   fraction of the sequence, and the stacked pairs of aromatic rings.  One XS
+   walk of the structure serves all of them, because each has to touch every
+   atom and flattening a hash of chains of residues of atoms into coordinate
+   arrays is the expensive part.
+
+ - new: structure_sasa(), the solvent-accessible surface on its own, and
+   structure_pi_stacking(), the stacked ring pairs on their own.
+
+ - the per-atom, per-residue and per-chain results are written into the
+   structure beside the atom, residue and chain they belong to:
+   $info->{chains}{A}{sasa}, {residues}{54}{sasa}, {residues}{54}{rsa} --
+   the residue's surface as a fraction of the most it could have -- and
+   {residues}{54}{atoms}{CZ}{sasa}.  store => 0 leaves the structure alone
+   and returns the totals only.
+
+ - the arithmetic is a translation of somebody else's, and is tested against
+   it rather than against itself: the Shrake-Rupley surface, the van der
+   Waals radii, the atomic masses, the ring geometry and the radius of
+   gyration are mdtraj 1.11's, and the hydropathy and aromaticity scales are
+   Biopython's.  t/features.t compares every atom, every residue and every
+   stacked pair against what mdtraj answered for the structures in t/data,
+   frozen in t/data/features.txt, and re-runs mdtraj where it is installed so
+   the frozen answer cannot go stale.  Run in float64, mdtraj's own kernel
+   and this one agree on every atom to nine digits.
+
+ - the neighbour search is a uniform grid rather than the all-pairs scan
+   mdtraj uses, which is what makes the surface of a large entry finish: the
+   cost is flat at about 24 microseconds an atom from 6,000 atoms to 16,000,
+   where an all-pairs scan grows with the square.  Both find the same
+   neighbours, which is what the comparison above establishes.
+
+ - two departures from mdtraj, both deliberate and both documented where they
+   are made.  Its face-to-face centroid cutoff of 5.5 is nanometres in a
+   function whose other distances are nanometres -- 55 A, far enough that any
+   two rings in a small protein would qualify -- where ProLIF, which the
+   geometry comes from, has 5.5 A; face_distance defaults to 5.5 A and
+   face_distance => 55 gets mdtraj's number.  And compute_rg(traj, masses)
+   weights distances by mass but measures them from the geometric centroid;
+   rg_mass measures from the centre of mass, while rg keeps mdtraj's
+   equal-weight default, where the two centres coincide.
+
+ - a ligand contributes no aromatic rings.  Finding one means perceiving its
+   bonds, which this module does not do -- it reads no CONECT record and
+   guesses no bond -- so structure_pi_stacking() says so rather than quietly
+   finding nothing.
+
+ - structure.info.pl gains --features, one tab separated row of properties per
+   structure, and --stacks, one row per stacked pair.
+
+ - removed: pdb_info() and cif_info().  Each was structure_info() with
+   format => 'pdb' or format => 'mmcif' filled in, and nothing else -- no
+   option, no error and no answer of their own -- so the two names bought a
+   reader nothing but the question of whether they differed.  Detection costs
+   nothing to skip: it reads the file only when the name says nothing at all.
+   Call structure_info($file, format => 'pdb') where you called pdb_info($file),
+   and structure_info($file, format => 'mmcif') where you called cif_info($file).
+
+ - the release notes are no longer generated from README.md.  They lived in
+   three places at once -- the README, the module's POD and this file -- and
+   the POD copy was a hundred and fifty lines of history in the middle of the
+   reference documentation.  This file is now written by hand and md2pod.pl
+   only checks it.
+
+ - one fewer prerequisite: autodie is no longer required.  It was there to
+   check five calls -- two opens, a read and two closes -- and those are now
+   checked where they are made, dying in autodie's own words, so a failure
+   says exactly what it used to say.  Nothing a caller can see changes.
+
+ - fixed: a truncated or corrupt .gz was read as a short file and not as the
+   error it is.  IO::Uncompress::Gunzip's read() returns a negative number for
+   one, where the loop reading the archive took anything not positive for the
+   end of the stream: half of a gzipped entry came back as a structure with no
+   atoms in it and nothing said so.  It now dies, naming the file and what the
+   decompressor said was wrong with it.  A directory of downloads is where such
+   a file is found, and a silent half-read of one is the worst answer available.
+
+ - fixed: an integer field too big for an IV wrapped instead of being declined.
+   No PDB record can reach it -- a serial number has five columns and a residue
+   number four -- but an mmCIF value is free-form, and twenty digits of
+   _atom_site.id came back as 200376420520689663 and twenty-one digits of
+   auth_seq_id as a negative residue number.  A number that does not fit is now
+   undef, which is what '*****' in an overflowed PDB column already gave, and
+   IV_MAX and IV_MIN still read back exactly.
+
+ - fixed: a numeric field of digits and dots that is not a number took the whole
+   read down.  The pattern behind CRYST1's cell, a HELIX length and every mmCIF
+   number matched '1.2.3' and then added it to zero, which under
+   warnings FATAL => 'all' is fatal rather than merely wrong.  Fields of that
+   shape are in the archive -- 5m04 writes its pH as '5.4.-5.8' -- and one now
+   reads as the undef that says the file gave no number, leaving the fields
+   beside it alone.
+
+ - fixed: model => 2 of a file with no MODEL records came back with no atoms and
+   no chains and said nothing.  Asking for a model that is not there falls back
+   to the first one, but the fall-back read the list of model numbers the file
+   declared, and a crystal structure declares none: its one model is model 1.
+   It now falls back for those too, which is most of the archive.  A structure
+   emptied by something else -- a chains list that matches nothing, a file with
+   no coordinates -- is untouched and is not read a second time.
+
+ - structure_contacts() no longer takes time proportional to the residues times
+   the atoms.  Each residue scanned the whole heavy-atom array to find its own,
+   though the atoms of a residue are one contiguous run of it; walking that run
+   instead took the contacts of 4fqr -- 11,406 residues, 88,416 heavy atoms --
+   from 2.25 seconds to 0.15, and the whole feature walk of that entry from 5.98
+   to 3.87, the rest of which is the solvent-accessible surface.  It finds the
+   same pairs: t/features.t compares them with mdtraj's, as it did before, and
+   they are the same pairs an all-against-all walk of the fixtures finds.
+
+ - the parse builds a third fewer SVs.  A residue's identity -- its name, its
+   chain, its number, its insertion code, whether it is a HETATM and which model
+   it is in -- was built once per atom and read once per residue.  It is now
+   built where it is read, which for the shape structure_info() asks for is six
+   strings and integers per residue instead of six per atom: over 200 entries of
+   PDBbind v2020 the coordinate section went from 1.95 to 1.59 seconds, and
+   reading the largest of them (4fqr, 90,792 atoms) from 168 MB of peak memory
+   to 141 and from 0.28 seconds to 0.21.  A caller of the low-level parse that
+   asks for columns still gets one entry per atom, because there the columns are
+   the answer; t/parse.t reads both shapes of four fixtures and asserts they say
+   the same thing.
+
+ - the surface of each chain alone -- the interface half of the properties, and
+   about a third of what they cost -- no longer computes every atom twice.  An
+   atom whose every neighbour is in its own chain has the same surface with the
+   other chains there and taken away, bit for bit, so only the atoms that do
+   have a neighbour across a chain boundary are computed again.  Over 20 entries
+   of PDBbind v2020 the interface pass went from 1.85 seconds to 0.38, and the
+   whole default feature walk of 4fqr from 4.38 seconds to 2.61.  It is the same
+   answer: t/features.t still compares each chain's isolated surface with
+   mdtraj's, and t/properties.t compares it with reading that chain on its own,
+   which agreed to the last bit on all 131 chains of the 32 multi-chain entries
+   of a PDBbind v2020 sample as well as on the fixtures.
+
+ - the sphere-point loop inside the surface reads its neighbours out of four
+   arrays of its own rather than through an index into the structure's, with
+   each neighbour's radius squared once when it is found rather than once per
+   point.  Same comparisons, same answers, about 9% off the surface.
+
+ - fixed: missing_residues could name a residue the chain has.  A polymer
+   numbered out of order has jumps that pass over each other, and the list was
+   the jumps' contents added up rather than the set of numbers the chain does
+   not have -- so a residue modelled out of line could appear in its own chain's
+   missing list, and a number two jumps passed over could appear twice.  It is
+   now a set, ascending.  No chain of the 1,000 entries of PDBbind v2020 this
+   was measured over is affected; a chain numbered out of order is.
+
+ - structure_features() no longer trusts a chain's n_atoms to size its walk.  It
+   is an upper bound for every structure this module reads, and a structure a
+   caller assembled by hand can say less than it holds, or not say at all --
+   where the walk quietly stopped at the count instead of at the atoms.
+
+ - the test suite exercises a good deal more of the module: every name in the
+   residue table rather than a sample of them (150 of them, checked against
+   gemmi 0.7.5 where gemmi's own table carries the name), the mmCIF categories
+   and syntax the fixtures have no use for, the header records an entry has one
+   of, the low-level parse in both of its shapes, and the error paths of the XS
+   entry points.  Statement coverage of the Perl half goes from 96.5% to 99.6%
+   and of the XS from 94.3% to 96.6%, and branch coverage from 82.2% to 88.9%
+   and from 83.1% to 85.6%.
+
+ - t/leaks.t no longer fails under Devel::Cover.  Test::LeakTrace does not work
+   with it and has a guard that says so, but Devel::Cover 1.52 installs no
+   runops routine for the guard to notice, so every statement it had
+   instrumented was counted as a leak and `cover -t' failed 65 of that file's 85
+   tests on Devel::Cover's own counters.  The file now makes the skip itself,
+   running each block anyway so that a coverage run still covers it, and the
+   reference-cycle checks at the foot of it still run for real.
+
+ - fixed: installing the module no longer installs Test::More and Test::Exception
+   with it.  dist.ini listed both in a [Prereqs] block with no phase, which is
+   the runtime phase, so the released META.json asked every installer for the
+   two modules only t/*.t loads -- both releases so far, and not the checked-in
+   Makefile.PL, which has had them in TEST_REQUIRES all along.
+   They are in [Prereqs / TestRequires] now.  Carp is gone from Makefile.PL's
+   PREREQ_PM for the same reason in reverse: it was listed and loaded nowhere.
+
+ - SECURITY.md says where to take a report that goes unanswered -- the CPAN
+   Security Group, <cpan-security@security.metacpan.org>, who can triage it and
+   who are the better first stop for anybody who would rather not write to an
+   individual maintainer -- and which perls the support statement covers, which
+   is every perl the module installs on and not merely the newest.
+
 0.02 2026-08-22 CDT
 
  - Fix for Windows: https://www.cpantesters.org/cpan/report/960c8de0-8001-1014-8897-e6a949c55ebf

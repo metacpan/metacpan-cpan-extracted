@@ -1466,7 +1466,12 @@ static int sa_abi_selftest(void)
      * merge widens it and a reset empties it. */
     {
         sa_hll *g1, *g2;
-        double c1, c1b, c2;
+        /* volatile, so each estimate is stored as a 64-bit double before it
+         * is compared. On i386 a double comes back on the x87 stack with 80
+         * bits of precision, and `c1b != c1` compared a c1 spilled to memory
+         * across a thousand calls with a c1b still in the register: the same
+         * computation, unequal on both 32-bit Linux smokers. */
+        volatile double c1, c1b, c2;
         char kb[32];
         int n, i;
 

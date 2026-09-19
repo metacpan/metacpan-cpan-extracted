@@ -140,6 +140,22 @@ subtest "uploading blobs" => sub {
   is($upload->size,    18,            "got the size we expect");
 };
 
+subtest "logging out" => sub {
+  my $logout = $tester->logout;
+  isa_ok($logout, 'JMAP::Tester::Result::Logout');
+  ok($logout->is_success, "successful logout is successful");
+  is($logout->http_response->code, 204, "logout got a 204");
+
+  my $stubborn = JMAP::Tester->new({
+    authentication_uri => "http://localhost:5627/jmap/nonesuch/",
+  });
+
+  my $failure = $stubborn->logout;
+  isa_ok($failure, 'JMAP::Tester::Result::Failure');
+  ok(! $failure->is_success, "logout against a bogus URI fails");
+  is($failure->ident, "failed to log out", "failure has the logout ident");
+};
+
 subtest 'http logger' => sub {
   my @lines;
 

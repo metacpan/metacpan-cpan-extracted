@@ -20,7 +20,7 @@ use Scalar::Util qw(blessed refaddr);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 90;
+	plan tests => 102;
 	use_ok('Database::Join');
 }
 
@@ -151,6 +151,21 @@ my %LEDGER = (
 	'cp:rows_both_values'        => 1,  # merged row carries both values
 	'cp:criterion_prefixed_routes' => 1, # criterion on "pfx.col" routes to correct DA
 	'cp:remove_prefixed_col'     => 1,  # remove_column on published prefixed name works
+
+	# backend parameter states (POD: "new() -- backend / max_array_rows / tmpdir")
+	'new:backend_default_auto'                => 1,
+	'new:backend_array_accepted'              => 1,
+	'new:backend_sqlite_accepted'             => 1,
+	'new:error_invalid_backend'               => 1,
+	'new:max_array_rows_default'              => 1,
+	'new:max_array_rows_stored'               => 1,
+	'new:tmpdir_stored'                       => 1,
+	'backend:array_path_no_dbi'               => 1,
+	'backend:sqlite_path_uses_dbi'            => 1,
+	'backend:auto_below_threshold_uses_array' => 1,
+	'backend:auto_above_threshold_uses_sqlite'=> 1,
+	'backend:results_identical'               => 1,
+	'backend:error_sqlite_connect'            => 1,
 );
 
 # ---------------------------------------------------------------------------
@@ -210,6 +225,18 @@ Readonly::Scalar my $COL_PFX     => "b.notes";   # published prefixed name of th
 		return \@rows;
 	}
 	sub DESTROY {}
+}
+
+# ---------------------------------------------------------------------------
+# MinimalDA3: MinimalDA subclass that directly defines count() so that
+# Database::Join's 'auto' backend threshold check can size datasets without
+# fetching all rows (defined &{"${pkg}::count"} check in _sqlite_join).
+# ---------------------------------------------------------------------------
+{
+	package MinimalDA3;
+	use parent -norequire, 'MinimalDA';
+
+	sub count { return scalar @{ $_[0]->{_rows} } }
 }
 
 # ---------------------------------------------------------------------------
@@ -354,6 +381,53 @@ subtest 'new: filters stored in the object' => sub {
 	my $j = _two_db_join(filters => { 1 => $filter });
 	is_deeply($j->{_filters}, { 1 => $filter }, 'filters stored verbatim in the object');
 	delete $LEDGER{'new:filters_stored'};
+};
+
+subtest 'new: backend defaults to "auto"' => sub {
+	plan tests => 1;
+	my $j = _two_db_join();
+	is($j->{_backend}, 'auto', 'backend defaults to "auto" when omitted');
+	delete $LEDGER{'new:backend_default_auto'};
+};
+
+subtest 'new: backend => "array" accepted and stored' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'array');
+	is($j->{_backend}, 'array', 'backend "array" accepted and stored');
+	delete $LEDGER{'new:backend_array_accepted'};
+};
+
+subtest 'new: backend => "sqlite" accepted and stored' => sub {
+	plan tests => 1;
+	my $j = _two_db_join(backend => 'sqlite');
+	is($j->{_backend}, 'sqlite', 'backend "sqlite" accepted and stored');
+	delete $LEDGER{'new:backend_sqlite_accepted'};
+};
+
+subtest 'new: error_invalid_backend -- unrecognised backend string rejected' => sub {
+	plan tests => 1;
+	my $db = MinimalDA->new(cols => [$JC], rows => []);
+	throws_ok {
+		Database::Join->new(databases => [$db], join_column => $JC, backend => 'sql')
+	} qr/must be one of array, sqlite, auto/,
+	  'new() croaks with error_invalid_backend for an unrecognised backend string';
+	delete $LEDGER{'new:error_invalid_backend'};
+};
+
+subtest 'new: max_array_rows defaults to 10,000' => sub {
+	plan tests => 1;
+	my $j = _two_db_join();
+	is($j->{_max_array_rows}, 10_000, 'max_array_rows defaults to 10,000 when omitted');
+	delete $LEDGER{'new:max_array_rows_default'};
+};
+
+subtest 'new: max_array_rows and tmpdir stored when supplied' => sub {
+	plan tests => 2;
+	my $j = _two_db_join(max_array_rows => 500, tmpdir => '/tmp');
+	is($j->{_max_array_rows}, 500,   'max_array_rows stored correctly');
+	is($j->{_tmpdir},         '/tmp', 'tmpdir stored correctly');
+	delete $LEDGER{'new:max_array_rows_stored'};
+	delete $LEDGER{'new:tmpdir_stored'};
 };
 
 # ===========================================================================
@@ -1437,7 +1511,145 @@ subtest 'collision_prefix: remove_column on the prefixed name hides that column'
 };
 
 # ===========================================================================
-# SECTION 17 -- API ledger verification (must be last)
+# SECTION 17 -- backend dispatch
+# Tests that the three backend modes route queries correctly.
+# Strategy: pass a non-existent tmpdir to prove the array path (which does
+# not touch the filesystem) succeeds, while the SQLite path fails with the
+# documented error_sqlite_connect.  The results-identical test uses the
+# default (writable) tmpdir so both paths complete successfully.
+# ===========================================================================
+
+subtest 'backend array: query succeeds with non-writable tmpdir (array path ignores tmpdir)' => sub {
+	plan tests => 2;
+	# If the SQLite path were taken, File::Temp->new(DIR => ...) would fail.
+	# Succeeding here proves the array path was chosen.
+	my $j    = _two_db_join(backend => 'array', tmpdir => '/nonexistent/__no_such_dir__');
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref() }
+		'backend=array: query succeeds despite a non-writable tmpdir (tmpdir unused)';
+	is(scalar @{$rows}, 2, 'backend=array: correct number of rows returned');
+	delete $LEDGER{'backend:array_path_no_dbi'};
+};
+
+subtest 'backend sqlite: produces correct merged results' => sub {
+	plan tests => 2;
+	# Force the SQLite path unconditionally and verify it returns the same rows
+	# as the default (array) path would.
+	my $j    = _two_db_join(backend => 'sqlite');
+	my $rows = $j->selectall_arrayref();
+	is(scalar @{$rows}, 2, 'backend=sqlite: correct number of rows');
+	my %by_key = map { $_->{$JC} => $_ } @{$rows};
+	is($by_key{K1}{$COL_B}, 95, 'backend=sqlite: merged column value correct for K1');
+	delete $LEDGER{'backend:sqlite_path_uses_dbi'};
+};
+
+subtest 'backend auto below threshold: array path used (non-writable tmpdir ok)' => sub {
+	plan tests => 2;
+	# MinimalDA3 provides its own count(), so auto mode can size each DA
+	# without fetching rows.  2+2=4 rows total; threshold=1000 => array path.
+	# A non-writable tmpdir proves the array path was taken (SQLite would fail).
+	my $db_a = MinimalDA3->new(
+		cols => [$JC, $COL_A],
+		rows => [
+			{ entry => 'K1', name => 'Alice' },
+			{ entry => 'K2', name => 'Bob'   },
+		],
+	);
+	my $db_b = MinimalDA3->new(
+		cols => [$JC, $COL_B],
+		rows => [
+			{ entry => 'K1', score => 95 },
+			{ entry => 'K2', score => 70 },
+		],
+	);
+	my $j = Database::Join->new(
+		databases      => [$db_a, $db_b],
+		join_column    => $JC,
+		backend        => 'auto',
+		max_array_rows => 1_000,
+		tmpdir         => '/nonexistent/__no_such_dir__',
+	);
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref() }
+		'auto below threshold: succeeds despite non-writable tmpdir (array path, tmpdir not accessed)';
+	is(scalar @{$rows}, 2, 'auto below threshold: correct row count');
+	delete $LEDGER{'backend:auto_below_threshold_uses_array'};
+};
+
+subtest 'backend auto above threshold: SQLite path taken (triggers error_sqlite_connect)' => sub {
+	plan tests => 1;
+	# 2+2=4 rows total; threshold=1 => SQLite path.  A non-writable tmpdir
+	# proves SQLite was chosen: if the array path were used it would succeed.
+	my $db_a = MinimalDA3->new(
+		cols => [$JC, $COL_A],
+		rows => [
+			{ entry => 'K1', name => 'Alice' },
+			{ entry => 'K2', name => 'Bob'   },
+		],
+	);
+	my $db_b = MinimalDA3->new(
+		cols => [$JC, $COL_B],
+		rows => [
+			{ entry => 'K1', score => 95 },
+			{ entry => 'K2', score => 70 },
+		],
+	);
+	my $j = Database::Join->new(
+		databases      => [$db_a, $db_b],
+		join_column    => $JC,
+		backend        => 'auto',
+		max_array_rows => 1,
+		tmpdir         => '/nonexistent/__no_such_dir__',
+	);
+	# The SQLite path is taken, so File::Temp attempts to create a temp file
+	# in the non-existent directory and dies.  Any die/croak from the module
+	# proves the SQLite path was chosen (the array path would have succeeded).
+	throws_ok { $j->selectall_arrayref() }
+		qr/does not exist|Failed to open/,
+		'auto above threshold: SQLite path taken — query throws when tmpdir is not accessible';
+	delete $LEDGER{'backend:auto_above_threshold_uses_sqlite'};
+};
+
+subtest 'backend sqlite and array paths: identical results for the same query' => sub {
+	plan tests => 1;
+	# Both paths must be semantically equivalent; this is an explicit
+	# result-identity invariant stated in the POD.
+	my $rows_array  = _two_db_join(backend => 'array')->selectall_arrayref();
+	my $rows_sqlite = _two_db_join(backend => 'sqlite')->selectall_arrayref();
+	is_deeply($rows_array, $rows_sqlite,
+		'SQLite and array backends return identical merged rows for the same query');
+	delete $LEDGER{'backend:results_identical'};
+};
+
+subtest 'error_sqlite_connect: DBI::connect failure croaks with the documented message' => sub {
+	plan tests => 1;
+	# Trigger error_sqlite_connect by letting File::Temp succeed (default tmpdir)
+	# but making DBI->connect return undef.  The module must then croak with
+	# the message documented under MESSAGES for error_sqlite_connect.
+	my $j = _two_db_join(backend => 'sqlite');
+	my $orig_connect;
+	{
+		no strict 'refs';
+		no warnings 'redefine';
+		$orig_connect = \&DBI::connect;
+		*DBI::connect  = sub { return undef };
+	}
+	my $err;
+	eval { $j->selectall_arrayref() };
+	$err = $@;
+	{
+		no strict 'refs';
+		no warnings 'redefine';
+		*DBI::connect = $orig_connect;
+	}
+	my ($first_line) = split /\n/, ($err // ''), 2;
+	like($first_line, qr/Failed to open temporary SQLite database/,
+		'error_sqlite_connect: documented message fires when DBI::connect returns undef');
+	delete $LEDGER{'backend:error_sqlite_connect'};
+};
+
+# ===========================================================================
+# SECTION 18 -- API ledger verification (must be last)
 # Must run last so all deletes above have completed.
 # ===========================================================================
 

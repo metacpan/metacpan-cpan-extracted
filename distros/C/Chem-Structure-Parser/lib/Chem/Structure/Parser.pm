@@ -3,18 +3,23 @@
 require 5.010;
 use strict;
 package Chem::Structure::Parser;
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 require XSLoader;
-use autodie ':default';
 use warnings FATAL => 'all';
+# No `use autodie': it would ask every installer for a prerequisite in order to
+# check five calls.  They are checked by hand instead, in autodie's own words,
+# and anything fallible added here must be checked the same way.
 use Exporter 'import';
 use Scalar::Util 'reftype';
 XSLoader::load('Chem::Structure::Parser', $VERSION);
 
 our @EXPORT_OK = qw(
-	structure_info structure_info_string pdb_info cif_info
+	structure_info structure_info_string
 	structure_atoms structure_residues structure_ligands structure_sequences
 	chain_sequence structure_summary is_single_ion
+	structure_features structure_sasa structure_pi_stacking structure_disulfides
+	structure_base_pairs structure_base_stacks structure_contacts structure_hbonds
+	structure_dssp structure_rmsd
 	aa3to1 aa1to3 res1 res_type formats h
 );
 our @EXPORT = @EXPORT_OK;
@@ -78,10 +83,12 @@ my %DEFAULT = (
 	waters    => 1,       # keep waters
 	hetatm    => 1,       # keep HETATM records (ligands, ions, modified residues)
 	atoms     => 1,       # build the per-atom hashes; 0 stops at the residue level
+	features  => 1,       # compute the physical properties; needs atoms => 1
 	meta      => 1,       # parse the header records
 	anisou    => 0,       # keep ANISOU lines (they double the size of the file)
 	chains    => undef,   # arrayref: read only these chains
 	format    => undef,   # override format detection
+	dssp      => 0,       # also put the secondary structure roll-up at $info->{dssp}
 );
 
 # residues that need no explanation.  Everything else that res_type() calls an
@@ -113,9 +120,26 @@ my $NUM = qr/[0-9]*\.?[0-9]+/;
 
 # Public entry points
 
+# The views structure_info($file, $view) will hand back on their own, and the
+# key each is filed under in $info->{features}.  A second argument that is a
+# plain string is a request for one of these rather than the first half of an
+# option pair, and the two forms cannot be confused: a file and an even number
+# of arguments after it is always an odd-sized option list, which is an error.
+my %VIEW = (dssp => 'dssp');
+
 # structure_info($file, %opt) -- read a structure file into a hash of hashes.
+# structure_info($file, $view, %opt) -- one view of it, and nothing else.
 sub structure_info {
-	my ($file, %opt) = @_;
+	my $file = shift;
+	my $view;
+	if (@_ % 2 == 1 && defined $_[0] && !ref $_[0]) {
+		$view = shift;
+		die "structure_info: '$view' is not a view; the ones there are: "
+		    . join(', ', sort keys %VIEW) . "\nOr did you mean an option? "
+		    . "Those are named pairs: structure_info(\$file, $view => 1)"
+			unless exists $VIEW{$view};
+	}
+	my %opt = @_;
 	die 'structure_info: no file name given' unless defined $file && length $file;
 	die "structure_info: '$file' does not exist"  unless -e $file;
 	die "structure_info: '$file' is a directory"  if -d $file;
@@ -126,21 +150,15 @@ sub structure_info {
 		       . (exists $NOT_YET{$fmt}
 		          ? "$NOT_YET{$fmt} is not implemented yet; formats read today: " . join(', ', sort keys %READER)
 		          : "unrecognized format '$fmt'; formats read today: " . join(', ', sort keys %READER));
-	return $reader->($file, $o);
-}
-
-# pdb_info($file, %opt) -- structure_info() with the format settled in advance.
-sub pdb_info {
-	my ($file, %opt) = @_;
-	return structure_info($file, %opt, format => 'pdb');
-}
-
-# cif_info($file, %opt) -- the same for mmCIF/PDBx.  Both of these exist for a
-# caller who already knows what they have; structure_info() works it out and
-# returns the same thing either way, so neither is the usual way in.
-sub cif_info {
-	my ($file, %opt) = @_;
-	return structure_info($file, %opt, format => 'mmcif');
+	my $info = $reader->($file, $o);
+	return $info unless defined $view;
+	# a view asked for on its own is the whole answer, and asking for one of a
+	# file read with features => 0 or atoms => 0 is a mistake worth saying out
+	# loud rather than an empty hash that reads as a structure with none
+	die "structure_info: '$view' needs the features, and this file was read with "
+	  . (!$o->{atoms} ? 'atoms => 0' : 'features => 0')
+		unless $info->{features};
+	return $info->{features}{ $VIEW{$view} };
 }
 
 # structure_info_string($text, %opt) -- the same, from a string already in hand.
@@ -299,6 +317,642 @@ sub structure_summary {
 	return join("\n", @l) . "\n";
 }
 
+# Physical properties
+#
+# Everything a structure is asked about after it has been read: how much of it
+# the solvent can touch, how big and how heavy it is, which of its aromatic
+# rings are stacked, and the numbers a sequence alone answers -- a protein's
+# mean hydropathy and aromatic fraction, a nucleic acid's G+C and purine
+# fractions.
+#
+# The first three are one XS call, because all three have to touch every atom
+# and the walk that flattens a hash of chains of residues of atoms into
+# coordinate arrays is the expensive part; asking for all of them costs one
+# walk.  The sequence numbers are here rather than there because they read a
+# sequence string the chain already carries, which is a few hundred characters
+# and no per-atom work at all.
+#
+# Every number is checked against the implementation it came from, not against
+# this one.  t/features.t compares with mdtraj 1.11 and Biopython 1.87 -- live
+# where mdtraj is installed, and against t/data/features.txt where it is not --
+# and t/properties.t covers the parts that are this module's own: the options,
+# the call forms, and what each function leaves behind in $info.
+
+# Kyte, J; Doolittle, R F (1982) "A simple method for displaying the hydropathic
+# character of a protein", J Mol Biol 157(1):105-132, the hydropathy index of
+# Table 2.  Spelled the way Bio::SeqUtils' Python cousin spells it --
+# Bio.SeqUtils.ProtParamData.kd of Biopython 1.87 -- which is what
+# structure_features's mean is compared against.
+#
+# The twenty are all of it: there is no value for B, J, O, U, X or Z, and a
+# residue whose single-letter code is one of those is left out of both the sum
+# and the count rather than scored as something it is not.
+my %KD = (
+	A =>  1.8, R => -4.5, N => -3.5, D => -3.5, C =>  2.5,
+	Q => -3.5, E => -3.5, G => -0.4, H => -3.2, I =>  4.5,
+	L =>  3.8, K => -3.9, M =>  1.9, F =>  2.8, P => -1.6,
+	S => -0.8, T => -0.7, W => -0.9, Y => -1.3, V =>  4.2,
+);
+
+# Phenylalanine, tryptophan and tyrosine.  Aromaticity is their relative
+# frequency and nothing else -- Lobry, J R; Gautier, C (1994) Nucleic Acids Res
+# 22(15):3174-3180, and Biopython's ProteinAnalysis.aromaticity(), which is
+# what it is compared against.  Histidine's ring is aromatic and is not in the
+# count, because it is not in Lobry's; structure_pi_stacking() does count it,
+# because there the question is about the ring rather than about the index.
+my %AROMATIC = map { $_ => 1 } qw(F W Y);
+
+# The bases that count towards a nucleic acid chain's composition, and the two
+# of them that are the G+C half of it.  Which letters count is
+# Bio.SeqUtils.gc_fraction() of Biopython 1.87 with its default
+# ambiguous => 'remove', which is what these fractions are compared against: it
+# divides the C and G by the C, G, A, T and U, so an ambiguous or unknown base
+# is in neither half rather than counted as something it is not.  That is the
+# same rule %KD applies to the amino acids it has no index for, for the same
+# reason.
+#
+# It leaves out I as well -- an inosine is a real base and not an ambiguity, but
+# it is not one of the five Biopython counts, and answering a different question
+# than the function this is checked against would be the worse trade.
+# base_counts is every letter, including those, so a caller can see what the
+# fractions left out.
+my %BASE   = map { $_ => 1 } qw(A C G T U);
+my %GC     = map { $_ => 1 } qw(C G);
+# adenine and guanine, the two-ring bases.  No Biopython function answers this
+# one; it is the same five-letter denominator with a different numerator.
+my %PURINE = map { $_ => 1 } qw(A G);
+
+# The options the three feature functions take, with what they mean and what
+# they default to.  This table is the one place the defaults are written down:
+# the XS carries the same numbers as a fallback, and never sees it, because
+# every call below passes the whole merged hash.
+#
+# The angles are degrees and the distances angstrom, which is what the rest of
+# the module is in.  mdtraj's are degrees and nanometres; see the note on
+# face_distance in structure_pi_stacking's documentation for the one place that
+# difference is more than a conversion.
+my %FEATURE_DEFAULT = (
+	sasa        => 1,     # compute the solvent-accessible surface
+	pi_stacking => 1,     # look for stacked aromatic rings
+	disulfides  => 1,     # look for SG-SG pairs close enough to be bonded
+	base_pairs  => 1,     # look for Watson-Crick and wobble base pairs
+	base_stacks => 1,     # score how far every nearby pair of bases is stacked
+	interface   => 1,     # also run the surface on each chain alone, for the buried area
+	shape       => 1,     # the gyration tensor and the descriptors built from it
+	dihedrals   => 1,     # phi, psi, omega and chi1..chi5, onto each residue
+	contacts    => 1,     # which residues touch which
+	exposure    => 1,     # half-sphere exposure, onto each amino acid residue
+	hbonds      => 1,     # backbone hydrogen bonds, by Kabsch and Sander's energy
+	secondary   => 1,     # DSSP secondary structure, onto each residue
+	# write per-atom, per-residue and per-chain results into $info.  The torsion
+	# angles, the half-sphere exposure and the secondary structure have nowhere
+	# else to go, so store => 0 does not compute them rather than computing them
+	# and dropping them; structure_info() always stores.
+	store       => 1,
+	probe       => 1.4,   # solvent probe radius, angstrom: mdtraj's 0.14 nm
+	points      => 960,   # sphere points per atom; more is more accurate and slower
+	face_distance   => 5.5, # face-to-face: centroid separation, angstrom
+	face_plane_min  => 0,   # ... angle between the two ring planes, degrees
+	face_plane_max  => 35,
+	face_normal_min => 0,   # ... a ring's normal against the centroid-to-centroid line
+	face_normal_max => 33,
+	edge_distance   => 6.5, # edge-to-face: centroid separation, angstrom
+	edge_plane_min  => 50,
+	edge_plane_max  => 90,
+	edge_normal_min => 0,
+	edge_normal_max => 30,
+	edge_radius     => 1.5, # ... centroid to where the two planes meet, angstrom
+	# mdtraj's Topology.create_disulfide_bonds() uses 0.3 nm, and the cutoff is
+	# the whole of the rule, so it is an option rather than a constant
+	disulfide_distance => 3.0, # the largest SG-SG separation that is a bond, angstrom
+	# Bio.PDB.Polypeptide.PPBuilder's `radius': the largest C-to-N separation
+	# that still means two residues are joined, and so the largest one across
+	# which a phi or a psi means anything
+	peptide_bond       => 1.8, # angstrom
+	# the same question for a nucleic acid, and the same answer from the other
+	# half of gemmi's are_connected(): an O3'-to-P separation under 1.5 times
+	# the 1.6 A ideal bond, which is the largest one an alpha, an epsilon or a
+	# zeta may be measured across
+	phosphodiester_bond => 2.4, # angstrom
+	# the closest two heavy atoms of two residues may be and still count as a
+	# contact; 4.5 A is the usual convention and the option is there because
+	# there is no single right answer
+	contact_distance   => 4.5, # angstrom
+	# the two halves of the base pair rule, measured in Parser.xs's header
+	# comment for base_pairs() against the wwPDB's own annotation of forty
+	# entries: no annotated pair has a longer hydrogen bond than 3.4941 A or
+	# stands further out of its partner's plane than 2.5408 A, and the nearest
+	# candidate that is not a pair is at 3.5144 A and 2.6983 A
+	base_pair_hbond    => 3.5, # angstrom: the longest hydrogen bond a pair may have
+	base_pair_stagger  => 2.6, # angstrom: the furthest out of plane it may be
+	# the two cutoffs of the stacking criteria of Condon et al. (2015), section
+	# 2.4: bases further apart than the first are not stacked and their angles
+	# are not computed, and a pair whose overlap angle is past the second is not
+	# stacked and has no Xi.  Both are the paper's, which took the distance from
+	# CCSD(T) calculations on uracil and adenine dimers and the angle from X-ray
+	# statistics.  The knees of the two ramps between them are the definition
+	# rather than a threshold, and are constants in Parser.xs.
+	base_stack_distance => 5.0, # angstrom: the furthest apart two centres of mass may be
+	base_stack_omega    => 50,  # degrees: the largest overlap angle that is a stack
+);
+
+# which of those each function takes.  A geometry threshold passed to
+# structure_sasa() is a misunderstanding rather than a harmless extra, and the
+# same is true the other way round, so each function only knows its own.
+my @SASA_OPT = qw(store probe points interface);
+my @PI_OPT   = qw(
+	face_distance face_plane_min face_plane_max face_normal_min face_normal_max
+	edge_distance edge_plane_min edge_plane_max edge_normal_min edge_normal_max
+	edge_radius
+);
+my @SS_OPT   = qw(store disulfide_distance);
+my @BP_OPT   = qw(store base_pair_hbond base_pair_stagger);
+my @BS_OPT   = qw(store base_stack_distance base_stack_omega);
+my @TORS_OPT = qw(store peptide_bond phosphodiester_bond);
+my @CONT_OPT = qw(store contact_distance);
+my @HB_OPT   = qw(peptide_bond);
+
+sub _feature_options {
+	my ($opt, $who, $allowed) = @_;
+	my %ok = map { $_ => 1 } @$allowed;
+	for my $k (sort keys %$opt) {
+		die "$who: unknown option '$k'; known options are: " . join(', ', sort @$allowed)
+			unless $ok{$k};
+	}
+	my %o = (%FEATURE_DEFAULT, %$opt);
+	die "$who: probe must be a number and must not be negative, not '$o{probe}'"
+		unless $o{probe} =~ /\A[0-9]*\.?[0-9]+\z/;
+	# the upper bound is memory rather than accuracy: a sphere point is three
+	# NVs, so ten million of them is 240 MB on a double perl and four times that
+	# on a quadmath one, for an atom whose area is one number
+	die "$who: points must be an integer between 1 and 10000000, not '$o{points}'"
+		unless $o{points} =~ /\A[0-9]+\z/ && $o{points} > 0 && $o{points} <= 10_000_000;
+	for my $k (@PI_OPT) {
+		die "$who: $k must be a number, not '$o{$k}'"
+			unless $o{$k} =~ /\A-?[0-9]*\.?[0-9]+\z/;
+	}
+	die "$who: disulfide_distance must be a number and must not be negative, "
+	  . "not '$o{disulfide_distance}'"
+		unless $o{disulfide_distance} =~ /\A[0-9]*\.?[0-9]+\z/;
+	die "$who: peptide_bond must be a positive number, not '$o{peptide_bond}'"
+		unless $o{peptide_bond} =~ /\A[0-9]*\.?[0-9]+\z/ && $o{peptide_bond} > 0;
+	die "$who: phosphodiester_bond must be a positive number, "
+	  . "not '$o{phosphodiester_bond}'"
+		unless $o{phosphodiester_bond} =~ /\A[0-9]*\.?[0-9]+\z/
+		    && $o{phosphodiester_bond} > 0;
+	die "$who: contact_distance must be a positive number, not '$o{contact_distance}'"
+		unless $o{contact_distance} =~ /\A[0-9]*\.?[0-9]+\z/ && $o{contact_distance} > 0;
+	die "$who: base_pair_hbond must be a positive number, not '$o{base_pair_hbond}'"
+		unless $o{base_pair_hbond} =~ /\A[0-9]*\.?[0-9]+\z/ && $o{base_pair_hbond} > 0;
+	die "$who: base_pair_stagger must be a number and must not be negative, "
+	  . "not '$o{base_pair_stagger}'"
+		unless $o{base_pair_stagger} =~ /\A[0-9]*\.?[0-9]+\z/;
+	die "$who: base_stack_distance must be a positive number, "
+	  . "not '$o{base_stack_distance}'"
+		unless $o{base_stack_distance} =~ /\A[0-9]*\.?[0-9]+\z/
+		    && $o{base_stack_distance} > 0;
+	die "$who: base_stack_omega must be a number between 0 and 180, "
+	  . "not '$o{base_stack_omega}'"
+		unless $o{base_stack_omega} =~ /\A[0-9]*\.?[0-9]+\z/
+		    && $o{base_stack_omega} <= 180;
+	return \%o;
+}
+
+# The properties structure_info() computes on the way past, which is all of
+# them.  Kept apart from the wrappers below because it is also what decides what
+# $info->{features} holds, and so what the wrappers can hand back without doing
+# the work a second time.
+sub _all_features {
+	my ($info, $who) = @_;
+	my $o = _feature_options({}, $who,
+		[ qw(sasa pi_stacking disulfides base_pairs base_stacks shape dihedrals
+		     contacts exposure hbonds secondary),
+		  @SASA_OPT, @PI_OPT, @SS_OPT, @BP_OPT, @BS_OPT, @TORS_OPT, @CONT_OPT,
+		  @HB_OPT ]);
+	my $f = _features($info, $o, $who);
+	_sequence_features($info, $f, 1);
+	return $f;
+}
+
+# structure_features($info, %opt) -- the physical properties of a structure.
+#
+# With no options this is a lookup: structure_info() computed them on the way
+# past and left them in $info->{features}, and computing them again would give
+# the same answer for the price of the walk.  Name any option and it is
+# computed again with that option in force.
+sub structure_features {
+	my ($info, %opt) = @_;
+	_check_info($info, 'structure_features');
+	return $info->{features} if !%opt && $info->{features};
+	my $o = _feature_options(\%opt, 'structure_features',
+		[ qw(sasa pi_stacking disulfides base_pairs base_stacks shape dihedrals
+		     contacts exposure hbonds secondary),
+		  @SASA_OPT, @PI_OPT, @SS_OPT, @BP_OPT, @BS_OPT, @TORS_OPT, @CONT_OPT,
+		  @HB_OPT ]);
+	my $f = _features($info, $o, 'structure_features');
+	_sequence_features($info, $f, $o->{store});
+	return $f;
+}
+
+# structure_sasa($info, %opt) -- the solvent-accessible surface, and nothing else.
+sub structure_sasa {
+	my ($info, %opt) = @_;
+	_check_info($info, 'structure_sasa');
+	return $info->{features}{sasa} if !%opt && $info->{features};
+	my $o = _feature_options(\%opt, 'structure_sasa', \@SASA_OPT);
+	$o->{sasa}        = 1;
+	$o->{pi_stacking} = 0;
+	$o->{disulfides}  = 0;
+	$o->{base_pairs}  = 0;
+	$o->{base_stacks} = 0;
+	$o->{shape}       = 0;
+	$o->{dihedrals}   = 0;
+	$o->{contacts}    = 0;
+	$o->{exposure}    = 0;
+	$o->{hbonds}      = 0;
+	$o->{secondary}   = 0;
+	return _features($info, $o, 'structure_sasa')->{sasa};
+}
+
+# structure_pi_stacking($info, %opt) -- the stacked pairs of aromatic rings.
+sub structure_pi_stacking {
+	my ($info, %opt) = @_;
+	_check_info($info, 'structure_pi_stacking');
+	return $info->{features}{pi_stacking} if !%opt && $info->{features};
+	my $o = _feature_options(\%opt, 'structure_pi_stacking', \@PI_OPT);
+	$o->{sasa}        = 0;
+	$o->{pi_stacking} = 1;
+	$o->{disulfides}  = 0;
+	$o->{base_pairs}  = 0;
+	$o->{base_stacks} = 0;
+	$o->{shape}       = 0;
+	$o->{dihedrals}   = 0;
+	$o->{contacts}    = 0;
+	$o->{exposure}    = 0;
+	$o->{hbonds}      = 0;
+	$o->{secondary}   = 0;
+	$o->{store}       = 0;
+	return _features($info, $o, 'structure_pi_stacking')->{pi_stacking};
+}
+
+# structure_contacts($info, %opt) -- which residues touch which.
+sub structure_contacts {
+	my ($info, %opt) = @_;
+	_check_info($info, 'structure_contacts');
+	return $info->{features}{contacts} if !%opt && $info->{features};
+	my $o = _feature_options(\%opt, 'structure_contacts', \@CONT_OPT);
+	$o->{sasa}        = 0;
+	$o->{pi_stacking} = 0;
+	$o->{disulfides}  = 0;
+	$o->{base_pairs}  = 0;
+	$o->{base_stacks} = 0;
+	$o->{shape}       = 0;
+	$o->{dihedrals}   = 0;
+	$o->{contacts}    = 1;
+	$o->{exposure}    = 0;
+	$o->{hbonds}      = 0;
+	$o->{secondary}   = 0;
+	return _features($info, $o, 'structure_contacts')->{contacts};
+}
+
+# structure_hbonds($info, %opt) -- the backbone hydrogen bonds.
+sub structure_hbonds {
+	my ($info, %opt) = @_;
+	_check_info($info, 'structure_hbonds');
+	return $info->{features}{hbonds} if !%opt && $info->{features};
+	my $o = _feature_options(\%opt, 'structure_hbonds', \@HB_OPT);
+	$o->{$_} = 0 for qw(sasa pi_stacking disulfides base_pairs base_stacks shape
+	                    dihedrals contacts exposure secondary);
+	$o->{hbonds} = 1;
+	return _features($info, $o, 'structure_hbonds')->{hbonds};
+}
+
+# structure_dssp($info) -- the secondary structure, chain by chain and letter by
+# letter.  There is nothing to tune, so there are no options: DSSP is the
+# hydrogen bonds and the two constants Kabsch and Sander chose for them.
+sub structure_dssp {
+	my ($info, %opt) = @_;
+	_check_info($info, 'structure_dssp');
+	return $info->{features}{dssp} if !%opt && $info->{features};
+	my $o = _feature_options(\%opt, 'structure_dssp', []);
+	$o->{$_} = 0 for qw(sasa pi_stacking disulfides base_pairs base_stacks shape
+	                    dihedrals contacts exposure hbonds);
+	$o->{secondary} = 1;
+	return _features($info, $o, 'structure_dssp')->{dssp};
+}
+
+# structure_disulfides($info, %opt) -- the SG-SG pairs close enough to be bonded.
+sub structure_disulfides {
+	my ($info, %opt) = @_;
+	_check_info($info, 'structure_disulfides');
+	return $info->{features}{disulfides} if !%opt && $info->{features};
+	my $o = _feature_options(\%opt, 'structure_disulfides', \@SS_OPT);
+	$o->{sasa}        = 0;
+	$o->{pi_stacking} = 0;
+	$o->{disulfides}  = 1;
+	$o->{base_pairs}  = 0;
+	$o->{base_stacks} = 0;
+	$o->{shape}       = 0;
+	$o->{dihedrals}   = 0;
+	$o->{contacts}    = 0;
+	$o->{exposure}    = 0;
+	$o->{hbonds}      = 0;
+	$o->{secondary}   = 0;
+	return _features($info, $o, 'structure_disulfides')->{disulfides};
+}
+
+# structure_base_pairs($info, %opt) -- the Watson-Crick and wobble base pairs.
+sub structure_base_pairs {
+	my ($info, %opt) = @_;
+	_check_info($info, 'structure_base_pairs');
+	return $info->{features}{base_pairs} if !%opt && $info->{features};
+	my $o = _feature_options(\%opt, 'structure_base_pairs', \@BP_OPT);
+	$o->{sasa}        = 0;
+	$o->{pi_stacking} = 0;
+	$o->{disulfides}  = 0;
+	$o->{base_pairs}  = 1;
+	$o->{base_stacks} = 0;
+	$o->{shape}       = 0;
+	$o->{dihedrals}   = 0;
+	$o->{contacts}    = 0;
+	$o->{exposure}    = 0;
+	$o->{hbonds}      = 0;
+	$o->{secondary}   = 0;
+	return _features($info, $o, 'structure_base_pairs')->{base_pairs};
+}
+
+# structure_base_stacks($info, %opt) -- how stacked every nearby pair of bases is.
+sub structure_base_stacks {
+	my ($info, %opt) = @_;
+	_check_info($info, 'structure_base_stacks');
+	return $info->{features}{base_stacks} if !%opt && $info->{features};
+	my $o = _feature_options(\%opt, 'structure_base_stacks', \@BS_OPT);
+	$o->{sasa}        = 0;
+	$o->{pi_stacking} = 0;
+	$o->{disulfides}  = 0;
+	$o->{base_pairs}  = 0;
+	$o->{base_stacks} = 1;
+	$o->{shape}       = 0;
+	$o->{dihedrals}   = 0;
+	$o->{contacts}    = 0;
+	$o->{exposure}    = 0;
+	$o->{hbonds}      = 0;
+	$o->{secondary}   = 0;
+	return _features($info, $o, 'structure_base_stacks')->{base_stacks};
+}
+
+#
+# Comparing structures
+#
+# Everything above answers a question about one structure.  structure_rmsd()
+# is the one that takes two, or twenty: how far apart are these copies of the
+# same molecule?  The work is in the XS -- pairing the atoms, the superposition
+# and the deviation all touch every atom, and an NMR ensemble asks for them
+# once per pair of models -- and what is here is deciding what is being
+# compared with what.
+#
+# An argument is a file name or a structure already read, in any mix, and a
+# structure read with model => 'all' counts as one per model: that is what
+# makes the ensemble case a single call.  Two things to compare give the
+# number; more than two give the matrix, because with three structures there
+# is no one RMSD to hand back.
+#
+my %RMSD_DEFAULT = (
+	fit       => 1,      # superpose first; 0 measures the two where they lie
+	select    => 'all',  # 'all', 'heavy', 'backbone' or 'ca'
+	match     => 'key',  # 'key' = chain, residue and atom name; 'order' = the nth of each
+	min_atoms => 3,      # fewer atoms in common than this and there is no answer
+	detail    => 0,      # the whole hash rather than the one number
+	chain_map => undef,  # hashref: what a chain of the second and later structures
+	                     # is called in the first
+);
+
+# The options that are about reading a file rather than about the comparison.
+# They are structure_info()'s own and mean the same thing here; an argument
+# that is already a structure was read without them, so chains is applied to it
+# as a filter instead and the rest cannot be.
+my @RMSD_READ = qw(model altloc hydrogens waters hetatm chains format);
+
+# structure_rmsd($a, $b, %opt) -- the RMSD of two structures.
+# structure_rmsd($a, $b, $c, ..., %opt) -- the matrix of every pair.
+# structure_rmsd($ensemble, %opt) -- the matrix over one file's models.
+sub structure_rmsd {
+	my @in;
+	# The structures come first and the options after them, and what separates
+	# the two is that a structure is a reference or the name of a file that
+	# exists.  A name that does not exist is the mistake it looks like and is
+	# said to be one below, rather than being read as the first half of an
+	# option pair and reported as an unknown option.
+	while (@_) {
+		last unless defined $_[0];
+		if (ref $_[0]) { push @in, shift; next }
+		last unless -e $_[0];
+		push @in, shift;
+	}
+	die 'structure_rmsd: nothing to compare; give two structures, two file '
+	  . 'names, or one file read with model => \'all\'' unless @in;
+	die "structure_rmsd: '$_[0]' is not a file that exists, and the options "
+	  . 'after the structures come in name => value pairs' if @_ % 2;
+	my %opt = @_;
+	for my $k (sort keys %opt) {
+		die "structure_rmsd: unknown option '$k'; known options are: "
+		    . join(', ', sort (keys %RMSD_DEFAULT, @RMSD_READ))
+			unless exists $RMSD_DEFAULT{$k} || grep { $_ eq $k } @RMSD_READ;
+	}
+	my %o = (%RMSD_DEFAULT, map { $_ => $opt{$_} }
+	                        grep { exists $RMSD_DEFAULT{$_} } keys %opt);
+	my %read = map { $_ => $opt{$_} } grep { exists $opt{$_} } @RMSD_READ;
+
+	die "structure_rmsd: select must be 'all', 'heavy', 'backbone' or 'ca', not '$o{select}'"
+		unless grep { $_ eq $o{select} } qw(all heavy backbone ca);
+	die "structure_rmsd: match must be 'key' or 'order', not '$o{match}'"
+		unless $o{match} eq 'key' || $o{match} eq 'order';
+	die "structure_rmsd: min_atoms must be a whole number of at least 1, not '$o{min_atoms}'"
+		unless $o{min_atoms} =~ /\A[0-9]+\z/ && $o{min_atoms} >= 1;
+	if (defined $o{chain_map}) {
+		die 'structure_rmsd: chain_map must be a hash reference'
+			unless (reftype($o{chain_map}) || '') eq 'HASH';
+	}
+	my $keep;
+	if (defined $read{chains}) {
+		die 'structure_rmsd: chains must be an array reference'
+			unless (reftype($read{chains}) || '') eq 'ARRAY';
+		die 'structure_rmsd: chains is empty' unless @{ $read{chains} };
+		$keep = { map { $_ => 1 } @{ $read{chains} } };
+	}
+
+	my (@sets, @labels);
+	my $nth = 0;
+	my $most_models = 0;   # for the message when there turns out to be nothing to compare
+	for my $thing (@in) {
+		my ($info, $name);
+		$nth++;
+		if (ref $thing) {
+			_check_info($thing, 'structure_rmsd');
+			$info = $thing;
+			$name = defined $info->{file}                  ? $info->{file}
+			      : defined $info->{id} && length $info->{id} ? $info->{id}
+			      :                                          "structure $nth";
+		}
+		else {
+			# meta => 0 and features => 0: the header records and the physical
+			# properties are the expensive half of a read and none of this
+			# looks at either.  atoms => 1 is the default and is said out loud
+			# because without the atom hashes there is nothing to measure.
+			$info = structure_info($thing, %read,
+			                       atoms => 1, features => 0, meta => 0);
+			$name = $thing;
+		}
+		$most_models = $info->{n_models}
+			if ($info->{n_models} || 0) > $most_models;
+		# read with model => 'all', an ensemble is one structure per model, and
+		# that is the whole of what makes structure_rmsd($nmr, model => 'all')
+		# the pairwise matrix over the models
+		my @models = $info->{models}
+		           ? map { [ $_, $info->{models}{$_} ] }
+		             sort { $a <=> $b } keys %{ $info->{models} }
+		           : ([ undef, { chains      => $info->{chains},
+		                         chain_order => $info->{chain_order} } ]);
+		for my $m (@models) {
+			my ($num, $set) = @$m;
+			push @labels, defined $num ? "$name model $num" : $name;
+			push @sets, _rmsd_set($set, $keep,
+			                      ($nth > 1 ? $o{chain_map} : undef));
+		}
+	}
+	# One structure is not a comparison.  When it is an ensemble read at one
+	# model, though, the caller almost certainly meant the other thing, and
+	# saying so is more use than saying it wanted two.
+	if (@sets < 2) {
+		die 'structure_rmsd: only one structure to compare'
+		  . ($most_models > 1
+		     ? "; it has $most_models models, and reading it with "
+		     . "model => 'all' is what makes them a set to compare"
+		     : '');
+	}
+
+	my $r = _rmsd(\@sets, { %o, transform => (@sets == 2 && $o{detail}) ? 1 : 0 });
+	return $r->{rmsd}[0][1] if @sets == 2 && !$o{detail};
+	my %out = (
+		labels  => \@labels,
+		n_atoms => $r->{n_atoms},
+		fit     => $o{fit} ? 1 : 0,
+		select  => $o{select},
+		match   => $o{match},
+	);
+	if (@sets == 2) {
+		# two structures have one RMSD and one count, and handing back a 2x2
+		# matrix of which three cells are known in advance would be a puzzle
+		$out{rmsd} = $r->{rmsd}[0][1];
+		$out{n}    = $r->{n}[0][1];
+		$out{rotation}    = $r->{rotation}    if $r->{rotation};
+		$out{translation} = $r->{translation} if $r->{translation};
+	}
+	else {
+		$out{rmsd} = $r->{rmsd};
+		$out{n}    = $r->{n};
+	}
+	return \%out;
+}
+
+# One structure, or one model of one, as the XS wants it: a hash with chains
+# and chain_order.  chains => filters it, chain_map => renames it.
+#
+# Both are done by building a new chain_order and, for the rename, a shallow
+# copy of each chain hash under its new name.  Nothing below this writes to a
+# chain and the residues are shared, so the copy is a few dozen scalars per
+# chain and no coordinates at all.
+sub _rmsd_set {
+	my ($set, $keep, $map) = @_;
+	my @order = @{ $set->{chain_order} };
+	@order = grep { $keep->{$_} } @order if $keep;
+	return { chains => $set->{chains}, chain_order => \@order }
+		unless $map && %$map;
+	my (%chains, %from, @renamed);
+	for my $cid (@order) {
+		my $to = exists $map->{$cid} ? $map->{$cid} : $cid;
+		die "structure_rmsd: chain_map puts both '$from{$to}' and '$cid' "
+		  . "under '$to'; two chains cannot become one chain"
+			if exists $chains{$to};
+		$chains{$to} = { %{ $set->{chains}{$cid} }, id => $to };
+		$from{$to}   = $cid;
+		push @renamed, $to;
+	}
+	return { chains => \%chains, chain_order => \@renamed };
+}
+
+# The two sequence-level numbers, per protein chain and over the structure.
+#
+# Over the observed sequence -- the residues that are actually in the file --
+# rather than over SEQRES, because these are properties of the model in front of
+# the caller and a residue nobody could see has no coordinates to be a property
+# of.  chain_sequence($info, $chain, 'seqres') is there for anyone who wants the
+# other one.
+sub _sequence_features {
+	my ($info, $f, $store) = @_;
+	my ($sum, $scored, $arom, $len) = (0, 0, 0, 0);
+	my ($gc, $pur, $counted, $nlen) = (0, 0, 0, 0);
+	my %bases;
+	for my $cid (@{ $info->{chain_order} }) {
+		my $c = $info->{chains}{$cid};
+		my $type = $c->{type} || '';
+		my $seq = $c->{sequence};
+		next unless defined $seq && length $seq;
+		if ($type eq 'dna' || $type eq 'rna') {
+			my ($cgc, $cpur, $cn, %cb) = (0, 0, 0);
+			for my $b (split //, uc $seq) {
+				$cb{$b}++;
+				next unless $BASE{$b};
+				$cgc++  if $GC{$b};
+				$cpur++ if $PURINE{$b};
+				$cn++;
+			}
+			$gc      += $cgc;
+			$pur     += $cpur;
+			$counted += $cn;
+			$nlen    += length $seq;
+			$bases{$_} += $cb{$_} for keys %cb;
+			next unless $store;
+			$c->{base_counts} = \%cb;
+			if ($cn) {
+				$c->{gc_fraction}     = $cgc / $cn;
+				$c->{purine_fraction} = $cpur / $cn;
+			}
+			next;
+		}
+		next unless $type eq 'protein';
+		my ($csum, $cn, $ca) = (0, 0, 0);
+		for my $aa (split //, uc $seq) {
+			$ca++ if $AROMATIC{$aa};
+			next unless exists $KD{$aa};
+			$csum += $KD{$aa};
+			$cn++;
+		}
+		$sum    += $csum;
+		$scored += $cn;
+		$arom   += $ca;
+		$len    += length $seq;
+		next unless $store;
+		$c->{hydropathy}        = $csum / $cn if $cn;
+		$c->{aromatic_fraction} = $ca / length $seq;
+	}
+	$f->{hydropathy}        = $sum / $scored if $scored;
+	$f->{aromatic_fraction} = $arom / $len   if $len;
+	$f->{n_aromatic}        = $arom;
+	$f->{sequence_length}   = $len;
+	# the nucleic half, and only when there is one: a structure with no nucleic
+	# acid in it gets no gc_fraction rather than a zero that would read as a
+	# chain of nothing but A and T
+	if ($nlen) {
+		$f->{gc_fraction}       = $gc / $counted  if $counted;
+		$f->{purine_fraction}   = $pur / $counted if $counted;
+		$f->{n_gc}              = $gc;
+		$f->{nucleotide_length} = $nlen;
+		$f->{base_counts}       = \%bases;
+	}
+	return $f;
+}
+
 # Options and format detection
 
 sub _options {
@@ -315,8 +969,12 @@ sub _options {
 			unless (reftype($o{chains}) || '') eq 'ARRAY';
 		die "$who: chains is empty" unless @{ $o{chains} };
 	}
+	# 0 is a model number and not a mistake: an ensemble numbered from 0 is
+	# unusual and legal, which is why the XS takes a negative number rather than
+	# zero as its "every model" sentinel.  The message said positive and the
+	# test has always accepted 0; it is the message that was wrong.
 	if (defined $o{model} && $o{model} ne 'all') {
-		die "$who: model must be a positive integer or 'all', not '$o{model}'"
+		die "$who: model must be a whole number or 'all', not '$o{model}'"
 			unless $o{model} =~ /\A[0-9]+\z/;
 	}
 	return \%o;
@@ -386,23 +1044,36 @@ sub _slurp_maybe_gzipped {
 			or die "Chem::Structure::Parser: cannot gunzip '$file': "
 			       . do { no warnings 'once'; $IO::Uncompress::Gunzip::GunzipError };
 		my ($text, $buf) = ('', '');
-		while ($z->read($buf, 65536) > 0) {
+		# read() returns 0 at the end of the stream and a negative number on
+		# error, so a `> 0' loop reads a truncated or corrupt archive as a short
+		# file: half of mini.pdb.gz came back as a structure with no atoms in it
+		# and nothing said so.  That is the failure autodie existed to stop, on a
+		# method autodie never covered, so it is checked here.
+		while (1) {
+			my $n = $z->read($buf, 65536);
+			die "Can't read from '$file': '" . $z->error . "'"
+				unless defined $n && $n >= 0;
+			last if $n == 0;
 			$text .= $buf;
 			last if defined $limit && length($text) >= $limit;
 		}
 		$z->close;
 		return $text;
 	}
-	open my $fh, '<:raw', $file;
+	open my $fh, '<:raw', $file
+		or die "Can't open '$file' with mode '<:raw': '$!'";
 	my $text = '';
 	if (defined $limit) {
-		read $fh, $text, $limit;
+		# 0 is a short file rather than a failure, so it is defined() that says
+		# which happened
+		defined(read $fh, $text, $limit)
+			or die "Can't read from '$file': '$!'";
 	} else {
 		local $/;
 		$text = <$fh>;
 		$text = '' unless defined $text;
 	}
-	close $fh;
+	close $fh or die "Can't close '$file': '$!'";
 	return $text;
 }
 
@@ -436,11 +1107,22 @@ sub _read {
 # is MODEL 7, would otherwise come back empty for the default model => 1.  The
 # parse says which model numbers it saw, so ask again for the first real one
 # rather than handing back a structure with no atoms in it.
+#
+# A file with no MODEL records has one model and it is model 1 -- that is what
+# the parse read its atoms under -- so it is the fall-back for that file as
+# model 0 is for the ensemble numbered from 0.  Without it the rule held for an
+# ensemble and not for the crystal structures that are most of the archive:
+# model => 2 of a file with no MODEL records handed back a structure with no
+# atoms and no chains and said nothing, which is the answer this exists to
+# prevent.  Nothing is read twice to get it: the model the caller asked for is
+# already in the list for every file that was emptied by something else -- a
+# chains or waters option, or a file with no coordinates at all -- and those
+# return here untouched.
 sub _retry_model {
 	my ($p, $o, $parse, $src) = @_;
 	return $p if $p->{n_atoms} || $o->{model} eq 'all';
-	my $nums = $p->{model_numbers};
-	return $p unless @$nums && !grep { $_ == $o->{model} } @$nums;
+	my $nums = @{ $p->{model_numbers} } ? $p->{model_numbers} : [ 1 ];
+	return $p if grep { $_ == $o->{model} } @$nums;
 	my $x = _xs_options($o);
 	$x->{model} = $nums->[0];
 	my $q = $parse->($src, $x);
@@ -510,6 +1192,33 @@ sub _build_structure {
 	_finish_chains($info);
 	_chain_stats($info);
 	$info->{id} = _id_from($info, $file);
+
+	# The physical properties, computed on the way past.
+	#
+	# They are on by default because a structure's surface, size and contacts
+	# are as much a part of what it *is* as its sequence, and a caller who has
+	# to know to ask for them mostly does not.  What that costs is real and is
+	# measured in notes.txt: reading a structure goes from about 214,000 atoms a
+	# second to about 19,500, which is eleven times the cost.  Nearly all of it
+	# is the solvent-accessible surface, at 960 sphere points per atom -- with
+	# sasa => 0 the rest together come to 2.7x the read, and interface => 0
+	# alone takes the whole thing from 10.9x to 7.1x.  features => 0 is the way
+	# back to the old speed, and is what to reach for when reading a directory
+	# for its headers or its sequences.
+	#
+	# atoms => 0 turns them off on its own rather than dying: it is the
+	# documented way to read a file for its residues without its coordinates,
+	# structure_sequences() passes it, and a fast path that started dying would
+	# be a worse answer than one that quietly has nothing to compute from.
+	$info->{features} = _all_features($info, 'structure_info')
+		if $o->{features} && $o->{atoms};
+
+	# dssp => 1 lifts the secondary structure roll-up out of the features and
+	# puts it where a caller who wants that and not the rest will look for it.
+	# It is the same hash, not a copy: structure_dssp() hands back the same one.
+	$info->{dssp} = $info->{features}{dssp}
+		if $o->{dssp} && $info->{features};
+
 	return $info;
 }
 
@@ -536,11 +1245,17 @@ sub _assemble {
 
 	for my $r (0 .. $#$rf) {
 		my ($i0, $i1) = ($rf->[$r], $rl->[$r]);
-		my $m   = $model->[$i0];
-		my $cid = $chain->[$i0];
-		my $rn  = $resname->[$i0];
-		my $num = $resseq->[$i0];
-		my $ic  = $icode->[$i0];
+		# Where the residue's identity is.  The parse emits it once per residue
+		# when it is building the atom hashes and once per atom when it is
+		# building columns, because that is the shape each caller is asking for
+		# -- and either way it is read here, at the residue.  The six fields
+		# were a third of everything the parse built; see the note in the XS.
+		my $ri  = $atom_of ? $r : $i0;
+		my $m   = $model->[$ri];
+		my $cid = $chain->[$ri];
+		my $rn  = $resname->[$ri];
+		my $num = $resseq->[$ri];
+		my $ic  = $icode->[$ri];
 		my $key = (defined $num ? $num : '') . $ic;
 
 		my $mm = $by_model{$m} ||= { chains => {}, chain_order => [] };
@@ -574,7 +1289,7 @@ sub _assemble {
 				key        => $key,
 				one        => res1($rn),
 				type       => $type,
-				hetero     => $het->[$i0],
+				hetero     => $het->[$ri],
 				standard   => ($STANDARD{$rn} ? 1 : 0),
 				modified   => (($type eq 'amino_acid' || $type eq 'nucleotide') && !$STANDARD{$rn}) ? 1 : 0,
 				n_atoms    => 0,
@@ -597,7 +1312,7 @@ sub _assemble {
 		$res->{_sb}      += $rsb->[$r] if defined $rsb->[$r];
 		$res->{_nb}      += $rnb->[$r];
 		$c->{n_atoms}    += $n;
-		if ($het->[$i0]) {    # the record type is part of a residue's identity
+		if ($het->[$ri]) {    # the record type is part of a residue's identity
 			$c->{n_hetatm} += $n;
 			$st->{n_hetatm} += $n;
 		}
@@ -736,7 +1451,7 @@ sub _finish_chains {
 			# coordinates alone, so a chain answers the same whether it was
 			# read from a PDB file or an mmCIF one and whether or not the
 			# headers were parsed.
-			my (@gaps, @missing, %numbered);
+			my (@gaps, %missing, %numbered);
 			my @nums = grep { defined } map { $_->{number} } @poly;
 			$numbered{$_} = 1 for @nums;
 			my $budget = @nums ? $nums[-1] - $nums[0] + 1 - keys %numbered : 0;
@@ -746,15 +1461,20 @@ sub _finish_chains {
 				my $n = $b->{number} - $a->{number} - 1;
 				next if $n < 1 || $n > $budget;
 				push @gaps, { after => $a->{key}, before => $b->{key}, missing => $n };
-				push @missing, ($a->{number} + 1) .. ($b->{number} - 1);
+				# the numbers the jump passes over, less any the chain turns out
+				# to have after all.  A polymer numbered out of order -- the
+				# same thing the budget above is for -- has jumps that overlap
+				# each other and jumps that pass over a residue further down the
+				# list, and a set rather than a list is what keeps "is 47
+				# modelled?" answerable: no number appears twice and no number
+				# appears that the chain has.
+				$missing{$_} = 1
+					for grep { !$numbered{$_} } ($a->{number} + 1) .. ($b->{number} - 1);
 			}
-			# a residue numbered out of line with the rest can leave the list
-			# out of order, and ascending is the whole use of it
-			@missing = sort { $a <=> $b } @missing
-				if grep { $missing[$_] < $missing[ $_ - 1 ] } 1 .. $#missing;
 			$c->{gaps}             = \@gaps;
 			$c->{n_gaps}           = scalar @gaps;
-			$c->{missing_residues} = \@missing;
+			# ascending, and numbers rather than the strings a hash key is
+			$c->{missing_residues} = [ map { $_ + 0 } sort { $a <=> $b } keys %missing ];
 		}
 	}
 	return $info;
@@ -1660,9 +2380,20 @@ sub _c {
 	return $s;
 }
 
+# _n($field) -- a numeric field as a number, or undef where it is not one.
+#
+# The pattern spells a number rather than "digits and dots", which is what it
+# used to say: [\d.]+ also matches '1.2.3' and a lone '.', neither of which is
+# something Perl will add.  Under warnings FATAL => 'all' that is not a wrong
+# answer but a dead read -- a CRYST1 whose cell edge is written '1.2.3' took
+# the whole structure down with "Argument isn't numeric in addition".  Fields
+# of that shape are in the archive: 5m04 writes its pH as '5.4.-5.8'.  A field
+# that is not a number is now the undef it always meant.  '1.' and '.5' still
+# read as numbers, as they always did and as Perl does.
 sub _n {
 	my $v = _t($_[0]);
-	return $v =~ /\A[-+]?[\d.]+(?:[eE][-+]?\d+)?\z/ ? $v + 0 : undef;
+	return $v =~ /\A[-+]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][-+]?[0-9]+)?\z/
+	     ? $v + 0 : undef;
 }
 
 # continuation records: text from column $from on, glued back together.  A
@@ -1754,7 +2485,9 @@ sub _pod_sections {
 	# any other, which listed the version number among the documented functions
 	# until this filtered on the export list.
 	my %exported = map { $_ => 1 } @EXPORT_OK;
-	open my $fh, '<', __FILE__;
+	my $self = __FILE__;
+	open my $fh, '<', $self
+		or die "Can't open '$self' with mode '<': '$!'";
 	my ($in, $name);
 	while (my $l = <$fh>) {
 		if ($l =~ /\A=head2\s+(\S+)/) {
@@ -1775,7 +2508,7 @@ sub _pod_sections {
 		}
 		$sec{$name} .= $l if $in && defined $name;
 	}
-	close $fh;
+	close $fh or die "Can't close '$self': '$!'";
 	s/\A\n+//, s/\n+\z/\n/ for values %sec;
 	return \%sec;
 }
@@ -1827,9 +2560,52 @@ which prints
                PKFTKCRSPERETFSCHWTLGPIQLFYTRRNTQEWTQEWKECPDYVSAGENSCYFNSSFTS...
                GROWTH HORMONE RECEPTOR
 
+What the structure I<is> comes back the same way, in one more call:
+
+ my $f = structure_features($info);
+
+ print $f->{sasa}{total};          # 17805.0  solvent-accessible surface, A^2
+ print $f->{rg};                   # 22.85    radius of gyration, A
+ print $f->{mass};                 # 41307.1  dalton
+ print $f->{hydropathy};           # -0.452   mean Kyte-Doolittle hydropathy
+ print $f->{aromatic_fraction};    # 0.1263   the F, W and Y share of the sequence
+ print scalar @{ $f->{pi_stacking} };  # 2    stacked pairs of aromatic rings
+
+ print $info->{chains}{A}{residues}{54}{rsa};   # 0.103  PHE 54 is mostly buried
+ print $info->{chains}{A}{residues}{54}{ss};    # 'G'    and it is in a 3-10 helix
+
+which is the Shrake-Rupley surface, the ring geometry, the radii and the masses
+as mdtraj implements them and the two sequence indices as Biopython does. All of
+it is in C, for the same reason the parse is.
+
+The secondary structure comes back the other way round as well, which is the
+shape to take a whole fold in at once:
+
+ my $dssp = structure_info('1a22.ent.pdb', 'dssp');
+
+ print scalar @{ $dssp->{A}{H} };   # 122   residues of chain A in alpha helix
+ print scalar @{ $dssp->{B}{E} };   # 90    and of chain B in a strand
+
+Chain, then DSSP letter, then where in that chain those residues are. It is
+mdtraj's C<compute_dssp()> letter for letter — see C<structure_dssp>.
+
+Two copies of a molecule are compared in one call, and an NMR ensemble is
+compared against itself in the same one:
+
+ my $d = structure_rmsd('before.pdb', 'after.cif');   # 1.83   angstrom
+
+ my $r = structure_rmsd('2ll7.ent.pdb', model => 'all');
+ print scalar @{ $r->{labels} };      # 20   models, compared with each other
+ printf '%.2f', $r->{rmsd}[0][1];     # 3.61 A between models 1 and 2
+
+Atoms are paired on the identity the file gives them and the superposition is
+Theobald's quaternion characteristic polynomial, which agrees with gemmi's
+C<superpose_positions> to 5.65e-12 over 5,598 real superpositions — see
+C<structure_rmsd>.
+
 The coordinate section is parsed in C, because across a directory of
 structures it is millions of lines: the largest entry in PDBbind v2020 is
-33 MB and 411,648 atom records, and it reads in about 1.5 seconds. The header
+33 MB and 411,648 atom records, and it reads in about a second. The header
 records are parsed in Perl, because they are irregular and there are only a
 few dozen of them in a file.
 
@@ -2050,11 +2826,20 @@ C<res_type()> before C<h> is ever reached. Use one of the three forms above.
 =head2 structure_info
 
  my $info = structure_info($file, %options);
+ my $dssp = structure_info($file, 'dssp', %options);
 
 Reads C<$file> and returns a hash reference. The format is worked out from the
 file name — C<.pdb>, C<.ent>, C<.cif>, C<.mmcif>, C<.pdbx> — and from the first
 records in the file when the name gives nothing away. C<.gz> files are read as
 they are, without unpacking to a temporary file.
+
+A plain string in second place names a I<view>, and asks for that and nothing
+else: the file is read, the view is taken out of it, and the rest is thrown
+away. There is one view today, C<dssp> — see C<structure_dssp> below — and the
+options that follow are the reader's, the same ones the first form takes. The
+two forms cannot be confused with one another: a file name followed by an even
+number of arguments is an option list with an odd number of elements, which was
+never anything but a mistake.
 
 =head3 What comes back
 
@@ -2359,11 +3144,16 @@ that goes unnoticed until the ten-thousandth file.
  hetatm    => 1          keep HETATM records
  atoms     => 1          build the atom hashes; 0 stops at the residue
                          level, which is much smaller and faster
+ features  => 1          compute the physical properties, into
+                         {features} and onto the chains, residues and
+                         atoms; see structure_features below
  meta      => 1          parse the header records
  anisou    => 0          keep ANISOU lines
  chains    => ['A','B']  read only these chains
  format    => 'pdb'      skip the format detection: 'pdb' or 'mmcif'
                          ('cif', 'pdbx' and 'ent' name the same two)
+ dssp      => 0          also leave the secondary structure roll-up at
+                         {dssp}, where structure_dssp() would find it
 
 Every option is checked. A misspelled one is fatal, because an ignored typo is
 a wrong answer that arrives without a word: C<< hydrogen =E<gt> 0 >> that is quietly
@@ -2373,9 +3163,34 @@ For a very large structure the options are the difference between a hash of
 hashes that fits in memory and one that does not. The largest entry in PDBbind
 v2020 is 2wy2: 33 MB, 64 models, 411,648 atom records.
 
- structure_info($f)                # model 1 only    50 MB    0.07 s
- structure_info($f, model => 'all')                 711 MB    1.4 s
- structure_info($f, model => 'all', atoms => 0)     418 MB    0.9 s
+ structure_info($f)                # model 1 only    47 MB    0.20 s
+ structure_info($f, model => 'all')                 514 MB    1.06 s
+ structure_info($f, model => 'all', atoms => 0)     408 MB    0.74 s
+
+The chains are built from one model whichever of those is asked for — C<models>
+is the rest of them — so the physical properties in the first two rows cost the
+same, and the third has none to compute.
+
+C<features> is the expensive one, and it is on by default because a structure's
+surface, size and contacts are as much a part of what it is as its sequence, and
+a caller who has to know to ask mostly does not. What it costs is measured, over
+60 structures of PDBbind:
+
+ structure_info($f, features => 0)         1.30 s   246,000 atoms/s
+ structure_info($f)                       10.77 s    29,700 atoms/s    8.3x
+ ... with interface => 0                  10.02 s    32,000 atoms/s    7.7x
+ ... with sasa => 0                        3.80 s    84,000 atoms/s    2.9x
+
+Nearly all of it is the solvent-accessible surface, at 960 sphere points per
+atom; everything else together is 2.9 times the read. C<< interface =E<gt> 0 >> drops the
+per-chain surfaces, which is a fourteenth of the whole: an atom with no
+neighbour outside its own chain has the same surface alone as it has in the
+structure, and only the ones that do have such a neighbour are computed twice.
+
+C<< features =E<gt> 0 >> is what to reach for when reading a directory for its headers or
+its sequences. C<< atoms =E<gt> 0 >> turns them off on its own — there are no coordinates
+to compute from — rather than dying, so C<< structure_sequences($f, atoms =E<gt> 0) >>
+still works.
 
 Filtering happens in the C, before a hydrogen or a water has become a Perl
 value, so C<< hydrogens =E<gt> 0 >> is cheaper than reading them and throwing them away.
@@ -2386,22 +3201,6 @@ file has -- every ATOM and HETATM record, every model, before any option had a
 say -- and C<total_atoms == n_atoms + n_skipped> however the options were set.
 2wy2 above, read with the default C<< model =E<gt> 1 >>, gives C<n_atoms> 6,432 and
 C<total_atoms> 411,648.
-
-=head2 pdb_info
-
- my $info = pdb_info($file, %options);
-
-C<structure_info()> with the format settled in advance. Use it when the file is
-known to be a PDB whatever it happens to be called.
-
-Telling it wrongly reads no atoms rather than dying, which is what forcing a
-format means; C<structure_info()> looks at the file and is the usual way in.
-
-=head2 cif_info
-
- my $info = cif_info($file, %options);
-
-The same for mmCIF/PDBx.
 
 =head2 structure_info_string
 
@@ -2515,6 +3314,1567 @@ C<seqres> is what SEQRES says was in the crystal.
 A paragraph a person can read: id, title, method, resolution, models, atom
 counts, and a line per chain with its type, size, sequence and molecule. The
 example at the top of this document is its output.
+
+=head2 structure_features
+
+ my $f = $info->{features};        # structure_info computed them already
+ my $g = structure_features($info);   # the same hash, not a second walk
+
+ $f->{sasa}{total};        # 17805.0   solvent-accessible surface, A^2
+ $f->{sasa}{apolar};       # 8211.8    the carbon and sulphur part of it
+ $f->{rg};                 # 22.85     radius of gyration, A
+ $f->{rg_mass};            # 22.84     the same, weighted by mass
+ $f->{mass};               # 41307.1   dalton
+ $f->{hydropathy};         # -0.452    mean Kyte-Doolittle over the sequence
+ $f->{aromatic_fraction};  # 0.1263    the F, W and Y share of it
+ @{ $f->{pi_stacking} };   # the stacked pairs of aromatic rings
+ @{ $f->{disulfides} };    # the SG-SG pairs close enough to be bonded
+ @{ $f->{base_pairs} };    # the Watson-Crick and wobble base pairs
+
+(1a22 again, the structure the summary at the top of this document is of.)
+
+Everything the module can work out about a structure that is a number rather
+than a name. One call, because all of it has to touch every atom and the
+expensive part is walking the structure into coordinate arrays: asking for all
+of it costs one walk.
+
+C<structure_info()> makes that call on the way past and leaves the answer in
+C<< $info-E<gt>{features} >>, so most callers never name this function at all. With no
+options it is a lookup — it hands back what is already there. Name any option
+and it walks the structure again with that option in force. C<< features =E<gt> 0 >> on
+the read is how to skip the work; see C<structure_info>'s options above.
+
+The whole-structure figures come back in the hash. What is per-atom, per-residue
+or per-chain is written into C<$info> instead, where the atom, residue and chain
+already are:
+
+ $info->{chains}{A}{sasa};                          # 8450.6   the chain's surface
+ $info->{chains}{A}{hydropathy};                    # -0.3144  and its mean hydropathy
+ $info->{chains}{A}{aromatic_fraction};             # 0.1222
+ $info->{chains}{A}{residues}{54}{sasa};            # 24.62    one residue's surface
+ $info->{chains}{A}{residues}{54}{rsa};             # 0.103    ... as a fraction of its maximum
+ $info->{chains}{A}{residues}{54}{atoms}{CZ}{sasa}; # one atom's
+
+ $info->{chains}{A}{buried};                        # 1445.0   what it buries
+ $info->{chains}{A}{residues}{54}{phi};             # -127.6   degrees
+ $info->{chains}{A}{residues}{54}{psi};             #   20.5
+ $info->{chains}{A}{residues}{54}{chi};             # [ -60.6, -82.9 ]
+ $info->{chains}{A}{torsions}{phi};                 # every phi of the chain,
+                                                    # by residue_order
+ $info->{chains}{A}{residues}{54}{ss};              # 'G'      or H I E B T S ' '
+ $info->{chains}{A}{residues}{54}{ss_simple};       # 'H'      or E or C
+ $info->{chains}{A}{residues}{54}{hse_up};          # 12       half-sphere exposure
+ $info->{chains}{A}{residues}{54}{n_contacts};      # 13
+ $info->{chains}{A}{residues}{23}{disulfide};       # [ { chain, residue, distance } ]
+
+A nucleic acid chain answers a different set of the same questions, and 1bna —
+the Drew-Dickerson dodecamer, which is where B-DNA is usually quoted from — is
+what these are of:
+
+ $info->{chains}{A}{gc_fraction};                   # 0.6667   the C and G share of the strand
+ $info->{chains}{A}{purine_fraction};               # 0.5      ... and the A and G share
+ $info->{chains}{A}{base_counts};                   # { A => 2, C => 4, G => 4, T => 2 }
+ $info->{chains}{A}{residues}{6}{alpha};            # -73.3    degrees; and beta 179.7,
+ $info->{chains}{A}{residues}{6}{delta};            # 121.1    gamma 66.0, epsilon 173.7,
+ $info->{chains}{A}{residues}{6}{zeta};             # -88.5    the six backbone torsions
+ $info->{chains}{A}{residues}{6}{chi};              # -122.2   the glycosidic torsion
+ $info->{chains}{A}{residues}{6}{glycosidic};       # 'anti'   or 'syn'
+ $info->{chains}{A}{residues}{6}{nu};               # [ -48.1, 47.5, -29.9, 2.2, 29.0 ]
+ $info->{chains}{A}{residues}{6}{pucker};           # "C1'-exo"  which shape those make it
+ $info->{chains}{A}{residues}{6}{pucker_phase};     # 126.9    degrees, 0 to 360
+ $info->{chains}{A}{residues}{6}{pucker_amplitude}; # 49.8     how far from flat
+
+C<< store =E<gt> 0 >> turns that off and leaves C<$info> exactly as it was; the totals
+still come back. Asking twice replaces what was stored rather than adding to it,
+so a second call with a different probe radius leaves the second answer behind.
+
+Three of the properties are I<only> per-residue — the torsion angles (both
+kinds), the half-sphere exposure and the secondary structure — so C<< store =E<gt> 0 >>
+does not compute them at all rather than computing them and dropping them on the
+floor.
+C<structure_info()> always stores, so this is only reachable by calling
+C<structure_features()> yourself.
+
+=head3 What comes back
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>key</th>
+  <th>what it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>n_atoms</code></td>
+  <td>atoms the walk found: the ones in <code>$info</code>, after whatever <code>structure_info()</code> was told to leave out</td>
+</tr>
+<tr>
+  <td><code>n_residues</code>, <code>n_chains</code></td>
+  <td>and how they were grouped</td>
+</tr>
+<tr>
+  <td><code>n_no_element</code></td>
+  <td>atoms whose element field spells no element this module knows; they get a 2.0 A radius and no mass</td>
+</tr>
+<tr>
+  <td><code>sasa</code></td>
+  <td><code>total</code>, <code>apolar</code>, <code>polar</code>, and the <code>probe</code> and <code>points</code> used</td>
+</tr>
+<tr>
+  <td><code>mass</code></td>
+  <td>the sum of the atoms' standard atomic weights, in dalton</td>
+</tr>
+<tr>
+  <td><code>rg</code></td>
+  <td>radius of gyration about the centroid, in angstrom</td>
+</tr>
+<tr>
+  <td><code>rg_mass</code></td>
+  <td>the same, weighted by mass and taken about the centre of mass</td>
+</tr>
+<tr>
+  <td><code>center</code>, <code>center_of_mass</code></td>
+  <td><code>[x, y, z]</code>, in angstrom</td>
+</tr>
+<tr>
+  <td><code>hydropathy</code></td>
+  <td>the mean Kyte-Doolittle index over the protein chains' observed sequences</td>
+</tr>
+<tr>
+  <td><code>aromatic_fraction</code>, <code>n_aromatic</code></td>
+  <td>how much of that sequence is phenylalanine, tryptophan or tyrosine</td>
+</tr>
+<tr>
+  <td><code>sequence_length</code></td>
+  <td>how long the sequence those two are over is</td>
+</tr>
+<tr>
+  <td><code>gc_fraction</code></td>
+  <td>the C and G share of the nucleic acid chains' observed sequences</td>
+</tr>
+<tr>
+  <td><code>purine_fraction</code>, <code>n_gc</code></td>
+  <td>the A and G share of the same, and how many bases the first counted</td>
+</tr>
+<tr>
+  <td><code>nucleotide_length</code></td>
+  <td>how long the sequence those are over is</td>
+</tr>
+<tr>
+  <td><code>base_counts</code></td>
+  <td>every letter of it tallied, ambiguous ones included</td>
+</tr>
+<tr>
+  <td><code>pi_stacking</code></td>
+  <td>the arrayref <code>structure_pi_stacking()</code> returns</td>
+</tr>
+<tr>
+  <td><code>disulfides</code></td>
+  <td>the arrayref <code>structure_disulfides()</code> returns</td>
+</tr>
+<tr>
+  <td><code>base_pairs</code></td>
+  <td>the arrayref <code>structure_base_pairs()</code> returns</td>
+</tr>
+<tr>
+  <td><code>base_stacks</code></td>
+  <td>the arrayref <code>structure_base_stacks()</code> returns</td>
+</tr>
+<tr>
+  <td><code>contacts</code></td>
+  <td>the arrayref <code>structure_contacts()</code> returns</td>
+</tr>
+<tr>
+  <td><code>hbonds</code></td>
+  <td>the arrayref <code>structure_hbonds()</code> returns</td>
+</tr>
+<tr>
+  <td><code>dssp</code></td>
+  <td>the hashref <code>structure_dssp()</code> returns</td>
+</tr>
+<tr>
+  <td><code>shape</code></td>
+  <td><code>gyration_tensor</code>, <code>principal_moments</code>, <code>asphericity</code>, <code>acylindricity</code>, <code>anisotropy</code></td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+C<rg>, C<center> and C<center_of_mass> are absent from a structure with no atoms in
+it, and C<rg_mass> and C<center_of_mass> from one whose atoms have no mass between
+them, because there is no such number rather than because it is zero. The same
+goes for C<hydropathy> and C<aromatic_fraction> when there is no protein, and for
+C<gc_fraction> and the three keys beside it when there is no nucleic acid.
+
+The surface is of the structure as C<$info> holds it. Reading with C<< waters =E<gt> 0 >>
+and asking for the surface afterwards gives the surface of a protein with no
+water in the way, which is a different — and usually more useful — number than
+the surface of the file. C<< hydrogens =E<gt> 0 >> likewise: crystallographic structures
+mostly have no hydrogens to begin with, and one that does will give a smaller
+surface than its neighbours in the archive unless they are taken out.
+
+=head3 Options
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>option</th>
+  <th>default</th>
+  <th>what it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>sasa</code></td>
+  <td>1</td>
+  <td>compute the solvent-accessible surface</td>
+</tr>
+<tr>
+  <td><code>pi_stacking</code></td>
+  <td>1</td>
+  <td>look for stacked aromatic rings</td>
+</tr>
+<tr>
+  <td><code>disulfides</code></td>
+  <td>1</td>
+  <td>look for SG-SG pairs close enough to be bonded</td>
+</tr>
+<tr>
+  <td><code>base_pairs</code></td>
+  <td>1</td>
+  <td>look for Watson-Crick and wobble base pairs</td>
+</tr>
+<tr>
+  <td><code>base_stacks</code></td>
+  <td>1</td>
+  <td>score how far every nearby pair of bases is stacked</td>
+</tr>
+<tr>
+  <td><code>interface</code></td>
+  <td>1</td>
+  <td>also run the surface on each chain alone, for the buried area</td>
+</tr>
+<tr>
+  <td><code>shape</code></td>
+  <td>1</td>
+  <td>the gyration tensor and the descriptors built from it</td>
+</tr>
+<tr>
+  <td><code>dihedrals</code></td>
+  <td>1</td>
+  <td>phi, psi, omega and chi1-chi5 on an amino acid, alpha to zeta, chi and the pucker on a nucleotide, onto each residue and, as one array per angle, onto each chain</td>
+</tr>
+<tr>
+  <td><code>contacts</code></td>
+  <td>1</td>
+  <td>which residues touch which</td>
+</tr>
+<tr>
+  <td><code>exposure</code></td>
+  <td>1</td>
+  <td>half-sphere exposure, onto each amino acid residue</td>
+</tr>
+<tr>
+  <td><code>hbonds</code></td>
+  <td>1</td>
+  <td>backbone hydrogen bonds, by Kabsch and Sander's energy</td>
+</tr>
+<tr>
+  <td><code>secondary</code></td>
+  <td>1</td>
+  <td>secondary structure, onto each residue and as the <code>dssp</code> roll-up</td>
+</tr>
+<tr>
+  <td><code>store</code></td>
+  <td>1</td>
+  <td>write the per-atom, per-residue and per-chain figures into <code>$info</code></td>
+</tr>
+<tr>
+  <td><code>probe</code></td>
+  <td>1.4</td>
+  <td>solvent probe radius, angstrom</td>
+</tr>
+<tr>
+  <td><code>points</code></td>
+  <td>960</td>
+  <td>sphere points per atom, from 1 to 10,000,000</td>
+</tr>
+<tr>
+  <td><code>face_distance</code></td>
+  <td>5.5</td>
+  <td>face-to-face: the largest centroid separation, angstrom</td>
+</tr>
+<tr>
+  <td><code>face_plane_min</code>, <code>face_plane_max</code></td>
+  <td>0, 35</td>
+  <td>... and the angle between the ring planes, degrees</td>
+</tr>
+<tr>
+  <td><code>face_normal_min</code>, <code>face_normal_max</code></td>
+  <td>0, 33</td>
+  <td>... and between a ring's normal and the line joining the centroids</td>
+</tr>
+<tr>
+  <td><code>edge_distance</code></td>
+  <td>6.5</td>
+  <td>edge-to-face: the largest centroid separation, angstrom</td>
+</tr>
+<tr>
+  <td><code>edge_plane_min</code>, <code>edge_plane_max</code></td>
+  <td>50, 90</td>
+  <td>... and the angle between the ring planes</td>
+</tr>
+<tr>
+  <td><code>edge_normal_min</code>, <code>edge_normal_max</code></td>
+  <td>0, 30</td>
+  <td>... and between a normal and the centroid line</td>
+</tr>
+<tr>
+  <td><code>edge_radius</code></td>
+  <td>1.5</td>
+  <td>... and how close to a centroid the two planes' shared line must pass</td>
+</tr>
+<tr>
+  <td><code>disulfide_distance</code></td>
+  <td>3.0</td>
+  <td>the largest SG-SG separation that counts as a bond, angstrom</td>
+</tr>
+<tr>
+  <td><code>peptide_bond</code></td>
+  <td>1.8</td>
+  <td>the largest C-to-N separation that still joins two residues, angstrom</td>
+</tr>
+<tr>
+  <td><code>phosphodiester_bond</code></td>
+  <td>2.4</td>
+  <td>the same for the O3'-to-P separation of two nucleotides</td>
+</tr>
+<tr>
+  <td><code>base_pair_hbond</code></td>
+  <td>3.5</td>
+  <td>the longest hydrogen bond a base pair may have, angstrom</td>
+</tr>
+<tr>
+  <td><code>base_pair_stagger</code></td>
+  <td>2.6</td>
+  <td>and the furthest one base may sit out of the other's plane</td>
+</tr>
+<tr>
+  <td><code>base_stack_distance</code></td>
+  <td>5.0</td>
+  <td>the furthest apart two stacked bases' centres of mass may be, angstrom</td>
+</tr>
+<tr>
+  <td><code>base_stack_omega</code></td>
+  <td>50</td>
+  <td>and the largest overlap angle that is still a stack, degrees</td>
+</tr>
+<tr>
+  <td><code>contact_distance</code></td>
+  <td>4.5</td>
+  <td>the largest heavy-atom separation that counts as a contact, angstrom</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+A structure read with C<< atoms =E<gt> 0 >> has no coordinates to work from, and saying
+so is more use than reporting no surface:
+
+ my $info = structure_info('1ubq.pdb', atoms => 0);
+ structure_features($info);
+ # dies: this structure has no atom hashes to work from;
+ #       read it again without atoms => 0
+
+=head3 Shape, and what the chains bury
+
+C<< $f-E<gt>{shape} >> is the gyration tensor and the three numbers built from its
+eigenvalues, which are mdtraj's C<geometry/shape.py>:
+
+ $f->{shape}{principal_moments};   # [ 74.1, 92.6, 132.1 ]  A^2, ascending
+ $f->{shape}{asphericity};         # 41.84   how far from a sphere
+ $f->{shape}{acylindricity};       # 21.10   how far from a cylinder
+ $f->{shape}{anisotropy};          # 0.0233  0 for a sphere, 1 for a line
+
+The three moments sum to C<rg> squared, which is the same sum read two ways.
+
+C<< $f-E<gt>{sasa}{buried} >> is what the chains bury against each other — the surface
+they have apart, less the surface they have together — and each chain carries
+C<sasa_alone> and C<buried> of its own. A two-body interface is usually quoted as
+half of the total, because the area is counted once on each side of it.
+
+ $f->{sasa}{buried} / 2;              # 1471.2 A^2 of interface
+ $info->{chains}{A}{buried};          # 1445.0 A^2, chain A's side of it
+
+It costs one more surface calculation per chain, and a chain's calculation
+touches only that chain's atoms, so all of them together cost about what the
+first one cost rather than the number of chains times it. C<< interface =E<gt> 0 >> turns
+it off.
+
+=head3 Torsion angles
+
+On each amino acid residue: C<phi>, C<psi> and C<omega>, in degrees, and C<chi> as a
+list of chi1 upwards — mdtraj's C<compute_phi>, C<compute_psi>, C<compute_omega> and
+C<compute_chi1> through C<compute_chi5>.
+
+An angle that would be measured across a chain break is not reported: the two
+residues must be peptide-bonded first, at Biopython's C<PPBuilder> radius of
+1.8 Å. mdtraj takes the residue before this one to be whichever came before it
+in the file and computes a phi across whatever gap is there, which is a number
+rather than an answer. Four collinear atoms get no angle either, for the same
+reason.
+
+C<omega> near zero is a cis peptide bond, which C<< $info-E<gt>{cispep} >> is the
+depositor's own record of — two answers to one question, as with the disulfides.
+
+=head3 The same angles, by chain
+
+Every angle written onto a residue is also gathered onto its chain, one array
+per torsion, which is the form a Ramachandran plot or a rotamer census wants:
+
+ my $t = $info->{chains}{A}{torsions};
+ $t->{phi};       # [ undef, -64.2, -175.0, -127.6, ... ]
+ $t->{psi};       # [ -167.5, 158.8, -149.5, 20.5, ... ]
+ $t->{omega};     # [ -167.3, 177.7, -176.3, -177.5, ... ]
+ $t->{chi};       # [ [ -132.6, -44.5 ], [ 79.3, -89.7 ], undef, ... ]
+
+Each array is parallel to the chain's C<residue_order>, one element per residue,
+so C<< $t-E<gt>{phi}[$i] >> and C<< $info-E<gt>{chains}{A}{residues}{ $c-E<gt>{residue_order}[$i] } >>
+are the same residue. A residue that has no such torsion — the first of a chain
+has no C<phi>, glycine no C<chi> — holds an C<undef> there rather than being left
+out: the position is what says which residue a value came from.
+
+A key no residue in the chain has at all is absent instead, so a protein chain
+carries C<phi>, C<psi>, C<omega> and C<chi>, a nucleic acid one C<alpha> through
+C<zeta> and the pucker, and neither carries a dozen arrays of nothing. The
+elements are copies, except that C<chi> and C<nu> are the residue's own lists
+named a second time.
+
+It is the same option as the angles themselves: C<< dihedrals =E<gt> 0 >> leaves the
+C<torsions> hash off with them, and so does C<< store =E<gt> 0 >>.
+
+A nucleotide gets a different set of torsions from the same option; they are
+below.
+
+=head3 Nucleic acid torsions, and the sugar pucker
+
+The same block answers the nucleic acid question, because a residue is one kind
+or the other and both want the same walk. On every nucleotide, in degrees:
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>key</th>
+  <th>what it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>alpha</code></td>
+  <td>O3' of the residue before, then P, O5', C5'</td>
+</tr>
+<tr>
+  <td><code>beta</code></td>
+  <td>P, O5', C5', C4'</td>
+</tr>
+<tr>
+  <td><code>gamma</code></td>
+  <td>O5', C5', C4', C3'</td>
+</tr>
+<tr>
+  <td><code>delta</code></td>
+  <td>C5', C4', C3', O3'</td>
+</tr>
+<tr>
+  <td><code>epsilon</code></td>
+  <td>C4', C3', O3', then P of the residue after</td>
+</tr>
+<tr>
+  <td><code>zeta</code></td>
+  <td>C3', O3', then P and O5' of the residue after</td>
+</tr>
+<tr>
+  <td><code>chi</code></td>
+  <td>O4', C1', then N9 and C4 of a purine or N1 and C2 of a pyrimidine</td>
+</tr>
+<tr>
+  <td><code>nu</code></td>
+  <td>the five torsions of the sugar ring itself, nu0 to nu4</td>
+</tr>
+<tr>
+  <td><code>pucker_phase</code></td>
+  <td>the pseudorotation phase angle, 0 to 360</td>
+</tr>
+<tr>
+  <td><code>pucker_amplitude</code></td>
+  <td>how far the ring is from flat</td>
+</tr>
+<tr>
+  <td><code>pucker</code></td>
+  <td>which of the ten envelope shapes that phase names</td>
+</tr>
+<tr>
+  <td><code>glycosidic</code></td>
+  <td><code>anti</code> or <code>syn</code></td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+The names and the atoms are the IUPAC-IUB Joint Commission on Biochemical
+Nomenclature's (1983) I<Abbreviations and symbols for the description of
+conformations of polynucleotide chains>. C<chi> is the same key an amino acid's
+side chain torsions come back under and no residue has both — an amino acid has
+no C1' and a nucleotide has no CB — but an amino acid's is a list of up to five
+and a nucleotide's is one number.
+
+C<alpha>, C<epsilon> and C<zeta> each span two residues and are not reported across
+a chain break, the way C<phi> and C<psi> are not: the two nucleotides must be
+joined by a phosphodiester bond first, which is gemmi's test — an O3'-to-P
+separation under 1.5 times the 1.6 Å ideal bond.
+
+The pucker is Altona and Sundaralingam (1972) I<J Am Chem Soc> 94(23):8205-12,
+which describes the ring with two numbers instead of five on the observation
+that the five C<nu> are one sinusoid sampled at five points. It is the number
+that tells the two helices apart, and it does so out loud: every ribose of
+C<t/data/rna.pdb>, six nucleotides of a real rRNA hairpin, is C3'-endo, and every
+deoxyribose of C<t/data/duplex.pdb>, four base pairs of the Drew-Dickerson
+dodecamer, is in the southern half of the cycle where C2'-endo is.
+
+ C3'-endo    0-36     C4'-exo    36-72    O4'-endo   72-108
+ C1'-exo   108-144    C2'-endo  144-180   C3'-exo   180-216
+ C4'-endo  216-252    O4'-exo   252-288   C1'-endo  288-324
+ C2'-exo   324-360
+
+C<glycosidic> bisects C<chi> at 90° either side of zero, which is Saenger's
+division and what DSSR reports. It has two names and no third, so the band
+around -90° that the literature calls high-anti comes back as C<syn>; C<chi>
+itself is beside it for a caller who wants to say so.
+
+Which bases are paired is a separate question and a separate answer;
+C<structure_base_pairs> below has it.
+
+=head3 Half-sphere exposure
+
+C<hse_up> and C<hse_down> on each residue: the CA atoms of other residues within
+12 Å, split by which side of the plane through this residue's CA they fall —
+C<hse_up> towards the side chain. It says something the accessible surface does
+not, because a residue can be buried and still have its side chain pointing into
+a cavity. This is Biopython's C<Bio.PDB.HSExposure.HSExposureCB>, and the two
+agree exactly.
+
+Only the twenty standard amino acids, because Biopython's is built on
+C<CaPPBuilder> with C<aa_only>, so a selenomethionine is invisible to it — it
+neither gets a figure nor counts towards anybody else's. Glycine gets the
+virtual CB Biopython builds for it.
+
+=head2 structure_sasa
+
+ my $s = structure_sasa($info);
+ $s->{total};                                # 17805.0 A^2
+ $info->{chains}{A}{residues}{54}{rsa};      # 0.103 -- mostly buried
+
+ my $vdw = structure_sasa($info, probe => 0);   # the van der Waals surface
+ my $fast = structure_sasa($info, points => 100);
+
+The solvent-accessible surface and nothing else: the same calculation
+C<structure_features()> runs, without the ring geometry. It returns the C<sasa>
+hash and writes the per-atom, per-residue and per-chain surfaces into C<$info>
+the same way. C<store>, C<probe> and C<points> are the options it takes.
+
+A water molecule is a sphere about 1.4 A across, which is where the default
+probe comes from; rolling a larger one gives a larger surface, because it cannot
+reach into the dips. C<< probe =E<gt> 0 >> gives the van der Waals surface, which is the
+smallest of them.
+
+C<points> is accuracy against time. The area of an atom is 4*pi*r^2 times the
+share of its sphere points no neighbour covers, so one point is worth about
+0.13 A^2 for a carbon at 960 points and ten times that at 96; the whole surface
+of a small protein moves by well under a percent between the two, and any single
+atom can move by rather more.
+
+=head3 Relative accessibility
+
+C<rsa> is a residue's surface as a fraction of the most it could have — the
+number the buried-or-exposed question is actually asked of, since 130 A^2 is
+most of an alanine and a sliver of a tryptophan. It is on every amino acid
+residue and on nothing else: the single-letter codes of the nucleotides are
+amino acid codes too, and a guanine divided by glycine's maximum would be a
+number rather than an answer.
+
+A residue can come out above 1. The maxima are of a Gly-X-Gly tripeptide
+stretched out, and a residue at the end of a chain with nothing next to it can
+beat that.
+
+C<apolar> is the part of the surface belonging to carbon and sulphur atoms and
+C<polar> is everything else, which is the split Chothia made when he first added
+a protein's buried surface up. Only the element symbol decides it, so a sulphur
+in a sulphate counts as apolar; the per-atom figures are there for anyone who
+wants a chemistry-aware split.
+
+=head2 structure_pi_stacking
+
+ for my $s (@{ structure_pi_stacking($info) }) {
+     printf "%s %s%s %s and %s %s%s %s are %s stacked, %.2f A apart\n",
+         $s->{chain1}, $s->{resname1}, $s->{residue1}, $s->{ring1},
+         $s->{chain2}, $s->{resname2}, $s->{residue2}, $s->{ring2},
+         $s->{type}, $s->{distance};
+ }
+ # A TRP5 6 and A HIS64 5 are face stacked, 3.70 A apart
+ # A PHE66 6 and A PHE226 6 are edge stacked, 5.36 A apart
+
+Every pair of aromatic rings in the structure that is stacked on the other, as
+an arrayref of hashes. Two arrangements count, and they are the two ProLIF and
+mdtraj look for: I<face>, two rings lying flat on each other, and I<edge>, one
+ring pointing its edge at the other's face.
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>key</th>
+  <th>what it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>type</code></td>
+  <td><code>face</code> or <code>edge</code></td>
+</tr>
+<tr>
+  <td><code>chain1</code>, <code>residue1</code>, <code>resname1</code>, <code>ring1</code></td>
+  <td>the first ring: its chain, the residue key it is keyed by in <code>$info</code>, the residue name, and <code>6</code> or <code>5</code> for the ring's size</td>
+</tr>
+<tr>
+  <td><code>chain2</code>, <code>residue2</code>, <code>resname2</code>, <code>ring2</code></td>
+  <td>the second</td>
+</tr>
+<tr>
+  <td><code>distance</code></td>
+  <td>between the two ring centroids, angstrom</td>
+</tr>
+<tr>
+  <td><code>plane_angle</code></td>
+  <td>between the two ring planes, degrees, folded into 0 to 90</td>
+</tr>
+<tr>
+  <td><code>normal_angle1</code>, <code>normal_angle2</code></td>
+  <td>between each ring's normal and the line joining the centroids, likewise</td>
+</tr>
+<tr>
+  <td><code>intersect_distance</code></td>
+  <td>edge stacks only: how far the line where the two planes meet passes from the nearer centroid</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+It writes nothing into C<$info>, and takes the eleven geometry options in the
+table above and none of the others.
+
+=head3 Which rings
+
+The rings are the ones the format's own atom naming fixes: phenylalanine and
+tyrosine's six-membered ring, tryptophan's six and five, histidine's five
+(including the HID/HIE/HIP and HSD/HSE/HSP spellings a force field leaves
+behind), the six- and five-membered rings of adenine and guanine, and the
+six-membered ring of cytosine, thymine and uracil, in DNA and in RNA.
+
+A ligand contributes none. Working out that a ligand has an aromatic ring means
+perceiving its bonds, and this module never reads a CONECT record or guesses a
+bond — so a stack between a drug and a tyrosine is not something it can find,
+and it says so here rather than quietly finding nothing.
+
+A ring missing any of its atoms is skipped, and the two rings of one tryptophan
+or one purine are never paired with each other: they are fused into one aromatic
+system, not two systems stacked.
+
+=head3 On the face-to-face distance
+
+C<face_distance> defaults to 5.5 B<angstrom>. mdtraj's C<pi_stacking()>, which
+this is a translation of, has C<max_face_to_face_centroid_distance=5.5> in a
+function whose other three distances are nanometres — 55 A, far enough that any
+two aromatic rings in a small protein would qualify on distance alone. ProLIF,
+whose geometry mdtraj's is taken from, has 5.5 A, and mdtraj's other three
+distances are ProLIF's converted. So 5.5 A is what was meant, and it is what
+this uses. C<< face_distance =E<gt> 55 >> gets the number mdtraj ships.
+
+=head2 structure_contacts
+
+ for my $c (@{ structure_contacts($info) }) {
+     printf "%s%s - %s%s  %.2f A\n",
+         $c->{chain1}, $c->{residue1}, $c->{chain2}, $c->{residue2}, $c->{distance};
+ }
+
+Which residues touch which: pairs whose closest heavy atoms are within
+C<contact_distance>, with that distance. C<< $residue-E<gt>{n_contacts} >> counts them per
+residue. Hydrogens are left out, which is what makes the number comparable
+between a structure that has them and one that does not.
+
+This is mdtraj's C<compute_contacts()> with its default C<closest-heavy> scheme.
+mdtraj's C<all> pairs up residues in the same chain that are three or more apart
+in it; this reports those and the neighbouring and cross-chain pairs too,
+because a caller looking at a complex wants the interface and dropping it
+silently would be strange. C<t/features.t> compares the subset mdtraj has an
+opinion about, and finds the same distances.
+
+=head2 structure_hbonds
+
+ for my $b (@{ structure_hbonds($info) }) {
+     printf "%s%s N-H ... O=C %s%s  %.2f kcal/mol\n",
+         $b->{donor_chain}, $b->{donor_residue},
+         $b->{acceptor_chain}, $b->{acceptor_residue}, $b->{energy};
+ }
+
+The backbone hydrogen bonds, by Kabsch and Sander's electrostatic definition:
+a charge of -0.42 e on the carbonyl oxygen and +0.20 e on the amide hydrogen,
+their opposites on the carbon and the nitrogen, and the four-way Coulomb sum as
+the energy. Anything below -0.5 kcal/mol is a bond.
+
+The amide hydrogen is not read from the file, it is placed — one angstrom from
+N along the previous residue's C=O — which is what lets the definition be used
+on a crystal structure that has no hydrogens in it. Proline has no amide
+hydrogen and never donates. Each nitrogen keeps its two best acceptors.
+
+This is mdtraj's C<kabsch_sander()>, and the two agree exactly: over 1A42, 1A22,
+1AHW and 3AU6 they find the same bonds and the same energies to 4e-5 kcal/mol,
+which is float32 rounding on mdtraj's side.
+
+These are not the bonds the secondary structure is read from. C<structure_dssp()>
+builds a second table, to mdtraj's rules rather than to this module's, and the
+two differ by a handful of bonds per structure; the section below says why.
+
+=head2 structure_dssp
+
+ my $dssp = structure_dssp($info);
+ my $dssp = structure_info($file, 'dssp');       # the same, from a file
+
+ for my $i (@{ $dssp->{A}{H} }) {                # every helical residue of A
+     my $order = $info->{chains}{A}{residue_order};
+     my $r     = $info->{chains}{A}{residues}{ $order->[$i] };
+     printf "%s%s is in a helix\n", $r->{resname}, $r->{number};
+ }
+
+The secondary structure, chain by chain and letter by letter: a hash of hashes
+whose keys are chain ids and then DSSP letters, and whose values are the
+positions in that chain's C<residue_order> of the residues that have the letter,
+in order.
+
+This is C<t/data/fold.pdb>, a stretch of carbonic anhydrase II that folds and has
+no strand in it, so five of the eight letters appear:
+
+ {
+     A => {
+         'H' => [ 9, 10, 11, 12 ],               alpha helix
+         'G' => [ 17, 18, 19, 20, 31, 32, 33 ],  3-10 helix
+         'T' => [ 5, 6, 7, 13, 14, 15, ... ],    turns
+         'S' => [ 3, 4, 8, 21, 25, 34 ],         bends
+         ' ' => [ 0, 1, 2, 16, 24, ... ],        coil
+     },
+ }
+
+An index is a position and not a residue number: C<residue_order> is what it
+indexes, and so is C<structure_residues($info, $chain)>, which is the same
+residues in the same order. A chain with no assigned residue in it is not a key,
+and neither is a letter no residue of the chain has — so a nucleic acid chain,
+or a chain of waters, is simply absent.
+
+The eight letters are the Kabsch–Sander dictionary's:
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>letter</th>
+  <th>what it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>H</code></td>
+  <td>alpha helix</td>
+</tr>
+<tr>
+  <td><code>G</code></td>
+  <td>3-10 helix</td>
+</tr>
+<tr>
+  <td><code>I</code></td>
+  <td>pi helix</td>
+</tr>
+<tr>
+  <td><code>E</code></td>
+  <td>extended strand</td>
+</tr>
+<tr>
+  <td><code>B</code></td>
+  <td>isolated beta bridge</td>
+</tr>
+<tr>
+  <td><code>T</code></td>
+  <td>hydrogen-bonded turn</td>
+</tr>
+<tr>
+  <td><code>S</code></td>
+  <td>bend</td>
+</tr>
+<tr>
+  <td><code> </code></td>
+  <td>none of them</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+The same assignment is on the residues themselves, which is where to read it
+when you are walking them anyway: C<< $residue-E<gt>{ss} >> is the letter and
+C<< $residue-E<gt>{ss_simple} >> is the three-state reduction of it — C<H> for the three
+helices, C<E> for the two sheet letters, C<C> for everything else. A residue with
+no backbone gets neither, because it is not coil, it is not protein.
+
+There is nothing to tune, so C<structure_dssp()> takes no options: DSSP is the
+hydrogen bonds and the two constants Kabsch and Sander chose for them.
+C<< structure_info($file, dssp =E<gt> 1) >> leaves the same hash at C<< $info-E<gt>{dssp} >> for a
+caller who wants the structure as well.
+
+=head3 Against mdtraj
+
+This is mdtraj's C<compute_dssp()>, letter for letter. It is not the 1983 paper
+read afresh: C<mdtraj/geometry/src/dssp.cpp> — itself DSSP 2.2.0 ported by
+Robert T. McGibbon — is transcribed function for function, together with the
+C<kabsch_sander()> it calls and the float32 arithmetic both compute in, down to
+the order the four terms of the energy are summed in. C<t/features.t> demands
+equality on every residue of every structure in C<t/data> rather than bounding a
+disagreement.
+
+Measured over every tenth entry of PDBbind v2020 — 1,011 of the 1,012 read, the
+other being a file mdtraj will not open at all — the two give the same letter
+for all 619,067 residues that have a backbone. Not most of them; all of them.
+
+There is one place where that agreement is luck rather than construction, and it
+is mdtraj's end. It places an amide hydrogen from the residue before in its
+array without checking that that residue has a carbonyl; where it has none,
+C<ks_assign_hydrogens()> indexes the coordinate array with -1 and reads whatever
+lies in front of it. What it finds is not a structure, and the hydrogen it
+places from it bonds to nothing — which is what this code does on purpose. If it
+ever found something, the two would part company there.
+
+Two things follow from matching it that are worth knowing about.
+
+The first is that the hydrogen bonds underneath are not the ones
+C<structure_hbonds()> reports. Those are the same energy over a table built to
+this module's own rules: a donor has to be peptide-bonded to the residue whose
+carbonyl its hydrogen was placed from. mdtraj asks for no such thing — the
+residue before in its array will do, bonded or not, same chain or not — and DSSP
+is defined on mdtraj's table. A table built to be right and a table built to be
+mdtraj's cannot be the same table, so there are two.
+
+The second is where one chain stops and the next begins, which DSSP needs
+because no turn, bridge or bend may cross a chain. mdtraj starts a new chain at
+every C<TER> record and every change of chain id, so a chain's ligands and its
+waters are chains of their own; this module keeps an author chain whole. The
+division is made here instead, by cutting an author chain after the last residue
+of its polymer — which is the same line the C<TER> draws, and is drawn from the
+residues themselves rather than from a record only one of the two formats has.
+That is what keeps C<1cka.pdb> and C<1cka.cif> answering the same.
+
+=head2 structure_disulfides
+
+ for my $b (@{ structure_disulfides($info) }) {
+     printf "%s%s - %s%s  %.2f A\n",
+         $b->{chain1}, $b->{residue1}, $b->{chain2}, $b->{residue2}, $b->{distance};
+ }
+ # A23 - A88    2.01 A
+ # A134 - A194  2.04 A
+
+ $info->{chains}{A}{residues}{23}{disulfide};
+ # [ { chain => 'A', residue => '88', distance => 2.011 } ]
+
+The disulfide bonds the coordinates show: pairs of cysteines whose SG atoms are
+close enough to be bonded. Each bond is also written onto both of its residues,
+as a list naming the partner — a list because a cysteine that appears to hold
+two bonds means something is wrong with the entry, and reporting both is more
+use than dropping one.
+
+The rule is a cysteine with an C<SG> and no C<HG>, paired with another under 3.0 Å.
+The C<HG> test is what separates a cysteine whose thiol hydrogen was modelled — so
+it is reduced, and holds no bond — from one that was not; a crystal structure
+with no hydrogens has no C<HG> anywhere and every cysteine is a candidate, which
+is right. C<disulfide_distance> moves the cutoff.
+
+Only residues named C<CYS>. AMBER and CHARMM rename a bonded cysteine to C<CYX>,
+and a structure that has been through a force field needs its residues named the
+way the archive names them.
+
+=head3 Against what the file says
+
+C<< $info-E<gt>{ssbond} >> is the other answer: what the depositor wrote in an SSBOND
+record, or in an mmCIF C<_struct_conn> row of type C<disulf>. Neither is the
+authority, and comparing them is worth doing:
+
+ my $key = sub {
+     my ($c1, $r1, $c2, $r2) = @_;
+     return join '|', sort "$c1/$r1", "$c2/$r2";
+ };
+ my %found = map { $key->(@{$_}{qw(chain1 residue1 chain2 residue2)}) => $_->{distance} }
+             @{ structure_disulfides($info) };
+ my %said  = map { $key->(@{$_}{qw(chain1 resseq1 chain2 resseq2)}) => $_->{length} }
+             @{ $info->{ssbond} };
+ my @undeclared = grep { !exists $said{$_}  } keys %found;
+ my @unseen     = grep { !exists $found{$_} } keys %said;
+
+Over a 60-entry spread of PDBbind the two agree on every entry that has
+disulfides, and where both name the same bond their lengths agree to the two
+decimals SSBOND is written in. Over a wider sweep they agree on 21 of 22; the
+one that does not is 1A4K, a Fab that is in the file twice, whose SSBOND records
+cover one copy and whose coordinates show both. A disagreement is a fact about
+the entry, not about either answer.
+
+=head2 structure_base_pairs
+
+ for my $p (@{ structure_base_pairs($info) }) {
+     printf "%s%s %s - %s%s %s  %s, Saenger %d\n",
+         $p->{chain1}, $p->{residue1}, $p->{resname1},
+         $p->{chain2}, $p->{residue2}, $p->{resname2},
+         $p->{type}, $p->{saenger};
+ }
+ # A2648 G - A2672 U  G-U, Saenger 28
+ # A2649 C - A2671 G  C-G, Saenger 19
+ # A2650 U - A2670 A  U-A, Saenger 20
+ # A2651 C - A2669 G  C-G, Saenger 19
+ # A2652 C - A2668 G  C-G, Saenger 19
+
+ $info->{chains}{A}{residues}{2648}{base_pair};
+ # [ { chain => 'A', residue => '2672', resname => 'U',
+ #     type => 'G-U', saenger => 28 } ]
+
+(C<t/data/wobble.pdb>, twelve nucleotides of 1MSY.)
+
+The base pairs the coordinates show. Like the disulfides, this is geometry and
+not something the file declares, and each pair is written onto both of its
+residues as well as returned.
+
+Only the canonical pairing, which is three geometries:
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th><code>saenger</code></th>
+  <th><code>type</code></th>
+  <th>hydrogen bonds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>19</td>
+  <td>G-C</td>
+  <td>O6···N4, N1···N3, N2···O2</td>
+</tr>
+<tr>
+  <td>20</td>
+  <td>A-U, A-T</td>
+  <td>N6···O4, N1···N3</td>
+</tr>
+<tr>
+  <td>28</td>
+  <td>G-U, G-T — the wobble</td>
+  <td>O6···N3, N1···O2</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+C<type> names the two bases in the order the record reports them, so a C<C-G> and
+a C<G-C> are the same pair read from the two ends; C<saenger> does not depend on
+the order. The numbers are Saenger's, from the table of twenty-eight pair types
+in I<Principles of Nucleic Acid Structure> chapter 6, and are the same numbers
+the archive uses in C<_ndb_struct_na_base_pair.hbond_type_28>.
+
+Each pair also carries the geometry it was found by:
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>key</th>
+  <th>what it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>hbonds</code></td>
+  <td>one <code>{ atom1, atom2, distance }</code> per bond above, in the order the table gives them</td>
+</tr>
+<tr>
+  <td><code>distance</code></td>
+  <td>between the two bases' six-membered ring centroids, angstrom</td>
+</tr>
+<tr>
+  <td><code>plane_angle</code></td>
+  <td>between the two ring planes, 0 to 90 degrees</td>
+</tr>
+<tr>
+  <td><code>stagger</code></td>
+  <td>how far one base sits out of the other's plane, angstrom</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+Two bases are a pair when every one of that type's hydrogen bonds is at most
+C<base_pair_hbond> long and the stagger is at most C<base_pair_stagger>. The
+stagger is what tells a pair from the base stacked above or below it, which
+brings the same atoms within reach but sits a helical rise away rather than
+beside it.
+
+=head3 Where the thresholds come from
+
+There is no reader on hand with an opinion about which bases are paired — not
+mdtraj, not gemmi, not Biopython — so the rule is measured against the
+annotation the wwPDB deposits with the entry itself, which is 3DNA's. Forty
+archive entries carrying an C<_ndb_struct_na_base_pair> loop hold 1372 pairs of
+Saenger type 19, 20 or 28 between them, and 1354 of those are between two
+unmodified bases. The defaults find all 1354 and miss none:
+
+=over
+
+=item * the longest hydrogen bond in one of them is 3.4941 Å and the shortest one in
+a candidate the annotation does not call a pair is 3.5144 Å, so 3.5 Å — which
+is also the conventional heavy-atom hydrogen bond distance — falls between;
+
+=item * the largest stagger in one of them is 2.5408 Å and the smallest in a rejected
+candidate 2.6983 Å, with the stacked contacts proper beginning near 3.0 Å.
+
+=back
+
+The eighteen pairs it does not see are not geometry. Eleven have a modified base
+on one side — C<5MC>, C<2MG>, C<BRU>, C<DDG> — which has no single-letter code to
+match the table with. The other seven are in entries whose asymmetric unit holds
+one strand of a self-complementary duplex and whose second strand is a
+crystallographic symmetry mate: this reads the coordinates as deposited, where
+the two are thirty and forty angstrom apart.
+
+Two pairs are found that the annotation does not list, and both are worth
+reading. 1JJ2's C2542–G2617 is a G-C with all three bonds under 2.94 Å and half
+an angstrom of stagger that appears nowhere in that entry's 1121 annotated rows.
+3SWP's DT4–DA24 is in a 4.11 Å structure whose annotation pairs its DT4 with
+DA25 instead and cannot put a Saenger number on that pair either.
+
+Every base in those forty entries came out of the rule with at most one partner.
+That is what the geometry did rather than something imposed, so a residue's
+C<base_pair> is a list all the same: nothing in the rule forbids a second, and
+a second would say something about the entry worth not hiding.
+
+=head3 What is not here
+
+A base pair that is none of those three. There are twenty-eight in Saenger's
+table and rather more in the Leontis–Westhof classification, and telling them
+apart is a different kind of work: the canonical three are defined by which
+atoms hydrogen-bond to which, and the rest need the base reference frames and
+the six pair parameters that C<_ndb_struct_na_base_pair> carries. What comes back
+here is the double helix, not the whole of RNA structure. C<t/data/wobble.pdb>
+holds one of the others — the U2647·G2673 pair 1MSY's annotation records and
+cannot classify — and this leaves it alone, which is the test that it does.
+
+=head2 structure_base_stacks
+
+ for my $s (@{ structure_base_stacks($info) }) {
+     printf "%s%s %s - %s%s %s  d0 %.2f  omega %.1f  Xi %.1f  %.0f%%\n",
+         $s->{chain1}, $s->{residue1}, $s->{resname1},
+         $s->{chain2}, $s->{residue2}, $s->{resname2},
+         $s->{distance}, $s->{omega}, $s->{xi}, $s->{score};
+ }
+ # B13 C - B14 G  d0 4.53  omega 40.7  Xi 17.3   33%
+ # B14 G - B15 C  d0 3.94  omega 23.3  Xi  7.8  100%
+ # B15 C - B16 G  d0 4.34  omega 36.1  Xi 17.1   48%
+ # B16 G - B17 A  d0 4.34  omega 34.8  Xi 13.9   51%
+ # B17 A - B18 A  d0 3.91  omega 29.3  Xi 18.0   91%
+
+ $info->{chains}{B}{residues}{14}{base_stack};
+ # [ { chain => 'B', residue => '13', resname => 'C', type => 'G-C',
+ #     distance => 4.5286, omega => 40.740, xi => 17.307,
+ #     score => 32.518, side => "3'" },
+ #   { chain => 'B', residue => '15', resname => 'C', type => 'G-C',
+ #     distance => 3.9353, omega => 23.292, xi => 7.833,
+ #     score => 100, side => "5'" } ]
+
+(C<t/data/aform.pdb>, six nucleotides of 157D.)
+
+How stacked every nearby pair of nucleobases is, on the three variables the RNA
+literature scores stacking with — the distance d0 between the two bases, the
+overlap angle ω, and the angle Ξ between their planes — and as one score built
+out of them. Like the base pairs this is geometry rather than anything the file
+declares, and each stack is written onto both of its residues as well as
+returned.
+
+The definition is section 2.4 of
+
+ Condon, D E; Kennedy, S D; Mort, B C; Kierzek, R; Yildirim, I;
+ Turner, D H (2015) "Stacking in RNA: NMR of Four Tetramers Benchmark
+ Molecular Dynamics", J Chem Theory Comput 11(6):2729-2742,
+ doi:10.1021/ct501025q
+
+which is where the criteria, the thresholds and the score come from; the
+implementation its numbers were produced with is the same authors'
+L<PDB_stacker|https://github.com/hhg7/PDB_stacker>. The paper benchmarks AMBER
+force fields by comparing four RNA tetramers against NMR, and these three
+numbers are how it decides which bases a simulation had stacked.
+
+=head3 The three variables
+
+Each base gets a centre of mass over its heavy atoms and two vectors C<a> and C<b>
+from there to two atoms far apart on the ring, chosen so that the pair spans the
+base and out-of-plane distortion moves their cross product as little as
+possible. C<a> × C<b> and C<b> × C<a> are the base's two normal vectors, one above
+the plane and one below.
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>key</th>
+  <th>what it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>distance</code></td>
+  <td>d0, between the two bases' centres of mass, angstrom</td>
+</tr>
+<tr>
+  <td><code>omega</code></td>
+  <td>ω, "oh-mega" for overlap: how far the 3' base sits off the 5' base's face, degrees</td>
+</tr>
+<tr>
+  <td><code>xi</code></td>
+  <td>Ξ, the angle between the two bases' normals: 0 is parallel, 90 a T-shape, degrees</td>
+</tr>
+<tr>
+  <td><code>score</code></td>
+  <td>the three of them as one percentage, -100 to 100</td>
+</tr>
+<tr>
+  <td><code>stacked</code></td>
+  <td>1 when <code>score</code> is over 50, which is what the paper calls stacked</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+ω is the angle at the 5' base's centre of mass in the triangle whose sides are
+d0, the length of that base's normal vector, and the distance from the tip of
+whichever of its two normals lands nearer the 3' base's centre of mass. It is
+small when one base sits over the other's face and large when it sits beside it
+— the angle between the steps of a staircase. Ξ tells a parallel stack from a
+T-shape, which is a different interaction and scores negative rather than being
+dropped.
+
+The pair is ordered, because ω is measured from one base and not the other. The
+5' base is the one the file lists first, which along a strand written 5' to 3' —
+as both formats and the archive write one — is the chemical order. Two bases in
+different chains have no 5'/3' relation at all, and there the order is the chain
+order. Each residue's own C<base_stack> entry says which end of the pair it is,
+in C<side>, so that a residue's ω can be read the right way round.
+
+=head3 The score
+
+Two points, one for the distance and one for the overlap, reported as a
+percentage of two:
+
+=over
+
+=item * d0 at or under 4 Å scores 1, and falls off as r^-3 from there to the
+C<base_stack_distance> cutoff;
+
+=item * ω at or under 25 degrees scores 1, and falls linearly to 0 at the
+C<base_stack_omega> cutoff;
+
+=item * Ξ over 45 degrees multiplies the whole thing by -1, which is a T-shape rather
+than a stack.
+
+=back
+
+Every pair inside C<base_stack_distance> is reported, stacked or not, because the
+three variables are the answer and the score is a summary of them: a run of
+tetramer snapshots wants the pair that scored 12% as much as the one that scored
+98%. A pair whose ω is past C<base_stack_omega> carries no C<xi> — the paper does
+not compute it there — and scores 0.
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>option</th>
+  <th>default</th>
+  <th>what it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>base_stack_distance</code></td>
+  <td>5.0</td>
+  <td>the furthest apart two centres of mass may be, angstrom</td>
+</tr>
+<tr>
+  <td><code>base_stack_omega</code></td>
+  <td>50</td>
+  <td>the largest overlap angle that is still a stack, degrees</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+Both are the paper's, which took the distance from CCSD(T) calculations on
+stacked uracil and adenine dimers and the angle from X-ray statistics. The two
+knees between them — 4 Å and 25 degrees — are the shape of the score rather than
+a threshold, and are not options.
+
+=head3 Which bases
+
+Every residue this module gives a single-letter code of C<A>, C<C>, C<G>, C<I>, C<T>
+or C<U> and calls a nucleotide, which is DNA and RNA alike and the sixty-odd
+spellings C<res1()> knows: a C<PSU> is measured as a uridine, a C<7MG> as a
+guanosine, a C<DA> and an C<A> the same way. Four sets of atoms serve the six
+letters — adenine's, guanine's (which inosine shares, having the same ring and
+the same O6), cytosine's and uracil's (which thymine shares) — and each names
+the two atoms its C<a> and C<b> run to:
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>base</th>
+  <th><code>a</code></th>
+  <th><code>b</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>A</td>
+  <td>C8</td>
+  <td>N6</td>
+</tr>
+<tr>
+  <td>G, I</td>
+  <td>C8</td>
+  <td>O6</td>
+</tr>
+<tr>
+  <td>C</td>
+  <td>O2</td>
+  <td>N4</td>
+</tr>
+<tr>
+  <td>U, T</td>
+  <td>O2</td>
+  <td>O4</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+A base missing any of the atoms its entry names has no frame and is in no pair,
+the same way an incomplete ring has no plane. That covers a C<4SU>, whose O4 is a
+sulphur, as well as a base whose density ran out; no geometry is invented for
+either.
+
+=head3 Against the paper's worked example
+
+Figure 4 of the paper illustrates the three variables on residues 13 (C) and 14
+(G) of chain B of 157D and reports d0 = 4.5 Å, ω = 40.7 degrees and Ξ = 17.3
+degrees. Those six residues are C<t/data/aform.pdb>, exactly as deposited, and
+C<t/stacking.t> checks this against all three: it answers 4.5286, 40.7402 and
+17.3071.
+
+That one pair is the whole of the cross-validation, and it settles more than it
+looks like. Three things about the definition are ambiguous on the printed page,
+and the caption picks one reading of each:
+
+=over
+
+=item * B<Equation 10> is a minimum of two arcsines that differ only in the sign of a
+cross product, so the two are equal and the minimum is a formality; and taken
+literally it is the angle between the two normals with no reference to where
+the bases are, which gives 9.5 degrees for this pair. C<PDB_stacker> instead
+compares the 5' base's normal with the 3' base's normal I<redrawn from the 5'
+base's centre of mass>, and takes the smaller of the two answers its two
+normals give. That gives 17.31 degrees, so that is what Ξ means here.
+
+=item * B<Guanine's centre of mass> is over ten atoms and not eleven: N2, the
+exocyclic amino nitrogen, is not in C<PDB_stacker>'s list, though adenine's N6
+and cytosine's N4 are in theirs. Including it gives d0 = 4.77 Å and ω = 43.56
+degrees against the caption's 4.5 and 40.7; leaving it out gives 4.53 and
+40.74.
+
+=item * B<The distance knee> is 3.5 Å in criterion I's text and 4 Å in
+C<PDB_stacker>'s C<$DISTANCE_MIN>. 4 is used, because it is the number the
+published percentages were computed with.
+
+=back
+
+Each of those is marked at the site in C<Parser.xs> with the measurement that
+settles it.
+
+=head3 What is not here
+
+Whether a stack is what holds a structure together. The score is a geometric
+summary and not an energy: two bases at 100% are stacked in the sense the paper
+counts stacks in an MD trajectory, which is what it was built to do. It says
+nothing about what that stack is worth in kcal/mol, and the paper's own point is
+that force fields which reproduce the geometry can still get the populations
+wrong.
+
+C<structure_pi_stacking()> is the other question about the same atoms: mdtraj's
+face-to-face and edge-to-face geometry over aromatic rings, ring by ring rather
+than base by base, and over the aromatic amino acids as well. It answers whether
+two rings are stacked; this answers how much.
+
+=head2 structure_rmsd
+
+ my $d = structure_rmsd('before.pdb', 'after.cif');   # one number, in angstrom
+ my $d = structure_rmsd($info1, $info2);              # or two structures already read
+
+ # an NMR ensemble against itself: every model against every other model
+ my $r = structure_rmsd('2ll7.pdb', model => 'all');
+ printf "models 1 and 7 are %.2f A apart\n", $r->{rmsd}[0][6];
+
+How far apart two copies of the same molecule are: the root mean square
+deviation over the atoms they have in common, after the rigid-body move that
+makes it as small as it can be.
+
+Each argument is a file name or the hash reference C<structure_info()> returned,
+in any mix, and the options come after them. A structure read with
+C<< model =E<gt> 'all' >> counts as one structure per model, which is what makes the
+ensemble case a single call. B<Every structure is compared with every other
+one>: two of them give the number, more than two give the matrix.
+
+An argument that is a file name is read for you, with C<< meta =E<gt> 0 >> and
+C<< features =E<gt> 0 >> — the header records and the physical properties are most of
+what a read costs and none of this looks at either.
+
+=head3 Which atom is which
+
+Atoms are paired on the identity the file gives them: the chain, the residue as
+this module keys it (its number and insertion code), and the atom name. Nothing
+is aligned and nothing is guessed. An atom that is not in both structures under
+the same name is not in the answer, and C<< $r-E<gt>{n} >> says how many were.
+
+That is exactly right for two models of one ensemble, for a structure before
+and after a minimisation, and for the same entry read as PDB and as mmCIF. It
+is not right for two structures that number their residues differently or call
+their chains by different letters, and there are three ways round that:
+C<chains> reads only some of them, C<chain_map> says what a chain of the later
+structures is called in the first, and C<< match =E<gt> 'order' >> pairs the I<n>th atom
+of each and ignores the names altogether.
+
+ # the same domain, chain A in one file and chain H in the other
+ structure_rmsd($apo, $holo, chain_map => { H => 'A' });
+
+=head3 What comes back
+
+With two structures it is the RMSD in angstrom, or C<undef> when there is no
+answer to give — fewer than C<min_atoms> atoms in common. With more than two it
+is a hash reference:
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>key</th>
+  <th>what it holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>rmsd</code></td>
+  <td>the matrix, <code>$r-&gt;{rmsd}[$i][$j]</code>: symmetric, 0 down the diagonal, <code>undef</code> for a pair with too few atoms in common</td>
+</tr>
+<tr>
+  <td><code>n</code></td>
+  <td>the same shape: how many atoms that pair had in common</td>
+</tr>
+<tr>
+  <td><code>n_atoms</code></td>
+  <td>one count per structure: how many atoms the selection left it with</td>
+</tr>
+<tr>
+  <td><code>labels</code></td>
+  <td>one name per structure, in the same order — the file name, and <code>... model N</code> for a model of an ensemble</td>
+</tr>
+<tr>
+  <td><code>fit</code>, <code>select</code>, <code>match</code></td>
+  <td>the options the answer was computed under</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+C<< detail =E<gt> 1 >> gives the same hash for two structures, with C<rmsd> and C<n> as
+plain numbers rather than matrices, and adds the move itself: C<rotation>, a
+3x3 array of arrays, and C<translation>, a vector, such that
+C<$b = rotation . $a + translation> takes the first structure onto the second.
+
+=head3 Options
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>option</th>
+  <th>default</th>
+  <th>what it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>fit</code></td>
+  <td>1</td>
+  <td>superpose before measuring; 0 measures the two where they lie, which is the question for two structures already in one frame</td>
+</tr>
+<tr>
+  <td><code>select</code></td>
+  <td><code>'all'</code></td>
+  <td>which atoms take part: <code>'all'</code>, <code>'heavy'</code> (everything but hydrogen and deuterium), <code>'backbone'</code> (N, CA, C, O of an amino acid; P, O5', C5', C4', C3', O3' of a nucleotide), or <code>'ca'</code> (CA of an amino acid, P of a nucleotide)</td>
+</tr>
+<tr>
+  <td><code>match</code></td>
+  <td><code>'key'</code></td>
+  <td>how atoms are paired: <code>'key'</code> by chain, residue and atom name, or <code>'order'</code> by position in the file</td>
+</tr>
+<tr>
+  <td><code>min_atoms</code></td>
+  <td>3</td>
+  <td>fewer atoms in common than this and the answer is <code>undef</code>. Three is where a rotation is determined; a pair below it has an arithmetic answer and not a meaningful one</td>
+</tr>
+<tr>
+  <td><code>chain_map</code></td>
+  <td>—</td>
+  <td>hash reference: what a chain of the second and later structures is called in the first</td>
+</tr>
+<tr>
+  <td><code>detail</code></td>
+  <td>0</td>
+  <td>return the hash rather than the one number</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+C<model>, C<altloc>, C<hydrogens>, C<waters>, C<hetatm>, C<chains> and C<format> are
+C<structure_info()>'s own and mean the same thing here; they apply to the
+arguments that are file names. C<chains> also applies to a structure already
+read, as a filter over the chains it has.
+
+Reading a file without its hydrogens and selecting the heavy atoms of one that
+has them are the same answer over the same atoms — C<t/rmsd.t> asserts it — so
+either will do.
+
+=head3 Against gemmi and Biopython
+
+The superposition is Theobald's quaternion characteristic polynomial (Theobald,
+D L (2005) I<Acta Cryst> A61:478), as its reference implementation C<qcprot.c>
+writes it (Liu, Agrafiotis and Theobald (2010) I<J Comput Chem> 31:1561) and as
+Biopython 1.85 ships it in C<Bio/PDB/qcprot.py>.
+
+The deviation itself is not read off the eigenvalue, which is what makes QCP
+fast, and that is deliberate. C<sqrt(2|E0 - L|/n)> subtracts two numbers that
+agree in as many figures as the two structures do, and two structures being
+nearly the same is the ordinary case: models 24 and 25 of 1JM4 have identical
+coordinates, and gemmi 0.7.5 — which takes that route — answers 8.6e-07 A for
+them where this answers 0. Here the rotation is formed and the deviation
+measured with it, which costs one more pass over the paired atoms and has no
+cancellation in it anywhere.
+
+Against gemmi's C<superpose_positions> over every pair of models of the 40 NMR
+entries in the first two thousand files of PDBbind v2020 — 5,598 superpositions
+— the largest relative difference is 5.65e-12 and the median 1.43e-14. Against
+Biopython's C<SVDSuperimposer> the two agree to every figure either prints.
+
+Biopython's C<QCPSuperimposer> is the exception and does not agree with any of
+the three: over the 20 models of 2LL7 it reports 3.5022 A where gemmi,
+C<SVDSuperimposer> and this module all report 3.6090 A. Its Newton-Raphson
+convergence test lost the absolute value C<qcprot.c> has around it, so it stops
+on the first iteration and reads the RMSD off a barely-improved starting guess.
+Measuring with the rotation it returns itself gives 3.60899. C<t/rmsd.t> says so
+in its header, so that the next person to compare against it knows what they
+are looking at.
 
 =head2 aa3to1
 
@@ -2642,6 +5002,182 @@ the record was read that way rather than parsed into tokens.
 
 C<t/data/pdb1gdr.ent> is one such file, a 1993 entry, and C<t/foreign.t> reads it.
 
+=head1 Where the physical properties come from
+
+None of the arithmetic in C<structure_features()> is this module's own. Each
+piece is a translation of a published method as somebody else implemented it,
+and the tests compare against those implementations rather than against what
+this module currently does — C<t/features.t> reads what mdtraj and gemmi answered
+for every structure in C<t/data>, frozen into C<t/data/features.txt>, and re-runs
+them where they are installed so the frozen answer cannot go stale.
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>what</th>
+  <th>from</th>
+  <th>as implemented in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>solvent-accessible surface</td>
+  <td>Shrake, A; Rupley, J A (1973) <i>J Mol Biol</i> 79(2):351-71</td>
+  <td>mdtraj 1.11's <code>mdtraj.geometry.shrake_rupley</code></td>
+</tr>
+<tr>
+  <td>gyration tensor and shape</td>
+  <td></td>
+  <td>mdtraj's <code>geometry/shape.py</code></td>
+</tr>
+<tr>
+  <td>torsion angles</td>
+  <td></td>
+  <td><code>mdtraj.compute_phi</code>, <code>compute_psi</code>, <code>compute_omega</code>, <code>compute_chi1</code>-<code>chi5</code></td>
+</tr>
+<tr>
+  <td>nucleic acid torsions</td>
+  <td>IUPAC-IUB Joint Commission on Biochemical Nomenclature (1983) <i>Eur J Biochem</i> 131:9-15</td>
+  <td><code>mdtraj.compute_dihedrals</code> and gemmi's <code>calculate_dihedral</code>, over the four atoms each definition names</td>
+</tr>
+<tr>
+  <td>sugar pucker</td>
+  <td>Altona, C; Sundaralingam, M (1972) <i>J Am Chem Soc</i> 94(23):8205-12, equations 1 and 2; the envelope names as tabulated there and in Saenger, W (1984) <i>Principles of Nucleic Acid Structure</i>, ch. 2</td>
+  <td></td>
+</tr>
+<tr>
+  <td>the phosphodiester cutoff</td>
+  <td></td>
+  <td>gemmi's <code>are_connected()</code> in <code>gemmi/polyheur.hpp</code></td>
+</tr>
+<tr>
+  <td>base pairs</td>
+  <td>Watson, J D; Crick, F H C (1953) <i>Nature</i> 171(4356):737-8; the pair types as numbered in Saenger, W (1984) <i>Principles of Nucleic Acid Structure</i>, ch. 6</td>
+  <td>no implementation on hand: measured against the wwPDB's own <code>_ndb_struct_na_base_pair</code> annotation, which is 3DNA's, over forty entries</td>
+</tr>
+<tr>
+  <td>base stacking</td>
+  <td>Condon, D E; Kennedy, S D; Mort, B C; Kierzek, R; Yildirim, I; Turner, D H (2015) <i>J Chem Theory Comput</i> 11(6):2729-2742, section 2.4</td>
+  <td>the same authors' <code>PDB_stacker</code>, and the paper's own Figure 4 worked on 157D</td>
+</tr>
+<tr>
+  <td>residue contacts</td>
+  <td></td>
+  <td><code>mdtraj.compute_contacts</code>, <code>closest-heavy</code></td>
+</tr>
+<tr>
+  <td>backbone hydrogen bonds</td>
+  <td>Kabsch, W; Sander, C (1983) <i>Biopolymers</i> 22(12):2577-637</td>
+  <td><code>mdtraj.geometry.kabsch_sander</code></td>
+</tr>
+<tr>
+  <td>secondary structure</td>
+  <td>the same paper</td>
+  <td><code>mdtraj.compute_dssp</code> — exactly; see <code>structure_dssp</code></td>
+</tr>
+<tr>
+  <td>half-sphere exposure</td>
+  <td>Hamelryck, T (2005) <i>Proteins</i> 59(1):38-48</td>
+  <td>Biopython's <code>Bio.PDB.HSExposure.HSExposureCB</code></td>
+</tr>
+<tr>
+  <td>the peptide-bond cutoff</td>
+  <td></td>
+  <td>Biopython's <code>Bio.PDB.Polypeptide.PPBuilder</code> <code>radius</code></td>
+</tr>
+<tr>
+  <td>disulfides</td>
+  <td></td>
+  <td>mdtraj's <code>Topology.create_disulfide_bonds</code> rule</td>
+</tr>
+<tr>
+  <td>van der Waals radii</td>
+  <td>Bondi, A (1964) <i>J Phys Chem</i> 68:441, extended by Mantina, M <i>et al.</i> (2009) <i>J Phys Chem A</i> 113:5806, with Shannon, R D (1976) <i>Acta Cryst</i> A32:751 ionic radii for the ions that are always ionised</td>
+  <td>mdtraj's <code>_ATOMIC_RADII</code></td>
+</tr>
+<tr>
+  <td>atomic masses</td>
+  <td></td>
+  <td>mdtraj's <code>mdtraj/core/element.py</code></td>
+</tr>
+<tr>
+  <td>pi-stacking geometry</td>
+  <td>ProLIF's FaceToFace and EdgeToFace</td>
+  <td><code>mdtraj.geometry.pi_stacking</code></td>
+</tr>
+<tr>
+  <td>radius of gyration</td>
+  <td></td>
+  <td><code>mdtraj.geometry.compute_rg</code></td>
+</tr>
+<tr>
+  <td>maximum accessible surface, for <code>rsa</code></td>
+  <td>Tien, M Z <i>et al.</i> (2013) <i>PLoS ONE</i> 8(11):e80635, Table 1, the theoretical column</td>
+  <td></td>
+</tr>
+<tr>
+  <td>hydropathy</td>
+  <td>Kyte, J; Doolittle, R F (1982) <i>J Mol Biol</i> 157(1):105-132</td>
+  <td>Biopython's <code>Bio.SeqUtils.ProtParamData.kd</code> and <code>ProteinAnalysis.gravy()</code></td>
+</tr>
+<tr>
+  <td>aromaticity</td>
+  <td>Lobry, J R; Gautier, C (1994) <i>Nucleic Acids Res</i> 22(15):3174-3180</td>
+  <td>Biopython's <code>ProteinAnalysis.aromaticity()</code></td>
+</tr>
+<tr>
+  <td>G+C content</td>
+  <td></td>
+  <td>Biopython's <code>Bio.SeqUtils.gc_fraction()</code>, with its default <code>ambiguous =&gt; 'remove'</code></td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+mdtraj works in nanometres and float32; this module works in angstrom and NV,
+which is what the two file formats are written in and what the rest of the
+module already returns. The formulae are the same ones, so the answers agree to
+the width of a float32: run in float64, mdtraj's own Shrake-Rupley loop and this
+one give the same surface for every atom of every structure in C<t/data> to nine
+digits, and mdtraj as it ships differs on four atoms of 620, by one sphere point
+each — a point sitting within a float32 ulp of a neighbouring atom's surface is
+accessible at one width and covered at the other.
+
+The secondary structure is the exception, and computes in float32 and nanometre
+as mdtraj does. It is not a number but a letter, and the letter turns on two
+comparisons against constants — an energy below -0.5 kcal/mol is a hydrogen
+bond, a CA-to-CA separation under 0.9 nm is worth testing at all. Computing
+those wider does not make them better; it makes them different, and one bond
+either way is worth several residues' letters.
+
+Three of these are deliberately not what the reference does, and each is argued
+where it is written down. mdtraj computes a torsion angle, and places a Kabsch–
+Sander amide hydrogen, between whichever residues are next to each other in the
+file — across a chain break, where the chemistry never joined them; here the two
+must be peptide-bonded, or phosphodiester-bonded, first. mdtraj's C<Topology.create_disulfide_bonds()>
+compares angstrom coordinates against a nanometre cutoff and so finds no
+disulfide in any file; the rule it documents is the one implemented here. And
+the face-to-face pi-stacking distance, above.
+
+Two more are deliberately not mdtraj's: C<rg_mass>, and
+C<compute_rg(traj, masses=m)> weights the distances by mass but still measures
+them from the geometric centroid; C<rg_mass> measures from the centre of mass,
+which is what the quantity means. C<rg> takes mdtraj's default of equal weights,
+where the two centres are the same point and the two answers agree exactly.
+
+The secondary structure is not one of the three, and is the reason the hydrogen
+bonds are computed twice: C<structure_dssp()> wants mdtraj's table, bonds across
+chain breaks and all, because that is the table mdtraj's answer is defined on,
+and C<structure_hbonds()> reports the other one. Both are written up under
+C<structure_dssp> above.
+
 =head1 What is parsed in C, and why
 
 The C side does one pass over the bytes. It splits ATOM/HETATM records into
@@ -2682,164 +5218,6 @@ C<benchmark.pl>, which measures all of it rather than asserting any of it.
 =head1 Author
 
 David E. Condon L<mailto:dec986@gmail.com>
-
-=head1 Changes
-
-=head2 0.02 2026-08-22 CDT
-
-Fix for Windows: https://www.cpantesters.org/cpan/report/960c8de0-8001-1014-8897-e6a949c55ebf
-
-=head2 0.01 2026-08-21 CDT
-
-initial version: reads PDB into a hash of hashes, single-letter
-sequences, residue types.  Release notes from here on are the
-maintainer's to write.
-
-reads mmCIF/PDBx (.cif, .mmcif, .pdbx) as well as PDB.  structure_info()
-works out which, and returns the same hash of hashes either way: the same
-chains, residues, atoms, sequences and counts.  Tested by reading fixture
-pairs both ways and comparing them with is_deeply, and by converting real
-PDB entries to mmCIF and asserting that nothing changes.
-
-the mmCIF reader uses the auth_* identifiers, so a chain read from a .cif
-has the same name and residue numbering as the same chain read from a
-.pdb, and converts the values the two formats spell differently (a formal
-charge of -1 reads back as '1-', and a charge of 0 stays '0', which is
-not the same answer as a blank charge field).
-
-new: cif_info(), the mmCIF counterpart of pdb_info().
-
-new: $info->{chains}{$chain}{missing_residues}, the residue numbers the
-chain's gaps step over, in ascending order.  Every chain has the list;
-a chain with no gaps has it empty.  It counts numbers rather than
-residues, so a chain numbered by homology to a reference protein --
-chymotrypsin numbering and the conventions like it, about one chain in
-twenty-five -- reports the numbers its scheme skips on purpose along
-with the ones that went unmodelled.  n_missing is the count to trust
-when a file has SEQRES and the two disagree.
-
-gaps no longer reads a change of numbering scheme as a gap.  An antibody
-numbered by the Kabat scheme runs 27, 1027, 2027, 28, where the
-thousands are insertions after 27 and not a 999-residue hole, and 1a4k
-was reading as a 214-residue light chain missing five thousand
-residues.  A chain can only be missing as many residues as the span
-from its first polymer residue to its last leaves room for, counting
-insertion codes as the one number they share, and a jump wider than
-that is no longer counted.  Nothing is read from SEQRES to decide it,
-so a chain answers the same whether it came from a PDB file or an
-mmCIF one and whether or not the headers were parsed.
-
-formats() now reports mmcif as supported.
-
-new: $info->{stats}{total_atoms}, every ATOM and HETATM record the file
-has, every model and before the model selection or the hydrogens,
-waters, hetatm and chains options threw anything away.  n_atoms is what
-came back and this is what there was, so total_atoms == n_atoms +
-n_skipped whatever the options were set to, and a structure read out of
-a 64-model ensemble can say that its 6,432 atoms are one model of
-411,648 rather than the whole file.  Both readers count it the same way.
-
-new: is_single_ion($chain), or is_single_ion($info, $chain), true when a
-chain holds exactly one residue.  An ion given a chain of its own is a
-chain with no sequence to read, and a structure with a dozen of them has
-more of those chains than polymer ones, so the loop that puts them aside
-is worth not writing by hand.  In XS, and single counts residues in the
-chain: not atoms in the residue, so a sulphate and a perchlorate answer
-the same, and not the residue's type, which comes off a table of names
-that cannot be complete -- SO4 is on the module's ION list and BF4 is
-not, and that is a fact about the list.  The residue is not asked what it
-is, so a chain of one sugar or one water reads true as well; the residue
-says which it is, in its own type.  A chain of two zincs is not one, and
-neither is a protein chain with a zinc numbered into it.  Handing it the
-whole structure with no chain id, or a residue, is fatal: all three are
-hash references and a false answer would be taken at face value.
-
-fixed: SEQRES was read to the end of the line rather than to column 70.
-An entry deposited before about 1996 keeps its id and a line number in
-columns 73-80 of every record, and those became two more residues per
-SEQRES line: pdb1gdr's 140-residue chain read as 162 residues with an X
-every thirteenth place, which is a wrong sequence rather than a missing
-one.  No file in the remediated archive is affected; the ones the archive
-still distributes as deposited are.
-
-fixed: the element columns are no longer believed when they do not spell
-an element.  The same files put part of the entry id in columns 77-78, so
-every atom of pdb1gdr read as element '1' -- which also stopped
-hydrogens => 0 from finding hydrogens, since the element is what says
-which atoms those are.  A field that is not letters falls back to the
-atom name, which the module already knows how to read.  Likewise the
-charge columns: a charge is a digit and a sign, and 'DR' is not one, so
-it reads as the empty string a blank field would have given.
-
-fixed: a HELIX length that is not a number now reads as empty rather
-than as the text that was in columns 72-76.
-
-fixed: the text records -- TITLE, COMPND, SOURCE, KEYWDS, AUTHOR, EXPDTA,
-JRNL -- are cut at column 72 when columns 73-80 hold nothing but the
-entry id and a line number.  Text that is not the entry id is left alone,
-so a title that really does run to column 80 is not truncated.
-
-fixed: a free-text COMPND or SOURCE is no longer thrown away.  A file
-older than the MOL_ID convention writes 'COMPND    GAMMA DELTA RESOLVASE'
-and names no chains, so the entry is the one molecule and every chain in
-it gets it; $info->{compound}{1}{free_text} says the record was read that
-way rather than parsed into tokens.
-
-fixed: an atom's altlocs list was missing the conformer that supplied the
-coordinates when that record had no altloc letter.  disordered.pdb writes
-ARG 27's CZ once with a blank altloc and once as B; the list held only
-the B, so the occupancies of an atom summed to 0.5 and a caller writing
-the conformers back out wrote one of two.
-
-resolution now falls back to REMARK 3's RESOLUTION RANGE HIGH when there
-is no REMARK 2.  A file written by a refinement program rather than by
-the archive often has the whole of REMARK 3 and no REMARK 2 at all, and
-it is the same number the mmCIF reader already takes from
-_refine.ls_d_res_high, so the two formats answer alike.  REMARK 2 still
-wins where there is one, and a BIN RESOLUTION RANGE HIGH is never it.
-
-new: t/foreign.t, the cases that gemmi's and Biopython's own test
-directories know about -- an atom whose first record has no altloc
-letter, a coordinate line that stops early, the same record written
-twice, a MODEL with no serial number, a serial number that spills out of
-its columns, one residue modelled in two chemical states in mmCIF, the
-element rules with no element columns, a resolution that is only in
-REMARK 3, CRLF line endings, and CIFs that are not structures.
-
-new: t/data/pdb1gdr.ent, a 1993 entry that keeps its id in columns 73-80.
-
-new: t/oracle.t, which compares every atom of model 1 against gemmi --
-chain, number, insertion code, name, altloc and coordinates, as a
-multiset -- over t/data and a spread of STRUCTURE_INFO_TEST_DIR and
-STRUCTURE_INFO_TEST_CIF_DIR.  t/real.t checks the C against a second
-reader in Perl, which cannot catch a column both of them read wrongly
-because one person wrote both.  It skips unless python3 can import gemmi.
-Over 655 real structures the two agree atom for atom except where a
-residue is modelled in two chemical states at once, which is one residue
-here and two there.
-
-new: $info->{chains}{$chain}{elements}, how many atoms of each element the
-chain holds.  Same shape as $info->{stats}{elements}, which is the whole
-structure; both count coordinate records, as the n_atoms beside them
-does, so both add up to it.  Gathered in the parse, once per residue for
-the lookup and once per atom for the increment, so it costs the same as
-the whole-structure tally already did.  With model => 'all' each model's
-chains carry their own.
-
-element symbols now read back as IUPAC writes them: Zn, not ZN.  Columns
-77-78 of a PDB record are capitals, an mmCIF type_symbol is capitals as
-often as not, and guess_element() uppercases what it takes from the atom
-name, so a zinc arrived as ZN by all three roads.  The correction runs
-once, on the symbol, where it is settled, so an atom's element, the chain
-tally and the structure tally cannot disagree.  Only the 118 named
-elements are corrected; a field that spells no element is left as the
-file wrote it, so XX stays XX rather than becoming a plausible Xx.
-Incompatible: $atom->{element}, the element column of the low-level
-parse, and the keys of $info->{stats}{elements} all change spelling for
-the two-letter elements.
-
-the element counts are unsigned integers rather than whatever sv_inc()
-left behind.  They are counted up from nothing and never down.
 
 =head1 COPYRIGHT AND LICENSE
 

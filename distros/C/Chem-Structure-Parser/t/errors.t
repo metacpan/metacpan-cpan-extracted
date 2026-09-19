@@ -58,6 +58,29 @@ throws_ok { structure_info($data) } qr/is a directory/, 'a directory dies';
 	is(structure_info("$dir/coords.txt")->{chains}{A}{sequence}, 'A',
 		'and read properly');
 
+	# the other format that is recognised and not written yet, and the two ways
+	# a format is recognised: by the name, and by what is in the file
+	open my $s, '>', "$dir/x.sdf" or die $!;
+	print {$s} "  Mrv1234\n\n\n  0  0  0  0  0  0            999 V2000\nM  END\n";
+	close $s;
+	throws_ok { structure_info("$dir/x.sdf") } qr/SDF.*not implemented/,
+		'an SDF is recognised by its name and is not implemented yet';
+	rename "$dir/x.sdf", "$dir/x.dat" or die $!;
+	throws_ok { structure_info("$dir/x.dat") } qr/SDF.*not implemented/,
+		'and by its M  END line when the name says nothing';
+	open my $m, '>', "$dir/y.dat" or die $!;
+	print {$m} "\@<TRIPOS>MOLECULE\nthing\n";
+	close $m;
+	throws_ok { structure_info("$dir/y.dat") } qr/MOL2.*not implemented/,
+		'a MOL2 likewise, by its TRIPOS record';
+	# and from a string, where there is no name to go on at all
+	throws_ok { structure_info_string("\@<TRIPOS>MOLECULE\nthing\n") }
+		qr/MOL2.*not implemented/, 'and the same from a string';
+	# text that looks like nothing in particular is read as PDB from a string,
+	# because the caller has already said it is a structure
+	lives_ok { structure_info_string("this is not a structure file\n") }
+		'while text that looks like nothing is read as PDB rather than refused';
+
 	# and the format can be forced past the detection
 	lives_ok { structure_info("$dir/x.txt", format => 'pdb') }
 		'format => pdb overrides the detection';
@@ -118,6 +141,63 @@ lives_ok  { structure_info_string('') } 'empty text does not die';
 is(structure_info_string('')->{stats}{n_atoms}, 0, 'and reads as nothing');
 
 #--------
+# the XS entry points, asked directly.
+#
+# structure_info() checks its arguments before the parse ever sees them, so
+# these croaks are the ones underneath -- what a caller reaching past the front
+# door hits, and the last thing between a wrong argument and a segmentation
+# fault.  They are tested here because nothing else can reach them.
+#--------
+{
+	my %parse = (
+		_parse_file       => "$data/mini.pdb",
+		_parse_string     => "ATOM      1  CA  ALA A   1      1.0 2.0 3.0\n",
+		_parse_cif_file   => "$data/mini.cif",
+		_parse_cif_string => "data_x\n",
+	);
+	for my $fn (sort keys %parse) {
+		no strict 'refs';
+		my $f = \&{"Chem::Structure::Parser::$fn"};
+		throws_ok { $f->(undef, {}) } qr/is undefined/,
+			"$fn: an undefined argument dies";
+		throws_ok { $f->($parse{$fn}, []) } qr/options must be a hash reference/,
+			"$fn: options that are not a hash reference die";
+		throws_ok { $f->($parse{$fn}, 'no') } qr/options must be a hash reference/,
+			"$fn: and so does a plain string";
+		lives_ok { $f->($parse{$fn}) } "$fn: and the options may be left out entirely";
+	}
+	# a path that opens and will not read.  A directory is the one every system
+	# has: fopen() takes it and the first fread() fails, which is the error path
+	# that has to free the buffer it had already allocated (t/leaks.t watches
+	# the same path for the leak).
+	for my $fn (qw(_parse_file _parse_cif_file)) {
+		no strict 'refs';
+		throws_ok { &{"Chem::Structure::Parser::$fn"}($data, {}) } qr/error reading/,
+			"$fn: a path that opens and does not read dies";
+	}
+}
+
+#--------
+# is_single_ion, which takes two shapes of argument and has to tell them apart
+#--------
+{
+	my $i = structure_info("$data/mini.pdb");
+	throws_ok { is_single_ion({ chains => 'not a hash' }, 'A') }
+		qr/expected the hash reference from structure_info/,
+		'a structure whose chains are not chains dies';
+	throws_ok { is_single_ion({ chains => {} }, 'Z') } qr/no chain 'Z'/,
+		'and a chain that is not in it names the chain';
+	throws_ok { is_single_ion($i, undef) } qr/no chain given/,
+		'two arguments with no chain in the second is a missing chain, not a chain hash';
+	throws_ok { is_single_ion($i->{chains}{A}{residues}{6}) } qr/that is a residue/,
+		'a residue says it is a residue';
+	throws_ok { is_single_ion($i) } qr/that is the whole structure/,
+		'and the whole structure says so as well';
+	throws_ok { is_single_ion('A') } qr/expected the chain hash reference/,
+		'something that is not a reference at all dies';
+}
+
+#--------
 # unreadable files
 #--------
 SKIP: {
@@ -133,6 +213,24 @@ SKIP: {
 	throws_ok { structure_info("$dir/locked.pdb") } qr/locked\.pdb/,
 		'and names the file';
 	chmod 0600, "$dir/locked.pdb";
+
+	# the same thing on the gzip path, which opens the file through
+	# IO::Uncompress::Gunzip rather than through the XS and so has a failure of
+	# its own to report.  A method's return value was never autodie's job, which
+	# is why this one is checked by hand.
+	SKIP: {
+		eval { require IO::Compress::Gzip; 1 } or skip 'IO::Compress is not installed', 2;
+		IO::Compress::Gzip::gzip("$dir/locked.pdb" => "$dir/locked.pdb.gz")
+			or skip 'cannot gzip the fixture: '
+			        . do { no warnings 'once'; $IO::Compress::Gzip::GzipError }, 2;
+		chmod 0000, "$dir/locked.pdb.gz";
+		skip 'file is still readable', 2 if -r "$dir/locked.pdb.gz";
+		throws_ok { structure_info("$dir/locked.pdb.gz") } qr/cannot gunzip/,
+			'a gzipped file that cannot be opened dies too';
+		throws_ok { structure_info("$dir/locked.pdb.gz") } qr/locked\.pdb\.gz/,
+			'and names that file as well';
+		chmod 0600, "$dir/locked.pdb.gz";
+	}
 }
 
 done_testing();

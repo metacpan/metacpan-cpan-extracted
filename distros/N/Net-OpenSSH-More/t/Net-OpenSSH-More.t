@@ -7,6 +7,8 @@ use Test2::Tools::Subtest qw{subtest_streamed};
 use Test2::Plugin::NoWarnings;
 use Test::MockModule qw{strict};
 
+use IO::Socket::INET;
+
 use FindBin;
 
 use lib "$FindBin::Bin/../lib";
@@ -40,6 +42,17 @@ subtest_streamed "Live tests versus localhost" => sub {
 # Mock based testing
 subtest_streamed "Common tests using mocks" => sub {
     local %Net::OpenSSH::More::cache;
+
+    # The constructor will not try to authenticate until a real TCP connect
+    # succeeds. Give it a listener of its own rather than resting on whether
+    # this machine happens to run sshd on port 22.
+    my $listener = IO::Socket::INET->new(
+        'LocalAddr' => '127.0.0.1',
+        'Listen'    => 5,
+        'Proto'     => 'tcp',
+    );
+    ok( $listener, "Bound a listener for the reachability check" ) or return;
+
     my $parent_mock = Test::MockModule->new('Net::OpenSSH');
     $parent_mock->redefine(
         'new'          => sub { bless {}, $_[0] },
@@ -50,7 +63,7 @@ subtest_streamed "Common tests using mocks" => sub {
         no warnings qw{redefine};
         *Net::OpenSSH::DESTROY = sub { undef };
     }
-    my $obj = Net::OpenSSH::More->new( 'host' => '127.0.0.1', retry_max => 1, 'output_prefix' => '# ', 'password' => 'mock' );
+    my $obj = Net::OpenSSH::More->new( 'host' => '127.0.0.1', retry_max => 1, 'port' => $listener->sockport(), 'output_prefix' => '# ', 'password' => 'mock' );
     is( ref $obj,           'Net::OpenSSH::More', "Got right ref type for object upon instantiation" );
     is( $obj->diag("Whee"), undef,                "You should see whee before this subtest" );
 };

@@ -2,7 +2,9 @@
 use 5.010;
 use strict;
 use warnings;
+use Config;
 use Test::More;
+use Time::HiRes ();
 use Shared::Arena ();
 
 # A PER-KEY DEADLINE ON A MAP.
@@ -15,8 +17,33 @@ use Shared::Arena ();
 # TIMING IS A RANGE, NEVER A POINT. A sleep is a lower bound on elapsed time
 # and nothing more, so the tests below say "before the deadline it is present,
 # after it is gone", with the sleep comfortably past the ttl.
+#
+# AND A CHECK THAT MUST LAND BEFORE THE DEADLINE IS ONLY A CHECK WHEN IT DID.
+# A smoker running a dozen builds can park this process for longer than any
+# ttl worth waiting out, and the FreeBSD box did exactly that between a store
+# with a 40ms ttl and the `exists` three lines later, which then read as
+# "expired early". So every live check runs inside a measured window: `live`
+# stores, runs the checks, and accepts their answers only when the whole of it
+# fitted inside the ttl. A window that overran says nothing about the map and
+# is run again with a fresh store, a few times, before it is called a failure.
 
 plan skip_all => 'no atomics in this build' unless Shared::Arena::have_atomics();
+
+sub live {
+    my ($ttl_ms, $store, $check) = @_;
+    my @r;
+    for my $try (1 .. 5) {
+        my $t0 = Time::HiRes::time();
+        $store->();
+        @r = $check->();
+        my $took = (Time::HiRes::time() - $t0) * 1000;
+        return @r if $took < $ttl_ms;
+        note sprintf 'the live window took %.0fms against a %dms ttl (try %d): '
+                   . 'it says nothing, so again', $took, $ttl_ms, $try;
+    }
+    diag "five live windows in a row overran the ttl; these checks ran late";
+    return @r;
+}
 
 my $arena = Shared::Arena->create(size => 2 * 1024 * 1024);
 
@@ -25,11 +52,13 @@ my $arena = Shared::Arena->create(size => 2 * 1024 * 1024);
 {
     my $m = $arena->map('ttl', slots => 64, slot_size => 128);
     $m->store('perm', 'forever');
-    $m->store('temp', 'briefly', ttl_ms => 40);
+    my ($val, $there) = live(40,
+        sub { $m->store('temp', 'briefly', ttl_ms => 40) },
+        sub { (($m->fetch('temp'))[0], $m->exists('temp') ? 1 : 0) });
 
     is(($m->fetch('perm'))[0], 'forever', 'a key with no ttl is stored');
-    is(($m->fetch('temp'))[0], 'briefly', 'a key with a ttl is present before it');
-    ok($m->exists('temp'), 'exists agrees while it is live');
+    is($val, 'briefly', 'a key with a ttl is present before it');
+    ok($there, 'exists agrees while it is live');
 
     select undef, undef, undef, 0.12;
 
@@ -42,8 +71,10 @@ my $arena = Shared::Arena->create(size => 2 * 1024 * 1024);
 
 {
     my $m = $arena->map('secs', slots => 64, slot_size => 128);
-    $m->store('k', 'v', ttl => 0.03);       # 30ms
-    ok($m->exists('k'), 'ttl in seconds stores');
+    my ($there) = live(30,
+        sub { $m->store('k', 'v', ttl => 0.03) },      # 30ms
+        sub { $m->exists('k') ? 1 : 0 });
+    ok($there, 'ttl in seconds stores');
     select undef, undef, undef, 0.10;
     ok(!$m->exists('k'), '...and lapses');
 }
@@ -75,11 +106,15 @@ my $arena = Shared::Arena->create(size => 2 * 1024 * 1024);
 
 {
     my $m = $arena->map('refresh', slots => 64, slot_size => 128);
-    $m->store('k', 'first', ttl_ms => 30);
-    select undef, undef, undef, 0.02;
-    $m->store('k', 'second', ttl_ms => 200);   # renew, well before it lapses
-    select undef, undef, undef, 0.05;          # past the FIRST deadline
-    is(($m->fetch('k'))[0], 'second', 'a re-store renews the deadline');
+    my ($val) = live(200,
+        sub {
+            $m->store('k', 'first', ttl_ms => 30);
+            select undef, undef, undef, 0.02;
+            $m->store('k', 'second', ttl_ms => 200);   # renew, well before it lapses
+            select undef, undef, undef, 0.05;          # past the FIRST deadline
+        },
+        sub { ($m->fetch('k'))[0] });
+    is($val, 'second', 'a re-store renews the deadline');
 }
 
 # ---- an expired counter resets to zero, it does not accumulate -------------
@@ -87,11 +122,17 @@ my $arena = Shared::Arena->create(size => 2 * 1024 * 1024);
 {
     my $m = $arena->map('ctr', slots => 64, slot_size => 128);
     # incr does not take a ttl, so give the counter one via store, as 8 raw
-    # bytes, then let it lapse.
+    # bytes, then let it lapse. The bytes are built by hand: a perl without
+    # 64-bit integers has no Q template (t/24 dodges it the same way).
+    my $five = $Config{byteorder} =~ /^1234/
+             ? pack('L', 5) . ("\0" x 4)
+             : ("\0" x 4) . pack('L', 5);
     is($m->incr('hits'), 1, 'a fresh counter starts at one');
     is($m->incr('hits'), 2, '...and climbs');
-    $m->store('win', pack('Q', 5), ttl_ms => 30);   # an 8-byte counter with a ttl
-    is($m->counter('win'), 5, 'a stored 8-byte value reads as a counter');
+    my ($read) = live(30,
+        sub { $m->store('win', $five, ttl_ms => 30) },   # an 8-byte counter with a ttl
+        sub { $m->counter('win') });
+    is($read, 5, 'a stored 8-byte value reads as a counter');
 
     select undef, undef, undef, 0.09;
 
@@ -103,25 +144,39 @@ my $arena = Shared::Arena->create(size => 2 * 1024 * 1024);
 #
 # One worker sets a deadline; every worker sees the same lapse, because the
 # deadline is a wall-clock timestamp in the shared entry, not per-process state.
+#
+# The child's first look has to land before the deadline, and a fork is where
+# a loaded host is most likely to park the new process. So the child times its
+# look against the parent's store, and a look that came after the deadline is
+# reported as late (exit 3) rather than as a miss, and the parent runs the whole
+# thing again.
 
 SKIP: {
     skip 'fork is POSIX-only here', 2 if $^O eq 'MSWin32';
 
     my $m = $arena->map('pool', slots => 64, slot_size => 128);
-    $m->store('ban', 'yes', ttl_ms => 60);
+    my $rc;
+    for my $try (1 .. 5) {
+        my $t0 = Time::HiRes::time();
+        $m->store('ban', 'yes', ttl_ms => 200);
 
-    my $pid = fork;
-    die "fork: $!" unless defined $pid;
-    if (!$pid) {
-        # The child sees it live now...
-        my $live = $m->exists('ban') ? 1 : 0;
-        select undef, undef, undef, 0.12;
-        # ...and gone after, from a deadline the parent set.
-        my $gone = $m->exists('ban') ? 0 : 1;
-        exit($live && $gone ? 0 : 1);
+        my $pid = fork;
+        die "fork: $!" unless defined $pid;
+        if (!$pid) {
+            # The child sees it live now...
+            my $live = $m->exists('ban') ? 1 : 0;
+            my $late = (Time::HiRes::time() - $t0) * 1000 >= 200;
+            select undef, undef, undef, 0.3;
+            # ...and gone after, from a deadline the parent set.
+            my $gone = $m->exists('ban') ? 0 : 1;
+            exit(!$live && $late ? 3 : $live && $gone ? 0 : 1);
+        }
+        waitpid($pid, 0);
+        $rc = $? >> 8;
+        last unless $rc == 3;
+        note "the child's first look came after the 200ms deadline (try $try): again";
     }
-    waitpid($pid, 0);
-    is($? >> 8, 0, 'a child sees the deadline the parent set, live then gone');
+    is($rc, 0, 'a child sees the deadline the parent set, live then gone');
 
     # And by now the parent agrees.
     ok(!$m->exists('ban'), 'the parent sees it gone too');

@@ -3,6 +3,7 @@ on 'runtime' => sub {
     requires 'strict';
     requires 'warnings';
     requires 'base';
+    requires 'Carp';
     requires 'DateTime';
     requires 'Exporter' => '5.57';
     requires 'IO::Socket::SSL' => '1.94';

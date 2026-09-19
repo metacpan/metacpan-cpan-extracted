@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use 5.008004;
 use Alien::Build::Plugin;
+use Capture::Tiny qw( capture_merged );
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using the pkg-config command line interface
-our $VERSION = '2.87'; # VERSION
+our $VERSION = '2.88'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -17,18 +18,31 @@ has '+pkg_name' => sub {
 # NOT used, for compat with other PkgConfig plugins
 has register_prereqs => 1;
 
+sub _supports_static {
+  my($bin) = @_;
+  # Some very old pkg-config implementations (e.g. the one still
+  # found on some Solaris installs) predate the --static flag
+  # entirely, and this plugin relies on it to gather the
+  # {libs,cflags}_static properties.
+  my $help = capture_merged { system $bin, '--help' };
+  return $help =~ /--static\b/ ? 1 : 0;
+}
+
 sub _bin_name {
 
   # We prefer pkgconf to pkg-config because it seems to be the future.
 
   require File::Which;
-  File::Which::which($ENV{PKG_CONFIG})
-    ? $ENV{PKG_CONFIG}
-    : File::Which::which('pkgconf')
-      ? 'pkgconf'
-      : File::Which::which('pkg-config')
-        ? 'pkg-config'
-        : undef;
+
+  foreach my $bin ($ENV{PKG_CONFIG}, 'pkgconf', 'pkg-config')
+  {
+    next unless $bin;
+    next unless File::Which::which($bin);
+    next unless _supports_static($bin);
+    return $bin;
+  }
+
+  undef;
 };
 
 has bin_name => \&_bin_name;
@@ -203,7 +217,7 @@ Alien::Build::Plugin::PkgConfig::CommandLine - Probe system and determine librar
 
 =head1 VERSION
 
-version 2.87
+version 2.88
 
 =head1 SYNOPSIS
 

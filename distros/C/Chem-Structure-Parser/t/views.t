@@ -52,6 +52,8 @@ my $i = structure_info("$data/mini.pdb");
 	is(refaddr($res->[0]), refaddr($i->{chains}{A}{residues}{1}),
 		'and they are the very residues in the structure, not copies of them');
 	is(scalar @{ structure_residues($i, 'B') }, 4, 'one chain on request');
+	throws_ok { structure_residues($i, 'Z') } qr/structure_residues: no chain 'Z'/,
+		'and a chain that is not there is a mistake rather than an empty list';
 }
 
 #--------
@@ -174,6 +176,22 @@ my $i = structure_info("$data/mini.pdb");
 	like($s, qr/1 gap\b/, 'summary: gaps, singular');
 	like($s, qr/NAG_A_201/, 'summary: the ligands');
 	is(substr($s, -1), "\n", 'summary: ends with a newline');
+
+	# a summary of an ensemble says which model the chains were built from,
+	# which is the one line a single-model structure does not have
+	my $nmr = structure_summary(structure_info("$data/nmr.pdb", model => 'all'));
+	like($nmr, qr/models\s+3 \(chains built from model 1\)/,
+		'summary: an ensemble says how many models and which one it read');
+
+	# and a structure read from a string has no file name, no method, no
+	# resolution and no R factors: every one of those lines is there only when
+	# the file said something, rather than printed as a dash
+	my $bare = structure_summary(structure_info_string(
+		"ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00           C\n"));
+	unlike($bare, qr/file|method|resolution|R-free|gap|ligands/,
+		'summary: nothing the structure does not say is printed');
+	like($bare, qr/\A\?\?\?\?  \(no title\)/,
+		'summary: an entry with no id and no title says so rather than printing an empty line');
 }
 
 #--------

@@ -1,0 +1,15 @@
+Alien-gettext-*
+.build
+
+# Claude Code — commit: skills/, agents/, rules/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+.claude/*.local.*
+.claude/local/
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+
+# karr materialized task view -- never commit
+tasks/
+config.yml

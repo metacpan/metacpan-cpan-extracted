@@ -12,6 +12,11 @@ use Test::More;
 # A source scan, in the shape of Game::Dominoes' t/21-no-io.t, over the C and
 # the Perl. Comments and POD are stripped first: the C's header comment names
 # printf in prose, and this file names rand in its own.
+#
+# The C also names no transcendental: sin, cos, tan, atan2 and pow are banned
+# because V8's and libm's may differ in the last bit, and the fixtures are
+# recorded by the JavaScript. The curve is a rotation by the half-angle
+# tangent for exactly this reason (0.03), and pow is multiplied out.
 
 plan tests => 2;
 
@@ -28,14 +33,14 @@ subtest 'the C names no handle, no clock and no random' => sub {
 		my $line = 0;
 		for my $text (split /\n/, $code) {
 			$line++;
-			for my $bad (qw(printf fprintf puts fopen fread fwrite scanf getchar rand srand random time clock_gettime gettimeofday sleep usleep nanosleep)) {
+			for my $bad (qw(printf fprintf puts fopen fread fwrite scanf getchar rand srand random time clock_gettime gettimeofday sleep usleep nanosleep sin cos tan atan2 atan asin acos pow exp log hypot)) {
 				push @caught, "$path:$line calls $bad" if $text =~ /(?<![A-Za-z0-9_])\Q$bad\E\s*\(/;
 			}
 			push @caught, "$path:$line includes stdio" if $text =~ /^\s*#\s*include\s*<stdio\.h>/;
 			push @caught, "$path:$line includes time.h" if $text =~ /^\s*#\s*include\s*<time\.h>/;
 		}
 	}
-	is_deeply \@caught, [], 'pb_engine.c and pb_abi.h are pure' or diag(join "\n", @caught);
+	is_deeply \@caught, [], 'pb_engine.c and pb_abi.h are pure, and call no transcendental' or diag(join "\n", @caught);
 };
 
 subtest 'the Perl names no handle, no clock and no random' => sub {

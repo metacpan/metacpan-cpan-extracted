@@ -8,7 +8,7 @@ use Config;
 use File::Which qw( which );
 
 # ABSTRACT: Core setup plugin
-our $VERSION = '2.87'; # VERSION
+our $VERSION = '2.88'; # VERSION
 
 
 sub init
@@ -199,7 +199,7 @@ sub _cpu_arch {
     | \b i386 \b   # freebsd-i386
     | \b i486 \b   # i486-linux
     | \b i686 \b   # i686-cygwin
-    | \b i86pc.*64 \b # i86pc-solaris-thread-multi-64
+    | \b i86pc \b      # i86pc-solaris, i86pc-solaris-thread-multi-64
     /ix ) {
     $arch = { name => 'x86' };
   } elsif( $Config{archname} =~ m/
@@ -267,7 +267,7 @@ Alien::Build::Plugin::Core::Setup - Core setup plugin
 
 =head1 VERSION
 
-version 2.87
+version 2.88
 
 =head1 SYNOPSIS
 

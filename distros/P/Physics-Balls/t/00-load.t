@@ -29,6 +29,6 @@ use strict 'refs';
 is scalar(keys %version), 1,
 	'every module carries the same $VERSION (' . join(', ', keys %version) . ')';
 
-is Physics::Balls->abi_version, 1, 'the C table is ABI 1';
+cmp_ok Physics::Balls->abi_version, '>=', 2, 'the C table is at least ABI 2';
 
 diag("Testing Physics::Balls $Physics::Balls::VERSION, Perl $], $^X");

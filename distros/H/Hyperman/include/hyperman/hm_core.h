@@ -2837,6 +2837,26 @@ static void hm_process(pTHX_ hm_conn *c) {
         c->req_start = loop->now;
 }
 
+/* A tunnel's bytes belong to its handle, not the request parser: hand over
+ * whatever the read left in rbuf, or keep it when no read half is registered
+ * yet. ONE function for both ways a read completes - readiness (hm_readable)
+ * and completion (HM_EV_RECV) - because the completion path once had no
+ * tunnel branch at all and fed the bytes to hm_process, where they sat as
+ * the start of a request that never came. Every Linux box with liburing
+ * takes that path by default, and macOS never does, so the six smokers that
+ * failed t/41 were the first time it ran. Returns 0 when the callback closed
+ * the connection. */
+static int hm_tunnel_bytes(pTHX_ hm_conn *c) {
+    hm_loop *loop = c->loop;
+    size_t have = c->rlen;
+    c->rlen = 0;
+    if (!hm_stream_deliver(aTHX_ c->fd, c->id, -1, c->rbuf, have, 0)) {
+        if (loop->conns[c->fd] != c) return 0;
+        c->rlen = have;         /* no read half yet: kept for it */
+    }
+    return loop->conns[c->fd] == c;
+}
+
 static void hm_readable(pTHX_ hm_conn *c) {
     hm_loop *loop = c->loop;
     for (;;) {
@@ -2886,15 +2906,7 @@ static void hm_readable(pTHX_ hm_conn *c) {
              * not a request. Handed up read by read, so the buffer never
              * grows toward the ceiling that ends an oversize request. The
              * callback may close the stream and with it the connection. */
-            if (c->tunnel) {
-                size_t have = c->rlen;
-                c->rlen = 0;
-                if (!hm_stream_deliver(aTHX_ c->fd, c->id, -1, c->rbuf, have, 0)) {
-                    if (loop->conns[c->fd] != c) return;
-                    c->rlen = have;     /* no read half yet: kept for it */
-                }
-                if (loop->conns[c->fd] != c) return;
-            }
+            if (c->tunnel && !hm_tunnel_bytes(aTHX_ c)) return;
             /* A SHORT read means the socket buffer is drained: the kernel
              * handed over everything it had, so the confirming read that
              * would follow can only return EAGAIN. Stopping here removes ONE
@@ -3220,13 +3232,22 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
         }
         c->recv_inflight = 0;
         if (ev->res <= 0) {   /* EOF, error, or the cancel from a close */
+            /* The peer half-closed a tunnel: fin to the handle first, as
+             * hm_readable's zero read does, then the close says the rest. */
+            if (c->tunnel && ev->res == 0) {
+                (void)hm_stream_deliver(aTHX_ c->fd, c->id, -1, c->rbuf, 0, 1);
+                if (loop->conns[fd] != c) return;
+            }
             hm_close(aTHX_ loop, c);
             return;
         }
         c->rlen += (size_t)ev->res;
         c->last_active = loop->now;
         hm_lru_touch(loop, c);
-        hm_process(aTHX_ c);
+        /* A tunnel carries no requests: its bytes go to the handle. The
+         * parser would hold them as an unfinished request line forever. */
+        if (c->tunnel) { if (!hm_tunnel_bytes(aTHX_ c)) return; }
+        else hm_process(aTHX_ c);
         if (loop->conns[fd] != c) return;      /* dispatch closed it */
         hm_flush(aTHX_ c);
         if (loop->conns[fd] != c) return;      /* flush closed it */

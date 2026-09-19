@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 our (@FLAGS, %MESSAGE);
 
@@ -16,6 +16,9 @@ BEGIN {
 		bad_power
 		bad_spin
 		bad_layout
+		bad_kind
+		bad_adjust
+		bad_roll
 		overlap
 		engine
 	/;
@@ -25,7 +28,10 @@ BEGIN {
 		bad_direction => 'dx and dy must be integers within plus or minus 1,000,000 and not both zero',
 		bad_power     => 'power must be an integer from 0 to 1000',
 		bad_spin      => 'sx and sy must be integers from -500 to 500',
-		bad_layout    => 'a layout is a list of [id, x, y] integers with distinct ids',
+		bad_layout    => 'a layout is a list of [id, x, y] or [id, x, y, kind] integers with distinct ids',
+		bad_kind      => 'a kind is an integer index into the kinds the world declares',
+		bad_adjust    => 'an adjust is a line in hundredths of a millimetre on axis 0 or 1, a direction of 1 or -1, and two factors in thousandths from 0 to 100000',
+		bad_roll      => 'a release roll is a direction tx, ty within plus or minus 1,000,000, not both zero, and a spin from 0 to 1000',
 		overlap       => 'two balls in the layout overlap',
 		engine        => 'the engine gave up',
 	);
@@ -75,7 +81,7 @@ Physics::Balls::Error - a flagged refusal, returned and never thrown
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -89,8 +95,9 @@ Version 0.02
 
 Every refusal is one of these, so a caller tests C<error> and reads C<code>
 rather than parsing a string. The codes are C<no_ball>, C<bad_direction>,
-C<bad_power>, C<bad_spin>, C<bad_layout>, C<overlap> and C<engine>, each also a
-true attribute on the object.
+C<bad_power>, C<bad_spin>, C<bad_layout>, C<bad_kind>, C<bad_adjust>,
+C<bad_roll>, C<overlap> and C<engine>, each also a true attribute on the
+object.
 
 =head1 METHODS
 
@@ -139,11 +146,29 @@ C<sx> and C<sy> must be integers from -500 to 500.
 
 =head2 bad_layout
 
-A layout is a list of C<[id, x, y]> integers with distinct ids.
+A layout is a list of C<[id, x, y]> or C<[id, x, y, kind]> integers with
+distinct ids.
+
+=head2 bad_kind
+
+A row's kind is not an integer index into the kinds the world declares. A
+world with no kinds accepts kind 0 only.
+
+=head2 bad_adjust
+
+The adjust fields are not integers in range: C<adjust_at> any integer,
+C<adjust_axis> 0 or 1, C<adjust_dir> 1 or -1, C<adjust_mu> and
+C<adjust_curve> 0 to 100000.
+
+=head2 bad_roll
+
+The release roll is not a direction within plus or minus 1,000,000, not both
+zero, with a spin from 0 to 1000.
 
 =head2 overlap
 
-Two balls in the layout are more than a tenth of a millimetre inside each other.
+Two balls in the layout are more than a tenth of a millimetre inside each
+other, at the touching distance of their kinds.
 
 =head2 engine
 

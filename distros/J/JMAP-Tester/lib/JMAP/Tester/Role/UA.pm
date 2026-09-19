@@ -1,7 +1,7 @@
 use v5.20.0;
 use warnings;
 
-package JMAP::Tester::Role::UA 0.112;
+package JMAP::Tester::Role::UA 0.113;
 
 use Moo::Role;
 
@@ -31,7 +31,7 @@ JMAP::Tester::Role::UA
 
 =head1 VERSION
 
-version 0.112
+version 0.113
 
 =head1 PERL VERSION
 

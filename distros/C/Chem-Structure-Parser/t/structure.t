@@ -112,6 +112,25 @@ is_deeply($info->{chains}{B}{missing_residues}, [],
 	is_deeply($icodes->{chains}{H}{gaps},
 		[ { after => '152', before => '155', missing => 2 } ],
 		'and it is the one gap the chain has');
+
+	# A polymer whose residues are not in numerical order at all.  Two jumps
+	# then pass over the same numbers, and one of them passes over a residue
+	# that is further down the list -- so the list of missing numbers has to be
+	# a set and not a running tally: 15 and 20 are modelled, and 16 to 19 are
+	# missing once rather than twice.  missing_residues is the field a caller
+	# asks "is 47 modelled?" of, and that question has one right answer.
+	my $shuffled = structure_info_string(join "\n",
+		(map { $ca->('ALA', 'S', $_) } 10, 20, 15, 25),
+		'END', '');
+	is_deeply($shuffled->{chains}{S}{missing_residues},
+		[ 11, 12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24 ],
+		'a polymer numbered out of order lists each missing number once, ascending');
+	is($shuffled->{chains}{S}{n_gaps}, 2, 'and the jumps themselves are still two gaps');
+	is_deeply([ grep { my $m = $_; grep { $_ == $m } @{ $shuffled->{chains}{S}{missing_residues} } }
+	            map { $shuffled->{chains}{S}{residues}{$_}{number} }
+	            @{ $shuffled->{chains}{S}{residue_order} } ],
+	          [],
+		'and no residue the chain has is in its own missing list');
 }
 
 #--------
@@ -324,8 +343,9 @@ is(scalar @{ $info->{stats}{center} }, 3, 'and a centre');
 }
 
 #--------
-# pdb_info() is structure_info() with the format settled
+# naming the format, rather than letting it be detected
 #--------
-is_deeply(pdb_info("$data/mini.pdb"), $info, 'pdb_info: the same answer as structure_info');
+is_deeply(structure_info("$data/mini.pdb", format => 'pdb'), $info,
+	"format => 'pdb': the same answer as letting structure_info() detect it");
 
 done_testing();

@@ -139,4 +139,69 @@ sub atoms {
 		'the ion and the ligand are both bound heterogens; the water is not');
 }
 
+#--------
+# what a chain of nothing but heterogens is called
+#--------
+{
+	my $w = structure_info_string(
+		atoms('ATOM  ', 'A', 'MET', 1, qw(N CA C O)) .
+		atoms('HETATM', 'W', 'HOH', 1, qw(O)) .
+		atoms('HETATM', 'W', 'HOH', 2, qw(O))
+	);
+	is($w->{chains}{W}{type}, 'water',
+		'a chain of nothing but water is a water chain, not a heterogen one');
+	is($w->{chains}{W}{n_water}, 2, 'with its waters counted');
+	is($w->{chains}{A}{type}, 'protein', 'and the polymer beside it is unaffected');
+
+	my $h = structure_info_string(
+		atoms('HETATM', 'L', 'NAG', 1, qw(C1 C2 C3 O5 N2)) .
+		atoms('HETATM', 'L', 'HOH', 2, qw(O))
+	);
+	is($h->{chains}{L}{type}, 'hetero',
+		'a chain holding a ligand as well as water is a heterogen chain');
+	is($h->{chains}{L}{n_ligand}, 1, 'and the ligand is counted as one');
+
+	# the shape a caller walking chains wants out of the way: one residue, no
+	# sequence.  is_single_ion() asks the shape and not the chemistry, so a
+	# chain of one sugar answers as a chain of one zinc does.
+	my $one = structure_info_string(
+		atoms('ATOM  ', 'A', 'MET', 1, qw(N CA C O)) .
+		atoms('ATOM  ', 'A', 'ALA', 2, qw(N CA C O)) .
+		"HETATM   99 ZN    ZN Z 201       1.000   1.000   1.000  1.00 20.00          ZN\n"
+	);
+	ok(is_single_ion($one, 'Z'), 'a chain that is one zinc is a single ion');
+	ok(!is_single_ion($one, 'A'), 'and a chain of two residues is not');
+}
+
+#--------
+# the classification does not depend on the atom hashes
+#
+# atoms => 0 stops the parse at the residue level, and the two questions that
+# read a residue's atoms -- is this GUA a nucleotide or a free base, and is
+# this single-atom residue an ion -- then have to read the parse's own columns
+# instead.  They are two roads to one answer and they must arrive at the same
+# place, or a structure read for its sequences would classify differently from
+# the same structure read whole.
+#--------
+{
+	my $text = atoms('ATOM  ', 'A', 'MET', 1, qw(N CA C O))
+	         . atoms('HETATM', 'A', 'GUA', 501, qw(N1 C2 N2 N3 C4 C5 C6 O6 N7 C8 N9))
+	         . atoms('ATOM  ', 'B', 'ADE', 1, qw(P OP1 C1* N9 C4))
+	         . atoms('ATOM  ', 'B', 'GUA', 2, qw(P OP1 C1* N9 C4))
+	         . "HETATM   99 ZN    ZN C 201       1.000   1.000   1.000  1.00 20.00          ZN\n";
+	my $with = structure_info_string($text);
+	my $bare = structure_info_string($text, atoms => 0);
+	for my $cid (qw(A B C)) {
+		is_deeply([ map { $bare->{chains}{$cid}{residues}{$_}{type} }
+		            @{ $bare->{chains}{$cid}{residue_order} } ],
+		          [ map { $with->{chains}{$cid}{residues}{$_}{type} }
+		            @{ $with->{chains}{$cid}{residue_order} } ],
+			"chain $cid: every residue types the same with atoms => 0");
+		is($bare->{chains}{$cid}{sequence}, $with->{chains}{$cid}{sequence},
+			"chain $cid: and the sequence is the same");
+		is($bare->{chains}{$cid}{type}, $with->{chains}{$cid}{type},
+			"chain $cid: and so is what the chain is");
+	}
+}
+
 done_testing();

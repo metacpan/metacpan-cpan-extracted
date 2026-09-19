@@ -1,5 +1,40 @@
 Revision history for Database::Join
 
+0.004.0	Fri Sep 18 08:27:22 PM EDT 2026
+	[ Enhancements ]
+	- Add SQLite-backed join backend (backend => 'sqlite' | 'auto' | 'array').
+	  'auto' (default) transparently spills source data to a temporary SQLite
+	  database and executes a single SQL JOIN when combined source row count
+	  exceeds max_array_rows (default 10,000), reducing peak RAM from 3x to
+	  roughly 1x source size for large joins.  Small joins continue to use the
+	  existing in-memory array path with no overhead.  'sqlite' forces the SQL
+	  path unconditionally; 'array' forces the existing path unconditionally.
+	- Add max_array_rows constructor parameter (integer, default 10,000):
+	  threshold above which 'auto' mode activates the SQLite path.
+	- Add tmpdir constructor parameter (string, default File::Spec->tmpdir):
+	  directory used for the per-call temporary SQLite database file.
+	- Zero-copy ATTACH optimisation: source databases that implement
+	  dbi_source() (returning a hashref with dbh => $sqlite_dbh and
+	  table => $name) bypass row-level copying; their SQLite file is ATTACHed
+	  directly to the temporary join connection.
+	- collision_prefix renaming is applied as SQL AS aliases in the SELECT
+	  clause, preserving identical column-name semantics on the SQLite path.
+	- join_map asymmetric key names are applied in the JOIN ON clause.
+	- Auto-threshold row count uses dbi_source() COUNT(*) or a DA-defined
+	  count() override (checked via defined &{"${pkg}::count"}) to avoid
+	  fetching rows purely for sizing; falls back conservatively to the array
+	  path when neither is available.
+	- Move DBD::SQLite (>= 1.70), DBI, and File::Temp from TEST_REQUIRES to
+	  PREREQ_PM; add File::Spec to PREREQ_PM.
+	- Add t/sqlite-backend.t: 14 subtests covering backend dispatch, auto
+	  threshold, result identity, inner/outer join, 3-way join, collision_prefix
+	  SQL aliases, join_map ON clause, dbi_source() zero-copy ATTACH, temp file
+	  cleanup, and max_array_rows boundary conditions.
+
+0.003.1	Fri Sep 18 04:30:36 PM EDT 2026
+	[ Enhancements ]
+	- Added tsv file tests
+
 0.003.0	Fri Sep 11 05:12:03 PM EDT 2026
 	[ Bug Fixes ]
 	- Replace isa('Database::Abstraction') guard in new() and add_database()

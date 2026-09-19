@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use Physics::Balls;
 
@@ -17,6 +17,16 @@ sub new {
 sub strike {
 	my ($self, $layout, $shot) = @_;
 	return _strike($self->{ptr}, $layout, $shot);
+}
+
+sub strike_v1 {
+	my ($self, $layout, $shot) = @_;
+	return _strike_v1($self->{ptr}, $layout, $shot);
+}
+
+sub bad_size_refused {
+	my ($self) = @_;
+	return _bad_size_refused($self->{ptr});
 }
 
 sub DESTROY {
@@ -37,7 +47,7 @@ Physics::Balls::Engine - the door to the C engine
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -62,7 +72,19 @@ classes wrap, in the shape the prototype's fixtures use.
     my $raw = $engine->strike(\@layout, \%shot);
 
 Returns a hash with C<t>, C<n>, C<error>, C<events>, C<rest>, C<holed>,
-C<segments> and, when C<< $shot->{trace} >> is set, C<energy>.
+C<segments> and, when C<< $shot->{trace} >> is set, C<energy>. Goes through
+the ABI 2 entry point, so a row may carry a kind and a shot an adjust.
+
+=head2 strike_v1
+
+The same shot through the ABI 1 entry point, rows of three and no adjust.
+The v1 functions are wrappers over the v2 path with the v1 defaults, and
+this is how a test proves that they give the same doubles.
+
+=head2 bad_size_refused
+
+True when the engine refuses a v2 description and a v2 shot whose C<size> is
+smaller than this version needs. A probe for a test.
 
 =head2 DESTROY
 

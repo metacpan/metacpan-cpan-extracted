@@ -1,13 +1,19 @@
 ---
-abstract: 'singly linked list manager.'
+abstract: unknown
 author:
-  - unknown
+  - 'Steven Lembark <lembark@wrkhors.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Copy::Recursive::Reduced: '0.006000'
+  File::Spec::Functions: '0'
+  List::Util: '0'
+  strict: '0'
+  version: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +24,19 @@ no_index:
     - t
     - inc
 requires:
+  Benchmark: '0'
   Carp: '0'
-  ExtUtils::MakeMaker: '0'
-  Scalar::Util: '0'
+  Cwd: '3.073000'
+  Data::Dump: '0'
+  Devel::Size: '0'
+  File::Basename: '0'
+  File::Copy::Recursive::Reduced: '0.002000'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  List::Util: '0'
   Symbol: '0'
-  Test::Deep: '0'
   Test::More: '0'
-  overload: '0'
   strict: '0'
-version: 1.02
+  version: '0'
+version: v2.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

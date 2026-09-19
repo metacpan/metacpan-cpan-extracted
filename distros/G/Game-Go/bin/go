@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long ();
+
+use Game::Go;
+use Game::Go::Terminal;
+
+my %opt = (
+	size     => 9,
+	level    => 2,
+	colour   => 'black',
+	handicap => 0,
+	seed     => 'terminal',
+);
+
+Getopt::Long::GetOptions(\%opt,
+	'size=i', 'level=i', 'colour|color=s', 'komi=s',
+	'handicap=i', 'seed=s', 'ascii', 'help|h',
+) or usage(2);
+
+usage(0) if $opt{help};
+
+my $terminal = eval {
+	Game::Go::Terminal->new(
+		in     => \*STDIN,
+		out    => \*STDOUT,
+		size   => $opt{size},
+		level  => $opt{level},
+		colour => $opt{colour},
+		(defined $opt{komi} ? (komi => $opt{komi}) : ()),
+		handicap => $opt{handicap},
+		seed     => $opt{seed},
+		ascii    => ($opt{ascii} ? 1 : 0),
+	);
+};
+if (!$terminal) {
+	my $why = $@ || "could not start\n";
+	$why =~ s/\AGame::Go::Terminal: //;
+	print {*STDERR} "go: $why";
+	exit 2;
+}
+
+my $result = $terminal->start;
+my $game = $terminal->game;
+
+exit 0 unless defined $game->winner;
+
+my $human = lc($opt{colour}) =~ /\Aw/ ? Game::Go::WHITE : Game::Go::BLACK;
+exit($game->winner == $human ? 0 : 1);
+
+sub usage {
+	my ($status) = @_;
+	my $out = $status ? *STDERR : *STDOUT;
+	print {$out} <<'USAGE';
+go - play Go against the bot
+
+  go [options]
+
+  --size N       9, 13 or 19            (default 9)
+  --level N      1 to 5                 (default 2)
+  --colour C     black or white         (default black)
+  --komi N       a multiple of 0.5      (default 6.5, or 0.5 with a handicap)
+  --handicap N   2 to 9 on 19x19, 2 to 5 on the smaller boards
+  --seed S       the seed the bot plays from
+  --ascii        X and O rather than stones
+  --help
+
+Columns are A to T with I left out, and rows are numbered from the bottom, so
+the bottom left point is A1. Two passes STOP play; the game is not over until
+both players have agreed which stones are dead.
+
+Exit status is 0 for a win, 1 for a loss, 2 for a bad option.
+USAGE
+	exit $status;
+}

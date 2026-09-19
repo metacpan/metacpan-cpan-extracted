@@ -1,0 +1,132 @@
+########################################################################
+# housekeeping
+########################################################################
+package GC::Testy;
+use v5.40;
+use FindBin::libs;
+use FindBin::libs   qw( base=Dancer2 subdir=lib subonly export=dance_d scalar );
+use FindBin::libs   qw( base=lib                        export=lib_d          );
+use FindBin::libs   qw( base=t                          export=test_d  scalar );
+use FindBin::libs   qw( base=.prove                     export=prove   scalar );
+use autodie;
+
+use File::Basename;
+use Test::More;
+
+use List::Util  qw( first );
+
+use File::Spec::Functions
+qw
+(
+    rel2abs
+    catdir
+    catpath
+);
+
+use GC::Test::Env;
+
+########################################################################
+# package variables and sanity checks
+########################################################################
+
+$ENV{ RDBO_CFG }
+||= catpath dirname( $test_d ), qw( lib GC RDBO.cfg );
+
+my $path
+= do
+{
+    my $base    = basename $0 => qw( .t );
+    my $sep     = substr $base, 0, 1;
+
+    join '/' => split "$sep" => $base
+};
+
+-e $path
+or BAIL_OUT "Non-existant: '$path'\n";
+
+my $last_prove  = $ENV{ LAST_PROVE } // 0;
+
+SKIP:
+{
+    ( stat $path )[9] > $last_prove
+    or skip "File unchanged: $path", 1;
+
+    my $root_d  = dirname $test_d;
+    my $base    = basename $path;
+
+    chomp( my @output = qx{ bash -n $path 2>&1 } );
+
+    if( $? or @output )
+    {
+        fail "Fails bash -n: $base";
+        diag join "\n\t" => "\nWarnings:", @output;
+    }
+    else
+    {
+        pass "Syntax OK: $base";
+    }
+}
+
+done_testing
+
+__END__
+
+=head1 NAME
+
+01-pm_t - generic unit test for perl modules.
+
+=head1 SYNOPSIS
+
+    # symlink the absolute path to a module to this
+    # file and then run prove. 
+
+    cd t;
+    rm -rf 01-pm;
+    mkdir 01-pm;
+    cd 01-pm;
+    ln -fs /path/to/lib/Foo/Bar.pm path~to~lib~Foo~Bar.pm.t;
+
+    cd ../..;
+    prove -v t/01-pm;
+
+=head1 Description
+
+Simplifed sanity check for require and using a method in a module.
+In this case the module name is derived from the path and the method
+is standardized to "VERSION".
+
+=head2 Ignored modules
+
+Some modules are not suitable for unit testing: Net::FTP::* modules
+require Net::FTP to be loaded first, GSSAPI depends on kerberos that
+may not be installed. These are filtered out by the test code and 
+skipped. The list if ignored modules is curated as a list in the 
+code for now:
+
+    my @ignorz
+    = qw
+    (
+        GSSAPI
+        new_booking_passport
+
+        Test2
+        Manual
+        Net::FTP
+        Test2/AsyncSubtest/Formatter
+        PDF/API2/Win32
+        if
+        File/Spec/VMS
+    );
+
+=head1 SEE ALSO
+
+=over 4
+
+=item t/bin/install-pm-tests
+
+Locates all "*.pm" files in the sibling "lib" directory
+to t containing the executable and symlinks them to the
+*_t files in its directory.
+
+
+=back

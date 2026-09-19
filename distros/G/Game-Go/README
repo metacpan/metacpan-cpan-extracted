@@ -1,0 +1,34 @@
+Game-Go
+
+Go, on a 9x9, 13x13 or 19x19 board, under the Japanese rules of 1989. The
+board, the chains, the liberties and the search are in C, behind a published
+ABI in include/go_abi.h; the Perl is the rules, the notation and the bot's
+policy.
+
+This version carries the board and only the board: points, colours, chains,
+exact liberty counts, a zobrist hash and a packed position. Nothing in it
+judges a move, so there is no ko, no capture and no suicide rule yet. The
+engine is perl-free, so the same C compiles into the XS, into a plain program,
+or to wasm.
+
+This is an XS distribution with no pure-Perl fallback, so it needs a working
+compiler.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

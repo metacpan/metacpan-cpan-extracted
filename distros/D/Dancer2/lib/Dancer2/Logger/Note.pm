@@ -1,6 +1,6 @@
 package Dancer2::Logger::Note;
 # ABSTRACT: Test::More note() logging engine for Dancer2
-$Dancer2::Logger::Note::VERSION = '2.2.0';
+$Dancer2::Logger::Note::VERSION = '2.2.1';
 use Moo;
 use Test::More;
 
@@ -26,7 +26,7 @@ Dancer2::Logger::Note - Test::More note() logging engine for Dancer2
 
 =head1 VERSION
 
-version 2.2.0
+version 2.2.1
 
 =head1 DESCRIPTION
 

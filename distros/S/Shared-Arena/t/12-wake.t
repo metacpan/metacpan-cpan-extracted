@@ -68,7 +68,9 @@ if (!$pid) {
     POSIX::_exit(0);
 }
 
-ok(wait_ready(3), 'the first publish woke the reader');
+# The bound is only ever paid by a failing run: a healthy one returns the
+# moment the byte lands.
+ok(wait_ready(10), 'the first publish woke the reader');
 $arena->drained;
 my @got = $cursor->drain;
 is(scalar @got, 1, 'and there was one record waiting');
@@ -76,14 +78,37 @@ is($got[0][1], 'first', 'which is the one that was published');
 
 # THE ASSERTION THAT MATTERS. A reader that cleared its flag before draining
 # its pipe is deaf from here on, and every check above would still have passed.
-ok(wait_ready(3), 'the SECOND publish woke the reader too - the flag was '
-                . 'cleared after the pipe was drained, not before');
+#
+# LATE IS NOT DEAF. The child sleeps 0.3s between its publishes, and a loaded
+# smoker parked one for longer than the whole wait: the byte and the record
+# both arrived after the parent had given up, and the test called the reader
+# deaf. So a miss is followed by the question that tells the two apart: let
+# the child finish, then look again. A parked child's byte is there with it;
+# a deaf reader's never comes, and its record sits in the ring unannounced.
+my $woke = wait_ready(10);
+unless ($woke) {
+    waitpid $pid, 0;
+    $pid  = 0;
+    $woke = wait_ready(0);
+    if ($woke) {
+        note 'the child was parked for over ten seconds between its publishes; '
+           . 'the wakeup arrived with it';
+    }
+    else {
+        diag 'no wakeup after the child exited: '
+           . ((() = $ring->cursor(from_start => 1)->drain) > 1
+                ? 'its record is in the ring, so the reader is DEAF'
+                : 'and no second record in the ring, so the child never published');
+    }
+}
+ok($woke, 'the SECOND publish woke the reader too - the flag was '
+        . 'cleared after the pipe was drained, not before');
 $arena->drained;
 @got = $cursor->drain;
 is(scalar @got, 1, 'and its record was there');
 is($got[0][1], 'second', 'and is the second one');
 
-waitpid $pid, 0;
+waitpid $pid, 0 if $pid;
 
 # ---- a storm of publishes costs one wakeup, not one each ------------------
 {

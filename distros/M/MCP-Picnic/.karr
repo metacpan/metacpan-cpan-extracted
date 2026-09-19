@@ -1,0 +1,7 @@
+claude: true
+prompt: >
+  Pick the next actionable ticket from this MCP-Picnic board and complete it.
+  Delegate behavior-relevant code to the mcp-picnic-worker agent; use
+  mcp-picnic-test-writer for tests and mcp-picnic-pod-writer for POD. Keep tests
+  network-free. Never run `dzil release` or any CPAN upload. Record any drift you
+  find as a new karr ticket rather than expanding scope mid-change.

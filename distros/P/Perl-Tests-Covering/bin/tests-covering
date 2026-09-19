@@ -1,0 +1,292 @@
+#!/usr/bin/env perl
+
+package Perl::Tests::Covering::Script;
+$Perl::Tests::Covering::Script::VERSION = '0.002';
+# PODNAME: tests-covering
+# ABSTRACT: Print the tests that cover the files, subs or changes you name.
+
+use 5.014;
+
+use strict;
+use warnings FATAL => 'all';
+
+use re '/aa';
+
+use Cwd          ();
+use File::Spec   ();
+use Getopt::Long ();
+use List::Util   ();
+use Pod::Usage   ();
+
+use Perl::Tests::Covering ();
+
+
+exit main(@ARGV) if !caller;
+
+
+sub main {
+    my (@argv) = @_;
+
+    my %opts = ( 'test-dir' => [], lib => [] );
+    Getopt::Long::GetOptionsFromArray( \@argv, \%opts, qw{root=s test-dir=s@ lib=s@ jobs=i cache-dir=s map=s no-map unexplained=s diff sub=s by refresh help} )
+      or return synopsis(2);
+    return synopsis(0) if $opts{help};
+
+    my @modes = grep { defined $opts{$_} } qw{diff sub by refresh};
+    return usage_error('Give one of --diff, --sub, --by and --refresh, not several') if @modes > 1;
+    my $mode = $modes[0] // 'files';
+    return usage_error("--$mode takes no files")           if @argv              && grep { $mode eq $_ } qw{diff refresh};
+    return usage_error('--sub takes exactly one file')     if $mode eq 'sub'     && @argv != 1;
+    return usage_error('Give --map or --no-map, not both') if defined $opts{map} && $opts{'no-map'};
+
+    my $covering = Perl::Tests::Covering->new(
+        ( defined $opts{root}        ? ( root        => $opts{root} )        : () ),
+        ( @{ $opts{'test-dir'} }     ? ( tests       => $opts{'test-dir'} )  : () ),
+        ( @{ $opts{lib} }            ? ( lib         => $opts{lib} )         : () ),
+        ( defined $opts{jobs}        ? ( jobs        => $opts{jobs} )        : () ),
+        ( defined $opts{'cache-dir'} ? ( cache_dir   => $opts{'cache-dir'} ) : () ),
+        ( defined $opts{map}         ? ( map         => $opts{map} )         : () ),
+        ( $opts{'no-map'}            ? ( map         => undef )              : () ),
+        ( defined $opts{unexplained} ? ( unexplained => $opts{unexplained} ) : () ),
+    );
+
+    my @names     = @argv || $mode eq 'refresh' || $mode eq 'diff' ? @argv : read_names( \*STDIN );
+    my %answer_to = (
+        files => sub { $covering->tests_covering(@names) },
+        diff  => sub {
+            $covering->tests_covering_diff( do { local $/ = undef; <STDIN> } );
+        },
+        sub => sub { $covering->tests_covering_sub( $names[0], $opts{sub} ) },
+        by  => sub {
+            List::Util::uniq( map { $covering->files_covered_by($_) } @names );
+        },
+        refresh => sub { $covering->refresh(); () },
+    );
+
+    my $cwd = Cwd::getcwd();
+    foreach my $file ( $answer_to{$mode}->() ) {
+        say File::Spec->abs2rel( File::Spec->catfile( $covering->root(), $file ), $cwd );
+    }
+    return 0;
+}
+
+
+sub read_names {
+    my ($fh) = @_;
+    return grep { length } map { s/\r?\n\z//r } <$fh>;
+}
+
+
+sub usage_error {
+    my ($message) = @_;
+    warn "tests-covering: $message\n";
+    return synopsis(2);
+}
+
+
+sub synopsis {
+    my ($code) = @_;
+    Pod::Usage::pod2usage( -input => __FILE__, -exitval => 'NOEXIT', -verbose => 1, -output => $code ? \*STDERR : \*STDOUT );
+    return $code;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tests-covering - Print the tests that cover the files, subs or changes you name.
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+    tests-covering [options] FILE...
+    git diff --cached --name-only --diff-filter=ACMRD | tests-covering
+    git diff --cached | tests-covering --diff
+    tests-covering --sub NAME FILE
+    tests-covering --by TEST...
+    tests-covering --refresh
+
+    Modes, of which you can give one:
+      --diff           read a diff from STDIN, and print the tests it could break
+      --sub NAME       print the tests that ran the sub NAME in FILE
+      --by             print the files that each TEST loaded
+      --refresh        run the stale tests under coverage, and print nothing
+
+    Options:
+      --root DIR       the distribution; default: found from the current directory
+      --test-dir DIR   a directory of tests, relative to the root; repeatable; default: t
+      --lib DIR        a directory for PERL5LIB, relative to the root; repeatable; default: lib
+      --jobs N         how many coverage runs at once; default: 1
+      --cache-dir DIR  where the coverage records are kept
+      --map FILE       a Perl file that returns the map; default: .tests-covering-map.pl in the root
+      --no-map         use no map, even when the root has one
+      --unexplained W  none or all: the tests a file nothing explains chooses; default: none
+      --help           this text
+
+=head1 DESCRIPTION
+
+Prints the tests that cover any of the files you name, one per line, relative
+to the current directory.  With no files on the command line, it reads their
+names from standard input, one per line.  A file that is relative is relative to
+the current directory.
+
+Tests that are new, or that changed, or whose files changed, run first under
+L<Devel::Cover>, with their output discarded.  L<Perl::Tests::Covering> says
+what counts as covering and when a test runs again.
+
+With C<--diff>, it reads a unified diff from git on standard input and prints
+the tests whose runs reached the lines the diff changes.  It runs nothing
+first.  L<Perl::Tests::Covering/CHOOSING TESTS FOR A CHANGE> says how it
+decides, and when it falls back to every test that loads a file.
+
+A file that no test loads, such as a template that a test reads, chooses the
+tests that the map names.  L<Perl::Tests::Covering/THE MAP> says how to write
+one.  A file that neither a record nor the map explains chooses no test, or
+with C<--unexplained all>, every test.
+
+With C<--sub>, it prints the tests that ran a statement of one sub.  With
+C<--by>, it prints the files each test you name loaded, which is the question
+turned around.  With C<--refresh>, it only brings the records up to date.
+
+It exits 0 when it printed an answer, which can be no tests at all, and 2 when
+the options are wrong.
+
+=head1 A PRE-COMMIT HOOK
+
+Put this in F<.git/hooks/pre-commit> and make it executable:
+
+    #!/bin/sh
+    tests=$(git diff --cached --name-only --diff-filter=ACMRD | tests-covering) || exit 1
+    [ -z "$tests" ] && exit 0
+    exec prove -l $tests
+
+C<D> is in the filter on purpose.  A deleted module is reported as covered by
+the tests that used it, and those are the tests the deletion breaks.
+
+The tests run against the working tree, not against what is staged.  If you
+stage part of a file, the tests see all of it.  Git starts the hook in the top
+directory of the work tree, so if the distribution is in a subdirectory, pass
+C<--root>.
+
+The first commit after the hook is installed runs every test under coverage,
+which is slow.  Run C<tests-covering> once by hand beforehand, with C<--jobs>,
+to have that done when it suits you.
+
+=head1 HOOKS THAT CHOOSE BY HUNK
+
+This pair runs only the tests whose runs reached the lines a commit changes.
+The pre-commit hook reads the diff of what is staged:
+
+    #!/bin/sh
+    tests=$(git diff --cached --full-index | tests-covering --diff) || exit 1
+    [ -z "$tests" ] && exit 0
+    exec prove -l $tests
+
+A diff describes the files as they were before the change, so the records it
+is read against have to be of those files.  The post-commit hook, in
+F<.git/hooks/post-commit>, brings them up to the commit just made, in the
+background:
+
+    #!/bin/sh
+    tests-covering --refresh >/dev/null 2>&1 &
+
+Without it, a test whose records are older than the last commit is run
+whenever it loaded a file that changed since, and the choice gets coarser with
+each commit.  Run C<tests-covering --refresh> by hand to catch up.
+
+A pre-commit hook for a distribution whose tests read templates, or run
+scripts under another perl, wants a map in F<.tests-covering-map.pl> at the
+root, and C<--unexplained all>.  Then a change that the records and the map
+cannot follow runs every test, and the hook needs no list of its own.
+
+Choosing by hunk trusts that each changed file still compiles.  A syntax error
+in a sub that no test runs chooses no tests, and still breaks every test that
+loads the file.  Put C<perl -c> over the changed files in the pre-commit hook
+before the tests, if that matters to you.
+
+=head1 FUNCTIONS
+
+=head2 main
+
+    exit main(@ARGV);
+
+Everything the command does.  Returns the exit code.
+
+=head2 read_names
+
+The file names in a handle, one per line, without blank lines.
+
+=head2 usage_error
+
+Says what is wrong with the options on standard error, then does what
+L</synopsis> does with exit code 2.
+
+=head2 synopsis
+
+Prints the synopsis, to standard output when it was asked for and to standard
+error when the options were wrong, and returns the exit code.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Perl::Tests::Covering|Perl::Tests::Covering>
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/Troglodyne-Internet-Widgets/perl-tests-covering/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHORS
+
+Current Maintainers:
+
+=over 4
+
+=item *
+
+George S. Baugh <george@troglodyne.net>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2026 Troglodyne LLC
+
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=cut

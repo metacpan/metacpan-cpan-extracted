@@ -1,0 +1,292 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use autodie qw(:all);
+
+# ---------------------------------------------------------------------------
+# Core / CPAN dependencies
+# ---------------------------------------------------------------------------
+use Carp         qw(croak);
+use Getopt::Long qw(GetOptions);
+use Pod::Usage   qw(pod2usage);
+use File::Find   qw(find);
+use File::Spec   ();
+
+Getopt::Long::Configure(qw(no_ignore_case bundling));
+
+use lib 'lib';
+use Music::NWC2MusicXML;
+use Music::NWC2MusicXML::Diagnostics;
+
+our $VERSION = '0.001.0';
+
+# ---------------------------------------------------------------------------
+# Parse command-line options
+# ---------------------------------------------------------------------------
+my %opt = (
+	help       => 0,
+	version    => 0,
+	verbose    => 0,
+	quiet      => 0,
+	debug      => 0,
+	overwrite  => 0,
+	recursive  => 0,
+	validate   => 0,
+	output_dir => undef,
+	format     => 'musicxml',
+	warnings   => undef,
+);
+
+GetOptions(
+	'help|h'         => \$opt{help},
+	'version|V'      => \$opt{version},
+	'verbose|v'      => \$opt{verbose},
+	'quiet|q'        => \$opt{quiet},
+	'debug'          => \$opt{debug},
+	'overwrite'      => \$opt{overwrite},
+	'recursive|r'    => \$opt{recursive},
+	'validate'       => \$opt{validate},
+	'output-dir|o=s' => \$opt{output_dir},
+	'format=s'       => \$opt{format},
+	'warnings=s'     => \$opt{warnings},
+) or pod2usage(2);
+
+pod2usage(1)  if $opt{help};
+
+if ($opt{version}) {
+	print "nwc2musicxml $VERSION\n";
+	exit $Music::NWC2MusicXML::EXIT_OK;
+}
+
+pod2usage({ -message => 'No input files specified.', -exitval => 2 })
+	unless @ARGV;
+
+# ---------------------------------------------------------------------------
+# Determine log level
+# ---------------------------------------------------------------------------
+my $log_level =
+	  $opt{debug}   ? 'debug'
+	: $opt{verbose} ? 'verbose'
+	: $opt{quiet}   ? 'quiet'
+	:                 'normal';
+
+# ---------------------------------------------------------------------------
+# Open optional warnings file
+# ---------------------------------------------------------------------------
+my $warnings_fh;
+if (defined $opt{warnings}) {
+	open $warnings_fh, '>:encoding(UTF-8)', $opt{warnings}
+		or croak "Cannot open warnings file '$opt{warnings}': $!";
+}
+
+# ---------------------------------------------------------------------------
+# Build converter
+# ---------------------------------------------------------------------------
+my $converter = Music::NWC2MusicXML->new(
+	log_level   => $log_level,
+	validate    => $opt{validate},
+	(defined $warnings_fh ? (warnings_fh => $warnings_fh) : ()),
+);
+
+# ---------------------------------------------------------------------------
+# Collect input files, detecting an optional explicit output path
+# ---------------------------------------------------------------------------
+# When called as: nwc2musicxml input.nwc output.musicxml
+# the second arg is the output, not an input.  Detect this before the loop
+# so the loop does not try to treat the output path as an NWC input.
+
+my ($explicit_output, @inputs);
+
+if (	@ARGV == 2
+	&& !-d $ARGV[0]
+	&& $ARGV[0] =~ /\.nwc\z/i
+	&& $ARGV[1] !~ /\.nwc\z/i
+	&& !defined $opt{output_dir}
+) {
+	@inputs          = ($ARGV[0]);
+	$explicit_output = $ARGV[1];
+} else {
+	for my $arg (@ARGV) {
+		if (-d $arg) {
+			# Directory passed: collect .nwc files within it.
+			# opendir/readdir avoids glob-metachar expansion on hostile dir names.
+			if ($opt{recursive}) {
+				find(
+					sub {
+						push @inputs, $File::Find::name
+							if /\.nwc\z/i && -f $File::Find::name;
+					},
+					$arg,
+				);
+			} else {
+				opendir(my $dh, $arg)
+					or croak "Cannot open directory '$arg': $!";
+				push @inputs,
+					map  { File::Spec->catfile($arg, $_) }
+					grep { /\.nwc\z/i && -f File::Spec->catfile($arg, $_) }
+					readdir($dh);
+				closedir($dh);
+			}
+		} else {
+			push @inputs, $arg;
+		}
+	}
+}
+
+# ---------------------------------------------------------------------------
+# Determine output location and dispatch
+# ---------------------------------------------------------------------------
+
+if (@inputs == 1 && !$opt{recursive} && !defined $opt{output_dir}) {
+	my $result = $converter->convert(
+		input     => $inputs[0],
+		(defined $explicit_output ? (output => $explicit_output) : ()),
+		overwrite => $opt{overwrite},
+	);
+
+	close $warnings_fh if defined $warnings_fh;
+
+	exit(
+		!defined $result                         ? $Music::NWC2MusicXML::EXIT_BAD_INPUT
+		: $converter->diagnostics->has_warnings  ? $Music::NWC2MusicXML::EXIT_WARNINGS
+		:                                          $Music::NWC2MusicXML::EXIT_OK
+	);
+}
+
+# Multiple files / recursive: batch convert
+my $batch_result = $converter->batch_convert(
+	inputs     => \@inputs,
+	(defined $opt{output_dir} ? (output_dir => $opt{output_dir}) : ()),
+	overwrite  => $opt{overwrite},
+	recursive  => $opt{recursive},
+);
+
+close $warnings_fh if defined $warnings_fh;
+
+my $diag = $converter->diagnostics;
+
+exit(
+	  $diag->has_warnings                   ? $Music::NWC2MusicXML::EXIT_WARNINGS
+	:                                         $Music::NWC2MusicXML::EXIT_OK
+);
+
+__END__
+
+=head1 NAME
+
+nwc2musicxml - Convert NoteWorthy Composer 2 files to MusicXML.
+
+=head1 VERSION
+
+0.001.0
+
+=head1 SYNOPSIS
+
+    nwc2musicxml [options] input.nwc [output.musicxml]
+    nwc2musicxml [options] file1.nwc file2.nwc ...
+    nwc2musicxml --recursive --output-dir musicxml scores/
+
+=head1 DESCRIPTION
+
+Converts NoteWorthy Composer 2 binary C<.nwc> score files into MusicXML
+C<.musicxml> files suitable for import into MuseScore and other MusicXML-
+compatible notation programs.
+
+NoteWorthy Composer does not need to be installed.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>, B<-h>
+
+Print this help text and exit.
+
+=item B<--version>, B<-V>
+
+Print the program version and exit.
+
+=item B<--verbose>, B<-v>
+
+Emit per-file progress information.
+
+=item B<--quiet>, B<-q>
+
+Suppress all non-error output.
+
+=item B<--debug>
+
+Emit low-level pipeline tracing (very chatty).
+
+=item B<--overwrite>
+
+Overwrite existing output files.  By default, existing files are skipped.
+
+=item B<--recursive>, B<-r>
+
+When a directory is given as input, descend into subdirectories.
+The relative directory structure is preserved under C<--output-dir>.
+
+=item B<--output-dir DIRECTORY>, B<-o DIRECTORY>
+
+Write all output files to C<DIRECTORY>.
+
+=item B<--format FORMAT>
+
+Output format.  Currently only C<musicxml> (default) is supported.
+
+=item B<--validate>
+
+Perform extended consistency checks on the converted score (pitch validity,
+tie/slur pairing, measure duration sums, etc.).
+
+=item B<--warnings FILE>
+
+Write all warnings to C<FILE> in addition to STDERR.
+
+=back
+
+=head1 EXIT CODES
+
+=over 4
+
+=item 0 -- successful conversion (no warnings)
+
+=item 1 -- conversion completed with warnings
+
+=item 2 -- invalid or unsupported input
+
+=item 3 -- output error
+
+=item 4 -- internal / programming error
+
+=back
+
+=head1 EXAMPLES
+
+    # Convert a single file
+    nwc2musicxml Pilgrim.nwc
+
+    # Convert with explicit output name
+    nwc2musicxml Pilgrim.nwc Pilgrim.musicxml
+
+    # Convert all .nwc files to a directory
+    nwc2musicxml --output-dir musicxml *.nwc
+
+    # Recursive conversion preserving directory structure
+    nwc2musicxml --recursive --output-dir musicxml scores/
+
+    # Validate and log warnings
+    nwc2musicxml --validate --warnings conv.log Pilgrim.nwc
+
+=head1 AUTHOR
+
+Nigel Horne C<< <nigel.horne@gmail.com> >>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -9,7 +9,30 @@ use 5.010;
 use ExtUtils::MakeMaker 6.52;
 
 use Config;
+use File::Temp ();
+use File::Spec;
 my $std = ($Config{gccversion} || $Config{cc} =~ /\b(?:g?cc|clang)\b/) ? ' -std=gnu99' : '';
+my $define = '';
+if ($Config{nvtype} eq 'long double') {
+my $src = "#include <math.h>\n"
+. "int main(void) { long double x = 1.0L;\n"
+. "  volatile long double r = fabsl(x) + sqrtl(x) + acosl(x) + cosl(x) + sinl(x)\n"
+. "    + atan2l(x, x);\n"
+. "  return (int)r * 0; }\n";
+my $dir = File::Temp::tempdir(CLEANUP => 1);
+my $c   = File::Spec->catfile($dir, 'ldmath.c');
+my $bin = File::Spec->catfile($dir, 'ldmath');
+if (open my $fh, '>', $c) {
+print {$fh} $src;
+close $fh;
+my $quiet = File::Spec->devnull;
+$define = '-DCSP_HAVE_LONG_DOUBLE_MATH'
+if system("$Config{cc}$std -o $bin $c -lm > $quiet 2> $quiet") == 0;
+}
+warn "Chem::Structure::Parser: this libm is missing some long double math\n"
+. "  functions; the feature calculations fall back to double precision.\n"
+unless $define;
+}
 {
 package MY;
 sub libscan {
@@ -32,12 +55,13 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Exporter" => 0,
     "Scalar::Util" => 0,
-    "Test::Exception" => 0,
-    "Test::More" => 0,
-    "XSLoader" => 0,
-    "autodie" => 0
+    "XSLoader" => 0
   },
-  "VERSION" => "0.02",
+  "TEST_REQUIRES" => {
+    "Test::Exception" => 0,
+    "Test::More" => 0
+  },
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +70,8 @@ my %WriteMakefileArgs = (
 %WriteMakefileArgs = (
     %WriteMakefileArgs,
     CCFLAGS => $Config::Config{ccflags} . $std,
+    DEFINE => $define,
+    LIBS => ['-lm'],
 );
 
 my %FallbackPrereqs = (
@@ -53,8 +79,7 @@ my %FallbackPrereqs = (
   "Scalar::Util" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "XSLoader" => 0,
-  "autodie" => 0
+  "XSLoader" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

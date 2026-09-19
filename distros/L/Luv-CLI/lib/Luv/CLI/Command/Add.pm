@@ -93,7 +93,7 @@ Luv::CLI::Command::Add - add a library dependency from a git repo or the registr
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

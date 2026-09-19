@@ -8,6 +8,12 @@ nothing about any game; a pool or snooker adapter describes its table, sends a
 strike as integers, and reads back the contacts in order, the rest layout, the
 balls that dropped, and the trajectory as segments a client plays back.
 
+Since 0.03 a ball may curve, by its kind: a curling stone or a biased bowl runs
+as a chain of parabolas that bends, with no trigonometry anywhere, and a shot
+may say the surface under the struck ball changes partway down its run. The
+turn rate is a house law with fitted constants, not a model of ice. A world
+that declares no kinds is exactly what it was.
+
 The same inputs give the same doubles on every platform that keeps IEEE
 arithmetic honest. The build turns off fused multiply-adds for that reason, and
 the fixtures under t/ were recorded by the JavaScript prototype the engine was

@@ -1,0 +1,51 @@
+Physics-Terrain
+
+A field of cells generated from a seed, with a ground, overhangs and caves;
+bodies of one size that stand on it, walk up and down three cells at a time,
+jump and fall; projectiles that fly under gravity and wind, bounce, split in
+the air or burst on contact or on a fuse; and explosions that carve a disc out
+of the ground, hurt everything in reach and throw it. An integer engine in C,
+perl-free, with an XS door whose every method is an XSUB and a versioned C ABI
+(include/pt_abi.h) so another module can drive a turn with no Perl frame in
+between. It knows nothing about any game; an adapter places its squads by seat
+number, plays a turn from an input log or a tick at a time, and reads back the
+events in order, the craters, the traces and the end state.
+
+Everything is fixed point at 1/256 of a cell, every division floors, and the
+same inputs give the same integers on every platform. The fixtures under t/
+were recorded by the JavaScript prototype the engine was transliterated from
+and are reproduced bit for bit, which is what lets a browser simulate a turn
+live and a server replay the same input log to the same result.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Physics::Terrain
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Physics-Terrain
+
+    Search CPAN
+        https://metacpan.org/release/Physics-Terrain
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

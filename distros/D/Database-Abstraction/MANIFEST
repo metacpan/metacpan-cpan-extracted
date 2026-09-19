@@ -30,6 +30,7 @@ t/data/test5.csv
 t/data/test6.xml
 t/data/test7.csv
 t/data/test8.psv
+t/data/test_tsv.tsv
 t/db.t
 t/db_noentry.t
 t/deep.t
@@ -54,6 +55,7 @@ t/lib/Database/test5.pm
 t/lib/Database/test6.pm
 t/lib/Database/test7.pm
 t/lib/Database/test8.pm
+t/lib/Database/test_tsv.pm
 t/lib/MyLogger.pm
 t/locales.t
 t/logger.t
@@ -79,6 +81,7 @@ t/tabs.t
 t/test7.t
 t/test8.t
 t/transaction.t
+t/tsv.t
 t/two_databases.t
 t/unit.t
 t/vars.t

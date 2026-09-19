@@ -1,5 +1,5 @@
 This archive contains the distribution Chem-Structure-Parser,
-version 0.02:
+version 0.03:
 
   Read a molecular structure file into a hash of hashes, sequences and all, using XS for the coordinate section
 

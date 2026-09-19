@@ -129,6 +129,7 @@ sub _handle_upload_req ($req) {
 }
 
 sub _handle_session_req ($req) {
+  return [ 204, [], [] ] if $req->method eq 'DELETE';
   return _error(400) unless $req->method eq 'GET';
 
   return [

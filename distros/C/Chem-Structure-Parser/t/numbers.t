@@ -189,4 +189,38 @@ push @fixed_shape, '.5', '-.5', '+.25', '5.', '-5.', '007.5', '0.0', '-0.0',
 	is($p->{x}[0], undef, 'an overflowed coordinate field is undef, not zero');
 }
 
+#--------
+# the integer reader, at the ends of an IV.
+#
+# A PDB record cannot reach them: a serial number has five columns and a
+# residue number four.  An mmCIF value has no columns at all, so a file is free
+# to write twenty digits of _atom_site.id, and the reader used to accumulate
+# into an IV and wrap -- signed overflow, which is undefined behaviour rather
+# than a defined wrap, and which on this build turned the two fields below into
+# 200376420520689663 and a negative residue number.  A number that does not fit
+# is declined, as '*****' is, and reads as the undef that says the file gave no
+# usable value.
+#--------
+sub cif_row {
+	my ($id, $seq) = @_;
+	return "data_x\nloop_\n_atom_site.id\n_atom_site.auth_seq_id\n"
+	     . "_atom_site.type_symbol\n_atom_site.cartn_x\n_atom_site.cartn_y\n"
+	     . "_atom_site.cartn_z\n_atom_site.auth_comp_id\n_atom_site.auth_asym_id\n"
+	     . "_atom_site.auth_atom_id\n$id $seq C 1.0 2.0 3.0 ALA A CA\n";
+}
+{
+	my $p = Chem::Structure::Parser::_parse_cif_string(
+		cif_row('99999999999999999999999', '123456789012345678901'), {});
+	is($p->{serial}[0], undef, 'an mmCIF serial too big for an IV is undef, not wrapped');
+	is($p->{resseq}[0], undef, 'and so is a residue number too big for one');
+}
+{
+	# the largest and the smallest an IV holds, which must still read exactly:
+	# the bound is the type's and not a digit count
+	my ($max, $min) = (~0 >> 1, -(~0 >> 1) - 1);
+	my $p = Chem::Structure::Parser::_parse_cif_string(cif_row($max, $min), {});
+	is($p->{serial}[0], $max, 'IV_MAX reads back exactly');
+	is($p->{resseq}[0], $min, 'and so does IV_MIN, which is not the negation of one');
+}
+
 done_testing();

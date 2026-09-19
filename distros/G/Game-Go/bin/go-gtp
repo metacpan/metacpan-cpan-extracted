@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long ();
+
+use Game::Go::GTP;
+
+my %opt = (size => 9, level => 2, seed => 'gtp');
+
+Getopt::Long::GetOptions(\%opt, 'size=i', 'level=i', 'seed=s', 'help|h')
+	or usage(2);
+usage(0) if $opt{help};
+
+my $gtp = eval {
+	Game::Go::GTP->new(size => $opt{size}, level => $opt{level}, seed => $opt{seed});
+};
+unless ($gtp) {
+	my $why = $@ || "could not start\n";
+	print {*STDERR} "go-gtp: $why";
+	exit 2;
+}
+
+$| = 1;
+
+exit $gtp->run(\*STDIN, \*STDOUT);
+
+sub usage {
+	my ($status) = @_;
+	my $out = $status ? *STDERR : *STDOUT;
+	print {$out} <<'USAGE';
+go-gtp - Game::Go speaking the Go Text Protocol
+
+  go-gtp [--size N] [--level N] [--seed S]
+
+Commands answered:
+  protocol_version name version list_commands known_command quit
+  boardsize clear_board komi play genmove undo showboard
+  final_score final_status_list
+
+Vertices are A to T with I left out and rows numbered from the bottom, which is
+GTP's own format.
+USAGE
+	exit $status;
+}

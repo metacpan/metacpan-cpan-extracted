@@ -1,4 +1,4 @@
-package JMAP::Tester::Manual 0.112;
+package JMAP::Tester::Manual 0.113;
 # ABSTRACT: how to use JMAP::Tester
 
 #pod =head1 OVERVIEW
@@ -53,8 +53,11 @@ package JMAP::Tester::Manual 0.112;
 #pod There are a few methods for dealing with the session:
 #pod
 #pod =for :list
-#pod * C<< L<JMAP::Tester/get_client_session> >>, an async method that fetches and returns the session object; on success, it returns an Auth object
-#pod * C<< L<JMAP::Tester/update_client_session> >>, an async method that gets the client session, uses it to reconfigure the tester (if necessary), and returns the Auth object
+#pod * C<< L<JMAP::Tester/get_client_session> >>, an async method that fetches and
+#pod   returns the session object; on success, it returns an Auth object
+#pod * C<< L<JMAP::Tester/update_client_session> >>, an async method that gets the
+#pod   client session, uses it to reconfigure the tester (if necessary), and returns
+#pod   the Auth object
 #pod
 #pod =head2 API requests
 #pod
@@ -89,11 +92,19 @@ package JMAP::Tester::Manual 0.112;
 #pod Here are the most important methods on a Response:
 #pod
 #pod =for :list
-#pod * C<sentence($n)> returns the I<n>th sentence in the response (or dies if out of bounds)
-#pod * C<sentence_named($name)> returns the sentence with this name (or dies if there isn't exactly one with that name)
-#pod * C<single_sentence($name)> dies unless there is exactly one sentence in the response; if C<$name> is given, the method dies unless the sentence has that name; if it doesn't die, it returns that sentence.
-#pod * C<as_pairs> and C<as_triples> return arrayrefs where each element is a 2- or 3-element arrayref of the name, arguments, and (maybe) client id of each sentence -- in other words, a plain structure representing the method response
-#pod * C<as_stripped_pairs> and C<as_stripped_triples> return the same, but with L<JSON::Typist> data tripped from the arguments
+#pod * C<sentence($n)> returns the I<n>th sentence in the response (or dies if out
+#pod   of bounds)
+#pod * C<sentence_named($name)> returns the sentence with this name (or dies if
+#pod   there isn't exactly one with that name)
+#pod * C<single_sentence($name)> dies unless there is exactly one sentence in the
+#pod   response; if C<$name> is given, the method dies unless the sentence has that
+#pod   name; if it doesn't die, it returns that sentence.
+#pod * C<as_pairs> and C<as_triples> return arrayrefs where each element is a 2- or
+#pod   3-element arrayref of the name, arguments, and (maybe) client id of each
+#pod   sentence -- in other words, a plain structure representing the method
+#pod   response
+#pod * C<as_stripped_pairs> and C<as_stripped_triples> return the same, but with
+#pod   L<JSON::Typist> data tripped from the arguments
 #pod
 #pod L<Sentence|JMAP::Tester::Response::Sentence> objects have these useful methods:
 #pod
@@ -101,30 +112,43 @@ package JMAP::Tester::Manual 0.112;
 #pod * C<name> returns the sentence name
 #pod * C<arguments> returns the sentence arguments
 #pod * C<client_id> returns the method call id
-#pod * C<as_pair>, C<as_triple>, C<as_stripped_pair>, and C<as_stripped_triple> behave like the similarly-named methods on a Response, but just return the arrayref representing this sentence
+#pod * C<as_pair>, C<as_triple>, C<as_stripped_pair>, and C<as_stripped_triple>
+#pod   behave like the similarly-named methods on a Response, but just return the
+#pod   arrayref representing this sentence
 #pod * C<as_set> returns a new L<Set|JMAP::Tester::Response::Sentence::Set> object,
-#pod with extra methods for testing the response to C</set>-style methods
+#pod   with extra methods for testing the response to C</set>-style methods
 #pod
 #pod A "Set" sentence has all the methods of a normal sentence as well as:
 #pod
 #pod =for :list
 #pod * C<new_state> and C<old_state>: return the new and old state
 #pod * C<created>: returns the C<created> argument, or an empty hashref if null
-#pod * C<created_id($creation_id)>: returns the C<id> for the object created for that creation id
+#pod * C<created_id($creation_id)>: returns the C<id> for the object created for
+#pod   that creation id
 #pod * C<updated>: returns the C<updated> argument, or an empty hashref if null
-#pod * C<created_ids>, C<updated_ids>, C<destroyed_ids>: return the ids of objects created, updated, or destroyed
-#pod * C<create_errors>, C<update_errors>, C<destroy_errors>: return the errors with their respective operations, or an empty hashref if none
-#pod * C<not_created_ids>, C<not_updated_ids>, C<not_destroyed_ids>: return the ids of objects not created, not updated, or not destroyed; in other words, the keys of the hashrefs returned by the error methods above
+#pod * C<created_ids>, C<updated_ids>, C<destroyed_ids>: return the ids of objects
+#pod   created, updated, or destroyed
+#pod * C<create_errors>, C<update_errors>, C<destroy_errors>: return the errors with
+#pod   their respective operations, or an empty hashref if none
+#pod * C<not_created_ids>, C<not_updated_ids>, C<not_destroyed_ids>: return the ids
+#pod   of objects not created, not updated, or not destroyed; in other words, the
+#pod   keys of the hashrefs returned by the error methods above
 #pod
 #pod There are also a few useful assertion-making methods to know.  These will throw
 #pod aborts (L<see below|/Diagnostics and logging>) if the condition they assert
 #pod doesn't hold true:
 #pod
 #pod =for :list
-#pod * C<< $result->assert_successful >>: the result must be a success (C<is_success> is true)
-#pod * C<< $result->assert_successful_set($name) >>: the result must be an API request result with a sentence named C<$name>, which must be a C</set> method, and it must be reporting zero errors (like C<notCreated> etc.)
-#pod * C<< $result->assert_single_successful_set($name) >>: just like the above, but there must be only one sentence in the response; C<$name> can be omitted to allow any C</set>
-#pod * C<< $set->assert_no_errors >>: on a Set sentence, this asserts that there were no errors in any of its operations
+#pod * C<< $result->assert_successful >>: the result must be a success
+#pod   (C<is_success> is true)
+#pod * C<< $result->assert_successful_set($name) >>: the result must be an API
+#pod   request result with a sentence named C<$name>, which must be a C</set>
+#pod   method, and it must be reporting zero errors (like C<notCreated> etc.)
+#pod * C<< $result->assert_single_successful_set($name) >>: just like the above, but
+#pod   there must be only one sentence in the response; C<$name> can be omitted to
+#pod   allow any C</set>
+#pod * C<< $set->assert_no_errors >>: on a Set sentence, this asserts that there
+#pod   were no errors in any of its operations
 #pod
 #pod =head2 Uploads and downloads
 #pod
@@ -188,7 +212,7 @@ JMAP::Tester::Manual - how to use JMAP::Tester
 
 =head1 VERSION
 
-version 0.112
+version 0.113
 
 =head1 OVERVIEW
 
@@ -342,9 +366,7 @@ C<as_pair>, C<as_triple>, C<as_stripped_pair>, and C<as_stripped_triple> behave 
 
 =item *
 
-C<as_set> returns a new L<Set|JMAP::Tester::Response::Sentence::Set> object,
-
-with extra methods for testing the response to C</set>-style methods
+C<as_set> returns a new L<Set|JMAP::Tester::Response::Sentence::Set> object, with extra methods for testing the response to C</set>-style methods
 
 =back
 

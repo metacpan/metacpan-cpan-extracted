@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Scoreboard - one row per worker, published live
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 

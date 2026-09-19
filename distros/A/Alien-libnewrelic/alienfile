@@ -24,6 +24,10 @@ share {
     '%{patch} -p1 < %{.install.patch}/clang-fallthrough.diff',
     '%{patch} -p1 < %{.install.patch}/header-guard.diff',
     '%{patch} -p1 < %{.install.patch}/realloc-oldptr.diff',
+    # newer glibc (2.39+) adds const-correct overloads for memchr/strchr/
+    # strrchr/strstr under gnu dialects, which trips -Wcast-qual / -Werror
+    # on these helper wrappers.
+    '%{patch} -p1 < %{.install.patch}/const-correctness.diff',
   );
   push @patch, '%{patch} -p1 < %{.install.patch}/macos.diff' if $^O eq 'darwin';
 

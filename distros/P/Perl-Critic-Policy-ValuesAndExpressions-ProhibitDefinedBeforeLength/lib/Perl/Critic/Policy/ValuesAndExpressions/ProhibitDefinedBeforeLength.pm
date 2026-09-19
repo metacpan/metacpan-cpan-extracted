@@ -1,5 +1,5 @@
 package Perl::Critic::Policy::ValuesAndExpressions::ProhibitDefinedBeforeLength;
-$Perl::Critic::Policy::ValuesAndExpressions::ProhibitDefinedBeforeLength::VERSION = '0.001';
+$Perl::Critic::Policy::ValuesAndExpressions::ProhibitDefinedBeforeLength::VERSION = '0.002';
 # ABSTRACT: Test the value, not its length, and shape it before measuring it.
 
 use strict;
@@ -29,6 +29,11 @@ Readonly::Hash my %NOT => map { $_ => 1 } ( q{!}, 'not' );
 # The operators a condition is built from.  A length joined to others by these
 # is still a condition if the whole chain is one.
 Readonly::Hash my %LOGICAL => map { $_ => 1 } ( qw{&& || // and or xor not}, q{!} );
+
+# The operators before which a chain is a value rather than a condition: an
+# assignment takes it, a comma passes it, and ?: picks it as a branch.  Any
+# other operator to the left belongs to another operand of the chain.
+Readonly::Hash my %VALUE_STARTS => map { $_ => 1 } ( qw{= += -= *= /= .= %= x= **= //= ||= &&= |= &= ^= <<= >>= => ? :}, q{,} );
 
 # What makes the rest of a statement its condition.
 Readonly::Hash my %MODIFIER => map { $_ => 1 } qw{if unless while until};
@@ -118,7 +123,7 @@ sub _is_boolean {
     while ($left) {
         return 1 if $left->isa('PPI::Token::Word')     && $MODIFIER{ $left->content };
         return 0 if $left->isa('PPI::Token::Word')     && $left->content eq 'return';
-        return 0 if $left->isa('PPI::Token::Operator') && !$LOGICAL{ $left->content };
+        return 0 if $left->isa('PPI::Token::Operator') && $VALUE_STARTS{ $left->content };
         $left = $left->sprevious_sibling;
     }
 
@@ -142,11 +147,12 @@ sub _is_boolean_place {
 
     return 1 if $holder->isa('PPI::Structure::Condition');
 
-    # Parenthesised: the list is the term, one level out -- unless it is the
-    # argument list of a call.
+    # Parenthesised: the list is the term, one level out.  After return it is a
+    # value like any other term.  After any other word, it is the argument list
+    # of a call.
     if ( $holder->isa('PPI::Structure::List') ) {
         my $before = $holder->sprevious_sibling;
-        return 0 if $before && $before->isa('PPI::Token::Word');
+        return 0 if $before && $before->isa('PPI::Token::Word') && $before->content ne 'return';
         return _is_boolean( $holder, $holder->snext_sibling );
     }
 
@@ -239,7 +245,7 @@ Perl::Critic::Policy::ValuesAndExpressions::ProhibitDefinedBeforeLength - Test t
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 Perl::Critic::Policy::ValuesAndExpressions::ProhibitDefinedBeforeLength
 

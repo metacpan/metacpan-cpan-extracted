@@ -64,11 +64,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 =head1 DESCRIPTION
 
@@ -250,7 +250,11 @@ Requires L<DBM::Deep> (loaded lazily).
 
 Pipe-separated file, ending C<.psv>
 
-=item 4. C<CSV>
+=item 4. C<TSV>
+
+Tab-separated file, ending C<.tsv>
+
+=item 5. C<CSV>
 
 Comma (or custom) separated file, ending C<.csv> or C<.db>; can be
 gzipped.
@@ -855,7 +859,7 @@ sub _open :Protected
 			my $tmpdir_obj = File::Temp->newdir(CLEANUP => 1);
 			$self->{'_remote_tmpdir'} = $tmpdir_obj;	# auto-cleans on DESTROY
 			my $tmpdir = $tmpdir_obj->dirname();
-			for my $ext (qw(sql dbm deep db csv.gz db.gz psv xls xlsx csv xml)) {
+			for my $ext (qw(sql dbm deep db csv.gz db.gz psv tsv xls xlsx csv xml)) {
 				my $remote_file = "$remote_dir/$dbname.$ext";
 				my $content = eval { scalar File::Slurp::Remote::read_remote_file($host, $remote_file) };
 				next unless defined($content) && length($content);
@@ -972,13 +976,21 @@ sub _open :Protected
 				$slurp_file = $psv;
 				$params->{'sep_char'} = '|';
 			} else {
-				# CSV or BerkeleyDB-extension file
-				for my $ext (qw(csv db)) {
-					my $candidate = File::Spec->catfile($dir, "$dbname.$ext");
-					next unless -r $candidate;
-					open($fin, '<', $candidate);
-					$slurp_file = $candidate;
-					last;
+				my $tsv = File::Spec->catfile($dir, "$dbname.tsv");
+				if(-r $tsv) {
+					open($fin, '<', $tsv);
+					# Tab separated file
+					$slurp_file = $tsv;
+					$params->{'sep_char'} = "\t";
+				} else {
+					# CSV or BerkeleyDB-extension file
+					for my $ext (qw(csv db)) {
+						my $candidate = File::Spec->catfile($dir, "$dbname.$ext");
+						next unless -r $candidate;
+						open($fin, '<', $candidate);
+						$slurp_file = $candidate;
+						last;
+					}
 				}
 			}
 		}
@@ -2941,7 +2953,7 @@ DBI failed to connect to the given C<dsn>.  Check credentials and host.
 
 =item C<< Can't find a file called 'I<name>' for the table I<T> in I<dir> >>
 
-None of the probe extensions (C<.sql>, C<.psv>, C<.csv>, C<.xlsx>, C<.db>, C<.xml>)
+None of the probe extensions (C<.sql>, C<.psv>, C<.tsv>, C<.csv>, C<.xlsx>, C<.db>, C<.xml>)
 matched in C<directory>.
 
 =item C<< I<Class>: prepare failed: I<$errstr> >>

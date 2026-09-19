@@ -1,0 +1,678 @@
+#!/usr/bin/env perl
+# PODNAME: mcp-picnic-setup
+# ABSTRACT: Setup wizard for Picnic MCP Server in various MCP clients
+
+use strict;
+use warnings;
+use JSON::MaybeXS;
+use Path::Tiny;
+use Config;
+use File::Path qw(make_path);
+use Cwd qw(getcwd);
+
+# Term::ReadKey for hidden password input (optional)
+my $HAS_READKEY = eval { require Term::ReadKey; 1 };
+
+my $json = JSON::MaybeXS->new(utf8 => 1, pretty => 1, canonical => 1);
+
+# Detect system language (need this early for signal handler)
+my $LANG = detect_language();
+
+# Handle Ctrl+C gracefully (works on Windows too)
+$SIG{INT} = sub {
+  # Restore terminal if ReadKey was active
+  Term::ReadKey::ReadMode('restore') if $HAS_READKEY;
+  print "\n\n";
+  print $LANG eq 'de' ? "Abgebrochen.\n" : "Cancelled.\n";
+  exit 130;
+};
+
+# Also handle TERM signal on Unix
+$SIG{TERM} = $SIG{INT} if $^O ne 'MSWin32';
+
+# Translations
+my %T = (
+  en => {
+    banner_subtitle     => 'Setup Wizard for MCP Clients',
+    no_clients          => 'No MCP clients found.',
+    show_config_prompt  => 'Show config for manual copying? [Y/n] ',
+    found_clients       => 'Found MCP Clients:',
+    installed           => 'installed',
+    show_config_option  => 'Show config only (for copying)',
+    selection           => 'Selection',
+    account_data        => 'Picnic Account Details',
+    email               => 'Email address: ',
+    password            => 'Password: ',
+    password_visible    => '(input visible!) ',
+    country             => 'Country [de/nl] (default: de): ',
+    email_required      => 'Email required!',
+    password_required   => 'Password required!',
+    config_file         => 'Config file',
+    current_dir         => 'Current directory',
+    create_here         => 'Create config here? [Y/n] ',
+    alt_path            => 'Alternative path (or Enter to cancel): ',
+    already_configured  => 'Picnic is already configured. Overwrite? [y/N] ',
+    written             => 'Written',
+    done                => 'Done!',
+    configured_for      => 'Picnic MCP Server has been configured for',
+    next_steps          => 'Next steps:',
+    step1               => 'Restart',
+    step2               => 'Ask: "Show me my Picnic cart"',
+    step3               => 'If 2FA needed: enter SMS code when prompted',
+    have_fun            => 'Happy shopping!',
+    copy_block          => 'Copy the appropriate block into your config file.',
+    config_files        => 'Config files:',
+    in_project          => 'in project',
+    format_claude       => 'Claude Desktop / Claude Code Format',
+    format_vscode       => 'VS Code / Cursor / Windsurf Format',
+  },
+  de => {
+    banner_subtitle     => 'Setup Wizard fuer MCP Clients',
+    no_clients          => 'Keine MCP Clients gefunden.',
+    show_config_prompt  => 'Config zum Kopieren anzeigen? [J/n] ',
+    found_clients       => 'Gefundene MCP Clients:',
+    installed           => 'installiert',
+    show_config_option  => 'Nur Config anzeigen (zum Kopieren)',
+    selection           => 'Auswahl',
+    account_data        => 'Picnic Account Daten',
+    email               => 'E-Mail Adresse: ',
+    password            => 'Passwort: ',
+    password_visible    => '(Eingabe sichtbar!) ',
+    country             => 'Land [de/nl] (Standard: de): ',
+    email_required      => 'E-Mail erforderlich!',
+    password_required   => 'Passwort erforderlich!',
+    config_file         => 'Config-Datei',
+    current_dir         => 'Aktuelles Verzeichnis',
+    create_here         => 'Config hier erstellen? [J/n] ',
+    alt_path            => 'Alternativer Pfad (oder Enter fuer Abbruch): ',
+    already_configured  => 'Picnic ist bereits konfiguriert. Ueberschreiben? [j/N] ',
+    written             => 'Geschrieben',
+    done                => 'Fertig!',
+    configured_for      => 'Picnic MCP Server wurde konfiguriert fuer',
+    next_steps          => 'Naechste Schritte:',
+    step1               => 'Neu starten:',
+    step2               => 'Fragen: "Zeig mir meinen Picnic Warenkorb"',
+    step3               => 'Falls 2FA noetig: SMS-Code eingeben wenn danach gefragt wird',
+    have_fun            => 'Viel Spass beim Einkaufen!',
+    copy_block          => 'Kopiere den passenden Block in deine Config-Datei.',
+    config_files        => 'Config-Dateien:',
+    in_project          => 'im Projekt',
+    format_claude       => 'Claude Desktop / Claude Code Format',
+    format_vscode       => 'VS Code / Cursor / Windsurf Format',
+  },
+);
+
+sub t { return $T{$LANG}{$_[0]} // $T{en}{$_[0]} // $_[0] }
+
+sub detect_language {
+  # Check environment variables first (works on all platforms)
+  my $lang = $ENV{LANG} || $ENV{LC_ALL} || $ENV{LC_MESSAGES} || '';
+
+  # On Windows, check system locale
+  if ($^O eq 'MSWin32' && !$lang) {
+    # Try PowerShell to get culture
+    my $culture = `powershell -command "(Get-Culture).Name" 2>nul`;
+    chomp $culture if $culture;
+    $lang = $culture if $culture;
+  }
+
+  # Return 'de' for German locales
+  return 'de' if $lang =~ /^de[-_]/i || $lang =~ /german/i;
+
+  # Default to English
+  return 'en';
+}
+
+# Define all supported clients
+my @ALL_CLIENTS = (
+  {
+    id          => 'claude_desktop',
+    name        => 'Claude Desktop',
+    config_key  => 'mcpServers',
+    get_path    => \&get_claude_desktop_config_path,
+    detect      => \&detect_claude_desktop,
+  },
+  {
+    id          => 'vscode',
+    name        => 'VS Code / GitHub Copilot',
+    config_key  => 'servers',
+    dir         => '.vscode',
+    file        => 'mcp.json',
+    detect      => \&detect_vscode,
+  },
+  {
+    id          => 'cursor',
+    name        => 'Cursor',
+    config_key  => 'servers',
+    dir         => '.cursor',
+    file        => 'mcp.json',
+    detect      => \&detect_cursor,
+  },
+  {
+    id          => 'claude_code',
+    name        => 'Claude Code',
+    config_key  => 'mcpServers',
+    dir         => '',
+    file        => '.mcp.json',
+    detect      => sub { 1 },  # CLI tool, always "available"
+  },
+  {
+    id          => 'windsurf',
+    name        => 'Windsurf',
+    config_key  => 'servers',
+    dir         => '.windsurf',
+    file        => 'mcp.json',
+    detect      => \&detect_windsurf,
+  },
+);
+
+print "\n";
+print "  ____  _            _        __  __  ____ ____\n";
+print " |  _ \\(_) ___ _ __ (_) ___  |  \\/  |/ ___|  _ \\\n";
+print " | |_) | |/ __| '_ \\| |/ __| | |\\/| | |   | |_) |\n";
+print " |  __/| | (__| | | | | (__  | |  | | |___|  __/\n";
+print " |_|   |_|\\___|_| |_|_|\\___| |_|  |_|\\____|_|\n";
+print "\n";
+print "  " . t('banner_subtitle') . "\n\n";
+
+# Detect installed clients
+my @available_clients = detect_installed_clients();
+
+if (@available_clients == 0) {
+  print t('no_clients') . "\n\n";
+  print t('show_config_prompt');
+  my $ans = <STDIN>;
+  chomp $ans;
+  if (lc($ans) ne 'n') {
+    get_credentials_and_show_config();
+  }
+  exit 0;
+}
+
+# Show menu
+print t('found_clients') . "\n\n";
+my $i = 1;
+my %menu;
+for my $client (@available_clients) {
+  print "  [$i] $client->{name}";
+  print " (" . t('installed') . ")" if $client->{detected};
+  print "\n";
+  $menu{$i} = $client;
+  $i++;
+}
+print "  [$i] " . t('show_config_option') . "\n";
+$menu{$i} = { id => 'show_only' };
+my $max = $i;
+
+print "\n" . t('selection') . " [1-$max]: ";
+my $choice = <STDIN>;
+chomp $choice;
+$choice = 1 unless $choice && $choice =~ /^\d+$/ && $choice >= 1 && $choice <= $max;
+
+print "\n";
+
+my $selected = $menu{$choice};
+
+if ($selected->{id} eq 'show_only') {
+  get_credentials_and_show_config();
+  exit 0;
+}
+
+# Get credentials
+my ($email, $pass, $country) = get_credentials();
+
+# Find mcp-picnic command
+my $mcp_cmd = find_mcp_picnic_command();
+
+# Build the MCP server config entry
+my $server_config = {
+  command => $mcp_cmd->{command},
+  env => {
+    MOJO_MCP_VERSION => '2024-11-05',  # Protocol version for Claude Desktop compatibility
+    PICNIC_USER      => $email,
+    PICNIC_PASS      => $pass,
+    PICNIC_COUNTRY   => $country,
+  },
+};
+$server_config->{args} = $mcp_cmd->{args} if $mcp_cmd->{args};
+
+# Configure selected client
+configure_client($selected, $server_config);
+
+#
+# Subroutines
+#
+
+sub get_credentials {
+  print "=== " . t('account_data') . " ===\n\n";
+
+  print t('email');
+  my $email = <STDIN>;
+  chomp $email;
+  die t('email_required') . "\n" unless $email;
+
+  print t('password');
+  my $pass;
+  if ($HAS_READKEY) {
+    Term::ReadKey::ReadMode('noecho');
+    $pass = Term::ReadKey::ReadLine(0);
+    Term::ReadKey::ReadMode('restore');
+    print "\n";
+  } else {
+    print t('password_visible');
+    $pass = <STDIN>;
+  }
+  chomp $pass;
+  die t('password_required') . "\n" unless $pass;
+
+  print t('country');
+  my $country = <STDIN>;
+  chomp $country;
+  $country = 'de' unless $country && $country =~ /^(de|nl)$/i;
+  $country = lc($country);
+
+  print "\n";
+
+  return ($email, $pass, $country);
+}
+
+sub get_credentials_and_show_config {
+  my ($email, $pass, $country) = get_credentials();
+  my $mcp_cmd = find_mcp_picnic_command();
+
+  my $server_config = {
+    command => $mcp_cmd->{command},
+    env => {
+      MOJO_MCP_VERSION => '2024-11-05',  # Protocol version for Claude Desktop compatibility
+      PICNIC_USER      => $email,
+      PICNIC_PASS      => $pass,
+      PICNIC_COUNTRY   => $country,
+    },
+  };
+  $server_config->{args} = $mcp_cmd->{args} if $mcp_cmd->{args};
+
+  show_config_only($server_config);
+}
+
+sub detect_installed_clients {
+  my @found;
+
+  for my $client (@ALL_CLIENTS) {
+    my $detected = $client->{detect}->();
+    if ($detected || $^O ne 'MSWin32') {
+      # On Windows: only show detected clients
+      # On Linux/Mac: show all (detection is less reliable)
+      push @found, { %$client, detected => $detected };
+    }
+  }
+
+  # On non-Windows, mark which ones we actually detected
+  if ($^O ne 'MSWin32') {
+    # Still try to detect but show all anyway
+    for my $client (@found) {
+      $client->{detected} = $client->{detect}->();
+    }
+  }
+
+  return @found;
+}
+
+sub detect_claude_desktop {
+  if ($^O eq 'MSWin32') {
+    # Check for Claude Desktop installation
+    my $localappdata = $ENV{LOCALAPPDATA} || '';
+    my $appdata = $ENV{APPDATA} || '';
+
+    return 1 if -d "$localappdata\\Programs\\claude-desktop";
+    return 1 if -d "$localappdata\\claude-desktop";
+    return 1 if -d "$appdata\\Claude";
+
+    # Check registry (if we can)
+    my $reg_check = `reg query "HKCU\\Software\\Claude" 2>nul`;
+    return 1 if $reg_check && $reg_check =~ /Claude/i;
+
+    return 0;
+  }
+  elsif ($^O eq 'darwin') {
+    return -d '/Applications/Claude.app';
+  }
+  else {
+    # Linux - check common locations
+    return -d "$ENV{HOME}/.config/Claude"
+        || -f '/usr/bin/claude'
+        || -f '/usr/local/bin/claude';
+  }
+}
+
+sub detect_vscode {
+  if ($^O eq 'MSWin32') {
+    my $localappdata = $ENV{LOCALAPPDATA} || '';
+    my $appdata = $ENV{APPDATA} || '';
+
+    return 1 if -d "$localappdata\\Programs\\Microsoft VS Code";
+    return 1 if -d "$appdata\\Code";
+    return 1 if `where code 2>nul` =~ /code/i;
+    return 0;
+  }
+  elsif ($^O eq 'darwin') {
+    return -d '/Applications/Visual Studio Code.app'
+        || `which code 2>/dev/null` =~ /code/;
+  }
+  else {
+    return -d "$ENV{HOME}/.config/Code"
+        || `which code 2>/dev/null` =~ /code/;
+  }
+}
+
+sub detect_cursor {
+  if ($^O eq 'MSWin32') {
+    my $localappdata = $ENV{LOCALAPPDATA} || '';
+    my $appdata = $ENV{APPDATA} || '';
+
+    return 1 if -d "$localappdata\\Programs\\cursor";
+    return 1 if -d "$localappdata\\cursor";
+    return 1 if -d "$appdata\\Cursor";
+    return 0;
+  }
+  elsif ($^O eq 'darwin') {
+    return -d '/Applications/Cursor.app';
+  }
+  else {
+    return -d "$ENV{HOME}/.config/Cursor"
+        || `which cursor 2>/dev/null` =~ /cursor/;
+  }
+}
+
+sub detect_windsurf {
+  if ($^O eq 'MSWin32') {
+    my $localappdata = $ENV{LOCALAPPDATA} || '';
+    my $appdata = $ENV{APPDATA} || '';
+
+    return 1 if -d "$localappdata\\Programs\\windsurf";
+    return 1 if -d "$localappdata\\Windsurf";
+    return 1 if -d "$appdata\\Windsurf";
+    return 0;
+  }
+  elsif ($^O eq 'darwin') {
+    return -d '/Applications/Windsurf.app';
+  }
+  else {
+    return -d "$ENV{HOME}/.config/Windsurf"
+        || `which windsurf 2>/dev/null` =~ /windsurf/;
+  }
+}
+
+sub configure_client {
+  my ($client, $server_config) = @_;
+
+  if ($client->{id} eq 'claude_desktop') {
+    configure_global_config($client, $server_config);
+  }
+  else {
+    configure_project_config($client, $server_config);
+  }
+}
+
+sub configure_global_config {
+  my ($client, $server_config) = @_;
+
+  my $config_path = $client->{get_path}->();
+  print t('config_file') . ": $config_path\n\n";
+
+  my $config = load_json_file($config_path);
+  my $key = $client->{config_key};
+  $config->{$key} //= {};
+
+  if (exists $config->{$key}{Picnic}) {
+    print t('already_configured');
+    my $answer = <STDIN>;
+    chomp $answer;
+    return unless lc($answer) eq 'j' || lc($answer) eq 'y';
+    print "\n";
+  }
+
+  $config->{$key}{Picnic} = $server_config;
+
+  save_json_file($config_path, $config);
+  print_success($client->{name});
+}
+
+sub configure_project_config {
+  my ($client, $server_config) = @_;
+
+  my $cwd = getcwd();
+  my $target_dir = $client->{dir} ? path($cwd, $client->{dir})->stringify : $cwd;
+  my $config_path = path($target_dir, $client->{file})->stringify;
+
+  print t('current_dir') . ": $cwd\n";
+  print t('config_file') . ": $config_path\n\n";
+
+  print t('create_here');
+  my $answer = <STDIN>;
+  chomp $answer;
+  if (lc($answer) eq 'n') {
+    print "\n" . t('alt_path');
+    my $alt = <STDIN>;
+    chomp $alt;
+    return unless $alt;
+    $config_path = $alt;
+    $target_dir = path($config_path)->parent->stringify;
+  }
+  print "\n";
+
+  my $config = load_json_file($config_path);
+  my $key = $client->{config_key};
+  $config->{$key} //= {};
+
+  if (exists $config->{$key}{Picnic}) {
+    print t('already_configured');
+    my $ans = <STDIN>;
+    chomp $ans;
+    return unless lc($ans) eq 'j' || lc($ans) eq 'y';
+    print "\n";
+  }
+
+  $config->{$key}{Picnic} = $server_config;
+
+  make_path($target_dir) if $target_dir && !-d $target_dir;
+  save_json_file($config_path, $config);
+  print_success($client->{name});
+}
+
+sub show_config_only {
+  my ($server_config) = @_;
+
+  print "=== " . t('format_claude') . " ===\n\n";
+  print $json->encode({
+    mcpServers => {
+      Picnic => $server_config,
+    },
+  });
+
+  print "\n=== " . t('format_vscode') . " ===\n\n";
+  print $json->encode({
+    servers => {
+      Picnic => $server_config,
+    },
+  });
+
+  print "\n";
+  print t('copy_block') . "\n\n";
+
+  print t('config_files') . "\n";
+  my $in_proj = t('in_project');
+  print "  Claude Desktop:  " . get_claude_desktop_config_path() . "\n";
+  print "  VS Code:         .vscode/mcp.json ($in_proj)\n";
+  print "  Cursor:          .cursor/mcp.json ($in_proj)\n";
+  print "  Claude Code:     .mcp.json ($in_proj)\n";
+  print "  Windsurf:        .windsurf/mcp.json ($in_proj)\n";
+  print "\n";
+}
+
+sub load_json_file {
+  my ($path) = @_;
+  return {} unless -f $path;
+  open my $fh, '<:utf8', $path or return {};
+  local $/;
+  my $content = <$fh>;
+  close $fh;
+  return {} unless $content && $content =~ /\S/;
+  return eval { $json->decode($content) } // {};
+}
+
+sub save_json_file {
+  my ($path, $data) = @_;
+  my $target_dir = path($path)->parent->stringify;
+  make_path($target_dir) if $target_dir && !-d $target_dir;
+
+  open my $fh, '>:utf8', $path or die "Cannot write: $path: $!";
+  print $fh $json->encode($data);
+  close $fh;
+  print t('written') . ": $path\n\n";
+}
+
+sub print_success {
+  my ($client) = @_;
+  print "=== " . t('done') . " ===\n\n";
+  print t('configured_for') . " $client.\n\n";
+  print t('next_steps') . "\n";
+  print "1. " . t('step1') . " $client\n";
+  print "2. " . t('step2') . "\n";
+  print "3. " . t('step3') . "\n\n";
+  print t('have_fun') . "\n\n";
+}
+
+sub get_claude_desktop_config_path {
+  if ($^O eq 'MSWin32' || $^O eq 'cygwin') {
+    my $appdata = $ENV{APPDATA} || "$ENV{USERPROFILE}\\AppData\\Roaming";
+    return path($appdata, 'Claude', 'claude_desktop_config.json')->stringify;
+  }
+  elsif ($^O eq 'darwin') {
+    return path($ENV{HOME}, 'Library', 'Application Support', 'Claude', 'claude_desktop_config.json')->stringify;
+  }
+  else {
+    my $config_home = $ENV{XDG_CONFIG_HOME} || path($ENV{HOME}, '.config')->stringify;
+    return path($config_home, 'Claude', 'claude_desktop_config.json')->stringify;
+  }
+}
+
+sub find_mcp_picnic_command {
+  # On Windows, we need to return perl.exe + script path directly
+  # because Claude Desktop uses "cmd.exe /C" which breaks stdin pipes
+  if ($^O eq 'MSWin32') {
+    # Find perl.exe
+    my $perl_exe = $^X;  # Currently running perl
+    $perl_exe =~ s/\//\\/g;  # Normalize path separators
+
+    # Find mcp-picnic script (not .bat)
+    for my $dir (_path_dirs()) {
+      my $script = path($dir, 'mcp-picnic')->stringify;
+      if (-f $script) {
+        $script =~ s/\//\\/g;
+        return { command => $perl_exe, args => [$script] };
+      }
+      # Try without extension (Strawberry Perl installs scripts with .bat wrapper)
+      my $pl_script = "$script.pl";
+      if (-f $pl_script) {
+        $pl_script =~ s/\//\\/g;
+        return { command => $perl_exe, args => [$pl_script] };
+      }
+    }
+
+    # Fallback: assume it's installed in Strawberry's site/bin
+    my $strawberry_script = 'C:\\Strawberry\\perl\\site\\bin\\mcp-picnic';
+    if (-f $strawberry_script) {
+      return { command => $perl_exe, args => [$strawberry_script] };
+    }
+
+    # Last resort: just return the perl + script name
+    return { command => $perl_exe, args => ['mcp-picnic'] };
+  }
+
+  # On Unix, just return the command name
+  for my $dir (_path_dirs()) {
+    my $cmd = path($dir, 'mcp-picnic')->stringify;
+    return { command => 'mcp-picnic' } if -x $cmd;
+  }
+  return { command => 'mcp-picnic' };
+}
+
+# Replacement for File::Spec->path(): split $PATH on the platform separator.
+sub _path_dirs {
+  my @dirs = grep { length } split /\Q$Config{path_sep}\E/, ($ENV{PATH} // '');
+  for (@dirs) { s/\A"//; s/"\z//; }  # Windows PATH entries may be quoted
+  return @dirs;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mcp-picnic-setup - Setup wizard for Picnic MCP Server in various MCP clients
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  mcp-picnic-setup
+
+=head1 DESCRIPTION
+
+Interactive setup wizard that configures the Picnic MCP Server for various
+MCP-compatible clients.
+
+On Windows, the wizard automatically detects which MCP clients are installed
+and only shows those as options. On Linux/macOS, all clients are shown but
+detected ones are marked.
+
+=head1 SUPPORTED CLIENTS
+
+=over 4
+
+=item * Claude Desktop
+
+=item * VS Code / GitHub Copilot
+
+=item * Cursor
+
+=item * Claude Code
+
+=item * Windsurf
+
+=back
+
+The wizard can also display the configuration for manual copying.
+
+=head1 SEE ALSO
+
+L<MCP::Picnic>, L<mcp-picnic>
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-mcp-picnic/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

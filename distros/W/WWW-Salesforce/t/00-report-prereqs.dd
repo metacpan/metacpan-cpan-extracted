@@ -28,6 +28,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Carp' => '0',
                                       'DateTime' => '0',
                                       'Exporter' => '5.57',
                                       'IO::Socket::SSL' => '1.94',

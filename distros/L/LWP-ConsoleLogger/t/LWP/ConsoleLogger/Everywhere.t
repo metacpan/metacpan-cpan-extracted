@@ -3,12 +3,15 @@ use warnings;
 use version;
 
 use Capture::Tiny   qw( capture_stderr );
+use HTTP::Tiny      ();
 use LWP::UserAgent  ();
 use Module::Runtime qw( require_module );
 use Path::Tiny      qw( path );
+use Plack::Loader   ();
+use Test::TCP;
 use Test::Warnings;
 use Test::Fatal qw( exception );
-use Test::More import => [qw( diag done_testing is ok skip )];
+use Test::More import => [qw( diag done_testing is like ok skip )];
 use Try::Tiny      qw( catch try );
 use WWW::Mechanize ();
 
@@ -104,12 +107,39 @@ foreach my $ua (
     ok $stderr, '... and there was a dump';
 }
 
+# HTTP::Tiny support: creating an instance should register a new logger.
+my $before_http_tiny = scalar @{ LWP::ConsoleLogger::Everywhere->loggers };
+my $http_tiny        = HTTP::Tiny->new;
+is(
+    scalar @{ LWP::ConsoleLogger::Everywhere->loggers },
+    $before_http_tiny + 1,
+    'HTTP::Tiny->new registers a new logger'
+);
+
+test_tcp(
+    client => sub {
+        my $port   = shift;
+        my $url    = "http://127.0.0.1:$port/";
+        my $stderr = capture_stderr sub {
+            $http_tiny->get($url);
+        };
+        ok $stderr, 'HTTP::Tiny request produced a dump';
+        like $stderr, qr{200}, '... and it mentions the status';
+    },
+    server => sub {
+        my $port = shift;
+        Plack::Loader->auto( port => $port, host => '127.0.0.1' )
+            ->run(
+            sub { [ 200, [ 'Content-Type' => 'text/plain' ], ['ok'] ] } );
+    },
+);
+
 is(
     (
         grep { $_->isa('LWP::ConsoleLogger') }
             @{ LWP::ConsoleLogger::Everywhere->loggers }
     ),
-    4 + defined($mojo) + defined($mojo_based) + defined($Foo::Bar::mua)
+    5 + defined($mojo) + defined($mojo_based) + defined($Foo::Bar::mua)
         + defined($Foo::Bar::mua_based),
     'all loggers are stored'
 );
@@ -127,7 +157,7 @@ is(
         grep { $_->dump_content == 0 }
             @{ LWP::ConsoleLogger::Everywhere->loggers }
     ),
-    4 + defined($mojo) + defined($mojo_based) + defined($Foo::Bar::mua)
+    5 + defined($mojo) + defined($mojo_based) + defined($Foo::Bar::mua)
         + defined($Foo::Bar::mua_based),
     '... and all loggers have been changed'
 );

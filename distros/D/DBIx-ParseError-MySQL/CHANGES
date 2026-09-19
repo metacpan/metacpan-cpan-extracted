@@ -1,6 +1,14 @@
 Changelog for DBIx-ParseError-MySQL
 
-v1.0.5 2026-09-11T22:00:53
+v1.0.6 2026-09-18T16:26:05
+ - Update README (Brendan Byrd)
+ - Pull request #7: SM-6891 a (Brendan Byrd)
+ - Add packet corruption, table definition change, and writer capacity
+   errors as transient (Brendan Byrd)
+ - Add Aurora write forwarding request failure to the transient shutdown
+   category (Brendan Byrd)
+
+v1.0.5 2026-09-11T21:57:16
  - Pull request #6: SM-6891 (Brendan Byrd)
  - Update README / LICENSE (Brendan Byrd)
  - Add Aurora failover errors to the transient shutdown category (Brendan

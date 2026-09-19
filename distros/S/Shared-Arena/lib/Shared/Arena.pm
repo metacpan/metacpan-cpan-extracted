@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Frozen;
 use Struct::Codec;
@@ -24,7 +24,7 @@ Shared::Arena - memory two processes can both read, without a syscall
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 

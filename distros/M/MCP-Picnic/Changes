@@ -1,0 +1,11 @@
+Revision history for MCP-Picnic
+
+0.001     2026-09-18 19:29:01Z
+    - Initial release
+    - MCP server exposing the Picnic Supermarket API (via WWW::Picnic)
+      to AI assistants such as Claude
+    - Interactive 2FA login flow
+    - Tools: search_products, get_product_details, get_suggestions,
+      get_cart, add_to_cart, remove_from_cart, clear_cart,
+      get_delivery_slots, set_delivery_slot, get_user, get_categories
+    - HTTP server variant (mcp-picnic-http) for remote MCP and a REST API

@@ -1,0 +1,44 @@
+Revision history for Music-NWC2MusicXML
+
+0.001.0	Fri Sep 18 12:49:11 PM EDT 2026
+      Initial CPAN release. Fully functional NWC-to-MusicXML conversion pipeline.
+
+      Core modules:
+      - Music::NWC2MusicXML         -- top-level facade; single-file and batch conversion.
+      - Music::NWC2MusicXML::NWC    -- NWC 2.x binary container decoder (zlib decompression).
+      - Music::NWC2MusicXML::Parser -- NWCTXT text parser producing Score/Staff/Event trees.
+      - Music::NWC2MusicXML::Score  -- internal score model.
+      - Music::NWC2MusicXML::Staff  -- internal staff model.
+      - Music::NWC2MusicXML::Event  -- internal event model with exact rational durations.
+      - Music::NWC2MusicXML::MusicXML -- MusicXML 4.0 generator.
+      - Music::NWC2MusicXML::Diagnostics -- i18n warning/logging subsystem.
+      - bin/nwc2musicxml            -- command-line interface.
+
+      MusicXML features emitted:
+      - Notes, chords, rests (all NWC durations; dotted, double-dotted, triplets).
+      - Grace notes (<grace/> element; duration omitted per MusicXML schema).
+      - Slurs (numbered 1-6 for simultaneous arcs), ties, articulations, ornaments.
+      - Clef, key-signature, and time-signature changes (initial and mid-staff).
+      - Transposing instruments (<transpose><chromatic>).
+      - Tempo and tempo-variance directions (metronome, rit., accel., etc.).
+      - Dynamic markings with per-staff MIDI velocity (DynVel) mapping.
+      - Hairpin crescendo/diminuendo wedges.
+      - Text directions, flow-control marks (coda, segno, D.C., D.S., Fine, ...).
+      - Lyrics with syllabic type (begin/middle/end/single).
+      - Part groups (bracket and brace) from WithNextStaff flags.
+      - MIDI channel, program, volume, and pan from NWC staff properties.
+      - Visible/hidden staves (print-object="no" on part-name).
+      - Custom ending barlines from NWC EndingBar property.
+      - Asymmetric page margins (Left/Right/Top/Bottom from PgMargins).
+      - Word-font and lyric-font defaults from NWC Font records.
+      - Score metadata: title, author, lyricist, copyright, comments.
+      - Repeat barlines (MasterRepeatOpen/Close, LocalRepeatOpen/Close).
+      - Double, section-close, and other barline styles.
+
+      CLI features:
+      - Single-file and batch conversion.
+      - Recursive directory scanning (--recursive).
+      - Selectable output directory (--output-dir).
+      - Overwrite guard (--overwrite).
+      - Warning log file (--warnings).
+      - Extended consistency validation (--validate).

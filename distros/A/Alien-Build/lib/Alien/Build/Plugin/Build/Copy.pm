@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Path::Tiny ();
 
 # ABSTRACT: Copy plugin for Alien::Build
-our $VERSION = '2.87'; # VERSION
+our $VERSION = '2.88'; # VERSION
 
 
 sub init
@@ -24,7 +24,7 @@ sub init
       $build->system(qq{xcopy . "$stage" /E});
     });
   }
-  elsif($^O eq 'darwin')
+  elsif($^O eq 'darwin' || $^O eq 'solaris')
   {
     # On recent macOS -pPR is the same as -aR
     # on older Mac OS X (10.5 at least) -a is not supported but -pPR is.
@@ -33,6 +33,9 @@ sub init
     # someone is using  coreutils on macOS, although there are semantic
     # differences between -pPR and -aR on coreutils, that may or may not be
     # important enough to care about.
+
+    # Solaris /usr/bin/cp and /usr/xpg4/bin/cp don't support -a at all,
+    # but do support -p, -P and -R.
 
     $meta->register_hook(build => [
       'cp -pPR * "%{.install.stage}"',
@@ -62,7 +65,7 @@ Alien::Build::Plugin::Build::Copy - Copy plugin for Alien::Build
 
 =head1 VERSION
 
-version 2.87
+version 2.88
 
 =head1 SYNOPSIS
 

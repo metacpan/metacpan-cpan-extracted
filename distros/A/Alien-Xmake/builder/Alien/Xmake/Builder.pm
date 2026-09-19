@@ -13,8 +13,7 @@ class    #
     use Path::Tiny        qw[path cwd];
     use ExtUtils::Helpers qw[make_executable split_like_shell detildefy];
     use Capture::Tiny     qw[capture];
-    use Symbol            qw[gensym];
-    use IPC::Open3;
+    use File::Temp        qw[tempfile];
 
     # Configuration
     field $target_version : param : reader //= '';    # empty means "latest release" (resolved from the GitHub API)
@@ -355,8 +354,12 @@ use %s;
 
     method _get_xmake_version ($cmd) {
         local @ENV{qw[XMAKE_PROGRAM_DIR XMAKE_PROGRAM_FILE XMAKE_ROOTDIR]};
-        my ( $out, undef, $exit ) = capture { system $cmd, '--version' };
+        my ( $out, undef, $exit ) = eval { capture { system $cmd, '--version' } };
         return "v$1" if $exit == 0 && $out =~ /xmake\s+v?(\d+\.\d+\.\d+)/i;
+        if ($@) {    # perl itself could not spawn $cmd (e.g. wrong-arch binary on Windows-on-ARM64)
+            my $w32 = ( $^O eq 'MSWin32' && defined $^E && length $^E ) ? " [$^E]" : '';
+            warn sprintf "Warning: cannot run '%s' --version%s\n", $cmd, $w32;
+        }
         return 'v0.0.0';
     }
 
@@ -439,22 +442,31 @@ use %s;
         say "Generated $dest";
     }
 
+    # PROCESSOR_ARCHITEW6432 names the *host* processor and is set for x86 WOW64 processes as
+    # well as for x64 processes on Windows-on-ARM64, so an emulated perl still detects an ARM64
+    # host and downloads the native ARM64 bundle. Prefer it over PROCESSOR_ARCHITECTURE,
+    # mirroring the Alien::Build::Util convention.
+    method _windows_arch () {
+        my $arch = $ENV{PROCESSOR_ARCHITEW6432};
+        return defined($arch) && length($arch) ? $arch : ( $ENV{PROCESSOR_ARCHITECTURE} // '' );
+    }
+
     method _install_windows ($installdir) {
         my $temppath = path('_build_xmake');
         $temppath->mkpath;
-        my $arch_env   = $ENV{PROCESSOR_ARCHITECTURE} // '';
-        my $arch64_env = $ENV{PROCESSOR_ARCHITEW6432} // '';
-        my $target     = $self->_desired_version;
+        my $arch   = $self->_windows_arch;      # host arch, so an x64 perl on Windows-on-ARM64 picks the native bundle
+        my $target = $self->_desired_version;
         my $filename;
-        if ( $arch_env eq 'ARM64' || $arch64_env eq 'ARM64' ) {    # Check for ARM64
-            $filename = "xmake-bundle-$target.arm64.exe";          # ARM64 releases use the 'bundle' naming convention
+        if ( $arch eq 'ARM64' ) {               # ARM64 host (Windows-on-ARM64)
+            $filename = "xmake-bundle-$target.arm64.exe";    # ARM64 releases use the 'bundle' naming convention
         }
-        elsif ( $arch_env eq 'AMD64' || $arch_env eq 'IA64' || $arch64_env eq 'AMD64' || $arch64_env eq 'IA64' ) {    # Check for x64 (AMD64/IA64)
+        elsif ( $arch eq 'AMD64' || $arch eq 'IA64' ) {      # x64 (AMD64/IA64) host
             $filename = "xmake-$target.win64.exe";
         }
-        else {                                                                                                        # Fallback to x86
+        else {                                               # Fallback to x86 host
             $filename = "xmake-$target.win32.exe";
         }
+        say sprintf 'Selecting xmake installer: %s (host arch: %s)', $filename, $arch if $verbose;
 
         # Preferred: the exact asset URL reported by the GitHub API. Fall back to
         # the canonical hardcoded URL if the release metadata is unavailable.
@@ -545,8 +557,10 @@ use %s;
         }
         if ( -f 'configure' ) {
             say "Configuring with make=$make_cmd..." if $verbose;
-            system( './configure', "--make=$make_cmd" ) == 0 or die 'Configure failed';
-            system( $make_cmd,     '-j4' ) == 0              or die 'Make failed';
+            my @sh = ( './configure', "--make=$make_cmd" );
+            @sh = ( 'bash', @sh ) if $self->_cmd_exists( 'bash', '-c', 'true' );
+            system(@sh) == 0                or die 'Configure failed';
+            system( $make_cmd, '-j4' ) == 0 or die 'Make failed';
             say "Installing to $installdir..." if $verbose;
             system( $make_cmd, 'install', "PREFIX=$installdir" ) == 0 or die 'Install failed';
         }
@@ -651,22 +665,17 @@ use %s;
         }
 
         # Compiler
-        my $found_cc  = 0;
-        my $prog      = "#include <stdio.h>\nint main(){return 0;}";
-        my @compilers = ( [qw[cc -xc - -o /dev/null]], [qw[gcc -xc - -o /dev/null]], [qw[clang -xc - -o /dev/null]] );
-        for my $cmd_ref (@compilers) {
-            my $name = $cmd_ref->[0];
-            my $err  = gensym;
-            my $pid  = open3( my $in, my $out, $err, @$cmd_ref );
-            if ($pid) {
-                print $in $prog;
-                close $in;
-                waitpid( $pid, 0 );
-                if ( $? == 0 ) {
-                    say " - compiler: Found ($name)" if $verbose;
-                    $found_cc = 1;
-                    last;
-                }
+        my $found_cc = 0;
+        my $prog     = "#include <stdio.h>\nint main(){return 0;}";
+        my ( $probe_fh, $probe_file ) = tempfile( SUFFIX => '.c', UNLINK => 1 );
+        print {$probe_fh} $prog;
+        close $probe_fh;
+        for my $cc (qw[cc gcc clang]) {
+            my ( undef, undef, $exit ) = capture { system $cc, '-xc', $probe_file, '-o', '/dev/null' };
+            if ( $exit == 0 ) {
+                say " - compiler: Found ($cc)" if $verbose;
+                $found_cc = 1;
+                last;
             }
         }
         unless ($found_cc) {

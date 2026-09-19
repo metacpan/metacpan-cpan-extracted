@@ -1,6 +1,6 @@
 package Dancer2::Serializer::YAML;
 # ABSTRACT: Serializer for handling YAML data
-$Dancer2::Serializer::YAML::VERSION = '2.2.0';
+$Dancer2::Serializer::YAML::VERSION = '2.2.1';
 use Moo;
 use Carp 'croak';
 use Encode;
@@ -34,6 +34,29 @@ sub serialize {
 
 sub deserialize {
     my ( $self, $content ) = @_;
+
+    # Content reaching here is untrusted -- for an app with 'serializer: YAML'
+    # (or Serializer::Mutable, which maps both text/x-yaml and text/html to
+    # this class) it is the raw request body.
+    #
+    # YAML tags can ask the loader to build things that are not data.
+    # !!perl/hash:Some::Class instantiates an arbitrary blessed object, which
+    # is the entry point for DESTROY/AUTOLOAD gadget chains, and !!perl/code
+    # asks for a string eval. Both are refused here.
+    #
+    # These are set explicitly rather than left to YAML.pm's defaults so the
+    # behaviour does not depend on which YAML.pm the user resolved: LoadBlessed
+    # only defaults to 0 from YAML 1.30, and the variable itself only exists
+    # from 1.25 (which is why cpanfile floors YAML -- see the note there).
+    #
+    # UseCode must be zeroed as well: YAML::Loader::Base decides on code
+    # loading with a plain OR -- load_code($YAML::LoadCode || $YAML::UseCode) --
+    # so LoadCode = 0 alone is defeated by an ambient $YAML::UseCode = 1, and
+    # the !!perl/code string eval is not gated on LoadBlessed at all.
+    local $YAML::LoadBlessed = 0;
+    local $YAML::LoadCode    = 0;
+    local $YAML::UseCode     = 0;
+
     YAML::Load(decode('UTF-8', $content));
 }
 
@@ -51,7 +74,7 @@ Dancer2::Serializer::YAML - Serializer for handling YAML data
 
 =head1 VERSION
 
-version 2.2.0
+version 2.2.1
 
 =head1 DESCRIPTION
 

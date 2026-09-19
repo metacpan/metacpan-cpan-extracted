@@ -1,0 +1,33 @@
+Game-Oware
+
+Oware, the African sow and capture game, under the Abapa rules: twelve
+houses, two stores and forty-eight seeds, for two players. Perfect
+information, and no randomness of any kind.
+
+The engine prints nothing, reads nothing and never calls rand. A refused
+move comes back as a flagged object rather than an exception, a game
+serialises as its move log rather than as a position, and a log that
+records something the rules would not have produced is refused on replay.
+
+Two rules in this game surprise people, and this distribution says so
+wherever it can: a move that would take every seed an opponent has takes
+none, and a seat that cannot give a starved opponent seeds takes its own
+and ends the game. A third, the rule that stops a game which will not end,
+is a HOUSE RULE rather than a rule of Oware, and is documented as one.
+
+A terminal game and a bot come with it:
+
+    oware --level 3
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under the Artistic License 2.0.

@@ -32,11 +32,28 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON::PP" : "0"
+            "JSON::PP" : "0",
+            "perl" : "5.026003"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "JSON::PP" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rouzier/JQ-XS.git",
+         "web" : "https://github.com/rouzier/JQ-XS"
+      }
+   },
+   "version" : "2.02",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

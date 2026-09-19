@@ -1,3 +1,15 @@
+0.324     2026-09-19 01:05:02Z
+
+  - F<.karr> is now excluded from the gathered distribution files for CPAN
+    releases, so it never lands in a consuming dist's release tarball. No
+    new toggle -- reuses the existing gather_exclude_filename mechanism
+    alongside the README.md exclusion, and is skipped when C<no_cpan> is
+    set, so a non-CPAN distribution still ships F<.karr>.
+
+  - Fixed POD for C<alien_build>: it does not set C<no_makemaker> to 1 (that
+    claim was wrong and self-contradictory -- C<Alien::Build::MM> munges the
+    MakeMaker-generated Makefile.PL, so MakeMaker has to stay).
+
 0.323     2026-09-18 02:52:39Z
 
   - SimpiCI provider: the generated `dzil test` job now exports

@@ -1,5 +1,13 @@
 Revision history for App-perlvars
 
+0.000008  2026-09-19 02:00:35Z
+    - Support linting package-less files, e.g. .t and .pl scripts, by wrapping
+      them in a synthetic package. This is opt-in via the new --scripts flag
+      (lint_scripts constructor argument). A package-less file that opts out at
+      compile time (e.g. "use Test::More skip_all => ...") or that is not valid
+      UTF-8 is now skipped or analyzed cleanly instead of crashing (GH#40)
+      (Olaf Alders)
+
 0.000007  2026-09-15 20:55:39Z
     - Add a --version flag to perlvars (GH#38) (Olaf Alders)
 

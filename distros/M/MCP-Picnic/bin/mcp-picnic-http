@@ -1,0 +1,638 @@
+#!/usr/bin/env perl
+# PODNAME: mcp-picnic-http
+# ABSTRACT: HTTP MCP + REST server for Picnic Supermarket
+
+use strict;
+use warnings;
+use Mojolicious::Lite -signatures;
+use MCP::Picnic;
+
+my $mcp = MCP::Picnic->new;
+my $picnic = $mcp->picnic;
+my $json = $mcp->json;
+
+# MCP endpoint (for Claude remote)
+any '/mcp' => $mcp->server->to_action;
+
+# Info endpoint
+get '/' => sub ($c) {
+  $c->render(json => {
+    name    => 'Picnic Supermarket MCP API',
+    version => $MCP::Picnic::VERSION,
+    country => $mcp->country,
+    auth_state => $mcp->_auth_state,
+    endpoints => {
+      mcp  => '/mcp (Claude MCP protocol)',
+      auth => {
+        status    => 'GET /api/auth/status',
+        login     => 'POST /api/auth/login',
+        verify_2fa => 'POST /api/auth/verify-2fa',
+      },
+      rest => {
+        search          => 'GET /api/products?q=',
+        product         => 'GET /api/products/:id',
+        suggestions     => 'GET /api/suggestions?q=',
+        cart            => 'GET /api/cart',
+        add_to_cart     => 'POST /api/cart/add',
+        remove_from_cart => 'POST /api/cart/remove',
+        clear_cart      => 'POST /api/cart/clear',
+        delivery_slots  => 'GET /api/delivery-slots',
+        set_slot        => 'POST /api/delivery-slots/select',
+        user            => 'GET /api/user',
+        categories      => 'GET /api/categories?depth=',
+      },
+    },
+  });
+};
+
+# OpenAPI spec for ChatGPT Actions
+get '/openapi.json' => sub ($c) {
+  my $base_url = $ENV{OPENAPI_SERVER_URL};
+  unless ($base_url) {
+    my $proto = $c->req->headers->header('X-Forwarded-Proto') // $c->req->url->base->scheme // 'http';
+    my $host = $c->req->headers->header('X-Forwarded-Host') // $c->req->url->base->host_port;
+    $base_url = "$proto://$host";
+  }
+  $base_url =~ s{/$}{};
+
+  $c->render(json => {
+    openapi => '3.1.0',
+    info => {
+      title       => 'Picnic Supermarket API',
+      description => 'API for the Picnic supermarket - product search, cart, delivery slots. Requires prior authentication via /api/auth/login',
+      version     => $MCP::Picnic::VERSION,
+    },
+    servers => [{ url => $base_url }],
+    paths => {
+      '/api/auth/status' => {
+        get => {
+          operationId => 'getAuthStatus',
+          summary     => 'Check authentication status',
+          responses   => { 200 => { description => 'Auth status (none, pending_2fa, authenticated)' } },
+        },
+      },
+      '/api/auth/login' => {
+        post => {
+          operationId => 'login',
+          summary     => 'Start login (may trigger a 2FA SMS)',
+          responses   => { 200 => { description => 'Login result' } },
+        },
+      },
+      '/api/auth/verify-2fa' => {
+        post => {
+          operationId  => 'verify2FA',
+          summary      => 'Verify 2FA code',
+          requestBody  => {
+            required => \1,
+            content  => {
+              'application/json' => {
+                schema => {
+                  type => 'object',
+                  properties => {
+                    code => { type => 'string', description => '6-digit SMS code' },
+                  },
+                  required => ['code'],
+                },
+              },
+            },
+          },
+          responses => { 200 => { description => 'Verification result' } },
+        },
+      },
+      '/api/products' => {
+        get => {
+          operationId => 'searchProducts',
+          summary     => 'Search products',
+          parameters  => [
+            { name => 'q', in => 'query', required => \1, schema => { type => 'string' }, description => 'Search term' },
+          ],
+          responses => { 200 => { description => 'List of products' } },
+        },
+      },
+      '/api/products/{id}' => {
+        get => {
+          operationId => 'getProduct',
+          summary     => 'Get product details',
+          parameters  => [
+            { name => 'id', in => 'path', required => \1, schema => { type => 'string' } },
+          ],
+          responses => { 200 => { description => 'Product details' } },
+        },
+      },
+      '/api/suggestions' => {
+        get => {
+          operationId => 'getSuggestions',
+          summary     => 'Get search suggestions',
+          parameters  => [
+            { name => 'q', in => 'query', required => \1, schema => { type => 'string' }, description => 'Partial search term' },
+          ],
+          responses => { 200 => { description => 'Suggestions' } },
+        },
+      },
+      '/api/cart' => {
+        get => {
+          operationId => 'getCart',
+          summary     => 'Show cart',
+          responses   => { 200 => { description => 'Cart with items and total price' } },
+        },
+      },
+      '/api/cart/add' => {
+        post => {
+          operationId  => 'addToCart',
+          summary      => 'Add product to cart',
+          requestBody  => {
+            required => \1,
+            content  => {
+              'application/json' => {
+                schema => {
+                  type => 'object',
+                  properties => {
+                    product_id => { type => 'string' },
+                    count      => { type => 'integer', default => 1 },
+                  },
+                  required => ['product_id'],
+                },
+              },
+            },
+          },
+          responses => { 200 => { description => 'Updated cart' } },
+        },
+      },
+      '/api/cart/remove' => {
+        post => {
+          operationId  => 'removeFromCart',
+          summary      => 'Remove product from cart',
+          requestBody  => {
+            required => \1,
+            content  => {
+              'application/json' => {
+                schema => {
+                  type => 'object',
+                  properties => {
+                    product_id => { type => 'string' },
+                    count      => { type => 'integer', default => 1 },
+                  },
+                  required => ['product_id'],
+                },
+              },
+            },
+          },
+          responses => { 200 => { description => 'Updated cart' } },
+        },
+      },
+      '/api/cart/clear' => {
+        post => {
+          operationId => 'clearCart',
+          summary     => 'Clear cart',
+          responses   => { 200 => { description => 'Confirmation' } },
+        },
+      },
+      '/api/delivery-slots' => {
+        get => {
+          operationId => 'getDeliverySlots',
+          summary     => 'Available delivery time windows',
+          responses   => { 200 => { description => 'List of delivery slots' } },
+        },
+      },
+      '/api/delivery-slots/select' => {
+        post => {
+          operationId  => 'selectDeliverySlot',
+          summary      => 'Select delivery slot',
+          requestBody  => {
+            required => \1,
+            content  => {
+              'application/json' => {
+                schema => {
+                  type => 'object',
+                  properties => {
+                    slot_id => { type => 'string' },
+                  },
+                  required => ['slot_id'],
+                },
+              },
+            },
+          },
+          responses => { 200 => { description => 'Updated cart with slot' } },
+        },
+      },
+      '/api/user' => {
+        get => {
+          operationId => 'getUser',
+          summary     => 'User information',
+          responses   => { 200 => { description => 'User profile' } },
+        },
+      },
+      '/api/categories' => {
+        get => {
+          operationId => 'getCategories',
+          summary     => 'Product categories',
+          parameters  => [
+            { name => 'depth', in => 'query', schema => { type => 'integer', default => 0 }, description => 'Category depth' },
+          ],
+          responses => { 200 => { description => 'Categories' } },
+        },
+      },
+    },
+  });
+};
+
+#
+# Auth endpoints
+#
+
+get '/api/auth/status' => sub ($c) {
+  $c->render(json => {
+    status  => $mcp->_auth_state,
+    message => _auth_status_message($mcp->_auth_state),
+  });
+};
+
+post '/api/auth/login' => sub ($c) {
+  my $auth = $mcp->_ensure_auth;
+
+  if (ref $auth && $auth->{error}) {
+    # 2FA required or error
+    $c->render(json => {
+      status  => $mcp->_auth_state,
+      message => $auth->{message},
+    });
+  } else {
+    $c->render(json => {
+      status  => 'authenticated',
+      message => 'Successfully logged in!',
+    });
+  }
+};
+
+post '/api/auth/verify-2fa' => sub ($c) {
+  my $data = $c->req->json // {};
+  my $code = $data->{code};
+
+  return $c->render(json => { error => 'Code required' }, status => 400) unless $code;
+
+  unless ($mcp->_auth_state eq 'pending_2fa') {
+    return $c->render(json => {
+      status  => $mcp->_auth_state,
+      message => 'No 2FA verification pending',
+    });
+  }
+
+  my $result = eval { $picnic->verify_2fa_code($code) };
+  if ($@) {
+    return $c->render(json => { error => "2FA failed: $@" }, status => 401);
+  }
+
+  $mcp->_auth_state('authenticated');
+  $c->render(json => {
+    status  => 'authenticated',
+    message => 'Successfully verified!',
+  });
+};
+
+#
+# REST API endpoints
+#
+
+get '/api/products' => sub ($c) {
+  my $q = $c->param('q');
+  return $c->render(json => { error => 'q parameter required' }, status => 400) unless $q;
+
+  my $auth = _check_auth($c, $mcp);
+  return unless $auth;
+
+  my $results = eval { $picnic->search($q) };
+  return $c->render(json => { error => "Search failed: $@" }, status => 500) if $@;
+
+  my @items = map { _article_hash($_) } $results->all_items;
+  $c->render(json => \@items);
+};
+
+get '/api/products/:id' => sub ($c) {
+  my $id = $c->param('id');
+
+  my $auth = _check_auth($c, $mcp);
+  return unless $auth;
+
+  my $article = eval { $picnic->get_article($id) };
+  return $c->render(json => { error => "Product not found: $@" }, status => 404) if $@;
+
+  $c->render(json => {
+    id            => $article->id,
+    name          => $article->name,
+    price         => $article->price,
+    display_price => $article->display_price,
+    description   => $article->description,
+    unit_quantity => $article->unit_quantity,
+    image_url     => $article->image_url,
+  });
+};
+
+get '/api/suggestions' => sub ($c) {
+  my $q = $c->param('q');
+  return $c->render(json => { error => 'q parameter required' }, status => 400) unless $q;
+
+  my $auth = _check_auth($c, $mcp);
+  return unless $auth;
+
+  my $suggestions = eval { $picnic->get_suggestions($q) };
+  return $c->render(json => { error => "Error: $@" }, status => 500) if $@;
+
+  $c->render(json => $suggestions);
+};
+
+get '/api/cart' => sub ($c) {
+  my $auth = _check_auth($c, $mcp);
+  return unless $auth;
+
+  my $cart = eval { $picnic->get_cart };
+  return $c->render(json => { error => "Error: $@" }, status => 500) if $@;
+
+  $c->render(json => _cart_hash($cart));
+};
+
+post '/api/cart/add' => sub ($c) {
+  my $data = $c->req->json // {};
+  my $product_id = $data->{product_id};
+  my $count = $data->{count} // 1;
+
+  return $c->render(json => { error => 'product_id required' }, status => 400) unless $product_id;
+
+  my $auth = _check_auth($c, $mcp);
+  return unless $auth;
+
+  my $cart = eval { $picnic->add_to_cart($product_id, $count) };
+  return $c->render(json => { error => "Error: $@" }, status => 500) if $@;
+
+  $c->render(json => {
+    message => "Added ($count x)",
+    cart    => _cart_hash($cart),
+  });
+};
+
+post '/api/cart/remove' => sub ($c) {
+  my $data = $c->req->json // {};
+  my $product_id = $data->{product_id};
+  my $count = $data->{count} // 1;
+
+  return $c->render(json => { error => 'product_id required' }, status => 400) unless $product_id;
+
+  my $auth = _check_auth($c, $mcp);
+  return unless $auth;
+
+  my $cart = eval { $picnic->remove_from_cart($product_id, $count) };
+  return $c->render(json => { error => "Error: $@" }, status => 500) if $@;
+
+  $c->render(json => {
+    message => "Removed ($count x)",
+    cart    => _cart_hash($cart),
+  });
+};
+
+post '/api/cart/clear' => sub ($c) {
+  my $auth = _check_auth($c, $mcp);
+  return unless $auth;
+
+  my $cart = eval { $picnic->clear_cart };
+  return $c->render(json => { error => "Error: $@" }, status => 500) if $@;
+
+  $c->render(json => { message => 'Cart cleared' });
+};
+
+get '/api/delivery-slots' => sub ($c) {
+  my $auth = _check_auth($c, $mcp);
+  return unless $auth;
+
+  my $slots = eval { $picnic->get_delivery_slots };
+  return $c->render(json => { error => "Error: $@" }, status => 500) if $@;
+
+  my @available = map { _slot_hash($_) } $slots->available_slots;
+  $c->render(json => \@available);
+};
+
+post '/api/delivery-slots/select' => sub ($c) {
+  my $data = $c->req->json // {};
+  my $slot_id = $data->{slot_id};
+
+  return $c->render(json => { error => 'slot_id required' }, status => 400) unless $slot_id;
+
+  my $auth = _check_auth($c, $mcp);
+  return unless $auth;
+
+  my $cart = eval { $picnic->set_delivery_slot($slot_id) };
+  return $c->render(json => { error => "Error: $@" }, status => 500) if $@;
+
+  $c->render(json => {
+    message => 'Delivery slot selected',
+    cart    => _cart_hash($cart),
+  });
+};
+
+get '/api/user' => sub ($c) {
+  my $auth = _check_auth($c, $mcp);
+  return unless $auth;
+
+  my $user = eval { $picnic->get_user };
+  return $c->render(json => { error => "Error: $@" }, status => 500) if $@;
+
+  $c->render(json => _user_hash($user));
+};
+
+get '/api/categories' => sub ($c) {
+  my $depth = $c->param('depth') // 0;
+
+  my $auth = _check_auth($c, $mcp);
+  return unless $auth;
+
+  my $categories = eval { $picnic->get_categories($depth) };
+  return $c->render(json => { error => "Error: $@" }, status => 500) if $@;
+
+  $c->render(json => $categories);
+};
+
+#
+# Helper functions
+#
+
+sub _check_auth ($c, $mcp) {
+  my $auth = $mcp->_ensure_auth;
+  if (ref $auth && $auth->{error}) {
+    $c->render(json => {
+      error   => 'auth_required',
+      status  => $mcp->_auth_state,
+      message => $auth->{message},
+    }, status => 401);
+    return 0;
+  }
+  return 1;
+}
+
+sub _auth_status_message ($state) {
+  return 'Not logged in' if $state eq 'none';
+  return '2FA code required - SMS has been sent' if $state eq 'pending_2fa';
+  return 'Logged in' if $state eq 'authenticated';
+  return 'Unknown';
+}
+
+sub _article_hash ($article) {
+  return {
+    id            => $article->id,
+    name          => $article->name,
+    price         => $article->price,
+    display_price => $article->display_price,
+    unit_quantity => $article->unit_quantity,
+    image_url     => $article->image_url,
+  };
+}
+
+sub _cart_hash ($cart) {
+  return {
+    total_count     => $cart->total_count,
+    total_price     => $cart->total_price,
+    items           => $cart->items,
+    checkout_status => $cart->checkout_status,
+    delivery_slot   => $cart->selected_slot,
+  };
+}
+
+sub _slot_hash ($slot) {
+  return {
+    slot_id             => $slot->slot_id,
+    window_start        => $slot->window_start,
+    window_end          => $slot->window_end,
+    is_available        => $slot->is_available,
+    minimum_order_value => $slot->minimum_order_value,
+  };
+}
+
+sub _user_hash ($user) {
+  return {
+    user_id          => $user->user_id,
+    firstname        => $user->firstname,
+    lastname         => $user->lastname,
+    address          => $user->address,
+    phone            => $user->phone,
+    total_deliveries => $user->total_deliveries,
+  };
+}
+
+app->start;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mcp-picnic-http - HTTP MCP + REST server for Picnic Supermarket
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  # Set environment variables
+  export PICNIC_USER="your@email.de"
+  export PICNIC_PASS="your-password"
+  export PICNIC_COUNTRY="de"
+
+  # Start server
+  mcp-picnic-http daemon -l http://*:3000
+
+  # Or with morbo for development
+  morbo mcp-picnic-http
+
+=head1 DESCRIPTION
+
+HTTP server providing both MCP protocol support (for Claude) and REST API
+(for ChatGPT and other clients).
+
+=head1 ENDPOINTS
+
+=head2 MCP Protocol
+
+  /mcp - Claude MCP protocol endpoint
+
+=head2 Authentication
+
+  GET  /api/auth/status     - Check auth status
+  POST /api/auth/login      - Start login (may trigger 2FA SMS)
+  POST /api/auth/verify-2fa - Verify 2FA code
+
+=head2 Products
+
+  GET /api/products?q=      - Search products
+  GET /api/products/:id     - Get product details
+  GET /api/suggestions?q=   - Get search suggestions
+
+=head2 Cart
+
+  GET  /api/cart            - Get cart contents
+  POST /api/cart/add        - Add product to cart
+  POST /api/cart/remove     - Remove product from cart
+  POST /api/cart/clear      - Clear cart
+
+=head2 Delivery
+
+  GET  /api/delivery-slots        - Get available slots
+  POST /api/delivery-slots/select - Select a slot
+
+=head2 User
+
+  GET /api/user             - Get user profile
+  GET /api/categories       - Get product categories
+
+=head1 CHATGPT INTEGRATION
+
+Import the OpenAPI schema from C</openapi.json> in your ChatGPT Action.
+
+The authentication flow for ChatGPT:
+
+1. Call C</api/auth/login>
+2. If response has C<status: pending_2fa>, ask user for SMS code
+3. Call C</api/auth/verify-2fa> with the code
+4. Now all other endpoints work
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item PICNIC_USER - Picnic account email
+
+=item PICNIC_PASS - Picnic account password
+
+=item PICNIC_COUNTRY - Country code (de/nl)
+
+=item OPENAPI_SERVER_URL - Override server URL in OpenAPI spec
+
+=back
+
+=head1 SEE ALSO
+
+L<MCP::Picnic>, L<WWW::Picnic>, L<Mojolicious>
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-mcp-picnic/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

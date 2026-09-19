@@ -1,0 +1,34 @@
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Testy;
+use v5.40;
+use FindBin::libs;
+
+use Test::More;
+use LinkedList::Single::TestUtil;
+
+########################################################################
+# tests
+########################################################################
+
+my $method  = $test->method;
+my @expect  = $test->gen_expect;
+
+my $prep
+= sub( $list )
+{
+    # do something here...
+
+    @expect
+};
+
+my $extract
+= sub( $list )
+{
+    # return matching value to @expect
+};
+
+$test->generic_list( $prep, $extract );
+done_testing
+__END__

@@ -3,7 +3,12 @@ abstract: 'Perl wrapper for libjq'
 author:
   - 'James Rouzier <rouzier@gmail.com>'
 build_requires:
+  Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  JSON::PP: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -19,5 +24,8 @@ no_index:
     - inc
 requires:
   JSON::PP: '0'
-version: '1.01'
+  perl: '5.026003'
+resources:
+  repository: https://github.com/rouzier/JQ-XS.git
+version: '2.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

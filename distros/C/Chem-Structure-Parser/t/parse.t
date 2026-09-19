@@ -146,6 +146,97 @@ for my $case (
 }
 
 #--------
+# The two shapes the parse hands back, which have to say the same thing.
+#
+# With atom_hashes the per-atom fields are a hash per atom and the residue's
+# identity is one entry per residue; without it they are one array per field,
+# one entry per atom.  Everything above reads the columnar shape, which is what
+# a caller of the low-level parse gets; the module itself always asks for the
+# hashes, so the two are checked against each other here -- read at the index a
+# residue begins on, they are the same residue in both.
+#--------
+for my $stem (qw(mini.pdb nmr.pdb quirks.cif mini.cif)) {
+	my $file = "t/data/$stem";
+	my $read = $stem =~ /\.cif\z/
+		? \&Chem::Structure::Parser::_parse_cif_file
+		: \&Chem::Structure::Parser::_parse_file;
+	my $cols = $read->($file, {});
+	my $hash = $read->($file, { atom_hashes => 1 });
+	is($hash->{n_atoms}, $cols->{n_atoms}, "$stem: both shapes keep the same atoms");
+	is_deeply($hash->{res_first}, $cols->{res_first}, "$stem: and mark the same residues");
+	is_deeply($hash->{res_last},  $cols->{res_last},  "$stem: at the same atoms");
+	my (@from_hash, @from_cols);
+	for my $r (0 .. $#{ $cols->{res_first} }) {
+		my $i0 = $cols->{res_first}[$r];
+		for my $f (qw(resname chain resseq icode het model)) {
+			push @from_hash, $hash->{$f}[$r];
+			push @from_cols, $cols->{$f}[$i0];
+		}
+	}
+	is_deeply(\@from_hash, \@from_cols,
+		"$stem: every residue's identity reads the same out of either shape");
+	is(scalar @{ $hash->{resname} }, scalar @{ $hash->{res_first} },
+		"$stem: the hash shape has one identity per residue");
+	is(scalar @{ $cols->{resname} }, $cols->{n_atoms},
+		"$stem: and the columnar shape one per atom");
+	# the atoms themselves: the hash carries what the columns do
+	for my $i (0 .. ($cols->{n_atoms} > 3 ? 3 : $cols->{n_atoms} - 1)) {
+		is_deeply([ map { $hash->{atoms}[$i]{$_} } qw(name altloc x y z element charge) ],
+		          [ map { $cols->{$_}[$i] } qw(name altloc x y z element charge) ],
+			"$stem: atom $i is the same atom in both shapes");
+	}
+}
+
+#--------
+# the charge columns, 79-80, which in a file old enough to keep its entry id in
+# columns 73-80 hold the tail of that id instead.  A field that is not a digit
+# and a sign is not a charge, and reads as the empty field a blank column would
+# have given -- pdb1gdr.ent ends its records '1GDR 109', where '09' is two
+# digits and not a charge either.
+#--------
+{
+	# columns 1-66 are the record up to the B-factor, 67-76 are blank, 77-78 are
+	# the element and 79-80 the charge
+	my $head = 'ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00';
+	is(length $head, 66, 'the record prefix ends where the B-factor does');
+	my $rec = sub { $head . (' ' x 10) . sprintf('%2s%2s', @_) };
+	is(length $rec->(' C', 'DR'), 80, 'and the whole record runs to column 80');
+	my $q = Chem::Structure::Parser::_parse_string($rec->(' C', 'DR') . "\n", {});
+	is($q->{charge}[0], '', 'letters in the charge columns are not a charge');
+	is($q->{element}[0], 'C', 'and the element beside them is still read');
+	my $r = Chem::Structure::Parser::_parse_string($rec->(' C', '1+') . "\n", {});
+	is($r->{charge}[0], '1+', 'a digit and a sign is');
+	my $s = Chem::Structure::Parser::_parse_string($rec->(' C', '09') . "\n", {});
+	is($s->{charge}[0], '', 'and two digits, as pdb1gdr.ent writes its line numbers, are not');
+}
+
+#--------
+# a residue number that is not a number.  Four columns hold at most 9999, and a
+# file written by something that overflowed them puts '****' there, the same
+# way an overflowed serial number becomes '*****'.  It has to read as undef --
+# the file does not say which residue this is -- rather than as a zero that
+# would merge every such residue with a real residue 0.
+#--------
+{
+	# built with sprintf rather than typed: the fields either side of this one
+	# are one character wide and a hand-typed record slides them
+	my $rec = sprintf('ATOM  %5s %-4s%1s%3s %1s%4s%1s   %8s%8s%8s  1.00 20.00           C',
+		1, ' CA ', '', 'ALA', 'A', '****', '', 10, 10, 10);
+	is(length $rec, 78, 'the record is as long as a record with an element column');
+	my $q = Chem::Structure::Parser::_parse_string("$rec\n", {});
+	is($q->{resseq}[0], undef, 'a residue number of **** is undef, not zero');
+	is($q->{icode}[0], '', 'and it has not been read as an insertion code');
+	is($q->{resname}[0], 'ALA', 'the fields around it are unharmed');
+	is($q->{x}[0], 10, 'including the coordinates');
+
+	my $i = structure_info_string("$rec\n");
+	is_deeply($i->{chains}{A}{residue_order}, [ '' ],
+		'the residue it builds is keyed by the insertion code alone');
+	is($i->{chains}{A}{residues}{''}{number}, undef, 'and has no number to give');
+	is($i->{chains}{A}{n_gaps}, 0, 'a chain whose residues have no numbers has no gaps');
+}
+
+#--------
 # arguments
 #--------
 throws_ok { Chem::Structure::Parser::_parse_string(undef) } qr/undefined/,

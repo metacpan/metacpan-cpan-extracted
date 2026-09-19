@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW-Salesforce
 
+0.401     2026-09-18
+    - Added the new OAuth2 Client Credentials flow. (Thank you, Ian Broster)
+
 0.400     2025-09-18
     - Fix some typos in the query documentation
     - Add a new login type, OAuth2.0 Username-Password

@@ -1,5 +1,11 @@
 Revision history for Database-Abstraction
 
+0.43	Fri Sep 18 02:25:48 PM EDT 2026
+	[ Enhancements ]
+	- TSV backend: tab-separated files ending .tsv are now detected and opened
+	  in the file-detection probe order between .psv and .csv.  sep_char is set
+	  to "\t" automatically.  Remote host probe and POD updated accordingly.
+
 0.42	Sat Sep 12 02:59:48 PM EDT 2026
 	[ Enhancements ]
 	- XLS backend: .xls (old binary format) now detected before .xlsx; opened via

@@ -4,7 +4,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.42
+Version 0.43
 
 # DESCRIPTION
 
@@ -160,7 +160,11 @@ The module probes the `directory` for files in this priority order:
 
     Pipe-separated file, ending `.psv`
 
-- 4. `CSV`
+- 4. `TSV`
+
+    Tab-separated file, ending `.tsv`
+
+- 5. `CSV`
 
     Comma (or custom) separated file, ending `.csv` or `.db`; can be
     gzipped.
@@ -709,7 +713,7 @@ triggers it, and how to resolve it.
 
 - `Can't find a file called '_name_' for the table _T_ in _dir_`
 
-    None of the probe extensions (`.sql`, `.psv`, `.csv`, `.xlsx`, `.db`, `.xml`)
+    None of the probe extensions (`.sql`, `.psv`, `.tsv`, `.csv`, `.xlsx`, `.db`, `.xml`)
     matched in `directory`.
 
 - `_Class_: prepare failed: _$errstr_`

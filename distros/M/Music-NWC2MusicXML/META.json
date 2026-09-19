@@ -1,0 +1,88 @@
+{
+   "abstract" : "Convert NoteWorthy Composer 2 C<.nwc> score files to MusicXML.",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Music-NWC2MusicXML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Compress::Zlib" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "List::Util" : "0",
+            "Object::Configure" : "0",
+            "POSIX" : "0",
+            "Params::Get" : "0",
+            "Params::Validate::Strict" : "0",
+            "Pod::Usage" : "0",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "autodie" : "0",
+            "perl" : "5.036",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Temp" : "0",
+            "IPC::System::Simple" : "0",
+            "Test::Exception" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::Returns" : "0",
+            "Test::Without::Module" : "0",
+            "XML::PP" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Music-NWC2MusicXML@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Music-NWC2MusicXML",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Music-NWC2MusicXML"
+      },
+      "homepage" : "https://metacpan.org/pod/Music::NWC2MusicXML",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nigelhorne/NWC2MusicXML.git",
+         "web" : "https://github.com/nigelhorne/NWC2MusicXML"
+      }
+   },
+   "version" : "v0.001.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

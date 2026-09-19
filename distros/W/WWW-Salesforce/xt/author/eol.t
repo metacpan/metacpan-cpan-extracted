@@ -16,7 +16,9 @@ my @files = (
     't/00-report-prereqs.t',
     't/01-load-salesforce-simple.t',
     't/01-load-salesforce.t',
-    't/WWW-Salesforce-oauth.t',
+    't/02-helpers.t',
+    't/WWW-Salesforce-oauth2-cc.t',
+    't/WWW-Salesforce-oauth2-up.t',
     't/WWW-Salesforce.t',
     't/www_sf_utils.t'
 );

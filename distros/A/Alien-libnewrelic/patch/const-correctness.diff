@@ -1,0 +1,72 @@
+diff --git a/vendor/newrelic/axiom/util_memory.h b/vendor/newrelic/axiom/util_memory.h
+index 1234567..89abcde 100644
+--- a/vendor/newrelic/axiom/util_memory.h
++++ b/vendor/newrelic/axiom/util_memory.h
+@@ -16,6 +16,7 @@
+ #include <stdlib.h>
+ #endif
+
++#include <stdint.h>
+ #include <string.h>
+
+ /*
+@@ -146,7 +147,8 @@
+  */
+ static inline void* nr_memchr(const void* str, int c, size_t len) {
+   if (nrlikely(str && (len > 0))) {
+-    return memchr(str, c, len);
++    const void* found = memchr(str, c, len);
++    return (void*)(uintptr_t)found;
+   }
+   return NULL;
+ }
+diff --git a/vendor/newrelic/axiom/util_strings.h b/vendor/newrelic/axiom/util_strings.h
+index 1234567..89abcde 100644
+--- a/vendor/newrelic/axiom/util_strings.h
++++ b/vendor/newrelic/axiom/util_strings.h
+@@ -11,6 +11,7 @@
+
+ #include "nr_axiom.h"
+
++#include <stdint.h>
+ #include <string.h>
+
+ #include "util_object.h"
+@@ -155,11 +156,21 @@
+  */
+
+ static inline char* nr_strchr(const char* str, int c) {
+-  return nrlikely(str) ? strchr(str, c) : NULL;
++  const char* found;
++  if (!nrlikely(str)) {
++    return NULL;
++  }
++  found = strchr(str, c);
++  return (char*)(uintptr_t)found;
+ }
+
+ static inline char* nr_strrchr(const char* str, int c) {
+-  return nrlikely(str) ? strrchr(str, c) : NULL;
++  const char* found;
++  if (!nrlikely(str)) {
++    return NULL;
++  }
++  found = strrchr(str, c);
++  return (char*)(uintptr_t)found;
+ }
+
+ /*
+@@ -169,7 +180,12 @@
+  *           2. The substring being searched for (the needle).
+  */
+ static inline char* nr_strstr(const char* str, const char* needle) {
+-  return nrlikely(str && needle) ? strstr(str, needle) : NULL;
++  const char* found;
++  if (!nrlikely(str && needle)) {
++    return NULL;
++  }
++  found = strstr(str, needle);
++  return (char*)(uintptr_t)found;
+ }
+
+ /*

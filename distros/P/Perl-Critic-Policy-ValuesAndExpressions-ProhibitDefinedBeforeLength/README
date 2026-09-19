@@ -1,5 +1,5 @@
 This archive contains the distribution Perl-Critic-Policy-ValuesAndExpressions-ProhibitDefinedBeforeLength,
-version 0.001:
+version 0.002:
 
   Test the value, not its length, and shape it before measuring it.
 

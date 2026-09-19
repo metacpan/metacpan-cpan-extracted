@@ -1,6 +1,22 @@
 Revision history for Struct::Codec
 
+0.05	2026-09-18
+        - FIXES a heap corruption decoding a hash key of length zero that
+          carries the UTF-8 flag. 
+        - t/25-wide-nv.t used perl's numifier to build -1.797...e+308, which
+          overflows to -Inf below 5.30, and an infinity compares against
+          nothing. The exponent is divided out and the mantissa named.
+        - t/14-corrupt.t asserted two refusals that only a 64-bit UV gives:
+          an eleven-byte varint is refused for its width, not its length,
+          where a UV is 32 bits, and the descriptor fixture is now a value
+          past INT_MAX that still fits one.
+
 0.04	2026-09-18
+        - A float on a perl built -Dusequadmath kept one significant digit: a
+          third came back 0.3, and on a 32-bit one perl died "panic:
+          my_snprintf buffer overflow". The precision was passed as "%.*",
+          which my_snprintf never hands to quadmath_snprintf. It is written
+          into the format now, as perl's own sv.c does.
         - A float on a perl built -Duselongdouble below 5.30 came back a ULP
           or two out: the digits were read with Atof, which is perl's own
           numifier and was not correctly rounded until 5.30 (perl RT #41202).

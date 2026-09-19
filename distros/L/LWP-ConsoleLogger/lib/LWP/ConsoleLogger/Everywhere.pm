@@ -2,7 +2,7 @@ package LWP::ConsoleLogger::Everywhere;
 use strict;
 use warnings;
 
-our $VERSION = '1.000002';
+our $VERSION = '1.000003';
 
 use Class::Method::Modifiers ();
 use LWP::ConsoleLogger::Easy qw( debug_ua );
@@ -58,6 +58,14 @@ try {
     );
 };
 
+try {
+    require_module('HTTP::Tiny');
+    Class::Method::Modifiers::install_modifier(
+        'HTTP::Tiny', 'around',
+        'new' => $code_injection
+    );
+};
+
 sub loggers {
     return $loggers;
 }
@@ -85,7 +93,7 @@ LWP::ConsoleLogger::Everywhere - LWP tracing everywhere
 
 =head1 VERSION
 
-version 1.000002
+version 1.000003
 
 =head1 SYNOPSIS
 
@@ -114,7 +122,8 @@ version 1.000002
 
 =head1 DESCRIPTION
 
-This module turns on L<LWP::ConsoleLogger::Easy> debugging for every L<LWP::UserAgent> or L<Mojo::UserAgent>
+This module turns on L<LWP::ConsoleLogger::Easy> debugging for every L<LWP::UserAgent>,
+L<Mojo::UserAgent>, or L<HTTP::Tiny>
 based user agent anywhere in your code. It doesn't matter what package or class it is in,
 or if you have access to the object itself. All you need to do is C<use> this module
 anywhere in your code and it will work.
@@ -202,7 +211,40 @@ that might overwrite the ones L<LWP::ConsoleLogger> installed.
 L<LWP::ConsoleLogger::Everywhere> will keep references to all user agents that were
 ever created during for the lifetime of your application. If you have a lot of lexical
 user agents that you recycle all the time they will not actually go away and might
-consume memory.
+consume memory. This is especially easy to hit with L<HTTP::Tiny>, where the common
+C<< HTTP::Tiny->new->get(...) >> one-shot idiom creates a fresh logger on every call.
+
+L<HTTP::Tiny> traffic is only captured when the user agent is created via
+C<< HTTP::Tiny->new >>. Class-method calls such as C<< HTTP::Tiny->get(...) >>
+bypass the constructor and are not logged. Also, because C<< HTTP::Tiny->mirror >>
+streams the response body straight to a file, the body and text tables will be
+empty for C<mirror> requests.
+
+The L<HTTP::Tiny> path has a few further limitations that the L<LWP::UserAgent>
+and L<Mojo::UserAgent> paths do not share:
+
+=over 4
+
+=item *
+
+Redirect chains are collapsed. L<HTTP::Tiny> follows redirects internally and
+only the final response is visible to the logger, so intermediate hops are not
+logged. The LWP and L<Mojo::UserAgent> paths log each hop separately.
+
+=item *
+
+Some headers that L<HTTP::Tiny> adds at the transport layer are reconstructed
+on a best-effort basis and may not exactly match what goes out on the wire. For
+example the C<Connection> header and an C<Authorization> header synthesized from
+C<userinfo> in the request URL are not reflected in the logged request.
+
+=item *
+
+Cookie values are B<not> redacted by the C<LWPCL_REDACT_*> environment
+variables. This is existing behaviour shared with the LWP and L<Mojo::UserAgent> paths and is
+noted here so the logged output is not mistaken for a redacted view.
+
+=back
 
 =head1 SEE ALSO
 

@@ -28,6 +28,7 @@ Martin
 Mckay
 Moyer
 Nicholas
+OAuth
 Reese
 SOQL
 SOSL
@@ -56,6 +57,7 @@ describeSObject
 describeSObjects
 describeTabs
 dreamForce
+dropdown
 dsteinbrunner
 fred
 getDeleted
@@ -70,6 +72,7 @@ lib
 majordojo
 martin
 nfoos
+oauth
 phred
 queryAll
 queryLocator
@@ -83,5 +86,6 @@ searchString
 serverUrl
 serverurl
 setPassword
+th
 upsert
 userId

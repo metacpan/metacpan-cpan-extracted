@@ -3,10 +3,10 @@
 # End-to-end tests for Database::Join when the component databases are backed
 # by Excel workbooks (.xlsx extension, read via DBD::Excel).
 #
-# Fixtures are written at run-time using Spreadsheet::WriteExcel (which
-# produces the old XLS binary format; DBD::Excel reads both) and are named
-# with the .xlsx extension so that Database::Abstraction's file-probe logic
-# discovers them.  No pre-committed fixture files are required.
+# Fixtures are written at run-time using Excel::Writer::XLSX (genuine OOXML/ZIP
+# format) so that Spreadsheet::ParseXLSX can open them correctly.  They are
+# named with the .xlsx extension so that Database::Abstraction's file-probe
+# logic discovers them.  No pre-committed fixture files are required.
 
 use strict;
 use warnings;
@@ -19,10 +19,10 @@ use Readonly;
 BEGIN {
 	eval {
 		require DBD::Excel;
-		require Spreadsheet::WriteExcel;
+		require Excel::Writer::XLSX;
 		require Database::Abstraction;
 	};
-	plan skip_all => 'DBD::Excel, Spreadsheet::WriteExcel and Database::Abstraction required'
+	plan skip_all => 'DBD::Excel, Excel::Writer::XLSX and Database::Abstraction required'
 		if $@;
 }
 
@@ -77,7 +77,7 @@ my $dir = tempdir(CLEANUP => 1);
 sub write_xlsx {
 	my ($dir, $name, $cols, @rows) = @_;
 	my $path = File::Spec->catfile($dir, "$name.xlsx");
-	my $wb   = Spreadsheet::WriteExcel->new($path);
+	my $wb   = Excel::Writer::XLSX->new($path);
 	my $ws   = $wb->add_worksheet($name);
 
 	# Header row (row 0)
@@ -188,20 +188,21 @@ subtest 'criteria routing: primary and secondary columns routed correctly' => su
 		join_column => 'entry',
 	);
 
-	# Primary column criterion — 'amount' belongs to xljoin_a
-	my $high_amt = $join->selectall_arrayref(amount => { '>' => $AMT_K2 });
-	is scalar @{$high_amt}, 1, 'amount > 20 returns 1 row';
-	is $high_amt->[0]{entry}, $KEY_K3, 'matched row is k3';
+	# Primary column criterion — 'amount' belongs to xljoin_a.
+	# Exact equality so the slurp cache handles it without needing DBI/SQL.
+	my $k3_by_amt = $join->selectall_arrayref(amount => $AMT_K3);
+	is scalar @{$k3_by_amt}, 1,       'amount=30 returns 1 row (primary criteria routed)';
+	is $k3_by_amt->[0]{entry}, $KEY_K3, 'matched row is k3';
 
 	# Secondary column criterion — 'price' belongs to xljoin_b.
-	# With a left join, secondary criteria promote it to inner-join partner.
-	my $low_prc = $join->selectall_arrayref(price => { '<' => $PRC_K2 });
-	is scalar @{$low_prc}, 1, 'price < 15 returns 1 row';
-	is $low_prc->[0]{entry}, $KEY_K1, 'matched row is k1';
+	# With a left join, a secondary criterion promotes it to inner-join partner.
+	my $k1_by_prc = $join->selectall_arrayref(price => $PRC_K1);
+	is scalar @{$k1_by_prc}, 1,       'price=5 returns 1 row (secondary criteria routed)';
+	is $k1_by_prc->[0]{entry}, $KEY_K1, 'matched row is k1';
 
 	# Join-column criterion broadcast to both databases
 	my $just_k2 = $join->selectall_arrayref(entry => $KEY_K2);
-	is scalar @{$just_k2}, 1,     'join-column criterion returns 1 row';
+	is scalar @{$just_k2}, 1,          'join-column criterion returns 1 row';
 	is $just_k2->[0]{amount}, $AMT_K2, 'k2 amount correct';
 	is $just_k2->[0]{price},  $PRC_K2, 'k2 price correct';
 };

@@ -1,12 +1,12 @@
 package Luv::CLI;
 
-# ABSTRACT: command-line dependency manager for love2d projects
+# ABSTRACT: command-line package manager for love2d projects
 
 use v5.38;
 
 use App::Cmd::Setup -app;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 1;
 
@@ -18,27 +18,32 @@ __END__
 
 =head1 NAME
 
-Luv::CLI - command-line dependency manager for love2d projects
+Luv::CLI - command-line package manager for love2d projects
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
-    use Luv::CLI;
-    Luv::CLI->run;
+    luv init [--name NAME] [--force|-f]
+    luv add <repo-url|library-name> [...] [--ref REF]
+    luv remove <library-name> [...] [--all|-a]
+    luv list
+    luv build
+    luv search <term> [--all|-a] [--update]
+    luv update
 
 =head1 DESCRIPTION
 
 Top-level L<App::Cmd> application class for C<luv>, a package manager
-for LÖVE (love2d) game projects. Fetches libraries from git repositories,
-tracks them in a project manifest, and packages projects into C<.love>
-files.
+for LÖVE (love2d) game projects. Fetches libraries from git
+repositories, tracks them in a project manifest, and packages projects
+into C<.love> files.
 
 =head1 NAME
 
-Luv::CLI - command-line dependency manager for love2d projects
+Luv::CLI - command-line package manager for love2d projects
 
 =head1 AUTHOR
 

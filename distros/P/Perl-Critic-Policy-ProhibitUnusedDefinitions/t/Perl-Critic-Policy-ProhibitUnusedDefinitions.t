@@ -25,16 +25,21 @@ plainly in use gets switched off.
 
 use Test::More;
 use Test::NoWarnings;
-use File::Temp       qw{tempdir};
-use File::Path       qw{make_path};
-use File::Basename   qw{dirname};
-use Test::MockModule qw{strict};
+use File::Temp         qw{tempdir};
+use File::Path         qw{make_path};
+use File::Basename     qw{dirname};
+use Test::MockModule   qw{strict};
+use IO::Compress::Gzip ();
 
 use FindBin::libs;
 
 use Perl::Critic ();
 
 use_ok('Perl::Critic::Policy::ProhibitUnusedDefinitions');
+
+# The index on disk goes somewhere of its own, never into the cache of whoever
+# runs the tests.
+$ENV{XDG_CACHE_HOME} = tempdir( CLEANUP => 1 );
 
 # -profile => q{} so Perl::Critic does not find this dist's own .perlcriticrc
 # and run every policy in it against the fixtures.
@@ -405,6 +410,169 @@ subtest 'the distribution is read once' => sub {
 
     my $fresh = dist( 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\n" );
     is_deeply( found( $fresh, 'lib/Foo.pm' ), [ sub_unused('Foo::bar') ], 'while another distribution gets its own' );
+};
+
+# --- The index on disk ---------------------------------------------------
+# A new process is an empty %INDEX_FOR, so emptying it is how these start a new
+# run.  _parse is what reads a file, so counting its calls counts the files that
+# a run read again.
+
+sub profile {
+    my (%set) = @_;
+    my $dir = tempdir( CLEANUP => 1 );
+    dist_file( $dir, 'perlcriticrc', join( q{}, "[ProhibitUnusedDefinitions]\n", map { "$_ = $set{$_}\n" } sort keys %set ) );
+    return "$dir/perlcriticrc";
+}
+
+# What a new run finds for $file, which files it parsed to find it, and how
+# many uses it resolved.
+sub new_run {
+    my ( $root, $file, $profile ) = @_;
+
+    local %Perl::Critic::Policy::ProhibitUnusedDefinitions::INDEX_FOR;
+    my @parsed;
+    my $resolved = 0;
+    my $parse    = Perl::Critic::Policy::ProhibitUnusedDefinitions->can('_parse');
+    my $resolve  = Perl::Critic::Policy::ProhibitUnusedDefinitions->can('_resolve');
+    my $mock     = Test::MockModule->new('Perl::Critic::Policy::ProhibitUnusedDefinitions');
+    $mock->redefine( _parse   => sub { push @parsed, $_[0] =~ s{\A\Q$root\E/}{}r; return $parse->(@_) } );
+    $mock->redefine( _resolve => sub { $resolved++;                               return $resolve->(@_) } );
+
+    my $found = found( $root, $file, critic($profile) );
+    return ( $found, [ sort @parsed ], $resolved );
+}
+
+subtest 'the index is kept on disk, and only what changed is read again' => sub {
+    my $cache   = tempdir( CLEANUP => 1 );
+    my $profile = profile( cache_dir => $cache );
+    my $root    = dist( 'lib/Foo.pm' => $FOO_BAR, 'lib/Baz.pm' => "package Baz;\n1;\n", 'bin/tool' => "#!/usr/bin/env perl\nFoo::bar();\n" );
+
+    my ( $found, $parsed ) = new_run( $root, 'lib/Foo.pm', $profile );
+    is_deeply( $found,  [],                                   'called from the script' );
+    is_deeply( $parsed, [qw{bin/tool lib/Baz.pm lib/Foo.pm}], 'the first run reads every file' );
+    my ($written) = glob("$cache/*.json.gz");
+    ok( $written, 'and writes the index to cache_dir' );
+    open( my $gzfh, '<:raw', $written // '/bogus' ) or die "no cache in $cache";
+    read( $gzfh, my $magic, 2 );
+    is( $magic, "\x1f\x8b", 'compressed with gzip' );
+
+    ( $found, $parsed ) = new_run( $root, 'lib/Foo.pm', $profile );
+    is_deeply( $found,  [], 'a second run finds the same' );
+    is_deeply( $parsed, [], 'without reading any file again' );
+
+    dist_file( $root, 'bin/tool', "#!/usr/bin/env perl\n" );
+    ( $found, $parsed ) = new_run( $root, 'lib/Foo.pm', $profile );
+    is_deeply( $parsed, [qw{bin/tool}],             'a changed file is read again, and only that one' );
+    is_deeply( $found,  [ sub_unused('Foo::bar') ], 'and what changed in it counts' );
+
+    dist_file( $root, 'bin/other', "#!/usr/bin/env perl\nFoo::bar();\n" );
+    ( $found, $parsed ) = new_run( $root, 'lib/Foo.pm', $profile );
+    is_deeply( $parsed, [qw{bin/other}], 'a new file is read' );
+    is_deeply( $found,  [],              'and counts' );
+
+    unlink "$root/bin/other" or die "$root/bin/other: $!";
+    ( $found, $parsed ) = new_run( $root, 'lib/Foo.pm', $profile );
+    is_deeply( $parsed, [],                         'a deleted file is not read' );
+    is_deeply( $found,  [ sub_unused('Foo::bar') ], 'and no longer counts' );
+};
+
+subtest 'uses are resolved again only when they can mean something new' => sub {
+    my $profile = profile( cache_dir => tempdir( CLEANUP => 1 ) );
+    my $root    = dist(
+        'lib/Foo.pm' => "package Foo;\nsub run { helper(); return 1 }\n1;\n",
+        'bin/tool'   => "#!/usr/bin/env perl\nFoo::run();\nFoo::run();\n",
+    );
+
+    my ( $found, $parsed, $resolved ) = new_run( $root, 'lib/Foo.pm', $profile );
+    ok( $resolved, 'the first run resolves every use' );
+    my $all = $resolved;
+
+    ( $found, $parsed, $resolved ) = new_run( $root, 'lib/Foo.pm', $profile );
+    is( $resolved, 0, 'a run with nothing changed resolves none' );
+
+    # A change that defines nothing new: only the changed file is resolved.
+    dist_file( $root, 'bin/tool', "#!/usr/bin/env perl\nFoo::run();\n" );
+    ( $found, $parsed, $resolved ) = new_run( $root, 'lib/Foo.pm', $profile );
+    ok( $resolved > 0 && $resolved < $all, "a changed body resolves its own uses and no others ($resolved of $all)" );
+
+    # helper() in lib/Foo.pm meant nothing, because nothing defined Foo::helper.
+    # Now a new file does, and the untouched call means it.
+    make_path("$root/lib/Foo");
+    dist_file( $root, 'lib/Foo/More.pm', "package Foo;\nsub helper { 1 }\n1;\n" );
+    ( $found, $parsed, $resolved ) = new_run( $root, 'lib/Foo/More.pm', $profile );
+    is_deeply( $parsed, [qw{lib/Foo/More.pm}], 'a new definition reads only its own file' );
+    is_deeply( $found,  [],                    'but an unchanged call that now means it counts' );
+};
+
+subtest 'a cache that cannot be used is rebuilt, not trusted' => sub {
+    my $cache   = tempdir( CLEANUP => 1 );
+    my $profile = profile( cache_dir => $cache );
+    my $root    = dist( 'lib/Foo.pm' => $FOO_BAR, 'bin/tool' => "#!/usr/bin/env perl\nFoo::bar();\n" );
+    new_run( $root, 'lib/Foo.pm', $profile );
+    my ($file) = glob("$cache/*.json.gz");
+
+    # The last three are compressed, so that what fails is the check of what is
+    # inside rather than the decompression.
+    foreach my $case (
+        [ 'a cache that is not gzip',        "\x1f\x8b not gzip",                                                    0 ],
+        [ 'a cache that does not parse',     "{ not json",                                                           1 ],
+        [ 'a cache from another version',    '{"key":"0/bogus","files":{}}',                                         1 ],
+        [ 'a cache with an entry cut short', '{"key":"KEY","files":{"' . "$root/bin/tool" . '":{"stamp":"STAMP"}}}', 1 ],
+    ) {
+        my ( $name, $content, $compress ) = @$case;
+        my $key   = Perl::Critic::Policy::ProhibitUnusedDefinitions::_cache_key();
+        my $stamp = Perl::Critic::Policy::ProhibitUnusedDefinitions::_stamp("$root/bin/tool");
+        $content =~ s/KEY/$key/;
+        $content =~ s/STAMP/$stamp/;
+        IO::Compress::Gzip::gzip( \( my $plain = $content ) => \$content ) if $compress;
+        dist_file( $cache, ( $file =~ s{\A\Q$cache\E/}{}r ), $content );
+
+        my ( $found, $parsed ) = new_run( $root, 'lib/Foo.pm', $profile );
+        ok( scalar( grep { $_ eq 'bin/tool' } @$parsed ), "$name: the file is read again" );
+        is_deeply( $found, [], "$name: and the result is right" );
+    }
+};
+
+subtest 'a write removes the caches of roots that are gone, and nothing else' => sub {
+    my $cache   = tempdir( CLEANUP => 1 );
+    my $profile = profile( cache_dir => $cache );
+
+    my $gone = dist( 'lib/Foo.pm' => $FOO_BAR );
+    new_run( $gone, 'lib/Foo.pm', $profile );
+    my ($gone_cache) = glob("$cache/*.json.gz");
+    File::Path::remove_tree($gone);
+
+    my $kept = dist( 'lib/Foo.pm' => $FOO_BAR );
+    new_run( $kept, 'lib/Foo.pm', $profile );
+    my ($kept_cache) = grep { $_ ne $gone_cache } glob("$cache/*.json.gz");
+
+    # A cache from before the cache was compressed, and a file that is not one
+    # of this policy's.
+    dist_file( $cache, ( 'a' x 40 ) . '.json', '{}' );
+    dist_file( $cache, 'notes.txt',            'mine' );
+
+    my $third = dist( 'lib/Foo.pm' => $FOO_BAR );
+    new_run( $third, 'lib/Foo.pm', $profile );
+
+    ok( !-e $gone_cache,                        'the cache of a root that is gone is removed' );
+    ok( -e $kept_cache,                         'the cache of a root that is there is kept' );
+    ok( !-e "$cache/" . ( 'a' x 40 ) . '.json', 'a cache from before compression is removed' );
+    ok( -e "$cache/notes.txt",                  'a file that is not a cache is left alone' );
+};
+
+subtest 'the cache can be turned off, and a cache_dir that cannot be written costs nothing' => sub {
+    my $root = dist( 'lib/Foo.pm' => $FOO_BAR );
+
+    my $off = tempdir( CLEANUP => 1 );
+    my ($found) = new_run( $root, 'lib/Foo.pm', profile( cache => 0, cache_dir => $off ) );
+    is_deeply( $found, [ sub_unused('Foo::bar') ], 'with cache = 0 it still reports' );
+    ok( !glob("$off/*"), 'and writes nothing' );
+
+    # A cache_dir below a plain file cannot be made.
+    my $blocked = tempdir( CLEANUP => 1 );
+    dist_file( $blocked, 'file', q{} );
+    ($found) = new_run( $root, 'lib/Foo.pm', profile( cache_dir => "$blocked/file/cache" ) );
+    is_deeply( $found, [ sub_unused('Foo::bar') ], 'with a cache_dir that cannot be made it still reports, and warns of nothing' );
 };
 
 Test::NoWarnings::had_no_warnings();

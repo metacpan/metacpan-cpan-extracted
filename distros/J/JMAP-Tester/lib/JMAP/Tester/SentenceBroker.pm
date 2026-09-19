@@ -1,5 +1,5 @@
 use v5.20.0;
-package JMAP::Tester::SentenceBroker 0.112;
+package JMAP::Tester::SentenceBroker 0.113;
 
 use Moo;
 with 'JMAP::Tester::Role::SentenceBroker';
@@ -57,7 +57,7 @@ JMAP::Tester::SentenceBroker
 
 =head1 VERSION
 
-version 0.112
+version 0.113
 
 =head1 PERL VERSION
 

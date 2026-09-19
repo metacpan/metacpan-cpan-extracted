@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::HasLocation;
 # ABSTRACT: Role for application location "guessing"
-$Dancer2::Core::Role::HasLocation::VERSION = '2.2.0';
+$Dancer2::Core::Role::HasLocation::VERSION = '2.2.1';
 use Carp ();
 use Moo::Role;
 use Sub::Quote 'quote_sub';
@@ -150,7 +150,7 @@ Dancer2::Core::Role::HasLocation - Role for application location "guessing"
 
 =head1 VERSION
 
-version 2.2.0
+version 2.2.1
 
 =head1 AUTHOR
 

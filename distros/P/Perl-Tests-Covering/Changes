@@ -1,0 +1,32 @@
+Revision history for Perl-Tests-Covering
+
+0.002 2026-09-19 TEODESIAN
+    - Let a distribution say which tests reach a file that no test loads,
+      such as a template a test reads, through a map: a code reference, or
+      .tests-covering-map.pl at the root, or --map.  A file the map names
+      stands in for the changed one.  (GH #1)
+    - With unexplained => 'all', or --unexplained all, a change that
+      neither a record nor the map explains runs every test.
+    - The blocks of a parsed diff carry the text of their lines, for a map
+      to read.
+    - A map says that a path reaches no test by returning NO_TESTS, which
+      Perl::Tests::Covering exports on request.  Returning the path itself,
+      as the map documentation said before, now makes it a stand-in that
+      no test loads, which leaves the path unexplained.  (GH #2)
+    - A stand-in that no test loads no longer explains a path, so
+      --unexplained all runs every test for it.  (GH #2)
+    - The map is asked about a Perl file that a diff adds, for code that
+      finds modules at run time.  When it says nothing, the file counts as
+      explained, as before.  (GH #2)
+
+0.001 2026-09-19 TEODESIAN
+    - Initial Release.  Perl::Tests::Covering says which tests of a
+      distribution load a given file, from records of Devel::Cover runs kept
+      in a cache, and runs again only the tests whose records are stale.
+      bin/tests-covering is the command line, meant for a pre-commit hook.
+    - Choose tests by the lines a diff changes, from the lines each test
+      ran and where PPI finds each statement: tests_covering_diff, and
+      tests-covering --diff.  Choose by sub with tests_covering_sub and
+      --sub, and turn the question around with files_covered_by and --by.
+    - Run a test with -T or -t on its #! line under taint, as prove does.
+    - Compare with Devel::CoverX::Covered in the POD.

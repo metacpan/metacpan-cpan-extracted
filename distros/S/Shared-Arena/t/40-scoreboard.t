@@ -134,7 +134,7 @@ SKIP: {
 # that.
 
 SKIP: {
-    skip 'fork is POSIX-only here', 2 if $^O eq 'MSWin32';
+    skip 'fork is POSIX-only here', 3 if $^O eq 'MSWin32';
 
     my $sb = $arena->scoreboard('coherent', fields => ['kind'], slots => 4);
     my $A = 'A' x 60;
@@ -143,7 +143,7 @@ SKIP: {
     my $pid = spawn(sub {
         my $b = $arena->scoreboard('coherent');
         $b->take;
-        my $end = Time::HiRes::time() + 0.6;
+        my $end = Time::HiRes::time() + 1.0;
         my $k = 1;
         while (Time::HiRes::time() < $end) {
             for (1 .. 200) {
@@ -153,10 +153,26 @@ SKIP: {
         }
     });
 
+    # CONVERGE ON THE ROW, THEN READ. The child's first update lands whenever
+    # the host schedules it, and a reader that starts its window at the fork
+    # can spend the whole of it on an empty board: the OpenBSD smoker read the
+    # row 0 times in 0.4s and the test called that a reader that never read.
+    # So wait, bounded, until the row is there, and only then count reads -
+    # until there are enough of them AND the window has passed, so a slow box
+    # gets its thousand and a fast one still overlaps the writer.
+    my $seen = 0;
+    my $until = Time::HiRes::time() + 10;
+    until ($seen || Time::HiRes::time() > $until) {
+        $seen = grep { $_->{kind} } $sb->all;
+    }
+    ok($seen, 'the writer\'s row appeared on the board');
+
     my $torn = 0;
     my $reads = 0;
     my $end = Time::HiRes::time() + 0.4;
-    while (Time::HiRes::time() < $end) {
+    my $cap = Time::HiRes::time() + 5;
+    while (($reads <= 1000 || Time::HiRes::time() < $end)
+           && Time::HiRes::time() < $cap) {
         for my $r ($sb->all) {
             next unless $r->{kind};
             $reads++;

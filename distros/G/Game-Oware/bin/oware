@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config bundling no_ignore_case);
+
+use Game::Oware;
+use Game::Oware::Terminal;
+
+my %opt = (
+	level   => 3,
+	variant => 'abapa',
+	seat    => 'p1',
+	seed    => '',
+	quiet   => 0,
+	ascii   => 0,
+);
+
+GetOptions(\%opt,
+	'level|l=i',
+	'variant|V=s',
+	'seat|s=s',
+	'seed=s',
+	'quiet|q',
+	'ascii|a',
+	'ansi!',
+	'version|v',
+	'help|h',
+) or usage(2);
+
+usage(0) if $opt{help};
+
+if ($opt{version}) {
+	print "oware $Game::Oware::VERSION\n";
+	exit 0;
+}
+
+my $terminal = eval {
+	Game::Oware::Terminal->new(
+		level   => $opt{level},
+		variant => $opt{variant},
+		seat    => $opt{seat},
+		seed    => $opt{seed},
+		quiet   => $opt{quiet} ? 1 : 0,
+		ascii   => $opt{ascii} ? 1 : 0,
+		(exists $opt{ansi} ? (ansi => $opt{ansi} ? 1 : 0) : ()),
+	);
+};
+
+unless ($terminal) {
+	my $why = $@ || 'could not start';
+	$why =~ s/ at \S+ line \d+\.?\s*\z//;
+	$why =~ s/\A[\w:]+: //;
+	chomp $why;
+	print STDERR "oware: $why\n";
+	exit 2;
+}
+
+my $result = $terminal->start;
+
+exit 0 unless $result;
+exit 0 if !defined $result->winner;
+exit 0 if $result->winner eq $opt{seat};
+exit 1;
+
+sub usage {
+	my ($status) = @_;
+	my $handle = $status ? \*STDERR : \*STDOUT;
+
+	print {$handle} <<'USAGE';
+oware - play Oware against a bot
+
+Usage: oware [options]
+
+  -l, --level N      bot level, 1 to 5 (default 3)
+  -s, --seat SEAT    the seat you play, p1 or p2 (default p1)
+  -V, --variant V    abapa or slam_ends (default abapa)
+      --seed STRING  the seed, so a game can be replayed
+  -q, --quiet        no banner and no narration
+  -a, --ascii        plain box drawing
+      --ansi         force colour on, --no-ansi forces it off
+  -v, --version      print the version
+  -h, --help         this
+
+Levels 4 and 5 think for up to a second and up to six seconds a move.
+
+Exit status is 0 if you won or drew, 1 if you lost, 2 for a bad option.
+USAGE
+
+	exit $status;
+}

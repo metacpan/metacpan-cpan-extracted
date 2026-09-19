@@ -30,6 +30,26 @@ require POSIX;
 
 my $parent = $$;
 
+# ---- a child knows it is a child ------------------------------------------
+#
+# FIRST, because everything below depends on it. The library caches getpid
+# and relies on a pthread_atfork handler to drop the cache in the child. When
+# the handler is registered but never runs (FreeBSD's libc stub, in a perl
+# built without libthr), every child answers as its parent: peers merge,
+# leases pass to nobody, wakers hand out the wrong pipe. That showed as six
+# files failing at once; this is the one assertion that names it.
+{
+    is(Shared::Arena::_pid(), $$, 'the parent knows its own pid');   # primes the cache
+    my $pid = fork();
+    die "fork: $!" unless defined $pid;
+    if (!$pid) {
+        POSIX::_exit(Shared::Arena::_pid() == $$ ? 0 : 1);
+    }
+    waitpid $pid, 0;
+    is($? >> 8, 0, 'a child sees its own pid, not its parent\'s cached one: '
+                 . 'the pthread_atfork child handler ran');
+}
+
 # ---- the mapping is shared ------------------------------------------------
 {
     my $arena = Shared::Arena->create(size => 512 * 1024);

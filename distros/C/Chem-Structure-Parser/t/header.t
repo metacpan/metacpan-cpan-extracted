@@ -8,6 +8,7 @@ use warnings FATAL => 'all';
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use Chem::Structure::Parser;
+use Test::Exception;
 use Test::More;
 
 my $data = dirname(abs_path(__FILE__)) . '/data';
@@ -73,6 +74,36 @@ is($i->{compound}{2}{molecule}, 'TEST DNA', 'COMPND: a second MOL_ID starts a se
 is($i->{source}{1}{organism_scientific}, 'HOMO SAPIENS', 'SOURCE: organism');
 is($i->{source}{1}{organism_taxid}, '9606', 'SOURCE: taxid');
 is($i->{source}{2}{synthetic}, 'YES', 'SOURCE: the second entity');
+
+# the shapes of that record an entry is allowed to have and mini.pdb does not:
+# a first entity that never says MOL_ID, a token given twice, and the stray
+# semicolons a depositor leaves behind
+{
+	my $c = structure_info_string(<<'PDB');
+HEADER    TEST                                    01-JAN-94   9XYZ
+COMPND    MOLECULE: FIRST THING;;
+COMPND   2 CHAIN: A, B;
+COMPND   3 OTHER_DETAILS: SOMETHING;
+COMPND   4 OTHER_DETAILS: AND MORE;
+COMPND   5 MOL_ID: 2;
+COMPND   6 MOLECULE: SECOND THING;
+COMPND   7 CHAIN: C;
+SOURCE    ORGANISM_SCIENTIFIC: HOMO SAPIENS;
+ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00           C
+ATOM      2  CA  ALA B   1      12.000  10.000  10.000  1.00 20.00           C
+ATOM      3  CA  ALA C   1      14.000  10.000  10.000  1.00 20.00           C
+PDB
+	is($c->{compound}{1}{molecule}, 'FIRST THING',
+		'COMPND: an entity that never names a MOL_ID is entity 1');
+	is($c->{compound}{1}{other_details}, 'SOMETHING AND MORE',
+		'COMPND: a token given twice is joined rather than overwritten');
+	is_deeply($c->{compound}{1}{chain}, [ 'A', 'B' ], 'COMPND: with both its chains');
+	is($c->{compound}{2}{molecule}, 'SECOND THING', 'COMPND: and the MOL_ID after it is its own');
+	is($c->{chains}{B}{molecule}, 'FIRST THING', 'every chain of an entity is that molecule');
+	is($c->{chains}{C}{molecule}, 'SECOND THING', 'and the next entity names its own');
+	is($c->{chains}{A}{organism}, 'HOMO SAPIENS',
+		'a SOURCE with no MOL_ID belongs to the first entity, as the COMPND did');
+}
 
 #--------
 # SEQRES, DBREF, SEQADV, MODRES
@@ -194,6 +225,76 @@ PDB
 	is($i->{cryst1}{gamma}, 90, 'a CRYST1 with no space group parses');
 	is($i->{cryst1}{sgroup}, '', 'and the space group is empty');
 	is($i->{het}{NAG}{instances}[0]{chain}, 'A', 'a HET record with no atom count parses');
+}
+{
+	# The records an entry has one of and most entries have none of.  Each is
+	# one line of the reader and they are grouped here rather than spread over
+	# the fixtures, because a fixture carrying all of them at once would not be
+	# a structure anybody deposited.  The columns are built with sprintf where
+	# they are not obvious, because a hand-typed record shifts a column
+	# silently -- which is the reason t/data is generated rather than typed.
+	my $seqres = sprintf('SEQRES %3d %s %4s  %s', 1, 'A', '??', 'ALA GLY SER');
+	is(length $seqres, 30, 'the SEQRES line puts its residues in column 20');
+	my $pdb = <<"PDB";
+HEADER    HYDROLASE                               01-JAN-94   9XYZ
+OBSLTE     31-JAN-94 9XYZ      2ABC
+CAVEAT     9XYZ    CHIRALITY ERROR AT CA OF RESIDUE 12
+SPLIT      1VOQ 1VOR 1VOS
+MDLTYP    CA ATOMS ONLY, CHAIN A, B
+NUMMDL    20
+$seqres
+JRNL
+JRNL        AUTH   A.B.SMITH,C.D.JONES
+JRNL        TITL   A PAPER ABOUT A
+JRNL        TITL 2 STRUCTURE
+REMARK
+CONECT 1179  746 1184 1195 1203
+CONECT 1180
+ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00           C
+ATOM      2  CA  GLY A   2      13.000  10.000  10.000  1.00 20.00           C
+ATOM      3  CA  SER A   3      16.000  10.000  10.000  1.00 20.00           C
+PDB
+	my $h = structure_info_string($pdb);
+	is($h->{caveat}, 'CHIRALITY ERROR AT CA OF RESIDUE 12',
+		'CAVEAT is read, with the entry id cut off the front of the text');
+	is($h->{obsolete}, '31-JAN-94 9XYZ      2ABC', 'OBSLTE is kept whole');
+	is_deeply($h->{split}, [ '1VOQ', '1VOR', '1VOS' ], 'SPLIT is a list of entry ids');
+	is($h->{model_type}, 'CA ATOMS ONLY, CHAIN A, B', 'MDLTYP is kept as written');
+	is($h->{n_models_declared}, 20,
+		'NUMMDL says how many models the file claims, which is not how many it has');
+	is($h->{n_models}, 1, 'and the count of the ones that are really there is its own key');
+	is($h->{journal}{titl}, 'A PAPER ABOUT A STRUCTURE',
+		'a JRNL sub-record continued across two lines is glued back together');
+	is_deeply($h->{journal}{auth}, [ 'A.B.SMITH', 'C.D.JONES' ],
+		'and the authors are a list');
+	# a JRNL or REMARK line with nothing on it names no sub-record and no
+	# number, and is passed over rather than filed under the empty string
+	ok(!exists $h->{journal}{''}, 'a JRNL line with no sub-record is not a sub-record');
+	ok(!exists $h->{remarks}{''}, 'and a REMARK with no number is not a remark');
+	is_deeply($h->{conect}, [ [ 1179, 746, 1184, 1195, 1203 ] ],
+		'CONECT gives the atom and what it is bonded to');
+	is($h->{records}{CONECT}, 2,
+		'both CONECT lines were read, though the one bonded to nothing is not a bond');
+	is($h->{seqres}{A}{length}, 3,
+		'a SEQRES whose residue count is not a number is as long as the residues it lists');
+	is($h->{seqres}{A}{sequence}, 'AGS', 'and the residues themselves are read as usual');
+}
+{
+	# A numeric field that is digits and dots and is not a number.  The archive
+	# writes them -- 5m04's pH is '5.4.-5.8' -- and the cell edge below is the
+	# same shape in a field that is read with _n().  It used to match a pattern
+	# of "digits and dots" and then be added to 0, which under
+	# warnings FATAL => 'all' took the whole read down with
+	# `Argument "1.2.3" isn't numeric in addition (+)'; a field that is not a
+	# number is undef, which is what every other unreadable field here gives.
+	my $i;
+	lives_ok { $i = structure_info_string(<<'PDB') } 'a CRYST1 with a malformed cell edge is read';
+CRYST1    1.2.3   50.200   60.300  90.00  95.50  90.00 P 1           1
+ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00           C
+PDB
+	is($i->{cryst1}{a}, undef, 'and the field that is not a number reads as undef');
+	is($i->{cryst1}{b}, 50.2,  'while the fields beside it are unharmed');
+	is($i->{cryst1}{sgroup}, 'P 1', 'and so is the rest of the record');
 }
 
 done_testing();

@@ -1,4 +1,4 @@
-package JMAP::Tester 0.112;
+package JMAP::Tester 0.113;
 # ABSTRACT: a JMAP client made for testing JMAP servers
 
 use v5.20.0;
@@ -917,6 +917,7 @@ sub logout ($self) {
       return Future->done(
         JMAP::Tester::Result::Logout->new({
           http_response => $res,
+          diagnostic_dumper => $self->default_diagnostic_dumper,
         })
       );
     }
@@ -1021,7 +1022,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.112
+version 0.113
 
 =head1 OVERVIEW
 
