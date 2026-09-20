@@ -61,9 +61,10 @@ sub _setup_repo {
     return $repo;
 }
 
-# A generated agent name is exactly one lowercase hyphenated word pair and
-# nothing else (App::karr::Cmd::AgentName prints "$word-$word\n").
-my $NAME_RE = qr/\A[a-z]+-[a-z]+\s*\z/;
+# An agent name is a claim-safe token and nothing else: since ADR 0005
+# (ticket #281) that is the sanitised checkout-directory name, lowercase with
+# non-[a-z0-9] runs folded to single dashes -- not the old two-word pair.
+my $NAME_RE = qr/\A[a-z0-9]+(?:-[a-z0-9]+)*\s*\z/;
 
 # ------------------------------------------------------------------ (a) alias
 

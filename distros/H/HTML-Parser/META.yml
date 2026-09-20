@@ -33,26 +33,26 @@ no_index:
 provides:
   HTML::Entities:
     file: lib/HTML/Entities.pm
-    version: '3.85'
+    version: '3.86'
   HTML::Filter:
     file: lib/HTML/Filter.pm
-    version: '3.85'
+    version: '3.86'
     x_deprecated: 1
   HTML::HeadParser:
     file: lib/HTML/HeadParser.pm
-    version: '3.85'
+    version: '3.86'
   HTML::LinkExtor:
     file: lib/HTML/LinkExtor.pm
-    version: '3.85'
+    version: '3.86'
   HTML::Parser:
     file: lib/HTML/Parser.pm
-    version: '3.85'
+    version: '3.86'
   HTML::PullParser:
     file: lib/HTML/PullParser.pm
-    version: '3.85'
+    version: '3.86'
   HTML::TokeParser:
     file: lib/HTML/TokeParser.pm
-    version: '3.85'
+    version: '3.86'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -68,7 +68,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTML-Parser/issues
   homepage: https://github.com/libwww-perl/HTML-Parser
   repository: https://github.com/libwww-perl/HTML-Parser.git
-version: '3.85'
+version: '3.86'
 x_contributors:
   - 'Andy Lester <andy@petdance.com>'
   - 'Antonio Radici <antonio@dyne.org>'

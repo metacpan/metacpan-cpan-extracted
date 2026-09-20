@@ -1,14 +1,14 @@
 # ABSTRACT: Turn internal errors into one clean user-facing line
 
 package App::karr::Error;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use strict;
 use warnings;
 use Scalar::Util qw( blessed );
 use Exporter qw( import );
 
 our @EXPORT_OK = qw( user_error clean_error is_usage_error command_hint
-  original_argv set_original_argv );
+  original_argv set_original_argv require_claim_message mandatory_claim_message );
 
 
 # The indentation every suggestion line carries, and the pattern that finds one
@@ -17,7 +17,12 @@ our @EXPORT_OK = qw( user_error clean_error is_usage_error command_hint
 # below has to tell karr's own answer apart from the backend chatter it exists
 # to cut away.
 my $HINT_INDENT = '  ';
-my $HINT_LINE   = qr{\n\Q$HINT_INDENT\Ekarr [^\n]*};
+# A suggestion line is `  karr ...` -- and, since ADR 0005, the `  export
+# KARR_CLAIM=...` line that names the second way to claim (require_claim_message
+# below). Both are part of the answer clean_error must carry past the first-line
+# reduction, so a `move` into a require_claim column keeps both ways out even
+# when its per-id failure is cleaned by the batch runner.
+my $HINT_LINE   = qr{\n\Q$HINT_INDENT\E(?:karr |export KARR_CLAIM)[^\n]*};
 
 sub command_hint {
   my (@tokens) = @_;
@@ -126,6 +131,43 @@ sub is_usage_error {
 }
 
 
+# The two ways out of a missing claim, side by side (ADR 0005): the invocation
+# with --claim added, and the once-per-session export. The `karr` line comes
+# LAST so a `tail -n` keeps the immediate copy-paste fix (the k263 rule), with
+# the session-level export advice above it; both are shaped so $HINT_LINE
+# rescues them through clean_error.
+sub _claim_ways_out {
+  my (@hint_tokens) = @_;
+  return $HINT_INDENT
+    . 'export KARR_CLAIM=$(karr agent-name)     # once per session' . "\n"
+    . command_hint(@hint_tokens);
+}
+
+# The "and KARR_CLAIM is unset" clause, only when it truly is (ADR 0005). A
+# presence test on %ENV, not a value read, so nothing crosses the encoding
+# boundary here.
+sub _karr_claim_unset_clause {
+  return ( defined $ENV{KARR_CLAIM} && length $ENV{KARR_CLAIM} )
+    ? ''
+    : ', and KARR_CLAIM is unset';
+}
+
+sub require_claim_message {
+  my ( $status, @hint_tokens ) = @_;
+  return "Status '$status' requires a claim"
+    . _karr_claim_unset_clause() . ":\n"
+    . _claim_ways_out(@hint_tokens);
+}
+
+
+sub mandatory_claim_message {
+  my ( $command, @hint_tokens ) = @_;
+  return "karr $command needs a claim"
+    . _karr_claim_unset_clause() . ":\n"
+    . _claim_ways_out(@hint_tokens);
+}
+
+
 1;
 
 __END__
@@ -140,7 +182,7 @@ App::karr::Error - Turn internal errors into one clean user-facing line
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 
@@ -245,6 +287,28 @@ rather than "the operation failed" -- decided by the stable leading markers
 listed in F<bin/karr>. Accepts a plain string or an exception object; a new
 usage-error die must start with one of those markers, and C<usage_error> in
 L<App::karr::Role::ExitCodes> is the generic way to emit one.
+
+=head2 require_claim_message
+
+    user_error( require_claim_message( 'in-progress',
+        'move', $id, 'in-progress', '--claim', 'NAME' ) );
+
+The refusal a C<require_claim> column raises when no claim is on the card and
+none was supplied (ADR 0002 / ticket k263, extended by ADR 0005). Names both
+ways to claim -- the invocation with C<--claim>, and C<export KARR_CLAIM=$(karr
+agent-name)> -- and adds "and KARR_CLAIM is unset" to the first line only when
+that variable really is empty. The first line stays a self-contained sentence
+so the C<--json> C<error> field (one line, colon stripped) reads cleanly.
+
+=head2 mandatory_claim_message
+
+    $self->usage_error( mandatory_claim_message(
+        'pick', 'pick', '--claim', 'NAME' ) );
+
+The counterpart of L</require_claim_message> for a command that always needs a
+claim -- C<pick> and C<handoff>, whose C<--claim> was C<required> before ADR
+0005 let C<KARR_CLAIM> fill it. Raised only when neither the flag nor the
+environment supplied one.
 
 =head1 SUPPORT
 

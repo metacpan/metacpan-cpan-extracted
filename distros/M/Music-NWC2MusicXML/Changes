@@ -1,5 +1,11 @@
 Revision history for Music-NWC2MusicXML
 
+0.001.1	Sat Sep 19 09:14:05 PM EDT 2026
+	[ Bug Fixes]
+	- Fix Test Dashboard URL
+	- Bump minimum version of Params::Validate::Strict
+	  fixes https://matrix.perl-magpie.org/results/c463e98e-b3b3-11f1-9d51-cce2e4961366
+
 0.001.0	Fri Sep 18 12:49:11 PM EDT 2026
       Initial CPAN release. Fully functional NWC-to-MusicXML conversion pipeline.
 

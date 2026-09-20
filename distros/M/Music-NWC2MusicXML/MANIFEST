@@ -30,6 +30,7 @@ t/input/Pilgrim.nwc
 t/integration.t
 t/locales.t
 t/mutant_killers.t
+t/no404s.t
 t/path.t
 t/transaction.t
 t/unit.t

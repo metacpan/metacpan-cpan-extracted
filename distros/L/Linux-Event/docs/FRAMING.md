@@ -225,6 +225,18 @@ A transition changes application protocol policy, not the Linux resource. A
 connected stream socket remains a connected stream socket; a pipe remains a
 pipe.
 
+When both source and target declare native consumers, `transition_to()` may
+also replace the native consumer provider while preserving the same native input
+buffer. The target provider context is prepared before the source is disturbed;
+the source flush/context lifetime is settled at a safe provider boundary; then
+unread bytes are re-driven through the target provider. This lets a protocol
+parser consume only its own prefix and hand a same-read tail directly to the
+next protocol without first materializing that tail as a Perl byte string.
+
+Adding or removing native-consumer mode during a live transition is still
+rejected. See `ORDERED-BYTE-CONSUMER-ABI.md` for the provider lifecycle and
+raw-input contract.
+
 ## Framing and serialization
 
 Framing and serialization are intentionally separate layers:

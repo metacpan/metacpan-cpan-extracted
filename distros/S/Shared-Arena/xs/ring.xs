@@ -200,26 +200,44 @@ MODULE = Shared::Arena    PACKAGE = Shared::Arena::Ring::Cursor    PREFIX = sarc
 # The collector builds the list in C rather than calling back into Perl per
 # record, because a drain of ten thousand records should not be ten thousand
 # Perl frames.
+#
+# At a HOLE - a record reserved and never committed - the core never sleeps:
+# the grace period runs on the cursor across calls, and this door keeps the
+# blocking feel a Perl caller expects by napping between looks until the
+# question "is the publisher dead" has been asked once, or the hole fills.
+# `wait => 0` returns at once with whatever came before the hole, which is
+# the C ABI's behaviour and what an event loop wants.
 void
 sarc_drain(self, ...)
         SV *self
     PREINIT:
         sa_cursor *c;
         IV max = 0;
+        int wait = 1;
         I32 i;
     PPCODE:
         c = SA_SELF(sa_cursor, self);
         if (!c) croak("Shared::Arena::Ring::Cursor: this cursor is released");
         for (i = 1; i + 1 < items; i += 2) {
             const char *o = SvPV_nolen(ST(i));
-            if (strEQ(o, "max")) max = SvIV(ST(i + 1));
+            if      (strEQ(o, "max"))  max  = SvIV(ST(i + 1));
+            else if (strEQ(o, "wait")) wait = SvTRUE(ST(i + 1)) ? 1 : 0;
         }
         {
-            uint64_t end;
+            uint64_t end, asks0 = c->hole_asks, t0 = sa_now_us(), budget;
+            uint32_t grace = sa_at_load32_acq(&c->ring->arena->hdr->reap_grace_us);
+            int stuck;
+            if (!grace) grace = 1000;
+            /* Two grace periods and a little: one for the wait, one for a
+             * baseline that was moved by a claim that changed hands. Bounded,
+             * as every wait here is. */
+            budget = (uint64_t)grace * 2u + 100000u;
             /* Draining is proof of life too: a peer that only ever reads must
              * still tick, or a publisher's hole check would judge it wedged. */
             sa_peer_join(c->ring->arena);
             sa_peer_beat(c->ring->arena);
+          again:
+            stuck = 0;
             sa_cursor_catchup(c);
             end = sa_at_load64_acq(&c->ring->hdr->seq);
             while (c->seq < end && (max <= 0 || (IV)(SP - MARK) < max)) {
@@ -231,7 +249,7 @@ sarc_drain(self, ...)
                 if (rc == SA_READ_PENDING) {
                     /* A hole. Wait on the QUESTION of whether its publisher is
                      * alive, not on a clock, and fill it if the answer is no. */
-                    if (!sa_ring_tombstone(c, c->seq)) break;
+                    if (!sa_ring_tombstone(c, c->seq)) { stuck = 1; break; }
                     rc = sa_ring_read(c, c->seq, &topic, &tlen,
                                       &data, &dlen, &flags, &span);
                     if (rc != SA_READ_OK) break;
@@ -267,6 +285,19 @@ sarc_drain(self, ...)
                 }
                 c->delivered++;
                 c->seq += span;
+            }
+            /* Stuck on a hole nobody has been asked about yet: nap and look
+             * again, until the question is asked (alive: stop; dead: the
+             * hole fills and the loop above delivers past it), the cursor is
+             * inside the throttle after an answer, or the budget is spent. */
+            if (stuck && wait && c->hole_seq && c->hole_asks == asks0
+                && (max <= 0 || (IV)(SP - MARK) < max)) {
+                uint64_t now = sa_now_us();
+                if (now - t0 < budget
+                    && !(c->hole_next_us && now < c->hole_next_us)) {
+                    sa_stall(1000);
+                    goto again;
+                }
             }
         }
 

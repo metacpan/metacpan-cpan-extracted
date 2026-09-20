@@ -19,6 +19,12 @@ requires 'Errno';
 requires 'POSIX';
 requires 'Sys::Hostname';
 requires 'Time::HiRes';
+requires 'Carp';
+requires 'Digest::MD5';
+requires 'Exporter';
+requires 'Fcntl';
+requires 'IPC::Open3';
+requires 'Symbol';
 requires 'Git::Native', '0.006';
 requires 'Git::Libgit2', '0.007';
 # Not used directly -- Git::Libgit2 loads the C library through it. Pinned so

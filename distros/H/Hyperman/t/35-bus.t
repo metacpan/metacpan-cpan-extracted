@@ -295,6 +295,25 @@ sub run_group {
 # A gap with a number beside it is a diagnosis. A gap without one is a mystery,
 # and indistinguishable from a quiet room.
 {
+    # A GROUP IS THE (topic, name) PAIR. One group name on two topics is two
+    # independent cursors: each claims its own topic's records and neither
+    # eats the other's. A ring whose group identity was the name alone would
+    # refuse the second topic, or hand one topic's records to the other.
+    {
+        my @a = Hyperman->claim('ident:a', 'shared');   # both start "from now"
+        my @b = Hyperman->claim('ident:b', 'shared');
+        Hyperman->publish('ident:a', "a$_") for 1 .. 3;
+        Hyperman->publish('ident:b', "b$_") for 1 .. 2;
+        @a = Hyperman->claim('ident:a', 'shared');
+        @b = Hyperman->claim('ident:b', 'shared');
+        is_deeply([ map { $_->[1] } @a ], [qw(a1 a2 a3)],
+                  'one group name on topic a claims exactly the a records');
+        is_deeply([ map { $_->[1] } @b ], [qw(b1 b2)],
+                  'and the same name on topic b claims exactly the b records');
+        is(scalar(() = Hyperman->claim('ident:a', 'shared')), 0,
+           'and a second claim on either finds it empty');
+    }
+
     Hyperman->bus_reset;
     my $before = Hyperman->bus_gaps;
     Hyperman->publish('t', 'x') for 1 .. 200;    # the ring holds 64

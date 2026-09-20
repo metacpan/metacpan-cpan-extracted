@@ -72,103 +72,103 @@
    "provides" : {
       "Linux::Event" : {
          "file" : "lib/Linux/Event.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Address" : {
          "file" : "lib/Linux/Event/Address.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Error" : {
          "file" : "lib/Linux/Event/Error.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Framer" : {
          "file" : "lib/Linux/Event/Framer.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Framer::DecimalLength" : {
          "file" : "lib/Linux/Event/Framer/DecimalLength.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Framer::Delimiter" : {
          "file" : "lib/Linux/Event/Framer/Delimiter.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Framer::Fixed" : {
          "file" : "lib/Linux/Event/Framer/Fixed.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Framer::LengthPrefix" : {
          "file" : "lib/Linux/Event/Framer/LengthPrefix.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Framer::Netstring" : {
          "file" : "lib/Linux/Event/Framer/Netstring.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Framer::U32BE" : {
          "file" : "lib/Linux/Event/Framer/U32BE.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Framer::Varint" : {
          "file" : "lib/Linux/Event/Framer/Varint.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::IO" : {
          "file" : "lib/Linux/Event/IO.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::IO::Pipe" : {
          "file" : "lib/Linux/Event/IO/Pipe.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::IO::Sock" : {
          "file" : "lib/Linux/Event/IO/Sock.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::IO::Sock::Dgram" : {
          "file" : "lib/Linux/Event/IO/Sock/Dgram.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::IO::Sock::Listener" : {
          "file" : "lib/Linux/Event/IO/Sock/Listener.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::IO::Sock::Stream" : {
          "file" : "lib/Linux/Event/IO/Sock/Stream.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::IO::TTY" : {
          "file" : "lib/Linux/Event/IO/TTY.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Kernel" : {
          "file" : "lib/Linux/Event/Kernel.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Kernel::Event" : {
          "file" : "lib/Linux/Event/Kernel/Event.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Kernel::Process" : {
          "file" : "lib/Linux/Event/Kernel/Process.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Kernel::Signal" : {
          "file" : "lib/Linux/Event/Kernel/Signal.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Kernel::Timer" : {
          "file" : "lib/Linux/Event/Kernel/Timer.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::Loop" : {
          "file" : "lib/Linux/Event/Loop.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       },
       "Linux::Event::TLS" : {
          "file" : "lib/Linux/Event/TLS.pm",
-         "version" : "0.114"
+         "version" : "0.115"
       }
    },
    "release_status" : "stable",
@@ -183,6 +183,6 @@
          "web" : "https://github.com/haxmeister/perl-linux-event"
       }
    },
-   "version" : "0.114",
+   "version" : "0.115",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

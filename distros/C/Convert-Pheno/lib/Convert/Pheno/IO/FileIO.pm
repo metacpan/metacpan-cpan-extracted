@@ -12,7 +12,6 @@ $YAML::XS::Boolean = 'JSON::PP';    # use JSON::PP::Boolean objects
 use JSON::XS;
 use IO::Compress::Gzip     qw($GzipError);
 use IO::Uncompress::Gunzip qw($GunzipError);
-use Sort::Naturally qw(nsort);
 use Data::Leaf::Walker;
 use Exporter 'import';
 our @EXPORT = qw(read_json read_yaml io_yaml_or_json write_json write_yaml);
@@ -61,9 +60,9 @@ sub _spew_text {
     if ( $file =~ /\.gz$/ ) {
         # JSON strings produced without ->utf8 are Perl text and should be
         # encoded exactly once at the filehandle boundary.
-        my $fh = IO::Compress::Gzip->new($file)
+        # Gzip's binmode is a no-op; its Encode option handles Perl text.
+        my $fh = IO::Compress::Gzip->new($file, Encode => 'UTF-8')
           or die "Cannot gzip <$file>: $GzipError";
-        binmode( $fh, ':encoding(UTF-8)' );
         print {$fh} $text;
         close $fh;
         return 1;
@@ -152,12 +151,9 @@ sub write_yaml {
     my $arg       = shift;
     my $file      = $arg->{filepath};
     my $json_data = $arg->{data};
-    # Keep YAML::XS::DumpFile for plain files to match the historical
-    # behavior. Gzip is the only special case that needs a manual writer.
-    return _spew_raw( $file, Dump($json_data) ) if $file =~ /\.gz$/;
-
-    YAML::XS::DumpFile( $file, $json_data );
-    return 1;
+    # Dump returns UTF-8 bytes. Write them unchanged to avoid both double
+    # encoding and Windows LF-to-CRLF translation, including inside values.
+    return _spew_raw( $file, Dump($json_data) );
 }
 
 sub traverse_yaml_data_to_coerce_numbers {

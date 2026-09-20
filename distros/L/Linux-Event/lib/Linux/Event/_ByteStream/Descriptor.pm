@@ -161,7 +161,7 @@ sub _stream_tuning_for ($class) {
         low_watermark      =>   262_144,
         max_pending_bytes  =>         0,
         read_size          =>    65_536,
-        read_budget_bytes  =>         0,
+        read_budget_bytes  =>    65_536,
         read_batch_bytes   =>         0,
         message_batch_size =>         0,
         max_buffer         => 8_388_608,
@@ -198,6 +198,12 @@ sub validate_modes ($target, $descriptor, $tuning, $callbacks) {
             if $callbacks->{on_message};
         croak "$target on_messages requires a framed ordered-byte class"
             if $callbacks->{on_messages};
+        if ($descriptor->{consumer}) {
+            croak "$target raw native consumer cannot be combined with read_batch_bytes"
+                if $tuning->{read_batch_bytes};
+            croak "$target on_data cannot be combined with a native consumer"
+                if $callbacks->{on_data};
+        }
         return;
     }
 
@@ -305,14 +311,18 @@ sub for_class ($class) {
                 if $callback{on_messages};
         }
     } else {
-        croak "$class native consumer requires a framed ordered-byte class"
-            if $consumer;
         croak "$class defines on_message() but does not declare a framer"
             if $callback{on_message};
         croak "$class defines on_messages() but does not declare a framer"
             if $callback{on_messages};
         croak "$class message_batch_size is available only to framed ordered-byte classes"
             if $option->{message_batch_size};
+        if ($consumer) {
+            croak "$class raw native consumer cannot be combined with read_batch_bytes"
+                if $option->{read_batch_bytes};
+            croak "$class native consumer cannot be combined with on_data()"
+                if $callback{on_data};
+        }
     }
 
     my $framing = $framer ? { %{ $framer->{native} } } : { read_mode => 0 };

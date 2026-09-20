@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Ring - a record queue several processes can write at once
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 

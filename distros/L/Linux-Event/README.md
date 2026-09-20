@@ -82,8 +82,10 @@ plus constructor closures for per-instance application state.
 cpanm Linux::Event
 ```
 
-Building requires Linux, a C compiler, and OpenSSL development files. The
-distribution requires Perl 5.36 or newer.
+Building the complete distribution requires Perl 5.36 or newer, Linux headers
+with pidfd syscall definitions, a Linux 5.4 or newer runtime for pidfd process
+status, a libc providing `posix_spawn_file_actions_addchdir_np`, a C compiler,
+and OpenSSL 1.1.1 or newer development files. Perl ithreads are not required.
 
 ## The reactor
 
@@ -107,6 +109,23 @@ $loop->add($object);
 `add()` returns the same object. Low-level applications can also use
 `$loop->watch(...)` or `$loop->watch_fd(...)` directly. Those methods return
 opaque native registrations rather than public watcher objects.
+
+A Linux::Event Loop can also run beneath another event loop without adding a
+runtime dependency on that loop. `poll_fd()` exposes the Loop-owned epoll
+readiness descriptor as a borrowed fd, and `poll()` performs exactly one
+nonblocking dispatch turn:
+
+```perl
+my $fd = $loop->poll_fd;
+
+# Register $fd for level-triggered read readiness in the foreign loop.
+# From that foreign-loop callback:
+$loop->poll;
+```
+
+The foreign loop owns scheduling; Linux::Event continues to own its epoll fd
+and all registered Linux resources. Adapters that need a Perl filehandle should
+duplicate the borrowed descriptor rather than close it directly.
 
 ## Stream socket server
 
@@ -312,7 +331,7 @@ constructor callbacks select an instance's effective cached CVs.
 sub stream_tuning ($class) {
     return (
         read_size          => 65_536,
-        read_budget_bytes  => 0,
+        read_budget_bytes  => 65_536,
         read_batch_bytes   => 0,
         message_batch_size => 0,
         high_watermark     => 1_048_576,
@@ -326,10 +345,24 @@ sub stream_tuning ($class) {
 }
 ```
 
+`read_budget_bytes` defaults to 65,536 bytes per readiness callback so one continuously replenished ordered-byte fd cannot monopolize Loop dispatch. Explicit `read_budget_bytes => 0` remains the opt-in drain-until-EAGAIN mode.
+
 `read_batch_bytes` coalesces raw input callbacks. `message_batch_size` switches
 a framed type from `on_message` to `on_messages`. Partial batches flush at the
 end of the current native read drain; Linux::Event does not wait for a later
 readiness event merely to fill the configured batch size.
+
+Native protocol extensions can bypass an unnecessary Perl byte-string handoff.
+`Linux::Event::Framer->declare_native_consumer(...)` supports complete framed
+messages and, with the raw-input ABI flag, a borrowed `(data, length)` view of
+the native ordered-byte input buffer. A provider reports the prefix it consumed
+and Linux::Event retains the remaining tail natively.
+
+`transition_to()` can hand a live ordered-byte connection from one native
+consumer provider to another while preserving that unread native tail. This is
+intended for protocol transitions such as an HTTP parser handing already-read
+post-Upgrade bytes to a WebSocket parser. See
+`docs/ORDERED-BYTE-CONSUMER-ABI.md` for the extension-author contract.
 
 ## TLS
 
@@ -513,6 +546,7 @@ performance-regression baselines.
 
 Architecture and behavior are documented under `docs/`. In particular:
 
+- `docs/CORE.md`
 - `docs/IO-KERNEL-ARCHITECTURE.md`
 - `docs/ARCHITECTURE.md`
 - `docs/FIRST-CLASS-STREAM-CALLBACKS.md`
@@ -523,6 +557,7 @@ Architecture and behavior are documented under `docs/`. In particular:
 - `docs/LISTENER-DESIGN.md`
 - `docs/PROCESS-DESIGN.md`
 - `docs/INTROSPECTION.md`
+- `docs/ORDERED-BYTE-CONSUMER-ABI.md`
 
 The architecture documents describe public semantics. Historical engineering
 roadmaps and benchmark decision logs are development material rather than

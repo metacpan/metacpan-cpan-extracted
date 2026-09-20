@@ -14,7 +14,7 @@ use URI ();
 use Net::Async::WebSearch::Provider ();
 use Net::Async::WebSearch::Result ();
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 # Reciprocal Rank Fusion constant (Cormack et al.)
 our $RRF_K = 60;
@@ -494,7 +494,7 @@ Net::Async::WebSearch - IO::Async multi-provider web search aggregator
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -674,6 +674,42 @@ is 100 QPM per OAuth identity. See
 L<Net::Async::WebSearch::Provider::Reddit::OAuth/SETUP> for the full
 walkthrough.
 
+=item * B<Tavily> — L<https://app.tavily.com>
+
+Search API built for LLM and agent workflows. B<Free self-service
+tier: 1000 credits/month, no credit card required> — sign up and the
+key (prefixed C<tvly->) is shown in the dashboard. Sent as an
+C<Authorization: Bearer> header. Honours C<language> and C<region>.
+
+=item * B<Exa> — L<https://dashboard.exa.ai>
+
+Neural (embeddings-based) search API. B<Free self-service tier
+(generous), no credit card required>; the key is issued in the
+dashboard and sent as the C<x-api-key> header. Exa has no
+C<language>/C<region>/C<safesearch> knobs; the provider always
+requests page text (C<contents.text>) so hits carry a snippet.
+
+=item * B<Marginalia> — L<https://marginalia-search.com/>
+
+Independent, English-only index of the non-commercial "small web"
+(deliberately I<not> an SEO-optimised corpus). It ships a shared
+B<public> key (C<"public">, heavily rate-limited) that needs no
+signup, so the provider works out of the box; for a personal B<free>
+key with a higher limit, e-mail C<contact@marginalia-search.com>. Sent
+as the C<API-Key> header. Results are licensed B<CC-BY-NC-SA 4.0> —
+respect the attribution / non-commercial / share-alike terms if you
+redistribute them. No C<language>/C<region> controls.
+
+=item * B<Mojeek> — L<https://www.mojeek.com/services/search/web-search-api/>
+
+Independent search engine running its own crawler and index (I<not> a
+Google/Bing reseller). B<There is no free tier and no public key>: the
+Search API is B<commercial (priced per-thousand in GBP) and available
+on request only> through the contact form — do not expect a
+self-service key. The key travels as the C<api_key> B<query parameter>
+(not a header) and C<fmt=json> is mandatory. Honours C<language>,
+C<region> and C<safesearch>.
+
 =back
 
 Summary table:
@@ -688,6 +724,10 @@ Summary table:
   Yandex           Cloud trial credits              no   console.yandex.cloud/link/search-api/
   Reddit           keyless (rate-limited)           no   (no key)
   Reddit OAuth     100 QPM per client_id            no   reddit.com/prefs/apps
+  Tavily           1000 credits/month               no   app.tavily.com
+  Exa              generous, self-service           no   dashboard.exa.ai
+  Marginalia       public key / free by e-mail      no   contact@marginalia-search.com
+  Mojeek           none (commercial, on request)    n/a  mojeek.com/services/search/web-search-api/
 
 =head2 Fetching result bodies
 

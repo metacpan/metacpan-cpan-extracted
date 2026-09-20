@@ -504,11 +504,23 @@ static int sa_hash_delete(sa_hash *m, const char *key, uint32_t klen)
  * An entry that exists and is not eight bytes is left alone and refused, rather
  * than reinterpreted: a caller that stored a string and then counted on it has
  * a bug, and silently overwriting it would hide the bug and the string. */
-static int sa_hash_incr(sa_hash *m, const char *key, uint32_t klen,
-                        int64_t by, uint64_t *now)
+/* `ttl_ms` is set only when the increment CREATES the counter or RESETS an
+ * expired one: a live counter keeps the deadline it has, so a window does not
+ * slide. 0 means no deadline, which is what sa_hash_incr passes.
+ *
+ * `now_ms` is the caller's reading of the wall clock, or 0 to read it here.
+ * A caller that has just read the clock to compute the deadline it passes -
+ * a fixed-window rate limiter does exactly that - hands the reading in, so
+ * a hit on a counter with a deadline costs one clock read and not two. The
+ * clock is read at most once on this path, and only when a deadline is
+ * involved. */
+static int sa_hash_incr_at(sa_hash *m, const char *key, uint32_t klen,
+                           int64_t by, uint64_t ttl_ms, uint64_t now_ms,
+                           uint64_t *now)
 {
 #if !SA_HAVE_ATOMICS
-    (void)m; (void)key; (void)klen; (void)by; (void)now;
+    (void)m; (void)key; (void)klen; (void)by; (void)ttl_ms; (void)now_ms;
+    (void)now;
     return SA_H_FULL;
 #else
     sa_hash_hdr *h = m->hdr;
@@ -537,9 +549,10 @@ static int sa_hash_incr(sa_hash *m, const char *key, uint32_t klen,
          * would get wrong. A non-counter that has expired is likewise gone, so
          * the deadline is checked before the not-a-counter refusal. */
         int reset = 0;
-        if (found && sa_at_load64_acq(&s->expires)
-            && sa_now_ms() >= sa_at_load64_acq(&s->expires))
-            reset = 1;
+        if (found && sa_at_load64_acq(&s->expires)) {
+            if (!now_ms) now_ms = sa_now_ms();
+            if (now_ms >= sa_at_load64_acq(&s->expires)) reset = 1;
+        }
 
         if (found && !reset && sa_at_load32_acq(&s->vlen) != 8) {
             sa_at_unlock(h->locks, tag);
@@ -556,7 +569,10 @@ static int sa_hash_incr(sa_hash *m, const char *key, uint32_t klen,
             memcpy(s->bytes + klen, &zero, 8);
             s->vlen = 8;
             sa_at_store64_rel(&s->tag, tag);
-            sa_at_store64_rel(&s->expires, 0);   /* a reset counter has no TTL */
+            /* A fresh counter's deadline, or none: a reset one starts its
+             * window now, never inherits the old deadline. */
+            if (ttl_ms && !now_ms) now_ms = sa_now_ms();
+            sa_at_store64_rel(&s->expires, ttl_ms ? now_ms + ttl_ms : 0);
             sa_at_fence_rel();
             sa_at_store32_rel(&s->version, sa_at_load32_acq(&s->version) + 1u);
             sa_at_store32_rel(&s->state, SA_H_LIVE);
@@ -568,15 +584,19 @@ static int sa_hash_incr(sa_hash *m, const char *key, uint32_t klen,
     }
 
     /* The counter itself, aligned inside the slot only if the key length says
-     * so - so it is read and written through the atomic helpers on a copy when
-     * it is not. The common case, a key whose length keeps the value aligned,
-     * is one instruction. */
+     * so - so it is read and written through a copy when it is not. The
+     * stripe lock is held, so no other writer can be here: a load and a
+     * release store of the aligned word, never a read-modify-write, which
+     * costs a locked instruction the lock has already paid for. A reader
+     * (`counter`, `fetch`) sees the old whole word or the new one, since an
+     * aligned 64-bit store cannot tear on any target with 64-bit atomics. */
     {
         char *p = s->bytes + s->klen;
         if (((size_t)p & 7u) == 0) {
-            uint64_t v = sa_at_fetch_add64((volatile uint64_t *)p,
-                                           (uint64_t)by);
-            if (now) *now = v + (uint64_t)by;
+            volatile uint64_t *w = (volatile uint64_t *)p;
+            uint64_t v = sa_at_load64_acq(w) + (uint64_t)by;
+            sa_at_store64_rel(w, v);
+            if (now) *now = v;
         }
         else {
             uint64_t v;
@@ -590,6 +610,18 @@ static int sa_hash_incr(sa_hash *m, const char *key, uint32_t klen,
     sa_at_unlock(h->locks, tag);
     return SA_H_OK;
 #endif
+}
+
+static int sa_hash_incr_ttl(sa_hash *m, const char *key, uint32_t klen,
+                            int64_t by, uint64_t ttl_ms, uint64_t *now)
+{
+    return sa_hash_incr_at(m, key, klen, by, ttl_ms, 0, now);
+}
+
+static int sa_hash_incr(sa_hash *m, const char *key, uint32_t klen,
+                        int64_t by, uint64_t *now)
+{
+    return sa_hash_incr_at(m, key, klen, by, 0, 0, now);
 }
 
 #endif /* SA_HASH_H */

@@ -61,6 +61,43 @@ if ($^O eq 'linux') {
     }
 }
 
+# --- a coarse wall clock, for the rate counters' deadlines (Linux) --------
+#
+# CLOCK_REALTIME_COARSE is the kernel's last tick out of the vDSO, with no
+# counter access: about a quarter of gettimeofday. Run, not just compiled,
+# because a header can name the clock on a kernel whose syscall refuses it.
+my $cc_inc = '';
+if ($^O ne 'MSWin32' && probe_coarse_clock()) {
+    $cc_inc = ' -DHM_HAVE_COARSE_CLOCK';
+    print "clock_gettime(CLOCK_REALTIME_COARSE): yes, the rate counters read it.\n";
+}
+
+sub probe_coarse_clock {
+    my $dir = "hm_clock_probe_$$";
+    mkdir $dir or return 0;
+    my ($src, $bin, $ok) = ("$dir/probe.c", "$dir/probe", 0);
+    if (open my $fh, '>', $src) {
+        print $fh <<'C';
+#include <time.h>
+int main(void) {
+#ifdef CLOCK_REALTIME_COARSE
+    struct timespec ts;
+    return clock_gettime(CLOCK_REALTIME_COARSE, &ts) == 0 ? 0 : 1;
+#else
+    return 1;
+#endif
+}
+C
+        close $fh;
+        my $cc = $Config{cc} || 'cc';
+        $ok = system("$cc $src -o $bin >$DEVNULL 2>&1") == 0
+           && system("./$bin >$DEVNULL 2>&1") == 0;
+    }
+    unlink $src, $bin;
+    rmdir $dir;
+    return $ok;
+}
+
 # --- TLS/HTTPS via OpenSSL (any platform with the library) ---------------
 #
 # A non-blocking TLS layer on the event loop; with nghttp2 also present, ALPN
@@ -562,30 +599,32 @@ if (!probe_clock_gettime('') && probe_clock_gettime('-lrt')) {
 # table consumers resolve at runtime via Hyperman::_abi_ptr) so dependents
 # like DBIx::Loop reach the header without vendoring a copy. save_config
 # writes Install/Files.pm; consumers then ExtUtils::Depends->new(X,'Hyperman').
-my $pkg = ExtUtils::Depends->new('Hyperman');
+#
+# And a CONSUMER: the fork-shared arena is Shared::Arena's, reached through
+# its sa_abi.h. A sibling checkout, when there is one, comes FIRST - ahead of
+# the header ExtUtils::Depends found in the installed dist - or a working tree
+# that requires 0.11 compiles against an installed 0.10's header and fails on
+# a member the version it asked for does have. With no sibling present this
+# adds no paths at all. Frozen's include path arrives through Shared::Arena's
+# own Install/Files.pm, so Frozen must be installed at configure time.
+my @PROVIDERS = (
+    [ 'Shared::Arena' => '../Shared-Arena/include' ],
+);
+my ($pkg, $sib_inc) = (undef, '');
+if (eval { $pkg = ExtUtils::Depends->new('Hyperman',
+                      map { $_->[0] } @PROVIDERS); 1 } && $pkg) {
+    my @sib = grep { -d $_->[1] } @PROVIDERS;
+    $sib_inc = join '', map { " -I$_->[1]" } @sib;
+}
+else {
+    my @missing = grep { !-d $_->[1] } @PROVIDERS;
+    die "Hyperman needs " . join(', ', map { $_->[0] } @missing)
+      . " installed, or present as a sibling directory.\n" if @missing;
+    $sib_inc = join '', map { " -I$_->[1]" } @PROVIDERS;
+    $pkg = ExtUtils::Depends->new('Hyperman');
+}
 $pkg->set_inc('-Iinclude/hyperman');
 $pkg->install('include/hyperman/hm_abi.h');
-
-# THE BUS IS PUBLISHED TOO, and under a `hyperman/` subdirectory.
-#
-# A consumer that wants the cross-worker live tail includes
-# "hyperman/hm_bus.h" - Punk::Observe does - and hm_bus.h in turn includes
-# "hm_atomic.h" relative to its own directory. So both have to land together
-# in a directory of that name, or the include resolves and its dependency
-# does not.
-#
-# NOT through ExtUtils::Depends' install(), which takes the basename and
-# would flatten both into Install/ - where "hyperman/hm_bus.h" does not
-# resolve at all. The PM entries are written out instead.
-#
-# Publishing only hm_abi.h was the whole of the bug this fixes: a consumer
-# with Hyperman correctly installed found no hm_bus.h, silently fell back to
-# an in-process tail, and a live tail on a prefork pool then showed whichever
-# quarter of the traffic the answering worker happened to hold.
-for my $h (qw(hm_bus.h hm_atomic.h)) {
-    $pkg->add_pm("include/hyperman/$h",
-                 '$(INST_ARCHLIB)/$(FULLEXT)/Install/hyperman/' . $h);
-}
 
 mkdir 'Install' unless -d 'Install';
 $pkg->save_config('Install/Files.pm');
@@ -616,7 +655,7 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.010000',
     OBJECT           => 'Hyperman$(OBJ_EXT)',
     INC              => join(' ', grep { defined && length }
-                            '-Iinclude/hyperman' . $uring_inc . $h2_inc . $tls_inc . $sf_inc . $z_inc . $q_inc,
+                            '-Iinclude/hyperman' . $sib_inc . $uring_inc . $h2_inc . $tls_inc . $sf_inc . $z_inc . $q_inc . $cc_inc,
                             $dep_inc),
     LIBS             => [ join(' ', grep { defined && length } $uring_libs, $h2_libs, $tls_libs, $z_libs, $q_libs, $rt_libs, $win_libs, $dep_libs) ],
     # MakeMaker tracks neither include/*.h nor the xs/*.xs pulled in with
@@ -640,23 +679,28 @@ my %WriteMakefileArgs = (
           . 'include/hyperman/hm_stream.h '
           . 'include/hyperman/hm_quic.h include/hyperman/hm_http3.h '
           . 'include/hyperman/hm_compress.h include/hyperman/hm_parse.h '
-          . 'include/hyperman/hm_ratelimit.h '
-          . 'include/hyperman/hm_atomic.h include/hyperman/hm_bus.h '
-          . 'include/hyperman/hm_bus_perl.h '
+          . 'include/hyperman/hm_sa_abuse.h '
+          . 'include/hyperman/hm_atomic.h include/hyperman/hm_sa_bus.h '
+          . 'include/hyperman/hm_sa_bus_perl.h include/hyperman/hm_sa.h '
+          . 'include/hyperman/hm_sa_board.h '
           . 'include/hyperman/hm_workerhook.h '
           . 'include/hyperman/hm_workerhook_perl.h',
     },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         'ExtUtils::Depends'   => '0.404',
+        # EU::Depends reads the provider's Install/Files.pm at configure time,
+        # and Shared::Arena's names Frozen as its own dependency.
+        'Shared::Arena'       => '0.11',
+        'Frozen'              => '0.07',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
     	'Plack::Test::Suite' => '0',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'Shared::Arena' => '0.11',
+        'Frozen'        => '0.07',
     },
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
 	list_workflow_types
 );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -764,10 +764,13 @@ Nigel Horne E<lt>njh@nigelhorne.comE<gt>
 
 L<https://github.com/nigelhorne>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+Copyright 2025-2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

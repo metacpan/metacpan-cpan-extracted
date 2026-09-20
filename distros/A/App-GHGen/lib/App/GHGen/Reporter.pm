@@ -11,7 +11,7 @@ our @EXPORT_OK = qw(
 	estimate_savings
 );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 

@@ -37,7 +37,7 @@
    "provides" : {
       "Chem::Structure::Parser" : {
          "file" : "lib/Chem/Structure/Parser.pm",
-         "version" : "0.03"
+         "version" : "0.031"
       }
    },
    "release_status" : "stable",
@@ -51,7 +51,7 @@
          "web" : "https://github.com/hhg7/Chem-Structure-Parser"
       }
    },
-   "version" : "0.03",
+   "version" : "0.031",
    "x_generated_by_perl" : "v5.44.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

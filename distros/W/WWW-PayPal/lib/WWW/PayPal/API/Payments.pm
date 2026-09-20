@@ -8,7 +8,7 @@ use WWW::PayPal::Capture;
 use WWW::PayPal::Refund;
 use namespace::clean;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 
 has client => (
@@ -82,7 +82,7 @@ WWW::PayPal::API::Payments - PayPal Payments v2 API (captures, refunds, authoriz
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

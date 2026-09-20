@@ -1,5 +1,43 @@
 Revision history for Linux-Event
 
+0.115  2026-09-19
+    - Make raw native-consumer input safe when application callbacks close the
+      Stream reentrantly. Terminal teardown owns the cleared native buffer, so
+      the core no longer applies a returned consumed count afterward. Preserve
+      nonterminal provider-changing transition_to() accounting: consume the
+      source prefix, then re-drive the retained tail through the replacement.
+    - Generalize transition_to() so one native consumer provider can hand the
+      live ordered-byte stream to another provider without surfacing unread
+      tail bytes through Perl. Pre-create the target context, settle source
+      flush debt, defer source destruction across active provider frames/host
+      retains, and re-drive preserved native input through the target. Keep
+      adding/removing native-consumer mode during a live transition rejected.
+    - Add the supported foreign-loop integration boundary: poll_fd() exposes
+      the Loop-owned epoll descriptor as a borrowed readiness fd, and poll()
+      performs exactly one nonblocking dispatch turn. Keep adapters outside
+      core and preserve dependency-free shipped contract coverage.
+    - Bound the shared ordered-byte read drain by default with
+      read_budget_bytes => 65_536 so continuously replenished Stream, Pipe,
+      or TTY input yields back to Loop dispatch instead of starving timerfd
+      and other ready descriptors. Explicit read_budget_bytes => 0 remains
+      the opt-in drain-until-EAGAIN mode. Preserve the fairness reproducer,
+      payload sweep, raw benchmark evidence, and KEEP decision record.
+    - Generalize the append-only native consumer ABI v1 with an optional
+      raw-input capability for protocol engines that cannot use a built-in
+      native framer. Providers may consume a borrowed contiguous native
+      (data, length) window before payload bytes become a Perl SV; unconsumed
+      tails remain in the shared native input buffer across later reads and
+      pause/resume. Original ABI-v1 providers remain compatible.
+    - Keep protocol subclasses free to define public close() semantics by
+      routing involuntary Stream teardown through the private terminal-close
+      primitive instead of virtual close() dispatch.
+    - Cover adopted socket configuration failure, accepted Stream setup
+      failure, and on_accept failure with regressions proving subclass close()
+      overrides are bypassed while descriptor cleanup and on_close behavior
+      remain intact.
+    - Preserve LES_CONSUMER_CLOSE virtual dispatch because that ABI status is
+      an explicit semantic request to close the host through normal lifecycle.
+
 0.114  2026-09-13
     - Enforce the documented transition_to() invariant across all public
       ordered-byte resource kinds. Pipe, TTY, and connected SOCK_STREAM

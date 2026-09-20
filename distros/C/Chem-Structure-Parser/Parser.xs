@@ -4244,8 +4244,7 @@ static bool dihedral4(const NV *CSP_RESTRICT p0, const NV *CSP_RESTRICT p1,
                       const NV *CSP_RESTRICT p2, const NV *CSP_RESTRICT p3,
                       NV *CSP_RESTRICT out)
 {
-	NV b0[3], b1[3], b2[3], v[3], w[3], cr[3];
-	NV len, d0, d2, x, y;
+	NV b0[3], b1[3], b2[3], v[3], w[3], cr[3], len, d0, d2, x, y;
 	unsigned short int k;
 	for (k = 0; k < 3; k++) {
 		b0[k] = p0[k] - p1[k];
@@ -4285,8 +4284,7 @@ static bool four_atoms(pTHX_ HV *CSP_RESTRICT a, HV *CSP_RESTRICT b,
                        const unsigned short int *CSP_RESTRICT which,
                        NV p[4][3])
 {
-	unsigned short int k;
-	for (k = 0; k < 4; k++) {
+	for (unsigned short int k = 0; k < 4; k++) {
 		HV *from = which[k] ? b : a;
 		if (!from) return FALSE;
 		if (!atom_xyz(aTHX_ from, name[k], &p[k][0], &p[k][1], &p[k][2])) return FALSE;
@@ -4731,8 +4729,7 @@ static bool atom_is_h(pTHX_ HV *CSP_RESTRICT a)
 //CA-to-CB vector, as the real one does.
 static bool gly_cb(pTHX_ HV *CSP_RESTRICT atoms, NV *CSP_RESTRICT out)
 {
-	NV nx, ny, nz, cx, cy, cz, ax, ay, az;
-	NV k[3], v[3], len, c, sn, dot;
+	NV nx, ny, nz, cx, cy, cz, ax, ay, az, k[3], v[3], len, c, sn, dot;
 	const NV ang = -CSP_PI * 120.0 / 180.0;
 	unsigned short int i;
 	if (!atom_xyz(aTHX_ atoms, "N",  &nx, &ny, &nz)) return FALSE;
@@ -4765,8 +4762,14 @@ static AV *contacts_find(pTHX_ structset *CSP_RESTRICT s, NV cut, bool store)
 	unsigned char *CSP_RESTRICT heavy = NULL;
 	NV *CSP_RESTRICT hx = NULL, *CSP_RESTRICT hy = NULL, *CSP_RESTRICT hz = NULL;
 	UV *CSP_RESTRICT hres = NULL;
-	touch *CSP_RESTRICT near = NULL;
-	UV near_cap = 32;
+	/*`touching', not the obvious `near': <windows.h> still carries the 16-bit
+	segment keywords as empty object-like macros -- `#define near' and
+	`#define far' -- and perl.h includes it on Win32, so a variable of that
+	name is deleted by the preprocessor and its declaration becomes a syntax
+	error.  0.03 shipped with it and a Strawberry 5.42.2 smoker rejected the
+	whole file over the one word.*/
+	touch *CSP_RESTRICT touching = NULL;
+	UV touch_cap = 32;
 	cell_grid g;
 	UV n = 0, i, r, lo;
 
@@ -4790,7 +4793,7 @@ static AV *contacts_find(pTHX_ structset *CSP_RESTRICT s, NV cut, bool store)
 		return out;
 	}
 	grid_build(aTHX_ &g, hx, hy, hz, n, cut);
-	Newx(near, near_cap, touch);
+	Newx(touching, touch_cap, touch);
 
 	if (store)
 		for (r = 0; r < s->n_res; r++)
@@ -4805,7 +4808,7 @@ static AV *contacts_find(pTHX_ structset *CSP_RESTRICT s, NV cut, bool store)
 	same pairs: the loop body has not changed, only how it is reached.*/
 	lo = 0;
 	for (r = 0; r < s->n_res; r++) {
-		UV n_near = 0, k, hi = lo;
+		UV n_touch = 0, k, hi = lo;
 		while (hi < n && hres[hi] == r) hi++;
 		for (i = lo; i < hi; i++) {
 			UV bx, by, bz, ci, cj, ck;
@@ -4824,38 +4827,38 @@ static AV *contacts_find(pTHX_ structset *CSP_RESTRICT s, NV cut, bool store)
 					d2 = dx * dx + dy * dy + dz * dz;
 					if (d2 >= cut * cut) continue;
 					d = nv_sqrt(d2);
-					for (k = 0; k < n_near; k++)
-						if (near[k].res == hres[j]) break;
-					if (k < n_near) {
-						if (d < near[k].d) near[k].d = d;
+					for (k = 0; k < n_touch; k++)
+						if (touching[k].res == hres[j]) break;
+					if (k < n_touch) {
+						if (d < touching[k].d) touching[k].d = d;
 					} else {
-						if (n_near == near_cap) { near_cap *= 2; Renew(near, near_cap, touch); }
-						near[n_near].res = hres[j];
-						near[n_near].d = d;
-						n_near++;
+						if (n_touch == touch_cap) { touch_cap *= 2; Renew(touching, touch_cap, touch); }
+						touching[n_touch].res = hres[j];
+						touching[n_touch].d = d;
+						n_touch++;
 					}
 				}
 			}
 		}
-		for (k = 0; k < n_near; k++) {
+		for (k = 0; k < n_touch; k++) {
 			HV *h = newHV();
 			pi_field(aTHX_ h, "chain1", 6, s->res_hv[r], "chain", 5);
 			pi_field(aTHX_ h, "residue1", 8, s->res_hv[r], "key", 3);
-			pi_field(aTHX_ h, "chain2", 6, s->res_hv[near[k].res], "chain", 5);
-			pi_field(aTHX_ h, "residue2", 8, s->res_hv[near[k].res], "key", 3);
-			(void)hv_stores(h, "distance", newSVnv(near[k].d));
+			pi_field(aTHX_ h, "chain2", 6, s->res_hv[touching[k].res], "chain", 5);
+			pi_field(aTHX_ h, "residue2", 8, s->res_hv[touching[k].res], "key", 3);
+			(void)hv_stores(h, "distance", newSVnv(touching[k].d));
 			av_push(out, newRV_noinc((SV *)h));
 			if (!store) continue;
 			{
 				SV **a = hv_fetch(s->res_hv[r], "n_contacts", 10, 0);
-				SV **b = hv_fetch(s->res_hv[near[k].res], "n_contacts", 10, 0);
+				SV **b = hv_fetch(s->res_hv[touching[k].res], "n_contacts", 10, 0);
 				if (a && *a) sv_setuv(*a, SvUV(*a) + 1);
 				if (b && *b) sv_setuv(*b, SvUV(*b) + 1);
 			}
 		}
 		lo = hi;
 	}
-	Safefree(near);
+	Safefree(touching);
 	grid_free(aTHX_ &g);
 	Safefree(hx); Safefree(hy); Safefree(hz); Safefree(hres);
 	return out;
@@ -5007,8 +5010,7 @@ static NV ks_energy(const backbone *CSP_RESTRICT a, const NV *CSP_RESTRICT h,
                     const NV *CSP_RESTRICT nd)
 {
 	NV r_on = 0.0, r_ch = 0.0, r_oh = 0.0, r_cn = 0.0, e;
-	unsigned short int k;
-	for (k = 0; k < 3; k++) {
+	for (unsigned short int k = 0; k < 3; k++) {
 		NV d;
 		d = a->o[k] - nd[k];   r_on += d * d;
 		d = a->c[k] - h[k];    r_ch += d * d;
@@ -5112,9 +5114,8 @@ static AV *hbond_list(pTHX_ structset *CSP_RESTRICT s)
 {
 	AV *out = newAV();
 	UV d;
-	unsigned short int k;
 	for (d = 0; d < s->n_res; d++) {
-		for (k = 0; k < CSP_KS_KEEP; k++) {
+		for (unsigned short int k = 0; k < CSP_KS_KEEP; k++) {
 			UV a = s->ks_acc[d * CSP_KS_KEEP + k];
 			HV *h;
 			if (a >= s->n_res) continue;
@@ -5280,12 +5281,11 @@ OH, CN, CH, ON with the first two negated.*/
 static float dssp_energy(const dssp_res *CSP_RESTRICT a, const dssp_res *CSP_RESTRICT d)
 {
 	float v[3], r[4], lo, hi, e;
-	unsigned short int k;
 	dssp_sub3(d->h, a->o, v); r[0] = dssp_dot3(v, v);
 	dssp_sub3(d->n, a->c, v); r[1] = dssp_dot3(v, v);
 	dssp_sub3(d->h, a->c, v); r[2] = dssp_dot3(v, v);
 	dssp_sub3(d->n, a->o, v); r[3] = dssp_dot3(v, v);
-	for (k = 0; k < 4; k++) r[k] = 1.0f / (float)sqrt((double)r[k]);
+	for (unsigned short int k = 0; k < 4; k++) r[k] = 1.0f / (float)sqrt((double)r[k]);
 	lo = (-DSSP_COUPLE) * r[0] + (-DSSP_COUPLE) * r[1];
 	hi = DSSP_COUPLE * r[2] + DSSP_COUPLE * r[3];
 	e = lo + hi;

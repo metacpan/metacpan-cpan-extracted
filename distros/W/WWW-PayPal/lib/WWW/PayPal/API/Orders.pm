@@ -7,7 +7,7 @@ use Carp qw(croak);
 use WWW::PayPal::Order;
 use namespace::clean;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 
 has client => (
@@ -188,7 +188,7 @@ WWW::PayPal::API::Orders - PayPal Checkout / Orders v2 API
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

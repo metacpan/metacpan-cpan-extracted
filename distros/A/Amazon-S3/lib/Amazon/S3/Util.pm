@@ -5,17 +5,18 @@ use warnings;
 
 use Amazon::S3::Constants qw(:all);
 use Data::Dumper;
-use Digest::MD5       qw(md5 md5_hex);
+use Digest::MD5 qw(md5 md5_hex);
 use Digest::MD5::File qw(file_md5 file_md5_hex);
-use English           qw(-no_match_vars);
+use English qw(-no_match_vars);
 use MIME::Base64;
 use Scalar::Util qw(reftype);
-use URI::Escape  qw(uri_escape_utf8);
+use URI::Escape qw(uri_escape_utf8);
 use XML::Simple;
 
 use parent qw(Exporter);
 
 our @EXPORT_OK = qw(
+  choose
   create_query_string
   create_grant_header
   create_xml_request
@@ -25,9 +26,29 @@ our @EXPORT_OK = qw(
   get_parameters
 );
 
+our $VERSION = '2.1.0';
+
 our %EXPORT_TAGS;
 
 $EXPORT_TAGS{all} = [@EXPORT_OK];
+
+########################################################################
+sub choose(&) { ## no critic
+########################################################################
+  my $code = shift;
+
+  # Pass the correct context down to the block
+  if (wantarray) {
+    return $code->();
+  }
+  elsif ( defined wantarray ) {
+    return scalar $code->();
+  }
+  else {
+    $code->();
+    return;
+  }
+}
 
 ########################################################################
 sub urlencode {
@@ -51,8 +72,7 @@ sub create_query_string {
   return $EMPTY
     if !$parameters || !keys %{$parameters};
 
-  return join $AMPERSAND,
-    map { sprintf '%s=%s', $_, urlencode( $parameters->{$_} ) }
+  return join $AMPERSAND, map { sprintf '%s=%s', $_, urlencode( $parameters->{$_} ) }
     keys %{$parameters};
 }
 

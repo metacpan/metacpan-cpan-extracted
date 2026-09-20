@@ -157,4 +157,61 @@ require POSIX;
     is($p{reaped}, 0, 'and no peer reaped');
 }
 
+# ---- a reader at a hole never sleeps inside one look ----------------------
+#
+# The default drain waits at a hole so a caller gets an answer; an event loop
+# cannot afford that, and the C ABI never does it. `wait => 0` is that
+# behaviour from Perl: it returns at once with what came before the hole, and
+# the grace period runs on the cursor across calls rather than inside one - so
+# a queue-group claim, which always behaves this way, comes back at once too.
+
+{
+    require Time::HiRes;
+    my $arena = Shared::Arena->create(size => 512 * 1024);
+    my $ring  = $arena->ring('quick', slots => 32, slot_size => 128);
+    $arena->region('flag', size => 16);
+    $arena->poke('flag', 0, '....');
+
+    my $cursor = $ring->cursor;
+    my $group  = $ring->group('pool');
+    $ring->publish('ok', 'before');
+
+    # A full second in the stall against a half-second grace: a look that
+    # slept the grace would take 500ms; one that does not takes microseconds.
+    $arena->_test_timing(stall_us => 1_000_000, reap_grace_us => 500_000);
+
+    my $pid = fork();
+    die "fork: $!" unless defined $pid;
+    if (!$pid) {
+        $arena->poke('flag', 0, 'GO!!');
+        $ring->publish('slow', 'eventually');
+        POSIX::_exit(0);
+    }
+    my $spins = 0;
+    while (($ring->stats)[5] < 3) {
+        die "child never reserved a sequence\n" if ++$spins > 50_000_000;
+    }
+
+    my $t0  = Time::HiRes::time();
+    my @got = $cursor->drain(wait => 0);
+    my $t1  = Time::HiRes::time();
+    my @cl  = $group->claim;
+    my $t2  = Time::HiRes::time();
+
+    is(scalar @got, 1, 'wait => 0 delivered the record before the hole');
+    is($got[0][1], 'before', '...and that one only');
+    cmp_ok(($t1 - $t0) * 1000, '<', 100,
+           'and came back well inside the grace period rather than sleeping it');
+    is(scalar @cl, 1, 'a group claim took the record before the hole');
+    cmp_ok(($t2 - $t1) * 1000, '<', 100, 'and came back at once too');
+
+    waitpid $pid, 0;
+    my @rest = $cursor->drain;
+    is(scalar @rest, 1, 'the slow record arrives whole once committed');
+    is($rest[0][1], 'eventually', 'and is the one that was published');
+    my %s = $cursor->stats;
+    is($s{abandoned} + $s{unattributed}, 0, 'with nothing written off');
+    $arena->_test_timing(stall_us => 0);
+}
+
 done_testing;

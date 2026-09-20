@@ -4,6 +4,12 @@
 # control and must never be exposed to the public internet. Containers talk to
 # each other over the compose network via http://crawl4ai:11235 and
 # http://cloakbrowser:9222.
+#
+# Crawl4AI 0.9.3 REQUIRES CRAWL4AI_API_TOKEN: without it the server binds the
+# container's loopback only, so the published 11235 port resets every connection
+# and the stack looks dead. With a token it binds 0.0.0.0 and requires
+# `Authorization: Bearer <token>` on every endpoint except /health. Export the
+# SAME value for the client — WWW::Crawl4AI reads $ENV{CRAWL4AI_API_TOKEN}.
 services:
   crawl4ai:
     image: unclecode/crawl4ai:latest
@@ -14,7 +20,14 @@ services:
       - "127.0.0.1:11235:11235"
     environment:
       - CRAWL4AI_LOG_LEVEL=INFO
-      # - CRAWL4AI_API_TOKEN=changeme   # uncomment to require a bearer token
+      # Required on 0.9.3 (see header). Change this token; a fixed default is
+      # only safe here because the port above is bound to 127.0.0.1.
+      - CRAWL4AI_API_TOKEN=changeme-crawl4ai-token
+      # 0.9.3's SSRF guard refuses to crawl private/internal hosts. Uncomment
+      # ONLY to crawl internal targets; never on an internet-facing host.
+      # - CRAWL4AI_ALLOW_INTERNAL_URLS=true
+      # POST /execute_js is disabled by default in 0.9.3; uncomment to enable.
+      # - CRAWL4AI_EXECUTE_JS_ENABLED=true
     depends_on:
       cloakbrowser:
         condition: service_healthy

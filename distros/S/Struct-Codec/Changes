@@ -1,5 +1,19 @@
 Revision history for Struct::Codec
 
+0.07	2026-09-19
+        - A pointer object whose integer has been printed was encoded, not
+          refused: before 5.36 perl marks the digits it caches as a string.
+          A string that spells the integer back is the integer now, so the
+          refusal is the same on every perl. A blessed decimal string used
+          as a number has those flags too and is refused with it.
+
+0.06	2026-09-19
+        - Refuse a pointer object: a blessed integer scalar in a class with a
+          DESTROY, on encode and on decode, so the copy's DESTROY never frees
+          an address it does not own.
+        - struct_encode takes strip_pointers => 1 to write such an object as
+          undef instead.
+
 0.05	2026-09-18
         - FIXES a heap corruption decoding a hash key of length zero that
           carries the UTF-8 flag. 

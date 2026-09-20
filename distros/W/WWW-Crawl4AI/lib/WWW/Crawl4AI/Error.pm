@@ -53,7 +53,7 @@ WWW::Crawl4AI::Error - structured error class for WWW::Crawl4AI
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

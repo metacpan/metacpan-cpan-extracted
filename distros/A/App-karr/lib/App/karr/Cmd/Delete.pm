@@ -1,11 +1,11 @@
 # ABSTRACT: Delete a task
 
 package App::karr::Cmd::Delete;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
-  usage_string => 'USAGE: karr delete ID[,ID,...] [--yes] [--json]',
+  usage_string => 'USAGE: karr delete ID[,ID,...] [--yes] [--claim NAME] [--json]',
 );
 use IO::Handle;
 use App::karr::CrossBoard;
@@ -24,6 +24,12 @@ option yes => (
   doc => 'Skip confirmation',
 );
 
+option claim => (
+  is => 'ro',
+  format => 's',
+  doc => 'Delete a task claimed by this agent',
+);
+
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
 
@@ -36,14 +42,14 @@ sub execute {
   my $id_str = $pos[0];
   # See the note in Cmd::Move: length, not truth, or the id "0" is read as no
   # id at all and answered with a usage error instead of "not found" (#239).
-  die "Usage: karr delete ID[,ID,...] [--yes] [--json]\n"
+  die "Usage: karr delete ID[,ID,...] [--yes] [--claim NAME] [--json]\n"
     unless defined $id_str && length $id_str;
   # And a comma with no ids around it passes that guard and
   # splits to nothing, so the command used to exit 0 having done nothing --
   # which on a delete reads as "deleted", and is the worst possible place for
   # that ambiguity.
   my @ids = $self->parse_ids($id_str);
-  die "Usage: karr delete ID[,ID,...] [--yes] [--json]\n" unless @ids;
+  die "Usage: karr delete ID[,ID,...] [--yes] [--claim NAME] [--json]\n" unless @ids;
 
   # Every id is attempted, whatever the ones before it did. A missing id used to
   # die from inside this loop, which on delete was the worst version of the bug
@@ -60,11 +66,13 @@ sub execute {
     # and for every other command on the mutation path (ticket k264).
     die $self->task_not_found($id) unless $task;
 
-    # A live claim blocks the delete whoever holds it -- an empty claimant, the
-    # way kanban-md's cmd/delete.go calls CheckClaim. Neither implementation
-    # gives delete a --claim option, so releasing the claim (or letting it
-    # expire) is the way through, for the holder as much as for anybody else.
-    $self->check_claim($task, undef);
+    # A live claim blocks the delete whoever holds it -- unless --claim names
+    # the holder, which is the key the refusal message now offers (ticket
+    # #269). kanban-md's cmd/delete.go still passes an empty claimant and has
+    # no --claim option; karr's delete takes one so the hint the claim check
+    # prints is followable. Releasing the claim (or letting it expire) stays
+    # the other way through, for the holder as much as for anybody else.
+    $self->check_claim($task, $self->claim);
 
     # Before the confirmation, never after it. The point of the warning is that
     # it can still change the answer, and the operator who reads it and types
@@ -190,7 +198,7 @@ sub execute {
       }
     }
 
-    $self->delete_task_guarded($task->id, undef);
+    $self->delete_task_guarded($task->id, $self->claim);
     printf "Deleted task %d: %s\n", $task->id, $task->title unless $self->json;
     # Reported here and not before the prompt, because a card the operator
     # answered "n" for had its claim examined but not overridden. The two
@@ -351,12 +359,13 @@ App::karr::Cmd::Delete - Delete a task
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 
     karr delete 9
     karr delete 9,10,11 --yes
+    karr delete 9 --yes --claim agent-fox
     karr delete 9 --json
 
 =head1 DESCRIPTION
@@ -375,6 +384,13 @@ Skips the interactive confirmation prompt for each task. Required whenever
 nothing will answer that prompt: if stdin is not a terminal and carries no
 answer, the command refuses rather than guessing.
 
+=item * C<--claim>
+
+Delete a task claimed by this agent. This is the key to the claim rule: a card
+held by C<NAME> is deleted when C<--claim NAME> is passed, and a card held by
+anybody else is still refused. The claim is not re-stamped -- the card is
+being removed, so the name only unlocks the check.
+
 =back
 
 The prompt itself goes to STDERR, on every path and not only under C<--json>: a
@@ -388,8 +404,10 @@ or false -- under C<--json>.
 
 =head1 CLAIMS
 
-A task with a live claim is not deleted, whoever holds it. Release the claim
-with C<< karr edit ID --release >> or wait for C<claim_timeout> to expire it.
+A task with a live claim is not deleted, whoever holds it -- unless C<--claim>
+names the holder, which is how the holder (or an agent acting for it) deletes
+its own card. Release the claim with C<< karr edit ID --release >> or wait for
+C<claim_timeout> to expire it.
 
 =head1 DEPENDENTS
 

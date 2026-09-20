@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -93,6 +93,10 @@ interfaces (F<xs/>).
         bus_slots      => 2048,        # message bus: ring depth
         bus_slot_size  => 2048,        # ... and the largest message
         bus_groups     => 64,          # ... and how many named queue groups
+        arena_name     => 'app',       # Shared::Arena name (default: anonymous)
+        arena_size     => 8_000_000,   # ... and its bytes (default: computed)
+        distinct_clients => 0,         # count distinct peers at accept (see
+                                       # "Pool state"; costs ~20ns an accept)
     );
 
 The event backend is chosen automatically (kqueue, io_uring, epoll, then poll) and can
@@ -671,12 +675,14 @@ L</Stream handles>.
 
 =head2 Denylist and rate limiting
 
-Hyperman maps a small anonymous shared-memory arena B<before it forks its
-workers>, holding an IP denylist and a set of fixed-window rate counters. It
-is shared, not per-worker, on purpose: a counter kept per worker would let a
-C<100/min> limit through at C<workers x 100/min>, and a denylist kept per
-worker would be a different list on each. Because the mapping is inherited
-across the fork, every worker reads and writes the one copy.
+Hyperman creates a L<Shared::Arena> B<before it forks its workers> (see
+L</arena>) and keeps an IP denylist and a set of fixed-window rate counters
+on two maps in it. They are shared, not per-worker, on purpose: a counter
+kept per worker would let a C<100/min> limit through at C<workers x 100/min>,
+and a denylist kept per worker would be a different list on each. Because the
+mapping is inherited across the fork, every worker reads and writes the one
+copy, and C<< Hyperman->arena->map('deny') >> and C<map('rate')> are those
+very maps.
 
 The B<denylist> is enforced at C<accept>: a blocked peer's connection is
 closed before a connection object is built or a byte is read - the cheapest
@@ -686,13 +692,15 @@ C<rate_capacity> size the two tables (both default, and both round-trip a few
 thousand entries).
 
 The B<rate counters> are a fixed window: at most C<limit> hits against a key
-in each C<window>-second wall-clock slot, the first hit of a new slot finding
-a stale record and zeroing it - no timer, no sweep. A slot whose window has
-rolled is reclaimable, so when the keys that filled the table go quiet their
-slots are reused on demand by new keys rather than lingering; sizing
-C<rate_capacity> above the peak of distinct keys in a window keeps live
-counters from evicting each other (an over-capacity eviction resets a
-counter, so it would leak looser, never tighter). N gateways behind a load
+in each C<window>-second wall-clock slot. The first hit of a slot creates the
+counter with a deadline at the slot's end, every later hit counts against
+that same deadline, and the first hit after it starts the next slot at one -
+no timer, no sweep, and the window never slides. A lapsed counter's slot is
+reclaimed the next time anything lands on it, so when the keys that filled
+the table go quiet their slots are reused on demand rather than lingering.
+Size C<rate_capacity> above the peak of distinct keys in a window: over
+capacity the map refuses the new key and the request is allowed, which leaks
+looser, never tighter, and disturbs no live counter. N gateways behind a load
 balancer admit up to N times the limit, which is honest rather than a
 distributed count this does not implement.
 
@@ -720,8 +728,8 @@ denylist per worker>, and a counter in the worker turns a limit of C<$n> into
 C<workers x $n>. The arena is the one copy all of them share.
 
 All four fail B<open> when there is no arena - outside a running server, or
-on a platform without the atomics it needs - so nothing is denied and nothing
-is limited. That is the same answer the accept path gives itself, and the safe
+when L<Shared::Arena> is absent or refuses to create one - so nothing is
+denied and nothing is limited. That is the same answer the accept path gives itself, and the safe
 one for a check that could not run. Note that a denylist entry added from
 inside a request is enforced at C<accept> from then on, so it takes effect on
 the B<next> connection, not the one that added it.
@@ -737,9 +745,10 @@ the B<next> connection, not the one that added it.
         $_->send($payload) for $room->clients;
     });
 
-A publish/subscribe bus across the whole worker pool, on a second
-fork-shared arena beside the one above. No Redis, no hub process, no new
-prerequisite.
+A publish/subscribe bus across the whole worker pool, on a
+L<Shared::Arena::Ring> in the server's arena (see L</arena>) beside the
+denylist and the rate counters. No Redis, no hub process. C<bus_groups> is
+accepted for compatibility and ignored: the ring's group table holds 64.
 
 It exists because a prefork server makes anything held in a worker a lie
 about the pool. L<Punk::WebSocket::Room> says so in its own documentation: a
@@ -944,6 +953,85 @@ depend on rather than assuming it ran.
 
 The C ABI's C<on_worker_start> is the same registry, for a consumer that would
 rather register a C function than a coderef.
+
+=head2 arena
+
+    my $arena = Hyperman->arena;          # a Shared::Arena, or undef
+
+    Hyperman->arena->lease('cron');       # every tenant, in the server's region
+    Hyperman->arena->hll('visitors');
+    Hyperman->arena->map('sessions', slots => 4096, slot_size => 512);
+
+The L<Shared::Arena> the server created before it forked its workers: one
+region every worker maps, with L<Shared::Arena>'s tenants all available on it.
+A structure a worker opens here is the same structure in every other worker,
+which is what a lease, a distinct count or a shared map is for.
+
+C<undef> before C<run>, and when L<Shared::Arena> could not be loaded or is
+older than this Hyperman was built against, in which case the server runs
+without one and everything that would use it fails open.
+
+C<< run(arena_name => $name) >> gives the region a name, so another process
+can C<< Shared::Arena->attach($name) >> to it and a restarted server attaches
+to the region the previous one left rather than creating a fresh one. The
+default is anonymous: inherited across the fork, gone when the last worker
+exits. C<arena_size> overrides the size Hyperman computes from its own tables;
+a tenant that does not fit is refused by L<Shared::Arena> and warns at the
+point of use.
+
+=head2 Pool state
+
+    my @rows = Hyperman->pool_stats;         # one hashref per worker
+    my $sum  = Hyperman->stats(pool => 1);   # every row summed
+
+    my $lease = Hyperman->leader('cron', ttl => 30);
+    if ($lease->acquire) { ... this worker, and only this one ... }
+
+    my ($distinct, $err) = Hyperman->distinct_clients;   # run(distinct_clients => 1)
+
+What the arena makes possible, off the hot path. The rule for everything
+here is that B<nothing runs per request or per accept by default>.
+
+B<The scoreboard.> Every worker owns one row on a L<Shared::Arena::Scoreboard>
+in the server's arena and copies its own counters into it B<once a second,
+from a timer>: requests, accepts, denied, connections, bytes out, QUIC
+datagrams, HTTP/3 requests, and a status of C<idle> or C<busy N>. One
+seqlock bracket per worker per second, and nothing on the request path.
+C<pool_stats> reads every row coherently, from a worker, from the supervisor,
+or from a process that attached by C<arena_name>, which is what a C</status>
+endpoint or a C<punk doctor> wants; C<< stats(pool => 1) >> is the sum. A
+row's C<alive> is C<kill(pid, 0)>, which answers 1 for a process this user may
+not signal, whether it lives or not. C<USR1> to the supervisor now prints one
+aggregate line and one line per worker, a dead row marked C<DEAD>; the
+workers no longer print their own.
+
+The supervisor also looks at the board every three seconds. A worker whose
+pid answers but whose row has not moved for three looks is logged as
+B<wedged>: alive is not the same as serving, and a loop that has stopped
+turning is the one failure a pid check cannot see. The respawn policy is
+unchanged; the log line is the deliverable.
+
+B<The leader.> C<leader($name, ttl => $secs)> is C<< Hyperman->arena->lease >>,
+a L<Shared::Arena::Lease>: exactly one process in the pool holds it at a time,
+and when the holder dies or fails to renew before the ttl a successor takes
+over. This is what a cron plugin or a queue scheduler needs, and the thing to
+read first is B<the fencing token>. A leader that is paused - a stop-the-world
+pause, a swap storm, a debugger - does not know it has lost the lease until
+it wakes, and by then a successor may hold it and be working. Anything the
+leader writes must carry C<< $lease->fence >> and the resource must refuse a
+stale one; without that, two leaders write and the second overwrites the
+first. L<Shared::Arena::Lease> has the whole argument.
+
+B<Distinct clients.> C<< run(distinct_clients => 1) >> opens a
+L<Shared::Arena::HyperLogLog> at precision 14 and adds every accepted peer's
+B<address> to it, right after the denylist check: a client is an address, so
+a thousand connections from one host are one client. That is a hash and a
+CAS-max on the accept path, about 10 nanoseconds per connection (measured in
+C<BENCHMARKS.md>), which is why it is B<off by default>: this server promises
+the accept path costs nothing it was not asked for, and with the option off
+the branch is one load of a NULL. C<distinct_clients> returns the estimate
+and its relative error (about 0.8%), or the empty list when off. The sketch
+is 16KB, shared by the whole pool, and never resets on its own.
 
 =head1 C ABI
 
@@ -1228,7 +1316,11 @@ message. One entry point, because they are one mechanism.
 
 C<bus_publish> returns 1 on the ring, 0 local-only (no arena), -1 refused as
 oversize. Like the v3 abuse controls it takes no C<pTHX>: the arena is
-process-global and the publish path touches no SV.
+process-global and the publish path touches no SV. The ceiling is
+C<bus_slot_size - 16> bytes of topic and payload together, the same number
+the old ring's slot header left, and a message over it is refused before the
+ring sees it; the ring itself could carry more, and a caller sizing against
+this bus must not rely on that.
 
 The callback is subject to the same contract as every other in this table and
 one that matters more here: B<it must not croak>. It is reached from the event

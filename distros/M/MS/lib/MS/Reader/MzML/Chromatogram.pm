@@ -139,7 +139,7 @@ sub rt {
 
 sub id { return $_[0]->{id} };
 
-sub window { return undef}; # TODO: implement
+sub window { return }; # TODO: implement
 
 1;
 

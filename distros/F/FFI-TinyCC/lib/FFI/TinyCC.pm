@@ -11,7 +11,7 @@ use File::Spec;
 use File::ShareDir::Dist qw( dist_share );
 
 # ABSTRACT: Tiny C Compiler for FFI
-our $VERSION = '0.30'; # VERSION
+our $VERSION = '0.31'; # VERSION
 
 
 sub _dlext ()
@@ -336,7 +336,7 @@ FFI::TinyCC - Tiny C Compiler for FFI
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -682,7 +682,7 @@ pipcet
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Graham Ollis.
+This software is copyright (c) 2015-2026 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

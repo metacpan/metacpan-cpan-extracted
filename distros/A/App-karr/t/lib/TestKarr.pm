@@ -1,6 +1,7 @@
 package TestKarr;
 use strict;
 use warnings;
+use TestEnv; # k288: scrub KARR_CLAIM before any dispatch() call below runs
 
 # In-process karr runner: dispatch the command classes many times in one
 # interpreter instead of paying ~0.3s of Perl startup per `karr` subprocess.

@@ -10,8 +10,8 @@ my $ctl = shift || '12=74,13=71'; # trigger=control,... cutoff,resonance
 my %ctl = map { split /=/, $_ } split /,/, $ctl;
 my @filters = map {
     +{
-        port  => $in,
-        event => 'control_change',
+        port    => $in,
+        event   => 'control_change',
         trigger => $_,
         control => $ctl{$_},
     }
@@ -28,3 +28,7 @@ MIDI::RtController::Filter::CC::add_filters(\@filters, { $in => $controller });
 $controller->run;
 
 # ...and now trigger a MIDI message!
+
+END {
+    $controller->stop;
+}

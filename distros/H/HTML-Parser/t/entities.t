@@ -4,7 +4,7 @@ use utf8;
 
 use HTML::Entities
     qw(_decode_entities decode_entities encode_entities encode_entities_numeric);
-use Test::More tests => 32;
+use Test::More tests => 43;
 
 my $x = "V&aring;re norske tegn b&oslash;r &#230res";
 
@@ -100,8 +100,7 @@ is($x, $ent);
 # CVE-2026-8829
 # _decode_entities heap-use-after-free when the input SV is the same SV as
 # a self-referential entity value. The payload must be large enough to
-# force grow_gap() to realloc the SV's PV; the fix copies the entity value
-# into an owned buffer so repl is not left pointing at the freed allocation.
+# force grow_gap() to realloc the SV's PV.
 {
     my $prefix_a = "A" x 32;
     my $suffix_b = "B" x 8192;
@@ -110,6 +109,139 @@ is($x, $ent);
     _decode_entities($h{foo}, \%h);
     is($h{foo}, ("A" x 64) . "&foo;" . ("B" x 16384),
         "_decode_entities() with self-aliased entity hash value");
+}
+
+# An entity name that runs to the end of the input must not match a
+# "name;" key on a byte beyond the end.  Growing the string moves the
+# tail without its NUL, so that byte holds whatever the buffer held
+# before.  Trim the string in place so a ";" is left just past its end.
+{
+    my %t = ("ab;" => "X" x 40, "a;" => "Y");
+    my $s = "&ab;&a" . (";" x 200);
+    substr($s, 6) = "";
+    _decode_entities($s, \%t);
+    is(
+        $s,
+        ("X" x 40) . "&a",
+        "_decode_entities() does not read past the end of the input"
+    );
+}
+
+# GH#68
+# An entity whose value is the string being decoded expands to the value
+# that string had when the call began, which is what an entity table
+# holding a separate copy of that string has always given.  The first two
+# cases are the examples from the ticket.
+{
+    my %g;
+    $g{foo} = "";
+    $g{bar} = "&foo;X&bar;";
+    _decode_entities($g{bar}, \%g);
+    is($g{bar}, "X&foo;X&bar;",
+        "_decode_entities() expands a self-reference after another entity");
+
+    my %i;
+    $i{foo} = "[.....]";
+    $i{bar} = "&foo;X&bar;Y";
+    _decode_entities($i{bar}, \%i);
+    is($i{bar}, "[.....]X&foo;X&bar;YY",
+        "_decode_entities() leaves no stale bytes at a self-reference");
+
+    my %j;
+    $j{amp} = "&";
+    $j{bar} = "&bar;&amp;";
+    _decode_entities($j{bar}, \%j);
+    is($j{bar}, "&bar;&amp;&",
+        "_decode_entities() keeps decoding after a self-reference");
+
+    my %p;
+    $p{nb} = "&nbspX";
+    _decode_entities($p{nb}, \%p, 1);
+    is($p{nb}, "&nbspXspX",
+        "_decode_entities() expands a self-reference matched as a prefix");
+
+    my %u;
+    $u{smile} = "\x{263a}";
+    $u{bar}   = "\xe9&smile;&bar;";
+    _decode_entities($u{bar}, \%u);
+    is(
+        $u{bar},
+        "\x{e9}\x{263a}\x{e9}&smile;&bar;",
+        "_decode_entities() expands a self-reference after an upgrade"
+    );
+}
+
+# Looking up an entity value can run Perl code, through a tied hash or
+# an overloaded object.  That code must not be able to pull the string
+# out from under the decoder.
+{
+
+    package UndefOnFetch;
+    require Tie::Hash;
+    our @ISA = ("Tie::StdHash");
+    our $target;
+    sub FETCH { undef $$target; "x" }
+}
+{
+    my %tied;
+    tie %tied, "UndefOnFetch";
+    my $s = "&foo;" . ("a" x 100);
+    $UndefOnFetch::target = \$s;
+    eval { _decode_entities($s, \%tied) };
+    like(
+        $@,
+        qr/modified while fetching an entity value/,
+        "_decode_entities() dies when a tied table undefines the string"
+    );
+}
+{
+    package ReallocateOnFetch;
+    require Tie::Hash;
+    our @ISA = ("Tie::StdHash");
+    our $target;
+    sub FETCH { undef $$target; $$target = "Z" x 1000; undef }
+}
+{
+    my %tied;
+    tie %tied, "ReallocateOnFetch";
+    my $s = "&foo;" . ("a" x 100);
+    $ReallocateOnFetch::target = \$s;
+    eval { _decode_entities($s, \%tied) };
+    like(
+        $@,
+        qr/modified while fetching an entity value/,
+        "_decode_entities() dies when a tied table reallocates the string"
+    );
+}
+{
+    my $s = "&foo;" . ("a" x 100);
+    my %t = (foo => bless {}, "ShrinkOnStringify");
+    {
+
+        package ShrinkOnStringify;
+        use overload
+            '""'     => sub { undef $s; $s = "Z" x 10; "x" },
+            fallback => 1;
+    }
+    eval { _decode_entities($s, \%t) };
+    like(
+        $@,
+        qr/modified while fetching an entity value/,
+        "_decode_entities() dies when a value shrinks the string"
+    );
+}
+{
+    my %h;
+    {
+
+        package DeleteOnStringify;
+        use overload '""' => sub { delete $h{str}; "x" }, fallback => 1;
+    }
+    $h{obj} = bless {}, "DeleteOnStringify";
+    $h{str} = "&obj;" . ("a" x 100);
+    eval { _decode_entities($h{str}, \%h) };
+    is($@, "", "_decode_entities() survives a value deleting the string");
+    ok(!exists $h{str}, "the deleted string stays deleted");
 }
 
 # From: Bill Simpson-Young <bill.simpson-young@cmis.csiro.au>

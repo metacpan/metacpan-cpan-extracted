@@ -123,14 +123,31 @@ _new_validated(CLASS, spec_rv)
         if (consumer_ops->struct_size < LES_CONSUMER_OPS_V1_REQUIRED_SIZE)
             croak("consumer operations table is smaller than ABI v1");
         if (consumer_ops->flags
-            & ~(LES_CONSUMER_F_START_PAUSED | LES_CONSUMER_F_WANT_FLUSH))
+            & ~(LES_CONSUMER_F_START_PAUSED | LES_CONSUMER_F_WANT_FLUSH
+                | LES_CONSUMER_F_RAW_INPUT))
             croak("consumer operations table has unsupported flags");
         if (!consumer_ops->name || !consumer_ops->name[0]
-            || !consumer_ops->create || !consumer_ops->message
-            || !consumer_ops->event || !consumer_ops->destroy)
+            || !consumer_ops->create || !consumer_ops->event
+            || !consumer_ops->destroy)
             croak("consumer operations table is incomplete");
+        if ((consumer_ops->flags & LES_CONSUMER_F_RAW_INPUT)) {
+            if (consumer_ops->struct_size
+                    < LES_CONSUMER_OPS_V1_RAW_INPUT_REQUIRED_SIZE
+                || !consumer_ops->input)
+                croak("consumer operations table requests raw input without an input function");
+            if (read_mode != LES_READ_DELIVER)
+                croak("raw-input native consumer requires an unframed ordered-byte class");
+            if (read_batch_bytes)
+                croak("raw-input native consumer cannot use read_batch_bytes");
+        } else {
+            if (!consumer_ops->message)
+                croak("consumer operations table is incomplete");
+            if (read_mode == LES_READ_DELIVER)
+                croak("framed native consumer requires a built-in native framer");
+        }
         if ((consumer_ops->flags & LES_CONSUMER_F_WANT_FLUSH)
-            && (consumer_ops->struct_size < sizeof(les_consumer_ops_v1_t)
+            && (consumer_ops->struct_size
+                    < LES_CONSUMER_OPS_V1_FLUSH_REQUIRED_SIZE
                 || !consumer_ops->flush))
             croak("consumer operations table requests flush without a flush function");
     } else if ((consumer_provider && SvOK(consumer_provider))
@@ -271,7 +288,9 @@ _new_validated(CLASS, object, read_fd, write_fd, descriptor_obj, input_cb = &PL_
         : descriptor->drain_cb
             ? SvREFCNT_inc_simple_NN(descriptor->drain_cb) : NULL;
 
-    if (read_fd >= 0 && descriptor->read_mode == LES_READ_DELIVER) {
+    if (read_fd >= 0 && descriptor->read_mode == LES_READ_DELIVER
+        && !(descriptor->consumer_ops
+            && (descriptor->consumer_ops->flags & LES_CONSUMER_F_RAW_INPUT))) {
         st->read_buffer = (char *)malloc(descriptor->read_size);
         if (!st->read_buffer) {
             SvREFCNT_dec(st->descriptor_sv);
@@ -490,7 +509,11 @@ _transition_ready(state_obj)
     ENTER;
     SAVEFREESV(SvREFCNT_inc(state_obj));
     st = les_state_from_sv(state_obj);
-    if (!st->closed && !LES_INPUT_PAUSED(st) && !st->read_eof
+    if (st->consumer_transition_pending && !st->consumer_call_depth
+        && !st->consumer_host_retain_count)
+        les_consumer_flush(aTHX_ st);
+    if (!st->consumer_transition_pending
+        && !st->closed && !LES_INPUT_PAUSED(st) && !st->read_eof
         && st->input_dispatch_depth == 0 && st->input_len) {
         ENTER;
         SAVEINT(st->input_dispatch_depth);
@@ -716,11 +739,29 @@ _test_consumer_destroy_count(CLASS)
   OUTPUT:
     RETVAL
 
+UV
+_test_consumer_last_destroy_flushes(CLASS)
+    const char *CLASS
+  CODE:
+    PERL_UNUSED_VAR(CLASS);
+    RETVAL = les_test_consumer_last_destroy_flushes();
+  OUTPUT:
+    RETVAL
+
 int
 _test_consumer_external_arm(object, callback)
     SV *object
     SV *callback
   CODE:
     RETVAL = les_test_consumer_external_arm(aTHX_ object, callback);
+  OUTPUT:
+    RETVAL
+
+SV *
+_test_consumer_transition_retain(object, callback)
+    SV *object
+    SV *callback
+  CODE:
+    RETVAL = les_test_consumer_transition_retain(aTHX_ object, callback);
   OUTPUT:
     RETVAL

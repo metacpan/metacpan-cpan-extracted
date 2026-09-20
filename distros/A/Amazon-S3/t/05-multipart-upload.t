@@ -5,14 +5,15 @@
 use warnings;
 use strict;
 
-use lib qw( . lib);
+use lib qw(t/lib);
 
 use Carp;
+use Carp::Always;
 
 use Data::Dumper;
 use Digest::MD5::File qw(file_md5_hex);
-use English           qw{-no_match_vars};
-use File::Temp        qw{ tempfile };
+use English qw{-no_match_vars};
+use File::Temp qw{ tempfile };
 use Test::More;
 
 use S3TestUtils qw(:constants :subs);
@@ -54,11 +55,9 @@ subtest 'multipart-manual' => sub {
   my $part_list = {};
 
   my $part = 0;
-  my $data = 'x' x ( 1024 * 1024 * 5 ); # 5 MB part
+  my $data = 'x' x ( 1024 * 1024 * 5 );  # 5 MB part
 
-  my $etag
-    = $bucket_obj->upload_part_of_multipart_upload( $key, $id, ++$part, $data,
-    length $data );
+  my $etag = $bucket_obj->upload_part_of_multipart_upload( $key, $id, ++$part, $data, length $data );
 
   $part_list->{$part} = $etag;
 

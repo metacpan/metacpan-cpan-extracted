@@ -1,7 +1,7 @@
 # ABSTRACT: The one guarded path for changing an existing task
 
 package App::karr::Role::TaskMutation;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo::Role;
 # No Time::Piece here on purpose: this role never asks for the time itself --
 # the lifecycle stamps are set by App::karr::Task::update_timestamps, which
@@ -347,8 +347,8 @@ sub apply_status_change {
     # and the status this call already has -- see claim_hint_tokens for why the
     # command name comes from the consumer.
     App::karr::Error::user_error(
-        "Status '$new_status' requires a claim:\n",
-        App::karr::Error::command_hint( $self->claim_hint_tokens( $task, $new_status ) ) )
+        App::karr::Error::require_claim_message(
+            $new_status, $self->claim_hint_tokens( $task, $new_status ) ) )
         if $self->store->status_requires_claim($new_status)
         && !( defined $claimant && length $claimant )
         && !$task->has_claimed_by;
@@ -398,7 +398,7 @@ App::karr::Role::TaskMutation - The one guarded path for changing an existing ta
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 DESCRIPTION
 

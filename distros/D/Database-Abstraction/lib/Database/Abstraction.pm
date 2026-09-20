@@ -64,11 +64,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.43
+Version 0.44
 
 =cut
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 =head1 DESCRIPTION
 
@@ -133,7 +133,7 @@ A CHI-compatible cache layer is also supported.
     use parent 'Database::Abstraction';
 
     # 2. Open the database - file is auto-detected from the class name
-    #    (looks for foo.sql / foo.psv / foo.csv / foo.xlsx / foo.xml / foo.db)
+    #    (looks for foo.sql / foo.sqlite / foo.sqlite3 / foo.psv / foo.csv / foo.xlsx / foo.xml / foo.db)
     my $db = Database::Foo->new(directory => '/path/to/data');
 
     # 3. Simple lookups -----------------------------------------------
@@ -238,7 +238,7 @@ The module probes the C<directory> for files in this priority order:
 
 =item 1. C<SQLite>
 
-File ending C<.sql>
+File ending C<.sql>, C<.sqlite>, or C<.sqlite3>
 
 =item 2. C<Deep>
 
@@ -859,7 +859,7 @@ sub _open :Protected
 			my $tmpdir_obj = File::Temp->newdir(CLEANUP => 1);
 			$self->{'_remote_tmpdir'} = $tmpdir_obj;	# auto-cleans on DESTROY
 			my $tmpdir = $tmpdir_obj->dirname();
-			for my $ext (qw(sql dbm deep db csv.gz db.gz psv tsv xls xlsx csv xml)) {
+			for my $ext (qw(sql sqlite sqlite3 dbm deep db csv.gz db.gz psv tsv xls xlsx csv xml)) {
 				my $remote_file = "$remote_dir/$dbname.$ext";
 				my $content = eval { scalar File::Slurp::Remote::read_remote_file($host, $remote_file) };
 				next unless defined($content) && length($content);
@@ -875,7 +875,13 @@ sub _open :Protected
 	} else {
 		$dir = Cwd::abs_path($self->{'directory'} || $defaults{'directory'});
 	}
-	my $slurp_file = File::Spec->catfile($dir, "$dbname.sql");
+	# Probe for SQLite files (.sql, .sqlite, .sqlite3)
+	my $slurp_file;
+	for my $ext (qw(sql sqlite sqlite3)) {
+		my $candidate = File::Spec->catfile($dir, "$dbname.$ext");
+		if(-r $candidate) { $slurp_file = $candidate; last }
+	}
+	$slurp_file //= File::Spec->catfile($dir, "$dbname.sql");
 
 	$self->_debug("_open: try to open $slurp_file");
 
@@ -2953,7 +2959,7 @@ DBI failed to connect to the given C<dsn>.  Check credentials and host.
 
 =item C<< Can't find a file called 'I<name>' for the table I<T> in I<dir> >>
 
-None of the probe extensions (C<.sql>, C<.psv>, C<.tsv>, C<.csv>, C<.xlsx>, C<.db>, C<.xml>)
+None of the probe extensions (C<.sql>, C<.sqlite>, C<.sqlite3>, C<.psv>, C<.tsv>, C<.csv>, C<.xlsx>, C<.db>, C<.xml>)
 matched in C<directory>.
 
 =item C<< I<Class>: prepare failed: I<$errstr> >>

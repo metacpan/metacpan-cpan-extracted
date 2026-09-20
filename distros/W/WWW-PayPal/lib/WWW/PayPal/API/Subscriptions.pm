@@ -7,7 +7,7 @@ use Carp qw(croak);
 use WWW::PayPal::Subscription;
 use namespace::clean;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 
 has client => (
@@ -133,7 +133,7 @@ WWW::PayPal::API::Subscriptions - PayPal Billing Subscriptions API (v1)
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

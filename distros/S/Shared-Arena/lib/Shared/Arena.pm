@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Frozen;
 use Struct::Codec;
@@ -24,7 +24,7 @@ Shared::Arena - memory two processes can both read, without a syscall
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 
@@ -460,7 +460,9 @@ inherited nothing. There, C<waker_fd> returns -1 and the reader polls.
 
     $arena->wakers($count);
 
-Creates the wakeup channels. Must run before the fork.
+Creates the wakeup channels. Must run before the fork. Every publish pokes
+each of the C<$count> channels but the publisher's own, so ask for the number
+of processes that will read, not a round number.
 
 =head2 waker
 

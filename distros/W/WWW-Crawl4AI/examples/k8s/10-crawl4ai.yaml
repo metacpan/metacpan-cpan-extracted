@@ -1,0 +1,115 @@
+# Crawl4AI REST service (the Docker API on port 11235), the same image the
+# examples/docker-compose.yml stack uses. This is the target the Perl client
+# talks to; WWW::Crawl4AI::Client->base_url points at the Service below.
+#
+# Crawl4AI 0.9.3 security posture — all three settings below are REQUIRED for
+# this sample to work, and each is a real change from an unconfigured run:
+#   * CRAWL4AI_API_TOKEN   — without a token the server binds the CONTAINER's
+#     loopback only, so the readiness probe and the Service both get connection
+#     resets and the pod never turns ready. Setting it makes the server bind
+#     0.0.0.0 AND require `Authorization: Bearer <token>` on every endpoint
+#     except /health. The Perl client sends it via $ENV{CRAWL4AI_API_TOKEN}.
+#   * CRAWL4AI_ALLOW_INTERNAL_URLS — 0.9.3 adds SSRF protection that refuses to
+#     crawl private/internal hosts. The fixture Service is exactly that, so the
+#     live tests need this on. Leave it OFF for any internet-facing deployment.
+#   * CRAWL4AI_EXECUTE_JS_ENABLED — /execute_js is disabled by default (arbitrary
+#     JS + SSRF risk); the t/70 execute_js subtest needs it enabled.
+#
+# NOTE: no CloakBrowser sidecar here (crawl4ai plain is enough for the tests).
+# Add one + set CLOAKBROWSER_CDP_URL for the stealth-CDP backend; never expose
+# that CDP port outside the cluster.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: crawl4ai-secrets
+  namespace: crawl4ai-test
+type: Opaque
+stringData:
+  # SAMPLE ONLY — replace before any real use, e.g.
+  #   kubectl -n crawl4ai-test create secret generic crawl4ai-secrets \
+  #     --from-literal=api-token="$(openssl rand -hex 32)"
+  api-token: "change-me-sample-token"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crawl4ai
+  namespace: crawl4ai-test
+  labels:
+    app.kubernetes.io/name: crawl4ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: crawl4ai
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: crawl4ai
+    spec:
+      containers:
+        - name: crawl4ai
+          image: unclecode/crawl4ai:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 11235
+          env:
+            - name: CRAWL4AI_LOG_LEVEL
+              value: INFO
+            - name: CRAWL4AI_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: crawl4ai-secrets
+                  key: api-token
+            # Required only because the crawl target is the in-cluster fixture
+            # (a private host). Remove for an internet-facing deployment.
+            - name: CRAWL4AI_ALLOW_INTERNAL_URLS
+              value: "true"
+            # Enables POST /execute_js (off by default in 0.9.3).
+            - name: CRAWL4AI_EXECUTE_JS_ENABLED
+              value: "true"
+          # Chromium needs a large /dev/shm or it crashes on real pages.
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crawl4ai
+  namespace: crawl4ai-test
+  labels:
+    app.kubernetes.io/name: crawl4ai
+spec:
+  selector:
+    app.kubernetes.io/name: crawl4ai
+  ports:
+    - name: http
+      port: 11235
+      targetPort: http

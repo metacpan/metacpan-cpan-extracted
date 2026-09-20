@@ -9,42 +9,32 @@ use File::Temp qw( tempdir );
 use Cwd qw( abs_path );
 use Path::Tiny qw( path );
 
-# Ticket #176: `karr agentname` mints a new name on every call and remembers it
-# nowhere, and the shipped docs demonstrated the idiom as
+# Ticket #176 filed the claim-continuity bug: `karr agentname` minted a NEW
+# random name every call, so `karr pick --claim "$(karr agentname)"` followed by
+# `karr handoff ID --claim "$(karr agentname)"` claimed under one name and handed
+# off under another. The fix recorded on #176 was documentation only -- keep the
+# generator random and stateless, warn against the inline shape, show only the
+# capture-once idiom.
 #
-#     karr pick --claim "$(karr agentname)" --move in-progress
-#
-# which is correct for that one call and wrong for everything an agent does
-# afterwards. Copied by analogy to the end of the work --
-# `karr handoff ID --claim "$(karr agentname)"` -- it claims under one name and
-# hands off under another. That is what bit a worker on this repo's own board.
-#
-# The decision recorded on #176 was to keep the generator random and stateless
-# (a name derived from anything stable enough to survive across separate karr
-# processes -- board, git identity, host -- would be shared by every concurrent
-# agent on that board, turning a refused mismatch into an unrefusable
-# collision) and to make the documentation carry the warning and show only the
-# capture-once idiom. So this test pins three things:
-#
-#   1. the property that makes the idiom dangerous (the name really is fresh
-#      every call), because a future "let's cache it" change must not land
-#      quietly;
-#   2. what the mismatch actually does -- refused while the claim is live, with
-#      the held name in the error, and silent on the read paths -- since that
-#      is exactly what the new POD promises a confused agent;
-#   3. that no shipped doc or POD demonstrates the breaking shape again.
-
-my $ROOT = abs_path('.');
-
-# In-process runner (t/lib/TestKarr.pm): same ($cwd, @argv) signature and
-# { exit, stdout, stderr } return as the open3 helper this file used to carry,
-# dispatched through the shared App::karr::Dispatch path. KARR_TEST_SUBPROC=1
-# restores the old open3 path.
-sub _run_karr { return run_karr(@_) }
+# ADR 0005 (ticket #281) SUPERSEDES that decision. `karr agent-name` is no longer
+# random: it returns the checkout's own directory name, sanitised to a claim-safe
+# token, which is STABLE across calls. So the very shape #176 warned about now
+# agrees with itself, and the recommended carrier is `KARR_CLAIM`, exported once,
+# from which every claiming command defaults. This test now pins the new
+# contract: the name is stable, the inline substitution is safe, and the mismatch
+# #176 was about no longer happens by construction. (The precise agent-name
+# behaviour and the KARR_CLAIM default across commands live in t/281.)
 
 # Always a throwaway repo; never the developer's real board.
+sub _run_karr { return run_karr(@_) }
+
 sub _setup_repo {
-    my $repo = tempdir( CLEANUP => 1 );
+    # A named directory: agent-name derives the claim from the worktree root's
+    # basename, so a stable, predictable name needs a stable, predictable dir.
+    my $parent = tempdir( CLEANUP => 1 );
+    my $repo   = path($parent)->child('continuity-board');
+    $repo->mkpath;
+    $repo = "$repo";
     system( 'git', 'init', '-q', $repo ) == 0 or die 'git init failed';
     system( 'git', '-C', $repo, 'config', 'user.email', 'test@example.com' ) == 0
       or die 'git config failed';
@@ -58,158 +48,77 @@ sub _setup_repo {
 }
 
 sub _name {
-    my ($repo) = @_;
-    my $rv = _run_karr( $repo, 'agentname' );
-    is( $rv->{exit}, 0, 'karr agentname exits 0' ) or diag $rv->{stderr};
+    my ( $repo, @args ) = @_;
+    my $rv = _run_karr( $repo, 'agent-name', @args );
+    is( $rv->{exit}, 0, 'karr agent-name exits 0' ) or diag $rv->{stderr};
     my $name = $rv->{stdout};
     chomp $name;
     return $name;
 }
 
-subtest 'agentname is ephemeral: repeated calls do not agree' => sub {
+subtest 'agent-name is stable: repeated calls agree (ADR 0005)' => sub {
     my $repo = _setup_repo();
 
-    # Six draws from a word list of hundreds. Asserting "call 1 ne call 2"
-    # would be a flaky test (two draws can legitimately collide); asserting
-    # that six draws are not *all* the same value cannot fail by chance in any
-    # practical sense, and still fails immediately the day someone makes the
-    # name stable per repo or per board -- which is the change #176 decided
-    # against and which this pins.
+    # The opposite of the property #176 pinned. Six draws must ALL be the same
+    # value now -- and be the sanitised checkout basename, not a random word.
     my %seen;
     $seen{ _name($repo) }++ for 1 .. 6;
 
-    cmp_ok( scalar keys %seen, '>', 1,
-        'six karr agentname calls do not all return the same name' )
-      or diag "every call returned: " . join( ', ', keys %seen );
+    is( scalar keys %seen, 1,
+        'six karr agent-name calls all return the same name' )
+      or diag "calls returned: " . join( ', ', keys %seen );
+    is( ( keys %seen )[0], 'continuity-board',
+        'and it is the sanitised worktree directory name' );
 };
 
-subtest 'a freshly minted name does not carry the claim' => sub {
+subtest 'the inline substitution #176 warned about now agrees with itself' => sub {
     my $repo = _setup_repo();
 
     my $create = _run_karr( $repo, 'create', 'Claim continuity' );
     is( $create->{exit}, 0, 'task created' ) or diag $create->{stderr};
 
-    my $claimed  = _name($repo);
-    my $unrelated;
-    # Guard against the (astronomically unlikely) draw that repeats the claim
-    # name, which would make the mismatch assertions below vacuous.
-    do { $unrelated = _name($repo) } while $unrelated eq $claimed;
+    # Claim with one $(karr agent-name), hand off with another: the exact pair
+    # #176 said must never be written inline. Because the name is now stable,
+    # both substitutions produce the same value, so the handoff matches the claim
+    # and succeeds -- the continuity #176 wanted, achieved without a variable.
+    my $claimed = _name($repo);
+    my $again   = _name($repo);
+    is( $again, $claimed, 'two separate agent-name calls produce one name' );
 
     my $move = _run_karr( $repo, 'move', '1', 'in-progress', '--claim', $claimed );
     is( $move->{exit}, 0, 'move claims the task' ) or diag $move->{stderr};
 
-    # The write path is loud: check_claim refuses, and names the holder, which
-    # is the recovery route App::karr::Cmd::AgentName's POD points a confused
-    # agent at.
-    my $handoff = _run_karr( $repo, 'handoff', '1', '--claim', $unrelated, '--note', 'x' );
-    isnt( $handoff->{exit}, 0, 'handoff under a freshly minted name is refused' );
-    like( $handoff->{stderr}, qr/\Qis claimed by $claimed\E/,
-        'the refusal names the claim actually held, so the name is recoverable' );
+    my $handoff = _run_karr( $repo, 'handoff', '1', '--claim', $again, '--note', 'x' );
+    is( $handoff->{exit}, 0, 'handoff under the same stable name is accepted' )
+      or diag $handoff->{stderr};
 
     my $show = _run_karr( $repo, 'show', '1' );
     like( $show->{stdout}, qr/^Claimed:\s+\Q$claimed\E$/m,
-        'karr show reads the held claim name back off the card' );
-
-    # The read paths are silent: no error, no output, exit 0. This is why the
-    # mismatch is easy to miss -- an agent that asks "what do I hold?" under a
-    # fresh name is told "nothing" rather than "wrong name".
-    my $list = _run_karr( $repo, 'list', '--claimed-by', $unrelated, '--compact' );
-    is( $list->{exit}, 0, 'list --claimed-by with a fresh name exits 0' );
-    unlike( $list->{stdout}, qr/Claim continuity/,
-        'list --claimed-by silently reports nothing for the fresh name' );
-
-    my $log = _run_karr( $repo, 'log', '--agent', $unrelated );
-    is( $log->{exit}, 0, 'log --agent with a fresh name exits 0' );
-    unlike( $log->{stdout}, qr/\bmove\b/,
-        'log --agent silently reports nothing for the fresh name' );
-
-    # ... while the name that was actually used finds both.
-    my $list_ok = _run_karr( $repo, 'list', '--claimed-by', $claimed, '--compact' );
-    like( $list_ok->{stdout}, qr/Claim continuity/,
-        'the captured name still finds the task' );
+        'the card is held under the checkout name throughout' );
 };
 
-subtest 'no shipped doc demonstrates --claim "$(karr agentname)"' => sub {
-    my $root = path($ROOT);
+subtest 'KARR_CLAIM defaults every claiming call to the checkout name' => sub {
+    my $repo = _setup_repo();
 
-    # Every place a user or agent copies a command line from. Some of these are
-    # absent outside a full source checkout (.claude/ is repo-only, docs/ and
-    # share/ may be pruned), so missing roots are skipped rather than failed --
-    # the same shape t/62 and t/136 use.
-    my @roots = grep { $_->exists } map { $root->child(@$_) } (
-        [qw( lib )],
-        [qw( bin karr )],
-        [qw( share claude-skill.md )],
-        [qw( README.md )],
-        [qw( CONTEXT.md )],
-        [qw( docs )],
-        [qw( .claude )],
-    );
+    _run_karr( $repo, 'create', 'Exported' );
 
-    my @files;
-    for my $r (@roots) {
-        if ( $r->is_dir ) {
-            $r->visit(
-                sub {
-                    my ($p) = @_;
-                    push @files, $p if -f $p && $p =~ /\.(?:pm|md|pod|t)\z/;
-                },
-                { recurse => 1 }
-            );
-        }
-        else { push @files, $r }
-    }
+    my $name = _name($repo);
+    is( $name, 'continuity-board', 'the name to export' );
 
-    cmp_ok( scalar @files, '>', 0, 'found documentation files to scan' );
+    # The recommended shape: export once, omit --claim everywhere after.
+    local $ENV{KARR_CLAIM} = $name;
 
-    my @bad;
-    for my $file (@files) {
-        my @lines = split /\n/, $file->slurp_utf8, -1;
-        my $n     = 0;
-        for my $line (@lines) {
-            $n++;
-            # Only copy-pasteable command lines: a line that *starts* with the
-            # command. Prose that quotes the broken shape in order to warn
-            # about it (as the skill doc now does) is not a demonstration of
-            # it, and neither is a line explicitly marked as a counter-example.
-            next unless $line =~ /\A\s*karr\s/;
-            next unless $line =~ /--claim(?:ed-by)?\b/;
-            next unless $line =~ /\$\(\s*karr\s+agent-?name\s*\)/;
-            next if $line =~ /DON'T/;
-            push @bad, $file->relative($root) . " line $n: $line";
-        }
-    }
+    my $move = _run_karr( $repo, 'move', '1', 'in-progress' );
+    is( $move->{exit}, 0, 'move with no --claim takes it from KARR_CLAIM' )
+      or diag $move->{stderr};
 
-    is( scalar @bad, 0,
-        'no doc line claims with an inline $(karr agentname) substitution' )
-      or diag( "these lines teach the shape that loses the claim -- capture the\n"
-          . "name once into a shell variable and pass that instead (ticket #176):\n  "
-          . join( "\n  ", @bad ) );
+    my $handoff = _run_karr( $repo, 'handoff', '1', '--note', 'done' );
+    is( $handoff->{exit}, 0, 'handoff with no --claim agrees, via the same env' )
+      or diag $handoff->{stderr};
 
-    # And the capture-once idiom is actually shown, so the warning cannot be
-    # satisfied by deleting the examples altogether.
-    # Single-quoted, not interpolated: '$(' and '$NAME' are a Perl variable and
-    # a Perl variable, and a qr// literal here would silently match nothing.
-    my $capture_pod   = 'NAME=$(karr agentname)';
-    my $reuse_pod     = '--claim "$NAME"';
-    my $capture_skill = 'NAME=$(karr agent-name)';
-
-    my $pod = $root->child(qw( lib App karr Cmd AgentName.pm ))->slurp_utf8;
-    like( $pod, qr/\Q$capture_pod\E/,
-        'AgentName POD shows capturing the name into a variable' );
-    like( $pod, qr/\Q$reuse_pod\E/,
-        'AgentName POD shows reusing that variable for --claim' );
-
-    my $skill_file = $root->child(qw( share claude-skill.md ));
-  SKIP: {
-        skip 'share/claude-skill.md not present in this tree', 2
-          unless $skill_file->exists;
-        my $skill = $skill_file->slurp_utf8;
-        like( $skill, qr/\Q$capture_skill\E/,
-            'skill doc shows capturing the name into a variable' );
-        like( $skill, qr/mints a \*\*new\*\* name/,
-            'skill doc warns that every call mints a new name' );
-    }
+    my $show = _run_karr( $repo, 'show', '1' );
+    like( $show->{stdout}, qr/^Claimed:\s+\Q$name\E$/m,
+        'the card is held under the exported name' );
 };
 
 done_testing;

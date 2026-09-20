@@ -16,23 +16,19 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "WWW::PayPal",
   "PREREQ_PM" => {
-    "Carp" => 0,
     "HTTP::Request" => 0,
     "JSON::MaybeXS" => 0,
     "LWP::Protocol::https" => 0,
     "LWP::UserAgent" => 0,
     "Log::Any" => 0,
-    "MIME::Base64" => 0,
     "Moo" => "2.000000",
-    "Moo::Role" => 0,
-    "Types::Standard" => 0,
     "URI" => 0,
     "namespace::clean" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.302015"
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,17 +36,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
   "HTTP::Request" => 0,
   "JSON::MaybeXS" => 0,
   "LWP::Protocol::https" => 0,
   "LWP::UserAgent" => 0,
   "Log::Any" => 0,
-  "MIME::Base64" => 0,
   "Moo" => "2.000000",
-  "Moo::Role" => 0,
   "Test::More" => "1.302015",
-  "Types::Standard" => 0,
   "URI" => 0,
   "namespace::clean" => 0
 );

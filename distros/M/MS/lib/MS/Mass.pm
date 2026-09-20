@@ -58,7 +58,7 @@ sub _mass {
     my ($group, $name, $type) = @_;
     if (! defined $unimod->{$group}->{$name}) {
         carp "Undefined $group $name";
-        return undef;
+        return;
     }
     $type = _check_type( $type );
     return $unimod->{$group}->{$name}->{$type};
@@ -115,7 +115,7 @@ sub atoms {
     my ($type,$name) = @_;
     if (! defined $unimod->{$type}->{$name}) {
         carp "Undefined $type $name";
-        return undef;
+        return;
     }
     return { %{$unimod->{$type}->{$name}->{atoms}} };
 

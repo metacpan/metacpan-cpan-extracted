@@ -12,7 +12,7 @@ use WWW::Crawl4AI::Detect ();
 use WWW::Crawl4AI::StrategyChain ();
 use WWW::Crawl4AI::DeepCrawlIterator ();
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 
 has strategy_chain => (
@@ -131,7 +131,8 @@ sub _detect_opts {
 #
 # Classification is performed by overridable methods. To swap in a different
 # classifier (e.g. Crawl4AI's own quality score), subclass and override
-# classify_signals and classify_why_failed.
+# classify_is_good (the win/continue decision), classify_signals (the reported
+# signals) and classify_why_failed (the failure token).
 sub _attempt_for {
   my ( $self, $strategy, $page, $err, $elapsed, $detect ) = @_;
   $detect ||= {};
@@ -152,7 +153,7 @@ sub _attempt_for {
   ) unless defined $page;
 
   my $signals = $self->classify_signals( $page, %$detect );
-  my $good    = WWW::Crawl4AI::Detect::is_good( $page, %$detect );
+  my $good    = $self->classify_is_good( $page, %$detect );
   return WWW::Crawl4AI::Attempt->new(
     backend    => $strategy->name,
     cost_class => $strategy->cost_class,
@@ -162,6 +163,12 @@ sub _attempt_for {
     why_failed => ( $good ? undef : $self->classify_why_failed( $page, %$detect ) ),
     elapsed    => $elapsed,
   );
+}
+
+
+sub classify_is_good {
+  my ( $self, $page, %opts ) = @_;
+  return WWW::Crawl4AI::Detect::is_good( $page, %opts );
 }
 
 
@@ -312,7 +319,7 @@ WWW::Crawl4AI - Perl client and fallback orchestrator for Crawl4AI
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -415,17 +422,28 @@ given per call as C<< markdown($url, min_markdown => N) >>.
 The underlying L<WWW::Crawl4AI::Client>. Lazily built from C<base_url> /
 C<api_token> / C<timeout>; inject your own to share a UA or change transport.
 
+=head2 classify_is_good
+
+Decides whether a fetched page is good enough to win the chain. Default calls
+L<WWW::Crawl4AI::Detect/is_good>. This is the B<win/continue> lever: when it
+returns true the current strategy wins and the chain stops; when false the chain
+escalates to the next strategy. Override in a subclass to enforce a different
+quality bar (e.g. Crawl4AI's own score) — an override actually changes which
+strategy wins, not just what each attempt reports.
+
 =head2 classify_signals
 
 Returns the signals hashref for a normalized page. Default calls
 L<WWW::Crawl4AI::Detect/signals>. Override in a subclass to substitute an
-alternative classifier.
+alternative classifier. Note this changes only the B<reported> signals on each
+attempt; to change which strategy wins, override L</classify_is_good>.
 
 =head2 classify_why_failed
 
 Returns the most-specific failure token for a page. Default calls
 L<WWW::Crawl4AI::Detect/why_failed>. Override in a subclass to substitute an
-alternative classifier.
+alternative classifier. Like L</classify_signals>, this only labels a rejected
+attempt; the rejection itself is decided by L</classify_is_good>.
 
 =head2 crawl
 

@@ -43,6 +43,15 @@ my %NUMERIC_COLUMN = map { $_ => 1 } qw(
 );
 
 use constant MAX_XLSX_DATA_ROWS => 1_048_575;
+use constant PREVIEW_ROWS_PER_ACTION => 100;
+
+my @REVIEW_ACTIONS = qw(
+  resolve_or_accept_fallback
+  review_similarity
+  review_source_fallback
+  preserve_source
+  keep
+);
 
 sub new {
     my ( $class, %arg ) = @_;
@@ -58,8 +67,11 @@ sub new {
             review     => 0,
             unresolved => 0,
             not_searched => 0,
+            preserved => 0,
         },
-        total_rows => 0,
+        action_counts => { map { $_ => 0 } @REVIEW_ACTIONS },
+        preview_rows => { map { $_ => [] } @REVIEW_ACTIONS },
+        total_rows   => 0,
     }, $class;
 
     if ( $path =~ /\.tsv(?:\.gz)?\z/i ) {
@@ -86,7 +98,6 @@ sub write_row {
 
     my %output_row = %{$row};
     $output_row{review_action} //= _review_action(\%output_row);
-
     if ( $self->{format} eq 'xlsx' ) {
         $self->_write_xlsx_row(\%output_row);
     }
@@ -95,9 +106,32 @@ sub write_row {
     }
 
     my $category = _review_category(\%output_row);
+    my $action   = $output_row{review_action};
     $self->{counts}{$category}++;
+    $self->{action_counts}{$action}++;
+    if ( @{ $self->{preview_rows}{$action} } < PREVIEW_ROWS_PER_ACTION ) {
+        push @{ $self->{preview_rows}{$action} },
+          { map { $_ => $output_row{$_} } @COLUMNS };
+    }
     $self->{total_rows}++;
     return 1;
+}
+
+sub review {
+    my ($self) = @_;
+    my @rows = map { @{ $self->{preview_rows}{$_} } } @REVIEW_ACTIONS;
+    my %settings = map { $_ => $self->{config}{$_} }
+      qw(search text_similarity_method min_text_similarity_score levenshtein_weight);
+
+    return {
+        total_decisions          => $self->{total_rows},
+        counts                   => { %{ $self->{action_counts} } },
+        rows                     => \@rows,
+        preview_rows             => scalar @rows,
+        preview_limit_per_action => PREVIEW_ROWS_PER_ACTION,
+        truncated                => $self->{total_rows} > @rows ? 1 : 0,
+        settings                 => \%settings,
+    };
 }
 
 sub close {
@@ -122,13 +156,14 @@ sub _open_tsv {
     my $fh;
 
     if ( $path =~ /\.gz\z/i ) {
-        $fh = IO::Compress::Gzip->new($path)
+        # IO::Compress::Gzip ignores binmode; encode text through its own option.
+        $fh = IO::Compress::Gzip->new($path, Encode => 'UTF-8')
           or die "Cannot gzip <$path>: $GzipError\n";
-        binmode( $fh, ':encoding(UTF-8)' );
         $self->{format} = 'tsv_gzip';
     }
     else {
-        open $fh, '>:encoding(UTF-8)', $path
+        # Match gzip and the other text writers: encode once, preserve LF.
+        open $fh, '>:raw:encoding(UTF-8)', $path
           or die "Cannot write terminology audit <$path>: $!\n";
         $self->{format} = 'tsv';
     }
@@ -179,8 +214,12 @@ sub _open_xlsx {
         review => $workbook->add_format( bg_color => '#FFF2CC' ),
         unresolved => $workbook->add_format( bg_color => '#FCE4D6' ),
         not_searched => $workbook->add_format( bg_color => '#E7E6E6' ),
+        preserved => $workbook->add_format( bg_color => '#DDEBF7' ),
     );
     my %legend_format = (
+        preserved => $workbook->add_format(
+            bold => 1, color => '#1F4E78', bg_color => '#DDEBF7', border => 1,
+        ),
         resolved => $workbook->add_format(
             bold => 1, color => 'white', bg_color => '#1B5E20', border => 1,
         ),
@@ -293,6 +332,7 @@ sub _close_xlsx {
         [ 'similarity_review',          $counts->{review} ],
         [ 'unresolved',                 $counts->{unresolved} ],
         [ 'not_searched_or_source_fallback', $counts->{not_searched} ],
+        [ 'source_value_preserved',     $counts->{preserved} ],
     );
     for my $index ( 0 .. $#summary_rows ) {
         $summary->write_string(
@@ -317,6 +357,7 @@ sub _close_xlsx {
         [ review       => 'Similarity or spelling result to review' ],
         [ unresolved   => 'No term emitted' ],
         [ not_searched => 'Not searched or source fallback' ],
+        [ preserved => 'Source text deliberately retained; no ontology lookup attempted' ],
     );
     for my $index ( 0 .. $#legend ) {
         my ( $category, $description ) = @{ $legend[$index] };
@@ -357,10 +398,11 @@ sub _close_xlsx {
         my $last_row = $self->{total_rows} + 1;
         my $range = "A2:Z$last_row";
         my @rules = (
+            [ preserved => '=$P2="preserved"' ],
             [ unresolved => '=$P2="not_found"' ],
             [ not_searched => '=OR($P2="not_searched",$Q2="source_fallback")' ],
-            [ review => '=AND($P2<>"not_found",$P2<>"not_searched",$Q2<>"source_fallback",OR($T2="similarity",$V2="one_token_relaxed"))' ],
-            [ resolved => '=AND($P2<>"not_found",$P2<>"not_searched",$Q2<>"source_fallback",$T2<>"similarity",$V2<>"one_token_relaxed")' ],
+            [ review => '=AND($P2<>"preserved",$P2<>"not_found",$P2<>"not_searched",$Q2<>"source_fallback",OR($T2="similarity",$V2="one_token_relaxed"))' ],
+            [ resolved => '=AND($P2<>"preserved",$P2<>"not_found",$P2<>"not_searched",$Q2<>"source_fallback",$T2<>"similarity",$V2<>"one_token_relaxed")' ],
         );
         for my $rule (@rules) {
             $audit->conditional_formatting(
@@ -381,6 +423,7 @@ sub _close_xlsx {
 
 sub _review_category {
     my ($row) = @_;
+    return 'preserved' if ($row->{match_status} // q{}) eq 'preserved';
     return 'unresolved' if ( $row->{match_status} // q{} ) eq 'not_found';
     return 'not_searched'
       if ( $row->{match_status} // q{} ) eq 'not_searched'
@@ -394,6 +437,7 @@ sub _review_category {
 sub _review_action {
     my ($row) = @_;
     my $category = _review_category($row);
+    return 'preserve_source'            if $category eq 'preserved';
     return 'keep'                       if $category eq 'resolved';
     return 'review_similarity'          if $category eq 'review';
     return 'resolve_or_accept_fallback' if $category eq 'unresolved';

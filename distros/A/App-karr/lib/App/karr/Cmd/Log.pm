@@ -1,15 +1,17 @@
 # ABSTRACT: Show activity log
 
 package App::karr::Cmd::Log;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
-    usage_string => 'USAGE: karr log [--agent NAME] [--task ID] [--last N] [--json] [--compact]',
+    usage_string => 'USAGE: karr log [--agent NAME] [--task ID] [--last N] [--since DATE] [--action KIND] [--json] [--compact]',
 );
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
 use App::karr::Role::CompactOutput;
+use App::karr::ActivityLog;
+use App::karr::Config;
 use App::karr::Encoding qw( json_decode );
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output',
@@ -35,6 +37,18 @@ option last => (
     doc => 'Number of entries to show (default: 20)',
 );
 
+option since => (
+    is => 'ro',
+    format => 's',
+    doc => 'Only show entries on or after this date (YYYY-MM-DD)',
+);
+
+option action => (
+    is => 'ro',
+    format => 's',
+    doc => 'Only show entries with this action kind',
+);
+
 sub execute {
     my ($self, $args_ref, $chain_ref) = @_;
 
@@ -47,6 +61,34 @@ sub execute {
     $self->usage_error(
         sprintf '--last must be 1 or greater (got %d)', $self->last )
       if $self->last < 1;
+
+    # Option validation first, so a bad --since or --action still exits 2 on a
+    # repository that has no board (ADR 0002, the ordering require_local_board
+    # documents -- the same rule `metrics --since` follows).
+    #
+    # --since is a date, validated the way every other date in karr is
+    # (App::karr::Config/validate_due): calendar-correct YYYY-MM-DD, and a
+    # usage error otherwise. A typo used to be answered with "No log entries."
+    # and exit 0, which reads as "no activity" when the truth is "no such
+    # date" (ticket #278).
+    if ( defined $self->since && length $self->since ) {
+      eval { App::karr::Config->validate_due( $self->since ); 1 }
+        or $self->usage_error(
+          sprintf 'invalid --since date "%s" (expected YYYY-MM-DD)', $self->since );
+    }
+
+    # --action is one of the actions the board log can actually hold, and the
+    # vocabulary comes from App::karr::ActivityLog/ACTIONS -- the same constant
+    # the writers' actions are checked against -- rather than a second list
+    # that drifts from what the commands record (ticket #278). A typo used to
+    # be answered with "No log entries." and exit 0, which reads as "no
+    # activity" when the truth is "no such action".
+    if ( defined $self->action ) {
+      my @valid = App::karr::ActivityLog->ACTIONS;
+      $self->usage_error(
+        sprintf 'invalid --action "%s" (valid: %s)', $self->action, join(', ', @valid) )
+        unless grep { $_ eq $self->action } @valid;
+    }
 
     # This is where the empty answers are told apart, and all three are
     # settled before a single ref is read. "No log entries." is what a board
@@ -88,6 +130,15 @@ sub execute {
     }
     if ($self->task) {
         @entries = grep { ($_->{task_id} // 0) == $self->task } @entries;
+    }
+    if ( defined $self->since && length $self->since ) {
+        # String comparison against the RFC3339 timestamp: an entry from the
+        # --since day itself is kept, matching kanban-md's
+        # entry.Timestamp.Before(opts.Since).
+        @entries = grep { ($_->{ts} // '') ge $self->since } @entries;
+    }
+    if ( defined $self->action ) {
+        @entries = grep { ($_->{action} // '') eq $self->action } @entries;
     }
 
     # Limit
@@ -149,13 +200,14 @@ App::karr::Cmd::Log - Show activity log
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 
     karr log
     karr log --agent agent-fox
     karr log --task 12 --last 50 --json
+    karr log --since 2026-01-01 --action move
     karr log --compact
 
 =head1 DESCRIPTION
@@ -186,6 +238,25 @@ Only show entries associated with a specific task id.
 =item * C<--last>
 
 Limit the output to the most recent C<N> entries after sorting by timestamp.
+
+=item * C<--since>
+
+Only show entries timestamped on or after this date (C<YYYY-MM-DD>). The date
+is validated the way every other date in karr is
+(L<App::karr::Config/validate_due>): calendar-correct C<YYYY-MM-DD>, and a
+usage error otherwise -- the same rule C<karr metrics --since> follows. The
+comparison is a string one against the entry's RFC3339 timestamp, so an entry
+from the C<--since> day itself is kept, matching kanban-md's
+C<entry.Timestamp.Before(opts.Since)>.
+
+=item * C<--action>
+
+Only show entries whose action is C<KIND>. The valid kinds are the actions the
+board log can actually hold -- C<archive>, C<create>, C<delete>, C<edit>,
+C<handoff>, C<move>, C<needs>, C<pick> -- taken from
+L<App::karr::ActivityLog/ACTIONS>, the same constant the writers' actions are
+checked against, so the list cannot drift from what the commands record. An
+unknown kind is a usage error listing the valid ones, not an empty log.
 
 =back
 

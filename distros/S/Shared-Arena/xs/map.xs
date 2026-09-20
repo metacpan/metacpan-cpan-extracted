@@ -195,6 +195,11 @@ sam_delete(self, key)
     OUTPUT:
         RETVAL
 
+# $map->incr($key)
+# $map->incr($key, $by)
+# $map->incr($key, $by, ttl => 60)        # a deadline when the counter is
+# $map->incr($key, $by, ttl_ms => 60000)  # CREATED or reset; never renewed
+#
 # Add to a counter, creating it at $by when it is absent. Returns the new
 # value, or undef when the table is full or the entry is not a counter.
 #
@@ -210,15 +215,21 @@ sam_incr(self, key, ...)
         const char *k;
         STRLEN klen;
         IV by = 1;
-        uint64_t now = 0;
+        uint64_t now = 0, ttl_ms = 0;
         int rc;
+        I32 i;
     CODE:
         m = SA_SELF(sa_hash, self);
         if (!m) croak("Shared::Arena::Map: this map is released");
         if (m->serialise) croak(SA_SER_INCR_MSG);
         k = SvPV(key, klen);
         if (items > 2) by = SvIV(ST(2));
-        rc = sa_hash_incr(m, k, (uint32_t)klen, (int64_t)by, &now);
+        for (i = 3; i + 1 < items; i += 2) {
+            const char *o = SvPV_nolen(ST(i));
+            if      (strEQ(o, "ttl"))    ttl_ms = (uint64_t)(SvNV(ST(i + 1)) * 1000.0);
+            else if (strEQ(o, "ttl_ms")) ttl_ms = (uint64_t)SvUV(ST(i + 1));
+        }
+        rc = sa_hash_incr_ttl(m, k, (uint32_t)klen, (int64_t)by, ttl_ms, &now);
         if (rc != SA_H_OK) XSRETURN_UNDEF;
         RETVAL = newSVuv((UV)now);
     OUTPUT:

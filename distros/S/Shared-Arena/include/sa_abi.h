@@ -88,10 +88,68 @@
  *   1  0.01 and 0.02 - everything up to and including queue groups.
  *   2  0.03 - map_store_ttl, the cuckoo filter, lease, then the scoreboard.
  *   3  0.04 - the HyperLogLog.
+ *   4  0.11 - the wakeup pipes, map_incr_ttl, rate_counts.
+ *   5  0.11 - map_incr_at. Appended after 4 had been built and installed
+ *            on a development box, and that is why it is a bump of its own:
+ *            the number is what lets a consumer built against this header
+ *            refuse that earlier build rather than call past its table.
  *
  * A consumer that needs only what version 1 had keeps asking for >= 1 and
  * loads against this table unchanged. */
-#define SA_ABI_VERSION 3
+#define SA_ABI_VERSION 5
+
+/* ---- the answers the table gives, by name ----------------------------------
+ *
+ * Every one of these is a number the core also defines under its own name, and
+ * sa_abi_impl.h pins each pair with a build-time assertion, so a consumer that
+ * compares against these compares against what the provider returns.
+ *
+ * `group_claim` and a drain callback's view of a record: */
+#define SA_READ_OK      0
+#define SA_READ_PENDING 1
+#define SA_READ_LAPPED  2
+
+/* `map_store`, `map_store_ttl`, `map_incr`, `map_incr_ttl`: */
+#define SA_MAP_STORE_OK      1
+#define SA_MAP_STORE_FULL    0
+#define SA_MAP_STORE_TOOBIG (-1)
+#define SA_MAP_STORE_NOTNUM (-2)
+
+/* `cache_set`: */
+#define SA_CACHE_OK      1
+#define SA_CACHE_TOOBIG (-1)
+
+/* every `*err`, and what `errstr` renders: */
+#define SA_ERR_OK          0
+#define SA_ERR_MAGIC     (-1)
+#define SA_ERR_LAYOUT    (-2)
+#define SA_ERR_HDRSIZE   (-3)
+#define SA_ERR_ENDIAN    (-4)
+#define SA_ERR_WORD      (-5)
+#define SA_ERR_SHORT     (-6)
+#define SA_ERR_NOMEM     (-7)
+#define SA_ERR_MAP       (-8)
+#define SA_ERR_EXISTS    (-9)
+#define SA_ERR_NOENT    (-10)
+#define SA_ERR_NAME     (-11)
+#define SA_ERR_FULL     (-12)
+#define SA_ERR_NOATOMICS (-13)
+#define SA_ERR_SHAPE    (-14)
+
+/* what `carve` takes as `type`, and what a registry entry records: */
+#define SA_TYPE_RAW         0u
+#define SA_TYPE_RING        1u
+#define SA_TYPE_MAP         2u
+#define SA_TYPE_BLOOM       3u
+#define SA_TYPE_HIST        4u
+#define SA_TYPE_CACHE       5u
+#define SA_TYPE_RATE        6u
+#define SA_TYPE_CMS         7u
+#define SA_TYPE_FROZEN      8u
+#define SA_TYPE_CUCKOO      9u
+#define SA_TYPE_LEASE      10u
+#define SA_TYPE_SCOREBOARD 11u
+#define SA_TYPE_HLL        12u
 
 /* The three handles, opaque here. The guards are shared with the private
  * headers, which define the structs in the provider build - C89 makes a
@@ -225,6 +283,17 @@ typedef struct sa_cache_counts {
     uint64_t capacity;
     uint32_t ways;
 } sa_cache_counts;
+
+/* What a rate limiter has done. `evicted` is live buckets taken over because
+ * the table was too small, and `contended` is checks that gave up on the
+ * compare-and-swap and ALLOWED the request: a limiter that has stopped
+ * limiting is visible here and nowhere else. */
+typedef struct sa_rate_counts {
+    uint64_t allowed;
+    uint64_t denied;
+    uint64_t evicted;
+    uint64_t contended;
+} sa_rate_counts;
 
 #ifndef SA_CUCKOO_FWD
 #define SA_CUCKOO_FWD
@@ -664,6 +733,45 @@ typedef struct sa_abi {
     void      (*hll_reset)(sa_hll *h);
     uint32_t  (*hll_precision)(const sa_hll *h);
     uint64_t  (*hll_filled)(sa_hll *h);
+
+    /* ---- the wakeup: a pipe per process, poked after a commit ---------------
+     *
+     * `wake_init` makes `n` pipes and MUST run before the fork; the descriptor
+     * numbers are inherited, which is what lets them live in the region. After
+     * the fork a process calls `wake_take` (an index, or -1 for any free slot),
+     * puts `wake_fd` in its event loop, and on readiness calls `wake_drained`
+     * BEFORE it drains the ring - the pipe is emptied and the coalescing flag
+     * cleared in that order, so a publish landing mid-drain pokes afresh.
+     *
+     * A publish pokes every slot but its own, and only the publisher that
+     * flips a slot's flag writes a byte, so a burst costs one wakeup per drain
+     * cycle. A process that attached by name inherited no pipes: every entry
+     * answers -1 there, and the caller polls. Likewise on Windows and with no
+     * atomics. */
+    int  (*wake_init)(sa_region *r, uint32_t n);
+    int  (*wake_take)(sa_region *r, int idx);
+    int  (*wake_fd)(sa_region *r);
+    void (*wake_drained)(sa_region *r);
+
+    /* map_incr with a deadline: exactly map_incr, except that when the
+     * increment CREATES the counter or RESETS an expired one, the counter
+     * lapses `ttl_ms` from now (0 = never). A live counter keeps the deadline
+     * it has, so a window does not slide. A fixed window in one call. */
+    int  (*map_incr_ttl)(sa_hash *m, const char *key, uint32_t klen,
+                         int64_t by, uint64_t ttl_ms, uint64_t *now);
+
+    /* A limiter's own account of itself. A NULL limiter zeroes the struct. */
+    void (*rate_counts)(sa_rate *rl, sa_rate_counts *out);
+
+    /* map_incr_ttl with the caller's clock. `now_ms` is the caller's reading
+     * of the same wall clock the map's deadlines are on (milliseconds since
+     * the epoch), or 0 to have the map read it. A caller that has just read
+     * the clock to compute `ttl_ms` passes that reading, so a hit on a
+     * counter with a deadline costs one clock read and not two: what a
+     * fixed-window rate limiter on the accept path wants. */
+    int  (*map_incr_at)(sa_hash *m, const char *key, uint32_t klen,
+                        int64_t by, uint64_t ttl_ms, uint64_t now_ms,
+                        uint64_t *now);
 } sa_abi;
 
 #endif /* SA_ABI_H */

@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
@@ -179,6 +179,37 @@ C<fh>.
 
 =head1 DRIVING THE LOOP
 
+=head2 poll_fd
+
+Return the Loop-owned epoll descriptor used to integrate Linux::Event beneath
+another event system. The descriptor becomes readable whenever Linux::Event has
+kernel readiness pending, including its timerfd, signalfd, pidfds, eventfds,
+and ordinary I/O registrations.
+
+The returned descriptor is borrowed. Linux::Event owns it and closes it when
+the Loop is destroyed; foreign adapters must not close it. An adapter that
+requires a Perl filehandle may duplicate the descriptor and watch the duplicate.
+
+Foreign loops should normally watch C<poll_fd> for level-triggered read
+readiness and call C<poll> once from that readiness callback.
+
+=head2 poll
+
+Perform exactly one nonblocking C<epoll_wait> and dispatch the returned batch.
+Returns the number of events returned by epoll. This is the supported
+foreign-loop drive primitive; adapters should not depend on C<resources()> or
+use C<run_once(0)> as an integration convention.
+
+If more than C<event_capacity> events are pending, the epoll descriptor remains
+readable so a level-triggered foreign loop can schedule another turn. C<poll>
+does not run or stop the foreign event system. A prior C<stop> request does not
+suppress C<poll>.
+
+Like the other driver methods, C<poll> cannot recursively drive the same Loop
+from one of its callbacks. An interrupted C<epoll_wait> returns zero events;
+other C<epoll_wait> failures throw. Callback exceptions propagate after native
+driver state is restored.
+
 =head2 run
 
 Wait and dispatch until C<stop> is called.
@@ -195,8 +226,9 @@ C<run_once> call.
 Run against a monotonic deadline for the supplied non-negative number of
 seconds.
 
-Only one driver method may be active for a given Loop. Calling C<run>,
-C<run_once>, or C<run_for> recursively on that same Loop throws an exception;
+Only one driver method may be active for a given Loop. Calling C<poll>,
+C<run>, C<run_once>, or C<run_for> recursively on that same Loop throws an
+exception;
 a callback may drive a different Loop. C<set_event_capacity> is likewise
 rejected while its Loop is running or dispatching.
 
@@ -209,8 +241,8 @@ work completes.
 
 =head2 running
 
-True while this Loop is inside C<run>, C<run_once>, or C<run_for>, including
-from a callback. This is an O(1) query of native driver state.
+True while this Loop is inside C<poll>, C<run>, C<run_once>, or C<run_for>,
+including from a callback. This is an O(1) query of native driver state.
 
 =head2 count
 

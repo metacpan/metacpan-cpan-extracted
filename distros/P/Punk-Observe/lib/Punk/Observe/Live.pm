@@ -61,7 +61,7 @@ silently short stream is indistinguishable from a quiet one.
 
     my $bool = Punk::Observe::Live::have_bus();
 
-Whether this build found C<hm_bus.h> and can carry a tail across workers.
+Whether this process has a Shared::Arena ring and can carry a tail across workers.
 False means an in-process tail, which is correct for one worker and wrong for
 a pool.
 

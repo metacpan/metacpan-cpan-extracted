@@ -23,11 +23,12 @@ use Carp;
 use Data::Dumper;
 use Digest::HMAC_SHA1;
 use Digest::MD5 qw(md5_hex);
-use English     qw(-no_match_vars);
+use English qw(-no_match_vars);
 use HTTP::Date;
 use LWP::UserAgent::Determined;
-use List::Util   qw( any pairs none );
+use List::Util qw( any pairs none );
 use MIME::Base64 qw(encode_base64 decode_base64);
+use Module::Load;
 use Scalar::Util qw( reftype blessed );
 use URI;
 use XML::Simple;
@@ -41,6 +42,8 @@ __PACKAGE__->mk_accessors(
     token
     buffer_size
     cache_signer
+    checksum_types
+    checksum_algorithm
     credentials
     dns_bucket_names
     digest
@@ -53,16 +56,18 @@ __PACKAGE__->mk_accessors(
     last_response
     logger
     log_level
+    raise_error
     retry
     _region
     secure
     _signer
     timeout
     ua
+    verify_checksums
   ),
 );
 
-our $VERSION = '2.0.2'; ## no critic (RequireInterpolation)
+our $VERSION = '2.1.0'; ## no critic (RequireInterpolation)
 
 our @EXPORT_OK = qw(is_domain_bucket);
 
@@ -73,13 +78,47 @@ sub new {
 
   my %options = ref $args[0] ? %{ $args[0] } : @args;
 
-  $options{timeout}          //= $DEFAULT_TIMEOUT;
+  $options{timeout}            //= $DEFAULT_TIMEOUT;
+  $options{cache_signer}       //= $FALSE;
+  $options{retry}              //= $FALSE;
+  $options{express}            //= $FALSE;
+  $options{verify_checksums}   //= $TRUE;
+  $options{checksum_algorithm} //= 'crc64nvme';
+  $options{raise_error}        //= $FALSE;
+
+  if ( my $endpoint_url = delete $options{endpoint_url} ) {
+    croak "ERROR: use endpoint_url or host but not both\n"
+      if $options{host};
+
+    croak "ERROR: use endpoint_url or secure but not both\n"
+      if defined $options{secure};
+
+    my $uri    = URI->new($endpoint_url);
+    my $scheme = $uri->scheme;
+
+    croak "ERROR: endpoint_url must include a host\n"
+      if !defined $uri->host || !length $uri->host;
+
+    croak "ERROR: endpoint_url must use http or https\n"
+      if !defined $scheme || ( $scheme ne 'http' && $scheme ne 'https' );
+
+    croak "ERROR: endpoint_url must not contain a query or fragment\n"
+      if defined $uri->query || defined $uri->fragment;
+
+    croak "ERROR: endpoint_url must not contain a path\n"
+      if $uri->path && $uri->path ne $SLASH;
+
+    $options{secure} = $scheme eq 'https' ? $TRUE : $FALSE;
+    $options{host}   = $uri->host_port;
+  }
+
   $options{secure}           //= $TRUE;
   $options{host}             //= $DEFAULT_HOST;
   $options{dns_bucket_names} //= $TRUE;
-  $options{cache_signer}     //= $FALSE;
-  $options{retry}            //= $FALSE;
-  $options{express}          //= $FALSE;
+
+  croak sprintf "ERROR: invalid checksum_algorithm: '%s'\nMust be one of: %s\n", $options{checksum_algorithm}, join q{,},
+    @AWS_CHECKSUM_TYPES
+    if none { $options{checksum_algorithm} eq $_ } @AWS_CHECKSUM_TYPES;
 
   $options{_region} = delete $options{region};
   $options{_signer} = delete $options{signer};
@@ -165,6 +204,39 @@ sub new {
 
   $self->turn_on_special_retry();
 
+  $self->_init_checksum_types;
+
+  return $self;
+}
+
+########################################################################
+sub _init_checksum_types {
+########################################################################
+  my ($self) = @_;
+
+  my %checksum_types;
+  $self->checksum_types( \%checksum_types );
+
+  foreach my $algorithm (@AWS_CHECKSUM_TYPES) {
+    next
+      if !exists $CHECKSUM_TYPES{$algorithm};
+
+    my $checksum_type = $CHECKSUM_TYPES{$algorithm};
+    my $module        = $checksum_type->{module};
+
+    my $loaded = eval {
+      load $module;
+      return $TRUE;
+    };
+
+    next
+      if !$loaded;
+
+    # since our module has already been loaded we only need the code
+    # ref to the implementation
+    $checksum_types{$algorithm} = $checksum_type->{digest};
+  }
+
   return $self;
 }
 
@@ -178,6 +250,7 @@ sub use_express_one_zone {
   $self->express($TRUE);
 
   $self->host( sprintf 's3express-control.%s.amazonaws.com', $self->region );
+  $self->secure($TRUE);
   $self->dns_bucket_names($FALSE);
 
   return $express;
@@ -352,8 +425,7 @@ sub region {
     $self->_region( $args[0] );
   }
 
-  $self->get_logger->debug(
-    sub { return 'region: ' . ( $self->_region // $EMPTY ) } );
+  $self->get_logger->debug( sub { return 'region: ' . ( $self->_region // $EMPTY ) } );
 
   if ( $self->_region ) {
     my $host = $self->host;
@@ -380,9 +452,9 @@ sub buckets {
   my $region = $self->_region;
   my $bucket_list;
 
-  $self->reset_signer_region($DEFAULT_REGION); # default region for buckets op
+  $self->reset_signer_region($DEFAULT_REGION);  # default region for buckets op
 
-  my $r = $self->_send_request(
+  my $r = $self->send_request(
     { method  => 'GET',
       path    => $EMPTY,
       headers => {},
@@ -419,7 +491,7 @@ sub buckets {
     }
   }
 
-  $self->reset_signer_region($region); # restore original region
+  $self->reset_signer_region($region);  # restore original region
 
   $bucket_list = {
     owner_id          => $owner_id,
@@ -501,8 +573,7 @@ sub _add_bucket {
   $region  //= $EMPTY;
   $headers //= {};
 
-  my $request
-    = { CreateBucketConfiguration => { LocationConstraint => $region, } };
+  my $request = { CreateBucketConfiguration => { LocationConstraint => $region, } };
 
   if ($availability_zone) {
     $request->{CreateBucketConfiguration}->{Location} = {
@@ -527,7 +598,7 @@ sub _add_bucket {
 
   $headers->{'Content-Length'} = length $data;
 
-  my $retval = $self->_send_request_expect_nothing(
+  my $retval = $self->send_request_expect_nothing(
     { method  => 'PUT',
       path    => "$bucket/",
       headers => $headers,
@@ -593,7 +664,7 @@ sub delete_bucket {
   croak 'must specify bucket'
     if !$bucket;
 
-  return $self->_send_request_expect_nothing(
+  return $self->send_request_expect_nothing(
     { method  => 'DELETE',
       path    => $bucket . $SLASH,
       headers => $headers // {},
@@ -611,7 +682,7 @@ sub list_directory_buckets {
 
   my $express = $self->use_express_one_zone;
 
-  my $result = $self->_send_request(
+  my $result = $self->send_request(
     { method     => 'GET',
       headers    => {},
       path       => $SLASH,
@@ -647,7 +718,7 @@ sub list_bucket {
 
   $conf //= {};
 
-  my $bucket_list; # return this
+  my $bucket_list;  # return this
   my $path = $bucket . $SLASH;
 
   my $headers = delete $conf->{headers};
@@ -672,8 +743,7 @@ sub list_bucket {
       delete $conf->{$_};
     }
 
-    my $query_string = $QUESTION_MARK . join $AMPERSAND,
-      map { $_ . $EQUAL_SIGN . urlencode( $conf->{$_} ) }
+    my $query_string = $QUESTION_MARK . join $AMPERSAND, map { $_ . $EQUAL_SIGN . urlencode( $conf->{$_} ) }
       keys %{$conf};
 
     $path .= $query_string;
@@ -681,10 +751,10 @@ sub list_bucket {
 
   $self->get_logger->debug( sprintf 'PATH: %s', $path );
 
-  my $r = $self->_send_request(
+  my $r = $self->send_request(
     { method  => 'GET',
       path    => $path,
-      headers => $headers // {}, # { 'Content-Length' => 0 },
+      headers => $headers // {},  # { 'Content-Length' => 0 },
       region  => $self->region,
     },
   );
@@ -888,10 +958,9 @@ sub list_object_versions {
     }
   }
 
-  my $path
-    = create_api_uri( path => "$bucket/", api => 'versions', %{$conf} );
+  my $path = create_api_uri( path => "$bucket/", api => 'versions', %{$conf} );
 
-  my $r = $self->_send_request(
+  my $r = $self->send_request(
     { method  => 'GET',
       path    => $path,
       headers => $headers // {},
@@ -995,8 +1064,7 @@ sub _validate_acl_short {
   my ( $self, $policy_name ) = @_;
 
   croak sprintf '%s is not a supported canned access policy', $policy_name
-    if none { $policy_name eq $_ }
-    qw(private public-read public-read-write authenticated-read);
+    if none { $policy_name eq $_ } qw(private public-read public-read-write authenticated-read);
 
   return;
 }
@@ -1116,8 +1184,7 @@ sub _make_request {
         if !$url || $EVAL_ERROR;
     }
     else {
-      $url = sprintf '%s://%s.%s%s%s', $protocol, $bucket, $host, $path,
-        $query_string;
+      $url = sprintf '%s://%s.%s%s%s', $protocol, $bucket, $host, $path, $query_string;
     }
   }
 
@@ -1129,18 +1196,15 @@ sub _make_request {
     $request->content($data);
   }
 
-  $self->signer->region($region); # always set regional endpoint for signing
+  $self->signer->region($region);  # always set regional endpoint for signing
 
   $self->signer->sign($request);
 
   return $request;
 }
 
-# $self->_send_request($HTTP::Request)
-# $self->_send_request(@params_to_make_request)
-# $self->_send_request($params_to_make_request)
 ########################################################################
-sub _send_request {
+sub send_request {
 ########################################################################
   my ( $self, @args ) = @_;
 
@@ -1164,7 +1228,7 @@ sub _send_request {
     return $args[0]
       if ref $args[0];
 
-    croak 'invalid argument to _send_request';
+    croak 'invalid argument to send_request';
   };
 
   if ( ref($request) !~ /HTTP::Request/xsm ) {
@@ -1194,7 +1258,7 @@ sub _decode_response {
   my $content;
 
   if ( $response->code !~ /\A2\d{2}\z/xsm ) {
-    $self->_remember_errors( $response->content, 1 );
+    $self->_handle_response_error($response);
     $content = undef;
   }
   elsif ( is_xml_response($response) ) {
@@ -1403,7 +1467,7 @@ sub _do_http_no_redirect {
 }
 
 ########################################################################
-sub _send_request_expect_nothing {
+sub send_request_expect_nothing {
 ########################################################################
   my ( $self, @args ) = @_;
 
@@ -1417,7 +1481,7 @@ sub _send_request_expect_nothing {
     if $response->code =~ /^2\d\d$/xsm;
 
   # anything else is a failure, and we save the parsed result
-  $self->_remember_errors( $response->content, $TRUE );
+  $self->_handle_response_error($response);
 
   return $FALSE;
 }
@@ -1430,7 +1494,7 @@ sub _send_request_expect_nothing {
 # first time we used it. Thus, we need to probe first to find out what's going on,
 # before we start sending any actual data.
 ########################################################################
-sub _send_request_expect_nothing_probed {
+sub send_request_expect_nothing_probed {
 ########################################################################
   my ( $self, @args ) = @_;
 
@@ -1460,7 +1524,7 @@ sub _send_request_expect_nothing_probed {
       $override_uri = $response->header('Location');
     }
     else {
-      $self->_croak_if_response_error($response);
+      $self->_handle_response_error( $response, $TRUE );
     }
 
     $self->get_logger->debug(
@@ -1493,7 +1557,7 @@ sub _send_request_expect_nothing_probed {
     if $response->code =~ /^2\d\d$/xsm;
 
   # anything else is a failure, and we save the parsed result
-  $self->_remember_errors( $response->content, $TRUE );
+  $self->_handle_response_error($response);
 
   return $FALSE;
 }
@@ -1503,15 +1567,10 @@ sub _croak_if_response_error {
 ########################################################################
   my ( $self, $response ) = @_;
 
-  if ( $response->code !~ /^2\d{2}$/xsm ) {
-    $self->err('network_error');
+  return
+    if $response->code =~ /^2\d{2}$/xsm;
 
-    $self->errstr( $response->status_line );
-
-    croak $response->status_line;
-  }
-
-  return;
+  return $self->_handle_response_error( $response, $TRUE );
 }
 
 ########################################################################
@@ -1519,15 +1578,8 @@ sub _xpc_of_content {
 ########################################################################
   my ( $self, $src, $keep_root ) = @_;
 
-  my $xml_hr = eval {
-    XMLin(
-      $src,
-      SuppressEmpty => $EMPTY,
-      ForceArray    => ['Contents'],
-      KeepRoot      => $keep_root,
-      NoAttr        => $TRUE,
-    );
-  };
+  my $xml_hr
+    = eval { XMLin( $src, SuppressEmpty => $EMPTY, ForceArray => ['Contents'], KeepRoot => $keep_root, NoAttr => $TRUE, ); };
 
   if ( !$xml_hr && $EVAL_ERROR ) {
     confess "Error parsing $src:  $EVAL_ERROR";
@@ -1536,6 +1588,24 @@ sub _xpc_of_content {
   return $xml_hr;
 }
 
+########################################################################
+sub _handle_response_error {
+########################################################################
+  my ( $self, $response, $force_raise ) = @_;
+
+  my $remembered = eval { return $self->_remember_errors( $response->content, $TRUE ); };
+
+  if ( !$remembered ) {
+    $self->err('network_error');
+    $self->errstr( $response->status_line );
+  }
+
+  if ( $self->raise_error || $force_raise ) {
+    croak sprintf '%s - %s: %s', $response->status_line, $self->err, $self->errstr;
+  }
+
+  return $TRUE;
+}
 # returns 1 if errors were found
 ########################################################################
 sub _remember_errors {
@@ -1545,8 +1615,8 @@ sub _remember_errors {
   return
     if !$src;
 
-  if ( !ref $src && $src !~ /^[[:space:]]*</xsm ) { # if not xml
-    ( my $code = $src ) =~ s/^[[:space:]]*[(][\d]*[)].*$/$1/xsm;
+  if ( !ref $src && $src !~ /^[[:space:]]*</xsm ) {
+    ( my $code = $src ) =~ s/^[[:space:]]*[(]([\d]*)[)].*$/$1/xsm;
 
     $self->err($code);
     $self->errstr($src);
@@ -1580,8 +1650,7 @@ sub _add_auth_header { ## no critic (ProhibitUnusedPrivateSubroutines)
 ########################################################################
   my ( $self, $headers, $method, $path ) = @_;
 
-  my ( $aws_access_key_id, $aws_secret_access_key, $token )
-    = $self->get_credentials;
+  my ( $aws_access_key_id, $aws_secret_access_key, $token ) = $self->get_credentials;
 
   if ( not $headers->header('Date') ) {
     $headers->header( Date => time2str(time) );
@@ -1603,8 +1672,7 @@ sub _add_auth_header { ## no critic (ProhibitUnusedPrivateSubroutines)
     }
   );
 
-  my $encoded_canonical
-    = $self->_encode( $aws_secret_access_key, $canonical_string );
+  my $encoded_canonical = $self->_encode( $aws_secret_access_key, $canonical_string );
 
   $headers->header(
     Authorization => sprintf 'AWS %s:%s',
@@ -1708,9 +1776,7 @@ sub _canonical_string {
       # re-evaluate query string, the order of the params is important
       # for request signing, so we can't depend on URI to do the right
       # thing
-      $buf .= sprintf '?partNumber=%s&uploadId=%s',
-        $query_params{partNumber},
-        $query_params{uploadId};
+      $buf .= sprintf '?partNumber=%s&uploadId=%s', $query_params{partNumber}, $query_params{uploadId};
     }
     elsif ( $query_params{uploadId} ) {
       $buf .= sprintf '?uploadId=%s', $query_params{uploadId};
@@ -1787,1195 +1853,1692 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
-Amazon::S3 - A portable client library for working with and
-managing Amazon S3 buckets and keys.
-
-=begin markdown
-
-![Amazon::S3](https://github.com/rlauer6/perl-amazon-s3/actions/workflows/build.yml/badge.svg?event=push)
-
-=end markdown
+Amazon::S3 - A Perl client library for working with and managing
+Amazon S3 buckets and objects.
 
 =head1 SYNOPSIS
 
   use Amazon::S3;
-  
-  my $aws_access_key_id     = "Fill me in!";
-  my $aws_secret_access_key = "Fill me in too!";
-  
+
   my $s3 = Amazon::S3->new(
-      {   aws_access_key_id     => $aws_access_key_id,
-          aws_secret_access_key => $aws_secret_access_key,
-          retry                 => 1
-      }
+    { credentials => $credentials,
+      region      => 'us-east-1',
+    }
   );
-  
-  my $response = $s3->buckets;
-  
-  # create a bucket
-  my $bucket_name = $aws_access_key_id . '-net-amazon-s3-test';
 
-  my $bucket = $s3->add_bucket( { bucket => $bucket_name } )
-      or die $s3->err . ": " . $s3->errstr;
-  
-  # store a key with a content-type and some optional metadata
-  my $keyname = 'testing.txt';
-
-  my $value   = 'T';
+  my $bucket = $s3->bucket('example-bucket');
 
   $bucket->add_key(
-      $keyname, $value,
-      {   content_type        => 'text/plain',
-          'x-amz-meta-colour' => 'orange',
-      }
+    'testing.txt',
+    'T',
+    { content_type        => 'text/plain',
+      'x-amz-meta-colour' => 'orange',
+    }
   );
 
-  # copy an object
-  $bucket->copy_object(
-    source => $source,
-    key    => $new_keyname
-  );
+  my $response = $bucket->list
+    or die $s3->err . ': ' . $s3->errstr;
 
-  # list keys in the bucket
-  $response = $bucket->list
-      or die $s3->err . ": " . $s3->errstr;
-
-  print $response->{bucket}."\n";
-
-  for my $key (@{ $response->{keys} }) {
-        print "\t".$key->{key}."\n";  
+  for my $key ( @{ $response->{keys} } ) {
+    print $key->{key} . "\n";
   }
 
-  # delete key from bucket
-  $bucket->delete_key($keyname);
+  my $object = $bucket->get_key('testing.txt')
+    or die $s3->err . ': ' . $s3->errstr;
 
-  # delete multiple keys from bucket
-  $bucket->delete_keys([$key1, $key2, $key3]);
-  
-  # delete bucket
-  $bucket->delete_bucket;
+  print $object->{value};
 
 =head1 DESCRIPTION
 
-This documentation refers to version 2.0.2.
+C<Amazon::S3> provides a Perl interface to Amazon Simple Storage
+Service (S3).
 
-C<Amazon::S3> provides a portable client interface to Amazon Simple
-Storage System (S3).
+The distribution separates account-level S3 operations from
+bucket and object operations.
 
-This module is rather dated, however with some help from a few
-contributors it has had some recent updates. Recent changes include
-implementations of:
+C<Amazon::S3> represents the S3 client and AWS account context. It
+manages credentials, request signing, regions, service endpoints,
+bucket creation and discovery, and account-level listing operations.
 
-=over 5
+L<Amazon::S3::Bucket> represents an individual bucket. Object
+operations such as uploads, downloads, deletes, ACLs, multipart
+uploads, and bucket-scoped listing operations are provided primarily
+through that class.
 
-=item ListObjectsV2
+L<Amazon::S3::BucketV2> is a subclass of L<Amazon::S3::Bucket> that
+provides a more general interface to S3 APIs. It accepts API
+parameters, headers, URI parameters, and request payload structures
+using a consistent calling convention.
 
-=item CopyObject
+C<Amazon::S3> originated as a fork of L<Net::Amazon::S3>, but the two
+distributions have diverged substantially. Current versions should
+not be considered interchangeable.
 
-=item DeleteObjects
+Version 2.1.0 adds modern S3 checksum support while preserving the
+existing C<Amazon::S3> and L<Amazon::S3::Bucket> interfaces. Managed
+uploads use CRC64NVME by default, and downloads can request and verify
+checksum metadata returned by S3.
 
-=item ListObjectVersions
+=head1 AUTHENTICATION AND CREDENTIALS
 
-=back
+C<Amazon::S3> supports either explicit AWS access keys or a credentials
+object.
 
-Additionally, this module now implements Signature Version 4 signing,
-unit tests have been updated and more documentation has been added or
-corrected. Credentials are encrypted if you have encryption modules installed.
+Explicit credentials may be supplied to the constructor:
 
-I<NEW!>
+  my $s3 = Amazon::S3->new(
+    { aws_access_key_id     => $aws_access_key_id,
+      aws_secret_access_key => $aws_secret_access_key,
+      token                 => $session_token,
+    }
+  );
 
-The C<Amazon::S3> modules have been heavily refactored over the last
-few releases to increase maintainability and to add new features. New
-features include:
+The C<token> option is required only when temporary AWS credentials
+include a session token.
 
-=over 5
+For applications that obtain credentials dynamically, a credentials
+object is preferred:
 
-=item L<Amazon::S3::BucketV2>
+  my $s3 = Amazon::S3->new({ credentials => $credentials } );
 
-This new module implements a mechanism to invoke I<almost> all of the
-S3 APIs using a standard calling method.
+The credentials object must provide:
 
-The module will format your Perl objects as XML payloads and enable
-you to provide all of the parameters required to make an API
-call. Headers and URI parameters can also be passed to the
-methods. L<Amazon::S3::BucketV2> is a subclass of
-L<Amazon::S3::Bucket>, meaning you can still invoke all of the same
-methods found there.
+  get_aws_access_key_id()
+  get_aws_secret_access_key()
+  get_token()
 
-See L<Amazon::S3::BucketV2> for more details.
+L<Amazon::Credentials> is one implementation of this interface.
 
-=item Limited Support for Directory Buckets
+Using a credentials object allows the credential provider to manage
+credential discovery and refresh independently of C<Amazon::S3>.
 
-This version include limited support for directory buckets.
+C<Amazon::S3> uses Signature Version 4 for AWS API requests.
 
-You can create and list directory buckets.
+The signer normally uses the credentials associated with the
+C<Amazon::S3> object. A signer may also be supplied to the constructor
+using the C<signer> option.
 
-I<Directory buckets use the S3 Express One Zone storage class, which
-is recommended if your application is performance sensitive and
-benefits from single-digit millisecond PUT and GET latencies.> -
-L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-buckets-overview.html>
+By default, signers are not cached. Setting C<cache_signer> to true
+causes C<Amazon::S3> to retain and reuse the signer object.
 
-=over 10
+Applications should avoid dumping C<Amazon::S3>, credential, or signer
+objects to logs. These objects participate in request authentication
+and may contain or provide access to sensitive authentication
+material.
 
-=item list_directory_buckets
+=head1 CHECKSUMS
 
-List the directory buckets. Note this only returns a list of you
-directory buckets, not their contents. In order to list the contents
-of a directory bucket you must first create a session that establishes
-temporary credentials used to acces the Zonal endpoints. You then use
-those credentials for signing requests using the ListObjectV2 API.
+Version 2.1.0 adds checksum generation for uploads and checksum
+verification for downloads.
 
-This process is currently B<not supported> by this class.
+The default upload checksum algorithm is C<crc64nvme>.
 
-L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateSession.html>
+C<Amazon::S3> provides local implementations for:
 
-<Lhttps://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html>
+  crc64nvme
+  crc32
+  crc32c
+  md5
+  sha1
+  sha256
+  sha512
 
-=item add_bucket
+Amazon S3 also defines XXHash checksum algorithms. They are recognized
+by C<Amazon::S3> but are not implemented locally in this release.
 
-You can add a regin and availability zone to this call in order to
-create a directory bucket.
+=head2 Uploads
 
- $bucket->add_bucket({ bucket => $bucket_name, availability_zone => 'use1-az5' });
+When an upload is performed through L<Amazon::S3::Bucket>,
+C<Amazon::S3> calculates the configured checksum when that operation
+supports checksum submission.
 
-Note that your bucket name must conform to the naming conventions for
-directory buckets. -
-L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-buckets-overview.html#directory-buckets-name>
- 
-=back
+The checksum algorithm is selected using C<checksum_algorithm>. The
+default is C<crc64nvme>.
 
-=item Addition of version parameter for C<delete_key>
+Managed multipart uploads performed by
+C<Amazon::S3::Bucket::upload_multipart_object()> also use the
+configured checksum algorithm.
 
-You can now delete a version of a key by including its verion ID.
+Low-level multipart methods do not implicitly enable an additional
+checksum algorithm. Applications that directly manage the multipart
+workflow are responsible for selecting and carrying the checksum
+algorithm through that workflow.
 
- $bucket->delete_key($key, $version_id);
+=head2 Downloads
 
-=item Methods that accept a hash reference can now accept a
-C<headers> object that may contain any additional headers you might want
-to send with a request. Some of the methods that now allow you to pass
-a header object include:
+Checksum verification is enabled by default.
 
-=over 10
+When C<verify_checksums> is true, object downloads request checksum
+metadata from S3. C<Amazon::S3> verifies supported C<FULL_OBJECT>
+checksums returned by the service.
 
-=item add_bucket
+Verification is opportunistic. If S3 does not return a checksum, or
+returns a checksum for an algorithm that C<Amazon::S3> cannot
+calculate locally, the object can still be downloaded.
 
-=item add_key
+C<COMPOSITE> checksums are not independently verified.
 
-=item get_key
+Partial and ranged downloads are not checksum verified because the
+checksum returned for an object describes the complete object rather
+than the requested byte range.
 
-Can now be called with a hashref which may include both a C<headers>
-and C<uri_params> object.
+The C<verify_checksums> setting controls download verification only.
+It does not disable checksum generation for uploads.
 
-=item delete_bucket
-
-=item list_bucket
+=head1 WORKING WITH BUCKETS AND OBJECTS
 
-=item list_object_versions
-
-=item upload_multipart_object
+C<Amazon::S3> creates bucket objects that provide the object-oriented
+interface used for most S3 operations.
 
-=back
+=head2 Creating and Representing Buckets
 
-=back
+C<add_bucket()> creates a bucket in S3.
 
-=head2 Comparison to Other Perl S3 Modules
+C<bucket()> and C<bucketv2()> do not create a bucket. They construct
+client-side objects representing a bucket.
 
-Other implementations for accessing Amazon's S3 service include
-C<Net::Amazon::S3> and the C<Paws> project. C<Amazon::S3> ostensibly
-was intended to be a drop-in replacement for C<Net:Amazon::S3> that
-"traded some performance in return for portability". That statement is
-no longer accurate as C<Amazon::S3> may have changed the interface in
-ways that might break your applications if you are relying on
-compatibility with C<Net::Amazon::S3>.
+A bucket region can be supplied explicitly when constructing a bucket
+object. Region verification can also be requested when the bucket
+region is not already known; doing so requires an additional service
+request.
 
-However, C<Net::Amazon::S3> and C<Paws::S3> today, are dependent on
-C<Moose> which may in fact level the playing field in terms of
-performance penalties that may have been introduced by recent updates
-to C<Amazon::S3>. Changes to C<Amazon::S3> include the use of more
-Perl modules in lieu of raw Perl code to increase maintainability and
-stability as well as some refactoring. C<Amazon::S3> also strives now
-to adhere to best practices as much as possible.
+Amazon S3 applies public-access-block settings to new buckets by
+default. Applications that intentionally create public buckets or
+apply public ACLs must ensure that the account and bucket public access
+settings permit the requested policy.
 
-C<Paws::S3> may be a much more robust implementation of a Perl S3
-interface, however this module may still appeal to those that favor
-simplicity of the interface and a lower number of dependencies. The
-new L<Amazon::S3::BucketV2> module now provides access to nearly all
-of the main S3 API metods.
+Directory buckets have additional creation requirements. See
+L</DIRECTORY BUCKETS>.
 
- Below is the original description of the module.
 
-=over 10
+  my $bucket = $s3->bucket('example-bucket');
 
-Amazon S3 is storage for the Internet. It is designed to
-make web-scale computing easier for developers. Amazon S3
-provides a simple web services interface that can be used to
-store and retrieve any amount of data, at any time, from
-anywhere on the web. It gives any developer access to the
-same highly scalable, reliable, fast, inexpensive data
-storage infrastructure that Amazon uses to run its own
-global network of web sites. The service aims to maximize
-benefits of scale and to pass those benefits on to
-developers.
+Calling C<bucket()> does not create the bucket and does not verify
+that it exists. It constructs an L<Amazon::S3::Bucket> object
+associated with the C<Amazon::S3> client.
 
-To sign up for an Amazon Web Services account, required to
-use this library and the S3 service, please visit the Amazon
-Web Services web site at http://www.amazonaws.com/.
+A bucket can be assigned a region explicitly:
 
-You will be billed accordingly by Amazon when you use this
-module and must be responsible for these costs.
+  my $bucket = $s3->bucket(
+    { bucket => 'example-bucket',
+      region => 'us-west-2',
+    }
+  );
 
-To learn more about Amazon's S3 service, please visit:
-http://s3.amazonaws.com/.
+The bucket interface provides operations including:
 
-The need for this module arose from some work that needed
-to work with S3 and would be distributed, installed and used
-on many various environments where compiled dependencies may
-not be an option. L<Net::Amazon::S3> used L<XML::LibXML>
-tying it to that specific and often difficult to install
-option. In order to remove this potential barrier to entry,
-this module is forked and then modified to use L<XML::SAX>
-via L<XML::Simple>.
+  add_key()
+  add_key_filename()
+  copy_object()
+  delete_key()
+  delete_keys()
+  get_acl()
+  get_key()
+  get_key_filename()
+  head_key()
+  set_acl()
 
-=back
+See L<Amazon::S3::Bucket> for the method reference for bucket and
+object operations.
 
-=head1 LIMITATIONS AND DIFFERENCES WITH EARLIER VERSIONS
+=head1 LISTING OBJECTS
 
-As noted, this module is no longer a I<drop-in> replacement for
-C<Net::Amazon::S3> and has limitations and differences that may impact
-the use of this module in your applications. Additionally, one of the
-original intents of this fork of C<Net::Amazon::S3> was to reduce the
-number of dependencies and make it I<easy to install>. Recent changes
-to this module have introduced new dependencies in order to improve
-the maintainability and provide additional features. Installing CPAN
-modules is never easy, especially when the dependencies of the
-dependencies are impossible to control and include may include XS
-modules.
+The distribution provides both the original S3 ListObjects API and
+ListObjectsV2.
 
-=over 5
+At the C<Amazon::S3> level these are exposed as:
 
-=item MINIMUM PERL
+  list_bucket()
+  list_bucket_v2()
 
-Technically, this module should run on versions 5.10 and above,
-however some of the dependencies may require higher versions of
-C<perl> or some lower versions of the dependencies due to conflicts
-with other versions of dependencies...it's a crapshoot when dealing
-with older C<perl> versions and CPAN modules.
+The corresponding convenience methods:
 
-You may however, be able to build this module by installing older
-versions of those dependencies and take your chances that those older
-versions provide enough working features to support C<Amazon::S3>. It
-is likely they do...and this module has recently been tested on
-version 5.10.0 C<perl> using some older CPAN modules to resolve
-dependency issues.
+  list_bucket_all()
+  list_bucket_all_v2()
 
-To build this module on an earlier version of C<perl> you may need to
-downgrade some modules.  In particular I have found this recipe to
-work for building and testing on 5.10.0.
+follow pagination automatically and return the combined result.
 
-In this order install:
+L<Amazon::S3::Bucket> provides bucket-oriented wrappers for these
+operations.
 
- HTML::HeadParser 2.14
- LWP 6.13
- Amazon::S3
+=head2 Choosing a Listing API
 
-...other versions I<may> work...YMMV. If you do decide to run on an
-earlier version of C<perl>, you are encouraged to run the test
-suite. See the L</TESTING> section for more details.
+ListObjectsV2 is generally preferred for new code.
 
-=item API Signing
+C<list_bucket()> uses the original marker-based pagination model.
 
-Making calls to AWS APIs requires that the calls be signed.  Amazon
-has added a new signing method (Signature Version 4) to increase
-security around their APIs. This module no longer utilizes Signature
-Version V2.
+C<list_bucket_v2()> uses the continuation-token model introduced by
+ListObjectsV2 and also supports C<start-after>.
 
-B<New regions after January 30, 2014 will only support Signature Version 4.>
+Applications that need control over individual result pages should
+use C<list_bucket()> or C<list_bucket_v2()> directly.
 
-See L</Signature Version V4> below for important details.
+Applications that simply need all matching objects can use the
+corresponding C<_all> method.
 
-=over 10
+=head2 Prefixes and Delimiters
 
-=item Signature Version 4
+S3 keys are not filesystem paths. However, C<prefix> and C<delimiter>
+can be used to present a hierarchy-like view of keys.
 
-L<https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html>
+For example, given these keys:
 
-I<IMPORTANT NOTE:>
+  bar/baz
+  bar/buz
+  bar/buz/biz
+  bar/buz/zip
 
-Unlike Signature Version 2, Version 4 requires a regional
-parameter. This implies that you need to supply the bucket's region
-when signing requests for any API call that involves a specific
-bucket. Starting with version 0.55 of this module,
-C<Amazon::S3::Bucket> provides a new method (C<region()>) and accepts
-in the constructor a C<region> parameter.  If a region is not
-supplied, the region for the bucket will be set to the region set in
-the C<account> object (C<Amazon::S3>) that you passed to the bucket's
-new constructor.  Alternatively, you can request that the bucket's new
-constructor determine the bucket's region for you by calling the
-C<get_location_constraint()> method.
+a request using:
 
-When signing API calls, the region for the specific bucket will be
-used. For calls that are not regional (C<buckets()>, e.g.) the default
-region ('us-east-1') will be used.
+  prefix    => 'bar/'
+  delimiter => '/'
 
-=item Signature Version 2
+returns the keys at that level and rolls deeper keys into a common
+prefix.
 
-L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html>
+A typical request is:
 
-=back
+  my $response = $s3->list_bucket_v2(
+    { bucket    => 'example-bucket',
+      prefix    => 'bar/',
+      delimiter => '/',
+    }
+  );
 
-=item Multipart Upload Support
+The rolled-up prefixes are returned in C<common_prefixes>.
 
-There are some recently added unit tests for multipart uploads that
-seem to indicate this feature is working as expected.  Please report
-any deviation from expected results if you are using those methods.
+=head2 Pagination
 
-For more information regarding multipart uploads visit the link below.
+C<list_bucket()> resumes a truncated listing using C<marker>.
 
-L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateMultipartUpload.html>
+When a delimiter is used, the normalized response can contain
+C<next_marker>. Without a delimiter, the last returned key can be
+used as the marker for the next request.
 
-=back
+C<list_bucket_v2()> resumes a truncated listing using the continuation
+token returned by S3. In the normalized C<Amazon::S3> result,
+C<next_marker> contains C<NextContinuationToken>.
+
+For example:
+
+  my $response = $s3->list_bucket_v2(
+    { bucket => 'example-bucket',
+    }
+  );
+
+  while ( $response->{is_truncated} ) {
+    $response = $s3->list_bucket_v2(
+      { bucket               => 'example-bucket',
+        'continuation-token' => $response->{next_marker},
+      }
+    );
+  }
+
+When application code does not need to process individual pages,
+C<list_bucket_all()> and C<list_bucket_all_v2()> perform this work
+automatically.
+
+=head2 Listing Results
+
+C<list_bucket()> and C<list_bucket_v2()> normalize their results into
+the same general structure:
+
+  {
+    bucket          => $bucket_name,
+    prefix          => $prefix,
+    marker          => $marker,
+    next_marker     => $next_marker,
+    max_keys        => $max_keys,
+    is_truncated    => $boolean,
+    keys            => \@keys,
+    common_prefixes => \@prefixes,
+  }
+
+C<common_prefixes> is present when the request uses a delimiter and S3
+returns rolled-up prefixes.
+
+Each element of C<keys> is a hash reference containing object metadata:
+
+  {
+    key               => $key,
+    last_modified     => $last_modified,
+    etag              => $etag,
+    size              => $size,
+    storage_class     => $storage_class,
+    owner_id          => $owner_id,
+    owner_displayname => $owner_displayname,
+  }
+
+The C<etag> value is the ETag returned by S3. It must not be assumed
+to be a checksum of the complete object.
+
+C<list_object_versions()> is different: it returns the parsed
+ListObjectVersions service response rather than this normalized
+listing structure and does not automatically follow pagination.
+
+See the corresponding entries under L</METHODS AND SUBROUTINES> for
+the method contracts.
+
+=head1 MULTIPART UPLOADS
+
+Multipart upload operations are provided by L<Amazon::S3::Bucket>.
+
+For normal application use,
+C<Amazon::S3::Bucket::upload_multipart_object()> is the preferred
+interface. It manages initiation, part uploads, completion, checksum
+state, and optional abort-on-error behavior.
+
+  my $parts = $bucket->upload_multipart_object(
+    { key  => 'large-object.dat',
+      data => $data,
+    }
+  );
+
+The method can also consume data from a file handle or callback.
+
+The lower-level multipart methods are available for applications that
+need to control the multipart lifecycle themselves:
+
+  initiate_multipart_upload()
+  upload_part_of_multipart_upload()
+  complete_multipart_upload()
+  abort_multipart_upload()
+  list_multipart_upload_parts()
+  list_multipart_uploads()
+
+These methods should generally be considered building blocks for
+specialized workflows rather than the default multipart API.
+
+See L<Amazon::S3::Bucket> for their complete method documentation.
+
+=head1 DIRECTORY BUCKETS
+
+C<Amazon::S3> provides limited support for Amazon S3 directory
+buckets.
+
+Directory buckets use the S3 Express One Zone storage class.
+
+C<Amazon::S3> can currently create and list directory buckets.
+Object access within directory buckets is not yet supported because
+that requires creating an S3 Express session and using the resulting
+temporary credentials when signing requests to the directory bucket's
+Zonal endpoint.
+
+A directory bucket can be created by supplying an availability zone
+to C<add_bucket()>:
+
+  my $bucket = $s3->add_bucket(
+    { bucket            => $bucket_name,
+      availability_zone => 'use1-az5',
+    }
+  );
+
+Directory buckets owned by the account can be listed with
+C<list_directory_buckets()>.
+
+See
+L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-buckets-overview.html>.
+
+=head1 ERROR HANDLING
+
+C[Amazon::S3](Amazon::S3) uses both return-value errors and exceptions.
+
+For backward compatibility, many service operations return C<undef> or
+a false value when an S3 request fails and record information about the
+most recent error on the C[Amazon::S3](Amazon::S3) object.
+
+The primary error accessors are:
+
+err()
+errstr()
+error()
+
+C<err()> contains the S3 error code when one is available.
+
+C<errstr()> contains the human-readable service error message.
+
+C<error()> contains the parsed structured error response when the
+service returned one.
+
+Typical error handling using the historical interface therefore looks
+like:
+
+my $response = $s3->buckets;
+
+if (!$response) {
+die $s3->err . ': ' . $s3->errstr;
+}
+
+Applications that prefer request failures to throw exceptions can
+enable C<raise_error> when constructing the client:
+
+my $s3 = Amazon::S3->new(
+credentials => $credentials,
+raise_error => 1,
+);
+
+With C<raise_error> enabled, S3 request failures that would normally
+return a failure value instead throw an exception. The error state is
+still recorded in C<err()>, C<errstr()>, and C<error()> before the
+exception is raised.
+
+When available, the exception includes the HTTP status together with
+the S3 error code and message.
+
+Some request, protocol, multipart, checksum verification, and
+validation failures always throw exceptions because the operation
+cannot safely continue.
+
+The most recent HTTP request and response can be inspected using
+C<last_request()> and C<last_response()>.
+
+These accessors are especially useful when diagnosing signing,
+endpoint, header, or protocol problems.
+
+C<raise_error> defaults to false to preserve the historical
+C[Amazon::S3](Amazon::S3) interface. New applications may prefer to enable it when
+they want request failures to be impossible to overlook.
 
 =head1 METHODS AND SUBROUTINES
 
-Unless otherwise noted methods will return an C<undef> if an error
-occurs.  You can get more information about the error by calling
-C<err()> and C<errstr()>.
+This section documents methods provided directly by C<Amazon::S3>.
 
-=head2 new 
+Methods implemented by L<Amazon::S3::Bucket> or
+L<Amazon::S3::BucketV2> are documented by those classes and are not
+duplicated here.
 
-Create a new S3 client object. Takes some arguments:
+Unless otherwise noted, a service operation returns C<undef> when an
+error occurs and records error information on the C<Amazon::S3>
+object. Some request, protocol, and validation failures throw an
+exception instead.
 
-=over
+See L</ERROR HANDLING>.
 
-=item credentials (optional)
+=head2 CONSTRUCTOR
 
-Reference to a class (like C<Amazon::Credentials>) that can provide
-credentials via the methods:
+=head3 new
 
- get_aws_access_key_id()
- get_aws_secret_access_key()
- get_token()
+  my $s3 = Amazon::S3->new(%options);
 
-If you do not provide a credential class you must provide the keys
-when you instantiate the object. See below.
+  my $s3 = Amazon::S3->new(\%options);
 
-I<You are strongly encourage to use a class that provides getters. If
-you choose to provide your credentials to this class then they will be
-stored in this object. If you dump the class you will likely expose
-those credentials.>
+Creates and returns a new C<Amazon::S3> client object.
+
+The constructor accepts either a list of key/value pairs or a hash
+reference.
+
+At least one of the following credential configurations is required:
+
+=over 4
+
+=item *
+
+A C<credentials> object that provides C<get_aws_access_key_id()>,
+C<get_aws_secret_access_key()>, and C<get_token()>.
+
+=item *
+
+Both C<aws_access_key_id> and C<aws_secret_access_key>.
+
+=back
+
+The following options are supported:
+
+=over 4
 
 =item aws_access_key_id
 
-Use your Access Key ID as the value of the AWSAccessKeyId parameter
-in requests you send to Amazon Web Services (when required). Your
-Access Key ID identifies you as the party responsible for the
-request.
+AWS access key ID.
 
-=item aws_secret_access_key 
+This option is required when a C<credentials> object is not supplied.
 
-Since your Access Key ID is not encrypted in requests to AWS, it
-could be discovered and used by anyone. Services that are not free
-require you to provide additional information, a request signature,
-to verify that a request containing your unique Access Key ID could
-only have come from you.
+When explicit credentials are supplied, C<Amazon::S3> stores them
+internally for use when signing requests. Applications should avoid
+dumping the client object to logs.
 
-B<DO NOT INCLUDE THIS IN SCRIPTS OR APPLICATIONS YOU
-DISTRIBUTE. YOU'LL BE SORRY.>
+See L</AUTHENTICATION AND CREDENTIALS>.
 
-I<Consider using a credential class as described above to provide
-credentials, otherwise this class will store your credentials for
-signing the requests. If you dump this object to logs your credentials
-could be discovered.>
+=item aws_secret_access_key
 
-=item token
+AWS secret access key.
 
-An optional temporary token that will be inserted in the request along
-with your access and secret key.  A token is used in conjunction with
-temporary credentials when your EC2 instance has
-assumed a role and you've scraped the temporary credentials from
-I<http://169.254.169.254/latest/meta-data/iam/security-credentials>
+This option is required when a C<credentials> object is not supplied.
 
-=item secure
-
-Set this to a true value if you want to use SSL-encrypted connections
-when connecting to S3. Starting in version 0.49, the default is true.
-
-default: true
-
-=item timeout
-
-Defines the time, in seconds, your script should wait or a
-response before bailing.
-
-default: 30s
-
-=item retry
-
-Enables or disables the library to retry upon errors. This
-uses exponential backoff with retries after 1, 2, 4, 8, 16,
-32 seconds, as recommended by Amazon.
-
-default: off
-
-=item host
-
-Defines the S3 host endpoint to use.
-
-default: s3.amazonaws.com
-
-Note that requests are made to domain buckets when possible.  You can
-prevent that behavior if either the bucket name does not conform to
-DNS bucket naming conventions or you preface the bucket name with '/'
-or explicitly turn off domain buckets by setting C<dns_bucket_names>
-to false.
-
-If you set a region then the host name will be modified accordingly if
-it is an Amazon endpoint.
-
-=item region
-
-The AWS region you where your bucket is located.
-
-default: us-east-1
+See L</AUTHENTICATION AND CREDENTIALS>.
 
 =item buffer_size
 
-The default buffer size when reading or writing files.
+Default buffer size, in bytes, used by operations that stream object
+data.
 
-default: 4096
+The default is 4096.
+
+=item cache_signer
+
+When true, retain and reuse the Signature Version 4 signer.
+
+When false, construct a signer when one is needed.
+
+The default is false.
+
+See L</AUTHENTICATION AND CREDENTIALS>.
+
+=item checksum_algorithm
+
+Checksum algorithm used when C<Amazon::S3> supplies a checksum with an
+upload.
+
+The default is C<crc64nvme>.
+
+Recognized S3 checksum algorithm names are validated by the
+constructor. Local checksum implementations provided by this release
+are described in L</CHECKSUMS>.
+
+=item credentials
+
+Credentials provider object.
+
+The object must provide:
+
+  get_aws_access_key_id()
+  get_aws_secret_access_key()
+  get_token()
+
+L<Amazon::Credentials> is one implementation of this interface.
+
+See L</AUTHENTICATION AND CREDENTIALS>.
+
+=item debug
+
+Compatibility option that sets the default logger level to C<debug>.
+
+Applications should normally use C<level> instead.
+
+This option affects the internally created logger only.
+
+=item dns_bucket_names
+
+Controls whether virtual-hosted-style bucket names are used when
+possible.
+
+The default is true.
+
+A bucket name that cannot be used as a DNS subdomain is placed in the
+request path instead.
+
+=item endpoint_url
+
+A fully qualified HTTP or HTTPS service endpoint. The URL may include a
+port. This constructor option is a convenience for setting C<host> and
+C<secure> together.
+
+For example:
+
+  endpoint_url => 'http://localhost:4566'
+
+C<endpoint_url> cannot be used together with C<host> or C<secure> and
+must not contain a path.
+
+=item host
+
+S3 service endpoint.
+
+The default is C<s3.amazonaws.com>.
+
+When C<region()> is set and the host is a standard Amazon S3 endpoint,
+C<Amazon::S3> adjusts the host for the configured region.
+
+This option can also be used with S3-compatible and local testing
+services.
+
+=item level
+
+Logging level used when C<Amazon::S3> creates its default logger.
+
+The default is C<error>.
+
+See L</LOGGING AND DEBUGGING>.
+
+=item logger
+
+Logger object.
+
+If omitted, C<Amazon::S3::Logger> is used.
+
+A caller-supplied logger is expected to provide the logging methods
+used by C<Amazon::S3>.
+
+See L</LOGGING AND DEBUGGING>.
+
+=item raise_error
+
+When true, S3 request failures that would normally be reported through
+the return value and the C<err()>, C<errstr()>, and C<error()> accessors
+instead throw an exception.
+
+The exception includes the HTTP status and, when available, the S3
+error code and message.
+
+The default is false for backward compatibility.
+
+See L</ERROR HANDLING>.
+
+=item region
+
+AWS region used for account-level requests and as the default region
+for newly constructed bucket objects.
+
+The default is C<us-east-1>.
+
+=item retry
+
+When true, use retry-aware HTTP handling.
+
+Retries use exponential delays of 1, 2, 4, 8, 16, and 32 seconds.
+
+The default is false.
+
+=item secure
+
+When true, use HTTPS when communicating with the service.
+
+The default is true.
+
+=item signer
+
+Optional Signature Version 4 signer object.
+
+When supplied, this signer is used instead of constructing one from
+the configured credentials.
+
+See L</AUTHENTICATION AND CREDENTIALS>.
+
+=item timeout
+
+HTTP request timeout in seconds.
+
+The default is 30.
+
+=item token
+
+Optional AWS session token used with temporary credentials.
+
+=item verify_checksums
+
+Controls checksum verification when downloading objects.
+
+The default is true.
+
+See L</CHECKSUMS>.
 
 =back
 
-=head2 signer
+If neither a credentials provider nor both explicit access key values
+are supplied, the constructor throws an exception.
 
-Sets or retrieves the signer object. API calls must be signed using
-your AWS credentials. By default, starting with version 0.54 the
-module will use L<Net::Amazon::Signature::V4> as the signer and
-instantiate a signer object in the constructor. Note however, that
-signers need your credentials and they I<will> get stored by that
-class, making them susceptible to inadvertant exfiltration. You have a
-few options here:
+An invalid C<checksum_algorithm> also causes the constructor to throw
+an exception.
 
-=over 5
+On success, returns the new C<Amazon::S3> object.
 
-=item 1. Use your own signer.
+=head2 ACCESSORS
 
-You may have noticed that you can also provide your own credentials
-object forcing this module to use your object for retrieving
-credentials. Likewise, you can use your own signer so that this
-module's signer never sees or stores those credentials.
+=head3 buffer_size
 
-=item 2. Pass the credentials object and set C<cache_signer> to a
-false value.
+  my $buffer_size = $s3->buffer_size;
 
-If you pass a credentials object and set C<cache_signer> to a false
-value, the module will use the credentials object to retrieve
-credentials and create a new signer each time an API call is made that
-requires signing. This prevents your credentials from being stored
-inside of the signer class.
+  $s3->buffer_size($bytes);
 
-I<Note that using your own credentials object that stores your
-credentials in plaintext is also going to expose your credentials when
-someone dumps the class.>
+Gets or sets the default streaming buffer size in bytes.
 
-=item 3. Pass credentials, set C<cache_signer> to a false value.
+The constructor default is 4096.
 
-Unfortunately, while this will prevent L<Net::Amazon::Signature::V4>
-from hanging on to your credentials, you credentials will be stored in
-the C<Amazon::S3> object.
+=head3 cache_signer
 
-Starting with version 0.55 of this module, if you have installed
-L<Crypt::CBC> and L<Crypt::Blowfish>, your credentials will be
-encrypted using a random key created when the class is
-instantiated. While this is more secure than leaving them in
-plaintext, if the key is discovered (the key however is not stored in
-the object's hash) and the object is dumped, your I<encrypted>
-credentials can be exposed.
+  my $cache_signer = $s3->cache_signer;
 
-=item 4. Use very granular credentials for bucket access only.
+  $s3->cache_signer($boolean);
 
-Use credentials that only allow access to a bucket or portions of a
-bucket required for your application. This will at least limit the
-I<blast radius> of any potential security breach.
+Gets or sets whether a generated request signer is retained for reuse.
 
-=item 5. Do nothing...send the credentials, use the default signer.
+The constructor default is false.
 
-In this case, both the C<Amazon::S3> class and the
-L<Net::Amazon::Signature::V4> have your credentials. Caveat Emptor.
+See L</AUTHENTICATION AND CREDENTIALS>.
 
-See also L<Amazon::Credentials> for more information about safely
-storing your credentials and preventing exfiltration.
+=head3 checksum_algorithm
+
+  my $algorithm = $s3->checksum_algorithm;
+
+  $s3->checksum_algorithm('sha256');
+
+Gets or sets the checksum algorithm selected for uploads.
+
+The constructor default is C<crc64nvme>.
+
+The constructor validates the initial value. Callers that change this
+accessor after construction are responsible for supplying an
+algorithm supported by the operation being performed.
+
+See L</CHECKSUMS>.
+
+=head3 checksum_types
+
+  my $checksum_types = $s3->checksum_types;
+
+Returns the checksum implementations initialized for this client.
+
+The value is a hash reference keyed by algorithm name.
+
+This accessor is intended for introspection. The internal checksum
+implementation entries are not a public plugin interface in this
+release.
+
+See L</CHECKSUMS>.
+
+=head3 credentials
+
+  my $credentials = $s3->credentials;
+
+  $s3->credentials($credentials);
+
+Gets or sets the credentials provider object.
+
+See L</AUTHENTICATION AND CREDENTIALS>.
+
+=head3 dns_bucket_names
+
+  my $enabled = $s3->dns_bucket_names;
+
+  $s3->dns_bucket_names($boolean);
+
+Gets or sets whether virtual-hosted-style bucket addressing is used
+when possible.
+
+The constructor default is true.
+
+=head3 err
+
+Returns the most recent S3 error code or short error identifier.
+
+See L</ERROR HANDLING>.
+
+=head3 error
+
+Returns the most recent parsed structured error response.
+
+See L</ERROR HANDLING>.
+
+=head3 errstr
+
+Returns the most recent human-readable error message.
+
+See L</ERROR HANDLING>.
+
+=head3 host
+
+  my $host = $s3->host;
+
+  $s3->host($endpoint);
+
+Gets or sets the configured S3 endpoint.
+
+The constructor default is C<s3.amazonaws.com>.
+
+See L</S3-COMPATIBLE SERVICES>.
+
+=head3 last_request
+
+Returns the most recent L<HTTP::Request> generated by C<Amazon::S3>.
+
+See L</ERROR HANDLING>.
+
+=head3 last_response
+
+Returns the most recent L<HTTP::Response> received by C<Amazon::S3>.
+
+See L</ERROR HANDLING>.
+
+=head3 logger
+
+  my $logger = $s3->logger;
+
+  $s3->logger($logger);
+
+Gets or sets the logger used by C<Amazon::S3>.
+
+See L</LOGGING AND DEBUGGING>.
+
+=head3 retry
+
+  my $retry = $s3->retry;
+
+  $s3->retry($boolean);
+
+Gets or sets whether retry-aware HTTP handling is enabled.
+
+The constructor default is false.
+
+=head3 secure
+
+  my $secure = $s3->secure;
+
+  $s3->secure($boolean);
+
+Gets or sets whether HTTPS is used.
+
+The constructor default is true.
+
+=head3 timeout
+
+  my $timeout = $s3->timeout;
+
+  $s3->timeout($seconds);
+
+Gets or sets the HTTP request timeout in seconds.
+
+The constructor default is 30.
+
+=head3 verify_checksums
+
+  my $verify_checksums = $s3->verify_checksums;
+
+  $s3->verify_checksums($boolean);
+
+Gets or sets whether supported checksums returned for downloaded
+objects are verified.
+
+The constructor default is true.
+
+See L</CHECKSUMS>.
+
+=head2 AUTHENTICATION AND CONFIGURATION METHODS
+
+=head3 get_credentials
+
+  my ( $access_key_id, $secret_access_key, $token )
+    = $s3->get_credentials;
+
+Returns the credentials used by the client.
+
+When a C<credentials> provider is configured, this method obtains the
+three values from that provider.
+
+Otherwise it returns the credentials stored by the C<Amazon::S3>
+object.
+
+The return values, in order, are:
+
+=over 4
+
+=item 1.
+
+AWS access key ID.
+
+=item 2.
+
+AWS secret access key.
+
+=item 3.
+
+Session token, or C<undef> when no token is configured.
 
 =back
 
-=head2 region
+See L</AUTHENTICATION AND CREDENTIALS>.
 
-Sets the region for the API calls. This will also be the
-default when instantiating the bucket object unless you pass the
-region parameter in the C<bucket> method or use the C<verify_region>
-flag that will I<always> verify the region of the bucket using the
-C<get_location_constraint> method.
+=head3 get_default_region
 
-default: us-east-1
+  my $region = $s3->get_default_region;
 
-=head2 buckets
+Attempts to determine the default AWS region.
 
- buckets([verify-region])
+The method checks, in order:
 
-=over
+=over 4
 
-=item verify-region (optional)
+=item 1.
 
-C<verify-region> is a boolean value that indicates if the
-bucket's region should be verified when the bucket object is
-instantiated.
+C<AWS_REGION>.
 
-If set to true, this method will call the C<bucket> method with
-C<verify_region> set to true causing the constructor to call the
-C<get_location_constraint> for each bucket to set the bucket's
-region. This will cause a significant decrease in the peformance of
-the C<buckets()> method. Setting the region for each bucket is
-necessary since API operations on buckets require the region of the
-bucket when signing API requests. If all of your buckets are in the
-same region and you have passed a region parameter to your S3 object,
-then that region will be used when calling the constructor of your
-bucket objects.
+=item 2.
 
-default: false
+C<AWS_DEFAULT_REGION>.
+
+=item 3.
+
+The EC2 instance metadata availability-zone endpoint.
 
 =back
 
-Returns a reference to a hash containing the metadata for all of the
-buckets owned by the accout or (see below) or C<undef> on error.
+When an availability zone is obtained from instance metadata, the
+zone suffix is removed to derive the region.
 
-=over
+If no region can be determined, C<us-east-1> is returned.
 
-=item owner_id
+=head3 get_logger
 
-The owner ID of the bucket's owner.
+  my $logger = $s3->get_logger;
 
-=item owner_display_name
+Returns the logger associated with the client.
 
-The name of the owner account. 
+If no logger was supplied to C<new()>, this is the
+L<Amazon::S3::Logger> instance created by the constructor.
 
-=item buckets
+This method is provided for compatibility with logger interfaces that
+expect C<get_logger()>.
 
-An array of L<Amazon::S3::Bucket> objects for the account. Returns
-C<undef> if there are not buckets or an error occurs.
+See L</LOGGING AND DEBUGGING>.
 
-=back
+=head3 level
 
-=head2 add_bucket
+  my $level = $s3->level;
 
- add_bucket(bucket-configuration)
+  $s3->level('debug');
 
-C<bucket-configuration> is a reference to a hash with bucket
-configuration parameters.
+Gets or sets the logging level.
 
-I<Note that since April of 2023, new buckets are created that block
-public access by default. If you attempt to set an ACL with public
-permissions the create operation will fail. To create a public bucket
-you must first create the bucket with private permissions, remove the
-public block and subsequently apply public permissions.>
+When a level is supplied, both the stored logging level and the
+associated logger level are updated.
 
-See L</delete_public_access_block>.
+When called without an argument, returns the current logger level.
 
-=over
+The constructor default is C<error>.
+
+See L</LOGGING AND DEBUGGING>.
+
+=head3 region
+
+  my $region = $s3->region;
+
+  $s3->region('us-west-2');
+
+Gets or sets the region used by the client.
+
+The region is used for account-level requests and as the default
+region assigned to bucket objects when no bucket-specific region is
+supplied.
+
+When the configured host uses the standard C<s3.amazonaws.com> form,
+setting the region also adjusts the host to the regional Amazon S3
+endpoint.
+
+The constructor default is C<us-east-1>.
+
+=head3 signer
+
+  my $signer = $s3->signer;
+
+Returns the Signature Version 4 signer used for requests.
+
+If a signer was supplied to the constructor, that signer is returned.
+
+Otherwise a signer is constructed from the current credentials,
+region, and session token.
+
+When C<cache_signer> is true, a generated signer is retained and
+reused. When it is false, a signer can be generated as needed.
+
+This method does not accept a signer argument. Supply a custom signer
+using the C<signer> constructor option.
+
+See L</AUTHENTICATION AND CREDENTIALS>.
+
+=head2 BUCKET MANAGEMENT
+
+=head3 add_bucket
+
+  my $bucket = $s3->add_bucket(\%configuration);
+
+Creates a bucket.
+
+The argument is a hash reference containing the bucket configuration.
+
+=over 4
 
 =item bucket
 
-The name of the bucket. See L<Bucket name
-rules|https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html>
-for more details on bucket naming rules.
+Required. Bucket name.
 
-=item acl_short (optional)
+=item acl_short
 
-See the set_acl subroutine for documenation on the acl_short
-options. Note that starting in April of 2023 new buckets are
-configured to automatically block public access. Trying to create a
-bucket with public permissions will fail. In order to create a public
-bucket you must first create a private bucket, then call the
-DeletePublicAccessBlock API. You can then set public permissions for
-your bucket using ACLs or a bucket policy.
+Optional canned ACL.
+
+Optional canned ACL applied when creating the bucket.
+
+See L</WORKING WITH BUCKETS AND OBJECTS>.
 
 =item location_constraint
 
+Compatibility name for the region in which the bucket should be
+created.
+
+When both C<location_constraint> and C<region> are supplied,
+C<location_constraint> takes precedence.
+
 =item region
 
-The region the bucket is to be created in.
+Region in which the bucket should be created.
+
+If neither C<region> nor C<location_constraint> is supplied, the
+client region is used.
+
+For C<us-east-1>, no location constraint is sent.
 
 =item headers
 
-Additional headers to send with request.
+Optional hash reference containing additional request headers.
+
+=item availability_zone
+
+When supplied, create an S3 directory bucket in the specified
+availability zone.
+
+See L</DIRECTORY BUCKETS>.
 
 =back
 
-Returns a L<Amazon::S3::Bucket> object on success or C<undef> on failure.
+On success, returns an L<Amazon::S3::Bucket> object for the newly
+created bucket.
 
-=head2 bucket
+On failure, returns C<undef> and records error information on the
+client.
 
- bucket(bucket, [region])
+=head3 bucket
 
- bucket({ bucket => bucket-name, verify_region => boolean, region => region });
+  my $bucket = $s3->bucket($bucket_name);
 
-Takes a scalar argument or refernce to a hash of arguments.
+  my $bucket = $s3->bucket($bucket_name, $region);
 
-You can pass the region or set C<verify_region> indicating that
-you want the bucket constructor to detemine the bucket region.
+  my $bucket = $s3->bucket(
+    { bucket        => $bucket_name,
+      region        => $region,
+      verify_region => $boolean,
+    }
+  );
 
-If you do not pass the region or set the C<verify_region> value, the
-region will be set to the default region set in your C<Amazon::S3>
-object.
+Constructs and returns an L<Amazon::S3::Bucket> object.
 
-See L<Amazon::S3::Bucket> for a complete description of the C<bucket>
-method.
+This method does not create an S3 bucket and does not otherwise verify
+that the bucket exists.
 
-=head2 delete_bucket
+The hash-reference form accepts:
 
-Takes either a L<Amazon::S3::Bucket> object or a reference to a hash
-containing:
-
-=over
+=over 4
 
 =item bucket
 
-The name of the bucket to remove
+Bucket name.
 
 =item region
 
-Region the bucket is located in. If not provided, the method will
-determine the bucket's region by calling C<get_bucket_location>.
+Region containing the bucket.
+
+When no region is supplied and C<verify_region> is false, the client
+region is used.
+
+=item verify_region
+
+When true, allow the L<Amazon::S3::Bucket> constructor to determine
+the bucket region using the bucket location API.
+
+This incurs an additional service request.
 
 =back
 
-Returns a boolean indicating the success or failure of the API
-call. Check C<err> or C<errstr> for error messages.
+The returned bucket object is associated with this C<Amazon::S3>
+client.
 
-Note from the L<Amazon's documentation|https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html>
+See L<Amazon::S3::Bucket>.
 
-=over 10
+=head3 buckets
 
-If a bucket is empty, you can delete it. After a bucket is deleted,
-the name becomes available for reuse. However, after you delete the
-bucket, you might not be able to reuse the name for various reasons.
+  my $response = $s3->buckets;
 
-For example, when you delete the bucket and the name becomes available
-for reuse, another AWS account might create a bucket with that
-name. In addition, B<some time might pass before you can reuse the name
-of a deleted bucket>. If you want to use the same bucket name, we
-recommend that you don't delete the bucket.
+  my $response = $s3->buckets($verify_region);
+
+Lists the general-purpose buckets owned by the account.
+
+C<verify_region> is an optional boolean. When true, each returned
+L<Amazon::S3::Bucket> object is constructed with region verification
+enabled.
+
+Region verification can require an additional service request for
+each bucket and can therefore significantly increase the cost and
+latency of C<buckets()>.
+
+The default is false.
+
+On success, returns a hash reference containing:
+
+=over 4
+
+=item owner_id
+
+Owner ID returned by S3.
+
+=item owner_displayname
+
+Owner display name returned by S3.
+
+=item buckets
+
+Array reference of L<Amazon::S3::Bucket> objects.
+
+When the account has no returned buckets, this is an empty array
+reference.
 
 =back
 
-=head2 delete_public_access_block
+On failure, returns C<undef> and records error information on the
+client.
 
- delete_public_access_block(bucket-obj)
+=head3 bucketv2
 
-Removes the public access block flag for the bucket.
+  my $bucket = $s3->bucketv2(
+    { bucket        => $bucket_name,
+      region        => $region,
+      verify_region => $boolean,
+    }
+  );
 
-=head2 dns_bucket_names
+Constructs and returns an L<Amazon::S3::BucketV2> object.
 
-Set or get a boolean that indicates whether to use DNS bucket
-names.
+The accepted parameters are:
 
-default: true
+=over 4
 
-=head2 err
+=item bucket
 
-Returns the last error. Usually this is the error code returned from
-an API call or a short message that the describes the error. Use
-C<errstr> for a more descriptive explanation of the error condition.
+Bucket name.
 
-=head2 errstr
+=item region
 
-Detailed error description.
+Region containing the bucket.
 
-=head2 list_bucket, list_bucket_v2
+When no region is supplied and C<verify_region> is false, the client
+region is used.
 
-List keys in a bucket. Note that this method will only return
-C<max-keys>. If you want all of the keys you should use
-C<list_bucket_all> or C<list_bucket_all_v2>.
+=item verify_region
 
-I<See the note in the C<delimiter> and C<max-keys> descriptions below
-regarding how keys are counted against the C<max-keys> value.>
+When true, allow the bucket object to determine its region.
 
-Takes a reference to a hash of arguments:
+=back
 
-=over
+Like C<bucket()>, this method constructs a client-side object. It does
+not create the S3 bucket.
 
-=item bucket (required)
+=head3 delete_bucket
 
-The name of the bucket you want to list keys on.
+  my $ok = $s3->delete_bucket($bucket);
 
-=item prefix
+  my $ok = $s3->delete_bucket(
+    { bucket  => $bucket_name,
+      region  => $region,
+      headers => $headers,
+    }
+  );
 
-Restricts the response to only contain results that begin with the
-specified prefix. If you omit this optional argument, the value of
-prefix for your query will be the empty string. In other words, the
-results will be not be restricted by prefix.
+Deletes an S3 bucket.
+
+The first form accepts an L<Amazon::S3::Bucket> object and uses its
+bucket name and region.
+
+The hash-reference form accepts:
+
+=over 4
+
+=item bucket
+
+Required. Bucket name.
+
+=item region
+
+Region containing the bucket.
+
+If omitted, C<get_bucket_location()> is called to determine the
+region.
+
+=item headers
+
+Optional hash reference containing additional request headers.
+
+=back
+
+The bucket must be empty before Amazon S3 will delete it.
+
+Returns a true value on success.
+
+On failure, returns C<undef> and records error information on the
+client.
+
+=head3 delete_public_access_block
+
+  my $response = $s3->delete_public_access_block($bucket);
+
+Removes the public access block configuration from a bucket.
+
+The argument is expected to be an L<Amazon::S3::Bucket> object.
+
+The method performs the C<DeletePublicAccessBlock> operation through
+the L<Amazon::S3::BucketV2> interface and returns that operation's
+result.
+
+This operation may be required before applying public ACLs or public
+bucket policies to buckets whose public access block settings prohibit
+them.
+
+=head3 get_bucket_location
+
+  my $region = $s3->get_bucket_location($bucket_name);
+
+  my $region = $s3->get_bucket_location($bucket);
+
+Returns the region containing a bucket.
+
+The argument may be a bucket name or an L<Amazon::S3::Bucket> object.
+
+For a bucket name, a temporary L<Amazon::S3::Bucket> object is
+constructed and its C<get_location_constraint()> method is called.
+
+Amazon S3 represents C<us-east-1> with a null location constraint.
+When the bucket location call returns no region,
+C<get_bucket_location()> returns C<us-east-1>.
+
+=head3 list_directory_buckets
+
+  my $response = $s3->list_directory_buckets;
+
+  my $response = $s3->list_directory_buckets(
+    { uri_params => \%params,
+    }
+  );
+
+Lists directory buckets owned by the account.
+
+The optional C<uri_params> hash reference is passed as URI parameters
+to the S3 Express control endpoint.
+
+The method temporarily switches the client to the S3 Express control
+endpoint for the request and restores the previous express-mode state
+afterward.
+
+On success, returns the parsed S3 response.
+
+On failure, returns C<undef> and records error information on the
+client.
+
+See L</DIRECTORY BUCKETS>.
+
+=head2 OBJECT LISTING AND VERSIONING
+
+=head3 list_bucket
+
+  my $response = $s3->list_bucket(\%parameters);
+
+Lists objects using the original S3 ListObjects API.
+
+The argument is a hash reference. C<bucket> is required. Other defined
+entries are sent as ListObjects query parameters.
+
+Common parameters are:
+
+=over 4
+
+=item bucket
+
+Required. Bucket name.
 
 =item delimiter
 
-If this optional, Unicode string parameter is included with your
-request, then keys that contain the same string between the prefix
-and the first occurrence of the delimiter will be rolled up into a
-single result element in the CommonPrefixes collection. These
-rolled-up keys are not returned elsewhere in the response.  For
-example, with prefix="USA/" and delimiter="/", the matching keys
-"USA/Oregon/Salem" and "USA/Oregon/Portland" would be summarized
-in the response as a single "USA/Oregon" element in the CommonPrefixes
-collection. If an otherwise matching key does not contain the
-delimiter after the prefix, it appears in the Contents collection.
+Optional delimiter used to group matching keys into common prefixes.
 
-Each element in the CommonPrefixes collection counts as one against
-the C<MaxKeys> limit. The rolled-up keys represented by each CommonPrefixes
-element do not.  
+=item headers
 
-In other words, key below the delimiter are not considered in the
-count.
-
-Remember that S3 keys do not represent a file system hierarchy
-although it might look like that depending on how you choose to store
-objects. Using the C<prefix> and C<delimiter> parameters essentially
-allows you to restrict the return set to parts of your key
-"hierarchy". So in the example above If all I wanted was the very top
-level of the hierarchy I would set my C<delimiter to> '/' and omit the
-C<prefix> parameter.
-
-
-If the C<Delimiter> parameter is not present in your
-request, keys in the result set will not be rolled-up and neither
-the CommonPrefixes collection nor the NextMarker element will be
-present in the response.
-
-NOTE: CommonPrefixes isn't currently supported by Amazon::S3. 
-
-Example:
-
-Suppose I have the keys:
-
- bar/baz
- bar/buz
- bar/buz/biz
- bar/buz/zip
-
-And I'm only interest in object directly below 'bar'
-
- prefix=bar/
- delimiter=/
-
-Would yield:
-
- bar/baz
- bar/buz
-
-Omitting the delimiter would yield:
-
- bar/baz
- bar/buz
- bar/buz/biz
- bar/buz/zip
-
-=item max-keys 
-
-This optional argument limits the number of results returned in
-response to your query. Amazon S3 will return no more than this
-number of results, but possibly less. Even if max-keys is not
-specified, Amazon S3 will limit the number of results in the response.
-Check the IsTruncated flag to see if your results are incomplete.
-If so, use the C<Marker> parameter to request the next page of results.
-For the purpose of counting C<max-key>s, a 'result' is either a key
-in the 'Contents' collection, or a delimited prefix in the
-'CommonPrefixes' collection. So for delimiter requests, max-keys
-limits the total number of list results, not just the number of
-keys.
+Optional hash reference containing additional request headers.
 
 =item marker
 
-This optional parameter enables pagination of large result sets.
-C<marker> specifies where in the result set to resume listing. It
-restricts the response to only contain results that occur alphabetically
-after the value of marker. To retrieve the next page of results,
-use the last key from the current page of results as the marker in
-your next request.
+Optional key after which listing should resume.
 
-See also C<next_marker>, below. 
+=item max-keys
 
-If C<marker> is omitted,the first page of results is returned. 
+Optional maximum number of results returned by S3.
 
-=back
+=item prefix
 
-Returns C<undef> on error and a reference to a hash of data on success:
-
-The return value looks like this:
-
-  {
-   bucket       => $bucket_name,
-   prefix       => $bucket_prefix, 
-   marker       => $bucket_marker, 
-   next_marker  => $bucket_next_available_marker,
-   max_keys     => $bucket_max_keys,
-   is_truncated => $bucket_is_truncated_boolean
-   keys          => [$key1,$key2,...]
-  }
-
-=over
-
-=item is_truncated
-
-Boolean flag that indicates whether or not all results of your query were
-returned in this response. If your results were truncated, you can
-make a follow-up paginated request using the Marker parameter to
-retrieve the rest of the results.
-
-=item next_marker 
-
-A convenience element, useful when paginating with delimiters. The
-value of C<next_marker>, if present, is the largest (alphabetically)
-of all key names and all CommonPrefixes prefixes in the response.
-If the C<is_truncated> flag is set, request the next page of results
-by setting C<marker> to the value of C<next_marker>. This element
-is only present in the response if the C<delimiter> parameter was
-sent with the request.
+Optional prefix used to restrict returned keys.
 
 =back
 
-Each key is a reference to a hash that looks like this:
+On success, returns the normalized listing structure described in
+L</LISTING OBJECTS>.
 
-  {
-    key           => $key,
-    last_modified => $last_mod_date,
-    etag          => $etag, # An MD5 sum of the stored content.
-    size          => $size, # Bytes
-    storage_class => $storage_class # Doc?
-    owner_id      => $owner_id,
-    owner_displayname => $owner_name
-  }
+On failure, returns C<undef> and records error information on the
+client.
 
-=head2 get_bucket_location
+See L</LISTING OBJECTS>.
+=head3 list_bucket_all
 
- get_bucket_location(bucket-name)
- get_bucket_locaiton(bucket-obj)
+  my $response = $s3->list_bucket_all(\%parameters);
 
-This is a convenience routines for the C<get_location_constraint()> of
-the bucket object.  This method will return the default
-region of 'us-east-1' when C<get_location_constraint()> returns a null
-value.
+Lists all matching objects using the original ListObjects API.
 
- my $region = $s3->get_bucket_location('my-bucket');
+The accepted parameters are the same as for C<list_bucket()>.
 
-Starting with version 0.55, C<Amazon::S3::Bucket> will call this
-C<get_location_constraint()> to determine the region for the
-bucket. You can get the region for the bucket by using the C<region()>
-method of the bucket object.
+The method follows pagination automatically and can therefore make
+multiple S3 requests.
 
-  my $bucket = $s3->bucket('my-bucket');
-  my $bucket_region = $bucket->region;
+On success, returns the combined normalized listing result.
 
-=head2 get_logger
+On a pagination failure, the method throws an exception.
 
-Returns the logger object. If you did not set a logger when you
-created the object then an instance of C<Amazon::S3::Logger> is
-returned. You can log to STDERR using this logger. For example:
+See L</LISTING OBJECTS>.
+=head3 list_bucket_all_v2
 
- $s3->get_logger->debug('this is a debug message');
+  my $response = $s3->list_bucket_all_v2(\%parameters);
 
- $s3->get_logger->trace(sub { return Dumper([$response]) });
+Lists all matching objects using ListObjectsV2.
 
-=head2 list_bucket_all, list_bucket_all_v2
+The accepted parameters are the same as for C<list_bucket_v2()>.
 
-List all keys in this bucket without having to worry about
-'marker'. This is a convenience method, but may make multiple requests
-to S3 under the hood.
+The method follows pagination automatically and can therefore make
+multiple S3 requests.
 
-Takes the same arguments as C<list_bucket>.
+On success, returns the combined normalized listing result.
 
-I<You are encouraged to use the newer C<list_bucket_all_v2> method.>
+On a pagination failure, the method throws an exception.
 
-=head2 list_object_versions
+See L</LISTING OBJECTS>.
+=head3 list_bucket_v2
 
- list_object_versions( args ) 
+  my $response = $s3->list_bucket_v2(\%parameters);
 
-Returns metadata about all versions of the objects in a bucket. You
-can also use request parameters as selection criteria to return
-metadata about a subset of all the object versions.
+Lists objects using the S3 ListObjectsV2 API.
 
-This method will only return the raw result set and does not perform
-pagination or unravel common prefixes as do other methods like
-C<list_bucket>. This may change in the future.
+The argument is a hash reference. C<bucket> is required. Other defined
+entries are sent as ListObjectsV2 query parameters.
 
-See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html>
-for more information about the request parameters and the result body.
+Common parameters are:
 
-C<args> is hash reference containing the following parameters:
-
-=over 5
+=over 4
 
 =item bucket
 
-Name of the bucket. This method is not vailable for directory buckets.
+Required. Bucket name.
 
-=item headers
+=item continuation-token
 
-Optional headers. See
-L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html>
-for more details regarding optional headers.
+Optional continuation token returned by a previous ListObjectsV2
+request.
 
 =item delimiter
 
-A delimiter is a character that you specify to group keys. All keys
-that contain the same string between the prefix and the first
-occurrence of the delimiter are grouped under a single result element
-in CommonPrefixes. These groups are counted as one result against the
-max-keys limitation. These keys are not returned elsewhere in the
-response.
+Optional delimiter used to group matching keys into common prefixes.
 
-=item encoding-type     
+=item encoding-type
 
-Requests Amazon S3 to encode the object keys in the response and
-specifies the encoding method to use.
+Optional S3 response encoding type.
 
-=item key-marker        
+=item fetch-owner
 
-Specifies the key to start with when listing objects in a bucket.
+Optional boolean controlling whether owner information is returned.
 
-=item max-keys          
+=item headers
 
-Sets the maximum number of keys returned in the response. By default,
-the action returns up to 1,000 key names. The response might contain
-fewer keys but will never contain more. If additional keys satisfy the
-search criteria, but were not returned because max-keys was exceeded,
-the response contains <isTruncated>true</isTruncated>. To return the
-additional keys, see key-marker and version-id-marker.
+Optional hash reference containing additional request headers.
 
-default: 1000
+=item marker
 
-=item prefix            
+Compatibility alias for C<continuation-token>.
 
-Use this parameter to select only those keys that begin with the
-specified prefix. You can use prefixes to separate a bucket into
-different groupings of keys. (You can think of using prefix to make
-groups in the same way that you'd use a folder in a file system.) You
-can use prefix with delimiter to roll up numerous objects into a
-single result under CommonPrefixes.
+=item max-keys
 
-=item version-id-marker 
+Optional maximum number of results returned by S3.
 
-Specifies the object version you want to start listing from.
+=item prefix
+
+Optional prefix used to restrict returned keys.
+
+=item start-after
+
+Optional key after which S3 should begin the listing.
 
 =back
 
-=head2 err
+On success, returns the normalized listing structure described in
+L</LISTING OBJECTS>.
 
-The S3 error code for the last error encountered.
+On failure, returns C<undef> and records error information on the
+client.
 
-=head2 errstr
+See L</LISTING OBJECTS>.
+=head3 list_object_versions
 
-A human readable error string for the last error encountered.
+  my $response = $s3->list_object_versions(\%parameters);
 
-=head2 error
+Lists object versions in a bucket.
 
-The decoded XML string as a hash object of the last error.
+The argument is a hash reference.
 
-=head2 last_response
+=over 4
 
-Returns the last L<HTTP::Response> object.
+=item bucket
 
-=head2 last_request
+Required. Bucket name.
 
-Returns the last L<HTTP::Request> object.
+This operation is not available for directory buckets.
 
-=head2 level
+=item delimiter
 
-Set the logging level.
+Optional delimiter used to group matching keys.
 
-default: error
+=item encoding-type
 
-=head2 turn_on_special_retry
+Optional S3 response encoding type.
 
-Called to add extra retry codes if retry has been set
+=item headers
 
-=head2 turn_off_special_retry
+Optional hash reference containing additional request headers.
 
-Called to turn off special retry codes when we are deliberately
-triggering them
+=item key-marker
 
-=head1 ABOUT
+Optional key marker used when continuing a paginated listing.
 
-This module contains code modified from Amazon that contains the
-following notice:
+=item max-keys
 
-  #  This software code is made available "AS IS" without warranties of any
-  #  kind.  You may copy, display, modify and redistribute the software
-  #  code either by itself or as incorporated into your code; provided that
-  #  you do not remove any proprietary notices.  Your use of this software
-  #  code is at your own risk and you waive any claim against Amazon
-  #  Digital Services, Inc. or its affiliates with respect to your use of
-  #  this software code. (c) 2006 Amazon Digital Services, Inc. or its
-  #  affiliates.
+Optional maximum number of results returned by S3.
+
+The S3 default is 1000.
+
+=item prefix
+
+Optional prefix used to restrict returned keys.
+
+=item version-id-marker
+
+Optional version ID marker used with C<key-marker> when continuing a
+paginated listing.
+
+=back
+
+On success, returns the parsed ListObjectVersions service response.
+This method does not automatically follow pagination.
+
+On failure, returns C<undef> and records error information on the
+client.
+
+See L</LISTING OBJECTS> and
+L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html>.
+=head2 ADVANCED AND COMPATIBILITY METHODS
+
+=head3 turn_off_special_retry
+
+  $s3->turn_off_special_retry;
+
+Removes the additional HTTP 400 retry condition installed by
+C<turn_on_special_retry()>.
+
+When retry handling is disabled, this method has no effect.
+
+This method exists primarily for internal and compatibility use.
+
+=head3 turn_on_special_retry
+
+  $s3->turn_on_special_retry;
+
+When retry handling is enabled, adds HTTP 400 to the conditions
+handled by the retry-aware user agent.
+
+This behavior exists because some S3 request timeouts have historically
+been returned as HTTP 400 responses.
+
+The constructor calls this method automatically.
+
+When retry handling is disabled, this method has no effect.
+
+This method exists primarily for internal and compatibility use.
+
+=head1 LOGGING AND DEBUGGING
+
+Logging is controlled by the configured logger and logging level.
+
+When no logger is supplied, C<Amazon::S3::Logger> is used.
+
+Valid levels include:
+
+  fatal
+  error
+  warn
+  info
+  debug
+  trace
+
+The default level is C<error>.
+
+At C<debug> level, C<Amazon::S3> records higher-level request and
+configuration information.
+
+At C<trace> level, HTTP request and response information may also be
+logged.
+
+Applications should review trace output before retaining or sharing
+it. Request and response data may contain sensitive application
+information even when authentication values are sanitized.
+
+=head1 S3-COMPATIBLE SERVICES
+
+C<Amazon::S3> can be used with S3-compatible services and local S3
+implementations by configuring the service endpoint and related
+connection options.
+
+The C<host>, C<secure>, and C<dns_bucket_names> settings are commonly
+relevant when using a non-AWS endpoint.
+
+S3-compatible implementations may differ from AWS in supported APIs,
+request validation, checksum behavior, or edge cases.
+
+The integration tests used during development include LocalStack, but
+applications targeting another S3-compatible implementation should
+test against that implementation directly.
+
+=head1 COMPARISON TO OTHER PERL S3 MODULES
+
+Perl applications have several choices for accessing Amazon S3,
+including L<Net::Amazon::S3>, L<Paws::S3>, L<Amazon::S3::Lite>, and
+L<Amazon::API::S3>. Each takes a different approach.
+
+C<Amazon::S3> provides a dedicated S3 interface with a long-established
+API. The distribution combines the account-level C<Amazon::S3>
+interface with L<Amazon::S3::Bucket> for common object workflows and
+L<Amazon::S3::BucketV2> for broader low-level API access.
+
+C<Net::Amazon::S3> is the project from which C<Amazon::S3> originally
+forked. The distributions have since diverged and should not be
+considered drop-in replacements for one another.
+
+C<Paws::S3> is part of the larger L<Paws> AWS SDK for Perl and follows
+AWS service APIs through its generated service model.
+
+L<Amazon::S3::Lite> is a smaller client intended for applications
+where dependency size and startup cost are important.
+
+L<Amazon::API::S3> is generated from the AWS Botocore service model
+and is intended to closely reflect the current low-level S3 API.
+
+The appropriate client depends primarily on the interface and level of
+abstraction required by the application.
+
+=head1 COMPATIBILITY AND LIMITATIONS
+
+=head2 Minimum Perl Version
+
+C<Amazon::S3> declares Perl 5.10 as its minimum supported Perl
+version.
+
+Dependencies may impose additional constraints on older Perl
+installations.
+
+Applications using an older Perl should run the complete distribution
+test suite after installation.
+
+=head2 Signature Version 4
+
+AWS API requests are signed using Signature Version 4.
+
+Signature Version 2 is not supported.
+
+Because Signature Version 4 includes the AWS region in the signature,
+bucket operations must use the region containing the bucket.
+
+A bucket region can be supplied explicitly or determined using bucket
+region verification.
+
+=head2 Directory Buckets
+
+Directory bucket support is currently limited to account-level create
+and list operations.
+
+See L</DIRECTORY BUCKETS>.
 
 =head1 TESTING
 
-Testing S3 is a tricky thing. Amazon wants to charge you a bit of
-money each time you use their service. And yes, testing counts as
-using.  Because of this, the application's test suite skips anything
-approaching a real test unless you set certain environment variables.
+The distribution includes unit tests and integration tests that
+exercise behavior requiring an S3 endpoint.
 
-For more on testing this module see
-L<README-TESTING.md|https://github.com/rlauer6/perl-amazon-s3/blob/master/README-TESTING.md>
+Run the normal distribution test suite with:
 
-=over 
+  make test
 
-=item AMAZON_S3_EXPENSIVE_TESTS
+Integration testing during development includes LocalStack.
 
-Doesn't matter what you set it to. Just has to be set
-
-=item AMAZON_S3_HOST
-
-Sets the host to use for the API service.
-
-default: s3.amazonaws.com
-
-Note that if this value is set, DNS bucket name usage will be disabled
-for testing. Most likely, if you set this variable, you are using a
-mocking service and your bucket names are probably not resolvable. You
-can override this behavior by setting C<AWS_S3_DNS_BUCKET_NAMES> to any
-value.
-
-=item AWS_S3_DNS_BUCKET_NAMES
-
-Set this to any value to override the default behavior of disabling
-DNS bucket names during testing.
-
-=item AWS_ACCESS_KEY_ID 
-
-Your AWS access key
-
-=item AWS_SECRET_ACCESS_KEY
-
-Your AWS sekkr1t passkey. Be forewarned that setting this environment variable
-on a shared system might leak that information to another user. Be careful.
-
-=item AMAZON_S3_SKIP_ACL_TESTS
-
-Doesn't matter what you set it to. Just has to be set if you want
-to skip ACLs tests.
-
-=item AMAZON_S3_SKIP_PERMISSIONS
-
-Skip tests that check for enforcement of ACLs...as of this version,
-LocalStack for example does not support enforcement of ACLs.
-
-=item AMAZON_S3_SKIP_REGION_CONSTRAINT_TEST
-
-Doesn't matter what you set it to. Just has to be set if you want
-to skip region constraint test.
-
-=item AMAZON_S3_MINIO
-
-Doesn't matter what you set it to. Just has to be set if you want
-to skip tests that would fail on minio.
-
-=item AMAZON_S3_LOCALSTACK
-
-Doesn't matter what you set it to. Just has to be set if you want
-to skip tests that would fail on LocalStack.
-
-=item AMAZON_S3_REGIONS
-
-A comma delimited list of regions to use for testing. The default will
-only test creating a bucket in the local region.
-
-=back
-
-I<Consider using an S3 mocking service like C<minio> or C<LocalStack>
-if you want to create real tests for your applications or this module.>
-
-Here's bash script for testing using LocalStack
-
- #!/bin/bash
- # -*- mode: sh; -*-
- 
- BUCKET=net-amazon-s3-test-test 
- ENDPOINT_URL=s3.localhost.localstack.cloud:4566
- 
- AMAZON_S3_EXPENSIVE_TESTS=1 \
- AMAZON_S3_HOST=$ENDPOINT_URL \
- AMAZON_S3_LOCALSTACK=1 \
- AWS_ACCESS_KEY_ID=test \
- AWS_ACCESS_SECRET_KEY=test  \
- AMAZON_S3_DOMAIN_BUCKET_NAMES=1 make test 2>&1 | tee test.log
-
-To run the tests...clone the project and build the software.
-
- cd src/main/perl
- ./test.localstack
-
-=head1 ADDITIONAL INFORMATION
-
-=head2 LOGGING AND DEBUGGING
-
-Additional debugging information can be output to STDERR by setting
-the C<level> option when you instantiate the C<Amazon::S3>
-object. Levels are represented as a string.  The valid levels are:
-
- fatal
- error
- warn
- info
- debug
- trace
-
-You can set an optionally pass in a logger that implements a subset of
-the C<Log::Log4perl> interface.  Your logger should support at least
-these method calls. If you do not supply a logger the default logger
-(C<Amazon::S3::Logger>) will be used.
-
- get_logger()
- fatal()
- error()
- warn()
- info()
- debug()
- trace()
- level()
-
-At the C<trace> level, every HTTP request and response will be output
-to STDERR.  At the C<debug> level information regarding the higher
-level methods will be output to STDERR.  There currently is no
-additional information logged at lower levels.
-
-=head2 S3 LINKS OF INTEREST
-
-=over 5
-
-=item L<Bucket restrictions and limitations|https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html>
-
-=item L<Bucket naming rules|https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html>
-
-=item L<Amazon S3 REST API|https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html>
-
-=item L<Authenticating Requests (AWS Signature Version 4)|https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html>
-
-=item L<Authenticating Requests (AWS Signature Version 2)|https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html>
-
-=item L<LocalStack|https://localstack.io>
-
-=back
+See F<README-TESTING.md> in the distribution root for test
+environment setup, integration-test requirements, and additional
+testing instructions.
 
 =head1 SUPPORT
 
-Bugs should be reported via the CPAN bug tracker at
+Bug reports and feature requests should be submitted through the
+project issue tracker.
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Amazon-S3>
+When reporting a problem, include the C<Amazon::S3> version, Perl
+version, operating system, and enough information to reproduce the
+behavior.
 
-For other issues, contact the author.
+For request or protocol problems, debug or trace logging may also be
+useful. Review logs before sharing them to ensure that they do not
+contain credentials, authorization information, or sensitive object
+data.
 
 =head1 REPOSITORY
 
-L<https://github.com/rlauer6/perl-amazon-s3|https://github.com/rlauer6/perl-amazon-s3>
+The source repository, issue tracker, and development history are
+available at:
+
+L<https://github.com/rlauer6/Amazon-S3>
 
 =head1 AUTHOR
 
@@ -2985,27 +3548,45 @@ Current maintainer: Rob Lauer <bigfoot@cpan.org>
 
 =head1 SEE ALSO
 
-L<Amazon::S3::Bucket>, L<Net::Amazon::S3>
+L<Amazon::S3::Bucket>
 
-=head1 COPYRIGHT AND LICENCE
+L<Amazon::S3::BucketV2>
 
-This module was initially based on L<Net::Amazon::S3> 0.41, by
-Leon Brocard. Net::Amazon::S3 was based on example code from
-Amazon with this notice:
+L<Amazon::S3::Constants>
 
-I<This software code is made available "AS IS" without warranties of any
-kind.  You may copy, display, modify and redistribute the software
-code either by itself or as incorporated into your code; provided that
-you do not remove any proprietary notices.  Your use of this software
-code is at your own risk and you waive any claim against Amazon
-Digital Services, Inc. or its affiliates with respect to your use of
-this software code. (c) 2006 Amazon Digital Services, Inc. or its
-affiliates.>
+L<Amazon::S3::Logger>
 
-The software is released under the Artistic License. The
-terms of the Artistic License are described at
-http://www.perl.com/language/misc/Artistic.html. Except
-where otherwise noted, C<Amazon::S3> is Copyright 2008, Timothy
-Appnel, tima@cpan.org. All rights reserved.
+L<Amazon::Credentials>
+
+L<Net::Amazon::S3>
+
+L<Amazon S3 API Reference|https://docs.aws.amazon.com/AmazonS3/latest/API/Welcome.html>
+
+L<Amazon S3 bucket naming rules|https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html>
+
+L<Amazon S3 bucket restrictions and limitations|https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html>
+
+L<AWS Signature Version 4|https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html>
+
+L<Amazon S3 directory buckets|https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-buckets-overview.html>
+
+L<LocalStack|https://localstack.io>
+
+=head1 LICENCE
+
+This library is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Portions of this distribution contain code modified from Amazon. That
+code is made available under the following notice:
+
+  #  This software code is made available "AS IS" without warranties of any
+  #  kind.  You may copy, display, modify and redistribute the software
+  #  code either by itself or as incorporated into your code; provided that
+  #  you do not remove any proprietary notices.  Your use of this software
+  #  code is at your own risk and you waive any claim against Amazon
+  #  Digital Services, Inc. or its affiliates with respect to your use of
+  #  this software code. (c) 2006 Amazon Digital Services, Inc. or its
+  #  affiliates.
 
 =cut

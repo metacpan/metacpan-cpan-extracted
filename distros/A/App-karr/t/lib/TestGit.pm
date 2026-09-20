@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use Exporter 'import';
+use TestEnv; # k288: scrub KARR_CLAIM before any test using this helper runs
 
 our @EXPORT_OK = qw( require_git_c );
 

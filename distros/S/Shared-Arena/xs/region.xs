@@ -202,6 +202,21 @@ sar_base(self)
     OUTPUT:
         RETVAL
 
+# The handle itself, for a consumer that created the arena from Perl and drives
+# the same region through the C ABI (Hyperman does). Private, like _abi_ptr,
+# and unsigned for the same reason: PTR2UV, never PTR2IV.
+UV
+sar__region_ptr(self)
+        SV *self
+    PREINIT:
+        sa_region *r;
+    CODE:
+        r = SA_SELF(sa_region, self);
+        if (!r || !r->map.base) croak("Shared::Arena: this region is released");
+        RETVAL = PTR2UV(r);
+    OUTPUT:
+        RETVAL
+
 # Registry entries this process has refused because their extent is not inside
 # the mapping. Non-zero means the arena has been written by something that
 # should not have: corruption, or another process. It is not a health metric to

@@ -197,7 +197,9 @@ static void sa_peer_beat(sa_region *r) {
 #if SA_HAVE_ATOMICS
     if (r && r->peer_idx >= 0 && r->map.base) {
         sa_peer *p = &SA_PEERS(r->map.base, r->hdr)[r->peer_idx];
-        sa_at_fetch_add64(&p->heartbeat, 1);
+        /* One writer per row, so a load and a release store: a reader only
+         * ever asks whether it MOVED. */
+        sa_at_store64_rel(&p->heartbeat, sa_at_load64_acq(&p->heartbeat) + 1);
     }
 #else
     (void)r;

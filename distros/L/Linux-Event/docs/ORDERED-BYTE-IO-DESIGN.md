@@ -105,7 +105,7 @@ The complete cached option contract is:
 | Option | Default | Contract |
 | --- | ---: | --- |
 | `read_size` | 65,536 | Positive maximum bytes requested by one read |
-| `read_budget_bytes` | 0 | Bytes per readiness drain; zero drains to blocking |
+| `read_budget_bytes` | 65,536 | Bytes per readiness drain; zero explicitly opts into drain-until-EAGAIN |
 | `read_batch_bytes` | 0 | Raw `on_data` batching target; zero disables |
 | `message_batch_size` | 0 | Framed `on_messages` batch count; zero disables |
 | `max_buffer` | 8,388,608 | Positive retained-input and message-batch byte bound |
@@ -252,6 +252,11 @@ ordered-byte layer.
 `transition_to()` changes the cached protocol descriptor while retaining the
 same native ordered-byte state, descriptors, buffered input, output queue,
 backpressure state, deadlines, and application data.
+
+When both protocol descriptors declare native consumers, the transition may
+replace the consumer provider at a safe provider-frame/host-retain boundary.
+Unread bytes remain in that same native input buffer and are re-driven through
+the incoming provider after the source flush/context handoff completes.
 
 The target must represent the same underlying resource category. Protocol
 transition must not silently turn a pipe into a socket or a connected socket

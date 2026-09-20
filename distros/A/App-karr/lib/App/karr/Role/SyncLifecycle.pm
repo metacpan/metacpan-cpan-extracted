@@ -1,7 +1,7 @@
 # ABSTRACT: Role providing sync lifecycle with retry and guard insurance
 
 package App::karr::Role::SyncLifecycle;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo::Role;
 use MooX::Options;
 # Loaded without importing, and every call below is qualified: a Moo::Role
@@ -14,6 +14,22 @@ use App::karr::SyncGuard;
 option quiet => (
     is  => 'ro',
     doc => 'Suppress sync progress and retry messages (errors are still shown)',
+    # Every syncing command carries --quiet. Per-command help suppresses it for
+    # the same reason --dir is hidden (ticket k276): the page should list what
+    # is interesting about THIS command, and --quiet is the same on all of them.
+    hidden => 1,
+);
+
+option local_only => (
+    is  => 'ro',
+    default => 0,
+    doc => 'Write to the local board refs only; skip the fetch and the push',
+    # Left visible where --quiet is hidden (k291). --quiet and --dir are hidden
+    # because they are the same uninteresting plumbing on every command; this is
+    # a per-invocation behaviour change -- it is exactly how you keep a `karr
+    # move`/`edit`/`handoff`/`create` from blocking on an unreachable remote --
+    # so the command's own help page is where an agent hitting a transport
+    # timeout should find it.
 );
 
 # Holds the SyncGuard for the duration of a command so its DESTROY-insurance
@@ -118,12 +134,20 @@ sub _sync_attempts {
 
 sub sync_before {
     my ( $self, %opt ) = @_;
-    $self->sync_pull(%opt);
+
+    # --local-only writes to the board's local refs and never reaches the
+    # remote, so the fetch is skipped. The command still writes, so a guard is
+    # created for the callers that capture one (Backup/Repair/Unlock call ->done
+    # on it), but it is spent immediately: with the push skipped in sync_after,
+    # neither the guard's DESTROY nor bin/karr's END-block flush may turn that
+    # skip into a push at process teardown.
+    $self->sync_pull(%opt) unless $self->local_only;
 
     # Stash the guard on the object so it outlives sync_before's return and
     # covers the whole command body; sync_after neutralises it on success.
     my $git = $self->_sync_git;
     my $guard = App::karr::SyncGuard->new( git => $git, quiet => $self->quiet );
+    $guard->done if $self->local_only;
     $self->_sync_guard($guard);
     return $guard;
 }
@@ -131,6 +155,13 @@ sub sync_before {
 
 sub sync_after {
     my ($self) = @_;
+
+    # --local-only skipped the fetch and spent the guard in sync_before; skip
+    # the push to match, so nothing here reaches the remote. The refs are on the
+    # local board, and `karr sync` publishes them once the remote is reachable
+    # again.
+    return if $self->local_only;
+
     my $git = $self->_sync_git;
 
     my ( $ok, $rejected ) = $self->_sync_attempts( 'Push', $git,
@@ -221,7 +252,7 @@ App::karr::Role::SyncLifecycle - Role providing sync lifecycle with retry and gu
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 DESCRIPTION
 
@@ -246,6 +277,26 @@ L</sync_pull_foundation> and L</sync_push_foundation> are the same two halves
 for C<refs/karr-foundation/*> (#190). They share the retry loop rather than
 copying it -- there is exactly one in this file, and every attempt count, retry
 banner and C<--quiet> rule is decided in it.
+
+=head2 Local-only mode
+
+The C<--local-only> option (k291) makes a writing command write to the board's
+local C<refs/karr/*> and touch the remote in neither direction: L</sync_before>
+skips the fetch and L</sync_after> skips the push. It exists for the
+multi-board case where a mutating command (C<move>, C<edit>, C<handoff>,
+C<create>, and every other command that composes this role) would otherwise
+block in the caller's timeout on an unreachable or silent I<configured> remote,
+because the fetch and push are inline and each is bounded only by
+C<KARR_TRANSPORT_TIMEOUT> per attempt over three attempts.
+
+A board with B<no> configured remote already syncs as a clean no-op -- both
+L<App::karr::Git/pull> and L<App::karr::Git/push> return early on C<has_remote>
+without a round trip -- so C<--local-only> is not needed there and changes
+nothing. It is the reachable-but-slow or unreachable I<configured> remote that
+it removes from the command's critical path. The default is unchanged: without
+the option the fetch and push run exactly as before. The refs written under
+C<--local-only> are canonical local board state; C<karr sync> publishes them
+once the remote is reachable again.
 
 =head1 METHODS
 
@@ -286,6 +337,10 @@ L<App::karr::SyncGuard>, retains it on the object (so it outlives the call and
 covers the command body), and also returns it for callers that want to manage
 it explicitly. C<sync_after> clears it on a successful push.
 
+Under C<--local-only> (see L</Local-only mode>) the pull is skipped and the
+returned guard is handed back already spent, so the callers that call
+C<< $guard->done >> on it still get an object and no push can fire at teardown.
+
 =head2 sync_after
 
     $self->sync_after;  # push with up to 3 attempts
@@ -304,6 +359,10 @@ which the error message carries ref by ref. A rejection that is only
 contention -- two pushes racing for the same ref, see
 L<App::karr::Git/push_contention> -- is retried like any other transient
 failure, because the same refspec lands on the next attempt.
+
+Under C<--local-only> (see L</Local-only mode>) this returns immediately without
+pushing: the fetch was skipped and the guard already spent in L</sync_before>,
+so the local refs stay put until C<karr sync>.
 
 =head2 sync_pull_foundation
 

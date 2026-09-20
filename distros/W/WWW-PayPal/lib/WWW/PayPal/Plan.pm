@@ -5,7 +5,7 @@ package WWW::PayPal::Plan;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 
 has _client => (
@@ -65,7 +65,7 @@ WWW::PayPal::Plan - PayPal Billing Plan entity
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -111,6 +111,7 @@ typedef struct les_xsstats_s {
     unsigned long long framing_error_count;
     unsigned long long transition_count;
     unsigned long long consumer_message_calls;
+    unsigned long long consumer_input_calls;
     unsigned long long consumer_pause_count;
     unsigned long long consumer_resume_count;
     unsigned long long consumer_event_calls;
@@ -167,7 +168,13 @@ typedef struct les_xsstate_s {
 
     const les_consumer_ops_v1_t *consumer_ops;
     void *consumer_context;
+    const les_consumer_ops_v1_t *consumer_next_ops;
+    void *consumer_next_context;
+    SV *consumer_retiring_descriptor_sv;
     UV consumer_host_retain_count;
+    int consumer_call_depth;
+    int consumer_transition_pending;
+    int consumer_transition_preparing;
     int destroy_pending;
 
     /* Native framed-input storage. Logical bytes begin at input_start and
@@ -263,6 +270,14 @@ void les_flush_raw_batch(pTHX_ les_xsstate_t *st);
 
 int les_consumer_create(pTHX_ les_xsstate_t *st);
 void les_consumer_destroy(pTHX_ les_xsstate_t *st);
+void *les_consumer_prepare_transition_context(
+    pTHX_ les_xsstate_t *st, const les_consumer_ops_v1_t *ops);
+void les_consumer_schedule_transition(
+    pTHX_ les_xsstate_t *st, const les_consumer_ops_v1_t *ops, void *context);
+void les_consumer_settle_transition(pTHX_ les_xsstate_t *st);
+int les_consumer_uses_raw_input(const les_xsstate_t *st);
+int les_consumer_input(pTHX_ les_xsstate_t *st, const char *data,
+    size_t length, size_t *consumed_out);
 int les_consumer_message(pTHX_ les_xsstate_t *st, SV *message);
 int les_consumer_flush(pTHX_ les_xsstate_t *st);
 int les_consumer_flush_terminal(pTHX_ les_xsstate_t *st);
@@ -275,12 +290,14 @@ void les_consumer_notify_paused(pTHX_ les_xsstate_t *st);
 SV *les_test_consumer_definition(pTHX_ const char *variant);
 void les_test_consumer_arm(pTHX_ les_xsstate_t *st, SV *callback);
 int les_test_consumer_external_arm(pTHX_ SV *stream, SV *callback);
+SV *les_test_consumer_transition_retain(pTHX_ SV *stream, SV *callback);
 void les_test_consumer_cancel(pTHX_ les_xsstate_t *st);
 SV *les_test_consumer_take(pTHX_ les_xsstate_t *st);
 SV *les_test_consumer_events(pTHX_ les_xsstate_t *st);
 SV *les_test_consumer_stats(pTHX_ les_xsstate_t *st);
 SV *les_test_consumer_trace(pTHX_ les_xsstate_t *st);
 UV les_test_consumer_destroy_count(void);
+UV les_test_consumer_last_destroy_flushes(void);
 
 void les_clear_write_queue(les_xsstate_t *st);
 void les_queue_bytes(

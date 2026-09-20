@@ -9,7 +9,7 @@ use JQ::Lite::Evaluator;
 use JQ::Lite::Parser;
 use JQ::Lite::Runtime;
 
-our $VERSION = '2.57';
+our $VERSION = '2.58';
 
 sub new {
     my ($class, %opts) = @_;
@@ -64,7 +64,7 @@ JQ::Lite - jq-compatible JSON query engine in pure Perl (no external binaries)
 
 =head1 VERSION
 
-Version 2.57
+Version 2.58
 
 =head1 SYNOPSIS
 
@@ -270,7 +270,7 @@ Example:
 
 =item * C<pick(...)> and C<merge_objects()> to reshape objects.
 
-=item * C<to_entries()>, C<from_entries()>, and C<with_entries(filter)> for entry-wise transformations.
+=item * C<to_entries()>, C<from_entries()>, C<with_entries(filter)> for entry-wise transformations.
 
 =item * C<map_values(filter)> to apply filters across every value in an object or array of objects.
 

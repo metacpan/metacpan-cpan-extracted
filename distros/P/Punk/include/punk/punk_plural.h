@@ -65,8 +65,23 @@ typedef enum {
     PR_N
 } pi_rule;
 
-/* Language subtag to rule. Matched on the PRIMARY subtag, so en-GB, en-US and
- * en all share English's rule - a region does not change a grammar. */
+/* Language tag to rule. Matched on the WHOLE TAG FIRST, then on the primary
+ * subtag, so en-GB, en-US and en all share English's rule while a tag that
+ * names its own is given it.
+ *
+ * The primary-subtag match is the rule and the whole-tag match is the
+ * exception, because a region almost never changes a grammar. PORTUGUESE IS
+ * THE EXCEPTION THAT PROVES IT WRONG, and it is the reason this lookup grew a
+ * first pass: CLDR gives `pt` one at i = 0..1, so 0 is singular in Brazil,
+ * and `pt_PT` one at i = 1 and v = 0, so 0 is plural in Portugal. Under a
+ * primary-subtag-only match a European Portuguese catalogue would be handed
+ * Brazil's rule and would render "0 peca" where it wants "0 pecas" - which is
+ * exactly the silent, reads-perfectly-well wrongness the error message below
+ * refuses to allow for a language with no rule at all.
+ *
+ * Add a whole-tag row only with a citation. The CLDR plural rules chart is
+ * the source, and a region that merely spells differently does not belong
+ * here: en-GB and en-US are one grammar and share one row. */
 static const struct { const char *lang; pi_rule rule; } PI_RULES[] = {
     /* one form */
     { "ja", PR_OTHER }, { "zh", PR_OTHER }, { "ko", PR_OTHER },
@@ -88,6 +103,11 @@ static const struct { const char *lang; pi_rule rule; } PI_RULES[] = {
     { "fr", PR_ZERO_ONE }, { "hi", PR_ZERO_ONE }, { "pt", PR_ZERO_ONE },
     { "bn", PR_ZERO_ONE }, { "fa", PR_ZERO_ONE },
 
+    /* the whole-tag exceptions, each with its CLDR rule quoted */
+    { "pt-PT", PR_ONE },  /* CLDR pt_PT: one is `i = 1 and v = 0`, so 0 is
+                           * plural in Portugal while `pt` above has 0 and 1
+                           * together for Brazil */
+
     /* the Slavic families, which differ from each other */
     { "ru", PR_RUSSIAN }, { "uk", PR_RUSSIAN }, { "be", PR_RUSSIAN },
     { "hr", PR_RUSSIAN }, { "sr", PR_RUSSIAN }, { "bs", PR_RUSSIAN },
@@ -99,14 +119,42 @@ static const struct { const char *lang; pi_rule rule; } PI_RULES[] = {
     { "ar", PR_ARABIC }
 };
 
-/* The rule for a language tag, or PR_NONE. */
+/* Case-insensitive over ASCII, because a language tag's case carries no
+ * meaning: BCP 47 writes pt-PT and the plugin lowercases to pt-pt, and a
+ * table that matched only one of those would answer a different rule for the
+ * same language depending on who asked. */
+static int pi_rule_tag_eq(const char *a, const char *b, STRLEN n) {
+    STRLEN i;
+    for (i = 0; i < n; i++) {
+        char x = a[i], y = b[i];
+        if (x >= 'A' && x <= 'Z') x = (char)(x - 'A' + 'a');
+        if (y >= 'A' && y <= 'Z') y = (char)(y - 'A' + 'a');
+        if (x != y) return 0;
+    }
+    return 1;
+}
+
+/* The rule for a language tag, or PR_NONE.
+ *
+ * Two passes, and the order is the whole point: the whole tag first so that
+ * pt-PT is not given pt's rule, then the primary subtag so that en-GB is
+ * still given en's. A tag with no hyphen cannot match a hyphenated row, so
+ * the first pass changes no existing answer. */
 static pi_rule pi_rule_for(const char *tag, STRLEN tl) {
     STRLEN prim = 0;
     size_t i;
-    while (prim < tl && tag[prim] != '-') prim++;
+
     for (i = 0; i < sizeof PI_RULES / sizeof PI_RULES[0]; i++) {
         const char *l = PI_RULES[i].lang;
-        if (strlen(l) == prim && memcmp(l, tag, prim) == 0)
+        if (strlen(l) == tl && pi_rule_tag_eq(l, tag, tl))
+            return PI_RULES[i].rule;
+    }
+
+    while (prim < tl && tag[prim] != '-') prim++;
+    if (prim == tl) return PR_NONE;   /* no hyphen: pass one already looked */
+    for (i = 0; i < sizeof PI_RULES / sizeof PI_RULES[0]; i++) {
+        const char *l = PI_RULES[i].lang;
+        if (strlen(l) == prim && pi_rule_tag_eq(l, tag, prim))
             return PI_RULES[i].rule;
     }
     return PR_NONE;

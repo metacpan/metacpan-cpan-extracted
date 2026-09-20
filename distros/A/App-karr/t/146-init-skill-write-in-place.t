@@ -34,6 +34,9 @@ my $BIN  = "$ROOT/bin/karr";
 # encode on top). Spelled with \x{} so this file needs no source encoding.
 my $OLD = "# karr skill \x{2014} old\n";
 my $NEW = "# karr skill \x{2014} new\n\nBl\x{00f6}cke \x{2026} \x{00fc}ml\x{00e4}ute\n";
+# Since #285 the skill ships references/*.md beside SKILL.md. One such file,
+# to pin that init carries it along without touching SKILL.md's inode.
+my $REF = "# reference \x{2014} Bl\x{00f6}cke\n";
 
 # (dev, inode, link count) of a path, without following the last symlink.
 sub ident {
@@ -60,8 +63,12 @@ sub chained_install {
 # TAP stream.
 sub install_into {
     my ( $root, $content ) = @_;
+    # The #285 layout: a directory with SKILL.md and references/ under it.
     my $share = path( tempdir( CLEANUP => 1 ) );
-    $share->child('claude-skill.md')->spew_utf8($content);
+    my $skill = $share->child('kanban-issues-karr-cli');
+    $skill->child('references')->mkpath;
+    $skill->child('SKILL.md')->spew_utf8($content);
+    $skill->child('references/extra.md')->spew_utf8($REF);
 
     require File::ShareDir;
     no warnings 'redefine';
@@ -130,6 +137,10 @@ subtest 'init keeps the inode, so every link in the chain updates' => sub {
     is( $installed->slurp_utf8, $NEW, 'the installed path has the new skill' );
     is( $elsewhere->slurp_utf8, $NEW, 'and so does every other project on the chain' );
 
+    my $reference = $installed->sibling('references/extra.md');
+    ok( $reference->exists, 'the reference beside it was installed too (#285)' );
+    is( $reference->slurp_utf8, $REF, 'with the shipped content' );
+
     like( $r->{stdout}, qr/Installed Claude Code skill/, 'and it still says so' );
     is( scalar( @{ $r->{warnings} } ), 0, 'an in-place write says nothing' )
         or diag "warnings emitted: @{ $r->{warnings} }";
@@ -139,6 +150,27 @@ subtest 'init keeps the inode, so every link in the chain updates' => sub {
     install_into( $dir, "short\n" );
     is( $elsewhere->slurp_utf8, "short\n", 'a shorter install truncates rather than overwriting in place' );
     is( ident($installed)->{ino}, $before->{ino}, 'still the same inode afterwards' );
+};
+
+subtest 'a missing reference is added while SKILL.md keeps its inode' => sub {
+    # SKILL.md installed and current, the reference not there: what a project
+    # that installed before #285 looks like. init writes the reference and
+    # leaves SKILL.md -- inode, links and text -- exactly as it was.
+    my $dir = tempdir( CLEANUP => 1 );
+    my ( $installed, $elsewhere ) = chained_install( $dir, $NEW );
+    plan skip_all => 'filesystem does not support hardlinks' unless $installed;
+    my $reference = $installed->sibling('references/extra.md');
+    ok( !$reference->exists, 'no reference to begin with' );
+
+    my $before = ident($installed);
+    my $r = install_into( $dir, $NEW );
+    is( $r->{error}, '', 'the install succeeds' );
+
+    ok( $reference->exists, 'the reference was added' );
+    is( $reference->slurp_utf8, $REF, 'with the shipped content' );
+    is( ident($installed)->{ino}, $before->{ino}, 'and SKILL.md kept its inode' );
+    is( ident($installed)->{nlink}, 2, 'with both links' );
+    is( $elsewhere->slurp_utf8, $NEW, 'the chain still reads the same skill' );
 };
 
 subtest 'the content is encoded exactly once' => sub {
@@ -167,6 +199,8 @@ subtest 'a project without .claude yet still gets the skill installed' => sub {
     ok( $installed->exists, 'the file was created' );
     is( $installed->slurp_utf8, $NEW, 'with the right content' );
     is( ident($installed)->{nlink}, 1, 'one link, as a fresh file should have' );
+    is( $installed->sibling('references/extra.md')->slurp_utf8, $REF,
+        'and references/ was created beside it with the shipped reference' );
 };
 
 subtest 'a read-only installed skill is still updated, and a broken chain is reported' => sub {
@@ -236,9 +270,10 @@ subtest 'karr init --claude-skill through the real CLI keeps the inode' => sub {
     # reads a skill we control rather than an installed App::karr's (t/65 has
     # the long version of why this matters).
     my $share_lib = path( tempdir( CLEANUP => 1 ) );
-    my $share_dir = $share_lib->child(qw( auto share dist App-karr ));
-    $share_dir->mkpath;
-    $share_dir->child('claude-skill.md')->spew_utf8($NEW);
+    my $share_dir = $share_lib->child(qw( auto share dist App-karr kanban-issues-karr-cli ));
+    $share_dir->child('references')->mkpath;
+    $share_dir->child('SKILL.md')->spew_utf8($NEW);
+    $share_dir->child('references/extra.md')->spew_utf8($REF);
 
     my $before = ident($installed);
 
@@ -260,6 +295,8 @@ subtest 'karr init --claude-skill through the real CLI keeps the inode' => sub {
     is( ident($installed)->{nlink}, 2, 'the chain still has both links' );
     is( $installed->slurp_utf8, $NEW, 'the project got the new skill' );
     is( $elsewhere->slurp_utf8, $NEW, 'and so did every other project on the chain' );
+    is( $installed->sibling('references/extra.md')->slurp_utf8, $REF,
+        'and the reference landed beside it (#285)' );
 };
 
 done_testing;

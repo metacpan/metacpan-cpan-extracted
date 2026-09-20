@@ -1,10 +1,10 @@
 /* hm_atomic.h - the atomics probe, and the handful of operations the
- * fork-shared arenas are built from.
+ * fork-shared arena code is built from.
  *
- * Its own file because two shared-memory arenas - the abuse controls in
- * hm_ratelimit.h and the message bus in hm_bus.h - need the same four
- * operations over the same builtins. Probed separately they would eventually
- * disagree, on the one machine nobody develops on.
+ * Its own file because more than one header needs the same operations over
+ * the same builtins (today the FNV the abuse controls and the bus key on).
+ * Probed separately they would eventually disagree, on the one machine
+ * nobody develops on.
  *
  * THE PROBE IS OF A FEATURE, NOT A COMPILER VERSION. The __atomic builtins
  * only arrived in GCC 4.7, so __GNUC__ alone is the wrong question and asking

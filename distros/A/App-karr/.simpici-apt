@@ -1,0 +1,7 @@
+# System packages the [@Author::GETTY] SimpiCI provider installs before running
+# `dzil test` (see the provider's README). Alien::Libgit2 is pinned for
+# libgit2 >= 1.9.3 -- newer than Debian bookworm's 1.5.1 -- so it builds libgit2
+# from source and needs the C toolchain plus libgit2's own link dependencies;
+# Alien::FFI links the system libffi here instead of fetching a fragile tarball.
+cmake build-essential pkg-config git
+libssl-dev libssh2-1-dev zlib1g-dev libzstd-dev libffi-dev

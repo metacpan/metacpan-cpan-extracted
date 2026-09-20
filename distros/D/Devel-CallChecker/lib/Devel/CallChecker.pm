@@ -60,7 +60,7 @@ package Devel::CallChecker;
 use warnings;
 use strict;
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(callchecker0_h callchecker_linkable);

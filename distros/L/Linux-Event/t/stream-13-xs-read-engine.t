@@ -41,13 +41,13 @@ is($state->{got}, 'abcdefghij', 'native read engine drains and delivers bytes');
 my $stats = $stream->{xs_state}->stats;
 my $snapshot = $stream->{xs_state}->_stats_snapshot;
 is(ref($snapshot), 'ARRAY', 'native stats primitive returns a compact snapshot');
-is(scalar($snapshot->@*), 49, 'native stats snapshot has one value per public key');
+is(scalar($snapshot->@*), 50, 'native stats snapshot has one value per public key');
 is_deeply(
     [sort keys $stats->%*],
     [sort qw(
         activity_clock_calls activity_tracking bytes_read bytes_written
         consumer_event_calls consumer_flush_calls consumer_flush_pending
-        consumer_message_calls consumer_pause_count consumer_paused
+        consumer_input_calls consumer_message_calls consumer_pause_count consumer_paused
         consumer_resume_count delimiter_searches delivery_calls drain_calls
         empty_calls eof_count frames_emitted framing_error_count input_appends
         input_buffered_bytes input_compactions input_peak_bytes

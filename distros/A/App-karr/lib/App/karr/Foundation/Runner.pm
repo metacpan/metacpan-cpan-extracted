@@ -1,10 +1,11 @@
 # ABSTRACT: karr-foundation command execution -- fork/pipe/select tee + run classification
 
 package App::karr::Foundation::Runner;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use App::karr::Error qw( clean_error user_error );
 use App::karr::Encoding qw( from_octets json_decode to_octets to_octets_for_env );
+use App::karr::AgentName qw( agent_name );
 use Encode ();
 use IO::Select;
 use IO::Handle ();
@@ -85,6 +86,20 @@ sub _run_command {
   # works with every command template that exists today, including the
   # synthesized `claude -p "$PROMPT"`.
   local $ENV{KARR_TASK} = defined $ticket ? to_octets_for_env("$ticket") : '';
+
+  # The claim name this run holds its cards under, defaulted for every nested
+  # `karr` call the child makes (ADR 0005 / #281). `karr agent-name` and this
+  # have to produce the same string from the same checkout, so both go through
+  # App::karr::AgentName; the value is the checkout's own directory name (a
+  # claim visible in `karr show`, distinct per worktree). `unique => 1` appends
+  # a per-run random suffix -- foundation is the many-agent context, and two
+  # checkouts of one shared board could otherwise stamp the same bare name at
+  # once. It is minted ONCE here and exported, so it is the same value for
+  # every `karr` the child spawns during this run (stable per run, not per
+  # invocation -- which is why a fresh PID per call was rejected); a run that
+  # dies leaves at most this claim for claim_timeout to clear. Through the same
+  # %ENV octet edge KARR_TASK above uses, never a direct encode.
+  local $ENV{KARR_CLAIM} = to_octets_for_env( agent_name( dir => "$repo", unique => 1 ) );
 
   # The expansion is the shell's, not ours (#159). Splicing %ENV into the command
   # string here instead meant the shell went on to parse the *values*: a prompt
@@ -741,7 +756,7 @@ App::karr::Foundation::Runner - karr-foundation command execution -- fork/pipe/s
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 DESCRIPTION
 

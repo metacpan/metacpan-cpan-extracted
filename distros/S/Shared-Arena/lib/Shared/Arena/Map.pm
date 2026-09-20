@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Map - a fixed-capacity map several processes share
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 
@@ -177,10 +177,20 @@ On a serialised map the structure comes back decoded, a fresh copy each call.
 
     my $now = $map->incr($key);
     my $now = $map->incr($key, $by);
+    my $now = $map->incr($key, $by, ttl => 60);         # seconds
+    my $now = $map->incr($key, $by, ttl_ms => 60_000);  # milliseconds
 
 Adds to a counter, creating it at C<$by> when the key is absent, and returns the
 new value. C<$by> may be negative. Returns C<undef> when the table is full, or
 when the key holds something that is not a counter.
+
+A C<ttl> gives the counter a deadline B<when this call creates it, or resets
+one that has lapsed>, and never otherwise: a live counter keeps the deadline it
+was created with whatever a later C<incr> passes. That is a fixed window in one
+call. The first hit of a window starts it, every hit inside it counts against
+the same deadline, and the first hit after it starts the next one at C<$by>. A
+C<ttl> on every call does not slide the window, which is the mistake this is
+shaped to make impossible.
 
 This is the one operation that does not go through the version at all: a counter
 is a single machine word, so the addition is one atomic instruction and cannot

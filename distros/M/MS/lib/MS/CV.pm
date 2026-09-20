@@ -21,7 +21,7 @@ BEGIN {
     $terms = retrieve $fn_obo;
 
     # necessary for symbol table manipulation
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     
     # generate constants and track root terms
     for my $id (keys %{$terms} ) {
@@ -38,6 +38,15 @@ BEGIN {
         push @{ $exports{$cv} }, $const_name;
         push @MS::CV::EXPORT_OK, $const_name;
         push @{$roots{$cv} }, $id if (! exists $ref->{is_a});
+
+        if (defined $ref->{alt_constants}) {
+            for my $const_name (@{ $ref->{alt_constants} }) {
+                # define constant
+                *$const_name = sub () {$id};
+                push @{ $exports{$cv} }, $const_name;
+                push @MS::CV::EXPORT_OK, $const_name;
+            }
+        }
 
     } 
 
@@ -60,7 +69,7 @@ sub is_a {
     
     my ($child, $parent) = @_;
 
-    return undef if (! defined $terms->{$child});
+    return if (! defined $terms->{$child});
     return 0 if (! defined $terms->{$child}->{is_a});
 
     my @parents = @{ $terms->{$child}->{is_a} };
@@ -77,7 +86,7 @@ sub units_for {
 
     my ($id) = @_;
 
-    return undef if (! defined $terms->{$id}->{has_units});
+    return if (! defined $terms->{$id}->{has_units});
     return [ @{ $terms->{$id}->{has_units} } ];
 
 }
@@ -86,11 +95,8 @@ sub regex_for {
 
     my ($id) = @_;
 
-    return undef if (! defined $terms->{$id}->{has_regexp});
-    croak "Multiple regular expressions not supported for $id\n"
-        if (defined $terms->{$id}->{has_regexp}->[1]);
-    my $rid = $terms->{$id}->{has_regexp}->[0];
-    return qr/$terms->{$rid}->{name}/;
+    return if (! defined $terms->{$id}->{regexp});
+    return qr/$terms->{$id}->{regexp}/;
 
 }
 

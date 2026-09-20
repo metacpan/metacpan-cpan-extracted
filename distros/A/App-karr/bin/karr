@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use App::karr::SyncGuard;
 use App::karr::Dispatch qw( dispatch );
 
@@ -54,7 +54,7 @@ karr - Kanban Assignment & Responsibility Registry
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 
@@ -189,6 +189,11 @@ Soft-deletes tasks by moving them to the archived status.
 
 Shows the grouped board view.
 
+=item * L<App::karr::Cmd::Dashboard>
+
+Shows a multi-board overview of every karr board found under a directory
+tree, without touching any of them.
+
 =item * L<App::karr::Cmd::Pick>
 
 Finds the next suitable task and claims it for an agent.
@@ -219,7 +224,9 @@ C<< karr create --needs >> / C<--escalated-from> and C<< karr edit
 
 =item * L<App::karr::Cmd::AgentName>
 
-Generates short random agent names for multi-agent workflows.
+Prints the claim name for this checkout -- its directory name, stable per
+worktree -- for C<< export KARR_CLAIM=$(karr agent-name) >>; C<--unique>
+tells apart several agents started in one directory.
 
 =item * L<App::karr::Cmd::Sync>
 

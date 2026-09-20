@@ -87,7 +87,33 @@ les_process_existing_input(pTHX_ les_xsstate_t *st, int flush_batch)
         les_descriptor_t *descriptor = st->descriptor;
 
         if (descriptor->read_mode == LES_READ_DELIVER) {
-            if (st->read_batch_bytes) {
+            if (les_consumer_uses_raw_input(st)) {
+                const char *data = les_input_data(st);
+                size_t len = st->input_len;
+                size_t consumed = 0;
+
+                les_consumer_input(aTHX_ st, data, len, &consumed);
+                /* input() may enter Perl and close the Stream reentrantly.
+                 * Terminal teardown owns and clears the input buffer, so a
+                 * count returned from the now-finished borrowed window must
+                 * not be applied afterward. A descriptor/provider handoff is
+                 * deliberately nonterminal: consume the source prefix before
+                 * flushing the old provider and re-driving the retained tail. */
+                if (consumed && !st->closed && !st->read_eof
+                    && !st->consumer_terminal)
+                    les_input_consume(st, consumed);
+                if (st->descriptor != descriptor) {
+                    les_consumer_flush(aTHX_ st);
+                    if (st->consumer_transition_pending)
+                        return;
+                    continue;
+                }
+                if (!consumed)
+                    return;
+                if (!st->closed && !LES_INPUT_PAUSED(st)
+                    && !st->read_eof && st->input_len)
+                    continue;
+            } else if (st->read_batch_bytes) {
                 les_flush_raw_batch(aTHX_ st);
             } else {
                 const char *data = les_input_data(st);
@@ -101,6 +127,8 @@ les_process_existing_input(pTHX_ les_xsstate_t *st, int flush_batch)
             les_process_buffered(aTHX_ st);
             if (st->descriptor != descriptor) {
                 les_consumer_flush(aTHX_ st);
+                if (st->consumer_transition_pending)
+                    return;
                 continue;
             }
             if (flush_batch) {

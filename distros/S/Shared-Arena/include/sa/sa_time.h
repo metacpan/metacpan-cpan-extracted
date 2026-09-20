@@ -69,6 +69,18 @@ static uint64_t sa_now_ms(void) {
     return (uint64_t)(u.QuadPart / 10000ULL);
 #else
     struct timeval tv;
+#  ifdef SA_HAVE_COARSE_CLOCK
+    /* A millisecond deadline needs a millisecond clock, and on Linux the
+     * coarse one is the kernel's last tick read out of the vDSO with no
+     * counter access: about a quarter of gettimeofday's cost, which on a map
+     * hit that carries a deadline was most of the hit. Its granularity is a
+     * tick, up to four milliseconds, which is one round of early or late
+     * expiry - the tolerance every deadline here already carries. Makefile.PL
+     * probes for it by running it; the fallback is the clock below. */
+    struct timespec ts;
+    if (clock_gettime(CLOCK_REALTIME_COARSE, &ts) == 0)
+        return (uint64_t)ts.tv_sec * 1000ULL + (uint64_t)(ts.tv_nsec / 1000000);
+#  endif
     gettimeofday(&tv, NULL);
     return (uint64_t)tv.tv_sec * 1000ULL + (uint64_t)(tv.tv_usec / 1000);
 #endif

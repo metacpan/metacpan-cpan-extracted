@@ -246,8 +246,8 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
   /* Offset 7 gives the best switch position.  */
   switch (name[7]) {
   case 'C':
-    if (memEQ(name, "EL_SETTC", 8)) {
-    /*                      ^      */
+    if (memEQ(name, "EL_SETT", 7)) {
+    /*                      C     */
 #ifdef EL_SETTC
       *iv_return = EL_SETTC;
       return PERL_constant_ISIV;
@@ -257,8 +257,8 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'D':
-    if (memEQ(name, "H_APPEND", 8)) {
-    /*                      ^      */
+    if (memEQ(name, "H_APPEN", 7)) {
+    /*                      D     */
 #ifdef H_APPEND
       *iv_return = H_APPEND;
       return PERL_constant_ISIV;
@@ -268,8 +268,8 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'L':
-    if (memEQ(name, "CC_FATAL", 8)) {
-    /*                      ^      */
+    if (memEQ(name, "CC_FATA", 7)) {
+    /*                      L     */
 #ifdef CC_FATAL
       *iv_return = CC_FATAL;
       return PERL_constant_ISIV;
@@ -279,8 +279,8 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'N':
-    if (memEQ(name, "EL_ADDFN", 8)) {
-    /*                      ^      */
+    if (memEQ(name, "EL_ADDF", 7)) {
+    /*                      N     */
 #ifdef EL_ADDFN
       *iv_return = EL_ADDFN;
       return PERL_constant_ISIV;
@@ -290,8 +290,8 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'R':
-    if (memEQ(name, "CC_ERROR", 8)) {
-    /*                      ^      */
+    if (memEQ(name, "CC_ERRO", 7)) {
+    /*                      R     */
 #ifdef CC_ERROR
       *iv_return = CC_ERROR;
       return PERL_constant_ISIV;
@@ -301,8 +301,8 @@ constant_8 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'Y':
-    if (memEQ(name, "EL_SETTY", 8)) {
-    /*                      ^      */
+    if (memEQ(name, "EL_SETT", 7)) {
+    /*                      Y     */
 #ifdef EL_SETTY
       *iv_return = EL_SETTY;
       return PERL_constant_ISIV;
@@ -561,21 +561,21 @@ constant (pTHX_ const char *name, STRLEN len, IV *iv_return) {
 #!/usr/bin/perl -w
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
-my $types = {map {($_, 1)} qw(IV)};
+my $types = {map {($_, 1)} qw(IV UNDEF)};
 my @names = (qw(CC_ARGHACK CC_CURSOR CC_EOF CC_ERROR CC_FATAL CC_NEWLINE
 	       CC_NORM CC_REDISPLAY CC_REFRESH CC_REFRESH_BEEP EL_ADDFN EL_BIND
-	       EL_BUILTIN_GETCFN EL_CLIENTDATA EL_ECHOTC EL_EDITMODE EL_EDITOR
-	       EL_GETCFN EL_HIST EL_PROMPT EL_RPROMPT EL_SETTC EL_SETTY
-	       EL_SIGNAL EL_TELLTC EL_TERMINAL H_ADD H_APPEND H_CLEAR H_CURR
-	       H_END H_ENTER H_FIRST H_FUNC H_GETSIZE H_LAST H_LOAD H_NEXT
-	       H_NEXT_EVENT H_NEXT_STR H_PREV H_PREV_EVENT H_PREV_STR H_SAVE
-	       H_SET H_SETSIZE));
+	       EL_CLIENTDATA EL_ECHOTC EL_EDITMODE EL_EDITOR EL_GETCFN EL_HIST
+	       EL_PROMPT EL_RPROMPT EL_SETTC EL_SETTY EL_SIGNAL EL_TELLTC
+	       EL_TERMINAL H_ADD H_APPEND H_CLEAR H_CURR H_END H_ENTER H_FIRST
+	       H_FUNC H_GETSIZE H_LAST H_LOAD H_NEXT H_NEXT_EVENT H_NEXT_STR
+	       H_PREV H_PREV_EVENT H_PREV_STR H_SAVE H_SET H_SETSIZE),
+            {name=>"EL_BUILTIN_GETCFN", type=>"UNDEF"});
 
-print constant_types(); # macro defs
+print constant_types(), "\n"; # macro defs
 foreach (C_constant ("Term::EditLine", 'constant', 'IV', $types, undef, 3, @names) ) {
     print $_, "\n"; # C constant subs
 }
-print "#### XS Section:\n";
+print "\n#### XS Section:\n";
 print XS_constant ("Term::EditLine", $types);
 __END__
    */
@@ -654,8 +654,7 @@ __END__
   case 17:
     if (memEQ(name, "EL_BUILTIN_GETCFN", 17)) {
 #ifdef EL_BUILTIN_GETCFN
-      *iv_return = EL_BUILTIN_GETCFN;
-      return PERL_constant_ISIV;
+      return PERL_constant_ISUNDEF;
 #else
       return PERL_constant_NOTDEF;
 #endif

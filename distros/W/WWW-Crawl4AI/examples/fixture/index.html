@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!--
+  Deterministic crawl fixture for WWW::Crawl4AI live tests (t/70, t/75).
+  Canonical source. The k8s ConfigMap in examples/k8s/20-fixture.yaml mirrors
+  this file verbatim — keep the two in sync. Served by plain nginx (no JS), so
+  the cheapest strategy (crawl4ai_plain) must classify it as good.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Crawl4AI Live Fixture — Home</title>
+  <meta name="description" content="Static fixture home page for WWW::Crawl4AI live tests.">
+</head>
+<body>
+  <h1>Crawl4AI Live Fixture</h1>
+  <p>FIXTURE_MARKER_HOME</p>
+  <p>
+    This page exists so the WWW::Crawl4AI live test suite has a stable, fully
+    deterministic crawl target that does not depend on the public internet, on
+    any bot wall, or on a captcha challenge. Every assertion in t/70-live-client
+    and t/75-live-chain reads back a value that is written right here in the
+    fixture, so a green run means the real Crawl4AI REST service fetched this
+    document, extracted its markdown, resolved its title, and reported its links
+    exactly the way the Perl client normalizes them.
+  </p>
+  <p>
+    The body carries several sentences of genuine prose on purpose: the default
+    content-volume classifier (WWW::Crawl4AI::Detect) discards anything under
+    five hundred characters of markdown as thin_content, so a fixture that is
+    too short would wrongly escalate the strategy chain past the cheap plain
+    backend. With this much text in hand the scrape succeeds on the first, least
+    expensive attempt, which is precisely what the chain test asserts.
+  </p>
+  <h2>Where to go next</h2>
+  <ul>
+    <li><a href="/page2.html">Page Two</a> — an internal link on the same host, followed by deep_crawl.</li>
+    <li><a href="page2.html">Page Two (relative)</a> — the same target, so link dedup can be asserted.</li>
+    <li><a href="/">Home</a> — a self back-link, also deduplicated.</li>
+    <li><a href="https://example.com/">Example.com</a> — an off-host link that same_host must NOT follow.</li>
+  </ul>
+</body>
+</html>

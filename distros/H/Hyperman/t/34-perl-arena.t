@@ -79,11 +79,29 @@ if (!$pid) {
                 Hyperman->deny_remove('127.0.0.9');
                 $out = 'still=' . Hyperman->deny_check('127.0.0.9');
             }
+            elsif ($path eq '/ban1') {
+                Hyperman->deny_add('127.0.0.11', 1);
+                $out = 'banned=' . Hyperman->deny_check('127.0.0.11');
+            }
+            elsif ($path eq '/check11') {
+                $out = 'banned=' . Hyperman->deny_check('127.0.0.11');
+            }
+            elsif ($path eq '/fill') {
+                # more than the table holds: the overflow is refused silently
+                Hyperman->deny_add("10.9.0.$_", 0) for 1 .. 12;
+                $out = 'held=' . (grep { Hyperman->deny_check("10.9.0.$_") } 1 .. 12);
+            }
+            elsif ($path eq '/win') {
+                my ($ok, $rem, $reset) = Hyperman->ratelimit_hit('win-key', 100, 2);
+                $out = "ok=$ok remaining=$rem reset=$reset now=" . time;
+            }
             else { $out = 'ok' }
             return [ 200, [ 'Content-Type' => 'text/plain',
                             'Content-Length' => length $out ], [$out] ];
         },
         host => '127.0.0.1', port => $port, workers => 2,
+        # small on purpose: the overflow case below fills it
+        deny_capacity => 8,
     );
     exit 0;
 }
@@ -170,6 +188,40 @@ sub http_get {
     like(http_get('/deny'), qr/added=1/, 'deny_add from inside a request took');
     like(http_get('/deny'), qr/added=1/, 'and is still there for the next one');
     like(http_get('/undeny'), qr/still=0/, 'deny_remove takes it away again');
+}
+
+# a ban with a ttl lapses on its own, read through the accept-path idiom
+{
+    like(http_get('/ban1'), qr/banned=1/, 'a one-second ban is in force');
+    select undef, undef, undef, 2.1;
+    like(http_get('/check11'), qr/banned=0/,
+         'and has lapsed two seconds later, with nobody sweeping');
+}
+
+# the window resets at its boundary, and only there
+{
+    my %h = http_get('/win') =~ /(\w+)=(-?\d+)/g;
+    # Start early in a window: if this one is nearly over, wait it out and
+    # begin again, so the next two hits cannot straddle the boundary.
+    if ($h{reset} - $h{now} < 1) {
+        select undef, undef, undef, ($h{reset} - $h{now}) + 0.2;
+        %h = http_get('/win') =~ /(\w+)=(-?\d+)/g;
+    }
+    my $first = $h{remaining};
+    my %h2 = http_get('/win') =~ /(\w+)=(-?\d+)/g;
+    is($h2{remaining}, $first - 1, 'a second hit inside the window counts down');
+    select undef, undef, undef, ($h2{reset} - time) + 0.2;
+    my %h3 = http_get('/win') =~ /(\w+)=(-?\d+)/g;
+    is($h3{remaining}, 99, 'past the boundary the count starts again at one');
+    cmp_ok($h3{reset}, '>', $h2{reset}, 'in the next window');
+}
+
+# a full denylist refuses the overflow silently, and reads it as not denied
+{
+    like(http_get('/fill'), qr/held=(\d+)/, 'twelve adds into a table of eight');
+    my ($held) = http_get('/fill') =~ /held=(\d+)/;
+    cmp_ok($held, '<', 12, 'the overflow was refused rather than evicting');
+    cmp_ok($held, '>=', 6, 'and most of the table is in use');
 }
 
 kill 'TERM', $pid;

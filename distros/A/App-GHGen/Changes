@@ -1,12 +1,16 @@
 Revision history for App-GHGen
 
-0.10
-	[ Bug Fixes ]
-	- Added --verbose to the --installdeps stage to prevent timeout on
-	  GitHub actions
+0.11	Sat Sep 19 07:37:44 PM EDT 2026
+	[ Enhancements ]
+	- Updated to actions-setup-perl to 1.44.0
+
+0.10	Sat Aug 29 13:35:13 PM EDT 2026
 	[ Enhancements ]
 	- Install DB_File on Linux
 	- Latest ATG dashboard
+	[ Bug Fixes ]
+	- Added --verbose to the --installdeps stage to prevent timeout on
+	  GitHub actions
 
 0.09	Mon Aug 10 08:26:23 PM EDT 2026
 	[ Bug Fixes ]

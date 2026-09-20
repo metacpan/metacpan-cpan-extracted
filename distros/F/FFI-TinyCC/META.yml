@@ -7,9 +7,9 @@ build_requires:
   Archive::Ar: '2.02'
   File::chdir: '0'
   Module::Build: '0.3601'
-  Path::Tiny: '0'
-  Test2::Require: '0.000060'
-  Test2::V0: '0.000060'
+  Path::Tiny: '0.130'
+  Test2::Require: '0.000121'
+  Test2::V0: '0.000121'
   autodie: '0'
   perl: '5.008001'
 configure_requires:
@@ -20,8 +20,8 @@ configure_requires:
   Path::Tiny: '0'
   autodie: '0'
   perl: '5.008001'
-dynamic_config: '1'
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,16 +34,17 @@ requires:
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
+  Twitter: https://fosstodon.org/@PerlFFI
   bugtracker: https://github.com/PerlFFI/FFI-TinyCC/issues
   homepage: https://metacpan.org/pod/FFI::TinyCC
   repository: git://github.com/PerlFFI/FFI-TinyCC.git
-version: '0.30'
+version: '0.31'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - aero
   - 'Dylan Cali (calid)'
   - pipcet
-x_generated_by_perl: v5.32.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.42.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

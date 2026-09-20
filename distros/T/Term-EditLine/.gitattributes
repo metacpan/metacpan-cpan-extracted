@@ -1,3 +1,0 @@
-*.t linguist-language=Perl
-*.inc linguist-language=C
-/ppport.h linguist-vendored

@@ -88,8 +88,8 @@ and `claude: true`, and `--force` does not override it. A parked backlog stays
 fully usable by hand; only automation is switched off.
 
 **Overview**:
-Foundation's read-only dashboard (`--status` / `--overview`, or the default when
-no agent is configured) — per board: status counts and what is
+Foundation's read-only dashboard (`--status`, or the default when no agent is
+configured) — per board: status counts and what is
 in-progress/claimed/blocked, plus which repos are locked (agent running) or in
 cooldown. Fires no agent.
 
@@ -102,10 +102,30 @@ not a branding leftover.
 _Avoid_: renaming the sentinels to "karr" (breaks cross-tool round-trips).
 
 **Claim name**:
-The ephemeral two-word agentname (e.g. `agent-fox`) passed per `pick`/`move`
-via `--claim`, stored in `claimed_by` and in the **Activity log** entry's
-`agent` field. Distinct from **Identity**: a single Identity may run under many
-Claim names over time.
+The name a card is held under, passed per `pick`/`move`/`handoff`/`edit`/`create`
+via `--claim` (defaulting to **KARR_CLAIM** when the flag is omitted), stored in
+`claimed_by` and in the **Activity log** entry's `agent` field. `karr agent-name`
+derives it from the checkout's own directory name. Distinct from **Identity**: a
+single Identity may run under many Claim names over time.
+
+**KARR_CLAIM**:
+The **Claim name** carried per process — the default `--claim` reads when the flag
+is omitted (ADR 0005). Set once per session (`export KARR_CLAIM=$(karr
+agent-name)`); an explicit `--claim` overrides it. Per process and never stored,
+so concurrent agents never share one — the counterpart for the claim name of what
+`KARR_ROLE` is for the **Role**. Not the log **Identity**: `show --me` stays the
+Identity, not `KARR_CLAIM`.
+_Avoid_: calling it a "stored" or "remembered" claim — it lives only in the
+process environment.
+
+**Parent / Subtask**:
+Deliberately *not* a concept. kanban-md's hierarchical cards (`--parent`) are a
+documented non-goal: karr's answers to "this card relates to that one" are
+`depends_on` (local ordering) and `needs` (cross-board). The `parent` field
+round-trips through `karr import` unchanged — no data loss — but no karr
+command sets, filters, renders or sorts it (see `Task.pm`), so a kanban-md board
+that needs hierarchy keeps it in kanban-md.
+_Avoid_: "parent"/"subtask" as karr vocabulary.
 
 ## Relationships
 

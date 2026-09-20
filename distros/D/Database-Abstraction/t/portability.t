@@ -16,7 +16,7 @@ eval { require DBI; require DBD::SQLite };
 if ($@) {
 	plan skip_all => 'DBD::SQLite not available';
 } else {
-	plan tests => 16;
+	plan tests => 20;
 }
 
 {
@@ -69,3 +69,27 @@ ok((grep { $_ eq 'name' } @{$cols}), 'columns() has "name"');
 my $schema = $db->schema();
 isa_ok($schema, 'HASH', 'schema() over DSN returns hashref');
 is($schema->{'id'}{'pk'}, 1, 'pk column detected via DSN');
+
+# .sqlite extension — directory probe should detect and open the file
+my $dir_sqlite = tempdir(CLEANUP => 1);
+my $file_sqlite = File::Spec->catfile($dir_sqlite, 'porttest.sqlite');
+my $setup_sqlite = DBI->connect("dbi:SQLite:dbname=$file_sqlite", undef, undef, { RaiseError => 1 });
+$setup_sqlite->do(q{CREATE TABLE porttest (id INTEGER PRIMARY KEY, name TEXT NOT NULL)});
+$setup_sqlite->do(q{INSERT INTO porttest VALUES (1, 'Alice')});
+$setup_sqlite->do(q{INSERT INTO porttest VALUES (2, 'Bob')});
+$setup_sqlite->disconnect();
+my $db_sqlite = Database::porttest->new(directory => $dir_sqlite, no_entry => 1);
+is($db_sqlite->count(), 2, '.sqlite extension: count() returns 2');
+is($db_sqlite->{'type'}, 'DBI', '.sqlite extension: type is DBI');
+
+# .sqlite3 extension — directory probe should detect and open the file
+my $dir_sqlite3 = tempdir(CLEANUP => 1);
+my $file_sqlite3 = File::Spec->catfile($dir_sqlite3, 'porttest.sqlite3');
+my $setup_sqlite3 = DBI->connect("dbi:SQLite:dbname=$file_sqlite3", undef, undef, { RaiseError => 1 });
+$setup_sqlite3->do(q{CREATE TABLE porttest (id INTEGER PRIMARY KEY, name TEXT NOT NULL)});
+$setup_sqlite3->do(q{INSERT INTO porttest VALUES (1, 'Alice')});
+$setup_sqlite3->do(q{INSERT INTO porttest VALUES (2, 'Bob')});
+$setup_sqlite3->disconnect();
+my $db_sqlite3 = Database::porttest->new(directory => $dir_sqlite3, no_entry => 1);
+is($db_sqlite3->count(), 2, '.sqlite3 extension: count() returns 2');
+is($db_sqlite3->{'type'}, 'DBI', '.sqlite3 extension: type is DBI');

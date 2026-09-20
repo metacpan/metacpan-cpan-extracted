@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Parent class of RtController filters
 
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 
 use Moo;
 use strictures 2;
@@ -80,7 +80,7 @@ MIDI::RtController::Filter - Parent class of RtController filters
 
 =head1 VERSION
 
-version 0.0104
+version 0.0105
 
 =head1 SYNOPSIS
 

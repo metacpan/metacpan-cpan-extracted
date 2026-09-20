@@ -35,6 +35,24 @@ sub deliver_performance_samples {
     );
 }
 
+# Delivers a batch of individual capture_metric entries as { metrics => [...] }, and infrastructure
+# readings the same way.
+sub deliver_metrics {
+    my ($self, $entries) = @_;
+    return $self->_post($self->{configuration}->custom_metrics_uri, { metrics => $entries }, 'metrics delivery');
+}
+
+sub deliver_infrastructure_metrics {
+    my ($self, $entries) = @_;
+    return $self->_post($self->{configuration}->infrastructure_metrics_uri, { metrics => $entries }, 'infrastructure metrics delivery');
+}
+
+# Delivers one finished trace, { trace_id => ..., spans => [...] }, to the spans endpoint.
+sub deliver_spans {
+    my ($self, $trace) = @_;
+    return $self->_post($self->{configuration}->spans_uri, $trace, 'span delivery');
+}
+
 sub _post {
     my ($self, $uri, $payload, $description) = @_;
     my $config = $self->{configuration};

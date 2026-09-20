@@ -4,6 +4,9 @@ PROTOTYPES: DISABLE
 
 BOOT:
     hm_fq = newAV();
+    /* Shared::Arena's table, once. NULL when it is absent or too old, and
+     * every arena door then fails open. */
+    hm_sa_resolve(aTHX);
 
 # Run the server. Key/value options as documented in Hyperman.pm:
 # app (required), host, port (scalar or arrayref), listen (arrayref of
@@ -62,6 +65,17 @@ run(class, ...)
             else if (strEQ(key, "bus_slots"))      cfg.bus_slots = (unsigned)SvUV(val);
             else if (strEQ(key, "bus_slot_size"))  cfg.bus_slot_size = (unsigned)SvUV(val);
             else if (strEQ(key, "bus_groups"))     cfg.bus_groups = (unsigned)SvUV(val);
+            /* The Shared::Arena. A name makes it attachable by another
+             * process and survives a restart; the size is computed from the
+             * tenants unless overridden. */
+            else if (strEQ(key, "arena_name")) {
+                if (SvOK(val)) cfg.arena_name = SvPV(val, cfg.arena_name_len);
+            }
+            else if (strEQ(key, "arena_size"))     cfg.arena_size = SvUV(val);
+            /* Count distinct peers at accept. Off by default: it is a hash
+             * and a CAS-max on the accept path, about 20ns, and this server
+             * promises that path costs nothing it did not ask for. */
+            else if (strEQ(key, "distinct_clients")) cfg.distinct_clients = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "access_log")) {
                 /* coderef -> per-request Perl callback (as before);
                  * a filehandle or a path -> fast C-side Combined-log writer. */
@@ -219,11 +233,34 @@ io_ready(class, fh, ...)
         RETVAL
 
 # Per-worker stats: requests/accepts/bytes_out/connections/backend/pid.
+# Hyperman->stats(pool => 1) is the POOL's: every worker's scoreboard row
+# summed, from any process that has the arena - a worker, the supervisor, or
+# one that attached by name. undef when there is no board.
 SV *
 stats(...)
     CODE:
-        PERL_UNUSED_VAR(items);
-        if (!hm_cur_loop) {
+    {
+        int pool = 0, i;
+        for (i = 1; i + 1 < items; i += 2)
+            if (strEQ(SvPV_nolen(ST(i)), "pool")) pool = SvTRUE(ST(i + 1)) ? 1 : 0;
+        if (pool) {
+            hm_sa_pool_stats p;
+            if (!hm_sa_board_pool(&p)) RETVAL = &PL_sv_undef;
+            else {
+                HV *h = newHV();
+                hv_stores(h, "workers",   newSVuv((UV)p.workers));
+                hv_stores(h, "alive",     newSVuv((UV)p.alive));
+                hv_stores(h, "requests",  newSVuv((UV)p.requests));
+                hv_stores(h, "accepts",   newSVuv((UV)p.accepts));
+                hv_stores(h, "denied",    newSVuv((UV)p.denied));
+                hv_stores(h, "connections", newSVuv((UV)p.conns));
+                hv_stores(h, "bytes_out", newSVuv((UV)p.bytes_out));
+                hv_stores(h, "datagrams", newSVuv((UV)p.datagrams));
+                hv_stores(h, "h3_requests", newSVuv((UV)p.h3));
+                RETVAL = newRV_noinc((SV *)h);
+            }
+        }
+        else if (!hm_cur_loop) {
             RETVAL = &PL_sv_undef;
         } else {
             HV *h = newHV();
@@ -241,6 +278,7 @@ stats(...)
             hv_stores(h, "pid",         newSViv((IV)hm_os_getpid()));
             RETVAL = newRV_noinc((SV *)h);
         }
+    }
     OUTPUT:
         RETVAL
 
@@ -532,7 +570,7 @@ deny_add(class, ip, ttl = 0)
         IV ttl
     CODE:
         PERL_UNUSED_VAR(class);
-        if (SvOK(ip)) hm_rl_deny_add(SvPV_nolen(ip), (long)ttl);
+        if (SvOK(ip)) hm_sa_deny_add(SvPV_nolen(ip), (long)ttl);
 
 # Hyperman->deny_remove($ip): unblock it again.
 void
@@ -541,7 +579,104 @@ deny_remove(class, ip)
         SV *ip
     CODE:
         PERL_UNUSED_VAR(class);
-        if (SvOK(ip)) hm_rl_deny_remove(SvPV_nolen(ip));
+        if (SvOK(ip)) hm_sa_deny_remove(SvPV_nolen(ip));
+
+# Hyperman->pool_stats: every worker's scoreboard row, as a list of hashrefs
+# (pid, alive, updated, status, and the seven gauges). From any process that
+# has the arena: a worker, the supervisor, or one that attached by name. The
+# empty list when there is no board. `alive` is kill(pid, 0), which says 1
+# for a process this user may not signal (EPERM) whether it lives or not.
+void
+pool_stats(class = &PL_sv_undef)
+        SV *class
+    PPCODE:
+    {
+        uint64_t i, n = hm_sa_board_slots();
+        PERL_UNUSED_VAR(class);
+        for (i = 0; i < n; i++) {
+            sa_sb_reading rd;
+            HV *h;
+            if (!hm_sa_board_read((uint32_t)i, &rd)) continue;
+            h = newHV();
+            hv_stores(h, "pid",         newSVuv((UV)rd.pid));
+            hv_stores(h, "alive",       newSViv(rd.alive ? 1 : 0));
+            hv_stores(h, "updated",     newSVuv((UV)rd.updated));
+            hv_stores(h, "status",      newSVpvn(rd.status, rd.statuslen));
+            hv_stores(h, "requests",    newSVuv((UV)rd.gauges[HM_SB_REQUESTS]));
+            hv_stores(h, "accepts",     newSVuv((UV)rd.gauges[HM_SB_ACCEPTS]));
+            hv_stores(h, "denied",      newSVuv((UV)rd.gauges[HM_SB_DENIED]));
+            hv_stores(h, "connections", newSVuv((UV)rd.gauges[HM_SB_CONNS]));
+            hv_stores(h, "bytes_out",   newSVuv((UV)rd.gauges[HM_SB_BYTES_OUT]));
+            hv_stores(h, "datagrams",   newSVuv((UV)rd.gauges[HM_SB_DATAGRAMS]));
+            hv_stores(h, "h3_requests", newSVuv((UV)rd.gauges[HM_SB_H3]));
+            XPUSHs(sv_2mortal(newRV_noinc((SV *)h)));
+        }
+    }
+
+# Hyperman->leader($name, ttl => $secs): the Shared::Arena::Lease of that
+# name on the server's arena, so exactly one worker in the pool holds it at a
+# time and a successor takes over when the holder dies or lapses. A
+# convenience over Hyperman->arena->lease; undef with no arena. The fencing
+# token is the part to read about in the POD before trusting it.
+SV *
+leader(class, name, ...)
+        SV *class
+        SV *name
+    CODE:
+    {
+        int i, count;
+        SV *ret = NULL;
+        PERL_UNUSED_VAR(class);
+        if (!hm_sa_arena_sv) XSRETURN_UNDEF;
+        {
+            dSP;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            EXTEND(SP, items + 1);
+            PUSHs(hm_sa_arena_sv);
+            PUSHs(name);
+            for (i = 2; i < items; i++) PUSHs(ST(i));
+            PUTBACK;
+            count = call_method("lease", G_SCALAR);
+            SPAGAIN;
+            if (count == 1) ret = newSVsv(POPs);
+            PUTBACK;
+            FREETMPS; LEAVE;
+        }
+        if (!ret) XSRETURN_UNDEF;
+        RETVAL = ret;
+    }
+    OUTPUT:
+        RETVAL
+
+# Hyperman->distinct_clients -> ($estimate, $relative_error), or the empty
+# list when the sketch is off (run(distinct_clients => 1) turns it on).
+void
+distinct_clients(class = &PL_sv_undef)
+        SV *class
+    PPCODE:
+    {
+        double c = hm_sa_hll_count();
+        PERL_UNUSED_VAR(class);
+        if (c < 0.0) XSRETURN_EMPTY;
+        EXTEND(SP, 2);
+        mPUSHn(c);
+        mPUSHn(1.04 / 128.0);          /* 1.04 / sqrt(2^14) */
+    }
+
+# Hyperman->arena: the Shared::Arena the server created before the fork; it
+# answers undef before run() and when there is no table. A fresh reference
+# to the one object every call, so a caller's copy going out of scope frees
+# nothing the workers share. (No comment line here may begin with a word
+# the preprocessor knows: xsubpp passes these through as C.)
+SV *
+arena(class)
+        SV *class
+    CODE:
+        PERL_UNUSED_VAR(class);
+        RETVAL = hm_sa_arena_sv ? newSVsv(hm_sa_arena_sv) : newSV(0);
+    OUTPUT:
+        RETVAL
 
 # Hyperman->deny_check($ip): is it blocked right now?
 IV
@@ -550,7 +685,7 @@ deny_check(class, ip)
         SV *ip
     CODE:
         PERL_UNUSED_VAR(class);
-        RETVAL = SvOK(ip) ? hm_rl_deny_check(SvPV_nolen(ip)) : 0;
+        RETVAL = SvOK(ip) ? hm_sa_deny_check(SvPV_nolen(ip)) : 0;
     OUTPUT:
         RETVAL
 
@@ -572,7 +707,7 @@ ratelimit_hit(class, key, limit, window = 60)
         long rem = 0, reset = 0;
         int ok;
         if (!SvOK(key)) klen = 0;
-        ok = hm_rl_ratelimit_hit(kp, (size_t)klen, (long)limit, (long)window,
+        ok = hm_sa_ratelimit_hit(kp, (size_t)klen, (long)limit, (long)window,
                                  &rem, &reset);
         EXTEND(SP, 3);
         mPUSHi(ok);

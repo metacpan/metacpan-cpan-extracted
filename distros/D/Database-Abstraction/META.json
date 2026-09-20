@@ -113,6 +113,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.43",
+   "version" : "0.44",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

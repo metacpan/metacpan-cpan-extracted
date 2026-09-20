@@ -9,6 +9,7 @@ use Socket qw(AF_UNIX SOCK_STREAM PF_UNSPEC);
 use Linux::Event::Loop;
 use Linux::Event::_ByteStream ();
 use Linux::Event::IO::Sock::Stream;
+use Linux::Event::Framer ();
 use Linux::Event::TLS;
 
 is(Linux::Event::_ByteStream->_native_consumer_abi_version, 1,
@@ -24,6 +25,67 @@ is(Linux::Event::_ByteStream->_native_consumer_abi_version, 1,
     }
     sub on_error ($stream, $error) { $stream->data->{error} = $error }
     sub on_eof ($stream) { $stream->data->{eof}++ }
+}
+
+{
+    package T::RawConsumer;
+    use parent 'Linux::Event::IO::Sock::Stream';
+    BEGIN {
+        Linux::Event::Framer->declare_native_consumer(
+            __PACKAGE__,
+            Linux::Event::_ByteStream::TestSupport->_test_consumer_definition(
+                'raw-input',
+            ),
+        );
+    }
+    sub on_error ($stream, $error) { $stream->data->{error} = $error }
+    sub on_eof ($stream) { $stream->data->{eof}++ }
+}
+
+{
+    package T::RawTransitionTarget;
+    use parent 'Linux::Event::IO::Sock::Stream';
+    BEGIN {
+        Linux::Event::Framer->declare_native_consumer(
+            __PACKAGE__,
+            Linux::Event::_ByteStream::TestSupport->_test_consumer_definition(
+                'raw-transition-target',
+            ),
+        );
+    }
+    sub on_error ($stream, $error) { $stream->data->{error} = $error }
+    sub on_eof ($stream) { $stream->data->{eof}++ }
+}
+
+{
+    package T::RawConsumerBadCallback;
+    use parent -norequire, 'T::RawConsumer';
+    sub on_data ($stream, $bytes) { return }
+}
+
+{
+    package T::RawConsumerBatch;
+    use parent -norequire, 'T::RawConsumer';
+    sub stream_tuning ($class) { return read_batch_bytes => 64 }
+}
+
+{
+    package T::RawConsumerFramed;
+    use parent -norequire, 'T::RawConsumer';
+    use Linux::Event::Framer 'Delimiter', "\n";
+}
+
+{
+    package T::RawMissingInput;
+    use parent 'Linux::Event::IO::Sock::Stream';
+    BEGIN {
+        Linux::Event::Framer->declare_native_consumer(
+            __PACKAGE__,
+            Linux::Event::_ByteStream::TestSupport->_test_consumer_definition(
+                'raw-missing-input',
+            ),
+        );
+    }
 }
 
 {
@@ -193,6 +255,25 @@ is(Linux::Event::_ByteStream->_native_consumer_abi_version, 1,
 }
 
 {
+    package T::TransitionCreateFailureBase;
+    use parent 'Linux::Event::IO::Sock::Stream';
+    BEGIN {
+        Linux::Event::_ByteStream->_declare_consumer(
+            __PACKAGE__,
+            Linux::Event::_ByteStream::TestSupport->_test_consumer_definition(
+                'create-failure',
+            ),
+        );
+    }
+}
+
+{
+    package T::TransitionCreateFailureLine;
+    use parent -norequire, 'T::TransitionCreateFailureBase';
+    use Linux::Event::Framer 'Delimiter', "\n";
+}
+
+{
     package T::CallbackLine;
     use parent 'Linux::Event::IO::Sock::Stream';
     use Linux::Event::Framer 'Delimiter', "\n";
@@ -251,6 +332,137 @@ sub cancel_arm ($stream) {
 
 sub take ($stream) {
     return $stream->{xs_state}->_test_consumer_take;
+}
+
+{
+    my ($loop, $stream, $peer) = pair('T::RawConsumer');
+    my $ready = 0;
+    arm($stream, sub {
+        $ready++;
+        $loop->stop;
+    });
+    syswrite($peer, "hel") == 3 or die "raw partial write: $!";
+    $loop->run_for(0.01);
+    is($ready, 0, 'raw consumer retains an incomplete protocol unit natively');
+    is($stream->{xs_state}->stats->{input_buffered_bytes}, 3,
+        'incomplete raw input remains in the native input buffer');
+    is($stream->{xs_state}->stats->{delivery_calls}, 0,
+        'raw native consumer does not surface partial bytes through on_data');
+
+    syswrite($peer, "lo\nnext\n") == 8 or die "raw completion write: $!";
+    $loop->run;
+    is($ready, 1, 'raw consumer wakes when its protocol parser consumes a unit');
+    is(take($stream), 'hello',
+        'raw consumer parser receives the contiguous native input window');
+    is($stream->{xs_state}->stats->{input_buffered_bytes}, 5,
+        'unconsumed raw tail remains native after one protocol unit');
+
+    my $immediate = 0;
+    arm($stream, sub { $immediate++ });
+    is($immediate, 1,
+        'raw consumer resume immediately re-drives an already-buffered tail');
+    is(take($stream), 'next',
+        'raw consumer preserves tail bytes across pause/resume');
+    my $stats = $stream->{xs_state}->stats;
+    cmp_ok($stats->{consumer_input_calls}, '>=', 2,
+        'raw consumer input calls are instrumented');
+    is($stats->{consumer_message_calls}, 0,
+        'raw consumer bypasses framed message delivery');
+    is($stats->{message_callback_calls}, 0,
+        'raw consumer bypasses Perl message callbacks');
+    is($stats->{delivery_calls}, 0,
+        'raw consumer bypasses Perl raw callbacks');
+    $stream->close;
+    close $peer;
+}
+
+{
+    my ($loop, $stream, $peer) = pair('T::RawConsumer');
+    my @ready;
+    arm($stream, sub {
+        push @ready, 'first';
+        arm($stream, sub {
+            push @ready, 'second';
+            $loop->stop;
+        });
+    });
+    syswrite($peer, "one\ntwo\n") == 8
+        or die "raw CONTINUE write: $!";
+    $loop->run;
+    is_deeply(\@ready, [qw(first second)],
+        'raw consumer CONTINUE re-drives a complete native-buffer tail');
+    is(take($stream), 'one',
+        'first raw unit is delivered before reentrant receive arm');
+    is(take($stream), 'two',
+        'second raw unit is delivered without another fd readiness event');
+    is($stream->{xs_state}->stats->{read_ready_calls}, 1,
+        'buffered raw CONTINUE path completes in the same read-ready turn');
+    $stream->close;
+    close $peer;
+}
+
+{
+    my ($loop, $stream, $peer, $xs) = pair('T::RawConsumer');
+    arm($stream, sub {
+        $stream->close;
+        $loop->stop;
+    });
+    syswrite($peer, "close-inside-input\nretained-tail\n")
+        == length("close-inside-input\nretained-tail\n")
+        or die "raw reentrant-close write: $!";
+    my $ok = eval { $loop->run; 1 };
+    ok($ok,
+        'raw consumer may close the Stream reentrantly from input callback')
+        or diag $@;
+    ok($stream->is_closed,
+        'reentrant raw-consumer close leaves the Stream terminal');
+    is($xs->stats->{input_buffered_bytes}, 0,
+        'terminal teardown owns and clears the native input buffer');
+    is_deeply($xs->_test_consumer_events, [[4, 0, '']],
+        'reentrant raw-consumer close emits one terminal consumer event');
+    close $peer;
+}
+
+for my $case (
+    ['T::RawConsumerBadCallback', qr/native consumer.*on_data/,
+        'raw native consumer rejects a class on_data callback'],
+    ['T::RawConsumerBatch', qr/raw native consumer.*read_batch_bytes/,
+        'raw native consumer rejects Perl raw batching'],
+    ['T::RawConsumerFramed', qr/raw-input native consumer requires an unframed/,
+        'raw-input capability rejects a built-in native framer'],
+    ['T::RawMissingInput', qr/requests raw input without an input function/,
+        'raw-input capability requires the appended input operation'],
+) {
+    my ($class, $error, $label) = @$case;
+    my $ok = eval {
+        socketpair(my $a, my $b, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
+            or die "socketpair: $!";
+        my $loop = Linux::Event::Loop->new;
+        $class->new(loop => $loop, fh => $a);
+        close $b;
+        1;
+    };
+    ok(!$ok, $label);
+    like($@, $error, "$label reports a stable diagnostic");
+}
+
+{
+    socketpair(my $a, my $b, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
+        or die "socketpair: $!";
+    my $loop = Linux::Event::Loop->new;
+    my $ok = eval {
+        T::RawConsumer->new(
+            loop => $loop,
+            fh => $a,
+            on_data => sub ($stream, $bytes) { return },
+        );
+        1;
+    };
+    ok(!$ok, 'raw native consumer rejects a constructor on_data callback');
+    like($@, qr/on_data cannot be combined with a native consumer/,
+        'constructor callback conflict reports the native consumer boundary');
+    close $a;
+    close $b;
 }
 
 {
@@ -609,9 +821,109 @@ for my $case (
         'retained consumer uses target native framer after transition');
 
     my $ok = eval { $stream->transition_to('T::CallbackLine'); 1 };
-    ok(!$ok, 'transition cannot remove a live native consumer');
-    like($@, qr/cannot change native consumer provider/,
-        'consumer-changing transition reports the ABI boundary');
+    ok(!$ok, 'transition still rejects removing a live native consumer');
+    like($@, qr/cannot add or remove a native consumer provider/,
+        'consumer removal remains outside the handoff contract');
+    $stream->close;
+    close $peer;
+}
+
+{
+    my $before =
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count;
+    my ($loop, $stream, $peer) = pair('T::RawConsumer');
+    my $source_class = ref($stream);
+
+    arm($stream, sub {
+        $stream->transition_to('T::RawTransitionTarget');
+    });
+    syswrite($peer, "http-head\nfirst-websocket-frame\n")
+        == length("http-head\nfirst-websocket-frame\n")
+        or die "short native consumer handoff fixture write: $!";
+    $loop->run_for(0.05);
+
+    is($source_class, 'T::RawConsumer',
+        'handoff fixture begins on the source native consumer');
+    isa_ok($stream, 'T::RawTransitionTarget');
+    is(take($stream), 'first-websocket-frame',
+        'unconsumed native tail is re-driven through the target consumer');
+    is(
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count,
+        $before + 1,
+        'source consumer context is destroyed at the live handoff boundary',
+    );
+    cmp_ok(
+        Linux::Event::_ByteStream::TestSupport
+            ->_test_consumer_last_destroy_flushes,
+        '>=', 1,
+        'source consumer flush obligation is settled before destruction',
+    );
+    is($stream->{xs_state}->stats->{consumer_input_calls}, 2,
+        'source and target each consume directly from native input');
+    is($stream->data->{error}, undef,
+        'native consumer replacement reports no Stream error');
+
+    syswrite($peer, "later-websocket-frame\n")
+        == length("later-websocket-frame\n")
+        or die "short post-handoff fixture write: $!";
+    $loop->run_for(0.05);
+    is(take($stream), 'later-websocket-frame',
+        'target consumer keeps receiving later kernel input after handoff');
+
+    $stream->close;
+    close $peer;
+}
+
+{
+    my $before =
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count;
+    my ($loop, $stream, $peer) = pair('T::RawConsumer');
+
+    my $host_results =
+        Linux::Event::_ByteStream::TestSupport::_test_consumer_transition_retain(
+            $stream,
+            sub { $stream->transition_to('T::RawTransitionTarget') },
+        );
+
+    is_deeply($host_results, [0, 0, 0, 1],
+        'retiring provider cannot mutate or re-retain host before release');
+    isa_ok($stream, 'T::RawTransitionTarget',
+        'host release completes deferred provider handoff');
+    is(
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count,
+        $before + 1,
+        'retained source context is destroyed only after host release',
+    );
+
+    syswrite($peer, "after-retain-release\n")
+        == length("after-retain-release\n")
+        or die "short retained-handoff fixture write: $!";
+    $loop->run_for(0.05);
+    is(take($stream), 'after-retain-release',
+        'target consumer receives input after retained handoff settles');
+
+    $stream->close;
+    close $peer;
+}
+
+{
+    my ($loop, $stream, $peer) = pair('T::ConsumerLine');
+    my $ok = eval {
+        $stream->transition_to('T::TransitionCreateFailureLine');
+        1;
+    };
+    ok(!$ok, 'target consumer creation failure rejects transition');
+    like($@, qr/failed to create context/,
+        'target consumer creation failure has a stable transition diagnostic');
+    isa_ok($stream, 'T::ConsumerLine',
+        'failed target creation leaves the source Perl protocol active');
+
+    arm($stream, sub { $loop->stop });
+    syswrite($peer, "still-source\n");
+    $loop->run;
+    is(take($stream), 'still-source',
+        'failed target creation leaves the source native consumer usable');
+
     $stream->close;
     close $peer;
 }

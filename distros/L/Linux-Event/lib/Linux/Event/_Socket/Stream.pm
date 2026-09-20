@@ -73,7 +73,7 @@ sub new ($class, %opt) {
     };
     if (!$configured) {
         my $failure = $@;
-        eval { $self->close; 1 };
+        eval { $self->_close_now(1); 1 };
         die $failure;
     }
     return $self;

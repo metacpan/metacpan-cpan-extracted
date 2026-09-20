@@ -10,14 +10,15 @@ use Path::Tiny qw( path );
 use App::karr::Cmd::Init;
 use App::karr::Cmd::Skill;
 
-# Where `karr` gets the bundled skill file from, for both commands that need it.
+# Where `karr` gets the bundled skill from, for both commands that need it.
 #
 # There are two places to look and they are tried in order: File::ShareDir,
-# which is where share/claude-skill.md lands once the dist is installed, and --
-# when it is not, i.e. a checkout being run with -Ilib -- share/ in that
-# checkout. Both are exercised below, because the second one is the half that
-# can fail invisibly: `karr skill show` would print a stale or missing file
-# rather than say anything, and `karr init --claude-skill` would install one.
+# which is where share/kanban-issues-karr-cli/ lands once the dist is
+# installed, and -- when it is not, i.e. a checkout being run with -Ilib --
+# share/ in that checkout. Both are exercised below, because the second one is
+# the half that can fail invisibly: `karr skill show` would print a stale or
+# missing file rather than say anything, and `karr init --claude-skill` would
+# install one.
 #
 # Until ticket #146 this file pinned two names, App::karr::Cmd::Init's
 # _find_skill_source and App::karr::Cmd::Skill's _skill_content, which were the
@@ -28,6 +29,11 @@ use App::karr::Cmd::Skill;
 # of this dist that is certain to be loaded whenever either command asks.
 # The tests still ask through both classes: one implementation is the claim
 # being made, not a reason to stop checking that both commands get it.
+#
+# Since ticket #285 the skill is a directory -- SKILL.md plus references/*.md
+# -- and the lookup finds that directory: _skill_content is still SKILL.md
+# (what `karr skill show` prints) and _skill_files is every *.md under it,
+# walked rather than listed, as (relative path => content) pairs.
 
 my $ROOT = abs_path('.');
 my $BIN  = "$ROOT/bin/karr";
@@ -37,19 +43,40 @@ my $BIN  = "$ROOT/bin/karr";
 # instead of quietly testing a lookup nothing uses.
 my $ANCHOR = 'App/karr/Role/SkillFile.pm';
 
-# Non-ASCII on purpose: the skill file is Markdown prose full of em dashes, and
-# both lookups must hand back characters (slurp_utf8), not octets -- t/65 pins
-# what happens to them afterwards. Spelled with \x{} so this file needs no
-# source encoding of its own.
+# The directory the skill ships in, under share/ and under an installed share
+# dir alike.
+my $SKILL_DIR = 'kanban-issues-karr-cli';
+
+# Non-ASCII on purpose: the skill is Markdown prose full of em dashes, and both
+# lookups must hand back characters (slurp_utf8), not octets -- t/65 pins what
+# happens to them afterwards. Spelled with \x{} so this file needs no source
+# encoding of its own.
 my $SHARED_SKILL = "# karr \x{2014} from the installed share dir\n";
 my $DEV_SKILL    = "# karr \x{2014} from the checkout\n\nBl\x{00f6}cke \x{2026}\n";
+my %DEV_REFS     = (
+    'references/cards.md'   => "# cards \x{2014} Bl\x{00f6}cke\n",
+    'references/queries.md' => "# queries \x{2026}\n",
+);
+
+# Write SKILL.md (and any references) into a skill directory.
+sub fill_skill_dir {
+    my ( $dir, $content, %refs ) = @_;
+    $dir->mkpath;
+    $dir->child('SKILL.md')->spew_utf8($content);
+    for my $rel ( sort keys %refs ) {
+        my $file = $dir->child($rel);
+        $file->parent->mkpath;
+        $file->spew_utf8( $refs{$rel} );
+    }
+    return $dir;
+}
 
 # A share dir as File::ShareDir would report one: a directory with the bundled
-# file in it.
+# skill directory in it.
 sub share_dir_holding {
-    my ($content) = @_;
+    my ( $content, %refs ) = @_;
     my $dir = path( tempdir( CLEANUP => 1 ) );
-    $dir->child('claude-skill.md')->spew_utf8($content) if defined $content;
+    fill_skill_dir( $dir->child($SKILL_DIR), $content, %refs ) if defined $content;
     return $dir;
 }
 
@@ -58,18 +85,16 @@ sub share_dir_holding {
 # out of it -- the fallback does path arithmetic on the anchor, so pointing
 # %INC at that file is what moves the lookup into this tree.
 sub checkout_holding {
-    my ($content) = @_;
+    my ( $content, %refs ) = @_;
     my $root = path( tempdir( CLEANUP => 1 ) );
     $root->child( 'lib', $ANCHOR )->parent->mkpath;
     $root->child( 'lib', $ANCHOR )->spew_utf8("# located, never loaded\n");
-    if ( defined $content ) {
-        $root->child('share')->mkpath;
-        $root->child('share/claude-skill.md')->spew_utf8($content);
-    }
+    fill_skill_dir( $root->child( 'share', $SKILL_DIR ), $content, %refs )
+        if defined $content;
     return $root;
 }
 
-subtest 'both commands look the file up through one implementation' => sub {
+subtest 'both commands look the skill up through one implementation' => sub {
     # The copy is what ticket #146 was about: the same lookup in two commands,
     # differing only in which $INC key it read. If someone re-inlines a private
     # one into either command, this fails.
@@ -80,6 +105,9 @@ subtest 'both commands look the file up through one implementation' => sub {
     is( App::karr::Cmd::Init->can('_skill_content'),
         App::karr::Cmd::Skill->can('_skill_content'),
         'and both reach the same code, so the lookup cannot be fixed in one of them only' );
+    is( App::karr::Cmd::Init->can('_skill_files'),
+        App::karr::Cmd::Skill->can('_skill_files'),
+        'the same for the whole-directory lookup (#285)' );
 
     ok( !App::karr::Cmd::Init->can('_find_skill_source'),
         'the second copy is gone rather than left behind as an alias' );
@@ -115,12 +143,12 @@ subtest 'not installed: the content comes from the checkout the code was loaded 
     # it, so a fallback that slurped raw would come back three octets longer
     # and fail rather than quietly hand octets on to print.
     is( App::karr::Cmd::Init->new->_skill_content, $DEV_SKILL,
-        'init falls back to share/claude-skill.md in that tree' );
+        "init falls back to share/$SKILL_DIR/SKILL.md in that tree" );
     is( App::karr::Cmd::Skill->new->_skill_content, $DEV_SKILL,
         'and so does the skill command' );
 };
 
-subtest 'the same fallback when the share dir is there but the file is not' => sub {
+subtest 'the same fallback when the share dir is there but the skill is not' => sub {
     my $empty    = share_dir_holding(undef);
     my $checkout = checkout_holding($DEV_SKILL);
 
@@ -129,6 +157,27 @@ subtest 'the same fallback when the share dir is there but the file is not' => s
     # The other way the first lookup comes up empty: dist_dir answers, but
     # nothing is in it. It must fall through rather than return nothing.
     local *File::ShareDir::dist_dir = sub { return "$empty" };
+    local $INC{$ANCHOR} = $checkout->child( 'lib', $ANCHOR )->stringify;
+
+    is( App::karr::Cmd::Init->new->_skill_content, $DEV_SKILL,
+        'init falls through to the checkout' );
+    is( App::karr::Cmd::Skill->new->_skill_content, $DEV_SKILL,
+        'and so does the skill command' );
+};
+
+subtest 'an installed App::karr from before #285 does not shadow the checkout' => sub {
+    # The situation on any machine that has an older release installed: its
+    # share dir answers and holds the one-file skill of that release,
+    # claude-skill.md, and nothing under kanban-issues-karr-cli/. That is not
+    # the skill being looked for, so it must fall through -- or a checkout
+    # would silently run against the installed release's skill.
+    my $old      = share_dir_holding(undef);
+    my $checkout = checkout_holding($DEV_SKILL);
+    $old->child('claude-skill.md')->spew_utf8("# the pre-#285 single file\n");
+
+    require File::ShareDir;
+    no warnings 'redefine';
+    local *File::ShareDir::dist_dir = sub { return "$old" };
     local $INC{$ANCHOR} = $checkout->child( 'lib', $ANCHOR )->stringify;
 
     is( App::karr::Cmd::Init->new->_skill_content, $DEV_SKILL,
@@ -148,9 +197,40 @@ subtest 'neither: it says so instead of returning nothing' => sub {
     for my $class (qw( App::karr::Cmd::Init App::karr::Cmd::Skill )) {
         my $content = eval { $class->new->_skill_content };
         is( $content, undef, "$class returns nothing usable" );
-        like( $@, qr/Could not find claude-skill\.md/,
+        like( $@, qr{Could not find \Q$SKILL_DIR\E/SKILL\.md},
             "$class names the file it could not find" );
         unlike( $@, qr/ at \S+ line \d+/, "$class adds no source location" );
+
+        my @files = eval { $class->new->_skill_files };
+        is( scalar(@files), 0, "$class: _skill_files has nothing either" );
+        like( $@, qr{Could not find \Q$SKILL_DIR\E/SKILL\.md},
+            "$class: and says the same" );
+    }
+};
+
+subtest '_skill_files is every *.md under the directory, as characters, in order' => sub {
+    my $checkout = checkout_holding( $DEV_SKILL, %DEV_REFS );
+    # Not a *.md, so not shipped: what an editor or a stray tool leaves behind
+    # next to the real files must not land in anyone's .claude.
+    $checkout->child( 'share', $SKILL_DIR, 'references/queries.md~' )->spew_utf8("backup\n");
+    $checkout->child( 'share', $SKILL_DIR, 'notes.txt' )->spew_utf8("not shipped\n");
+
+    require File::ShareDir;
+    no warnings 'redefine';
+    local *File::ShareDir::dist_dir = sub { die "Failed to find share dir for dist 'App-karr'\n" };
+    local $INC{$ANCHOR} = $checkout->child( 'lib', $ANCHOR )->stringify;
+
+    for my $class (qw( App::karr::Cmd::Init App::karr::Cmd::Skill )) {
+        my @pairs = $class->new->_skill_files;
+        is_deeply(
+            \@pairs,
+            [ 'SKILL.md' => $DEV_SKILL,
+              map { ( $_ => $DEV_REFS{$_} ) } sort keys %DEV_REFS ],
+            "$class: SKILL.md first, then references/*.md in sorted order, nothing else"
+        );
+        my %files = @pairs;
+        is( length $files{'references/cards.md'}, length $DEV_REFS{'references/cards.md'},
+            "$class: a reference comes back as characters, not octets" );
     }
 };
 
@@ -158,8 +238,8 @@ subtest 'neither: it says so instead of returning nothing' => sub {
 # proves the arithmetic; it does not prove the CLI ever reaches it. Below, both
 # commands are run as `karr` really runs, against a File::ShareDir that cannot
 # answer -- the situation of anyone working from a checkout without the dist
-# installed -- and have to come back with this checkout's share file.
-my $SHARE = path($ROOT)->child('share/claude-skill.md');
+# installed -- and have to come back with this checkout's share directory.
+my $SHARE = path($ROOT)->child( 'share', $SKILL_DIR );
 
 # A File::ShareDir that fails the way an uninstalled dist makes it fail, ahead
 # of the real one in the child's @INC. Cheaper and far more reliable than
@@ -198,9 +278,19 @@ sub run_karr {
     return { stdout => $out, stderr => $err, exit => $exit };
 }
 
+# Every shipped file of this checkout, relative to the skill directory.
+sub shipped_in_checkout {
+    my @rel;
+    $SHARE->visit(
+        sub { my ($p) = @_; push @rel, $p->relative($SHARE)->stringify if $p->is_file && $p =~ /\.md\z/ },
+        { recurse => 1 },
+    );
+    return sort @rel;
+}
+
 subtest 'karr skill show through the real CLI, with nothing installed' => sub {
     plan skip_all => "$SHARE not found - not a source checkout"
-        unless $SHARE->exists;
+        unless $SHARE->is_dir;
 
     # Run from somewhere else entirely: the fallback has to find the tree the
     # code was loaded from, not the directory the user happens to stand in.
@@ -208,13 +298,13 @@ subtest 'karr skill show through the real CLI, with nothing installed' => sub {
     my $r = run_karr( $elsewhere, stub_sharedir_lib(), 'skill', 'show' );
 
     is( $r->{exit}, 0, 'it exits 0' ) or diag "stderr: $r->{stderr}";
-    is( $r->{stdout}, $SHARE->slurp_raw,
-        'and prints this checkout\'s share/claude-skill.md, byte for byte' );
+    is( $r->{stdout}, $SHARE->child('SKILL.md')->slurp_raw,
+        "and prints this checkout's share/$SKILL_DIR/SKILL.md, byte for byte" );
 };
 
 subtest 'karr init --claude-skill through the real CLI, with nothing installed' => sub {
     plan skip_all => "$SHARE not found - not a source checkout"
-        unless $SHARE->exists;
+        unless $SHARE->is_dir;
 
     my $repo = tempdir( CLEANUP => 1 );
     system( 'git', 'init', '-q', $repo ) == 0
@@ -227,10 +317,17 @@ subtest 'karr init --claude-skill through the real CLI, with nothing installed' 
     is( $r->{exit}, 0, 'it exits 0' ) or diag "stderr: $r->{stderr}";
     like( $r->{stdout}, qr/Installed Claude Code skill/, 'and reports the install' );
 
-    my $installed = path($repo)->child('.claude/skills/kanban-issues-karr-cli/SKILL.md');
-    ok( $installed->exists, 'the skill is there' ) or return;
-    is( $installed->slurp_raw, $SHARE->slurp_raw,
-        'and it is this checkout\'s share/claude-skill.md, byte for byte' );
+    my $installed = path($repo)->child( '.claude/skills', $SKILL_DIR );
+    ok( $installed->child('SKILL.md')->exists, 'the skill is there' ) or return;
+
+    my @shipped = shipped_in_checkout();
+    ok( ( grep { m{^references/} } @shipped ) >= 1,
+        'this checkout ships at least one references/*.md to compare against' );
+    for my $rel (@shipped) {
+        ok( $installed->child($rel)->exists, "$rel was installed" ) or next;
+        is( $installed->child($rel)->slurp_raw, $SHARE->child($rel)->slurp_raw,
+            "and it is this checkout's share/$SKILL_DIR/$rel, byte for byte" );
+    }
 };
 
 done_testing;

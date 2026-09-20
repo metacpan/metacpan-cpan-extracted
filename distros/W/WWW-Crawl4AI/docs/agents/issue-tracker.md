@@ -4,7 +4,8 @@ Issues und PRDs für dieses Repo leben in **karr** — einem git-nativen Kanban-
 Der Board-Zustand wird in `refs/karr/*` gespeichert (nicht in Commits oder im
 Arbeitsverzeichnis). Tasks sind Markdown + YAML-Frontmatter mit numerischer ID.
 
-CLI: `karr` (App::karr). Siehe `../p5-app-karr/README.md` für die volle Doku.
+CLI: `karr` (App::karr). Siehe `../karr/README.md` (Schwester-Repo im Workspace)
+für die volle Doku.
 
 ## Board-Initialisierung
 

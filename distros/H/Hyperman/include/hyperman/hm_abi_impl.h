@@ -92,15 +92,15 @@ static int hm_abi_conn_detach(pTHX_ void *vl, int fd, UV id) {
     return hm_detach(aTHX_ (hm_loop *)vl, fd, id);
 }
 
-/* v3: abuse controls. Plain forwards onto the shared arena (hm_ratelimit.h);
- * no pTHX, no SV - the arena is process-global. */
-static int  hm_abi_deny_check(const char *ip)            { return hm_rl_deny_check(ip); }
-static void hm_abi_deny_add(const char *ip, long ttl)    { hm_rl_deny_add(ip, ttl); }
-static void hm_abi_deny_remove(const char *ip)           { hm_rl_deny_remove(ip); }
+/* v3: abuse controls. Plain forwards onto the two maps in the Shared::Arena
+ * (hm_sa_abuse.h); no pTHX, no SV - the maps are process-global. */
+static int  hm_abi_deny_check(const char *ip)            { return hm_sa_deny_check(ip); }
+static void hm_abi_deny_add(const char *ip, long ttl)    { hm_sa_deny_add(ip, ttl); }
+static void hm_abi_deny_remove(const char *ip)           { hm_sa_deny_remove(ip); }
 static int  hm_abi_ratelimit_hit(const void *key, STRLEN klen,
                                  IV limit, IV window, IV *remaining, IV *reset) {
     long rem = 0, rst = 0;
-    int ok = hm_rl_ratelimit_hit(key, (size_t)klen, (long)limit, (long)window,
+    int ok = hm_sa_ratelimit_hit(key, (size_t)klen, (long)limit, (long)window,
                                  &rem, &rst);
     if (remaining) *remaining = (IV)rem;
     if (reset)     *reset     = (IV)rst;
@@ -111,13 +111,8 @@ static int  hm_abi_ratelimit_hit(const void *key, STRLEN klen,
 
 static int hm_abi_bus_publish(const char *topic, STRLEN tlen,
                               const char *payload, STRLEN plen) {
-#if HM_BUS_HAVE_ATOMICS
-    int r = hm_bus_publish(topic, (uint32_t)tlen, payload, (uint32_t)plen);
+    int r = hm_sa_bus_publish(topic, (uint32_t)tlen, payload, (uint32_t)plen);
     return r == HM_BUS_OK ? 1 : r == HM_BUS_LOCAL ? 0 : -1;
-#else
-    (void)topic; (void)tlen; (void)payload; (void)plen;
-    return 0;
-#endif
 }
 
 /* The ABI's callback takes pTHX and no sequence; the ring's takes a sequence
@@ -142,8 +137,8 @@ static int hm_abi_bus_subscribe(pTHX_ const char *topic, STRLEN tlen,
     int id;
     PERL_UNUSED_CONTEXT;
     if (!cb) return -1;
-    id = hm_bus_subscribe(topic, (uint32_t)tlen, group, (uint32_t)glen,
-                          hm_abi_bus_trampoline, NULL);
+    id = hm_sa_bus_subscribe(topic, (uint32_t)tlen, group, (uint32_t)glen,
+                             hm_abi_bus_trampoline, NULL);
     if (id < 0) return -1;
     hm_abi_bus_subs[id].cb = cb;
     hm_abi_bus_subs[id].ud = ud;
@@ -157,12 +152,38 @@ static int hm_abi_bus_unsubscribe(pTHX_ int id) {
         hm_abi_bus_subs[id].cb = NULL;
         hm_abi_bus_subs[id].ud = NULL;
     }
-    return hm_bus_unsubscribe(id);
+    return hm_sa_bus_unsubscribe(id);
 }
 
 static int hm_abi_bus_dispatch(pTHX) {
     PERL_UNUSED_CONTEXT;
-    return (int)hm_bus_dispatch();
+    return (int)hm_sa_bus_dispatch();
+}
+
+/* ---- v9: the arena and the scoreboard ------------------------------------ */
+
+static void       *hm_abi_arena_region(void) { return (void *)hm_sa_region; }
+static const void *hm_abi_arena_table(void)  { return (const void *)HM_SA; }
+
+static int hm_abi_pool_sum(hm_abi_pool_stats *out) {
+    hm_sa_pool_stats p;
+    if (!out) return 0;
+    if (!hm_sa_board_pool(&p)) { memset(out, 0, sizeof *out); return 0; }
+    out->workers   = (UV)p.workers;   out->alive     = (UV)p.alive;
+    out->requests  = (UV)p.requests;  out->accepts   = (UV)p.accepts;
+    out->denied    = (UV)p.denied;    out->conns     = (UV)p.conns;
+    out->bytes_out = (UV)p.bytes_out; out->datagrams = (UV)p.datagrams;
+    out->h3        = (UV)p.h3;
+    return 1;
+}
+
+/* The selftest's bus subscriber: counts what reached it. */
+static int hm_abi_selftest_bus_n = 0;
+static void hm_abi_selftest_bus_cb(pTHX_ const char *topic, STRLEN tl,
+                                   const char *payload, STRLEN pl, void *ud) {
+    PERL_UNUSED_CONTEXT;
+    (void)topic; (void)tl; (void)payload; (void)pl; (void)ud;
+    hm_abi_selftest_bus_n++;
 }
 
 static const hm_abi hm_abi_table = {
@@ -198,6 +219,9 @@ static const hm_abi hm_abi_table = {
     hm_stream_on_abort,
     hm_stream_abort_h,           /* v7 - the ending a failed producer needs */
     hm_stream_on_data,           /* v8 - the read half                     */
+    hm_abi_arena_region,         /* v9 - the arena, its table, the board   */
+    hm_abi_arena_table,
+    hm_abi_pool_sum,
 };
 
 /* ---- v4 on_worker_start, driven from C (t/33-worker-start.t) ------------ *
@@ -492,14 +516,18 @@ static int hm_abi_selftest(pTHX) {
      * selftest exercises them even with no server running (idempotent). */
     {
         IV rem = 0, rst = 0;
-        hm_rl_arena_init(0, 0);
+        /* The Shared::Arena and its two maps, with the defaults: Punk's
+         * no-server tests get Hyperman->arena and a working ratelimit_hit
+         * from this call. Idempotent. */
+        hm_sa_open(aTHX_ NULL, 0, hm_sa_bytes(0, 0, 0, 0));
+        (void)hm_sa_abuse_open(0, 0, NULL, NULL);
         if (!A->deny_check || !A->deny_add || !A->deny_remove
             || !A->ratelimit_hit)                                 ok = 0;
-        else if (!hm_rl_arena_live()) {
-            /* No arena on this platform: the contract is that every entry
-             * point FAILS OPEN, and that is what gets asserted. Anything
-             * else here would be testing a feature the build does not
-             * have. (Windows, or a compiler without the atomics.) */
+        else if (!hm_sa_abuse_live()) {
+            /* No arena: the contract is that every entry point FAILS OPEN,
+             * and that is what gets asserted. Anything else here would be
+             * testing a feature the build does not have. (Shared::Arena
+             * absent, or a compiler without the atomics it needs.) */
             A->deny_add("203.0.113.7", 0);
             if (A->deny_check("203.0.113.7") != 0)                ok = 0;
             A->deny_remove("203.0.113.7");
@@ -523,6 +551,76 @@ static int hm_abi_selftest(pTHX) {
             /* unlimited is always allowed */
             if (A->ratelimit_hit("st2", 3, 0, 60, &rem, &rst) != 1) ok = 0;
         }
+    }
+
+    /* v5 the bus, driven through the table. The ring is opened here with the
+     * defaults when the arena exists (idempotent), so Punk's no-server tests
+     * get a working bus from this call as they get the maps. */
+    {
+        int e = 0;
+        (void)hm_sa_bus_open(0, 0, &e);
+        if (!A->bus_publish || !A->bus_subscribe || !A->bus_unsubscribe
+            || !A->bus_dispatch)                                  ok = 0;
+        else if (!hm_sa_bus_live()) {
+            /* No ring: publish is local-only, and says so. */
+            if (A->bus_publish("selft", 5, "x", 1) != 0)          ok = 0;
+        }
+        else {
+            static char big[HM_BUS_SLOT_SIZE + 64];
+            int id, g1, g2, i;
+            memset(big, 'x', sizeof big);
+
+            /* fanout: one record, one subscriber, delivered once */
+            hm_abi_selftest_bus_n = 0;
+            id = A->bus_subscribe(aTHX_ "selft", 5, NULL, 0,
+                                  hm_abi_selftest_bus_cb, NULL);
+            if (id < 0)                                           ok = 0;
+            if (A->bus_publish("selft", 5, "one", 3) != 1)        ok = 0;
+            /* the ceiling: one byte over is refused, never truncated */
+            if (A->bus_publish("selft", 5, big,
+                               (STRLEN)hm_sa_bus_max_msg - 5 + 1) != -1) ok = 0;
+            if (A->bus_publish("selft", 5, big,
+                               (STRLEN)hm_sa_bus_max_msg - 5) != 1)      ok = 0;
+            if (A->bus_dispatch(aTHX) < 2 || hm_abi_selftest_bus_n != 2) ok = 0;
+            if (!A->bus_unsubscribe(aTHX_ id))                    ok = 0;
+
+            /* a queue group: ten records, two handles in this process, each
+             * record delivered exactly once between them */
+            hm_abi_selftest_bus_n = 0;
+            g1 = A->bus_subscribe(aTHX_ "selfg", 5, "pool", 4,
+                                  hm_abi_selftest_bus_cb, NULL);
+            g2 = A->bus_subscribe(aTHX_ "selfg", 5, "pool", 4,
+                                  hm_abi_selftest_bus_cb, NULL);
+            if (g1 < 0 || g2 < 0)                                 ok = 0;
+            for (i = 0; i < 10; i++)
+                if (A->bus_publish("selfg", 5, "job", 3) != 1)    ok = 0;
+            if (A->bus_dispatch(aTHX) != 10 || hm_abi_selftest_bus_n != 10) ok = 0;
+            if (A->bus_dispatch(aTHX) != 0)                       ok = 0;
+            (void)A->bus_unsubscribe(aTHX_ g1);
+            (void)A->bus_unsubscribe(aTHX_ g2);
+        }
+    }
+
+    /* v9: the arena and its table are handed out together or not at all,
+     * and the scoreboard sums once it exists. Opened here with two rows so
+     * a no-server process (t/22) sees the same board a server would. */
+    {
+        int e = 0;
+        hm_abi_pool_stats ps;
+        if (!A->arena_region || !A->arena_table || !A->pool_stats) ok = 0;
+        else if ((A->arena_region() != NULL) != (A->arena_table() != NULL)) ok = 0;
+        else if (A->arena_region()) {
+            (void)hm_sa_board_open(2, &e);
+            if (!hm_sa_board_live())                                ok = 0;
+            else {
+                if (A->pool_stats(&ps) != 1)                        ok = 0;
+                if (hm_sa_board_take() < 0)                         ok = 0;
+                hm_sa_board_mirror(7, 3, 1, 0, 512, 0, 0);
+                if (A->pool_stats(&ps) != 1 || ps.workers < 1
+                    || ps.requests < 7 || ps.alive < 1)             ok = 0;
+            }
+        }
+        else if (A->pool_stats(&ps) != 0)                           ok = 0;
     }
 
     return ok;

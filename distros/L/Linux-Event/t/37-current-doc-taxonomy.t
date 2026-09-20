@@ -99,6 +99,15 @@ for my $relative (@current_docs) {
 like($current_text{'README.md'},
     qr/docs\/FIRST-CLASS-STREAM-CALLBACKS\.md/,
     'README links the first-class callback contract');
+like($current_text{'README.md'},
+    qr/\bpoll_fd\(\).*?\bpoll\(\)/s,
+    'README surfaces the foreign-loop integration boundary');
+like($current_text{'README.md'},
+    qr/docs\/ORDERED-BYTE-CONSUMER-ABI\.md/,
+    'README links the native consumer ABI contract');
+like($current_text{'docs/FRAMING.md'},
+    qr/replace the native consumer provider.*same native input/s,
+    'framing guide documents provider-changing protocol transitions');
 like($current_text{'docs/FIRST-CLASS-STREAM-CALLBACKS.md'},
     qr/(?:constructor callback|callback supplied at construction).*overrides/is,
     'current callback contract documents constructor precedence');

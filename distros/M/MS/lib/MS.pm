@@ -1,7 +1,10 @@
 package MS;
 
-our $VERSION = 0.207003;
-$VERSION = eval $VERSION;
+use strict;
+use warnings;
+
+our $VERSION = 0.207004;
+$VERSION = eval $VERSION; ## no critic
 
 1;
 

@@ -52,6 +52,6 @@
          "web" : "https://github.com/eansearch/perl-ean-search"
       }
    },
-   "version" : "1.22",
+   "version" : "1.23",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

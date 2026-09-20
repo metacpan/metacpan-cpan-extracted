@@ -1,5 +1,22 @@
 Revision history for WWW-PayPal
 
+0.003     2026-09-19 17:28:23Z
+    - WWW::PayPal::API::Webhooks (Notifications v1): new controller for
+      webhook endpoint management and signature verification. verify()
+      calls POST /v1/notifications/verify-webhook-signature and returns a
+      real boolean (1 on SUCCESS, 0 on anything else including FAILURE —
+      never truthy on the raw status string); croaks only on missing
+      arguments or a transport/API error. create() registers an endpoint
+      (event_types accepts bare event-name strings or {name=>...}
+      hashrefs, mixed freely); list()/get()/delete() round out CRUD. New
+      $pp->webhooks client attribute.
+    - WWW::PayPal::Webhook entity: id, url, event_names.
+    - WWW::PayPal::WebhookEvents: curated :all-exportable constants for
+      the event-type strings the library's two flows need (order/capture,
+      subscription lifecycle, dispute), including both
+      PAYMENT_CAPTURE_DECLINED (Payments v2, what Orders v2 captures
+      emit) and PAYMENT_CAPTURE_DENIED (Payments v1) as distinct events.
+
 0.002     2026-04-17 02:45:51Z
     - WWW::PayPal::API::Orders: new checkout() convenience method — the
       modern Express Checkout one-liner. Builds purchase_units +

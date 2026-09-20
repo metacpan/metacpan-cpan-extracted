@@ -1,18 +1,18 @@
 # ABSTRACT: Show full details of a task
 
 package App::karr::Cmd::Show;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
-  usage_string => 'USAGE: karr show [ID] [--me] [--agent NAME] [--last N] [--json] [--compact]',
+  usage_string => 'USAGE: karr show [ID[,ID,...]] [--me] [--agent NAME] [--last N] [--json] [--compact]',
 );
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
 use App::karr::Role::CompactOutput;
 use App::karr::Task;
 use App::karr::CrossBoard;
-use App::karr::Error qw( command_hint );
+use App::karr::Error qw( command_hint user_error );
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output',
      'App::karr::Role::CompactOutput';
@@ -109,19 +109,26 @@ sub _my_recent_ids {
   return @ids;
 }
 
+# The id names no card, so there is nothing to show -- end on the command
+# that lists the ids that do exist, the same spelling the mutation commands
+# raise through App::karr::Role::TaskMutation/task_not_found (ticket k264).
+# Show is read-only and composes no mutation role, so the line is inlined.
+# The single-id path dies with it (the hint is the very last line, pinned by
+# t/264); the batch path warns it per missing id and reports the failure at
+# the end.
+sub _not_found {
+  my ($self, $id) = @_;
+  return "Task $id not found on this board:\n"
+    . command_hint('list', '--compact') . "\n";
+}
+
 sub _select_tasks {
   my ($self, $id) = @_;
 
   # Explicit id always wins.
   if (defined $id) {
     my $task = $self->find_task($id);
-    # The id names no card, so there is nothing to show -- end on the command
-    # that lists the ids that do exist, the same spelling the mutation commands
-    # raise through App::karr::Role::TaskMutation/task_not_found (ticket k264).
-    # Show is read-only and composes no mutation role, so the line is inlined.
-    die "Task $id not found on this board:\n"
-      . command_hint('list', '--compact') . "\n"
-      unless $task;
+    die $self->_not_found($id) unless $task;
     return ($task);
   }
 
@@ -160,41 +167,77 @@ sub execute {
   $self->require_local_board;
 
   my @pos = $self->positional_args($args_ref);
-  my @tasks = $self->_select_tasks($pos[0]);
+  my @tasks;
+  my $failed = 0;
+  my @ids;
+
+  if (defined $pos[0] && length $pos[0]) {
+    # The batch form, split by the shared ID[,ID,...] splitter of the batch
+    # commands (App::karr::Role::BoardAccess/parse_ids). A comma with no ids
+    # around it splits to nothing and is a usage error, the same guard move,
+    # delete and archive raise.
+    @ids = $self->parse_ids($pos[0]);
+    die "Usage: karr show [ID[,ID,...]] [--me] [--agent NAME] [--last N] [--json] [--compact]\n"
+      unless @ids;
+
+    if (@ids == 1) {
+      # A single id keeps the hard not-found answer: the message ends on the
+      # working command, with nothing after it (ticket k264).
+      my $task = $self->find_task($ids[0]);
+      die $self->_not_found($ids[0]) unless $task;
+      @tasks = ($task);
+    } else {
+      # The batch rule of ADR 0002: every id is attempted, a missing one is
+      # reported and the ids after it are still shown, and the exit code
+      # reports the failure at the end.
+      for my $id (@ids) {
+        my $task = $self->find_task($id);
+        if ($task) {
+          push @tasks, $task;
+        } else {
+          $failed++;
+          warn $self->_not_found($id);
+        }
+      }
+    }
+  } else {
+    @tasks = $self->_select_tasks(undef);
+  }
 
   # "No tasks found." stands under --compact too. It is one line already, and
   # printing nothing at all would make an empty selection indistinguishable
   # from a card whose line went missing -- `list --compact` can afford silence
   # because its table says "0 task(s)", this command has no second half to say
-  # it in.
+  # it in. A batch that reported every id missing has its second half on
+  # STDERR already, so the line is left out there.
   unless (@tasks) {
-    print "No tasks found.\n" unless $self->json;
+    print "No tasks found.\n" unless $self->json || $failed;
     $self->print_json([]) if $self->json;
-    return;
-  }
-
-  if ($self->json) {
+  } elsif ($self->json) {
     my @data = map { $_->to_json_hash } @tasks;
-    # A single explicit lookup stays a bare object for backward compatibility.
-    $self->print_json(@data == 1 ? $data[0] : \@data);
-    return;
-  }
-
-  # Below --json and above the detail view, the same place `pick` cuts (#251):
-  # --compact shapes the plaintext rendering and never the payload. The line
-  # is App::karr::Task's, shared with `list --compact` so the two renderings
-  # of one card cannot drift apart (#254).
-  if ($self->compact) {
+    # A single explicit lookup stays a bare object for backward compatibility;
+    # the batch form is always an array, the shape `list --json` uses.
+    $self->print_json( @ids > 1 ? \@data : ( @data == 1 ? $data[0] : \@data ) );
+  } elsif ($self->compact) {
+    # Below --json and above the detail view, the same place `pick` cuts
+    # (#251): --compact shapes the plaintext rendering and never the payload.
+    # The line is App::karr::Task's, shared with `list --compact` so the two
+    # renderings of one card cannot drift apart (#254).
     for my $task (@tasks) {
       print $task->compact_line . "\n";
     }
-    return;
+  } else {
+    for my $i (0 .. $#tasks) {
+      $self->_show_task($tasks[$i]);
+      print "\n" . ('=' x 60) . "\n\n" if $i < $#tasks;
+    }
   }
 
-  for my $i (0 .. $#tasks) {
-    $self->_show_task($tasks[$i]);
-    print "\n" . ('=' x 60) . "\n\n" if $i < $#tasks;
-  }
+  # The batch rule of ADR 0002, the exit-code half: partial success is
+  # committed, the exit code reports the failure (1). The same summary the
+  # mutation commands raise through App::karr::Role::TaskMutation/
+  # report_batch_failure.
+  user_error( sprintf '%d of %d ids failed', $failed, scalar @ids ) if $failed;
 }
 
 1;
@@ -211,11 +254,12 @@ App::karr::Cmd::Show - Show full details of a task
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 
     karr show 12              # a specific task
+    karr show 12,13,14        # several tasks, one after another
     karr show                 # the most recently updated task
     karr show --last 5        # the 5 most recently updated tasks
     karr show --me            # the last task my identity acted on
@@ -229,11 +273,19 @@ Shows the full details of a task, including optional metadata such as tags, due
 date, estimate, claim state, and the Markdown body. This is the most complete
 human-readable view of an individual card.
 
+C<ID> takes the comma-separated batch form the other task commands share
+(C<ID[,ID,...]>), printing the cards one after another: C<--json> as an array
+(the shape C<karr list --json> uses), plain text separated by a blank line, and
+C<--compact> as one line per card. An id that names no card is reported on
+STDERR while the ids around it are still shown, and the command exits C<1> --
+the batch rule of ADR 0002 (F<docs/adr/0002-exit-code-contract.md>), the same
+answer C<karr move> and C<karr delete> give a partly missing batch.
+
 With no C<ID>, shows the most recently updated task. C<--last N> widens that to
 the C<N> most recently updated. C<--me> instead resolves the task(s) the
 current identity most recently acted on (via the activity log). C<--agent NAME>
-shows the task(s) most recently claimed by that agent name. C<ID> always wins
-over the selector options.
+shows the task(s) most recently claimed by that agent name. The selector
+options stay exclusive to the no-id form: C<ID> always wins over them.
 
 C<--compact> replaces that full view with one line per card -- the very line
 C<karr list --compact> prints, from L<App::karr::Task/compact_line>. It is the

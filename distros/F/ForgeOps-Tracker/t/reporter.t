@@ -17,8 +17,9 @@ sub enabled_configuration {
 package Fake::EventBuilder {
     sub new { my ($class, %args) = @_; return bless { %args }, $class; }
     sub build {
-        my ($self, $error, $context) = @_;
-        push @{ $self->{calls} }, [$error, $context];
+        my ($self, $error, $context, $user, $breadcrumbs) = @_;
+        push @{ $self->{calls} }, [$error, $context, $user];
+        $self->{breadcrumbs} = $breadcrumbs;
         return $self->{payload};
     }
 }
@@ -47,8 +48,33 @@ subtest 'builds and enqueues a payload when reporting is enabled' => sub {
 
     $reporter->report($error, $context);
 
-    is_deeply($event_builder->{calls}, [[$error, $context]]);
+    is_deeply($event_builder->{calls}, [[$error, $context, undef]]);
     is_deeply($delivery_queue->{pushed}, [$built_payload]);
+};
+
+subtest 'passes the user through to the event builder' => sub {
+    my $configuration = enabled_configuration();
+    my $event_builder = Fake::EventBuilder->new(calls => [], payload => {});
+    my $delivery_queue = Fake::DeliveryQueue->new(pushed => []);
+    my $reporter = ForgeOps::Tracker::Reporter->new($configuration, $event_builder, $delivery_queue);
+    my $error = "boom\n";
+    my $user = { id => 42, email => 'alice@example.com' };
+
+    $reporter->report($error, {}, $user);
+
+    is_deeply($event_builder->{calls}, [[$error, {}, $user]]);
+};
+
+subtest 'passes the breadcrumbs through to the event builder' => sub {
+    my $configuration = enabled_configuration();
+    my $event_builder = Fake::EventBuilder->new(calls => [], payload => {});
+    my $delivery_queue = Fake::DeliveryQueue->new(pushed => []);
+    my $reporter = ForgeOps::Tracker::Reporter->new($configuration, $event_builder, $delivery_queue);
+    my $crumbs = [{ category => 'custom', message => 'hi', level => 'info', timestamp => 't', data => {} }];
+
+    $reporter->report("boom\n", {}, undef, $crumbs);
+
+    is_deeply($event_builder->{breadcrumbs}, $crumbs);
 };
 
 subtest 'does nothing when reporting is disabled' => sub {

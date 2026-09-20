@@ -1,7 +1,7 @@
 # ABSTRACT: The one dispatch path shared by bin/karr and the in-process test runner
 
 package App::karr::Dispatch;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use strict;
 use warnings;
 use Exporter qw( import );
@@ -212,7 +212,7 @@ App::karr::Dispatch - The one dispatch path shared by bin/karr and the in-proces
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 

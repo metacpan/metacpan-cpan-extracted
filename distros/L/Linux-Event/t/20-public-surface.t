@@ -59,7 +59,11 @@ for my $required (
     'bench/run-callback-ceiling.pl',
     'bench/run-stream-lifecycle-bench.pl',
     'bench/run-stream-microbench.pl',
+    'bench/run-stream-timer-fairness.pl',
+    'bench/run-stream-feedback-timer-fairness.pl',
     'bench/run-stream-payload-sweep.pl',
+    'bench/run-stream-timer-fairness.pl',
+    'bench/run-stream-feedback-timer-fairness.pl',
     'bench/run-tls-accept-setup-bench.pl',
     'bench/run-tls-microbench.pl',
     'bench/run-stream-transition-bench.pl',
@@ -225,6 +229,8 @@ my %allowed = map { $_ => 1 } qw(
     run-stream-lifecycle-bench.pl
     run-stream-microbench.pl
     run-stream-payload-sweep.pl
+    run-stream-timer-fairness.pl
+    run-stream-feedback-timer-fairness.pl
     run-tls-accept-setup-bench.pl
     run-tls-microbench.pl
     run-stream-transition-bench.pl

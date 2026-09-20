@@ -35,8 +35,11 @@
  *   6 - stream handles (stream_open .. stream_on_abort)
  *   7 - stream_abort (end a stream so the peer can tell it was not finished)
  *   8 - stream_on_data (the read half: a stream handle becomes
- *       bidirectional, which is what Extended CONNECT needs) */
-#define HM_ABI_VERSION 8
+ *       bidirectional, which is what Extended CONNECT needs)
+ *   9 - arena_region, arena_table, pool_stats (the Shared::Arena the server
+ *       created, its provider's table, and the worker scoreboard's sum)
+ */
+#define HM_ABI_VERSION 9
 
 /* io_watch masks (match Hyperman's internal HM_EV_READ/HM_EV_WRITE) */
 #define HM_ABI_READ  0x1
@@ -56,6 +59,14 @@ typedef struct hm_abi_timer hm_abi_timer;
 /* fd readiness; mask is the HM_ABI_* direction that fired */
 typedef void (*hm_abi_io_cb)(pTHX_ int fd, int mask, void *ud);
 typedef void (*hm_abi_timer_cb)(pTHX_ void *ud);
+
+/* v9: the worker scoreboard, summed. `workers` is rows that read coherently,
+ * `alive` those whose writer is running; the rest are the pool's totals as
+ * of each worker's last one-second tick. */
+typedef struct hm_abi_pool_stats {
+    UV workers, alive;
+    UV requests, accepts, denied, conns, bytes_out, datagrams, h3;
+} hm_abi_pool_stats;
 /* fires exactly once when the future settles - including cancellation
  * (future_state says which); this is the cancellation hook */
 typedef void (*hm_abi_ready_cb)(pTHX_ SV *future, void *ud);
@@ -293,6 +304,22 @@ typedef struct hm_abi {
      * A NULL cb removes the registration and restores buffering.
      * HM_ABI_STREAM_STALE for a handle that is not live. */
     int   (*stream_on_data)(pTHX_ void *h, hm_abi_stream_data_cb cb, void *ud);
+
+    /* ---- v9: the arena, and what it makes possible -----------------------
+     *
+     * The Shared::Arena the server created before the fork, and its
+     * provider's own function table, as `void *` so this header stays
+     * includable without sa_abi.h: a consumer that wants the tenants includes
+     * sa_abi.h itself and casts - `((const sa_abi *)A->arena_table())`,
+     * `(sa_region *)A->arena_region()` - and then has every tenant on the
+     * server's region with no per-tenant door here. Both NULL with no arena
+     * (Shared::Arena absent or too old, or before run()).
+     *
+     * pool_stats sums the worker scoreboard, one row per worker mirrored
+     * from a one-second timer: 1 with the struct filled, 0 with no board. */
+    void       *(*arena_region)(void);
+    const void *(*arena_table)(void);
+    int         (*pool_stats)(hm_abi_pool_stats *out);
 } hm_abi;
 
 /* How many worker-start callbacks the server will hold. Fixed, so

@@ -106,6 +106,63 @@ subtest 'leaves the payload untouched when scrub_pii is disabled' => sub {
     is_deeply($payload->{context}, { email => 'ada@example.com' });
 };
 
+subtest 'includes the user when given one, never scrubbed even though it\'s an email' => sub {
+    my $builder = ForgeOps::Tracker::EventBuilder->new(new_configuration());
+    eval { die 'boom' };
+    my $payload = $builder->build($@, {}, { id => 42, email => 'ada@example.com' });
+
+    is_deeply($payload->{user}, { id => 42, email => 'ada@example.com' });
+};
+
+subtest 'omits the user key entirely when none was given' => sub {
+    my $builder = ForgeOps::Tracker::EventBuilder->new(new_configuration());
+    eval { die 'boom' };
+    my $payload = $builder->build($@);
+
+    ok(!exists $payload->{user});
+};
+
+subtest 'includes breadcrumbs when given' => sub {
+    my $builder = ForgeOps::Tracker::EventBuilder->new(new_configuration());
+    eval { die 'boom' };
+    my $crumb = { category => 'controller', message => 'GET /orders/42', level => 'info', timestamp => '2024-01-15T10:29:58Z', data => { status => 200 } };
+
+    my $payload = $builder->build($@, {}, undef, [$crumb]);
+
+    is_deeply($payload->{breadcrumbs}, [$crumb]);
+};
+
+subtest 'omits the breadcrumbs key entirely when none were given, or the list is empty' => sub {
+    my $builder = ForgeOps::Tracker::EventBuilder->new(new_configuration());
+    eval { die 'boom' };
+    my $error = $@;
+
+    ok(!exists $builder->build($error)->{breadcrumbs});
+    ok(!exists $builder->build($error, {}, undef, [])->{breadcrumbs});
+};
+
+subtest 'scrubs breadcrumb message and data but leaves category, level, and timestamp untouched' => sub {
+    my $builder = ForgeOps::Tracker::EventBuilder->new(new_configuration());
+    eval { die 'boom' };
+    my $crumb = {
+        category  => 'custom',
+        message   => 'emailed alice@example.com',
+        level     => 'info',
+        timestamp => '2024-01-15T10:29:58Z',
+        data      => { email => 'alice@example.com', password => 'hunter2' },
+    };
+
+    my $payload = $builder->build($@, {}, undef, [$crumb]);
+
+    my ($scrubbed) = @{ $payload->{breadcrumbs} };
+    is($scrubbed->{message}, 'emailed [EMAIL FILTERED]');
+    is($scrubbed->{category}, 'custom');
+    is($scrubbed->{level}, 'info');
+    is($scrubbed->{timestamp}, '2024-01-15T10:29:58Z');
+    is_deeply($scrubbed->{data}, { email => '[EMAIL FILTERED]', password => '[FILTERED]' });
+    is($crumb->{message}, 'emailed alice@example.com', 'the caller\'s own entry is not mutated');
+};
+
 # --- Source context capture -------------------------------------------------
 
 # Writes a small, real Perl fixture file where line $die_at_line is a `die "boom";` statement and

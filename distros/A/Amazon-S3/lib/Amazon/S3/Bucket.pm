@@ -4,34 +4,34 @@ use strict;
 use warnings;
 
 use Amazon::S3::Constants qw(:all);
-use Amazon::S3::Util      qw(:all);
+use Amazon::S3::Util qw(:all);
 
 use Carp;
 use Data::Dumper;
-use Digest::MD5       qw(md5 md5_hex);
+use Digest::MD5 qw(md5 md5_hex);
 use Digest::MD5::File qw(file_md5 file_md5_hex);
-use English           qw(-no_match_vars);
+use English qw(-no_match_vars);
 use File::stat;
 use IO::File;
 use IO::Scalar;
+use List::Util qw(none pairs any);
 use MIME::Base64;
-use List::Util   qw(none pairs);
 use Scalar::Util qw(reftype);
 use URI;
 use XML::Simple; ## no critic (DiscouragedModules)
 
 use parent qw(Exporter Class::Accessor::Fast);
 
-our $VERSION = '2.0.2'; ## no critic (RequireInterpolation)
+our $VERSION = '2.1.0'; ## no critic (RequireInterpolation)
 
 __PACKAGE__->mk_accessors(
   qw(
-    bucket
-    creation_date
     account
+    bucket
     buffer_size
-    region
+    creation_date
     logger
+    region
     verify_region
   ),
 );
@@ -65,8 +65,7 @@ sub new {
       $region = $self->get_location_constraint() // 'us-east-1';
     }
 
-    $self->logger->debug( sprintf "bucket: %s region: %s\n",
-      $self->bucket, ( $region // $EMPTY ) );
+    $self->logger->debug( sprintf "bucket: %s region: %s\n", $self->bucket, ( $region // $EMPTY ) );
 
     $self->region($region);
   }
@@ -128,6 +127,24 @@ sub add_key {
 
   set_md5_header( data => $value, headers => $headers );
 
+  my $algorithm      = lc $account->checksum_algorithm;
+  my $checksum_types = $account->checksum_types;
+
+  if ( exists $checksum_types->{$algorithm} ) {
+    my %digest_parameters;
+
+    if ( ref $value ) {
+      $digest_parameters{filename} = ${$value};
+    }
+    else {
+      $digest_parameters{data} = $value;
+    }
+
+    my $digest = $checksum_types->{$algorithm}->(%digest_parameters);
+
+    $headers->{ 'x-amz-checksum-' . $algorithm } = encode_base64( $digest, $EMPTY );
+  }
+
   if ( ref $value ) {
     $value = _content_sub( ${$value}, $self->buffer_size );
 
@@ -138,14 +155,7 @@ sub add_key {
   # DNS flux, we might get a 307 Since LWP doesn't support actually
   # waiting for a 100 Continue response, we'll just send a HEAD first
   # to see what's going on
-  my $retval = eval {
-    return $self->_add_key(
-      { headers => $headers,
-        data    => $value,
-        key     => $key,
-      },
-    );
-  };
+  my $retval = eval { return $self->_add_key( { headers => $headers, data => $value, key => $key, }, ); };
 
   # one more try? if someone specified the wrong region, we'll get a
   # 301 and you'll only know the region of redirection - no location
@@ -177,26 +187,18 @@ sub _add_key {
 
   my $account = $self->account;
 
-  if ( ref $data ) {
-    return $account->_send_request_expect_nothing_probed(
-      { method  => 'PUT',
-        path    => $self->_uri($key),
-        headers => $headers,
-        data    => $data,
-        region  => $self->region,
-      },
-    );
-  }
-  else {
-    return $account->_send_request_expect_nothing(
-      { method  => 'PUT',
-        path    => $self->_uri($key),
-        headers => $headers,
-        data    => $data,
-        region  => $self->region,
-      },
-    );
-  }
+  my $args = {
+    method  => 'PUT',
+    path    => $self->_uri($key),
+    headers => $headers,
+    data    => $data,
+    region  => $self->region,
+  };
+
+  return $account->send_request_expect_nothing_probed($args)
+    if ref $data;
+
+  return $account->send_request_expect_nothing($args);
 }
 
 ########################################################################
@@ -231,8 +233,7 @@ sub upload_multipart_object {
 
   if ( !$parameters->{callback} && !$parameters->{fh} ) {
     #...but really nobody should be passing a >5MB scalar
-    my $data
-      = ref $parameters->{data} ? $parameters->{data} : \$parameters->{data};
+    my $data = ref $parameters->{data} ? $parameters->{data} : \$parameters->{data};
 
     $parameters->{fh} = IO::Scalar->new($data);
   }
@@ -248,13 +249,11 @@ sub upload_multipart_object {
 
     $logger->trace( sub { return sprintf 'length of object: %s', $length; } );
 
-    croak 'length of the object must be >= '
-      . $MIN_MULTIPART_UPLOAD_CHUNK_SIZE
+    croak 'length of the object must be >= ' . $MIN_MULTIPART_UPLOAD_CHUNK_SIZE
       if $length < $MIN_MULTIPART_UPLOAD_CHUNK_SIZE;
 
     my $chunk_size
-      = ( $parameters->{chunk_size} && $parameters->{chunk_size} )
-      > $MIN_MULTIPART_UPLOAD_CHUNK_SIZE
+      = ( $parameters->{chunk_size} && $parameters->{chunk_size} ) > $MIN_MULTIPART_UPLOAD_CHUNK_SIZE
       ? $parameters->{chunk_size}
       : $MIN_MULTIPART_UPLOAD_CHUNK_SIZE;
 
@@ -283,15 +282,19 @@ sub upload_multipart_object {
     };
   }
 
-  my $headers = $parameters->{headers} || {};
+  my $headers = { %{ $parameters->{headers} || {} } };
 
-  my $id = $self->initiate_multipart_upload( $parameters->{key}, $headers );
+  $headers->{'x-amz-checksum-algorithm'} //= uc $self->account->checksum_algorithm;
+
+  my ( $id, $algorithm )
+    = $self->initiate_multipart_upload( $parameters->{key}, $headers );
 
   $logger->trace( sprintf 'multipart id: %s', $id );
 
   my $part = 1;
 
   my %parts;
+  my %return_parts;
 
   my $key = $parameters->{key};
 
@@ -300,26 +303,35 @@ sub upload_multipart_object {
       my ( $buffer, $length ) = $parameters->{callback}->();
       last if !$buffer;
 
-      my $etag = $self->upload_part_of_multipart_upload(
-        { id   => $id,
-          key  => $key,
-          data => $buffer,
-          part => $part,
+      my ( $etag, $checksum ) = $self->upload_part_of_multipart_upload(
+        { id        => $id,
+          key       => $key,
+          data      => $buffer,
+          part      => $part,
+          algorithm => $algorithm,
         },
       );
+      my $part_number = $part++;
 
-      $parts{ $part++ } = $etag;
+      $parts{$part_number}        = { etag => $etag, checksum => $checksum };
+      $return_parts{$part_number} = $etag;
     }
 
-    $self->complete_multipart_upload( $parameters->{key}, $id, \%parts );
+    $self->complete_multipart_upload( $parameters->{key}, $id, \%parts, $algorithm );
   };
 
-  if ( $EVAL_ERROR && $parameters->{abort_on_error} ) {
+  my $err = $EVAL_ERROR;
+
+  warn $err
+    if $err;
+
+  if ( $err && $parameters->{abort_on_error} ) {
     $self->abort_multipart_upload( $key, $id );
-    %parts = ();
+    %parts        = ();
+    %return_parts = ();
   }
 
-  return \%parts;
+  return \%return_parts;
 }
 
 # Initiates a multipart upload operation. This is necessary for uploading
@@ -334,8 +346,25 @@ sub initiate_multipart_upload {
 
   croak 'Object key is required'
     if !$key;
+  my $acct           = $self->account;
+  my $checksum_types = $acct->checksum_types;
 
-  my $acct = $self->account;
+  $headers = { %{ $headers // {} } };
+
+  my $algorithm = $EMPTY;
+
+  if ( exists $headers->{'x-amz-checksum-algorithm'} ) {
+    $algorithm = lc $headers->{'x-amz-checksum-algorithm'};
+
+    if ( none { $algorithm eq $_ } qw(crc64nvme crc32 crc32c) ) {
+      croak sprintf 'Checksum algorithm %s is not available for multipart upload', uc $algorithm
+        if !exists $checksum_types->{$algorithm};
+    }
+
+    if ( any { $algorithm eq $_ } qw(crc64nvme crc32 crc32c) ) {
+      $headers->{'x-amz-checksum-type'} = 'FULL_OBJECT';
+    }
+  }
 
   my $request = $acct->_make_request(
     { region  => $self->region,
@@ -351,7 +380,7 @@ sub initiate_multipart_upload {
 
   my $r = $acct->_xpc_of_content( $response->content );
 
-  return $r->{UploadId};
+  return wantarray ? ( $r->{UploadId}, lc $algorithm ) : $r->{UploadId};
 }
 
 #
@@ -367,19 +396,19 @@ sub upload_part_of_multipart_upload {
 ########################################################################
   my ( $self, @args ) = @_;
 
-  my ( $key, $upload_id, $part_number, $data, $length );
+  my ( $key, $upload_id, $part_number, $data, $length, $algorithm );
 
   if ( @args == 1 ) {
     if ( reftype( $args[0] ) eq 'HASH' ) {
-      ( $key, $upload_id, $part_number, $data, $length )
-        = @{ $args[0] }{qw{ key id part data length}};
+      ( $key, $upload_id, $part_number, $data, $length, $algorithm )
+        = @{ $args[0] }{qw{ key id part data length algorithm}};
     }
     elsif ( reftype( $args[0] ) eq 'ARRAY' ) {
-      ( $key, $upload_id, $part_number, $data, $length ) = @{ $args[0] };
+      ( $key, $upload_id, $part_number, $data, $length, $algorithm ) = @{ $args[0] };
     }
   }
   else {
-    ( $key, $upload_id, $part_number, $data, $length ) = @args;
+    ( $key, $upload_id, $part_number, $data, $length, $algorithm ) = @args;
   }
 
   # argh...wish we didn't have to do this!
@@ -402,6 +431,20 @@ sub upload_part_of_multipart_upload {
   my $acct    = $self->account;
 
   set_md5_header( data => $data, headers => $headers );
+
+  $algorithm = lc( $algorithm // $EMPTY );
+
+  my $checksum;
+
+  my $checksum_types = $self->account->checksum_types;
+
+  if ( exists $checksum_types->{$algorithm} ) {
+    my $digest = $checksum_types->{$algorithm}->( data => $data, );
+
+    $checksum = encode_base64( $digest, $EMPTY );
+
+    $headers->{ 'x-amz-checksum-' . $algorithm } = $checksum;
+  }
 
   my $path = create_api_uri(
     path       => $self->_uri($key),
@@ -448,7 +491,7 @@ sub upload_part_of_multipart_upload {
     $etag =~ s/"$//xsm;
   }
 
-  return $etag;
+  return wantarray ? ( $etag, $checksum ) : $etag;
 }
 
 #
@@ -459,7 +502,7 @@ sub upload_part_of_multipart_upload {
 ########################################################################
 sub complete_multipart_upload {
 ########################################################################
-  my ( $self, $key, $upload_id, $parts_hr ) = @_;
+  my ( $self, $key, $upload_id, $parts_hr, $algorithm ) = @_;
 
   $self->logger->debug( Dumper( [ $key, $upload_id, $parts_hr ] ) );
 
@@ -472,9 +515,11 @@ sub complete_multipart_upload {
   croak 'Part number => etag hashref is required'
     if ref $parts_hr ne 'HASH';
 
+  $algorithm = lc( $algorithm // $EMPTY );
+
   # The complete command requires sending a block of xml containing all
   # the part numbers and their associated etags (returned from the upload)
-  my $content = _create_multipart_upload_request($parts_hr);
+  my $content = _create_multipart_upload_request( $parts_hr, $algorithm );
 
   $self->logger->debug("content: \n$content");
 
@@ -502,10 +547,7 @@ sub complete_multipart_upload {
 
   my $response = $acct->_do_http($request);
 
-  if ( $response->code !~ /\A2\d\d\z/xsm ) {
-    $acct->_remember_errors( $response->content, 1 );
-    croak $response->status_line;
-  }
+  $acct->_croak_if_response_error($response);
 
   return $TRUE;
 }
@@ -618,22 +660,23 @@ sub get_key {
 ########################################################################
   my ( $self, @args ) = @_;
 
-  my ( $key, $method, $headers, $uri_params );
+  my ( $key, $method, $headers, $uri_params, $verify_checksums );
 
   if ( ref $args[0] ) {
-    ( $key, $method, $headers, $uri_params )
-      = @{ $args[0] }{qw(key method headers uri_params)};
+    ( $key, $method, $headers, $uri_params, $verify_checksums )
+      = @{ $args[0] }{qw(key method headers uri_params verify_checksums)};
   }
   else {
     ( $key, $method, $headers, $uri_params ) = @args;
   }
 
   return $self->_get_key(
-    key        => $key,
-    method     => $method,
-    filename   => undef,
-    headers    => $headers,
-    uri_params => $uri_params,
+    key              => $key,
+    method           => $method,
+    filename         => undef,
+    headers          => $headers,
+    uri_params       => $uri_params,
+    verify_checksums => $verify_checksums,
   );
 }
 
@@ -644,15 +687,17 @@ sub _get_key {
 
   my $parameters = get_parameters(@args);
 
-  my ( $key, $method, $filename, $headers, $uri_params )
-    = @{$parameters}{qw(key method filename headers uri_params)};
+  my ( $key, $method, $filename, $headers, $uri_params, $verify_checksums )
+    = @{$parameters}{qw(key method filename headers uri_params verify_checksums)};
+
+  $verify_checksums //= $self->account->verify_checksums;
 
   $method //= 'GET';
 
   my $uri = $self->_uri($key);
 
   if ( $uri_params && keys %{$uri_params} ) {
-    $uri = $QUESTION_MARK . create_query_string($uri_params);
+    $uri .= $QUESTION_MARK . create_query_string($uri_params);
   }
 
   if ( ref $filename ) {
@@ -660,6 +705,12 @@ sub _get_key {
   }
 
   my $acct = $self->account;
+
+  $headers = { %{ $headers // {} } };  # do not mutate caller's headers
+
+  if ( $verify_checksums && $method eq 'GET' ) {
+    $headers->{'x-amz-checksum-mode'} = 'ENABLED';
+  }
 
   my $request = $acct->_make_request(
     { region  => $self->region,
@@ -683,6 +734,17 @@ sub _get_key {
     $etag =~ s/"$//xsm;
   }
 
+  my %checksums;
+
+  foreach my $header ( $response->headers->header_field_names ) {
+    if ( $header =~ /\Ax-amz-checksum-(.+)\z/ixsm ) {
+      my $algorithm = lc $1;
+      if ( $algorithm ne 'type' ) {
+        $checksums{$algorithm} = $response->header($header);
+      }
+    }
+  }
+
   my $retval = {
     content_length => ( $response->content_length || 0 ),
     content_type   => scalar $response->content_type,
@@ -690,19 +752,17 @@ sub _get_key {
     value          => ( $response->content // $EMPTY ),
     content_range  => ( $response->header('Content-Range') || $EMPTY ),
     last_modified  => ( $response->header('Last-Modified') || $EMPTY ),
+    checksums      => \%checksums,
+    checksum_type  => scalar $response->header('x-amz-checksum-type'),
   };
 
-  # Validate against data corruption by verifying the MD5 (only if not partial)
-  if ( $method eq 'GET' && $response->code ne $HTTP_PARTIAL_CONTENT ) {
-    my $md5
-      = ( $filename and -f $filename )
-      ? file_md5_hex($filename)
-      : md5_hex( $retval->{value} );
-
-    # Some S3-compatible providers return an all-caps MD5 value in the
-    # etag so it should be lc'd for comparison.
-    croak "Computed and Response MD5's do not match:  $md5 : $etag"
-      if $md5 ne lc $etag;
+  if ( $verify_checksums && $method eq 'GET' && $response->code ne $HTTP_PARTIAL_CONTENT ) {
+    $self->_verify_checksums(
+      checksums     => $retval->{checksums},
+      checksum_type => $retval->{checksum_type},
+      filename      => $filename,
+      data          => $retval->{value},
+    );
   }
 
   foreach my $header ( $response->headers->header_field_names ) {
@@ -714,15 +774,58 @@ sub _get_key {
 }
 
 ########################################################################
+sub _verify_checksums {
+########################################################################
+  my ( $self, @args ) = @_;
+
+  my $parameters = get_parameters(@args);
+
+  my ( $checksums, $checksum_type, $filename, $data )
+    = @{$parameters}{qw(checksums checksum_type filename data)};
+
+  return $TRUE
+    if !$checksums || !keys %{$checksums};
+
+  return $TRUE
+    if ( $checksum_type // $EMPTY ) ne 'FULL_OBJECT';
+
+  my $checksum_types = $self->account->checksum_types;
+
+  foreach my $algorithm ( keys %{$checksums} ) {
+    next
+      if !exists $checksum_types->{$algorithm};
+
+    my %digest_parameters;
+
+    if ( defined $filename ) {
+      $digest_parameters{filename} = $filename;
+    }
+    else {
+      $digest_parameters{data} = $data // $EMPTY;
+    }
+
+    my $digest = $checksum_types->{$algorithm}->(%digest_parameters);
+
+    my $computed = encode_base64( $digest, $EMPTY );
+    my $expected = $checksums->{$algorithm};
+
+    croak sprintf 'Computed and response %s checksums do not match: %s : %s', uc($algorithm), $computed, $expected
+      if $computed ne $expected;
+  }
+
+  return $TRUE;
+}
+
+########################################################################
 sub get_key_filename {
 ########################################################################
   my ( $self, @args ) = @_;
 
-  my ( $key, $method, $filename, $headers, $uri_params );
+  my ( $key, $method, $filename, $headers, $uri_params, $verify_checksums );
 
   if ( ref $args[0] ) {
-    ( $key, $method, $filename, $headers, $uri_params )
-      = @{ $args[0] }{qw(key method filename headers uri_params)};
+    ( $key, $method, $filename, $headers, $uri_params, $verify_checksums )
+      = @{ $args[0] }{qw(key method filename headers uri_params verify_checksums)};
   }
   else {
     ( $key, $method, $filename, $headers, $uri_params ) = @args;
@@ -733,11 +836,12 @@ sub get_key_filename {
   }
 
   return $self->_get_key(
-    key        => $key,
-    method     => $method,
-    filename   => \$filename,
-    headers    => $headers,
-    uri_params => $uri_params,
+    key              => $key,
+    method           => $method,
+    filename         => \$filename,
+    headers          => $headers,
+    uri_params       => $uri_params,
+    verify_checksums => $verify_checksums,
   );
 }
 
@@ -783,8 +887,7 @@ sub copy_object {
 
   if ( !$request_headers{'x-amz-copy-source'} ) {
 
-    $request_headers{'x-amz-copy-source'} = sprintf '%s/%s', $bucket,
-      urlencode($source);
+    $request_headers{'x-amz-copy-source'} = sprintf '%s/%s', $bucket, urlencode($source);
   }
 
   $request_headers{'x-amz-tagging-directive'} //= 'COPY';
@@ -823,7 +926,7 @@ sub delete_key {
     $path = '?versionId=' . $version;
   }
 
-  return $account->_send_request_expect_nothing(
+  return $account->send_request_expect_nothing(
     { method  => 'DELETE',
       region  => $self->region,
       path    => $path,
@@ -840,7 +943,7 @@ sub _format_delete_keys {
   my @keys;
 
   if ( ref $args[0] ) {
-    if ( reftype( $args[0] ) eq 'ARRAY' ) { # list of keys, no version ids
+    if ( reftype( $args[0] ) eq 'ARRAY' ) {  # list of keys, no version ids
       foreach my $key ( @{ $args[0] } ) {
         if ( ref($key) && reftype($key) eq 'HASH' ) {
 
@@ -852,12 +955,12 @@ sub _format_delete_keys {
             : (),
             };
         }
-        else { # array of keys
+        else {  # array of keys
           push @keys, { Key => [$key], };
         }
       }
     }
-    elsif ( reftype( $args[0] ) eq 'CODE' ) { # sub that returns key, version id
+    elsif ( reftype( $args[0] ) eq 'CODE' ) {  # sub that returns key, version id
       while ( my (@object) = $args[0]->() ) {
         last if !@object || !defined $object[0];
 
@@ -868,7 +971,7 @@ sub _format_delete_keys {
           };
       }
     }
-    else {                                    # list of keys
+    else {  # list of keys
       croak 'argument must be array or list';
     }
   }
@@ -937,7 +1040,7 @@ sub delete_keys {
 
   $headers->{'Content-MD5'} = $md5_base64;
 
-  return $account->_send_request(
+  return $account->send_request(
     { method  => 'POST',
       region  => $self->region,
       path    => $self->_uri() . '?delete',
@@ -1090,7 +1193,7 @@ sub set_acl {
 
   $headers->{'Content-Length'} = length $xml;
 
-  return $account->_send_request_expect_nothing(
+  return $account->send_request_expect_nothing(
     { method  => 'PUT',
       path    => $path,
       headers => $headers,
@@ -1113,7 +1216,7 @@ sub get_location_constraint {
   my $account = $self->account;
   $bucket //= $self->bucket;
 
-  my $location = $account->_send_request(
+  my $location = $account->send_request(
     { region  => $region // $self->region,
       method  => 'GET',
       path    => $bucket . '/?location=',
@@ -1196,14 +1299,13 @@ sub _content_sub {
     my $read = $fh->read( $buffer, $blksize );
 
     if ( !$read ) {
-      croak
-        "Error while reading upload content $filename ($remaining remaining) $OS_ERROR"
+      croak "Error while reading upload content $filename ($remaining remaining) $OS_ERROR"
         if $OS_ERROR and $remaining;
 
-      $fh->close # otherwise, we found EOF
+      $fh->close  # otherwise, we found EOF
         or croak "close of upload content $filename failed: $OS_ERROR";
 
-      $buffer ||= $EMPTY; # LWP expects an empty string on finish, read returns 0
+      $buffer ||= $EMPTY;  # LWP expects an empty string on finish, read returns 0
     }
 
     $remaining -= length $buffer;
@@ -1215,20 +1317,33 @@ sub _content_sub {
 ########################################################################
 sub _create_multipart_upload_request {
 ########################################################################
-  my ($parts_hr) = @_;
+  my ( $parts_hr, $algorithm ) = @_;
 
   my @parts;
 
   foreach my $part_num ( sort { $a <=> $b } keys %{$parts_hr} ) {
-    push @parts,
-      {
-      PartNumber => $part_num,
-      ETag       => $parts_hr->{$part_num},
-      };
+    my $part = $parts_hr->{$part_num};
+
+    my $entry = { PartNumber => $part_num, };
+
+    if ( ref $part ) {
+      $entry->{ETag} = $part->{etag};
+
+      if ( defined $part->{checksum} ) {
+        my $checksum_name = 'Checksum' . uc $algorithm;
+
+        $entry->{$checksum_name} = $part->{checksum};
+      }
+    }
+    else {
+      # Legacy part_number => etag representation
+      $entry->{ETag} = $part;
+    }
+
+    push @parts, $entry;
   }
 
-  return create_xml_request(
-    { CompleteMultipartUpload => { Part => \@parts } } );
+  return create_xml_request( { CompleteMultipartUpload => { Part => \@parts } } );
 }
 
 1;
@@ -1239,754 +1354,1226 @@ __END__
 
 =head1 NAME
 
-Amazon::S3::Bucket - A container class for a S3 bucket and its contents.
+Amazon::S3::Bucket - An Amazon S3 bucket and object interface
 
 =head1 SYNOPSIS
 
   use Amazon::S3;
-  
-  # creates bucket object (no "bucket exists" check)
-  my $bucket = $s3->bucket("foo"); 
-  
-  # create resource with meta data (attributes)
-  my $keyname = 'testing.txt';
-  my $value   = 'T';
-  $bucket->add_key(
-      $keyname, $value,
-      {   content_type        => 'text/plain',
-          'x-amz-meta-colour' => 'orange',
-      }
+
+  my $s3 = Amazon::S3->new(
+    { credentials => $credentials,
+      region      => 'us-east-1',
+    }
   );
-  
-  # list keys in the bucket
-  $response = $bucket->list
-      or die $s3->err . ": " . $s3->errstr;
-  print $response->{bucket}."\n";
-  for my $key (@{ $response->{keys} }) {
-        print "\t".$key->{key}."\n";  
-  }
 
-  # check if resource exists.
-  print "$keyname exists\n" if $bucket->head_key($keyname);
+  my $bucket = $s3->bucket('example-bucket');
 
-  # delete key from bucket
-  $bucket->delete_key($keyname);
+  $bucket->add_key(
+    'example.txt',
+    'hello world',
+    { content_type => 'text/plain',
+    }
+  );
+
+  my $object = $bucket->get_key('example.txt');
+
+  my $response = $bucket->list_v2(
+    { prefix => 'logs/',
+    }
+  );
+
+  $bucket->delete_key('example.txt');
 
 =head1 DESCRIPTION
 
-Class for interacting with AWS S3 buckets.
+C<Amazon::S3::Bucket> represents an Amazon S3 bucket and provides
+bucket-scoped object operations.
+
+Instances are normally created by L<Amazon::S3/bucket> or
+L<Amazon::S3/bucketv2> rather than by calling C<new()> directly.
+
+This document is primarily a method reference. For broader discussion
+of credentials, checksums, object listing, multipart uploads, error
+handling, and directory buckets, see L<Amazon::S3>.
 
 =head1 METHODS AND SUBROUTINES
 
-=head2 new
+=head2 CONSTRUCTOR
 
-Instaniates a new bucket object. 
+=head3 new
 
-Pass a hash or hash reference containing various options:
+  my $bucket = Amazon::S3::Bucket->new(%options);
 
-=over
+  my $bucket = Amazon::S3::Bucket->new(\%options);
 
-=item bucket (required)
+Creates and returns a bucket object.
 
-The name (identifier) of the bucket.
+The constructor accepts either a list of key/value pairs or a hash
+reference.
 
-=item account (required)
+The following options are supported:
 
-The L<S3::Amazon> object (representing the S3 account) this
-bucket is associated with.
+=over 4
+
+=item account
+
+Required. The L<Amazon::S3> object associated with this bucket.
+
+=item bucket
+
+Required. Bucket name.
 
 =item buffer_size
 
-The buffer size used for reading and writing objects to S3.
+Buffer size used when streaming object data.
 
-default: 4K
-
-=item region
-
-If no region is set and C<verify_region> is set to true, the region of
-the bucket will be determined by calling the
-C<get_location_constraint> method.  Note that this will decrease
-performance of the constructor. If you know the region or are
-operating in only 1 region, set the region in the C<account> object
-(C<Amazon::S3>).
+The default is 4096 bytes.
 
 =item logger
 
-Sets the logger.  The logger should be a blessed reference capable of
-providing at least a C<debug> and C<trace> method for recording log
-messages. If no logger object is passed the C<account> object's logger
-object will be used.
+Logger used by the bucket object.
+
+When omitted, the logger from C<account> is used.
+
+=item region
+
+Region containing the bucket.
+
+When omitted and C<verify_region> is false, the region configured on
+the associated L<Amazon::S3> object is used.
 
 =item verify_region
 
-Indicates that the bucket's region should be determined by calling the
-C<get_location_constraint> method.
+When true and no region is supplied, determine the bucket region by
+calling C<get_location_constraint()>.
 
-default: false
+The default is false.
 
 =back
 
-I<NOTE:> This method does not check if a bucket actually exists unless
-you set C<verify_region> to true. If the bucket does not exist,
-the constructor will set the region to the default region specified by
-the L<Amazon::S3> object (C<account>) that you passed.
+The constructor throws an exception when C<bucket> or C<account> is
+not supplied.
 
-Typically a developer will not call this method directly,
-but work through the interface in L<S3::Amazon> that will
-handle their creation.
+On success, returns the new C<Amazon::S3::Bucket> object.
 
-=head2 add_key
+=head2 ACCESSORS
 
- add_key( key, value, configuration)
+=head3 account
 
-Write a new or existing object to S3.
+  my $s3 = $bucket->account;
 
-=over
+Gets or sets the associated L<Amazon::S3> object.
+
+=head3 bucket
+
+  my $name = $bucket->bucket;
+
+Gets or sets the bucket name.
+
+=head3 buffer_size
+
+  my $buffer_size = $bucket->buffer_size;
+
+  $bucket->buffer_size($bytes);
+
+Gets or sets the buffer size used when streaming object data.
+
+=head3 creation_date
+
+  my $creation_date = $bucket->creation_date;
+
+Gets or sets the creation date associated with the bucket object.
+
+Bucket objects returned by L<Amazon::S3/buckets> may have this value
+populated from the ListBuckets response.
+
+=head3 logger
+
+  my $logger = $bucket->logger;
+
+  $bucket->logger($logger);
+
+Gets or sets the logger used by the bucket object.
+
+=head3 region
+
+  my $region = $bucket->region;
+
+  $bucket->region($region);
+
+Gets or sets the region containing the bucket.
+
+=head3 verify_region
+
+  my $verify_region = $bucket->verify_region;
+
+  $bucket->verify_region($boolean);
+
+Gets or sets whether the bucket constructor should determine the
+bucket region when no region is supplied.
+
+=head2 OBJECT OPERATIONS
+
+=head3 add_key
+
+  my $ok = $bucket->add_key($key, $value);
+
+  my $ok = $bucket->add_key(
+    $key,
+    $value,
+    \%configuration,
+  );
+
+Creates or replaces an object.
+
+=over 4
 
 =item key
 
-A string identifier for the object being written to the bucket.
+Required. Object key.
 
 =item value
 
-A SCALAR string representing the contents of the object.
+Required. Object content.
+
+A scalar value is uploaded directly.
+
+A scalar reference is interpreted as a filename and the referenced
+file is streamed to S3.
+
+Use C<add_key_filename()> when uploading a file by name.
 
 =item configuration
 
-A HASHREF of configuration data for this key. The configuration
-is generally the HTTP headers you want to pass to the S3
-service. The client library will add all necessary headers.
-Adding them to the configuration hash will override what the
-library would send and add headers that are not typically
-required for S3 interactions.
+Optional hash reference containing request headers and object
+configuration.
 
-=item acl_short (optional)
+Entries are added to the request headers. A nested C<headers> hash
+reference may also be supplied; entries in C<headers> take precedence
+over duplicate top-level configuration entries.
 
-In addition to additional and overriden HTTP headers, this
-HASHREF can have a C<acl_short> key to set the permissions
-(access) of the resource without a seperate call via
-C<add_acl> or in the form of an XML document.  See the
-documentation in C<add_acl> for the values and usage. 
+The special C<acl_short> entry sets C<x-amz-acl> after validating the
+canned ACL value.
 
 =back
 
-Returns a boolean indicating the sucess or failure of the call. Check
-C<err> and C<errstr> for error messages if this operation fails. To
-examine the raw output of the response from the API call, use the
-C<last_response()> method.
+C<Content-MD5> is added automatically.
 
-  my $retval = $bucket->add_key('foo', $content, {});
+C<Content-MD5> is added automatically.
 
-  if ( !$retval ) {
-    print STDERR Dumper([$bucket->err, $bucket->errstr, $bucket->last_response]);
-  }
+C<Amazon::S3> also calculates and sends an S3 checksum automatically.
+By default, CRC64NVME is used. Most applications do not need to select
+or calculate a checksum explicitly.
 
-=head2 add_key_filename
+The checksum algorithm can be changed using the associated
+L<Amazon::S3> object's C<checksum_algorithm> setting.
 
-The method works like C<add_key> except the value is assumed
-to be a filename on the local file system. The file will 
-be streamed rather then loaded into memory in one big chunk.
+See L<Amazon::S3/CHECKSUMS>.
 
-=head2 copy_object %parameters
+On success, returns a true value.
 
-Copies an object from one bucket to another bucket. I<Note that the
-bucket represented by the bucket object is the destination.> Returns a
-hash reference to the response object (C<CopyObjectResult>).
+On failure, returns C<undef> or throws an exception depending on the
+underlying request failure.
 
-Headers returned from the request can be obtained using the
-C<last_response()> method.
+See L<Amazon::S3/CHECKSUMS>.
 
- my $headers = { $bucket->last_response->headers->flatten };
+=head3 add_key_filename
 
-Throws an exception if the response code is not 2xx. You can get an
-extended error message using the C<errstr()> method.
+  my $ok = $bucket->add_key_filename(
+    $key,
+    $filename,
+    \%configuration,
+  );
 
- my $result = eval { return $s3->copy_object( key => 'foo.jpg',
-     source => 'boo.jpg' ); };
- 
- if ($@) {
-   die $s3->errstr;
- }
+Creates or replaces an object by streaming the contents of a local
+file.
 
-Examples:
+The arguments are the same as C<add_key()> except that C<filename> is
+the local file to upload.
 
- $bucket->copy_object( key => 'foo.jpg', source => 'boo.jpg' );
+The file is streamed rather than read into memory as one scalar.
 
- $bucket->copy_object(
-   key    => 'foo.jpg',
-   source => 'boo.jpg',
-   bucket => 'my-source-bucket'
- );
- 
- $bucket->copy_object(
-   key     => 'foo.jpg',
-   headers => { 'x-amz-copy-source' => 'my-source-bucket/boo.jpg'
-   );
+Returns the same value as C<add_key()>.
 
-See L<CopyObject|
-https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html>
-for more details.
+=head3 copy_object
 
-C<%parameters> is a list of key/value pairs described below:
+  my $result = $bucket->copy_object(
+    { key    => $destination_key,
+      source => $source_key,
+      bucket => $source_bucket,
+      headers => \%headers,
+    }
+  );
 
-=over
+  my $result = $bucket->copy_object(
+    key    => $destination_key,
+    source => $source_key,
+    bucket => $source_bucket,
+  );
 
-=item key (required)
+Copies an S3 object.
 
-Name of the destination key in the bucket represented by the bucket object.
+The bucket represented by this object is the destination bucket.
 
-=item headers (optional)
+The following parameters are supported:
 
-Hash or array reference of headers to send in the request.
+=over 4
 
-=item bucket (optional)
+=item bucket
 
-Name of the source bucket. Default is the same bucket as the destination.
+Optional source bucket name.
 
-=item source (optional)
-
-Name of the source key in the source bucket. If not provided, you must
-provide the source in the `x-amz-copy-source` header.
-
-=back
-
-=head2 head_key $key_name
-
-Returns a configuration HASH of the given key. If a key does
-not exist in the bucket C<undef> will be returned.
-
-HASH will contain the following members:
-
-=over
-
-=item content_length
-
-=item content_type
-
-=item etag
-
-=item value
-
-=back
-
-=head2 delete_key
-
- delete_key(key, [version])
-
-Permanently removes C<$key_name> from the bucket. Returns a
-boolean value indicating the operation's success.
-
-=head2 delete_keys @keys
-
-=head2 delete_keys $keys
-
-Permanently removes keys from the bucket. Returns the response body
-from the API call. Returns C<undef> on non '2xx' return codes.
-
-See <Deleting Amazon S3 objects | https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjects.html>
-
-The argument to C<delete_keys> can be:
-
-=over 5
-
-=item * list of key names
-
-=item * an array of hashes where each hash reference contains the keys
-C<Key> and optionally C<VersionId>.
-
-=item * an array of scalars where each scalar is a key name
-
-=item * a hash of options where the hash contains
-
-=item * a callback that returns the key and optionally the version id
-
-=over 10
-
-=item quiet
-
-Boolean indicating quiet mode
-
-=item keys
-
-An array of keys containing scalars or hashes as describe above.
-
-=back
-
-=back
-
-Examples:
-
- # delete a list of keys
- $bucket->delete_keys(qw( foo bar baz));
-
- # delete an array of keys
- $bucket->delete_keys([qw(foo bar baz)]);
-
- # delete an array of keys in quiet mode 
- $bucket->delete({ quiet => 1, keys => [ qw(foo bar baz) ]);
-
- # delete an array of versioned objects
- $bucket->delete_keys([ { Key => 'foo', VersionId => '1'} ]);
-
- # callback
- my @key_list = qw(foo => 1, bar => 3, biz => 1);
-
- $bucket->delete_keys(
-   sub {
-     return ( shift @key_list, shift @key_list );
-   }
- );
-
-I<When using a callback, the keys are deleted in bulk. The
-C<DeleteObjects> API is only called once.>
-
-=head2 delete_bucket
-
-Permanently removes the bucket from the server. A bucket
-cannot be removed if it contains any keys (contents).
-
-This is an alias for C<$s3-E<gt>delete_bucket($bucket)>.
-
-=head2 get_key key, [method, headers, uri_params]
-
-=head2 get_key hashref
-
-Takes a key and optional arguments and returns the hash of metatdata
-which includes the contents of the S3 object.
-
-Example:
-
- $bucket->get_key(
-   key        => 'foo',
-   uri_params => { versionId => $version },
-   headers    => { Range     => 'bytes=0-9' }
- );
-
-=over 5
-
-=item key
-
-Key name
-
-=item method
-
-HTTP method (GET or HEAD)
-
-default: GET
+The default is the destination bucket.
 
 =item headers
 
-A hashref of additional headers to send with the request
+Optional hash or array reference containing request headers.
 
-=item uri-params
+C<x-amz-copy-source> may be supplied directly in these headers.
 
-A hashref containing key/value pairs representing the URI parameters
-you want to include in the request. Possible parameters are shown below.
-
-See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html#API_GetObject_RequestSyntax>
-
-=over 10
-
-=item partNumber
-
-=item response-cache-control
-
-=item response-content-disposition
-
-=item response-content-encoding
-
-=item response-content-language
-
-=item response-content-type
-
-=item response-expires
-
-=item versionId
-
-=back
-
-=back
-
-The method returns C<undef> if the key does not exist in the
-bucket and throws an exception (dies) on server errors.
-
-On success, the method returns a HASHREF containing:
-
-=over
-
-=item content_type
-
-=item etag
-
-=item value
-
-=item @meta
-
-=item content_range
-
-=item last_modified
-
-=back
-
-I<Note that the C<etag> for ranged gets is the MD5 value for the entire file.>
-
-=head2 get_key_filename $key_name, [$method, $filename, $headers, $uri_params]
-
-=head2 get_key_filename $args
-
-Pass a list of arguments or a hash of key value/pairs.
-
-This method works like C<get_key>, but takes an added
-filename that the S3 resource will be written to.
-
-If C<filename> is undefined or an empty string, the a file with the
-key name will be created.
-
-=over 5
-
-=item key (required)
-
-=item method
-
-default: GET
-
-=item filename
-
-default: name of the key
-
-=item headers
-
-A hashref of additional headers to send with the request
-
-=item uri-params
-
-A hashref containing key/value pairs representing the URI parameters
-you want to include in the request. See L</get_key> for possible parameters.
-
-See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html#API_GetObject_RequestSyntax>
-
-=back
-
-=head2 list
-
-List all keys in this bucket.
-
-See L<Amazon::S3/list_bucket> for documentation of this
-method.
-
-=head2 list_v2
-
-See L<Amazon::S3/list_bucket_v2> for documentation of this
-method.
-
-=head2 list_all
-
-List all keys in this bucket without having to worry about
-'marker'. This may make multiple requests to S3 under the
-hood.
-
-See L<Amazon::S3/list_bucket_all> for documentation of this
-method.
-
-=head2 list_all_v2
-
-Same as C<list_all> but uses the version 2 API for listing keys.
-
-See L<Amazon::S3/list_bucket_all_v2> for documentation of this
-method.
-
-=head2 get_acl
-
-Retrieves the Access Control List (ACL) for the bucket or
-resource as an XML document.
-
-=over
+C<x-amz-tagging-directive> defaults to C<COPY>.
 
 =item key
 
-The key of the stored resource to fetch. This parameter is
-optional. By default the method returns the ACL for the
-bucket itself.
+Required destination object key.
+
+=item source
+
+Source object key.
+
+Either C<source> or the C<x-amz-copy-source> request header is
+required.
 
 =back
 
-=head2 set_acl
+When C<x-amz-copy-source> is not supplied explicitly, it is generated
+from C<bucket> and C<source>.
 
- set_acl(acl)
+On success, returns the parsed C<CopyObjectResult> response.
 
-Sets the Access Control List (ACL) for the bucket or
-resource. Requires a HASHREF argument with one of the following keys:
+On a non-2xx response, records the S3 error and throws an exception.
 
-=over
+The HTTP response is available through C<last_response()>.
 
-=item acl_xml
+See
+L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html>.
 
-An XML string which contains access control information
-which matches Amazon's published schema.
+=head3 delete_key
 
-=item acl_short
+  my $ok = $bucket->delete_key($key);
 
-Alternative shorthand notation for common types of ACLs that
-can be used in place of a ACL XML document.
+  my $ok = $bucket->delete_key($key, $version_id);
 
-According to the Amazon S3 API documentation the following recognized acl_short
-types are defined as follows:
+Deletes an object.
 
-=over
-
-=item private
-
-Owner gets FULL_CONTROL. No one else has any access rights.
-This is the default.
-
-=item public-read
-
-Owner gets FULL_CONTROL and the anonymous principal is
-granted READ access. If this policy is used on an object, it
-can be read from a browser with no authentication.
-
-=item public-read-write
-
-Owner gets FULL_CONTROL, the anonymous principal is granted
-READ and WRITE access. This is a useful policy to apply to a
-bucket, if you intend for any anonymous user to PUT objects
-into the bucket.
-
-=item authenticated-read
-
-Owner gets FULL_CONTROL, and any principal authenticated as
-a registered Amazon S3 user is granted READ access.
-
-=back
+=over 4
 
 =item key
 
-The key name to apply the permissions. If the key is not
-provided the bucket ACL will be set.
+Required object key.
+
+=item version_id
+
+Optional version ID.
+
+When supplied, the specified object version is deleted.
 
 =back
 
-Returns a boolean indicating the operations success.
+Returns a true value on success.
 
-=head2 get_location_constraint
+=head3 delete_keys
 
-Returns the location constraint (region the bucket resides in) for a
-bucket. Returns undef if there is no location constraint.
+  my $response = $bucket->delete_keys(@keys);
 
-Valid values that may be returned:
+  my $response = $bucket->delete_keys(\@keys);
 
- af-south-1
- ap-east-1
- ap-northeast-1
- ap-northeast-2
- ap-northeast-3
- ap-south-1
- ap-southeast-1
- ap-southeast-2
- ca-central-1
- cn-north-1
- cn-northwest-1
- EU
- eu-central-1
- eu-north-1
- eu-south-1
- eu-west-1
- eu-west-2
- eu-west-3
- me-south-1
- sa-east-1
- us-east-2
- us-gov-east-1
- us-gov-west-1
- us-west-1
- us-west-2
+  my $response = $bucket->delete_keys(\@objects);
 
-For more information on location constraints, refer to the
-documentation for
-L<GetBucketLocation|https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html>.
+  my $response = $bucket->delete_keys($callback);
 
-=head2 err
+  my $response = $bucket->delete_keys(
+    { keys    => \@objects,
+      quiet   => 1,
+      headers => \%headers,
+    }
+  );
 
-The S3 error code for the last error the account encountered.
+Deletes multiple objects using the S3 DeleteObjects API.
 
-=head2 errstr
+The following input forms are supported:
 
-A human readable error string for the last error the account encountered.
+=over 4
 
-=head2 error
+=item list of keys
 
-The decoded XML string as a hash object of the last error.
+  $bucket->delete_keys(qw(foo bar baz));
 
-=head2 last_response
+=item array reference of keys
 
-Returns the last C<HTTP::Response> to an API call.
+  $bucket->delete_keys([qw(foo bar baz)]);
 
-=head1 MULTIPART UPLOAD SUPPORT
+=item array reference of object hashes
 
-From Amazon's website:
+Each hash contains C<Key> and may contain C<VersionId>.
 
-I<Multipart upload allows you to upload a single object as a set of
-parts. Each part is a contiguous portion of the object's data. You can
-upload these object parts independently and in any order. If
-transmission of any part fails, you can retransmit that part without
-affecting other parts. After all parts of your object are uploaded,
-Amazon S3 assembles these parts and creates the object. In general,
-when your object size reaches 100 MB, you should consider using
-multipart uploads instead of uploading the object in a single
-operation.>
-
-See L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html> for more information about multipart uploads.
-
-=over 5
-
-=item * Maximum object size 5TB
-
-=item * Maximum number of parts 10,000
-
-=item * Part numbers 1 to 10,000 (inclusive)
-
-=item * Part size 5MB to 5GB. There is no limit on the last part of your multipart upload.
-
-=item * Maximum nubmer of parts returned for a list parts request - 1000
-
-=item * Maximum number of multipart uploads returned in a list multipart uploads request - 1000
-
-=back
-
-A multipart upload begins by calling
-C<initiate_multipart_upload()>. This will return an identifier that is
-used in subsequent calls.
-
- my $bucket = $s3->bucket('my-bucket');
- my $id = $bucket->initiate_multipart_upload('some-big-object');
-
- my $part_list = {};
-
- my $part = 1;
- my $etag = $bucket->upload_part_of_multipart_upload('my-bucket', $id, $part, $data, length $data);
- $part_list{$part++} = $etag;
-
- $bucket->complete_multipart_upload('my-bucket', $id, $part_list);
-
-=heads upload_multipart_object
-
- upload_multipart_object( ... )
-
-Convenience routine C<upload_multipart_object> that encapsulates the
-multipart upload process. Accepts a hash or hash reference of
-arguments. If successful, a reference to a hash that contains the part
-numbers and etags of the uploaded parts.
-
-You can pass a data object, callback routine or a file handle.
-
-=over 5
-
-=item key
-
-Name of the key to create.
-
-=item data
-
-Scalar object that contains the data to write to S3.
+  $bucket->delete_keys(
+    [ { Key => 'foo', VersionId => '1' },
+      { Key => 'bar' },
+    ]
+  );
 
 =item callback
 
-Optionally provided a callback routine that will be called until you
-pass a buffer with a length of 0. Your callback will receive no
-arguments but should return a tuple consisting of a B<reference> to a
-scalar object that contains the data to write and a scalar that
-represents the length of data. Once you return a zero length buffer
-the multipart process will be completed.
+The callback is repeatedly invoked and should return a key and,
+optionally, a version ID.
 
-=item fh
+Iteration ends when the callback returns no key.
 
-File handle of an open file. The file must be greater than the minimum
-chunk size for multipart uploads otherwise the method will throw an
-exception.
+  $bucket->delete_keys(
+    sub {
+      return ( $key, $version_id );
+    }
+  );
 
-=item abort_on_error
+=item configuration hash reference
 
-Indicates whether the multipart upload should be aborted if an error
-is encountered. Amazon will charge you for the storage of parts that
-have been uploaded unless you abort the upload.
+The hash reference supports:
 
-default: true
+=over 8
+
+=item headers
+
+Optional request headers.
+
+=item keys
+
+Required key specification in one of the supported forms.
+
+=item quiet
+
+Optional boolean controlling DeleteObjects quiet mode.
+
+The default is false.
 
 =back
 
-=head2 abort_multipart_upload
+=back
 
- abort_multipart_upload(key, multpart-upload-id)
+A maximum of 1000 objects may be supplied in one call.
 
-Abort a multipart upload
+The request C<Content-MD5> header is generated automatically.
 
-=head2 complete_multipart_upload
+Returns the response from the DeleteObjects request.
 
- complete_multipart_upload(key, multpart-upload-id, parts)
+Invalid input or more than 1000 objects causes an exception.
 
-Signal completion of a multipart upload. C<parts> is a reference to a
-hash of part numbers and etags.
+=head3 get_key
 
-=head2 initiate_multipart_upload
+  my $object = $bucket->get_key($key);
 
- initiate_multipart_upload(key, headers)
+  my $object = $bucket->get_key(
+    $key,
+    $method,
+    $headers,
+    $uri_params,
+  );
 
-Initiate a multipart upload. Returns an id used in subsequent call to
-C<upload_part_of_multipart_upload()>.
+  my $object = $bucket->get_key(
+    { key              => $key,
+      method           => 'GET',
+      headers          => \%headers,
+      uri_params       => \%uri_params,
+      verify_checksums => 1,
+    }
+  );
 
-=head2 list_multipart_upload_parts
+Retrieves object data and metadata.
 
-List all the uploaded parts of a multipart upload
+The positional and hash-reference forms are both supported.
 
-=head2 list_multipart_uploads
+=over 4
 
-List multipart uploads in progress
+=item headers
 
-=head2 upload_part_of_multipart_upload
-
-  upload_part_of_multipart_upload(key, id, part, data, length)
-
-Upload a portion of a multipart upload
-
-=over 5
+Optional hash reference containing request headers.
 
 =item key
 
-Name of the key in the bucket to create.
+Required object key.
 
-=item id
+=item method
 
-The multipart-upload id return in the C<initiate_multipart_upload> call.
+Optional HTTP method.
 
-=item part
+The default is C<GET>.
 
-The next part number (part numbers start at 1).
+C<HEAD> may be used to retrieve metadata without the object body.
+
+=item uri_params
+
+Optional hash reference containing GetObject URI parameters.
+
+Examples include:
+
+  partNumber
+  response-cache-control
+  response-content-disposition
+  response-content-encoding
+  response-content-language
+  response-content-type
+  response-expires
+  versionId
+
+=item verify_checksums
+
+Optional per-request override for checksum verification.
+
+When omitted, the value of
+L<Amazon::S3/verify_checksums> is used.
+
+This option is available only in the hash-reference form.
+
+=back
+
+When checksum verification is enabled for a C<GET>, the request asks
+S3 to return checksum metadata.
+
+On success, returns a hash reference containing:
+
+=over 4
+
+=item checksum_type
+
+The value of C<x-amz-checksum-type>, when returned by S3.
+
+=item checksums
+
+Hash reference containing checksum values returned in
+C<x-amz-checksum-*> response headers.
+
+Keys are lowercase algorithm names.
+
+=item content_length
+
+Object content length.
+
+=item content_range
+
+C<Content-Range> header value, when present.
+
+=item content_type
+
+Object content type.
+
+=item etag
+
+ETag returned by S3.
+
+The ETag must not be assumed to be a checksum of the complete object.
+
+=item last_modified
+
+C<Last-Modified> response header.
+
+=item value
+
+Object content.
+
+=item x-amz-meta-*
+
+User metadata headers are also added to the returned hash using
+lowercase header names.
+
+=back
+
+Returns C<undef> when the object does not exist.
+
+Other request errors throw an exception.
+
+Supported C<FULL_OBJECT> checksums are verified when verification is
+enabled. Partial-content responses and C<COMPOSITE> checksums are not
+verified.
+
+A checksum mismatch throws an exception.
+
+See L<Amazon::S3/CHECKSUMS> and
+L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html>.
+
+=head3 get_key_filename
+
+  my $object = $bucket->get_key_filename(
+    $key,
+    $method,
+    $filename,
+    $headers,
+    $uri_params,
+  );
+
+  my $object = $bucket->get_key_filename(
+    { key              => $key,
+      filename         => $filename,
+      method           => 'GET',
+      headers          => \%headers,
+      uri_params       => \%uri_params,
+      verify_checksums => 1,
+    }
+  );
+
+Retrieves an object and writes the body to a local file.
+
+The accepted parameters and return metadata are the same as for
+C<get_key()>, with the addition of:
+
+=over 4
+
+=item filename
+
+Destination filename.
+
+When omitted, the object key is used as the filename.
+
+=back
+
+Checksum verification, when enabled, is performed against the
+downloaded file.
+
+Returns C<undef> when the object does not exist.
+
+Other request errors or checksum mismatches throw an exception.
+
+See C<get_key()>.
+
+=head3 get_key_v2
+
+  my $object = $bucket->get_key_v2(
+    $key,
+    $method,
+    $headers,
+  );
+
+Compatibility wrapper around the object retrieval implementation.
+
+It accepts an object key, optional HTTP method, and optional headers
+hash reference.
+
+For new code, use C<get_key()>.
+
+=head3 head_key
+
+  my $metadata = $bucket->head_key($key);
+
+Retrieves object metadata using an HTTP C<HEAD> request.
+
+This is equivalent to:
+
+  $bucket->get_key($key, 'HEAD');
+
+Returns the same metadata structure as C<get_key()>.
+
+The C<value> entry is empty because no object body is returned.
+
+Returns C<undef> when the object does not exist.
+
+Other request errors throw an exception.
+
+=head2 LISTING METHODS
+
+=head3 list
+
+  my $response = $bucket->list;
+
+  my $response = $bucket->list(\%parameters);
+
+Lists objects in this bucket using the original S3 ListObjects API.
+
+The supplied parameters are passed to
+L<Amazon::S3/list_bucket>; the bucket name is supplied automatically.
+
+Returns the same normalized result as
+L<Amazon::S3/list_bucket>.
+
+See L<Amazon::S3/LISTING OBJECTS>.
+
+=head3 list_all
+
+  my $response = $bucket->list_all;
+
+  my $response = $bucket->list_all(\%parameters);
+
+Lists all matching objects in this bucket using the original
+ListObjects API.
+
+The supplied parameters are passed to
+L<Amazon::S3/list_bucket_all>; the bucket name is supplied
+automatically.
+
+Pagination is followed automatically.
+
+Returns the same normalized result as
+L<Amazon::S3/list_bucket_all>.
+
+See L<Amazon::S3/LISTING OBJECTS>.
+
+=head3 list_all_v2
+
+  my $response = $bucket->list_all_v2;
+
+  my $response = $bucket->list_all_v2(\%parameters);
+
+Lists all matching objects in this bucket using ListObjectsV2.
+
+The supplied parameters are passed to
+L<Amazon::S3/list_bucket_all_v2>; the bucket name is supplied
+automatically.
+
+Pagination is followed automatically.
+
+Returns the same normalized result as
+L<Amazon::S3/list_bucket_all_v2>.
+
+See L<Amazon::S3/LISTING OBJECTS>.
+
+=head3 list_v2
+
+  my $response = $bucket->list_v2;
+
+  my $response = $bucket->list_v2(\%parameters);
+
+Lists objects in this bucket using ListObjectsV2.
+
+The supplied parameters are passed to
+L<Amazon::S3/list_bucket_v2>; the bucket name is supplied
+automatically.
+
+C<marker> is accepted as a compatibility alias for
+C<continuation-token>.
+
+Returns the same normalized result as
+L<Amazon::S3/list_bucket_v2>.
+
+See L<Amazon::S3/LISTING OBJECTS>.
+
+=head2 ACCESS CONTROL AND BUCKET METADATA
+
+=head3 delete_bucket
+
+  my $ok = $bucket->delete_bucket;
+
+Deletes this bucket.
+
+This is equivalent to:
+
+  $bucket->account->delete_bucket($bucket);
+
+The bucket must be empty before S3 will delete it.
+
+Returns the value returned by L<Amazon::S3/delete_bucket>.
+
+=head3 get_acl
+
+  my $xml = $bucket->get_acl;
+
+  my $xml = $bucket->get_acl($key);
+
+  my $xml = $bucket->get_acl($key, \%headers);
+
+Retrieves the access control list for the bucket or an object.
+
+=over 4
+
+=item headers
+
+Optional request headers.
+
+=item key
+
+Optional object key.
+
+When omitted, retrieves the ACL for the bucket.
+
+=back
+
+On success, returns the ACL XML document as a scalar.
+
+Returns C<undef> when S3 returns C<404 Not Found>.
+
+Other request errors throw an exception.
+
+=head3 get_location_constraint
+
+  my $location = $bucket->get_location_constraint;
+
+  my $location = $bucket->get_location_constraint(
+    { bucket  => $bucket_name,
+      headers => \%headers,
+      region  => $region,
+    }
+  );
+
+Returns the S3 location constraint for a bucket.
+
+The optional parameters are:
+
+=over 4
+
+=item bucket
+
+Bucket name.
+
+The default is the current bucket.
+
+=item headers
+
+Optional request headers.
+
+=item region
+
+Region used to sign the request.
+
+The default is the bucket region.
+
+=back
+
+For C<us-east-1>, S3 may return no location constraint.
+
+Callers that require a normalized region name can use
+L<Amazon::S3/get_bucket_location>.
+
+See
+L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html>.
+
+=head3 set_acl
+
+  my $ok = $bucket->set_acl(
+    { acl_short => 'private',
+      key       => $key,
+      headers   => \%headers,
+    }
+  );
+
+  my $ok = $bucket->set_acl(
+    { acl_xml => $xml,
+      key     => $key,
+      headers => \%headers,
+    }
+  );
+
+Sets the access control list for the bucket or an object.
+
+Exactly one of C<acl_short> or C<acl_xml> is required.
+
+=over 4
+
+=item acl_short
+
+Canned ACL value sent using C<x-amz-acl>.
+
+=item acl_xml
+
+ACL XML document.
+
+=item headers
+
+Request headers.
+
+=item key
+
+Optional object key.
+
+When omitted, sets the ACL for the bucket.
+
+=back
+
+Returns a true value on success.
+
+Invalid ACL configuration throws an exception.
+
+=head2 ERROR AND RESPONSE ACCESSORS
+
+=head3 err
+
+Returns the most recent error code from the associated
+L<Amazon::S3> object.
+
+See L<Amazon::S3/ERROR HANDLING>.
+
+=head3 error
+
+Returns the most recent parsed structured error from the associated
+L<Amazon::S3> object.
+
+See L<Amazon::S3/ERROR HANDLING>.
+
+=head3 errstr
+
+Returns the most recent human-readable error message from the
+associated L<Amazon::S3> object.
+
+See L<Amazon::S3/ERROR HANDLING>.
+
+=head3 last_response
+
+Returns the most recent L<HTTP::Response> from the associated
+L<Amazon::S3> object.
+
+See L<Amazon::S3/ERROR HANDLING>.
+
+=head2 MULTIPART UPLOAD METHODS
+
+For normal multipart uploads, C<upload_multipart_object()> is the
+preferred interface.
+
+The remaining multipart methods expose the lower-level multipart
+lifecycle for callers that need to manage initiation, individual
+parts, completion, or abort behavior themselves.
+
+See L<Amazon::S3/MULTIPART UPLOADS>.
+
+=head3 abort_multipart_upload
+
+  my $ok = $bucket->abort_multipart_upload(
+    $key,
+    $upload_id,
+  );
+
+Aborts an existing multipart upload.
+
+=over 4
+
+=item key
+
+Required object key.
+
+=item upload_id
+
+Required multipart upload ID.
+
+=back
+
+Returns a true value on success.
+
+Request errors throw an exception.
+
+=head3 complete_multipart_upload
+
+  my $ok = $bucket->complete_multipart_upload(
+    $key,
+    $upload_id,
+    \%parts,
+  );
+
+  my $ok = $bucket->complete_multipart_upload(
+    $key,
+    $upload_id,
+    \%parts,
+    $algorithm,
+  );
+
+Completes an existing multipart upload.
+
+=over 4
+
+=item algorithm
+
+Optional checksum algorithm associated with the multipart upload.
+
+=item key
+
+Required object key.
+
+=item parts
+
+Required hash reference keyed by part number.
+
+For the historical interface, each value is the ETag returned for the
+part:
+
+  {
+    1 => $etag_1,
+    2 => $etag_2,
+  }
+
+When checksum information is needed, each value may instead be a hash
+reference:
+
+  {
+    1 => {
+      etag     => $etag_1,
+      checksum => $checksum_1,
+    },
+  }
+
+=item upload_id
+
+Required multipart upload ID.
+
+=back
+
+Returns a true value on success.
+
+Invalid arguments or request errors throw an exception.
+
+=head3 initiate_multipart_upload
+
+  my $upload_id = $bucket->initiate_multipart_upload(
+    $key,
+    \%headers,
+  );
+
+  my ( $upload_id, $algorithm )
+    = $bucket->initiate_multipart_upload(
+      $key,
+      \%headers,
+    );
+
+Initiates a multipart upload.
+
+=over 4
+
+=item headers
+
+Optional request headers.
+
+When C<x-amz-checksum-algorithm> is supplied, the selected algorithm
+is carried through the multipart workflow.
+
+For CRC64NVME, CRC32, and CRC32C, C<x-amz-checksum-type> is set to
+C<FULL_OBJECT>.
+
+=item key
+
+Required object key.
+
+=back
+
+In scalar context, returns the upload ID assigned by S3.
+
+In list context, returns the upload ID and the lowercase checksum
+algorithm selected for the upload.
+
+Invalid arguments, unsupported explicitly requested checksum
+algorithms, or request errors throw an exception.
+
+=head3 list_multipart_upload_parts
+
+  my $xml = $bucket->list_multipart_upload_parts(
+    $key,
+    $upload_id,
+    \%headers,
+  );
+
+Lists parts already uploaded for an existing multipart upload.
+
+=over 4
+
+=item headers
+
+Optional request headers.
+
+=item key
+
+Required object key.
+
+=item upload_id
+
+Required multipart upload ID.
+
+=back
+
+Returns the XML response body returned by S3.
+
+Request errors throw an exception.
+
+=head3 list_multipart_uploads
+
+  my $xml = $bucket->list_multipart_uploads;
+
+  my $xml = $bucket->list_multipart_uploads(\%headers);
+
+Lists active multipart uploads for this bucket.
+
+The optional argument is a request-headers hash reference.
+
+Returns the XML response body returned by S3.
+
+Request errors throw an exception.
+
+=head3 upload_multipart_object
+
+  my $parts = $bucket->upload_multipart_object(
+    { key  => $key,
+      data => $data,
+    }
+  );
+
+Uploads an object using the multipart upload API and manages the
+multipart lifecycle.
+
+The method accepts a hash reference or a list of key/value pairs.
+
+Exactly one usable data source must be supplied using C<data>,
+C<callback>, or C<fh>.
+
+The following parameters are supported:
+
+=over 4
+
+=item abort_on_error
+
+When true, attempt to abort the multipart upload if an error occurs.
+
+The default is true.
+
+=item callback
+
+Coderef used to provide object data.
+
+The callback receives no arguments and should return:
+
+  ( \$buffer, $length )
+
+Returning no buffer ends the upload.
+
+=item chunk_size
+
+Requested multipart chunk size.
+
+For file-handle uploads, values smaller than the S3 minimum multipart
+part size are raised to that minimum.
 
 =item data
 
-Scalar or reference to a scalar that contains the data to upload.
+Scalar or scalar reference containing object data.
 
-=item length (optional)
+When neither C<callback> nor C<fh> is supplied, the data is read
+through an in-memory file handle.
 
-Length of the data.
+=item fh
+
+Open file handle containing the object data.
+
+The file must be at least the minimum multipart upload size.
+
+=item headers
+
+Optional headers supplied when initiating the multipart upload.
+
+When no C<x-amz-checksum-algorithm> header is supplied, the checksum
+algorithm configured on the associated L<Amazon::S3> object is used.
+
+=item key
+
+Required destination object key.
 
 =back
+
+On success, returns a hash reference mapping part numbers to the ETags
+returned by S3:
+
+  {
+    1 => $etag_1,
+    2 => $etag_2,
+  }
+
+The method automatically initiates the upload, uploads each part, and
+completes the upload.
+
+When C<abort_on_error> is true, an error during the managed workflow
+causes an abort attempt and the returned part hash is empty.
+
+See L<Amazon::S3/MULTIPART UPLOADS> and L<Amazon::S3/CHECKSUMS>.
+
+=head3 upload_part_of_multipart_upload
+
+  my $etag = $bucket->upload_part_of_multipart_upload(
+    $key,
+    $upload_id,
+    $part_number,
+    $data,
+    $length,
+    $algorithm,
+  );
+
+  my ( $etag, $checksum )
+    = $bucket->upload_part_of_multipart_upload(
+      { key       => $key,
+        id        => $upload_id,
+        part      => $part_number,
+        data      => $data,
+        length    => $length,
+        algorithm => $algorithm,
+      }
+    );
+
+Uploads one part of an existing multipart upload.
+
+The method accepts positional arguments, a hash reference, or an
+array reference.
+
+=over 4
+
+=item algorithm
+
+Optional checksum algorithm associated with the multipart upload.
+
+When a local implementation is available, the checksum is calculated
+and sent with the UploadPart request.
+
+=item data
+
+Required part data.
+
+A scalar or scalar reference may be supplied.
+
+=item id
+
+Required multipart upload ID.
+
+=item key
+
+Required object key.
+
+=item length
+
+Optional data length.
+
+When omitted, the length is calculated from C<data>.
+
+=item part
+
+Required part number.
+
+=back
+
+In scalar context, returns the ETag returned by S3.
+
+In list context, returns the ETag and the Base64-encoded checksum
+calculated for the part, when one was calculated.
+
+Invalid arguments or request errors throw an exception.
 
 =head1 SEE ALSO
 
 L<Amazon::S3>
 
+L<Amazon::S3::BucketV2>
+
 =head1 AUTHOR
 
-Please see the L<Amazon::S3> manpage for author, copyright, and
-license information.
+Please see L<Amazon::S3> for author, copyright, and license
+information.
 
 =head1 CONTRIBUTORS
 
 Rob Lauer
+
 Jojess Fournier
+
 Tim Mullin
+
 Todd Rinaldo
+
 luiserd97
 
 =cut

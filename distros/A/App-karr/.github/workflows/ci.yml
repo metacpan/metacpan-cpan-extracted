@@ -3,21 +3,29 @@ on:
   push:
     branches: ['**']
   pull_request:
+concurrency:                                    # cancel a branch's superseded runs
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 jobs:
-  test:
+  # One SimpiCI run drives the whole .cicd DAG in containers:
+  #   - the [@Author::GETTY] provider (public on ghcr, pulled anonymously) emits a
+  #     `dzil test` job per Perl version in .simpici-perl; each installs
+  #     .simpici-apt's toolchain so Alien::Libgit2 builds from source, and the
+  #     provider sets DZIL_DOCKER_API_SKIP so `dzil test` ignores the Docker plugin.
+  #   - karr's .cicd/docker+27+* jobs build both runtime images and, on main,
+  #     publish the rolling `edge` tags to Docker Hub. Canonical release tags
+  #     (latest / %v / user / %v-user) stay owned by `dzil release`.
+  simpici:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        perl-version: ['5.36', '5.38', '5.40']
-    container:
-      image: perl:${{ matrix.perl-version }}-bookworm
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v5
-      - name: Fix safe.directory
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - name: perl -V
-        run: perl -V
-      - name: Install libgit2 (system)
-        run: apt-get update && apt-get install -y libgit2-dev pkg-config
-      - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+      - uses: actions/checkout@v6
+      - uses: Getty/simpici/action@main
+        env:
+          CICD_REGISTRY: docker.io
+          CICD_REGISTRY_USER: raudssus
+          CICD_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          CICD_IMAGE_REPOSITORY: raudssus/karr
+          CICD_PUBLISH_IMAGE: ${{ github.event_name != 'pull_request' }}
+          SIMPICI_PROVIDERS: ghcr.io/getty/simpici-dzil-provider:main

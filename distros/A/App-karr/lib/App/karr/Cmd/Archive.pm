@@ -1,11 +1,11 @@
 # ABSTRACT: Archive a task (soft-delete)
 
 package App::karr::Cmd::Archive;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
-  usage_string => 'USAGE: karr archive ID[,ID,...] [--json]',
+  usage_string => 'USAGE: karr archive ID[,ID,...] [--claim NAME] [--json]',
 );
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
@@ -14,6 +14,12 @@ use App::karr::Task;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output',
      'App::karr::Role::TaskMutation';
+
+option claim => (
+  is => 'ro',
+  format => 's',
+  doc => 'Archive a task claimed by this agent',
+);
 
 
 sub execute {
@@ -28,13 +34,13 @@ sub execute {
   my $id_str = $pos[0];
   # See the note in Cmd::Move: length, not truth, or the id "0" is read as no
   # id at all and answered with a usage error instead of "not found" (#239).
-  die "Usage: karr archive ID[,ID,...]\n"
+  die "Usage: karr archive ID[,ID,...] [--claim NAME]\n"
     unless defined $id_str && length $id_str;
   # And a comma with no ids around it passes that guard and
   # splits to nothing, so the command used to exit 0 having done nothing
   # (ticket #152).
   my @ids = $self->parse_ids($id_str);
-  die "Usage: karr archive ID[,ID,...]\n" unless @ids;
+  die "Usage: karr archive ID[,ID,...] [--claim NAME]\n" unless @ids;
 
   # This loop was already the shape ADR 0002 asks for -- warn on a bad id, keep
   # going, report failure at the end -- and is now the shared one, so move, edit
@@ -74,8 +80,10 @@ sub execute {
       # take a card off an agent who was still holding it. `archived` carries no
       # require_claim, so #55 did not reach it, but the claim rule does -- and
       # it is the same rule, from the same place, applied under the same guard
-      # (ticket #97).
-      $self->check_claim($task, undef);
+      # (ticket #97). The claimant is the caller's --claim, the key the refusal
+      # message now offers (ticket #269), exactly as kanban-md's archive takes
+      # one.
+      $self->check_claim($task, $self->claim);
 
       # apply_status_change is where `archived` is validated against the board's
       # configured statuses and where the terminal-status stamps are maintained,
@@ -85,10 +93,11 @@ sub execute {
     });
 
     printf "Archived task %d: %s\n", $task->id, $task->title unless $self->json;
-    # The claimant passed above is undef, so the only way a claimed card reaches
-    # here at all is an expired claim -- which makes archive one of the two
-    # commands (delete is the other) that can take a card away from a named
-    # holder with nothing on the card left to say so (#177).
+    # The claimant passed above is the caller's --claim, so a claimed card
+    # reaches here either because the claim expired (reported below, #177) or
+    # because the caller named the holder. The claim itself is not re-stamped:
+    # the name on an archived card is provenance, and kanban-md's Archive
+    # leaves it the same way.
     return {
       id         => $task->id,
       title      => $task->title,
@@ -119,11 +128,12 @@ App::karr::Cmd::Archive - Archive a task (soft-delete)
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 
     karr archive 4
+    karr archive 4 --claim agent-fox
     karr archive 4,5,6 --json
 
 =head1 DESCRIPTION
@@ -134,10 +144,12 @@ the default C<karr list> output.
 
 =head1 CLAIMS
 
-A task with a live claim is not archived, whoever holds it -- archiving is a
-status change like any other, and karr has no C<--claim> option on it. Release
-the claim with C<< karr edit ID --release >> or wait for C<claim_timeout> to
-expire it. Re-archiving an already-archived task changes nothing and is
+A task with a live claim is not archived, whoever holds it -- unless C<--claim>
+names the holder, which is how the holder (or an agent acting for it) archives
+its own card. The claim is not re-stamped by the archive: the name on an
+archived card is provenance, and kanban-md's Archive leaves it the same way.
+Release the claim with C<< karr edit ID --release >> or wait for C<claim_timeout>
+to expire it. Re-archiving an already-archived task changes nothing and is
 therefore allowed whatever its claim says.
 
 =head1 SEE ALSO

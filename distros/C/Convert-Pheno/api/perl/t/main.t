@@ -1,136 +1,90 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Convert::Pheno::Operations qw(http_request_fields);
 use FindBin qw($Bin);
-use Mojo::JSON ();
+use File::Temp qw(tempdir);
+use Mojo::JSON qw(decode_json true);
 use Path::Tiny qw(path);
 use Test::Mojo;
 use Test::More;
 
+local $ENV{CONVERT_PHENO_API_TOKEN} = 'test-api-token-' x 3;
+local $ENV{CONVERT_PHENO_STATE_DIR} = tempdir(CLEANUP => 1);
+local $ENV{CONVERT_PHENO_JOB_LIMIT} = 4;
 require "$Bin/../main.pl";
 my $t = Test::Mojo->new(main::app());
+my $auth = {Authorization => 'Bearer ' . $ENV{CONVERT_PHENO_API_TOKEN}};
 
-note 'OpenAPI request fields should match the public registry';
-my $openapi = Mojo::JSON::decode_json( path("$Bin/../openapi.json")->slurp_raw );
-my $request_properties =
-  $openapi->{paths}{'/api'}{post}{requestBody}{content}{'application/json'}{schema}{properties};
-my $http_fields = http_request_fields();
-for my $section (qw(input output options)) {
-    is_deeply(
-        [ sort keys %{ $request_properties->{$section}{properties} } ],
-        [ sort @{ $http_fields->{$section} } ],
-        "$section fields match the conversion registry"
-    );
+$t->get_ok('/api/jobs/settings')->status_is(401);
+$t->get_ok('/api/jobs/settings' => $auth)->status_is(200)
+  ->json_is('/data/maxConcurrentJobs', 1);
+$t->post_ok('/api/jobs/settings' => $auth => json => {maxConcurrentJobs => 4})
+  ->status_is(200)->json_is('/data/maxConcurrentJobs', 4);
+$t->post_ok('/api/jobs/settings' => $auth => json => {maxConcurrentJobs => 0})
+  ->status_is(422);
+$t->get_ok('/api/jobs/settings' => $auth)->status_is(200)
+  ->json_is('/data/maxConcurrentJobs', 4);
+$t->post_ok('/api/jobs/settings' => $auth => json => {maxConcurrentJobs => 1})
+  ->status_is(200);
+
+$t->get_ok('/api/health')->status_is(401);
+$t->get_ok('/api/health' => $auth)->status_is(200)->json_is('/ok', true);
+$t->get_ok('/api/conversions' => $auth)->status_is(200);
+ok(grep($_->{id} eq 'pxf2bff', @{$t->tx->res->json->{data}}), 'catalog includes fixture route');
+
+sub complete_job {
+    my ($request) = @_;
+    $t->post_ok('/api/jobs' => $auth => json => $request)->status_is(202);
+    my $id = $t->tx->res->json->{data}{id};
+    BAIL_OUT('Submission did not return a job ID') unless $id;
+    my $deadline = time + 30;
+    my $job;
+    while (time < $deadline) {
+        my $response = $t->ua->get("/api/jobs/$id" => $auth)->result;
+        $job = $response->json->{data};
+        last if $job && $job->{status} !~ /\A(?:queued|running)\z/;
+        select undef, undef, undef, .05;
+    }
+    is($job->{status}, 'completed', 'HTTP job completes a real fixture conversion')
+      or diag explain $job;
+    return ($id, $job);
 }
 
-note 'Valid request should return the response envelope';
-$t->post_ok(
-    '/api',
-    json => {
-        conversion => 'pxf2bff',
-        input => {
-            data => {
-                phenopacket => {
-                    id      => 'P0007500',
-                    subject => {
-                        id          => 'P0007500',
-                        dateOfBirth => 'unknown-01-01T00:00:00Z',
-                        sex         => 'FEMALE',
-                    },
-                },
-            },
-        },
-    }
-)->status_is(200)->json_is('/ok', Mojo::JSON->true)->json_is('/meta/conversion', 'pxf2bff')
-  ->json_is('/data/id', 'P0007500');
+my $pxf = decode_json(path("$Bin/../../../t/pxf2bff/in/pxf.json")->slurp_raw);
+my ($id, $job) = complete_job({
+    conversion => 'pxf2bff', input => {data => $pxf},
+    output => {entities => ['individuals', 'biosamples']}, options => {test => true},
+});
+is_deeply([sort map {$_->{filename}} @{$job->{result}{artifacts}}],
+    ['biosamples.json', 'individuals.json'], 'both entity outputs are retained');
+$t->get_ok("/api/jobs/$id/outputs/individuals/preview" => $auth)->status_is(200)
+  ->json_has('/data/data');
+$t->get_ok("/api/jobs/$id/outputs/individuals/download" => $auth)->status_is(200);
+my $download = decode_json($t->tx->res->body);
+ok(ref($download) eq 'ARRAY' && @$download, 'download contains converted individuals');
 
-note 'FHIR Bundles should be available through the in-memory HTTP contract';
-my $fhir_bundle = Mojo::JSON::decode_json(
-    path("$Bin/../../../t/fhir2bff/in/patient-bundle.json")->slurp_raw
-);
-$t->post_ok(
-    '/api',
-    json => {
-        conversion => 'fhir2bff',
-        input      => { data => $fhir_bundle },
-        options    => { test => Mojo::JSON->true },
-    }
-)->status_is(200)->json_is('/ok', Mojo::JSON->true)
-  ->json_is('/meta/conversion', 'fhir2bff')
-  ->json_is('/data/0/id', '5b24c87b-6223-f5b4-51e9-82051159bd1d');
+$t->post_ok('/api/inputs' => $auth => form => {
+    source => {file => "$Bin/../../../t/csv2bff/in/csv_data.csv"},
+    mapping => {file => "$Bin/../../../t/csv2bff/in/csv_mapping.yaml"},
+})->status_is(201);
+my %handles = map {$_->{filename} => $_->{id}} @{$t->tx->res->json->{data}};
+my ($source) = map {$handles{$_}} grep {/csv_data\.csv\z/} keys %handles;
+my ($mapping) = map {$handles{$_}} grep {/csv_mapping\.yaml\z/} keys %handles;
+ok($source && $mapping, 'uploads return handles for both input roles');
+my ($csv_id, $csv_job) = complete_job({
+    conversion => 'csv2bff', input => {files => {source => [$source], mapping => [$mapping]}},
+    output => {entities => ['individuals']},
+    options => {separator => ',', term_audit => 'xlsx', test => true},
+});
+ok($csv_job->{result}{meta}{terminologyAudit}, 'audit summary accompanies completed job');
+$t->get_ok("/api/jobs/$csv_id/outputs/term-audit/download" => $auth)->status_is(200);
+is(substr($t->tx->res->body, 0, 2), 'PK', 'Excel audit downloads as a binary workbook');
 
-note 'OMOP tables should be grouped by participant inside the conversion core';
-my $omop_request = Mojo::JSON::decode_json(
-    path("$Bin/../omop.json")->slurp_raw
-);
-$t->post_ok( '/api', json => $omop_request )->status_is(200)
-  ->json_is('/ok', Mojo::JSON->true)
-  ->json_is('/meta/conversion', 'omop2bff')
-  ->json_is('/data/0/id', '974');
-
-my $omop_to_pxf_request = Mojo::JSON::decode_json(
-    path("$Bin/../omop.json")->slurp_raw
-);
-$omop_to_pxf_request->{conversion} = 'omop2pxf';
-$t->post_ok( '/api', json => $omop_to_pxf_request )->status_is(200)
-  ->json_is('/ok', Mojo::JSON->true)
-  ->json_is('/meta/conversion', 'omop2pxf');
-
-note 'OpenAPI should reject invalid input shape';
-$t->post_ok('/api', json => { conversion => 'pxf2bff', input => [] })
-  ->status_is(400);
-
-note 'OpenAPI should reject host filesystem options';
-$t->post_ok(
-    '/api',
-    json => {
-        conversion => 'pxf2bff',
-        input      => { data => {} },
-        options    => { out_file => '/tmp/result.json' },
-    }
-)->status_is(400);
-
-note 'Conversion failures should use the JSON error envelope';
-$t->post_ok('/api', json => { conversion => 'not_a_method', input => { data => {} } })
-  ->status_is(422)->json_is('/ok', Mojo::JSON->false)
-  ->json_is('/error/code', 'conversion_error')
-  ->json_like('/error/message', qr/not_a_method/);
-
-note 'Callable internal methods should not be API conversions';
-$t->post_ok('/api', json => { conversion => 'get_info', input => {} })
-  ->status_is(422)->json_is('/ok', Mojo::JSON->false)
-  ->json_is('/error/code', 'conversion_error')
-  ->json_like('/error/message', qr/Unsupported conversion <get_info>/)
-  ->json_hasnt('/data');
-
-note 'File-based conversion routes should remain on the CLI';
-$t->post_ok(
-    '/api',
-    json => {
-        conversion => 'redcap2bff',
-        input      => { data => {} },
-    }
-)->status_is(422)->json_is('/ok', Mojo::JSON->false)
-  ->json_is('/error/code', 'conversion_error')
-  ->json_like('/error/message', qr/not available over HTTP/);
-
-note 'The request flattener should also reject host filesystem options';
-my $flatten_error;
-eval {
-    main::flatten_public_request(
-        {
-            conversion => 'pxf2bff',
-            input      => { data => {} },
-            options    => { mapping_file => '/srv/mapping.yaml' },
-        }
-    );
-    1;
-} or $flatten_error = $@;
-like(
-    $flatten_error,
-    qr/Unsupported key 'mapping_file' in 'options'/,
-    'request flattener rejects host filesystem options'
-);
+$t->post_ok('/api/jobs' => $auth => json => {conversion => 'not-a-route', input => {data => {}}})
+  ->status_is(422)->json_is('/error/code', 'invalid_request');
+$t->post_ok('/api/jobs' => $auth => json => {conversion => 'pxf2bff', input => {files => {source => ['/tmp/input.json']}}})
+  ->status_is(422)->json_is('/error/code', 'invalid_request');
+$t->post_ok('/api/inputs/local' => $auth => json => {paths => ['/tmp/input.json']})
+  ->status_is(403);
 
 done_testing;

@@ -517,7 +517,7 @@ sub _accept_client ($self, $fh, $peer) {
     };
     if (!$prepared) {
         my $failure = $@;
-        eval { $stream->close; 1 } if $stream;
+        eval { $stream->_close_now(1); 1 } if $stream;
         CORE::close($fh) if !$stream && defined fileno($fh);
         my $error = blessed($failure)
             && $failure->isa('Linux::Event::Error')
@@ -541,7 +541,7 @@ sub _accept_client ($self, $fh, $peer) {
             my $message = "$@";
             $message =~ s/\s+\z//;
             $message = 'on_accept callback failed' if $message eq '';
-            eval { $stream->close; 1 };
+            eval { $stream->_close_now(1); 1 };
             my $error = Linux::Event::Error->new(
                 type      => 'callback',
                 operation => 'on_accept',

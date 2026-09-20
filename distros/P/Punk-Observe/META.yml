@@ -30,6 +30,7 @@ requires:
   Punk::Cache: '0.34'
   Punk::OpenTelemetry: '0.08'
   Punk::Queue: '0.04'
+  Shared::Arena: '0.11'
   perl: '5.010000'
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

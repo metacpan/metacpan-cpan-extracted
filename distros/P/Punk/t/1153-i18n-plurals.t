@@ -40,6 +40,11 @@ cat(ru => '{ "items": { "one":  "{count} tovar",
                         "many": "{count} tovarov",
                         "other":"{count} tovara" } }');
 cat(fr => '{ "items": { "one": "{count} article", "other": "{count} articles" } }');
+# The two Portugueses differ ON THE RULE, not just on the words, which is why
+# both catalogues below hold the same two strings.
+cat('pt'    => '{ "items": { "one": "{count} peca", "other": "{count} pecas" } }');
+cat('pt-PT' => '{ "items": { "one": "{count} peca", "other": "{count} pecas" } }');
+cat('en-GB' => '{ "items": { "one": "{count} item", "other": "{count} items" } }');
 cat(ja => '{ "items": { "other": "{count} ko" } }');
 cat(cs => '{ "items": { "one": "{count} polozka", "few": "{count} polozky",
                         "other": "{count} polozek" } }');
@@ -122,6 +127,31 @@ sub say_n {
     is(say_n(fr => 0), '0 article',  'fr 0 is `one` - French says "0 article"');
     is(say_n(fr => 1), '1 article',  'fr 1 is `one`');
     is(say_n(fr => 2), '2 articles', 'fr 2 is `other`');
+}
+
+# ---- Portuguese: the one language here where a REGION changes the rule ------
+#
+# CLDR gives `pt` one at `i = 0..1` and `pt_PT` one at `i = 1 and v = 0`. So
+# zero is singular in Brazil and plural in Portugal, and a lookup that matched
+# only the primary subtag would hand Portugal Brazil's rule and render
+# "0 peca". That is the invisible kind of wrong this file exists for: the
+# sentence is grammatical, just not for that number.
+{
+    is(say_n(pt => 0), '0 peca',  'pt 0 is `one` - Brazil groups 0 with 1');
+    is(say_n(pt => 1), '1 peca',  'pt 1 is `one`');
+    is(say_n(pt => 2), '2 pecas', 'pt 2 is `other`');
+
+    is(say_n('pt-PT' => 0), '0 pecas',
+        'pt-PT 0 is `other` - Portugal does NOT group 0 with 1, and the whole '
+      . 'tag is matched before the primary subtag to say so');
+    is(say_n('pt-PT' => 1), '1 peca',  'pt-PT 1 is `one`');
+    is(say_n('pt-PT' => 2), '2 pecas', 'pt-PT 2 is `other`');
+
+    # The exception must not become the rule: a region that only spells
+    # differently still shares its language's grammar.
+    is(say_n('en-GB' => 0), '0 items',
+        'en-GB still takes English\'s rule through the primary subtag');
+    is(say_n('en-GB' => 1), '1 item', 'en-GB 1 is `one`');
 }
 
 # ---- Japanese: one form for every number ------------------------------------

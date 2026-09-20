@@ -87,7 +87,7 @@ sub next_spectrum {
     my ($self, @args) = @_;
 
     my $s = $self->SUPER::next_spectrum(@args);
-    return undef if (! defined $s);
+    return if (! defined $s);
     # the spectrum will need access to the binary filehandle
     $s->{__fh_ibd} = $self->{__fh_ibd};
 
@@ -100,7 +100,7 @@ sub fetch_spectrum {
     my ($self, @args) = @_;
 
     my $s = $self->SUPER::fetch_spectrum(@args);
-    return undef if (! defined $s);
+    return if (! defined $s);
     # the spectrum will need access to the binary filehandle
     $s->{__fh_ibd} = $self->{__fh_ibd};
 

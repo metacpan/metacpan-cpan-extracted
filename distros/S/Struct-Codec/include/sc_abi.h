@@ -79,8 +79,11 @@
  * `decode(encode(v))` is v: strings stay strings and numbers stay numbers, the
  * UTF-8 flag survives, a blessed referent is blessed into the same class, and
  * references that were shared or cyclic are shared or cyclic again. Weak
- * references come back strong and a dualvar keeps its string. CODE, GLOB, IO,
- * FORMAT, Regexp and tied values are refused with a croak naming the type.
+ * references come back strong and a dualvar keeps its string. A closure, an
+ * anonymous XSUB and a nameless empty glob are refused with a croak naming
+ * the type, and so is a pointer object: a blessed scalar holding only an
+ * integer in a class with a DESTROY, which is how XS hands out a handle to a
+ * C struct. The table has no option to drop those; the Perl surface does.
  *
  * Contents are TRUSTED, as Storable's are: a class name in the stream is
  * blessed into, creating the stash. Corrupt bytes are a different matter and

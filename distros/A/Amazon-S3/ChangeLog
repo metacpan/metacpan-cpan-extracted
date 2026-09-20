@@ -1,3 +1,167 @@
+Thu Sep 17 11:58:02 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.1.0]: autoconf migration
+	* Makefile.am: deleted
+	* autotools/ads_PERL_INCLUDES.m4: deleted
+	* autotools/ads_PERL_LIBDIR.m4: deleted
+	* autotools/ads_PERL_MODULE.m4: deleted
+	* autotools/ads_PROG_PERL.m4: deleted
+	* autotools/am_rpm_build_mode.m4: deleted
+	* autotools/ax_am_conditional_example.m4: deleted
+	* autotools/ax_deps_check.m4: deleted
+	* autotools/ax_distcheck_hack.m4: deleted
+	* autotools/ax_rpmbuild_check.m4: deleted
+	* bin/run-test.in: renamed
+	* bin/s3-perl.pl: renamed
+	* bootstrap: deleted
+	* configure.ac: deleted
+	* cpan/Makefile.am: deleted
+	* cpan/buildspec.yml: renamed
+	* cpan/requires: renamed
+	* cpan/test-requires: renamed
+	* lib/Amazon/S3.pm.in: renamed
+	* lib/Amazon/S3/Bucket.pm.in: renamed
+	* lib/Amazon/S3/BucketV2.pm.in: renamed
+	* lib/Amazon/S3/Constants.pm.in: renamed
+	* lib/Amazon/S3/Logger.pm.in: renamed
+	* lib/Amazon/S3/Signature/V4.pm.in: renamed
+	* lib/Amazon/S3/Util.pm.in: renamed
+	* perl-Amazon-S3.spec.in: deleted
+	* src/Makefile.am: deleted
+	* src/main/Makefile.am: deleted
+	* src/main/perl/Makefile.am: deleted
+	* src/main/perl/lib/Makefile.am: deleted
+	* t/01-api.t: renamed
+	* t/02-logger.t: renamed
+	* t/03-region.t: renamed
+	* t/04-list-buckets.t: renamed
+	* t/05-multipart-upload.t: renamed
+	* t/06-list-multipart-uploads.t: renamed
+	* t/lib/S3TestUtils.pm: renamed
+
+	[2.1.0]: new from CPAN::Maker::Bootstrapper import
+	* .includes/bash-completion.mk: new
+	* .includes/bootstrap.mk: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/local.mk: new
+	* .includes/modulino.mk: new
+	* .includes/perl.mk: new
+	* .includes/release-notes.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* .includes/version.mk: new
+	* Makefile: new
+	* t/00-amazon-s3.t: new
+	* cpanfile: new
+	* deps.mk: new
+	* recommends: new
+	* suggests: new
+
+	[2.1.0]: new for 2.1.0
+	* .prompts/release-notes.prompt
+	* release-notes.md: new
+	* release-notes/release-notes-2.1.0.md: new
+	* build-mirrors: new
+	* config.mk: new
+	* lib/Digest/CRC64NVME.pm.in: new
+	* t/07-crc64nvme.t: new
+	* t/08-checksums.t: new
+	* t/09-bucket-v2.t: new
+	* t/10-enpoint-url.t: new
+	* test-requires.skip: new
+
+	[2.1.0]: changed in 2.1.0
+	* requires: +Digest::CRC, +LWP::Protocol::https
+	* .gitignore
+	- remove all autoconf related files
+	- added files by CPAN::Maker::Bootstrapper
+	* VERSION: bump
+	* README.md: generated
+	* buildspec.yml
+	- moved S3TestUtils.pm
+	- renamed git repository
+	* lib/Amazon/S3.pm.in
+	- complete POD rewrite
+	- add checksum_types, checksum_algorithm, verify_checksums accessors, raise_error
+	(new)
+	- set default options for new accessors
+	- support endpoint_url
+	(use_express_one_zone): set secure
+	(_decode_response)
+	- use _handle_response_error to support raise_error
+	(send_request_expect_nothing_: likewise
+	(send_request_expect_nothing_probed): likewise
+	(_croak_if_response_error): likewise
+	(_handle_response_error): new
+	(_init_checksum_types): new
+	(add_bucket): _send_request_expect_nothing => send_request_expect_nothing
+	(delete_bucket): likewise
+	(list_directory_buckets): _send_request => send_request
+	(list_bucket): likewise
+	(list_object_version): likewise
+	(_send_request):
+	- => send_request
+	(_send_request_expect_nothing)
+	- => send_request_expect_nothing
+	(_send_request_expect_nothing_probed)
+	- => send_request_expect_nothing_probed
+	(_croak_if_response_error)
+	- expose error strings
+	(_remember_errors): fixed regexp that was not capturing code
+	* lib/Amazon/S3/Bucket.pm.in
+	- complete POD rewrite
+	(add_key)
+	- send x-amz-checksum
+	(upload_multipart_object)
+	- set x-amz-checksum-algorithm header
+	(initiate_multipart_upload)
+	- orchestrate checksum support
+	(upload_part_of_multipart_upload)
+	- calculate checksum
+	(complete_multipart_upload)
+	- orchestrate checksum support
+	(_get_key)
+	- append query parameters to uri
+	- enable checksums if verify checksums and method is GET
+	- verify checksums if enabled after response
+	(_verify_checksums): new
+	(get_key_filename)
+	- pass verify_checksums
+	(delete_key)
+	- _send_request_expect_nothing => send_request_expect_nothing
+	(delete_keys): likewise
+	(set_acl): likewise
+	(get_location_constraint)
+	- _send_request => send_request
+	(_create_multipart_upload_request)
+	- add checksums to request
+	* lib/Amazon/S3/BucketV2.pm.in
+	(send_request)
+	- acct->send_request
+	(create_methods)
+	- fix bug that would mutate method
+	* lib/Amazon/S3/Constants.pm.in
+	(%CHECK_SUM_TYPES): new
+	(@AWS_CHECKSUM_TYPES): new
+	* lib/Amazon/S3/Logger.pm.in: whitespace
+	* lib/Amazon/S3/Signature/V4.pm.in: + $VERSION
+	* lib/Amazon/S3/Util.pm.in
+	- likewise
+	(choose): new
+	* test-requires
+	- +Carp::Always, HTTP::Headers, HTTP::Response, ReadOnly, Test::Output, XML::Simple
+	* t/01-api.t: lib => t/lib
+	* t/02-logger.t: likewise
+	* t/03-region.t: likewise
+	* t/04-list-buckets.t: likewise
+	* t/06-list-multipart-uploads.t
+	- likewise
+	* t/05-multipart-upload.t
+	- likewise
+	- new tests for checksums
+	* bin/s3-perl.pl.in: deleted
+
 Mon Jun 10 08:33:31 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[2.0.2]:

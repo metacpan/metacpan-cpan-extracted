@@ -1,5 +1,21 @@
 Revision history for Hyperman
 
+0.50	2026-09-19
+        - Now Depends on Shared::Arena: one arena is created before the fork and
+          Hyperman->arena hands it to Perl; run(arena_name => ..., arena_size => ...).
+        - The denylist and the fixed-window rate counters live on two maps in
+          that arena; the accept path no longer reads the clock. hm_ratelimit.h is gone.
+        - The message bus is a Shared::Arena ring in the same arena, with the
+          same doors, ceiling and delivery modes. hm_bus.h stays published for
+          Punk::Observe only.
+        - A worker scoreboard mirrored once a second: Hyperman->pool_stats,
+          stats(pool => 1), USR1 prints the aggregate, a wedged worker is logged.
+        - Hyperman->leader, Hyperman->distinct_clients (run(distinct_clients => 1)).
+        - C ABI 9: arena_region, arena_table, pool_stats.
+        - FIX: a respawned worker inherited the supervisor's signal handlers and
+          blocked mask, so a TERM landing before its own loop took over was
+          swallowed and the pool never finished shutting down.
+
 0.49	2026-09-19
         - FIX: an HTTP/1.1 tunnel (a 101 stream handle) went deaf after
           the upgrade on io_uring with completion reads.

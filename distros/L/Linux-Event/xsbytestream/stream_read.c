@@ -11,14 +11,28 @@ les_flush_framed_read_boundary(pTHX_ les_xsstate_t *st)
         les_process_existing_input(aTHX_ st, 1);
 }
 
+static void
+les_flush_raw_consumer_read_boundary(pTHX_ les_xsstate_t *st)
+{
+    int was_consumer_paused = st->consumer_paused;
+
+    les_consumer_flush(aTHX_ st);
+    if (les_consumer_resumed_with_buffered_input(st, was_consumer_paused))
+        les_process_existing_input(aTHX_ st, 1);
+}
+
 static int
 les_settle_read_boundary(pTHX_ les_xsstate_t *st,
     les_descriptor_t *descriptor)
 {
-    if (descriptor->read_mode == LES_READ_DELIVER)
-        les_flush_raw_batch(aTHX_ st);
-    else
+    if (descriptor->read_mode == LES_READ_DELIVER) {
+        if (les_consumer_uses_raw_input(st))
+            les_flush_raw_consumer_read_boundary(aTHX_ st);
+        else
+            les_flush_raw_batch(aTHX_ st);
+    } else {
         les_flush_framed_read_boundary(aTHX_ st);
+    }
     return !st->closed && !LES_INPUT_PAUSED(st)
         && st->descriptor != descriptor;
 }
@@ -58,6 +72,8 @@ les_read_ready(pTHX_ les_xsstate_t *st)
         if (st->descriptor->read_mode != LES_READ_DELIVER
             || !st->read_batch_bytes)
             les_process_existing_input(aTHX_ st, 0);
+        if (st->consumer_transition_pending)
+            break;
         if (st->closed || LES_INPUT_PAUSED(st) || st->read_eof)
             break;
 
@@ -71,7 +87,19 @@ les_read_ready(pTHX_ les_xsstate_t *st)
             want = (size_t)st->read_budget_bytes - drain_bytes;
 
         if (st->descriptor->read_mode == LES_READ_DELIVER) {
-            if (st->read_batch_bytes) {
+            if (les_consumer_uses_raw_input(st)) {
+                if (st->input_len >= st->max_buffer) {
+                    char msg[128];
+                    snprintf(msg, sizeof(msg), "input buffer cannot grow beyond max_buffer=%llu",
+                        (unsigned long long)st->max_buffer);
+                    les_call_framing_error(aTHX_ st, msg);
+                    break;
+                }
+                if ((UV)want > st->max_buffer - (UV)st->input_len)
+                    want = (size_t)(st->max_buffer - (UV)st->input_len);
+                les_input_reserve(st, want);
+                target = st->input_buffer + st->input_start + st->input_len;
+            } else if (st->read_batch_bytes) {
                 UV remaining;
 
                 if ((UV)st->input_len >= st->read_batch_bytes) {
@@ -115,7 +143,14 @@ les_read_ready(pTHX_ les_xsstate_t *st)
             les_note_read_activity(aTHX_ st);
 
             if (st->descriptor->read_mode == LES_READ_DELIVER) {
-                if (st->read_batch_bytes) {
+                if (les_consumer_uses_raw_input(st)) {
+                    st->input_len += (size_t)result.count;
+                    LES_STAT(st, input_appends)++;
+                    if ((unsigned long long)st->input_len
+                        > LES_STAT(st, input_peak_bytes))
+                        LES_STAT(st, input_peak_bytes)
+                            = (unsigned long long)st->input_len;
+                } else if (st->read_batch_bytes) {
                     st->input_len += (size_t)result.count;
                     if ((UV)st->input_len >= st->read_batch_bytes)
                         les_flush_raw_batch(aTHX_ st);
@@ -172,8 +207,12 @@ les_read_ready(pTHX_ les_xsstate_t *st)
         }
     }
 
-    if (!st->closed && st->descriptor->read_mode != LES_READ_DELIVER)
-        les_flush_framed_read_boundary(aTHX_ st);
+    if (!st->closed) {
+        if (st->descriptor->read_mode != LES_READ_DELIVER)
+            les_flush_framed_read_boundary(aTHX_ st);
+        else if (les_consumer_uses_raw_input(st))
+            les_flush_raw_consumer_read_boundary(aTHX_ st);
+    }
 
     LEAVE;
 

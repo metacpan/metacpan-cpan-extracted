@@ -1,0 +1,31 @@
+#!/bin/bash
+# -*- mode: sh; -*-
+
+service="$1"
+service=${service:-localstack}
+
+if [[ "$service" = "localstack" ]]; then
+    export AMAZON_S3_HOST=s3.localhost.localstack.cloud:4566
+    export ENDPOINT_URL=http://$AMAZON_S3_HOST
+    export AMAZON_S3_LOCALSTACK=1
+elif [[ "$service" = "aws" ]]; then
+    if test -z "$AWS_ACCESS_KEY_ID"; then
+        echo "set AWS_ACCESS_KEY_ID before running test"
+        exit 1;
+    fi
+
+    if test -z "$AWS_SECRET_ACCESS_KEY"; then
+        echo "set AWS_SECRET_ACCESS_KEY before running test"
+        exit 1;
+    fi   
+fi
+
+export BUCKET=net-amazon-s3-test-$AWS_ACCESS_KEY_ID
+export AMAZON_S3_DOMAIN_BUCKET_NAMES=1
+
+if aws s3api --endpoint-url=$ENDPOINT_URL list-buckets  | grep "$BUCKET"; then
+    aws s3 --endpoint-url=$ENDPOINT_URL --recursive rm s3://$BUCKET/
+    aws s3 --endpoint-url=$ENDPOINT_URL rb s3://$BUCKET
+fi
+
+prove -I lib -v t/

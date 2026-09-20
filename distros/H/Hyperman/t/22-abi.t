@@ -24,6 +24,15 @@ is(Hyperman::_abi_ptr(), $ptr, 'the table is static - same address');
 is(Hyperman::_abi_selftest(), 1,
    '_abi_selftest: loop, watchers, timers and futures through the ABI table');
 
+# The selftest maps the arenas as a side effect (Punk's t/1220 relies on it
+# for a no-server run), and since 0.50 that includes the Shared::Arena.
+SKIP: {
+    skip 'no Shared::Arena table (HYPERMAN_NO_SA_ABI, or not installed)', 2
+        unless defined Hyperman->arena;
+    isa_ok(Hyperman->arena, 'Shared::Arena', 'Hyperman->arena after the selftest');
+    is(Hyperman->arena, Hyperman->arena, 'and it is the one object every time');
+}
+
 # The table only ever grows at the tail, so a consumer compiled against an
 # older header keeps working: existing entries never move. The selftest
 # above also exercises the v2 conn_detach entry's rejection path (a ticket
@@ -32,9 +41,9 @@ is(Hyperman::_abi_selftest(), 1,
 # ratelimit_hit) against the shared arena, and the v6 stream entries' refusal
 # paths - a ticket naming no connection, and every entry point handed a
 # pointer that is not a live handle. t/41-stream-abi.t covers v6 live.
-is(Hyperman::_abi_version(), 8,
-   'ABI version 8 (v2 conn_detach, v3 denylist + rate limit, v4 worker start, '
- . 'v5 the cross-worker message bus, v6 stream handles, v7 stream_abort, v8 stream_on_data)');
+is(Hyperman::_abi_version(), 9,
+   'ABI version 9 (v2 conn_detach, v3 denylist + rate limit, v4 worker start, '
+ . 'v5 the cross-worker message bus, v6 stream handles, v7 stream_abort, v8 stream_on_data, v9 the arena and its scoreboard)');
 
 # v4 on_worker_start registers here; that it actually FIRES, once per worker
 # and after the fork, is t/33-worker-start.t, which needs a live server.

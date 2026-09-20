@@ -42,6 +42,14 @@ test_psgi $app, sub {
         is($reported[0][1]{method}, 'GET');
     };
 
+    subtest 'clears the breadcrumb trail at the start of each request' => sub {
+        ForgeOps::Tracker::add_breadcrumb('left by an earlier request');
+
+        $cb->(GET '/fine');
+
+        is(scalar(@ForgeOps::Tracker::current_breadcrumbs), 0);
+    };
+
     subtest 'does not report a request that completes normally' => sub {
         @reported = ();
         my $res = $cb->(GET '/fine');

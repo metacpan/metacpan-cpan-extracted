@@ -52,7 +52,7 @@ my $pKt = _pKt();
 sub molecular_weight {
 
     my ($seq, $type) = @_;
-    return sum( map {aa_mass($_, $type) // return undef}
+    return sum( map {aa_mass($_, $type) // return}
         split('', $seq) ) + formula_mass('H2O');
 
 }
@@ -218,7 +218,7 @@ sub isoelectric_point {
         $pH    = ($upper+$lower)/2;
         last if (abs($z) <= $cut);
     }
-    return undef if (abs($z) > $cut); # failed to converge
+    return if (abs($z) > $cut); # failed to converge
     return $pH;
 
 }

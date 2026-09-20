@@ -10,6 +10,7 @@ use Time::Piece;
 
 use App::karr::Config;
 use App::karr::Task;
+use App::karr::Error qw( set_original_argv );
 use MockStore;
 
 # Ticket #223. App::karr::Role::ClaimTimeout::check_claim knew four cases --
@@ -205,6 +206,12 @@ sub _claimed_card {
 # "the card was guarded".
 sub _answer_of {
     my ( $consumer, $status ) = @_;
+    # The refusal appends the caller's own command line with --claim HOLDER
+    # when App::karr::Error/original_argv was recorded (ticket #269). The CLI
+    # subtests above recorded theirs, and this direct call has none of its own
+    # -- so the recorded one is cleared, and the message is pinned as the
+    # no-argv shape: prose plus the release door, and nothing else.
+    set_original_argv();
     my $ok = eval { $consumer->check_claim( _claimed_card($status), $OTHER ) };
     return $ok ? 'allowed' : $@;
 }
@@ -213,7 +220,8 @@ subtest 'terminal is whatever the board calls terminal' => sub {
     my $default = _consumer_for();
     is( _answer_of( $default, 'done' ), 'allowed',
         'default board: a claim on `done` guards nothing' );
-    like( _answer_of( $default, 'review' ), qr/\ATask 1 is claimed by \Q$HOLDER\E\n\z/,
+    like( _answer_of( $default, 'review' ),
+        qr/\ATask 1 is claimed by \Q$HOLDER\E:\n  karr edit 1 --release\n\z/,
         'default board: a claim on `review` still guards the card' );
 
     # A board imported from kanban-md may end anywhere; `done` is not even a
@@ -223,12 +231,14 @@ subtest 'terminal is whatever the board calls terminal' => sub {
         'custom board: a claim on `shipped` guards nothing' );
     is( _answer_of( $custom, 'archived' ), 'allowed',
         'custom board: `archived` is terminal here too' );
-    like( _answer_of( $custom, 'doing' ), qr/\ATask 1 is claimed by \Q$HOLDER\E\n\z/,
+    like( _answer_of( $custom, 'doing' ),
+        qr/\ATask 1 is claimed by \Q$HOLDER\E:\n  karr edit 1 --release\n\z/,
         'custom board: a claim on `doing` still guards the card' );
 
     # And the boards really do disagree: `done` is not a column on the custom
     # board, so nothing there releases the claim for it.
-    like( _answer_of( $custom, 'done' ), qr/\ATask 1 is claimed by \Q$HOLDER\E\n\z/,
+    like( _answer_of( $custom, 'done' ),
+        qr/\ATask 1 is claimed by \Q$HOLDER\E:\n  karr edit 1 --release\n\z/,
         'custom board: `done` is no longer the magic word' );
 };
 

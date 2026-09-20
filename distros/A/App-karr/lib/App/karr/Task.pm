@@ -1,7 +1,7 @@
 # ABSTRACT: Task object representing a single kanban card
 
 package App::karr::Task;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use Path::Tiny;
 use Time::Piece;
@@ -452,7 +452,7 @@ App::karr::Task - Task object representing a single kanban card
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 

@@ -25,7 +25,7 @@ ok(JQ::Lite::Value::equal($decoded_number, 10),
     'stringification does not change numeric equality');
 
 my $dual_number = dualvar(10, '10');
-is(JSON::PP::encode_json($dual_number), '10',
+is(JSON::PP->new->allow_nonref->encode($dual_number), '10',
     'dual-valued scalar retains JSON numeric identity');
 is(JQ::Lite::Value::type_of($dual_number), 'number',
     'numeric flags take precedence over a public string flag');

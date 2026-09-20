@@ -3,6 +3,7 @@ package WWW::Crawl4AI::Client;
 use Moo;
 use Carp qw( croak );
 use HTTP::Request ();
+use LWP::UserAgent ();
 use JSON::MaybeXS ();
 use URI ();
 use URI::Escape ();
@@ -72,7 +73,6 @@ sub _build__retry_status_set {
 
 sub _build_ua {
   my ( $self ) = @_;
-  require LWP::UserAgent;
   return LWP::UserAgent->new(
     agent   => $self->user_agent_string,
     timeout => $self->timeout,
@@ -533,7 +533,7 @@ WWW::Crawl4AI::Client - UA-agnostic REST client for the Crawl4AI Docker API
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

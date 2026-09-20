@@ -106,7 +106,7 @@ sub scan_window {
     my $l = $self->param(MS_SCAN_WINDOW_LOWER_LIMIT, ref => $win);
     my $r = $self->param(MS_SCAN_WINDOW_UPPER_LIMIT, ref => $win);
 
-    return undef if (! defined $l || ! defined $r);
+    return if (! defined $l || ! defined $r);
     return [$l, $r];
 
 }
@@ -117,7 +117,7 @@ sub scan_number {
     if ($self->{id} =~ /\bscan=(\d+)/) {
         return $1;
     }
-    return undef;
+    return;
 
 }
 

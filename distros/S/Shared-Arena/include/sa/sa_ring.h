@@ -106,10 +106,13 @@
 
 #define SA_RING_MAGIC 0x474E4952u    /* 'R','I','N','G' little-endian */
 
-/* Read results. */
+/* Read results. Guarded, because sa_abi.h publishes the same three names for
+ * consumers and either header may arrive first; sa_abi_impl.h pins the values. */
+#ifndef SA_READ_OK
 #define SA_READ_OK      0
 #define SA_READ_PENDING 1
 #define SA_READ_LAPPED  2
+#endif
 
 /* Publish results. */
 #define SA_PUB_OK       1
@@ -259,9 +262,16 @@ struct sa_cursor {
 
     /* The hole this cursor is stuck on, so the escalation in sa_ring_tombstone
      * is paid once per hole rather than once per drain. Sequence 0 is never
-     * used, so it doubles as "not stuck". */
+     * used, so it doubles as "not stuck". `hole_since_us` is when this cursor
+     * first saw it and `hole_hb0` the publisher's heartbeat at that moment:
+     * the grace period runs from first sight, across drains, instead of being
+     * slept inside one. `hole_asks` counts the peer checks run for this hole,
+     * which is how a caller tells "not yet" from "asked, and it is alive". */
     uint64_t  hole_seq;
     uint64_t  hole_next_us;
+    uint64_t  hole_since_us;
+    uint64_t  hole_hb0;
+    uint64_t  hole_asks;
     int       hole_counted;
 };
 
@@ -453,9 +463,15 @@ static int sa_ring_publish(sa_ring *r, const char *topic, uint32_t tlen,
 
     /* Raised BEFORE the reservation and lowered after the commit, so a reader
      * can ask whether any dead peer has an unfinished record even when the
-     * publisher died before it could announce which one it was. */
+     * publisher died before it could announce which one it was.
+     *
+     * A release STORE, not a read-modify-write: the row has one writer, this
+     * process, and a publish is serial within it, so a flag says everything a
+     * count did. Three atomic read-modify-writes per record on the publisher's
+     * own row were a measurable share of a publish (phase 01 of the Hyperman
+     * port); three plain stores are not. */
     if (r->arena->peer_idx >= 0)
-        sa_at_fetch_add64(&SA_PEERS(r->arena->map.base,
+        sa_at_store64_rel(&SA_PEERS(r->arena->map.base,
                                     r->arena->hdr)[r->arena->peer_idx].want, 1);
 
     /* The reservation. ONE atomic however many slots the record needs, and
@@ -517,8 +533,8 @@ static int sa_ring_publish(sa_ring *r, const char *topic, uint32_t tlen,
     if (r->arena->peer_idx >= 0) {
         sa_peer *me = &SA_PEERS(r->arena->map.base,
                                 r->arena->hdr)[r->arena->peer_idx];
-        sa_at_fetch_add64(&me->want, (uint64_t)-1);
-        sa_at_fetch_add64(&me->heartbeat, 1);
+        sa_at_store64_rel(&me->want, 0);
+        sa_at_store64_rel(&me->heartbeat, sa_at_load64_acq(&me->heartbeat) + 1);
     }
     sa_at_fetch_add64(&h->published, 1);
     /* Tell anybody who is asleep. Only the publisher that flips a waker's flag
@@ -716,11 +732,11 @@ static int sa_ring_tombstone(sa_cursor *c, uint64_t want) {
     sa_ring *r = c->ring;
     sa_slot *s = SA_SLOT_AT(r, want);
     sa_region *a = r->arena;
-    uint64_t claim, hb0;
+    uint64_t claim, now;
     uint32_t grace;
     long spin;
 
-    /* ---- THE ESCALATION IS PER HOLE, NOT PER VISIT -------------------------
+    /* ---- THE ESCALATION IS PER HOLE, NOT PER VISIT, AND IT NEVER SLEEPS ----
      *
      * A drain that finds an unfilled hole stops there, so the NEXT drain
      * arrives at the same sequence - and the first version paid the whole
@@ -731,14 +747,19 @@ static int sa_ring_tombstone(sa_cursor *c, uint64_t want) {
      * for. It also counted `unattributed` once per VISIT, so a single hole
      * inflated the number that exists to tell you how rare this is.
      *
-     * So the cursor remembers which sequence it is stuck on and when it is
-     * worth asking again. The cheap check still runs every time - a record
-     * that landed is picked up immediately - and only the expensive half is
-     * rate-limited to once per grace period. */
+     * The second version still slept the grace period INSIDE the read, once
+     * per hole. An event-loop worker cannot afford a quarter second in a drain
+     * either, so now the grace period runs on the cursor: the publisher's
+     * heartbeat is captured the FIRST time the hole is seen, and the peer
+     * check runs on whichever visit finds the grace period elapsed. A caller
+     * that wants to wait naps between drains; this function only ever spins
+     * its two thousand turns. */
     if (c->hole_seq != want) {
-        c->hole_seq     = want;
-        c->hole_next_us = 0;
-        c->hole_counted = 0;
+        c->hole_seq      = want;
+        c->hole_next_us  = 0;
+        c->hole_counted  = 0;
+        c->hole_since_us = sa_now_us();
+        c->hole_hb0      = sa_peer_hb(a, sa_at_load64_acq(&s->claim));
     }
 
     for (spin = 0; spin < 2000; spin++) {
@@ -748,25 +769,27 @@ static int sa_ring_tombstone(sa_cursor *c, uint64_t want) {
         }
     }
 
+    now   = sa_now_us();
+    grace = sa_at_load32_acq(&a->hdr->reap_grace_us);
+    if (!grace) grace = 1000;
+
     /* Asked recently, and the answer cannot have changed: the heartbeat test
      * below needs a grace period to have passed before it means anything. */
-    if (c->hole_next_us && sa_now_us() < c->hole_next_us) return 0;
+    if (c->hole_next_us && now < c->hole_next_us) return 0;
 
-    claim = sa_at_load64_acq(&s->claim);
-    hb0   = sa_peer_hb(a, claim);
-    grace = sa_at_load32_acq(&a->hdr->reap_grace_us);
+    /* The grace period is still running. The clock can step backwards, and a
+     * wait that then never ends is the one thing rule 5 forbids, so a `now`
+     * before `since` counts as elapsed. */
+    if (now >= c->hole_since_us && now - c->hole_since_us < grace) return 0;
 
-    sa_stall(grace ? grace : 1000);
-    if (sa_at_load64_acq(&s->end) == want) {
-        c->hole_seq = 0;
-        return 0;
-    }
-    c->hole_next_us = sa_now_us() + (uint64_t)(grace ? grace : 1000);
+    c->hole_next_us = now + grace;
+    c->hole_asks++;
 
     /* Re-read: a publisher may have claimed the slot during the wait, in which
-     * case the claim we started from is the wrong one to judge. */
+     * case the heartbeat we hold belongs to the wrong peer. Start the grace
+     * period again against the new one. */
     claim = sa_at_load64_acq(&s->claim);
-    if (!sa_peer_is_dead(a, claim, hb0)) {
+    if (!sa_peer_is_dead(a, claim, c->hole_hb0)) {
         /* Nobody provably dead. If SOME dead peer has an uncommitted
          * reservation, this hole is very likely theirs and waiting for ever is
          * worse than counting it - but say so separately, because a non-zero
@@ -777,6 +800,10 @@ static int sa_ring_tombstone(sa_cursor *c, uint64_t want) {
             c->unattributed++;
             c->hole_counted = 1;
         }
+        /* A fresh baseline for the next question: the heartbeat must stand
+         * still for a WHOLE grace period, measured from here. */
+        c->hole_since_us = now;
+        c->hole_hb0      = sa_peer_hb(a, claim);
         return 0;
     }
 

@@ -37,9 +37,14 @@ my $have_bus = $L->can('have_bus')->();
 
 is($slot, 2048, 'the tail encodes against a 2048-byte slot');
 SKIP: {
-    skip 'no hm_bus.h in this build', 1 unless $have_bus;
-    is($bus_slot, $slot,
-       'and it is the SAME constant the bus enforces, not a copy that drifted');
+    skip 'no Shared::Arena ring in this build', 2 unless $have_bus;
+    # The ring's slot is a runtime answer, and it must hold at least what the
+    # record is sized against: a record sized against a bigger number than
+    # the ring carries is refused rather than truncated.
+    ok($L->can('bus_init')->(64), 'the ring comes up to be asked');
+    ($slot, $bus_slot) = $L->can('slot_sizes')->();
+    cmp_ok($bus_slot, '>=', $slot,
+           "the ring's slot ($bus_slot) holds a record sized against $slot");
 }
 
 # --- the topic IS the tenant boundary ---------------------------------------
@@ -58,7 +63,7 @@ SKIP: {
 
 # --- A LONG LINE ARRIVES TRUNCATED, NOT NOT-AT-ALL --------------------------
 #
-# The bus REFUSES oversize (hm_bus.h returns HM_BUS_OVERSIZE), it does not
+# The ring REFUSES oversize (publish answers -1), it does not
 # shorten. So a long line published unchanged is a line that never arrives,
 # and the tail would silently skip exactly the interesting ones.
 
@@ -275,7 +280,7 @@ SKIP: {
 # forks for real and asserts on what ARRIVED, not on how long it took.
 
 SKIP: {
-    skip 'no hm_bus.h in this build', 9 unless $have_bus;
+    skip 'no Shared::Arena ring in this build', 9 unless $have_bus;
     skip 'no fork on this platform', 9 unless $Config{d_fork};
 
     my $init  = $L->can('bus_init');

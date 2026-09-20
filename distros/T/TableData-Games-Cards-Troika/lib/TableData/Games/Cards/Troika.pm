@@ -1,0 +1,279 @@
+package TableData::Games::Cards::Troika;
+
+use strict;
+use utf8;
+
+use Role::Tiny::With;
+with 'TableDataRole::Source::CSVInDATA';
+with 'TableDataRole::Spec::TableDef';
+
+sub get_table_def {
+    return +{
+        fields => {
+            id1 => {pos=>0, schema=>'posint*'},
+            id2 => {pos=>1, schema=>'str*'},
+
+            type => {pos=>2, schema=>['str*', in=>[qw/object wildcard wildcard+cut/]]},
+
+            eng_object_category_name => {pos=>3, schema=>'str*'},
+            ind_object_category_name => {pos=>4, schema=>'str*'},
+            fra_object_category_name => {pos=>5, schema=>'str*'},
+
+            eng_object_name => {pos=>6, schema=>'str*'},
+            ind_object_name => {pos=>7, schema=>'str*'},
+            fra_object_name => {pos=>8, schema=>'str*'},
+
+            eng_shape => {pos=>9, schema=>'str*'},
+            ind_shape => {pos=>10, schema=>'str*'},
+            fra_shape => {pos=>11, schema=>'str*'},
+
+            eng_color => {pos=>12, schema=>'str*'},
+            ind_color => {pos=>13, schema=>'str*'},
+            fra_color => {pos=>14, schema=>'str*'},
+
+            eng_size => {pos=>15, schema=>'str*'},
+            ind_size => {pos=>16, schema=>'str*'},
+            fra_size => {pos=>17, schema=>'str*'},
+
+            quantity => {pos=>18, schema=>['posint*', in=>[1, 2, 3]]},
+
+            eng_short_name => {pos=>19, schema=>'str*'},
+            eng_descriptive_name => {pos=>20, schema=>'str*'},
+
+            ind_short_name => {pos=>21, schema=>'str*'},
+            ind_descriptive_name => {pos=>22, schema=>'str*'},
+
+            fra_short_name => {pos=>23, schema=>'str*'},
+            fra_descriptive_name => {pos=>24, schema=>'str*'},
+        },
+        pk => 'id1',
+    };
+}
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2026-07-15'; # DATE
+our $DIST = 'TableData-Games-Cards-Troika'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+our %STATS = ("num_rows",99,"num_columns",25); # STATS
+
+1;
+# ABSTRACT: Cards of Anak Bos Troika
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+TableData::Games::Cards::Troika - Cards of Anak Bos Troika
+
+=head1 VERSION
+
+This document describes version 0.001 of TableData::Games::Cards::Troika (from Perl distribution TableData-Games-Cards-Troika), released on 2026-07-15.
+
+=head1 SYNOPSIS
+
+To use from Perl code:
+
+ use TableData::Games::Cards::Troika;
+
+ my $td = TableData::Games::Cards::Troika->new;
+
+ # Iterate rows of the table
+ $td->each_row_arrayref(sub { my $row = shift; ... });
+ $td->each_row_hashref (sub { my $row = shift; ... });
+
+ # Get the list of column names
+ my @columns = $td->get_column_names;
+
+ # Get the number of rows
+ my $row_count = $td->get_row_count;
+
+See also L<TableDataRole::Spec::Basic> for other methods.
+
+To use from command-line (using L<tabledata> CLI):
+
+ # Display as ASCII table and view with pager
+ % tabledata Games::Cards::Troika --page
+
+ # Get number of rows
+ % tabledata --action count_rows Games::Cards::Troika
+
+See the L<tabledata> CLI's documentation for other available actions and options.
+
+=head1 TABLEDATA STATISTICS
+
+ +-------------+-------+
+ | key         | value |
+ +-------------+-------+
+ | num_columns | 25    |
+ | num_rows    | 99    |
+ +-------------+-------+
+
+The statistics is available in the C<%STATS> package variable.
+
+=for Pod::Coverage ^(get_table_def)$
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/TableData-Games-Cards-Troika>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-TableData-Games-Cards-Troika>.
+
+=head1 SEE ALSO
+
+Website of publisher. L<https://www.engaginc.com/> .
+
+Homepage for the game. L<https://www.engaginc.com/products/anak-bos-troika/> .
+
+Some additional materials for the game (instruction, logo, box mockup). L<https://github.com/berdikaritc/engaginc-productinfo-troika> .
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar
+
+perlancar <perlancar@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Games-Cards-Troika>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut
+
+__DATA__
+id1,id2,type,eng_object_category_name,ind_object_category_name,fra_object_category_name,eng_object_name,ind_object_name,fra_object_name,eng_shape,ind_shape,fra_shape,eng_color,ind_color,fra_color,eng_size,ind_size,fra_size,quantity,eng_short_name,eng_descriptive_name,ind_short_name,ind_descriptive_name,fra_short_name,fra_descriptive_name
+1,C1B01RL1S1,object,fruit,buah,fruit,grape,anggur,raisin,round,bundar,rond,purple,ungu,violet,small,kecil,petit,1,1-grape,"1-grape (fruit, round, purple, small)",1-anggur,"1-anggur (buah, bundar, ungu, kecil)",1-raisin,"1-raisin (fruit, rond, violet, petit)"
+2,C1B01RL1S2,object,fruit,buah,fruit,grape,anggur,raisin,round,bundar,rond,purple,ungu,violet,small,kecil,petit,2,2-grape,"2-grape (fruit, round, purple, small)",2-anggur,"2-anggur (buah, bundar, ungu, kecil)",2-raisin,"2-raisin (fruit, rond, violet, petit)"
+3,C1B01RL1S3,object,fruit,buah,fruit,grape,anggur,raisin,round,bundar,rond,purple,ungu,violet,small,kecil,petit,3,3-grape,"3-grape (fruit, round, purple, small)",3-anggur,"3-anggur (buah, bundar, ungu, kecil)",3-raisin,"3-raisin (fruit, rond, violet, petit)"
+4,C1B02RL2M1,object,fruit,buah,fruit,orange,jeruk,orange,round,bundar,rond,orange,oranye,orange,medium,sedang,moyen,1,1-orange,"1-orange (fruit, round, orange, medium)",1-jeruk,"1-jeruk (buah, bundar, oranye, sedang)",1-orange,"1-orange (fruit, rond, orange, moyen)"
+5,C1B02RL2M2,object,fruit,buah,fruit,orange,jeruk,orange,round,bundar,rond,orange,oranye,orange,medium,sedang,moyen,2,2-orange,"2-orange (fruit, round, orange, medium)",2-jeruk,"2-jeruk (buah, bundar, oranye, sedang)",2-orange,"2-orange (fruit, rond, orange, moyen)"
+6,C1B02RL2M3,object,fruit,buah,fruit,orange,jeruk,orange,round,bundar,rond,orange,oranye,orange,medium,sedang,moyen,3,3-orange,"3-orange (fruit, round, orange, medium)",3-jeruk,"3-jeruk (buah, bundar, oranye, sedang)",3-orange,"3-orange (fruit, rond, orange, moyen)"
+7,C1B03RL3L1,object,fruit,buah,fruit,watermelon,semangka,pastèque,round,bundar,rond,green,hijau,vert,large,besar,grand,1,1-watermelon,"1-watermelon (fruit, round, green, large)",1-semangka,"1-semangka (buah, bundar, hijau, besar)",1-pastèque,"1-pastèque (fruit, rond, vert, grand)"
+8,C1B03RL3L2,object,fruit,buah,fruit,watermelon,semangka,pastèque,round,bundar,rond,green,hijau,vert,large,besar,grand,2,2-watermelon,"2-watermelon (fruit, round, green, large)",2-semangka,"2-semangka (buah, bundar, hijau, besar)",2-pastèque,"2-pastèque (fruit, rond, vert, grand)"
+9,C1B03RL3L3,object,fruit,buah,fruit,watermelon,semangka,pastèque,round,bundar,rond,green,hijau,vert,large,besar,grand,3,3-watermelon,"3-watermelon (fruit, round, green, large)",3-semangka,"3-semangka (buah, bundar, hijau, besar)",3-pastèque,"3-pastèque (fruit, rond, vert, grand)"
+10,C2B04RL4S1,object,sports,olahraga,sports,"golf ball","bola golf","balle de golf",round,bundar,rond,white,putih,blanc,small,kecil,petit,1,"1-golf ball","1-golf ball (sports, round, white, small)","1-bola golf","1-bola golf (olahraga, bundar, putih, kecil)","1-balle de golf","1-balle de golf (sports, rond, blanc, petit)"
+11,C2B04RL4S2,object,sports,olahraga,sports,"golf ball","bola golf","balle de golf",round,bundar,rond,white,putih,blanc,small,kecil,petit,2,"2-golf ball","2-golf ball (sports, round, white, small)","2-bola golf","2-bola golf (olahraga, bundar, putih, kecil)","2-balle de golf","2-balle de golf (sports, rond, blanc, petit)"
+12,C2B04RL4S3,object,sports,olahraga,sports,"golf ball","bola golf","balle de golf",round,bundar,rond,white,putih,blanc,small,kecil,petit,3,"3-golf ball","3-golf ball (sports, round, white, small)","3-bola golf","3-bola golf (olahraga, bundar, putih, kecil)","3-balle de golf","3-balle de golf (sports, rond, blanc, petit)"
+13,C2B05RL3M1,object,sports,olahraga,sports,"tennis ball","bola tenis","balle de tennis",round,bundar,rond,green,hijau,vert,medium,sedang,moyen,1,"1-tennis ball","1-tennis ball (sports, round, green, medium)","1-bola tenis","1-bola tenis (olahraga, bundar, hijau, sedang)","1-balle de tennis","1-balle de tennis (sports, rond, vert, moyen)"
+14,C2B05RL3M2,object,sports,olahraga,sports,"tennis ball","bola tenis","balle de tennis",round,bundar,rond,green,hijau,vert,medium,sedang,moyen,2,"2-tennis ball","2-tennis ball (sports, round, green, medium)","2-bola tenis","2-bola tenis (olahraga, bundar, hijau, sedang)","2-balle de tennis","2-balle de tennis (sports, rond, vert, moyen)"
+15,C2B05RL3M3,object,sports,olahraga,sports,"tennis ball","bola tenis","balle de tennis",round,bundar,rond,green,hijau,vert,medium,sedang,moyen,3,"3-tennis ball","3-tennis ball (sports, round, green, medium)","3-bola tenis","3-bola tenis (olahraga, bundar, hijau, sedang)","3-balle de tennis","3-balle de tennis (sports, rond, vert, moyen)"
+16,C2B06RL2L1,object,sports,olahraga,sports,"basket ball","bola basket",basketball,round,bundar,rond,orange,oranye,orange,large,besar,grand,1,"1-basket ball","1-basket ball (sports, round, orange, large)","1-bola basket","1-bola basket (olahraga, bundar, oranye, besar)",1-basketball,"1-basketball (sports, rond, orange, grand)"
+17,C2B06RL2L2,object,sports,olahraga,sports,"basket ball","bola basket",basketball,round,bundar,rond,orange,oranye,orange,large,besar,grand,2,"2-basket ball","2-basket ball (sports, round, orange, large)","2-bola basket","2-bola basket (olahraga, bundar, oranye, besar)",2-basketball,"2-basketball (sports, rond, orange, grand)"
+18,C2B06RL2L3,object,sports,olahraga,sports,"basket ball","bola basket",basketball,round,bundar,rond,orange,oranye,orange,large,besar,grand,3,"3-basket ball","3-basket ball (sports, round, orange, large)","3-bola basket","3-bola basket (olahraga, bundar, oranye, besar)",3-basketball,"3-basketball (sports, rond, orange, grand)"
+19,C3B07TL5L1,object,building,bangunan,bâtiment,"house roof","atap rumah","toit de maison",triangle,segitiga,triangle,red,merah,rouge,large,besar,grand,1,"1-house roof","1-house roof (building, triangle, red, large)","1-atap rumah","1-atap rumah (bangunan, segitiga, merah, besar)","1-toit de maison","1-toit de maison (bâtiment, triangle, rouge, grand)"
+20,C3B07TL5L2,object,building,bangunan,bâtiment,"house roof","atap rumah","toit de maison",triangle,segitiga,triangle,red,merah,rouge,large,besar,grand,2,"2-house roof","2-house roof (building, triangle, red, large)","2-atap rumah","2-atap rumah (bangunan, segitiga, merah, besar)","2-toit de maison","2-toit de maison (bâtiment, triangle, rouge, grand)"
+21,C3B07TL5L3,object,building,bangunan,bâtiment,"house roof","atap rumah","toit de maison",triangle,segitiga,triangle,red,merah,rouge,large,besar,grand,3,"3-house roof","3-house roof (building, triangle, red, large)","3-atap rumah","3-atap rumah (bangunan, segitiga, merah, besar)","3-toit de maison","3-toit de maison (bâtiment, triangle, rouge, grand)"
+22,C3B08TL6L1,object,building,bangunan,bâtiment,tent,tenda,tente,triangle,segitiga,triangle,yellow,kuning,jaune,large,besar,grand,1,1-tent,"1-tent (building, triangle, yellow, large)",1-tenda,"1-tenda (bangunan, segitiga, kuning, besar)",1-tente,"1-tente (bâtiment, triangle, jaune, grand)"
+23,C3B08TL6L2,object,building,bangunan,bâtiment,tent,tenda,tente,triangle,segitiga,triangle,yellow,kuning,jaune,large,besar,grand,2,2-tent,"2-tent (building, triangle, yellow, large)",2-tenda,"2-tenda (bangunan, segitiga, kuning, besar)",2-tente,"2-tente (bâtiment, triangle, jaune, grand)"
+24,C3B08TL6L3,object,building,bangunan,bâtiment,tent,tenda,tente,triangle,segitiga,triangle,yellow,kuning,jaune,large,besar,grand,3,3-tent,"3-tent (building, triangle, yellow, large)",3-tenda,"3-tenda (bangunan, segitiga, kuning, besar)",3-tente,"3-tente (bâtiment, triangle, jaune, grand)"
+25,C3B09TL7L1,object,building,bangunan,bâtiment,pyramid,piramid,pyramide,triangle,segitiga,triangle,brown,cokelat,marron,large,besar,grand,1,1-pyramid,"1-pyramid (building, triangle, brown, large)",1-piramid,"1-piramid (bangunan, segitiga, cokelat, besar)",1-pyramide,"1-pyramide (bâtiment, triangle, marron, grand)"
+26,C3B09TL7L2,object,building,bangunan,bâtiment,pyramid,piramid,pyramide,triangle,segitiga,triangle,brown,cokelat,marron,large,besar,grand,2,2-pyramid,"2-pyramid (building, triangle, brown, large)",2-piramid,"2-piramid (bangunan, segitiga, cokelat, besar)",2-pyramide,"2-pyramide (bâtiment, triangle, marron, grand)"
+27,C3B09TL7L3,object,building,bangunan,bâtiment,pyramid,piramid,pyramide,triangle,segitiga,triangle,brown,cokelat,marron,large,besar,grand,3,3-pyramid,"3-pyramid (building, triangle, brown, large)",3-piramid,"3-piramid (bangunan, segitiga, cokelat, besar)",3-pyramide,"3-pyramide (bâtiment, triangle, marron, grand)"
+28,C4B10TL2S1,object,food,makanan,aliment,"cake slice","sepotong kue","part de gâteau",triangle,segitiga,triangle,orange,oranye,orange,small,kecil,petit,1,"1-cake slice","1-cake slice (food, triangle, orange, small)","1-sepotong kue","1-sepotong kue (makanan, segitiga, oranye, kecil)","1-part de gâteau","1-part de gâteau (aliment, triangle, orange, petit)"
+29,C4B10TL2S2,object,food,makanan,aliment,"cake slice","sepotong kue","part de gâteau",triangle,segitiga,triangle,orange,oranye,orange,small,kecil,petit,2,"2-cake slice","2-cake slice (food, triangle, orange, small)","2-sepotong kue","2-sepotong kue (makanan, segitiga, oranye, kecil)","2-part de gâteau","2-part de gâteau (aliment, triangle, orange, petit)"
+30,C4B10TL2S3,object,food,makanan,aliment,"cake slice","sepotong kue","part de gâteau",triangle,segitiga,triangle,orange,oranye,orange,small,kecil,petit,3,"3-cake slice","3-cake slice (food, triangle, orange, small)","3-sepotong kue","3-sepotong kue (makanan, segitiga, oranye, kecil)","3-part de gâteau","3-part de gâteau (aliment, triangle, orange, petit)"
+31,C4B11TL6M1,object,food,makanan,aliment,"pizza slice","sepotong pizza","part de pizza",triangle,segitiga,triangle,yellow,kuning,jaune,medium,sedang,moyen,1,"1-pizza slice","1-pizza slice (food, triangle, yellow, medium)","1-sepotong pizza","1-sepotong pizza (makanan, segitiga, kuning, sedang)","1-part de pizza","1-part de pizza (aliment, triangle, jaune, moyen)"
+32,C4B11TL6M2,object,food,makanan,aliment,"pizza slice","sepotong pizza","part de pizza",triangle,segitiga,triangle,yellow,kuning,jaune,medium,sedang,moyen,2,"2-pizza slice","2-pizza slice (food, triangle, yellow, medium)","2-sepotong pizza","2-sepotong pizza (makanan, segitiga, kuning, sedang)","2-part de pizza","2-part de pizza (aliment, triangle, jaune, moyen)"
+33,C4B11TL6M3,object,food,makanan,aliment,"pizza slice","sepotong pizza","part de pizza",triangle,segitiga,triangle,yellow,kuning,jaune,medium,sedang,moyen,3,"3-pizza slice","3-pizza slice (food, triangle, yellow, medium)","3-sepotong pizza","3-sepotong pizza (makanan, segitiga, kuning, sedang)","3-part de pizza","3-part de pizza (aliment, triangle, jaune, moyen)"
+34,C4B12RL1S1,object,food,makanan,aliment,jelly,jeli,gelée,round,bundar,rond,purple,ungu,violet,small,kecil,petit,1,1-jelly,"1-jelly (food, round, purple, small)",1-jeli,"1-jeli (makanan, bundar, ungu, kecil)",1-gelée,"1-gelée (aliment, rond, violet, petit)"
+35,C4B12RL1S2,object,food,makanan,aliment,jelly,jeli,gelée,round,bundar,rond,purple,ungu,violet,small,kecil,petit,2,2-jelly,"2-jelly (food, round, purple, small)",2-jeli,"2-jeli (makanan, bundar, ungu, kecil)",2-gelée,"2-gelée (aliment, rond, violet, petit)"
+36,C4B12RL1S3,object,food,makanan,aliment,jelly,jeli,gelée,round,bundar,rond,purple,ungu,violet,small,kecil,petit,3,3-jelly,"3-jelly (food, round, purple, small)",3-jeli,"3-jeli (makanan, bundar, ungu, kecil)",3-gelée,"3-gelée (aliment, rond, violet, petit)"
+37,C5B13QL8S1,object,gadget,gawai,gadget,handphone,ponsel,portable,rectangle,kotak,carré,black,hitam,noir,small,kecil,petit,1,1-handphone,"1-handphone (gadget, rectangle, black, small)",1-ponsel,"1-ponsel (gawai, kotak, hitam, kecil)",1-portable,"1-portable (gadget, carré, noir, petit)"
+38,C5B13QL8S2,object,gadget,gawai,gadget,handphone,ponsel,portable,rectangle,kotak,carré,black,hitam,noir,small,kecil,petit,2,2-handphone,"2-handphone (gadget, rectangle, black, small)",2-ponsel,"2-ponsel (gawai, kotak, hitam, kecil)",2-portable,"2-portable (gadget, carré, noir, petit)"
+39,C5B13QL8S3,object,gadget,gawai,gadget,handphone,ponsel,portable,rectangle,kotak,carré,black,hitam,noir,small,kecil,petit,3,3-handphone,"3-handphone (gadget, rectangle, black, small)",3-ponsel,"3-ponsel (gawai, kotak, hitam, kecil)",3-portable,"3-portable (gadget, carré, noir, petit)"
+40,C5B14QL8M1,object,gadget,gawai,gadget,tv,tv,télé,rectangle,kotak,carré,black,hitam,noir,medium,sedang,moyen,1,1-tv,"1-tv (gadget, rectangle, black, medium)",1-tv,"1-tv (gawai, kotak, hitam, sedang)",1-télé,"1-télé (gadget, carré, noir, moyen)"
+41,C5B14QL8M2,object,gadget,gawai,gadget,tv,tv,télé,rectangle,kotak,carré,black,hitam,noir,medium,sedang,moyen,2,2-tv,"2-tv (gadget, rectangle, black, medium)",2-tv,"2-tv (gawai, kotak, hitam, sedang)",2-télé,"2-télé (gadget, carré, noir, moyen)"
+42,C5B14QL8M3,object,gadget,gawai,gadget,tv,tv,télé,rectangle,kotak,carré,black,hitam,noir,medium,sedang,moyen,3,3-tv,"3-tv (gadget, rectangle, black, medium)",3-tv,"3-tv (gawai, kotak, hitam, sedang)",3-télé,"3-télé (gadget, carré, noir, moyen)"
+43,C5B15QL5M1,object,gadget,gawai,gadget,laptop,laptop,ordi,rectangle,kotak,carré,red,merah,rouge,medium,sedang,moyen,1,1-laptop,"1-laptop (gadget, rectangle, red, medium)",1-laptop,"1-laptop (gawai, kotak, merah, sedang)",1-ordi,"1-ordi (gadget, carré, rouge, moyen)"
+44,C5B15QL5M2,object,gadget,gawai,gadget,laptop,laptop,ordi,rectangle,kotak,carré,red,merah,rouge,medium,sedang,moyen,2,2-laptop,"2-laptop (gadget, rectangle, red, medium)",2-laptop,"2-laptop (gawai, kotak, merah, sedang)",2-ordi,"2-ordi (gadget, carré, rouge, moyen)"
+45,C5B15QL5M3,object,gadget,gawai,gadget,laptop,laptop,ordi,rectangle,kotak,carré,red,merah,rouge,medium,sedang,moyen,3,3-laptop,"3-laptop (gadget, rectangle, red, medium)",3-laptop,"3-laptop (gawai, kotak, merah, sedang)",3-ordi,"3-ordi (gadget, carré, rouge, moyen)"
+46,C6B16TL9S1,object,fashion,fesyen,mode,"swimming trunk","celana renang","maillot de bain",triangle,segitiga,triangle,blue,biru,bleu,small,kecil,petit,1,"1-swimming trunk","1-swimming trunk (fashion, triangle, blue, small)","1-celana renang","1-celana renang (fesyen, segitiga, biru, kecil)","1-maillot de bain","1-maillot de bain (mode, triangle, bleu, petit)"
+47,C6B16TL9S2,object,fashion,fesyen,mode,"swimming trunk","celana renang","maillot de bain",triangle,segitiga,triangle,blue,biru,bleu,small,kecil,petit,2,"2-swimming trunk","2-swimming trunk (fashion, triangle, blue, small)","2-celana renang","2-celana renang (fesyen, segitiga, biru, kecil)","2-maillot de bain","2-maillot de bain (mode, triangle, bleu, petit)"
+48,C6B16TL9S3,object,fashion,fesyen,mode,"swimming trunk","celana renang","maillot de bain",triangle,segitiga,triangle,blue,biru,bleu,small,kecil,petit,3,"3-swimming trunk","3-swimming trunk (fashion, triangle, blue, small)","3-celana renang","3-celana renang (fesyen, segitiga, biru, kecil)","3-maillot de bain","3-maillot de bain (mode, triangle, bleu, petit)"
+49,C6B17TL9L1,object,fashion,fesyen,mode,"cloth hanger","gantungan baju",cintre,triangle,segitiga,triangle,blue,biru,bleu,large,besar,grand,1,"1-cloth hanger","1-cloth hanger (fashion, triangle, blue, large)","1-gantungan baju","1-gantungan baju (fesyen, segitiga, biru, besar)",1-cintre,"1-cintre (mode, triangle, bleu, grand)"
+50,C6B17TL9L2,object,fashion,fesyen,mode,"cloth hanger","gantungan baju",cintre,triangle,segitiga,triangle,blue,biru,bleu,large,besar,grand,2,"2-cloth hanger","2-cloth hanger (fashion, triangle, blue, large)","2-gantungan baju","2-gantungan baju (fesyen, segitiga, biru, besar)",2-cintre,"2-cintre (mode, triangle, bleu, grand)"
+51,C6B17TL9L3,object,fashion,fesyen,mode,"cloth hanger","gantungan baju",cintre,triangle,segitiga,triangle,blue,biru,bleu,large,besar,grand,3,"3-cloth hanger","3-cloth hanger (fashion, triangle, blue, large)","3-gantungan baju","3-gantungan baju (fesyen, segitiga, biru, besar)",3-cintre,"3-cintre (mode, triangle, bleu, grand)"
+52,C6B18RL1M1,object,fashion,fesyen,mode,hat,topi,chapeau,round,bundar,rond,purple,ungu,violet,medium,sedang,moyen,1,1-hat,"1-hat (fashion, round, purple, medium)",1-topi,"1-topi (fesyen, bundar, ungu, sedang)",1-chapeau,"1-chapeau (mode, rond, violet, moyen)"
+53,C6B18RL1M2,object,fashion,fesyen,mode,hat,topi,chapeau,round,bundar,rond,purple,ungu,violet,medium,sedang,moyen,2,2-hat,"2-hat (fashion, round, purple, medium)",2-topi,"2-topi (fesyen, bundar, ungu, sedang)",2-chapeau,"2-chapeau (mode, rond, violet, moyen)"
+54,C6B18RL1M3,object,fashion,fesyen,mode,hat,topi,chapeau,round,bundar,rond,purple,ungu,violet,medium,sedang,moyen,3,3-hat,"3-hat (fashion, round, purple, medium)",3-topi,"3-topi (fesyen, bundar, ungu, sedang)",3-chapeau,"3-chapeau (mode, rond, violet, moyen)"
+55,C7B19QL7M1,object,furniture,mebel,meuble,table,meja,table,rectangle,kotak,carré,brown,cokelat,marron,medium,sedang,moyen,1,1-table,"1-table (furniture, rectangle, brown, medium)",1-meja,"1-meja (mebel, kotak, cokelat, sedang)",1-table,"1-table (meuble, carré, marron, moyen)"
+56,C7B19QL7M2,object,furniture,mebel,meuble,table,meja,table,rectangle,kotak,carré,brown,cokelat,marron,medium,sedang,moyen,2,2-table,"2-table (furniture, rectangle, brown, medium)",2-meja,"2-meja (mebel, kotak, cokelat, sedang)",2-table,"2-table (meuble, carré, marron, moyen)"
+57,C7B19QL7M3,object,furniture,mebel,meuble,table,meja,table,rectangle,kotak,carré,brown,cokelat,marron,medium,sedang,moyen,3,3-table,"3-table (furniture, rectangle, brown, medium)",3-meja,"3-meja (mebel, kotak, cokelat, sedang)",3-table,"3-table (meuble, carré, marron, moyen)"
+58,C7B20QL7L1,object,furniture,mebel,meuble,cupboard,lemari,armoire,rectangle,kotak,carré,brown,cokelat,marron,large,besar,grand,1,1-cupboard,"1-cupboard (furniture, rectangle, brown, large)",1-lemari,"1-lemari (mebel, kotak, cokelat, besar)",1-armoire,"1-armoire (meuble, carré, marron, grand)"
+59,C7B20QL7L2,object,furniture,mebel,meuble,cupboard,lemari,armoire,rectangle,kotak,carré,brown,cokelat,marron,large,besar,grand,2,2-cupboard,"2-cupboard (furniture, rectangle, brown, large)",2-lemari,"2-lemari (mebel, kotak, cokelat, besar)",2-armoire,"2-armoire (meuble, carré, marron, grand)"
+60,C7B20QL7L3,object,furniture,mebel,meuble,cupboard,lemari,armoire,rectangle,kotak,carré,brown,cokelat,marron,large,besar,grand,3,3-cupboard,"3-cupboard (furniture, rectangle, brown, large)",3-lemari,"3-lemari (mebel, kotak, cokelat, besar)",3-armoire,"3-armoire (meuble, carré, marron, grand)"
+61,C7B21QL4L1,object,furniture,mebel,meuble,bed,ranjang,lit,rectangle,kotak,carré,white,putih,blanc,large,besar,grand,1,1-bed,"1-bed (furniture, rectangle, white, large)",1-ranjang,"1-ranjang (mebel, kotak, putih, besar)",1-lit,"1-lit (meuble, carré, blanc, grand)"
+62,C7B21QL4L2,object,furniture,mebel,meuble,bed,ranjang,lit,rectangle,kotak,carré,white,putih,blanc,large,besar,grand,2,2-bed,"2-bed (furniture, rectangle, white, large)",2-ranjang,"2-ranjang (mebel, kotak, putih, besar)",2-lit,"2-lit (meuble, carré, blanc, grand)"
+63,C7B21QL4L3,object,furniture,mebel,meuble,bed,ranjang,lit,rectangle,kotak,carré,white,putih,blanc,large,besar,grand,3,3-bed,"3-bed (furniture, rectangle, white, large)",3-ranjang,"3-ranjang (mebel, kotak, putih, besar)",3-lit,"3-lit (meuble, carré, blanc, grand)"
+64,C8B22TL6S1,object,toy,mainan,jouet,"paper airplane","pesawat kertas","avion en papier",triangle,segitiga,triangle,yellow,kuning,jaune,small,kecil,petit,1,"1-paper airplane","1-paper airplane (toy, triangle, yellow, small)","1-pesawat kertas","1-pesawat kertas (mainan, segitiga, kuning, kecil)","1-avion en papier","1-avion en papier (jouet, triangle, jaune, petit)"
+65,C8B22TL6S2,object,toy,mainan,jouet,"paper airplane","pesawat kertas","avion en papier",triangle,segitiga,triangle,yellow,kuning,jaune,small,kecil,petit,2,"2-paper airplane","2-paper airplane (toy, triangle, yellow, small)","2-pesawat kertas","2-pesawat kertas (mainan, segitiga, kuning, kecil)","2-avion en papier","2-avion en papier (jouet, triangle, jaune, petit)"
+66,C8B22TL6S3,object,toy,mainan,jouet,"paper airplane","pesawat kertas","avion en papier",triangle,segitiga,triangle,yellow,kuning,jaune,small,kecil,petit,3,"3-paper airplane","3-paper airplane (toy, triangle, yellow, small)","3-pesawat kertas","3-pesawat kertas (mainan, segitiga, kuning, kecil)","3-avion en papier","3-avion en papier (jouet, triangle, jaune, petit)"
+67,C8B23QL5S1,object,toy,mainan,jouet,dice,dadu,dé,rectangle,kotak,carré,red,merah,rouge,small,kecil,petit,1,1-dice,"1-dice (toy, rectangle, red, small)",1-dadu,"1-dadu (mainan, kotak, merah, kecil)",1-dé,"1-dé (jouet, carré, rouge, petit)"
+68,C8B23QL5S2,object,toy,mainan,jouet,dice,dadu,dé,rectangle,kotak,carré,red,merah,rouge,small,kecil,petit,2,2-dice,"2-dice (toy, rectangle, red, small)",2-dadu,"2-dadu (mainan, kotak, merah, kecil)",2-dé,"2-dé (jouet, carré, rouge, petit)"
+69,C8B23QL5S3,object,toy,mainan,jouet,dice,dadu,dé,rectangle,kotak,carré,red,merah,rouge,small,kecil,petit,3,3-dice,"3-dice (toy, rectangle, red, small)",3-dadu,"3-dadu (mainan, kotak, merah, kecil)",3-dé,"3-dé (jouet, carré, rouge, petit)"
+70,C8B24QL3S1,object,toy,mainan,jouet,"alphabet block","balok huruf","cube avec lettre",rectangle,kotak,carré,green,hijau,vert,small,kecil,petit,1,"1-alphabet block","1-alphabet block (toy, rectangle, green, small)","1-balok huruf","1-balok huruf (mainan, kotak, hijau, kecil)","1-cube avec lettre","1-cube avec lettre (jouet, carré, vert, petit)"
+71,C8B24QL3S2,object,toy,mainan,jouet,"alphabet block","balok huruf","cube avec lettre",rectangle,kotak,carré,green,hijau,vert,small,kecil,petit,2,"2-alphabet block","2-alphabet block (toy, rectangle, green, small)","2-balok huruf","2-balok huruf (mainan, kotak, hijau, kecil)","2-cube avec lettre","2-cube avec lettre (jouet, carré, vert, petit)"
+72,C8B24QL3S3,object,toy,mainan,jouet,"alphabet block","balok huruf","cube avec lettre",rectangle,kotak,carré,green,hijau,vert,small,kecil,petit,3,"3-alphabet block","3-alphabet block (toy, rectangle, green, small)","3-balok huruf","3-balok huruf (mainan, kotak, hijau, kecil)","3-cube avec lettre","3-cube avec lettre (jouet, carré, vert, petit)"
+73,C9B25TL4M1,object,music,musik,musique,"the triangle",trikona,triangle,triangle,segitiga,triangle,white,putih,blanc,medium,sedang,moyen,1,"1-the triangle","1-the triangle (music, triangle, white, medium)",1-trikona,"1-trikona (musik, segitiga, putih, sedang)",1-triangle,"1-triangle (musique, triangle, blanc, moyen)"
+74,C9B25TL4M2,object,music,musik,musique,"the triangle",trikona,triangle,triangle,segitiga,triangle,white,putih,blanc,medium,sedang,moyen,2,"2-the triangle","2-the triangle (music, triangle, white, medium)",2-trikona,"2-trikona (musik, segitiga, putih, sedang)",2-triangle,"2-triangle (musique, triangle, blanc, moyen)"
+75,C9B25TL4M3,object,music,musik,musique,"the triangle",trikona,triangle,triangle,segitiga,triangle,white,putih,blanc,medium,sedang,moyen,3,"3-the triangle","3-the triangle (music, triangle, white, medium)",3-trikona,"3-trikona (musik, segitiga, putih, sedang)",3-triangle,"3-triangle (musique, triangle, blanc, moyen)"
+76,C9B26RL9M1,object,music,musik,musique,drum,drum,tambour,round,bundar,rond,blue,biru,bleu,medium,sedang,moyen,1,1-drum,"1-drum (music, round, blue, medium)",1-drum,"1-drum (musik, bundar, biru, sedang)",1-tambour,"1-tambour (musique, rond, bleu, moyen)"
+77,C9B26RL9M2,object,music,musik,musique,drum,drum,tambour,round,bundar,rond,blue,biru,bleu,medium,sedang,moyen,2,2-drum,"2-drum (music, round, blue, medium)",2-drum,"2-drum (musik, bundar, biru, sedang)",2-tambour,"2-tambour (musique, rond, bleu, moyen)"
+78,C9B26RL9M3,object,music,musik,musique,drum,drum,tambour,round,bundar,rond,blue,biru,bleu,medium,sedang,moyen,3,3-drum,"3-drum (music, round, blue, medium)",3-drum,"3-drum (musik, bundar, biru, sedang)",3-tambour,"3-tambour (musique, rond, bleu, moyen)"
+79,C9B27QL8L1,object,music,musik,musique,piano,piano,piano,rectangle,kotak,carré,black,hitam,noir,large,besar,grand,1,1-piano,"1-piano (music, rectangle, black, large)",1-piano,"1-piano (musik, kotak, hitam, besar)",1-piano,"1-piano (musique, carré, noir, grand)"
+80,C9B27QL8L2,object,music,musik,musique,piano,piano,piano,rectangle,kotak,carré,black,hitam,noir,large,besar,grand,2,2-piano,"2-piano (music, rectangle, black, large)",2-piano,"2-piano (musik, kotak, hitam, besar)",2-piano,"2-piano (musique, carré, noir, grand)"
+81,C9B27QL8L3,object,music,musik,musique,piano,piano,piano,rectangle,kotak,carré,black,hitam,noir,large,besar,grand,3,3-piano,"3-piano (music, rectangle, black, large)",3-piano,"3-piano (musik, kotak, hitam, besar)",3-piano,"3-piano (musique, carré, noir, grand)"
+82,W1,wildcard,,,,,,,,,,,,,,,,,"wildcard max 1","wildcard max 1","wildcard max 1","wildcard max 1","wildcard max 1","wildcard max 1"
+83,W2,wildcard,,,,,,,,,,,,,,,,,"wildcard max 2","wildcard max 2","wildcard max 2","wildcard max 2","wildcard max 2","wildcard max 2"
+84,W3,wildcard,,,,,,,,,,,,,,,,,"wildcard max 3","wildcard max 3","wildcard max 3","wildcard max 3","wildcard max 3","wildcard max 3"
+85,W4,wildcard,,,,,,,,,,,,,,,,,"wildcard max 4","wildcard max 4","wildcard max 4","wildcard max 4","wildcard max 4","wildcard max 4"
+86,W5,wildcard,,,,,,,,,,,,,,,,,"wildcard max 5","wildcard max 5","wildcard max 5","wildcard max 5","wildcard max 5","wildcard max 5"
+87,W6,wildcard,,,,,,,,,,,,,,,,,"wildcard max 6","wildcard max 6","wildcard max 6","wildcard max 6","wildcard max 6","wildcard max 6"
+88,W7,wildcard,,,,,,,,,,,,,,,,,"wildcard tux 1","wildcard tux 1","wildcard tux 1","wildcard tux 1","wildcard tux 1","wildcard tux 1"
+89,W8,wildcard,,,,,,,,,,,,,,,,,"wildcard tux 2","wildcard tux 2","wildcard tux 2","wildcard tux 2","wildcard tux 2","wildcard tux 2"
+90,W9,wildcard,,,,,,,,,,,,,,,,,"wildcard tux 3","wildcard tux 3","wildcard tux 3","wildcard tux 3","wildcard tux 3","wildcard tux 3"
+91,W10,wildcard,,,,,,,,,,,,,,,,,"wildcard tux 4","wildcard tux 4","wildcard tux 4","wildcard tux 4","wildcard tux 4","wildcard tux 4"
+92,W11,wildcard,,,,,,,,,,,,,,,,,"wildcard tux 5","wildcard tux 5","wildcard tux 5","wildcard tux 5","wildcard tux 5","wildcard tux 5"
+93,W12,wildcard,,,,,,,,,,,,,,,,,"wildcard tux 6","wildcard tux 6","wildcard tux 6","wildcard tux 6","wildcard tux 6","wildcard tux 6"
+94,WC1,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 1","wildcard+tux lyx 1","wildcard+tux lyx 1","wildcard+tux lyx 1","wildcard+tux lyx 1","wildcard+tux lyx 1"
+95,WC2,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 2","wildcard+tux lyx 2","wildcard+tux lyx 2","wildcard+tux lyx 2","wildcard+tux lyx 2","wildcard+tux lyx 2"
+96,WC3,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 3","wildcard+tux lyx 3","wildcard+tux lyx 3","wildcard+tux lyx 3","wildcard+tux lyx 3","wildcard+tux lyx 3"
+97,WC4,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 4","wildcard+tux lyx 4","wildcard+tux lyx 4","wildcard+tux lyx 4","wildcard+tux lyx 4","wildcard+tux lyx 4"
+98,WC5,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 5","wildcard+tux lyx 5","wildcard+tux lyx 5","wildcard+tux lyx 5","wildcard+tux lyx 5","wildcard+tux lyx 5"
+99,WC6,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 6","wildcard+tux lyx 6","wildcard+tux lyx 6","wildcard+tux lyx 6","wildcard+tux lyx 6","wildcard+tux lyx 6"

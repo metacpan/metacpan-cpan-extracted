@@ -60,6 +60,11 @@ struct sa_region {
     uint64_t    wakers_off;
     uint32_t    wakers_max;
     int         waker_idx;
+    /* Looked for the waker table and found none. Cached, because sa_wake_poke
+     * runs on every publish and a registry walk per record on a ring that
+     * simply has no wakers was a measurable share of the publish. wake_init
+     * clears it. */
+    int         wakers_probed;
 
     /* Whether the descriptors in the waker table are the ones THIS process
      * holds, answered once with an fstat and cached here rather than in the
@@ -157,7 +162,11 @@ static sa_reg *sa_find(sa_region *r, const char *name, size_t nlen) {
 
     for (i = 0; i < used; i++) {
         if (sa_at_load32_acq(&regs[i].state) != SA_R_LIVE) continue;
-        if (strncmp(regs[i].name, name, nlen) == 0 && regs[i].name[nlen] == '\0') {
+        /* memcmp, not strncmp: a name is `nlen` bytes and the reserved ones
+         * begin with a NUL, so strncmp called "\0leases" and "\0wakers" the
+         * same name and a region with a lease refused its wakers as a shape
+         * mismatch. */
+        if (memcmp(regs[i].name, name, nlen) == 0 && regs[i].name[nlen] == '\0') {
             /* AN ENTRY WHOSE EXTENT IS NOT IN THE MAPPING IS NOT AN ENTRY, so
              * it is skipped exactly as a non-live one is - not treated as a
              * fatal answer for the name.

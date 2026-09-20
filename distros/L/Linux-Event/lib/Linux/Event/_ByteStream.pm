@@ -463,8 +463,8 @@ sub transition_to ($self, $class, %opt) {
         ? $source_consumer->{operations_address} : 0;
     my $target_ops = $target_consumer
         ? $target_consumer->{operations_address} : 0;
-    croak 'transition_to(): cannot change native consumer provider'
-        if $source_ops != $target_ops;
+    croak 'transition_to(): cannot add or remove a native consumer provider'
+        if (!$source_ops) != (!$target_ops);
     _require_read_sink(
         $descriptor,
         $self->{_input_callback_overrides},
@@ -587,6 +587,8 @@ sub _validate_callback_modes ($method, $descriptor, $callback) {
             if $callback->{on_message};
         croak "$method(): on_messages requires a framed ordered-byte class"
             if $callback->{on_messages};
+        croak "$method(): on_data cannot be combined with a native consumer"
+            if $descriptor->{consumer} && $callback->{on_data};
         return;
     }
 
@@ -805,12 +807,12 @@ sub _watch_write_terminal_xs_cb ($state) {
 sub _require_read_sink ($descriptor, $instance, $readable, $raw_error,
     $framed_error) {
     return if !$readable;
+    return if $descriptor->{consumer};
     if (!$descriptor->{framer}) {
         croak $raw_error
             if !$instance->{on_data} && !$descriptor->{callbacks}{on_data};
         return;
     }
-    return if $descriptor->{consumer};
     if ($descriptor->{options}{message_batch_size}) {
         croak $framed_error
             if !$instance->{on_messages}
@@ -1469,7 +1471,8 @@ my @STAT_NAME = qw(
     input_compactions input_peak_bytes delimiter_searches frames_emitted
     message_callback_calls message_batch_calls message_batch_peak_messages
     message_batch_peak_bytes framing_error_count transition_count
-    consumer_message_calls consumer_pause_count consumer_resume_count
+    consumer_message_calls consumer_input_calls consumer_pause_count
+    consumer_resume_count
     consumer_event_calls consumer_flush_calls write_submit_calls
     write_ready_calls write_calls writev_calls bytes_written
     write_eagain_count write_eintr_count write_error_count output_limit_count

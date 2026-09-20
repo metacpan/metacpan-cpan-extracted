@@ -35,13 +35,17 @@ sub _setup_repo {
     my $init = _run_karr( $repo, 'init', '--name', 'CLI Board' );
     is( $init->{exit}, 0, 'karr init succeeds' ) or diag $init->{stderr};
 
+    # 'in-progress' is a require_claim column (ticket #270's own default
+    # board config), so its create needs a claim or the create is refused --
+    # a fixed, spoken-for name rather than `karr agent-name`, since nothing
+    # here reads it back.
     for my $spec (
-        [ 'Open work',    'todo' ],
-        [ 'In flight',    'in-progress' ],
-        [ 'Shipped thing', 'done' ],
+        [ 'Open work',    'todo',        [] ],
+        [ 'In flight',    'in-progress', [ '--claim', 'agent-t40' ] ],
+        [ 'Shipped thing', 'done',       [] ],
     ) {
-        my ( $title, $status ) = @$spec;
-        my $rv = _run_karr( $repo, 'create', '--title', $title, '--status', $status );
+        my ( $title, $status, $extra ) = @$spec;
+        my $rv = _run_karr( $repo, 'create', '--title', $title, '--status', $status, @$extra );
         is( $rv->{exit}, 0, "karr create '$title' --status $status succeeds" ) or diag $rv->{stderr};
     }
 

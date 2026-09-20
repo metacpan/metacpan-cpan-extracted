@@ -1,5 +1,9 @@
 Revision history for Punk
 
+0.52    2026-09-19
+        - FIX: the plural rule for a language tag was matched on the primary
+          subtag only, so pt-PT was given pt's rule.
+
 0.51    2026-09-17
         - ADDS: websocket routes work over HTTP/1.1 on TLS. 
         - FIX: csrf refused every websocket handshake over HTTP/2 and

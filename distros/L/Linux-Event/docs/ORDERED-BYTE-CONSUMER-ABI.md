@@ -1,9 +1,10 @@
 # Native ordered-byte consumer ABI
 
 The native consumer ABI is an extension boundary for distributions that need
-complete framed messages without entering Perl through `on_message` for every
-frame. It belongs to the private ordered-byte engine shared by
-`IO::Pipe`, `IO::TTY`, and `IO::Sock::Stream`.
+either complete framed messages or direct native raw input without surfacing
+each payload through a Perl callback first. It belongs to the private
+ordered-byte engine shared by `IO::Pipe`, `IO::TTY`, and
+`IO::Sock::Stream`.
 
 It is deliberately narrower than a transport, framer, Future, queue, or
 scheduler. The core ABI contains no coroutine semantics, Future class,
@@ -32,6 +33,20 @@ epoll
   -> provider message function
 ```
 
+A raw-input native consumer instead uses:
+
+```text
+epoll
+  -> native byte transport read
+  -> shared native input buffer
+  -> provider input function over borrowed (data, length)
+```
+
+The raw-input provider reports how many leading bytes it consumed. Linux::Event
+keeps any unconsumed tail in native storage and presents it again on a later
+provider call; no payload SV is required merely to cross the core/provider
+boundary.
+
 The provider owns one context per ordered-byte object. It can retain an
 outstanding receive, queue a result, or wake another abstraction; Linux::Event
 core does not need to know the higher-level policy.
@@ -53,10 +68,14 @@ Linux::Event::Framer->declare_native_consumer(
 );
 ```
 
-The target must inherit a Linux::Event ordered-byte leaf and also declare one
-built-in native framer. A native consumer is mutually exclusive with
-`on_message`, `on_messages`, and `message_batch_size`. Raw `on_data` classes
-cannot attach one.
+The target must inherit a Linux::Event ordered-byte leaf. A framed consumer
+declares one built-in native framer and is mutually exclusive with
+`on_message`, `on_messages`, and `message_batch_size`.
+
+A provider that sets `LES_CONSUMER_F_RAW_INPUT` instead attaches to an
+unframed ordered-byte class and must provide the appended `input` operation.
+Raw-input consumers are mutually exclusive with `on_data`,
+`read_batch_bytes`, and built-in native framing.
 
 The declaration follows normal Perl MRO inheritance and becomes immutable when
 the concrete class descriptor is built. The `provider` value is retained for
@@ -82,6 +101,7 @@ The provider operations table contains:
 |---|---|
 | `create` | Create one provider context for one host ordered-byte object. Return `NULL` on failure. |
 | `message` | Consume one borrowed framed-message `SV *` and return a consumer status. |
+| `input` | Optional appended ABI-v1 raw-input hook receiving a borrowed contiguous native byte window plus a consumed-byte output. |
 | `event` | Observe the first terminal input/lifecycle event. |
 | `destroy` | Release the provider context exactly once. |
 | `flush` | Optional end-of-drain notification for bounded provider batching. |
@@ -104,6 +124,37 @@ host object.
 
 The provider operations table must remain at a stable address for every cached
 class descriptor that declares it.
+
+## Optional v1 raw-input extension
+
+`input` is an optional field appended to `les_consumer_ops_v1_t`. A provider
+requests it with `LES_CONSUMER_F_RAW_INPUT`; the host then verifies
+`struct_size` reaches that field and that the function pointer is non-null.
+Providers using the original ABI-v1 table layout remain valid when they do not
+request raw input.
+
+The call receives a borrowed contiguous `(data, length)` view into the
+ordered-byte native input buffer. The provider writes the number of leading
+bytes consumed to `*consumed` and returns an ordinary consumer status.
+`consumed` may be zero to retain an incomplete protocol unit for a later read,
+but it must never exceed `length`.
+
+The borrowed pointer is valid only for the duration of the `input` call.
+Provider code must copy bytes it needs after return. The host retains
+unconsumed bytes natively, including across provider pause/resume, and can
+re-drive already-buffered input synchronously when resumed.
+
+An `input` call may invoke application code that closes the host reentrantly.
+Terminal teardown then owns and clears the native input buffer; the host
+validates the provider's returned status and consumed count but does not apply
+that count to the cleared buffer. A nonterminal provider-changing
+`transition_to()` is different: the source provider's consumed prefix is
+applied first, and the unconsumed native tail is then re-driven through the
+replacement provider.
+
+This extension is intended for protocol engines whose own native parser cannot
+be expressed as one of Linux::Event's built-in native framers. It generalizes
+the existing consumer boundary without making the core own protocol parsing.
 
 ## Optional v1 flush extension
 
@@ -143,6 +194,10 @@ The `message` argument is borrowed and valid for the duration of the provider
 call. A provider that retains it increments its Perl reference count and later
 releases that reference.
 
+The raw `input` byte window is likewise borrowed, but it is native memory
+rather than a Perl scalar. Its pointer becomes invalid when `input` returns;
+only the provider-reported consumed count crosses that boundary.
+
 Retaining the same scalar transfers no payload bytes and is the intended
 zero-copy-ish result path for a native receive integration.
 
@@ -152,7 +207,7 @@ lifetime retain has been released.
 
 ## Consumer statuses
 
-`message` and requested `flush` operations return one of:
+`message`, raw `input`, and requested `flush` operations return one of:
 
 | Status | Effect |
 |---|---|
@@ -263,22 +318,42 @@ terminal rather than reject it or attempt to resume input.
 
 ## Descriptor transitions
 
-`transition_to()` can change framing while retaining one provider context only
-when source and target cached descriptors use the same operations-table
-pointer.
+`transition_to()` can change framing while retaining one provider context when
+source and target cached descriptors use the same operations-table pointer.
 
-Adding, removing, or changing the native consumer provider on a live object is
-rejected. Unread bytes stay in native input storage and are interpreted by the
-target framer under the ordinary protocol-transition rules.
+It can also replace one native consumer provider with another. The target
+provider context is created before the live source context is disturbed. If
+target creation fails, the source descriptor, source provider context, and
+unread native input remain active.
 
+A provider-changing transition preserves unread bytes in the shared native input
+buffer. Source flush debt is settled before the source context is destroyed.
+If the transition is requested reentrantly from a provider callback, or while
+the source provider holds a host lifetime retain, destruction is deferred until
+that provider frame/retain is safely released. The target context is then
+installed and retained input is immediately re-driven through the target
+provider when its policy is not paused.
+
+During transition-time target `create`, host `pause`, `resume`, `retain`,
+and `release` are intentionally unavailable until the target context is
+activated. Once a
+provider-changing handoff is pending, those same mutating operations are also
+unavailable to the retiring source context; an already-held source retain may
+only be released so the handoff can reach its safe point. Stream identity and
+closed-state queries remain available. This prevents either side from driving
+buffered input while target descriptor state and source provider state overlap.
+
+Adding or removing a native consumer provider on a live object remains rejected;
+this handoff contract is specifically provider-to-provider replacement.
 The transition also must remain within the same public resource category.
 
 ## Fairness
 
-`read_budget_bytes` is a general ordered-byte class option. Zero preserves
-drain-until-EAGAIN behavior. A positive value bounds transport bytes read in
-one readiness callback; level-triggered readiness continues on a later Loop
-turn.
+`read_budget_bytes` is a general ordered-byte class option. The shared
+default is 65,536 bytes, which bounds one readiness callback so continuously
+replenished input yields back to the Loop. Explicit zero preserves the
+drain-until-EAGAIN opt-in. Level-triggered readiness continues on a later Loop
+turn when a positive budget is reached.
 
 This can be useful when a reentrant pull consumer continuously returns
 `CONTINUE`, but the option is not specific to async/await and also applies to

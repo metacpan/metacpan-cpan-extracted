@@ -9,11 +9,15 @@
 # the "use is_terminal_status() throughout" sweep in 85f6e9f widened it while
 # claiming only to centralize config knowledge.
 #
-# Two reported values move with that list -- the header total and the blocked
-# count/section -- and both are pinned here. The three that must NOT move
-# (active, overdue, and the In Progress section) re-test the terminal status
-# themselves, so they are pinned too: this file is only correct if it fails on
-# the old filter and on a fix that overshoots into them.
+# One reported value moves with that list -- the header total -- and it is
+# pinned here. The values that must NOT move re-test the terminal status
+# themselves: active, overdue, the In Progress section, and -- since ticket
+# #295 -- the blocked count and section too. A card that reached a terminal
+# status is no longer an active blocker (a done card is finished), even though
+# it still counts in the total; block_reason stays on the card as provenance.
+# All are pinned: this file is only correct if it fails both on the old
+# archived-only filter (which dropped `done` from the total) and on a change
+# that lets a terminal card back into the blocked count or section.
 
 use strict;
 use warnings;
@@ -71,7 +75,7 @@ sub run_context {
 #   #1 backlog                     counted, not active
 #   #2 in-progress, overdue        counted, active, overdue, In Progress
 #   #3 done, overdue, completed    counted, but none of the three above
-#   #4 done and blocked            counted and blocked
+#   #4 done and blocked            counted, but NOT an active blocker (#295)
 #   #5 archived and blocked        excluded from everything
 sub board {
   return [
@@ -97,19 +101,21 @@ subtest 'finished cards count in the header total' => sub {
     'and the archived one is in none of it' ) or diag("got:\n$out");
 };
 
-subtest 'a blocked card that reached done is still blocked' => sub {
+subtest 'a blocked card that reached done is not an active blocker (#295)' => sub {
   my $out = run_context( tasks => board() );
 
-  like( $out, qr/\| 1 blocked \|/,
-    'the blocked count sees it' ) or diag("got:\n$out");
-  like( $out, qr/^### Blocked$/m,
-    'the Blocked section is rendered' ) or diag("got:\n$out");
-  like( $out, qr/\*\*#4\*\* Finished but stuck/,
-    'with the done-and-blocked card in it' ) or diag("got:\n$out");
-  like( $out, qr/waiting on the release/,
-    'carrying its reason' ) or diag("got:\n$out");
+  like( $out, qr/\| 0 blocked \|/,
+    'the blocked count no longer sees the terminal card' ) or diag("got:\n$out");
+  unlike( $out, qr/^### Blocked$/m,
+    'and with nothing to show the Blocked section is not rendered' )
+    or diag("got:\n$out");
+  unlike( $out, qr/Finished but stuck/,
+    'the done-and-blocked card is not listed as blocked' ) or diag("got:\n$out");
+  unlike( $out, qr/waiting on the release/,
+    'nor is its reason surfaced -- it stays on the card for --status done' )
+    or diag("got:\n$out");
   unlike( $out, qr/nobody cares any more/,
-    'while an archived card stays blocked-and-gone' ) or diag("got:\n$out");
+    'and the archived card is gone as before' ) or diag("got:\n$out");
 };
 
 subtest 'the counts that test the terminal status themselves do not move' => sub {
@@ -159,14 +165,12 @@ subtest '--json reports the same four numbers' => sub {
   my $data = decode_json($out);
 
   is( $data->{summary}{total_tasks}, 4, 'total_tasks matches the header' );
-  is( $data->{summary}{blocked},     1, 'blocked matches the header' );
+  is( $data->{summary}{blocked},     0, 'blocked matches the header (#295)' );
   is( $data->{summary}{active},      1, 'active matches the header' );
   is( $data->{summary}{overdue},     1, 'overdue matches the header' );
 
   my ($blocked) = grep { $_->{name} eq 'blocked' } @{ $data->{sections} };
-  ok( $blocked, 'the blocked section is in --json too' ) or diag("got:\n$out");
-  is_deeply( [ map { $_->{id} } @{ $blocked->{items} } ], [ 4 ],
-    'holding the done-and-blocked card and nothing else' )
+  ok( !$blocked, 'no blocked section: the only blocked card is terminal (#295)' )
     or diag("got:\n$out");
 
   my ($overdue) = grep { $_->{name} eq 'overdue' } @{ $data->{sections} };
@@ -197,8 +201,9 @@ subtest 'the boundary is archived, not whatever this board calls finished' => su
   like( $out, qr/^\*\*2 tasks\*\*/m,
     'both shipped cards count, the archived one does not' )
     or diag("got:\n$out");
-  like( $out, qr/\*\*#2\*\* Delivered but stuck/,
-    'and a blocked shipped card is reported blocked' ) or diag("got:\n$out");
+  unlike( $out, qr/Delivered but stuck/,
+    'but a blocked card in a terminal status is not reported blocked (#295)' )
+    or diag("got:\n$out");
 };
 
 done_testing;

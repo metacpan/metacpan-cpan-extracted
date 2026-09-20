@@ -1,5 +1,12 @@
 Revision history for Database-Abstraction
 
+0.44	Sat Sep 19 09:28:17 PM EDT 2026
+	[ Enhancements ]
+	- SQLite backend: .sqlite and .sqlite3 are now accepted as file extensions
+	  alongside .sql.  The probe tries all three in order; the remote host probe
+	  list and the "Can't find a file" error message are updated accordingly.
+	  t/portability.t extended with 4 new assertions covering both new extensions.
+
 0.43	Fri Sep 18 02:25:48 PM EDT 2026
 	[ Enhancements ]
 	- TSV backend: tab-separated files ending .tsv are now detected and opened

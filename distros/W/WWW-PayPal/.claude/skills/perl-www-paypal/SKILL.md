@@ -1,6 +1,6 @@
 ---
 name: perl-www-paypal
-description: "WWW::PayPal — Perl client for the PayPal REST API. Covers one-off product purchases (Orders v2) and recurring monthly subscriptions (Billing Subscriptions v1), plus refunds."
+description: Use when talking to PayPal from Perl — WWW::PayPal for one-off purchases (Orders v2), recurring subscriptions (Billing v1), refunds, and receiving/verifying webhooks.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -8,7 +8,7 @@ model: sonnet
 
 # WWW::PayPal
 
-Perl client for the PayPal REST API. Use when the project imports `WWW::PayPal`, calls `$pp->orders`, `$pp->subscriptions`, `$pp->payments`, or when migrating from `Business::PayPal::API::ExpressCheckout`.
+Perl client for the PayPal REST API. Use when the project imports `WWW::PayPal`, calls `$pp->orders`, `$pp->subscriptions`, `$pp->payments`, `$pp->webhooks`, or when migrating from `Business::PayPal::API::ExpressCheckout`.
 
 ## Client setup
 
@@ -174,6 +174,82 @@ my $txs = $pp->subscriptions->transactions($sub_id,
 # $txs->{transactions} is the raw ArrayRef from PayPal
 ```
 
+## Receiving webhooks
+
+Registration and signature verification for incoming webhook events — order/capture
+and subscription-lifecycle notifications delivered asynchronously, outside the
+browser return-URL flow above. The domain-level event table and the full receiver
+design rationale live in skill `paypal-integration`; this section is the library's
+call surface.
+
+### Registering an endpoint (once per environment)
+
+```perl
+use WWW::PayPal::WebhookEvents qw( :all );   # optional named constants; bare strings work too
+
+my $webhook = $pp->webhooks->create(
+    url         => 'https://example.com/paypal/webhook',
+    event_types => [
+        PAYMENT_CAPTURE_COMPLETED,
+        BILLING_SUBSCRIPTION_ACTIVATED,
+        PAYMENT_SALE_COMPLETED,
+        'CUSTOMER.DISPUTE.CREATED',          # bare strings and constants mix freely
+    ],
+);
+# store $webhook->id per environment — sandbox id != live id
+
+$pp->webhooks->list;              # ArrayRef of WWW::PayPal::Webhook
+$pp->webhooks->get($webhook_id);
+$pp->webhooks->delete($webhook_id);
+
+$webhook->url;
+$webhook->event_names;            # ('PAYMENT.CAPTURE.COMPLETED', ...)
+```
+
+### Verifying an incoming event
+
+```perl
+my $ok = $pp->webhooks->verify(
+    webhook_id        => $config->{webhook_id},   # from config — never hard-coded, never defaulted
+    raw_body          => $raw_bytes,               # untouched bytes, captured before any parsing
+    transmission_id   => $req->header('Paypal-Transmission-Id'),
+    transmission_time => $req->header('Paypal-Transmission-Time'),
+    transmission_sig  => $req->header('Paypal-Transmission-Sig'),
+    cert_url          => $req->header('Paypal-Cert-Url'),
+    auth_algo         => $req->header('Paypal-Auth-Algo'),
+);
+return $c->render(status => 400, text => 'bad signature') unless $ok;
+
+my $event = decode_json($raw_bytes);
+# dedupe on $event->{id}, then answer 2xx and process asynchronously
+```
+
+Critical rules — get any of these wrong and the receiver is either insecure or broken:
+
+- **Always `verify()` before acting on an event, full stop.** An unverified receiver
+  is a "grant everyone premium" endpoint — the payload alone proves nothing.
+- **Capture the raw request body before anything parses it**, and pass those exact
+  bytes as `raw_body`. In Mojolicious that's `$c->req->body`; in a Plack app, read
+  `psgi.input` in full before any body-parser middleware touches it. A framework
+  that decodes and re-serialises JSON changes the bytes, and re-serialised JSON
+  never verifies — `verify` also croaks outright if `raw_body` is a reference.
+- **`verify` returns a real boolean; `0` means reject, not retry.** `1` only on
+  PayPal's `verification_status => SUCCESS`; a forged or tampered event comes back
+  as ordinary HTTP 200 with `FAILURE`, which this method turns into `0` rather than
+  a truthy string — never treat a non-empty status string as success. Only a
+  transport error or a 4xx/5xx from PayPal itself croaks.
+- **Dedupe on the event's own `id`** before doing any work. PayPal redelivers an
+  event, with backoff, for up to ~3 days until you answer 2xx.
+- **Answer 2xx fast; process asynchronously.** Slow handlers cause retries, retries
+  cause duplicate processing — and event order is not guaranteed, so handlers must
+  be commutative or re-fetch the object rather than assume what came before.
+- **`webhook_id` is per environment.** Sandbox and live webhooks have different
+  ids; keep it in config next to `client_id`/`secret` — never as a constant, and
+  never defaulted.
+- **`PAYMENT_CAPTURE_DECLINED` (v2) and `PAYMENT_CAPTURE_DENIED` (v1) are not
+  aliases.** Orders v2 captures (the flow above) emit `DECLINED`; only legacy
+  Payments v1 emits `DENIED`. Subscribe to the one matching your capture path.
+
 ## Migration from Business::PayPal::API::ExpressCheckout
 
 | Legacy NVP                                   | WWW::PayPal                                    |
@@ -204,7 +280,7 @@ If you find yourself reaching into `->data` repeatedly for the same field across
 
 ## Gotchas
 
-- **`return_url` is a browser redirect, not a webhook.** No callback HTTPS/ingress needed for local testing. Webhooks (`BILLING.SUBSCRIPTION.*`, `PAYMENT.SALE.COMPLETED`) are a separate optional feature not covered by WWW::PayPal directly.
+- **`return_url` is a browser redirect, not a webhook.** No callback HTTPS/ingress needed for local testing. Webhook events (`BILLING.SUBSCRIPTION.*`, `PAYMENT.SALE.COMPLETED`, ...) arrive separately and asynchronously — see "Receiving webhooks" above.
 - **PayPal amounts are decimal strings** (`"9.99"`), not floats. Pass strings, not numbers, or you risk precision surprises.
 - **Products and Plans are permanent.** Cache their IDs; don't recreate them on each app restart.
 - **Freshly created plans start in status `CREATED`** — activate them before creating subscriptions.

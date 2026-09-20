@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.001.1';
 
 use Carp qw(croak carp);
 use POSIX qw(floor);
@@ -163,7 +163,7 @@ Music::NWC2MusicXML::MusicXML - Convert an internal Score object to a MusicXML 4
 
 =head1 VERSION
 
-0.001.0
+0.001.1
 
 =head1 SYNOPSIS
 

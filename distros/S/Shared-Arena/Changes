@@ -1,5 +1,20 @@
 Revision history for Shared::Arena
 
+0.11	2026-09-19
+        - Add wake_init, wake_take, wake_fd and wake_drained to the C ABI (4).
+        - Add map_incr_ttl to the C ABI and ttl => to Map->incr: a fixed window in one call.
+        - Add rate_counts to the C ABI.
+        - Add map_incr_at to the C ABI (5): map_incr_ttl on the caller's clock.
+        - A counter under the stripe lock is a load and a store, not an atomic add.
+        - Publish SA_READ_*, SA_MAP_STORE_*, SA_CACHE_*, SA_ERR_* and SA_TYPE_* in sa_abi.h.
+        - Add Shared::Arena::_region_ptr.
+        - A drain or claim at a hole never sleeps; Cursor->drain takes wait => 0.
+        - A publish walks only the wakers that have pipes, and no registry when there are none.
+        - The peer row is written with stores on publish, not read-modify-writes.
+        - Deadlines read CLOCK_REALTIME_COARSE where it exists.
+        - FIXES a region with a lease refusing wakers: the registry compared
+          reserved names only up to their leading NUL.
+
 0.10	2026-09-19
         - FIXES six files failing at once on the FreeBSD 5.14 and 5.16 smokers:
           Makefile.PL's pthread_atfork probe only linked, and FreeBSD's libc

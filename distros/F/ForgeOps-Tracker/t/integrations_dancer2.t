@@ -8,7 +8,11 @@ use HTTP::Request::Common qw(GET);
 use ForgeOps::Tracker;
 
 my @reported;
-local *ForgeOps::Tracker::report = sub { push @reported, [@_]; };
+my @reported_trails;
+local *ForgeOps::Tracker::report = sub {
+    push @reported, [@_];
+    push @reported_trails, [ map { {%$_} } @ForgeOps::Tracker::current_breadcrumbs ];
+};
 
 package TestApp {
     use Dancer2;
@@ -35,6 +39,16 @@ test_psgi $app, sub {
         like($reported[0][0], qr/route exploded/);
         is($reported[0][1]{path}, '/boom');
         is($reported[0][1]{method}, 'GET');
+    };
+
+    subtest 'the failing request\'s own controller breadcrumb is in the trail when it is reported' => sub {
+        @reported_trails = ();
+        $cb->(GET '/boom');
+
+        my ($crumb) = @{ $reported_trails[0] };
+        is($crumb->{category}, 'controller');
+        is($crumb->{message}, 'GET /boom');
+        is($crumb->{level}, 'error');
     };
 
     subtest 'does not report a route that completes normally' => sub {

@@ -21,7 +21,7 @@ typedef struct _HistEdit {
   SV *promptSv;     /* perl prompt subref */
   SV *rpromptSv;    /* perl rprompt subref */
   SV *getcSv;       /* perl EL_GETCFN subref */
-  char *prompt; 
+  char *prompt;
   char *rprompt;
 } HistEdit;
 
@@ -128,7 +128,7 @@ unsigned char pwrapper (EditLine * e, int k, unsigned int id)
       SPAGAIN;
 
       if(count != 1) {
-	croak ("Term::EditLine: internal error\n");
+    croak ("Term::EditLine: internal error\n");
       }
 
       ret = POPi;
@@ -213,13 +213,13 @@ int te_getc_fun (EditLine *e, char *c)
   if (he->getcSv != NULL) {
 
     dSP;
-    
+
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
     XPUSHs(he->el_ref);
     PUTBACK;
-  
+
     count = perl_call_sv(he->getcSv,G_SCALAR);
 
     SPAGAIN;
@@ -247,7 +247,7 @@ INCLUDE: const-xs.inc
 
 void
 el_beep(he)
-	HistEdit * 	he
+    HistEdit *  he
 CODE:
 {
   el_beep(he->el);
@@ -255,8 +255,8 @@ CODE:
 
 void
 el_deletestr(he, count)
-	HistEdit * 	he
-	int		count
+    HistEdit *  he
+    int     count
 CODE:
 {
   el_deletestr(he->el,count);
@@ -264,7 +264,7 @@ CODE:
 
 char *
 el_getc(he)
-	HistEdit * 	he
+    HistEdit *  he
 PREINIT:
   char ch[2];
   char c;
@@ -279,13 +279,22 @@ CODE:
 
 void
 el_gets(he)
-	HistEdit* he
+    HistEdit* he
 PREINIT:
   int count;
   const char *line;
 PPCODE:
 {
   line = el_gets(he->el,&count);
+
+  /* el_gets() may have invoked a bound key function, a prompt
+   * function, or a custom getc function, any of which can call
+   * back into Perl. If that callback grows the Perl stack (for
+   * example by pushing many elements onto an array), the stack
+   * gets reallocated out from under the SP captured by this
+   * function's implicit dSP, leaving it pointing at freed memory.
+   * Refresh it before pushing anything. */
+  SPAGAIN;
 
   dXSTARG;
   if (line != NULL)
@@ -298,9 +307,9 @@ HistEdit *
 el_new(pkg,name,fin=stdin,fout=stdout,ferr=stderr)
      char *     pkg
      char *     name
-     FILE *	fin
-     FILE *	fout
-     FILE *	ferr
+     FILE * fin
+     FILE * fout
+     FILE * ferr
 PREINIT:
    HistEvent ev;
    SV *el;
@@ -308,10 +317,10 @@ CODE:
 {
 
   RETVAL = malloc(sizeof(HistEdit));
-  
+
   RETVAL->el = el_init(name, fin, fout, ferr);
   RETVAL->el_ref = newSVsv(sv_newmortal());
-  sv_setref_pv(RETVAL->el_ref,"Term::EditLine",(void*)RETVAL);  
+  sv_setref_pv(RETVAL->el_ref,"Term::EditLine",(void*)RETVAL);
 
   RETVAL->promptSv = NULL;
   RETVAL->prompt = NULL;
@@ -337,7 +346,7 @@ SV *el;
 CODE:
 {
   if(he->prompt != NULL)
-    free(he->prompt);  
+    free(he->prompt);
   if(he->rprompt != NULL)
     free(he->rprompt);
   if(he->promptSv != NULL) {
@@ -580,8 +589,8 @@ OUTPUT:
 
 int
 el_insertstr(he, str)
-	HistEdit * 	he
-	char *		str
+    HistEdit *  he
+    char *      str
 CODE:
 {
   RETVAL = el_insertstr(he->el,str);
@@ -589,7 +598,7 @@ CODE:
 
 void
 el_line(he)
-     HistEdit * 	he
+     HistEdit *     he
 PREINIT:
      const LineInfo *le;
 PPCODE:
@@ -613,7 +622,7 @@ CODE:
   l->lastchar = buffer+strlen(buffer);
   if(buffer+cursor > l->lastchar)
     l->cursor = l->lastchar;
-  else 
+  else
     l->cursor = buffer+cursor;
 }
 
@@ -629,14 +638,14 @@ PPCODE:
   if (items > 1) {
 
     argv = malloc(sizeof(char*)*items);
-    
+
     alen = items - 1;
 
     for(i=1;i<items;i++) {
       if(SvPOK(ST(i))) {
-	argv[i-1] = SvPV(ST(i),len);
+    argv[i-1] = SvPV(ST(i),len);
       } else {
-	argv[i-1] = NULL;
+    argv[i-1] = NULL;
       }
     }
 
@@ -653,8 +662,8 @@ PPCODE:
 
 void
 el_push(he, arg1)
-	HistEdit * he
-	char *	arg1
+    HistEdit * he
+    char *  arg1
 CODE:
 {
   el_push(he->el,arg1);
@@ -662,7 +671,7 @@ CODE:
 
 void
 el_reset(he)
-	HistEdit * 	he
+    HistEdit *  he
 CODE:
 {
   el_reset(he->el);
@@ -670,7 +679,7 @@ CODE:
 
 void
 el_resize(he)
-	HistEdit * 	he
+    HistEdit *  he
 CODE:
 {
   el_resize(he->el);
@@ -682,7 +691,7 @@ int el_set_prompt(he, func)
      SV * func
 CODE:
 {
-  if(strcmp(sv_reftype(SvRV(func),0),"CODE") == 0) {
+  if(SvROK(func) && strcmp(sv_reftype(SvRV(func),0),"CODE") == 0) {
     he->promptSv = newSVsv(func);
     RETVAL = el_set(he->el,EL_PROMPT,promptfunc);
   } else {
@@ -703,7 +712,7 @@ int el_set_rprompt(he, func)
      SV * func
 CODE:
 {
-  if(strcmp(sv_reftype(SvRV(func),0),"CODE") == 0) {
+  if(SvROK(func) && strcmp(sv_reftype(SvRV(func),0),"CODE") == 0) {
     he->rpromptSv = newSVsv(func);
     RETVAL = el_set(he->el,EL_RPROMPT,rpromptfunc);
   } else {
@@ -715,7 +724,7 @@ CODE:
       he->rprompt = malloc(SvLEN(func)+1);
       strcpy(he->rprompt,SvPV(func,PL_na));
     }
-    RETVAL = el_set(he->el,EL_PROMPT,rpromptfunc);
+    RETVAL = el_set(he->el,EL_RPROMPT,rpromptfunc);
   }
 }
 
@@ -727,7 +736,7 @@ PPCODE:
     XPUSHs(sv_2mortal(he->promptSv));
   else if(he->prompt != NULL)
     XPUSHs(sv_2mortal(newSVpv(he->prompt,0)));
-  else 
+  else
     XSRETURN_UNDEF;
 }
 
@@ -739,7 +748,7 @@ PPCODE:
     XPUSHs(sv_2mortal(he->rpromptSv));
   else if(he->rprompt != NULL)
     XPUSHs(sv_2mortal(newSVpv(he->rprompt,0)));
-  else 
+  else
     XSRETURN_UNDEF;
 }
 
@@ -798,9 +807,9 @@ CODE:
 
     for(i=1;i<items;i++) {
       if(SvPOK(ST(i))) {
-	argv[i] = SvPV(ST(i),PL_na);
+    argv[i] = SvPV(ST(i),PL_na);
       } else {
-	argv[i] = NULL;
+    argv[i] = NULL;
       }
     }
 
@@ -843,7 +852,7 @@ int el_set_getc_fun (he,sub)
      SV *sub
 CODE:
 {
-  if (SvTYPE(SvRV(sub)) == SVt_PVCV) {
+  if (SvROK(sub) && SvTYPE(SvRV(sub)) == SVt_PVCV) {
     he->getcSv = newSVsv(sub);
     RETVAL = el_set(he->el,EL_GETCFN,te_getc_fun);
   } else {
@@ -862,8 +871,8 @@ CODE:
 
 int
 el_source(he, arg1)
-	HistEdit * 	he
-	const char *	arg1
+    HistEdit *  he
+    const char *    arg1
 CODE:
 {
   el_source(he->el,arg1);

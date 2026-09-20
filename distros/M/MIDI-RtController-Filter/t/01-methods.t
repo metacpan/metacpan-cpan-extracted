@@ -18,4 +18,21 @@ subtest defaults => sub {
     ok !$obj->verbose, 'verbose';
 };
 
+subtest assignment => sub {
+    my $obj = new_ok 'MIDI::RtController::Filter';
+    my $expect = 1;
+    $obj->channel($expect);
+    is $obj->channel, $expect, 'channel';
+    $obj->value($expect);
+    is $obj->value, $expect, 'value';
+    $obj->trigger($expect);
+    is $obj->trigger, $expect, 'trigger';
+    $obj->running($expect);
+    is $obj->running, $expect, 'running';
+    $obj->halt($expect);
+    is $obj->halt, $expect, 'halt';
+    $obj->continue($expect);
+    is $obj->continue, $expect, 'continue';
+};
+
 done_testing();

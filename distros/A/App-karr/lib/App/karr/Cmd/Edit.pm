@@ -1,7 +1,7 @@
 # ABSTRACT: Modify an existing task
 
 package App::karr::Cmd::Edit;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -11,6 +11,7 @@ use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
 use App::karr::Role::TaskMutation;
 use App::karr::Role::DependencyArgs;
+use App::karr::Role::ClaimDefault;
 use App::karr::Task;
 use App::karr::Config;
 use App::karr::CrossBoard;
@@ -23,7 +24,8 @@ use Time::Piece;
 # split the two; before that the set-time helpers arrived through TaskMutation
 # by accident of them sharing a role.
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output',
-     'App::karr::Role::TaskMutation', 'App::karr::Role::DependencyArgs';
+     'App::karr::Role::TaskMutation', 'App::karr::Role::DependencyArgs',
+     'App::karr::Role::ClaimDefault';
 
 
 option title => (
@@ -92,6 +94,23 @@ option due => (
   doc => 'New due date',
 );
 
+option clear_due => (
+  is => 'ro',
+  doc => 'Clear due date',
+);
+
+option class => (
+  is => 'ro',
+  format => 's',
+  doc => 'New class of service',
+);
+
+option estimate => (
+  is => 'ro',
+  format => 's',
+  doc => 'New time estimate',
+);
+
 option body => (
   is => 'ro',
   format => 's',
@@ -140,7 +159,7 @@ option unblock => (
 );
 
 # Every option above that can change a card, in the order they are declared:
-# the ones that carry a value, and the two that are flags. --json and --quiet
+# the ones that carry a value, and the three that are flags. --json and --quiet
 # are deliberately absent -- they decide how the result is printed, not what it
 # is, so `karr edit 5 --json` asks for a change just as little as `karr edit 5`
 # does. (--compact stood here too until #254, when this command stopped taking
@@ -153,9 +172,10 @@ option unblock => (
 # something to do.
 my @FIELD_OPTIONS = qw(
   title status priority assignee add_tag remove_tag add_depends_on
-  remove_depends_on add_needs remove_needs due body append_body claim block
+  remove_depends_on add_needs remove_needs due class estimate body append_body
+  claim block
 );
-my @FIELD_FLAGS = qw( release unblock );
+my @FIELD_FLAGS = qw( clear_due release unblock );
 
 sub _has_field_change {
   my ($self) = @_;
@@ -253,8 +273,17 @@ sub execute {
       if (defined $self->body && length $self->body)
       && (defined $self->append_body && length $self->append_body);
 
+  # The same pair rule, one field over: --due sets a date --clear-due is about
+  # to remove, so naming both halves contradicts the caller (ticket #273).
+  # length, not truth, on the value-carrying half, exactly as above: an empty
+  # --due names no date and sets nothing in the callback, so it is not a change
+  # for --clear-due to contradict (tickets #78, #153).
+  $self->usage_error('cannot use --due and --clear-due together')
+      if (defined $self->due && length $self->due) && $self->clear_due;
+
   my $config = App::karr::Config->from_merged( $self->store->effective_config );
   $config->validate_priority( $self->priority ) if defined $self->priority;
+  $config->validate_class( $self->class )       if defined $self->class;
   App::karr::Config->validate_due( $self->due ) if defined $self->due;
 
   # Same rule for the dependency flags (ticket #124): a malformed or unknown
@@ -303,12 +332,17 @@ sub execute {
     my $task = $self->update_task_guarded($id, sub {
       my ($task) = @_;
 
+      # The effective claim: --claim when given, else KARR_CLAIM (ADR 0005).
+      # --claim/--release mutual exclusion above stays on the explicit flag, so
+      # an env-default claim never turns a plain --release into a usage error.
+      my $claim = $self->resolved_claim;
+
       # --release is the one edit that may act on somebody else's claim: it
       # exists precisely to break a claim a crashed agent left behind, and it
       # is karr's only way out of one before the timeout. Everything else has
       # to own the claim, or find it expired. Same carve-out as kanban-md's
       # validateEditClaim (cmd/edit.go).
-      $self->check_claim($task, $self->claim) unless $self->release;
+      $self->check_claim($task, $claim) unless $self->release;
 
       # Clear the claim BEFORE the status change so the require_claim guard
       # in apply_status_change sees the post-release state: --release sets up
@@ -323,13 +357,17 @@ sub execute {
       }
 
       # length, not truth: a literal "0" is a meaningful title, status,
-      # priority, assignee, due, body, append, tag or block reason (ticket
-      # #153, extending ticket #78's rule from --body to its siblings).
+      # priority, assignee, due, class, estimate, body, append, tag or block
+      # reason (ticket #153, extending ticket #78's rule from --body to its
+      # siblings).
       $task->title($self->title)       if defined $self->title && length $self->title;
-      $self->apply_status_change($task, $self->status, $self->claim) if defined $self->status && length $self->status;
+      $self->apply_status_change($task, $self->status, $claim) if defined $self->status && length $self->status;
       $task->priority($self->priority) if defined $self->priority && length $self->priority;
       $task->assignee($self->assignee) if defined $self->assignee && length $self->assignee;
       $task->due($self->due)           if defined $self->due && length $self->due;
+      $task->clear_due                 if $self->clear_due;
+      $task->class($self->class)       if defined $self->class && length $self->class;
+      $task->estimate($self->estimate) if defined $self->estimate && length $self->estimate;
       $task->body($self->body)         if defined $self->body && length $self->body;
 
       # length, not truth: appending to a body of "0" must not replace it
@@ -371,8 +409,8 @@ sub execute {
       App::karr::CrossBoard->add_needs( $task, $add_needs )       if $add_needs;
       App::karr::CrossBoard->remove_needs( $task, $remove_needs ) if $remove_needs;
 
-      if (defined $self->claim && length $self->claim) {
-        $task->claimed_by($self->claim);
+      if (defined $claim && length $claim) {
+        $task->claimed_by($claim);
         $task->claimed_at(gmtime->datetime . 'Z');
       }
 
@@ -420,7 +458,7 @@ App::karr::Cmd::Edit - Modify an existing task
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 
@@ -431,6 +469,8 @@ version 0.600
     karr edit 5 -a "Waiting for review"
     karr edit 5 -a "Handed the API question upstream" --timestamp
     karr edit 5 --claim agent-fox --block "waiting on API"
+    karr edit 5 --class expedite --estimate 3d --due 2026-09-15
+    karr edit 5 --clear-due
 
 =head1 DESCRIPTION
 
@@ -451,9 +491,12 @@ matching the write path, which discards such a value rather than storing it.
 
 =item * Metadata updates
 
-C<--title>, C<--status>, C<--priority>, C<--assignee>, and C<--due> replace
-existing values. C<--status> is the same status change L<App::karr::Cmd::Move>
-performs and obeys the same rules, C<require_claim> included.
+C<--title>, C<--status>, C<--priority>, C<--assignee>, C<--class>,
+C<--estimate>, and C<--due> replace existing values. C<--clear-due> removes
+the due date, and is rejected together with C<--due> as a usage error (exit 2)
+before any task is read. C<--status> is the same status change
+L<App::karr::Cmd::Move> performs and obeys the same rules, C<require_claim>
+included.
 
 =item * Claim ownership
 

@@ -1,5 +1,5 @@
 package Net::Async::WebSearch::Provider::Yandex;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 # ABSTRACT: Yandex Search API (XML) provider
 use strict;
 use warnings;
@@ -112,7 +112,7 @@ Net::Async::WebSearch::Provider::Yandex - Yandex Search API (XML) provider
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -50,14 +50,32 @@ PROTOTYPES: DISABLE
 # struct_encode is the name; encode is the same XSUB under the short name for
 # a caller who writes Struct::Codec::encode in full. Only the long names are
 # ever exported, so neither collides with Encode's in a caller's namespace.
+#
+# Options follow the value as pairs. The only one is strip_pointers, and an
+# unknown name is an error rather than a silently ignored typo.
 SV *
-struct_encode(value)
+struct_encode(value, ...)
         SV *value
     ALIAS:
         encode = 1
+    PREINIT:
+        U32 flags = 0;
+        I32 i;
     CODE:
         PERL_UNUSED_VAR(ix);
-        RETVAL = sc_encode(aTHX_ value);
+        if (!(items & 1)) croak("Struct::Codec: options come in pairs");
+        for (i = 1; i < items; i += 2) {
+            STRLEN n;
+            const char *k = SvPV(ST(i), n);
+            if (n == 14 && memEQ(k, "strip_pointers", 14)) {
+                if (SvTRUE(ST(i + 1))) flags |= SC_STRIP_POINTERS;
+                else                   flags &= ~SC_STRIP_POINTERS;
+            }
+            else {
+                croak("Struct::Codec: unknown option '%" SVf "'", SVfARG(ST(i)));
+            }
+        }
+        RETVAL = sc_encode_flags(aTHX_ value, flags);
     OUTPUT:
         RETVAL
 

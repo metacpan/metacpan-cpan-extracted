@@ -178,7 +178,7 @@ SKIP: {
 # the worker that renders the status page. The drain now forwards the DELTA to
 # the shared arena, so the number the page shows is the sum across workers.
 SKIP: {
-    skip 'no hm_bus in this build', 4
+    skip 'no Shared::Arena ring in this build', 4
         unless eval { Punk::Observe::Live::have_bus() };
 
     require Punk::Observe::Live;

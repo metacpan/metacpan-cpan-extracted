@@ -1,7 +1,7 @@
 # ABSTRACT: Activity log writer for karr board operations
 
 package App::karr::ActivityLog;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use App::karr::Encoding qw( json_encode json_decode );
 use POSIX qw( strftime );
@@ -29,6 +29,16 @@ has role => (
 # written grows linearly. 8 KiB is roughly 80 karr entries, so a board gains
 # about one extra ref per 80 mutating commands.
 use constant SEGMENT_MAX_BYTES => 8192;
+
+# The one source for the action vocabulary of the board activity log. Every
+# entry is written either by a command's log_action (the command's own name,
+# hyphenated -- create, move, edit, delete, archive, handoff, needs) or by the
+# explicit 'pick' of C<karr pick> (Role::BoardAccess/append_log), so this is
+# exactly the set that can appear in refs/karr/log/*. C<karr log --action>
+# validates against it and prints it in the usage error, instead of keeping a
+# second hand-maintained list that drifts from what the commands actually write
+# (ticket #278).
+use constant ACTIONS => qw( archive create delete edit handoff move needs pick );
 
 
 has segment_max_bytes => (
@@ -310,7 +320,7 @@ App::karr::ActivityLog - Activity log writer for karr board operations
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 

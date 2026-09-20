@@ -1,7 +1,7 @@
 {
    "abstract" : "Perl interface to AWS S3 API",
    "author" : [
-      "Rob Lauer <rlauer6@comcat.net>"
+      "Rob Lauer <rclauer@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
@@ -34,77 +34,84 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::Accessor::Fast" : "0",
-            "Digest::HMAC_SHA1" : "0",
-            "Digest::MD5::File" : "0",
-            "HTTP::Date" : "0",
-            "IO::Scalar" : "0",
-            "JSON::PP" : "0",
-            "LWP" : "0",
+            "Class::Accessor::Fast" : "0.51",
+            "Digest::CRC" : "0.24",
+            "Digest::HMAC_SHA1" : "1.05",
+            "Digest::MD5::File" : "0.08",
+            "HTTP::Date" : "6.08",
+            "IO::Scalar" : "2.113",
             "LWP::Protocol::https" : "0",
-            "LWP::UserAgent::Determined" : "0",
-            "List::Util" : "1.5",
-            "Net::Amazon::Signature::V4" : "0",
-            "Net::HTTP" : "0",
-            "Pod::Markdown" : "0",
-            "Readonly" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0",
-            "XML::Simple" : "0",
-            "perl" : "5.010000"
+            "LWP::UserAgent::Determined" : "1.07",
+            "Net::Amazon::Signature::V4" : "0.22",
+            "Readonly" : "2.05",
+            "URI" : "5.37",
+            "URI::Escape" : "5.37",
+            "XML::Simple" : "2.25",
+            "perl" : "5.010"
+         },
+         "suggests" : {
+            "Crypt::Blowfish" : "2.14",
+            "Crypt::CBC" : "3.07"
          }
       },
       "test" : {
          "requires" : {
+            "Carp::Always" : "0.16",
             "Digest::MD5::File" : "0.08",
-            "Test::More" : "1.302190",
-            "Test::Output" : "1.033"
+            "HTTP::Headers" : "7.04",
+            "HTTP::Response" : "7.04",
+            "Readonly" : "2.05",
+            "Test::Output" : "1.036",
+            "XML::Simple" : "2.25"
          }
       }
    },
    "provides" : {
       "Amazon::S3" : {
          "file" : "lib/Amazon/S3.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.1.0"
       },
       "Amazon::S3::Bucket" : {
          "file" : "lib/Amazon/S3/Bucket.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.1.0"
       },
       "Amazon::S3::BucketV2" : {
          "file" : "lib/Amazon/S3/BucketV2.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.1.0"
       },
       "Amazon::S3::Constants" : {
          "file" : "lib/Amazon/S3/Constants.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.1.0"
       },
       "Amazon::S3::Logger" : {
          "file" : "lib/Amazon/S3/Logger.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.1.0"
       },
       "Amazon::S3::Signature::V4" : {
          "file" : "lib/Amazon/S3/Signature/V4.pm",
-         "version" : "0"
+         "version" : "v2.1.0"
       },
       "Amazon::S3::Util" : {
          "file" : "lib/Amazon/S3/Util.pm",
+         "version" : "v2.1.0"
+      },
+      "Digest::CRC64NVME" : {
+         "file" : "lib/Digest/CRC64NVME.pm",
          "version" : "0"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "rlauer6@comcast.net",
-         "web" : "http://github.com/rlauer6/perl-amazon-s3/issues"
+         "mailto" : "rclauer@gmail.com",
+         "web" : "https://github.com/rlauer6/Amazon-S3/issues"
       },
-      "homepage" : "http://github.com/rlauer6/perl-amazon-s3",
+      "homepage" : "https://github.com/rlauer6/Amazon-S3",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/rlauer6/perl-amazon-s3.git",
-         "web" : "http://github.com/rlauer6/perl-amazon-s3"
+         "web" : "https://github.com/rlauer6/Amazon-S3"
       }
    },
-   "version" : "v2.0.2",
+   "version" : "v2.1.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

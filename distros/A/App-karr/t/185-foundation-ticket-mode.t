@@ -6,6 +6,7 @@ use Time::Piece;
 
 use App::karr::Foundation;
 use App::karr::Foundation::Picker;
+use App::karr::AgentName qw( agent_name );
 use App::karr::Git;
 use App::karr::BoardStore;
 use App::karr::Task;
@@ -188,6 +189,29 @@ subtest 'the ticket travels in $PROMPT and $KARR_TASK' => sub {
   is $out, '[]', 'KARR_TASK is empty outside ticket mode';
   my ( undef, $out2 ) = $f->_run_command( $rdir, {}, 'printf "[%s]" "$KARR_TASK"', 7 );
   is $out2, '[7]', 'and carries the id in it';
+};
+
+# Ticket #281 / ADR 0005: the runner exports KARR_CLAIM into the child, so
+# every nested `karr` the agent spawns defaults its claim to the same name.
+# The value is `karr agent-name --unique` for this checkout -- the checkout's
+# own directory name plus a per-run suffix, minted once and stable for the run.
+subtest 'the claim name travels in $KARR_CLAIM' => sub {
+  my $f = App::karr::Foundation->new( _config_data => {} );
+
+  my $rdir = tempdir( CLEANUP => 1 );
+  my $base = agent_name( dir => "$rdir" );   # same checkout, no suffix
+  ok length $base, 'the checkout has a claim-safe base name';
+
+  my ( undef, $out ) = $f->_run_command( $rdir, {}, 'printf "[%s]" "$KARR_CLAIM"' );
+  like $out, qr/\A\[\Q$base\E-[a-z0-9]{3}\]\z/,
+    'KARR_CLAIM is the checkout name with a per-run suffix';
+
+  # Minted once per child and inherited by every nested call: the two reads a
+  # single run makes see one value, not a fresh one each time.
+  my ( undef, $twice ) =
+    $f->_run_command( $rdir, {}, 'printf "[%s][%s]" "$KARR_CLAIM" "$KARR_CLAIM"' );
+  like $twice, qr/\A\[(\Q$base\E-[a-z0-9]{3})\]\[\g{1}\]\z/,
+    'the same value within one run, not re-minted per reference';
 };
 
 # ---------------------------------------------------------------------------

@@ -177,7 +177,16 @@ subtest 'tree with boarded and board-less repos, default depth' => sub {
   unlike $out, qr/^loop\s/m,            'loop is not a board entry';
   unlike $out, qr/No board:.*\bloop\b/, 'loop is not in the no-board summary either';
 
-  unlike $out, qr/\binner\b/, 'a repo under an unreadable parent directory is never found';
+  # chmod 0000 on $locked_dir keeps 'inner' unreachable for a normal user, but
+  # root ignores directory permission bits entirely (CI's dzil test runs as
+  # root inside the perl:<ver> container), so under root 'inner' IS found and
+  # this assertion would fail on an environment difference, not a real bug.
+  SKIP: {
+    skip 'root bypasses directory permission bits, so inner is reachable', 1
+      if $> == 0;
+
+    unlike $out, qr/\binner\b/, 'a repo under an unreadable parent directory is never found';
+  }
 };
 
 subtest 'depth limiting: --depth widened finds delta, narrowed drops charlie' => sub {
@@ -214,9 +223,17 @@ subtest '--json' => sub {
   # unreadable 'locked' directory are both out of reach -- see the discovery
   # subtest above -- so only alpha, bravo, custom and charlie are found, and
   # of those only bravo has no board.
-  is $doc->{summary}{repos},  4, 'summary counts all 4 repos found at this depth';
-  is $doc->{summary}{boards}, 3, 'summary counts 3 of them as boarded (alpha, custom, charlie)';
-  is $doc->{summary}{open},   4, 'summary open total: 3 (alpha) + 1 (custom) + 0 (charlie)';
+  # As above: root ignores the chmod 0000 on 'locked', so the 'inner' board
+  # (1 backlog task) is found too, shifting these three counts by exactly one
+  # repo/board/open task. Same environment difference, not a real bug.
+  SKIP: {
+    skip 'root bypasses directory permission bits, so inner inflates these counts', 3
+      if $> == 0;
+
+    is $doc->{summary}{repos},  4, 'summary counts all 4 repos found at this depth';
+    is $doc->{summary}{boards}, 3, 'summary counts 3 of them as boarded (alpha, custom, charlie)';
+    is $doc->{summary}{open},   4, 'summary open total: 3 (alpha) + 1 (custom) + 0 (charlie)';
+  }
 
   my ($alpha) = grep { $_->{name} eq 'alpha' } @{ $doc->{boards} };
   ok $alpha, 'alpha present in boards[]';

@@ -13,10 +13,12 @@ use Encode qw( encode_utf8 decode FB_CROAK LEAVE_SRC );
 
 use App::karr::Cmd::Skill;
 
-# The bundled skill file is real Markdown prose and legitimately contains
+# The bundled SKILL.md is real Markdown prose and legitimately contains
 # non-ASCII (em dashes, ellipses, umlauts). _skill_content hands it back
 # decoded (slurp_utf8), so exactly one encode must happen between there and the
-# terminal.
+# terminal. Since #285 the skill ships as a directory
+# (kanban-issues-karr-cli/SKILL.md plus references/), and `karr skill show`
+# still prints its SKILL.md alone; the share dirs below hold that layout.
 #
 # Ticket #33 put that encode inside the command, because the rest of the CLI
 # handed raw octets to print and a UTF-8 layer on STDOUT would have
@@ -33,6 +35,15 @@ my $SKILL_TEXT = "# karr \x{2014} skill\n\nBl\x{00f6}cke \x{2026} \x{00fc}ml\x{0
 
 my $ROOT = abs_path('.');
 my $BIN  = "$ROOT/bin/karr";
+
+# A share dir whose kanban-issues-karr-cli/SKILL.md holds $SKILL_TEXT.
+sub share_dir_with_skill {
+    my $dir  = path( tempdir( CLEANUP => 1 ) );
+    my $file = $dir->child('kanban-issues-karr-cli/SKILL.md');
+    $file->parent->mkpath;
+    $file->spew_utf8($SKILL_TEXT);
+    return "$dir";
+}
 
 sub run_skill_show {
     my ($share_dir) = @_;
@@ -60,8 +71,7 @@ sub run_skill_show {
 }
 
 subtest 'skill show prints UTF-8 bytes without a wide character warning' => sub {
-    my $dir = tempdir( CLEANUP => 1 );
-    path($dir)->child('claude-skill.md')->spew_utf8($SKILL_TEXT);
+    my $dir = share_dir_with_skill();
 
     my ( $out, $warnings ) = run_skill_show($dir);
 
@@ -87,8 +97,7 @@ subtest '_skill_content stays decoded so check/update comparisons keep working' 
     # Guards the tempting wrong fix of slurping raw: that would silence the
     # warning but make _check/_update compare bytes against slurp_utf8 text
     # (always "outdated") and make _install spew_utf8 a double-encoded file.
-    my $dir = tempdir( CLEANUP => 1 );
-    path($dir)->child('claude-skill.md')->spew_utf8($SKILL_TEXT);
+    my $dir = share_dir_with_skill();
 
     require File::ShareDir;
     no warnings 'redefine';
@@ -101,8 +110,8 @@ subtest '_skill_content stays decoded so check/update comparisons keep working' 
 };
 
 subtest 'karr skill show through the real CLI emits the bundled file verbatim' => sub {
-    my $bundled = path($ROOT)->child('share/claude-skill.md');
-    plan skip_all => "no share/claude-skill.md in this checkout" unless $bundled->exists;
+    my $bundled = path($ROOT)->child('share/kanban-issues-karr-cli/SKILL.md');
+    plan skip_all => "no share/kanban-issues-karr-cli/SKILL.md in this checkout" unless $bundled->exists;
 
     my $raw = do {
         open my $fh, '<:raw', "$bundled" or die "open $bundled: $!";
@@ -117,14 +126,14 @@ subtest 'karr skill show through the real CLI emits the bundled file verbatim' =
     # falls back to the checkout, so on a machine with App::karr installed this
     # compared `karr skill show`'s output against a file the child never read.
     # It passed only for as long as the installed copy happened to be
-    # byte-identical to the checkout -- i.e. it broke on any edit to
-    # share/claude-skill.md, reporting it as an encoding bug. dist_dir resolves
+    # byte-identical to the checkout -- i.e. it broke on any edit to the
+    # shipped SKILL.md, reporting it as an encoding bug. dist_dir resolves
     # auto/share/dist/<dist> against @INC in order, so a -I in front of the rest
     # pins it deterministically.
     my $share_lib = path( tempdir( CLEANUP => 1 ) );
-    my $share_dir = $share_lib->child(qw( auto share dist App-karr ));
+    my $share_dir = $share_lib->child(qw( auto share dist App-karr kanban-issues-karr-cli ));
     $share_dir->mkpath;
-    $bundled->copy( $share_dir->child('claude-skill.md') );
+    $bundled->copy( $share_dir->child('SKILL.md') );
 
     my $err_fh = gensym;
     my $pid = open3( my $in, my $out_fh, $err_fh,

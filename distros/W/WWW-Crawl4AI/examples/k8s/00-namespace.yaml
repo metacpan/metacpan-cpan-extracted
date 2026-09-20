@@ -1,0 +1,9 @@
+# Dedicated namespace for the WWW::Crawl4AI live-test stack. Everything else in
+# examples/k8s/ lives here, so teardown is a single `kubectl delete namespace
+# crawl4ai-test`.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: crawl4ai-test
+  labels:
+    app.kubernetes.io/part-of: www-crawl4ai

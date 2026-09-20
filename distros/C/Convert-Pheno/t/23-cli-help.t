@@ -85,6 +85,22 @@ is(
 
 $request = build_cli_request(
     argv => [
+        '-iomop', 't/omop2bff/in/mimic_specimen',
+        '-obff',  'individuals.json',
+    ],
+    usage_error => sub { die @_ },
+    schema_file => 'share/schema/mapping-v2.json',
+    out_dir     => $tmpdir,
+    color       => 1,
+);
+is_deeply(
+    $request->{data}{in_files},
+    ['t/omop2bff/in/mimic_specimen'],
+    'CLI parser accepts an OMOP table directory',
+);
+
+$request = build_cli_request(
+    argv => [
         '-ipxf',     't/pxf2bff/in/pxf.json',
         '-obff',
         '--entities', 'biosamples',
@@ -199,6 +215,35 @@ is(
     'datasetjson2omop',
     'CLI parser accepts Dataset-JSON to OMOP output'
 );
+
+for my $case (
+    [ i2b2 => 't/i2b22bff/in', '-ii2b2', 'i2b22bff' ],
+    [ pcornet => 't/pcornet2bff/in', '-ipcornet', 'pcornet2bff' ],
+    [ sentinel => 't/sentinel2bff/in', '-isentinel', 'sentinel2bff' ],
+) {
+    my ( $source, $directory, $flag, $method ) = @{$case};
+    $request = build_cli_request(
+        argv => [ $flag, $directory, '-obff', 'individuals.json' ],
+        usage_error => sub { die @_ },
+        schema_file => 'share/schema/mapping-v2.json',
+        out_dir     => $tmpdir,
+        color       => 1,
+    );
+    is( $request->{data}{method}, $method, "CLI parser accepts compact $source input" );
+    is_deeply( $request->{data}{in_files}, [$directory], "CLI parser retains the $source table package" );
+}
+
+$request = build_cli_request(
+    argv => [
+        '-i', 'PCORnet-CDM', 't/pcornet2bff/in',
+        '-o', 'pxf', 'phenopackets.json',
+    ],
+    usage_error => sub { die @_ },
+    schema_file => 'share/schema/mapping-v2.json',
+    out_dir     => $tmpdir,
+    color       => 1,
+);
+is( $request->{data}{method}, 'pcornet2pxf', 'CLI parser normalizes the generic PCORnet CDM name' );
 
 my @datasetxml_files = map { "t/datasetxml2bff/in/$_.xml" } qw(dm mh lb ts);
 $request = build_cli_request(
@@ -527,6 +572,11 @@ my @help_contract = (
     [ like => qr/--define-xml <file>/, 'CLI help documents the required Define-XML metadata' ],
     [ like => qr/-ifhir <files\.\.\.>/, 'CLI help documents FHIR Bundle input' ],
     [ like => qr/FHIR R4 JSON Bundles, including mCODE/, 'CLI help documents mCODE as a FHIR profile' ],
+    [ like => qr/-ii2b2 <paths\.\.\.>/, 'CLI help documents i2b2 table input' ],
+    [ like => qr/-ipcornet <paths\.\.\.>/, 'CLI help documents PCORnet CDM table input' ],
+    [ like => qr/-isentinel <paths\.\.\.>/, 'CLI help documents Sentinel CDM table input' ],
+    [ like => qr/OMOP-CDM CSV\/TSV files, one directory or ZIP package/s, 'CLI help documents OMOP table packages' ],
+    [ like => qr/exported tables rather than live databases/, 'CLI help states the clinical CDM input boundary' ],
     [ like => qr/\[ALIVE\|DECEASED\|UNKNOWN_STATUS\]/, 'CLI help documents supported vitalStatus fallback values' ],
     [ like => qr/Supported:\s+individuals,\s+biosamples,\s+datasets,\s+cohorts/s, 'CLI help documents the supported BFF entities' ],
     [ like => qr/biosamples are emitted from -ipxf, cBioPortal samples,\s+FHIR Specimen, OMOP SPECIMEN, or mapping rules/s, 'CLI help documents all first-class biosample sources' ],

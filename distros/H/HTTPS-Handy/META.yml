@@ -1,0 +1,59 @@
+--- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+name: HTTPS-Handy
+version: 1.01
+abstract: A tiny HTTPS/1.0 server, TLS included, in pure Perl
+author:
+  - ina <ina.cpan@gmail.com>
+license: perl
+generated_by: pmake.bat version 0.51
+configure_requires:
+  ExtUtils::MakeMaker: 5.4302
+requires:
+  Carp: 0
+  IO::Socket: 0
+  POSIX: 0
+  perl: 5.00503
+build_requires:
+  Config: 0
+  Cwd: 0
+  Exporter: 0
+  File::Spec: 0
+  FindBin: 1.42
+minimum_perl_version: 5.00503
+no_index:
+  directory:
+    - t
+    - eg
+provides:
+  HTTPS::Handy:
+    file: lib/HTTPS/Handy.pm
+    version: 1.01
+  HTTPS::Handy::BigInt:
+    file: lib/HTTPS/Handy.pm
+    version: 1.01
+  HTTPS::Handy::ChaCha:
+    file: lib/HTTPS/Handy.pm
+    version: 1.01
+  HTTPS::Handy::Crypt:
+    file: lib/HTTPS/Handy.pm
+    version: 1.01
+  HTTPS::Handy::EC:
+    file: lib/HTTPS/Handy.pm
+    version: 1.01
+  HTTPS::Handy::Input:
+    file: lib/HTTPS/Handy.pm
+    version: 1.01
+  HTTPS::Handy::RSA:
+    file: lib/HTTPS/Handy.pm
+    version: 1.01
+  HTTPS::Handy::TLS:
+    file: lib/HTTPS/Handy.pm
+    version: 1.01
+  HTTPS::Handy::X509:
+    file: lib/HTTPS/Handy.pm
+    version: 1.01
+resources:
+  license: http://dev.perl.org/licenses/

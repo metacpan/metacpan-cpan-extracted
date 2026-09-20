@@ -18,12 +18,12 @@ sub new {
 }
 
 sub report {
-    my ($self, $error, $context) = @_;
+    my ($self, $error, $context, $user, $breadcrumbs) = @_;
 
     eval {
         return unless $self->{configuration}->is_enabled;
 
-        my $payload = $self->{event_builder}->build($error, $context);
+        my $payload = $self->{event_builder}->build($error, $context, $user, $breadcrumbs);
         $self->{delivery_queue}->push($payload);
         1;
     } or do {

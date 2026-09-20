@@ -1,3 +1,5 @@
+bin/run-test
+bin/run-test.in
 ChangeLog
 lib/Amazon/S3.pm
 lib/Amazon/S3/Bucket.pm
@@ -6,16 +8,24 @@ lib/Amazon/S3/Constants.pm
 lib/Amazon/S3/Logger.pm
 lib/Amazon/S3/Signature/V4.pm
 lib/Amazon/S3/Util.pm
+lib/Digest/CRC64NVME.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README-TESTING.md
 README.md
-S3TestUtils.pm
+share/README.md
+t/00-amazon-s3.t
 t/01-api.t
 t/02-logger.t
 t/03-region.t
 t/04-list-buckets.t
 t/05-multipart-upload.t
 t/06-list-multipart-uploads.t
+t/07-crc64nvme.t
+t/08-checksums.t
+t/09-bucket-v2.t
+t/10-endpoint-url.t
+t/lib/S3TestUtils.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

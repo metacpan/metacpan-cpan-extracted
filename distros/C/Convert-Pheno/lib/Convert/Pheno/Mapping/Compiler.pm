@@ -13,11 +13,28 @@ use YAML::PP;
 our @EXPORT_OK = qw(
   assert_mapping_version
   compile_mapping
+  is_metadata_profile
   load_mapping_document
 );
 
 use constant MAPPING_VERSION       => 2;
 use constant BEACON_SCHEMA_VERSION => '2.0.0';
+
+my %METADATA_PROFILE = map { $_ => 1 } qw(
+  fhir
+  i2b2
+  omop
+  openehr
+  pcornet
+  pxf
+  sentinel
+);
+
+sub is_metadata_profile {
+    my ($profile) = @_;
+    return 0 unless defined $profile && !ref($profile);
+    return $METADATA_PROFILE{$profile} ? 1 : 0;
+}
 
 sub load_mapping_document {
     my ($filepath) = @_;
@@ -85,17 +102,20 @@ sub compile_mapping {
     _validate_target($mapping);
     _validate_source_profile( $mapping, $record_profile );
 
-    # SDTM structure is built in; its compact mapping profile compiles only
-    # terminology selectors. Tabular profiles retain the full entity mapping.
-    my $compiled = $record_profile eq 'sdtm'
-      ? _compile_sdtm_mapping($mapping)
-      : _compile_authoring_mapping($mapping);
+    # Built-in source mappings accept metadata overlays without exposing their
+    # structural conversion rules. SDTM compiles terminology selectors, while
+    # project-specific tabular profiles retain the full authoring mapping.
+    my $compiled =
+        $record_profile eq 'bff'         ? dclone($mapping)
+      : $record_profile eq 'sdtm'        ? _compile_sdtm_mapping($mapping)
+      : is_metadata_profile($record_profile) ? dclone($mapping)
+      :                                      _compile_authoring_mapping($mapping);
     $compiled->{_compiled} = {
         sourceProfile => $profile,
         recordProfile => $record_profile,
     };
 
-    if ( exists $arg{headers} ) {
+    if ( exists $arg{headers} && !is_metadata_profile($record_profile) ) {
         if ( $record_profile eq 'sdtm' ) {
             _validate_sdtm_source_fields( $compiled, $arg{headers}, $profile );
         }
@@ -396,6 +416,13 @@ sub _clone {
 sub _validate_target {
     my ($mapping) = @_;
     my $target = $mapping->{target};
+    if ( ( $mapping->{source}{profile} // q{} ) eq 'bff' ) {
+        die "BFF terminology mappings require <target.model: omop> and <target.schemaVersion: 5.4>.\n"
+          unless ref($target) eq 'HASH'
+          && ( $target->{model} // q{} ) eq 'omop'
+          && ( $target->{schemaVersion} // q{} ) eq '5.4';
+        return 1;
+    }
     die "The mapping must declare <target.model: beacon> and <target.schemaVersion: 2.0.0>.\n"
       unless ref($target) eq 'HASH';
 

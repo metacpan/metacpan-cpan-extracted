@@ -1,5 +1,32 @@
 Revision history for App::papersway
 
+3.001     2026-09-19 20:15:40+01:00 Europe/London
+    - Don't send "focus tiling" if there are no tiling containers.
+    - Send "focus tiling" before running commands that might need it.
+    - Restructure to reduce ignoring events we shouldn't.
+    - Stop losing containers off to the sides when a workspace empties.
+    - When ensuring that hiding containers doesn't change which workspace
+      'workspace back_and_forth' will switch to,
+      + stop inadvertedly emptying workspaces; and
+      + make sure we don't just send "workspace N" twice and thus do nothing.
+
+    - 'fresh-workspace': Fix recording last focused workspace in one branch.
+    - 'bury-column', 'bury-workspace': When fixing 'workspace back_and_forth',
+      don't change the workspace shown on another output, and fix a case where
+      we wouldn't actually fix 'workspace back_and_forth'.
+    - 'scroll left|right': Make scrolling actually a no-op when the only
+      column to be pulled on is wide.
+    - i3 compat: Fix unfloating previously hidden containers on startup.
+
+    - Ask swaybar/i3bar not to send us SIGSTOP and SIGCONT.
+    - Explicitly check for EOF on i3status output pipe.
+    - Quit the i3status output filtering loop on EOF or parse error.
+
+    - Fix some other issues with the normalisation algorithm.
+    - Add some other checks.
+    - Fix handling exceptions when AnyEvent's libev backend is in use.
+    - Other internal changes.
+
 3.000     2026-04-25 16:20:14+01:00 Europe/London
     - Rename arguments to 'workspace' and 'move-to-workspace' commands:
       'prev'->'prev_on_output', 'next'->'next_on_output'.

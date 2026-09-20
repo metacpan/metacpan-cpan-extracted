@@ -38,7 +38,7 @@ les_store_optional_cb(SV *cb, const char *name)
 int
 les_descriptor_input_kind(const les_descriptor_t *descriptor)
 {
-    if (!descriptor)
+    if (!descriptor || descriptor->consumer_ops)
         return LES_CALLBACK_NONE;
     if (descriptor->read_mode == LES_READ_DELIVER)
         return LES_CALLBACK_DATA;
@@ -89,6 +89,7 @@ les_state_stats_snapshot(pTHX_ les_xsstate_t *st)
     LES_PUSH_STAT(framing_error_count);
     LES_PUSH_STAT(transition_count);
     LES_PUSH_STAT(consumer_message_calls);
+    LES_PUSH_STAT(consumer_input_calls);
     LES_PUSH_STAT(consumer_pause_count);
     LES_PUSH_STAT(consumer_resume_count);
     LES_PUSH_STAT(consumer_event_calls);

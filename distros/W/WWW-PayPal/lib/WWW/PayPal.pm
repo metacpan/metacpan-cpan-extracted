@@ -9,9 +9,10 @@ use WWW::PayPal::API::Payments;
 use WWW::PayPal::API::Products;
 use WWW::PayPal::API::Plans;
 use WWW::PayPal::API::Subscriptions;
+use WWW::PayPal::API::Webhooks;
 use namespace::clean;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 
 has client_id => (
@@ -71,6 +72,12 @@ has plans => (
 has subscriptions => (
     is      => 'lazy',
     builder => sub { WWW::PayPal::API::Subscriptions->new(client => $_[0]) },
+);
+
+
+has webhooks => (
+    is      => 'lazy',
+    builder => sub { WWW::PayPal::API::Webhooks->new(client => $_[0]) },
 );
 
 
@@ -149,7 +156,7 @@ WWW::PayPal - Perl client for the PayPal REST API
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -263,6 +270,11 @@ recurring-cycle definitions that subscriptions reference).
 
 Returns a L<WWW::PayPal::API::Subscriptions> controller for creating and
 managing per-user recurring subscriptions.
+
+=head2 webhooks
+
+Returns a L<WWW::PayPal::API::Webhooks> controller for registering webhook
+endpoints and verifying the signature of incoming webhook events.
 
 =head2 js_sdk_url
 

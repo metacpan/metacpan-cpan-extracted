@@ -52,6 +52,13 @@ use Linux::Event::Loop;
 }
 
 {
+    package T::OptionsUnlimited;
+    use parent 'Linux::Event::IO::Sock::Stream';
+    sub stream_tuning ($class) { return read_budget_bytes => 0 }
+    sub on_data ($stream, $bytes) { }
+}
+
+{
     package T::OptionsNegativeBudget;
     use parent 'Linux::Event::IO::Sock::Stream';
     sub stream_tuning ($class) { return read_budget_bytes => -1 }
@@ -74,11 +81,17 @@ is_deeply(
     {
         read_size => 8, high_watermark => 1234,
         low_watermark => 123, max_pending_bytes => 0, max_buffer => 4096,
-        read_budget_bytes => 0, read_batch_bytes => 0,
+        read_budget_bytes => 65_536, read_batch_bytes => 0,
         message_batch_size => 0,
         idle_timeout => 0, read_timeout => 0, write_timeout => 0,
     },
     'hashref class options are validated and cached',
+);
+is(
+    Linux::Event::_ByteStream::Descriptor::for_class('T::OptionsUnlimited')
+        ->{options}{read_budget_bytes},
+    0,
+    'explicit zero read budget preserves drain-until-EAGAIN opt-in',
 );
 $first->close;
 $second->close;

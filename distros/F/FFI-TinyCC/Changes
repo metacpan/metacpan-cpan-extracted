@@ -1,5 +1,9 @@
 Revision history for FFI-TinyCC
 
+0.31      2026-09-19 03:58:36 -0600
+  - Skip DLL relink/reload tests on systems where the bundled tcc is
+    known to be incompatible with newer glibc/binutils
+
 0.30      2020-07-07 10:22:25 -0600
   - Use $Config{cpprun} instead of $Config{cpp} for C pre-processor
     (gh#11, gh#12)

@@ -21,6 +21,11 @@ use Linux::Event::IO::Sock::Stream;
 
     sub on_data ($stream, $bytes) { return }
 
+    sub close ($stream) {
+        $stream->data->{public_close}++;
+        return $stream;
+    }
+
     sub on_close ($stream) {
         $stream->data->{closed}++;
         return;
@@ -44,7 +49,7 @@ use Linux::Event::IO::Sock::Stream;
 }
 
 my $loop = Linux::Event::Loop->new;
-my $state = { ready => 0, closed => 0 };
+my $state = { ready => 0, closed => 0, public_close => 0 };
 my $listener = T::FailingAcceptListener->new(
     loop => $loop,
     host => '127.0.0.1',
@@ -73,6 +78,8 @@ is($listener->last_error, $state->{error},
     'Listener retains the callback error');
 ok($state->{stream}->is_closed,
     'on_accept exception closes the constructed Stream');
+is($state->{public_close}, 0,
+    'on_accept failure bypasses subclass close override');
 is($state->{closed}, 1, 'failed accepted Stream closes exactly once');
 is($state->{ready}, 0, 'failed on_accept suppresses Stream on_ready');
 is($listener->state, 'listening',
@@ -85,6 +92,10 @@ close $client;
     package T::BrokenAttachStream;
     use parent 'Linux::Event::IO::Sock::Stream';
     sub on_data ($stream, $bytes) { }
+    sub close ($stream) {
+        $stream->data->{setup_public_close}++;
+        return $stream;
+    }
     sub on_close ($stream) { $stream->data->{setup_closed}++ }
     sub _attach_to_loop ($stream, $loop) {
         die "synthetic accepted Stream attachment failure\n";
@@ -101,7 +112,7 @@ close $client;
 }
 
 my $setup_loop = Linux::Event::Loop->new;
-my $setup_state = { setup_closed => 0 };
+my $setup_state = { setup_closed => 0, setup_public_close => 0 };
 my $setup_listener = T::SetupFailureListener->new(
     loop => $setup_loop,
     host => '127.0.0.1',
@@ -121,6 +132,8 @@ is($setup_state->{setup_error}->type, 'setup',
     'accepted Stream attachment failure is typed');
 is($setup_state->{setup_error}->operation, 'accepted_socket',
     'accepted setup error identifies Stream attachment');
+is($setup_state->{setup_public_close}, 0,
+    'accepted Stream setup failure bypasses subclass close override');
 is($setup_state->{setup_closed}, 1,
     'accepted Stream attachment failure closes the Stream exactly once');
 is($setup_listener->state, 'listening',

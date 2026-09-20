@@ -6,7 +6,7 @@ use Moo::Role;
 use Carp qw(croak);
 use Log::Any qw($log);
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 
 requires 'client';
@@ -62,7 +62,7 @@ WWW::PayPal::Role::OpenAPI - operationId-based dispatch against a cached OpenAPI
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

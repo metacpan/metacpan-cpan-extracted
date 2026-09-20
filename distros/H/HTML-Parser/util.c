@@ -61,6 +61,16 @@ grow_gap(pTHX_ SV* sv, STRLEN grow, char** t, char** s, char** e)
     *e += grow;
 }
 
+static void
+save_original(pTHX_ SV* sv, STRLEN len, char** orig)
+{
+    if (*orig)
+	return;
+    Newx(*orig, len ? len : 1, char);
+    SAVEFREEPV(*orig);
+    Copy(SvPVX(sv), *orig, len, char);
+}
+
 EXTERN SV*
 decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 {
@@ -72,7 +82,8 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 
     char *repl;
     STRLEN repl_len;
-    char *repl_allocated = 0;
+    char *orig = 0;
+    int orig_utf8 = SvUTF8(sv);
     char buf[UTF8_MAXLEN];
     int repl_utf8;
     int high_surrogate = 0;
@@ -82,6 +93,12 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
     repl_utf8 = 0;
 #endif
 
+    /* Looking up an entity value can run Perl code, which must not be
+     * able to free sv while we hold pointers into it. */
+    ENTER;
+    SvREFCNT_inc_simple_void(sv);
+    SAVEFREESV(sv);
+
     while (s < end) {
 	assert(t <= s);
 
@@ -90,7 +107,6 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 
 	ent_start = s;
 	repl = 0;
-	repl_allocated = 0;
 
 	if (s < end && *s == '#') {
 	    UV num = 0;
@@ -174,22 +190,22 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 		s++;
 	    if (ent_name != s && entity2char) {
 		SV** svp;
+		char *pvx = SvPVX(sv);
+		STRLEN cur = SvCUR(sv);
+		STRLEN alloc = SvLEN(sv);
+		U32 utf8 = SvUTF8(sv);
 		if (              (svp = hv_fetch(entity2char, ent_name, s - ent_name, 0)) ||
-		    (*s == ';' && (svp = hv_fetch(entity2char, ent_name, s - ent_name + 1, 0)))
+		    (s < end && *s == ';' && (svp = hv_fetch(entity2char, ent_name, s - ent_name + 1, 0)))
 		   )
 		{
-		    char *src = SvPV(*svp, repl_len);
-		    repl_utf8 = SvUTF8(*svp);
 		    if ((SV*)*svp == sv) {
-			/* Self-aliased: hash entry SV == input SV.
-			 * grow_gap() may realloc sv's PV later; copy
-			 * the entity value into an owned buffer first.
-			 * Freed by the repl_allocated cleanup below. */
-			Newx(repl_allocated, repl_len ? repl_len : 1, char);
-			Copy(src, repl_allocated, repl_len, char);
-			repl = repl_allocated;
+			save_original(aTHX_ sv, len, &orig);
+			repl = orig;
+			repl_len = len;
+			repl_utf8 = orig_utf8;
 		    } else {
-			repl = src;
+			repl = SvPV(*svp, repl_len);
+			repl_utf8 = SvUTF8(*svp);
 		    }
 		}
 		else if (expand_prefix) {
@@ -197,14 +213,14 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 		    while (ss > ent_name) {
 			svp = hv_fetch(entity2char, ent_name, ss - ent_name, 0);
 			if (svp) {
-			    char *src = SvPV(*svp, repl_len);
-			    repl_utf8 = SvUTF8(*svp);
 			    if ((SV*)*svp == sv) {
-				Newx(repl_allocated, repl_len ? repl_len : 1, char);
-				Copy(src, repl_allocated, repl_len, char);
-				repl = repl_allocated;
+				save_original(aTHX_ sv, len, &orig);
+				repl = orig;
+				repl_len = len;
+				repl_utf8 = orig_utf8;
 			    } else {
-				repl = src;
+				repl = SvPV(*svp, repl_len);
+				repl_utf8 = SvUTF8(*svp);
 			    }
 			    s = ss;
 			    break;
@@ -212,19 +228,24 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 			ss--;
 		    }
 		}
+		/* The lookups may have run Perl code, and we still hold
+		 * pointers into the buffer it could have changed. */
+		if (SvPVX(sv) != pvx || SvCUR(sv) != cur ||
+		    SvLEN(sv) != alloc || SvUTF8(sv) != utf8)
+		    croak("String being decoded was modified"
+			  " while fetching an entity value");
 	    }
 	    high_surrogate = 0;
 	}
 
 	if (repl) {
-	    /* repl_allocated is now function-scoped; set by the
-	     * named-entity self-alias path above or by the UTF8 mismatch
-	     * branch below. Same cleanup in either case. */
+	    char *repl_allocated = 0;
+	    save_original(aTHX_ sv, len, &orig);
 	    if (s < end && *s == ';')
 		s++;
 	    t--;  /* '&' already copied, undo it */
 
-	    if (*s != '&') {
+	    if (s >= end || *s != '&') {
 		high_surrogate = 0;
 	    }
 
@@ -270,6 +291,8 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 
     *t = '\0';
     SvCUR_set(sv, t - SvPVX(sv));
+
+    LEAVE;
 
     return sv;
 }

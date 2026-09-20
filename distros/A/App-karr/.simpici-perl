@@ -1,0 +1,5 @@
+# Perl versions the [@Author::GETTY] SimpiCI provider tests karr on. Restricted
+# to images whose Debian base still has a live apt: 5.36/5.38 are bookworm,
+# 5.40/5.42/5.44 are trixie. Older perl:<ver> images (stretch/bullseye) can't
+# install .simpici-apt's toolchain -- their package mirrors are archived (404).
+5.36 5.38 5.40 5.42 5.44

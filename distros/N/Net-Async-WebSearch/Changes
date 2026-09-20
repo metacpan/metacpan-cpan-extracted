@@ -1,6 +1,20 @@
-0.002     2026-04-18 15:48:51Z
+0.003     2026-09-19 16:11:26Z
 
-0.002     2026-04-18
+ - Google CSE provider now pages over `start` to satisfy `limit > 10`
+   (searches previously returned at most 10 Google results regardless of
+   `limit`); merges pages of 10 up to CSE's 100-result ceiling and trims
+   the last page to the exact limit
+ - New provider Net::Async::WebSearch::Provider::Tavily — Tavily Search API
+   (POST/JSON, Bearer key, free tier); honors language/region
+ - New provider Net::Async::WebSearch::Provider::Exa — Exa neural search API
+   (POST/JSON, x-api-key, free tier); requests page text so results carry snippets
+ - New provider Net::Async::WebSearch::Provider::Marginalia — Marginalia
+   independent English-only index (GET/JSON; `public` key, or a free key by
+   e-mail); results are CC-BY-NC-SA licensed
+ - New provider Net::Async::WebSearch::Provider::Mojeek — Mojeek independent
+   index (GET/JSON, api_key query param, fmt=json); commercial API key required
+
+0.002     2026-04-18 15:48:51Z
 
  - POD documentation: clarified provider instantiation and registration examples
  - SYNOPSIS now shows consistent provider stack with tags (free, paid)

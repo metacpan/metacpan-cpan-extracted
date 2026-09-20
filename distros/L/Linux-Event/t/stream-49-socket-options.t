@@ -65,8 +65,10 @@ like(exception(sub { T::InvalidSocketOption->_validate_accepted_configuration })
 {
     package T::FailingSocketConfiguration;
     use parent 'Linux::Event::IO::Sock::Stream';
+    our $CLOSE_CALLS = 0;
     sub on_data ($self, $bytes) { }
     sub configure_socket ($self, $fh, $role, $peer) { die "synthetic failure\n" }
+    sub close ($self) { ++$CLOSE_CALLS; return $self }
 }
 
 socketpair(my $failed_left, my $failed_right, AF_UNIX, SOCK_STREAM, 0)
@@ -74,6 +76,8 @@ socketpair(my $failed_left, my $failed_right, AF_UNIX, SOCK_STREAM, 0)
 like(exception(sub { T::FailingSocketConfiguration->new(fh => $failed_left) }),
     qr/configure_socket: synthetic failure/,
     'configure_socket failure propagates as a typed setup error');
+is($T::FailingSocketConfiguration::CLOSE_CALLS, 0,
+    'forced constructor cleanup bypasses subclass close override');
 ok(!defined(fileno($failed_left)),
     'configure_socket failure closes the adopted descriptor');
 close $failed_right;

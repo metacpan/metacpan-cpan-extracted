@@ -1,7 +1,7 @@
 # ABSTRACT: karr-foundation question mailbox under refs/karr-foundation/questions/*
 
 package App::karr::Foundation::Questions;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use POSIX qw( strftime );
 use Try::Tiny;
@@ -389,7 +389,7 @@ App::karr::Foundation::Questions - karr-foundation question mailbox under refs/k
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 

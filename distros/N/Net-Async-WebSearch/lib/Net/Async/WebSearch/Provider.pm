@@ -1,5 +1,5 @@
 package Net::Async::WebSearch::Provider;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 # ABSTRACT: Base class for Net::Async::WebSearch providers
 use strict;
 use warnings;
@@ -74,7 +74,7 @@ Net::Async::WebSearch::Provider - Base class for Net::Async::WebSearch providers
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

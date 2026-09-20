@@ -8,9 +8,12 @@ lib/ForgeOps/Tracker/Integrations/Dancer2.pm
 lib/ForgeOps/Tracker/Integrations/Dancer2Performance.pm
 lib/ForgeOps/Tracker/Integrations/PSGI.pm
 lib/ForgeOps/Tracker/Integrations/PSGIPerformance.pm
+lib/ForgeOps/Tracker/MetricBuffer.pm
 lib/ForgeOps/Tracker/PerformanceFlusher.pm
 lib/ForgeOps/Tracker/PiiScrubber.pm
 lib/ForgeOps/Tracker/Reporter.pm
+lib/ForgeOps/Tracker/SpanBuffer.pm
+lib/ForgeOps/Tracker/SpanDelivery.pm
 LICENSE.txt
 Makefile.PL
 MANIFEST			This list of files
@@ -24,9 +27,11 @@ t/integrations_dancer2_performance.t
 t/integrations_psgi.t
 t/integrations_psgi_performance.t
 t/lib/EchoServer.pm
+t/metric_buffer.t
 t/performance_flusher.t
 t/pii_scrubber.t
 t/reporter.t
+t/tracing.t
 t/tracker.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -159,8 +159,8 @@ sub get_app_data {
 
     my ($self, $app_id, $field) = @_;
 
-    return undef if (! exists $self->{__app_data}->{$app_id});
-    return undef if (! exists $self->{__app_data}->{$app_id}->{$field});
+    return if (! exists $self->{__app_data}->{$app_id});
+    return if (! exists $self->{__app_data}->{$app_id}->{$field});
     return $self->{__app_data}->{$app_id}->{$field};
 
 }

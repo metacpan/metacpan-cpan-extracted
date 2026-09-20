@@ -288,6 +288,7 @@ xs/tenant.xs
 xs/traces.xs
 xs/view.xs
 xs/wal.xs
+t/0917-tail-hole.t
 xt/palette.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

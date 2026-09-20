@@ -1,7 +1,7 @@
 # ABSTRACT: Cross-board dependencies -- a link from a card here to a card on another board
 
 package App::karr::CrossBoard;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use Path::Tiny;
 use Try::Tiny;
@@ -315,7 +315,7 @@ App::karr::CrossBoard - Cross-board dependencies -- a link from a card here to a
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 

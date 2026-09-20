@@ -1,5 +1,8 @@
 Revision history for Punk-Observe
 
+0.11	2026-09-19
+	- The live tail crosses workers on a Shared::Arena ring through its C ABI, in Observe's own region or one bus_init is handed; Shared::Arena is a prerequisite and Hyperman's hm_bus.h is no longer compiled in.
+
 0.10	2026-09-16
 	- The trace page shows each span's attributes: a + on the row opens a table under it. Assembly works on the indexed 64-byte span, which carries no attributes, so the view read a list that was never filled; the trace's span records are now read once more, filtered on the trace id, and matched by span id.
 	- Fixes: collapsing a subtree set the hidden attribute on rows whose display: grid rule outranked the browser's [hidden] rule, so nothing was hidden. 

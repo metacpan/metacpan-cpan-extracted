@@ -1,0 +1,116 @@
+name: release-binaries
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to build and attach assets to (dry-run)
+        required: true
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: perl:5.40-bookworm
+    # Values that reach shell here go through env, never inline ${{ }} in a
+    # run: body -- a crafted tag name must not be able to inject shell (k293).
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      ARCH: ${{ matrix.arch }}
+    steps:
+      - name: Install system build deps
+        run: |
+          apt-get update
+          apt-get install -y cmake build-essential git jq curl pkg-config libssh2-1-dev libssl-dev zlib1g-dev libzstd-dev
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+            | tee /usr/share/keyrings/githubcli-archive-keyring.gpg >/dev/null
+          chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+            > /etc/apt/sources.list.d/github-cli.list
+          apt-get update
+          apt-get install -y gh
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ env.TAG }}
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Install Perl deps (Alien share build + PAR::Packer)
+        env:
+          # TAR_OPTIONS silences GNU tar's warning on the com.apple.provenance
+          # LIBARCHIVE pax header some CPAN tarballs carry, keeping tar's output
+          # clean (cosmetic; not the cause of any failure).
+          TAR_OPTIONS: "--warning=no-unknown-keyword"
+        run: |
+          # ALIEN_INSTALL_TYPE=share must apply to libgit2 ONLY. Build-tool
+          # aliens like Alien::cmake3 must stay `system` so they use the
+          # apt-installed cmake -- forcing them to share rebuilds cmake from
+          # source and fails. So install Alien::cmake3 first (system), then set
+          # share inline for just the libgit2 aliens so it doesn't leak.
+          cpanm --notest Alien::cmake3
+          ALIEN_INSTALL_TYPE=share cpanm --notest Alien::Libgit2 Git::Libgit2 Git::Native
+          cpanm --notest --installdeps .
+          cpanm --notest PAR::Packer
+      - name: Compute version and asset base name
+        id: v
+        run: |
+          v="${TAG#v}"
+          echo "v=$v" >> "$GITHUB_OUTPUT"
+          echo "base=karr-$v-linux-$ARCH" >> "$GITHUB_OUTPUT"
+      - name: Build binary
+        env:
+          KARR_BIN_OUT: ${{ steps.v.outputs.base }}
+        run: ./scripts/build-binary.sh
+      - name: Verify binary
+        env:
+          BASE: ${{ steps.v.outputs.base }}
+        run: ./scripts/verify-binary.sh "$BASE"
+      - name: Record and check runtime libs
+        run: |
+          LG=$(perl -MAlien::Libgit2 -e 'print +(Alien::Libgit2->dynamic_libs)[0]')
+          ldd "$LG" | tee "runtime-libs-$ARCH.txt"
+          # k293: the packed binary is portable only if libgit2 needs nothing on
+          # the target beyond the libs the README promises. Fail the build if ldd
+          # names a shared lib outside that documented set (plus the always-present
+          # libc/loader family), so a new transitive link dependency can't
+          # silently ship a binary that dies on a clean target with a missing .so.
+          undocumented=$(ldd "$LG" | awk '{print $1}' \
+            | grep -E '\.so' | sed -E 's|.*/||; s/\.so.*//' | sort -u \
+            | grep -vixE 'libssl|libcrypto|libssh2|libz|libzstd|libc|libm|libpthread|libdl|librt|libgcc_s|ld-linux.*|linux-vdso' \
+            || true)
+          if [ -n "$undocumented" ]; then
+            printf '::error::libgit2 needs undocumented runtime libs on the target: %s\n' "$undocumented" >&2
+            exit 1
+          fi
+          echo "runtime-libs check: only the documented libs are needed"
+      - name: Package
+        env:
+          BASE: ${{ steps.v.outputs.base }}
+          V: ${{ steps.v.outputs.v }}
+        run: |
+          mkdir -p "pkg/$BASE"
+          cp "$BASE" "pkg/$BASE/karr"
+          cp LICENSE "pkg/$BASE/LICENSE"
+          printf 'karr %s (linux-%s)\nRuntime libs required on target: libssl libcrypto libssh2 libz libzstd\nhttps://github.com/Getty/karr\n' \
+            "$V" "$ARCH" > "pkg/$BASE/README"
+          tar -C pkg -czf "$BASE.tar.gz" "$BASE"
+          sha256sum "$BASE" > "$BASE.sha256"
+          sha256sum "$BASE.tar.gz" > "$BASE.tar.gz.sha256"
+      - name: Upload assets to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE: ${{ steps.v.outputs.base }}
+        run: |
+          gh release upload "$TAG" \
+            "$BASE" "$BASE.sha256" \
+            "$BASE.tar.gz" "$BASE.tar.gz.sha256" \
+            --clobber --repo "$GITHUB_REPOSITORY"

@@ -1,0 +1,103 @@
+{
+    "name" : "HTTPS-Handy",
+    "version" : "1.01",
+    "abstract" : "A tiny HTTPS/1.0 server, TLS included, in pure Perl",
+    "author" : [
+        "ina <ina.cpan@gmail.com>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat version 0.51",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "no_index" : {
+        "directory" : [
+            "t",
+            "eg"
+        ]
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ]
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "Carp" : "0",
+                "IO::Socket" : "0",
+                "POSIX" : "0",
+                "perl" : "5.00503"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "Carp" : "0",
+                "IO::Socket" : "0",
+                "POSIX" : "0",
+                "perl" : "5.00503"
+            }
+        },
+        "test" : {
+            "requires" : {
+                "Carp" : "0",
+                "Config" : "0",
+                "Cwd" : "0",
+                "Exporter" : "0",
+                "File::Spec" : "0",
+                "FindBin" : "1.42",
+                "IO::Socket" : "0",
+                "POSIX" : "0",
+                "perl" : "5.00503"
+            }
+        }
+    },
+    "provides" : {
+        "HTTPS::Handy" : {
+            "file" : "lib/HTTPS/Handy.pm",
+            "version" : "1.01"
+        },
+        "HTTPS::Handy::BigInt" : {
+            "file" : "lib/HTTPS/Handy.pm",
+            "version" : "1.01"
+        },
+        "HTTPS::Handy::ChaCha" : {
+            "file" : "lib/HTTPS/Handy.pm",
+            "version" : "1.01"
+        },
+        "HTTPS::Handy::Crypt" : {
+            "file" : "lib/HTTPS/Handy.pm",
+            "version" : "1.01"
+        },
+        "HTTPS::Handy::EC" : {
+            "file" : "lib/HTTPS/Handy.pm",
+            "version" : "1.01"
+        },
+        "HTTPS::Handy::Input" : {
+            "file" : "lib/HTTPS/Handy.pm",
+            "version" : "1.01"
+        },
+        "HTTPS::Handy::RSA" : {
+            "file" : "lib/HTTPS/Handy.pm",
+            "version" : "1.01"
+        },
+        "HTTPS::Handy::TLS" : {
+            "file" : "lib/HTTPS/Handy.pm",
+            "version" : "1.01"
+        },
+        "HTTPS::Handy::X509" : {
+            "file" : "lib/HTTPS/Handy.pm",
+            "version" : "1.01"
+        }
+    }
+}

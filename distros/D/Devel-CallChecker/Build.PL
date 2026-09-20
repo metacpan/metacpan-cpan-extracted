@@ -116,9 +116,12 @@ Module::Build->subclass(code => q{
 		"meta-spec" => { version => "2" },
 		resources => {
 			bugtracker => {
-				mailto => "bug-Devel-CallChecker\@rt.cpan.org",
-				web => "https://rt.cpan.org/Public/Dist/".
-					"Display.html?Name=Devel-CallChecker",
+				web => "https://github.com/kawamurashingo/Devel-CallChecker/issues",
+			},
+			repository => {
+				type => "git",
+				url => "https://github.com/kawamurashingo/Devel-CallChecker.git",
+				web => "https://github.com/kawamurashingo/Devel-CallChecker",
 			},
 		},
 	},

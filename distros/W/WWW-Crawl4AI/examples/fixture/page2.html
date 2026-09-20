@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!--
+  Second fixture page — the deep_crawl target reached from index.html at depth 1.
+  Canonical source; mirrored into examples/k8s/20-fixture.yaml. Keep in sync.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Crawl4AI Live Fixture — Page Two</title>
+</head>
+<body>
+  <h1>Page Two</h1>
+  <p>FIXTURE_MARKER_PAGE2</p>
+  <p>
+    This is the second page of the crawl fixture. It is linked from the home
+    page and exists so that a breadth-first deep_crawl with max_depth set to one
+    discovers exactly two pages: the start page at depth zero and this page at
+    depth one. Like the home page it holds enough real prose to clear the
+    thin_content threshold on its own, so it is scored as a good crawl rather
+    than being surfaced as an ok=0 dead child in the results.
+  </p>
+  <p>
+    <a href="/">Back to Home</a> — a link back to the start URL, which the
+    frontier must deduplicate instead of visiting the home page a second time.
+  </p>
+</body>
+</html>

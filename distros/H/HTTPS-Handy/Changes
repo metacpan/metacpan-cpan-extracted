@@ -1,0 +1,104 @@
+Revision history for HTTPS::Handy
+
+1.01    2026-09-20
+        TLS is now implemented in this distribution, in pure Perl, and
+        an ordinary browser opens the pages it serves.
+
+        Dependencies
+        - Removed the dependency on IO::Socket::SSL. The distribution
+          now uses core modules only (IO::Socket, POSIX, Carp)
+        - Removed every call to an external program: openssl and
+          certbot are no longer run, or needed
+        - The distribution contains no binary file, no XS code and no
+          compiled component
+
+        The TLS implementation
+        - Added HTTPS::Handy::TLS, the TLS 1.2 record layer and both
+          sides of the handshake
+        - Added HTTPS::Handy::EC, the P-256 curve, ECDH and ECDSA
+        - Added HTTPS::Handy::ChaCha, ChaCha20-Poly1305 (RFC 8439)
+        - Added HTTPS::Handy::Crypt, SHA-256, HMAC and the TLS 1.2 PRF
+        - Added HTTPS::Handy::X509, Base64, DER, PEM and self-signed
+          certificate generation
+        - Added HTTPS::Handy::RSA, for a certificate issued elsewhere
+        - Added HTTPS::Handy::BigInt, multiple precision arithmetic
+          with Montgomery multiplication
+
+        Protocol
+        - Key agreement is ECDHE on P-256, which gives forward secrecy
+        - Cipher suites: TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+          and TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256. These are
+          what current browsers still accept, so https://localhost:8443/
+          opens in Chrome, Firefox, Safari and Edge as well as in curl
+          and openssl s_client, with no special options on either side
+        - ChaCha20-Poly1305 rather than AES-GCM because in pure Perl it
+          is both shorter to read and about three times faster
+        - Session resumption by session id: only the first connection
+          of a session pays for the curve arithmetic
+
+        Certificates
+        - A self-signed certificate is generated here, in Perl, and
+          cached in cert_dir. It holds a P-256 key signed with ECDSA and
+          SHA-256, and takes about a second to make; an RSA key of
+          comparable strength takes minutes in pure Perl
+        - Validity is 397 days, which browsers accept
+        - ssl_key_file also accepts an EC PRIVATE KEY file
+        - The domains option now uses an installed Let's Encrypt
+          certificate when there is one, and otherwise puts those names
+          into the generated self-signed certificate. The email option
+          and the certbot invocation are gone; no ACME client is
+          included
+
+        Interface
+        - The PSGI interface, the $env keys, the response format and
+          every utility method are unchanged from 1.00
+        - New $env keys psgix.tls_cipher and psgix.tls_resumed, so the
+          demo page at /info shows what the handshake did
+        - A header value holding CR or LF could split the response.
+          Those characters are now removed from response headers, and a
+          status code that is not three digits becomes 500
+        - A non-numeric Content-Length is treated as no body, rather
+          than warning and being read as zero
+        - serve_static refuses a path holding a null or control byte
+        - The log option now governs every message this module writes
+          to STDERR. An application error was reported even when
+          logging was turned off
+
+        Portability
+        - Verified on Perl 5.005_03 and on Perl 5.42
+        - No remainder is taken modulo 2**32 anywhere: on a 32 bit build
+          that divisor does not fit in an integer and Perl reads it as
+          zero. Carries are removed by subtraction, and 64 bit values
+          are split with int() division
+
+        Tests
+        - t/0006-crypto.t: known answer tests for SHA-256, HMAC, the
+          TLS 1.2 PRF, ChaCha20-Poly1305, the P-256 curve, Base64 and
+          DER, each taken from the document that defines it
+        - t/0007-tls.t: the record layer, key derivation, the
+          ClientHello parser, the session cache and certificate
+          reading, none of which needs a socket
+        - t/0008-http.t: the whole HTTP request and response path,
+          driven through a connection object made of two strings
+        - t/9080-docparity.t: ten checks that read a fact out of the
+          code and the same fact out of the POD, the README and the
+          metadata, so that documented methods, $env keys, cipher
+          suites, package list, line counts, defaults and the provides
+          list cannot drift apart
+        - t/9020-perl5compat.t gained check P15, which refuses any
+          remainder by 2**31 or more
+
+        Documentation
+        - The POD says where to start reading, what each package is
+          for, and why each algorithm was chosen
+        - DIAGNOSTICS lists every handshake failure message with its
+          likely cause
+        - SECURITY says plainly not to protect anything of value with
+          this, and then lists the specific weaknesses
+
+1.00    2026-09-05
+        First release.
+        - HTTPS/1.0 server based on HTTP::Handy philosophy
+        - Auto TLS certificate resolution (Let's Encrypt / self-signed / manual)
+        - Single-file, minimal dependencies (IO::Socket::SSL only)
+        - Perl 5.5.3+ compatible

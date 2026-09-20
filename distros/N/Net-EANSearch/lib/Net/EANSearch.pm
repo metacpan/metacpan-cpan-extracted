@@ -29,7 +29,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 our $ALL_LANGUAGES = 99;
 our $ENGLISH = 1;
@@ -72,7 +72,7 @@ sub barcodeLookup {
 	my $ean = shift;
 	my $lang = shift || 1;
 
-	my $json_str = $self->_apiCall($self->{base_uri} . "&op=asin-for-ean-lookup&ean=$ean&language=$lang");
+	my $json_str = $self->_apiCall($self->{base_uri} . "&op=barcode-lookup&ean=$ean&language=$lang");
 	my $json = decode_json($json_str);
 	return $json->[0];
 }

@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 use parent 'Linux::Event::_ByteStream';
 use Carp qw(croak);
@@ -103,10 +103,11 @@ The complete option set is:
 
 Maximum bytes requested by one native read; a positive integer.
 
-=item * C<read_budget_bytes> (default 0)
+=item * C<read_budget_bytes> (default 65_536)
 
-Maximum bytes read during one readiness drain. Zero drains until the input
-would block.
+Maximum bytes read during one readiness drain. The default bounds one
+readiness callback to 65,536 bytes so other Loop resources can run. Zero is an
+explicit opt-in to drain until the input would block.
 
 =item * C<read_batch_bytes> (default 0)
 

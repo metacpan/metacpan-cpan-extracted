@@ -36,11 +36,11 @@ is(Shared::Arena::_abi_selftest(), 0,
 # The header's own policy (see sa_abi.h): the table only grows at the end and
 # SA_ABI_VERSION bumps on every append, so a consumer that checks
 # `t->abi_version >= SA_ABI_VERSION` refuses a provider that is missing entries
-# it was built against. 0.03 appended map_store_ttl and the cuckoo filter,
-# taking it to 2. The next `is` proves the header and the compiled table agree
-# on that number, which is what actually matters.
-is(Shared::Arena::_abi_version(), 3,
-   'the table is at version 2, matching sa_abi.h after the 0.03 appends');
+# it was built against. 0.11 appended the wakeup entries, map_incr_ttl and
+# rate_counts, then map_incr_at, taking it to 5. The next `is` proves the header and the
+# compiled table agree on that number, which is what actually matters.
+is(Shared::Arena::_abi_version(), 5,
+   'the table is at version 5, matching sa_abi.h after the 0.11 appends');
 
 {
     require Shared::Arena::Install::Files;
@@ -123,6 +123,11 @@ is(Shared::Arena::_abi_version(), 3,
 
             hll_open hll_release hll_add hll_count hll_merge hll_reset
             hll_precision hll_filled
+
+            wake_init wake_take wake_fd wake_drained
+            map_incr_ttl
+            rate_counts
+            map_incr_at
         )], 'the entries are in the order they were published in');
 
         # Under PERL_IMPLICIT_SYS - every Strawberry perl - XSUB.h redefines
@@ -140,6 +145,16 @@ is(Shared::Arena::_abi_version(), 3,
                   'and none of them is a name XSUB.h turns into a macro')
             or diag "rename these, or every call site needs parentheses: @named";
     }
+}
+
+# ---- the region handle, for a consumer that drives a Perl-made arena from C --
+SKIP: {
+    skip 'no atomics in this build', 3 unless Shared::Arena::have_atomics();
+    my $arena = Shared::Arena->create(size => 64 * 1024);
+    my $ptr = Shared::Arena::_region_ptr($arena);
+    ok($ptr, '_region_ptr returns a non-zero address');
+    like($ptr, qr/^\d+$/, 'and an unsigned integer, as _abi_ptr is');
+    is($ptr, $arena->_region_ptr, 'the same one as a method');
 }
 
 # ---- the provider config ---------------------------------------------------

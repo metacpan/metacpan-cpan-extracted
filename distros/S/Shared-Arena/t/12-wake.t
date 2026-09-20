@@ -28,7 +28,11 @@ require POSIX;
 
 my $arena = Shared::Arena->create(size => 512 * 1024);
 my $ring  = $arena->ring('woken', slots => 64, slot_size => 128);
-ok($arena->wakers(8), 'created the wakers, before any fork');
+# A lease first: its table and the wakers' both live under reserved names that
+# begin with a NUL and have the same length, and a lookup that stopped at the
+# NUL took one for the other and refused the wakers as a shape mismatch.
+$arena->lease('leader');
+ok($arena->wakers(8), 'created the wakers, before any fork, beside a lease');
 
 # A region that never called wakers has none, and says so rather than lying.
 {

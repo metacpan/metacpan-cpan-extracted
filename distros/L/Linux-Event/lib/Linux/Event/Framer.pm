@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 use Carp qw(croak);
 use Linux::Event::_ByteStream::Descriptor ();
@@ -137,8 +137,21 @@ them through a Perl C<on_message> callback:
       },
   );
 
-This is an extension boundary for high-performance integrations such as
-coroutine or awaitable layers. It is independent of the public Perl class
+A native consumer may receive complete framed-message SVs, or an unframed
+provider may request the raw-input ABI and receive a borrowed contiguous native
+byte window before those bytes are converted to a Perl SV. Raw-input providers
+report the number of leading bytes consumed; Linux::Event keeps the unconsumed
+tail in native ordered-byte storage.
+
+C<transition_to()> can retain one provider when source and target share the same
+operations table, or replace one native consumer provider with another while
+preserving unread native input. Source flush/lifetime obligations are settled
+before the retiring context is destroyed and the retained tail is re-driven
+through the target provider. Adding or removing native-consumer mode during a
+live transition remains invalid.
+
+This is an extension-author boundary for high-performance protocol and
+coroutine/awaitable integrations. It is independent of the public Perl class
 names and must not depend on retired implementation packages.
 
 See F<docs/ORDERED-BYTE-CONSUMER-ABI.md>.

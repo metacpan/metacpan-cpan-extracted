@@ -213,9 +213,9 @@ sub fetch_missing_elements {
         die "Missing or too many avg masses for $elements{$el}\n"
             if (scalar @avg != 1);
 
-        my $mass_avg = $avg[0]->{value}->{fval}
+        my $mass_avg = $avg[0]->{value}->{sval}
             // die "Missing avg mass for $el";
-        my $mass_mono = $mono[0]->{value}->{fval}
+        my $mass_mono = $mono[0]->{value}->{sval}
             // die "Missing mono mass for $el";
         
         my $existing = $unimod->{elem}->{ $elements{$el} };

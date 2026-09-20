@@ -1,8 +1,10 @@
-use strict;
+use strict; # -*- mode: perl -*-
 use warnings;
 use utf8;
 use Test::More;
 use Term::EditLine;
+use File::Temp qw( tempfile );
+use File::Spec;
 
 my $el;
 
@@ -156,6 +158,22 @@ subtest 'history_save, history_load' => sub {
 
         unlink 't/history.dat' if -f 't/history.dat';
     };
+};
+
+subtest 'gets' => sub {
+    my ($fh, $filename) = tempfile(UNLINK => 1);
+    print $fh "hoge\nfuga\n";
+    close $fh;
+
+    open my $in, '<', $filename or die "$filename: $!";
+    open my $out, '>', File::Spec->devnull or die $!;
+
+    my $el2 = Term::EditLine->new($0, $in, $out, $out);
+    $el2->parse('bind', '-e');
+
+    is($el2->gets(), "hoge\n", 'first line');
+    is($el2->gets(), "fuga\n", 'second line');
+    is($el2->gets(), undef, 'eof');
 };
 
 done_testing;

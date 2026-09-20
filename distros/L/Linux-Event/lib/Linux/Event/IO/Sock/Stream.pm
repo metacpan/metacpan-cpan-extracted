@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.114';
+our $VERSION = '0.115';
 
 use parent 'Linux::Event::_Socket::Stream';
 
@@ -148,10 +148,11 @@ set is:
 
 Maximum bytes requested by one native read; a positive integer.
 
-=item * C<read_budget_bytes> (default 0)
+=item * C<read_budget_bytes> (default 65_536)
 
-Maximum bytes read during one readiness drain. Zero drains until the socket
-would block.
+Maximum bytes read during one readiness drain. The default bounds one
+readiness callback to 65,536 bytes so other Loop resources can run. Zero is an
+explicit opt-in to drain until the socket would block.
 
 =item * C<read_batch_bytes> (default 0)
 
@@ -381,7 +382,10 @@ uses high/low watermarks plus optional C<max_pending_bytes> protection.
 C<pause_read> and C<resume_read> control application reads. C<transition_to>
 changes protocol callback/framing descriptors in place while retaining the live
 socket, transport, output queue, and unread native input according to the
-transition rules in F<docs/FRAMING.md>.
+transition rules in F<docs/FRAMING.md>. Native protocol extensions may also
+hand off from one native consumer provider to another without copying the
+retained input through Perl; adding or removing native-consumer mode during a
+live transition remains invalid.
 
 =head1 SOCKET POLICY
 

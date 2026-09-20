@@ -146,7 +146,7 @@ for my $config (values %{ $p->{instrumentConfigurationList}->{instrumentConfigur
         }
     }
 }
-ok( $model eq 'LTQ Orbitrap Elite', "find instrument model param" );
+ok( $model eq 'Orbitrap Elite', "find instrument model param" );
 ok( defined $p->param(
     MS_MS1_SPECTRUM,
     ref => $p->{fileDescription}->{fileContent}

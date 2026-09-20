@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -20,7 +20,7 @@
             "Archive::Ar" : "2.02",
             "File::chdir" : "0",
             "Module::Build" : "0.3601",
-            "Path::Tiny" : "0",
+            "Path::Tiny" : "0.130",
             "autodie" : "0"
          }
       },
@@ -36,6 +36,17 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::InsertExample" : "0",
+            "Dist::Zilla::Plugin::Meta::Dynamic::Config" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::PruneFiles" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.79",
+            "Software::License::Perl_5" : "0"
+         },
          "requires" : {
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
@@ -62,9 +73,9 @@
          "requires" : {
             "Archive::Ar" : "2.02",
             "File::chdir" : "0",
-            "Path::Tiny" : "0",
-            "Test2::Require" : "0.000060",
-            "Test2::V0" : "0.000060",
+            "Path::Tiny" : "0.130",
+            "Test2::Require" : "0.000121",
+            "Test2::V0" : "0.000121",
             "perl" : "5.008001"
          }
       }
@@ -80,17 +91,18 @@
          "url" : "git://github.com/PerlFFI/FFI-TinyCC.git",
          "web" : "https://github.com/PerlFFI/FFI-TinyCC"
       },
-      "x_IRC" : "irc://irc.perl.org/#native"
+      "x_IRC" : "irc://irc.perl.org/#native",
+      "x_twitter" : "https://fosstodon.org/@PerlFFI"
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "aero",
       "Dylan Cali (calid)",
       "pipcet"
    ],
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.42.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

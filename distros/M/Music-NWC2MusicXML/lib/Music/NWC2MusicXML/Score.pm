@@ -3,7 +3,7 @@ package Music::NWC2MusicXML::Score;
 use strict;
 use warnings;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.001.1';
 
 use Carp qw(croak carp);
 use Readonly;
@@ -35,7 +35,7 @@ Music::NWC2MusicXML::Score - Internal representation of a complete NWC score.
 
 =head1 VERSION
 
-0.001.0
+0.001.1
 
 =head1 SYNOPSIS
 

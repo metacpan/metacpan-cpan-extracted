@@ -1,5 +1,5 @@
 package Net::Async::WebSearch::Provider::Reddit;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 # ABSTRACT: Reddit search provider (keyless JSON endpoint)
 use strict;
 use warnings;
@@ -122,7 +122,7 @@ Net::Async::WebSearch::Provider::Reddit - Reddit search provider (keyless JSON e
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

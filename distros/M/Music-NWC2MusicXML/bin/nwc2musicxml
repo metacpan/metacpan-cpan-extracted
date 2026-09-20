@@ -19,7 +19,7 @@ use lib 'lib';
 use Music::NWC2MusicXML;
 use Music::NWC2MusicXML::Diagnostics;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.001.1';
 
 # ---------------------------------------------------------------------------
 # Parse command-line options
@@ -179,7 +179,7 @@ nwc2musicxml - Convert NoteWorthy Composer 2 files to MusicXML.
 
 =head1 VERSION
 
-0.001.0
+0.001.1
 
 =head1 SYNOPSIS
 
@@ -282,11 +282,14 @@ Write all warnings to C<FILE> in addition to STDERR.
 
 =head1 AUTHOR
 
-Nigel Horne C<< <nigel.horne@gmail.com> >>
+Nigel Horne C<< <njh@nigelhorne.com> >>
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+Copyright 2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut

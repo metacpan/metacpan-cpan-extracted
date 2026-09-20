@@ -13,7 +13,7 @@
  * THE ORDER MATTERS AND THE FAILURE IS SILENT. A region mapped AFTER the fork
  * is private per worker: each one counts its own series, the effective limit
  * becomes N times what was configured, and nothing anywhere reports a problem
- * - the operator simply finds the cap did not hold. hm_bus.h makes the same
+ * - the operator simply finds the cap did not hold. the tail's ring makes the same
  * point about its own waker descriptors, and calls the symptom "delivery
  * works to some workers", which is the same shape of bug.
  */

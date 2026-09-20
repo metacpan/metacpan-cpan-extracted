@@ -1,5 +1,5 @@
 package Net::Async::WebSearch::Provider::Reddit::OAuth;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 # ABSTRACT: Reddit search provider using the OAuth2 endpoint
 use strict;
 use warnings;
@@ -295,7 +295,7 @@ Net::Async::WebSearch::Provider::Reddit::OAuth - Reddit search provider using th
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

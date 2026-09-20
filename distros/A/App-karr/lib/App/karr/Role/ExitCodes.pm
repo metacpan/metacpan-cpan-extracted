@@ -1,7 +1,7 @@
 # ABSTRACT: Normalize MooX::Options option-parse errors to exit code 2 (ADR 0002)
 
 package App::karr::Role::ExitCodes;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo::Role;
 # Both loaded without importing, and every call below is qualified: a Moo::Role
 # composes every sub in its package into its consumers, imported ones included
@@ -231,21 +231,210 @@ around new_with_options => sub {
     return wantarray ? @created : $created[0];
 };
 
+# The per-command help block (k276).
+#
+# MooX::Options' own text() rendered underscored names, listed the four
+# built-ins (--usage/-h/--help/--man), and tacked on a blank-line divider the
+# USAGE line on the previous page contradicted. Building it ourselves off
+# _options_data (which carries none of the built-ins) lets us name options the
+# way the command line spells them, drop the four built-ins for the same
+# reason, and drop any option a command marks `hidden => 1` -- --dir lives on
+# every board command and --quiet on every syncing one, so hiding them on
+# per-command pages is what lets a page list only what differs between
+# commands.
+sub _render_help_long {
+    my ($self) = @_;
+
+    my %data   = $self->_options_data;
+    my %config = $self->_options_config;
+
+    # Width budget. The terminal reports columns through a layer of env vars
+    # and tty detection, all of which are unreliable in the test runner and
+    # under the agent harness; default to 76 columns and let a TEST_FORCE_*
+    # override pin it (the help-column-alignment test uses one).
+    my $cols = $ENV{TEST_FORCE_COLUMN_SIZE}
+        || ( eval {
+            require Term::Size::Any;
+            Term::Size::Any::chars() || 0;
+        } ) || 76;
+    $cols = 76 if !defined $cols || $cols < 40;
+
+    # The USAGE line is the command's own usage_string, which already starts
+    # with `USAGE: karr <cmd> ...` and may itself spell options out. Two cases:
+    # one where it does, where the renderer keeps the command's wording
+    # verbatim and just adds the option list underneath; one where it does not
+    # and we are the first place the option list appears at all. Both are
+    # correct.
+    my $text = ( defined $config{usage_string} ? $config{usage_string} : '' );
+    $text .= "\n" if length $text && substr( $text, -1 ) ne "\n";
+
+    my @rows;
+    for my $name ( sort keys %data ) {
+        my $opt = $data{$name};
+        next if $opt->{hidden};
+        push @rows, [
+            $self->_option_spec_for_help( $name, $opt ),
+            $opt->{doc} // '',
+        ];
+    }
+
+    # Column width: longest option spec in the table, with at least four
+    # spaces between the spec and the description. The 4 leading spaces are a
+    # deliberate indent -- matching the one --help already used -- so the help
+    # block and the USAGE line share their left margin.
+    my $max_spec = 0;
+    $max_spec = length $_->[0] > $max_spec ? length $_->[0] : $max_spec
+      for @rows;
+    $max_spec = 0 if !defined $max_spec;
+
+    my $pad_indent = ' ' x 4;
+    my $gutter     = $max_spec + 4;
+    my $doc_width  = $cols - length($pad_indent) - $gutter;
+    $doc_width = 20 if $doc_width < 20;
+
+    for my $row (@rows) {
+        my ( $spec, $doc ) = @$row;
+        my $between = ' ' x ( $gutter - length $spec );
+        my @wrapped = $self->_wrap_help_doc( $doc, $doc_width );
+        $text .= $pad_indent . $spec . $between . $wrapped[0] . "\n";
+        if ( @wrapped > 1 ) {
+            my $cont = $pad_indent . ' ' x $gutter;
+            $text .= $cont . $_ . "\n" for @wrapped[ 1 .. $#wrapped ];
+        }
+    }
+    return $text;
+}
+
+# The one-line spelling of an option for the help table.
+#
+# MooX::Options' Usage object builds this same string from the Getopt::Long
+# spec it hands describe_options; the difference here is that we have the
+# raw option declaration in hand (the underscored name, the short alias, the
+# type), so we can hyphenate without losing the case and we can keep the
+# `=String`/`=Int` suffix that matches what Getopt::Long prints on the
+# option-parse error line -- a `--claimed_by=String` in the help and a
+# `--claimed_by requires an argument` in the error are two forms of the same
+# word, and the help's spelling is the one the user has to fix.
+sub _option_spec_for_help {
+    my ( undef, $name, $opt ) = @_;
+
+    my $display = $name;
+    $display =~ tr/_/-/;
+
+    my $spec = '--' . $display;
+    if ( defined $opt->{short} && length $opt->{short} ) {
+        $spec = '-' . $opt->{short} . ' ' . $spec;
+    }
+    if ( defined $opt->{format} && length $opt->{format} ) {
+        my $fmt  = $opt->{format};
+        $fmt =~ s/@\z//;
+        my %type = (
+            s => 'String',
+            i => 'Int',
+            o => 'Ext. Int',
+            f => 'Real',
+        );
+        $spec .= '=' . $type{$fmt} if defined $type{$fmt};
+    }
+    return $spec;
+}
+
+# Wrap $text to fit $width columns, splitting on whitespace. The input is one
+# paragraph; the output is one or more lines of equal-or-less width, the
+# caller is in charge of indenting. A word longer than the width is kept whole
+# rather than split mid-word -- the help block is short, the descriptions
+# short, and a word like `--claude-skill` would only ever break the layout
+# for a few columns.
+sub _wrap_help_doc {
+    my ( undef, $text, $width ) = @_;
+
+    return ('') unless defined $text && length $text;
+    return ($text) if length $text <= $width;
+
+    my @lines;
+    my $current = '';
+    for my $word ( split /\s+/, $text ) {
+        next unless length $word;
+        if ( length $current == 0 ) {
+            $current = $word;
+        }
+        elsif ( length($current) + 1 + length($word) <= $width ) {
+            $current .= ' ' . $word;
+        }
+        else {
+            push @lines, $current;
+            $current = $word;
+        }
+    }
+    push @lines, $current if length $current;
+    return @lines;
+}
+
 around options_usage => sub {
-    my ($orig, $self, $code, @rest) = @_;
+    my ( $orig, $self, $code, @rest ) = @_;
     $code = 2 if defined $code && $code > 0;
+    $code //= 0;
 
-    # The usage block, exactly as options_usage would have printed it: with the
-    # Usage object as the only argument, the whole message MooX::Options builds
-    # is that object stringified (4.103, options_usage line 456). Anything else
-    # -- extra messages to print in front, no usage object at all -- is none of
-    # this role's business and goes to the original untouched.
-    my $usage = @rest == 1 && ref $rest[0] eq 'MooX::Options::Descriptive::Usage'
-        ? "$rest[0]"
-        : undef;
+    # Anything else -- extra messages to print in front, no usage object at all
+    # -- is none of this role's business and goes to the original untouched
+    # (4.103, options_usage line 456 stringifies the Usage object as the whole
+    # message).
+    unless ( @rest == 1 && ref $rest[0] eq 'MooX::Options::Descriptive::Usage' ) {
+        return $orig->( $self, $code, @rest );
+    }
 
-    $self->_usage_error_last( $usage, $code );
-    return $orig->($self, $code, @rest);
+    # Build karr's own help block: hyphenated names, one option per line, the
+    # built-in --usage/-h/--help/--man and any `hidden => 1` option (--dir,
+    # --quiet) suppressed. MooX::Options' own long format spelled every option
+    # with underscores, listed the four built-ins, and inserted two blank lines
+    # before them, all of which contradicted the README and the USAGE line a
+    # screen apart (ticket k276).
+    my $text = $self->_render_help_long;
+
+    # k263's reorder goes first: on the error path the buffered diagnostic is
+    # moved after $text and the process exits; on the success path the capture
+    # is ended and whatever was buffered is printed verbatim, and we then print
+    # $text below. STDERR is the real handle at this point either way.
+    my $done = $self->_usage_error_last( $text, $code );
+    return if $done;
+
+    if ( $code > 0 ) {
+        CORE::warn $text;
+    }
+    else {
+        print $text;
+    }
+    exit $code if $code >= 0;
+    return;
+};
+
+# options_help is the method MooX::Options calls for --help (options_usage is
+# what -h reaches). The two were two different renderings of the same options
+# table -- long form for --help, compact for -h -- and the ticket asked for one
+# rendering, the compact one, on both (#k276). options_short_usage (--usage)
+# stays untouched: that one prints a one-line summary that has never been the
+# "help" page.
+around options_help => sub {
+    my ( $orig, $self, $code, @rest ) = @_;
+    $code = 2 if defined $code && $code > 0;
+    $code //= 0;
+
+    unless ( @rest == 1 && ref $rest[0] eq 'MooX::Options::Descriptive::Usage' ) {
+        return $orig->( $self, $code, @rest );
+    }
+
+    my $text = $self->_render_help_long;
+    my $done = $self->_usage_error_last( $text, $code );
+    return if $done;
+
+    if ( $code > 0 ) {
+        CORE::warn $text;
+    }
+    else {
+        print $text;
+    }
+    exit $code if $code >= 0;
+    return;
 };
 
 1;
@@ -262,7 +451,7 @@ App::karr::Role::ExitCodes - Normalize MooX::Options option-parse errors to exit
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 DESCRIPTION
 

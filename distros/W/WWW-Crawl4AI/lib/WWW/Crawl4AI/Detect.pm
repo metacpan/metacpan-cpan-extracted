@@ -2,6 +2,7 @@ package WWW::Crawl4AI::Detect;
 # ABSTRACT: service detection and content-quality classification for Crawl4AI
 use strict;
 use warnings;
+use LWP::UserAgent ();
 
 our $VERSION = '0.001';
 
@@ -115,7 +116,6 @@ sub why_failed {
 sub _probe_ua {
   my ( $ua, $timeout ) = @_;
   return $ua if $ua;
-  require LWP::UserAgent;
   return LWP::UserAgent->new( agent => "WWW-Crawl4AI/$VERSION", timeout => ( $timeout // 5 ) );
 }
 
@@ -149,7 +149,7 @@ WWW::Crawl4AI::Detect - service detection and content-quality classification for
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

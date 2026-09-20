@@ -8,6 +8,8 @@ use feature 'say';
 use Getopt::Long;
 use WWW::Crawl4AI;
 
+our $VERSION = '0.001';
+
 binmode STDOUT, ':encoding(UTF-8)';
 
 my %opt;
@@ -60,7 +62,7 @@ www-crawl4ai-doctor - probe Crawl4AI / CloakBrowser / proxy reachability and pri
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

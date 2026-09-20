@@ -4,7 +4,7 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -54,19 +54,23 @@
    "provides" : {
       "Devel::CallChecker" : {
          "file" : "lib/Devel/CallChecker.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Devel-CallChecker@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-CallChecker"
+         "web" : "https://github.com/kawamurashingo/Devel-CallChecker/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kawamurashingo/Devel-CallChecker.git",
+         "web" : "https://github.com/kawamurashingo/Devel-CallChecker"
+      }
    },
-   "version" : "0.009",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "0.010",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

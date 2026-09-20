@@ -1,7 +1,7 @@
 # ABSTRACT: karr-foundation agent definitions, invocation contract and availability
 
 package App::karr::Foundation::Agents;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use Path::Tiny;
 use Fcntl qw( LOCK_EX );
@@ -442,7 +442,7 @@ App::karr::Foundation::Agents - karr-foundation agent definitions, invocation co
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 DESCRIPTION
 

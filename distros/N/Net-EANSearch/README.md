@@ -64,6 +64,7 @@ my $eansearch = Net::EANSearch->new($API_TOKEN);
 
 my $ean = '5099750442227';
 my $isbn = '1119578884';
+my $isbn13 = '9780815346333';
 
 my $product = $eansearch->barcodeLookup($ean);
 

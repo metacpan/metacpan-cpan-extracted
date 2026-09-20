@@ -1,7 +1,7 @@
 # ABSTRACT: Role providing minimal board discovery and config access
 
 package App::karr::Role::BoardDiscovery;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo::Role;
 use MooX::Options;
 # Both loaded without importing, and every call below is qualified. A Moo::Role
@@ -34,6 +34,12 @@ option dir => (
   format    => 's',
   doc       => 'Path used as the starting point for Git repository discovery',
   predicate => 1,
+  # `karr CMD --dir PATH` and `karr --dir PATH CMD` resolve the same board
+  # through the same walk, so this option appears on every command. It is
+  # documented in the root help (`karr --help`) and described above; per-command
+  # help suppresses it so the page lists only what differs between commands
+  # (ticket k276).
+  hidden => 1,
 );
 
 has git_root => (
@@ -305,7 +311,7 @@ App::karr::Role::BoardDiscovery - Role providing minimal board discovery and con
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 DESCRIPTION
 

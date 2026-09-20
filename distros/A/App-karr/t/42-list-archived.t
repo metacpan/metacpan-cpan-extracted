@@ -85,7 +85,8 @@ subtest 'default list hides archived and done (current, intended behaviour)' => 
   unlike $out, qr/Shipped feature/,  'done task hidden by default (pinned intended behaviour)';
   unlike $out, qr/Retired ticket/,   'archived task hidden by default';
   unlike $out, qr/Old cleanup task/, 'second archived task hidden by default';
-  like $out, qr/^2 task\(s\)$/m,     'footer counts only the 2 non-terminal tasks';
+  like $out, qr/^2 task\(s\) \(1 done hidden; --status done to include\)$/m,
+    'footer counts the 2 non-terminal tasks and names the done card the default filter hid (ticket #275)';
 };
 
 subtest '--status archived surfaces archived tasks (BUG: currently empty)' => sub {

@@ -12,12 +12,15 @@ for (qw(
   WWW::PayPal::API::Products
   WWW::PayPal::API::Plans
   WWW::PayPal::API::Subscriptions
+  WWW::PayPal::API::Webhooks
   WWW::PayPal::Order
   WWW::PayPal::Capture
   WWW::PayPal::Refund
   WWW::PayPal::Product
   WWW::PayPal::Plan
   WWW::PayPal::Subscription
+  WWW::PayPal::Webhook
+  WWW::PayPal::WebhookEvents
 )) {
     use_ok($_);
 }

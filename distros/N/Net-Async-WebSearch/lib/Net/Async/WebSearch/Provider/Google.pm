@@ -1,5 +1,5 @@
 package Net::Async::WebSearch::Provider::Google;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 # ABSTRACT: Google Programmable Search (CSE) JSON API provider
 use strict;
 use warnings;
@@ -7,6 +7,7 @@ use parent 'Net::Async::WebSearch::Provider';
 
 use Carp qw( croak );
 use Future;
+use Future::Utils qw( repeat );
 use JSON::MaybeXS qw( decode_json );
 use URI;
 use HTTP::Request::Common qw( GET );
@@ -29,62 +30,85 @@ sub search {
   $opts ||= {};
   my $limit = $opts->{limit} || 10;
 
-  my $uri = URI->new( $self->endpoint );
-  my %q = (
-    q   => $query,
-    key => $self->api_key,
-    cx  => $self->cx,
-    num => ( $limit > 10 ? 10 : $limit ),  # CSE hard-caps num to 10
-  );
-  $q{gl}        = $opts->{region}     if defined $opts->{region};
-  $q{hl}        = $opts->{language}   if defined $opts->{language};
-  $q{safe}      = $opts->{safesearch} if defined $opts->{safesearch};
-  $q{dateRestrict} = $opts->{date_restrict} if defined $opts->{date_restrict};
-  $uri->query_form(%q);
+  # CSE serves at most 10 results per call and never past the 100th hit
+  # overall, so satisfy limit > 10 by paging over the 1-based `start` index
+  # (start=1,11,21,…) until we have `limit` results or the API runs dry.
+  my @out;
+  my $rank      = 0;
+  my $exhausted = 0;
 
-  my $req = GET( $uri->as_string );
-  $req->header( 'User-Agent' => $self->user_agent_string );
-  $req->header( 'Accept'     => 'application/json' );
+  my $paging = repeat {
+    my $start = @out + 1;                          # CSE `start` is 1-based
+    my $num   = $limit - @out;
+    $num = 10 if $num > 10;                         # CSE hard-caps num to 10
+    $num = 100 - @out if @out + $num > 100;         # never page past hit #100
 
-  return $http->do_request( request => $req )->then(sub {
-    my ( $resp ) = @_;
-    unless ( $resp->is_success ) {
-      return Future->fail(
-        $self->name.": HTTP ".$resp->status_line, 'websearch', $self->name,
-      );
-    }
-    my $data = eval { decode_json( $resp->decoded_content ) };
-    if ( my $e = $@ ) {
-      return Future->fail( $self->name.": invalid JSON: $e", 'websearch', $self->name );
-    }
-    my @out;
-    my $rank = 0;
-    for my $r ( @{ $data->{items} || [] } ) {
-      $rank++;
-      my $pagemap = $r->{pagemap} || {};
-      my ($metatags) = @{ $pagemap->{metatags} || [] };
-      push @out, Net::Async::WebSearch::Result->new(
-        url      => $r->{link},
-        title    => $r->{title},
-        snippet  => $r->{snippet},
-        provider => $self->name,
-        rank     => $rank,
-        published_at => (
-          $metatags && ( $metatags->{'article:published_time'}
-                      // $metatags->{'og:article:published_time'}
-                      // $metatags->{'date'} )
-        ),
-        raw      => $r,
-        extra    => {
-          ( defined $r->{displayLink} ? ( displayLink => $r->{displayLink} ) : () ),
-          ( defined $r->{mime}        ? ( mime        => $r->{mime} )        : () ),
-          ( defined $r->{fileFormat}  ? ( fileFormat  => $r->{fileFormat} )  : () ),
-        },
-      );
-      last if $rank >= $limit;
-    }
-    return Future->done(\@out);
-  });
+    my $uri = URI->new( $self->endpoint );
+    my %q = (
+      q     => $query,
+      key   => $self->api_key,
+      cx    => $self->cx,
+      num   => $num,
+      start => $start,
+    );
+    $q{gl}        = $opts->{region}     if defined $opts->{region};
+    $q{hl}        = $opts->{language}   if defined $opts->{language};
+    $q{safe}      = $opts->{safesearch} if defined $opts->{safesearch};
+    $q{dateRestrict} = $opts->{date_restrict} if defined $opts->{date_restrict};
+    $uri->query_form(%q);
+
+    my $req = GET( $uri->as_string );
+    $req->header( 'User-Agent' => $self->user_agent_string );
+    $req->header( 'Accept'     => 'application/json' );
+
+    $http->do_request( request => $req )->then(sub {
+      my ( $resp ) = @_;
+      unless ( $resp->is_success ) {
+        return Future->fail(
+          $self->name.": HTTP ".$resp->status_line, 'websearch', $self->name,
+        );
+      }
+      my $data = eval { decode_json( $resp->decoded_content ) };
+      if ( my $e = $@ ) {
+        return Future->fail( $self->name.": invalid JSON: $e", 'websearch', $self->name );
+      }
+      my $items = $data->{items} || [];
+      $exhausted = 1 unless @$items;                # no more results upstream
+      for my $r ( @$items ) {
+        $rank++;
+        my $pagemap = $r->{pagemap} || {};
+        my ($metatags) = @{ $pagemap->{metatags} || [] };
+        push @out, Net::Async::WebSearch::Result->new(
+          url      => $r->{link},
+          title    => $r->{title},
+          snippet  => $r->{snippet},
+          provider => $self->name,
+          rank     => $rank,
+          published_at => (
+            $metatags && ( $metatags->{'article:published_time'}
+                        // $metatags->{'og:article:published_time'}
+                        // $metatags->{'date'} )
+          ),
+          raw      => $r,
+          extra    => {
+            ( defined $r->{displayLink} ? ( displayLink => $r->{displayLink} ) : () ),
+            ( defined $r->{mime}        ? ( mime        => $r->{mime} )        : () ),
+            ( defined $r->{fileFormat}  ? ( fileFormat  => $r->{fileFormat} )  : () ),
+          },
+        );
+        last if @out >= $limit;                     # honour limit exactly
+      }
+      return Future->done;
+    });
+  } until => sub {
+    my ( $trial ) = @_;
+    return 1 if $trial->failure;                    # stop and propagate on error
+    return 1 if @out >= $limit;                     # limit satisfied
+    return 1 if @out >= 100;                         # CSE result ceiling reached
+    return $exhausted;                              # nothing left to page
+  };
+
+  return $paging->then(sub { Future->done( \@out ) });
 }
 
 1;
@@ -101,7 +125,7 @@ Net::Async::WebSearch::Provider::Google - Google Programmable Search (CSE) JSON 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -113,7 +137,9 @@ version 0.002
 =head1 DESCRIPTION
 
 Provider for Google Programmable Search (Custom Search Engine) JSON API.
-Returns the C<items> array, capped at 10 per call by the upstream API.
+The API returns at most 10 C<items> per call, so a C<limit> above 10 is
+satisfied by paging over the C<start> index (C<start=1,11,21,…>) and merging
+the pages, up to CSE's hard ceiling of 100 results per query.
 
 =head1 API KEY
 
@@ -156,8 +182,10 @@ C<https://www.googleapis.com/customsearch/v1>.
 
 =head2 search
 
-Honours C<limit> (C<num>, capped at 10), C<language> (C<hl>), C<region>
-(C<gl>), C<safesearch> (C<safe>), C<date_restrict> (C<dateRestrict>).
+Honours C<limit> — paging over C<start> in blocks of C<num> (capped at 10 per
+call) until C<limit> results are collected, the upstream runs out, or CSE's
+100-result ceiling is reached — plus C<language> (C<hl>), C<region> (C<gl>),
+C<safesearch> (C<safe>), C<date_restrict> (C<dateRestrict>).
 
 =head1 SEE ALSO
 

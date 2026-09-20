@@ -27,8 +27,12 @@ To install this module, run the following commands:
 	make test
 	make install
 
-Requires a C compiler. No non-core runtime dependencies; Plack is optional
-(needed only for `plackup -s Hyperman` and the conformance tests).
+Requires a C compiler and Shared::Arena 0.11 or later (which brings Frozen
+and Struct::Codec), installed before `perl Makefile.PL` runs: the arena the
+workers share is Shared::Arena's, and its C header is found through
+ExtUtils::Depends at configure time. A sibling checkout in ../Shared-Arena is
+used ahead of an installed copy. Plack is optional (needed only for
+`plackup -s Hyperman` and the conformance tests).
 
 SUPPORT AND DOCUMENTATION
 

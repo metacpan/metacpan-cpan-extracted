@@ -24,6 +24,7 @@ t/26-random.t
 t/28-processes.t
 t/30-encode-to.t
 t/32-kinds.t
+t/34-pointers.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -60,7 +60,7 @@ sub rt {
 
     my ($self) = @_;
 
-    return undef if (! defined $self->{retentionTime});
+    return if (! defined $self->{retentionTime});
 
     if ($self->{retentionTime} =~ /^PT(?:([\d\.]+)M)?(?:([\d\.]+)S)?/) {
         my $s = 0;
@@ -183,7 +183,7 @@ sub scan_window {
     my $l = $self->{startMz} // $self->{lowMz};
     my $r = $self->{endMZ}   // $self->{highMz};
 
-    return undef if (! defined $l || ! defined $r);
+    return if (! defined $l || ! defined $r);
     return [$l, $r];
 
 }

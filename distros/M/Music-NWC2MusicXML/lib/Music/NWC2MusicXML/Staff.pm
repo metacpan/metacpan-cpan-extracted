@@ -3,7 +3,7 @@ package Music::NWC2MusicXML::Staff;
 use strict;
 use warnings;
 
-our $VERSION = '0.001.0';
+our $VERSION = '0.001.1';
 
 use Carp qw(croak carp);
 use Readonly;
@@ -27,7 +27,7 @@ Music::NWC2MusicXML::Staff - Internal representation of a single NWC staff.
 
 =head1 VERSION
 
-0.001.0
+0.001.1
 
 =head1 SYNOPSIS
 

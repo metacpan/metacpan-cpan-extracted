@@ -140,6 +140,82 @@ my $arena = Shared::Arena->create(size => 2 * 1024 * 1024);
     is($m->incr('win', 3), 3, 'an expired counter resets to zero before adding');
 }
 
+# ---- a counter created with a deadline: a fixed window in one call ---------
+#
+# The deadline is set when the increment CREATES the counter or resets a lapsed
+# one, and never renewed by a hit inside the window. The mutation this exists
+# to catch is the sliding window - an incr that re-arms the deadline on every
+# hit - which passes every "it expires" test and fails only the one that hits
+# again INSIDE the window and then looks just after the ORIGINAL deadline.
+
+{
+    my $m = $arena->map('win', slots => 64, slot_size => 128);
+    is($m->incr('w', 1, ttl_ms => 60), 1, 'a counter created with a ttl starts at one');
+    is($m->incr('w', 1, ttl_ms => 60), 2, '...and climbs inside its window');
+    is($m->incr('w', 5), 7, 'an incr with no ttl adds to the same live counter');
+
+    my ($late) = live(60,
+        sub {
+            $m->incr('slide', 1, ttl_ms => 60);           # the window opens: t0
+            select undef, undef, undef, 0.03;             # t0 + 30ms
+            $m->incr('slide', 1, ttl_ms => 60);           # 2; MUST NOT re-arm
+        },
+        sub { $m->counter('slide') });
+    is($late, 2, 'two hits inside the window count two');
+
+    select undef, undef, undef, 0.05;                     # t0 + 80ms: past 60,
+                                                          # before a slid 90
+    is($m->incr('slide', 1, ttl_ms => 60), 1,
+       'the counter lapsed at the FIRST deadline: the second hit did not '
+     . 'slide the window');
+
+    select undef, undef, undef, 0.09;
+    is($m->incr('w', 3, ttl_ms => 60), 3,
+       'after the deadline a hit starts the next window at $by');
+    is($m->incr('w', 1), 4, '...with a fresh deadline: still live');
+}
+
+# ---- four workers on one window counter, across the deadline ---------------
+#
+# Every hit before the deadline vanishes at it, from every process, because the
+# deadline is in the entry. Ten hits each from four children after it are
+# exactly forty, and not forty plus whatever came before.
+
+SKIP: {
+    skip 'fork is POSIX-only here', 2 if $^O eq 'MSWin32';
+    my $m = $arena->map('pool-win', slots => 64, slot_size => 128);
+
+    my $burst = sub {
+        my ($n) = @_;
+        my @kids;
+        for (1 .. 4) {
+            my $pid = fork;
+            die "fork: $!" unless defined $pid;
+            if (!$pid) { $m->incr('pw', 1, ttl_ms => 100) for 1 .. $n; exit 0 }
+            push @kids, $pid;
+        }
+        waitpid $_, 0 for @kids;
+    };
+
+    my $before;
+    for my $try (1 .. 5) {
+        my $t0 = Time::HiRes::time();
+        $m->delete('pw');
+        $burst->(25);
+        $before = $m->counter('pw');
+        my $took = (Time::HiRes::time() - $t0) * 1000;
+        last if $took < 100;
+        note sprintf 'the pre-deadline burst took %.0fms against a 100ms ttl '
+                   . '(try %d): again', $took, $try;
+    }
+    is($before, 100, 'four children put a hundred hits into the window');
+
+    select undef, undef, undef, 0.15;
+    $burst->(10);
+    is($m->counter('pw'), 40,
+       'after the deadline the count is exactly the forty hits that followed it');
+}
+
 # ---- shared across a pre-forked pool ---------------------------------------
 #
 # One worker sets a deadline; every worker sees the same lapse, because the

@@ -1,7 +1,7 @@
 # ABSTRACT: Multi-board overview of every karr board under a directory tree
 
 package App::karr::Cmd::Dashboard;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -15,6 +15,7 @@ use App::karr::Role::CliArgs;
 use App::karr::Role::ExitCodes;
 use App::karr::Role::Output;
 use App::karr::Role::CompactOutput;
+use App::karr::Role::Color;
 
 # Board-less on purpose (ticket #220): this walks a directory tree for
 # repositories and opens each board directly through App::karr::Git /
@@ -27,7 +28,8 @@ use App::karr::Role::CompactOutput;
 # placement as well (#225); without it the option was accepted there and
 # silently dropped.
 with 'App::karr::Role::CliArgs', 'App::karr::Role::ExitCodes',
-     'App::karr::Role::Output', 'App::karr::Role::CompactOutput';
+     'App::karr::Role::Output', 'App::karr::Role::CompactOutput',
+     'App::karr::Role::Color';
 
 
 option depth => (
@@ -143,7 +145,7 @@ sub execute {
     return;
   }
 
-  my $color = -t STDOUT && !$ENV{NO_COLOR};
+  my $color = $self->_want_color;
   my $c = sub {
     my ( $text, $spec ) = @_;
     return $color ? colored( $text, $spec ) : $text;
@@ -545,7 +547,7 @@ App::karr::Cmd::Dashboard - Multi-board overview of every karr board under a dir
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 

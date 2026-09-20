@@ -49,7 +49,7 @@ runs:
   using: 'composite'
   steps:
     - name: Setup Perl
-      uses: shogo82148/actions-setup-perl@v1
+      uses: shogo82148/actions-setup-perl@v1.44.0
       with:
         perl-version: ${{ inputs.perl-version }}
     
@@ -125,7 +125,7 @@ runs:
         Run `ghgen analyze --fix` locally to automatically apply these fixes, or enable auto-fix mode in this action:
         
         ```yaml
-        - uses: nigelhorne/App-GHGen@v10
+        - uses: nigelhorne/App-GHGen@v11
           with:
             auto-fix: true
         ```
@@ -138,7 +138,7 @@ runs:
     - name: Comment on PR
       if: github.event_name == 'pull_request' && inputs.mode == 'comment' && steps.analyze.outputs.issues > 0
       id: comment
-      uses: actions/github-script@v9
+      uses: actions/github-script@v9.0.0
       with:
         github-token: ${{ inputs.github-token }}
         script: |
@@ -157,7 +157,7 @@ runs:
     
     - name: Create PR with fixes
       if: inputs.create-pr == 'true' && steps.analyze.outputs.fixes > 0
-      uses: peter-evans/create-pull-request@v8
+      uses: peter-evans/create-pull-request@v8.1.1
       with:
         token: ${{ inputs.github-token }}
         commit-message: 'chore: optimize GitHub Actions workflows'

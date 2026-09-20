@@ -59,7 +59,7 @@
 #include "punk_observe/po_maplayout.h"
 #include "punk_observe/po_scan.h"
 #ifdef PO_HAVE_BUS
-#  include "hyperman/hm_bus.h"
+#  include "sa_abi.h"       /* Shared::Arena's C ABI: the tail's ring */
 #endif
 #include "punk_observe/po_live.h"
 #include "punk_observe/po_alert.h"
@@ -87,26 +87,67 @@
  * post-fork hook calls. */
 typedef struct { AV *av; const char *t; size_t tl; } po_live_ud;
 
-static po_u64 po_live_cursor = 0, po_live_gaps = 0;
+/* Shared::Arena's table, resolved once at BOOT; NULL means no tail across
+ * workers, which is the degrade this dist always had. The region is
+ * Observe's own anonymous one unless bus_init was handed a Shared::Arena to
+ * ride on, and the ring is "po.tail" in it. */
+static const sa_abi *PO_SA        = NULL;
+static sa_region    *po_sa_region = NULL;
+static sa_ring      *po_sa_ring   = NULL;
+static sa_cursor    *po_sa_cur    = NULL;
+static int           po_sa_joined = 0;
+static po_u64        po_live_gaps = 0;    /* lapped + abandoned, cumulative */
+
+static void po_sa_resolve(pTHX) {
+    SV *sv, *err;
+    if (PO_SA) return;
+    sv  = eval_pv("require Shared::Arena; Shared::Arena::_abi_ptr()", 0);
+    err = get_sv("@", 0);
+    if (!sv || !SvOK(sv) || (err && SvTRUE(err))) return;
+    {
+        const sa_abi *t = INT2PTR(const sa_abi *, SvUV(sv));
+        if (t && t->abi_version >= SA_ABI_VERSION) PO_SA = t;
+    }
+}
+
+/* The tail's cursor, opened on first use from the START of what the ring
+ * still holds (the old cursor was born at zero and caught up the same way). */
+static sa_cursor *po_live_cursor(void) {
+    if (!po_sa_cur && po_sa_ring) po_sa_cur = PO_SA->cursor_open(po_sa_ring, 1);
+    return po_sa_cur;
+}
 
 /* A post-fork reset starts at NOW, not at zero.
  *
  * Zero means "replay the whole ring", which is the opposite of what a freshly
  * forked worker wants: it would re-deliver every line the parent already
- * forwarded. The bus makes the same choice for its own dispatch cursor
- * (hm_bus_reset_cursors), and for the same reason - a cursor is a position in
- * a stream this process has not been reading. */
+ * forwarded. A cursor is a position in a stream this process has not been
+ * reading, so it is released and reopened at the current sequence; its gaps
+ * start again at nothing, as they did. */
 static void po_live_cursor_reset(void) {
-    po_live_cursor = (po_u64)hm_bus_seq();
-    po_live_gaps   = 0;
+    if (!po_sa_ring) return;
+    if (po_sa_cur) PO_SA->cursor_release(po_sa_cur);
+    po_sa_cur     = PO_SA->cursor_open(po_sa_ring, 0);
+    po_live_gaps  = 0;
+    po_sa_joined  = 0;        /* a new process after a fork: join again */
+}
+
+/* What this cursor missed: lapped by the ring, or a hole a dead publisher
+ * left that the ring filled and this reader stepped over. */
+static po_u64 po_live_cursor_gaps(void) {
+    sa_counts n;
+    if (!po_sa_cur) return 0;
+    PO_SA->counts(po_sa_cur, &n);
+    return (po_u64)(n.lapped + n.abandoned);
 }
 
 static void po_live_collect(void *ud, uint64_t seq,
                             const char *topic, uint32_t tlen,
-                            const char *payload, uint32_t plen) {
+                            const char *payload, uint32_t plen,
+                            uint32_t flags) {
     po_live_ud *u = (po_live_ud *)ud;
     dTHX;
-    (void)seq;
+    (void)seq; (void)flags;
     /* A fanout subscriber sees every topic, so the filter is here. A tail
      * that forwarded another tenant's topic would be the tenancy boundary
      * failing open. */
@@ -1509,14 +1550,6 @@ static void povw_window_vars(pTHX_ HV *v, SV *req, SV **from, SV **to) {
 /* Some of the static helpers above are used only by later phases. Silence the
  * unused warnings without hiding a real one by taking their addresses once. */
 static void po_keep_alive(void) {
-#ifdef PO_HAVE_BUS
-    /* The rest of the bus. Subscriptions and the waker belong to the mount -
-     * a subscription made anywhere but boot or on_worker_start lands in one
-     * worker - so they are referenced here rather than left to warn. */
-    (void)hm_bus_wakers_init; (void)hm_bus_waker_take; (void)hm_bus_waker_fd;
-    (void)hm_bus_waker_drained; (void)hm_bus_group_gaps; (void)hm_bus_published;
-    (void)hm_bus_subscribe; (void)hm_bus_unsubscribe; (void)hm_bus_dispatch;
-#endif
     (void)po_le32; (void)po_tick_ns;
     (void)po_pbr_done; (void)po_pbr_float;
     (void)po_pb_packed_begin; (void)po_pb_packed_varint; (void)po_pb_packed_double;
@@ -4496,6 +4529,9 @@ MODULE = Punk::Observe   PACKAGE = Punk::Observe
 
 BOOT:
     po_keep_alive();
+#ifdef PO_HAVE_BUS
+    po_sa_resolve(aTHX);
+#endif
 
 INCLUDE: xs/contracts.xs
 

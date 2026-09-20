@@ -2987,7 +2987,10 @@ static void hm_accept(pTHX_ hm_loop *loop, hm_listener *lst) {
          * connection object is allocated or a byte is read - the cheapest
          * possible rejection. Fails open (no arena -> deny_check is 0). */
         hm_fmt_peer(peer, sizeof(peer), &peer_port, (struct sockaddr *)&ss);
-        if (hm_rl_deny_check(peer)) { hm_os_close(fd); loop->denied++; continue; }
+        if (hm_sa_deny_check(peer)) { hm_os_close(fd); loop->denied++; continue; }
+        /* Distinct clients, opt-in: with the sketch off this is one load of
+         * a NULL, with it on a hash and a CAS-max on the peer string. */
+        if (hm_sa_hll) hm_sa_hll_add(peer);
         c = hm_new_conn(loop, fd, lst);
         memcpy(c->peer, peer, sizeof(c->peer));
         c->peer_port = peer_port;
@@ -3204,13 +3207,16 @@ static void hm_dispatch(pTHX_ hm_loop *loop, hm_event *ev) {
     }
     case HM_EV_SIGNAL:
         if (ev->fd == SIGUSR1) {
-            fprintf(stderr,
-                "Hyperman worker %d: requests=%lu accepts=%lu conns=%d "
-                "bytes_out=%lu backend=%s%s\n",
-                hm_os_getpid(),
-                (unsigned long)loop->requests, (unsigned long)loop->accepts,
-                loop->nconns, (unsigned long)loop->bytes_out,
-                loop->be->name, loop->stopping ? " (draining)" : "");
+            /* With a scoreboard the supervisor prints every row itself and
+             * never forwards USR1; this line is the no-arena fallback. */
+            if (!hm_sa_board_live())
+                fprintf(stderr,
+                    "Hyperman worker %d: requests=%lu accepts=%lu conns=%d "
+                    "bytes_out=%lu backend=%s%s\n",
+                    hm_os_getpid(),
+                    (unsigned long)loop->requests, (unsigned long)loop->accepts,
+                    loop->nconns, (unsigned long)loop->bytes_out,
+                    loop->be->name, loop->stopping ? " (draining)" : "");
             return;
         }
         hm_on_signal(aTHX_ loop);
@@ -3708,11 +3714,44 @@ static int hm_make_udp_listener(const char *host, int port, int reuseport) {
 static volatile sig_atomic_t hm_sup_term = 0;
 static volatile sig_atomic_t hm_sup_hup  = 0;
 static volatile sig_atomic_t hm_sup_usr1 = 0;
+static volatile sig_atomic_t hm_sup_tick = 0;   /* ALRM: the liveness look */
 static void hm_sup_sig(int sig) {
     if (sig == SIGHUP || sig == SIGUSR2) hm_sup_hup = 1;
     else if (sig == SIGUSR1)             hm_sup_usr1 = 1;
+    else if (sig == SIGALRM)             hm_sup_tick = 1;
     else if (sig == SIGCHLD)             ;   /* no-op: just wakes sigsuspend() */
     else                                 hm_sup_term = 1;
+}
+
+/* Wedged is not dead. A worker that is alive but has stopped turning its
+ * loop keeps its pid and its row; what stops is the row's `updated` stamp,
+ * which the one-second tick moves. Three looks three seconds apart with the
+ * stamp unmoved and the pid answering kill(0) is the signal, logged once per
+ * episode. The respawn policy is untouched: this says, it does not act. */
+#define HM_SUP_TICK_SECS   3
+#define HM_SUP_WEDGED_TICKS 3
+static uint64_t hm_child_seen[1024];
+static int      hm_child_stale[1024];
+
+static void hm_sup_watch_board(void) {
+    int i;
+    if (!hm_sa_board_live()) return;
+    for (i = 0; i < hm_nchildren; i++) {
+        sa_sb_reading rd;
+        pid_t pid = hm_children[i];
+        if (hm_sa_board_row_of((uint64_t)pid, &rd) < 0) { hm_child_stale[i] = 0; continue; }
+        if (kill(pid, 0) != 0) continue;      /* gone: the reaper's business */
+        if (rd.updated == hm_child_seen[i]) {
+            if (++hm_child_stale[i] == HM_SUP_WEDGED_TICKS)
+                fprintf(stderr, "Hyperman: worker %d is alive but has not "
+                        "updated its scoreboard row for %d seconds: wedged?\n",
+                        (int)pid, HM_SUP_TICK_SECS * HM_SUP_WEDGED_TICKS);
+        }
+        else {
+            hm_child_seen[i]  = rd.updated;
+            hm_child_stale[i] = 0;
+        }
+    }
 }
 
 #endif /* !_WIN32 - the rest of this section is shared; hm_spawn and the
@@ -3816,6 +3855,10 @@ typedef struct {
     unsigned    deny_cap, rate_cap; /* arena table sizes, 0 = default        */
     unsigned    bus_slots, bus_slot_size, bus_groups;  /* 0 = default        */
     UV          http3_max_conns;    /* QUIC connection ceiling, 0 = off      */
+    const char *arena_name;         /* Shared::Arena name, NULL = anonymous  */
+    STRLEN      arena_name_len;
+    UV          arena_size;         /* bytes, 0 = computed from the tenants  */
+    int         distinct_clients;   /* count distinct peers at accept (HLL)  */
 } hm_worker_cfg;
 
 /* Populate the loop's listener array from the (already bound) specs. Under
@@ -3951,9 +3994,9 @@ static int hm_tls_reload(pTHX_ hm_loop *loop, SV *sni) {
 
 /* The bus wakeup, on this worker's loop.
  *
- * Lives here rather than in hm_bus.h because it is the one part that needs
- * both halves: hm_bus.h deliberately knows nothing about the server, and the
- * loop knows nothing about the ring.
+ * Lives here rather than in hm_sa_bus.h because it is the one part that needs
+ * both halves: hm_sa_bus.h deliberately knows nothing about the server, and
+ * the loop knows nothing about the ring.
  *
  * The callback MUST NOT CROAK. It is called from the event loop with no Perl
  * frame around it, and a die from a subscriber would unwind through the loop
@@ -3963,34 +4006,46 @@ static void hm_bus_wake_cb(pTHX_ int fd, int mask, void *ud) {
     PERL_UNUSED_ARG(fd);
     PERL_UNUSED_ARG(mask);
     PERL_UNUSED_ARG(ud);
-#if HM_BUS_HAVE_ATOMICS
+    PERL_UNUSED_CONTEXT;
     /* Empty the pipe and clear the flag BEFORE dispatching, so a publish that
      * lands while we are dispatching sets it again and pokes afresh, rather
      * than being folded into a wakeup that has already been handled. The
-     * order inside hm_bus_waker_drained matters too - see it. */
-    hm_bus_waker_drained();
-    (void)hm_bus_dispatch();
-#endif
+     * order inside the ring's wake_drained matters too - see hm_sa_bus.h. */
+    hm_sa_bus_waker_drained();
+    (void)hm_sa_bus_dispatch();
+}
+
+/* The one-second tick: the loop's counters into this worker's scoreboard
+ * row in one seqlock bracket, a heartbeat on the peer row, and the next
+ * tick armed. A C timer is one-shot and freed on fire, so re-arming here is
+ * the whole of the repetition. Stops with the loop: a draining worker keeps
+ * mirroring until its last connection closes, and nothing here holds the
+ * loop open once it wants to end. */
+static void hm_board_tick(pTHX_ void *ud) {
+    hm_loop *loop = (hm_loop *)ud;
+    hm_sa_board_mirror((uint64_t)loop->requests, (uint64_t)loop->accepts,
+                       (uint64_t)loop->denied, loop->nconns,
+                       (uint64_t)loop->bytes_out, (uint64_t)loop->datagrams,
+                       (uint64_t)loop->h3_requests);
+    if (HM_SA && hm_sa_region) HM_SA->beat(hm_sa_region);
+    if (!loop->stopping)
+        (void)hm_add_timer_watch_c(loop, 1.0, hm_board_tick, loop);
 }
 
 static void hm_bus_worker_attach(pTHX_ hm_loop *loop) {
-#if HM_BUS_HAVE_ATOMICS
     int fd;
-    if (!hm_bus_arena_live()) return;
-    /* A worker inherited the parent's cursor along with everything else, and a
-     * cursor is a position in a stream this process has not been reading.
+    if (!hm_sa_bus_live()) return;
+    /* A worker inherited the parent's cursors along with everything else, and
+     * a cursor is a position in a stream this process has not been reading.
      * Left alone it either replays what the parent already handled or skips
      * what it has not. From now on. */
-    hm_bus_reset_cursors();
-    fd = hm_bus_waker_fd();
+    hm_sa_bus_reset_cursors();
+    fd = hm_sa_bus_waker_fd();
     if (fd < 0) return;
     hm_add_io_watch_c(aTHX_ loop, fd, HM_EV_READ, hm_bus_wake_cb, NULL);
     /* Anything published between the fork and this attach is already on the
      * ring with no poke coming, because nothing was watching to be poked. */
-    (void)hm_bus_dispatch();
-#else
-    PERL_UNUSED_ARG(loop);
-#endif
+    (void)hm_sa_bus_dispatch();
 }
 
 static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {
@@ -4037,6 +4092,14 @@ static void hm_worker(pTHX_ const hm_worker_cfg *cfg, const int *fds) {
      * already run and anything it subscribed is registered before the first
      * wakeup can arrive. */
     hm_bus_worker_attach(aTHX_ loop);
+    /* A peer slot of this worker's own in the Shared::Arena, keyed on the
+     * pid it has now rather than the one it inherited. */
+    hm_sa_worker_join();
+    /* This worker's scoreboard row, mirrored now and then once a second.
+     * The tick also beats the peer row, so a worker that only ever receives
+     * on the bus never looks dead to the ring's hole escalation. */
+    if (hm_sa_board_live() && hm_sa_board_take() >= 0)
+        hm_board_tick(aTHX_ loop);
 
     hm_loop_run(aTHX_ loop, NULL);
     hm_loop_free(aTHX_ loop);
@@ -4050,6 +4113,27 @@ static pid_t hm_spawn(pTHX_ const hm_worker_cfg *cfg, int widx) {
     if (pid == 0) {
         int  stackfds[8];
         int *fds = NULL;
+
+        /* A RESPAWNED worker is forked from inside the supervisor's loop,
+         * where the pool's signals are handled by hm_sup_sig and BLOCKED.
+         * The child inherits both. Until the worker's own loop has taken
+         * over its signals, a TERM landing here would run the supervisor's
+         * handler and set a flag nobody in this process reads: the signal
+         * is swallowed, the worker never learns the pool is shutting down,
+         * and the supervisor waits for it for ever. Found by a test that
+         * killed a worker and sent TERM the moment its replacement had a
+         * scoreboard row. Default dispositions and an empty mask, so a
+         * TERM in that window ends the child, which is what TERM means. */
+        {
+            sigset_t none;
+            sigemptyset(&none);
+            signal(SIGTERM, SIG_DFL); signal(SIGINT,  SIG_DFL);
+            signal(SIGHUP,  SIG_DFL); signal(SIGUSR1, SIG_DFL);
+            signal(SIGUSR2, SIG_DFL); signal(SIGCHLD, SIG_DFL);
+            signal(SIGALRM, SIG_DFL);
+            alarm(0);
+            sigprocmask(SIG_SETMASK, &none, NULL);
+        }
 
         /* Tell perl it has been forked. $$ is a plain SV that perl only
          * refreshes inside pp_fork; forking from C here happens behind its
@@ -4103,7 +4187,7 @@ static pid_t hm_spawn(pTHX_ const hm_worker_cfg *cfg, int widx) {
         /* This child's own waker slot, claimed before hm_worker so the
          * attach below finds it. Index by worker number, so two workers never
          * share a descriptor. */
-        (void)hm_bus_waker_take(widx);
+        (void)hm_sa_bus_waker_take(widx);
         hm_worker(aTHX_ cfg, fds);
         _exit(0);
     }
@@ -4123,12 +4207,25 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
         workers = hm_os_ncpu();               /* always 1 on Windows */
     cfg->nworkers = workers;
 
-    /* The abuse-control arena, mapped HERE - before any worker forks - so
-     * every worker inherits the one shared denylist and counter table. Static
-     * `deny` entries are loaded now, in the parent, so they are live from the
-     * first accepted connection. Single-worker (dev) mode maps it too, so the
-     * ABI behaves the same whether or not a supervisor forks. */
-    hm_rl_arena_init(cfg->deny_cap, cfg->rate_cap);
+    /* The Shared::Arena, created HERE - before any worker forks - so every
+     * worker inherits the one mapping, and from Perl, so Hyperman->arena is
+     * the real object with every tenant on it. The denylist and the rate
+     * counters are two maps in it; static `deny` entries are loaded now, in
+     * the parent, so they are live from the first accepted connection.
+     * Single-worker (dev) mode maps it too, so the ABI behaves the same
+     * whether or not a supervisor forks. */
+    hm_sa_open(aTHX_ cfg->arena_name, cfg->arena_name_len,
+               cfg->arena_size ? cfg->arena_size
+                               : hm_sa_bytes(cfg->deny_cap, cfg->rate_cap,
+                                             cfg->bus_slots, cfg->bus_slot_size));
+    {
+        const char *which = NULL;
+        int err = 0;
+        if (hm_sa_abuse_open(cfg->deny_cap, cfg->rate_cap, &which, &err) < 0)
+            warn("Hyperman: could not carve the \"%s\" map in the arena "
+                 "(Shared::Arena error %d): the denylist and the rate "
+                 "counters fail open; raise arena_size", which, err);
+    }
 
     /* QUIC's stateless-reset and (later) Retry secret, generated HERE - once,
      * before any worker forks - for the same reason the TLS ticket key is:
@@ -4137,22 +4234,41 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
      * token unverifiable. Inherited across the fork, so every worker agrees. */
     hm_quic_secret_init();
 
-    /* The message bus, mapped in the same place and for the same reason: a
+    /* The message bus, a ring in the same arena and for the same reason: a
      * ring created after the fork would be one ring per worker, which is a
-     * bus that delivers to nobody. Mapped even in single-worker mode, so the
+     * bus that delivers to nobody. Opened even in single-worker mode, so the
      * ABI behaves the same whether or not a supervisor forks. */
-    hm_bus_arena_init(cfg->bus_slots, cfg->bus_slot_size, cfg->bus_groups);
+    {
+        int err = 0;
+        if (hm_sa_bus_open(cfg->bus_slots, cfg->bus_slot_size, &err) < 0)
+            warn("Hyperman: could not carve the bus ring in the arena "
+                 "(Shared::Arena error %d): the bus is local-only; raise "
+                 "arena_size", err);
+    }
     /* ... and the wakeup descriptors, HERE for the same reason as the ring
      * and one more: a pipe created inside a worker is invisible to its
      * siblings, so a bus built after the fork delivers to some workers and
      * not others. One extra waker for the supervisor's own slot. */
-    hm_bus_wakers_init((uint32_t)(workers > 0 ? workers + 1 : 2));
+    (void)hm_sa_bus_wake_init((uint32_t)(workers > 0 ? workers + 1 : 2));
+    /* The worker scoreboard, one row per worker plus one, and the
+     * distinct-client sketch when asked for. Neither is on a hot path by
+     * default: the board is mirrored by a timer, the sketch is opt-in. */
+    {
+        int err = 0;
+        if (hm_sa_board_open((uint32_t)(workers > 0 ? workers + 1 : 2), &err) < 0)
+            warn("Hyperman: could not carve the worker scoreboard in the arena "
+                 "(Shared::Arena error %d): pool_stats is empty; raise "
+                 "arena_size", err);
+        if (cfg->distinct_clients && hm_sa_hll_open(&err) < 0)
+            warn("Hyperman: could not carve the distinct-client sketch in the "
+                 "arena (Shared::Arena error %d): distinct_clients is off", err);
+    }
     if (cfg->deny && SvROK(cfg->deny) && SvTYPE(SvRV(cfg->deny)) == SVt_PVAV) {
         AV *av = (AV *)SvRV(cfg->deny);
         SSize_t i, n = av_len(av) + 1;
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(av, i, 0);
-            if (e && *e && SvOK(*e)) hm_rl_deny_add(SvPV_nolen(*e), 0);
+            if (e && *e && SvOK(*e)) hm_sa_deny_add(SvPV_nolen(*e), 0);
         }
     }
 
@@ -4275,6 +4391,11 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
         /* SIGCHLD must be delivered so sigsuspend() below wakes when a worker
          * exits; hm_sup_sig() treats it as a no-op wakeup. */
         sigaction(SIGCHLD, &sa, NULL);
+        /* ALRM is the supervisor's only clock: a look at the scoreboard every
+         * few seconds for a worker that is alive and not moving. Armed only
+         * when there is a board to look at. */
+        sigaction(SIGALRM, &sa, NULL);
+        if (hm_sa_board_live()) alarm(HM_SUP_TICK_SECS);
 
         /* Race-free supervision: keep the acted-on signals blocked, check the
          * flags, reap without blocking, then sigsuspend() to wait for the next
@@ -4288,6 +4409,7 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
             sigaddset(&block, SIGTERM); sigaddset(&block, SIGINT);
             sigaddset(&block, SIGHUP);  sigaddset(&block, SIGUSR1);
             sigaddset(&block, SIGUSR2); sigaddset(&block, SIGCHLD);
+            sigaddset(&block, SIGALRM);
             sigprocmask(SIG_BLOCK, &block, &orig);
 
             for (;;) {
@@ -4304,8 +4426,20 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
 
                 if (hm_sup_usr1) {
                     hm_sup_usr1 = 0;
-                    for (i = 0; i < hm_nchildren; i++)
-                        kill(hm_children[i], SIGUSR1);
+                    /* With a scoreboard the supervisor has every worker's
+                     * numbers already: one aggregate line and one per row,
+                     * a dead row marked. Without one, each worker prints its
+                     * own line as it always did. */
+                    if (hm_sa_board_live()) hm_sa_board_print(stderr);
+                    else
+                        for (i = 0; i < hm_nchildren; i++)
+                            kill(hm_children[i], SIGUSR1);
+                }
+
+                if (hm_sup_tick) {
+                    hm_sup_tick = 0;
+                    hm_sup_watch_board();
+                    alarm(HM_SUP_TICK_SECS);
                 }
 
                 if (hm_sup_hup) {

@@ -1,7 +1,7 @@
 # ABSTRACT: karr-foundation per-repo state -- lock file, JSON state, cooldown backoff
 
 package App::karr::Foundation::State;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use Path::Tiny;
 use Fcntl qw( LOCK_EX LOCK_NB LOCK_UN );
@@ -304,7 +304,7 @@ App::karr::Foundation::State - karr-foundation per-repo state -- lock file, JSON
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 DESCRIPTION
 

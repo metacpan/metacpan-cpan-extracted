@@ -1,7 +1,7 @@
 # ABSTRACT: Disable automated agent runs on this board
 
 package App::karr::Cmd::Disable;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -59,7 +59,7 @@ App::karr::Cmd::Disable - Disable automated agent runs on this board
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 

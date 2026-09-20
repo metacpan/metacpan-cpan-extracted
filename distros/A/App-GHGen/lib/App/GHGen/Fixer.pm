@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(
 	%ACTION_UPDATES
 );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 PACKAGE DATA
 

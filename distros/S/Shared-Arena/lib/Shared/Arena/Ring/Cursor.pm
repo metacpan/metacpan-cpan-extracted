@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require Shared::Arena;
 
@@ -20,7 +20,7 @@ Shared::Arena::Ring::Cursor - one reader's position in a ring
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 
@@ -53,12 +53,21 @@ the cursor in the child.
 
     my @records = $cursor->drain;
     my @records = $cursor->drain(max => 100);
+    my @records = $cursor->drain(wait => 0);
 
 Everything published since this cursor last looked, as array references of
 C<[$topic, $payload, $sequence]>. An empty list when there is nothing new,
-which is not an error and not a wait: C<drain> never blocks.
+which is not an error and not a wait: C<drain> never blocks on an empty ring.
 
 C<max> caps how many are returned in one call; the rest stay for the next.
+
+The one place it does wait is a B<hole>, a record reserved by a publisher that
+has not committed it (see L<Shared::Arena/WHEN A PROCESS DIES>). By default
+C<drain> waits there for up to the grace period, so that one call either gets
+past a dead publisher's hole or learns that the publisher is alive. With
+C<< wait => 0 >> it returns at once with whatever came before the hole and
+leaves the cursor on it; the next C<drain> looks again. That is what an event
+loop wants, and it is how the C ABI always behaves.
 
 The sequence is the record's identity. It increases, never repeats, and is
 what a gap is counted in.

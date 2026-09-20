@@ -290,12 +290,17 @@ typedef struct {
  * with no destructor to register: measured, the ENTER/SAVEDESTRUCTOR pair, the
  * malloc and the final copy were most of the 86ns it took to encode one
  * integer, against 34ns to decode it. */
+/* struct_encode(..., strip_pointers => 1): a pointer object is written as
+ * undef instead of refused. See sc_is_pointer_obj. */
+#define SC_STRIP_POINTERS 1u
+
 typedef struct {
     char    *buf;
     STRLEN   len;      /* bytes written, or that WOULD have been in a fixed buffer */
     STRLEN   cap;
     SV      *bufsv;    /* the SV `buf` points into, NULL for a fixed buffer  */
     int      fixed;    /* encode_to: never grow, keep counting past cap      */
+    U32      flags;    /* SC_STRIP_POINTERS                                  */
     sc_seen *seen;     /* open addressing keyed on the SV's address          */
     STRLEN   nseen;
     STRLEN   seen_cap; /* a power of two, 0 until the first shared SV        */
@@ -436,6 +441,55 @@ static MAGIC *sc_tie_magic(pTHX_ SV *sv) {
     if (SvTYPE(sv) == SVt_PVAV || SvTYPE(sv) == SVt_PVHV)
         return mg_find(sv, PERL_MAGIC_tied);
     return mg_find(sv, PERL_MAGIC_tiedscalar);
+}
+
+/* An object whose whole state is one integer, in a class whose DESTROY is an
+ * XSUB, is the shape the typemap gives a handle: T_PTROBJ stores the address
+ * of a C struct as the IV and the generated DESTROY frees it. Compress::Raw::
+ * Zlib's streams and XML::LibXML's nodes are this shape. The SV itself says
+ * nothing, which is why Storable carries one happily unless the class
+ * installs a STORABLE_freeze that croaks; a faithful copy in another process
+ * hands its DESTROY an address that was never allocated there, and a copy in
+ * the same process frees the original's struct under it. So the encoder
+ * refuses the shape (or, asked to, writes undef) and the decoder refuses to
+ * bless it, and no DESTROY ever sees the integer.
+ *
+ * The DESTROY must be XS: a blessed integer with a DESTROY written in Perl is
+ * an ordinary object - Tie::StdScalar's tie object is exactly that, and its
+ * DESTROY only undefs the scalar - and Perl code cannot free C memory, so a
+ * Perl DESTROY that does so calls an XSUB to do it, which is the one shape
+ * this cannot see. A class without a DESTROY frees nothing and is carried as
+ * before; a string, a float, a reference or a container in any class is
+ * data, not an address. The DESTROY is looked up through the class's
+ * inheritance, as perl will look it up. */
+#ifndef CvISXSUB
+#  define CvISXSUB(cv) (CvXSUB(cv) != NULL)
+#endif
+
+/* An address that has been printed still has a public POK on perls before
+ * 5.36, where caching the digits set it, so POK alone cannot say "string".
+ * The PV that spells the integer back is the cached spelling and says nothing
+ * the IV did not; any other PV is a string, and a string is data. The cost is
+ * one ambiguous shape on those perls: a blessed "7" that has also been used
+ * as a number carries the same flags and the same bytes as a printed 7, and
+ * is refused with it. */
+static int sc_pv_spells_the_iv(pTHX_ SV *sv) {
+    char buf[64];
+    int blen;
+    PERL_UNUSED_CONTEXT;
+    blen = SvIsUV(sv) ? my_snprintf(buf, sizeof(buf), "%" UVuf, SvUVX(sv))
+                          : my_snprintf(buf, sizeof(buf), "%" IVdf, SvIVX(sv));
+    return blen > 0 && (STRLEN)blen == SvCUR(sv)
+           && memEQ(SvPVX_const(sv), buf, (STRLEN)blen);
+}
+
+static int sc_is_pointer_obj(pTHX_ SV *sv, HV *stash) {
+    GV *gv;
+    if (SvTYPE(sv) >= SVt_PVAV || SvTYPE(sv) == SVt_PVGV) return 0;
+    if (!SvIOK(sv) || SvNOK(sv) || SvROK(sv)) return 0;
+    if (SvPOK(sv) && !sc_pv_spells_the_iv(aTHX_ sv)) return 0;
+    gv = gv_fetchmeth(stash, "DESTROY", 7, 0);
+    return gv && GvCV(gv) && CvISXSUB(GvCV(gv)) ? 1 : 0;
 }
 
 static void sc_enc_value(pTHX_ sc_enc *e, SV *sv);
@@ -729,6 +783,14 @@ static void sc_enc_body(pTHX_ sc_enc *e, SV *sv) {
             HV *stash = SvSTASH(rv);
             const char *nm = HvNAME(stash);
             if (!nm) sc_enc_croak_type(aTHX_ "reference blessed into an anonymous stash");
+            if (sc_is_pointer_obj(aTHX_ rv, stash)) {
+                /* Not entered in the seen table, so a second reference to it
+                 * arrives here again and is dropped again. */
+                if (e->flags & SC_STRIP_POINTERS) { SC_PUT(e, SC_T_UNDEF); return; }
+                croak("Struct::Codec: cannot encode a %.*s object that holds a pointer"
+                      " (strip_pointers => 1 drops it)",
+                      (int)HvNAMELEN_get(stash), nm);
+            }
             SC_PUT(e, SC_T_OBJECT);
             sc_enc_key(aTHX_ e, nm, (STRLEN)HvNAMELEN_get(stash),
                        HvNAMEUTF8(stash) ? 1 : 0);
@@ -852,17 +914,23 @@ static void sc_enc_run(pTHX_ sc_enc *e, SV *value) {
  * large one moves into a mortal SV when it outgrows the stack; that SV is
  * then handed back with the caller's reference added, and the pending mortal
  * decrement belongs to the caller's frame as it does for any XSUB's return. */
-static SV *sc_encode(pTHX_ SV *value) {
+static SV *sc_encode_flags(pTHX_ SV *value, U32 flags) {
     sc_enc e;
     char stack[SC_ENC_STACK];
     memset(&e, 0, sizeof e);
     e.buf = stack;
     e.cap = sizeof stack;
+    e.flags = flags;
     sc_enc_run(aTHX_ &e, value);
     if (!e.bufsv) return newSVpvn(e.buf, e.len);
     SvCUR_set(e.bufsv, e.len);
     e.buf[e.len] = '\0';
     return SvREFCNT_inc_simple_NN(e.bufsv);
+}
+
+/* The ABI's encode: no options, so a pointer object is a croak. */
+static SV *sc_encode(pTHX_ SV *value) {
+    return sc_encode_flags(aTHX_ value, 0);
 }
 
 /* Into caller memory. See sc_abi.h for the contract. */
@@ -1379,7 +1447,16 @@ static void sc_dec_referent(pTHX_ sc_dec *d, SV *rv, STRLEN tag_off, int track,
         }
     }
 
-    if (stash) sv_bless(rv, stash);
+    /* rule 10 has a second reason now: a referent that would become a pointer
+     * object is refused BEFORE the bless, so it is freed as the plain integer
+     * it is and the class's DESTROY never runs on it. Streams written before
+     * the encoder refused the shape are how one arrives. */
+    if (stash) {
+        if (sc_is_pointer_obj(aTHX_ SvRV(rv), stash))
+            croak("Struct::Codec: a %.*s object that holds a pointer at byte %" UVuf,
+                  (int)HvNAMELEN_get(stash), HvNAME(stash), SC_OFF(d));
+        sv_bless(rv, stash);
+    }
 }
 
 /* Fill `into`, which the caller has already attached. Returns NULL, or the SV

@@ -63,9 +63,10 @@ tool *and* the workflow, so use it; don't invoke a skill first, just run it:
 - `karr create "Title" --priority high --tags a,b --body '…'` — new ticket
 - `karr edit ID -a "note"` · `--claim NAME` · `--block "why"` — update
 - `karr move ID in-progress --claim NAME` — start · `karr handoff ID --claim NAME --note "…"` — to review
-- `NAME=$(karr agentname)` — mint a claim name **once** and reuse that same `$NAME` for move,
-  handoff and `--claimed-by`; every call returns a different name, so a fresh one at handoff time
-  no longer matches the claim (`karr show ID` reads the held name back off the card)
+- `export KARR_CLAIM=$(karr agent-name)` — name yourself **once** per session; every `--claim`
+  (move, handoff, pick, edit, create) and `list --claimed-by` then defaults to it, so the handoff
+  matches the claim. A card you `create` without starting it (`--status in-progress`) stays
+  unclaimed, so others can pick it
 
 Bugs found while dogfooding become tickets on this board. Full command surface (pick / context /
 set-refs / multi-agent): skill `kanban-issues-karr-cli`.

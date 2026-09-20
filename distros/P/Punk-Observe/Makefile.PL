@@ -1,4 +1,3 @@
-use 5.010;
 use strict;
 use warnings;
 use Config;                 # $Config{cc}, for the probes below
@@ -118,26 +117,30 @@ push @DEFINE, '-DPO_HAVE_CRC32C_ARM'
     }
 }
 
+# The live tail's ring is Shared::Arena's, driven through its C ABI, so the
+# header is sa_abi.h and the table is resolved at boot. A sibling checkout
+# comes first, ahead of an installed copy, as everywhere in this workspace;
+# Shared::Arena is REQUIRED (one code path, as Hyperman decided), so a build
+# that finds neither stops here rather than shipping a tail that cannot
+# cross workers.
 {
-    my $bus;
+    my $sa;
+    my @sib = grep { -d } ('../Shared-Arena/include');
     my $inst = eval { require ExtUtils::Depends;
-                          my $d = ExtUtils::Depends->new('Punk::Observe', 'Hyperman');
-                          my %v = $d->get_makefile_vars;
-                          $v{INC} } || '';
-    for my $d (inc_dirs($inst)) {
-        next unless -f "$d/hyperman/hm_bus.h";
-        $bus = $d;
+                      my $d = ExtUtils::Depends->new('Punk::Observe', 'Shared::Arena');
+                      my %v = $d->get_makefile_vars;
+                      $v{INC} } || '';
+    for my $d (@sib, inc_dirs($inst)) {
+        next unless -f "$d/sa_abi.h";
+        $sa = $d;
         last;
     }
-    if ($bus) {
-        $INC .= " -I$bus";
-        push @DEFINE, '-DPO_HAVE_BUS';
-        print "hm_bus.h: from $bus - the tail crosses workers.\n";
-    }
-    else {
-        print "No hm_bus.h: the live tail is in-process only "
-            . "(correct for workers => 1).\n";
-    }
+    die "Punk::Observe needs Shared::Arena 0.11 installed, or present as the "
+      . "sibling ../Shared-Arena: its sa_abi.h is the live tail's ring.\n"
+        unless $sa;
+    $INC .= " -I$sa";
+    push @DEFINE, '-DPO_HAVE_BUS';
+    print "sa_abi.h: from $sa - the tail crosses workers.\n";
 }
 
 print "DEFINE:   @DEFINE\n" if @DEFINE;
@@ -222,7 +225,8 @@ my %WriteMakefileArgs = (
         'Punk::OpenTelemetry' => '0.08',   # otel_proto.h at build, decode at test
         'File::Raw::JSON'     => '0.06',   # the OTLP/JSON parse
         'IO::Uncompress::Gunzip' => '0',   # gzip request bodies
-        'Hyperman' => '0.36',
+        'Hyperman' => '0.36',              # the server the tail runs under
+        'Shared::Arena' => '0.11',         # the ring the tail crosses workers on
         # THE SCHEDULER FOR THE PERIODIC WORK. Compaction, retention, alert
         # evaluation and health polling are four cron tasks under one leader
         # lease, so they inherit election, restart, backoff and the admin UI

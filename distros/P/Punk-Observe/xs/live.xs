@@ -1,28 +1,30 @@
 MODULE = Punk::Observe   PACKAGE = Punk::Observe::Live   PREFIX = poli_
 
-# Was this build able to find hm_bus.h? A test that needs a second worker
+# Can the tail cross workers in this process? Built with Shared::Arena's
+# header AND its table resolved at boot. A test that needs a second worker
 # asks, rather than assuming a layout.
 int
 poli_have_bus()
     CODE:
 #ifdef PO_HAVE_BUS
-        RETVAL = 1;
+        RETVAL = PO_SA ? 1 : 0;
 #else
         RETVAL = 0;
 #endif
     OUTPUT:
         RETVAL
 
-# The slot size this build encodes for, and - where the bus is present - the
-# bus's own. A test asserts they agree, because a record sized against the
-# wrong constant is refused rather than truncated.
+# The slot size this build encodes for, and - once the ring is open - what
+# one of its slots carries, a RUNTIME answer. A test asserts the ring holds
+# at least the slot the record is sized against, because a record sized
+# against the wrong number is refused rather than truncated.
 void
 poli_slot_sizes()
     PPCODE:
         {
             mXPUSHi(PO_TAIL_SLOT);
 #ifdef PO_HAVE_BUS
-            mXPUSHi(HM_BUS_SLOT_SIZE);
+            mXPUSHi(po_sa_ring ? (IV)PO_SA->slot_bytes(po_sa_ring) : 0);
 #else
             mXPUSHi(0);
 #endif
@@ -223,15 +225,55 @@ poli_heartbeat()
 
 # ---- the bus, where this build has one -------------------------------------
 
-# Set up the shared arena. Called BEFORE the fork, because a subscription made
-# after one lands in a single process and a cursor that starts at "now"
-# silently misses everything published before it.
+# Set up the ring. Called BEFORE the fork, because a subscription made after
+# one lands in a single process and a cursor that starts at "now" silently
+# misses everything published before it.
+#
+#   bus_init()           an anonymous Shared::Arena of Observe's own
+#   bus_init(, )   the ring on a Shared::Arena the caller holds
+#                              (Hyperman->arena, or a test's with its hooks)
+#
+# The ring's slot is 64 bytes wider than PO_TAIL_SLOT, so a record sized
+# against PO_TAIL_SLOT always fits one slot and never spans. Idempotent.
 int
-poli_bus_init(int slots)
+poli_bus_init(int slots, ...)
     CODE:
 #ifdef PO_HAVE_BUS
-        hm_bus_arena_init((uint32_t)slots, HM_BUS_SLOT_SIZE, 0);
-        RETVAL = hm_bus_arena_live() ? 1 : 0;
+        {
+            int err = 0;
+            if (!PO_SA) { RETVAL = 0; }
+            else if (po_sa_ring) { RETVAL = 1; }
+            else {
+                if (slots < 2) slots = 2;
+                if (items > 1 && SvROK(ST(1))) {
+                    /* Ride on the caller's arena: Shared::Arena::_region_ptr */
+                    dSP;
+                    int count;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP);
+                    XPUSHs(ST(1));
+                    PUTBACK;
+                    count = call_method("_region_ptr", G_SCALAR | G_EVAL);
+                    SPAGAIN;
+                    if (count == 1 && !SvTRUE(ERRSV)) {
+                        SV *p = POPs;
+                        po_sa_region = INT2PTR(sa_region *, SvUV(p));
+                    }
+                    PUTBACK; FREETMPS; LEAVE;
+                }
+                if (!po_sa_region) {
+                    sa_config cfg;
+                    PO_SA->config_init(&cfg);
+                    cfg.bytes = (uint64_t)slots * (PO_TAIL_SLOT + 64) + 65536;
+                    po_sa_region = PO_SA->create(&cfg, &err);
+                }
+                if (po_sa_region)
+                    po_sa_ring = PO_SA->ring_open(po_sa_region, "po.tail", 7,
+                                                  (uint64_t)slots,
+                                                  PO_TAIL_SLOT + 64, &err);
+                RETVAL = po_sa_ring ? 1 : 0;
+            }
+        }
 #else
         (void)slots;
         RETVAL = 0;
@@ -247,7 +289,16 @@ poli_bus_publish(SV *topic, SV *payload)
             STRLEN tl, pl;
             const char *t = SvPV(topic, tl);
             const char *p = SvPV(payload, pl);
-            RETVAL = hm_bus_publish(t, (uint32_t)tl, p, (uint32_t)pl);
+            /* 0 on the ring, -1 refused as oversize (never truncated: the
+             * record is truncated at ingest, where the reader can see it),
+             * 1 with no ring (this process only), -2 built without one. */
+            if (!po_sa_ring) RETVAL = 1;
+            else if ((uint64_t)tl + pl > PO_TAIL_SLOT - 16) RETVAL = -1;
+            else {
+                int64_t rc = PO_SA->publish(po_sa_ring, t, (uint32_t)tl,
+                                            p, (uint32_t)pl);
+                RETVAL = SA_PUBLISHED(rc) ? 0 : rc == SA_TOO_BIG ? -1 : 1;
+            }
         }
 #else
         (void)topic; (void)payload;
@@ -273,9 +324,16 @@ poli_bus_drain(SV *topic, ...)
             po_u64 before = po_live_gaps;
             po_live_ud ud;
             ud.av = out; ud.t = t; ud.tl = (size_t)tl;
-            got = hm_bus_drain((uint64_t *)&po_live_cursor,
-                               (uint64_t *)&po_live_gaps,
-                               po_live_collect, &ud);
+            {
+                sa_cursor *c = po_live_cursor();
+                /* Draining is proof of life: a reader that only ever drains
+                 * must still tick, or the ring's hole check would judge it
+                 * wedged. Join once per process, beat on each drain. */
+                if (c && !po_sa_joined) { PO_SA->join(po_sa_region); po_sa_joined = 1; }
+                if (c) PO_SA->beat(po_sa_region);
+                got = c ? PO_SA->drain(c, 0, po_live_collect, &ud) : 0;
+                po_live_gaps = po_live_cursor_gaps();
+            }
             /* THE DELTA GOES TO THE ARENA, when the caller passed one.
              *
              * po_live_gaps is a per-process cumulative: honest to this
@@ -305,7 +363,6 @@ void
 poli_bus_reset_cursors()
     PPCODE:
 #ifdef PO_HAVE_BUS
-        hm_bus_reset_cursors();
         po_live_cursor_reset();
 #endif
         XSRETURN_EMPTY;

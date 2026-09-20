@@ -4,6 +4,9 @@ use strict;
 use warnings;
 use 5.008001;
 
+# ABSTRACT: Perl interface to the NetBSD editline library
+our $VERSION = '0.12'; # VERSION
+
 require Exporter;
 use AutoLoader;
 
@@ -13,26 +16,24 @@ our @ISA = qw(Exporter);
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-# This allows declaration	use Term::EditLine ':all';
+# This allows declaration   use Term::EditLine ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	CC_ARGHACK
-	CC_CURSOR
-	CC_EOF
-	CC_ERROR
-	CC_FATAL
-	CC_NEWLINE
-	CC_NORM
-	CC_REDISPLAY
-	CC_REFRESH
-	CC_REFRESH_BEEP
+    CC_ARGHACK
+    CC_CURSOR
+    CC_EOF
+    CC_ERROR
+    CC_FATAL
+    CC_NEWLINE
+    CC_NORM
+    CC_REDISPLAY
+    CC_REFRESH
+    CC_REFRESH_BEEP
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = ();
-
-our $VERSION = '0.11';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -52,14 +53,14 @@ sub AUTOLOAD {
     }
 
     {
-	no strict 'refs';
-	# Fixed between 5.005_53 and 5.005_61
-#XXX	if ($] >= 5.00561) {
-#XXX	    *$AUTOLOAD = sub () { $val };
-#XXX	}
-#XXX	else {
-	    *$AUTOLOAD = sub { $val };
-#XXX	}
+    no strict 'refs';
+    # Fixed between 5.005_53 and 5.005_61
+#XXX    if ($] >= 5.00561) {
+#XXX        *$AUTOLOAD = sub () { $val };
+#XXX    }
+#XXX    else {
+        *$AUTOLOAD = sub { $val };
+#XXX    }
     }
     goto &$AUTOLOAD;
 }
@@ -75,24 +76,31 @@ XSLoader::load('Term::EditLine', $VERSION);
 
 __END__
 
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Term::EditLine - Perl interface to the NetBSD editline library
 
+=head1 VERSION
+
+version 0.12
+
 =head1 SYNOPSIS
 
   use Term::EditLine qw(CC_EOF);
-
+ 
   my $el = Term::EditLine->new('progname');
   $el->set_prompt ('# ');
-
+ 
   $el->add_fun ('bye','desc',sub { print "\nbye\n"; return CC_EOF; });
-
+ 
   $el->parse('bind','-e');
   $el->parse('bind','^D','bye');
-
-  while (defined($_ = $el->gets())) {
+ 
+  while (defined(my $line = $el->gets())) {
     $el->history_enter($_);
     print $_;
   }
@@ -119,7 +127,7 @@ should be globs. See also el_init(3).
 =item gets
 
 Read a line from the tty. If successful returns the line read,
-or undef if no characters where read or if an error occured.
+or undef if no characters were read or if an error occurred.
 
 =item set_prompt ( PROMPT )
 
@@ -143,62 +151,62 @@ reference to a perl subroutine.
 
 =item line
 
-Returns three items (in this order): the current string buffer of the 
-Term::EditLine structure, the index of the cursor, and the index of the 
-last character. 
+Returns three items (in this order): the current string buffer of the
+Term::EditLine structure, the index of the cursor, and the index of the
+last character.
 
 =item set_getc_fun ( SUBREF )
 
 Define the character reading function as SUBREF. This function is to
 return one single character. It is called internally by gets() and getc().
-It is useful to define a custom getc function, if you want to write an 
+It is useful to define a custom getc function, if you want to write an
 interactive program with line editing function that has to process events
 when no input is available. A simple tcp chatclient example:
 
   use Term::EditLine;
   use IO::Socket;
   use strict;
-
+ 
   my ($sock,$el,$rin,$buf);
-
+ 
   $sock = IO::Socket::INET->new("$ARGV[0]:$ARGV[1]") or die "...";
-
+ 
   $rin = '';
   vec($rin,fileno($sock),1) = 1;
   vec($rin,fileno(STDIN),1) = 1;
-
+ 
   $el = Term::EditLine->new('example');
-
+ 
   $el->set_prompt('$ ');
   $el->set_getc_fun(\&get_c);
   $el->bind('-e');
-
+ 
   while (defined($_ = $el->gets)) {
     chomp;
     syswrite($sock,"$_\n",length($_)+1);
   }
-
+ 
   sub get_c {
     my ($tmp,$i,$c);
     while (1) {
       my $rout = $rin;
       if (select ($rout,undef,undef,0.1)) {
         if (vec($rout,fileno($sock),1)) {
-	  if(sysread ($sock,$tmp,1024)) {
-	    $tmp = $buf . $tmp;
-	  }
-	  while (($i = index($tmp,"\n")) != -1) {
-	    $_ = substr ($tmp,0,$i);
-  	    chomp ($_);
-	    print "\r\e[0J";                 # ugly
-	    print "$_\n". $el->get_prompt(); # hack!
-	    $tmp = substr($tmp,$i+1<=length($tmp)?$i+1:length($i+1));
-	  }
-	  $buf = $tmp;
+      if(sysread ($sock,$tmp,1024)) {
+        $tmp = $buf . $tmp;
+      }
+      while (($i = index($tmp,"\n")) != -1) {
+        $_ = substr ($tmp,0,$i);
+        chomp ($_);
+        print "\r\e[0J";                 # ugly
+        print "$_\n". $el->get_prompt(); # hack!
+        $tmp = substr($tmp,$i+1<=length($tmp)?$i+1:length($i+1));
+      }
+      $buf = $tmp;
         }
         if (vec($rout,fileno(STDIN),1)) {
-	  sysread(STDIN,$c,1);
-	  return $c;
+      sysread(STDIN,$c,1);
+      return $c;
         }
       }
     }
@@ -322,11 +330,11 @@ version of libedit that provides redisplay functions.
 
 To report bugs, please use the GitHub bugtracker:
 
-L<https://github.com/plicease/Term-EditLine/issues>
+L<https://github.com/uperl/Term-EditLine/issues>
 
 To submit patches, please create a pull request on GitHub:
 
-L<https://github.com/plicease/Term-EditLine/pulls>
+L<https://github.com/uperl/Term-EditLine/pulls>
 
 =head1 SEE ALSO
 
@@ -340,22 +348,25 @@ L<https://github.com/plicease/Term-EditLine/pulls>
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Original Author:
+=over 4
 
-Ulrich Burgbacher, E<lt>ulrich@burgbacher.netE<gt>
+=item *
 
-Current Maintainer:
+Ulrich Burgbacher <ulrich@burgbacher.net>
 
-Graham Ollis E<lt>plicease@cpan.orgE<gt>
+=item *
+
+Graham Ollis <plicease@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003 by Ulrich Burgbacher
+This software is copyright (c) 2003-2026 by Ulrich Burgbacher.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

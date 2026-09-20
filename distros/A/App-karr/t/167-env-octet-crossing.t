@@ -110,6 +110,8 @@ subtest 'Foundation/Runner wraps the three ENV writes through the helper' => sub
         'KARR_ROLE is written through to_octets_for_env' );
     like( $src, qr/^\s*local \$ENV\{PROMPT\}    = to_octets_for_env\(/m,
         'PROMPT is written through to_octets_for_env' );
+    like( $src, qr/^\s*local \$ENV\{KARR_CLAIM\} = to_octets_for_env\(/m,
+        'KARR_CLAIM is written through to_octets_for_env' );
 };
 
 # The Encoding module documents the edge. Pin the doc addition so a future

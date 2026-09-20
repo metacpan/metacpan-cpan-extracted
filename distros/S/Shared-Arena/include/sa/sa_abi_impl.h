@@ -24,6 +24,33 @@ typedef char sa_abi_assert_map[
   && SA_MAP_BUSY == SA_H_BUSY) ? 1 : -1];
 typedef char sa_abi_assert_pub[
     (SA_NO_RING == SA_PUB_NORING && SA_TOO_BIG == SA_PUB_OVERSIZE) ? 1 : -1];
+/* SA_READ_* is one set of names in both headers, guarded in sa_ring.h, so the
+ * pin is against the published numbers themselves. */
+typedef char sa_abi_assert_read[
+    (SA_READ_OK == 0 && SA_READ_PENDING == 1 && SA_READ_LAPPED == 2) ? 1 : -1];
+typedef char sa_abi_assert_store[
+    (SA_MAP_STORE_OK == SA_H_OK && SA_MAP_STORE_FULL == SA_H_FULL
+  && SA_MAP_STORE_TOOBIG == SA_H_TOOBIG
+  && SA_MAP_STORE_NOTNUM == SA_H_NOTNUM) ? 1 : -1];
+typedef char sa_abi_assert_cache[
+    (SA_CACHE_OK == SA_C_OK && SA_CACHE_TOOBIG == SA_C_TOOBIG) ? 1 : -1];
+typedef char sa_abi_assert_err[
+    (SA_ERR_OK == SA_E_OK && SA_ERR_MAGIC == SA_E_MAGIC
+  && SA_ERR_LAYOUT == SA_E_LAYOUT && SA_ERR_HDRSIZE == SA_E_HDRSIZE
+  && SA_ERR_ENDIAN == SA_E_ENDIAN && SA_ERR_WORD == SA_E_WORD
+  && SA_ERR_SHORT == SA_E_SHORT && SA_ERR_NOMEM == SA_E_NOMEM
+  && SA_ERR_MAP == SA_E_MAP && SA_ERR_EXISTS == SA_E_EXISTS
+  && SA_ERR_NOENT == SA_E_NOENT && SA_ERR_NAME == SA_E_NAME
+  && SA_ERR_FULL == SA_E_FULL && SA_ERR_NOATOMICS == SA_E_NOATOMICS
+  && SA_ERR_SHAPE == SA_E_SHAPE) ? 1 : -1];
+typedef char sa_abi_assert_type[
+    (SA_TYPE_RAW == SA_T_RAW && SA_TYPE_RING == SA_T_RING
+  && SA_TYPE_MAP == SA_T_MAP && SA_TYPE_BLOOM == SA_T_BLOOM
+  && SA_TYPE_HIST == SA_T_HIST && SA_TYPE_CACHE == SA_T_CACHE
+  && SA_TYPE_RATE == SA_T_RATE && SA_TYPE_CMS == SA_T_CMS
+  && SA_TYPE_FROZEN == SA_T_FROZEN && SA_TYPE_CUCKOO == SA_T_CUCKOO
+  && SA_TYPE_LEASE == SA_T_LEASE && SA_TYPE_SCOREBOARD == SA_T_SCOREBOARD
+  && SA_TYPE_HLL == SA_T_HLL) ? 1 : -1];
 
 static void sa_abi_config_init(sa_config *cfg) {
     if (!cfg) return;
@@ -323,6 +350,15 @@ static uint64_t sa_abi_rate_slots(const sa_rate *rl) {
 
 static uint64_t sa_abi_rate_used(sa_rate *rl) {
     return rl ? sa_rate_used(rl) : 0;
+}
+
+static void sa_abi_rate_counts(sa_rate *rl, sa_rate_counts *out) {
+    if (!out) return;
+    if (!rl) { memset(out, 0, sizeof *out); return; }
+    out->allowed   = sa_at_load64_acq(&rl->hdr->allowed);
+    out->denied    = sa_at_load64_acq(&rl->hdr->denied);
+    out->evicted   = sa_at_load64_acq(&rl->hdr->evicted);
+    out->contended = sa_at_load64_acq(&rl->hdr->contended);
 }
 
 /* ---- the count-min sketch --------------------------------------------------
@@ -738,7 +774,22 @@ static const sa_abi SA_ABI = {
     sa_hll_merge,
     sa_hll_reset,
     sa_abi_hll_precision,
-    sa_hll_filled
+    sa_hll_filled,
+
+    /* the wakeup */
+    sa_wake_init,
+    sa_wake_take,
+    sa_wake_fd,
+    sa_wake_drained,
+
+    /* a counter with a deadline */
+    sa_hash_incr_ttl,
+
+    /* the limiter's account */
+    sa_abi_rate_counts,
+
+    /* a counter with a deadline, on the caller's clock */
+    sa_hash_incr_at
 };
 
 /* ---- the selftest ---------------------------------------------------------
@@ -1519,6 +1570,106 @@ static int sa_abi_selftest(void)
         if (A->hll_count(g1) != 0.0 || A->hll_filled(g1))
             { A->hll_release(g1); SA_STEP(25); goto done; }
         A->hll_release(g1);
+    }
+
+    /* 26: the wakeup. Two pipes, this process takes slot 0, and a publish from
+     * this same process pokes nobody: the publisher is excluded and slot 1 has
+     * no owner. So the descriptor must NOT be readable afterwards, which is
+     * the one thing a single process can prove about the mechanism; t/12 has
+     * the rest. Drained is idempotent. On Windows every entry answers -1. */
+    {
+#if defined(_WIN32)
+        if (A->wake_init(r, 2) != 0) { SA_STEP(26); goto done; }
+        if (A->wake_take(r, 0) != -1 || A->wake_fd(r) != -1)
+            { SA_STEP(26); goto done; }
+        A->wake_drained(r);
+#else
+        int fd;
+        char junk[8];
+        if (A->wake_init(r, 2) != 1) { SA_STEP(26); goto done; }
+        if (A->wake_take(r, 0) != 0) { SA_STEP(26); goto done; }
+        fd = A->wake_fd(r);
+        if (fd < 0) { SA_STEP(26); goto done; }
+        /* Past the slots given pipes: refused, never standard input. */
+        if (A->wake_take(r, 2) != -1) { SA_STEP(26); goto done; }
+        if (!SA_PUBLISHED(A->publish(ring, "t", 1, "poke", 4)))
+            { SA_STEP(26); goto done; }
+        if (read(fd, junk, sizeof junk) > 0) { SA_STEP(26); goto done; }
+        A->wake_drained(r);
+        A->wake_drained(r);
+        if (A->wake_fd(r) != fd) { SA_STEP(26); goto done; }
+#endif
+    }
+
+    /* 27: a counter with a deadline. The proof is that the deadline does not
+     * SLIDE: a live counter keeps the one it was created with, however long a
+     * ttl a later increment carries, and lapses when that first one is up. */
+    {
+        sa_hash *mp = A->map_open(r, "selt", 4, 16, 128, &err);
+        uint64_t now = 0;
+        if (!mp || err != SA_E_OK) { SA_STEP(27); goto done; }
+        if (A->map_incr_ttl(mp, "w", 1, 1, 1, &now) != SA_MAP_STORE_OK || now != 1)
+            { A->map_release(mp); SA_STEP(27); goto done; }
+        if (A->map_incr_ttl(mp, "w", 1, 1, 3600000ULL, &now) != SA_MAP_STORE_OK
+            || now != 2)
+            { A->map_release(mp); SA_STEP(27); goto done; }
+        sa_stall(20000);
+        /* The 1ms deadline from the create stood; the hour from the second
+         * call was ignored. Reset, so it starts again at `by`. */
+        if (A->map_incr_ttl(mp, "w", 1, 3, 3600000ULL, &now) != SA_MAP_STORE_OK
+            || now != 3)
+            { A->map_release(mp); SA_STEP(27); goto done; }
+        /* A ttl of 0 is a counter that never lapses, as map_incr makes. */
+        if (A->map_incr_ttl(mp, "p", 1, 1, 0, &now) != SA_MAP_STORE_OK || now != 1)
+            { A->map_release(mp); SA_STEP(27); goto done; }
+        if (A->map_incr(mp, "p", 1, 1, &now) != SA_MAP_STORE_OK || now != 2)
+            { A->map_release(mp); SA_STEP(27); goto done; }
+        A->map_release(mp);
+    }
+
+    /* 28: the limiter's account of itself: three allowed, one denied, and the
+     * two counts that mean "the table is too small" both zero. */
+    {
+        sa_rate *rl = A->rate_open(r, "selq", 4, 3, 3600000, 64, &err);
+        sa_rate_counts rc;
+        uint64_t left = 0, retry = 0;
+        int i;
+        if (!rl || err != SA_E_OK) { SA_STEP(28); goto done; }
+        for (i = 0; i < 4; i++)
+            (void)A->rate_allow(rl, "k", 1, 1, &left, &retry);
+        A->rate_counts(rl, &rc);
+        if (rc.allowed != 3 || rc.denied != 1 || rc.evicted || rc.contended)
+            { A->rate_release(rl); SA_STEP(28); goto done; }
+        A->rate_counts(NULL, &rc);
+        if (rc.allowed || rc.denied) { A->rate_release(rl); SA_STEP(28); goto done; }
+        A->rate_release(rl);
+    }
+
+    /* 29: the caller's clock. With a clock the selftest controls, the whole
+     * window is deterministic: created at 1000 with 5ms to live, still live at
+     * 1004, lapsed at 1005 and reset to `by` with a deadline from THAT reading
+     * (1010), so 1009 adds and 1010 resets again. A clock of 0 means the
+     * map's own, which is what map_incr_ttl passes. */
+    {
+        sa_hash *mp = A->map_open(r, "selat", 5, 16, 128, &err);
+        uint64_t now = 0;
+        if (!mp || err != SA_E_OK) { SA_STEP(29); goto done; }
+        if (A->map_incr_at(mp, "a", 1, 1, 5, 1000, &now) != SA_MAP_STORE_OK || now != 1)
+            { A->map_release(mp); SA_STEP(29); goto done; }
+        if (A->map_incr_at(mp, "a", 1, 1, 5, 1004, &now) != SA_MAP_STORE_OK || now != 2)
+            { A->map_release(mp); SA_STEP(29); goto done; }
+        if (A->map_incr_at(mp, "a", 1, 3, 5, 1005, &now) != SA_MAP_STORE_OK || now != 3)
+            { A->map_release(mp); SA_STEP(29); goto done; }
+        if (A->map_incr_at(mp, "a", 1, 1, 5, 1009, &now) != SA_MAP_STORE_OK || now != 4)
+            { A->map_release(mp); SA_STEP(29); goto done; }
+        if (A->map_incr_at(mp, "a", 1, 1, 5, 1010, &now) != SA_MAP_STORE_OK || now != 1)
+            { A->map_release(mp); SA_STEP(29); goto done; }
+        /* No deadline, no clock: a plain counter whatever `now_ms` says. */
+        if (A->map_incr_at(mp, "p", 1, 2, 0, 1, &now) != SA_MAP_STORE_OK || now != 2)
+            { A->map_release(mp); SA_STEP(29); goto done; }
+        if (A->map_incr_at(mp, "p", 1, 2, 0, 0, &now) != SA_MAP_STORE_OK || now != 4)
+            { A->map_release(mp); SA_STEP(29); goto done; }
+        A->map_release(mp);
     }
 
 done:

@@ -1,7 +1,7 @@
 # ABSTRACT: Shared claim timeout logic
 
 package App::karr::Role::ClaimTimeout;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo::Role;
 # Loaded without importing, and every call below is qualified. A Moo::Role
 # composes every sub in its package into its consumers, imported ones included,
@@ -19,6 +19,13 @@ use Moo::Role;
 # Time::Piece::gmtime().
 use Time::Piece ();
 use App::karr::Config;
+# Loaded without importing, for the reason spelled out in
+# App::karr::Role::Output: a Moo::Role composes every sub in its package into
+# its consumers, imported ones included, so `use App::karr::Error qw( ... )`
+# here would quietly make those names methods on every command that composes
+# this role. The refusal message is built with command_hint and original_argv,
+# both called qualified below.
+use App::karr::Error ();
 
 # What this role calls on its consumer, said out loud (ticket #144; the rule is
 # ticket #128's, and this is the last of the three mutation-path roles to get
@@ -232,10 +239,14 @@ has _expired_claims => (
 #     later, turning an allowed move into a refused one. Expired claims are
 #     reaped where they always were, by `karr pick`.
 #
-#   * the message stays "Task N is claimed by X", the wording `karr handoff`
-#     has always used, rather than kanban-md's "add --claim X" hint: `karr
-#     delete` has no --claim option, so that hint would be unfollowable for one
-#     of the four callers.
+#   * the refusal names the way out, in the shape ticket k263 settled on: the
+#     prose line, then `karr edit ID --release` -- the one door that needs no
+#     claim knowledge -- then, where the caller's own argv was recorded, the
+#     caller's own command line with `--claim HOLDER` added, so the last line
+#     is the invocation that would have worked. kanban-md's hint is the same
+#     idea ("If this is you, add: --claim X"); karr's is followable because
+#     every command that applies this rule now takes --claim, delete and
+#     archive included (ticket #269).
 #
 #   * the expired case is recorded, because it used to be the one answer this
 #     method gave -- here and in kanban-md both -- with nothing said anywhere
@@ -273,6 +284,16 @@ has _expired_claims => (
 #     compare-and-swap, which is about concurrent writes and not about
 #     ownership.
 #
+# The refusal is deliberately not the only door, and the message says both
+# doors out loud. `karr edit ID --release` takes any claim off without knowing
+# whose it is -- the release bypasses this check entirely -- while `karr edit
+# ID --claim NAME` is refused against a live claim held by somebody else and
+# succeeds only when the claim has expired (and then reports the takeover,
+# #177). That asymmetry is deliberate and matches kanban-md: release is the
+# escape hatch, and a live claim is not stealable by name. Naming the release
+# is what keeps a caller who is not the holder from being left staring at a
+# claim they cannot satisfy.
+#
 # That last case is checked last, after the expiry test rather than before it,
 # although either order allows the same calls. The difference is the record: a
 # terminal card whose claim had *also* expired keeps reporting the takeover it
@@ -307,7 +328,48 @@ sub check_claim {
         return 1;
     }
     return 1 if $self->store->is_terminal_status( $task->status );
-    die sprintf "Task %d is claimed by %s\n", $task->id, $task->claimed_by;
+    my $holder = $task->claimed_by;
+    my $msg = sprintf( "Task %d is claimed by %s:\n", $task->id, $holder )
+        . App::karr::Error::command_hint( 'edit', $task->id, '--release' ) . "\n";
+    my @hint = $self->_claim_refusal_hint($task);
+    $msg .= App::karr::Error::command_hint(@hint) . "\n" if @hint;
+    die $msg;
+}
+
+# The caller's own command line with --claim HOLDER added, or nothing. The
+# words come from App::karr::Error/original_argv, which bin/karr records before
+# either argv rewrite and the in-process test runner records through the shared
+# App::karr::Dispatch path -- and which nothing else records, so a library
+# caller or a direct check_claim gets no working-command line at all. That is
+# the k263 rule: a suggestion built from placeholders would only spell the
+# "Usage:" line a second time, and the release line above is always the honest
+# answer for a caller whose words are unknown.
+#
+# An existing --claim VALUE is replaced rather than appended to, so `karr
+# handoff 1 --claim carol` is answered with `karr handoff 1 --claim bob` and
+# not with a second --claim that Getopt::Long would refuse. Both spellings the
+# caller could have typed are handled: the space form and the `=` form.
+sub _claim_refusal_hint {
+    my ( $self, $task ) = @_;
+    my $argv = App::karr::Error::original_argv();
+    return () unless $argv && @$argv;
+    my @tokens = @$argv;
+    my $holder = $task->claimed_by;
+    my $replaced = 0;
+    for my $i ( 0 .. $#tokens ) {
+        if ( $tokens[$i] eq '--claim' ) {
+            $tokens[ $i + 1 ] = $holder if defined $tokens[ $i + 1 ];
+            $replaced = 1;
+            last;
+        }
+        if ( $tokens[$i] =~ /\A--claim=(.*)\z/ ) {
+            $tokens[$i] = '--claim=' . $holder;
+            $replaced = 1;
+            last;
+        }
+    }
+    push @tokens, '--claim', $holder unless $replaced;
+    return @tokens;
 }
 
 
@@ -349,7 +411,7 @@ App::karr::Role::ClaimTimeout - Shared claim timeout logic
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 DESCRIPTION
 
@@ -410,8 +472,12 @@ held, by anybody, and records nothing.
     $self->check_claim( $task, $self->claim );   # $self->claim may be undef
 
 In a command class that composes this role, decides whether C<$task>'s
-existing claim blocks the caller and either returns true or dies with
-C<"Task N is claimed by X\n">. Five cases, checked in order:
+existing claim blocks the caller and either returns true or dies with a
+message naming the holder and both ways out: C<< karr edit ID --release >>,
+and -- where the caller's own argv was recorded
+(L<App::karr::Error/original_argv>) -- the caller's own command line with
+C<--claim HOLDER> added, so the last line is the invocation that would have
+worked (the shape ticket k263 settled on). Five cases, checked in order:
 
 =over 4
 
@@ -438,6 +504,15 @@ terminal card whose claim had also expired still reports the takeover;
 call dies rather than silently taking the claim over.
 
 =back
+
+The two doors are deliberately asymmetric, and the message says so because
+the asymmetry is easy to file as a bug. C<< karr edit ID --release >> takes
+any claim off without knowing whose it is: the release bypasses this check
+entirely. C<< karr edit ID --claim NAME >> is refused against a I<live> claim
+held by somebody else, and succeeds only when the claim has expired -- and
+then reports the takeover (L</expired_claim_report>). Both are deliberate and
+match kanban-md: release is the escape hatch, and a live claim is not
+stealable by name.
 
 Call it against the same task revision the caller then writes -- see
 L<App::karr::Role::TaskMutation/update_task_guarded> -- since a check made

@@ -19,214 +19,234 @@ name: App-karr
 provides:
   App::karr:
     file: lib/App/karr.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::ActivityLog:
     file: lib/App/karr/ActivityLog.pm
-    version: '0.600'
+    version: '0.601'
+  App::karr::AgentName:
+    file: lib/App/karr/AgentName.pm
+    version: '0.601'
+  App::karr::Board:
+    file: lib/App/karr/Board.pm
+    version: '0.601'
   App::karr::BoardStore:
     file: lib/App/karr/BoardStore.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::AgentName:
     file: lib/App/karr/Cmd/AgentName.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Archive:
     file: lib/App/karr/Cmd/Archive.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Backup:
     file: lib/App/karr/Cmd/Backup.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Board:
     file: lib/App/karr/Cmd/Board.pm
-    version: '0.600'
+    version: '0.601'
+  App::karr::Cmd::Completion:
+    file: lib/App/karr/Cmd/Completion.pm
+    version: '0.601'
   App::karr::Cmd::Config:
     file: lib/App/karr/Cmd/Config.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Context:
     file: lib/App/karr/Cmd/Context.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Create:
     file: lib/App/karr/Cmd/Create.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Dashboard:
     file: lib/App/karr/Cmd/Dashboard.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Delete:
     file: lib/App/karr/Cmd/Delete.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Destroy:
     file: lib/App/karr/Cmd/Destroy.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Disable:
     file: lib/App/karr/Cmd/Disable.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Edit:
     file: lib/App/karr/Cmd/Edit.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Enable:
     file: lib/App/karr/Cmd/Enable.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::GetRefs:
     file: lib/App/karr/Cmd/GetRefs.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Handoff:
     file: lib/App/karr/Cmd/Handoff.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Import:
     file: lib/App/karr/Cmd/Import.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Init:
     file: lib/App/karr/Cmd/Init.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::List:
     file: lib/App/karr/Cmd/List.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Log:
     file: lib/App/karr/Cmd/Log.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Materialize:
     file: lib/App/karr/Cmd/Materialize.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Metrics:
     file: lib/App/karr/Cmd/Metrics.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Move:
     file: lib/App/karr/Cmd/Move.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Needs:
     file: lib/App/karr/Cmd/Needs.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Pick:
     file: lib/App/karr/Cmd/Pick.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Repair:
     file: lib/App/karr/Cmd/Repair.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Restore:
     file: lib/App/karr/Cmd/Restore.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::SetRefs:
     file: lib/App/karr/Cmd/SetRefs.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Show:
     file: lib/App/karr/Cmd/Show.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Skill:
     file: lib/App/karr/Cmd/Skill.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Sync:
     file: lib/App/karr/Cmd/Sync.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Cmd::Unlock:
     file: lib/App/karr/Cmd/Unlock.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Config:
     file: lib/App/karr/Config.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::CrossBoard:
     file: lib/App/karr/CrossBoard.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Dispatch:
     file: lib/App/karr/Dispatch.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Encoding:
     file: lib/App/karr/Encoding.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Error:
     file: lib/App/karr/Error.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Foundation:
     file: lib/App/karr/Foundation.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Foundation::Agents:
     file: lib/App/karr/Foundation/Agents.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Foundation::ChainStore:
     file: lib/App/karr/Foundation/ChainStore.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Foundation::Coordinator:
     file: lib/App/karr/Foundation/Coordinator.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Foundation::Executor:
     file: lib/App/karr/Foundation/Executor.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Foundation::Limits:
     file: lib/App/karr/Foundation/Limits.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Foundation::Overview:
     file: lib/App/karr/Foundation/Overview.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Foundation::Picker:
     file: lib/App/karr/Foundation/Picker.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Foundation::Questions:
     file: lib/App/karr/Foundation/Questions.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Foundation::Runner:
     file: lib/App/karr/Foundation/Runner.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Foundation::State:
     file: lib/App/karr/Foundation/State.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Git:
     file: lib/App/karr/Git.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Lock:
     file: lib/App/karr/Lock.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Role::BoardAccess:
     file: lib/App/karr/Role/BoardAccess.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Role::BoardDiscovery:
     file: lib/App/karr/Role/BoardDiscovery.pm
-    version: '0.600'
+    version: '0.601'
+  App::karr::Role::ClaimDefault:
+    file: lib/App/karr/Role/ClaimDefault.pm
+    version: '0.601'
   App::karr::Role::ClaimTimeout:
     file: lib/App/karr/Role/ClaimTimeout.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Role::CliArgs:
     file: lib/App/karr/Role/CliArgs.pm
-    version: '0.600'
+    version: '0.601'
+  App::karr::Role::Color:
+    file: lib/App/karr/Role/Color.pm
+    version: '0.601'
   App::karr::Role::CompactOutput:
     file: lib/App/karr/Role/CompactOutput.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Role::DependencyArgs:
     file: lib/App/karr/Role/DependencyArgs.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Role::DependencyCheck:
     file: lib/App/karr/Role/DependencyCheck.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Role::ExitCodes:
     file: lib/App/karr/Role/ExitCodes.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Role::Output:
     file: lib/App/karr/Role/Output.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Role::PickRules:
     file: lib/App/karr/Role/PickRules.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Role::SkillFile:
     file: lib/App/karr/Role/SkillFile.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Role::SyncLifecycle:
     file: lib/App/karr/Role/SyncLifecycle.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Role::TaskMutation:
     file: lib/App/karr/Role/TaskMutation.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::SyncGuard:
     file: lib/App/karr/SyncGuard.pm
-    version: '0.600'
+    version: '0.601'
   App::karr::Task:
     file: lib/App/karr/Task.pm
-    version: '0.600'
+    version: '0.601'
 requires:
   Alien::Libgit2: '0.002'
+  Carp: '0'
+  Digest::MD5: '0'
   Encode: '0'
   Errno: '0'
+  Exporter: '0'
+  Fcntl: '0'
   File::ShareDir: '0'
   Git::Libgit2: '0.007'
   Git::Native: '0.006'
   IO::Handle: '0'
   IO::Select: '0'
+  IPC::Open3: '0'
   JSON::MaybeXS: '0'
   Module::Runtime: '0'
   Moo: '0'
@@ -235,6 +255,7 @@ requires:
   POSIX: '0'
   Path::Tiny: '0'
   Scalar::Util: '0'
+  Symbol: '0'
   Sys::Hostname: '0'
   Term::ANSIColor: '0'
   Time::HiRes: '0'
@@ -247,7 +268,7 @@ resources:
   bugtracker: https://github.com/Getty/karr/issues
   homepage: https://github.com/Getty/karr
   repository: https://github.com/Getty/karr.git
-version: '0.600'
+version: '0.601'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -257,6 +278,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - .karr
             - README.md
           exclude_match:
             - ^assets/
@@ -527,7 +549,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.600'
+          tag: '0.601'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

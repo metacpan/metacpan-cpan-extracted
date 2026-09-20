@@ -3,7 +3,7 @@ package Hyperman::Writer;
 use strict;
 use warnings;
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 require Hyperman;   # all methods are XS (xs/writer.xs, include/hyperman/)
 

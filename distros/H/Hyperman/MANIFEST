@@ -12,8 +12,9 @@ include/hyperman/backend_wsapoll.c
 include/hyperman/hm_abi.h
 include/hyperman/hm_abi_impl.h
 include/hyperman/hm_atomic.h
-include/hyperman/hm_bus.h
-include/hyperman/hm_bus_perl.h
+include/hyperman/hm_sa_board.h
+include/hyperman/hm_sa_bus.h
+include/hyperman/hm_sa_bus_perl.h
 include/hyperman/hm_compat.h
 include/hyperman/hm_compress.h
 include/hyperman/hm_core.h
@@ -22,7 +23,8 @@ include/hyperman/hm_http2.h
 include/hyperman/hm_http3.h
 include/hyperman/hm_parse.h
 include/hyperman/hm_quic.h
-include/hyperman/hm_ratelimit.h
+include/hyperman/hm_sa_abuse.h
+include/hyperman/hm_sa.h
 include/hyperman/hm_stream.h
 include/hyperman/hm_tls.h
 include/hyperman/hm_win.h
@@ -68,6 +70,7 @@ t/34-perl-arena.t
 t/35-bus.t
 t/36-bus-wakeup.t
 t/37-ktls.t
+t/37-arena.t
 t/38-awaitable.t
 t/39-awaitable-conformance.t
 t/40-continue.t
@@ -81,6 +84,9 @@ t/47-http3.t
 t/48-extended-connect.t
 t/49-tunnel-backends.t
 t/lib/HMTest.pm
+t/50-scoreboard.t
+t/51-leader.t
+t/52-distinct.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

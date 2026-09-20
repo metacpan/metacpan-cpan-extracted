@@ -149,6 +149,30 @@ C
     }
 }
 
+if ($^O ne 'MSWin32') {
+    # Run, not just linked: a header can name the clock on a kernel whose
+    # syscall refuses it, and the fallback is silent only when the probe was
+    # honest about that.
+    my $coarse = <<'C';
+#include <time.h>
+int main(void) {
+#ifdef CLOCK_REALTIME_COARSE
+    struct timespec ts;
+    return clock_gettime(CLOCK_REALTIME_COARSE, &ts) == 0 ? 0 : 1;
+#else
+    return 1;
+#endif
+}
+C
+    if (probe('coarse', $coarse, '', 1)) {
+        $DEFINE .= ' -DSA_HAVE_COARSE_CLOCK';
+        print "clock_gettime(CLOCK_REALTIME_COARSE): yes, deadlines read it.\n";
+    }
+    else {
+        print "clock_gettime(CLOCK_REALTIME_COARSE): no, gettimeofday.\n";
+    }
+}
+
 my $xs_deps = join ' ', glob('xs/*.xs');
 my $h_deps  = join ' ', glob('include/*.h'), glob('include/sa/*.h');
 

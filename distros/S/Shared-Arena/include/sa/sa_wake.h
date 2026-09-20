@@ -175,12 +175,25 @@ static int sa_wake_init(sa_region *r, uint32_t n) {
             sa_at_store32_rel(&hp->ready, 1);
         }
     }
+    else if (n > hp->n) {
+        hp->n = n;                /* a second init that made more pipes */
+    }
 
     r->wakers_off = off;
     r->wakers_max = SA_WAKERS_MAX;
+    r->wakers_probed = 0;
     r->wake_checked = 0;          /* re-verify: we are the maker now */
     return 1;
 #endif
+}
+
+/* How many slots were given pipes: the ones a poke walks and a take may claim.
+ * The table always has SA_WAKERS_MAX slots, but a pool of eight workers has
+ * nine pipes, and walking the other fifty-five on every publish cost more
+ * than the publish itself (phase 01 of the Hyperman port: 41.6 to 14.8ns). */
+static uint32_t sa_wake_n(const sa_waker_hdr *hp) {
+    uint32_t n = hp->n;
+    return n > SA_WAKERS_MAX ? SA_WAKERS_MAX : n;
 }
 
 /* Are the descriptors in this table the ones THIS process holds?
@@ -237,8 +250,12 @@ static int sa_wake_attach(sa_region *r) {
     sa_reg *e;
     if (!r || !r->map.base) return 0;
     if (r->wakers_off) return 1;
+    /* A miss is cached: the table is made before the fork or not at all, so
+     * a process that once found nothing will not find it later. wake_init in
+     * THIS process clears the cache. */
+    if (r->wakers_probed) return 0;
     e = sa_find(r, SA_WAKERS_NAME, SA_WAKERS_NLEN);
-    if (!e) return 0;
+    if (!e) { r->wakers_probed = 1; return 0; }
     r->wakers_off = e->off;
     r->wakers_max = SA_WAKERS_MAX;
     return 1;
@@ -264,15 +281,17 @@ static int sa_wake_take(sa_region *r, int idx) {
     if (!hp) return -1;
     w = SA_WAKER_SLOTS(hp);
 
+    /* Only a slot that was given a pipe. A slot past `n` has descriptor 0 in
+     * both fields, and taking it would mean reading standard input. */
     if (idx >= 0) {
         i = (uint32_t)idx;
-        if (i >= r->wakers_max) return -1;
+        if (i >= sa_wake_n(hp)) return -1;
         if (!sa_at_cas32(&w[i].live, 0, 1)) return -1;
     }
     else {
-        for (i = 0; i < r->wakers_max; i++)
+        for (i = 0; i < sa_wake_n(hp); i++)
             if (sa_at_cas32(&w[i].live, 0, 1)) break;
-        if (i >= r->wakers_max) return -1;
+        if (i >= sa_wake_n(hp)) return -1;
     }
 
     {
@@ -307,7 +326,7 @@ static void sa_wake_poke(sa_region *r) {
 #else
     sa_waker_hdr *hp;
     sa_waker *w;
-    uint32_t i;
+    uint32_t i, n;
     char b = 1;
 
     if (!sa_wake_attach(r)) return;
@@ -318,8 +337,9 @@ static void sa_wake_poke(sa_region *r) {
     hp = (sa_waker_hdr *)sa_ptr(r, r->wakers_off);
     if (!hp) return;
     w = SA_WAKER_SLOTS(hp);
+    n = sa_wake_n(hp);
 
-    for (i = 0; i < r->wakers_max; i++) {
+    for (i = 0; i < n; i++) {
         if ((int)i == r->waker_idx) continue;          /* not ourselves   */
         if (!sa_at_load32_acq(&w[i].live)) continue;   /* nobody there    */
         /* ONLY the caller that flips the flag writes. Everybody else has

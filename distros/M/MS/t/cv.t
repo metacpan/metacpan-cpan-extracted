@@ -31,7 +31,11 @@ close STDOUT;
 open STDOUT, '>', \$tree;
 print_tree('MS');
 close STDOUT;
-my $re = qr/\-\-\-\-\-\-MS\:1001117\s*theoretical mass\s*MS_THEORETICAL_MASS/;
+my $re = qr/\-\-\-\-\-\-MS\:1001117\s*theoretical neutral mass\s*MS_THEORETICAL_NEUTRAL_MASS/;
 ok( $tree =~ /$re/s, "tree contents check" );
+
+# test alternative constants
+ok( MS_NEUTRAL_LOSS eq 'MS:1000336' );
+ok( MS_NEUTRAL_LOSS_1 eq 'MS:1000336' );
 
 done_testing();

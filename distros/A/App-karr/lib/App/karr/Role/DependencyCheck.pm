@@ -1,7 +1,7 @@
 # ABSTRACT: Warn when a card is taken up while its dependencies are unfinished
 
 package App::karr::Role::DependencyCheck;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo::Role;
 use App::karr::CrossBoard;
 
@@ -124,7 +124,7 @@ App::karr::Role::DependencyCheck - Warn when a card is taken up while its depend
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 DESCRIPTION
 

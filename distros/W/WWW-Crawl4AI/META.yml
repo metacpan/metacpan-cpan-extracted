@@ -18,80 +18,78 @@ name: WWW-Crawl4AI
 provides:
   WWW::Crawl4AI:
     file: lib/WWW/Crawl4AI.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Attempt:
     file: lib/WWW/Crawl4AI/Attempt.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Client:
     file: lib/WWW/Crawl4AI/Client.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::DeepCrawlIterator:
     file: lib/WWW/Crawl4AI/DeepCrawlIterator.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Detect:
     file: lib/WWW/Crawl4AI/Detect.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Error:
     file: lib/WWW/Crawl4AI/Error.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Markdown:
     file: lib/WWW/Crawl4AI/Markdown.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Request:
     file: lib/WWW/Crawl4AI/Request.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Result:
     file: lib/WWW/Crawl4AI/Result.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Strategy:
     file: lib/WWW/Crawl4AI/Strategy.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Strategy::Browser:
     file: lib/WWW/Crawl4AI/Strategy/Browser.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Strategy::Callback:
     file: lib/WWW/Crawl4AI/Strategy/Callback.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Strategy::CloakBrowser:
     file: lib/WWW/Crawl4AI/Strategy/CloakBrowser.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Strategy::Plain:
     file: lib/WWW/Crawl4AI/Strategy/Plain.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Strategy::Proxy:
     file: lib/WWW/Crawl4AI/Strategy/Proxy.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::Strategy::Stealth:
     file: lib/WWW/Crawl4AI/Strategy/Stealth.pm
-    version: '0.005'
+    version: '0.006'
   WWW::Crawl4AI::StrategyChain:
     file: lib/WWW/Crawl4AI/StrategyChain.pm
-    version: '0.005'
+    version: '0.006'
 requires:
-  HTTP::Message: '6.00'
+  HTTP::Request: '6.00'
   JSON::MaybeXS: '1.004000'
   LWP::UserAgent: '6.00'
-  MIME::Base64: '0'
   Moo: '2.000000'
-  Moo::Role: '2.000000'
   Safe::Isa: '1.000005'
-  Time::HiRes: '0'
   URI: '1.70'
-  URI::Escape: '0'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/Getty/p5-www-crawl4ai/issues
   homepage: https://github.com/Getty/p5-www-crawl4ai
   repository: https://github.com/Getty/p5-www-crawl4ai.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
-    version: '5.036000'
+    version: '5.040001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - .karr
             - README.md
           exclude_match: []
           include_dotfiles: 1
@@ -109,10 +107,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::GETTY/@Filter/MetaYAML'
-      version: '6.037'
-    -
-      class: Dist::Zilla::Plugin::License
-      name: '@Author::GETTY/@Filter/License'
       version: '6.037'
     -
       class: Dist::Zilla::Plugin::Readme
@@ -154,6 +148,10 @@ x_Dist_Zilla:
       name: '@Author::GETTY/@Filter/UploadToCPAN'
       version: '6.037'
     -
+      class: Dist::Zilla::Plugin::LicenseFile
+      name: '@Author::GETTY/LicenseFile'
+      version: '0.002'
+    -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
       version: '6.037'
@@ -185,7 +183,7 @@ x_Dist_Zilla:
           inherit_version: 1
           meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000038'
           version: '0.006'
       name: '@Author::GETTY/MetaProvides::Package'
       version: '2.004003'
@@ -205,10 +203,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
       name: '@Author::GETTY/Git::CheckFor::CorrectBranch'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
       name: '@Author::GETTY/Prereqs::FromCPANfile'
@@ -343,7 +341,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -356,11 +354,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.005'
+          tag: '0.006'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -394,10 +392,11 @@ x_Dist_Zilla:
             - Changes
             - Makefile.PL
           allow_dirty_match:
+            - (?^:^bin/)
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -411,14 +410,14 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
       name: '@Author::GETTY/Git::Push'
       version: '2.052'
     -
       class: Dist::Zilla::Plugin::GitHub::CreateRelease
       name: '@Author::GETTY/GitHub::CreateRelease'
-      version: '0.0009'
+      version: '0.0012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -469,6 +468,6 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.037'
 x_authority: cpan:GETTY
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

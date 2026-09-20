@@ -1,3 +1,27 @@
+0.006     2026-09-19 17:09:50Z
+
+ - The chain win/continue decision now runs through an overridable
+   classify_is_good method (default: WWW::Crawl4AI::Detect::is_good), instead of
+   _attempt_for calling Detect::is_good directly. A subclass override of
+   classify_is_good now actually changes which strategy wins and whether the
+   chain escalates -- previously only classify_signals / classify_why_failed
+   could be overridden, which changed just the *reported* signals per attempt,
+   not the decision, contradicting the POD. Default behaviour is unchanged.
+
+ - examples/docker-compose.yml and docker-compose.proxy.yml now set
+   CRAWL4AI_API_TOKEN. Crawl4AI 0.9.3 binds the container's loopback only when
+   no token is set, so the published 11235 port reset every connection and the
+   sample stack was unreachable out of the box; with a token it binds 0.0.0.0
+   and requires Bearer auth (the client sends $ENV{CRAWL4AI_API_TOKEN}). The
+   0.9.3 SSRF switches CRAWL4AI_ALLOW_INTERNAL_URLS and
+   CRAWL4AI_EXECUTE_JS_ENABLED are documented alongside.
+
+ - examples/k8s/ adds a deployable sample stack -- namespace, Crawl4AI
+   Deployment/Service/Secret and an nginx fixture ConfigMap -- carrying the
+   0.9.3 security posture (API token, SSRF guard, execute_js switch) in the
+   manifests and README. examples/fixture/ is the deterministic page the
+   env-gated live suite points at.
+
 0.005     2026-06-12 15:23:16Z
 
  - Detect: removed every body-text and HTML/title fingerprint from the block

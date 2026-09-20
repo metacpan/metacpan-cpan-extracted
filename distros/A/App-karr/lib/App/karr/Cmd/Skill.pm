@@ -1,7 +1,7 @@
 # ABSTRACT: Install, check, and update bundled agent skills
 
 package App::karr::Cmd::Skill;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -18,9 +18,9 @@ use Path::Tiny;
 # is board-less, so it does not inherit ExitCodes via BoardDiscovery -- and for
 # the same reason it declares no --dir and refuses the root form of it in
 # _reject_root_dir below (#226).
-# SkillFile: _skill_content and _write_skill, shared with `karr init
-# --claude-skill`, which writes the same file this command writes for the
-# claude-code agent (tickets #145, #146).
+# SkillFile: _skill_files, _skill_content and the two writers, shared with
+# `karr init --claude-skill`, which writes the same directory this command
+# writes for the claude-code agent (tickets #145, #146, #285).
 with 'App::karr::Role::Output', 'App::karr::Role::CliArgs',
      'App::karr::Role::ExitCodes', 'App::karr::Role::SkillFile';
 
@@ -96,20 +96,23 @@ sub _show {
 sub _install {
   my ($self) = @_;
   my @agents = $self->_target_agents;
-  my $content = $self->_skill_content;
+  my %shipped = $self->_skill_files;
   my @results;
 
   for my $agent (@agents) {
     my $dir = $self->_skill_dir($agent);
     my $file = $dir->child('SKILL.md');
 
+    # "Installed" is keyed on SKILL.md alone: it is the file an agent loads,
+    # so a target that has it is a target someone installed into. A missing
+    # reference beside it is what `update` is for, not a reason to overwrite.
     if ($file->exists && !$self->force) {
       push @results, { agent => $agent, status => 'exists', path => "$file" };
       printf "%-12s already installed (use --force to reinstall)\n", $agent unless $self->json;
       next;
     }
 
-    $self->_write_skill($file, $content);
+    $self->_write_skill_files($dir, \%shipped);
     push @results, { agent => $agent, status => 'installed', path => "$file" };
     printf "%-12s installed to %s\n", $agent, $file unless $self->json;
   }
@@ -122,12 +125,13 @@ sub _install {
 sub _check {
   my ($self) = @_;
   my @agents = $self->_target_agents;
-  my $current = $self->_skill_content;
+  my %shipped = $self->_skill_files;
   my @results;
   my $outdated = 0;
 
   for my $agent (@agents) {
-    my $file = $self->_skill_dir($agent)->child('SKILL.md');
+    my $dir  = $self->_skill_dir($agent);
+    my $file = $dir->child('SKILL.md');
 
     unless ($file->exists) {
       push @results, { agent => $agent, status => 'not installed' };
@@ -135,8 +139,7 @@ sub _check {
       next;
     }
 
-    my $installed = $self->_read_skill($file);
-    if ($installed eq $current) {
+    unless ( %{ $self->_stale_files($dir, \%shipped) } ) {
       push @results, { agent => $agent, status => 'current' };
       printf "%-12s current\n", $agent unless $self->json;
     } else {
@@ -156,11 +159,12 @@ sub _check {
 sub _update {
   my ($self) = @_;
   my @agents = $self->_target_agents;
-  my $content = $self->_skill_content;
+  my %shipped = $self->_skill_files;
   my @results;
 
   for my $agent (@agents) {
-    my $file = $self->_skill_dir($agent)->child('SKILL.md');
+    my $dir  = $self->_skill_dir($agent);
+    my $file = $dir->child('SKILL.md');
 
     unless ($file->exists) {
       push @results, { agent => $agent, status => 'not installed' };
@@ -168,12 +172,16 @@ sub _update {
       next;
     }
 
-    my $installed = $self->_read_skill($file);
-    if ($installed eq $content) {
+    # Only what is missing or differs gets written: a file that already
+    # matches is not rewritten (nothing to gain, and one fewer chance for the
+    # read-only fallback in _write_skill to have to say anything), and a file
+    # in the target that is not shipped is nobody's to remove from here.
+    my $stale = $self->_stale_files($dir, \%shipped);
+    unless (%$stale) {
       push @results, { agent => $agent, status => 'current' };
       printf "%-12s already current\n", $agent unless $self->json;
     } else {
-      $self->_write_skill($file, $content);
+      $self->_write_skill_files($dir, $stale);
       push @results, { agent => $agent, status => 'updated' };
       printf "%-12s updated\n", $agent unless $self->json;
     }
@@ -182,6 +190,23 @@ sub _update {
   if ($self->json) {
     $self->print_json(\@results);
   }
+}
+
+# The shipped files whose copy under $dir is missing or differs, as the same
+# (relative path => content) pairs _skill_files hands out -- i.e. exactly what
+# _write_skill_files has to write to bring the target current. Empty means
+# current. Compared as characters on both sides (slurp_utf8 against
+# slurp_utf8), so a byte-level difference in encoding shows up as a
+# difference rather than being hidden by a decode on one side only.
+sub _stale_files {
+  my ($self, $dir, $shipped) = @_;
+  my %stale;
+  for my $rel (sort keys %$shipped) {
+    my $file = $dir->child($rel);
+    next if $file->exists && $self->_read_skill($file) eq $shipped->{$rel};
+    $stale{$rel} = $shipped->{$rel};
+  }
+  return \%stale;
 }
 
 # Path::Tiny raises Path::Tiny::Error objects that stringify with the call site
@@ -197,12 +222,14 @@ sub _read_skill {
   return $content;
 }
 
-# _write_skill -- the in-place write, and why it has to be one -- lives in
-# App::karr::Role::SkillFile, composed above: `karr init --claude-skill` writes
-# the very same .claude/skills/kanban-issues-karr-cli/SKILL.md, and kept its own spew_utf8 copy of
-# this rule until ticket #145 because the rule lived here (#142). _skill_content,
-# which finds the bundled file in the first place, followed it there in #146 --
-# it was duplicated in Cmd::Init down to the last line but one.
+# _write_skill and _write_skill_files -- the in-place write, and why it has to
+# be one -- live in App::karr::Role::SkillFile, composed above: `karr init
+# --claude-skill` writes the very same .claude/skills/kanban-issues-karr-cli/,
+# and kept its own spew_utf8 copy of this rule until ticket #145 because the
+# rule lived here (#142). _skill_content, which finds the bundled skill in the
+# first place, followed it there in #146 -- it was duplicated in Cmd::Init down
+# to the last line but one -- and _skill_files, the whole directory rather than
+# its SKILL.md, joined it in #285.
 
 # `karr skill install --dir PATH` was always rejected by MooX::Options -- this
 # command declares no such option -- but `karr --dir PATH skill install` was
@@ -223,7 +250,7 @@ sub _read_skill {
 # Honouring --dir would have meant either refusing those installs or giving one
 # option two meanings that answer about different directories. `cd` is how you
 # install into another tree, and `karr init --claude-skill` is the command that
-# writes this same file through git_root.
+# writes this same directory through git_root.
 #
 # The root is read from $chain_ref the way App::karr::Cmd::Dashboard reads it
 # for its own refusal and App::karr::Cmd::GetRefs reads it to honour the
@@ -296,7 +323,7 @@ App::karr::Cmd::Skill - Install, check, and update bundled agent skills
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 
@@ -308,12 +335,15 @@ version 0.600
 
 =head1 DESCRIPTION
 
-Installs and maintains the bundled C<karr> skill file for supported agent
-clients. The command can target project-local directories or global skill
-locations in the current user's home directory, which makes it useful both for
-direct Perl installs and Docker-wrapped vendor usage.
+Installs and maintains the bundled C<karr> skill for supported agent
+clients. The skill is a directory -- F<SKILL.md>, which an agent loads on
+every trigger, plus F<references/*.md>, which it reads on demand -- and every
+action below treats that set as one unit. The command can target
+project-local directories or global skill locations in the current user's
+home directory, which makes it useful both for direct Perl installs and
+Docker-wrapped vendor usage.
 
-Writes go into the target file B<in place>, keeping its inode, so a
+Writes go into each target file B<in place>, keeping its inode, so a
 F<SKILL.md> that is one link of a hardlink chain shared across projects stays
 part of that chain instead of being silently broken out of it.
 
@@ -323,10 +353,10 @@ C<codex> (see L</SUPPORTED AGENTS>).
 
 =head1 TARGET DIRECTORY
 
-The project-local target is the B<current working directory>: the skill file
-is written straight underneath it, at
-F<.claude/skills/kanban-issues-karr-cli/SKILL.md> for C<claude-code> and at
-the equivalent path for the other agents. Nothing is discovered on the way
+The project-local target is the B<current working directory>: the skill
+directory is written straight underneath it, at
+F<.claude/skills/kanban-issues-karr-cli/> for C<claude-code> and at the
+equivalent path for the other agents. Nothing is discovered on the way
 there and no repository is involved -- this command has no board, and
 installing into a directory that is not a Git repository at all is a
 supported use. C<--global> is the same idea one level up: the target is the
@@ -346,7 +376,7 @@ ticket #226 the root placement was accepted and then discarded without a
 word, so the file was written into the tree the caller happened to be
 standing in while the message read as if the named one had been used.
 
-C<karr init --claude-skill> writes the very same F<SKILL.md> and does honour
+C<karr init --claude-skill> writes the very same directory and does honour
 C<--dir>: it installs into the root of the repository it is initializing, and
 it needs a repository in the first place.
 
@@ -362,24 +392,30 @@ falls back to all known agents if nothing is detected.
 
 =item * C<install>
 
-Writes the current bundled skill file to the selected target locations. A
-target that already has a F<SKILL.md> is left alone and reported C<exists>
-unless C<--force> is given, which overwrites it unconditionally. Every target
-is reported with its absolute path, in the plain output as well as under the
-C<path> key of C<--json>, so the message says which tree the file went into.
+Writes the current bundled skill -- F<SKILL.md> and every F<references/*.md>
+-- to the selected target locations. A target that already has a F<SKILL.md>
+is left alone and reported C<exists> unless C<--force> is given, which
+overwrites every file unconditionally. Every target is reported with the
+absolute path of its F<SKILL.md>, in the plain output as well as under the
+C<path> key of C<--json>, so the message says which tree the skill went into.
 
 =item * C<check>
 
-Compares installed skill files with the bundled version and exits non-zero when
-one or more targets are outdated.
+Compares every installed file with the bundled version and exits non-zero
+when one or more targets are outdated: a shipped file that is missing from
+the target, or differs from it, makes the target C<outdated>. A target with
+no F<SKILL.md> is C<not installed>, whatever else is under it.
 
 =item * C<update>
 
-Refreshes existing installed copies in place.
+Refreshes installed copies in place: every shipped file that is missing or
+differs is rewritten, the ones that match are left untouched, and so is
+anything in the target that is not shipped (a reference file a later release
+dropped, say). C<current> means every file already matched.
 
 =item * C<show>
 
-Prints the bundled skill content to standard output. With C<--json> the same
+Prints the bundled F<SKILL.md> to standard output. With C<--json> the same
 content is emitted as a JSON object under the C<content> key instead of raw
 Markdown.
 

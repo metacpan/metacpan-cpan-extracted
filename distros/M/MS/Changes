@@ -1,5 +1,10 @@
 Revision history for MS
 
+0.207004 2026-09-18
+        Update CV, Unimod
+        Signficant changes to CV constant generation to handle redundancies, ensure backward compatibility
+        Minor refactor based on perlcritic feedback
+
 0.207003 2023-10-22
         Update Uniprot REST URLs
 

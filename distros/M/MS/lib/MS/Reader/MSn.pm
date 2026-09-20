@@ -91,7 +91,7 @@ sub next_spectrum {
 
     my ($self) = @_;
 
-    return undef if ($self->{pos} == $self->{count}); #EOF
+    return if ($self->{pos} == $self->{count}); #EOF
     return $self->fetch_spectrum($self->{pos}++);
 
 }

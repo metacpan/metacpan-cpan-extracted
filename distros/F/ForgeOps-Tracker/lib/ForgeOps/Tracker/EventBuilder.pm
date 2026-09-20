@@ -36,7 +36,7 @@ sub new {
 #     directly against real confess()/die output before relying on the format, not assumed from
 #     documentation alone.
 sub build {
-    my ($self, $error, $context) = @_;
+    my ($self, $error, $context, $user, $breadcrumbs) = @_;
     $context ||= {};
     my $config = $self->{configuration};
 
@@ -54,6 +54,9 @@ sub build {
         tags            => {},
         sdk_name        => $SDK_NAME,
     );
+    $payload{user} = { %$user } if $user && %$user;
+    # Omitted entirely (never sent as an empty array) when there's nothing to report.
+    $payload{breadcrumbs} = [ map { { %$_ } } @$breadcrumbs ] if $breadcrumbs && @$breadcrumbs;
 
     return $config->{scrub_pii} ? $self->_scrub_payload(\%payload) : \%payload;
 }
@@ -178,6 +181,11 @@ sub _truncate_line {
     return substr($line, 0, $MAX_CONTEXT_LINE_LENGTH) . '...';
 }
 
+# exception_class/occurred_at/environment/release/server_name/sdk_name/user are left alone:
+# structured fields this client or the host app sets deliberately, not free text an exception or
+# its context could accidentally spill sensitive data into. user specifically is a deliberate
+# exemption, not an oversight: scrub_string's own email pattern would otherwise redact the exact
+# thing this field exists to carry (the %scrubbed copy below never touches it either way).
 sub _scrub_payload {
     my ($self, $payload) = @_;
     my %scrubbed = %$payload;
@@ -195,6 +203,19 @@ sub _scrub_payload {
             \%frame;
         } @{ $payload->{backtrace} }
     ];
+    # Breadcrumb message/data are free text the host app or an integration wrote; category, level,
+    # and timestamp are structured values set deliberately, the same split as the top-level
+    # fields above, so they are left alone.
+    if ($payload->{breadcrumbs}) {
+        $scrubbed{breadcrumbs} = [
+            map {
+                my %crumb = %$_;
+                $crumb{message} = scrub_string($crumb{message}) if defined $crumb{message};
+                $crumb{data}    = scrub($crumb{data});
+                \%crumb;
+            } @{ $payload->{breadcrumbs} }
+        ];
+    }
     $scrubbed{context} = scrub($payload->{context});
     $scrubbed{tags}     = scrub($payload->{tags});
     return \%scrubbed;

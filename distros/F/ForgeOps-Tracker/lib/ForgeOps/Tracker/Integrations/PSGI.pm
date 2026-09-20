@@ -25,6 +25,9 @@ use ForgeOps::Tracker;
 sub call {
     my ($self, $env) = @_;
 
+    # A fresh breadcrumb trail per request: a prefork worker serves many requests in a row.
+    ForgeOps::Tracker::clear_breadcrumbs();
+
     my @response = eval { @{ $self->app->($env) } };
     if (my $error = $@) {
         ForgeOps::Tracker::report($error, {

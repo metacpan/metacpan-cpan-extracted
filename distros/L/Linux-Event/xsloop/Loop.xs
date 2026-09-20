@@ -201,6 +201,7 @@ struct le_loop_s {
     unsigned long long callback_scope_rotations;
     unsigned long long callback_scope_max_callbacks;
     unsigned int callback_scope_limit;
+    unsigned long long poll_calls;
     unsigned long long run_once_calls;
     unsigned long long run_calls;
     unsigned long long run_for_calls;
@@ -1466,6 +1467,7 @@ stats(loop_obj)
     hv_stores(hv, "callback_scope_rotations", newSVuv(loop->callback_scope_rotations));
     hv_stores(hv, "callback_scope_max_callbacks", newSVuv(loop->callback_scope_max_callbacks));
     hv_stores(hv, "callback_scope_limit", newSVuv(loop->callback_scope_limit));
+    hv_stores(hv, "poll_calls", newSVuv(loop->poll_calls));
     hv_stores(hv, "run_once_calls", newSVuv(loop->run_once_calls));
     hv_stores(hv, "run_calls", newSVuv(loop->run_calls));
     hv_stores(hv, "run_for_calls", newSVuv(loop->run_for_calls));
@@ -1604,6 +1606,7 @@ reset_stats(loop_obj)
     loop->callback_batch_scope_enters = 0;
     loop->callback_scope_rotations = 0;
     loop->callback_scope_max_callbacks = 0;
+    loop->poll_calls = 0;
     loop->run_once_calls = 0;
     loop->run_calls = 0;
     loop->run_for_calls = 0;
@@ -1726,6 +1729,47 @@ unwatch_fd(loop_obj, fd_sv)
     w->active = 0;
     le_watcher_recycle_or_destroy(w);
 
+
+int
+poll_fd(loop_obj)
+    SV *loop_obj
+  CODE:
+    RETVAL = le_loop_from_sv(loop_obj)->epoll_fd;
+  OUTPUT:
+    RETVAL
+
+int
+poll(loop_obj)
+    SV *loop_obj
+  PREINIT:
+    int n;
+    le_loop_t *loop;
+    unsigned long long t0;
+    unsigned long long dispatch_t0;
+  CODE:
+    loop = le_loop_from_sv(loop_obj);
+    loop->poll_calls++;
+    le_loop_driver_enter(aTHX_ loop);
+    ENTER;
+    SAVEDESTRUCTOR_X(le_loop_driver_leave, loop);
+    loop->stop_flag = 0;
+    t0 = loop->profile_enabled ? le_now_ns() : 0;
+    n = epoll_wait(loop->epoll_fd, loop->events, (int)loop->event_cap, 0);
+    if (loop->profile_enabled) loop->epoll_wait_ns += le_now_ns() - t0;
+    if (n < 0) {
+        if (errno == EINTR) RETVAL = 0;
+        else croak("epoll_wait failed: %s", strerror(errno));
+    }
+    else {
+        le_note_epoll_batch(loop, n);
+        dispatch_t0 = loop->profile_enabled ? le_now_ns() : 0;
+        le_dispatch_batch(aTHX_ loop, n);
+        if (loop->profile_enabled) loop->dispatch_ns += le_now_ns() - dispatch_t0;
+        RETVAL = n;
+    }
+    LEAVE;
+  OUTPUT:
+    RETVAL
 
 int
 run_once(loop_obj, timeout_value = -1)

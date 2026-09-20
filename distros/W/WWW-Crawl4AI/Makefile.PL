@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -18,25 +18,22 @@ my %WriteMakefileArgs = (
     "bin/www-crawl4ai-test-url"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "WWW::Crawl4AI",
   "PREREQ_PM" => {
-    "HTTP::Message" => "6.00",
+    "HTTP::Request" => "6.00",
     "JSON::MaybeXS" => "1.004000",
     "LWP::UserAgent" => "6.00",
-    "MIME::Base64" => 0,
     "Moo" => "2.000000",
-    "Moo::Role" => "2.000000",
     "Safe::Isa" => "1.000005",
-    "Time::HiRes" => 0,
-    "URI" => "1.70",
-    "URI::Escape" => 0
+    "URI" => "1.70"
   },
   "TEST_REQUIRES" => {
     "Test::Fatal" => "0.014",
     "Test::LoadAllModules" => "0.021",
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,19 +41,15 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "HTTP::Message" => "6.00",
+  "HTTP::Request" => "6.00",
   "JSON::MaybeXS" => "1.004000",
   "LWP::UserAgent" => "6.00",
-  "MIME::Base64" => 0,
   "Moo" => "2.000000",
-  "Moo::Role" => "2.000000",
   "Safe::Isa" => "1.000005",
   "Test::Fatal" => "0.014",
   "Test::LoadAllModules" => "0.021",
   "Test::More" => "0.98",
-  "Time::HiRes" => 0,
-  "URI" => "1.70",
-  "URI::Escape" => 0
+  "URI" => "1.70"
 );
 
 

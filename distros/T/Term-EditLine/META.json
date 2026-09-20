@@ -1,53 +1,84 @@
 {
    "abstract" : "Perl interface to the NetBSD editline library",
    "author" : [
-      "Graham Ollis <plicease@cpan.org>",
-      "Ulrich Burgbacher, <ulrich@burgbacher.net>"
+      "Ulrich Burgbacher <ulrich@burgbacher.net>",
+      "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Term-EditLine",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {}
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.52"
+            "ExtUtils::MakeMaker" : "6.64",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::AlienBase::Wrapper::Bundle" : "0.26",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::PruneFiles" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.79",
+            "Software::License::Perl_5" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0.96",
+            "XSLoader" : "0",
             "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test2::V0" : "0.000121",
+            "Test::More" : "0.98",
+            "perl" : "5.008001",
+            "utf8" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/Term-EditLine/issues"
+         "web" : "https://github.com/uperl/Term-EditLine/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/Term-EditLine/",
+      "homepage" : "https://metacpan.org/pod/Term::EditLine",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/Term-EditLine.git",
-         "web" : "https://github.com/plicease/Term-EditLine.git"
+         "url" : "git://github.com/uperl/Term-EditLine.git",
+         "web" : "https://github.com/uperl/Term-EditLine"
       }
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.12",
+   "x_generated_by_perl" : "v5.42.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
 }
+

@@ -1,89 +1,38 @@
-# ABSTRACT: Generate a random two-word agent name
+# ABSTRACT: Print a claim name derived from the checkout directory
 
 package App::karr::Cmd::AgentName;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
-  usage_string => 'USAGE: karr agentname',
+  usage_string => 'USAGE: karr agentname [--unique]',
 );
+use App::karr::AgentName qw( agent_name );
 use App::karr::Role::CliArgs;
 use App::karr::Role::ExitCodes;
+use App::karr::Role::Output;
 
 # Unknown option / bad option value exits 2, not 1 (ADR 0002 exit-code
 # contract). This board-less command has no BoardDiscovery to inherit it from.
 with 'App::karr::Role::CliArgs';
 with 'App::karr::Role::ExitCodes';
+with 'App::karr::Role::Output';
 
+
+option unique => (
+  is  => 'ro',
+  doc => 'Append a short random suffix, to tell apart agents in one directory',
+);
 
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
 
-  my @words = $self->_load_words;
-  my $name = $words[rand @words] . '-' . $words[rand @words];
-  print "$name\n";
-}
-
-sub _load_words {
-  my ($self) = @_;
-  my @words;
-
-  # Try system dictionary first
-  if (-r '/usr/share/dict/words') {
-    open my $fh, '<', '/usr/share/dict/words' or last;
-    while (<$fh>) {
-      chomp;
-      push @words, lc $_ if /^[a-z]{4,8}$/i;
-    }
-    close $fh;
+  my $name = agent_name( unique => $self->unique );
+  if ($self->json) {
+    $self->print_json( { name => $name } );
+  } else {
+    print "$name\n";
   }
-
-  # Fallback word list
-  unless (@words) {
-    @words = qw(
-      able acid aged also area army away baby back ball band bank base bath
-      bear beat been bell best bill bird bite blow blue boat body bomb bond
-      bone book born boss bulk burn busy cake call calm came camp card care
-      cash cast cell chat chip city claim clan clay clip club coal coat code
-      coin cold come cook cool cope copy core cost crew crop dark data date
-      dawn dead deal dear debt deep deny desk diet dirt disc disk dock does
-      done door dose down draw drew drop drug dual duke dull dust duty each
-      earn ease east easy edge else even ever evil exam exec face fact fail
-      fair fall fame farm fast fate fear feed feel fell file fill film find
-      fine fire firm fish five flat fled flew flip flow fold folk fond font
-      food foot ford form fort four free from fuel full fund gain game gang
-      gate gave gear gift girl give glad goal goes gold golf gone good grab
-      gray grew grid grip grow gulf guru hack half hall hand hang harm hate
-      have head hear heat held help herb here hero high hill hint hire hold
-      hole holy home hope host hour huge hung hunt hurt idea inch into iron
-      item jack jean jobs join joke jump jury just keen keep kept kick kill
-      kind king knew knit know lack laid lake lamp land lane last late lawn
-      lead lean left lend less life lift like limb line link lion list live
-      load loan lock logo long look lord lose loss lost lots love luck made
-      mail main make male many mark mass mate meal mean meat meet menu mere
-      mild mile milk mind mine miss mode mood moon more most move much must
-      myth name navy near neat neck need nest next nice nine none norm nose
-      note odds once only onto open oral ours pace pack page paid pain pair
-      pale palm park part pass past path peak pick pile pine pink pipe plan
-      play plot plug plus poem poet poll pond pool poor port post pour pray
-      pull pump pure push quit race rain rank rare rate read real rear rely
-      rent rest rice rich ride ring rise risk road rock rode role roll roof
-      room root rope rose ruin rule rush safe said sake sale salt same sand
-      sang save seal seat seed seek seem seen self send sept ship shop shot
-      show shut sick side sign silk site size skin slim slip slow snap snow
-      soft soil sold sole some song soon sort soul spin spot star stay stem
-      step stop such suit sure swim tail take tale talk tall tank tape task
-      taxi team teen tell tend term test text than that them then they thin
-      this thus tide tied till time tiny told toll tone took tool tops toss
-      tour town trap tree trim trio trip true tube tuck tune turn twin type
-      ugly unit upon urge used user vale vast very vice view vote wage wait
-      wake walk wall want ward warm wash vast wave weak wear week went were
-      west what whom wide wife wild will wind wine wing wire wise wish with
-      wood word wore work worn wrap yard yeah year zero zone
-    );
-  }
-
-  return @words;
 }
 
 1;
@@ -96,72 +45,80 @@ __END__
 
 =head1 NAME
 
-App::karr::Cmd::AgentName - Generate a random two-word agent name
+App::karr::Cmd::AgentName - Print a claim name derived from the checkout directory
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 
-    karr agentname
+    # The claim name for this checkout -- stable, so every call agrees:
+    karr agent-name                 # -> karr, graphify-fix, wt1, ...
 
-    # Capture the name once, then pass the same variable to every call that
-    # has to agree about the claim:
-    NAME=$(karr agentname)
-    karr pick --claim "$NAME" --move in-progress
-    karr handoff 7 --claim "$NAME" --note "Implementation complete"
+    # Export it once; every nested karr call in the session claims as it:
+    export KARR_CLAIM=$(karr agent-name)
+    karr pick --move in-progress
+    karr handoff 7 --note "Implementation complete"
+
+    # Several agents in ONE directory: a random suffix keeps them apart.
+    export KARR_CLAIM=$(karr agent-name --unique)   # -> karr-8fa
 
 =head1 DESCRIPTION
 
-Generates a random two-word, lowercase agent name joined by a hyphen. The
-command prefers the system dictionary when available and falls back to the
-built-in word list otherwise.
+Prints a claim-safe name for the current checkout: the worktree root's
+directory name, lowercased with every run of non-C<[a-z0-9]> characters folded
+to a single C<-> and the ends trimmed. The agent working the C<karr> checkout
+is C<karr>; the one in a worktree at C<.../graphify-fix> is C<graphify-fix>. The
+source is the worktree root (libgit2's C<workdir>, what C<git rev-parse
+--show-toplevel> reports), so it does not matter which subdirectory the command
+runs in; outside a work tree it falls back to the current directory's basename.
 
-Every call mints a new name. Nothing is remembered between calls -- not per
-board, not per process, not per agent -- so C<$(karr agentname)> written twice
-produces two unrelated names.
+ADR 0005 makes this the value C<KARR_CLAIM> carries. Every command that takes
+C<--claim> (L<App::karr::Cmd::Move>, L<App::karr::Cmd::Handoff>,
+L<App::karr::Cmd::Pick>, L<App::karr::Cmd::Edit>, L<App::karr::Cmd::Create>) and
+C<karr list --claimed-by> defaults to C<$KARR_CLAIM> when the flag is omitted,
+so the recommended shape is to export it once per session:
 
-That matters because claims are compared by name. C<--claim> on
-L<App::karr::Cmd::Pick> and L<App::karr::Cmd::Move> records the name;
-L<App::karr::Cmd::Move>, L<App::karr::Cmd::Edit> and
-L<App::karr::Cmd::Handoff> check the name they are handed against the one on
-the card (L<App::karr::Role::ClaimTimeout/check_claim>); and C<karr list
---claimed-by> and C<karr log --agent> select on it. So this pair
+    export KARR_CLAIM=$(karr agent-name)
 
-    karr pick --claim "$(karr agentname)" --move in-progress    # DON'T
-    karr handoff 7 --claim "$(karr agentname)"                  # DON'T
+rather than passing C<--claim NAME> on every call. An explicit C<--claim> still
+wins over the environment for a one-off.
 
-claims under one name and hands off under another. Substituting the command
-inline is only ever correct where the name is used once and never referred to
-again -- which is almost never, since the handoff at the end of the work is a
-second reference. Capture it into a shell variable instead, as the SYNOPSIS
-does (ticket #176).
+The name is now B<stable> per checkout, not the random word it used to be: it
+is meaningful in C<karr show>, and distinct per worktree without a generator.
+The recommended way to run several agents on one board is therefore one
+worktree each -- their directory names already differ, so their claims differ.
 
-A name that was not captured is still recoverable from the board rather than
-lost: C<karr pick> prints C<(claimed by NAME)>, C<karr show ID> prints
-C<Claimed:>, and the refusal C<check_claim> raises names the current claimant.
-Minting a fresh one instead is the mistake. While the original claim is live
-the mismatch is refused outright; once it has expired the mutation goes
-through and re-stamps the card, but no longer without saying so -- the
-override is reported with the name it stepped over
-(L<App::karr::Role::ClaimTimeout/expired_claim_report>), which is the same
-name to go back to.
+=head2 --unique
 
-The generated name is deliberately not made stable per agent. Any handle that
-would survive across separate C<karr> processes -- the board, the Git
-identity, the host -- is equally shared by every other agent working that same
-board, so deriving a name from one would hand two concurrent agents an
-identical claim. That is strictly worse than the mismatch it would fix: a
-mismatch is refused by C<check_claim>, a collision is indistinguishable from
-the rightful owner and is not. Callers that need a stable identity should
-supply their own name and not go through this command, which exists to suggest
-a name, not to remember one.
+The one case a directory name cannot tell apart is several agents started in
+the B<same> directory: they would all get the same name and, because claims
+match by name, stamp and hand off over each other. C<--unique> appends a short
+random suffix -- C<karr-8fa> -- keeping the checkout identity visible while
+making each agent distinct. Captured once into C<KARR_CLAIM>, the suffix is
+stable for that session. This is where the old random-name behaviour now lives.
+
+=head1 OPTIONS
+
+=over 4
+
+=item * C<--unique>
+
+Append a short random suffix to the checkout name, for several agents sharing
+one directory.
+
+=item * C<--json>
+
+Emit the name as one JSON object -- C<{"name":"..."}> -- and nothing else on
+stdout, so a caller can capture the name without trimming a trailing newline.
+
+=back
 
 =head1 SEE ALSO
 
-L<karr>, L<App::karr>, L<App::karr::Cmd::Pick>, L<App::karr::Cmd::Handoff>,
-L<App::karr::Cmd::Log>, L<App::karr::Role::ClaimTimeout>
+L<karr>, L<App::karr>, L<App::karr::AgentName>, L<App::karr::Cmd::Pick>,
+L<App::karr::Cmd::Handoff>, L<App::karr::Role::ClaimDefault>
 
 =head1 SUPPORT
 

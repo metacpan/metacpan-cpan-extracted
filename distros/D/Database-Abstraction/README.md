@@ -4,7 +4,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.43
+Version 0.44
 
 # DESCRIPTION
 
@@ -45,7 +45,7 @@ A CHI-compatible cache layer is also supported.
     use parent 'Database::Abstraction';
 
     # 2. Open the database - file is auto-detected from the class name
-    #    (looks for foo.sql / foo.psv / foo.csv / foo.xlsx / foo.xml / foo.db)
+    #    (looks for foo.sql / foo.sqlite / foo.sqlite3 / foo.psv / foo.csv / foo.xlsx / foo.xml / foo.db)
     my $db = Database::Foo->new(directory => '/path/to/data');
 
     # 3. Simple lookups -----------------------------------------------
@@ -148,7 +148,7 @@ The module probes the `directory` for files in this priority order:
 
 - 1. `SQLite`
 
-    File ending `.sql`
+    File ending `.sql`, `.sqlite`, or `.sqlite3`
 
 - 2. `Deep`
 
@@ -713,7 +713,7 @@ triggers it, and how to resolve it.
 
 - `Can't find a file called '_name_' for the table _T_ in _dir_`
 
-    None of the probe extensions (`.sql`, `.psv`, `.tsv`, `.csv`, `.xlsx`, `.db`, `.xml`)
+    None of the probe extensions (`.sql`, `.sqlite`, `.sqlite3`, `.psv`, `.tsv`, `.csv`, `.xlsx`, `.db`, `.xml`)
     matched in `directory`.
 
 - `_Class_: prepare failed: _$errstr_`

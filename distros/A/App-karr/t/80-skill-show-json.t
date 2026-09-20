@@ -37,8 +37,11 @@ my $BIN  = "$ROOT/bin/karr";
 # $out therefore holds octets, exactly like t/51-json-output.t.
 sub run_skill_show {
     my (@cmd_opts) = @_;
-    my $dir = tempdir( CLEANUP => 1 );
-    path($dir)->child('claude-skill.md')->spew_utf8($SKILL_TEXT);
+    # The #285 layout: the skill is a directory, and show prints its SKILL.md.
+    my $dir  = tempdir( CLEANUP => 1 );
+    my $file = path($dir)->child('kanban-issues-karr-cli/SKILL.md');
+    $file->parent->mkpath;
+    $file->spew_utf8($SKILL_TEXT);
 
     require File::ShareDir;
     no warnings 'redefine';
@@ -106,8 +109,8 @@ subtest 'plain skill show is unchanged by the --json branch' => sub {
 };
 
 subtest 'karr skill show --json through the real CLI' => sub {
-    my $bundled = path($ROOT)->child('share/claude-skill.md');
-    plan skip_all => "no share/claude-skill.md in this checkout" unless $bundled->exists;
+    my $bundled = path($ROOT)->child('share/kanban-issues-karr-cli/SKILL.md');
+    plan skip_all => "no share/kanban-issues-karr-cli/SKILL.md in this checkout" unless $bundled->exists;
 
     my $run = sub {
         my (@argv) = @_;

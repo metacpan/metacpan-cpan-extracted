@@ -11,7 +11,7 @@ use MIME::Base64 qw(encode_base64);
 use URI;
 use Log::Any qw($log);
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 
 requires 'client_id';
@@ -128,7 +128,7 @@ WWW::PayPal::Role::HTTP - HTTP + OAuth2 role for the PayPal REST API
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -11,6 +11,7 @@
 
 #define LES_CONSUMER_F_START_PAUSED 0x01U
 #define LES_CONSUMER_F_WANT_FLUSH   0x02U
+#define LES_CONSUMER_F_RAW_INPUT    0x04U
 
 #define LES_CONSUMER_CONTINUE 0
 #define LES_CONSUMER_PAUSE    1
@@ -58,13 +59,24 @@ typedef struct les_consumer_ops_v1_s {
     void (*event)(pTHX_ void *context, uint32_t event, int error,
         const char *message);
     void (*destroy)(pTHX_ void *context);
-    /* Optional. Called once after a native framed-input drain that delivered
-     * one or more messages. This field was appended to ABI v1; hosts must
-     * check struct_size before reading it. */
+    /* Optional. Called once after a native input drain that delivered one or
+     * more framed messages or invoked raw input. This field was appended to
+     * ABI v1; hosts must check struct_size before reading it. */
     int (*flush)(pTHX_ void *context);
+    /* Optional raw-input extension. Providers requesting
+     * LES_CONSUMER_F_RAW_INPUT receive a borrowed contiguous native input
+     * window before any payload SV is created. They report how many leading
+     * bytes were consumed; the host retains the unconsumed tail. */
+    int (*input)(pTHX_ void *context, const char *data, size_t length,
+        size_t *consumed);
 } les_consumer_ops_v1_t;
 
 #define LES_CONSUMER_OPS_V1_REQUIRED_SIZE \
     offsetof(les_consumer_ops_v1_t, flush)
+#define LES_CONSUMER_OPS_V1_FLUSH_REQUIRED_SIZE \
+    offsetof(les_consumer_ops_v1_t, input)
+#define LES_CONSUMER_OPS_V1_RAW_INPUT_REQUIRED_SIZE \
+    (offsetof(les_consumer_ops_v1_t, input) \
+        + sizeof(((les_consumer_ops_v1_t *)0)->input))
 
 #endif

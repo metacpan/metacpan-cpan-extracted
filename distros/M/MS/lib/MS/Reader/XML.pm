@@ -291,7 +291,7 @@ sub next_record {
         $ref->{__pos} = $pos;
 
         return $record if (! defined $record || ! $record->{filtered}); 
-        return undef if ($pos == $ref->{__count}); #EOF
+        return if ($pos == $ref->{__count}); #EOF
     }
 
     return $record;

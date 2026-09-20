@@ -181,12 +181,17 @@ subtest 'the split is what lets DependencyCheck require json' => sub {
     ok( App::karr::Cmd::Create->can('parse_dependency_ids'),
         'and it has the set-time half it composes the role for' );
 
-    # Still no --json, and that is now nobody's problem: a create cannot have a
-    # dependency warning to emit -- the card does not exist until it is written
-    # -- so it must not carry the emitting half at all.
-    ok( !App::karr::Cmd::Create->can('json'),
-        'create still has no ->json' );
-    ok( !App::karr::Cmd::Create->can($_), "and no ->$_ to call without one" )
+    # Ticket #268 gave create its own ->json: Role::Output, for the created
+    # card's own output in the same shape `karr show --json` uses. That is a
+    # different json than the one DependencyCheck requires, and does not
+    # change the invariant this subtest is about -- a create still cannot
+    # have a dependency warning to emit, because the card does not exist
+    # until it is written, so it must not carry the emitting half at all,
+    # json or no json.
+    ok( App::karr::Cmd::Create->can('json'),
+        'create has ->json now (#268), for its own card output' );
+    ok( !App::karr::Cmd::Create->can($_),
+        "but still no ->$_ -- the DependencyCheck half it never composes" )
         for qw( check_dependencies dependency_report );
 
     # The commands that do reach the reporting half all bring json, which is

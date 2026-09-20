@@ -30,7 +30,7 @@ sub param {
         else {
             # need to track index across potentially multiple ParamGroups
             --$idx;
-            return undef if ($idx < 0);
+            return if ($idx < 0);
         }
 
     }
@@ -55,14 +55,14 @@ sub param {
             else {
                 # need to track index across potentially multiple ParamGroups
                 --$idx;
-                return undef if ($idx < 0);
+                return if ($idx < 0);
             }
 
         }
 
     }
         
-    return undef;
+    return;
 
 }
 

@@ -6,7 +6,7 @@
 
 **Strategy**: A single step in the chain. Implements `WWW::Crawl4AI::Strategy` role. Has `name` (backend identifier), `cost_class` (cheap/browser/stealth/paid), `applicable` (gate for conditional inclusion), and `crawl` (fetch logic). Strategies are Pluggable — replace or extend via `StrategyChain` object or subclass.
 
-**Classification**: Decision of whether a fetched page is "good enough." Runs via `signals($page)` → `{ js_required, blocked, captcha, thin_html, http_error }` and `is_good($page)`. Can be overridden via `classify_signals` / `classify_why_failed` methods in a subclass of `WWW::Crawl4AI`.
+**Classification**: Decision of whether a fetched page is "good enough." Runs via `signals($page)` → `{ blocked, captcha, thin_html, http_error }` and `is_good($page)`. Content volume is the master signal; `blocked`/`captcha` fire only on challenge-endpoint final_urls (no body-text fingerprints since 0.005). All three are overridable in a subclass of `WWW::Crawl4AI`: `classify_is_good` is the win/continue lever — override it to change which Strategy wins and whether the chain escalates — while `classify_signals` / `classify_why_failed` shape only the *reported* signals and failure token per Attempt.
 
 **Attempt**: A single strategy execution. Records `backend`, `cost_class`, `ok` (bool), `page`, `signals`, `why_failed` (token like bot_wall_detected / captcha / thin_content), `error`, `elapsed`. Every strategy run becomes an Attempt, giving full transparency on why the chain stopped or continued.
 
@@ -35,7 +35,7 @@
 > **Docs:** "Yes. Subclass `WWW::Crawl4AI::StrategyChain` and pass it to `WWW::Crawl4AI->new(strategy_chain => $my_chain)`. Or override `_build_strategy_chain` in a subclass of WWW::Crawl4AI. Use `add_strategy` / `remove_strategy` / `replace_strategy` at runtime."
 
 > **Dev:** "One of my pages has a very specific quality bar — can I use a different classifier?"
-> **Docs:** "Yes. Subclass WWW::Crawl4AI and override `classify_signals` and `classify_why_failed`. They receive the page hash and detect opts, return the signals hash and failure token. All Attempt construction goes through them."
+> **Docs:** "Yes. Subclass WWW::Crawl4AI and override `classify_is_good` — the win/continue lever that decides which Strategy wins and whether the chain escalates (default: `Detect::is_good`). `classify_signals` / `classify_why_failed` are overridable too, but they only shape each Attempt's reported signals and failure token, not the decision. For a simple stricter/looser bar, `min_markdown` is the lightweight lever."
 
 ## Flagged ambiguities
 

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.1202';
+our $VERSION = '0.1301';
 
 use v5.36;
 
@@ -19,7 +19,7 @@ use Types::Common::Numeric qw(PositiveNum);
 use namespace::clean;
 
 use constant KNOWN_FILTERS => qw(
-    single clock_it breathe scatter stair_step ramp_up ramp_down flicker
+    single clock_it breathe scatter stair_step ramp_up ramp_down flicker threshold
 );
 
 extends 'MIDI::RtController::Filter';
@@ -402,6 +402,28 @@ sub flicker ($self, $device, $dt, $event) {
     return $self->continue;
 }
 
+
+sub threshold ($self, $device, $dt, $event) {
+    return 0 if $self->running;
+
+    my ($ev, $chan, $note, $val) = $event->@*;
+
+    if (defined $self->trigger && defined $note) {
+        if ($self->step_up && !$self->step_down && $val <= $self->trigger) {
+            return 0;
+        }
+        elsif (!$self->step_up && $self->step_down && $val >= $self->trigger) {
+            return 0;
+        }
+        else {
+            say "Sending $note" if $self->verbose;
+            $self->rtc->send_it([ $ev, $self->channel, $note, $val ]);
+        }
+    }
+
+    return $self->continue;
+}
+
 1;
 
 __END__
@@ -416,7 +438,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.1202
+version 0.1301
 
 =head1 SYNOPSIS
 
@@ -670,6 +692,16 @@ MIDI event C<note> or C<value>, respectively, to see if the filter
 should be applied.
 
 If the B<halt> attribute is set to true, the running filter will stop.
+
+=head2 threshold
+
+  $control->add_filter('threshold', all => $filter->curry::threshold);
+
+This filter only allows notes with velocity above or below a given
+threshold, specified by the L</trigger>. If only notes I<above> are
+allowed, set the L</step_up> attribute to C<1> and set the
+L</step_down> attribute to C<0>. For notes I<below> allowed, swap
+these step attribute settings.
 
 =head1 SEE ALSO
 

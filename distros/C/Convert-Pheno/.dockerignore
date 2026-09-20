@@ -12,6 +12,9 @@ SESSION*.md
 /README*
 /docs
 /docs-site
+/app
+/scripts
+/TODO.md
 /nb
 /non-containerized
 /docker
@@ -31,6 +34,7 @@ SESSION*.md
 /_Inline
 /nytprof*
 node_modules
+app/dist
 __pycache__
 *.pyc
 *.pyo

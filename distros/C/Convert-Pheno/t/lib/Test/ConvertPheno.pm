@@ -13,6 +13,7 @@ use FindBin qw($Bin);
 use IPC::Open3 qw(open3);
 use IO::Uncompress::Gunzip;
 use IO::Uncompress::Unzip qw($UnzipError);
+use IO::Compress::Zip qw($ZipError);
 use JSON::XS qw(decode_json);
 use Text::CSV_XS;
 use lib qw(./lib ../lib);
@@ -44,6 +45,7 @@ our @EXPORT_OK = qw(
   csv_files_match
   gunzip_file_content
   slurp_zip_member
+  write_zip_from_files
   run_command_capture
 );
 
@@ -228,6 +230,43 @@ sub slurp_zip_member {
     die "Archive member '$member_name' not found in '$archive_path'\n";
 }
 
+sub write_zip_from_files {
+    my ( $archive_path, $members ) = @_;
+    die 'write_zip_from_files requires an array of member definitions'
+      unless ref($members) eq 'ARRAY' && @{$members};
+
+    my $zip;
+    for my $member ( @{$members} ) {
+        die 'ZIP member requires file and name values'
+          unless ref($member) eq 'HASH'
+          && defined $member->{file}
+          && defined $member->{name};
+
+        if ($zip) {
+            $zip->newStream( Name => $member->{name} )
+              or die "Cannot add ZIP member <$member->{name}>: $ZipError\n";
+        }
+        else {
+            $zip = IO::Compress::Zip->new(
+                $archive_path,
+                Name => $member->{name},
+            ) or die "Cannot create ZIP archive <$archive_path>: $ZipError\n";
+        }
+
+        open my $fh, '<:raw', $member->{file}
+          or die "Cannot read ZIP source <$member->{file}>: $!\n";
+        my $buffer;
+        while ( read $fh, $buffer, 64 * 1024 ) {
+            $zip->print($buffer)
+              or die "Cannot write ZIP member <$member->{name}>: $ZipError\n";
+        }
+        close $fh;
+    }
+    $zip->close
+      or die "Cannot close ZIP archive <$archive_path>: $ZipError\n";
+    return $archive_path;
+}
+
 sub load_json_file {
     my ($file) = @_;
     return decode_json( slurp_file($file) );
@@ -336,7 +375,8 @@ sub load_csv_table {
 
 sub write_csv_rows {
     my ( $file, $headers, $rows ) = @_;
-    open my $fh, '>', $file or die "Could not open file '$file': $!";
+    open my $fh, '>:raw:encoding(UTF-8)', $file
+      or die "Could not open file '$file': $!";
     my $csv = Text::CSV_XS->new( { binary => 1, eol => "\n", sep_char => ';' } );
     $csv->print( $fh, $headers );
     for my $row (@$rows) {

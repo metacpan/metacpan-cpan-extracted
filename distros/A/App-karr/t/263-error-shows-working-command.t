@@ -158,10 +158,13 @@ subtest 'move into a require_claim status names the move that would have worked'
 
     is( $rv->{exit}, 1, 'exit 1, exactly as before (ADR 0002)' )
         or diag $rv->{stdout} . $rv->{stderr};
-    like( $rv->{stderr}, qr/^Status 'in-progress' requires a claim:$/m,
-        'the wording says a VALUE is wanted, not just that --claim exists' );
+    like( $rv->{stderr},
+        qr/^Status 'in-progress' requires a claim, and KARR_CLAIM is unset:$/m,
+        'the wording says a VALUE is wanted, not just that --claim exists (ADR 0005)' );
+    like( $rv->{stderr}, qr/^  export KARR_CLAIM=\$\(karr agent-name\)/m,
+        'and the once-per-session export is the other way named' );
     _hint_is_last( $rv->{stderr}, '  karr move 1 in-progress --claim NAME',
-        'the suggestion is the last line of the error' );
+        'the immediate copy-paste fix is still the last line of the error' );
 
     # (a): the real id and the real status, not a placeholder or an example.
     unlike( $rv->{stderr}, qr/karr move ID/, 'no placeholder id in the suggestion' );
@@ -266,7 +269,8 @@ subtest '--json is untouched: one-line error, no suggestion in the payload' => s
     my $rv = _run_karr( $repo, 'move', 1, 'in-progress', '--json' );
     is( $rv->{exit}, 1, 'exit 1' ) or diag $rv->{stderr};
     unlike( $rv->{stdout}, qr/karr move/, 'the shell line is not in the JSON' );
-    like( $rv->{stdout}, qr/\Q"error":"Status 'in-progress' requires a claim"\E/,
+    like( $rv->{stdout},
+        qr/\Q"error":"Status 'in-progress' requires a claim, and KARR_CLAIM is unset"\E/,
         'the error field is one line, with no dangling colon where the suggestion was cut' );
 };
 
@@ -502,17 +506,29 @@ subtest 'a missing option value answers under the block, not over it' => sub {
         0, 'running the suggested line succeeds' );
 };
 
-subtest 'an option missing altogether is appended to the line that was typed' => sub {
+subtest 'handoff with neither --claim nor KARR_CLAIM names both ways out' => sub {
     my $repo = _board_repo('a card');
 
-    # handoff declares --claim `required => 1`, so this never reaches
-    # Getopt::Long at all: MooX::Options fails in the constructor and reports it
-    # with a bare `print STDERR "claim is missing"` (4.103, new_with_options).
-    # That is the writer no $SIG{__WARN__} would ever see, which is why STDERR
-    # itself is captured.
+    # --claim was MooX::Options `required => 1` before ADR 0005 -- a constructor
+    # error saying "claim is missing". Now KARR_CLAIM fills it when the flag is
+    # omitted, and a handoff with neither is karr's own usage error (still
+    # exit 2), naming both ways: the once-per-session export, and the immediate
+    # --claim invocation last, for the agent reading `tail -1`.
+    local $ENV{KARR_CLAIM};
+    delete $ENV{KARR_CLAIM};
+
     my $rv = _run_karr( $repo, 'handoff', 1 );
-    _answer_is_last( $rv, 'claim is missing', '  karr handoff 1 --claim NAME',
-        'handoff 1' );
+
+    is( $rv->{exit}, 2, 'still a usage error (2), as the old required was' )
+        or diag $rv->{stdout} . $rv->{stderr};
+    is( $rv->{stdout}, '', 'nothing of it reaches stdout' );
+    like( $rv->{stderr}, qr/needs a claim, and KARR_CLAIM is unset/,
+        'the diagnostic names the empty environment' );
+    like( $rv->{stderr}, qr/^  export KARR_CLAIM=\$\(karr agent-name\)/m,
+        'the once-per-session export is named' );
+    is( ( _lines( $rv->{stderr} ) )[-1], '  karr handoff 1 --claim NAME',
+        'and the immediate --claim invocation is the last line' )
+        or diag $rv->{stderr};
 
     is( _run_karr( $repo, 'handoff', 1, '--claim', 'NAME' )->{exit},
         0, 'running the suggested line succeeds' );

@@ -3,11 +3,15 @@ package Amazon::S3::Constants;
 use strict;
 use warnings;
 
+use English qw(-no_match_vars);
+use Carp qw(croak);
+use IO::File;
+
 use parent qw(Exporter);
 
 use Readonly;
 
-our $VERSION = '2.0.2'; ## no critic (RequireInterpolation)
+our $VERSION = '2.1.0'; ## no critic (RequireInterpolation)
 
 # defaults
 Readonly our $AMAZON_HEADER_PREFIX            => 'x-amz-';
@@ -23,8 +27,7 @@ Readonly our $DEFAULT_LOG_LEVEL               => 'error';
 Readonly our $MAX_DELETE_KEYS                 => 1000;
 Readonly our $MAX_RETRIES                     => 5;
 Readonly our $DEFAULT_REGION                  => 'us-east-1';
-Readonly our $AWS_METADATA_BASE_URL =>
-  'http://169.254.169.254/latest/meta-data/';
+Readonly our $AWS_METADATA_BASE_URL           => 'http://169.254.169.254/latest/meta-data/';
 
 Readonly our $XMLDECL  => '<?xml version="1.0" encoding="UTF-8"?>';
 Readonly our $S3_XMLNS => 'http://s3.amazonaws.com/doc/2006-03-01/';
@@ -73,6 +76,189 @@ Readonly our $HTTP_MOVED_PERMANENTLY => 301;
 Readonly our $HTTP_FOUND             => 302;
 Readonly our $HTTP_SEE_OTHER         => 303;
 Readonly our $HTTP_NOT_MODIFIED      => 304;
+
+Readonly::Hash our %CHECKSUM_TYPES => (
+  crc64nvme => {
+    module => 'Digest::CRC64NVME',
+    digest => sub {
+      my (%parameters) = @_;
+
+      my $digest = Digest::CRC64NVME->new;
+
+      if ( defined $parameters{filename} ) {
+        my $fh = IO::File->new( $parameters{filename}, 'r' )
+          or croak "Could not open $parameters{filename}: $OS_ERROR";
+
+        $fh->binmode;
+        $digest->addfile($fh);
+        $fh->close;
+      }
+      else {
+        $digest->add( $parameters{data} // $EMPTY );
+      }
+
+      return $digest->digest;
+    },
+  },
+  crc32 => {
+    module => 'Digest::CRC',
+    digest => sub {
+      my (%parameters) = @_;
+
+      my $digest = Digest::CRC->new( type => 'crc32' );
+
+      if ( defined $parameters{filename} ) {
+
+        my $fh = IO::File->new( $parameters{filename}, 'r' )
+          or croak "Could not open $parameters{filename}: $OS_ERROR";
+
+        $fh->binmode;
+        $digest->addfile($fh);
+        $fh->close;
+      }
+      else {
+        $digest->add( $parameters{data} // $EMPTY );
+      }
+
+      return $digest->digest;
+    },
+  },
+  crc32c => {
+    module => 'String::CRC32C',
+    digest => sub {
+      my (%parameters) = @_;
+
+      if ( defined $parameters{filename} ) {
+
+        my $fh = IO::File->new( $parameters{filename}, 'r' )
+          or croak "Could not open $parameters{filename}: $OS_ERROR";
+
+        $fh->binmode;
+
+        my $crc;
+
+        while (1) {
+          my $buffer;
+          my $read = $fh->read( $buffer, $DEFAULT_BUFFER_SIZE );
+
+          croak "Error while reading $parameters{filename}: $OS_ERROR"
+            if !defined $read;
+
+          last
+            if !$read;
+
+          $crc
+            = defined $crc
+            ? String::CRC32C::crc32c( $buffer, $crc )
+            : String::CRC32C::crc32c($buffer);
+        }
+
+        $fh->close;
+
+        $crc //= String::CRC32C::crc32c($EMPTY);
+
+        return pack 'L>', $crc;
+      }
+
+      my $crc = String::CRC32C::crc32c( $parameters{data} // $EMPTY );
+
+      return pack 'L>', $crc;
+    },
+  },
+  md5 => {
+    module => 'Digest::MD5',
+    digest => sub {
+      my (%parameters) = @_;
+
+      my $digest = Digest::MD5->new;
+
+      if ( defined $parameters{filename} ) {
+        require IO::File;
+        my $fh = IO::File->new( $parameters{filename}, 'r' )
+          or croak "Could not open $parameters{filename}: $OS_ERROR";
+
+        $fh->binmode;
+        $digest->addfile($fh);
+        $fh->close;
+      }
+      else {
+        $digest->add( $parameters{data} // $EMPTY );
+      }
+
+      return $digest->digest;
+    }
+  },
+  sha1 => {
+    module => 'Digest::SHA',
+    digest => sub {
+      my (%parameters) = @_;
+
+      my $digest = Digest::SHA->new(1);
+
+      if ( defined $parameters{filename} ) {
+        $digest->addfile( $parameters{filename}, 'b' );
+      }
+      else {
+        $digest->add( $parameters{data} // $EMPTY );
+      }
+
+      return $digest->digest;
+    },
+  },
+
+  sha256 => {
+    module => 'Digest::SHA',
+    digest => sub {
+      my (%parameters) = @_;
+
+      my $digest = Digest::SHA->new(256);
+
+      if ( defined $parameters{filename} ) {
+        $digest->addfile( $parameters{filename}, 'b' );
+      }
+      else {
+        $digest->add( $parameters{data} // $EMPTY );
+      }
+
+      return $digest->digest;
+    },
+  },
+  sha512 => {
+    module => 'Digest::SHA',
+    digest => sub {
+      my (%parameters) = @_;
+
+      my $digest = Digest::SHA->new(512);
+
+      if ( defined $parameters{filename} ) {
+        $digest->addfile( $parameters{filename}, 'b' );
+      }
+      else {
+        $digest->add( $parameters{data} // $EMPTY );
+      }
+
+      return $digest->digest;
+    },
+  },
+  #  xxhash64  => { digest => sub { my (%parameters) = @_; }, module => 'Crypt::xxHash' },
+  #  xxhash3   => { digest => sub { my (%parameters) = @_; }, module => 'Crypt::xxHash' },
+  #  xxhash128 => { digest => sub { my (%parameters) = @_; }, module => 'Crypt::xxHash' },
+);
+
+Readonly::Array our @AWS_CHECKSUM_TYPES => (
+  qw(
+    crc64nvme
+    crc32
+    crc32c
+    md5
+    sha1
+    sha256
+    sha512
+    xxhash64
+    xxhash3
+    xxhash128
+  )
+);
 
 our %EXPORT_TAGS = (
   chars => [
@@ -140,7 +326,7 @@ our %EXPORT_TAGS = (
   ],
 );
 
-our @EXPORT_OK = map { @{ $EXPORT_TAGS{$_} } } keys %EXPORT_TAGS;
+our @EXPORT_OK = ( qw(%CHECKSUM_TYPES @AWS_CHECKSUM_TYPES), map { @{ $EXPORT_TAGS{$_} } } keys %EXPORT_TAGS, );
 
 $EXPORT_TAGS{all} = [@EXPORT_OK];
 

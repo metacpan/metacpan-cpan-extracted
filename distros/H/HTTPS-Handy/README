@@ -1,0 +1,180 @@
+NAME
+    HTTPS::Handy - A tiny HTTPS/1.0 server with TLS written in pure Perl
+
+VERSION
+    Version 1.01
+
+SYNOPSIS
+        use HTTPS::Handy;
+
+        my $app = sub {
+            my $env = shift;
+            return [200, ['Content-Type', 'text/plain'], ['Hello, Secure World!']];
+        };
+
+        # Zero-config HTTPS: the module generates its own key and
+        # self-signed certificate, in Perl, in about a second, and
+        # caches them on disk.
+        HTTPS::Handy->run(app => $app, port => 8443);
+
+        # With a certificate you already have
+        HTTPS::Handy->run(
+            app           => $app,
+            port          => 8443,
+            ssl_cert_file => 'server-cert.pem',
+            ssl_key_file  => 'server-key.pem',
+        );
+
+DESCRIPTION
+    The shortest way in:
+
+        perl lib/HTTPS/Handy.pm
+
+    That starts a demonstration server. The first run spends about a
+    second making a key and a certificate, then prints the address to
+    open. The browser warns that the certificate vouches for itself;
+    say to continue, and the page appears. Nothing had to be installed,
+    and no other program ran.
+
+    HTTPS::Handy is a single-file HTTPS/1.0 server for Perl 5.5.3 and
+    later. It is built on the same philosophy as HTTP::Handy: simplicity,
+    portability, and minimal configuration.
+
+    The TLS layer is part of this file. Big integer arithmetic, the
+    P-256 elliptic curve, SHA-256, HMAC, the TLS pseudo random function,
+    ChaCha20-Poly1305, DER and PEM encoding, X.509 certificate
+    generation, the record layer and the handshake are all written in
+    Perl here. The distribution contains no binary file, no XS code and
+    no compiled component, and the module loads nothing outside the Perl
+    core. Nothing external is called either: no OpenSSL, no certbot, no
+    compiler.
+
+    Two things follow from that. An ordinary browser opens the pages it
+    serves, because the cipher suites here are the ones Chrome, Firefox,
+    Safari and Edge still accept: ECDHE for key agreement,
+    ChaCha20-Poly1305 for the data, an ECDSA certificate. And every step
+    from the first byte of a ClientHello to the HTML the browser
+    displays can be read, printed out, and traced with a print
+    statement -- which is the point of the module.
+
+    The core is one subroutine, HTTPS::Handy::TLS::server_handshake,
+    about a hundred and fifty lines long. Everything else in the file is
+    a part it calls, and the packages are laid out in the order they are
+    meant to be read.
+
+    The demo page at /info prints the PSGI environment, including
+    psgix.tls_cipher and psgix.tls_resumed. Reloading it shows
+    psgix.tls_resumed turn from 0 into 1 as session resumption starts
+    working, which is the quickest way to see what it is for.
+
+    Certificates are handled like this:
+
+    - If "ssl_cert_file" and "ssl_key_file" are given, they are used.
+    - Otherwise, if "domains" is given and a Let's Encrypt certificate
+      for that name is already installed on the machine, it is used.
+    - Otherwise a P-256 key and a self-signed certificate are generated
+      here and cached in "cert_dir", so later runs start immediately.
+
+    Certificate renewal is not automatic, and no ACME client is included:
+    certificates from a certificate authority must be obtained by other
+    means and passed in with "ssl_cert_file" and "ssl_key_file".
+
+COMPATIBILITY
+    Perl     : 5.5.3 or later
+    OS       : Any (Windows, Unix, macOS, and others)
+    Modules  : Core only (IO::Socket, POSIX, Carp)
+    Tools    : None
+    Protocol : TLS 1.2, ECDHE on P-256 (forward secrecy),
+               TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 and
+               TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+    Clients  : Current browsers, curl, openssl s_client
+    Model    : Single process, single thread
+
+TARGET USE CASES
+    HTTPS::Handy is meant for teaching, for reading, and for local work:
+    a classroom where the whole of HTTPS has to fit on a projector, a
+    development machine that needs an "https://" URL for a webhook or an
+    OAuth callback, a small tool on a private network. It is not meant
+    for internet-facing production traffic; see LIMITATIONS.
+
+INCLUDED DOCUMENTATION
+    The "eg/" directory contains runnable examples:
+
+        eg/01_hello_world.pl   Minimal app, self-signed HTTPS
+        eg/02_static_files.pl  serve_static with Cache-Control
+        eg/03_certificates.pl  Explicit cert/key, domains, cert_dir
+
+    Run any of them with "perl eg/NAME.pl [port]" from the distribution
+    directory.
+
+INSTALLATION
+    Via CPAN:
+
+        cpan HTTPS::Handy
+        cpanm HTTPS::Handy
+
+    Manual (no build tools, and no dependencies at all):
+
+        cp lib/HTTPS/Handy.pm /path/to/your/project/
+
+    Via perl Makefile.PL:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+DEMO
+    Run directly to start a self-contained demo server:
+
+        perl lib/HTTPS/Handy.pm
+        perl lib/HTTPS/Handy.pm 9443
+
+    The first run generates a key and a self-signed certificate, which
+    takes about a second; later runs start at once. Then open
+    https://localhost:8443/ in your browser and click past the
+    certificate warning, which is expected for a self-signed
+    certificate.
+
+DIFFERENCES FROM HTTP::HANDY
+    - Transport is HTTPS instead of HTTP
+    - psgi.url_scheme is "https"
+    - psgi.ssl is set to 1
+    - Default port is 8443 instead of 8080
+    - A certificate and key are needed, and are generated when absent
+
+SECURITY NOTES
+    - This TLS implementation is written to be read, not to guard
+      anything valuable. Nothing in it is constant time, so timing
+      attacks are possible.
+    - Random bytes come from /dev/urandom where it exists, and from a
+      much weaker fallback where it does not (Windows, for example).
+      For ECDSA that matters: two signatures made with the same random
+      value give away the private key.
+    - Self-signed certificates trigger browser warnings. They are
+      suitable for development, a local network, or behind a reverse
+      proxy.
+    - This server is single-process and single-thread. It is designed
+      for teaching, local tools, and low-traffic services.
+
+LIMITATIONS
+    - Single-process, single-thread: a slow client or slow TLS handshake
+      blocks all other clients for the duration of that request.
+    - TLS 1.2 only, one curve (P-256) and one cipher
+      (ChaCha20-Poly1305). Every current browser supports both.
+    - Cryptography in Perl is slow: a full handshake costs one to two
+      seconds, a resumed one is instant, and bulk data moves at roughly
+      two hundred kilobytes per second.
+    - No ALPN, renegotiation, client certificates, OCSP, session
+      tickets, or ACME client.
+    - No Server Name Indication: one certificate is served to everyone.
+    - POST body is fully buffered in memory before the application runs.
+    - No Keep-Alive: every request pays for a new TLS handshake.
+    - No cookie or session management (implement in the application layer).
+
+AUTHOR
+    INABA Hitoshi <ina.cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as Perl itself.

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 our $Eval = 1;
 
@@ -23,7 +23,7 @@ Struct::Codec - a Perl structure to bytes and back, with nothing lost
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -149,6 +149,32 @@ rather than being turned into a string or a sub that runs but does something
 else, because either is a bug that nobody finds until they read it back. A
 refusal leaves nothing behind; the next call is unaffected.
 
+Also refused is a B<pointer object>: a blessed scalar that holds nothing but
+an integer, in a class whose C<DESTROY> is an XSUB. That is what an XS module
+hands out for a handle to something outside perl, a L<Compress::Raw::Zlib>
+stream, an L<XML::LibXML> node: the integer is an address, and the C<DESTROY>
+frees it. A copy would come back as the same integer, and its C<DESTROY>
+would free memory the copy does not own, in another process or in this one.
+The error names the class,
+
+    Struct::Codec: cannot encode a Compress::Raw::Zlib::inflateStream object that holds a pointer (strip_pointers => 1 drops it)
+
+and C<< strip_pointers => 1 >> on L</struct_encode> writes such an object as
+C<undef> instead, for a structure that carries one incidentally. A stream
+that already holds one, written before this refusal existed, is refused on
+decode with the byte it was found at, before the class's C<DESTROY> could see
+it. A blessed integer in a class with no C<DESTROY>, or with one written in
+Perl, is data and comes back as before, as does any object whose state is a
+string, a float, a reference or a container. A Perl C<DESTROY> that frees C
+memory through an XSUB of its own is the one shape this cannot see.
+
+An address that has been printed is still an address: perl keeps the digits
+it spelled in the same scalar, and before 5.36 it marks them as a string, so
+a value whose string is nothing but its own integer back counts as the
+integer. One shape pays for that: a blessed C<"7"> in such a class, if it has
+also been used as a number, is indistinguishable from a printed 7 and is
+refused with it. Any string that spells something else is data.
+
 =head2 Trusted contents
 
 A class name in the stream is blessed into, and the package is created if it
@@ -214,8 +240,20 @@ exported on request, and are the same two functions.
 =head2 struct_encode
 
     my $bytes = struct_encode($value);
+    my $bytes = struct_encode($value, strip_pointers => 1);
 
-A byte string. Croaks, naming the type, on a value it cannot carry.
+A byte string. Croaks, naming the type, on a value it cannot carry. Options
+follow the value as pairs, and an unknown one is an error:
+
+=over 4
+
+=item strip_pointers
+
+True writes a pointer object (see L</What is refused>) as C<undef> where it
+sits, and the rest of the structure as it is. False, the default, refuses the
+whole value.
+
+=back
 
 =head2 struct_decode
 

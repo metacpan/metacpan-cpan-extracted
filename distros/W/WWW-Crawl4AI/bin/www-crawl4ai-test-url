@@ -7,6 +7,8 @@ use feature 'say';
 use Getopt::Long;
 use WWW::Crawl4AI;
 
+our $VERSION = '0.001';
+
 my %opt = ( show => 400 );
 GetOptions(
   'base-url=s'         => \$opt{base_url},
@@ -80,7 +82,7 @@ www-crawl4ai-test-url - run the full WWW::Crawl4AI strategy chain against one UR
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

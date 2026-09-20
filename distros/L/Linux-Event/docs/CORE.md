@@ -177,6 +177,37 @@ their native write queue.
 
 ## Driving the loop
 
+### Foreign-loop integration
+
+Another event system can own the application's top-level loop and drive
+Linux::Event through one fd:
+
+```perl
+my $fd = $loop->poll_fd;
+
+# Register $fd for level-triggered read readiness in the foreign loop.
+# From that readiness callback:
+my $events = $loop->poll;
+```
+
+`poll_fd()` is the Loop-owned epoll descriptor. It becomes readable when any
+Linux::Event-owned kernel source is ready, including ordinary I/O, timerfd,
+signalfd, pidfds, and eventfd notifications. The descriptor is borrowed; do not
+close it. Duplicate it first if the foreign API requires ownership of a Perl
+filehandle.
+
+`poll()` performs exactly one nonblocking epoll wait and dispatches that batch.
+It is intentionally a separate public contract from `run_once(0)`, even though
+both use the same native readiness path. Foreign adapters should watch
+`poll_fd()` with level-triggered semantics and call `poll()` once per host-loop
+readiness callback. If more work remains than one event batch can hold, the
+epoll fd remains readable for a later host-loop turn. An interrupted native
+wait is treated as an empty turn; other native wait failures throw, and callback
+exceptions propagate after driver state is restored.
+
+Linux::Event does not depend on or take ownership of the foreign loop. Adapters
+for EV/AnyEvent, IO::Async, Mojo, or other event systems belong outside core.
+
 Persistent drive:
 
 ```perl

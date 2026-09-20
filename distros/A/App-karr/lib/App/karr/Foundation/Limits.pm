@@ -1,7 +1,7 @@
 # ABSTRACT: karr-foundation concurrency limits -- machine ceiling, per-agent estimates, chain header
 
 package App::karr::Foundation::Limits;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use Try::Tiny;
 use App::karr::Error qw( user_error clean_error );
@@ -132,7 +132,7 @@ App::karr::Foundation::Limits - karr-foundation concurrency limits -- machine ce
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 DESCRIPTION
 

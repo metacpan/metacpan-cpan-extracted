@@ -222,8 +222,10 @@ pause state, deadlines, and application data.
 
 The native transition validates the new descriptor before callbacks are
 allowed to continue. Buffered unread input is then interpreted using the new
-parser. The transition cannot change the underlying resource category or
-native consumer provider.
+parser. The transition cannot change the underlying resource category. When
+both source and target use native consumers, `transition_to()` may replace the
+provider at a safe callback/lifetime boundary while preserving the same native
+input buffer; adding or removing native-consumer mode remains rejected.
 
 A connected stream socket therefore remains a connected stream socket across a
 protocol transition; only its application protocol/framing class changes.

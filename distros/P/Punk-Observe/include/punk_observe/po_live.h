@@ -7,7 +7,8 @@
  *
  * THE TRANSPORT REFUSES OVERSIZE RATHER THAN TRUNCATING.
  *
- * `hm_bus.h` fixes a slot at 2048 bytes and returns HM_BUS_OVERSIZE for
+ * The ring fixes a slot and REFUSES a record that does not fit one, and the
+ * old bus before it returned HM_BUS_OVERSIZE for
  * anything larger - refused, never shortened. Handing it a long log line
  * therefore does not produce a short line, it produces NO line, and the tail
  * would silently skip exactly the interesting ones: a stack trace, a

@@ -1,7 +1,7 @@
 # ABSTRACT: Generate board context summary for embedding
 
 package App::karr::Cmd::Context;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -77,22 +77,27 @@ sub execute {
   # Archived, and nothing else. The boundary is kanban-md's IsArchivedStatus
   # (cmd/context.go filters the list with it), and that is literally
   # `s == "archived"` -- not "terminal". A finished card is still part of what
-  # the board reports about itself: it counts in the header total, and it is
-  # still listed as blocked if someone blocked it before it got there. Only
-  # filed-away work drops out of the briefing entirely.
-  #
-  # karr excluded every terminal status here between 85f6e9f (a sweep that
-  # replaced the original `ne 'archived'` while claiming only to centralize
-  # config knowledge) and ticket #229, so on the default board `done` was
-  # missing from both those numbers -- while this comment already described the
-  # narrower rule. Widening it again would also break the sentinel interop
-  # contract explained in _render_markdown below: karr and kanban-md maintain
-  # one block in a shared host file, so the same board has to put the same
-  # numbers in it.
+  # the board reports about itself: it counts in the header total and can show
+  # up under recently-completed. Only filed-away work drops out of the briefing
+  # entirely. Excluding every terminal status here instead (as karr did between
+  # 85f6e9f and ticket #229) would drop `done` from the total on the default
+  # board, so @context_tasks stays wide.
   #
   # The values below that must NOT see terminal cards test the status
-  # themselves, as kanban-md's computeSummary does: `active`, `_is_overdue` and
-  # the in-progress section each carry their own is_terminal_status check.
+  # themselves, as kanban-md's computeSummary does for most of them: `active`,
+  # `_is_overdue` and the in-progress section each carry their own
+  # is_terminal_status check -- and `blocked` now joins them (ticket #295).
+  #
+  # `blocked` is a DELIBERATE divergence from kanban-md, not a bug. kanban-md's
+  # computeSummary counts a card as blocked even in a terminal status, and #229
+  # once matched that here so a co-driven shared block held identical numbers.
+  # #295 reverses that call: a card in a terminal status is finished and is not
+  # an active blocker, so it is neither counted nor listed as blocked, the same
+  # rule `karr board`'s footer applies. block_reason is untouched and `karr list
+  # --blocked --status done` still surfaces it. Accepted consequence: the
+  # blocked count in the shared sentinel block (see _render_markdown) can now
+  # differ from the one kanban-md would write for the same board. See
+  # docs/adr/0006-context-diverges-from-kanban-md-on-terminal-blocked-counting.md.
   my @context_tasks = grep { $_->status ne App::karr::Config->ARCHIVED_STATUS } @tasks;
 
   # Build summary
@@ -103,7 +108,10 @@ sub execute {
   # below, blocked cards included. See there for why that span is wider than the
   # heading sounds.
   my $active = grep { $_->status ne $first_status && !$self->store->is_terminal_status($_->status) } @context_tasks;
-  my $blocked = grep { $_->has_blocked } @context_tasks;
+  # Terminal cards excluded (ticket #295): a finished card carrying a stale
+  # blocked flag is not an active blocker. Same is_terminal_status test `active`
+  # above uses, so the two summary numbers agree on what "finished" means.
+  my $blocked = grep { $_->has_blocked && !$self->store->is_terminal_status($_->status) } @context_tasks;
   my $overdue = $self->_count_overdue(\@context_tasks);
 
   # Build sections
@@ -136,8 +144,11 @@ sub execute {
         grep { $_->status ne $first_status && !$self->store->is_terminal_status($_->status) && !$_->has_blocked }
         @context_tasks;
     } elsif ($sec eq 'blocked') {
+      # Terminal cards excluded, matching the header count above (ticket #295):
+      # a finished card is not listed as an active blocker even if its flag is
+      # still set. block_reason stays put; --status done still surfaces it.
       @items = map { $self->_task_item($_, 'blocked: ' . ($_->has_block_reason ? $_->block_reason : '')) }
-        grep { $_->has_blocked }
+        grep { $_->has_blocked && !$self->store->is_terminal_status($_->status) }
         @context_tasks;
     } elsif ($sec eq 'overdue') {
       my $now = gmtime->strftime('%Y-%m-%d');
@@ -437,7 +448,7 @@ App::karr::Cmd::Context - Generate board context summary for embedding
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 
@@ -487,9 +498,12 @@ leaves behind a file that decodes whole -- the channel rule C<delete>'s prompt
 follows for the same reason (#248). Without one, stdout is prose anyway and
 the line stays there.
 
-Only C<archived> tasks are left out of the summary. Finished work still counts
-towards the reported total and is still reported as blocked if it is, which is
-the rule kanban-md applies to the same block.
+Only C<archived> tasks are left out of the summary: finished work still counts
+towards the reported total, the rule kanban-md applies to the same block. One
+number deliberately diverges -- a card in a terminal status is not counted or
+listed as blocked here even when its flag is still set, because a done card is
+not an active blocker (tickets #229, #295). Its C<block_reason> stays on the
+card as provenance and C<karr list --blocked --status done> still finds it.
 
 =head1 SECTIONS
 

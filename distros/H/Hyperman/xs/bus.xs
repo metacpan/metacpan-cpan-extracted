@@ -2,9 +2,9 @@ MODULE = Hyperman    PACKAGE = Hyperman
 
 PROTOTYPES: DISABLE
 
-# The cross-worker message bus.
+# The cross-worker message bus, on a ring in the Shared::Arena.
 #
-# Class methods, matching deny_add / ratelimit_hit next door: the arena is
+# Class methods, matching deny_add / ratelimit_hit next door: the ring is
 # process-global, so there is nothing to hold an object over, and an
 # application that is not an XS module should not have to become one to reach
 # it.
@@ -12,23 +12,26 @@ PROTOTYPES: DISABLE
 # TWO DELIVERY MODES, ONE MECHANISM. A message is published once; what differs
 # is where the cursor lives. A FANOUT reader keeps its cursor in its own
 # process, so every reader sees every message. A QUEUE GROUP keeps one cursor
-# in the arena, advanced with an atomic add, so exactly one member of the pool
-# sees each message.
+# in the arena, advanced with a compare-and-swap, so exactly one member of the
+# pool sees each message.
 
-# bus_init(slots => N, slot_size => N, groups => N) -> 1 if there is an arena
+# bus_init(slots => N, slot_size => N, groups => N, wakers => N) -> 1 if
+# there is a ring
 #
 # run() does this before it forks, which is the only place it can be done: a
 # ring created after the fork is one ring per worker, which is a bus that
 # delivers to nobody. This is here for a script or a test that forks by hand
 # and needs the same guarantee. Idempotent - the first call wins, so calling
-# it after the server has started changes nothing.
+# it after the server has started changes nothing. With no arena yet, the
+# default one is created first. `groups` is accepted and ignored: the ring's
+# group table is fixed at 64.
 IV
 bus_init(class, ...)
         SV *class
     CODE:
     {
         UV slots = 0, slot_size = 0, groups = 0, wakers = 0;
-        int i;
+        int i, err = 0;
         PERL_UNUSED_VAR(class);
         for (i = 1; i + 1 < items; i += 2) {
             const char *k = SvPV_nolen(ST(i));
@@ -37,38 +40,38 @@ bus_init(class, ...)
             else if (strEQ(k, "groups"))    groups    = SvUV(ST(i + 1));
             else if (strEQ(k, "wakers"))    wakers    = SvUV(ST(i + 1));
         }
-        hm_bus_arena_init((uint32_t)slots, (uint32_t)slot_size,
-                          (uint32_t)groups);
-#if HM_BUS_HAVE_ATOMICS
+        PERL_UNUSED_VAR(groups);
+        hm_sa_open(aTHX_ NULL, 0,
+                   hm_sa_bytes(0, 0, (unsigned)slots, (unsigned)slot_size));
+        (void)hm_sa_bus_open((uint32_t)slots, (uint32_t)slot_size, &err);
         /* The wakeup descriptors go with the ring and for the same reason:
          * made before any fork, or a worker's poke reaches nobody. run()
          * sizes this from the worker count. */
-        hm_bus_wakers_init((uint32_t)(wakers ? wakers : 8));
-#endif
-        RETVAL = hm_bus_arena_live() ? 1 : 0;
+        (void)hm_sa_bus_wake_init((uint32_t)(wakers ? wakers : 8));
+        RETVAL = hm_sa_bus_live() ? 1 : 0;
     }
     OUTPUT:
         RETVAL
 
 # Is there a shared ring at all?
 #
-# Ask before assuming the pool can hear you. With no arena - Windows, a
-# compiler without atomics, or simply not running under Hyperman - publish
-# reaches this process only. That is a supported configuration and the tested
-# path, not a broken one.
+# Ask before assuming the pool can hear you. With no ring - Shared::Arena
+# absent, a compiler without atomics, or simply not running under Hyperman -
+# publish reaches this process only. That is a supported configuration and
+# the tested path, not a broken one.
 IV
 bus_live(class = &PL_sv_undef)
         SV *class
     CODE:
         PERL_UNUSED_VAR(class);
-        RETVAL = hm_bus_arena_live() ? 1 : 0;
+        RETVAL = hm_sa_bus_live() ? 1 : 0;
     OUTPUT:
         RETVAL
 
 # publish($topic, $payload)
 #
 #    1  on the ring, and the whole pool will see it
-#    0  LOCAL ONLY - there is no arena, so nobody else will
+#    0  LOCAL ONLY - there is no ring, so nobody else will
 #   -1  refused: too big for a slot
 #
 # Three outcomes rather than true/false, because "sent to the pool" and "sent
@@ -89,7 +92,7 @@ publish(class, topic, payload)
         STRLEN tl, pl;
         const char *t = SvPV_const(topic, tl);
         const char *p = SvPV_const(payload, pl);
-        int r = hm_bus_publish(t, (uint32_t)tl, p, (uint32_t)pl);
+        int r = hm_sa_bus_publish(t, (uint32_t)tl, p, (uint32_t)pl);
         PERL_UNUSED_VAR(class);
         RETVAL = (r == HM_BUS_OK) ? 1 : (r == HM_BUS_LOCAL) ? 0 : -1;
     }
@@ -98,26 +101,22 @@ publish(class, topic, payload)
 
 # bus_reset() -> the sequence it reset to
 #
-# Point this process's fanout cursor at "from now on". A WORKER MUST CALL THIS
-# AFTER A FORK: a cursor inherited from the parent either replays what the
-# parent already delivered or skips what it has not, and both look like the
-# bus being broken. on_worker_start is the place.
+# Point this process's fanout cursors at "from now on". A WORKER MUST CALL
+# THIS AFTER A FORK: a cursor inherited from the parent either replays what
+# the parent already delivered or skips what it has not, and both look like
+# the bus being broken. on_worker_start is the place.
+#
+# BOTH cursors. There are two - one for receive(), one for the subscription
+# dispatcher - because two readers in one process must not consume each
+# other's messages. But a caller saying "from now on" means the process, not
+# one of its two halves, and resetting only one leaves the other replaying.
 IV
 bus_reset(class = &PL_sv_undef)
         SV *class
     CODE:
         PERL_UNUSED_VAR(class);
-        /* BOTH cursors. There are two - one for receive(), one for the
-         * subscription dispatcher - because two readers in one process must
-         * not consume each other's messages. But a caller saying "from now
-         * on" means the process, not one of its two halves, and resetting
-         * only one leaves the other replaying history. */
-        hm_bus_perl_cursor = hm_bus_seq();
-        hm_bus_perl_gaps   = 0;
-#if HM_BUS_HAVE_ATOMICS
-        hm_bus_reset_cursors();
-#endif
-        RETVAL = (IV)hm_bus_perl_cursor;
+        hm_sa_bus_reset_cursors();
+        RETVAL = (IV)hm_sa_bus_seq();
     OUTPUT:
         RETVAL
 
@@ -136,8 +135,7 @@ receive(class = &PL_sv_undef)
         AV *out = (AV *)sv_2mortal((SV *)newAV());
         SSize_t i, n;
         PERL_UNUSED_VAR(class);
-        (void)hm_bus_drain(&hm_bus_perl_cursor, &hm_bus_perl_gaps,
-                           hm_bus_perl_collect, out);
+        (void)hm_sa_bus_drain(&hm_sa_recv_cur, hm_bus_perl_collect, out);
         n = av_len(out) + 1;
         EXTEND(SP, n);
         for (i = 0; i < n; i++) {
@@ -147,7 +145,7 @@ receive(class = &PL_sv_undef)
     }
 
 # How many messages this process MISSED, because it did not read them before
-# the ring wrapped past them.
+# the ring wrapped past them, or because a publisher died leaving a hole.
 #
 # Reporting this is not optional. A silently short chat room is
 # indistinguishable from a quiet one; a gap with a number beside it is a
@@ -159,22 +157,22 @@ receive(class = &PL_sv_undef)
 # subscribe() has another - and this used to report only receive()'s. Under a
 # server nothing calls receive(), so the number was always zero however much
 # the dispatcher dropped: the one place a short count had to be explained was
-# the one place the counter could not see. A Punk worker short of messages
-# printed `gaps: 0` and the report was read as "nothing was dropped".
+# the one place the counter could not see.
 IV
 bus_gaps(class = &PL_sv_undef)
         SV *class
     CODE:
         PERL_UNUSED_VAR(class);
-        RETVAL = (IV)(hm_bus_perl_gaps + hm_bus_disp_gaps);
+        RETVAL = (IV)(hm_sa_bus_gaps_of(hm_sa_recv_cur)
+                    + hm_sa_bus_gaps_of(hm_sa_disp_cur));
     OUTPUT:
         RETVAL
 
 # claim($topic, $group) -> ( [topic, payload], ... )
 #
-# A QUEUE GROUP: whatever nobody else in the pool has taken. One atomic add on
-# the group's shared cursor hands each message to exactly one caller, in one
-# process, across every worker.
+# A QUEUE GROUP: whatever nobody else in the pool has taken. One
+# compare-and-swap on the group's shared cursor hands each message to exactly
+# one caller, in one process, across every worker.
 #
 # Balancing is not implemented, it is a consequence: a worker that is busy is
 # not in this call, so it does not claim, so the free workers take the
@@ -202,11 +200,11 @@ claim(class, topic, group = &PL_sv_undef)
         STRLEN tl, gl;
         const char *t = SvPV_const(topic, tl);
         const char *g = SvOK(group) ? SvPV_const(group, gl) : (gl = tl, t);
-        int gidx = hm_bus_group_of(t, (uint32_t)tl, g, (uint32_t)gl);
+        sa_group_h *gh = hm_sa_bus_group(t, (uint32_t)tl, g, (uint32_t)gl);
         SSize_t i, n;
         PERL_UNUSED_VAR(class);
-        if (gidx < 0) XSRETURN_EMPTY;      /* no arena, or the table is full */
-        (void)hm_bus_claim(gidx, hm_bus_perl_collect, out);
+        if (!gh) XSRETURN_EMPTY;           /* no ring, or the table is full */
+        (void)hm_sa_bus_claim(gh, hm_bus_perl_collect, out);
         n = av_len(out) + 1;
         EXTEND(SP, n);
         for (i = 0; i < n; i++) {
@@ -249,8 +247,8 @@ subscribe(class, topic, cb, ...)
             if (strEQ(k, "group") && SvOK(ST(i + 1)))
                 g = SvPV_const(ST(i + 1), gl);
         }
-        id = hm_bus_subscribe(t, (uint32_t)tl, g, (uint32_t)gl,
-                              hm_bus_perl_deliver, NULL);
+        id = hm_sa_bus_subscribe(t, (uint32_t)tl, g, (uint32_t)gl,
+                                 hm_bus_perl_deliver, NULL);
         if (id < 0) XSRETURN_IV(-1);
         if (hm_bus_perl_subs[id]) SvREFCNT_dec(hm_bus_perl_subs[id]);
         hm_bus_perl_subs[id] = newSVsv(cb);
@@ -271,7 +269,7 @@ unsubscribe(class, id)
             SvREFCNT_dec(hm_bus_perl_subs[id]);
             hm_bus_perl_subs[id] = NULL;
         }
-        RETVAL = hm_bus_unsubscribe((int)id);
+        RETVAL = hm_sa_bus_unsubscribe((int)id);
     }
     OUTPUT:
         RETVAL
@@ -280,13 +278,14 @@ unsubscribe(class, id)
 #
 # Runs the subscriptions by hand. Under a Hyperman worker the wakeup does this
 # and a caller never needs to; outside one - a script, a test, a server that is
-# not Hyperman - this is the poll that stands in for it.
+# not Hyperman - this is the poll that stands in for it. It never blocks: a
+# record still being written is left for the next call.
 IV
 dispatch(class = &PL_sv_undef)
         SV *class
     CODE:
         PERL_UNUSED_VAR(class);
-        RETVAL = (IV)hm_bus_dispatch();
+        RETVAL = (IV)hm_sa_bus_dispatch();
     OUTPUT:
         RETVAL
 
@@ -302,11 +301,7 @@ bus_waker_take(class, idx)
         IV idx
     CODE:
         PERL_UNUSED_VAR(class);
-#if HM_BUS_HAVE_ATOMICS
-        RETVAL = hm_bus_waker_take((int)idx);
-#else
-        RETVAL = -1;
-#endif
+        RETVAL = hm_sa_bus_waker_take((int)idx);
     OUTPUT:
         RETVAL
 
@@ -318,15 +313,14 @@ bus_waker_drained(class = &PL_sv_undef)
         SV *class
     CODE:
         PERL_UNUSED_VAR(class);
-#if HM_BUS_HAVE_ATOMICS
-        hm_bus_waker_drained();
-#endif
+        hm_sa_bus_waker_drained();
 
 # bus_stats() -> ( published => N, gaps => N, group_gaps => N )
 #
 # `gaps` is this process's; `group_gaps` belongs to the named group and is
 # shared, because a message lapped before anybody claimed it was lost by the
-# group rather than by whichever member noticed.
+# group rather than by whichever member noticed. The group is the one
+# claim($group) without a topic would use: named after its topic.
 void
 bus_stats(class, group = &PL_sv_undef)
         SV *class
@@ -335,15 +329,15 @@ bus_stats(class, group = &PL_sv_undef)
     {
         PERL_UNUSED_VAR(class);
         EXTEND(SP, 6);
-        mPUSHp("published", 9); mPUSHu((UV)hm_bus_published());
+        mPUSHp("published", 9); mPUSHu((UV)hm_sa_bus_published());
         /* Both cursors, for the reason bus_gaps says. */
-        mPUSHp("gaps", 4);      mPUSHu((UV)(hm_bus_perl_gaps
-                                            + hm_bus_disp_gaps));
+        mPUSHp("gaps", 4);      mPUSHu((UV)(hm_sa_bus_gaps_of(hm_sa_recv_cur)
+                                            + hm_sa_bus_gaps_of(hm_sa_disp_cur)));
         if (SvOK(group)) {
             STRLEN gl;
             const char *g = SvPV_const(group, gl);
-            int gidx = hm_bus_group_of(g, (uint32_t)gl, g, (uint32_t)gl);
+            sa_group_h *gh = hm_sa_bus_group(g, (uint32_t)gl, g, (uint32_t)gl);
             mPUSHp("group_gaps", 10);
-            mPUSHu(gidx >= 0 ? (UV)hm_bus_group_gaps(gidx) : 0);
+            mPUSHu(gh ? (UV)hm_sa_bus_group_gaps(gh) : 0);
         }
     }

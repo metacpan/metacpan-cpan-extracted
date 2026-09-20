@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use lib qw( . .. lib);
+use lib qw(t/lib);
 
 use Data::Dumper;
 use Digest::MD5::File qw(file_md5_hex);

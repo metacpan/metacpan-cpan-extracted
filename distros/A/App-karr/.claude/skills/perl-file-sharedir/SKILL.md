@@ -16,7 +16,7 @@ my-dist/
   share/           ← convention, configurable
     templates/
     schema.json
-    claude-skill.md
+    kanban-issues-karr-cli/
   dist.ini
 ```
 
@@ -131,14 +131,25 @@ sub default_config_path {
 
 ```
 share/
-  claude-skill.md
+  kanban-issues-karr-cli/
+    SKILL.md
+    references/*.md
 ```
 
 ```perl
-# In init/install command:
+# In init/install command: copy the directory, every file written in place --
+# spew_utf8 renames a temp file over the target and would break a SKILL.md
+# that is one link of a hardlink chain (manage-skills) out of that chain.
 my $share = find_share_dir();  # with fallback
-my $skill = $share->child('claude-skill.md')->slurp_utf8;
-path('.claude/skills/myapp/SKILL.md')->spew_utf8($skill);
+my $src   = $share->child('kanban-issues-karr-cli');
+my $dst   = path('.claude/skills/kanban-issues-karr-cli');
+$src->visit(sub {
+  my ($p) = @_;
+  return unless $p->is_file && $p->basename =~ /\.md\z/;
+  my $target = $dst->child( $p->relative($src) );
+  $target->parent->mkpath;
+  $target->append_utf8( { truncate => 1 }, $p->slurp_utf8 );
+}, { recurse => 1 });
 ```
 
 ### Ship JSON schemas (like OpenAPI-Modern)

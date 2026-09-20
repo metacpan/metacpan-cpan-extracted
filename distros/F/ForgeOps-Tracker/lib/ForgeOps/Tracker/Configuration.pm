@@ -33,6 +33,12 @@ sub new {
         # should never even attempt that disk read in the first place.
         capture_source_context => 1,
         logger               => undef, # coderef, or undef to log nowhere
+        # Whether add_breadcrumb records anything at all: on by default, matching every other
+        # client in this repo.
+        track_breadcrumbs    => 1,
+        # How many of the most recent breadcrumbs are kept, oldest dropped first; 30, matching
+        # every other client's own default (all traced back to gems/forge_ops_tracker's).
+        max_breadcrumbs      => 30,
         # Whether the PSGI/Dancer2 performance integrations time every request, bucketed by
         # transaction name, and periodically report the aggregates for a dashboard widget on a
         # project's Performance page. On by default, the same "on unless you turn it off" posture
@@ -42,6 +48,18 @@ sub new {
         # in-process and flushed as one small report on this interval, not one network call per
         # request.
         performance_flush_interval => 60,
+        # Seconds between flushes of the buffered capture_metric / capture_infrastructure_metric
+        # entries (see MetricBuffer). No track_metrics flag the way track_performance has one: these
+        # are explicit calls the host app's own code makes, not automatic instrumentation, so there is
+        # nothing to turn off that simply not calling them doesn't already do.
+        metric_flush_interval                => 60,
+        infrastructure_metric_flush_interval => 60,
+        # Whether the PSGI/Dancer2 performance integrations start a trace per request and report
+        # it (when slow) to /spans. span() and record_span() only record inside a trace, so this
+        # gates the whole feature. On by default.
+        track_tracing => 1,
+        # A trace is only sent when its root span took at least this many seconds.
+        trace_capture_threshold => 1,
     }, $class;
 }
 
@@ -88,6 +106,36 @@ sub performance_samples_uri {
     return undef unless defined $uri;
 
     (my $swapped = $uri) =~ s{/events\z}{/performance_samples};
+    return $swapped;
+}
+
+# Same derivation again, swapping the trailing "/events" for "/custom_metrics" and
+# "/infrastructure_metrics".
+sub custom_metrics_uri {
+    my ($self) = @_;
+    my $uri = $self->ingestion_uri;
+    return undef unless defined $uri;
+
+    (my $swapped = $uri) =~ s{/events\z}{/custom_metrics};
+    return $swapped;
+}
+
+sub infrastructure_metrics_uri {
+    my ($self) = @_;
+    my $uri = $self->ingestion_uri;
+    return undef unless defined $uri;
+
+    (my $swapped = $uri) =~ s{/events\z}{/infrastructure_metrics};
+    return $swapped;
+}
+
+# Same derivation again, swapping the trailing "/events" for "/spans".
+sub spans_uri {
+    my ($self) = @_;
+    my $uri = $self->ingestion_uri;
+    return undef unless defined $uri;
+
+    (my $swapped = $uri) =~ s{/events\z}{/spans};
     return $swapped;
 }
 

@@ -3,7 +3,7 @@
 # ABSTRACT: Single-shot foundation daemon for periodic karr agent execution
 use strict;
 use warnings;
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 use App::karr::Foundation;
 use App::karr::Encoding qw( decode_argv enable_std_utf8 );
 use App::karr::Error qw( is_usage_error );
@@ -71,7 +71,7 @@ karr-foundation - Single-shot foundation daemon for periodic karr agent executio
 
 =head1 VERSION
 
-version 0.600
+version 0.601
 
 =head1 SYNOPSIS
 
@@ -118,7 +118,7 @@ statement about the plan, not about this binary.
 file does not parse or is not a mapping, a hub command found no hub, C<ask>
 rejects a value it accepted syntactically as the wrong string (an unrecognized
 C<--policy>, a C<--default> not among C<--options>, a policy that needs a
-C<--deadline> it was not given), the question being answered already had an
+C<--wait> it was not given), the question being answered already had an
 answer, the chain document handed to C<plan> is not a chain, or C<chain>
 could not fetch C<refs/karr-foundation/*> and refused to run a step another
 machine may already be running.

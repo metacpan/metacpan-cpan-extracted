@@ -16,14 +16,17 @@ use Linux::Event::Loop;
 use Linux::Event::IO::Sock::Stream;
 
 our $READ_SIZE = 262_144;
+our $READ_BUDGET_BYTES;
 
 {
     package Linux::Event::Bench::PayloadSweep::Base;
     use parent 'Linux::Event::IO::Sock::Stream';
 
     sub stream_tuning ($class) {
+        my $budget = defined($main::READ_BUDGET_BYTES)
+            ? $main::READ_BUDGET_BYTES : $main::READ_SIZE;
         return read_size => $main::READ_SIZE,
-            read_budget_bytes => $main::READ_SIZE;
+            read_budget_bytes => $budget;
     }
 
     sub on_error ($stream, $error) { die "Stream error: $error\n" }
@@ -71,6 +74,7 @@ GetOptions(
     'min-messages=i' => \$min_messages,
     'max-messages=i' => \$max_messages,
     'read-size=i' => \$READ_SIZE,
+    'read-budget-bytes=i' => \$READ_BUDGET_BYTES,
     'variant=s' => \$variant,
     'commit=s' => \$commit,
     'output=s' => \$output,
@@ -81,6 +85,8 @@ die "repeats must be positive\n" if $repeats < 1;
 die "warmup must be non-negative\n" if $warmup < 0;
 die "target-bytes, min-messages, max-messages, and read-size must be positive\n"
     if grep { $_ < 1 } ($target_bytes, $min_messages, $max_messages, $READ_SIZE);
+die "read-budget-bytes must be non-negative\n"
+    if defined($READ_BUDGET_BYTES) && $READ_BUDGET_BYTES < 0;
 die "min-messages must not exceed max-messages\n"
     if $min_messages > $max_messages;
 
@@ -371,6 +377,8 @@ my $report = {
         minimum_messages => $min_messages,
         maximum_messages => $max_messages,
         read_size => $READ_SIZE,
+        read_budget_bytes => defined($READ_BUDGET_BYTES)
+            ? $READ_BUDGET_BYTES : $READ_SIZE,
     },
     effective_config_by_mode => \%effective_config_by_mode,
     samples => \@samples,

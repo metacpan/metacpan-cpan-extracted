@@ -33,6 +33,10 @@ my $BIN  = "$ROOT/bin/karr";
 # may encode on top). Spelled with \x{} so this file needs no source encoding.
 my $OLD = "# karr skill \x{2014} old\n";
 my $NEW = "# karr skill \x{2014} new\n\nBl\x{00f6}cke \x{2026} \x{00fc}ml\x{00e4}ute\n";
+# Since #285 the skill ships references/*.md beside SKILL.md. One such file,
+# to pin that update and install carry it along without touching SKILL.md's
+# inode.
+my $REF = "# reference \x{2014} Bl\x{00f6}cke\n";
 
 # (dev, inode, link count) of a path, without following the last symlink.
 sub ident {
@@ -229,16 +233,44 @@ subtest 'an unwritable directory is still a clean one-line error' => sub {
     is( scalar(@lines), 1, 'exactly one line' ) or diag "error was: $err";
 };
 
+subtest '_write_skill_files writes a whole set, each file in place' => sub {
+    my $dir = tempdir( CLEANUP => 1 );
+    my ( $primary, $secondary ) = linked_pair( $dir, $OLD );
+    plan skip_all => 'filesystem does not support hardlinks' unless $primary;
+
+    my $target = $primary->parent;
+    my $before = ident($primary);
+    App::karr::Cmd::Skill->new->_write_skill_files( $target, {
+        'SKILL.md'            => $NEW,
+        'references/extra.md' => $REF,
+    } );
+
+    is( ident($primary)->{ino}, $before->{ino}, 'SKILL.md went through its existing inode' );
+    is( $secondary->slurp_utf8, $NEW, 'so the other link sees the new content' );
+    my $reference = $target->child('references/extra.md');
+    ok( $reference->exists, 'references/ was created on the way and the reference written' );
+    is( $reference->slurp_utf8, $REF, 'with the content handed in, as characters' );
+
+    # A partial set is a partial write: what update hands over after finding
+    # only the reference stale. SKILL.md is not touched at all.
+    my $mtime = ( stat "$primary" )[9];
+    App::karr::Cmd::Skill->new->_write_skill_files( $target, { 'references/extra.md' => "short\n" } );
+    is( $reference->slurp_utf8, "short\n", 'only the file in the set was written' );
+    is( $primary->slurp_utf8, $NEW, 'SKILL.md still holds what it held' );
+};
+
 subtest 'karr skill install/update through the real CLI keep the inode' => sub {
     my $dir = tempdir( CLEANUP => 1 );
 
     # A share dir of our own, ahead of everything else in @INC, so the child
     # reads a skill we control rather than an installed App::karr's (t/65 has
-    # the long version of why this matters).
+    # the long version of why this matters). The #285 layout: a directory
+    # with SKILL.md and references/ under it.
     my $share_lib = path( tempdir( CLEANUP => 1 ) );
-    my $share_dir = $share_lib->child(qw( auto share dist App-karr ));
-    $share_dir->mkpath;
-    $share_dir->child('claude-skill.md')->spew_utf8($NEW);
+    my $share_dir = $share_lib->child(qw( auto share dist App-karr kanban-issues-karr-cli ));
+    $share_dir->child('references')->mkpath;
+    $share_dir->child('SKILL.md')->spew_utf8($NEW);
+    $share_dir->child('references/extra.md')->spew_utf8($REF);
 
     my $installed = path($dir)->child('.claude/skills/kanban-issues-karr-cli/SKILL.md');
     $installed->parent->mkpath;
@@ -273,12 +305,30 @@ subtest 'karr skill install/update through the real CLI keep the inode' => sub {
     is( ident($installed)->{nlink}, 2, 'the chain still has both links' );
     is( $chained->slurp_utf8, $NEW, 'the other project sees the new skill' );
 
+    my $reference = $installed->sibling('references/extra.md');
+    ok( $reference->exists, 'update added the reference the target was missing (#285)' );
+    is( $reference->slurp_utf8, $REF, 'with the shipped content' );
+
+    # A target whose SKILL.md is current and only lacks a reference: update
+    # adds the reference and has no business touching SKILL.md at all -- its
+    # inode, its links and its content all stay.
+    $reference->remove or die "remove $reference: $!";
+    ( $exit, $out, $err ) = $run->( 'update', '--agent', 'claude-code' );
+    is( $exit, 0, 'update with only a reference missing exits 0' ) or diag "stderr: $err";
+    like( $out, qr/updated/, 'and counts as an update' );
+    ok( $reference->exists, 'the reference is back' );
+    is( ident($installed)->{ino}, $before->{ino}, 'SKILL.md kept its inode' );
+    is( ident($installed)->{nlink}, 2, 'and both links' );
+    is( $chained->slurp_utf8, $NEW, 'and its content' );
+
     # --force reinstall takes the same write path, so it must behave the same.
     $installed->append_utf8( { truncate => 1 }, $OLD );
+    $reference->remove or die "remove $reference: $!";
     ( $exit, $out, $err ) = $run->( 'install', '--force', '--agent', 'claude-code' );
     is( $exit, 0, 'karr skill install --force exits 0' ) or diag "stderr: $err";
     is( ident($installed)->{ino}, $before->{ino}, 'install --force wrote through it too' );
     is( $chained->slurp_utf8, $NEW, 'and the chain carries the new skill again' );
+    is( $reference->slurp_utf8, $REF, 'and the reference is back beside it' );
 };
 
 done_testing;

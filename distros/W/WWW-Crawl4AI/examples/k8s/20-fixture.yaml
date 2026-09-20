@@ -1,0 +1,127 @@
+# Deterministic crawl target: plain nginx serving the two fixture pages. The
+# live tests point Crawl4AI at http://crawl4ai-fixture/ (in-cluster DNS) so their
+# assertions never depend on the public internet or a bot wall.
+#
+# The HTML below mirrors examples/fixture/index.html and page2.html verbatim —
+# keep the two in sync. (Local docker runs mount examples/fixture/ directly; this
+# ConfigMap is the in-cluster equivalent so `kubectl apply -f` is self-contained.)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: crawl4ai-fixture-html
+  namespace: crawl4ai-test
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <title>Crawl4AI Live Fixture — Home</title>
+      <meta name="description" content="Static fixture home page for WWW::Crawl4AI live tests.">
+    </head>
+    <body>
+      <h1>Crawl4AI Live Fixture</h1>
+      <p>FIXTURE_MARKER_HOME</p>
+      <p>
+        This page exists so the WWW::Crawl4AI live test suite has a stable, fully
+        deterministic crawl target that does not depend on the public internet, on
+        any bot wall, or on a captcha challenge. Every assertion in t/70-live-client
+        and t/75-live-chain reads back a value that is written right here in the
+        fixture, so a green run means the real Crawl4AI REST service fetched this
+        document, extracted its markdown, resolved its title, and reported its links
+        exactly the way the Perl client normalizes them.
+      </p>
+      <p>
+        The body carries several sentences of genuine prose on purpose: the default
+        content-volume classifier (WWW::Crawl4AI::Detect) discards anything under
+        five hundred characters of markdown as thin_content, so a fixture that is
+        too short would wrongly escalate the strategy chain past the cheap plain
+        backend. With this much text in hand the scrape succeeds on the first, least
+        expensive attempt, which is precisely what the chain test asserts.
+      </p>
+      <h2>Where to go next</h2>
+      <ul>
+        <li><a href="/page2.html">Page Two</a> — an internal link on the same host, followed by deep_crawl.</li>
+        <li><a href="page2.html">Page Two (relative)</a> — the same target, so link dedup can be asserted.</li>
+        <li><a href="/">Home</a> — a self back-link, also deduplicated.</li>
+        <li><a href="https://example.com/">Example.com</a> — an off-host link that same_host must NOT follow.</li>
+      </ul>
+    </body>
+    </html>
+  page2.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <title>Crawl4AI Live Fixture — Page Two</title>
+    </head>
+    <body>
+      <h1>Page Two</h1>
+      <p>FIXTURE_MARKER_PAGE2</p>
+      <p>
+        This is the second page of the crawl fixture. It is linked from the home
+        page and exists so that a breadth-first deep_crawl with max_depth set to one
+        discovers exactly two pages: the start page at depth zero and this page at
+        depth one. Like the home page it holds enough real prose to clear the
+        thin_content threshold on its own, so it is scored as a good crawl rather
+        than being surfaced as an ok=0 dead child in the results.
+      </p>
+      <p>
+        <a href="/">Back to Home</a> — a link back to the start URL, which the
+        frontier must deduplicate instead of visiting the home page a second time.
+      </p>
+    </body>
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crawl4ai-fixture
+  namespace: crawl4ai-test
+  labels:
+    app.kubernetes.io/name: crawl4ai-fixture
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: crawl4ai-fixture
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: crawl4ai-fixture
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - name: http
+              containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+      volumes:
+        - name: html
+          configMap:
+            name: crawl4ai-fixture-html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crawl4ai-fixture
+  namespace: crawl4ai-test
+  labels:
+    app.kubernetes.io/name: crawl4ai-fixture
+spec:
+  selector:
+    app.kubernetes.io/name: crawl4ai-fixture
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

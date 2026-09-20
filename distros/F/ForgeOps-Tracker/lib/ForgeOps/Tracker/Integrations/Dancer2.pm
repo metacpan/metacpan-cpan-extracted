@@ -25,11 +25,30 @@ use ForgeOps::Tracker;
 sub BUILD {
     my ($plugin) = @_;
 
+    # A fresh breadcrumb trail per request: a prefork worker serves many requests in a row.
+    $plugin->app->add_hook(Dancer2::Core::Hook->new(
+        name => 'before_request',
+        code => sub { ForgeOps::Tracker::clear_breadcrumbs() },
+    ));
+
     $plugin->app->add_hook(Dancer2::Core::Hook->new(
         name => 'on_route_exception',
         code => sub {
             my ($app, $error) = @_;
             my $request = $app->request;
+            # Dancer2's after_request hook never fires for a request that raised (confirmed
+            # directly), so the performance plugin's own controller breadcrumb can't cover this
+            # case: record the failing request's own here, so the report below carries it.
+            if ($request) {
+                my $route = $request->route;
+                my $pattern = $route ? $route->spec_route : undef;
+                ForgeOps::Tracker::add_breadcrumb(
+                    $request->method . ' ' . (defined $pattern ? "$pattern" : $request->path),
+                    category => 'controller',
+                    level    => 'error',
+                    data     => { path => $request->path },
+                );
+            }
             ForgeOps::Tracker::report($error, {
                 path   => $request ? $request->path : undef,
                 method => $request ? $request->method : undef,

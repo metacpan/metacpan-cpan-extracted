@@ -12,6 +12,7 @@ use Convert::Pheno::Operations qw(
   is_http_conversion
   is_public_conversion
   public_conversions
+  registry_metadata
 );
 
 ok( is_public_conversion('pxf2bff'), 'registry accepts a public conversion' );
@@ -28,7 +29,7 @@ is_deeply(
     'registry defines compound conversion stages'
 );
 ok( $csv_to_omop->{resources}{sqlite}, 'registry defines route resources' );
-ok( !$csv_to_omop->{http_enabled}, 'registry excludes file-based routes from HTTP' );
+ok( $csv_to_omop->{http_enabled}, 'registry exposes file-based routes through multipart HTTP' );
 
 my $datasetjson_to_bff = conversion_spec('datasetjson2bff');
 is_deeply(
@@ -46,8 +47,8 @@ is_deeply(
     'registry limits Dataset-JSON BFF output to implemented entities'
 );
 ok(
-    !is_http_conversion('datasetjson2bff'),
-    'registry keeps multi-file Dataset-JSON conversion outside HTTP'
+    is_http_conversion('datasetjson2bff'),
+    'registry exposes multi-file Dataset-JSON conversion through multipart HTTP'
 );
 
 is_deeply(
@@ -68,8 +69,8 @@ is_deeply(
     'registry limits Dataset-XML BFF output to implemented entities'
 );
 ok(
-    !is_http_conversion('datasetxml2bff'),
-    'registry keeps Dataset-XML plus Define-XML outside HTTP'
+    is_http_conversion('datasetxml2bff'),
+    'registry exposes Dataset-XML plus Define-XML through multipart HTTP'
 );
 is_deeply(
     conversion_spec('datasetxml2omop')->{pipeline},
@@ -89,8 +90,8 @@ is_deeply(
     'registry exposes the implemented cBioPortal-derived BFF entities'
 );
 ok(
-    !is_http_conversion('cbioportal2bff'),
-    'registry keeps filesystem cBioPortal study packages outside HTTP'
+    is_http_conversion('cbioportal2bff'),
+    'registry exposes uploaded cBioPortal ZIP packages through multipart HTTP'
 );
 is_deeply(
     conversion_spec('cbioportal2pxf')->{pipeline},
@@ -128,6 +129,34 @@ is_deeply(
     'registry defines FHIR to OMOP as a compound conversion'
 );
 
+for my $source (qw(i2b2 pcornet sentinel)) {
+    my $to_bff = conversion_spec( $source . '2bff' );
+    is_deeply(
+        $to_bff->{pipeline},
+        [ $source . '2bff' ],
+        "registry defines $source as a direct BFF bundle operation",
+    );
+    is_deeply(
+        $to_bff->{entities}{supported},
+        [ 'individuals', 'datasets', 'cohorts' ],
+        "registry limits $source BFF output to implemented entities",
+    );
+    ok(
+        is_http_conversion( $source . '2bff' ),
+        "registry exposes uploaded $source table packages through HTTP",
+    );
+    is_deeply(
+        conversion_spec( $source . '2pxf' )->{pipeline},
+        [ $source . '2bff', 'bff2pxf' ],
+        "registry defines $source to PXF as a compound conversion",
+    );
+    is_deeply(
+        conversion_spec( $source . '2omop' )->{pipeline},
+        [ $source . '2bff', 'bff2omop' ],
+        "registry defines $source to OMOP as a compound conversion",
+    );
+}
+
 my $omop_to_bff = conversion_spec('omop2bff');
 ok( $omop_to_bff->{streaming}, 'registry defines streaming capability' );
 is_deeply(
@@ -135,8 +164,16 @@ is_deeply(
     [ 'individuals', 'biosamples', 'datasets', 'cohorts' ],
     'registry defines supported Beacon entities'
 );
+my $registry = registry_metadata();
+ok(
+    scalar(
+        grep { $_ eq '.zip' }
+          @{ $registry->{input_definitions}{omop}{files}[0]{accept} }
+    ),
+    'registry exposes OMOP ZIP packages through multipart HTTP',
+);
 ok( is_http_conversion('pxf2bff'), 'registry exposes in-memory PXF conversion over HTTP' );
-ok( !is_http_conversion('redcap2bff'), 'registry keeps file-based REDCap conversion on the CLI' );
+ok( is_http_conversion('redcap2bff'), 'registry exposes file-based REDCap conversion through multipart HTTP' );
 
 my $http_fields = http_request_fields();
 ok(

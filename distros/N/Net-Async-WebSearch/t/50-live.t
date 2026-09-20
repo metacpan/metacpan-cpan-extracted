@@ -135,6 +135,50 @@ subtest 'Yandex Search API' => sub {
   );
 };
 
+subtest 'Tavily Search API' => sub {
+  plan skip_all => 'need TEST_WEBSEARCH_TAVILY_API_KEY'
+    unless $ENV{TEST_WEBSEARCH_TAVILY_API_KEY};
+  require Net::Async::WebSearch::Provider::Tavily;
+  run_one( 'tavily',
+    Net::Async::WebSearch::Provider::Tavily->new(
+      api_key => $ENV{TEST_WEBSEARCH_TAVILY_API_KEY},
+    ),
+  );
+};
+
+subtest 'Exa neural search API' => sub {
+  plan skip_all => 'need TEST_WEBSEARCH_EXA_API_KEY'
+    unless $ENV{TEST_WEBSEARCH_EXA_API_KEY};
+  require Net::Async::WebSearch::Provider::Exa;
+  run_one( 'exa',
+    Net::Async::WebSearch::Provider::Exa->new(
+      api_key => $ENV{TEST_WEBSEARCH_EXA_API_KEY},
+    ),
+  );
+};
+
+subtest 'Marginalia Search API' => sub {
+  plan skip_all => 'need TEST_WEBSEARCH_MARGINALIA_API_KEY (set it to "public" for the shared key)'
+    unless $ENV{TEST_WEBSEARCH_MARGINALIA_API_KEY};
+  require Net::Async::WebSearch::Provider::Marginalia;
+  run_one( 'marginalia',
+    Net::Async::WebSearch::Provider::Marginalia->new(
+      api_key => $ENV{TEST_WEBSEARCH_MARGINALIA_API_KEY},
+    ),
+  );
+};
+
+subtest 'Mojeek Search API' => sub {
+  plan skip_all => 'need TEST_WEBSEARCH_MOJEEK_API_KEY'
+    unless $ENV{TEST_WEBSEARCH_MOJEEK_API_KEY};
+  require Net::Async::WebSearch::Provider::Mojeek;
+  run_one( 'mojeek',
+    Net::Async::WebSearch::Provider::Mojeek->new(
+      api_key => $ENV{TEST_WEBSEARCH_MOJEEK_API_KEY},
+    ),
+  );
+};
+
 subtest 'Reddit OAuth (client_credentials)' => sub {
   plan skip_all => 'need TEST_WEBSEARCH_REDDIT_CLIENT_ID + TEST_WEBSEARCH_REDDIT_CLIENT_SECRET'
     unless $ENV{TEST_WEBSEARCH_REDDIT_CLIENT_ID}

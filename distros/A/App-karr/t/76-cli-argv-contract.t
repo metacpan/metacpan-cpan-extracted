@@ -110,8 +110,8 @@ subtest '--dir before the subcommand reaches the dashed helper-ref commands' => 
 
     my $an = _run_karr( $A, '--dir', $B, 'agent-name' );
     is( $an->{exit}, 0, 'karr --dir B agent-name exits 0' ) or diag $an->{stderr};
-    like( $an->{stdout}, qr/\A[a-z]+-[a-z]+\n\z/,
-        'and prints a generated name, not "Unknown command"' );
+    like( $an->{stdout}, qr/\A[a-z0-9]+(?:-[a-z0-9]+)*\n\z/,
+        'and prints a claim-safe checkout name, not "Unknown command" (ADR 0005)' );
 };
 
 subtest '--dir after the subcommand works on the board-less ref commands' => sub {
