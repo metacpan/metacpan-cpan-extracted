@@ -10,7 +10,7 @@ use File::SOPS::Format::JSON;
 use File::SOPS::Backend::Age;
 use Crypt::Age;
 use File::Temp qw(tempdir);
-use File::Slurp qw(write_file);
+use File::Slurper qw(write_binary);
 use lib 't/lib';
 use SopsBin qw(find_sops_bin);
 
@@ -266,14 +266,14 @@ subtest 'a real sops multi-document file verifies by index, and a swap fails' =>
 
     my ($public, $secret) = Crypt::Age->generate_keypair();
     my $tempdir = tempdir(CLEANUP => 1);
-    write_file("$tempdir/key.txt", $secret);
+    write_binary("$tempdir/key.txt", $secret);
     local $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
     # Two documents sharing a key NAME but not a value -- a shape mismatch
     # would croak for an unrelated reason (_document_leaves refusing a key the
     # paired document does not have); this makes the digest itself disagree
     # instead, which is what the trap actually protects against.
-    write_file("$tempdir/two.yaml", "greeting: hello\n---\ngreeting: world\n");
+    write_binary("$tempdir/two.yaml", "greeting: hello\n---\ngreeting: world\n");
     my $enc = `$sops_bin --age $public -e $tempdir/two.yaml 2>&1`;
     is($? >> 8, 0, 'sops encrypted a two-document file') or do {
         diag("sops output: $enc");

@@ -1,0 +1,583 @@
+NAME
+
+    AWS::Signature::V4 - User-Agent agnostic AWS Signatures V4 for
+    credentials and X509
+
+VERSION
+
+    This document describes AWS::Signature::V4 version 0.001.
+
+SYNOPSIS
+
+       use AWS::Signature::V4;
+    
+       # traditional variant, based on credentials
+       my $s = AWS::Signature::V4->new(
+          service => 'iam', region => 'us-east-1',
+          credentials => {
+             access_key_id     => $key_id,
+             secret_access_key => $secret,
+             session_token     => $token,    # optional
+          },
+       );
+    
+       # certificate-based variant (IAM Roles Anywhere)
+       my $x = AWS::Signature::V4->new(
+          service => 'rolesanywhere', region => 'eu-west-1',
+          x509 => {
+             key_type         => 'ECDSA',      # or RSA
+             certificate_file => 'cert.pem',
+             private_key_file => 'key.pem',
+          },
+       );
+    
+       # sign a request: nothing is sent, nothing depends on the user agent
+       my $r = $s->sign(
+          method  => 'POST',
+          url     => 'https://iam.amazonaws.com/?Action=ListUsers',
+          headers => { 'Content-Type' => 'application/json' },
+          body    => $payload,
+       );
+       $ua_request->header($_ => $r->{headers}{$_}) for keys $r->{headers}->%*;
+    
+       # presigned URL, i.e. signature in the query string; the signer must
+       # be for the service of the URL, S3 here
+       my $s3 = AWS::Signature::V4->new(
+          service => 's3', region => 'us-east-1',
+          credentials => {
+             access_key_id     => $key_id,
+             secret_access_key => $secret,
+          },
+       );
+       my $p = $s3->presign(
+          url     => 'https://bucket.s3.amazonaws.com/key',
+          expires => 3600,
+       );
+       my $url = $p->{url};
+
+DESCRIPTION
+
+    This module implements the AWS Signature Version 4 algorithm without
+    being tied to any specific user agent: it does not send anything, it
+    just takes the pieces of a request (method, URL, headers, body) and
+    returns what has to be added to it, so that it can be used with
+    whatever HTTP client is at hand.
+
+    Two variants are supported:
+
+      * the traditional one, based on credentials (algorithm
+      AWS4-HMAC-SHA256), with optional session token;
+
+      * the one based on X.509 certificates, as used by IAM Roles Anywhere
+      (algorithms AWS4-X509-RSA-SHA256 and AWS4-X509-ECDSA-SHA256). The
+      signature is made with the private key that goes with the
+      certificate, using CryptX (Crypt::PK::RSA and Crypt::PK::ECC) or a
+      signing function of your own.
+
+    Both header-based signing ("sign") and presigned URLs ("presign") are
+    available, as well as chunked and streaming uploads to S3 (see "sign"
+    and "encoded_length") and hashing of large payloads without loading
+    them in memory.
+
+    Some conventions apply to the inputs, because what is signed has to be
+    exactly what goes on the wire and the module cannot guess an encoding:
+
+      * the url must be ASCII, with anything else already percent-encoded;
+
+      * the body is a byte string, or a reference to one: encode text as
+      the user agent will, wide characters are an error;
+
+      * headers are a hash reference or an array reference of pairs, with
+      names that are case insensitive.
+
+    Defaults that depend on the service (e.g. S3 handles path encoding
+    differently from all other services) are set from the service name, and
+    can be overridden (see "new").
+
+INTERFACE
+
+ new
+
+       my $s = AWS::Signature::V4->new(%args);
+
+    Create a signer. service and region are mandatory (for the X.509
+    variant used with IAM Roles Anywhere, the service is rolesanywhere) and
+    can only hold letters, digits, ., _ and -; exactly one of credentials
+    or x509 must be provided.
+
+    The classes of this distribution are built with Moo: the constructor
+    also accepts a hash reference, and every option below is available as a
+    read-only accessor of the same name (e.g. $s->region).
+
+    Options that are undef are treated as missing. This is important: if
+    you want to pass a false value in an input that accepts a boolean
+    value, use 0 for false.
+
+    The constructor checks the options, including that certificates and
+    keys can be read and loaded, and that signer is a code reference, so
+    problems are reported by it and not by the first signature; it does not
+    check that a certificate is otherwise valid, nor that a key matches it.
+    credentials and x509 are copied (shallowly), so changing your own hash
+    afterwards has no effect, but the accessors give back the copies held
+    by the object: leave them alone. Mind that ->credentials includes the
+    secret access key. private_key and private_key_password are dropped
+    from the copy of x509 as soon as the key is loaded, so ->x509 does not
+    have them. Subclasses and roles work as usual.
+
+    The two variants are implemented by two internal classes, one per
+    option, that this class uses on your behalf:
+    AWS::Signature::V4::Credentials and AWS::Signature::V4::X509. They are
+    documented for the record, but you do not need to know about them.
+
+    credentials
+
+      hash reference with access_key_id, secret_access_key and the optional
+      session_token. Other keys are an error, so that a misspelled
+      session_token is not silently ignored. An empty value is like a
+      missing one: an error for the first two, no token for session_token
+      (so that an empty AWS_SESSION_TOKEN can be passed as it is).
+
+    x509
+
+      hash reference with the following keys (others are an error):
+
+      key_type
+
+	RSA or ECDSA, depending on the key (mandatory). It determines the
+	signing algorithm, see "algorithm";
+
+      certificate, certificate_file
+
+	the certificate, either as PEM or DER content, or as the path of a
+	file holding it. One of them is needed, certificate wins if both
+	are given. If the PEM holds several certificates (e.g. a
+	fullchain.pem), only the first one is used and the others are
+	ignored: put the intermediate certificates in chain or chain_files;
+
+      chain, chain_files
+
+	optional intermediate certificates. chain is either an array
+	reference of certificates (PEM or DER content, possibly mixed) or a
+	plain string, that then MUST be PEM. chain_files is either an array
+	reference of file paths or a single path, each file holding PEM or
+	DER content. chain wins if both are given.
+
+	A PEM item, whether from a string or a file, can be a bundle of
+	several certificates: whatever sits between the BEGIN
+	CERTIFICATE/END CERTIFICATE blocks is ignored, so they can be
+	separated by empty or whitespace-only lines, and CRLF line endings
+	are fine;
+
+      serial
+
+	the serial number of the certificate, in decimal. It is taken from
+	the certificate if not provided;
+
+      private_key_file, private_key
+
+	the private key, either as the path of a file or as its content, in
+	PEM or DER format (as understood by CryptX). private_key wins if
+	both are given;
+
+      private_key_password
+
+	only for encrypted keys. Like private_key, it is not kept once the
+	key is loaded;
+
+      signer
+
+	alternative to the keys: a function that gets the bytes to sign and
+	returns the signature of their SHA-256, as raw bytes: PKCS#1 v1.5
+	for RSA and DER for ECDSA (e.g. to delegate to an HSM or a KMS).
+	Decode it first if your HSM or KMS gives it in base64 or hex: the
+	returned bytes are put in the request as they are, hex-encoded, and
+	AWS would just refuse a signature in the wrong form. It takes
+	precedence over the keys. If it returns undef, an empty string, a
+	reference or a string with wide characters, signing fails with an
+	Ouch exception with code 400; if it dies, the error goes through as
+	it is.
+
+    double_encode, normalize_path, payload_header
+
+      boolean overrides for what is decided from the service: encode the
+      path twice, remove empty, . and .. segments from it, and always add
+      the x-amz-content-sha256 header. They default to true, true, false
+      for every service but S3, where they are false, false, true. S3 goes
+      by several names: s3, s3-object-lambda, s3-outposts and s3express.
+
+      Again, setting an undef value for these three arguments does NOT mean
+      false but default instead (i.e. false, false, and true).
+
+      payload_header also tells "presign" what the service takes for
+      granted in a presigned URL: UNSIGNED-PAYLOAD if true, as S3 does, the
+      hash of the body it gets otherwise.
+
+ algorithm
+
+       my $name = $s->algorithm;
+
+    The name of the signing algorithm in use, e.g. AWS4-HMAC-SHA256.
+
+ sign
+
+       my $r = $s->sign(%args);
+       my $r = $s->sign(\%args);
+
+    Sign a request. The arguments are name/value pairs or a hash reference;
+    an unknown name, or one that does not apply (e.g. expires, which is for
+    "presign"), is an error, and an undef value is the same as a missing
+    argument. Named arguments:
+
+    method, url
+
+      the HTTP method and the full URL (mandatory). The method must be an
+      HTTP token, and it is uppercased. The host, lowercased and without
+      default ports, provides the host header unless it is given; user
+      information (user@host) is an error, it is not stripped. The URL can
+      also be just a path, starting with /, if a Host header is given. See
+      "DESCRIPTION" and "SECURITY CONSIDERATIONS" for what the URL can
+      hold; in particular, the query cannot hold +, which some read as a
+      space and others as a plus sign: write %20 or %2B;
+
+    headers
+
+      the headers of the request, as a hash reference or an array reference
+      of pairs. A value is a byte string, or an array reference of them,
+      and repeated names are joined with a comma; undef values are skipped.
+      Names must be HTTP tokens (RFC 9110: letters, digits and
+      !#$%&'*+-.^_`|~) and values cannot hold CR, LF or NUL characters:
+      anything else is an error, as it could inject headers or change the
+      meaning of the canonical request. The same check applies to the
+      values that sign adds, e.g. the session token, and to the ones that
+      "presign" puts in the query string instead.
+
+      An X-Amz-Content-Sha256 header is taken as the payload hash; if the
+      payload hash also comes from the arguments below, the two must agree;
+
+    body, body_fh
+
+      the payload, as a byte string, a reference to one (which avoids
+      copying large data around) or an open filehandle. The filehandle is
+      hashed from its current position to its end, without loading it in
+      memory, and put back where it was: so it must be seekable (a file,
+      not a pipe or a socket) and binary, without layers like :encoding or
+      :crlf that change the bytes read. Only one of them can be used;
+
+    payload_hash, unsigned_payload
+
+      skip the calculation and use the provided SHA-256 in hex, or
+      UNSIGNED-PAYLOAD. They take precedence over body and body_fh.
+      payload_hash can also be a STREAMING-* marker, anything else is an
+      error. When the payload hash is not a SHA-256, the
+      x-amz-content-sha256 header carries it, whatever the service;
+
+    signed_headers
+
+      array reference of the names of the headers to sign. By default all
+      the headers are signed except a few that are commonly changed on the
+      way (e.g. user-agent) or that are meant for a single hop (e.g.
+      keep-alive). host and all the x-amz-* headers, including those that
+      sign adds, are always signed, even if not in the list: AWS wants them
+      signed, and it binds the signature to the host, the date and the
+      session token. It is an error to name a missing header;
+
+    time
+
+      the epoch to sign for, in seconds (a fractional part is dropped),
+      defaults to now;
+
+    streaming, decoded_content_length, checksum, trailers
+
+      chunked and streaming uploads, see below.
+
+    The returned hash reference contains:
+
+    headers
+
+      the complete set of headers to send, with lowercase names. Beyond
+      those in input, they include host, x-amz-date, authorization and,
+      depending on the case, x-amz-security-token, x-amz-x509,
+      x-amz-x509-chain, x-amz-content-sha256;
+
+    authorization
+
+      the value of the Authorization header;
+
+    signature, signed_headers, scope
+
+      the signature in hex, the semicolon-separated list of signed headers,
+      and the credential scope;
+
+    canonical_request, string_to_sign
+
+      the intermediate values of the algorithm, handy for debugging;
+
+    chunker
+
+      only when streaming: see below.
+
+  Chunked and streaming uploads
+
+    streaming enables the aws-chunked encoding used for uploads to S3,
+    where the body is sent in chunks that are signed as they go. It can be
+    1 or signed (each chunk is signed, credentials variant only) or
+    unsigned (no chunk signatures, only the request headers are signed,
+    also OK with X.509). The decoded_content_length, i.e. the size of the
+    data, is mandatory. sign sets the payload hash to
+    STREAMING-AWS4-HMAC-SHA256-PAYLOAD (or its variants below), adds
+    x-amz-decoded-content-length and aws-chunked to Content-Encoding (after
+    any other encoding, e.g. gzip,aws-chunked, as it is the one applied
+    last: S3 takes that token off the end and stores what is left, here
+    gzip), all signed; the Content-Length to provide is the size of the
+    encoded body, see "encoded_length". S3 wants all chunks but the last
+    one to be at least 8 KiB. body, body_fh, payload_hash and
+    unsigned_payload do not apply.
+
+       my $length = AWS::Signature::V4->encoded_length($decoded_length, $chunk_size);
+       my $r = $s->sign(
+          method => 'PUT', url => $url,
+          headers => { 'Content-Length' => $length },
+          streaming => 1, decoded_content_length => $decoded_length,
+       );
+       # send $r->{headers}, then the body, made of encoded chunks:
+       my $ck = $r->{chunker};
+       print {$socket} $ck->chunk($_) for @chunks;
+       print {$socket} $ck->finish;
+
+    Trailers, i.e. headers sent after the data, e.g. for a checksum that is
+    only known at the end, are declared with sign, which adds the
+    x-amz-trailer header (signed like the others):
+
+    checksum
+
+      the name of an algorithm that the chunker computes while the chunks
+      go through: crc32, crc32c, sha1 or sha256. The trailer is named after
+      it (e.g. x-amz-checksum-crc32c);
+
+    trailers
+
+      array reference of names of trailers whose values you provide when
+      calling "finish", so that any other algorithm can be used, e.g.
+      x-amz-checksum-crc64nvme.
+
+    Unsigned streaming needs at least one trailer. The payload hash becomes
+    STREAMING-AWS4-HMAC-SHA256-PAYLOAD-TRAILER or
+    STREAMING-UNSIGNED-PAYLOAD-TRAILER, and with signed chunks the trailers
+    get their own signature.
+
+    S3 takes only one x-amz-checksum-* per request: use either checksum or
+    a checksum in trailers, not both. For example, with a CRC-64 computed
+    by you:
+
+       my $r = $s->sign(
+          method => 'PUT', url => $url, streaming => 'signed',
+          decoded_content_length => $decoded_length,
+          trailers => ['x-amz-checksum-crc64nvme'],
+          headers  => { 'Content-Length' => AWS::Signature::V4->encoded_length(
+             $decoded_length, $chunk_size,
+             trailers => { 'x-amz-checksum-crc64nvme' => 12 }) },
+       );
+       my $ck = $r->{chunker};
+       ...
+       print {$socket} $ck->finish('x-amz-checksum-crc64nvme' => $base64);
+
+    Several trailers are sent in the order checksum, then trailers; this
+    has not been checked against AWS.
+
+ presign
+
+       my $p = $s->presign(%args);
+       my $p = $s->presign(\%args);
+
+    Generate a presigned URL, where the signature travels in the query
+    string. It accepts method (default GET), url, headers, time,
+    signed_headers, body, body_fh, payload_hash and unsigned_payload with
+    the same meaning as in "sign", plus:
+
+    expires
+
+      validity in seconds, from 1 to 604800 (default 3600).
+
+    Only host and the x-amz-* headers are signed by default, other headers
+    must be named in signed_headers (and provided). The session token and,
+    for the X.509 variant, the certificate and chain travel as query
+    parameters. The payload is UNSIGNED-PAYLOAD for S3 and the hash of the
+    empty body for other services, unless body, body_fh, payload_hash,
+    unsigned_payload or an X-Amz-Content-Sha256 header say otherwise. The
+    service cannot know about a payload hash that it does not take for
+    granted (see payload_header in "new"): in that case it goes in the
+    x-amz-content-sha256 header, signed, which the client must send.
+    Streaming does not apply, and its arguments are an error.
+
+    The URL must not already carry any of the parameters that presign adds
+    (X-Amz-Algorithm, X-Amz-Credential, X-Amz-Date, X-Amz-Expires,
+    X-Amz-SignedHeaders, X-Amz-Signature, X-Amz-Security-Token, X-Amz-X509,
+    X-Amz-X509-Chain, in any case): it is an error, so that the URL cannot
+    end up with two values for the same parameter.
+
+    The returned hash reference has the url to hand out, with any character
+    that is not allowed in a URL path (e.g. a space) percent-encoded, the
+    headers that the client must send along (just host by default), and
+    signature, signed_headers, scope, canonical_request and string_to_sign
+    like in "sign".
+
+ encoded_length
+
+       my $length = AWS::Signature::V4->encoded_length($decoded, $chunk_size, %opts);
+
+    Class method that computes the size of an aws-chunked body made of
+    $decoded bytes of data cut in chunks of $chunk_size bytes (except for
+    the last one, that can be shorter), which is what to put in the
+    Content-Length header. The sizes must be integers, and unknown options
+    are an error. The options mirror the choices made for "sign":
+
+    signed
+
+      true (1, default) if the chunks are signed, false (0 or the empty
+      string) otherwise; signed and unsigned are also accepted, as for
+      streaming in "sign";
+
+    checksum
+
+      the name of the built-in checksum, if any;
+
+    trailers
+
+      hash reference from the name of each trailer that will be given to
+      "finish" to the length of its value (e.g. 12 for a base64-encoded
+      CRC-64). As in "sign", the trailer of checksum must not be listed
+      here as well: declaring the same name twice is an error.
+
+ The chunker
+
+    When streaming, "sign" returns a chunker that wraps the data into
+    chunks, signing them if needed. It keeps track of the amount of data
+    and of the signatures, so use it for one body only, and feed it the
+    data in order.
+
+  chunk
+
+       my $encoded = $chunker->chunk($data);
+
+    Return the encoded version of a piece of data, to be sent as it is.
+    $data is a byte string or a reference to one, it cannot be empty. It is
+    an error to go past the decoded_content_length.
+
+  finish
+
+       my $encoded = $chunker->finish(%trailer_values);
+
+    Return the final, empty chunk, followed by the trailers if any. It is
+    an error if the amount of data is not decoded_content_length. The
+    values of the trailers declared in trailers are passed by name, in any
+    case; it is an error to omit one, to pass one twice, to pass one that
+    was not declared or that is computed by the chunker, or to pass a value
+    that is not a byte string or has a CR, LF or NUL in it. After an error,
+    the chunker is as it was: finish can be called again.
+
+ERRORS
+
+    Errors are reported by throwing Ouch exceptions (see $@->code,
+    $@->message). The code is 400 when the problem is in what the caller
+    provided, e.g. a missing option, an invalid URL, a certificate that
+    cannot be read, a chunk that goes past the declared size; it is 500
+    when the fault is in the module itself, i.e. something that should not
+    happen whatever the input. The exception is reported at the line of the
+    caller, and its trace does not include the arguments of the calls, as
+    they may hold secrets like passwords. Moo's own complaints, e.g. about
+    the arguments of the constructors that are not meant to be called
+    directly, are not Ouch exceptions.
+
+SECURITY CONSIDERATIONS
+
+      * URLs. A URL must be ASCII, without control characters and without
+      user information (user@host): AWS endpoints never have it, and user
+      agents do not all agree on which host such a URL points to. For the
+      same reason the host can only be a name made of letters, digits, .,
+      _, ~ and -, or an IP address, with an optional numeric port.
+
+      * Authorize on what is signed. For every service but S3 the path is
+      normalized before signing, as AWS does: /public/../admin/delete is
+      signed as /admin/delete, and that is what AWS executes. If your
+      application decides whether a caller may have a request signed by
+      looking at the URL, it must look at the normalized path (see the
+      second line of canonical_request), not at the raw URL, or it can be
+      bypassed. For those same services, dot segments that are
+      percent-encoded (e.g. %2e%2e) are an error, as it is not certain how
+      AWS reads them; S3 does not normalize at all, so there they are
+      ordinary characters of the key and /public/%2e%2e/admin is signed as
+      it is.
+
+      * Do not log the results. headers and authorization can be used to
+      replay the request for up to 15 minutes; a presigned URL is a bearer
+      token until it expires; headers, canonical_request and presigned URLs
+      include the session token, if there is one. Treat them as secrets.
+
+      * Secrets in memory. The signer keeps the credentials (the secret
+      access key included) as long as it lives, and ->credentials gives
+      them back. The text of an X.509 private key and its password are
+      dropped once the key is loaded. The key derived for signed chunks,
+      which could sign any request for the same service, region and day, is
+      kept by the chunker in a closure: no accessor gives back its bytes
+      and dumping the chunker does not show them, but whoever holds the
+      chunker can still sign with it through its internals. Do not hand the
+      chunker, let alone the signer, to code that you would not trust with
+      the credentials.
+
+      * Error messages may include values that the caller provided, with
+      non-printable characters escaped (e.g. \x{A}), so that they cannot
+      forge lines in a log.
+
+      * Dependencies are listed with their versions in cpanfile.snapshot;
+      check them regularly against published advisories, e.g. with
+      CPAN::Audit.
+
+BUGS AND LIMITATIONS
+
+    Minimum perl version 5.24.
+
+    Only Signature Version 4 is supported, not Version 4A (asymmetric,
+    multi-region). Event stream signing is not supported either.
+
+    Signing with the X.509 variant, including presigned URLs and the
+    transport of the certificate in the query string, follows the algorithm
+    as documented for IAM Roles Anywhere but has only been tested with
+    local signatures.
+
+    The signature of trailers in streaming uploads has not been checked
+    against AWS.
+
+    Please report any bug or feature request through the repository of the
+    project, available at https://codeberg.org/polettix/AWS-Signature-V4.
+
+AUTHOR
+
+    Flavio Poletti <flavio@polettix.it>
+
+AI ASSISTANCE
+
+    This module was developed with the assistance of artificial
+    intelligence (Anthropic Claude 5). The AI was used to generate the code
+    based on the specifications from Amazon and directions from the author
+    to organize the code and use relevant base modules.
+
+    All AI-generated code has been manually audited, refactored, and
+    verified by the maintainer to ensure compliance with Perl best
+    practices and security standards.
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+    implied. See the License for the specific language governing
+    permissions and limitations under the License.
+

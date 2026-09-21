@@ -10,6 +10,7 @@ lib/Devel/CallParser.pm
 lib/Devel/CallParser.xs
 t/LoadXS.pm
 t/WriteHeader.pm
+t/blockscope.t
 t/dataalias.t
 t/develdeclare.t
 t/getset0.t
@@ -31,4 +32,5 @@ t/proto.xs
 t/stdargs.t
 t/stdargs.xs
 t/substrictdecl.t
+SIGNATURE    Added here by Module::Build
 SIGNATURE    Added here by Module::Build

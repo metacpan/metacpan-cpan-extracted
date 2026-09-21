@@ -691,7 +691,7 @@ my %WriteMakefileArgs = (
         'ExtUtils::Depends'   => '0.404',
         # EU::Depends reads the provider's Install/Files.pm at configure time,
         # and Shared::Arena's names Frozen as its own dependency.
-        'Shared::Arena'       => '0.11',
+        'Shared::Arena'       => '0.12',
         'Frozen'              => '0.07',
     },
     TEST_REQUIRES => {
@@ -699,7 +699,7 @@ my %WriteMakefileArgs = (
     	'Plack::Test::Suite' => '0',
     },
     PREREQ_PM => {
-        'Shared::Arena' => '0.11',
+        'Shared::Arena' => '0.12',
         'Frozen'        => '0.07',
     },
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },

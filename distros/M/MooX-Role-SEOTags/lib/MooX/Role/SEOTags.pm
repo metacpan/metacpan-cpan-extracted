@@ -239,7 +239,7 @@ no if $] <= 5.036, 'warnings', 'experimental::signatures';
 use Moo::Role;
 use HTML::Tiny;
 
-our $VERSION = '1.2.1';
+our $VERSION = '1.2.2';
 
 requires qw[og_title og_type og_description og_url];
 

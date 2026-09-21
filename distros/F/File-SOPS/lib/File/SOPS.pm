@@ -44,7 +44,7 @@ use File::SOPS::Format::ENV;
 use File::SOPS::Format::INI;
 use namespace::clean;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 
 my %FORMATS = (
@@ -222,10 +222,14 @@ sub decrypt {
     # at sops -- rather than being read as though it had none at all.
     croak "No SOPS metadata found" unless $metadata;
 
-    # Decrypt data key using age backend
+    # Decrypt data key using age backend. max_stanzas is forwarded verbatim: when
+    # the caller does not pass it, it arrives here as undef and the backend applies
+    # its own default of 64 (CVE-2026-85783), so the absent-argument path stays
+    # byte-identical. A caller with a legitimately large recipient list raises it.
     my $data_key = File::SOPS::Backend::Age->decrypt_data_key(
-        age_keys   => $metadata->age,
-        identities => $identities,
+        age_keys    => $metadata->age,
+        identities  => $identities,
+        max_stanzas => $args{max_stanzas},
     );
 
     # Decrypt every document's values. One metadata block, one data key, applied
@@ -336,10 +340,11 @@ sub decrypt_file {
 
     # Decrypt
     my $data = $class->decrypt(
-        encrypted  => $content,
-        identities => $identities,
-        format     => $format,
-        ignore_mac => $args{ignore_mac},
+        encrypted   => $content,
+        identities  => $identities,
+        format      => $format,
+        ignore_mac  => $args{ignore_mac},
+        max_stanzas => $args{max_stanzas},
     );
 
     my $decrypted = _serialize_plaintext($data, $format);
@@ -366,10 +371,11 @@ sub extract {
         unless $document =~ /\A\d+\z/;
 
     my $data = $class->decrypt(
-        encrypted  => $content,
-        identities => $identities,
-        format     => $format,
-        ignore_mac => $args{ignore_mac},
+        encrypted   => $content,
+        identities  => $identities,
+        format      => $format,
+        ignore_mac  => $args{ignore_mac},
+        max_stanzas => $args{max_stanzas},
     );
 
     # A single-document file decrypts to a HashRef, a multi-document stream to an
@@ -432,10 +438,11 @@ sub rotate {
 
     # Decrypt
     my $data = $class->decrypt(
-        encrypted  => $content,
-        identities => $identities,
-        format     => $format,
-        ignore_mac => $args{ignore_mac},
+        encrypted   => $content,
+        identities  => $identities,
+        format      => $format,
+        ignore_mac  => $args{ignore_mac},
+        max_stanzas => $args{max_stanzas},
     );
 
     # docs/adr/0046's guard stood here and is gone: the decryption above is
@@ -496,10 +503,11 @@ sub edit {
     $metadata->assert_rule_regexes_agree;
 
     my $data = $class->decrypt(
-        encrypted  => $content,
-        identities => $identities,
-        format     => $format,
-        ignore_mac => $args{ignore_mac},
+        encrypted   => $content,
+        identities  => $identities,
+        format      => $format,
+        ignore_mac  => $args{ignore_mac},
+        max_stanzas => $args{max_stanzas},
     );
 
     # docs/adr/0046's guard stood here too and is gone for rotate's reason
@@ -766,14 +774,6 @@ sub _first_matching_rule {
         # .sops.yaml is usually written. Same in sops.
         return ($rule, $index) unless defined $regex && length $regex;
 
-        my $matched = eval { $subject =~ /$regex/ ? 1 : 0 };
-        croak "Cannot use the path_regex of creation rule $index in '$config' "
-            . "as a regular expression (" . _reason($@) . "). It is compiled as "
-            . "a Perl regex here and with Go's RE2 by sops, which accept "
-            . "different things -- sops reports this one too, as \"error "
-            . "parsing regexp\"."
-            if $@;
-
         # sops compiles the same string with Go RE2, which is not the same
         # dialect. A pattern the two dialects do not agree on -- one RE2
         # rejects, or one both take and read differently -- silently selects
@@ -785,6 +785,12 @@ sub _first_matching_rule {
         # because sops's behaviour here is different -- it REPORTS the
         # unsupported case as "error parsing regexp" rather than discarding
         # the compile error -- and the two croaks describe different things.
+        # This runs BEFORE the real Perl match attempt below (mirroring
+        # Metadata::_rule_verdict's order, k197), so a divergent construct
+        # such as \Q/\E never reaches a live regex compile/match here -- that
+        # would otherwise warn ("Unrecognized escape \Q passed through...")
+        # on STDERR for a pattern Perl merely tolerates rather than reads the
+        # way RE2 does.
         my ($construct, $kind) = _re2_path_regex_diagnosis($regex);
         if ($construct) {
             my $shown = length($regex) > 60
@@ -802,6 +808,14 @@ sub _first_matching_rule {
                 . "agree on, or drop the rule. See the POD on "
                 . "creation_rules_for.";
         }
+
+        my $matched = eval { $subject =~ /$regex/ ? 1 : 0 };
+        croak "Cannot use the path_regex of creation rule $index in '$config' "
+            . "as a regular expression (" . _reason($@) . "). It is compiled as "
+            . "a Perl regex here and with Go's RE2 by sops, which accept "
+            . "different things -- sops reports this one too, as \"error "
+            . "parsing regexp\"."
+            if $@;
 
         return ($rule, $index) if $matched;
     }
@@ -2912,7 +2926,7 @@ File::SOPS - Perl implementation of Mozilla SOPS encrypted file format
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -3807,10 +3821,11 @@ L<docs/adr/0034|https://github.com/Getty/p5-file-sops/blob/main/docs/adr/0034-a-
 =head2 decrypt
 
     my $data = File::SOPS->decrypt(
-        encrypted  => $encrypted_content,
-        identities => \@age_secret_keys,
-        format     => 'yaml',  # optional, auto-detected
-        ignore_mac => 0,       # optional, see below
+        encrypted   => $encrypted_content,
+        identities  => \@age_secret_keys,
+        format      => 'yaml',  # optional, auto-detected
+        ignore_mac  => 0,       # optional, see below
+        max_stanzas => 64,      # optional, see below
     );
 
 Decrypts SOPS-encrypted content.
@@ -3887,6 +3902,18 @@ authenticated> -- the AAD binding on each individual value still holds, but
 nothing detects a value that was deleted, duplicated, moved to another key, or
 replaced with one taken from elsewhere in the same document. Use it to recover
 data, not to consume it.
+
+C<max_stanzas> bounds how many age entries in the document's C<sops.age> list
+this method will attempt to decrypt, and B<defaults to 64>. A document
+presenting more than this is refused before any age entry is decrypted, because
+each attempt costs an X25519 scalar multiplication per stanza before the age
+header is authenticated -- a document carrying many entries amplifies that into
+a denial of service (CVE-2026-85783). Sixty-four is deliberately conservative;
+real documents carry a handful of recipients. Raise it explicitly for a document
+that legitimately carries more. Passing C<undef> (or omitting it) keeps the
+default, so a caller that does not set it is unaffected. This is the limit
+L<File::SOPS::Backend::Age/decrypt_data_key> enforces; the value given here is
+forwarded to it unchanged.
 
 =head3 The rule decides what a value is, in both directions
 
@@ -4204,7 +4231,8 @@ with an empty one and C<decrypt_file> still returned true. See L</How a file is
 written>, which also covers what mode the output file gets.
 
 C<ignore_mac> is passed through to L</decrypt>; read the warning there before
-using it.
+using it. C<max_stanzas> is passed through to L</decrypt> as well, and defaults
+to 64.
 
 A dotenv or INI document whose encrypted slot holds a I<plaintext> comment
 C<carp>s on the read, as L</decrypt> describes under L</A comment in a list comes
@@ -4244,7 +4272,8 @@ C<["items"][0]> matched C<items> alone and returned the whole ArrayRef.
 
 The whole file is decrypted and MAC-verified either way. C<extract> saves you
 the navigation, not the work -- it is not a cheaper L</decrypt>.
-C<ignore_mac> is passed through to L</decrypt>.
+C<ignore_mac> is passed through to L</decrypt>, and so is C<max_stanzas>
+(default 64).
 
 =head3 Reaching a document of a multi-document stream
 
@@ -4471,7 +4500,8 @@ not, and sops reads both: one whose stored MAC really is over the literal, and
 -- under C<< ignore_mac => 1 >> -- any of them.
 
 C<ignore_mac> is passed through to L</decrypt>; rotating a file you could not
-verify re-signs whatever it contained, so prefer to fail.
+verify re-signs whatever it contained, so prefer to fail. C<max_stanzas> is
+passed through to L</decrypt> as well, and defaults to 64.
 
 A dotenv or INI document whose encrypted slot holds a I<plaintext> comment
 C<carp>s on the L</decrypt> this does first (see L</A comment in a list comes
@@ -4593,7 +4623,8 @@ and it is the order this distribution writes documents in anyway, so it does
 not affect the MAC.
 
 C<ignore_mac> is passed through to L</decrypt>; editing a file you could not
-verify re-signs whatever it contained, so prefer to fail.
+verify re-signs whatever it contained, so prefer to fail. C<max_stanzas> is
+passed through to L</decrypt> as well, and defaults to 64.
 
 A dotenv or INI document whose encrypted slot holds a I<plaintext> comment
 C<carp>s on the L</decrypt> this does first (see L</A comment in a list comes

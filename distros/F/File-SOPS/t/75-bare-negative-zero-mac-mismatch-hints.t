@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 
 use File::SOPS;
 use File::SOPS::Metadata;
@@ -131,7 +131,7 @@ unless ($sops_bin) {
 
 my $tempdir = tempdir(CLEANUP => 1);
 my ($public, $secret) = Crypt::Age->generate_keypair();
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 # Write a sops-encrypted file whose unencrypted slot is `-1e-400`. Go's
@@ -140,7 +140,7 @@ $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 sub sops_write_negzero {
     my ($fmt, $plaintext) = @_;
     my $ext = $fmt eq 'yaml' ? 'yaml' : 'json';
-    write_file("$tempdir/src.$ext", $plaintext);
+    write_binary("$tempdir/src.$ext", $plaintext);
     my $out = `$sops_bin encrypt --age $public --filename-override x.$ext --input-type $fmt --output-type $fmt $tempdir/src.$ext --output $tempdir/enc.$ext 2>&1`;
     return ($? >> 8, $out, "$tempdir/enc.$ext");
 }
@@ -161,7 +161,7 @@ for my $fmt (qw(yaml json)) {
         ok(-s $enc_path, 'sops -e: wrote a non-empty file');
 
         # The file sops wrote carries the bare -0 token on the wire.
-        my $written = read_file($enc_path);
+        my $written = read_binary($enc_path);
         like($written, qr/-0(?:\.0+)*(?![0-9.])/,
             'sops -e: the document carries the bare -0 token');
 
@@ -207,7 +207,7 @@ for my $fmt (qw(yaml json)) {
         my $hits = $fixed =~ s/$fix_re/$1-0.0/;
         ok($hits, 'counter-check: the hand-fix replaces the bare -0 token')
             or diag("no match for $fix_re in:\n$fixed");
-        write_file("$tempdir/enc.fixed", $fixed);
+        write_binary("$tempdir/enc.fixed", $fixed);
         # Tell sops what format the hand-fixed file is -- without the
         # extension hint it guesses JSON on the YAML output and the
         # unmarshal fails before MAC verification gets a chance, and its
@@ -226,7 +226,7 @@ for my $fmt (qw(yaml json)) {
         my ($enc_rc, $enc_out, $enc_path) = sops_write_negzero($fmt, $plaintext);
         die "sops -e failed for $fmt: $enc_out"
             unless $enc_rc == 0;
-        my $written = read_file($enc_path);
+        my $written = read_binary($enc_path);
 
         my $data = File::SOPS->decrypt(
             encrypted  => $written,

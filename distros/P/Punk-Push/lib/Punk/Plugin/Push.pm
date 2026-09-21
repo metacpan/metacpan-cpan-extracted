@@ -13,7 +13,7 @@ use Punk::Push ();
 use Punk::Push::Subscription ();
 use Punk::Push::Result ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @OPTIONS = qw(
     subject public_key private_key
@@ -293,6 +293,21 @@ sub _routes {
     return;
 }
 
+# A topic is NOT a free-form string. RFC 8030 section 5.4 restricts the
+# header to at most 32 characters of the URL and filename-safe base64
+# alphabet, so the obvious "game:42" or "chat/7" is refused by the push
+# service with 400 Bad Request - a failure that arrives long after the call
+# that caused it, in a worker, against a subscription that is perfectly
+# healthy. Refused here instead, where the caller can see which topic.
+sub _check_topic {
+    my ($topic) = @_;
+    return if $topic =~ m{\A[A-Za-z0-9_-]{1,32}\z};
+    Carp::croak(sprintf
+        "Punk::Plugin::Push: '%s' is not a usable Topic. RFC 8030 allows at "
+      . 'most 32 characters of A-Z a-z 0-9 - _ , so a colon or a slash is '
+      . 'refused by the push service with 400.', $topic);
+}
+
 our $TASK = 'punk.push.send';
 
 sub _queue_task {
@@ -301,12 +316,20 @@ sub _queue_task {
     my $install = sub {
         my $caller = $app->can('caller_class') ? $app->caller_class : undef;
         my $task = $caller && $caller->can('task');
+
+        my $queue;
+        if ($caller && eval { require Punk::Plugin::Queue; 1 }) {
+            my $state = Punk::Plugin::Queue->can('state_for')
+                      ? Punk::Plugin::Queue->state_for($caller) : undef;
+            $queue = $state && $state->{queue};
+        }
         Carp::croak('Punk::Plugin::Push: queue => 1 needs Punk::Queue, and '
                   . "`plugin 'Queue'` on this application")
-            unless $task;
+            unless $queue || $task;
+        $task = sub { $queue->task(@_) } if $queue;
+
         $task->($TASK, sub {
             my ($job, $id, $payload, @rest) = @_;
-            my $app = $job->app;
             my $model = __PACKAGE__->_model($app);
             my $row = $model->get(id => $id);
             # Pruned since the job was enqueued. Not an error: the
@@ -328,6 +351,11 @@ sub send_via {
     my ($class, $c, $who, $payload, %opts) = @_;
     my $app = $c->app;
     my $cfg = $class->config_for($app);
+
+    # Before a job exists, not inside the worker that later claims it: a
+    # topic the push service will refuse should fail at the call that chose
+    # it, where the caller and the game are still on the stack.
+    _check_topic($opts{topic}) if defined $opts{topic};
 
     return $class->send($c, $who, $payload, %opts)
         unless $cfg->{queue} && $c->can('enqueue');
@@ -478,7 +506,10 @@ sub send_to {
     );
     my $urgency = defined $opts{urgency} ? $opts{urgency} : $cfg->{urgency};
     $headers{Urgency} = $urgency if $urgency ne 'normal';
-    $headers{Topic} = $opts{topic} if defined $opts{topic};
+    if (defined $opts{topic}) {
+        _check_topic($opts{topic});
+        $headers{Topic} = $opts{topic};
+    }
 
     my ($status, $error);
     my $res = eval {

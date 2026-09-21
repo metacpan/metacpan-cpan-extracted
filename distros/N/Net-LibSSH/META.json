@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "Alien::libssh" : "0.002",
-            "ExtUtils::MakeMaker" : "7.00"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -42,15 +42,15 @@
    "provides" : {
       "Net::LibSSH" : {
          "file" : "lib/Net/LibSSH.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Net::LibSSH::Channel" : {
          "file" : "lib/Net/LibSSH/Channel.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Net::LibSSH::SFTP" : {
          "file" : "lib/Net/LibSSH/SFTP.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/Getty/p5-net-libssh"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -76,6 +76,7 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
+                     ".karr",
                      "README.md"
                   ],
                   "exclude_match" : [],
@@ -426,7 +427,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.003",
+                  "tag" : "0.004",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -581,7 +582,7 @@
    },
    "x_authority" : "cpan:GETTY",
    "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.52",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 
 use File::SOPS;
 use File::SOPS::Encrypted;
@@ -44,7 +44,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 # A leaf exactly as the YAML format handler hands it over -- which is the only
@@ -348,17 +348,17 @@ SKIP: {
         for my $source (@OVERFLOW, @SPELLINGS) {
             my $short = length($source) > 20 ? substr($source, 0, 17) . '...' : $source;
             my $file  = "$tempdir/read.yaml";
-            write_file("$tempdir/read.plain.yaml",
+            write_binary("$tempdir/read.plain.yaml",
                 "keep: x\nv_unencrypted: $source\n");
 
             my $out = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/read.plain.yaml 2>&1`;
             is($? >> 8, 0, "[$short] sops -e writes the document") or diag($out);
-            write_file($file, $out);
+            write_binary($file, $out);
             like($out, qr/^\Qv_unencrypted: $source\E$/m,
                 "[$short] with the literal verbatim, as a string");
 
             my $got = eval { File::SOPS->decrypt(
-                encrypted => scalar read_file($file), identities => [$secret]) };
+                encrypted => read_binary($file), identities => [$secret]) };
             ok(defined $got, "[$short] and this module verifies its MAC")
                 or diag($@);
             is($got->{v_unencrypted}, $source,
@@ -381,7 +381,7 @@ SKIP: {
                 "[$short] with sops's own token for the encrypted slot");
 
             my $file = "$tempdir/write.yaml";
-            write_file($file, $document);
+            write_binary($file, $document);
             my $out = `$sops_bin -d --input-type yaml --output-type yaml $file 2>&1`;
             is($? >> 8, 0, "[$short] and sops -d accepts it") or diag($out);
 
@@ -397,16 +397,16 @@ SKIP: {
         # data. sops writes a bare `.inf` in an ENCRYPTED slot as type:float
         # with the plaintext +Inf, and this module has always handed that back
         # as a real Perl infinity. It still must.
-        write_file("$tempdir/inf.plain.yaml",
+        write_binary("$tempdir/inf.plain.yaml",
             "keep: x\npos: .inf\nneg: -.inf\nnn: .nan\n");
         my $out = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/inf.plain.yaml 2>&1`;
         is($? >> 8, 0, 'sops -e writes the document') or diag($out);
         like($out, qr/^pos: ENC\[AES256_GCM,.*type:float\]$/m,
             'with type:float for the encrypted slot');
-        write_file("$tempdir/inf.yaml", $out);
+        write_binary("$tempdir/inf.yaml", $out);
 
         my $got = eval { File::SOPS->decrypt(
-            encrypted => scalar read_file("$tempdir/inf.yaml"),
+            encrypted => read_binary("$tempdir/inf.yaml"),
             identities => [$secret]) };
         ok(defined $got, 'and this module reads it') or diag($@);
 

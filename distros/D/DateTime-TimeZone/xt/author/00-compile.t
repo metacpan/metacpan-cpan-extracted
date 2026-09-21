@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 327;
+plan tests => 331;
 
 my @module_files = (
     'DateTime/TimeZone.pm',
@@ -250,7 +250,9 @@ my @module_files = (
     'DateTime/TimeZone/Australia/Melbourne.pm',
     'DateTime/TimeZone/Australia/Perth.pm',
     'DateTime/TimeZone/Australia/Sydney.pm',
+    'DateTime/TimeZone/CST6CDT.pm',
     'DateTime/TimeZone/Catalog.pm',
+    'DateTime/TimeZone/EST5EDT.pm',
     'DateTime/TimeZone/Europe/Andorra.pm',
     'DateTime/TimeZone/Europe/Astrakhan.pm',
     'DateTime/TimeZone/Europe/Athens.pm',
@@ -297,12 +299,14 @@ my @module_files = (
     'DateTime/TimeZone/Local/Android.pm',
     'DateTime/TimeZone/Local/Unix.pm',
     'DateTime/TimeZone/Local/VMS.pm',
+    'DateTime/TimeZone/MST7MDT.pm',
     'DateTime/TimeZone/OffsetOnly.pm',
     'DateTime/TimeZone/OlsonDB.pm',
     'DateTime/TimeZone/OlsonDB/Change.pm',
     'DateTime/TimeZone/OlsonDB/Observance.pm',
     'DateTime/TimeZone/OlsonDB/Rule.pm',
     'DateTime/TimeZone/OlsonDB/Zone.pm',
+    'DateTime/TimeZone/PST8PDT.pm',
     'DateTime/TimeZone/Pacific/Apia.pm',
     'DateTime/TimeZone/Pacific/Auckland.pm',
     'DateTime/TimeZone/Pacific/Bougainville.pm',

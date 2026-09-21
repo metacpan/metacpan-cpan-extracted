@@ -1,6 +1,34 @@
 Revision history for Linux-Event-HTTP
 
-0.001  UNRELEASED
+0.002  2026-09-20
+
+    - Fix interpreter context handling in native Response helpers on threaded Perl.
+    - Require Linux::Event 0.116 for the ordered-byte raw-consumer ABI,
+      native-consumer retirement/transition semantics, and the current Stream and
+      Listener contracts used by HTTP.
+    - Optimize the server request/response lifecycle without changing the public
+      Request, Response, Transaction, or callback APIs.
+    - Parse production HTTP/1 request heads directly from Linux::Event's native
+      ordered-byte input buffer before bytes are surfaced through Perl on_data.
+    - Preserve unread same-read bytes across HTTP Upgrade and CONNECT handoff to
+      another native consumer or an ordinary Stream target.
+    - Keep Content-Length request bodies on native input: drain unused bodies
+      without Perl materialization, deliver on_body payload directly, and preserve
+      an immediately following pipelined request head at the exact body boundary.
+    - Keep chunked request bodies on native input with persistent picohttpparser
+      decoder state, native drain mode, direct decoded on_body delivery, trailer
+      consumption, fragmented-read support, and exact next-request preservation.
+    - Make the native HTTP/1 consumer the production Server::Connection input
+      contract. HTTP owns protocol bytes; application subclasses customize
+      on_request, on_body, on_request_end, transport lifecycle callbacks, and
+      stream_tuning rather than replacing HTTP input with on_data.
+    - Extend correctness coverage for native request input, reentrant close,
+      fragmented chunked bodies, pipelining, Upgrade, CONNECT, and invalid
+      Server::Connection on_data overrides.
+    - Update benchmark and CI coverage for the production-native server path and
+      retain same-run pre-native comparisons as regression evidence.
+
+0.001  2026-09-13
     - Initial distribution scaffold.
     - Establish HTTP protocol, transport, message, transaction, and high-level
       client-operation boundaries.

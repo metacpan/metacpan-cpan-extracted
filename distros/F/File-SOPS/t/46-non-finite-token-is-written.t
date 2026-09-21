@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use Scalar::Util qw(dualvar);
 
 use File::SOPS;
@@ -416,7 +416,7 @@ YAML
 
 subtest 'rotate writes back a document sops wrote' => sub {
     my $tempdir = tempdir(CLEANUP => 1);
-    write_file("$tempdir/bare.yaml", $FIXTURE_BARE);
+    write_binary("$tempdir/bare.yaml", $FIXTURE_BARE);
 
     my $ok = eval {
         File::SOPS->rotate(file => "$tempdir/bare.yaml",
@@ -426,7 +426,7 @@ subtest 'rotate writes back a document sops wrote' => sub {
     ok($ok, 'rotate succeeds where it used to croak') or diag($@);
     return unless $ok;
 
-    my $written = read_file("$tempdir/bare.yaml");
+    my $written = read_binary("$tempdir/bare.yaml");
     like($written, qr/^v_unencrypted: \.inf$/m,
         'and the unencrypted slot still says what sops put there');
     isnt($written, $FIXTURE_BARE, 'with a new data key, so the file did change');
@@ -449,13 +449,13 @@ subtest 'decrypt_file still reproduces the plaintext byte for byte' => sub {
     # with, and refusing here would refuse to WRITE OUT a document this module
     # reads correctly.
     my $tempdir = tempdir(CLEANUP => 1);
-    write_file("$tempdir/bare.yaml", $FIXTURE_BARE);
+    write_binary("$tempdir/bare.yaml", $FIXTURE_BARE);
     File::SOPS->decrypt_file(
         input      => "$tempdir/bare.yaml",
         output     => "$tempdir/plain.yaml",
         identities => [$FIXTURE_IDENTITY],
     );
-    like(read_file("$tempdir/plain.yaml"), qr/^v_unencrypted: \.inf$/m,
+    like(read_binary("$tempdir/plain.yaml"), qr/^v_unencrypted: \.inf$/m,
         'the token, bare, exactly as sops -d writes it');
 };
 
@@ -472,7 +472,7 @@ SKIP: {
     my $tempdir = tempdir(CLEANUP => 1);
     my ($public, $secret) = Crypt::Age->generate_keypair();
     my $keyfile = "$tempdir/age.key";
-    write_file($keyfile, "$secret\n");
+    write_binary($keyfile, "$secret\n");
     local $ENV{SOPS_AGE_KEY_FILE} = $keyfile;
 
     # The three spellings a sops-written document can hold: `sops -e`
@@ -481,10 +481,10 @@ SKIP: {
 
     subtest 'sops -e, File::SOPS->rotate, sops -d' => sub {
         for my $token (sort keys %WRITTEN) {
-            write_file("$tempdir/p.yaml", "keep: x\nv_unencrypted: $token\n");
+            write_binary("$tempdir/p.yaml", "keep: x\nv_unencrypted: $token\n");
             my $enc = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/p.yaml 2>&1`;
             is($? >> 8, 0, "[$token] sops -e") or diag($enc);
-            write_file("$tempdir/e.yaml", $enc);
+            write_binary("$tempdir/e.yaml", $enc);
 
             my $ok = eval {
                 File::SOPS->rotate(file => "$tempdir/e.yaml",
@@ -494,7 +494,7 @@ SKIP: {
             ok($ok, "[$token] File::SOPS->rotate") or diag($@);
             next unless $ok;
 
-            my ($wire) = read_file("$tempdir/e.yaml") =~ /^v_unencrypted: (.*)$/m;
+            my ($wire) = read_binary("$tempdir/e.yaml") =~ /^v_unencrypted: (.*)$/m;
             is($wire, $token, "[$token] the wire is byte-identical");
 
             my $out = `$sops_bin -d --input-type yaml --output-type yaml $tempdir/e.yaml 2>&1`;
@@ -518,7 +518,7 @@ SKIP: {
 
             like($doc, qr/^v_unencrypted: \Q$token\E$/m,
                 "[$token] the document holds the token itself");
-            write_file("$tempdir/t.yaml", $doc);
+            write_binary("$tempdir/t.yaml", $doc);
             my $out = `$sops_bin -d --input-type yaml --output-type yaml $tempdir/t.yaml 2>&1`;
             is($? >> 8, 0, "[$token] sops -d") or diag($out);
 
@@ -548,7 +548,7 @@ SKIP: {
         is(scalar(@warnings), 0, 'and says nothing: the bytes agree with Go')
             or diag(join '', @warnings);
 
-        write_file("$tempdir/m.yaml", $doc);
+        write_binary("$tempdir/m.yaml", $doc);
         my $out = `$sops_bin -d --input-type yaml --output-type yaml $tempdir/m.yaml 2>&1`;
         is($? >> 8, 0, 'sops -d') or diag($out);
         like($out, qr/^v_unencrypted: \.inf$/m, 'and reads the token back');

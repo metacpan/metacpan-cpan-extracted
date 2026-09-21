@@ -5,7 +5,7 @@ use utf8;
 use Test::More;
 use Carp qw(croak);
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(write_binary);
 
 use File::SOPS;
 use File::SOPS::Format::JSON;
@@ -206,11 +206,11 @@ SKIP: {
 
     my $tempdir = tempdir(CLEANUP => 1);
     my ($public, $secret) = Crypt::Age->generate_keypair();
-    write_file("$tempdir/key.txt", $secret);
+    write_binary("$tempdir/key.txt", $secret);
     $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
     my $input = "$tempdir/input.json";
-    write_file($input, qq({"outer": {"$surr_escape": "v"}}) . "\n");
+    write_binary($input, qq({"outer": {"$surr_escape": "v"}}) . "\n");
 
     # Encrypt the hand-written file through sops, naming the recipient on
     # the command line so sops does not have to discover it from .sops.yaml.
@@ -224,7 +224,7 @@ SKIP: {
     like($enc, qr/\xf0\x9f\x98\x80/,
         'sops writes the UTF-8 encoding of U+1F600, the combined codepoint');
 
-    write_file("$tempdir/enc.json", $enc);
+    write_binary("$tempdir/enc.json", $enc);
 
     my $dec = `$sops_bin -d --input-type json --output-type json $tempdir/enc.json 2>/dev/null`;
     is($? >> 8, 0, 'sops -d exits 0 on the encrypted file');

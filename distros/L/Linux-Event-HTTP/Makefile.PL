@@ -46,7 +46,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'HTTP::CookieJar'     => '0.014',
-        'Linux::Event'        => '0.113',
+        'Linux::Event'        => '0.116',
         'Uniform::HTTP::Auth' => '0.02',
         'URI'                 => 0,
     },

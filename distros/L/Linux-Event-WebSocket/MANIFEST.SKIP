@@ -1,0 +1,14 @@
+^\.git/
+^\.github/
+^bench/
+^handoff\.md$
+^xt/
+^Linux-Event-WebSocket-
+^MYMETA\.
+^Makefile$
+^Makefile\.old$
+^WebSocket\.c$
+^WebSocket\.o$
+^WebSocket\.bs$
+^blib/
+^pm_to_blib$

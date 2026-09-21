@@ -86,6 +86,76 @@ my $first = $parser->parse_request($pipeline);
 is($first->_consumed, length($head), 'native request consumes only first pipelined head');
 is($first->target, '/hello?x=1', 'native request represents first pipelined request');
 
+my $server_request = $parser->_parse_server_request(
+    "GET /server HTTP/1.1\r\nHost: example.test\r\n\r\n",
+);
+isa_ok($server_request, 'Linux::Event::HTTP::Request');
+is($server_request->_expect_continue, 0,
+    'server parser records no Expect policy when field is absent');
+
+my $expect_request = $parser->_parse_server_request(
+    "POST /expect HTTP/1.1\r\n" .
+    "Host: example.test\r\n" .
+    "Content-Length: 4\r\n" .
+    "Expect: 100-continue\r\n\r\n",
+);
+isa_ok($expect_request, 'Linux::Event::HTTP::Request');
+is($expect_request->_expect_continue, 1,
+    'server parser records supported 100-continue expectation');
+
+my $unsupported_expect = $parser->_parse_server_request(
+    "POST /expect HTTP/1.1\r\n" .
+    "Host: example.test\r\n" .
+    "Content-Length: 4\r\n" .
+    "Expect: something-else\r\n\r\n",
+);
+isa_ok($unsupported_expect, 'Linux::Event::HTTP::Request');
+is($unsupported_expect->_expect_continue, -1,
+    'server parser records unsupported expectation without Perl header scanning');
+
+my $old_expect = $parser->_parse_server_request(
+    "POST /expect HTTP/1.0\r\n" .
+    "Content-Length: 4\r\n" .
+    "Expect: 100-continue\r\n\r\n",
+);
+isa_ok($old_expect, 'Linux::Event::HTTP::Request');
+is($old_expect->_expect_continue, -1,
+    'HTTP/1.0 expectation is rejected by native server policy');
+
+is(
+    $parser->_parse_server_request(
+        "GET / HTTP/1.1\r\nBad Header: value\r\n\r\n",
+    ),
+    400,
+    'server parser returns protocol status for malformed request',
+);
+
+is(
+    $parser->_parse_server_request(
+        "POST / HTTP/1.1\r\n" .
+        "Host: example.test\r\n" .
+        "Transfer-Encoding: gzip, chunked\r\n\r\n",
+    ),
+    501,
+    'server parser returns semantic status without exception parsing',
+);
+
+ok(
+    !defined $parser->_parse_server_request(
+        "GET /partial HTTP/1.1\r\nHost: example.test",
+    ),
+    'server parser returns undef for an incomplete request head',
+);
+
+is(
+    $parser->_parse_server_request(
+        "GET /too-long HTTP/1.1\r\nHost: example.test",
+        16,
+    ),
+    431,
+    'server parser applies request-head limit natively while incomplete',
+);
+
 undef $request;
 pass('native request destruction completed');
 

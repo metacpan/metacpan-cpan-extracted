@@ -29,7 +29,7 @@ use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.4';
+our $VERSION = 'v0.4.5';
 
 
 has resolver => (
@@ -593,7 +593,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords CIDR GoogleBot TOML dotless googlebot iMessage superstrings validator yacybot
+=for stopwords Aho CIDR Corasick GoogleBot TOML dotless googlebot iMessage superstrings validator yacybot
 
 =head1 NAME
 
@@ -601,7 +601,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.4.4
+version v0.4.5
 
 =head1 SYNOPSIS
 
@@ -739,6 +739,10 @@ distribution and maintain a separate file with rules that are suited
 to their application.
 
 Users are also encouraged to submit new and updated rules back to the maintainers. See L</SOURCE>.
+
+The string-matching algorithm used for identifying robots is based on the Aho-Corasick algorithm,
+which uses a state-machine for identifying matches.  Adding new rules will have a negligible effect on
+performance.
 
 =head2 index
 

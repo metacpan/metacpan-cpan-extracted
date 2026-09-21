@@ -1,7 +1,7 @@
 # ABSTRACT: Rex remote file handle via Net::LibSSH exec channels
 
 package Rex::Interface::File::LibSSH;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -111,7 +111,7 @@ Rex::Interface::File::LibSSH - Rex remote file handle via Net::LibSSH exec chann
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

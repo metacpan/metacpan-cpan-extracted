@@ -1,9 +1,9 @@
 ##############################################################################
 #
 #  Exception::Sink
-#  Copyright (c) 2006-2024 Vladi Belperchinov-Shabanski "Cade" 
+#  Copyright (c) 2006-2026 Vladi Belperchinov-Shabanski "Cade"
 #        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
-#  http://cade.noxrun.com/  
+#  http://cade.noxrun.com/
 #
 #  GPLv2
 #
@@ -15,35 +15,27 @@
 package Exception::Sink;
 use Exporter;
 our @ISA         = qw( Exporter );
-our @EXPORT      = qw( 
-                       sink 
-                       dive 
-                       surface 
-                       surface2 
-                       
+our @EXPORT      = qw(
+                       sink
+                       dive
+                       surface
+                       surface2
+
                        boom_skip
-                       boom 
+                       boom
                      );
 
-our @EXPORT_OK   = qw( 
-                       $DEBUG_SINK 
+our @EXPORT_OK   = qw(
+                       $DEBUG_SINK
                        get_stack_trace
                      );
-                     
+
 our %EXPORT_TAGS = ( 'none' => [ ] );
-our $VERSION     = '3.09';
+our $VERSION     = '3.10';
 use Exception::Sink::Class;
 use strict;
 
 our $DEBUG_SINK = 0;
-
-sub sink($);
-sub dive();
-sub surface(@);
-sub surface2(@);
-
-sub boom_skip($$);
-sub boom($);
 
 ##############################################################################
 #
@@ -174,28 +166,28 @@ sub boom($)
 sub get_stack_trace
 {
   my $skip = shift;
-  
+
   my @st;
   my $i;
-  my $ml;
-  
+  my $ml = 0;
+
   $i = 1 + $skip; # skip get_stack_trace frame and optionally first N frames
   while ( my ( $pack, $file, $line, $subname ) = caller($i++) )
     {
-    my $l = length( "$pack::$subname" );
+    my $l = length( "$subname" );
     $ml = $l if $l > $ml;
     }
-  
+
   $i = 1 + $skip; # skip get_stack_trace frame and optionally first N frames
   my $ii;
   while ( my ( $pack, $file, $line, $subname ) = caller($i++) )
     {
     $ii++;
-    my $l = length( "$pack::$subname" );
+    my $l = length( "$subname" );
     my $pad = ' ' x ( $ml - $l );
-    push @st, "      [$$] $ii: $pack::$subname $pad $file line $line\n";
+    push @st, "      [$$] $ii: $subname $pad $file line $line\n";
     }
-  
+
   return wantarray ? ( @st ) : join( '', @st );
 }
 
@@ -300,9 +292,9 @@ Exception::Sink - general purpose compact exception handling.
 =head2 boom_skip($$)
 
   same as boom() but has extra argument to skip the first N context frames in
-  the stack. it is useful when boom() should be called from a handler, which 
+  the stack. it is useful when boom() should be called from a handler, which
   is not useful since it will be always present.
-  
+
   if you are not sure what this means, just ignore it :)
 
 =head2 get_stack_trace()
@@ -373,9 +365,9 @@ Exception::Sink - general purpose compact exception handling.
 =head1 GITHUB REPOSITORY
 
   git@github.com:cade-vs/perl-exception-sink.git
-  
+
   git clone git://github.com/cade-vs/perl-exception-sink.git
-  
+
 =head1 AUTHOR
 
   Vladi Belperchinov-Shabanski "Cade"

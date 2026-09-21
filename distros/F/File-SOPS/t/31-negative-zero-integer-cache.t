@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use YAML::XS qw(Load);
 
 use File::SOPS;
@@ -76,7 +76,7 @@ diag("Using sops binary: $sops_bin");
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 my $serial = 0;
@@ -251,7 +251,7 @@ subtest 'an unencrypted YAML negative zero is written and sops reads it back' =>
             "$spelling: the source spelling survives into the document");
 
         my $file = scratch_file('yaml');
-        write_file($file, $document);
+        write_binary($file, $document);
         my ($rc, $out) = sops_decrypt($file, 'yaml');
         is($rc, 0, "$spelling: sops -d accepts it") or diag($out);
         like($out, qr/^x_unencrypted: -0$/m,
@@ -281,7 +281,7 @@ subtest 'an ENCRYPTED negative zero is type:float, as sops itself writes it' => 
                 "[$format] $spelling: the encrypted slot is labelled type:float");
 
             my $file = scratch_file($format);
-            write_file($file, $document);
+            write_binary($file, $document);
             my ($rc, $out) = sops_decrypt($file, $format);
             is($rc, 0, "[$format] $spelling: sops -d accepts it") or diag($out);
             like($out, qr/-0(?![0-9.])/,
@@ -312,7 +312,7 @@ subtest 'the JSON handler writes it too, where it used to croak' => sub {
             "$spelling: written as -0.0, not as the canonical -0");
 
         my $file = scratch_file('json');
-        write_file($file, $document);
+        write_binary($file, $document);
         my ($rc, $out) = sops_decrypt($file, 'json');
         is($rc, 0, "$spelling: sops -d accepts it") or diag($out);
         like($out, qr/"x_unencrypted"\s*:\s*-0\b/,
@@ -325,12 +325,12 @@ subtest 'a sops-written encrypted negative zero reads back here as one' => sub {
     # UNENCRYPTED negative zero: sops writes `-0` for it and then rejects its
     # own file with exit 51, measured, so no such document exists to read.
     my $plain = scratch_file('yaml');
-    write_file($plain, "y: -0.0e0\nkeep: k\n");
+    write_binary($plain, "y: -0.0e0\nkeep: k\n");
     my $encrypted = scratch_file('yaml');
     system("$sops_bin -e --age $public $plain > $encrypted 2>/dev/null");
     is($? >> 8, 0, 'sops encrypted the fixture');
 
-    my $document = read_file($encrypted);
+    my $document = read_binary($encrypted);
     like($document, qr/type:float/, 'sops labelled the leaf type:float');
 
     my $data = eval {
@@ -364,7 +364,7 @@ subtest 'three encrypts of the same tree produce the same value, every round' =>
             my ($leaf) = $document =~ /^x_unencrypted: (.*)$/m;
             push @leaves, $leaf;
             my $file = scratch_file('yaml');
-            write_file($file, $document);
+            write_binary($file, $document);
             my ($rc, $out) = sops_decrypt($file, 'yaml');
             push @reads, "$rc:" . join(' ', $out =~ /^(x[^\n]*)$/mg);
         }
@@ -412,7 +412,7 @@ subtest 'k86 still refuses what it refused' => sub {
         '.inf is written double-quoted');
 
     my $file = scratch_file('yaml');
-    write_file($file, $document);
+    write_binary($file, $document);
     my ($rc, $out) = sops_decrypt($file, 'yaml');
     is($rc, 0, '.inf: sops -d accepts the document') or diag($out);
 };
@@ -441,7 +441,7 @@ subtest 'k86 still accepts what it accepted, byte for byte' => sub {
             next;
         };
         my $file = scratch_file('yaml');
-        write_file($file, $document);
+        write_binary($file, $document);
         my ($rc, $out) = sops_decrypt($file, 'yaml');
         is($rc, 0, "$spelling: sops -d still accepts it") or diag($out);
     }

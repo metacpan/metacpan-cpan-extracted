@@ -4,7 +4,7 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "Devel::CallParser" : {
          "file" : "lib/Devel/CallParser.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -67,6 +67,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.004",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.005",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

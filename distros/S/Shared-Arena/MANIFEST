@@ -61,6 +61,7 @@ t/09-span.t
 t/10-crash.t
 t/11-waker-identity.t
 t/12-wake.t
+t/13-waker-reclaim.t
 t/14-map.t
 t/16-bloom.t
 t/18-hist.t

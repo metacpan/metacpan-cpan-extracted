@@ -1,13 +1,12 @@
 package Tcl::Tk;
 
 use strict;
-use 5;
 use Tcl;
 use Exporter 'import';
 use vars qw(@EXPORT_OK %EXPORT_TAGS);
 
 @Tcl::Tk::ISA = qw(Tcl);
-$Tcl::Tk::VERSION = '1.51';
+$Tcl::Tk::VERSION = '1.52';
 
 sub WIDGET_CLEANUP() {0}
 
@@ -647,7 +646,6 @@ sub declare_widget {
 }
 sub widget_deletion_watcher {
     my (undef,$int,undef,$path) = @_;
-    #print STDERR "[D:$path]";
 }
 
 # widget_data return anonymous hash that could be used to hold any
@@ -1400,61 +1398,87 @@ sub w_uniq {
     return "$wp.$type$gwcnt";
 }
 
-# perlTk<->Tcl::Tk mapping in form [widget, wprefix, ?package?, ?{method=>widget_class}?, ?[by_passed_method1, by_passed_method2, ...]?]
+# perlTk<->Tcl::Tk mapping in form
+#   WidgetClass => [
+#       widget,
+#       wprefix,
+#      	?package?,
+#      	?{method1=>widget_class1, method2=>widget_class2, ...}?,
+#      	?[by_passed_method1, by_passed_method2, ...]?
+#   ]
 # These will be looked up 1st in AUTOLOAD
 my %ptk2tcltk = (
-     Button      => ['button', 'btn',],
-     Checkbutton => ['checkbutton', 'cb',],
-     Canvas      => ['canvas', 'can', undef, undef, [qw[raise lower]]],
-     Entry       => ['entry', 'ent',],
-     Frame       => ['frame', 'f',],
-     LabelFrame  => ['labelframe', 'lf',],
-     Labelframe  => ['labelframe', 'lf',],
-     #LabFrame    => ['labelframe', 'lf',],
-     Label       => ['label', 'lbl',],
-     Listbox     => ['listbox', 'lb',],
-     Message     => ['message', 'msg',],
-     Menu        => ['menu', 'mnu',],
-     Menubutton  => ['menubutton', 'mbtn',],
-     Panedwindow => ['panedwindow', 'pw',],
-     Bitmap	 => ['image', 'bmp',],
-     Photo	 => ['image', 'pht',],
-     Radiobutton => ['radiobutton', 'rb',],
-     ROText	 => ['text', 'rotext','snit'],
-     Text        => ['text', 'text',],
-     Scrollbar   => ['scrollbar','sb',],
-     Scale       => ['scale','scl',],
-     TextUndo    => ['text', 'utext',],
-     Toplevel    => ['toplevel', 'top',],
+    Button      => ['button', 'btn',],
+    Checkbutton => ['checkbutton', 'cb',],
+    Canvas      => ['canvas', 'can', undef, undef, [qw[raise lower]]],
+    Entry       => ['entry', 'ent',],
+    Frame       => ['frame', 'f',],
+    LabelFrame  => ['labelframe', 'lf',],
+    Labelframe  => ['labelframe', 'lf',],
+    Label       => ['label', 'lbl',],
+    Listbox     => ['listbox', 'lb',],
+    Message     => ['message', 'msg',],
+    Menu        => ['menu', 'mnu',],
+    Menubutton  => ['menubutton', 'mbtn',],
+    Panedwindow => ['panedwindow', 'pw',],
+    Bitmap	=> ['image', 'bmp',],
+    Photo	=> ['image', 'pht',],
+    Radiobutton => ['radiobutton', 'rb',],
+    ROText	=> ['text', 'rotext','snit'],
+    Text        => ['text', 'text',],
+    Scrollbar   => ['scrollbar','sb',],
+    Scale       => ['scale','scl',],
+    TextUndo    => ['text', 'utext',],
+    Toplevel    => ['toplevel', 'top',],
 
-     Table       => ['table', 'tbl', 'Tktable'],
+    Table       => ['table', 'tbl', 'Tktable'],
 
-     Separator   => ['Separator', 'sep', 'BWidget'],
-     ScrollableFrame => ['ScrollableFrame', 'sfr', 'BWidget',
-			{getframe => 'Frame'}],
-     ScrolledWindow => ['ScrolledWindow', 'sw', 'BWidget'],
+    Separator   => ['Separator', 'sep', 'BWidget'],
+    ScrollableFrame => ['ScrollableFrame', 'sfr', 'BWidget',
+       		{getframe => 'Frame'}],
+    ScrolledWindow => ['ScrolledWindow', 'sw', 'BWidget'],
 
-     BrowseEntry => ['ComboBox', 'combo', 'BWidget'],
-     ComboBox    => ['ComboBox', 'combo', 'BWidget'],
-     ListBox     => ['ListBox', 'lb', 'BWidget'],
-     BWTree      => ['Tree', 'bwtree', 'BWidget'],
+    BrowseEntry => ['ComboBox', 'combo', 'BWidget'],
+    ComboBox    => ['ComboBox', 'combo', 'BWidget'],
+    ListBox     => ['ListBox', 'lb', 'BWidget'],
+    BWTree      => ['Tree', 'bwtree', 'BWidget'],
 
-     BWNoteBook  => ['NoteBook', 'bwnb', 'BWidget',
-			{getframe => 'Frame'},
-			   # i.e. getframe returns 'Frame' widget
+    BWNoteBook  => ['NoteBook', 'bwnb', 'BWidget',
+			{getframe => 'Frame'}, # i.e. getframe returns 'Frame' widget
 		        ['raise']
 		    ],
 
-     TileNoteBook => ['tile::notebook', 'tnb', 'tile'],
+    # old tcl/tk needed to load 'tile' package for ttk
+    TileNoteBook => ['tile::notebook', 'tnb', 'tile'],
 
-     Treectrl    => ['treectrl', 'treectrl', 'treectrl'],
-     Spinbox     => ['spinbox', 'spn',],
+    # now ttk::* widgets could be used without loading anything
+    TtkCheckbutton => ['ttk::checkbutton', 'tchk'],
+    TtkButton      => ['ttk::button',      'tbtn'],
+    TtkRadiobutton => ['ttk::radiobutton', 'trdb'],
+    TtkLabel       => ['ttk::label',       'tlbl'],
+    TtkEntry       => ['ttk::entry',       'tent'],
+    TtkFrame       => ['ttk::frame',       'tfrm'],
+    TtkLabelframe  => ['ttk::labelframe',  'tlfr'],
+    TtkNotebook    => ['ttk::notebook',    'tnb'],
+    TtkScrollbar   => ['ttk::scrollbar',   'tsb'],
+    TtkCombobox    => ['ttk::combobox',    'tcbo'],
+    TtkProgressbar => ['ttk::progressbar', 'tprg'],
+    TtkScale       => ['ttk::scale',       'tscl'],
+    TtkSeparator   => ['ttk::separator',   'tsep'],
+    TtkSizegrip    => ['ttk::sizegrip',    'tsz'],
+    TtkTreeview    => ['ttk::treeview',    'ttv', undef, {}, ['children']],
+    TtkPanedwindow => ['ttk::panedwindow', 'tpw'],
+    TtkSpinbox     => ['ttk::spinbox',     'tspn'],
 
-     Balloon     => ['tixBalloon', 'bl', 'Tix'],
-     DirTree     => ['tixDirTree', 'dirtr', 'Tix'],
-     HList       => ['tixHList', 'hlist', 'Tix'],
-     TList       => ['tixTList', 'tlist', 'Tix'],
-     NoteBook    => ['tixNoteBook', 'nb', 'Tix'],
+    Treectrl    => ['treectrl', 'treectrl', 'treectrl'],
+    Spinbox     => ['spinbox', 'spn',],
+
+    # tix is obsoleted, but we do have Tcl::Tk::Tkwidget::Tix on CPAN so these are available
+    Balloon     => ['tixBalloon', 'bl', 'Tix'],
+    DirTree     => ['tixDirTree', 'dirtr', 'Tix'],
+    HList       => ['tixHList', 'hlist', 'Tix'],
+    TList       => ['tixTList', 'tlist', 'Tix'],
+    NoteBook    => ['tixNoteBook', 'nb', 'Tix'],
 );
 
 # hash to track widget methods returning widgets, so we'll assign
@@ -2095,8 +2119,8 @@ sub Scrolled {
     my $self = shift; # this will be a parent widget for newer Scrolled
     my $int = $self->interp;
     my $wtype = shift; # what type of scrolled widget
-    die "wrong 'scrolled' type $wtype" unless $wtype =~ /^\w+$/;
-    my $lwtype = $scrolled_map{$wtype} || lc($wtype);
+    my $lwtype = $scrolled_map{$wtype} || (exists $ptk2tcltk{$wtype}? $ptk2tcltk{$wtype}->[0] : lc($wtype));
+    die "wrong 'scrolled' type $wtype --- $ptk2tcltk{$wtype}->[0]" unless $lwtype =~ /^[\w:]+$/;
     my %args = @_;
 
     # some widgets do their own scrolling... exclusions, exclusions.
@@ -2248,9 +2272,10 @@ sub Declare {
 my %created_w_packages; # (may be look in global stash %:: ?)
 sub create_widget_package {
     my $widgetname = shift;
+    $widgetname =~ tr/://d;
     unless (exists $created_w_packages{$widgetname}) {
 	$created_w_packages{$widgetname} = {};
-	die "not allowed widg name $widgetname" unless $widgetname=~/^\w+$/;
+	die "not allowed widget name $widgetname" unless $widgetname=~/^\w+$/;
 	{
 	    no strict 'refs';
 	    # create Widget package itself;
@@ -2297,6 +2322,7 @@ sub create_widget_package {
 # '" #syntax calm down
 sub create_method_in_widget_package {
     my $widgetname = shift;
+    $widgetname =~ tr/://d;
     create_widget_package($widgetname);
     while ($#_>0) {
 	my $widgetmethod = shift;

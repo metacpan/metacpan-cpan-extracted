@@ -22,7 +22,7 @@ use utf8;
 use open qw(:std :encoding(UTF-8));
 
 package App::PDFLibrarian::BibTeX;
-$App::PDFLibrarian::BibTeX::VERSION = '6.3.2';
+$App::PDFLibrarian::BibTeX::VERSION = '6.3.3';
 use parent 'Exporter';
 
 use Capture::Tiny;

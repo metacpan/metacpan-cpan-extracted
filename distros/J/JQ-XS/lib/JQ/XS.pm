@@ -25,7 +25,7 @@ BEGIN {
   require JSON::PP unless JSON::PP::Boolean->can('((');
 }
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 XSLoader::load('JQ::XS', $VERSION);
 

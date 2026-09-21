@@ -24,7 +24,7 @@ conflicts:
   Devel::Declare: '< 0.006004'
   indirect: '< 0.27'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ name: Devel-CallParser
 provides:
   Devel::CallParser:
     file: lib/Devel/CallParser.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Devel::CallChecker: '0.002'
   DynaLoader: '0'
@@ -45,5 +45,5 @@ requires:
   warnings: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.004'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.005'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

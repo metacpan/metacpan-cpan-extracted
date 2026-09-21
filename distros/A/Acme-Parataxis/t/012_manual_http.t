@@ -16,10 +16,12 @@ Acme::Parataxis::run(
                     Acme::Parataxis->await_read( $client, 1000 );
                     my $req;
                     sysread( $client, $req, 1024 );
-                    my $res = "HTTP/1.1 200 OK
-Content-Length: 2
+                    my $res = <<~'EOF';
+                    HTTP/1.1 200 OK
+                    Content-Length: 2
 
-HI";
+                    HI
+                    EOF
                     Acme::Parataxis->await_write( $client, 1000 );
                     syswrite( $client, $res );
                     $client->close();
@@ -27,10 +29,11 @@ HI";
             }
         );
         my $client = IO::Socket::INET->new( PeerAddr => '127.0.0.1', PeerPort => $port );
-        my $req    = "GET / HTTP/1.1
-Host: 127.0.0.1
+        my $req    = <<~'EOF';
+        GET / HTTP/1.1
+        Host: 127.0.0.1
 
-";
+        EOF
         Acme::Parataxis->await_write( $client, 1000 );
         syswrite( $client, $req );
         my $buf;
@@ -38,7 +41,7 @@ Host: 127.0.0.1
             Acme::Parataxis->await_read( $client, 1000 );
             sysread( $client, $buf, 1024 );
         };
-        like( $buf, qr/HI/, "Manual HTTP with eval works" );
+        like $buf, qr/HI/, 'Manual HTTP with eval works';
         $client->close();
         $listener->close();
         Acme::Parataxis::stop();

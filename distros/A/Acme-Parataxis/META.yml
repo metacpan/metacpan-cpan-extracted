@@ -1,7 +1,7 @@
 ---
 abstract: 'A dangerous hybrid of cooperative fibers and preemptive native threads'
 author:
-  - 'Sanko Robinson <sanko@cpan.org>'
+  - 'Sanko Robinson'
 build_requires:
   Test2::V1: '0'
 configure_requires:
@@ -22,7 +22,7 @@ configure_requires:
   Test2::V1: '0'
   perl: v5.40.0
 dynamic_config: 1
-generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150012'
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
 keywords: []
 license: artistic_2
 meta-spec:
@@ -37,7 +37,21 @@ no_index:
 provides:
   Acme::Parataxis:
     file: lib/Acme/Parataxis.pm
-    version: v0.0.10
+    version: v0.1.0
+  Acme::Parataxis::Channel:
+    file: lib/Acme/Parataxis/Channel.pm
+    version: v0.1.0
+  Acme::Parataxis::Future:
+    file: lib/Acme/Parataxis/Future.pm
+    version: v0.1.0
+  Acme::Parataxis::Semaphore:
+    file: lib/Acme/Parataxis/Semaphore.pm
+    version: v0.1.0
+  Acme::Parataxis::Semaphore::Guard:
+    file: lib/Acme/Parataxis/Semaphore.pm
+  Acme::Parataxis::Signal:
+    file: lib/Acme/Parataxis/Signal.pm
+    version: v0.1.0
 requires:
   Affix: v1.0.7
   File::Basename: '0'
@@ -47,7 +61,7 @@ resources:
   homepage: https://github.com/sanko/Acme-Parataxis.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/sanko/Acme-Parataxis.pm.git
-version: v0.0.10
+version: v0.1.0
 x_ignore:
   - .tidyallrc
   - .gitignore

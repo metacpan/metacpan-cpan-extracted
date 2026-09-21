@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__);
@@ -15,6 +15,14 @@ my $NATIVE_PARSE_REQUEST = \&parse_request;
     *parse_request = sub ($class, @args) {
         require Linux::Event::HTTP::Request;
         return $NATIVE_PARSE_REQUEST->($class, @args);
+    };
+}
+
+sub _raw_consumer_definition ($class) {
+    return {
+        provider           => \&_raw_consumer_operations_address,
+        abi_version        => 1,
+        operations_address => _raw_consumer_operations_address(),
     };
 }
 

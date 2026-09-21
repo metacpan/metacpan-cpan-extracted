@@ -8,7 +8,7 @@ use Carp qw(croak);
 use Linux::Event::IO::Sock::Listener;
 use Linux::Event::HTTP::Server::Connection;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub _load_connection_class ($class) {
     croak 'new(): connection_class must be a package name'

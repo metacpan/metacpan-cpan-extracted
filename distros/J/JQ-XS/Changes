@@ -1,5 +1,27 @@
 Revision history for Perl extension JQ::XS.
 
+2.03
+	- No change to the module itself.  Fixes building the distribution
+	  against Archive::Tar 3.x, which refuses to unpack the vendored jq
+	  tarball and so fails the build before it starts:
+
+	    No such file in archive: 'jq-1.8.2/docs/content/manual/v1.8/
+	    jq-1.8.2/docs/content/manual/manual.yml'
+
+	  jq's release tarball stores docs/content/manual/v1.8/manual.yml as
+	  a hard link to docs/content/manual/manual.yml.  Archive::Tar now
+	  defaults $EXTRACT_HARDLINK to 0 -- extracting a hard link chmods
+	  the inode it shares -- and re-extracts the target as a plain file
+	  rather than calling link(), but resolves that target relative to
+	  the link's own directory instead of the root of the archive, where
+	  tar anchors it; and extract_archive() streams, so the entry is not
+	  held in memory to be found either way.  vendor/build-jq.pl now
+	  reads the archive up front and dereferences hard links itself, and
+	  falls back to tar(1) if Archive::Tar fails regardless.
+	  vendor/jq-1.8.2.tar.gz is untouched and stays byte-for-byte jq's
+	  own release, which is what makes the sha256 beside it worth
+	  checking.  Reported by Andreas Koenig (GH #2).
+
 2.02
 	- Stop warning when another JSON module is loaded alongside JQ::XS.
 	  Cpanel::JSON::XS installs the JSON::PP::Boolean operators itself,

@@ -1,5 +1,10 @@
 Revision history for Shared::Arena
 
+0.12	2026-09-20
+        - FIXES a waker slot outliving its owner. Nothing released a slot when
+          a process was killed or _exits, so `live` stayed set for a process
+          that was gone and the next taker of that index was refused 
+
 0.11	2026-09-19
         - Add wake_init, wake_take, wake_fd and wake_drained to the C ABI (4).
         - Add map_incr_ttl to the C ABI and ttl => to Map->incr: a fixed window in one call.

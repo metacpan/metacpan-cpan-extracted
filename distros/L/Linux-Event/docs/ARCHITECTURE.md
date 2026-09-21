@@ -225,7 +225,9 @@ allowed to continue. Buffered unread input is then interpreted using the new
 parser. The transition cannot change the underlying resource category. When
 both source and target use native consumers, `transition_to()` may replace the
 provider at a safe callback/lifetime boundary while preserving the same native
-input buffer; adding or removing native-consumer mode remains rejected.
+input buffer. A native consumer may also retire into an ordinary Perl input
+sink using that same buffered-input and source-lifetime machinery. Adding a
+native consumer to an already-ordinary live Stream remains rejected.
 
 A connected stream socket therefore remains a connected stream socket across a
 protocol transition; only its application protocol/framing class changes.

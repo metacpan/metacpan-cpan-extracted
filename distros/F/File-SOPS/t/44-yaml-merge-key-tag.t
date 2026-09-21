@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 
 use File::SOPS;
 use File::SOPS::Backend::Age;
@@ -273,14 +273,14 @@ SKIP: {
     my $tempdir = tempdir(CLEANUP => 1);
     my ($public, $secret) = Crypt::Age->generate_keypair();
     my $keyfile = "$tempdir/age.key";
-    write_file($keyfile, "$secret\n");
+    write_binary($keyfile, "$secret\n");
     local $ENV{SOPS_AGE_KEY_FILE} = $keyfile;
 
     my $PLAIN = "base: &b\n  x: 1\nderived:\n  <<: *b\n  y: 2\n";
     my $TREE  = { base => { x => 1 }, derived => { '<<' => { x => 1 }, y => 2 } };
 
     subtest 'sops writes it -> File::SOPS reads it' => sub {
-        write_file("$tempdir/plain.yaml", $PLAIN);
+        write_binary("$tempdir/plain.yaml", $PLAIN);
         my $doc = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/plain.yaml 2>&1`;
         is($? >> 8, 0, 'sops -e accepts the merge document') or diag($doc);
 
@@ -303,7 +303,7 @@ SKIP: {
         );
         unlike($doc, qr/!!merge/, 'we write the untagged spelling');
 
-        write_file("$tempdir/ours.yaml", $doc);
+        write_binary("$tempdir/ours.yaml", $doc);
         my $out = `$sops_bin -d --input-type yaml --output-type yaml $tempdir/ours.yaml 2>&1`;
         is($? >> 8, 0, 'sops -d accepts it') or diag($out);
         like($out, qr/^\s*!!merge <<:/m,
@@ -319,12 +319,12 @@ SKIP: {
             recipients => [$public],
             format     => 'yaml',
         );
-        write_file("$tempdir/rot.yaml", $doc);
+        write_binary("$tempdir/rot.yaml", $doc);
 
         my $out = `$sops_bin rotate -i $tempdir/rot.yaml 2>&1`;
         is($? >> 8, 0, 'sops rotate -i') or diag($out);
 
-        my $back = read_file("$tempdir/rot.yaml");
+        my $back = read_binary("$tempdir/rot.yaml");
         like($back, qr/^\s*!!merge <<:/m, 'sops added the tag to our document');
 
         my $got = eval {

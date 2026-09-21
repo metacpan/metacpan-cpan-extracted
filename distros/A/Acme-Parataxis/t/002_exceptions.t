@@ -5,7 +5,6 @@ use Acme::Parataxis;
 use experimental 'class';
 $|++;
 #
-diag 'Testing exception handling in Acme::Parataxis fibers...';
 subtest 'Die inside coroutine, catch outside' => sub {
     my $fiber = Acme::Parataxis->new(
         code => sub {

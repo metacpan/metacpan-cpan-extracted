@@ -1,0 +1,26 @@
+Revision history for Linux::Event::WebSocket
+
+0.001  2026-09-20
+
+    First CPAN release.
+
+    - Add WebSocket client and server APIs for Linux::Event.
+    - Support ws:// and wss:// transports.
+    - Support text and binary messages, fragmentation, Ping/Pong, Close,
+      subprotocol negotiation, and configurable message-size limits.
+    - Require Linux::Event::HTTP 0.002 and use its native server-input Upgrade
+      path instead of the obsolete WebSocket-owned server HTTP byte bridge.
+    - Preserve the live Linux::Event Stream across HTTP Upgrade, including TLS,
+      queued output, application state, and post-101 bytes read in the same
+      transport operation.
+    - Use Linux::Event 0.116's raw native-consumer ABI for established
+      WebSocket input.
+    - Use a vendored, locally patched bq_websocket protocol core behind a
+      private XS adapter for RFC 6455 framing and message assembly.
+    - Validate inbound and outbound text against RFC 3629 in XS.
+    - Use Linux getrandom(2) for client masking keys.
+    - Keep Linux::Event responsible for sockets, epoll, TLS, buffering,
+      backpressure, timers, and lifecycle.
+    - Pass the production test suite on Perl 5.36 and 5.44.
+    - Pass the selected Autobahn client and server conformance set with zero
+      conformance failures.

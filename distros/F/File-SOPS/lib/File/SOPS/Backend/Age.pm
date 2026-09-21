@@ -1,6 +1,6 @@
 package File::SOPS::Backend::Age;
 # ABSTRACT: age encryption backend for SOPS
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 use Carp qw(croak);
 use Crypt::Age;
@@ -51,6 +51,22 @@ sub decrypt_data_key {
     croak "age_keys must be an array ref" unless ref($age_keys) eq 'ARRAY';
     croak "identities must be an array ref" unless ref($identities) eq 'ARRAY';
 
+    # k192 / CVE-2026-85783 -- Crypt::Age's per-blob stanza DoS (capped upstream
+    # in 0.004) is amplified on this path: the loop below tries every age entry
+    # in the document, and each try costs an X25519 scalar multiplication per
+    # stanza before the header is authenticated, so a document carrying many age
+    # entries multiplies the cost by entries x stanzas x identities. Nothing
+    # before us bounds the entry count, so bound it here, ahead of any age work.
+    # 64 is a deliberately conservative default -- real documents carry a handful
+    # of recipients; a caller that legitimately has more may raise it.
+    my $max_stanzas = $args{max_stanzas} // 64;
+    _check_max_stanzas($args{max_stanzas});
+    croak sprintf(
+        "SOPS document has %d age stanzas, exceeding the max_stanzas limit of %d; refusing to decrypt",
+        scalar(@$age_keys),
+        $max_stanzas,
+    ) if @$age_keys > $max_stanzas;
+
     # The data key the SOPS data path consumes is exactly 32 bytes -- the
     # AES-256 key every value in the document is encrypted under. A short
     # return is silently accepted by CryptX as a working AES-128/192 key
@@ -99,16 +115,36 @@ sub can_decrypt {
     return 0 unless ref($age_keys) eq 'ARRAY' && @$age_keys;
     return 0 unless ref($identities) eq 'ARRAY' && @$identities;
 
+    # A bad max_stanzas is a caller error, not a "can't decrypt" answer: validate
+    # it here, ahead of the eval below, so it croaks clearly instead of being
+    # swallowed into a false result (k200).
+    _check_max_stanzas($args{max_stanzas});
+
     my $data_key = eval {
         $class->decrypt_data_key(
-            age_keys   => $age_keys,
-            identities => $identities,
+            age_keys    => $age_keys,
+            identities  => $identities,
+            max_stanzas => $args{max_stanzas},
         );
     };
 
     return defined $data_key ? 1 : 0;
 }
 
+
+# k200 -- validate max_stanzas the way Crypt::Age does (a positive integer),
+# ahead of the count guard. Absent/undef means the default and is not an error
+# here (unlike Crypt::Age); a defined non-positive-integer is. Without this,
+# max_stanzas => 0/negative refuses every non-empty document with a confusing
+# "exceeding the limit" message, and a non-numeric value numifies to 0 with a
+# Perl warning. The message names neither recipients nor blobs.
+sub _check_max_stanzas {
+    my ($max_stanzas) = @_;
+    return unless defined $max_stanzas;
+    croak "max_stanzas must be a positive integer"
+        unless $max_stanzas =~ m{\A[0-9]+\z} && $max_stanzas > 0;
+    return;
+}
 
 sub _armor {
     my ($data) = @_;
@@ -155,7 +191,7 @@ File::SOPS::Backend::Age - age encryption backend for SOPS
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -231,6 +267,15 @@ the SOPS metadata (as returned by L</encrypt_data_key>).
 The C<identities> parameter must be an ArrayRef of age secret keys (e.g.,
 C<AGE-SECRET-KEY-1QYQSZQGPQYQSZQGPQYQSZQGPQYQSZQGPQYQSZQGPQYQSZ...>).
 
+The optional C<max_stanzas> parameter bounds the number of age stanzas (entries
+in the document's C<sops.age> list) that will be attempted, and defaults to
+B<64> -- a deliberately conservative limit. A document presenting more age
+stanzas than this is refused with a C<croak> before any of them is decrypted,
+because each attempt costs work before the age header is authenticated
+(CVE-2026-85783). Raise it explicitly for a document that legitimately carries
+more recipients. A C<max_stanzas> that is defined but not a positive integer is
+a caller error and C<croak>s before any document is inspected.
+
 Tries each encrypted key until one can be decrypted with the provided identities.
 
 Returns the decrypted data key (32 bytes) on success.
@@ -250,7 +295,13 @@ Class method to check if any of the provided identities can decrypt the data key
 
 Returns true if decryption is possible, false otherwise.
 
-This is a non-throwing version of L</decrypt_data_key>.
+The optional C<max_stanzas> parameter is forwarded to L</decrypt_data_key> and
+carries the same meaning and default (B<64>): an over-limit document answers
+false rather than throwing. As with L</decrypt_data_key>, a C<max_stanzas> that
+is defined but not a positive integer is a caller error and C<croak>s.
+
+This is a non-throwing version of L</decrypt_data_key> for the decryption
+outcome; a malformed C<max_stanzas> argument still C<croak>s.
 
 =head1 SEE ALSO
 

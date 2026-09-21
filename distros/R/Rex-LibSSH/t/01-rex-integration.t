@@ -30,6 +30,7 @@ Rex::connect(
     private_key => $srv->client_key,
     public_key  => $srv->client_key . '.pub',
     auth_type   => 'key',
+    knownhosts  => $srv->known_hosts,
 );
 
 # --- run ---

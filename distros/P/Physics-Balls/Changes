@@ -1,5 +1,9 @@
 Revision history for Physics::Balls
 
+0.05	2026-09-20
+        - The lane fixtures are read in ulps of a double and not bit for bit: a long double perl parses their decimals to a wider number, and a compiler the prototype was not recorded on lands an ulp away
+        - t/11-kinds.t to Test2::Bundle::Numerical
+
 0.04	2026-09-18
         - A kind may give a body its radius, mass, friction multiplier, a sweep radius against its own kind and a speed above which it is down: for example a bowling ball among pins
         - A shot may carry a release roll off its line, the hook

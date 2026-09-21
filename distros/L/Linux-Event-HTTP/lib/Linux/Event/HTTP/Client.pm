@@ -13,7 +13,7 @@ use Linux::Event::HTTP::Client::Operation;
 use Linux::Event::HTTP::Request;
 use Linux::Event::HTTP::_ClientAuth ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my %CALLBACK = map { $_ => 1 } qw(
     on_response on_body on_complete on_error on_informational on_redirect

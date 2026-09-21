@@ -1,0 +1,94 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+AWS::Signature::V4::Error - Throw the errors of AWS::Signature::V4
+
+
+=head1 VERSION
+
+This module is part of the L<AWS::Signature::V4> distribution and shares
+its version.
+
+
+=head1 SYNOPSIS
+
+   use AWS::Signature::V4::Error qw< fail shown >;
+
+   fail 400, 'missing parameter "url"';
+   fail 400, 'bad option', {option => 'foo', got => $value};    # data for logs
+
+
+=head1 DESCRIPTION
+
+B<This module is internal: you are not supposed to use it.> It is what the
+modules of the distribution use to throw L<Ouch> exceptions, see
+L<AWS::Signature::V4/ERRORS> for what the callers can expect.
+
+It exists to do two things that a bare C<ouch> would not do: report the
+error at the line of the caller, like C<croak>, and keep the arguments of
+the calls out of the backtrace kept by the exception, because they can
+include secrets like passwords and tokens.
+
+
+=head1 INTERFACE
+
+=head2 fail
+
+   fail $code, $message;
+   fail $code, $message, $data;
+
+Throw an L<Ouch> exception. All arguments go to C<ouch> as they are.
+
+The code is C<400> when the problem is in what the caller provided, C<500>
+when it is in the module itself.
+
+The optional C<$data> is kept by the exception and is available with
+C<< $@->data >> (and C<< $@->hashref >>), but it is not part of the
+message, so it is not shown by just printing the error. Use it for the
+details that are useful in a log, e.g. what was received, and keep it
+out of what is shown to end users. It is also kept out of the backtrace:
+the exception stores C<$data> itself, but the arguments of the calls are
+not recorded in C<< $@->trace >>, so they can safely carry secrets.
+
+Nothing in the distribution passes C<$data> at the moment, but it is part
+of the interface and you can rely on it being passed through.
+
+
+=head2 shown
+
+   fail 400, 'unknown checksum ' . shown($name);
+
+Return a value provided by the caller in a form that is safe to put in a
+message: every character that is not printable ASCII is escaped as
+C<\x{...}>, so that the message cannot forge lines in a log; C<undef>
+becomes the string C<undef>.
+
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

@@ -1,5 +1,5 @@
 ---
-abstract: 'error reporting client for a ForgeOps instance'
+abstract: 'error reporting client for ForgeOps'
 author:
   - 'ForgeOps <support@getforgeops.net>'
 build_requires:
@@ -24,5 +24,5 @@ resources:
   bugtracker: https://github.com/Luke-Popwell/forge-ops-tracker-perl/issues
   homepage: https://getforgeops.net
   repository: https://github.com/Luke-Popwell/forge-ops-tracker-perl.git
-version: v0.6.0
+version: v0.7.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

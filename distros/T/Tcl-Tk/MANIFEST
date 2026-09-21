@@ -3,7 +3,7 @@ Changes		changes file
 test-for-tk.tcl	check if existing Tcl/Tk installation fits
 MANIFEST	This list of files
 Makefile.PL	Tcl::Tk extension makefile writer
-README		Introduction to the Tcl::Tk extension
+README.md	Introduction to the Tcl::Tk extension
 lib/Tcl/Tk.pm	Tcl::Tk extension module
 lib/Tcl/Fallback/snit1.pm	pure-tcl code, in case it isn't found in tcl/tk
 lib/Tcl/Fallback/scrollw.pm	pure-tcl code, in case it isn't found in tcl/tk
@@ -18,6 +18,7 @@ t/folder.xpm
 t/ptk-compat.t	file to check for perlTk compatibility
 t/Tk.xbm
 t/tk-mw.t
+t/ttk_widgets.t
 t/Xcamel.gif
 t/text.t
 t/canvas.t

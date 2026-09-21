@@ -1,0 +1,62 @@
+---
+abstract: 'WebSocket client and server for Linux::Event'
+author:
+  - 'Joshua S. Day <hax@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-Event-WebSocket
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Linux::Event::WebSocket::_BQ
+    - Linux::Event::WebSocket::_Engine
+    - Linux::Event::WebSocket::_Frame
+    - Linux::Event::WebSocket::_Handshake
+    - Linux::Event::WebSocket::_Parser
+    - Linux::Event::WebSocket::_Random
+    - Linux::Event::WebSocket::_State
+    - Linux::Event::WebSocket::_UTF8
+    - Linux::Event::WebSocket::Client::_HTTPConnection
+    - Linux::Event::WebSocket::Server::_HTTPConnection
+provides:
+  Linux::Event::WebSocket:
+    file: lib/Linux/Event/WebSocket.pm
+    version: '0.001'
+  Linux::Event::WebSocket::Client:
+    file: lib/Linux/Event/WebSocket/Client.pm
+    version: '0.001'
+  Linux::Event::WebSocket::Client::Connection:
+    file: lib/Linux/Event/WebSocket/Client/Connection.pm
+    version: '0.001'
+  Linux::Event::WebSocket::Connection:
+    file: lib/Linux/Event/WebSocket/Connection.pm
+    version: '0.001'
+  Linux::Event::WebSocket::Server:
+    file: lib/Linux/Event/WebSocket/Server.pm
+    version: '0.001'
+  Linux::Event::WebSocket::Server::Connection:
+    file: lib/Linux/Event/WebSocket/Server/Connection.pm
+    version: '0.001'
+requires:
+  Digest::SHA: '0'
+  Linux::Event: '0.116'
+  Linux::Event::HTTP: '0.002'
+  MIME::Base64: '0'
+  URI: '0'
+  perl: '5.036000'
+resources:
+  bugtracker: https://github.com/haxmeister/perl-Linux-Event-WebSocket/issues
+  repository: https://github.com/haxmeister/perl-Linux-Event-WebSocket.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

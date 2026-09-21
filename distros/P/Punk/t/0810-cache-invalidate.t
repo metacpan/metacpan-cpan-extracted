@@ -145,8 +145,8 @@ my @VARIANTS = (
 for my $variant (@VARIANTS) {
 SKIP: {
     my $LABEL = $variant->{label};
-    skip 'fork is POSIX-only here', 4 if $^O eq 'MSWin32';
-    skip 'this Hyperman has no message bus', 4
+    skip 'fork is POSIX-only here', 5 if $^O eq 'MSWin32';
+    skip 'this Hyperman has no message bus', 5
         unless eval { require Hyperman; Hyperman->can('bus_init') };
 
     my $port  = 26900 + (($$ + ($variant->{tier} ? 151 : 0)) % 300);
@@ -253,13 +253,19 @@ SKIP: {
     SKIP: {
         skip 'every request landed on one worker; this machine will not '
            . 'spread them, so nothing here could distinguish a working '
-           . 'invalidation from a single-worker cache', 4
+           . 'invalidation from a single-worker cache', 5
             if keys %warmed < 2;
 
         is(scalar(grep { $fetch->('/read') =~ /:original\z/ } 1 .. 6), 6,
             "$LABEL: every worker is serving the cached original");
 
-        $fetch->("/write/updated");
+        # ASSERTED, not fired and forgotten. A write that never landed leaves
+        # the truth unchanged and nothing published, so every read below comes
+        # back stale - which is indistinguishable, in a smoker's report, from a
+        # pool that heard the invalidation and ignored it. One assertion here
+        # tells those two apart before anybody goes looking.
+        like($fetch->("/write/updated"), qr/:wrote\z/,
+            "$LABEL: the write request reached a worker");
 
         # Converged WITHIN A BOUND, not instantly. Invalidation is
         # asynchronous and best effort by design - the message has to reach

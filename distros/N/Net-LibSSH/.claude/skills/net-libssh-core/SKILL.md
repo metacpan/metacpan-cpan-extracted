@@ -28,7 +28,7 @@ API in here — no put, no get, no scp; `Rex::LibSSH` builds its own on top of `
 SFTP exists as an optional extra and degrades to `undef` rather than dying. If a code path in here ever makes SFTP
 mandatory, the distribution has lost the thing it exists for.
 
-Downstream consumer: `Rex::LibSSH` (`~/dev/perl/getty-rex-libssh`), which reimplements
+Downstream consumer: `Rex::LibSSH` (`~/dev/perl/rex-libssh`), which reimplements
 Rex's four connection interfaces on top of this module, for Hetzner dedicated
 servers whose sshd ships without `Subsystem sftp`. `Rex::LibSSH` pins this
 distribution in its `cpanfile`, so a behaviour change here reaches its deploys.

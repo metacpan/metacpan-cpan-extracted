@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 
 use File::SOPS;
 use File::SOPS::Encrypted;
@@ -77,7 +77,7 @@ sub scratch {
 sub editor_replacing {
     my ($from, $to) = @_;
     my $path = "$tempdir/editor-" . ++$serial . ".pl";
-    write_file($path, <<"PERL");
+    write_binary($path, <<"PERL");
 #!/usr/bin/env perl
 use strict; use warnings;
 my \$file = shift or die "no file";
@@ -180,7 +180,7 @@ subtest 'a plaintext this library emitted parses back to what it emitted' => sub
 subtest 'an encrypted slot is written as the type:float sops gives it' => sub {
     for my $token (sort keys %SOPS_WRITES) {
         my $dir = scratch();
-        write_file("$dir/p.yaml", "secret: $token\nkeep_unencrypted: 1\n");
+        write_binary("$dir/p.yaml", "secret: $token\nkeep_unencrypted: 1\n");
 
         my $ok = eval {
             File::SOPS->encrypt_file(input      => "$dir/p.yaml",
@@ -191,7 +191,7 @@ subtest 'an encrypted slot is written as the type:float sops gives it' => sub {
         ok($ok, "[$token] written in an encrypted slot") or do {
             diag($@); next };
 
-        my $document = scalar read_file("$dir/e.yaml");
+        my $document = read_binary("$dir/e.yaml");
         like($document, qr/^secret: ENC\[.*type:float\]$/m,
             "[$token] as type:float, which is what sops writes");
         unlike($document, qr/^secret: ENC\[.*type:str\]$/m,
@@ -302,12 +302,12 @@ SKIP: {
         unless $sops_bin;
 
     my $keyfile = "$tempdir/age.key";
-    write_file($keyfile, "$secret\n");
+    write_binary($keyfile, "$secret\n");
     local $ENV{SOPS_AGE_KEY_FILE} = $keyfile;
 
     my $encrypt_with_sops = sub {
         my ($dir, $plaintext) = @_;
-        write_file("$dir/p.yaml", $plaintext);
+        write_binary("$dir/p.yaml", $plaintext);
         my $enc = `$sops_bin -e --age $public --input-type yaml --output-type yaml $dir/p.yaml 2>&1`;
         return ($? >> 8, $enc);
     };
@@ -318,7 +318,7 @@ SKIP: {
             my ($status, $enc) =
                 $encrypt_with_sops->($dir, "keep: x\nv_unencrypted: $token\n");
             is($status, 0, "[$token] sops -e") or diag($enc);
-            write_file("$dir/e.yaml", $enc);
+            write_binary("$dir/e.yaml", $enc);
 
             local $ENV{EDITOR} = editor_replacing('keep: x', 'keep: y');
             my $rewritten = eval {
@@ -329,7 +329,7 @@ SKIP: {
                 or diag($err);
             next unless $rewritten;
 
-            my ($wire) = read_file("$dir/e.yaml") =~ /^v_unencrypted: (.*)$/m;
+            my ($wire) = read_binary("$dir/e.yaml") =~ /^v_unencrypted: (.*)$/m;
             is($wire, $token, "[$token] the leaf is byte-identical to sops's");
 
             my $out = `$sops_bin -d --input-type yaml --output-type yaml $dir/e.yaml 2>&1`;
@@ -352,7 +352,7 @@ SKIP: {
             my ($status, $enc) =
                 $encrypt_with_sops->($dir, "keep: x\nv_unencrypted: .inf\n");
             is($status, 0, "[$label] sops -e") or diag($enc);
-            write_file("$dir/e.yaml", $enc);
+            write_binary("$dir/e.yaml", $enc);
 
             local $ENV{EDITOR} = editor_replacing($from, $to);
             my $rewritten = eval {
@@ -381,12 +381,12 @@ SKIP: {
             my ($status, $enc) =
                 $encrypt_with_sops->($dir, "keep: x\nv_unencrypted: $token\n");
             is($status, 0, "[$token] sops -e") or diag($enc);
-            write_file("$dir/e.yaml", $enc);
+            write_binary("$dir/e.yaml", $enc);
 
             File::SOPS->decrypt_file(input      => "$dir/e.yaml",
                                      output     => "$dir/plain.yaml",
                                      identities => [$secret]);
-            like(scalar read_file("$dir/plain.yaml"),
+            like(read_binary("$dir/plain.yaml"),
                 qr/^v_unencrypted: \Q$token\E$/m,
                 "[$token] decrypt_file writes the token sops -d writes");
 
@@ -400,7 +400,7 @@ SKIP: {
                 or diag($@);
             next unless $ok;
 
-            my ($wire) = read_file("$dir/re.yaml") =~ /^v_unencrypted: (.*)$/m;
+            my ($wire) = read_binary("$dir/re.yaml") =~ /^v_unencrypted: (.*)$/m;
             is($wire, $token, "[$token] and writes the same token back");
 
             my $out = `$sops_bin -d --input-type yaml --output-type yaml $dir/re.yaml 2>&1`;
@@ -421,7 +421,7 @@ SKIP: {
     subtest 'all twelve spellings encrypt from a plaintext and sops reads them' => sub {
         for my $token (sort keys %GO_RESOLVES) {
             my $dir = scratch();
-            write_file("$dir/p.yaml", "keep: x\nv_unencrypted: $token\n");
+            write_binary("$dir/p.yaml", "keep: x\nv_unencrypted: $token\n");
 
             my $ok = eval {
                 File::SOPS->encrypt_file(input      => "$dir/p.yaml",
@@ -432,7 +432,7 @@ SKIP: {
             ok($ok, "[$token] encrypt_file writes it") or diag($@);
             next unless $ok;
 
-            my ($wire) = read_file("$dir/e.yaml") =~ /^v_unencrypted: (.*)$/m;
+            my ($wire) = read_binary("$dir/e.yaml") =~ /^v_unencrypted: (.*)$/m;
             is($wire, $token, "[$token] our wire keeps the source spelling");
 
             my $out = `$sops_bin -d --input-type yaml --output-type yaml $dir/e.yaml 2>&1`;
@@ -467,8 +467,8 @@ SKIP: {
         like($enc, qr/^secret: ENC\[.*type:float\]$/m,
             'sops stores it as a type:float');
 
-        write_file("$dir/ours.yaml", $enc);
-        write_file("$dir/theirs.yaml", $enc);
+        write_binary("$dir/ours.yaml", $enc);
+        write_binary("$dir/theirs.yaml", $enc);
 
         local $ENV{EDITOR} = editor_replacing('keep: x', 'keep: y');
         my $rewritten = eval {
@@ -476,10 +476,10 @@ SKIP: {
         };
         ok($rewritten, 'edit saves the change instead of refusing') or diag($@);
 
-        like(scalar read_file("$dir/ours.yaml"),
+        like(read_binary("$dir/ours.yaml"),
             qr/^secret: ENC\[.*type:float\]$/m,
             'and the leaf it never touched is still a type:float');
-        unlike(scalar read_file("$dir/ours.yaml"),
+        unlike(read_binary("$dir/ours.yaml"),
             qr/^secret: ENC\[.*type:str\]$/m,
             'not silently a type:str, which is the defect k134 named');
 
@@ -491,7 +491,7 @@ SKIP: {
 
         my $theirs = `$sops_bin edit $dir/theirs.yaml 2>&1`;
         is($? >> 8, 0, 'sops edit on the same document') or diag($theirs);
-        like(scalar read_file("$dir/theirs.yaml"),
+        like(read_binary("$dir/theirs.yaml"),
             qr/^secret: ENC\[.*type:float\]$/m,
             'keeps it a type:float -- the same answer we now give');
     };

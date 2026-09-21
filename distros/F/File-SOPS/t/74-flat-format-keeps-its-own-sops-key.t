@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 
 use File::SOPS;
 use File::SOPS::Format::ENV;
@@ -59,7 +59,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my $tempdir = tempdir(CLEANUP => 1);
 my ($public, $secret) = Crypt::Age->generate_keypair();
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 sub exception {
@@ -105,7 +105,7 @@ subtest 'ENV accepts a top-level `sops` data key' => sub {
 
 subtest 'ENV encrypt_file writes the file and decrypt_file reads it back' => sub {
     my $plain = "sops=mine\nother=kept\n";
-    write_file("$tempdir/with-sops.env", $plain);
+    write_binary("$tempdir/with-sops.env", $plain);
 
     my $enc = "$tempdir/with-sops.enc.env";
     File::SOPS->encrypt_file(
@@ -115,7 +115,7 @@ subtest 'ENV encrypt_file writes the file and decrypt_file reads it back' => sub
     );
 
     # The wire has the encrypted `sops` line and the metadata section.
-    my $document = read_file($enc);
+    my $document = read_binary($enc);
     like($document, qr/^sops=ENC\[/m,
         'encrypt_file writes `sops` as encrypted data, like encrypt() does');
 
@@ -130,7 +130,7 @@ subtest 'ENV encrypt_file writes the file and decrypt_file reads it back' => sub
         identities => [$secret],
     );
     my %back = map { /\A([^=]*)=(.*)\z/s ? ($1 => $2) : () }
-               grep { !/\A#/ } split /\n/, read_file($back);
+               grep { !/\A#/ } split /\n/, read_binary($back);
     is($back{sops},  'mine', 'the `sops` data key decrypts back');
     is($back{other}, 'kept', 'and so does `other`');
 };
@@ -194,7 +194,7 @@ subtest 'rotate on an env file with `sops=1` works end to end' => sub {
     );
 
     my $file = "$tempdir/rotate.env";
-    write_file($file, $encrypted);
+    write_binary($file, $encrypted);
 
     # Before the fix this croaked with _sops_key_reserved('data'), pointing the
     # caller at the rotate method that had just refused them.
@@ -202,7 +202,7 @@ subtest 'rotate on an env file with `sops=1` works end to end' => sub {
     ok($ok, 'rotate completes') or diag("died: $@");
 
     # The rotated document still decrypts and still holds the `sops` data key.
-    my $after = read_file($file);
+    my $after = read_binary($file);
     my $back  = File::SOPS->decrypt(
         encrypted => $after, identities => [$secret]);
     is($back->{sops},  '1',   'the `sops` data key survives the rotate');
@@ -227,7 +227,7 @@ subtest 'encrypt_in_place on env plaintext with `sops=` works' => sub {
     # fix.
     my $plain = "sops=mine\nother=kept\n";
     my $file = "$tempdir/inplace.env";
-    write_file($file, $plain);
+    write_binary($file, $plain);
 
     my $ok = eval {
         File::SOPS->encrypt_in_place(
@@ -236,7 +236,7 @@ subtest 'encrypt_in_place on env plaintext with `sops=` works' => sub {
     };
     ok($ok, 'encrypt_in_place completes') or diag("died: $@");
 
-    my $after = read_file($file);
+    my $after = read_binary($file);
     like($after, qr/^sops=ENC\[/m,
         'and the file on disk has `sops` encrypted as a data value');
 
@@ -277,7 +277,7 @@ subtest 'the YAML/JSON error message no longer names its own caller' => sub {
         format     => 'yaml',
     );
     my $file = "$tempdir/yaml.enc.yaml";
-    write_file($file, $encrypted);
+    write_binary($file, $encrypted);
 
     my $err2 = exception(sub {
         File::SOPS->encrypt_file(
@@ -318,7 +318,7 @@ SKIP: {
             recipients => [$public],
             format     => 'env',
         );
-        write_file("$tempdir/lib.env", $document);
+        write_binary("$tempdir/lib.env", $document);
 
         my $out = `$sops_bin -d $tempdir/lib.env 2>&1`;
         is($?, 0, 'sops -d exits 0') or diag("sops said: $out");
@@ -331,7 +331,7 @@ SKIP: {
 
     subtest 'this library reads a sops-encrypted env file with `sops=1`' => sub {
         # Round-trip the other way: sops encrypts, this library decrypts.
-        write_file("$tempdir/sk.env", "sops=1\nother=kept\n");
+        write_binary("$tempdir/sk.env", "sops=1\nother=kept\n");
         my ($rc, $out) = sops_run('-e', '--age', $public,
             "$tempdir/sk.env", '>', "$tempdir/sk.enc.env");
         is($rc, 0, 'sops -e wrote the env file') or diag($out);
@@ -340,7 +340,7 @@ SKIP: {
         # call below stores the content in a scalar first. Inline `read_file`
         # as an argument expands each line into a separate arg, and the last
         # `identities` ends up bound to the wrong key in %args.
-        my $content = read_file("$tempdir/sk.enc.env");
+        my $content = read_binary("$tempdir/sk.enc.env");
         my $data = File::SOPS->decrypt(
             encrypted  => $content,
             identities => [$secret],
@@ -352,7 +352,7 @@ SKIP: {
     subtest 'the round-tripped file is byte-stable across a rotate' => sub {
         # Rotate an env file sops wrote with a `sops` data key, then hand it
         # back to sops. Both sides must agree on the result.
-        write_file("$tempdir/sk.env", "sops=1\nother=kept\n");
+        write_binary("$tempdir/sk.env", "sops=1\nother=kept\n");
         my ($rc, $out) = sops_run('-e', '--age', $public,
             "$tempdir/sk.env", '>', "$tempdir/sk.enc.env");
         is($rc, 0, 'sops -e wrote the env file') or diag($out);

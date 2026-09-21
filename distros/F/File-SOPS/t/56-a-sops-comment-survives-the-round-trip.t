@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 
 use File::SOPS;
 use File::SOPS::Encrypted;
@@ -59,7 +59,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my $tempdir = tempdir(CLEANUP => 1);
 my ($public, $secret) = Crypt::Age->generate_keypair();
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 # The MAC's own plaintext: the SHA-512 hex string sops stores, decrypted. Two
@@ -213,10 +213,10 @@ map:
 YAML
 
     subtest 'a sops document with comments is read, MAC and all' => sub {
-        write_file("$tempdir/all.plain.yaml", $PLAIN);
+        write_binary("$tempdir/all.plain.yaml", $PLAIN);
         my $enc = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/all.plain.yaml 2>&1`;
         is($? >> 8, 0, 'sops -e writes the document') or diag($enc);
-        write_file("$tempdir/all.enc.yaml", $enc);
+        write_binary("$tempdir/all.enc.yaml", $enc);
 
         is(scalar(() = $enc =~ /^\s*- ENC\[AES256_GCM,[^\]]*,type:comment\]$/mg),
             4, 'four of the five comments became sequence ELEMENTS');
@@ -250,10 +250,10 @@ YAML
 
     subtest 'and written back, sops reads what sops wrote' => sub {
         my $tree = File::SOPS->decrypt(
-            encrypted => scalar read_file("$tempdir/all.enc.yaml"),
+            encrypted => read_binary("$tempdir/all.enc.yaml"),
             identities => [$secret]);
 
-        write_file("$tempdir/all.rt.yaml", File::SOPS->encrypt(
+        write_binary("$tempdir/all.rt.yaml", File::SOPS->encrypt(
             data => $tree, recipients => [$public], format => 'yaml'));
 
         my $ours = `$sops_bin -d --input-type yaml --output-type yaml $tempdir/all.rt.yaml 2>&1`;
@@ -296,7 +296,7 @@ YAML
                 'one',
             ], plain => 'x' },
             recipients => [$public], format => 'yaml');
-        write_file("$tempdir/fresh.enc.yaml", $doc);
+        write_binary("$tempdir/fresh.enc.yaml", $doc);
 
         my $out = `$sops_bin -d --input-type yaml --output-type yaml $tempdir/fresh.enc.yaml 2>&1`;
         is($? >> 8, 0, 'sops -d reads it -- MAC included') or diag($out);
@@ -308,7 +308,7 @@ YAML
         # stays one sops reads.
         ok(File::SOPS->rotate(file => "$tempdir/fresh.enc.yaml",
             identities => [$secret]), 'rotate re-keys the document');
-        isnt(scalar read_file("$tempdir/fresh.enc.yaml"), $doc, 'writing a new one');
+        isnt(read_binary("$tempdir/fresh.enc.yaml"), $doc, 'writing a new one');
 
         my $after = `$sops_bin -d --input-type yaml --output-type yaml $tempdir/fresh.enc.yaml 2>&1`;
         is($? >> 8, 0, 'which sops still reads') or diag($after);
@@ -316,7 +316,7 @@ YAML
 
         # The encoding half, against the binary: a non-ASCII comment reaches
         # sops as UTF-8 and comes back out of it unchanged (docs/adr/0003).
-        write_file("$tempdir/u.enc.yaml", File::SOPS->encrypt(
+        write_binary("$tempdir/u.enc.yaml", File::SOPS->encrypt(
             data => { list => [
                 File::SOPS::Comment->new(text => " caf\x{e9} \x{263a}"), 'one',
             ] },
@@ -337,11 +337,11 @@ YAML
         # never covered by ADR 0024's guard, so k108's defect was open in
         # JSON the whole time: measured at that HEAD, ignore_mac => 1 returned
         # { list => [' a comment', 'one'] }.
-        write_file("$tempdir/j.plain.yaml", "list:\n  # a json comment\n  - one\n");
+        write_binary("$tempdir/j.plain.yaml", "list:\n  # a json comment\n  - one\n");
         my $enc = `$sops_bin -e --age $public --input-type yaml --output-type json $tempdir/j.plain.yaml 2>&1`;
         is($? >> 8, 0, 'sops -e writes JSON') or diag($enc);
         like($enc, qr/,type:comment\]/, 'with a comment leaf in it');
-        write_file("$tempdir/j.enc.json", $enc);
+        write_binary("$tempdir/j.enc.json", $enc);
 
         my $got = eval { File::SOPS->decrypt(
             encrypted => $enc, identities => [$secret], format => 'json') };
@@ -351,11 +351,11 @@ YAML
         is($got->{list}[0]->text, ' a json comment', 'is the comment');
         is($got->{list}[1], 'one', 'and the value is the value');
 
-        write_file("$tempdir/j.rt.json", File::SOPS->encrypt(
+        write_binary("$tempdir/j.rt.json", File::SOPS->encrypt(
             data => $got, recipients => [$public], format => 'json'));
         my $out = `$sops_bin -d --input-type json --output-type json $tempdir/j.rt.json 2>&1`;
         is($? >> 8, 0, 'sops reads our re-encryption') or diag($out);
-        like(scalar read_file("$tempdir/j.rt.json"), qr/,type:comment\]/,
+        like(read_binary("$tempdir/j.rt.json"), qr/,type:comment\]/,
             'which still carries the comment leaf');
         # JSON has no comment syntax, so sops drops it on OUTPUT -- exactly as
         # it does for its own file. The leaf survives in the document; only the

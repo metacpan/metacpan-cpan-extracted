@@ -1,6 +1,6 @@
 package File::SOPS::Metadata;
 # ABSTRACT: SOPS metadata section handling
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moo;
 use Carp qw(croak);
 use POSIX qw(strftime);
@@ -1075,7 +1075,7 @@ File::SOPS::Metadata - SOPS metadata section handling
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

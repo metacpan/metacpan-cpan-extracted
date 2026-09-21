@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use YAML::XS qw(Load);
 
 use File::SOPS;
@@ -45,7 +45,7 @@ sub plaintext_file {
     my ($content, %args) = @_;
     my $sub  = $args{dir} // scratch();
     my $file = "$sub/" . ($args{name} // 'secrets.yaml');
-    write_file($file, $content);
+    write_binary($file, $content);
     return $file;
 }
 
@@ -55,7 +55,7 @@ sub encrypted_file {
     my $file = "$sub/" . (delete $args{name} // 'secrets.yaml');
     delete $args{dir};
 
-    write_file($file, File::SOPS->encrypt(
+    write_binary($file, File::SOPS->encrypt(
         recipients => [$public],
         format     => 'yaml',
         %args,
@@ -88,7 +88,7 @@ sub error_from {
 sub editor {
     my ($name, $body) = @_;
     my $script = "$dir/editor-$name.pl";
-    write_file($script, <<"PERL");
+    write_binary($script, <<"PERL");
 use strict;
 use warnings;
 my \$file = \$ARGV[-1];
@@ -106,7 +106,7 @@ subtest 'encrypt_in_place encrypts a file over itself' => sub {
     ok(File::SOPS->encrypt_in_place(file => $file, recipients => [$public]),
         'returns true');
 
-    my $content = read_file($file);
+    my $content = read_binary($file);
     like($content, qr/password: ENC\[AES256_GCM,/, 'the value is encrypted');
     like($content, qr/^sops:/m, 'and the metadata section is there');
 
@@ -133,7 +133,7 @@ subtest 'encrypt_in_place keeps the permissions the file had' => sub {
 
 subtest 'encrypt_in_place refuses an already encrypted file' => sub {
     my $file  = encrypted_file(data => { secret => 'shh' });
-    my $before = read_file($file);
+    my $before = read_binary($file);
 
     my $err = error_from(sub {
         File::SOPS->encrypt_in_place(file => $file, recipients => [$public])
@@ -142,7 +142,7 @@ subtest 'encrypt_in_place refuses an already encrypted file' => sub {
     like($err, qr/top-level 'sops' entry/,
         'refuses rather than encrypting the ENC[...] strings a second time');
     like($err, qr/\bedit\b/, 'and says which method to use instead');
-    is(read_file($file), $before, 'the file is untouched');
+    is(read_binary($file), $before, 'the file is untouched');
     is_deeply([strays($file)], [], 'and nothing was left in the directory');
 };
 
@@ -155,7 +155,7 @@ subtest 'encrypt_in_place leaves the file alone when encryption fails' => sub {
     });
 
     ok($err, 'a bad recipient is an error');
-    is(read_file($file), $plain,
+    is(read_binary($file), $plain,
         'and the plaintext file is exactly as it was')
         or diag('a failure after the file is opened for writing destroys it');
     is_deeply([strays($file)], [], 'no half-written temporary file');
@@ -170,7 +170,7 @@ subtest 'encrypt_in_place passes the encryption rules through' => sub {
         encrypted_suffix => '_enc',
     );
 
-    my $content = read_file($file);
+    my $content = read_binary($file);
     like($content, qr/^password_enc: ENC\[/m, 'the rule was applied');
     like($content, qr/^host: db\.example$/m,  'on both sides of it');
     like($content, qr/^\s+encrypted_suffix: _enc$/m,
@@ -187,7 +187,7 @@ subtest 'encrypt_in_place follows a symlink instead of replacing it' => sub {
 
     ok(-l $link, 'the symlink is still a symlink')
         or diag('rename() over a symlink replaces the link with a regular file');
-    like(read_file($real), qr/ENC\[AES256_GCM,/,
+    like(read_binary($real), qr/ENC\[AES256_GCM,/,
         'and the file it points at is the one that got encrypted');
 };
 
@@ -196,7 +196,7 @@ subtest 'encrypt_in_place handles json too' => sub {
 
     File::SOPS->encrypt_in_place(file => $file, recipients => [$public]);
 
-    my $content = read_file($file);
+    my $content = read_binary($file);
     is_deeply(
         File::SOPS->decrypt(encrypted => $content, identities => [$secret]),
         { secret => 'shh', n => 5 },
@@ -237,11 +237,11 @@ PERL
     is(File::SOPS->edit(file => $file, identities => [$secret], editor => $ed), 1,
         'returns 1 when the file was rewritten');
 
-    is_deeply(Load(scalar read_file($seen)),
+    is_deeply(Load(read_binary($seen)),
         { db => { password => 'old', host => 'h' } },
         'the editor was handed the DECRYPTED document');
 
-    my $content = read_file($file);
+    my $content = read_binary($file);
     like($content, qr/password: ENC\[AES256_GCM,/, 'the result is encrypted again');
     is_deeply(
         File::SOPS->decrypt(encrypted => $content, identities => [$secret]),
@@ -269,7 +269,7 @@ PERL
 
     File::SOPS->edit(file => $file, identities => [$secret], editor => $ed);
 
-    my ($path, $file_mode, $dir_mode, $dirname) = split /\n/, read_file($report);
+    my ($path, $file_mode, $dir_mode, $dirname) = split /\n/, read_binary($report);
     is($file_mode, '0600', 'the plaintext file is readable only by its owner');
     is($dir_mode,  '0700', 'and so is the directory holding it');
     like($path, qr{/secrets\.yaml$},
@@ -293,7 +293,7 @@ PERL
 
     File::SOPS->edit(file => $file, identities => [$secret], editor => $ed);
 
-    my $content = read_file($file);
+    my $content = read_binary($file);
     my $sops    = Load($content)->{sops};
     is($sops->{encrypted_suffix}, '_enc', 'encrypted_suffix survived the edit');
     ok(!exists $sops->{unencrypted_suffix},
@@ -304,7 +304,7 @@ PERL
 
 subtest 'edit re-keys the file, unlike sops edit' => sub {
     my $file = encrypted_file(data => { secret => 'old' });
-    my $before = Load(scalar read_file($file))->{sops};
+    my $before = Load(read_binary($file))->{sops};
 
     my $ed = editor('rekey', <<'PERL');
 open my $out, '>', $file or die $!;
@@ -314,7 +314,7 @@ PERL
 
     File::SOPS->edit(file => $file, identities => [$secret], editor => $ed);
 
-    my $after = Load(scalar read_file($file))->{sops};
+    my $after = Load(read_binary($file))->{sops};
     isnt($after->{age}[0]{enc}, $before->{age}[0]{enc},
         'the wrapped data key changed -- edit is a rotation as well')
         or diag('sops edit keeps the data key; this does not, and says so');
@@ -341,7 +341,7 @@ PERL
     File::SOPS->edit(file => $file, identities => [$secret], editor => $ed);
 
     is_deeply(
-        File::SOPS->decrypt(encrypted => scalar read_file($file), identities => [$secret]),
+        File::SOPS->decrypt(encrypted => read_binary($file), identities => [$secret]),
         { "caf\x{e9}" => "\x{fc}ber", plain => 'w' },
         'the key and the value came back as the characters they went in as',
     );
@@ -361,7 +361,7 @@ PERL
     File::SOPS->edit(file => $file, identities => [$secret]);
 
     is_deeply(
-        File::SOPS->decrypt(encrypted => scalar read_file($file), identities => [$secret]),
+        File::SOPS->decrypt(encrypted => read_binary($file), identities => [$secret]),
         { secret => 'via-env' },
         'the words after the program name reached the editor as arguments',
     );
@@ -372,20 +372,20 @@ PERL
 ###############################################################################
 subtest 'edit leaves the file alone when the editor changes nothing' => sub {
     my $file   = encrypted_file(data => { secret => 'shh' });
-    my $before = read_file($file);
+    my $before = read_binary($file);
 
     my $ed = editor('noop', '1;');
 
     is(File::SOPS->edit(file => $file, identities => [$secret], editor => $ed), 0,
         'returns 0 rather than reporting a rewrite that did not happen');
-    is(read_file($file), $before,
+    is(read_binary($file), $before,
         'and the file is byte-identical -- no new data key, MAC or lastmodified')
         or diag('sops stops here too: "File has not changed, exiting."');
 };
 
 subtest 'edit fails when the editor fails, and keeps the file' => sub {
     my $file   = encrypted_file(data => { secret => 'shh' });
-    my $before = read_file($file);
+    my $before = read_binary($file);
 
     my $ed = editor('fail', <<'PERL');
 open my $out, '>', $file or die $!;
@@ -400,13 +400,13 @@ PERL
 
     like($err, qr/exited with status 3/, 'the editor status is reported');
     like($err, qr/unchanged/,            'and so is what happened to the file');
-    is(read_file($file), $before, 'which is nothing')
+    is(read_binary($file), $before, 'which is nothing')
         or diag('an editor that refused to start has not produced an edit');
 };
 
 subtest 'edit refuses a document that does not parse, and keeps the file' => sub {
     my $file   = encrypted_file(data => { secret => 'shh' });
-    my $before = read_file($file);
+    my $before = read_binary($file);
 
     my $ed = editor('broken', <<'PERL');
 open my $out, '>', $file or die $!;
@@ -426,12 +426,12 @@ PERL
         or diag('the two cases have to stay apart in both directions -- '
               . 'text that really does not parse must not be reported as a '
               . 'document that does');
-    is(read_file($file), $before, 'the encrypted file is untouched');
+    is(read_binary($file), $before, 'the encrypted file is untouched');
 };
 
 subtest 'edit refuses an empty document' => sub {
     my $file   = encrypted_file(data => { secret => 'shh' });
-    my $before = read_file($file);
+    my $before = read_binary($file);
 
     my $ed = editor('empty', <<'PERL');
 open my $out, '>', $file or die $!;
@@ -445,7 +445,7 @@ PERL
         qr/does not parse/,
         'an emptied file is not an instruction to encrypt nothing',
     );
-    is(read_file($file), $before, 'the encrypted file is untouched');
+    is(read_binary($file), $before, 'the encrypted file is untouched');
 };
 
 # Every shape of a hand-written `sops` entry, because the refusal for it used
@@ -469,7 +469,7 @@ subtest 'edit refuses a hand-written sops entry, whatever shape it has' => sub {
 
     for my $name (sort keys %shape) {
         my $file   = encrypted_file(data => { secret => 'shh' });
-        my $before = read_file($file);
+        my $before = read_binary($file);
 
         my $ed = editor("sopskey-$name", <<"PERL");
 open my \$out, '>', \$file or die \$!;
@@ -491,7 +491,7 @@ PERL
             or diag('the reserved-key refusal reaches edit as an exception out '
                   . 'of parse(); reporting it as a parse failure sends the user '
                   . 'looking for a syntax error that is not there');
-        is(read_file($file), $before, "the encrypted file is untouched ($name)");
+        is(read_binary($file), $before, "the encrypted file is untouched ($name)");
     }
 };
 
@@ -511,7 +511,7 @@ PERL
         File::SOPS->edit(file => $file, identities => [$secret], editor => $ed)
     });
 
-    my ($path, $dirname) = split /\n/, read_file($report);
+    my ($path, $dirname) = split /\n/, read_binary($report);
     ok(!-e $path,    'the decrypted copy did not survive the failure');
     ok(!-d $dirname, 'and neither did its directory');
 };
@@ -537,7 +537,7 @@ kill 'TERM', getppid();
 PERL
 
     my $runner = "$dir/edit-signal-runner.pl";
-    write_file($runner, <<"PERL");
+    write_binary($runner, <<"PERL");
 use strict;
 use warnings;
 use File::SOPS;
@@ -555,7 +555,7 @@ PERL
     is($status & 127, 15, 'the process died of the signal it was sent')
         or diag("wait status $status");
 
-    my ($dirname) = split /\n/, read_file($report);
+    my ($dirname) = split /\n/, read_binary($report);
     ok(!-d $dirname, 'and the decrypted copy did not outlive it')
         or diag("$dirname still exists");
 };
@@ -589,14 +589,14 @@ subtest 'edit refuses a file it cannot re-key' => sub {
     # wrap a new data key for. Re-dumping is safe here only because the
     # document came from our own emitter, which sorts keys the same way the
     # MAC was computed over.
-    my $doc = Load(scalar read_file($file));
+    my $doc = Load(read_binary($file));
     $doc->{sops}{pgp} = [ { enc => 'WRAPPED-FOR-SOMEONE-ELSE' } ];
-    write_file($file, do {
+    write_binary($file, do {
         my $yaml = YAML::XS::Dump($doc);
         $yaml =~ s/^(\s+lastmodified: )(\S+)$/$1"$2"/m;
         $yaml;
     });
-    my $before = read_file($file);
+    my $before = read_binary($file);
 
     my $err = error_from(sub {
         File::SOPS->edit(file => $file, identities => [$secret],
@@ -605,7 +605,7 @@ subtest 'edit refuses a file it cannot re-key' => sub {
 
     like($err, qr/Refusing to edit/, 'edit refuses it, as rotate does');
     like($err, qr/pgp/,              'naming the backend in the way');
-    is(read_file($file), $before, 'and the file is untouched');
+    is(read_binary($file), $before, 'and the file is untouched');
 };
 
 subtest 'edit needs a file, identities and a sops section' => sub {
@@ -637,7 +637,7 @@ SKIP: {
         unless $sops_bin;
 
     my $keyfile = "$dir/age-key.txt";
-    write_file($keyfile, $secret);
+    write_binary($keyfile, $secret);
     local $ENV{SOPS_AGE_KEY_FILE} = $keyfile;
 
     subtest 'sops -d reads what encrypt_in_place wrote' => sub {

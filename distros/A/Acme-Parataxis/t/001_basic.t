@@ -5,7 +5,6 @@ use Test2::V1 -ipP;
 $|++;
 #
 diag '$Acme::Parataxis::VERSION = ' . $Acme::Parataxis::VERSION;
-diag 'Testing basic asymmetric coroutine flow...';
 subtest 'Asymmetric Coroutines' => sub {
     diag 'Creating a new Acme::Parataxis object (Fiber)...';
     my $f = Acme::Parataxis->new(

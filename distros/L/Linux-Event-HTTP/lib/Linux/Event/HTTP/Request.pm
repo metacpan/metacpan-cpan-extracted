@@ -9,7 +9,7 @@ use utf8 ();
 
 use Linux::Event::HTTP::_HTTP1 ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my (
     $NATIVE_METHOD,

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use JSON::MaybeXS qw(decode_json JSON);
 use YAML::XS qw(Load);
 use Scalar::Util qw(blessed);
@@ -83,7 +83,7 @@ package main;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 my $serial = 0;
@@ -128,7 +128,7 @@ for my $format (qw(yaml json)) {
         is_deeply($self, $data, 'and the data round-trips') if $self;
 
         my $file = scratch_file($format);
-        write_file($file, $encrypted);
+        write_binary($file, $encrypted);
         my $out = `$sops_bin -d $file 2>&1`;
         is($? >> 8, 0, 'sops -d accepts the mac_only_encrypted document')
             or diag("sops output: $out");
@@ -173,7 +173,7 @@ for my $format (qw(yaml json)) {
         }
 
         my $file = scratch_file($format);
-        write_file($file, $encrypted);
+        write_binary($file, $encrypted);
         my $out       = `$sops_bin -d $file 2>&1`;
         my $exit_code = $? >> 8;
         is($exit_code, 0, 'sops -d accepts the document') or diag("sops output: $out");
@@ -373,7 +373,7 @@ for my $format (qw(yaml json)) {
             q{and decrypts back to the object's stringification}) if $self;
 
         my $file = scratch_file($format);
-        write_file($file, $encrypted);
+        write_binary($file, $encrypted);
         my $out       = `$sops_bin -d $file 2>&1`;
         my $exit_code = $? >> 8;
         is($exit_code, 0, 'sops -d accepts the document') or diag("sops output: $out");
@@ -480,7 +480,7 @@ subtest 'decrypt_file on a parsed !!perl/regexp leaf croaks instead of writing a
     );
 
     my $infile = scratch_file('yaml');
-    write_file($infile, $doc);
+    write_binary($infile, $doc);
 
     # Baseline: decrypt() alone (no write involved) sees a real blessed
     # Regexp and the MAC verifies -- proving the fixture is valid before
@@ -511,11 +511,11 @@ subtest 'edit() on a parsed !!perl/regexp leaf croaks before the editor ever run
     );
 
     my $editfile = scratch_file('yaml');
-    write_file($editfile, $doc);
+    write_binary($editfile, $doc);
 
     my $editor_touched = "$tempdir/editor-touched-" . ++$serial;
     my $editor_script   = "$tempdir/editor-" . ++$serial . '.pl';
-    write_file($editor_script,
+    write_binary($editor_script,
         qq{open my \$t, '>', '$editor_touched' or die \$!; print \$t "ran\\n"; close \$t;\n});
 
     my $ret = eval {
@@ -527,7 +527,7 @@ subtest 'edit() on a parsed !!perl/regexp leaf croaks before the editor ever run
     like($@, qr/\bRegexp\b/, 'and croaks with the guard message');
     ok(!-e $editor_touched, 'the editor never ran -- the guard fires before the temp file for it exists');
 
-    my $after = read_file($editfile);
+    my $after = read_binary($editfile);
     is($after, $doc, 'and the original file is untouched');
 };
 
@@ -538,7 +538,7 @@ subtest 'decrypt_file on a parsed !!perl/ref leaf croaks too (read with ignore_m
     );
 
     my $infile = scratch_file('yaml');
-    write_file($infile, $doc);
+    write_binary($infile, $doc);
 
     my $parsed = eval {
         File::SOPS->decrypt(

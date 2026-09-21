@@ -100,7 +100,7 @@ OpenStack::MetaAPI::API::Images
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 Note loading all images can be very slow
 as we have to use multiple requests (kind of pagination)...

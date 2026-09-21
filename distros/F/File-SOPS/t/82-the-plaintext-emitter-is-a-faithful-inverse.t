@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use YAML::XS ();
 
 use File::SOPS;
@@ -40,7 +40,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 my $serial = 0;
@@ -79,11 +79,11 @@ SKIP: {
     subtest 'decrypt_file writes a quoted safe-set leaf byte-identical to sops -d' => sub {
         for my $spelling (@SPELLINGS) {
             my $dir = scratch();
-            write_file("$dir/p.yaml", "x_unencrypted: \"$spelling\"\nkeep: v\n");
+            write_binary("$dir/p.yaml", "x_unencrypted: \"$spelling\"\nkeep: v\n");
 
             my $enc = `$sops_bin -e --age $public --input-type yaml --output-type yaml $dir/p.yaml 2>&1`;
             is($? >> 8, 0, "[$spelling] sops -e") or diag($enc);
-            write_file("$dir/e.yaml", $enc);
+            write_binary("$dir/e.yaml", $enc);
 
             my $theirs = `$sops_bin -d $dir/e.yaml 2>&1`;
             is($? >> 8, 0, "[$spelling] sops -d") or diag($theirs);
@@ -99,7 +99,7 @@ SKIP: {
             ok($ok, "[$spelling] decrypt_file writes it") or diag($@);
             next unless $ok;
 
-            my ($our_line) = scalar(read_file("$dir/plain.yaml")) =~ /^(x_unencrypted:.*)$/m;
+            my ($our_line) = read_binary("$dir/plain.yaml") =~ /^(x_unencrypted:.*)$/m;
             is($our_line, $their_line,
                 "[$spelling] and the leaf line is byte-identical to sops -d's");
         }
@@ -114,11 +114,11 @@ SKIP: {
     subtest 'decrypt_file -> re-encrypt -> sops -d reads each leaf back as a string' => sub {
         for my $spelling (@SPELLINGS) {
             my $dir = scratch();
-            write_file("$dir/p.yaml", "x_unencrypted: \"$spelling\"\nkeep: v\n");
+            write_binary("$dir/p.yaml", "x_unencrypted: \"$spelling\"\nkeep: v\n");
 
             my $enc = `$sops_bin -e --age $public --input-type yaml --output-type yaml $dir/p.yaml 2>&1`;
             is($? >> 8, 0, "[$spelling] sops -e") or diag($enc);
-            write_file("$dir/e.yaml", $enc);
+            write_binary("$dir/e.yaml", $enc);
 
             File::SOPS->decrypt_file(input => "$dir/e.yaml",
                 output => "$dir/plain.yaml", identities => [$secret]);
@@ -156,14 +156,14 @@ SKIP: {
 
     subtest 'an encrypted type:float non-finite stays bare, a plain number/string are untouched' => sub {
         my $dir = scratch();
-        write_file("$dir/p.yaml",
+        write_binary("$dir/p.yaml",
             "secret: .inf\nnum_unencrypted: 42\nstr_unencrypted: hello\nkeep_unencrypted: v\n");
 
         my $enc = `$sops_bin -e --age $public --input-type yaml --output-type yaml $dir/p.yaml 2>&1`;
         is($? >> 8, 0, 'sops -e') or diag($enc);
         like($enc, qr/^secret: ENC\[.*type:float\]$/m,
             'sops stores the encrypted leaf as type:float -- the carrier that must not move');
-        write_file("$dir/e.yaml", $enc);
+        write_binary("$dir/e.yaml", $enc);
 
         my $ok = eval {
             File::SOPS->decrypt_file(input => "$dir/e.yaml",
@@ -172,7 +172,7 @@ SKIP: {
         };
         ok($ok, 'decrypt_file writes it') or diag($@);
 
-        my $plain = scalar read_file("$dir/plain.yaml");
+        my $plain = read_binary("$dir/plain.yaml");
         like($plain, qr/^secret: \.inf$/m,
             'the float carrier is written bare -- the case that must not move');
         unlike($plain, qr/^secret: "\.inf"$/m, 'and never quoted');
@@ -187,7 +187,7 @@ SKIP: {
         ok($reok, 're-encrypt_file accepts our own plaintext') or diag($@);
         return unless $reok;
 
-        my $rewire = scalar read_file("$dir/re.yaml");
+        my $rewire = read_binary("$dir/re.yaml");
         like($rewire, qr/^secret: ENC\[.*type:float\]$/m,
             'and re-encrypts as type:float, not type:str -- the divergence this pins against');
 
@@ -221,12 +221,12 @@ subtest 'a quotable leaf in document 2 of a decrypted stream is quoted there' =>
     return unless defined $document;
 
     my $dir = scratch();
-    write_file("$dir/e.yaml", $document);
+    write_binary("$dir/e.yaml", $document);
 
     File::SOPS->decrypt_file(input => "$dir/e.yaml",
         output => "$dir/plain.yaml", identities => [$secret]);
 
-    my $plain = scalar read_file("$dir/plain.yaml");
+    my $plain = read_binary("$dir/plain.yaml");
     my @blocks = split /^---\s*$/m, $plain;
     is(scalar @blocks, 3, 'two documents, split on the two --- separators');
     unlike($blocks[1], qr/"True"|"\.nan"/,

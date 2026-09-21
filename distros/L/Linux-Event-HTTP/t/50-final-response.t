@@ -21,6 +21,26 @@ use Linux::Event::HTTP::Server;
 
         if (($state->{mode} // '') eq 'invalid-body') {
             $response->body([]);
+        } elsif (($state->{mode} // '') eq 'custom-status') {
+            $state->{response_ref} = $response;
+            $response->status(201);
+            $response->body($state->{response_body});
+        } elsif (($state->{mode} // '') eq 'custom-header') {
+            $state->{response_ref} = $response;
+            $response->header('X-Fastpath-Fallback', 'yes');
+            $response->body($state->{response_body});
+        } elsif (($state->{mode} // '') eq 'bad-length') {
+            $response->header('Content-Length', '99');
+            $response->body($state->{response_body});
+        } elsif (($state->{mode} // '') eq 'no-content') {
+            $response->status(204);
+            $response->header('X-No-Content', 'yes');
+            $response->body('');
+        } elsif (($state->{mode} // '') eq 'response-close') {
+            $response->header('Connection', 'close');
+            $response->body($state->{response_body});
+        } elsif (($state->{mode} // '') eq 'early-body') {
+            $response->body($state->{response_body});
         } elsif (($state->{mode} // '') ne 'body') {
             $response->body($state->{response_body});
         }
@@ -28,8 +48,15 @@ use Linux::Event::HTTP::Server;
     }
 
     sub on_body ($self, $request, $response, $bytes) {
-        ++$self->data->{body_hits};
-        $self->data->{body} .= $bytes;
+        my $state = $self->data;
+        ++$state->{body_hits};
+        $state->{body} .= $bytes;
+        if (($state->{mode} // '') eq 'early-body') {
+            my $transaction = $self->transaction;
+            $state->{early_transaction} = $transaction;
+            $state->{early_started_in_body}
+                = $transaction->is_response_started ? 1 : 0;
+        }
         return;
     }
 
@@ -38,6 +65,12 @@ use Linux::Event::HTTP::Server;
         ++$state->{request_end_hits};
         if (($state->{mode} // '') eq 'body') {
             $response->body('post:' . $state->{body} . "\n");
+        } elsif (($state->{mode} // '') eq 'early-body') {
+            my $transaction = $self->transaction;
+            $state->{early_started_at_end}
+                = $transaction->is_response_started ? 1 : 0;
+            $state->{early_complete_at_end}
+                = $transaction->is_complete ? 1 : 0;
         }
         return;
     }
@@ -80,8 +113,13 @@ sub run_exchange ($request_wire, $state, $expected_wire_body = undef) {
         return if $head_end < 0;
         my $head_len = $head_end + 4;
         my $head = substr($state->{wire}, 0, $head_len);
-        return if $head !~ /\r\nContent-Length:\s*(\d+)\r\n/i;
-        my $body_len = defined($expected_wire_body) ? $expected_wire_body : 0 + $1;
+        my $body_len;
+        if (defined $expected_wire_body) {
+            $body_len = $expected_wire_body;
+        } else {
+            return if $head !~ /\r\nContent-Length:\s*(\d+)\r\n/i;
+            $body_len = 0 + $1;
+        }
         return if length($state->{wire}) < $head_len + $body_len;
 
         $done = 1;
@@ -127,6 +165,112 @@ like(
     'ordinary on_request plus Response->body completes eligible scalar response',
 );
 is($state->{request_hits}, 1, 'ordinary request callback runs once');
+
+$state = new_state(
+    mode => 'early-body',
+    response_body => "early\n",
+);
+$wire = run_exchange(
+    "POST /early HTTP/1.1\r\n" .
+        "Host: example.test\r\n" .
+        "Content-Length: 4\r\n\r\n" .
+        "data",
+    $state,
+);
+like(
+    $wire,
+    qr/\AHTTP\/1\.1 200 OK\r\nContent-Length: 6\r\n\r\nearly\n\z/s,
+    'scalar response may complete before request body consumption finishes',
+);
+is($state->{body}, 'data', 'early response still drains the complete request body');
+ok($state->{early_started_in_body},
+    'late-materialized Transaction inherits response-started state');
+ok($state->{early_started_at_end},
+    'Transaction remains response-started at request-end callback');
+ok(!$state->{early_complete_at_end},
+    'Transaction completes only after request-end callback returns');
+ok($state->{early_transaction}->is_complete,
+    'late-materialized Transaction reaches complete after exchange finalization');
+
+$state = new_state(mode => 'custom-status', response_body => "created\n");
+$wire = run_exchange(
+    "GET /custom-status HTTP/1.1\r\nHost: example.test\r\n\r\n",
+    $state,
+);
+like(
+    $wire,
+    qr/\AHTTP\/1\.1 201 Created\r\nContent-Length: 8\r\n\r\ncreated\n\z/s,
+    'status mutation leaves the trusted default fast path and preserves wire semantics',
+);
+
+is(
+    $state->{response_ref}->header('Content-Length'),
+    '8',
+    'fast scalar final preserves generated Content-Length on Response metadata',
+);
+
+$state = new_state(mode => 'custom-header', response_body => "header\n");
+$wire = run_exchange(
+    "GET /custom-header HTTP/1.1\r\nHost: example.test\r\n\r\n",
+    $state,
+);
+like(
+    $wire,
+    qr/\AHTTP\/1\.1 200 OK\r\nX-Fastpath-Fallback: yes\r\nContent-Length: 7\r\n\r\nheader\n\z/s,
+    'header mutation leaves the trusted default fast path and preserves custom fields',
+);
+
+is(
+    $state->{response_ref}->header('Content-Length'),
+    '7',
+    'custom-header fast scalar final retains generated Content-Length metadata',
+);
+
+$state = new_state(mode => 'custom-header', response_body => 'head-body');
+$wire = run_exchange(
+    "HEAD /custom-head HTTP/1.1\r\nHost: example.test\r\n\r\n",
+    $state,
+    0,
+);
+like(
+    $wire,
+    qr/\AHTTP\/1\.1 200 OK\r\nX-Fastpath-Fallback: yes\r\nContent-Length: 9\r\n\r\n\z/s,
+    'general scalar fast path preserves HEAD representation length and suppresses body bytes',
+);
+
+$state = new_state(mode => 'no-content');
+$wire = run_exchange(
+    "GET /no-content HTTP/1.1\r\nHost: example.test\r\n\r\n",
+    $state,
+    0,
+);
+like(
+    $wire,
+    qr/\AHTTP\/1\.1 204 No Content\r\nX-No-Content: yes\r\n\r\n\z/s,
+    'general scalar fast path preserves body-forbidden 204 semantics without Content-Length',
+);
+
+$state = new_state(mode => 'response-close', response_body => "close\n");
+$wire = run_exchange(
+    "GET /response-close HTTP/1.1\r\nHost: example.test\r\n\r\n",
+    $state,
+);
+like(
+    $wire,
+    qr/\AHTTP\/1\.1 200 OK\r\nConnection: close\r\nContent-Length: 6\r\n\r\nclose\n\z/s,
+    'explicit Connection response semantics fall back to the general response state machine',
+);
+
+$state = new_state(mode => 'bad-length', response_body => "bad\n");
+$wire = run_exchange(
+    "GET /bad-length HTTP/1.1\r\nHost: example.test\r\n\r\n",
+    $state,
+);
+like(
+    $wire,
+    qr/\AHTTP\/1\.1 500 [^\r\n]+\r\nContent-Length: 0\r\nConnection: close\r\n\r\n\z/s,
+    'fast scalar final rejects mismatched explicit Content-Length safely',
+);
 
 $state = new_state(response_body => 'head-body');
 $wire = run_exchange(

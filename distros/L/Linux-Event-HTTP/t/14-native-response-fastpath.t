@@ -5,6 +5,8 @@ use warnings;
 use Test::More;
 
 use Linux::Event::HTTP::_HTTP1 ();
+use Linux::Event::HTTP::Request;
+use Linux::Event::HTTP::Response;
 
 my $parser = 'Linux::Event::HTTP::_HTTP1';
 my $native = 'Linux::Event::HTTP::_HTTP1';
@@ -83,5 +85,32 @@ $ok = eval {
 };
 ok(!$ok, 'wide-character body is rejected');
 like($@, qr/body contains wide characters/, 'wide-character body error is stable');
+
+subtest 'scalar builder validates later headers before committing metadata' => sub {
+    for my $bad (
+        ['Content-Length', '5'], ['Transfer-Encoding', 'chunked'],
+        ['Connection', 'close'], ['Bad Name', 'value'],
+        ['X-Bad', "bad\r\nInjected: yes"], ['X-Missing'], 'not an array',
+    ) {
+        my $response = Linux::Event::HTTP::Response->_new_server_default($get);
+        $response->header('Content-Type', 'text/plain');
+        $response->body('hello');
+        # Bypass the setter deliberately, leaving the fast-path marker intact.
+        push @{$response->{headers}}, $bad;
+        is($native->build_simple_scalar_final($get, $response, 'hello'), undef,
+            'late malformed/framing header declines the fast path');
+        ok(!$response->{committed}, 'decline does not commit the response');
+        is(scalar @{$response->{headers}}, 2,
+            'decline does not append generated Content-Length');
+        pop @{$response->{headers}};
+        $response->header('X-Second', 'two');
+        is($native->build_simple_scalar_final($get, $response, 'hello'),
+            "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nX-Second: two\r\n"
+                . "Content-Length: 5\r\n\r\nhello",
+            'corrected response emits all headers once in order');
+        is($response->header('Content-Length'), '5',
+            'generated framing remains visible through the public API');
+    }
+};
 
 done_testing;

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use JSON::MaybeXS;
 use Encode qw(encode_utf8);
 
@@ -77,7 +77,7 @@ sub encrypted_file {
     my ($format) = @_;
     my $file = scratch() . "/secrets.$format";
 
-    write_file($file, File::SOPS->encrypt(
+    write_binary($file, File::SOPS->encrypt(
         data       => { %DOC },
         recipients => [$public],
         format     => $format,
@@ -89,7 +89,7 @@ sub encrypted_file {
 sub decrypted_tree {
     my ($format, $file) = @_;
     return File::SOPS->decrypt(
-        encrypted  => scalar read_file($file),
+        encrypted  => read_binary($file),
         identities => [$secret],
         format     => $format,
     );
@@ -115,7 +115,7 @@ for my $format (sort keys %HANDLER) {
 
         my $enc = encrypted_file($format);
         my $out = scratch() . "/plain.$format";
-        my (undef, $metadata) = $handler->parse(scalar read_file($enc));
+        my (undef, $metadata) = $handler->parse(read_binary($enc));
 
         my $capture = scratch() . "/editor-saw";
         local $ENV{FILE_SOPS_EDIT_CAPTURE} = $capture;
@@ -135,7 +135,7 @@ for my $format (sort keys %HANDLER) {
             identities => [$secret],
             format     => $format,
         );
-        is(read_file($out), $marker,
+        is(read_binary($out), $marker,
            "decrypt_file writes what $handler->emit returned");
 
         is($handler->serialize(data => { a => 1 }, metadata => $metadata),
@@ -150,7 +150,7 @@ for my $format (sort keys %HANDLER) {
             editor     => [@CAPTURING_EDITOR],
         );
         is($unchanged, 0, 'the editor changed nothing, so edit stopped');
-        is(read_file($capture), $marker,
+        is(read_binary($capture), $marker,
            "edit hands the editor what $handler->emit returned");
     };
 
@@ -203,7 +203,7 @@ for my $format (sort keys %HANDLER) {
             format     => $format,
         );
 
-        is(read_file($out), $handler->emit(decrypted_tree($format, $enc)),
+        is(read_binary($out), $handler->emit(decrypted_tree($format, $enc)),
            'byte for byte');
     };
 }

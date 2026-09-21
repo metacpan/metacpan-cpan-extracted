@@ -1,12 +1,12 @@
 exclude = [
     ".build/**/*",
-    "Dist-Zilla-PluginBundle-DROLSKY-*/**/*",
+    "DateTime-TimeZone-*/**/*",
+    "META.yml",
+    "MYMETA.yml",
     "blib/**/*",
     "lib/DateTime/TimeZone/Catalog.pm",
     "lib/DateTime/TimeZone/{Africa,America,Antarctica,Asia,Atlantic,Australia,Europe,Indian,Pacific}/**/*",
     "lib/DateTime/TimeZone/{CET,CST6CDT,EET,EST5EDT,EST,HST,MET,MST7MDT,MST,PST8PDT,WET}.pm",
-    "META.yml",
-    "MYMETA.yml",
     "t/00-*",
     "t/author-*",
     "t/release-*",
@@ -18,20 +18,22 @@ exclude = [
 [commands.omegasort-gitignore]
 type = "both"
 include = "**/.gitignore"
-cmd = ["omegasort", "--sort=path", "--unique"]
+cmd = ["omegasort", "--sort", "path", "--unique"]
 lint_flags = "--check"
 tidy_flags = "--in-place"
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
+ignore-stderr = ["The .+ file is not sorted", "The .+ file is not unique"]
 
 [commands.omegasort-stopwords]
 type = "both"
 include = ".stopwords"
-cmd = ["omegasort", "--sort=text", "--case-insensitive", "--unique"]
+cmd = ["omegasort", "--sort", "text", "--case-insensitive", "--unique"]
 lint_flags = "--check"
 tidy_flags = "--in-place"
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
+ignore-stderr = ["The .+ file is not sorted", "The .+ file is not unique"]
 
 [commands.perlcritic]
 type = "lint"
@@ -56,7 +58,12 @@ include = ["**/*.{pl,pm,pod}"]
 cmd = ["podchecker", "--warnings", "--warnings"]
 ok_exit_codes = [0, 2]
 lint_failure_exit_codes = 1
-ignore_stderr = [".+ pod syntax OK", ".+ does not contain any pod commands"]
+ignore_stderr = [
+    ".+ pod syntax OK",
+    ".+ does not contain any pod commands",
+    '\*\*\* WARNING: multiple occurrences \(\d+\) of link target .+',
+    '\*\*\* WARNING: empty section in previous paragraph .+',
+]
 
 [commands.podtidy]
 type = "tidy"
@@ -65,21 +72,21 @@ cmd = ["podtidy", "--columns", "80", "--inplace", "--nobackup"]
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
 
-[commands.prettier]
+[commands.oxfmt]
 type = "both"
-include = ["**/*.yml"]
-cmd = ["prettier", "--no-config", "--prose-wrap", "always", "--print-width", "100"]
-lint_flags = "--check"
-tidy_flags = "--write"
-ok_exit_codes = 0
-lint_failure_exit_codes = 1
-ignore_stderr = "Code style issues"
+include = ["**/*.yml", "**/*.toml"]
+cmd = ["oxfmt"]
+lint-flags = "--check"
+tidy-flags = "--write"
+ok-exit-codes = 0
+lint-failure-exit-codes = 1
 
-[commands.taplo]
+[commands.typos]
 type = "both"
-include = "**/*.toml"
-cmd = ["taplo", "format", "--option", "indent_string=    ", "--option", "column_width=100"]
-lint_flags = "--check"
-ok_exit_codes = 0
-lint_failure_exit_codes = 1
-ignore_stderr = "INFO taplo.+"
+include = "**/*"
+exclude = [".stopwords"]
+cmd = "typos"
+tidy_flags = "--write-changes"
+invoke = "once"
+ok-exit-codes = 0
+lint-failure-exit-codes = 2

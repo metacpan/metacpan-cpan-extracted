@@ -179,7 +179,8 @@ sub verify_checksum {
 
 # Unpack with Archive::Tar so no external tar is needed.  Fall back to tar(1)
 # where Archive::Tar is not installed -- some distros package the core modules
-# separately.
+# separately -- and also where it is installed but cannot manage the archive,
+# so that an Archive::Tar of any vintage cannot be what stops the build.
 sub extract {
     my ($file, $into, $expect) = @_;
 
@@ -190,20 +191,82 @@ sub extract {
 
     print "extracting $base\n";
 
-    if (eval { require Archive::Tar; 1 }) {
-        my $cwd = getcwd();
-        chdir $into or die "$0: cannot chdir to $into: $!\n";
-        my $ok = eval { Archive::Tar->extract_archive($file, 1) };
-        my $err = $@ || Archive::Tar->error || '';
-        chdir $cwd or die "$0: cannot chdir back to $cwd: $!\n";
-        $ok or die "$0: cannot extract $file: $err\n";
-    }
-    else {
-        warn "$0: Archive::Tar is not available; falling back to tar\n";
+    my $err = eval { require Archive::Tar; 1 }
+        ? extract_with_archive_tar($file, $into)
+        : 'Archive::Tar is not installed';
+
+    if (defined $err) {
+        warn "$0: $err; falling back to tar\n";
         run('tar', 'xzf', $file, '-C', $into);
     }
 
     -d $expect or die "$0: $file did not contain $expect\n";
+}
+
+# Returns undef once the archive is unpacked into $into, or the reason it
+# could not be, for extract() to fall back on.
+sub extract_with_archive_tar {
+    my ($file, $into) = @_;
+
+    # Read the whole archive rather than using extract_archive(), which
+    # extracts as it streams and so keeps no entry in memory -- which the
+    # dereferencing below needs, and which Archive::Tar itself needs to
+    # resolve a hard link.  The jq tarball is ~9M unpacked; next to compiling
+    # it that is not a cost worth optimising.
+    my $tar = Archive::Tar->new;
+    $tar->read($file)
+        or return "Archive::Tar cannot read $base: " . (Archive::Tar->error || '?');
+
+    deref_hardlinks($tar);
+
+    my $cwd = getcwd();
+    chdir $into or die "$0: cannot chdir to $into: $!\n";
+    my $ok  = eval { $tar->extract };
+    my $err = $@ || $tar->error || '?';
+    chdir $cwd or die "$0: cannot chdir back to $cwd: $!\n";
+
+    return $ok ? undef : "Archive::Tar cannot extract $base: $err";
+}
+
+# Replace every hard link in the archive with a plain copy of what it points
+# at, before anything reaches the disk.
+#
+# tar anchors a hard link's target at the root of the archive.  Archive::Tar
+# agreed as long as it called link(), but it now defaults $EXTRACT_HARDLINK to
+# 0 -- extracting a hard link chmods the inode it shares, which a hostile
+# archive can aim at a file that is already there -- and instead re-extracts
+# the target as a plain file, resolving its name relative to the link's own
+# directory.  jq's tarball holds exactly one hard link,
+# docs/content/manual/v1.8/manual.yml -> docs/content/manual/manual.yml, so
+# that lookup goes hunting for
+#
+#   jq-1.8.2/docs/content/manual/v1.8/jq-1.8.2/docs/content/manual/manual.yml
+#
+# and one entry it cannot place fails the whole extraction.
+#
+# Dereferencing here rather than repacking vendor/jq-1.8.2.tar.gz keeps it
+# byte-for-byte the upstream release, which is what makes the sha256 beside it
+# jq's own and worth checking.  Nothing in the build cares that the two files
+# no longer share an inode: --disable-docs means neither is so much as read.
+sub deref_hardlinks {
+    my ($tar) = @_;
+
+    my @entries = $tar->get_files;
+    my %by_path = map { $_->full_path => $_ } @entries;
+
+    for my $link (grep { $_->is_hardlink } @entries) {
+        # Leave anything we cannot resolve to a plain file exactly as it is,
+        # for Archive::Tar to report and the tar(1) fallback to deal with:
+        # a target that is missing, or is itself a link -- tar names the first
+        # member it archived, so links should never chain, and guessing at one
+        # that did would be worse than handing the job to tar.
+        my $target = $by_path{ $link->linkname };
+        next unless $target && !$target->is_hardlink;
+
+        $link->replace_content($target->get_content);
+        $link->type($target->type);
+        $link->linkname('');
+    }
 }
 
 sub run {

@@ -19,7 +19,7 @@ name: TableData-Games-Cards-Troika
 provides:
   TableData::Games::Cards::Troika:
     file: lib/TableData/Games/Cards/Troika.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Role::Tiny::With: '0'
   TableDataRole::Source::CSVInDATA: '0'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableData-Games-Cards-Troika
   homepage: https://metacpan.org/release/TableData-Games-Cards-Troika
   repository: git://github.com/perlancar/perl-TableData-Games-Cards-Troika.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

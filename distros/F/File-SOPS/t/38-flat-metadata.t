@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(write_binary);
 use JSON::MaybeXS qw(JSON);
 
 use File::SOPS::Metadata;
@@ -301,7 +301,7 @@ SKIP: {
         # Only the SECOND recipient's key is available for the decrypt, so the
         # test cannot pass unless the age entry at __list_1__ survived our
         # round trip byte-exactly.
-        write_file("$dir/key.txt", $sec2);
+        write_binary("$dir/key.txt", $sec2);
         local $ENV{SOPS_AGE_KEY_FILE} = "$dir/key.txt";
 
         for my $case (
@@ -311,7 +311,7 @@ SKIP: {
               plain  => "[db]\nhost = localhost\nport = 5432\n" },
         ) {
             my $path = "$dir/$case->{file}";
-            write_file($path, $case->{plain});
+            write_binary($path, $case->{plain});
 
             my $enc = `$sops_bin -e --age '$pub1,$pub2' '$path' 2>&1`;
             unless ($? == 0) {
@@ -336,7 +336,7 @@ SKIP: {
 
             # And sops has to accept the file we rebuild from it.
             my $ours_path = "$dir/ours-$case->{file}";
-            write_file($ours_path, $body . $render->(\@ours));
+            write_binary($ours_path, $body . $render->(\@ours));
 
             my $out = `$sops_bin -d '$ours_path' 2>&1`;
             is $?, 0, "$case->{format}: sops decrypts a file we wrote the metadata of"

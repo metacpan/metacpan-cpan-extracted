@@ -20,7 +20,7 @@ requires 'Class::Utils' => 0.05;
 requires 'English' => 0;
 requires 'Error::Pure' => 0.16;
 requires 'Indent::Word' => 0.04;
-requires 'List::MoreUtils' => 0;
+requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.2';
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Indent-Form/issues';
@@ -33,7 +33,7 @@ test_requires 'File::Object' => 0.08;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

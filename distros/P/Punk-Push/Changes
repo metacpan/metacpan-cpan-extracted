@@ -1,5 +1,17 @@
 Revision history for Punk-Push
 
+0.03    2026-09-21
+        - Fix: with `queue => 1` no notification was ever delivered, and the
+        worker refused every job with "no task registered for
+        'punk.push.send'".
+        - Fix: the task asked the job for the application and a
+        Punk::Queue::Job has no `app` method, so a send that did reach the
+        body died on its first line. It closes over the application it was
+        registered on instead.
+        - Fix: push.js `current` and `unsubscribe` asked for the registration
+        while the worker was still installing and got none, so a page that
+        registers the worker and then asks reported nobody as subscribed.
+
 0.02    2026-09-07
         Validate `subject` in the plugin instead of relying on VAPID's croak.
         Fix a perl 5.16 parse failure in t/00-load.t.

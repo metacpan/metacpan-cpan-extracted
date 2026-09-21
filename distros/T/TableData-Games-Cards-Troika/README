@@ -2,9 +2,9 @@ NAME
     TableData::Games::Cards::Troika - Cards of Anak Bos Troika
 
 VERSION
-    This document describes version 0.001 of TableData::Games::Cards::Troika
+    This document describes version 0.002 of TableData::Games::Cards::Troika
     (from Perl distribution TableData-Games-Cards-Troika), released on
-    2026-07-15.
+    2026-07-16.
 
 SYNOPSIS
     To use from Perl code:

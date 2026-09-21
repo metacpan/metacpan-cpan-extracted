@@ -1,7 +1,7 @@
 # ABSTRACT: Rex SSH connection via Net::LibSSH (no SFTP required)
 
 package Rex::Interface::Connection::LibSSH;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -35,6 +35,18 @@ sub connect {
 
     ( $server, $port ) = Rex::Helper::IP::get_server_and_port( $server, $port );
 
+    # Host key verification: a per-connect option wins, otherwise the same
+    # openssh_opt knobs the OpenSSH backend honours -- StrictHostKeyChecking
+    # (what -feature => ['disable_strict_host_key_checking'] sets to "no")
+    # and UserKnownHostsFile. Strict unless explicitly turned off.
+    my %openssh_opt = Rex::Config->get_openssh_opt();
+    my $strict      = $opt{strict_hostkeycheck};
+    unless ( defined $strict ) {
+        my $shkc = $openssh_opt{StrictHostKeyChecking} // '';
+        $strict = $shkc =~ /^(?:no|off)$/i ? 0 : 1;
+    }
+    my $knownhosts = $opt{knownhosts} // $openssh_opt{UserKnownHostsFile};
+
     Rex::Logger::debug("LibSSH: connecting to $server:$port as $user");
 
     my $ssh = Net::LibSSH->new;
@@ -42,11 +54,18 @@ sub connect {
     $ssh->option( port    => $port     );
     $ssh->option( user    => $user     ) if defined $user;
     $ssh->option( timeout => $timeout  );
-    $ssh->option( strict_hostkeycheck => 0 );
+    $ssh->option( strict_hostkeycheck => $strict ? 1 : 0 );
+    $ssh->option( knownhosts => $knownhosts ) if defined $knownhosts;
 
     unless ( $ssh->connect ) {
-        Rex::Logger::info( "LibSSH: can't connect to $server: " . ( $ssh->error // '' ), 'warn' );
+        Rex::Logger::info( "LibSSH: can't connect to $server: " . ( $ssh->error // '' )
+              . ( $strict
+                ? " -- host key checking is on: add the host to known_hosts (ssh-keyscan)"
+                  . " or opt out with strict_hostkeycheck => 0 / use Rex -feature => ['disable_strict_host_key_checking']"
+                : '' ), 'warn' );
+        $self->{error}     = $ssh->error;
         $self->{connected} = 0;
+        $self->{auth_ret}  = 0;
         return;
     }
 
@@ -77,11 +96,13 @@ sub connect {
     unless ($authed) {
         Rex::Logger::info( "LibSSH: authentication failed for $user\@$server: "
               . ( $ssh->error // '' ), 'warn' );
+        $self->{error}    = $ssh->error;
         $self->{auth_ret} = 0;
         return;
     }
 
     Rex::Logger::debug("LibSSH: authenticated $user\@$server");
+    delete $self->{error};
     $self->{ssh}      = $ssh;
     $self->{auth_ret} = 1;
 }
@@ -103,7 +124,7 @@ sub disconnect {
 
 sub error {
     my ($self) = @_;
-    return $self->{ssh} ? $self->{ssh}->error : undef;
+    return $self->{ssh} ? $self->{ssh}->error : $self->{error};
 }
 
 sub get_connection_object {
@@ -145,7 +166,7 @@ Rex::Interface::Connection::LibSSH - Rex SSH connection via Net::LibSSH (no SFTP
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -162,6 +183,14 @@ performed via exec channels.
 
 Use this connection type on servers where the SSH daemon has no SFTP
 subsystem configured (e.g. minimal containers, embedded systems).
+
+C<connect> verifies the server's host key against C<known_hosts> by default
+— an unknown or changed key fails the connection before any authentication
+is attempted. A C<strict_hostkeycheck> connect option (C<0>/C<1>) or the
+C<knownhosts> connect option overrides the C<StrictHostKeyChecking> /
+C<UserKnownHostsFile> C<openssh_opt> defaults; see
+L<Rex::LibSSH/"Host key verification"> for the full precedence rules.
+Requires L<Net::LibSSH> 0.004 or later.
 
 =head1 SEE ALSO
 

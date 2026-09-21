@@ -91,6 +91,7 @@ Buenos_Aires
 Burkina
 CN
 CPAN
+CST6CDT
 CX
 CY
 Cabo
@@ -149,6 +150,7 @@ Dublin
 Dushanbe
 EE
 EG
+EST5EDT
 Easter
 Edmonton
 Efate
@@ -283,6 +285,7 @@ Louisville
 MF
 MH
 MQ
+MST7MDT
 MX
 MZ
 Maarten
@@ -354,6 +357,7 @@ OlsonDB
 Omsk
 Oral
 PN
+PST8PDT
 PY
 Pacific
 Pago_Pago

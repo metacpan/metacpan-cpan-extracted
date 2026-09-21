@@ -41,6 +41,10 @@ package Fake::Client {
         my ($self, $samples) = @_;
         $self->{calls}++;
         return 0 if $self->{fail};
+        # Lets a test land a record() in the window between the snapshot and delivery succeeding.
+        if (my $on_deliver = delete $self->{on_deliver}) {
+            $on_deliver->();
+        }
         {
             # A shared array can only hold shared references (or plain scalars): JSON-encoding
             # each delivery into a plain string, the same way DeliveryQueue's own Fake::Client
@@ -131,6 +135,58 @@ subtest 'does not record when track_performance is disabled' => sub {
     $flusher->flush;
 
     is($client->{calls}, 0);
+};
+
+subtest 'delivers a latency histogram per bucket alongside count, sum and max' => sub {
+    my @delivered :shared;
+    my $client = Fake::Client->new(delivered => \@delivered);
+    my $flusher = ForgeOps::Tracker::PerformanceFlusher->new(new_configuration(), $client);
+
+    $flusher->record('GET /posts', $_) for (10, 40, 120, 700, 12000);
+    $flusher->flush;
+
+    my $sample = decode_delivered($delivered[0])->[0];
+    is_deeply($sample->{histogram}, { 50 => 2, 250 => 1, 1000 => 1, inf => 1 });
+    my $total = 0;
+    $total += $_ for values %{ $sample->{histogram} };
+    is($total, $sample->{request_count}, 'histogram counts add up to request_count');
+};
+
+subtest 'keeps histogram counts for the next flush when delivery fails' => sub {
+    my @delivered :shared;
+    my $client = Fake::Client->new(delivered => \@delivered, fail => 1);
+    my $flusher = ForgeOps::Tracker::PerformanceFlusher->new(new_configuration(), $client);
+
+    $flusher->record('GET /posts', 10);
+    $flusher->flush;
+
+    $client->{fail} = 0;
+    $flusher->record('GET /posts', 300);
+    $flusher->flush;
+
+    is_deeply(decode_delivered($delivered[0])->[0]{histogram}, { 50 => 1, 500 => 1 });
+};
+
+subtest 'a record that lands during delivery is never lost and is sent on the next flush' => sub {
+    my @delivered :shared;
+    my $client = Fake::Client->new(delivered => \@delivered);
+    my $flusher = ForgeOps::Tracker::PerformanceFlusher->new(new_configuration(), $client);
+    $client->{on_deliver} = sub {
+        $flusher->record('GET /posts', 300);
+        $flusher->record('GET /new', 5);
+    };
+
+    $flusher->record('GET /posts', 10);
+    $flusher->flush;
+    $flusher->flush;
+
+    is(scalar(@delivered), 2);
+    is_deeply(decode_delivered($delivered[0])->[0]{histogram}, { 50 => 1 });
+
+    my %second = map { $_->{transaction_name} => $_ } @{ decode_delivered($delivered[1]) };
+    is($second{'GET /posts'}{request_count}, 1);
+    is_deeply($second{'GET /posts'}{histogram}, { 500 => 1 });
+    is_deeply($second{'GET /new'}{histogram}, { 50 => 1 });
 };
 
 done_testing;

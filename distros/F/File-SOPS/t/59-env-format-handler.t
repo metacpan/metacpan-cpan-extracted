@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use JSON::MaybeXS qw(JSON);
 
 use File::SOPS;
@@ -56,7 +56,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my $tempdir = tempdir(CLEANUP => 1);
 my ($public, $secret) = Crypt::Age->generate_keypair();
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 my $FLAT = File::SOPS::Metadata::Flat->new(prefix => 'sops_');
@@ -443,7 +443,7 @@ SKIP: {
         # Deliberately NOT in sorted key order, and with comments in three
         # positions: this is the document that fails to verify if the order
         # recovery or the comment exclusion is lost.
-        write_file("$tempdir/plain.env", <<"ENV");
+        write_binary("$tempdir/plain.env", <<"ENV");
 # a leading comment
 zebra=first
 NUM=5
@@ -458,7 +458,7 @@ ENV
             "$tempdir/plain.env", '>', "$tempdir/enc.env");
         is($rc, 0, 'sops -e wrote the document');
 
-        my $encrypted = read_file("$tempdir/enc.env");
+        my $encrypted = read_binary("$tempdir/enc.env");
         like($encrypted, qr/^#ENC\[[^\n]*type:comment\]$/m,
             'with its comments as type:comment lines');
 
@@ -527,7 +527,7 @@ ENV
             recipients => [$public],
             format     => 'env',
         );
-        write_file("$tempdir/ours.env", $encrypted);
+        write_binary("$tempdir/ours.env", $encrypted);
 
         my ($rc, $out) = sops_run('-d', "$tempdir/ours.env");
         is($rc, 0, 'sops -d reads it, MAC and all')
@@ -567,13 +567,13 @@ ENV
         # so the file it just wrote fails its own MAC.
         for my $case ([true => 'true'], [null => '<nil>'], ['1.0' => '1.0']) {
             my ($yaml_value, $written) = @$case;
-            write_file("$tempdir/defect.yaml", "v_unencrypted: $yaml_value\n");
+            write_binary("$tempdir/defect.yaml", "v_unencrypted: $yaml_value\n");
             my ($erc) = sops_run('-e', '--age', $public, '--input-type', 'yaml',
                 '--output-type', 'dotenv', "$tempdir/defect.yaml",
                 '>', "$tempdir/defect.env");
             is($erc, 0, "sops -e wrote a document for $yaml_value");
 
-            my $document = read_file("$tempdir/defect.env");
+            my $document = read_binary("$tempdir/defect.env");
             like($document, qr/^v_unencrypted=\Q$written\E$/m,
                 "  and wrote v_unencrypted=$written");
 
@@ -604,7 +604,7 @@ NUM=5
 
 plain_unencrypted=visible
 ENV
-        write_file("$tempdir/f.env", $plain);
+        write_binary("$tempdir/f.env", $plain);
 
         File::SOPS->encrypt_file(
             input => "$tempdir/f.env", output => "$tempdir/f.enc.env",
@@ -616,12 +616,12 @@ ENV
         File::SOPS->decrypt_file(
             input => "$tempdir/f.enc.env", output => "$tempdir/f.back.env",
             identities => [$secret]);
-        is(read_file("$tempdir/f.back.env"),
+        is(read_binary("$tempdir/f.back.env"),
            "# a comment\nFOO=bar\nNUM=5\nplain_unencrypted=visible\n",
            'decrypt_file writes the comment block first and drops blank lines');
 
         # rotate a document SOPS wrote, and hand it back to sops.
-        write_file("$tempdir/r.env", read_file("$tempdir/enc.env"));
+        write_binary("$tempdir/r.env", read_binary("$tempdir/enc.env"));
         File::SOPS->rotate(file => "$tempdir/r.env", identities => [$secret]);
         my ($rrc, $rout) = sops_run('-d', "$tempdir/r.env");
         is($rrc, 0, 'rotate on a sops-written document -> sops -d at exit 0')
@@ -639,7 +639,7 @@ ENV
             "$tempdir/plain.env", '>', "$tempdir/moe.env");
         is($rc, 0, 'sops -e --mac-only-encrypted');
 
-        my $document = read_file("$tempdir/moe.env");
+        my $document = read_binary("$tempdir/moe.env");
         like($document, qr/^sops_mac_only_encrypted=true$/m,
             'the flag is in the flat section as a string');
         my $data = File::SOPS->decrypt(
@@ -649,7 +649,7 @@ ENV
         my $ours = File::SOPS->encrypt(
             data => { A => '1', B_unencrypted => 'plain' },
             recipients => [$public], format => 'env', mac_only_encrypted => 1);
-        write_file("$tempdir/moe2.env", $ours);
+        write_binary("$tempdir/moe2.env", $ours);
         my ($drc, $dout) = sops_run('-d', "$tempdir/moe2.env");
         is($drc, 0, 'and sops reads one written here') or diag($dout);
     };

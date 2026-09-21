@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use English qw(-no_match_vars);
 use Error::Pure qw(err);
 use Indent::Word;
-use List::MoreUtils qw(none);
+use List::Util 1.33 qw(none);
 use Readonly;
 
 # Constants.
@@ -15,7 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LINE_SIZE => 79;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -438,7 +438,7 @@ L<Class::Utils>,
 L<English>,
 L<Error::Pure>,
 L<Indent::Word>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>.
 
 L<Text::ANSI::Util> for situation with 'ansi' => 1.
@@ -485,7 +485,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2023 Michal Josef Špaček
+© 2011-2026 Michal Josef Špaček
 
 Artistic License
 
@@ -493,6 +493,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

@@ -29,8 +29,8 @@ sub type_of {
         my $flags = B::svref_2object(\$value)->FLAGS;
         # Test the public numeric flags first. Older Perl releases may promote
         # the cached PV to SVf_POK during interpolation even though IOK/NOK is
-        # still present and JSON::PP continues to encode the scalar as a
-        # number. Numeric identity therefore wins for dual-valued scalars.
+        # still present. Numeric identity therefore wins for dual-valued
+        # scalars regardless of how the bundled JSON::PP treats dualvars.
         return 'number' if $flags & ($SVf_IOK | $SVf_NOK);
         return 'string' if $flags & $SVf_POK;
         return 'number' if looks_like_number($value);

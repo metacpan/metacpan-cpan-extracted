@@ -161,6 +161,69 @@ is(
 );
 
 {
+    package T::RawUpgradeHTTP;
+    use parent -norequire, 'T::UpgradeHTTP';
+        
+    sub _http_native_request ($self, $request) {
+        $self->data->{raw_request_hits}++;
+        return $self->SUPER::_http_native_request($request);
+    }
+}
+
+subtest 'raw native HTTP Upgrade retires into ordinary on_data target' => sub {
+    my $loop = Linux::Event::Loop->new;
+    my $state = {
+        wire => '',
+        target_hits => 0,
+        target_input => '',
+        request_end_hits => 0,
+        raw_request_hits => 0,
+    };
+
+    my $server = Linux::Event::HTTP::Server->new(
+        loop             => $loop,
+        host             => '127.0.0.1',
+        port             => 0,
+        data             => $state,
+        connection_class => 'T::RawUpgradeHTTP',
+    );
+
+    run_client(
+        $loop,
+        $server,
+        "GET /switch HTTP/1.1\r\n" .
+            "Host: example.test\r\n" .
+            "Connection: keep-alive, Upgrade\r\n" .
+            "Upgrade: test-proto\r\n" .
+            "\r\n" .
+            "PING",
+        $state,
+        qr/TARGET:PING\z/,
+    );
+
+    is($state->{raw_request_hits}, 1,
+        'Upgrade request head entered through the raw native provider');
+    is($state->{target_hits}, 1,
+        'ordinary target receives retained native tail exactly once');
+    is($state->{target_input}, 'PING',
+        'same-read post-Upgrade bytes survive native-to-ordinary transition');
+    is($state->{target_class}, 'T::UpgradedProtocol',
+        'native HTTP consumer retires into ordinary target class');
+    ok($state->{same_object},
+        'production native Upgrade retains live Stream object identity');
+    is(
+        $state->{wire},
+        "HTTP/1.1 101 Switching Protocols\r\n" .
+            "Upgrade: test-proto\r\n" .
+            "X-Handshake: ok\r\n" .
+            "Connection: Upgrade\r\n" .
+            "\r\n" .
+            "TARGET:PING",
+        '101 output precedes retained-tail delivery to ordinary target',
+    );
+};
+
+{
     package T::BadUpgradeHTTP;
     use parent 'Linux::Event::HTTP::Server::Connection';
 

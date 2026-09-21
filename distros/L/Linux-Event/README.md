@@ -359,10 +359,12 @@ the native ordered-byte input buffer. A provider reports the prefix it consumed
 and Linux::Event retains the remaining tail natively.
 
 `transition_to()` can hand a live ordered-byte connection from one native
-consumer provider to another while preserving that unread native tail. This is
-intended for protocol transitions such as an HTTP parser handing already-read
-post-Upgrade bytes to a WebSocket parser. See
-`docs/ORDERED-BYTE-CONSUMER-ABI.md` for the extension-author contract.
+consumer provider to another, or retire a native consumer into an ordinary Perl
+Stream input sink, while preserving the unread native tail. This supports
+protocol transitions such as an HTTP parser handing already-read post-Upgrade
+bytes either to a native WebSocket parser or to an ordinary `on_data` target.
+Adding a native consumer to an already-ordinary live Stream remains rejected.
+See `docs/ORDERED-BYTE-CONSUMER-ABI.md` for the extension-author contract.
 
 ## TLS
 

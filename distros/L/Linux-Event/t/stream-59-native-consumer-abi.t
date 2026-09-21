@@ -58,6 +58,18 @@ is(Linux::Event::_ByteStream->_native_consumer_abi_version, 1,
 }
 
 {
+    package T::RawTransitionOrdinary;
+    use parent 'Linux::Event::IO::Sock::Stream';
+    sub on_data ($stream, $bytes) {
+        $stream->data->{bytes} = ($stream->data->{bytes} // '') . $bytes;
+        push @{$stream->data->{chunks}}, $bytes;
+        $stream->close if $stream->data->{close_on_data};
+    }
+    sub on_error ($stream, $error) { $stream->data->{error} = $error }
+    sub on_eof ($stream) { $stream->data->{eof}++ }
+}
+
+{
     package T::RawConsumerBadCallback;
     use parent -norequire, 'T::RawConsumer';
     sub on_data ($stream, $bytes) { return }
@@ -820,10 +832,6 @@ for my $case (
     is(take($stream), 'abc',
         'retained consumer uses target native framer after transition');
 
-    my $ok = eval { $stream->transition_to('T::CallbackLine'); 1 };
-    ok(!$ok, 'transition still rejects removing a live native consumer');
-    like($@, qr/cannot add or remove a native consumer provider/,
-        'consumer removal remains outside the handoff contract');
     $stream->close;
     close $peer;
 }
@@ -869,6 +877,180 @@ for my $case (
     $loop->run_for(0.05);
     is(take($stream), 'later-websocket-frame',
         'target consumer keeps receiving later kernel input after handoff');
+
+    $stream->close;
+    close $peer;
+}
+
+{
+    my $before =
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count;
+    my $data = { bytes => '', chunks => [] };
+    my ($loop, $stream, $peer, $xs) = pair('T::RawConsumer', $data);
+
+    arm($stream, sub {
+        $stream->transition_to('T::RawTransitionOrdinary');
+    });
+    my $wire = "http-head\nfirst-ordinary-tail\nsecond-ordinary-tail\n";
+    syswrite($peer, $wire) == length($wire)
+        or die "short native-to-ordinary transition fixture write: $!";
+    my $ok = eval { $loop->run_for(0.05); 1 };
+    ok($ok,
+        'native consumer may transition to ordinary on_data from input callback')
+        or diag $@;
+
+    isa_ok($stream, 'T::RawTransitionOrdinary');
+    is($data->{bytes}, "first-ordinary-tail\nsecond-ordinary-tail\n",
+        'unread native tail is delivered to ordinary on_data in order');
+    is_deeply($data->{chunks},
+        ["first-ordinary-tail\nsecond-ordinary-tail\n"],
+        'retained native tail is surfaced to the new target exactly once');
+    is(
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count,
+        $before + 1,
+        'source provider is destroyed when native-consumer mode is removed',
+    );
+    cmp_ok(
+        Linux::Event::_ByteStream::TestSupport
+            ->_test_consumer_last_destroy_flushes,
+        '>=', 1,
+        'source provider flush debt is settled before consumer removal',
+    );
+    is($xs->stats->{consumer_input_calls}, 1,
+        'retained tail is not consumed a second time by the retiring provider');
+    is($xs->stats->{delivery_calls}, 1,
+        'retained tail crosses into Perl only through the ordinary target');
+
+    my $later = "later-ordinary-input\n";
+    syswrite($peer, $later) == length($later)
+        or die "short post-removal fixture write: $!";
+    $loop->run_for(0.05);
+    is($data->{bytes},
+        "first-ordinary-tail\nsecond-ordinary-tail\nlater-ordinary-input\n",
+        'future kernel input continues through ordinary on_data after transition');
+    is($xs->stats->{delivery_calls}, 2,
+        'later socket input is delivered once through the ordinary target');
+
+    $stream->close;
+    close $peer;
+}
+
+{
+    my $before =
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count;
+    my $data = { bytes => '', chunks => [], close_on_data => 1 };
+    my ($loop, $stream, $peer, $xs) = pair('T::RawConsumer', $data);
+
+    arm($stream, sub {
+        $stream->transition_to('T::RawTransitionOrdinary');
+    });
+    my $wire = "http-head\nclose-on-redrive\n";
+    syswrite($peer, $wire) == length($wire)
+        or die "short native-to-ordinary close fixture write: $!";
+    my $ok = eval { $loop->run_for(0.05); 1 };
+    ok($ok,
+        'ordinary target may close reentrantly while retained input is redriven')
+        or diag $@;
+    ok($stream->is_closed,
+        'reentrant ordinary-target close leaves the Stream terminal');
+    is($data->{bytes}, "close-on-redrive\n",
+        'ordinary target receives the retained bytes once before closing');
+    is($xs->stats->{input_buffered_bytes}, 0,
+        'reentrant target close leaves no stale retained native input');
+    is($xs->stats->{consumer_input_calls}, 1,
+        'reentrant target close causes no extra source-consumer input call');
+    is(
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count,
+        $before + 1,
+        'source provider is already retired before ordinary target close',
+    );
+    close $peer;
+}
+
+{
+    my $before =
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count;
+    my $data = { bytes => '', chunks => [] };
+    my ($loop, $stream, $peer) = pair('T::RawConsumer', $data);
+
+    my $host_results =
+        Linux::Event::_ByteStream::TestSupport::_test_consumer_transition_retain(
+            $stream,
+            sub { $stream->transition_to('T::RawTransitionOrdinary') },
+        );
+
+    is_deeply($host_results, [0, 0, 0, 1],
+        'retiring provider host stays frozen until retained removal releases');
+    isa_ok($stream, 'T::RawTransitionOrdinary',
+        'host release completes deferred native-consumer removal');
+    is(
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count,
+        $before + 1,
+        'retained source context survives until its final host release',
+    );
+
+    my $later = "after-removal-retain-release\n";
+    syswrite($peer, $later) == length($later)
+        or die "short retained-removal fixture write: $!";
+    $loop->run_for(0.05);
+    is($data->{bytes}, $later,
+        'ordinary target receives input after retained provider retirement');
+
+    $stream->close;
+    close $peer;
+}
+
+{
+    my $before =
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count;
+    my $data = { bytes => '', chunks => [] };
+    my ($loop, $stream, $peer, $xs) = pair('T::RawConsumer', $data);
+
+    arm($stream, sub { $loop->stop });
+    my $wire = "head-before-pause\npaused-native-tail\n";
+    syswrite($peer, $wire) == length($wire)
+        or die "short paused-removal fixture write: $!";
+    $loop->run;
+    is($xs->stats->{input_buffered_bytes}, length("paused-native-tail\n"),
+        'source leaves a complete unread tail in native storage while paused');
+
+    $stream->pause_read;
+    $stream->transition_to('T::RawTransitionOrdinary');
+    isa_ok($stream, 'T::RawTransitionOrdinary');
+    is($data->{bytes}, '',
+        'explicit read pause suppresses retained-tail redrive across transition');
+    is(
+        Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count,
+        $before + 1,
+        'provider retires even while application read pause remains active',
+    );
+
+    $stream->resume_read;
+    is($data->{bytes}, "paused-native-tail\n",
+        'resume_read synchronously delivers the preserved tail to on_data');
+    is_deeply($data->{chunks}, ["paused-native-tail\n"],
+        'pause/resume preserves exact-once retained-tail delivery');
+
+    $stream->close;
+    close $peer;
+}
+
+{
+    my $data = { bytes => '', chunks => [] };
+    my ($loop, $stream, $peer) = pair('T::RawTransitionOrdinary', $data);
+    my $ok = eval { $stream->transition_to('T::RawConsumer'); 1 };
+    ok(!$ok, 'ordinary Stream still rejects adding a native consumer live');
+    like($@, qr/cannot add a native consumer provider/,
+        'reverse direction keeps an explicit narrow transition contract');
+    isa_ok($stream, 'T::RawTransitionOrdinary',
+        'failed ordinary-to-native transition leaves source class active');
+
+    my $later = "ordinary-still-live\n";
+    syswrite($peer, $later) == length($later)
+        or die "short reverse-rejection fixture write: $!";
+    $loop->run_for(0.05);
+    is($data->{bytes}, $later,
+        'failed reverse transition leaves ordinary on_data delivery usable');
 
     $stream->close;
     close $peer;

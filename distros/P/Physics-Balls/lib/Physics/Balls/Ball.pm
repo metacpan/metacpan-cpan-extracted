@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has id => (
 	is => 'ro',
@@ -55,7 +55,7 @@ Physics::Balls::Ball - one ball's place in a layout
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 
 use File::SOPS;
 use File::SOPS::Encrypted;
@@ -63,7 +63,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 # A well-formed ENC[...] string carrying an arbitrary type label. Built through
@@ -352,7 +352,7 @@ subtest 'a comment this emitter would have to write as text is refused' => sub {
 subtest 'the file-based read paths keep it too' => sub {
     my $file = "$tempdir/comment.enc.yaml";
     my $before = document_with_comment_leaf();
-    write_file($file, $before);
+    write_binary($file, $before);
 
     # Under ADR 0024 extract and rotate croaked `list:0: ...` here.
     is(File::SOPS->extract(file => $file, path => '["list"][1]',
@@ -365,9 +365,9 @@ subtest 'the file-based read paths keep it too' => sub {
 
     ok(File::SOPS->rotate(file => $file, identities => [$secret]),
         'rotate re-keys the document');
-    isnt(scalar read_file($file), $before, 'writing a new one');
+    isnt(read_binary($file), $before, 'writing a new one');
     my $rotated = File::SOPS->decrypt(
-        encrypted => scalar read_file($file), identities => [$secret]);
+        encrypted => read_binary($file), identities => [$secret]);
     isa_ok($rotated->{list}[0], 'File::SOPS::Comment',
         'with the comment still a comment');
     is($rotated->{list}[0]->text, ' only a sequence comment', 'and its text');
@@ -394,7 +394,7 @@ SKIP: {
 
     subtest 'sops really writes a list comment as a list element' => sub {
         # The three-line minimal reproducer from k108, verbatim.
-        write_file("$tempdir/seq.plain.yaml", "list:\n  # only a sequence comment\n  - one\n");
+        write_binary("$tempdir/seq.plain.yaml", "list:\n  # only a sequence comment\n  - one\n");
         my $out = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/seq.plain.yaml 2>&1`;
         is($? >> 8, 0, 'sops -e writes the document') or diag($out);
 
@@ -403,7 +403,7 @@ SKIP: {
         like($out, qr/^\s+- ENC\[AES256_GCM,.*,type:str\]$/m,
             'followed by the value it was written above');
 
-        write_file("$tempdir/seq.enc.yaml", $out);
+        write_binary("$tempdir/seq.enc.yaml", $out);
         my $back = `$sops_bin -d --input-type yaml --output-type yaml $tempdir/seq.enc.yaml 2>&1`;
         is($? >> 8, 0, 'and sops -d reads it back') or diag($back);
         like($back, qr/# only a sequence comment/,
@@ -413,7 +413,7 @@ SKIP: {
         # load-bearing half -- it is sops's own digest, and it only matches
         # because the comment is left out of ours.
         my $got = eval { File::SOPS->decrypt(
-            encrypted => scalar read_file("$tempdir/seq.enc.yaml"),
+            encrypted => read_binary("$tempdir/seq.enc.yaml"),
             identities => [$secret]) };
         ok(defined $got, 'File::SOPS reads the document sops just wrote')
             or diag($@);
@@ -426,18 +426,18 @@ SKIP: {
         # sops rewrites `flow: [1, 2]  # after` into a BLOCK sequence with the
         # comment as element 0, so a list of integers gained a leading string:
         # sops reads [1, 2], File::SOPS read [' after a flow seq', 1, 2].
-        write_file("$tempdir/flow.plain.yaml", "flow: [1, 2]  # after a flow seq\n");
+        write_binary("$tempdir/flow.plain.yaml", "flow: [1, 2]  # after a flow seq\n");
         my $out = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/flow.plain.yaml 2>&1`;
         is($? >> 8, 0, 'sops -e writes the document') or diag($out);
         like($out, qr/^flow:\n\s+- ENC\[AES256_GCM,.*,type:comment\]$/m,
             'the flow sequence became a block sequence led by the comment');
 
-        write_file("$tempdir/flow.enc.yaml", $out);
+        write_binary("$tempdir/flow.enc.yaml", $out);
         # A refusal at flow:0 under ADR 0024. sops reads [1, 2] with a
         # comment; so do we, where k108 read
         # [' after a flow seq', 1, 2].
         my $got = eval { File::SOPS->decrypt(
-            encrypted => scalar read_file("$tempdir/flow.enc.yaml"),
+            encrypted => read_binary("$tempdir/flow.enc.yaml"),
             identities => [$secret]) };
         ok(defined $got, 'File::SOPS reads it, MAC and all') or diag($@);
         isa_ok($got->{flow}[0], 'File::SOPS::Comment', 'element 0');
@@ -449,7 +449,7 @@ SKIP: {
     subtest 'a document whose comments are all in mapping position still reads' => sub {
         # The control, and the thing this change must not break. Every comment
         # position sops turns into a `#ENC[...]` LINE rather than an element.
-        write_file("$tempdir/map.plain.yaml", <<'YAML');
+        write_binary("$tempdir/map.plain.yaml", <<'YAML');
 # first line
 database:
   # above a key
@@ -465,9 +465,9 @@ YAML
         unlike($out, qr/^\s*- ENC\[AES256_GCM,.*,type:comment\]$/m,
             'and not one of them is a sequence element');
 
-        write_file("$tempdir/map.enc.yaml", $out);
+        write_binary("$tempdir/map.enc.yaml", $out);
         my $got = eval { File::SOPS->decrypt(
-            encrypted => scalar read_file("$tempdir/map.enc.yaml"),
+            encrypted => read_binary("$tempdir/map.enc.yaml"),
             identities => [$secret]) };
         ok(defined $got, 'File::SOPS reads it, MAC and all') or diag($@);
         is_deeply($got, {

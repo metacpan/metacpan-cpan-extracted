@@ -370,4 +370,144 @@ for my $status (sort { $a <=> $b } keys %STATUS) {
     ok($r2->delivered, 'sending with only the application still works');
 }
 
+# ---- the worker actually runs the task -------------------------------------
+#
+# THE JOB IS NOT ASKED FOR THE APPLICATION. Everything above proves a send is
+# ENQUEUED; nothing ran the body of the task the worker later claims, and the
+# body asked `$job->app` for the application. A Punk::Queue::Job has no such
+# method and never had one, so on a live site every queued notification died
+# on the task's first line and nobody was ever told it was their move. The
+# plugin knows the application already - it was registered on it - so it
+# closes over that instead.
+#
+# The job here carries only what a real one does. Adding an `app` method to
+# this stand-in is what hid the bug for two versions: the test answered a
+# question the real object cannot.
+
+{
+    package TFake::Job;
+    sub new { my ($c, %a) = @_; bless {%a}, $c }
+    sub id           { $_[0]{id} }
+    sub args         { $_[0]{args} }
+    sub task         { 'punk.push.send' }
+    sub queue        { 'default' }
+    sub queue_object { undef }
+    sub state        { 'active' }
+    sub note         { }
+    sub log          { }
+}
+
+# ---- the Topic header is not a free-form string ----------------------------
+#
+# RFC 8030 section 5.4 allows at most 32 characters of the URL and filename
+# safe base64 alphabet. "game:42" reads like an obvious topic and earns a 400
+# Bad Request from the push service, which arrives inside a worker, long
+# after the call that chose it, against a subscription that is perfectly
+# healthy. That is a whole afternoon to diagnose, so it is refused here.
+
+{
+    my $cfg = Punk::Plugin::Push->config_for($app);
+    my $ua  = TFake::UA->new(plan => [ { status => 201 } ]);
+    local $cfg->{ua} = $ua;
+
+    my $ok = eval {
+        Punk::Plugin::Push->send_to($app, real_sub('topicok'), { t => 1 },
+                                    topic => 'game-42');
+    };
+    ok($ok && $ok->delivered, 'a topic of the allowed alphabet is sent');
+
+    for my $bad ('game:42', 'games/42', 'a' x 33, '') {
+        my $r = eval {
+            Punk::Plugin::Push->send_to($app, real_sub("t$bad"), { t => 1 },
+                                        topic => $bad);
+        };
+        my $err = $@;
+        ok(!$r && $err, "a topic of '" . ($bad || 'empty') . "' is refused here, not by the service");
+        like($err, qr/Topic/, '...and the message says which header') if $err;
+    }
+    is(scalar($ua->calls), 1, 'only the good one went on the wire');
+}
+
+# ---- the task reaches the QUEUE, not just a declaration list ---------------
+#
+# The worker looks the task up on the queue by name. Punk::Plugin::Queue
+# resolves the declarations its `task` keyword recorded at to_app, from its
+# own on_compile callback - and this plugin's callback runs after that one,
+# so a declaration made here is recorded into a list nobody reads again. The
+# job was enqueued, claimed, and refused with "no task registered for
+# 'punk.push.send'" while every page of the site looked healthy.
+#
+# This asks the queue the question the worker asks.
+
+SKIP: {
+    skip 'Punk::Plugin::Queue is needed for the registration path', 2
+        unless eval { require Punk::Plugin::Queue; 1 };
+
+    eval <<'PERL' or die $@;
+package PushQueued;
+use Punk;
+use Punk::Plugin::Queue;
+host 'https://example.com';
+database dsn => $main::DSN;
+plugin 'Queue' => {};
+plugin 'Push'  => { %main::OPTS, queue => 1 };
+1;
+PERL
+    PushQueued->punk_app;
+    PushQueued->to_app;
+
+    # keyed by the caller class, as the Queue plugin keys it
+    my $state = Punk::Plugin::Queue->state_for('PushQueued');
+    my $queue = $state && $state->{queue};
+    ok($queue, 'the application has a queue') or skip 'no queue to ask', 1;
+    my $code = eval { $queue->task($Punk::Plugin::Push::TASK) };
+    ok(ref $code eq 'CODE',
+       'the send task is registered ON THE QUEUE, which is where the worker looks')
+        or diag 'the worker would refuse every job with "no task registered"';
+}
+
+{
+    # A SECOND APPLICATION, with queue => 1, so the plugin registers its task
+    # through its own path rather than one this file reimplements. `task` is
+    # the keyword Punk::Queue would export; defining it in the application
+    # package is what the plugin looks for, and here it hands the closure
+    # back so the body can be run the way a worker runs it.
+    our @REGISTERED;
+    eval <<'PERL' or die $@;
+package PushWorker;
+use Punk;
+sub task { push @main::REGISTERED, [ @_ ] }
+host 'https://example.com';
+database dsn => $main::DSN;
+plugin 'Push' => { %main::OPTS, queue => 1 };
+1;
+PERL
+    my $wapp = PushWorker->punk_app;
+    PushWorker->to_app;
+
+    my ($name, $code) = @{ $REGISTERED[0] || [] };
+    is($name, 'punk.push.send', 'the plugin registered its task under the name the sender enqueues');
+    ok(ref $code eq 'CODE', '...with a body for the worker to run') or done_testing, exit;
+
+    my $wcfg = Punk::Plugin::Push->config_for($wapp);
+    my $ua   = TFake::UA->new(plan => [ { status => 201 } ]);
+    local $wcfg->{ua} = $ua;
+
+    Punk::Plugin::Push->store($wapp, 90, real_sub('worker'));
+    my ($row) = Punk::Plugin::Push->for_user($wapp, 90);
+    my $id = $row && $row->{id};
+    ok($id, 'the subscription the worker will re-read is stored') or diag 'nothing stored';
+
+    my $out = eval { $code->(TFake::Job->new(id => 1), $id, { t => 'run' }) };
+    my $err = $@;
+    is($err, '', 'the task runs against a job that has no app method') or diag $err;
+    is($out && $out->{status}, 201, '...and delivers');
+    is(scalar($ua->calls), 1, '...through the push service exactly once');
+
+    # a row pruned between the enqueue and the claim is not an error
+    $out = eval { $code->(TFake::Job->new(id => 2), $id + 9999, { t => 'gone' }) };
+    is($@, '', 'a subscription that has gone does not kill the job');
+    ok($out && $out->{gone}, '...it reports it as gone');
+}
+
 done_testing;

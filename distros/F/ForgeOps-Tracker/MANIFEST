@@ -4,6 +4,7 @@ lib/ForgeOps/Tracker/Client.pm
 lib/ForgeOps/Tracker/Configuration.pm
 lib/ForgeOps/Tracker/DeliveryQueue.pm
 lib/ForgeOps/Tracker/EventBuilder.pm
+lib/ForgeOps/Tracker/HistogramBucketer.pm
 lib/ForgeOps/Tracker/Integrations/Dancer2.pm
 lib/ForgeOps/Tracker/Integrations/Dancer2Performance.pm
 lib/ForgeOps/Tracker/Integrations/PSGI.pm
@@ -22,6 +23,7 @@ t/client.t
 t/configuration.t
 t/delivery_queue.t
 t/event_builder.t
+t/histogram_bucketer.t
 t/integrations_dancer2.t
 t/integrations_dancer2_performance.t
 t/integrations_psgi.t

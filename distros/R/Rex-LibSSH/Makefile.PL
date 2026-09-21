@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Rex::LibSSH",
   "PREREQ_PM" => {
-    "Net::LibSSH" => "0.003",
+    "Net::LibSSH" => "0.004",
     "Rex" => "1.16.0"
   },
   "TEST_REQUIRES" => {
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "IO::Socket::INET" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "File::Temp" => 0,
   "IO::Socket::INET" => 0,
-  "Net::LibSSH" => "0.003",
+  "Net::LibSSH" => "0.004",
   "Rex" => "1.16.0",
   "Test::More" => "0.98"
 );

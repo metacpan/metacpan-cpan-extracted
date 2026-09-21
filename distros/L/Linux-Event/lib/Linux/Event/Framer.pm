@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.115';
+our $VERSION = '0.116';
 
 use Carp qw(croak);
 use Linux::Event::_ByteStream::Descriptor ();
@@ -144,11 +144,12 @@ report the number of leading bytes consumed; Linux::Event keeps the unconsumed
 tail in native ordered-byte storage.
 
 C<transition_to()> can retain one provider when source and target share the same
-operations table, or replace one native consumer provider with another while
-preserving unread native input. Source flush/lifetime obligations are settled
-before the retiring context is destroyed and the retained tail is re-driven
-through the target provider. Adding or removing native-consumer mode during a
-live transition remains invalid.
+operations table, replace one native consumer provider with another, or retire
+a native consumer into an ordinary Perl input sink while preserving unread
+native input. Source flush/lifetime obligations are settled before the retiring
+context is destroyed and the retained tail is re-driven under the target
+descriptor. Adding a native consumer to an already-ordinary live Stream remains
+invalid.
 
 This is an extension-author boundary for high-performance protocol and
 coroutine/awaitable integrations. It is independent of the public Perl class

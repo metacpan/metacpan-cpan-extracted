@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.69';
+our $VERSION = '2.70';
 
 our @ALL =
 qw(
@@ -256,6 +256,8 @@ qw(
   Australia/Melbourne
   Australia/Perth
   Australia/Sydney
+  CST6CDT
+  EST5EDT
   Europe/Andorra
   Europe/Astrakhan
   Europe/Athens
@@ -297,6 +299,8 @@ qw(
   Indian/Chagos
   Indian/Maldives
   Indian/Mauritius
+  MST7MDT
+  PST8PDT
   Pacific/Apia
   Pacific/Auckland
   Pacific/Bougainville
@@ -1735,7 +1739,6 @@ our %LINKS =
   'Brazil/East' => 'America/Sao_Paulo',
   'Brazil/West' => 'America/Manaus',
   'CET' => 'Europe/Brussels',
-  'CST6CDT' => 'America/Chicago',
   'Canada/Atlantic' => 'America/Halifax',
   'Canada/Central' => 'America/Winnipeg',
   'Canada/Eastern' => 'America/Toronto',
@@ -1749,7 +1752,6 @@ our %LINKS =
   'Cuba' => 'America/Havana',
   'EET' => 'Europe/Athens',
   'EST' => 'America/Panama',
-  'EST5EDT' => 'America/New_York',
   'Egypt' => 'Africa/Cairo',
   'Eire' => 'Europe/Dublin',
   'Etc/GMT' => 'UTC',
@@ -1814,7 +1816,6 @@ our %LINKS =
   'Libya' => 'Africa/Tripoli',
   'MET' => 'Europe/Brussels',
   'MST' => 'America/Phoenix',
-  'MST7MDT' => 'America/Denver',
   'Mexico/BajaNorte' => 'America/Tijuana',
   'Mexico/BajaSur' => 'America/Mazatlan',
   'Mexico/General' => 'America/Mexico_City',
@@ -1822,7 +1823,6 @@ our %LINKS =
   'NZ-CHAT' => 'Pacific/Chatham',
   'Navajo' => 'America/Denver',
   'PRC' => 'Asia/Shanghai',
-  'PST8PDT' => 'America/Los_Angeles',
   'Pacific/Chuuk' => 'Pacific/Port_Moresby',
   'Pacific/Enderbury' => 'Pacific/Kanton',
   'Pacific/Funafuti' => 'Pacific/Tarawa',
@@ -1864,7 +1864,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2026c' }
+sub OlsonVersion { '2026d' }
 
 
 1;
@@ -2040,8 +2040,8 @@ so that applications can easily present a list of timezones.
   Antarctica/Rothera
   Antarctica/Troll
   Antarctica/Vostok
-  Antarctica/Macquarie
   Antarctica/Palmer
+  Antarctica/Macquarie
 
 =head3 Asia
 
@@ -2194,6 +2194,8 @@ so that applications can easily present a list of timezones.
 
 =head3 Pacific
 
+  Pacific/Easter
+  Pacific/Galapagos
   Pacific/Apia
   Pacific/Auckland
   Pacific/Bougainville
@@ -2221,8 +2223,6 @@ so that applications can easily present a list of timezones.
   Pacific/Tahiti
   Pacific/Tarawa
   Pacific/Tongatapu
-  Pacific/Easter
-  Pacific/Galapagos
   Pacific/Honolulu
 
 =head2 Zones by Country
@@ -2447,7 +2447,7 @@ so that applications can easily present a list of timezones.
   America/Swift_Current - CST - SK (midwest)
   America/Edmonton - CST - AB, BC(E), NT(E), SK(W)
   America/Cambridge_Bay - Mountain - NU (west)
-  America/Inuvik - Mountain - NT (west)
+  America/Inuvik - CST - NT (west)
   America/Vancouver - MST - BC (most areas)
   America/Creston - MST - BC (Creston)
   America/Dawson_Creek - MST - BC (Dawson Cr, Ft St John)
@@ -3525,7 +3525,6 @@ A linked zone is an alias from one name to another.
   Brazil/East => America/Sao_Paulo
   Brazil/West => America/Manaus
   CET => Europe/Brussels
-  CST6CDT => America/Chicago
   Canada/Atlantic => America/Halifax
   Canada/Central => America/Winnipeg
   Canada/Eastern => America/Toronto
@@ -3539,7 +3538,6 @@ A linked zone is an alias from one name to another.
   Cuba => America/Havana
   EET => Europe/Athens
   EST => America/Panama
-  EST5EDT => America/New_York
   Egypt => Africa/Cairo
   Eire => Europe/Dublin
   Etc/GMT => UTC
@@ -3604,7 +3602,6 @@ A linked zone is an alias from one name to another.
   Libya => Africa/Tripoli
   MET => Europe/Brussels
   MST => America/Phoenix
-  MST7MDT => America/Denver
   Mexico/BajaNorte => America/Tijuana
   Mexico/BajaSur => America/Mazatlan
   Mexico/General => America/Mexico_City
@@ -3612,7 +3609,6 @@ A linked zone is an alias from one name to another.
   NZ-CHAT => Pacific/Chatham
   Navajo => America/Denver
   PRC => Asia/Shanghai
-  PST8PDT => America/Los_Angeles
   Pacific/Chuuk => Pacific/Port_Moresby
   Pacific/Enderbury => Pacific/Kanton
   Pacific/Funafuti => Pacific/Tarawa

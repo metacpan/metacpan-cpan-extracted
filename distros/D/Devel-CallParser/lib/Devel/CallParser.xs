@@ -12,6 +12,19 @@
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 #endif /* !PERL_VERSION_GE */
 
+/* the pad's name list: a PADNAMELIST from 5.21.7, an AV before */
+#if PERL_VERSION_GE(5,21,7)
+# define Q_PADNAMES_MAX(pnl) PadnamelistMAX(pnl)
+# define Q_PADNAMES_TRIM(pnl, n) STMT_START { \
+	if(PadnamelistMAX(pnl) > (n)) PadnamelistMAX(pnl) = (n); \
+	} STMT_END
+#else /* < 5.21.7 */
+# define Q_PADNAMES_MAX(pnl) av_len(pnl)
+# define Q_PADNAMES_TRIM(pnl, n) STMT_START { \
+	if(av_len(pnl) > (n)) av_fill(pnl, n); \
+	} STMT_END
+#endif /* < 5.21.7 */
+
 #ifndef op_append_elem
 # define op_append_elem(t, f, l) THX_op_append_elem(aTHX_ t, f, l)
 static OP *THX_op_append_elem(pTHX_ I32 type, OP *first, OP *last)
@@ -386,10 +399,22 @@ static int my_keyword_plugin(pTHX_
 	 * to padrange.  Restoring the pad's fill pointer works around
 	 * this bug too.  So for now this workaround is used with no
 	 * upper bound on the Perl version.
+	 *
+	 * The pad's name list must be restored with it.  Allocating the
+	 * constant slot for the gv op stores a placeholder name at that
+	 * index, which can extend the name list; freeing the op replaces
+	 * the placeholder but leaves the list's fill where it was.  A
+	 * block opened right after the declined keyword then takes the
+	 * inflated fill as its floor, the first "my" inside the block
+	 * lands on the floor slot, and pad_leavemy never closes it: the
+	 * lexical stays visible after the block, masking the outer one
+	 * of the same name (a "masks earlier declaration in same scope"
+	 * warning where the two are in different scopes).
 	 */
 #define MUST_RESTORE_PAD_FILL PERL_VERSION_GE(5,17,6)
 #if MUST_RESTORE_PAD_FILL
 	I32 padfill = av_len(PL_comppad);
+	SSize_t namefill = Q_PADNAMES_MAX(PL_comppad_name);
 #endif /* MUST_RESTORE_PAD_FILL */
 	/*
 	 * If Devel::Declare happens to be loaded, it triggers magic
@@ -420,6 +445,7 @@ static int my_keyword_plugin(pTHX_
 		op_free(cvop);
 #if MUST_RESTORE_PAD_FILL
 		av_fill(PL_comppad, padfill);
+		Q_PADNAMES_TRIM(PL_comppad_name, namefill);
 #endif /* MUST_RESTORE_PAD_FILL */
 		return next_keyword_plugin(aTHX_
 			keyword_ptr, keyword_len, op_ptr);

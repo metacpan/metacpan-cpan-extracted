@@ -1,5 +1,13 @@
 Revision history for Punk
 
+0.53    2026-09-20
+        - Requires Hyperman 0.51. A worker that could not claim a wakeup
+          descriptor installed no watch and never read the bus again, so
+          cross-worker cache invalidation and room broadcasts stopped
+          reaching it silently. That is what failed t/0810 on the smokers.
+        - t/0810 asserts the write request landed, so a failed request is no
+          longer indistinguishable from a pool that ignored the invalidation.
+
 0.52    2026-09-19
         - FIX: the plural rule for a language tag was matched on the primary
           subtag only, so pt-PT was given pt's rule.

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use B ();
 use Cpanel::JSON::XS ();
 
@@ -40,7 +40,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 my $serial = 0;
@@ -162,7 +162,7 @@ JSON
 
 sub _wide_fixture {
     my $plain = scratch_file('json');
-    write_file($plain, $wide_plain_doc);
+    write_binary($plain, $wide_plain_doc);
     my $enc_file = scratch_file('json');
     File::SOPS->encrypt_file(input => $plain, output => $enc_file, recipients => [$public]);
     return $enc_file;
@@ -171,7 +171,7 @@ sub _wide_fixture {
 subtest 'decrypt: the unencrypted slot comes back a dualvar printing the document digits' => sub {
     my $enc_file = _wide_fixture();
     my $data = File::SOPS->decrypt(
-        encrypted => scalar(read_file($enc_file)), identities => [$secret], format => 'json');
+        encrypted => read_binary($enc_file), identities => [$secret], format => 'json');
 
     is(_pub_bits($data->{big_unencrypted}), 'NP', 'NOK+POK -- a dualvar');
     is("$data->{big_unencrypted}", $WIDE, 'stringifying prints the document digits');
@@ -180,7 +180,7 @@ subtest 'decrypt: the unencrypted slot comes back a dualvar printing the documen
 subtest 'decrypt: the encrypted slot comes back the bare NV every decrypted float is' => sub {
     my $enc_file = _wide_fixture();
     my $data = File::SOPS->decrypt(
-        encrypted => scalar(read_file($enc_file)), identities => [$secret], format => 'json');
+        encrypted => read_binary($enc_file), identities => [$secret], format => 'json');
 
     is(_pub_bits($data->{big_secret}), 'N', 'NOK only -- no string half');
     is("$data->{big_secret}", '1e+20',
@@ -202,7 +202,7 @@ subtest 'decrypt_file: the plaintext document carries the number bare, not quote
     my $out = scratch_file('json');
     File::SOPS->decrypt_file(input => $enc_file, output => $out, identities => [$secret]);
 
-    my $written = read_file($out);
+    my $written = read_binary($out);
     like($written, qr/"big_unencrypted"\s*:\s*\Q$WIDE\E\b/,
         'the unencrypted slot is written as a bare number with full digits');
     unlike($written, qr/"big_unencrypted"\s*:\s*"/,
@@ -232,7 +232,7 @@ subtest 'a literal that overflows a double dies at encrypt() and at encrypt_file
             "[$slot] encrypt() dies at assert_representable's non-finite guard");
 
         my $plain = scratch_file('json');
-        write_file($plain, $json);
+        write_binary($plain, $json);
         my $out = scratch_file('json');
         eval { File::SOPS->encrypt_file(input => $plain, output => $out, recipients => [$public]) };
         like($@, qr/non-finite float \(\+Inf\)/, "[$slot] encrypt_file() dies the same way");
@@ -269,7 +269,7 @@ subtest 'the same overflow does not croak on read paths: +Inf as the number, all
     (my $forged = $small) =~ s/"huge_unencrypted"\s*:\s*1\b/"huge_unencrypted": $HUGE_ZEROS/;
 
     my $file = scratch_file('json');
-    write_file($file, $forged);
+    write_binary($file, $forged);
 
     my $decrypted = eval {
         File::SOPS->decrypt(encrypted => $forged, identities => [$secret], format => 'json', ignore_mac => 1);
@@ -332,11 +332,11 @@ subtest 'a document already written quoted (type:str) verifies, rotates and read
     my $old_shaped = qq({\n  "big_unencrypted": "$WIDE",\n  "big_secret": "$WIDE"\n}\n);
 
     my $plain = scratch_file('json');
-    write_file($plain, $old_shaped);
+    write_binary($plain, $old_shaped);
     my $enc_file = scratch_file('json');
     File::SOPS->encrypt_file(input => $plain, output => $enc_file, recipients => [$public]);
 
-    my $before_doc = read_file($enc_file);
+    my $before_doc = read_binary($enc_file);
     like($before_doc, qr/"big_unencrypted"\s*:\s*"\Q$WIDE\E"/,
         'the unencrypted slot is quoted -- the shape every pre-fix version produced');
     like($before_doc, qr/"big_secret"[^{]*type:str/,
@@ -351,7 +351,7 @@ subtest 'a document already written quoted (type:str) verifies, rotates and read
     is(File::SOPS::Encrypted->detect_type($before->{big_unencrypted}), 'str', 'still type str');
 
     File::SOPS->rotate(file => $enc_file, identities => [$secret]);
-    my $after_doc = read_file($enc_file);
+    my $after_doc = read_binary($enc_file);
     like($after_doc, qr/"big_unencrypted"\s*:\s*"\Q$WIDE\E"/,
         'rotate keeps it quoted -- it never enters the new leaf class');
     like($after_doc, qr/"big_secret"[^{]*type:str/, 'and the encrypted slot is still type:str');
@@ -459,20 +459,20 @@ SKIP: {
 
     subtest 'sops -e writes the bare literal; our rotate leaves it byte-unchanged; sops -d exits 0' => sub {
         my $plain = scratch_file('json');
-        write_file($plain, qq({\n  "big_unencrypted": $WIDE,\n)
+        write_binary($plain, qq({\n  "big_unencrypted": $WIDE,\n)
             . qq(  "quoted_unencrypted": "$WIDE",\n  "big_secret": $WIDE\n}\n));
 
         my $sops_e_out = `$sops_bin -e -i --age $public $plain 2>&1`;
         is($? >> 8, 0, 'sops -e wrote the fixture') or diag($sops_e_out);
 
-        my $written_by_sops = read_file($plain);
+        my $written_by_sops = read_binary($plain);
         like($written_by_sops, qr/"big_unencrypted"\s*:\s*\Q$WIDE\E\b/,
             'sops itself writes the literal bare, as a number');
         like($written_by_sops, qr/"big_secret"\s*:\s*"ENC\[[^\]]*type:float\]"/,
             'and types the encrypted slot float -- the answer this fix now matches');
 
         File::SOPS->rotate(file => $plain, identities => [$secret]);
-        my $after_rotate = read_file($plain);
+        my $after_rotate = read_binary($plain);
         like($after_rotate, qr/"big_unencrypted"\s*:\s*\Q$WIDE\E\b/,
             'our rotate leaves the unencrypted slot bare and byte-unchanged');
         like($after_rotate, qr/"quoted_unencrypted"\s*:\s*"\Q$WIDE\E"/,
@@ -487,12 +487,12 @@ SKIP: {
     subtest 'our encrypt of wide literals: sops -d exits 0, values as numbers, encrypted slots type:float' => sub {
         for my $literal ($WIDE, '18446744073709551616', '-9223372036854775809') {
             my $plain = scratch_file('json');
-            write_file($plain, qq({\n  "wide_unencrypted": $literal,\n  "wide_secret": $literal\n}\n));
+            write_binary($plain, qq({\n  "wide_unencrypted": $literal,\n  "wide_secret": $literal\n}\n));
 
             my $enc_file = scratch_file('json');
             File::SOPS->encrypt_file(input => $plain, output => $enc_file, recipients => [$public]);
 
-            my $document = read_file($enc_file);
+            my $document = read_binary($enc_file);
             like($document, qr/"wide_secret"\s*:\s*"ENC\[[^\]]*type:float\]"/,
                 "[$literal] our own encrypt types the leaf float, matching sops's own answer");
 

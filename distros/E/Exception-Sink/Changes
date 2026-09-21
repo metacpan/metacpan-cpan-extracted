@@ -1,5 +1,9 @@
 Revision history for Perl extension Exception::Sink.
 
+3.10  2026.09.20
+
+    1. fixed $pack::
+
 3.09  2024.07.18
 
     1. fixed stack frames numbers when skipping frames
@@ -17,7 +21,7 @@ Revision history for Perl extension Exception::Sink.
 3.06  2016.01.27
 
     1. fixed get_stack_trace() return data in scalar context
-    
+
 3.04  2014.03.13
 
     1. added get_stack_trace() function

@@ -108,6 +108,12 @@ like($current_text{'README.md'},
 like($current_text{'docs/FRAMING.md'},
     qr/replace the native consumer provider.*same native input/s,
     'framing guide documents provider-changing protocol transitions');
+like($current_text{'docs/FRAMING.md'},
+    qr/native consumer may also retire into an ordinary Perl target/s,
+    'framing guide documents native-consumer retirement into ordinary input');
+like($current_text{'docs/ORDERED-BYTE-CONSUMER-ABI.md'},
+    qr/Adding a native consumer to an already-ordinary live object remains rejected/s,
+    'consumer ABI guide keeps the reverse live transition explicitly unsupported');
 like($current_text{'docs/FIRST-CLASS-STREAM-CALLBACKS.md'},
     qr/(?:constructor callback|callback supplied at construction).*overrides/is,
     'current callback contract documents constructor precedence');

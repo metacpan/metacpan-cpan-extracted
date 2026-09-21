@@ -1,5 +1,24 @@
 OpenStack::MetaAPI Changes
 
+0.005     2026-09-20 16:47:03-06:00 America/Denver
+
+  [ Security ]
+  - Check the hostname of the TLS certificate of each OpenStack endpoint.
+    OpenStack::Client makes its user agents with verify_hostname => 0, so
+    the X-Auth-Token of every request went to whichever server answered.
+    new() now gives OpenStack::Client::Auth the new class
+    OpenStack::MetaAPI::UserAgent as package_ua, which leaves the check to
+    LWP: on, unless PERL_LWP_SSL_VERIFY_HOSTNAME=0. If that variable is
+    not set, HTTPS_CA_FILE or HTTPS_CA_DIR also turns it off. A caller that
+    builds its own auth object passes package_ua => 'OpenStack::MetaAPI::UserAgent'
+    to get the same. A cloud with a self-signed certificate now needs
+    PERL_LWP_SSL_CA_FILE, or PERL_LWP_SSL_VERIFY_HOSTNAME=0.
+
+  [ Dependencies ]
+  - LWP::UserAgent is now a direct requirement. OpenStack::MetaAPI::UserAgent
+    subclasses it. It was already pulled in by OpenStack::Client, but the
+    distribution now asks for it by name.
+
 0.004     2026-09-10 20:02:40-06:00 America/Denver
 
   [ New features ]

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use YAML::XS qw(Load);
 
 use File::SOPS;
@@ -56,7 +56,7 @@ sub plaintext_file {
     my ($content, %args) = @_;
     my $sub  = $args{dir} // scratch();
     my $file = "$sub/" . ($args{name} // 'secrets.yaml');
-    write_file($file, $content);
+    write_binary($file, $content);
     return $file;
 }
 
@@ -65,7 +65,7 @@ sub encrypted_file {
     my $sub  = delete $args{dir} // scratch();
     my $file = "$sub/" . (delete $args{name} // 'secrets.yaml');
 
-    write_file($file, File::SOPS->encrypt(
+    write_binary($file, File::SOPS->encrypt(
         recipients => [$public],
         format     => 'yaml',
         %args,
@@ -112,7 +112,7 @@ sub scratch_of {
 # reports EFBIG, and the old path checked neither.
 
 my $wrapper = "$dir/no-disk.sh";
-write_file($wrapper, "#!/bin/sh\nulimit -f 0 || exit 99\nexec \"\$@\"\n");
+write_binary($wrapper, "#!/bin/sh\nulimit -f 0 || exit 99\nexec \"\$@\"\n");
 chmod 0755, $wrapper or die $!;
 
 # Run $body (Perl source) in a child that cannot write to any regular file.
@@ -122,7 +122,7 @@ sub under_full_disk {
     my ($body) = @_;
 
     my $script = "$dir/child-" . ++$serial . ".pl";
-    write_file($script, <<"PERL");
+    write_binary($script, <<"PERL");
 use strict;
 use warnings;
 \$SIG{XFSZ} = 'IGNORE';
@@ -145,7 +145,7 @@ PERL
 # out first, on a file of no consequence.
 my $limit_works = do {
     my $probe = "$dir/probe.txt";
-    write_file($probe, "before\n");
+    write_binary($probe, "before\n");
     my $out = under_full_disk(
         "open my \$fh, '>', '$probe' or die \$!;"
       . "print {\$fh} 'x' x 4096 or die \$!;"
@@ -171,7 +171,7 @@ SKIP: {
 
         like($out, qr/^ERR/, 'the failed write is reported as a failure')
             or diag('the old path ignored print and close and returned 1');
-        is(read_file($file), $plain, 'and the plaintext file is exactly as it was')
+        is(read_binary($file), $plain, 'and the plaintext file is exactly as it was')
             or diag('output defaults to input, so this was the only copy of it');
         is_deeply([strays(scratch_of($file), 'secrets.yaml')], [],
             'no half-written temporary file left next to it');
@@ -179,19 +179,19 @@ SKIP: {
 
     subtest 'rotate keeps the old document when the write cannot complete' => sub {
         my $file   = encrypted_file(data => { db => { password => 'secret123' } });
-        my $before = read_file($file);
+        my $before = read_binary($file);
 
         my $out = under_full_disk(
             "File::SOPS->rotate(file => '$file', identities => ['$secret']);"
         );
 
         like($out, qr/^ERR/, 'the failed write is reported as a failure');
-        is(read_file($file), $before, 'the file is byte-identical');
+        is(read_binary($file), $before, 'the file is byte-identical');
         # In an eval because the failure mode under test is a file that is gone:
         # decrypt on an emptied file croaks, and a croak here would abort the
         # rest of this file instead of reporting the claim that was broken.
         my $roundtrip = eval {
-            File::SOPS->decrypt(encrypted => scalar read_file($file),
+            File::SOPS->decrypt(encrypted => read_binary($file),
                                 identities => [$secret])
         };
         is_deeply(
@@ -209,8 +209,8 @@ SKIP: {
         my $sub  = scratch();
         my $file = encrypted_file(data => { secret => 'shh' }, dir => $sub);
         my $out  = "$sub/working-copy.yaml";
-        write_file($out, "secret: the previous working copy\n");
-        my $before = read_file($out);
+        write_binary($out, "secret: the previous working copy\n");
+        my $before = read_binary($out);
 
         my $result = under_full_disk(
             "File::SOPS->decrypt_file(input => '$file', output => '$out', "
@@ -218,7 +218,7 @@ SKIP: {
         );
 
         like($result, qr/^ERR/, 'the failed write is reported as a failure');
-        is(read_file($out), $before, 'and the output file is exactly as it was')
+        is(read_binary($out), $before, 'and the output file is exactly as it was')
             or diag('output is required, but nothing stops it naming a file '
                   . 'that matters');
         is_deeply([strays($sub, 'secrets.yaml', 'working-copy.yaml')], [],
@@ -247,7 +247,7 @@ subtest 'an existing target keeps the mode it had' => sub {
     is(sprintf('%04o', (stat $enc)[2] & 07777), '0640', 'rotate');
 
     my $out = "$sub/out.yaml";
-    write_file($out, "placeholder\n");
+    write_binary($out, "placeholder\n");
     chmod 0640, $out or die $!;
     File::SOPS->decrypt_file(input => $enc, output => $out, identities => [$secret]);
     is(sprintf('%04o', (stat $out)[2] & 07777), '0640', 'decrypt_file');
@@ -290,7 +290,7 @@ subtest 'the file comes back with a new inode, so hard links keep the old conten
     File::SOPS->encrypt_file(input => $file, recipients => [$public]);
 
     isnt((stat $file)[1], $inode_before, 'the encrypted file is a new inode');
-    is(read_file($link), "db:\n  password: secret123\n",
+    is(read_binary($link), "db:\n  password: secret123\n",
         'and the hard link still holds the PLAINTEXT')
         or diag('sops keeps the inode here, so its hard links follow along');
 };
@@ -307,7 +307,7 @@ subtest 'a symlink is resolved rather than replaced' => sub {
     ok(-l $link, 'the symlink is still a symlink')
         or diag('rename() over a symlink replaces the link with a regular file');
     is_deeply(
-        File::SOPS->decrypt(encrypted => scalar read_file($real),
+        File::SOPS->decrypt(encrypted => read_binary($real),
                             identities => [$secret]),
         { secret => 'shh' },
         'and the file it points at is the one that was rotated',
@@ -341,14 +341,14 @@ subtest 'the ordinary results are unchanged' => sub {
     my $enc  = "$sub/secrets.enc.yaml";
 
     File::SOPS->encrypt_file(input => $in, output => $enc, recipients => [$public]);
-    like(read_file($enc), qr/password: ENC\[AES256_GCM,/, 'encrypt_file wrote a document');
-    is(read_file($in), "db:\n  password: secret123\n  port: 5432\n",
+    like(read_binary($enc), qr/password: ENC\[AES256_GCM,/, 'encrypt_file wrote a document');
+    is(read_binary($in), "db:\n  password: secret123\n  port: 5432\n",
         'and left the input alone');
 
     File::SOPS->rotate(file => $enc, identities => [$secret]);
     my $dec = "$sub/back.yaml";
     File::SOPS->decrypt_file(input => $enc, output => $dec, identities => [$secret]);
-    is_deeply(Load(scalar read_file($dec)),
+    is_deeply(Load(read_binary($dec)),
         { db => { password => 'secret123', port => 5432 } },
         'and the values survive encrypt_file -> rotate -> decrypt_file');
 
@@ -385,20 +385,20 @@ subtest 'a read-only target is refused and left untouched' => sub {
 
     my $ro_in = plaintext_file($plain, dir => $sub, name => 'ro-in.yaml');
     chmod 0444, $ro_in or die $!;
-    my $before_in = read_file($ro_in);
+    my $before_in = read_binary($ro_in);
 
     my $ro_out = "$sub/ro-out.yaml";
-    write_file($ro_out, "placeholder: previous contents\n");
+    write_binary($ro_out, "placeholder: previous contents\n");
     chmod 0444, $ro_out or die $!;
-    my $before_out = read_file($ro_out);
+    my $before_out = read_binary($ro_out);
 
     my $enc_in = encrypted_file(data => { db => { password => 'shh' } },
                                 dir => $sub, name => 'ro-enc.yaml');
     chmod 0444, $enc_in or die $!;
-    my $before_enc = read_file($enc_in);
+    my $before_enc = read_binary($enc_in);
 
     my $dec_in = "$sub/ro-dec-input.yaml";
-    write_file($dec_in, File::SOPS->encrypt(
+    write_binary($dec_in, File::SOPS->encrypt(
         recipients => [$public], format => 'yaml',
         data => { a => 'b' }));
     my @known = ('ro-in.yaml', 'ro-out.yaml', 'ro-enc.yaml', 'ro-dec-input.yaml');
@@ -437,7 +437,7 @@ subtest 'a read-only target is refused and left untouched' => sub {
             "$case->{name}: refused with the sops wording")
             or diag("sops reports 'Could not open in-place file for writing: "
                   . "$case->{file}: permission denied'");
-        is(read_file($case->{file}), $case->{before},
+        is(read_binary($case->{file}), $case->{before},
             "$case->{name}: the file is untouched")
             or diag('the failure that has to be raised BEFORE any work is '
                   . 'doing the work');
@@ -454,10 +454,10 @@ subtest 'edit refuses a read-only file too, before the re-encrypt' => sub {
     # re-encrypting over a read-only file when it is not.
     my $file = encrypted_file(data => { secret => 'shh' });
     chmod 0444, $file or die $!;
-    my $before = read_file($file);
+    my $before = read_binary($file);
 
     my $script = "$dir/editor-ro-edit.pl";
-    write_file($script, <<"PERL");
+    write_binary($script, <<"PERL");
 use strict;
 use warnings;
 my \$file = \$ARGV[-1];
@@ -472,7 +472,7 @@ PERL
     });
 
     like($err, qr/permission denied/i, 'edit is refused at the write step');
-    is(read_file($file), $before, 'and the encrypted file is untouched')
+    is(read_binary($file), $before, 'and the encrypted file is untouched')
         or diag('the editor wrote plaintext to the temp file copy, which '
               . 'is fine; the refusal has to come before _replace_file '
               . 'would overwrite the original');
@@ -498,7 +498,7 @@ subtest 'a writable target still works (the check is not a false positive)' => s
     chmod 0644, $file or die $!;
 
     File::SOPS->encrypt_in_place(file => $file, recipients => [$public]);
-    like(read_file($file), qr/ENC\[AES256_GCM,/,
+    like(read_binary($file), qr/ENC\[AES256_GCM,/,
         'a 0644 file is encrypted normally')
         or diag('the check is on the file, not on some other condition');
     is(sprintf('%04o', (stat $file)[2] & 07777), '0644',

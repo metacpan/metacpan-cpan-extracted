@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use Crypt::Age;
 
 use lib 't/lib';
@@ -54,10 +54,10 @@ sub sops_encrypt {
 
     my ($public, $secret) = Crypt::Age->generate_keypair();
     my $tempdir = tempdir(CLEANUP => 1);
-    write_file("$tempdir/key.txt", $secret);
+    write_binary("$tempdir/key.txt", $secret);
     local $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
-    write_file("$tempdir/$name", $content);
+    write_binary("$tempdir/$name", $content);
     my $enc = `$sops_bin --age $public -e $tempdir/$name 2>&1`;
     is($? >> 8, 0, "sops encrypted $name") or do {
         diag("sops output: $enc");
@@ -187,11 +187,11 @@ subtest 'encrypt_file and encrypt_in_place write a multi-document stream, and so
 
     my ($public, $secret) = Crypt::Age->generate_keypair();
     my $dir = tempdir(CLEANUP => 1);
-    write_file("$dir/key.txt", $secret);
+    write_binary("$dir/key.txt", $secret);
     local $ENV{SOPS_AGE_KEY_FILE} = "$dir/key.txt";
 
     my $in = "$dir/two.yaml";
-    write_file($in, $TWO_DOCS);
+    write_binary($in, $TWO_DOCS);
     my $out = "$dir/two.enc.yaml";
 
     ok(File::SOPS->encrypt_file(
@@ -200,7 +200,7 @@ subtest 'encrypt_file and encrypt_in_place write a multi-document stream, and so
         recipients => [$public],
     ), 'encrypt_file returns true');
 
-    my $content = read_file($out);
+    my $content = read_binary($out);
     is(scalar(() = $content =~ /^---\s*$/mg), 2,
         'two --- separators -- YAML::XS::Dump prepends one to EVERY document (docs/adr/0033 point 5)');
     is(scalar(() = $content =~ /^sops:\s*$/mg), 2,
@@ -215,11 +215,11 @@ subtest 'encrypt_file and encrypt_in_place write a multi-document stream, and so
     # unrecoverable, because there was no separate output file to compare
     # against. It writes the same stream over the source file.
     my $inplace = "$dir/inplace.yaml";
-    write_file($inplace, $TWO_DOCS);
+    write_binary($inplace, $TWO_DOCS);
     ok(File::SOPS->encrypt_in_place(file => $inplace, recipients => [$public]),
         'encrypt_in_place returns true');
 
-    my $inplace_content = read_file($inplace);
+    my $inplace_content = read_binary($inplace);
     is(scalar(() = $inplace_content =~ /^---\s*$/mg), 2,
         'encrypt_in_place: two --- separators too');
     is(scalar(() = $inplace_content =~ /^sops:\s*$/mg), 2,
@@ -249,7 +249,7 @@ subtest 'encrypt(data => arrayref) writes a multi-document stream, and sops -d r
 
     my ($public, $secret) = Crypt::Age->generate_keypair();
     my $dir = tempdir(CLEANUP => 1);
-    write_file("$dir/key.txt", $secret);
+    write_binary("$dir/key.txt", $secret);
     local $ENV{SOPS_AGE_KEY_FILE} = "$dir/key.txt";
 
     my $enc = eval {
@@ -261,7 +261,7 @@ subtest 'encrypt(data => arrayref) writes a multi-document stream, and sops -d r
     ok(!$@, 'encrypt(data => arrayref) with two documents no longer dies') or diag($@);
 
     my $out = "$dir/arrayref.enc.yaml";
-    write_file($out, $enc);
+    write_binary($out, $enc);
 
     my $decrypted = `$sops_bin -d $out 2>&1`;
     is($? >> 8, 0, 'sops -d reads the stream encrypt(data => arrayref) wrote') or diag($decrypted);
@@ -341,7 +341,7 @@ subtest 'rotate re-keys a multi-document stream, and sops -d still reads it (poi
 
     my $dir  = tempdir(CLEANUP => 1);
     my $file = "$dir/rotate.enc.yaml";
-    write_file($file, $enc);
+    write_binary($file, $enc);
 
     my ($blob_before) = $enc =~ /(-----BEGIN AGE ENCRYPTED FILE-----.*?-----END AGE ENCRYPTED FILE-----)/s;
     ok(length $blob_before, 'sanity: found the original age blob to compare against');
@@ -349,7 +349,7 @@ subtest 'rotate re-keys a multi-document stream, and sops -d still reads it (poi
     ok(File::SOPS->rotate(file => $file, identities => [$secret]),
         'rotate returns true on a multi-document stream');
 
-    my $rotated = read_file($file);
+    my $rotated = read_binary($file);
     my ($blob_after) = $rotated =~ /(-----BEGIN AGE ENCRYPTED FILE-----.*?-----END AGE ENCRYPTED FILE-----)/s;
     isnt($blob_after, $blob_before,
         'the age blob changed -- rotate really generated a new data key, not a no-op');
@@ -362,7 +362,7 @@ subtest 'rotate re-keys a multi-document stream, and sops -d still reads it (poi
     # and is gone by the time it returns; rotate() kept the same recipient
     # (no `recipients` argument was given), so the same $secret still opens
     # the file -- it just needs pointing at again for this shell-out.
-    write_file("$dir/key.txt", $secret);
+    write_binary("$dir/key.txt", $secret);
     local $ENV{SOPS_AGE_KEY_FILE} = "$dir/key.txt";
 
     my $decrypted = `$sops_bin -d $file 2>&1`;
@@ -393,7 +393,7 @@ subtest 'edit refuses a multi-document stream, with its own k41 message' => sub 
 
     my $dir  = tempdir(CLEANUP => 1);
     my $file = "$dir/edit.enc.yaml";
-    write_file($file, $enc);
+    write_binary($file, $enc);
 
     my $ok = eval {
         File::SOPS->edit(
@@ -410,19 +410,19 @@ subtest 'edit refuses a multi-document stream, with its own k41 message' => sub 
         'naming why: the new-data-key divergence, not an unimplemented mechanic');
     like($@, qr/docs\/adr\/0033 deliberately leaves edit-on-a-stream semantics open/,
         'and pointing at the ADR that left this open');
-    is(read_file($file), $enc, 'and the file on disk is untouched');
+    is(read_binary($file), $enc, 'and the file on disk is untouched');
 
     # A SINGLE-document file the editor itself turns into a stream is refused
     # the same way -- discovered after the editor has run, but still before
     # anything is re-encrypted or written back.
     my ($public2, $secret2) = Crypt::Age->generate_keypair();
     my $single_file = "$dir/single.enc.yaml";
-    write_file($single_file, File::SOPS->encrypt(
+    write_binary($single_file, File::SOPS->encrypt(
         data => { alpha => 'one' }, recipients => [$public2], format => 'yaml'));
-    my $single_before = read_file($single_file);
+    my $single_before = read_binary($single_file);
 
     my $editor_script = "$dir/editor-multidoc.pl";
-    write_file($editor_script, <<'PERL');
+    write_binary($editor_script, <<'PERL');
 use strict;
 use warnings;
 my $file = $ARGV[-1];
@@ -442,7 +442,7 @@ PERL
     ok(!$ok, 'edit dies when the editor turns one document into a stream');
     like($@, qr/edit on a multi-document YAML stream \(2 documents\) is not supported/,
         'the SAME refusal, discovered after the editor ran rather than before');
-    is(read_file($single_file), $single_before,
+    is(read_binary($single_file), $single_before,
         'the original single-document file is untouched -- the edit is discarded, not partially applied');
 };
 
@@ -610,7 +610,7 @@ subtest 'extract addresses one document at a time, and never falls through' => s
 
     my $dir  = tempdir(CLEANUP => 1);
     my $file = "$dir/two.enc.yaml";
-    write_file($file, $enc);
+    write_binary($file, $enc);
 
     is(File::SOPS->extract(file => $file, path => '["alpha"]', identities => [$secret]),
         'one', 'document is 0 by default, reaching document 0');
@@ -645,7 +645,7 @@ subtest 'document => 1 on a single-document file is out of range' => sub {
     my ($public, $secret) = Crypt::Age->generate_keypair();
     my $dir  = tempdir(CLEANUP => 1);
     my $file = "$dir/one.enc.yaml";
-    write_file($file, File::SOPS->encrypt(
+    write_binary($file, File::SOPS->encrypt(
         data       => { alpha => 'one' },
         recipients => [$public],
     ));
@@ -702,12 +702,12 @@ subtest 'N3: the MAC covers the concatenated leaf sequence, not where the docume
 
     my $dir  = tempdir(CLEANUP => 1);
     my $file = "$dir/three.mutated.yaml";
-    write_file($file, $mutated);
+    write_binary($file, $mutated);
 
     # sops_encrypt()'s own SOPS_AGE_KEY_FILE is `local`-scoped to that call
     # and is gone by the time it returns, so the identity for this shell-out
     # has to be set again here, against the same $secret it gave back.
-    write_file("$dir/key.txt", $secret);
+    write_binary("$dir/key.txt", $secret);
     local $ENV{SOPS_AGE_KEY_FILE} = "$dir/key.txt";
 
     my $decrypted = `$sops_bin -d $file 2>&1`;
@@ -747,7 +747,7 @@ subtest 'point 6: an empty document round-trips through both directions, middle 
     # empty TRAILING document; sops -d reads both back as {}.
     my ($public, $secret) = Crypt::Age->generate_keypair();
     my $dir = tempdir(CLEANUP => 1);
-    write_file("$dir/key.txt", $secret);
+    write_binary("$dir/key.txt", $secret);
     local $ENV{SOPS_AGE_KEY_FILE} = "$dir/key.txt";
 
     my $enc = File::SOPS->encrypt(
@@ -756,7 +756,7 @@ subtest 'point 6: an empty document round-trips through both directions, middle 
         format     => 'yaml',
     );
     my $out = "$dir/empty.enc.yaml";
-    write_file($out, $enc);
+    write_binary($out, $enc);
 
     my $decrypted = `$sops_bin -d $out 2>&1`;
     is($? >> 8, 0, 'sops -d reads a stream we wrote with empty documents in it') or diag($decrypted);
@@ -804,12 +804,12 @@ subtest 'N5/Decision 5: a cross-document anchor is a stream sops reads that this
 
     my $dir  = tempdir(CLEANUP => 1);
     my $file = "$dir/anchor.enc.yaml";
-    write_file($file, $enc);
+    write_binary($file, $enc);
 
     # sops_encrypt()'s own SOPS_AGE_KEY_FILE is `local`-scoped to that call
     # and is gone by the time it returns, so the identity for this shell-out
     # has to be set again here, against the same $secret it gave back.
-    write_file("$dir/key.txt", $secret);
+    write_binary("$dir/key.txt", $secret);
     local $ENV{SOPS_AGE_KEY_FILE} = "$dir/key.txt";
 
     my $decrypted = `$sops_bin -d $file 2>&1`;

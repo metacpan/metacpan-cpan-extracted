@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use JSON::MaybeXS qw(decode_json);
 use YAML::XS qw(Load);
 use POSIX qw(signbit);
@@ -57,7 +57,7 @@ diag("Using sops binary: $sops_bin");
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 my $serial = 0;
@@ -100,7 +100,7 @@ for my $format (qw(yaml json)) {
                 if $self;
 
             my $file = scratch_file($format);
-            write_file($file, $encrypted);
+            write_binary($file, $encrypted);
 
             my $out       = `$sops_bin -d $file 2>&1`;
             my $exit_code = $? >> 8;
@@ -175,7 +175,7 @@ subtest 'floats that already round-trip at 15 digits keep their exact wire bytes
         }
 
         my $file = scratch_file($format);
-        write_file($file, $encrypted);
+        write_binary($file, $encrypted);
         my $out = `$sops_bin -d $file 2>&1`;
         is($? >> 8, 0, "[$format] sops -d still accepts the unmoved document")
             or diag("sops output: $out");
@@ -215,7 +215,7 @@ subtest 'JSON -0.0 keeps its sign at exit 0 (guards against the naive fix)' => s
         if $self;
 
     my $file = scratch_file('json');
-    write_file($file, $encrypted);
+    write_binary($file, $encrypted);
     my $out = `$sops_bin -d $file 2>&1`;
     is($? >> 8, 0, 'sops -d accepts it') or diag("sops output: $out");
 };
@@ -247,7 +247,7 @@ my $full_precision_value = 0.1 + 0.2;
 
 subtest 'rotate() on a sops-written JSON document with a 17-digit float' => sub {
     my $plain = scratch_file('json');
-    write_file($plain,
+    write_binary($plain,
         qq({\n  "ratio_unencrypted": $full_precision_text,\n  "secret": "shh"\n}\n));
 
     my $enc_file = scratch_file('json');
@@ -255,7 +255,7 @@ subtest 'rotate() on a sops-written JSON document with a 17-digit float' => sub 
     is($? >> 8, 0, 'sops -e wrote the fixture') or return;
 
     # Baseline: reading it (no re-serialization involved) already works.
-    my $content = read_file($enc_file);
+    my $content = read_binary($enc_file);
     my $read = eval {
         File::SOPS->decrypt(encrypted => $content, identities => [$secret], format => 'json')
     };
@@ -275,7 +275,7 @@ subtest 'rotate() on a sops-written JSON document with a 17-digit float' => sub 
 
 subtest 'edit() on a sops-written JSON document with a 17-digit float' => sub {
     my $plain = scratch_file('json');
-    write_file($plain, qq({\n  "ratio_unencrypted": $full_precision_text,\n)
+    write_binary($plain, qq({\n  "ratio_unencrypted": $full_precision_text,\n)
         . qq(  "note_unencrypted": "old",\n  "secret": "shh"\n}\n));
 
     my $enc_file = scratch_file('json');
@@ -287,7 +287,7 @@ subtest 'edit() on a sops-written JSON document with a 17-digit float' => sub {
     # plaintext round trip already mangled the value before the editor ran,
     # this editor would never see or reintroduce the correct one.
     my $editor_script = "$tempdir/editor-" . ++$serial . '.pl';
-    write_file($editor_script, <<'PERL');
+    write_binary($editor_script, <<'PERL');
 my $file = $ARGV[-1];
 open my $in, '<', $file or die $!;
 my $content = do { local $/; <$in> };
@@ -466,7 +466,7 @@ subtest '[json] a global Math::BigFloat->accuracy/precision does not corrupt the
         if $self;
 
     my $file = scratch_file('json');
-    write_file($file, $encrypted);
+    write_binary($file, $encrypted);
     my $out = `$sops_bin -d $file 2>&1`;
     is($? >> 8, 0, 'sops -d accepts the document despite the global accuracy/precision')
         or diag("sops output: $out");
@@ -519,7 +519,7 @@ for my $format (qw(yaml json)) {
         }
 
         my $file = scratch_file($format);
-        write_file($file, $encrypted);
+        write_binary($file, $encrypted);
         my $out       = `$sops_bin -d $file 2>&1`;
         my $exit_code = $? >> 8;
         is($exit_code, 0, 'sops -d accepts the document') or diag("sops output: $out");
@@ -549,7 +549,7 @@ for my $format (qw(yaml json)) {
 
 subtest '[json -> yaml] a float that arrived as a bare NV from JSON survives re-emission as YAML' => sub {
     my $plain = scratch_file('json');
-    write_file($plain,
+    write_binary($plain,
         qq({\n  "ratio_unencrypted": $full_precision_text,\n  "secret": "shh"\n}\n));
 
     my $enc_file = scratch_file('json');
@@ -558,7 +558,7 @@ subtest '[json -> yaml] a float that arrived as a bare NV from JSON survives re-
 
     # Decrypting via JSON hands back a bare NV for the float -- Cpanel::
     # JSON::XS keeps no parsed text, unlike YAML::XS (k58 section 1a).
-    my $content = read_file($enc_file);
+    my $content = read_binary($enc_file);
     my $data = File::SOPS->decrypt(
         encrypted => $content, identities => [$secret], format => 'json',
     );
@@ -575,7 +575,7 @@ subtest '[json -> yaml] a float that arrived as a bare NV from JSON survives re-
     );
 
     my $yaml_file = scratch_file('yaml');
-    write_file($yaml_file, $yaml_encrypted);
+    write_binary($yaml_file, $yaml_encrypted);
     my $out       = `$sops_bin -d $yaml_file 2>&1`;
     my $exit_code = $? >> 8;
     is($exit_code, 0, 'sops -d accepts the cross-format YAML document')
@@ -590,7 +590,7 @@ subtest '[json -> yaml] a float that arrived as a bare NV from JSON survives re-
 
 subtest 'decrypt_file on a sops-written JSON document matches what sops -d itself prints' => sub {
     my $plain = scratch_file('json');
-    write_file($plain,
+    write_binary($plain,
         qq({\n  "ratio_unencrypted": $full_precision_text,\n  "secret": "shh"\n}\n));
 
     my $enc_file = scratch_file('json');
@@ -607,7 +607,7 @@ subtest 'decrypt_file on a sops-written JSON document matches what sops -d itsel
         identities => [$secret],
         format     => 'json',
     );
-    my $our_content = read_file($our_output);
+    my $our_content = read_binary($our_output);
 
     # Not a byte-for-byte comparison of the two documents: sops's plaintext
     # writer uses tabs and different key spacing (a pretty-printing choice,
@@ -681,7 +681,7 @@ subtest '[yaml] -0.0 keeps its sign and its MAC (k62)' => sub {
         if $self;
 
     my $file = scratch_file('yaml');
-    write_file($file, $encrypted);
+    write_binary($file, $encrypted);
     my $out = `$sops_bin -d $file 2>&1`;
     is($? >> 8, 0, 'sops -d accepts it') or diag("sops output: $out");
     like($out, qr/^negzero_unencrypted: -0$/m,
@@ -717,7 +717,7 @@ subtest '[yaml] the -0 carrier does not touch the neighbouring cases' => sub {
         "the STRING '-0.0' stays a quoted string");
 
     my $file = scratch_file('yaml');
-    write_file($file, $strs);
+    write_binary($file, $strs);
     my $out = `$sops_bin -d $file 2>&1`;
     is($? >> 8, 0, 'sops -d accepts the string document') or diag("sops: $out");
 
@@ -746,7 +746,7 @@ subtest '[yaml] an ENCRYPTED -0.0 is unaffected by the carrier' => sub {
             format     => $format,
         );
         my $file = scratch_file($format);
-        write_file($file, $encrypted);
+        write_binary($file, $encrypted);
         my $out = `$sops_bin -d $file 2>&1`;
         is($? >> 8, 0, "[$format] sops -d accepts an encrypted -0.0")
             or diag("sops output: $out");
@@ -779,7 +779,7 @@ subtest '[yaml] an ENCRYPTED -0.0 is unaffected by the carrier' => sub {
 for my $format (qw(yaml json)) {
     subtest "[$format] an encrypted -0 survives sops -> decrypt -> rotate -> sops (k72)" => sub {
         my $plain = scratch_file($format);
-        write_file($plain, $format eq 'json'
+        write_binary($plain, $format eq 'json'
             ? qq({\n  "negzero": -0.0,\n  "other": 1.5\n}\n)
             :  "negzero: -0.0\nother: 1.5\n");
 
@@ -787,7 +787,7 @@ for my $format (qw(yaml json)) {
         system("$sops_bin -e --age $public $plain > $enc_file 2>/dev/null");
         is($? >> 8, 0, 'sops -e wrote the fixture') or return;
 
-        my $content = read_file($enc_file);
+        my $content = read_binary($enc_file);
         like($content, qr/negzero.*ENC\[AES256_GCM,.*type:float\]/,
             'and the leaf really is an encrypted type:float, not a plain one')
             or diag("fixture:\n$content");
@@ -829,7 +829,7 @@ for my $format (qw(yaml json)) {
             identities => [$secret],
             format     => $format,
         );
-        like(read_file($plain_out), qr/negzero"?\s*:?\s*:\s*-0\.0\b/,
+        like(read_binary($plain_out), qr/negzero"?\s*:?\s*:\s*-0\.0\b/,
             'decrypt_file writes the sign out too');
     };
 }
@@ -929,7 +929,7 @@ subtest 'the rest of the type:float read ladder does not move (k72)' => sub {
 for my $format (qw(yaml json)) {
     subtest "[$format] decrypt_file keeps an ENCRYPTED float's digits (k61)" => sub {
         my $plain = scratch_file($format);
-        write_file($plain, $format eq 'json'
+        write_binary($plain, $format eq 'json'
             ? qq({\n  "ratio": $full_precision_text,\n  "other": "hello"\n}\n)
             :  "ratio: $full_precision_text\nother: hello\n");
 
@@ -940,7 +940,7 @@ for my $format (qw(yaml json)) {
         # The whole point of this section: the leaf has to be ENCRYPTED, or
         # this is section 8 again on a different path. sops encrypts every
         # value whose key does not carry the _unencrypted suffix.
-        my $fixture = read_file($enc_file);
+        my $fixture = read_binary($enc_file);
         like($fixture, qr/ratio"?\s*:\s*"?ENC\[AES256_GCM,.*type:float\]/,
             'and the float leaf is ENC[...,type:float], not a plain value')
             or diag("fixture:\n$fixture");
@@ -957,7 +957,7 @@ for my $format (qw(yaml json)) {
             identities => [$secret],
             format     => $format,
         );
-        my $our_content = read_file($our_output);
+        my $our_content = read_binary($our_output);
 
         # The assertion that can fail when a future emitter goes back to 15
         # significant digits. A decoded comparison alone cannot: an emitter
@@ -1051,7 +1051,7 @@ subtest 'a type:float plaintext stays a float, whatever its digits spell (k73)' 
 for my $format (qw(yaml json)) {
     subtest "[$format] an integral type:float keeps its label through sops -> rotate -> sops (k73)" => sub {
         my $plain = scratch_file($format);
-        write_file($plain, $format eq 'json'
+        write_binary($plain, $format eq 'json'
             ? qq({\n  "whole": 2.0,\n  "negwhole": -2.0,\n  "zero": 0.0,\n  "half": 1.5\n}\n)
             :  "whole: 2.0\nnegwhole: -2.0\nzero: 0.0\nhalf: 1.5\n");
 
@@ -1059,7 +1059,7 @@ for my $format (qw(yaml json)) {
         system("$sops_bin -e --age $public $plain > $enc_file 2>/dev/null");
         is($? >> 8, 0, 'sops -e wrote the fixture') or return;
 
-        my $fixture = read_file($enc_file);
+        my $fixture = read_binary($enc_file);
         for my $leaf (qw( whole negwhole zero half )) {
             like($fixture, qr/\Q$leaf\E"?\s*:\s*"?ENC\[AES256_GCM,[^\]]*type:float\]/,
                 "sops wrote $leaf as an encrypted type:float")
@@ -1079,7 +1079,7 @@ for my $format (qw(yaml json)) {
 
         # The write side, which is where it became a changed document.
         File::SOPS->rotate(file => $enc_file, identities => [$secret]);
-        my $rotated = read_file($enc_file);
+        my $rotated = read_binary($enc_file);
         for my $leaf (qw( whole negwhole zero half )) {
             like($rotated, qr/\Q$leaf\E"?\s*:\s*"?ENC\[AES256_GCM,[^\]]*type:float\]/,
                 "$leaf is still type:float after our rotate")
@@ -1106,7 +1106,7 @@ subtest 'decrypt_file renders an integral float as ADR 0009 measured it' => sub 
     # consequence, not an accident, and the obvious "fix" is to undo it.
     for my $format (qw(yaml json)) {
         my $plain = scratch_file($format);
-        write_file($plain, $format eq 'json'
+        write_binary($plain, $format eq 'json'
             ? qq({\n  "whole": 2.0,\n  "half": 1.5\n}\n)
             :  "whole: 2.0\nhalf: 1.5\n");
 
@@ -1121,7 +1121,7 @@ subtest 'decrypt_file renders an integral float as ADR 0009 measured it' => sub 
             identities => [$secret],
             format     => $format,
         );
-        my $content = read_file($our_output);
+        my $content = read_binary($our_output);
 
         if ($format eq 'json') {
             like($content, qr/"whole"\s*:\s*2\.0\b/,
@@ -1168,7 +1168,7 @@ subtest 'decrypt_file renders an integral float as ADR 0009 measured it' => sub 
 for my $format (qw(yaml json)) {
     subtest "[$format] extract keeps an encrypted float's digits (k61)" => sub {
         my $plain = scratch_file($format);
-        write_file($plain, $format eq 'json'
+        write_binary($plain, $format eq 'json'
             ? qq({\n  "ratio": $full_precision_text,\n  "name": "db",\n  "port": 5432,\n  "on": true\n}\n)
             :  "ratio: $full_precision_text\nname: db\nport: 5432\non: true\n");
 
@@ -1176,7 +1176,7 @@ for my $format (qw(yaml json)) {
         system("$sops_bin -e --age $public $plain > $enc_file 2>/dev/null");
         is($? >> 8, 0, 'sops -e wrote the fixture') or return;
 
-        my $fixture = read_file($enc_file);
+        my $fixture = read_binary($enc_file);
         like($fixture, qr/ratio"?\s*:\s*"?ENC\[AES256_GCM,[^\]]*type:float\]/,
             'and the float leaf is encrypted, which is the half this ticket is about')
             or diag("fixture:\n$fixture");
@@ -1235,7 +1235,7 @@ subtest 'the dualvar stops at the leaf extract returns (ADR 0010)' => sub {
     # one as a quoted string, so an unencrypted JSON float would silently
     # become a string in the file (k78).
     my $plain = scratch_file('json');
-    write_file($plain, qq({\n  "db": { "ratio": $full_precision_text }\n}\n));
+    write_binary($plain, qq({\n  "db": { "ratio": $full_precision_text }\n}\n));
 
     my $enc_file = scratch_file('json');
     system("$sops_bin -e --age $public $plain > $enc_file 2>/dev/null");
@@ -1257,7 +1257,7 @@ subtest 'the dualvar stops at the leaf extract returns (ADR 0010)' => sub {
     # decrypt() is the same boundary from the other side. read_file in a
     # scalar, because in list context it returns LINES and would shift every
     # named argument after it.
-    my $document = read_file($enc_file);
+    my $document = read_binary($enc_file);
     my $data = File::SOPS->decrypt(encrypted => $document,
         identities => [$secret], format => 'json');
     ok(!isdual($data->{db}{ratio}), 'decrypt returns plain scalars too');
@@ -1324,7 +1324,7 @@ subtest 'a non-finite float is returned unwrapped (ADR 0010)' => sub {
 
 subtest 'the extract -> encrypt caller path writes a NUMBER in a JSON plain slot (k78)' => sub {
     my $plain = scratch_file('json');
-    write_file($plain, qq({\n  "ratio": $full_precision_text\n}\n));
+    write_binary($plain, qq({\n  "ratio": $full_precision_text\n}\n));
 
     my $enc_file = scratch_file('json');
     system("$sops_bin -e --age $public $plain > $enc_file 2>/dev/null");
@@ -1369,7 +1369,7 @@ subtest 'the extract -> encrypt caller path writes a NUMBER in a JSON plain slot
 
     # And the binary reads a NUMBER back out of it.
     my $out_file = scratch_file('json');
-    write_file($out_file, $document);
+    write_binary($out_file, $document);
     my $out = `$sops_bin -d $out_file 2>&1`;
     is($? >> 8, 0, 'sops -d accepts the document') or diag("sops: $out");
     my $decoded = eval { decode_json($out) };
@@ -1391,7 +1391,7 @@ subtest 'the extract -> encrypt caller path writes a NUMBER in a JSON plain slot
 
     if ($ok) {
         my $enc_out_file = scratch_file('json');
-        write_file($enc_out_file, $ok);
+        write_binary($enc_out_file, $ok);
         my $enc_out = `$sops_bin -d $enc_out_file 2>&1`;
         is($? >> 8, 0, 'sops -d accepts it') or diag("sops: $enc_out");
         my $enc_decoded = eval { decode_json($enc_out) };
@@ -1427,7 +1427,7 @@ subtest 'a float that arrived through a YAML parse reaches JSON as a number (k78
     unlike($document, qr/_unencrypted" : "/, 'neither of them quoted');
 
     my $file = scratch_file('json');
-    write_file($file, $document);
+    write_binary($file, $document);
     my $out = `$sops_bin -d $file 2>&1`;
     is($? >> 8, 0, 'sops -d accepts the document') or diag("sops: $out");
     my $decoded = eval { decode_json($out) };
@@ -1457,7 +1457,7 @@ subtest 'YAML writes the same number, unchanged by ADR 0011 (k78)' => sub {
         'and writes it unquoted, at full precision');
 
     my $file = scratch_file('yaml');
-    write_file($file, $document);
+    write_binary($file, $document);
     my $out = `$sops_bin -d $file 2>&1`;
     is($? >> 8, 0, 'sops -d accepts the document') or diag("sops: $out");
     my $decoded = eval { Load($out) };
@@ -1594,7 +1594,7 @@ subtest '[json] a -0.0 out of a YAML parse is written, not refused (k88)' => sub
             "[$spelling] and the value decrypts back negative") if $self;
 
         my $file = scratch_file('json');
-        write_file($file, $encrypted);
+        write_binary($file, $encrypted);
         my $out = `$sops_bin -d $file 2>&1`;
         is($? >> 8, 0, "[$spelling] sops -d accepts it") or diag("sops output: $out");
         like($out, qr/"negzero_unencrypted"\s*:\s*-0\b/,
@@ -1657,7 +1657,7 @@ subtest '[json] the -0 branch does not touch the neighbouring float cases' => su
         format     => 'json',
     );
     my $file = scratch_file('json');
-    write_file($file, $encrypted);
+    write_binary($file, $encrypted);
     my $out = `$sops_bin -d $file 2>&1`;
     is($? >> 8, 0, 'sops -d accepts an encrypted -0.0 from a YAML parse')
         or diag("sops output: $out");

@@ -1,3 +1,9 @@
+2.59  2026-09-20
+
+  - Make the dual-valued scalar regression test independent of the
+    version-specific encoding behavior of JSON::PP on Perl 5.26.
+  - Bump module version to 2.59.
+
 2.58  2026-09-18
 
   - Keep the value semantics regression test compatible with older JSON::PP

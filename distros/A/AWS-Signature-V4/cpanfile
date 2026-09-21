@@ -1,0 +1,29 @@
+requires 'perl', '5.024';
+
+# Core modules, listed for completeness
+requires 'Digest::SHA';
+requires 'MIME::Base64';
+requires 'Math::BigInt';
+requires 'POSIX';
+requires 'Carp';
+requires 'experimental';
+
+# Crypto for the X.509 variant (RSA and ECDSA signing, key/certificate
+# parsing); CryptX provides Crypt::PK::RSA and Crypt::PK::ECC
+requires 'CryptX', '0.091';
+requires 'Moo', '2.005005';
+requires 'namespace::clean', '0.27';
+requires 'Ouch', '0.0501';
+
+# Much faster crc32c checksums, used when installed
+recommends 'String::CRC32C';
+
+on develop => sub {
+   requires 'Template::Perlish', '1.64';
+};
+
+on test => sub {
+   requires 'Test2::V0';
+   requires 'File::Temp';
+   requires 'Test::Pod';
+};

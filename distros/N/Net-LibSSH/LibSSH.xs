@@ -46,6 +46,11 @@ typedef struct {
        a spent session stays spent, and that is the reason every later call
        on it fails too. */
     const char        *own_error;
+    /* Mirror of SSH_OPTIONS_STRICTHOSTKEYCHECK, kept here because libssh
+       has no getter for it and connect() has to know. Inverted so that the
+       zero Newxz leaves behind means strict -- the secure default, and
+       libssh's own. Only option('strict_hostkeycheck') writes it. */
+    int                hostkey_check_disabled;
 } NLSS_Session;
 
 typedef struct {
@@ -161,6 +166,25 @@ static const MGVTBL Net__LibSSH__SFTP_magic = { .svt_free = nlss_sftp_free };
    Helper functions
    ==================================================== */
 
+/* The one disconnect path, shared by disconnect() and the host-key refusal
+   in connect(): both have to spend a connected session and bump the
+   generation before libssh frees the channels, and having the invariant in
+   one place is what keeps the two from drifting apart. */
+static void
+nlss_session_disconnect(NLSS_Session *self)
+{
+    /* Only a session that actually got connected is spent by this: measured
+       on libssh 0.10.6, disconnect() on a never-connected session leaves it
+       connectable, and marking it would refuse a call that works. */
+    if (self->state == NLSS_SESSION_CONNECTED)
+        self->state = NLSS_SESSION_SPENT;
+    /* Bump before disconnecting: ssh_disconnect() frees every channel the
+       session owns, so every channel and sftp session opened on it has to be
+       stale by the time that memory goes away. */
+    self->generation++;
+    ssh_disconnect(self->session);
+}
+
 static void
 nlss_croak_error(pTHX_ ssh_session session, const char *prefix)
 {
@@ -249,6 +273,8 @@ option(self, key, value)
     } else if (strcmp(key, "strict_hostkeycheck") == 0) {
         int v = SvTRUE(value) ? 1 : 0;
         rc = ssh_options_set(self->session, SSH_OPTIONS_STRICTHOSTKEYCHECK, &v);
+        if (rc == SSH_OK)
+            self->hostkey_check_disabled = !v;
     } else {
         Perl_croak(aTHX_ "Net::LibSSH::option: unknown option '%s'", key);
     }
@@ -268,8 +294,49 @@ connect(self)
         self->own_error = "session was disconnected and cannot be reconnected";
         RETVAL = 0;
     } else if (ssh_connect(self->session) == SSH_OK) {
+        /* CONNECTED first: ssh_connect() has completed the key exchange, so
+           a refusal below is a disconnect of a connected session and spends
+           it exactly as disconnect() would. */
         self->state = NLSS_SESSION_CONNECTED;
         RETVAL = 1;
+        /* ssh_connect() negotiates the host key but never checks it against
+           known_hosts -- that is a separate call libssh leaves to the
+           application, and without it SSH_OPTIONS_STRICTHOSTKEYCHECK is
+           decoration. strict_hostkeycheck => 0 is documented as disabling
+           verification outright, so it skips the question entirely: no
+           refusal on CHANGED either, and nothing is written to known_hosts. */
+        if (!self->hostkey_check_disabled) {
+            const char *refusal = NULL;
+            switch (ssh_session_is_known_server(self->session)) {
+            case SSH_KNOWN_HOSTS_OK:
+                break;
+            case SSH_KNOWN_HOSTS_CHANGED:
+                refusal = "host key has changed from the known_hosts entry"
+                          " -- possible man-in-the-middle attack";
+                break;
+            case SSH_KNOWN_HOSTS_OTHER:
+                refusal = "host key type differs from the known_hosts entry"
+                          " -- possible man-in-the-middle attack";
+                break;
+            case SSH_KNOWN_HOSTS_ERROR:
+                refusal = "could not verify host key against known_hosts";
+                break;
+            case SSH_KNOWN_HOSTS_NOT_FOUND:
+            case SSH_KNOWN_HOSTS_UNKNOWN:
+            default:
+                refusal = "host key is not in known_hosts"
+                          " and strict_hostkeycheck is on";
+                break;
+            }
+            if (refusal) {
+                /* Same 1/0 contract as every other connect() failure. The
+                   session is spent from here on, so own_error being sticky
+                   is right: the later "cannot be reconnected" overwrites it. */
+                nlss_session_disconnect(self);
+                self->own_error = refusal;
+                RETVAL = 0;
+            }
+        }
     } else {
         RETVAL = 0;
     }
@@ -280,16 +347,7 @@ void
 disconnect(self)
     Net::LibSSH self
   CODE:
-    /* Only a session that actually got connected is spent by this: measured
-       on libssh 0.10.6, disconnect() on a never-connected session leaves it
-       connectable, and marking it would refuse a call that works. */
-    if (self->state == NLSS_SESSION_CONNECTED)
-        self->state = NLSS_SESSION_SPENT;
-    /* Bump before disconnecting: ssh_disconnect() frees every channel the
-       session owns, so every channel and sftp session opened on it has to be
-       stale by the time that memory goes away. */
-    self->generation++;
-    ssh_disconnect(self->session);
+    nlss_session_disconnect(self);
 
 SV *
 error(self)

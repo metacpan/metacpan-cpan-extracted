@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 
 use File::SOPS;
 use File::SOPS::Backend::Age;
@@ -283,7 +283,7 @@ SKIP: {
     my $tempdir = tempdir(CLEANUP => 1);
     my ($public, $secret) = Crypt::Age->generate_keypair();
     my $keyfile = "$tempdir/age.key";
-    write_file($keyfile, "$secret\n");
+    write_binary($keyfile, "$secret\n");
     local $ENV{SOPS_AGE_KEY_FILE} = $keyfile;
 
     my $TAGGED   = "flag: !!bool true\noff_unencrypted: !!bool false\nk: 1\n";
@@ -301,7 +301,7 @@ SKIP: {
     };
 
     subtest 'sops encrypts the tagged plaintext -> File::SOPS reads it' => sub {
-        write_file("$tempdir/tagged.yaml", $TAGGED);
+        write_binary("$tempdir/tagged.yaml", $TAGGED);
         my $doc = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/tagged.yaml 2>&1`;
         is($? >> 8, 0, 'sops -e accepts the tagged document') or diag($doc);
 
@@ -319,7 +319,7 @@ SKIP: {
     subtest 'File::SOPS encrypts the tagged plaintext -> sops reads it' => sub {
         # This is the whole of k118: before the repair, encrypt_file died
         # on a plaintext `sops -e` takes at exit 0.
-        write_file("$tempdir/in.yaml", $TAGGED);
+        write_binary("$tempdir/in.yaml", $TAGGED);
         my $ok = eval {
             File::SOPS->encrypt_file(
                 input      => "$tempdir/in.yaml",
@@ -330,7 +330,7 @@ SKIP: {
         };
         ok($ok, 'File::SOPS->encrypt_file accepts it') or do { diag($@); return };
 
-        my $doc = read_file("$tempdir/ours.yaml");
+        my $doc = read_binary("$tempdir/ours.yaml");
         like($doc, qr/^flag: ENC\[[^\]]*type:bool\]$/m,
             'and writes type:bool -- the type label sops writes for the same leaf');
         like($doc, qr/^off_unencrypted: false$/m, 'the unencrypted leaf goes out bare');
@@ -343,8 +343,8 @@ SKIP: {
     subtest 'the tag moves not one digest byte' => sub {
         # The measurement the repair rests on. sops resolves the tag away, so
         # the tagged and untagged plaintexts have to produce the same MAC.
-        write_file("$tempdir/t.yaml", $TAGGED);
-        write_file("$tempdir/u.yaml", $UNTAGGED);
+        write_binary("$tempdir/t.yaml", $TAGGED);
+        write_binary("$tempdir/u.yaml", $UNTAGGED);
 
         my %mac;
         for my $pair ([ tagged => 't' ], [ untagged => 'u' ]) {
@@ -369,11 +369,11 @@ SKIP: {
             [ '!!bool True', "v: !!bool True\n",            qr/^v: true$/m ],
         ) {
             my ($label, $plain, $resolves_to) = @$case;
-            write_file("$tempdir/r.yaml", $plain);
+            write_binary("$tempdir/r.yaml", $plain);
 
             my $doc = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/r.yaml 2>&1`;
             is($? >> 8, 0, "[$label] sops -e accepts the plaintext") or diag($doc);
-            write_file("$tempdir/r.enc.yaml", $doc);
+            write_binary("$tempdir/r.enc.yaml", $doc);
             my $out = `$sops_bin -d --input-type yaml --output-type yaml $tempdir/r.enc.yaml 2>&1`;
             like($out, $resolves_to, "[$label] and resolves it as the refusal says");
 

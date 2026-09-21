@@ -5,6 +5,12 @@ All notable changes to Alien::Xmake will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.3] - 2026-09-20
+
+### Fixed
+
+- Retry `config`/`build`/`clean` actions on Windows when there's no `--toolchain` setting because xmake has a hard time with the non-standard location of `gcc` from a Strawberry Perl install.
+
 ## [v1.0.2] - 2026-09-18
 
 ### Changed
@@ -191,7 +197,8 @@ The docs have been greatly expanded since January but the stars of this release 
 
 - It exists.
 
-[Unreleased]: https://github.com/sanko/Alien-Xmake/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/sanko/Alien-Xmake/compare/v1.0.3...HEAD
+[v1.0.3]: https://github.com/sanko/Alien-Xmake/compare/v1.0.2...v1.0.3
 [v1.0.2]: https://github.com/sanko/Alien-Xmake/compare/v1.0.1...v1.0.2
 [v1.0.1]: https://github.com/sanko/Alien-Xmake/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/sanko/Alien-Xmake/compare/v0.9.5...v1.0.0

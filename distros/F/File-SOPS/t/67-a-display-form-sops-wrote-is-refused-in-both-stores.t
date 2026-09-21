@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(write_binary);
 use JSON::MaybeXS qw(JSON);
 
 use File::SOPS;
@@ -104,7 +104,7 @@ if (!$sops_bin) {
 require Crypt::Age;
 my $tempdir = tempdir(CLEANUP => 1);
 my ($public, $secret) = Crypt::Age->generate_keypair();
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 # One document per case. `$slot` is the YAML for the leaf under test.
@@ -115,14 +115,14 @@ $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 # store and exits 4 on a perfectly good document. Both flags, always.
 sub sops_write {
     my ($fmt, $yaml) = @_;
-    write_file("$tempdir/src.yaml", $yaml);
+    write_binary("$tempdir/src.yaml", $yaml);
     my $out = `$sops_bin -e --input-type yaml --output-type $fmt --age $public $tempdir/src.yaml 2>&1`;
     return ($? >> 8, $out);
 }
 
 sub sops_read {
     my ($fmt, $document) = @_;
-    write_file("$tempdir/doc.txt", $document);
+    write_binary("$tempdir/doc.txt", $document);
     my $out = `$sops_bin -d --input-type $fmt --output-type json $tempdir/doc.txt 2>&1`;
     return ($? >> 8, $out);
 }

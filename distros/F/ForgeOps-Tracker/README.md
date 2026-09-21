@@ -1,6 +1,6 @@
 # ForgeOps::Tracker
 
-Perl error reporting client for a [ForgeOps](../../) instance. Zero
+Perl error reporting client for [ForgeOps](https://getforgeops.net). Zero
 non-core runtime dependencies: `HTTP::Tiny`, `JSON::PP`, `threads`, `threads::shared`,
 `Thread::Queue`, `POSIX`, `Cwd`, `Sys::Hostname`, and `Carp` are all part of core Perl (5.14+).
 `Plack` and `Dancer2` are only needed for their own optional integrations below.
@@ -37,7 +37,7 @@ environment variable or explicitly:
 use ForgeOps::Tracker;
 
 ForgeOps::Tracker::init(
-    dsn         => 'https://<api_key>@your-forgeops-host/api/v1/events', # or leave unset to read FORGE_OPS_DSN
+    dsn         => 'https://<api_key>@getforgeops.net/api/v1/events', # or leave unset to read FORGE_OPS_DSN
     release     => '...',
     environment => 'production',
 );
@@ -228,6 +228,11 @@ by transaction name, for a dashboard widget on a project's Performance page (so 
 parts of your app are actually slow, not just which ones raise). Counted in-process and flushed as
 a small periodic aggregate on a background thread, the same delivery philosophy as error
 reporting: a broken or unreachable tracker never affects the host app either way.
+
+Each aggregate also carries a small latency histogram (a count per fixed latency bucket: 50, 100,
+250, 500, 1000, 2500, 5000 and 10000ms, plus an overflow bucket), so ForgeOps can show an
+approximate p50/p95/p99 per transaction, not just an average. Percentiles are accurate to the width
+of whichever bucket a duration falls into; the SDK never stores the individual durations.
 
 ```perl
 # PSGI / Plack

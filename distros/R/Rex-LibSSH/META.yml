@@ -18,27 +18,27 @@ name: Rex-LibSSH
 provides:
   Rex::Interface::Connection::LibSSH:
     file: lib/Rex/Interface/Connection/LibSSH.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Interface::Exec::LibSSH:
     file: lib/Rex/Interface/Exec/LibSSH.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Interface::File::LibSSH:
     file: lib/Rex/Interface/File/LibSSH.pm
-    version: '0.003'
+    version: '0.004'
   Rex::Interface::Fs::LibSSH:
     file: lib/Rex/Interface/Fs/LibSSH.pm
-    version: '0.003'
+    version: '0.004'
   Rex::LibSSH:
     file: lib/Rex/LibSSH.pm
-    version: '0.003'
+    version: '0.004'
 requires:
-  Net::LibSSH: '0.003'
+  Net::LibSSH: '0.004'
   Rex: v1.16.0
 resources:
   bugtracker: https://github.com/Getty/rex-libssh/issues
   homepage: https://github.com/Getty/rex-libssh
   repository: https://github.com/Getty/rex-libssh.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -48,6 +48,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - .karr
             - README.md
           exclude_match: []
           include_dotfiles: 1
@@ -313,7 +314,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.003'
+          tag: '0.004'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

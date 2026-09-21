@@ -463,8 +463,8 @@ sub transition_to ($self, $class, %opt) {
         ? $source_consumer->{operations_address} : 0;
     my $target_ops = $target_consumer
         ? $target_consumer->{operations_address} : 0;
-    croak 'transition_to(): cannot add or remove a native consumer provider'
-        if (!$source_ops) != (!$target_ops);
+    croak 'transition_to(): cannot add a native consumer provider'
+        if !$source_ops && $target_ops;
     _require_read_sink(
         $descriptor,
         $self->{_input_callback_overrides},

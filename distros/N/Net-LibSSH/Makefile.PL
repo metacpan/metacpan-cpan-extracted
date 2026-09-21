@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   "AUTHOR" => "Torsten Raudssus <getty\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "Alien::libssh" => "0.002",
-    "ExtUtils::MakeMaker" => "7.00"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Net-LibSSH",
   "LICENSE" => "perl",
@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,5 +1,13 @@
 Revision history for Linux-Event
 
+0.116  2026-09-20
+    - Allow transition_to() to retire a live native consumer into an ordinary
+      Perl Stream input sink while preserving unread ordered input natively
+      until the target consumes it. Reuse provider flush/retain lifetime
+      settling, support reentrant transition and target close safely, preserve
+      exact-once ordered tail delivery across pause/resume, and keep
+      ordinary-to-native live transitions explicitly rejected.
+
 0.115  2026-09-19
     - Make raw native-consumer input safe when application callbacks close the
       Stream reentrantly. Terminal teardown owns the cleared native buffer, so

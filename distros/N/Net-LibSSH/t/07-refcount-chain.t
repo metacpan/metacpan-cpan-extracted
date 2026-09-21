@@ -32,7 +32,7 @@ sub connect_session {
     $ssh->option(host       => $srv->host);
     $ssh->option(port       => $srv->port);
     $ssh->option(user       => scalar getpwuid($<));
-    $ssh->option(knownhosts => '/dev/null');
+    $ssh->option(knownhosts => $srv->known_hosts);
     $ssh->connect
         or die 'connect: ' . ($ssh->error // '') . "\n";
     $ssh->auth_publickey($srv->client_key)

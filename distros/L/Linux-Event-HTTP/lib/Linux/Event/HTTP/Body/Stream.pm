@@ -5,7 +5,7 @@ use warnings;
 
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub _validated_options ($kind, %option) {
     die 'body stream kind must be request or response'

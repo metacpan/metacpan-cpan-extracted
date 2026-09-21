@@ -9,7 +9,7 @@ use Test::More;
 use Test::Fatal;
 
 # The point of this group of tests is to try to check that DST changes
-# are occuring at exactly the right time in various time zones.  It's
+# are occurring at exactly the right time in various time zones.  It's
 # important to check both pre-generated spans, as well as spans that
 # have to be generated on the fly.
 

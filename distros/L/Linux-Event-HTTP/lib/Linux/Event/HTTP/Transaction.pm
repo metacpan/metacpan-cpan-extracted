@@ -5,7 +5,7 @@ use warnings;
 
 use Scalar::Util qw(blessed weaken);
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my %TERMINAL = map { $_ => 1 } qw(complete cancelled error);
 
@@ -35,6 +35,17 @@ sub _new ($class, %args) {
         controller                => $controller,
     }, $class;
     weaken($self->{controller}) if defined $self->{controller};
+    return $self;
+}
+
+sub _new_server_active ($class, $request, $response, $controller) {
+    my $self = bless {
+        request    => $request,
+        response   => $response,
+        state      => 'active',
+        controller => $controller,
+    }, $class;
+    weaken($self->{controller});
     return $self;
 }
 

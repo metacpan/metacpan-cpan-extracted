@@ -1,5 +1,14 @@
 Revision history for Hyperman
 
+0.51	2026-09-20
+        - FIXES a respawned worker going deaf to the bus for the rest of its
+          life. 
+        - A worker with no waker claims any free one rather than going silent,
+          and says so when there is none. Single-worker mode held none at all.
+        - Wakers are sized for two generations: a HUP forks the new pool while
+          the old drains, and the fresh workers found every slot held.
+        - Requires Shared::Arena 0.12, which reclaims a dead owner's slot.
+
 0.50	2026-09-19
         - Now Depends on Shared::Arena: one arena is created before the fork and
           Hyperman->arena hands it to Perl; run(arena_name => ..., arena_size => ...).

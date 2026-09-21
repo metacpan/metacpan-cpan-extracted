@@ -9,7 +9,7 @@ use Scalar::Util qw(refaddr);
 use Linux::Event::IO::Sock::Stream ();
 use Linux::Event::Kernel::Timer;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub _load_target ($target) {
     croak 'tunnel(): target class must be a package name'

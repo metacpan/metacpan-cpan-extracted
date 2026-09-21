@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.1301';
+our $VERSION = '0.1303';
 
 use v5.36;
 
@@ -407,21 +407,20 @@ sub threshold ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
+    return 0 unless defined $self->trigger && defined $val;
 
-    if (defined $self->trigger && defined $note) {
-        if ($self->step_up && !$self->step_down && $val <= $self->trigger) {
-            return 0;
-        }
-        elsif (!$self->step_up && $self->step_down && $val >= $self->trigger) {
-            return 0;
-        }
-        else {
-            say "Sending $note" if $self->verbose;
-            $self->rtc->send_it([ $ev, $self->channel, $note, $val ]);
-        }
+    my $above_only = $self->step_up   && !$self->step_down;
+    my $below_only = $self->step_down && !$self->step_up;
+
+    if ($above_only && $val <= $self->trigger) {
+        return 1; # block: only notes above the trigger are allowed
+    }
+    if ($below_only && $val >= $self->trigger) {
+        return 1; # block: only notes below the trigger are allowed
     }
 
-    return $self->continue;
+    say "Sending $note" if $self->verbose;
+    return 0; # allow: let MIDI::RtController's own fallback send_it forward it once
 }
 
 1;
@@ -438,7 +437,7 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.1301
+version 0.1303
 
 =head1 SYNOPSIS
 

@@ -22,7 +22,7 @@ use utf8;
 use open qw(:std :encoding(UTF-8));
 
 package App::PDFLibrarian::Util;
-$App::PDFLibrarian::Util::VERSION = '6.3.2';
+$App::PDFLibrarian::Util::VERSION = '6.3.3';
 use parent 'Exporter';
 
 use Carp;
@@ -90,6 +90,9 @@ sub find_pdf_files {
   # return unique found PDF files
   my %pdffileorder;
   my $order = 0;
+  my $preprocess = sub {
+    return sort @_;
+  };
   my $wanted = sub {
     if (-l $_) {
       $_ = readlink($_) or croak "$Script: could not resolve '$_': %!";
@@ -101,11 +104,11 @@ sub find_pdf_files {
   # find PDF files in the given list of search paths
   foreach (@_) {
     if (-d $_) {
-      find({wanted => \&$wanted, no_chdir => 1}, $_);
+      find({preprocess => \&$preprocess, wanted => \&$wanted, no_chdir => 1}, $_);
     } elsif (-r $_) {
       &$wanted($_);
     } elsif (!File::Spec->file_name_is_absolute($_) && -d File::Spec->catdir($pdflibrarydir, $_)) {
-      find({wanted => \&$wanted, no_chdir => 1}, File::Spec->catdir($pdflibrarydir, $_));
+      find({preprocess => \&$preprocess, wanted => \&$wanted, no_chdir => 1}, File::Spec->catdir($pdflibrarydir, $_));
     } elsif (!File::Spec->file_name_is_absolute($_) && -r File::Spec->catfile($pdflibrarydir, $_)) {
       &$wanted(File::Spec->catfile($pdflibrarydir, $_));
     } else {

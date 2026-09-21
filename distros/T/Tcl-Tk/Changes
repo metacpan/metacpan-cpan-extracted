@@ -1,5 +1,17 @@
 Revision history for Perl extension Tcl::Tk.
 
+1.52    20-sept-2026
+        - Improved support for core themed widgets (ttk::*)
+        - Added native Perl/Tk method syntax mappings for all standard Ttk components:
+          TtkButton, TtkCheckbutton, TtkRadiobutton, TtkLabel, TtkEntry,
+          TtkFrame, TtkLabelframe, TtkNoteBook, TtkScrollbar, TtkCombobox,
+          TtkProgressbar, TtkScale, TtkSeparator, TtkSizegrip, TtkTreeview,
+          TtkPanedwindow, TtkSpinbox
+        - Refined configuration warnings in Makefile.PL regarding tklib/tooltip
+        - Added comprehensive automated test suite (t/ttk_widgets.t)
+        - WARNING: Next major release will likely reconsider 'scrolled'
+          implementation to avoid Snit framework dependencies.
+
 1.51	28-jan-2025
 	No code change: confirmed Tcl9, minor doc tweaks + show Tcl/Tk version in tests
 

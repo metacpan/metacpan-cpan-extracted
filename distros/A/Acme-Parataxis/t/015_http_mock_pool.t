@@ -80,12 +80,14 @@ Acme::Parataxis::run(
                     Acme::Parataxis->await_read( $listener, 1000 );
                     while ( my $client = $listener->accept() ) {
                         $client->blocking(0);
-                        my $response = "HTTP/1.1 200 OK
-Content-Type: text/plain
-Content-Length: 2
-Connection: close
+                        my $response = <<~'EOF';
+                        HTTP/1.1 200 OK
+                        Content-Type: text/plain
+                        Content-Length: 2
+                        Connection: close
 
-HI";
+                        HI
+                        EOF
                         my $offset = 0;
                         my $len    = length($response);
                         while ( $offset < $len ) {
@@ -145,4 +147,5 @@ HI";
         Acme::Parataxis::stop();
     }
 );
+#
 done_testing();

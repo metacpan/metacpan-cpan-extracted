@@ -212,4 +212,4 @@ shape: `sub new { my ($that,%args)=@_; bless {%args}, ref($that)||$that }`, `use
 on the matching `Rex::Interface::*::Base`. `# ABSTRACT:` first line, `our $VERSION`
 right after `package`, POD at the end of the file. `Rex::Logger::debug` for tracing,
 `Rex::Logger::info(..., 'warn')` for connection failures. Everything else: skill
-`getty-perl-core`. Rex's own idioms, connection types and command surface: skill `getty-rex`.
+`getty-perl-core`. Rex's own idioms, connection types and command surface: skill `rex`.

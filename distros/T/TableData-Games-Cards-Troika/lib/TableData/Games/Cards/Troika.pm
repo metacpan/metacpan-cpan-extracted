@@ -51,11 +51,11 @@ sub get_table_def {
 }
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-07-15'; # DATE
+our $DATE = '2026-07-16'; # DATE
 our $DIST = 'TableData-Games-Cards-Troika'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
-our %STATS = ("num_rows",99,"num_columns",25); # STATS
+our %STATS = ("num_columns",25,"num_rows",99); # STATS
 
 1;
 # ABSTRACT: Cards of Anak Bos Troika
@@ -70,7 +70,7 @@ TableData::Games::Cards::Troika - Cards of Anak Bos Troika
 
 =head1 VERSION
 
-This document describes version 0.001 of TableData::Games::Cards::Troika (from Perl distribution TableData-Games-Cards-Troika), released on 2026-07-15.
+This document describes version 0.002 of TableData::Games::Cards::Troika (from Perl distribution TableData-Games-Cards-Troika), released on 2026-07-16.
 
 =head1 SYNOPSIS
 
@@ -271,9 +271,9 @@ id1,id2,type,eng_object_category_name,ind_object_category_name,fra_object_catego
 91,W10,wildcard,,,,,,,,,,,,,,,,,"wildcard tux 4","wildcard tux 4","wildcard tux 4","wildcard tux 4","wildcard tux 4","wildcard tux 4"
 92,W11,wildcard,,,,,,,,,,,,,,,,,"wildcard tux 5","wildcard tux 5","wildcard tux 5","wildcard tux 5","wildcard tux 5","wildcard tux 5"
 93,W12,wildcard,,,,,,,,,,,,,,,,,"wildcard tux 6","wildcard tux 6","wildcard tux 6","wildcard tux 6","wildcard tux 6","wildcard tux 6"
-94,WC1,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 1","wildcard+tux lyx 1","wildcard+tux lyx 1","wildcard+tux lyx 1","wildcard+tux lyx 1","wildcard+tux lyx 1"
-95,WC2,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 2","wildcard+tux lyx 2","wildcard+tux lyx 2","wildcard+tux lyx 2","wildcard+tux lyx 2","wildcard+tux lyx 2"
-96,WC3,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 3","wildcard+tux lyx 3","wildcard+tux lyx 3","wildcard+tux lyx 3","wildcard+tux lyx 3","wildcard+tux lyx 3"
-97,WC4,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 4","wildcard+tux lyx 4","wildcard+tux lyx 4","wildcard+tux lyx 4","wildcard+tux lyx 4","wildcard+tux lyx 4"
-98,WC5,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 5","wildcard+tux lyx 5","wildcard+tux lyx 5","wildcard+tux lyx 5","wildcard+tux lyx 5","wildcard+tux lyx 5"
-99,WC6,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+tux lyx 6","wildcard+tux lyx 6","wildcard+tux lyx 6","wildcard+tux lyx 6","wildcard+tux lyx 6","wildcard+tux lyx 6"
+94,WC1,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+cut lyx 1","wildcard+cut lyx 1","wildcard+cut lyx 1","wildcard+cut lyx 1","wildcard+cut lyx 1","wildcard+cut lyx 1"
+95,WC2,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+cut lyx 2","wildcard+cut lyx 2","wildcard+cut lyx 2","wildcard+cut lyx 2","wildcard+cut lyx 2","wildcard+cut lyx 2"
+96,WC3,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+cut lyx 3","wildcard+cut lyx 3","wildcard+cut lyx 3","wildcard+cut lyx 3","wildcard+cut lyx 3","wildcard+cut lyx 3"
+97,WC4,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+cut lyx 4","wildcard+cut lyx 4","wildcard+cut lyx 4","wildcard+cut lyx 4","wildcard+cut lyx 4","wildcard+cut lyx 4"
+98,WC5,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+cut lyx 5","wildcard+cut lyx 5","wildcard+cut lyx 5","wildcard+cut lyx 5","wildcard+cut lyx 5","wildcard+cut lyx 5"
+99,WC6,wildcard+cut,,,,,,,,,,,,,,,,,"wildcard+cut lyx 6","wildcard+cut lyx 6","wildcard+cut lyx 6","wildcard+cut lyx 6","wildcard+cut lyx 6","wildcard+cut lyx 6"

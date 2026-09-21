@@ -47,9 +47,16 @@ sub rt { struct_decode(struct_encode(@_)) }
     $err = do { local $@; eval { struct_encode(Handle::Sub->new(1)) }; $@ };
     like($err, qr/cannot encode a Handle::Sub object/, 'an inherited DESTROY counts');
 
-    my $big = 2**40 + 7;
+    # ~0 and not a literal, because an address is only ever as wide as a
+    # pointer: where ivsize is 4, 2**40 is no integer at all but an NV, and an
+    # NV is not an address. Asking for one there asked for a refusal that
+    # should not come.
+    my $big = ~0;
     $err = do { local $@; eval { struct_encode(Handle->new($big)) }; $@ };
-    like($err, qr/holds a pointer/, 'a wide integer is still refused');
+    like($err, qr/holds a pointer/, 'the widest integer a pointer could be is refused');
+
+    my $f = do { my $v = 2**70; bless \$v, 'Handle' };
+    is(${ rt($f) }, 2**70, 'a float is no address, so it stays data');
 
     # Printing an integer leaves the digits in the same scalar, and before
     # 5.36 perl marks them public POK, so POK alone cannot say "string".

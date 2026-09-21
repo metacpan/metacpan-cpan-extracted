@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use JSON::MaybeXS qw(JSON);
 use YAML::XS ();
 
@@ -59,7 +59,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 my $serial = 0;
@@ -228,7 +228,7 @@ SKIP: {
                 "[$spelling] double-quoted, the token sops itself writes");
 
             my $file = scratch_file('yaml');
-            write_file($file, $document);
+            write_binary($file, $document);
             my $out = `$sops_bin -d --input-type yaml --output-type yaml $file 2>&1`;
             is($? >> 8, 0, "[$spelling] sops -d accepts it") or diag($out);
             like($out, qr/^x_unencrypted: "\Q$spelling\E"$/m,
@@ -236,7 +236,7 @@ SKIP: {
 
             system("$sops_bin rotate -i $file 2>/dev/null");
             is($? >> 8, 0, "[$spelling] sops rotate accepts the document");
-            like(scalar read_file($file), qr/^x_unencrypted: "\Q$spelling\E"$/m,
+            like(read_binary($file), qr/^x_unencrypted: "\Q$spelling\E"$/m,
                 "[$spelling] and re-writes the SAME quoted token -- stable");
         }
     };
@@ -358,7 +358,7 @@ SKIP: {
             'and the quoted .nan, both in the SECOND document');
 
         my $file = scratch_file('yaml');
-        write_file($file, $document);
+        write_binary($file, $document);
         my $out = `$sops_bin -d $file 2>&1`;
         is($? >> 8, 0, 'sops -d accepts the stream') or diag($out);
         like($out, qr/^x_unencrypted: "True"$/m, 'and reads True as a string there too');

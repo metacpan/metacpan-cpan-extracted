@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use Scalar::Util qw(dualvar);
 use B ();
 
@@ -90,7 +90,7 @@ sub wire_type_of {
 # returns 0 without re-encrypting, which is the path this defect hid behind.
 sub editor_touching_other {
     my $path = "$tempdir/editor-" . ++$serial . ".pl";
-    write_file($path, <<'PERL');
+    write_binary($path, <<'PERL');
 #!/usr/bin/env perl
 use strict; use warnings;
 my $file = shift or die "no file";
@@ -475,13 +475,13 @@ SKIP: {
         unless $sops_bin;
 
     my $keyfile = "$tempdir/age.key";
-    write_file($keyfile, "$secret\n");
+    write_binary($keyfile, "$secret\n");
     local $ENV{SOPS_AGE_KEY_FILE} = $keyfile;
 
     my $encrypt_with_sops = sub {
         my ($dir, $plaintext, $out) = @_;
         $out //= 'yaml';
-        write_file("$dir/p.yaml", $plaintext);
+        write_binary("$dir/p.yaml", $plaintext);
         my ($rc, $document) = sops_run('-e', '--age', $public,
             '--input-type', 'yaml', '--output-type', $out, "$dir/p.yaml");
         return ($rc, $document);
@@ -515,7 +515,7 @@ SKIP: {
             my $dir = scratch();
             my ($rc, $document) = $encrypt_with_sops->($dir, "secret: .inf\n", $wire);
             is($rc, 0, "[$wire] sops -e exit 0");
-            write_file("$dir/w.$wire", $document);
+            write_binary("$dir/w.$wire", $document);
 
             my ($yrc, $yout) = sops_run('-d', '--input-type', $wire,
                 '--output-type', 'yaml', "$dir/w.$wire");
@@ -542,13 +542,13 @@ SKIP: {
                 is($rc, 0, "[$case->{token}/$wire] sops -e exit 0") or next;
 
                 my $file = "$dir/w.$wire";
-                write_file($file, $document);
+                write_binary($file, $document);
                 my $ok = eval { File::SOPS->rotate(file => $file,
                     identities => [$secret]); 1 };
                 ok($ok, "[$case->{token}/$wire] rotate succeeds") or do {
                     diag($@); next };
 
-                my $rotated = read_file($file);
+                my $rotated = read_binary($file);
                 is(wire_type_of($rotated, 'secret'), 'float',
                     "[$case->{token}/$wire] the leaf is still type:float");
 
@@ -575,13 +575,13 @@ SKIP: {
             is($rc, 0, "[$case->{token}] sops -e exit 0") or next;
 
             my $file = "$dir/w.yaml";
-            write_file($file, $document);
+            write_binary($file, $document);
             my $changed = eval { File::SOPS->edit(file => $file,
                 identities => [$secret], editor => $editor) };
             ok($changed, "[$case->{token}] edit saved the change") or do {
                 diag($@); next };
 
-            my $edited = read_file($file);
+            my $edited = read_binary($file);
             is(wire_type_of($edited, 'secret'), 'float',
                 "[$case->{token}] the untouched leaf is still type:float");
 
@@ -606,7 +606,7 @@ SKIP: {
             is($rc, 0, "[$case->{token}] sops -e exit 0") or next;
 
             my $file = "$dir/w.yaml";
-            write_file($file, $document);
+            write_binary($file, $document);
             my $plain = "$dir/plain.yaml";
             my $ok = eval {
                 File::SOPS->decrypt_file(input => $file, output => $plain,
@@ -630,7 +630,7 @@ SKIP: {
             ok($rewritten, "[$case->{token}] decrypt -> encrypt in memory")
                 or diag($@);
             if ($rewritten) {
-                write_file("$dir/mem.yaml", $rewritten);
+                write_binary("$dir/mem.yaml", $rewritten);
                 my ($mrc, $mout) = sops_run('-d', "$dir/mem.yaml");
                 is($mrc, 0, "[$case->{token}] sops -d exit 0");
                 like($mout, qr/^secret: \Q$case->{token}\E$/m,
@@ -648,14 +648,14 @@ SKIP: {
     subtest 'all twelve spellings encrypt as the type sops gives them' => sub {
         for my $token (@TOKENS) {
             my $dir = scratch();
-            write_file("$dir/p.yaml", "secret: $token\n");
+            write_binary("$dir/p.yaml", "secret: $token\n");
 
             my $written = eval {
                 File::SOPS->encrypt_file(input => "$dir/p.yaml",
                     output => "$dir/ours.yaml", recipients => [$public]); 1 };
             ok($written, "[$token] encrypt_file writes the document")
                 or diag($@);
-            is($written ? wire_type_of(scalar read_file("$dir/ours.yaml"),
+            is($written ? wire_type_of(read_binary("$dir/ours.yaml"),
                     'secret') : undef,
                 'float', "[$token] we write type:float");
 
@@ -665,7 +665,7 @@ SKIP: {
             is(wire_type_of($theirs, 'secret'), 'float',
                 "[$token] and so does sops");
 
-            write_file("$dir/theirs.yaml", $theirs);
+            write_binary("$dir/theirs.yaml", $theirs);
             my ($orc, $oout) = sops_run('-d', "$dir/ours.yaml");
             my ($trc, $tout) = sops_run('-d', "$dir/theirs.yaml");
             is($orc, 0, "[$token] sops -d reads ours at exit 0");
@@ -696,8 +696,8 @@ SKIP: {
             is(wire_type_of($ours, 'secret'), wire_type_of($theirs, 'secret'),
                 "[$case->{token}] our wire type is sops's wire type");
 
-            write_file("$dir/ours.json", $ours);
-            write_file("$dir/theirs.json", $theirs);
+            write_binary("$dir/ours.json", $ours);
+            write_binary("$dir/theirs.json", $theirs);
             for my $which (qw( ours theirs )) {
                 my ($drc) = sops_run('-d', "$dir/$which.json");
                 is($drc, 4, "[$case->{token}/$which] default sops -d is exit 4");
@@ -727,14 +727,14 @@ SKIP: {
             is($rc, 0, "[$case->{token}] sops -e exit 0") or next;
 
             my $file = "$dir/w.json";
-            write_file($file, $document);
-            my $before = read_file($file);
+            write_binary($file, $document);
+            my $before = read_binary($file);
 
             my $err = error_from(sub { File::SOPS->edit(file => $file,
                 identities => [$secret], editor => $editor) });
             ok($err, "[$case->{token}] edit refuses it");
             like($err, qr/\bsecret\b/, "[$case->{token}] naming the key path");
-            is(scalar read_file($file), $before,
+            is(read_binary($file), $before,
                 "[$case->{token}] and the wire is untouched");
 
             my ($erc) = sops_run('edit', $file);

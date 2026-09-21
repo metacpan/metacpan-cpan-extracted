@@ -30,24 +30,11 @@
       },
       "runtime" : {
          "requires" : {
-            "B" : "0",
-            "Carp" : "0",
             "Cpanel::JSON::XS" : "4.38",
-            "Crypt::Age" : "0.003",
+            "Crypt::Age" : "0.004",
             "CryptX" : "0",
-            "Cwd" : "0",
-            "Digest::SHA" : "0",
-            "Fcntl" : "0",
-            "File::Basename" : "0",
-            "File::Spec" : "0",
-            "File::Temp" : "0",
             "JSON::MaybeXS" : "0",
-            "MIME::Base64" : "0",
-            "Math::BigFloat" : "0",
             "Moo" : "0",
-            "POSIX" : "0",
-            "Scalar::Util" : "0",
-            "Text::ParseWords" : "0",
             "YAML::PP" : "0",
             "YAML::XS" : "0",
             "namespace::clean" : "0",
@@ -56,57 +43,54 @@
       },
       "test" : {
          "requires" : {
-            "File::Path" : "0",
-            "File::Slurp" : "0",
-            "File::Temp" : "0",
-            "Test::More" : "0"
+            "File::Slurper" : "0"
          }
       }
    },
    "provides" : {
       "File::SOPS" : {
          "file" : "lib/File/SOPS.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "File::SOPS::Backend::Age" : {
          "file" : "lib/File/SOPS/Backend/Age.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "File::SOPS::Comment" : {
          "file" : "lib/File/SOPS/Comment.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "File::SOPS::Encrypted" : {
          "file" : "lib/File/SOPS/Encrypted.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "File::SOPS::Format::ENV" : {
          "file" : "lib/File/SOPS/Format/ENV.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "File::SOPS::Format::ENV::Ordered" : {
          "file" : "lib/File/SOPS/Format/ENV/Ordered.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "File::SOPS::Format::INI" : {
          "file" : "lib/File/SOPS/Format/INI.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "File::SOPS::Format::JSON" : {
          "file" : "lib/File/SOPS/Format/JSON.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "File::SOPS::Format::YAML" : {
          "file" : "lib/File/SOPS/Format/YAML.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "File::SOPS::Metadata" : {
          "file" : "lib/File/SOPS/Metadata.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "File::SOPS::Metadata::Flat" : {
          "file" : "lib/File/SOPS/Metadata/Flat.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -121,7 +105,7 @@
          "web" : "https://github.com/Getty/p5-file-sops"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -132,6 +116,7 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
+                     ".karr",
                      "README.md"
                   ],
                   "exclude_match" : [
@@ -479,7 +464,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.003",
+                  "tag" : "0.004",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -634,7 +619,7 @@
    },
    "x_authority" : "cpan:GETTY",
    "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.52",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

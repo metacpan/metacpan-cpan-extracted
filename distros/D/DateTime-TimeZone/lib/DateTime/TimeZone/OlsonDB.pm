@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.69';
+our $VERSION = '2.70';
 
 use DateTime::Duration;
 use DateTime::TimeZone::OlsonDB::Rule;
@@ -304,7 +304,7 @@ DateTime::TimeZone::OlsonDB - An object to represent an Olson time zone database
 
 =head1 VERSION
 
-version 2.69
+version 2.70
 
 =head1 SYNOPSIS
 

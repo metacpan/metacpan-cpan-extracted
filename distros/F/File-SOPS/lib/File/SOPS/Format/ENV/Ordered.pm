@@ -1,6 +1,6 @@
 package File::SOPS::Format::ENV::Ordered;
 # ABSTRACT: the tied hash that keeps a flat format's parse in document order
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use strict;
 use warnings;
 use namespace::clean;
@@ -61,7 +61,7 @@ File::SOPS::Format::ENV::Ordered - the tied hash that keeps a flat format's pars
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

@@ -83,9 +83,9 @@ Acme::Parataxis::run(
             ReuseAddr => 1,
             Blocking  => 0
             ) or
-            die "Could not create listener: $!";
+            die 'Could not create listener: ' . $!;
         my $server_port = $listener->sockport;
-        diag "Mock server listening on 127.0.0.1:$server_port";
+        diag 'Mock server listening on 127.0.0.1:' . $server_port;
         #
         Acme::Parataxis->spawn(
             sub {
@@ -112,9 +112,16 @@ Acme::Parataxis::run(
                                 last if defined $bytes && $bytes == 0;    # EOF
                             }
                             #
-                            my $response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 2\r\nConnection: close\r\n\r\nHI";
-                            my $offset   = 0;
-                            my $len      = length($response);
+                            my $response = <<~'EOF';
+                            HTTP/1.1 200 OK
+                            Content-Type: text/plain
+                            Content-Length: 2
+                            Connection: close
+
+                            HI
+                            EOF
+                            my $offset = 0;
+                            my $len    = length($response);
                             while ( $offset < $len ) {
                                 my $written = syswrite( $client, $response, $len - $offset, $offset );
                                 if ( defined $written ) {
@@ -150,8 +157,8 @@ Acme::Parataxis::run(
         # Verify results
         for my $i ( 0 .. $#urls ) {
             my $res = $futures[$i]->await();
-            is $res->{status},  200,  "Request " . ( $i + 1 ) . " status is 200";
-            is $res->{content}, 'HI', "Request " . ( $i + 1 ) . " content is correct";
+            is $res->{status},  200,  'Request ' . ( $i + 1 ) . ' status is 200';
+            is $res->{content}, 'HI', 'Request ' . ( $i + 1 ) . ' content is correct';
         }
         $listener->close();
         Acme::Parataxis::stop();

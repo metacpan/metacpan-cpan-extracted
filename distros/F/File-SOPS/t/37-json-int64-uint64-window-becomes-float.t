@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use B ();
 use Scalar::Util qw(dualvar);
 
@@ -42,7 +42,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 my $serial = 0;
@@ -342,13 +342,13 @@ SKIP: {
 
     subtest 'sops -e normalises the window; our rotate no longer croaks and leaves it byte-identical' => sub {
         my $plain = scratch_file('json');
-        write_file($plain, qq({\n  "keep_unencrypted": "x",\n)
+        write_binary($plain, qq({\n  "keep_unencrypted": "x",\n)
             . qq(  "big_unencrypted": 9223372036854775808,\n  "big_secret": 9223372036854775808\n}\n));
 
         my $sops_e_out = `$sops_bin -e -i --age $public $plain 2>&1`;
         is($? >> 8, 0, 'sops -e wrote the fixture') or diag($sops_e_out);
 
-        my $written_by_sops = read_file($plain);
+        my $written_by_sops = read_binary($plain);
         like($written_by_sops, qr/"big_unencrypted"\s*:\s*9223372036854776000\b/,
             'sops itself normalises the literal to the float64 it truncates to');
         like($written_by_sops, qr/"big_secret"[^{]*type:float/,
@@ -361,7 +361,7 @@ SKIP: {
         };
         is($rotate_err, '', 'our rotate no longer croaks -- this is the k101 fix') or diag($rotate_err);
 
-        my $after_rotate = read_file($plain);
+        my $after_rotate = read_binary($plain);
         like($after_rotate, qr/"big_unencrypted"\s*:\s*9223372036854776000\b/,
             'and leaves the unencrypted slot byte-identical to what sops -e wrote');
         like($after_rotate, qr/"big_secret"[^{]*type:float/,
@@ -372,7 +372,7 @@ SKIP: {
         # Separated from the subtest above so a rotate failure there does not
         # also hide whether sops itself can still read the file afterwards.
         my $plain = scratch_file('json');
-        write_file($plain, qq({\n  "big_unencrypted": 9223372036854775808,\n)
+        write_binary($plain, qq({\n  "big_unencrypted": 9223372036854775808,\n)
             . qq(  "big_secret": 9223372036854775808\n}\n));
 
         my $sops_e_out = `$sops_bin -e -i --age $public $plain 2>&1`;
@@ -390,12 +390,12 @@ SKIP: {
             my ($data) = File::SOPS::Format::JSON->parse(qq({"v":$literal}));
 
             my $plain = scratch_file('json');
-            write_file($plain, qq({\n  "v_unencrypted": $literal,\n  "v_secret": $literal\n}\n));
+            write_binary($plain, qq({\n  "v_unencrypted": $literal,\n  "v_secret": $literal\n}\n));
 
             my $enc_file = scratch_file('json');
             File::SOPS->encrypt_file(input => $plain, output => $enc_file, recipients => [$public]);
 
-            my $document = read_file($enc_file);
+            my $document = read_binary($enc_file);
             like($document, qr/"v_secret"\s*:\s*"ENC\[[^\]]*type:float\]"/,
                 "[$literal] our own encrypt types the leaf float, matching sops's own answer");
 
@@ -411,7 +411,7 @@ SKIP: {
     subtest 'YAML stays shut: sops -e itself refuses the window, in both slots' => sub {
         for my $slot (qw(v v_unencrypted)) {
             my $plain = scratch_file('yaml');
-            write_file($plain, "$slot: 9223372036854775808\n");
+            write_binary($plain, "$slot: 9223372036854775808\n");
 
             my $sops_e_out = `$sops_bin -e -i --age $public $plain 2>&1`;
             is($? >> 8, 23, "[$slot] sops -e itself exits 23 on this window in YAML") or diag($sops_e_out);

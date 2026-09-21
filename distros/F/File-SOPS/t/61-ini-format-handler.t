@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 
 use File::SOPS;
 use File::SOPS::Comment;
@@ -55,7 +55,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my $tempdir = tempdir(CLEANUP => 1);
 my ($public, $secret) = Crypt::Age->generate_keypair();
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 sub exception {
@@ -261,7 +261,7 @@ subtest 'every walk that builds a path asks the same question' => sub {
     like($encrypted, qr/^; ENC\[[^\]]*type:comment\]$/m,
         'the comment is ENCRYPTED under a rule that matches only the bucket key');
 
-    write_file("$tempdir/walks.ini", $encrypted);
+    write_binary("$tempdir/walks.ini", $encrypted);
     is(exception(sub {
         File::SOPS->rotate(file => "$tempdir/walks.ini", identities => [$secret])
     }), undef, 'and rotate accepts the file encrypt just wrote');
@@ -270,7 +270,7 @@ subtest 'every walk that builds a path asks the same question' => sub {
     # still refuses, because the comment would be rewritten as plain text.
     (my $misruled = $encrypted) =~ s/^(unencrypted_regex +\= )\^\$$/$1^db\$/m
         or die 'the rule line moved';
-    write_file("$tempdir/misruled.ini", $misruled);
+    write_binary("$tempdir/misruled.ini", $misruled);
     like(exception(sub {
         File::SOPS->rotate(file => "$tempdir/misruled.ini", identities => [$secret])
     }), qr/MAC verification failed/,
@@ -503,12 +503,12 @@ key = secret
 multi = """line1
 line2"""
 INI
-        write_file("$tempdir/in.ini", { binmode => ':raw' }, $plain);
+        write_binary("$tempdir/in.ini", $plain);
         my ($rc) = sops_run('-e', '--age', $public,
             "$tempdir/in.ini", '>', "$tempdir/in.enc.ini");
         is($rc, 0, 'sops -e wrote the document');
 
-        my $document = read_file("$tempdir/in.enc.ini", binmode => ':raw');
+        my $document = read_binary("$tempdir/in.enc.ini");
         unlike($document, qr/^alpha .*\nempty/m,
             'and its keys are NOT in sorted order');
 
@@ -548,7 +548,7 @@ INI
         };
         my $encrypted = File::SOPS->encrypt(
             data => $data, recipients => [$public], format => 'ini');
-        write_file("$tempdir/ours.enc.ini", { binmode => ':raw' }, $encrypted);
+        write_binary("$tempdir/ours.enc.ini", $encrypted);
 
         my ($rc, $out) = sops_run('-d', "$tempdir/ours.enc.ini");
         is($rc, 0, 'sops -d read the document this library wrote')
@@ -570,12 +570,12 @@ INI
     };
 
     subtest 'sops -> File::SOPS -> sops, the whole way round' => sub {
-        my $document = read_file("$tempdir/in.enc.ini", binmode => ':raw');
+        my $document = read_binary("$tempdir/in.enc.ini");
         my $data = File::SOPS->decrypt(
             encrypted => $document, identities => [$secret], format => 'ini');
         my $ours = File::SOPS->encrypt(
             data => $data, recipients => [$public], format => 'ini');
-        write_file("$tempdir/chain.enc.ini", { binmode => ':raw' }, $ours);
+        write_binary("$tempdir/chain.enc.ini", $ours);
 
         my ($rc, $out) = sops_run('-d', "$tempdir/chain.enc.ini");
         is($rc, 0, 'sops reads a document it wrote and this library rewrote')

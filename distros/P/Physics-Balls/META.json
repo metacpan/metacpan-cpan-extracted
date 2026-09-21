@@ -40,11 +40,13 @@
       "test" : {
          "requires" : {
             "JSON::PP" : "0",
+            "Test2::Bundle::Numerical" : "0.03",
+            "Test2::Suite" : "0.000060",
             "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

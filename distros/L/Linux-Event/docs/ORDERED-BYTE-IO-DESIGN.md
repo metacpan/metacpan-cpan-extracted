@@ -254,9 +254,12 @@ same native ordered-byte state, descriptors, buffered input, output queue,
 backpressure state, deadlines, and application data.
 
 When both protocol descriptors declare native consumers, the transition may
-replace the consumer provider at a safe provider-frame/host-retain boundary.
-Unread bytes remain in that same native input buffer and are re-driven through
-the incoming provider after the source flush/context handoff completes.
+replace the consumer provider at a safe provider-frame/host-retain boundary. A
+native consumer may also retire into an ordinary Perl input sink at that same
+safe boundary. Unread bytes remain in the same native input buffer and are
+re-driven under the incoming descriptor after source flush/context retirement
+completes. Adding a native consumer to an already-ordinary live object remains
+outside the supported transition contract.
 
 The target must represent the same underlying resource category. Protocol
 transition must not silently turn a pipe into a socket or a connected socket

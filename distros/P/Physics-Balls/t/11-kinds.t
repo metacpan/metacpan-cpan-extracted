@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use FindBin ();
 use lib "$FindBin::Bin/lib";
-use Test::More;
+use Test2::Bundle::Numerical;
 use Config;
 
 # Ball kinds (0.04, plan_bowling 02). The marks, in order:
@@ -14,7 +14,7 @@ use Config;
 #      fixture bit-identically through rows that name the kind
 #   2  the C is the JavaScript: every lane fixture recorded by
 #      plan_bowling/prototype/record.js from the forked physics.js is
-#      bit-identical here, events, rest, holed, down, peak and segments
+#      reproduced here, events, rest, holed, down, peak and segments
 #   3  momentum: a head-on hit between a ball and a pin at e_bb 0.55 and the
 #      4.29:1 mass ratio leaves the striker (m1 - e m2)/(m1 + m2) of its speed
 #      and gives the struck body m1 (1 + e)/(m1 + m2), the closed forms worked
@@ -29,6 +29,17 @@ use Config;
 #
 # The lane fixtures under t/fixtures/lane are REGRESSION baselines; the
 # constants in them are house choices plan_bowling/01 decided and say so.
+#
+# Mark 2 is read in ulps of a double and not in bits, for two reasons a smoker
+# found. The fixtures carry each number as the shortest decimal that names its
+# double, which a long double perl parses to a long double a few bits off the
+# double the engine holds, and prints differently again; and a compiler the
+# prototype was never recorded on may order a sum its own way and land one ulp
+# away, which the collisions after it carry along. Both are differences below
+# the fifteenth digit. So the comparison is double's, whatever this perl's NV
+# is, and the worst distance seen is in the test's own name: a smoke report
+# then says how close to the tolerance the platform ran. The bit-for-bit
+# target lives in t/03-bitwise.t, over the table fixtures.
 
 use Physics::Balls;
 use Physics::Balls::World;
@@ -43,8 +54,29 @@ my @fx = map { Presets::read_json("$dir/$_") } @files;
 
 plan tests => 4 * @fx + 33;
 
-sub hexd { my ($v) = @_; return unpack 'H*', pack 'd>', ($v == 0 ? 0 : $v) }
-sub hexes { my ($row) = @_; return join ' ', map { hexd($_) } @$row }
+sub hexes { my ($row) = @_; return join ' ', map { unpack 'H*', pack 'd>', ($_ == 0 ? 0 : $_) } @$row }
+
+# how far apart two recorded numbers are, counted in ulps of a double: the
+# perl's own epsilon is not the measure, because the numbers being compared
+# came out of a double and went into the fixture as one
+use constant DBL_EPSILON => 2 ** -52;
+use constant ULPS => 64;
+sub ulps {
+	my ($a, $b) = @_;
+	return 0 if $a == $b;
+	my $max = abs($a) > abs($b) ? abs($a) : abs($b);
+	return $max > 0 ? abs($a - $b) / ($max * DBL_EPSILON) : 0;
+}
+# a failing lane has hundreds of differing numbers and a smoke report has to
+# carry them: the count is the assertion, the first five are the diagnosis
+sub first_few { my @all = @_; return @all[0 .. ($#all < 4 ? $#all : 4)] }
+# an integer is an integer on every platform; a double is read in ulps
+sub same {
+	my ($a, $b) = @_;
+	return !defined $a && !defined $b unless defined $a && defined $b;
+	return "$a" eq "$b" if $a =~ /\A-?[0-9]+\z/ && $b =~ /\A-?[0-9]+\z/;
+	return ulps($a, $b) <= ULPS;
+}
 sub lane_world {
 	my (%over) = @_;
 	my $w = $lane->{world};
@@ -60,20 +92,71 @@ for my $f (@fx) {
 	my $label = "lane/$f->{id}";
 	my $out = Physics::Balls->strike($world, layout => $f->{layout}, %{ $f->{shot} });
 	ok !$out->error, "$label: the engine plays it (" . scalar(@{ $out->events }) . ' events)' or diag($out->message);
-	is join("\n", map { hexd($_->[0]) . " $_->[1] $_->[2]" . (defined $_->[3] ? " $_->[3]" : '') } @{ $out->events }),
-		join("\n", map { hexd($_->[0]) . " $_->[1] $_->[2]" . (defined $_->[3] ? " $_->[3]" : '') } @{ $f->{events} }),
-		"$label: the events are identical, times bit for bit";
-	# the prototype's rest rows carry the kind; the dist's are [id, x, y], the 0.03 contract
-	is_deeply [ $out->rest, $out->holed, [ map { [ @$_[0 .. 2], hexd($_->[3]) ] } @{ $out->down } ], { map { $_ => hexd($out->peak->{$_}) } keys %{ $out->peak } } ],
-		[ [ map { [ @$_[0 .. 2] ] } @{ $f->{rest} } ], $f->{holed}, [ map { [ @$_[0 .. 2], hexd($_->[3]) ] } @{ $f->{down} } ], { map { $_ => hexd($f->{peak}{$_}) } keys %{ $f->{peak} } } ],
-		"$label: rest, holed, down and peak are identical";
-	my (@mine, @theirs);
-	for my $id (sort { $a <=> $b } keys %{ $f->{segments} }) {
-		push @theirs, map { hexes($_) } @{ $f->{segments}{$id} };
-		push @mine, map { hexes($_) } @{ $out->segments->{$id} || [] };
+
+	my @mine = @{ $out->events };
+	my @theirs = @{ $f->{events} };
+	my @bad;
+	my $worst = 0;
+	push @bad, 'count ' . scalar(@mine) . ' vs ' . scalar(@theirs) if @mine != @theirs;
+	for my $i (0 .. ($#mine < $#theirs ? $#mine : $#theirs)) {
+		my ($m, $t) = ($mine[$i], $theirs[$i]);
+		my $u = ulps($m->[0], $t->[0]);
+		$worst = $u if $u > $worst;
+		push @bad, "event $i: mine [@$m] theirs [@$t]"
+			unless $m->[1] eq $t->[1] && same($m->[2], $t->[2]) && same($m->[3], $t->[3]) && $u <= ULPS;
 	}
-	is join("\n", @mine), join("\n", @theirs), "$label: the segments are bit-identical to the prototype's (" . scalar(@theirs) . ' segments)'
-		or diag("on $Config{archname}, $Config{cc}");
+	is_deeply \@bad, [],
+		sprintf('%s: the same events between the same bodies in the same order, their times to %d ulps (worst %.1f)', $label, ULPS, $worst)
+		or diag(join("\n", first_few(@bad)) . "\non $Config{archname}, $Config{cc}");
+
+	# the prototype's rest rows carry the kind; the dist's are [id, x, y], the
+	# 0.03 contract. rest and down carry hundredths of a millimetre, integers;
+	# the time in holed and down, and every peak, is a double
+	my @state;
+	my $rows = sub {
+		my ($what, $mine, $theirs, $n) = @_;
+		if (@$mine != @$theirs) {
+			push @state, "$what: " . scalar(@$mine) . ' rows vs ' . scalar(@$theirs);
+			return;
+		}
+		for my $i (0 .. $#$theirs) {
+			my ($m, $t) = ($mine->[$i], $theirs->[$i]);
+			push @state, "$what $i: [@{[ @$m[0 .. $n] ]}] vs [@{[ @$t[0 .. $n] ]}]" if grep { !same($m->[$_], $t->[$_]) } 0 .. $n;
+		}
+	};
+	$rows->('rest', $out->rest, $f->{rest}, 2);
+	$rows->('holed', $out->holed, $f->{holed}, 2);
+	$rows->('down', $out->down, $f->{down}, 3);
+	my $peak = $out->peak;
+	push @state, 'peak: ' . scalar(keys %$peak) . ' bodies vs ' . scalar(keys %{ $f->{peak} }) if keys %$peak != keys %{ $f->{peak} };
+	for my $id (sort { $a <=> $b } keys %{ $f->{peak} }) {
+		push @state, "peak $id: " . (defined $peak->{$id} ? $peak->{$id} : 'none') . " vs $f->{peak}{$id}" unless same($peak->{$id}, $f->{peak}{$id});
+	}
+	is_deeply \@state, [], "$label: rest, holed, down and peak are the prototype's" or diag(join("\n", first_few(@state)) . "\non $Config{archname}, $Config{cc}");
+
+	my @seg;
+	my ($n, $worst_seg) = (0, 0);
+	my $segments = $out->segments;
+	push @seg, 'balls ' . join(' ', sort { $a <=> $b } keys %$segments) . ' moved, not ' . join(' ', sort { $a <=> $b } keys %{ $f->{segments} })
+		if join(' ', sort { $a <=> $b } keys %$segments) ne join(' ', sort { $a <=> $b } keys %{ $f->{segments} });
+	for my $id (sort { $a <=> $b } keys %{ $f->{segments} }) {
+		my ($m, $t) = ($segments->{$id} || [], $f->{segments}{$id});
+		$n += @$t;
+		if (@$m != @$t) {
+			push @seg, "ball $id: " . scalar(@$m) . ' segments vs ' . scalar(@$t);
+			next;
+		}
+		for my $i (0 .. $#$t) {
+			for my $k (0 .. 7) {
+				my $u = ulps($m->[$i][$k], $t->[$i][$k]);
+				$worst_seg = $u if $u > $worst_seg;
+				push @seg, sprintf('ball %d segment %d field %d: %s vs %s (%.1f ulps)', $id, $i, $k, $m->[$i][$k], $t->[$i][$k], $u) if $u > ULPS;
+			}
+		}
+	}
+	is_deeply \@seg, [],
+		sprintf('%s: the segments are the prototype\'s to %d ulps (%d segments, worst %.1f)', $label, ULPS, $n, $worst_seg)
+		or diag(join("\n", first_few(@seg)) . "\non $Config{archname}, $Config{cc}");
 }
 
 # ---- 1: the default kind is the old world ---------------------------------------------------
@@ -114,22 +197,23 @@ my %roll = (ball => 0, dx => 1_000_000, dy => 0, power => 600, sx => 0, sy => 40
 	my ($m1, $m2, $e) = (6.804, 1.588, 0.55);
 	my $keep = ($m1 - $e * $m2) / ($m1 + $m2);      # 0.70556, on paper
 	my $give = $m1 * (1 + $e) / ($m1 + $m2);        # 1.25688, on paper
-	cmp_ok abs($after0->[4] - $keep * $v), '<', 1e-9, sprintf('mark 3: the ball keeps (m1 - e m2)/(m1 + m2) = %.5f of %.3f m/s', $keep, $v);
-	cmp_ok abs($after1->[4] - $give * $v), '<', 1e-9, sprintf('mark 3: the pin takes m1 (1 + e)/(m1 + m2) = %.5f of it', $give);
-	cmp_ok abs($m1 * $after0->[4] + $m2 * $after1->[4] - $m1 * $v), '<', 1e-9, 'mark 3: momentum is conserved';
-	cmp_ok $after0->[4], '>', 0, 'mark 3: the ball carries through, which at equal mass it would not (it would keep 0.225)';
+	within_tol $after0->[4], $keep * $v, sprintf('mark 3: the ball keeps (m1 - e m2)/(m1 + m2) = %.5f of %.3f m/s', $keep, $v), 1e-9;
+	within_tol $after1->[4], $give * $v, sprintf('mark 3: the pin takes m1 (1 + e)/(m1 + m2) = %.5f of it', $give), 1e-9;
+	within_tol $m1 * $after0->[4] + $m2 * $after1->[4], $m1 * $v, 'mark 3: momentum is conserved', 1e-9;
+	is_gt $after0->[4], 0, 'mark 3: the ball carries through, which at equal mass it would not (it would keep 0.225)';
 	# ---- 4: the peak is the peak
-	cmp_ok abs($out->peak_of(1) - $after1->[4]), '<', 1e-12, 'mark 4: the pin\'s peak is its speed after the hit';
+	within_tol $out->peak_of(1), $after1->[4], 'mark 4: the pin\'s peak is its speed after the hit', 1e-12;
 	my $release = 0.3 + 0.36 * (9.5 - 0.3);
-	cmp_ok abs($out->peak_of(0) - $release), '<', 1e-12, 'mark 4: the ball\'s peak is its release speed';
+	within_tol $out->peak_of(0), $release, 'mark 4: the ball\'s peak is its release speed', 1e-12;
 	# ---- 5: down
 	ok $out->downed(1), 'mark 5: the pin, past 0.25 m/s, went down';
 	ok !(grep { $_->[0] == 1 } @{ $out->rest }) && !$out->potted(1), 'mark 5: and is in neither rest nor holed';
 	is scalar(grep { $_->[1] eq 'down' && $_->[2] == 1 } @{ $out->events }), 1, 'mark 5: with one down event';
 	ok((grep { $_->[0] == 0 } @{ $out->rest }), 'mark 5: the ball rests');
 	my $d = $out->downed(1);
-	cmp_ok abs($d->[1] * 1e-5 - ($out->segments->{1}[-1][2] + $out->segments->{1}[-1][4] * $out->segments->{1}[-1][1] + 0.5 * $out->segments->{1}[-1][6] * $out->segments->{1}[-1][1] ** 2)), '<', 1e-5,
-		'mark 5: the down row is where its last segment ends';
+	my $last = $out->segments->{1}[-1];
+	within_tol $d->[1] * 1e-5, $last->[2] + $last->[4] * $last->[1] + 0.5 * $last->[6] * $last->[1] ** 2,
+		'mark 5: the down row is where its last segment ends', 1e-5;
 }
 {
 	# the slowest ball there is (power 0 is 0.3 m/s) glancing off a pin set
@@ -139,7 +223,7 @@ my %roll = (ball => 0, dx => 1_000_000, dy => 0, power => 600, sx => 0, sy => 40
 	ok !$out->error && !$out->downed(1), 'mark 5: a pin nudged at ' . sprintf('%.3f', $out->peak_of(1)) . ' m/s, below 0.25, is not down' or diag $out->message;
 	my ($r) = grep { $_->[0] == 1 } @{ $out->rest };
 	ok $r && ($r->[1] != 60000 || $r->[2] != 215000), 'mark 5: it stands where it was pushed to, ' . ($r ? sprintf('%.1f mm off its spot', sqrt(($r->[1] - 60000) ** 2 + ($r->[2] - 215000) ** 2) / 100) : 'gone');
-	cmp_ok $out->peak_of(1), '>', 0, 'mark 5: though it did move';
+	is_gt $out->peak_of(1), 0, 'mark 5: though it did move';
 }
 
 # ---- 6: the sweep radius ---------------------------------------------------------------------

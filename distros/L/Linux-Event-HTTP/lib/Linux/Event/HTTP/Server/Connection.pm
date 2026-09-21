@@ -9,11 +9,18 @@ use Carp qw(croak);
 use Scalar::Util qw(refaddr);
 use utf8 ();
 
+use Linux::Event::Framer ();
 use Linux::Event::HTTP::_HTTP1 ();
+use Linux::Event::HTTP::Request;
 use Linux::Event::HTTP::Response;
 use Linux::Event::HTTP::Transaction;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
+
+Linux::Event::Framer->declare_native_consumer(
+    __PACKAGE__,
+    Linux::Event::HTTP::_HTTP1->_raw_consumer_definition,
+);
 
 my $PARSER = 'Linux::Event::HTTP::_HTTP1';
 my $CHUNKED = 'Linux::Event::HTTP::_HTTP1::Chunked';
@@ -80,6 +87,8 @@ sub new ($class, %option) {
     $self->{_http_active_response} = undef;
     $self->{_http_request_state} = undef;
     $self->{_http_response_state} = undef;
+    $self->{_http_response_output_started} = 0;
+    $self->{_http_response_output_complete} = 0;
     $self->{_http_driving} = 0;
     $self->{_http_dispatching} = 0;
     $self->{_http_closing} = 0;
@@ -93,14 +102,169 @@ sub connect ($class, %option) {
 }
 
 sub transaction ($self) {
-    return $self->{_http_active_transaction};
+    my $transaction = $self->{_http_active_transaction};
+    return $transaction if $transaction;
+
+    my $request = $self->{_http_active_request} or return;
+    my $response = $self->{_http_active_response} or return;
+
+    $transaction = Linux::Event::HTTP::Transaction
+        ->_new_server_active($request, $response, $self);
+    $transaction->{response_output_started} = 1
+        if $self->{_http_response_output_started};
+    $transaction->{response_output_complete} = 1
+        if $self->{_http_response_output_complete};
+    $self->{_http_active_transaction} = $transaction;
+    return $transaction;
 }
 
-sub on_data ($self, $bytes) {
-    return if $self->{_http_closing} || $self->is_closed;
+sub _http_native_protocol_400 ($self) {
+    $self->_protocol_error(400);
+    return 0;
+}
+
+sub _http_native_protocol_431 ($self) {
+    $self->_protocol_error(431);
+    return 0;
+}
+
+sub _http_native_protocol_501 ($self) {
+    $self->_protocol_error(501);
+    return 0;
+}
+
+sub _http_native_fallback_input ($self, $bytes) {
+    return 0 if $self->{_http_closing} || $self->is_closed;
+
     $self->{_http_input} .= $bytes;
     $self->_drive_http1;
-    return;
+
+    return 0 if $self->{_http_closing} || $self->is_closed;
+    return 1 if length($self->{_http_input});
+
+    my $state = $self->{_http_request_state};
+    return 1 if $self->{_http_active_request}
+        && $state && !$state->{body_done};
+
+    return 0;
+}
+
+sub _http_native_request ($self, $request) {
+    return 0 if $self->{_http_closing} || $self->is_closed;
+    croak 'raw HTTP input delivered a new Request while another Request is active'
+        if $self->{_http_active_request};
+
+    my $consumed = $request->_consumed;
+    if ($consumed > $MAX_REQUEST_HEAD) {
+        $self->_protocol_error(431, $request->version);
+        return 0;
+    }
+
+    my $action = $self->_activate_native_http_request($request);
+    return 0 if $action != 2;
+
+    return $self->{_http_on_body} ? 5 : 4
+        if $request->_http1_body_mode eq 'chunked';
+    return $self->{_http_on_body} ? 3 : 2;
+}
+
+sub _http_native_chunked_body ($self, $bytes, $done) {
+    return 0 if $self->{_http_closing} || $self->is_closed;
+
+    my $request = $self->{_http_active_request} or return 0;
+    my $response = $self->{_http_active_response} or return 0;
+    my $state = $self->{_http_request_state} or return 0;
+
+    croak 'raw chunked body delivery has wrong request state'
+        if $state->{body_done} || $state->{mode} ne 'chunked';
+
+    if (length($bytes) && !$self->_invoke_http_callback(
+        $self->{_http_on_body}, $request, $response, $bytes,
+    )) {
+        return 0;
+    }
+    return 0 if $self->{_http_closing} || $self->is_closed;
+    return 0 if !$self->{_http_active_request};
+
+    if ($done) {
+        $self->_finish_request_body;
+        return 0;
+    }
+
+    return 1;
+}
+
+sub _http_native_chunked_complete ($self) {
+    return 0 if $self->{_http_closing} || $self->is_closed;
+
+    my $state = $self->{_http_request_state} or return 0;
+    croak 'raw chunked drain has wrong request state'
+        if $state->{body_done} || $state->{mode} ne 'chunked';
+    croak 'raw chunked drain cannot bypass an on_body callback'
+        if $self->{_http_on_body};
+
+    $self->_finish_request_body;
+    return 0;
+}
+
+sub _http_native_chunked_error ($self) {
+    return 0 if $self->{_http_closing} || $self->is_closed;
+
+    my $request = $self->{_http_active_request} or return 0;
+    my $response = $self->{_http_active_response} or return 0;
+    $self->_fail_active_transaction(400, $request, $response);
+    return 0;
+}
+
+sub _http_native_content_length_body ($self, $bytes, $done) {
+    return 0 if $self->{_http_closing} || $self->is_closed;
+
+    my $request = $self->{_http_active_request} or return 0;
+    my $response = $self->{_http_active_response} or return 0;
+    my $state = $self->{_http_request_state} or return 0;
+
+    croak 'raw Content-Length body delivery has wrong request state'
+        if $state->{body_done} || $state->{mode} ne 'content-length';
+
+    my $length = length($bytes);
+    my $remaining = $state->{remaining} // 0;
+    croak 'raw Content-Length body delivery exceeds remaining body'
+        if $length > $remaining;
+
+    $state->{remaining} = $remaining - $length;
+
+    if ($length && !$self->_invoke_http_callback(
+        $self->{_http_on_body}, $request, $response, $bytes,
+    )) {
+        return 0;
+    }
+    return 0 if $self->{_http_closing} || $self->is_closed;
+    return 0 if !$self->{_http_active_request};
+
+    if ($done) {
+        croak 'raw Content-Length body completed before declared length'
+            if $state->{remaining} != 0;
+        $self->_finish_request_body;
+        return 0;
+    }
+
+    croak 'raw Content-Length body reached zero without completion'
+        if $state->{remaining} == 0;
+    return 1;
+}
+
+sub _http_native_content_length_complete ($self) {
+    return 0 if $self->{_http_closing} || $self->is_closed;
+
+    my $state = $self->{_http_request_state} or return 0;
+    croak 'raw Content-Length drain has wrong request state'
+        if $state->{body_done} || $state->{mode} ne 'content-length';
+    croak 'raw Content-Length drain cannot bypass an on_body callback'
+        if $self->{_http_on_body};
+
+    $state->{remaining} = 0;
+    $self->_finish_request_body;
+    return 0;
 }
 
 sub _http_transport_drain ($self) {
@@ -170,25 +334,16 @@ sub _expect_continue ($request) {
 sub _invoke_http_callback ($self, $handler, $request, $response, @extra) {
     return 1 if !$handler;
 
-    my $ok;
-    {
-        local $self->{_http_dispatching} = 1;
-        $ok = eval {
+    my $ok = eval {
+        {
+            local $self->{_http_dispatching} = 1;
             $handler->($self, $request, $response, @extra);
-            1;
-        };
-    }
-
-    if (!$ok) {
-        $self->_fail_active_transaction(500, $request, $response);
-        return 0;
-    }
-
-    my $ready = eval {
+        }
         $self->_response_body_ready($response);
         1;
     };
-    if (!$ready) {
+
+    if (!$ok) {
         $self->_fail_active_transaction(500, $request, $response);
         return 0;
     }
@@ -197,16 +352,76 @@ sub _invoke_http_callback ($self, $handler, $request, $response, @extra) {
 }
 
 sub _response_body_ready ($self, $response) {
-    return if !$response || !$response->_has_scalar_body;
+    return if !$response;
     return if $self->{_http_dispatching};
 
-    my $transaction = $self->{_http_active_transaction} or return;
-    return if $transaction->_is_response_output_complete;
-    my $active = $transaction->response;
-    return if !$active || refaddr($active) != refaddr($response);
+    my $active_response = $self->{_http_active_response} or return;
+    return if refaddr($active_response) != refaddr($response);
 
-    $self->_send_http_response($transaction);
+    return if $self->{_http_response_output_complete};
+
+    my $transaction = $self->{_http_active_transaction};
+    if ((($response->{_server_flags} // 0) & 1)
+        && ($response->{body_kind} // '') eq 'scalar') {
+        return if $self->_try_native_default_final(
+            $transaction, $response->{body},
+        );
+    }
+
+    return if ($response->{body_kind} // '') ne 'scalar';
+    my $body = $response->{body};
+    return if $self->_try_simple_scalar_final($response, $body);
+    $self->_write_response(
+        $response, $body, 1, 'send_response',
+    );
     return;
+}
+
+
+sub _try_simple_scalar_final ($self, $response, $body) {
+    my $request = $self->{_http_active_request} or return 0;
+    return 0 if $self->{_http_response_state};
+
+    my $wire = Linux::Event::HTTP::_HTTP1
+        ->build_simple_scalar_final($request, $response, $body);
+    return 0 if !defined $wire;
+
+    my $request_state = $self->{_http_request_state};
+
+    # The ordinary synchronous bodyless response has no materialized
+    # Transaction and no later request-body phase that needs output state.
+    # Keep only the started bit across write() for exception safety, then
+    # retire the three live exchange references directly.
+    if ($request_state && $request_state->{body_done}
+        && !$self->{_http_active_transaction}) {
+        $self->{_http_response_output_started} = 1;
+        $self->write($wire);
+        $self->{_http_active_request} = undef;
+        $self->{_http_active_response} = undef;
+        $self->{_http_request_state} = undef;
+        $self->{_http_response_output_started} = 0;
+        $self->resume_read if $self->is_read_paused;
+        return 1;
+    }
+
+    $self->{_http_response_output_started} = 1;
+    $self->{_http_response_output_complete} = 1;
+    if (my $transaction = $self->{_http_active_transaction}) {
+        $transaction->{response_output_started} = 1;
+        $transaction->{response_output_complete} = 1;
+    }
+
+    $self->write($wire);
+
+    if ($request_state && $request_state->{body_done}) {
+        if (my $transaction = $self->{_http_active_transaction}) {
+            $transaction->{state} = 'complete';
+        }
+        $self->_clear_transaction;
+    }
+
+    $self->resume_read if $self->is_read_paused;
+    return 1;
 }
 
 sub _send_http_response ($self, $transaction) {
@@ -222,42 +437,55 @@ sub _send_http_response ($self, $transaction) {
     my $response = $transaction->response
         or croak 'send_response(): Transaction has no Response';
     croak 'send_response(): Response does not have a complete scalar body'
-        if !$response->_has_scalar_body;
+        if ($response->{body_kind} // '') ne 'scalar';
 
-    my $body = $response->_scalar_body;
+    my $body = $response->{body};
     return 1 if $self->_try_native_default_final($transaction, $body);
+    return 1 if $self->_try_simple_scalar_final($response, $body);
 
     $self->_write_response($response, $body, 1, 'send_response');
     return 1;
 }
 
 sub _try_native_default_final ($self, $transaction, $body) {
-    my $response = $transaction->response or return 0;
-    return 0 if ref($response) ne 'Linux::Event::HTTP::Response';
-    return 0 if $response->status != 200 || defined($response->reason);
-    return 0 if $response->header_count;
-    return 0 if $self->{_http_closing} || $self->is_closed;
+    my $response = $transaction
+        ? $transaction->{response}
+        : $self->{_http_active_response};
+    return 0 if !$response;
+    return 0 if !(($response->{_server_flags} // 0) & 1);
+    return 0 if (($response->{status} // 200) != 200);
+    return 0 if defined $response->{reason};
+    my $headers = $response->{headers};
+    return 0 if defined($headers)
+        && (ref($headers) ne 'ARRAY' || @$headers);
     return 0 if $self->{_http_response_state};
 
-    my $active = $self->{_http_active_transaction} or return 0;
-    return 0 if refaddr($active) != refaddr($transaction);
-
-    my $request = $transaction->request or return 0;
     my $request_state = $self->{_http_request_state} or return 0;
-    return 0 if !$request_state->{body_done};
+    my $body_done = $request_state->{body_done} ? 1 : 0;
 
+    my $request = $transaction
+        ? $transaction->{request}
+        : $self->{_http_active_request};
+    return 0 if !$request;
     my $wire = Linux::Event::HTTP::_HTTP1
         ->build_default_final($request, $body);
     return 0 if !defined $wire;
 
-    $response->_commit;
-    $transaction->_mark_response_started;
-    $transaction->_mark_response_output_complete;
+    $response->{committed} = 1;
+    $self->{_http_response_output_started} = 1;
+    $self->{_http_response_output_complete} = 1;
+    if ($transaction) {
+        $transaction->{response_output_started} = 1;
+        $transaction->{response_output_complete} = 1;
+    }
     $self->{_http_response_state} = undef;
 
     $self->write($wire);
-    $self->_complete_active_transaction_state;
-    $self->_clear_transaction;
+
+    if ($body_done) {
+        $transaction->{state} = 'complete' if $transaction;
+        $self->_clear_transaction;
+    }
 
     $self->resume_read if $self->is_read_paused;
     return 1;
@@ -308,6 +536,8 @@ sub _clear_transaction ($self) {
     $self->{_http_active_response} = undef;
     $self->{_http_request_state} = undef;
     $self->{_http_response_state} = undef;
+    $self->{_http_response_output_started} = 0;
+    $self->{_http_response_output_complete} = 0;
     delete $self->{_http_pending_upgrade};
     delete $self->{_http_pending_tunnel};
     return;
@@ -344,7 +574,7 @@ sub _fail_active_transaction ($self, $status, $request, $response) {
     return if $self->{_http_closing} || $self->is_closed;
 
     my $transaction = $self->{_http_active_transaction};
-    my $started = $transaction && $transaction->is_response_started ? 1 : 0;
+    my $started = $self->{_http_response_output_started} ? 1 : 0;
     $self->_fail_active_transaction_state("HTTP server transaction failed ($status)");
 
     if ($started) {
@@ -372,8 +602,7 @@ sub _finish_request_body ($self) {
     return if $self->{_http_closing} || $self->is_closed;
     return if !$self->{_http_active_request};
 
-    my $transaction = $self->{_http_active_transaction};
-    if ($transaction && $transaction->_is_response_output_complete) {
+    if ($self->{_http_response_output_complete}) {
         $self->_finalize_transaction;
     } else {
         $self->pause_read if !$self->is_read_paused;
@@ -473,6 +702,89 @@ sub _finalize_transaction ($self) {
     return;
 }
 
+sub _activate_native_http_request ($self, $request) {
+    return 0 if $self->{_http_closing} || $self->is_closed;
+    croak 'cannot activate a new HTTP Request while another Request is active'
+        if $self->{_http_active_request};
+
+    my $expect = $request->_expect_continue;
+    if ($expect < 0) {
+        $self->_protocol_error(417, $request->version);
+        return 0;
+    }
+
+    my $body_mode = $request->_http1_body_mode;
+    my $bodyless = $body_mode eq 'none';
+
+    my $response = Linux::Event::HTTP::Response
+        ->_new_server_default($request);
+
+    my $request_state;
+    if ($bodyless) {
+        $request_state = $self->{_http_bodyless_state};
+        if (!$request_state) {
+            $request_state = $self->{_http_bodyless_state} = {
+                mode      => 'none',
+                body_done => $self->{_http_on_request_end} ? 0 : 1,
+            };
+        } elsif ($self->{_http_on_request_end}) {
+            $request_state->{body_done} = 0;
+        }
+    } elsif ($body_mode eq 'chunked') {
+        $request_state = {
+            mode      => 'chunked',
+            body_done => 0,
+        };
+    } else {
+        $request_state = _new_request_state($request, $body_mode);
+    }
+
+    $self->{_http_active_request} = $request;
+    $self->{_http_active_response} = $response;
+    $self->{_http_request_state} = $request_state;
+
+    if ($expect && _body_pending($request_state)) {
+        $self->write("HTTP/1.1 100 Continue\r\n\r\n");
+    }
+
+    if (!$self->_invoke_http_callback(
+        $self->{_http_on_request}, $request, $response,
+    )) {
+        return 0;
+    }
+    return 0 if $self->{_http_closing} || $self->is_closed;
+    return 1 if !$self->{_http_active_request};
+
+    if ($bodyless) {
+        if ($self->{_http_on_request_end}) {
+            $request_state->{body_done} = 1;
+            return 0 if !$self->_invoke_http_callback(
+                $self->{_http_on_request_end}, $request, $response,
+            );
+            return 0 if $self->{_http_closing} || $self->is_closed;
+            return 1 if !$self->{_http_active_request};
+        }
+
+        if ($self->{_http_response_output_complete}) {
+            $self->_finalize_transaction;
+            return 0 if $self->{_http_closing} || $self->is_closed;
+            return 1;
+        }
+
+        $self->pause_read if !$self->is_read_paused;
+        return 0;
+    }
+
+    if (!_body_pending($request_state)) {
+        $self->_finish_request_body;
+        return 0 if $self->{_http_closing} || $self->is_closed;
+        return 1 if !$self->{_http_active_request};
+        return 0;
+    }
+
+    return 2;
+}
+
 sub _drive_http1 ($self) {
     return if $self->{_http_driving} || $self->{_http_closing}
         || $self->is_closed;
@@ -496,7 +808,7 @@ sub _drive_http1 ($self) {
                 next;
             }
 
-            if ($transaction && $transaction->_is_response_output_complete) {
+            if ($self->{_http_response_output_complete}) {
                 $self->_finalize_transaction;
                 next;
             }
@@ -507,25 +819,15 @@ sub _drive_http1 ($self) {
 
         last if !length($self->{_http_input});
 
-        my $request;
-        my $parsed = eval {
-            $request = $PARSER->parse_request(
-                $self->{_http_input}, 0, $MAX_HEADERS,
-            );
-            1;
-        };
-
-        if (!$parsed) {
-            my $failure = "$@";
-            my $status = $failure =~ /semantic error \(501\)/ ? 501 : 400;
-            $self->_protocol_error($status);
-            last;
-        }
+        my $request = $PARSER->_parse_server_request(
+            $self->{_http_input}, $MAX_REQUEST_HEAD, $MAX_HEADERS,
+        );
 
         if (!defined $request) {
-            if (length($self->{_http_input}) > $MAX_REQUEST_HEAD) {
-                $self->_protocol_error(431);
-            }
+            last;
+        }
+        if (!ref $request) {
+            $self->_protocol_error(0 + $request);
             last;
         }
 
@@ -534,10 +836,9 @@ sub _drive_http1 ($self) {
             $self->_protocol_error(431, $request->version);
             last;
         }
-
         substr($self->{_http_input}, 0, $consumed, '');
 
-        my $expect = _expect_continue($request);
+        my $expect = $request->_expect_continue;
         if ($expect < 0) {
             $self->_protocol_error(417, $request->version);
             last;
@@ -546,35 +847,34 @@ sub _drive_http1 ($self) {
         my $body_mode = $request->_http1_body_mode;
         my $bodyless = $body_mode eq 'none';
 
-        my $response = Linux::Event::HTTP::Response->new(
-            version => $request->version,
-        );
-        my $transaction = Linux::Event::HTTP::Transaction->_new(
-            request    => $request,
-            controller => $self,
-        );
-        $transaction->_set_response($response);
-        $transaction->_activate;
+        my $response = Linux::Event::HTTP::Response
+            ->_new_server_default($request);
 
         my $request_state;
         if ($bodyless) {
-            $request_state = $self->{_http_bodyless_state} //= {
-                mode      => 'none',
-                body_done => 0,
-            };
-            $request_state->{body_done}
-                = $self->{_http_on_request_end} ? 0 : 1;
-            delete $request_state->{close_after_response};
-            $request->_mark_complete;
+            $request_state = $self->{_http_bodyless_state};
+            if (!$request_state) {
+                $request_state = $self->{_http_bodyless_state} = {
+                    mode      => 'none',
+                    body_done => $self->{_http_on_request_end} ? 0 : 1,
+                };
+            } elsif ($self->{_http_on_request_end}) {
+                $request_state->{body_done} = 0;
+            }
+
+            # Native bodyless Requests are intrinsically complete: Request
+            # derives this from the parser's body mode. Do not create a
+            # fieldhash completion override for every ordinary request.
         } else {
             $request_state = _new_request_state($request, $body_mode);
         }
 
-        $self->{_http_active_transaction} = $transaction;
+        # A new request is reached only after the previous exchange was
+        # cleared (or on a freshly initialized Connection), so transaction,
+        # response-state, and output-progress fields are already neutral.
         $self->{_http_active_request} = $request;
         $self->{_http_active_response} = $response;
         $self->{_http_request_state} = $request_state;
-        $self->{_http_response_state} = undef;
 
         if ($expect && _body_pending($request_state)) {
             $self->write("HTTP/1.1 100 Continue\r\n\r\n");
@@ -598,7 +898,7 @@ sub _drive_http1 ($self) {
                 next if !$self->{_http_active_request};
             }
 
-            if ($transaction->_is_response_output_complete) {
+            if ($self->{_http_response_output_complete}) {
                 $self->_finalize_transaction;
                 next;
             }
@@ -668,9 +968,9 @@ sub _chunked_transfer_encoding ($operation, $version, $values) {
 }
 
 sub _response_start ($self, $response, $bytes, $final, $operation = undef) {
-    my $transaction = $self->{_http_active_transaction}
-        or croak 'response output requires an active HTTP Transaction';
-    my $request = $transaction->request;
+    my $transaction = $self->{_http_active_transaction};
+    my $request = $self->{_http_active_request}
+        or croak 'response output requires an active HTTP Request';
     my $version = $request->version;
     my $method = $request->method;
     my $status = $response->status;
@@ -745,7 +1045,8 @@ sub _response_start ($self, $response, $bytes, $final, $operation = undef) {
 
     my $head = $response->_serialize_head($version);
     $response->_commit;
-    $transaction->_mark_response_started;
+    $self->{_http_response_output_started} = 1;
+    $transaction->_mark_response_started if $transaction;
 
     return (
         {
@@ -833,9 +1134,10 @@ sub _write_response ($self, $response, $body, $final, $operation = undef) {
 }
 
 sub _complete_response ($self, $response, $wire, $close_after) {
-    my $transaction = $self->{_http_active_transaction}
-        or croak 'response completion requires an active HTTP Transaction';
-    $transaction->_mark_response_output_complete;
+    my $transaction = $self->{_http_active_transaction};
+    $self->{_http_response_output_started} = 1;
+    $self->{_http_response_output_complete} = 1;
+    $transaction->_mark_response_output_complete if $transaction;
     $self->{_http_response_state} = undef;
 
     my $request_state = $self->{_http_request_state};
@@ -979,10 +1281,16 @@ high-watermark contract, and C<on_drain> is driven by the connection's native
 drain transition. C<on_cancel> runs if the connection disappears before the
 producer completes.
 
-C<on_data> is reserved by this HTTP connection implementation. Connection-level
-C<on_drain> and C<on_close> callbacks or subclass methods remain supported;
-HTTP composes its body-stream bookkeeping with those lifecycle callbacks rather
-than replacing them.
+HTTP request bytes are consumed by the class-level native HTTP/1 consumer
+before ordinary Perl C<on_data> delivery. C<on_data> is therefore protocol-owned
+and is not a Connection subclass extension point; defining it on a subclass is
+invalid. Customize request handling through C<on_request>, C<on_body>, and
+C<on_request_end>, and customize transport policy through C<stream_tuning> and
+the supported transport lifecycle callbacks.
+
+Connection-level C<on_drain> and C<on_close> callbacks or subclass methods remain
+supported; HTTP composes its body-stream bookkeeping with those lifecycle
+callbacks rather than replacing them.
 
 =head1 REQUEST BODY STREAMING
 

@@ -20,7 +20,7 @@ use Time::HiRes ();
 # directly: retrying the identical 0.2.0 tarball came back 409 Conflict, not the original success
 # response repeated). No functional change from 0.2.0; this bump exists solely to get a fresh,
 # uploadable version number.
-our $VERSION = '0.6.0';
+our $VERSION = '0.7.1';
 
 my $configuration;
 my $reporter;
@@ -102,7 +102,7 @@ sub _span_queue {
 
 # init(%overrides): configure the client. Call once at startup, e.g.:
 #
-#   ForgeOps::Tracker::init(dsn => 'https://<api_key>@your-forgeops-host/api/v1/events');
+#   ForgeOps::Tracker::init(dsn => 'https://<api_key>@getforgeops.net/api/v1/events');
 #
 # Any Configuration field can be overridden by name.
 sub init {
@@ -324,14 +324,14 @@ __END__
 
 =head1 NAME
 
-ForgeOps::Tracker - error reporting client for a ForgeOps instance
+ForgeOps::Tracker - error reporting client for ForgeOps
 
 =head1 SYNOPSIS
 
     use ForgeOps::Tracker;
 
     ForgeOps::Tracker::init(
-        dsn         => 'https://<api_key>@your-forgeops-host/api/v1/events',
+        dsn         => 'https://<api_key>@getforgeops.net/api/v1/events',
         environment => 'production',
     );
 

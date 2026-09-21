@@ -23,7 +23,7 @@ my $ssh = Net::LibSSH->new;
 $ssh->option(host       => $srv->host);
 $ssh->option(port       => $srv->port);
 $ssh->option(user       => scalar getpwuid($<));
-$ssh->option(knownhosts => '/dev/null');
+$ssh->option(knownhosts => $srv->known_hosts);
 
 ok $ssh->connect, 'connect() succeeds against sftp-free sshd'
     or diag 'connect error: ' . ($ssh->error // '');

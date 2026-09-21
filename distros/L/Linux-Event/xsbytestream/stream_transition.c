@@ -218,7 +218,7 @@ les_transition_descriptor(pTHX_ les_xsstate_t *st, SV *descriptor_obj,
             (size_t)injected_len);
     }
 
-    if (consumer_change) {
+    if (consumer_change && next_descriptor->consumer_ops) {
         JMPENV_PUSH(jump_status);
         if (jump_status == 0) {
             next_consumer_context = les_consumer_prepare_transition_context(

@@ -132,6 +132,11 @@ like(
     package T::ServerConnection;
     use parent 'Linux::Event::HTTP::Server::Connection';
 
+    sub _http_native_request ($self, $request) {
+        $self->data->{native_request_hits}++;
+        return $self->SUPER::_http_native_request($request);
+    }
+
     sub on_request ($self, $req, $res) {
         $self->data->{class_method_hits}++;
         $self->data->{actual_class} = ref($self);
@@ -143,6 +148,7 @@ $loop = Linux::Event::Loop->new;
 my $custom = {
     wire => '',
     class_method_hits => 0,
+    native_request_hits => 0,
 };
 
 $server = Linux::Event::HTTP::Server->new(
@@ -165,6 +171,8 @@ run_client(
 
 is($custom->{class_method_hits}, 1,
     'custom connection_class method handles accepted request');
+is($custom->{native_request_hits}, 1,
+    'ordinary Connection subclass inherits production native HTTP input');
 is($custom->{actual_class}, 'T::ServerConnection',
     'accepted object is the configured custom Connection class');
 like($custom->{wire}, qr/\r\n\r\nclass\n\z/s,
@@ -245,6 +253,33 @@ $ok = eval {
 };
 ok(!$ok, 'Server rejects raw on_data callback');
 like($@, qr/owns on_data/, 'raw callback rejection explains HTTP ownership');
+
+{
+    package T::InvalidHTTPOnData;
+    use parent 'Linux::Event::HTTP::Server::Connection';
+
+    sub on_data ($self, $bytes) { return }
+
+    sub on_request ($self, $req, $res) {
+        $res->body("unreachable\n");
+    }
+}
+
+$ok = eval {
+    Linux::Event::HTTP::Server->new(
+        loop => Linux::Event::Loop->new,
+        host => '127.0.0.1',
+        port => 0,
+        connection_class => 'T::InvalidHTTPOnData',
+    );
+    1;
+};
+ok(!$ok, 'HTTP Connection subclass cannot replace protocol-owned native input');
+like(
+    $@,
+    qr/native consumer cannot be combined with on_data/,
+    'subclass on_data conflict fails explicitly at descriptor construction',
+);
 
 $ok = eval {
     Linux::Event::HTTP::Server->new(

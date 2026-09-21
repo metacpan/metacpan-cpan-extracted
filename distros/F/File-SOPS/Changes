@@ -1,5 +1,15 @@
 Revision history for File-SOPS
 
+0.004     2026-09-20 15:52:56Z
+  - SECURITY: fixes CVE-2026-85783, an unbounded age-header stanza count that
+    let a single document force expensive work per decrypt attempt. Crypt::Age
+    is raised to 0.004; decrypt (and decrypt_file/extract/rotate/edit) also caps
+    age entries processed per document at 64 by default, raise-able via the new
+    max_stanzas argument. (k192, k194)
+  - creation_rules_for no longer prints a spurious escape-sequence warning to
+    STDERR before refusing a path_regex that Perl and Go RE2 read apart; the
+    refusal itself is unchanged. (k197)
+
 0.003     2026-09-03 16:02:56Z
   - DATA LOSS: multi-document YAML is read and written: decrypt returns an
     ArrayRef of HashRefs for a stream (one document stays a HashRef), encrypt

@@ -72,6 +72,12 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES => {
         'Test::More' => '0.88',
         'JSON::PP'   => '0',
+        # t/11-kinds.t reads the lane fixtures in ulps of a double on a perl
+        # whose NV may be wider than one. Test2::Bundle::Numerical 0.03 names
+        # Test::Simple but uses Test2::Tools::Basic, which ships in
+        # Test2::Suite: core only since 5.39.4, so it is named here too.
+        'Test2::Bundle::Numerical' => '0.03',
+        'Test2::Suite'             => '0.000060',
     },
     PREREQ_PM => {
         'Object::Proto::Sugar' => '0.05',

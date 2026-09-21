@@ -1,7 +1,8 @@
 use v5.40;
+no warnings 'recursion';    # fibers run on separate heap stacks; Perl's C-stack-depth heuristic misfires there
 use experimental qw[class try];
 
-package Acme::Parataxis v0.0.10 {
+package Acme::Parataxis v0.1.0 {
     use Affix;
     use Config;
     use File::Spec;
@@ -24,22 +25,56 @@ package Acme::Parataxis v0.0.10 {
     our @IPC_BUFFER;
     my $lib;
     my @SCHEDULER_QUEUE;
+    my %SCHEDULER_QUEUED;
     my $IS_RUNNING = 0;
+
+    # Fiber object layout: a flat arrayref of slots rather than perlclass objects (array access is much cheaper than
+    # classes and even hash lookup on the hot spawn/await path).
+    use constant {
+        F_CODE        => 0,
+        F_IS_DONE     => 1,
+        F_ERROR       => 2,
+        F_RESULT      => 3,
+        F_FID         => 4,
+        F_IS_READY    => 5,
+        F_CALLBACKS   => 6,
+        F_WAITER      => 7,
+        F_LAST_STATUS => 8,
+        F_PRIORITY    => 9
+    };
+
+    # Scheduler run queue.  Kept sorted by descending priority (stable for
+    # equal priorities, so a group of same-priority fibers stays FIFO).
+    sub _enqueue ($fiber) {
+        my $fid = $fiber->[F_FID];
+        return if $SCHEDULER_QUEUED{$fid};
+        $SCHEDULER_QUEUED{$fid} = 1;
+        my $prio = $fiber->[F_PRIORITY] // 0;
+        my $i    = 0;
+        $i++ while $i < @SCHEDULER_QUEUE && ( $SCHEDULER_QUEUE[$i]->[F_PRIORITY] // 0 ) >= $prio;
+        splice @SCHEDULER_QUEUE, $i, 0, $fiber;
+    }
 
     sub _bind_functions ($l) {
         affix $l, 'init_system',                       [],                             Int;
         affix $l, 'create_fiber',                      [ Pointer [SV], Pointer [SV] ], Int;
+        affix $l, 'spawn_fiber',                       [ Pointer [SV], Pointer [SV] ], Pointer [SV];
         affix $l, 'coro_call',                         [ Int, Pointer [SV] ],          Pointer [SV];
+        affix $l, 'run_fiber_checked',                 [ Int, Pointer [SV] ],          Int;
         affix $l, 'coro_transfer',                     [ Int, Pointer [SV] ],          Pointer [SV];
         affix $l, 'coro_yield',                        [ Pointer [SV] ],               Pointer [SV];
         affix $l, 'is_finished',                       [Int],                          Int;
+        affix $l, 'get_fiber_by_id',                   [Int],                          Pointer [SV];
+        affix $l, 'get_live_fiber_count',              [],                             Int;
         affix $l, 'destroy_coro',                      [Int],                          Void;
         affix $l, 'force_depth_zero',                  [ Pointer [SV] ],               Void;
         affix $l, 'cleanup',                           [],                             Void;
         affix $l, 'get_os_thread_id_export',           [],                             Int;
         affix $l, 'get_current_parataxis_id',          [],                             Int;
         affix $l, 'submit_c_job',                      [ Int, LongLong, Int ],         Int;
+        affix $l, 'drain_jobs',                        [ Pointer [SV] ],               Void;
         affix $l, 'check_for_completion',              [],                             Int;
+        affix $l, 'get_outstanding_jobs',              [],                             Int;
         affix $l, 'get_job_result',                    [Int],                          Pointer [SV];
         affix $l, 'get_job_coro_id',                   [Int],                          Int;
         affix $l, 'free_job_slot',                     [Int],                          Void;
@@ -50,7 +85,7 @@ package Acme::Parataxis v0.0.10 {
         affix $l, [ 'maybe_yield' => '_maybe_yield' ], [],                             Pointer [SV];
         affix $l, 'get_preempt_count',                 [],                             LongLong;
 
-        # Capture the main interpreter context eagerly
+        # Capture the main interpreter context
         init_system();
         if ( $^O eq 'MSWin32' ) {
             my $perl_dll = $Config{libperl};
@@ -69,9 +104,6 @@ package Acme::Parataxis v0.0.10 {
         push @paths, File::Spec->catfile( dirname(__FILE__), '..',   'arch', 'auto',      'Acme', 'Parataxis', $lib_name );
         push @paths, File::Spec->catfile( dirname(__FILE__), '..',   '..',   'arch',      'auto', 'Acme', 'Parataxis', $lib_name );
         push @paths, File::Spec->catfile( dirname(__FILE__), 'auto', 'Acme', 'Parataxis', $lib_name );
-
-        # XXX - Local dir check (This is temporary)
-        push @paths, File::Spec->catfile( '.', $lib_name );
         for my $inc (@INC) {
             next if ref $inc;
             push @paths, File::Spec->catfile( $inc, 'auto', 'Acme', 'Parataxis', $lib_name );
@@ -87,28 +119,15 @@ package Acme::Parataxis v0.0.10 {
     }
 
     # API aliases and wrappers
-    sub fiber : prototype(&) ($code) { spawn( 'Acme::Parataxis', $code ) }
-
-    sub async : prototype(&) ($code) {
-        my $ret = run($code);
-        stop();
-        return $ret;
-    }
-
-    sub await {
-        my $thing = shift;
-        if ( builtin::blessed($thing) ) {
-            return $thing->await if $thing->can('await');
-            return $thing->wait  if $thing->can('wait');
-        }
-        croak 'await() requires a Future or Fiber object';
-    }
+    sub fiber : prototype(&) ($code) { spawn( __PACKAGE__, $code ) }
+    sub async : prototype(&) ($code) { return run($code) }
 
     sub yield {
         my $invocant = shift;
-        if ( !defined $invocant || ( ( ref $invocant || $invocant ) ne 'Acme::Parataxis' && !eval { $invocant->isa('Acme::Parataxis') } ) ) {
+        if ( !defined $invocant ||
+            ( ( ref $invocant || $invocant ) ne __PACKAGE__ && !( builtin::blessed($invocant) && $invocant->isa(__PACKAGE__) ) ) ) {
             unshift @_, $invocant if defined $invocant;
-            $invocant = 'Acme::Parataxis';
+            $invocant = __PACKAGE__;
         }
         my $result = coro_yield( \@_ );
         return unless defined $result;
@@ -119,36 +138,59 @@ package Acme::Parataxis v0.0.10 {
         my ( $class, $code ) = @_;
         if ( ref $class eq 'CODE' ) {
             $code  = $class;
-            $class = 'Acme::Parataxis';
+            $class = __PACKAGE__;
         }
-        my $future = Acme::Parataxis::Future->new();
-        my $fiber  = Acme::Parataxis->new( code => $code, future => $future );
-        push @SCHEDULER_QUEUE, $fiber;
-        return $future;
+        my $fiber = Acme::Parataxis::spawn_fiber( $code, $class );
+        croak 'could not allocate a fiber: the fiber table is full (destroy some fibers first)' unless $fiber && ref $fiber;
+        my $status = $fiber->[F_LAST_STATUS];
+        if ( $status == 1 ) {
+            my $err = $fiber->[F_ERROR];
+            die $err if defined $err;
+        }
+        elsif ( $status == 0 ) {
+            $fiber->[F_PRIORITY] //= 0;
+            _enqueue($fiber);
+        }
+        return $fiber;
+    }
+
+    sub _submit_job ( $type, $arg, $timeout ) {
+        my $rc = submit_c_job( $type, $arg, $timeout );
+        if ( $rc < 0 ) {
+
+            # The 1024-slot job queue is full. Yield once so the scheduler can drain completed jobs, then retry.
+            Acme::Parataxis->yield;
+            $rc = submit_c_job( $type, $arg, $timeout );
+            croak "job queue full: could not submit the job after a scheduler tick (submit_c_job returned $rc)" if $rc < 0;
+        }
+        return 0;
     }
 
     sub await_sleep {
         my $invocant = shift;
-        if ( !defined $invocant || ( ( ref $invocant || $invocant ) ne 'Acme::Parataxis' && !eval { $invocant->isa('Acme::Parataxis') } ) ) {
+        if ( !defined $invocant ||
+            ( ( ref $invocant || $invocant ) ne __PACKAGE__ && !( builtin::blessed($invocant) && $invocant->isa(__PACKAGE__) ) ) ) {
             unshift @_, $invocant if defined $invocant;
         }
         my $ms = shift // 0;
-        return 'Queue Full' if submit_c_job( 0, $ms, 0 ) < 0;
+        _submit_job( 0, $ms, 0 );
         return yield('WAITING');
     }
 
     sub await_core_id {
         my $invocant = shift;
-        if ( !defined $invocant || ( ( ref $invocant || $invocant ) ne 'Acme::Parataxis' && !eval { $invocant->isa('Acme::Parataxis') } ) ) {
+        if ( !defined $invocant ||
+            ( ( ref $invocant || $invocant ) ne __PACKAGE__ && !( builtin::blessed($invocant) && $invocant->isa(__PACKAGE__) ) ) ) {
             unshift @_, $invocant if defined $invocant;
         }
-        return 'Queue Full' if submit_c_job( 1, 0, 0 ) < 0;
+        _submit_job( 1, 0, 0 );
         return yield('WAITING');
     }
 
     sub await_read {
         my $invocant = shift;
-        if ( !defined $invocant || ( ( ref $invocant || $invocant ) ne 'Acme::Parataxis' && !eval { $invocant->isa('Acme::Parataxis') } ) ) {
+        if ( !defined $invocant ||
+            ( ( ref $invocant || $invocant ) ne __PACKAGE__ && !( builtin::blessed($invocant) && $invocant->isa(__PACKAGE__) ) ) ) {
             unshift @_, $invocant if defined $invocant;
         }
         my ( $fh, $timeout ) = @_;
@@ -156,13 +198,14 @@ package Acme::Parataxis v0.0.10 {
         my $fileno = fileno($fh);
         die 'Not a valid filehandle' unless defined $fileno;
         my $handle = $^O eq 'MSWin32' ? win32_get_osfhandle($fileno) : $fileno;
-        return 'Queue Full' if submit_c_job( 2, $handle, $timeout ) < 0;
+        _submit_job( 2, $handle, $timeout );
         return yield('WAITING');
     }
 
     sub await_write {
         my $invocant = shift;
-        if ( !defined $invocant || ( ( ref $invocant || $invocant ) ne 'Acme::Parataxis' && !eval { $invocant->isa('Acme::Parataxis') } ) ) {
+        if ( !defined $invocant ||
+            ( ( ref $invocant || $invocant ) ne __PACKAGE__ && !( builtin::blessed($invocant) && $invocant->isa(__PACKAGE__) ) ) ) {
             unshift @_, $invocant if defined $invocant;
         }
         my ( $fh, $timeout ) = @_;
@@ -170,13 +213,14 @@ package Acme::Parataxis v0.0.10 {
         my $fileno = fileno($fh);
         die 'Not a valid filehandle' unless defined $fileno;
         my $handle = $^O eq 'MSWin32' ? win32_get_osfhandle($fileno) : $fileno;
-        return 'Queue Full' if submit_c_job( 3, $handle, $timeout ) < 0;
+        _submit_job( 3, $handle, $timeout );
         return yield('WAITING');
     }
 
     sub maybe_yield {
         my $invocant = shift;
-        if ( !defined $invocant || ( ( ref $invocant || $invocant ) ne 'Acme::Parataxis' && !eval { $invocant->isa('Acme::Parataxis') } ) ) {
+        if ( !defined $invocant ||
+            ( ( ref $invocant || $invocant ) ne __PACKAGE__ && !( builtin::blessed($invocant) && $invocant->isa(__PACKAGE__) ) ) ) {
             unshift @_, $invocant if defined $invocant;
         }
         my $result = Acme::Parataxis::_maybe_yield();
@@ -190,8 +234,9 @@ package Acme::Parataxis v0.0.10 {
 
     # Scheduler internals
     sub _scheduler_enqueue_by_id ($fid) {
+        return if $SCHEDULER_QUEUED{$fid};
         if ( my $fiber = Acme::Parataxis->by_id($fid) ) {
-            push @SCHEDULER_QUEUE, $fiber;
+            _enqueue($fiber);
         }
     }
 
@@ -208,190 +253,222 @@ package Acme::Parataxis v0.0.10 {
         return @ready;
     }
 
+    sub _handle_run ( $fiber, $status ) {
+        if ( $status == 1 ) {
+            Acme::Parataxis::_mark_done($fiber);
+            my $err = $fiber->[F_ERROR];
+            die $err if defined $err;
+            return 1;
+        }
+        if ( $status == 0 ) {
+            $fiber->[F_PRIORITY] //= 0;
+            _enqueue($fiber);
+        }
+        return $status;
+    }
+
     sub run ($code) {
-        @SCHEDULER_QUEUE = ();
-        $IS_RUNNING      = 1;
-        my $main_fiber = Acme::Parataxis->new( code => $code );
-        push @SCHEDULER_QUEUE, $main_fiber;
+        if ($IS_RUNNING) {
+
+            # Nested run/async inside a shared global scheduler. Queue a fresh fiber for the block and park the current
+            # fiber until it completes.
+            my $fiber = __PACKAGE__->new( code => $code );
+            _enqueue($fiber);
+            return $fiber->await;
+        }
+        @SCHEDULER_QUEUE  = ();
+        %SCHEDULER_QUEUED = ();
+        $IS_RUNNING       = 1;
+        my $main_fiber = __PACKAGE__->new( code => $code );
+        _enqueue($main_fiber);
         while ($IS_RUNNING) {
-            my @ready = poll_io();
+            my @ready;
+            if ( get_outstanding_jobs() ) {
+                my $out = [];
+                drain_jobs($out);
+                @ready = @$out;
+            }
             for my $ready (@ready) {
                 my ( $fid, $res ) = @$ready;
-                my $fiber = Acme::Parataxis->by_id($fid);
-                if ($fiber) {
-                    my $yield_val = $fiber->call($res);
-                    if ( defined $fiber && !$fiber->is_done ) {
-                        if ( defined $yield_val && $yield_val eq 'WAITING' ) { }
-                        else {
-                            push @SCHEDULER_QUEUE, $fiber;
-                        }
-                    }
+                my $fiber = __PACKAGE__->by_id($fid);
+                next unless $fiber;
+                my $yield_val = $fiber->call($res);
+                if ( defined $fiber && !$fiber->is_done ) {
+                    _enqueue($fiber) unless defined $yield_val && $yield_val eq 'WAITING';
                 }
             }
             if (@SCHEDULER_QUEUE) {
-                my $current = shift @SCHEDULER_QUEUE;
-                next unless $current;
-                next if $current->is_done;
-                my $res = $current->call();
-                if ( defined $current && !$current->is_done ) {
-                    if ( defined $res && $res eq 'WAITING' ) { }
-                    else {
-                        push @SCHEDULER_QUEUE, $current;
-                    }
+                my @work = @SCHEDULER_QUEUE;
+                @SCHEDULER_QUEUE  = ();
+                %SCHEDULER_QUEUED = ();
+                for my $current (@work) {
+                    next unless $current;
+                    _handle_run( $current, run_fiber_checked( $current->fid, undef ) );
                 }
             }
-            my $active_count = scalar keys %Acme::Parataxis::REGISTRY;
-            if ( defined $main_fiber && $main_fiber->is_done && $active_count == 0 && !@SCHEDULER_QUEUE ) {
-                $IS_RUNNING = 0;
-            }
+            my $active_count = get_live_fiber_count();
             if ( $IS_RUNNING && !@SCHEDULER_QUEUE && !@ready ) {
-                usleep(1000);
+                if ( get_outstanding_jobs() ) {
+                    usleep(1000);    # Wait for background jobs to finish
+                }
+                else {
+                    die 'FATAL: deadlock detected...' if $active_count > 0;
+                    $IS_RUNNING = 0                   if defined $main_fiber && $main_fiber->is_done;
+                }
             }
         }
+        return $main_fiber->[F_RESULT];
     }
     sub stop () { $IS_RUNNING = 0 }
-    class    #
-        Acme::Parataxis {
-        use Carp qw[croak];
-        field $code : reader : param;
-        field $is_done = 0;
-        field $error  : reader;
-        field $result : reader;
-        field $fid    : reader;
-        field $future : param = undef;
 
-        method set_result ($val) {
-            $result = $val;
-            $future->set_result($val) if $future;
-        }
+    sub new ( $class, %args ) {
+        my $self = bless [ $args{code}, 0, undef, undef, undef, 0, [], undef, undef, 0 ], $class;
+        my $fid  = Acme::Parataxis::create_fiber( $args{code}, $self );
+        croak 'could not allocate a fiber: the fiber table is full (destroy some fibers first)' if $fid < 0;
+        $self->[F_FID] = $fid;
+        return $self;
+    }
+    sub fid   ($self) { $self->[F_FID] }
+    sub code  ($self) { $self->[F_CODE] }
+    sub error ($self) { $self->[F_ERROR] }
 
-        method set_error ($err) {
-            $error = $err;
-            $future->set_error($err) if $future;
+    # Higher numbers run first; ties are broken in the FIFO order they were enqueued in. The default is 0.
+    sub priority {
+        my $self = shift;
+        my $prio = $self->[F_PRIORITY] // 0;
+        return $prio unless @_;
+        my $n = shift;
+        $self->[F_PRIORITY] = $n;
+        my $fid = $self->[F_FID];
+        if ( delete $SCHEDULER_QUEUED{$fid} ) {
+            @SCHEDULER_QUEUE = grep { $_->[F_FID] != $fid } @SCHEDULER_QUEUE;
+            _enqueue($self);
         }
+        return $n;
+    }
+    sub is_ready ($self) { $self->[F_IS_READY] }
 
-        method _clear_result () {
-            $result = undef;
-            $error  = undef;
-        }
-        our %REGISTRY;
-        ADJUST {
-            Acme::Parataxis::force_depth_zero($code);
-            $fid = Acme::Parataxis::create_fiber( $code, $self );
-            $REGISTRY{$fid} = $self;
-            builtin::weaken $REGISTRY{$fid};
-        }
+    sub set_result {
+        my ( $self, $val ) = @_;
+        return if $self->[F_IS_READY];
+        $self->[F_RESULT]   = $val;
+        $self->[F_IS_READY] = 1;
+        $_->($self) for @{ $self->[F_CALLBACKS] };
+    }
 
-        method call (@args) {
-            croak 'Cannot call a finished fiber' if $is_done;
-            my $rv = Acme::Parataxis::coro_call( $fid, \@args );
-            return unless defined $self;
-            if ( $self->is_done ) {
-                my $err = $error;
-                die $err if defined $err;
-            }
-            return unless defined $rv;
-            return ( ref $rv eq 'ARRAY' ) ? ( wantarray ? @$rv : $rv->[-1] ) : $rv;
-        }
+    sub set_error ( $self, $err ) {
+        return if $self->[F_IS_READY];
+        $self->[F_ERROR]    = $err;
+        $self->[F_IS_READY] = 1;
+        $_->($self) for @{ $self->[F_CALLBACKS] };
+    }
 
-        method transfer (@args) {
-            croak 'Cannot transfer to a finished fiber' if $self->is_done;
-            my $rv = Acme::Parataxis::coro_transfer( $fid, \@args );
-            if ( $self->is_done ) {
-                my $err = $error;
-                die $err if defined $err;
-            }
-            return unless defined $rv;
-            return ( ref $rv eq 'ARRAY' ) ? ( wantarray ? @$rv : $rv->[-1] ) : $rv;
-        }
+    sub _result ($self) {
+        croak 'Future not ready' unless $self->[F_IS_READY];
+        return $self->[F_RESULT];
+    }
+    sub result ($self) { return _result($self) }
 
-        method is_done () {
-            return 1 if $is_done;
-            if ( defined $fid && $fid >= 0 && Acme::Parataxis::is_finished($fid) ) {
-                $is_done = 1;
-                my $old_fid = $fid;
-                $fid = -1;
-                delete $REGISTRY{$old_fid};
-                Acme::Parataxis::destroy_coro($old_fid);
-                return 1;
-            }
-            return 0;
-        }
+    sub _clear_result ($self) {
+        $self->[F_RESULT] = undef;
+        $self->[F_ERROR]  = undef;
+    }
 
-        method wait () {
-            while ( !$self->is_done ) {
-                Acme::Parataxis->yield('WAITING_FOR_CHILD');
-            }
-            return $self->result;
+    sub _mark_done ($self) {
+        return if $self->[F_IS_DONE];
+        $self->[F_IS_DONE] = 1;
+        if ( defined $self->[F_FID] && $self->[F_FID] >= 0 ) {
+            $self->[F_FID] = -1;
         }
+    }
 
-        method DESTROY {
-            return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
-            if ( defined $fid && $fid >= 0 ) {
-                delete $REGISTRY{$fid};
-                Acme::Parataxis::destroy_coro($fid);
-                $fid = -1;
-            }
+    sub call ( $self, @args ) {
+        croak 'Cannot call a finished fiber' if $self->[F_IS_DONE];
+        my $rv = Acme::Parataxis::coro_call( $self->[F_FID], \@args );
+        return unless defined $self;
+        if ( $self->is_done ) {
+            my $err = $self->[F_ERROR];
+            die $err if defined $err;
         }
-        sub by_id ( $class, $fid ) { $REGISTRY{$fid} }
+        return unless defined $rv;
+        return ( ref $rv eq 'ARRAY' ) ? ( wantarray ? @$rv : $rv->[-1] ) : $rv;
+    }
+
+    sub transfer ( $self, @args ) {
+        croak 'Cannot transfer to a finished fiber' if $self->is_done;
+        my $rv = Acme::Parataxis::coro_transfer( $self->[F_FID], \@args );
+        if ( $self->is_done ) {
+            my $err = $self->[F_ERROR];
+            die $err if defined $err;
+        }
+        return unless defined $rv;
+        return ( ref $rv eq 'ARRAY' ) ? ( wantarray ? @$rv : $rv->[-1] ) : $rv;
+    }
+
+    sub is_done ($self) {
+        return 1 if $self->[F_IS_DONE];
+        if ( defined $self->[F_FID] && $self->[F_FID] >= 0 && Acme::Parataxis::is_finished( $self->[F_FID] ) ) {
+            $self->[F_IS_DONE] = 1;
+            my $old_fid = $self->[F_FID];
+            $self->[F_FID] = -1;
+            Acme::Parataxis::destroy_coro($old_fid);
+            return 1;
+        }
+        return 0;
+    }
+
+    sub wait ($self) {
+        if ( !$self->is_done && Acme::Parataxis->current_fid < 0 ) {
+            croak 'wait() must be called from inside the scheduler, or the fiber must already be done';
+        }
+        Acme::Parataxis->yield('WAITING_FOR_CHILD') until $self->is_done;
+        return _result($self);
+    }
+
+    sub on_ready ( $self, $cb ) {
+        if   ( $self->[F_IS_READY] ) { $cb->($self) }
+        else                         { push @{ $self->[F_CALLBACKS] }, $cb }
+    }
+
+    sub await ($self) {
+        my $ready = $self->[F_IS_READY];
+        if ( !$ready ) {
+            croak 'await() must be called from inside a scheduled fiber' if Acme::Parataxis->current_fid < 0;
+            $self->[F_WAITER] = Acme::Parataxis->current_fid;
+            $self->on_ready( \&_wake_waiter );
+            Acme::Parataxis->yield('WAITING');
+            $ready = $self->[F_IS_READY];
+        }
+        croak 'Future not ready' unless $ready;
+        $self->[F_RESULT];
+    }
+
+    sub _wake_waiter ($self) {
+        return unless defined $self->[F_WAITER];
+        Acme::Parataxis::_scheduler_enqueue_by_id( $self->[F_WAITER] );
+        $self->[F_WAITER] = undef;
+    }
+
+    sub DESTROY($self) {
+        return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+        if ( defined $self->[F_FID] && $self->[F_FID] >= 0 ) {
+            Acme::Parataxis::destroy_coro( $self->[F_FID] );
+            $self->[F_FID] = -1;
+        }
+    }
+    sub by_id ( $class, $fid ) { Acme::Parataxis::get_fiber_by_id($fid) }
+
+    sub _dispatch_callbacks ($self) {
+        $_->($self) for @{ $self->[F_CALLBACKS] };
     }
     class    #
         Acme::Parataxis::Root {
+        field $fid : reader = -1;    # For now
 
         method transfer (@args) {
             my $rv = Acme::Parataxis::coro_transfer( -1, \@args );
             return unless defined $rv;
             return ( ref $rv eq 'ARRAY' ) ? ( wantarray ? @$rv : $rv->[-1] ) : $rv;
-        }
-        method fid () {-1}
-    }
-    class    #
-        Acme::Parataxis::Future {
-        use Carp qw[croak];
-        field $is_ready : reader = 0;
-        field $result;
-        field $error;
-        field @callbacks;
-
-        method result () {
-            croak 'Future not ready' unless $is_ready;
-            return $result;
-        }
-
-        method set_result ($val) {
-            die 'Future already ready' if $is_ready;
-            $result   = $val;
-            $is_ready = 1;
-            $_->($self) for @callbacks;
-        }
-
-        method set_error ($err) {
-            die 'Future already ready' if $is_ready;
-            $error    = $err;
-            $is_ready = 1;
-            $_->($self) for @callbacks;
-        }
-
-        method clear_result () {
-            $result = undef;
-            $error  = undef;
-        }
-
-        method on_ready ($cb) {
-            if   ($is_ready) { $cb->($self) }
-            else             { push @callbacks, $cb }
-        }
-
-        method await () {
-            return $self->result if $is_ready;
-            my $fid = Acme::Parataxis->current_fid;
-            $self->on_ready(
-                sub ($f) {
-                    Acme::Parataxis::_scheduler_enqueue_by_id($fid);
-                }
-            );
-            Acme::Parataxis->yield('WAITING');
-            $self->result;
         }
     }
     END { cleanup() unless ${^GLOBAL_PHASE} eq 'DESTRUCT' }

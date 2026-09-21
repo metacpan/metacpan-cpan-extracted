@@ -9,6 +9,7 @@ use Test2::V0;
 
 use Test2::Require::Module 'CHI';
 
+use Module::Load qw( autoload );
 use Net::DNS::Resolver::Mock;
 
 use Robots::Validate;
@@ -53,7 +54,7 @@ subtest 'an empty domain list matches no hostname' => sub {
 
 subtest 'a cache can be configured without cache_options' => sub {
 
-    require CHI;
+    autoload "CHI";
 
     my $rv = Robots::Validate->new(
         resolver => $resolver,

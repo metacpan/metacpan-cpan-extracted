@@ -2,6 +2,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "stream_consumer_abi.h"
 
 #include "../vendor/picohttpparser/picohttpparser.c"
 
@@ -10,6 +11,11 @@
 #define LE_HTTP_BODY_NONE 0
 #define LE_HTTP_BODY_CONTENT_LENGTH 1
 #define LE_HTTP_BODY_CHUNKED 2
+
+#define LE_HTTP_RESPONSE_SERVER_DEFAULT_FINAL 0x01
+#define LE_HTTP_RESPONSE_SERVER_SCALAR_SIMPLE 0x02
+#define LE_HTTP_RESPONSE_SERVER_HTTP10        0x04
+#define LE_HTTP_RESPONSE_SERVER_OBJECT        0x08
 
 #define LE_HTTP_SEMANTICS_OK 0
 #define LE_HTTP_SEMANTICS_BAD_REQUEST 400
@@ -26,6 +32,7 @@ typedef struct {
     int body_mode;
     int keep_alive;
     int has_content_length;
+    int expect_mode;
     UV content_length;
 } le_http_request_semantics;
 
@@ -35,6 +42,7 @@ typedef struct {
     int body_mode;
     int keep_alive;
     int has_content_length;
+    int expect_mode;
     UV content_length;
     size_t method_offset;
     size_t method_length;
@@ -427,6 +435,40 @@ parse_transfer_encoding_field(
 }
 
 static int
+parse_expect_field(const char *value, size_t len)
+{
+    size_t pos = 0;
+    int members = 0;
+
+    while (1) {
+        size_t start;
+        size_t end;
+
+        while (pos < len && is_ows((unsigned char)value[pos]))
+            ++pos;
+
+        start = pos;
+        while (pos < len && value[pos] != ',')
+            ++pos;
+        end = pos;
+
+        while (end > start && is_ows((unsigned char)value[end - 1]))
+            --end;
+
+        if (end == start ||
+            !ascii_equal_ci(value + start, end - start, "100-continue", 12))
+            return -1;
+
+        ++members;
+        if (pos == len)
+            break;
+        ++pos;
+    }
+
+    return members ? 1 : -1;
+}
+
+static int
 validate_request_semantics(
     int minor_version,
     const struct phr_header *headers,
@@ -490,6 +532,12 @@ validate_request_semantics(
                 &saw_close,
                 &saw_keep_alive
             );
+        } else if (ascii_equal_ci(name, name_len, "Expect", 6)) {
+            int expect = parse_expect_field(value, value_len);
+            if (minor_version != 1 || expect < 0)
+                semantics->expect_mode = -1;
+            else if (semantics->expect_mode >= 0)
+                semantics->expect_mode = 1;
         }
     }
 
@@ -613,6 +661,7 @@ new_request_object(
     state->body_mode = semantics->body_mode;
     state->keep_alive = semantics->keep_alive;
     state->has_content_length = semantics->has_content_length;
+    state->expect_mode = semantics->expect_mode;
     state->content_length = semantics->content_length;
     state->method_offset = (size_t)(method - buf);
     state->method_length = method_len;
@@ -640,6 +689,662 @@ new_request_object(
 
     return object;
 }
+
+enum {
+    LE_HTTP_RAW_INPUT_REQUEST = 0,
+    LE_HTTP_RAW_INPUT_FALLBACK = 1,
+    LE_HTTP_RAW_INPUT_CONTENT_LENGTH_DRAIN = 2,
+    LE_HTTP_RAW_INPUT_CONTENT_LENGTH_BODY = 3,
+    LE_HTTP_RAW_INPUT_CHUNKED_DRAIN = 4,
+    LE_HTTP_RAW_INPUT_CHUNKED_BODY = 5
+};
+
+typedef struct {
+    const les_consumer_host_api_v1_t *host;
+    void *host_context;
+    SV *stream;
+    CV *request_cv;
+    CV *fallback_cv;
+    CV *content_length_body_cv;
+    CV *content_length_complete_cv;
+    CV *chunked_body_cv;
+    CV *chunked_complete_cv;
+    CV *chunked_error_cv;
+    CV *protocol_400_cv;
+    CV *protocol_431_cv;
+    CV *protocol_501_cv;
+    int input_mode;
+    UV content_length_remaining;
+    struct phr_chunked_decoder chunked_decoder;
+} le_http_raw_consumer_context;
+
+static CV *
+le_http_raw_method_cv(
+    pTHX_
+    le_http_raw_consumer_context *context,
+    CV **slot,
+    const char *method_name
+)
+{
+    GV *gv;
+    CV *cv;
+
+    if (*slot != NULL)
+        return *slot;
+
+    if (!SvROK(context->stream))
+        croak("Linux::Event HTTP raw consumer stream is not an object");
+
+    gv = gv_fetchmethod_autoload(
+        SvSTASH(SvRV(context->stream)),
+        method_name,
+        0
+    );
+    if (gv == NULL || (cv = GvCV(gv)) == NULL)
+        croak("Linux::Event HTTP raw consumer method %s is unavailable",
+            method_name);
+
+    *slot = (CV *)SvREFCNT_inc((SV *)cv);
+    return *slot;
+}
+
+static int
+le_http_raw_call_scalar_int(
+    pTHX_
+    le_http_raw_consumer_context *context,
+    CV **slot,
+    const char *method_name,
+    SV *arg,
+    int store_fallback
+)
+{
+    const les_consumer_host_api_v1_t *host;
+    void *host_context;
+    CV *cv;
+    int result = 0;
+    int count;
+    int jump_status;
+    dJMPENV;
+    dSP;
+
+    host = context->host;
+    host_context = context->host_context;
+    if (!host
+        || host->struct_size < LES_CONSUMER_HOST_V1_RETAIN_REQUIRED_SIZE
+        || !host->retain || !host->release)
+        croak("Linux::Event raw consumer host lifetime extension is unavailable");
+
+    cv = le_http_raw_method_cv(aTHX_ context, slot, method_name);
+
+    if (!host->retain(aTHX_ host_context))
+        croak("Linux::Event raw consumer host is no longer available");
+
+    JMPENV_PUSH(jump_status);
+    if (jump_status == 0) {
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(context->stream);
+        if (arg != NULL)
+            XPUSHs(arg);
+        PUTBACK;
+        count = call_sv((SV *)cv, G_SCALAR);
+        SPAGAIN;
+        if (count > 0)
+            result = POPi;
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+        JMPENV_POP;
+    } else {
+        JMPENV_POP;
+        host->release(aTHX_ host_context);
+        JMPENV_JUMP(jump_status);
+    }
+
+    if (store_fallback)
+        context->input_mode = result
+            ? LE_HTTP_RAW_INPUT_FALLBACK
+            : LE_HTTP_RAW_INPUT_REQUEST;
+
+    host->release(aTHX_ host_context);
+    return result;
+}
+
+static int
+le_http_raw_call_request(
+    pTHX_
+    le_http_raw_consumer_context *context,
+    SV *request,
+    UV content_length
+)
+{
+    const les_consumer_host_api_v1_t *host;
+    void *host_context;
+    CV *cv;
+    int result = 0;
+    int count;
+    int jump_status;
+    dJMPENV;
+    dSP;
+
+    host = context->host;
+    host_context = context->host_context;
+    if (!host
+        || host->struct_size < LES_CONSUMER_HOST_V1_RETAIN_REQUIRED_SIZE
+        || !host->retain || !host->release)
+        croak("Linux::Event raw consumer host lifetime extension is unavailable");
+
+    cv = le_http_raw_method_cv(
+        aTHX_ context,
+        &context->request_cv,
+        "_http_native_request"
+    );
+
+    if (!host->retain(aTHX_ host_context))
+        croak("Linux::Event raw consumer host is no longer available");
+
+    JMPENV_PUSH(jump_status);
+    if (jump_status == 0) {
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(context->stream);
+        XPUSHs(request);
+        PUTBACK;
+        count = call_sv((SV *)cv, G_SCALAR);
+        SPAGAIN;
+        if (count > 0)
+            result = POPi;
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+        JMPENV_POP;
+    } else {
+        JMPENV_POP;
+        host->release(aTHX_ host_context);
+        JMPENV_JUMP(jump_status);
+    }
+
+    if (result < LE_HTTP_RAW_INPUT_REQUEST
+        || result > LE_HTTP_RAW_INPUT_CHUNKED_BODY)
+        croak("Linux::Event HTTP raw consumer returned invalid input mode");
+
+    context->input_mode = result;
+    context->content_length_remaining
+        = (result == LE_HTTP_RAW_INPUT_CONTENT_LENGTH_DRAIN
+            || result == LE_HTTP_RAW_INPUT_CONTENT_LENGTH_BODY)
+        ? content_length : 0;
+
+    if (result == LE_HTTP_RAW_INPUT_CHUNKED_DRAIN
+        || result == LE_HTTP_RAW_INPUT_CHUNKED_BODY) {
+        Zero(&context->chunked_decoder, 1, struct phr_chunked_decoder);
+        context->chunked_decoder.consume_trailer = 1;
+    }
+
+    host->release(aTHX_ host_context);
+    return result;
+}
+
+static int
+le_http_raw_call_content_length_body(
+    pTHX_
+    le_http_raw_consumer_context *context,
+    SV *bytes,
+    int done
+)
+{
+    const les_consumer_host_api_v1_t *host;
+    void *host_context;
+    CV *cv;
+    int result = 0;
+    int count;
+    int jump_status;
+    dJMPENV;
+    dSP;
+
+    host = context->host;
+    host_context = context->host_context;
+    if (!host
+        || host->struct_size < LES_CONSUMER_HOST_V1_RETAIN_REQUIRED_SIZE
+        || !host->retain || !host->release)
+        croak("Linux::Event raw consumer host lifetime extension is unavailable");
+
+    cv = le_http_raw_method_cv(
+        aTHX_ context,
+        &context->content_length_body_cv,
+        "_http_native_content_length_body"
+    );
+
+    if (!host->retain(aTHX_ host_context))
+        croak("Linux::Event raw consumer host is no longer available");
+
+    if (done)
+        context->input_mode = LE_HTTP_RAW_INPUT_REQUEST;
+
+    JMPENV_PUSH(jump_status);
+    if (jump_status == 0) {
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(context->stream);
+        XPUSHs(bytes);
+        mPUSHi(done ? 1 : 0);
+        PUTBACK;
+        count = call_sv((SV *)cv, G_SCALAR);
+        SPAGAIN;
+        if (count > 0)
+            result = POPi;
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+        JMPENV_POP;
+    } else {
+        JMPENV_POP;
+        host->release(aTHX_ host_context);
+        JMPENV_JUMP(jump_status);
+    }
+
+    if (!result)
+        context->input_mode = LE_HTTP_RAW_INPUT_REQUEST;
+
+    host->release(aTHX_ host_context);
+    return result;
+}
+
+static int
+le_http_raw_call_chunked_body(
+    pTHX_
+    le_http_raw_consumer_context *context,
+    SV *bytes,
+    int done
+)
+{
+    const les_consumer_host_api_v1_t *host;
+    void *host_context;
+    CV *cv;
+    int result = 0;
+    int count;
+    int jump_status;
+    dJMPENV;
+    dSP;
+
+    host = context->host;
+    host_context = context->host_context;
+    if (!host
+        || host->struct_size < LES_CONSUMER_HOST_V1_RETAIN_REQUIRED_SIZE
+        || !host->retain || !host->release)
+        croak("Linux::Event raw consumer host lifetime extension is unavailable");
+
+    cv = le_http_raw_method_cv(
+        aTHX_ context,
+        &context->chunked_body_cv,
+        "_http_native_chunked_body"
+    );
+
+    if (!host->retain(aTHX_ host_context))
+        croak("Linux::Event raw consumer host is no longer available");
+
+    if (done)
+        context->input_mode = LE_HTTP_RAW_INPUT_REQUEST;
+
+    JMPENV_PUSH(jump_status);
+    if (jump_status == 0) {
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(context->stream);
+        XPUSHs(bytes);
+        mPUSHi(done ? 1 : 0);
+        PUTBACK;
+        count = call_sv((SV *)cv, G_SCALAR);
+        SPAGAIN;
+        if (count > 0)
+            result = POPi;
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+        JMPENV_POP;
+    } else {
+        JMPENV_POP;
+        host->release(aTHX_ host_context);
+        JMPENV_JUMP(jump_status);
+    }
+
+    if (!result)
+        context->input_mode = LE_HTTP_RAW_INPUT_REQUEST;
+
+    host->release(aTHX_ host_context);
+    return result;
+}
+
+static void *
+le_http_raw_consumer_create(
+    pTHX_
+    const les_consumer_host_api_v1_t *host,
+    void *host_context,
+    SV *stream
+)
+{
+    le_http_raw_consumer_context *context;
+
+    if (!host
+        || host->abi_version != LES_CONSUMER_ABI_VERSION
+        || host->struct_size < LES_CONSUMER_HOST_V1_RETAIN_REQUIRED_SIZE
+        || !host->retain || !host->release)
+        return NULL;
+
+    Newxz(context, 1, le_http_raw_consumer_context);
+    if (context == NULL)
+        return NULL;
+
+    context->host = host;
+    context->host_context = host_context;
+    context->stream = SvREFCNT_inc(stream);
+    context->input_mode = LE_HTTP_RAW_INPUT_REQUEST;
+    context->content_length_remaining = 0;
+    return context;
+}
+
+static int
+le_http_raw_consumer_input(
+    pTHX_
+    void *opaque,
+    const char *buf,
+    size_t buffer_len,
+    size_t *host_consumed
+)
+{
+    le_http_raw_consumer_context *context
+        = (le_http_raw_consumer_context *)opaque;
+    const char *method;
+    size_t method_len;
+    const char *path;
+    size_t path_len;
+    int minor_version;
+    struct phr_header headers[LE_HTTP1_MAX_HEADERS];
+    size_t num_headers = 100;
+    int consumed;
+    le_http_request_semantics semantics;
+    const char *detail;
+    int semantic_status;
+    SV *request;
+
+    *host_consumed = 0;
+
+    if (context->input_mode == LE_HTTP_RAW_INPUT_CONTENT_LENGTH_DRAIN
+        || context->input_mode == LE_HTTP_RAW_INPUT_CONTENT_LENGTH_BODY) {
+        UV remaining = context->content_length_remaining;
+        size_t take = buffer_len;
+        int done;
+
+        if (remaining == 0)
+            croak("Linux::Event HTTP raw Content-Length mode has no body remaining");
+        if (remaining < (UV)take)
+            take = (size_t)remaining;
+
+        done = (UV)take == remaining ? 1 : 0;
+        *host_consumed = take;
+        context->content_length_remaining -= (UV)take;
+
+        if (context->input_mode == LE_HTTP_RAW_INPUT_CONTENT_LENGTH_BODY) {
+            SV *bytes = sv_2mortal(newSVpvn(buf, (STRLEN)take));
+            (void)le_http_raw_call_content_length_body(
+                aTHX_ context,
+                bytes,
+                done
+            );
+            return LES_CONSUMER_CONTINUE;
+        }
+
+        if (done) {
+            context->input_mode = LE_HTTP_RAW_INPUT_REQUEST;
+            (void)le_http_raw_call_scalar_int(
+                aTHX_ context,
+                &context->content_length_complete_cv,
+                "_http_native_content_length_complete",
+                NULL,
+                0
+            );
+        }
+        return LES_CONSUMER_CONTINUE;
+    }
+
+    if (context->input_mode == LE_HTTP_RAW_INPUT_CHUNKED_DRAIN
+        || context->input_mode == LE_HTTP_RAW_INPUT_CHUNKED_BODY) {
+        char *scratch;
+        size_t decoded_len = buffer_len;
+        ssize_t result;
+        size_t leftover = 0;
+        int emit = context->input_mode == LE_HTTP_RAW_INPUT_CHUNKED_BODY;
+        int done;
+
+        Newx(scratch, buffer_len ? buffer_len : 1, char);
+        if (buffer_len)
+            Copy(buf, scratch, buffer_len, char);
+
+        result = phr_decode_chunked(
+            &context->chunked_decoder,
+            scratch,
+            &decoded_len
+        );
+
+        if (result == -1) {
+            Safefree(scratch);
+            *host_consumed = buffer_len;
+            context->input_mode = LE_HTTP_RAW_INPUT_REQUEST;
+            (void)le_http_raw_call_scalar_int(
+                aTHX_ context,
+                &context->chunked_error_cv,
+                "_http_native_chunked_error",
+                NULL,
+                0
+            );
+            return LES_CONSUMER_CONTINUE;
+        }
+
+        done = result >= 0 ? 1 : 0;
+        if (done) {
+            leftover = (size_t)result;
+            if (leftover > buffer_len)
+                croak("Linux::Event HTTP raw chunked decoder returned invalid leftover");
+            *host_consumed = buffer_len - leftover;
+            context->input_mode = LE_HTTP_RAW_INPUT_REQUEST;
+        } else {
+            *host_consumed = buffer_len;
+        }
+
+        if (emit) {
+            SV *bytes = sv_2mortal(newSVpvn(scratch, (STRLEN)decoded_len));
+            Safefree(scratch);
+            (void)le_http_raw_call_chunked_body(
+                aTHX_ context,
+                bytes,
+                done
+            );
+            return LES_CONSUMER_CONTINUE;
+        }
+
+        Safefree(scratch);
+        if (done) {
+            (void)le_http_raw_call_scalar_int(
+                aTHX_ context,
+                &context->chunked_complete_cv,
+                "_http_native_chunked_complete",
+                NULL,
+                0
+            );
+        }
+        return LES_CONSUMER_CONTINUE;
+    }
+
+    if (context->input_mode == LE_HTTP_RAW_INPUT_FALLBACK) {
+        SV *bytes = sv_2mortal(newSVpvn(buf, (STRLEN)buffer_len));
+        *host_consumed = buffer_len;
+        (void)le_http_raw_call_scalar_int(
+            aTHX_ context,
+            &context->fallback_cv,
+            "_http_native_fallback_input",
+            bytes,
+            1
+        );
+        return LES_CONSUMER_CONTINUE;
+    }
+
+    consumed = parse_request_strict(
+        buf,
+        buffer_len,
+        &method,
+        &method_len,
+        &path,
+        &path_len,
+        &minor_version,
+        headers,
+        &num_headers,
+        0
+    );
+
+    if (consumed == -2) {
+        if (buffer_len > 65536) {
+            *host_consumed = buffer_len;
+            (void)le_http_raw_call_scalar_int(
+                aTHX_ context,
+                &context->protocol_431_cv,
+                "_http_native_protocol_431",
+                NULL,
+                0
+            );
+        }
+        return LES_CONSUMER_CONTINUE;
+    }
+
+    if (consumed == -1) {
+        *host_consumed = buffer_len;
+        (void)le_http_raw_call_scalar_int(
+            aTHX_ context,
+            &context->protocol_400_cv,
+            "_http_native_protocol_400",
+            NULL,
+            0
+        );
+        return LES_CONSUMER_CONTINUE;
+    }
+
+    semantic_status = validate_request_semantics(
+        minor_version,
+        headers,
+        num_headers,
+        &semantics,
+        &detail
+    );
+    if (semantic_status != LE_HTTP_SEMANTICS_OK) {
+        *host_consumed = (size_t)consumed;
+        if (semantic_status == LE_HTTP_SEMANTICS_NOT_IMPLEMENTED)
+            (void)le_http_raw_call_scalar_int(
+                aTHX_ context,
+                &context->protocol_501_cv,
+                "_http_native_protocol_501",
+                NULL,
+                0
+            );
+        else
+            (void)le_http_raw_call_scalar_int(
+                aTHX_ context,
+                &context->protocol_400_cv,
+                "_http_native_protocol_400",
+                NULL,
+                0
+            );
+        return LES_CONSUMER_CONTINUE;
+    }
+
+    request = new_request_object(
+        aTHX_
+        buf,
+        consumed,
+        minor_version,
+        method,
+        method_len,
+        path,
+        path_len,
+        headers,
+        num_headers,
+        &semantics
+    );
+
+    *host_consumed = (size_t)consumed;
+    (void)le_http_raw_call_request(
+        aTHX_ context,
+        sv_2mortal(request),
+        semantics.content_length
+    );
+    return LES_CONSUMER_CONTINUE;
+}
+
+static void
+le_http_raw_consumer_event(
+    pTHX_
+    void *opaque,
+    uint32_t event,
+    int error,
+    const char *message
+)
+{
+    PERL_UNUSED_ARG(opaque);
+    PERL_UNUSED_ARG(event);
+    PERL_UNUSED_ARG(error);
+    PERL_UNUSED_ARG(message);
+    PERL_UNUSED_CONTEXT;
+}
+
+static void
+le_http_raw_consumer_destroy(pTHX_ void *opaque)
+{
+    le_http_raw_consumer_context *context
+        = (le_http_raw_consumer_context *)opaque;
+
+    PERL_UNUSED_CONTEXT;
+
+    if (context == NULL)
+        return;
+
+    if (context->request_cv != NULL)
+        SvREFCNT_dec((SV *)context->request_cv);
+    if (context->fallback_cv != NULL)
+        SvREFCNT_dec((SV *)context->fallback_cv);
+    if (context->content_length_body_cv != NULL)
+        SvREFCNT_dec((SV *)context->content_length_body_cv);
+    if (context->content_length_complete_cv != NULL)
+        SvREFCNT_dec((SV *)context->content_length_complete_cv);
+    if (context->chunked_body_cv != NULL)
+        SvREFCNT_dec((SV *)context->chunked_body_cv);
+    if (context->chunked_complete_cv != NULL)
+        SvREFCNT_dec((SV *)context->chunked_complete_cv);
+    if (context->chunked_error_cv != NULL)
+        SvREFCNT_dec((SV *)context->chunked_error_cv);
+    if (context->protocol_400_cv != NULL)
+        SvREFCNT_dec((SV *)context->protocol_400_cv);
+    if (context->protocol_431_cv != NULL)
+        SvREFCNT_dec((SV *)context->protocol_431_cv);
+    if (context->protocol_501_cv != NULL)
+        SvREFCNT_dec((SV *)context->protocol_501_cv);
+    if (context->stream != NULL)
+        SvREFCNT_dec(context->stream);
+    Safefree(context);
+}
+
+static const les_consumer_ops_v1_t le_http_raw_consumer_ops = {
+    LES_CONSUMER_ABI_VERSION,
+    sizeof(les_consumer_ops_v1_t),
+    "Linux::Event::HTTP::_HTTP1 raw input",
+    LES_CONSUMER_F_RAW_INPUT,
+    le_http_raw_consumer_create,
+    NULL,
+    le_http_raw_consumer_event,
+    le_http_raw_consumer_destroy,
+    NULL,
+    le_http_raw_consumer_input
+};
 
 static const char *
 default_reason_phrase(int status)
@@ -734,8 +1439,501 @@ request_method_is_head(le_http_request_state *state)
         memEQ(state->bytes + state->method_offset, "HEAD", 4);
 }
 
+static HV *
+response_hv_from_object(pTHX_ SV *self)
+{
+    if (!SvROK(self) ||
+        !sv_derived_from(self, "Linux::Event::HTTP::Response") ||
+        SvTYPE(SvRV(self)) != SVt_PVHV)
+        croak("not a Linux::Event::HTTP::Response object");
+
+    return (HV *)SvRV(self);
+}
+
+static int
+response_hv_true(pTHX_ HV *hv, const char *key, I32 key_len)
+{
+    SV **value = hv_fetch(hv, key, key_len, 0);
+    return value != NULL && SvTRUE(*value);
+}
+
+static UV
+response_server_flags(pTHX_ HV *hv)
+{
+    SV **value = hv_fetch(
+        hv,
+        "_server_flags",
+        (I32)(sizeof("_server_flags") - 1),
+        0
+    );
+    return value != NULL && SvOK(*value) ? SvUV(*value) : 0;
+}
+
+static void
+response_clear_server_flags(pTHX_ HV *hv, UV mask)
+{
+    SV **value = hv_fetch(
+        hv,
+        "_server_flags",
+        (I32)(sizeof("_server_flags") - 1),
+        0
+    );
+    UV flags;
+
+    if (value == NULL || !SvOK(*value))
+        return;
+
+    flags = SvUV(*value);
+    flags &= ~mask;
+    sv_setuv(*value, flags);
+}
+
+static const char *
+response_input_bytes(
+    pTHX_
+    SV *input,
+    const char *label,
+    SV **temporary,
+    STRLEN *length
+)
+{
+    if (!SvOK(input) || SvROK(input))
+        croak("%s must be a defined scalar byte string", label);
+
+    *temporary = NULL;
+
+    if (SvPOK(input) && !SvUTF8(input) && !SvGMAGICAL(input))
+        return SvPVbyte(input, *length);
+
+    *temporary = sv_2mortal(newSVsv(input));
+    if (SvUTF8(*temporary) &&
+        !sv_utf8_downgrade(*temporary, TRUE))
+        croak("%s contains wide characters; encode it to bytes first", label);
+
+    return SvPVbyte(*temporary, *length);
+}
+
+static SV *
+response_header_pair_sv(
+    pTHX_
+    const char *name,
+    STRLEN name_len,
+    const char *value,
+    STRLEN value_len
+)
+{
+    AV *pair = newAV();
+    av_extend(pair, 1);
+    av_push(pair, newSVpvn(name, name_len));
+    av_push(pair, newSVpvn(value, value_len));
+    return newRV_noinc((SV *)pair);
+}
+
+static int
+response_header_row_matches(
+    pTHX_
+    SV *row_ref,
+    const char *wanted,
+    STRLEN wanted_len
+)
+{
+    AV *row;
+    SV **name_ptr;
+    STRLEN name_len;
+    const char *name;
+
+    if (!SvROK(row_ref) || SvTYPE(SvRV(row_ref)) != SVt_PVAV)
+        croak("response header entry is invalid");
+
+    row = (AV *)SvRV(row_ref);
+    name_ptr = av_fetch(row, 0, 0);
+    if (name_ptr == NULL || !SvOK(*name_ptr) || SvROK(*name_ptr))
+        croak("response header entry requires a scalar name");
+
+    name = SvPVbyte(*name_ptr, name_len);
+    return ascii_equal_ci(
+        name,
+        (size_t)name_len,
+        wanted,
+        (size_t)wanted_len
+    );
+}
+
+static void
+response_set_header_native(
+    pTHX_
+    SV *self,
+    SV *name_sv,
+    SV *value_sv
+)
+{
+    HV *hv = response_hv_from_object(aTHX_ self);
+    SV *name_tmp;
+    SV *value_tmp;
+    STRLEN name_len;
+    STRLEN value_len;
+    const char *name;
+    const char *value;
+    SV **headers_ptr;
+    AV *headers;
+    SSize_t max_index;
+    SSize_t first = -1;
+    UV matches = 0;
+    SSize_t i;
+    int framing_header = 0;
+
+    if (response_hv_true(aTHX_ hv, "committed", 9))
+        croak("response metadata cannot change after message commit");
+
+    name = response_input_bytes(
+        aTHX_ name_sv, "response header field name",
+        &name_tmp, &name_len
+    );
+    if (!valid_field_name(name, (size_t)name_len))
+        croak("invalid response header field name");
+
+    framing_header =
+        ascii_equal_ci(name, (size_t)name_len, "Content-Length", 14) ||
+        ascii_equal_ci(name, (size_t)name_len, "Transfer-Encoding", 17) ||
+        ascii_equal_ci(name, (size_t)name_len, "Connection", 10);
+
+    value = response_input_bytes(
+        aTHX_ value_sv, "response header field value",
+        &value_tmp, &value_len
+    );
+    if (!valid_output_field_value(value, (size_t)value_len))
+        croak("response header field value contains invalid control characters");
+
+    headers_ptr = hv_fetch(hv, "headers", 7, 0);
+    if (headers_ptr == NULL) {
+        headers = NULL;
+        max_index = -1;
+    } else {
+        if (!SvROK(*headers_ptr) ||
+            SvTYPE(SvRV(*headers_ptr)) != SVt_PVAV)
+            croak("response headers storage is invalid");
+        headers = (AV *)SvRV(*headers_ptr);
+        max_index = av_len(headers);
+    }
+
+    /*
+     * Fresh server Responses share one immutable empty array. Never append to
+     * it in place: replace the hash slot with a private one-element array.
+     */
+    if (max_index < 0) {
+        AV *new_headers = newAV();
+        av_push(
+            new_headers,
+            response_header_pair_sv(aTHX_ name, name_len, value, value_len)
+        );
+        hv_store(
+            hv, "headers", 7,
+            newRV_noinc((SV *)new_headers), 0
+        );
+        response_clear_server_flags(
+            aTHX_
+            hv,
+            framing_header
+                ? LE_HTTP_RESPONSE_SERVER_DEFAULT_FINAL
+                    | LE_HTTP_RESPONSE_SERVER_SCALAR_SIMPLE
+                : LE_HTTP_RESPONSE_SERVER_DEFAULT_FINAL
+        );
+        return;
+    }
+
+    for (i = 0; i <= max_index; ++i) {
+        SV **row_ptr = av_fetch(headers, i, 0);
+        if (row_ptr == NULL)
+            croak("response header entry is missing");
+
+        if (response_header_row_matches(
+                aTHX_ *row_ptr, name, name_len
+            )) {
+            if (matches == 0)
+                first = i;
+            ++matches;
+        }
+    }
+
+    if (matches == 0) {
+        av_push(
+            headers,
+            response_header_pair_sv(aTHX_ name, name_len, value, value_len)
+        );
+    } else if (matches == 1) {
+        av_store(
+            headers,
+            first,
+            response_header_pair_sv(aTHX_ name, name_len, value, value_len)
+        );
+    } else {
+        AV *new_headers = newAV();
+        int inserted = 0;
+
+        av_extend(new_headers, max_index - (SSize_t)matches + 1);
+
+        for (i = 0; i <= max_index; ++i) {
+            SV **row_ptr = av_fetch(headers, i, 0);
+            int is_match;
+
+            if (row_ptr == NULL)
+                croak("response header entry is missing");
+
+            is_match = response_header_row_matches(
+                aTHX_ *row_ptr, name, name_len
+            );
+
+            if (is_match) {
+                if (!inserted) {
+                    av_push(
+                        new_headers,
+                        response_header_pair_sv(
+                            aTHX_
+                            name, name_len, value, value_len
+                        )
+                    );
+                    inserted = 1;
+                }
+                continue;
+            }
+
+            av_push(new_headers, SvREFCNT_inc(*row_ptr));
+        }
+
+        hv_store(
+            hv, "headers", 7,
+            newRV_noinc((SV *)new_headers), 0
+        );
+    }
+
+    response_clear_server_flags(
+        aTHX_
+        hv,
+        framing_header
+            ? LE_HTTP_RESPONSE_SERVER_DEFAULT_FINAL
+                | LE_HTTP_RESPONSE_SERVER_SCALAR_SIMPLE
+            : LE_HTTP_RESPONSE_SERVER_DEFAULT_FINAL
+    );
+}
+
+static void
+response_set_body_native(pTHX_ SV *self, SV *body_sv)
+{
+    HV *hv = response_hv_from_object(aTHX_ self);
+    SV **kind_ptr;
+    SV *body_tmp;
+    STRLEN body_len;
+    const char *body;
+
+    if (response_hv_true(aTHX_ hv, "committed", 9))
+        croak("response metadata cannot change after message commit");
+
+    kind_ptr = hv_fetch(hv, "body_kind", 9, 0);
+    if (kind_ptr != NULL && SvOK(*kind_ptr) &&
+        strEQ(SvPV_nolen(*kind_ptr), "stream"))
+        croak("body(): response already has an incremental body producer");
+
+    body = response_input_bytes(
+        aTHX_ body_sv, "body(): body",
+        &body_tmp, &body_len
+    );
+
+    hv_store(hv, "body", 4, newSVpvn(body, body_len), 0);
+    hv_store(hv, "body_kind", 9, newSVpvs("scalar"), 0);
+    hv_store(hv, "complete", 8, newSViv(1), 0);
+}
+
+static SV *
+response_build_simple_scalar_final(
+    pTHX_
+    SV *request,
+    SV *response,
+    SV *body_sv
+)
+{
+    le_http_request_state *request_state;
+    HV *hv;
+    SV **status_ptr;
+    SV **reason_ptr;
+    SV **headers_ptr;
+    AV *headers;
+    SSize_t max_index;
+    SSize_t i;
+    IV status;
+    const char *reason;
+    STRLEN reason_len;
+    SV *body_tmp;
+    STRLEN body_len;
+    const char *body;
+    int head_request;
+    int body_forbidden;
+    SV *wire;
+
+    request_state = request_state_from_object(aTHX_ request);
+    hv = response_hv_from_object(aTHX_ response);
+
+    if (!(response_server_flags(aTHX_ hv)
+            & LE_HTTP_RESPONSE_SERVER_SCALAR_SIMPLE))
+        return NULL;
+
+    if (request_state->minor_version != 1 || !request_state->keep_alive)
+        return NULL;
+
+    status_ptr = hv_fetch(hv, "status", 6, 0);
+    if (status_ptr == NULL)
+        status = 200;
+    else if (!SvOK(*status_ptr))
+        return NULL;
+    else
+        status = SvIV(*status_ptr);
+    if (status < 100 || status > 999)
+        return NULL;
+
+    if (status >= 100 && status < 200)
+        croak("send_response(): informational responses require a future interim-response API");
+
+    body = response_input_bytes(
+        aTHX_ body_sv, "send_response(): body",
+        &body_tmp, &body_len
+    );
+
+    head_request = request_method_is_head(request_state);
+    body_forbidden = status == 204 || status == 304;
+    if (body_forbidden && body_len != 0)
+        croak("send_response(): this response status cannot carry a message body");
+
+    reason_ptr = hv_fetch(hv, "reason", 6, 0);
+    if (reason_ptr != NULL && SvOK(*reason_ptr)) {
+        reason = SvPVbyte(*reason_ptr, reason_len);
+        if (!valid_reason_phrase(reason, (size_t)reason_len))
+            return NULL;
+    } else {
+        reason = default_reason_phrase((int)status);
+        reason_len = (STRLEN)strlen(reason);
+    }
+
+    headers_ptr = hv_fetch(hv, "headers", 7, 0);
+    if (headers_ptr == NULL) {
+        headers = NULL;
+        max_index = -1;
+    } else {
+        if (!SvROK(*headers_ptr) ||
+            SvTYPE(SvRV(*headers_ptr)) != SVt_PVAV)
+            return NULL;
+        headers = (AV *)SvRV(*headers_ptr);
+        max_index = av_len(headers);
+    }
+
+    /*
+     * The marker is maintained by the public server Response mutation path,
+     * but validate the actual header storage anyway. Direct hash tampering
+     * must fall back to the general response state machine rather than turn
+     * the fast path into a second, weaker protocol implementation.
+     */
+    for (i = 0; i <= max_index; ++i) {
+        SV **row_ptr = av_fetch(headers, i, 0);
+        AV *row;
+        SV **name_ptr;
+        SV **value_ptr;
+        const char *name;
+        const char *value;
+        STRLEN name_len;
+        STRLEN value_len;
+
+        if (row_ptr == NULL ||
+            !SvROK(*row_ptr) ||
+            SvTYPE(SvRV(*row_ptr)) != SVt_PVAV)
+            return NULL;
+
+        row = (AV *)SvRV(*row_ptr);
+        if (av_len(row) != 1)
+            return NULL;
+
+        name_ptr = av_fetch(row, 0, 0);
+        value_ptr = av_fetch(row, 1, 0);
+        if (name_ptr == NULL || value_ptr == NULL ||
+            !SvOK(*name_ptr) || !SvOK(*value_ptr) ||
+            SvROK(*name_ptr) || SvROK(*value_ptr))
+            return NULL;
+
+        name = SvPVbyte(*name_ptr, name_len);
+        value = SvPVbyte(*value_ptr, value_len);
+        if (!valid_field_name(name, (size_t)name_len) ||
+            !valid_output_field_value(value, (size_t)value_len))
+            return NULL;
+
+        if (ascii_equal_ci(name, (size_t)name_len, "Content-Length", 14) ||
+            ascii_equal_ci(name, (size_t)name_len, "Transfer-Encoding", 17) ||
+            ascii_equal_ci(name, (size_t)name_len, "Connection", 10))
+            return NULL;
+    }
+
+    wire = newSVpvf(
+        "HTTP/1.1 %03" IVdf " ",
+        status
+    );
+    sv_catpvn(wire, reason, reason_len);
+    sv_catpvn(wire, "\r\n", 2);
+
+    for (i = 0; i <= max_index; ++i) {
+        SV **row_ptr = av_fetch(headers, i, 0);
+        AV *row = (AV *)SvRV(*row_ptr);
+        SV **name_ptr = av_fetch(row, 0, 0);
+        SV **value_ptr = av_fetch(row, 1, 0);
+        STRLEN name_len;
+        STRLEN value_len;
+        const char *name = SvPVbyte(*name_ptr, name_len);
+        const char *value = SvPVbyte(*value_ptr, value_len);
+
+        sv_catpvn(wire, name, name_len);
+        sv_catpvn(wire, ": ", 2);
+        sv_catpvn(wire, value, value_len);
+        sv_catpvn(wire, "\r\n", 2);
+    }
+
+    if (!body_forbidden) {
+        AV *pair = newAV();
+        SV *length_sv = newSVpvf("%" UVuf, (UV)body_len);
+
+        av_extend(pair, 1);
+        av_push(pair, newSVpvs("Content-Length"));
+        av_push(pair, SvREFCNT_inc(length_sv));
+
+        if (max_index < 0) {
+            AV *new_headers = newAV();
+            av_push(new_headers, newRV_noinc((SV *)pair));
+            hv_store(
+                hv, "headers", 7,
+                newRV_noinc((SV *)new_headers), 0
+            );
+        } else {
+            av_push(headers, newRV_noinc((SV *)pair));
+        }
+
+        sv_catpvs(wire, "Content-Length: ");
+        sv_catsv(wire, length_sv);
+        sv_catpvn(wire, "\r\n", 2);
+        SvREFCNT_dec(length_sv);
+    }
+
+    sv_catpvn(wire, "\r\n", 2);
+    if (!head_request && !body_forbidden)
+        sv_catpvn(wire, body, body_len);
+
+    hv_store(hv, "committed", 9, newSViv(1), 0);
+    return wire;
+}
+
+
 MODULE = Linux::Event::HTTP::_HTTP1    PACKAGE = Linux::Event::HTTP::_HTTP1
 PROTOTYPES: DISABLE
+
+UV
+_raw_consumer_operations_address()
+  CODE:
+    RETVAL = PTR2UV(&le_http_raw_consumer_ops);
+  OUTPUT:
+    RETVAL
 
 const char *
 pico_version(CLASS)
@@ -848,6 +2046,99 @@ parse_request(CLASS, buffer, last_len = 0, max_headers = 100)
         num_headers,
         &semantics
     );
+  OUTPUT:
+    RETVAL
+
+SV *
+build_simple_scalar_final(CLASS, request, response, body)
+    const char *CLASS
+    SV *request
+    SV *response
+    SV *body
+  PREINIT:
+    SV *wire;
+  CODE:
+    (void)CLASS;
+    wire = response_build_simple_scalar_final(
+        aTHX_ request, response, body
+    );
+    if (wire == NULL)
+        XSRETURN_UNDEF;
+    RETVAL = wire;
+  OUTPUT:
+    RETVAL
+
+SV *
+_parse_server_request(CLASS, buffer, max_head = 65536, max_headers = 100)
+    const char *CLASS
+    SV *buffer
+    UV max_head
+    UV max_headers
+  PREINIT:
+    STRLEN buffer_len;
+    const char *buf;
+    const char *method;
+    size_t method_len;
+    const char *path;
+    size_t path_len;
+    int minor_version;
+    struct phr_header headers[LE_HTTP1_MAX_HEADERS];
+    size_t num_headers;
+    int consumed;
+    le_http_request_semantics semantics;
+    const char *detail;
+    int semantic_status;
+  CODE:
+    (void)CLASS;
+    buf = SvPVbyte(buffer, buffer_len);
+    validate_limits(buffer_len, 0, max_headers);
+    num_headers = (size_t)max_headers;
+    consumed = parse_request_strict(
+        buf,
+        (size_t)buffer_len,
+        &method,
+        &method_len,
+        &path,
+        &path_len,
+        &minor_version,
+        headers,
+        &num_headers,
+        0
+    );
+
+    if (consumed == -2) {
+        if ((UV)buffer_len > max_head)
+            RETVAL = newSViv(431);
+        else
+            XSRETURN_UNDEF;
+    } else if (consumed == -1) {
+        RETVAL = newSViv(400);
+    } else {
+        semantic_status = validate_request_semantics(
+            minor_version,
+            headers,
+            num_headers,
+            &semantics,
+            &detail
+        );
+        if (semantic_status != LE_HTTP_SEMANTICS_OK) {
+            RETVAL = newSViv(semantic_status);
+        } else {
+            RETVAL = new_request_object(
+                aTHX_
+                buf,
+                consumed,
+                minor_version,
+                method,
+                method_len,
+                path,
+                path_len,
+                headers,
+                num_headers,
+                &semantics
+            );
+        }
+    }
   OUTPUT:
     RETVAL
 
@@ -1111,6 +2402,17 @@ header_values(self, name)
         }
     }
 
+int
+_expect_continue(self)
+    SV *self
+  PREINIT:
+    le_http_request_state *state;
+  CODE:
+    state = request_state_from_object(aTHX_ self);
+    RETVAL = state->expect_mode;
+  OUTPUT:
+    RETVAL
+
 IV
 _consumed(self)
     SV *self
@@ -1140,7 +2442,55 @@ DESTROY(self)
     Safefree(state);
     sv_setiv(inner, 0);
 
+
 MODULE = Linux::Event::HTTP::_HTTP1    PACKAGE = Linux::Event::HTTP::Response
+
+SV *
+_new_server_default(CLASS, request)
+    const char *CLASS
+    SV *request
+  PREINIT:
+    le_http_request_state *state;
+    HV *hv;
+    UV flags;
+    HV *stash;
+  CODE:
+    state = request_state_from_object(aTHX_ request);
+    flags = LE_HTTP_RESPONSE_SERVER_DEFAULT_FINAL
+        | LE_HTTP_RESPONSE_SERVER_SCALAR_SIMPLE
+        | LE_HTTP_RESPONSE_SERVER_OBJECT;
+    if (state->minor_version == 0)
+        flags |= LE_HTTP_RESPONSE_SERVER_HTTP10;
+
+    hv = newHV();
+    hv_store(
+        hv,
+        "_server_flags",
+        (I32)(sizeof("_server_flags") - 1),
+        newSVuv(flags),
+        0
+    );
+
+    RETVAL = newRV_noinc((SV *)hv);
+    stash = gv_stashpv(CLASS, GV_ADD);
+    sv_bless(RETVAL, stash);
+  OUTPUT:
+    RETVAL
+
+void
+_set_header_native(self, name, value)
+    SV *self
+    SV *name
+    SV *value
+  CODE:
+    response_set_header_native(aTHX_ self, name, value);
+
+void
+_set_body_native(self, body)
+    SV *self
+    SV *body
+  CODE:
+    response_set_body_native(aTHX_ self, body);
 
 SV *
 _serialize_head(self, http_version = "1.1")
@@ -1172,10 +2522,15 @@ _serialize_head(self, http_version = "1.1")
     hv = (HV *)SvRV(self);
 
     status_ptr = hv_fetch(hv, "status", 6, 0);
-    if (status_ptr == NULL || !SvOK(*status_ptr))
-        croak("response status is required");
-
-    status = SvIV(*status_ptr);
+    if (status_ptr == NULL) {
+        if (!response_server_flags(aTHX_ hv))
+            croak("response status is required");
+        status = 200;
+    } else {
+        if (!SvOK(*status_ptr))
+            croak("response status is required");
+        status = SvIV(*status_ptr);
+    }
     if (status < 100 || status > 999)
         croak("response status must be between 100 and 999");
 
@@ -1190,19 +2545,23 @@ _serialize_head(self, http_version = "1.1")
     }
 
     headers_ptr = hv_fetch(hv, "headers", 7, 0);
-    if (headers_ptr == NULL ||
-        !SvROK(*headers_ptr) ||
-        SvTYPE(SvRV(*headers_ptr)) != SVt_PVAV)
-        croak("response headers storage is invalid");
-
-    headers = (AV *)SvRV(*headers_ptr);
+    if (headers_ptr == NULL) {
+        if (!response_server_flags(aTHX_ hv))
+            croak("response headers storage is invalid");
+        headers = NULL;
+    } else {
+        if (!SvROK(*headers_ptr) ||
+            SvTYPE(SvRV(*headers_ptr)) != SVt_PVAV)
+            croak("response headers storage is invalid");
+        headers = (AV *)SvRV(*headers_ptr);
+    }
 
     head = newSVpvn("", 0);
     sv_catpvf(head, "HTTP/%s %03" IVdf " ", http_version, status);
     sv_catpvn(head, reason, reason_len);
     sv_catpvn(head, "\r\n", 2);
 
-    max_index = av_len(headers);
+    max_index = headers == NULL ? -1 : av_len(headers);
     for (i = 0; i <= max_index; ++i) {
         SV **row_ptr = av_fetch(headers, i, 0);
         AV *row;

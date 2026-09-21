@@ -6,7 +6,7 @@ build_requires:
   Test::More: '0.98'
 configure_requires:
   Alien::libssh: '0.002'
-  ExtUtils::MakeMaker: '7.00'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -17,20 +17,20 @@ name: Net-LibSSH
 provides:
   Net::LibSSH:
     file: lib/Net/LibSSH.pm
-    version: '0.003'
+    version: '0.004'
   Net::LibSSH::Channel:
     file: lib/Net/LibSSH/Channel.pm
-    version: '0.003'
+    version: '0.004'
   Net::LibSSH::SFTP:
     file: lib/Net/LibSSH/SFTP.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Alien::libssh: '0.002'
 resources:
   bugtracker: https://github.com/Getty/p5-net-libssh/issues
   homepage: https://github.com/Getty/p5-net-libssh
   repository: https://github.com/Getty/p5-net-libssh.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -40,6 +40,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - .karr
             - README.md
           exclude_match: []
           include_dotfiles: 1
@@ -309,7 +310,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.003'
+          tag: '0.004'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

@@ -1,5 +1,21 @@
 Revision history for Rex-LibSSH
 
+0.004     2026-09-20 18:54:48Z
+  - SECURITY: the server host key is now verified against known_hosts by
+    default (CWE-322, reported privately via CPANSec). Previously
+    Rex::Interface::Connection::LibSSH hardcoded strict_hostkeycheck => 0
+    and ignored the strict_hostkeycheck/knownhosts connect options, so the
+    documented opt-in never did anything and any server -- including a
+    man-in-the-middle -- was accepted. An unknown or changed key now fails
+    the connection before authentication. Opt out per connection with
+    strict_hostkeycheck => 0, or Rexfile-wide with
+    -feature => ['disable_strict_host_key_checking'] (the same flag the
+    OpenSSH backend honours); knownhosts => $file and
+    Rex::Config->set_openssh_opt(UserKnownHostsFile => $file) select the
+    file. Hosts that were never added to known_hosts (fresh Hetzner
+    installs) must be ssh-keyscan'ed first or use the opt-out
+  - Requires Net::LibSSH 0.004, whose connect() performs the check
+
 0.003     2026-09-01 00:07:32Z
   - exec() now matches the 3-arg signature Rex::Commands::Run invokes
     ($cmd, $path, $option), so env hashes and shell options actually

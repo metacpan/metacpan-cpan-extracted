@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our $Eval = 1;
 
@@ -23,7 +23,7 @@ Struct::Codec - a Perl structure to bytes and back, with nothing lost
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 

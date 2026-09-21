@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 use Test::More;
 use File::Temp qw(tempfile tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use JSON::MaybeXS qw(decode_json encode_json JSON);
 use YAML::XS qw(Load Dump);
 
@@ -47,7 +47,7 @@ my $tempdir = tempdir(CLEANUP => 1);
 
 # Write age key file for sops CLI
 my $keyfile = "$tempdir/key.txt";
-write_file($keyfile, $secret);
+write_binary($keyfile, $secret);
 $ENV{SOPS_AGE_KEY_FILE} = $keyfile;
 
 ###############################################################################
@@ -70,7 +70,7 @@ subtest 'Perl encrypt -> sops decrypt (YAML)' => sub {
     );
 
     my $enc_file = "$tempdir/perl_encrypted.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     # Decrypt with sops CLI
     my $output = `$sops_bin -d $enc_file 2>&1`;
@@ -110,7 +110,7 @@ subtest 'Perl encrypt -> sops decrypt (JSON)' => sub {
     );
 
     my $enc_file = "$tempdir/perl_encrypted.json";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     my $output = `$sops_bin -d $enc_file 2>&1`;
     my $exit_code = $? >> 8;
@@ -139,7 +139,7 @@ subtest 'sops encrypt -> Perl decrypt (YAML)' => sub {
     my $plain_file = "$tempdir/sops_plain.yaml";
     my $enc_file = "$tempdir/sops_encrypted.yaml";
 
-    write_file($plain_file, Dump($data));
+    write_binary($plain_file, Dump($data));
 
     # Encrypt with sops CLI
     my $output = `$sops_bin -e --age $public $plain_file 2>&1`;
@@ -149,7 +149,7 @@ subtest 'sops encrypt -> Perl decrypt (YAML)' => sub {
         or diag("sops output: $output");
 
     if ($exit_code == 0) {
-        write_file($enc_file, $output);
+        write_binary($enc_file, $output);
 
         # Decrypt with Perl
         my $decrypted = File::SOPS->decrypt(
@@ -174,7 +174,7 @@ subtest 'sops encrypt -> Perl decrypt (JSON)' => sub {
     };
 
     my $plain_file = "$tempdir/sops_plain.json";
-    write_file($plain_file, encode_json($data));
+    write_binary($plain_file, encode_json($data));
 
     my $output = `$sops_bin -e --age $public $plain_file 2>&1`;
     my $exit_code = $? >> 8;
@@ -213,7 +213,7 @@ subtest 'Various data types' => sub {
     );
 
     my $enc_file = "$tempdir/types.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     my $output = `$sops_bin -d $enc_file 2>&1`;
     my $exit_code = $? >> 8;
@@ -254,7 +254,7 @@ subtest 'Nested structures' => sub {
     );
 
     my $enc_file = "$tempdir/nested.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     my $output = `$sops_bin -d $enc_file 2>&1`;
     my $exit_code = $? >> 8;
@@ -290,7 +290,7 @@ subtest 'Arrays' => sub {
     );
 
     my $enc_file = "$tempdir/arrays.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     my $output = `$sops_bin -d $enc_file 2>&1`;
     my $exit_code = $? >> 8;
@@ -320,11 +320,11 @@ subtest 'Multiple recipients' => sub {
 
     # Both keys should work with sops
     my $enc_file = "$tempdir/multi.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     # Test with first key
     my $keyfile1 = "$tempdir/key1.txt";
-    write_file($keyfile1, $secret);
+    write_binary($keyfile1, $secret);
     local $ENV{SOPS_AGE_KEY_FILE} = $keyfile1;
 
     my $output1 = `$sops_bin -d $enc_file 2>&1`;
@@ -332,7 +332,7 @@ subtest 'Multiple recipients' => sub {
 
     # Test with second key
     my $keyfile2 = "$tempdir/key2.txt";
-    write_file($keyfile2, $secret2);
+    write_binary($keyfile2, $secret2);
     $ENV{SOPS_AGE_KEY_FILE} = $keyfile2;
 
     my $output2 = `$sops_bin -d $enc_file 2>&1`;
@@ -360,7 +360,7 @@ subtest 'Roundtrip consistency' => sub {
     );
 
     my $enc_file = "$tempdir/roundtrip.yaml";
-    write_file($enc_file, $perl_enc);
+    write_binary($enc_file, $perl_enc);
 
     my $sops_dec = `$sops_bin -d $enc_file 2>&1`;
     is($? >> 8, 0, 'sops decrypted Perl-encrypted file')
@@ -377,7 +377,7 @@ subtest 'Roundtrip consistency' => sub {
     # opaque "binary" value, which silently discards the "app" key rather
     # than failing loudly (measured while writing this fix).
     my $dec_file = "$tempdir/roundtrip_dec.yaml";
-    write_file($dec_file, $sops_dec);
+    write_binary($dec_file, $sops_dec);
 
     my $sops_enc = `$sops_bin -e --age $public $dec_file 2>&1`;
     is($? >> 8, 0, 'sops re-encrypted its own decrypted output')
@@ -419,7 +419,7 @@ subtest 'Large values' => sub {
     );
 
     my $enc_file = "$tempdir/large.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     my $output = `$sops_bin -d $enc_file 2>&1`;
     is($? >> 8, 0, 'sops decrypts large values');
@@ -442,7 +442,7 @@ subtest 'File operations' => sub {
     my $enc_file = "$tempdir/file_test.enc.yaml";
     my $dec_file = "$tempdir/file_test.dec.yaml";
 
-    write_file($plain_file, Dump($data));
+    write_binary($plain_file, Dump($data));
 
     File::SOPS->encrypt_file(
         input      => $plain_file,
@@ -452,7 +452,7 @@ subtest 'File operations' => sub {
 
     ok(-f $enc_file, 'encrypted file created');
 
-    my $enc_content = read_file($enc_file);
+    my $enc_content = read_binary($enc_file);
     like($enc_content, qr/ENC\[/, 'file contains encrypted values');
 
     # Decrypt with sops
@@ -467,7 +467,7 @@ subtest 'File operations' => sub {
     );
 
     ok(-f $dec_file, 'decrypted file created');
-    my $file_content = read_file($dec_file);
+    my $file_content = read_binary($dec_file);
     my $dec_content = Load($file_content);
     is_deeply($dec_content, $data, 'decrypted file matches original');
     # Cleanup to avoid YAML::XS internal state issues
@@ -492,7 +492,7 @@ subtest 'Extract single value' => sub {
         data       => $data,
         recipients => [$public],
     );
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     my $password = File::SOPS->extract(
         file       => $enc_file,
@@ -522,16 +522,16 @@ subtest 'Rotate key' => sub {
         data       => $data,
         recipients => [$public],
     );
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
-    my $before = read_file($enc_file);
+    my $before = read_binary($enc_file);
 
     File::SOPS->rotate(
         file       => $enc_file,
         identities => [$secret],
     );
 
-    my $after = read_file($enc_file);
+    my $after = read_binary($enc_file);
 
     # Content should be different (new IVs/data keys)
     isnt($before, $after, 'file changed after rotation');
@@ -574,7 +574,7 @@ subtest 'Unencrypted suffix values' => sub {
         'value is written in plaintext');
 
     my $enc_file = "$tempdir/unencrypted_suffix.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     my $output = `$sops_bin -d $enc_file 2>&1`;
     is($? >> 8, 0, 'sops decrypts a file with unencrypted values')
@@ -585,7 +585,7 @@ subtest 'Unencrypted suffix values' => sub {
     # sops -> Perl, in an order that is NOT sorted, so the decrypt side has
     # to place the unencrypted values by document order and not by key.
     my $plain_file = "$tempdir/unencrypted_suffix_plain.yaml";
-    write_file($plain_file, "zz: last\nblk_unencrypted:\n  b: 1\n  a: two\naa: first\n");
+    write_binary($plain_file, "zz: last\nblk_unencrypted:\n  b: 1\n  a: two\naa: first\n");
 
     my $sops_enc = `$sops_bin -e --age $public $plain_file 2>&1`;
     is($? >> 8, 0, 'sops encrypts it') or diag($sops_enc);
@@ -620,7 +620,7 @@ subtest 'mac_only_encrypted' => sub {
         'the flag is recorded in the sops section');
 
     my $enc_file = "$tempdir/mac_only.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     my $output = `$sops_bin -d $enc_file 2>&1`;
     is($? >> 8, 0, 'sops decrypts a mac_only_encrypted file we wrote')
@@ -629,7 +629,7 @@ subtest 'mac_only_encrypted' => sub {
 
     # And the other way round.
     my $plain_file = "$tempdir/mac_only_plain.yaml";
-    write_file($plain_file, "zz: last\ncfg_unencrypted: plain\nsecret: shh\n");
+    write_binary($plain_file, "zz: last\ncfg_unencrypted: plain\nsecret: shh\n");
 
     my $sops_enc = `$sops_bin -e --age $public --mac-only-encrypted $plain_file 2>&1`;
     is($? >> 8, 0, 'sops encrypts with --mac-only-encrypted') or diag($sops_enc);
@@ -652,7 +652,7 @@ subtest 'Keys ending in mac' => sub {
         data => $data, recipients => [$public], format => 'yaml',
     );
     my $enc_file = "$tempdir/hmac.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     my $output = `$sops_bin -d $enc_file 2>&1`;
     is($? >> 8, 0, 'sops decrypts a file with hmac/webmac/mac keys')
@@ -660,7 +660,7 @@ subtest 'Keys ending in mac' => sub {
     is_deeply(Load($output), $data, 'all of them survive') if $? >> 8 == 0;
 
     my $plain_file = "$tempdir/hmac_plain.yaml";
-    write_file($plain_file, "hmac: h\nwebmac: w\nmac: m\nother: o\n");
+    write_binary($plain_file, "hmac: h\nwebmac: w\nmac: m\nother: o\n");
     my $sops_enc = `$sops_bin -e --age $public $plain_file 2>&1`;
     is($? >> 8, 0, 'sops encrypts them') or diag($sops_enc);
 
@@ -682,7 +682,7 @@ subtest 'Keys ending in mac' => sub {
 ###############################################################################
 subtest 'Values that do not survive Perl numeric conversion' => sub {
     my $plain_file = "$tempdir/lossy.yaml";
-    write_file($plain_file, "big: 1e20\ntiny: 0.00000015\nf: 1.50\npadded: \"007\"\nneg: -0.0\n");
+    write_binary($plain_file, "big: 1e20\ntiny: 0.00000015\nf: 1.50\npadded: \"007\"\nneg: -0.0\n");
 
     my $sops_enc = `$sops_bin -e --age $public $plain_file 2>&1`;
     is($? >> 8, 0, 'sops encrypts them') or diag($sops_enc);
@@ -748,7 +748,7 @@ subtest 'Quoted scalars: Perl encrypt -> sops decrypt' => sub {
             "[$format] a bare 007 is written as type:int");
 
         my $enc_file = "$tempdir/quoted.$format";
-        write_file($enc_file, $encrypted);
+        write_binary($enc_file, $encrypted);
 
         my $output = `$sops_bin -d $enc_file 2>&1`;
         my $exit_code = $? >> 8;
@@ -834,7 +834,7 @@ JSON
 
     for my $format (qw(yaml json)) {
         my $plain_file = "$tempdir/quoted_src.$format";
-        write_file($plain_file, $source{$format});
+        write_binary($plain_file, $source{$format});
 
         my $sops_enc = `$sops_bin -e --age $public $plain_file 2>&1`;
         is($? >> 8, 0, "[$format] sops encrypts the source document")
@@ -922,7 +922,7 @@ subtest 'Latin-1-range values survive in both directions' => sub {
         );
 
         my $enc_file = "$tempdir/latin1.$format";
-        write_file($enc_file, $encrypted);
+        write_binary($enc_file, $encrypted);
 
         my $output = `$sops_bin -d $enc_file 2>&1`;
         my $exit_code = $? >> 8;
@@ -954,7 +954,7 @@ subtest 'Latin-1-range values survive in both directions' => sub {
         utf8::encode($plain);   # the FILE is UTF-8; that is what sops reads
 
         my $plain_file = "$tempdir/latin1_src.$format";
-        write_file($plain_file, $plain);
+        write_binary($plain_file, $plain);
 
         my $sops_enc = `$sops_bin -e --age $public $plain_file 2>&1`;
         is($? >> 8, 0, "[$format] sops encrypts a Latin-1-range document")
@@ -989,7 +989,7 @@ subtest 'Latin-1-range values survive in both directions' => sub {
 ###############################################################################
 subtest 'sops refuses a document with a top-level sops key' => sub {
     my $plain = "$tempdir/userkey.yaml";
-    write_file($plain, "sops: mine\nother: v\n");
+    write_binary($plain, "sops: mine\nother: v\n");
 
     my $out = `$sops_bin -e --age $public $plain 2>&1`;
     is($? >> 8, 203, 'sops refuses a plaintext file with a user key named sops');
@@ -1001,7 +1001,7 @@ subtest 'sops refuses a document with a top-level sops key' => sub {
         data => { secret => 'value' }, recipients => [$public], format => 'yaml',
     );
     my $enc_file = "$tempdir/already_encrypted.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     $out = `$sops_bin -e --age $public $enc_file 2>&1`;
     is($? >> 8, 203, 'sops refuses to encrypt an already-encrypted file');
@@ -1070,7 +1070,7 @@ subtest 'Integer range against the reference' => sub {
             data => { v => $edge, n => 1 }, recipients => [$public], format => 'yaml',
         );
         my $f = "$tempdir/int_edge.yaml";
-        write_file($f, $encrypted);
+        write_binary($f, $encrypted);
 
         my $output = `$sops_bin -d $f 2>&1`;
         is($? >> 8, 0, "sops decrypts a document holding $edge")
@@ -1082,7 +1082,7 @@ subtest 'Integer range against the reference' => sub {
     # something sops can even encrypt, which is why File::SOPS refuses to
     # produce one rather than degrading it to a float.
     my $plain = "$tempdir/uint64.yaml";
-    write_file($plain, "v: 12345678901234567890\n");
+    write_binary($plain, "v: 12345678901234567890\n");
     my $out = `$sops_bin -e --age $public $plain 2>&1`;
     is($? >> 8, 23, 'sops itself refuses a YAML integer above int64');
     like($out, qr/unknown type: uint64/, 'because yaml.v3 hands it a uint64');
@@ -1106,7 +1106,7 @@ subtest 'Integer range against the reference' => sub {
         recipients => [$public], format => 'yaml',
     );
     my $f = "$tempdir/int_string.yaml";
-    write_file($f, $encrypted);
+    write_binary($f, $encrypted);
     my $output = `$sops_bin -d $f 2>&1`;
     is($? >> 8, 0, 'sops decrypts the same digits stored as a string')
         or diag("sops output: $output");
@@ -1131,7 +1131,7 @@ subtest 'Null values survive in both directions' => sub {
             format     => $format,
         );
         my $f = "$tempdir/null.$format";
-        write_file($f, $encrypted);
+        write_binary($f, $encrypted);
 
         my $output = `$sops_bin -d $f 2>&1`;
         my $code = $? >> 8;
@@ -1146,7 +1146,7 @@ subtest 'Null values survive in both directions' => sub {
 
         # --- sops writes, we read ------------------------------------------
         my $plain_file = "$tempdir/null_src.$format";
-        write_file($plain_file, $format eq 'json'
+        write_binary($plain_file, $format eq 'json'
             ? qq({"a": null, "d": "x", "e_unencrypted": null}\n)
             : "a: null\nd: x\ne_unencrypted: null\n");
 
@@ -1181,7 +1181,7 @@ subtest 'Null values survive in both directions' => sub {
 ###############################################################################
 subtest 'type:time and type:comment in a real sops document' => sub {
     my $plain_file = "$tempdir/time.yaml";
-    write_file($plain_file, <<'YAML');
+    write_binary($plain_file, <<'YAML');
 # a leading comment
 ts: 2026-08-09T12:00:00Z
 date: 2026-08-09
@@ -1239,7 +1239,7 @@ subtest 'Non-default encryption rule' => sub {
         'and the default rule is not written alongside it');
 
     my $enc_file = "$tempdir/encrypted_suffix.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     my $output = `$sops_bin -d $enc_file 2>&1`;
     is($? >> 8, 0, 'sops decrypts a document written under encrypted_suffix')
@@ -1248,7 +1248,7 @@ subtest 'Non-default encryption rule' => sub {
 
     # The other direction: sops chose the rule, we must read the file back.
     my $plain_file = "$tempdir/encrypted_suffix_plain.yaml";
-    write_file($plain_file, "password_enc: hidden\nhost: db.example.com\n");
+    write_binary($plain_file, "password_enc: hidden\nhost: db.example.com\n");
 
     my $sops_enc = `$sops_bin -e --age $public --encrypted-suffix _enc $plain_file 2>&1`;
     is($? >> 8, 0, 'sops encrypts with --encrypted-suffix') or diag($sops_enc);
@@ -1276,7 +1276,7 @@ subtest 'Non-default encryption rule' => sub {
 ###############################################################################
 subtest 'Rotate a sops-written document with a non-default rule' => sub {
     my $plain_file = "$tempdir/rotate_rules_plain.yaml";
-    write_file($plain_file, "password_enc: hidden\nhost: db.example.com\n");
+    write_binary($plain_file, "password_enc: hidden\nhost: db.example.com\n");
 
     my $sops_enc = `$sops_bin -e --age $public --encrypted-suffix _enc $plain_file 2>&1`;
     is($? >> 8, 0, 'sops encrypts with --encrypted-suffix') or diag($sops_enc);
@@ -1291,7 +1291,7 @@ subtest 'Rotate a sops-written document with a non-default rule' => sub {
         or die "could not find the sops section to inject into";
 
     my $enc_file = "$tempdir/rotate_rules.yaml";
-    write_file($enc_file, $with_extra);
+    write_binary($enc_file, $with_extra);
 
     my $ok = eval {
         File::SOPS->rotate(file => $enc_file, identities => [$secret]);
@@ -1299,7 +1299,7 @@ subtest 'Rotate a sops-written document with a non-default rule' => sub {
     };
     is($ok, 1, 'File::SOPS rotates it') or diag("died: $@");
 
-    my $rotated = read_file($enc_file);
+    my $rotated = read_binary($enc_file);
     my $sops_meta = Load($rotated)->{sops};
     is($sops_meta->{encrypted_suffix}, '_enc', 'the rule sops chose survived');
     ok(!exists $sops_meta->{unencrypted_suffix},
@@ -1347,7 +1347,7 @@ list_enc:
 YAML
 
     my $plain_file = "$tempdir/path_rule_plain.yaml";
-    write_file($plain_file, $source);
+    write_binary($plain_file, $source);
 
     my $sops_enc = `$sops_bin -e --age $public --encrypted-suffix _enc $plain_file 2>&1`;
     is($? >> 8, 0, 'sops encrypts with --encrypted-suffix') or diag($sops_enc);
@@ -1392,7 +1392,7 @@ YAML
     }
 
     my $enc_file = "$tempdir/path_rule.yaml";
-    write_file($enc_file, $encrypted);
+    write_binary($enc_file, $encrypted);
 
     my $output = `$sops_bin -d $enc_file 2>&1`;
     is($? >> 8, 0, 'sops decrypts our nested document')
@@ -1422,7 +1422,7 @@ subtest 'Unicode through decrypt_file (the file API, not just decrypt)' => sub {
         # sops encrypts a unicode plaintext document ...
         my $plain_file = "$tempdir/unicode_file_src.$format";
         my $plain_data = { greeting => $unicode, note_unencrypted => $unicode };
-        write_file($plain_file,
+        write_binary($plain_file,
             $format eq 'json' ? encode_json($plain_data) : Dump($plain_data));
 
         my $sops_enc = `$sops_bin -e --age $public $plain_file 2>&1`;
@@ -1430,7 +1430,7 @@ subtest 'Unicode through decrypt_file (the file API, not just decrypt)' => sub {
             or diag($sops_enc);
 
         my $enc_file = "$tempdir/unicode_file_enc.$format";
-        write_file($enc_file, $sops_enc);
+        write_binary($enc_file, $sops_enc);
 
         # ... and File::SOPS decrypts it through decrypt_file, to a file.
         my $dec_file = "$tempdir/unicode_file_dec.$format";
@@ -1446,7 +1446,7 @@ subtest 'Unicode through decrypt_file (the file API, not just decrypt)' => sub {
         # returned in memory (it doesn't; decrypt_file has no return value
         # carrying the data). read_file here returns raw bytes, same as
         # elsewhere in this suite when handing sops output to Load/decode_json.
-        my $dec_bytes = read_file($dec_file);
+        my $dec_bytes = read_binary($dec_file);
 
         # Checked against the BMP portion only, not the trailing emoji:
         # YAML::XS::Dump is free to write an astral-plane codepoint as a
@@ -1476,7 +1476,7 @@ subtest 'Unicode through decrypt_file (the file API, not just decrypt)' => sub {
             or diag($reenc);
 
         my $reenc_file = "$tempdir/unicode_file_reenc.$format";
-        write_file($reenc_file, $reenc);
+        write_binary($reenc_file, $reenc);
 
         my $final = `$sops_bin -d $reenc_file 2>&1`;
         is($? >> 8, 0, "[$format] sops decrypts what it re-encrypted from decrypt_file's output")
@@ -1515,7 +1515,7 @@ subtest '.sops.yaml creation rules agree with sops' => sub {
 
     # $public rides along in every rule so that sops can decrypt whatever this
     # library writes below; the per-rule key is what identifies the rule.
-    write_file("$root/.sops.yaml", <<"YAML");
+    write_binary("$root/.sops.yaml", <<"YAML");
 creation_rules:
   - path_regex: ^secrets/.*\\.yaml\$
     age: $pub1,$public
@@ -1527,9 +1527,9 @@ creation_rules:
     encrypted_suffix: _three
 YAML
 
-    write_file("$root/secrets/prod.yaml", "plain: hello\nkeep_one: a\n");
-    write_file("$root/other/dev.yaml",    "plain: hello\nkeep_three: a\n");
-    write_file("$root/a/b/deep.yaml",     "plain: hello\nkeep_two: a\n");
+    write_binary("$root/secrets/prod.yaml", "plain: hello\nkeep_one: a\n");
+    write_binary("$root/other/dev.yaml",    "plain: hello\nkeep_three: a\n");
+    write_binary("$root/a/b/deep.yaml",     "plain: hello\nkeep_two: a\n");
 
     # What sops made of a file: the recipients it wrapped for and the
     # encryption rule it recorded. Run with the working directory set to the
@@ -1578,7 +1578,7 @@ YAML
     my %args = File::SOPS->creation_rules_for(file => $file);
     File::SOPS->encrypt_in_place(file => $file, %args);
 
-    my $written = read_file($file);
+    my $written = read_binary($file);
     # encrypted_suffix: _one, so keep_one is the one that gets encrypted and
     # everything else stays readable -- the rule came out of the config file,
     # not out of any argument this test passed.
@@ -1602,12 +1602,12 @@ YAML
     # File::SOPS/creation_rules_for stops being true out loud rather than
     # quietly, should a later sops change its mind.
     mkdir "$root/a/b/nested" or die "mkdir: $!";
-    write_file("$root/a/b/nested/.sops.yaml", <<"YAML");
+    write_binary("$root/a/b/nested/.sops.yaml", <<"YAML");
 creation_rules:
   - age: $pub3,$public
     encrypted_suffix: _nested
 YAML
-    write_file("$root/a/b/nested/s.yaml", "plain: hello\n");
+    write_binary("$root/a/b/nested/s.yaml", "plain: hello\n");
 
     my $from_above = sops_chose($sops_bin, $root, 'a/b/nested/s.yaml');
     is($from_above->{suffix}, '_three',
@@ -1679,7 +1679,7 @@ CHILD
         'an unencrypted -0.0 is written as -0.0 even there');
 
     my $file = "$tempdir/json-xs-floats.json";
-    write_file($file, $written);
+    write_binary($file, $written);
 
     my $out = `$sops_bin -d --input-type json --output-type json $file 2>&1`;
     is($? >> 8, 0, 'sops decrypts a JSON document written from a JSON::XS process')
@@ -1698,7 +1698,7 @@ CHILD
     # its own MAC on the file it just produced (measured, sops 3.13.3, exit
     # 51), so there is no such document to read. See docs/adr/0005.
     my $plain = "$tempdir/json-xs-plain.json";
-    write_file($plain, <<'JSON');
+    write_binary($plain, <<'JSON');
 {
   "third_unencrypted": 0.3,
   "seventh_unencrypted": 0.7,
@@ -1761,7 +1761,7 @@ half: .5
 YAML
 
     my $plain_yaml = "$tempdir/parser_gap.yaml";
-    write_file($plain_yaml, $yaml_src);
+    write_binary($plain_yaml, $yaml_src);
 
     # sops encrypts these: 0x10 -> type:int, plaintext 16; 1_000 -> type:int,
     # plaintext 1000; .5 -> type:float, plaintext 0.5.
@@ -1817,7 +1817,7 @@ YAML
         '[yaml] a string ".5" is a string here too (YAML::XS does not see it as a bare scalar because we passed a Perl string)');
 
     my $perl_file = "$tempdir/perl_yaml_gap.yaml";
-    write_file($perl_file, $perl_enc);
+    write_binary($perl_file, $perl_enc);
 
     my $sops_dec = `$sops_bin -d $perl_file 2>&1`;
     is($? >> 8, 0,
@@ -1871,7 +1871,7 @@ YAML
 }
 JSON
     my $plain_json = "$tempdir/parser_gap.json";
-    write_file($plain_json, $json_num_src);
+    write_binary($plain_json, $json_num_src);
     my $sops_json_enc = `$sops_bin -e --age $public $plain_json 2>&1`;
     is($? >> 8, 0, '[json] sops encrypts a JSON number above 2^64')
         or diag($sops_json_enc);
@@ -1957,7 +1957,7 @@ subtest "Perl's boolean SV is a bool to sops, in both directions" => sub {
                 if $key eq 'flag';
 
             my $file = "$tempdir/bool_sentinel.$format";
-            write_file($file, $encrypted);
+            write_binary($file, $encrypted);
 
             my $output = `$sops_bin -d $file 2>&1`;
             my $exit = $? >> 8;
@@ -1981,7 +1981,7 @@ subtest "Perl's boolean SV is a bool to sops, in both directions" => sub {
     # keep both ends of the same value agreeing.
     for my $format (qw(yaml json)) {
         my $plain = "$tempdir/bool_plain.$format";
-        write_file($plain, $format eq 'yaml'
+        write_binary($plain, $format eq 'yaml'
             ? "flag: true\nflag_unencrypted: true\nnope: false\n"
             : encode_json({ flag => JSON->true, flag_unencrypted => JSON->true,
                             nope => JSON->false }));
@@ -1991,11 +1991,11 @@ subtest "Perl's boolean SV is a bool to sops, in both directions" => sub {
         is($? >> 8, 0, "[$format] sops encrypted a plaintext boolean document");
         next unless $? >> 8 == 0;
 
-        like(read_file($enc), qr/ENC\[AES256_GCM,[^\]]*,type:bool\]/,
+        like(read_binary($enc), qr/ENC\[AES256_GCM,[^\]]*,type:bool\]/,
             "[$format] sops writes a bare boolean as type:bool");
 
         my $decrypted = File::SOPS->decrypt(
-            encrypted  => scalar read_file($enc),
+            encrypted  => read_binary($enc),
             identities => [$secret],
             format     => $format,
         );

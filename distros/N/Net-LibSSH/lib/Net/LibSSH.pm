@@ -5,7 +5,7 @@ package Net::LibSSH;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use XSLoader;
 XSLoader::load('Net::LibSSH', $VERSION);
@@ -25,7 +25,7 @@ Net::LibSSH - Perl binding for libssh — SSH without SFTP dependency
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -67,6 +67,12 @@ SFTP is supported as an optional feature via L</sftp>: it returns C<undef>
 gracefully when the remote server has no SFTP subsystem, rather than
 crashing.
 
+By default, L</connect> verifies the server's host key against
+C<knownhosts> the same way an interactive C<ssh> client would, and refuses
+to connect — returning 0, not dying — when the key is unknown, has
+changed, or cannot be verified. See L</connect> for the exact refusal
+messages and L<< option()|/"option($key, $value)" >> for turning that off.
+
 B<Note:> This module is not thread-safe and does not support fork. Use one
 connection per process.
 
@@ -86,7 +92,17 @@ Creates a new session object.
 
 Set a session option before connecting. Supported keys: C<host>, C<port>,
 C<user>, C<knownhosts>, C<timeout>, C<compression>, C<log_verbosity>,
-C<strict_hostkeycheck> (set to 0 to disable host key verification).
+C<strict_hostkeycheck>.
+
+C<strict_hostkeycheck> controls whether L</connect> verifies the server's
+host key against C<knownhosts>, mirroring libssh's own default: leaving
+it unset, or setting it to a true value, leaves verification on — the
+secure default. Setting it to C<0> turns verification off entirely:
+C<connect> then skips the known_hosts check altogether, so it will
+connect through an unknown or a changed host key without complaint, and
+without ever writing to C<knownhosts> either way. C<knownhosts> names the
+file consulted; left unset, that is libssh's own default of
+F<~/.ssh/known_hosts>.
 
 Croaks if C<$key> is not one of the keys above, or if libssh rejects the
 resulting value. C<$value> is not validated on this side of the boundary —
@@ -105,6 +121,55 @@ read the absence of a croak here as validation.
 Connect to the host. Returns 1 on success, 0 on failure, and never dies —
 including when called on a session that has already been connected and
 disconnected, see L</disconnect>.
+
+When C<strict_hostkeycheck> is on (the default, see
+L<< option()|/"option($key, $value)" >>), a successful TCP connection and
+key exchange is not by itself enough: C<connect> then verifies the
+server's host key against C<knownhosts> before reporting success, the
+same check an interactive C<ssh> client makes before it would prompt to
+trust a new key — except this module never prompts and never writes the
+file, so it can only refuse. Only a
+match against the key libssh already has on file for this host lets
+C<connect> return 1. Every other outcome is a refusal: C<connect> returns
+0, the reason is on L</error>, and the session is left exactly as spent
+as if L</disconnect> had been called on it — a later C<connect> on it
+returns 0 with C<"session was disconnected and cannot be reconnected">.
+The refusal messages are:
+
+=over 4
+
+=item the host is not in C<knownhosts>
+
+C<"host key is not in known_hosts and strict_hostkeycheck is on">
+
+=item the host is known, but under a different key
+
+C<"host key has changed from the known_hosts entry -- possible
+man-in-the-middle attack">
+
+=item the host is known, but under a different key type
+
+C<"host key type differs from the known_hosts entry -- possible
+man-in-the-middle attack">
+
+=item C<knownhosts> exists but could not be read
+
+C<"could not verify host key against known_hosts">
+
+=back
+
+There is no equivalent here of an interactive client's "yes, trust this
+key" prompt: a host has to be added to C<knownhosts> out of band —
+C<ssh-keyscan>, or letting an actual ssh client connect to it once —
+before C<connect> will accept it, or verification has to be turned off
+with C<< strict_hostkeycheck => 0 >>, see
+L<< option()|/"option($key, $value)" >>. A host reachable on a
+non-standard port needs the C<< [host]:port >> form in C<knownhosts>;
+libssh looks the entry up under that form, not under the bare hostname.
+
+With C<strict_hostkeycheck> off, none of the above runs: C<connect>
+returns 1 on a successful key exchange regardless of what C<knownhosts>
+says, or whether the host is in it at all.
 
 =head2 disconnect
 
@@ -142,9 +207,11 @@ connect/disconnect pair is terminal, not the mere act of disconnecting.
   my $msg = $ssh->error;
 
 Return the last error message from libssh, or C<undef> — not the empty
-string — when libssh has nothing to report. One message is this module's
-own rather than libssh's — the refusal described in L</disconnect> — and
-takes precedence over whatever libssh has to say.
+string — when libssh has nothing to report. A few messages are this
+module's own rather than libssh's, and take precedence over whatever
+libssh has to say: the spent-session refusal described in L</disconnect>,
+and the host-key refusals L</connect> raises when C<strict_hostkeycheck>
+rejects the server's key.
 
 =head2 auth_password($password)
 

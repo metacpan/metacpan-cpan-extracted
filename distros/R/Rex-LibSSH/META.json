@@ -29,7 +29,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Net::LibSSH" : "0.003",
+            "Net::LibSSH" : "0.004",
             "Rex" : "v1.16.0"
          }
       },
@@ -44,23 +44,23 @@
    "provides" : {
       "Rex::Interface::Connection::LibSSH" : {
          "file" : "lib/Rex/Interface/Connection/LibSSH.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Rex::Interface::Exec::LibSSH" : {
          "file" : "lib/Rex/Interface/Exec/LibSSH.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Rex::Interface::File::LibSSH" : {
          "file" : "lib/Rex/Interface/File/LibSSH.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Rex::Interface::Fs::LibSSH" : {
          "file" : "lib/Rex/Interface/Fs/LibSSH.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Rex::LibSSH" : {
          "file" : "lib/Rex/LibSSH.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/Getty/rex-libssh"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -86,6 +86,7 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
+                     ".karr",
                      "README.md"
                   ],
                   "exclude_match" : [],
@@ -431,7 +432,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.003",
+                  "tag" : "0.004",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -586,7 +587,7 @@
    },
    "x_authority" : "cpan:GETTY",
    "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.52",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,7 +1,7 @@
 {
    "abstract" : "A dangerous hybrid of cooperative fibers and preemptive native threads",
    "author" : [
-      "Sanko Robinson <sanko@cpan.org>"
+      "Sanko Robinson"
    ],
    "description" : "Acme::Parataxis is an experimental concurrency platform that merges cooperative user mode fibers with a preemptive native thread pool. It should allow thousands of concurrent 'green threads' to run alongside blocking C-level tasks without stalling the main event loop.",
    "dynamic_config" : 1,
@@ -68,7 +68,26 @@
    "provides" : {
       "Acme::Parataxis" : {
          "file" : "lib/Acme/Parataxis.pm",
-         "version" : "v0.0.10"
+         "version" : "v0.1.0"
+      },
+      "Acme::Parataxis::Channel" : {
+         "file" : "lib/Acme/Parataxis/Channel.pm",
+         "version" : "v0.1.0"
+      },
+      "Acme::Parataxis::Future" : {
+         "file" : "lib/Acme/Parataxis/Future.pm",
+         "version" : "v0.1.0"
+      },
+      "Acme::Parataxis::Semaphore" : {
+         "file" : "lib/Acme/Parataxis/Semaphore.pm",
+         "version" : "v0.1.0"
+      },
+      "Acme::Parataxis::Semaphore::Guard" : {
+         "file" : "lib/Acme/Parataxis/Semaphore.pm"
+      },
+      "Acme::Parataxis::Signal" : {
+         "file" : "lib/Acme/Parataxis/Signal.pm",
+         "version" : "v0.1.0"
       }
    },
    "release_status" : "stable",
@@ -86,7 +105,7 @@
          "web" : "https://github.com/sanko/Acme-Parataxis.pm"
       }
    },
-   "version" : "v0.0.10",
+   "version" : "v0.1.0",
    "x_ignore" : [
       ".tidyallrc",
       ".gitignore",

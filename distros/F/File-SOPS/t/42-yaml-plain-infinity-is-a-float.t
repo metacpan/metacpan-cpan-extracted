@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use Scalar::Util qw(dualvar);
 use B ();
 
@@ -376,7 +376,7 @@ subtest 'and the quoted twin still verifies, unchanged' => sub {
 
 subtest 'a document with a bare .inf can be written back' => sub {
     my $tempdir = tempdir(CLEANUP => 1);
-    write_file("$tempdir/bare.yaml", $FIXTURE_BARE);
+    write_binary("$tempdir/bare.yaml", $FIXTURE_BARE);
 
     my $ok = eval {
         File::SOPS->rotate(file => "$tempdir/bare.yaml",
@@ -386,7 +386,7 @@ subtest 'a document with a bare .inf can be written back' => sub {
     ok($ok, 'rotate writes it') or diag($@);
     return unless $ok;
 
-    like(read_file("$tempdir/bare.yaml"), qr/^v_unencrypted: \.inf$/m,
+    like(read_binary("$tempdir/bare.yaml"), qr/^v_unencrypted: \.inf$/m,
         'and the slot still holds the token sops put there');
 };
 
@@ -402,7 +402,7 @@ SKIP: {
     my $tempdir = tempdir(CLEANUP => 1);
     my ($public, $secret) = Crypt::Age->generate_keypair();
     my $keyfile = "$tempdir/age.key";
-    write_file($keyfile, "$secret\n");
+    write_binary($keyfile, "$secret\n");
     local $ENV{SOPS_AGE_KEY_FILE} = $keyfile;
 
     # The three spellings a sops-written document can actually hold: measured,
@@ -412,7 +412,7 @@ SKIP: {
 
     subtest 'sops -e writes only three of the twelve spellings' => sub {
         for my $token (sort keys %GO_RESOLVES) {
-            write_file("$tempdir/p.yaml", "keep: x\nv_unencrypted: $token\n");
+            write_binary("$tempdir/p.yaml", "keep: x\nv_unencrypted: $token\n");
             my $out = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/p.yaml 2>&1`;
             is($? >> 8, 0, "[$token] sops -e accepts it") or diag($out);
             my ($wire) = $out =~ /^v_unencrypted: (.*)$/m;
@@ -426,7 +426,7 @@ SKIP: {
 
     subtest 'and every document it writes is readable here' => sub {
         for my $token (sort keys %WRITTEN) {
-            write_file("$tempdir/p.yaml", "keep: x\nv_unencrypted: $token\n");
+            write_binary("$tempdir/p.yaml", "keep: x\nv_unencrypted: $token\n");
             my $out = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/p.yaml 2>&1`;
             is($? >> 8, 0, "[$token] sops -e") or diag($out);
 
@@ -444,10 +444,10 @@ SKIP: {
 
     subtest 'decrypt_file reproduces the plaintext sops -d writes' => sub {
         for my $token (sort keys %WRITTEN) {
-            write_file("$tempdir/p.yaml", "keep: x\nv_unencrypted: $token\n");
+            write_binary("$tempdir/p.yaml", "keep: x\nv_unencrypted: $token\n");
             my $enc = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/p.yaml 2>&1`;
             is($? >> 8, 0, "[$token] sops -e") or diag($enc);
-            write_file("$tempdir/e.yaml", $enc);
+            write_binary("$tempdir/e.yaml", $enc);
 
             my $theirs = `$sops_bin -d --input-type yaml --output-type yaml $tempdir/e.yaml 2>&1`;
             is($? >> 8, 0, "[$token] sops -d") or diag($theirs);
@@ -461,7 +461,7 @@ SKIP: {
             ok($ok, "[$token] File::SOPS->decrypt_file writes it") or diag($@);
             next unless $ok;
 
-            my ($mine_line)   = scalar(read_file("$tempdir/d.yaml")) =~ /^v_unencrypted: (.*)$/m;
+            my ($mine_line)   = read_binary("$tempdir/d.yaml") =~ /^v_unencrypted: (.*)$/m;
             my ($theirs_line) = $theirs =~ /^v_unencrypted: (.*)$/m;
             is($mine_line, $theirs_line,
                 "[$token] and writes the same token sops does");

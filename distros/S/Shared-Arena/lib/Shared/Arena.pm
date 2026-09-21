@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Frozen;
 use Struct::Codec;
@@ -24,7 +24,7 @@ Shared::Arena - memory two processes can both read, without a syscall
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 
@@ -467,9 +467,20 @@ of processes that will read, not a round number.
 =head2 waker
 
     my $index = $arena->waker;
+    my $index = $arena->waker($n);        # that one, or -1
 
 Claims one for this process, after the fork. Returns its index, or -1 when
 there are none left, in which case the caller polls.
+
+B<A slot whose owner has died is reclaimed.> Nothing hands a slot back when a
+process is killed or C<_exit>s, so without this a supervisor respawning a
+worker into the same index would be refused, and that worker would hold no
+descriptor and never read the ring again.
+
+A slot whose owner is B<alive> is never taken, and a pid that has been reused
+reads as alive. That costs a waker and leaves one reader polling, which is what
+an attached process already does; the other direction would hand one process's
+pipe to another.
 
 =head2 waker_fd
 

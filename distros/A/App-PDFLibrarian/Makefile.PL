@@ -75,7 +75,7 @@ my %WriteMakefileArgs = (
     "XML::LibXML" => "2.0134",
     "XML::LibXSLT" => "2.002001"
   },
-  "VERSION" => "6.3.2",
+  "VERSION" => "6.3.3",
   "test" => {
     "TESTS" => ""
   }

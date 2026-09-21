@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use JSON::MaybeXS qw(decode_json);
 use YAML::XS qw(Load Dump);
 use Scalar::Util qw(dualvar);
@@ -68,7 +68,7 @@ diag("Using sops binary: $sops_bin");
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 my $serial = 0;
@@ -253,7 +253,7 @@ subtest 'the 15 ambiguous rows are still refused; the 7 non-finite are now quote
             "[$spelling] written double-quoted");
 
         my $file = scratch_file('yaml');
-        write_file($file, $document);
+        write_binary($file, $document);
         my $out = `$sops_bin -d --input-type yaml --output-type yaml $file 2>&1`;
         is($? >> 8, 0, "[$spelling] and sops reads it back") or diag($out);
         like($out, qr/^x_unencrypted: "\Q$spelling\E"$/m,
@@ -270,7 +270,7 @@ subtest 'the 15 ambiguous rows are still refused; the 7 non-finite are now quote
         'a string YAML::XS quotes by itself is written, quoted');
 
     my $file = scratch_file('yaml');
-    write_file($file, $document);
+    write_binary($file, $document);
     my $out = `$sops_bin -d --input-type yaml --output-type yaml $file 2>&1`;
     is($? >> 8, 0, 'and sops reads it back');
     # sops writes its own quoting style back -- double quotes where YAML::XS
@@ -286,13 +286,13 @@ subtest 'the 15 ambiguous rows are still refused; the 7 non-finite are now quote
 subtest 'sops writes each of the 22 double-quoted and reads it back' => sub {
     for my $spelling (@STRING_ROWS) {
         my $plain = scratch_file('yaml');
-        write_file($plain, "v: \"$spelling\"\nv_unencrypted: \"$spelling\"\n");
+        write_binary($plain, "v: \"$spelling\"\nv_unencrypted: \"$spelling\"\n");
         my $wire = scratch_file('yaml');
         my $rc = system("$sops_bin -e --age '$public' --input-type yaml "
                       . "--output-type yaml '$plain' > '$wire' 2>/dev/null");
         is($rc, 0, "[$spelling] sops -e writes a document");
 
-        my $text = read_file($wire);
+        my $text = read_binary($wire);
         like($text, qr/^\Qv_unencrypted: "$spelling"\E$/m,
             "[$spelling] with the string double-quoted, not resolved");
 
@@ -360,11 +360,11 @@ subtest 'a bare and a quoted source are the same string here, and are not to sop
     );
     for my $spelling (sort keys %bare_output) {
         my $plain = scratch_file('yaml');
-        write_file($plain, "v_unencrypted: $spelling\n");
+        write_binary($plain, "v_unencrypted: $spelling\n");
         my $wire = scratch_file('yaml');
         system("$sops_bin -e --age '$public' --input-type yaml "
              . "--output-type yaml '$plain' > '$wire' 2>/dev/null");
-        like(read_file($wire),
+        like(read_binary($wire),
             qr/^\Qv_unencrypted: $bare_output{$spelling}\E$/m,
             "[$spelling] bare, sops writes the RESOLVED form");
     }
@@ -382,7 +382,7 @@ subtest 'encrypting the leaf works for all 22' => sub {
                 recipients => [$public], format => 'yaml');
         };
         my $file = scratch_file('yaml');
-        write_file($file, $document);
+        write_binary($file, $document);
         my $out = `$sops_bin -d --input-type yaml --output-type yaml $file 2>&1`;
         my $rc = $? >> 8;
         is($rc, 0, "[$spelling] sops reads the encrypted slot");
@@ -398,7 +398,7 @@ subtest 'writing the document as JSON works for all 22' => sub {
                 recipients => [$public], format => 'json');
         };
         my $file = scratch_file('json');
-        write_file($file, $document);
+        write_binary($file, $document);
         my $out = `$sops_bin -d --input-type json --output-type json $file 2>&1`;
         my $rc = $? >> 8;
         is($rc, 0, "[$spelling] sops reads the JSON document");

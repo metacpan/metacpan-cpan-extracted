@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 
 use File::SOPS;
 use File::SOPS::Encrypted;
@@ -59,7 +59,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 # A well-formed ENC[...,type:comment] string, used for the structural subtests.
@@ -179,7 +179,7 @@ subtest 'decrypt_file refuses the sequence-comment document' => sub {
     my $doc  = document_with_sequence_comment_leaf();
     my $file = "$tempdir/B.enc.yaml";
     my $out  = "$tempdir/B.out.yaml";
-    write_file($file, $doc);
+    write_binary($file, $doc);
     unlink $out;
 
     eval { File::SOPS->decrypt_file(
@@ -201,7 +201,7 @@ subtest 'decrypt_file silently writes the mapping-only document' => sub {
     my $doc  = document_with_only_mapping_comments();
     my $file = "$tempdir/A.enc.yaml";
     my $out  = "$tempdir/A.out.yaml";
-    write_file($file, $doc);
+    write_binary($file, $doc);
     unlink $out;
 
     # No eval -- this is the asymmetry. The mapping-only document is
@@ -212,7 +212,7 @@ subtest 'decrypt_file silently writes the mapping-only document' => sub {
     ok(defined $rc, 'decrypt_file returned a defined value');
     ok(-e $out, 'and the output file exists');
 
-    my $plaintext = read_file($out);
+    my $plaintext = read_binary($out);
     unlike($plaintext, qr/type:comment/,
         'no type:comment string in the plaintext output');
     unlike($plaintext, qr/^#ENC\[/m,
@@ -251,7 +251,7 @@ subtest 'extract and rotate behave the same way' => sub {
     # silently absent from the tree in the mapping-only case.
 
     my $a_doc = document_with_only_mapping_comments();
-    write_file("$tempdir/A.enc.yaml", $a_doc);
+    write_binary("$tempdir/A.enc.yaml", $a_doc);
     is(File::SOPS->extract(file => "$tempdir/A.enc.yaml",
         path => '["database"]["host"]', identities => [$secret]),
         'localhost',
@@ -261,7 +261,7 @@ subtest 'extract and rotate behave the same way' => sub {
         'mapping-only: rotate re-keys the document');
 
     my $b_doc = document_with_sequence_comment_leaf();
-    write_file("$tempdir/B.enc.yaml", $b_doc);
+    write_binary("$tempdir/B.enc.yaml", $b_doc);
     my $got = File::SOPS->extract(file => "$tempdir/B.enc.yaml",
         path => '["list"][1]', identities => [$secret]);
     is($got, 'one',
@@ -283,7 +283,7 @@ SKIP: {
 
     # The two plaintexts k169 measured against. A carries comments
     # in BOTH positions; B carries them in MAPPING position only.
-    write_file("$tempdir/A.plain.yaml", <<'YAML');
+    write_binary("$tempdir/A.plain.yaml", <<'YAML');
 # a file-leading comment
 database:
     # a comment above a mapping key
@@ -293,7 +293,7 @@ list:
     # a comment above a sequence entry
     - one
 YAML
-    write_file("$tempdir/B.plain.yaml", <<'YAML');
+    write_binary("$tempdir/B.plain.yaml", <<'YAML');
 # a file-leading comment
 database:
     # a comment above a mapping key
@@ -304,12 +304,12 @@ YAML
     my $enc = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/A.plain.yaml 2>&1`;
     is($? >> 8, 0, 'sops -e encrypts the sequence-position document')
         or diag($enc);
-    write_file("$tempdir/A.enc.yaml", $enc);
+    write_binary("$tempdir/A.enc.yaml", $enc);
 
     my $enc2 = `$sops_bin -e --age $public --input-type yaml --output-type yaml $tempdir/B.plain.yaml 2>&1`;
     is($? >> 8, 0, 'sops -e encrypts the mapping-only document')
         or diag($enc2);
-    write_file("$tempdir/B.enc.yaml", $enc2);
+    write_binary("$tempdir/B.enc.yaml", $enc2);
 
     subtest 'sops -d returns the comments intact for both documents' => sub {
         # The reference behaviour. If this stops holding, k169's
@@ -360,7 +360,7 @@ YAML
         ok(-e "$tempdir/B.out.yaml",
             'and the output file exists');
 
-        my $plaintext = read_file("$tempdir/B.out.yaml");
+        my $plaintext = read_binary("$tempdir/B.out.yaml");
         like($plaintext, qr/^\s+host: localhost$/m,
             'with the value intact under database');
         unlike($plaintext, qr/^#/m,

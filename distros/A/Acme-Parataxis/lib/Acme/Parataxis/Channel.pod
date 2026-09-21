@@ -1,0 +1,88 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Channel - A simple message queue for inter-fiber communication
+
+=head1 SYNOPSIS
+
+    use Acme::Parataxis;
+    use Acme::Parataxis::Channel;
+
+    my $q = Acme::Parataxis::Channel->new( 4 );
+
+    async {
+        fiber { $q->put( $_ ) for 1 .. 8 };      # producers
+        say $q->get for 1 .. 8;                  # consumer
+    };
+
+=head1 DESCRIPTION
+
+A simple message queue that allows you to send and receive data between fibers. If the channel is full, writers block;
+if it is empty, readers block. Both ends can be used by as many fibers as you want concurrently.
+
+A channel of size C<1> is a rendezvous point (no buffering: C<put> waits for a matching C<get>); to buffer one element
+use size C<2>, and so on.
+
+Channels are internally implemented using two L<Acme::Parataxis::Semaphore> instances to coordinate producers and
+consumers.
+
+=head1 CONSTRUCTOR
+
+=head2 C<new( [...] )>
+
+    my $ch = Acme::Parataxis::Channel->new;
+    my $ch = Acme::Parataxis::Channel->new(capacity => 10);
+
+Creates a new channel. The optional C<capacity> parameter sets the maximum number of items the channel can hold and
+defaults to C<2_000_000_000>.
+
+=head1 METHODS
+
+=head2 C<put( $value )>
+
+    $ch->put($value);
+
+Append a value to the channel. Blocks the current fiber if the channel is at capacity, waiting until space becomes
+available.
+
+=head2 C<get( )>
+
+    my $value = $ch->get;
+
+Remove and return the next value from the channel. Blocks the current fiber if the channel is empty, waiting until a
+value is available.
+
+=head2 C<size( )>
+
+    my $n = $ch->size;
+
+Returns the number of items currently in the channel.
+
+=head2 C<adjust( $diff )>
+
+    $ch->adjust( $diff );
+
+Adjust the channel capacity by C<$diff>. This can be used to grow or shrink the effective capacity at runtime.
+
+=head2 C<shutdown( )>
+
+    $ch->shutdown;
+
+Shut down the channel by releasing a large number of permits on the internal get semaphore. This unblocks any fibers
+waiting on C<get( )>, allowing them to drain remaining items.
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

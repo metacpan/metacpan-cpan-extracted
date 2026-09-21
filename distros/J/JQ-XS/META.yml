@@ -27,5 +27,5 @@ requires:
   perl: '5.026003'
 resources:
   repository: https://github.com/rouzier/JQ-XS.git
-version: '2.02'
+version: '2.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

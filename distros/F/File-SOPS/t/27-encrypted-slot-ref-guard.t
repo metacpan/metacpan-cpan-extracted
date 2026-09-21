@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(write_binary);
 use JSON::MaybeXS qw(decode_json JSON);
 use YAML::XS qw(Load);
 use Scalar::Util qw(blessed);
@@ -98,7 +98,7 @@ package main;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 my $serial = 0;
@@ -144,7 +144,7 @@ for my $format (qw(yaml json)) {
             'and decrypts back to the object stringification') if $self;
 
         my $file = scratch_file($format);
-        write_file($file, $encrypted);
+        write_binary($file, $encrypted);
         my $out       = `$sops_bin -d $file 2>&1`;
         my $exit_code = $? >> 8;
         is($exit_code, 0, 'sops -d accepts the document') or diag("sops output: $out");

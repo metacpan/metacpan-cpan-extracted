@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use JSON::MaybeXS qw(JSON);
 use YAML::XS ();
 
@@ -45,7 +45,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 # A leaf exactly as a YAML parse hands it over. libyaml resolves `true` and
@@ -224,7 +224,7 @@ subtest 'the plaintext emitters stay silent' => sub {
 
     my ($document) = encrypt_capturing(
         data => { flag_unencrypted => yaml_leaf('True'), s => 'x' });
-    write_file("$tempdir/enc.yaml", $document);
+    write_binary("$tempdir/enc.yaml", $document);
     my @on_read;
     {
         local $SIG{__WARN__} = sub { push @on_read, $_[0] };
@@ -256,7 +256,7 @@ SKIP: {
             'and the document carries it double-quoted');
 
         my $file = "$tempdir/rt.yaml";
-        write_file($file, $document);
+        write_binary($file, $document);
 
         my $json = `$sops_bin -d --output-type json $file 2>&1`;
         is($? >> 8, 0, 'sops -d accepts the document') or diag($json);
@@ -271,10 +271,10 @@ SKIP: {
 
         my $out = `$sops_bin rotate -i $file 2>&1`;
         is($? >> 8, 0, 'sops rotate rewrites the document') or diag($out);
-        like(scalar read_file($file), qr/^flag_unencrypted: "True"$/m,
+        like(read_binary($file), qr/^flag_unencrypted: "True"$/m,
             'and re-writes the SAME double-quoted token, not a bare boolean');
 
-        my $after = File::SOPS->decrypt(encrypted => scalar read_file($file),
+        my $after = File::SOPS->decrypt(encrypted => read_binary($file),
                                         identities => [$secret]);
         is(ref($after->{flag_unencrypted}), '',
             'and this module still reads a plain string after the write-back');

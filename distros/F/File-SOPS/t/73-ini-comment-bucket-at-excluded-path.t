@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use Test::Fatal qw(exception);
 
 use File::SOPS;
@@ -52,7 +52,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 ###############################################################################
@@ -94,7 +94,7 @@ subtest 'a misruled INI file with an ENC-comment bucket rotates under ignore_mac
     like($misruled, qr/^; ENC\[[^\]]*type:comment\]$/m,
         'and the comment line is still an ENC-comment string in the file');
 
-    write_file("$tempdir/misruled.ini", $misruled);
+    write_binary("$tempdir/misruled.ini", $misruled);
 
     my $err = exception {
         File::SOPS->rotate(
@@ -109,7 +109,7 @@ subtest 'a misruled INI file with an ENC-comment bucket rotates under ignore_mac
     # The comment line survives. It is still an ENC-comment string (a fresh
     # one, with a fresh IV -- the bucket predicate is what lets the walk
     # keep the wire half as-is), and the type:comment label is intact.
-    my $rotated = read_file("$tempdir/misruled.ini");
+    my $rotated = read_binary("$tempdir/misruled.ini");
     like($rotated, qr/^; ENC\[[^\]]*type:comment\]$/m,
         'the comment line is preserved as type:comment, not rewritten as type:str');
 };

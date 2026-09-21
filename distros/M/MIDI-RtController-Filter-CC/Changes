@@ -1,5 +1,11 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.1303 2026-09-20 22:37:58
+  - Fix truthy values vs the `threshold()` filter returns.
+
+0.1302 2026-09-20 22:23:29
+  - Clarify the `threshold()` filter logic.
+
 0.1301 2026-09-20 02:03:49
   - Add threshold to the known filters. Oops.
 

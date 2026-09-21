@@ -3,7 +3,7 @@ Changes.md
 LICENSE
 README.md
 MANIFEST
-t/lib/Object.pm
+t/lib/TestObject.pm
 t/object.t
 t/edge-cases.t
 t/pod.t

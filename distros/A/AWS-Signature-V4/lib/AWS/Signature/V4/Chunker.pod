@@ -1,0 +1,122 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+AWS::Signature::V4::Chunker - Encode the body of an aws-chunked upload
+
+
+=head1 VERSION
+
+This module is part of the L<AWS::Signature::V4> distribution and shares
+its version.
+
+
+=head1 SYNOPSIS
+
+   # you do not create the chunker: sign() gives it to you
+   use AWS::Signature::V4;
+
+   my $s = AWS::Signature::V4->new(
+      service => 's3', region => 'eu-west-1',
+      credentials => { access_key_id => $id, secret_access_key => $secret },
+   );
+   my $r = $s->sign(
+      method => 'PUT', url => $url, streaming => 1,
+      decoded_content_length => $size,
+      headers => { 'Content-Length' => AWS::Signature::V4->encoded_length($size, $chunk_size) },
+   );
+
+   my $chunker = $r->{chunker};
+   print {$socket} $chunker->chunk($_) for @pieces;
+   print {$socket} $chunker->finish;
+
+
+=head1 DESCRIPTION
+
+This module wraps the data of an S3 upload into the C<aws-chunked>
+encoding: each piece is prefixed by its size and, for the signed
+variants, by a signature that depends on the previous one.
+
+B<You are not supposed to use this module directly.> Objects are created
+by L<AWS::Signature::V4/sign> when called with C<streaming>, and returned
+in the C<chunker> key of its result. Only then do they hold what they need
+to sign: the derived signing key, the scope, the date and the signature of
+the request itself (the "seed" of the chain). The constructor is
+therefore an internal detail and its arguments are not a stable
+interface; the options that matter (C<streaming>, C<checksum>,
+C<trailers>, C<decoded_content_length>) are all described in
+L<AWS::Signature::V4/Chunked and streaming uploads>.
+
+What you do use are the two methods below, which are part of the public
+interface. A chunker is good for one body: create a new one, i.e. call
+C<sign> again, for each upload.
+
+
+=head1 INTERFACE
+
+=head2 chunk
+
+   my $encoded = $chunker->chunk($data);
+
+Return the encoded version of a piece of data, to be sent as it is.
+C<$data> is a byte string or a reference to one (to avoid copying large
+pieces), it cannot be empty. Other kinds of references, objects included,
+are refused. It is an error to pass characters that do not
+fit in a byte, or to go past the C<decoded_content_length> declared to
+C<sign>. Pieces must be passed in the order they are sent.
+
+If a C<checksum> was requested, the piece also updates the running
+checksum.
+
+=head2 finish
+
+   my $encoded = $chunker->finish(%trailer_values);
+
+Return the final, empty chunk, followed by the trailers if any, and
+their signature for the signed variants. It is an error if the amount of
+data passed so far is not the declared C<decoded_content_length>, or if
+the chunker was already finished.
+
+The values of the trailers declared with C<trailers> are passed by name,
+in any case (C<X-Foo> and C<x-foo> are the same trailer). It is an error
+to omit one, to pass one twice, to pass one that was not declared or that
+the chunker computes by itself (see C<checksum>), or to pass a value that
+is not a byte string or has a CR, LF or NUL in it. The trailer of a
+C<checksum> is added automatically.
+
+All the errors are found before anything changes: after one, the
+chunker is as it was, and C<finish> can be called again with good
+values.
+
+=head2 new
+
+Internal, see L</DESCRIPTION>.
+
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

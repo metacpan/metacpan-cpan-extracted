@@ -1,0 +1,100 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Semaphore - A counting semaphore for fiber synchronization
+
+=head1 SYNOPSIS
+
+    use Acme::Parataxis;
+    use Acme::Parataxis::Semaphore;
+
+    my $sem = Acme::Parataxis::Semaphore->new;   # unlocked by default
+
+    async {
+        fiber { $sem->down };   # wait for a signal
+        $sem->up;
+    };
+
+=head1 DESCRIPTION
+
+A simple integer counter that optionally blocks fibers when it reaches zero. There is no owner associated with a
+semaphore, so one fiber can C<down> it while another can C<up> it, C<up> may be called before C<down>, and so on.
+
+Blocked fibers are parked (they do not busy-wait) and are resumed in FIFO order as permits become available, exactly
+like the futures used by C<await>.
+
+=head1 CONSTRUCTOR
+
+=head2 C<new( [...] )>
+
+    my $sem = Acme::Parataxis::Semaphore->new;
+    my $sem = Acme::Parataxis::Semaphore->new(count => 3);
+
+Creates a new semaphore. The optional C<count> parameter sets the initial number of permits and defaults to C<1>.
+
+=head1 METHODS
+
+=head2 C<down( )>
+
+    $sem->down;
+
+Acquire a permit. If the count is zero, the current fiber is suspended until a permit becomes available. Decrements the
+count upon success.
+
+=head2 C<up( )>
+
+    $sem->up;
+
+Release a permit. Increments the count and wakes one blocked waiter if any are queued.
+
+=head2 C<try( )>
+
+    my $acquired = $sem->try;
+
+Attempt to acquire a permit without blocking. Returns true and decrements the count if a permit is available; returns
+false immediately otherwise. This is useful when you want to opportunistically grab a permit but don't want to stall
+the fiber.
+
+=head2 C<adjust( $diff )>
+
+    $sem->adjust($diff);
+
+Adjust the permit count by C<$diff> (which may be negative). Wakes up to C<$diff> blocked waiters if the new count is
+positive. This is useful for bulk-release scenarios, such as unblocking a channel.
+
+=head2 C<wait( )>
+
+    $sem->wait;
+
+Block until a permit is available. This is equivalent to C<down> but is named for consistency with other
+C<Acme::Parataxis> synchronization primitives.
+
+=head2 C<guard>
+
+    my $guard = $sem->guard( );
+
+Acquire a permit and return an L<Acme::Parataxis::Semaphore::Guard> object. The permit is automatically released when
+the guard object goes out of scope (unless the interpreter is in global destruction). This is a convenient way to
+ensure cleanup.
+
+    {
+        my $guard = $sem->guard;
+        # permits are held here
+    }
+    # $sem->up called automatically
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

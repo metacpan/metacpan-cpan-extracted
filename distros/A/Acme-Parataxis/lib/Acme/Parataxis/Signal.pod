@@ -1,0 +1,83 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Signal - A two-state flag with a FIFO queue of waiters
+
+=head1 SYNOPSIS
+
+    use Acme::Parataxis;
+    use Acme::Parataxis::Signal;
+
+    my $sig = Acme::Parataxis::Signal->new;
+
+    async {
+        fiber { $sig->wait; say 'I rise!' };
+        $sig->send;
+    };
+
+=head1 DESCRIPTION
+
+An object with a two-state flag and a FIFO queue of waiters. A fiber parked in C<wait> does not busy-wait; it is
+resumed by the scheduler when the signal fires.
+
+If C<send> is called when nobody is waiting, the signal is remembered and the next C<wait> consumes it immediately.
+This makes signals safe to fire before anyone has had a chance to register interest.
+
+B<Broadcast:> C<broadcast> wakes every currently queued waiter at once, which is useful for fan-out patterns. Unlike
+C<send>, a broadcast that finds nobody waiting simply drops the signal.
+
+=head1 METHODS
+
+=head2 C<new( [...] )>
+
+    my $sig = Acme::Parataxis::Signal->new();
+
+Creates a new signal. By default, it initializes in the *signalled* state (C<count = true>), meaning the very first
+C<wait> will return immediately without blocking. You can pass C<count =E<gt> false> to create a signal in the
+unsignalled state.
+
+=head2 C<send( )>
+
+    $sig->send;
+
+Wake up one waiter if any are queued. If nobody is currently waiting, the signal is remembered so the next C<wait>
+returns immediately without blocking. Returns true.
+
+=head2 C<broadcast( )>
+
+    $sig->broadcast;
+
+Wake up B<all> currently waiting fibers. If nobody is waiting, the signal is lost (not remembered). Returns true.
+
+=head2 C<wait( [...] )>
+
+    $sig->wait;
+    $sig->wait(\&callback);
+
+Wait for the signal. In the no-argument form, it suspends the current fiber until the signal is sent. If the signal is
+already pending, it is consumed immediately without blocking.
+
+When a coderef is passed, it is registered as a callback and invoked when the signal fires. If the signal is already
+pending, the callback fires immediately and the fiber is not suspended.
+
+=head2 C<awaited( )>
+
+    my $n = $sig->awaited;
+
+Returns the number of fibers (or callbacks) currently waiting on this signal. Returns 0 when nobody is waiting.
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

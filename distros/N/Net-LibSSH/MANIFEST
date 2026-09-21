@@ -5,9 +5,18 @@
 .claude/agents/net-libssh-worker.md
 .claude/rules/net-libssh-rules.md
 .claude/settings.json
+.claude/skills/getty-git-commit-style/SKILL.md
+.claude/skills/getty-git-usage/SKILL.md
 .claude/skills/getty-perl-core/SKILL.md
 .claude/skills/getty-perl-release-author-getty/SKILL.md
 .claude/skills/kanban-issues-karr-cli/SKILL.md
+.claude/skills/kanban-issues-karr-cli/references/cards.md
+.claude/skills/kanban-issues-karr-cli/references/claims.md
+.claude/skills/kanban-issues-karr-cli/references/config.md
+.claude/skills/kanban-issues-karr-cli/references/cross-board.md
+.claude/skills/kanban-issues-karr-cli/references/queries.md
+.claude/skills/kanban-issues-karr-cli/references/setup.md
+.claude/skills/kanban-issues-karr-cli/references/storage.md
 .claude/skills/net-libssh-core/SKILL.md
 .claude/skills/perl-xs/SKILL.md
 .claude/skills/perl-xs/references/build-and-test.md
@@ -40,6 +49,7 @@ t/06-exit-status-ordering.t
 t/07-refcount-chain.t
 t/08-disconnect-invalidates.t
 t/09-connect-after-disconnect.t
+t/10-hostkey.t
 t/author-pod-syntax.t
 t/lib/TestSSHD.pm
 t/release-changes_has_content.t

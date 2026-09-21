@@ -1,0 +1,130 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+AWS::Signature::V4::Checksum - Incremental checksums for S3 trailers
+
+
+=head1 VERSION
+
+This module is part of the L<AWS::Signature::V4> distribution and shares
+its version.
+
+
+=head1 SYNOPSIS
+
+   use AWS::Signature::V4::Checksum ();
+
+   my $sum = AWS::Signature::V4::Checksum->new('crc32c');
+   $sum->add(\$_) for @pieces;    # or $sum->add(\$data)
+   my $value = $sum->base64;       # to send as x-amz-checksum-crc32c
+
+   my $size = AWS::Signature::V4::Checksum->encoded_size('sha256');   # 44
+
+
+=head1 DESCRIPTION
+
+This module computes, a piece at a time, the checksums that S3 accepts
+in the C<x-amz-checksum-*> headers and trailers: C<crc32>, C<crc32c>,
+C<sha1> and C<sha256>. C<crc32> comes from L<Compress::Raw::Zlib>, the SHA
+ones from L<Digest::SHA>, C<crc32c> from L<String::CRC32C> if it is
+installed. Otherwise C<crc32c> is computed in pure Perl, at roughly 12 MB/s:
+install L<String::CRC32C> to use it with big data.
+
+C<crc64nvme> is not provided: for that and any other algorithm, first
+figure out if you I<really> need something that is not provided out of
+the box with one of the alternatives above, then if still convinced
+calculate the value yourself and give it to
+L<AWS::Signature::V4::Chunker/finish>.
+
+You normally do not need to use this module: L<AWS::Signature::V4>
+uses it on your behalf when you pass C<checksum> to
+L<AWS::Signature::V4/sign> or L<AWS::Signature::V4/encoded_length>, and
+the chunker feeds it with the data. B<It is however safe to use it
+directly>, e.g. to compute a checksum in advance and send it as a normal
+header, because it is self-contained and does not depend on any signing
+material. Note that it is not tied to the AWS signature in any way.
+
+
+=head1 INTERFACE
+
+=head2 new
+
+   my $sum = AWS::Signature::V4::Checksum->new($algorithm);
+
+Start a new checksum. C<$algorithm> is one of C<crc32>, C<crc32c>,
+C<sha1> and C<sha256>, in lowercase. Other names are not validated here;
+L<AWS::Signature::V4/sign> checks them before getting to this point, so
+check against L</is_supported_algorithm> if you call this directly.
+
+=head2 add
+
+   $sum->add(\$bytes);
+
+Update the checksum with a piece of data. The argument is a I<reference>
+to a byte string, to avoid copying data around. Return the object, so
+calls can be chained.
+
+It is an error (an L<Ouch> exception with code C<400>) to pass anything
+else than a reference to a defined string, or a string with characters
+that do not fit in a byte: encode them first, e.g. with
+C<Encode::encode('UTF-8', $text)>.
+
+=head2 base64
+
+   my $value = $sum->base64;
+
+Return the checksum of what was added so far, as base64 of the raw
+(big-endian) checksum without line breaks, as AWS wants it. It does not
+consume the object for the CRCs, but for the SHA algorithms it does
+(L<Digest::SHA> resets after C<digest>): call it once, at the end.
+
+=head2 encoded_size
+
+   my $length = AWS::Signature::V4::Checksum->encoded_size($algorithm);
+
+Class method returning the length of the base64 value for an algorithm
+(8 for the CRCs, 28 for C<sha1>, 44 for C<sha256>). It is what
+L<AWS::Signature::V4/encoded_length> needs to work out the size of the
+trailer without having the data.
+
+=head2 is_supported_algorithm
+
+   my $bool = AWS::Signature::V4::Checksum->is_supported_algorithm($name);
+
+Class method returning a (Perl) true/false value indicating whether the
+provided C<$name> is the name of a supported algorithm or not.
+
+=head2 supported_algorithms
+
+   my @list = AWS::Signature::V4::Checksum->supported_algorithms;
+
+Class method returning the sorted list of supported checksum algorithms.
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

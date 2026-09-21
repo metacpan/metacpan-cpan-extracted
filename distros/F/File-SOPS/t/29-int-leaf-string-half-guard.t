@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(write_binary);
 use JSON::MaybeXS qw(decode_json);
 use YAML::XS qw(Load);
 use Scalar::Util qw(dualvar);
@@ -71,7 +71,7 @@ diag("Using sops binary: $sops_bin");
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 my $serial = 0;
@@ -163,7 +163,7 @@ subtest '[yaml] a source spelling YAML writes back faithfully is not refused (so
         is($@, '', "[$key] YAML accepts it") or do { diag("died: $@"); next };
 
         my $file = scratch_file('yaml');
-        write_file($file, $document);
+        write_binary($file, $document);
         my $out = `$sops_bin -d $file 2>&1`;
         is($? >> 8, 0, "[$key] and sops -d accepts the document") or diag("sops: $out");
         my $decoded = eval { Load($out) };
@@ -252,7 +252,7 @@ subtest 'plain ints, including the int64 edges, are unaffected in both formats' 
         is($@, '', "[$format] encrypt accepts every plain int") or do { diag("died: $@"); next };
 
         my $file = scratch_file($format);
-        write_file($file, $document);
+        write_binary($file, $document);
         my $out = `$sops_bin -d $file 2>&1`;
         is($? >> 8, 0, "[$format] sops -d accepts the document") or diag("sops: $out");
         my $decoded = $format eq 'json' ? eval { decode_json($out) } : eval { Load($out) };
@@ -280,7 +280,7 @@ subtest 'the same leaf in an ENCRYPTED slot is unaffected (docs/adr/0008 exempti
         like($document, qr/type:int/, "[$format] labelled type:int");
 
         my $file = scratch_file($format);
-        write_file($file, $document);
+        write_binary($file, $document);
         my $out = `$sops_bin -d $file 2>&1`;
         is($? >> 8, 0, "[$format] sops -d accepts it") or diag("sops: $out");
         my $decoded = $format eq 'json' ? eval { decode_json($out) } : eval { Load($out) };
@@ -314,7 +314,7 @@ subtest 'a decrypted tree re-encrypts in its own format, and is refused in the o
     is($@, '', 'the same tree re-encrypts as YAML') or diag("died: $@");
     if ($again) {
         my $file = scratch_file('yaml');
-        write_file($file, $again);
+        write_binary($file, $again);
         my $out = `$sops_bin -d $file 2>&1`;
         is($? >> 8, 0, 'and sops -d accepts the result') or diag("sops: $out");
     }

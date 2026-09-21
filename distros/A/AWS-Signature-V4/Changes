@@ -1,0 +1,5 @@
+0.001  2026-09-20 22:42:38 CEST
+   - Initial release
+   - Code structure, initial test suites and examples generated with
+     assistance from AI (mainly Anthropic Claude 5), subsequently
+     reviewed, modified and refactoredd by the author.

@@ -1,0 +1,46 @@
+---
+abstract: 'User-Agent agnostic AWS Signatures V4 for credentials and X509'
+author:
+  - 'Flavio Poletti (flavio@polettix.it)'
+build_requires:
+  File::Temp: '0'
+  Test2::V0: '0'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AWS-Signature-V4
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  String::CRC32C: '0'
+requires:
+  Carp: '0'
+  CryptX: '0.091'
+  Digest::SHA: '0'
+  MIME::Base64: '0'
+  Math::BigInt: '0'
+  Moo: '2.005005'
+  Ouch: '0.0501'
+  POSIX: '0'
+  experimental: '0'
+  namespace::clean: '0.27'
+  perl: '5.024'
+version: '0.001'
+x_contributors:
+  - 'Flavio Poletti <flavio@polettix.it>'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: Apache-2.0
+x_static_install: 1

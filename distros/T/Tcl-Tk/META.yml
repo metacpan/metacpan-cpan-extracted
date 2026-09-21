@@ -10,7 +10,7 @@ dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 keywords:
   - Tk
-  - Tcl/Tk/Tix
+  - Tcl/Tk
   - GUI
 license: perl
 meta-spec:
@@ -28,6 +28,6 @@ requires:
   perl: '5.006'
 resources:
   MailingList: mailto:tcltk@perl.org
-  repository: https://github.com/vadrer/perl-tcl-tk.git
-version: '1.51'
+  repository: https://github.com/vadrerko/perl-tcl-tk.git
+version: '1.52'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

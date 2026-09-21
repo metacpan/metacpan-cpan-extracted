@@ -21,7 +21,7 @@ Acme::Parataxis::run(
         Acme::Parataxis->await_read( $client, 1000 );
         my $buf;
         sysread( $client, $buf, 2 );
-        is( $buf, 'HI', 'Socket communication works' );
+        is $buf, 'HI', 'Socket communication works';
         $client->close();
         $listener->close();
         Acme::Parataxis::stop();

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use Scalar::Util qw(dualvar);
 
 use File::SOPS;
@@ -95,7 +95,7 @@ sub scratch {
 sub editor_replacing {
     my ($from, $to) = @_;
     my $path = "$tempdir/editor-" . ++$serial . ".pl";
-    write_file($path, <<"PERL");
+    write_binary($path, <<"PERL");
 #!/usr/bin/env perl
 use strict; use warnings;
 my \$file = shift or die "no file";
@@ -398,13 +398,13 @@ SKIP: {
         unless $sops_bin;
 
     my $keyfile = "$tempdir/age.key";
-    write_file($keyfile, "$secret\n");
+    write_binary($keyfile, "$secret\n");
     local $ENV{SOPS_AGE_KEY_FILE} = $keyfile;
 
     my $encrypt_with_sops = sub {
         my ($dir, $plaintext, $out) = @_;
         $out //= 'yaml';
-        write_file("$dir/p.yaml", $plaintext);
+        write_binary("$dir/p.yaml", $plaintext);
         my $enc = `$sops_bin -e --age $public --input-type yaml --output-type $out $dir/p.yaml 2>&1`;
         return ($? >> 8, $enc);
     };
@@ -419,7 +419,7 @@ SKIP: {
             like($enc, qr/^secret: ENC\[.*type:float\]$/m,
                 "[$token] sops stores it as a type:float");
 
-            write_file("$dir/w.yaml", $enc);
+            write_binary("$dir/w.yaml", $enc);
             my $theirs = `$sops_bin -d --input-type yaml --output-type yaml $dir/w.yaml 2>&1`;
             is($? >> 8, 0, "[$token] sops -d") or diag($theirs);
 
@@ -429,7 +429,7 @@ SKIP: {
                 1;
             }, "[$token] decrypt_file") or diag($@);
 
-            my ($ours_line)   = read_file("$dir/ours.yaml") =~ /^(secret:.*)$/m;
+            my ($ours_line)   = read_binary("$dir/ours.yaml") =~ /^(secret:.*)$/m;
             my ($theirs_line) = $theirs =~ /^(secret:.*)$/m;
             is($ours_line, $theirs_line,
                 "[$token] the leaf line is byte-identical to sops's");
@@ -455,7 +455,7 @@ SKIP: {
             my ($status, $enc) =
                 $encrypt_with_sops->($dir, "secret: $token\nkeep: x\n");
             is($status, 0, "[$token] sops -e") or diag($enc);
-            write_file("$dir/ours.yaml", $enc);
+            write_binary("$dir/ours.yaml", $enc);
 
             local $ENV{EDITOR} = editor_replacing('keep: x', 'keep: y');
             my $rewritten = eval {
@@ -465,7 +465,7 @@ SKIP: {
             ok($rewritten, "[$token] edit saves the change") or do {
                 diag($@); next };
 
-            like(scalar read_file("$dir/ours.yaml"),
+            like(read_binary("$dir/ours.yaml"),
                 qr/^secret: ENC\[.*type:float\]$/m,
                 "[$token] still a type:float, not silently a type:str");
 
@@ -483,12 +483,12 @@ SKIP: {
             my ($status, $enc) =
                 $encrypt_with_sops->($dir, "secret: $token\nkeep: x\n");
             is($status, 0, "[$token] sops -e") or diag($enc);
-            write_file("$dir/theirs.yaml", $enc);
+            write_binary("$dir/theirs.yaml", $enc);
 
             local $ENV{EDITOR} = editor_replacing('keep: x', 'keep: y');
             my $out = `$sops_bin edit $dir/theirs.yaml 2>&1`;
             is($? >> 8, 0, "[$token] sops edit") or diag($out);
-            like(scalar read_file("$dir/theirs.yaml"),
+            like(read_binary("$dir/theirs.yaml"),
                 qr/^secret: ENC\[.*type:float\]$/m,
                 "[$token] keeps the leaf a type:float");
         }
@@ -510,7 +510,7 @@ SKIP: {
             is($status, 0, "[$token] sops -e --output-type json") or diag($enc);
             like($enc, qr/"secret"\s*:\s*"ENC\[[^"]*type:float\]"/,
                 "[$token] sops writes a JSON wire document holding a type:float");
-            write_file("$dir/w.json", $enc);
+            write_binary("$dir/w.json", $enc);
 
             my $theirs = `$sops_bin -d --input-type json --output-type json $dir/w.json 2>&1`;
             is($? >> 8, 4,
@@ -552,7 +552,7 @@ SKIP: {
             my ($status, $enc) =
                 $encrypt_with_sops->($dir, "keep: x\nv_unencrypted: $token\n");
             is($status, 0, "[$token] sops -e") or diag($enc);
-            write_file("$dir/e.yaml", $enc);
+            write_binary("$dir/e.yaml", $enc);
 
             local $ENV{EDITOR} = editor_replacing('keep: x', 'keep: y');
             my $rewritten = eval {

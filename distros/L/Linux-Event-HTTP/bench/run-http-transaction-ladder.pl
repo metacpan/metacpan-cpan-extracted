@@ -18,84 +18,35 @@ use Time::HiRes qw(time sleep);
 $SIG{PIPE} = 'IGNORE';
 
 my %case = (
-    parse => {
-        label => '3a Parsed Request + prebuilt write',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'parse',
-        description => 'Perl input buffer plus pico parse_request/native Request construction; prebuilt response write',
-    },
-    bound => {
-        label => '3b + Response construction',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'bound',
-        description => 'Parsed Request plus Response construction using the request HTTP version; prebuilt response write',
-    },
-    state => {
-        label => '3c + Transaction/body state',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'state',
-        description => 'Response construction plus Transaction activation, production-style bodyless Request completion/state reuse, active assignment, and clear; prebuilt response write',
-    },
-    callbacks => {
-        label => '3d + guarded callbacks',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'callbacks',
-        description => 'Transaction state plus two _invoke_http_callback no-op dispatches; prebuilt response write',
-    },
-    fused => {
-        label => '3e + fused callbacks',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'fused',
-        description => 'Transaction state plus both no-op callbacks under one dispatch flag and eval boundary; prebuilt response write',
-    },
-    eligibility => {
-        label => '3f + native eligibility',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'eligibility',
-        description => 'Fused callbacks plus current native-default Response/Transaction eligibility checks; prebuilt response write',
-    },
-    build => {
-        label => '3g + native wire build',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'build',
-        description => 'Native eligibility plus _HTTP1 build_default_final; generated response write',
-    },
-    mark => {
-        label => '3h + message/output marking',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'mark',
-        description => 'Native wire build plus public scalar Response body, message commit, and Transaction response-output markers; generated response write',
-    },
-    commit => {
-        label => '3i + Transaction completion',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'commit',
-        description => 'Message/output marking plus wire write, Transaction completion checks, active clear, and read-resume check',
-    },
-    complete => {
-        label => '3j + guarded public Response body',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'complete',
-        description => 'Two production-style guarded request callbacks with public Response->body through the private native default-final path',
-    },
-    checked => {
-        label => '3k + production request checks',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'checked',
-        description => 'Guarded public Response body plus production parser eval/error boundary, request-head size guard, and Expect validation',
-    },
-    bodyless => {
-        label => '3l production Connection driver',
-        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-transaction-stage.pl"],
-        stage => 'bodyless',
-        description => 'Actual Server::Connection bodyless request driver and native default-final path using a raw Listener, excluding only the Server convenience wrapper',
-    },
-    http => {
-        label => '4 Full HTTP transaction',
+    current_http => {
+        label => 'C full Server + Content-Type',
         command => [$^X, '-Mblib', "$Bin/servers/linuxevent-http.pl"],
-        description => 'Current Server plus Server::Connection request/response lifecycle with the private native default-final optimization enabled',
+        linuxevent_mode => 'content-type',
+        description => 'Current Server plus production native Server::Connection lifecycle with ordinary Content-Type scalar response',
     },
 );
+
+# Contract 10: keep manual construction diagnostics separate from the
+# production native-input Connection.
+my @production_stages = (
+    [prod_api => 'P1 parse + public Response mutation + prebuilt write',
+        'Manual byte driver: native Request parse, compact Response, public Content-Type/body setters, and prebuilt wire'],
+    [prod_wire => 'P2 + production native scalar wire builder',
+        'P1 plus build_simple_scalar_final validation, generated Content-Length metadata, commit, and wire construction'],
+    [prod_active => 'P3 + minimal active exchange fields',
+        'P2 plus assignment and retirement of the three live exchange fields used by the production Connection'],
+    [prod_connection => 'P4 production native Connection',
+        'Actual Server::Connection with inherited native HTTP input through a raw Listener; no copied HTTP request driver'],
+);
+for my $stage (@production_stages) {
+    my ($name, $label, $description) = @$stage;
+    $case{$name} = {
+        label => $label,
+        description => $description,
+        stage => $name,
+        command => [$^X, '-Mblib', "$Bin/servers/linuxevent-production-stage.pl"],
+    };
+}
 
 my $requests = 100_000;
 my $warmup = 10_000;
@@ -106,6 +57,7 @@ my $repeats = 7;
 my $timeout = 120;
 my $read_budget_bytes = 0;
 my $json_path;
+my $case_list;
 my $smoke = 0;
 my $help = 0;
 
@@ -119,6 +71,7 @@ GetOptions(
     'timeout=f'           => \$timeout,
     'read-budget-bytes=i' => \$read_budget_bytes,
     'json=s'              => \$json_path,
+    'cases=s'             => \$case_list,
     'smoke'               => \$smoke,
     'help'                => \$help,
 ) or usage(2);
@@ -144,7 +97,16 @@ die "timeout must be > 0\n" if $timeout <= 0;
 die "read-budget-bytes must be >= 0\n" if $read_budget_bytes < 0;
 
 my $request_wire = "GET /bench HTTP/1.1\r\nHost: benchmark.test\r\n\r\n";
-my @names = qw(parse bound state callbacks fused eligibility build mark commit complete checked bodyless http);
+my @names = ((map { $_->[0] } @production_stages), 'current_http');
+if (defined $case_list) {
+    my %known = map { $_ => 1 } keys %case;
+    my @selected = grep { length } split /,/, $case_list;
+    die "cases must name at least one benchmark case\n" if !@selected;
+    for my $name (@selected) {
+        die "unknown benchmark case '$name'\n" if !$known{$name};
+    }
+    @names = @selected;
+}
 my @records;
 
 say 'Linux::Event::HTTP transaction lifecycle ladder';
@@ -195,11 +157,11 @@ for my $i (1 .. $#summary) {
 if (defined $json_path) {
     my ($sysname, $nodename, $release, $version, $machine) = uname();
     my %contract = map { $_ => $case{$_}{description} } @names;
-    $contract{common} = 'same raw client, 45-byte GET request wire, persistent loopback TCP sockets, unframed Linux::Event Stream transport, read budget, response payload size, and write transport; parse through checked are cumulative staged costs; bodyless uses the production Server::Connection driver through a raw Listener; full HTTP adds the Server convenience wrapper';
+    $contract{common} = 'same raw client, 45-byte GET request wire, persistent loopback TCP sockets, unframed Linux::Event Stream transport, read budget, response payload size, and write transport; prod stages isolate the actual fused scalar-final builder and current minimal exchange state; prod_dispatch calls production callback/readiness/send; prod_connection uses the unmodified production Connection; current_http adds the Server wrapper; prebuilt wire is a diagnostic only, not an optimization';
 
     my $report = {
         benchmark => 'linux-event-http-transaction-ladder',
-        benchmark_contract_version => 7,
+        benchmark_contract_version => 10,
         generated_at => strftime('%Y-%m-%dT%H:%M:%SZ', gmtime),
         environment => {
             perl => "$^V",
@@ -285,6 +247,11 @@ sub start_server ($name, $port) {
             $ENV{BENCH_TRANSACTION_STAGE} = $case{$name}{stage};
         } else {
             delete $ENV{BENCH_TRANSACTION_STAGE};
+        }
+        if (defined $case{$name}{linuxevent_mode}) {
+            $ENV{BENCH_LINUXEVENT_MODE} = $case{$name}{linuxevent_mode};
+        } else {
+            delete $ENV{BENCH_LINUXEVENT_MODE};
         }
         open STDOUT, '>', $stdout_path or POSIX::_exit(126);
         open STDERR, '>', $stderr_path or POSIX::_exit(126);
@@ -520,15 +487,16 @@ Options:
   --read-budget-bytes=N   Linux::Event Stream read budget (default 0)
   --timeout=N             per-phase timeout seconds (default 120)
   --json=PATH             write machine-readable report
+  --cases=LIST            comma-separated benchmark cases to run
   --smoke                 tiny one-repeat validation run
   --help                  show this help
 
-The stages cumulatively decompose the cost between a parsed Request with a
-prebuilt response and the full Server/Server::Connection HTTP lifecycle. The
-bodyless stage uses the production Server::Connection driver directly through a
-raw Listener, while the final HTTP stage adds the Server convenience wrapper.
-All stages use the same raw client and Linux::Event Stream transport; this
-benchmark adds no new XS/C implementation.
+The current ladder keeps manual construction diagnostics separate from the
+production HTTP input path. prod_api, prod_wire, and prod_active use a plain
+IO::Sock::Stream byte driver so they can isolate Response construction and wire
+building without pretending to be HTTP Connection subclasses. prod_connection
+uses the actual production Server::Connection with inherited native HTTP input,
+and current_http adds the Server convenience wrapper.
 USAGE
     exit $exit;
 }

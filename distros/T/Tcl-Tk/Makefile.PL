@@ -63,19 +63,10 @@ EOS
     unless ($res =~ /^ok3/m) {
         warn <<EOS;
 
-Your Tk installation fails to find 'tklib' package. This package is recommended,
-otherwise we'll substitute some older version.
-Be informed on this and better have this package installed within your Tcl/Tk.
-EOS
-    }
-
-    unless ($res =~ /^ok4/m) {
-        warn <<EOS;
-
-Your Tk installation fails to find 'tile' package. This package is highly
-recommended, otherwise no 'scrolled_text' and 'scrolled_canvas' widgets will be
-available. Probably it will be in some future, but you'll better ensure than
-you have 'tile' package installed. (ttk widgets)
+Your Tcl/Tk installation lacks the 'tklib' package. This package is highly
+recommended because it provides 'tooltip::tooltip' for widget hints. You
+can ignore this warning if you either have tooltip::tooltip on your system
+or do not plan to use this functionality.
 EOS
     }
 }
@@ -91,15 +82,15 @@ WriteMakefile(
         resources => {
             repository => {
                 type => 'git',
-                web => 'https://github.com/vadrer/perl-tcl-tk',
-                url => 'https://github.com/vadrer/perl-tcl-tk.git',
+                web => 'https://github.com/vadrerko/perl-tcl-tk',
+                url => 'https://github.com/vadrerko/perl-tcl-tk.git',
             },
             MailingList => 'mailto:tcltk@perl.org',
         },
 	no_index => {
 	  directory=>[qw(demos tk-demos)]
 	},
-	keywords => [qw(Tk Tcl/Tk/Tix GUI)],
+	keywords => [qw(Tk Tcl/Tk GUI)],
     },
     PREREQ_PM => {
 	Tcl => 1.11, # this is required, otherwise $int->Eval(">500octets") silently misbehaves

@@ -134,6 +134,8 @@ Getty-authored (non-exhaustive): `Langertha`, `IO::K8s`, `Kubernetes::REST`, `WW
 Every distribution ships a `Changes` file with a `{{$NEXT}}` token at the top (Dist::Zilla's `[NextRelease]` fills it at release time).
 
 - **Add a bullet under `{{$NEXT}}` in the SAME commit as any user-facing change** — new bindings, behaviour changes, bug fixes, deprecations. If a CPAN consumer would notice, it belongs there.
+- **Measured against the last RELEASE, not the last commit.** "Would a consumer notice?" is asked against the version on CPAN. Something broken *and* fixed while unreleased was never visible to anyone and gets no bullet, however many commits it cost — a dependency floor corrected before it shipped, a rename that never left the branch, a bug the new test found. A changelog is the difference between two releases, not a work log.
+- **Before the FIRST release there is no "no longer".** A distribution with nothing on CPAN has a `{{$NEXT}}` that says what the thing IS, not how it came to be. "no longer", "used to", "previously", "instead of" are wrong by construction there — the reader has never seen the old behaviour. Write that block as one document when the release is cut, not bullet by bullet along the way.
 - **Match the existing style:** two-space indent, `  - ` bullets, wrap near 78 columns, present-tense imperative ("New binding X", "Fix Y on macOS").
 - **One topic, one bullet, one to three lines** — touching an area again rewrites the bullet that is already there instead of adding a second. Wording and length: `getty-git-commit-style`.
 - **Skip pure dev-tooling noise** — skill hardlinks, editor config, internal CI refactors. A CI fix that unbreaks the build for everyone IS worth a line.

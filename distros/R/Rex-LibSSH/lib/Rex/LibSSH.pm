@@ -1,7 +1,7 @@
 # ABSTRACT: Rex connection backend using Net::LibSSH (no SFTP required)
 
 package Rex::LibSSH;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ Rex::LibSSH - Rex connection backend using Net::LibSSH (no SFTP required)
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -78,14 +78,46 @@ Or pass keys directly to C<Rex::connect>:
       auth_type   => 'key',
   );
 
-Host key checking is disabled by default (C<strict_hostkeycheck =E<gt> 0>)
-to avoid blocking non-interactive deploys. To enable it, pass the option
-when connecting:
+=head2 Host key verification
 
+The server's host key is verified against C<known_hosts> by default, exactly
+like an interactive C<ssh> client but without the prompt: an unknown or
+changed key makes the connection fail before any authentication is
+attempted. Requires L<Net::LibSSH> 0.004 or later — earlier versions of
+Rex::LibSSH never verified the host key regardless of what was passed
+(CWE-322).
+
+Precedence: a C<strict_hostkeycheck> option passed to C<Rex::connect> wins
+(C<0> or C<1>); otherwise C<< Rex::Config->get_openssh_opt() >>'s
+C<StrictHostKeyChecking> is consulted — C<no> or C<off> (case-insensitive)
+turns verification off, anything else or unset leaves it on. C<< use Rex
+-feature => ['disable_strict_host_key_checking'] >> sets exactly that
+C<openssh_opt>, so the Rexfile-wide flag the C<OpenSSH> backend honours
+works here too.
+
+The C<known_hosts> file is, in order: the C<knownhosts> connect option, then
+C<openssh_opt>'s C<UserKnownHostsFile>, then libssh's own default
+(F<~/.ssh/known_hosts>). A host reached on a non-standard port needs the
+C<[host]:port> form in C<known_hosts>. Nothing is ever written to
+C<known_hosts> by this backend — add a host out of band first
+(C<ssh-keyscan>), or turn verification off explicitly:
+
+  # Rexfile-wide, same flag the OpenSSH backend honours
+  use Rex -feature => ['1.4', 'disable_strict_host_key_checking'];
+
+  # or per connection
   Rex::connect(
-      server            => '10.0.0.1',
-      strict_hostkeycheck => 1,
+      server              => '10.0.0.1',
+      strict_hostkeycheck => 0,
+      knownhosts          => '/path/to/known_hosts',   # optional
   );
+
+An unknown or changed key makes C<Rex::connect> die with C<"Connection error
+or refused.">; inside a task Rex reports C<"Couldn't connect to
+$server.">. The underlying reason from L<Net::LibSSH> (e.g. C<"host key is
+not in known_hosts and strict_hostkeycheck is on">, or C<"host key has
+changed from the known_hosts entry -- possible man-in-the-middle attack">)
+is logged as a C<warn>-level line that also names the opt-out.
 
 =head1 SEE ALSO
 

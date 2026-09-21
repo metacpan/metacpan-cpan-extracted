@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use Scalar::Util qw(dualvar);
 use YAML::XS ();
 
@@ -40,7 +40,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 # A scalar exactly as YAML::XS hands it to the parse path. Use this to write a
@@ -60,7 +60,7 @@ sub round_trip_yaml {
     my $spelling = $args{spelling};
 
     my $pt_file = "$tempdir/in-$spelling.yaml";
-    write_file($pt_file, "mode_unencrypted: $spelling\ns: x\n");
+    write_binary($pt_file, "mode_unencrypted: $spelling\ns: x\n");
 
     my $enc_file = "$tempdir/enc-$spelling.yaml";
     File::SOPS->encrypt_file(
@@ -77,9 +77,7 @@ sub round_trip_yaml {
 
 sub read_decrypted {
     my ($file) = @_;
-    my $content = read_file($file);    # File::Slurp returns a list without
-                                        # an explicit scalar assignment, so
-                                        # capture in scalar context.
+    my $content = read_binary($file);
     return YAML::XS::Load($content);
 }
 
@@ -106,7 +104,7 @@ subtest 'a reparable spelling reparsed out of an encrypted document is Go\'s int
     {
         local $SIG{__WARN__} = sub { push @warnings, $_[0] };
         my $pt_file = "$tempdir/silent-0755.yaml";
-        write_file($pt_file, "mode_unencrypted: 0755\ns: x\n");
+        write_binary($pt_file, "mode_unencrypted: 0755\ns: x\n");
         File::SOPS->encrypt_file(
             input => $pt_file, output => "$tempdir/silent-enc.yaml",
             recipients => [$public]);
@@ -190,7 +188,7 @@ subtest 'an unparsed spelling is left alone -- the predicate gates on SVf_IOK an
             "spelling '$spelling' has no IV -- the predicate skips it");
 
         my $pt_file = "$tempdir/unparsed-in-$spelling.yaml";
-        write_file($pt_file, "mode_unencrypted: $spelling\ns: x\n");
+        write_binary($pt_file, "mode_unencrypted: $spelling\ns: x\n");
         my $enc_file = "$tempdir/unparsed-enc-$spelling.yaml";
         File::SOPS->encrypt_file(
             input => $pt_file, output => $enc_file,
@@ -278,7 +276,7 @@ SKIP: {
             { spelling => '017',  go => 15  },
         ) {
             my $pt_file = "$tempdir/bin-in-$case->{spelling}.yaml";
-            write_file($pt_file, "mode_unencrypted: $case->{spelling}\ns: x\n");
+            write_binary($pt_file, "mode_unencrypted: $case->{spelling}\ns: x\n");
 
             my $enc_file = "$tempdir/bin-enc-$case->{spelling}.yaml";
             File::SOPS->encrypt_file(
@@ -295,7 +293,7 @@ SKIP: {
             # plaintext), and reads the same integer out of it. The byte-level
             # claim is that the encrypted document is interchangeable: sops
             # reads 493 here, f-sops reads 493 here, both verify.
-            my $enc_content = read_file($enc_file);    # scalar context
+            my $enc_content = read_binary($enc_file);    # scalar context
             my $ours = File::SOPS->decrypt(
                 encrypted => $enc_content,
                 identities => [$secret]);

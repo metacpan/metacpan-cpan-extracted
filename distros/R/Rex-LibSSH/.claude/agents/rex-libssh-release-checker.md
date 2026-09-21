@@ -71,7 +71,7 @@ releases. **Never** run `dzil release` or upload to CPAN.
 
 ## Downstream — this distribution is an upstream
 
-`Rex::GPU` (`~/dev/perl/getty-rex-gpu`) and `Rex::Rancher` (`~/dev/perl/getty-rex-rancher`) both
+`Rex::GPU` (`~/dev/perl/rex-gpu`) and `Rex::Rancher` (`~/dev/perl/rex-rancher`) both
 carry `recommends 'Rex::LibSSH'` and drive Hetzner dedicated servers through it. They
 recommend rather than pin, so a release here does not stale a version pin — but a
 behaviour change in `run`, `file` or `upload` reaches their production deploys with no

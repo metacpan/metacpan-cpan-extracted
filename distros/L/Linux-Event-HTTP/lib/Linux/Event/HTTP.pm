@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 1;
 
@@ -15,7 +15,7 @@ Linux::Event::HTTP - native HTTP protocol support for Linux::Event
 
 =head1 VERSION
 
-Version 0.001
+Version 0.002
 
 =head1 DESCRIPTION
 

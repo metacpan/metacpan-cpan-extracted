@@ -4,11 +4,42 @@ use warnings;
 
 use Test::More;
 use Linux::Event::HTTP::Response;
+use Linux::Event::HTTP::_HTTP1 ();
 
 my $class = 'Linux::Event::HTTP::Response';
 ok($class->can('new'), 'Response exposes a public message constructor');
 
 my $response = $class->new(status => 200);
+
+my $server_request = Linux::Event::HTTP::_HTTP1->parse_request(
+    "GET / HTTP/1.1\r\nHost: example.test\r\n\r\n",
+);
+my $server_default = $class->_new_server_default($server_request);
+is($server_default->status, 200,
+    'trusted server Response exposes implicit default status');
+is($server_default->version, '1.1',
+    'trusted server Response exposes implicit HTTP/1.1 version');
+is($server_default->header_count, 0,
+    'trusted server Response exposes implicit empty headers');
+is(
+    $server_default->_serialize_head('1.1'),
+    "HTTP/1.1 200 OK\r\n\r\n",
+    'trusted server Response serializes implicit defaults',
+);
+$server_default->add_header('X-Test', 'yes');
+is($server_default->status, 200,
+    'metadata mutation preserves implicit default status');
+is($server_default->version, '1.1',
+    'metadata mutation preserves implicit server version');
+is($server_default->header('X-Test'), 'yes',
+    'trusted server Response materializes header storage on mutation');
+
+my $server_request_10 = Linux::Event::HTTP::_HTTP1->parse_request(
+    "GET / HTTP/1.0\r\n\r\n",
+);
+my $server_default_10 = $class->_new_server_default($server_request_10);
+is($server_default_10->version, '1.0',
+    'compact server Response preserves HTTP/1.0 version');
 
 is($response->status, 200, 'status getter returns initial status');
 ok(!defined $response->reason, 'reason is optional');
@@ -93,6 +124,37 @@ is_deeply(
 );
 is($response->header_name(0), 'Content-Type',
     'header replacement retains first matching field position');
+
+my $duplicate_replace = $class->new(
+    headers => [
+        [ 'X-Dupe', 'first' ],
+        [ 'X-Keep', 'middle' ],
+        [ 'x-dupe', 'second' ],
+        [ 'X-Last', 'last' ],
+    ],
+);
+$duplicate_replace->header('X-Dupe', 'final');
+is_deeply(
+    $duplicate_replace->header_values('x-dupe'),
+    [ 'final' ],
+    'header setter collapses duplicate same-name fields',
+);
+is_deeply(
+    [
+        map {
+            [
+                $duplicate_replace->header_name($_),
+                $duplicate_replace->header_value($_),
+            ]
+        } 0 .. $duplicate_replace->header_count - 1
+    ],
+    [
+        [ 'X-Dupe', 'final' ],
+        [ 'X-Keep', 'middle' ],
+        [ 'X-Last', 'last' ],
+    ],
+    'duplicate replacement preserves the first field position and unrelated order',
+);
 
 $response->remove_header('Set-Cookie');
 is_deeply(

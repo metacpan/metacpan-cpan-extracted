@@ -288,6 +288,13 @@ static SV      *hm_empty_input;     /* shared empty psgi.input */
 #ifndef _WIN32
 static pid_t    hm_children[1024];  /* the supervisor's pool (POSIX only) */
 static time_t   hm_child_start[1024];
+/* The WORKER INDEX each of those was forked with, which is not its position
+ * here: this array is kept packed by swapping the last entry down over a
+ * departed one, so a position means nothing beyond "somebody lives here". The
+ * index is an identity - it picks the worker's waker slot and its CPU - so it
+ * has to travel with the child rather than be recomputed from where the child
+ * happens to sit. */
+static int      hm_child_widx[1024];
 static int      hm_nchildren = 0;
 #endif
 static UV       hm_id_counter = 0;
@@ -4040,8 +4047,37 @@ static void hm_bus_worker_attach(pTHX_ hm_loop *loop) {
      * Left alone it either replays what the parent already handled or skips
      * what it has not. From now on. */
     hm_sa_bus_reset_cursors();
+
+    /* THE LAST WORD ON WHETHER THIS PROCESS CAN BE WOKEN.
+     *
+     * hm_spawn asks for a slot by worker index, which is what keeps two
+     * workers off one descriptor. It can come back empty-handed: the index it
+     * asked for may still be held by a worker that is draining after a HUP,
+     * and single-worker mode never goes through hm_spawn at all. Either way
+     * the process ends up with no descriptor.
+     *
+     * Before this, that was the end of it - no watch was installed and this
+     * worker never dispatched again, so a published invalidation or room
+     * broadcast reached every worker but this one, for as long as it ran, with
+     * nothing in any statistic to say so. Single-worker mode never delivered
+     * to its own subscribers at all.
+     *
+     * So take whatever is going rather than go deaf. Which slot a worker holds
+     * has never mattered; holding one is the whole of it. */
     fd = hm_sa_bus_waker_fd();
-    if (fd < 0) return;
+    if (fd < 0) {
+        (void)hm_sa_bus_waker_take(-1);
+        fd = hm_sa_bus_waker_fd();
+    }
+    if (fd < 0) {
+        /* Say so. A worker that cannot be woken still serves requests, and the
+         * bus degrades to what it is without a ring, but an operator reading
+         * "pool" in a cache's statistics would otherwise be told this pool is
+         * coherent when one of its members cannot hear a word. */
+        warn("Hyperman: worker %ld has no wakeup descriptor and will not "
+             "receive published messages; raise the waker count", (long)getpid());
+        return;
+    }
     hm_add_io_watch_c(aTHX_ loop, fd, HM_EV_READ, hm_bus_wake_cb, NULL);
     /* Anything published between the fork and this attach is already on the
      * ring with no poke coming, because nothing was watching to be poked. */
@@ -4248,8 +4284,14 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
     /* ... and the wakeup descriptors, HERE for the same reason as the ring
      * and one more: a pipe created inside a worker is invisible to its
      * siblings, so a bus built after the fork delivers to some workers and
-     * not others. One extra waker for the supervisor's own slot. */
-    (void)hm_sa_bus_wake_init((uint32_t)(workers > 0 ? workers + 1 : 2));
+     * not others.
+     *
+     * TWO GENERATIONS' WORTH, plus the supervisor's own. A HUP or USR2 forks
+     * the replacement pool while the old one is still draining, so both exist
+     * at once and both want descriptors - and sized for one generation the
+     * fresh workers found every slot held and came up deaf, which outlives the
+     * recycle that caused it. Shared::Arena caps this at its own ceiling. */
+    (void)hm_sa_bus_wake_init((uint32_t)(workers > 0 ? 2 * workers + 1 : 2));
     /* The worker scoreboard, one row per worker plus one, and the
      * distinct-client sketch when asked for. Neither is on a hot path by
      * default: the board is mirrored by a timer, the sketch is opt-in. */
@@ -4377,6 +4419,7 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                 croak("Hyperman: fork: %s", strerror(errno));
             }
             hm_child_start[hm_nchildren] = time(NULL);
+            hm_child_widx[hm_nchildren]  = i;
             hm_children[hm_nchildren++] = pid;
         }
 
@@ -4445,9 +4488,11 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                 if (hm_sup_hup) {
                     pid_t  old[1024];
                     time_t old_start[1024];
+                    int    old_widx[1024];
                     int nold = hm_nchildren, nfresh = 0;
                     memcpy(old, hm_children, nold * sizeof(pid_t));
                     memcpy(old_start, hm_child_start, nold * sizeof(time_t));
+                    memcpy(old_widx, hm_child_widx, nold * sizeof(int));
                     hm_sup_hup = 0;
                     hm_nchildren = 0;
                     for (i = 0; i < workers; i++) {
@@ -4457,6 +4502,7 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                         pid_t pid = hm_spawn(aTHX_ cfg, i);
                         if (pid < 0) continue;
                         hm_child_start[hm_nchildren] = time(NULL);
+                        hm_child_widx[hm_nchildren]  = i;
                         hm_children[hm_nchildren++]  = pid;
                         nfresh++;
                     }
@@ -4468,6 +4514,7 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                             kill(old[i], SIGTERM);   /* drain gracefully */
                         } else {
                             hm_child_start[hm_nchildren] = old_start[i];
+                            hm_child_widx[hm_nchildren]  = old_widx[i];
                             hm_children[hm_nchildren++]  = old[i];
                         }
                     }
@@ -4480,13 +4527,16 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                  * immediately. */
                 while ((pid = waitpid(-1, &st, WNOHANG)) > 0) {
                     int live = 0;
+                    int dead_widx = 0;
                     time_t started = 0;
                     for (i = 0; i < hm_nchildren; i++) {
                         if (hm_children[i] == pid) {
-                            started = hm_child_start[i];
+                            started   = hm_child_start[i];
+                            dead_widx = hm_child_widx[i];
                             hm_nchildren--;
                             hm_children[i]    = hm_children[hm_nchildren];
                             hm_child_start[i] = hm_child_start[hm_nchildren];
+                            hm_child_widx[i]  = hm_child_widx[hm_nchildren];
                             live = 1;
                             break;
                         }
@@ -4507,10 +4557,27 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
                         }
                     }
                     {
+                        /* The replacement takes the DEAD worker's index, not
+                         * the position it is about to occupy here.
+                         *
+                         * Those are different numbers, because the array above
+                         * is kept packed by swapping the last entry down: kill
+                         * the worker at position 0 of three and the survivor
+                         * from position 2 moves into it, so the next free
+                         * position is 2 - an index a LIVE worker still holds.
+                         * Spawned with that, the replacement asked for a waker
+                         * slot its own sibling owned, was refused, and ran
+                         * deaf to the bus for the rest of its life while the
+                         * slot its predecessor had died holding went spare. It
+                         * was pinned to that sibling's CPU too.
+                         *
+                         * So identity comes from the child that left, and only
+                         * the bookkeeping position is reused. */
                         int slot = hm_nchildren;
-                        pid_t fresh = hm_spawn(aTHX_ cfg, slot);
+                        pid_t fresh = hm_spawn(aTHX_ cfg, dead_widx);
                         if (fresh > 0) {            /* never record a -1 */
                             hm_child_start[slot] = time(NULL);
+                            hm_child_widx[slot]  = dead_widx;
                             hm_children[slot]    = fresh;
                             hm_nchildren = slot + 1;
                         }

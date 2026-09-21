@@ -43,10 +43,24 @@
  * that this dist's correctness rests on the poke following the commit, and a
  * comment claiming otherwise would be describing somebody else's code.
  *
- * Needs sa_arena.h.
+ * ---- a slot outlives its owner ---------------------------------------------
+ *
+ * Nothing releases a slot on the way out. `sa_wake_leave` is reached from
+ * `sa_abi_release`, and a worker that is killed by its supervisor, crashes, or
+ * simply `_exit`s runs no such thing - so `live` stays set for a process that
+ * no longer exists, and the next taker of that index is refused.
+ *
+ * That refusal is silent and permanent: the caller gets -1, has no descriptor
+ * to watch, and never reads the ring again. Under a prefork server it means
+ * the replacement for a crashed worker is deaf to every publish for the rest
+ * of its life, while every statistic still reports a healthy pool. So a take
+ * RECLAIMS a slot whose owner is gone - see sa_wake_reclaim.
+ *
+ * Needs sa_arena.h and sa_peer.h (for sa_pid_alive / sa_getpid).
  */
 
 #include "sa/sa_arena.h"
+#include "sa/sa_peer.h"
 
 #ifndef _WIN32
 #  include <unistd.h>
@@ -262,6 +276,31 @@ static int sa_wake_attach(sa_region *r) {
 #endif
 }
 
+/* Take over a slot whose owner has died. 1 if this process now owns it.
+ *
+ * The handoff is a CAS on the OWNER rather than on `live`, for two reasons.
+ * Two processes reclaiming the same dead slot must not both win, and one of
+ * them has to lose on the same word it read. And clearing `live` first would
+ * publish the slot as free for as long as it took to take it again, which is
+ * the one state a third process could step into.
+ *
+ * A REUSED pid reads as alive and the slot is left alone. That costs a waker
+ * and leaves a reader polling, which is what an attached process already gets;
+ * the other direction would hand one process's pipe to another. The peer
+ * table makes the same trade in the other direction for the same reason. */
+static int sa_wake_reclaim(sa_waker *w) {
+#if defined(_WIN32) || !SA_HAVE_ATOMICS
+    (void)w;
+    return 0;
+#else
+    uint64_t owner;
+    if (!sa_at_load32_acq(&w->live)) return 0;   /* free: nothing to reclaim */
+    owner = sa_at_load64_acq(&w->owner);
+    if (!owner || sa_pid_alive(owner)) return 0;
+    return sa_at_cas64(&w->owner, owner, sa_getpid());
+#endif
+}
+
 static int sa_wake_take(sa_region *r, int idx) {
 #if defined(_WIN32) || !SA_HAVE_ATOMICS
     (void)r; (void)idx;
@@ -286,11 +325,20 @@ static int sa_wake_take(sa_region *r, int idx) {
     if (idx >= 0) {
         i = (uint32_t)idx;
         if (i >= sa_wake_n(hp)) return -1;
-        if (!sa_at_cas32(&w[i].live, 0, 1)) return -1;
+        /* Free, or held by a process that is gone. A prefork supervisor hands
+         * a respawned worker the SAME index its predecessor died holding, so
+         * without the reclaim that worker never gets a descriptor. */
+        if (!sa_at_cas32(&w[i].live, 0, 1) && !sa_wake_reclaim(&w[i]))
+            return -1;
     }
     else {
         for (i = 0; i < sa_wake_n(hp); i++)
             if (sa_at_cas32(&w[i].live, 0, 1)) break;
+        /* Only once nothing is actually free: a dead owner's slot is worth
+         * having, but not ahead of one nobody has ever taken. */
+        if (i >= sa_wake_n(hp))
+            for (i = 0; i < sa_wake_n(hp); i++)
+                if (sa_wake_reclaim(&w[i])) break;
         if (i >= sa_wake_n(hp)) return -1;
     }
 

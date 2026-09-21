@@ -1,0 +1,108 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Acme::Parataxis::Future - A placeholder for an eventual computation result
+
+=head1 SYNOPSIS
+
+    use Acme::Parataxis::Future;
+
+    my $future = Acme::Parataxis::Future->new;
+
+    # Register a callback
+    $future->on_ready(sub ($f) {
+        say 'Result: ' . $f->result;
+    });
+
+    # Set the result (from another fiber)
+    $future->set_result(42);
+
+    # Await in a fiber (suspends until ready)
+    my $value = $future->await;
+
+=head1 DESCRIPTION
+
+A common pattern for lightweight concurrency abstractions. A future represents a value that will be available at some
+point in the future. Futures are used to coordinate between fibers: one fiber produces a result via C<set_result> or
+C<set_error>, and one or more consumers retrieve it via C<result> or C<await>.
+
+A future transitions from not-ready to ready exactly once. Attempting to set the result or error on an already-ready
+future throws an exception.
+
+=head1 CONSTRUCTOR
+
+=head2 C<new()>
+
+    my $future = Acme::Parataxis::Future->new();
+
+Creates a new, not-ready Future.
+
+=head1 METHODS
+
+=head2 C<is_ready()>
+
+    my $ready = $future->is_ready;
+
+Returns true if the future has been resolved (via C<set_result> or C<set_error>).
+
+=head2 C<result()>
+
+    my $val = $future->result;
+
+Returns the result value immediately. Croaks if the future is not yet ready. Use C<is_ready> to check first, or
+C<await> to suspend until the value is available. Dies with the stored error if the future was resolved via
+C<set_error>.
+
+=head2 C<set_result( $value )>
+
+    $future->set_result($val);
+
+Resolve the future with a result value. Fires any registered C<on_ready> callbacks. Dies if the future is already
+ready.
+
+=head2 C<set_error( $error )>
+
+    $future->set_error($err);
+
+Resolve the future with an error. Fires any registered C<on_ready> callbacks. Dies if the future is already ready.
+
+=head2 C<clear_result()>
+
+    $future->clear_result();
+
+Clear the stored result and error, resetting the future to a not-ready state. Any registered callbacks and waiters are
+discarded, so the future may be resolved and awaited again (recycling).
+
+=head2 C<on_ready( $callback )>
+
+    $future->on_ready(sub { my ($f) = @_; ... });
+
+Register a callback to be invoked when the future becomes ready. If the future is already ready, the callback fires
+immediately. The callback receives the future object as its argument.
+
+=head2 C<await()>
+
+    my $val = $future->await;
+
+Suspend the current fiber until the future is ready. Returns the result on success; dies if the future was resolved
+with an error via C<set_error>. If the future is already ready, returns immediately without blocking.
+
+Must be called from inside a running fiber (that is, while the C<Acme::Parataxis> scheduler is active); awaiting a
+not-yet-ready future from the mainline will croak. Multiple fibers may await the same future at once; each is resumed
+when it becomes ready.
+
+=head1 AUTHOR
+
+Sanko Robinson L<https://github.com/sanko>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2.
+
+=cut

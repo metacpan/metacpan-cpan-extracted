@@ -37,7 +37,10 @@ task 'deploy', '10.0.0.1', sub {
 
 ## Key Details
 
-- `strict_hostkeycheck => 0` by default (non-interactive deploys)
+- Host key verified against `known_hosts` by default; opt out per-connection
+  with `strict_hostkeycheck => 0` or Rexfile-wide with
+  `-feature => ['disable_strict_host_key_checking']` (CWE-322 fix, requires
+  Net::LibSSH >= 0.004)
 - Public key auth via `Rex::Config->set_private_key` / `set_public_key`
 - No SFTP subsystem needed on remote host
 - Used by Rex::Rancher and Rex::GPU for Hetzner dedicated server deployments

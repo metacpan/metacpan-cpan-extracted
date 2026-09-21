@@ -213,8 +213,7 @@ ignored.
 ## Dependencies
 
 Sketch only — `cpanfile` is the truth, and it is longer (YAML::PP for the
-order-preserving reparse, the core modules declared explicitly because there is no
-AutoPrereqs).
+order-preserving reparse, Cpanel::JSON::XS for the JSON wire bytes).
 
 ```perl
 requires 'Crypt::Age';        # age encryption backend

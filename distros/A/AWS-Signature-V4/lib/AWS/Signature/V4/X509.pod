@@ -1,0 +1,146 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+AWS::Signature::V4::X509 - The certificate-based variant of AWS Signature V4
+
+
+=head1 VERSION
+
+This module is part of the L<AWS::Signature::V4> distribution and shares
+its version.
+
+
+=head1 SYNOPSIS
+
+   # you do not create it: AWS::Signature::V4 does, from "x509"
+   use AWS::Signature::V4;
+
+   my $s = AWS::Signature::V4->new(
+      service => 'rolesanywhere', region => 'us-east-1',
+      x509 => {
+         key_type         => 'RSA',
+         certificate_file => 'cert.pem',
+         private_key_file => 'key.pem',
+      },
+   );
+
+
+=head1 DESCRIPTION
+
+This class implements the variant of the algorithm that uses an X.509
+certificate, as required by IAM Roles Anywhere
+(C<AWS4-X509-RSA-SHA256> or C<AWS4-X509-ECDSA-SHA256>): the signature is
+made with the private key of the certificate, and the certificate, and
+its chain, travel with the request.
+
+B<You are not supposed to use this module directly.>
+L<AWS::Signature::V4> creates an object when it is given the C<x509>
+option, using the same keys, and calls the methods below. All the options
+(C<key_type>, C<certificate>, C<certificate_file>, C<chain>,
+C<chain_files>, C<serial>, C<signer>, C<private_key_file>, C<private_key>
+and C<private_key_password>) are described in L<AWS::Signature::V4/new>;
+each one but C<private_key> and C<private_key_password> (see below) is
+available as a read-only accessor. C<key_type> is the type of
+the key, C<RSA> or C<ECDSA>, and it is what makes the L</algorithm> the
+name AWS knows. The class is documented for those who work on the
+distribution, not as a public interface.
+
+The constructor loads and checks everything: it reads the files, decodes
+the certificates (PEM or DER) and finds the serial number, and loads the
+key with L<CryptX> unless a C<signer> is provided. Any problem is reported
+by an L<Ouch> exception with code C<400>, so it is seen when the signer is
+created and not when the first request is signed. It does not check that
+the certificate is valid otherwise, or that the key matches it: only
+that each certificate is a DER SEQUENCE (definite, minimal lengths) that
+fills its data exactly. The error of L<CryptX> about the key goes in the
+message without its location or backtrace, which may hold the password,
+and escaped, as it may hold the file name.
+
+C<private_key> and C<private_key_password> have no public accessor and are
+dropped as soon as the key is loaded, so that the object does not keep
+them around.
+
+
+=head1 THE INTERFACE OF A VARIANT
+
+L<AWS::Signature::V4> talks to the variant in use, this class or its
+sibling, through the same few methods, so that it does not need to know
+which one it is dealing with. The scope is what appears in the
+C<Credential> and in the string to sign, like
+C<20150830/us-east-1/iam/aws4_request>.
+
+=head1 INTERFACE
+
+=head2 algorithm
+
+   my $name = $variant->algorithm;    # AWS4-X509-RSA-SHA256
+
+The name depends on the type of the key.
+
+=head2 credential_id
+
+   my $id = $variant->credential_id;
+
+The serial number of the certificate, in decimal, or the C<serial> option
+if it was provided.
+
+=head2 signature
+
+   my $hex = $variant->signature($scope, $string_to_sign);
+
+The hexadecimal signature of the string to sign, as computed by the
+private key (or the C<signer>): PKCS#1 v1.5 for RSA, DER for ECDSA, both
+with SHA-256. The C<signer> must return the raw bytes, which are
+hex-encoded as they are: a signature in base64 or hex has to be decoded
+first. The scope is not used. If the C<signer> returns something
+that is not a non-empty byte string, it throws an L<Ouch> exception with
+code C<400>.
+
+=head2 signing_key
+
+Always throws an L<Ouch> exception with code C<400>: there is no key
+derived from a secret in this variant, so signed chunks are not possible.
+
+=head2 can_sign_chunks
+
+False, for the same reason. Unsigned chunks work with this variant.
+
+=head2 extra_fields
+
+   my @pairs = $variant->extra_fields;
+
+What goes with the request besides the signature, as a list of
+C<< name => value >> pairs, named as query parameters (the caller
+lowercases them to make headers): the certificate as C<X-Amz-X509>, in
+base64, and the chain as C<X-Amz-X509-Chain>, a comma-separated list of
+certificates in base64, if there is a chain.
+
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

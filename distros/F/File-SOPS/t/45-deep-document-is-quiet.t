@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(write_binary);
 use YAML::XS ();
 
 use File::SOPS;
@@ -56,7 +56,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 # A chain of mappings, $containers deep, one scalar at the bottom.
@@ -303,7 +303,7 @@ SKIP: {
     # is quadratic in the depth. It was measured by hand and is recorded in
     # docs/adr/0029.
     my $flow = "a: " . ('{a: ' x 10_001) . 'v' . ('}' x 10_001) . "\n";
-    write_file("$tempdir/too-deep.yaml", $flow);
+    write_binary("$tempdir/too-deep.yaml", $flow);
     my $out = `$sops_bin -e --age $public $tempdir/too-deep.yaml 2>&1`;
     like($out, qr/exceeded max depth of 10000/,
         'sops refuses 10002 containers of YAML, one past what it accepts');
@@ -311,7 +311,7 @@ SKIP: {
     # And the JSON half, which is one level tighter and is the reason the bound
     # here is 10000 rather than go-yamls 10001.
     my $json = ('{"a": ' x 10_001) . '"v"' . ('}' x 10_001) . "\n";
-    write_file("$tempdir/too-deep.json", $json);
+    write_binary("$tempdir/too-deep.json", $json);
     my $json_out = `$sops_bin -e --age $public $tempdir/too-deep.json 2>&1`;
     like($json_out, qr/exceeded max depth/,
         'and Gos JSON encoder refuses 10001 containers, one level sooner');
@@ -328,7 +328,7 @@ SKIP: {
             format     => 'yaml',
         );
     };
-    write_file("$tempdir/deep-1000.enc.yaml", $deep);
+    write_binary("$tempdir/deep-1000.enc.yaml", $deep);
     my $plain = `$sops_bin -d $tempdir/deep-1000.enc.yaml 2>&1`;
     is($? >> 8, 0, 'sops -d reads a 1000-container document this library wrote')
         or diag($plain);

@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.115';
+our $VERSION = '0.116';
 
 use overload '""' => 'as_string', fallback => 1;
 

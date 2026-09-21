@@ -7,7 +7,7 @@
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Tk",
-      "Tcl/Tk/Tix",
+      "Tcl/Tk",
       "GUI"
    ],
    "license" : [
@@ -48,11 +48,11 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/vadrer/perl-tcl-tk.git",
-         "web" : "https://github.com/vadrer/perl-tcl-tk"
+         "url" : "https://github.com/vadrerko/perl-tcl-tk.git",
+         "web" : "https://github.com/vadrerko/perl-tcl-tk"
       },
       "x_MailingList" : "mailto:tcltk@perl.org"
    },
-   "version" : "1.51",
+   "version" : "1.52",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

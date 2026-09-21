@@ -1,5 +1,18 @@
 Revision history for Net-LibSSH
 
+0.004     2026-09-20 18:38:02Z
+  - SECURITY: connect() now verifies the server host key against known_hosts
+    (CWE-322, reported privately via CPANSec). Previously
+    strict_hostkeycheck was passed to libssh but ssh_session_is_known_server()
+    was never consulted, so any server -- including a man-in-the-middle --
+    was accepted silently. With the default strict_hostkeycheck => 1,
+    connect() now returns 0 with error() naming the problem when the host key
+    is unknown, changed, of a different type, or known_hosts cannot be read;
+    the session is disconnected and stays spent. strict_hostkeycheck => 0
+    disables the check entirely, as documented. Users who relied on the
+    default and never populated known_hosts must add the host key (e.g. via
+    ssh-keyscan) or set strict_hostkeycheck => 0 explicitly
+
 0.003     2026-09-01 00:06:26Z
   - SFTP integration test now stats /etc/passwd instead of /etc/hostname, so
     it passes on FreeBSD smokers where /etc/hostname does not exist (GH #1)

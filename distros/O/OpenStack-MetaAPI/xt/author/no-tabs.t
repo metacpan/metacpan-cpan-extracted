@@ -24,6 +24,7 @@ my @files = (
     'lib/OpenStack/MetaAPI/Roles/GetFromId.pm',
     'lib/OpenStack/MetaAPI/Roles/Listable.pm',
     'lib/OpenStack/MetaAPI/Routes.pm',
+    'lib/OpenStack/MetaAPI/UserAgent.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/01_base.t',
@@ -47,6 +48,7 @@ my @files = (
     't/specs-and-filtering.t',
     't/specs-fields.t',
     't/specs-integrity.t',
+    't/useragent.t',
     't/xtra-create-vm.t',
     't/xtra-delete-vm.t'
 );

@@ -135,6 +135,65 @@ Comparison output reports per-repeat and median requests/second plus
 p50/p95/p99/max client-visible latency. Runtime and framework versions are
 included in JSON output when available.
 
+### Linux::Event request-body diagnostics
+
+The comparison harness exposes production Linux::Event::HTTP request-body modes
+for isolating application lifecycle costs while keeping the same native HTTP
+input path:
+
+```text
+linuxevent_body_ignore
+linuxevent_body_callback
+linuxevent_body_end
+linuxevent_body_callback_end
+```
+
+They distinguish bodies drained without an application consumer from bodies
+delivered through `on_body`, and responses generated immediately in
+`on_request` from responses generated after completion in `on_request_end`.
+These are diagnostic server modes, not separate public APIs.
+
+For example:
+
+```sh
+perl -Mblib bench/run-http-comparison.pl \
+  --servers=linuxevent_body_ignore,linuxevent_body_callback,linuxevent_body_end,linuxevent_body_callback_end \
+  --request-body-bytes=65536 --response-bytes=32 --repeats=5
+```
+
+To send the same decoded body using HTTP/1.1 chunked transfer coding:
+
+```sh
+perl -Mblib bench/run-http-comparison.pl \
+  --servers=linuxevent_body_ignore,linuxevent_body_callback,linuxevent_body_end,linuxevent_body_callback_end \
+  --request-body-bytes=65536 \
+  --request-body-framing=chunked \
+  --request-chunk-bytes=4096 \
+  --response-bytes=32 --repeats=5
+```
+
+`--request-body-bytes` always means decoded application body bytes.
+`--request-chunk-bytes` controls only the payload size of each chunk on the
+wire; the harness adds hexadecimal chunk lengths, CRLF delimiters, and the final
+zero chunk.
+
+Production `Server::Connection` uses the raw native HTTP/1 consumer. A
+Content-Length body is drained directly from the native ordered-byte buffer when
+there is no `on_body` callback; when `on_body` is present, only body bytes are
+materialized for that callback.
+
+Chunked request bodies also remain on the native path. The provider keeps a
+persistent pico chunk decoder and copies each borrowed encoded input window only
+into mutable native scratch because pico's decoder rewrites its input. Drained
+chunked bodies do not materialize body bytes in Perl; when `on_body` is present,
+only decoded payload bytes cross into Perl. Trailers are consumed by the decoder,
+and bytes following the terminating chunk remain in Linux::Event's native input
+buffer for the next request head.
+
+A following request head that shares the same read with either a Content-Length
+body boundary or a completed chunked body therefore remains native input and is
+parsed without an ordinary Perl `on_data` handoff.
+
 The comparison is a protocol-stack comparison, not an attempt to make each
 framework perform an identical amount of application-layer work. Each adapter
 uses the smallest normal server API that still receives the complete request
@@ -188,3 +247,49 @@ A single parser microbenchmark number is not a server throughput number, and a
 single end-to-end throughput number does not identify where CPU time is spent.
 Use the parser benchmark, the end-to-end harness, the comparison harness, and
 Linux::Event profiling as separate views of the stack.
+
+## Current production lifecycle diagnostic
+
+The transaction ladder uses contract 10:
+
+```sh
+perl -Mblib bench/run-http-transaction-ladder.pl \
+  --requests=50000 --warmup=5000 --connections=100 --pipeline=1 \
+  --response-bytes=32 --repeats=5 --read-budget-bytes=0 \
+  --json=bench/results/production-lifecycle.json
+```
+
+| Case | Work measured |
+| --- | --- |
+| `prod_api` | Manual Stream byte driver: native Request parse, sparse Response, public Content-Type/body setters, prebuilt diagnostic wire |
+| `prod_wire` | Adds the production native scalar-final builder and generated Content-Length/commit work |
+| `prod_active` | Adds the three live exchange references used by the HTTP Connection |
+| `prod_connection` | Actual production `Server::Connection` with inherited native HTTP input through a Listener |
+| `current_http` | Adds the full `Server` wrapper with Content-Type |
+
+The first three stages intentionally use a plain `IO::Sock::Stream` because
+they manually drive bytes in order to isolate construction costs. They are not
+HTTP Connection subclasses and should not be interpreted as alternative server
+implementations. `prod_connection` is the first stage that runs the real
+production HTTP input provider.
+
+The older copied Perl `on_data` lifecycle ladder was removed when native HTTP
+input became the production Connection contract. Keeping it as an HTTP subclass
+would misrepresent the public API and require an invalid native-consumer /
+`on_data` combination.
+
+For an actual optimization, build an exact baseline in another directory and
+run the production comparison with `BENCH_BASE_TREE` set to that directory:
+
+```sh
+BENCH_BASE_TREE=/path/to/built/baseline \
+  perl -Mblib bench/run-http-comparison.pl \
+  --servers=linuxevent_baseline_content_type,linuxevent_content_type \
+  --requests=100000 --warmup=10000 --connections=100 --pipeline=1 \
+  --response-bytes=32 --repeats=7 \
+  --json=bench/results/production-ab.json
+```
+
+Also measure a 16 KiB response and a 4 KiB POST
+(`--request-body-bytes=4096`). Both builds must use the same Perl and
+Linux::Event core.

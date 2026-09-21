@@ -233,7 +233,7 @@ sub parse_file {
         $from .= "  Olson data version $opts{version}"
             if defined $opts{version};
 
-        # Helps avoid mis indexing on (meta)cpan
+        # Helps avoid incorrect indexing on (meta)cpan
         my $keyword = 'package';
         my $pkg     = "$keyword DateTime::TimeZone::$mod_name";
 
@@ -525,7 +525,7 @@ sub make_catalog_pm {
         $countries .= "\n) ],\n";
     }
 
-    # Helps avoid mis indexing on (meta)cpan
+    # Helps avoid incorrect indexing on (meta)cpan
     my $keyword = 'package';
     my $pkg     = "$keyword DateTime::TimeZone::Catalog";
 

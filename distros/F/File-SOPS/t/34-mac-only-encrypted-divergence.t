@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use File::Slurp qw(read_file write_file);
+use File::Slurper qw(read_binary write_binary);
 use YAML::XS ();
 
 use File::SOPS;
@@ -49,7 +49,7 @@ diag("Using sops binary: $sops_bin") if $sops_bin;
 
 my ($public, $secret) = Crypt::Age->generate_keypair();
 my $tempdir = tempdir(CLEANUP => 1);
-write_file("$tempdir/key.txt", $secret);
+write_binary("$tempdir/key.txt", $secret);
 $ENV{SOPS_AGE_KEY_FILE} = "$tempdir/key.txt";
 
 # A leaf exactly as a YAML parse hands it over: YAML::XS keeps the source text
@@ -176,7 +176,7 @@ subtest 'the plaintext emitters stay silent' => sub {
 
     my $enc = "$tempdir/enc.yaml";
     my $out = "$tempdir/plain.yaml";
-    write_file($enc, $document);
+    write_binary($enc, $document);
     my @on_read;
     {
         local $SIG{__WARN__} = sub { push @on_read, $_[0] };
@@ -184,7 +184,7 @@ subtest 'the plaintext emitters stay silent' => sub {
                                  identities => [$secret]);
     }
     is_deeply(\@on_read, [], 'and reading it back says nothing');
-    like(read_file($out), qr/^mode_unencrypted: 493$/m,
+    like(read_binary($out), qr/^mode_unencrypted: 493$/m,
         'with Go\'s number written straight back out, not the spelling');
 
     my @on_emit;
@@ -225,7 +225,7 @@ SKIP: {
                                 . 'longer diverges');
 
         my $file = "$tempdir/warned.yaml";
-        write_file($file, $document);
+        write_binary($file, $document);
         my $out = `$sops_bin -d --input-type yaml --output-type yaml $file 2>&1`;
         is($? >> 8, 0, 'and sops -d accepts the document') or diag("sops: $out");
         like($out, qr/^mode_unencrypted: 493$/m, 'reading the leaf as 493');

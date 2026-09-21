@@ -118,6 +118,6 @@ specific issue.
 ## Reference, don't restate
 
 Perl house style and cpanfile pinning: skills `getty-perl-core`, `getty-perl-release-author-getty`.
-Rex idioms, connection types and command surface: skill `getty-rex`. This distribution's
+Rex idioms, connection types and command surface: skill `rex`. This distribution's
 interface contracts and the Net::LibSSH channel API: skill `rex-libssh-core`. All are
 force-loaded for `rex-libssh-*` agents; do not duplicate them here.

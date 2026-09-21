@@ -42,6 +42,21 @@ sub start {
     my $port = _free_port() or return undef;
     my $user = getpwuid($<);
 
+    # A known_hosts that trusts exactly this server, in the bracketed
+    # [host]:port form libssh expects for a non-22 port. Tests that want the
+    # strict default to succeed point at this file; a test wanting an
+    # unknown or changed key builds its own from host_key_pub instead.
+    {
+        open my $pub, '<', "$dir/host_key.pub" or return undef;
+        my $line = <$pub>;
+        close $pub;
+        defined $line or return undef;
+        chomp $line;
+        open my $kh, '>', "$dir/known_hosts" or return undef;
+        print $kh "[127.0.0.1]:$port $line\n";
+        close $kh;
+    }
+
     my $cfg = "$dir/sshd_config";
     open my $fh, '>', $cfg or return undef;
     print $fh <<"CONFIG";
@@ -84,19 +99,23 @@ CONFIG
     }
 
     return bless {
-        dir        => $dir,
-        pid        => $pid,
-        port       => $port,
-        host       => '127.0.0.1',
-        client_key => "$dir/client_key",
-        has_sftp   => $SFTP_SERVER ? 1 : 0,
+        dir          => $dir,
+        pid          => $pid,
+        port         => $port,
+        host         => '127.0.0.1',
+        client_key   => "$dir/client_key",
+        host_key_pub => "$dir/host_key.pub",
+        known_hosts  => "$dir/known_hosts",
+        has_sftp     => $SFTP_SERVER ? 1 : 0,
     }, $class;
 }
 
-sub port       { $_[0]->{port}       }
-sub host       { $_[0]->{host}       }
-sub client_key { $_[0]->{client_key} }
-sub has_sftp   { $_[0]->{has_sftp}   }
+sub port         { $_[0]->{port}         }
+sub host         { $_[0]->{host}         }
+sub client_key   { $_[0]->{client_key}   }
+sub host_key_pub { $_[0]->{host_key_pub} }
+sub known_hosts  { $_[0]->{known_hosts}  }
+sub has_sftp     { $_[0]->{has_sftp}     }
 
 sub DESTROY {
     my ($self) = @_;

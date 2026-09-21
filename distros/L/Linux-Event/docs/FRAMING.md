@@ -226,16 +226,22 @@ connected stream socket remains a connected stream socket; a pipe remains a
 pipe.
 
 When both source and target declare native consumers, `transition_to()` may
-also replace the native consumer provider while preserving the same native input
+replace the native consumer provider while preserving the same native input
 buffer. The target provider context is prepared before the source is disturbed;
 the source flush/context lifetime is settled at a safe provider boundary; then
-unread bytes are re-driven through the target provider. This lets a protocol
-parser consume only its own prefix and hand a same-read tail directly to the
-next protocol without first materializing that tail as a Perl byte string.
+unread bytes are re-driven through the target provider.
 
-Adding or removing native-consumer mode during a live transition is still
-rejected. See `ORDERED-BYTE-CONSUMER-ABI.md` for the provider lifecycle and
-raw-input contract.
+A native consumer may also retire into an ordinary Perl target such as a raw
+`on_data` Stream. The same source flush and lifetime rules apply, but there is
+no target provider context to create. The source-reported consumed prefix is
+removed first and the remaining native tail is then interpreted by the ordinary
+target descriptor. This lets a protocol parser consume only its own prefix and
+hand a same-read tail to the next protocol without first materializing that tail
+in Perl before the transition.
+
+The reverse ordinary-to-native direction remains rejected. See
+`ORDERED-BYTE-CONSUMER-ABI.md` for the provider lifecycle and raw-input
+contract.
 
 ## Framing and serialization
 

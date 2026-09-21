@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.115';
+our $VERSION = '0.116';
 
 use parent 'Linux::Event::_Socket::Stream';
 
@@ -383,9 +383,10 @@ C<pause_read> and C<resume_read> control application reads. C<transition_to>
 changes protocol callback/framing descriptors in place while retaining the live
 socket, transport, output queue, and unread native input according to the
 transition rules in F<docs/FRAMING.md>. Native protocol extensions may also
-hand off from one native consumer provider to another without copying the
-retained input through Perl; adding or removing native-consumer mode during a
-live transition remains invalid.
+hand off from one native consumer provider to another, or retire a native
+consumer into an ordinary Perl input sink, without copying retained input
+through Perl before the transition. Adding a native consumer to an
+already-ordinary live Stream remains invalid.
 
 =head1 SOCKET POLICY
 

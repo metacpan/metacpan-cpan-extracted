@@ -15,7 +15,7 @@ use Linux::Event::HTTP::Request;
 use Linux::Event::HTTP::Response;
 use Linux::Event::HTTP::Transaction;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my $CHUNKED = 'Linux::Event::HTTP::_HTTP1::Chunked';
 my $MAX_RESPONSE_HEAD = 65_536;

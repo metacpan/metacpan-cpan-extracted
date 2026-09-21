@@ -230,8 +230,7 @@ EXAMPLE5
      #      Author: skim.cz
 
 DEPENDENCIES
-    Class::Utils, English, Error::Pure, Indent::Word, List::MoreUtils,
-    Readonly.
+    Class::Utils, English, Error::Pure, Indent::Word, List::Util, Readonly.
 
     Text::ANSI::Util for situation with 'ansi' => 1.
 
@@ -263,12 +262,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2011-2023 Michal Josef Špaček
+    © 2011-2026 Michal Josef Špaček
 
     Artistic License
 
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 
