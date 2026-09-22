@@ -8,9 +8,7 @@
 #   SC02: command-line mode: clean file reports no violations
 #   SC03: command-line mode: multiple files, all clean
 #   SC04: command-line mode: known-bad file reports violation
-#   SC05: self-check: OrDie.pm passed to itself reports known
-#         false-positive (qr// patterns visible to scanner) --
-#         this is a documented limitation, not a bug
+#   SC05: self-check: OrDie.pm passed to itself reports no violation
 #
 ######################################################################
 use strict;
@@ -31,19 +29,49 @@ my $ROOT = do {
 my $PM   = File::Spec->catfile($ROOT, 'lib', 'Perl500503Syntax', 'OrDie.pm');
 my $PERL = $^X;
 
-# Helper: run perl PM [args] and capture stdout+stderr
-# Returns output string only; exit-code detection is omitted for portability
-# across Unix/Windows/old-Perl where $? encoding differs.
+# Helper: run "perl OrDie.pm [args]" and capture its stdout and stderr.
+# Returns the output string only; exit-code detection is omitted for
+# portability across Unix/Windows/old-Perl where $? encoding differs.
+#
+# The command is deliberately NOT handed to a shell.  The former spelling
+# built a single command line with every word quoted and opened it as a
+# pipe.  On Windows such a line reaches cmd.exe, which strips the first and
+# the last quote character of the line it is given: a line whose first word
+# is quoted -- as the absolute path in $^X must be -- was torn in half, the
+# child never ran, and run_cmd returned the empty string for every call.
+# Every assertion here then examined an empty string, and the whole file
+# passed only because the assertions were being evaluated in list context.
+#
+# system() with a LIST bypasses the shell on both platforms and quotes each
+# argument itself.  The child inherits this process's standard handles, so
+# redirecting them to a file first is enough to capture what it prints.
 sub run_cmd {
     my @args = @_;
-    my $cmd = join(' ', map { "\"$_\"" } ($PERL, $PM, @args));
+    my $out_file = File::Spec->catfile(File::Spec->tmpdir(),
+                                       "ordie_out_$$.txt");
     my $out = '';
-    local *_CMD_FH;
-    if (open(_CMD_FH, "$cmd 2>&1 |")) {
+    local(*SAVEOUT, *SAVEERR, *_CMD_FH);
+
+    if (open(SAVEOUT, '>&STDOUT') and open(SAVEERR, '>&STDERR')) {
+        if (open(STDOUT, "> $out_file")) {
+            open(STDERR, '>&STDOUT');
+            select((select(STDOUT), $| = 1)[0]);
+            system($PERL, $PM, @args);
+            close(STDERR);
+            close(STDOUT);
+        }
+        open(STDOUT, '>&SAVEOUT');
+        open(STDERR, '>&SAVEERR');
+        close(SAVEOUT);
+        close(SAVEERR);
+    }
+
+    if (open(_CMD_FH, $out_file)) {
         $out = do { local $/; <_CMD_FH> };
         close _CMD_FH;
     }
-    return $out;
+    unlink $out_file;
+    return defined($out) ? $out : '';
 }
 
 my @tests = ();
@@ -90,17 +118,23 @@ push @tests, sub {
 };
 
 # SC05: self-check -- OrDie.pm passed to itself
-# The module contains qr// patterns (regex literals) which are intentionally
-# NOT masked by the scanner (so that regex constructs inside qr// are
-# detectable).  This means the BLACKLIST entries themselves trigger hits
-# when OrDie.pm is scanned as source.  This is a documented limitation.
+# The scanner masks the contents of qr// and of the other quote-like
+# operators before it looks for a forbidden construct, so the BLACKLIST
+# patterns the module carries in its own source are not mistaken for uses
+# of what they describe.  The module must therefore come out clean when it
+# is scanned against itself, and a violation reported here is a real defect
+# in the masking, not the documented limitation it once was.
 push @tests, sub {
     my $out = run_cmd($PM);
-    ok($out =~ /VIOLATION/, 'SC05: self-check reports expected false-positive from qr// patterns');
+    ok($out !~ /VIOLATION/, 'SC05: self-check of OrDie.pm reports no violation');
 };
 push @tests, sub {
     my $out = run_cmd($PM);
-    ok($out =~ /OrDie\.pm/, 'SC05b: self-check violation references OrDie.pm');
+    ok($out =~ /OrDie\.pm/, 'SC05b: self-check output names the file it checked');
+};
+push @tests, sub {
+    my $out = run_cmd($PM);
+    ok($out =~ m{1/1 passed}, 'SC05c: self-check counts OrDie.pm as passed');
 };
 
 # Cleanup temp file

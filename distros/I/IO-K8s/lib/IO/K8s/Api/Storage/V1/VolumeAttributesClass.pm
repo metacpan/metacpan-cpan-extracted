@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::VolumeAttributesClass;
 # ABSTRACT: VolumeAttributesClass represents a specification of mutable volume attributes defined by the CSI driver. The class can be specified during dynamic provisioning of PersistentVolumeClaims, and changed in the PersistentVolumeClaim spec after provisioning.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Storage::V1::VolumeAttributesClass - VolumeAttributesClass represe
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ This field is required and must contain at least one key/value pair. The keys ca
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#volumeattributesclass-v1-storage.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#volumeattributesclass-v1-storage.k8s.io>
 
 =head1 SUPPORT
 

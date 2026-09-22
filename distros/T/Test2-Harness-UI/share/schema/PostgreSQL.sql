@@ -190,6 +190,8 @@ CREATE TABLE run_fields (
 
     UNIQUE(run_id, name)
 );
+-- https://github.com/Test-More/Test2-Harness/issues/457 (filed on the wrong repo)
+CREATE INDEX IF NOT EXISTS run_fields_name ON run_fields(name);
 
 CREATE TABLE test_files (
     test_file_id    UUID            NOT NULL PRIMARY KEY,
@@ -355,6 +357,8 @@ CREATE INDEX IF NOT EXISTS reporting_d    ON reporting(project_id, test_file_id,
 CREATE INDEX IF NOT EXISTS reporting_e    ON reporting(project_id, test_file_id, subtest, user_id, run_ord);
 CREATE INDEX IF NOT EXISTS reporting_run  ON reporting(run_id);
 CREATE INDEX IF NOT EXISTS reporting_job  ON reporting(job_key);
+-- https://github.com/Test-More/Test2-Harness/issues/457 (filed on the wrong repo)
+CREATE INDEX IF NOT EXISTS reporting_run_analytics ON reporting(run_id, test_file_id, subtest, pass, fail, duration);
 
 CREATE TABLE resource_batch (
     resource_batch_id   UUID            DEFAULT UUID_GENERATE_V4() PRIMARY KEY,

@@ -126,6 +126,28 @@ sub auth : Tests(4) {
   return;
 }
 
+# Regression: coercing a hash auth into an object must not mutate the caller's
+# hash. RestApi used to delete 'class' (and add 'config_dir') from the passed-in
+# hashref, which silently corrupted a caller's config when that hashref was a
+# live slice of their on-disk config (the 'class' key vanished on next save).
+sub auth_hash_not_mutated : Tests(3) {
+  my $self = shift;
+
+  my $auth = {
+    class         => 'OAuth2Client',
+    client_id     => 'x',
+    client_secret => 'x',
+    token_file    => mock_token_file(),
+  };
+  my $api = RestApi->new(auth => $auth);
+  isa_ok $api->auth(), OAuth2Client, 'hash auth coerced to object';
+
+  is $auth->{class}, 'OAuth2Client', "caller's 'class' key is preserved after coercion";
+  ok !exists $auth->{config_dir}, "caller's hash is not polluted with config_dir";
+
+  return;
+}
+
 # token_file path resolution: absolute paths pass through, bare names resolve
 # against the auth config_file's dir first, then the main config_file's dir.
 sub auth_token_file_paths : Tests(4) {

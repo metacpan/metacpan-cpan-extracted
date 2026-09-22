@@ -11,9 +11,9 @@ if NOT "%COMSPEC%" == "%SystemRoot%\system32\cmd.exe" goto endofperl
 if %errorlevel% == 9009 echo You do not have Perl in your PATH.
 goto endofperl
 BATCHFILE
-PERL5LIB=lib
-perl -x -S $0 ${1+"$@"}
-exit
+PERL5LIB=lib; export PERL5LIB #
+exec perl -x -S "$0" ${1+"$@"} #
+exit 1 #
 #!perl
 #line 19
 package pmake;
@@ -24,7 +24,7 @@ package pmake;
 # Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
-$PMAKE_BAT_VERSION = '0.32';
+$PMAKE_BAT_VERSION = q{0.51};
 $PMAKE_BAT_VERSION = $PMAKE_BAT_VERSION;
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
@@ -73,14 +73,53 @@ END
     }
 }
 
+# This file is a cmd.exe / sh / Perl polyglot, and its preamble has to use
+# CRLF line endings for cmd.exe.  Every sh line of that preamble therefore
+# ends in a CR, and sh treats the CR as ordinary text: it used to be
+# appended to the last argument ("./pmake.bat ptar" arrived as "ptar\r" and
+# was reported as an unknown target), and, worse, it turned the final "exit"
+# into the unknown command "exit\r", so sh did NOT stop there and went on to
+# read the Perl body of this file as a shell script.  Running "./pmake.bat"
+# with no argument at all was broken too: the lone CR became a single empty
+# argument, so @ARGV was not empty and the usage message was never printed.
+#
+# The preamble now ends each sh line with a " #" comment, which swallows the
+# CR before the shell can see it, and hands over with "exec" rather than
+# running perl and then trying to exit.  This loop is kept as a second line
+# of defence for a hand-edited or re-encoded copy: stripping a trailing CR
+# from an argument is harmless when there is none.
+for (@ARGV) {
+    s/\r\z//;
+}
+
 # get file list
+#
+# A MANIFEST written on Windows and read on Unix keeps its CR after chomp,
+# which turns every entry into a file name that does not exist, and
+# ExtUtils::Manifest ignores blank lines and comment lines.  Trim trailing
+# whitespace and skip those lines here so that one MANIFEST works on either
+# platform.  Trailing whitespace is trimmed rather than split off, so a
+# file name that legitimately contains a space survives.
 my @file = ();
 if (open(FH_MANIFEST, 'MANIFEST')) {
-    chomp(@file = <FH_MANIFEST>);
+    while (<FH_MANIFEST>) {
+        chomp;
+        s/\s+\z//;
+        next if /^\s*$/;
+        next if /^\s*#/;
+        push @file, $_;
+    }
     close FH_MANIFEST;
 }
 
 for my $target (@ARGV) {
+
+    # Option flags are read by the targets that understand them: dist reads
+    # --no-check1..3 and selfcheck reads --check1 / --check2.  Without this
+    # they also reach the dispatch chain below, so a documented invocation
+    # such as "pmake dist --no-check1" ended with a spurious
+    # "unknown target: --no-check1." warning.
+    next if $target =~ /^--/;
 
     # make test
     if ($target eq 'test') {
@@ -125,7 +164,12 @@ for my $target (@ARGV) {
         }
 
         # install *.pl, *.bat, *.exe, and *.com files to /Perl/bin
-        my($perl_bin) = $^X =~ /^(.*)\\[^\\]*$/;
+        #
+        # dirname() finds the interpreter's directory on every platform.
+        # The former pattern matched a backslash only, so $perl_bin was
+        # undefined anywhere but Windows and every path below was built
+        # from an undefined value.
+        my $perl_bin = dirname($^X);
         for (grep m/ \. (?: pl | bat | exe | com ) \z /xmsi, @file) {
             next if m/(?: Makefile | test ) \.pl  $/xmsi;
             next if m/(?: pmake | ptar )    \.bat $/xmsi;
@@ -140,8 +184,11 @@ for my $target (@ARGV) {
                 copy($_, "$perl_bin/$1/$2");
             }
             else {
+                # The message always named $perl_bin, but the copy went to
+                # $perl_site_lib, so a top-level executable landed in the
+                # library tree instead of the bin directory.
                 print STDERR "copy $_ $perl_bin/$_\n";
-                copy($_, "$perl_site_lib/$_");
+                copy($_, "$perl_bin/$_");
             }
         }
     }
@@ -149,20 +196,30 @@ for my $target (@ARGV) {
     # make dist
     elsif ($target eq 'dist') {
 
-        # dist-time check flags (both ON by default)
+        # dist-time check flags (all ON by default)
         my $dist_check1 = 1;
         my $dist_check2 = 1;
+        my $dist_check3 = 1;
         for my $arg (@ARGV) {
             $dist_check1 = 0 if $arg eq '--no-check1';
             $dist_check2 = 0 if $arg eq '--no-check2';
+            $dist_check3 = 0 if $arg eq '--no-check3';
         }
 
         # your PAUSE ID here
         my $author = q{ina <ina.cpan@gmail.com>};
 
         # get $name_as_filesystem
-        open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
-        chomp(my $name_as_filesystem = <FH_MANIFEST>);
+        open(FH_MANIFEST, 'MANIFEST') || die "Can't open file: MANIFEST.\n";
+        my $name_as_filesystem = '';
+        while (<FH_MANIFEST>) {
+            chomp;
+            s/\s+\z//;
+            next if /^\s*$/;
+            next if /^\s*#/;
+            $name_as_filesystem = $_;
+            last;
+        }
         close(FH_MANIFEST);
         die "'NAME_AS_FILESYSTEM' not found.\n" unless $name_as_filesystem;
         check_usascii('MANIFEST');
@@ -185,7 +242,7 @@ for my $target (@ARGV) {
         my $package  = '';
         my $version  = '';
         my $abstract = '';
-        open(FH_NAME,$name_as_filesystem) || die "Can't open file: $name_as_filesystem.\n";
+        open(FH_NAME, $name_as_filesystem) || die "Can't open file: $name_as_filesystem.\n";
         while (<FH_NAME>) {
             if ($package eq '') {
                 if (/^#/) {
@@ -233,11 +290,35 @@ for my $target (@ARGV) {
         my %requires = (qw(
             perl                 5.005_03
         ));
+        my %recommends = ();
         my %provides = ();
-        for my $file (grep m{\Alib/.*\.pm\z}i, @file) {
+        # Runtime prerequisites come from every file the distribution
+        # installs: lib/*.pm plus the bin/*.pl scripts that go out as
+        # EXE_FILES. Scanning lib/ alone silently dropped a launcher
+        # script's own prerequisites (FindBin, for one) from META.
+        #
+        # Both spellings of a load are collected, and they do not mean the
+        # same thing.  "use Module" and a bare "require Module" are
+        # unconditional: the distribution cannot run without the module, so
+        # it is a runtime requirement.  A require inside eval is the pure
+        # Perl way of writing "use this if it happens to be here" -- the
+        # caller has a fallback for the case where it is not -- so the
+        # module is reported as a recommendation.  Promoting it to requires
+        # would force an installation the distribution does not need; but
+        # leaving it out of META altogether, which is what scanning for
+        # "use" alone did, hides a real relationship from the toolchain.
+        #
+        # POD and full-line comments are skipped, so prose that merely
+        # mentions a module name cannot invent a dependency.
+        for my $file (grep { m{\Alib/.*\.pm\z}i || m{\Abin/.*\.pl\z}i } @file) {
             if (open FILE, $file) {
+                my $in_pod = 0;
                 while (<FILE>) {
                     chomp;
+                    if    (/^=cut\b/)    { $in_pod = 0; next }
+                    elsif (/^=[A-Za-z]/) { $in_pod = 1; next }
+                    next if $in_pod;
+                    next if /^\s*#/;
                     if (/^use\s+([0-9]+(\.[0-9]*)?)/) {
                         $requires{'perl'} = $1;
                     }
@@ -247,11 +328,21 @@ for my $target (@ARGV) {
                     elsif (/^package\s+([A-Za-z][^;\s]*).*;/) {
                         $provides{$1} = $file;
                     }
+                    elsif (/\brequire\s+([A-Z][A-Za-z0-9_]*(?:::[A-Za-z0-9_]+)*)\s*(?:;|\})/) {
+                        my $module = $1;
+                        if (/\beval\b/) {
+                            $recommends{$module} = ($requires_version{$module} || '0');
+                        }
+                        else {
+                            $requires{$module} = ($requires_version{$module} || '0');
+                        }
+                    }
                 }
                 close(FILE);
             }
         }
         delete @requires{keys %provides};
+        delete @recommends{keys %provides};
         if ($package eq 'Char') {
             delete @requires{qw(
                 Ebig5hkscs
@@ -271,10 +362,80 @@ for my $target (@ARGV) {
         delete $requires{'strict'};
         delete $requires{'warnings'};
         delete $requires{'vars'};
-        $requires{'ExtUtils::MakeMaker'} = '5.4302';
+        delete $requires{'lib'};
 
+        # Test-phase prerequisites.
+        #
+        # The runtime scan above walks only what the distribution
+        # INSTALLS, which is right for the runtime phase and wrong for
+        # the test phase: a module that only the suite loads was being
+        # reported nowhere at all, so META claimed a test could run
+        # against a perl that cannot in fact run it.  The suite is
+        # scanned separately, with the same parser, into its own phase.
+        #
+        # An eval'd require in a test is NOT collected.  In the suite
+        # that spelling means "skip this case when the module is
+        # absent", which is the opposite of a prerequisite.
+        #
+        # Nothing found here is allowed near %provides: t/lib holds
+        # packages that are part of the suite and not of the interface,
+        # and PAUSE must go on seeing only lib/.
+        my %test_requires = %requires;
+        my %test_provides = ();
+        for my $file (grep { m{\At/.*\.t\z}i || m{\At/lib/.+\.pm\z}i || m{\Atest\.pl\z}i } @file) {
+            if (open FILE, $file) {
+                my $in_pod = 0;
+                while (<FILE>) {
+                    chomp;
+                    if    (/^=cut\b/)    { $in_pod = 0; next }
+                    elsif (/^=[A-Za-z]/) { $in_pod = 1; next }
+                    next if $in_pod;
+                    next if /^\s*#/;
+                    if (/^use\s+([0-9]+(\.[0-9]*)?)/) {
+                        $test_requires{'perl'} = $1;
+                    }
+                    elsif (/^use\s+([A-Za-z][^;\s]*).*;/) {
+                        $test_requires{$1} = ($requires_version{$1} || '0');
+                    }
+                    elsif (/^package\s+([A-Za-z][^;\s]*).*;/) {
+                        $test_provides{$1} = $file;
+                    }
+                    elsif (/\brequire\s+([A-Z][A-Za-z0-9_]*(?:::[A-Za-z0-9_]+)*)\s*(?:;|\})/) {
+                        $test_requires{$1} = ($requires_version{$1} || '0')
+                            unless /\beval\b/;
+                    }
+                }
+                close(FILE);
+            }
+        }
+        delete @test_requires{keys %provides};
+        delete @test_requires{keys %test_provides};
+        delete $test_requires{'strict'};
+        delete $test_requires{'warnings'};
+        delete $test_requires{'vars'};
+        delete $test_requires{'lib'};
+        delete $test_requires{'ExtUtils::MakeMaker'};
+
+        # A module loaded unconditionally somewhere and inside an eval
+        # somewhere else is not optional; requires wins over recommends.
+        delete @recommends{keys %requires};
+
+        # ExtUtils::MakeMaker is needed to run Makefile.PL, not to run the
+        # module, so it belongs in configure_requires and nowhere else.
+        # Listing it under runtime requires is what CPANTS penalises.
+        delete $requires{'ExtUtils::MakeMaker'};
+        my %configure_requires = (
+            'ExtUtils::MakeMaker' => ($requires_version{'ExtUtils::MakeMaker'} || '0'),
+        );
+
+        # MIN_PERL_VERSION carries the perl version for Makefile.PL, so leaving
+        # it in PREREQ_PM as well makes older EUMM report a missing prerequisite
+        # named "perl".  The META files still list it under requires.
         #                                                12345678
-        my $requires_as_makefile_pl = join "\n", map {qq{        '$_' => '$requires{$_}',}} sort keys %requires;
+        my $requires_as_makefile_pl = join "\n", map {qq{        '$_' => '$requires{$_}',}} grep { $_ ne q{perl} } sort keys %requires;
+
+        #                                                        12345678
+        my $configure_requires_as_makefile_pl = join "\n", map {qq{        '$_' => '$configure_requires{$_}',}} sort keys %configure_requires;
 
         #                                                12345678901234567890
         my $provides_as_makefile_pl = join ",\n", map {
@@ -283,9 +444,9 @@ for my $target (@ARGV) {
         } sort keys %provides;
 
         # write Makefile.PL
-        open(FH_MAKEFILEPL,'>Makefile.PL') || die "Can't open file: Makefile.PL.\n";
+        open(FH_MAKEFILEPL, '>Makefile.PL') || die "Can't open file: Makefile.PL.\n";
         binmode FH_MAKEFILEPL;
-        printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl, $author, $name_as_dist_on_url, $name_as_dist_on_url, $name_as_dist_on_url, $provides_as_makefile_pl);
+        printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl, $author, $configure_requires_as_makefile_pl, $provides_as_makefile_pl);
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
@@ -301,11 +462,32 @@ my %%args = (
     'AUTHOR'    => q{%s},
 );
 
+# Install bin/*.pl as executables (EUMM creates .bat wrappers on Win32).
+# A dist without a bin/ directory is unaffected.
+if (-d 'bin') {
+    local *BINDIR;
+    if (opendir(BINDIR, 'bin')) {
+        $args{EXE_FILES} =
+            [map { "bin/$_" } sort grep { /\.pl\z/ && -f "bin/$_" } readdir(BINDIR)];
+        closedir(BINDIR);
+    }
+}
+
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
 # Passing it to older versions produces an "is not a known parameter" warning
 # without failing, but we suppress the noise by checking the version.
 if ($ExtUtils::MakeMaker::VERSION >= 6.31) {
     $args{LICENSE} = q{perl};
+}
+
+# CONFIGURE_REQUIRES was introduced in ExtUtils::MakeMaker 6.52.  Older
+# versions ignore an unknown parameter with a warning, so it is passed
+# only when it is understood; the generated META files carry the same
+# information for every toolchain.
+if ($ExtUtils::MakeMaker::VERSION >= 6.52) {
+    $args{CONFIGURE_REQUIRES} = {
+%s
+    };
 }
 
 # MIN_PERL_VERSION (6.48) and META_MERGE (6.46) arrived together in the
@@ -316,15 +498,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
     $args{META_MERGE} = {
         'meta-spec' => { version => 2 },
         'resources' => {
-            'license'    => [ 'https://dev.perl.org/licenses/' ],
-            'bugtracker' => {
-                'web' => 'https://github.com/ina-cpan/%s/issues',
-            },
-            'repository' => {
-                'url'  => 'https://github.com/ina-cpan/%s',
-                'web'  => 'https://github.com/ina-cpan/%s',
-                'type' => 'git',
-            },
+            'license'    => [ 'http://dev.perl.org/licenses/' ],
         },
         'provides' => {
 %s
@@ -355,20 +529,51 @@ END
         #
         #   meta-spec:
         #     version: 1.4
-        #     url: https://module-build.sourceforge.net/META-spec-v1.4.html
+        #     url: http://module-build.sourceforge.net/META-spec-v1.4.html
 
         #                                      12     1234
         my $provides_as_yml = join "\n", map {"  $_:\n    file: $provides{$_}\n    version: $version"} sort keys %provides;
         my $requires_as_yml = join "\n", map {"  $_: $requires{$_}"}                                   sort keys %requires;
+        my $configure_requires_as_yml = join "\n", map {"  $_: $configure_requires{$_}"}               sort keys %configure_requires;
+        # META 1.4 spells the test phase "build_requires".  It is
+        # emitted only when the suite actually needs something the
+        # runtime does not, so a distribution whose tests load nothing
+        # extra keeps the META file it had.
+        my %extra_test = ();
+        for my $k (keys %test_requires) {
+            $extra_test{$k} = $test_requires{$k} unless exists $requires{$k};
+        }
+        my $build_requires_as_yml = %extra_test
+            ? join('', "build_requires:\n", map {"  $_: $extra_test{$_}\n"} sort keys %extra_test)
+            : '';
+        my $recommends_as_yml = %recommends
+            ? join('', "recommends:\n", map {"  $_: $recommends{$_}\n"} sort keys %recommends)
+            : '';
         #                                      12
 
-        open(FH_METAYML,'>META.yml') || die "Can't open file: META.yml.\n";
+        # no_index: directories that PAUSE must not index.  Only the
+        # ones that actually exist in this distribution are listed, so
+        # the key is omitted entirely when there are none.
+        my @no_index_dirs = grep { -d $_ } qw(t xt eg doc examples inc share);
+        my $no_index_as_yml = @no_index_dirs
+            ? join(q{}, qq{no_index:\n}, qq{  directory:\n},
+                        map {qq{    - $_\n}} @no_index_dirs)
+            : q{};
+        my $no_index_as_json = @no_index_dirs
+            ? join(q{}, qq{    "no_index" : \x7b\n},
+                        qq{        "directory" : [\n},
+                        join(qq{,\n}, map {qq{            "$_"}} @no_index_dirs),
+                        qq{\n        ]\n},
+                        qq{    \x7d,\n})
+            : q{};
+
+        open(FH_METAYML, '>META.yml') || die "Can't open file: META.yml.\n";
         binmode FH_METAYML;
-        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $pmake::PMAKE_BAT_VERSION, $requires_as_yml, $provides_as_yml, $name_as_dist_on_url, $name_as_dist_on_url);
+        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $pmake::PMAKE_BAT_VERSION, $configure_requires_as_yml, $requires_as_yml, $build_requires_as_yml, $recommends_as_yml, $no_index_as_yml, $provides_as_yml);
 --- #YAML:1.0
 meta-spec:
   version: 1.4
-  url: https://module-build.sourceforge.net/META-spec-v1.4.html
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: %s
 version: %s
 abstract: %s
@@ -376,15 +581,15 @@ author:
   - %s
 license: perl
 generated_by: pmake.bat version %s
+configure_requires:
+%s
 requires:
 %s
-minimum_perl_version: 5.00503
-provides:
+%s%sminimum_perl_version: 5.00503
+%sprovides:
 %s
 resources:
-  license: https://dev.perl.org/licenses/
-  bugtracker: https://github.com/ina-cpan/%s/issues
-  repository: https://github.com/ina-cpan/%s
+  license: http://dev.perl.org/licenses/
 END
         close(FH_METAYML);
         check_usascii('META.yml');
@@ -404,18 +609,28 @@ END
         # How to escape from trap
         #
         #   "meta-spec" : {
-        #       "url" : "https://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        #       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
         #       "version" : 2
         #   },
 
         #                                          1234567890123456
         my $requires_as_json = join ",\n", map {qq{                "$_" : "$requires{$_}"}}                            sort keys %requires;
+        my $test_requires_as_json = join ",\n", map {qq{                "$_" : "$test_requires{$_}"}}                  sort keys %test_requires;
+        my $configure_requires_as_json = join ",\n", map {qq{                "$_" : "$configure_requires{$_}"}}          sort keys %configure_requires;
+        my $recommends_as_json = '';
+        if (%recommends) {
+            $recommends_as_json = ",\n" . '            "recommends" : ' . "{\n"
+                . join(",\n", map { '                "' . $_ . '" : "'
+                                    . $recommends{$_} . '"' }
+                              sort keys %recommends)
+                . "\n" . '            }';
+        }
         my $provides_as_json = join ",\n", map {qq{        "$_" : {\n            "file" : "$provides{$_}",\n            "version" : "$version"\n        }}} sort keys %provides;
         #                                          12345678          123456789012                          12345678
 
-        open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
+        open(FH_METAJSON, '>META.json') || die "Can't open file: META.json.\n";
         binmode FH_METAJSON;
-        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $pmake::PMAKE_BAT_VERSION, $name_as_dist_on_url, $name_as_dist_on_url, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json, $requires_as_json, $provides_as_json);
+        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $pmake::PMAKE_BAT_VERSION, $no_index_as_json, $requires_as_json, $configure_requires_as_json, $requires_as_json, $recommends_as_json, $test_requires_as_json, $provides_as_json);
 {
     "name" : "%s",
     "version" : "%s",
@@ -429,22 +644,14 @@ END
         "perl_5"
     ],
     "meta-spec" : {
-        "url" : "https://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
         "version" : 2
     },
-    "release_status" : "stable",
+%s    "release_status" : "stable",
     "resources" : {
         "license" : [
-            "https://dev.perl.org/licenses/"
-        ],
-        "bugtracker" : {
-            "web" : "https://github.com/ina-cpan/%s/issues"
-        },
-        "repository" : {
-            "url"  : "https://github.com/ina-cpan/%s",
-            "web"  : "https://github.com/ina-cpan/%s",
-            "type" : "git"
-        }
+            "http://dev.perl.org/licenses/"
+        ]
     },
     "prereqs" : {
         "build" : {
@@ -460,7 +667,7 @@ END
         "runtime" : {
             "requires" : {
 %s
-            }
+            }%s
         },
         "test" : {
             "requires" : {
@@ -477,7 +684,7 @@ END
         check_usascii('META.json');
 
         # write LICENSE
-        open(FH_LICENSE,'>LICENSE') || die "Can't open file: LICENSE\n";
+        open(FH_LICENSE, '>LICENSE') || die "Can't open file: LICENSE\n";
         binmode FH_LICENSE;
         print FH_LICENSE <<'LICENSING';
 Terms of Perl itself
@@ -881,26 +1088,37 @@ LICENSING
         check_usascii('LICENSE');
 
         # write CONTRIBUTING
-        open(FH_CONTRIBUTING,'>CONTRIBUTING') || die "Can't open file: CONTRIBUTING\n";
+        open(FH_CONTRIBUTING, '>CONTRIBUTING') || die "Can't open file: CONTRIBUTING\n";
         binmode FH_CONTRIBUTING;
         print FH_CONTRIBUTING <<'TO_CONTRIBUTE';
 # Contributing to this project
 
-Before you go crazy with huge changes, send some small e-mail to check
-that we want to change the tools in that way. E-mail that have one logical
-change are better.
+This distribution is maintained by e-mail.  There is no public issue
+tracker and no pull requests; send everything to the author, whose address
+is in the AUTHOR section of the module documentation and in META.yml.
 
-Good e-mail, patches, improvements, new features - are a fantastic help.
-They should remain focused in scope and avoid containing unrelated commits.
+## Reporting a bug
 
-**Please ask first** before embarking on any significant e-mail (e.g.
-implementing features, refactoring code, porting to a different language),
-otherwise you risk spending a lot of time working on something that the
-project's developers might not want to merge into the project.
+Please include a minimal, self-contained script that reproduces the
+problem, the version of the distribution, the output of `perl -V`, and
+your operating system and file system.  A report that can be run as-is is
+worth more than a long description.
 
-Please adhere to the coding conventions used throughout a project
-(indentation, accurate comments, etc.) and any other requirements (such
-as test coverage).
+## Sending a patch
+
+Ask first before starting anything large -- a new feature, a refactoring,
+a port to another environment.  It costs you one e-mail and can save you a
+lot of work on something that will not be merged.
+
+Send a unified diff (`diff -u`) against the latest release.  One patch per
+logical change: a patch that fixes a bug and reformats three files at the
+same time is hard to review and will be sent back.  Please include a test
+that fails before the patch and passes after it.
+
+Follow the conventions already used in the code: indentation, the style of
+the surrounding comments, and the Perl version the distribution supports.
+The distribution ships its own test suite; please make sure it still
+passes before you send anything.
 
 **IMPORTANT**: By submitting a patch, you agree to allow the project owner
 to license your work under the same license as that used by the project.
@@ -909,7 +1127,7 @@ TO_CONTRIBUTE
         check_usascii('CONTRIBUTING');
 
         # write SECURITY.md
-        open(FH_SECURITY,'>SECURITY.md') || die "Can't open file: SECURITY.md\n";
+        open(FH_SECURITY, '>SECURITY.md') || die "Can't open file: SECURITY.md\n";
         binmode FH_SECURITY;
         print FH_SECURITY <<'TO_SECURITY';
 # Security Policy
@@ -919,8 +1137,9 @@ TO_CONTRIBUTE
 If you discover a security vulnerability in this distribution, please report
 it by e-mail to the author at ina.cpan@gmail.com.
 
-Do NOT open a public GitHub issue for security vulnerabilities.  Please use
-private e-mail so that a fix can be prepared before public disclosure.
+Please do not disclose the problem publicly before a fix is available.
+This distribution has no public issue tracker; private e-mail to the author
+is the reporting channel.
 
 You can expect an acknowledgement within a few days.  If you do not receive
 a response within one week, please follow up.
@@ -936,10 +1155,24 @@ TO_SECURITY
         # check source files in MANIFEST (lib/*.pm lib/*.pl t/*.t eg/*.pl bin/*.pl etc.)
         _dist_check_sources(\@file, $dist_check1, $dist_check2);
 
+        # check the test suite for TAP plan sanity: exactly one plan line
+        # per file, plan count == number of ok/not-ok lines, and no failing
+        # tests. This runs t/*.t (and xt/*.t) in a child Perl, catching the
+        # defects that "perl t/foo.t" by hand hides but a real harness (and
+        # therefore CPAN Testers) exposes. Disable with --no-check3.
+        if ($dist_check3 and -f q{t/lib/INA_CPAN_Check.pm}) {
+            print STDERR "pmake dist: running test-suite plan self-check...\n";
+            my $rc = system($^X, q{-Ilib}, q{-It/lib}, q{-MINA_CPAN_Check},
+                            q{-e}, q{exit(INA_CPAN_Check::selfcheck_suite())});
+            if ($rc != 0) {
+                die "pmake dist aborted: test-suite plan self-check failed.\n";
+            }
+        }
+
         # make work directory
         my $dirname = (dirname($file[0]) eq 'bin') ? 'App' : dirname($file[0]);
         $dirname =~ tr#/#-#;
-        my $basename = basename($file[0], '.pm','.pl','.bat');
+        my $basename = basename($file[0], '.pm', '.pl', '.bat');
         my $tardir = "$dirname-$basename-$version";
         $tardir =~ s#^lib-##;
         rmtree($tardir, 0, 0);
@@ -951,21 +1184,21 @@ TO_SECURITY
                     print STDERR "copy $file $tardir/$file\n";
                     copy($file, "$tardir/$file");
                     if ($file =~ m/ (?: Build\.PL | Makefile\.PL ) \z/oxmsi) {
-                        chmod(0664, "$tardir/$file");
+                        chmod(0644, "$tardir/$file");
                     }
                     elsif ($file =~ m/\. (?: pl | bat | exe | com ) \z/oxmsi) {
-                        chmod(0775, "$tardir/$file");
+                        chmod(0755, "$tardir/$file");
                     }
                     elsif ($file =~ m{^bin/}oxmsi) {
-                        chmod(0775, "$tardir/$file");
+                        chmod(0755, "$tardir/$file");
                     }
                     else {
-                        chmod(0664, "$tardir/$file");
+                        chmod(0644, "$tardir/$file");
                     }
                 }
             }
             system(qq{tar -cvf $tardir.tar $tardir});
-            system(qq{gzip $tardir.tar});
+            system(qq{gzip -f $tardir.tar});
         }
         else {
 
@@ -992,9 +1225,9 @@ TO_SECURITY
 #-----------------------------------------------------------------------------
 # Sunday December 21, 2008 07:38 PM
 # Fixing world writable files in tarball before upload to CPAN [ #38127 ]
-# https://use.perl.org/~bart/journal/38127 (dead link)
+# http://use.perl.org/~bart/journal/38127 (dead link)
 # Fix CPAN uploads for world writable files
-# https://perlmonks.org/index.pl?node_id=731935
+# http://perlmonks.org/index.pl?node_id=731935
 #-----------------------------------------------------------------------------
 #                   $tar->add_files("$tardir/$file");
 #-----------------------------------------------------------------------------
@@ -1015,13 +1248,13 @@ TO_SECURITY
 
                     my $tar = Archive::Tar->new;
                     if ($file =~ m/ (?: Build\.PL | Makefile\.PL ) \z/oxmsi) {
-                        $tar->add_data("$tardir/$file", $data, {'mode' => 0664});
+                        $tar->add_data("$tardir/$file", $data, {q{mode} => 0644});
                     }
                     elsif ($file =~ m/\. (?: pl | bat | exe | com ) \z/oxmsi) {
-                        $tar->add_data("$tardir/$file", $data, {'mode' => 0775});
+                        $tar->add_data("$tardir/$file", $data, {q{mode} => 0755});
                     }
                     else {
-                        $tar->add_data("$tardir/$file", $data, {'mode' => 0664});
+                        $tar->add_data("$tardir/$file", $data, {q{mode} => 0644});
                     }
                     my $format_tar_file = $tar->write;
                     syswrite FH_TAR, $format_tar_file, length($format_tar_file) - length($ZERO_BLOCK . $ZERO_BLOCK);
@@ -1060,14 +1293,26 @@ TO_SECURITY
         local @ENV{qw(IFS CDPATH ENV BASH_ENV)};
 
         # untar test
-        if ($^O =~ /\A (?: MSWin32 | NetWare | symbian | dos ) \z/oxms) {
-            system(qq{pmake.bat ptar.bat});
-            system(qq{ptar.bat xzvf $tardir.tar.gz});
+        #
+        # Both helpers are started as "$^X -x FILE" through the list form of
+        # system(), which spawns them directly instead of handing a command
+        # line to a shell.  That drops three platform dependencies at once:
+        # the execute bit of this file (a tarball unpacked under a umask
+        # that clears it, or a checkout on a filesystem without mode bits,
+        # made "./pmake.bat" fail outright), the presence of "." in PATH,
+        # and the cmd.exe / sh dispatch of the polyglot preamble.  Perl's -x
+        # skips to the "#!perl" line, which is what the preamble exists for,
+        # so one spelling now serves Windows and every Unix alike.
+        my $self_path = $0;
+        # On Windows, perl -x -S sets $0 to the script name; use FindBin as fallback
+        unless (-f $self_path) {
+            $self_path = "$FindBin::RealBin/$FindBin::RealScript";
         }
-        else {
-            system(qq{./pmake.bat ptar});
-            system(qq{./ptar xzvf $tardir.tar.gz});
-        }
+        my $ptar_file = ($^O =~ /\A (?: MSWin32 | NetWare | symbian | dos ) \z/oxms)
+                      ? 'ptar.bat'
+                      : 'ptar';
+        system($^X, '-x', $self_path, $ptar_file);
+        system($^X, '-x', $ptar_file, 'xzvf', "$tardir.tar.gz");
     }
 
     # make ptar
@@ -1344,7 +1589,7 @@ sub which {
         return $_[0];
     }
     else {
-        for my $path (split(/:/,$ENV{'PATH'})) {
+        for my $path (split(/:/, $ENV{'PATH'})) {
             if (-e qq{$path/$_[0]}) {
                 return qq{$path/$_[0]};
             }
@@ -1368,7 +1613,7 @@ sub _runtests {
     #   Preferred POSIX equivalent is: /cygdrive/c/cpan/Char-X.XX
     #   CYGWIN environment variable option "nodosfilewarning" turns off this warning.
     #   Consult the user's guide for more details about POSIX paths: #'
-    #     https://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+    #     http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
 
     if (exists $ENV{'CYGWIN'}) {
         if ($ENV{'CYGWIN'} !~ /\b nodosfilewarning \b/x) {
@@ -1377,47 +1622,85 @@ sub _runtests {
     }
 
     my $start_time = time();
+
+    # The interpreter path may contain spaces (C:\Program Files\...), so
+    # quote it for the piped command, exactly as
+    # INA_CPAN_Check::selfcheck_suite already does.  Test file names in an
+    # ina distribution never contain spaces.
+    my $perl = $^X;
+    $perl = qq{"$perl"} if $perl =~ /\s/;
+
     my $scriptno = 0;
     for my $script (@script) {
-        next if not -e $script;
+
+        # A file listed in MANIFEST but missing from the working directory
+        # used to be skipped without a word, and without advancing
+        # $scriptno, which then misaligned every later entry of
+        # @fail_testno against @script in the summary report.
+        if (not -e $script) {
+            printf("$script FAILED -- file not found\n");
+            $not_ok_script++;
+            $scriptno++;
+            next;
+        }
 
         my $ok = 0;
         my $not_ok = 0;
         my $skip = 0;
-        if (my @result = qx{$^X $script}) {
-            if (my($tests) = shift(@result) =~ /^1..([0-9]+)/) {
-                for my $result (@result) {
-                    # Read TAP test number directly to avoid offset from comment lines
-                    if ($result =~ /^ok (\d+)/) {
-                        my $tapno = $1;
-                        if ($result =~ /\bSKIP\b/i) {
-                            $skip++;
-                        }
-                        else {
-                            $ok++;
-                        }
-                    }
-                    elsif ($result =~ /^not ok (\d+)/) {
-                        my $tapno = $1;
-                        push @{$fail_testno[$scriptno]}, $tapno;
-                        $not_ok++;
-                    }
-                    # TAP comment lines (^#) and other lines are silently ignored
-                }
-                if ($not_ok == 0) {
-                    if ($skip > 0) {
-                        printf("$script ok (skipped: %d)\n", $skip);
-                    }
-                    else {
-                        printf("$script ok\n");
-                    }
-                    $ok_script++;
+        my @result = qx{$perl $script};
+
+        # Look for the plan anywhere in the output rather than on the first
+        # line only.  A file that prints anything before its plan, or that
+        # dies before printing one at all, used to be counted as neither ok
+        # nor not ok: the run was reported as a failure with nothing named
+        # in the summary.  Both cases are now named.
+        my $plan = undef;
+        for my $i (0 .. $#result) {
+            if ($result[$i] =~ /^1\.\.([0-9]+)/) {
+                $plan = $1;
+                splice(@result, $i, 1);
+                last;
+            }
+        }
+        if (not defined $plan) {
+            printf("$script FAILED -- no TAP plan in its output\n");
+            $not_ok_script++;
+            $scriptno++;
+            next;
+        }
+
+        for my $result (@result) {
+            # Read TAP test number directly to avoid offset from comment lines
+            if ($result =~ /^ok (\d+)/) {
+                if ($result =~ /\bSKIP\b/i) {
+                    $skip++;
                 }
                 else {
-                    printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok+$skip);
-                    $not_ok_script++;
+                    $ok++;
                 }
             }
+            elsif ($result =~ /^not ok (\d+)/) {
+                my $tapno = $1;
+                push @{$fail_testno[$scriptno]}, $tapno;
+                $not_ok++;
+            }
+            # TAP comment lines (^#) and other lines are silently ignored
+        }
+        if ($not_ok == 0) {
+            if ($skip > 0) {
+                printf("$script ok (skipped: %d)\n", $skip);
+            }
+            else {
+                printf("$script ok\n");
+            }
+            $ok_script++;
+        }
+        else {
+            # The planned count is what prove reports as the denominator;
+            # the number of result lines actually seen can be smaller when
+            # the file died part way through.
+            printf("$script Failed %d/%d subtests\n", $not_ok, $plan);
+            $not_ok_script++;
         }
         $total_ok   += $ok;
         $total_not_ok += $not_ok;
@@ -1507,6 +1790,12 @@ sub _sc_slurp_lines {
     my @lines = <SC_FH>;
     close SC_FH;
     return @lines;
+}
+
+sub _sc_has_non_usascii {
+    my ($path) = @_;
+    my $raw = _sc_slurp($path);
+    return ($raw =~ /[^\x00-\x7f]/) ? 1 : 0;
 }
 
 # Mask here-document bodies, blanking each body line while keeping the
@@ -1613,9 +1902,30 @@ sub _selfcheck_p1p12 {
         "$label P1: no bare use 5.006+");
 
     # P2: 3-arg open guarded or absent
-    my $has_3arg = ($code =~ /\bopen\s*\(\s*(?:(?:my\s+)?\$\w+|[A-Z_][A-Z0-9_]*)\s*,\s*['"](?:>>?|<<?|\+>|\+<)['"]\s*,/);
-    _sc_ok(!$has_3arg || $guarded,
-        "$label P2: 3-arg open guarded or absent");
+    do {
+        # Scan per line, skipping comment lines and stripping quoted
+        # strings, so a 3-arg open() shown in a descriptive comment or
+        # quoted inside a diagnostic message is not mistaken for executable
+        # code. Once strings collapse to ''/"", a genuine 3-arg open still
+        # carries an empty mode-string between two commas
+        # (open($fh,'<',$f) -> open($fh,'',$f)), while a 2-arg open
+        # (open(FH,"<$file")) collapses to a single argument and is not
+        # flagged. (Masking discipline carried over from
+        # Perl500503Syntax::OrDie.)
+        my $has_3arg = 0;
+        for my $l (split /\n/, $code) {
+            next if $l =~ /^\s*#/;
+            my $s = $l;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s/#.*$//;
+            if ($s =~ /\bopen\s*\(\s*(?:(?:my\s+)?\$\w+|[A-Z_][A-Z0-9_]*)\s*,\s*(?:''|"")\s*,/) {
+                $has_3arg = 1; last;
+            }
+        }
+        _sc_ok(!$has_3arg || $guarded,
+            "$label P2: 3-arg open guarded or absent");
+    };
 
     # P3: open(my $fh...) guarded or absent
     do {
@@ -1664,6 +1974,18 @@ sub _selfcheck_p1p12 {
             $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
             $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
             $s =~ s/#.*$//;
+            # Strip quote-like regex operators whose delimiters are braces,
+            # brackets, parens or angles (m{...} qr{...} s{...}{...} m[...]
+            # m(...) m<...>) so a regex *pattern* such as m{//=} -- data,
+            # not an operator -- does not leak its text into the scan below.
+            # A bare /.../ is intentionally left alone: an empty-pattern
+            # match // is indistinguishable from the // of the //= operator,
+            # so stripping it would hide a real //=. (Masking discipline
+            # carried over from Perl500503Syntax::OrDie.)
+            $s =~ s/\b(?:m|qr|s)\s*\{[^{}]*\}(?:\s*\{[^{}]*\})?[a-z]*//g;
+            $s =~ s/\b(?:m|qr|s)\s*\[[^\[\]]*\](?:\s*\[[^\[\]]*\])?[a-z]*//g;
+            $s =~ s/\b(?:m|qr|s)\s*\([^()]*\)(?:\s*\([^()]*\))?[a-z]*//g;
+            $s =~ s/\b(?:m|qr|s)\s*<[^<>]*>(?:\s*<[^<>]*>)?[a-z]*//g;
             next if $s =~ m{://};
             # Built from single characters so this detector does not itself
             # contain a literal defined-or-assignment token in its source.
@@ -1698,18 +2020,26 @@ sub _selfcheck_p1p12 {
 
     # P12: // defined-or guarded or absent
     do {
+        # Mask single/double-quoted strings and trailing comments before
+        # scanning, so a literal "//" appearing inside a string (e.g. a
+        # diagnostic message such as "no defined-or // operator") is not
+        # mistaken for the 5.10 defined-or operator. (Masking discipline
+        # carried over from P8 and Perl500503Syntax::OrDie.)
         my $p12_fail = 0;
         for my $p12_line (split /\n/, $code) {
             next if $p12_line =~ /^\s*#/;
-            $p12_line =~ s/#[^'"]*$//;
-            next if $p12_line =~ /=~\s*[sm]?\//;
+            my $s = $p12_line;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s/#.*$//;
+            next if $s =~ /=~\s*[sm]?\//;
             # split/grep/map are regex-introducing list operators: an empty
             # pattern (as the first argument) immediately after one of them
             # is a pattern, never the 5.10 defined-or operator. (Knowledge
             # carried over from Perl500503Syntax::OrDie.)
-            next if $p12_line =~ /\b(?:split|grep|map)\s*\/\//;
-            next if $p12_line =~ m{://};
-            if ($p12_line =~ m{\s//[^/=]}) { $p12_fail = 1; last }
+            next if $s =~ /\b(?:split|grep|map)\s*\/\//;
+            next if $s =~ m{://};
+            if ($s =~ m{\s//[^/=]}) { $p12_fail = 1; last }
         }
         _sc_ok(!$p12_fail || $guarded,
             "$label P12: defined-or operator guarded or absent");
@@ -1789,9 +2119,14 @@ sub _selfcheck_style {
             $s =~ s{(?<![\w*&:'])(?:s|m|qr|split\s*/)[^/]*/[^/]*/[gimsex]*}{}g;
             $s =~ s{/[^/]+/[gimsex]*}{}g;
             $s =~ s/#.*$//;
-            # Allow comma immediately before $ (variable) or '' "" (empty string after strip)
-            # and before quote characters (residue of stripped strings)
-            if ($s =~ /,(?=[^\s\n\)\]\}\/'"\$])/) {
+            # K1 must be spelled exactly as INA_CPAN_Check::check_K spells
+            # it.  This copy used to exempt a comma followed by $, ' or ",
+            # on the grounds that a stripped string leaves a quote behind
+            # -- but f("a","b") really does lack the space, and f($x,$y)
+            # really does too, so the exemption was hiding the very lines
+            # the rule exists to find.  Two implementations of one named
+            # rule that disagree are worse than either, so it is gone.
+            if ($s =~ /,(?=[^\s\n\)\]\}\/])/) {
                 push @k1_bad, $lineno;
             }
         }
@@ -1838,6 +2173,52 @@ sub _selfcheck_style {
             "$label K3: use { \%hash } instead of \\\%hash"
             . (@k3_bad ? " (lines: @k3_bad[0..(@k3_bad<3?$#k3_bad:2)])" : ''));
     };
+
+    # K4: a match handed to a locally declared ok()/is() must be forced
+    # into scalar context.
+    #
+    # ok() and is() take a plain list, so their arguments are evaluated in
+    # LIST context.  A match in list context returns the empty list when it
+    # fails and the capture list when it succeeds, not the 1/'' a boolean
+    # argument is meant to be.  ok($str =~ /wanted/, 'name') therefore
+    # hands 'name' to ok() as the condition and nothing as the description
+    # whenever the match FAILS: the assertion prints as a nameless "ok" and
+    # can never fail.  With a capture group the error runs the other way, a
+    # successful match capturing '0' or '' reporting a failure.  Either way
+    # the assertion is inert and the defect it was written to catch is
+    # never reported.
+    #
+    # INA_CPAN_Check::ok carries an ($;$) prototype, which imposes scalar
+    # context, so only helpers declared in the file under test are looked
+    # at.  Spelled exactly as INA_CPAN_Check::check_K spells K4.
+    do {
+        my %own;
+        for my $line (split /\n/, $code) {
+            next unless $line =~ /^[ \t]*sub[ \t]+(ok|is|isnt)[ \t]*(\S?)/;
+            $own{$1} = 1 unless $2 eq '(';
+        }
+        my @k4_bad;
+        if (keys %own) {
+            my $names = join '|', sort keys %own;
+            my $lineno = 0;
+            for my $line (split /\n/, $code) {
+                $lineno++;
+                next if $line =~ /^\s*#/;
+                my $cl = $line;
+                $cl =~ s/#.*$//;
+                next unless $cl =~ /(?:^|[^\w\$>:-])(?:$names)\s*\(([^;]*)/;
+                my $arg = $1;
+                next unless $arg =~ /=~/;
+                next if $arg =~ /\?[^?]*:/;
+                next if $arg =~ /\bscalar\s*\(/;
+                next if $arg =~ /(?:^|[\(,])\s*!/;
+                push @k4_bad, $lineno;
+            }
+        }
+        _sc_ok(!@k4_bad,
+            "$label K4: match as a test argument needs scalar context"
+            . (@k4_bad ? " (lines: @k4_bad[0..(@k4_bad<3?$#k4_bad:2)])" : ''));
+    };
 }
 
 ######################################################################
@@ -1854,14 +2235,36 @@ sub _dist_check_sources {
     my ($files_ref, $do_check1, $do_check2) = @_;
     return unless $do_check1 || $do_check2;
 
-    # Target: lib/*.pm, lib/*.pl, t/*.t, xt/*.t, eg/*.pl, bin/*.pl, bin/*.pm
+    # Target: lib/*.pm, lib/*.pl, t/*.t, t/lib/*.pm, xt/*.t, eg/*.pl, bin/*.pl, bin/*.pm
     my @targets = grep {
         /^lib\/.*\.(pm|pl)$/i
         || /^t\/.*\.t$/i
+        || /^t\/lib\/.+\.pm$/i
         || /^xt\/.*\.t$/i
-        || /^eg\/.*\.pl$/i
+        || m{^eg\/[^/]*\.pl$}i
+        || /^eg\/en\/.*\.pl$/i
         || /^bin\/.*\.(pl|pm)$/i
     } @{$files_ref};
+
+    # Scope mirrors t/9020-perl5compat.t (P1-P12) and t/9040-style.t
+    # (C1/E/K1-K3): the multibyte transpiler core (lib/mb.pm) and the
+    # t/NNNN fixtures (any t/*.t that is not a t/9xxx maintenance test)
+    # intentionally carry post-5.005_03 tokens and/or non-US-ASCII bytes as
+    # transformation data, so the ina@CPAN house-style scans do not apply to
+    # them. The t/9xxx tests and t/lib/*.pm are themselves US-ASCII and
+    # 5.005_03-clean and are checked. (Without this scope every fixture
+    # false-fails C1, and lib/mb.pm false-fails P/K -- 212 spurious FAILs.)
+    # A distribution module is exempted from the house-style scans only when
+    # it actually carries non-US-ASCII bytes: that marks a multibyte
+    # transpiler core (e.g. lib/mb.pm, lib/mb8.pm) whose bytes are
+    # transformation DATA, not code. Ordinary US-ASCII modules (e.g.
+    # lib/BATsh.pm) are always checked. Exemption is decided by CONTENT, not
+    # by MANIFEST position, so the test stays correct for every ina dist.
+    @targets = grep {
+        !( m{\.pm$}i && _sc_has_non_usascii($_) )
+        && !( m{^t/.*\.t$}i && $_ !~ m{^t/9\d{3}}i )
+    } @targets;
+
     @targets = grep { -f $_ } @targets;
 
     return unless @targets;
@@ -1945,7 +2348,7 @@ sub _selfcheck {
 
 sub check_usascii {
     my($file) = @_;
-    if (open(FILE,$file)) {
+    if (open(FILE, $file)) {
         while (<FILE>) {
             if (not /^[\x0A\x20-\x7E]+$/) {
                 die "error not US-ASCII: $file, q(;_;)bad!!";

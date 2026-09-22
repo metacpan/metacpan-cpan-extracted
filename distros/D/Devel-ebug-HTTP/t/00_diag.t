@@ -9,21 +9,20 @@ use Test::More tests => 1;
 my %modules;
 my $post_diag;
 
+BEGIN { eval q{ use EV; } }
 $modules{$_} = $_ for qw(
-  Catalyst
-  Catalyst::Controller
-  Catalyst::Plugin::Static::Simple
-  Catalyst::ScriptRunner
-  Catalyst::View::TT
   Devel::ebug
+  EV
   ExtUtils::MakeMaker
   File::ShareDir::Dist
   File::ShareDir::Install
-  HTTP::Request::Common
+  Mojolicious
+  Mojolicious::Lite
+  Mojolicious::Plugin::TtRenderer
   PPI
   PPI::HTML
+  Test::Mojo
   Test::More
-  Test::WWW::Mechanize::Catalyst
 );
 
 

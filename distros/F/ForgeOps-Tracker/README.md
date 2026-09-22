@@ -324,6 +324,27 @@ succeeds, since a plan without the feature rejects every flush and would otherwi
 as the process lives. A NaN, infinite or non-numeric value is dropped at capture. Requires a ForgeOps
 plan that includes custom metrics / infrastructure monitoring.
 
+## Database errors
+
+Perl has no exception type that carries the statement, but DBI puts it in the error text as `[for Statement "SELECT ..."]` when the handle has `ShowErrorStatement` turned on (DBIx::Class turns it on for you), and SQLite's own errors end `while compiling: ...`. This client reads the statement out of that text (never the `with ParamValues:` part, which is the values), so the event includes the names of the stored procedure, table and view it touched, and the issue tells you where to start looking. This is on by default and sends identifiers only, never values.
+
+To also send the SQL statement itself, opt in. Every string and number is replaced by `?` before it
+leaves your process (`WHERE email = 'a@b.co' AND id = 42` is sent as `WHERE email = ? AND id = ?`),
+and ForgeOps masks it again on arrival:
+
+```perl
+my $dbh = DBI->connect($dsn, $user, $pass, { RaiseError => 1, ShowErrorStatement => 1 });
+
+# Opt in to also sending the masked statement (default 0).
+ForgeOps::Tracker::init(dsn => '...', capture_sql_statement => 1);
+# capture_sql_objects => 0 stops even the names (default 1)
+```
+
+Each ForgeOps project also has its own "Capture the SQL behind database errors" setting. Turn it off
+there and the statement is never stored for that project, whatever this flag says; the names are
+still kept. A view and a table are written the same way in SQL, so both show as tables/views; the
+database's own error message usually settles which it was.
+
 ## Running the tests
 
 ```bash

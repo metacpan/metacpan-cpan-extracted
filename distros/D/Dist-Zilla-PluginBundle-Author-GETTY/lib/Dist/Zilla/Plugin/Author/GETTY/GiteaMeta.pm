@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::Author::GETTY::GiteaMeta;
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider';
 
-our $VERSION = '0.324';
+our $VERSION = '0.325';
 
 
 
@@ -146,7 +146,7 @@ Dist::Zilla::Plugin::Author::GETTY::GiteaMeta - Add Gitea/Forgejo (incl. Codeber
 
 =head1 VERSION
 
-version 0.324
+version 0.325
 
 =head1 DESCRIPTION
 

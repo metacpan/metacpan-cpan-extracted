@@ -1,13 +1,13 @@
 package IO::K8s::Cilium::V2::CiliumEnvoyConfig;
-# ABSTRACT: Cilium Envoy proxy configuration
-our $VERSION = '1.107';
+# ABSTRACT: CiliumEnvoyConfig
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumenvoyconfigs';
 with 'IO::K8s::Role::Namespaced';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec => '+IO::K8s::Cilium::V2::CiliumEnvoyConfigSpec';
+
 
 1;
 
@@ -19,25 +19,15 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Cilium::V2::CiliumEnvoyConfig - Cilium Envoy proxy configuration
+IO::K8s::Cilium::V2::CiliumEnvoyConfig - CiliumEnvoyConfig
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-This namespace-scoped resource configures an Envoy proxy sidecar for L7 network policies and service mesh capabilities within a namespace. It uses API version C<cilium.io/v2>. The C<spec> and C<status> fields contain opaque CRD-specific data structures managed by the Cilium operator and Envoy integration.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<IO::K8s::Cilium> - Main Cilium CRD namespace
-
-=item * L<https://docs.cilium.io/en/stable/network/servicemesh/envoy-config/> - Upstream Cilium Envoy configuration documentation
-
-=back
+No description in the upstream schema.
 
 =head1 SUPPORT
 

@@ -1,6 +1,6 @@
 package Google::RestApi;
 
-our $VERSION = '2.2.3';
+our $VERSION = '2.2.4';
 
 use Google::RestApi::Setup;
 
@@ -169,14 +169,19 @@ sub auth {
   my $self = shift;
 
   if (!blessed($self->{auth})) {
+    # Work on a shallow copy: the auth hashref may be owned by the caller
+    # (e.g. a live slice of an application's on-disk config). Deleting
+    # 'class' or adding 'config_dir' on the original would silently corrupt
+    # the caller's config, dropping the 'class' key when it is next saved.
+    my %auth = %{ $self->{auth} };
     # turn OAuth2Client into Google::RestApi::Auth::OAuth2Client etc.
-    my $class = __PACKAGE__ . "::Auth::" . delete $self->{auth}->{class};
+    my $class = __PACKAGE__ . "::Auth::" . delete $auth{class};
     load $class;
     # add the path to the base config file so auth hash doesn't have
     # to store the full path name for things like token_file etc.
-    $self->{auth}->{config_dir} = dirname($self->{config_file})
+    $auth{config_dir} = dirname($self->{config_file})
       if $self->{config_file};
-    $self->{auth} = $class->new(%{ $self->{auth} });
+    $self->{auth} = $class->new(%auth);
   }
 
   return $self->{auth};

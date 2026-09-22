@@ -1,9 +1,9 @@
 package IO::K8s::Api::Resource::V1::CapacityRequirements;
 # ABSTRACT: CapacityRequirements defines the capacity requirements for a specific device request.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
-k8s requests => { Str => 1 };
+k8s requests => { Quantity => 1 };
 
 
 1;
@@ -20,7 +20,7 @@ IO::K8s::Api::Resource::V1::CapacityRequirements - CapacityRequirements defines 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 requests
 

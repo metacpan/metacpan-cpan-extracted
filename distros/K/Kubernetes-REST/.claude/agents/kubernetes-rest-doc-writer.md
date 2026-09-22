@@ -5,7 +5,7 @@ model: sonnet
 allowed-tools: Read, Edit, Grep, Glob
 briefing:
   skills:
-    - perl-release-author-getty
+    - getty-perl-release-author-getty
     - kubernetes-rest-core
     - perl-kubernetes-rest
 ---

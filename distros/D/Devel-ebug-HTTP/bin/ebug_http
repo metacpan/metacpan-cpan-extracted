@@ -1,9 +1,4 @@
 #!perl
-BEGIN { 
-    $ENV{CATALYST_ENGINE} ||= 'HTTP';
-    $ENV{CATALYST_SCRIPT_GEN} = 40;
-}  
-
 use strict;
 use warnings;
 #use lib::findbin '../lib'; # dev-only
@@ -11,7 +6,7 @@ use Devel::ebug::HTTP;
 
 # PODNAME: ebug_http
 # ABSTRACT: A simple, extensible web Perl debugger
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.37'; # VERSION
 
 Devel::ebug::HTTP::App->main;
 
@@ -29,7 +24,7 @@ ebug_http - A simple, extensible web Perl debugger
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -52,7 +47,7 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2005-2021 by Leon Brocard.
+This software is copyright (c) 2005-2024 by Leon Brocard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

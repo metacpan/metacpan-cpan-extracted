@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceClaimConfiguration;
 # ABSTRACT: DeviceClaimConfiguration is used for configuration parameters in DeviceClaim.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s opaque => 'Resource::V1::OpaqueDeviceConfiguration';
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1::DeviceClaimConfiguration - DeviceClaimConfiguration 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 opaque
 

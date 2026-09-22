@@ -1,0 +1,11 @@
+{
+  "vnc": {
+    "server_ip": "203.0.113.50",
+    "server_ipv6_net": "2001:db8:111:4221::",
+    "server_number": 123456,
+    "dist": "centOS-5.0",
+    "lang": "en_US",
+    "active": true,
+    "password": "zQw3RtYuIoPaSdFg"
+  }
+}

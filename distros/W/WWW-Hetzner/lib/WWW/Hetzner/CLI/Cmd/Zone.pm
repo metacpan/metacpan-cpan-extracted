@@ -1,12 +1,13 @@
 package WWW::Hetzner::CLI::Cmd::Zone;
 # ABSTRACT: DNS Zone commands
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl zone [list|describe|create|delete] [options]';
 use JSON::MaybeXS qw(encode_json);
+
 
 
 sub execute {
@@ -40,10 +41,10 @@ sub _list {
     $params{label_selector} = $self->selector if $self->selector;
     $params{name} = $self->name if $self->name;
 
-    my $zones = $cloud->zones->list(%params);
+    my $zones = $cloud->zones->list_all(%params);
 
     if ($main->output eq 'json') {
-        print encode_json($zones), "\n";
+        print encode_json([ map { $_->data } @$zones ]), "\n";
         return;
     }
 
@@ -57,12 +58,13 @@ sub _list {
     print "-" x 80, "\n";
 
     for my $z (@$zones) {
-        my $labels = join(', ', map { "$_=$z->{labels}{$_}" } keys %{$z->{labels} // {}});
+        my $labels_data = $z->labels;
+        my $labels = join(', ', map { "$_=$labels_data->{$_}" } keys %{$labels_data // {}});
         printf "%-15s %-30s %-10s %-8s %s\n",
-            $z->{id},
-            $z->{name},
-            $z->{status} // '-',
-            $z->{ttl} // '-',
+            $z->id,
+            $z->name,
+            $z->status // '-',
+            $z->ttl // '-',
             $labels || '-';
     }
 }
@@ -81,7 +83,7 @@ WWW::Hetzner::CLI::Cmd::Zone - DNS Zone commands
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -90,6 +92,20 @@ version 0.100
     hcloud.pl zone describe <id>        # Show zone details
     hcloud.pl zone create --name example.com
     hcloud.pl zone delete <id>
+
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * L<list|WWW::Hetzner::CLI::Cmd::Zone::Cmd::List> - List DNS zones
+
+=item * L<describe|WWW::Hetzner::CLI::Cmd::Zone::Cmd::Describe> - Describe a DNS zone
+
+=item * L<create|WWW::Hetzner::CLI::Cmd::Zone::Cmd::Create> - Create a DNS zone
+
+=item * L<delete|WWW::Hetzner::CLI::Cmd::Zone::Cmd::Delete> - Delete a DNS zone
+
+=back
 
 =head1 SUPPORT
 
@@ -112,7 +128,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

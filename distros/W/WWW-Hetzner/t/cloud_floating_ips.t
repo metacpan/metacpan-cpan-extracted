@@ -67,6 +67,8 @@ subtest 'create floating IP' => sub {
     is($fip->id, 600, 'new floating IP id');
     is($fip->ip, '203.0.113.60', 'new IP address');
     ok(!$fip->is_assigned, 'not assigned');
+    isa_ok($fip->action, 'WWW::Hetzner::Action', 'create action is an Action');
+    is($fip->action->command, 'create_floating_ip', 'action command');
 };
 
 subtest 'delete floating IP' => sub {
@@ -100,7 +102,8 @@ subtest 'assign floating IP' => sub {
     );
 
     my $result = $cloud->floating_ips->assign(500, 456);
-    is($result->{action}{command}, 'assign_floating_ip', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Action');
+    is($result->command, 'assign_floating_ip', 'action command');
 };
 
 subtest 'unassign floating IP' => sub {
@@ -112,7 +115,8 @@ subtest 'unassign floating IP' => sub {
     );
 
     my $result = $cloud->floating_ips->unassign(500);
-    is($result->{action}{command}, 'unassign_floating_ip', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Action');
+    is($result->command, 'unassign_floating_ip', 'action command');
 };
 
 subtest 'change dns ptr' => sub {
@@ -129,14 +133,19 @@ subtest 'change dns ptr' => sub {
     );
 
     my $result = $cloud->floating_ips->change_dns_ptr(500, '203.0.113.50', 'new.example.com');
-    is($result->{action}{command}, 'change_dns_ptr', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Action');
+    is($result->command, 'change_dns_ptr', 'action command');
 };
 
 subtest 'floating IP entity methods' => sub {
     my $fixture = load_fixture('floating_ips_get');
+    my $action_fixture = load_fixture('floating_ips_action');
 
     my $cloud = mock_cloud(
         '/floating_ips/500' => $fixture,
+        'POST /floating_ips/500/actions/assign' => $action_fixture,
+        'POST /floating_ips/500/actions/unassign' => $action_fixture,
+        'POST /floating_ips/500/actions/change_dns_ptr' => $action_fixture,
     );
 
     my $fip = $cloud->floating_ips->get(500);
@@ -145,6 +154,10 @@ subtest 'floating IP entity methods' => sub {
     is($data->{id}, 500, 'data id');
     is($data->{ip}, '203.0.113.50', 'data ip');
     is($data->{type}, 'ipv4', 'data type');
+
+    isa_ok($fip->assign(456), 'WWW::Hetzner::Action', 'entity assign returns Action');
+    isa_ok($fip->unassign, 'WWW::Hetzner::Action', 'entity unassign returns Action');
+    isa_ok($fip->change_dns_ptr('203.0.113.50', 'new.example.com'), 'WWW::Hetzner::Action', 'entity change_dns_ptr returns Action');
 };
 
 done_testing;

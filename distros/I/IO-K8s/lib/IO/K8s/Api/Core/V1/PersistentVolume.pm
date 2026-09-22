@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PersistentVolume;
 # ABSTRACT: PersistentVolume (PV) is a storage resource provisioned by an administrator. It is analogous to a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::PersistentVolume - PersistentVolume (PV) is a storage re
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ status represents the current information/status for the persistent volume. Popu
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#persistentvolume-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#persistentvolume-v1-core>
 
 =head1 SUPPORT
 

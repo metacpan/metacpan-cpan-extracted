@@ -1,0 +1,289 @@
+# cert-manager CRD emitter overlay (D5/D6, k95, task B-cert-manager).
+#
+# Read by maint/crd-drift-check.pl --render/--check for --provider CertManager.
+# `names` maps the logical path below each Kind (what
+# IO::K8s::AutoGen::class_path returns, e.g. "Spec::Solver::Dns01::Route53")
+# to the upstream Go type name at the pinned upstream_version (v1.21.1):
+#   pkg/apis/certmanager/v1/types_certificate.go, types_certificaterequest.go,
+#   types_issuer.go (github.com/cert-manager/cert-manager -- IssuerSpec is
+#   the literal same Go type embedded by both Issuer and ClusterIssuer, so
+#   both Kinds below map their whole spec tree onto the same class names)
+#   pkg/apis/acme/v1/types_issuer.go (ACMEIssuer/ACMEChallengeSolver family,
+#   embedded by Issuer/ClusterIssuer's `acme` and referenced directly by
+#   Challenge's `solver` -- one shared class set across all three Kinds),
+#   types_challenge.go, types_order.go
+#   pkg/apis/meta/v1/types.go (IssuerReference, SecretKeySelector,
+#   LocalObjectReference -- shared across every Kind that carries them)
+# A Go type reused verbatim across Kinds or fields (SecretKeySelector,
+# IssuerReference, LocalObjectReference, ServiceAccountRef,
+# CertificateDNSNameSelector, the whole ACMEChallengeSolver family, the
+# whole IssuerSpec family) maps to the same bare name at every occurrence --
+# one shared class, per D6. The HTTP01 solver's inlined pod template is
+# cert-manager's own trimmed corev1.PodSpec subset, not the full
+# PodTemplateSpec, so reuse_core leaves it a nested class (as documented in
+# lib/IO/K8s/AutoGen.pm) -- named after cert-manager's own
+# ACMEChallengeSolverHTTP01IngressPodTemplate/PodObjectMeta/PodSpec Go types
+# (shared between the Ingress and GatewayHTTPRoute solvers, which embed the
+# literal same Go struct). `with`/`extra` are copied verbatim from the
+# opaque roots this overlay replaces.
+base: IO::K8s::CertManager
+kinds:
+  Certificate:
+    extra: []
+    names:
+      Spec::AdditionalOutputFormatsItem: CertificateAdditionalOutputFormat
+      Spec::IssuerRef: IssuerReference
+      Spec::Keystores: CertificateKeystores
+      Spec::Keystores::Jks: JKSKeystore
+      Spec::Keystores::Jks::PasswordSecretRef: SecretKeySelector
+      Spec::Keystores::Pkcs12: PKCS12Keystore
+      Spec::Keystores::Pkcs12::PasswordSecretRef: SecretKeySelector
+      Spec::NameConstraints: NameConstraints
+      Spec::NameConstraints::Excluded: NameConstraintItem
+      Spec::NameConstraints::Permitted: NameConstraintItem
+      Spec::OtherNamesItem: OtherName
+      Spec::PrivateKey: CertificatePrivateKey
+      Spec::Renewal: CertificateRenewal
+      Spec::Renewal::WindowsItem: CertificateRenewalWindows
+      Spec::SecretTemplate: CertificateSecretTemplate
+      Spec::Subject: X509Subject
+      Status::Acme: CertificateACMEStatus
+      Status::Acme::Ari: CertificateACMEARIStatus
+      Status::Acme::Ari::SuggestedWindow: ACMERenewalWindow
+      Status::ConditionsItem: CertificateCondition
+    with:
+    - IO::K8s::Role::Namespaced
+    - IO::K8s::Role::CertManaged
+  CertificateRequest:
+    extra: []
+    no_reuse_core:
+    - Status::ConditionsItem
+    names:
+      Spec::IssuerRef: IssuerReference
+      Status::ConditionsItem: CertificateRequestCondition
+    with:
+    - IO::K8s::Role::Namespaced
+  Challenge:
+    extra: []
+    names:
+      Spec::IssuerRef: IssuerReference
+      Spec::Solver: ACMEChallengeSolver
+      Spec::Solver::Dns01: ACMEChallengeSolverDNS01
+      Spec::Solver::Dns01::AcmeDNS: ACMEIssuerDNS01ProviderAcmeDNS
+      Spec::Solver::Dns01::AcmeDNS::AccountSecretRef: SecretKeySelector
+      Spec::Solver::Dns01::Akamai: ACMEIssuerDNS01ProviderAkamai
+      Spec::Solver::Dns01::Akamai::AccessTokenSecretRef: SecretKeySelector
+      Spec::Solver::Dns01::Akamai::ClientSecretSecretRef: SecretKeySelector
+      Spec::Solver::Dns01::Akamai::ClientTokenSecretRef: SecretKeySelector
+      Spec::Solver::Dns01::AzureDNS: ACMEIssuerDNS01ProviderAzureDNS
+      Spec::Solver::Dns01::AzureDNS::ClientSecretSecretRef: SecretKeySelector
+      Spec::Solver::Dns01::AzureDNS::ManagedIdentity: AzureManagedIdentity
+      Spec::Solver::Dns01::CloudDNS: ACMEIssuerDNS01ProviderCloudDNS
+      Spec::Solver::Dns01::CloudDNS::ServiceAccountSecretRef: SecretKeySelector
+      Spec::Solver::Dns01::Cloudflare: ACMEIssuerDNS01ProviderCloudflare
+      Spec::Solver::Dns01::Cloudflare::ApiKeySecretRef: SecretKeySelector
+      Spec::Solver::Dns01::Cloudflare::ApiTokenSecretRef: SecretKeySelector
+      Spec::Solver::Dns01::Digitalocean: ACMEIssuerDNS01ProviderDigitalOcean
+      Spec::Solver::Dns01::Digitalocean::TokenSecretRef: SecretKeySelector
+      Spec::Solver::Dns01::Rfc2136: ACMEIssuerDNS01ProviderRFC2136
+      Spec::Solver::Dns01::Rfc2136::TsigSecretSecretRef: SecretKeySelector
+      Spec::Solver::Dns01::Route53: ACMEIssuerDNS01ProviderRoute53
+      Spec::Solver::Dns01::Route53::AccessKeyIDSecretRef: SecretKeySelector
+      Spec::Solver::Dns01::Route53::Auth: Route53Auth
+      Spec::Solver::Dns01::Route53::Auth::Kubernetes: Route53KubernetesAuth
+      Spec::Solver::Dns01::Route53::Auth::Kubernetes::ServiceAccountRef: ServiceAccountRef
+      Spec::Solver::Dns01::Route53::SecretAccessKeySecretRef: SecretKeySelector
+      Spec::Solver::Dns01::Webhook: ACMEIssuerDNS01ProviderWebhook
+      Spec::Solver::Http01: ACMEChallengeSolverHTTP01
+      Spec::Solver::Http01::GatewayHTTPRoute: ACMEChallengeSolverHTTP01GatewayHTTPRoute
+      Spec::Solver::Http01::GatewayHTTPRoute::ParentRefsItem: ParentReference
+      Spec::Solver::Http01::GatewayHTTPRoute::PodTemplate: ACMEChallengeSolverHTTP01IngressPodTemplate
+      Spec::Solver::Http01::GatewayHTTPRoute::PodTemplate::Metadata: ACMEChallengeSolverHTTP01IngressPodObjectMeta
+      Spec::Solver::Http01::GatewayHTTPRoute::PodTemplate::Spec: ACMEChallengeSolverHTTP01IngressPodSpec
+      Spec::Solver::Http01::GatewayHTTPRoute::PodTemplate::Spec::ImagePullSecretsItem: LocalObjectReference
+      Spec::Solver::Http01::GatewayHTTPRoute::PodTemplate::Spec::SecurityContext: ACMEChallengeSolverHTTP01IngressPodSecurityContext
+      Spec::Solver::Http01::Ingress: ACMEChallengeSolverHTTP01Ingress
+      Spec::Solver::Http01::Ingress::IngressTemplate: ACMEChallengeSolverHTTP01IngressTemplate
+      Spec::Solver::Http01::Ingress::IngressTemplate::Metadata: ACMEChallengeSolverHTTP01IngressObjectMeta
+      Spec::Solver::Http01::Ingress::PodTemplate: ACMEChallengeSolverHTTP01IngressPodTemplate
+      Spec::Solver::Http01::Ingress::PodTemplate::Metadata: ACMEChallengeSolverHTTP01IngressPodObjectMeta
+      Spec::Solver::Http01::Ingress::PodTemplate::Spec: ACMEChallengeSolverHTTP01IngressPodSpec
+      Spec::Solver::Http01::Ingress::PodTemplate::Spec::ImagePullSecretsItem: LocalObjectReference
+      Spec::Solver::Http01::Ingress::PodTemplate::Spec::Resources: ACMEChallengeSolverHTTP01IngressPodResources
+      Spec::Solver::Http01::Ingress::PodTemplate::Spec::SecurityContext: ACMEChallengeSolverHTTP01IngressPodSecurityContext
+      Spec::Solver::Selector: CertificateDNSNameSelector
+    with:
+    - IO::K8s::Role::Namespaced
+  ClusterIssuer:
+    extra: []
+    names:
+      Spec: IssuerSpec
+      Spec::Acme: ACMEIssuer
+      Spec::Acme::ExternalAccountBinding: ACMEExternalAccountBinding
+      Spec::Acme::ExternalAccountBinding::KeySecretRef: SecretKeySelector
+      Spec::Acme::PrivateKeySecretRef: SecretKeySelector
+      Spec::Acme::SolversItem: ACMEChallengeSolver
+      Spec::Acme::SolversItem::Dns01: ACMEChallengeSolverDNS01
+      Spec::Acme::SolversItem::Dns01::AcmeDNS: ACMEIssuerDNS01ProviderAcmeDNS
+      Spec::Acme::SolversItem::Dns01::AcmeDNS::AccountSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Akamai: ACMEIssuerDNS01ProviderAkamai
+      Spec::Acme::SolversItem::Dns01::Akamai::AccessTokenSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Akamai::ClientSecretSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Akamai::ClientTokenSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::AzureDNS: ACMEIssuerDNS01ProviderAzureDNS
+      Spec::Acme::SolversItem::Dns01::AzureDNS::ClientSecretSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::AzureDNS::ManagedIdentity: AzureManagedIdentity
+      Spec::Acme::SolversItem::Dns01::CloudDNS: ACMEIssuerDNS01ProviderCloudDNS
+      Spec::Acme::SolversItem::Dns01::CloudDNS::ServiceAccountSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Cloudflare: ACMEIssuerDNS01ProviderCloudflare
+      Spec::Acme::SolversItem::Dns01::Cloudflare::ApiKeySecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Cloudflare::ApiTokenSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Digitalocean: ACMEIssuerDNS01ProviderDigitalOcean
+      Spec::Acme::SolversItem::Dns01::Digitalocean::TokenSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Rfc2136: ACMEIssuerDNS01ProviderRFC2136
+      Spec::Acme::SolversItem::Dns01::Rfc2136::TsigSecretSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Route53: ACMEIssuerDNS01ProviderRoute53
+      Spec::Acme::SolversItem::Dns01::Route53::AccessKeyIDSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Route53::Auth: Route53Auth
+      Spec::Acme::SolversItem::Dns01::Route53::Auth::Kubernetes: Route53KubernetesAuth
+      Spec::Acme::SolversItem::Dns01::Route53::Auth::Kubernetes::ServiceAccountRef: ServiceAccountRef
+      Spec::Acme::SolversItem::Dns01::Route53::SecretAccessKeySecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Webhook: ACMEIssuerDNS01ProviderWebhook
+      Spec::Acme::SolversItem::Http01: ACMEChallengeSolverHTTP01
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute: ACMEChallengeSolverHTTP01GatewayHTTPRoute
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::ParentRefsItem: ParentReference
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::PodTemplate: ACMEChallengeSolverHTTP01IngressPodTemplate
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::PodTemplate::Metadata: ACMEChallengeSolverHTTP01IngressPodObjectMeta
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::PodTemplate::Spec: ACMEChallengeSolverHTTP01IngressPodSpec
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::PodTemplate::Spec::ImagePullSecretsItem: LocalObjectReference
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::PodTemplate::Spec::SecurityContext: ACMEChallengeSolverHTTP01IngressPodSecurityContext
+      Spec::Acme::SolversItem::Http01::Ingress: ACMEChallengeSolverHTTP01Ingress
+      Spec::Acme::SolversItem::Http01::Ingress::IngressTemplate: ACMEChallengeSolverHTTP01IngressTemplate
+      Spec::Acme::SolversItem::Http01::Ingress::IngressTemplate::Metadata: ACMEChallengeSolverHTTP01IngressObjectMeta
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate: ACMEChallengeSolverHTTP01IngressPodTemplate
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate::Metadata: ACMEChallengeSolverHTTP01IngressPodObjectMeta
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate::Spec: ACMEChallengeSolverHTTP01IngressPodSpec
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate::Spec::ImagePullSecretsItem: LocalObjectReference
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate::Spec::Resources: ACMEChallengeSolverHTTP01IngressPodResources
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate::Spec::SecurityContext: ACMEChallengeSolverHTTP01IngressPodSecurityContext
+      Spec::Acme::SolversItem::Selector: CertificateDNSNameSelector
+      Spec::Ca: CAIssuer
+      Spec::SelfSigned: SelfSignedIssuer
+      Spec::Vault: VaultIssuer
+      Spec::Vault::Auth: VaultAuth
+      Spec::Vault::Auth::AppRole: VaultAppRole
+      Spec::Vault::Auth::AppRole::SecretRef: SecretKeySelector
+      Spec::Vault::Auth::Aws: VaultAWSAuth
+      Spec::Vault::Auth::Aws::ServiceAccountRef: ServiceAccountRef
+      Spec::Vault::Auth::ClientCertificate: VaultClientCertificateAuth
+      Spec::Vault::Auth::Kubernetes: VaultKubernetesAuth
+      Spec::Vault::Auth::Kubernetes::SecretRef: SecretKeySelector
+      Spec::Vault::Auth::Kubernetes::ServiceAccountRef: ServiceAccountRef
+      Spec::Vault::Auth::TokenSecretRef: SecretKeySelector
+      Spec::Vault::CaBundleSecretRef: SecretKeySelector
+      Spec::Vault::ClientCertSecretRef: SecretKeySelector
+      Spec::Vault::ClientKeySecretRef: SecretKeySelector
+      Spec::Venafi: VenafiIssuer
+      Spec::Venafi::Cloud: VenafiCloud
+      Spec::Venafi::Cloud::ApiTokenSecretRef: SecretKeySelector
+      Spec::Venafi::Ngts: VenafiNGTS
+      Spec::Venafi::Ngts::CredentialsRef: CertManagerLocalObjectReference
+      Spec::Venafi::Tpp: VenafiTPP
+      Spec::Venafi::Tpp::CaBundleSecretRef: SecretKeySelector
+      Spec::Venafi::Tpp::CredentialsRef: CertManagerLocalObjectReference
+      Status: IssuerStatus
+      Status::Acme: ACMEIssuerStatus
+      Status::ConditionsItem: IssuerCondition
+    with:
+    - IO::K8s::Role::CertManaged
+  Issuer:
+    extra: []
+    names:
+      Spec: IssuerSpec
+      Spec::Acme: ACMEIssuer
+      Spec::Acme::ExternalAccountBinding: ACMEExternalAccountBinding
+      Spec::Acme::ExternalAccountBinding::KeySecretRef: SecretKeySelector
+      Spec::Acme::PrivateKeySecretRef: SecretKeySelector
+      Spec::Acme::SolversItem: ACMEChallengeSolver
+      Spec::Acme::SolversItem::Dns01: ACMEChallengeSolverDNS01
+      Spec::Acme::SolversItem::Dns01::AcmeDNS: ACMEIssuerDNS01ProviderAcmeDNS
+      Spec::Acme::SolversItem::Dns01::AcmeDNS::AccountSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Akamai: ACMEIssuerDNS01ProviderAkamai
+      Spec::Acme::SolversItem::Dns01::Akamai::AccessTokenSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Akamai::ClientSecretSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Akamai::ClientTokenSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::AzureDNS: ACMEIssuerDNS01ProviderAzureDNS
+      Spec::Acme::SolversItem::Dns01::AzureDNS::ClientSecretSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::AzureDNS::ManagedIdentity: AzureManagedIdentity
+      Spec::Acme::SolversItem::Dns01::CloudDNS: ACMEIssuerDNS01ProviderCloudDNS
+      Spec::Acme::SolversItem::Dns01::CloudDNS::ServiceAccountSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Cloudflare: ACMEIssuerDNS01ProviderCloudflare
+      Spec::Acme::SolversItem::Dns01::Cloudflare::ApiKeySecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Cloudflare::ApiTokenSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Digitalocean: ACMEIssuerDNS01ProviderDigitalOcean
+      Spec::Acme::SolversItem::Dns01::Digitalocean::TokenSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Rfc2136: ACMEIssuerDNS01ProviderRFC2136
+      Spec::Acme::SolversItem::Dns01::Rfc2136::TsigSecretSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Route53: ACMEIssuerDNS01ProviderRoute53
+      Spec::Acme::SolversItem::Dns01::Route53::AccessKeyIDSecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Route53::Auth: Route53Auth
+      Spec::Acme::SolversItem::Dns01::Route53::Auth::Kubernetes: Route53KubernetesAuth
+      Spec::Acme::SolversItem::Dns01::Route53::Auth::Kubernetes::ServiceAccountRef: ServiceAccountRef
+      Spec::Acme::SolversItem::Dns01::Route53::SecretAccessKeySecretRef: SecretKeySelector
+      Spec::Acme::SolversItem::Dns01::Webhook: ACMEIssuerDNS01ProviderWebhook
+      Spec::Acme::SolversItem::Http01: ACMEChallengeSolverHTTP01
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute: ACMEChallengeSolverHTTP01GatewayHTTPRoute
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::ParentRefsItem: ParentReference
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::PodTemplate: ACMEChallengeSolverHTTP01IngressPodTemplate
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::PodTemplate::Metadata: ACMEChallengeSolverHTTP01IngressPodObjectMeta
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::PodTemplate::Spec: ACMEChallengeSolverHTTP01IngressPodSpec
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::PodTemplate::Spec::ImagePullSecretsItem: LocalObjectReference
+      Spec::Acme::SolversItem::Http01::GatewayHTTPRoute::PodTemplate::Spec::SecurityContext: ACMEChallengeSolverHTTP01IngressPodSecurityContext
+      Spec::Acme::SolversItem::Http01::Ingress: ACMEChallengeSolverHTTP01Ingress
+      Spec::Acme::SolversItem::Http01::Ingress::IngressTemplate: ACMEChallengeSolverHTTP01IngressTemplate
+      Spec::Acme::SolversItem::Http01::Ingress::IngressTemplate::Metadata: ACMEChallengeSolverHTTP01IngressObjectMeta
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate: ACMEChallengeSolverHTTP01IngressPodTemplate
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate::Metadata: ACMEChallengeSolverHTTP01IngressPodObjectMeta
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate::Spec: ACMEChallengeSolverHTTP01IngressPodSpec
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate::Spec::ImagePullSecretsItem: LocalObjectReference
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate::Spec::Resources: ACMEChallengeSolverHTTP01IngressPodResources
+      Spec::Acme::SolversItem::Http01::Ingress::PodTemplate::Spec::SecurityContext: ACMEChallengeSolverHTTP01IngressPodSecurityContext
+      Spec::Acme::SolversItem::Selector: CertificateDNSNameSelector
+      Spec::Ca: CAIssuer
+      Spec::SelfSigned: SelfSignedIssuer
+      Spec::Vault: VaultIssuer
+      Spec::Vault::Auth: VaultAuth
+      Spec::Vault::Auth::AppRole: VaultAppRole
+      Spec::Vault::Auth::AppRole::SecretRef: SecretKeySelector
+      Spec::Vault::Auth::Aws: VaultAWSAuth
+      Spec::Vault::Auth::Aws::ServiceAccountRef: ServiceAccountRef
+      Spec::Vault::Auth::ClientCertificate: VaultClientCertificateAuth
+      Spec::Vault::Auth::Kubernetes: VaultKubernetesAuth
+      Spec::Vault::Auth::Kubernetes::SecretRef: SecretKeySelector
+      Spec::Vault::Auth::Kubernetes::ServiceAccountRef: ServiceAccountRef
+      Spec::Vault::Auth::TokenSecretRef: SecretKeySelector
+      Spec::Vault::CaBundleSecretRef: SecretKeySelector
+      Spec::Vault::ClientCertSecretRef: SecretKeySelector
+      Spec::Vault::ClientKeySecretRef: SecretKeySelector
+      Spec::Venafi: VenafiIssuer
+      Spec::Venafi::Cloud: VenafiCloud
+      Spec::Venafi::Cloud::ApiTokenSecretRef: SecretKeySelector
+      Spec::Venafi::Ngts: VenafiNGTS
+      Spec::Venafi::Ngts::CredentialsRef: CertManagerLocalObjectReference
+      Spec::Venafi::Tpp: VenafiTPP
+      Spec::Venafi::Tpp::CaBundleSecretRef: SecretKeySelector
+      Spec::Venafi::Tpp::CredentialsRef: CertManagerLocalObjectReference
+      Status: IssuerStatus
+      Status::Acme: ACMEIssuerStatus
+      Status::ConditionsItem: IssuerCondition
+    with:
+    - IO::K8s::Role::Namespaced
+    - IO::K8s::Role::CertManaged
+  Order:
+    extra: []
+    names:
+      Spec::IssuerRef: IssuerReference
+      Status::AuthorizationsItem: ACMEAuthorization
+      Status::AuthorizationsItem::ChallengesItem: ACMEChallenge
+    with:
+    - IO::K8s::Role::Namespaced

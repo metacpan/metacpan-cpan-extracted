@@ -1,7 +1,10 @@
 package IO::K8s::Api::Authentication::V1::TokenRequestSpec;
 # ABSTRACT: TokenRequestSpec contains client provided parameters of a token request.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
+
+k8s attestations => { Str => 1 };
+
 
 k8s audiences => [Str], 'required';
 
@@ -26,7 +29,11 @@ IO::K8s::Api::Authentication::V1::TokenRequestSpec - TokenRequestSpec contains c
 
 =head1 VERSION
 
-version 1.107
+version 1.108
+
+=head2 attestations
+
+attestations is a map of well-known keys to string-slice values. The values for each key have a specific semantic meaning, which is documented on the key definition. Requesters of tokens may ask the Kubernetes API Server to attest to certain claims. The API Server may perform authorization checks depending on the key of this map.
 
 =head2 audiences
 

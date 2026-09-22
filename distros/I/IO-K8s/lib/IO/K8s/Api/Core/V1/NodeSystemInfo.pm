@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeSystemInfo;
 # ABSTRACT: NodeSystemInfo is a set of ids/uuids to uniquely identify the node.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s architecture => Str, 'required';
@@ -30,6 +30,9 @@ k8s operatingSystem => Str, 'required';
 k8s osImage => Str, 'required';
 
 
+k8s runningInUserNamespace => Bool;
+
+
 k8s swap => 'Core::V1::NodeSwapStatus';
 
 
@@ -50,7 +53,7 @@ IO::K8s::Api::Core::V1::NodeSystemInfo - NodeSystemInfo is a set of ids/uuids to
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 architecture
 
@@ -87,6 +90,10 @@ The Operating System reported by the node
 =head2 osImage
 
 OS Image reported by the node from /etc/os-release (e.g. Debian GNU/Linux 7 (wheezy)).
+
+=head2 runningInUserNamespace
+
+Whether the node is running in a user namespace.
 
 =head2 swap
 

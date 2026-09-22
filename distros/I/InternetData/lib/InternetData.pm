@@ -12,8 +12,9 @@ use Scalar::Util ();
 
 use InternetData::Database;
 use InternetData::Error;
+use InternetData::Oauth;
 
-our $VERSION = '1.5.0';
+our $VERSION = '1.6.0';
 
 use constant DEFAULT_BASE_URL => 'https://internetdata.io';
 
@@ -50,12 +51,17 @@ sub new {
     return $self;
 }
 
-# The licensed database downloads, which is every call this API has. Built per
-# call rather than held, so the client and its sub-API never form a reference
-# cycle.
+# The licensed database downloads. Built per call rather than held, so the
+# client and its sub-API never form a reference cycle.
 sub database {
     my ($self) = @_;
     return InternetData::Database->_new($self);
+}
+
+# The OAuth device-flow sign-in, built per call for the same reason.
+sub oauth {
+    my ($self) = @_;
+    return InternetData::Oauth->_new($self);
 }
 
 # One file transfer. Every chunk is handed to $on_chunk and none is kept, so a
@@ -271,17 +277,18 @@ Downloads InternetData's licensed IP and network databases, and reads what the
 API publishes about them: the catalog, per-database metadata, checksums, and
 your organization's recent download attempts.
 
-Every endpoint published today needs a key carrying the C<db.download> scope.
-L</new> takes one as an option rather than requiring it: a client built without
-a key sends no C<Authorization> header at all, which is what a database served
-without a licence would need.
+Every database endpoint published today needs a key carrying the
+C<db.download> scope. L</new> takes one as an option rather than requiring it: a
+client built without a key sends no C<Authorization> header at all, which is what
+a database served without a license would need, and what L</oauth> needs anyway.
 
 =head1 METHODS
 
-The seven calls live on L<InternetData::Database>, reached as L</database>.
-Each has a C<_p> twin returning a L<Mojo::Promise> and takes a per-call
-C<retries> option, and all but the two transfers a per-call C<timeout>. Failures
-die with an L<InternetData::Error>.
+The seven database calls live on L<InternetData::Database>, reached as
+L</database>. Each has a C<_p> twin returning a L<Mojo::Promise> and takes a
+per-call C<retries> option, and all but the two transfers a per-call C<timeout>.
+Failures die with an L<InternetData::Error>. The OAuth sign-in lives on
+L<InternetData::Oauth>, reached as L</oauth>.
 
 =head2 new
 
@@ -294,7 +301,7 @@ die with an L<InternetData::Error>.
 A console-issued key carrying the C<db.download> scope. Keys are default-deny,
 so an existing key does not reach these endpoints until the scope is added to
 it. Optional: omit it, or pass an empty string, and no C<Authorization> header
-is sent. Every endpoint published today answers C<401> without one.
+is sent. Every database endpoint published today answers C<401> without one.
 
 =item base_url
 
@@ -324,12 +331,20 @@ multi-gigabyte file into memory.
 
     my $databases = $client->database->list;
 
-The licensed database downloads, which is every call this API has. See
-L<InternetData::Database>.
+The licensed database downloads. See L<InternetData::Database>.
+
+=head2 oauth
+
+    my $device = $client->oauth->device_authorization('your-client-id');
+
+Signs a person in on their own machine with the OAuth device flow, so a program
+can be handed one of their API keys instead of asking for it. See
+L<InternetData::Oauth>.
 
 =head1 NON-BLOCKING USE
 
-Every call has a C<_p> twin returning a L<Mojo::Promise>, so the library drops
+Every call has a C<_p> twin returning a L<Mojo::Promise>, on
+L<InternetData::Database> and L<InternetData::Oauth> alike, so the library drops
 into a Mojolicious application without a worker. The blocking forms are those
 promises plus a C<wait>, so nothing is duplicated and both paths retry
 identically.
@@ -344,7 +359,7 @@ croak saying so. Use the C<_p> forms there.
 
 =head1 SEE ALSO
 
-L<InternetData::Database>, L<InternetData::Error>.
+L<InternetData::Database>, L<InternetData::Error>, L<InternetData::Oauth>.
 
 =head1 LICENSE
 

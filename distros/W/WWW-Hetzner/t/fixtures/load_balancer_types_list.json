@@ -1,0 +1,61 @@
+{
+  "load_balancer_types": [
+    {
+      "id": 1,
+      "name": "lb11",
+      "description": "LB11",
+      "max_connections": 20000,
+      "max_services": 5,
+      "max_targets": 25,
+      "max_assigned_certificates": 10,
+      "deprecated": null,
+      "prices": [
+        {
+          "location": "fsn1",
+          "price_hourly": { "net": "0.0079", "gross": "0.0094" },
+          "price_monthly": { "net": "4.9000", "gross": "5.8310" },
+          "included_traffic": 21990232555520,
+          "price_per_tb_traffic": { "net": "1.0000", "gross": "1.1900" }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "lb21",
+      "description": "LB21",
+      "max_connections": 75000,
+      "max_services": 10,
+      "max_targets": 75,
+      "max_assigned_certificates": 20,
+      "deprecated": null,
+      "prices": [
+        {
+          "location": "fsn1",
+          "price_hourly": { "net": "0.0160", "gross": "0.0190" },
+          "price_monthly": { "net": "9.9000", "gross": "11.7810" },
+          "included_traffic": 43980465111040,
+          "price_per_tb_traffic": { "net": "1.0000", "gross": "1.1900" }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "lb31",
+      "description": "LB31",
+      "max_connections": 150000,
+      "max_services": 15,
+      "max_targets": 150,
+      "max_assigned_certificates": 30,
+      "deprecated": null,
+      "prices": [
+        {
+          "location": "fsn1",
+          "price_hourly": { "net": "0.0320", "gross": "0.0380" },
+          "price_monthly": { "net": "19.9000", "gross": "23.6810" },
+          "included_traffic": 87960930222080,
+          "price_per_tb_traffic": { "net": "1.0000", "gross": "1.1900" }
+        }
+      ]
+    }
+  ]
+}

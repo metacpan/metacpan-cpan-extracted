@@ -14,6 +14,7 @@ use File::Spec ();
 
 use lib 'lib', File::Spec->catdir('t', 'lib');
 use INA_CPAN_Check qw(ok plan_tests diag _slurp);
+use Perl500503Syntax::OrDie ();
 
 my $root = do {
     my @up = (File::Spec->updir());
@@ -64,7 +65,18 @@ my @VERSION_MARKERS = (
 #  10. contains "use vars"
 #  11. raw bytes are free of the UTF-8 double-encoding (mojibake)
 #      signature (a regression guard against re-encoded cheatsheets)
-my $CHECKS_PER_LANG = 11;
+#  12. the version stated under the VERSION heading is $VERSION
+#
+# CS12 exists because nothing tied the number printed in doc/ to the one
+# the module carries.  Twenty-one hand-edited copies of a version number
+# that no test reads is exactly the sort of thing that goes stale: every
+# cheatsheet still said 0.03 one whole release after the module had moved
+# on, and the suite reported success throughout.  The check is the doc/
+# counterpart of the B8 check that INA_CPAN_Check makes on =head1 VERSION.
+my $CHECKS_PER_LANG = 12;
+
+# The version every cheatsheet must state.
+my $VER = $Perl500503Syntax::OrDie::VERSION;
 
 # perldelta_summary.txt checks: 4
 my $SUMMARY_CHECKS = 4;
@@ -128,6 +140,19 @@ for my $lang (@LANGS) {
         my $bytes = -f $file ? _slurp($file) : '';
         my $bad = ($bytes =~ /\xC2[\x80-\x9F]/) || ($bytes =~ /\xC3\x83\xC2/);
         ok(!$bad, "CS11[$l]: free of UTF-8 double-encoding (mojibake)");
+    };
+    push @tests, sub {
+        # The version is the first line of its own that follows the
+        # VERSION heading, whatever that heading is called in this
+        # language, so the value is taken positionally: the eighth line
+        # of the file, as every sheet in the set is laid out.
+        my $content = -f $file ? _slurp($file) : '';
+        my @l = split(/\n/, $content);
+        my $stated = defined $l[7] ? $l[7] : '';
+        $stated =~ s/^\s+//;
+        $stated =~ s/\s+$//;
+        ok($stated eq $VER,
+           "CS12[$l]: states version $VER (got: '$stated')");
     };
 }
 

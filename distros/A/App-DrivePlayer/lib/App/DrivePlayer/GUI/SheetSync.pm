@@ -12,6 +12,8 @@ use Gtk3  '-init';
 
 use App::DrivePlayer::SheetDB;
 
+my $log = do { eval { require Log::Log4perl; Log::Log4perl->get_logger(__PACKAGE__) } };
+
 sub _sheet_db {
     my ($self) = @_;
     my $sid = $self->config->sheet_id() or do {
@@ -33,7 +35,6 @@ sub _clear_sheet_id {
     $self->config->_data->{sheet_id} = '';
     $self->config->save();
 
-    my $log = do { eval { require Log::Log4perl; Log::Log4perl->get_logger(__PACKAGE__) } };
     $log->warn('Spreadsheet not found (deleted?); sheet ID cleared from config') if $log;
     return;
 }
@@ -42,7 +43,7 @@ sub _auto_sync_to_sheet {
     my ($self) = @_;
     return unless $self->config->sheet_id();
     $self->_set_status('Auto-syncing to Sheet…');
-    Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+    $self->_pump_events();
     my $sheet  = $self->_sheet_db() or return;
     my $counts = eval { $sheet->push_to_sheet($self->db) };
     if ($@) {
@@ -67,7 +68,7 @@ sub _auto_sync_track_to_sheet {
     my ($self, $track_id) = @_;
     return unless $self->config->sheet_id();
     $self->_set_status('Syncing track to Sheet…');
-    Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+    $self->_pump_events();
     my $sheet = $self->_sheet_db() or return;
     my $ok    = eval { $sheet->push_track($self->db, $track_id) };
     if ($@) {
@@ -88,7 +89,7 @@ sub _sync_with_sheet {
     my ($self) = @_;
     my $sheet = $self->_sheet_db() or return;
     $self->_set_status('Syncing with Sheet…');
-    Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+    $self->_pump_events();
 
     my $drive   = $self->drive;
     my $summary = eval {
@@ -125,8 +126,6 @@ sub _sync_with_sheet {
 
 sub _auto_sync_from_sheet_on_new_db {
     my ($self) = @_;
-
-    my $log = do { eval { require Log::Log4perl; Log::Log4perl->get_logger(__PACKAGE__) } };
 
     # Skip silently if OAuth credentials aren't configured on this device yet
     my $auth = $self->config->auth_config();
@@ -179,8 +178,6 @@ sub _auto_sync_from_sheet_on_new_db {
 
 sub _prune_removed_folders {
     my ($self) = @_;
-
-    my $log = do { eval { require Log::Log4perl; Log::Log4perl->get_logger(__PACKAGE__) } };
 
     my @config_ids = map { $_->{id} } @{ $self->config->music_folders() };
     return unless @config_ids;   # no folders configured yet — nothing to prune

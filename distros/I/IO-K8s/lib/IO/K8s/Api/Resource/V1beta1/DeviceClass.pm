@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::DeviceClass;
 # ABSTRACT: DeviceClass is a vendor- or admin-provided resource that contains device configuration and selectors. It can be referenced in the device requests of a claim to apply these presets. Cluster scoped.  This is an alpha type and requires enabling the DynamicResourceAllocation feature gate.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -21,7 +21,7 @@ IO::K8s::Api::Resource::V1beta1::DeviceClass - DeviceClass is a vendor- or admin
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -36,7 +36,7 @@ Spec defines what can be allocated and how to configure it.  This is mutable. Co
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#deviceclass-v1beta1-resource.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#deviceclass-v1beta1-resource.k8s.io>
 
 =head1 SUPPORT
 

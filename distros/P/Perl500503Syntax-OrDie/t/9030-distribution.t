@@ -65,7 +65,9 @@ ok($meta_yml =~ /version\s*:\s*['"']?\Q$ver\E['"']?/,
    "B2: META.yml version matches \$VERSION ($ver)");
 ok($meta_jsn =~ /["']version["']\s*:\s*["']\Q$ver\E["']/,
    "B3: META.json version matches \$VERSION ($ver)");
-ok($mkpl =~ /VERSION\s*=>\s*['"]\Q$ver\E['"]/,
+# pmake.bat writes the version as q{...}; a hand-written Makefile.PL may
+# use ordinary quotes.  Both spellings are accepted.
+ok($mkpl =~ /VERSION['"]?\s*=>\s*(?:['"]\Q$ver\E['"]|q\{\Q$ver\E\})/,
    "B4: Makefile.PL VERSION matches \$VERSION ($ver)");
 ok($changes =~ /^\Q$ver\E\b/m,
    "B5: Changes has entry for version $ver");
@@ -76,7 +78,7 @@ ok($changes =~ /^\Q$ver\E\b/m,
 ok($meta_yml =~ /^name\s*:/m,        'I1: META.yml has name field');
 ok($meta_yml =~ /^version\s*:/m,     'I2: META.yml has version field');
 ok($meta_jsn =~ /["']name["']\s*:/,  'I3: META.json has name field');
-ok($meta_jsn =~ /["']version["']\s*:/,'I4: META.json has version field');
+ok($meta_jsn =~ /["']version["']\s*:/, 'I4: META.json has version field');
 
 ######################################################################
 # J: 9NNN test file naming

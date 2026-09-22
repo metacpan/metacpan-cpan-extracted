@@ -23,7 +23,6 @@ BEGIN { use_ok('Params::Validate::Strict', 'validate_strict') }
 use_ok('Scalar::Util',       qw(blessed looks_like_number));
 # List::Util already loaded with correct version above; just assert it here.
 cmp_ok(List::Util->VERSION, '>=', '1.33', 'List::Util 1.33+ available (any() present)');
-use_ok('Unicode::GCString');
 use_ok('Encode',             qw(decode_utf8));
 use_ok('Carp');
 use_ok('Readonly::Values::Boolean');
@@ -218,13 +217,11 @@ subtest 'Readonly::Values::Boolean: undefined boolean string rejected' => sub {
 };
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Unicode::GCString integration (real grapheme-cluster counting)
+# Grapheme-cluster counting (Perl \X — handles all Unicode versions)
 # ══════════════════════════════════════════════════════════════════════════════
 
-subtest 'Unicode::GCString: Japanese string — grapheme clusters, not bytes' => sub {
+subtest 'grapheme clusters: Japanese string — clusters not bytes' => sub {
 	my $str = "\x{65e5}\x{672c}\x{8a9e}";	# 日本語 — 3 chars, 9 UTF-8 bytes
-	my $gcstr = Unicode::GCString->new($str);
-	is($gcstr->length, 3, 'GCString reports 3 for 3 Japanese characters');
 	cmp_ok(length(encode('UTF-8', $str)), '>', 3, 'UTF-8 byte count is > 3');
 
 	my $r = validate_strict(
@@ -234,22 +231,18 @@ subtest 'Unicode::GCString: Japanese string — grapheme clusters, not bytes' =>
 	is($r->{s}, $str, '3-char Japanese string satisfies min=>3,max=>3');
 };
 
-subtest 'Unicode::GCString: min fails when grapheme count is short' => sub {
-	my $str = "\x{65e5}\x{672c}";	# 日本 — 2 chars
-	my $gcstr = Unicode::GCString->new($str);
-	is($gcstr->length, 2, 'GCString confirms 2 grapheme clusters');
+subtest 'grapheme clusters: min fails when grapheme count is short' => sub {
+	my $str = "\x{65e5}\x{672c}";	# 日本 — 2 grapheme clusters
 	throws_ok {
 		validate_strict(
 			schema => { s => { type => 'string', min => 3 } },
 			input  => { s => $str },
 		)
-	} qr/too short/, '2-char string fails min=>3 by grapheme count';
+	} qr/too short/, '2-cluster string fails min=>3';
 };
 
-subtest 'Unicode::GCString: Latin-extended string — accented characters' => sub {
+subtest 'grapheme clusters: Latin-extended accented characters' => sub {
 	my $str = "\x{00e9}l\x{00e8}ve";	# élève — 5 grapheme clusters
-	my $gcstr = Unicode::GCString->new($str);
-	is($gcstr->length, 5, 'GCString reports 5 for "élève"');
 	my $r = validate_strict(
 		schema => { s => { type => 'string', min => 5, max => 5 } },
 		input  => { s => $str },
@@ -257,15 +250,33 @@ subtest 'Unicode::GCString: Latin-extended string — accented characters' => su
 	is($r->{s}, $str, '"élève" accepted with min=>5,max=>5');
 };
 
-subtest 'Unicode::GCString: mixed ASCII and non-ASCII' => sub {
+subtest 'grapheme clusters: mixed ASCII and non-ASCII' => sub {
 	my $str = "caf\x{00e9}";	# café — 4 grapheme clusters, 5 bytes
-	my $gcstr = Unicode::GCString->new($str);
-	is($gcstr->length, 4, 'GCString reports 4 for "café"');
 	my $r = validate_strict(
 		schema => { s => { type => 'string', min => 4, max => 4 } },
 		input  => { s => $str },
 	);
 	is($r->{s}, $str, '"café" accepted with min=>4,max=>4');
+};
+
+subtest 'grapheme clusters: ZWJ emoji family counts as 1 cluster' => sub {
+	# U+1F468 ZWJ U+1F469 ZWJ U+1F467 — 5 code points, 1 grapheme cluster
+	my $family = "\x{1F468}\x{200D}\x{1F469}\x{200D}\x{1F467}";
+	my $r = validate_strict(
+		schema => { s => { type => 'string', min => 1, max => 1 } },
+		input  => { s => $family },
+	);
+	ok(defined $r->{s}, 'ZWJ family emoji satisfies min=>1,max=>1 (1 grapheme cluster)');
+};
+
+subtest 'grapheme clusters: skin-tone modifier counts as 1 cluster' => sub {
+	# U+1F44D U+1F3FD — thumbs-up + medium skin tone, 1 grapheme cluster
+	my $thumbs = "\x{1F44D}\x{1F3FD}";
+	my $r = validate_strict(
+		schema => { s => { type => 'string', min => 1, max => 1 } },
+		input  => { s => $thumbs },
+	);
+	ok(defined $r->{s}, 'skin-tone thumbs-up satisfies min=>1,max=>1 (1 grapheme cluster)');
 };
 
 # ══════════════════════════════════════════════════════════════════════════════

@@ -1,4 +1,4 @@
-package Email::Sender 2.601;
+package Email::Sender 2.603;
 # ABSTRACT: a library for sending email
 
 use Moo::Role;
@@ -68,7 +68,7 @@ Email::Sender - a library for sending email
 
 =head1 VERSION
 
-version 2.601
+version 2.603
 
 =head1 SYNOPSIS
 
@@ -221,7 +221,7 @@ William Blunn <zgpmax@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo Signes.
+This software is copyright (c) 2026 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

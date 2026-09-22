@@ -124,32 +124,6 @@ sub upsert_folder_update : Tests(2) {
     is $self->db->schema->resultset('Folder')->count, 1, 'no duplicate folder row';
 }
 
-sub get_folder_by_drive_id : Tests(2) {
-    my ($self) = @_;
-
-    my $sf = $self->db->upsert_scan_folder(FAKE_FOLDER_ID, FAKE_FOLDER_NAME);
-    $self->db->upsert_folder(sample_folder(scan_folder_id => $sf->{id}));
-    my $fld = $self->db->get_folder_by_drive_id('folder_drive_id_rock');
-    is $fld->{name}, 'Rock', 'folder found by drive_id';
-    is $self->db->get_folder_by_drive_id('nope'), undef, 'returns undef when not found';
-}
-
-sub folders_for_scan_folder : Tests(2) {
-    my ($self) = @_;
-
-    my $sf  = $self->db->upsert_scan_folder(FAKE_FOLDER_ID, FAKE_FOLDER_NAME);
-    $self->db->upsert_folder(sample_folder(
-        scan_folder_id => $sf->{id}, drive_id => 'f1', name => 'Z', path => 'Z'
-    ));
-    $self->db->upsert_folder(sample_folder(
-        scan_folder_id => $sf->{id}, drive_id => 'f2', name => 'A', path => 'A'
-    ));
-
-    my @flds = $self->db->folders_for_scan_folder($sf->{id});
-    is scalar @flds, 2,      'returns all folders for scan_folder';
-    is $flds[0]{name}, 'A',  'folders ordered by path';
-}
-
 # ---- tracks ----
 
 sub upsert_track_create : Tests(6) {

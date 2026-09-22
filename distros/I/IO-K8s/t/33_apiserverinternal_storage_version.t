@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Regression coverage for karr ticket #3:
+# Regression coverage for k3:
 # IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersionSpec.pm was
 # never shipped. Because StorageVersion->spec is declared 'required' and
 # the type specifier resolves cleanly via the default IO::K8s::Api prefix,

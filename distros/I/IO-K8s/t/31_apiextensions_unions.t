@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Regression coverage for karr ticket #1: four apiextensions.k8s.io/v1 union
+# Regression coverage for k1: four apiextensions.k8s.io/v1 union
 # classes that JSONSchemaProps depends on but that the distribution didn't
 # ship (JSON, JSONSchemaPropsOrArray, JSONSchemaPropsOrBool,
 # JSONSchemaPropsOrStringArray). Without them, inflating any real

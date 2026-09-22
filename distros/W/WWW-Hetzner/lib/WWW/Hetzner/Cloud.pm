@@ -3,9 +3,11 @@ package WWW::Hetzner::Cloud;
 # ABSTRACT: Perl client for Hetzner Cloud API
 
 use Moo;
+use WWW::Hetzner::Cloud::API::Actions;
 use WWW::Hetzner::Cloud::API::Servers;
 use WWW::Hetzner::Cloud::API::ServerTypes;
 use WWW::Hetzner::Cloud::API::Images;
+use WWW::Hetzner::Cloud::API::ISOs;
 use WWW::Hetzner::Cloud::API::SSHKeys;
 use WWW::Hetzner::Cloud::API::Locations;
 use WWW::Hetzner::Cloud::API::Datacenters;
@@ -16,11 +18,13 @@ use WWW::Hetzner::Cloud::API::Firewalls;
 use WWW::Hetzner::Cloud::API::FloatingIPs;
 use WWW::Hetzner::Cloud::API::PrimaryIPs;
 use WWW::Hetzner::Cloud::API::LoadBalancers;
+use WWW::Hetzner::Cloud::API::LoadBalancerTypes;
 use WWW::Hetzner::Cloud::API::Certificates;
 use WWW::Hetzner::Cloud::API::PlacementGroups;
+use WWW::Hetzner::Cloud::API::Pricing;
 use namespace::clean;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 
 has token => (
@@ -61,6 +65,12 @@ has servers => (
 );
 
 
+has actions => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Actions->new(client => shift) },
+);
+
+
 has server_types => (
     is      => 'lazy',
     builder => sub { WWW::Hetzner::Cloud::API::ServerTypes->new(client => shift) },
@@ -70,6 +80,12 @@ has server_types => (
 has images => (
     is      => 'lazy',
     builder => sub { WWW::Hetzner::Cloud::API::Images->new(client => shift) },
+);
+
+
+has isos => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::ISOs->new(client => shift) },
 );
 
 
@@ -133,6 +149,12 @@ has load_balancers => (
 );
 
 
+has load_balancer_types => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::LoadBalancerTypes->new(client => shift) },
+);
+
+
 has certificates => (
     is      => 'lazy',
     builder => sub { WWW::Hetzner::Cloud::API::Certificates->new(client => shift) },
@@ -142,6 +164,12 @@ has certificates => (
 has placement_groups => (
     is      => 'lazy',
     builder => sub { WWW::Hetzner::Cloud::API::PlacementGroups->new(client => shift) },
+);
+
+
+has pricing => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Cloud::API::Pricing->new(client => shift) },
 );
 
 
@@ -160,7 +188,7 @@ WWW::Hetzner::Cloud - Perl client for Hetzner Cloud API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -192,6 +220,14 @@ servers, DNS zones, networks, volumes, and other resources.
 
 =head1 RESOURCES
 
+=head2 Actions
+
+=over 4
+
+=item * actions - Async job objects (L<WWW::Hetzner::Action>) returned by every mutating call below; poll status or block with C<< ->wait >>
+
+=back
+
 =head2 Compute
 
 =over 4
@@ -201,6 +237,8 @@ servers, DNS zones, networks, volumes, and other resources.
 =item * server_types - Available server types
 
 =item * images - OS images
+
+=item * isos - ISO images that can be attached to a server
 
 =item * ssh_keys - SSH keys
 
@@ -221,6 +259,8 @@ servers, DNS zones, networks, volumes, and other resources.
 =item * primary_ips - Primary IPs for servers
 
 =item * load_balancers - Load balancers with targets and services
+
+=item * load_balancer_types - Available load balancer types
 
 =back
 
@@ -256,6 +296,8 @@ servers, DNS zones, networks, volumes, and other resources.
 
 =item * datacenters - Datacenters
 
+=item * pricing - Current price list (a single object, not a list)
+
 =back
 
 =head2 token
@@ -270,6 +312,14 @@ Base URL for the Cloud API. Defaults to C<https://api.hetzner.cloud/v1>.
 
 Returns a L<WWW::Hetzner::Cloud::API::Servers> instance for managing cloud servers.
 
+=head2 actions
+
+Returns a L<WWW::Hetzner::Cloud::API::Actions> instance for reading Cloud
+actions. Actions (L<WWW::Hetzner::Action> objects) are the async job
+objects that mutating calls across every resource in this class return --
+this accessor is how one is looked up or polled directly by id, independent
+of the resource that created it.
+
 =head2 server_types
 
 Returns a L<WWW::Hetzner::Cloud::API::ServerTypes> instance for listing server types.
@@ -277,6 +327,10 @@ Returns a L<WWW::Hetzner::Cloud::API::ServerTypes> instance for listing server t
 =head2 images
 
 Returns a L<WWW::Hetzner::Cloud::API::Images> instance for listing OS images.
+
+=head2 isos
+
+Returns a L<WWW::Hetzner::Cloud::API::ISOs> instance for listing ISO images.
 
 =head2 ssh_keys
 
@@ -318,6 +372,11 @@ Returns a L<WWW::Hetzner::Cloud::API::PrimaryIPs> instance for managing primary 
 
 Returns a L<WWW::Hetzner::Cloud::API::LoadBalancers> instance for managing load balancers.
 
+=head2 load_balancer_types
+
+Returns a L<WWW::Hetzner::Cloud::API::LoadBalancerTypes> instance for listing
+load balancer types.
+
 =head2 certificates
 
 Returns a L<WWW::Hetzner::Cloud::API::Certificates> instance for managing TLS certificates.
@@ -325,6 +384,12 @@ Returns a L<WWW::Hetzner::Cloud::API::Certificates> instance for managing TLS ce
 =head2 placement_groups
 
 Returns a L<WWW::Hetzner::Cloud::API::PlacementGroups> instance for managing placement groups.
+
+=head2 pricing
+
+Returns a L<WWW::Hetzner::Cloud::API::Pricing> instance for reading the
+current price list. Pricing is a single object rather than a collection, so
+that controller only has C<get>.
 
 =head1 DNS EXAMPLE
 
@@ -400,7 +465,8 @@ API issues without adding any code.
 
 =head1 SEE ALSO
 
-L<WWW::Hetzner>, L<WWW::Hetzner::Role::HTTP>
+L<WWW::Hetzner>, L<WWW::Hetzner::Role::HTTP>, L<WWW::Hetzner::Action>,
+L<WWW::Hetzner::Cloud::API::Actions>
 
 =head1 SUPPORT
 
@@ -423,7 +489,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

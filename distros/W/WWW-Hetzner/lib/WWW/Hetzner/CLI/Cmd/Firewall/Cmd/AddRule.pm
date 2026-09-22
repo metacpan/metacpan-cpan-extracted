@@ -1,11 +1,12 @@
 package WWW::Hetzner::CLI::Cmd::Firewall::Cmd::AddRule;
 # ABSTRACT: Add a rule to a firewall
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl firewall add-rule <id> --direction <in|out> --protocol <tcp|udp|icmp|gre|esp> --port <port> [--source-ips <ips>]';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option direction => (
     is       => 'ro',
@@ -62,8 +63,9 @@ sub execute {
     push @rules, $rule;
 
     print "Adding rule to firewall $id...\n";
-    $cloud->firewalls->set_rules($id, @rules);
-    print "Rule added.\n";
+    my $actions = $cloud->firewalls->set_rules($id, \@rules);
+    $self->handle_action($actions);
+    print $self->no_wait ? "Rule add requested.\n" : "Rule added.\n";
 }
 
 1;
@@ -80,7 +82,7 @@ WWW::Hetzner::CLI::Cmd::Firewall::Cmd::AddRule - Add a rule to a firewall
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -103,7 +105,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

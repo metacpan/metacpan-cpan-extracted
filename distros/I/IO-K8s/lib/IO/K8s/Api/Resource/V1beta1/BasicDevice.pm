@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::BasicDevice;
 # ABSTRACT: BasicDevice defines one device instance.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s allNodes => Bool;
@@ -30,6 +30,9 @@ k8s consumesCounters => ['Resource::V1beta1::DeviceCounterConsumption'];
 k8s nodeAllocatableResourceMappings => { 'Resource::V1beta1::NodeAllocatableResourceMapping' => 1 };
 
 
+k8s nodeAllocatableResources => { 'Resource::V1beta1::NodeAllocatableResource' => 1 };
+
+
 k8s nodeName => Str;
 
 
@@ -53,7 +56,7 @@ IO::K8s::Api::Resource::V1beta1::BasicDevice - BasicDevice defines one device in
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 allNodes
 
@@ -90,6 +93,10 @@ ConsumesCounters defines a list of references to sharedCounters and the set of c
 =head2 nodeAllocatableResourceMappings
 
 NodeAllocatableResourceMappings defines the mapping of node resources that are managed by the DRA driver exposing this device. This includes resources currently reported in v1.Node `status.allocatable` that are not extended resources (see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#extended-resources). Examples include "cpu", "memory", "ephemeral-storage", and hugepages. In addition to standard requests made through the Pod `spec`, these resources can also be requested through claims and allocated by the DRA driver. For example, a CPU DRA driver might allocate exclusive CPUs or auxiliary node memory dependencies of an accelerator device. The keys of this map are the node-allocatable resource names (e.g., "cpu", "memory"). Extended resource names are not permitted as keys.
+
+=head2 nodeAllocatableResources
+
+NodeAllocatableResources defines the mapping of node resources that are managed by the DRA driver exposing this device. This includes resources currently reported in v1.Node `status.allocatable` that are not extended resources (see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#extended-resources). Examples include "cpu", "memory", "ephemeral-storage", and hugepages. In addition to standard requests made through the Pod `spec`, these resources can also be requested through claims and allocated by the DRA driver. For example, a CPU DRA driver might allocate exclusive CPUs or auxiliary node memory dependencies of an accelerator device. The keys of this map are the node-allocatable resource names (e.g., "cpu", "memory"). Extended resource names are not permitted as keys.
 
 =head2 nodeName
 

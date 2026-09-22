@@ -1,11 +1,11 @@
 package IO::K8s::Api::Apps::V1::StatefulSet;
 # ABSTRACT: StatefulSet represents a set of pods with consistent identities.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
 
-k8s spec => 'Apps::V1::StatefulSetSpec';
+k8s spec => 'Apps::V1::StatefulSetSpec', 'required';
 
 
 k8s status => 'Apps::V1::StatefulSetStatus';
@@ -24,7 +24,7 @@ IO::K8s::Api::Apps::V1::StatefulSet - StatefulSet represents a set of pods with 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ Status is the current status of Pods in this StatefulSet. This data may be out o
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#statefulset-v1-apps>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#statefulset-v1-apps>
 
 =head1 SUPPORT
 

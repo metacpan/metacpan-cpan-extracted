@@ -47,17 +47,18 @@ suppresses duplicates (card-payment credits), and assigns destination accounts.
 
 ## Perl Dependencies
 
-Runtime: Cpanel::JSON::XS, DateTime::Format::Flexible, Getopt::Long::Descriptive,
-Path::Tiny, Mojo::SQLite, Text::CSV
+Runtime: Cpanel::JSON::XS, DateTime::Format::Flexible, DBD::SQLite, DBI,
+Getopt::Long::Descriptive, Path::Tiny, Text::CSV
 
 Testing: Capture::Tiny, Test2::V0, Test2::Bundle::More, Test2::Tools::Exception
 
 ### On Debian/Ubuntu:
 
-All of Tiller2QIF’s dependencies are available through package management if you need to install to system Perl.
+All of Tiller2QIF’s dependencies are available through package management if you need to install to system Perl on Debian 13 or Ubuntu 26.04 or later.
 
     sudo apt install libpath-tiny-perl libtext-csv-perl libtest2-suite-perl libcapture-tiny-perl \
-      libmojo-sqlite-perl libcpanel-json-xs-perl libdatetime-format-flexible-perl
+      libdbi-perl libdbd-sqlite3-perl libgetopt-long-descriptive-perl \
+      libcpanel-json-xs-perl libdatetime-format-flexible-perl
     sudo cpan install Finance::Tiller2QIF
 
 ### On Windows
@@ -65,6 +66,8 @@ All of Tiller2QIF’s dependencies are available through package management if y
 tiller2qif works with Strawberry Perl, after installing Strawberry Perl, install from CPAN.
 
 # CLI COMMANDS
+
+The command word may be given either before or after the options; any other stray argument on the command line is an error.
 
 - **run** -- ingest, map, and emit in one step
 
@@ -85,6 +88,13 @@ tiller2qif works with Strawberry Perl, after installing Strawberry Perl, install
 - **preview** -- preview the records that would be emitted
 
         tiller2qif preview --db tiller.sqlite3
+
+        # read the preview in an editor or pager instead of the terminal
+        tiller2qif preview --db tiller.sqlite3 --viewer less
+
+        # and open the mapping file beside it
+        tiller2qif preview --db tiller.sqlite3 --mapfile tiller.mapping \
+                           --viewer 'code --wait' --multipreview
 
 - **emit** -- write QIF from the database
 
@@ -125,9 +135,11 @@ config file.  A typical config file looks like:
       "output":     "/tmp/tillerout.qif",
       "db":         "~/.data/tiller2qif.sqlite3",
       "mapfile":    "~/.config/tiller.mapping",
-      "verbose":    false,
-      "checkpoint": false,
-      "confirm":    false
+      "viewer":       "console",
+      "verbose":      false,
+      "checkpoint":   false,
+      "confirm":      false,
+      "multipreview": false
     }
 
 Pass the config file with `--config`.  Command-line options override config
@@ -156,6 +168,8 @@ The `run` command always checkpoints, even without this flag.
 confirmation before writing the QIF file. When used with `--checkpoint`, adds
 a revert option (press `r`) to restore the database to its checkpoint state,
 useful if you want to undo changes made during ingest or mapping.
+- **--viewer** Program used to display preview output. The default, `console`, prints the preview to STDOUT. Any other value names an external program, and may include arguments, for example `less`, `gedit`, or `code --wait`. The value is split on whitespace — first word the program, the rest arguments — so the program's own path cannot contain spaces; point `--viewer` at a wrapper script or a symlink if yours does. The preview is written to a read-only temporary file named `tiller2qif-preview-*.t2qpv`, the program is launched with that file as its argument, and the path is printed so you can find or reopen it. The temporary file is left in place, because graphical editors typically fork and return immediately; ask them to wait (`code --wait`) when you want the export prompt to appear only after you close the preview. A viewer that cannot be found, fails to launch, is killed by a signal, or exits non-zero is a fatal error rather than a fall back to the console. In a config file the key is `viewer`.
+- **--multipreview** Open the mapping file in the preview viewer alongside the preview itself, so you can read the pending transactions and edit the rules that produced them side by side. Both files are passed to a single invocation of the viewer. This requires `--viewer` and `--mapfile`; asking for it with the console viewer or without a mapping file is an error rather than a silent no-op. In a config file the key is `multipreview`.
 - **--verbose** Print detailed progress information during each phase.  Also
 runs `checkconfig` automatically before any operations begin.
 - **--version** Print the installed version number and exit.
@@ -263,6 +277,33 @@ If the `default` line is omitted, unmatched transactions behave as
 
         default | source
 
+# VS CODE EXTENSION
+
+The repository includes a Visual Studio Code extension, `vscode-tiller-map/`, which highlights mapping files and preview files and completes destination account names from your chart of accounts. It is not published to the Marketplace, it can only be installed from a checkout of the repository.
+
+With **--viewer code** and **--multipreview** the actions **preview** and **run** will open the preview and map file in vscode
+
+## Installation
+
+    git clone https://github.com/brainbuz/tiller2qif
+    cp -r tiller2qif/vscode-tiller-map ~/.vscode/extensions/
+    # or, to track the checkout:
+    ln -s "$PWD/tiller2qif/vscode-tiller-map" ~/.vscode/extensions/
+
+Reload VS Code afterwards.
+
+## Syntax Highlighting
+
+Files with `.map` and `.mapping` extensions are recognized as mappings, preview files have the `t2qpv` extension.
+
+## Completion Hinting
+
+In addition to completion of Tiller2QIF keywords you can also configure your Chart of Accounts for Completion! The extension's settings `tiller2qifMap.coaPath` and `tiller2qifMap.coaFormat` control this. Currently the only available coaFormat is `gnucash-csv`.
+
+## Row Colors
+
+`tiller2qifMap.rowColors` controls row backgrounds in both file types. `rainbow`, the default, gives rows a repeating series of subtle background colors; `none` turns backgrounds off. A preview transaction occupies two lines, both receive the same color.
+
 # Advanced Use
 
 You can write SQL scripts or use an interactive sqlite3 client to make changes between steps. For example your Tiller sheet might have an account "Checking", while your table of accounts has "Assets::Current Assets::Bank::Checking". With custom SQL you can keep the short name in Tiller even though mapping rules can't rename accounts.
@@ -272,7 +313,7 @@ and after the map phase without having to break the workflow into separate comma
 This is the preferred way to preprocess or post-process transactions when using `run`,
 or `map` as a single step.
 
-The `preview` command is meant to be run between map and emit. You may run the steps individually (ingest, map, preview, emit), or use the `--confirm` option to run preview before emit (including run).
+The `preview` command is meant to be run between map and emit. You may run the steps individually (ingest, map, preview, emit), or use the `--confirm` option to run preview before emit (including run). The preview table is wide, so `--viewer` is often more comfortable than the terminal; combined with `--confirm` it lets you read the pending transactions in an editor or pager and then answer the export prompt.
 
 When using `--confirm` with `--checkpoint`, three choices Y=Yes N=No R=Revert are offered. No keeps the database state while not completing the export, Revert restores the database to the checkpoint in addition to aborting.
 

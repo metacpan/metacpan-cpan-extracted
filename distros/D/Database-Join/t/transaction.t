@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 131;
+use Test::Most tests => 146;
 use Readonly;
 use Scalar::Util qw(refaddr);
 use Carp qw(croak);
@@ -75,6 +75,16 @@ use_ok('Database::Join');	# T1
 		return \@out;
 	}
 
+	sub DESTROY {}
+}
+
+# DA with count() defined in its own package — required so that
+# defined &{"TransCountDA::count"} is true (the backend='auto' threshold
+# probe checks for a directly-defined count(), not an inherited one).
+{
+	package TransCountDA;
+	use parent -norequire, 'TransactionDA';
+	sub count   { return scalar @{ $_[0]->{rows} } }
 	sub DESTROY {}
 }
 
@@ -987,3 +997,171 @@ is_deeply($rows17a, $rows17b,
 # Phase 4: count() consistent with selectall_arrayref() length for outer join
 is($j17->count(), scalar @{ $j17->selectall_arrayref() },
 	'S17-P4: count() agrees with selectall_arrayref() length in outer join');	# T131
+
+# ---------------------------------------------------------------------------
+# S18: SQLite Backend Cache Lifecycle
+#
+# Transaction sequence: construct(backend='sqlite') → first query builds cache
+# (ABSENT→FRESH) → second query reuses cache (FRESH→FRESH) → add_database
+# invalidates cache (FRESH→ABSENT) → third query rebuilds cache (ABSENT→FRESH)
+# and the newly added column appears in all rows.
+# ---------------------------------------------------------------------------
+note '--- S18: SQLite Backend Cache Lifecycle ---';
+
+my $p18 = TransactionDA->new(
+	cols => ['entry', 'name'],
+	rows => [{ entry => $K1, name => 'Alice' }, { entry => $K2, name => 'Bob' }],
+);
+my $s18 = TransactionDA->new(
+	cols => ['entry', 'score'],
+	rows => [{ entry => $K1, score => $SCORE_HIGH }],
+);
+my $j18 = Database::Join->new(
+	databases   => [$p18, $s18],
+	join_column => 'entry',
+	backend     => 'sqlite',
+);
+
+# Phase 1: ABSENT — no cache before first query
+ok(!defined $j18->{_sqlite_cache},
+	'S18-P1: SQLite cache ABSENT before first query');				# T132
+
+# Phase 2: First query → FRESH; cache is populated; rows are correct
+my $rows18a = $j18->selectall_arrayref();
+ok(defined $j18->{_sqlite_cache},
+	'S18-P2a: cache built after first query (FRESH)');				# T133
+is(scalar @{$rows18a}, 2,
+	'S18-P2b: first query returns 2 merged rows');					# T134
+
+# Phase 3: Second query reuses cache — refaddr of the cache hashref is unchanged
+my $addr18 = refaddr($j18->{_sqlite_cache});
+my $rows18b = $j18->selectall_arrayref();
+is(refaddr($j18->{_sqlite_cache}), $addr18,
+	'S18-P3a: cache refaddr unchanged on second query (FRESH→FRESH)');		# T135
+is_deeply($rows18a, $rows18b,
+	'S18-P3b: second query returns identical rows to first');			# T136
+
+# Phase 4: add_database invalidates the cache (FRESH→ABSENT)
+my $t18 = TransactionDA->new(
+	cols => ['entry', 'tag'],
+	rows => [{ entry => $K1, tag => 'vip' }, { entry => $K2, tag => 'std' }],
+);
+$j18->add_database($t18);
+ok(!defined $j18->{_sqlite_cache},
+	'S18-P4: add_database invalidates SQLite cache (FRESH→ABSENT)');		# T137
+
+# Phase 5: Next query rebuilds cache (ABSENT→FRESH); new column appears in rows
+my $rows18c = $j18->selectall_arrayref();
+ok(defined $j18->{_sqlite_cache},
+	'S18-P5a: cache rebuilt after add_database query (ABSENT→FRESH)');		# T138
+my ($k1_18) = grep { $_->{entry} eq $K1 } @{$rows18c};
+is($k1_18->{tag}, 'vip',
+	'S18-P5b: k1 row carries "tag" column from newly added DA');			# T139
+
+# ---------------------------------------------------------------------------
+# S19: SQLite Backend + Filter — criteria separation
+#
+# Filter criteria are applied at cache-build (spill) time; query-time criteria
+# are applied as SQL WHERE clauses each call.  Both constraints must compose
+# correctly: filter limits the spilled rows, WHERE limits the returned rows.
+# ---------------------------------------------------------------------------
+note '--- S19: SQLite Backend + Filter Criteria Separation ---';
+
+my $p19 = TransactionDA->new(
+	cols => ['entry', 'name'],
+	rows => [{ entry => $K1, name => 'Alice' }, { entry => $K2, name => 'Bob' }],
+);
+my $s19 = TransactionDA->new(
+	cols => ['entry', 'score'],
+	rows => [
+		{ entry => $K1, score => $SCORE_HIGH },	# 90 — above filter (>60) and WHERE (>=80)
+		{ entry => $K2, score => $SCORE_LOW  },	# 70 — above filter (>60), below WHERE (>=80)
+	],
+);
+my $j19 = Database::Join->new(
+	databases   => [$p19, $s19],
+	join_column => 'entry',
+	backend     => 'sqlite',
+	filters     => { 1 => { score => { '>' => 60 } } },
+);
+
+# Phase 1: No query-time criteria — filter alone; both rows pass score>60
+my $rows19a = $j19->selectall_arrayref();
+is(scalar @{$rows19a}, 2,
+	'S19-P1: filter(score>60) alone → 2 rows (both pass)');			# T140
+
+# Phase 2: Add WHERE criterion score>=80; only k1 (90) survives the AND
+my $rows19b = $j19->selectall_arrayref(score => { '>=' => $SCORE_MID });
+is(scalar @{$rows19b}, 1,
+	'S19-P2a: filter(score>60) AND WHERE(score>=80) → 1 row');			# T141
+is($rows19b->[0]{entry}, $K1,
+	'S19-P2b: qualifying row is entry=k1 (score=90)');				# T142
+
+# Phase 3: Repeated call with same criteria is idempotent (cache must survive)
+my $rows19c = $j19->selectall_arrayref(score => { '>=' => $SCORE_MID });
+is_deeply($rows19b, $rows19c,
+	'S19-P3: repeated WHERE query returns identical rows (cache reused)');		# T143
+
+# ---------------------------------------------------------------------------
+# S20: backend='auto' Threshold Routing Lifecycle
+#
+# When total row count <= max_array_rows the array path is taken and tmpdir is
+# never accessed; when count > max_array_rows the SQLite path is taken and a
+# bad tmpdir causes File::Temp to croak.  TransCountDA is used because the
+# module checks defined &{"${pkg}::count"} (not $db->can('count')) to detect
+# a directly-defined count() method.
+# ---------------------------------------------------------------------------
+note '--- S20: backend=auto Threshold Routing ---';
+
+Readonly::Scalar my $BAD_TMPDIR => '/nonexistent/__txn_test_dir__';
+
+# Phase 1: count <= threshold → array path; bad tmpdir never accessed → lives
+{
+	my $pa = TransCountDA->new(
+		cols => ['entry', 'name'],
+		rows => [{ entry => $K1, name => 'Alice' }, { entry => $K2, name => 'Bob' }],
+	);
+	my $sa = TransCountDA->new(
+		cols => ['entry', 'score'],
+		rows => [{ entry => $K1, score => $SCORE_HIGH }],
+	);
+	# total rows = 3; max_array_rows=10 → 3 <= 10 → array path
+	my $ja = Database::Join->new(
+		databases      => [$pa, $sa],
+		join_column    => 'entry',
+		backend        => 'auto',
+		max_array_rows => 10,
+		tmpdir         => $BAD_TMPDIR,
+	);
+	my $rows;
+	lives_ok { $rows = $ja->selectall_arrayref() }
+		'S20-P1a: auto + count<=threshold → array path; bad tmpdir never accessed';	# T144
+	is(scalar @{$rows}, 2,
+		'S20-P1b: array path returns 2 merged rows');					# T145
+}
+
+# Phase 2: count > threshold → SQLite path; bad tmpdir → File::Temp croak
+{
+	my $pb = TransCountDA->new(
+		cols => ['entry', 'name'],
+		rows => [{ entry => $K1, name => 'Alice' }],
+	);
+	my $sb = TransCountDA->new(
+		cols => ['entry', 'score'],
+		rows => [{ entry => $K1, score => $SCORE_HIGH }],
+	);
+	# total rows = 2; max_array_rows=0 → 2 > 0 → SQLite path → File::Temp croak
+	my $jb = Database::Join->new(
+		databases      => [$pb, $sb],
+		join_column    => 'entry',
+		backend        => 'auto',
+		max_array_rows => 0,
+		tmpdir         => $BAD_TMPDIR,
+	);
+	my $err;
+	eval { $jb->selectall_arrayref() };
+	$err = $@;
+	my ($first_line) = split /\n/, ($err // ''), 2;
+	like($first_line, qr/does not exist|no such file|cannot|failed/i,
+		'S20-P2: auto + count>threshold → SQLite path; bad tmpdir → croak');		# T146
+}

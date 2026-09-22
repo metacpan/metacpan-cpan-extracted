@@ -105,7 +105,8 @@ subtest 'add subnet' => sub {
         network_zone => 'eu-central',
         type         => 'cloud',
     );
-    is($result->{action}{command}, 'add_subnet', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Action');
+    is($result->command, 'add_subnet', 'action command');
 };
 
 subtest 'delete subnet' => sub {
@@ -121,7 +122,8 @@ subtest 'delete subnet' => sub {
     );
 
     my $result = $cloud->networks->delete_subnet(100, '10.0.2.0/24');
-    is($result->{action}{command}, 'delete_subnet', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Action');
+    is($result->command, 'delete_subnet', 'action command');
 };
 
 subtest 'add route' => sub {
@@ -141,7 +143,8 @@ subtest 'add route' => sub {
         destination => '10.200.0.0/16',
         gateway     => '10.0.0.1',
     );
-    is($result->{action}{command}, 'add_route', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Action');
+    is($result->command, 'add_route', 'action command');
 };
 
 subtest 'delete route' => sub {
@@ -161,14 +164,20 @@ subtest 'delete route' => sub {
         destination => '10.200.0.0/16',
         gateway     => '10.0.0.1',
     );
-    is($result->{action}{command}, 'delete_route', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Action');
+    is($result->command, 'delete_route', 'action command');
 };
 
 subtest 'network entity methods' => sub {
     my $fixture = load_fixture('networks_get');
+    my $action_fixture = load_fixture('networks_action');
 
     my $cloud = mock_cloud(
         '/networks/100' => $fixture,
+        'POST /networks/100/actions/add_subnet' => $action_fixture,
+        'POST /networks/100/actions/delete_subnet' => $action_fixture,
+        'POST /networks/100/actions/add_route' => $action_fixture,
+        'POST /networks/100/actions/delete_route' => $action_fixture,
     );
 
     my $network = $cloud->networks->get(100);
@@ -177,6 +186,14 @@ subtest 'network entity methods' => sub {
     is($data->{id}, 100, 'data id');
     is($data->{name}, 'my-network', 'data name');
     is($data->{ip_range}, '10.0.0.0/8', 'data ip_range');
+
+    isa_ok($network->add_subnet(ip_range => '10.0.2.0/24', network_zone => 'eu-central', type => 'cloud'),
+        'WWW::Hetzner::Action', 'entity add_subnet returns Action');
+    isa_ok($network->delete_subnet('10.0.2.0/24'), 'WWW::Hetzner::Action', 'entity delete_subnet returns Action');
+    isa_ok($network->add_route(destination => '10.200.0.0/16', gateway => '10.0.0.1'),
+        'WWW::Hetzner::Action', 'entity add_route returns Action');
+    isa_ok($network->delete_route(destination => '10.200.0.0/16', gateway => '10.0.0.1'),
+        'WWW::Hetzner::Action', 'entity delete_route returns Action');
 };
 
 done_testing;

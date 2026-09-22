@@ -314,6 +314,16 @@ static int sa_at_lock(volatile unsigned char *locks, uint64_t h) {
     return 1;
 }
 
+/* ONE attempt, no spin at all: 1 if taken, 0 if somebody else has it.
+ *
+ * For a caller that intends to sleep between attempts. sa_at_lock's spin is
+ * right when the holder is about to finish, and wrong when it is not running:
+ * a hundred thousand test-and-sets on the holder's own cache line make it
+ * slower to reach its unlock, so waiting harder makes the wait longer. */
+static int sa_at_trylock(volatile unsigned char *locks, uint64_t h) {
+    return !sa_at_tas(&locks[h % SA_LOCK_STRIPES]);
+}
+
 static void sa_at_unlock(volatile unsigned char *locks, uint64_t h) {
     sa_at_clear(&locks[h % SA_LOCK_STRIPES]);
 }
@@ -364,6 +374,9 @@ static int sa_at_cas32(volatile uint32_t *p, uint32_t expect, uint32_t want) {
 static void sa_at_fence_rel(void) { }
 static void sa_at_fence_acq(void) { }
 static int sa_at_lock(volatile unsigned char *locks, uint64_t h) {
+    return !sa_at_tas(&locks[h % SA_LOCK_STRIPES]);
+}
+static int sa_at_trylock(volatile unsigned char *locks, uint64_t h) {
     return !sa_at_tas(&locks[h % SA_LOCK_STRIPES]);
 }
 static void sa_at_unlock(volatile unsigned char *locks, uint64_t h) {

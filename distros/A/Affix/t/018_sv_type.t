@@ -8,6 +8,8 @@ use Affix::Build;
 use Config;
 use ExtUtils::Embed;
 #
+plan skip_all => 'MSVC cannot compile embedded Strawberry perl headers in test shims' if ( $ENV{AFFIX_CC} // 'gcc' ) =~ /^cl(\b|$)/i;
+#
 diag '$Config{useshrplib} claims to be ' . $Config{useshrplib};
 diag '$Config{libperl} is ' . $Config{libperl};
 

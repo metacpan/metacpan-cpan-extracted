@@ -4,7 +4,7 @@ Crypt-SelfCertificate
 Generate random self-signed SSL certificates in memory.
 
     use Crypt::SelfCertificate qw(generate_certificates);
-    my $certs = generate_certificates(10);
+    my $certs = generate_certificates(20);
 
 INSTALLATION
 

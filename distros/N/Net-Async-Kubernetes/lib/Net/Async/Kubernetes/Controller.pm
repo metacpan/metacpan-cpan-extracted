@@ -1,19 +1,23 @@
 package Net::Async::Kubernetes::Controller;
 # ABSTRACT: Minimal controller runtime for Net::Async::Kubernetes
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
 
 use Carp qw(croak);
 use Future;
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed weaken);
 
 sub configure {
     my ($self, %params) = @_;
 
     if (exists $params{kube}) {
+        # Borrowed client: weak, like Net::Async::Kubernetes::Watcher does.
+        # $kube->controller(...) add_child()s us, so a strong ref here would
+        # cycle kube -> child controller -> kube and never free either.
         $self->{kube} = delete $params{kube};
+        weaken($self->{kube});
     } elsif (!$self->{kube}) {
         require Net::Async::Kubernetes;
         my %kube_args;
@@ -23,11 +27,15 @@ sub configure {
         )) {
             $kube_args{$key} = delete $params{$key} if exists $params{$key};
         }
+        # Self-constructed client: strong, the controller is its only owner.
         $self->{kube} = Net::Async::Kubernetes->new(%kube_args) if %kube_args;
     }
 
     if (exists $params{on_reconcile}) {
         $self->{on_reconcile} = delete $params{on_reconcile};
+    }
+    if (exists $params{on_watch_error}) {
+        $self->{on_watch_error} = delete $params{on_watch_error};
     }
     if (exists $params{retry_delay}) {
         $self->{retry_delay} = delete $params{retry_delay};
@@ -42,6 +50,7 @@ sub configure {
 
 sub kube { $_[0]->{kube} }
 sub on_reconcile { $_[0]->{on_reconcile} }
+sub on_watch_error { $_[0]->{on_watch_error} }
 sub retry_delay { exists $_[0]->{retry_delay} ? $_[0]->{retry_delay} : 1 }
 
 sub _add_to_loop {
@@ -84,10 +93,26 @@ sub stop {
     for my $spec (@{ $self->{watch_specs} || [] }) {
         next unless my $watcher = delete $spec->{watcher};
         $watcher->stop;
+        # $kube->watcher() add_child()ed it and a restart builds a fresh one,
+        # so without the matching removal every stop/start cycle leaves another
+        # stopped watcher attached to the client.
+        $watcher->remove_from_parent;
     }
 
-    for my $key (keys %{ $self->{entries} || {} }) {
-        delete $self->{entries}{$key}{retry_future};
+    # A restart re-lists through fresh watches, so everything still alive
+    # arrives again as ADDED: what was pending is a stale snapshot, and a key
+    # left flagged queued makes that new event return early without ever
+    # scheduling a drain. Queue and flags go together - a key in the queue
+    # without its flag, or a flag without the queue entry, is a stall either
+    # way. A dirty flag is pending work as well - it records an event a
+    # reconcile in flight has not seen yet, and the re-list delivers that
+    # object again anyway. The entries themselves stay: they carry the failure
+    # counts.
+    $self->{queue} = [];
+    for my $entry (values %{ $self->{entries} || {} }) {
+        delete $entry->{retry_future};
+        $entry->{queued} = 0;
+        $entry->{dirty} = 0;
     }
 }
 
@@ -111,6 +136,21 @@ sub _start_watch_spec {
     my %watch_args = %$spec;
     my $resource = delete $watch_args{resource};
     delete @watch_args{qw(key_for)};
+
+    # ERROR events carry a Status hashref, not a keyed resource object, so they
+    # cannot go through the reconcile workqueue. Report them to the controller
+    # hook instead - an on_error given per watch keeps precedence.
+    my $on_watch_error = $self->on_watch_error;
+    if ($on_watch_error && !$watch_args{on_error}) {
+        $watch_args{on_error} = sub {
+            my ($error) = @_;
+            $on_watch_error->($error, {
+                controller => $self,
+                kube       => $self->kube,
+                resource   => $spec->{resource},
+            });
+        };
+    }
 
     $spec->{watcher} = $self->kube->watcher($resource,
         %watch_args,
@@ -136,6 +176,12 @@ sub _enqueue_event {
         key        => $key,
         attempt    => ($entry->{failures} // 0) + 1,
     };
+    # The ctx outlives the reconcile in {entries} whenever the key still has
+    # work pending, so neither ref may be strong: the client would restore the
+    # kube -> controller -> kube cycle weakened above, and the controller
+    # would close controller -> entries -> ctx -> controller on itself.
+    weaken($entry->{ctx}{kube});
+    weaken($entry->{ctx}{controller});
 
     if ($entry->{active}) {
         $entry->{dirty} = 1;
@@ -162,9 +208,22 @@ sub _drain_queue {
     my ($self) = @_;
     return if $self->{stopped} || $self->{active_key};
 
-    my $key = shift @{ $self->{queue} || [] } or return;
-    my $entry = $self->{entries}{$key} or return;
-    my $ctx = $entry->{ctx} or return;
+    my ($key, $entry);
+    while (defined(my $candidate = shift @{ $self->{queue} || [] })) {
+        my $next = $self->{entries}{$candidate};
+        # A queued key whose entry or ctx is gone has nothing to reconcile.
+        # Skip it and take the next one: returning here would leave the rest
+        # of the queue sitting until an unrelated key schedules the next
+        # drain. Clear the flag so the key can be queued again later.
+        if (!$next || !$next->{ctx}) {
+            $next->{queued} = 0 if $next;
+            next;
+        }
+        ($key, $entry) = ($candidate, $next);
+        last;
+    }
+    return unless $entry;
+    my $ctx = $entry->{ctx};
 
     $entry->{queued} = 0;
     $entry->{active} = 1;
@@ -184,10 +243,22 @@ sub _drain_queue {
 
         if ($f->is_done) {
             delete $entry->{failures};
-            if ($entry->{dirty}) {
+            # Nothing enters the queue while stopped, here no more than
+            # anywhere else: the drain is off, so the key would sit in the
+            # queue stop() just emptied, and the ADDED a restart re-lists would
+            # return early on its queued flag without scheduling a drain.
+            if ($entry->{dirty} && !$self->{stopped}) {
                 $entry->{dirty} = 0;
                 $entry->{queued} = 1;
                 push @{ $self->{queue} }, $key;
+            }
+            elsif (!$entry->{retry_future}) {
+                # Clean reconcile: nothing queued, nothing dirty, no backoff
+                # left to remember. Keeping the entry would hold one hashref
+                # plus its ctx per key seen, for the lifetime of the process.
+                # A DELETED event needs no case of its own - its reconcile
+                # ends here like any other.
+                delete $self->{entries}{$key};
             }
         } else {
             $entry->{dirty} = 0;
@@ -287,7 +358,9 @@ sub patch_status {
             return Future->fail("Invalid arguments to patch_status()");
         }
 
-        $class = $rest->expand_class($class_or_object);
+        $class = $rest->expand_class($class_or_object)
+            // return Future->fail(
+                $self->kube->_unknown_resource_error($class_or_object));
         $name = $args{name} or return Future->fail("name required for patch_status");
         $namespace = $args{namespace};
         $status = $args{status} // return Future->fail("status required for patch_status");
@@ -347,7 +420,7 @@ Net::Async::Kubernetes::Controller - Minimal controller runtime for Net::Async::
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -417,17 +490,32 @@ Accepted parameters:
 
 =item C<kube>
 
-Existing L<Net::Async::Kubernetes> instance to bind to.
+Existing L<Net::Async::Kubernetes> instance to bind to. The reference is weak,
+as in L<Net::Async::Kubernetes::Watcher>, so the caller has to keep the client
+alive for as long as the controller is used.
 
 =item C<kubeconfig>, C<context>, C<server>, C<credentials>, C<resource_map>,
 C<resource_map_from_cluster>
 
-Client construction parameters used when C<kube> is not supplied.
+Client construction parameters used when C<kube> is not supplied. A client
+built this way is owned by the controller.
 
 =item C<on_reconcile>
 
 Required reconcile callback. Receives a hashref with C<controller>, C<kube>,
-C<resource>, C<event_type>, C<object>, C<key>, and C<attempt>.
+C<resource>, C<event_type>, C<object>, C<key>, and C<attempt>. C<controller>
+and C<kube> are weak references. Both are valid for the whole reconcile,
+including anything chained onto the C<Future> it returns, but a context kept
+past that keeps neither object alive.
+
+=item C<on_watch_error>
+
+Optional callback for C<ERROR> events from a registered watch, for example a
+C<403> arriving mid-stream. Receives C<($error, $ctx)>, where C<$error> is the
+raw error hashref the watcher reports and C<$ctx> carries C<controller>,
+C<kube>, and C<resource>. Error events are not reconcile objects, so they never
+enter the workqueue. An C<on_error> passed to C<watch_resource> takes
+precedence for that watch.
 
 =item C<retry_delay>
 
@@ -444,6 +532,10 @@ Returns the bound L<Net::Async::Kubernetes> client.
 
 Returns the reconcile callback.
 
+=head2 on_watch_error
+
+Returns the watch error callback, if one is configured.
+
 =head2 retry_delay
 
 Returns the configured retry delay policy. Defaults to C<1>.
@@ -455,7 +547,18 @@ controller is added to an event loop.
 
 =head2 stop
 
-Stops registered watches and prevents further queue processing.
+Stops registered watches and prevents further queue processing. Each stopped
+watch is also detached from the client it was registered on, so a watcher
+handle a caller kept from C<watch_resource> does not survive its controller's
+C<stop>: it is no longer attached to anything, calling C<start> on it directly
+drives a notifier with no loop, and the controller's own C<start> builds a
+fresh watcher for the spec regardless. Do not hold on to a watcher handle past
+a C<stop>.
+
+Pending work is dropped with them: the workqueue is cleared and any retry timer
+is cancelled, because a restart re-lists through fresh watches and delivers
+everything still present again. A key's failure count survives, so a key that
+was retrying picks up at its next attempt number rather than at attempt 1.
 
 =head2 watch_resource
 
@@ -469,15 +572,19 @@ Stops registered watches and prevents further queue processing.
 
 Registers a watched resource and returns the watcher instance once started.
 Repeated events for the same reconcile key are coalesced into a single queued
-entry.
+entry. A key's entry is dropped once it reconciles cleanly, so the queue does
+not grow with the number of objects seen; a key that is still queued, dirty or
+retrying keeps its entry, and with it its C<attempt> count.
 
 =head2 get_object
 
-Thin wrapper around C<< $controller->kube->get(...) >>.
+Thin wrapper around C<< $controller->kube->get(...) >>. Returns its
+L<Future>, resolving to the inflated IO::K8s object.
 
 =head2 list_objects
 
-Thin wrapper around C<< $controller->kube->list(...) >>.
+Thin wrapper around C<< $controller->kube->list(...) >>. Returns its
+L<Future>, resolving to an L<IO::K8s::List>.
 
 =head2 patch_status
 
@@ -487,13 +594,15 @@ Thin wrapper around C<< $controller->kube->list(...) >>.
     )->get;
 
 Patch the C</status> subresource for an object. Accepts either a class/name
-pair or an object instance plus a C<status> payload.
+pair or an object instance plus a C<status> payload. Returns a L<Future> that
+resolves to the patched object.
 
 =head2 update_status
 
     $controller->update_status($object)->get;
 
-Update the C</status> subresource for a full object instance.
+Update the C</status> subresource for a full object instance. Returns a
+L<Future> that resolves to the updated object.
 
 =head1 SEE ALSO
 

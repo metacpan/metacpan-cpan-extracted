@@ -5,7 +5,7 @@ Perl500503Syntax::OrDie 치트시트 (한국어)
     Perl500503Syntax::OrDie - (see EN cheatsheet for full description)
 
 버전
-    0.03
+    0.05
 
 개요
     use Perl500503Syntax::OrDie;
@@ -25,7 +25,9 @@ Perl500503Syntax::OrDie 치트시트 (한국어)
 검사하는 구문 (정적, 컴파일 시)
     Perl 5.6  : our / 3-arg open / use utf8 / use VERSION>=5.6 / \x{} /
                 \N{} / @+@- $+[N] $-[N] / CHECK/INIT / v-string / $^V /
-                :lvalue / *name{SLOT} / \p{}\P{}
+                :lvalue / *name{SLOT} / \p{}\P{} /
+                open(my $fh,...) opendir(my $dh,...) / binmode(FH,LAYER) /
+                use warnings without the $INC{'warnings.pm'} stub
     Perl 5.8  : use encoding / use constant { HASH }
     Perl 5.10 : //= // say state given/when ~~ use feature
                 \K (?<name>) \k<name> (?|) (*VERB) \h\H\v\V\R

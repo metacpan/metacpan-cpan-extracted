@@ -58,7 +58,7 @@ my $kube = Net::Async::Kubernetes->new(
 );
 $loop->add($kube);
 
-my $rest = $kube->_rest;
+my $rest = $kube->rest;
 
 # ============================================================
 # Helper: create or fetch existing resource

@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::API::Zones;
 # ABSTRACT: Hetzner Cloud DNS Zones API
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::API::RRSets;
 use WWW::Hetzner::Cloud::Zone;
@@ -16,11 +17,14 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Role::HasActions';
+
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::Zone->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -30,12 +34,20 @@ sub _wrap_list {
 }
 
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/zones', params => \%params);
-    return $self->_wrap_list($result->{zones} // []);
+    return ($self->_wrap_list($result->{zones} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
 
 
 sub list_by_label {
@@ -66,7 +78,10 @@ sub create {
     $body->{ttl}    = $params{ttl}    if $params{ttl};
 
     my $result = $self->client->post('/zones', $body);
-    return $self->_wrap($result->{zone});
+    return $self->_wrap(
+        $result->{zone},
+        action => $self->_wrap_action($result->{action}),
+    );
 }
 
 
@@ -87,7 +102,8 @@ sub delete {
     my ($self, $id) = @_;
     croak "Zone ID required" unless $id;
 
-    return $self->client->delete("/zones/$id");
+    my $result = $self->client->delete("/zones/$id");
+    return $self->_wrap_action($result->{action});
 }
 
 
@@ -125,7 +141,7 @@ WWW::Hetzner::Cloud::API::Zones - Hetzner Cloud DNS Zones API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -134,7 +150,7 @@ version 0.100
     my $cloud = WWW::Hetzner::Cloud->new(token => $ENV{HETZNER_API_TOKEN});
 
     # List all zones
-    my $zones = $cloud->zones->list;
+    my $zones = $cloud->zones->list_all;
 
     # Create a zone
     my $zone = $cloud->zones->create(
@@ -172,6 +188,15 @@ All methods return L<WWW::Hetzner::Cloud::Zone> objects.
 Returns an arrayref of L<WWW::Hetzner::Cloud::Zone> objects.
 Optional parameters: name, label_selector, sort, page, per_page.
 
+=head2 list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
+
 =head2 list_by_label
 
     my $zones = $cloud->zones->list_by_label('env=production');
@@ -202,9 +227,11 @@ Updates zone name or labels. Returns a L<WWW::Hetzner::Cloud::Zone> object.
 
 =head2 delete
 
-    $cloud->zones->delete($id);
+    my $action = $cloud->zones->delete($id);
 
-Deletes a zone and all its RRSets.
+Deletes a zone and all its RRSets. Returns the L<WWW::Hetzner::Action>
+tracking the deletion; call C<< $action->wait >> to block until the zone is
+gone.
 
 =head2 export
 
@@ -256,7 +283,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,6 +5,8 @@ use Test2::Tools::Affix qw[:all];
 use Path::Tiny          qw[path tempfile tempdir];
 use Test2::V0 -no_srand => 1;
 use Affix qw[:all];
+plan skip_all => 'Skipping on MSVC: the gcc-built perl FILE*/PerlIO handles cannot be passed into a cl-built CRT DLL (io-layer ABI mismatch)'
+    if $^O eq 'MSWin32' && ( $ENV{AFFIX_CC} // '' ) =~ /^cl(\b|$)/i;
 $|++;
 #
 subtest simple => sub {

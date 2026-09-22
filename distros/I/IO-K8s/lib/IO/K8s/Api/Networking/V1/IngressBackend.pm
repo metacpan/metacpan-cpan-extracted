@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::IngressBackend;
 # ABSTRACT: IngressBackend describes all endpoints for a given service and port.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s resource => 'Core::V1::TypedLocalObjectReference';
@@ -23,7 +23,7 @@ IO::K8s::Api::Networking::V1::IngressBackend - IngressBackend describes all endp
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 resource
 

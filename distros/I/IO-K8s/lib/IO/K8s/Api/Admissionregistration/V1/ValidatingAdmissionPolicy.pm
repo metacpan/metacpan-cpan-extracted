@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::ValidatingAdmissionPolicy;
 # ABSTRACT: ValidatingAdmissionPolicy describes the definition of an admission validation policy that accepts or rejects an object without changing it.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Admissionregistration::V1::ValidatingAdmissionPolicy - ValidatingA
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ The status of the ValidatingAdmissionPolicy, including warnings that are useful 
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#validatingadmissionpolicy-v1-admissionregistration.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#validatingadmissionpolicy-v1-admissionregistration.k8s.io>
 
 =head1 SUPPORT
 

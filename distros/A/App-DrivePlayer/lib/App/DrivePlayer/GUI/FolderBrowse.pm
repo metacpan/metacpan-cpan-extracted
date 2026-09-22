@@ -10,6 +10,8 @@ use Moo::Role;
 use Glib  qw( TRUE FALSE );
 use Gtk3  '-init';
 
+my $log = do { eval { require Log::Log4perl; Log::Log4perl->get_logger(__PACKAGE__) } };
+
 sub _add_folder_dialog {
     my ($self) = @_;
     return unless $self->_init_api();
@@ -81,7 +83,6 @@ sub _add_folder_dialog {
 
 sub _fetch_drive_name {
     my ($self, $folder_id) = @_;
-    my $log = do { eval { require Log::Log4perl; Log::Log4perl->get_logger(__PACKAGE__) } };
     my $meta = eval { $self->drive->file(id => $folder_id)->get(fields => 'id,name') };
     $log->warn("Failed to fetch Drive name for $folder_id: $@") if $@ && $log;
     return $meta ? $meta->{name} : undef;

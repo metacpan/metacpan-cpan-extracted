@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodCertificateProjection;
 # ABSTRACT: PodCertificateProjection provides a private key and X.509 certificate in the pod filesystem.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s certificateChainPath => Str;
@@ -21,6 +21,9 @@ k8s maxExpirationSeconds => Int;
 k8s signerName => Str, 'required';
 
 
+k8s user => Int;
+
+
 k8s userAnnotations => { Str => 1 };
 
 
@@ -38,7 +41,7 @@ IO::K8s::Api::Core::V1::PodCertificateProjection - PodCertificateProjection prov
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 certificateChainPath
 
@@ -81,6 +84,10 @@ The signer implementation is then free to issue a certificate with any lifetime 
 =head2 signerName
 
 Kubelet's generated CSRs will be addressed to this signer.
+
+=head2 user
+
+user is Optional: The owner UID of the created file. If specified, the item-level user field takes precedence over defaultUser. (Alpha) This field requires the AtomicWriteVolumeUserFields feature gate to be enabled.
 
 =head2 userAnnotations
 

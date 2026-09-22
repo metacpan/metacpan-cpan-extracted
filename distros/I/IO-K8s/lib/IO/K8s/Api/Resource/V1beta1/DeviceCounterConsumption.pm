@@ -1,7 +1,10 @@
 package IO::K8s::Api::Resource::V1beta1::DeviceCounterConsumption;
 # ABSTRACT: DeviceCounterConsumption defines a set of counters that a device will consume from a CounterSet.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
+
+k8s compatibilityGroups => [Str];
+
 
 k8s counterSet => Str, 'required';
 
@@ -23,7 +26,19 @@ IO::K8s::Api::Resource::V1beta1::DeviceCounterConsumption - DeviceCounterConsump
 
 =head1 VERSION
 
-version 1.107
+version 1.108
+
+=head2 compatibilityGroups
+
+CompatibilityGroups is a list of opaque group names for this counter set consumption.
+
+Devices that consume counters from the same counter set may only be allocated at the same time ("co-allocated") if they all share at least one common group: the intersection of the CompatibilityGroups of all co-allocated devices on that counter set must be non-empty. Devices that consume from different counter sets are never compared via this field.
+
+An unset field, an explicit nil, and an empty list are equivalent and mean "no groups": such a device is only co-allocatable with sibling devices on the same counter set that also have no groups, and is never co-allocatable with a device that declares one or more groups.
+
+Group names are opaque and meaningful only within the publishing driver's pool.
+
+The maximum number of groups is 2, and the names must be unique.
 
 =head2 counterSet
 

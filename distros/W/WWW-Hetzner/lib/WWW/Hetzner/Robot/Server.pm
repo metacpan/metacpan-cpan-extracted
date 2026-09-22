@@ -1,7 +1,7 @@
 package WWW::Hetzner::Robot::Server;
 # ABSTRACT: Hetzner Robot Server entity
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use namespace::clean;
@@ -93,7 +93,7 @@ WWW::Hetzner::Robot::Server - Hetzner Robot Server entity
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head2 server_number
 
@@ -190,7 +190,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

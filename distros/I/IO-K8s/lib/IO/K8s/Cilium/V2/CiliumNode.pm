@@ -1,12 +1,14 @@
 package IO::K8s::Cilium::V2::CiliumNode;
-# ABSTRACT: Cilium node configuration and status
-our $VERSION = '1.107';
+# ABSTRACT: CiliumNode represents a node managed by Cilium.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumnodes';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => '+IO::K8s::Cilium::V2::NodeSpec', { required => 'schema' };
+k8s status => '+IO::K8s::Cilium::V2::NodeStatus';
+
+
 
 1;
 
@@ -18,25 +20,20 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Cilium::V2::CiliumNode - Cilium node configuration and status
+IO::K8s::Cilium::V2::CiliumNode - CiliumNode represents a node managed by Cilium.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-This cluster-scoped resource stores Cilium-specific node configuration and status, including IPAM allocations, encryption keys, and health information. It uses API version C<cilium.io/v2>. The C<spec> and C<status> fields contain opaque CRD-specific data structures managed by the Cilium agent running on each node.
+Spec defines the desired specification/configuration of the node.
 
-=head1 SEE ALSO
+=head2 status
 
-=over
-
-=item * L<IO::K8s::Cilium> - Main Cilium CRD namespace
-
-=item * L<https://docs.cilium.io/en/stable/network/concepts/ipam/> - Upstream Cilium IPAM and node management documentation
-
-=back
+Status defines the realized specification/configuration and status
+of the node.
 
 =head1 SUPPORT
 

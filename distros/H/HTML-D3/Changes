@@ -1,5 +1,19 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.16	Mon Sep 21 07:34:35 PM EDT 2026
+	[ Enhancements ]
+	- render_heatmap_snippet: new snippet method that generates an embeddable
+	  D3 v7 grid heatmap. Accepts an array of [$x, $y, $value] triples and an
+	  optional \%opts hashref with keys: color_scheme (YlOrRd/Blues/Greens/
+	  Purples/RdPu/YlGnBu, default YlOrRd), x_label, y_label, val_label
+	  (tooltip label, default 'Value'), show_values (print value in each cell,
+	  auto-suppressed when cell < 28px), cell_padding (0-8 px gap, default 2),
+	  legend (colour-scale bar, default on), animated (fade-in with
+	  prefers-reduced-motion support, default off). Returns
+	  { svg_id => 'heatmap', html => Str }. undef values are silently skipped;
+	  duplicate (x, y) pairs: last write wins. Requires Scalar::Util
+	  looks_like_number (already in core distribution).
+
 0.15	Wed Sep 16 01:51:38 PM EDT 2026
 	[ Enhancements ]
 	- render_pie_chart, render_animated_pie_chart, render_pie_chart_snippet: new

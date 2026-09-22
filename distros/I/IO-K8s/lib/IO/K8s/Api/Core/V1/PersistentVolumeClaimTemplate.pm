@@ -1,7 +1,10 @@
 package IO::K8s::Api::Core::V1::PersistentVolumeClaimTemplate;
 # ABSTRACT: PersistentVolumeClaimTemplate is used to produce PersistentVolumeClaim objects as part of an EphemeralVolumeSource.
-our $VERSION = '1.107';
-use IO::K8s::APIObject;
+our $VERSION = '1.108';
+use IO::K8s::Resource;
+
+
+k8s metadata => 'Meta::V1::ObjectMeta';
 
 
 k8s spec => 'Core::V1::PersistentVolumeClaimSpec', 'required';
@@ -21,14 +24,15 @@ IO::K8s::Api::Core::V1::PersistentVolumeClaimTemplate - PersistentVolumeClaimTem
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
 PersistentVolumeClaimTemplate is used to produce PersistentVolumeClaim objects as part of an EphemeralVolumeSource.
 
-This is a Kubernetes API object. See L<IO::K8s::Role::APIObject> for
-C<metadata>, C<api_version()>, and C<kind()>.
+=head2 metadata
+
+Standard object's metadata. See L<IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta>.
 
 =head2 spec
 

@@ -14,7 +14,7 @@ use Module::Pluggable require => 1;
 use base qw(Class::Accessor::Chained::Fast);
 
 # ABSTRACT: A simple, extensible Perl debugger
-our $VERSION = '0.64'; # VERSION
+our $VERSION = '0.65'; # VERSION
 
 __PACKAGE__->mk_accessors(qw(
     backend
@@ -135,7 +135,7 @@ Devel::ebug - A simple, extensible Perl debugger
 
 =head1 VERSION
 
-version 0.64
+version 0.65
 
 =head1 SYNOPSIS
 
@@ -547,6 +547,18 @@ L<Devel::ebug> does not support Perls prior to 5.10.1.
 
 L<Devel::ebug> does not handle signals under Windows.
 
+Running C<perl -d:ebug script.pl> directly does not work, and will fail
+with C<No DB::DB routine defined>. L<Devel::ebug> is the frontend class;
+it is not itself a C<-d> debugger backend. The backend is the internal
+L<Devel::ebug::Backend> module, which is invoked automatically as
+C<perl -d:ebug::Backend script.pl> when you call C<< $ebug->load >>. To
+debug a script, either use the L<ebug> command, or use L<Devel::ebug>
+programmatically:
+
+  my $ebug = Devel::ebug->new;
+  $ebug->program('script.pl');
+  $ebug->load;
+
 =head1 AUTHOR
 
 Original author: Leon Brocard E<lt>acme@astray.comE<gt>
@@ -561,7 +573,7 @@ Taisuke Yamada
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2005-2021 by Leon Brocard.
+This software is copyright (c) 2005-2026 by Leon Brocard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

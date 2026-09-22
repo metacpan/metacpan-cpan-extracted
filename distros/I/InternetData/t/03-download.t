@@ -183,7 +183,7 @@ subtest 'a database the organization does not license is refused once' => sub {
         # The API says WHICH refusal this is, under `rc`. Falling back to the
         # status means the envelope went unread.
         is($@->message, 'NOT_LICENSED', "$name: carries the API's rc");
-        is($@->retryable, 0, "$name: a licence refusal is not worth retrying");
+        is($@->retryable, 0, "$name: a license refusal is not worth retrying");
         is($origin->count, 1, "$name: and was asked exactly once");
     }
     ok(!-e "$path.part", 'a refused download leaves no partial file');

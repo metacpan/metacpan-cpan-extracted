@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Regression coverage for karr ticket #2:
+# Regression coverage for k2:
 # KubeAggregator's CamelCase prefix was not recognised by Resource.pm's
 # _expand_class, so APIService's spec/status resolved to non-existent
 # IO::K8s::Api::KubeAggregator::V1::APIServiceSpec classes instead of the

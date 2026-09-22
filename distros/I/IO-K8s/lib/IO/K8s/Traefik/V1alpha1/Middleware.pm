@@ -1,13 +1,13 @@
 package IO::K8s::Traefik::V1alpha1::Middleware;
-# ABSTRACT: Traefik HTTP middleware
-our $VERSION = '1.107';
+# ABSTRACT: Middleware is the CRD implementation of a Traefik Middleware.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'middlewares';
 with 'IO::K8s::Role::Namespaced', 'IO::K8s::Role::MiddlewareBuilder';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec => '+IO::K8s::Traefik::V1alpha1::MiddlewareSpec', { required => 'schema' };
+
 
 1;
 
@@ -19,25 +19,15 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Traefik::V1alpha1::Middleware - Traefik HTTP middleware
+IO::K8s::Traefik::V1alpha1::Middleware - Middleware is the CRD implementation of a Traefik Middleware.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-Middleware configures HTTP middleware for Traefik. It provides request/response transformations including rate limiting, header manipulation, redirects, authentication, and more. This is a namespace-scoped custom resource using API version C<traefik.io/v1alpha1>. The C<spec> and C<status> fields are opaque hashrefs managed by Traefik.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<IO::K8s::Traefik> - Traefik CRD namespace
-
-=item * L<https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/> - Official Traefik CRD documentation
-
-=back
+MiddlewareSpec defines the desired state of a Middleware.
 
 =head1 SUPPORT
 

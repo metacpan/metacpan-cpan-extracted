@@ -1,0 +1,10 @@
+{
+  "iso": {
+    "id": 4711,
+    "name": "netboot.xyz.iso",
+    "description": "netboot.xyz",
+    "type": "public",
+    "architecture": "x86",
+    "deprecation": null
+  }
+}

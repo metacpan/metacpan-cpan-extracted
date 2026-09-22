@@ -237,10 +237,32 @@ sar_refused(self)
     OUTPUT:
         RETVAL
 
+# Why the last ->region call on this handle returned an empty list: SA_E_BUSY
+# for a stripe held through the whole bounded wait, SA_E_FULL for a registry or
+# an arena with no room, SA_E_SHAPE for a name already carved with another
+# type or a smaller length, SA_E_NOENT for a plain lookup that missed. Private:
+# a reason for a diagnostic, not a second way to ask whether a region exists.
+IV
+sar__last_err(self)
+        SV *self
+    PREINIT:
+        sa_region *r;
+    CODE:
+        r = SA_SELF(sa_region, self);
+        if (!r || !r->map.base) croak("Shared::Arena: this region is released");
+        RETVAL = (IV)r->last_err;
+    OUTPUT:
+        RETVAL
+
 # $arena->region($name, size => N) -> ($offset, $length)
 #
 # Carves it, or hands back the one already there under that name. An empty list
 # when the region is full or the name is unusable.
+#
+# The empty list carries no reason, and a CPAN smoker reporting "two carves
+# refused" with no way to say whether the arena was full or a stripe was merely
+# busy is how a transient contention failure got read as an exhausted registry.
+# The code from the last refusal in this process is kept for _last_err below.
 void
 sar_region(self, name, ...)
         SV *self
@@ -261,9 +283,15 @@ sar_region(self, name, ...)
             const char *o = SvPV_nolen(ST(i));
             if (strEQ(o, "size")) size = SvUV(ST(i + 1));
         }
+        r->last_err = SA_E_OK;
         e = size ? sa_carve(r, nm, (size_t)nlen, (uint64_t)size, SA_T_RAW, &err)
                  : sa_find(r, nm, (size_t)nlen);
-        if (!e) XSRETURN_EMPTY;
+        if (!e) {
+            /* sa_find reports nothing, so a plain lookup that missed is
+             * SA_E_NOENT rather than whatever the last carve left behind. */
+            r->last_err = size ? err : SA_E_NOENT;
+            XSRETURN_EMPTY;
+        }
         EXTEND(SP, 2);
         mPUSHu((UV)e->off);
         mPUSHu((UV)e->len);

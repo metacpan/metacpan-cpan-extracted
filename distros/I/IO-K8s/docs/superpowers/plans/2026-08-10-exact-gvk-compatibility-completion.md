@@ -227,7 +227,7 @@ Run:
 
 ```text
 prove -lv t/43_spec_kind_dispatch.t
-prove -lv t/40_karr_11_multi_version_dispatch.t
+prove -lv t/40_k11_multi_version_dispatch.t
 prove -lv t/41_api_group_short_form.t
 perl maint/spec-drift-check.pl --spec spec/v1.36.3.json
 prove -lr t/
@@ -248,7 +248,7 @@ Require `git diff --cached --name-only` to match them and review the full
 ### Task 3: Correct the stale dispatch-test comment (Karr #19)
 
 **Files:**
-- Modify: `t/40_karr_11_multi_version_dispatch.t`
+- Modify: `t/40_k11_multi_version_dispatch.t`
 
 - [ ] **Step 1: Replace the obsolete mechanism name**
 
@@ -258,11 +258,11 @@ change assertions.
 
 - [ ] **Step 2: Verify and commit**
 
-Run: `prove -lv t/40_karr_11_multi_version_dispatch.t`
+Run: `prove -lv t/40_k11_multi_version_dispatch.t`
 
 Expected: PASS with 25 tests. Commit subject:
 `Correct static dispatch map test commentary` with `Karr: #19` and trailers.
-Stage only `t/40_karr_11_multi_version_dispatch.t`; review
+Stage only `t/40_k11_multi_version_dispatch.t`; review
 `git diff --cached --name-only` and `git diff --cached` first.
 
 ---

@@ -1,5 +1,11 @@
 Revision history for Luv-CLI
 
+0.004     2026-09-21 19:23:40-04:00 America/New_York
+    - Fixed `luv build`: files under source_dir now bundle inside their
+      own subfolder in the .love archive instead of landing at the
+      archive root, matching how library_dir and assets_dir are
+      already packaged
+
 0.003     2026-09-18 13:21:56-04:00 America/New_York
     - Documentation: added POD to all modules and commands
     - Documentation: configured pod-coverage.t with trustme exemptions

@@ -3,7 +3,7 @@ package Devel::ebug::Backend;
 use strict;
 use warnings;
 
-our $VERSION = '0.64'; # VERSION
+our $VERSION = '0.65'; # VERSION
 
 package DB;
 
@@ -16,7 +16,7 @@ use Module::Pluggable
 
 use vars qw(@dbline %dbline);
 
-our $VERSION = '0.64'; # VERSION
+our $VERSION = '0.65'; # VERSION
 
 # Let's catch INT signals and set a flag when they occur
 $SIG{INT} = sub {
@@ -156,7 +156,6 @@ sub get {
 }
 
 sub sub {
-  my (@args) = @_;
   my $sub = $DB::sub;
 
   my $frame = { single => $DB::single, sub => $sub };
@@ -167,8 +166,22 @@ sub sub {
 
   no strict 'refs';
   if (wantarray) { ## no critic (Community::Wantarray)
-    my @ret   = &$sub;
-    my $frame = pop @{ $context->{stack} };
+    my @ret = &$sub;
+
+    # Restore from $frame (our own lexical) rather than whatever pop
+    # returns, and check $frame->{'return'} the same way. $frame is
+    # the exact object that was pushed, so this is correct even if
+    # $context->{stack} has become misaligned - which can happen if
+    # an earlier, unrelated call's exception got caught further up
+    # the debuggee's own call stack (eg. Tk widgets routinely wrap
+    # internal calls in eval {} blocks for feature detection),
+    # skipping that call's own cleanup and leaving a stale frame
+    # behind. Trusting the popped value here would then read that
+    # stale frame and corrupt $DB::single for callers further up the
+    # stack too, leaving next/step permanently unable to stop the
+    # debuggee again (it just runs to completion, or hangs forever if
+    # that includes something like Tk's MainLoop).
+    pop @{ $context->{stack} };
     $DB::single = $frame->{single};
     $DB::single = 0 if defined $context->{mode} && $context->{mode} eq 'run' && !@{$context->{watch_points}};
 
@@ -178,8 +191,9 @@ sub sub {
       return @ret;
     }
   } else {
-    my $ret   = &$sub;
-    my $frame = pop @{ $context->{stack} };
+    my $ret = &$sub;
+
+    pop @{ $context->{stack} };
     $DB::single = $frame->{single};
     $DB::single = 0 if defined $context->{mode} && $context->{mode} eq 'run' && !@{$context->{watch_points}};
 
@@ -276,7 +290,7 @@ Devel::ebug::Backend
 
 =head1 VERSION
 
-version 0.64
+version 0.65
 
 =head1 AUTHOR
 
@@ -292,7 +306,7 @@ Taisuke Yamada
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2005-2021 by Leon Brocard.
+This software is copyright (c) 2005-2026 by Leon Brocard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

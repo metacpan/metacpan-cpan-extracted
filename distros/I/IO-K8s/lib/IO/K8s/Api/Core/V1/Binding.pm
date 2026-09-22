@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::Binding;
 # ABSTRACT: Binding ties one object to another; for example, a pod is bound to a node by a scheduler. Deprecated in 1.7, please use the bindings subresource of pods instead.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -21,7 +21,7 @@ IO::K8s::Api::Core::V1::Binding - Binding ties one object to another; for exampl
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -36,7 +36,7 @@ The target object that you want to bind to the standard object.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#binding-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#binding-v1-core>
 
 =head1 SUPPORT
 

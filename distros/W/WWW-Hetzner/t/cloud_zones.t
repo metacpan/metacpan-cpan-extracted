@@ -74,6 +74,8 @@ subtest 'create zone' => sub {
     is($zone->{id}, 'zone789012', 'new zone id');
     is($zone->{name}, 'newdomain.com', 'new zone name');
     is($zone->{status}, 'pending', 'new zone status');
+    isa_ok($zone->action, 'WWW::Hetzner::Action', 'create action is an Action');
+    is($zone->action->command, 'create_zone', 'action command');
 };
 
 subtest 'update zone' => sub {
@@ -95,12 +97,27 @@ subtest 'update zone' => sub {
 };
 
 subtest 'delete zone' => sub {
+    # karr #7: DELETE /zones/{id_or_name} answers 201 {action}
     my $cloud = mock_cloud(
-        'DELETE /zones/zone123456' => {},
+        'DELETE /zones/zone123456' => sub { load_fixture('zones_action') },
     );
 
-    my $result = $cloud->zones->delete('zone123456');
-    ok(1, 'delete succeeded');
+    my $action = $cloud->zones->delete('zone123456');
+    isa_ok($action, 'WWW::Hetzner::Action', 'delete returns an Action');
+    is($action->id, 9101, 'delete action id');
+    is($action->command, 'delete_zone', 'delete action command');
+};
+
+subtest 'delete zone via entity mirror' => sub {
+    my $cloud = mock_cloud(
+        'GET /zones/zone123456'    => sub { load_fixture('zones_get') },
+        'DELETE /zones/zone123456' => sub { load_fixture('zones_action') },
+    );
+
+    my $zone = $cloud->zones->get('zone123456');
+    my $action = $zone->delete;
+    isa_ok($action, 'WWW::Hetzner::Action', '$zone->delete returns an Action');
+    is($action->command, 'delete_zone', 'entity mirror carries the action command');
 };
 
 subtest 'create zone with ttl' => sub {

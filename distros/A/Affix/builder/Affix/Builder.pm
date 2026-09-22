@@ -454,6 +454,14 @@ END_C
         my @objs;
         require ExtUtils::CBuilder;
         my %config = %Config;
+
+        # ExtUtils::CBuilder only uses $Config{ccflags} and silently drops
+        # ccflags_uselargefiles, which Configure keeps separate on Solaris/
+        # illumos (and a few other platforms). Without those defines the system
+        # headers do not expose off64_t, sigjmp_buf, alloca or fileno, so the
+        # same source that perl itself builds fails to compile here. Merge them
+        # in (harmless duplication when ccflags already contains them).
+        $config{ccflags} = join ' ', grep {length} $config{ccflags}, $config{ccflags_uselargefiles};
         if ($debug) {
             $config{ldflags}   =~ s/-s //g;
             $config{ldflags}   =~ s/ -s//g;

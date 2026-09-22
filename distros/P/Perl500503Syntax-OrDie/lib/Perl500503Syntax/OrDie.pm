@@ -16,9 +16,9 @@ BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
         $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
 use warnings; local $^W = 1;
 
-use vars qw($VERSION @BLACKLIST @REGEX_BLACKLIST @RAW_BLACKLIST $_OPEN_GUARDED $_MKDIR_GUARDED);
+use vars qw($VERSION @BLACKLIST @REGEX_BLACKLIST @RAW_BLACKLIST @STRING_BLACKLIST $_OPEN_GUARDED $_MKDIR_GUARDED);
 
-$VERSION = '0.03';
+$VERSION = '0.05';
 
 # ======================================================================
 # BLACKLIST
@@ -94,6 +94,23 @@ $VERSION = '0.03';
     # ------------------------------------------------------------------
     # Perl 5.8 features
     # ------------------------------------------------------------------
+
+    # Lexical filehandle / directory handle.
+    #
+    # open(my $fh, ...), opendir(my $dh, ...) and their relatives rely on
+    # a handle being autovivified into an undefined lexical, which arrived
+    # in Perl 5.6.  Perl 5.005_03 has nothing to autovivify into: it
+    # reports "Can't use an undefined value as a symbol reference" at run
+    # time, so the defect survives compilation and shows up only when the
+    # code actually opens something.  Write  local *FH;  and pass the
+    # bareword, or pass a glob reference.
+    #
+    # Only the  my  spelling is listed.  open($fh, ...) against a lexical
+    # filled in earlier cannot be told apart from open($fh, ...) against a
+    # lexical holding a glob, which is valid in 5.005_03, so flagging it
+    # would report working code.
+    [ qr/\b(?:open|opendir|sysopen|pipe|socket|socketpair|accept)\s*(?:\(\s*)?my\s*[\$\(]/,
+      "lexical filehandle or directory handle (introduced in Perl 5.6; use 'local *FH' and a bareword)" ],
 
     # use encoding
     [ qr/\buse\s+encoding\b/,
@@ -390,8 +407,48 @@ $VERSION = '0.03';
 #   sprintf/printf "%v" format flag
 #     -> The format string is a runtime value, not a syntax construct.
 #        A string literal containing "%v" is valid Perl 5.005_03 syntax.
+#
+# Note that this reasoning covers the *value* a string denotes, not the
+# escape sequences its source spelling is made of.  Those are syntax and
+# are checked; see @STRING_BLACKLIST below.
 # ======================================================================
 @RAW_BLACKLIST = ();
+
+# ======================================================================
+# STRING_BLACKLIST
+# Matched against the body of every INTERPOLATING string literal:
+# "...", qq//, qx//, `...`, an unquoted or double-quoted heredoc, and the
+# replacement half of s/// unless it is single-quote delimited.
+#
+# The bodies of string literals are masked out before @BLACKLIST runs, so
+# an escape written inside one used to be invisible to every stage: the
+# \x{} and \N{} entries in @BLACKLIST could fire only on the rare source
+# that puts them outside a string, and @REGEX_BLACKLIST covered them only
+# inside a regex.  The ordinary spelling
+#
+#     my $smiley = "\x{263A}";
+#
+# therefore passed unreported, which is precisely the construct this
+# distribution exists to catch: Perl 5.005_03 does not know \x{...} and
+# quietly reads it as \x with no hex digits followed by the literal text
+# "{263A}", so the program keeps running and produces the wrong string.
+#
+# Only escapes are listed here.  What a string *says* is still none of
+# this module's business; an interpolating string may contain any text.
+# A single-quoted string performs no escape processing at all and is not
+# scanned.
+# ======================================================================
+@STRING_BLACKLIST = (
+
+    # \x{HHHH} Unicode escape in a string -- Perl 5.6
+    [ qr/\\x\{[0-9A-Fa-f]+\}/,
+      "\\x{} Unicode escape in a string (introduced in Perl 5.6)" ],
+
+    # \N{name} named character in a string -- Perl 5.6
+    [ qr/\\N\{[^}]+\}/,
+      "\\N{} named character escape in a string (introduced in Perl 5.6)" ],
+
+);
 
 # ======================================================================
 # import() -- called when the caller writes:  use Perl500503Syntax::OrDie;
@@ -443,9 +500,17 @@ sub _check_source {
 
     my @violations;
 
-    my ($masked, $regex_bodies_ref) = _mask_source($source);
+    my ($masked, $regex_bodies_ref, $string_bodies_ref) = _mask_source($source);
     my @lines    = split(/\n/, $masked, -1);
     my @rawlines = split(/\n/, $source,  -1);
+
+    # A line carries live code when its masked form still holds something
+    # other than the mask character, whitespace and the comment marker.
+    # Comments, POD, heredoc bodies and everything after __END__ are dead
+    # by that test, which is what the stages below need when they have to
+    # consult the RAW text of a line: it keeps a construct quoted in prose
+    # from being read as the construct itself.
+    my @live = map { ($lines[$_] =~ /[^X\s#]/) ? 1 : 0 } 0 .. $#lines;
 
     # ------------------------------------------------------------------
     # Pre-scan: detect  use List::Util qw(... any ... all ...)
@@ -552,6 +617,94 @@ sub _check_source {
         }
     }
 
+    # Stage 1d: binmode() with more than one argument.
+    #
+    # Perl 5.005_03's binmode takes exactly one argument.  The LAYER
+    # argument -- binmode($fh, ':raw') -- arrived with PerlIO in Perl 5.6,
+    # and a 5.005_03 perl rejects it outright with "Too many arguments for
+    # binmode".  What the layer string says does not enter into it: this is
+    # a question of arity, the same question the 3-argument open() stage
+    # above asks, so it is answered the same way, by counting the commas
+    # that sit at the top level of the call.
+    {
+        my $kw = 'binm' . 'ode';
+        my $lineno = 0;
+        for my $mline (@lines) {
+            $lineno++;
+            my $hit = 0;
+
+            # binmode(...) -- count top-level commas inside the parens.
+            while ($mline =~ /\b$kw\s*\(/g) {
+                my $i      = pos($mline);
+                my $len    = length($mline);
+                my $depth  = 1;
+                my $commas = 0;
+                while ($i < $len && $depth > 0) {
+                    my $c = substr($mline, $i, 1);
+                    if    ($c eq '(') { $depth++ }
+                    elsif ($c eq ')') { $depth-- }
+                    elsif ($c eq ',' && $depth == 1) { $commas++ }
+                    $i++;
+                }
+                $hit = 1 if $commas >= 1;
+            }
+
+            # binmode FH, LAYER -- the same call without parentheses.  The
+            # argument text is taken up to the end of the statement, so a
+            # comma belonging to a later statement on the same line is not
+            # counted.
+            $hit = 1 if $mline =~ /\b$kw\s+[^;(]*,/;
+
+            if ($hit) {
+                push @violations,
+                    "Perl500503Syntax::OrDie: VIOLATION at $file line $lineno:\n"
+                  . "  $kw() with a LAYER argument (introduced in Perl 5.6; "
+                  . "5.005_03 takes the filehandle alone)\n";
+            }
+        }
+    }
+
+    # Stage 1e: use warnings / no warnings without the compatibility stub.
+    #
+    # The warnings pragma is Perl 5.6.  On 5.005_03 the bare statement dies
+    # at compile time with "Can't locate warnings.pm", which makes it the
+    # 5.6-ism a port trips over first.  It is nevertheless written in every
+    # cross-version file, guarded:
+    #
+    #     BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }
+    #     use warnings;
+    #
+    # With the entry in %INC the require is skipped, and Perl ignores a
+    # missing import/unimport, so both  use warnings  and  no warnings
+    # become no-ops on 5.005_03 and keep their meaning everywhere else.
+    # That idiom is the tolerated form, exactly as the empty-import form of
+    # use feature is tolerated above; the unguarded statement is not.
+    #
+    # The guard is looked for in the raw text of lines that carry live
+    # code, so that the idiom quoted in a comment or in POD -- this file's
+    # own documentation quotes it -- is not mistaken for the guard itself.
+    {
+        my $guard_line = 0;
+        for my $i (0 .. $#rawlines) {
+            next unless $live[$i];
+            if ($rawlines[$i] =~ /\$INC\s*\{\s*['"]warnings\.pm['"]\s*\}/) {
+                $guard_line = $i + 1;
+                last;
+            }
+        }
+        my $lineno = 0;
+        for my $mline (@lines) {
+            $lineno++;
+            next unless $mline =~ /\b(use|no)\s+warnings\b/;
+            my $word = $1;
+            next if $guard_line && $guard_line <= $lineno;
+            push @violations,
+                "Perl500503Syntax::OrDie: VIOLATION at $file line $lineno:\n"
+              . "  '$word warnings' without the \$INC{'warnings.pm'} stub "
+              . "(the warnings pragma was introduced in Perl 5.6)\n";
+        }
+    }
+
     # Possessive quantifiers in code: a++  a*+  a?+  a{n,m}+
     {
         my $lineno2 = 0;
@@ -617,6 +770,29 @@ sub _check_source {
         }
     }
 
+    # Stage 4: STRING_BLACKLIST -- body of interpolating string literals
+    # only.  Escaped backslashes are neutralised first, exactly as in
+    # stage 3, so that the two-character literal sequence "\\x" (a
+    # backslash written as \\ followed by the letter x, valid in every
+    # Perl) is not mistaken for the \x escape introducer.
+    my @scan_strings;
+    for my $sbody (@{$string_bodies_ref}) {
+        my ($body_text, $body_line) = @{$sbody};
+        (my $scan = $body_text) =~ s/\\\\/\0\0/g;
+        push @scan_strings, [$scan, $body_line];
+    }
+    for my $entry (@STRING_BLACKLIST) {
+        my ($pattern, $desc) = @{$entry};
+        for my $sbody (@scan_strings) {
+            my ($body_text, $body_line) = @{$sbody};
+            if ($body_text =~ $pattern) {
+                push @violations,
+                    "Perl500503Syntax::OrDie: VIOLATION at $file line $body_line:\n"
+                  . "  $desc\n";
+            }
+        }
+    }
+
     return @violations;
 }
 
@@ -667,6 +843,7 @@ sub _mask_source {
     my $pos          = 0;
     my $len          = length($src);
     my @regex_bodies;
+    my @string_bodies;
     my $in_pod       = 0;
     my @pending_heredocs;
 
@@ -682,7 +859,10 @@ sub _mask_source {
             $out .= "\n";
             $pos++;
             while (@pending_heredocs) {
-                my $sentinel = shift @pending_heredocs;
+                my $pending  = shift @pending_heredocs;
+                my $sentinel = $pending->[0];
+                my $interp   = $pending->[1];
+                my $bodyline = 1 + _count_newlines($src, 0, $pos);
                 my $remain   = substr($src, $pos);
                 my $bodylen;
                 if ($remain =~ /^\Q$sentinel\E[\t ]*\r?\n/m) {
@@ -695,6 +875,7 @@ sub _mask_source {
                     $bodylen = length($remain);
                 }
                 my $raw = substr($src, $pos, $bodylen);
+                push @string_bodies, [$raw, $bodyline] if $interp;
                 (my $masked_body = $raw) =~ s/[^\n]/X/g;
                 $out .= $masked_body;
                 $pos += $bodylen;
@@ -747,6 +928,8 @@ sub _mask_source {
         # -- double-quoted string  "..." --------------------------------
         if ($ch eq '"') {
             my ($rep, $len2) = _mask_dquote($src, $pos);
+            push @string_bodies, [substr($src, $pos, $len2),
+                                  1 + _count_newlines($src, 0, $pos)];
             $out .= $rep;
             $pos += $len2;
             next;
@@ -781,6 +964,8 @@ sub _mask_source {
         # -- backtick string  `...` -------------------------------------
         if ($ch eq '`') {
             my ($rep, $len2) = _mask_delimited($src, $pos, '`', '`');
+            push @string_bodies, [substr($src, $pos, $len2),
+                                  1 + _count_newlines($src, 0, $pos)];
             $out .= $rep;
             $pos += $len2;
             next;
@@ -794,6 +979,10 @@ sub _mask_source {
                 if ($d =~ /\S/) {
                     my $cl = _matching_delim($d);
                     my ($rep, $len2) = _mask_delimited($src, $pos + 2, $d, $cl);
+                    # qq// and qx// interpolate; qw// does not.
+                    push @string_bodies, [substr($src, $pos + 2, $len2),
+                                          1 + _count_newlines($src, 0, $pos)]
+                        if $nxt eq 'q' || $nxt eq 'x';
                     $out .= substr($src, $pos, 2) . $rep;
                     $pos += 2 + $len2;
                     next;
@@ -817,8 +1006,11 @@ sub _mask_source {
             my $rest = substr($src, $pos);
             if ($rest =~ /\A(<<\s*([\"']?)(\w+)\2)/) {
                 my $token    = $1;
+                my $quote    = $2;
                 my $sentinel = $3;
-                push @pending_heredocs, $sentinel;
+                # <<'WORD' performs no escape processing; <<WORD and
+                # <<"WORD" do, so only those bodies are scanned.
+                push @pending_heredocs, [$sentinel, ($quote eq "'" ? 0 : 1)];
                 $out .= 'X' x length($token);
                 $pos += length($token);
                 next;
@@ -870,7 +1062,12 @@ sub _mask_source {
                             $close2 = _matching_delim($delim2);
                         }
                     }
+                    my $repl_line = 1 + _count_newlines($src, 0, $pos);
                     my ($body2, $blen2) = _mask_delimited_raw($src, $pos, $delim2, $close2);
+                    # The replacement half of s/// interpolates unless it
+                    # is single-quote delimited; tr/// and y/// never do.
+                    push @string_bodies, [$body2, $repl_line]
+                        if $op eq 's' && $delim2 ne "'";
                     $pos += $blen2;
                     $repl_len += $blen2;
                 }
@@ -926,7 +1123,7 @@ sub _mask_source {
         $pos++;
     }
 
-    return ($out, \@regex_bodies);
+    return ($out, \@regex_bodies, \@string_bodies);
 }
 
 # ======================================================================
@@ -1200,7 +1397,7 @@ Perl500503Syntax::OrDie - Validate that source code is compatible with Perl 5.00
 
 =head1 VERSION
 
-0.03
+0.05
 
 =head1 SYNOPSIS
 
@@ -1308,8 +1505,11 @@ list if any violations are found; returns normally otherwise.
 =item * C<use vVERSION> where VERSION E<gt>= v5.6
 
 =item * C<\x{HHHH}> Unicode escape -- Perl 5.6
+(in a regex and in an interpolating string literal alike; a
+single-quoted string performs no escape processing and is not scanned)
 
 =item * C<\N{name}> named character escape -- Perl 5.6
+(same scanning rule as C<\x{HHHH}>)
 
 =item * Match-position arrays C<@+>/C<@-> and C<$+[N]>/C<$-[N]> -- Perl 5.6
 
@@ -1322,6 +1522,24 @@ list if any violations are found; returns normally otherwise.
 =item * C<:lvalue> subroutine attribute -- Perl 5.6
 
 =item * Typeglob component access C<*name{SLOT}> -- Perl 5.6
+
+=item * Lexical filehandle or directory handle -- Perl 5.6
+(C<open(my $fh, ...)>, C<opendir>, C<sysopen>, C<pipe>, C<socket>,
+C<socketpair>, C<accept>.  Only the C<my> spelling is reported:
+C<open($fh, ...)> against a lexical that already holds a glob is valid
+Perl 5.005_03 and cannot be told apart from the invalid case.)
+
+=item * C<binmode()> with a LAYER argument -- Perl 5.6
+(a question of arity: Perl 5.005_03 C<binmode> takes the filehandle
+alone, whatever the layer string would have said)
+
+=item * C<use warnings> / C<no warnings> without the
+C<$INC{'warnings.pm'}> stub -- Perl 5.6
+(the guarded idiom, C<BEGIN { $INC{'warnings.pm'} = '' if $] E<lt> 5.006 }>
+ahead of the statement, is a no-op on Perl 5.005_03 and is treated as
+compatible, exactly as the empty-import form of C<use feature> is.  The
+stub is recognised only where it is live code, so the idiom quoted in a
+comment or in POD does not excuse an unguarded statement.)
 
 =item * C<use encoding> -- Perl 5.8
 
@@ -1418,12 +1636,38 @@ and is treated as compatible)
 
 =back
 
+=head2 String checks (body of interpolating string literals)
+
+What a string I<says> is not inspected: a string literal may contain any
+text, including PerlIO layer names or sprintf format flags, and remains
+valid Perl 5.005_03 syntax.  How it is I<spelled> is another matter, and
+the escape sequences below are syntax:
+
+=over 4
+
+=item * C<\x{HHHH}> Unicode escape in a string -- Perl 5.6
+
+=item * C<\N{name}> named character escape in a string -- Perl 5.6
+
+=back
+
+The wording of these two items deliberately differs from the wording of
+the corresponding items under L</Static checks (compile time, via source
+scan)>.  An C<=item> is a link target, and Pod::Checker takes the target
+name from the first line of the command paragraph alone, so two items
+whose first lines match are a duplicate target -- reported as a warning
+by the Pod::Parser-based Pod::Checker that Perls up to 5.24 ship, and
+silently accepted by the Pod::Simple-based one that came later.
+
+Scanned in C<"...">, C<qq//>, C<qx//>, C<`...`>, an unquoted or
+double-quoted heredoc body, and the replacement half of C<s///> unless it
+is single-quote delimited.  C<'...'>, C<q//>, C<qw//> and C<E<lt>E<lt>'WORD'>
+perform no escape processing, so the same characters there are an ordinary
+backslash followed by text and are not reported.
+
 =head2 RAW checks
 
-None.  String and regex contents are intentionally not inspected:
-string literals containing any text (including PerlIO layer names or
-sprintf format flags) are valid Perl 5.005_03 syntax.  Only source-level
-syntax constructs are checked.
+None.
 
 =head2 Runtime checks (via CORE::GLOBAL:: overrides)
 
@@ -1497,7 +1741,9 @@ Do not use this module in production deployments.
 =item *
 
 Regex violations are reported with the line number of the opening
-delimiter of the regex, not the line within the regex body.
+delimiter of the regex, not the line within the regex body.  A violation
+inside a heredoc body is reported with the line number of the body, not
+of the C<E<lt>E<lt>> operator.
 
 =back
 

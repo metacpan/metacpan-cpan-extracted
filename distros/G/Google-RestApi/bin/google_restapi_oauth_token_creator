@@ -7,9 +7,11 @@ use lib "$FindBin::RealBin/../lib";
 
 use Cwd qw( abs_path );
 use File::Basename qw( dirname );
+use File::Spec ();
 use File::Spec::Functions qw( catfile file_name_is_absolute );
+use HTTP::Daemon ();
+use HTTP::Response ();
 use Storable qw( store );
-use Term::Prompt qw( prompt );
 use Type::Params qw( signature );
 use Types::Standard qw( Str StrMatch ArrayRef Optional );
 use YAML::Any qw( Dump LoadFile );
@@ -37,15 +39,24 @@ my $check = signature(
 );
 $check->(%{ $config->{auth} });
 
+# Start a loopback web server on an ephemeral port to catch Google's
+# redirect. Google blocked the old out-of-band (OOB) copy-the-code flow in
+# 2023; the loopback address is its sanctioned replacement for desktop apps.
+# Desktop-app OAuth clients automatically permit http://127.0.0.1:<any port>
+# as a redirect URI, so no extra Google Cloud Console configuration is needed.
+my $daemon = HTTP::Daemon->new(LocalAddr => '127.0.0.1', LocalPort => 0)
+  or die "Unable to start local callback server: $!\n";
+my $redirect_uri = sprintf 'http://127.0.0.1:%d/', $daemon->sockport;
+
 my $oauth2 = Google::RestApi::Auth::OAuth2Client->new(
   client_id     => $config->{auth}->{client_id},
   client_secret => $config->{auth}->{client_secret},
+  redirect_uri  => $redirect_uri,
   defined $config->{auth}->{scope} ? (scope => $config->{auth}->{scope}) : (),
 );
 
-# We need to set these parameters this way in order to ensure 
-# that we get not only an access token, but also a refresh token
-# that can be used to update it as needed. 
+# access_type=offline + approval_prompt=force ensure we get not only an access
+# token but also a refresh token that can be used to update it as needed.
 my $url = $oauth2->authorize_url(
   access_type     => 'offline',
   approval_prompt => 'force',
@@ -54,31 +65,32 @@ my $url = $oauth2->authorize_url(
 # Give the user instructions on what to do:
 print <<END
 
-The following URL can be used to obtain an access token from
-Google.  
+To authorise access to your Google account:
 
-1. Copy the URL and paste it into a browser.  
+1. A browser window should open automatically. If it does not, copy the
+URL printed below and paste it into a browser yourself.
 
-2. You may be asked to log into your Google account if you 
-were not logged in already in that browser. If so, go 
-ahead and log in to whatever account you want to have 
-access to the Google doc. 
+2. Log in to the Google account you want to grant access to, if you are
+not already logged in.
 
-3. On the next page, click "Accept" when asked to grant access. 
+3. When asked to grant access, click "Continue" / "Allow".
 
-4. You will then be redirected to a page with a box in the 
-left-hand column labeled  "Authorization code". Copy the code 
-in that box and come back here.
+4. Google will redirect back to this script automatically and the browser
+will show a "you can close this tab" message. Then return here.
 
-Here is the URL to paste in your browser to get the code:
+Authorisation URL:
 
 $url
 
 END
     ;
 
-# Here is where we get the code from the user:
-my $code = prompt('x', 'Paste the code obtained at the above URL here: ', '', ''); 
+open_browser($url);
+
+print "Waiting for the Google authorisation redirect on $redirect_uri ...\n";
+my $code = wait_for_code($daemon);
+$daemon->close();
+die "No authorisation code was received; aborting.\n" unless defined $code;
 
 # Exchange the code for an access token:
 my $token = $oauth2->access_token($code)
@@ -170,6 +182,72 @@ END_MISSING
     print "SCOPE CHECK: all APIs reachable. Your token is ready to use.\n";
   }
   print "=" x 60, "\n";
+}
+
+# Best-effort attempt to open the auth URL in the user's browser. Non-fatal:
+# if no opener is found the user can still paste the URL printed above.
+sub open_browser {
+  my ($url) = @_;
+  for my $cmd (qw( xdg-open open )) {
+    next unless which($cmd);
+    my $pid = fork();
+    return unless defined $pid;   # fork failed; user can open it manually
+    if (!$pid) {
+      open STDOUT, '>', File::Spec->devnull();
+      open STDERR, '>', File::Spec->devnull();
+      exec($cmd, $url);
+      exit 1;                     # exec failed
+    }
+    return;
+  }
+  return;
+}
+
+sub which {
+  my ($cmd) = @_;
+  for my $dir (split /:/, ($ENV{PATH} // '')) {
+    return 1 if length $dir && -x catfile($dir, $cmd);
+  }
+  return 0;
+}
+
+# Block until the browser hits our loopback server with ?code=... (success)
+# or ?error=... (user denied). Returns the code, or undef on error/denial.
+# Other requests (e.g. favicon.ico) are answered 404 and ignored.
+sub wait_for_code {
+  my ($daemon) = @_;
+  while (my $conn = $daemon->accept()) {
+    while (my $req = $conn->get_request()) {
+      my %q = $req->uri->query_form();
+      if ($q{code}) {
+        $conn->send_response(html_response(
+          'Authorisation complete',
+          'You can close this tab and return to the terminal.',
+        ));
+        return $q{code};
+      }
+      if ($q{error}) {
+        $conn->send_response(html_response(
+          'Authorisation failed',
+          "Google returned an error: $q{error}. You can close this tab.",
+        ));
+        return;
+      }
+      $conn->send_error(404);
+    }
+  }
+  return;
+}
+
+sub html_response {
+  my ($title, $body) = @_;
+  return HTTP::Response->new(
+    200, 'OK',
+    [ 'Content-Type' => 'text/html; charset=utf-8' ],
+    "<!doctype html><html><head><meta charset='utf-8'><title>$title</title></head>"
+      . "<body style='font-family:sans-serif;max-width:40em;margin:3em auto'>"
+      . "<h2>$title</h2><p>$body</p></body></html>\n",
+  );
 }
 
 __END__
@@ -307,18 +385,27 @@ config file is used by this package at runtime to access the Google APIs.
 
     perl bin/google_restapi_oauth_token_creator /path/to/your/config.yaml
 
-Follow the prompts:
+The script starts a temporary web server on a random port on the loopback
+address (C<http://127.0.0.1:E<lt>portE<gt>>) to receive Google's redirect,
+then:
 
 =over
 
-=item * Copy the printed URL and paste it into a browser.
+=item * A browser opens automatically on the authorisation URL. If it does
+not, copy the URL the script prints and paste it into a browser yourself.
 
 =item * Log in to your Google account if prompted, then click B<Allow>.
 
-=item * Copy the authorisation code from the resulting page and paste it back
-into the terminal.
+=item * Google redirects back to the local server, which captures the
+authorisation code automatically. The browser shows a "you can close this
+tab" message and the script continues on its own -- no copy-and-paste.
 
 =back
+
+This uses the OAuth2 loopback flow, the replacement for the out-of-band (OOB)
+flow that Google discontinued in 2023. Desktop-app OAuth clients (the type
+created in step 4) automatically permit loopback redirect URIs on any port,
+so no additional Google Cloud Console configuration is required.
 
 The script will store the token and then run a scope check to confirm that all
 enabled APIs are reachable. Any failing check will print the Cloud Console URL

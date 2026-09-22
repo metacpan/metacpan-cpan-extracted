@@ -1,0 +1,265 @@
+#!/usr/bin/env perl
+# PODNAME: kube_test_minikube
+# ABSTRACT: Run a command against a throwaway minikube cluster
+
+use strict;
+use warnings;
+
+use Kubernetes::REST::CLI::Minikube;
+
+our $VERSION = '1.108';
+
+my ($options, $command) = Kubernetes::REST::CLI::Minikube->split_argv(@ARGV);
+@ARGV = @$options;
+my $runner = Kubernetes::REST::CLI::Minikube->new_with_options;
+exit $runner->run(@$command);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+kube_test_minikube - Run a command against a throwaway minikube cluster
+
+=head1 VERSION
+
+version 1.108
+
+=head1 SYNOPSIS
+
+    # Run this distribution's test suite against a live minikube cluster
+    kube_test_minikube prove -lr t/
+
+    # A single test file
+    kube_test_minikube perl t/05_api_operations.t
+
+    # Stop the cluster afterwards (delete it with --delete)
+    kube_test_minikube --stop prove -lr t/
+
+    # Tear down only
+    kube_test_minikube --stop
+    kube_test_minikube --delete
+
+    # No command: bring the cluster up and print the environment for eval
+    eval "$(kube_test_minikube)"
+
+    # An interactive shell with the environment exported
+    kube_test_minikube -- bash
+
+    # Pin versions, size the cluster, add a gate variable of your own
+    kube_test_minikube --minikube-version v1.38.1 -k v1.34.0 -c 4 -m 8g \
+        -e TEST_MY_DIST_KUBECONFIG prove -lr t/
+
+=head1 DESCRIPTION
+
+B<kube_test_minikube> is a test-cluster runner for the Kubernetes::REST family
+of distributions: L<Kubernetes::REST>, L<Net::Async::Kubernetes>, L<IO::K8s>
+and C<Kubernetes-REST-Deprecated>. Their test suites are mock-driven and skip
+the live tests unless a gate variable names a kubeconfig; this tool provides
+that kubeconfig. It
+
+=over 4
+
+=item 1.
+
+makes sure a C<minikube> binary is available - one on C<PATH> is used as-is,
+otherwise a release is downloaded into a cache directory and verified against
+its published SHA-256 checksum before it is installed;
+
+=item 2.
+
+brings up a minikube profile (default C<kube-rest-test>, docker driver),
+skipping C<minikube start> when the profile already reports a running host
+and API server;
+
+=item 3.
+
+exports C<KUBECONFIG>, C<TEST_KUBERNETES_REST_KUBECONFIG>,
+C<TEST_IO_K8S_KUBECONFIG> and every C<--env> name, all pointing at the
+cluster's kubeconfig, and runs the command it was given.
+
+=back
+
+The tool is deliberately generic: it knows nothing about the distribution it
+is run from, so the same invocation works in all four checkouts, and a
+distribution with a gate variable of its own passes it with C<--env>.
+
+=head2 Isolation
+
+The cluster's kubeconfig is written to its own file
+(F<E<lt>install_dirE<gt>/E<lt>profileE<gt>.kubeconfig> by default, see
+C<--kubeconfig>), and every C<minikube> invocation runs with C<KUBECONFIG>
+pointing at it. The user's F<~/.kube/config> is never read or written, and
+the current context of any other cluster stays untouched.
+
+=head2 Teardown
+
+The cluster is left running by default, so the next run finds it up and
+skips the start - fast iteration is the point. C<--stop> and C<--delete>
+tear it down after the command; given without a command they only tear down.
+C<--delete> also removes the kubeconfig file. Teardown never masks the
+command's exit status.
+
+=head1 OPTIONS
+
+Options come first; the command starts at the first argument that is not an
+option, or after C<-->. Anything after that point is passed to the command
+untouched.
+
+=over 4
+
+=item B<-p>, B<--profile>=NAME
+
+minikube profile to use. Default: C<kube-rest-test>.
+
+=item B<-d>, B<--driver>=NAME
+
+minikube driver, passed as C<--driver>. Default: C<docker>.
+
+=item B<-k>, B<--kubernetes-version>=VERSION
+
+Kubernetes version for the cluster, passed as C<--kubernetes-version> to
+C<minikube start> when set.
+
+=item B<--minikube-version>=VERSION
+
+Pin the minikube release to download and use, as tagged upstream
+(C<v1.38.1>). With a pin, a C<minikube> on C<PATH> is ignored and the binary
+in C<--install-dir> is used only if it reports exactly that version. Default:
+the latest release.
+
+=item B<-c>, B<--cpus>=N
+
+CPUs for the cluster, passed as C<--cpus> when set.
+
+=item B<-m>, B<--memory>=SIZE
+
+Memory for the cluster (C<4g>, C<4096mb>, or megabytes), passed as
+C<--memory> when set.
+
+=item B<--install-dir>=DIR
+
+Where a downloaded C<minikube> goes, and where the default kubeconfig lives.
+Default: C<$XDG_CACHE_HOME/kube_test_minikube>, or
+F<~/.cache/kube_test_minikube>. When the binary in use comes from here the
+directory is also prepended to the command's C<PATH>.
+
+=item B<--kubeconfig>=FILE
+
+The isolated kubeconfig file. Default:
+F<E<lt>install_dirE<gt>/E<lt>profileE<gt>.kubeconfig>.
+
+=item B<-e>, B<--env>=NAME
+
+Additional environment variable to set to the kubeconfig path. Repeatable.
+
+=item B<--context>=NAME
+
+Also export C<TEST_KUBERNETES_REST_CONTEXT> with this value. Not exported
+otherwise.
+
+=item B<-s>, B<--stop>
+
+Run C<minikube stop> after the command, or only stop without a command.
+
+=item B<-D>, B<--delete>
+
+Run C<minikube delete> after the command and remove the kubeconfig file, or
+only delete without a command. Wins over C<--stop>.
+
+=item B<-r>, B<--restart>
+
+Run C<minikube start> even when the profile is already running.
+
+=item B<-v>, B<--verbose>
+
+Print every C<minikube> command line to STDERR before running it.
+
+=back
+
+=head1 ENVIRONMENT
+
+The command runs with these variables set, and without a command they are
+printed to STDOUT as C<export NAME='value'> lines:
+
+=over 4
+
+=item C<KUBECONFIG>
+
+=item C<TEST_KUBERNETES_REST_KUBECONFIG>
+
+=item C<TEST_IO_K8S_KUBECONFIG>
+
+=item every C<--env> NAME
+
+The absolute path of the cluster's kubeconfig file.
+
+=item C<TEST_KUBERNETES_REST_CONTEXT>
+
+Only with C<--context>, set to that value.
+
+=item C<PATH>
+
+With the install directory prepended when the C<minikube> in use was
+downloaded there.
+
+=back
+
+Read by the tool itself: C<XDG_CACHE_HOME> and C<HOME> for the default
+install directory, C<PATH> to find an existing C<minikube>.
+
+=head1 EXIT STATUS
+
+The command's: its exit code, 128 plus the signal number when it died from a
+signal, or 127 when it could not be started. Teardown failures are reported
+on STDERR and do not change it. Without a command, 0 - or, with C<--stop> or
+C<--delete>, minikube's exit status. When C<minikube start> fails the tool
+dies with a message naming the profile and driver and exits with minikube's
+exit code.
+
+=head1 SEE ALSO
+
+L<Kubernetes::REST::CLI::Minikube>, L<Kubernetes::REST>, L<kube_client>,
+L<kube_watch>
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/pplu/kubernetes-rest/issues>.
+
+=head2 IRC
+
+Join C<#kubernetes> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Torsten Raudssus <getty@cpan.org>
+
+=item *
+
+Jose Luis Martinez Torres <jlmartin@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

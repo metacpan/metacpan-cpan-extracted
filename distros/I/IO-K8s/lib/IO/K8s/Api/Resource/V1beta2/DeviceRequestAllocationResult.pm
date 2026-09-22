@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::DeviceRequestAllocationResult;
 # ABSTRACT: DeviceRequestAllocationResult contains the allocation result for one request.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s adminAccess => Bool;
@@ -30,6 +30,9 @@ k8s request => Str, 'required';
 k8s shareID => Str;
 
 
+k8s skipNodeOperations => [Str];
+
+
 k8s tolerations => ['Resource::V1beta2::DeviceToleration'];
 
 
@@ -47,7 +50,7 @@ IO::K8s::Api::Resource::V1beta2::DeviceRequestAllocationResult - DeviceRequestAl
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 adminAccess
 
@@ -84,6 +87,10 @@ Request is the name of the request in the claim which caused this device to be a
 =head2 shareID
 
 ShareID uniquely identifies an individual allocation share of the device, used when the device supports multiple simultaneous allocations. It serves as an additional map key to differentiate concurrent shares of the same device.
+
+=head2 skipNodeOperations
+
+SkipNodeOperations lists node-local resource operations (gRPC calls) that will be skipped for this allocated device when determining whether operations are necessary on the node. If all allocated devices for a driver in a claim skip an operation, that gRPC call will be skipped. It is a copy of the ResourceSlice.spec.skipNodeOperations value at the time when the device was allocated.
 
 =head2 tolerations
 

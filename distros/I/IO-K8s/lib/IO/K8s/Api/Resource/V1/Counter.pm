@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::Counter;
 # ABSTRACT: Counter describes a quantity associated with a device.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s value => Quantity, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Resource::V1::Counter - Counter describes a quantity associated wi
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 value
 

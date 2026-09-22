@@ -1,11 +1,12 @@
 package WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::Unassign;
 # ABSTRACT: Unassign a floating IP from its server
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl floating-ip unassign <id>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 sub execute {
     my ($self, $args, $chain) = @_;
@@ -15,8 +16,9 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Unassigning floating IP $id...\n";
-    $cloud->floating_ips->unassign($id);
-    print "Floating IP unassigned.\n";
+    my $action = $cloud->floating_ips->unassign($id);
+    $self->handle_action($action);
+    print $self->no_wait ? "Floating IP unassignment requested.\n" : "Floating IP unassigned.\n";
 }
 
 1;
@@ -33,7 +35,7 @@ WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::Unassign - Unassign a floating IP from 
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -56,7 +58,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

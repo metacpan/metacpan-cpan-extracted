@@ -251,36 +251,72 @@ subtest 'group namespace lookup matches the full group name exactly' => sub {
 subtest 'fetch_resource_map keeps colliding CRD groups out of the exception' => sub {
     my $api = mock_api();
 
-    $api->io->add_response('GET', '/openapi/v2', {
-        paths => {
-            '/apis/apiextensions.k8s.io/v1/customresourcedefinitions' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => 'apiextensions.k8s.io',
-                        version => 'v1',
-                        kind => 'CustomResourceDefinition',
+    # The cluster map is built from aggregated discovery (design D11), so mock
+    # GET /api (empty core list) and GET /apis (APIGroupDiscoveryList) rather
+    # than /openapi/v2.
+    $api->io->add_response('GET', '/api',
+        { kind => 'APIGroupDiscoveryList', items => [] });
+    $api->io->add_response('GET', '/apis', {
+        kind  => 'APIGroupDiscoveryList',
+        items => [
+            {
+                metadata => { name => 'apiextensions.k8s.io' },
+                versions => [
+                    {
+                        version   => 'v1',
+                        resources => [
+                            {
+                                resource     => 'customresourcedefinitions',
+                                responseKind => {
+                                    group => 'apiextensions.k8s.io',
+                                    version => 'v1',
+                                    kind => 'CustomResourceDefinition',
+                                },
+                                scope => 'Cluster',
+                            },
+                        ],
                     },
-                },
+                ],
             },
-            '/apis/apiextensions.example.com/v1/widgets' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => 'apiextensions.example.com',
-                        version => 'v1',
-                        kind => 'Widget',
+            {
+                metadata => { name => 'apiextensions.example.com' },
+                versions => [
+                    {
+                        version   => 'v1',
+                        resources => [
+                            {
+                                resource     => 'widgets',
+                                responseKind => {
+                                    group => 'apiextensions.example.com',
+                                    version => 'v1',
+                                    kind => 'Widget',
+                                },
+                                scope => 'Namespaced',
+                            },
+                        ],
                     },
-                },
+                ],
             },
-            '/apis/apiregistration.acme.io/v1/gadgets' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => 'apiregistration.acme.io',
-                        version => 'v1',
-                        kind => 'Gadget',
+            {
+                metadata => { name => 'apiregistration.acme.io' },
+                versions => [
+                    {
+                        version   => 'v1',
+                        resources => [
+                            {
+                                resource     => 'gadgets',
+                                responseKind => {
+                                    group => 'apiregistration.acme.io',
+                                    version => 'v1',
+                                    kind => 'Gadget',
+                                },
+                                scope => 'Namespaced',
+                            },
+                        ],
                     },
-                },
+                ],
             },
-        },
+        ],
     });
 
     my $map = $api->fetch_resource_map;
@@ -288,10 +324,19 @@ subtest 'fetch_resource_map keeps colliding CRD groups out of the exception' => 
     is $map->{CustomResourceDefinition},
         'ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinition',
         'the real apiextensions group still gets the staging namespace';
-    is $map->{Widget}, 'Api::Apiextensions::V1::Widget',
-        'a CRD in apiextensions.example.com stays under Api::';
-    is $map->{Gadget}, 'Api::Apiregistration::V1::Gadget',
-        'a CRD in apiregistration.acme.io stays under Api::';
+
+    # apiextensions.example.com and apiregistration.acme.io merely START WITH
+    # an exception-table prefix; they are ordinary foreign CRD groups. The
+    # exact-match guard keeps them OUT of the staging namespace (that routing
+    # is pinned directly on _io_k8s_namespace_for_group in the subtest above),
+    # and D12/D13 "stop inventing" then omits them from the map entirely --
+    # rather than the pre-fix Api::Apiextensions::V1::Widget /
+    # Api::Apiregistration::V1::Gadget classes, which this distribution does
+    # not ship.
+    ok !exists $map->{Widget},
+        'a CRD in apiextensions.example.com is omitted, not mislabelled into the exception namespace';
+    ok !exists $map->{Gadget},
+        'a CRD in apiregistration.acme.io is omitted, not mislabelled into the exception namespace';
 };
 
 # ============================================================================

@@ -22,11 +22,13 @@ use Test::Most;
 use Test::Mockingbird qw(spy restore_all);
 use Readonly;
 use Scalar::Util qw(blessed looks_like_number refaddr);
+use File::Temp qw(tempdir);
+use File::Spec;
 
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 83;
+	plan tests => 91;
 	use_ok('Database::Join');
 }
 
@@ -1360,4 +1362,257 @@ subtest 'filter + remove_column: filter still restricts results after its column
 	is scalar @{$rows}, 1,             'filter still restricts after remove_column';
 	is $rows->[0]{name}, 'Alice',      'Alice (score 95) survives the hidden filter';
 	ok !exists($rows->[0]{score}),     'score column absent from output as expected';
+};
+
+# ===========================================================================
+# Section 16: SQLite backend hostile inputs and security (8 subtests)
+#
+# The SQLite backend caches source data in a per-object File::Temp file and
+# uses parameterised SQL queries.  These tests probe eight failure modes that
+# could cause crashes, data corruption, or security breaches:
+#
+#   (1) tmpdir is a regular file → File::Temp croaks cleanly
+#   (2) DBI::connect patched to return undef → error_sqlite_connect
+#   (3) SQL injection via criteria VALUE → safely bound (not interpolated)
+#   (4) Two concurrent join objects → independent temp files in same tmpdir
+#   (5) DESTROY without any prior query → no crash (no cache to disconnect)
+#   (6) DA croaks during cache build → exception propagates, no dangling .db file
+#   (7) max_array_rows=0 with a DA that defines count() → SQLite path taken
+#   (8) DA returns empty result set on SQLite path → empty arrayref (not crash)
+# ===========================================================================
+
+# CountableEdgeDA: variant of MockEdgeDA that defines count() in its own
+# package so that `defined &{"${pkg}::count"}` is true.  Required for the
+# max_array_rows threshold probe, which avoids calling inherited count() to
+# prevent uninitialised-value warnings from Database::Abstraction::count($entry).
+{
+	package CountableEdgeDA;
+	use parent -norequire, 'Database::Abstraction';
+
+	sub new {
+		my ($class, %args) = @_;
+		return bless {
+			id    => $args{id}      // 'entry',
+			_cols => $args{cols}    // ['entry'],
+			_rows => $args{rows}    // [],
+			_ts   => $args{updated} // 1_000_000,
+		}, $class;
+	}
+
+	sub columns           { return $_[0]->{_cols} }
+	sub schema            { return {} }
+	sub updated           { return $_[0]->{_ts} }
+	sub set_logger        { $_[0]->{_logger} = $_[1]; return $_[0] }
+	sub count             { return scalar @{ $_[0]->{_rows} } }
+	sub selectall_arrayref {
+		my ($self, $criteria) = @_;
+		my @rows = @{ $self->{_rows} };
+		for my $col (keys %{ $criteria // {} }) {
+			my $val = $criteria->{$col};
+			next if ref $val;
+			@rows = grep { defined $_->{$col} && $_->{$col} eq $val } @rows;
+		}
+		return \@rows;
+	}
+	sub DESTROY {}
+}
+
+Readonly::Scalar my $BAD_DIR => File::Spec->catfile(
+	File::Spec->tmpdir, '__edge_cases_nonexistent_dir_xyz__'
+);
+
+subtest 'sqlite backend: tmpdir pointing to a regular file → File::Temp croaks cleanly' => sub {
+	# File::Temp->new(DIR => $path) requires $path to be an existing directory.
+	# When $path is a regular file, File::Temp must croak with a clear message
+	# rather than silently writing into an impossible path or segfaulting.
+	#
+	# Proof: create a real temp file, then pass its path as tmpdir.
+	my $tmp_file = File::Temp->new(UNLINK => 1);
+	my $file_path = $tmp_file->filename;
+	my $db_a = MockEdgeDA->new(
+		cols => ['entry', 'x'],
+		rows => [{ entry => $K_ALPHA, x => 1 }],
+	);
+	my $j = Database::Join->new(
+		databases   => [$db_a],
+		join_column => $JC,
+		backend     => 'sqlite',
+		tmpdir      => $file_path,   # a regular file, not a directory
+	);
+	throws_ok { $j->selectall_arrayref() }
+		qr/does not exist|not.*director|cannot.*creat|POSIX/i,
+		'File::Temp croaks when tmpdir is a regular file';
+};
+
+subtest 'sqlite backend: DBI::connect returning undef → error_sqlite_connect' => sub {
+	# Monkey-patch DBI::connect to simulate a driver failure (e.g. missing
+	# DBD::SQLite, corrupt db, or permission denied on the temp file path).
+	# The module must croak with error_sqlite_connect rather than dereferencing
+	# a null handle and generating an uninformative "can't call method on undef".
+	#
+	# Technique from CLAUDE.md: patch and restore around a scoped eval.
+	my $db_a = MockEdgeDA->new(
+		cols => ['entry', 'x'],
+		rows => [{ entry => $K_ALPHA, x => 1 }],
+	);
+	my $j = Database::Join->new(
+		databases => [$db_a],
+		join_column => $JC,
+		backend   => 'sqlite',
+	);
+	require DBI;
+	my $orig = \&DBI::connect;
+	{ no warnings 'redefine'; *DBI::connect = sub { return undef } }
+	eval { $j->selectall_arrayref() };
+	my $err = $@;
+	{ no warnings 'redefine'; *DBI::connect = $orig }
+	my ($first_line) = split /\n/, ($err // ''), 2;
+	like $first_line, qr/Failed to open temporary SQLite database/,
+		'error_sqlite_connect croaked when DBI::connect returns undef';
+};
+
+subtest 'sqlite backend security: criteria VALUE is bound, not interpolated (no SQL injection)' => sub {
+	# The value side of an operator-hashref criterion (e.g. { '>' => VALUE }) goes
+	# into an execute() bind parameter, NOT into the SQL string.  A weaponised
+	# VALUE such as "'; DROP TABLE t0; --" must not alter the query structure.
+	#
+	# Proof:
+	#   (1) The query lives (no syntax error from the injected string).
+	#   (2) It returns 0 rows (no row has score equal to the injection payload).
+	#   (3) A subsequent normal query still returns correct data.
+	my $db_a = MockEdgeDA->new(
+		cols => ['entry', 'score'],
+		rows => [
+			{ entry => $K_ALPHA, score => 10 },
+			{ entry => $K_BETA,  score => 20 },
+		],
+	);
+	my $j = Database::Join->new(
+		databases => [$db_a], join_column => $JC, backend => 'sqlite',
+	);
+	my $injection = q{'; DROP TABLE "t0"; SELECT * FROM "t0" WHERE '' = '};
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref(score => { '=' => $injection }) }
+		'query lives despite SQL injection payload in criteria value (bind prevents injection)';
+	is scalar @{$rows}, 0,
+		'no rows match the injection payload (treated as a literal string)';
+	# Verify the cache is intact: a normal query still works.
+	my $normal = $j->selectall_arrayref(score => { '>' => 15 });
+	is scalar @{$normal}, 1,
+		'subsequent normal query works (table not dropped by the injection payload)';
+};
+
+subtest 'sqlite backend: two concurrent join objects in same tmpdir have independent temp files' => sub {
+	# Each Database::Join object must own exactly one File::Temp file, created
+	# independently of any other Database::Join object.  Two objects sharing a
+	# tmpdir must each have their own file (2 total), and each query must return
+	# the correct result from its own cached data.
+	my $shared_tmpdir = tempdir(CLEANUP => 1);
+	my $da_a = MockEdgeDA->new(
+		cols => ['entry', 'tag'],
+		rows => [ { entry => 'X1', tag => 'alpha' } ],
+	);
+	my $da_b = MockEdgeDA->new(
+		cols => ['entry', 'tag'],
+		rows => [ { entry => 'X2', tag => 'beta' } ],
+	);
+	my $j1 = Database::Join->new(
+		databases => [$da_a], join_column => $JC, backend => 'sqlite',
+		tmpdir => $shared_tmpdir,
+	);
+	my $j2 = Database::Join->new(
+		databases => [$da_b], join_column => $JC, backend => 'sqlite',
+		tmpdir => $shared_tmpdir,
+	);
+	$j1->selectall_arrayref();   # build j1's cache
+	$j2->selectall_arrayref();   # build j2's cache
+	my @files = glob("$shared_tmpdir/*.db");
+	is scalar @files, 2, 'exactly two temp .db files in shared tmpdir (one per join object)';
+	# Each object must return its own data, not the other's.
+	my $r1 = $j1->fetchrow_hashref('X1');
+	my $r2 = $j2->fetchrow_hashref('X2');
+	is $r1->{tag}, 'alpha', 'j1 returns data from its own cache';
+	is $r2->{tag}, 'beta',  'j2 returns data from its own cache';
+};
+
+subtest 'sqlite backend: DESTROY without prior query does not crash (no cache to release)' => sub {
+	# If a Database::Join object is constructed with backend=sqlite but never
+	# queried, _sqlite_cache is undef.  DESTROY must guard against this.
+	my $da = MockEdgeDA->new(
+		cols => ['entry', 'x'],
+		rows => [{ entry => $K_ALPHA, x => 1 }],
+	);
+	my $j = Database::Join->new(
+		databases => [$da], join_column => $JC, backend => 'sqlite',
+	);
+	# Explicitly call DESTROY (which undef-checks $self->{_sqlite_cache}).
+	lives_ok { $j->DESTROY() }
+		'explicit DESTROY without prior query does not crash';
+	# The object is now in a post-DESTROY state; no further assertions.
+};
+
+subtest 'sqlite backend: DA croaks during cache build → exception propagates, no dangling .db file' => sub {
+	# If a component DA's selectall_arrayref croaks while _build_sqlite_cache is
+	# spilling its rows into SQLite, the exception must propagate to the caller.
+	# Because File::Temp was created with UNLINK=>1, it must be automatically
+	# deleted when the _build_sqlite_cache stack frame unwinds (File::Temp goes
+	# out of scope), leaving no dangling .db file in tmpdir.
+	my $bomb_tmpdir = tempdir(CLEANUP => 1);
+	my $good = MockEdgeDA->new(
+		cols => ['entry', 'x'],
+		rows => [{ entry => $K_ALPHA, x => 1 }],
+	);
+	my $bomber = MockEdgeDA->new(
+		cols      => ['entry', 'y'],
+		croak_msg => 'simulated mid-spill DA failure',
+	);
+	my $j = Database::Join->new(
+		databases => [$good, $bomber], join_column => $JC,
+		backend   => 'sqlite', tmpdir => $bomb_tmpdir,
+	);
+	throws_ok { $j->selectall_arrayref() }
+		qr/simulated mid-spill DA failure/,
+		'exception from DA during cache build propagates to the caller';
+	my @leftover = glob("$bomb_tmpdir/*.db");
+	is scalar @leftover, 0,
+		'no dangling .db file in tmpdir after cache-build exception (File::Temp auto-cleanup)';
+};
+
+subtest 'sqlite backend: max_array_rows=0 with countable DA forces SQLite path' => sub {
+	# When max_array_rows => 0, any non-empty dataset (total > 0) pushes the
+	# 'auto' backend onto the SQLite path.  Proof via the bad-tmpdir technique
+	# from CLAUDE.md: the SQLite path calls File::Temp, which dies for a missing
+	# directory; the array path never calls File::Temp and succeeds.
+	my $da = CountableEdgeDA->new(
+		cols => ['entry', 'x'],
+		rows => [{ entry => $K_ALPHA, x => 1 }],   # 1 row → total(1) > max_array_rows(0)
+	);
+	my $j = Database::Join->new(
+		databases      => [$da],
+		join_column    => $JC,
+		backend        => 'auto',
+		max_array_rows => 0,          # force SQLite path for any non-empty dataset
+		tmpdir         => $BAD_DIR,   # File::Temp will die here if SQLite path is taken
+	);
+	throws_ok { $j->selectall_arrayref() }
+		qr/does not exist|not.*director|cannot.*creat/i,
+		'max_array_rows=0 forces SQLite path (File::Temp dies on bad tmpdir as expected)';
+};
+
+subtest 'sqlite backend: DA returns no rows → empty arrayref (not crash or undef)' => sub {
+	# A DA whose selectall_arrayref returns [] (no rows at all) is valid on the
+	# SQLite path.  _build_sqlite_cache must create an empty table, and the SQL
+	# JOIN must return an empty result set -- not crash, not return undef.
+	my $empty_da = MockEdgeDA->new(
+		cols => ['entry', 'score'],
+		rows => [],   # no rows at all
+	);
+	my $j = Database::Join->new(
+		databases => [$empty_da], join_column => $JC, backend => 'sqlite',
+	);
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref() }
+		'query lives when DA has no rows on the SQLite path';
+	ok ref($rows) eq 'ARRAY', 'result is an arrayref (not undef)';
+	is scalar @{$rows}, 0, 'empty arrayref returned (no rows, no crash)';
 };

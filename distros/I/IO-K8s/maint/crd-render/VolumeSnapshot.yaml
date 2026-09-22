@@ -1,0 +1,89 @@
+# VolumeSnapshot CRD emitter overlay (D5/D6, k95 conventions, k120).
+#
+# Read by maint/crd-drift-check.pl --render/--check for --provider
+# VolumeSnapshot. `names` maps the logical path below each Kind (what
+# IO::K8s::AutoGen::class_path returns, e.g. 'Spec::Source') to the upstream
+# Go type name at the pinned upstream_version (v8.6.0,
+# github.com/kubernetes-csi/external-snapshotter):
+# client/apis/volumesnapshot/v1/types.go. Only the two struct fields whose
+# Go type name differs from the emitter's joined default need an entry --
+# VolumeSnapshotSpec/Status and VolumeSnapshotContentSpec/Status are already
+# spelled Kind + field path, so the default IS the Go name there.
+#
+# `VolumeSnapshotError` is ONE Go type (types.go, `type VolumeSnapshotError
+# struct`) referenced by both VolumeSnapshotStatus.Error and
+# VolumeSnapshotContentStatus.Error (`*VolumeSnapshotError` in each), so per
+# D6 both Kinds map their `Status::Error` to the same bare name and share
+# the one class -- the two renders write the identical file to the identical
+# path, which is what the checked-in tree already ships. Same shared-type
+# pattern as GatewayAPI's ParentReference.
+#
+# `VolumeSnapshotClass` has no spec/status wrapper upstream at all (driver /
+# deletionPolicy / parameters sit directly on the Kind) and so has no nested
+# class to name -- listed as an empty entry, the same way Cilium.yaml lists
+# CiliumIdentity, so every served Kind of the provider is accounted for
+# here and t/86_crd_render_overlay_roles.t sees it.
+#
+# No `with` key on VolumeSnapshotClass or VolumeSnapshotContent: both are
+# cluster-scoped upstream (`spec.scope: Cluster`), and the emitter's own
+# default -- Namespaced only when the generated class composes it -- is
+# already right, as for GatewayAPI's cluster-scoped GatewayClass. No Kind
+# here composes a behaviour mixin, so every `extra` is empty.
+#
+# The groupsnapshot.storage.k8s.io family (k121, external-snapshotter v8.6.0,
+# served v1/v1beta1/v1beta2) is mapped the same way (k134). One `names` map
+# per Kind applies to EVERY served version, so cross-version and shared
+# targets are written as absolute '::' packages (the k120 mechanism):
+#
+#   * Status::Error on both group Kinds points at the ONE shared type
+#     IO::K8s::VolumeSnapshot::V1::VolumeSnapshotError -- every track (v1 and
+#     both betas) references that single v1 class (types.go reuses
+#     snapshotv1.VolumeSnapshotError in all three tracks). v1 emits the file
+#     via VolumeSnapshot above; the group Kinds only reference it. Written
+#     absolute so the one shared map does not fold it into a per-version
+#     VolumeSnapshotError the betas do not ship.
+#
+#   * VolumeGroupSnapshotContent's status list item differs by track:
+#     v1/v1beta2 carry volumeSnapshotInfoList (item VolumeSnapshotInfo),
+#     v1beta1 carries volumeSnapshotHandlePairList (item
+#     VolumeSnapshotHandlePair). Both item paths are listed; each is used only
+#     in the track whose schema has that field, and each is a bare
+#     version-local name (v8.6.0 keeps VolumeSnapshotInfo/HandlePair per
+#     track). Spec::Source / Spec::Source::GroupSnapshotHandles are likewise
+#     bare version-local names, the same joined-default override as
+#     VolumeSnapshot's own Source. VolumeGroupSnapshot is Namespaced;
+#     VolumeGroupSnapshotClass and VolumeGroupSnapshotContent are
+#     cluster-scoped, so no `with`, and VolumeGroupSnapshotClass has no
+#     spec/status wrapper (driver / deletionPolicy / parameters sit on the
+#     Kind), so it is an empty entry like VolumeSnapshotClass.
+base: IO::K8s::VolumeSnapshot
+kinds:
+  VolumeSnapshot:
+    extra: []
+    names:
+      Spec::Source: VolumeSnapshotSource
+      Status::Error: VolumeSnapshotError
+    with:
+    - IO::K8s::Role::Namespaced
+  VolumeSnapshotClass: {}
+  VolumeSnapshotContent:
+    extra: []
+    names:
+      Spec::Source: VolumeSnapshotContentSource
+      Status::Error: VolumeSnapshotError
+  VolumeGroupSnapshot:
+    extra: []
+    names:
+      Spec::Source: VolumeGroupSnapshotSource
+      Status::Error: IO::K8s::VolumeSnapshot::V1::VolumeSnapshotError
+    with:
+    - IO::K8s::Role::Namespaced
+  VolumeGroupSnapshotClass: {}
+  VolumeGroupSnapshotContent:
+    extra: []
+    names:
+      Spec::Source: VolumeGroupSnapshotContentSource
+      Spec::Source::GroupSnapshotHandles: GroupSnapshotHandles
+      Status::Error: IO::K8s::VolumeSnapshot::V1::VolumeSnapshotError
+      Status::VolumeSnapshotInfoListItem: VolumeSnapshotInfo
+      Status::VolumeSnapshotHandlePairListItem: VolumeSnapshotHandlePair

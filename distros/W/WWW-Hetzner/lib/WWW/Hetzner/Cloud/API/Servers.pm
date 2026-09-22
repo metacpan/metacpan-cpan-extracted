@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::API::Servers;
 # ABSTRACT: Hetzner Cloud Servers API
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::Server;
 use namespace::clean;
@@ -15,11 +16,14 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Role::HasActions';
+
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::Server->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -29,12 +33,20 @@ sub _wrap_list {
 }
 
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/servers', params => \%params);
-    return $self->_wrap_list($result->{servers} // []);
+    return ($self->_wrap_list($result->{servers} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
 
 
 sub list_by_label {
@@ -110,7 +122,11 @@ sub create {
     }
 
     my $result = $self->client->post('/servers', $body);
-    return $self->_wrap($result->{server});
+    return $self->_wrap(
+        $result->{server},
+        action       => $self->_wrap_action($result->{action}),
+        next_actions => $self->_wrap_actions($result->{next_actions}),
+    );
 }
 
 
@@ -118,7 +134,8 @@ sub delete {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->delete("/servers/$id");
+    my $result = $self->client->delete("/servers/$id");
+    return $self->_wrap_action($result->{action});
 }
 
 
@@ -126,7 +143,9 @@ sub power_on {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/poweron", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/poweron", {})->{action}
+    );
 }
 
 
@@ -134,7 +153,9 @@ sub power_off {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/poweroff", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/poweroff", {})->{action}
+    );
 }
 
 
@@ -142,7 +163,9 @@ sub reboot {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/reboot", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/reboot", {})->{action}
+    );
 }
 
 
@@ -150,7 +173,9 @@ sub shutdown {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/shutdown", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/shutdown", {})->{action}
+    );
 }
 
 
@@ -159,7 +184,9 @@ sub rebuild {
     croak "Server ID required" unless $id;
     croak "Image required" unless $image;
 
-    return $self->client->post("/servers/$id/actions/rebuild", { image => $image });
+    return $self->_wrap_action_result(
+        $self->client->post("/servers/$id/actions/rebuild", { image => $image })
+    );
 }
 
 
@@ -168,10 +195,12 @@ sub change_type {
     croak "Server ID required" unless $id;
     croak "Server type required" unless $server_type;
 
-    return $self->client->post("/servers/$id/actions/change_type", {
-        server_type     => $server_type,
-        upgrade_disk    => $opts{upgrade_disk} // 1,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/change_type", {
+            server_type     => $server_type,
+            upgrade_disk    => $opts{upgrade_disk} // 1,
+        })->{action}
+    );
 }
 
 
@@ -179,7 +208,9 @@ sub reset {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/reset", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/reset", {})->{action}
+    );
 }
 
 
@@ -190,7 +221,9 @@ sub enable_rescue {
     my $body = { type => $opts{type} // 'linux64' };
     $body->{ssh_keys} = $opts{ssh_keys} if $opts{ssh_keys};
 
-    return $self->client->post("/servers/$id/actions/enable_rescue", $body);
+    return $self->_wrap_action_result(
+        $self->client->post("/servers/$id/actions/enable_rescue", $body)
+    );
 }
 
 
@@ -198,7 +231,9 @@ sub disable_rescue {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/disable_rescue", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/disable_rescue", {})->{action}
+    );
 }
 
 
@@ -206,7 +241,9 @@ sub request_console {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/request_console", {});
+    return $self->_wrap_action_result(
+        $self->client->post("/servers/$id/actions/request_console", {})
+    );
 }
 
 
@@ -214,7 +251,9 @@ sub reset_password {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/reset_password", {});
+    return $self->_wrap_action_result(
+        $self->client->post("/servers/$id/actions/reset_password", {})
+    );
 }
 
 
@@ -223,7 +262,9 @@ sub attach_iso {
     croak "Server ID required" unless $id;
     croak "ISO required" unless $iso;
 
-    return $self->client->post("/servers/$id/actions/attach_iso", { iso => $iso });
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/attach_iso", { iso => $iso })->{action}
+    );
 }
 
 
@@ -231,7 +272,9 @@ sub detach_iso {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/detach_iso", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/detach_iso", {})->{action}
+    );
 }
 
 
@@ -239,7 +282,9 @@ sub enable_backup {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/enable_backup", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/enable_backup", {})->{action}
+    );
 }
 
 
@@ -247,7 +292,9 @@ sub disable_backup {
     my ($self, $id) = @_;
     croak "Server ID required" unless $id;
 
-    return $self->client->post("/servers/$id/actions/disable_backup", {});
+    return $self->_wrap_action(
+        $self->client->post("/servers/$id/actions/disable_backup", {})->{action}
+    );
 }
 
 
@@ -293,7 +340,7 @@ WWW::Hetzner::Cloud::API::Servers - Hetzner Cloud Servers API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -302,7 +349,7 @@ version 0.100
     my $cloud = WWW::Hetzner::Cloud->new(token => $ENV{HETZNER_API_TOKEN});
 
     # List all servers
-    my $servers = $cloud->servers->list;
+    my $servers = $cloud->servers->list_all;
 
     # Create a server
     my $server = $cloud->servers->create(
@@ -348,6 +395,15 @@ All methods return L<WWW::Hetzner::Cloud::Server> objects.
 Returns an arrayref of L<WWW::Hetzner::Cloud::Server> objects.
 Optional parameters: label_selector, name, status, sort.
 
+=head2 list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
+
 =head2 list_by_label
 
     my $servers = $cloud->servers->list_by_label('env=production');
@@ -387,9 +443,10 @@ Creates a new server. Returns a L<WWW::Hetzner::Cloud::Server> object.
 
 =head2 delete
 
-    $cloud->servers->delete($id);
+    my $action = $cloud->servers->delete($id);
 
-Deletes a server.
+Deletes a server. Returns the L<WWW::Hetzner::Action> tracking the
+deletion; call C<< $action->wait >> to block until the server is gone.
 
 =head2 power_on
 
@@ -492,6 +549,9 @@ Updates server name or labels.
     $cloud->servers->wait_for_status($id, 'running', 120);
 
 Polls until server reaches the specified status. Default timeout is 120 seconds.
+This polls the server's own status, not an action -- to wait on the
+L<WWW::Hetzner::Action> returned by C<create> or one of the power/rebuild
+methods above instead, call L<WWW::Hetzner::Action/wait> on that action.
 
 =head1 SEE ALSO
 
@@ -500,6 +560,8 @@ Polls until server reaches the specified status. Default timeout is 120 seconds.
 =item * L<WWW::Hetzner::Cloud> - Main Cloud API client
 
 =item * L<WWW::Hetzner::Cloud::Server> - Server entity class
+
+=item * L<WWW::Hetzner::Action> - Action object returned by the methods above
 
 =item * L<WWW::Hetzner::CLI::Cmd::Server> - Server CLI commands
 
@@ -528,7 +590,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

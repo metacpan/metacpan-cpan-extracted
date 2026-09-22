@@ -1,13 +1,15 @@
 package IO::K8s::GatewayAPI::V1::Gateway;
-# ABSTRACT: Gateway API network gateway
-our $VERSION = '1.107';
+# ABSTRACT: Gateway represents an instance of a service-traffic handling infrastructure by binding Listeners to a set of IP addresses.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
     resource_plural => 'gateways';
 with 'IO::K8s::Role::Namespaced';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => '+IO::K8s::GatewayAPI::V1::GatewaySpec', { required => 'schema' };
+k8s status => '+IO::K8s::GatewayAPI::V1::GatewayStatus', { default => {'conditions' => [{'lastTransitionTime' => '1970-01-01T00:00:00Z','message' => 'Waiting for controller','reason' => 'Pending','status' => 'Unknown','type' => 'Accepted'},{'lastTransitionTime' => '1970-01-01T00:00:00Z','message' => 'Waiting for controller','reason' => 'Pending','status' => 'Unknown','type' => 'Programmed'}]} };
+
+
 
 1;
 
@@ -19,31 +21,19 @@ __END__
 
 =head1 NAME
 
-IO::K8s::GatewayAPI::V1::Gateway - Gateway API network gateway
+IO::K8s::GatewayAPI::V1::Gateway - Gateway represents an instance of a service-traffic handling infrastructure by binding Listeners to a set of IP addresses.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-Represents a Gateway resource from the Kubernetes Gateway API (C<gateway.networking.k8s.io/v1>). A Gateway represents a network gateway instance with listeners for accepting traffic, typically acting as an entrypoint to a cluster. Gateway is a namespaced resource that references a GatewayClass for its configuration. The C<spec> and C<status> fields are opaque hashrefs containing the Gateway API structure.
+Spec defines the desired state of Gateway.
 
-=head1 SEE ALSO
+=head2 status
 
-=over
-
-=item * L<IO::K8s::GatewayAPI> - Gateway API module namespace
-
-=item * L<https://gateway-api.sigs.k8s.io/api-types/gateway/> - Upstream Gateway documentation
-
-=item * L<IO::K8s::GatewayAPI::V1::GatewayClass> - Gateway class definition
-
-=item * L<IO::K8s::GatewayAPI::V1::HTTPRoute> - HTTP routing to this gateway
-
-=item * L<IO::K8s::GatewayAPI::V1::GRPCRoute> - gRPC routing to this gateway
-
-=back
+Status defines the current state of Gateway.
 
 =head1 SUPPORT
 

@@ -22,7 +22,14 @@ my $err = errno();
 
 # On POSIX, removing a missing file is ENOENT (2).
 # On Windows, it is typically ERROR_FILE_NOT_FOUND (2).
-ok int($err) > 0, 'Got positive numeric error code: ' . int($err);
+# On Haiku, errno carries Haiku's negative B_* style codes (BeOS legacy),
+# so a missing file is B_ENTRY_NOT_FOUND rather than positive ENOENT.
+if ( $^O eq 'haiku' ) {
+    ok int($err) < 0, 'Got negative numeric Haiku error code: ' . int($err);
+}
+else {
+    ok int($err) > 0, 'Got positive numeric error code: ' . int($err);
+}
 #
 diag $err;
 ok length("$err") > 0, "Got error message string: '$err'";

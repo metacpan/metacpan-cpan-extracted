@@ -1,13 +1,13 @@
 package IO::K8s::Traefik::V1alpha1::ServersTransportTCP;
-# ABSTRACT: Traefik TCP servers transport configuration
-our $VERSION = '1.107';
+# ABSTRACT: ServersTransportTCP is the CRD implementation of a TCPServersTransport.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'serverstransporttcps';
 with 'IO::K8s::Role::Namespaced';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec => '+IO::K8s::Traefik::V1alpha1::ServersTransportTCPSpec', { required => 'schema' };
+
 
 1;
 
@@ -19,25 +19,15 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Traefik::V1alpha1::ServersTransportTCP - Traefik TCP servers transport configuration
+IO::K8s::Traefik::V1alpha1::ServersTransportTCP - ServersTransportTCP is the CRD implementation of a TCPServersTransport.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-ServersTransportTCP configures transport settings for connections to backend TCP servers. It controls TLS verification, timeouts, and connection parameters for upstream TCP services. This is a namespace-scoped custom resource using API version C<traefik.io/v1alpha1>. The C<spec> and C<status> fields are opaque hashrefs managed by Traefik.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<IO::K8s::Traefik> - Traefik CRD namespace
-
-=item * L<https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/> - Official Traefik CRD documentation
-
-=back
+ServersTransportTCPSpec defines the desired state of a ServersTransportTCP.
 
 =head1 SUPPORT
 

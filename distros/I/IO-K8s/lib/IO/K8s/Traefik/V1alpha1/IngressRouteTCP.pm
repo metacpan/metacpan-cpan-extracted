@@ -1,13 +1,13 @@
 package IO::K8s::Traefik::V1alpha1::IngressRouteTCP;
-# ABSTRACT: Traefik TCP routing via IngressRouteTCP
-our $VERSION = '1.107';
+# ABSTRACT: IngressRouteTCP is the CRD implementation of a Traefik TCP Router.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'ingressroutetcps';
 with 'IO::K8s::Role::Namespaced';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec => '+IO::K8s::Traefik::V1alpha1::IngressRouteTCPSpec', { required => 'schema' };
+
 
 1;
 
@@ -19,25 +19,15 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Traefik::V1alpha1::IngressRouteTCP - Traefik TCP routing via IngressRouteTCP
+IO::K8s::Traefik::V1alpha1::IngressRouteTCP - IngressRouteTCP is the CRD implementation of a Traefik TCP Router.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-IngressRouteTCP defines TCP routing rules for Traefik. It configures routes, match rules, and services for raw TCP traffic. This is a namespace-scoped custom resource using API version C<traefik.io/v1alpha1>. The C<spec> and C<status> fields are opaque hashrefs managed by Traefik.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<IO::K8s::Traefik> - Traefik CRD namespace
-
-=item * L<https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/> - Official Traefik CRD documentation
-
-=back
+IngressRouteTCPSpec defines the desired state of IngressRouteTCP.
 
 =head1 SUPPORT
 

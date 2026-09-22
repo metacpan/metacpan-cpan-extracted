@@ -53,10 +53,11 @@ opaque_types:
 # entry that definition contributes is skipped, not just one. Consumed by
 # t/43_spec_kind_dispatch.t, which walks every upstream GVK entry and checks
 # IO::K8s->expand_class($kind, $apiVersion) resolves + loads; without this
-# list it would report ~125 false gaps every run (matches
-# maint/spec-drift-check.pl's coarser per-definition-key coverage check,
-# which never notices this because it only asks "does a class exist for
-# this key", not "is this exact apiVersion+kind pair dispatchable").
+# list it would report ~125 false gaps every run. Also consumed by
+# maint/spec-drift-check.pl's TYPEMETA DRIFT check (karr #50): these
+# definitions carry a GVK upstream but ship as plain Resource classes that
+# emit no apiVersion/kind -- the same settled call, so the checker
+# suppresses them here instead of re-reporting them every run.
 non_dispatchable_kinds:
   - key: io.k8s.apimachinery.pkg.apis.meta.v1.DeleteOptions
     reason: "shared per-group delete-request-body type -- the SAME definition lists one GVK entry per API group (60 in v1.36.3) purely as a client-codegen convenience; there is one Perl class (Apimachinery::Pkg::Apis::Meta::V1::DeleteOptions) and it is constructed directly, never looked up by kind+apiVersion. Confirmed in karr #10."
@@ -97,16 +98,30 @@ perl_only:
     reason: "pre-graduation alpha track of authentication.k8s.io, kept for older clusters"
   - prefix: "IO::K8s::Api::Authentication::V1beta1::"
     reason: "pre-graduation beta track of authentication.k8s.io, kept for older clusters"
+  - prefix: "IO::K8s::Api::Certificates::V1alpha1::"
+    reason: "karr k72 (v1.37 sync): ClusterTrustBundle* graduated certificates.k8s.io/v1alpha1 -> v1beta1/v1 and was dropped from v1alpha1 upstream in v1.37; kept for older clusters"
   - prefix: "IO::K8s::Api::Coordination::V1alpha1::"
     reason: "pre-graduation alpha track of coordination.k8s.io (superseded by v1alpha2/v1beta1), kept for older clusters"
+  - prefix: "IO::K8s::Api::Networking::V1beta1::"
+    reason: "karr k72 (v1.37 sync): IPAddress/ServiceCIDR (+ ParentReference and their Spec/Status) graduated networking.k8s.io/v1beta1 -> v1 and were dropped from v1beta1 upstream in v1.37; kept for older clusters"
   - prefix: "IO::K8s::Api::Flowcontrol::V1beta3::"
     reason: "flowcontrol.k8s.io/v1beta3 superseded by v1, kept for older clusters"
   - prefix: "IO::K8s::Api::Resource::V1alpha3::"
     reason: "classic DRA core (resource.k8s.io/v1alpha3), superseded by v1beta1/v1beta2/v1; kept for older clusters. The v1.36 delta types (DeviceTaint, DeviceTaintRule*, DeviceTaintSelector, PoolStatus, ResourcePoolStatusRequest*) have real upstream matches in v1alpha3 and are checked normally"
+  - prefix: "IO::K8s::Api::Scheduling::V1alpha2::"
+    reason: "karr k72 (v1.37 sync): PodGroup/Workload gang-scheduling alpha (scheduling.k8s.io/v1alpha2) superseded by v1alpha3/v1beta1 and dropped from v1alpha2 upstream in v1.37; kept for older clusters"
   - prefix: "IO::K8s::Api::Storagemigration::V1alpha1::"
     reason: "storagemigration.k8s.io/v1alpha1 superseded by v1beta1, kept for older clusters"
   - prefix: "IO::K8s::Api::Storage::V1alpha1::"
     reason: "pre-graduation alpha track of storage.k8s.io (VolumeAttributesClass), kept for older clusters"
+  - prefix: "IO::K8s::Api::Storage::V1beta1::"
+    reason: "karr k72 (v1.37 sync): VolumeAttributesClass graduated storage.k8s.io/v1beta1 -> v1 and was dropped from v1beta1 upstream in v1.37; kept for older clusters"
+  - prefix: "IO::K8s::Api::Resource::V1::NodeAllocatableResourceMapping"
+    reason: "karr k72 (v1.37 sync): v1.37 restructured the flat NodeAllocatableResourceMapping (allocationMultiplier + capacityKey) into NodeAllocatableResource (mapping + overhead) on resource.k8s.io/v1; the old type is kept for older clusters (v1.36) that still serve it"
+  - prefix: "IO::K8s::Api::Resource::V1beta1::NodeAllocatableResourceMapping"
+    reason: "karr k72 (v1.37 sync): v1beta1 track of the same NodeAllocatableResourceMapping restructure above; kept for older clusters"
+  - prefix: "IO::K8s::Api::Resource::V1beta2::NodeAllocatableResourceMapping"
+    reason: "karr k72 (v1.37 sync): v1beta2 track of the same NodeAllocatableResourceMapping restructure above; kept for older clusters"
 
 # One-off suppressions that don't fit a whole-namespace prefix rule above.
 # Empty by design -- add sparingly, each with a reason, each pointing at the
@@ -123,6 +138,22 @@ perl_only:
 #     - class: "IO::K8s::Api::Foo::V1::Bar"
 #       field: "someField"
 #       reason: "..."
+#   ignore_typemeta:            # TypeMeta drift (karr #50): class prefix, like perl_only
+#     - prefix: "IO::K8s::Api::Foo::V1::Bar"
+#       reason: "..."
 ignore_missing_classes: []
 ignore_missing_fields: []
-ignore_extra_fields: []
+ignore_extra_fields:
+  - class: "IO::K8s::Api::Core::V1::NodeAllocatableResourceClaimStatus"
+    field: "resources"
+    reason: "karr k72 (v1.37 sync): points at the restructured-away NodeAllocatableResourceMapping; kept for older clusters (v1.36) alongside the new v1.37 surface"
+  - class: "IO::K8s::Api::Resource::V1::Device"
+    field: "nodeAllocatableResourceMappings"
+    reason: "karr k72 (v1.37 sync): superseded by nodeAllocatableResources in v1.37; kept for older clusters"
+  - class: "IO::K8s::Api::Resource::V1beta1::BasicDevice"
+    field: "nodeAllocatableResourceMappings"
+    reason: "karr k72 (v1.37 sync): superseded by nodeAllocatableResources in v1.37; kept for older clusters"
+  - class: "IO::K8s::Api::Resource::V1beta2::Device"
+    field: "nodeAllocatableResourceMappings"
+    reason: "karr k72 (v1.37 sync): superseded by nodeAllocatableResources in v1.37; kept for older clusters"
+ignore_typemeta: []

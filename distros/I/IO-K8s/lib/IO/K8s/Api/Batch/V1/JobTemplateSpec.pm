@@ -1,7 +1,10 @@
 package IO::K8s::Api::Batch::V1::JobTemplateSpec;
 # ABSTRACT: JobTemplateSpec describes the data a Job should have when created from a template
-our $VERSION = '1.107';
-use IO::K8s::APIObject;
+our $VERSION = '1.108';
+use IO::K8s::Resource;
+
+
+k8s metadata => 'Meta::V1::ObjectMeta';
 
 
 k8s spec => 'Batch::V1::JobSpec';
@@ -21,14 +24,15 @@ IO::K8s::Api::Batch::V1::JobTemplateSpec - JobTemplateSpec describes the data a 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
 JobTemplateSpec describes the data a Job should have when created from a template
 
-This is a Kubernetes API object. See L<IO::K8s::Role::APIObject> for
-C<metadata>, C<api_version()>, and C<kind()>.
+=head2 metadata
+
+Standard object's metadata. See L<IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta>.
 
 =head2 spec
 

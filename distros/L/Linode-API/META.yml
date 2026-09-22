@@ -1,0 +1,51 @@
+---
+abstract: "A client for the Linode API, generated from Linode's own OpenAPI specification"
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  File::Spec: '0'
+  FindBin::libs: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Mojolicious: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V1: '0'
+  Test::File::ShareDir::Dist: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linode-API
+no_index:
+  directory:
+    - t
+provides:
+  Linode::API:
+    file: lib/Linode/API.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Cpanel::JSON::XS: '0'
+  File::ShareDir: '0'
+  File::Slurper: '0'
+  Mojo::Util: '0'
+  OpenAPI::Client: '0'
+  parent: '0'
+  perl: '5.016'
+  re: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Troglodyne-Internet-Widgets/Linode-API/issues
+  homepage: https://github.com/Troglodyne-Internet-Widgets/Linode-API
+  repository: https://github.com/Troglodyne-Internet-Widgets/Linode-API.git
+version: '0.001'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

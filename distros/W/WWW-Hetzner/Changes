@@ -1,5 +1,60 @@
 Revision history for WWW-Hetzner
 
+0.101     2026-09-22 05:53:00Z
+    - New: WWW::Hetzner::Storage, a third API host (api.hetzner.com) for
+      Storage Boxes
+      - $storage->storage_boxes, ->storage_box_types and ->actions; Storage
+        Box objects expose per-box ->subaccounts, ->snapshots and ->actions
+      - CLI: hcloud.pl storage-box, 33 subcommands (create/update/delete,
+        access settings, protection, snapshot plan, snapshots, subaccounts)
+    - New: list_all collects all remaining pages on paginated controllers
+      (WWW::Hetzner::Role::Pagination); list keeps its single-page contract.
+      CLI lists and local name lookups use complete results; pagination
+      failures are reported explicitly
+    - New read-only Cloud resources: ISOs, Load Balancer Types and Pricing
+      - $cloud->isos (list/get/get_by_name), ->load_balancer_types, and
+        ->pricing (a singleton, so get only)
+      - New entities WWW::Hetzner::Cloud::ISO, ::LoadBalancerType, ::Pricing
+      - CLI: hcloud.pl iso, load-balancer-type and pricing
+    - New Robot resources: boot, rdns and failover
+      - $robot->boot (rescue system, Linux install, VNC, Windows), with
+        enable_*/disable_* methods; returns raw hashrefs, no entity
+      - $robot->rdns and $robot->failover, listable per-IP resources with
+        entities WWW::Hetzner::Robot::RDNS and ::Failover
+      - CLI: hrobot.pl boot (rescue/linux/vnc/windows), rdns, failover
+    - BREAKING: mutating Cloud methods now return a WWW::Hetzner::Action object
+      instead of a raw decoded-JSON action hashref (66 methods across the API
+      controllers and their entity mirrors)
+      - Action has status predicates (is_running/is_success/is_error),
+        error_message, refresh and a blocking wait(interval => 1, timeout => 120)
+      - $cloud->actions looks up any action by id, independent of the resource
+        that created it
+      - Created entities carry the creating action as ->action plus any
+        ->next_actions (WWW::Hetzner::Role::HasAction); Firewall create returns
+        plural ->actions
+      - Server enable_rescue/rebuild/reset_password/request_console preserve
+        their sidecar data (root_password, password, wss_url) on the Action via
+        ->result and typed readers
+      - Action and its roles live directly under WWW::Hetzner, so the other
+        Hetzner APIs can reuse them
+      - CLI: mutating hcloud.pl commands wait for a terminal action state by
+        default; --no-wait opts out (new injectable Role::HTTP sleeper)
+    - BREAKING: server, zone and rrset delete now return an Action; the other
+      ten DELETE endpoints answer 204 and are unchanged
+      - CLI: hcloud.pl server/zone/record delete wait for the deletion action
+        by default; --no-wait opts out
+    - Fix: Robot request bodies use application/x-www-form-urlencoded, incl.
+      repeated array fields; Cloud and Storage keep JSON encoding
+    - Fix: URI-encode query names and values (incl. Unicode); arrayrefs become
+      repeated query parameters
+    - Fix: CLI table output reads entity accessors, restoring server type,
+      datacenter and location values; firewall add-rule preserves existing
+      rules
+    - Fix: --output json no longer dies on the server, image, datacenter,
+      sshkey, location, servertype, zone and record list commands
+    - Tests: exercise every Cloud and Robot CLI command through execute with
+      MockIO, including action waits and non-action deletes
+
 0.100     2026-02-12 17:13:58Z
     - Pluggable HTTP transport via WWW::Hetzner::Role::IO
       - New: WWW::Hetzner::HTTPRequest, WWW::Hetzner::HTTPResponse

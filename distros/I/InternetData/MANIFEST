@@ -1,6 +1,8 @@
 lib/InternetData.pm
 lib/InternetData/Database.pm
 lib/InternetData/Error.pm
+lib/InternetData/Oauth.pm
+lib/InternetData/OauthError.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -10,6 +12,7 @@ t/00-compile.t
 t/01-conformance.t
 t/02-client.t
 t/03-download.t
+t/04-oauth.t
 t/lib/InternetDataTest.pm
 t/lib/InternetDataTest/Origin.pm
 testdata/testdata.json

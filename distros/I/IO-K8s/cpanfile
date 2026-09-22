@@ -14,6 +14,7 @@ on 'test' => sub {
     requires 'Test::More';
     requires 'Test::Exception';
     requires 'Test::Deep';
+    requires 'Path::Tiny';
 };
 
 on 'develop' => sub {

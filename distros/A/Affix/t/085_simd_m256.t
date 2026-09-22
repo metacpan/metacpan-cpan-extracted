@@ -71,13 +71,13 @@ subtest 'M256d (4 x double) -- AVX2' => sub {
     # Pass as packed string (fast path)
     my $v1  = pack( 'd*', 1.0,  2.0,  3.0,  4.0 );
     my $v2  = pack( 'd*', 10.0, 20.0, 30.0, 40.0 );
-    my $sum = add_m256d( $v1, $v2 );
+    my $sum = $add->( $v1, $v2 );
     is ref($sum), 'ARRAY',     'add_m256d returns array ref';
     is $sum->[0], float(11.0), 'M256d add index 0';
     is $sum->[1], float(22.0), 'M256d add index 1';
     is $sum->[2], float(33.0), 'M256d add index 2';
     is $sum->[3], float(44.0), 'M256d add index 3';
-    my $prod = mul_m256d( $v1, $v2 );
+    my $prod = $mul->( $v1, $v2 );
     is $prod->[0], float(10.0),  'M256d mul index 0';
     is $prod->[1], float(40.0),  'M256d mul index 1';
     is $prod->[2], float(90.0),  'M256d mul index 2';
@@ -94,12 +94,12 @@ subtest 'M256 (8 x float) -- AVX2' => sub {
     # 8 x float
     my $v1  = pack( 'f*', 1.0,  2.0,  3.0,  4.0,  5.0,  6.0,  7.0,  8.0 );
     my $v2  = pack( 'f*', 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0 );
-    my $sum = add_m256( $v1, $v2 );
+    my $sum = $add->( $v1, $v2 );
     is ref($sum),    'ARRAY',     'add_m256 returns array ref';
     is scalar @$sum, 8,           'M256 result has 8 elements';
     is $sum->[0],    float(11.0), 'M256 add index 0';
     is $sum->[7],    float(88.0), 'M256 add index 7';
-    my $prod = mul_m256( $v1, $v2 );
+    my $prod = $mul->( $v1, $v2 );
     is $prod->[0], float(10.0),  'M256 mul index 0';
     is $prod->[7], float(640.0), 'M256 mul index 7';
 };
@@ -110,7 +110,7 @@ subtest 'M256d -- pass as array ref (slow path)' => sub {
     isa_ok my $add = wrap( $lib, 'add_m256d', [ M256d, M256d ] => M256d ), ['Affix'];
     my $v1  = [ 1.5, 2.5, 3.5, 4.5 ];
     my $v2  = [ 0.5, 0.5, 0.5, 0.5 ];
-    my $sum = add_m256d( $v1, $v2 );
+    my $sum = $add->( $v1, $v2 );
     is $sum->[0], float(2.0), 'M256d array ref add index 0';
     is $sum->[1], float(3.0), 'M256d array ref add index 1';
     is $sum->[2], float(4.0), 'M256d array ref add index 2';

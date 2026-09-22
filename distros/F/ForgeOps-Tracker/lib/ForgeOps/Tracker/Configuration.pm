@@ -32,6 +32,17 @@ sub new {
         # back on the way a local config value could. Set this to false too if this host app
         # should never even attempt that disk read in the first place.
         capture_source_context => 1,
+        # When an error's text carries the SQL behind a failed database call (DBI's
+        # `[for Statement "..."]`, which needs ShowErrorStatement on the handle, or SQLite's
+        # `while compiling:`), send the names of the stored procedure, table and view it touched,
+        # so an issue says where to start looking. Names are identifiers, never values, which is
+        # why this defaults on. capture_sql_statement is the separate, opt-in step of also
+        # sending the statement itself, with every string and number replaced by "?"; off by
+        # default because even a masked statement describes your schema, and ForgeOps' own
+        # per-project setting is what durably governs whether the server stores it. See
+        # ForgeOps::Tracker::SqlStatement.
+        capture_sql_objects    => 1,
+        capture_sql_statement  => 0,
         logger               => undef, # coderef, or undef to log nowhere
         # Whether add_breadcrumb records anything at all: on by default, matching every other
         # client in this repo.

@@ -1,11 +1,11 @@
 package IO::K8s::Api::Apps::V1::ControllerRevision;
 # ABSTRACT: ControllerRevision implements an immutable snapshot of state data.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
 
-k8s data => { Str => 1 };
+k8s data => { Str => 1 }, 'required';
 
 
 k8s revision => Int, 'required';
@@ -24,7 +24,7 @@ IO::K8s::Api::Apps::V1::ControllerRevision - ControllerRevision implements an im
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ Revision indicates the revision of the state represented by Data.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#controllerrevision-v1-apps>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#controllerrevision-v1-apps>
 
 =head1 SUPPORT
 

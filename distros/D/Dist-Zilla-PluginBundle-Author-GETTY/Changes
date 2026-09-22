@@ -1,3 +1,9 @@
+0.325     2026-09-22 06:46:49Z
+
+  - Version rewriting defaults to ":InstallModules" and ":PerlExecFiles", so
+    modules and Perl executables receive the release version while non-Perl
+    programs under "bin/" remain installed without being parsed as Perl.
+
 0.324     2026-09-19 01:05:02Z
 
   - F<.karr> is now excluded from the gathered distribution files for CPAN

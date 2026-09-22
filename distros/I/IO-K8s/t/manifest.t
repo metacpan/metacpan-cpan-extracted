@@ -193,4 +193,55 @@ spec:
     like($errors->[1], qr/pod2|invalid2/, 'second error mentioned');
 };
 
+# k71 (P7): collect_errors above is only ever exercised with an
+# all-invalid stream. A mixed stream -- most documents valid, one bad -- is
+# the realistic case (a big manifest bundle where one Kind has a typo) and
+# never had its own test: this asserts the good documents still come back as
+# objects (not dropped or short-circuited by the bad one) alongside exactly
+# the one collected error, named with its kind/name prefix.
+subtest 'type validation - collect_errors on a mixed 3-doc stream (2 valid, 1 invalid)' => sub {
+    my $mixed_yaml = q{---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: good-config
+data:
+  hello: world
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-pod
+spec:
+  containers:
+  - name: app
+    image: nginx
+    ports:
+    - containerPort: "not-a-number"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: good-secret
+type: Opaque
+data:
+  password: cGFzc3dvcmQ=
+};
+
+    my ($objs, $errors) = $k8s->load_yaml($mixed_yaml, collect_errors => 1);
+    is(ref($objs), 'ARRAY', 'objects is arrayref');
+    is(scalar(@$objs), 2, 'the two valid documents came back as objects');
+    is(ref($errors), 'ARRAY', 'errors is arrayref');
+    is(scalar(@$errors), 1, 'exactly the one invalid document was collected as an error, not more');
+
+    is($objs->[0]->kind, 'ConfigMap', 'first valid object is the ConfigMap');
+    is($objs->[0]->metadata->name, 'good-config', 'first valid object retains its identity');
+    is($objs->[1]->kind, 'Secret', 'second valid object is the Secret');
+    is($objs->[1]->metadata->name, 'good-secret',
+        'second valid object retains its identity -- the bad document in between did not swallow it');
+
+    like($errors->[0], qr/\APod\/bad-pod:/,
+        'the collected error is prefixed with the failing document\'s kind/name');
+};
+
 done_testing;

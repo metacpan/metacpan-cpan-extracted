@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::API::LoadBalancers;
 # ABSTRACT: Hetzner Cloud Load Balancers API
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::LoadBalancer;
 use namespace::clean;
@@ -15,11 +16,14 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Role::HasActions';
+
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::LoadBalancer->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -29,12 +33,20 @@ sub _wrap_list {
 }
 
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/load_balancers', params => \%params);
-    return $self->_wrap_list($result->{load_balancers} // []);
+    return ($self->_wrap_list($result->{load_balancers} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
 
 
 sub get {
@@ -68,7 +80,11 @@ sub create {
     $body->{targets}     = $params{targets}     if $params{targets};
 
     my $result = $self->client->post('/load_balancers', $body);
-    return $self->_wrap($result->{load_balancer});
+    return $self->_wrap(
+        $result->{load_balancer},
+        action       => $self->_wrap_action($result->{action}),
+        next_actions => $self->_wrap_actions($result->{next_actions}),
+    );
 }
 
 
@@ -98,7 +114,9 @@ sub add_target {
     croak "Load Balancer ID required" unless $id;
     croak "type required" unless $opts{type};
 
-    return $self->client->post("/load_balancers/$id/actions/add_target", \%opts);
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/add_target", \%opts)->{action}
+    );
 }
 
 
@@ -107,7 +125,9 @@ sub remove_target {
     croak "Load Balancer ID required" unless $id;
     croak "type required" unless $opts{type};
 
-    return $self->client->post("/load_balancers/$id/actions/remove_target", \%opts);
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/remove_target", \%opts)->{action}
+    );
 }
 
 
@@ -115,7 +135,9 @@ sub add_service {
     my ($self, $id, %opts) = @_;
     croak "Load Balancer ID required" unless $id;
 
-    return $self->client->post("/load_balancers/$id/actions/add_service", \%opts);
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/add_service", \%opts)->{action}
+    );
 }
 
 
@@ -124,9 +146,11 @@ sub delete_service {
     croak "Load Balancer ID required" unless $id;
     croak "listen_port required" unless $listen_port;
 
-    return $self->client->post("/load_balancers/$id/actions/delete_service", {
-        listen_port => $listen_port,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/delete_service", {
+            listen_port => $listen_port,
+        })->{action}
+    );
 }
 
 
@@ -138,7 +162,9 @@ sub attach_to_network {
     my $body = { network => $network_id };
     $body->{ip} = $opts{ip} if $opts{ip};
 
-    return $self->client->post("/load_balancers/$id/actions/attach_to_network", $body);
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/attach_to_network", $body)->{action}
+    );
 }
 
 
@@ -147,9 +173,11 @@ sub detach_from_network {
     croak "Load Balancer ID required" unless $id;
     croak "network required" unless $network_id;
 
-    return $self->client->post("/load_balancers/$id/actions/detach_from_network", {
-        network => $network_id,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/load_balancers/$id/actions/detach_from_network", {
+            network => $network_id,
+        })->{action}
+    );
 }
 
 
@@ -167,7 +195,7 @@ WWW::Hetzner::Cloud::API::LoadBalancers - Hetzner Cloud Load Balancers API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -210,6 +238,15 @@ All methods return L<WWW::Hetzner::Cloud::LoadBalancer> objects.
     my $lbs = $cloud->load_balancers->list(label_selector => 'env=prod');
 
 Returns arrayref of L<WWW::Hetzner::Cloud::LoadBalancer> objects.
+
+=head2 list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
 
 =head2 get
 
@@ -327,7 +364,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,13 +2,15 @@ package Devel::ebug::HTTP;
 
 use strict;
 use warnings;
-use 5.010001;
-use Catalyst qw/Static::Simple/;
-#use Catalyst qw/-Debug Static::Simple/;
+use 5.016;
+use Mojolicious::Lite;
 use File::ShareDir::Dist qw( dist_share );
+use PPI;
+use PPI::HTML;
+use List::Util qw( max );
 
 # ABSTRACT: A web front end to a simple, extensible Perl debugger
-our $VERSION = '0.36'; # VERSION
+our $VERSION = '0.37'; # VERSION
 
 # global for now, sigh
 my $codelines_cache;
@@ -17,48 +19,33 @@ my $lines_visible_above_count = 10;
 my $sequence = 1;
 my $vars;
 
-Devel::ebug::HTTP->config(
-  name => 'Devel::ebug::HTTP',
-);
-
 {
   my $share = dist_share('Devel-ebug-HTTP');
-  
+
   unless(defined $share)
   {
-    $share = -f "share/root/index"  # TODO do relative to ebug?
+    $share = -f "share/root/index.html.tt"  # TODO do relative to ebug?
       ? "share"
       : die "unable to find home or root";
   }
 
-  Devel::ebug::HTTP->config(
-    home => "$share",
-    root => "$share/root",
-  );
+  push @{ app->static->paths }, "$share/root";
+  push @{ app->renderer->paths }, "$share/root";
 }
 
-Devel::ebug::HTTP->setup;
+plugin 'TtRenderer';
+app->renderer->default_handler('tt');
 
-package Devel::ebug::HTTP::Controller::Root;
+app->log->level('fatal');
 
-use PPI;
-use PPI::HTML;
-use List::Util qw( max );
-use base qw( Catalyst::Controller );
+any '/ajax_variable/:variable' => \&_ajax_variable;
+any '/ajax_eval' => \&_ajax_eval;
+any '/' => \&_do_the_request;
+any '/*whatever' => \&_do_the_request;
 
-BEGIN {
-  $INC{'Devel/ebug/HTTP/Controller/Root.pm'} = __FILE__;
-  Devel::ebug::HTTP::Controller::Root->config( namespace => '' );
-}
-
-sub default : Private {
-  my($self, $c) = @_;
-  $c->stash->{template} = 'index';
-  $c->forward('do_the_request');
-}
-
-sub ajax_variable : Local {
-  my ($self, $context, $variable) = @_;
+sub _ajax_variable {
+  my($c) = @_;
+  my $variable = $c->stash('variable');
   $variable = '\\' . $variable if $variable =~ /^[%@]/;
   my $value = $ebug->yaml($variable);
   $value =~ s/^--- // unless $variable =~ /^[%@]/;
@@ -70,37 +57,29 @@ sub ajax_variable : Local {
   <value><![CDATA[$value]]></value>
 </response>
   };
-  $context->response->content_type("text/xml");
-  $context->response->output($xml);
+  $c->res->headers->content_type("text/xml");
+  $c->render(data => $xml);
 }
 
-sub ajax_eval : Local {
-  my ($self, $context) = @_;
-  my $eval = $context->request->parameters->{eval};
+sub _ajax_eval {
+  my($c) = @_;
+  my $eval = $c->req->params->to_hash->{eval};
   my $result = $ebug->eval($eval) || "No output";
   $result =~ s/ at \(eval .+$//;
-  $context->response->content_type("text/html");
-  $context->response->output($result);
+  $c->res->headers->content_type("text/html");
+  $c->render(data => $result);
 }
 
-sub end : Private {
-  my($self, $c) = @_;
-  if ($c->stash->{template}) {
-    $c->response->content_type("text/html");
-    $c->forward('Devel::ebug::HTTP::View::TT');
-  }
-}
-
-sub do_the_request : Private {
-  my($self, $c) = @_;
-  my $params = $c->request->parameters;
+sub _do_the_request {
+  my($c) = @_;
+  my $params = $c->req->params->to_hash;
 
   # clear out template variables
   $vars = {};
 
   # pass commands we've been passed to the ebug
   my $action = lc($params->{myaction} || '');
-  tell_ebug($c, $action);
+  _tell_ebug($c, $action);
 
   # check we're doing things in the right order
   my $cgi_sequence = $params->{sequence};
@@ -110,13 +89,15 @@ sub do_the_request : Private {
   }
   $sequence++;
 
-  set_up_stash($c);
+  _set_up_stash($c);
+
+  $c->render(template => 'index');
 }
 
-sub tell_ebug {
+sub _tell_ebug {
   my ($c, $action) = @_;
-  my $params = $c->request->parameters;
-  
+  my $params = $c->req->params->to_hash;
+
   if ($ebug->finished &&
      ($action ne "restart") &&
      ($action ne "undo")) {
@@ -144,18 +125,19 @@ sub tell_ebug {
   }
 }
 
-sub set_up_stash {
+sub _set_up_stash {
   my($c) = @_;
-  my $params = $c->request->parameters;
 
   my $break_points;
   $break_points->{$_}++ foreach $ebug->break_points;
 
-  my $url = $c->request->base;
+  my $url = $c->req->url->base->clone;
+  $url->path('/');
+  $url = $url->to_string;
 
   my($stdout, $stderr) = $ebug->output;
 
-  my $codelines = codelines($c);
+  my $codelines = _codelines($c);
 
   $vars = {
     %$vars,
@@ -171,17 +153,17 @@ sub set_up_stash {
     url => $url,
   };
 
-  foreach my $k (keys %$vars) {
-    $c->stash->{$k} = $vars->{$k};
-  }
+  $c->stash(%$vars);
 }
 
-sub codelines {
+sub _codelines {
   my($c) = @_;
   my $filename = $ebug->filename;
   return $codelines_cache->{$filename} if exists $codelines_cache->{$filename};
 
-  my $url = $c->request->base;
+  my $url = $c->req->url->base->clone;
+  $url->path('/');
+  $url = $url->to_string;
   my $code = join "\n", $ebug->codelines;
   my $document = PPI::Document->new(\$code);
   my $highlight = PPI::HTML->new(line_numbers => 1);
@@ -229,23 +211,12 @@ sub codelines {
 
 sub variable_html {
   my($url, $variable) = @_;
-  return qq{<a href="#" style="text-decoration: none" onmouseover="return tooltip('$variable')" onmouseout="return nd();">$variable</a>};
+  return qq{<a href="#" style="text-decoration: none" onmouseover="highlight_variable('$variable'); return tooltip('$variable')" onmouseout="unhighlight_variable('$variable'); return nd();">$variable</a>};
 }
 
 sub line_html {
   my($url, $line) = @_;
   return qq{<a href="#" style="text-decoration: none" onClick="return break_point($line)">$line</a>};
-}
-
-package Devel::ebug::HTTP::View::TT;
-
-use strict;
-use warnings;
-use Catalyst::View::TT;
-use base qw(Catalyst::View::TT);
-
-BEGIN {
-  $INC{'Devel/ebug/HTTP/View/TT.pm'} = __FILE__;
 }
 
 package Devel::ebug::HTTP::App;
@@ -259,8 +230,7 @@ sub main {
   $ebug->program($filename);
   $ebug->load;
 
-  require Catalyst::ScriptRunner;
-  Catalyst::ScriptRunner->run('Devel::ebug::HTTP', 'Server');
+  Devel::ebug::HTTP::app->start(@ARGV ? @ARGV : 'daemon');
 }
 
 sub ebug {
@@ -283,7 +253,7 @@ Devel::ebug::HTTP - A web front end to a simple, extensible Perl debugger
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -294,7 +264,7 @@ version 0.36
 A debugger is a computer program that is used to debug other
 programs. L<Devel::ebug> is a simple, extensible Perl debugger with a
 clean API. L<Devel::ebug::HTTP> is a web-based frontend to L<Devel::ebug> which
-presents a simple, pretty way to debug programs. L<ebug_http> is 
+presents a simple, pretty way to debug programs. L<ebug_http> is
 the command line program to launch the debugger. It will return a URL
 which you should point a web browser to.
 
@@ -324,7 +294,7 @@ Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2005-2021 by Leon Brocard.
+This software is copyright (c) 2005-2024 by Leon Brocard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

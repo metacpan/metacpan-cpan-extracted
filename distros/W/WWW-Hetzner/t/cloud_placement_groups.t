@@ -59,6 +59,24 @@ subtest 'create placement group' => sub {
 
     isa_ok($pg, 'WWW::Hetzner::Cloud::PlacementGroup');
     is($pg->id, 1400, 'new placement group id');
+    isa_ok($pg->action, 'WWW::Hetzner::Action', 'create action is an Action');
+    is($pg->action->command, 'create_placement_group', 'action command');
+};
+
+subtest 'create placement group without action (unmanaged)' => sub {
+    my $fixture = load_fixture('placement_groups_create');
+    delete $fixture->{action};
+
+    my $cloud = mock_cloud(
+        'POST /placement_groups' => $fixture,
+    );
+
+    my $pg = $cloud->placement_groups->create(
+        name => 'new-group',
+        type => 'spread',
+    );
+
+    is($pg->action, undef, 'action is undef when API omits it');
 };
 
 subtest 'delete placement group' => sub {

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeSpec;
 # ABSTRACT: NodeSpec describes the attributes that a node is created with.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s configSource => 'Core::V1::NodeConfigSource';
@@ -13,6 +13,9 @@ k8s podCIDR => Str;
 
 
 k8s podCIDRs => [Str];
+
+
+k8s podPreemptionPolicy => 'Core::V1::NodePodPreemptionPolicy';
 
 
 k8s providerID => Str;
@@ -38,7 +41,7 @@ IO::K8s::Api::Core::V1::NodeSpec - NodeSpec describes the attributes that a node
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 configSource
 
@@ -55,6 +58,10 @@ PodCIDR represents the pod IP range assigned to the node.
 =head2 podCIDRs
 
 podCIDRs represents the IP ranges assigned to the node for usage by Pods on that node. If this field is specified, the 0th entry must match the podCIDR field. It may contain at most 1 value for each of IPv4 and IPv6.
+
+=head2 podPreemptionPolicy
+
+PodPreemptionPolicy controls the node-level preemption behaviors for pods on this node. This is an alpha field and requires enabling the InPlacePodVerticalScalingSchedulerPreemption feature gate.
 
 =head2 providerID
 

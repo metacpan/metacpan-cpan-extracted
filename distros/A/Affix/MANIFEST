@@ -60,6 +60,7 @@ lib/Affix.pod
 lib/Affix/Build.pm
 lib/Affix/Build.pod
 lib/Affix/Platform/BSD.pm
+lib/Affix/Platform/Haiku.pm
 lib/Affix/Platform/MacOS.pm
 lib/Affix/Platform/Solaris.pm
 lib/Affix/Platform/Unix.pm

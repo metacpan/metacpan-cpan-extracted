@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authentication::V1beta1::SelfSubjectReview;
 # ABSTRACT: SelfSubjectReview contains the user information that the kube-apiserver has about the user making this request. When using impersonation, users will receive the user info of the user being impersonated.  If impersonation or request header authentication is used, any extra keys will have their case ignored and returned as lowercase.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -20,7 +20,7 @@ IO::K8s::Api::Authentication::V1beta1::SelfSubjectReview - SelfSubjectReview con
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 

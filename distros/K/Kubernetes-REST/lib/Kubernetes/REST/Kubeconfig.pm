@@ -1,6 +1,6 @@
 package Kubernetes::REST::Kubeconfig;
 # ABSTRACT: Parse kubeconfig files and create Kubernetes::REST instances
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use Moo;
 use Carp qw(croak);
 use Config ();
@@ -139,11 +139,31 @@ sub _merge_configs {
     return \%merged;
 }
 
-sub _not_found_error {
+sub _kubeconfig_paths_string {
     my $self = shift;
     my $paths = $self->kubeconfig_paths;
-    return 'Kubeconfig not found: ' . join($PATH_SEP, @$paths) if @$paths;
-    return 'Kubeconfig not found: neither KUBECONFIG nor HOME is set';
+    return join($PATH_SEP, @$paths) if @$paths;
+    return 'neither KUBECONFIG nor HOME is set';
+}
+
+sub _not_found_error {
+    my $self = shift;
+    return 'Kubeconfig not found: ' . $self->_kubeconfig_paths_string;
+}
+
+# The two ways a lookup fails before a single name is compared: the kubeconfig
+# defines no such section at all, or there is no name to look for. Both used to
+# reach _find_by_name, which compared against undef and croaked "not found: "
+# with nothing behind the colon - an unusable kubeconfig, described in a way
+# nobody can act on.
+sub _assert_lookup {
+    my ($self, $config, $section, $name, $missing_name_error) = @_;
+    my $entries = $config->{$section};
+    croak "kubeconfig defines no $section: " . $self->_kubeconfig_paths_string
+        unless ref $entries eq 'ARRAY' and @$entries;
+    croak "$missing_name_error: " . $self->_kubeconfig_paths_string
+        unless defined $name and length $name;
+    return;
 }
 
 sub current_context_name {
@@ -180,6 +200,8 @@ sub context {
     my $config = $self->_config
         or croak $self->_not_found_error;
     $name //= $self->current_context_name;
+    $self->_assert_lookup($config, 'contexts', $name,
+        'kubeconfig has no current-context set');
     my $ctx = $self->_find_by_name($config->{contexts}, $name)
         or croak "Context not found: $name";
     return $ctx->{context};
@@ -191,6 +213,7 @@ sub cluster {
 
     my $config = $self->_config
         or croak $self->_not_found_error;
+    $self->_assert_lookup($config, 'clusters', $name, 'no cluster name given');
     my $cluster = $self->_find_by_name($config->{clusters}, $name)
         or croak "Cluster not found: $name";
     return $cluster->{cluster};
@@ -202,6 +225,7 @@ sub user {
 
     my $config = $self->_config
         or croak $self->_not_found_error;
+    $self->_assert_lookup($config, 'users', $name, 'no user name given');
     my $user = $self->_find_by_name($config->{users}, $name)
         or croak "User not found: $name";
     return $user->{user};
@@ -353,7 +377,7 @@ Kubernetes::REST::Kubeconfig - Parse kubeconfig files and create Kubernetes::RES
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 SYNOPSIS
 
@@ -480,19 +504,19 @@ Returns an arrayref of all available context names from the kubeconfig, or from 
     my $ctx = $kc->context;
     my $ctx = $kc->context('production');
 
-Look up a context entry by name and return its C<context> hashref (with C<cluster>, C<user>, and optional C<namespace> keys). Defaults to C<current_context_name> when C<$name> is omitted. Croaks if the context is not found.
+Look up a context entry by name and return its C<context> hashref (with C<cluster>, C<user>, and optional C<namespace> keys). Defaults to C<current_context_name> when C<$name> is omitted. Croaks if the context is not found, and, before it gets that far, with a message naming the kubeconfig if the kubeconfig defines no contexts at all or has no C<current-context> to fall back to.
 
 =head2 cluster
 
     my $cluster = $kc->cluster('prod-cluster');
 
-Look up a cluster entry by name and return its C<cluster> hashref (with keys such as C<server>, C<certificate-authority>/C<certificate-authority-data>, and C<insecure-skip-tls-verify>). Croaks if the cluster is not found.
+Look up a cluster entry by name and return its C<cluster> hashref (with keys such as C<server>, C<certificate-authority>/C<certificate-authority-data>, and C<insecure-skip-tls-verify>). Croaks if the cluster is not found, and, before it gets that far, with a message naming the kubeconfig if the kubeconfig defines no clusters at all or no name was given.
 
 =head2 user
 
     my $user = $kc->user('token-user');
 
-Look up a user entry by name and return its C<user> hashref (with keys such as C<token>, C<client-certificate>/C<client-certificate-data>, C<client-key>/C<client-key-data>, or C<exec>). Croaks if the user is not found.
+Look up a user entry by name and return its C<user> hashref (with keys such as C<token>, C<client-certificate>/C<client-certificate-data>, C<client-key>/C<client-key-data>, or C<exec>). Croaks if the user is not found, and, before it gets that far, with a message naming the kubeconfig if the kubeconfig defines no users at all or no name was given.
 
 =head2 api
 
@@ -585,8 +609,8 @@ the first request after the rotation.
 
 What "changed" means, and what it costs, is
 L<Kubernetes::REST::AuthTokenFile/token>: one C<stat> per request, comparing
-inode, size and modification time, so the C<..data> symlink swap the kubelet
-performs is seen as the different file it is. A read that fails after a
+device, inode, size and modification time, so the C<..data> symlink swap the
+kubelet performs is seen as the different file it is. A read that fails after a
 successful one - the file gone for a moment mid-rotation - keeps the last good
 token rather than breaking the client. Only the first read, when the client is
 built, is fatal.

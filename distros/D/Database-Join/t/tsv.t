@@ -256,4 +256,135 @@ subtest 'add_database: TSV-backed secondary DA added at runtime' => sub {
 	is $rows->[0]{score}, $SCORE_A2,   'A2 score from TSV secondary after add_database';
 };
 
+# ===========================================================================
+# S9: SQLite backend with TSV-backed sources -- left join
+# TSV DAs use the regular fetch path (not dbi_source() ATTACH) because
+# DBD::CSV is not a SQLite driver.  The SQLite backend spills the fetched
+# rows into a temp file and executes the JOIN there.  Results must be
+# identical to the in-memory (array) path.
+# ===========================================================================
+
+SKIP: {
+	eval { require DBD::SQLite };
+	skip 'DBD::SQLite required for SQLite backend tests', 5 if $@;
+
+	subtest 'SQLite backend: left join over TSV-backed sources' => sub {
+		my $join = Database::Join->new(
+			databases   => [$da_a, $da_b],
+			join_column => 'entry',
+			backend     => 'sqlite',
+		);
+
+		my $rows = $join->selectall_arrayref();
+		is scalar @{$rows}, 3, 'SQLite backend left join: 3 rows (A1, A2, A3)';
+
+		my %by_key = map { $_->{entry} => $_ } @{$rows};
+		ok  exists $by_key{$KEY_A1}, 'A1 present';
+		ok  exists $by_key{$KEY_A3}, 'A3 present (primary-only)';
+		ok !exists $by_key{$KEY_A4}, 'A4 absent (secondary-only in left join)';
+
+		is $by_key{$KEY_A1}{name},  $NAME_A1,  'A1 name correct';
+		is $by_key{$KEY_A1}{score}, $SCORE_A1, 'A1 score correct';
+		ok !defined $by_key{$KEY_A3}{score}, 'A3 score undef (no secondary row)';
+	};
+
+	# =========================================================================
+	# S10: SQLite backend with TSV sources -- result identity vs. array path
+	# =========================================================================
+
+	subtest 'SQLite backend: TSV results identical to array path' => sub {
+		my $join_array = Database::Join->new(
+			databases   => [$da_a, $da_b],
+			join_column => 'entry',
+			backend     => 'array',
+		);
+		my $join_sqlite = Database::Join->new(
+			databases   => [$da_a, $da_b],
+			join_column => 'entry',
+			backend     => 'sqlite',
+		);
+
+		my $rows_a = $join_array->selectall_arrayref();
+		my $rows_s = $join_sqlite->selectall_arrayref();
+
+		is scalar @{$rows_s}, scalar @{$rows_a}, 'same row count from both backends';
+
+		my @sorted_a = sort { $a->{entry} cmp $b->{entry} } @{$rows_a};
+		my @sorted_s = sort { $a->{entry} cmp $b->{entry} } @{$rows_s};
+
+		for my $i (0 .. $#sorted_a) {
+			for my $col (keys %{$sorted_a[$i]}) {
+				is $sorted_s[$i]{$col}, $sorted_a[$i]{$col},
+					"TSV row[$i].$col matches between array and sqlite backends";
+			}
+		}
+	};
+
+	# =========================================================================
+	# S11: SQLite backend with TSV sources -- inner join
+	# =========================================================================
+
+	subtest 'SQLite backend: inner join over TSV-backed sources' => sub {
+		my $join = Database::Join->new(
+			databases   => [$da_a, $da_b],
+			join_column => 'entry',
+			backend     => 'sqlite',
+			join_type   => 'inner',
+		);
+
+		my $rows = $join->selectall_arrayref();
+		is scalar @{$rows}, 2, 'SQLite backend inner join: 2 rows (A1, A2)';
+
+		my %by_key = map { $_->{entry} => $_ } @{$rows};
+		ok  exists $by_key{$KEY_A1}, 'A1 present (in both)';
+		ok  exists $by_key{$KEY_A2}, 'A2 present (in both)';
+		ok !exists $by_key{$KEY_A3}, 'A3 absent (primary-only)';
+		ok !exists $by_key{$KEY_A4}, 'A4 absent (secondary-only)';
+	};
+
+	# =========================================================================
+	# S12: SQLite backend with TSV sources -- outer join
+	# =========================================================================
+
+	subtest 'SQLite backend: outer join over TSV-backed sources' => sub {
+		my $join = Database::Join->new(
+			databases   => [$da_a, $da_b],
+			join_column => 'entry',
+			backend     => 'sqlite',
+			join_type   => 'outer',
+		);
+
+		my $rows = $join->selectall_arrayref();
+		is scalar @{$rows}, 4, 'SQLite backend outer join: 4 rows (A1-A4)';
+
+		my %by_key = map { $_->{entry} => $_ } @{$rows};
+		ok  exists $by_key{$KEY_A3}, 'A3 present (primary-only)';
+		ok  exists $by_key{$KEY_A4}, 'A4 present (secondary-only)';
+		ok !defined $by_key{$KEY_A4}{name},  'A4 name undef';
+		ok !defined $by_key{$KEY_A3}{score}, 'A3 score undef';
+		is $by_key{$KEY_A4}{score}, $SCORE_A4, 'A4 score correct';
+	};
+
+	# =========================================================================
+	# S13: SQLite backend with TSV sources -- fetchrow_hashref
+	# =========================================================================
+
+	subtest 'SQLite backend: fetchrow_hashref with TSV-backed sources' => sub {
+		my $join = Database::Join->new(
+			databases   => [$da_a, $da_b],
+			join_column => 'entry',
+			backend     => 'sqlite',
+		);
+
+		my $row = $join->fetchrow_hashref(entry => $KEY_A1);
+		ok  defined $row,              'fetchrow_hashref returned a row';
+		is  $row->{name},  $NAME_A1,   'name from primary TSV';
+		is  $row->{tier},  $TIER_A1,   'tier from primary TSV';
+		is  $row->{score}, $SCORE_A1,  'score from secondary TSV';
+
+		my $none = $join->fetchrow_hashref(entry => 'NOKEY');
+		ok !defined $none, 'fetchrow_hashref returns undef for missing key';
+	};
+}
+
 done_testing();

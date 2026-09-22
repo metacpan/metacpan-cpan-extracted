@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::MutatingAdmissionPolicy;
 # ABSTRACT: MutatingAdmissionPolicy describes the definition of an admission mutation policy that mutates the object coming into admission chain.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -20,7 +20,7 @@ IO::K8s::Api::Admissionregistration::V1::MutatingAdmissionPolicy - MutatingAdmis
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ spec defines the desired behavior of the MutatingAdmissionPolicy.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#mutatingadmissionpolicy-v1-admissionregistration.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#mutatingadmissionpolicy-v1-admissionregistration.k8s.io>
 
 =head1 SUPPORT
 

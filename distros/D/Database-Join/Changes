@@ -1,5 +1,40 @@
 Revision history for Database::Join
 
+0.005.0	Mon Sep 21 02:13:04 PM EDT 2026
+	[ Enhancements ]
+	- SQLite backend now caches the spilled temporary database across query
+	  calls on the same Database::Join object.  Source data is spilled once
+	  at first use; subsequent selectall_arrayref / fetchrow_hashref / count
+	  calls reuse the same File::Temp SQLite file and DBI handle.  The cache
+	  is invalidated automatically when any source database's updated()
+	  timestamp changes, or when add_database() is called.
+	- Query-time criteria are no longer applied at spill time.  They are
+	  translated into parameterised SQL WHERE clauses (bind values, not
+	  string interpolation) and applied per-call against the cached data.
+	  This means the cached tables are query-agnostic and serve any
+	  combination of criteria without rebuilding.
+	- Zero-copy ATTACH (dbi_source() path) is now unconditional: the
+	  previous restriction that prevented ATTACH when query-time criteria
+	  existed has been removed.  Criteria for ATTACHed sources go into the
+	  SQL WHERE clause alongside criteria for spilled sources.
+	- Add %SAFE_SQL_OPS constant to gate operator-hashref interpolation
+	  into WHERE clauses (>, <, >=, <=, !=, =), preventing SQL injection
+	  from caller-supplied operator hashrefs.
+	- DESTROY now disconnects the cached DBI handle and releases the
+	  File::Temp object, ensuring the temp file is removed when the
+	  Database::Join object goes out of scope.
+	- add_database() now invalidates the SQLite cache so the next query
+	  picks up the new source.
+	- _cache_fresh :Protected helper added; _build_sqlite_cache :Protected
+	  helper added (formerly inline in _sqlite_join).
+	- Update t/sqlite-backend.t: S12 (temp file cleanup) updated to match
+	  new lifetime semantics; add S16 (cache reuse verified by DA call
+	  counts), S17 (cache invalidation via UpdatableDA), S18 (ATTACH with
+	  query-time criteria now produces correct filtered results).
+	- Update POD: LIMITATIONS, COMMON PITFALLS, and backend section
+	  updated to document per-object cache lifetime, cache invalidation
+	  rules, and %SAFE_SQL_OPS operator gating.
+
 0.004.0	Fri Sep 18 08:27:22 PM EDT 2026
 	[ Enhancements ]
 	- Add SQLite-backed join backend (backend => 'sqlite' | 'auto' | 'array').

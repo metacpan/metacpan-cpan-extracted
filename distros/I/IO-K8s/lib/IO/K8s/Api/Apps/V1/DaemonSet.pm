@@ -1,11 +1,11 @@
 package IO::K8s::Api::Apps::V1::DaemonSet;
 # ABSTRACT: DaemonSet represents the configuration of a daemon set.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
 
-k8s spec => 'Apps::V1::DaemonSetSpec';
+k8s spec => 'Apps::V1::DaemonSetSpec', 'required';
 
 
 k8s status => 'Apps::V1::DaemonSetStatus';
@@ -24,7 +24,7 @@ IO::K8s::Api::Apps::V1::DaemonSet - DaemonSet represents the configuration of a 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ The current status of this daemon set. This data may be out of date by some wind
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#daemonset-v1-apps>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#daemonset-v1-apps>
 
 =head1 SUPPORT
 

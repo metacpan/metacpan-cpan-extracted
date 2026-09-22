@@ -10,11 +10,20 @@
 #include "XSUB.h"
 #include "ppport.h"
 #include <string.h>
-#include <ctype.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <math.h>
+/*No <ctype.h>: every classification in this file is ASCII by definition -- an
+element symbol, a residue name, a one-letter code, a CIF keyword -- and the
+ctype.h functions answer for the locale perl set from the environment at
+startup.  In a Latin-1 locale isalpha() calls an accented byte a letter, so a
+stray one in the atom name column guesses an element that is not ASCII; in a
+Turkish one tolower('I') is not 'i', so cif_iskw() stops recognising an mmCIF
+file whose tags are written in capitals.  perl's toUPPER(), toLOWER(),
+isALPHA() and isDIGIT() (handy.h, and ASCII-only on every non-EBCDIC build
+since long before 5.10) do not consult the locale.  The two read a directory of
+PDBbind in the same time to the noise, so what this buys is the locale and not
+speed.*/
 /*Chem::Structure::Parser -- the parts of reading a PDB file worth doing in C.
 
 A PDB file is one record per line with every field at a fixed column range
@@ -139,7 +148,7 @@ static U32 res_key(const char *CSP_RESTRICT s, STRLEN len)
 	while (len && (s[len - 1] == ' ' || s[len - 1] == '\t')) len--;
 	if (len == 0 || len > 3) return 0;
 	b[0] = b[1] = b[2] = ' ';
-	for (i = 0; i < len; i++) b[3 - len + i] = (char)toupper((unsigned char)s[i]);
+	for (i = 0; i < len; i++) b[3 - len + i] = (char)toUPPER((unsigned char)s[i]);
 	return K3((unsigned char)b[0], (unsigned char)b[1], (unsigned char)b[2]);
 }
 
@@ -296,7 +305,7 @@ static const char *aa1to3_lookup(const char *CSP_RESTRICT s, STRLEN len)
 	while (len && (*s == ' ' || *s == '\t')) { s++; len--; }
 	while (len && (s[len - 1] == ' ' || s[len - 1] == '\t')) len--;
 	if (len != 1) return NULL;
-	int c = toupper((unsigned char)*s);
+	int c = toUPPER((unsigned char)*s);
 	if (c < 'A' || c > 'Z') return NULL;
 	return aa1to3_name[c - 'A'];
 }
@@ -351,7 +360,7 @@ static bool str2iv(const char *CSP_RESTRICT s, STRLEN n, IV *CSP_RESTRICT out)
 	limit = neg ? (UV)IV_MAX + 1 : (UV)IV_MAX;
 	for (; i < n; i++) {
 		UV d;
-		if (!isdigit((unsigned char)s[i])) return FALSE;
+		if (!isDIGIT((unsigned char)s[i])) return FALSE;
 		d = (UV)(s[i] - '0');
 		if (v > (limit - d) / 10) return FALSE;
 		v = v * 10 + d;
@@ -525,22 +534,22 @@ static STRLEN guess_element(const char *CSP_RESTRICT raw, STRLEN rawlen,
 	file becomes mercury.*/
 	if (rawlen >= 4 && raw[0] != ' ' && raw[1] != ' ' && raw[2] != ' ' && raw[3] != ' '
 	    && (raw[0] == 'H' || raw[0] == 'D' || raw[0] == 'h' || raw[0] == 'd')) {
-		buf[0] = (char)toupper((unsigned char)raw[0]);
+		buf[0] = (char)toUPPER((unsigned char)raw[0]);
 		return 1;
 	}
 	/*a name that starts in column 13 with two letters is a two-letter element
 	(FE, ZN, CL, MG); a digit there is a hydrogen count (1HB)*/
-	if (raw[0] != ' ' && isalpha((unsigned char)raw[0])
-	    && rawlen >= 2 && isalpha((unsigned char)raw[1])) {
-		buf[0] = (char)toupper((unsigned char)raw[0]);
-		buf[1] = (char)toupper((unsigned char)raw[1]);
+	if (raw[0] != ' ' && isALPHA((unsigned char)raw[0])
+	    && rawlen >= 2 && isALPHA((unsigned char)raw[1])) {
+		buf[0] = (char)toUPPER((unsigned char)raw[0]);
+		buf[1] = (char)toUPPER((unsigned char)raw[1]);
 		return 2;
 	}
 	{	//otherwise the first letter in the field is the element
 		STRLEN i;
 		for (i = 0; i < rawlen; i++) {
-			if (isalpha((unsigned char)raw[i])) {
-				buf[0] = (char)toupper((unsigned char)raw[i]);
+			if (isALPHA((unsigned char)raw[i])) {
+				buf[0] = (char)toUPPER((unsigned char)raw[i]);
 				return 1;
 			}
 		}
@@ -599,7 +608,7 @@ static void elem_case(char *CSP_RESTRICT buf, STRLEN n)
 		case K2('B','H'): case K2('H','S'): case K2('M','T'): case K2('D','S'):
 		case K2('R','G'): case K2('C','N'): case K2('N','H'): case K2('F','L'):
 		case K2('M','C'): case K2('L','V'): case K2('T','S'): case K2('O','G'):
-			buf[1] = (char)tolower((unsigned char)buf[1]);
+			buf[1] = (char)toLOWER((unsigned char)buf[1]);
 			break;
 		default: break; //not a symbol: leave it as the file wrote it
 	}
@@ -821,7 +830,7 @@ static HV *parse_buf(pTHX_ const char *CSP_RESTRICT buf, STRLEN len, HV *CSP_RES
 			if (ellen) {
 				STRLEN k;
 				if (ellen > 2) ellen = 2;
-				for (k = 0; k < ellen; k++) elbuf[k] = (char)toupper((unsigned char)s[k]);
+				for (k = 0; k < ellen; k++) elbuf[k] = (char)toUPPER((unsigned char)s[k]);
 	/*and not believed unless it spells an element.  A file written
 	before the element column existed keeps the entry id in columns
 	73-80 instead, so what sits where the element goes is '1G' and
@@ -829,7 +838,7 @@ static HV *parse_buf(pTHX_ const char *CSP_RESTRICT buf, STRLEN len, HV *CSP_RES
 	hydrogens => 0 from finding the hydrogens.  A field that is not
 	letters is not an element, and the atom name knows better.*/
 				for (k = 0; k < ellen; k++) {
-					if (!isALPHA(elbuf[k])) { ellen = 0; break; }
+					if (!isALPHA((unsigned char)elbuf[k])) { ellen = 0; break; }
 				}
 			}
 			if (!ellen) ellen = guess_element(nm_raw, nm_rawlen, elbuf);
@@ -1145,7 +1154,7 @@ static bool cif_iskw(const char *CSP_RESTRICT s, STRLEN n, const char *CSP_RESTR
 	STRLEN i;
 	if (n < kwn) return FALSE;
 	for (i = 0; i < kwn; i++)
-		if (tolower((unsigned char)s[i]) != kw[i]) return FALSE;
+		if (toLOWER((unsigned char)s[i]) != kw[i]) return FALSE;
 	return TRUE;
 }
 
@@ -1405,13 +1414,22 @@ static void cif_atom_row(pTHX_ cif_state *CSP_RESTRICT st,
 	alt_s = v[A_ALT] ? v[A_ALT] : "";
 	alt_n = v[A_ALT] ? vn[A_ALT] : 0;
 
+	ellen = 0;
 	if (v[A_SYMBOL]) {
 		STRLEN k;
 		ellen = vn[A_SYMBOL] > 2 ? 2 : vn[A_SYMBOL];
-		for (k = 0; k < ellen; k++) elbuf[k] = (char)toupper((unsigned char)v[A_SYMBOL][k]);
-	} else {
-		ellen = cif_guess_element(nm_s, nm_n, elbuf);
+		for (k = 0; k < ellen; k++) elbuf[k] = (char)toUPPER((unsigned char)v[A_SYMBOL][k]);
+	/*and not believed unless it spells an element, which is the rule parse_buf()
+	applies to columns 77-80: a file converted from a pre-1996 entry carries that
+	entry's id where the element goes ('1G' in pdb1gdr), and a type_symbol
+	written as an empty string rather than as '.' or '?' is a null field that
+	looks like a value.  Either way the atom name knows better, and the PDB
+	reader would have guessed -- which is the answer the two formats owe each
+	other.*/
+		for (k = 0; k < ellen; k++)
+			if (!isALPHA((unsigned char)elbuf[k])) { ellen = 0; break; }
 	}
+	if (!ellen) ellen = cif_guess_element(nm_s, nm_n, elbuf);
 	//settled, and spelled as the PDB reader spells it; see elem_case()
 	elem_case(elbuf, ellen);
 	if (!st->keep_h && ellen == 1 && (elbuf[0] == 'H' || elbuf[0] == 'D')) {
@@ -1547,7 +1565,7 @@ static SV *cif_key(pTHX_ const char *CSP_RESTRICT s, STRLEN n)
 	SV *sv = newSVpvn(s, n);
 	char *CSP_RESTRICT p = SvPVX(sv);
 	STRLEN i;
-	for (i = 0; i < n; i++) p[i] = (char)tolower((unsigned char)p[i]);
+	for (i = 0; i < n; i++) p[i] = (char)toLOWER((unsigned char)p[i]);
 	return sv;
 }
 
@@ -1823,33 +1841,55 @@ static HV *parse_cif_buf(pTHX_ const char *CSP_RESTRICT buf, STRLEN len, HV *CSP
 }
 
 /*slurp() -- read the whole file.  Chunked rather than stat-then-read so that
-a named pipe or /dev/stdin works the same as a file on disk.*/
+a named pipe or /dev/stdin works the same as a file on disk.
+
+Read through PerlIO, not stdio, so the file goes through the same layer perl's
+own opens do on whatever this was built for.  The mode is "rb": PerlIOBase_pushed()
+clears PERLIO_F_CRLF for a mode with a `b' in it, which is what keeps a Windows
+build from translating line endings under the fixed-column reader.  The buffered
+layer copies the file once more than glibc's fread() does, which on 2wy2 -- the
+33 MB largest entry in PDBbind v2020 -- is 1 ms of a 23 ms read (best of seven,
+warm cache) and nothing measurable on an ordinary entry.
+
+A directory is refused before the open, because what happens when one is read is
+not the same on two systems: glibc opens it and fails the first fread() with
+EISDIR, Windows will not open it at all, and NetBSD hands back the raw directory
+blocks, which parse as a structure with nothing in it -- a silent empty answer
+for what is always a mistake.  Both of the others came back as t/errors.t
+failures from 0.031 smokers (Strawberry 5.42.0 on Win2012, and perl 5.42.3 on
+NetBSD 11).  structure_info() rejects a directory in Perl before it ever gets
+here; this is the same complaint for a caller that reached past it.*/
 static char *slurp(pTHX_ const char *CSP_RESTRICT path, STRLEN *CSP_RESTRICT lenp)
 {
-	FILE *CSP_RESTRICT fh = fopen(path, "rb");
+	//no CSP_RESTRICT on fh: it is perl-managed, and the layers below it alias it
+	PerlIO *fh;
 	char *CSP_RESTRICT buf;
+	Stat_t st;
 	/*1 MB to start and doubling from there: an ordinary entry is one
 	allocation, and the 33 MB largest in PDBbind v2020 is six.*/
 	STRLEN cap = 1 << 20, len = 0;
+	if (PerlLIO_stat(path, &st) == 0 && S_ISDIR(st.st_mode))
+		croak("Chem::Structure::Parser: cannot read '%s': it is a directory", path);
+	fh = PerlIO_open(path, "rb");
 	if (!fh) croak("Chem::Structure::Parser: cannot read '%s': %s", path, Strerror(errno));
 	Newx(buf, cap, char);
 	for (;;) {
-		size_t got;
+		SSize_t got;
 		if (len == cap) {
 			cap *= 2;
 			Renew(buf, cap, char);
 		}
-		got = fread(buf + len, 1, cap - len, fh);
-		len += got;
-		if (got == 0) break;
+		got = PerlIO_read(fh, buf + len, cap - len);
+		if (got <= 0) break; // 0 is end of file, -1 an error PerlIO_error() reports
+		len += (STRLEN)got;
 	}
-	if (ferror(fh)) {
+	if (PerlIO_error(fh)) {
 		int e = errno;
 		Safefree(buf);
-		fclose(fh);
+		PerlIO_close(fh);
 		croak("Chem::Structure::Parser: error reading '%s': %s", path, Strerror(e));
 	}
-	fclose(fh);
+	PerlIO_close(fh);
 	*lenp = len;
 	return buf;
 }
@@ -2009,9 +2049,9 @@ static bool elem_prop_of(const char *CSP_RESTRICT s, STRLEN len,
 	while (len && (s[len - 1] == ' ' || s[len - 1] == '\t')) len--;
 	if (len == 0 || len > 2) return FALSE;
 	key = (len == 1)
-	    ? K2((unsigned char)toupper((unsigned char)s[0]), 0)
-	    : K2((unsigned char)toupper((unsigned char)s[0]),
-	         (unsigned char)toupper((unsigned char)s[1]));
+	    ? K2((unsigned char)toUPPER((unsigned char)s[0]), 0)
+	    : K2((unsigned char)toUPPER((unsigned char)s[0]),
+	         (unsigned char)toUPPER((unsigned char)s[1]));
 	switch (key) {
 		case K2('B',0):       r =   1.92; m = 10.8117;     break;
 		case K2('C',0):       r =   1.70; m = 12.01078;    break;
@@ -2706,6 +2746,20 @@ typedef struct {
 	const unsigned char *CSP_RESTRICT only;
 } sasa_aux;
 
+/*How long a neighbour list may be and still be worth sorting.  141 is the
+longest over a 405-structure spread of PDBbind v2020 and the low tens is the
+ordinary length, so 512 is three and a half times anything a real structure
+produced, and a list that short is sorted for far less than the thousand sphere
+points the order goes on to shorten.
+
+The cap is not tidiness.  The sort is quadratic in the length of the list, and
+nothing about a *file* bounds that length: 3,000 atoms scattered through a 6 A
+ball -- which is what an unmodelled ligand or a badly converted model looks
+like -- makes every atom a neighbour of nearly every other, and the surface of
+it goes from 0.12 s to 8.3 s with the sort left uncapped.  With the cap it is
+0.10 s, and the answer is the same NV in all three cases.*/
+#define SASA_SORT_MAX 512
+
 /*sasa_compute() -- Shrake and Rupley, as mdtraj computes it.
 
 Each atom gets a sphere of npts points at its van der Waals radius plus the
@@ -2728,6 +2782,16 @@ on the spiral are close together, so the atom that covered the last one is the
 one most likely to cover this one, and starting the scan there rather than at
 the beginning is most of the kernel's speed.
 
+The list is also sorted by how near the neighbour is before the points are
+walked, which the rotation does not make redundant: the rotation says where to
+start, the order says what to try next, and a nearer neighbour hides more of
+the sphere and so is likelier to end the scan.  Only which neighbour is found
+first changes -- acc counts the points that no neighbour covers at all -- so
+the area is the same NV to the last bit.  That is what was checked rather than
+argued: over a 60-structure spread of PDBbind v2020, all 369,621 atom, residue
+and chain surfaces printed as %.17g compare byte for byte, and the surface of
+40 of them goes from 4.64 s to 4.24 s, best of three.
+
 The neighbours are copied out of the coordinate arrays rather than kept as
 indices into them, with the square of each one's radius worked out while it is
 being copied.  The innermost loop is the whole cost of the surface -- it runs
@@ -2746,7 +2810,7 @@ static void sasa_kernel(pTHX_ const NV *CSP_RESTRICT x, const NV *CSP_RESTRICT y
 	grown by doubling as needed.  64 covers every atom of a protein, where the
 	neighbour count runs to the low tens, without a single reallocation.*/
 	NV *CSP_RESTRICT nx = NULL, *CSP_RESTRICT ny = NULL, *CSP_RESTRICT nz = NULL;
-	NV *CSP_RESTRICT nr2 = NULL;
+	NV *CSP_RESTRICT nr2 = NULL, *CSP_RESTRICT nd2 = NULL;
 	UV nbr_cap = 64;
 	cell_grid g;
 	NV rmax = 0.0, constant;
@@ -2758,6 +2822,7 @@ static void sasa_kernel(pTHX_ const NV *CSP_RESTRICT x, const NV *CSP_RESTRICT y
 	Newx(ny,  nbr_cap, NV);
 	Newx(nz,  nbr_cap, NV);
 	Newx(nr2, nbr_cap, NV);
+	Newx(nd2, nbr_cap, NV);
 	constant = 4.0 * CSP_PI / (NV)npts;
 
 	for (UV i = 0; i < n; i++) {
@@ -2779,25 +2844,52 @@ static void sasa_kernel(pTHX_ const NV *CSP_RESTRICT x, const NV *CSP_RESTRICT y
 			UV p;
 			for (p = g.start[c]; p < g.start[c + 1]; p++) {
 				UV a = g.idx[p];
-				NV dx, dy, dz, sum;
+				NV dx, dy, dz, sum, d2;
 				if (a == i) continue;
 				dx = x[a] - xi; dy = y[a] - yi; dz = z[a] - zi;
 				sum = ri + rad[a];
-				if (dx * dx + dy * dy + dz * dz >= sum * sum) continue;
+				d2 = dx * dx + dy * dy + dz * dz;
+				if (d2 >= sum * sum) continue;
 				if (n_nbr == nbr_cap) {
 					nbr_cap *= 2;
 					Renew(nx,  nbr_cap, NV);
 					Renew(ny,  nbr_cap, NV);
 					Renew(nz,  nbr_cap, NV);
 					Renew(nr2, nbr_cap, NV);
+					Renew(nd2, nbr_cap, NV);
 				}
 				nx[n_nbr] = x[a]; ny[n_nbr] = y[a]; nz[n_nbr] = z[a];
 				nr2[n_nbr] = rad[a] * rad[a];
+				//kept for the sort below, and already worked out for the test above
+				nd2[n_nbr] = d2;
 				n_nbr++;
 				//a neighbour in another chain is what makes this atom's surface
 				//depend on that chain being there
 				if (aux && aux->cross && aux->chain_of[a] != aux->chain_of[i])
 					aux->cross[i] = 1;
+			}
+		}
+	/*nearest neighbour first.  An insertion sort and not qsort(): the list
+	runs to the low tens, where the call through a comparison pointer costs
+	more than the loop it would be speeding up.
+
+	Skipped above SASA_SORT_MAX, where that sort would be the cost rather than
+	the saving: it is quadratic in the length of the list, and the length is
+	bounded by physics only as long as the file describes a structure.  A file
+	that writes thousands of atoms on one coordinate -- an unmodelled ligand
+	left at the origin -- has no such bound, and there the first neighbour tried
+	covers every point already, so there is nothing for an order to save.*/
+		if (n_nbr <= SASA_SORT_MAX) {
+			UV q;
+			for (q = 1; q < n_nbr; q++) {
+				const NV kx = nx[q], ky = ny[q], kz = nz[q], kr = nr2[q], kd = nd2[q];
+				UV w = q;
+				while (w && nd2[w - 1] > kd) {
+					nx[w]  = nx[w - 1];  ny[w]  = ny[w - 1]; nz[w] = nz[w - 1];
+					nr2[w] = nr2[w - 1]; nd2[w] = nd2[w - 1];
+					w--;
+				}
+				nx[w] = kx; ny[w] = ky; nz[w] = kz; nr2[w] = kr; nd2[w] = kd;
 			}
 		}
 		for (j = 0; j < npts; j++) {
@@ -2821,7 +2913,7 @@ static void sasa_kernel(pTHX_ const NV *CSP_RESTRICT x, const NV *CSP_RESTRICT y
 		}
 		area[i] = (NV)acc * constant * ri * ri;
 	}
-	Safefree(nx); Safefree(ny); Safefree(nz); Safefree(nr2);
+	Safefree(nx); Safefree(ny); Safefree(nz); Safefree(nr2); Safefree(nd2);
 	grid_free(aTHX_ &g);
 }
 
@@ -5349,8 +5441,8 @@ static bool dssp_is_polymer(pTHX_ HV *CSP_RESTRICT res)
 
 static void dssp_segments(pTHX_ structset *CSP_RESTRICT s, UV *CSP_RESTRICT seg)
 {
-	UV c, r, k = 0;
-	for (c = 0; c < s->n_chain; c++) {
+	UV r, k = 0;
+	for (UV c = 0; c < s->n_chain; c++) {
 		UV first = s->chain_first[c], last = s->chain_last[c], cut = first;
 		for (r = first; r < last; r++)
 			if (dssp_is_polymer(aTHX_ s->res_hv[r])) cut = r + 1;
@@ -5385,9 +5477,7 @@ of this block, refusing to place it changes no letter.*/
 static void dssp_read(pTHX_ structset *CSP_RESTRICT s, dssp_res *CSP_RESTRICT bb,
                       const UV *CSP_RESTRICT seg)
 {
-	UV r;
-	unsigned short int k;
-	for (r = 0; r < s->n_res; r++) {
+	for (UV r = 0; r < s->n_res; r++) {
 		HV *at = hvf_hv(aTHX_ s->res_hv[r], "atoms", 5);
 		dssp_res *b = &bb[r];
 		NV x, y, z;
@@ -5412,7 +5502,7 @@ static void dssp_read(pTHX_ structset *CSP_RESTRICT s, dssp_res *CSP_RESTRICT bb
 		}
 		b->whole = b->has_n && b->has_ca && b->has_c && b->has_o;
 	}
-	for (r = 1; r < s->n_res; r++) {
+	for (UV r = 1; r < s->n_res; r++) {
 		dssp_res *b = &bb[r];
 		const dssp_res *p = &bb[r - 1];
 		float co[3], len;
@@ -5421,9 +5511,9 @@ static void dssp_read(pTHX_ structset *CSP_RESTRICT s, dssp_res *CSP_RESTRICT bb
 		dssp_sub3(p->c, p->o, co);
 		len = (float)sqrt((double)dssp_dot3(co, co));
 		if (!(len > 0.0f)) continue;
-		for (k = 0; k < 3; k++) {
-			//one step per named float, so that each is rounded to float where
-			//it is in mdtraj, rather than a wider product reaching the sum
+		for (unsigned short int k = 0; k < 3; k++) {
+	//one step per named float, so that each is rounded to float where
+	//it is in mdtraj, rather than a wider product reaching the sum
 			float u = co[k] / len;
 			float step = u * DSSP_H;
 			b->h[k] = b->n[k] + step;
@@ -5482,14 +5572,14 @@ static void dssp_hbonds(pTHX_ structset *CSP_RESTRICT s, const dssp_res *CSP_RES
 	NV *CSP_RESTRICT cx = NULL, *CSP_RESTRICT cy = NULL, *CSP_RESTRICT cz = NULL;
 	UV *CSP_RESTRICT which = NULL;
 	cell_grid g;
-	UV n = 0, r;
+	UV n = 0;
 
-	for (r = 0; r < s->n_res * DSSP_KEEP; r++) { acc[r] = s->n_res; en[r] = 0.0f; }
+	for (UV r = 0; r < s->n_res * DSSP_KEEP; r++) { acc[r] = s->n_res; en[r] = 0.0f; }
 	if (s->n_res == 0) return;
 
 	Newx(cx, s->n_res, NV); Newx(cy, s->n_res, NV); Newx(cz, s->n_res, NV);
 	Newx(which, s->n_res, UV);
-	for (r = 0; r < s->n_res; r++) {
+	for (UV r = 0; r < s->n_res; r++) {
 		if (!bb[r].whole) continue;
 		cx[n] = (NV)bb[r].ca[0]; cy[n] = (NV)bb[r].ca[1]; cz[n] = (NV)bb[r].ca[2];
 		which[n] = r;
@@ -5521,11 +5611,11 @@ static void dssp_hbonds(pTHX_ structset *CSP_RESTRICT s, const dssp_res *CSP_RES
 					e = dssp_energy(&bb[j], &bb[i]);
 					if (e < DSSP_CUTOFF) dssp_store(s->n_res, acc, en, i, j, e);
 				}
-				/*The pair a residue makes with the one before it is not a bond
-				to test in that direction: j's hydrogen was placed from i's own
-				carbonyl, so the two are one peptide unit and the energy between
-				them is an artefact of having placed it.  mdtraj skips it as
-				rj == ri + 1 in its array, which is the same residue as this.*/
+	/*The pair a residue makes with the one before it is not a bond
+	to test in that direction: j's hydrogen was placed from i's own
+	carbonyl, so the two are one peptide unit and the energy between
+	them is an artefact of having placed it.  mdtraj skips it as
+	rj == ri + 1 in its array, which is the same residue as this.*/
 				if (j != i + 1 && bb[j].donor) {
 					e = dssp_energy(&bb[i], &bb[j]);
 					if (e < DSSP_CUTOFF) dssp_store(s->n_res, acc, en, j, i, e);
@@ -5579,12 +5669,11 @@ being so when two ladders are joined across a bulge, which is why the ends are
 kept rather than the runs.  n_i is the count the join does not disturb, and
 tells an isolated bridge from a ladder.*/
 typedef struct {
-	unsigned char type;   //BR_PARA or BR_ANTI
-	UV chain_i;           //the DSSP chain the i run is in; mdtraj's Bridge keeps
-	                      //the j run's as well and never reads it, so this does not
-	UV i_first, i_last, j_first, j_last;
-	UV n_i;
-	UV seq;               //the order it was found in, so the sort below is stable
+	unsigned char type; //BR_PARA or BR_ANTI
+	UV chain_i; //the DSSP chain the i run is in; mdtraj's Bridge keeps
+	                    //the j run's as well and never reads it, so this does not
+	UV i_first, i_last, j_first, j_last, n_i;
+	UV seq; //the order it was found in, so the sort below is stable
 } dssp_bridge;
 
 static int dssp_bridge_cmp(const void *pa, const void *pb)
@@ -5679,7 +5768,7 @@ static void dssp_sheets(pTHX_ UV n_res, const UV *CSP_RESTRICT seg,
 {
 	dssp_pair *CSP_RESTRICT cand = NULL;
 	dssp_bridge *CSP_RESTRICT br = NULL;
-	UV ncand, nbr = 0, cap = 0, c, x, y;
+	UV ncand, nbr = 0, cap = 0, c;
 
 	ncand = dssp_candidates(aTHX_ n_res, acc, &cand);
 	for (c = 0; c < ncand; c++) {
@@ -5687,7 +5776,7 @@ static void dssp_sheets(pTHX_ UV n_res, const UV *CSP_RESTRICT seg,
 		unsigned char type = dssp_test_bridge(n_res, seg, acc, j, i);
 		bool found = 0;
 		if (type == BR_NONE || !bb[i].whole || !bb[j].whole) continue;
-		for (x = 0; x < nbr; x++) {
+		for (UV x = 0; x < nbr; x++) {
 			if (type != br[x].type || i != br[x].i_last + 1) continue;
 			if (type == BR_PARA && br[x].j_last + 1 == j) {
 				br[x].i_last = i; br[x].j_last = j; br[x].n_i++;
@@ -5717,13 +5806,13 @@ static void dssp_sheets(pTHX_ UV n_res, const UV *CSP_RESTRICT seg,
 
 	//join the ladders a beta bulge separates
 	if (nbr > 1) qsort(br, (size_t)nbr, sizeof(dssp_bridge), dssp_bridge_cmp);
-	for (x = 0; x < nbr; x++) {
-		for (y = x + 1; y < nbr; y++) {
-			/*IV and not UV: mdtraj's are ints and three of the tests below are
-			written to be false when the difference comes out negative, which is
-			the ordinary case for two ladders that do not overlap.  Read at
-			unsigned width a negative difference is an enormous positive one and
-			every one of those tests flips.*/
+	for (UV x = 0; x < nbr; x++) {
+		for (UV y = x + 1; y < nbr; y++) {
+	/*IV and not UV: mdtraj's are ints and three of the tests below are
+	written to be false when the difference comes out negative, which is
+	the ordinary case for two ladders that do not overlap.  Read at
+	unsigned width a negative difference is an enormous positive one and
+	every one of those tests flips.*/
 			IV ibi = (IV)br[x].i_first, iei = (IV)br[x].i_last;
 			IV jbi = (IV)br[x].j_first, jei = (IV)br[x].j_last;
 			IV ibj = (IV)br[y].i_first, iej = (IV)br[y].i_last;
@@ -5752,7 +5841,7 @@ static void dssp_sheets(pTHX_ UV n_res, const UV *CSP_RESTRICT seg,
 		}
 	}
 
-	for (x = 0; x < nbr; x++) {
+	for (UV x = 0; x < nbr; x++) {
 		char lt = (br[x].n_i > 1) ? SS_STRAND : SS_BRIDGE;
 		UV r;
 		for (r = br[x].i_first; r <= br[x].i_last; r++)
@@ -6411,7 +6500,7 @@ static bool rmsd_wanted(pTHX_ short int sel, unsigned char rtype,
 		while (el && (*e == ' ' || *e == '\t')) { e++; el--; }
 		while (el && (e[el - 1] == ' ' || e[el - 1] == '\t')) el--;
 		if (el != 1) return TRUE;
-		c = toupper((unsigned char)*e);
+		c = toUPPER((unsigned char)*e);
 		return (c != 'H' && c != 'D');
 	}
 	if (rtype == RT_AA) {

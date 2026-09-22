@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::API::FloatingIPs;
 # ABSTRACT: Hetzner Cloud Floating IPs API
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::FloatingIP;
 use namespace::clean;
@@ -15,11 +16,14 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Role::HasActions';
+
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::FloatingIP->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -29,12 +33,20 @@ sub _wrap_list {
 }
 
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/floating_ips', params => \%params);
-    return $self->_wrap_list($result->{floating_ips} // []);
+    return ($self->_wrap_list($result->{floating_ips} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
 
 
 sub get {
@@ -63,7 +75,11 @@ sub create {
     $body->{labels}      = $params{labels}      if $params{labels};
 
     my $result = $self->client->post('/floating_ips', $body);
-    return $self->_wrap($result->{floating_ip});
+    return $self->_wrap(
+        $result->{floating_ip},
+        action       => $self->_wrap_action($result->{action}),
+        next_actions => $self->_wrap_actions($result->{next_actions}),
+    );
 }
 
 
@@ -94,9 +110,11 @@ sub assign {
     croak "Floating IP ID required" unless $id;
     croak "Server ID required" unless $server_id;
 
-    return $self->client->post("/floating_ips/$id/actions/assign", {
-        server => $server_id,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/floating_ips/$id/actions/assign", {
+            server => $server_id,
+        })->{action}
+    );
 }
 
 
@@ -104,7 +122,9 @@ sub unassign {
     my ($self, $id) = @_;
     croak "Floating IP ID required" unless $id;
 
-    return $self->client->post("/floating_ips/$id/actions/unassign", {});
+    return $self->_wrap_action(
+        $self->client->post("/floating_ips/$id/actions/unassign", {})->{action}
+    );
 }
 
 
@@ -114,10 +134,12 @@ sub change_dns_ptr {
     croak "IP required" unless $ip;
     croak "dns_ptr required" unless defined $dns_ptr;
 
-    return $self->client->post("/floating_ips/$id/actions/change_dns_ptr", {
-        ip      => $ip,
-        dns_ptr => $dns_ptr,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/floating_ips/$id/actions/change_dns_ptr", {
+            ip      => $ip,
+            dns_ptr => $dns_ptr,
+        })->{action}
+    );
 }
 
 
@@ -135,7 +157,7 @@ WWW::Hetzner::Cloud::API::FloatingIPs - Hetzner Cloud Floating IPs API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -171,6 +193,15 @@ All methods return L<WWW::Hetzner::Cloud::FloatingIP> objects.
     my $fips = $cloud->floating_ips->list(label_selector => 'env=prod');
 
 Returns arrayref of L<WWW::Hetzner::Cloud::FloatingIP> objects.
+
+=head2 list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
 
 =head2 get
 
@@ -260,7 +291,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

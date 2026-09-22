@@ -1580,18 +1580,6 @@ static void ws_handle_control(bqws_socket *ws, bqws_msg_imp *msg)
 
 	if (type == BQWS_MSG_CONTROL_CLOSE) {
 
-		/*
-		 * Upstream retains the incoming Close object for the automatic echo.
-		 * If control messages are also exposed, queue a distinct copy so the
-		 * application cannot free the object still owned by close_to_send.
-		 */
-		if (ws->recv_control_messages) {
-			bqws_msg_imp *copy = msg_alloc(ws, type, msg->msg.size);
-			if (!copy) return;
-			memcpy(copy->msg.data, msg->msg.data, msg->msg.size);
-			msg_to_enqueue = copy;
-		}
-
 		if (msg->msg.size == 1) {
 			msg_free_owned(ws, msg);
 			ws_fail(ws, BQWS_ERR_BAD_CLOSE);
@@ -1613,6 +1601,21 @@ static void ws_handle_control(bqws_socket *ws, bqws_msg_imp *msg)
 				ws_fail(ws, BQWS_ERR_BAD_UTF8);
 				return;
 			}
+		}
+
+		/*
+		 * Upstream retains the incoming Close object for the automatic echo.
+		 * Only copy a validated Close for application delivery. Allocating the
+		 * copy before validation leaks it on rejected Close frames.
+		 */
+		if (ws->recv_control_messages) {
+			bqws_msg_imp *copy = msg_alloc(ws, type, msg->msg.size);
+			if (!copy) {
+				msg_free_owned(ws, msg);
+				return;
+			}
+			memcpy(copy->msg.data, msg->msg.data, msg->msg.size);
+			msg_to_enqueue = copy;
 		}
 
 		bqws_mutex_lock(&ws->state.mutex);

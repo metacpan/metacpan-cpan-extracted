@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::Device;
 # ABSTRACT: Device represents one individual hardware instance that can be selected based on its attributes. Besides the name, exactly one field must be set.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s allNodes => Bool;
@@ -33,6 +33,9 @@ k8s name => Str, 'required';
 k8s nodeAllocatableResourceMappings => { 'Resource::V1::NodeAllocatableResourceMapping' => 1 };
 
 
+k8s nodeAllocatableResources => { 'Resource::V1::NodeAllocatableResource' => 1 };
+
+
 k8s nodeName => Str;
 
 
@@ -56,7 +59,7 @@ IO::K8s::Api::Resource::V1::Device - Device represents one individual hardware i
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 allNodes
 
@@ -103,6 +106,10 @@ Name is unique identifier among all devices managed by the driver in the pool. I
 NodeAllocatableResourceMappings defines the mapping of node resources that are managed by the DRA driver exposing this device. This includes resources currently reported in v1.Node C<status.allocatable> that are not extended resources. Examples include "cpu", "memory", "ephemeral-storage", and hugepages. In addition to standard requests made through the Pod C<spec>, these resources can also be requested through claims and allocated by the DRA driver.
 
 The keys of this map are the node-allocatable resource names (e.g., "cpu", "memory"). Extended resource names are not permitted as keys.
+
+=head2 nodeAllocatableResources
+
+NodeAllocatableResources defines the mapping of node resources that are managed by the DRA driver exposing this device. This includes resources currently reported in v1.Node `status.allocatable` that are not extended resources (see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#extended-resources). Examples include "cpu", "memory", "ephemeral-storage", and hugepages. In addition to standard requests made through the Pod `spec`, these resources can also be requested through claims and allocated by the DRA driver. For example, a CPU DRA driver might allocate exclusive CPUs or auxiliary node memory dependencies of an accelerator device. The keys of this map are the node-allocatable resource names (e.g., "cpu", "memory"). Extended resource names are not permitted as keys.
 
 =head2 nodeName
 

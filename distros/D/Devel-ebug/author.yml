@@ -16,6 +16,11 @@ pod_spelling_system:
    - keepio
    - codeline
    - codelines
+   - eg
+   - Ctrl
+   - SIGINT
+   - EXPR
+   - ret
 
 
 pod_coverage:

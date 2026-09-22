@@ -1,4 +1,4 @@
-package Affix::Build v1.2.5 {
+package Affix::Build v1.2.7 {
     use v5.40;
     use experimental qw[class try];
     use Config;
@@ -22,6 +22,8 @@ package Affix::Build v1.2.5 {
         # Global flags applied to all compilations of that type
         # cflags, cxxflags, ldflags, rustflags, etc.
         field $flags : param : reader //= {};
+        field $cc    : param : reader //= $ENV{AFFIX_CC}  // $Config{cc} // 'cc';
+        field $cxx   : param : reader //= $ENV{AFFIX_CXX} // '';
 
         # Internal State
         field @sources;
@@ -45,8 +47,12 @@ package Affix::Build v1.2.5 {
             $safe_name =~ s/[^\w.-]/_/g;
             $libname = $build_dir->child("$prefix$safe_name.$so_ext$suffix")->absolute;
 
+            # A C++ driver override defaults to the C++ sibling of the C compiler.
+            $cxx ||= $self->_is_msvc($cc) ? $cc : $cc =~ /clang/i ? 'clang++' : $cc =~ /gcc/ ? 'g++' : 'c++';
+
             # We prefer C++ drivers (g++, clang++) to handle standard libraries for mixed code (C+Rust, C+C++)
-            $linker = $self->_can_run(qw[g++ clang++ c++ icpx]) || $self->_can_run(qw[cc gcc clang icx cl]) || 'c++';
+            $linker = $self->_is_msvc($cc) ? ( $self->_can_run(qw[cl link]) // 'link' ) :
+                ( $self->_can_run(qw[g++ clang++ c++ icpx]) || $self->_can_run(qw[cc gcc clang icx cl]) || 'c++' );
 
             # Parse global flags...
             @cflags   = map { chomp; $_ } grep { defined && length } Text::ParseWords::parse_line( q/ /, 1, $flags->{cflags}   // '' );
@@ -116,13 +122,20 @@ package Affix::Build v1.2.5 {
             }
 
             # Link step
-            my @cmd = ($linker);
-            push @cmd, $os eq 'MSWin32' ? ('-shared') : ( '-shared', '-fPIC' );
-            push @cmd, '-Wl,--export-all-symbols' if $os eq 'MSWin32' && $linker =~ /gcc|g\+\+|clang/;
-            push @cmd, '-o', $libname->stringify;
+            my $msvc = $self->_is_msvc;
+            my @cmd  = ($linker);
+            if ($msvc) {
+                push @cmd, '/nologo', '/LD';
+            }
+            else {
+                push @cmd, $os eq 'MSWin32' ? ('-shared') : ( '-shared', '-fPIC' );
+                push @cmd, '-Wl,--export-all-symbols' if $os eq 'MSWin32' && $linker =~ /gcc|g\+\+|clang/;
+                push @cmd, '-o', $libname->stringify;
+            }
+            push @cmd, '/Fe' . $libname->stringify if $msvc;
 
             # MinGW Static Lib Fix: --whole-archive ensures unused symbols (like language runtimes) are kept
-            my $is_gcc = ( $linker =~ /gcc|g\+\+|clang/ || $Config{cc} =~ /gcc/ );
+            my $is_gcc = ( $linker =~ /gcc|g\+\+|clang/ || $cc =~ /gcc/ );
             foreach my $f (@files) {
                 my $p = "$f";
                 if ( $is_gcc && $p =~ /\Q$Config{_a}\E$/ ) {
@@ -198,12 +211,31 @@ package Affix::Build v1.2.5 {
             }
             return undef;
         }
+
+        # True when the given command (defaults to the C compiler) is MSVC 'cl'.
+        method _is_msvc ( $cmd = undef ) {
+            $cmd //= $cc;
+            return defined $cmd && $cmd =~ /(?:^|[\\\/])cl(?:\.exe)?$/i;
+        }
+
+        # Object/static-library extensions follow the active compiler, not perl's
+        # Config (Strawberry's Config reports .o/.a even when cl is selected).
+        method _obj_ext      { $self->_is_msvc ? '.obj' : $Config{_o} }
+        method _lib_ext      { $self->_is_msvc ? '.lib' : $Config{_a} }
         method _base ($file) { return $file->basename(qr/\.[^.]+$/); }
         #
         method _build_c ( $src, $out, $mode ) {
             my $file  = $src->{path};
             my @local = @{ $src->{flags} };
-            my $cc    = $Config{cc} // 'cc';
+            if ( $self->_is_msvc ) {
+                if ( $mode eq 'dynamic' ) {
+                    $self->_run( $cc, '/nologo', '/LD', @cflags, @local, "$file", '/Fe' . "$out", @ldflags );
+                    return $out;
+                }
+                my $obj = $build_dir->child( $self->_base($file) . $self->_obj_ext );
+                $self->_run( $cc, '/nologo', '/c', @cflags, @local, "$file", '/Fo' . "$obj" );
+                return { file => $obj };
+            }
             if ( $mode eq 'dynamic' ) {
 
                 # Combine Global CFLAGS + Local Flags + Global LDFLAGS
@@ -226,7 +258,15 @@ package Affix::Build v1.2.5 {
         method _build_cpp ( $src, $out, $mode ) {
             my $file  = $src->{path};
             my @local = @{ $src->{flags} };
-            my $cxx   = ( $Config{cc} =~ /gcc/ ) ? 'g++' : ( ( $Config{cc} =~ /clang/ ) ? 'clang++' : 'c++' );
+            if ( $self->_is_msvc($cxx) ) {
+                if ( $mode eq 'dynamic' ) {
+                    $self->_run( $cxx, '/nologo', '/LD', @cxxflags, @local, "$file", '/Fe' . "$out", @ldflags );
+                    return $out;
+                }
+                my $obj = $build_dir->child( $self->_base($file) . $self->_obj_ext );
+                $self->_run( $cxx, '/nologo', '/c', @cxxflags, @local, "$file", '/Fo' . "$obj" );
+                return { file => $obj };
+            }
             if ( $mode eq 'dynamic' ) {
                 my @cmd = ( $cxx, '-shared', @cxxflags, @local, "$file", '-o', "$out", @ldflags );
                 push @cmd, '-fPIC' unless $os eq 'MSWin32';
@@ -248,7 +288,7 @@ package Affix::Build v1.2.5 {
         method _build_asm ( $src, $out, $mode ) {
             my $file  = $src->{path};
             my @local = @{ $src->{flags} };
-            my $obj   = $build_dir->child( $self->_base($file) . $Config{_o} );
+            my $obj   = $build_dir->child( $self->_base($file) . $self->_obj_ext );
 
             # Detect Assembler Type: .asm (Intel/NASM) vs .s (AT&T/CC)
             my $is_nasm  = ( $file =~ /\.asm$/i );
@@ -260,7 +300,6 @@ package Affix::Build v1.2.5 {
                 $compiled = 1;
             }
             else {             # .s = AT&T/GNU syntax = System CC
-                my $cc = $Config{cc};
                 if ( $cc && $self->_can_run($cc) ) {
                     my @cmd = ( $cc, '-c', @local, "$file", '-o', "$obj" );
                     push @cmd, '-fPIC' unless $os eq 'MSWin32';
@@ -270,6 +309,10 @@ package Affix::Build v1.2.5 {
             }
             croak 'Assembly failed' unless $compiled && -e "$obj";
             if ( $mode eq 'dynamic' ) {
+                if ( $self->_is_msvc ) {
+                    $self->_run( $linker, '/nologo', '/LD', "$obj", '/Fe' . "$out", @ldflags );
+                    return $out;
+                }
                 my @cmd = ( $linker, '-shared', "$obj", '-o', "$out", @ldflags );
                 push @cmd, '-fPIC' unless $os eq 'MSWin32';
                 if ( $os eq 'MSWin32' && $linker =~ /gcc|g\+\+/ ) {
@@ -295,7 +338,7 @@ package Affix::Build v1.2.5 {
                 my @cmd = ( $rc, '--crate-type=staticlib', '--emit=link', '-C', 'panic=abort', @local, "$file", '-o', "$lib" );
 
                 # Force GNU target on MinGW to ensure compatibility with Perl's linker
-                if ( $os eq 'MSWin32' && $Config{cc} =~ /gcc/ ) {
+                if ( $os eq 'MSWin32' && $cc =~ /gcc/ ) {
                     push @cmd, '--target', 'x86_64-pc-windows-gnu';
                 }
                 elsif ( $os ne 'MSWin32' ) {
@@ -529,7 +572,7 @@ XML
 
                 # Link the object to shared
                 # We use the generic linker logic for this single file
-                my $linker = $Config{cc} // 'cc';
+                my $linker = $self->cc;
                 $self->_run( $linker, '-shared', '-o', "$out", "$obj" );
                 return $out;
             }

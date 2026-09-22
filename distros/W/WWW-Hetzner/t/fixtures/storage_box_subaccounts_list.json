@@ -1,0 +1,14 @@
+{
+  "subaccounts": [{
+    "id": 42,
+    "name": "my-name",
+    "username": "u1337-sub1",
+    "server": "u1337-sub1.your-storagebox.de",
+    "home_directory": "my_backups/host01.my.company",
+    "access_settings": {"samba_enabled": false, "ssh_enabled": true, "webdav_enabled": false, "reachable_externally": true, "readonly": false},
+    "description": "host01 backup",
+    "created": "2025-02-22T00:02:00Z",
+    "labels": {"environment": "prod", "example.com/my": "label", "just-a-key": ""},
+    "storage_box": 42
+  }]
+}

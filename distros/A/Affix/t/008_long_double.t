@@ -26,6 +26,8 @@ END_C
 
 # On FreeBSD/ARM64, 128-bit float runtime support might be missing in shared libs?
 skip_all 'Skipping Long Double on FreeBSD ARM64 due to missing runtime symbols' if $^O eq 'freebsd' && $Config{archname} =~ /aarch64/;
+skip_all 'Skipping Long Double on MSVC: long double is a 64-bit double (no x87 80-bit ABI)'
+    if $^O eq 'MSWin32' && ( $ENV{AFFIX_CC} // '' ) =~ /^cl(\b|$)/i;
 #
 my $lib = compile_ok($c_source);
 #

@@ -1,11 +1,12 @@
 package WWW::Hetzner::CLI::Cmd::Network::Cmd::AddSubnet;
 # ABSTRACT: Add a subnet to a network
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl network add-subnet <id> --ip-range <cidr> --type <type> --network-zone <zone>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option 'ip_range' => (
     is       => 'ro',
@@ -38,12 +39,13 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Adding subnet ", $self->ip_range, " to network $id...\n";
-    $cloud->networks->add_subnet($id,
+    my $action = $cloud->networks->add_subnet($id,
         ip_range     => $self->ip_range,
         type         => $self->type,
         network_zone => $self->network_zone,
     );
-    print "Subnet added.\n";
+    $self->handle_action($action);
+    print $self->no_wait ? "Subnet add requested.\n" : "Subnet added.\n";
 }
 
 1;
@@ -60,7 +62,7 @@ WWW::Hetzner::CLI::Cmd::Network::Cmd::AddSubnet - Add a subnet to a network
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -83,7 +85,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

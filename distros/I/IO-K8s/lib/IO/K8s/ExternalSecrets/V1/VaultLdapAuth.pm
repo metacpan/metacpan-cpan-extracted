@@ -1,0 +1,78 @@
+package IO::K8s::ExternalSecrets::V1::VaultLdapAuth;
+# ABSTRACT: Ldap authenticates with Vault by passing username/password pair using the LDAP authentication method
+our $VERSION = '1.108';
+use IO::K8s::Resource;
+
+k8s path      => Str, { required => 'schema', default => 'ldap' };
+k8s secretRef => '+IO::K8s::ExternalSecrets::V1::SecretKeySelector';
+k8s username  => Str, { required => 'schema' };
+
+
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+IO::K8s::ExternalSecrets::V1::VaultLdapAuth - Ldap authenticates with Vault by passing username/password pair using the LDAP authentication method
+
+=head1 VERSION
+
+version 1.108
+
+=head2 path
+
+Path where the LDAP authentication backend is mounted
+in Vault, e.g: "ldap"
+
+=head2 secretRef
+
+SecretRef to a key in a Secret resource containing password for the LDAP
+user used to authenticate with Vault using the LDAP authentication
+method
+
+=head2 username
+
+Username is an LDAP username used to authenticate using the LDAP Vault
+authentication method
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/pplu/io-k8s-p5/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Torsten Raudssus <getty@cpan.org>
+
+=item *
+
+Jose Luis Martinez Torres <jlmartin@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

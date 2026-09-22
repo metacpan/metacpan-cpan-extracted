@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
         'Cairo'                     =>  '1.109',
         'Prima::Cairo'              =>  '1.08',
 		'Logic::Relational' 		=> 	'0.01',
+		'Audio::Play::Native'       =>  '0.01',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Games-GUI-Battleship-*' },

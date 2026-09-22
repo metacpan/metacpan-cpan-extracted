@@ -1,13 +1,15 @@
 package IO::K8s::CertManager::V1::Issuer;
-# ABSTRACT: cert-manager namespace-scoped certificate issuer
-our $VERSION = '1.107';
+# ABSTRACT: An Issuer represents a certificate issuing authority which can be referenced as part of `issuerRef` fields.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cert-manager.io/v1',
     resource_plural => 'issuers';
 with 'IO::K8s::Role::Namespaced', 'IO::K8s::Role::CertManaged';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => '+IO::K8s::CertManager::V1::IssuerSpec', { required => 'schema' };
+k8s status => '+IO::K8s::CertManager::V1::IssuerStatus';
+
+
 
 1;
 
@@ -19,25 +21,19 @@ __END__
 
 =head1 NAME
 
-IO::K8s::CertManager::V1::Issuer - cert-manager namespace-scoped certificate issuer
+IO::K8s::CertManager::V1::Issuer - An Issuer represents a certificate issuing authority which can be referenced as part of `issuerRef` fields.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-Issuer configures a namespace-scoped certificate issuer (e.g. ACME, CA, Vault). This is a namespaced resource using the C<cert-manager.io/v1> API version. It can only be referenced by Certificate resources in the same namespace. The C<spec> and C<status> attributes contain opaque HashRefs whose structure is defined by cert-manager's OpenAPI schema.
+Desired state of the Issuer resource.
 
-=head1 SEE ALSO
+=head2 status
 
-=over
-
-=item * L<IO::K8s::CertManager> - cert-manager API classes for Perl
-
-=item * L<https://cert-manager.io/docs/configuration/> - Issuer upstream documentation
-
-=back
+Status of the Issuer. This is set and managed automatically.
 
 =head1 SUPPORT
 

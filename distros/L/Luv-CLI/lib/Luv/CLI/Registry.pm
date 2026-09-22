@@ -128,7 +128,7 @@ Luv::CLI::Registry - local cache of the awesome-love2d library list
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

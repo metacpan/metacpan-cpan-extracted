@@ -29,13 +29,21 @@ use Shared::Arena ();
 
 plan skip_all => 'no atomics in this build' unless Shared::Arena::have_atomics();
 
+#
+# A RETRY IS A FRESH EXPERIMENT, AND A BODY THAT ACCUMULATES HAS TO SAY SO. The
+# try number is handed to both closures for exactly one reason: a body that
+# INCREMENTS a counter, run a second time on the same key, adds to what the
+# first attempt left there. That is how this helper turned a parked process
+# into a wrong answer rather than a retry - two hits inside the window read as
+# three on a Linux smoker, and the map was never at fault. A body that stores
+# can ignore the argument; a body that counts must key on it.
 sub live {
     my ($ttl_ms, $store, $check) = @_;
     my @r;
     for my $try (1 .. 5) {
         my $t0 = Time::HiRes::time();
-        $store->();
-        @r = $check->();
+        $store->($try);
+        @r = $check->($try);
         my $took = (Time::HiRes::time() - $t0) * 1000;
         return @r if $took < $ttl_ms;
         note sprintf 'the live window took %.0fms against a %dms ttl (try %d): '
@@ -154,18 +162,23 @@ my $arena = Shared::Arena->create(size => 2 * 1024 * 1024);
     is($m->incr('w', 1, ttl_ms => 60), 2, '...and climbs inside its window');
     is($m->incr('w', 5), 7, 'an incr with no ttl adds to the same live counter');
 
+    # A KEY PER ATTEMPT: these two increments are not idempotent, so a retried
+    # window must not land on the counter the last one left behind. The key the
+    # winning attempt used is what the assertions after it have to ask about.
+    my $slide;
     my ($late) = live(60,
         sub {
-            $m->incr('slide', 1, ttl_ms => 60);           # the window opens: t0
+            $slide = "slide$_[0]";
+            $m->incr($slide, 1, ttl_ms => 60);            # the window opens: t0
             select undef, undef, undef, 0.03;             # t0 + 30ms
-            $m->incr('slide', 1, ttl_ms => 60);           # 2; MUST NOT re-arm
+            $m->incr($slide, 1, ttl_ms => 60);            # 2; MUST NOT re-arm
         },
-        sub { $m->counter('slide') });
+        sub { $m->counter($slide) });
     is($late, 2, 'two hits inside the window count two');
 
     select undef, undef, undef, 0.05;                     # t0 + 80ms: past 60,
                                                           # before a slid 90
-    is($m->incr('slide', 1, ttl_ms => 60), 1,
+    is($m->incr($slide, 1, ttl_ms => 60), 1,
        'the counter lapsed at the FIRST deadline: the second hit did not '
      . 'slide the window');
 

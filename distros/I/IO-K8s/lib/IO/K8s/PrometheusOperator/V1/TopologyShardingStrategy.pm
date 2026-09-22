@@ -1,0 +1,73 @@
+package IO::K8s::PrometheusOperator::V1::TopologyShardingStrategy;
+# ABSTRACT: topology defines the configuration for topology-aware sharding.
+our $VERSION = '1.108';
+use IO::K8s::Resource;
+
+k8s externalLabelName => Str;
+k8s values            => [Str];
+
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+IO::K8s::PrometheusOperator::V1::TopologyShardingStrategy - topology defines the configuration for topology-aware sharding.
+
+=head1 VERSION
+
+version 1.108
+
+=head2 externalLabelName
+
+externalLabelName defines the name of the Prometheus external label used
+to communicate the topology zone assigned to the Prometheus instance.
+If not defined, it defaults to "zone".
+If set to the empty string, no external label is added to the Prometheus configuration.
+
+=head2 values
+
+values defines the list of topology values (e.g. zone names) to be used
+for sharding. The configured number of shards must be greater than or
+equal to the number of values.
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/pplu/io-k8s-p5/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Torsten Raudssus <getty@cpan.org>
+
+=item *
+
+Jose Luis Martinez Torres <jlmartin@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

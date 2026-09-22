@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::PlacementGroup;
 # ABSTRACT: Hetzner Cloud Placement Group object
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::HasAction';
 use Carp qw(croak);
 use namespace::clean;
 
@@ -83,7 +84,7 @@ WWW::Hetzner::Cloud::PlacementGroup - Hetzner Cloud Placement Group object
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -183,7 +184,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

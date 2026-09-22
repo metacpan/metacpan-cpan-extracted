@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::HTTPGetAction;
 # ABSTRACT: HTTPGetAction describes an action based on HTTP Get requests.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s host => Str;
@@ -13,6 +13,9 @@ k8s path => Str;
 
 
 k8s port => IntOrStr, 'required';
+
+
+k8s protocol => Str;
 
 
 k8s scheme => Str;
@@ -32,7 +35,7 @@ IO::K8s::Api::Core::V1::HTTPGetAction - HTTPGetAction describes an action based 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 host
 
@@ -49,6 +52,10 @@ Path to access on the HTTP server.
 =head2 port
 
 Name or number of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.
+
+=head2 protocol
+
+Protocol selects the wire protocol for the probe connection. Nil defaults to HTTP/1.1.
 
 =head2 scheme
 

@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes;
 # ABSTRACT: Async Kubernetes client for IO::Async
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -19,6 +19,9 @@ use Kubernetes::REST::HTTPRequest;
 use Kubernetes::REST::HTTPResponse;
 use Kubernetes::REST::WatchEvent;
 use Kubernetes::REST::LogEvent;
+use Net::Async::Kubernetes::PortForwardSession;
+use Net::Async::Kubernetes::Watcher;
+use Net::Async::Kubernetes::Controller;
 
 sub configure {
     my ($self, %params) = @_;
@@ -101,8 +104,7 @@ sub credentials {
 }
 
 
-# Lazy internal Kubernetes::REST for request building + response processing
-sub _rest {
+sub rest {
     my ($self) = @_;
     $self->{_rest} //= Kubernetes::REST->new(
         server      => $self->server,
@@ -111,6 +113,16 @@ sub _rest {
         ($self->resource_map ? (resource_map => $self->resource_map) : ()),
     );
 }
+
+
+# Lazy internal Kubernetes::REST for request building + response processing
+sub _rest { $_[0]->rest }
+
+sub new_object {
+    my ($self, @args) = @_;
+    return $self->rest->new_object(@args);
+}
+
 
 # Lazy Net::Async::HTTP instance
 sub _http {
@@ -173,7 +185,25 @@ sub _materialize_ssl_pem {
     return $fh->filename;
 }
 
-sub expand_class { shift->_rest->expand_class(@_) }
+# IO::K8s::expand_class fails closed: an unknown, malformed or mismatched
+# apiVersion yields undef instead of a bare-name guess. Passing that undef on to
+# build_path dies with "argument is not a module name", naming neither the
+# resource nor the reason, so every call site guards the result with this.
+sub _unknown_resource_error {
+    my ($self, $short_class) = @_;
+    return sprintf(
+        "unknown resource '%s': no IO::K8s class for this apiVersion/kind"
+            . " (add it to resource_map if it is a CRD)",
+        defined $short_class ? $short_class : '(undef)',
+    );
+}
+
+sub expand_class {
+    my ($self, @args) = @_;
+    my $class = $self->_rest->expand_class(@args);
+    croak $self->_unknown_resource_error($args[0]) unless defined $class;
+    return $class;
+}
 
 
 sub _add_to_loop {
@@ -189,7 +219,8 @@ sub list {
     my ($self, $short_class, %args) = @_;
 
     my $rest = $self->_rest;
-    my $class = $rest->expand_class($short_class);
+    my $class = $rest->expand_class($short_class)
+        // return Future->fail($self->_unknown_resource_error($short_class));
     my $path = $rest->build_path($class, %args);
     my $req = $rest->prepare_request('GET', $path);
 
@@ -217,7 +248,8 @@ sub get {
         return Future->fail("Invalid arguments to get()");
     }
 
-    my $class = $rest->expand_class($short_class);
+    my $class = $rest->expand_class($short_class)
+        // return Future->fail($self->_unknown_resource_error($short_class));
     return Future->fail("name required for get") unless $args{name};
 
     my $path = $rest->build_path($class, %args);
@@ -297,7 +329,8 @@ sub patch {
             return Future->fail("Invalid arguments to patch()");
         }
 
-        $class = $rest->expand_class($class_or_object);
+        $class = $rest->expand_class($class_or_object)
+            // return Future->fail($self->_unknown_resource_error($class_or_object));
         $name = $args{name} or return Future->fail("name required for patch");
         $namespace = $args{namespace};
         $patch = $args{patch} // return Future->fail("patch requires 'patch' parameter");
@@ -349,7 +382,8 @@ sub delete {
             return Future->fail("Invalid arguments to delete()");
         }
 
-        $class = $rest->expand_class($class_or_object);
+        $class = $rest->expand_class($class_or_object)
+            // return Future->fail($self->_unknown_resource_error($class_or_object));
         $name = $args{name} or return Future->fail("name required for delete");
         $namespace = $args{namespace};
     }
@@ -397,7 +431,8 @@ sub log {
     my $previous      = delete $args{previous};
     my $limit_bytes   = delete $args{limitBytes};
 
-    my $class = $rest->expand_class($short_class);
+    my $class = $rest->expand_class($short_class)
+        // return Future->fail($self->_unknown_resource_error($short_class));
     my $path = $rest->build_path($class, %args) . '/log';
 
     my %params;
@@ -477,7 +512,8 @@ sub port_forward {
     my $on_close = delete $args{on_close};
     my $on_error = delete $args{on_error};
 
-    my $class = $rest->expand_class($short_class);
+    my $class = $rest->expand_class($short_class)
+        // return Future->fail($self->_unknown_resource_error($short_class));
     my $path = $rest->build_path($class, %args) . '/portforward';
 
     # Keep compatibility with Kubernetes::REST >= 1.100 by expanding repeated
@@ -495,6 +531,7 @@ sub port_forward {
     );
 
     return $self->_do_duplex_request($req,
+        caller   => 'port_forward',
         on_open  => $on_open,
         on_frame => $on_frame,
         on_close => $on_close,
@@ -546,7 +583,8 @@ sub exec {
     my $on_close = delete $args{on_close};
     my $on_error = delete $args{on_error};
 
-    my $class = $rest->expand_class($short_class);
+    my $class = $rest->expand_class($short_class)
+        // return Future->fail($self->_unknown_resource_error($short_class));
     my $path = $rest->build_path($class, %args) . '/exec';
 
     my %params = (
@@ -569,6 +607,7 @@ sub exec {
     );
 
     return $self->_do_duplex_request($req,
+        caller   => 'exec',
         on_open  => $on_open,
         on_frame => $on_frame,
         on_close => $on_close,
@@ -611,7 +650,8 @@ sub attach {
     my $on_close = delete $args{on_close};
     my $on_error = delete $args{on_error};
 
-    my $class = $rest->expand_class($short_class);
+    my $class = $rest->expand_class($short_class)
+        // return Future->fail($self->_unknown_resource_error($short_class));
     my $path = $rest->build_path($class, %args) . '/attach';
 
     my %params = (
@@ -633,6 +673,7 @@ sub attach {
     );
 
     return $self->_do_duplex_request($req,
+        caller   => 'attach',
         on_open  => $on_open,
         on_frame => $on_frame,
         on_close => $on_close,
@@ -827,8 +868,6 @@ sub _send_stdin_chunks {
 sub watcher {
     my ($self, $resource, %args) = @_;
 
-    require Net::Async::Kubernetes::Watcher;
-
     my $watcher = Net::Async::Kubernetes::Watcher->new(
         kube     => $self,
         resource => $resource,
@@ -839,10 +878,9 @@ sub watcher {
     return $watcher;
 }
 
+
 sub controller {
     my ($self, %args) = @_;
-
-    require Net::Async::Kubernetes::Controller;
 
     my $controller = Net::Async::Kubernetes::Controller->new(
         kube => $self,
@@ -852,7 +890,6 @@ sub controller {
     $self->add_child($controller);
     return $controller;
 }
-
 
 
 # ============================================================================
@@ -915,8 +952,9 @@ sub _do_streaming_request {
 
 sub _do_duplex_request {
     my ($self, $req, %callbacks) = @_;
+    my $caller_name = delete($callbacks{caller}) // 'duplex request';
     my $loop = eval { $self->loop };
-    return Future->fail("port_forward requires Net::Async::Kubernetes to be added to an IO::Async::Loop")
+    return Future->fail("$caller_name requires Net::Async::Kubernetes to be added to an IO::Async::Loop")
         unless $loop;
 
     my $on_open  = $callbacks{on_open};
@@ -1067,78 +1105,6 @@ sub _make_websocket_client {
     return Net::Async::WebSocket::Client->new(%args);
 }
 
-package Net::Async::Kubernetes::PortForwardSession;
-
-use strict;
-use warnings;
-use Carp qw(croak);
-
-sub new {
-    my ($class, %args) = @_;
-    croak "ws_client required" unless $args{ws_client};
-    return bless \%args, $class;
-}
-
-sub ws_client { $_[0]->{ws_client} }
-
-sub write_channel {
-    my ($self, $channel, $payload) = @_;
-
-    croak "channel required for write_channel" unless defined $channel;
-    croak "invalid channel '$channel' for write_channel"
-        unless $channel =~ /^\d+$/ && $channel >= 0 && $channel <= 255;
-
-    $payload = '' unless defined $payload;
-    croak "payload must be a plain string for write_channel" if ref($payload);
-
-    return $self->ws_client->send_binary_frame(chr($channel) . $payload);
-}
-
-sub write_stdin {
-    my ($self, $payload) = @_;
-    return $self->write_channel(0, $payload);
-}
-
-{
-    no warnings 'once';
-    *write = \&write_channel;
-    *stdin = \&write_stdin;
-}
-
-sub resize {
-    my ($self, %args) = @_;
-
-    my $width  = exists($args{width})  ? $args{width}  : $args{cols};
-    my $height = exists($args{height}) ? $args{height} : $args{rows};
-
-    croak "width required for resize" unless defined $width;
-    croak "height required for resize" unless defined $height;
-    croak "invalid width '$width' for resize"
-        unless $width =~ /^\d+$/ && $width > 0;
-    croak "invalid height '$height' for resize"
-        unless $height =~ /^\d+$/ && $height > 0;
-
-    my $payload = sprintf('{"Width":%d,"Height":%d}', $width, $height);
-    return $self->write_channel(4, $payload);
-}
-
-sub close {
-    my ($self, %args) = @_;
-    my $code = $args{code};
-    my $payload = exists $args{payload} ? $args{payload} : '';
-
-    croak "payload must be a plain string for close" if ref($payload);
-    croak "invalid websocket close code '$code'"
-        if defined($code) && ($code !~ /^\d+$/ || $code < 1000 || $code > 4999);
-
-    my $close_payload = defined($code) ? pack('n', $code) . $payload : $payload;
-    my $ret = $self->ws_client->send_close_frame($close_payload);
-    $self->ws_client->close_when_empty if $self->ws_client->can('close_when_empty');
-    return $ret;
-}
-
-package Net::Async::Kubernetes;
-
 1;
 
 __END__
@@ -1153,7 +1119,7 @@ Net::Async::Kubernetes - Async Kubernetes client for IO::Async
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -1330,6 +1296,27 @@ Returns the credentials object (typically L<Kubernetes::REST::AuthToken>).
 Croaks if neither C<credentials> nor C<kubeconfig> was provided during
 initialization.
 
+=head2 rest
+
+    my $rest = $kube->rest;
+
+Returns the underlying lazily-built L<Kubernetes::REST> instance used for
+request building and response processing. Exposed for advanced use -- most
+callers want the higher-level CRUD methods instead. The private C<_rest>
+accessor used throughout the internals returns this same cached instance.
+
+=head2 new_object
+
+    my $cm = $kube->new_object(ConfigMap =>
+        metadata => { name => 'my-config' },
+        data     => { key => 'value' },
+    );
+
+Builds a typed L<IO::K8s> object from a short class name (e.g. C<'Pod'>,
+C<'ConfigMap'>) and either a hashref or a hash of attributes. Delegates to
+L<Kubernetes::REST/new_object>. This is the public path for constructing the
+objects passed to C<create> and C<update>.
+
 =head2 expand_class
 
     my $full_class = $kube->expand_class('Pod');
@@ -1338,19 +1325,40 @@ initialization.
 Expands a short resource name (e.g., C<'Pod'>, C<'Deployment'>) to its full
 IO::K8s class name. Delegates to L<Kubernetes::REST/expand_class>.
 
+The name may also be qualified as C<'group/version/Kind'>, which resolves to
+that exact API version instead of the historical default the bare Kind name
+carries -- the two forms can and do point at different classes:
+
+    $kube->expand_class('HorizontalPodAutoscaler');
+    # 'IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscaler' (bare-name default)
+
+    $kube->expand_class('autoscaling/v1/HorizontalPodAutoscaler');
+    # 'IO::K8s::Api::Autoscaling::V1::HorizontalPodAutoscaler' (pinned to v1)
+
+This qualified form is accepted anywhere a resource name is, including
+C<list>, C<get>, and C<watcher>.
+
+Croaks when the name cannot be resolved to an IO::K8s class. This is the
+synchronous counterpart of the C<Future>-returning methods below, which report
+the same condition as a failed L<Future>.
+
 =head2 list
 
     my $future = $kube->list('Pod', namespace => 'default');
-    my $pods = $future->get;
+    my $list = $future->get;
+    my @pods = @{ $list->items };
 
 List resources of the given type. Returns a L<Future> that resolves to an
-ArrayRef of inflated IO::K8s objects.
+L<IO::K8s::List>. Its C<items> accessor holds the ArrayRef of inflated
+IO::K8s objects.
 
 Arguments:
 
 =over 4
 
-=item C<$short_class> - Resource type (e.g., C<'Pod'>, C<'Deployment'>)
+=item C<$short_class> - Resource type (e.g., C<'Pod'>, C<'Deployment'>), or a
+qualified C<'group/version/Kind'> name to pin a specific API version -- see
+L</expand_class>
 
 =item C<%args> - Optional parameters (C<namespace>, etc.)
 
@@ -1368,7 +1376,8 @@ Arguments:
 
 =over 4
 
-=item C<$short_class> - Resource type (e.g., C<'Pod'>)
+=item C<$short_class> - Resource type (e.g., C<'Pod'>), or a qualified
+C<'group/version/Kind'> name -- see L</expand_class>
 
 =item C<$name> - Resource name (required)
 
@@ -1575,7 +1584,13 @@ binary websocket frame is decoded as Kubernetes channel id.
     );
     my $result = $f->get;
 
-Copy a single local file into a pod using C<exec()> and stdin streaming.
+Copy a single local file into a pod. Reads the entire local file into memory,
+then runs C<sh -c 'head -c "$1" > "$2"'> inside the pod via C<exec()> and
+streams the bytes over stdin.
+
+This is a single-file copy, not a tar-based transfer: there is no recursive
+directory copy, and the whole file is held in memory, so it is not suitable
+for very large files.
 
 Returns a L<Future> resolving to a hashref containing C<local>, C<remote>,
 C<bytes>, C<stderr>, and C<status>.
@@ -1590,7 +1605,13 @@ C<bytes>, C<stderr>, and C<status>.
     );
     my $result = $f->get;
 
-Copy a single file from a pod using C<exec()> and stdout streaming.
+Copy a single file out of a pod. Runs C<cat $remote> inside the pod via
+C<exec()>, buffers the entire stdout stream in memory, then writes it to the
+local file.
+
+This is a single-file copy, not a tar-based transfer: there is no recursive
+directory copy, and the whole file is held in memory, so it is not suitable
+for very large files.
 
 Returns a L<Future> resolving to a hashref containing C<local>, C<remote>,
 C<bytes>, C<stderr>, and C<status>.
@@ -1638,14 +1659,11 @@ resource watches, queue reconcile work, and patch object status.
 
 Returns the controller object.
 
-=head1 NAME
-
-Net::Async::Kubernetes - Async Kubernetes client for IO::Async
-
 =head1 SEE ALSO
 
-L<Net::Async::Kubernetes::Watcher>, L<Kubernetes::REST>, L<IO::Async>,
-L<IO::K8s>, L<Net::Async::WebSocket::Client>
+L<Net::Async::Kubernetes::Watcher>, L<Net::Async::Kubernetes::Controller>,
+L<Net::Async::Kubernetes::PortForwardSession>, L<Kubernetes::REST>,
+L<IO::Async>, L<IO::K8s>, L<Net::Async::WebSocket::Client>
 
 =head1 SUPPORT
 

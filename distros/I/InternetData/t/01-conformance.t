@@ -110,7 +110,7 @@ subtest 'a listing survives every standing, right and format the API publishes' 
         is_deeply($db->{versions}[0]{formats}, $corpus->{formats},
             "$db->{base}: the formats it is built in survived");
     }
-    # An unlicensed family has no licence, so it has no license_type right;
+    # An unlicensed family has no license, so it has no license_type right;
     # inventing one would tell a caller they may redistribute something they do
     # not hold.
     my ($unlicensed) = grep { $_->{standing} eq 'unlicensed' } @$databases;
@@ -171,14 +171,14 @@ my %VISIBILITY = (
     'a-listing-is-never-reused-across-clients' => sub {
         serve({ body => { databases => [InternetDataTest::family()] } });
 
-        # Two keys can be on different licences and entitled to see different
+        # Two keys can be on different licenses and entitled to see different
         # families, so a listing held from one is not an answer for the other.
         client(api_key => 'key-a')->database->list;
         client(api_key => 'key-b')->database->list;
         is($origin->count, 2, 'each client asked the server for itself');
 
         # And a second call on ONE client asks again: a catalog held across a
-        # licence change is the same disclosure with a slower fuse.
+        # license change is the same disclosure with a slower fuse.
         $origin->reset;
         my $one = client(api_key => 'key-a');
         $one->database->list;

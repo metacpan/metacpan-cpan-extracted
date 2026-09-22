@@ -6,7 +6,6 @@ WriteMakefile(
     NAME             => 'Crypt::SelfCertificate',
     VERSION_FROM     => 'lib/Crypt/SelfCertificate.pm',
     ABSTRACT         => 'Generate random self-signed SSL certificates in memory',
-    AUTHOR           => 'Ryan Scott',
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.008001',
     PREREQ_PM        => {

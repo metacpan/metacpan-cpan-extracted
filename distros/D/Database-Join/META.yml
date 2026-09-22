@@ -32,7 +32,7 @@ requires:
   Carp: '0'
   DBD::SQLite: '1.70'
   DBI: '0'
-  Database::Abstraction: '0.43'
+  Database::Abstraction: '0.44'
   File::Spec: '0'
   File::Temp: '0'
   List::Util: '1.33'
@@ -47,5 +47,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Join
   repository: https://github.com/nigelhorne/Database-Join.git
-version: v0.004.0
+version: v0.005.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

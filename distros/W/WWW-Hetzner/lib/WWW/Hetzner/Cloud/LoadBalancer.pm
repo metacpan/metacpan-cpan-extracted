@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::LoadBalancer;
 # ABSTRACT: Hetzner Cloud Load Balancer object
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::HasAction';
 use Carp qw(croak);
 use namespace::clean;
 
@@ -100,8 +101,7 @@ sub add_target {
     croak "Cannot modify load balancer without ID" unless $self->id;
     croak "type required" unless $opts{type};
 
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/add_target", \%opts);
-    return $self;
+    return $self->_client->load_balancers->add_target($self->id, %opts);
 }
 
 
@@ -110,8 +110,7 @@ sub remove_target {
     croak "Cannot modify load balancer without ID" unless $self->id;
     croak "type required" unless $opts{type};
 
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/remove_target", \%opts);
-    return $self;
+    return $self->_client->load_balancers->remove_target($self->id, %opts);
 }
 
 
@@ -122,8 +121,7 @@ sub add_service {
     croak "listen_port required" unless $opts{listen_port};
     croak "destination_port required" unless $opts{destination_port};
 
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/add_service", \%opts);
-    return $self;
+    return $self->_client->load_balancers->add_service($self->id, %opts);
 }
 
 
@@ -132,10 +130,7 @@ sub delete_service {
     croak "Cannot modify load balancer without ID" unless $self->id;
     croak "listen_port required" unless $listen_port;
 
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/delete_service", {
-        listen_port => $listen_port,
-    });
-    return $self;
+    return $self->_client->load_balancers->delete_service($self->id, $listen_port);
 }
 
 
@@ -144,11 +139,7 @@ sub attach_to_network {
     croak "Cannot modify load balancer without ID" unless $self->id;
     croak "network required" unless $network_id;
 
-    my $body = { network => $network_id };
-    $body->{ip} = $opts{ip} if $opts{ip};
-
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/attach_to_network", $body);
-    return $self;
+    return $self->_client->load_balancers->attach_to_network($self->id, $network_id, %opts);
 }
 
 
@@ -157,10 +148,7 @@ sub detach_from_network {
     croak "Cannot modify load balancer without ID" unless $self->id;
     croak "network required" unless $network_id;
 
-    $self->_client->post("/load_balancers/" . $self->id . "/actions/detach_from_network", {
-        network => $network_id,
-    });
-    return $self;
+    return $self->_client->load_balancers->detach_from_network($self->id, $network_id);
 }
 
 
@@ -212,7 +200,7 @@ WWW::Hetzner::Cloud::LoadBalancer - Hetzner Cloud Load Balancer object
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -421,7 +409,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -236,7 +236,7 @@ subtest 'These are called under valgrind in 900_leak' => sub {
         my $lib = compile_ok(<<'');
 #include "std.h"
 // ext: .c
-void * test( ) { void * ret = "Testing"; return ret; }
+DLLEXPORT void * test( ) { void * ret = "Testing"; return ret; }
 
         ok my $fn         = wrap( $lib, 'test', [] => Pointer [Void] ), 'affix';
         ok my $string_ptr = $fn->(),                                    'call';

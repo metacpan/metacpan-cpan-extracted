@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1::PriorityClass;
 # ABSTRACT: PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -29,7 +29,7 @@ IO::K8s::Api::Scheduling::V1::PriorityClass - PriorityClass defines mapping from
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -56,7 +56,7 @@ value represents the integer value of this priority class. This is the actual pr
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#priorityclass-v1-scheduling.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#priorityclass-v1-scheduling.k8s.io>
 
 =head1 SUPPORT
 

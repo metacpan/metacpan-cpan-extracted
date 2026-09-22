@@ -1,13 +1,13 @@
 package IO::K8s::Traefik::V1alpha1::TraefikService;
-# ABSTRACT: Traefik weighted round-robin and mirroring service
-our $VERSION = '1.107';
+# ABSTRACT: TraefikService is the CRD implementation of a Traefik Service.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'traefikservices';
 with 'IO::K8s::Role::Namespaced', 'IO::K8s::Role::Loadbalanced';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec => '+IO::K8s::Traefik::V1alpha1::TraefikServiceSpec', { required => 'schema' };
+
 
 1;
 
@@ -19,25 +19,15 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Traefik::V1alpha1::TraefikService - Traefik weighted round-robin and mirroring service
+IO::K8s::Traefik::V1alpha1::TraefikService - TraefikService is the CRD implementation of a Traefik Service.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-TraefikService defines advanced load balancing and traffic routing. It enables weighted round-robin distribution across multiple services and traffic mirroring for A/B testing. This is a namespace-scoped custom resource using API version C<traefik.io/v1alpha1>. The C<spec> and C<status> fields are opaque hashrefs managed by Traefik.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<IO::K8s::Traefik> - Traefik CRD namespace
-
-=item * L<https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/> - Official Traefik CRD documentation
-
-=back
+TraefikServiceSpec defines the desired state of a TraefikService.
 
 =head1 SUPPORT
 

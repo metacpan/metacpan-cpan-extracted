@@ -1,12 +1,14 @@
 package IO::K8s::Cilium::V2alpha1::CiliumBGPPeerConfig;
-# ABSTRACT: Cilium BGP peer configuration
-our $VERSION = '1.107';
+# ABSTRACT: CiliumBGPPeerConfig
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
     resource_plural => 'ciliumbgppeerconfigs';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => '+IO::K8s::Cilium::V2alpha1::CiliumBGPPeerConfigSpec', { required => 'schema' };
+k8s status => '+IO::K8s::Cilium::V2alpha1::CiliumBGPPeerConfigStatus';
+
+
 
 1;
 
@@ -18,25 +20,19 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Cilium::V2alpha1::CiliumBGPPeerConfig - Cilium BGP peer configuration
+IO::K8s::Cilium::V2alpha1::CiliumBGPPeerConfig - CiliumBGPPeerConfig
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-This cluster-scoped resource configures individual BGP peer parameters, including neighbor addresses, authentication, and session options for Cilium's BGP control plane. It uses API version C<cilium.io/v2alpha1>. The C<spec> and C<status> fields contain opaque CRD-specific data structures managed by the Cilium BGP control plane controller.
+Spec is the specification of the desired behavior of the CiliumBGPPeerConfig.
 
-=head1 SEE ALSO
+=head2 status
 
-=over
-
-=item * L<IO::K8s::Cilium> - Main Cilium CRD namespace
-
-=item * L<https://docs.cilium.io/en/stable/network/bgp-control-plane/> - Upstream Cilium BGP control plane documentation
-
-=back
+Status is the running status of the CiliumBGPPeerConfig
 
 =head1 SUPPORT
 

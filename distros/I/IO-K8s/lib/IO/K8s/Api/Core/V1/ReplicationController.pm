@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ReplicationController;
 # ABSTRACT: ReplicationController represents the configuration of a replication controller.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Core::V1::ReplicationController - ReplicationController represents
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ Status is the most recently observed status of the replication controller. This 
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#replicationcontroller-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#replicationcontroller-v1-core>
 
 =head1 SUPPORT
 

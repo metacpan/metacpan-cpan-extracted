@@ -1,55 +1,53 @@
 {
     "name" : "Perl500503Syntax-OrDie",
-    "version" : "0.03",
+    "version" : "0.05",
     "abstract" : "Validate Perl 5.005_03 source compatibility",
     "author" : [
         "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat version 0.32",
+    "generated_by" : "pmake.bat version 0.51",
     "license" : [
         "perl_5"
     ],
     "meta-spec" : {
-        "url" : "https://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
         "version" : 2
+    },
+    "no_index" : {
+        "directory" : [
+            "t",
+            "eg",
+            "doc"
+        ]
     },
     "release_status" : "stable",
     "resources" : {
         "license" : [
-            "https://dev.perl.org/licenses/"
-        ],
-        "bugtracker" : {
-            "web" : "https://github.com/ina-cpan/Perl500503Syntax-OrDie/issues"
-        },
-        "repository" : {
-            "url"  : "https://github.com/ina-cpan/Perl500503Syntax-OrDie",
-            "web"  : "https://github.com/ina-cpan/Perl500503Syntax-OrDie",
-            "type" : "git"
-        }
+            "http://dev.perl.org/licenses/"
+        ]
     },
     "prereqs" : {
         "build" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
                 "perl" : "5.00503"
             }
         },
         "configure" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
-                "perl" : "5.00503"
+                "ExtUtils::MakeMaker" : "5.4302"
             }
         },
         "runtime" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
                 "perl" : "5.00503"
             }
         },
         "test" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
+                "Exporter" : "0",
+                "File::Spec" : "0",
+                "FindBin" : "1.42",
                 "perl" : "5.00503"
             }
         }
@@ -57,7 +55,7 @@
     "provides" : {
         "Perl500503Syntax::OrDie" : {
             "file" : "lib/Perl500503Syntax/OrDie.pm",
-            "version" : "0.03"
+            "version" : "0.05"
         }
     }
 }

@@ -1,11 +1,12 @@
 package WWW::Hetzner::Robot::CLI::Cmd::Server;
 # ABSTRACT: Robot server commands
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hrobot.pl server [list|describe] [options]';
+
 
 
 sub execute {
@@ -55,13 +56,23 @@ WWW::Hetzner::Robot::CLI::Cmd::Server - Robot server commands
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
     hrobot.pl server                    # List all servers (default)
     hrobot.pl server list               # List all servers
     hrobot.pl server describe <number>  # Show server details
+
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * L<list|WWW::Hetzner::Robot::CLI::Cmd::Server::Cmd::List> - List dedicated servers
+
+=item * L<describe|WWW::Hetzner::Robot::CLI::Cmd::Server::Cmd::Describe> - Describe a dedicated server
+
+=back
 
 =head1 SUPPORT
 
@@ -84,7 +95,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

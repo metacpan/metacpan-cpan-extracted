@@ -9,7 +9,7 @@ use JSON::MaybeXS;
 use Object::Configure;
 use Params::Get;
 use Params::Validate::Strict;
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed looks_like_number);
 
 =head1 NAME
 
@@ -17,11 +17,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -1278,6 +1278,347 @@ $legend_div_html</div>
 $anim_draw_js
 $donut_center_js
 $legend_section_js</script>
+HTML
+
+	return { svg_id => $svg_id, html => $html };
+}
+
+=head2 render_heatmap_snippet
+
+    my $fragment = $chart->render_heatmap_snippet(\@triples);
+    my $fragment = $chart->render_heatmap_snippet(\@triples, \%opts);
+    # $fragment->{svg_id} - always 'heatmap'
+    # $fragment->{html}   - embeddable fragment; caller must load D3 v7
+
+Generates an embeddable grid heatmap for use in existing HTML layouts.
+Each cell sits at the intersection of an X-axis label and a Y-axis label;
+its colour encodes the cell's numeric value using a sequential D3 colour
+scale.  Returns C<{ svg_id =E<gt> 'heatmap', html =E<gt> Str }>.  The
+caller is responsible for loading D3 v7 before embedding the fragment.
+
+=head3 Data format
+
+Each element of C<\@triples> is C<[$x_label, $y_label, $value]>.
+C<$value> must be numeric or C<undef> (C<undef> rows are silently
+skipped).  Zero is a valid value and maps to the lightest cell colour.
+The caller is responsible for any aggregation: if multiple triples share
+the same (x_label, y_label) pair, the last one wins.
+
+=head3 Options (C<\%opts>)
+
+=over 4
+
+=item * C<color_scheme> (string, default C<'YlOrRd'>) - D3 sequential
+colour scheme.  Supported: C<YlOrRd>, C<Blues>, C<Greens>, C<Purples>,
+C<RdPu>, C<YlGnBu>.
+
+=item * C<x_label> (string, default C<''>) - Axis title below the X axis.
+
+=item * C<y_label> (string, default C<''>) - Axis title left of the Y axis.
+
+=item * C<val_label> (string, default C<'Value'>) - Tooltip value label.
+
+=item * C<show_values> (bool, default 0) - Print value inside each cell.
+Auto-suppressed when any cell is narrower than 28 px.
+
+=item * C<cell_padding> (int 0-8, default 2) - Gap in pixels between cells.
+
+=item * C<legend> (bool, default 1) - Render a colour-scale legend bar.
+
+=item * C<animated> (bool, default 0) - Fade cells in on first load.
+Respects C<prefers-reduced-motion>.
+
+=back
+
+=head3 Errors
+
+=over 4
+
+=item * Dies with C<Data must be an array of arrays> when C<\@triples>
+is not an ARRAY reference.
+
+=item * Dies with C<Each data point must be an array reference> when a
+triple element is not an arrayref.
+
+=item * Dies with C<Each data point must have at least 3 elements> when
+a triple has fewer than 3 elements.
+
+=item * Dies with C<Value must be numeric> when C<$value> is defined but
+not numeric.
+
+=item * Dies with C<Unknown color_scheme: E<lt>nameE<gt>> for an
+unsupported C<color_scheme> value.
+
+=item * Dies with C<cell_padding must be between 0 and 8> when
+C<cell_padding> is outside the valid range.
+
+=back
+
+=head3 Side Effects
+
+Appends a tooltip C<div> to the page when the fragment is rendered in
+the browser.
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        data => { type => 'arrayref' },
+        opts => { type => 'hashref', optional => 1, default => {} },
+    }
+
+    Each element of C<$data> is C<[ Str, Str, Num|undef ]>.
+    Recognised C<opts> keys: C<color_scheme> (string, default C<'YlOrRd'>),
+    C<x_label> (string, default C<''>), C<y_label> (string, default C<''>),
+    C<val_label> (string, default C<'Value'>), C<show_values> (boolean,
+    default C<0>), C<cell_padding> (integer 0-8, default C<2>),
+    C<legend> (boolean, default C<1>), C<animated> (boolean, default C<0>).
+
+=head4 Output
+
+    HashRef -- C<{ svg_id =E<gt> 'heatmap', html =E<gt> Str }>;
+               embeddable fragment; no DOCTYPE, no page shell, no D3 CDN tag.
+
+=cut
+
+sub render_heatmap_snippet {
+	my ($self, $data, $opts) = @_;
+	$opts //= {};
+
+	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+
+	my %color_scheme_map = (
+		YlOrRd  => 'd3.interpolateYlOrRd',
+		Blues   => 'd3.interpolateBlues',
+		Greens  => 'd3.interpolateGreens',
+		Purples => 'd3.interpolatePurples',
+		RdPu    => 'd3.interpolateRdPu',
+		YlGnBu  => 'd3.interpolateYlGnBu',
+	);
+
+	my $color_scheme = $opts->{color_scheme} // 'YlOrRd';
+	die "Unknown color_scheme: $color_scheme"
+		unless exists $color_scheme_map{$color_scheme};
+	my $d3_interpolator = $color_scheme_map{$color_scheme};
+
+	my $cell_padding = defined($opts->{cell_padding}) ? int($opts->{cell_padding}) : 2;
+	die 'cell_padding must be between 0 and 8'
+		unless $cell_padding >= 0 && $cell_padding <= 8;
+
+	my $x_label    = $opts->{x_label}    // '';
+	my $y_label    = $opts->{y_label}    // '';
+	my $val_label  = $opts->{val_label}  // 'Value';
+	my $show_values = $opts->{show_values} ? 1 : 0;
+	my $legend     = exists $opts->{legend} ? ($opts->{legend} ? 1 : 0) : 1;
+	my $animated   = $opts->{animated}   ? 1 : 0;
+
+	my @triples;
+	for my $pt (@$data) {
+		die 'Each data point must be an array reference'
+			unless ref($pt) eq 'ARRAY';
+		die 'Each data point must have at least 3 elements'
+			unless scalar(@$pt) >= 3;
+		next unless defined $pt->[2];
+		die 'Value must be numeric' unless looks_like_number($pt->[2]);
+		push @triples, { x => $pt->[0], y => $pt->[1], v => $pt->[2] + 0 };
+	}
+
+	my $json_data = encode_json(\@triples);
+
+	# encode_json only accepts refs; escape label strings manually for JS
+	my ($x_label_esc, $y_label_esc, $val_label_esc) = map {
+		my $s = $_;
+		$s =~ s/\\/\\\\/g;
+		$s =~ s/"/\\"/g;
+		$s =~ s/\n/\\n/g;
+		$s =~ s/\r/\\r/g;
+		$s
+	} ($x_label, $y_label, $val_label);
+
+	my $svg_id = 'heatmap';
+	my $tip_id = 'heatmap_tip';
+
+	my $width  = $self->{width};
+	my $height = $self->{height};
+
+	my $margin_top    = 30;
+	my $margin_right  = $legend ? 65 : 20;
+	my $margin_bottom = $x_label ? 60 : 40;
+	my $margin_left   = $y_label ? 80 : 60;
+	my $inner_w = $width  - $margin_left - $margin_right;
+	my $inner_h = $height - $margin_top  - $margin_bottom;
+
+	my $anim_block = $animated ? <<"ANIM" : '';
+    var noAnim = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!noAnim) {
+        cellGs.attr("opacity", 0)
+            .transition()
+            .duration(300)
+            .delay(function(d) { return yMap.get(d.y) * 50; })
+            .attr("opacity", 1);
+    }
+ANIM
+
+	my $legend_block = $legend ? <<"LEGBLOCK" : '';
+    {
+        var defs = svg.append("defs");
+        var lgId = "heatmap-lg";
+        var lg = defs.append("linearGradient")
+            .attr("id", lgId)
+            .attr("x1", "0").attr("y1", "1")
+            .attr("x2", "0").attr("y2", "0");
+        for (var i = 0; i <= 6; i++) {
+            lg.append("stop")
+                .attr("offset", (i / 6 * 100) + "%")
+                .attr("stop-color", colorScale(maxV * i / 6));
+        }
+        var lgX = margin.left + innerW + 15;
+        var lgBarH = Math.min(innerH, 150);
+        var lgBarY = margin.top + (innerH - lgBarH) / 2;
+        svg.append("rect")
+            .attr("x", lgX)
+            .attr("y", lgBarY)
+            .attr("width", 12)
+            .attr("height", lgBarH)
+            .attr("fill", "url(#" + lgId + ")");
+        var lgScale = d3.scaleLinear().domain([0, maxV]).range([lgBarH, 0]);
+        svg.append("g")
+            .attr("transform", "translate(" + (lgX + 12) + "," + lgBarY + ")")
+            .call(d3.axisRight(lgScale).ticks(4));
+    }
+LEGBLOCK
+
+	my $html = <<"HTML";
+<style>
+    #$svg_id { display: block; }
+    #$tip_id {
+	position: absolute;
+	background: rgba(255,255,255,0.95);
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	padding: 6px 10px;
+	font-size: 12px;
+	pointer-events: none;
+	display: none;
+	line-height: 1.6;
+    }
+    .hm-cell-text {
+	font-size: 10px;
+	fill: #222;
+	pointer-events: none;
+	text-anchor: middle;
+	dominant-baseline: middle;
+    }
+</style>
+<svg id="$svg_id" width="$width" height="$height"></svg>
+<div id="$tip_id"></div>
+<script>
+(function() {
+    var data = $json_data;
+    var cellPad = $cell_padding;
+    var showVals0 = $show_values;
+    var xLabelStr = "$x_label_esc";
+    var yLabelStr = "$y_label_esc";
+    var valLabelStr = "$val_label_esc";
+    var margin = { top: $margin_top, right: $margin_right, bottom: $margin_bottom, left: $margin_left };
+    var innerW = $inner_w;
+    var innerH = $inner_h;
+
+    function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    var xMap = new Map(), yMap = new Map();
+    data.forEach(function(d) {
+        if (!xMap.has(d.x)) xMap.set(d.x, xMap.size);
+        if (!yMap.has(d.y)) yMap.set(d.y, yMap.size);
+    });
+    var xLabels = Array.from(xMap.keys());
+    var yLabels = Array.from(yMap.keys());
+
+    var maxV = d3.max(data, function(d) { return d.v; }) || 0;
+    var colorScale = d3.scaleSequential($d3_interpolator)
+        .domain(maxV === 0 ? [0, 1] : [0, maxV]);
+
+    var xPad = Math.min(cellPad / Math.max(1, innerW / Math.max(1, xLabels.length)), 0.4);
+    var yPad = Math.min(cellPad / Math.max(1, innerH / Math.max(1, yLabels.length)), 0.4);
+
+    var xScale = d3.scaleBand().domain(xLabels).range([0, innerW]).paddingInner(xPad);
+    var yScale = d3.scaleBand().domain(yLabels).range([0, innerH]).paddingInner(yPad);
+
+    var showVals = showVals0 && xScale.bandwidth() >= 28 && yScale.bandwidth() >= 28;
+
+    var svg = d3.select("#$svg_id");
+    var g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    g.append("g").attr("class", "hm-x-axis")
+        .call(d3.axisTop(xScale).tickSize(0))
+        .call(function(a) { a.select(".domain").remove(); });
+    g.append("g").attr("class", "hm-y-axis")
+        .call(d3.axisLeft(yScale).tickSize(0))
+        .call(function(a) { a.select(".domain").remove(); });
+
+    if (xLabelStr) {
+        svg.append("text")
+            .attr("x", margin.left + innerW / 2)
+            .attr("y", $height - 4)
+            .attr("text-anchor", "middle")
+            .attr("font-size", "12px")
+            .text(xLabelStr);
+    }
+    if (yLabelStr) {
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -(margin.top + innerH / 2))
+            .attr("y", 14)
+            .attr("text-anchor", "middle")
+            .attr("font-size", "12px")
+            .text(yLabelStr);
+    }
+
+    var tip = d3.select("#$tip_id");
+
+    var gridMap = new Map();
+    data.forEach(function(d) { gridMap.set(d.x + "\\t" + d.y, d); });
+    var cells = Array.from(gridMap.values());
+
+    var cellGs = g.selectAll(".hm-cell")
+        .data(cells)
+        .join("g")
+        .attr("class", "hm-cell")
+        .attr("transform", function(d) {
+            return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")";
+        });
+
+    cellGs.append("rect")
+        .attr("width", xScale.bandwidth())
+        .attr("height", yScale.bandwidth())
+        .attr("fill", function(d) { return colorScale(d.v); })
+        .on("mouseover", function(event, d) {
+            tip.html("X: " + esc(d.x) + "<br>Y: " + esc(d.y) + "<br>" + esc(valLabelStr) + ": " + d.v.toLocaleString())
+               .style("display", "block")
+               .style("left", (event.pageX + 12) + "px")
+               .style("top",  (event.pageY - 24) + "px");
+        })
+        .on("mousemove", function(event) {
+            tip.style("left", (event.pageX + 12) + "px")
+               .style("top",  (event.pageY - 24) + "px");
+        })
+        .on("mouseout", function() { tip.style("display", "none"); });
+
+    if (showVals) {
+        cellGs.append("text")
+            .attr("class", "hm-cell-text")
+            .attr("x", xScale.bandwidth() / 2)
+            .attr("y", yScale.bandwidth() / 2)
+            .text(function(d) { return d.v.toLocaleString(); });
+    }
+
+$legend_block
+$anim_block})();
+</script>
 HTML
 
 	return { svg_id => $svg_id, html => $html };
@@ -2799,6 +3140,32 @@ Nigel Horne <njh@nigelhorne.com>
     post opts.max_slices = N ∧ N ≥ 2 ∧ |data| > N
                             ⇒  |result_slices| = N ∧ "Other" ∈ result_labels
     post opts.separator = S ⇒  " S " ⊆ result.html (HTML legend: label S value (pct%))
+
+=head2 render_heatmap_snippet
+
+    render_heatmap_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'       ⇒ die "Data must be an array of arrays"
+    pre  ∃ pt ∈ data . ref(pt) ≠ 'ARRAY'
+                                   ⇒ die "Each data point must be an array reference"
+    pre  ∃ pt ∈ data . |pt| < 3   ⇒ die "Each data point must have at least 3 elements"
+    pre  ∃ pt ∈ data . defined(pt[2]) ∧ ¬numeric(pt[2])
+                                   ⇒ die "Value must be numeric"
+    pre  opts.color_scheme = S ∧ S ∉ {YlOrRd,Blues,Greens,Purples,RdPu,YlGnBu}
+                                   ⇒ die "Unknown color_scheme: S"
+    pre  opts.cell_padding = N ∧ (N < 0 ∨ N > 8)
+                                   ⇒ die "cell_padding must be between 0 and 8"
+    pre  ∀ pt ∈ data . pt[2] = undef ⇒ pt ∉ result     -- undef rows skipped
+    pre  ∃ pt₁,pt₂ ∈ data . pt₁[0]=pt₂[0] ∧ pt₁[1]=pt₂[1]
+                                   ⇒ last-write wins
+    post result ∈ HashRef
+    post result.svg_id = "heatmap"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post "scaleSequential" ⊆ result.html
+    post opts.animated = 1         ⇒ "prefers-reduced-motion" ⊆ result.html
+    post opts.legend = 1           ⇒ "linearGradient" ⊆ result.html
 
 =head2 render_line_chart_with_tooltips
 

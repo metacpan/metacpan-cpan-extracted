@@ -994,4 +994,48 @@ SKIP: {
 		'with the new figure, not the old one');
 }
 
+# ---- an atom with more neighbours than a structure can give it -----------
+#
+# The surface kernel sorts an atom's neighbours nearest-first so that the scan
+# over the sphere points ends sooner, and skips the sort above SASA_SORT_MAX
+# neighbours, where it would be quadratic work on a list no real structure
+# produces (141 is the longest over a 405-structure spread of PDBbind).  A
+# lattice of 729 atoms six tenths of an angstrom apart gives the atom in the
+# middle of it 728 neighbours, which is how the skipped path is reached at all
+# -- and what is asserted is what holds whichever path ran: the parts add up to
+# the whole, and no atom has more surface than a free sphere of its own radius.
+{
+	my ($pdb, $n) = ('', 0);
+	for my $i (0 .. 8) {
+		for my $j (0 .. 8) {
+			for my $k (0 .. 8) {
+				$n++;
+				$pdb .= sprintf "ATOM  %5d  CA  ALA A%4d    %8.3f%8.3f%8.3f  1.00  0.00           C\n",
+					$n, $n, $i * 0.6, $j * 0.6, $k * 0.6;
+			}
+		}
+	}
+	my $i = structure_info_string($pdb);
+	my $f = $i->{features}{sasa};
+	my ($sum, $over) = (0, 0);
+	# carbon's van der Waals radius plus the 1.4 A probe, which is the sphere
+	# the points are spread over
+	my $free = 4 * atan2(1, 0) * 2 * (1.70 + 1.4) ** 2;
+	for my $c (@{ $i->{chain_order} }) {
+		for my $rk (@{ $i->{chains}{$c}{residue_order} }) {
+			my $r = $i->{chains}{$c}{residues}{$rk};
+			for my $an (@{ $r->{atom_order} }) {
+				my $a = $r->{atoms}{$an}{sasa};
+				$sum += $a;
+				$over++ if $a > $free + 1e-9 || $a < 0;
+			}
+		}
+	}
+	is($n, 729, 'the lattice is 729 atoms, which is more neighbours than the sort takes');
+	# the total is a sum of the same NVs in the same order, so it is exact
+	cmp_ok(abs($f->{total} - $sum), '<', 1e-9,
+		'the atoms account for the whole surface');
+	is($over, 0, 'and none of them has more surface than a free sphere');
+}
+
 done_testing();

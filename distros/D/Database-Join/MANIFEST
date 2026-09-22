@@ -40,10 +40,13 @@ t/lib/Database/test1.pm
 t/lib/Database/test2.pm
 t/lib/Database/xljoin_a.pm
 t/lib/Database/xljoin_b.pm
+t/logic.t
 t/path.t
+t/pod.t
+t/sqlite-backend.t
 t/test1_2.t
 t/transaction.t
-t/sqlite-backend.t
+t/transition.t
 t/tsv.t
 t/unit.t
 t/xlsx.t

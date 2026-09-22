@@ -3,6 +3,7 @@
 ^\.gitignore$
 ^\.DS_Store$
 ^\.vscode$
+^vscode-tiller-map/
 ^t1\.pl$
 ^example\.
 ^bin/cover\.sh$

@@ -5,9 +5,9 @@ model: sonnet
 allowed-tools: Read, Edit, Grep, Glob
 briefing:
   skills:
-    - perl-release-author-getty
+    - getty-perl-release-author-getty
     - io-k8s-core
-    - perl-kubernetes-classes
+    - perl-io-k8s-kubernetes-classes
 ---
 
 You write POD for **IO::K8s**, an `[@Author::GETTY]` Dist::Zilla distribution. The

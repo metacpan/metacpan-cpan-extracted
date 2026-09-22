@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::JobSpec;
 # ABSTRACT: JobSpec describes how the job execution will look like.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s activeDeadlineSeconds => Int;
@@ -36,6 +36,9 @@ k8s podFailurePolicy => 'Batch::V1::PodFailurePolicy';
 k8s podReplacementPolicy => Str;
 
 
+k8s scheduling => 'Batch::V1::JobSchedulingConfiguration';
+
+
 k8s selector => 'Meta::V1::LabelSelector';
 
 
@@ -65,7 +68,7 @@ IO::K8s::Api::Batch::V1::JobSpec - JobSpec describes how the job execution will 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 activeDeadlineSeconds
 
@@ -120,6 +123,10 @@ Specifies the policy of handling failed pods. In particular, it allows to specif
 podReplacementPolicy specifies when to create replacement Pods. Possible values are: - TerminatingOrFailed means that we recreate pods when they are terminating (has a metadata.deletionTimestamp) or failed. - Failed means to wait until a previously created Pod is fully terminated (has phase Failed or Succeeded) before creating a replacement Pod.
 
 When using podFailurePolicy, Failed is the the only allowed value. TerminatingOrFailed and Failed are allowed values when podFailurePolicy is not in use. This is an beta field. To use this, enable the JobPodReplacementPolicy feature toggle. This is on by default.
+
+=head2 scheduling
+
+scheduling defines the Workload-aware Scheduling configuration for this Job. When set, it specifies the scheduling policy (basic or gang), topology constraints, disruption mode, and shared resource claims. When omitted, the Job defaults to the basic scheduling policy, which behaves as standard pod-by-pod scheduling. This field is alpha-level and requires the WorkloadWithJob feature gate. This field is immutable, including whether it is set at all, only policy.gang.minCount may be changed after creation.
 
 =head2 selector
 

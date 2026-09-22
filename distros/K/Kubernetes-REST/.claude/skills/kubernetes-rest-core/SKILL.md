@@ -1,6 +1,6 @@
 ---
 name: kubernetes-rest-core
-description: "Kubernetes::REST distribution internals for contributors — the request/response pipeline and its public seam for async wrappers, the bytes-vs-characters encoding contract, path building from IO::K8s class metadata, the resource map, ensure() race handling, the v0 AUTOLOAD compatibility layer, the mock test harness and the one-package-per-file rule. Load before editing anything under lib/Kubernetes/."
+description: Load before editing anything under lib/Kubernetes/ — the request pipeline and its async seam, the bytes-vs-characters encoding contract, path building, the resource map, the mock harness.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -10,7 +10,7 @@ model: sonnet
 
 Consumer-facing usage (`list`/`get`/`create`/`watch`/`log`, connecting, CRDs) lives in
 skill `perl-kubernetes-rest`. The typed objects this client returns come from `IO::K8s` —
-skill `perl-kubernetes-classes`. This skill is about *changing* the distribution.
+skill `perl-io-k8s-kubernetes-classes`. This skill is about *changing* the distribution.
 
 The division of labour matters: **this distribution owns HTTP, URLs and streaming;
 IO::K8s owns the objects.** Field names, types and required-ness are never decided here.

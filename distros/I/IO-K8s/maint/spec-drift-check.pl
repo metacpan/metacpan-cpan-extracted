@@ -6,7 +6,13 @@
 #
 #   Coverage mode (default): diffs one upstream swagger.json against what
 #   lib/IO/K8s/ actually ships (the k8s() DSL attribute registry), kind by
-#   kind, field by field.
+#   kind, field by field. It also cross-checks TypeMeta emission (karr #50):
+#   a shipped class must emit apiVersion/kind exactly when its upstream
+#   definition carries x-kubernetes-group-version-kind. Those two keys never
+#   live in the k8s() registry -- they come from IO::K8s::Role::APIObject
+#   and are written by Role::Resource::TO_JSON's _is_resource block -- so
+#   the field-level diff alone cannot see a class that stamps a GVK upstream
+#   does not have (karr #45), or a Kind that fails to stamp one.
 #
 #   Compare mode (--from/--to): diffs two upstream swagger.json specs
 #   directly against each other, with no reference to this dist's lib/ at
@@ -85,6 +91,11 @@ Common options:
   --format text|json  Report format (default: text)
   --output PATH       Also write the report to this file
   --help              This message
+
+Coverage mode reports missing Kinds/types/fields, extra fields, stale
+classes, and TypeMeta drift (a shipped class must emit apiVersion/kind
+exactly when its upstream definition carries
+x-kubernetes-group-version-kind).
 
 This is a report only -- it never creates karr tickets or edits lib/.
 USAGE
@@ -308,6 +319,8 @@ sub load_exceptions {
     $data->{ignore_missing_classes} //= [];
     $data->{ignore_missing_fields}  //= [];
     $data->{ignore_extra_fields}     //= [];
+    $data->{ignore_typemeta}        //= [];
+    $data->{non_dispatchable_kinds} //= [];
     return $data;
 }
 
@@ -353,6 +366,15 @@ sub run_coverage_mode {
     $scalarish{$_} = 1 for @{ $exceptions->{opaque_types} };
 
     my (@missing_kind, @missing_type, @field_tier2, @field_tier3, @extra_fields, @perl_only);
+    my (@typemeta_missing, @typemeta_extra);
+
+    # Definitions upstream tags with a GVK purely as a codegen convenience
+    # (DeleteOptions, Status, WatchEvent, the API discovery types) but that
+    # IO::K8s deliberately ships as plain Resource classes -- settled in
+    # karr #10, recorded in the exceptions file, exact def-key match.
+    my %non_dispatchable = map { ($_->{key} => $_->{reason}) }
+        grep { ref $_ eq 'HASH' && defined $_->{key} }
+        @{ $exceptions->{non_dispatchable_kinds} };
     my @suppressed;    # [category, subject, context, reason]
 
     # Pass 1: classes missing entirely.
@@ -426,6 +448,34 @@ sub run_coverage_mode {
             }
             push @extra_fields, [$pc, $key, $fname];
         }
+
+        # TypeMeta cross-check (karr #50). apiVersion/kind are not registry
+        # attributes -- Role::Resource::TO_JSON writes them iff the class
+        # composes IO::K8s::Role::APIObject (`_is_resource` is true) -- so
+        # the property diffs above are blind to them (both loops above
+        # deliberately skip the pair whenever the definition has a GVK).
+        # Keyed strictly on the spec's x-kubernetes-group-version-kind, NOT
+        # on "is this class embedded somewhere": Core::V1::PersistentVolumeClaim
+        # is embedded in StatefulSetSpec yet carries inline TypeMeta upstream,
+        # and that is correct (karr #45).
+        my $emits_typemeta = ($pc->can('_is_resource') && $pc->_is_resource) ? 1 : 0;
+        if ($emits_typemeta != (has_gvk($def) ? 1 : 0)) {
+            my ($ignored, $reason) = prefix_match($pc, $exceptions->{ignore_typemeta});
+            if ($ignored) {
+                push @suppressed, ['ignore_typemeta', $pc, $key, $reason];
+            }
+            elsif (has_gvk($def) && exists $non_dispatchable{$key}) {
+                # The GVK is a codegen artifact, not a wire identity this
+                # dist dispatches on -- same settled call as t/43's skip.
+                push @suppressed, ['non_dispatchable_kinds', $pc, $key, $non_dispatchable{$key}];
+            }
+            elsif (has_gvk($def)) {
+                push @typemeta_missing, [$pc, $key];
+            }
+            else {
+                push @typemeta_extra, [$pc, $key];
+            }
+        }
     }
 
     # Pass 3: shipped classes under an upstream root with no matching def at all.
@@ -451,6 +501,8 @@ sub run_coverage_mode {
         field_tier2  => \@field_tier2,
         field_tier3  => \@field_tier3,
         extra_fields => \@extra_fields,
+        typemeta_missing => \@typemeta_missing,
+        typemeta_extra   => \@typemeta_extra,
         perl_only    => \@perl_only,
         suppressed   => \@suppressed,
     );
@@ -469,6 +521,7 @@ sub render_coverage_report {
     push @out, sprintf("  Tier 2  MISSING TYPE    %4d  new type unshipped (standalone, or behind a missing field)", scalar @{ $r->{missing_type} } + scalar @{ $r->{field_tier2} });
     push @out, sprintf("  Tier 3  MISSING FIELD   %4d  field missing on a shipped class, target type already shipped", scalar @{ $r->{field_tier3} });
     push @out, sprintf("  Info    EXTRA FIELD     %4d  Perl declares a field the current spec no longer has", scalar @{ $r->{extra_fields} });
+    push @out, sprintf("  Info    TYPEMETA DRIFT  %4d  shipped class disagrees with the spec about emitting apiVersion/kind", scalar @{ $r->{typemeta_missing} } + scalar @{ $r->{typemeta_extra} });
     push @out, sprintf("  Info    STALE/PERL-ONLY %4d  shipped class, no matching definition key in this spec", scalar @{ $r->{perl_only} });
     my %supp_by_cat;
     $supp_by_cat{ $_->[0] }++ for @{ $r->{suppressed} };
@@ -511,6 +564,20 @@ sub render_coverage_report {
         push @out, "  $pc.$fname  ($key)";
     }
     push @out, "  (none)" unless @{ $r->{extra_fields} };
+    push @out, "";
+
+    push @out, "--- Info: TYPEMETA DRIFT (x-kubernetes-group-version-kind vs. shipped class) ---";
+    for my $e (@{ $r->{typemeta_missing} }) {
+        my ($pc, $key) = @$e;
+        push @out, "  [no-typemeta]     $pc  ($key)";
+        push @out, "                        upstream carries a GVK, class does not emit apiVersion/kind";
+    }
+    for my $e (@{ $r->{typemeta_extra} }) {
+        my ($pc, $key) = @$e;
+        push @out, "  [stamps-typemeta] $pc  ($key)";
+        push @out, "                        upstream has no GVK, class emits apiVersion/kind";
+    }
+    push @out, "  (none)" unless @{ $r->{typemeta_missing} } || @{ $r->{typemeta_extra} };
     push @out, "";
 
     push @out, "--- Info: STALE / PERL-ONLY (no matching upstream definition) ---";

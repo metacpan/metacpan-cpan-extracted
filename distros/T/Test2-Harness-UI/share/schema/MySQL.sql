@@ -181,6 +181,8 @@ CREATE TABLE run_fields (
 
     UNIQUE(run_id, name)
 ) ROW_FORMAT=COMPRESSED;
+-- https://github.com/Test-More/Test2-Harness/issues/457 (filed on the wrong repo)
+CREATE INDEX run_fields_name ON run_fields(name);
 
 CREATE TABLE test_files (
     test_file_id    BINARY(16)                                          NOT NULL PRIMARY KEY,
@@ -376,6 +378,8 @@ CREATE INDEX reporting_d    ON reporting(project_id, test_file_id, subtest, user
 CREATE INDEX reporting_e    ON reporting(project_id, test_file_id, subtest, user_id, run_ord);
 CREATE INDEX reporting_run  ON reporting(run_id);
 CREATE INDEX reporting_job  ON reporting(job_key);
+-- https://github.com/Test-More/Test2-Harness/issues/457 (filed on the wrong repo)
+CREATE INDEX reporting_run_analytics ON reporting(run_id, test_file_id, subtest, pass, fail, duration);
 
 CREATE TABLE resource_batch (
     resource_batch_id   BINARY(16)      NOT NULL PRIMARY KEY,

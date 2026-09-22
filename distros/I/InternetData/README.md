@@ -18,7 +18,7 @@ Requires Perl 5.22 or newer. [Mojolicious](https://metacpan.org/dist/Mojolicious
 
 ## Usage
 
-Every endpoint published today is licensed, so you need a key with the `db.download` scope; create one in the console. `api_key` is nevertheless an OPTION rather than a requirement: a client built without one sends no `Authorization` header at all, ready for a database served without a licence.
+Every database endpoint published today is licensed, so you need a key with the `db.download` scope; create one in the console. `api_key` is nevertheless an OPTION rather than a requirement: a client built without one sends no `Authorization` header at all, ready for a database served without a license.
 
 ```perl
 use InternetData;
@@ -34,7 +34,7 @@ Every call lives under `$client->database`. The downloads are the whole of this 
 
 ### The catalog
 
-`list` returns the database *families* your organization may see. A licence is held against a family, and the id you download is the one hanging off its `versions`:
+`list` returns the database *families* your organization may see. A license is held against a family, and the id you download is the one hanging off its `versions`:
 
 ```perl
 my ($bogon) = grep { $_->{base} eq 'bogon_ip' } @{ $client->database->list };
@@ -142,6 +142,25 @@ The blocking calls are those same promises plus a `wait`, so both paths retry id
 ### Nothing is cached
 
 The client caches nothing. What your organization may see depends on the key, so a listing held from one client is not an answer for another, and the catalog is small enough that re-reading it costs less than being wrong about whose it was.
+
+### Sign in with OAuth (device flow)
+
+A program running on the person's own machine can let them sign in with a browser and pick one of their API keys, instead of asking them to paste it:
+
+```perl
+my $client = InternetData->new;
+
+my $device = $client->oauth->device_authorization('your-client-id',
+    scope => 'account.read apikeys.read apikeys.reveal');
+print "Open $device->{verification_uri} and enter $device->{user_code}\n";
+
+my $token = $client->oauth->poll_device_token('your-client-id', $device);
+die "no API key came back: none was picked, or it can't be shown again\n"
+    unless defined $token->{apikey};
+my $keyed = InternetData->new(api_key => $token->{apikey});
+```
+
+A denied sign-in dies with `InternetData::OauthAccessDeniedError` and a code that ran out with `InternetData::OauthExpiredTokenError`. Client IDs are issued on request from support@internetdata.io, and `$client->oauth->revoke('your-client-id', $token->{refresh_token})` signs the machine out again.
 
 ## Other Libraries
 

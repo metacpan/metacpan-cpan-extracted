@@ -54,6 +54,7 @@ form {
 .line_number { color: #aaaaaa; }
 .comment  { color: #228B22; }
 .symbol  { color: #00688B; }
+.symbol.highlight { background-color: #ffff99; }
 .word { color: #8B008B; font-weight:bold; }
 .structure { color: #000000; }
 .number { color: #B452CD; }

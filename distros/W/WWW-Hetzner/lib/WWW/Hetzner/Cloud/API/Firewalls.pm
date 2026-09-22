@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::API::Firewalls;
 # ABSTRACT: Hetzner Cloud Firewalls API
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::Firewall;
 use namespace::clean;
@@ -15,11 +16,14 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Role::HasActions';
+
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::Firewall->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -29,12 +33,20 @@ sub _wrap_list {
 }
 
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/firewalls', params => \%params);
-    return $self->_wrap_list($result->{firewalls} // []);
+    return ($self->_wrap_list($result->{firewalls} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
 
 
 sub get {
@@ -60,7 +72,10 @@ sub create {
     $body->{apply_to} = $params{apply_to} if $params{apply_to};
 
     my $result = $self->client->post('/firewalls', $body);
-    return $self->_wrap($result->{firewall});
+    return $self->_wrap(
+        $result->{firewall},
+        actions => $self->_wrap_actions($result->{actions}),
+    );
 }
 
 
@@ -90,9 +105,11 @@ sub set_rules {
     croak "Firewall ID required" unless $id;
     croak "Rules arrayref required" unless ref $rules eq 'ARRAY';
 
-    return $self->client->post("/firewalls/$id/actions/set_rules", {
-        rules => $rules,
-    });
+    return $self->_wrap_actions(
+        $self->client->post("/firewalls/$id/actions/set_rules", {
+            rules => $rules,
+        })->{actions}
+    );
 }
 
 
@@ -100,9 +117,11 @@ sub apply_to_resources {
     my ($self, $id, @resources) = @_;
     croak "Firewall ID required" unless $id;
 
-    return $self->client->post("/firewalls/$id/actions/apply_to_resources", {
-        apply_to => \@resources,
-    });
+    return $self->_wrap_actions(
+        $self->client->post("/firewalls/$id/actions/apply_to_resources", {
+            apply_to => \@resources,
+        })->{actions}
+    );
 }
 
 
@@ -110,9 +129,11 @@ sub remove_from_resources {
     my ($self, $id, @resources) = @_;
     croak "Firewall ID required" unless $id;
 
-    return $self->client->post("/firewalls/$id/actions/remove_from_resources", {
-        remove_from => \@resources,
-    });
+    return $self->_wrap_actions(
+        $self->client->post("/firewalls/$id/actions/remove_from_resources", {
+            remove_from => \@resources,
+        })->{actions}
+    );
 }
 
 
@@ -130,7 +151,7 @@ WWW::Hetzner::Cloud::API::Firewalls - Hetzner Cloud Firewalls API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -177,6 +198,15 @@ All methods return L<WWW::Hetzner::Cloud::Firewall> objects.
     my $firewalls = $cloud->firewalls->list(label_selector => 'env=prod');
 
 Returns arrayref of L<WWW::Hetzner::Cloud::Firewall> objects.
+
+=head2 list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
 
 =head2 get
 
@@ -264,7 +294,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

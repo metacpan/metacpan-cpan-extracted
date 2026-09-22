@@ -248,4 +248,51 @@ throws_ok { Chem::Structure::Parser::_parse_file('t/data/does.not.exist.pdb') } 
 throws_ok { Chem::Structure::Parser::_parse_string('', 'not a hashref') } qr/hash reference/,
 	'_parse_string: options must be a hash reference';
 
+#--------
+# the answer does not depend on the locale.
+#
+# perl calls setlocale(LC_ALL, "") at startup on any USE_LOCALE build, so
+# LC_CTYPE in an XS module is whatever the caller's environment says -- the
+# NetBSD smoker that reported 0.031 ran under en_US.UTF-8.  Everything this
+# reader classifies is ASCII by definition (an element symbol, a residue name,
+# a CIF keyword), so the answer must not move when the locale does: isalpha()
+# in a Latin-1 locale calls an accented byte a letter, and tolower('I') in a
+# Turkish one is not 'i', which would stop an mmCIF file written in capitals
+# from being recognised at all.  Parser.xs uses perl's ASCII-only toUPPER(),
+# toLOWER(), isALPHA() and isDIGIT() rather than <ctype.h> for exactly that.
+#
+# Which locales exist is the machine's business, so the loop asks for a spread
+# and tests the ones it gets; "C" is always one of them, so this never becomes
+# a test that runs nowhere.
+#--------
+SKIP: {
+	eval { require POSIX; 1 } or skip 'POSIX is not available', 1;
+	my $lc = POSIX::setlocale(POSIX::LC_CTYPE());
+	my $pdb = <<'PDB';
+ATOM      1  N   MET A   1      11.104  13.207  10.000  1.00 15.00           N
+HETATM    2 ZN    ZN A 202      45.000  22.000  22.000  1.00 20.00          ZN
+ATOM      3  HG11ILE A   2      11.000  13.000  10.000  1.00 15.00
+PDB
+	# uppercase tags and keywords: legal mmCIF, and what a case-insensitive
+	# compare through tolower() gets wrong in a Turkish locale
+	my @tag = qw(group_PDB id type_symbol auth_atom_id auth_comp_id
+	             auth_asym_id auth_seq_id Cartn_x Cartn_y Cartn_z);
+	my $cif = "DATA_X\nLOOP_\n"
+	        . join('', map { "_ATOM_SITE.$_\n" } @tag)
+	        . "ATOM 1 N N MET A 1 11.104 13.207 10.000\n";
+	my $want_pdb = structure_info_string($pdb);
+	my $want_cif = structure_info_string($cif, format => 'mmcif');
+	my $tried = 0;
+	for my $loc (qw(C tr_TR.ISO8859-9 tr_TR.iso88599 tr_TR.UTF-8 tr_TR.utf8
+	                tr_TR de_DE.ISO-8859-1 de_DE.ISO8859-1 en_US.UTF-8)) {
+		next unless defined POSIX::setlocale(POSIX::LC_CTYPE(), $loc);
+		$tried++;
+		is_deeply(structure_info_string($pdb), $want_pdb, "PDB reads the same under $loc");
+		is_deeply(structure_info_string($cif, format => 'mmcif'), $want_cif,
+			"mmCIF reads the same under $loc");
+	}
+	POSIX::setlocale(POSIX::LC_CTYPE(), $lc) if defined $lc;
+	ok($tried, "the locale spread found $tried to test");
+}
+
 done_testing();

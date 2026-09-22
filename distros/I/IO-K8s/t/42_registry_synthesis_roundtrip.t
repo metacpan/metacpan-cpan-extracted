@@ -109,7 +109,19 @@ for my $path (sort @pm_paths) {
 }
 
 my $registry = \%IO::K8s::Resource::_attr_registry;
-my @classes  = sort keys %$registry;
+
+# k108 (fixed in 1.108): IO::K8s::Cilium::V2alpha1::AccessLogs used to be
+# excluded here -- it is the one class in the whole registry with a real
+# upstream field literally named `json`, which collided with
+# Role::Resource's own internal JSON-encoder attribute (also named `json`
+# at the time). Now that the role's encoder attribute is private
+# (`_json_encoder`), AccessLogs and its only referrer (Telemetry.accessLogs)
+# need no special-casing and are covered by the generic sweep below like
+# every other class.
+my %SKIP_CLASS  = ();
+my %SKIP_FIELD  = ();
+
+my @classes = sort grep { !$SKIP_CLASS{$_} } keys %$registry;
 
 cmp_ok(scalar(@classes), '>', 800, 'registry has the expected order of magnitude of classes')
     or diag("only " . scalar(@classes) . " classes in the registry - did the load loop above run?");
@@ -143,15 +155,18 @@ sub required_flags_for {
     return \%flags;
 }
 
-# A few ArrayRef[X] combinations (X = Quantity, at least) aren't tagged by
-# any is_array_of_* flag: _k8s's Type::Tiny branch only recognises
-# Str/Int/Bool as array element types (see IO::K8s::Resource's `_k8s`,
-# the `if $type_name eq 'Str' ... elsif 'Int' ... elsif 'Bool'` chain), so
-# e.g. `k8s validValues => [Quantity]` in
-# IO::K8s::Api::Resource::V1::CapacityRequestPolicy registers with no flags
-# at all. Rather than hardcode that one field, ask the real Moo `isa`
-# constraint what it is - that's the actual source of truth the task
-# briefing pointed at, and it covers any future addition of the same shape.
+# Before k96 task-2's review fix, a few ArrayRef[X] combinations (X =
+# Quantity, at least - IO::K8s::Api::Resource::V1::CapacityRequestPolicy's
+# validValues => [Quantity]) registered with NO is_array_of_* flag at all:
+# _k8s's Type::Tiny branch only recognised Str/Int/Bool as array element
+# types. That gap is closed (Resource.pm's array branch now also flags
+# Num/IntOrStr/Quantity/Time; synth_value below has explicit cases for all
+# four), so every currently-shipped shape reaches synth_value with a real
+# flag and never falls into this block. Left in place as a defensive
+# fallback for a hypothetical future scalar kind the DSL grows without a
+# matching case being added here: ask the real Moo `isa` constraint what it
+# is - the actual source of truth - rather than silently minting an invalid
+# "synthetic-$attr" string that fails its own type check.
 sub isa_text_for {
     my ($class, $attr) = @_;
     my $isa = moo_specs_for($class)->{$attr}{isa} or return undef;
@@ -181,20 +196,88 @@ sub union_bare_value {
 # Synthetic scalar values, one per registry type flag
 # ============================================================================
 
+# Shared candidate pool for every 'pattern'-constrained scalar shape a
+# shipped D3 field has turned out to need: HTTP-status-code-shaped
+# (100/404/500/8080), DNS-label-shaped (a/b), Go-duration-shaped (1h),
+# IPv4/IPv6-address-shaped (10.0.0.1, Cilium's peerAddress/ip fields, k95),
+# CIDR-shaped (10.0.0.0/24, Cilium's destinationCIDRs/excludedCIDRs),
+# BGP-community-triple-shaped (65000:1:1, Cilium's BGPCommunities.large),
+# absolute-URL-shaped (https://example.com, Gateway API's
+# SubjectAltName.uri and HTTPCORSFilter.allowOrigins, k95),
+# cron/@keyword-shaped (@daily, ExternalSecrets'
+# ExternalSecretSyncWindowEntry.schedule, which also accepts a 5-field cron
+# string or "@every <duration>"), GCP-service-account-email-shaped
+# (test@project.iam.gserviceaccount.com, ExternalSecrets'
+# GCPWorkloadIdentityFederation.gcpServiceAccountEmail), Nebius
+# service-account-id-shaped (serviceaccount-abc, ExternalSecrets'
+# NebiusWorkloadIdentity.iamServiceAccountID), byte-size-shaped (512MB,
+# PrometheusOperator's AlertmanagerLimitsSpec.maxPerSilenceBytes and the
+# several *.bodySizeLimit fields, all sharing one "trailing B, optional
+# K/M/G/T/E/P(i) prefix" pattern), abort|warn-enum-shaped (abort,
+# PrometheusOperator's RuleGroup.partial_response_strategy), and
+# filename-shaped (config.yaml, PrometheusOperator's
+# V1alpha1::FileSDConfig.files, which requires a .json/.yml/.yaml suffix).
+# Every call site below greps this same pool for the first entry that
+# satisfies the field's own pattern rather than assuming one fixed shape --
+# a value the field's own constraint rejects isn't a valid instance of it.
+my @PATTERN_CANDIDATES = (
+    '100', '404', '500', '8080', 'a', 'b', '1h', '10.0.0.1', '10.0.0.0/24', '65000:1:1', 'https://example.com',
+    '@daily', 'test@project.iam.gserviceaccount.com', 'serviceaccount-abc', '512MB', 'abort', 'config.yaml',
+);
+
 sub synth_scalar {
     my ($info, $attr) = @_;
+    my $opts = $info->{options} // {};
     if ($info->{is_bool}) {
         return ($bool_toggle++ % 2) ? JSON::MaybeXS::true() : JSON::MaybeXS::false();
     }
-    return 7                       if $info->{is_int};
+    # D3 value constraints (k8s DSL per-field option hash, k95 CRD full-depth
+    # providers are the first shipped classes to actually declare them):
+    # enum/minimum/maximum are enforced client-side (Types::Standard), so a
+    # synthetic value that ignores them isn't a valid instance of the field
+    # and struct_to_object rightly rejects it -- that is the constraint
+    # working, not a bug in the class under test. enum wins over the
+    # type-based synthesis below regardless of scalar kind.
+    return $opts->{enum}[0] if $opts->{enum};
+    if ($info->{is_int}) {
+        my $v = 7;
+        $v = $opts->{minimum} if defined $opts->{minimum} && $v < $opts->{minimum};
+        $v = $opts->{maximum} if defined $opts->{maximum} && $v > $opts->{maximum};
+        return $v;
+    }
     if ($info->{is_int_or_string}) {
         # IntOrStr must survive whichever form the caller gave it - toggle
         # between a numeric-looking string and a real string so both forms
-        # get exercised across the sweep.
+        # get exercised across the sweep. A 'pattern' constraint (Traefik's
+        # duration/percentage-shaped IntOrStr fields, Cilium's ICMPField.type
+        # which accepts either a 0-255 code or a named ICMP type, k95) is
+        # arbitrary and not guaranteed to accept free text OR the unchecked
+        # '8080' this used to hardcode regardless of whether it matched --
+        # search the same candidate pool as the plain-Str branch below and
+        # fall back to the toggle only when nothing in it satisfies the
+        # pattern.
+        if ($opts->{pattern}) {
+            my @ok = grep { $_ =~ $opts->{pattern} } @PATTERN_CANDIDATES;
+            return $ok[0] if @ok;
+        }
         return ($ios_toggle++ % 2) ? '8080' : 'http';
     }
     return '100m'                  if $info->{is_quantity};
     return '2024-01-01T00:00:00Z'  if $info->{is_time};
+    # A plain (non-array, non-IntOrStr) Str field can carry its own
+    # 'pattern' too -- cert-manager's embedded Gateway API ParentReference
+    # (group/kind/namespace/sectionName, all DNS-label-shaped),
+    # CertificateRenewalWindows.windowDuration (a Go-duration-shaped
+    # string), and Cilium's IP/CIDR/BGP-community-shaped fields (k95:
+    # CiliumBGPPeer.peerAddress, Frontend.ip, CiliumEgressGatewayPolicySpec
+    # .destinationCIDRs, BGPCommunities.large) are the shipped fields of
+    # this exact shape. Same reasoning as the is_array_of_str candidate-list
+    # below: an unconstrained "synthetic-$attr" isn't a valid instance of
+    # the field.
+    if ($opts->{pattern}) {
+        my @ok = grep { $_ =~ $opts->{pattern} } @PATTERN_CANDIDATES;
+        return $ok[0] if @ok;
+    }
     return "synthetic-$attr";      # is_str, and the generic fallback
 }
 
@@ -235,11 +318,55 @@ sub object_field_value {
 
 sub synth_value {
     my ($info, $attr, $mode, $depth, $class) = @_;
+    my $opts = $info->{options} // {};
 
-    return [ 'a', 'b' ] if $info->{is_array_of_str};
-    return [ 1, 2, 3 ]  if $info->{is_array_of_int};
+    # Per-element D3 constraints on an array of scalars (k8s tags => [Str],
+    # { enum => [...] } / { pattern => ... }) -- same reasoning as
+    # synth_scalar's enum/minimum/maximum handling: a value the field's own
+    # constraint rejects isn't a valid instance, so pick one that satisfies
+    # it instead of the unconstrained default.
+    if ($info->{is_array_of_str}) {
+        return [ @{ $opts->{enum} }[ 0, $#{ $opts->{enum} } ? 1 : 0 ] ] if $opts->{enum};
+        if ($opts->{pattern}) {
+            my @ok = grep { $_ =~ $opts->{pattern} } @PATTERN_CANDIDATES;
+            return [ @ok[ 0, $#ok ? 1 : 0 ] ] if @ok;
+        }
+        return [ 'a', 'b' ];
+    }
+    if ($info->{is_array_of_int}) {
+        my @vals = (1, 2, 3);
+        @vals = map {
+            my $v = $_;
+            $v = $opts->{minimum} if defined $opts->{minimum} && $v < $opts->{minimum};
+            $v = $opts->{maximum} if defined $opts->{maximum} && $v > $opts->{maximum};
+            $v;
+        } @vals if defined $opts->{minimum} || defined $opts->{maximum};
+        return \@vals;
+    }
     return [ 1, 0, 1 ]  if $info->{is_array_of_bool};    # the exact DeviceAttribute.bools shape
+    # k96 task-2 review: these four used to register with no flag at all
+    # (see the block comment above isa_text_for) and fell through to the
+    # isa-text fallback in synth_value below, which produced these same
+    # values by sniffing the real Moo ArrayRef[X] constraint. Now that the
+    # registry carries the flag directly, match those values here instead
+    # -- same synthetic data, sourced from the registry like every other
+    # case in this function rather than the isa-text side channel.
+    return [ 1.5, 2.5 ]                               if $info->{is_array_of_num};
+    return [ '8080', 'http' ]                         if $info->{is_array_of_int_or_string};
+    return [ '100m', '1Gi' ]                          if $info->{is_array_of_quantity};
+    return [ '2024-01-01T00:00:00Z' ]                 if $info->{is_array_of_time};
     return { 'sample-key' => 'sample-value' } if $info->{is_hash_of_str};
+    # Typed value maps -- the { TypeName => 1 } DSL form (k63). Each value
+    # must satisfy the scalar constraint the map carries.
+    return { 'sample-key' => '100m' }                 if $info->{is_hash_of_quantity};
+    return { 'sample-key' => 5 }                       if $info->{is_hash_of_int};
+    return { 'sample-key' => 1.5 }                     if $info->{is_hash_of_num};
+    return { 'sample-key' => 1 }                       if $info->{is_hash_of_bool};
+    return { 'sample-key' => '2024-01-01T00:00:00Z' }  if $info->{is_hash_of_time};
+    return { 'sample-key' => '8080' }                  if $info->{is_hash_of_int_or_string};
+    # Opaque array-of-hash / array-of-array forms (k66).
+    return [ { 'sample-key' => 'sample-value' } ]      if $info->{is_array_of_hash};
+    return [ [ 'sample-a', 'sample-b' ] ]              if $info->{is_array_of_array};
 
     if ($info->{is_hash_of_objects}) {
         my $child = object_field_value($info->{class}, $mode, $depth, $info->{required});
@@ -271,8 +398,10 @@ sub build_struct {
     my ($class, $mode, $depth) = @_;
     my $reg = $registry->{$class} // {};
     my $req = required_flags_for($class);
+    my $skip = $SKIP_FIELD{$class};
     my %struct;
     for my $attr (sort keys %$reg) {
+        next if $skip && $skip->{$attr};
         my $info = { %{ $reg->{$attr} }, required => ($req->{$attr} // 0) };
         next if $mode eq 'required' && !$info->{required};
         my $key = $info->{json_key} // $attr;

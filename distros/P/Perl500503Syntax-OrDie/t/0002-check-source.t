@@ -172,6 +172,116 @@ use vars qw(@tests);
         sub { violates("use feature ':5.10';\n") }],
 
     # ==============================================================
+    # lexical filehandle / directory handle  (Perl 5.6)
+    #
+    # Only the  my  spelling is checked.  open($fh, ...) against a
+    # lexical that already holds a glob is valid 5.005_03 and must not
+    # be reported.
+    # ==============================================================
+    ['lexfh: open(my $fh, ...) - detected',
+        sub { violates("open(my \$fh, '<f.txt') or die;\n") }],
+
+    ['lexfh: open my $fh without parens - detected',
+        sub { violates("open my \$fh, '<f.txt' or die;\n") }],
+
+    ['lexfh: opendir(my $dh, ...) - detected',
+        sub { violates("opendir(my \$dh, '.') or die;\n") }],
+
+    ['lexfh: sysopen(my $fh, ...) - detected',
+        sub { violates("sysopen(my \$fh, 'f', 0) or die;\n") }],
+
+    ['lexfh: pipe(my $r, my $w) - detected',
+        sub { violates("pipe(my \$r, my \$w) or die;\n") }],
+
+    ['lexfh: bareword open - ignored',
+        sub { !violates("open(FH, '<f.txt') or die;\n") }],
+
+    ['lexfh: glob open - ignored',
+        sub { !violates("local *FH;\nopen(*FH, '<f.txt') or die;\n") }],
+
+    ['lexfh: open against an existing lexical - ignored',
+        sub { !violates("local *FH;\nmy \$fh = *FH;\nopen(\$fh, '<f.txt');\n") }],
+
+    ['lexfh: in a comment - ignored',
+        sub { !violates("# open(my \$fh, '<f.txt')\nmy \$x = 1;\n") }],
+
+    # ==============================================================
+    # binmode() with a LAYER argument  (Perl 5.6)
+    #
+    # A question of arity, not of what the layer string says: 5.005_03
+    # binmode takes the filehandle alone.
+    # ==============================================================
+    ['binmode: two arguments - detected',
+        sub { violates("binmode(\$fh, ':raw');\n") }],
+
+    ['binmode: two arguments without parens - detected',
+        sub { violates("binmode FH, ':utf8';\n") }],
+
+    ['binmode: one argument - ignored',
+        sub { !violates("binmode(FH);\n") }],
+
+    ['binmode: one argument without parens - ignored',
+        sub { !violates("binmode FH;\n") }],
+
+    ['binmode: one glob-deref argument - ignored',
+        sub { !violates("{ no strict 'refs'; binmode(*{\$fhn}) }\n") }],
+
+    ['binmode: comma in a later statement on the same line - ignored',
+        sub { !violates("binmode(FH); my (\$a, \$b) = (1, 2);\n") }],
+
+    ['binmode: in a comment - ignored',
+        sub { !violates("# binmode(\$fh, ':raw')\nmy \$x = 1;\n") }],
+
+    # ==============================================================
+    # use warnings / no warnings without the stub  (Perl 5.6)
+    #
+    # The guarded idiom is the tolerated form; the bare statement is
+    # not.  The guard is recognised only where it is live code, so the
+    # idiom quoted in prose does not excuse an unguarded statement.
+    # ==============================================================
+    ['warnings: bare use warnings - detected',
+        sub { violates("use warnings;\n") }],
+
+    ['warnings: bare no warnings - detected',
+        sub { violates("no warnings;\n") }],
+
+    ['warnings: short stub then use warnings - ignored',
+        sub { !violates(
+            "BEGIN { \$INC{'warnings.pm'} = '' if \$] < 5.006 }\n"
+          . "use warnings; local \$^W = 1;\n") }],
+
+    ['warnings: full stub then use warnings - ignored',
+        sub { !violates(
+            "BEGIN { if (\$] < 5.006 && !defined(&warnings::import)) {\n"
+          . "        \$INC{'warnings.pm'} = 'stub';"
+          . " eval 'package warnings; sub import {}' } }\n"
+          . "use warnings; local \$^W = 1;\n") }],
+
+    ['warnings: stub and use warnings on one line - ignored',
+        sub { !violates(
+            "BEGIN { \$INC{'warnings.pm'} = '' if \$] < 5.006 };"
+          . " use warnings; \$^W = 1;\n") }],
+
+    ['warnings: stub after the use - detected',
+        sub { violates(
+            "use warnings;\n"
+          . "BEGIN { \$INC{'warnings.pm'} = '' if \$] < 5.006 }\n") }],
+
+    ['warnings: stub only in a comment - detected',
+        sub { violates(
+            "# BEGIN { \$INC{'warnings.pm'} = '' if \$] < 5.006 }\n"
+          . "use warnings;\n") }],
+
+    ['warnings: guarded stub, no warnings later - ignored',
+        sub { !violates(
+            "BEGIN { \$INC{'warnings.pm'} = '' if \$] < 5.006 }\n"
+          . "use warnings;\n"
+          . "sub f { no warnings; 1 }\n") }],
+
+    ['warnings: use strict alone - ignored',
+        sub { !violates("use strict;\n") }],
+
+    # ==============================================================
     # use utf8  (Perl 5.6)
     # ==============================================================
     ['use utf8: detected',
@@ -221,9 +331,10 @@ use vars qw(@tests);
 
     # ==============================================================
     # \x{HHHH}  (Perl 5.6)
-    # Note: \x{} inside a double-quoted string is masked and
-    # therefore not detected by the static scanner.  The typical
-    # use in a regex or outside a string IS detected.
+    # The escape is detected in a regex (stage 3) and in an
+    # interpolating string literal (stage 4).  A single-quoted string
+    # performs no escape processing, so the same characters there are
+    # an ordinary backslash followed by text and are NOT a violation.
     # The escape sequence is constructed at runtime (sprintf) so
     # that the literal pattern does not appear in this source file
     # and trigger the P3 check on this file itself.
@@ -240,10 +351,46 @@ use vars qw(@tests);
             !violates("# $esc\n");
         }],
 
-    ['xUNI: inside dquote string - masked (not detected)',
+    ['xUNI: inside dquote string - detected',
         sub {
             my $esc = sprintf("\\x{%s}", "263A");
+            violates("my \$s = \"$esc\";\n");
+        }],
+
+    ['xUNI: inside single-quoted string - ignored',
+        sub {
+            my $esc = sprintf("\\x{%s}", "263A");
+            !violates("my \$s = '$esc';\n");
+        }],
+
+    ['xUNI: escaped backslash in dquote string - ignored',
+        sub {
+            my $esc = sprintf("\\\\x{%s}", "263A");
             !violates("my \$s = \"$esc\";\n");
+        }],
+
+    ['xUNI: inside interpolating heredoc - detected',
+        sub {
+            my $esc = sprintf("\\x{%s}", "263A");
+            violates("my \$s = <<EOT;\n$esc\nEOT\n");
+        }],
+
+    ['xUNI: inside non-interpolating heredoc - ignored',
+        sub {
+            my $esc = sprintf("\\x{%s}", "263A");
+            !violates("my \$s = <<'EOT';\n$esc\nEOT\n");
+        }],
+
+    ['NUNI: inside dquote string - detected',
+        sub {
+            my $esc = sprintf("\\N{%s}", "BULLET");
+            violates("my \$s = \"$esc\";\n");
+        }],
+
+    ['NUNI: in s/// replacement - detected',
+        sub {
+            my $esc = sprintf("\\N{%s}", "BULLET");
+            violates("\$s =~ s/a/$esc/;\n");
         }],
 
     # ==============================================================

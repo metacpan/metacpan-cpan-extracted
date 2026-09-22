@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::ResourceClaimTemplate;
 # ABSTRACT: ResourceClaimTemplate is used to produce ResourceClaim objects.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -21,7 +21,7 @@ IO::K8s::Api::Resource::V1::ResourceClaimTemplate - ResourceClaimTemplate is use
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ This field is immutable. A ResourceClaim will get created by the control plane f
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#resourceclaimtemplate-v1-resource.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#resourceclaimtemplate-v1-resource.k8s.io>
 
 =head1 SUPPORT
 

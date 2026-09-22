@@ -1,11 +1,12 @@
 package WWW::Hetzner::CLI::Cmd::Firewall;
 # ABSTRACT: Hetzner Cloud Firewall commands
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl firewall <subcommand>';
+
 
 sub execute {
     my ($self) = @_;
@@ -34,7 +35,27 @@ WWW::Hetzner::CLI::Cmd::Firewall - Hetzner Cloud Firewall commands
 
 =head1 VERSION
 
-version 0.100
+version 0.101
+
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * L<list|WWW::Hetzner::CLI::Cmd::Firewall::Cmd::List> - List firewalls
+
+=item * L<describe|WWW::Hetzner::CLI::Cmd::Firewall::Cmd::Describe> - Describe a firewall
+
+=item * L<create|WWW::Hetzner::CLI::Cmd::Firewall::Cmd::Create> - Create a firewall
+
+=item * L<delete|WWW::Hetzner::CLI::Cmd::Firewall::Cmd::Delete> - Delete a firewall
+
+=item * L<add-rule|WWW::Hetzner::CLI::Cmd::Firewall::Cmd::AddRule> - Add a rule to a firewall
+
+=item * L<apply-to|WWW::Hetzner::CLI::Cmd::Firewall::Cmd::ApplyTo> - Apply a firewall to a server
+
+=item * L<remove-from|WWW::Hetzner::CLI::Cmd::Firewall::Cmd::RemoveFrom> - Remove a firewall from a server
+
+=back
 
 =head1 SUPPORT
 
@@ -57,7 +78,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

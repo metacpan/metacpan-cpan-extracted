@@ -11,7 +11,11 @@ $|++;
 # If the trampoline clobbers RAX and doesn't restore it,
 # the caller might see a wrong return value or corrupt state.
 my $C_CODE = <<'END_C';
+#if defined(_WIN32) || defined(_WIN64)
+#define DLLEXPORT __declspec(dllexport)
+#else
 #define DLLEXPORT __attribute__((visibility("default")))
+#endif
 #include <stdio.h>
 
 #ifdef __cplusplus

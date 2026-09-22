@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes::Watcher;
 # ABSTRACT: Auto-reconnecting Kubernetes watch as IO::Async::Notifier
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -117,7 +117,8 @@ sub _start_watch {
     $self->{_buffer} = '';
 
     my $rest = $self->kube->_rest;
-    my $class = $rest->expand_class($self->resource);
+    my $class = $rest->expand_class($self->resource)
+        // croak $self->kube->_unknown_resource_error($self->resource);
     my $path = $rest->build_path($class,
         ($self->namespace ? (namespace => $self->namespace) : ()),
     );
@@ -245,7 +246,7 @@ Net::Async::Kubernetes::Watcher - Auto-reconnecting Kubernetes watch as IO::Asyn
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -312,7 +313,8 @@ Returns the parent L<Net::Async::Kubernetes> instance.
 =head2 resource
 
 Required. The Kubernetes resource kind to watch (e.g., C<'Pod'>,
-C<'Deployment'>).
+C<'Deployment'>), or a qualified C<'group/version/Kind'> name to watch a
+specific API version -- see L<Net::Async::Kubernetes/expand_class>.
 
 =head2 namespace
 
@@ -390,10 +392,6 @@ is added to the event loop. Safe to call multiple times (idempotent).
 
 Stop the watch stream and cancel the current HTTP request. The watcher will
 not automatically reconnect until C<start()> is called again.
-
-=head1 NAME
-
-Net::Async::Kubernetes::Watcher - Auto-reconnecting Kubernetes watch as IO::Async::Notifier
 
 =head1 SEE ALSO
 

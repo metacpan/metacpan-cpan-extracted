@@ -1,9 +1,15 @@
 package IO::K8s::Api::Core::V1::NodeAllocatableResourceClaimStatus;
 # ABSTRACT: NodeAllocatableResourceClaimStatus tracks the status of node-allocatable resources allocated to a ResourceClaim for a Pod.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s containers => [Str], 'required';
+
+
+k8s mapping => ['Core::V1::NodeAllocatableMappedResources'];
+
+
+k8s overhead => ['Core::V1::NodeAllocatableOverheadResources'];
 
 
 k8s resourceClaimName => Str, 'required';
@@ -26,11 +32,19 @@ IO::K8s::Api::Core::V1::NodeAllocatableResourceClaimStatus - NodeAllocatableReso
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 containers
 
 Containers lists the names of the containers in the Pod that use this ResourceClaim to consume node-allocatable resources.
+
+=head2 mapping
+
+Mapping contains allocations through devices mapped in the device spec's `nodeAllocatableResources[...].mapping` field. This is used by kubelet for pod level and container-level cgroup enforcement.
+
+=head2 overhead
+
+Overhead contains allocations through devices mapped in the device spec's `nodeAllocatableResources[...].overhead` field. This is used by kubelet for pod level and container-level cgroup enforcement.
 
 =head2 resourceClaimName
 

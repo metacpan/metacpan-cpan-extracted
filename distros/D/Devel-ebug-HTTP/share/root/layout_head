@@ -10,6 +10,7 @@
 <script language="Javascript" type="text/javascript" src="/prototype.js"></script>
 <script language="Javascript" type="text/javascript" src="/tooltip.js"></script>
 <script language="Javascript" type="text/javascript" src="/break_point.js"></script>
+<script language="Javascript" type="text/javascript" src="/highlight_variable.js"></script>
 [% subroutine = ebug.subroutine | html %]
 <title>[% page_title | html %]</title>
 </head>

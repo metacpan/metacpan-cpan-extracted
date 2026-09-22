@@ -15,6 +15,10 @@ use Games::GUI::Battleship::Board;
 use Games::GUI::Battleship::Renderer;
 use Games::GUI::Battleship::AI;
 
+use Audio::Play::Native;
+use File::Basename qw(dirname);
+use File::Spec;
+
 =pod
 
 =head1 NAME
@@ -23,7 +27,7 @@ Games::GUI::Battleship - Play a game of Battleship through a GUI
 
 =head1 VERSION
 
-Version 1.0
+Version 1.1
 
 =head1 SYNOPSIS
 
@@ -99,7 +103,7 @@ This is free software, licensed under:
 =cut
 
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 my %SWEEP_PERIODS = (
     slow   => 7.0,
@@ -125,8 +129,7 @@ sub new ( $class, %args ) {
         hover_row      => undef,
         hover_opp_col  => undef,
         hover_opp_row  => undef,
-        status_msg     =>
-'Deploy your Carrier (length 5). Left-click to place, Right-click or "R" to rotate.',
+        status_msg     => 'Deploy your Carrier (length 5). Left-click to place, Right-click or "R" to rotate.',
         msg_type            => 'info',
         window              => undef,
         ai_timer            => undef,
@@ -524,8 +527,7 @@ sub start_new_game ( $self, $difficulty = undef ) {
 
     my $first_ship = $Games::GUI::Battleship::Ship::FLEET_ORDER[0];
     my $len        = $Games::GUI::Battleship::Ship::SHIP_SIZES{$first_ship};
-    $self->{status_msg} =
-"Deploy your $first_ship (length $len). Left-click to place, Right-click or 'R' to rotate.";
+    $self->{status_msg} = "Deploy your $first_ship (length $len). Left-click to place, Right-click or 'R' to rotate.";
     $self->{msg_type} = 'info';
 
     if ( $self->{window} ) {
@@ -585,8 +587,7 @@ sub handle_placement_click ( $self, $col, $row ) {
         my $next_ship =
           $Games::GUI::Battleship::Ship::FLEET_ORDER[ $self->{placement_idx} ];
         my $len = $Games::GUI::Battleship::Ship::SHIP_SIZES{$next_ship};
-        $self->{status_msg} =
-"Deploy your $next_ship (length $len). Left-click to place, Right-click or 'R' to rotate.";
+        $self->{status_msg} = "Deploy your $next_ship (length $len). Left-click to place, Right-click or 'R' to rotate.";
         $self->{msg_type}   = 'info';
         $self->{ghost_ship} = undef;
     }
@@ -639,8 +640,7 @@ sub reset_placement ($self) {
 
     my $first_ship = $Games::GUI::Battleship::Ship::FLEET_ORDER[0];
     my $len        = $Games::GUI::Battleship::Ship::SHIP_SIZES{$first_ship};
-    $self->{status_msg} =
-"Fleet reset. Deploy your $first_ship (length $len). Left-click to place.";
+    $self->{status_msg} = "Fleet reset. Deploy your $first_ship (length $len). Left-click to place.";
     $self->{msg_type} = 'info';
     $self->{window}->repaint if $self->{window};
     return;
@@ -651,10 +651,14 @@ sub begin_battle ($self) {
     $self->{opponent_board}->place_random_fleet;
     $self->{phase}      = 'battle';
     $self->{ghost_ship} = undef;
-    $self->{status_msg} =
-"Fleet deployed. Click a coordinate on the Enemy Radar to fire.";
+    $self->{status_msg} = "Fleet deployed. Click a coordinate on the Enemy Radar to fire.";
     $self->{msg_type} = 'info';
     return;
+}
+
+sub get_sound ( $name ) {
+    my $base_dir = dirname(__FILE__);
+    return File::Spec->catfile($base_dir, 'Battleship', 'assets', $name);
 }
 
 sub handle_battle_click ( $self, $col, $row ) {
@@ -673,14 +677,14 @@ sub handle_battle_click ( $self, $col, $row ) {
     my $ship_name = $res->{ship} ? $res->{ship}->type : 'Ship';
 
     if ( $res->{result} eq 'hit' ) {
-        $self->{status_msg} =
-          "DIRECT HIT! You struck the Enemy $ship_name at $coord_str!";
+        $self->{status_msg} = "DIRECT HIT! You struck the Enemy $ship_name at $coord_str!";
         $self->{msg_type} = 'hit';
+        Audio::Play::Native->play(get_sound('hit.wav'));
     }
     elsif ( $res->{result} eq 'sunk' ) {
-        $self->{status_msg} =
-          "You SUNK the Enemy $ship_name at $coord_str!";
+        $self->{status_msg} = "You SUNK the Enemy $ship_name at $coord_str!";
         $self->{msg_type} = 'sunk';
+        Audio::Play::Native->play(get_sound('sink.wav'));
     }
     else {
         $self->{status_msg} = "Shot at $coord_str missed.";
@@ -728,14 +732,14 @@ sub process_ai_turn ($self) {
     my $ship_name = $res->{ship} ? $res->{ship}->type : 'Ship';
 
     if ( $res->{result} eq 'hit' ) {
-        $self->{status_msg} =
-          "WARNING! Enemy hit your $ship_name at $coord_str! ($ai_mode)";
+        $self->{status_msg} = "WARNING! Enemy hit your $ship_name at $coord_str! ($ai_mode)";
         $self->{msg_type} = 'hit';
+        Audio::Play::Native->play(get_sound('hit.wav'));
     }
     elsif ( $res->{result} eq 'sunk' ) {
-        $self->{status_msg} =
-          "CRITICAL HIT! Enemy SUNK your $ship_name at $coord_str! ($ai_mode)";
+        $self->{status_msg} = "CRITICAL HIT! Enemy SUNK your $ship_name at $coord_str! ($ai_mode)";
         $self->{msg_type} = 'sunk';
+        Audio::Play::Native->play(get_sound('sink.wav'));
     }
     else {
         $self->{status_msg} =

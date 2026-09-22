@@ -1,6 +1,6 @@
 # Generated from Makefile.PL using makefilepl2cpanfile
 
-requires 'perl', '5.008';
+requires 'perl', '5.026';
 
 requires 'Carp';
 requires 'Encode';
@@ -9,7 +9,6 @@ requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
 requires 'List::Util', '1.33';   # Minimum version for any()
 requires 'Readonly::Values::Boolean';
 requires 'Scalar::Util';
-requires 'Unicode::GCString';
 requires 'strict';
 requires 'warnings';
 
@@ -28,6 +27,7 @@ on 'test' => sub {
 	requires 'Readonly';
 	requires 'Test::Compile';
 	requires 'Test::DescribeMe';
+	requires 'Test::Memory::Cycle';
 	requires 'Test::Mockingbird', '0.13';
 	requires 'Test::Most';
 	requires 'Test::Needs';

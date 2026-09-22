@@ -48,15 +48,27 @@ Readonly my @MULTI_DATA => (
 
 Readonly my %EXTRA_ROW => (Region => 'North', SKU => 'X1');
 
+# Two categorical axes x two rows -- enough variation to exercise x/y label sets.
+Readonly my @HEATMAP_DATA => (
+	['Jan', 'North', 100],
+	['Jan', 'South',  50],
+	['Feb', 'North',  80],
+	['Feb', 'South',  30],
+);
+
 Readonly my $DEFAULT_WIDTH  => 800;
 Readonly my $DEFAULT_HEIGHT => 600;
 Readonly my $DEFAULT_TITLE  => 'Chart';
 Readonly my $CDN_URL        => 'https://d3js.org/d3.v7.min.js';
 
 # Exact die() strings the module promises -- if these change, the API has changed.
-Readonly my $ERR_NOT_OPTIONAL   => 'Data is not optional';
-Readonly my $ERR_ARRAY_OF_ARRAY => 'Data must be an array of arrays';
-Readonly my $ERR_ARRAY_OF_HASH  => 'Data must be an array of hashes';
+Readonly my $ERR_NOT_OPTIONAL        => 'Data is not optional';
+Readonly my $ERR_ARRAY_OF_ARRAY      => 'Data must be an array of arrays';
+Readonly my $ERR_ARRAY_OF_HASH       => 'Data must be an array of hashes';
+Readonly my $ERR_EACH_POINT_ARRAYREF => 'Each data point must be an array reference';
+Readonly my $ERR_EACH_POINT_3_ELEMS  => 'Each data point must have at least 3 elements';
+Readonly my $ERR_VALUE_NUMERIC       => 'Value must be numeric';
+Readonly my $ERR_CELL_PADDING_RANGE  => 'cell_padding must be between 0 and 8';
 
 # ---------------------------------------------------------------------------
 # new()
@@ -676,6 +688,233 @@ subtest 'render_pie_chart_snippet - custom separator appears in legend entry' =>
 		->render_pie_chart_snippet(\@SIMPLE_DATA, { separator => '|' })->{html};
 	like($html,   qr/d\.data\.label \+ ' \| '/, 'custom separator | in snippet legend JS');
 	unlike($html, qr/d\.data\.label \+ ' \/ '/, 'default / absent when overridden');
+};
+
+# ---------------------------------------------------------------------------
+# render_heatmap_snippet
+# ---------------------------------------------------------------------------
+
+subtest 'render_heatmap_snippet - validation: all documented error conditions' => sub {
+	# Each of the six errors has a distinct trigger; test every branch so that
+	# a future refactor cannot silently drop one without breaking this test.
+	my $chart = HTML::D3->new();
+
+	throws_ok(
+		sub { $chart->render_heatmap_snippet('not an arrayref') },
+		qr/\Q$ERR_ARRAY_OF_ARRAY\E/,
+		'dies when data argument is not an arrayref',
+	);
+	throws_ok(
+		sub { $chart->render_heatmap_snippet(['scalar_element']) },
+		qr/\Q$ERR_EACH_POINT_ARRAYREF\E/,
+		'dies when a triple element is a scalar, not an arrayref',
+	);
+	throws_ok(
+		sub { $chart->render_heatmap_snippet([['Jan', 'North']]) },
+		qr/\Q$ERR_EACH_POINT_3_ELEMS\E/,
+		'dies when a triple has only two elements',
+	);
+	throws_ok(
+		sub { $chart->render_heatmap_snippet([['Jan']]) },
+		qr/\Q$ERR_EACH_POINT_3_ELEMS\E/,
+		'dies when a triple has only one element',
+	);
+	throws_ok(
+		sub { $chart->render_heatmap_snippet([['Jan', 'North', 'not_a_number']]) },
+		qr/\Q$ERR_VALUE_NUMERIC\E/,
+		'dies when defined value is not numeric',
+	);
+	throws_ok(
+		sub { $chart->render_heatmap_snippet(\@HEATMAP_DATA, { color_scheme => 'Viridis' }) },
+		qr/Unknown color_scheme: Viridis/,
+		'dies on unsupported color_scheme with the scheme name embedded in message',
+	);
+	throws_ok(
+		sub { $chart->render_heatmap_snippet(\@HEATMAP_DATA, { cell_padding => 9 }) },
+		qr/\Q$ERR_CELL_PADDING_RANGE\E/,
+		'dies when cell_padding exceeds the maximum of 8',
+	);
+	throws_ok(
+		sub { $chart->render_heatmap_snippet(\@HEATMAP_DATA, { cell_padding => -1 }) },
+		qr/\Q$ERR_CELL_PADDING_RANGE\E/,
+		'dies when cell_padding is negative (below the minimum of 0)',
+	);
+};
+
+subtest 'render_heatmap_snippet - return structure' => sub {
+	my $chart    = HTML::D3->new(width => 800, height => 600);
+	my $fragment = $chart->render_heatmap_snippet(\@HEATMAP_DATA);
+
+	returns_ok($fragment, { type => 'hashref' }, 'returns a hashref');
+	is($fragment->{svg_id}, 'heatmap', 'svg_id is always "heatmap"');
+	ok(defined($fragment->{html}),          'html key is present');
+	returns_ok($fragment->{html}, { type => 'string' }, 'html value is a scalar string');
+	ok(length($fragment->{html}) > 0,       'html value is non-empty');
+
+	diag('heatmap_snippet html length: ' . length($fragment->{html})) if $ENV{TEST_VERBOSE};
+};
+
+subtest 'render_heatmap_snippet - fragment must not contain page-shell elements' => sub {
+	# The fragment is embedded in an existing layout; a full page wrapper would
+	# break the host document's HTML structure.
+	my $html = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA)->{html};
+
+	unlike($html, qr/<!DOCTYPE/i,               'no DOCTYPE in fragment');
+	unlike($html, qr/<html/i,                   'no <html> element in fragment');
+	unlike($html, qr/<head/i,                   'no <head> element in fragment');
+	unlike($html, qr/<body/i,                   'no <body> element in fragment');
+	unlike($html, qr{https://d3js\.org/d3\.v7}, 'no D3 CDN tag -- caller loads D3');
+	like($html,   qr/<svg id="heatmap"/,        'SVG element has id="heatmap"');
+};
+
+subtest 'render_heatmap_snippet - uses d3.scaleSequential with default YlOrRd scheme' => sub {
+	# scaleSequential maps the continuous [0, max] domain to a gradient colour;
+	# scaleBand maps the categorical x/y label sets to pixel positions.
+	my $html = HTML::D3->new(width => 800, height => 600)
+	                   ->render_heatmap_snippet(\@HEATMAP_DATA)->{html};
+
+	like($html, qr/scaleSequential/,   'd3.scaleSequential present');
+	like($html, qr/interpolateYlOrRd/, 'default interpolator is YlOrRd');
+	like($html, qr/scaleBand/,         'd3.scaleBand present for categorical axes');
+};
+
+subtest 'render_heatmap_snippet - each supported color_scheme emits its d3.interpolate counterpart' => sub {
+	# The mapping is one-to-one: scheme name -> d3.interpolate<Name>.
+	# If the map in the module is wrong for any entry this test catches it.
+	my %scheme_to_interp = (
+		YlOrRd  => 'interpolateYlOrRd',
+		Blues   => 'interpolateBlues',
+		Greens  => 'interpolateGreens',
+		Purples => 'interpolatePurples',
+		RdPu    => 'interpolateRdPu',
+		YlGnBu  => 'interpolateYlGnBu',
+	);
+	my $chart = HTML::D3->new(width => 800, height => 600);
+	for my $scheme (sort keys %scheme_to_interp) {
+		my $interp = $scheme_to_interp{$scheme};
+		my $html   = $chart->render_heatmap_snippet(\@HEATMAP_DATA, { color_scheme => $scheme })->{html};
+		like($html, qr/\Q$interp\E/, "color_scheme '$scheme' emits d3.$interp");
+	}
+};
+
+subtest 'render_heatmap_snippet - legend on by default; legend => 0 omits legend JS block' => sub {
+	# The legend JS block is generated Perl-side: when legend => 0, the string
+	# "linearGradient" is entirely absent from the HTML source, not merely
+	# behind a JS runtime check.  This is intentional and testable.
+	my $html_default = HTML::D3->new(width => 800, height => 600)
+	                           ->render_heatmap_snippet(\@HEATMAP_DATA)->{html};
+	my $html_no_leg  = HTML::D3->new(width => 800, height => 600)
+	                           ->render_heatmap_snippet(\@HEATMAP_DATA, { legend => 0 })->{html};
+
+	like($html_default,  qr/linearGradient/,  'legend default: linearGradient block present');
+	unlike($html_no_leg, qr/linearGradient/,  'legend => 0: linearGradient entirely absent from source');
+};
+
+subtest 'render_heatmap_snippet - animated => 1 emits row-stagger fade with prefers-reduced-motion guard' => sub {
+	# The animation fades cell groups in from opacity 0, staggered by row index
+	# (yMap.get(d.y) * 50 ms).  It must check prefers-reduced-motion and skip
+	# the transition when the user has requested reduced motion.
+	my $html = HTML::D3->new(width => 800, height => 600)
+	                   ->render_heatmap_snippet(\@HEATMAP_DATA, { animated => 1 })->{html};
+
+	like($html, qr/prefers-reduced-motion/,    'prefers-reduced-motion guard present');
+	like($html, qr/yMap\.get\(d\.y\)/,         'row-index stagger uses yMap row position');
+	like($html, qr/\.attr\("opacity",\s*0\)/,  'cells start at opacity 0 before transition');
+	like($html, qr/noAnim/,                    'noAnim flag computed from media query');
+
+	diag('animated heatmap html length: ' . length($html)) if $ENV{TEST_VERBOSE};
+};
+
+subtest 'render_heatmap_snippet - animated => 0 omits animation code entirely' => sub {
+	# The animation block is Perl-side conditional, so its code is never present
+	# when animated => 0 (or when opts are omitted).
+	my $html_plain = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA)->{html};
+	my $html_off   = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA, { animated => 0 })->{html};
+
+	unlike($html_plain, qr/prefers-reduced-motion/, 'no animation code when opts omitted');
+	unlike($html_off,   qr/prefers-reduced-motion/, 'no animation code when animated => 0');
+	unlike($html_off,   qr/noAnim/,                 'noAnim variable absent when animated => 0');
+};
+
+subtest 'render_heatmap_snippet - undef values silently skipped; defined siblings retained' => sub {
+	# undef at position [2] drops the entire triple from @triples before JSON
+	# encoding.  The sibling triple in the same call must still appear.
+	my @mixed = (['Mar', 'East', undef], ['Mar', 'West', 77]);
+	my $html  = HTML::D3->new()->render_heatmap_snippet(\@mixed)->{html};
+
+	like($html,   qr/"v":77/,         'non-undef value appears in JSON data');
+	unlike($html, qr/"y":"East"/,     'undef triple silently skipped: East not in JSON');
+};
+
+subtest 'render_heatmap_snippet - duplicate (x,y) pair: Perl passes both; JS deduplicates via gridMap' => sub {
+	# Perl does not deduplicate at encode time -- it serialises all non-undef
+	# triples into JSON so the caller can see both entries arrive in the browser.
+	# The JS gridMap.set overwrites the first entry with the second (last write
+	# wins), which is the documented API contract.
+	my @dupes = (['Jan', 'North', 10], ['Jan', 'North', 99]);
+	my $html  = HTML::D3->new()->render_heatmap_snippet(\@dupes)->{html};
+
+	like($html, qr/"v":10/,          'first duplicate value present in JSON (Perl passes all)');
+	like($html, qr/"v":99/,          'second duplicate value present in JSON');
+	like($html, qr/gridMap\.set/,    'gridMap.set present -- JS last-write-wins deduplication mechanism');
+};
+
+subtest 'render_heatmap_snippet - all-zero values use degenerate-domain fallback [0, 1]' => sub {
+	# When all values are zero, d3.scaleSequential([0, 0]) is degenerate and
+	# returns a constant colour.  The JS guards with "maxV === 0 ? [0, 1] : [0, maxV]"
+	# so the scale always has a non-trivial domain.
+	my @zeros = (['A', 'X', 0], ['B', 'Y', 0]);
+	my $html;
+	lives_ok(
+		sub { $html = HTML::D3->new()->render_heatmap_snippet(\@zeros)->{html} },
+		'all-zero data renders without error',
+	);
+	like($html, qr/\[0,\s*1\]/,  'fallback domain literal [0, 1] present in JS scale call');
+};
+
+subtest 'render_heatmap_snippet - val_label: default "Value", custom label embedded in JS' => sub {
+	# val_label is embedded as the JS variable valLabelStr and shown in the
+	# tooltip.  Testing this confirms the Perl escaping path is exercised.
+	my $html_def = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA)->{html};
+	like($html_def, qr/valLabelStr = "Value"/, 'default val_label is "Value"');
+
+	my $html_cus = HTML::D3->new()->render_heatmap_snippet(
+		\@HEATMAP_DATA, { val_label => 'Revenue' }
+	)->{html};
+	like($html_cus, qr/valLabelStr = "Revenue"/, 'custom val_label embedded in JS');
+};
+
+subtest 'render_heatmap_snippet - x_label and y_label embedded as JS string vars' => sub {
+	# Labels are Perl-escaped and embedded as xLabelStr / yLabelStr.  The JS
+	# then guards rendering with "if (xLabelStr)" so empty strings suppress axes.
+	my $html = HTML::D3->new(width => 900, height => 500)->render_heatmap_snippet(
+		\@HEATMAP_DATA, { x_label => 'Month', y_label => 'Region' }
+	)->{html};
+
+	like($html, qr/xLabelStr = "Month"/,  'x_label "Month" embedded as xLabelStr');
+	like($html, qr/yLabelStr = "Region"/, 'y_label "Region" embedded as yLabelStr');
+};
+
+subtest 'render_heatmap_snippet - no circular references in returned hashref' => sub {
+	my $fragment = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA);
+	memory_cycle_ok($fragment, 'basic heatmap hashref has no circular references');
+};
+
+subtest 'render_heatmap_snippet - no circular references with combined opts' => sub {
+	# Verify the more complex code paths (animated + legend + custom labels) also
+	# stay cycle-free; a hashref holding a reference back to itself would fail here.
+	my $fragment = HTML::D3->new(width => 900, height => 500)->render_heatmap_snippet(
+		\@HEATMAP_DATA,
+		{
+			animated     => 1,
+			legend       => 1,
+			color_scheme => 'Blues',
+			show_values  => 1,
+			x_label      => 'Month',
+			y_label      => 'Region',
+		},
+	);
+	memory_cycle_ok($fragment, 'heatmap hashref with combined opts has no circular references');
 };
 
 # ---------------------------------------------------------------------------

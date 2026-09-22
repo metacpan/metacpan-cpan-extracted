@@ -1,0 +1,6 @@
+[% IF ebug.finished %]
+  [% INCLUDE finished.html.tt %]
+[% ELSE %]
+  [% INCLUDE running.html.tt %]
+[% END %]
+ 

@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::API::Datacenters;
 # ABSTRACT: Hetzner Cloud Datacenters API
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::Datacenter;
 use namespace::clean;
@@ -29,12 +30,20 @@ sub _wrap_list {
 }
 
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/datacenters', params => \%params);
-    return $self->_wrap_list($result->{datacenters} // []);
+    return ($self->_wrap_list($result->{datacenters} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
 
 
 sub get {
@@ -50,7 +59,7 @@ sub get_by_name {
     my ($self, $name) = @_;
     croak "Name required" unless $name;
 
-    my $datacenters = $self->list;
+    my $datacenters = $self->list_all;
     for my $dc (@$datacenters) {
         return $dc if $dc->name eq $name;
     }
@@ -72,7 +81,7 @@ WWW::Hetzner::Cloud::API::Datacenters - Hetzner Cloud Datacenters API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -81,7 +90,7 @@ version 0.100
     my $cloud = WWW::Hetzner::Cloud->new(token => $ENV{HETZNER_API_TOKEN});
 
     # List all datacenters
-    my $datacenters = $cloud->datacenters->list;
+    my $datacenters = $cloud->datacenters->list_all;
 
     # Get by name
     my $dc = $cloud->datacenters->get_by_name('fsn1-dc14');
@@ -98,6 +107,15 @@ All methods return L<WWW::Hetzner::Cloud::Datacenter> objects.
     my $datacenters = $cloud->datacenters->list;
 
 Returns an arrayref of L<WWW::Hetzner::Cloud::Datacenter> objects.
+
+=head2 list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
 
 =head2 get
 
@@ -146,7 +164,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

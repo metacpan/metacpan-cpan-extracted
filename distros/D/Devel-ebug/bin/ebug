@@ -7,7 +7,7 @@ use Devel::ebug::Console;
 
 # PODNAME: ebug
 # ABSTRACT: A simple, extensible console Perl debugger
-our $VERSION = '0.64'; # VERSION
+our $VERSION = '0.65'; # VERSION
 
 my $backend;
 if ($ARGV[0] eq '--backend') {
@@ -30,7 +30,7 @@ ebug - A simple, extensible console Perl debugger
 
 =head1 VERSION
 
-version 0.64
+version 0.65
 
 =head1 SYNOPSIS
 
@@ -41,6 +41,132 @@ version 0.64
 
 ebug is an interactive command-line front end to L<Devel::ebug>. It
 is a simple Perl debugger, much like perl5db.pl.
+
+=head1 COMMANDS
+
+At the C<ebug:> prompt, type one of the following commands and press
+return. Pressing return with an empty line repeats the last command
+(handy for repeatedly pressing C<s> or C<n> to step through code).
+Anything that isn't recognized as a command below is evaluated as
+Perl code in the debuggee, the same as the C<e> command.
+
+=over 4
+
+=item ? or h
+
+Show this list of commands.
+
+=item b LINE
+
+=item b LINE CONDITION
+
+Set a break point at C<LINE> in the current file, optionally only
+breaking when C<CONDITION> is true (eg: C<b 6>, C<b 6 $x E<gt> 7>).
+
+=item b FILE LINE
+
+=item b FILE LINE CONDITION
+
+Set a break point at C<LINE> in C<FILE> (eg: C<b code.pl 6>).
+
+=item b SUBROUTINE
+
+Set a break point at the start of C<SUBROUTINE>, given as a fully
+qualified name (eg: C<b Calc::fib>).
+
+=item bf FILE
+
+Set a break point that triggers as soon as C<FILE> is loaded (eg:
+C<bf Calc.pm>).
+
+=item d LINE
+
+=item d FILE LINE
+
+Delete the break point at C<LINE> in the current file, or in C<FILE>.
+
+=item e EXPR
+
+Evaluate C<EXPR> as Perl code in the debuggee and print the result
+(eg: C<e $x+$y>).
+
+=item f
+
+Show all the filenames currently loaded.
+
+=item l
+
+List code lines around the current line.
+
+=item l N
+
+List code lines around the current line, and remember C<N> as the
+number of lines to show from now on.
+
+=item L
+
+Toggle always listing code lines before each prompt.
+
+=item n
+
+Next: step onto the next line, stepping over any subroutine calls.
+
+=item o
+
+Show the debuggee's captured STDOUT and STDERR.
+
+=item p
+
+Show the pad: all lexical (C<my>) variables in scope.
+
+=item r
+
+Run until the next break point or watch point. Pressing Ctrl-C
+(SIGINT) while running stops the debuggee and drops back into the
+C<ebug:> prompt instead of killing the console.
+
+=item ret
+
+=item ret VALUE
+
+Return from the current subroutine, optionally forcing the return
+value to C<VALUE> for testing purposes (eg: C<ret 3.141>).
+
+=item restart
+
+Restart the program from the beginning.
+
+=item s
+
+Step: step onto the next line, stepping into any subroutine calls.
+
+=item T
+
+Show a stack trace.
+
+=item u
+
+=item u N
+
+Undo the last command, or the last C<N> commands. This restarts the
+debuggee and replays the previous session's state-changing commands.
+
+=item w CONDITION
+
+Set a watch point: execution stops as soon as C<CONDITION> becomes
+true (eg: C<w $t E<gt> 10>).
+
+=item x EXPR
+
+Evaluate C<EXPR> and dump the result using L<YAML> (eg: C<x $object>).
+Pressing Tab after C<x > completes on the names of variables currently
+in the pad.
+
+=item q
+
+Quit ebug.
+
+=back
 
 =head1 SEE ALSO
 
@@ -60,7 +186,7 @@ Taisuke Yamada
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2005-2021 by Leon Brocard.
+This software is copyright (c) 2005-2026 by Leon Brocard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

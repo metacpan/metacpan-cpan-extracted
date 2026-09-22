@@ -1,9 +1,12 @@
 package IO::K8s::Api::Core::V1::EmptyDirVolumeSource;
 # ABSTRACT: Represents an empty directory for a pod. Empty directory volumes support ownership management and SELinux relabeling.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s medium => Str;
+
+
+k8s mode => Int;
 
 
 k8s sizeLimit => Quantity;
@@ -23,11 +26,15 @@ IO::K8s::Api::Core::V1::EmptyDirVolumeSource - Represents an empty directory for
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 medium
 
 medium represents what type of storage medium should back this directory. The default is "" which means to use the node's default medium. Must be an empty string (default) or Memory. More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir
+
+=head2 mode
+
+mode specifies the permission bits for the emptyDir directory, in numeric notation (e.g., 0755, 01777). Must be a value between 0000 and 01777. If not specified, defaults to 0777. This might be in conflict with other options that affect the file mode, like fsGroup. If fsGroup is specified, the fsGroup permissions will override the mode specified here. This field has no effect on Windows. This field is alpha and requires EmptyDirVolumeMode featuregate to be enabled.
 
 =head2 sizeLimit
 

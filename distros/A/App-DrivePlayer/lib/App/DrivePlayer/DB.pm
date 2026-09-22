@@ -105,22 +105,6 @@ sub upsert_folder {
     return _row_to_hash($row);
 }
 
-sub get_folder_by_drive_id {
-    my ($self, $drive_id) = @_;
-    return _row_to_hash(
-        $self->_rs('Folder')->find({ drive_id => $drive_id })
-    );
-}
-
-sub folders_for_scan_folder {
-    my ($self, $scan_folder_id) = @_;
-    return map { _row_to_hash($_) }
-        $self->_rs('Folder')->search(
-            { scan_folder_id => $scan_folder_id },
-            { order_by       => 'path' },
-        )->all;
-}
-
 # ---------- tracks ----------
 
 my @STRUCTURAL_FIELDS = qw( folder_id folder_path mime_type size modified_time );
@@ -320,15 +304,20 @@ sub search_tracks {
         )->all;
 }
 
-sub all_genres {
-    my ($self) = @_;
-    return $self->_rs('Track')->search(
-        { genre => [ -and => { '!=' => undef }, { '!=' => '' } ] },
-        { columns  => ['genre'],
-          distinct  => 1,
-          order_by  => \['LOWER(genre)'] },
-    )->get_column('genre')->all;
+# Distinct, non-empty values of a single text column, ordered case-insensitively.
+sub _distinct_nonempty {
+    my ($self, $col) = @_;
+    my @vals = $self->_rs('Track')->search(
+        { $col => [ -and => { '!=' => undef }, { '!=' => '' } ] },
+        { columns => [$col], distinct => 1 },
+    )->get_column($col)->all;
+    my @sorted = sort { lc($a) cmp lc($b) } @vals;
+    return @sorted;
 }
+
+sub all_genres  { $_[0]->_distinct_nonempty('genre')  }
+sub all_artists { $_[0]->_distinct_nonempty('artist') }
+sub all_albums  { $_[0]->_distinct_nonempty('album')  }
 
 sub tracks_by_genre {
     my ($self, $genre) = @_;
@@ -336,41 +325,6 @@ sub tracks_by_genre {
         $self->_rs('Track')->search(
             \[ 'LOWER(genre) = LOWER(?)', $genre ],
             { order_by => \@TRACK_ORDER },
-        )->all;
-}
-
-sub all_artists {
-    my ($self) = @_;
-    return $self->_rs('Track')->search(
-        { artist => [ -and => { '!=' => undef }, { '!=' => '' } ] },
-        { columns  => ['artist'],
-          distinct  => 1,
-          order_by  => \['LOWER(artist)'] },
-    )->get_column('artist')->all;
-}
-
-sub all_albums {
-    my ($self) = @_;
-    return $self->_rs('Track')->search(
-        { album => [ -and => { '!=' => undef }, { '!=' => '' } ] },
-        { columns  => ['album'],
-          distinct  => 1,
-          order_by  => \['LOWER(album)'] },
-    )->get_column('album')->all;
-}
-
-sub top_folders {
-    my ($self) = @_;
-    return map { _row_to_hash($_) }
-        $self->_rs('Folder')->search(
-            \[
-                'folder.parent_drive_id = scan_folder.drive_id
-                 OR folder.drive_id = scan_folder.drive_id'
-            ],
-            {
-                join     => 'scan_folder',
-                order_by => 'me.path',
-            },
         )->all;
 }
 
@@ -432,30 +386,31 @@ sub clear_scan_folder_tracks {
     $self->_rs('Folder')->search({ scan_folder_id => $scan_folder_id })->delete;
 }
 
-sub count_unseen_tracks {
+# Resultset of tracks under $scan_folder_id whose drive_id is NOT in %$seen.
+# Returns undef if the scan folder has no folders (nothing to consider).
+sub _unseen_tracks_rs {
     my ($self, $scan_folder_id, $seen) = @_;
     my @keep = keys %$seen;
     my @folder_ids = $self->_rs('Folder')
         ->search({ scan_folder_id => $scan_folder_id })
         ->get_column('id')->all;
-    return 0 unless @folder_ids;
+    return unless @folder_ids;
     return $self->_rs('Track')->search({
         folder_id => { -in  => \@folder_ids },
         (@keep ? (drive_id => { -not_in => \@keep }) : ()),
-    })->count;
+    });
+}
+
+sub count_unseen_tracks {
+    my ($self, $scan_folder_id, $seen) = @_;
+    my $rs = $self->_unseen_tracks_rs($scan_folder_id, $seen) or return 0;
+    return $rs->count;
 }
 
 sub remove_unseen_tracks {
     my ($self, $scan_folder_id, $seen) = @_;
-    my @keep = keys %$seen;
-    my @folder_ids = $self->_rs('Folder')
-        ->search({ scan_folder_id => $scan_folder_id })
-        ->get_column('id')->all;
-    return 0 unless @folder_ids;
-    return $self->_rs('Track')->search({
-        folder_id => { -in  => \@folder_ids },
-        (@keep ? (drive_id => { -not_in => \@keep }) : ()),
-    })->delete;
+    my $rs = $self->_unseen_tracks_rs($scan_folder_id, $seen) or return 0;
+    return $rs->delete;
 }
 
 sub remove_unseen_folders {
@@ -564,18 +519,6 @@ its child folders and tracks.
 Insert or update a subfolder record.  Required keys: C<drive_id>, C<name>,
 C<path>, C<scan_folder_id>.  Optional: C<parent_drive_id>.
 
-=head2 get_folder_by_drive_id
-
-  my $hashref = $db->get_folder_by_drive_id($drive_id);
-
-Returns the folder hashref, or C<undef> if not found.
-
-=head2 folders_for_scan_folder
-
-  my @hashrefs = $db->folders_for_scan_folder($scan_folder_id);
-
-Returns all folders belonging to a scan folder, ordered by path.
-
 =head2 upsert_track
 
   $db->upsert_track(%fields);
@@ -640,13 +583,6 @@ Distinct, non-empty artist names ordered case-insensitively.
   my @strings = $db->all_albums;
 
 Distinct, non-empty album names ordered case-insensitively.
-
-=head2 top_folders
-
-  my @hashrefs = $db->top_folders;
-
-Returns folders that sit at the top level of a scan folder (i.e. whose
-parent is the scan-folder root), ordered by path.
 
 =head2 track_count
 

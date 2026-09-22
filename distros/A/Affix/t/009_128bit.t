@@ -4,6 +4,7 @@ use blib;
 use Test2::Tools::Affix qw[:all];
 use Test2::V0 -no_srand => 1;
 use Affix qw[:all];
+plan skip_all => 'MSVC (' . ( $ENV{AFFIX_CC} // 'unknown' ) . ') does not support __int128_t' if ( $ENV{AFFIX_CC} // '' ) =~ /^cl(\b|$)/i;
 #
 $|++;
 #

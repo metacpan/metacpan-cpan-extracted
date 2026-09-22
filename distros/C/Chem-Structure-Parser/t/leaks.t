@@ -61,9 +61,15 @@ no_leaks_ok {
 	Chem::Structure::Parser::_parse_string("ATOM      1  CA  ALA A   1      1.0  2.0  3.0\n", {});
 } '_parse_string does not leak';
 
+# both croak before the read buffer is allocated, so what is watched here is the
+# path SV and whatever the XSUB had built before it gave up
 no_leaks_ok {
 	eval { Chem::Structure::Parser::_parse_file("$data/no.such.file.pdb", {}) };
-} 'a failed open does not leak the buffer it had already allocated';
+} 'a failed open does not leak';
+
+no_leaks_ok {
+	eval { Chem::Structure::Parser::_parse_file($data, {}) };
+} 'and neither does the refusal to read a directory';
 
 no_leaks_ok {
 	eval { Chem::Structure::Parser::_parse_string('', 'not a hashref') };

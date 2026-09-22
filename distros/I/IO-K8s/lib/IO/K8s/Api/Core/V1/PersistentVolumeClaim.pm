@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PersistentVolumeClaim;
 # ABSTRACT: PersistentVolumeClaim is a user's request for and claim to a persistent volume
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Core::V1::PersistentVolumeClaim - PersistentVolumeClaim is a user'
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ status represents the current information/status of a persistent volume claim. R
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#persistentvolumeclaim-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#persistentvolumeclaim-v1-core>
 
 =head1 SUPPORT
 

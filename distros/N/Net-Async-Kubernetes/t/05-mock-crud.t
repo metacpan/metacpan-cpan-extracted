@@ -342,4 +342,53 @@ subtest 'auth header sent' => sub {
     is($req->{headers}{Accept}, 'application/json', 'Accept header');
 };
 
+# ============================================================================
+# public rest / new_object accessors
+# ============================================================================
+
+subtest 'rest returns the same instance as _rest' => sub {
+    my $kube = make_kube();
+
+    my $rest = $kube->rest;
+    isa_ok($rest, 'Kubernetes::REST', 'rest returns a Kubernetes::REST');
+    is($rest, $kube->_rest, 'rest and _rest are the identical cached instance');
+};
+
+subtest 'new_object mirrors _rest->new_object' => sub {
+    my $kube = make_kube();
+
+    my $via_public = $kube->new_object('ConfigMap',
+        metadata => { name => 'my-config' },
+        data     => { key => 'value' },
+    );
+    my $via_private = $kube->_rest->new_object('ConfigMap',
+        metadata => { name => 'my-config' },
+        data     => { key => 'value' },
+    );
+    isa_ok($via_public, ref($via_private), 'new_object builds the same kind of object');
+    is($via_public->metadata->name, 'my-config', 'metadata carried through');
+    is($via_public->data->{key}, 'value', 'data carried through');
+};
+
+subtest 'object built via new_object round-trips through create' => sub {
+    my $kube = make_kube();
+
+    MockTransport::mock_response('POST', '/api/v1/namespaces/default/configmaps', {
+        kind => 'ConfigMap', apiVersion => 'v1',
+        metadata => { name => 'my-config', namespace => 'default', uid => 'cm-uid' },
+        data => { key => 'value' },
+    });
+
+    my $cm = $kube->new_object('ConfigMap',
+        metadata => { name => 'my-config', namespace => 'default' },
+        data     => { key => 'value' },
+    );
+    my $created = $kube->create($cm)->get;
+    is($created->metadata->name, 'my-config', 'created ConfigMap returned');
+
+    my $req = MockTransport::last_request();
+    is($req->{method}, 'POST', 'used POST');
+    ok($req->{content}, 'request had body');
+};
+
 done_testing;

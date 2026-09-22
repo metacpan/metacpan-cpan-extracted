@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::ResourceSlice;
 # ABSTRACT: ResourceSlice represents one or more resources in a pool of similar resources, managed by a common driver. A pool may span more than one ResourceSlice, and exactly how many ResourceSlices comprise a pool is determined by the driver.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -20,7 +20,7 @@ IO::K8s::Api::Resource::V1::ResourceSlice - ResourceSlice represents one or more
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ Changing the spec automatically increments the metadata.generation number.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#resourceslice-v1-resource.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#resourceslice-v1-resource.k8s.io>
 
 =head1 SUPPORT
 

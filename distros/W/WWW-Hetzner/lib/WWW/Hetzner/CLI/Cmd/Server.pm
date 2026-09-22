@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Server;
 # ABSTRACT: Server commands
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
@@ -40,10 +40,10 @@ sub _list {
     $params{label_selector} = $self->selector if $self->selector;
     $params{name} = $self->name if $self->name;
 
-    my $servers = $cloud->servers->list(%params);
+    my $servers = $cloud->servers->list_all(%params);
 
     if ($main->output eq 'json') {
-        print encode_json($servers), "\n";
+        print encode_json([ map { $_->data } @$servers ]), "\n";
         return;
     }
 
@@ -59,12 +59,12 @@ sub _list {
 
     for my $s (@$servers) {
         printf "%-10s %-25s %-12s %-16s %-10s %s\n",
-            $s->{id},
-            $s->{name},
-            $s->{status},
-            $s->{public_net}{ipv4}{ip} // '-',
-            $s->{server_type}{name} // '-',
-            $s->{datacenter}{name} // '-';
+            $s->id,
+            $s->name,
+            $s->status,
+            $s->ipv4 // '-',
+            $s->server_type // '-',
+            $s->datacenter // '-';
     }
 }
 
@@ -83,7 +83,7 @@ WWW::Hetzner::CLI::Cmd::Server - Server commands
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -162,7 +162,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

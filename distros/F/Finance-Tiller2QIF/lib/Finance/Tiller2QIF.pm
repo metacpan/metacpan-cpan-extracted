@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF;
 # ABSTRACT: Convert Tiller CSV exports to QIF format
-$Finance::Tiller2QIF::VERSION = '1.09';
+$Finance::Tiller2QIF::VERSION = '1.10';
 use v5.34;
 use strict;
 use warnings;
@@ -80,17 +80,18 @@ suppresses duplicates (card-payment credits), and assigns destination accounts.
 
 =head2 Perl Dependencies
 
-Runtime: Cpanel::JSON::XS, DateTime::Format::Flexible, Getopt::Long::Descriptive,
-Path::Tiny, Mojo::SQLite, Text::CSV
+Runtime: Cpanel::JSON::XS, DateTime::Format::Flexible, DBD::SQLite, DBI,
+Getopt::Long::Descriptive, Path::Tiny, Text::CSV
 
 Testing: Capture::Tiny, Test2::V0, Test2::Bundle::More, Test2::Tools::Exception
 
 =head3 On Debian/Ubuntu:
 
-All of Tiller2QIF’s dependencies are available through package management if you need to install to system Perl.
+All of Tiller2QIF’s dependencies are available through package management if you need to install to system Perl on Debian 13 or Ubuntu 26.04 or later.
 
   sudo apt install libpath-tiny-perl libtext-csv-perl libtest2-suite-perl libcapture-tiny-perl \
-    libmojo-sqlite-perl libcpanel-json-xs-perl libdatetime-format-flexible-perl
+    libdbi-perl libdbd-sqlite3-perl libgetopt-long-descriptive-perl \
+    libcpanel-json-xs-perl libdatetime-format-flexible-perl
   sudo cpan install Finance::Tiller2QIF
 
 =head3 On Windows
@@ -98,6 +99,8 @@ All of Tiller2QIF’s dependencies are available through package management if y
 tiller2qif works with Strawberry Perl, after installing Strawberry Perl, install from CPAN.
 
 =head1 CLI COMMANDS
+
+The command word may be given either before or after the options; any other stray argument on the command line is an error.
 
 =over 4
 
@@ -120,6 +123,13 @@ tiller2qif works with Strawberry Perl, after installing Strawberry Perl, install
 =item B<preview> -- preview the records that would be emitted
 
   tiller2qif preview --db tiller.sqlite3
+
+  # read the preview in an editor or pager instead of the terminal
+  tiller2qif preview --db tiller.sqlite3 --viewer less
+
+  # and open the mapping file beside it
+  tiller2qif preview --db tiller.sqlite3 --mapfile tiller.mapping \
+                     --viewer 'code --wait' --multipreview
 
 =item B<emit> -- write QIF from the database
 
@@ -162,9 +172,11 @@ config file.  A typical config file looks like:
     "output":     "/tmp/tillerout.qif",
     "db":         "~/.data/tiller2qif.sqlite3",
     "mapfile":    "~/.config/tiller.mapping",
-    "verbose":    false,
-    "checkpoint": false,
-    "confirm":    false
+    "viewer":       "console",
+    "verbose":      false,
+    "checkpoint":   false,
+    "confirm":      false,
+    "multipreview": false
   }
 
 Pass the config file with C<--config>.  Command-line options override config
@@ -204,6 +216,10 @@ The C<run> command always checkpoints, even without this flag.
 confirmation before writing the QIF file. When used with C<--checkpoint>, adds
 a revert option (press C<r>) to restore the database to its checkpoint state,
 useful if you want to undo changes made during ingest or mapping.
+
+=item B<--viewer> Program used to display preview output. The default, C<console>, prints the preview to STDOUT. Any other value names an external program, and may include arguments, for example C<less>, C<gedit>, or C<code --wait>. The value is split on whitespace — first word the program, the rest arguments — so the program's own path cannot contain spaces; point C<--viewer> at a wrapper script or a symlink if yours does. The preview is written to a read-only temporary file named C<tiller2qif-preview-*.t2qpv>, the program is launched with that file as its argument, and the path is printed so you can find or reopen it. The temporary file is left in place, because graphical editors typically fork and return immediately; ask them to wait (C<code --wait>) when you want the export prompt to appear only after you close the preview. A viewer that cannot be found, fails to launch, is killed by a signal, or exits non-zero is a fatal error rather than a fall back to the console. In a config file the key is C<viewer>.
+
+=item B<--multipreview> Open the mapping file in the preview viewer alongside the preview itself, so you can read the pending transactions and edit the rules that produced them side by side. Both files are passed to a single invocation of the viewer. This requires C<--viewer> and C<--mapfile>; asking for it with the console viewer or without a mapping file is an error rather than a silent no-op. In a config file the key is C<multipreview>.
 
 =item B<--verbose> Print detailed progress information during each phase.  Also
 runs C<checkconfig> automatically before any operations begin.
@@ -328,6 +344,33 @@ C<default | source>.
 
 =back
 
+=head1 VS CODE EXTENSION
+
+The repository includes a Visual Studio Code extension, C<vscode-tiller-map/>, which highlights mapping files and preview files and completes destination account names from your chart of accounts. It is not published to the Marketplace, it can only be installed from a checkout of the repository.
+
+With B<--viewer code> and B<--multipreview> the actions B<preview> and B<run> will open the preview and map file in vscode
+
+=head2 Installation
+
+  git clone https://github.com/brainbuz/tiller2qif
+  cp -r tiller2qif/vscode-tiller-map ~/.vscode/extensions/
+  # or, to track the checkout:
+  ln -s "$PWD/tiller2qif/vscode-tiller-map" ~/.vscode/extensions/
+
+Reload VS Code afterwards.
+
+=head2 Syntax Highlighting
+
+Files with C<.map> and C<.mapping> extensions are recognized as mappings, preview files have the C<t2qpv> extension.
+
+=head2 Completion Hinting
+
+In addition to completion of Tiller2QIF keywords you can also configure your Chart of Accounts for Completion! The extension's settings C<tiller2qifMap.coaPath> and C<tiller2qifMap.coaFormat> control this. Currently the only available coaFormat is C<gnucash-csv>.
+
+=head2 Row Colors
+
+C<tiller2qifMap.rowColors> controls row backgrounds in both file types. C<rainbow>, the default, gives rows a repeating series of subtle background colors; C<none> turns backgrounds off. A preview transaction occupies two lines, both receive the same color.
+
 =head1 Advanced Use
 
 You can write SQL scripts or use an interactive sqlite3 client to make changes between steps. For example your Tiller sheet might have an account "Checking", while your table of accounts has "Assets::Current Assets::Bank::Checking". With custom SQL you can keep the short name in Tiller even though mapping rules can't rename accounts.
@@ -337,7 +380,7 @@ and after the map phase without having to break the workflow into separate comma
 This is the preferred way to preprocess or post-process transactions when using C<run>,
 or C<map> as a single step.
 
-The C<preview> command is meant to be run between map and emit. You may run the steps individually (ingest, map, preview, emit), or use the C<--confirm> option to run preview before emit (including run).
+The C<preview> command is meant to be run between map and emit. You may run the steps individually (ingest, map, preview, emit), or use the C<--confirm> option to run preview before emit (including run). The preview table is wide, so C<--viewer> is often more comfortable than the terminal; combined with C<--confirm> it lets you read the pending transactions in an editor or pager and then answer the export prompt.
 
 When using C<--confirm> with C<--checkpoint>, three choices Y=Yes N=No R=Revert are offered. No keeps the database state while not completing the export, Revert restores the database to the checkpoint in addition to aborting.
 
@@ -385,7 +428,9 @@ sub _emit (%options) {
 }
 
 sub _preview (%options) {
-  Finance::Tiller2QIF::WriteQIF::Preview( $options{db_path}, $options{verbose} );
+  my @also = $options{multipreview} ? ( $options{mapfile} ) : ();
+  Finance::Tiller2QIF::WriteQIF::Preview( $options{db_path}, $options{verbose},
+    $options{viewer}, @also );
 }
 
 sub _run (%options) {
@@ -468,7 +513,6 @@ my $badcmdhelp = <<'BADCMD';
 There was an error in your command line.
 Common causes are:
 * mistyping an option
-* command after options
 * accidental text in the line
 
 BADCMD
@@ -494,6 +538,10 @@ sub run_cli {
       [ 'aftermap=s',  "sql script to run after map" ],
       [ 'qifdate=s',   "QIF date format: ymd (default), mdy, or dmy" ],
       [ 'confirm',     "run preview before emit and confirm export"],
+      [ 'viewer=s',
+        "external program to view preview output (default: console)" ],
+      [ 'multipreview',
+        "also open the mapping file in the preview viewer" ],
       [ 'verbose|v',   "Print detailed progress information" ],
       [ 'version',     "Print the installed version and exit", { shortcircuit => 1 } ],
       [],
@@ -512,6 +560,15 @@ sub run_cli {
     say _version_text();
     return;
   }
+
+  # Getopt::Long permutes @ARGV, so a command word given after the options
+  # is left behind here rather than eaten as an option value; pick it up
+  # if the pre-parse grab above didn't already find one.
+  if ( !$cmd && @ARGV && $ARGV[0] !~ /^-/ ) {
+    $cmd = lc shift @ARGV;
+  }
+
+  die "tiller2qif: unexpected argument(s): @ARGV\n$badcmdhelp" if @ARGV;
 
   if ( !$cmd ) {
     die
@@ -541,16 +598,18 @@ sub run_cli {
 
   # Precedence: defaults < config file < CLI args
   my %options = (
-    input      => undef,
-    output     => undef,
-    db         => undef,
-    mapfile    => undef,
-    beforemap  => undef,
-    aftermap   => undef,
-    qifdate    => 'ymd',
-    verbose    => 0,
-    checkpoint => 0,
-    confirm    => 0,
+    input          => undef,
+    output         => undef,
+    db             => undef,
+    mapfile        => undef,
+    beforemap      => undef,
+    aftermap       => undef,
+    qifdate        => 'ymd',
+    verbose        => 0,
+    checkpoint     => 0,
+    confirm        => 0,
+    viewer         => 'console',
+    multipreview   => 0,
   );
 
   if ( $opt->config ) {
@@ -566,6 +625,15 @@ sub run_cli {
     $options{$key} = $val if defined $val;
   }
   $options{checkpoint} = 1 if $cmd eq 'run';
+
+  die "--viewer must name a program or 'console'\n"
+    unless defined $options{viewer} && $options{viewer} =~ /\S/;
+
+  if ( $options{multipreview} ) {
+    die "--multipreview requires --viewer, the console can't open files\n"
+      if lc $options{viewer} eq 'console';
+    die "--multipreview requires --mapfile\n" unless $options{mapfile};
+  }
 
   vPrint( $options{verbose}, _version_text() );
 

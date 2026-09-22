@@ -60,6 +60,33 @@ subtest 'create certificate' => sub {
 
     isa_ok($cert, 'WWW::Hetzner::Cloud::Certificate');
     is($cert->id, 1200, 'new certificate id');
+    isa_ok($cert->action, 'WWW::Hetzner::Action', 'create action is an Action');
+    is($cert->action->command, 'create_certificate', 'action command');
+};
+
+subtest 'retry certificate' => sub {
+    my $fixture = load_fixture('certificates_action');
+
+    my $cloud = mock_cloud(
+        'POST /certificates/1100/actions/retry' => $fixture,
+    );
+
+    my $result = $cloud->certificates->retry(1100);
+    isa_ok($result, 'WWW::Hetzner::Action');
+    is($result->command, 'issue_certificate', 'action command');
+};
+
+subtest 'certificate entity retry' => sub {
+    my $fixture = load_fixture('certificates_get');
+    my $action_fixture = load_fixture('certificates_action');
+
+    my $cloud = mock_cloud(
+        '/certificates/1100' => $fixture,
+        'POST /certificates/1100/actions/retry' => $action_fixture,
+    );
+
+    my $cert = $cloud->certificates->get(1100);
+    isa_ok($cert->retry, 'WWW::Hetzner::Action', 'entity retry returns Action');
 };
 
 subtest 'delete certificate' => sub {

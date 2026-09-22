@@ -1,11 +1,11 @@
 package IO::K8s::Api::Apps::V1::Deployment;
 # ABSTRACT: Deployment enables declarative updates for Pods and ReplicaSets.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
 
-k8s spec => 'Apps::V1::DeploymentSpec';
+k8s spec => 'Apps::V1::DeploymentSpec', 'required';
 
 
 k8s status => 'Apps::V1::DeploymentStatus';
@@ -26,7 +26,7 @@ IO::K8s::Api::Apps::V1::Deployment - Deployment enables declarative updates for 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ Most recently observed status of the Deployment.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#deployment-v1-apps>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#deployment-v1-apps>
 
 =head1 SUPPORT
 

@@ -1,12 +1,14 @@
 package IO::K8s::Cilium::V2::CiliumLoadBalancerIPPool;
-# ABSTRACT: Cilium load balancer IP address pool
-our $VERSION = '1.107';
+# ABSTRACT: CiliumLoadBalancerIPPool is a Kubernetes third-party resource which is used to defined pools of IPs which the operator can use to allocate and advertise IPs for Services of type LoadBalancer.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumloadbalancerippools';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => '+IO::K8s::Cilium::V2::CiliumLoadBalancerIPPoolSpec', { required => 'schema' };
+k8s status => '+IO::K8s::Cilium::V2::CiliumLoadBalancerIPPoolStatus';
+
+
 
 1;
 
@@ -18,25 +20,24 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Cilium::V2::CiliumLoadBalancerIPPool - Cilium load balancer IP address pool
+IO::K8s::Cilium::V2::CiliumLoadBalancerIPPool - CiliumLoadBalancerIPPool is a Kubernetes third-party resource which is used to defined pools of IPs which the operator can use to allocate and advertise IPs for Services of type LoadBalancer.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-This cluster-scoped resource defines an IP address pool for Cilium's LB IPAM (Load Balancer IP Address Management), allowing automatic allocation of service IPs from defined ranges. It uses API version C<cilium.io/v2>. The C<spec> and C<status> fields contain opaque CRD-specific data structures managed by the Cilium operator.
+Spec is a human readable description for a BGP load balancer
+ip pool.
 
-=head1 SEE ALSO
+=head2 status
 
-=over
+Status is the status of the IP Pool.
 
-=item * L<IO::K8s::Cilium> - Main Cilium CRD namespace
-
-=item * L<https://docs.cilium.io/en/stable/network/lb-ipam/> - Upstream Cilium LB IPAM documentation
-
-=back
+It might be possible for users to define overlapping IP Pools, we can't validate or enforce non-overlapping pools
+during object creation. The Cilium operator will do this validation and update the status to reflect the ability
+to allocate IPs from this pool.
 
 =head1 SUPPORT
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PersistentVolumeClaimStatus;
 # ABSTRACT: PersistentVolumeClaimStatus is the current status of a persistent volume claim.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s accessModes => [Str];
@@ -9,16 +9,19 @@ k8s accessModes => [Str];
 k8s allocatedResourceStatuses => { Str => 1 };
 
 
-k8s allocatedResources => { Str => 1 };
+k8s allocatedResources => { Quantity => 1 };
 
 
-k8s capacity => { Str => 1 };
+k8s capacity => { Quantity => 1 };
 
 
 k8s conditions => ['Core::V1::PersistentVolumeClaimCondition'];
 
 
 k8s currentVolumeAttributesClassName => Str;
+
+
+k8s healthStatus => 'Core::V1::VolumeHealthStatus';
 
 
 k8s modifyVolumeStatus => 'Core::V1::ModifyVolumeStatus';
@@ -41,7 +44,7 @@ IO::K8s::Api::Core::V1::PersistentVolumeClaimStatus - PersistentVolumeClaimStatu
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 accessModes
 
@@ -105,6 +108,10 @@ conditions is the current Condition of persistent volume claim. If underlying pe
 =head2 currentVolumeAttributesClassName
 
 currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using. When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
+
+=head2 healthStatus
+
+healthStatus contains the latest controller-reported health information for the volume bound to this claim.
 
 =head2 modifyVolumeStatus
 

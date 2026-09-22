@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::Job;
 # ABSTRACT: Job represents the configuration of a single job.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Batch::V1::Job - Job represents the configuration of a single job.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ Current status of a job. More info: https://git.k8s.io/community/contributors/de
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#job-v1-batch>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#job-v1-batch>
 
 =head1 SUPPORT
 

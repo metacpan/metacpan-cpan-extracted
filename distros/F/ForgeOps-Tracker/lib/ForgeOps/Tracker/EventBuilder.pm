@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use POSIX qw(strftime);
 use ForgeOps::Tracker::PiiScrubber qw(scrub scrub_string);
+use ForgeOps::Tracker::SqlStatement ();
 
 my $MAX_FRAMES = 500;
 
@@ -57,8 +58,26 @@ sub build {
     $payload{user} = { %$user } if $user && %$user;
     # Omitted entirely (never sent as an empty array) when there's nothing to report.
     $payload{breadcrumbs} = [ map { { %$_ } } @$breadcrumbs ] if $breadcrumbs && @$breadcrumbs;
+    $self->_attach_sql(\%payload, $error);
 
     return $config->{scrub_pii} ? $self->_scrub_payload(\%payload) : \%payload;
+}
+
+# See SqlStatement for what's read off the error and how it's masked. The statement itself only
+# goes out when capture_sql_statement is on; the extracted names go out on their own
+# (capture_sql_objects) so an issue can still name the procedure or view involved.
+sub _attach_sql {
+    my ($self, $payload, $error) = @_;
+    my $config = $self->{configuration};
+    return unless $config->{capture_sql_objects} || $config->{capture_sql_statement};
+
+    my $masked = ForgeOps::Tracker::SqlStatement::mask(ForgeOps::Tracker::SqlStatement::find_in($error));
+    return unless defined $masked;
+
+    my $objects = ForgeOps::Tracker::SqlStatement::objects($masked);
+    $payload->{sql_objects} = $objects if $objects && $config->{capture_sql_objects};
+    $payload->{sql_statement} = $masked if $config->{capture_sql_statement};
+    return;
 }
 
 sub _analyze {
@@ -190,6 +209,7 @@ sub _scrub_payload {
     my ($self, $payload) = @_;
     my %scrubbed = %$payload;
     $scrubbed{message} = scrub_string($payload->{message});
+    $scrubbed{sql_statement} = scrub_string($payload->{sql_statement}) if defined $payload->{sql_statement};
     $scrubbed{backtrace} = [
         map {
             my %frame = %$_;

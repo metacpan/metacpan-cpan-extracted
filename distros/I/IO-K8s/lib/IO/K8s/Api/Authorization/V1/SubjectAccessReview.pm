@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::SubjectAccessReview;
 # ABSTRACT: SubjectAccessReview checks whether or not a user or group can perform an action.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Authorization::V1::SubjectAccessReview - SubjectAccessReview check
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ Status is filled in by the server and indicates whether the request is allowed o
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#subjectaccessreview-v1-authorization.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#subjectaccessreview-v1-authorization.k8s.io>
 
 =head1 SUPPORT
 

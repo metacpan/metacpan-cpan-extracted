@@ -1,11 +1,12 @@
 package WWW::Hetzner::CLI::Cmd::Certificate::Cmd::Create;
 # ABSTRACT: Create a managed certificate
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl certificate create --name <name> --domain <domain> [--domain <domain>...]';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option name => (
     is       => 'ro',
@@ -33,6 +34,7 @@ sub execute {
         type         => 'managed',
         domain_names => $self->domain,
     );
+    $self->handle_action($cert->action);
     print "Certificate created with ID ", $cert->id, "\n";
 }
 
@@ -50,7 +52,7 @@ WWW::Hetzner::CLI::Cmd::Certificate::Cmd::Create - Create a managed certificate
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -73,7 +75,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

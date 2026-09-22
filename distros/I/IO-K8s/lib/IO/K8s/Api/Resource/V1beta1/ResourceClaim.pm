@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::ResourceClaim;
 # ABSTRACT: ResourceClaim describes a request for access to resources in the cluster, for use by workloads. For example, if a workload needs an accelerator device with specific properties, this is how that request is expressed. The status stanza tracks whether this claim has been satisfied and what specific resources have been allocated.  This is an alpha type and requires enabling the DynamicResourceAllocation feature gate.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -25,7 +25,7 @@ IO::K8s::Api::Resource::V1beta1::ResourceClaim - ResourceClaim describes a reque
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ Status describes whether the claim is ready to use and what has been allocated.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#resourceclaim-v1beta1-resource.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#resourceclaim-v1beta1-resource.k8s.io>
 
 =head1 SUPPORT
 

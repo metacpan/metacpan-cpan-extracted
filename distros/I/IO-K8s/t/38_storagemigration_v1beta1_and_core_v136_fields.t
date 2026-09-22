@@ -1,12 +1,12 @@
 #!/usr/bin/env perl
-# Regression coverage for karr tickets #5 and #6 (v1.36.3 spec-drift sweep):
+# Regression coverage for k5 and k6 (v1.36.3 spec-drift sweep):
 #
-# #5: storagemigration.k8s.io is served by upstream v1.36 clusters ONLY
+# k5: storagemigration.k8s.io is served by upstream v1.36 clusters ONLY
 # under v1beta1 (v1alpha1 dropped from the spec). Only V1alpha1 was shipped,
 # so IO::K8s::Api::Storagemigration::V1beta1::StorageVersionMigration(Spec|Status)
 # and the GroupResource type it needs (Meta::V1::GroupResource) did not exist.
 #
-# #6: four Core::V1 classes gained a new optional $ref field in v1.36 whose
+# k6: four Core::V1 classes gained a new optional $ref field in v1.36 whose
 # target class was never shipped: EnvVarSource.fileKeyRef, NodeSystemInfo.swap,
 # VolumeProjection.podCertificate, VolumeMountStatus.volumeStatus (which in turn
 # needs ImageVolumeStatus). t/34_registry_guard.t cannot catch a field that was

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storagemigration::V1beta1::StorageVersionMigration;
 # ABSTRACT: StorageVersionMigration represents a migration of stored data to the latest storage version.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Storagemigration::V1beta1::StorageVersionMigration - StorageVersio
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ Status of the migration.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#storageversionmigration-v1beta1-storagemigration.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#storageversionmigration-v1beta1-storagemigration.k8s.io>
 
 =head1 SUPPORT
 

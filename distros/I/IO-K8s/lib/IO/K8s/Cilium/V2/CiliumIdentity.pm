@@ -1,12 +1,12 @@
 package IO::K8s::Cilium::V2::CiliumIdentity;
-# ABSTRACT: Cilium security identity
-our $VERSION = '1.107';
+# ABSTRACT: CiliumIdentity is a CRD that represents an identity managed by Cilium.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumidentities';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s 'security-labels' => { Str => 1 }, { required => 'schema' };
+
 
 1;
 
@@ -18,25 +18,15 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Cilium::V2::CiliumIdentity - Cilium security identity
+IO::K8s::Cilium::V2::CiliumIdentity - CiliumIdentity is a CRD that represents an identity managed by Cilium.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 security-labels
 
-This cluster-scoped resource represents a Cilium security identity assigned to a set of endpoints based on their labels. Security identities are used by Cilium's eBPF datapath for efficient policy enforcement, using API version C<cilium.io/v2>. The C<spec> and C<status> fields contain opaque CRD-specific data structures managed by the Cilium controller.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<IO::K8s::Cilium> - Main Cilium CRD namespace
-
-=item * L<https://docs.cilium.io/en/stable/internals/security-identities/> - Upstream Cilium security identities documentation
-
-=back
+SecurityLabels is the source-of-truth set of labels for this identity.
 
 =head1 SUPPORT
 

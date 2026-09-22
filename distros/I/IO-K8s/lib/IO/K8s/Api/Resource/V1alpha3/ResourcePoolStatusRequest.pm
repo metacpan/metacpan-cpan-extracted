@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequest;
 # ABSTRACT: ResourcePoolStatusRequest triggers a one-time calculation of resource pool status based on the provided filters. Once status is set, the request is considered complete and will not be reprocessed. Users should delete and recreate requests to get updated information.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1alpha3::ResourcePoolStatusRequest - ResourcePoolStatus
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ Status is populated by the controller with the calculated pool status. When stat
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#resourcepoolstatusrequest-v1alpha3-resource.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#resourcepoolstatusrequest-v1alpha3-resource.k8s.io>
 
 =head1 SUPPORT
 

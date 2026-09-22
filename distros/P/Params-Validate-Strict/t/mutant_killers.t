@@ -169,4 +169,48 @@ subtest 'hashref max: default error message when no error_msg set' => sub {
       'default "must contain no more than" error for hashref max without error_msg';
 };
 
+# ── COND_INV_1253_3 ───────────────────────────────────────────────────────────
+# Mutation: invert the /\|/ guard in the pipe-normalisation block so it fires
+# on every non-pipe type string, turning every plain-type validation into an
+# infinite loop through the union-type ARRAY handler.
+# The recursion-depth guard in validate_strict converts that infinite loop into
+# a fast croak, which the tests below detect as a clean failure.
+
+subtest 'COND_INV_1253_3: plain string type validates without recursion' => sub {
+	# With the mutant this call recurses until the depth guard croaks.
+	lives_ok {
+		my $r = validate_strict(
+			schema => { name => { type => 'string' } },
+			input  => { name => 'Alice' },
+		);
+		is($r->{name}, 'Alice', 'value returned unchanged');
+	} 'plain string type: no recursion, no exception';
+};
+
+subtest 'COND_INV_1253_3: plain integer type validates without recursion' => sub {
+	lives_ok {
+		my $r = validate_strict(
+			schema => { n => { type => 'integer' } },
+			input  => { n => 42 },
+		);
+		is($r->{n}, 42, 'integer value returned');
+	} 'plain integer type: no recursion, no exception';
+};
+
+subtest 'COND_INV_1253_3: pipe type still expands to union correctly' => sub {
+	# Normal pipe-type behaviour must still work after the guard is added.
+	lives_ok {
+		validate_strict(
+			schema => { v => { type => 'string|integer', optional => 1 } },
+			input  => { v => 'hello' },
+		);
+	} 'string|integer pipe type accepted for string value';
+	lives_ok {
+		validate_strict(
+			schema => { v => { type => 'string|integer', optional => 1 } },
+			input  => { v => 42 },
+		);
+	} 'string|integer pipe type accepted for integer value';
+};
+
 done_testing();

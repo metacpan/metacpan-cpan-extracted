@@ -245,6 +245,19 @@ sub output_close_code ($wire) {
         'invalid close payload reports a protocol error');
     is(output_close_code($connection->{output}[0]), 1002,
         'invalid close payload sends close 1002');
+    is($engine->{native}->_memory_used, 0,
+        'rejected one-byte close leaves no native heap allocation');
+}
+
+{
+    my ($engine, $connection) = server_engine();
+    $engine->feed(client_frame('close', pack('n', 1005)));
+    like($connection->{errors}[0], qr/invalid status code/,
+        'reserved close status reports a protocol error');
+    is(output_close_code($connection->{output}[0]), 1002,
+        'reserved close status sends close 1002');
+    is($engine->{native}->_memory_used, 0,
+        'rejected reserved-status close leaves no native heap allocation');
 }
 
 {
@@ -254,6 +267,8 @@ sub output_close_code ($wire) {
         'invalid close reason reports a payload error');
     is(output_close_code($connection->{output}[0]), 1007,
         'invalid close reason sends close 1007');
+    is($engine->{native}->_memory_used, 0,
+        'rejected invalid-UTF8 close leaves no native heap allocation');
 }
 
 {

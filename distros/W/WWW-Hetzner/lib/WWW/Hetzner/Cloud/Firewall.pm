@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::Firewall;
 # ABSTRACT: Hetzner Cloud Firewall object
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use Carp qw(croak);
@@ -33,6 +33,9 @@ has labels => ( is => 'rw', default => sub { {} } );
 has created => ( is => 'ro' );
 
 
+has actions => ( is => 'ro', default => sub { [] } );
+
+
 # Actions
 sub update {
     my ($self) = @_;
@@ -59,11 +62,9 @@ sub set_rules {
     my ($self, @rules) = @_;
     croak "Cannot modify firewall without ID" unless $self->id;
 
-    $self->_client->post("/firewalls/" . $self->id . "/actions/set_rules", {
-        rules => \@rules,
-    });
+    my $actions = $self->_client->firewalls->set_rules($self->id, \@rules);
     $self->rules(\@rules);
-    return $self;
+    return $actions;
 }
 
 
@@ -71,10 +72,7 @@ sub apply_to_resources {
     my ($self, @resources) = @_;
     croak "Cannot modify firewall without ID" unless $self->id;
 
-    $self->_client->post("/firewalls/" . $self->id . "/actions/apply_to_resources", {
-        apply_to => \@resources,
-    });
-    return $self;
+    return $self->_client->firewalls->apply_to_resources($self->id, @resources);
 }
 
 
@@ -82,10 +80,7 @@ sub remove_from_resources {
     my ($self, @resources) = @_;
     croak "Cannot modify firewall without ID" unless $self->id;
 
-    $self->_client->post("/firewalls/" . $self->id . "/actions/remove_from_resources", {
-        remove_from => \@resources,
-    });
-    return $self;
+    return $self->_client->firewalls->remove_from_resources($self->id, @resources);
 }
 
 
@@ -132,7 +127,7 @@ WWW::Hetzner::Cloud::Firewall - Hetzner Cloud Firewall object
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -185,6 +180,12 @@ Labels hash (read-write).
 =head2 created
 
 Creation timestamp (read-only).
+
+=head2 actions
+
+Arrayref of L<WWW::Hetzner::Action> objects returned by C<create>.
+Empty arrayref when the API did not emit any (read-only). Not maintained
+afterwards.
 
 =head2 update
 
@@ -267,7 +268,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

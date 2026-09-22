@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# karr #18: class_namespaces subclassing must inflate and serialize through
+# k18: class_namespaces subclassing must inflate and serialize through
 # its parent's k8s attribute registry.
 #
 # A consumer can register a subclass via class_namespaces:
@@ -27,7 +27,7 @@ use IO::K8s;
 # ----------------------------------------------------------------------------
 # Test-local classes
 # ----------------------------------------------------------------------------
-# The Pod subclass is seeded into %INC so IO::K8s::load_class (a bare
+# The Pod subclass is seeded into %INC so IO::K8s::load_class (a memoised
 # Module::Runtime::require_module) treats it as loaded when inflate runs.
 
 {

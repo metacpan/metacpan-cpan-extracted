@@ -8,9 +8,10 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 118;
+use Test::Most tests => 140;
 use Readonly;
 use Scalar::Util qw(blessed);
+use File::Spec;
 
 use_ok('Database::Join');
 
@@ -78,6 +79,20 @@ use_ok('Database::Join');
 }
 
 # ---------------------------------------------------------------------------
+# DomainCountDA: subclass of DomainDA that defines count() directly in its
+# own package stash.  Required for the 'auto' threshold probe in _sqlite_join,
+# which checks `defined &{"${pkg}::count"}` and rejects inherited methods.
+# Without this, the probe cannot obtain a row count and falls back to the
+# array path regardless of max_array_rows, defeating threshold domain tests.
+# ---------------------------------------------------------------------------
+{
+	package DomainCountDA;
+	use parent -norequire, 'DomainDA';
+	# count() is defined here (not inherited) so the auto-threshold check finds it.
+	sub count { return scalar @{ $_[0]->{rows} } }
+}
+
+# ---------------------------------------------------------------------------
 # Constants — no magic strings in test bodies.
 # ---------------------------------------------------------------------------
 
@@ -86,13 +101,22 @@ Readonly::Scalar my $JC => 'entry';
 Readonly::Scalar my $LONG_COLNAME => 'x' x 255;	# 255-char boundary for join_column length
 
 Readonly::Hash my %ERR => (
-	no_databases     => qr/At least one Database::Abstraction object is required/,
-	invalid_db       => qr/databases\[\d+\] does not support/,
-	join_col_missing => qr/join_column "[^"]*" is absent from databases\[\d+\]/,
-	join_col_refval  => qr/join_column "\(join_map\[\d+\] must be a string\)" is absent from databases\[\d+\]/,
-	remove_join_col  => qr/Cannot remove join_column/,
-	unknown_col      => qr/Column "[^"]+" is not present in any configured database/,
+	no_databases      => qr/At least one Database::Abstraction object is required/,
+	invalid_db        => qr/databases\[\d+\] does not support/,
+	join_col_missing  => qr/join_column "[^"]*" is absent from databases\[\d+\]/,
+	join_col_refval   => qr/join_column "\(join_map\[\d+\] must be a string\)" is absent from databases\[\d+\]/,
+	remove_join_col   => qr/Cannot remove join_column/,
+	unknown_col       => qr/Column "[^"]+" is not present in any configured database/,
+	invalid_backend   => qr/backend.*(?:array|sqlite|auto)/i,
+	bad_tmpdir        => qr/Parent directory|does not exist|cannot.*creat|POSIX|No such file/i,
 );
+
+# BAD_TMPDIR: a directory that does not exist on any normal system.
+# Used to prove which backend path a query took: the array path never touches
+# tmpdir, so it succeeds; the SQLite path calls File::Temp(DIR => ...) and
+# croaks with "Parent directory ... does not exist".
+Readonly::Scalar my $BAD_TMPDIR =>
+	File::Spec->catdir(File::Spec->tmpdir, '__domain_t_no_such_dir_xyz__');
 
 # Shared two-DB fixture with overlapping key set {k1, k2}.
 sub _dbs {
@@ -1192,4 +1216,345 @@ note '--- Section 18: query and execute unsupported methods ---';
 	throws_ok { $j->execute() }
 		qr/execute\(\).*not supported/,
 		'execute: always croaks error_execute_unsupported (EP unsupported)';
+}
+
+# ==========================================================================
+# Section 19: `backend` parameter domain
+#
+# EP valid:   'array', 'sqlite', 'auto' (case-sensitive string enum).
+# EP absent:  defaults to 'auto'.
+# EP invalid: any other string, including uppercase variants.
+# BVA:        '' (empty string) is not in the enum → croak.
+# BVA:        case variants ('ARRAY', 'SQLITE', 'Auto') → croak.
+#
+# Proof technique for which path was taken (from CLAUDE.md):
+#   - Array path: tmpdir never accessed → query succeeds with $BAD_TMPDIR.
+#   - SQLite path: File::Temp(DIR => $BAD_TMPDIR) croaks → query dies.
+# DomainDA (no direct count()) causes 'auto' to fall back to the array path.
+# ==========================================================================
+
+note '--- Section 19: backend parameter domain ---';
+
+# EP absent → default 'auto'; DomainDA has no direct count() → falls back to
+# array path.  Bad tmpdir not reached → lives.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	lives_ok { $j->selectall_arrayref() }
+		'backend: absent → default auto; DomainDA has no count() → array path (EP absent)';
+}
+
+# EP valid 'array': array path ignores tmpdir entirely — bad dir never accessed.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(
+		databases   => [$p, $s],
+		join_column => $JC,
+		backend     => 'array',
+		tmpdir      => $BAD_TMPDIR,
+	);
+	lives_ok { $j->selectall_arrayref() }
+		"backend: 'array' + bad tmpdir → array path; tmpdir not accessed (EP valid array)";
+}
+
+# EP valid 'auto': DomainDA lacks a direct count() → can_count=0 → array fallback.
+# Even with a bad tmpdir the array path is taken and the query succeeds.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(
+		databases   => [$p, $s],
+		join_column => $JC,
+		backend     => 'auto',
+		tmpdir      => $BAD_TMPDIR,
+	);
+	lives_ok { $j->selectall_arrayref() }
+		"backend: 'auto' + DomainDA (no count()) → falls back to array path (EP auto-fallback)";
+}
+
+# EP valid 'sqlite': SQLite path taken; bad tmpdir exposes the File::Temp croak.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(
+		databases   => [$p, $s],
+		join_column => $JC,
+		backend     => 'sqlite',
+		tmpdir      => $BAD_TMPDIR,
+	);
+	throws_ok { $j->selectall_arrayref() }
+		$ERR{bad_tmpdir},
+		"backend: 'sqlite' + bad tmpdir → SQLite path taken; File::Temp croaks (EP valid sqlite)";
+}
+
+# EP invalid: unrecognised string → croak error_invalid_backend.
+{
+	my ($p, $s) = _dbs();
+	throws_ok {
+		Database::Join->new(databases => [$p, $s], join_column => $JC, backend => 'bogus')
+	} $ERR{invalid_backend}, "backend: 'bogus' → croak error_invalid_backend (EP invalid)";
+}
+
+# BVA case-sensitive: uppercase variant not in the enum → croak.
+{
+	my ($p, $s) = _dbs();
+	throws_ok {
+		Database::Join->new(databases => [$p, $s], join_column => $JC, backend => 'SQLITE')
+	} $ERR{invalid_backend}, "backend: 'SQLITE' rejected; enum is case-sensitive (BVA case)";
+}
+
+# ==========================================================================
+# Section 20: `max_array_rows` parameter domain
+#
+# EP absent:  default 10_000.
+# BVA 0:      threshold 0 → any DA returning ≥1 row triggers the SQLite path.
+#             (A DA with 0 rows produces total=0 ≤ 0 → array path — not tested here.)
+# BVA 1:      with 1-row DA: total=1 ≤ 1 → array path (at-boundary).
+#             with 2-row DA: total=2 > 1 → SQLite path (above-boundary).
+# EP large:   10_000_000 → always array path for any realistic dataset.
+# Combinatorial: max_array_rows=0 + backend='array' → array path regardless.
+#
+# DomainCountDA defines count() directly so the auto-threshold probe finds it.
+# Bad tmpdir distinguishes the two paths.
+# ==========================================================================
+
+note '--- Section 20: max_array_rows parameter domain ---';
+
+# EP absent → default stored as 10_000.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	is($j->{_max_array_rows}, 10_000,
+		'max_array_rows: absent → _max_array_rows default 10_000 (EP absent)');
+}
+
+# EP large: threshold 10_000_000 → total of any small DA ≤ threshold → array path.
+{
+	my $p = DomainCountDA->new(cols => [$JC, 'a'], rows => [{ $JC => 'k1', a => 1 }]);
+	my $j = Database::Join->new(
+		databases      => [$p],
+		join_column    => $JC,
+		backend        => 'auto',
+		max_array_rows => 10_000_000,
+		tmpdir         => $BAD_TMPDIR,
+	);
+	lives_ok { $j->selectall_arrayref() }
+		'max_array_rows: 10_000_000 → total 1 ≤ threshold → array path (EP large)';
+}
+
+# BVA at-boundary: threshold=1, DA has 1 row → total=1 ≤ 1 → array path.
+{
+	my $p = DomainCountDA->new(cols => [$JC, 'a'], rows => [{ $JC => 'k1', a => 1 }]);
+	my $j = Database::Join->new(
+		databases      => [$p],
+		join_column    => $JC,
+		backend        => 'auto',
+		max_array_rows => 1,
+		tmpdir         => $BAD_TMPDIR,
+	);
+	lives_ok { $j->selectall_arrayref() }
+		'max_array_rows=1, 1-row DA: total 1 ≤ 1 → array path (BVA at-boundary)';
+}
+
+# BVA above-boundary: threshold=1, DA has 2 rows → total=2 > 1 → SQLite path.
+{
+	my $p = DomainCountDA->new(
+		cols => [$JC, 'a'],
+		rows => [{ $JC => 'k1', a => 1 }, { $JC => 'k2', a => 2 }],
+	);
+	my $j = Database::Join->new(
+		databases      => [$p],
+		join_column    => $JC,
+		backend        => 'auto',
+		max_array_rows => 1,
+		tmpdir         => $BAD_TMPDIR,
+	);
+	throws_ok { $j->selectall_arrayref() }
+		$ERR{bad_tmpdir},
+		'max_array_rows=1, 2-row DA: total 2 > 1 → SQLite path (BVA above-boundary)';
+}
+
+# BVA zero-threshold: threshold=0, DA has 1 row → total=1 > 0 → SQLite path.
+{
+	my $p = DomainCountDA->new(cols => [$JC, 'a'], rows => [{ $JC => 'k1', a => 1 }]);
+	my $j = Database::Join->new(
+		databases      => [$p],
+		join_column    => $JC,
+		backend        => 'auto',
+		max_array_rows => 0,
+		tmpdir         => $BAD_TMPDIR,
+	);
+	throws_ok { $j->selectall_arrayref() }
+		$ERR{bad_tmpdir},
+		'max_array_rows=0, 1-row DA: total 1 > 0 → SQLite path (BVA zero-threshold)';
+}
+
+# Combinatorial: max_array_rows=0 + backend='array' → array path ignores threshold entirely.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(
+		databases      => [$p, $s],
+		join_column    => $JC,
+		backend        => 'array',
+		max_array_rows => 0,
+		tmpdir         => $BAD_TMPDIR,
+	);
+	lives_ok { $j->selectall_arrayref() }
+		'combinatorial: max_array_rows=0 + backend=array → array path; threshold ignored';
+}
+
+# ==========================================================================
+# Section 21: `tmpdir` parameter domain
+#
+# EP absent:  File::Spec->tmpdir() is used; array-path queries never touch it.
+# EP valid:   a known-good existing directory; array-path query succeeds.
+# EP array+bad: backend='array' ignores tmpdir even when the dir is invalid.
+# EP sqlite+bad: backend='sqlite' reaches File::Temp(DIR=>) and croaks.
+#
+# The last two subtests prove that tmpdir is checked lazily — only when the
+# SQLite path is actually taken, not at constructor time.
+# ==========================================================================
+
+note '--- Section 21: tmpdir parameter domain ---';
+
+# EP absent + array path: no tmpdir involved, query succeeds.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(
+		databases   => [$p, $s],
+		join_column => $JC,
+		backend     => 'array',
+	);
+	lives_ok { $j->selectall_arrayref() }
+		'tmpdir: absent + backend=array → system tmpdir used; query succeeds (EP absent)';
+}
+
+# EP valid dir + array path: explicit valid dir accepted, never accessed on array path.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(
+		databases   => [$p, $s],
+		join_column => $JC,
+		backend     => 'array',
+		tmpdir      => File::Spec->tmpdir,
+	);
+	lives_ok { $j->selectall_arrayref() }
+		'tmpdir: valid dir + backend=array → array path; tmpdir not accessed (EP valid dir)';
+}
+
+# EP bad dir + array path: even an invalid dir is accepted at construction; array path ignores it.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(
+		databases   => [$p, $s],
+		join_column => $JC,
+		backend     => 'array',
+		tmpdir      => $BAD_TMPDIR,
+	);
+	lives_ok { $j->selectall_arrayref() }
+		'tmpdir: nonexistent dir + backend=array → array path; bad tmpdir never accessed (EP bad+array)';
+}
+
+# EP bad dir + sqlite path: bad dir is rejected lazily by File::Temp at query time.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(
+		databases   => [$p, $s],
+		join_column => $JC,
+		backend     => 'sqlite',
+		tmpdir      => $BAD_TMPDIR,
+	);
+	throws_ok { $j->selectall_arrayref() }
+		$ERR{bad_tmpdir},
+		'tmpdir: nonexistent dir + backend=sqlite → File::Temp croak at query time (EP bad+sqlite)';
+}
+
+# ==========================================================================
+# Section 22: Multibyte and character domain
+#
+# The array-path merge copies values with `%{$row}`, which is Perl-scalar
+# identity — no encoding conversion.  All unicode strings created with
+# \x{...} escapes (source stays ASCII) round-trip through the in-memory join
+# without corruption.  Filtering uses `eq` on Perl strings, which compares
+# code-point sequences correctly.
+#
+# EP latin-ext:   Latin-1 supplement (ü, ö) in values and filter criteria.
+# EP emoji:       Multi-codepoint emoji (\x{1f600}) stored and retrieved.
+# EP unicode-key: Accented character in the join key → correct merged row.
+# ==========================================================================
+
+note '--- Section 22: Multibyte and character domain ---';
+
+# EP latin-ext round-trip: rows with umlaut values pass through in-memory join intact.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'city'],
+		rows => [
+			{ $JC => 'k1', city => "M\x{00fc}nchen"    },   # München
+			{ $JC => 'k2', city => "D\x{00fc}sseldorf" },   # Düsseldorf
+		],
+	);
+	my $s = DomainDA->new(
+		cols => [$JC, 'country'],
+		rows => [
+			{ $JC => 'k1', country => 'DE' },
+			{ $JC => 'k2', country => 'DE' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $rows = $j->selectall_arrayref();
+	is(scalar @{$rows}, 2, 'multibyte: 2 rows with umlaut values returned (EP latin-ext count)');
+	my ($r1) = grep { $_->{$JC} eq 'k1' } @{$rows};
+	is($r1->{city}, "M\x{00fc}nchen",
+		'multibyte: umlaut city value round-trips via in-memory join (EP latin-ext value)');
+}
+
+# EP umlaut-filter: equality criterion containing a umlaut selects the correct row.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'name'],
+		rows => [
+			{ $JC => 'k1', name => "Schr\x{00f6}dinger" },   # Schrödinger
+			{ $JC => 'k2', name => 'Schmidt'               },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(name => "Schr\x{00f6}dinger");
+	is(scalar @{$rows}, 1,
+		'multibyte: umlaut in filter criterion → 1 matching row (EP umlaut-filter)');
+}
+
+# EP emoji: multi-codepoint emoji value (\x{1f600} = U+1F600 GRINNING FACE)
+# stored and retrieved without crash or corruption.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'mood'],
+		rows => [{ $JC => 'k1', mood => "\x{1f600}" }],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref() }
+		'multibyte: emoji (\x{1f600}) in column value → query lives (EP emoji)';
+	is($rows->[0]{mood}, "\x{1f600}",
+		'multibyte: emoji value round-trips correctly via in-memory join');
+}
+
+# EP unicode-key: accented character in the join key → correct row retrieved after merge.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'region'],
+		rows => [
+			{ $JC => "caf\x{00e9}", region => 'Paris'  },   # café
+			{ $JC => 'bar',          region => 'London' },
+		],
+	);
+	my $s = DomainDA->new(
+		cols => [$JC, 'pop'],
+		rows => [
+			{ $JC => "caf\x{00e9}", pop => 2_000_000 },
+			{ $JC => 'bar',          pop => 9_000_000 },
+		],
+	);
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $row = $j->fetchrow_hashref($JC => "caf\x{00e9}");
+	is($row->{region}, 'Paris',
+		'multibyte: unicode char in join key retrieves correct merged row (EP unicode-key)');
 }

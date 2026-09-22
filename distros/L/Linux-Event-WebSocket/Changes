@@ -1,5 +1,17 @@
 Revision history for Linux::Event::WebSocket
 
+0.002  2026-09-21
+
+    - Fix a native bq_websocket allocation leak when an invalid Close frame is
+      rejected while control messages are exposed to the application.
+    - Delay the application-visible Close copy until after RFC Close payload
+      validation, and release the original message if copy allocation fails.
+    - Add regression checks that rejected one-byte, invalid-status, and
+      invalid-UTF8 Close frames leave no tracked native heap allocation.
+    - This fixes CPAN Testers aborts in t/03-engine.t on DEBUGGING/multiplicity
+      Perl builds where bq_websocket correctly asserted that native allocation
+      accounting was nonzero at socket destruction.
+
 0.001  2026-09-20
 
     First CPAN release.

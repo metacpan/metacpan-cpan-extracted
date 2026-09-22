@@ -1,12 +1,13 @@
 package WWW::Hetzner::CLI::Cmd::Record;
 # ABSTRACT: DNS Record commands
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl record [list|describe|create|delete] --zone <zone-id> [options]';
 use JSON::MaybeXS qw(encode_json);
+
 
 
 sub execute {
@@ -42,10 +43,10 @@ sub _list {
     $params{type} = $self->type if $self->type;
 
     my $rrsets = $cloud->zones->rrsets($self->zone);
-    my $records = $rrsets->list(%params);
+    my $records = $rrsets->list_all(%params);
 
     if ($main->output eq 'json') {
-        print encode_json($records), "\n";
+        print encode_json([ map { $_->data } @$records ]), "\n";
         return;
     }
 
@@ -59,11 +60,11 @@ sub _list {
     print "-" x 80, "\n";
 
     for my $r (@$records) {
-        my $values = join(', ', map { $_->{value} } @{$r->{records} // []});
+        my $values = join(', ', map { $_->{value} } @{$r->records // []});
         printf "%-25s %-8s %-8s %s\n",
-            $r->{name},
-            $r->{type},
-            $r->{ttl} // '-',
+            $r->name,
+            $r->type,
+            $r->ttl // '-',
             $values;
     }
 }
@@ -82,7 +83,7 @@ WWW::Hetzner::CLI::Cmd::Record - DNS Record commands
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -91,6 +92,20 @@ version 0.100
     hcloud.pl record list --zone <zone-id> --type A      # List A records only
     hcloud.pl record create --zone <zone-id> --name www --type A --value 1.2.3.4
     hcloud.pl record delete --zone <zone-id> --name www --type A
+
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * L<list|WWW::Hetzner::CLI::Cmd::Record::Cmd::List> - List DNS records
+
+=item * L<describe|WWW::Hetzner::CLI::Cmd::Record::Cmd::Describe> - Describe a DNS record
+
+=item * L<create|WWW::Hetzner::CLI::Cmd::Record::Cmd::Create> - Create a DNS record
+
+=item * L<delete|WWW::Hetzner::CLI::Cmd::Record::Cmd::Delete> - Delete a DNS record
+
+=back
 
 =head1 SUPPORT
 
@@ -113,7 +128,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

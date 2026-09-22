@@ -4,7 +4,7 @@ package WWW::Hetzner::HTTPResponse;
 
 use Moo;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 
 has status => (is => 'ro', required => 1);
@@ -28,7 +28,7 @@ WWW::Hetzner::HTTPResponse - HTTP response object for Hetzner API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

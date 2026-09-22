@@ -1,0 +1,31 @@
+{
+  "isos": [
+    {
+      "id": 4711,
+      "name": "netboot.xyz.iso",
+      "description": "netboot.xyz",
+      "type": "public",
+      "architecture": "x86",
+      "deprecation": null
+    },
+    {
+      "id": 4712,
+      "name": "netboot.xyz-arm64.iso",
+      "description": "netboot.xyz (arm64)",
+      "type": "public",
+      "architecture": "arm",
+      "deprecation": null
+    },
+    {
+      "id": 4713,
+      "name": "FreeBSD-11.0-RELEASE-amd64-dvd1",
+      "description": "FreeBSD 11.0 x64",
+      "type": "public",
+      "architecture": "x86",
+      "deprecation": {
+        "announced": "2023-06-01T00:00:00+00:00",
+        "unavailable_after": "2023-09-01T00:00:00+00:00"
+      }
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+# Gateway API CRD emitter overlay (D5/D6/D7, k95, task B-GatewayAPI).
+#
+# Read by maint/crd-drift-check.pl --render/--check for --provider
+# GatewayAPI. `names` maps the logical path below each Kind (what
+# IO::K8s::AutoGen::class_path returns) to the upstream Go type name at the
+# pinned upstream_version (v1.6.1): apis/v1/*.go (sigs.k8s.io/gateway-api --
+# gateway_types.go, gatewayclass_types.go, httproute_types.go,
+# grpcroute_types.go, tcproute_types.go, tlsroute_types.go,
+# udproute_types.go, backendtlspolicy_types.go, listenerset_types.go,
+# referencegrant_types.go, shared_types.go, object_reference_types.go,
+# policy_types.go). apis/v1beta1/*.go for the same Kinds are literal Go type
+# ALIASES of apis/v1 (`type Gateway v1.Gateway`, `type GatewaySpec =
+# v1.GatewaySpec`, ...) -- same field shapes, same Go type names -- so one
+# `kinds.<Kind>` entry below renders correctly for both the v1 and the
+# v1beta1 GVK of Gateway/GatewayClass/HTTPRoute/ReferenceGrant (D7: the
+# served v1beta1 tracks of those four Kinds get classes too; see
+# lib/IO/K8s/GatewayAPI.pm for the resource_map wiring and
+# maint/crd-drift-exceptions.yaml for the ignore_missing_kinds cleanup this
+# satisfies). A Go type reused verbatim across fields or Kinds
+# (ParentReference, LocalObjectReference, BackendObjectReference,
+# RouteGroupKind, RouteNamespaces, HTTPRouteFilter's HTTPHeaderFilter,
+# BackendTLSPolicy's shared PolicyStatus/PolicyAncestorStatus from
+# policy_types.go, ...) maps to the same bare name at every occurrence -- one
+# shared class, per D6. v1alpha2/v1alpha3 tracks in the same manifests are
+# NOT served (`served: false`) at v1.6.1 -- upstream graduated them to v1 --
+# so IO::K8s::CRD->generate (served_versions) never builds classes for them
+# and there is nothing to name here; see maint/crd-drift-exceptions.yaml.
+# `with`/`extra` are copied verbatim from the opaque roots this overlay
+# replaces (GatewayClass is cluster-scoped: no Namespaced role, no `with`
+# key; HTTPRoute/GRPCRoute/TLSRoute carry Routable + `_route_format
+# 'gateway'`, TCPRoute/UDPRoute do not since they have no `spec.hostnames`).
+base: IO::K8s::GatewayAPI
+kinds:
+  BackendTLSPolicy:
+    extra: []
+    names:
+      Spec::TargetRefsItem: LocalPolicyTargetReferenceWithSectionName
+      Spec::Validation: BackendTLSPolicyValidation
+      Spec::Validation::CaCertificateRefsItem: LocalObjectReference
+      Spec::Validation::SubjectAltNamesItem: SubjectAltName
+      Status: PolicyStatus
+      Status::AncestorsItem: PolicyAncestorStatus
+      Status::AncestorsItem::AncestorRef: ParentReference
+    with:
+    - IO::K8s::Role::Namespaced
+  GRPCRoute:
+    extra:
+    - sub _route_format { 'gateway' }
+    names:
+      Spec::ParentRefsItem: ParentReference
+      Spec::RulesItem: GRPCRouteRule
+      Spec::RulesItem::BackendRefsItem: GRPCBackendRef
+      Spec::RulesItem::BackendRefsItem::FiltersItem: GRPCRouteFilter
+      Spec::RulesItem::BackendRefsItem::FiltersItem::ExtensionRef: LocalObjectReference
+      Spec::RulesItem::BackendRefsItem::FiltersItem::RequestHeaderModifier: HTTPHeaderFilter
+      Spec::RulesItem::BackendRefsItem::FiltersItem::RequestMirror: HTTPRequestMirrorFilter
+      Spec::RulesItem::BackendRefsItem::FiltersItem::RequestMirror::BackendRef: BackendObjectReference
+      Spec::RulesItem::BackendRefsItem::FiltersItem::RequestMirror::Fraction: Fraction
+      Spec::RulesItem::BackendRefsItem::FiltersItem::ResponseHeaderModifier: HTTPHeaderFilter
+      Spec::RulesItem::FiltersItem: GRPCRouteFilter
+      Spec::RulesItem::FiltersItem::ExtensionRef: LocalObjectReference
+      Spec::RulesItem::FiltersItem::RequestHeaderModifier: HTTPHeaderFilter
+      Spec::RulesItem::FiltersItem::RequestMirror: HTTPRequestMirrorFilter
+      Spec::RulesItem::FiltersItem::RequestMirror::BackendRef: BackendObjectReference
+      Spec::RulesItem::FiltersItem::RequestMirror::Fraction: Fraction
+      Spec::RulesItem::FiltersItem::ResponseHeaderModifier: HTTPHeaderFilter
+      Spec::RulesItem::MatchesItem: GRPCRouteMatch
+      Spec::RulesItem::MatchesItem::HeadersItem: GRPCHeaderMatch
+      Spec::RulesItem::MatchesItem::Method: GRPCMethodMatch
+      Status::ParentsItem: RouteParentStatus
+      Status::ParentsItem::ParentRef: ParentReference
+    with:
+    - IO::K8s::Role::Namespaced
+    - IO::K8s::Role::Routable
+  Gateway:
+    extra: []
+    names:
+      Spec::AddressesItem: GatewaySpecAddress
+      Spec::AllowedListeners: AllowedListeners
+      Spec::AllowedListeners::Namespaces: ListenerNamespaces
+      Spec::Infrastructure: GatewayInfrastructure
+      Spec::Infrastructure::ParametersRef: LocalParametersReference
+      Spec::ListenersItem: Listener
+      Spec::ListenersItem::AllowedRoutes: AllowedRoutes
+      Spec::ListenersItem::AllowedRoutes::KindsItem: RouteGroupKind
+      Spec::ListenersItem::AllowedRoutes::Namespaces: RouteNamespaces
+      Spec::ListenersItem::Tls: ListenerTLSConfig
+      Spec::ListenersItem::Tls::CertificateRefsItem: SecretObjectReference
+      Spec::Tls: GatewayTLSConfig
+      Spec::Tls::Backend: GatewayBackendTLS
+      Spec::Tls::Backend::ClientCertificateRef: SecretObjectReference
+      Spec::Tls::Frontend: FrontendTLSConfig
+      Spec::Tls::Frontend::Default: TLSConfig
+      Spec::Tls::Frontend::Default::Validation: FrontendTLSValidation
+      Spec::Tls::Frontend::Default::Validation::CaCertificateRefsItem: ObjectReference
+      Spec::Tls::Frontend::PerPortItem: TLSPortConfig
+      Spec::Tls::Frontend::PerPortItem::Tls: TLSConfig
+      Spec::Tls::Frontend::PerPortItem::Tls::Validation: FrontendTLSValidation
+      Spec::Tls::Frontend::PerPortItem::Tls::Validation::CaCertificateRefsItem: ObjectReference
+      Status::AddressesItem: GatewayStatusAddress
+      Status::ListenersItem: ListenerStatus
+      Status::ListenersItem::SupportedKindsItem: RouteGroupKind
+    with:
+    - IO::K8s::Role::Namespaced
+  GatewayClass:
+    extra: []
+    names:
+      Spec::ParametersRef: ParametersReference
+      Status::SupportedFeaturesItem: SupportedFeature
+  HTTPRoute:
+    extra:
+    - sub _route_format { 'gateway' }
+    names:
+      Spec::ParentRefsItem: ParentReference
+      Spec::RulesItem: HTTPRouteRule
+      Spec::RulesItem::BackendRefsItem: HTTPBackendRef
+      Spec::RulesItem::BackendRefsItem::FiltersItem: HTTPRouteFilter
+      Spec::RulesItem::BackendRefsItem::FiltersItem::Cors: HTTPCORSFilter
+      Spec::RulesItem::BackendRefsItem::FiltersItem::ExtensionRef: LocalObjectReference
+      Spec::RulesItem::BackendRefsItem::FiltersItem::RequestHeaderModifier: HTTPHeaderFilter
+      Spec::RulesItem::BackendRefsItem::FiltersItem::RequestMirror: HTTPRequestMirrorFilter
+      Spec::RulesItem::BackendRefsItem::FiltersItem::RequestMirror::BackendRef: BackendObjectReference
+      Spec::RulesItem::BackendRefsItem::FiltersItem::RequestMirror::Fraction: Fraction
+      Spec::RulesItem::BackendRefsItem::FiltersItem::RequestRedirect: HTTPRequestRedirectFilter
+      Spec::RulesItem::BackendRefsItem::FiltersItem::RequestRedirect::Path: HTTPPathModifier
+      Spec::RulesItem::BackendRefsItem::FiltersItem::ResponseHeaderModifier: HTTPHeaderFilter
+      Spec::RulesItem::BackendRefsItem::FiltersItem::UrlRewrite: HTTPURLRewriteFilter
+      Spec::RulesItem::BackendRefsItem::FiltersItem::UrlRewrite::Path: HTTPPathModifier
+      Spec::RulesItem::FiltersItem: HTTPRouteFilter
+      Spec::RulesItem::FiltersItem::Cors: HTTPCORSFilter
+      Spec::RulesItem::FiltersItem::ExtensionRef: LocalObjectReference
+      Spec::RulesItem::FiltersItem::RequestHeaderModifier: HTTPHeaderFilter
+      Spec::RulesItem::FiltersItem::RequestMirror: HTTPRequestMirrorFilter
+      Spec::RulesItem::FiltersItem::RequestMirror::BackendRef: BackendObjectReference
+      Spec::RulesItem::FiltersItem::RequestMirror::Fraction: Fraction
+      Spec::RulesItem::FiltersItem::RequestRedirect: HTTPRequestRedirectFilter
+      Spec::RulesItem::FiltersItem::RequestRedirect::Path: HTTPPathModifier
+      Spec::RulesItem::FiltersItem::ResponseHeaderModifier: HTTPHeaderFilter
+      Spec::RulesItem::FiltersItem::UrlRewrite: HTTPURLRewriteFilter
+      Spec::RulesItem::FiltersItem::UrlRewrite::Path: HTTPPathModifier
+      Spec::RulesItem::MatchesItem: HTTPRouteMatch
+      Spec::RulesItem::MatchesItem::HeadersItem: HTTPHeaderMatch
+      Spec::RulesItem::MatchesItem::Path: HTTPPathMatch
+      Spec::RulesItem::MatchesItem::QueryParamsItem: HTTPQueryParamMatch
+      Spec::RulesItem::Timeouts: HTTPRouteTimeouts
+      Status::ParentsItem: RouteParentStatus
+      Status::ParentsItem::ParentRef: ParentReference
+    with:
+    - IO::K8s::Role::Namespaced
+    - IO::K8s::Role::Routable
+  ListenerSet:
+    extra: []
+    names:
+      Spec::ListenersItem: ListenerEntry
+      Spec::ListenersItem::AllowedRoutes: AllowedRoutes
+      Spec::ListenersItem::AllowedRoutes::KindsItem: RouteGroupKind
+      Spec::ListenersItem::AllowedRoutes::Namespaces: RouteNamespaces
+      Spec::ListenersItem::Tls: ListenerTLSConfig
+      Spec::ListenersItem::Tls::CertificateRefsItem: SecretObjectReference
+      Spec::ParentRef: ParentGatewayReference
+      Status::ListenersItem: ListenerEntryStatus
+      Status::ListenersItem::SupportedKindsItem: RouteGroupKind
+    with:
+    - IO::K8s::Role::Namespaced
+  ReferenceGrant:
+    extra: []
+    names:
+      Spec::FromItem: ReferenceGrantFrom
+      Spec::ToItem: ReferenceGrantTo
+    with:
+    - IO::K8s::Role::Namespaced
+  TCPRoute:
+    extra: []
+    names:
+      Spec::ParentRefsItem: ParentReference
+      Spec::RulesItem: TCPRouteRule
+      Spec::RulesItem::BackendRefsItem: BackendRef
+      Status::ParentsItem: RouteParentStatus
+      Status::ParentsItem::ParentRef: ParentReference
+    with:
+    - IO::K8s::Role::Namespaced
+  TLSRoute:
+    extra:
+    - sub _route_format { 'gateway' }
+    names:
+      Spec::ParentRefsItem: ParentReference
+      Spec::RulesItem: TLSRouteRule
+      Spec::RulesItem::BackendRefsItem: BackendRef
+      Status::ParentsItem: RouteParentStatus
+      Status::ParentsItem::ParentRef: ParentReference
+    with:
+    - IO::K8s::Role::Namespaced
+    - IO::K8s::Role::Routable
+  UDPRoute:
+    extra: []
+    names:
+      Spec::ParentRefsItem: ParentReference
+      Spec::RulesItem: UDPRouteRule
+      Spec::RulesItem::BackendRefsItem: BackendRef
+      Status::ParentsItem: RouteParentStatus
+      Status::ParentsItem::ParentRef: ParentReference
+    with:
+    - IO::K8s::Role::Namespaced

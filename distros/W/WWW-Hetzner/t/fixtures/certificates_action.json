@@ -1,0 +1,14 @@
+{
+  "action": {
+    "id": 1300,
+    "command": "issue_certificate",
+    "status": "running",
+    "progress": 0,
+    "started": "2024-09-01T12:30:00+00:00",
+    "finished": null,
+    "resources": [
+      { "id": 1100, "type": "certificate" }
+    ],
+    "error": { "code": null, "message": null }
+  }
+}

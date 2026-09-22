@@ -82,5 +82,3 @@ DrivePlayer-
 \.kate-swp$
 MYMETA\.
 ^Makefile$
-
-tools/fix_mojibake.pl

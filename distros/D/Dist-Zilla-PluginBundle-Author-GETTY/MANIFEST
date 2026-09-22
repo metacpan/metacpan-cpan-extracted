@@ -5,6 +5,8 @@
 .claude/rules/dist-zilla-pluginbundle-author-getty-rules.md
 .claude/settings.json
 .claude/skills/dist-zilla-pluginbundle-author-getty-core/SKILL.md
+.claude/skills/getty-git-commit-style/SKILL.md
+.claude/skills/getty-git-usage/SKILL.md
 .claude/skills/getty-perl-moose/SKILL.md
 .claude/skills/getty-perl-release-author-getty/SKILL.md
 .claude/skills/kanban-issues-karr-cli/SKILL.md

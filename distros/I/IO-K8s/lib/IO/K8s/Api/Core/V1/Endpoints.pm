@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::Endpoints;
 # ABSTRACT: Endpoints is a collection of endpoints that implement the actual service.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -21,7 +21,7 @@ IO::K8s::Api::Core::V1::Endpoints - Endpoints is a collection of endpoints that 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ The set of all endpoints is the union of all subsets. Addresses are placed into 
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#endpoints-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#endpoints-v1-core>
 
 =head1 SUPPORT
 

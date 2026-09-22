@@ -1,10 +1,15 @@
 use strict;
 use warnings;
 use Test::More;
+use File::Temp qw(tempdir);
+use IPC::Cmd qw(can_run);
+use Path::Tiny;
 
+use Dist::Zilla::Chrome::Term;
 use Dist::Zilla::PluginBundle::Author::GETTY;
+use Dist::Zilla::Tester;
 
-# Default: version_finder is an empty arrayref (no override -> plugins use their own defaults)
+# CPAN default: version Perl modules and Perl executables, not every executable
 {
   my $bundle = Dist::Zilla::PluginBundle::Author::GETTY->new(
     name    => '@Author::GETTY',
@@ -13,8 +18,8 @@ use Dist::Zilla::PluginBundle::Author::GETTY;
 
   is_deeply(
     $bundle->version_finder,
-    [],
-    'version_finder defaults to an empty arrayref',
+    [':InstallModules', ':PerlExecFiles'],
+    'version_finder defaults to install modules and Perl executables',
   );
 }
 
@@ -133,7 +138,8 @@ ok(
   );
 }
 
-# manual_version path without version_finder: PkgVersion stays at defaults
+# manual_version path without an explicit version_finder: PkgVersion gets the
+# CPAN default rather than its broader :ExecFiles default.
 {
   my $bundle = Dist::Zilla::PluginBundle::Author::GETTY->new(
     name    => '@Author::GETTY',
@@ -143,7 +149,11 @@ ok(
 
   my ($pkg_version) = grep { $_->[1] eq 'Dist::Zilla::Plugin::PkgVersion' } @{ $bundle->plugins };
   ok($pkg_version, 'PkgVersion was added on manual_version path');
-  ok(!exists $pkg_version->[2]{finder}, 'PkgVersion has no finder override when version_finder is unset');
+  is_deeply(
+    $pkg_version->[2]{finder},
+    [':InstallModules', ':PerlExecFiles'],
+    'PkgVersion.finder receives the CPAN default',
+  );
 }
 
 # no_cpan without an explicit version_finder: the :MainModule default reaches
@@ -179,5 +189,77 @@ ok(
     'PkgVersion.finder receives the no_cpan default',
   );
 }
+
+# The CPAN default must keep Perl executables versioned without sending shell
+# executables through the PPI-based version rewriters.
+subtest 'default version finders select Perl executables only' => sub {
+  plan skip_all => 'git binary not available' unless can_run('git');
+
+  my $tempdir = tempdir(CLEANUP => 1);
+  my $dist_dir = path($tempdir, 'dist');
+  $dist_dir->mkpath;
+
+  $dist_dir->child('dist.ini')->spew(<<'CONF');
+name = Finder-Test
+version = 0.001
+author = Test <test@example.com>
+license = Perl_5
+copyright_holder = Test
+
+[@Author::GETTY]
+no_github = 1
+CONF
+
+  $dist_dir->child('lib', 'Finder', 'Test.pm')->parent->mkpath;
+  $dist_dir->child('lib', 'Finder', 'Test.pm')->spew(<<'PERL');
+package Finder::Test;
+our $VERSION = '0.001';
+1;
+PERL
+
+  $dist_dir->child('bin')->mkpath;
+  $dist_dir->child('bin', 'perl-tool')->spew(<<'PERL');
+#!/usr/bin/env perl
+our $VERSION = '0.001';
+PERL
+  $dist_dir->child('bin', 'bash-tool')->spew(<<'BASH');
+#!/usr/bin/env bash
+VERSION=0.001
+BASH
+
+  for my $args (
+    [qw(init -q)],
+    [qw(add -A)],
+    ['-c', 'user.email=test@example.com', '-c', 'user.name=Test', 'commit', '-q', '-m', 'init'],
+  ) {
+    system('git', '-C', "$dist_dir", @$args) == 0
+      or die "git @{$args} failed in $dist_dir: $?";
+  }
+
+  my $tzil = Dist::Zilla::Tester->from_config({
+    dist_root => "$dist_dir",
+  }, {
+    tempdir_root => $tempdir,
+    chrome => Dist::Zilla::Chrome::Term->new,
+  });
+
+  $_->gather_files for @{ $tzil->plugins_with(-FileGatherer) };
+
+  my @cases = (
+    [ 'RewriteVersion::Transitional', 'Dist::Zilla::Plugin::RewriteVersion::Transitional' ],
+    [ 'BumpVersionAfterRelease',      'Dist::Zilla::Plugin::BumpVersionAfterRelease' ],
+  );
+
+  for my $case (@cases) {
+    my ($label, $class) = @$case;
+    my ($plugin) = grep { $_->isa($class) } @{ $tzil->plugins };
+    ok($plugin, "$label was configured");
+    is_deeply(
+      [ map { $_->name } @{ $plugin->found_files } ],
+      [ 'bin/perl-tool', 'lib/Finder/Test.pm' ],
+      "$label includes Perl executables but excludes Bash executables",
+    );
+  }
+};
 
 done_testing;

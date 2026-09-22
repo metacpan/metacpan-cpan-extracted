@@ -2,16 +2,17 @@
 
 # Black-box unit tests for the public API of Params::Validate::Strict.
 # Each subtest drives validate_strict through its documented interface only.
-# Test::Mockingbird (RAII guards) is used to mock the non-core logger and
-# Unicode::GCString dependencies.
+# Test::Mockingbird (RAII guards) is used to mock the non-core logger.
 
 use strict;
 use warnings;
 
 use Test::Most;
-use Test::Mockingbird qw(mock_scoped);
+use Test::Mockingbird  qw(mock_scoped);
+use Scalar::Util       qw(refaddr);
 
-use Params::Validate::Strict qw(validate_strict);
+use Params::Validate::Strict     qw(validate_strict);
+use Params::Validate::Strict::BNF qw(bnf_to_matcher);
 
 # ── Test support classes ──────────────────────────────────────────────────────
 
@@ -27,13 +28,6 @@ use Params::Validate::Strict qw(validate_strict);
 	sub warn  { }		# stub
 }
 
-# Lightweight Unicode::GCString replacement used in the non-ASCII min/max test.
-# A plain length() sub avoids the ($) prototype the real module carries.
-{
-	package Unit::GCString;
-	sub new    { bless {}, shift }
-	sub length { 3 }	# fixed at 3 grapheme clusters for that one test
-}
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Return-value contract
@@ -737,17 +731,15 @@ subtest 'max: string longer than maximum → croaks' => sub {
 	} qr/too long/, 'croaks when string exceeds max';
 };
 
-subtest 'min/max: non-ASCII string length counted in characters not bytes' => sub {
-	# Mock Unicode::GCString::new so the returned object reports 3 grapheme
-	# clusters — verifying that the module delegates length to GCString rather
-	# than using byte-count length().
-	my $m = mock_scoped('Unicode::GCString', 'new', sub { Unit::GCString->new });
+subtest 'min/max: non-ASCII string length counted in grapheme clusters not bytes' => sub {
+	# "\x{00e9}l\x{00e8}" = élè — 3 grapheme clusters, 5 UTF-8 bytes.
+	# min=>4 should reject it based on grapheme count (3), not byte count (5).
 	throws_ok {
 		validate_strict(
 			schema => { s => { type => 'string', min => 4 } },
-			input  => { s => "\x{00e9}l\x{00e8}" },	# 3-char Unicode string
+			input  => { s => "\x{00e9}l\x{00e8}" },
 		)
-	} qr/too short/, 'character count (not byte count) used for non-ASCII min';
+	} qr/too short/, 'grapheme count (not byte count) used for non-ASCII min';
 };
 
 subtest 'min: integer below minimum → croaks' => sub {
@@ -1849,6 +1841,269 @@ subtest 'values + max → "makes no sense" error' => sub {
 	} qr/makes no sense with memberof/, 'values combined with max croaks';
 };
 
+# ══════════════════════════════════════════════════════════════════════════════
+# PM FILE 1: Params::Validate::Strict — bnf rule key (public API)
+# POD reference: =item * C<bnf> in the METHODS section.
+# Tests drive validate_strict exclusively; no BNF internals are touched here.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# A small, deterministic grammar reused across all bnf-rule subtests.
+my @COLOUR_BNF = ('<colour> ::= "red" | "green" | "blue"');
+
+subtest 'bnf rule: matching value passes, value returned unchanged' => sub {
+	# POD: "The first rule is the start rule; the value must match it exactly."
+	my $r = validate_strict(
+		schema => { c => { type => 'string', bnf => \@COLOUR_BNF } },
+		input  => { c => 'green' },
+	);
+	is($r->{c}, 'green', 'valid value returned unchanged');
+};
+
+subtest 'bnf rule: non-matching value croaks with grammar message' => sub {
+	# POD: croaks when value does not belong to the language.
+	throws_ok {
+		validate_strict(
+			schema => { c => { type => 'string', bnf => \@COLOUR_BNF } },
+			input  => { c => 'purple' },
+		);
+	} qr/does not match the BNF grammar/, 'non-matching value croaks';
+};
+
+subtest 'bnf rule: undef optional value skips grammar check' => sub {
+	# POD says the bnf rule skips undef the same way matches does.
+	lives_ok {
+		validate_strict(
+			schema => { c => { type => 'string', bnf => \@COLOUR_BNF, optional => 1 } },
+			input  => { c => undef },
+		);
+	} 'optional undef value skips BNF check';
+};
+
+subtest 'bnf rule: non-arrayref bnf value croaks' => sub {
+	# POD: bnf must be an arrayref of grammar lines.
+	throws_ok {
+		validate_strict(
+			schema => { c => { type => 'string', bnf => 'not an arrayref' } },
+			input  => { c => 'red' },
+		);
+	} qr/must be an arrayref/, 'scalar bnf rule croaks with expected message';
+};
+
+subtest 'bnf rule: error_msg override replaces default message' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { c => {
+				type      => 'string',
+				bnf       => \@COLOUR_BNF,
+				error_msg => 'not a valid colour',
+			} },
+			input => { c => 'purple' },
+		);
+	} qr/not a valid colour/, 'error_msg replaces default BNF mismatch message';
+	throws_ok {
+		validate_strict(
+			schema => { c => {
+				type      => 'string',
+				bnf       => \@COLOUR_BNF,
+				error_msg => 'not a valid colour',
+			} },
+			input => { c => 'purple' },
+		);
+	} qr/not a valid colour/, 'error_msg only; original message absent';
+};
+
+subtest 'bnf rule: grammar with no rule definitions croaks' => sub {
+	# An arrayref with no ::= lines passes type/min checks but the BNF
+	# compiler then finds no rules and croaks.
+	throws_ok {
+		validate_strict(
+			schema => { c => { type => 'string', bnf => ['plain text'] } },
+			input  => { c => 'plain text' },
+		);
+	} qr/no rules found/i, 'grammar with no ::= lines croaks during compile';
+};
+
+subtest 'bnf rule: grammar with undefined non-terminal croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'string', bnf => ['<a> ::= <b>'] } },
+			input  => { x => 'anything' },
+		);
+	} qr/undefined rule.*<b>/i, 'undefined non-terminal croaks during compile';
+};
+
+subtest 'bnf rule: grammar with recursive non-terminal croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'string', bnf => ['<a> ::= <a> "x"'] } },
+			input  => { x => 'x' },
+		);
+	} qr/recursive rule.*<a>/i, 'recursive non-terminal croaks during compile';
+};
+
+subtest 'bnf rule: continuation line works correctly' => sub {
+	# A grammar line without ::= is a continuation of the preceding rule.
+	my $r;
+	lives_ok {
+		$r = validate_strict(
+			schema => { num => { type => 'string', bnf => [
+				'<number> ::= <digit> <digit>',
+				'<digit>',		# continuation — adds a third digit
+				'<digit>   ::= "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"',
+			] } },
+			input => { num => '123' },
+		);
+	} 'three-digit number accepted via continuation line';
+	is($r->{num}, '123', 'correct value returned');
+};
+
+subtest 'bnf rule: anchored matching — partial matches rejected' => sub {
+	# The start rule is anchored (^...$); a prefix match is not enough.
+	throws_ok {
+		validate_strict(
+			schema => { c => { type => 'string', bnf => \@COLOUR_BNF } },
+			input  => { c => 'red extra' },
+		);
+	} qr/does not match/, 'value with trailing text rejected';
+};
+
+subtest 'bnf rule: pipe-separated alternatives all match' => sub {
+	# Each alternative in the grammar is a valid value.
+	for my $colour (qw(red green blue)) {
+		my $r = validate_strict(
+			schema => { c => { type => 'string', bnf => \@COLOUR_BNF } },
+			input  => { c => $colour },
+		);
+		is($r->{c}, $colour, "colour '$colour' accepted");
+	}
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PM FILE 2: Params::Validate::Strict::BNF — bnf_to_matcher (public API)
+# POD reference: =head2 bnf_to_matcher in BNF.pm.
+# Tests drive the function strictly through its documented interface.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Constant grammar used across multiple bnf_to_matcher subtests.
+my @YESNO_BNF  = ('<answer> ::= "yes" | "no"');
+my @EMPTY_T_BNF = ('<opt> ::= "" | "x"');	# empty terminal case
+
+subtest 'bnf_to_matcher: returns a coderef (Return::Set contract)' => sub {
+	# POD Returns: "A code reference sub ($str) -> 0|1"
+	my $m = bnf_to_matcher(\@YESNO_BNF);
+	ok(ref($m) eq 'CODE', 'ref is CODE');
+};
+
+subtest 'bnf_to_matcher: matching string returns 1' => sub {
+	# POD: "returns 1 if it belongs to the language"
+	my $m = bnf_to_matcher(\@YESNO_BNF);
+	is($m->('yes'), 1, '"yes" returns 1');
+	is($m->('no'),  1, '"no" returns 1');
+};
+
+subtest 'bnf_to_matcher: non-matching string returns 0' => sub {
+	# POD: "0 otherwise"
+	my $m = bnf_to_matcher(\@YESNO_BNF);
+	is($m->('maybe'), 0, '"maybe" returns 0');
+	is($m->(''),      0, 'empty string returns 0 for non-empty grammar');
+};
+
+subtest 'bnf_to_matcher: undef argument returns 0' => sub {
+	# POD: "0 if $str is undef"
+	my $m = bnf_to_matcher(\@YESNO_BNF);
+	is($m->(undef), 0, 'undef returns 0');
+};
+
+subtest 'bnf_to_matcher: empty terminal matches empty string' => sub {
+	# POD: 'An empty terminal C<""> matches the empty string'
+	my $m = bnf_to_matcher(\@EMPTY_T_BNF);
+	is($m->(''),  1, 'empty string accepted by empty terminal');
+	is($m->('x'), 1, '"x" also accepted');
+	is($m->('y'), 0, '"y" rejected');
+};
+
+subtest 'bnf_to_matcher: non-arrayref argument croaks' => sub {
+	# POD: "Raises an exception if: the argument is not an arrayref"
+	throws_ok { bnf_to_matcher('a string') }
+		qr/must be an arrayref/, 'string arg croaks';
+	throws_ok { bnf_to_matcher(42) }
+		qr/must be an arrayref/, 'integer arg croaks';
+	throws_ok { bnf_to_matcher({ key => 'val' }) }
+		qr/must be an arrayref/, 'hashref arg croaks';
+};
+
+subtest 'bnf_to_matcher: empty arrayref croaks' => sub {
+	# POD: "Raises an exception if: the grammar contains no rule definitions"
+	# (An empty arrayref cannot contain any ::= lines.)
+	throws_ok { bnf_to_matcher([]) }
+		qr/at least 1 member/, 'empty arrayref croaks';
+};
+
+subtest 'bnf_to_matcher: no ::= lines in non-empty arrayref croaks' => sub {
+	# The arrayref has content but no rule definitions; the BNF compiler fires.
+	throws_ok { bnf_to_matcher(['just text']) }
+		qr/no rules found/i, 'arrayref with no ::= lines croaks';
+};
+
+subtest 'bnf_to_matcher: undefined non-terminal reference croaks' => sub {
+	# POD: "a non-terminal reference is not defined elsewhere in the grammar"
+	throws_ok { bnf_to_matcher(['<a> ::= <b>']) }
+		qr/undefined rule.*<b>/i, 'undefined non-terminal croaks with name';
+};
+
+subtest 'bnf_to_matcher: recursive rule croaks' => sub {
+	# POD: "a recursive rule is detected"
+	throws_ok { bnf_to_matcher(['<a> ::= <a> "x"']) }
+		qr/recursive rule.*<a>/i, 'recursive rule croaks with rule name';
+};
+
+subtest 'bnf_to_matcher: continuation line is part of preceding rule' => sub {
+	# POD: "A line that contains no ::= is appended (with a space) to the
+	# preceding rule's right-hand side."
+	my $m = bnf_to_matcher([
+		'<ab> ::= "a"',
+		'"b"',		# continuation
+	]);
+	is($m->('ab'), 1, '"ab" accepted — continuation joined to rule');
+	is($m->('a'),  0, '"a" alone rejected — only the joined form is valid');
+};
+
+subtest 'bnf_to_matcher: cache — same grammar returns identical closure' => sub {
+	# POD Side Effects: "Results are cached by grammar content."
+	my @g  = ('<c> ::= "c"');
+	my $m1 = bnf_to_matcher(\@g);
+	my $m2 = bnf_to_matcher(\@g);
+	is(refaddr($m1), refaddr($m2), 'same refaddr: cache returned same closure');
+};
+
+subtest 'bnf_to_matcher: cache — different grammar returns distinct closure' => sub {
+	my $m1 = bnf_to_matcher(['<d1> ::= "d1"']);
+	my $m2 = bnf_to_matcher(['<d2> ::= "d2"']);
+	isnt(refaddr($m1), refaddr($m2), 'distinct grammars produce distinct closures');
+};
+
+subtest 'bnf_to_matcher: whitespace around pipe is ignored' => sub {
+	# POD Grammar Format: alternatives separated by C<|>; the split uses
+	# /\s*\|\s*/ so whitespace around | is stripped.
+	my $m_spaced  = bnf_to_matcher(['<x> ::= "a" | "b"']);
+	my $m_compact = bnf_to_matcher(['<y> ::= "a"|"b"']);
+	is($m_spaced->('a'),  1, 'spaced pipe: "a" accepted');
+	is($m_compact->('a'), 1, 'compact pipe: "a" accepted');
+	is($m_spaced->('b'),  1, 'spaced pipe: "b" accepted');
+	is($m_compact->('b'), 1, 'compact pipe: "b" accepted');
+	is($m_spaced->('c'),  0, 'spaced pipe: "c" rejected');
+};
+
+subtest 'bnf_to_matcher: does not clobber $@ or $!' => sub {
+	# Global state integrity: the function must not alter $@ or $! on success.
+	$@ = 'prior error';
+	$! = 2;		# ENOENT
+	my $prior_errno = $! + 0;
+	bnf_to_matcher(['<g> ::= "g"']);
+	is($@, 'prior error', '$@ not clobbered on success');
+	is($! + 0, $prior_errno, '$! not clobbered on success');
+};
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # API Ledger  (tracks new documented states added in this session)
@@ -1873,6 +2128,27 @@ my %ledger = (
 	'control chars stripped from error msg'  => 1,
 	'invalid unknown_parameter_handler'      => 1,
 	'unknown rule name croaks'               => 1,
+
+	# bnf rule in validate_strict (Strict.pm)
+	'bnf rule: matching value passes'        => 1,
+	'bnf rule: mismatch croaks'              => 1,
+	'bnf rule: undef optional passes'        => 1,
+	'bnf rule: non-arrayref bnf croaks'      => 1,
+	'bnf rule: error_msg override'           => 1,
+	'bnf rule: no rules in grammar croaks'   => 1,
+
+	# bnf_to_matcher (BNF.pm)
+	'bnf_to_matcher: returns coderef'        => 1,
+	'bnf_to_matcher: match returns 1'        => 1,
+	'bnf_to_matcher: no-match returns 0'     => 1,
+	'bnf_to_matcher: undef returns 0'        => 1,
+	'bnf_to_matcher: non-arrayref croaks'    => 1,
+	'bnf_to_matcher: empty array croaks'     => 1,
+	'bnf_to_matcher: undefined rule croaks'  => 1,
+	'bnf_to_matcher: recursive rule croaks'  => 1,
+	'bnf_to_matcher: continuation works'     => 1,
+	'bnf_to_matcher: cache same closure'     => 1,
+	'bnf_to_matcher: empty terminal'         => 1,
 );
 
 # ── type: void ───────────────────────────────────────────────────────────────
@@ -2086,6 +2362,145 @@ subtest 'unknown rule name in schema croaks' => sub {
 		)
 	} qr/Unknown rule 'blah_xyz_unknown'/, 'unrecognised rule name croaks';
 	delete $ledger{'unknown rule name croaks'};
+};
+
+# ── bnf rule in validate_strict ──────────────────────────────────────────────
+
+subtest 'ledger: bnf rule — matching value passes' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'string', bnf => ['<x> ::= "ok"'] } },
+		input  => { x => 'ok' },
+	);
+	is($r->{x}, 'ok', 'value returned unchanged');
+	delete $ledger{'bnf rule: matching value passes'};
+};
+
+subtest 'ledger: bnf rule — mismatch croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'string', bnf => ['<x> ::= "ok"'] } },
+			input  => { x => 'bad' },
+		);
+	} qr/does not match the BNF grammar/, 'mismatch croaks';
+	delete $ledger{'bnf rule: mismatch croaks'};
+};
+
+subtest 'ledger: bnf rule — undef optional passes' => sub {
+	lives_ok {
+		validate_strict(
+			schema => { x => { type => 'string', bnf => ['<x> ::= "ok"'], optional => 1 } },
+			input  => { x => undef },
+		);
+	} 'optional undef skips BNF check';
+	delete $ledger{'bnf rule: undef optional passes'};
+};
+
+subtest 'ledger: bnf rule — non-arrayref bnf croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'string', bnf => 'not-an-arrayref' } },
+			input  => { x => 'anything' },
+		);
+	} qr/must be an arrayref/, 'scalar bnf rule croaks';
+	delete $ledger{'bnf rule: non-arrayref bnf croaks'};
+};
+
+subtest 'ledger: bnf rule — error_msg override' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => {
+				type      => 'string',
+				bnf       => ['<x> ::= "ok"'],
+				error_msg => 'my custom error',
+			} },
+			input => { x => 'bad' },
+		);
+	} qr/my custom error/, 'error_msg replaces default message';
+	delete $ledger{'bnf rule: error_msg override'};
+};
+
+subtest 'ledger: bnf rule — no rules in grammar croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'string', bnf => ['not a rule line'] } },
+			input  => { x => 'anything' },
+		);
+	} qr/no rules found/i, 'grammar without ::= croaks';
+	delete $ledger{'bnf rule: no rules in grammar croaks'};
+};
+
+# ── bnf_to_matcher (BNF.pm) ───────────────────────────────────────────────────
+
+subtest 'ledger: bnf_to_matcher — returns coderef' => sub {
+	my $m = bnf_to_matcher(['<r> ::= "r"']);
+	ok(ref($m) eq 'CODE');
+	delete $ledger{'bnf_to_matcher: returns coderef'};
+};
+
+subtest 'ledger: bnf_to_matcher — match returns 1' => sub {
+	my $m = bnf_to_matcher(['<r> ::= "hit"']);
+	is($m->('hit'), 1, 'matching value returns 1');
+	delete $ledger{'bnf_to_matcher: match returns 1'};
+};
+
+subtest 'ledger: bnf_to_matcher — no-match returns 0' => sub {
+	my $m = bnf_to_matcher(['<r> ::= "hit"']);
+	is($m->('miss'), 0, 'non-matching value returns 0');
+	delete $ledger{'bnf_to_matcher: no-match returns 0'};
+};
+
+subtest 'ledger: bnf_to_matcher — undef returns 0' => sub {
+	my $m = bnf_to_matcher(['<r> ::= "hit"']);
+	is($m->(undef), 0, 'undef returns 0');
+	delete $ledger{'bnf_to_matcher: undef returns 0'};
+};
+
+subtest 'ledger: bnf_to_matcher — non-arrayref arg croaks' => sub {
+	throws_ok { bnf_to_matcher('scalar') }
+		qr/must be an arrayref/, 'scalar arg croaks';
+	delete $ledger{'bnf_to_matcher: non-arrayref croaks'};
+};
+
+subtest 'ledger: bnf_to_matcher — empty arrayref croaks' => sub {
+	throws_ok { bnf_to_matcher([]) }
+		qr/at least 1 member/, 'empty arrayref croaks';
+	delete $ledger{'bnf_to_matcher: empty array croaks'};
+};
+
+subtest 'ledger: bnf_to_matcher — undefined rule croaks' => sub {
+	throws_ok { bnf_to_matcher(['<a> ::= <missing>']) }
+		qr/undefined rule.*<missing>/i, 'undefined non-terminal croaks';
+	delete $ledger{'bnf_to_matcher: undefined rule croaks'};
+};
+
+subtest 'ledger: bnf_to_matcher — recursive rule croaks' => sub {
+	throws_ok { bnf_to_matcher(['<loop> ::= <loop>']) }
+		qr/recursive rule.*<loop>/i, 'recursive rule croaks';
+	delete $ledger{'bnf_to_matcher: recursive rule croaks'};
+};
+
+subtest 'ledger: bnf_to_matcher — continuation line works' => sub {
+	my $m = bnf_to_matcher([
+		'<ab> ::= "a"',
+		'"b"',
+	]);
+	is($m->('ab'), 1, '"ab" accepted via continuation');
+	is($m->('a'),  0, '"a" alone rejected');
+	delete $ledger{'bnf_to_matcher: continuation works'};
+};
+
+subtest 'ledger: bnf_to_matcher — cache returns same closure' => sub {
+	my @g  = ('<ledger_cache_test> ::= "z"');
+	my $m1 = bnf_to_matcher(\@g);
+	my $m2 = bnf_to_matcher(\@g);
+	is(refaddr($m1), refaddr($m2), 'same closure on second call');
+	delete $ledger{'bnf_to_matcher: cache same closure'};
+};
+
+subtest 'ledger: bnf_to_matcher — empty terminal matches empty string' => sub {
+	my $m = bnf_to_matcher(['<e> ::= ""']);
+	is($m->(''), 1, 'empty terminal matches empty string');
+	delete $ledger{'bnf_to_matcher: empty terminal'};
 };
 
 # ── Ledger assertion ──────────────────────────────────────────────────────────

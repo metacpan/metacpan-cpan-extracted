@@ -1,13 +1,13 @@
 package IO::K8s::Cilium::V2::CiliumNodeConfig;
-# ABSTRACT: Cilium per-node configuration overrides
-our $VERSION = '1.107';
+# ABSTRACT: CiliumNodeConfig is a list of configuration key-value pairs.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumnodeconfigs';
 with 'IO::K8s::Role::Namespaced';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec => '+IO::K8s::Cilium::V2::CiliumNodeConfigSpec', { required => 'schema' };
+
 
 1;
 
@@ -19,25 +19,15 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Cilium::V2::CiliumNodeConfig - Cilium per-node configuration overrides
+IO::K8s::Cilium::V2::CiliumNodeConfig - CiliumNodeConfig is a list of configuration key-value pairs.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-This namespace-scoped resource provides per-node Cilium agent configuration overrides, allowing node-specific customization of Cilium behavior. It uses API version C<cilium.io/v2>. The C<spec> and C<status> fields contain opaque CRD-specific data structures managed by the Cilium operator.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<IO::K8s::Cilium> - Main Cilium CRD namespace
-
-=item * L<https://docs.cilium.io/en/stable/network/node-specific/> - Upstream Cilium node-specific configuration documentation
-
-=back
+Spec is the desired Cilium configuration overrides for a given node
 
 =head1 SUPPORT
 

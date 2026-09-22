@@ -1,0 +1,11 @@
+{
+  "windows": {
+    "server_ip": "203.0.113.50",
+    "server_ipv6_net": "2001:db8:111:4221::",
+    "server_number": 123456,
+    "os": "Windows Server 2022 Standard Edition",
+    "lang": "en",
+    "active": true,
+    "password": "mNbVcXzLkJhGfDsA"
+  }
+}

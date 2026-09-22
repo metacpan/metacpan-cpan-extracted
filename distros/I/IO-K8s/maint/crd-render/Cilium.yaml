@@ -1,0 +1,514 @@
+# Cilium CRD emitter overlay (D5/D6, k95, task B-Cilium).
+#
+# Read by maint/crd-drift-check.pl --render/--check for --provider Cilium.
+# `kinds` is keyed by bare Kind name -- NOT by version -- because the SAME
+# Kind name is served by both cilium.io/v2 and cilium.io/v2alpha1 for a
+# handful of BGP/CIDR/LoadBalancer Kinds (see lib/IO/K8s/Cilium.pm's
+# back-compat resource_map keys, k78/k83); render_gvk() picks `base` per
+# served version automatically, so one overlay entry covers both. This file
+# is filled in two passes matching the two-commit task split: cilium.io/v2
+# Kinds first, cilium.io/v2alpha1-only Kinds (CiliumDatapathPlugin,
+# CiliumEndpointSlice, CiliumGatewayClassConfig, CiliumL2AnnouncementPolicy,
+# CiliumPodIPPool) appended in the second commit.
+#
+# `names` maps the logical path below each Kind (what
+# IO::K8s::AutoGen::class_path returns) to the upstream Go type name at the
+# pinned upstream_version (v1.20.1, github.com/cilium/cilium):
+#   pkg/policy/api/{rule,egress,ingress,l4,http,icmp,cidr,fqdn,groups,
+#   selector,service}.go -- the shared Rule family (Rule, EndpointSelector,
+#   IngressRule/EgressRule, IngressDenyRule/EgressDenyRule, PortRule,
+#   PortDenyRule, CIDRRule, FQDNSelector, ...). CiliumNetworkPolicy and
+#   CiliumClusterwideNetworkPolicy embed the LITERAL SAME api.Rule at both
+#   `spec` (single Rule) and `specs` (Rule[]) -- verified byte-identical
+#   schema for both fields between the two Kinds before writing this file --
+#   so every Rule-family path is mapped to the SAME bare name at all four
+#   prefixes (CNP Spec::, CNP SpecsItem::, CCNP Spec::, CCNP SpecsItem::):
+#   one class per version directory, proven by --check MATCH plus
+#   t/07_cilium.t's "same Rule class" assertion.
+#   pkg/k8s/apis/cilium.io/v2/*.go -- the per-Kind CRD wrapper types
+#   (CiliumBGPAdvertisementSpec, CiliumNetworkPolicyStatus,
+#   CiliumNetworkPolicyNodeStatus, NodeSpec/NodeStatus, EndpointStatus, ...).
+#   pkg/aws/types, pkg/azure/types, pkg/alibabacloud/types, pkg/ipam/types,
+#   api/v1/models -- CiliumNode's per-cloud-provider ENI/IPAM subtrees and
+#   CiliumEndpoint's status subtree (EndpointHealth, EndpointIdentifiers,
+#   ControllerStatus*, IdentityTuple, ...).
+#
+# Three deliberate deviations from the literal upstream Go name, each
+# because the literal name COLLIDES with an unrelated type already claiming
+# it elsewhere in this same cilium.io/v2 overlay (overlay `names` values are
+# bare package names under one shared `base` per version directory, so two
+# different upstream Go types that happen to share a bare name in different
+# Go packages would otherwise silently alias into ONE Perl class):
+#   - cegp_types.go's own `EgressRule` (CiliumEgressGatewayPolicy's
+#     {namespaceSelector,podSelector,nodeSelector} selector triple) would
+#     collide with policy/api.EgressRule (the Rule family's egress rule,
+#     used pervasively by CNP/CCNP) -> named `EgressGatewaySelector`.
+#   - cec_types.go's own `Service` (CiliumEnvoyConfig's
+#     {name,namespace,ports} backend-service reference) would collide with
+#     policy/api.Service (the Rule family's k8s-service policy target) ->
+#     named `EnvoyConfigService`.
+#   - alibabaCloudTypes' `Spec`/`ENIStatus`/`ENI` (CiliumNode's Alibaba
+#     Cloud subtree) would collide with a bare "Spec" being a useless class
+#     name on its own, and ENIStatus/ENI collide outright with the AWS
+#     subtree's own (correctly bare) `ENIStatus`/`ENI` -> named
+#     `AlibabaCloudSpec`/`AlibabaCloudENIStatus`/`AlibabaCloudENI`, mirroring
+#     the AWS/Azure siblings' own already-qualified names
+#     (`ENISpec`/`AzureSpec`, `AwsVPC`/`VPC`).
+#
+# CiliumEndpoint, CiliumIdentity and CiliumEndpointSlice (v2alpha1, second
+# commit) are NOT reachable through maint/crd-drift-check.pl's own
+# --render/--check pipeline without tripping k107 (filed): its
+# parse_crds() reads `$schema->{properties}{spec}{properties}` to decide
+# has_spec_schema, which autovivifies an empty `properties.spec => {}` into
+# the shared manifest doc for any Kind that has NO `spec` property at all --
+# exactly these three. The corrupted doc then makes IO::K8s::CRD->generate
+# emit a bogus `k8s spec => Str;` attribute nothing upstream declares. These
+# three Kinds' checked-in files were rendered with the SAME emitter and this
+# SAME overlay via a bug-free direct call (IO::K8s::CRD->generate on the
+# manifest read straight off disk, bypassing crd-drift-check.pl's parse_crds
+# entirely) and are otherwise byte-identical emitter output; `--check` is
+# expected to report DIFFERS for exactly these three files (extra phantom
+# `spec` line + POD), documented in the task report rather than worked
+# around by shipping the invented field.
+#
+# `with`/`extra` are copied verbatim from the opaque roots this overlay
+# replaces, only where they differ from the emitter's own default (Namespaced
+# iff the CRD scope says so): CiliumNetworkPolicy and
+# CiliumClusterwideNetworkPolicy compose IO::K8s::Role::NetworkPolicy and
+# keep `sub _netpol_format { 'cilium' }` verbatim.
+kinds:
+  CiliumBGPAdvertisement:
+    names:
+      Spec: CiliumBGPAdvertisementSpec
+      Spec::AdvertisementsItem: BGPAdvertisement
+      Spec::AdvertisementsItem::Attributes: BGPAttributes
+      Spec::AdvertisementsItem::Attributes::Communities: BGPCommunities
+      Spec::AdvertisementsItem::Interface: BGPInterfaceOptions
+      Spec::AdvertisementsItem::Service: BGPServiceOptions
+  CiliumBGPClusterConfig:
+    names:
+      Spec: CiliumBGPClusterConfigSpec
+      Spec::BgpInstancesItem: CiliumBGPInstance
+      Spec::BgpInstancesItem::PeersItem: CiliumBGPPeer
+      Spec::BgpInstancesItem::PeersItem::AutoDiscovery: BGPAutoDiscovery
+      Spec::BgpInstancesItem::PeersItem::AutoDiscovery::DefaultGateway: DefaultGateway
+      Spec::BgpInstancesItem::PeersItem::PeerConfigRef: PeerConfigReference
+      Status: CiliumBGPClusterConfigStatus
+  CiliumBGPNodeConfig:
+    names:
+      Spec: CiliumBGPNodeSpec
+      Spec::BgpInstancesItem: CiliumBGPNodeInstance
+      Spec::BgpInstancesItem::PeersItem: CiliumBGPNodePeer
+      Spec::BgpInstancesItem::PeersItem::AutoDiscovery: BGPAutoDiscovery
+      Spec::BgpInstancesItem::PeersItem::AutoDiscovery::DefaultGateway: DefaultGateway
+      Spec::BgpInstancesItem::PeersItem::PeerConfigRef: PeerConfigReference
+      Status: CiliumBGPNodeStatus
+      Status::BgpInstancesItem: CiliumBGPNodeInstanceStatus
+      Status::BgpInstancesItem::PeersItem: CiliumBGPNodePeerStatus
+      Status::BgpInstancesItem::PeersItem::RouteCountItem: BGPFamilyRouteCount
+      Status::BgpInstancesItem::PeersItem::Timers: CiliumBGPTimersState
+  CiliumBGPNodeConfigOverride:
+    names:
+      Spec: CiliumBGPNodeConfigOverrideSpec
+      Spec::BgpInstancesItem: CiliumBGPNodeConfigInstanceOverride
+      Spec::BgpInstancesItem::PeersItem: CiliumBGPNodeConfigPeerOverride
+  CiliumBGPPeerConfig:
+    names:
+      Spec: CiliumBGPPeerConfigSpec
+      Spec::FamiliesItem: CiliumBGPFamilyWithAdverts
+      Spec::GracefulRestart: CiliumBGPNeighborGracefulRestart
+      Spec::Timers: CiliumBGPTimers
+      Spec::Transport: CiliumBGPTransport
+      Status: CiliumBGPPeerConfigStatus
+  CiliumCIDRGroup:
+    names:
+      Spec: CiliumCIDRGroupSpec
+  CiliumClusterwideEnvoyConfig:
+    names:
+      Spec: CiliumEnvoyConfigSpec
+      Spec::BackendServicesItem: EnvoyConfigService
+      Spec::ServicesItem: ServiceListener
+  CiliumClusterwideNetworkPolicy:
+    extra:
+    - sub _netpol_format { 'cilium' }
+    no_reuse_core:
+    - Status::ConditionsItem
+    names:
+      Spec: Rule
+      Spec::EgressDenyItem: EgressDenyRule
+      Spec::EgressDenyItem::IcmpsItem: ICMPRule
+      Spec::EgressDenyItem::IcmpsItem::FieldsItem: ICMPField
+      Spec::EgressDenyItem::ToCIDRSetItem: CIDRRule
+      Spec::EgressDenyItem::ToGroupsItem: Groups
+      Spec::EgressDenyItem::ToGroupsItem::Aws: AWSGroup
+      Spec::EgressDenyItem::ToPortsItem: PortDenyRule
+      Spec::EgressDenyItem::ToServicesItem: Service
+      Spec::EgressDenyItem::ToServicesItem::K8sService: K8sServiceNamespace
+      Spec::EgressDenyItem::ToServicesItem::K8sServiceSelector: K8sServiceSelectorNamespace
+      Spec::EgressItem: EgressRule
+      Spec::EgressItem::Authentication: Authentication
+      Spec::EgressItem::IcmpsItem: ICMPRule
+      Spec::EgressItem::IcmpsItem::FieldsItem: ICMPField
+      Spec::EgressItem::ToCIDRSetItem: CIDRRule
+      Spec::EgressItem::ToFQDNsItem: FQDNSelector
+      Spec::EgressItem::ToGroupsItem: Groups
+      Spec::EgressItem::ToGroupsItem::Aws: AWSGroup
+      Spec::EgressItem::ToPortsItem: PortRule
+      Spec::EgressItem::ToPortsItem::Listener: Listener
+      Spec::EgressItem::ToPortsItem::Listener::EnvoyConfig: EnvoyConfig
+      Spec::EgressItem::ToPortsItem::OriginatingTLS: TLSContext
+      Spec::EgressItem::ToPortsItem::Rules: L7Rules
+      Spec::EgressItem::ToPortsItem::Rules::DnsItem: PortRuleDNS
+      Spec::EgressItem::ToPortsItem::Rules::HttpItem: PortRuleHTTP
+      Spec::EgressItem::ToPortsItem::Rules::HttpItem::HeaderMatchesItem: HeaderMatch
+      Spec::EgressItem::ToPortsItem::TerminatingTLS: TLSContext
+      Spec::EgressItem::ToServicesItem: Service
+      Spec::EgressItem::ToServicesItem::K8sService: K8sServiceNamespace
+      Spec::EgressItem::ToServicesItem::K8sServiceSelector: K8sServiceSelectorNamespace
+      Spec::EnableDefaultDeny: DefaultDenyConfig
+      Spec::IngressDenyItem: IngressDenyRule
+      Spec::IngressDenyItem::FromCIDRSetItem: CIDRRule
+      Spec::IngressDenyItem::FromGroupsItem: Groups
+      Spec::IngressDenyItem::FromGroupsItem::Aws: AWSGroup
+      Spec::IngressDenyItem::IcmpsItem: ICMPRule
+      Spec::IngressDenyItem::IcmpsItem::FieldsItem: ICMPField
+      Spec::IngressDenyItem::ToPortsItem: PortDenyRule
+      Spec::IngressItem: IngressRule
+      Spec::IngressItem::Authentication: Authentication
+      Spec::IngressItem::FromCIDRSetItem: CIDRRule
+      Spec::IngressItem::FromGroupsItem: Groups
+      Spec::IngressItem::FromGroupsItem::Aws: AWSGroup
+      Spec::IngressItem::IcmpsItem: ICMPRule
+      Spec::IngressItem::IcmpsItem::FieldsItem: ICMPField
+      Spec::IngressItem::ToPortsItem: PortRule
+      Spec::IngressItem::ToPortsItem::Listener: Listener
+      Spec::IngressItem::ToPortsItem::Listener::EnvoyConfig: EnvoyConfig
+      Spec::IngressItem::ToPortsItem::OriginatingTLS: TLSContext
+      Spec::IngressItem::ToPortsItem::Rules: L7Rules
+      Spec::IngressItem::ToPortsItem::Rules::DnsItem: PortRuleDNS
+      Spec::IngressItem::ToPortsItem::Rules::HttpItem: PortRuleHTTP
+      Spec::IngressItem::ToPortsItem::Rules::HttpItem::HeaderMatchesItem: HeaderMatch
+      Spec::IngressItem::ToPortsItem::TerminatingTLS: TLSContext
+      Spec::LabelsItem: Label
+      Spec::Log: LogConfig
+      SpecsItem: Rule
+      SpecsItem::EgressDenyItem: EgressDenyRule
+      SpecsItem::EgressDenyItem::IcmpsItem: ICMPRule
+      SpecsItem::EgressDenyItem::IcmpsItem::FieldsItem: ICMPField
+      SpecsItem::EgressDenyItem::ToCIDRSetItem: CIDRRule
+      SpecsItem::EgressDenyItem::ToGroupsItem: Groups
+      SpecsItem::EgressDenyItem::ToGroupsItem::Aws: AWSGroup
+      SpecsItem::EgressDenyItem::ToPortsItem: PortDenyRule
+      SpecsItem::EgressDenyItem::ToServicesItem: Service
+      SpecsItem::EgressDenyItem::ToServicesItem::K8sService: K8sServiceNamespace
+      SpecsItem::EgressDenyItem::ToServicesItem::K8sServiceSelector: K8sServiceSelectorNamespace
+      SpecsItem::EgressItem: EgressRule
+      SpecsItem::EgressItem::Authentication: Authentication
+      SpecsItem::EgressItem::IcmpsItem: ICMPRule
+      SpecsItem::EgressItem::IcmpsItem::FieldsItem: ICMPField
+      SpecsItem::EgressItem::ToCIDRSetItem: CIDRRule
+      SpecsItem::EgressItem::ToFQDNsItem: FQDNSelector
+      SpecsItem::EgressItem::ToGroupsItem: Groups
+      SpecsItem::EgressItem::ToGroupsItem::Aws: AWSGroup
+      SpecsItem::EgressItem::ToPortsItem: PortRule
+      SpecsItem::EgressItem::ToPortsItem::Listener: Listener
+      SpecsItem::EgressItem::ToPortsItem::Listener::EnvoyConfig: EnvoyConfig
+      SpecsItem::EgressItem::ToPortsItem::OriginatingTLS: TLSContext
+      SpecsItem::EgressItem::ToPortsItem::Rules: L7Rules
+      SpecsItem::EgressItem::ToPortsItem::Rules::DnsItem: PortRuleDNS
+      SpecsItem::EgressItem::ToPortsItem::Rules::HttpItem: PortRuleHTTP
+      SpecsItem::EgressItem::ToPortsItem::Rules::HttpItem::HeaderMatchesItem: HeaderMatch
+      SpecsItem::EgressItem::ToPortsItem::TerminatingTLS: TLSContext
+      SpecsItem::EgressItem::ToServicesItem: Service
+      SpecsItem::EgressItem::ToServicesItem::K8sService: K8sServiceNamespace
+      SpecsItem::EgressItem::ToServicesItem::K8sServiceSelector: K8sServiceSelectorNamespace
+      SpecsItem::EnableDefaultDeny: DefaultDenyConfig
+      SpecsItem::IngressDenyItem: IngressDenyRule
+      SpecsItem::IngressDenyItem::FromCIDRSetItem: CIDRRule
+      SpecsItem::IngressDenyItem::FromGroupsItem: Groups
+      SpecsItem::IngressDenyItem::FromGroupsItem::Aws: AWSGroup
+      SpecsItem::IngressDenyItem::IcmpsItem: ICMPRule
+      SpecsItem::IngressDenyItem::IcmpsItem::FieldsItem: ICMPField
+      SpecsItem::IngressDenyItem::ToPortsItem: PortDenyRule
+      SpecsItem::IngressItem: IngressRule
+      SpecsItem::IngressItem::Authentication: Authentication
+      SpecsItem::IngressItem::FromCIDRSetItem: CIDRRule
+      SpecsItem::IngressItem::FromGroupsItem: Groups
+      SpecsItem::IngressItem::FromGroupsItem::Aws: AWSGroup
+      SpecsItem::IngressItem::IcmpsItem: ICMPRule
+      SpecsItem::IngressItem::IcmpsItem::FieldsItem: ICMPField
+      SpecsItem::IngressItem::ToPortsItem: PortRule
+      SpecsItem::IngressItem::ToPortsItem::Listener: Listener
+      SpecsItem::IngressItem::ToPortsItem::Listener::EnvoyConfig: EnvoyConfig
+      SpecsItem::IngressItem::ToPortsItem::OriginatingTLS: TLSContext
+      SpecsItem::IngressItem::ToPortsItem::Rules: L7Rules
+      SpecsItem::IngressItem::ToPortsItem::Rules::DnsItem: PortRuleDNS
+      SpecsItem::IngressItem::ToPortsItem::Rules::HttpItem: PortRuleHTTP
+      SpecsItem::IngressItem::ToPortsItem::Rules::HttpItem::HeaderMatchesItem: HeaderMatch
+      SpecsItem::IngressItem::ToPortsItem::TerminatingTLS: TLSContext
+      SpecsItem::LabelsItem: Label
+      SpecsItem::Log: LogConfig
+      Status: CiliumNetworkPolicyStatus
+      Status::ConditionsItem: NetworkPolicyCondition
+      Status::DerivativePoliciesValue: CiliumNetworkPolicyNodeStatus
+    with:
+    - IO::K8s::Role::NetworkPolicy
+  CiliumEgressGatewayPolicy:
+    names:
+      Spec: CiliumEgressGatewayPolicySpec
+      Spec::EgressGateway: EgressGateway
+      Spec::EgressGatewaysItem: EgressGateway
+      Spec::SelectorsItem: EgressGatewaySelector
+  CiliumEndpoint:
+    names:
+      Status: EndpointStatus
+      Status::ControllersItem: ControllerStatus
+      Status::ControllersItem::Configuration: ControllerStatusConfiguration
+      Status::ControllersItem::Status: ControllerStatusStatus
+      Status::Encryption: EncryptionSpec
+      Status::External_identifiers: EndpointIdentifiers
+      Status::Health: EndpointHealth
+      Status::Identity: EndpointIdentity
+      Status::LogItem: EndpointStatusChange
+      Status::Named_portsItem: Port
+      Status::Networking: EndpointNetworking
+      Status::Networking::AddressingItem: AddressPair
+      Status::Policy: EndpointPolicy
+      Status::Policy::Egress: EndpointPolicyDirection
+      Status::Policy::Egress::AddingItem: IdentityTuple
+      Status::Policy::Egress::AllowedItem: IdentityTuple
+      Status::Policy::Egress::DeniedItem: IdentityTuple
+      Status::Policy::Egress::RemovingItem: IdentityTuple
+      Status::Policy::Ingress: EndpointPolicyDirection
+      Status::Policy::Ingress::AddingItem: IdentityTuple
+      Status::Policy::Ingress::AllowedItem: IdentityTuple
+      Status::Policy::Ingress::DeniedItem: IdentityTuple
+      Status::Policy::Ingress::RemovingItem: IdentityTuple
+  CiliumEnvoyConfig:
+    names:
+      Spec: CiliumEnvoyConfigSpec
+      Spec::BackendServicesItem: EnvoyConfigService
+      Spec::ServicesItem: ServiceListener
+  CiliumIdentity: {}
+  CiliumLoadBalancerIPPool:
+    names:
+      Spec: CiliumLoadBalancerIPPoolSpec
+      Spec::BlocksItem: CiliumLoadBalancerIPPoolIPBlock
+      Status: CiliumLoadBalancerIPPoolStatus
+  CiliumLocalRedirectPolicy:
+    names:
+      Spec: CiliumLocalRedirectPolicySpec
+      Spec::RedirectBackend: RedirectBackend
+      Spec::RedirectBackend::ToPortsItem: PortInfo
+      Spec::RedirectFrontend: RedirectFrontend
+      Spec::RedirectFrontend::AddressMatcher: Frontend
+      Spec::RedirectFrontend::AddressMatcher::ToPortsItem: PortInfo
+      Spec::RedirectFrontend::ServiceMatcher: ServiceInfo
+      Spec::RedirectFrontend::ServiceMatcher::ToPortsItem: PortInfo
+      Status: CiliumLocalRedirectPolicyStatus
+  CiliumNetworkPolicy:
+    extra:
+    - sub _netpol_format { 'cilium' }
+    no_reuse_core:
+    - Status::ConditionsItem
+    names:
+      Spec: Rule
+      Spec::EgressDenyItem: EgressDenyRule
+      Spec::EgressDenyItem::IcmpsItem: ICMPRule
+      Spec::EgressDenyItem::IcmpsItem::FieldsItem: ICMPField
+      Spec::EgressDenyItem::ToCIDRSetItem: CIDRRule
+      Spec::EgressDenyItem::ToGroupsItem: Groups
+      Spec::EgressDenyItem::ToGroupsItem::Aws: AWSGroup
+      Spec::EgressDenyItem::ToPortsItem: PortDenyRule
+      Spec::EgressDenyItem::ToServicesItem: Service
+      Spec::EgressDenyItem::ToServicesItem::K8sService: K8sServiceNamespace
+      Spec::EgressDenyItem::ToServicesItem::K8sServiceSelector: K8sServiceSelectorNamespace
+      Spec::EgressItem: EgressRule
+      Spec::EgressItem::Authentication: Authentication
+      Spec::EgressItem::IcmpsItem: ICMPRule
+      Spec::EgressItem::IcmpsItem::FieldsItem: ICMPField
+      Spec::EgressItem::ToCIDRSetItem: CIDRRule
+      Spec::EgressItem::ToFQDNsItem: FQDNSelector
+      Spec::EgressItem::ToGroupsItem: Groups
+      Spec::EgressItem::ToGroupsItem::Aws: AWSGroup
+      Spec::EgressItem::ToPortsItem: PortRule
+      Spec::EgressItem::ToPortsItem::Listener: Listener
+      Spec::EgressItem::ToPortsItem::Listener::EnvoyConfig: EnvoyConfig
+      Spec::EgressItem::ToPortsItem::OriginatingTLS: TLSContext
+      Spec::EgressItem::ToPortsItem::Rules: L7Rules
+      Spec::EgressItem::ToPortsItem::Rules::DnsItem: PortRuleDNS
+      Spec::EgressItem::ToPortsItem::Rules::HttpItem: PortRuleHTTP
+      Spec::EgressItem::ToPortsItem::Rules::HttpItem::HeaderMatchesItem: HeaderMatch
+      Spec::EgressItem::ToPortsItem::TerminatingTLS: TLSContext
+      Spec::EgressItem::ToServicesItem: Service
+      Spec::EgressItem::ToServicesItem::K8sService: K8sServiceNamespace
+      Spec::EgressItem::ToServicesItem::K8sServiceSelector: K8sServiceSelectorNamespace
+      Spec::EnableDefaultDeny: DefaultDenyConfig
+      Spec::IngressDenyItem: IngressDenyRule
+      Spec::IngressDenyItem::FromCIDRSetItem: CIDRRule
+      Spec::IngressDenyItem::FromGroupsItem: Groups
+      Spec::IngressDenyItem::FromGroupsItem::Aws: AWSGroup
+      Spec::IngressDenyItem::IcmpsItem: ICMPRule
+      Spec::IngressDenyItem::IcmpsItem::FieldsItem: ICMPField
+      Spec::IngressDenyItem::ToPortsItem: PortDenyRule
+      Spec::IngressItem: IngressRule
+      Spec::IngressItem::Authentication: Authentication
+      Spec::IngressItem::FromCIDRSetItem: CIDRRule
+      Spec::IngressItem::FromGroupsItem: Groups
+      Spec::IngressItem::FromGroupsItem::Aws: AWSGroup
+      Spec::IngressItem::IcmpsItem: ICMPRule
+      Spec::IngressItem::IcmpsItem::FieldsItem: ICMPField
+      Spec::IngressItem::ToPortsItem: PortRule
+      Spec::IngressItem::ToPortsItem::Listener: Listener
+      Spec::IngressItem::ToPortsItem::Listener::EnvoyConfig: EnvoyConfig
+      Spec::IngressItem::ToPortsItem::OriginatingTLS: TLSContext
+      Spec::IngressItem::ToPortsItem::Rules: L7Rules
+      Spec::IngressItem::ToPortsItem::Rules::DnsItem: PortRuleDNS
+      Spec::IngressItem::ToPortsItem::Rules::HttpItem: PortRuleHTTP
+      Spec::IngressItem::ToPortsItem::Rules::HttpItem::HeaderMatchesItem: HeaderMatch
+      Spec::IngressItem::ToPortsItem::TerminatingTLS: TLSContext
+      Spec::LabelsItem: Label
+      Spec::Log: LogConfig
+      SpecsItem: Rule
+      SpecsItem::EgressDenyItem: EgressDenyRule
+      SpecsItem::EgressDenyItem::IcmpsItem: ICMPRule
+      SpecsItem::EgressDenyItem::IcmpsItem::FieldsItem: ICMPField
+      SpecsItem::EgressDenyItem::ToCIDRSetItem: CIDRRule
+      SpecsItem::EgressDenyItem::ToGroupsItem: Groups
+      SpecsItem::EgressDenyItem::ToGroupsItem::Aws: AWSGroup
+      SpecsItem::EgressDenyItem::ToPortsItem: PortDenyRule
+      SpecsItem::EgressDenyItem::ToServicesItem: Service
+      SpecsItem::EgressDenyItem::ToServicesItem::K8sService: K8sServiceNamespace
+      SpecsItem::EgressDenyItem::ToServicesItem::K8sServiceSelector: K8sServiceSelectorNamespace
+      SpecsItem::EgressItem: EgressRule
+      SpecsItem::EgressItem::Authentication: Authentication
+      SpecsItem::EgressItem::IcmpsItem: ICMPRule
+      SpecsItem::EgressItem::IcmpsItem::FieldsItem: ICMPField
+      SpecsItem::EgressItem::ToCIDRSetItem: CIDRRule
+      SpecsItem::EgressItem::ToFQDNsItem: FQDNSelector
+      SpecsItem::EgressItem::ToGroupsItem: Groups
+      SpecsItem::EgressItem::ToGroupsItem::Aws: AWSGroup
+      SpecsItem::EgressItem::ToPortsItem: PortRule
+      SpecsItem::EgressItem::ToPortsItem::Listener: Listener
+      SpecsItem::EgressItem::ToPortsItem::Listener::EnvoyConfig: EnvoyConfig
+      SpecsItem::EgressItem::ToPortsItem::OriginatingTLS: TLSContext
+      SpecsItem::EgressItem::ToPortsItem::Rules: L7Rules
+      SpecsItem::EgressItem::ToPortsItem::Rules::DnsItem: PortRuleDNS
+      SpecsItem::EgressItem::ToPortsItem::Rules::HttpItem: PortRuleHTTP
+      SpecsItem::EgressItem::ToPortsItem::Rules::HttpItem::HeaderMatchesItem: HeaderMatch
+      SpecsItem::EgressItem::ToPortsItem::TerminatingTLS: TLSContext
+      SpecsItem::EgressItem::ToServicesItem: Service
+      SpecsItem::EgressItem::ToServicesItem::K8sService: K8sServiceNamespace
+      SpecsItem::EgressItem::ToServicesItem::K8sServiceSelector: K8sServiceSelectorNamespace
+      SpecsItem::EnableDefaultDeny: DefaultDenyConfig
+      SpecsItem::IngressDenyItem: IngressDenyRule
+      SpecsItem::IngressDenyItem::FromCIDRSetItem: CIDRRule
+      SpecsItem::IngressDenyItem::FromGroupsItem: Groups
+      SpecsItem::IngressDenyItem::FromGroupsItem::Aws: AWSGroup
+      SpecsItem::IngressDenyItem::IcmpsItem: ICMPRule
+      SpecsItem::IngressDenyItem::IcmpsItem::FieldsItem: ICMPField
+      SpecsItem::IngressDenyItem::ToPortsItem: PortDenyRule
+      SpecsItem::IngressItem: IngressRule
+      SpecsItem::IngressItem::Authentication: Authentication
+      SpecsItem::IngressItem::FromCIDRSetItem: CIDRRule
+      SpecsItem::IngressItem::FromGroupsItem: Groups
+      SpecsItem::IngressItem::FromGroupsItem::Aws: AWSGroup
+      SpecsItem::IngressItem::IcmpsItem: ICMPRule
+      SpecsItem::IngressItem::IcmpsItem::FieldsItem: ICMPField
+      SpecsItem::IngressItem::ToPortsItem: PortRule
+      SpecsItem::IngressItem::ToPortsItem::Listener: Listener
+      SpecsItem::IngressItem::ToPortsItem::Listener::EnvoyConfig: EnvoyConfig
+      SpecsItem::IngressItem::ToPortsItem::OriginatingTLS: TLSContext
+      SpecsItem::IngressItem::ToPortsItem::Rules: L7Rules
+      SpecsItem::IngressItem::ToPortsItem::Rules::DnsItem: PortRuleDNS
+      SpecsItem::IngressItem::ToPortsItem::Rules::HttpItem: PortRuleHTTP
+      SpecsItem::IngressItem::ToPortsItem::Rules::HttpItem::HeaderMatchesItem: HeaderMatch
+      SpecsItem::IngressItem::ToPortsItem::TerminatingTLS: TLSContext
+      SpecsItem::LabelsItem: Label
+      SpecsItem::Log: LogConfig
+      Status: CiliumNetworkPolicyStatus
+      Status::ConditionsItem: NetworkPolicyCondition
+      Status::DerivativePoliciesValue: CiliumNetworkPolicyNodeStatus
+    with:
+    - IO::K8s::Role::Namespaced
+    - IO::K8s::Role::NetworkPolicy
+  CiliumNode:
+    names:
+      Spec: NodeSpec
+      Spec::AddressesItem: NodeAddress
+      Spec::Alibaba_cloud: AlibabaCloudSpec
+      Spec::Azure: AzureSpec
+      Spec::Encryption: EncryptionSpec
+      Spec::Eni: ENISpec
+      Spec::Health: HealthAddressingSpec
+      Spec::Ingress: AddressPair
+      Spec::Ipam: IPAMSpec
+      Spec::Ipam::Ipv6_poolValue: AllocationIP
+      Spec::Ipam::PoolValue: AllocationIP
+      Spec::Ipam::Pools: IPAMPoolSpec
+      Spec::Ipam::Pools::AllocatedItem: IPAMPoolAllocation
+      Spec::Ipam::Pools::RequestedItem: IPAMPoolRequest
+      Spec::Ipam::Pools::RequestedItem::Needed: IPAMPoolDemand
+      Status: NodeStatus
+      Status::Alibaba_cloud: AlibabaCloudENIStatus
+      Status::Alibaba_cloud::EnisValue: AlibabaCloudENI
+      Status::Alibaba_cloud::EnisValue::Private_ipsetsItem: PrivateIPSet
+      Status::Alibaba_cloud::EnisValue::Vpc: VPC
+      Status::Alibaba_cloud::EnisValue::Vswitch: VSwitch
+      Status::Azure: AzureStatus
+      Status::Azure::InterfacesItem: AzureInterface
+      Status::Azure::InterfacesItem::AddressesItem: AzureAddress
+      Status::Azure::InterfacesItem::Subnet: AzureSubnet
+      Status::Eni: ENIStatus
+      Status::Eni::EnisValue: ENI
+      Status::Eni::EnisValue::Subnet: AwsSubnet
+      Status::Eni::EnisValue::Vpc: AwsVPC
+      Status::Ipam: IPAMStatus
+      Status::Ipam::Ipv6_usedValue: AllocationIP
+      Status::Ipam::Operator_status: OperatorStatus
+      Status::Ipam::Pod_cidrsValue: PodCIDRMapEntry
+      Status::Ipam::UsedValue: AllocationIP
+  CiliumNodeConfig:
+    names:
+      Spec: CiliumNodeConfigSpec
+
+  # --- cilium.io/v2alpha1 (task B-Cilium, second commit) ---
+  # These five Kinds are v2alpha1-only (no v2 track): pkg/k8s/apis/
+  # cilium.io/v2alpha1/{cdpp_types,gatewayclassconfig_types,ippool_types,
+  # l2announcement_types,types}.go. The seven BGP/CIDR/LoadBalancerIPPool
+  # Kinds above are served at BOTH cilium.io/v2 and cilium.io/v2alpha1 from
+  # the same upstream CRD file (k78/k83 back-compat) and reuse the SAME
+  # `kinds.<Kind>` overlay entry already written above for their v2 render --
+  # render_gvk() picks `base` (IO::K8s::Cilium::V2 vs ::V2alpha1) per served
+  # version automatically, so nothing more was needed there; verified by
+  # --render-dir producing no unmapped (default-named) file for any of the
+  # seven when rendering the v2alpha1 GVKs.
+  CiliumDatapathPlugin:
+    names:
+      Spec: CiliumDatapathPluginSpec
+  CiliumEndpointSlice:
+    names:
+      EndpointsItem: CoreCiliumEndpoint
+      EndpointsItem::Encryption: EncryptionSpec
+      EndpointsItem::Named_portsItem: Port
+      EndpointsItem::Networking: EndpointNetworking
+      EndpointsItem::Networking::AddressingItem: AddressPair
+  CiliumGatewayClassConfig:
+    names:
+      Spec: CiliumGatewayClassConfigSpec
+      Spec::Envoy: EnvoyConfig
+      Spec::HttpOptions: HTTPOptions
+      Spec::HttpOptions::GrpcWebTranslation: GRPCWebTranslationConfig
+      Spec::Service: ServiceConfig
+      Spec::Telemetry: Telemetry
+      Spec::Telemetry::AccessLogsItem: AccessLogs
+      Status: CiliumGatewayClassConfigStatus
+  CiliumL2AnnouncementPolicy:
+    names:
+      Spec: CiliumL2AnnouncementPolicySpec
+      Status: CiliumL2AnnouncementPolicyStatus
+  CiliumPodIPPool:
+    names:
+      Spec: IPPoolSpec
+      Spec::Ipv4: IPv4PoolSpec
+      Spec::Ipv6: IPv6PoolSpec

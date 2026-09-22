@@ -72,6 +72,9 @@ subtest 'create volume' => sub {
     is($volume->id, 777, 'new volume id');
     is($volume->name, 'new-volume', 'new volume name');
     is($volume->status, 'creating', 'new volume status');
+    isa_ok($volume->action, 'WWW::Hetzner::Action', 'create action is an Action');
+    is($volume->action->command, 'create_volume', 'action command');
+    is(scalar @{ $volume->next_actions }, 1, 'next_actions populated');
 };
 
 subtest 'delete volume' => sub {
@@ -108,7 +111,8 @@ subtest 'attach volume' => sub {
     );
 
     my $result = $cloud->volumes->attach(555, 12345);
-    is($result->{action}{command}, 'attach_volume', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Action');
+    is($result->command, 'attach_volume', 'action command');
 };
 
 subtest 'detach volume' => sub {
@@ -120,7 +124,8 @@ subtest 'detach volume' => sub {
     );
 
     my $result = $cloud->volumes->detach(555);
-    is($result->{action}{command}, 'detach_volume', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Action');
+    is($result->command, 'detach_volume', 'action command');
 };
 
 subtest 'resize volume' => sub {
@@ -136,14 +141,19 @@ subtest 'resize volume' => sub {
     );
 
     my $result = $cloud->volumes->resize(555, 100);
-    is($result->{action}{command}, 'resize_volume', 'action command');
+    isa_ok($result, 'WWW::Hetzner::Action');
+    is($result->command, 'resize_volume', 'action command');
 };
 
 subtest 'volume entity methods' => sub {
     my $fixture = load_fixture('volumes_get');
+    my $action_fixture = load_fixture('volumes_action');
 
     my $cloud = mock_cloud(
         '/volumes/555' => $fixture,
+        'POST /volumes/555/actions/attach' => $action_fixture,
+        'POST /volumes/555/actions/detach' => $action_fixture,
+        'POST /volumes/555/actions/resize' => $action_fixture,
     );
 
     my $volume = $cloud->volumes->get(555);
@@ -153,6 +163,10 @@ subtest 'volume entity methods' => sub {
     is($data->{id}, 555, 'data id');
     is($data->{name}, 'my-data', 'data name');
     is($data->{size}, 50, 'data size');
+
+    isa_ok($volume->attach(12345), 'WWW::Hetzner::Action', 'entity attach returns Action');
+    isa_ok($volume->detach, 'WWW::Hetzner::Action', 'entity detach returns Action');
+    isa_ok($volume->resize(100), 'WWW::Hetzner::Action', 'entity resize returns Action');
 };
 
 done_testing;

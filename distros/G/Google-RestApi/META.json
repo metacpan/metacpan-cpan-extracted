@@ -36,6 +36,7 @@
             "Carp" : "0",
             "Exporter" : "0",
             "Furl" : "0",
+            "HTTP::Daemon" : "0",
             "Hash::Merge" : "0",
             "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
@@ -51,7 +52,6 @@
             "Retry::Backoff" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
-            "Term::Prompt" : "0",
             "Tie::Hash" : "0",
             "ToolSet" : "0",
             "Try::Tiny" : "0",
@@ -88,6 +88,6 @@
          "web" : "https://github.com/mvsjes2/p5-google-restapi"
       }
    },
-   "version" : "v2.2.3",
+   "version" : "v2.2.4",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -1,5 +1,53 @@
 Revision history for Params-Validate-Strict
 
+0.40	Mon Sep 21 09:22:05 PM EDT 2026
+	[Bug Fixes]
+	- min/max constraints on string parameters now correctly count grapheme
+	  clusters for ZWJ emoji sequences (e.g. 👨‍👩‍👧) and emoji skin-tone modifier
+	  sequences (e.g. 👍🏽), both of which Unicode::GCString 2013.10 could not
+	  handle.  _number_of_characters now uses Perl's built-in \X regex (extended
+	  grapheme cluster) instead of Unicode::GCString.  Perl ships updated Unicode
+	  tables with each release, so the fix is self-maintaining.
+	- Removed FIXME comment: "{max} doesn't play ball with non-ascii strings"
+	  (resolved by the above change).
+	[Enhancements]
+	- Unicode::GCString dependency removed from PREREQ_PM; no external module
+	  is now required for grapheme-cluster counting.
+	- description field on a per-parameter rule now appears parenthetically with
+	  the parameter name in error messages (e.g. "Parameter 'x' (UserAge) must
+	  be an integer") rather than replacing the schema-level context prefix.
+	  The schema description is now always present in error output.
+	- min > 0 constraint now rejects undef values for required fields across
+	  all types (string, integer, number, float, arrayref, hashref).  Previously
+	  undef was silently passed through regardless of any minimum.  Optional
+	  fields with undef still pass (undef is treated as "not provided").
+	  min => 0 also retains the old behaviour: undef passes.
+	- Union types can now be written as a pipe-separated string in addition to
+	  an arrayref: type => 'string|integer' is equivalent to
+	  type => ['string', 'integer'].  Whitespace around the pipe is ignored.
+	- New 'bnf' rule key: a string parameter can now be validated against a
+	  BNF grammar supplied as an arrayref of grammar lines.  The first rule in
+	  the grammar is the start rule; the value must match it exactly.
+	  Implemented in Params::Validate::Strict::BNF, lazy-loaded on first use.
+	[Tests]
+	- t/unicode.t: new file — comprehensive min/max tests for non-ASCII strings
+	  including accented/Latin-extended characters, CJK, plain emoji, ZWJ family
+	  sequences, skin-tone modifier sequences, and mixed ASCII+emoji strings.
+	- t/default.t: added test that a supplied value overrides the default.
+	- t/integration.t: GCString integration subtests replaced with \X-based
+	  equivalents; two new subtests for ZWJ and skin-tone grapheme counting.
+	- t/function.t, t/unit.t: GCString mocks removed; non-ASCII counting subtests
+	  updated to test \X behaviour directly.
+	- t/array.t: updated element_type error regex to match new quoted parameter
+	  name format.
+	- t/function.t: subtests covering undef behaviour under min > 0 (string,
+	  integer, arrayref, hashref), min => 0, optional+undef, and four new
+	  subtests for the pipe-separated union type syntax.
+	- t/bnf.t: new file — 14 unit subtests for Params::Validate::Strict::BNF
+	  (terminals, alternatives, empty terminal, sequences, nonterminals,
+	  continuation lines, anchoring, caching, error cases) and 5 integration
+	  subtests for the 'bnf' rule key in validate_strict.
+
 0.39	Fri Aug 21 11:43:35 AM EDT 2026
 	[ Bug Fixes ]
 	- Added "object" to element_type, when checking if an argument an

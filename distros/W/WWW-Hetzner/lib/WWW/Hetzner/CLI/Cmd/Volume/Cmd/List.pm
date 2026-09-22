@@ -1,7 +1,7 @@
 package WWW::Hetzner::CLI::Cmd::Volume::Cmd::List;
 # ABSTRACT: List volumes
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
@@ -14,7 +14,7 @@ sub execute {
     my $main = $chain->[0];
     my $cloud = $main->cloud;
 
-    my $volumes = $cloud->volumes->list;
+    my $volumes = $cloud->volumes->list_all;
 
     if ($main->output eq 'json') {
         print encode_json([map { $_->data } @$volumes]), "\n";
@@ -55,7 +55,7 @@ WWW::Hetzner::CLI::Cmd::Volume::Cmd::List - List volumes
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -78,7 +78,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

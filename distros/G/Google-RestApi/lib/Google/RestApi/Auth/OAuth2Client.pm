@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::OAuth2Client;
 
-our $VERSION = '2.2.3';
+our $VERSION = '2.2.4';
 
 use Google::RestApi::Setup;
 
@@ -37,7 +37,11 @@ sub new {
       client_secret     => Str,
       scope             => ArrayRef[Str], { optional => 1 },
       state             => Str, { default => '' },
-      redirect_uri      => Str, { default => 'urn:ietf:wg:oauth:2.0:oob' },
+      # Google blocked the old out-of-band (OOB) redirect in 2023; the
+      # loopback address is the sanctioned replacement for desktop apps.
+      # See bin/google_restapi_oauth_token_creator, which overrides this
+      # with a live 127.0.0.1:<port> callback it listens on.
+      redirect_uri      => Str, { default => 'http://localhost' },
       site              => Str, { default => 'https://accounts.google.com' },
       authorize_path    => Str, { default => '/o/oauth2/auth' },
       access_token_path => Str, { default => '/o/oauth2/token' },
@@ -238,7 +242,11 @@ of the urls to use at: L<http://code.google.com/intl/en-US/apis/gdata/faq.html#A
 
 =item * redirect_url
 
-OAuth2 redirect url. 'urn:ietf:wg:oauth:2.0:oob' will be used if you don't specify it.
+OAuth2 redirect url. Defaults to 'http://localhost'. Google discontinued the
+old out-of-band (OOB) redirect ('urn:ietf:wg:oauth:2.0:oob') in 2023; desktop
+apps should use a loopback address such as 'http://127.0.0.1:<port>' and listen
+on it for the redirect. See bin/google_restapi_oauth_token_creator for a
+working example.
 
 =back
 

@@ -1,5 +1,171 @@
 Revision history for Perl500503Syntax::OrDie
 
+0.05  2026-09-22 JST (Japan Standard Time)
+
+  - Fixes the FAIL report from the CPAN Testers smoker on perl 5.18.2.
+    t/9050-pod.t G13 asserts that Pod::Checker reports no warnings, and
+    on 5.18.2 it reported two:
+
+      multiple occurrence of link target
+        '\x{HHHH} Unicode escape -- Perl 5.6'
+      multiple occurrence of link target
+        '\N{name} named character escape -- Perl 5.6'
+
+    An =item is a POD link target, and Pod::Checker takes the target
+    name from the FIRST LINE of the command paragraph alone.  The two
+    items added to the new "String checks" section in 0.04 had first
+    lines identical to the corresponding items under "Static checks",
+    and the continuation line that distinguished them in prose does not
+    distinguish the targets.  Both now say "in a string", which matches
+    the wording of the STRING_BLACKLIST descriptions as well.
+  - t/9050-pod.t gained G14, which finds a duplicate POD link target
+    itself instead of relying on the tester's Pod::Checker.  The
+    Pod::Parser-based Pod::Checker that Perls up to 5.24 ship reports a
+    duplicate; the Pod::Simple-based one that came later does not.  The
+    duplicate above therefore passed every local run on a modern Perl
+    and was caught only by a 5.18 smoker, which is precisely the kind of
+    hole a distribution that promises 5.005_03 support cannot afford.
+  - t/lib/INA_CPAN_Check.pm 0.45: the same check is now G8 of check_G,
+    so that every distribution sharing this library gets it whether or
+    not it has a pod test of its own, and the target list is built by a
+    new exported helper, _pod_link_targets(), which t/9050-pod.t G14
+    calls rather than carrying a second copy of the rule.  count_G
+    returns 8 per module instead of 7; a distribution that calls check_G
+    and hard-codes its own plan needs that number updated.
+
+0.04  2026-09-21 JST (Japan Standard Time)
+
+  - The \x{HHHH} and \N{name} escapes are now detected inside
+    interpolating string literals, which is where they are actually
+    written.  Both were listed in CHECKED CONSTRUCTS and both were, in
+    practice, unreachable: the bodies of string literals are masked
+    before the blacklist runs, so the entries could fire only on the
+    rare source that puts the escape outside a string, and the regex
+    stage covered it only inside a regex.  The ordinary spelling
+
+        my $smiley = "\x{263A}";
+
+    passed unreported -- the exact defect this distribution exists to
+    catch, since Perl 5.005_03 reads \x{263A} as \x with no hex digits
+    followed by the literal text "{263A}" and carries on with the wrong
+    string.
+    A new stage 4 scans the body of every interpolating string literal:
+    "...", qq//, qx//, `...`, an unquoted or double-quoted heredoc, and
+    the replacement half of s/// unless it is single-quote delimited.
+    '...', q//, qw// and <<'WORD' process no escapes and are not
+    scanned.  Escaped backslashes are neutralised first, so "\\x{41}"
+    -- a literal backslash followed by text -- is not reported.
+  - doc/: all 21 cheatsheets still stated version 0.03 while everything
+    else in this release had moved on, and the suite reported success
+    throughout because nothing read that number.  They now state the
+    current version, and t/9080-cheatsheets.t gained CS12, which
+    compares the version each sheet states against $VERSION -- the doc/
+    counterpart of the B8 check INA_CPAN_Check makes on =head1 VERSION.
+  - t/0002-check-source.t: the xUNI case asserted the old behaviour
+    ("inside dquote string - masked (not detected)").  It now asserts
+    detection, and six cases were added for the single-quoted,
+    escaped-backslash, heredoc and s/// spellings.
+  - POD and README: the CHECKED CONSTRUCTS entries for \x{} and \N{}
+    now say where the escapes are looked for, and the "RAW checks"
+    section, which claimed that no string content is ever inspected,
+    has been split so that the rule it states is the one the code
+    follows: what a string says is not inspected, how it is spelled is.
+  - Three constructs that a port to Perl 5.005_03 meets early were
+    checked by nothing, and all three fail on 5.005_03 for reasons that
+    have nothing to do with what a string in them says:
+      * 'use warnings' and 'no warnings' without the
+        $INC{'warnings.pm'} stub.  The pragma is Perl 5.6 and the bare
+        statement dies at compile time with "Can't locate warnings.pm".
+        The guarded idiom that every cross-version file in this author's
+        distributions already carries is a no-op on 5.005_03 and is
+        treated as compatible, the same way the empty-import form of
+        'use feature' is.  The stub counts only where it is live code,
+        so the idiom quoted in a comment or in POD does not excuse an
+        unguarded statement.
+      * a lexical filehandle or directory handle -- open(my $fh, ...),
+        opendir, sysopen, pipe, socket, socketpair, accept.  Perl
+        5.005_03 has nothing to autovivify a handle into and fails at
+        run time with "Can't use an undefined value as a symbol
+        reference", so the defect survives compilation.  Only the 'my'
+        spelling is reported: open($fh, ...) against a lexical that
+        already holds a glob is valid 5.005_03 and cannot be told apart
+        from the invalid case.
+      * binmode() with a LAYER argument.  This is a question of arity,
+        not of the layer string: 5.005_03 binmode takes the filehandle
+        alone and rejects a second argument with "Too many arguments for
+        binmode".  The earlier decision to drop the PerlIO-layer entry
+        from RAW_BLACKLIST reasoned about the string, which is why the
+        call was left unchecked; the commas are counted at the top level
+        of the call instead, as the 3-argument open() stage already
+        does.
+    Verified against the 23 corpus modules and this distribution's own
+    sources, which carry guarded 'use warnings' and one-argument
+    binmode() throughout: no false positives.  t/0002-check-source.t
+    gained 25 cases, and t/0005-regex-checks.t had two that asserted
+    the old reasoning ("binmode with layer string - NOT a syntax
+    violation"); they now assert detection, with two more for the layer
+    held in a variable and for the layer string on its own.  doc/ and
+    README list the three constructs.
+  - t/corpus-stack: Jacode4e, Jacode4e::RoundTrip and mb shipped as
+    complete copies of their distributions -- 3.4 MB of the 5.2 MB this
+    distribution weighed, against 64 KB of lib/.  Almost none of it
+    reached the scanner.  Measured with the masker itself, 99% of
+    Jacode4e.pm and of RoundTrip.pm, and 73% of mb.pm, was POD, data
+    tables and text after __END__: regions the masker blanks before any
+    stage runs.  The three now ship as excerpts and the distribution is
+    1.2 MB.
+    Only lines the masker renders as dead were removed.  Lines inside a
+    regex literal or an interpolating string literal were kept, because
+    stages 3 and 4 read those, and so were POD directives, heredoc
+    terminators, __END__ and three lines of context on each side of
+    every removed run, so that each file still parses and still reads
+    as the source it came from.  No marker was written where lines were
+    removed: a marker is a line of text dropped into whatever quoted
+    region surrounds it, and one delimiter character in it -- a paren
+    inside qw(...) -- would close that region early and change what the
+    scanner sees.  Each file carries one header block instead.
+    The reduction was verified against the full sources: the masked
+    live code, the list of regex bodies and the list of string bodies
+    are byte-identical before and after, and all three still report
+    zero violations.
+  - t/0011-corpus-excerpt.t (new): guards the properties that can be
+    checked from inside the distribution -- a 256 KB cap on every
+    corpus module, the excerpt header, and the agreement between the
+    module named in that header and the package the file declares.
+    The cap is the one that matters: a corpus is refreshed by copying a
+    newer release over the old file, and the obvious way to do that is
+    to copy the whole thing.
+  - META.yml now conforms to the Meta 1.4 specification.  The
+    meta-spec url was written as an https URL, and CPAN::Meta::Validator
+    compares that value literally against the one the specification
+    names, so the file was rejected with "Unknown META specification"
+    and the CPANTS Kwalitee indicator
+    meta_yml_conforms_to_known_spec failed.  The url is now the
+    http form the specification itself uses.
+  - Rebuilt the distribution metadata with pmake.bat 0.51, which
+    writes the corrected url and declares the test-phase
+    prerequisites separately from the runtime ones.
+  - Updated the bundled t/lib/INA_CPAN_Check.pm to 0.44.  Its ok()
+    now carries an ($;$) prototype, which forces a match handed to it
+    into scalar context; without it an assertion written as
+    ok($out =~ /.../, 'name') silently passed whenever the match
+    failed.
+  - t/0007-selfcheck.t: run_cmd() built a fully quoted command line and
+    opened it as a pipe.  On Windows that line reaches cmd.exe, which
+    strips the first and the last quote character of the line it is
+    given, so a line beginning with the quoted absolute path in $^X was
+    torn in half: the child never ran and run_cmd() returned the empty
+    string for every call.  The whole file still reported success there
+    only because of the list-context defect above.  It now runs the
+    child with system() and a LIST, which uses no shell on either
+    platform, and captures the output through redirected handles.
+  - t/0007-selfcheck.t: SC05 asserted that the module reports a
+    violation when scanned against itself, describing a qr//
+    false positive as a documented limitation.  The module is in
+    fact clean against itself, and the assertion only appeared to
+    pass because of the list-context defect above.  It now asserts
+    that the self-check finds no violations.
+
 0.03  2026-05-31 JST (Japan Standard Time)
 
   - Updated the README DOCUMENTATION section to list the actual 21

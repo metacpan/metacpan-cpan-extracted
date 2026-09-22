@@ -1,13 +1,15 @@
 package IO::K8s::CertManager::V1::CertificateRequest;
-# ABSTRACT: cert-manager certificate signing request
-our $VERSION = '1.107';
+# ABSTRACT: A CertificateRequest is used to request a signed certificate from one of the configured issuers.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cert-manager.io/v1',
     resource_plural => 'certificaterequests';
 with 'IO::K8s::Role::Namespaced';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => '+IO::K8s::CertManager::V1::CertificateRequestSpec';
+k8s status => '+IO::K8s::CertManager::V1::CertificateRequestStatus';
+
+
 
 1;
 
@@ -19,25 +21,23 @@ __END__
 
 =head1 NAME
 
-IO::K8s::CertManager::V1::CertificateRequest - cert-manager certificate signing request
+IO::K8s::CertManager::V1::CertificateRequest - A CertificateRequest is used to request a signed certificate from one of the configured issuers.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-CertificateRequest represents a single certificate signing request. This is a namespaced resource using the C<cert-manager.io/v1> API version. It is normally created automatically by cert-manager when processing a Certificate resource. The C<spec> and C<status> attributes contain opaque HashRefs whose structure is defined by cert-manager's OpenAPI schema.
+Specification of the desired state of the CertificateRequest resource.
+https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 
-=head1 SEE ALSO
+=head2 status
 
-=over
-
-=item * L<IO::K8s::CertManager> - cert-manager API classes for Perl
-
-=item * L<https://cert-manager.io/docs/usage/certificaterequest/> - CertificateRequest upstream documentation
-
-=back
+Status of the CertificateRequest.
+This is set and managed automatically.
+Read-only.
+More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 
 =head1 SUPPORT
 

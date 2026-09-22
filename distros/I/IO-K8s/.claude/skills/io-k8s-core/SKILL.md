@@ -1,6 +1,6 @@
 ---
 name: io-k8s-core
-description: "IO::K8s distribution internals for contributors — Resource vs APIObject, the k8s DSL and its attribute registry, class-name expansion, the role mesh, CRD resource-map providers, runtime AutoGen, and how new API surface is added. Load before editing anything under lib/IO/K8s/."
+description: Load before editing anything under lib/IO/K8s/ — Resource vs APIObject, the k8s DSL and its attribute registry, class-name expansion, the role mesh, CRD providers.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -9,7 +9,7 @@ model: sonnet
 # IO::K8s — Distribution Internals
 
 Consumer-facing usage (`new_object`, `inflate`, `to_json`, short names) lives in skill
-`perl-kubernetes-classes`. This skill is about *changing* the distribution.
+`perl-io-k8s-kubernetes-classes`. This skill is about *changing* the distribution.
 
 ## There is no codegen step
 
@@ -100,10 +100,10 @@ classes also get `IO::K8s::Role::SpecBuilder` automatically.
 
 | Role | Purpose |
 |---|---|
-| `Resource` | instance behaviour: `TO_JSON`, `to_json`, `TO_YAML`, `to_yaml`, `FROM_HASH`, `from_json`, `compare_to_schema` |
+| `Resource` | instance behaviour: `TO_JSON`, `to_json`, `TO_YAML`, `to_yaml`, `FROM_HASH`, `from_json`, `compare_to_schema`; since 1.108 the `_unknown_fields` bag (undeclared constructor keys are kept and re-emitted; `IO::K8s->new(strict => 1)` makes them die instead, via `$IO::K8s::Resource::STRICT`) |
 | `APIObject` | top-level identity, metadata, labels, annotations, conditions, owners |
 | `Namespaced` | resources that live in a namespace |
-| `SpecBuilder` | deep-path spec manipulation: `spec_get`/`spec_set`/`spec_push`/`spec_merge`/`spec_delete` |
+| `SpecBuilder` | deep-path spec manipulation: `spec_get`/`spec_set`/`spec_push`/`spec_merge`/`spec_delete`/`spec_array`/`spec_hash`; walks typed specs through the registry since 1.108 (`-1` = last or new element, undeclared keys go to the bag, every write failure starts with `spec path '...':`) |
 | `ResourceMap` | packages that provide a short-name → class map (requires `resource_map`) |
 | `Routable`, `Loadbalanced`, `NetworkPolicy`, `CertManaged`, `HelmManaged`, `MiddlewareBuilder` | opt-in behaviour mixins for routing, traffic splitting, netpol, cert-manager, K3s Helm, Traefik middleware |
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 # Registry guard test — catches missing or misrouted attribute target
 # classes at build time, before they surface as "Can't locate ... in @INC"
-# at inflate time. This is the test that would have caught karr tickets #1
-# (apiextensions.k8s.io/v1 union types), #2 (KubeAggregator prefix did not
-# match) and #3 (StorageVersionSpec was never shipped) together, rather
+# at inflate time. This is the test that would have caught k1
+# (apiextensions.k8s.io/v1 union types), k2 (KubeAggregator prefix did not
+# match) and k3 (StorageVersionSpec was never shipped) together, rather
 # than one at a time on the consumer side.
 #
 # Strategy: after every shipped class has been loaded, walk the global
@@ -11,12 +11,12 @@
 # not care HOW it is loaded — that is Resource.pm's job — only that the
 # symbol is findable. This catches:
 #
-#   * a declared class that was never shipped  (ticket #3)
+#   * a declared class that was never shipped  (k3)
 #   * a class shipped under one namespace but declared under another
 #     because _expand_class fell through to the default expansion
-#     (ticket #2, before the prefix-match fix)
+#     (k2, before the prefix-match fix)
 #   * a self-inflating union class that the attribute side still
-#     references via the type spec (ticket #1)
+#     references via the type spec (k1)
 #
 # The registry is built lazily by `k8s` DSL calls at module load time, so
 # we must load every class first. `t/02_compile_all.t` already walks the
@@ -88,7 +88,7 @@ if (@missing) {
 }
 
 is(scalar @missing, 0,
-    'every k8s-attribute target class is loadable (would have caught karr tickets #1, #2, #3)')
+    'every k8s-attribute target class is loadable (would have caught k1, k2, k3)')
     or BAIL_OUT(scalar(@missing) . " attribute target(s) not loadable");
 
 done_testing;

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storagemigration::V1alpha1::MigrationCondition;
 # ABSTRACT: Describes the state of a migration at a certain point.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s lastUpdateTime => Time;
@@ -32,7 +32,7 @@ IO::K8s::Api::Storagemigration::V1alpha1::MigrationCondition - Describes the sta
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 lastUpdateTime
 

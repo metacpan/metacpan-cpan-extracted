@@ -416,7 +416,8 @@ subtest 'dbi_source: ATTACH used, no INSERT issued for that source' => sub {
 		no warnings 'redefine';
 		*DBI::db::do = sub {
 			my ($dbh, $sql, @rest) = @_;
-			push @inserts, $sql if $sql =~ /^\s*INSERT/i;
+			# \s*+ possessive: O(1) failure on non-INSERT strings (no backtrack).
+			push @inserts, $sql if $sql =~ /^\s*+INSERT/i;
 			$orig_do->($dbh, $sql, @rest);
 		};
 	}
@@ -452,7 +453,6 @@ subtest 'dbi_source: ATTACH used, no INSERT issued for that source' => sub {
 
 subtest 'temp file cleanup after object goes out of scope' => sub {
 	my $tmpdir = tempdir(CLEANUP => 1);
-	my $tmpfile_path;
 
 	{
 		my $join = Database::Join->new(
@@ -463,17 +463,20 @@ subtest 'temp file cleanup after object goes out of scope' => sub {
 			tmpdir         => $tmpdir,
 		);
 
-		# Execute a query so the temp file is actually created.
+		# Execute a query so the cache temp file is created.
 		$join->selectall_arrayref();
 
-		# Temp file is cleaned up immediately after the query completes
-		# (stored in $self->{_tmpfile} only for the duration of the call).
+		# The temp file persists while the object is alive (it is the cache).
 		my @db_files = glob(File::Spec->catfile($tmpdir, '*.db'));
-		is scalar @db_files, 0,
-			'temp .db file not present after query completes (per-call cleanup)';
+		is scalar @db_files, 1,
+			'temp .db file exists while join object is alive (cache persists)';
+		# $join goes out of scope here; DESTROY disconnects and unlinks the file.
 	}
 
-	pass 'join object went out of scope without error';
+	# After the object is destroyed the temp file should be gone.
+	my @db_files_after = glob(File::Spec->catfile($tmpdir, '*.db'));
+	is scalar @db_files_after, 0,
+		'temp .db file removed after join object is destroyed';
 };
 
 # ===========================================================================
@@ -505,6 +508,294 @@ subtest 'max_array_rows boundary: exactly at threshold => array path' => sub {
 	);
 	my $rows = $join_above->selectall_arrayref();
 	is(scalar @{$rows}, 5, 'threshold=8, 9 rows: SQLite path, correct row count');
+};
+
+# ===========================================================================
+# S14: dbi_source() ATTACH with a .sqlite file extension
+# SQLite has no constraint on file extensions; the ATTACH code path must
+# work regardless of whether the source file ends in .db, .sqlite, or .sqlite3.
+# ===========================================================================
+
+subtest 'dbi_source: ATTACH works with .sqlite file extension' => sub {
+	require DBI;
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $dbfile = File::Spec->catfile($tmpdir, 'source.sqlite');
+
+	my $src_dbh = DBI->connect(
+		"dbi:SQLite:dbname=$dbfile", '', '',
+		{ RaiseError => 1, PrintError => 0, AutoCommit => 1 },
+	);
+	$src_dbh->do('CREATE TABLE scores (id TEXT, score INTEGER)');
+	$src_dbh->do("INSERT INTO scores VALUES ('k1', 42)");
+	$src_dbh->do("INSERT INTO scores VALUES ('k3', 55)");
+
+	my $da_src = MinimalDA->new(
+		cols  => [qw(id score)],
+		rows  => [
+			{ id => 'k1', score => 42 },
+			{ id => 'k3', score => 55 },
+		],
+		dbh   => $src_dbh,
+		table => 'scores',
+	);
+
+	# Spy on INSERT calls: a zero-copy ATTACH must issue none for this source.
+	my @inserts;
+	my $orig_do = \&DBI::db::do;
+	{ no warnings 'redefine'; *DBI::db::do = sub {
+		my ($dbh, $sql, @rest) = @_;
+		push @inserts, $sql if $sql =~ /^\s*+INSERT/i;
+		$orig_do->($dbh, $sql, @rest);
+	} }
+
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_src],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+	my $rows = $join->selectall_arrayref();
+
+	{ no warnings 'redefine'; *DBI::db::do = $orig_do; }
+	$src_dbh->disconnect;
+
+	is scalar @{$rows}, 5, '.sqlite source: left join returns 5 rows';
+	my %by_id = map { $_->{id} => $_ } @{$rows};
+	is $by_id{k1}{score}, 42,      'k1 score from .sqlite ATTACHed source';
+	is $by_id{k1}{name},  'Alice', 'k1 name from spilled primary';
+	is scalar @inserts, 0, 'no INSERT for .sqlite source (zero-copy ATTACH)';
+};
+
+# ===========================================================================
+# S15: dbi_source() ATTACH with a .sqlite3 file extension
+# ===========================================================================
+
+subtest 'dbi_source: ATTACH works with .sqlite3 file extension' => sub {
+	require DBI;
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $dbfile = File::Spec->catfile($tmpdir, 'source.sqlite3');
+
+	my $src_dbh = DBI->connect(
+		"dbi:SQLite:dbname=$dbfile", '', '',
+		{ RaiseError => 1, PrintError => 0, AutoCommit => 1 },
+	);
+	$src_dbh->do('CREATE TABLE scores (id TEXT, score INTEGER)');
+	$src_dbh->do("INSERT INTO scores VALUES ('k2', 19)");
+	$src_dbh->do("INSERT INTO scores VALUES ('k4', 63)");
+
+	my $da_src = MinimalDA->new(
+		cols  => [qw(id score)],
+		rows  => [
+			{ id => 'k2', score => 19 },
+			{ id => 'k4', score => 63 },
+		],
+		dbh   => $src_dbh,
+		table => 'scores',
+	);
+
+	my @inserts;
+	my $orig_do = \&DBI::db::do;
+	{ no warnings 'redefine'; *DBI::db::do = sub {
+		my ($dbh, $sql, @rest) = @_;
+		push @inserts, $sql if $sql =~ /^\s*+INSERT/i;
+		$orig_do->($dbh, $sql, @rest);
+	} }
+
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_src],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+	my $rows = $join->selectall_arrayref();
+
+	{ no warnings 'redefine'; *DBI::db::do = $orig_do; }
+	$src_dbh->disconnect;
+
+	is scalar @{$rows}, 5, '.sqlite3 source: left join returns 5 rows';
+	my %by_id = map { $_->{id} => $_ } @{$rows};
+	is $by_id{k2}{score}, 19,    'k2 score from .sqlite3 ATTACHed source';
+	is $by_id{k4}{score}, 63,    'k4 score from .sqlite3 ATTACHed source';
+	is scalar @inserts, 0, 'no INSERT for .sqlite3 source (zero-copy ATTACH)';
+};
+
+# ===========================================================================
+# S16: Cache reuse — source DAs are called only once across multiple queries
+# The SQLite backend caches the spilled data; subsequent queries reuse the
+# temp file rather than re-fetching source rows.
+# ===========================================================================
+
+# Subclass of MinimalDA that counts how many times selectall_arrayref is called.
+{
+	package CountingDA;
+	use parent -norequire, 'MinimalDA';
+	sub new {
+		my ($class, %args) = @_;
+		my $self = $class->SUPER::new(%args);
+		$self->{_call_count} = 0;
+		return $self;
+	}
+	sub selectall_arrayref {
+		my ($self, @args) = @_;
+		$self->{_call_count}++;
+		return $self->SUPER::selectall_arrayref(@args);
+	}
+	sub call_count { return $_[0]->{_call_count} }
+	1;
+}
+
+subtest 'cache reuse: source DA selectall_arrayref called once, not per query' => sub {
+	my $da_a = CountingDA->new(
+		cols => [qw(id name)],
+		rows => [
+			{ id => 'k1', name => 'Alice' },
+			{ id => 'k2', name => 'Bob' },
+		],
+	);
+	my $da_b = CountingDA->new(
+		cols => [qw(id score)],
+		rows => [
+			{ id => 'k1', score => 95 },
+			{ id => 'k2', score => 72 },
+		],
+	);
+
+	my $join = Database::Join->new(
+		databases   => [$da_a, $da_b],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+
+	my $r1 = $join->selectall_arrayref();      # first call: builds cache
+	my $r2 = $join->selectall_arrayref();      # second: reuses cache
+	my $r3 = $join->selectall_arrayref();      # third: reuses cache
+
+	is $da_a->call_count, 1,
+		'primary DA: selectall_arrayref called once (cache build only)';
+	is $da_b->call_count, 1,
+		'secondary DA: selectall_arrayref called once (cache build only)';
+	is scalar @{$r1}, 2, 'first query returns 2 rows';
+	is scalar @{$r2}, 2, 'second query returns 2 rows (cache reused)';
+	is scalar @{$r3}, 2, 'third query returns 2 rows (cache reused)';
+};
+
+# ===========================================================================
+# S17: Cache invalidation — rebuilt when any source updated() changes
+# The cache tracks updated() timestamps; a changed timestamp forces a full
+# rebuild so queries see the new source data.
+# ===========================================================================
+
+{
+	package UpdatableDA;
+	use parent -norequire, 'CountingDA';
+	sub new {
+		my ($class, %args) = @_;
+		my $self = $class->SUPER::new(%args);
+		$self->{_ts} = $args{ts} // 1000;
+		return $self;
+	}
+	sub updated    { return $_[0]->{_ts} }
+	sub set_updated { $_[0]->{_ts} = $_[1] }
+	sub set_rows    { $_[0]->{_rows} = $_[1] }
+	1;
+}
+
+subtest 'cache invalidation: cache rebuilt when source updated() timestamp changes' => sub {
+	my $da_a = UpdatableDA->new(
+		cols => [qw(id name)],
+		rows => [{ id => 'k1', name => 'Alice' }],
+		ts   => 1000,
+	);
+	my $da_b = UpdatableDA->new(
+		cols => [qw(id score)],
+		rows => [{ id => 'k1', score => 10 }],
+		ts   => 2000,
+	);
+
+	my $join = Database::Join->new(
+		databases   => [$da_a, $da_b],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+
+	my $r1 = $join->selectall_arrayref();
+	is $r1->[0]{score}, 10, 'initial query: score=10';
+	is $da_b->call_count, 1, 'secondary DA called once for initial build';
+
+	# Simulate source update: change data and bump the timestamp.
+	$da_b->set_rows([{ id => 'k1', score => 99 }]);
+	$da_b->set_updated(2001);
+
+	my $r2 = $join->selectall_arrayref();
+	is $r2->[0]{score}, 99, 'after update: cache rebuilt, score=99';
+	is $da_b->call_count, 2, 'secondary DA called again after timestamp change';
+};
+
+# ===========================================================================
+# S18: ATTACH with query-time criteria
+# The old implementation blocked ATTACH when criteria existed (!%criteria guard).
+# The new implementation removes that restriction: ATTACH is unconditional, and
+# query-time criteria become SQL WHERE clauses against the ATTACHed table.
+# ===========================================================================
+
+subtest 'ATTACH with criteria: zero-copy path used; WHERE filters correctly' => sub {
+	require DBI;
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $dbfile = File::Spec->catfile($tmpdir, 'attach_crit.db');
+
+	my $src_dbh = DBI->connect(
+		"dbi:SQLite:dbname=$dbfile", '', '',
+		{ RaiseError => 1, PrintError => 0, AutoCommit => 1 },
+	);
+	$src_dbh->do('CREATE TABLE scores (id TEXT, score INTEGER)');
+	$src_dbh->do("INSERT INTO scores VALUES ('k1', 42)");
+	$src_dbh->do("INSERT INTO scores VALUES ('k2', 10)");
+	$src_dbh->do("INSERT INTO scores VALUES ('k3', 55)");
+
+	my $da_src = MinimalDA->new(
+		cols  => [qw(id score)],
+		rows  => [
+			{ id => 'k1', score => 42 },
+			{ id => 'k2', score => 10 },
+			{ id => 'k3', score => 55 },
+		],
+		dbh   => $src_dbh,
+		table => 'scores',
+	);
+
+	# Spy: track any INSERT SQL routed through do() (not through sth->execute).
+	my @inserts;
+	my $orig_do = \&DBI::db::do;
+	{ no warnings 'redefine'; *DBI::db::do = sub {
+		my ($dbh, $sql, @rest) = @_;
+		push @inserts, $sql if $sql =~ /^\s*+INSERT/i;
+		$orig_do->($dbh, $sql, @rest);
+	} }
+
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_src],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+
+	# Filter by score > 20 — this used to prevent ATTACH (old guard was
+	# !%criteria); now the criterion goes into the SQL WHERE clause instead.
+	my $rows = $join->selectall_arrayref(score => { '>' => 20 });
+
+	{ no warnings 'redefine'; *DBI::db::do = $orig_do; }
+	$src_dbh->disconnect;
+
+	# ATTACH source: no row-level inserts via do() (zero-copy)
+	is scalar @inserts, 0, 'ATTACH source: no INSERT via do() even with query criteria';
+
+	# Only k1 (score=42) and k3 (score=55) survive the WHERE score > 20 filter.
+	# k2 (score=10) is excluded; k4 and k5 are excluded by INNER JOIN
+	# (score criterion makes the secondary an inner-join partner).
+	my %by_id = map { $_->{id} => $_ } @{$rows};
+	is  scalar @{$rows}, 2, 'WHERE score > 20: 2 rows returned';
+	ok  exists $by_id{k1},    'k1 (score=42 > 20) present';
+	ok !exists $by_id{k2},    'k2 (score=10, not > 20) absent';
+	ok  exists $by_id{k3},    'k3 (score=55 > 20) present';
+	is  $by_id{k1}{score}, 42, 'k1 score correct';
+	is  $by_id{k3}{score}, 55, 'k3 score correct';
 };
 
 done_testing();

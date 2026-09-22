@@ -30,7 +30,7 @@ use Scalar::Util qw(blessed refaddr);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 136;
+	plan tests => 149;
 	use_ok('Database::Join');
 }
 
@@ -98,6 +98,8 @@ Readonly::Scalar my $TS_B     => 2_000_000;
 	sub expose_joined_query      { my $self = shift; return $self->_joined_query(@_) }
 	sub expose_err               { my $self = shift; return $self->_err(@_) }
 	sub expose_build_col_index   { my $self = shift; return $self->_build_col_index(@_) }
+	sub expose_cache_fresh        { my $self = shift; return $self->_cache_fresh(@_) }
+	sub expose_build_sqlite_cache { my $self = shift; return $self->_build_sqlite_cache(@_) }
 }
 
 # Convenience builder for a bare WhiteBox skeleton (no databases needed for
@@ -1913,6 +1915,301 @@ subtest 'add_database: _col_rename and _col_unrename populated for new DB' => su
 		'_col_rename[1] maps original to published name after add_database');
 	is($j->{_col_unrename}[1]{"extra.$COL_NOTES"}, $COL_NOTES,
 		'_col_unrename[1] maps published name back to original after add_database');
+};
+
+# ===========================================================================
+# SECTION 32 -- _cache_fresh (6 tests)
+#
+# _cache_fresh is the gatekeeper for cache reuse.  These tests exercise
+# every condition that causes it to return 0 (stale) or 1 (fresh), using
+# expose_cache_fresh via Database::Join::WhiteBox.
+#
+# DBI and DBD::SQLite are PREREQ_PM for Database::Join, so we do not skip
+# these sections when they are unavailable.
+# ===========================================================================
+
+subtest '_cache_fresh: returns 0 when _sqlite_cache is absent' => sub {
+	plan tests => 1;
+	# A brand-new Database::Join object has no _sqlite_cache key at all.
+	# _cache_fresh must return 0 so the caller knows to build the cache.
+	my $db = MinimalDA->new(cols => [$JC, $COL_A], rows => []);
+	my $wb = Database::Join::WhiteBox->new(databases => [$db], join_column => $JC);
+	ok(!$wb->expose_cache_fresh(),
+		'_cache_fresh returns 0 when no _sqlite_cache entry exists');
+};
+
+subtest '_cache_fresh: returns 0 when source count changed (n mismatch)' => sub {
+	plan tests => 1;
+	# If a second database has been added since the cache was built, the cached
+	# n will be smaller than the current @_dbs count, forcing a rebuild.
+	my $db = MinimalDA->new(cols => [$JC, $COL_A], rows => []);
+	my $wb = Database::Join::WhiteBox->new(databases => [$db], join_column => $JC);
+	# Fake a cache that claims n=0 while _dbs now has 1 source.
+	$wb->{_sqlite_cache} = { n => 0, updated => {}, dbh => bless({}, 'FakeDBH') };
+	ok(!$wb->expose_cache_fresh(),
+		'_cache_fresh returns 0 when cached n differs from current database count');
+};
+
+subtest '_cache_fresh: returns 0 when DBI handle is inactive' => sub {
+	plan tests => 1;
+	# Build a real cache so we have a genuine DBI handle, then disconnect it to
+	# simulate a dropped connection.  _cache_fresh must return 0.
+	my $db = MinimalDA->new(
+		cols    => [$JC, $COL_A],
+		rows    => [ { entry => 'K1', name => 'Alice' } ],
+		updated => $TS_A,
+	);
+	my $wb = Database::Join::WhiteBox->new(
+		databases   => [$db],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$wb->expose_build_sqlite_cache();
+	# Disconnect the handle to make it inactive.
+	$wb->{_sqlite_cache}{dbh}->disconnect();
+	ok(!$wb->expose_cache_fresh(),
+		'_cache_fresh returns 0 when the cached DBI handle is no longer Active');
+};
+
+subtest '_cache_fresh: returns 0 when a captured timestamp has changed' => sub {
+	plan tests => 2;
+	# Build the cache with timestamp TS_A.  Then bump the DA timestamp to TS_B.
+	# _cache_fresh must detect the mismatch and return 0.
+	my $db = MinimalDA->new(
+		cols    => [$JC, $COL_A],
+		rows    => [ { entry => 'K1', name => 'Alice' } ],
+		updated => $TS_A,
+	);
+	my $wb = Database::Join::WhiteBox->new(
+		databases   => [$db],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$wb->expose_build_sqlite_cache();
+	ok($wb->expose_cache_fresh(), 'cache is fresh immediately after build');
+	# Simulate the source being updated.
+	$db->{_ts} = $TS_B;
+	ok(!$wb->expose_cache_fresh(),
+		'_cache_fresh returns 0 after source updated() timestamp changes');
+};
+
+subtest '_cache_fresh: returns 1 when source has no updated() (timestamp skipped)' => sub {
+	plan tests => 1;
+	# A source DA without an updated() method should not invalidate the cache.
+	# _cache_fresh skips the timestamp check for it, leaving the cache valid.
+	{
+		package MinimalDA::NoTS;
+		use parent -norequire, 'MinimalDA';
+		sub updated { die 'no updated()' }   # simulates a DA that croaks
+	}
+	my $db = bless MinimalDA->new(cols => [$JC], rows => []), 'MinimalDA::NoTS';
+	my $wb = Database::Join::WhiteBox->new(
+		databases   => [$db],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$wb->expose_build_sqlite_cache();
+	# _sqlite_cache{updated}{0} is undef because updated() died → next → skip.
+	ok($wb->expose_cache_fresh(),
+		'_cache_fresh returns 1 when source has no working updated()');
+};
+
+subtest '_cache_fresh: returns 1 when all conditions pass' => sub {
+	plan tests => 2;
+	my $db = MinimalDA->new(
+		cols    => [$JC, $COL_A],
+		rows    => [ { entry => 'K1', name => 'Alice' } ],
+		updated => $TS_A,
+	);
+	my $wb = Database::Join::WhiteBox->new(
+		databases   => [$db],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$wb->expose_build_sqlite_cache();
+	ok($wb->expose_cache_fresh(), 'cache is fresh immediately after build (first check)');
+	ok($wb->expose_cache_fresh(), 'cache remains fresh on a second call without any change');
+};
+
+# ===========================================================================
+# SECTION 33 -- _build_sqlite_cache (4 tests)
+#
+# _build_sqlite_cache spills each source into a File::Temp SQLite file.
+# These tests verify: the cache structure is populated, rows are present,
+# updated() timestamps are recorded, and rebuilding disconnects the old handle.
+# ===========================================================================
+
+subtest '_build_sqlite_cache: populates _sqlite_cache with required keys' => sub {
+	plan tests => 4;
+	my $db = MinimalDA->new(
+		cols    => [$JC, $COL_A],
+		rows    => [ { entry => 'K1', name => 'Alice' } ],
+		updated => $TS_A,
+	);
+	my $wb = Database::Join::WhiteBox->new(
+		databases   => [$db],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$wb->expose_build_sqlite_cache();
+	my $cache = $wb->{_sqlite_cache};
+	ok(defined $cache,                    '_sqlite_cache is set after build');
+	ok(defined $cache->{dbh},             '_sqlite_cache has a dbh');
+	ok(defined $cache->{tmpfile},         '_sqlite_cache has a tmpfile');
+	is($cache->{n}, 1,                    '_sqlite_cache{n} matches source count (1)');
+};
+
+subtest '_build_sqlite_cache: spilled rows are queryable via the cached DBI handle' => sub {
+	plan tests => 2;
+	my $db = MinimalDA->new(
+		cols => [$JC, $COL_A],
+		rows => [
+			{ entry => 'K1', name => 'Alice' },
+			{ entry => 'K2', name => 'Bob'   },
+		],
+	);
+	my $wb = Database::Join::WhiteBox->new(
+		databases   => [$db],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$wb->expose_build_sqlite_cache();
+	my $dbh  = $wb->{_sqlite_cache}{dbh};
+	my $rows = $dbh->selectall_arrayref('SELECT * FROM "t0" ORDER BY "entry"', { Slice => {} });
+	is(scalar @{$rows}, 2, 'both rows from the source DA are present in the spilled table');
+	is($rows->[0]{name}, 'Alice', 'first row name matches');
+};
+
+subtest '_build_sqlite_cache: records updated() timestamps for sources that support it' => sub {
+	plan tests => 2;
+	my $db = MinimalDA->new(
+		cols    => [$JC, $COL_A],
+		rows    => [],
+		updated => $TS_A,
+	);
+	my $wb = Database::Join::WhiteBox->new(
+		databases   => [$db],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$wb->expose_build_sqlite_cache();
+	my $updated = $wb->{_sqlite_cache}{updated};
+	ok(exists $updated->{0},     '_sqlite_cache{updated}{0} is recorded');
+	is($updated->{0}, $TS_A,     '_sqlite_cache{updated}{0} equals TS_A');
+};
+
+subtest '_build_sqlite_cache: rebuilding disconnects old handle and creates a fresh one' => sub {
+	plan tests => 3;
+	my $db = MinimalDA->new(cols => [$JC], rows => [], updated => $TS_A);
+	my $wb = Database::Join::WhiteBox->new(
+		databases   => [$db],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$wb->expose_build_sqlite_cache();
+	my $old_dbh = $wb->{_sqlite_cache}{dbh};
+	ok($old_dbh->{Active}, 'first DBI handle is active before rebuild');
+	$wb->expose_build_sqlite_cache();   # rebuild
+	my $new_dbh = $wb->{_sqlite_cache}{dbh};
+	ok(!$old_dbh->{Active}, 'old DBI handle is disconnected after rebuild');
+	isnt($new_dbh, $old_dbh,            'new handle is a different object from the old one');
+};
+
+# ===========================================================================
+# SECTION 34 -- _sqlite_join criteria separation (3 tests)
+#
+# Query-time criteria must go into per-call SQL WHERE clauses, not the spilled
+# table.  This means the same cached table serves any combination of criteria
+# without rebuilding.  These tests verify:
+#   1. Criteria filter the result correctly (WHERE clause works).
+#   2. The SQLite cache is reused across calls (same DBI handle).
+#   3. An unsafe operator (not in %SAFE_SQL_OPS) is silently dropped.
+# ===========================================================================
+
+subtest '_sqlite_join: query criteria filter result without rebuilding cache' => sub {
+	plan tests => 3;
+	# Two rows in the source; query for only one.  The WHERE clause must
+	# exclude the non-matching row, not the spilled table itself.
+	my $db_a = MinimalDA->new(
+		cols => [$JC, $COL_A],
+		rows => [
+			{ entry => 'K1', name => 'Alice' },
+			{ entry => 'K2', name => 'Bob'   },
+		],
+	);
+	my $db_b = MinimalDA->new(
+		cols => [$JC, $COL_B],
+		rows => [
+			{ entry => 'K1', score => 10 },
+			{ entry => 'K2', score => 20 },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$db_a, $db_b],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref($JC => 'K1');
+	is(scalar @{$rows}, 1, 'query with entry criterion returns exactly 1 row');
+	is($rows->[0]{name},  'Alice', 'returned row has name=Alice');
+	is($rows->[0]{score}, 10,      'returned row has score=10');
+};
+
+subtest '_sqlite_join: cache reused across multiple queries (same DBI handle)' => sub {
+	plan tests => 2;
+	my $db_a = MinimalDA->new(
+		cols    => [$JC, $COL_A],
+		rows    => [ { entry => 'K1', name => 'Alice' }, { entry => 'K2', name => 'Bob' } ],
+		updated => $TS_A,
+	);
+	my $db_b = MinimalDA->new(
+		cols    => [$JC, $COL_B],
+		rows    => [ { entry => 'K1', score => 10 }, { entry => 'K2', score => 20 } ],
+		updated => $TS_A,
+	);
+	my $j = Database::Join->new(
+		databases   => [$db_a, $db_b],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();                   # first call — builds cache
+	my $dbh_first = $j->{_sqlite_cache}{dbh};
+	$j->selectall_arrayref();                   # second call — must reuse cache
+	my $dbh_second = $j->{_sqlite_cache}{dbh};
+	ok(defined $dbh_first,               'DBI handle exists after first query');
+	is($dbh_second, $dbh_first,          'DBI handle is identical on second query (cache reused)');
+};
+
+subtest '_sqlite_join: unsafe operator in criterion is dropped (not injected into SQL)' => sub {
+	plan tests => 2;
+	# An operator like 'DROP TABLE' must not appear in the WHERE clause.
+	# %SAFE_SQL_OPS gates interpolation; non-safe operators are silently
+	# skipped, so the query runs without error and returns unfiltered results.
+	my $db_a = MinimalDA->new(
+		cols => [$JC, $COL_A],
+		rows => [
+			{ entry => 'K1', name => 'Alice' },
+			{ entry => 'K2', name => 'Bob'   },
+		],
+	);
+	my $db_b = MinimalDA->new(
+		cols => [$JC, $COL_B],
+		rows => [
+			{ entry => 'K1', score => 10 },
+			{ entry => 'K2', score => 20 },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$db_a, $db_b],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	my $rows;
+	# A hashref criterion with an unsupported operator key must not croak.
+	lives_ok { $rows = $j->selectall_arrayref(score => { 'DROP TABLE t0;--' => 99 }) }
+		'unsafe operator criterion does not croak';
+	# The operator is silently dropped → no WHERE predicate on score → all rows returned.
+	is(scalar @{$rows}, 2, 'all rows returned when the operator key is dropped');
 };
 
 diag('All white-box function tests complete') if $ENV{TEST_VERBOSE};

@@ -7,7 +7,7 @@ use Carp ();
 
 use InternetData::Error;
 
-our $VERSION = '1.5.0';
+our $VERSION = '1.6.0';
 
 # The formats a database is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -25,11 +25,9 @@ use constant LICENSE_TYPES => qw(evaluation standard redistribute);
 # was, or has never been bought, so a caller can see what else is published
 # without a sales email.
 #
-# What comes back is the SERVER's answer for THIS key and nothing else. A
-# database commissioned for a single customer is absent entirely from a listing
-# for anyone else, rather than present with an `unlicensed` standing, so a
-# catalog held from one key is not an answer for another and is not a catalog of
-# what exists. Nothing here is cached for exactly that reason.
+# What comes back is the SERVER's answer for THIS key and nothing else, so a
+# listing held from one key is not an answer for another. Nothing here is cached
+# for exactly that reason.
 sub list {
     my $self = shift;
     $self->_assert_blocking_ok('list');
@@ -311,18 +309,18 @@ C<undef> instead, which is not a member.
     my $databases = $client->database->list;
 
 An array reference of the database B<families> this organization may see. A
-licence is held against a family, and each family carries every published
+license is held against a family, and each family carries every published
 version of itself:
 
     {
-        base => 'bogon_ip',              # what a licence is held against
+        base => 'bogon_ip',              # what a license is held against
         name => 'Bogon IP',
         summary => 'IP ranges that cannot legitimately appear on the internet.',
         standing => 'licensed',          # licensed, expired or unlicensed
         license_type => 'standard',    # evaluation, standard, redistribute or undef
         starts => '2026-09-04T07:49:45.118Z',
-        expires => undef,                # undef when the licence has no end date
-        renews_at => undef,              # when a rolling licence next turns over
+        expires => undef,                # undef when the license has no end date
+        renews_at => undef,              # when a rolling license next turns over
         notice_due_at => undef,          # last day to give notice for that term
         versions => [
             {
@@ -336,19 +334,6 @@ version of itself:
 
 The id every other method takes is C<< $version->{id} >>, never
 C<< $family->{base} >>.
-
-=head3 The listing is not the same for everyone
-
-C<standing> reports where your organization stands against a database, so an
-unlicensed one is listed and you can see that it exists. A B<private> database
-is different: it was commissioned for a single customer, so it is B<absent
-entirely> from a listing for anyone else rather than present with an
-C<unlicensed> standing. Listing it would advertise that customer.
-
-The server decides this per key. So do not reconstruct a catalog from any other
-source, do not hold one listing and reuse it for a different key, and do not
-treat what you got as a list of what InternetData publishes. Nothing here is
-cached for that reason.
 
 =head2 metadata($id)
 

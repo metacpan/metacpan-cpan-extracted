@@ -1,5 +1,13 @@
 Revision history for Shared::Arena
 
+0.13	2026-09-22
+        - FIXES two carves refused in four thousand on a loaded FreeBSD 15
+          smoker, with room in the arena for all of them. 
+        - A carve refused for a held stripe answers SA_E_BUSY, not SA_E_FULL:
+          one means try again, the other means stop.
+        - Add Shared::Arena::_last_err: why the last ->region returned empty.
+        - FIXES t/32-map-ttl.t counting three hits where it asked for two.
+
 0.12	2026-09-20
         - FIXES a waker slot outliving its owner. Nothing released a slot when
           a process was killed or _exits, so `live` stayed set for a process

@@ -1,10 +1,10 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrBool;
 # ABSTRACT: JSONSchemaPropsOrBool represents JSONSchemaProps or a boolean value. Defaults to true for the boolean property.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use v5.10;
 use Moo;
-use Types::Standard qw( Bool InstanceOf Maybe );
-use Scalar::Util qw( blessed reftype );
+use Types::Standard qw( Bool );
+use Scalar::Util ();
 use JSON::MaybeXS ();
 
 my $PROPS = 'IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaProps';
@@ -12,7 +12,7 @@ my $PROPS = 'IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSON
 
 has schema => (
     is  => 'rw',
-    isa => Maybe[InstanceOf[$PROPS]],
+    isa => Types::Standard::Maybe[ Types::Standard::InstanceOf[$PROPS] ],
 );
 
 
@@ -23,7 +23,7 @@ has allows => (
 );
 
 
-sub _build_json {
+sub _build__json_encoder {
     return JSON::MaybeXS->new(utf8 => 1, canonical => 1, allow_nonref => 1);
 }
 
@@ -37,14 +37,14 @@ sub is_schema {
 sub FROM_STRUCT {
     my ($class, $struct, $k8s) = @_;
 
-    if (ref $struct eq 'HASH' || (blessed($struct) && $struct->isa($PROPS))) {
+    if (ref $struct eq 'HASH' || (Scalar::Util::blessed($struct) && $struct->isa($PROPS))) {
         $k8s //= do { require IO::K8s; IO::K8s->new };
-        return $class->new(schema => $k8s->struct_to_object($PROPS, $struct));
+        return $class->new(schema => $k8s->_struct_to_object_expanded($PROPS, $struct));
     }
 
     # Booleans arrive as JSON::PP::Boolean, \1 / \0, or plain scalars.
     my $bool = $struct;
-    $bool = $$bool if ref($bool) && (reftype($bool) // '') eq 'SCALAR';
+    $bool = $$bool if ref($bool) && (Scalar::Util::reftype($bool) // '') eq 'SCALAR';
 
     return $class->new(allows => $bool ? 1 : 0);
 }
@@ -73,7 +73,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOr
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 

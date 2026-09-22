@@ -1,0 +1,12 @@
+{
+  "action": {
+    "id": 13,
+    "command": "delete_snapshot",
+    "status": "running",
+    "progress": 0,
+    "started": "2016-01-30T23:50:00Z",
+    "finished": null,
+    "resources": [{"id": 42, "type": "storage_box"}, {"id": 42, "type": "storage_box_snapshot"}],
+    "error": {"code": "action_failed", "message": "Action failed"}
+  }
+}

@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::PrimaryIP;
 # ABSTRACT: Hetzner Cloud Primary IP object
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::HasAction';
 use Carp qw(croak);
 use namespace::clean;
 
@@ -90,11 +91,7 @@ sub assign {
     croak "Assignee ID required" unless $assignee_id;
     $assignee_type //= 'server';
 
-    $self->_client->post("/primary_ips/" . $self->id . "/actions/assign", {
-        assignee_id   => $assignee_id,
-        assignee_type => $assignee_type,
-    });
-    return $self;
+    return $self->_client->primary_ips->assign($self->id, $assignee_id, $assignee_type);
 }
 
 
@@ -102,8 +99,7 @@ sub unassign {
     my ($self) = @_;
     croak "Cannot unassign primary IP without ID" unless $self->id;
 
-    $self->_client->post("/primary_ips/" . $self->id . "/actions/unassign", {});
-    return $self;
+    return $self->_client->primary_ips->unassign($self->id);
 }
 
 
@@ -113,11 +109,7 @@ sub change_dns_ptr {
     croak "IP required" unless $ip;
     croak "dns_ptr required" unless defined $dns_ptr;
 
-    $self->_client->post("/primary_ips/" . $self->id . "/actions/change_dns_ptr", {
-        ip      => $ip,
-        dns_ptr => $dns_ptr,
-    });
-    return $self;
+    return $self->_client->primary_ips->change_dns_ptr($self->id, $ip, $dns_ptr);
 }
 
 
@@ -171,7 +163,7 @@ WWW::Hetzner::Cloud::PrimaryIP - Hetzner Cloud Primary IP object
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -340,7 +332,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

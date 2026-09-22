@@ -1,11 +1,12 @@
 package WWW::Hetzner::CLI::Cmd::LoadBalancer::Cmd::AddService;
 # ABSTRACT: Add a service to a load balancer
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl load-balancer add-service <id> --protocol <proto> --listen-port <port> --destination-port <port>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option protocol => (
     is       => 'ro',
@@ -38,12 +39,13 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Adding ", $self->protocol, " service to load balancer $id...\n";
-    $cloud->load_balancers->add_service($id,
+    my $action = $cloud->load_balancers->add_service($id,
         protocol         => $self->protocol,
         listen_port      => $self->listen_port,
         destination_port => $self->destination_port,
     );
-    print "Service added.\n";
+    $self->handle_action($action);
+    print $self->no_wait ? "Service add requested.\n" : "Service added.\n";
 }
 
 1;
@@ -60,7 +62,7 @@ WWW::Hetzner::CLI::Cmd::LoadBalancer::Cmd::AddService - Add a service to a load 
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -83,7 +85,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

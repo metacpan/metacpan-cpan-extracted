@@ -99,13 +99,28 @@ subtest 'update rrset' => sub {
 };
 
 subtest 'delete rrset' => sub {
+    # karr #7: DELETE /zones/{id}/rrsets/{name}/{type} answers 201 {action}
     my $cloud = mock_cloud(
-        'DELETE /zones/zone123456/rrsets/www/A' => {},
+        'DELETE /zones/zone123456/rrsets/www/A' => sub { load_fixture('rrsets_action') },
     );
 
     my $rrsets = $cloud->zones->rrsets('zone123456');
-    my $result = $rrsets->delete('www', 'A');
-    ok(1, 'delete succeeded');
+    my $action = $rrsets->delete('www', 'A');
+    isa_ok($action, 'WWW::Hetzner::Action', 'delete returns an Action');
+    is($action->id, 9102, 'delete action id');
+    is($action->command, 'delete_rrset', 'delete action command');
+};
+
+subtest 'delete rrset via entity mirror' => sub {
+    my $cloud = mock_cloud(
+        'GET /zones/zone123456/rrsets/www/A'    => sub { load_fixture('rrsets_get') },
+        'DELETE /zones/zone123456/rrsets/www/A' => sub { load_fixture('rrsets_action') },
+    );
+
+    my $record = $cloud->zones->rrsets('zone123456')->get('www', 'A');
+    my $action = $record->delete;
+    isa_ok($action, 'WWW::Hetzner::Action', '$record->delete returns an Action');
+    is($action->command, 'delete_rrset', 'entity mirror carries the action command');
 };
 
 subtest 'create rrset requires params' => sub {

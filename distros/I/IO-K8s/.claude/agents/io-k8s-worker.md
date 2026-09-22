@@ -5,12 +5,12 @@ model: inherit
 allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:
-    - perl-core
-    - perl-moo
+    - getty-perl-core
+    - getty-perl-moo
     - io-k8s-core
-    - perl-kubernetes-classes
+    - perl-io-k8s-kubernetes-classes
     - kubernetes-concepts
-    - karr
+    - kanban-issues-karr-cli
 ---
 
 You are the io-k8s-worker for **IO::K8s**, the Perl object model of the Kubernetes API

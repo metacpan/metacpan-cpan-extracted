@@ -1,5 +1,33 @@
 Revision history for App::DrivePlayer.
 
+0.2.10 2026-09-21
+        - Sidebar: Artists/Albums/Genres now sort by their
+          displayed names (case-insensitive) rather than the raw
+          stored values.
+        - Config: stop writing a misplaced 'class' key at the
+          google_restapi level; it is stripped on load (self-
+          healing) and the auth hash is copied before being passed
+          to Google::RestApi so the library cannot delete our
+          'class' key from the live config.
+        - Internal: de-bloat pass -- removed dead methods, unused
+          imports and the obsolete tools/fix_mojibake.pl migration,
+          and collapsed duplicated logic into shared helpers.
+        - Sync: the progress dialog now stays up through the
+          post-scan Google Sheet sync instead of being destroyed
+          first.  On a large folder the sheet sync is a long
+          synchronous step, and closing the dialog beforehand left
+          the app looking frozen with no indication work was still
+          in progress.
+        - Logging: added a restapi_log_level config key (default
+          WARN) that controls the Google::RestApi logger subtree
+          independently of log_level.  At DEBUG that library emits
+          ~27 lines per cell while reading a worksheet -- tens of
+          thousands of lines for a large sheet -- and writing them
+          synchronously stalled the UI for around a minute during
+          a big sheet sync.  The app can now run at DEBUG without
+          the RestApi firehose.
+        - Require Google::RestApi 2.2.4 (cpanfile and Makefile.PL).
+
 0.2.9 2026-04-30
         - Fix: player IPC no longer drops mpv events when a recv()
           slices an event mid-line.  _drain_events and

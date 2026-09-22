@@ -1,7 +1,5 @@
 ---
 abstract: 'Generate random self-signed SSL certificates in memory'
-author:
-  - 'Ryan Scott'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -26,5 +24,5 @@ requires:
   perl: '5.008001'
   strict: '0'
   warnings: '0'
-version: '1.01'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

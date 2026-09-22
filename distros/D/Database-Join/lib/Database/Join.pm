@@ -2,6 +2,7 @@ package Database::Join;
 
 # ABSTRACT: Combined view across two or more Database::Abstraction objects
 
+use 5.010001;
 use strict;
 use warnings;
 use autodie qw(:all);
@@ -20,7 +21,88 @@ use Sub::Protected;
 # validate_strict schema cannot silently diverge.
 Readonly::Array my @_ADD_DB_KEYS => qw(database join_column filter remove_columns);
 
-our $VERSION = '0.004.0';
+# SQL comparison operators that are safe to interpolate into WHERE clauses.
+# Any operator not in this set is silently skipped to prevent SQL injection.
+Readonly::Hash my %SAFE_SQL_OPS => map { $_ => 1 } qw(> < >= <= != =);
+
+our $VERSION = '0.005.0';
+
+# ---------------------------------------------------------------------------
+# KNOWN GAPS & ROADMAP (derived from gap-analysis 2026-09-21)
+#
+# PRE-RELEASE BLOCKERS
+#
+# TODO: LIKE silently dropped on SQLite path (undocumented cross-backend gap)
+#   %SAFE_SQL_OPS covers { > < >= <= != = } only.  LIKE, NOT LIKE, IN, NOT IN,
+#   IS NULL, and IS NOT NULL are silently skipped on the SQLite path with no
+#   warning, while the array path passes them directly to the component DA
+#   (which may honour them).  A caller who develops against a small dataset
+#   (array path) and deploys at scale (SQLite path) gets silently wider results.
+#   Fix options: (a) add LIKE to %SAFE_SQL_OPS — safe with bind params; or
+#   (b) add a carp when an unrecognised operator is encountered on the SQLite
+#   path so callers are not silently misled.  Either way, add a COMMON PITFALLS
+#   entry.  See t/cgi_security.t for the %SAFE_SQL_OPS operator-whitelist tests.
+#
+# TODO: Missing =head3 MESSAGES POD sections in eight public methods
+#   Only new(), add_database(), and remove_column() document their error and
+#   warning strings under =head3 MESSAGES.  The following methods can also
+#   carp or croak and need matching sections: selectall_arrayref,
+#   selectall_array, fetchrow_hashref, count, columns, schema, updated,
+#   set_logger, AUTOLOAD.
+#
+# TODO: updated() not defensive against DAs without updated()
+#   sub updated { return max(map { $_->updated() } @{$self->{_dbs}}) }
+#   will propagate an uncaught exception if any component DA does not implement
+#   updated().  _cache_fresh() already handles this gracefully with eval{}.
+#   Either wrap the map body in eval and skip undef returns (consistent with
+#   _cache_fresh), or document the contract requirement in LIMITATIONS.
+#
+# POST-RELEASE ROADMAP
+#
+# TODO: count() SQL push-down on the SQLite path
+#   count() calls _joined_query() and returns scalar @{$rows}, fetching every
+#   row just to count them.  On the cached SQLite backend a SELECT COUNT(*)
+#   against the join SQL would be orders of magnitude cheaper for large tables.
+#
+# TODO: LIKE / NOT LIKE in %SAFE_SQL_OPS (also covers the pre-release gap above)
+#   LIKE with a bind parameter (col LIKE ?) is injection-safe and would unify
+#   array-path and SQLite-path behaviour for pattern-matching criteria.
+#
+# TODO: IN (...) / NOT IN (...) list-operator support
+#   Set-membership criteria are common in read-only query layers.  Requires
+#   bind-parameter list expansion (one ? per element) in the WHERE builder.
+#
+# TODO: IS NULL / IS NOT NULL operator support
+#   Nullable-column filtering cannot be expressed as a bind-parameter operator.
+#   Handle undef criterion values with a separate IS NULL generation path
+#   instead of the current `next if !defined $val` no-op.
+#
+# TODO: Caller-specified ORDER BY on query methods
+#   Results are sorted by join_column only.  An order_by => 'col' (or
+#   order_by => ['col', 'DESC']) parameter would cover a common use-case:
+#   SQL ORDER BY clause on the SQLite path; Perl sort block on the array path.
+#
+# TODO: Limit / offset for pagination
+#   limit => N, offset => M on selectall_arrayref/selectall_array would enable
+#   paginated access.  SQLite path: LIMIT ? OFFSET ? clauses; array path: slice.
+#
+# TODO: dbi_source() on Database::Join itself (composable nested joins)
+#   The join object cannot act as a zero-copy SQLite source in a parent join.
+#   Implementing dbi_source() — returning the cached File::Temp handle and the
+#   join table name — would allow composable nested Database::Join objects at
+#   full ATTACHed speed.
+#
+# TODO: Parallel DA queries in _fetch_indexed
+#   Component DAs are queried sequentially.  An optional parallel => 1
+#   constructor flag could reduce latency by the factor of the slowest DA,
+#   with no change to the merge logic (Coro or IO::Async back-end).
+#
+# TODO: Schema type consistency validation at construction
+#   Columns shared across two DAs (without collision_prefix) are merged
+#   type-blind.  A validation pass comparing schema() types for overlapping
+#   columns at new()/add_database() time could warn callers before silent
+#   type coercion produces unexpected results.
+# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
 # All user-facing strings route through this dictionary.  Supply an i18n
@@ -259,11 +341,22 @@ matching rows are fetched into Perl memory.  Peak RAM is roughly three times
 the source data size.  For large datasets use C<backend =E<gt> 'sqlite'>, or
 leave C<backend =E<gt> 'auto'> and set C<max_array_rows> appropriately.
 
-=item SQLite backend writes temporary files
+=item SQLite backend uses a persistent cache file
 
-When the SQLite path is active, a temporary C<.db> file is created in
-C<tmpdir> for every query call.  The file is removed when the call returns.
-The directory must be writable and have sufficient free space.
+When the SQLite path is active, a single C<.db> file with a randomly generated
+name (chosen by C<File::Temp> to avoid collisions) is created in C<tmpdir> the
+first time a query runs on a given C<Database::Join> object.  Source data is
+spilled into that file once; subsequent queries against the same object reuse
+the file without re-fetching the source data.
+
+The cache is automatically invalidated and rebuilt whenever any source
+database's C<updated()> timestamp changes (indicating new data), or when
+C<add_database()> is called.
+
+The file is deleted when the C<Database::Join> object is destroyed (typically
+when it goes out of scope).  At any given moment no more than one such file
+exists per object.  The directory must be writable and have enough free space
+for the full source data (once, not per-query).
 
 =item No chained builder or raw SQL
 
@@ -372,22 +465,25 @@ large.  To opt in to the SQLite path for such a DA, either add your own
 C<count()> override that returns the total row count, implement C<dbi_source()>,
 or use C<backend =E<gt> 'sqlite'> unconditionally.
 
-=item dbi_source() zero-copy path is skipped when query-time criteria apply
+=item dbi_source() ATTACH is unconditional - query-time criteria go into WHERE
 
-When a component database implements C<dbi_source()> but the current query
-includes criteria for columns in that database, C<Database::Join> cannot use
-the zero-copy ATTACH path (doing so would require generating a C<WHERE> clause
-inside the attached database, which is not supported in this version).  The
-database is queried normally via C<selectall_arrayref> and rows are spilled
-into the temporary SQLite file instead.
+When a component database implements C<dbi_source()>, C<Database::Join> always
+uses the zero-copy ATTACH path, I<even when the current query includes criteria
+for columns in that database>.  The criteria are translated into parameterised
+SQL C<WHERE> clauses applied against the ATTACHed table; no row-level copy is
+performed.  (Prior to 0.005.0 the presence of any query-time criteria would
+force a spill; that restriction has been removed.)
 
 =item Temp file directory must be writable and have free space
 
-When the SQLite path is active, a temporary C<.db> file is created in
-C<tmpdir> (default: C<File::Spec-E<gt>tmpdir()>) for every query call.
-If the directory is not writable, or the filesystem is full, the call will
-C<croak> with C<error_sqlite_connect>.  Check permissions and free space if
-you see that error.
+The SQLite path creates one temporary C<.db> file per C<Database::Join> object
+in C<tmpdir> (default: C<File::Spec-E<gt>tmpdir()>, usually C</tmp> on Unix).
+The filename is randomly generated by C<File::Temp> -- you cannot predict it,
+only the directory is under your control.  The file is created on the first
+query and kept alive until the object is destroyed; it is not re-created on
+every query call.  If the directory is not writable, or the filesystem is full,
+the call will C<croak> with C<error_sqlite_connect>.  Check permissions and
+free space if you see that error.
 
 =back
 
@@ -883,13 +979,20 @@ and merged there.  Simple and fast for small and medium datasets.  Peak RAM
 is roughly three times the combined source data size (one copy per database
 plus one merged copy).
 
-=item C<backend =E<gt> 'sqlite'> -- SQL JOIN via a temporary file
+=item C<backend =E<gt> 'sqlite'> -- SQL JOIN via a cached temporary file
 
 C<Database::Join> creates a temporary SQLite database file, spills source
 rows into it (one table per component database), then executes a single SQL
-C<JOIN> statement.  Peak RAM drops to roughly one times the source data size.
-The temporary file is created securely by C<File::Temp> and removed
-automatically when the query call returns, even if an error occurs.
+C<JOIN> statement per query call.  Peak RAM drops to roughly one times the
+source data size.
+
+The temporary file is created once and reused across multiple query calls on
+the same object (the cache).  Only query-time criteria vary per call; they
+are applied as SQL C<WHERE> clauses against the cached data.  The cache is
+automatically rebuilt when any source database's C<updated()> timestamp
+changes.  The file is deleted when the object is destroyed (goes out of
+scope).  See I<Temporary file: name, location, and lifetime> below for
+details.
 
 Requires C<DBD::SQLite E<gt>= 1.70> (C<FULL OUTER JOIN> support was added in
 SQLite 3.39.0; DBD::SQLite 1.70 ships SQLite 3.39.2).
@@ -927,12 +1030,36 @@ The default of 10,000 is a reasonable starting point.  Adjust it to match
 your hardware and typical row width.  For wide rows (many columns or long
 strings) you may want a lower threshold; for narrow rows you can raise it.
 
-B<Temporary file location (tmpdir)>
+B<Temporary file: name, location, and lifetime>
 
-When the SQLite path is active, the temporary C<.db> file is created in the
-directory given by C<tmpdir>.  If C<tmpdir> is not specified,
-C<File::Spec-E<gt>tmpdir()> is used (usually C</tmp> on Unix, or the value of
-the C<TEMP> or C<TMP> environment variable on Windows).
+When the SQLite path is active, a single temporary SQLite database file acts
+as the join cache for the life of the C<Database::Join> object.
+
+B<Name>: the filename is randomly generated by C<File::Temp>, for example:
+
+    /tmp/Cj8xK7mP2Q.db
+
+The random portion (ten characters) is chosen automatically to avoid
+collisions.  Only the directory is under your control; you cannot specify
+the filename itself.
+
+B<Location>: controlled by the C<tmpdir> constructor parameter.
+If C<tmpdir> is not specified, C<File::Spec-E<gt>tmpdir()> is used (usually
+C</tmp> on Unix, or the value of the C<TEMP> or C<TMP> environment variable
+on Windows).
+
+B<Lifetime: one file per object, deleted when the object is destroyed>: the
+file is created on the first query call that uses the SQLite path and kept
+alive until the C<Database::Join> object is destroyed (i.e. when it goes out
+of scope or is explicitly C<undef>-d).  At most one file exists per object at
+any given moment.  Calling C<selectall_arrayref()> ten times on the same
+object creates and uses I<one> file, not ten.
+
+B<Cache invalidation>: the cache is automatically rebuilt (the old file is
+replaced with a new one) when any source database's C<updated()> return value
+changes, or when C<add_database()> is called.  Base-filter criteria
+(C<filters> constructor parameter) are applied once at build time for spilled
+sources; query-time criteria are applied per-call as SQL C<WHERE> clauses.
 
 To use a different directory -- for example a RAM-backed filesystem or a
 faster local disk:
@@ -1630,6 +1757,12 @@ sub add_database {
 	$self->{_col_cache}    = undef;
 	$self->{_schema_cache} = undef;
 
+	# Invalidate the SQLite join cache: a new source requires a full rebuild.
+	if (my $old = delete $self->{_sqlite_cache}) {
+		local $@;
+		eval { $old->{dbh}->disconnect } if $old->{dbh};
+	}
+
 	# Propagate logger if one is configured
 	if (my $log = $self->{_logger}) {
 		$db->set_logger($log);
@@ -1746,7 +1879,7 @@ C<count> instead.
 =cut
 
 sub query {
-	my ($self) = @_;
+	my $self = $_[0];
 	croak $self->_err('error_query_unsupported');
 }
 
@@ -1760,7 +1893,7 @@ Use C<selectall_arrayref> or C<fetchrow_hashref> to query the joined view.
 =cut
 
 sub execute {
-	my ($self) = @_;
+	my $self = $_[0];
 	croak $self->_err('error_execute_unsupported');
 }
 
@@ -1853,10 +1986,6 @@ sub AUTOLOAD {
 		\z      # strict end-of-string (\z never matches a trailing newline,
 		        # unlike $ which can — important if $AUTOLOAD ever embeds \n)
 	/x;
-	# TODO: Unreachable code detected during path analysis. Investigate for removal.
-	# `sub DESTROY {}` is defined explicitly in this package; Perl's method-resolution
-	# order finds it before AUTOLOAD is ever invoked, so $col can never equal 'DESTROY'.
-	return if $col eq 'DESTROY';
 
 	# Private methods must not be reached via AUTOLOAD — croak immediately so
 	# typos like $join->_join_col are not silently swallowed.
@@ -1885,7 +2014,16 @@ sub AUTOLOAD {
 	return $db->$col(@_);
 }
 
-sub DESTROY {}
+sub DESTROY {
+	my ($self) = @_;
+	# Disconnect and release the cached SQLite handle (if any) so File::Temp
+	# can unlink the temp file before the object is freed.
+	if (my $cache = delete $self->{_sqlite_cache}) {
+		local $@;
+		eval { $cache->{dbh}->disconnect } if $cache->{dbh};
+		# $cache->{tmpfile} (File::Temp, UNLINK => 1) is released here.
+	}
+}
 
 # ---------------------------------------------------------------------------
 # Private helpers
@@ -1899,8 +2037,11 @@ sub DESTROY {}
 # Exit:    Always returns a hashref; never undef.
 sub _parse_query_args :Protected {
 	my ($self, $key, @args) = @_;
+	# D~ elimination (Modus Tollens): when @args is empty the early return fires
+	# before $key is ever read, making the $key //= assignment a dead store.
+	# Moving the guard above the assignment removes the wasted hash dereference.
+	return {} unless @args;
 	$key //= $self->{_join_col};
-	return {}                           unless @args;
 	return { $key => $args[0] }        if @args == 1 && !ref($args[0]);
 	return get_params(undef, @args) // {};
 }
@@ -2107,7 +2248,28 @@ sub _joined_query_array :Protected {
 
 	# Fetch and index each database with its own criteria slice.
 	my @indexed;
-	$indexed[$_] = $self->_fetch_indexed($_, $per_db->[$_]) for 0 .. $n - 1;
+	$indexed[0] = $self->_fetch_indexed(0, $per_db->[0]);
+
+	# Early exit: for inner and left joins, an empty primary result means the
+	# key set is provably empty (left: primary defines it; inner: ∩ ∅ = ∅).
+	# Skipping secondary fetches avoids up to N-1 unnecessary DA round-trips.
+	#
+	# Two guards prevent premature exit:
+	#   (a) join-column broadcast: when a join-col criterion is present it must
+	#       be physically delivered to each secondary DA (the call itself is what
+	#       forwards it; the partition only prepared the per-db slice).
+	#   (b) secondary-owned criteria: a secondary with its own criteria (e.g.
+	#       score => $val) must still be queried so those criteria are delivered.
+	#       Without the call the DA never receives them — breaking the partition-
+	#       isolation invariant the security tests verify.
+	my $local_jc_0_early    = $self->{_join_map}{0} // $join_col;
+	my $sec_has_criteria    = grep { %{ $per_db->[$_] } } 1 .. $n - 1;
+	return [] if !%{ $indexed[0] }
+	          && $join_type ne 'outer'
+	          && !exists $per_db->[0]{$local_jc_0_early}
+	          && !$sec_has_criteria;
+
+	$indexed[$_] = $self->_fetch_indexed($_, $per_db->[$_]) for 1 .. $n - 1;
 
 	# Premise: the key-set resolution loop starts at i=1 (primary seeds %key_set).
 	# Conclusion: $had_criteria[0] is a dead store (D~); compute only for i >= 1.
@@ -2219,17 +2381,202 @@ sub _joined_query_array :Protected {
 	return \@result;
 }
 
+# _cache_fresh() -> bool
+# Purpose: Check whether the SQLite join cache is still valid.
+# Entry:   $self->{_sqlite_cache} may or may not be set.
+# Exit:    Returns 1 if the cache exists, the DBI handle is active, the source
+#          count matches, and all source updated() timestamps match.  Returns 0
+#          if any of these conditions fail (caller must rebuild the cache).
+sub _cache_fresh :Protected {
+	my ($self) = @_;
+
+	my $cache = $self->{_sqlite_cache} // return 0;
+	my $n     = scalar @{ $self->{_dbs} };
+
+	return 0 if ($cache->{n} // 0) != $n;
+
+	# Verify the DBI handle is still usable.
+	return 0 unless do { local $@; eval { $cache->{dbh}{Active} } };
+
+	# Verify that no source has been updated since the cache was built.
+	# If a source does not implement updated(), skip the timestamp check for
+	# it (the data is assumed stable; the cache stays valid indefinitely for
+	# that source unless add_database() is called or the object is destroyed).
+	for my $i (0 .. $n - 1) {
+		my $cached_ts = $cache->{updated}{$i} // next;   # not captured → skip
+		my $current_ts;
+		do { local $@; $current_ts = eval { $self->{_dbs}[$i]->updated() } };
+		next unless defined $current_ts;                  # no updated() → skip
+		return 0 if $current_ts != $cached_ts;
+	}
+
+	return 1;
+}
+
+# _build_sqlite_cache()
+# Purpose: Create (or rebuild) the persistent SQLite join cache.  Spills each
+#          source database into a temp SQLite file using filter-only criteria;
+#          SQLite-backed sources are zero-copy ATTACHed instead of spilled.
+#          Query-time criteria are NOT applied here — they become WHERE clauses
+#          in the per-call SQL generated by _sqlite_join.
+# _sql_quote_identifier( $name ) -> $quoted
+# Purpose: Produce a properly double-quoted SQL identifier, escaping any
+#          embedded double-quote characters by doubling them (SQL standard).
+#          Defence-in-depth: prevents SQL identifier injection when DA-supplied
+#          column names or table names contain literal double-quote characters.
+#          SQLite, like all ANSI SQL databases, represents a literal " inside a
+#          double-quoted identifier as ""; this routine applies that transform.
+# Entry:   $name — raw identifier string (column name, table name, or alias).
+# Exit:    Returns the double-quoted, injection-safe SQL identifier string.
+sub _sql_quote_identifier {
+	my ($name) = @_;
+	(my $safe = $name) =~ s/"/""/g;
+	return "\"$safe\"";
+}
+
+# Entry:   _dbs, _join_map, _filters, _tmpdir must be set.
+# Exit:    $self->{_sqlite_cache} holds {dbh, tmpfile, table_refs, source_cols,
+#          is_attached, updated, n}.  Any previous cache is disconnected first.
+#          Each spilled table has a B-tree index on its join column.
+# Effects: Creates a File::Temp file (SUFFIX='.db', DIR=_tmpdir, UNLINK=1).
+#          Croaks with error_sqlite_connect if DBI::connect fails.
+sub _build_sqlite_cache :Protected {
+	my ($self) = @_;
+
+	# Disconnect any previous cache to release the old temp file.
+	if (my $old = delete $self->{_sqlite_cache}) {
+		local $@;
+		eval { $old->{dbh}->disconnect } if $old->{dbh};
+	}
+
+	require DBI;
+	require File::Temp;
+
+	my $join_col = $self->{_join_col};
+	my $n        = scalar @{ $self->{_dbs} };
+
+	my $tmpfile = File::Temp->new(
+		SUFFIX => '.db',
+		DIR    => $self->{_tmpdir},
+		UNLINK => 1,
+	);
+
+	my $tmpdbh = DBI->connect(
+		'dbi:SQLite:dbname=' . $tmpfile->filename, '', '',
+		{ RaiseError => 1, PrintError => 0, AutoCommit => 1 },
+	) or croak $self->_err('error_sqlite_connect', DBI->errstr // 'unknown error');
+
+	my (@table_refs, @source_cols, @is_attached);
+
+	for my $i (0 .. $n - 1) {
+		my $db       = $self->{_dbs}[$i];
+		my $local_jc = $self->{_join_map}{$i} // $join_col;
+
+		# Zero-copy ATTACH path: unconditionally available when the source
+		# implements dbi_source() returning a live SQLite handle.  Query-time
+		# criteria for this source will go into the SQL WHERE clause.
+		# eval wraps can() to suppress ISA warnings from stub packages in tests.
+		if (do { local $@; eval { $db->can('dbi_source') } }) {
+			my $src = eval { $db->dbi_source() };
+			if ($src && ref($src) eq 'HASH' && $src->{dbh} && $src->{table}
+				&& eval { $src->{dbh}{Driver}{Name} } eq 'SQLite') {
+				my ($db_file) = $src->{dbh}->selectrow_array(
+					"SELECT file FROM pragma_database_list WHERE name='main'"
+				);
+				my $alias = "ext$i";
+				$tmpdbh->do(sprintf("ATTACH DATABASE %s AS %s",
+					$tmpdbh->quote($db_file), $alias));
+				$table_refs[$i]  = $alias . '.' . _sql_quote_identifier($src->{table});
+				$is_attached[$i] = 1;
+				# Transitive reduction: new() and add_database() both validate
+				# can('columns') before registering any DA (P1 invariant).
+				# The else branch is dead code; the guard is vacuous.
+				$source_cols[$i] = $db->columns();
+				next;
+			}
+		}
+
+		# Spill path: fetch rows using filter-only criteria.  Query-time
+		# criteria are NOT applied here — they become WHERE clauses per call.
+		my $filter_crit = $self->{_filters}{$i} // {};
+		my $rows        = $db->selectall_arrayref($filter_crit) // [];
+
+		# No need to check if $rows exists or not
+		# Transitive reduction (P1 invariant): can('columns') is guaranteed for
+		# all _dbs elements
+		$source_cols[$i] = $db->columns();
+
+		my $tbl  = "t$i";
+		my $cols = $source_cols[$i] // [];
+
+		my $col_defs = join(', ', map { _sql_quote_identifier($_) . ' TEXT' } @{$cols});
+		$tmpdbh->do('CREATE TABLE ' . _sql_quote_identifier($tbl) . " ($col_defs)");
+		# Index on the join column: upgrades ON-clause equality lookups from
+		# an O(N²) full-table nested-loop scan to O(N log N) b-tree seek.
+		# SQLite query planner uses it for INNER JOIN / LEFT JOIN ON expressions.
+		$tmpdbh->do('CREATE INDEX ' . _sql_quote_identifier("${tbl}_jc")
+			. ' ON ' . _sql_quote_identifier($tbl)
+			. ' (' . _sql_quote_identifier($local_jc) . ')');
+
+		if (@{$rows}) {
+			my $col_list     = join(', ', map { _sql_quote_identifier($_) } @{$cols});
+			my $placeholders = join(', ', ('?') x scalar @{$cols});
+			my $sth = $tmpdbh->prepare(
+				'INSERT INTO ' . _sql_quote_identifier($tbl) . " ($col_list) VALUES ($placeholders)"
+			);
+			my $batch = 0;
+			$tmpdbh->begin_work;
+			for my $row (@{$rows}) {
+				$sth->execute(map { $row->{$_} } @{$cols});
+				if (++$batch >= 1_000) {
+					$tmpdbh->commit;
+					$tmpdbh->begin_work;
+					$batch = 0;
+				}
+			}
+			$tmpdbh->commit;
+		}
+		$table_refs[$i]  = _sql_quote_identifier($tbl);
+		$is_attached[$i] = 0;
+	}
+
+	# Snapshot updated() timestamps for cache-validity checks.
+	my %updated;
+	for my $i (0 .. $n - 1) {
+		local $@;
+		my $ts = eval { $self->{_dbs}[$i]->updated() };
+		$updated{$i} = $ts unless $@;
+	}
+
+	$self->{_sqlite_cache} = {
+		dbh         => $tmpdbh,
+		tmpfile     => $tmpfile,
+		table_refs  => \@table_refs,
+		source_cols => \@source_cols,
+		is_attached => \@is_attached,
+		updated     => \%updated,
+		n           => $n,
+	};
+
+	return;
+}
+
 # _sqlite_join( \%params ) -> \@merged_rows
 #
-# Purpose: Join via a temporary SQLite database.  Source data is spilled into
-#          temp tables (or ATTACHed for SQLite sources implementing dbi_source()),
-#          then a single SQL JOIN produces the merged result.  For 'auto' mode,
-#          uses count() or dbi_source() COUNT(*) to check the threshold without
-#          fetching rows; falls back to _joined_query_array when count <=
-#          $self->{_max_array_rows} or when no count method is available.
+# Purpose: Join via a persistent SQLite database cache.  The first call (or
+#          any call after a source updated() changes) spills source data into
+#          a File::Temp SQLite file via _build_sqlite_cache; subsequent calls
+#          reuse the same file and handle.  A single SQL JOIN with a per-call
+#          WHERE clause (built from query-time criteria) produces the result.
+#          For 'auto' mode, uses count() or dbi_source() COUNT(*) to check
+#          the threshold without fetching rows; falls back to
+#          _joined_query_array when count <= $self->{_max_array_rows} or when
+#          no count method is available.
 # Entry:   $params is the query criteria hashref.
 # Exit:    Returns arrayref of merged hashrefs sorted by join_column.
-# Effects: Creates and destroys a File::Temp SQLite database per call.
+# Effects: On the first call (or after cache invalidation), creates a
+#          File::Temp SQLite file in _tmpdir; the file persists until the
+#          Database::Join object is destroyed or the source data changes.
 sub _sqlite_join :Protected {
 	my ($self, $params) = @_;
 
@@ -2238,28 +2585,38 @@ sub _sqlite_join :Protected {
 	my $join_type = $self->{_join_type};
 	my $n         = scalar @{ $self->{_dbs} };
 
-	# Partition criteria and overlay base filters — same logic as _joined_query_array.
-	my $per_db = $self->_partition_criteria($params);
+	# Partition query-time criteria only (no filter overlay).
+	# Filters are applied at cache-build time for spilled sources, and via the
+	# SQL WHERE clause for ATTACHed sources.  Keeping them separate means the
+	# cached tables can serve any query without rebuilding.
+	my $per_db_query = $self->_partition_criteria($params);
+
+	# Compute the full merged criteria (filter + query) for each source.
+	# Used for had_criteria (join-type semantics) and the WHERE clause for
+	# ATTACHed sources (which were not filtered at spill time).
+	my @per_db_full;
 	for my $i (0 .. $n - 1) {
 		my $base = $self->{_filters}{$i} // {};
-		next unless %{$base};
-		$per_db->[$i] = _merge_criteria($base, $per_db->[$i]);
+		$per_db_full[$i] = %{$base}
+			? _merge_criteria($base, $per_db_query->[$i])
+			: $per_db_query->[$i];
 	}
 
 	# Determine which secondary sources had effective criteria (inner-join semantics).
 	my @had_criteria;
-	$had_criteria[$_] = !!%{ $per_db->[$_] } for 1 .. $n - 1;
+	$had_criteria[$_] = !!%{ $per_db_full[$_] } for 1 .. $n - 1;
 
 	# For 'auto' mode: check total row count without fetching rows.
-	# Use count() or dbi_source() COUNT(*) for each source.
-	# If any source supports neither, fall back conservatively to the array path.
+	# Count(*) is used for dbi_source() sources; count() for others.
+	# If any source supports neither, fall back to the array path.
 	if ($backend eq 'auto') {
-		my $total    = 0;
+		my $total     = 0;
 		my $can_count = 1;
 		for my $i (0 .. $n - 1) {
 			my $db  = $self->{_dbs}[$i];
-			# dbi_source() path: count rows directly in the SQLite source file.
-			if (!%{ $per_db->[$i] } && do { local $@; eval { $db->can('dbi_source') } }) {
+			# dbi_source() path: COUNT(*) against the entire source table
+			# (no WHERE) gives a conservative upper bound on the spilled size.
+			if (do { local $@; eval { $db->can('dbi_source') } }) {
 				my $src = eval { $db->dbi_source() };
 				if ($src && ref($src) eq 'HASH' && $src->{dbh} && $src->{table}
 					&& eval { $src->{dbh}{Driver}{Name} } eq 'SQLite') {
@@ -2285,7 +2642,6 @@ sub _sqlite_join :Protected {
 				$total += $cnt // 0;
 				next;
 			}
-			# No suitable count method: fall back to the array path without fetching.
 			$can_count = 0;
 			last;
 		}
@@ -2293,118 +2649,38 @@ sub _sqlite_join :Protected {
 			if !$can_count || $total <= $self->{_max_array_rows};
 	}
 
-	# --- SQLite join path: fetch rows from all sources ---
+	# Ensure the SQLite cache is valid; rebuild if stale or absent.
+	$self->_build_sqlite_cache() unless $self->_cache_fresh();
 
-	my (@source_rows, @source_cols, @dbi_sources);
+	my $cache       = $self->{_sqlite_cache};
+	my $tmpdbh      = $cache->{dbh};
+	my @table_refs  = @{ $cache->{table_refs}  };
+	my @source_cols = @{ $cache->{source_cols} };
+	my @is_attached = @{ $cache->{is_attached} };
 
+	# Build the WHERE clause from per-call criteria.
+	#   Spilled sources: query-only criteria (filter already applied to spilled data).
+	#   ATTACHed sources: full criteria (filter + query), since source was not filtered.
+	my (@where_parts, @bind_vals);
 	for my $i (0 .. $n - 1) {
-		my $db       = $self->{_dbs}[$i];
-		my $local_jc = $self->{_join_map}{$i} // $join_col;
-
-		# Zero-copy ATTACH: only when the source implements dbi_source(),
-		# the handle uses SQLite, and no query-time criteria apply to this
-		# source (criteria would require a WHERE clause inside the ATTACHed db,
-		# which this v1 implementation does not generate).
-		# eval wraps can() to suppress "can't locate package" ISA warnings
-		# emitted when a test's inline stub class has an unloaded parent.
-		if (!%{ $per_db->[$i] } && do { local $@; eval { $db->can('dbi_source') } }) {
-			my $src = eval { $db->dbi_source() };
-			if ($src && ref($src) eq 'HASH' && $src->{dbh} && $src->{table}
-				&& eval { $src->{dbh}{Driver}{Name} } eq 'SQLite') {
-				$dbi_sources[$i] = { %{$src}, local_jc => $local_jc };
-				# Columns: use columns() if available, else PRAGMA table_info.
-				if ($db->can('columns')) {
-					$source_cols[$i] = $db->columns();
-				} else {
-					my $rows = $src->{dbh}->selectall_arrayref(
-						'PRAGMA table_info("' . $src->{table} . '")'
-					);
-					$source_cols[$i] = [ map { $_->[1] } @{$rows} ];
+		my $crit = $is_attached[$i] ? $per_db_full[$i] : $per_db_query->[$i];
+		next unless %{$crit};
+		my $tref = $table_refs[$i];
+		for my $col (sort keys %{$crit}) {
+			my $val = $crit->{$col};
+			if (ref($val) eq 'HASH') {
+				for my $op (sort keys %{$val}) {
+					next unless $SAFE_SQL_OPS{$op};
+					push @where_parts, $tref . '.' . _sql_quote_identifier($col) . " $op ?";
+					push @bind_vals, $val->{$op};
 				}
-				next;
+			} else {
+				push @where_parts, $tref . '.' . _sql_quote_identifier($col) . ' = ?';
+				push @bind_vals, $val;
 			}
 		}
-
-		# Regular path: fetch rows with partitioned criteria.
-		my $rows = $db->selectall_arrayref($per_db->[$i]) // [];
-		$source_rows[$i] = $rows;
-
-		if ($db->can('columns')) {
-			$source_cols[$i] = $db->columns();
-		} elsif (@{$rows}) {
-			$source_cols[$i] = [ sort keys %{$rows->[0]} ];
-		} else {
-			$source_cols[$i] = [];
-		}
 	}
-
-	# --- SQLite join path ---
-
-	require DBI;
-	require File::Temp;
-
-	my $tmpfile = File::Temp->new(
-		SUFFIX => '.db',
-		DIR    => $self->{_tmpdir},
-		UNLINK => 1,
-	);
-	# Keep the object alive so the file persists until the query completes.
-	# Assigning to $self replaces any previous tmpfile, triggering its cleanup.
-	$self->{_tmpfile} = $tmpfile;
-
-	my $tmpdbh = DBI->connect(
-		'dbi:SQLite:dbname=' . $tmpfile->filename, '', '',
-		{ RaiseError => 1, PrintError => 0, AutoCommit => 1 },
-	) or croak $self->_err('error_sqlite_connect', $DBI::errstr // 'unknown error');
-
-	# Populate tables: spill or ATTACH each source.
-	my @table_refs;	# SQL table reference for each source ("t0" or "ext1.\"tbl\"")
-
-	for my $i (0 .. $n - 1) {
-		if (my $src = $dbi_sources[$i]) {
-			# ATTACH the source SQLite file to the temp connection.
-			my ($db_file) = $src->{dbh}->selectrow_array(
-				"SELECT file FROM pragma_database_list WHERE name='main'"
-			);
-			my $alias = "ext$i";
-			$tmpdbh->do(sprintf("ATTACH DATABASE %s AS %s",
-				$tmpdbh->quote($db_file), $alias));
-			$table_refs[$i] = "$alias.\"$src->{table}\"";
-			next;
-		}
-
-		# Spill source_rows[$i] into a local temp table tN.
-		my $tbl  = "t$i";
-		my $rows = $source_rows[$i] // [];
-		my $cols = $source_cols[$i] // [];
-
-		if (@{$cols}) {
-			my $col_defs = join(', ', map { "\"$_\" TEXT" } @{$cols});
-			$tmpdbh->do(qq{CREATE TABLE "$tbl" ($col_defs)});
-
-			if (@{$rows}) {
-				my $col_list     = join(', ', map { "\"$_\"" } @{$cols});
-				my $placeholders = join(', ', ('?') x scalar @{$cols});
-				my $sth = $tmpdbh->prepare(
-					qq{INSERT INTO "$tbl" ($col_list) VALUES ($placeholders)}
-				);
-				my $batch = 0;
-				$tmpdbh->begin_work;
-				for my $row (@{$rows}) {
-					$sth->execute(map { $row->{$_} } @{$cols});
-					if (++$batch >= 1_000) {
-						$tmpdbh->commit;
-						$tmpdbh->begin_work;
-						$batch = 0;
-					}
-				}
-				$tmpdbh->commit;
-			}
-		} else {
-			$tmpdbh->do(qq{CREATE TABLE "$tbl" (_dummy TEXT)});
-		}
-		$table_refs[$i] = "\"$tbl\"";
-	}
+	my $where_sql = @where_parts ? ' WHERE ' . join(' AND ', @where_parts) : '';
 
 	# Build SELECT clause.
 	# Walk sources in order, applying collision_prefix renaming exactly as
@@ -2423,12 +2699,12 @@ sub _sqlite_join :Protected {
 			$jc_expr = 'COALESCE('
 			         . join(', ', map {
 			               my $lc = $self->{_join_map}{$_} // $join_col;
-			               $table_refs[$_] . ".\"$lc\""
+			               $table_refs[$_] . '.' . _sql_quote_identifier($lc)
 			           } 0 .. $n - 1)
-			         . ") AS \"$join_col\"";
+			         . ') AS ' . _sql_quote_identifier($join_col);
 		} else {
-			$jc_expr = $table_refs[0] . ".\"$local_jc_0\"";
-			$jc_expr .= " AS \"$join_col\"" if $local_jc_0 ne $join_col;
+			$jc_expr = $table_refs[0] . '.' . _sql_quote_identifier($local_jc_0);
+			$jc_expr .= ' AS ' . _sql_quote_identifier($join_col) if $local_jc_0 ne $join_col;
 		}
 		push @selects, $jc_expr;
 		$pub_seen{$join_col} = 1;
@@ -2439,7 +2715,7 @@ sub _sqlite_join :Protected {
 		next if $col eq $local_jc_0;	# join column already handled above
 		next if $self->{_removed_cols}{$col};
 		$pub_seen{$col} = 1;
-		push @selects, $table_refs[0] . ".\"$col\"";
+		push @selects, $table_refs[0] . '.' . _sql_quote_identifier($col);
 	}
 
 	# Non-join columns from secondary tables, with collision_prefix renaming.
@@ -2453,8 +2729,8 @@ sub _sqlite_join :Protected {
 				if defined $prefix && exists $pub_seen{$col} && $col ne $join_col;
 			next if $self->{_removed_cols}{$pub};
 			$pub_seen{$pub} = 1;
-			my $expr = $table_refs[$i] . ".\"$col\"";
-			$expr   .= " AS \"$pub\"" if $pub ne $col;
+			my $expr = $table_refs[$i] . '.' . _sql_quote_identifier($col);
+			$expr   .= ' AS ' . _sql_quote_identifier($pub) if $pub ne $col;
 			push @selects, $expr;
 		}
 	}
@@ -2472,7 +2748,8 @@ sub _sqlite_join :Protected {
 		             : ($join_type eq 'outer')                       ? 'FULL OUTER JOIN'
 		             :                                                  'LEFT JOIN';
 		$join_sql .= " $join_kw $table_refs[$i]"
-		          .  " ON $table_refs[0].\"$local_jc_0\" = $table_refs[$i].\"$local_jc\"";
+		          . ' ON ' . $table_refs[0] . '.' . _sql_quote_identifier($local_jc_0)
+		          . ' = '  . $table_refs[$i] . '.' . _sql_quote_identifier($local_jc);
 	}
 
 	# ORDER BY: use a qualified column reference to avoid ambiguity.
@@ -2480,21 +2757,21 @@ sub _sqlite_join :Protected {
 	# the alias (SQLite resolves ORDER BY aliases from the SELECT list).
 	# For other join types, qualify with the primary table to be unambiguous.
 	my $order_col = ($join_type eq 'outer' && $n > 1)
-	              ? "\"$join_col\""
-	              : $table_refs[0] . ".\"$local_jc_0\"";
+	              ? _sql_quote_identifier($join_col)
+	              : $table_refs[0] . '.' . _sql_quote_identifier($local_jc_0);
 	my $sql = 'SELECT '
 	        . join(', ', @selects)
 	        . ' FROM ' . $from . $join_sql
+	        . $where_sql
 	        . ' ORDER BY ' . $order_col;
 
-	my $sth = $tmpdbh->prepare($sql);
-	$sth->execute;
-	my $result = $sth->fetchall_arrayref({});
-
-	$tmpdbh->disconnect;
-	delete $self->{_tmpfile};
-
-	return $result;
+	# prepare_cached reuses the parsed statement when the same SQL is executed
+	# again (e.g. identical criteria pattern in a pagination or batch loop),
+	# avoiding repeated statement compilation overhead.  fetchall_arrayref
+	# always exhausts the result set, so the handle is never left active.
+	my $sth = $tmpdbh->prepare_cached($sql);
+	$sth->execute(@bind_vals);
+	return $sth->fetchall_arrayref({});
 }
 
 # _merge_criteria( \%base, \%extra ) -> \%merged
@@ -3128,6 +3405,127 @@ Unicode is used throughout this section as required by Z notation.
     -- Result identity invariant: both paths return identical rows.
     ∀ C : CRITERIA •
         _sqlite_join(C) = _joined_query_array(C)
+
+=head1 STATE DIAGRAM
+
+C<Database::Join> objects follow three independent finite state machines (FSMs).
+Each FSM is described with an ASCII diagram showing valid states (boxes), the
+triggers that cause transitions (arrows), and important side-effects.
+
+=head2 FSM 1: Object Lifecycle
+
+Governs the structural state of a C<Database::Join> instance.
+Query methods (C<selectall_arrayref>, C<fetchrow_hashref>, C<count>,
+C<columns>, C<schema>, C<updated>) are schema-preserving (Xi-transitions) and
+are not shown because they do not change state.
+
+    [pre-creation]
+         |
+         | new( databases => [...], join_column => '...' )
+         |   Side-effect: _col_db routing table built;
+         |                _autoload_pk cached from dbs[0]{id}
+         v
+    [CONSTRUCTED] <-----------------------------------------+
+         |    |                                              |
+         |    +--------------------------------------------+ |
+         |    (query methods: no structural change)         | |
+         |                                                  | |
+         |-- remove_column( col ) -------> [COL_REMOVED] <--+ |
+         |                                      |    |        |
+         |   Side-effect: col removed from       |    |        |
+         |   _col_db; _col_cache and             +----+        |
+         |   _schema_cache cleared.              (idempotent;  |
+         |   Join column cannot be removed.)      chainable)   |
+         |                                                     |
+         +-- add_database( db ) ----------> [DB_ADDED] <------+
+                                                |    |
+             Side-effect: new columns added;    |    | add_database( db )
+             _col_db extended; SQLite cache     |    | (chainable; each
+             invalidated (if any).              +----+  extends the view)
+
+    Note: COL_REMOVED and DB_ADDED are not mutually exclusive.
+    Both transitions are legal on any valid object, in any order.
+
+    Illegal triggers (always croak; object state is not changed):
+
+      Trigger                              Error
+      -----------------------------------  ---------------------------------
+      new( databases => [] )               error_no_databases
+      remove_column( join_column )         error_remove_join_column
+      add_database( non-reference )        error_invalid_database
+      new() with join_col absent from DB   error_join_col_absent
+
+=head2 FSM 2: SQLite Cache Lifecycle
+
+Governs the temporary SQLite cache used by the C<backend='sqlite'> and
+C<backend='auto'> join paths.  The cache does not exist until the first
+query on the SQLite path.
+
+    [ABSENT] <----- add_database( db )
+       |                  |
+       |  (no temp file)  | Side-effect: old DBI handle disconnected;
+       |                  |   _sqlite_cache deleted.
+       |                  |
+       |                  +<-------------------------------------------+
+       |                                                               |
+       | first query on SQLite path                                    |
+       | Side-effect: File::Temp db created in tmpdir;                 |
+       |   DBI connected; sources ATTACHed or spilled;                 |
+       |   _sqlite_cache = { dbh, tmpfile, n, updated, ... }           |
+       v                                                               |
+    [FRESH] <--+                                                       |
+       |        |                                                      |
+       |        | subsequent queries                                   |
+       |        | (cache reused; refaddr of _sqlite_cache unchanged)   |
+       +--------+                                                      |
+       |                                                               |
+       | updated() timestamp of any source DA changes                  |
+       | -- OR -- source row count changes                             |
+       | Side-effect: none yet (_cache_fresh returns false)            |
+       v                                                               |
+    [STALE]                                                            |
+       |                                                               |
+       | next query                                                    |
+       | Side-effect: old DBI handle disconnected; old temp file       |
+       |   unlinked; new temp file built from current source data.     |
+       +---------------------------------------------------------------+
+       (transitions to FRESH)
+
+    On object DESTROY:
+      FRESH/STALE:  DBI handle disconnected; File::Temp object released
+                    (temp file unlinked by File::Temp DESTROY).
+      ABSENT:       No temp file exists; no-op.
+
+=head2 FSM 3: Column Visibility (per column)
+
+Each column in the logical view independently follows a two-state machine.
+Transition from VISIBLE to REMOVED is one-way: C<add_database> never
+restores a column that is in C<_removed_cols>.
+
+    [VISIBLE] <-- initial state for every column at construction
+         |    |
+         |    | query / columns() / schema()
+         |    | (column present in results; no state change)
+         +----+
+         |
+         | remove_column( col )
+         | Side-effect: col deleted from _col_db;
+         |   _col_cache and _schema_cache cleared.
+         v
+    [REMOVED] <---+
+         |         |
+         |         | remove_column( col ) again
+         |         | (idempotent; no error; no second side-effect)
+         +---------+
+
+    One-way invariant:
+      If col is in _removed_cols, then add_database( db_that_has_col )
+      does NOT re-add it.  Formal: col_db' = col_db ⊕ { c | c in
+      ran(db.columns) \ {local_jc} \ removed }.
+
+    Illegal trigger:
+      remove_column( join_column )  -- error_remove_join_column (croaks;
+                                       state unchanged)
 
 =head1 AUTHOR
 

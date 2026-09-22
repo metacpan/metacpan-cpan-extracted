@@ -61,27 +61,27 @@
    "provides" : {
       "Linux::Event::WebSocket" : {
          "file" : "lib/Linux/Event/WebSocket.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Linux::Event::WebSocket::Client" : {
          "file" : "lib/Linux/Event/WebSocket/Client.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Linux::Event::WebSocket::Client::Connection" : {
          "file" : "lib/Linux/Event/WebSocket/Client/Connection.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Linux::Event::WebSocket::Connection" : {
          "file" : "lib/Linux/Event/WebSocket/Connection.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Linux::Event::WebSocket::Server" : {
          "file" : "lib/Linux/Event/WebSocket/Server.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Linux::Event::WebSocket::Server::Connection" : {
          "file" : "lib/Linux/Event/WebSocket/Server/Connection.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -95,6 +95,6 @@
          "web" : "https://github.com/haxmeister/perl-Linux-Event-WebSocket"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -93,7 +93,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "HTTP::Tiny::UNIX" => 0
   },
-  "VERSION" => "0.000147",
+  "VERSION" => "0.000148",
   "test" => {
     "TESTS" => "t/*.t t/UI/*.t t/integration/*.t"
   }

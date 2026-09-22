@@ -1,6 +1,6 @@
 package IO::K8s::Api::Certificates::V1beta1::PodCertificateRequest;
 # ABSTRACT: PodCertificateRequest encapsulates a pod's request for a certificate from a signer, as well as the signer's response, if any.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Certificates::V1beta1::PodCertificateRequest - PodCertificateReque
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ status contains the issued certificate, and a standard set of conditions.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#podcertificaterequest-v1beta1-certificates.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#podcertificaterequest-v1beta1-certificates.k8s.io>
 
 =head1 SUPPORT
 

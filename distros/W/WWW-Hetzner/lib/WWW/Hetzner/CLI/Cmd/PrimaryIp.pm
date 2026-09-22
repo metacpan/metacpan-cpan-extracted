@@ -1,11 +1,12 @@
 package WWW::Hetzner::CLI::Cmd::PrimaryIp;
 # ABSTRACT: Hetzner Cloud Primary IP commands
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl primary-ip <subcommand>';
+
 
 sub execute {
     my ($self) = @_;
@@ -33,7 +34,25 @@ WWW::Hetzner::CLI::Cmd::PrimaryIp - Hetzner Cloud Primary IP commands
 
 =head1 VERSION
 
-version 0.100
+version 0.101
+
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item * L<list|WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::List> - List primary IPs
+
+=item * L<describe|WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::Describe> - Describe a primary IP
+
+=item * L<create|WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::Create> - Create a primary IP
+
+=item * L<delete|WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::Delete> - Delete a primary IP
+
+=item * L<assign|WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::Assign> - Assign a primary IP to a server
+
+=item * L<unassign|WWW::Hetzner::CLI::Cmd::PrimaryIp::Cmd::Unassign> - Unassign a primary IP from its server
+
+=back
 
 =head1 SUPPORT
 
@@ -56,7 +75,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

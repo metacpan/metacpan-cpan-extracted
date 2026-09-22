@@ -3,7 +3,7 @@ NAME
     Perl 5.005_03
 
 VERSION
-    0.03
+    0.05
 
 SYNOPSIS
         # Place at the top of any script you wish to guard:
@@ -79,6 +79,11 @@ CHECKED CONSTRUCTS
       use vVERSION where VERSION >= v5.6
       \x{HHHH}                             Unicode hex escape
       \N{name}                             Named character escape
+                                           (both are detected in a regex
+                                           and in an interpolating string;
+                                           '...' q// qw// <<'WORD' are not
+                                           scanned -- they process no
+                                           escapes)
       @+ / @-  and  $+[N] / $-[N]         Match-position arrays
       CHECK { } / INIT { }                 Phase blocks
       v1.2.3                               v-string notation
@@ -86,6 +91,15 @@ CHECKED CONSTRUCTS
       sub foo :lvalue { }                  :lvalue attribute
       *name{SLOT}                          Typeglob component access
       \p{} / \P{}                          Unicode property in regex
+      open(my $fh, ...)                    Lexical filehandle (also
+      opendir(my $dh, ...)                 opendir/sysopen/pipe/socket/
+                                           socketpair/accept; only the
+                                           "my" spelling is reported)
+      binmode(FH, LAYER)                   5.005_03 binmode takes the
+                                           filehandle alone
+      use warnings / no warnings           Without the $INC{'warnings.pm'}
+                                           stub; the guarded idiom is
+                                           treated as compatible
 
     Perl 5.8
       use encoding

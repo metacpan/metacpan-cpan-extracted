@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::API::RRSets;
 # ABSTRACT: Hetzner Cloud DNS RRSets (Records) API
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::RRSet;
 use namespace::clean;
@@ -19,6 +20,8 @@ has zone_id => (
     is       => 'ro',
     required => 1,
 );
+
+with 'WWW::Hetzner::Role::HasActions';
 
 sub _wrap {
     my ($self, $data) = @_;
@@ -40,12 +43,20 @@ sub _base_path {
 }
 
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get($self->_base_path, params => \%params);
-    return $self->_wrap_list($result->{rrsets} // []);
+    return ($self->_wrap_list($result->{rrsets} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
 
 
 sub get {
@@ -100,7 +111,8 @@ sub delete {
     croak "Record type required" unless $type;
 
     my $path = $self->_base_path . "/$name/$type";
-    return $self->client->delete($path);
+    my $result = $self->client->delete($path);
+    return $self->_wrap_action($result->{action});
 }
 
 
@@ -189,7 +201,7 @@ WWW::Hetzner::Cloud::API::RRSets - Hetzner Cloud DNS RRSets (Records) API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -205,7 +217,7 @@ version 0.100
     my $rrsets = $zone->rrsets;
 
     # List all records
-    my $records = $rrsets->list;
+    my $records = $rrsets->list_all;
     my $records = $rrsets->list(type => 'A');
 
     # Get specific record
@@ -247,6 +259,15 @@ All methods return L<WWW::Hetzner::Cloud::RRSet> objects.
 Returns an arrayref of L<WWW::Hetzner::Cloud::RRSet> objects.
 Optional parameters: name, type, sort, page, per_page.
 
+=head2 list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
+
 =head2 get
 
     my $record = $rrsets->get($name, $type);
@@ -276,9 +297,10 @@ Updates an existing RRSet. Returns a L<WWW::Hetzner::Cloud::RRSet> object.
 
 =head2 delete
 
-    $rrsets->delete('www', 'A');
+    my $action = $rrsets->delete('www', 'A');
 
-Deletes an RRSet.
+Deletes an RRSet. Returns the L<WWW::Hetzner::Action> tracking the
+deletion; call C<< $action->wait >> to block until the RRSet is gone.
 
 =head2 add_a
 
@@ -349,7 +371,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

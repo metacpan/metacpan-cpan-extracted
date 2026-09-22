@@ -3,14 +3,18 @@ package WWW::Hetzner::Robot;
 # ABSTRACT: Perl client for Hetzner Robot API (Dedicated Servers)
 
 use Moo;
+use URI::Escape ();
 use WWW::Hetzner::Robot::API::Servers;
 use WWW::Hetzner::Robot::API::Keys;
 use WWW::Hetzner::Robot::API::IPs;
 use WWW::Hetzner::Robot::API::Reset;
 use WWW::Hetzner::Robot::API::Traffic;
+use WWW::Hetzner::Robot::API::Boot;
+use WWW::Hetzner::Robot::API::RDNS;
+use WWW::Hetzner::Robot::API::Failover;
 use namespace::clean;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 
 has user => (
@@ -65,6 +69,29 @@ sub _set_auth {
 }
 
 
+sub _content_type { 'application/x-www-form-urlencoded' }
+
+sub _encode_body {
+    my ($self, $body) = @_;
+    my @pairs;
+
+    for my $key (keys %$body) {
+        my $value = $body->{$key};
+        my $is_array = ref $value eq 'ARRAY';
+        my $form_key = $is_array && $key !~ /\[\]\z/ ? "$key\[\]" : $key;
+        my @values = $is_array ? @$value : ($value);
+
+        for my $value (@values) {
+            next unless defined $value;
+            push @pairs, URI::Escape::uri_escape_utf8($form_key) . '=' .
+                URI::Escape::uri_escape_utf8($value);
+        }
+    }
+
+    return join '&', @pairs;
+}
+
+
 # Resource accessors
 has servers => (
     is      => 'lazy',
@@ -96,6 +123,24 @@ has traffic => (
 );
 
 
+has boot => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::Boot->new(client => shift) },
+);
+
+
+has rdns => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::RDNS->new(client => shift) },
+);
+
+
+has failover => (
+    is      => 'lazy',
+    builder => sub { WWW::Hetzner::Robot::API::Failover->new(client => shift) },
+);
+
+
 
 1;
 
@@ -111,7 +156,7 @@ WWW::Hetzner::Robot - Perl client for Hetzner Robot API (Dedicated Servers)
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -129,6 +174,11 @@ version 0.100
     my $server = $robot->servers->get(123456);
     print $server->name, "\n";
     print $server->product, "\n";
+
+    # Boot the rescue system (arm, then reset into it)
+    my $rescue = $robot->boot->enable_rescue(123456, os => 'linux');
+    print $rescue->{password}, "\n";
+    $robot->reset->execute(123456, 'hw');
 
     # Reset server
     $robot->reset->execute(123456, 'sw');  # software reset
@@ -162,6 +212,12 @@ Uses HTTP Basic Auth (user/password) instead of Bearer tokens.
 
 =item * traffic - Traffic statistics
 
+=item * boot - Boot configuration (rescue system, Linux/VNC/Windows installation)
+
+=item * rdns - Reverse DNS entries
+
+=item * failover - Failover IP routing
+
 =back
 
 =head2 user
@@ -179,6 +235,11 @@ Base URL for the Robot API. Defaults to C<https://robot-ws.your-server.de>.
 =head2 _set_auth
 
 Override for Basic Auth instead of Bearer token authentication.
+
+=head2 _encode_body
+
+Encode Robot request bodies as C<application/x-www-form-urlencoded>. Arrayref
+values become repeated C<name[]> fields without duplicating an existing C<[]> suffix.
 
 =head2 servers
 
@@ -199,6 +260,19 @@ Returns a L<WWW::Hetzner::Robot::API::Reset> instance for server reset operation
 =head2 traffic
 
 Returns a L<WWW::Hetzner::Robot::API::Traffic> instance for traffic statistics.
+
+=head2 boot
+
+Returns a L<WWW::Hetzner::Robot::API::Boot> instance for boot configuration
+(rescue system, Linux, VNC and Windows installation).
+
+=head2 rdns
+
+Returns a L<WWW::Hetzner::Robot::API::RDNS> instance for reverse DNS entries.
+
+=head2 failover
+
+Returns a L<WWW::Hetzner::Robot::API::Failover> instance for failover IP routing.
 
 =head1 ENVIRONMENT
 
@@ -235,7 +309,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

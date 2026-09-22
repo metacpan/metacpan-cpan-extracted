@@ -3,7 +3,7 @@
 require 5.010;
 use strict;
 package Chem::Structure::Parser;
-our $VERSION = 0.031;
+our $VERSION = 0.032;
 require XSLoader;
 use warnings FATAL => 'all';
 # No `use autodie': it would ask every installer for a prerequisite in order to
@@ -964,6 +964,12 @@ sub _options {
 	my %o = (%DEFAULT, %$opt);
 	die "$who: altloc must be 'first' or 'highest', not '$o{altloc}'"
 		unless $o{altloc} eq 'first' || $o{altloc} eq 'highest';
+	# features is a switch here and not the option hash structure_features()
+	# takes: `features => { sasa => 0 }` is a true value, so every feature would
+	# be computed, the surface included, and the caller told nothing.  That is
+	# the ignored option the check above exists for, spelled with a real name.
+	die "$who: features is 1 or 0 here; the per-feature options are "
+	  . "structure_features(\$info, ...)'s" if ref $o{features};
 	if (defined $o{chains}) {
 		die "$who: chains must be an array reference"
 			unless (reftype($o{chains}) || '') eq 'ARRAY';
@@ -1069,9 +1075,18 @@ sub _slurp_maybe_gzipped {
 		defined(read $fh, $text, $limit)
 			or die "Can't read from '$file': '$!'";
 	} else {
+		# readline in slurp mode returns undef for an empty file and for a read
+		# that failed alike, and readline is not a builtin autodie covered, so
+		# $! is what tells the two apart -- cleared first, because it is only
+		# meaningful where something set it.  An I/O error read as an empty
+		# string is a structure with no atoms and nothing said so.
 		local $/;
+		$! = 0;
 		$text = <$fh>;
-		$text = '' unless defined $text;
+		unless (defined $text) {
+			die "Can't read from '$file': '$!'" if $!;
+			$text = '';
+		}
 	}
 	close $fh or die "Can't close '$file': '$!'";
 	return $text;

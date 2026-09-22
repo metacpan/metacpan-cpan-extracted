@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1beta1::MutatingAdmissionPolicyBinding;
 # ABSTRACT: MutatingAdmissionPolicyBinding binds the MutatingAdmissionPolicy with parametrized resources. MutatingAdmissionPolicyBinding and the optional parameter resource together define how cluster administrators configure policies for clusters.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -20,7 +20,7 @@ IO::K8s::Api::Admissionregistration::V1beta1::MutatingAdmissionPolicyBinding - M
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ spec defines the desired behavior of the MutatingAdmissionPolicyBinding.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#mutatingadmissionpolicybinding-v1beta1-admissionregistration.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#mutatingadmissionpolicybinding-v1beta1-admissionregistration.k8s.io>
 
 =head1 SUPPORT
 

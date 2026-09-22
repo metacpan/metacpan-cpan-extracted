@@ -1,5 +1,5 @@
 package Kubernetes::REST::Authentication;
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 # ABSTRACT: Compatibility helper for deprecated v0 Authentication calls
 use Moo;
 extends 'Kubernetes::REST::V0Group';
@@ -20,7 +20,7 @@ Kubernetes::REST::Authentication - Compatibility helper for deprecated v0 Authen
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 SYNOPSIS
 

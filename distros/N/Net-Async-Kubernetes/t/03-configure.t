@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
+use File::Temp ();
 
 use IO::Async::Loop;
 use Net::Async::Kubernetes;
@@ -89,23 +91,91 @@ subtest 'no config and no auto-detection' => sub {
 };
 
 # ============================================================================
-# kubeconfig loading (if available)
+# kubeconfig loading (against a fixture, never the running system's config)
 # ============================================================================
 
-SKIP: {
-    skip 'No kubeconfig available', 3
-        unless -f ($ENV{KUBECONFIG} // "$ENV{HOME}/.kube/config");
+# A kubeconfig test must not read the kubeconfig of the machine it runs on.
+# Even a perfectly valid foreign config is no basis for a test: it may use an
+# exec auth plugin, name an unreachable cluster or an unusual cert setup, and
+# a degenerate one takes the whole run down (GitHub issue #1). Everything below
+# runs against fixtures in a throwaway HOME instead.
 
-    subtest 'new with kubeconfig' => sub {
-        my $kube = Net::Async::Kubernetes->new(
-            kubeconfig => ($ENV{KUBECONFIG} // "$ENV{HOME}/.kube/config"),
-        );
-        ok($kube->server, 'server resolved from kubeconfig');
-        isa_ok($kube->server, 'Kubernetes::REST::Server');
-        ok($kube->credentials, 'credentials resolved from kubeconfig');
-        like($kube->server->endpoint, qr{^https?://}, 'endpoint is a URL');
-    };
+# Write $yaml as the kubeconfig of a temporary HOME. Returns the File::Temp
+# directory object - which removes the directory once it goes out of scope, so
+# the caller has to keep it - and the path of the file inside it.
+sub kubeconfig_fixture {
+    my ($yaml) = @_;
+    my $home = File::Temp->newdir;
+    mkdir "$home/.kube" or die "mkdir $home/.kube: $!";
+    my $path = "$home/.kube/config";
+    open my $fh, '>', $path or die "open $path: $!";
+    print $fh $yaml;
+    close $fh or die "close $path: $!";
+    return ($home, $path);
 }
+
+subtest 'new with kubeconfig' => sub {
+    my ($home, $path) = kubeconfig_fixture(<<'YAML');
+apiVersion: v1
+kind: Config
+clusters:
+  - name: fixture-cluster
+    cluster:
+      server: https://k8s.fixture.local:6443
+      insecure-skip-tls-verify: true
+contexts:
+  - name: fixture-context
+    context:
+      cluster: fixture-cluster
+      user: fixture-user
+current-context: fixture-context
+users:
+  - name: fixture-user
+    user:
+      token: fixture-token
+YAML
+
+    # Both variables point at the fixture, so neither the explicit path nor any
+    # indirect resolution (KUBECONFIG, ~/.kube/config) can reach the config of
+    # the machine running the test.
+    local $ENV{HOME} = "$home";
+    local $ENV{KUBECONFIG} = $path;
+
+    my $kube = Net::Async::Kubernetes->new(kubeconfig => $path);
+    ok($kube->server, 'server resolved from kubeconfig');
+    isa_ok($kube->server, 'Kubernetes::REST::Server');
+    is($kube->server->endpoint, 'https://k8s.fixture.local:6443',
+        'endpoint from fixture cluster');
+    ok($kube->credentials, 'credentials resolved from kubeconfig');
+    is($kube->credentials->token, 'fixture-token', 'token from fixture user');
+};
+
+subtest 'degenerate kubeconfig croaks instead of killing the run' => sub {
+    # The config from GitHub issue #1: written by tooling that never reached a
+    # cluster, so it has no clusters, contexts or users at all. An explicitly
+    # passed kubeconfig must resolve or croak (Net::Async::Kubernetes::configure
+    # deliberately does not eval it), and that croak has to stay catchable.
+    my ($home, $path) = kubeconfig_fixture(<<'YAML');
+apiVersion: v1
+clusters: null
+contexts: null
+current-context: ""
+kind: Config
+preferences: {}
+users: null
+YAML
+
+    local $ENV{HOME} = "$home";
+    local $ENV{KUBECONFIG} = $path;
+
+    # Matched loosely on purpose: what is asserted here is that the failure
+    # arrives as a catchable, diagnosable exception about resolving the
+    # kubeconfig - not the exact wording of Kubernetes::REST, which is being
+    # reworded separately.
+    throws_ok {
+        Net::Async::Kubernetes->new(kubeconfig => $path)
+    } qr/context|kubeconfig/i, 'degenerate kubeconfig croaks, catchably';
+};
 
 # ============================================================================
 # _rest lazy builder

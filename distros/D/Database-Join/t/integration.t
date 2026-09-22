@@ -28,7 +28,7 @@ use Scalar::Util qw(blessed refaddr);
 BEGIN {
 	eval { require DBD::SQLite; require DBI; require Database::Abstraction };
 	plan skip_all => 'DBD::SQLite, DBI, and Database::Abstraction required' if $@;
-	plan tests => 64;
+	plan tests => 78;
 	use_ok('Database::Join');
 }
 
@@ -1142,4 +1142,343 @@ subtest 'execute(): croaks with the documented unsupported-operation message' =>
 		'execute() croaks with the documented message';
 };
 
-diag('section 16 done -- integration tests complete') if $ENV{TEST_VERBOSE};
+diag('section 16 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 17 -- SQLite backend dispatch and object lifecycle (7 subtests)
+#
+# Exercises the three backend modes (array / sqlite / auto), verifies that
+# the per-object temp-file is created on first query and removed on DESTROY,
+# and confirms that add_database() invalidates the cache so the next query
+# sees the new source.
+#
+# Path-disambiguation technique from CLAUDE.md: passing
+#   tmpdir => '/nonexistent/__no_such_dir__'
+# proves which path a query took without inspecting internals:
+#   array path  -- tmpdir never accessed  → query succeeds
+#   sqlite path -- File::Temp dies        → query croaks
+# ===========================================================================
+
+# Shared InMemDA fixtures for section 17 (isolated from the SQLite-backed DAs
+# used earlier so test state does not bleed between sections).
+my $s17_db_a = InMemDA->new(
+	cols => [$JC, 'city'],
+	rows => [
+		{ entry => 'TX', city => 'Austin' },
+		{ entry => 'CA', city => 'LA'     },
+	],
+	updated => 1_000_000,
+);
+my $s17_db_b = InMemDA->new(
+	cols => [$JC, 'pop_m'],
+	rows => [
+		{ entry => 'TX', pop_m => 29 },
+		{ entry => 'CA', pop_m => 39 },
+	],
+	updated => 1_000_000,
+);
+
+Readonly::Scalar my $BAD_TMPDIR => '/nonexistent/__no_such_dir__';
+Readonly::Scalar my $S17_ROWS   => 2;   # two states in the fixture
+
+subtest 'backend=array: query succeeds with an invalid tmpdir (array path never touches it)' => sub {
+	plan tests => 2;
+	my $j = Database::Join->new(
+		databases => [$s17_db_a, $s17_db_b],
+		join_column => $JC,
+		backend     => 'array',
+		tmpdir      => $BAD_TMPDIR,
+	);
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref() }
+		'backend=array succeeds despite invalid tmpdir (tmpdir never accessed)';
+	is(scalar @{$rows}, $S17_ROWS,
+		'backend=array returns the correct row count');
+};
+
+subtest 'backend=auto: InMemDA stubs (no count()) fall back to the array path' => sub {
+	plan tests => 1;
+	# InMemDA does not define count() in its own package, so 'auto' cannot
+	# determine the row count and conservatively uses the array path.
+	# Proof: query succeeds even though tmpdir does not exist.
+	my $j = Database::Join->new(
+		databases => [$s17_db_a, $s17_db_b],
+		join_column => $JC,
+		backend     => 'auto',
+		tmpdir      => $BAD_TMPDIR,
+	);
+	lives_ok { $j->selectall_arrayref() }
+		'backend=auto falls back to array when DA cannot supply a row count';
+};
+
+subtest 'backend=sqlite: produces the same rows as backend=array (semantic equivalence)' => sub {
+	plan tests => 2;
+	my $j_arr = Database::Join->new(
+		databases => [$s17_db_a, $s17_db_b],
+		join_column => $JC, backend => 'array',
+	);
+	my $j_sql = Database::Join->new(
+		databases => [$s17_db_a, $s17_db_b],
+		join_column => $JC, backend => 'sqlite',
+	);
+	is($j_sql->count(), $j_arr->count(),
+		'SQLite path returns the same row count as the array path');
+	my @sql_keys = sort map { $_->{$JC} } @{ $j_sql->selectall_arrayref() };
+	my @arr_keys = sort map { $_->{$JC} } @{ $j_arr->selectall_arrayref() };
+	is_deeply(\@sql_keys, \@arr_keys,
+		'SQLite and array paths return rows for the same join-key values');
+};
+
+subtest 'backend=sqlite: temp .db file exists while the join object is alive' => sub {
+	plan tests => 2;
+	my $tmpdir = tempdir(CLEANUP => 1);
+	my $j = Database::Join->new(
+		databases   => [$s17_db_a, $s17_db_b],
+		join_column => $JC,
+		backend     => 'sqlite',
+		tmpdir      => $tmpdir,
+	);
+	$j->selectall_arrayref();   # triggers cache build → temp file created
+	my @files = glob("$tmpdir/*.db");
+	is(scalar @files, 1, 'exactly one .db temp file present after first query');
+	ok(-f $files[0],            'temp .db file is a regular file');
+};
+
+subtest 'backend=sqlite: temp .db file removed after the join object is destroyed' => sub {
+	plan tests => 1;
+	my $tmpdir = tempdir(CLEANUP => 1);
+	{
+		my $j = Database::Join->new(
+			databases   => [$s17_db_a, $s17_db_b],
+			join_column => $JC,
+			backend     => 'sqlite',
+			tmpdir      => $tmpdir,
+		);
+		$j->selectall_arrayref();   # builds cache → temp file created
+	}   # $j goes out of scope → DESTROY disconnects and releases File::Temp
+	my @files = glob("$tmpdir/*.db");
+	is(scalar @files, 0, 'no .db files remain after the join object is destroyed');
+};
+
+subtest 'backend=sqlite: add_database invalidates cache; new columns visible on next query' => sub {
+	plan tests => 2;
+	my $j = Database::Join->new(
+		databases   => [$s17_db_a],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();   # build initial cache (only city column)
+	ok(!grep({ $_ eq 'pop_m' } @{ $j->columns() }),
+		'pop_m absent from columns() before add_database');
+	$j->add_database($s17_db_b);
+	ok( grep({ $_ eq 'pop_m' } @{ $j->columns() }),
+		'pop_m visible after add_database invalidates the cache');
+};
+
+subtest 'error_invalid_backend: croaks with the documented message' => sub {
+	plan tests => 1;
+	throws_ok {
+		Database::Join->new(
+			databases   => [$s17_db_a, $s17_db_b],
+			join_column => $JC,
+			backend     => 'bogus',
+		)
+	} qr/backend.*(?:array|sqlite|auto)/i,
+		'invalid backend value croaks mentioning the allowed values';
+};
+
+diag('section 17 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 18 -- SQLite backend: criteria and operator filtering (4 subtests)
+#
+# Query-time criteria go into per-call SQL WHERE clauses on the SQLite path.
+# These tests verify that equality, operator-hashref, and compound criteria
+# produce the same results as the array path, and that unsafe operators are
+# silently dropped without causing an exception.
+# ===========================================================================
+
+# Shared fixtures for section 18.
+my $s18_db_a = InMemDA->new(
+	cols => [$JC, 'name', 'tier'],
+	rows => [
+		{ entry => 'A', name => 'Alpha', tier => 'gold'   },
+		{ entry => 'B', name => 'Beta',  tier => 'silver' },
+		{ entry => 'C', name => 'Gamma', tier => 'gold'   },
+	],
+	updated => 2_000_000,
+);
+my $s18_db_b = InMemDA->new(
+	cols => [$JC, 'score'],
+	rows => [
+		{ entry => 'A', score => 95 },
+		{ entry => 'B', score => 70 },
+		{ entry => 'C', score => 55 },
+	],
+	updated => 2_000_000,
+);
+
+Readonly::Scalar my $S18_ALL   => 3;
+Readonly::Scalar my $S18_GOLD  => 2;
+Readonly::Scalar my $S18_HI    => 1;   # score > 80: only Alpha
+
+subtest 'backend=sqlite: equality criterion returns the matching row' => sub {
+	plan tests => 2;
+	my $j = Database::Join->new(
+		databases => [$s18_db_a, $s18_db_b],
+		join_column => $JC, backend => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(tier => 'gold');
+	is(scalar @{$rows}, $S18_GOLD, 'tier=gold returns the two gold-tier rows');
+	ok((grep { $_->{tier} eq 'gold' } @{$rows}) == $S18_GOLD,
+		'all returned rows have tier=gold');
+};
+
+subtest 'backend=sqlite: operator-hashref criterion (>) filters correctly' => sub {
+	plan tests => 2;
+	my $j = Database::Join->new(
+		databases => [$s18_db_a, $s18_db_b],
+		join_column => $JC, backend => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(score => { '>' => 80 });
+	is(scalar @{$rows}, $S18_HI,
+		'score > 80 returns exactly one row (Alpha with score=95)');
+	is($rows->[0]{name}, 'Alpha', 'returned row is Alpha');
+};
+
+subtest 'backend=sqlite: compound criteria on two columns filter with AND semantics' => sub {
+	plan tests => 1;
+	# tier=gold AND score < 90: Alpha (95 fails < 90), Beta (silver fails), Gamma (55 passes).
+	# Expected: only Gamma.
+	my $j = Database::Join->new(
+		databases => [$s18_db_a, $s18_db_b],
+		join_column => $JC, backend => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(tier => 'gold', score => { '<' => 90 });
+	is(scalar @{$rows}, 1,
+		'tier=gold AND score<90 returns exactly one row (Gamma)');
+};
+
+subtest 'backend=sqlite: unsafe operator key is silently dropped (no SQL injection, no croak)' => sub {
+	plan tests => 2;
+	# A hashref criterion with an operator key not in %SAFE_SQL_OPS must be
+	# dropped before interpolation.  The query must succeed and return all rows
+	# (no WHERE predicate applied for the invalid operator).
+	my $j = Database::Join->new(
+		databases => [$s18_db_a, $s18_db_b],
+		join_column => $JC, backend => 'sqlite',
+	);
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref(score => { 'DROP TABLE t1;--' => 99 }) }
+		'unsafe operator key does not croak';
+	is(scalar @{$rows}, $S18_ALL,
+		'all rows returned when the only operator key is unsafe (no WHERE clause applied)');
+};
+
+diag('section 18 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 19 -- SQLite backend with advanced features (3 subtests)
+#
+# Confirms that collision_prefix, join_map, and permanent filters all work
+# correctly end-to-end on the SQLite path, producing identical semantics to
+# the in-memory array path.
+# ===========================================================================
+
+subtest 'backend=sqlite: collision_prefix preserved in merged rows' => sub {
+	plan tests => 3;
+	# Two databases both have a 'notes' column.  With collision_prefix => {1 => 'ext'},
+	# the merged row must carry 'notes' (primary) and 'ext.notes' (secondary).
+	my $db0 = InMemDA->new(
+		cols => [$JC, 'notes', 'amount'],
+		rows => [ { entry => 'K1', notes => 'note-a', amount => 10 } ],
+		updated => 3_000_000,
+	);
+	my $db1 = InMemDA->new(
+		cols => [$JC, 'notes', 'price'],
+		rows => [ { entry => 'K1', notes => 'note-b', price => 5 } ],
+		updated => 3_000_000,
+	);
+	my $j = Database::Join->new(
+		databases        => [$db0, $db1],
+		join_column      => $JC,
+		backend          => 'sqlite',
+		collision_prefix => { 1 => 'ext' },
+	);
+	my $row = $j->fetchrow_hashref($JC => 'K1');
+	is($row->{notes},      'note-a', "plain 'notes' holds the primary-DB value on SQLite path");
+	is($row->{'ext.notes'}, 'note-b', "'ext.notes' holds the secondary-DB value on SQLite path");
+	ok(!exists $row->{'ext.entry'},
+		'join_column is never prefixed even when collision_prefix is active');
+};
+
+subtest 'backend=sqlite: join_map ON clause correctly links differently-named key columns' => sub {
+	plan tests => 2;
+	# DB 0 uses 'entry' as join key; DB 1 uses 'ref_id'.
+	# The SQLite JOIN ON clause must use the local alias for each source.
+	my $db0 = InMemDA->new(
+		cols => [$JC, 'city'],
+		rows => [
+			{ entry => 'TX', city => 'Austin' },
+			{ entry => 'CA', city => 'LA'     },
+		],
+		updated => 3_000_000,
+	);
+	my $db1 = InMemDA->new(
+		cols => ['ref_id', 'pop_m'],
+		rows => [
+			{ ref_id => 'TX', pop_m => 29 },
+			{ ref_id => 'CA', pop_m => 39 },
+		],
+		updated => 3_000_000,
+	);
+	my $j = Database::Join->new(
+		databases   => [$db0, $db1],
+		join_column => $JC,
+		join_map    => { 1 => 'ref_id' },
+		backend     => 'sqlite',
+	);
+	is($j->count(), 2, 'join_map join: SQLite path returns both rows');
+	my $row = $j->fetchrow_hashref('TX');
+	is($row->{pop_m}, 29, 'join_map join: TX row has correct pop_m on SQLite path');
+};
+
+subtest 'backend=sqlite: permanent filter restricts rows from the secondary source' => sub {
+	plan tests => 2;
+	# filter on DB 1: score > 60.  Alice=95 and Beta=70 pass; Gamma=55 fails.
+	# On the SQLite path, filter criteria are applied at spill time.
+	my $db0 = InMemDA->new(
+		cols => [$JC, 'name'],
+		rows => [
+			{ entry => 'A', name => 'Alice' },
+			{ entry => 'B', name => 'Beta'  },
+			{ entry => 'C', name => 'Gamma' },
+		],
+		updated => 3_000_000,
+	);
+	my $db1 = InMemDA->new(
+		cols => [$JC, 'score'],
+		rows => [
+			{ entry => 'A', score => 95 },
+			{ entry => 'B', score => 70 },
+			{ entry => 'C', score => 55 },
+		],
+		updated => 3_000_000,
+	);
+	my $j = Database::Join->new(
+		databases   => [$db0, $db1],
+		join_column => $JC,
+		backend     => 'sqlite',
+		join_type   => 'left',
+		filters     => { 1 => { score => { '>' => 60 } } },
+	);
+	# The filtered secondary DA acts as an inner-join partner: Gamma (score=55)
+	# is excluded because it has no row in the filtered secondary result.
+	is($j->count(), 2,
+		'filter applied at spill time: only 2 rows survive score>60 on SQLite path');
+	my @names = sort map { $_->{name} } @{ $j->selectall_arrayref() };
+	is_deeply(\@names, ['Alice', 'Beta'],
+		'surviving rows are Alice (score=95) and Beta (score=70)');
+};
+
+diag('section 19 done -- integration tests complete') if $ENV{TEST_VERBOSE};

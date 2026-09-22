@@ -204,6 +204,12 @@ static uint64_t sa_peers_offset(uint32_t reg_max) {
 #define SA_E_FULL   (-12)
 #define SA_E_NOATOMICS (-13)
 #define SA_E_SHAPE  (-14)
+/* The stripe was held for the whole of a bounded wait. A TRANSIENT answer, and
+ * the reason it is not SA_E_FULL: "the arena is full" tells a caller to stop,
+ * and this one means try again. They were the same code until a loaded smoker
+ * reported two refused carves in an arena with room for four hundred more, and
+ * nothing in the answer said which of the two had happened. */
+#define SA_E_BUSY   (-15)
 
 /* What a bind asks about a map's or a cache's values: 0 for opaque bytes, 1 for
  * Struct::Codec's encoding, and SA_SER_ANY to take whatever the tenant already
@@ -230,6 +236,7 @@ static const char *sa_strerror(int rc) {
     case SA_E_FULL:     return "has no room left";
     case SA_E_NOATOMICS:return "needs atomics this build does not have";
     case SA_E_SHAPE:    return "is already carved with a different type or size";
+    case SA_E_BUSY:     return "was held by another process for the whole of a bounded wait";
     default:            return "is not usable";
     }
 }

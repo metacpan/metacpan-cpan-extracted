@@ -22,8 +22,9 @@ policy and Linux-only runtime:
   effects can occur;
 - every received Ping retains its own Pong response instead of keeping only the
   latest pending Pong;
-- when control messages are exposed, a received Close is copied before the
-  original object is retained for automatic echo.
+- when control messages are exposed, a validated received Close is copied before
+  the original object is retained for automatic echo; rejected Close frames are
+  never copied, preserving native allocation ownership on protocol errors.
 
 The XS adapter additionally configures bq with skip_handshake, disables its
 automatic ping/timeout policy, removes the library's partial-fragment count cap

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodStatus;
 # ABSTRACT: PodStatus represents information about the status of a pod. Status may trail the actual state of a system, especially if the node that hosts the pod cannot contact the control plane.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s allocatedResources => { Str => 1 };
@@ -66,6 +66,9 @@ k8s resources => 'Core::V1::ResourceRequirements';
 k8s startTime => Time;
 
 
+k8s volumeHealth => ['Core::V1::PodVolumeHealth'];
+
+
 1;
 
 __END__
@@ -80,7 +83,7 @@ IO::K8s::Api::Core::V1::PodStatus - PodStatus represents information about the s
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 allocatedResources
 
@@ -171,6 +174,10 @@ This value is only set when PodLevelResources feature gate is enabled and the to
 =head2 startTime
 
 RFC 3339 date and time at which the object was acknowledged by the Kubelet. This is before the Kubelet pulled the container image(s) for the pod.
+
+=head2 volumeHealth
+
+volumeHealth contains node-reported health for each volume the pod is using. Populated by the kubelet on the pod's node.
 
 =head1 SUPPORT
 

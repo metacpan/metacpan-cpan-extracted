@@ -23,7 +23,7 @@ luv - command-line package manager for love2d projects
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

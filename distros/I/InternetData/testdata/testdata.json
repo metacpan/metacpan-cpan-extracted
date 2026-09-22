@@ -27,7 +27,7 @@
       }
     },
     {
-      "name": "licence-lapsed",
+      "name": "license-lapsed",
       "status": 403,
       "headers": {},
       "body": {
@@ -76,6 +76,20 @@
         "kind": "bad_request",
         "retryable": false,
         "message": "INVALID_FORMAT"
+      }
+    },
+    {
+      "name": "unlisted-4xx-is-not-retryable",
+      "why": "The RANGE is the rule, not a list of statuses. An SDK that enumerated 400 and 404 passed every other case here while a 422 fell through to the retryable server_error default.",
+      "status": 422,
+      "headers": {},
+      "body": {
+        "rc": "INVALID_REQUEST"
+      },
+      "expect": {
+        "kind": "bad_request",
+        "retryable": false,
+        "message": "INVALID_REQUEST"
       }
     },
     {
@@ -142,5 +156,1143 @@
       "no-catalog-is-compiled-into-the-client",
       "a-listing-is-never-reused-across-clients"
     ]
+  },
+  "oauth": {
+    "why": "The public OAuth accessor (docs/sdk/oauth.md). Arguments use the canonical parameter names; form fields and response members are WIRE names, mapped by each SDK exactly as it maps any other response. mslm:apikey_id and mslm:apikey surface as apikey_id and apikey.",
+    "endpoints": {
+      "metadata": {
+        "method": "GET",
+        "path": "/.well-known/oauth-authorization-server"
+      },
+      "deviceAuthorization": {
+        "method": "POST",
+        "path": "/oauth/device_authorization"
+      },
+      "token": {
+        "method": "POST",
+        "path": "/oauth/token"
+      },
+      "revoke": {
+        "method": "POST",
+        "path": "/oauth/revoke"
+      }
+    },
+    "noCredential": {
+      "why": "Build the client WITH this key, call every OAuth operation, and assert none of it leaves: no Authorization or X-Api-Key header, no apikey query parameter, and the key string nowhere in the URL, a header or the body.",
+      "apiKey": "id_test_SECRET_must_not_leave",
+      "forbiddenHeaders": [
+        "authorization",
+        "x-api-key"
+      ],
+      "forbiddenQuery": [
+        "apikey"
+      ]
+    },
+    "forms": {
+      "why": "Decode the received body as application/x-www-form-urlencoded (+ is a space) and compare the field map EXACTLY: same keys, no extras, same values. Values carrying + & = % / space and non-ASCII catch an encoder that leaves any of them raw. Field order is not significant.",
+      "contentType": "application/x-www-form-urlencoded",
+      "cases": [
+        {
+          "name": "device-authorization-client-only",
+          "operation": "deviceAuthorization",
+          "endpoint": "deviceAuthorization",
+          "args": {
+            "clientId": "internetdata-cli"
+          },
+          "fields": {
+            "client_id": "internetdata-cli"
+          }
+        },
+        {
+          "name": "device-authorization-scope-and-resource",
+          "operation": "deviceAuthorization",
+          "endpoint": "deviceAuthorization",
+          "args": {
+            "clientId": "internetdata-cli",
+            "scope": "account.read apikeys.read apikeys.reveal",
+            "resource": "https://internetdata.io/"
+          },
+          "fields": {
+            "client_id": "internetdata-cli",
+            "scope": "account.read apikeys.read apikeys.reveal",
+            "resource": "https://internetdata.io/"
+          }
+        },
+        {
+          "name": "exchange-device-code",
+          "operation": "exchangeDeviceCode",
+          "endpoint": "token",
+          "args": {
+            "clientId": "internetdata-cli",
+            "deviceCode": "mo_dc_Zq7+/="
+          },
+          "fields": {
+            "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+            "device_code": "mo_dc_Zq7+/=",
+            "client_id": "internetdata-cli"
+          }
+        },
+        {
+          "name": "exchange-refresh-token",
+          "operation": "exchangeRefreshToken",
+          "endpoint": "token",
+          "args": {
+            "clientId": "internetdata-cli",
+            "refreshToken": "mo_rt_a+b c&d=é"
+          },
+          "fields": {
+            "grant_type": "refresh_token",
+            "refresh_token": "mo_rt_a+b c&d=é",
+            "client_id": "internetdata-cli"
+          }
+        },
+        {
+          "name": "revoke",
+          "operation": "revoke",
+          "endpoint": "revoke",
+          "args": {
+            "clientId": "internetdata-cli",
+            "token": "mo_rt_x+y/z="
+          },
+          "fields": {
+            "token": "mo_rt_x+y/z=",
+            "client_id": "internetdata-cli"
+          }
+        }
+      ]
+    },
+    "responses": {
+      "why": "Decoding a 2xx. Every listed member is present with that value; every absent one is the language's absence, never an empty string or zero. An empty scope string is PRESENT.",
+      "metadata": [
+        {
+          "name": "production-document",
+          "status": 200,
+          "body": {
+            "issuer": "https://internetdata.io",
+            "authorization_endpoint": "https://internetdata.io/oauth/authorize",
+            "token_endpoint": "https://internetdata.io/oauth/token",
+            "device_authorization_endpoint": "https://internetdata.io/oauth/device_authorization",
+            "revocation_endpoint": "https://internetdata.io/oauth/revoke",
+            "scopes_supported": [
+              "account.read",
+              "apikeys.read",
+              "apikeys.reveal",
+              "apikeys.manage",
+              "org.read",
+              "billing.read"
+            ],
+            "response_types_supported": [
+              "code"
+            ],
+            "grant_types_supported": [
+              "authorization_code",
+              "refresh_token",
+              "urn:ietf:params:oauth:grant-type:device_code"
+            ],
+            "token_endpoint_auth_methods_supported": [
+              "none"
+            ],
+            "code_challenge_methods_supported": [
+              "S256"
+            ],
+            "authorization_response_iss_parameter_supported": true,
+            "service_documentation": "https://internetdata.io/"
+          },
+          "expect": {
+            "present": {
+              "issuer": "https://internetdata.io",
+              "authorization_endpoint": "https://internetdata.io/oauth/authorize",
+              "token_endpoint": "https://internetdata.io/oauth/token",
+              "device_authorization_endpoint": "https://internetdata.io/oauth/device_authorization",
+              "revocation_endpoint": "https://internetdata.io/oauth/revoke",
+              "scopes_supported": [
+                "account.read",
+                "apikeys.read",
+                "apikeys.reveal",
+                "apikeys.manage",
+                "org.read",
+                "billing.read"
+              ],
+              "response_types_supported": [
+                "code"
+              ],
+              "grant_types_supported": [
+                "authorization_code",
+                "refresh_token",
+                "urn:ietf:params:oauth:grant-type:device_code"
+              ],
+              "token_endpoint_auth_methods_supported": [
+                "none"
+              ],
+              "code_challenge_methods_supported": [
+                "S256"
+              ],
+              "authorization_response_iss_parameter_supported": true,
+              "service_documentation": "https://internetdata.io/"
+            },
+            "absent": []
+          }
+        }
+      ],
+      "deviceAuthorization": [
+        {
+          "name": "with-complete-uri",
+          "status": 200,
+          "body": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+            "expires_in": 900,
+            "interval": 5
+          },
+          "expect": {
+            "present": {
+              "device_code": "mo_dc_poll",
+              "user_code": "BCDF-GHJK",
+              "verification_uri": "https://app.internetdata.io/device",
+              "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+              "expires_in": 900,
+              "interval": 5
+            },
+            "absent": []
+          }
+        },
+        {
+          "name": "without-complete-uri",
+          "status": 200,
+          "body": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "expires_in": 900,
+            "interval": 5
+          },
+          "expect": {
+            "present": {
+              "device_code": "mo_dc_poll",
+              "user_code": "BCDF-GHJK",
+              "verification_uri": "https://app.internetdata.io/device",
+              "expires_in": 900,
+              "interval": 5
+            },
+            "absent": [
+              "verification_uri_complete"
+            ]
+          }
+        }
+      ],
+      "token": [
+        {
+          "name": "device-grant-hands-over-the-key",
+          "status": 200,
+          "body": {
+            "access_token": "mo_at_7Qm1",
+            "token_type": "Bearer",
+            "expires_in": 3600,
+            "refresh_token": "mo_rt_9Xc4",
+            "scope": "account.read apikeys.read apikeys.reveal",
+            "mslm:apikey_id": "3f1c2a4e-8d7b-4c6a-9e2f-5b0d1c7a8e93",
+            "mslm:apikey": "id_live_example_not_a_real_key"
+          },
+          "expect": {
+            "present": {
+              "access_token": "mo_at_7Qm1",
+              "token_type": "Bearer",
+              "expires_in": 3600,
+              "refresh_token": "mo_rt_9Xc4",
+              "scope": "account.read apikeys.read apikeys.reveal",
+              "apikey_id": "3f1c2a4e-8d7b-4c6a-9e2f-5b0d1c7a8e93",
+              "apikey": "id_live_example_not_a_real_key"
+            },
+            "absent": []
+          }
+        },
+        {
+          "name": "refresh-names-the-key-never-reveals-it",
+          "status": 200,
+          "body": {
+            "access_token": "mo_at_7Qm1",
+            "token_type": "Bearer",
+            "expires_in": 3600,
+            "refresh_token": "mo_rt_9Xc4",
+            "scope": "account.read apikeys.read apikeys.reveal",
+            "mslm:apikey_id": "3f1c2a4e-8d7b-4c6a-9e2f-5b0d1c7a8e93"
+          },
+          "expect": {
+            "present": {
+              "access_token": "mo_at_7Qm1",
+              "apikey_id": "3f1c2a4e-8d7b-4c6a-9e2f-5b0d1c7a8e93"
+            },
+            "absent": [
+              "apikey"
+            ]
+          }
+        },
+        {
+          "name": "no-key-picked",
+          "status": 200,
+          "body": {
+            "access_token": "mo_at_poll",
+            "token_type": "Bearer",
+            "expires_in": 3600,
+            "refresh_token": "mo_rt_poll",
+            "scope": "account.read"
+          },
+          "expect": {
+            "present": {
+              "access_token": "mo_at_poll",
+              "refresh_token": "mo_rt_poll",
+              "scope": "account.read"
+            },
+            "absent": [
+              "apikey_id",
+              "apikey"
+            ]
+          }
+        },
+        {
+          "name": "rfc-minimum",
+          "status": 200,
+          "body": {
+            "access_token": "mo_at_min",
+            "token_type": "Bearer",
+            "expires_in": 3600
+          },
+          "expect": {
+            "present": {
+              "access_token": "mo_at_min",
+              "token_type": "Bearer",
+              "expires_in": 3600
+            },
+            "absent": [
+              "refresh_token",
+              "scope",
+              "apikey_id",
+              "apikey"
+            ]
+          }
+        },
+        {
+          "name": "empty-scope-is-present",
+          "status": 200,
+          "body": {
+            "access_token": "mo_at_s",
+            "token_type": "Bearer",
+            "expires_in": 3600,
+            "refresh_token": "mo_rt_s",
+            "scope": ""
+          },
+          "expect": {
+            "present": {
+              "scope": ""
+            },
+            "absent": [
+              "apikey_id",
+              "apikey"
+            ]
+          }
+        },
+        {
+          "name": "unknown-members-ignored",
+          "status": 200,
+          "body": {
+            "access_token": "mo_at_u",
+            "token_type": "Bearer",
+            "expires_in": 3600,
+            "id_token": "x",
+            "mslm:future": {
+              "nested": [
+                1,
+                2
+              ]
+            }
+          },
+          "expect": {
+            "present": {
+              "access_token": "mo_at_u"
+            },
+            "absent": [
+              "apikey_id",
+              "apikey"
+            ]
+          }
+        }
+      ],
+      "revoke": [
+        {
+          "name": "empty-object",
+          "status": 200,
+          "body": {}
+        },
+        {
+          "name": "empty-body",
+          "status": 200,
+          "rawBody": ""
+        },
+        {
+          "name": "unexpected-members",
+          "status": 200,
+          "body": {
+            "revoked": true
+          }
+        }
+      ]
+    },
+    "errors": {
+      "why": "How a non-2xx from ANY OAuth operation is reported. type: oauth is the OAuth error, accessDenied and expiredToken its two distinct subtypes, client the SDK's ordinary error. Only a 4xx whose body is a JSON object with a string error member is an OAuth error; message is asserted only for OAuth errors. rawBody is sent verbatim, body as JSON.",
+      "cases": [
+        {
+          "name": "authorization-pending",
+          "status": 400,
+          "body": {
+            "error": "authorization_pending"
+          },
+          "expect": {
+            "type": "oauth",
+            "errorCode": "authorization_pending",
+            "errorDescription": null,
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false,
+            "message": "authorization_pending"
+          }
+        },
+        {
+          "name": "slow-down-from-the-rate-limiter",
+          "status": 400,
+          "body": {
+            "error": "slow_down",
+            "error_description": "too many requests; slow down and try again"
+          },
+          "expect": {
+            "type": "oauth",
+            "errorCode": "slow_down",
+            "errorDescription": "too many requests; slow down and try again",
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false,
+            "message": "slow_down: too many requests; slow down and try again"
+          }
+        },
+        {
+          "name": "access-denied",
+          "status": 400,
+          "body": {
+            "error": "access_denied"
+          },
+          "expect": {
+            "type": "accessDenied",
+            "errorCode": "access_denied",
+            "errorDescription": null,
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false,
+            "message": "access_denied"
+          }
+        },
+        {
+          "name": "expired-token",
+          "status": 400,
+          "body": {
+            "error": "expired_token"
+          },
+          "expect": {
+            "type": "expiredToken",
+            "errorCode": "expired_token",
+            "errorDescription": null,
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false,
+            "message": "expired_token"
+          }
+        },
+        {
+          "name": "invalid-grant-with-description",
+          "status": 400,
+          "body": {
+            "error": "invalid_grant",
+            "error_description": "PKCE verification failed"
+          },
+          "expect": {
+            "type": "oauth",
+            "errorCode": "invalid_grant",
+            "errorDescription": "PKCE verification failed",
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false,
+            "message": "invalid_grant: PKCE verification failed"
+          }
+        },
+        {
+          "name": "invalid-client-is-a-401",
+          "status": 401,
+          "body": {
+            "error": "invalid_client",
+            "error_description": "unknown client"
+          },
+          "expect": {
+            "type": "oauth",
+            "errorCode": "invalid_client",
+            "errorDescription": "unknown client",
+            "status": 401,
+            "kind": "unauthorized",
+            "retryable": false,
+            "message": "invalid_client: unknown client"
+          }
+        },
+        {
+          "name": "unknown-code-is-still-oauth",
+          "status": 400,
+          "body": {
+            "error": "some_future_code"
+          },
+          "expect": {
+            "type": "oauth",
+            "errorCode": "some_future_code",
+            "errorDescription": null,
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false,
+            "message": "some_future_code"
+          }
+        },
+        {
+          "name": "non-string-description-dropped",
+          "status": 400,
+          "body": {
+            "error": "invalid_request",
+            "error_description": 7
+          },
+          "expect": {
+            "type": "oauth",
+            "errorCode": "invalid_request",
+            "errorDescription": null,
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false,
+            "message": "invalid_request"
+          }
+        },
+        {
+          "name": "extra-members-ignored",
+          "status": 400,
+          "body": {
+            "error": "invalid_request",
+            "error_uri": "https://example.com/e",
+            "state": "x"
+          },
+          "expect": {
+            "type": "oauth",
+            "errorCode": "invalid_request",
+            "errorDescription": null,
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false,
+            "message": "invalid_request"
+          }
+        },
+        {
+          "name": "rc-envelope-500-is-not-oauth",
+          "status": 500,
+          "body": {
+            "rc": "ERROR"
+          },
+          "expect": {
+            "type": "client",
+            "status": 500,
+            "kind": "server_error",
+            "retryable": true
+          }
+        },
+        {
+          "name": "rfc-body-on-a-5xx-is-not-oauth",
+          "status": 500,
+          "body": {
+            "error": "server_error"
+          },
+          "expect": {
+            "type": "client",
+            "status": 500,
+            "kind": "server_error",
+            "retryable": true
+          }
+        },
+        {
+          "name": "html-gateway-error",
+          "status": 502,
+          "rawBody": "<html><body>Bad Gateway</body></html>",
+          "expect": {
+            "type": "client",
+            "status": 502,
+            "kind": "server_error",
+            "retryable": true
+          }
+        },
+        {
+          "name": "json-400-without-error-member",
+          "status": 400,
+          "body": {
+            "message": "nope"
+          },
+          "expect": {
+            "type": "client",
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false
+          }
+        },
+        {
+          "name": "error-member-not-a-string",
+          "status": 400,
+          "body": {
+            "error": 42
+          },
+          "expect": {
+            "type": "client",
+            "status": 400,
+            "kind": "bad_request",
+            "retryable": false
+          }
+        },
+        {
+          "name": "plain-text-404",
+          "status": 404,
+          "rawBody": "Not Found",
+          "expect": {
+            "type": "client",
+            "status": 404,
+            "kind": "bad_request",
+            "retryable": false
+          }
+        }
+      ]
+    },
+    "retries": {
+      "why": "Which operations retry, with the client left at its default retries. A retried operation takes a second attempt after a 5xx; a token exchange is issued exactly ONCE; an OAuth error is never retried by any operation.",
+      "cases": [
+        {
+          "name": "metadata-retries-a-5xx",
+          "operation": "metadata",
+          "args": {},
+          "responses": [
+            {
+              "status": 503,
+              "rawBody": ""
+            },
+            {
+              "status": 200,
+              "body": {
+                "issuer": "https://internetdata.io",
+                "authorization_endpoint": "https://internetdata.io/oauth/authorize",
+                "token_endpoint": "https://internetdata.io/oauth/token",
+                "device_authorization_endpoint": "https://internetdata.io/oauth/device_authorization",
+                "revocation_endpoint": "https://internetdata.io/oauth/revoke",
+                "scopes_supported": [
+                  "account.read",
+                  "apikeys.read",
+                  "apikeys.reveal",
+                  "apikeys.manage",
+                  "org.read",
+                  "billing.read"
+                ],
+                "response_types_supported": [
+                  "code"
+                ],
+                "grant_types_supported": [
+                  "authorization_code",
+                  "refresh_token",
+                  "urn:ietf:params:oauth:grant-type:device_code"
+                ],
+                "token_endpoint_auth_methods_supported": [
+                  "none"
+                ],
+                "code_challenge_methods_supported": [
+                  "S256"
+                ],
+                "authorization_response_iss_parameter_supported": true,
+                "service_documentation": "https://internetdata.io/"
+              }
+            }
+          ],
+          "expect": {
+            "requests": 2,
+            "outcome": "ok"
+          }
+        },
+        {
+          "name": "device-authorization-retries-a-5xx",
+          "operation": "deviceAuthorization",
+          "args": {
+            "clientId": "internetdata-cli"
+          },
+          "responses": [
+            {
+              "status": 503,
+              "rawBody": ""
+            },
+            {
+              "status": 200,
+              "body": {
+                "device_code": "mo_dc_poll",
+                "user_code": "BCDF-GHJK",
+                "verification_uri": "https://app.internetdata.io/device",
+                "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+                "expires_in": 900,
+                "interval": 5
+              }
+            }
+          ],
+          "expect": {
+            "requests": 2,
+            "outcome": "ok"
+          }
+        },
+        {
+          "name": "revoke-retries-a-5xx",
+          "operation": "revoke",
+          "args": {
+            "clientId": "internetdata-cli",
+            "token": "mo_rt_r"
+          },
+          "responses": [
+            {
+              "status": 503,
+              "rawBody": ""
+            },
+            {
+              "status": 200,
+              "body": {}
+            }
+          ],
+          "expect": {
+            "requests": 2,
+            "outcome": "ok"
+          }
+        },
+        {
+          "name": "device-code-exchange-is-issued-once",
+          "operation": "exchangeDeviceCode",
+          "args": {
+            "clientId": "internetdata-cli",
+            "deviceCode": "mo_dc_r"
+          },
+          "responses": [
+            {
+              "status": 503,
+              "rawBody": ""
+            }
+          ],
+          "expect": {
+            "requests": 1,
+            "outcome": "client",
+            "kind": "server_error"
+          }
+        },
+        {
+          "name": "refresh-is-issued-once",
+          "operation": "exchangeRefreshToken",
+          "args": {
+            "clientId": "internetdata-cli",
+            "refreshToken": "mo_rt_r"
+          },
+          "responses": [
+            {
+              "status": 503,
+              "rawBody": ""
+            }
+          ],
+          "expect": {
+            "requests": 1,
+            "outcome": "client",
+            "kind": "server_error"
+          }
+        },
+        {
+          "name": "oauth-error-is-never-retried",
+          "operation": "deviceAuthorization",
+          "args": {
+            "clientId": "internetdata-cli"
+          },
+          "responses": [
+            {
+              "status": 400,
+              "body": {
+                "error": "slow_down",
+                "error_description": "too many requests; slow down and try again"
+              }
+            }
+          ],
+          "expect": {
+            "requests": 1,
+            "outcome": "oauth",
+            "errorCode": "slow_down"
+          }
+        }
+      ]
+    },
+    "poll": {
+      "why": "pollDeviceToken against a stub answering responses in order. waits is every delay the helper takes, in seconds, INCLUDING the one before a local deadline check. With a seam replacing BOTH the sleep and the monotonic clock, assert waits exactly. On the real clock assert each gap (call to first request, then request to request) is at least its wait - 0.05 s and under wait + 1 s, and that the call settles no sooner than sum(waits) - 0.05 s after it began. requests is exact, and every request is the exchangeDeviceCode form for clientId and device.device_code.",
+      "cases": [
+        {
+          "name": "pending-then-token",
+          "clientId": "internetdata-cli",
+          "device": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+            "expires_in": 900,
+            "interval": 1
+          },
+          "responses": [
+            {
+              "status": 400,
+              "body": {
+                "error": "authorization_pending"
+              }
+            },
+            {
+              "status": 200,
+              "body": {
+                "access_token": "mo_at_poll",
+                "token_type": "Bearer",
+                "expires_in": 3600,
+                "refresh_token": "mo_rt_poll",
+                "scope": "account.read"
+              }
+            }
+          ],
+          "expect": {
+            "outcome": "token",
+            "requests": 2,
+            "waits": [
+              1,
+              1
+            ],
+            "token": {
+              "access_token": "mo_at_poll"
+            }
+          }
+        },
+        {
+          "name": "slow-down-widens-for-good",
+          "clientId": "internetdata-cli",
+          "device": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+            "expires_in": 900,
+            "interval": 1
+          },
+          "why": "+5 s per slow_down, cumulative, and kept through a pending answer. Catches a widening that lasts one tick, one that does not accumulate, and one a pending answer resets.",
+          "responses": [
+            {
+              "status": 400,
+              "body": {
+                "error": "slow_down"
+              }
+            },
+            {
+              "status": 400,
+              "body": {
+                "error": "authorization_pending"
+              }
+            },
+            {
+              "status": 400,
+              "body": {
+                "error": "slow_down",
+                "error_description": "too many requests; slow down and try again"
+              }
+            },
+            {
+              "status": 200,
+              "body": {
+                "access_token": "mo_at_poll",
+                "token_type": "Bearer",
+                "expires_in": 3600,
+                "refresh_token": "mo_rt_poll",
+                "scope": "account.read"
+              }
+            }
+          ],
+          "expect": {
+            "outcome": "token",
+            "requests": 4,
+            "waits": [
+              1,
+              6,
+              6,
+              11
+            ]
+          }
+        },
+        {
+          "name": "access-denied-ends-the-poll",
+          "clientId": "internetdata-cli",
+          "device": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+            "expires_in": 900,
+            "interval": 1
+          },
+          "responses": [
+            {
+              "status": 400,
+              "body": {
+                "error": "authorization_pending"
+              }
+            },
+            {
+              "status": 400,
+              "body": {
+                "error": "access_denied"
+              }
+            }
+          ],
+          "expect": {
+            "outcome": "accessDenied",
+            "requests": 2,
+            "waits": [
+              1,
+              1
+            ],
+            "status": 400
+          }
+        },
+        {
+          "name": "server-expired-token-ends-the-poll",
+          "clientId": "internetdata-cli",
+          "device": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+            "expires_in": 900,
+            "interval": 1
+          },
+          "responses": [
+            {
+              "status": 400,
+              "body": {
+                "error": "expired_token"
+              }
+            }
+          ],
+          "expect": {
+            "outcome": "expiredToken",
+            "requests": 1,
+            "waits": [
+              1
+            ],
+            "status": 400
+          }
+        },
+        {
+          "name": "deadline-passes-locally",
+          "clientId": "internetdata-cli",
+          "device": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+            "expires_in": 2,
+            "interval": 1
+          },
+          "why": "expires_in is counted from the call. The raised error has no status, which is how a local expiry is told apart.",
+          "responses": [
+            {
+              "status": 400,
+              "body": {
+                "error": "authorization_pending"
+              }
+            }
+          ],
+          "expect": {
+            "outcome": "expiredToken",
+            "requests": 1,
+            "waits": [
+              1,
+              1
+            ],
+            "status": null
+          }
+        },
+        {
+          "name": "other-oauth-error-ends-the-poll",
+          "clientId": "internetdata-cli",
+          "device": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+            "expires_in": 900,
+            "interval": 1
+          },
+          "responses": [
+            {
+              "status": 400,
+              "body": {
+                "error": "invalid_grant",
+                "error_description": "device code was not issued to this client"
+              }
+            }
+          ],
+          "expect": {
+            "outcome": "oauth",
+            "errorCode": "invalid_grant",
+            "requests": 1,
+            "waits": [
+              1
+            ]
+          }
+        },
+        {
+          "name": "server-error-ends-the-poll-unretried",
+          "clientId": "internetdata-cli",
+          "device": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+            "expires_in": 900,
+            "interval": 1
+          },
+          "responses": [
+            {
+              "status": 400,
+              "body": {
+                "error": "authorization_pending"
+              }
+            },
+            {
+              "status": 503,
+              "rawBody": ""
+            }
+          ],
+          "expect": {
+            "outcome": "client",
+            "kind": "server_error",
+            "retryable": true,
+            "requests": 2,
+            "waits": [
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "name": "interval-below-one-means-five",
+          "clientId": "internetdata-cli",
+          "device": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+            "expires_in": 900,
+            "interval": 0
+          },
+          "responses": [
+            {
+              "status": 200,
+              "body": {
+                "access_token": "mo_at_poll",
+                "token_type": "Bearer",
+                "expires_in": 3600,
+                "refresh_token": "mo_rt_poll",
+                "scope": "account.read"
+              }
+            }
+          ],
+          "expect": {
+            "outcome": "token",
+            "requests": 1,
+            "waits": [
+              5
+            ]
+          }
+        }
+      ]
+    },
+    "deferred": {
+      "why": "Vectors for authorizationUrl, exchangeAuthorizationCode, createPkce and pkceChallenge, which ship only once the server can complete the authorization-code flow (docs/sdk/oauth.md, Deferred). A device-flow runner never reads this key; nothing outside it names a deferred operation. emit.mjs still verifies these vectors so they are right when the methods ship.",
+      "pkce": {
+        "why": "RFC 7636 Appendix B. A generated verifier is 32 CSPRNG bytes as unpadded base64url.",
+        "verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+        "challenge": "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+        "method": "S256",
+        "generatedVerifierPattern": "^[A-Za-z0-9_-]{43}$"
+      },
+      "authorizationUrl": [
+        {
+          "name": "required-only",
+          "why": "The five parameters every URL carries, in this order, and nothing else.",
+          "baseUrl": "https://internetdata.io",
+          "clientId": "example-client",
+          "redirectUri": "http://127.0.0.1:8765/callback",
+          "codeChallenge": "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+          "expect": "https://internetdata.io/oauth/authorize?response_type=code&client_id=example-client&redirect_uri=http%3A%2F%2F127.0.0.1%3A8765%2Fcallback&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256"
+        },
+        {
+          "name": "every-option-reserved-characters-trailing-slash",
+          "why": "One trailing slash on the base URL is dropped. Only A-Z a-z 0-9 - . _ ~ stay literal: a space is %20 never +, a literal + is %2B, and encodeURIComponent alone leaves ! * ' ( ) unencoded, which this pins.",
+          "baseUrl": "https://internetdata.io/",
+          "clientId": "https://client.example/oauth/metadata.json",
+          "redirectUri": "https://app.example/cb?next=/a b&x=1+2#frag",
+          "codeChallenge": "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+          "scope": "account.read apikeys.read",
+          "state": "s/t+a=t&e~!*'()é",
+          "resource": "https://internetdata.io/",
+          "expect": "https://internetdata.io/oauth/authorize?response_type=code&client_id=https%3A%2F%2Fclient.example%2Foauth%2Fmetadata.json&redirect_uri=https%3A%2F%2Fapp.example%2Fcb%3Fnext%3D%2Fa%20b%26x%3D1%2B2%23frag&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256&scope=account.read%20apikeys.read&state=s%2Ft%2Ba%3Dt%26e~%21%2A%27%28%29%C3%A9&resource=https%3A%2F%2Finternetdata.io%2F"
+        }
+      ],
+      "forms": [
+        {
+          "name": "exchange-authorization-code",
+          "operation": "exchangeAuthorizationCode",
+          "endpoint": "token",
+          "args": {
+            "clientId": "example-client",
+            "code": "mo_ac_q+w&e=r%t",
+            "codeVerifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+            "redirectUri": "http://127.0.0.1:8765/callback?a=1&b=two words"
+          },
+          "fields": {
+            "grant_type": "authorization_code",
+            "code": "mo_ac_q+w&e=r%t",
+            "redirect_uri": "http://127.0.0.1:8765/callback?a=1&b=two words",
+            "client_id": "example-client",
+            "code_verifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
+          }
+        }
+      ],
+      "retries": [
+        {
+          "name": "authorization-code-exchange-is-issued-once",
+          "operation": "exchangeAuthorizationCode",
+          "args": {
+            "clientId": "example-client",
+            "code": "mo_ac_r",
+            "codeVerifier": "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+            "redirectUri": "http://127.0.0.1:8765/callback"
+          },
+          "responses": [
+            {
+              "status": 503,
+              "rawBody": ""
+            }
+          ],
+          "expect": {
+            "requests": 1,
+            "outcome": "client",
+            "kind": "server_error"
+          }
+        }
+      ]
+    }
   }
 }

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::VolumeProjection;
 # ABSTRACT: Projection that may be projected along with other supported volume types. Exactly one of these fields must be set.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s clusterTrustBundle => 'Core::V1::ClusterTrustBundleProjection';
@@ -35,7 +35,7 @@ IO::K8s::Api::Core::V1::VolumeProjection - Projection that may be projected alon
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 clusterTrustBundle
 

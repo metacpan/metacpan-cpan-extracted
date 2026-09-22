@@ -1,12 +1,13 @@
 package WWW::Hetzner::CLI::Cmd::Zone::Cmd::Create;
 # ABSTRACT: Create a DNS zone
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl zone create --name <domain> [--ttl <seconds>]';
 use JSON::MaybeXS qw(encode_json);
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option name => (
     is       => 'ro',
@@ -33,6 +34,7 @@ sub execute {
     $params{ttl} = $self->ttl if $self->ttl;
 
     my $zone = $cloud->zones->create(%params);
+    $self->handle_action($zone->action);
 
     if ($main->output eq 'json') {
         print encode_json($zone->data), "\n";
@@ -67,7 +69,7 @@ WWW::Hetzner::CLI::Cmd::Zone::Cmd::Create - Create a DNS zone
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -90,7 +92,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

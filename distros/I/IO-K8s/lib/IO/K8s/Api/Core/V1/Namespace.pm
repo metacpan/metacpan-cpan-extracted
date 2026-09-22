@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::Namespace;
 # ABSTRACT: Namespace provides a scope for Names. Use of multiple namespaces is optional.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -25,7 +25,7 @@ IO::K8s::Api::Core::V1::Namespace - Namespace provides a scope for Names. Use of
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ Status describes the current status of a Namespace. More info: https://git.k8s.i
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#namespace-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#namespace-v1-core>
 
 =head1 SUPPORT
 

@@ -1,13 +1,14 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Create;
 # ABSTRACT: Create a server
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl server create --name <name> --type <type> --image <image> [options]';
 use JSON::MaybeXS qw(encode_json);
 use Path::Tiny qw(path);
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 # Required options
 option name => (
@@ -200,6 +201,7 @@ sub execute {
     print "Creating server '$params{name}'...\n";
 
     my $server = $cloud->servers->create(%params);
+    $self->handle_action($server->action);
 
     if ($main->output eq 'json') {
         print encode_json($server->data), "\n";
@@ -229,7 +231,7 @@ WWW::Hetzner::CLI::Cmd::Server::Cmd::Create - Create a server
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -252,7 +254,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

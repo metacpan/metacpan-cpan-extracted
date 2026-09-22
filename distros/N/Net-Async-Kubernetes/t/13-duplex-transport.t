@@ -231,4 +231,44 @@ subtest 'attach uses websocket transport and stream flags' => sub {
     like($connect->{url}, qr/tty=false/, 'tty default set');
 };
 
+subtest 'loop requirement error names the calling method' => sub {
+    # deliberately not added to a loop
+    my $kube = Net::Async::Kubernetes->new(
+        server      => { endpoint => 'https://mock.local' },
+        credentials => { token => 'mock-token' },
+        resource_map_from_cluster => 0,
+    );
+
+    my %failure;
+    $failure{port_forward} = $kube->port_forward('Pod', 'nginx',
+        namespace => 'default',
+        ports     => [8080],
+    );
+    $failure{exec} = $kube->exec('Pod', 'nginx',
+        namespace => 'default',
+        command   => ['sh', '-c', 'id'],
+    );
+    $failure{attach} = $kube->attach('Pod', 'nginx',
+        namespace => 'default',
+    );
+    $failure{cp_to_pod} = $kube->cp_to_pod('Pod', 'nginx',
+        namespace => 'default',
+        local     => '/tmp/does-not-matter',
+        remote    => '/tmp/remote.txt',
+    );
+    $failure{cp_from_pod} = $kube->cp_from_pod('Pod', 'nginx',
+        namespace => 'default',
+        remote    => '/tmp/remote.txt',
+        local     => '/tmp/does-not-matter',
+    );
+
+    for my $method (sort keys %failure) {
+        my $f = $failure{$method};
+        ok($f->is_failed, "$method fails without a loop");
+        is(($f->failure)[0],
+            "$method requires Net::Async::Kubernetes to be added to an IO::Async::Loop",
+            "$method loop error names $method");
+    }
+};
+
 done_testing;

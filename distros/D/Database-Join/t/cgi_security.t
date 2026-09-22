@@ -26,7 +26,7 @@ use Readonly;
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 76;
+	plan tests => 92;
 }
 
 use_ok('Database::Join');
@@ -1161,6 +1161,212 @@ sub make_join {
 	my $cols = $join_ok->columns();
 	ok((grep { $_ eq 'secondary.name' } @{$cols}),
 		'collision_prefix guard: valid prefix produces correctly named collision column');
+}
+
+# ===========================================================================
+# SECTION 16 -- SQLite Backend: Operator Injection Blocked by %SAFE_SQL_OPS
+#
+# Major Premise: _sqlite_join builds SQL WHERE clauses by iterating over
+#   operator keys from criteria hashrefs and checking each key against
+#   %SAFE_SQL_OPS = { '>' => 1, '<' => 1, '>=' => 1, '<=' => 1, '!=' => 1,
+#   '=' => 1 }.  Any key NOT in the whitelist is silently skipped (next).
+#
+# Attack Model: attacker provides a malicious operator key such as
+#   "'; DELETE FROM t0; --" hoping it is interpolated into the WHERE clause.
+#   The SAFE_SQL_OPS guard must discard it without croaking.
+#
+# Invariant: a hostile operator key produces no WHERE clause fragment; the
+#   query returns the full unfiltered result set (degraded, not injected).
+# ===========================================================================
+
+Readonly::Scalar my $HOSTILE_OP   => q{'; DELETE FROM t0; --};
+Readonly::Scalar my $OR_INJECT_OP => q{OR 1=1 --};
+
+note '--- SECTION 16: SQLite Operator Injection Blocked by SAFE_SQL_OPS ---';
+
+# Tests 77 & 78
+# Attack: hostile SQL operator key inside a criteria operator hashref.
+# With backend='sqlite' the _sqlite_join builder sees the hostile key, checks
+# it against SAFE_SQL_OPS, finds no match, and skips it (next).  No WHERE
+# clause term is emitted; both rows are returned.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j16a = make_join($db_a, $db_b, backend => 'sqlite');
+	my $rows;
+	lives_ok {
+		$rows = $j16a->selectall_arrayref({ score => { $HOSTILE_OP => 5 } });
+	} 'S16: hostile SQL-injection operator key in criteria hashref does not croak';
+	is(scalar @{$rows}, 2,
+		'S16: hostile operator dropped by SAFE_SQL_OPS; unfiltered 2 rows returned');
+}
+
+# Tests 79 & 80
+# Attack: OR-based logical injection as operator key.  "OR 1=1 --" is not a
+# valid SQL operator, so SAFE_SQL_OPS rejects it and no WHERE clause is added.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j16b = make_join($db_a, $db_b, backend => 'sqlite');
+	my $rows;
+	lives_ok {
+		$rows = $j16b->selectall_arrayref({ score => { $OR_INJECT_OP => 0 } });
+	} 'S16: OR-injection operator key does not croak';
+	is(scalar @{$rows}, 2,
+		'S16: OR-injection operator dropped; full 2-row set returned safely');
+}
+
+# Tests 81 & 82
+# Defence-in-depth: mix one valid operator ('>') and one hostile key in the
+# same hashref.  The valid key must survive and filter rows (score > 80 =>
+# only Alice, score=95); the hostile key must be silently discarded.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j16c = make_join($db_a, $db_b, backend => 'sqlite');
+	my $rows;
+	lives_ok {
+		$rows = $j16c->selectall_arrayref({ score => { '>' => 80, $HOSTILE_OP => 0 } });
+	} 'S16: mixed valid+hostile operator keys do not croak';
+	is(scalar @{$rows}, 1,
+		'S16: valid operator survives; hostile discarded; only score>80 row returned');
+}
+
+# ===========================================================================
+# SECTION 17 -- selectall_array() Partition Isolation
+#
+# Major Premise: selectall_array() routes criteria through the same
+#   _partition_criteria path as selectall_arrayref(), fetchrow_hashref(), and
+#   count().  SQL injection strings in criteria values must be confined to the
+#   owning DB and must not leak into sibling DAs.
+#
+# This section provides the same proof as SECTION 1 but for the
+# selectall_array() calling convention, closing the coverage gap.
+# ===========================================================================
+
+note '--- SECTION 17: selectall_array() Partition Isolation ---';
+
+# Tests 83 & 84
+# Attack: SQL injection string as the value for a PRIMARY-DB column ('name').
+# Partition invariant: 'name' routes to db_a only; db_b must never receive
+# the 'name' key in any criteria hashref.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j17a = make_join($db_a, $db_b);
+	my @rows = $j17a->selectall_array(name => $SQL_INJECTION);
+	is(scalar @rows, 0,
+		'S17: selectall_array(): SQL injection value in primary column yields no rows');
+	ok(!exists($db_b->last_criteria->{name}),
+		'S17: selectall_array(): name criterion not forwarded to secondary DB');
+}
+
+# Tests 85 & 86
+# Attack: SQL injection string as the value for a SECONDARY-DB column ('score').
+# Partition invariant: 'score' routes to db_b only; db_a must never receive
+# the 'score' key in any criteria hashref.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j17b = make_join($db_a, $db_b);
+	my @rows = $j17b->selectall_array(score => $SQL_INJECTION);
+	is(scalar @rows, 0,
+		'S17: selectall_array(): SQL injection value in secondary column yields no rows');
+	ok(!exists($db_a->last_criteria->{score}),
+		'S17: selectall_array(): score criterion not forwarded to primary DB');
+}
+
+# ===========================================================================
+# SECTION 18 -- Null Byte Injection in Join-Column Criteria Value
+#
+# Major Premise: DJ handles criteria values as opaque Perl scalars.  No
+#   C-string null-byte truncation applies at the Perl layer.  A null byte
+#   embedded in a join-column value must not match real keys and must not
+#   trigger a crash.
+#
+# Attack Model: entry => "A1\x00'; DROP TABLE --" hopes that the null byte
+#   truncates to "A1" in a C-string comparison (giving an unexpected match)
+#   or injects SQL via the join-column broadcast path.
+# ===========================================================================
+
+Readonly::Scalar my $NULL_JC_VAL => "A1\x00'; DROP TABLE --";
+
+note '--- SECTION 18: Null Byte in Join-Column Criteria Value ---';
+
+# Tests 87 & 88
+# The null-embedded value "A1\x00..." is not equal to any stored key ("A1")
+# at the Perl string layer, so no rows are returned.  DJ must not crash.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j18 = make_join($db_a, $db_b);
+	my $rows;
+	lives_ok {
+		$rows = $j18->selectall_arrayref(entry => $NULL_JC_VAL);
+	} 'S18: null byte embedded in join-column criteria value does not croak';
+	is(scalar @{$rows}, 0,
+		'S18: null-byte value does not match real keys; 0 rows returned (no C-truncation)');
+}
+
+# ===========================================================================
+# SECTION 19 -- SQL Identifier Injection via DA-Supplied Column Name
+#
+# Major Premise: Column names returned by DA->columns() are embedded as SQL
+#   identifiers in the SQLite backend (CREATE TABLE, INSERT, SELECT, WHERE).
+#   A column name containing a literal double-quote character must be escaped
+#   by doubling it ("") inside the surrounding double-quoted identifier, per
+#   the ANSI SQL / SQLite standard.  Without _sql_quote_identifier(), the
+#   string "bad"col" would close the identifier early and inject SQL.
+#
+# Attack Model: A DA whose columns() returns ['entry', 'bad"col'] attempts
+#   SQL identifier injection through the spill-path CREATE TABLE, INSERT,
+#   SELECT, and WHERE clauses.  The fix must double every " so the column
+#   round-trips to SQLite safely, and criteria on that column must match
+#   exactly the rows whose value equals the criterion (no wildcard bleed).
+# ===========================================================================
+
+Readonly::Scalar my $INJECT_COL => 'bad"col';
+Readonly::Scalar my $INJECT_VAL => 'injection test';
+
+note '--- SECTION 19: SQL Identifier Injection via DA Column Name ---';
+
+# Tests 89 & 90
+# Proof: selectall_arrayref() survives a column name containing " and returns
+# the row with the column value intact (no SQL injection, no crash).
+{
+	my $inj_db = MockSecDB->new(
+		columns => ['entry', $INJECT_COL],
+		rows    => [{ entry => 'K1', $INJECT_COL => $INJECT_VAL }],
+	);
+	my ($j19, $rows);
+	lives_ok {
+		$j19 = Database::Join->new(
+			databases   => [$inj_db],
+			join_column => 'entry',
+			backend     => 'sqlite',
+		);
+		$rows = $j19->selectall_arrayref();
+	} 'S19: column name with embedded " round-trips through SQLite without croaking';
+	is($rows->[0]{$INJECT_COL}, $INJECT_VAL,
+		'S19: value of column with embedded " in name returned correctly');
+}
+
+# Tests 91 & 92
+# Proof: a WHERE criterion whose key is 'bad"col' is properly escaped in the
+# per-call SQL so only the matching row is returned (no SQL injection bleed).
+{
+	my $inj_db = MockSecDB->new(
+		columns => ['entry', $INJECT_COL],
+		rows    => [
+			{ entry => 'K1', $INJECT_COL => $INJECT_VAL },
+			{ entry => 'K2', $INJECT_COL => 'other'      },
+		],
+	);
+	my $j19b = Database::Join->new(
+		databases   => [$inj_db],
+		join_column => 'entry',
+		backend     => 'sqlite',
+	);
+	my $rows;
+	lives_ok {
+		$rows = $j19b->selectall_arrayref($INJECT_COL => $INJECT_VAL);
+	} 'S19: criteria keyed on column with embedded " does not croak';
+	is(scalar @{$rows}, 1,
+		'S19: WHERE clause on column "bad""col" returns exactly 1 matching row');
 }
 
 done_testing();

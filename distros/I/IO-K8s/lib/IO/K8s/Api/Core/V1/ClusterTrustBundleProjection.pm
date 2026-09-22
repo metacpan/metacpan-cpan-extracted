@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ClusterTrustBundleProjection;
 # ABSTRACT: ClusterTrustBundleProjection describes how to select a set of ClusterTrustBundle objects and project their contents into the pod filesystem.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s labelSelector => 'Meta::V1::LabelSelector';
@@ -18,6 +18,9 @@ k8s path => Str, 'required';
 k8s signerName => Str;
 
 
+k8s user => Int;
+
+
 1;
 
 __END__
@@ -32,7 +35,7 @@ IO::K8s::Api::Core::V1::ClusterTrustBundleProjection - ClusterTrustBundleProject
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 labelSelector
 
@@ -53,6 +56,10 @@ Relative path from the volume root to write the bundle.
 =head2 signerName
 
 Select all ClusterTrustBundles that match this signer name. Mutually-exclusive with name.  The contents of all selected ClusterTrustBundles will be unified and deduplicated.
+
+=head2 user
+
+user is Optional: The owner UID of the created file. If specified, the item-level user field takes precedence over defaultUser. (Alpha) This field requires the AtomicWriteVolumeUserFields feature gate to be enabled.
 
 =head1 SUPPORT
 

@@ -5,10 +5,10 @@ model: sonnet
 allowed-tools: Read, Bash, Glob, Grep
 briefing:
   skills:
-    - perl-release-author-getty
+    - getty-perl-release-author-getty
     - perl-release-dist-ini
-    - perl-core
-    - karr
+    - getty-perl-core
+    - kanban-issues-karr-cli
 ---
 
 You are the io-k8s-release-checker for **IO-K8s**. Conventions from the skills above are

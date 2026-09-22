@@ -1,5 +1,75 @@
 Revision history for Net-Async-Kubernetes
 
+0.008     2026-09-22 04:13:56Z
+ - Add public `rest` and `new_object($kind, %fields)` on the client: the
+   underlying `Kubernetes::REST` instance and a typed `IO::K8s` object for
+   `create`/`update`, so callers no longer reach through the private `_rest`.
+ - Require `IO::K8s` 1.108 and `Kubernetes::REST` 1.108. Older IO::K8s
+   resolved a bare Kind such as `Role`, `Event`, `Job` or `Service` to any
+   loadable top-level package of that name -- `Class::Mite` ships a
+   `lib/Role.pm` -- so creating the object died with `Can't locate object
+   method "_k8s_attr_info"` on smokers carrying such a module (GitHub issue
+   #2). The pair also brings UTF-8 request bodies (a manifest with a
+   non-ASCII character died with "HTTP::Message content must be bytes"), the
+   right API group paths for Storagemigration and Apiserverinternal, working
+   inflation of KubeAggregator's `APIService`, and the upstream Kubernetes
+   v1.37 sync with 11 new Kinds, all reached through the `Kubernetes::REST`
+   seam with no change here.
+ - Accept a qualified `group/version/Kind` resource name anywhere the client
+   takes one: `list('autoscaling/v1/HorizontalPodAutoscaler')` addresses that
+   version, while the bare Kind keeps the shipped default of v2.
+ - Move `Net::Async::Kubernetes::PortForwardSession` into its own file. It was
+   declared inline in `Net::Async::Kubernetes`, so `use`ing the class the POD
+   of `port_forward()`, `exec()` and `attach()` names failed, and every
+   `dzil build` warned about it. The code is unchanged.
+ - Add `on_watch_error` to `Net::Async::Kubernetes::Controller`. Watch `ERROR`
+   events (a `403` mid-stream, for example) were wired nowhere; they carry a
+   `Status` hashref rather than a keyed object, so they go to the callback
+   instead of the reconcile workqueue. An `on_error` passed to
+   `watch_resource` keeps precedence for that watch.
+ - Fix two reference cycles that leaked a controller and its client. The
+   controller held a strong `kube` while the client held the controller as a
+   child, and every reconcile context held a strong `controller` inside an
+   entry the controller owns. Both are now weak, as in `Watcher`; a client
+   the controller constructs itself stays owned by it.
+ - Fix the controller keeping one workqueue entry per key for the lifetime of
+   the process, each pinning the last object it saw. A key is dropped once it
+   reconciles cleanly; keys still queued, dirty or waiting on a retry keep
+   their entry, so backoff history survives.
+ - Fix a controller key stalling after a stop/start cycle. `stop()` left the
+   workqueue filled and its keys flagged queued or dirty, so the event a
+   restarted watch delivered was deduplicated away with no drain scheduled,
+   and a dirty key finishing its reconcile requeued past the stop. `stop()`
+   now clears queue and flags together and the requeue skips while stopped;
+   the failure counts stay, so a retrying key resumes at its next attempt.
+ - Fix `stop()` leaving a stopped watcher attached to the client on every
+   stop/start cycle, so a repeatedly restarted controller piled up notifiers.
+ - Fix the duplex transport naming `port_forward` in its "not added to an
+   IO::Async::Loop" failure whichever method was called; `exec()` and
+   `attach()` now name themselves.
+ - Fix a resource name that `IO::K8s` cannot resolve killing the caller with
+   "argument is not a module name" from `build_path`. `list()`, `get()`,
+   `patch()`, `delete()`, `log()`, `port_forward()`, `exec()`, `attach()` and
+   the controller's `patch_status()` now return a failed `Future` naming the
+   resource; `$kube->expand_class` and starting a watcher croak with the same
+   message.
+ - Stop `t/03-configure.t` reading the kubeconfig of the machine it runs on.
+   One CPAN Testers smoker carried a kubeconfig with `contexts: null`, so
+   every 0.005 report from it was a FAIL nobody else saw. The subtest now
+   runs against a fixture in a temporary HOME, and a companion subtest holds
+   the degenerate config to a catchable croak. Reported by Andreas Koenig,
+   GitHub issue #1.
+ - Load `Net::Async::Kubernetes::Watcher` and `::Controller` at compile time
+   instead of `require`ing them in `watcher()` and `controller()`: a broken
+   child module now surfaces on `use Net::Async::Kubernetes`.
+ - Move the example scripts from `ex/` to `eg/`; the 0.007 entry's
+   `ex/live_features.pl` ships as `eg/live_features.pl`.
+ - Documentation pass: PodWeaver generates the `NAME` sections,
+   `PortForwardSession` is documented and in `SEE ALSO`, `list()` and the `cp`
+   helpers describe what they do, the qualified resource name and the
+   status-subresource write-strip trap are written down, and the `Controller`
+   methods state the `Future` they return.
+
 0.007     2026-04-15 18:21:50Z
  - Add `Net::Async::Kubernetes::Controller` as a minimal controller runtime.
    Provides watch registration, keyed workqueue deduplication, serialized

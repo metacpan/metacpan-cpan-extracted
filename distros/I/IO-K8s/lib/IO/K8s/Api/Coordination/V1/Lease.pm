@@ -1,6 +1,6 @@
 package IO::K8s::Api::Coordination::V1::Lease;
 # ABSTRACT: Lease defines a lease concept.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -21,7 +21,7 @@ IO::K8s::Api::Coordination::V1::Lease - Lease defines a lease concept.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -36,7 +36,7 @@ spec contains the specification of the Lease. More info: https://git.k8s.io/comm
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#lease-v1-coordination.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#lease-v1-coordination.k8s.io>
 
 =head1 SUPPORT
 

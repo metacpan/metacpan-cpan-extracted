@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V1::Scale;
 # ABSTRACT: Scale represents a scaling request for a resource.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Autoscaling::V1::Scale - Scale represents a scaling request for a 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ status is the current status of the scale. More info: https://git.k8s.io/communi
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#scale-v1-autoscaling.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#scale-v1-autoscaling.k8s.io>
 
 =head1 SUPPORT
 

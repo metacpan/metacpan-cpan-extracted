@@ -220,7 +220,10 @@ use vars qw(@tests);
         sub { !violates('print $p{foo};' . "\n") }],
 
     # ==============================================================
-    # R8: PerlIO layer -- string contents are not syntax; only 3-arg open is checked
+    # R8: PerlIO layer -- the layer STRING is not syntax and is not
+    # inspected.  The call that carries it is: a 3-argument open() and a
+    # 2-argument binmode() are both Perl 5.6 arities, and both are
+    # reported whatever the string between the delimiters says.
     # ==============================================================
     ['R8 PerlIO: open with layer - detected as 3-arg open (Perl 5.6)',
         sub { violates('open(FH, ">:utf8", $f);' . "\n") }],
@@ -228,11 +231,17 @@ use vars qw(@tests);
     ['R8 PerlIO: open with encoding - detected as 3-arg open (Perl 5.6)',
         sub { violates('open(FH, "<:encoding(UTF-8)", $f);' . "\n") }],
 
-    ['R8 PerlIO: binmode with layer string - NOT a syntax violation',
-        sub { !violates('binmode($fh, ":encoding(utf8)");' . "\n") }],
+    ['R8 PerlIO: binmode with layer - detected as 2-arg binmode (Perl 5.6)',
+        sub { violates('binmode($fh, ":encoding(utf8)");' . "\n") }],
 
-    ['R8 PerlIO: binmode utf8 string - NOT a syntax violation',
-        sub { !violates('binmode(STDOUT, ":utf8");' . "\n") }],
+    ['R8 PerlIO: binmode utf8 - detected as 2-arg binmode (Perl 5.6)',
+        sub { violates('binmode(STDOUT, ":utf8");' . "\n") }],
+
+    ['R8 PerlIO: binmode second argument in a variable - still detected',
+        sub { violates('binmode($fh, $layer);' . "\n") }],
+
+    ['R8 PerlIO: layer string on its own - not detected',
+        sub { !violates('my $layer = ":encoding(utf8)";' . "\n") }],
 
     ['R8 PerlIO: open plain 2-arg - not detected',
         sub { !violates('open(FH, ">output.txt");' . "\n") }],

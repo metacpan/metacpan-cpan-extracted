@@ -48,6 +48,7 @@ t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/snippet.t
+t/snippet_heatmap.t
 t/snippet_pie.t
 t/tooltip.t
 t/unit.t

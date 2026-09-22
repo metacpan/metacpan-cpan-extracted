@@ -1,5 +1,5 @@
 package Kubernetes::REST::LWPIO;
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 # ABSTRACT: HTTP client using LWP::UserAgent
 use Moo;
 use LWP::UserAgent;
@@ -132,7 +132,7 @@ Kubernetes::REST::LWPIO - HTTP client using LWP::UserAgent
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 SYNOPSIS
 
@@ -207,7 +207,7 @@ Execute an HTTP request. Receives a fully prepared L<Kubernetes::REST::HTTPReque
 
 Execute an HTTP request with streaming response. The C<$data_callback> is called with each chunk of data as it arrives.
 
-Used internally by L<Kubernetes::REST/watch> for the Watch API.
+Used internally by L<Kubernetes::REST/watch> and L<Kubernetes::REST/log> for the Watch and Pod Log APIs.
 
 =head1 SEE ALSO
 

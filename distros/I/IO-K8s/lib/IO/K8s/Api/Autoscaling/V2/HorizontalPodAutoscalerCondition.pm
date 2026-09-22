@@ -1,12 +1,15 @@
 package IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscalerCondition;
 # ABSTRACT: HorizontalPodAutoscalerCondition describes the state of a HorizontalPodAutoscaler at a certain point.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time;
 
 
 k8s message => Str;
+
+
+k8s observedGeneration => Int;
 
 
 k8s reason => Str;
@@ -32,7 +35,7 @@ IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscalerCondition - HorizontalPodA
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 lastTransitionTime
 
@@ -41,6 +44,10 @@ lastTransitionTime is the last time the condition transitioned from one status t
 =head2 message
 
 message is a human-readable explanation containing details about the transition
+
+=head2 observedGeneration
+
+observedGeneration represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.
 
 =head2 reason
 

@@ -1,6 +1,6 @@
 package Kubernetes::REST::CLI;
 # ABSTRACT: CLI base class for Kubernetes::REST command-line tools
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use Moo;
 use MooX::Options;
 use MooX::Cmd;
@@ -94,7 +94,7 @@ Kubernetes::REST::CLI - CLI base class for Kubernetes::REST command-line tools
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 SYNOPSIS
 
@@ -156,7 +156,7 @@ Delete a resource by name.
 
     kube_client raw <Group> <Method> [key=value ...]
 
-Make a raw call through the deprecated v0 API.
+Make a raw call through the v0 compatibility layer.
 
 =head1 GLOBAL OPTIONS
 

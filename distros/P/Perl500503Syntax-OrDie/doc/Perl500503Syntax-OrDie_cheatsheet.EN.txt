@@ -5,7 +5,7 @@ NAME
     Perl500503Syntax::OrDie - Validate Perl 5.005_03 source compatibility
 
 VERSION
-    0.03
+    0.05
 
 SYNOPSIS
     # Auto-check the calling file at use-time:
@@ -68,6 +68,11 @@ CHECKED CONSTRUCTS (static, compile-time)
       sub foo :lvalue { }                  :lvalue attribute
       *name{SLOT}                          Typeglob component access
       \p{} / \P{}                          Unicode property in regex
+      open(my $fh, ...)                    Lexical filehandle
+      opendir(my $dh, ...)                 Lexical directory handle
+      binmode(FH, LAYER)                   binmode takes the handle alone
+      use warnings / no warnings           Without the $INC{'warnings.pm'}
+                                           stub; the guarded idiom is OK
 
     Perl 5.8
       use encoding

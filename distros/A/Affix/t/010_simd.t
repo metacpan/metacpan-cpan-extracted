@@ -5,6 +5,7 @@ use Test2::Tools::Affix qw[:all];
 use Test2::V0 -no_srand => 1;
 use Affix qw[:all];
 use Config;
+plan skip_all => 'MSVC (' . ( $ENV{AFFIX_CC} // 'unknown' ) . ') does not support vector extensions' if ( $ENV{AFFIX_CC} // '' ) =~ /^cl(\b|$)/i;
 #
 $|++;
 #

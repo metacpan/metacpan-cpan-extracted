@@ -244,6 +244,8 @@ share/schema/MySQL.sql
 share/schema/PostgreSQL.sql
 share/schema/changes/MySQL.sql
 share/schema/changes/PostgreSQL.sql
+share/schema/changes/analytics_indexes/MySQL.sql
+share/schema/changes/analytics_indexes/PostgreSQL.sql
 share/templates/interactions.tx
 share/templates/login.tx
 share/templates/lookup.tx
@@ -270,6 +272,7 @@ t/integration/coverage/once.tx
 t/integration/coverage/open.tx
 t/integration/coverage/x.tx
 t/lib/Test2/Harness/DB/Postgresql.pm
+t/populate_bulk.t
 t/simple.json
 t/simple.t
 t/util.t

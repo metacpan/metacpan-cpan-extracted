@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Project;
 use strict;
 use warnings;
 
-our $VERSION = '0.000147';
+our $VERSION = '0.000148';
 
 use Time::Elapsed qw/elapsed/;
 use List::Util qw/sum/;

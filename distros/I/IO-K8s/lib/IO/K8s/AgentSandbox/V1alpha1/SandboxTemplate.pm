@@ -1,6 +1,6 @@
 package IO::K8s::AgentSandbox::V1alpha1::SandboxTemplate;
 # ABSTRACT: Reusable sandbox configuration template
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'extensions.agents.x-k8s.io/v1alpha1',
     resource_plural => 'sandboxtemplates';
@@ -13,7 +13,6 @@ k8s spec => {
     envVarsInjectionPolicy      => Str,
     service                     => Bool,
     volumeClaimTemplates        => ['Core::V1::PersistentVolumeClaim'],
-    volumeClaimTemplatesPolicy  => Str,
 };
 
 1;
@@ -30,7 +29,7 @@ IO::K8s::AgentSandbox::V1alpha1::SandboxTemplate - Reusable sandbox configuratio
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -43,9 +42,9 @@ for this kind.
 As of upstream AgentSandbox v0.5.4, this API version is still served but is no longer
 the storage version — C<extensions.agents.x-k8s.io/v1beta1> (see
 L<IO::K8s::AgentSandbox::V1beta1::SandboxTemplate>) is now canonical. This C<v1alpha1>
-track has gained C<spec.envVarsInjectionPolicy>, C<spec.service>,
-C<spec.volumeClaimTemplates>, and C<spec.volumeClaimTemplatesPolicy> — the same
-additions made to the C<v1beta1> track.
+track carries C<spec.envVarsInjectionPolicy>, C<spec.service>, and
+C<spec.volumeClaimTemplates>. It does B<not> carry C<spec.volumeClaimTemplatesPolicy>,
+which is a C<v1beta1>-only addition and is absent from the C<v1alpha1> CRD schema.
 
 =head1 SEE ALSO
 

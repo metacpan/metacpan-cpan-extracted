@@ -34,6 +34,11 @@ sub _build_data {
             $file->{google_restapi} //= {};
             $file->{google_restapi}{auth} = delete $file->{auth};
         }
+        # 'class' belongs under google_restapi.auth, never as a sibling of it.
+        # A stray copy at the google_restapi level makes Google::RestApi->new
+        # reject the config ("Unrecognized parameter: class"), so drop it.
+        delete $file->{google_restapi}{class}
+            if ref $file->{google_restapi} eq 'HASH';
         _merge($data, $file);
     }
     _expand_paths($data, dirname($self->config_file));
@@ -55,7 +60,6 @@ sub _merge {
 sub _defaults {
     return {
         google_restapi => {
-            class => 'OAuth2Client',
             auth  => {
                 class         => 'OAuth2Client',
                 client_id     => '',
@@ -66,8 +70,9 @@ sub _defaults {
         },
         music_folders => [],
         database      => { path => $DEFAULT_DB_PATH },
-        log_level     => 'WARN',
-        log_file      => $DEFAULT_LOG_FILE,
+        log_level          => 'WARN',
+        restapi_log_level  => 'WARN',
+        log_file           => $DEFAULT_LOG_FILE,
         acoustid_key  => '',
         sheet_id      => '',
     };
@@ -118,9 +123,6 @@ sub auth_config {
     return $self->_data->{google_restapi}{auth} // $self->_data->{auth} // {};
 }
 
-# Full google_restapi config block for Google::RestApi->new(google_restapi => ...)
-sub google_restapi_config { $_[0]->_data->{google_restapi} }
-
 # Music folders: arrayref of { id => '...', name => '...' }
 sub music_folders {
     my ($self, $folders) = @_;
@@ -141,9 +143,10 @@ sub remove_music_folder {
     ];
 }
 
-sub db_path      { $_[0]->_data->{database}{path} }
-sub log_level    { $_[0]->_data->{log_level} // 'WARN' }
-sub log_file     { $_[0]->_data->{log_file} }
+sub db_path           { $_[0]->_data->{database}{path} }
+sub log_level         { $_[0]->_data->{log_level} // 'WARN' }
+sub restapi_log_level { $_[0]->_data->{restapi_log_level} // 'WARN' }
+sub log_file          { $_[0]->_data->{log_file} }
 sub token_file   { $_[0]->auth_config->{token_file} }
 sub acoustid_key { $_[0]->_data->{acoustid_key} // '' }
 sub sheet_id     { $_[0]->_data->{sheet_id}     // '' }
@@ -237,6 +240,16 @@ Absolute path to the SQLite database file.
   my $level = $cfg->log_level;   # e.g. 'WARN', 'DEBUG'
 
 Log4perl log level string.  Defaults to C<WARN>.
+
+=head2 restapi_log_level
+
+  my $level = $cfg->restapi_log_level;   # e.g. 'WARN', 'DEBUG'
+
+Log4perl level string for the C<Google::RestApi> logger subtree, controlled
+independently of L</log_level>.  Defaults to C<WARN> because that library
+emits tens of thousands of DEBUG lines per worksheet read, which stalls the
+UI during a large sheet sync.  Raise it to C<DEBUG> only when debugging the
+Google API layer itself.
 
 =head2 log_file
 

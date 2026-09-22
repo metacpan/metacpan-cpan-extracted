@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.64
+    version 0.65
 
 SYNOPSIS
 
@@ -412,6 +412,18 @@ CAVEATS
 
     Devel::ebug does not handle signals under Windows.
 
+    Running perl -d:ebug script.pl directly does not work, and will fail
+    with No DB::DB routine defined. Devel::ebug is the frontend class; it
+    is not itself a -d debugger backend. The backend is the internal
+    Devel::ebug::Backend module, which is invoked automatically as perl
+    -d:ebug::Backend script.pl when you call $ebug->load. To debug a
+    script, either use the ebug command, or use Devel::ebug
+    programmatically:
+
+      my $ebug = Devel::ebug->new;
+      $ebug->program('script.pl');
+      $ebug->load;
+
 AUTHOR
 
     Original author: Leon Brocard <acme@astray.com>
@@ -426,7 +438,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2005-2021 by Leon Brocard.
+    This software is copyright (c) 2005-2026 by Leon Brocard.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

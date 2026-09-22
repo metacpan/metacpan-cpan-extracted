@@ -1,11 +1,13 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Rebuild;
 # ABSTRACT: Rebuild a server with a new image
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl server rebuild <id> --image <image>';
+use JSON::MaybeXS qw(encode_json);
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option image => (
     is       => 'ro',
@@ -22,8 +24,19 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Rebuilding server $id with image ", $self->image, "...\n";
-    $cloud->servers->rebuild($id, $self->image);
-    print "Server rebuild initiated. Data on the server will be lost.\n";
+    my $action = $cloud->servers->rebuild($id, $self->image);
+    $self->handle_action($action);
+
+    if ($main->output eq 'json') {
+        print encode_json({ %{ $action->data }, %{ $action->result } }), "\n";
+    } else {
+        print $self->no_wait
+            ? "Server rebuild requested. Data on the server will be lost.\n"
+            : "Server rebuilt. Data on the server has been lost.\n";
+        if (defined $action->root_password) {
+            print "Root password: ", $action->root_password, "\n";
+        }
+    }
 }
 
 1;
@@ -40,7 +53,7 @@ WWW::Hetzner::CLI::Cmd::Server::Cmd::Rebuild - Rebuild a server with a new image
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -63,7 +76,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ServiceAccount;
 # ABSTRACT: ServiceAccount binds together: * a name, understood by users, and perhaps by peripheral systems, for an identity * a principal that can be authenticated and authorized * a set of secrets
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -27,7 +27,7 @@ IO::K8s::Api::Core::V1::ServiceAccount - ServiceAccount binds together: * a name
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ Secrets is a list of the secrets in the same namespace that pods running using t
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#serviceaccount-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#serviceaccount-v1-core>
 
 =head1 SUPPORT
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::KeyToPath;
 # ABSTRACT: Maps a string key to a path within a volume.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s key => Str, 'required';
@@ -10,6 +10,9 @@ k8s mode => Int;
 
 
 k8s path => Str, 'required';
+
+
+k8s user => Int;
 
 
 1;
@@ -26,7 +29,7 @@ IO::K8s::Api::Core::V1::KeyToPath - Maps a string key to a path within a volume.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 key
 
@@ -39,6 +42,10 @@ mode is Optional: mode bits used to set permissions on this file. Must be an oct
 =head2 path
 
 path is the relative path of the file to map the key to. May not be an absolute path. May not contain the path element '..'. May not start with the string '..'.
+
+=head2 user
+
+user is Optional: The owner UID of the created file. If specified, the item-level user field takes precedence over defaultUser. (Alpha) This field requires the AtomicWriteVolumeUserFields feature gate to be enabled.
 
 =head1 SUPPORT
 

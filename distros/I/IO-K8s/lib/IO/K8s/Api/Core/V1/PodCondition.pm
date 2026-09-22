@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodCondition;
 # ABSTRACT: PodCondition contains details for the current condition of this pod.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s lastProbeTime => Time;
@@ -38,7 +38,7 @@ IO::K8s::Api::Core::V1::PodCondition - PodCondition contains details for the cur
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 lastProbeTime
 

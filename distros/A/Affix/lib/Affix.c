@@ -1,4 +1,17 @@
 #include "Affix.h"
+#if defined(__sun) && !defined(alloca)
+#  include <alloca.h>    /* Solaris/Illumos only declare alloca() here (perl.h pulls it in on glibc/MSVC) */
+#endif
+/* alloca() must always expand to the compiler builtin: several platforms
+   (e.g. NetBSD aarch64/riscv64) do not export an alloca symbol from libc,
+   and gcc emits an external reference unless it resolves to __builtin_alloca. */
+#if defined(_MSC_VER)
+#  define AFFIX_ALLOCA(_size) _alloca(_size)
+#elif defined(__GNUC__) || defined(__clang__)
+#  define AFFIX_ALLOCA(_size) __builtin_alloca(_size)
+#else
+#  define AFFIX_ALLOCA(_size) alloca(_size)
+#endif
 /*
 |-------------------0----------------|--0---4----------------------------||
 |.----------0---3-------0---3---0----|----------3---0-------0---3---0---.||
@@ -346,7 +359,7 @@ void Affix_trigger_backend(pTHX_ CV * cv) {
     size_t ret_size = infix_type_get_size(backend->ret_type);
     void * ret_buffer;
     if (ret_size <= 2048)
-        ret_buffer = alloca(ret_size);
+        ret_buffer = AFFIX_ALLOCA(ret_size);
     else {
         Newxz(ret_buffer, ret_size, char);
         SAVEFREEPV(ret_buffer);
@@ -1771,7 +1784,7 @@ static void rebuild_affix_data(pTHX_ Affix * affix);
         void * args_buffer;                                                                                     \
         if (USE_STACK_ALLOC && affix->total_args_size <= 2048) {                                                \
             /* Fast path: Stack allocation if under 2k */                                                       \
-            args_buffer = alloca(affix->total_args_size);                                                       \
+            args_buffer = AFFIX_ALLOCA(affix->total_args_size);                                                 \
             memset(args_buffer, 0, affix->total_args_size);                                                     \
         }                                                                                                       \
         else {                                                                                                  \
@@ -1782,7 +1795,7 @@ static void rebuild_affix_data(pTHX_ Affix * affix);
         size_t c_args_alloc_size = affix->num_args * sizeof(void *);                                            \
         register void ** c_args;                                                                                \
         if (c_args_alloc_size <= 2048)                                                                          \
-            c_args = (void **)alloca(c_args_alloc_size);                                                        \
+            c_args = (void **)AFFIX_ALLOCA(c_args_alloc_size);                                                  \
         else {                                                                                                  \
             Newx(c_args, affix->num_args, void *);                                                              \
             SAVEFREEPV(c_args);                                                                                 \
@@ -2572,7 +2585,7 @@ void Affix_trigger_variadic(pTHX_ CV * cv) {
     size_t c_args_size = sizeof(void *) * items;
     void ** c_args;
     if (c_args_size <= 2048)
-        c_args = alloca(c_args_size);
+        c_args = AFFIX_ALLOCA(c_args_size);
     else {
         Newx(c_args, items, void *);
         SAVEFREEPV(c_args);
@@ -2725,6 +2738,7 @@ XS_INTERNAL(Affix_affix) {
         }
 
         if (symbol == nullptr) {
+            const infix_error_details_t load_err = created_implicit_handle ? infix_get_last_error() : (infix_error_details_t){0};
             if (created_implicit_handle) {
                 const char * lookup_path = SvOK(target_sv) ? SvPV_nolen(target_sv) : "";
                 SV ** entry_sv_ptr = hv_fetch(MY_CXT.lib_registry, lookup_path, strlen(lookup_path), 0);
@@ -2738,7 +2752,10 @@ XS_INTERNAL(Affix_affix) {
                     }
                 }
             }
-            warn("Failed to locate symbol '%s'", symbol_name_str ? symbol_name_str : "(null)");
+            if (load_err.message[0] != '\0')
+                warn("Failed to locate symbol '%s': %s", symbol_name_str ? symbol_name_str : "(null)", load_err.message);
+            else
+                warn("Failed to locate symbol '%s'", symbol_name_str ? symbol_name_str : "(null)");
             XSRETURN_UNDEF;
         }
     }

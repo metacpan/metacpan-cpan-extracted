@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1beta1::Mutation;
 # ABSTRACT: Mutation specifies the CEL expression which is used to apply the Mutation.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s applyConfiguration => 'Admissionregistration::V1beta1::ApplyConfiguration';
@@ -26,7 +26,7 @@ IO::K8s::Api::Admissionregistration::V1beta1::Mutation - Mutation specifies the 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 applyConfiguration
 

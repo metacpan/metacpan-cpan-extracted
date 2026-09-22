@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Regression coverage for karr ticket #13:
+# Regression coverage for k13:
 #
 # IO::K8s::Role::APIObject::api_version() used to derive the wire
 # apiVersion string by lc()-ing the CamelCase group component of the

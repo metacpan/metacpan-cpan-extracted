@@ -1,7 +1,10 @@
 package IO::K8s::Api::Core::V1::VolumeMount;
 # ABSTRACT: VolumeMount describes a mounting of a Volume within a container.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
+
+k8s bindMountOptions => [Str];
+
 
 k8s mountPath => Str, 'required';
 
@@ -38,7 +41,11 @@ IO::K8s::Api::Core::V1::VolumeMount - VolumeMount describes a mounting of a Volu
 
 =head1 VERSION
 
-version 1.107
+version 1.108
+
+=head2 bindMountOptions
+
+bindMountOptions is the list of additional bind mount options to apply when mounting this volume into the container. Allowed values are noexec, nodev, and nosuid. These are Linux mount options and have no effect on Windows nodes. This field is not supported with image volumes. This is an alpha field and requires enabling the VolumeBindMountOptions feature gate.
 
 =head2 mountPath
 

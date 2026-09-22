@@ -15,12 +15,14 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Kubernetes-REST",
   "EXE_FILES" => [
     "bin/kube_client",
+    "bin/kube_crd2class",
+    "bin/kube_test_minikube",
     "bin/kube_watch"
   ],
   "LICENSE" => "apache",
   "NAME" => "Kubernetes::REST",
   "PREREQ_PM" => {
-    "IO::K8s" => "1.107",
+    "IO::K8s" => "1.108",
     "IO::Socket::SSL" => 0,
     "JSON::MaybeXS" => 0,
     "LWP::UserAgent" => 0,
@@ -35,10 +37,9 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::Exception" => 0,
-    "Test::More" => 0
+    "Test::Exception" => 0
   },
-  "VERSION" => "1.107",
+  "VERSION" => "1.108",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +47,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "IO::K8s" => "1.107",
+  "IO::K8s" => "1.108",
   "IO::Socket::SSL" => 0,
   "JSON::MaybeXS" => 0,
   "LWP::UserAgent" => 0,
@@ -56,7 +57,6 @@ my %FallbackPrereqs = (
   "MooX::Options" => 0,
   "Path::Tiny" => 0,
   "Test::Exception" => 0,
-  "Test::More" => 0,
   "Throwable" => 0,
   "Types::Standard" => 0,
   "YAML::XS" => 0,

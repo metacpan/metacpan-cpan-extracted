@@ -135,6 +135,7 @@
 #define SA_ERR_FULL     (-12)
 #define SA_ERR_NOATOMICS (-13)
 #define SA_ERR_SHAPE    (-14)
+#define SA_ERR_BUSY     (-15)
 
 /* what `carve` takes as `type`, and what a registry entry records: */
 #define SA_TYPE_RAW         0u

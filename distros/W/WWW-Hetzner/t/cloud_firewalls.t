@@ -62,6 +62,8 @@ subtest 'create firewall' => sub {
     isa_ok($fw, 'WWW::Hetzner::Cloud::Firewall');
     is($fw->id, 400, 'new firewall id');
     is($fw->name, 'new-firewall', 'new firewall name');
+    isa_ok($fw->actions->[0], 'WWW::Hetzner::Action', 'firewall create yields actions list');
+    is($fw->actions->[0]->command, 'apply_firewall', 'action command');
 };
 
 subtest 'delete firewall' => sub {
@@ -95,7 +97,9 @@ subtest 'set rules' => sub {
     my $result = $cloud->firewalls->set_rules(300, [
         { direction => 'in', protocol => 'tcp', port => '443', source_ips => ['0.0.0.0/0'] },
     ]);
-    is($result->{actions}[0]{command}, 'set_firewall_rules', 'action command');
+    is(ref $result, 'ARRAY', 'returns arrayref of actions');
+    isa_ok($result->[0], 'WWW::Hetzner::Action');
+    is($result->[0]->command, 'set_firewall_rules', 'action command');
 };
 
 subtest 'apply to resources' => sub {
@@ -114,7 +118,8 @@ subtest 'apply to resources' => sub {
     my $result = $cloud->firewalls->apply_to_resources(300,
         { type => 'server', server => { id => 456 } },
     );
-    is($result->{actions}[0]{command}, 'apply_to_resources', 'action command');
+    isa_ok($result->[0], 'WWW::Hetzner::Action');
+    is($result->[0]->command, 'apply_to_resources', 'action command');
 };
 
 subtest 'remove from resources' => sub {
@@ -132,14 +137,19 @@ subtest 'remove from resources' => sub {
     my $result = $cloud->firewalls->remove_from_resources(300,
         { type => 'server', server => { id => 456 } },
     );
-    is($result->{actions}[0]{command}, 'remove_from_resources', 'action command');
+    isa_ok($result->[0], 'WWW::Hetzner::Action');
+    is($result->[0]->command, 'remove_from_resources', 'action command');
 };
 
 subtest 'firewall entity methods' => sub {
     my $fixture = load_fixture('firewalls_get');
+    my $action_fixture = load_fixture('firewalls_action');
 
     my $cloud = mock_cloud(
         '/firewalls/300' => $fixture,
+        'POST /firewalls/300/actions/set_rules' => $action_fixture,
+        'POST /firewalls/300/actions/apply_to_resources' => $action_fixture,
+        'POST /firewalls/300/actions/remove_from_resources' => $action_fixture,
     );
 
     my $fw = $cloud->firewalls->get(300);
@@ -148,6 +158,17 @@ subtest 'firewall entity methods' => sub {
     is($data->{id}, 300, 'data id');
     is($data->{name}, 'web-firewall', 'data name');
     is(scalar @{$data->{rules}}, 2, 'data rules count');
+
+    my $set_rules_result = $fw->set_rules(
+        { direction => 'in', protocol => 'tcp', port => '443', source_ips => ['0.0.0.0/0'] },
+    );
+    isa_ok($set_rules_result->[0], 'WWW::Hetzner::Action', 'entity set_rules returns Action list');
+
+    my $apply_result = $fw->apply_to_resources({ type => 'server', server => { id => 456 } });
+    isa_ok($apply_result->[0], 'WWW::Hetzner::Action', 'entity apply_to_resources returns Action list');
+
+    my $remove_result = $fw->remove_from_resources({ type => 'server', server => { id => 456 } });
+    isa_ok($remove_result->[0], 'WWW::Hetzner::Action', 'entity remove_from_resources returns Action list');
 };
 
 done_testing;

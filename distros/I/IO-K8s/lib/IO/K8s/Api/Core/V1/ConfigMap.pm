@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ConfigMap;
 # ABSTRACT: ConfigMap holds configuration data for pods to consume.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::ConfigMap - ConfigMap holds configuration data for pods 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -52,7 +52,7 @@ Immutable, if set to true, ensures that data stored in the ConfigMap cannot be u
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#configmap-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#configmap-v1-core>
 
 =head1 SUPPORT
 

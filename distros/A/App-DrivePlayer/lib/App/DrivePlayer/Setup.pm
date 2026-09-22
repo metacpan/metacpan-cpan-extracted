@@ -10,7 +10,6 @@ ToolSet->export(
     'Moo'             => undef,
     'Readonly'        => undef,
     'Types::Standard' => 'Str HashRef ArrayRef InstanceOf HasMethods CodeRef Bool Int Num Maybe',
-    'YAML::Any'       => 'Dump',
 );
 
 1;

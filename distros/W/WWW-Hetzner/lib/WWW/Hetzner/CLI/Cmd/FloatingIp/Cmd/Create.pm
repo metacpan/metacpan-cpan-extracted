@@ -1,11 +1,12 @@
 package WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::Create;
 # ABSTRACT: Create a floating IP
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl floating-ip create --type <ipv4|ipv6> --home-location <location>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option type => (
     is       => 'ro',
@@ -47,6 +48,7 @@ sub execute {
         ($self->name        ? (name        => $self->name)        : ()),
         ($self->description ? (description => $self->description) : ()),
     );
+    $self->handle_action($fip->action);
     print "Floating IP created with ID ", $fip->id, " (", $fip->ip, ")\n";
 }
 
@@ -64,7 +66,7 @@ WWW::Hetzner::CLI::Cmd::FloatingIp::Cmd::Create - Create a floating IP
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -87,7 +89,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 1;
 
@@ -39,6 +39,6 @@ evolve without changing the public Linux::Event API.
 
 =head1 STATUS
 
-Version 0.001 is the first CPAN release of Linux::Event::WebSocket.
+Version 0.002 fixes native allocation cleanup for rejected Close frames found by CPAN Testers.
 
 =cut

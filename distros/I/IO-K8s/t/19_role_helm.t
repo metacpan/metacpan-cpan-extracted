@@ -123,7 +123,7 @@ subtest 'loadbalanced: mirror_to' => sub {
     is($mirrors->[0]{percent}, 10, 'mirror percent');
 };
 
-# --- MiddlewareBuilder ---
+# --- MiddlewareBuilder (HTTP Middleware) ---
 
 subtest 'middleware: rate_limit' => sub {
     my $mw = IO::K8s::Traefik::V1alpha1::Middleware->new(
@@ -197,15 +197,82 @@ subtest 'middleware: chaining' => sub {
     is($result, $mw, 'chaining returns self');
 };
 
-subtest 'middlewareTCP: rate_limit' => sub {
-    my $mw = IO::K8s::Traefik::V1alpha1::MiddlewareTCP->new(
+# --- MiddlewareTCPBuilder ---
+#
+# Traefik's TCP middleware CRD is a much smaller schema than the HTTP one:
+# MiddlewareTCPSpec carries only inFlightConn, ipAllowList and the
+# deprecated ipWhiteList (k95/D5 full-depth modeling, verified against
+# traefik v3.7.12). Since k106 MiddlewareTCP composes MiddlewareTCPBuilder
+# for exactly those three, not the HTTP MiddlewareBuilder.
+
+sub tcp_mw {
+    IO::K8s::Traefik::V1alpha1::MiddlewareTCP->new(
         metadata => IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta->new(
-            name => 'tcp-rate',
+            name => $_[0],
         ),
     );
+}
 
-    $mw->rate_limit(average => 50);
-    is($mw->spec->{rateLimit}{average}, 50, 'TCP rate limit');
+subtest 'middlewareTCP: in_flight_conn' => sub {
+    my $mw = tcp_mw('tcp-conns');
+
+    my $result = $mw->in_flight_conn(10);
+    is($result, $mw, 'chaining returns self');
+    is($mw->spec->inFlightConn->amount, 10, 'written into the typed struct');
+    is($mw->TO_JSON->{spec}{inFlightConn}{amount}, 10, 'serializes under spec.inFlightConn');
+
+    my $again = IO::K8s::Traefik::V1alpha1::MiddlewareTCP->from_json($mw->to_json);
+    is($again->spec->inFlightConn->amount, 10, 'survives a full JSON round-trip');
+};
+
+subtest 'middlewareTCP: ip_allow_list' => sub {
+    my $mw = tcp_mw('tcp-allow');
+
+    $mw->ip_allow_list('10.0.0.0/8', '192.168.1.7');
+    is_deeply($mw->spec->ipAllowList->sourceRange, [ '10.0.0.0/8', '192.168.1.7' ],
+        'written into the typed struct');
+    is_deeply($mw->TO_JSON->{spec}{ipAllowList}{sourceRange}, [ '10.0.0.0/8', '192.168.1.7' ],
+        'serializes under spec.ipAllowList.sourceRange');
+
+    $mw->ip_allow_list('172.16.0.0/12');
+    is_deeply($mw->TO_JSON->{spec}{ipAllowList}{sourceRange}, [ '172.16.0.0/12' ],
+        'a second call replaces the block rather than appending');
+};
+
+subtest 'middlewareTCP: ip_white_list (upstream-deprecated predecessor)' => sub {
+    my $mw = tcp_mw('tcp-white');
+
+    $mw->ip_white_list('10.0.0.0/8');
+    is_deeply($mw->TO_JSON->{spec}{ipWhiteList}{sourceRange}, [ '10.0.0.0/8' ],
+        'serializes under spec.ipWhiteList.sourceRange');
+    ok(!exists $mw->TO_JSON->{spec}{ipAllowList}, 'and does not also write the allow-list field');
+};
+
+subtest 'middlewareTCP: the HTTP builders are not composed (k106)' => sub {
+    my $mw = tcp_mw('tcp-no-http');
+
+    # The point of the k106 split: an HTTP-only middleware setter on a TCP
+    # middleware is a caller error Traefik would silently ignore, so it now
+    # fails as an unknown method instead of writing a block nothing honours.
+    ok(!IO::K8s::Traefik::V1alpha1::MiddlewareTCP->can($_), "no $_ on MiddlewareTCP")
+        for qw( rate_limit basic_auth strip_prefix redirect_https
+                add_request_header add_response_header );
+    throws_ok { $mw->rate_limit(average => 50) } qr/rate_limit/,
+        'calling an HTTP setter on a TCP middleware dies';
+};
+
+subtest 'specbuilder: an undeclared key on a typed spec still round-trips' => sub {
+    my $mw = tcp_mw('tcp-unknown');
+
+    # Until k106 this was asserted through MiddlewareBuilder's rate_limit,
+    # which MiddlewareTCP no longer composes. The SpecBuilder behaviour
+    # itself is unchanged and is what this covers: a key the typed spec does
+    # not declare lands in its _unknown_fields bag (D1) and is re-emitted
+    # verbatim -- now written as the plain spec_set it always was underneath.
+    $mw->spec_set('rateLimit', { average => 50 });
+    is_deeply($mw->spec->_unknown_fields->{rateLimit}, { average => 50 },
+        'the undeclared key is kept in the bag');
+    is($mw->TO_JSON->{spec}{rateLimit}{average}, 50, 'and round-trips onto the wire');
 };
 
 done_testing;

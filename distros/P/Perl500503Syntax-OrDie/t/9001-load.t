@@ -16,14 +16,14 @@ use lib "$FindBin::Bin/lib";
 
 my ($T_PLAN, $T_RUN, $T_FAIL) = (0, 0, 0);
 sub plan_tests { $T_PLAN = $_[0]; print "1..$T_PLAN\n" }
-sub ok {
+sub ok ($;$) {
     my ($ok, $name) = @_;
     $T_RUN++; $T_FAIL++ unless $ok;
     print +($ok ? '' : 'not ') . "ok $T_RUN" . ($name ? " - $name" : '') . "\n";
     return $ok;
 }
 sub diag { print "# $_[0]\n" }
-END { exit 1 if $T_PLAN && $T_FAIL }
+END { $? = 1 if $T_PLAN && $T_FAIL }
 
 plan_tests(15);
 
@@ -41,8 +41,8 @@ ok(defined $Perl500503Syntax::OrDie::VERSION,
 ok($Perl500503Syntax::OrDie::VERSION =~ /^\d+\.\d+/,
    'Perl500503Syntax::OrDie: $VERSION looks like a version number');
 
-ok($Perl500503Syntax::OrDie::VERSION eq '0.03',
-   'Perl500503Syntax::OrDie: $VERSION is 0.03');
+ok($Perl500503Syntax::OrDie::VERSION eq '0.05',
+   'Perl500503Syntax::OrDie: $VERSION is 0.05');
 
 # Public API subs
 ok(defined &Perl500503Syntax::OrDie::check_file,

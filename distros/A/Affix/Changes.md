@@ -5,6 +5,33 @@ All notable changes to Affix.pm will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.7] - 2026-09-22
+
+### Fixed
+
+- All `alloca()` uses now expand to the compiler builtin (`AFFIX_ALLOCA`) instead of the libc declaration. NetBSD doesn't export an `alloca` symbol, and on aarch64 GCC emits a real external reference, so the built library carried an undefined PLT symbol that made every `dlopen` (and thus every test) fail on NetBSD/arm.
+- NetBSD CI now runs on 11.0 and covers x86_64, aarch64, and riscv64. The x86_64 leg is built against the same perl (5.42.3) and gcc as [this failing CPAN smoke tester](https://www.cpantesters.org/cpan/report/0b92f61a-b620-11f1-a0c9-8e4f39490bb5).
+
+## [v1.2.6] - 2026-09-21
+
+I'm doing CI work to make sure things function beyond the big three. BSDs required no changes (I started infix on FreeBSD) but Solaris (and forks) required VMs.
+
+### Fixed
+
+- The AVX2 subtests in `t/085_simd_m256.t` have always been skipped on hosts whose compiler defaulted to the baseline x86-64 target. Oops. It's not verified in CI.
+- `find_library` works again on Solaris/Illumos/OmniOS. The probe used to kill over looking for 64-bit library directories and no longer hard-fails on non-glibc `ldconfig` setups.
+- `find_library` now rejects candidates whose ELF class doesn't match perl's bitness, so a 32-bit `libc`/`libm` can't be handed to a 64-bit perl and fail to `dlopen`.
+- The `Failed to locate symbol '...'` warning now includes the loader's error detail when the failure came from opening the library, instead of burying the cause.
+- `alloca()` is now declared on Solaris/Illumos (via `<alloca.h>` under `__sun`), fixing implicit declaration errors with GCC 14+.
+- OmniOS no longer fails at link time with a GCC LTO wrapper race. I just disable LTO with ccflags.
+- Solidified MSVC support even on Strawberry Perls (mostly skipped or adapted in unit tests):
+  - Shims export their symbols with `DLLEXPORT`
+  - ABI-incompatible cases:
+    - `long double` == `double`
+    - unavailable `__int128`/SIMD helpers
+    - passing Perl `FILE*` into a cl-built CRT
+    - `usleep` vs `Sleep` (only used in unit test but...)
+
 ## [v1.2.5] - 2026-08-17
 
 ### Fixed
@@ -396,7 +423,9 @@ Based on infix v0.1.3
 
   - Affix.pm is born
 
-[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.2.5...HEAD
+[Unreleased]: https://github.com/sanko/Affix.pm/compare/v1.2.7...HEAD
+[v1.2.7]: https://github.com/sanko/Affix.pm/compare/v1.2.6...v1.2.7
+[v1.2.6]: https://github.com/sanko/Affix.pm/compare/v1.2.5...v1.2.6
 [v1.2.5]: https://github.com/sanko/Affix.pm/compare/v1.2.4...v1.2.5
 [v1.2.4]: https://github.com/sanko/Affix.pm/compare/v1.2.3...v1.2.4
 [v1.2.3]: https://github.com/sanko/Affix.pm/compare/v1.2.2...v1.2.3

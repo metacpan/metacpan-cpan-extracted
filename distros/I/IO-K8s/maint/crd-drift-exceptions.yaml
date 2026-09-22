@@ -1,0 +1,459 @@
+# Maintained allowlist for maint/crd-drift-check.pl.
+#
+# The CRD analog of maint/spec-drift-exceptions.yaml. Every entry here is a
+# deliberate, already-made decision -- not a TODO. New entries should say
+# *why* and reference the karr ticket or Changes bullet that made the call
+# (this file was seeded under k82). This file is read as-is on every run;
+# there is no merge with built-in defaults, so removing an entry immediately
+# surfaces whatever it was hiding.
+#
+# Matching: GVK-level entries (ignore_missing_kinds, ignore_stale_kinds)
+# match on an exact "group/version/Kind" `gvk`; field-level entries
+# (ignore_missing_fields, ignore_extra_fields) additionally match `field`.
+# An optional `provider` narrows an entry to one provider (omit it to match
+# in any provider). No globs, no regex.
+
+# Upstream GVKs the providers deliberately do not ship a class for.
+#
+# GatewayAPI (k95, task B-GatewayAPI): the standard-channel manifests at
+# v1.6.1 list a v1alpha2 or v1alpha3 entry inside the multi-version CRDs for
+# TCPRoute, UDPRoute, TLSRoute and BackendTLSPolicy, but every one of them
+# has `served: false` -- upstream graduated each to v1 and left the old
+# schema in the manifest only for conversion/history, the apiserver never
+# serves it, and IO::K8s::CRD->generate (served_versions) already skips
+# them. These five entries exist only because maint/crd-drift-check.pl's
+# parse_crds reads every versions[] entry regardless of served (Phase A,
+# frozen), so an unserved-but-listed version would otherwise misreport as a
+# missing Kind; there is nothing to model. (v1beta1 Gateway/GatewayClass/
+# HTTPRoute WAS a third case here before k95 -- those three ARE served at
+# v1beta1 and now have real classes at lib/IO/K8s/GatewayAPI/V1beta1/,
+# reachable via their domain-qualified resource_map keys; satisfied,
+# removed. See lib/IO/K8s/GatewayAPI.pm.)
+ignore_missing_kinds:
+  - provider: GatewayAPI
+    gvk: gateway.networking.k8s.io/v1alpha2/TCPRoute
+    reason: "k95: served: false at v1.6.1 (graduated to v1); nothing upstream serves to model"
+  - provider: GatewayAPI
+    gvk: gateway.networking.k8s.io/v1alpha2/UDPRoute
+    reason: "k95: served: false at v1.6.1 (graduated to v1); nothing upstream serves to model"
+  - provider: GatewayAPI
+    gvk: gateway.networking.k8s.io/v1alpha2/TLSRoute
+    reason: "k95: served: false at v1.6.1 (graduated to v1); nothing upstream serves to model"
+  - provider: GatewayAPI
+    gvk: gateway.networking.k8s.io/v1alpha3/TLSRoute
+    reason: "k95: served: false at v1.6.1 (graduated to v1); nothing upstream serves to model"
+  - provider: GatewayAPI
+    gvk: gateway.networking.k8s.io/v1alpha3/BackendTLSPolicy
+    reason: "k95: served: false at v1.6.1 (graduated to v1); nothing upstream serves to model"
+
+  # VolumeSnapshot (k97, external-snapshotter v8.6.0): the v1beta1 track of all
+  # three Kinds is served: false / storage: false in the pinned manifests -- v1
+  # is the sole served+storage version. GatewayAPI case above: nothing upstream
+  # serves at v1beta1 to model. (VolumeGroupSnapshot* GA'd at v8.6.0 lives in the
+  # separate groupsnapshot.storage.k8s.io group, not in crd_sources yet -- k113.)
+  - provider: VolumeSnapshot
+    gvk: snapshot.storage.k8s.io/v1beta1/VolumeSnapshot
+    reason: "k97: served: false at external-snapshotter v8.6.0 (v1 is sole served/storage version); nothing to model"
+  - provider: VolumeSnapshot
+    gvk: snapshot.storage.k8s.io/v1beta1/VolumeSnapshotClass
+    reason: "k97: served: false at external-snapshotter v8.6.0 (v1 is sole served/storage version); nothing to model"
+  - provider: VolumeSnapshot
+    gvk: snapshot.storage.k8s.io/v1beta1/VolumeSnapshotContent
+    reason: "k97: served: false at external-snapshotter v8.6.0 (v1 is sole served/storage version); nothing to model"
+
+  # ExternalSecrets (k97, external-secrets v2.10.0): the v1beta1 track of
+  # the four graduated external-secrets.io Kinds is served: false in the
+  # bundle; external-secrets.io/v1 is served+storage. (This used to be two
+  # kinds of deliberate gap -- generators.external-secrets.io/v1alpha1's 19
+  # Kinds, including the 17-member union ClusterGenerator, were the other
+  # one, deferred under k113; all 19 are modeled now and every entry for
+  # that group is gone, ClusterGenerator included.)
+  - provider: ExternalSecrets
+    gvk: external-secrets.io/v1beta1/ExternalSecret
+    reason: "k97: served: false at external-secrets v2.10.0 (graduated to v1); nothing to model"
+  - provider: ExternalSecrets
+    gvk: external-secrets.io/v1beta1/SecretStore
+    reason: "k97: served: false at external-secrets v2.10.0 (graduated to v1); nothing to model"
+  - provider: ExternalSecrets
+    gvk: external-secrets.io/v1beta1/ClusterSecretStore
+    reason: "k97: served: false at external-secrets v2.10.0 (graduated to v1); nothing to model"
+  - provider: ExternalSecrets
+    gvk: external-secrets.io/v1beta1/ClusterExternalSecret
+    reason: "k97: served: false at external-secrets v2.10.0 (graduated to v1); nothing to model"
+
+# Shipped GVKs (resource_map classes) intentionally kept with no matching
+# upstream CRD at the pinned upstream_version: back-compat tracks for
+# clusters still running an older provider release. Without these, every run
+# re-reports the same settled decisions.
+#
+# Cilium (k78): the v2alpha1 BGP/CIDR tracks were superseded by v2 and two
+# Kinds were REMOVED from upstream entirely -- CiliumBGPPeeringPolicy and
+# CiliumExternalWorkload. Their classes are kept, reachable only by their
+# domain-qualified resource_map keys, so older Cilium clusters still round-
+# trip. Documented in lib/IO/K8s/Cilium.pm. (The surviving v2alpha1 BGP/CIDR
+# Kinds are NOT stale: upstream v1.20 still serves them as extra versions of
+# the v2 CRDs, so they match normally.)
+#
+# AgentSandbox (k88): the pin moved from v0.5.4 to v1.0.0, a MAJOR upstream
+# bump that REMOVED the entire v1alpha1 track -- all four CRDs (Sandbox,
+# SandboxClaim, SandboxTemplate, SandboxWarmPool) now serve v1beta1 only. The
+# four v1alpha1 classes are kept as a back-compat superset for clusters still
+# on agent-sandbox v0.5.x, reachable only by their domain-qualified
+# resource_map keys, so those clusters still round-trip. Documented in
+# lib/IO/K8s/AgentSandbox.pm. (v1beta1 is unchanged by the bump and matches
+# upstream v1.0.0 exactly.)
+ignore_stale_kinds:
+  - provider: Cilium
+    gvk: cilium.io/v2/CiliumExternalWorkload
+    reason: "k78: removed from upstream Cilium; class kept for older clusters via its domain-qualified key"
+  - provider: Cilium
+    gvk: cilium.io/v2alpha1/CiliumBGPPeeringPolicy
+    reason: "k78: removed from upstream Cilium; class kept for older clusters via its domain-qualified key"
+  - provider: AgentSandbox
+    gvk: agents.x-k8s.io/v1alpha1/Sandbox
+    reason: "k88: v1alpha1 removed upstream at agent-sandbox v1.0.0; class kept for clusters still on v0.5.x"
+  - provider: AgentSandbox
+    gvk: extensions.agents.x-k8s.io/v1alpha1/SandboxClaim
+    reason: "k88: v1alpha1 removed upstream at agent-sandbox v1.0.0; class kept for clusters still on v0.5.x"
+  - provider: AgentSandbox
+    gvk: extensions.agents.x-k8s.io/v1alpha1/SandboxTemplate
+    reason: "k88: v1alpha1 removed upstream at agent-sandbox v1.0.0; class kept for clusters still on v0.5.x"
+  - provider: AgentSandbox
+    gvk: extensions.agents.x-k8s.io/v1alpha1/SandboxWarmPool
+    reason: "k88: v1alpha1 removed upstream at agent-sandbox v1.0.0; class kept for clusters still on v0.5.x"
+
+# Upstream spec fields a modeled class deliberately omits.
+ignore_missing_fields: []
+
+# Modeled spec fields a class ships that the current upstream CRD lacks:
+# fields kept for older provider releases, or upstream-removed fields kept
+# for back-compat.
+ignore_extra_fields: []
+
+# --check's NOT RENDERED status (A3, k95): a file under
+# lib/IO/K8s/<Provider>/ that --render's current pass does not produce --
+# typically a back-compat class for a GVK already excused above via
+# ignore_stale_kinds, whose upstream CRD is gone so there is nothing left
+# to render it from. `path` is lib/-relative
+# ("IO/K8s/<Provider>/<Version>/<File>.pm"), matching what --check itself
+# reports. Empty until a provider's Phase B task actually converts it to
+# full-depth rendering and finds a kept file the render legitimately can't
+# reproduce.
+#
+# Cilium (task B-Cilium, k95): CiliumExternalWorkload and
+# CiliumBGPPeeringPolicy are the two ignore_stale_kinds back-compat classes
+# above (k78) -- their upstream CRDs are gone, so --render has nothing left
+# to reproduce them from; both stay hand-checked-in as-is.
+#
+# AgentSandbox (task B-AgentSandbox, k95, D7): the entire v1alpha1 track
+# (Sandbox, SandboxClaim, SandboxTemplate, SandboxWarmPool) is the
+# ignore_stale_kinds back-compat superset above (k88) -- upstream v1.0.0
+# ships no v1alpha1 manifest at all (no api/v1alpha1 directory in the repo
+# at this tag) to render from, so all four stay hand-checked-in as-is.
+ignore_unrendered:
+  - provider: Cilium
+    path: IO/K8s/Cilium/V2/CiliumExternalWorkload.pm
+    reason: "k78: removed from upstream Cilium; class kept for older clusters via its domain-qualified key, nothing left upstream to render it from"
+  - provider: Cilium
+    path: IO/K8s/Cilium/V2alpha1/CiliumBGPPeeringPolicy.pm
+    reason: "k78: removed from upstream Cilium; class kept for older clusters via its domain-qualified key, nothing left upstream to render it from"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1alpha1/Sandbox.pm
+    reason: "k88: v1alpha1 removed upstream at agent-sandbox v1.0.0 (no api/v1alpha1 manifest left to render from); class kept for clusters still on v0.5.x"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1alpha1/SandboxClaim.pm
+    reason: "k88: v1alpha1 removed upstream at agent-sandbox v1.0.0 (no api/v1alpha1 manifest left to render from); class kept for clusters still on v0.5.x"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1alpha1/SandboxTemplate.pm
+    reason: "k88: v1alpha1 removed upstream at agent-sandbox v1.0.0 (no api/v1alpha1 manifest left to render from); class kept for clusters still on v0.5.x"
+  - provider: AgentSandbox
+    path: IO/K8s/AgentSandbox/V1alpha1/SandboxWarmPool.pm
+    reason: "k88: v1alpha1 removed upstream at agent-sandbox v1.0.0 (no api/v1alpha1 manifest left to render from); class kept for clusters still on v0.5.x"
+  - provider: ExternalSecrets
+    path: IO/K8s/ExternalSecrets/V1alpha1/UUIDSpec.pm
+    reason: "k120/k133: upstream models uuids .spec as a property-less {type: object}; AutoGen keeps a property-less object opaque (k55) so the render types UUID.spec as { Str => 1 } and emits no UUIDSpec, while lib ships a named empty struct. A typed-empty vs opaque-hash wrapper choice, not a field difference; k133 chose Weg 1 -- keep the named empty struct as a superset and accept the two residual reference-site divergences via accept_structural_divergence below."
+  # CertManager (k135/k139) / PrometheusOperator (k137): the provider-owned
+  # condition classes. lib gives each provider its own Issuer/Certificate/
+  # CertificateRequest/monitoringv1.Condition class, required exactly as its own
+  # CRD requires, so live conditions that omit message/reason/lastTransitionTime
+  # no longer drop on inflate. k136 taught reuse_core (D5) to refuse a candidate
+  # that marks a shared key required beyond what the schema itself requires;
+  # k139 went further -- when the k136 required filter drops the ONLY
+  # shared-vocab (Meta/Core) candidate a shape had and leaves just a
+  # domain-foreign one, reuse_core now returns undef so the provider's own
+  # nested condition class is generated (see IO::K8s::AutoGen::_core_class_for).
+  #   - Issuer/Certificate condition shape (6 keys, with observedGeneration,
+  #     schema requires [status,type]): metav1.Condition is dropped by the k136
+  #     required filter; k139 then stops the fallback to Autoscaling::V2::
+  #     HorizontalPodAutoscalerCondition, so the emitter now renders
+  #     IssuerCondition/CertificateCondition (overlay names in
+  #     maint/crd-render/CertManager.yaml). RESOLVED -- removed from this list,
+  #     and IssuerStatus/CertificateStatus now MATCH (removed from
+  #     accept_structural_divergence below). The one residual was a value
+  #     constraint: the render carries the CRD's `status` enum
+  #     [True,False,Unknown] which the hand-written lib classes omitted; k141
+  #     added `enum => [qw(True False Unknown)]` to the `status` field of both
+  #     IssuerCondition and CertificateCondition, so they now MATCH the render
+  #     and their two accept_structural_divergence entries were removed below.
+  #   - CertificateRequest condition shape (5 keys, no observedGeneration,
+  #     schema requires [status,type]): reused Core::V1::NamespaceCondition,
+  #     which IS shared-vocab (Core::V1) and SURVIVES the k136 required filter,
+  #     so k139 never fired and the emitter kept reusing it rather than rendering
+  #     CertificateRequestCondition. k140 RESOLVED this through the overlay, not
+  #     the reuse predicate (exactly as PrometheusOperator's WorkloadBinding
+  #     condition): maint/crd-render/CertManager.yaml lists the conditions item
+  #     path under `no_reuse_core` (D5 reuse suppressed) and names it
+  #     CertificateRequestCondition (D6), so the emitter renders the per-provider
+  #     class. lib was regrouped to the grouped k8s layout (k141 style) and its
+  #     `status` carries the CRD enum [True,False,Unknown], so it now MATCHes the
+  #     render -- removed from this list, and CertificateRequestStatus MATCHes
+  #     too (removed from accept_structural_divergence below).
+  #   - PrometheusOperator's condition shape (6 keys): k139 stops the
+  #     HorizontalPodAutoscalerCondition reuse. lib had hand-merged two
+  #     schema-distinct variants -- the enum-free Alertmanager/Prometheus
+  #     `.status.conditions[]` and the WorkloadBinding `.conditions[]` whose
+  #     `type` carries enum [Accepted] -- into one Condition class, which made
+  #     the render collide. k139 splits them in lib: Condition stays enum-free
+  #     (Alertmanager/Prometheus) and the new WorkloadBindingCondition carries
+  #     the type enum (referenced by both the V1 and V1alpha1 WorkloadBinding).
+  #     Both render now (overlay names in maint/crd-render/PrometheusOperator.yaml)
+  #     and MATCH modulo POD -- RESOLVED, removed from this list; the two
+  #     condition classes' POD-only diffs are in ignore_cosmetic_differs below,
+  #     and the four status classes now MATCH (removed from
+  #     accept_structural_divergence).
+# --check's COSMETIC status (k132): a DIFFERS whose ONLY divergence from the
+# emitter render is presentation -- the `# ABSTRACT:` summary, POD prose
+# (=description/=attr/=seealso wording and line-wrapping), ordinary comments,
+# =>-alignment, or where the k8s lines sit relative to their POD. The k8s
+# declarations themselves (name/type/required/enum, plus the identity/scope
+# `use IO::K8s::APIObject|Resource ...;` and any `with '...';`) are byte-
+# identical once whitespace is normalised, so the class round-trips exactly as
+# the emitter would; only the hand-authored documentation differs, which is
+# deliberately NOT aligned to the renderer (k120: never align lib to the
+# emitter). Listing a file here reclassifies its DIFFERS as COSMETIC --
+# dropped from the failing-differs count so --check exits 0 on it -- but the
+# listing is only ever a candidate: check_for suppresses it ONLY when
+# _structural_signature(render) eq _structural_signature(lib). A listed file
+# whose k8s declarations actually drift still trips as a real DIFFERS, flagged
+# as a stale entry (an exception must never hide a real change).
+#
+# `path` is lib/-relative ("IO/K8s/<Provider>/<Version>/<File>.pm"), matching
+# what --check itself reports. Under --verbose these are listed individually;
+# a routine --check shows only their count.
+#
+# VolumeSnapshot (k132/k134): the 33 groupsnapshot.storage.k8s.io classes
+# across V1/V1beta1/V1beta2. k134 extended maint/crd-render/VolumeSnapshot.yaml
+# so the emitter renders the whole VolumeGroupSnapshot* family; every residual
+# differ against it is presentation-only (hand-authored ABSTRACT/POD plus the
+# emitter's own grouped-k8s/aligned layout).
+#
+# PrometheusOperator (k132): Argument (POD re-wrap), HostPort (ABSTRACT),
+# RuleGroup (a kept k110 explanatory comment on a flagged pattern).
+#
+# ExternalSecrets (k132): 8 generators.external-secrets.io/v1alpha1 (+ one v1)
+# classes differing only in ABSTRACT/POD. NOT listed here, deliberately:
+# V1alpha1/UUID.pm and V1alpha1/ClusterGeneratorGenerator.pm, whose `spec`/
+# `uuidSpec` the emitter types as { Str => 1 } while lib ships the named empty
+# struct UUIDSpec (see ignore_unrendered's UUIDSpec.pm entry). Those are
+# genuine k8s-declaration differences, not cosmetic; the guard would refuse
+# them anyway. k133 settled the k120 follow-up (Weg 1): they are kept as a
+# superset and accepted via accept_structural_divergence below, never here.
+ignore_cosmetic_differs:
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1/GroupSnapshotHandles.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1/VolumeGroupSnapshot.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1/VolumeGroupSnapshotClass.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1/VolumeGroupSnapshotContent.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1/VolumeGroupSnapshotContentSource.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1/VolumeGroupSnapshotContentSpec.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1/VolumeGroupSnapshotContentStatus.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1/VolumeGroupSnapshotSource.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1/VolumeGroupSnapshotSpec.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1/VolumeGroupSnapshotStatus.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1/VolumeSnapshotInfo.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta1/GroupSnapshotHandles.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta1/VolumeGroupSnapshot.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta1/VolumeGroupSnapshotClass.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta1/VolumeGroupSnapshotContent.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta1/VolumeGroupSnapshotContentSource.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta1/VolumeGroupSnapshotContentSpec.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta1/VolumeGroupSnapshotContentStatus.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta1/VolumeGroupSnapshotSource.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta1/VolumeGroupSnapshotSpec.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta1/VolumeGroupSnapshotStatus.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta1/VolumeSnapshotHandlePair.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta2/GroupSnapshotHandles.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta2/VolumeGroupSnapshot.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta2/VolumeGroupSnapshotClass.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta2/VolumeGroupSnapshotContent.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta2/VolumeGroupSnapshotContentSource.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta2/VolumeGroupSnapshotContentSpec.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta2/VolumeGroupSnapshotContentStatus.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta2/VolumeGroupSnapshotSource.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta2/VolumeGroupSnapshotSpec.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta2/VolumeGroupSnapshotStatus.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: VolumeSnapshot
+    path: IO/K8s/VolumeSnapshot/V1beta2/VolumeSnapshotInfo.pm
+    reason: "k132/k134: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary, k8s-line grouping and =>-alignment and POD prose only"
+  - provider: PrometheusOperator
+    path: IO/K8s/PrometheusOperator/V1/Argument.pm
+    reason: "k132: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is POD prose only"
+  - provider: PrometheusOperator
+    path: IO/K8s/PrometheusOperator/V1/HostPort.pm
+    reason: "k132: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary and POD prose only"
+  - provider: PrometheusOperator
+    path: IO/K8s/PrometheusOperator/V1/RuleGroup.pm
+    reason: "k132: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is a retained explanatory comment and POD prose only"
+  - provider: PrometheusOperator
+    path: IO/K8s/PrometheusOperator/V1/Condition.pm
+    reason: "k139: cosmetic differ -- k8s declarations identical to the emitter render (enum-free Alertmanager/Prometheus condition) after whitespace normalisation; diff is hand-authored POD prose only"
+  - provider: PrometheusOperator
+    path: IO/K8s/PrometheusOperator/V1/WorkloadBindingCondition.pm
+    reason: "k139: cosmetic differ -- k8s declarations identical to the emitter render (the WorkloadBinding condition variant, type enum [Accepted]) after whitespace normalisation; diff is hand-authored POD prose only"
+  - provider: ExternalSecrets
+    path: IO/K8s/ExternalSecrets/V1/SecretKeySelector.pm
+    reason: "k132: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary and POD prose only"
+  - provider: ExternalSecrets
+    path: IO/K8s/ExternalSecrets/V1alpha1/ACRAccessTokenSpec.pm
+    reason: "k132: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary and POD prose only"
+  - provider: ExternalSecrets
+    path: IO/K8s/ExternalSecrets/V1alpha1/ClusterGeneratorSpec.pm
+    reason: "k132: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is k8s-line grouping and =>-alignment and POD prose only"
+  - provider: ExternalSecrets
+    path: IO/K8s/ExternalSecrets/V1alpha1/Fake.pm
+    reason: "k132: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary and POD prose only"
+  - provider: ExternalSecrets
+    path: IO/K8s/ExternalSecrets/V1alpha1/GCRWorkloadIdentity.pm
+    reason: "k132: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary and POD prose only"
+  - provider: ExternalSecrets
+    path: IO/K8s/ExternalSecrets/V1alpha1/GitlabDeployTokenSecretRef.pm
+    reason: "k132: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary and POD prose only"
+  - provider: ExternalSecrets
+    path: IO/K8s/ExternalSecrets/V1alpha1/PushSecretMetadata.pm
+    reason: "k132: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary and POD prose only"
+  - provider: ExternalSecrets
+    path: IO/K8s/ExternalSecrets/V1alpha1/WebhookSpec.pm
+    reason: "k132: cosmetic differ -- k8s declarations identical to the emitter render after whitespace normalisation; diff is the # ABSTRACT summary and POD prose only"
+
+# --check's ACCEPTED DIVERGENCE status (k133, Weg 1): a DIFFERS whose k8s
+# declarations GENUINELY differ from the emitter render and which the
+# maintainer has decided to KEEP as a documented, file-exact divergence. This
+# is deliberately a category of its own, NOT part of ignore_cosmetic_differs:
+# a cosmetic differ is one whose structural signature still matches (only
+# POD/ABSTRACT/whitespace differ) and is verified by the _structural_signature
+# guard; an accepted divergence is the opposite -- the k8s declarations really
+# do differ, so it can never pass that guard and must not be smuggled through
+# it. Listing a file here reclassifies its DIFFERS as ACCEPTED DIVERGENCE:
+# dropped from the failing-differs count so --check exits 0 on it, listed with
+# its diff under --verbose. Matching is strictly provider + exact `path`
+# (lib/-relative "IO/K8s/<Provider>/<Version>/<File>.pm") with no globs or
+# regex, so the category can only ever affect the exact files it names and can
+# never mask structural drift on any other file. Kept deliberately small; each
+# entry needs a one-line reason and a ticket ref.
+#
+# ExternalSecrets (k133 Weg 1 / k55 / k120): the typed-empty-vs-opaque-hash
+# UUIDSpec choice. generators.external-secrets.io/v1alpha1 models uuids .spec
+# (and ClusterGenerator's uuid generator, uuidSpec) as a property-less
+# {type: object}; AutoGen keeps a property-less object opaque (k55), so the
+# emitter types both reference sites as { Str => 1 } and emits no UUIDSpec,
+# while lib deliberately keeps the named empty struct UUIDSpec as a superset.
+# k133 chose Weg 1 -- keep lib as-is and accept these two residual
+# reference-site divergences here, rather than drop the class (Deprecated) or
+# teach AutoGen a forced-struct hook.
+accept_structural_divergence:
+  - provider: ExternalSecrets
+    path: IO/K8s/ExternalSecrets/V1alpha1/UUID.pm
+    reason: "k133 Weg 1 / k55 / k120: typed-empty UUIDSpec deliberately kept as a superset -- lib types spec as +IO::K8s::ExternalSecrets::V1alpha1::UUIDSpec, the emitter renders the opaque { Str => 1 }"
+  - provider: ExternalSecrets
+    path: IO/K8s/ExternalSecrets/V1alpha1/ClusterGeneratorGenerator.pm
+    reason: "k133 Weg 1 / k55 / k120: typed-empty UUIDSpec deliberately kept as a superset -- lib types uuidSpec as +IO::K8s::ExternalSecrets::V1alpha1::UUIDSpec, the emitter renders the opaque { Str => 1 }"
+  # CertManager (k135/k139) / PrometheusOperator (k137): the provider-owned
+  # condition classes and the status classes that reference them. k136 stopped
+  # reuse_core (D5) rendering Meta::V1::Condition here (it over-requires vs
+  # these CRDs); k139 then stopped the fallback to the domain-foreign
+  # Autoscaling::V2::HorizontalPodAutoscalerCondition, so the emitter now
+  # renders the provider's own condition class where a shared-vocab candidate
+  # existed but was required-filtered out (see ignore_unrendered above).
+  #   - CertManager Issuer/Certificate: fully RESOLVED -- IssuerStatus and
+  #     CertificateStatus now MATCH the render and were removed from this list.
+  #     The condition classes themselves (IssuerCondition/CertificateCondition)
+  #     rendered with one residual value constraint: the render carries the
+  #     CRD's `status` enum [True,False,Unknown] which the hand-written lib
+  #     classes omitted. k141 (lib-completeness follow-up) added that enum to
+  #     both classes, so they now MATCH the render and their two entries were
+  #     removed from this list.
+  #   - CertManager CertificateRequestStatus: RESOLVED by k140 -- the emitter no
+  #     longer reuses Core::V1::NamespaceCondition for its conditions (the overlay
+  #     suppresses D5 reuse on the conditions item path and names it
+  #     CertificateRequestCondition), so the render references the per-provider
+  #     class exactly as lib does. Now MATCHes -- removed from this list.
+  #   - PrometheusOperator: RESOLVED by k139's lib split -- Condition stays
+  #     enum-free (Alertmanager/Prometheus) and the new WorkloadBindingCondition
+  #     carries the type enum [Accepted] (referenced by both the V1 and V1alpha1
+  #     WorkloadBinding). AlertmanagerStatus, PrometheusStatus and both
+  #     WorkloadBinding classes now MATCH the render and were removed from this
+  #     list; the two condition classes' POD-only diffs are in
+  #     ignore_cosmetic_differs above.

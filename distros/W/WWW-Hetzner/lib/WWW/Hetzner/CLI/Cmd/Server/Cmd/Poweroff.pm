@@ -1,11 +1,12 @@
 package WWW::Hetzner::CLI::Cmd::Server::Cmd::Poweroff;
 # ABSTRACT: Power off a server (hard)
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl server poweroff <id>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 sub execute {
     my ($self, $args, $chain) = @_;
@@ -15,8 +16,9 @@ sub execute {
     my $cloud = $main->cloud;
 
     print "Powering off server $id...\n";
-    $cloud->servers->power_off($id);
-    print "Server powered off.\n";
+    my $action = $cloud->servers->power_off($id);
+    $self->handle_action($action);
+    print $self->no_wait ? "Power-off requested.\n" : "Server powered off.\n";
 }
 
 1;
@@ -33,7 +35,7 @@ WWW::Hetzner::CLI::Cmd::Server::Cmd::Poweroff - Power off a server (hard)
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -56,7 +58,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

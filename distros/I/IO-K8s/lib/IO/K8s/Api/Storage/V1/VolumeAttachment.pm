@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::VolumeAttachment;
 # ABSTRACT: VolumeAttachment captures the intent to attach or detach the specified volume to/from the specified node. VolumeAttachment objects are non-namespaced.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Storage::V1::VolumeAttachment - VolumeAttachment captures the inte
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ status represents status of the VolumeAttachment request. Populated by the entit
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#volumeattachment-v1-storage.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#volumeattachment-v1-storage.k8s.io>
 
 =head1 SUPPORT
 

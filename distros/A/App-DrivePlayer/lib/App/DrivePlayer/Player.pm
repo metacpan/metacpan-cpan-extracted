@@ -7,7 +7,6 @@ use App::DrivePlayer::Setup;
 use File::Temp      qw( tempfile );
 use IO::Socket::UNIX;
 use JSON::MaybeXS   qw( encode_json decode_json );
-use POSIX           qw( :sys_wait_h );
 use Time::HiRes     qw( time sleep );
 
 Readonly my $DRIVE_FILE_URL => 'https://www.googleapis.com/drive/v3/files/%s?alt=media';
@@ -90,12 +89,6 @@ sub seek {
 sub set_volume {
     my ($self, $pct) = @_;
     $self->_send_command(['set_property', 'volume', $pct]);
-}
-
-sub get_volume {
-    my ($self) = @_;
-    my $resp = $self->_send_command_sync(['get_property', 'volume']);
-    return $resp ? $resp->{data} : 50;
 }
 
 sub state         { $_[0]->_state }
@@ -429,12 +422,6 @@ Seek to an absolute position in seconds.  No-op when stopped.
   $player->set_volume($percent);   # 0-100
 
 Set the playback volume.
-
-=head2 get_volume
-
-  my $pct = $player->get_volume;
-
-Return the current volume (0-100).  Returns C<50> if mpv is not responding.
 
 =head2 state
 

@@ -1,0 +1,50 @@
+{
+  "actions": [
+    {
+      "id": 100,
+      "command": "create_server",
+      "status": "running",
+      "progress": 50,
+      "started": "2025-01-05T12:00:00+00:00",
+      "finished": null,
+      "resources": [
+        { "id": 123456, "type": "server" }
+      ],
+      "error": null
+    },
+    {
+      "id": 101,
+      "command": "create_server",
+      "status": "success",
+      "progress": 100,
+      "started": "2025-01-05T11:00:00+00:00",
+      "finished": "2025-01-05T11:02:00+00:00",
+      "resources": [
+        { "id": 123457, "type": "server" }
+      ],
+      "error": null
+    },
+    {
+      "id": 102,
+      "command": "delete_server",
+      "status": "error",
+      "progress": 100,
+      "started": "2025-01-05T10:00:00+00:00",
+      "finished": "2025-01-05T10:01:00+00:00",
+      "resources": [
+        { "id": 123458, "type": "server" }
+      ],
+      "error": { "code": "not_found", "message": "server does not exist" }
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "per_page": 25,
+      "previous_page": null,
+      "next_page": null,
+      "last_page": 1,
+      "total_entries": 3
+    }
+  }
+}

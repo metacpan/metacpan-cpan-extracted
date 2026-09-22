@@ -5,13 +5,13 @@ model: inherit
 allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:
-    - perl-core
-    - perl-moo
+    - getty-perl-core
+    - getty-perl-moo
     - kubernetes-rest-core
     - perl-kubernetes-rest
-    - perl-kubernetes-classes
+    - perl-io-k8s-kubernetes-classes
     - kubernetes-concepts
-    - karr
+    - kanban-issues-karr-cli
 ---
 
 You are the kubernetes-rest-worker for **Kubernetes::REST**, the Perl REST client for the

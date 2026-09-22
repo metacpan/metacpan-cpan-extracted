@@ -1,0 +1,72 @@
+package IO::K8s::GatewayAPI::V1beta1::HTTPRoute;
+# ABSTRACT: HTTPRoute provides a way to route HTTP requests.
+our $VERSION = '1.108';
+use IO::K8s::APIObject
+    api_version     => 'gateway.networking.k8s.io/v1beta1',
+    resource_plural => 'httproutes';
+with 'IO::K8s::Role::Namespaced', 'IO::K8s::Role::Routable';
+sub _route_format { 'gateway' }
+
+k8s spec   => '+IO::K8s::GatewayAPI::V1beta1::HTTPRouteSpec', { required => 'schema' };
+k8s status => '+IO::K8s::GatewayAPI::V1beta1::HTTPRouteStatus';
+
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+IO::K8s::GatewayAPI::V1beta1::HTTPRoute - HTTPRoute provides a way to route HTTP requests.
+
+=head1 VERSION
+
+version 1.108
+
+=head2 spec
+
+Spec defines the desired state of HTTPRoute.
+
+=head2 status
+
+Status defines the current state of HTTPRoute.
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/pplu/io-k8s-p5/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Torsten Raudssus <getty@cpan.org>
+
+=item *
+
+Jose Luis Martinez Torres <jlmartin@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

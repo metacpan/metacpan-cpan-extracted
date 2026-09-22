@@ -49,14 +49,18 @@ subtest 'os threads' => sub {
         thread_func(void* arg) {
             ThreadArgs* args = (ThreadArgs*)arg;
             // Brief sleep to ensure we aren't just getting lucky on the main thread stack
+        #if _WIN32
+            Sleep(2000);
+        #else
             usleep(2000000);
+        #endif
             // Execute Perl callback from this foreign thread
             // This will SEGFAULT if Affix doesn't inject Perl context!
             args->cb(args->val);
             return 0;
         }
 
-        void run_in_foreign_thread(callback_t cb, int val) {
+        DLLEXPORT void run_in_foreign_thread(callback_t cb, int val) {
         #if _WIN32
             ThreadArgs* args = (ThreadArgs*)malloc(sizeof(ThreadArgs));
             args->cb = cb;

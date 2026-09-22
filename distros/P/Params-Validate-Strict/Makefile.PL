@@ -29,7 +29,6 @@ WriteMakefile(
 		'List::Util' => 1.33,	# Minimum version for any()
 		'Readonly::Values::Boolean' => 0,
 		'Scalar::Util' => 0,
-		'Unicode::GCString' => 0,
 		'strict' => 0,
 		'warnings' => 0
 	}, TEST_REQUIRES => {
@@ -43,6 +42,7 @@ WriteMakefile(
 		'Readonly' => 0,
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::Memory::Cycle' => 0,
 		'Test::Mockingbird' => 0.13,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
@@ -68,5 +68,5 @@ WriteMakefile(
 			}
 		}
 	},
-	MIN_PERL_VERSION	=> '5.008'
+	MIN_PERL_VERSION	=> '5.026'
 );

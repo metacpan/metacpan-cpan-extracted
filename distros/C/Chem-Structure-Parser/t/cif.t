@@ -672,6 +672,50 @@ CIF
 	}
 }
 
+#--------------------------------------------------------------------
+# a type_symbol that is not an element.
+#
+# The PDB reader does not believe columns 77-78 unless they spell letters: an
+# entry from before the element column existed keeps the entry id in columns
+# 73-80 instead, so what sits where the element goes in gemmi's
+# tests/pdb1gdr.ent (a 1993 entry, and t/data/pdb1gdr.ent here) is '1G', and
+# every atom in it would otherwise read as element '1'.  A file converted from
+# one carries the same string in type_symbol, and a writer with no symbol to
+# write sometimes writes '' rather than the '.' or '?' CIF has for it.  Both
+# are the null field the PDB reader would have guessed past, so the mmCIF
+# reader guesses past them too and the two formats agree about what the atom
+# is made of.
+#--------------------------------------------------------------------
+{
+	# atom name, type_symbol as the .cif writes it, what columns 77-78 of the
+	# equivalent PDB record hold
+	my @case = (
+		[ 'CA', q{""}, '  ', 'an empty type_symbol'           ],
+		[ 'CB', q{.},  '  ', 'a type_symbol that is CIF null' ],
+		[ 'CG', q{?},  '  ', 'a type_symbol CIF calls unknown' ],
+		[ 'CD', q{1G}, '1G', "a type_symbol that is an entry's id" ],
+		[ 'ZN', q{ZN}, 'ZN', 'a type_symbol that is an element' ],
+	);
+	my $cif = "data_x\nloop_\n" . join('', map { "_atom_site.$_\n" } qw(
+		group_PDB id type_symbol auth_atom_id auth_comp_id auth_asym_id
+		auth_seq_id Cartn_x Cartn_y Cartn_z));
+	my $pdb = '';
+	my $n = 0;
+	for my $c (@case) {
+		$n++;
+		$cif .= "ATOM $n $c->[1] $c->[0] ALA A 1 1.000 2.000 3.000\n";
+		$pdb .= sprintf "ATOM  %5d %-4s ALA A   1       1.000   2.000   3.000  1.00  0.00          %2s\n",
+			$n, " $c->[0]", $c->[2];
+	}
+	my $ci = structure_info_string($cif, format => 'mmcif');
+	my $pi = structure_info_string($pdb);
+	for my $c (@case) {
+		my $got  = $ci->{chains}{A}{residues}{1}{atoms}{ $c->[0] }{element};
+		my $want = $pi->{chains}{A}{residues}{1}{atoms}{ $c->[0] }{element};
+		is($got, $want, "$c->[3] reads as the PDB reader reads it ('$want')");
+	}
+}
+
 # The physical properties are the coordinate half read a different way, so they
 # have to come out the same too -- and the whole hash, not the fields someone
 # thought to check.  The stacked-ring list carries the depositor's chain ids and

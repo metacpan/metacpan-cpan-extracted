@@ -312,6 +312,40 @@ subtest 'run - empty kind dies' => sub {
 };
 
 # ============================================================================
+# argv handling - Kind is the first positional after new_with_options
+#
+# bin/kube_watch reads the Kind with `shift @ARGV` after new_with_options.
+# MooX::Options must strip the parsed options from @ARGV (protect_argv => 0),
+# otherwise `kube_watch -n default Pod` shifts off '-n' instead of 'Pod'.
+# ============================================================================
+
+subtest 'new_with_options - options before Kind, @ARGV left with Kind first' => sub {
+    local @ARGV = ('-n', 'default', 'Pod');
+    my $w = Kubernetes::REST::CLI::Watch->new_with_options;
+    is $w->namespace, 'default', 'namespace option parsed';
+    # This is exactly what bin/kube_watch does to obtain the Kind
+    my $kind = shift @ARGV;
+    is $kind, 'Pod', 'Kind is Pod, not the consumed -n option';
+};
+
+subtest 'new_with_options - Kind after options, mixed short options' => sub {
+    local @ARGV = ('-n', 'default', '-o', 'json', 'Deployment');
+    my $w = Kubernetes::REST::CLI::Watch->new_with_options;
+    is $w->namespace, 'default', 'namespace parsed';
+    is $w->output, 'json', 'output parsed';
+    my $kind = shift @ARGV;
+    is $kind, 'Deployment', 'Kind is Deployment after consumed options';
+};
+
+subtest 'new_with_options - Kind before options still works' => sub {
+    local @ARGV = ('Pod', '-n', 'kube-system');
+    my $w = Kubernetes::REST::CLI::Watch->new_with_options;
+    is $w->namespace, 'kube-system', 'namespace parsed';
+    my $kind = shift @ARGV;
+    is $kind, 'Pod', 'Kind is Pod when given before options';
+};
+
+# ============================================================================
 # _name_re - regex compilation
 # ============================================================================
 

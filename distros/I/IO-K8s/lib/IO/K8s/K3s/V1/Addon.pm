@@ -1,13 +1,13 @@
 package IO::K8s::K3s::V1::Addon;
-# ABSTRACT: K3s cluster addon
-our $VERSION = '1.107';
+# ABSTRACT: Addon is used to track application of a manifest file on disk.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'k3s.cattle.io/v1',
     resource_plural => 'addons';
 with 'IO::K8s::Role::Namespaced';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec => '+IO::K8s::K3s::V1::AddonSpec', { required => 'schema' };
+
 
 1;
 
@@ -19,25 +19,15 @@ __END__
 
 =head1 NAME
 
-IO::K8s::K3s::V1::Addon - K3s cluster addon
+IO::K8s::K3s::V1::Addon - Addon is used to track application of a manifest file on disk.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-This class represents an Addon custom resource in the C<k3s.cattle.io/v1> API group. Addon resources represent K3s cluster addons, which are Kubernetes manifests automatically deployed during cluster startup or runtime. This is a namespace-scoped resource where the C<spec> and C<status> fields are opaque hash structures defined by the K3s API.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<IO::K8s::K3s> - K3s custom resources
-
-=item * L<https://docs.k3s.io/installation/packaged-components> - K3s Packaged Components Documentation
-
-=back
+Spec provides information about the on-disk manifest backing this resource.
 
 =head1 SUPPORT
 

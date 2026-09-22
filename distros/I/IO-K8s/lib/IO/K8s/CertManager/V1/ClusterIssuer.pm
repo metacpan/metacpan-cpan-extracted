@@ -1,14 +1,15 @@
 package IO::K8s::CertManager::V1::ClusterIssuer;
-# ABSTRACT: cert-manager cluster-scoped certificate issuer
-our $VERSION = '1.107';
+# ABSTRACT: A ClusterIssuer represents a certificate issuing authority which can be referenced as part of `issuerRef` fields.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cert-manager.io/v1',
     resource_plural => 'clusterissuers';
-
 with 'IO::K8s::Role::CertManaged';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => '+IO::K8s::CertManager::V1::IssuerSpec', { required => 'schema' };
+k8s status => '+IO::K8s::CertManager::V1::IssuerStatus';
+
+
 
 1;
 
@@ -20,25 +21,19 @@ __END__
 
 =head1 NAME
 
-IO::K8s::CertManager::V1::ClusterIssuer - cert-manager cluster-scoped certificate issuer
+IO::K8s::CertManager::V1::ClusterIssuer - A ClusterIssuer represents a certificate issuing authority which can be referenced as part of `issuerRef` fields.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-ClusterIssuer configures a cluster-wide certificate issuer, available to Certificate resources in any namespace. This is a cluster-scoped resource using the C<cert-manager.io/v1> API version. It functions similarly to Issuer but is not limited to a single namespace. The C<spec> and C<status> attributes contain opaque HashRefs whose structure is defined by cert-manager's OpenAPI schema.
+Desired state of the ClusterIssuer resource.
 
-=head1 SEE ALSO
+=head2 status
 
-=over
-
-=item * L<IO::K8s::CertManager> - cert-manager API classes for Perl
-
-=item * L<https://cert-manager.io/docs/configuration/> - ClusterIssuer upstream documentation
-
-=back
+Status of the ClusterIssuer. This is set and managed automatically.
 
 =head1 SUPPORT
 

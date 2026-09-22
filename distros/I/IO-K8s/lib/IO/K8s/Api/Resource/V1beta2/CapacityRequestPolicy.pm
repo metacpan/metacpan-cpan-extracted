@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::CapacityRequestPolicy;
 # ABSTRACT: CapacityRequestPolicy defines how requests consume device capacity.  Must not set more than one ValidRequestValues.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s default => Quantity;
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1beta2::CapacityRequestPolicy - CapacityRequestPolicy d
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 default
 

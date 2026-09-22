@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::NetworkPolicy;
 # ABSTRACT: NetworkPolicy describes what network traffic is allowed for a set of Pods
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced', 'IO::K8s::Role::NetworkPolicy';
 sub _netpol_format { 'core' }
@@ -22,7 +22,7 @@ IO::K8s::Api::Networking::V1::NetworkPolicy - NetworkPolicy describes what netwo
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ spec represents the specification of the desired behavior for this NetworkPolicy
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#networkpolicy-v1-networking.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#networkpolicy-v1-networking.k8s.io>
 
 =head1 SUPPORT
 

@@ -1,6 +1,6 @@
 # CLAUDE.md — IO::K8s
 
-Perl object model of the Kubernetes API (tracking upstream v1.36). Moo + Type::Tiny; the
+Perl object model of the Kubernetes API (tracking upstream v1.37). Moo + Type::Tiny; the
 ~850 API and CRD classes under `lib/IO/K8s/` are checked in and hand-maintained — there is
 no build-time codegen step.
 
@@ -26,6 +26,8 @@ for back-compat, an API track intentionally not backported — add a categorised
 that file with a one-line reason. New entries should reference the karr ticket or commit
 that established the call. `maint/spec-drift-check.pl --verbose` lists what is currently
 suppressed; the exception file is the source of truth, not the script's runtime memory.
+`maint/crd-drift-check.pl`'s `--suggest` prints the classes `IO::K8s::CRD::Emitter` renders
+for a reported gap, `--suggest-dir` writes them outside `lib/`.
 
 `maint/spec-drift-check.pl --help` for the full flag list.
 
@@ -45,5 +47,5 @@ principle, the lanes and this repo's hazards are in `.claude/rules/io-k8s-rules.
 
 The agents carry their conventions via `briefing.skills` (see `.claude/agents/`); the main
 agent delegates rather than loading them. Skill sources live in `.claude/skills/` —
-`io-k8s-core` holds the distribution internals, `perl-kubernetes-classes` the consumer-facing
+`io-k8s-core` holds the distribution internals, `perl-io-k8s-kubernetes-classes` the consumer-facing
 API. Work is tracked on the local `karr` board.

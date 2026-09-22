@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta2::DeviceTaintRuleSpec;
 # ABSTRACT: DeviceTaintRuleSpec specifies the selector and one taint.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s deviceSelector => 'Resource::V1beta2::DeviceTaintSelector';
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1beta2::DeviceTaintRuleSpec - DeviceTaintRuleSpec speci
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 deviceSelector
 

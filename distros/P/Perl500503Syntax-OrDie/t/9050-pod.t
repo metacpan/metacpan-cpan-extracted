@@ -13,7 +13,25 @@
 # G9:  =head1 SEE ALSO present
 # G10: =head1 AUTHOR present
 # G11: =head1 LICENSE present
-# G12: Pod::Checker (skip if Pod::Checker < 1.51)
+# G12: Pod::Checker errors  (skip if Pod::Checker < 1.51)
+# G13: Pod::Checker warnings (skip if Pod::Checker < 1.60)
+# G14: no duplicate POD link target
+#
+# G14 exists because G12 and G13 are only as strict as the Pod::Checker
+# the tester happens to have.  It is the same check as INA_CPAN_Check's
+# G8, and shares that module's _pod_link_targets(); this distribution
+# ships its own pod test and so does not call check_G itself.  Two =item paragraphs whose first lines
+# match are one link target declared twice; the Pod::Parser-based
+# Pod::Checker that Perls up to 5.24 ship reports that as a warning,
+# and the Pod::Simple-based one that came later does not.  A duplicate
+# introduced here therefore passed on a modern Perl and turned into a
+# FAIL report from a 5.18 smoker.  G14 makes the check local, so it
+# holds whatever Pod::Checker is installed -- or none at all.
+#
+# The target name is taken from the FIRST LINE of the command paragraph
+# alone, which is what Pod::Checker keys on: a continuation line that
+# distinguishes two otherwise identical items does not make their
+# targets distinct.
 #
 # COMPATIBILITY: Perl 5.005_03 and later
 #
@@ -39,7 +57,7 @@ plan_skip('primary .pm not found') unless -f $pm;
 my $pod_checker_ver = 0;
 eval { require Pod::Checker; $pod_checker_ver = $Pod::Checker::VERSION || 0 };
 
-plan_tests(13);
+plan_tests(14);
 
 my $src = _slurp($pm);
 my $rel = 'lib/Perl500503Syntax/OrDie.pm';
@@ -49,7 +67,7 @@ ok($src =~ /^=head1\s+VERSION\b/m,          "G2: =head1 VERSION in $rel");
 ok($src =~ /^=head1\s+SYNOPSIS\b/m,         "G3: =head1 SYNOPSIS in $rel");
 ok($src =~ /^=head1\s+DESCRIPTION\b/m,      "G4: =head1 DESCRIPTION in $rel");
 ok($src =~ /^=head1\s+DIAGNOSTICS\b/m,      "G5: =head1 DIAGNOSTICS in $rel");
-ok($src =~ /^=head1\s+CHECKED CONSTRUCTS\b/m,"G6: =head1 CHECKED CONSTRUCTS in $rel");
+ok($src =~ /^=head1\s+CHECKED CONSTRUCTS\b/m, "G6: =head1 CHECKED CONSTRUCTS in $rel");
 ok($src =~ /^=head1\s+COMPATIBILITY\b/m,    "G7: =head1 COMPATIBILITY in $rel");
 ok($src =~ /^=head1\s+LIMITATIONS\b/m,      "G8: =head1 LIMITATIONS in $rel");
 ok($src =~ /^=head1\s+SEE ALSO\b/m,         "G9: =head1 SEE ALSO in $rel");
@@ -95,3 +113,14 @@ else {
     ok(1, "G13: Pod::Checker skipped (version $pod_checker_ver < 1.60)");
 }
 
+# G14 -- no POD link target declared twice.
+{
+    my %seen;
+    my @dup;
+    for my $t (_pod_link_targets($src)) {
+        push @dup, $t if $seen{$t}++ == 1;
+    }
+    ok(!@dup, "G14: no duplicate POD link target in $rel"
+            . (@dup ? " (" . join('; ', @dup) . ")" : ''));
+    diag("  duplicate target: $_") for @dup;
+}

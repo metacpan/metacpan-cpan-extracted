@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::Server;
 # ABSTRACT: Hetzner Cloud Server object
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::HasAction';
 use Carp qw(croak);
 use namespace::clean;
 
@@ -84,8 +85,7 @@ sub delete {
     my ($self) = @_;
     croak "Cannot delete server without ID" unless $self->id;
 
-    $self->_client->delete("/servers/" . $self->id);
-    return 1;
+    return $self->_client->servers->delete($self->id);
 }
 
 
@@ -93,8 +93,7 @@ sub power_on {
     my ($self) = @_;
     croak "Cannot power on server without ID" unless $self->id;
 
-    $self->_client->post("/servers/" . $self->id . "/actions/poweron", {});
-    return $self;
+    return $self->_client->servers->power_on($self->id);
 }
 
 
@@ -102,8 +101,7 @@ sub power_off {
     my ($self) = @_;
     croak "Cannot power off server without ID" unless $self->id;
 
-    $self->_client->post("/servers/" . $self->id . "/actions/poweroff", {});
-    return $self;
+    return $self->_client->servers->power_off($self->id);
 }
 
 
@@ -111,8 +109,7 @@ sub reboot {
     my ($self) = @_;
     croak "Cannot reboot server without ID" unless $self->id;
 
-    $self->_client->post("/servers/" . $self->id . "/actions/reboot", {});
-    return $self;
+    return $self->_client->servers->reboot($self->id);
 }
 
 
@@ -120,8 +117,7 @@ sub shutdown {
     my ($self) = @_;
     croak "Cannot shutdown server without ID" unless $self->id;
 
-    $self->_client->post("/servers/" . $self->id . "/actions/shutdown", {});
-    return $self;
+    return $self->_client->servers->shutdown($self->id);
 }
 
 
@@ -130,8 +126,7 @@ sub rebuild {
     croak "Cannot rebuild server without ID" unless $self->id;
     croak "Image required" unless $image;
 
-    $self->_client->post("/servers/" . $self->id . "/actions/rebuild", { image => $image });
-    return $self;
+    return $self->_client->servers->rebuild($self->id, $image);
 }
 
 
@@ -183,7 +178,7 @@ WWW::Hetzner::Cloud::Server - Hetzner Cloud Server object
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -290,9 +285,10 @@ Saves changes to name and labels back to the API.
 
 =head2 delete
 
-    $server->delete;
+    my $action = $server->delete;
 
-Deletes the server.
+Deletes the server. Returns the L<WWW::Hetzner::Action> tracking the
+deletion; call C<< $action->wait >> to block until the server is gone.
 
 =head2 power_on
 
@@ -375,7 +371,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

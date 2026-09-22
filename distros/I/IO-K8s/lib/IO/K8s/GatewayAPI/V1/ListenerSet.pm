@@ -1,13 +1,15 @@
 package IO::K8s::GatewayAPI::V1::ListenerSet;
-# ABSTRACT: Gateway API listeners defined independently of a Gateway
-our $VERSION = '1.107';
+# ABSTRACT: ListenerSet defines a set of additional listeners to attach to an existing Gateway.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
     resource_plural => 'listenersets';
 with 'IO::K8s::Role::Namespaced';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => '+IO::K8s::GatewayAPI::V1::ListenerSetSpec', { required => 'schema' };
+k8s status => '+IO::K8s::GatewayAPI::V1::ListenerSetStatus', { default => {'conditions' => [{'lastTransitionTime' => '1970-01-01T00:00:00Z','message' => 'Waiting for controller','reason' => 'Pending','status' => 'Unknown','type' => 'Accepted'},{'lastTransitionTime' => '1970-01-01T00:00:00Z','message' => 'Waiting for controller','reason' => 'Pending','status' => 'Unknown','type' => 'Programmed'}]} };
+
+
 
 1;
 
@@ -19,27 +21,19 @@ __END__
 
 =head1 NAME
 
-IO::K8s::GatewayAPI::V1::ListenerSet - Gateway API listeners defined independently of a Gateway
+IO::K8s::GatewayAPI::V1::ListenerSet - ListenerSet defines a set of additional listeners to attach to an existing Gateway.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-Represents a ListenerSet resource from the Kubernetes Gateway API (C<gateway.networking.k8s.io/v1>). A ListenerSet defines a set of listeners independently of a Gateway and merges them onto a parent Gateway via C<parentRef>, enabling multi-tenant listener delegation and Gateways with more than 64 listeners. ListenerSet is a namespaced resource. The C<spec> and C<status> fields are opaque hashrefs containing the Gateway API structure.
+Spec defines the desired state of ListenerSet.
 
-=head1 SEE ALSO
+=head2 status
 
-=over
-
-=item * L<IO::K8s::GatewayAPI> - Gateway API module namespace
-
-=item * L<https://gateway-api.sigs.k8s.io/api-types/listenerset/> - Upstream ListenerSet documentation
-
-=item * L<IO::K8s::GatewayAPI::V1::Gateway> - Parent Gateway these listeners merge onto
-
-=back
+Status defines the current state of ListenerSet.
 
 =head1 SUPPORT
 

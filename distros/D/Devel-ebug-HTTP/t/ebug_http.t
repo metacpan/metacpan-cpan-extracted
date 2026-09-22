@@ -1,66 +1,67 @@
 use strict;
 use warnings;
 use Devel::ebug;
-use HTTP::Request::Common;
-use Test::More tests => 24;
-use Test::WWW::Mechanize::Catalyst 'Devel::ebug::HTTP';
+use Test::More;
+use Test::Mojo;
+use Devel::ebug::HTTP;
 
 my $ebug = Devel::ebug->new;
 $ebug->program("corpus/calc.pl");
 $ebug->load;
 Devel::ebug::HTTP::App->ebug($ebug);
 
-my $root = "http://localhost";
+my $t = Test::Mojo->new('Devel::ebug::HTTP');
 
-my $m = Test::WWW::Mechanize::Catalyst->new;
-$m->get_ok("$root/");
-is($m->ct, "text/html");
-$m->title_is('corpus/calc.pl main(corpus/calc.pl#3) my $q = 1;');
-$m->content_contains("Step");
-$m->content_contains("Next");
-$m->content_contains("corpus/calc.pl main(corpus/calc.pl#3)");
-$m->content_contains("#!perl");
-$m->content_contains("Variables in main");
-$m->content_contains("Stack trace");
-$m->content_contains("STDOUT");
-$m->content_contains("STDERR");
-$m->content_contains("Devel::ebug");
-$m->content_contains($Devel::ebug::VERSION);
+$t->get_ok("/")
+  ->status_is(200)
+  ->content_type_like(qr{^text/html})
+  ->text_is('title', 'corpus/calc.pl main(corpus/calc.pl#3) my $q = 1;')
+  ->content_like(qr/Step/)
+  ->content_like(qr/Next/)
+  ->content_like(qr/corpus\/calc\.pl main\(corpus\/calc\.pl#3\)/)
+  ->content_like(qr/#!perl/)
+  ->content_like(qr/Variables in main/)
+  ->content_like(qr/Stack trace/)
+  ->content_like(qr/STDOUT/)
+  ->content_like(qr/STDERR/)
+  ->content_like(qr/Devel::ebug/)
+  ->content_like(qr/\Q$Devel::ebug::VERSION\E/);
 
 # $q not defined yet
-$m->get_ok("$root/ajax_variable/\$q");
-is($m->ct, "text/xml");
-is(
-  $m->content, q|<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+$t->get_ok('/ajax_variable/$q')
+  ->status_is(200)
+  ->content_type_is('text/xml')
+  ->content_is(q|<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <response>
   <variable>$q</variable>
   <value><![CDATA[Not defined]]></value>
 </response>
-  |
-);
+  |);
 
 # 2+3 = 5
-$m->request(POST "$root/ajax_eval", [eval => '2+3', myaction => 'Eval']);
-#$m->get_ok("$root/ajax_eval?eval=2+3&myaction=Eval");
-is($m->ct, "text/html");
-is($m->content, "5");
+$t->post_ok('/ajax_eval', form => { eval => '2+3', myaction => 'Eval' })
+  ->status_is(200)
+  ->content_type_is('text/html')
+  ->content_is('5');
 
 # hit "Step"
-$m->request(POST 'http://somewhere/foo', [sequence => 3, myaction => 'Step']);
-is($m->ct, "text/html");
-$m->title_is('corpus/calc.pl main(corpus/calc.pl#4) my $w = 2;');
-$m->content_contains("corpus/calc.pl main(corpus/calc.pl#4)");
+$t->post_ok('/foo', form => { sequence => 3, myaction => 'Step' })
+  ->status_is(200)
+  ->content_type_like(qr{^text/html})
+  ->text_is('title', 'corpus/calc.pl main(corpus/calc.pl#4) my $w = 2;')
+  ->content_like(qr/corpus\/calc\.pl main\(corpus\/calc\.pl#4\)/);
 
 # $q is now defined, and 1
-$m->get_ok("$root/ajax_variable/\$q");
-is($m->ct, "text/xml");
-is(
-  $m->content, q|<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+$t->get_ok('/ajax_variable/$q')
+  ->status_is(200)
+  ->content_type_is('text/xml')
+  ->content_is(q|<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <response>
   <variable>$q</variable>
   <value><![CDATA[1<br/>]]></value>
 </response>
-  |
-);
+  |);
 
 undef $ebug->{proc};
+
+done_testing;

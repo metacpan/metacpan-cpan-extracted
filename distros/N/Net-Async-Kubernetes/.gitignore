@@ -16,11 +16,23 @@ dzil-local/
 *.swp
 *.bak
 
-# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Claude Code — commit: skills/, agents/, rules/, hooks/, settings.json
 # Ignore: local overrides, credentials, session data
-.claude/
+!/.claude/
+.claude/*
+!.claude/settings.json
+!.claude/agents/
+!.claude/agents/**
+!.claude/skills/
+!.claude/skills/**
+!.claude/rules/
+!.claude/rules/**
+!.claude/hooks/
+!.claude/hooks/**
+# Local overrides (machine-specific)
 .claude/*.local.*
 .claude/local/
+# Credentials & session state (never track)
 .claude/.credentials.json
 .claude/statsig/
 .claude/todos/
@@ -28,3 +40,10 @@ dzil-local/
 
 # Local planning artifacts
 docs/superpowers/
+
+# karr materialized task view -- never commit
+tasks/
+config.yml
+
+# karr-foundation per-repo state — local machine only, never commit
+.karr.state

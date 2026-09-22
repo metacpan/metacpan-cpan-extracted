@@ -158,6 +158,14 @@ throws_ok { structure_info($file, chains => []) } qr/chains is empty/,
 	'an empty chain list is a mistake';
 throws_ok { structure_info($file, model => 'two') } qr/model must be/,
 	'a model that is not a number dies';
+# structure_features() takes sasa => 0 and the rest of them; structure_info()
+# takes features => 0 and no more than that.  A hash of the first spelled into
+# the second is a true value, so it would compute every feature, the surface
+# included, and say nothing -- the ignored option the checks above exist for.
+throws_ok { structure_info($file, features => { sasa => 0 }) } qr/features is 1 or 0/,
+	'the per-feature options are not structure_info options';
+throws_ok { structure_info($file, features => { sasa => 0 }) } qr/structure_features/,
+	'and the message says where they do belong';
 lives_ok  { structure_info($file, model => 'all') } "model => 'all' is allowed";
 
 #--------

@@ -43,6 +43,70 @@ subtest 'Quantity constraint' => sub {
     }
 };
 
+# ---- k52: decimal SI suffixes n (nano) and u (micro) ----
+#
+# Upstream apimachinery accepts nine decimal SI suffixes -- n u m "" k M G T P
+# E (pkg/api/resource/suffix.go) -- but the suffix class in the Quantity
+# regex used to be [mkMGTPE], omitting n and u. Real cluster data uses both:
+# metrics-server reports CPU as e.g. "100n", and autoscaling/v2
+# MetricTarget/MetricValueStatus carry averageValue in "500u"-style units.
+subtest 'k52: n (nano) and u (micro) suffixes accepted' => sub {
+    my $q = IO::K8s::Types::Quantity();
+    ok($q->check('100n'), 'valid: 100n (nano)');
+    ok($q->check('500u'), 'valid: 500u (micro)');
+
+    # End-to-end, not just the bare type constraint: the ticket's own repro
+    # was EmptyDirVolumeSource->new(sizeLimit => '100n') dying outright.
+    use_ok('IO::K8s::Api::Core::V1::EmptyDirVolumeSource');
+    my $ed = IO::K8s::Api::Core::V1::EmptyDirVolumeSource->new(sizeLimit => '100n');
+    is($ed->sizeLimit, '100n', 'sizeLimit stores 100n verbatim');
+    is($ed->TO_JSON->{sizeLimit}, '100n', 'TO_JSON keeps 100n as a Quantity string');
+
+    use_ok('IO::K8s::Api::Autoscaling::V2::MetricValueStatus');
+    my $mv = IO::K8s::Api::Autoscaling::V2::MetricValueStatus->new(averageValue => '500u');
+    is($mv->averageValue, '500u', 'averageValue stores 500u verbatim');
+
+    # The existing matrix stays green.
+    ok($q->check('100m'), 'existing: 100m still valid');
+    ok($q->check('1Ki'), 'existing: 1Ki still valid');
+    ok($q->check('2e3'), 'existing: 2e3 still valid');
+};
+
+# ---- k52: the deliberate boundary -- what stays rejected ----
+#
+# Widening [mkMGTPE] to [numkMGTPE] must not go further than the fix sketch
+# called for. Two families of rejection here are intentional, not
+# incidental:
+#
+#  1. A mantissa-less quantity -- a bare suffix like "Ki" or "n", a bare
+#     exponent like "e3", or a bare "." -- with an optional sign. Upstream's
+#     parseQuantityString treats a missing numeric run before the suffix as
+#     an implicit "0" and accepts it. The Quantity regex requires at least
+#     one digit on one side of an optional decimal point
+#     (\d+\.?\d*|\d*\.\d+) and has no such special case, so these are
+#     rejected. This is a deliberate stricter-than-upstream stance, not a
+#     bug: nothing in this distribution's own use needs a bare-suffix
+#     quantity, and accepting one is far more likely to be a caller's typo
+#     (a stray suffix with no number) than an intentional zero.
+#  2. A malformed suffix -- "1mi" (the decimal 'm' suffix with a bogus
+#     trailing 'i'), "1KI" (wrong case for the binary 'Ki' suffix), "100nn"
+#     (a doubled decimal suffix) -- which upstream rejects too. These pin
+#     that widening the suffix class to include n/u did not also loosen the
+#     alternation into accepting near-misses of the binary suffixes or
+#     doubled-up decimal ones.
+subtest 'k52: the intended boundary stays rejected' => sub {
+    my $q = IO::K8s::Types::Quantity();
+
+    for my $bare (qw(Ki m n e3 .)) {
+        ok(!$q->check($bare),
+            "mantissa-less '$bare' stays rejected (upstream parses it as 0; deliberate strictness)");
+    }
+
+    for my $bad ('1mi', '1KI', '100nn') {
+        ok(!$q->check($bad), "malformed suffix '$bad' stays rejected");
+    }
+};
+
 # ---- Time validation ----
 
 subtest 'Time constraint' => sub {

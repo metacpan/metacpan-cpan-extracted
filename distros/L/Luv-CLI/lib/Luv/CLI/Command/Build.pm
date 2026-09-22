@@ -42,7 +42,7 @@ Luv::CLI::Command::Build - package the project into a .love file
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

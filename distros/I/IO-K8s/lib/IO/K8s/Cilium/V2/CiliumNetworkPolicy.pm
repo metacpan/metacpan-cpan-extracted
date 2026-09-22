@@ -1,16 +1,18 @@
 package IO::K8s::Cilium::V2::CiliumNetworkPolicy;
-# ABSTRACT: Cilium network policy for namespace-scoped network security
-our $VERSION = '1.107';
+# ABSTRACT: CiliumNetworkPolicy is a Kubernetes third-party resource with an extended version of NetworkPolicy.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumnetworkpolicies';
 with 'IO::K8s::Role::Namespaced', 'IO::K8s::Role::NetworkPolicy';
-
 sub _netpol_format { 'cilium' }
 
-k8s spec   => { Str => 1 };
-k8s specs  => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => '+IO::K8s::Cilium::V2::Rule';
+k8s specs  => ['+IO::K8s::Cilium::V2::Rule'];
+k8s status => '+IO::K8s::Cilium::V2::CiliumNetworkPolicyStatus';
+
+
+
 
 1;
 
@@ -22,25 +24,23 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Cilium::V2::CiliumNetworkPolicy - Cilium network policy for namespace-scoped network security
+IO::K8s::Cilium::V2::CiliumNetworkPolicy - CiliumNetworkPolicy is a Kubernetes third-party resource with an extended version of NetworkPolicy.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-This resource represents a namespace-scoped network policy enforced by Cilium's eBPF datapath. It provides fine-grained network security rules for pods within a namespace, using API version C<cilium.io/v2>. The C<spec>, C<specs>, and C<status> fields contain opaque CRD-specific data structures managed by the Cilium controller.
+Spec is the desired Cilium specific rule specification.
 
-=head1 SEE ALSO
+=head2 specs
 
-=over
+Specs is a list of desired Cilium specific rule specification.
 
-=item * L<IO::K8s::Cilium> - Main Cilium CRD namespace
+=head2 status
 
-=item * L<https://docs.cilium.io/en/stable/network/kubernetes/policy/> - Upstream Cilium network policy documentation
-
-=back
+Status is the status of the Cilium policy rule
 
 =head1 SUPPORT
 

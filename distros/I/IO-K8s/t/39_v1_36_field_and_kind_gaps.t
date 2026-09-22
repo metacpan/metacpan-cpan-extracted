@@ -1,19 +1,19 @@
 #!/usr/bin/env perl
-# Regression coverage for karr tickets #7, #8, #10:
+# Regression coverage for k7, k8, k10:
 # a scattered set of upstream v1.36.3 fields/kinds that maint/spec-drift-check.pl
 # found missing against the real swagger.json.
 #
-# #7: 14 fields missing on otherwise-shipped classes (Core::V1::ContainerStatus,
+# k7: 14 fields missing on otherwise-shipped classes (Core::V1::ContainerStatus,
 #     ::Lifecycle, ::PodCondition, ::PodSecurityContext, ::ResourceHealth,
 #     Storage::V1::VolumeError, the two CustomResourceDefinitionCondition/Status
 #     classes, Meta::V1::DeleteOptions/ListMeta, Version::Info), plus the new
 #     Meta::V1::ShardInfo struct that ListMeta.shardInfo needed.
-# #8: coordination.k8s.io/v1alpha2 (LeaseCandidate/LeaseCandidateSpec) was
+# k8: coordination.k8s.io/v1alpha2 (LeaseCandidate/LeaseCandidateSpec) was
 #     entirely unshipped, and scheduling.k8s.io/v1alpha2.TypedLocalObjectReference
 #     did not exist as its own class - WorkloadSpec.controllerRef pointed at
 #     Core::V1::TypedLocalObjectReference instead, a different upstream schema
 #     that happens to share the same three fields.
-# #10: the meta.v1 discovery Kinds APIGroupList/APIResourceList (used by
+# k10: the meta.v1 discovery Kinds APIGroupList/APIResourceList (used by
 #      /apis and /apis/<group>) were missing, unlike their already-shipped
 #      siblings APIGroup/APIVersions/Status/DeleteOptions.
 #
@@ -32,7 +32,7 @@ use IO::K8s;
 my $k8s  = IO::K8s->new;
 my $json = JSON::MaybeXS->new( utf8 => 0, canonical => 1, allow_nonref => 1 );
 
-subtest 'karr #7: scattered field additions' => sub {
+subtest 'k7: scattered field additions' => sub {
     my $cs = $k8s->struct_to_object(
         'IO::K8s::Api::Core::V1::ContainerStatus',
         { name => 'app', image => 'nginx', imageID => 'sha256:x', ready => JSON->true,
@@ -74,7 +74,7 @@ subtest 'karr #7: scattered field additions' => sub {
     is( $info->minCompatibilityMinor, '34', 'Info.minCompatibilityMinor round-trips' );
 };
 
-subtest 'karr #7: ListMeta.shardInfo is a real Meta::V1::ShardInfo, not a hashref' => sub {
+subtest 'k7: ListMeta.shardInfo is a real Meta::V1::ShardInfo, not a hashref' => sub {
     ok( eval { $k8s->load_class('IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ShardInfo'); 1 },
         'ShardInfo loads' ) or diag $@;
 
@@ -88,7 +88,7 @@ subtest 'karr #7: ListMeta.shardInfo is a real Meta::V1::ShardInfo, not a hashre
         'shardInfo serializes back to a plain selector hash' );
 };
 
-subtest 'karr #8: coordination.k8s.io/v1alpha2 LeaseCandidate round-trips byte-identical' => sub {
+subtest 'k8: coordination.k8s.io/v1alpha2 LeaseCandidate round-trips byte-identical' => sub {
     my $LC = 'IO::K8s::Api::Coordination::V1alpha2::LeaseCandidate';
     ok( eval { $k8s->load_class($LC); 1 }, "$LC loads" ) or diag $@;
     ok( $LC->DOES('IO::K8s::Role::Namespaced'), "$LC is namespaced (paths carry namespaces/{namespace})" );
@@ -116,7 +116,7 @@ subtest 'karr #8: coordination.k8s.io/v1alpha2 LeaseCandidate round-trips byte-i
         'inflate -> TO_JSON -> inflate -> TO_JSON is idempotent' );
 };
 
-subtest 'karr #8: scheduling.k8s.io/v1alpha2.TypedLocalObjectReference is its own class' => sub {
+subtest 'k8: scheduling.k8s.io/v1alpha2.TypedLocalObjectReference is its own class' => sub {
     my $TLOR = 'IO::K8s::Api::Scheduling::V1alpha2::TypedLocalObjectReference';
     ok( eval { $k8s->load_class($TLOR); 1 }, "$TLOR loads" ) or diag $@;
 
@@ -131,7 +131,7 @@ subtest 'karr #8: scheduling.k8s.io/v1alpha2.TypedLocalObjectReference is its ow
         'WorkloadSpec.controllerRef resolves to the scheduling/v1alpha2 schema, not Core::V1' );
 };
 
-subtest 'karr #10: meta.v1 discovery Kinds APIGroupList/APIResourceList' => sub {
+subtest 'k10: meta.v1 discovery Kinds APIGroupList/APIResourceList' => sub {
     my $AGL = 'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroupList';
     my $ARL = 'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResourceList';
     ok( eval { $k8s->load_class($AGL); 1 }, "$AGL loads" ) or diag $@;

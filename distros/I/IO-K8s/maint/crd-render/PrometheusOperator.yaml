@@ -1,0 +1,513 @@
+# PrometheusOperator CRD emitter overlay (D5/D6, k95 conventions, k120).
+#
+# Read by maint/crd-drift-check.pl --render/--check for --provider
+# PrometheusOperator, at the pinned upstream_version (v0.93.1,
+# github.com/prometheus-operator/prometheus-operator). `names` maps the
+# logical path below each Kind (what IO::K8s::AutoGen::class_path returns,
+# e.g. Spec::ClusterTLS) to the bare upstream Go type name -- which is the
+# checked-in class name under IO::K8s::PrometheusOperator::V1 (D6). Several
+# paths across Kinds map to the SAME name (SafeTLSConfig, SecretOrConfigMap,
+# OAuth2, ...): those are one shared Go type embedded at many points, and the
+# emitter collapses them to one file the way Cilium's shared Rule family does.
+#
+# Two k120 overlay mechanisms appear here, neither of which the pre-k120
+# names/with/extra vocabulary could express:
+#
+#   * no_reuse_core -- logical paths where D5 core-reuse is suppressed so the
+#     provider's OWN named type is generated even though its shape matches a
+#     shipped core class. Alertmanager's additionalArgs items are {name,value}
+#     and would reuse Core::V1::HTTPHeader; upstream calls that type Argument
+#     and lib ships it, so Spec::AdditionalArgsItem is listed here and named
+#     Argument below. The Smtp smartHost {host,port} pair is the same story
+#     against a core HostPort shape.
+#
+#   * an absolute `names` value (one carrying '::') -- a reference to a class
+#     this render does not itself emit. Spec::ImagePullSecretsItem is a
+#     single-key {name} that the reuse heuristic will not fold on its own
+#     (it needs two keys), but lib types it as Core::V1::LocalObjectReference;
+#     naming the path at the absolute core package makes the emitter reference
+#     that class and skip writing a per-provider copy.
+#
+# Provenance: this map was derived by walking each rendered Kind tree in
+# lockstep with the checked-in lib tree and reading lib's own class
+# references as the naming oracle (the fields agree field-for-field -- the
+# k120 schema audit found 0 constraint differences), then verified with
+# --check. It closes the STRUCTURAL half: 0 missing-in-lib, 0 not-rendered.
+# The residual --check DIFFERS are body formatting only (POD line wrapping, a
+# contextual # ABSTRACT taken from the embedding field's description on a
+# shared type, and lib's hand-written explanatory comments), the same
+# lib-rewrite follow-up VolumeSnapshot's own overlay left behind -- not a
+# name, field or type this overlay could touch without editing lib.
+base: IO::K8s::PrometheusOperator
+kinds:
+  Alertmanager:
+    extra: []
+    with:
+    - IO::K8s::Role::Namespaced
+    no_reuse_core:
+    - Spec::AdditionalArgsItem
+    - Spec::AlertmanagerConfiguration::Global::Smtp::SmartHost
+    names:
+      Spec: AlertmanagerSpec
+      Spec::AdditionalArgsItem: Argument
+      Spec::AlertmanagerConfigMatcherStrategy: AlertmanagerConfigMatcherStrategy
+      Spec::AlertmanagerConfiguration: AlertmanagerConfiguration
+      Spec::AlertmanagerConfiguration::Global: AlertmanagerGlobalConfig
+      Spec::AlertmanagerConfiguration::Global::HttpConfig: HTTPConfigWithProxy
+      Spec::AlertmanagerConfiguration::Global::HttpConfig::Authorization: SafeAuthorization
+      Spec::AlertmanagerConfiguration::Global::HttpConfig::BasicAuth: BasicAuth
+      Spec::AlertmanagerConfiguration::Global::HttpConfig::Oauth2: OAuth2
+      Spec::AlertmanagerConfiguration::Global::HttpConfig::Oauth2::ClientId: SecretOrConfigMap
+      Spec::AlertmanagerConfiguration::Global::HttpConfig::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::AlertmanagerConfiguration::Global::HttpConfig::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::AlertmanagerConfiguration::Global::HttpConfig::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::AlertmanagerConfiguration::Global::HttpConfig::TlsConfig: SafeTLSConfig
+      Spec::AlertmanagerConfiguration::Global::HttpConfig::TlsConfig::Ca: SecretOrConfigMap
+      Spec::AlertmanagerConfiguration::Global::HttpConfig::TlsConfig::Cert: SecretOrConfigMap
+      Spec::AlertmanagerConfiguration::Global::Jira: GlobalJiraConfig
+      Spec::AlertmanagerConfiguration::Global::Mattermost: GlobalMattermostConfig
+      Spec::AlertmanagerConfiguration::Global::RocketChat: GlobalRocketChatConfig
+      Spec::AlertmanagerConfiguration::Global::Smtp: GlobalSMTPConfig
+      Spec::AlertmanagerConfiguration::Global::Smtp::SmartHost: HostPort
+      Spec::AlertmanagerConfiguration::Global::Smtp::TlsConfig: SafeTLSConfig
+      Spec::AlertmanagerConfiguration::Global::Smtp::TlsConfig::Ca: SecretOrConfigMap
+      Spec::AlertmanagerConfiguration::Global::Smtp::TlsConfig::Cert: SecretOrConfigMap
+      Spec::AlertmanagerConfiguration::Global::Telegram: GlobalTelegramConfig
+      Spec::AlertmanagerConfiguration::Global::Victorops: GlobalVictorOpsConfig
+      Spec::AlertmanagerConfiguration::Global::Webex: GlobalWebexConfig
+      Spec::AlertmanagerConfiguration::Global::Wechat: GlobalWeChatConfig
+      Spec::AlertmanagerConfiguration::TemplatesItem: SecretOrConfigMap
+      Spec::ClusterTLS: ClusterTLSConfig
+      Spec::ClusterTLS::Client: SafeTLSConfig
+      Spec::ClusterTLS::Client::Ca: SecretOrConfigMap
+      Spec::ClusterTLS::Client::Cert: SecretOrConfigMap
+      Spec::ClusterTLS::Server: WebTLSConfig
+      Spec::ClusterTLS::Server::Cert: SecretOrConfigMap
+      Spec::ClusterTLS::Server::Client_ca: SecretOrConfigMap
+      Spec::ImagePullSecretsItem: IO::K8s::Api::Core::V1::LocalObjectReference
+      Spec::Limits: AlertmanagerLimitsSpec
+      Spec::PodMetadata: EmbeddedObjectMetadata
+      Spec::Storage: StorageSpec
+      Spec::Storage::EmptyDir: EmptyDirVolumeSource
+      Spec::Storage::Ephemeral: EphemeralVolumeSource
+      Spec::Storage::Ephemeral::VolumeClaimTemplate: PersistentVolumeClaimTemplate
+      Spec::Storage::VolumeClaimTemplate: EmbeddedPersistentVolumeClaim
+      Spec::Storage::VolumeClaimTemplate::Metadata: EmbeddedObjectMetadata
+      Spec::Storage::VolumeClaimTemplate::Status: PersistentVolumeClaimStatus
+      Spec::UpdateStrategy: StatefulSetUpdateStrategy
+      Spec::UpdateStrategy::RollingUpdate: RollingUpdateStatefulSetStrategy
+      Spec::VolumeMountsItem: VolumeMount
+      Spec::Web: AlertmanagerWebSpec
+      Spec::Web::HttpConfig: WebHTTPConfig
+      Spec::Web::HttpConfig::Headers: WebHTTPHeaders
+      Spec::Web::TlsConfig: WebTLSConfig
+      Spec::Web::TlsConfig::Cert: SecretOrConfigMap
+      Spec::Web::TlsConfig::Client_ca: SecretOrConfigMap
+      Status: AlertmanagerStatus
+      Status::ConditionsItem: Condition
+  PodMonitor:
+    extra: []
+    with:
+    - IO::K8s::Role::Namespaced
+    names:
+      Spec: PodMonitorSpec
+      Spec::AttachMetadata: AttachMetadata
+      Spec::NamespaceSelector: NamespaceSelector
+      Spec::PodMetricsEndpointsItem: PodMetricsEndpoint
+      Spec::PodMetricsEndpointsItem::Authorization: SafeAuthorization
+      Spec::PodMetricsEndpointsItem::BasicAuth: BasicAuth
+      Spec::PodMetricsEndpointsItem::MetricRelabelingsItem: RelabelConfig
+      Spec::PodMetricsEndpointsItem::Oauth2: OAuth2
+      Spec::PodMetricsEndpointsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::PodMetricsEndpointsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::PodMetricsEndpointsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::PodMetricsEndpointsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::PodMetricsEndpointsItem::RelabelingsItem: RelabelConfig
+      Spec::PodMetricsEndpointsItem::TlsConfig: SafeTLSConfig
+      Spec::PodMetricsEndpointsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::PodMetricsEndpointsItem::TlsConfig::Cert: SecretOrConfigMap
+      Status: ConfigResourceStatus
+      Status::BindingsItem: WorkloadBinding
+      Status::BindingsItem::ConditionsItem: '+IO::K8s::PrometheusOperator::V1::WorkloadBindingCondition'
+  Probe:
+    extra: []
+    with:
+    - IO::K8s::Role::Namespaced
+    names:
+      Spec: ProbeSpec
+      Spec::Authorization: SafeAuthorization
+      Spec::BasicAuth: BasicAuth
+      Spec::MetricRelabelingsItem: RelabelConfig
+      Spec::Oauth2: OAuth2
+      Spec::Oauth2::ClientId: SecretOrConfigMap
+      Spec::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::ParamsItem: ProbeParam
+      Spec::Prober: ProberSpec
+      Spec::Targets: ProbeTargets
+      Spec::Targets::Ingress: ProbeTargetIngress
+      Spec::Targets::Ingress::NamespaceSelector: NamespaceSelector
+      Spec::Targets::Ingress::RelabelingConfigsItem: RelabelConfig
+      Spec::Targets::StaticConfig: ProbeTargetStaticConfig
+      Spec::Targets::StaticConfig::RelabelingConfigsItem: RelabelConfig
+      Spec::TlsConfig: SafeTLSConfig
+      Spec::TlsConfig::Ca: SecretOrConfigMap
+      Spec::TlsConfig::Cert: SecretOrConfigMap
+      Status: ConfigResourceStatus
+      Status::BindingsItem: WorkloadBinding
+      Status::BindingsItem::ConditionsItem: '+IO::K8s::PrometheusOperator::V1::WorkloadBindingCondition'
+  Prometheus:
+    extra: []
+    with:
+    - IO::K8s::Role::Namespaced
+    no_reuse_core:
+    - Spec::AdditionalArgsItem
+    - Spec::ExcludedFromEnforcementItem
+    - Spec::Thanos::AdditionalArgsItem
+    names:
+      Spec: PrometheusSpec
+      Spec::AdditionalArgsItem: Argument
+      Spec::Alerting: AlertingSpec
+      Spec::Alerting::AlertmanagersItem: AlertmanagerEndpoints
+      Spec::Alerting::AlertmanagersItem::AlertRelabelingsItem: RelabelConfig
+      Spec::Alerting::AlertmanagersItem::Authorization: SafeAuthorization
+      Spec::Alerting::AlertmanagersItem::BasicAuth: BasicAuth
+      Spec::Alerting::AlertmanagersItem::RelabelingsItem: RelabelConfig
+      Spec::Alerting::AlertmanagersItem::Sigv4: Sigv4
+      Spec::Alerting::AlertmanagersItem::TlsConfig: TLSConfig
+      Spec::Alerting::AlertmanagersItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::Alerting::AlertmanagersItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::ApiserverConfig: APIServerConfig
+      Spec::ApiserverConfig::Authorization: Authorization
+      Spec::ApiserverConfig::BasicAuth: BasicAuth
+      Spec::ApiserverConfig::TlsConfig: TLSConfig
+      Spec::ApiserverConfig::TlsConfig::Ca: SecretOrConfigMap
+      Spec::ApiserverConfig::TlsConfig::Cert: SecretOrConfigMap
+      Spec::ArbitraryFSAccessThroughSMs: ArbitraryFSAccessThroughSMsConfig
+      Spec::ExcludedFromEnforcementItem: ObjectReference
+      Spec::Exemplars: Exemplars
+      Spec::ImagePullSecretsItem: IO::K8s::Api::Core::V1::LocalObjectReference
+      Spec::Otlp: OTLPConfig
+      Spec::PodMetadata: EmbeddedObjectMetadata
+      Spec::PrometheusRulesExcludedFromEnforceItem: PrometheusRuleExcludeConfig
+      Spec::Query: QuerySpec
+      Spec::RemoteReadItem: RemoteReadSpec
+      Spec::RemoteReadItem::Authorization: Authorization
+      Spec::RemoteReadItem::BasicAuth: BasicAuth
+      Spec::RemoteReadItem::Oauth2: OAuth2
+      Spec::RemoteReadItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::RemoteReadItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::RemoteReadItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::RemoteReadItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::RemoteReadItem::TlsConfig: TLSConfig
+      Spec::RemoteReadItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::RemoteReadItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::RemoteWriteItem: RemoteWriteSpec
+      Spec::RemoteWriteItem::Authorization: Authorization
+      Spec::RemoteWriteItem::AzureAd: AzureAD
+      Spec::RemoteWriteItem::AzureAd::ManagedIdentity: ManagedIdentity
+      Spec::RemoteWriteItem::AzureAd::Oauth: AzureOAuth
+      Spec::RemoteWriteItem::AzureAd::Sdk: AzureSDK
+      Spec::RemoteWriteItem::AzureAd::WorkloadIdentity: AzureWorkloadIdentity
+      Spec::RemoteWriteItem::BasicAuth: BasicAuth
+      Spec::RemoteWriteItem::MetadataConfig: MetadataConfig
+      Spec::RemoteWriteItem::Oauth2: OAuth2
+      Spec::RemoteWriteItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::RemoteWriteItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::RemoteWriteItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::RemoteWriteItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::RemoteWriteItem::QueueConfig: QueueConfig
+      Spec::RemoteWriteItem::Sigv4: Sigv4
+      Spec::RemoteWriteItem::TlsConfig: TLSConfig
+      Spec::RemoteWriteItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::RemoteWriteItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::RemoteWriteItem::WriteRelabelConfigsItem: RelabelConfig
+      Spec::Rules: Rules
+      Spec::Rules::Alert: RulesAlert
+      Spec::Runtime: RuntimeConfig
+      Spec::ScrapeClassesItem: ScrapeClass
+      Spec::ScrapeClassesItem::AttachMetadata: AttachMetadata
+      Spec::ScrapeClassesItem::Authorization: Authorization
+      Spec::ScrapeClassesItem::MetricRelabelingsItem: RelabelConfig
+      Spec::ScrapeClassesItem::RelabelingsItem: RelabelConfig
+      Spec::ScrapeClassesItem::TlsConfig: TLSConfig
+      Spec::ScrapeClassesItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::ScrapeClassesItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::ShardRetentionPolicy: ShardRetentionPolicy
+      Spec::ShardRetentionPolicy::Retain: RetainConfig
+      Spec::ShardingStrategy: ShardingStrategy
+      Spec::ShardingStrategy::Topology: TopologyShardingStrategy
+      Spec::Storage: StorageSpec
+      Spec::Storage::EmptyDir: EmptyDirVolumeSource
+      Spec::Storage::Ephemeral: EphemeralVolumeSource
+      Spec::Storage::Ephemeral::VolumeClaimTemplate: PersistentVolumeClaimTemplate
+      Spec::Storage::VolumeClaimTemplate: EmbeddedPersistentVolumeClaim
+      Spec::Storage::VolumeClaimTemplate::Metadata: EmbeddedObjectMetadata
+      Spec::Storage::VolumeClaimTemplate::Status: PersistentVolumeClaimStatus
+      Spec::Thanos: ThanosSpec
+      Spec::Thanos::AdditionalArgsItem: Argument
+      Spec::Thanos::GrpcServerTlsConfig: GRPCServerTLSConfig
+      Spec::Thanos::GrpcServerTlsConfig::Ca: SecretOrConfigMap
+      Spec::Thanos::GrpcServerTlsConfig::Cert: SecretOrConfigMap
+      Spec::Thanos::VolumeMountsItem: VolumeMount
+      Spec::TopologySpreadConstraintsItem: TopologySpreadConstraint
+      Spec::TracingConfig: TracingConfig
+      Spec::TracingConfig::TlsConfig: TLSConfig
+      Spec::TracingConfig::TlsConfig::Ca: SecretOrConfigMap
+      Spec::TracingConfig::TlsConfig::Cert: SecretOrConfigMap
+      Spec::Tsdb: TSDBSpec
+      Spec::Tsdb::ChunkEncoding: ChunkEncodingSpec
+      Spec::UpdateStrategy: StatefulSetUpdateStrategy
+      Spec::UpdateStrategy::RollingUpdate: RollingUpdateStatefulSetStrategy
+      Spec::VolumeMountsItem: VolumeMount
+      Spec::Web: PrometheusWebSpec
+      Spec::Web::HttpConfig: WebHTTPConfig
+      Spec::Web::HttpConfig::Headers: WebHTTPHeaders
+      Spec::Web::TlsConfig: WebTLSConfig
+      Spec::Web::TlsConfig::Cert: SecretOrConfigMap
+      Spec::Web::TlsConfig::Client_ca: SecretOrConfigMap
+      Status: PrometheusStatus
+      Status::ConditionsItem: Condition
+      Status::ShardStatusesItem: ShardStatus
+  PrometheusRule:
+    extra: []
+    with:
+    - IO::K8s::Role::Namespaced
+    names:
+      Spec: PrometheusRuleSpec
+      Spec::GroupsItem: RuleGroup
+      Spec::GroupsItem::RulesItem: Rule
+      Status: ConfigResourceStatus
+      Status::BindingsItem: WorkloadBinding
+      Status::BindingsItem::ConditionsItem: '+IO::K8s::PrometheusOperator::V1::WorkloadBindingCondition'
+  ScrapeConfig:
+    extra: []
+    with:
+    - IO::K8s::Role::Namespaced
+    names:
+      Spec: ScrapeConfigSpec
+      Spec::Authorization: SafeAuthorization
+      Spec::AzureSDConfigsItem: AzureSDConfig
+      Spec::AzureSDConfigsItem::Authorization: SafeAuthorization
+      Spec::AzureSDConfigsItem::BasicAuth: BasicAuth
+      Spec::AzureSDConfigsItem::Oauth2: OAuth2
+      Spec::AzureSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::AzureSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::AzureSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::AzureSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::AzureSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::AzureSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::AzureSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::BasicAuth: BasicAuth
+      Spec::ConsulSDConfigsItem: ConsulSDConfig
+      Spec::ConsulSDConfigsItem::Authorization: SafeAuthorization
+      Spec::ConsulSDConfigsItem::BasicAuth: BasicAuth
+      Spec::ConsulSDConfigsItem::Oauth2: OAuth2
+      Spec::ConsulSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::ConsulSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::ConsulSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::ConsulSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::ConsulSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::ConsulSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::ConsulSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::DigitalOceanSDConfigsItem: DigitalOceanSDConfig
+      Spec::DigitalOceanSDConfigsItem::Authorization: SafeAuthorization
+      Spec::DigitalOceanSDConfigsItem::Oauth2: OAuth2
+      Spec::DigitalOceanSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::DigitalOceanSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::DigitalOceanSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::DigitalOceanSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::DigitalOceanSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::DigitalOceanSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::DigitalOceanSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::DnsSDConfigsItem: DNSSDConfig
+      Spec::DockerSDConfigsItem: DockerSDConfig
+      Spec::DockerSDConfigsItem::Authorization: SafeAuthorization
+      Spec::DockerSDConfigsItem::BasicAuth: BasicAuth
+      Spec::DockerSDConfigsItem::FiltersItem: Filter
+      Spec::DockerSDConfigsItem::Oauth2: OAuth2
+      Spec::DockerSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::DockerSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::DockerSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::DockerSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::DockerSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::DockerSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::DockerSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::DockerSwarmSDConfigsItem: DockerSwarmSDConfig
+      Spec::DockerSwarmSDConfigsItem::Authorization: SafeAuthorization
+      Spec::DockerSwarmSDConfigsItem::BasicAuth: BasicAuth
+      Spec::DockerSwarmSDConfigsItem::FiltersItem: Filter
+      Spec::DockerSwarmSDConfigsItem::Oauth2: OAuth2
+      Spec::DockerSwarmSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::DockerSwarmSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::DockerSwarmSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::DockerSwarmSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::DockerSwarmSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::DockerSwarmSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::DockerSwarmSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::Ec2SDConfigsItem: EC2SDConfig
+      Spec::Ec2SDConfigsItem::FiltersItem: Filter
+      Spec::Ec2SDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::Ec2SDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::Ec2SDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::EurekaSDConfigsItem: EurekaSDConfig
+      Spec::EurekaSDConfigsItem::Authorization: SafeAuthorization
+      Spec::EurekaSDConfigsItem::BasicAuth: BasicAuth
+      Spec::EurekaSDConfigsItem::Oauth2: OAuth2
+      Spec::EurekaSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::EurekaSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::EurekaSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::EurekaSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::EurekaSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::EurekaSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::EurekaSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::FileSDConfigsItem: FileSDConfig
+      Spec::GceSDConfigsItem: GCESDConfig
+      Spec::HetznerSDConfigsItem: HetznerSDConfig
+      Spec::HetznerSDConfigsItem::Authorization: SafeAuthorization
+      Spec::HetznerSDConfigsItem::BasicAuth: BasicAuth
+      Spec::HetznerSDConfigsItem::Oauth2: OAuth2
+      Spec::HetznerSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::HetznerSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::HetznerSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::HetznerSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::HetznerSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::HetznerSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::HetznerSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::HttpSDConfigsItem: HTTPSDConfig
+      Spec::HttpSDConfigsItem::Authorization: SafeAuthorization
+      Spec::HttpSDConfigsItem::BasicAuth: BasicAuth
+      Spec::HttpSDConfigsItem::Oauth2: OAuth2
+      Spec::HttpSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::HttpSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::HttpSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::HttpSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::HttpSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::HttpSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::HttpSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::IonosSDConfigsItem: IonosSDConfig
+      Spec::IonosSDConfigsItem::Authorization: SafeAuthorization
+      Spec::IonosSDConfigsItem::Oauth2: OAuth2
+      Spec::IonosSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::IonosSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::IonosSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::IonosSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::IonosSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::IonosSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::IonosSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::KubernetesSDConfigsItem: KubernetesSDConfig
+      Spec::KubernetesSDConfigsItem::AttachMetadata: AttachMetadata
+      Spec::KubernetesSDConfigsItem::Authorization: SafeAuthorization
+      Spec::KubernetesSDConfigsItem::BasicAuth: BasicAuth
+      Spec::KubernetesSDConfigsItem::Namespaces: NamespaceDiscovery
+      Spec::KubernetesSDConfigsItem::Oauth2: OAuth2
+      Spec::KubernetesSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::KubernetesSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::KubernetesSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::KubernetesSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::KubernetesSDConfigsItem::SelectorsItem: K8SSelectorConfig
+      Spec::KubernetesSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::KubernetesSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::KubernetesSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::KumaSDConfigsItem: KumaSDConfig
+      Spec::KumaSDConfigsItem::Authorization: SafeAuthorization
+      Spec::KumaSDConfigsItem::BasicAuth: BasicAuth
+      Spec::KumaSDConfigsItem::Oauth2: OAuth2
+      Spec::KumaSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::KumaSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::KumaSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::KumaSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::KumaSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::KumaSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::KumaSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::LightSailSDConfigsItem: LightSailSDConfig
+      Spec::LightSailSDConfigsItem::Authorization: SafeAuthorization
+      Spec::LightSailSDConfigsItem::BasicAuth: BasicAuth
+      Spec::LightSailSDConfigsItem::Oauth2: OAuth2
+      Spec::LightSailSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::LightSailSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::LightSailSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::LightSailSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::LightSailSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::LightSailSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::LightSailSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::LinodeSDConfigsItem: LinodeSDConfig
+      Spec::LinodeSDConfigsItem::Authorization: SafeAuthorization
+      Spec::LinodeSDConfigsItem::Oauth2: OAuth2
+      Spec::LinodeSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::LinodeSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::LinodeSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::LinodeSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::LinodeSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::LinodeSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::LinodeSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::MetricRelabelingsItem: RelabelConfig
+      Spec::NomadSDConfigsItem: NomadSDConfig
+      Spec::NomadSDConfigsItem::Authorization: SafeAuthorization
+      Spec::NomadSDConfigsItem::BasicAuth: BasicAuth
+      Spec::NomadSDConfigsItem::Oauth2: OAuth2
+      Spec::NomadSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::NomadSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::NomadSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::NomadSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::NomadSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::NomadSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::NomadSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::Oauth2: OAuth2
+      Spec::Oauth2::ClientId: SecretOrConfigMap
+      Spec::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::OpenstackSDConfigsItem: OpenStackSDConfig
+      Spec::OpenstackSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::OpenstackSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::OpenstackSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::OvhcloudSDConfigsItem: OVHCloudSDConfig
+      Spec::PuppetDBSDConfigsItem: PuppetDBSDConfig
+      Spec::PuppetDBSDConfigsItem::Authorization: SafeAuthorization
+      Spec::PuppetDBSDConfigsItem::BasicAuth: BasicAuth
+      Spec::PuppetDBSDConfigsItem::Oauth2: OAuth2
+      Spec::PuppetDBSDConfigsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::PuppetDBSDConfigsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::PuppetDBSDConfigsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::PuppetDBSDConfigsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::PuppetDBSDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::PuppetDBSDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::PuppetDBSDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::RelabelingsItem: RelabelConfig
+      Spec::ScalewaySDConfigsItem: ScalewaySDConfig
+      Spec::ScalewaySDConfigsItem::TlsConfig: SafeTLSConfig
+      Spec::ScalewaySDConfigsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::ScalewaySDConfigsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::StaticConfigsItem: StaticConfig
+      Spec::TlsConfig: SafeTLSConfig
+      Spec::TlsConfig::Ca: SecretOrConfigMap
+      Spec::TlsConfig::Cert: SecretOrConfigMap
+      Status: ConfigResourceStatus
+      Status::BindingsItem: WorkloadBinding
+      Status::BindingsItem::ConditionsItem: '+IO::K8s::PrometheusOperator::V1::WorkloadBindingCondition'
+  ServiceMonitor:
+    extra: []
+    with:
+    - IO::K8s::Role::Namespaced
+    names:
+      Spec: ServiceMonitorSpec
+      Spec::AttachMetadata: AttachMetadata
+      Spec::EndpointsItem: Endpoint
+      Spec::EndpointsItem::Authorization: SafeAuthorization
+      Spec::EndpointsItem::BasicAuth: BasicAuth
+      Spec::EndpointsItem::MetricRelabelingsItem: RelabelConfig
+      Spec::EndpointsItem::Oauth2: OAuth2
+      Spec::EndpointsItem::Oauth2::ClientId: SecretOrConfigMap
+      Spec::EndpointsItem::Oauth2::TlsConfig: SafeTLSConfig
+      Spec::EndpointsItem::Oauth2::TlsConfig::Ca: SecretOrConfigMap
+      Spec::EndpointsItem::Oauth2::TlsConfig::Cert: SecretOrConfigMap
+      Spec::EndpointsItem::RelabelingsItem: RelabelConfig
+      Spec::EndpointsItem::TlsConfig: TLSConfig
+      Spec::EndpointsItem::TlsConfig::Ca: SecretOrConfigMap
+      Spec::EndpointsItem::TlsConfig::Cert: SecretOrConfigMap
+      Spec::NamespaceSelector: NamespaceSelector
+      Status: ConfigResourceStatus
+      Status::BindingsItem: WorkloadBinding
+      Status::BindingsItem::ConditionsItem: '+IO::K8s::PrometheusOperator::V1::WorkloadBindingCondition'

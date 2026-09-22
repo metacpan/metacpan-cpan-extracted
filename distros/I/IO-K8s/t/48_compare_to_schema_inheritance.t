@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# karr #30: compare_to_schema must be inheritance-aware.
+# k30: compare_to_schema must be inheritance-aware.
 #
 # compare_to_schema previously read IO::K8s::Resource::_attr_registry
 # directly, so a class_namespaces-style subclass (whose own registry entry

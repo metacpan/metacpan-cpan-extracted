@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::RRSet;
 # ABSTRACT: Hetzner Cloud DNS RRSet object
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use Carp qw(croak);
@@ -51,9 +51,8 @@ sub delete {
     croak "Cannot delete RRSet without name" unless $self->name;
     croak "Cannot delete RRSet without type" unless $self->type;
 
-    my $path = "/zones/" . $self->zone_id . "/rrsets/" . $self->name . "/" . $self->type;
-    $self->_client->delete($path);
-    return 1;
+    return $self->_client->zones->rrsets($self->zone_id)
+        ->delete($self->name, $self->type);
 }
 
 
@@ -90,7 +89,7 @@ WWW::Hetzner::Cloud::RRSet - Hetzner Cloud DNS RRSet object
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -147,9 +146,10 @@ Saves changes to TTL and records back to the API.
 
 =head2 delete
 
-    $record->delete;
+    my $action = $record->delete;
 
-Deletes the RRSet.
+Deletes the RRSet. Returns the L<WWW::Hetzner::Action> tracking the
+deletion; call C<< $action->wait >> to block until the RRSet is gone.
 
 =head2 values
 
@@ -200,7 +200,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

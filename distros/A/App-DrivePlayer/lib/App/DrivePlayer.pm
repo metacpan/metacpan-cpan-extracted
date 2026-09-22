@@ -3,7 +3,7 @@ package App::DrivePlayer;
 use strict;
 use warnings;
 
-our $VERSION = '0.2.9';
+our $VERSION = '0.2.10';
 
 1;
 
@@ -12,10 +12,6 @@ __END__
 =head1 NAME
 
 App::DrivePlayer - GTK3 music player for Google Drive
-
-=head1 VERSION
-
-0.2.8
 
 =head1 DESCRIPTION
 

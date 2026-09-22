@@ -17,7 +17,7 @@ require Test2::Harness::Util::UUID;
 require bytes;
 
 use Importer Importer => 'import';
-our @EXPORT_OK = qw/uuid_inflate uuid_deflate gen_uuid uuid_mass_inflate uuid_mass_deflate looks_like_uuid_36_or_16/;
+our @EXPORT_OK = qw/uuid_inflate uuid_deflate gen_uuid gen_deflated_uuid uuid_mass_inflate uuid_mass_deflate looks_like_uuid_36_or_16/;
 
 sub gen_uuid {
     my $binary = UG()->create();
@@ -31,6 +31,16 @@ sub gen_uuid {
         },
         __PACKAGE__
     );
+}
+
+# gen_uuid() builds both forms of the id and blesses them. A row headed
+# straight for the database needs only the stored form.
+sub gen_deflated_uuid {
+    my $binary = UG()->create();
+
+    return _reorder_bin($binary) if $Test2::Harness::UI::Schema::LOADED && $Test2::Harness::UI::Schema::LOADED =~ m/mysql/i;
+
+    return lc(UG()->to_string($binary));
 }
 
 sub new {

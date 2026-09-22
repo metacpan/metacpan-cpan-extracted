@@ -58,7 +58,7 @@ repo (single distribution, one board, no cross-repo handoff).
 
 - `karr list --compact` / `karr board` — open work · `karr show ID` — detail
 - `karr create "Title" --priority high --tags a,b --body '…'` · `karr edit ID -a "note"`
-  · `--claim NAME` · `--block "why"` · `karr move ID in-progress` — full surface: skill `karr`
+  · `--claim NAME` · `--block "why"` · `karr move ID in-progress` — full surface: skill `kanban-issues-karr-cli`
 
 Record drift and follow-up work as tickets rather than growing the current change.
 **Serialize board mutations when fanning out** — parallel implementation is fine, but collect
@@ -102,7 +102,7 @@ Every write publishes under the maintainer's account.
 
 ## Perl conventions — reference, don't restate
 
-Module loading, Moo patterns, dependency pinning and house style live in skills `perl-core`,
-`perl-moo`, `io-k8s-core` and `perl-release-author-getty` (force-loaded per lane via
+Module loading, Moo patterns, dependency pinning and house style live in skills `getty-perl-core`,
+`getty-perl-moo`, `io-k8s-core` and `getty-perl-release-author-getty` (force-loaded per lane via
 `briefing.skills` — `.claude/agents/` defines which agent briefs which). Do not duplicate
 that content here.

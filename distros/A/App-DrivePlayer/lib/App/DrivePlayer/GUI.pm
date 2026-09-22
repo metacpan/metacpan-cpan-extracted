@@ -114,8 +114,16 @@ sub _init_logging {
     my $level = $self->config->log_level();
     my $file  = $self->config->log_file() // '/tmp/drive_player.log';
 
+    # Google::RestApi logs ~27 DEBUG lines per cell while reading a worksheet
+    # (tens of thousands of lines for a large sheet), which froze the UI for a
+    # minute during a big sheet sync just writing them to disk.  Its category
+    # level is controlled independently via config (restapi_log_level), so the
+    # app can run at DEBUG without the RestApi firehose; default WARN.
+    my $restapi_level = $self->config->restapi_log_level();
+
     my $log4perl_conf = "
         log4perl.rootLogger=$level, Screen, File
+        log4perl.logger.Google.RestApi=$restapi_level
         log4perl.appender.Screen=Log::Log4perl::Appender::Screen
         log4perl.appender.Screen.layout=Log::Log4perl::Layout::PatternLayout
         log4perl.appender.Screen.layout.ConversionPattern=%d [%p] %m%n
@@ -152,7 +160,10 @@ sub _init_api {
         return;
     }
 
-    my $api = eval { Google::RestApi->new(auth => $auth_cfg) };
+    # Pass a shallow copy: Google::RestApi mutates the auth hash it is given
+    # (it deletes 'class' and adds 'config_dir'), which would otherwise strip
+    # the 'class' key from our live config and lose it on the next save().
+    my $api = eval { Google::RestApi->new(auth => { %$auth_cfg }) };
     if ($@) {
         $self->_show_error("Failed to initialise Google API: $@");
         return;
@@ -565,10 +576,7 @@ sub _build_tracklist {
         # sidebar to that group. The sidebar's cursor-changed signal then
         # repopulates the tracklist, so no further work is needed here.
         if ($col && (my $kind = $link_kind{$col})) {
-            my $iter  = $self->track_store->get_iter($path);
-            my $id    = $iter ? $self->track_store->get($iter, 0) : undef;
-            my $track = $id ? $self->_track_by_id->{$id} : undef;
-            my $value = $track ? $track->{$kind} : undef;
+            my $value = $self->_link_value_at($path, $kind);
             if (defined $value && length $value) {
                 $self->_navigate_sidebar_to($kind, $value);
                 return TRUE;
@@ -615,10 +623,7 @@ sub _build_tracklist {
         my ($path, $col) = $w->get_path_at_pos($event->x, $event->y);
         my $want_link = 0;
         if ($path && $col && (my $kind = $link_kind{$col})) {
-            my $iter  = $self->track_store->get_iter($path);
-            my $id    = $iter ? $self->track_store->get($iter, 0) : undef;
-            my $track = $id ? $self->_track_by_id->{$id} : undef;
-            my $value = $track ? $track->{$kind} : undef;
+            my $value = $self->_link_value_at($path, $kind);
             $want_link = 1 if defined $value && length $value;
         }
         $set_cursor->($want_link);
@@ -798,10 +803,24 @@ sub _populate_sidebar {
     my $all_iter = $store->append(undef);
     $store->set($all_iter, 0, 'All Tracks', 1, 'all', 2, '');
 
+    # Build display-sorted [display, raw] pairs so the sidebar's visible
+    # order matches what the user actually reads.  Raw values (e.g.
+    # "2025-The Best of ZZ Top") differ from display ("The Best of ZZ
+    # Top") whenever _display_album/text strips a prefix or rewrites
+    # underscores, and sorting on the raw form scatters those entries
+    # into the wrong alphabetical slot.
+    my $by_display = sub {
+        my ($display_fn, @raw) = @_;
+        return map  { $_->[1] }
+               sort { lc($a->[0]) cmp lc($b->[0]) }
+               map  { [ $display_fn->($_), $_ ] }
+                    @raw;
+    };
+
     # Artists
     my $art_iter = $store->append(undef);
     $store->set($art_iter, 0, 'Artists', 1, 'category', 2, '');
-    for my $artist ($self->db->all_artists()) {
+    for my $artist ($by_display->(\&_display_text, $self->db->all_artists())) {
         my $iter = $store->append($art_iter);
         $store->set($iter, 0, _display_text($artist), 1, 'artist', 2, $artist);
     }
@@ -809,7 +828,7 @@ sub _populate_sidebar {
     # Albums
     my $alb_iter = $store->append(undef);
     $store->set($alb_iter, 0, 'Albums', 1, 'category', 2, '');
-    for my $album ($self->db->all_albums()) {
+    for my $album ($by_display->(\&_display_album, $self->db->all_albums())) {
         my $iter = $store->append($alb_iter);
         $store->set($iter, 0, _display_album($album), 1, 'album', 2, $album);
     }
@@ -817,7 +836,7 @@ sub _populate_sidebar {
     # Genres
     my $gen_iter = $store->append(undef);
     $store->set($gen_iter, 0, 'Genres', 1, 'category', 2, '');
-    for my $genre ($self->db->all_genres()) {
+    for my $genre ($by_display->(sub { $_[0] }, $self->db->all_genres())) {
         my $iter = $store->append($gen_iter);
         $store->set($iter, 0, $genre, 1, 'genre', 2, $genre);
     }
@@ -833,6 +852,22 @@ sub _populate_sidebar {
     $self->sidebar_view->expand_all();
 }
 
+# Positional (col-index, value) pairs for the display columns of a track row
+# (columns 1-7: track#, title, artist, album, genre, year, duration).
+# Columns 0 (id) and 8 (drive_id) are set separately where needed.
+sub _track_row_cols {
+    my ($t) = @_;
+    return (
+        1, _track_num_str($t->{track_number}),
+        2, _display_title($t->{title}) || '(Unknown)',
+        3, _display_text($t->{artist}),
+        4, _display_album($t->{album}),
+        5, $t->{genre}        // '',
+        6, $t->{year}         // '',
+        7, _dur_str($t->{duration_ms}),
+    );
+}
+
 sub _populate_tracklist {
     my ($self, @tracks) = @_;
     my $store = $self->track_store;
@@ -846,15 +881,9 @@ sub _populate_tracklist {
     for my $t (@tracks) {
         my $iter = $store->append();
         $store->set($iter,
-            0, $t->{id}           // 0,
-            1, _track_num_str($t->{track_number}),
-            2, _display_title($t->{title}) || '(Unknown)',
-            3, _display_text($t->{artist}),
-            4, _display_album($t->{album}),
-            5, $t->{genre}        // '',
-            6, $t->{year}         // '',
-            7, _dur_str($t->{duration_ms}),
-            8, $t->{drive_id}     // '',
+            0, $t->{id}       // 0,
+            _track_row_cols($t),
+            8, $t->{drive_id} // '',
         );
         if ($t->{id}) {
             $self->_track_iter_map->{$t->{id}} = $iter;
@@ -870,15 +899,7 @@ sub _refresh_track_row {
     my ($self, $track_id) = @_;
     my $iter = $self->_track_iter_map->{$track_id} or return;
     my $t    = $self->db->get_track($track_id)      or return;
-    $self->track_store->set($iter,
-        1, _track_num_str($t->{track_number}),
-        2, _display_title($t->{title}) || '(Unknown)',
-        3, _display_text($t->{artist}),
-        4, _display_album($t->{album}),
-        5, $t->{genre}    // '',
-        6, $t->{year}     // '',
-        7, _dur_str($t->{duration_ms}),
-    );
+    $self->track_store->set($iter, _track_row_cols($t));
     # Keep the cached hashref in sync so subsequent edits start from the
     # new values rather than the stale pre-edit snapshot.
     $self->_track_by_id->{$track_id} = $t;
@@ -896,6 +917,22 @@ sub _track_at_path {
     my $iter = $self->track_store->get_iter($path) or return;
     my $id   = $self->track_store->get($iter, 0);
     return $self->_track_by_id->{$id};
+}
+
+# Process pending GTK events so the UI stays responsive during a long,
+# synchronous operation (progress bars, status updates, incremental scans).
+sub _pump_events {
+    Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+}
+
+# Value of the given "link" field ($kind: artist/album/genre) for the track
+# at $path, or undef. Shared by the click-to-navigate and hover-cursor handlers.
+sub _link_value_at {
+    my ($self, $path, $kind) = @_;
+    my $iter  = $self->track_store->get_iter($path);
+    my $id    = $iter ? $self->track_store->get($iter, 0) : undef;
+    my $track = $id ? $self->_track_by_id->{$id} : undef;
+    return $track ? $track->{$kind} : undef;
 }
 
 sub _current_path {
@@ -1147,12 +1184,12 @@ sub _show_sync_dialog {
             my ($msg) = @_;
             $status_lbl->set_text($msg);
             $progress->pulse();
-            Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+            $self->_pump_events();
         },
         on_track_found => sub {
             $track_count++;
             $count_lbl->set_text("$track_count tracks found");
-            Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+            $self->_pump_events();
         },
         on_large_deletion => sub {
             my ($count, $folder_name) = @_;
@@ -1177,7 +1214,7 @@ sub _show_sync_dialog {
         $current++;
         $status_lbl->set_text("Syncing folder $current/$total: $folder->{name}");
         $progress->set_fraction($current / ($total + 1));
-        Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+        $self->_pump_events();
 
         my $result = eval { $scanner->scan_folder($folder->{id}, $folder->{name}) };
         if ($@) {
@@ -1187,17 +1224,31 @@ sub _show_sync_dialog {
         }
     }
 
-    my $done_msg = "Done. $track_count tracks";
+    my $done_msg = "Scanned $track_count tracks";
     $done_msg   .= ", $total_removed removed" if $total_removed > 0;
     $done_msg   .= '.';
     $progress->set_fraction(1.0);
     $status_lbl->set_text($done_msg);
-    Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+    $self->_pump_events();
+
+    $self->_load_library();
+
+    # Keep the dialog up through the sheet sync — for a large folder this is a
+    # long, synchronous operation, and destroying the dialog first left the app
+    # looking frozen with no indication that work was still in progress.
+    unless ($stopped) {
+        $status_lbl->set_text('Syncing with Google Sheet…');
+        $progress->pulse();
+        $self->_pump_events();
+        $self->_sync_with_sheet();
+    }
+
+    $status_lbl->set_text('Sync complete.');
+    $progress->set_fraction(1.0);
+    $self->_pump_events();
     sleep 1;
 
     $dlg->destroy();
-    $self->_load_library();
-    $self->_sync_with_sheet() unless $stopped;
 }
 
 # ---- Dialogs ----
@@ -1301,7 +1352,7 @@ sub _settings_dialog {
         return unless $self->_init_api();
         $create_btn->set_sensitive(FALSE);
         $create_btn->set_label('Searching…');
-        Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+        $self->_pump_events();
 
         my $id;
         my @found = eval {
@@ -1316,7 +1367,7 @@ sub _settings_dialog {
             $id = $found[0]{id};
         } else {
             $create_btn->set_label('Creating…');
-            Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+            $self->_pump_events();
             my $sheet = App::DrivePlayer::SheetDB->new(api => $self->rest_api);
             $id = eval { $sheet->create() };
             $self->_show_error("Failed to create spreadsheet:\n$@") if $@;
@@ -1390,7 +1441,7 @@ sub _settings_dialog {
     $install_btn->signal_connect(clicked => sub {
         $install_btn->set_sensitive(FALSE);
         $fp_status->set_markup('<span foreground="#666666">Installing…</span>');
-        Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+        $self->_pump_events();
 
         my $pid = fork();
         if (!defined $pid) {
@@ -1608,7 +1659,7 @@ sub _edit_metadata_dialog {
         }
         $fetch_btn->set_sensitive(FALSE);
         $fetch_btn->set_label('Fetching…');
-        Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+        $self->_pump_events();
 
         my $meta = $self->_lookup_metadata(\%current);
 
@@ -1630,7 +1681,7 @@ sub _edit_metadata_dialog {
             $put->($entries{$key}, "$new");   # LRM-prefixed, LTR layout
             push @filled, $key;
         }
-        Gtk3::main_iteration_do(FALSE) while Gtk3::events_pending();
+        $self->_pump_events();
         $log->debug('Fetch filled: ' . (@filled ? join(',', @filled) : '(none)'))
             if $log;
     });

@@ -6,6 +6,12 @@ use Affix::Build;
 #
 my $c = Affix::Build->new();
 $c->add( \<<~'END', lang => 'c' );
+    #if defined(_WIN32)
+    #define DLLEXPORT __declspec(dllexport)
+    #else
+    #define DLLEXPORT __attribute__((visibility("default")))
+    #endif
+
     typedef void SV;
 
     // Callback: SV* tick(SV* context)
@@ -19,12 +25,12 @@ $c->add( \<<~'END', lang => 'c' );
 
     static Actor g_actor;
 
-    void spawn(SV* ctx, SV* first_step) {
+    DLLEXPORT void spawn(SV* ctx, SV* first_step) {
         g_actor.context = ctx;
         g_actor.current_step = first_step;
     }
 
-    void run_scheduler(tick_cb_t wrapper) {
+    DLLEXPORT void run_scheduler(tick_cb_t wrapper) {
         // Run limited steps to prevent infinite loop if logic fails
         int max_steps = 10;
         while (g_actor.current_step && max_steps-- > 0) {

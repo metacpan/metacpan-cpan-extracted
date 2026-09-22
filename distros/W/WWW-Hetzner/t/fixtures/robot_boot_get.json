@@ -1,0 +1,43 @@
+{
+  "boot": {
+    "rescue": {
+      "server_ip": "203.0.113.50",
+      "server_ipv6_net": "2001:db8:111:4221::",
+      "server_number": 123456,
+      "os": ["linux", "vkvm"],
+      "active": false,
+      "password": null,
+      "authorized_key": [],
+      "host_key": []
+    },
+    "linux": {
+      "server_ip": "203.0.113.50",
+      "server_ipv6_net": "2001:db8:111:4221::",
+      "server_number": 123456,
+      "dist": ["Debian 12 minimal", "Ubuntu 24.04 LTS minimal"],
+      "lang": ["en"],
+      "active": false,
+      "password": null,
+      "authorized_key": [],
+      "host_key": []
+    },
+    "vnc": {
+      "server_ip": "203.0.113.50",
+      "server_ipv6_net": "2001:db8:111:4221::",
+      "server_number": 123456,
+      "dist": ["centOS-5.0", "Fedora-6", "openSUSE-10.2"],
+      "lang": ["de_DE", "en_US"],
+      "active": false,
+      "password": null
+    },
+    "windows": {
+      "server_ip": "203.0.113.50",
+      "server_ipv6_net": "2001:db8:111:4221::",
+      "server_number": 123456,
+      "os": ["Windows Server 2022 Standard Edition", "Windows Server 2019 Standard Edition"],
+      "lang": null,
+      "active": false,
+      "password": null
+    }
+  }
+}

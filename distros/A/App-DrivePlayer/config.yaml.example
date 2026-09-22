@@ -27,4 +27,8 @@ database:
 
 # Logging: DEBUG, INFO, WARN, ERROR
 log_level: WARN
+# Level for the Google::RestApi logger subtree, controlled separately from
+# log_level. Keep at WARN: at DEBUG this library emits tens of thousands of
+# lines per worksheet read and stalls the UI during a large sheet sync.
+restapi_log_level: WARN
 log_file: "~/.local/share/drive_player/drive_player.log"

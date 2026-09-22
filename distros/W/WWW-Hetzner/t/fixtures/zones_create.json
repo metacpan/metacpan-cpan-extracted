@@ -12,5 +12,17 @@
       "helium.ns.hetzner.de"
     ],
     "status": "pending"
+  },
+  "action": {
+    "id": 9002,
+    "command": "create_zone",
+    "status": "running",
+    "progress": 0,
+    "started": "2026-01-05T15:00:00+00:00",
+    "finished": null,
+    "resources": [
+      { "id": "zone789012", "type": "zone" }
+    ],
+    "error": null
   }
 }

@@ -1,6 +1,6 @@
 ---
 name: kubernetes-concepts
-description: "Kubernetes concepts, architecture, resource relationships, networking, storage, RBAC — the big picture without language-specific typing"
+description: Use when reasoning about Kubernetes itself — control plane, resource relationships, networking, storage, RBAC — independent of any client library.
 user-invocable: true
 allowed-tools: Read, Grep, Glob, WebSearch, WebFetch
 model: sonnet
@@ -8,7 +8,7 @@ model: sonnet
 
 # Kubernetes — Big Picture Reference
 
-This skill covers Kubernetes concepts and architecture. For Perl typed objects use the `perl-kubernetes-classes` skill. For REST API calls use `perl-kubernetes-rest`. For container builds use `container-kubernetes`.
+This skill covers Kubernetes concepts and architecture, independent of any client library. For typed Kubernetes objects in Perl, the `perl-io-k8s-kubernetes-classes` skill applies on top; a project that talks to the API or builds images keeps its own skill for that.
 
 ## Architecture
 

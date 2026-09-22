@@ -5,7 +5,7 @@
       "Leon Brocard <acme@astray.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -19,10 +19,21 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::ShareDir::Install" : "0.06",
-            "perl" : "5.010001"
+            "perl" : "5.016"
          }
       },
       "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::CommentOut" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::Plugin::SetScriptShebang" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.79",
+            "Software::License::Perl_5" : "0",
+            "lib::findbin" : "0"
+         },
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
@@ -40,26 +51,25 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "EV" : "0"
+         },
          "requires" : {
-            "Catalyst" : "0",
-            "Catalyst::Controller" : "0",
-            "Catalyst::Plugin::Static::Simple" : "0",
-            "Catalyst::ScriptRunner" : "0",
-            "Catalyst::View::TT" : "0",
             "Devel::ebug" : "0.64",
             "File::ShareDir::Dist" : "0",
+            "Mojolicious" : "9.00",
+            "Mojolicious::Lite" : "0",
+            "Mojolicious::Plugin::TtRenderer" : "1.50",
             "PPI" : "0",
             "PPI::HTML" : "0",
-            "base" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.016"
          }
       },
       "test" : {
          "requires" : {
-            "HTTP::Request::Common" : "0",
+            "Test::Mojo" : "0",
             "Test::More" : "0.98",
-            "Test::WWW::Mechanize::Catalyst" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.016"
          }
       }
    },
@@ -75,13 +85,13 @@
          "web" : "https://github.com/uperl/Devel-ebug-HTTP"
       }
    },
-   "version" : "0.36",
+   "version" : "0.37",
    "x_contributors" : [
       "Leon Brocard <acme@astray.com>",
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_generated_by_perl" : "v5.42.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

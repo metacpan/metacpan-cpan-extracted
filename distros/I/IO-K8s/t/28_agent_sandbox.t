@@ -6,7 +6,25 @@ use Test::Exception;
 use IO::K8s;
 use IO::K8s::AgentSandbox;
 
-# --- All AgentSandbox CRD classes (v1alpha1: served, deprecated; v1beta1: storage) ---
+# v1beta1 is modeled to full depth (D5/D6, k95) with named classes, each in
+# its own file -- unlike v1alpha1's anonymous inline structs (defined as a
+# side effect of loading the Kind's own .pm file), these load lazily on
+# first coercion, so the "->can" checks below need them loaded explicitly.
+use IO::K8s::AgentSandbox::V1beta1::SandboxSpec;
+use IO::K8s::AgentSandbox::V1beta1::SandboxStatus;
+use IO::K8s::AgentSandbox::V1beta1::SandboxClaimSpec;
+use IO::K8s::AgentSandbox::V1beta1::SandboxClaimStatus;
+use IO::K8s::AgentSandbox::V1beta1::SandboxClaimStatusSandbox;
+use IO::K8s::AgentSandbox::V1beta1::SandboxTemplateSpec;
+use IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolSpec;
+use IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolStatus;
+use IO::K8s::AgentSandbox::V1beta1::SandboxTemplateRef;
+use IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolRef;
+use IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolUpdateStrategy;
+use IO::K8s::AgentSandbox::V1beta1::Lifecycle;
+
+# --- All AgentSandbox CRD classes (v1alpha1: removed upstream at v1.0.0, kept as
+#     back-compat for v0.5.x clusters; v1beta1: current, only upstream-served) ---
 
 my %core_classes = (
     Sandbox => {
@@ -62,13 +80,27 @@ subtest 'class metadata (v1alpha1 and v1beta1)' => sub {
 subtest 'IO::K8s::AgentSandbox resource_map' => sub {
     my $provider = IO::K8s::AgentSandbox->new;
     ok($provider->does('IO::K8s::Role::ResourceMap'), 'consumes ResourceMap role');
-    is($provider->upstream_version, 'v0.5.4', 'upstream_version is v0.5.4');
+    is($provider->upstream_version, 'v1.0.0', 'upstream_version is v1.0.0');
     my $map = $provider->resource_map;
-    is(scalar keys %$map, 4, 'resource_map has 4 entries');
+
+    # 4 short names (each resolving to the v1beta1/storage class) plus 4
+    # domain-qualified v1alpha1 keys (k58, k88) -- the v1alpha1 track was
+    # removed upstream at v1.0.0 and is kept here as back-compat for v0.5.x
+    # clusters, so it does not get a short name of its own; it is reachable
+    # only by full class name or by its own domain-qualified key.
+    is(scalar keys %$map, 8, 'resource_map has 4 short names + 4 domain-qualified v1alpha1 keys');
     for my $kind (sort keys %all_classes) {
         ok(exists $map->{$kind}, "$kind in resource_map");
         is($map->{$kind}, "AgentSandbox::V1beta1::$kind", "$kind maps to the v1beta1 (storage) class");
     }
+    is($map->{'agents.x-k8s.io/v1alpha1/Sandbox'}, 'AgentSandbox::V1alpha1::Sandbox',
+        'domain-qualified v1alpha1 Sandbox key present');
+    is($map->{'extensions.agents.x-k8s.io/v1alpha1/SandboxClaim'}, 'AgentSandbox::V1alpha1::SandboxClaim',
+        'domain-qualified v1alpha1 SandboxClaim key present');
+    is($map->{'extensions.agents.x-k8s.io/v1alpha1/SandboxTemplate'}, 'AgentSandbox::V1alpha1::SandboxTemplate',
+        'domain-qualified v1alpha1 SandboxTemplate key present');
+    is($map->{'extensions.agents.x-k8s.io/v1alpha1/SandboxWarmPool'}, 'AgentSandbox::V1alpha1::SandboxWarmPool',
+        'domain-qualified v1alpha1 SandboxWarmPool key present');
 };
 
 # --- new(with => ['IO::K8s::AgentSandbox']) integration ---
@@ -82,19 +114,32 @@ subtest 'with constructor parameter' => sub {
             "expand_class('$kind') resolves to v1beta1");
     }
 
-    # Domain-qualified access reaches the storage version registered under the
-    # short name (v1beta1). The v1alpha1 track is not auto-registered under a
-    # domain-qualified key (same precedent as e.g. ValidatingAdmissionPolicy in
-    # IO::K8s.pm, which maps only to its GA class) — it stays reachable by its
-    # full class name instead.
-    is($k8s->expand_class('agents.x-k8s.io/v1beta1/Sandbox'),
-        'IO::K8s::AgentSandbox::V1beta1::Sandbox',
-        'domain-qualified v1beta1 Sandbox resolves');
-    is($k8s->expand_class('extensions.agents.x-k8s.io/v1beta1/SandboxClaim'),
-        'IO::K8s::AgentSandbox::V1beta1::SandboxClaim',
-        'domain-qualified v1beta1 SandboxClaim resolves');
-    ok(!defined($k8s->expand_class('agents.x-k8s.io/v1alpha1/Sandbox')),
-        'domain-qualified v1alpha1 Sandbox is not auto-registered (use the full class name instead)');
+    # Domain-qualified access reaches BOTH tracks (k58). v1beta1 is
+    # reachable via the qualified key add() derives from the short-name
+    # registration; v1alpha1 is reachable because the resource_map ships its
+    # own domain-qualified keys for it directly (see
+    # IO::K8s::AgentSandbox::resource_map). This does NOT follow the
+    # ValidatingAdmissionPolicy precedent in IO::K8s.pm (a bare short name
+    # maps only to its GA class, and the older v1beta1/v1alpha1 tracks
+    # fail-close under a domain-qualified lookup): that precedent applies
+    # where there IS a GA release to prefer. AgentSandbox has no GA version at
+    # all -- v1beta1 is the current (and now only) upstream-served version,
+    # v1alpha1 was removed upstream at v1.0.0 and is kept here as back-compat,
+    # and IO::K8s::AgentSandbox's own POD has always
+    # promised this lookup ("via domain-qualified lookup (e.g.
+    # agents.x-k8s.io/v1alpha1/Sandbox)"). All eight GVK combinations (2
+    # tracks x 4 kinds) resolve; the four short names stay pinned to v1beta1
+    # regardless of track.
+    for my $kind (sort keys %all_classes) {
+        for my $ver (qw(v1alpha1 v1beta1)) {
+            my $api_version = $all_classes{$kind}{$ver}{api_version};
+            my $expected = "IO::K8s::AgentSandbox::" . ucfirst($ver) . "::$kind";
+            is($k8s->expand_class("$api_version/$kind"), $expected,
+                "domain-qualified '$api_version/$kind' resolves");
+            is($k8s->expand_class($kind, $api_version), $expected,
+                "expand_class('$kind', '$api_version') resolves");
+        }
+    }
 
     # Core resources are unaffected
     is($k8s->expand_class('Pod'), 'IO::K8s::Api::Core::V1::Pod',
@@ -170,7 +215,9 @@ subtest 'no collision with core K8s kinds' => sub {
         'core Deployment unaffected');
 };
 
-# --- Inline struct: inner classes exist (v1alpha1 track) ---
+# --- Inner classes exist: v1alpha1 stays an anonymous inline struct
+#     (unmodeled below the top level, D7 back-compat); v1beta1 is modeled to
+#     full depth (D5/D6, k95) with named classes -- see maint/crd-render/AgentSandbox.yaml ---
 
 subtest 'Sandbox v1alpha1 inline struct inner classes exist' => sub {
     ok('IO::K8s::AgentSandbox::V1alpha1::Sandbox'->can('spec'),   'spec accessor exists');
@@ -192,9 +239,12 @@ subtest 'Sandbox v1alpha1 inline struct inner classes exist' => sub {
     ok($status_class->can('podIPs'),      'status has podIPs (new in v0.5.4)');
 };
 
-subtest 'Sandbox v1beta1 inline struct inner classes exist' => sub {
-    my $spec_class   = 'IO::K8s::AgentSandbox::V1beta1::Sandbox::_Spec';
-    my $status_class = 'IO::K8s::AgentSandbox::V1beta1::Sandbox::_Status';
+subtest 'Sandbox v1beta1 full-depth classes exist' => sub {
+    # v1beta1 is modeled to full depth (D5/D6, k95): spec/status are named
+    # IO::K8s::AgentSandbox::V1beta1::SandboxSpec/SandboxStatus classes, not
+    # anonymous inline structs -- unlike the v1alpha1 track above.
+    my $spec_class   = 'IO::K8s::AgentSandbox::V1beta1::SandboxSpec';
+    my $status_class = 'IO::K8s::AgentSandbox::V1beta1::SandboxStatus';
 
     ok($spec_class->can('podTemplate'),    'spec has podTemplate');
     ok($spec_class->can('shutdownTime'),   'spec has shutdownTime');
@@ -210,10 +260,19 @@ subtest 'Sandbox v1beta1 inline struct inner classes exist' => sub {
     ok(!$status_class->can('replicas'),   'status has no replicas (dropped in v1beta1)');
 };
 
-subtest 'SandboxWarmPool inline struct inner classes exist (both versions)' => sub {
+subtest 'SandboxWarmPool spec/status classes exist (both versions)' => sub {
+    # v1alpha1 stays an anonymous inline struct (::_Spec/::_Status); v1beta1
+    # is full depth (D5/D6, k95) with named classes -- SandboxWarmPoolSpec/
+    # SandboxWarmPoolStatus, and its nested refs carry their own upstream Go
+    # type names (SandboxTemplateRef, SandboxWarmPoolUpdateStrategy) rather
+    # than the inline ::_Spec::_Foo path.
     for my $ver (qw(V1alpha1 V1beta1)) {
-        my $spec_class   = "IO::K8s::AgentSandbox::${ver}::SandboxWarmPool::_Spec";
-        my $status_class = "IO::K8s::AgentSandbox::${ver}::SandboxWarmPool::_Status";
+        my $spec_class   = $ver eq 'V1alpha1'
+            ? "IO::K8s::AgentSandbox::${ver}::SandboxWarmPool::_Spec"
+            : "IO::K8s::AgentSandbox::${ver}::SandboxWarmPoolSpec";
+        my $status_class = $ver eq 'V1alpha1'
+            ? "IO::K8s::AgentSandbox::${ver}::SandboxWarmPool::_Status"
+            : "IO::K8s::AgentSandbox::${ver}::SandboxWarmPoolStatus";
 
         ok($spec_class->can('replicas'),           "[$ver] spec has replicas");
         ok($spec_class->can('sandboxTemplateRef'), "[$ver] spec has sandboxTemplateRef");
@@ -222,10 +281,14 @@ subtest 'SandboxWarmPool inline struct inner classes exist (both versions)' => s
         ok($status_class->can('readyReplicas'),    "[$ver] status has readyReplicas");
         ok($status_class->can('selector'),         "[$ver] status has selector");
 
-        my $ref_class = "IO::K8s::AgentSandbox::${ver}::SandboxWarmPool::_Spec::_SandboxTemplateRef";
+        my $ref_class = $ver eq 'V1alpha1'
+            ? "IO::K8s::AgentSandbox::${ver}::SandboxWarmPool::_Spec::_SandboxTemplateRef"
+            : "IO::K8s::AgentSandbox::${ver}::SandboxTemplateRef";
         ok($ref_class->can('name'), "[$ver] sandboxTemplateRef has name");
 
-        my $strategy_class = "IO::K8s::AgentSandbox::${ver}::SandboxWarmPool::_Spec::_UpdateStrategy";
+        my $strategy_class = $ver eq 'V1alpha1'
+            ? "IO::K8s::AgentSandbox::${ver}::SandboxWarmPool::_Spec::_UpdateStrategy"
+            : "IO::K8s::AgentSandbox::${ver}::SandboxWarmPoolUpdateStrategy";
         ok($strategy_class->can('type'), "[$ver] updateStrategy has type");
     }
 };
@@ -256,9 +319,16 @@ subtest 'SandboxClaim v1alpha1 inline struct inner classes exist' => sub {
     ok($sandbox_ref_class->can('podIPs'), 'status.sandbox has podIPs (new in v0.5.4)');
 };
 
-subtest 'SandboxClaim v1beta1 inline struct inner classes exist' => sub {
-    my $spec_class   = 'IO::K8s::AgentSandbox::V1beta1::SandboxClaim::_Spec';
-    my $status_class = 'IO::K8s::AgentSandbox::V1beta1::SandboxClaim::_Status';
+subtest 'SandboxClaim v1beta1 full-depth classes exist' => sub {
+    # Full depth (D5/D6, k95): named classes, not the ::_Spec/::_Status
+    # inline-struct path v1alpha1 still uses above. warmPoolRef/lifecycle
+    # carry their upstream Go type names (SandboxWarmPoolRef, Lifecycle);
+    # status.sandbox is a genuine Go-name collision with the Sandbox Kind's
+    # own SandboxStatus class (both are literally called SandboxStatus
+    # upstream, in different Go packages) so it keeps the emitter's own
+    # Kind-prefixed default instead (see maint/crd-render/AgentSandbox.yaml).
+    my $spec_class   = 'IO::K8s::AgentSandbox::V1beta1::SandboxClaimSpec';
+    my $status_class = 'IO::K8s::AgentSandbox::V1beta1::SandboxClaimStatus';
 
     ok(!$spec_class->can('sandboxTemplateRef'), 'spec has no sandboxTemplateRef (dropped in v1beta1)');
     ok($spec_class->can('warmPoolRef'),          'spec has warmPoolRef (the only ref field in v1beta1)');
@@ -267,20 +337,22 @@ subtest 'SandboxClaim v1beta1 inline struct inner classes exist' => sub {
     ok($spec_class->can('lifecycle'),              'spec has lifecycle');
     ok($spec_class->can('volumeClaimTemplates'),   'spec has volumeClaimTemplates');
 
-    my $warmpool_ref_class = 'IO::K8s::AgentSandbox::V1beta1::SandboxClaim::_Spec::_WarmPoolRef';
+    my $warmpool_ref_class = 'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolRef';
     ok($warmpool_ref_class->can('name'), 'warmPoolRef has name');
 
-    my $lc_class = 'IO::K8s::AgentSandbox::V1beta1::SandboxClaim::_Spec::_Lifecycle';
+    my $lc_class = 'IO::K8s::AgentSandbox::V1beta1::Lifecycle';
     ok($lc_class->can('ttlSecondsAfterFinished'), 'lifecycle has ttlSecondsAfterFinished');
 
-    my $sandbox_ref_class = 'IO::K8s::AgentSandbox::V1beta1::SandboxClaim::_Status::_Sandbox';
+    my $sandbox_ref_class = 'IO::K8s::AgentSandbox::V1beta1::SandboxClaimStatusSandbox';
     ok($sandbox_ref_class->can('name'),   'status.sandbox has lowercase name');
     ok($sandbox_ref_class->can('podIPs'), 'status.sandbox has podIPs');
 };
 
-subtest 'SandboxTemplate inline struct inner classes exist (both versions)' => sub {
+subtest 'SandboxTemplate spec classes exist (both versions)' => sub {
     for my $ver (qw(V1alpha1 V1beta1)) {
-        my $spec_class = "IO::K8s::AgentSandbox::${ver}::SandboxTemplate::_Spec";
+        my $spec_class = $ver eq 'V1alpha1'
+            ? "IO::K8s::AgentSandbox::${ver}::SandboxTemplate::_Spec"
+            : "IO::K8s::AgentSandbox::${ver}::SandboxTemplateSpec";
 
         ok($spec_class->can('podTemplate'),                 "[$ver] spec has podTemplate");
         ok($spec_class->can('networkPolicy'),                "[$ver] spec has networkPolicy");
@@ -288,7 +360,17 @@ subtest 'SandboxTemplate inline struct inner classes exist (both versions)' => s
         ok($spec_class->can('envVarsInjectionPolicy'),        "[$ver] spec has envVarsInjectionPolicy (new in v0.5.4)");
         ok($spec_class->can('service'),                       "[$ver] spec has service (new in v0.5.4)");
         ok($spec_class->can('volumeClaimTemplates'),          "[$ver] spec has volumeClaimTemplates (new in v0.5.4)");
-        ok($spec_class->can('volumeClaimTemplatesPolicy'),    "[$ver] spec has volumeClaimTemplatesPolicy (new in v0.5.4)");
+
+        # volumeClaimTemplatesPolicy is a v1beta1-only addition; the v1alpha1 CRD
+        # schema does not carry it (karr k84).
+        if ($ver eq 'V1beta1') {
+            ok($spec_class->can('volumeClaimTemplatesPolicy'),
+                "[$ver] spec has volumeClaimTemplatesPolicy (v1beta1-only)");
+        }
+        else {
+            ok(!$spec_class->can('volumeClaimTemplatesPolicy'),
+                "[$ver] spec has no volumeClaimTemplatesPolicy (v1beta1-only, absent from v1alpha1 schema)");
+        }
 
         ok(!"IO::K8s::AgentSandbox::${ver}::SandboxTemplate"->can('status'),
             "[$ver] SandboxTemplate has no status object (upstream schema omits it)");
@@ -305,8 +387,8 @@ subtest 'Sandbox spec/status hashref coercion (v1beta1)' => sub {
         status   => { serviceFQDN => 'sandbox-test.default.svc.cluster.local', nodeName => 'node-1', podIPs => ['10.0.0.5'] },
     );
 
-    isa_ok($sandbox->spec,   'IO::K8s::AgentSandbox::V1beta1::Sandbox::_Spec');
-    isa_ok($sandbox->status, 'IO::K8s::AgentSandbox::V1beta1::Sandbox::_Status');
+    isa_ok($sandbox->spec,   'IO::K8s::AgentSandbox::V1beta1::SandboxSpec');
+    isa_ok($sandbox->status, 'IO::K8s::AgentSandbox::V1beta1::SandboxStatus');
 
     is($sandbox->spec->operatingMode,  'Suspended', 'spec.operatingMode');
     is($sandbox->spec->shutdownPolicy, 'Retain',    'spec.shutdownPolicy');
@@ -344,15 +426,15 @@ subtest 'SandboxWarmPool spec/status hashref coercion (v1beta1)' => sub {
         status   => { replicas => 3, readyReplicas => 2, selector => 'pool=my-pool' },
     );
 
-    isa_ok($swp->spec,   'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPool::_Spec');
-    isa_ok($swp->status, 'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPool::_Status');
+    isa_ok($swp->spec,   'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolSpec');
+    isa_ok($swp->status, 'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolStatus');
 
     is($swp->spec->replicas, 3, 'spec.replicas');
     isa_ok($swp->spec->sandboxTemplateRef,
-        'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPool::_Spec::_SandboxTemplateRef');
+        'IO::K8s::AgentSandbox::V1beta1::SandboxTemplateRef');
     is($swp->spec->sandboxTemplateRef->name, 'my-template', 'spec.sandboxTemplateRef.name');
     isa_ok($swp->spec->updateStrategy,
-        'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPool::_Spec::_UpdateStrategy');
+        'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolUpdateStrategy');
     is($swp->spec->updateStrategy->type, 'Recreate', 'spec.updateStrategy.type');
 
     is($swp->status->replicas,      3,             'status.replicas');
@@ -367,20 +449,27 @@ subtest 'SandboxClaim nested lifecycle/warmPoolRef coercion (v1beta1)' => sub {
         spec     => {
             warmPoolRef => { name => 'fast-pool' },
             lifecycle   => { shutdownPolicy => 'Delete', ttlSecondsAfterFinished => 300 },
-            env         => { FOO => 'bar' },
+            # env is an array of {name, value, containerName} EnvVar structs
+            # upstream (sandboxclaim_types.go), not a bare string map -- the
+            # full-depth v1beta1 model (D5) corrects the earlier opaque
+            # `{ Str => 1 }` guess.
+            env         => [{ name => 'FOO', value => 'bar' }],
         },
     );
 
-    isa_ok($claim->spec, 'IO::K8s::AgentSandbox::V1beta1::SandboxClaim::_Spec');
+    isa_ok($claim->spec, 'IO::K8s::AgentSandbox::V1beta1::SandboxClaimSpec');
 
     isa_ok($claim->spec->warmPoolRef,
-        'IO::K8s::AgentSandbox::V1beta1::SandboxClaim::_Spec::_WarmPoolRef');
+        'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolRef');
     is($claim->spec->warmPoolRef->name, 'fast-pool', 'warmPoolRef.name');
 
     isa_ok($claim->spec->lifecycle,
-        'IO::K8s::AgentSandbox::V1beta1::SandboxClaim::_Spec::_Lifecycle');
+        'IO::K8s::AgentSandbox::V1beta1::Lifecycle');
     is($claim->spec->lifecycle->shutdownPolicy, 'Delete', 'lifecycle.shutdownPolicy');
     is($claim->spec->lifecycle->ttlSecondsAfterFinished, 300, 'lifecycle.ttlSecondsAfterFinished');
+
+    isa_ok($claim->spec->env->[0], 'IO::K8s::AgentSandbox::V1beta1::EnvVar');
+    is($claim->spec->env->[0]->value, 'bar', 'env[0].value');
 };
 
 subtest 'SandboxClaim v1alpha1 sandboxTemplateRef/warmpool coercion' => sub {
@@ -419,14 +508,19 @@ subtest 'SandboxTemplate spec hashref coercion (v1beta1)' => sub {
         },
     );
 
-    isa_ok($tmpl->spec, 'IO::K8s::AgentSandbox::V1beta1::SandboxTemplate::_Spec');
+    isa_ok($tmpl->spec, 'IO::K8s::AgentSandbox::V1beta1::SandboxTemplateSpec');
     is($tmpl->spec->networkPolicyManagement, 'Managed', 'spec.networkPolicyManagement');
     is($tmpl->spec->envVarsInjectionPolicy, 'Allowed', 'spec.envVarsInjectionPolicy');
     is($tmpl->spec->service, 1, 'spec.service');
     is($tmpl->spec->volumeClaimTemplatesPolicy, 'Allowed', 'spec.volumeClaimTemplatesPolicy');
 };
 
-subtest 'SandboxTemplate volumeClaimTemplates as typed PersistentVolumeClaim array' => sub {
+subtest 'SandboxTemplate volumeClaimTemplates as typed PersistentVolumeClaimTemplate array' => sub {
+    # Upstream's PersistentVolumeClaimTemplate (sandbox_types.go) is a
+    # trimmed {metadata: EmbeddedObjectMetadata, spec: PersistentVolumeClaimSpec}
+    # struct, not a full corev1.PersistentVolumeClaim (no apiVersion/kind/
+    # status) -- the full-depth v1beta1 model (D5) corrects the earlier
+    # `['Core::V1::PersistentVolumeClaim']` guess.
     my $k8s = IO::K8s->new(with => ['IO::K8s::AgentSandbox']);
     my $tmpl = $k8s->new_object('SandboxTemplate',
         metadata => { name => 'my-tmpl', namespace => 'default' },
@@ -438,10 +532,201 @@ subtest 'SandboxTemplate volumeClaimTemplates as typed PersistentVolumeClaim arr
     );
 
     is(ref $tmpl->spec->volumeClaimTemplates, 'ARRAY', 'volumeClaimTemplates is an array');
-    isa_ok($tmpl->spec->volumeClaimTemplates->[0], 'IO::K8s::Api::Core::V1::PersistentVolumeClaim');
+    isa_ok($tmpl->spec->volumeClaimTemplates->[0], 'IO::K8s::AgentSandbox::V1beta1::PersistentVolumeClaimTemplate');
+    isa_ok($tmpl->spec->volumeClaimTemplates->[0]->metadata, 'IO::K8s::AgentSandbox::V1beta1::EmbeddedObjectMetadata');
     is($tmpl->spec->volumeClaimTemplates->[0]->metadata->name, 'data', 'volumeClaimTemplates[0].metadata.name');
+    isa_ok($tmpl->spec->volumeClaimTemplates->[0]->spec, 'IO::K8s::Api::Core::V1::PersistentVolumeClaimSpec');
     is_deeply($tmpl->spec->volumeClaimTemplates->[0]->spec->accessModes, ['ReadWriteOnce'],
         'volumeClaimTemplates[0].spec.accessModes');
+};
+
+# --- Full depth round-trip (k95/D5): each v1beta1 Kind's manifest, written
+# from the upstream kubernetes-sigs/agent-sandbox v1.0.0 Go sources
+# (api/v1beta1/sandbox_types.go, extensions/api/v1beta1/*.go), inflates into
+# typed nested objects several levels deep and TO_JSON reproduces it. Built
+# via new_object (coercing; NOT ->new(spec => {hashref}), which does not
+# coerce -- k100). ---
+
+subtest 'full depth round-trip: Sandbox' => sub {
+    my $k8s = IO::K8s->new(with => ['IO::K8s::AgentSandbox']);
+    my $sandbox = $k8s->new_object('Sandbox',
+        metadata => { name => 'agent-1', namespace => 'default' },
+        spec => {
+            operatingMode  => 'Running',
+            service        => 1,
+            shutdownPolicy => 'Retain',
+            podTemplate    => {
+                metadata => { labels => { app => 'agent' }, annotations => { note => 'x' } },
+                spec     => {
+                    containers       => [{ name => 'agent', image => 'agent:latest', imagePullPolicy => 'IfNotPresent' }],
+                    imagePullSecrets => [{ name => 'registry-creds' }],
+                    os               => { name => 'linux' },
+                    schedulingGroup  => { podGroupName => 'agent-group' },
+                    readinessGates   => [{ conditionType => 'agents.x-k8s.io/ready' }],
+                    schedulingGates  => [{ name => 'wait-for-quota' }],
+                    restartPolicy    => 'Never',
+                },
+            },
+            volumeClaimTemplates => [
+                {
+                    metadata => { name => 'workspace', labels => { tier => 'scratch' } },
+                    spec     => { accessModes => ['ReadWriteOnce'], resources => { requests => { storage => '10Gi' } } },
+                },
+            ],
+        },
+    );
+
+    isa_ok($sandbox->spec, 'IO::K8s::AgentSandbox::V1beta1::SandboxSpec');
+    isa_ok($sandbox->spec->podTemplate, 'IO::K8s::AgentSandbox::V1beta1::PodTemplate');
+    isa_ok($sandbox->spec->podTemplate->metadata, 'IO::K8s::AgentSandbox::V1beta1::PodMetadata');
+    isa_ok($sandbox->spec->podTemplate->spec, 'IO::K8s::AgentSandbox::V1beta1::PodSpec');
+    isa_ok($sandbox->spec->podTemplate->spec->containers->[0], 'IO::K8s::Api::Core::V1::Container');
+    isa_ok($sandbox->spec->podTemplate->spec->imagePullSecrets->[0], 'IO::K8s::AgentSandbox::V1beta1::LocalObjectReference');
+    isa_ok($sandbox->spec->podTemplate->spec->os, 'IO::K8s::AgentSandbox::V1beta1::PodOS');
+    isa_ok($sandbox->spec->podTemplate->spec->schedulingGroup, 'IO::K8s::AgentSandbox::V1beta1::PodSchedulingGroup');
+    isa_ok($sandbox->spec->podTemplate->spec->readinessGates->[0], 'IO::K8s::AgentSandbox::V1beta1::PodReadinessGate');
+    isa_ok($sandbox->spec->podTemplate->spec->schedulingGates->[0], 'IO::K8s::AgentSandbox::V1beta1::PodSchedulingGate');
+    isa_ok($sandbox->spec->volumeClaimTemplates->[0], 'IO::K8s::AgentSandbox::V1beta1::PersistentVolumeClaimTemplate');
+    isa_ok($sandbox->spec->volumeClaimTemplates->[0]->metadata, 'IO::K8s::AgentSandbox::V1beta1::EmbeddedObjectMetadata');
+    isa_ok($sandbox->spec->volumeClaimTemplates->[0]->spec, 'IO::K8s::Api::Core::V1::PersistentVolumeClaimSpec');
+
+    is($sandbox->spec->podTemplate->spec->containers->[0]->image, 'agent:latest', 'podTemplate.spec.containers[0].image');
+    is($sandbox->spec->podTemplate->metadata->labels->{app}, 'agent', 'podTemplate.metadata.labels.app');
+    is($sandbox->spec->podTemplate->spec->os->name, 'linux', 'podTemplate.spec.os.name');
+    is($sandbox->spec->podTemplate->spec->schedulingGroup->podGroupName, 'agent-group', 'podTemplate.spec.schedulingGroup.podGroupName');
+    is($sandbox->spec->podTemplate->spec->readinessGates->[0]->conditionType, 'agents.x-k8s.io/ready',
+        'podTemplate.spec.readinessGates[0].conditionType');
+    is($sandbox->spec->volumeClaimTemplates->[0]->metadata->name, 'workspace', 'volumeClaimTemplates[0].metadata.name');
+
+    my $json = $sandbox->TO_JSON;
+    is($json->{spec}{podTemplate}{spec}{containers}[0]{name}, 'agent', 'TO_JSON podTemplate.spec.containers[0].name');
+    is($json->{spec}{podTemplate}{spec}{os}{name}, 'linux', 'TO_JSON podTemplate.spec.os.name');
+    is($json->{spec}{podTemplate}{spec}{imagePullSecrets}[0]{name}, 'registry-creds',
+        'TO_JSON podTemplate.spec.imagePullSecrets[0].name');
+    is($json->{spec}{volumeClaimTemplates}[0]{spec}{resources}{requests}{storage}, '10Gi',
+        'TO_JSON volumeClaimTemplates[0].spec.resources.requests.storage');
+
+    my $re = $k8s->inflate($k8s->object_to_json($sandbox));
+    isa_ok($re, 'IO::K8s::AgentSandbox::V1beta1::Sandbox');
+    is($re->spec->podTemplate->spec->schedulingGates->[0]->name, 'wait-for-quota',
+        'JSON round-trip preserves podTemplate.spec.schedulingGates[0].name');
+};
+
+subtest 'full depth round-trip: SandboxClaim' => sub {
+    my $k8s = IO::K8s->new(with => ['IO::K8s::AgentSandbox']);
+    my $claim = $k8s->new_object('SandboxClaim',
+        metadata => { name => 'claim-1', namespace => 'default' },
+        spec => {
+            warmPoolRef            => { name => 'fast-pool' },
+            lifecycle              => { shutdownPolicy => 'DeleteForeground', ttlSecondsAfterFinished => 600 },
+            additionalPodMetadata  => { labels => { team => 'agents' } },
+            env                    => [
+                { name => 'MODEL', value => 'gpt' },
+                { name => 'TIMEOUT', value => '30', containerName => 'agent' },
+            ],
+            volumeClaimTemplates => [
+                { metadata => { name => 'scratch' }, spec => { accessModes => ['ReadWriteOnce'] } },
+            ],
+        },
+        status => {
+            conditions => [{
+                type => 'Ready', status => 'True', reason => 'DependenciesReady',
+                message => 'ready', lastTransitionTime => '2026-01-01T00:00:00Z',
+            }],
+            sandbox => { name => 'agent-1', podIPs => ['10.0.0.9'], serviceFQDN => 'agent-1.default.svc.cluster.local' },
+        },
+    );
+
+    isa_ok($claim->spec, 'IO::K8s::AgentSandbox::V1beta1::SandboxClaimSpec');
+    isa_ok($claim->spec->warmPoolRef, 'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolRef');
+    isa_ok($claim->spec->lifecycle, 'IO::K8s::AgentSandbox::V1beta1::Lifecycle');
+    isa_ok($claim->spec->additionalPodMetadata, 'IO::K8s::AgentSandbox::V1beta1::PodMetadata');
+    isa_ok($claim->spec->env->[0], 'IO::K8s::AgentSandbox::V1beta1::EnvVar');
+    isa_ok($claim->spec->volumeClaimTemplates->[0], 'IO::K8s::AgentSandbox::V1beta1::PersistentVolumeClaimTemplate');
+    isa_ok($claim->status, 'IO::K8s::AgentSandbox::V1beta1::SandboxClaimStatus');
+    isa_ok($claim->status->conditions->[0], 'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Condition');
+    isa_ok($claim->status->sandbox, 'IO::K8s::AgentSandbox::V1beta1::SandboxClaimStatusSandbox');
+
+    is($claim->spec->env->[1]->containerName, 'agent', 'env[1].containerName');
+    is($claim->spec->lifecycle->ttlSecondsAfterFinished, 600, 'lifecycle.ttlSecondsAfterFinished');
+    is($claim->status->sandbox->podIPs->[0], '10.0.0.9', 'status.sandbox.podIPs[0]');
+
+    my $json = $claim->TO_JSON;
+    is($json->{spec}{env}[0]{value}, 'gpt', 'TO_JSON env[0].value');
+    is($json->{spec}{warmPoolRef}{name}, 'fast-pool', 'TO_JSON warmPoolRef.name');
+    is($json->{status}{sandbox}{serviceFQDN}, 'agent-1.default.svc.cluster.local', 'TO_JSON status.sandbox.serviceFQDN');
+
+    my $re = $k8s->inflate($k8s->object_to_json($claim));
+    isa_ok($re, 'IO::K8s::AgentSandbox::V1beta1::SandboxClaim');
+    is($re->spec->env->[1]->name, 'TIMEOUT', 'JSON round-trip preserves env[1].name');
+};
+
+subtest 'full depth round-trip: SandboxTemplate' => sub {
+    my $k8s = IO::K8s->new(with => ['IO::K8s::AgentSandbox']);
+    my $tmpl = $k8s->new_object('SandboxTemplate',
+        metadata => { name => 'tmpl-1', namespace => 'default' },
+        spec => {
+            envVarsInjectionPolicy  => 'Overrides',
+            networkPolicyManagement => 'Managed',
+            networkPolicy => {
+                ingress => [{ from => [{ podSelector => { matchLabels => { role => 'router' } } }] }],
+                egress  => [{ to => [{ ipBlock => { cidr => '0.0.0.0/0' } }] }],
+            },
+            podTemplate => {
+                spec => { containers => [{ name => 'agent', image => 'agent:latest' }] },
+            },
+            volumeClaimTemplatesPolicy => 'Allowed',
+        },
+    );
+
+    isa_ok($tmpl->spec, 'IO::K8s::AgentSandbox::V1beta1::SandboxTemplateSpec');
+    isa_ok($tmpl->spec->networkPolicy, 'IO::K8s::AgentSandbox::V1beta1::NetworkPolicySpec');
+    isa_ok($tmpl->spec->networkPolicy->ingress->[0], 'IO::K8s::Api::Networking::V1::NetworkPolicyIngressRule');
+    isa_ok($tmpl->spec->networkPolicy->egress->[0], 'IO::K8s::Api::Networking::V1::NetworkPolicyEgressRule');
+    isa_ok($tmpl->spec->podTemplate, 'IO::K8s::AgentSandbox::V1beta1::PodTemplate');
+
+    is($tmpl->spec->networkPolicy->ingress->[0]->from->[0]->podSelector->matchLabels->{role}, 'router',
+        'networkPolicy.ingress[0].from[0].podSelector.matchLabels.role');
+
+    my $json = $tmpl->TO_JSON;
+    is($json->{spec}{networkPolicy}{egress}[0]{to}[0]{ipBlock}{cidr}, '0.0.0.0/0',
+        'TO_JSON networkPolicy.egress[0].to[0].ipBlock.cidr');
+
+    my $re = $k8s->inflate($k8s->object_to_json($tmpl));
+    isa_ok($re, 'IO::K8s::AgentSandbox::V1beta1::SandboxTemplate');
+    is($re->spec->networkPolicy->ingress->[0]->from->[0]->podSelector->matchLabels->{role}, 'router',
+        'JSON round-trip preserves networkPolicy.ingress[0].from[0].podSelector.matchLabels.role');
+};
+
+subtest 'full depth round-trip: SandboxWarmPool' => sub {
+    my $k8s = IO::K8s->new(with => ['IO::K8s::AgentSandbox']);
+    my $swp = $k8s->new_object('SandboxWarmPool',
+        metadata => { name => 'pool-1', namespace => 'default' },
+        spec => {
+            replicas           => 5,
+            sandboxTemplateRef => { name => 'tmpl-1' },
+            updateStrategy     => { type => 'Recreate' },
+        },
+        status => {
+            replicas           => 5,
+            readyReplicas      => 4,
+            selector           => 'pool=pool-1',
+            observedGeneration => 3,
+        },
+    );
+
+    isa_ok($swp->spec, 'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolSpec');
+    isa_ok($swp->spec->sandboxTemplateRef, 'IO::K8s::AgentSandbox::V1beta1::SandboxTemplateRef');
+    isa_ok($swp->spec->updateStrategy, 'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolUpdateStrategy');
+    isa_ok($swp->status, 'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPoolStatus');
+
+    my $json = $swp->TO_JSON;
+    is($json->{spec}{sandboxTemplateRef}{name}, 'tmpl-1', 'TO_JSON sandboxTemplateRef.name');
+    is($json->{status}{observedGeneration}, 3, 'TO_JSON status.observedGeneration');
+
+    my $re = $k8s->inflate($k8s->object_to_json($swp));
+    isa_ok($re, 'IO::K8s::AgentSandbox::V1beta1::SandboxWarmPool');
+    is($re->spec->updateStrategy->type, 'Recreate', 'JSON round-trip preserves updateStrategy.type');
 };
 
 # --- TO_JSON round-trip ---

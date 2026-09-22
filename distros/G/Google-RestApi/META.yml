@@ -30,6 +30,7 @@ requires:
   Carp: '0'
   Exporter: '0'
   Furl: '0'
+  HTTP::Daemon: '0'
   Hash::Merge: '0'
   JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
@@ -45,7 +46,6 @@ requires:
   Retry::Backoff: '0'
   Scalar::Util: '0'
   Storable: '0'
-  Term::Prompt: '0'
   Tie::Hash: '0'
   ToolSet: '0'
   Try::Tiny: '0'
@@ -61,5 +61,5 @@ requires:
   constant: '0'
 resources:
   repository: https://github.com/mvsjes2/p5-google-restapi.git
-version: v2.2.3
+version: v2.2.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

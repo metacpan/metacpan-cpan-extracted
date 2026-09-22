@@ -1,8 +1,5 @@
 {
    "abstract" : "Generate random self-signed SSL certificates in memory",
-   "author" : [
-      "Ryan Scott"
-   ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
    "license" : [
@@ -44,6 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

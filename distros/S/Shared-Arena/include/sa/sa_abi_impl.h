@@ -42,7 +42,7 @@ typedef char sa_abi_assert_err[
   && SA_ERR_MAP == SA_E_MAP && SA_ERR_EXISTS == SA_E_EXISTS
   && SA_ERR_NOENT == SA_E_NOENT && SA_ERR_NAME == SA_E_NAME
   && SA_ERR_FULL == SA_E_FULL && SA_ERR_NOATOMICS == SA_E_NOATOMICS
-  && SA_ERR_SHAPE == SA_E_SHAPE) ? 1 : -1];
+  && SA_ERR_SHAPE == SA_E_SHAPE && SA_ERR_BUSY == SA_E_BUSY) ? 1 : -1];
 typedef char sa_abi_assert_type[
     (SA_TYPE_RAW == SA_T_RAW && SA_TYPE_RING == SA_T_RING
   && SA_TYPE_MAP == SA_T_MAP && SA_TYPE_BLOOM == SA_T_BLOOM

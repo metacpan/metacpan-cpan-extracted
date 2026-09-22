@@ -13,8 +13,16 @@ my $robot = mock_robot(
         my ($method, $path, %opts) = @_;
         my $body = $opts{body} // {};
 
-        # Return different fixtures based on params
-        if ($body->{'ip[]'} && ref $body->{'ip[]'} eq 'ARRAY' && @{$body->{'ip[]'}} > 1) {
+        # Form decoding normalizes documented repeated ip[] fields to ip => [].
+        if ($body->{ip} && ref $body->{ip} eq 'ARRAY' && @{$body->{ip}} > 1) {
+            is_deeply($body->{ip}, ['1.2.3.4', '5.6.7.8'], 'form body decodes repeated IPs into an array');
+            isa_ok($opts{request}, 'WWW::Hetzner::HTTPRequest', 'raw traffic request is available');
+            is($opts{request}->headers->{'Content-Type'}, 'application/x-www-form-urlencoded', 'traffic uses form encoding');
+            my @ip_pairs = grep { /\Aip%5B%5D=/ } split /&/, $opts{request}->content;
+            is_deeply(\@ip_pairs, [
+                'ip%5B%5D=1.2.3.4',
+                'ip%5B%5D=5.6.7.8',
+            ], 'raw request sends each IP as a documented repeated ip[] form parameter');
             return $fixture_query_multi;
         }
         if ($body->{single_values} && $body->{single_values} eq 'true') {

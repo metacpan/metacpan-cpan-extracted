@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # Standalone unit test for IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersionSpec.
 #
-# The class was added together with the bugfix to make karr ticket #3
+# The class was added together with the bugfix to make k3
 # (missing StorageVersionSpec) a non-issue: without it,
 # IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersion's `spec` slot
 # failed to inflate.

@@ -7,6 +7,8 @@ my @modules = qw(
     InternetData
     InternetData::Database
     InternetData::Error
+    InternetData::Oauth
+    InternetData::OauthError
 );
 
 use_ok($_) for @modules;
@@ -16,6 +18,8 @@ use_ok($_) for @modules;
 # a test failure rather than a bad release.
 my $version = InternetData->VERSION;
 ok($version, "the distribution version is $version");
-is($_->VERSION, $version, "$_ is at $version") for @modules;
+# The two refusal subclasses live in OauthError.pm, so they are loaded, not used.
+my @packages = (@modules, qw(InternetData::OauthAccessDeniedError InternetData::OauthExpiredTokenError));
+is($_->VERSION, $version, "$_ is at $version") for @packages;
 
 done_testing();

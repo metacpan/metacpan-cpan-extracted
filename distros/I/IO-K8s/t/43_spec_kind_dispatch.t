@@ -68,14 +68,14 @@ my $io = IO::K8s->new;
 package main;
 
 subtest 'fixture provenance and count' => sub {
-    is($fixture->{generated_from}, 'v1.36.3',
+    is($fixture->{generated_from}, 'v1.37.0',
         'fixture identifies the pinned Kubernetes release');
-    is(scalar @{ $fixture->{entries} }, 311,
+    is(scalar @{ $fixture->{entries} }, 325,
         'fixture contains every expected GVK entry');
-    is($fixture->{gvk_total_in_spec}, 311,
+    is($fixture->{gvk_total_in_spec}, 325,
         'fixture records the complete source GVK count');
     is($fixture->{source_sha256},
-        'dcede2063da1d7ad62ecb5af8adb6d7fabd0b52385a7fa0048afb491dac90450',
+        '465276aedf437726de5a6ed23a41b86d78bb0d347edf251a755ae26a93cdd8a6',
         'fixture pins the exact source snapshot digest');
 };
 
@@ -157,11 +157,11 @@ subtest 'every official dispatchable GVK resolves to its independently derived c
         }
     }
 
-    is($accounted, 311, 'all 311 fixture entries are accounted for');
-    is($generic_lists, 88, '88 dropped generic List GVK entries are skipped structurally');
-    is($exception_entries, 125,
-        '125 non-addressable shared/discovery GVK entries are skipped by exact definition key');
-    is($dispatchable_entries, 98, '98 addressable GVK entries are checked exhaustively');
+    is($accounted, 325, 'all 325 fixture entries are accounted for');
+    is($generic_lists, 93, '93 dropped generic List GVK entries are skipped structurally');
+    is($exception_entries, 129,
+        '129 non-addressable shared/discovery GVK entries are skipped by exact definition key');
+    is($dispatchable_entries, 103, '103 addressable GVK entries are checked exhaustively');
     is($generic_lists + $exception_entries + $dispatchable_entries, $accounted,
         'every entry belongs to exactly one accounting category');
 };
@@ -184,26 +184,28 @@ my @expected_collision_kinds = qw(
     DeviceClass
     DeviceTaintRule
     Event
+    Eviction
     HorizontalPodAutoscaler
-    IPAddress
     LeaseCandidate
     MutatingAdmissionPolicy
     MutatingAdmissionPolicyBinding
+    PodCertificateRequest
+    PodGroup
     ResourceClaim
     ResourceClaimTemplate
     ResourceSlice
-    ServiceCIDR
-    VolumeAttributesClass
+    StorageVersionMigration
+    Workload
 );
 
-subtest 'all fourteen multi-version collision Kinds are explicit and loadable' => sub {
+subtest 'all sixteen multi-version collision Kinds are explicit and loadable' => sub {
     my @collision_kinds = sort grep {
         my %versions = map { $_->{api_version} => 1 } @{ $dispatchable_by_kind{$_} };
         my %classes  = map { $_->{class}       => 1 } @{ $dispatchable_by_kind{$_} };
         keys(%versions) > 1 && keys(%classes) > 1;
     } keys %dispatchable_by_kind;
 
-    is(scalar @collision_kinds, 14, 'exactly fourteen Kinds have multiple official class versions');
+    is(scalar @collision_kinds, 16, 'exactly sixteen Kinds have multiple official class versions');
     is_deeply(\@collision_kinds, \@expected_collision_kinds,
         'the complete multi-version collision Kind set is named');
 
@@ -225,10 +227,10 @@ subtest 'bare Kind compatibility map is pinned exactly' => sub {
     my %bare_map = map { $_ => $default_map->{$_} }
         grep { index($_, '/') < 0 } keys %$default_map;
 
-    is(scalar(keys %$short_name_compat), 78,
-        'compatibility snapshot contains all 78 approved bare aliases');
-    is(scalar(keys %bare_map), 78,
-        'live default map contains exactly 78 bare aliases');
+    is(scalar(keys %$short_name_compat), 80,
+        'compatibility snapshot contains all 80 approved bare aliases');
+    is(scalar(keys %bare_map), 80,
+        'live default map contains exactly 80 bare aliases');
     is_deeply(\%bare_map, $short_name_compat,
         'every live bare alias and target exactly matches the compatibility snapshot');
 };
@@ -297,19 +299,6 @@ subtest 'representative real objects cover every multi-version collision Kind' =
                         apiVersion => 'apps/v1', kind => 'Deployment', name => 'app',
                     },
                     targetCPUUtilizationPercentage => 70,
-                },
-            },
-        },
-        {
-            api_version => 'networking.k8s.io/v1',
-            kind        => 'IPAddress',
-            class       => 'IO::K8s::Api::Networking::V1::IPAddress',
-            body        => {
-                metadata => { name => '192.0.2.10' },
-                spec     => {
-                    parentRef => {
-                        group => '', resource => 'services', name => 'web', namespace => 'default',
-                    },
                 },
             },
         },
@@ -411,22 +400,60 @@ subtest 'representative real objects cover every multi-version collision Kind' =
             },
         },
         {
-            api_version => 'networking.k8s.io/v1',
-            kind        => 'ServiceCIDR',
-            class       => 'IO::K8s::Api::Networking::V1::ServiceCIDR',
+            api_version => 'lifecycle.k8s.io/v1alpha1',
+            kind        => 'Eviction',
+            class       => 'IO::K8s::Api::Lifecycle::V1alpha1::Eviction',
             body        => {
-                metadata => { name => 'primary' },
-                spec     => { cidrs => ['10.96.0.0/16'] },
+                metadata => { name => 'my-pod' },
+                spec     => { target => { pod => {
+                    name => 'my-pod',
+                    uid  => 'dddddddd-dddd-dddd-dddd-dddddddddddd',
+                } } },
             },
         },
         {
-            api_version => 'storage.k8s.io/v1',
-            kind        => 'VolumeAttributesClass',
-            class       => 'IO::K8s::Api::Storage::V1::VolumeAttributesClass',
+            api_version => 'certificates.k8s.io/v1',
+            kind        => 'PodCertificateRequest',
+            class       => 'IO::K8s::Api::Certificates::V1::PodCertificateRequest',
             body        => {
-                metadata   => { name => 'fast' },
-                driverName => 'csi.example.com',
-                parameters => { tier => 'fast' },
+                metadata => { name => 'req-1', namespace => 'default' },
+                spec     => {
+                    signerName          => 'example.com/foo',
+                    podName             => 'my-pod',
+                    podUID              => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+                    serviceAccountName  => 'default',
+                    serviceAccountUID   => 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+                    nodeName            => 'node-1',
+                    nodeUID             => 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+                    stubPKCS10Request   => 'ZmFrZQ==',
+                },
+            },
+        },
+        {
+            api_version => 'scheduling.k8s.io/v1beta1',
+            kind        => 'PodGroup',
+            class       => 'IO::K8s::Api::Scheduling::V1beta1::PodGroup',
+            body        => {
+                metadata => { name => 'my-group', namespace => 'default' },
+                spec     => { schedulingPolicy => { basic => {} } },
+            },
+        },
+        {
+            api_version => 'scheduling.k8s.io/v1beta1',
+            kind        => 'Workload',
+            class       => 'IO::K8s::Api::Scheduling::V1beta1::Workload',
+            body        => {
+                metadata => { name => 'my-workload', namespace => 'default' },
+                spec     => {},
+            },
+        },
+        {
+            api_version => 'storagemigration.k8s.io/v1',
+            kind        => 'StorageVersionMigration',
+            class       => 'IO::K8s::Api::Storagemigration::V1::StorageVersionMigration',
+            body        => {
+                metadata => { name => 'migrate-deployments' },
+                spec     => { resource => { group => 'apps', resource => 'deployments' } },
             },
         },
     );

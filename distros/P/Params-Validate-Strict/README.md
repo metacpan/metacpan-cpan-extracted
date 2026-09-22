@@ -198,15 +198,16 @@ The schema can define the following rules for each parameter:
           ]
         };
 
-    As a shorthand, `type` itself may be an arrayref of type name strings (a _union type_)
-    when all other constraints are shared between the alternatives:
+    As a shorthand, `type` itself may be an arrayref of type name strings (a _union type_),
+    or a pipe-separated string, when all other constraints are shared between the alternatives:
 
         $schema = {
           data => { type => ['string', 'arrayref'] },
-          id   => { type => ['string', 'integer'], optional => 1 },
+          id   => { type => 'string|integer', optional => 1 },
         };
 
     This is equivalent to the full array-of-rules form but more concise.
+    Whitespace around the `|` is ignored, so `'string | arrayref'` is the same as `'string|arrayref'`.
     Every other key in the rule hash (`optional`, `min`, `max`, `matches`, etc.)
     is inherited by each candidate type and validated independently against it.
     Type names are tried left-to-right; the first match wins and its coercion
@@ -381,6 +382,37 @@ The schema can define the following rules for each parameter:
 
     A regular expression that the parameter value must not match.
     Checks all members of arrayrefs.
+
+- `bnf`
+
+    An arrayref of BNF grammar lines that defines the set of strings the
+    parameter value must belong to.
+    The first rule in the grammar is the start rule; the value must match it
+    exactly (anchored).
+
+    Each element is either a rule definition (`<name> ::= ...`) or a
+    continuation of the previous rule.  Terminals are double-quoted; non-terminals
+    use angle brackets.  Alternatives are separated by `|`.
+
+        $schema = {
+          na_tel_no => {
+            type => 'string',
+            bnf  => [
+              '<telephone-number> ::= <country-code-opt> <area-code> <separator-opt>',
+              '<central-office-code> <separator-opt> <station-code>',
+              '<country-code-opt> ::= "" | "+1" | "1"',
+              '<separator-opt>    ::= "" | "-" | " " | "."',
+              '<area-code>        ::= <digit2-9> <digit0-9> <digit0-9>',
+              '<central-office-code> ::= <digit2-9> <digit0-9> <digit0-9>',
+              '<station-code>     ::= <digit0-9> <digit0-9> <digit0-9> <digit0-9>',
+              '<digit0-9> ::= "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"',
+              '<digit2-9> ::= "2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"',
+            ],
+          },
+        };
+
+    Implemented by [Params::Validate::Strict::BNF](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict%3A%3ABNF).  Recursive grammars are not
+    supported.
 
 - `position`
 

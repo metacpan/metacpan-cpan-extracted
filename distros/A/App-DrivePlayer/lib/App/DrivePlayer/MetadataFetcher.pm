@@ -402,9 +402,6 @@ sub probe_duration_ms {
     return int($1 * 1000);
 }
 
-# Keep private alias for internal calls
-sub _fpcalc_available { fpcalc_available() }
-
 sub _download_partial {
     my ($self, $drive_id, $max_bytes) = @_;
     my $token = $self->token_fn->();

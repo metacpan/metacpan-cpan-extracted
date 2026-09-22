@@ -33,7 +33,7 @@ subtest 'the API key reaches the wire, and only one way' => sub {
 
 subtest 'a keyless client builds and sends no credential at all' => sub {
     # Today every endpoint is licensed, so a keyless client only ever gets a
-    # 401. It still has to BUILD, because a database offered without a licence
+    # 401. It still has to BUILD, because a database offered without a license
     # would need exactly this client - and an empty key is what an unset
     # `${{ secrets.X }}` interpolates to, where `Bearer ` is worse than nothing.
     my $origin = InternetDataTest::Origin->new(sub {

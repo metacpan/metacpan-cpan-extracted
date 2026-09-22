@@ -7,7 +7,7 @@ use warnings;
 
 use Kubernetes::REST::CLI;
 
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 
 Kubernetes::REST::CLI->new_with_cmd;
 
@@ -23,7 +23,7 @@ kube_client - Kubernetes CLI client using Kubernetes::REST
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 SYNOPSIS
 
@@ -69,10 +69,6 @@ version 1.107
 B<kube_client> is a command-line tool for interacting with Kubernetes clusters
 using the L<Kubernetes::REST> Perl library. It reads cluster configuration from
 your kubeconfig file (typically F<~/.kube/config>).
-
-=head1 NAME
-
-kube_client - Kubernetes CLI client using Kubernetes::REST
 
 =head1 OPTIONS
 

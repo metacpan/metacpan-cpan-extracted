@@ -1,11 +1,11 @@
 package IO::K8s::Api::Apps::V1::ReplicaSet;
 # ABSTRACT: ReplicaSet ensures that a specified number of pod replicas are running at any given time.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
 
-k8s spec => 'Apps::V1::ReplicaSetSpec';
+k8s spec => 'Apps::V1::ReplicaSetSpec', 'required';
 
 
 k8s status => 'Apps::V1::ReplicaSetStatus';
@@ -24,7 +24,7 @@ IO::K8s::Api::Apps::V1::ReplicaSet - ReplicaSet ensures that a specified number 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ Status is the most recently observed status of the ReplicaSet. This data may be 
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#replicaset-v1-apps>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#replicaset-v1-apps>
 
 =head1 SUPPORT
 

@@ -15,7 +15,7 @@ WriteMakefile(
         'DBIx::Class'      => 0,
         'Glib'             => 0,
         'Gtk3'             => 0,
-        'Google::RestApi'  => '2.2.2',
+        'Google::RestApi'  => '2.2.4',
         'JSON::MaybeXS'    => 0,
         'Log::Log4perl'    => 0,
         'Moo'              => 0,

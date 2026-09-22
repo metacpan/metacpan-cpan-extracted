@@ -25,9 +25,9 @@ use warnings;
 #      resolution loop starts at i=1; when n==1, $had_criteria[0] is a
 #      permanent dead store.
 #
-#   3. Filter reference aliasing (annotated):
-#      $self->{_filters} stores the caller's hashref directly.  External
-#      mutation after construction silently changes query behaviour.
+#   3. Filter reference aliasing (FIXED):
+#      _copy_filters() deep-copies the caller's hashref at construction time.
+#      Post-construction mutation of the original hashref has no effect.
 #
 # All component databases are inline stubs (no SQLite, no disk I/O).
 # ---------------------------------------------------------------------------
@@ -39,7 +39,7 @@ use Scalar::Util qw(blessed refaddr weaken);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 53;
+	plan tests => 66;
 	use_ok('Database::Join');
 }
 
@@ -126,6 +126,64 @@ Readonly::Scalar my $K_C     => 'a3';   # secondary-only in some tests
 	sub set_logger { $_[0]->{logger} = $_[1]; return $_[0] }
 	sub selectall_arrayref { return $_[0]->{_rows} }   # always returns all rows
 	sub DESTROY {}
+}
+
+# ---------------------------------------------------------------------------
+# DFCountingDA: records how many times selectall_arrayref is called.
+# Applies simple equality filtering (same as DFRecordingDA) so filter criteria
+# passed at spill time actually restrict the spilled rows.
+# count() is defined directly in this package (not inherited) so that the
+# 'auto' threshold probe's `defined &{"${pkg}::count"}` check is satisfied.
+# ---------------------------------------------------------------------------
+{
+	package DFCountingDA;
+	use parent -norequire, 'Database::Abstraction';
+
+	sub new {
+		my ($class, %args) = @_;
+		return bless {
+			id      => $args{id}      // 'entry',
+			_cols   => $args{cols}    // ['entry'],
+			_rows   => $args{rows}    // [],
+			_schema => $args{schema}  // {},
+			_ts     => $args{updated} // 1_000_000,
+			_calls  => 0,
+		}, $class;
+	}
+
+	sub columns   { return $_[0]->{_cols} }
+	sub schema    { return $_[0]->{_schema} }
+	sub updated   { return $_[0]->{_ts} }
+	sub set_logger { $_[0]->{logger} = $_[1]; return $_[0] }
+	sub call_count { return $_[0]->{_calls} }
+	sub count { return scalar @{ $_[0]->{_rows} } }   # direct def for auto-threshold
+
+	sub selectall_arrayref {
+		my ($self, $criteria) = @_;
+		$self->{_calls}++;
+		my @rows = @{ $self->{_rows} };
+		for my $col (keys %{ $criteria // {} }) {
+			my $v = $criteria->{$col};
+			@rows = grep {
+				defined $_->{$col} && defined $v && $_->{$col} eq $v
+			} @rows if defined $v;
+		}
+		return \@rows;
+	}
+
+	sub DESTROY {}
+}
+
+# ---------------------------------------------------------------------------
+# DFNoTsDA: DA whose updated() returns undef (not a die/croak).
+# _build_sqlite_cache stores undef for the timestamp.
+# _cache_fresh: `$cached_ts = undef // next` skips the staleness check,
+# keeping the cache valid indefinitely for this source.
+# ---------------------------------------------------------------------------
+{
+	package DFNoTsDA;
+	use parent -norequire, 'DFMinimalDA';
+	sub updated { return undef }
 }
 
 # ---------------------------------------------------------------------------
@@ -432,11 +490,10 @@ subtest 'filter applied on every query: all results respect base restriction' =>
 	}
 };
 
-subtest 'filter reference aliasing — external mutation affects subsequent queries' => sub {
-	# DATA FLOW ANOMALY (annotated in Join.pm): _filters stores the caller's hashref
-	# directly.  Mutation after construction silently changes query behaviour.
-	# This test documents the current (reference-aliasing) behaviour.  A future
-	# deep-copy fix would make this test fail; update accordingly.
+subtest 'filter deep-copy isolation — post-construction mutation has no effect' => sub {
+	# Security property: _copy_filters() deep-copies the caller's hashref at
+	# construction time.  Mutating the original after new() must not change the
+	# stored filter, preserving the row-security guarantee.
 	my $filter_href = { score => '10' };
 	my $da          = DFRecordingDA->new(
 		cols => ['entry', 'score'],
@@ -455,18 +512,15 @@ subtest 'filter reference aliasing — external mutation affects subsequent quer
 	my $rows_before = $j->selectall_arrayref();
 	is scalar @{$rows_before}, 1, 'pre-mutation: filter restricts to 1 row';
 
-	# Mutate the caller's filter hashref
-	$filter_href->{score} = '20';    # now filter matches score=20 instead
+	# Mutate the caller's hashref — the stored deep-copy must be unaffected
+	$filter_href->{score} = '20';
 
-	# If reference aliasing is in effect, the next query uses the mutated filter
+	# The stored filter must still be '10' (the original value)
 	$da->clear_received();
-	my $rows_after = $j->selectall_arrayref();
+	my $rows_after  = $j->selectall_arrayref();
 	my $filter_used = $da->received()->[-1]{hashref};
-	TODO: {
-		local $TODO = 'filter aliasing is a known anomaly (see TODO in Join.pm)';
-		is $filter_used->{score}, '20',
-			'mutated filter hashref flows into query criteria (aliasing confirmed)';
-	}
+	is $filter_used->{score}, '10',
+		'deep-copy isolation: post-construction mutation does not affect stored filter';
 };
 
 subtest 'empty filter {} per DB: acts as no-op filter' => sub {
@@ -1087,4 +1141,328 @@ subtest '_removed_cols: entries accumulate across multiple remove_column calls, 
 	ok !exists($rows->[0]{score}), 'score stripped from merged row';
 	ok !exists($rows->[0]{name}),  'name stripped from merged row';
 	ok  exists($rows->[0]{entry}), 'join_column still present (not stripped)';
+};
+
+# ===========================================================================
+# Section 14: SQLite cache resource DU lifecycle (O~ open-use-close)
+#
+# Strategy: force backend=>'sqlite' so the SQLite path is always taken
+# regardless of row count.  Verify that File::Temp tmpfile and DBI handle
+# follow the correct D→U→K sequence: created once, used for queries, and
+# properly released on DESTROY or on add_database (which invalidates the cache).
+# ===========================================================================
+
+subtest 'O~: tmpfile D in _build_sqlite_cache, U by DBI, K (unlinked) on DESTROY' => sub {
+	# D: File::Temp object created inside _build_sqlite_cache; filename used as DBI DSN.
+	# U: DBI writes data to the file during cache population.
+	# K: DESTROY releases the File::Temp object (UNLINK=>1 removes the file from disk).
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [{ entry => $K_A, val => 'x' }],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();   # triggers _build_sqlite_cache (D)
+	my $fname = $j->{_sqlite_cache}{tmpfile}->filename;
+	ok -f $fname, 'tmpfile exists on disk while join object is alive (D→U confirmed)';
+	undef $j;                   # triggers DESTROY (K)
+	ok !-e $fname, 'tmpfile absent from disk after DESTROY (K: UNLINK=>1 fires)';
+};
+
+subtest 'O~: dbh handle D in _build_sqlite_cache, U for queries, K (disconnected) on DESTROY' => sub {
+	# D: DBI handle created by DBI->connect inside _build_sqlite_cache.
+	# U: stored in _sqlite_cache; all SQL queries execute through it.
+	# K: DESTROY calls $cache->{dbh}->disconnect, deactivating the handle.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [{ entry => $K_A, val => 'x' }],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();   # D: DBI handle created and cached
+	my $dbh = $j->{_sqlite_cache}{dbh};
+	ok $dbh->{Active}, 'dbh Active after cache build (D→U: handle live and serving queries)';
+	undef $j;                   # K: DESTROY disconnects
+	ok !$dbh->{Active}, 'dbh no longer Active after DESTROY (K: disconnected)';
+};
+
+subtest 'O~: add_database kills old dbh (K) before new one can be D\'d' => sub {
+	# Sequence: D (cache built on first query) → K (add_database calls disconnect+delete).
+	# The old handle must become inactive immediately after add_database, before
+	# any subsequent query that would trigger a new D (rebuild).
+	my $da1 = DFMinimalDA->new(cols => ['entry', 'a'], rows => [{ entry => $K_A, a => 1 }]);
+	my $da2 = DFMinimalDA->new(cols => ['entry', 'b'], rows => [{ entry => $K_A, b => 2 }]);
+	my $j   = Database::Join->new(
+		databases   => [$da1],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();          # D: cache built
+	my $old_dbh = $j->{_sqlite_cache}{dbh};
+	ok $old_dbh->{Active}, 'old dbh Active before add_database (pre-condition)';
+	$j->add_database($da2);            # K: add_database disconnects and deletes cache
+	ok !$old_dbh->{Active}, 'old dbh disconnected (K) immediately by add_database';
+	ok !defined $j->{_sqlite_cache}, 'cache entry removed from join object (K confirmed)';
+};
+
+subtest 'table_refs[i]: D in cache-build loop, U in SQL — spilled source uses "t0"' => sub {
+	# D: $table_refs[$i] set to '"t$i"' for non-ATTACH (spilled) sources.
+	# U: this quoted name is used in the SELECT, FROM, JOIN, and WHERE clauses.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [{ entry => $K_A, val => 'x' }],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();   # triggers cache build (D)
+	is $j->{_sqlite_cache}{table_refs}[0], '"t0"',
+		'table_refs[0] set to "t0" for the first spilled source (D confirmed)';
+};
+
+subtest 'source_cols[i]: D from columns(), U in CREATE TABLE and SELECT clause' => sub {
+	# D: $source_cols[$i] populated from $db->columns() during cache build.
+	# U: column list drives CREATE TABLE schema and SELECT expression list in _sqlite_join.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'alpha', 'beta'],
+		rows => [{ entry => $K_A, alpha => 1, beta => 2 }],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();   # triggers cache build (D)
+	my $sc = $j->{_sqlite_cache}{source_cols}[0];
+	is_deeply [sort @{$sc}], ['alpha', 'beta', 'entry'],
+		'source_cols[0] populated from columns() at build time (D confirmed)';
+};
+
+# ===========================================================================
+# Section 15: _cache_fresh DU checkpoint chains
+#
+# _cache_fresh reads the cache state (D'd at build time) and validates it
+# against current conditions.  Each condition guards one phase of the DU chain.
+# ===========================================================================
+
+subtest '_cache_fresh: DA with undef updated() — timestamp check skipped, cache valid' => sub {
+	# DU: _build_sqlite_cache stores undef for DFNoTsDA's timestamp.
+	#   _cache_fresh: $cached_ts = undef // next → skips check → returns 1 (fresh).
+	# Verify: second query returns from the same cache (same tmpfile path — no rebuild).
+	my $da = DFNoTsDA->new(
+		cols => ['entry', 'v'],
+		rows => [{ entry => $K_A, v => 42 }],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();   # D: cache built; updated->{0} = undef
+	my $fname1 = $j->{_sqlite_cache}{tmpfile}->filename;
+	$j->selectall_arrayref();   # U: _cache_fresh skips check; same cache reused
+	my $fname2 = $j->{_sqlite_cache}{tmpfile}->filename;
+	is $fname1, $fname2,
+		'same tmpfile on 2nd query: undef updated() keeps cache valid (skip-DU)';
+};
+
+subtest '_cache_fresh: DA call count stays at 1 — cache reuse proven by spill count' => sub {
+	# DU: DA rows D'd into SQLite cache on the first call (spill).
+	# U: subsequent queries read from the cache via SQL, not from the DA.
+	# The DA's call count must not change after the first (spill) call.
+	my $da = DFCountingDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'x' },
+			{ entry => $K_B, val => 'y' },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();           # call 1: spills DA rows (DA selectall called)
+	my $count_after_first = $da->call_count();
+	$j->selectall_arrayref();           # call 2: uses SQLite cache — DA NOT called
+	$j->selectall_arrayref();           # call 3: uses SQLite cache — DA NOT called
+	is $da->call_count(), $count_after_first,
+		'DA call count unchanged after 2nd and 3rd queries: cache reuse proven (DU)';
+};
+
+subtest '_cache_fresh: updated() timestamp change → stale → cache rebuilt (new tmpfile)' => sub {
+	# DU lifecycle:
+	#   D: $cache->{updated}{0} = old_ts at first build.
+	#   U: _cache_fresh compares current updated() to cached_ts.
+	#   K: mismatch → old cache disconnected (K); new D with fresh data.
+	my $da = DFCountingDA->new(
+		cols => ['entry', 'val'],
+		rows => [{ entry => $K_A, val => 'first' }],
+	);
+	$da->{_ts} = 1_000;   # initial timestamp (D)
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();          # D: cache built with ts=1_000
+	my $fname1 = $j->{_sqlite_cache}{tmpfile}->filename;
+
+	$da->{_ts}   = 2_000;   # timestamp advances — cache now stale
+	$da->{_rows} = [{ entry => $K_A, val => 'updated' }];   # new data
+	my $rows = $j->selectall_arrayref();   # U: _cache_fresh detects mismatch; K+D
+	my $fname2 = $j->{_sqlite_cache}{tmpfile}->filename;
+
+	isnt $fname1, $fname2, 'new tmpfile after timestamp change: cache rebuilt (K+D cycle)';
+	is $rows->[0]{val}, 'updated', 'rebuilt cache contains fresh rows from DA (U confirmed)';
+};
+
+subtest '_cache_fresh: n-mismatch detected — cache treated as stale, rebuilt' => sub {
+	# White-box DU: $cache->{n} D'd at build time.
+	# When _dbs grows without clearing the cache (adversarial direct mutation),
+	# n-check in _cache_fresh detects the discrepancy and returns 0, forcing rebuild.
+	my $da1 = DFMinimalDA->new(cols => ['entry', 'a'], rows => [{ entry => $K_A, a => 1 }]);
+	my $da2 = DFMinimalDA->new(cols => ['entry', 'b'], rows => [{ entry => $K_A, b => 2 }]);
+	my $j   = Database::Join->new(
+		databases   => [$da1],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();      # D: cache built with n=1
+	is $j->{_sqlite_cache}{n}, 1, 'cache n=1 after first build (D confirmed)';
+	my $fname1 = $j->{_sqlite_cache}{tmpfile}->filename;
+
+	# Adversarial: add a DA directly into _dbs without calling add_database.
+	# This bypasses the cache-clearing logic, creating a n-mismatch.
+	push @{ $j->{_dbs} }, $da2;   # _dbs now 2 entries; cache still says n=1
+
+	$j->selectall_arrayref();      # _cache_fresh: 2 != 1 → stale → rebuild
+	my $fname2 = $j->{_sqlite_cache}{tmpfile}->filename;
+	isnt $fname1, $fname2, 'cache rebuilt (new tmpfile) when n-mismatch detected (K+D)';
+	is $j->{_sqlite_cache}{n}, 2, 'rebuilt cache stores new n=2 (D confirmed)';
+};
+
+# ===========================================================================
+# Section 16: _sqlite_join criteria partition DU
+#
+# _sqlite_join partitions criteria into two distinct flows:
+#   - Filter criteria: D'd at construction, U'd at spill time only (spilled DAs)
+#   - Query-time criteria: D'd per call, U'd in SQL WHERE clause per call
+# These two DU chains must never contaminate each other.
+# ===========================================================================
+
+subtest 'per_db_query: query-time criterion flows into WHERE, not to DA on 2nd call' => sub {
+	# DU: $per_db_query D'd by _partition_criteria inside _sqlite_join.
+	# U: used in WHERE clause; the DA's selectall_arrayref is NOT called again.
+	# This proves that the query-time criterion is handled purely by SQL after spill.
+	my $da = DFCountingDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'alpha' },
+			{ entry => $K_B, val => 'beta'  },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();                 # spill: DA called once
+	my $spill_count = $da->call_count();
+
+	my $rows = $j->selectall_arrayref(entry => $K_A);   # query-time criterion
+	is $da->call_count(), $spill_count,
+		'DA not called again for query-time criterion: WHERE handles it (DU separation)';
+	is scalar @{$rows}, 1, 'query-time criterion filters correctly via SQL WHERE';
+	is $rows->[0]{entry}, $K_A, 'correct row returned by WHERE clause';
+};
+
+subtest 'filter criterion: applied at spill (D→K for excluded rows), absent from SQL WHERE' => sub {
+	# DU separation:
+	#   Filter D'd at construction → U'd at spill time → row excluded (K for that data flow)
+	#   Query-time criteria D'd per call → U'd as SQL WHERE bind parameters
+	# After spill, the filtered-out row is permanently absent; no query criterion can
+	# retrieve it because it was never written into the cache table.
+	my $da = DFCountingDA->new(
+		cols => ['entry', 'score'],
+		rows => [
+			{ entry => $K_A, score => '10' },
+			{ entry => $K_B, score => '20' },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+		filters     => { 0 => { score => '10' } },   # only score=10 spilled
+	);
+	my $all_rows = $j->selectall_arrayref();
+	is scalar @{$all_rows}, 1,
+		'filter applied at spill: only score=10 row in cache (D→K for score=20)';
+	ok !(grep { $_->{score} eq '20' } @{$all_rows}),
+		'score=20 row absent from all queries (permanently excluded at spill time)';
+};
+
+subtest '@had_criteria: written for secondaries (i>=1) — drives JOIN type in SQL' => sub {
+	# DU: @had_criteria[$i] D'd for i=1..n-1 only.
+	# U: used to select INNER JOIN vs LEFT JOIN for each secondary table.
+	# With a query-time criterion on a secondary column, had_criteria[1] is true
+	# → secondary becomes an INNER JOIN partner → primary-only key is excluded.
+	my $prim = DFMinimalDA->new(
+		cols => ['entry', 'a'],
+		rows => [
+			{ entry => $K_A, a => 1 },
+			{ entry => $K_B, a => 2 },   # no matching secondary row
+		],
+	);
+	my $sec = DFMinimalDA->new(
+		cols => ['entry', 'b'],
+		rows => [{ entry => $K_A, b => 10 }],
+	);
+	my $j = Database::Join->new(
+		databases   => [$prim, $sec],
+		join_column => $JC,
+		backend     => 'sqlite',
+		join_type   => 'left',   # without criteria: LEFT JOIN → $K_B would appear
+	);
+	# Query-time criterion on secondary column: had_criteria[1] becomes true → INNER JOIN
+	my $rows = $j->selectall_arrayref(b => '10');
+	ok !(grep { $_->{entry} eq $K_B } @{$rows}),
+		'had_criteria[1]=true triggers INNER JOIN: primary-only key excluded (DU)';
+	is scalar @{$rows}, 1, 'only shared key returned under had_criteria-driven INNER JOIN';
+};
+
+subtest '@bind_vals: operator hashref values D in WHERE-build loop, U in execute()' => sub {
+	# DU: @bind_vals D'd by the WHERE-clause builder loop from operator hashref values.
+	# U: passed as positional params to $sth->execute(@bind_vals) — parameterized SQL,
+	# not string interpolation, so SQL injection via the value is impossible.
+	# The correct filter result confirms the full D→U chain is intact.
+	my $da = DFCountingDA->new(
+		cols => ['entry', 'score'],
+		rows => [
+			{ entry => $K_A, score => '10' },
+			{ entry => $K_B, score => '20' },
+			{ entry => $K_C, score => '30' },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	$j->selectall_arrayref();   # prime cache
+	# Operator hashref: score > 15 → bind_vals = ['15'], operator = '>'
+	my $rows = $j->selectall_arrayref(score => { '>' => '15' });
+	is scalar @{$rows}, 2,
+		'@bind_vals carries operator value to execute(): 2 rows have score > 15 (DU)';
+	ok !(grep { $_->{score} eq '10' } @{$rows}),
+		'score=10 excluded by operator bound value > 15 (bind_vals DU chain confirmed)';
 };

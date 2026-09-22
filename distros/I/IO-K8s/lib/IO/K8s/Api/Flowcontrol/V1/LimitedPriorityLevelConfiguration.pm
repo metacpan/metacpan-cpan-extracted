@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1::LimitedPriorityLevelConfiguration;
 # ABSTRACT: LimitedPriorityLevelConfiguration specifies how to handle requests that are subject to limits. It addresses two issues: How are requests for this priority level limited? What should be done with requests that exceed the limit?
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s borrowingLimitPercent => Int;
@@ -9,7 +9,7 @@ k8s borrowingLimitPercent => Int;
 k8s lendablePercent => Int;
 
 
-k8s limitResponse => 'Flowcontrol::V1::LimitResponse';
+k8s limitResponse => 'Flowcontrol::V1::LimitResponse', 'required';
 
 
 k8s nominalConcurrencyShares => Int;
@@ -29,7 +29,7 @@ IO::K8s::Api::Flowcontrol::V1::LimitedPriorityLevelConfiguration - LimitedPriori
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 borrowingLimitPercent
 

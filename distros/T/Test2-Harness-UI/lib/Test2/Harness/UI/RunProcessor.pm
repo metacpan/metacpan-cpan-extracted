@@ -2,7 +2,7 @@ package Test2::Harness::UI::RunProcessor;
 use strict;
 use warnings;
 
-our $VERSION = '0.000147';
+our $VERSION = '0.000148';
 
 use DateTime;
 use Data::GUID;
@@ -12,12 +12,14 @@ use MIME::Base64 qw/decode_base64/;
 
 use Clone qw/clone/;
 use Carp qw/croak confess/;
+use Scalar::Util qw/blessed/;
+use bytes ();
 
 use Test2::Util::Facets2Legacy qw/causes_fail/;
 
 use Test2::Harness::UI::Util qw/format_duration is_invalid_subtest_name/;
 
-use Test2::Harness::UI::UUID qw/gen_uuid uuid_inflate uuid_mass_deflate/;
+use Test2::Harness::UI::UUID qw/gen_uuid gen_deflated_uuid uuid_inflate uuid_deflate uuid_mass_deflate/;
 use Test2::Harness::Util::JSON qw/encode_json decode_json/;
 use JSON::PP();
 
@@ -40,7 +42,7 @@ use Test2::Harness::UI::Util::HashBase qw{
 
     <mode
     <interval <last_flush
-    <run <run_id
+    <run <run_id +run_id_deflated +bulk_byte_cap
     +user +user_id
     +project +project_id
 
@@ -77,7 +79,12 @@ sub retry_on_disconnect {
         return 1 if eval { $callback->(); 1 };
         $err = $@;
 
-        last unless $err =~ m/(gone away|connect|timeout)/i;
+        # Only the driver's message decides. DBI appends the statement and
+        # bind values, and Carp a stack trace, and either can contain
+        # "connect" (event facets, or this sub's own name).
+        (my $msg = $err) =~ s/\[for Statement.*//s;
+        ($msg) = split /\n/, $msg;
+        last unless $msg =~ m/(gone away|connect|timeout)/i;
 
         # Try to fix the connection
         for (1 .. 10) {
@@ -123,6 +130,166 @@ sub populate {
             return 1;
         }
     );
+}
+
+# DBIx::Class populate() hands rows to DBI's execute_for_fetch(), and neither
+# DBD::Pg nor DBD::mysql batch that, so every row is its own round trip to
+# the database. Events and coverage arrive in the hundreds of thousands of
+# rows for one run, so those go out as multi-row INSERT statements instead,
+# all inside one transaction.
+#
+# Nothing here goes through the Result class, so rows must already hold what
+# the database stores: JSON encoded, ids either deflated or still
+# Test2::Harness::UI::UUID objects (those and DateTime objects are converted
+# here, see _bulk_value). Rows need not all name the same columns, the
+# column list is the union and missing columns are NULL.
+#
+# Duplicate recovery needs AutoCommit: on a duplicate the transaction rolls
+# back and the chunks are replayed outside one, so do not call this inside
+# txn_do().
+sub populate_bulk {
+    my $self = shift;
+    my ($type, $data, %params) = @_;
+
+    return unless $data && @$data;
+
+    # Past this many rows the statement gets slower per row on PostgreSQL,
+    # and MySQL gains nothing from it. The byte cap keeps a statement under
+    # MySQL's max_allowed_packet when events carry large facets.
+    my $max_rows  = $params{chunk}       // 100;
+    my $max_bytes = $params{chunk_bytes} // $self->bulk_byte_cap;
+    croak "chunk must be a positive integer, got '$max_rows'" unless $max_rows =~ m/^\d+$/ && $max_rows > 0;
+
+    my $schema  = $self->schema;
+    my $storage = $schema->storage;
+    my $source  = $schema->resultset($type)->result_source;
+
+    my %seen;
+    my @cols = sort grep { !$seen{$_}++ } map { keys %$_ } @$data;
+
+    # Binary columns (bytea on PostgreSQL) need their type bound, or the
+    # driver sends the bytes as text.
+    my $colinfo = $source->columns_info(\@cols);
+    my @attrs   = map { $storage->bind_attribute_by_data_type($colinfo->{$_}->{data_type}) } @cols;
+    my $attrs   = (grep { $_ } @attrs) ? \@attrs : undef;
+
+    # Convert everything before touching the database so a bad value dies
+    # cleanly instead of inside a transaction. Every path below, including
+    # duplicate recovery, writes these values so no row can be converted two
+    # different ways.
+    my @chunks = ([]);
+    my $bytes  = 0;
+    for my $item (@$data) {
+        my $values = [map { $self->_bulk_value($type, $_, $colinfo->{$_}->{data_type}, $item->{$_}) } @cols];
+
+        my $size = 0;
+        $size += bytes::length($_) for grep { defined } @$values;
+
+        if (@{$chunks[-1]} && (@{$chunks[-1]} >= $max_rows || $bytes + $size > $max_bytes)) {
+            push @chunks => [];
+            $bytes = 0;
+        }
+
+        push @{$chunks[-1]} => $values;
+        $bytes += $size;
+    }
+
+    my $dbh    = $storage->dbh;
+    my $insert = "INSERT INTO " . $dbh->quote_identifier($source->name) . " (" . join(', ', map { $dbh->quote_identifier($_) } @cols) . ") VALUES ";
+    my $row    = "(" . join(', ', ('?') x @cols) . ")";
+
+    my $insert_chunk = sub {
+        my ($dbh, $chunk) = @_;
+
+        my $sth = $dbh->prepare_cached($insert . join(', ', ($row) x @$chunk));
+
+        if ($attrs) {
+            for my $r (0 .. $#$chunk) {
+                for my $c (0 .. $#cols) {
+                    my $attr = $attrs->[$c] or next;
+                    $sth->bind_param($r * @cols + $c + 1, undef, $attr);
+                }
+            }
+        }
+
+        $sth->execute(map { @$_ } @$chunk);
+    };
+
+    $self->retry_on_disconnect(
+        "Populate '$type'",
+        sub {
+            my $ok = eval {
+                $schema->txn_do(sub { $storage->dbh_do(sub { $insert_chunk->($_[1], $_) for @chunks }) });
+                1;
+            };
+            my $err = $@;
+            return 1 if $ok;
+
+            die $err unless $err =~ m/duplicate/i;
+
+            # The transaction rolled back, so nothing went in. Redo it with
+            # autocommit, and only the chunk that holds the duplicate goes
+            # in one row at a time. Chunks before a later failure stay
+            # committed. DBI appends the whole statement and every bind value
+            # to the error, drop those from the warning.
+            (my $short = $err) =~ s/\s*\[for Statement.*//s;
+            warn "Duplicate found:\n====\n$short\n====\n\nPopulating '$type' in chunks, falling back to 1 at a time on duplicates.\n";
+            for my $chunk (@chunks) {
+                next if eval { $storage->dbh_do(sub { $insert_chunk->($_[1], $chunk) }); 1 };
+                my $err = $@;
+                die $err unless $err =~ m/duplicate/i;
+
+                for my $values (@$chunk) {
+                    next if eval { $storage->dbh_do(sub { $insert_chunk->($_[1], [$values]) }); 1 };
+                    my $err = $@;
+
+                    # Only duplicates may be skipped, anything else is a lost
+                    # row and must fail the import.
+                    next if $err =~ m/duplicate/i;
+                    die $err;
+                }
+            }
+
+            return 1;
+        }
+    );
+
+    return;
+}
+
+# MySQL rejects a statement larger than max_allowed_packet and drops the
+# connection, and DBD::mysql interpolates the bind values into the statement
+# text with escaping, so stay well under it. PostgreSQL has no such limit.
+sub bulk_byte_cap {
+    my $self = shift;
+
+    return $self->{+BULK_BYTE_CAP} //= do {
+        my $cap = 4 * 1024 * 1024;
+
+        if ($Test2::Harness::UI::Schema::LOADED && $Test2::Harness::UI::Schema::LOADED =~ m/mysql/i) {
+            my ($packet) = $self->schema->storage->dbh->selectrow_array('SELECT @@max_allowed_packet');
+            $cap = min($cap, int($packet / 2)) if $packet;
+        }
+
+        $cap;
+    };
+}
+
+sub _bulk_value {
+    my $self = shift;
+    my ($type, $col, $data_type, $val) = @_;
+
+    return $val unless ref $val;
+
+    if (blessed($val)) {
+        # MySQL keeps most ids in BINARY(16) but some (trace_id) in CHAR(36),
+        # so the column decides the form, not the database.
+        return (($data_type // '') =~ m/binary/i ? $val->binary : $val->string) if $val->isa('Test2::Harness::UI::UUID');
+        return $self->schema->storage->datetime_parser->format_datetime($val) if $val->isa('DateTime');
+        return "$val" if overload::Method($val, '""');
+    }
+
+    die "Cannot write a " . ref($val) . " to column '$col' of '$type', populate_bulk() rows must hold what the database stores\n";
 }
 
 sub format_stamp {
@@ -308,7 +475,7 @@ sub flush_events {
     }
 
     local $ENV{DBIC_DT_SEARCH_OK} = 1;
-    $self->populate(Event => \@write);
+    $self->populate_bulk(Event => \@write);
     $self->populate(Binary => \@write_bin);
 }
 
@@ -386,7 +553,7 @@ sub flush_reporting {
 
     local $ENV{DBIC_DT_SEARCH_OK} = 1;
 
-    $self->populate(Reporting => \@write);
+    $self->populate_bulk(Reporting => \@write);
 }
 
 sub user {
@@ -786,18 +953,24 @@ sub add_job_coverage {
     return if $self->{+JOBS}->{$job_id}->{$job_try + 1};
     return if $self->{+UNCOVER} && $self->{+UNCOVER}->{$job->{job_key}};
 
-    for my $source (keys %{$job_coverage->{files}}) {
-        my $subs = $job_coverage->{files}->{$source};
-        for my $sub (keys %$subs) {
-            my $test = $job_coverage->{test} // $job->{result}->file;
+    my $test = $job_coverage->{test} // $job->{result}->file;
 
+    my $test_id    = uuid_deflate($self->get_test_file_id($test)) or confess("Could not get test id (for '$test')");
+    my $manager_id = $self->get_coverage_manager_id($job_coverage->{manager});
+    my $job_key    = uuid_deflate($job->{job_key});
+
+    for my $source (keys %{$job_coverage->{files}}) {
+        my $subs      = $job_coverage->{files}->{$source};
+        my $source_id = $self->get_source_file_id($source);
+
+        for my $sub (keys %$subs) {
             $self->_add_coverage(
-                job_key => $job->{job_key},
-                test    => $test,
-                source  => $source,
-                sub     => $sub,
-                manager => $job_coverage->{manager},
-                meta    => $subs->{$sub},
+                job_key             => $job_key,
+                test_file_id        => $test_id,
+                source_file_id      => $source_id,
+                source_sub_id       => $self->get_source_sub_id($sub),
+                coverage_manager_id => $manager_id,
+                meta                => $subs->{$sub},
             );
         }
     }
@@ -812,17 +985,30 @@ sub add_run_coverage {
     my $files = $run_coverage->{files};
     my $meta  = $run_coverage->{testmeta};
 
+    my (%test_ids, %manager_ids);
+
     for my $source (keys %$files) {
-        my $subs = $files->{$source};
+        my $subs      = $files->{$source};
+        my $source_id = $self->get_source_file_id($source);
+
         for my $sub (keys %$subs) {
-            my $tests = $subs->{$sub};
+            my $tests  = $subs->{$sub};
+            my $sub_id = $self->get_source_sub_id($sub);
+
             for my $test (keys %$tests) {
+                my $test_id = $test_ids{$test} //= uuid_deflate($self->get_test_file_id($test)) or confess("Could not get test id (for '$test')");
+
+                my $manager_id;
+                if (defined(my $manager = $meta->{$test}->{manager})) {
+                    $manager_id = $manager_ids{$manager} //= $self->get_coverage_manager_id($manager);
+                }
+
                 $self->_add_coverage(
-                    test    => $test,
-                    source  => $source,
-                    sub     => $sub,
-                    manager => $meta->{$test}->{manager},
-                    meta    => $tests->{$test}
+                    test_file_id        => $test_id,
+                    source_file_id      => $source_id,
+                    source_sub_id       => $sub_id,
+                    coverage_manager_id => $manager_id,
+                    meta                => $tests->{$test},
                 );
             }
         }
@@ -831,26 +1017,24 @@ sub add_run_coverage {
     $self->flush_coverage;
 }
 
+# This runs once per coverage row, and there can be hundreds of thousands in
+# one job, so the ids arrive resolved and deflated: the row goes to the
+# database as it is, through populate_bulk().
 sub _add_coverage {
     my $self = shift;
     my %params = @_;
 
-    my $test_id = $self->get_test_file_id($params{test}) or confess("Could not get test id (for '$params{test}')");
-
-    my $source_id  = $self->_get__id(SourceFile      => 'source_file_id',      filename => $params{source}) or die "Could not get source id";
-    my $sub_id     = $self->_get__id(SourceSub       => 'source_sub_id',       subname  => $params{sub})    or die "Could not get sub id";
-    my $manager_id = $self->_get__id(CoverageManager => 'coverage_manager_id', package  => $params{manager});
-
+    my $manager_id = $params{coverage_manager_id};
     my $meta = $manager_id ? encode_json($params{meta}) : undef;
 
     my $coverage = $self->{+COVERAGE} //= [];
 
     push @$coverage => {
-        coverage_id         => gen_uuid(),
-        run_id              => $self->{+RUN_ID},
-        test_file_id        => $test_id,
-        source_file_id      => $source_id,
-        source_sub_id       => $sub_id,
+        coverage_id         => gen_deflated_uuid(),
+        run_id              => $self->{+RUN_ID_DEFLATED} //= uuid_deflate($self->{+RUN_ID}),
+        test_file_id        => $params{test_file_id},
+        source_file_id      => $params{source_file_id},
+        source_sub_id       => $params{source_sub_id},
         coverage_manager_id => $manager_id,
         metadata            => $meta,
         job_key             => $params{job_key},
@@ -866,7 +1050,7 @@ sub flush_coverage {
     $self->retry_on_disconnect("update has_coverage" => sub { $self->{+RUN}->update({has_coverage => 1}) })
         unless $self->{+RUN}->has_coverage;
 
-    $self->populate(Coverage => $coverage);
+    $self->populate_bulk(Coverage => $coverage);
 
     @$coverage = ();
 
@@ -880,6 +1064,8 @@ sub _get__id {
     return uuid_inflate($id);
 }
 
+# The cache holds the deflated id, what the database stores, so a caller that
+# writes rows directly can use it as it is.
 sub _get___id {
     my $self = shift;
     my ($type, $id_field, $field, $id) = @_;
@@ -892,7 +1078,7 @@ sub _get___id {
     my $spec = {$field => $id, $id_field => gen_uuid()};
     my $result = $self->schema->resultset($type)->find_or_create($spec);
 
-    return $self->{+ID_CACHE}->{$type}->{$id_field}->{$field}->{$id} = $result->$id_field;
+    return $self->{+ID_CACHE}->{$type}->{$id_field}->{$field}->{$id} = uuid_deflate($result->$id_field);
 }
 
 sub get_test_file_id {
@@ -902,6 +1088,28 @@ sub get_test_file_id {
     return undef unless $file;
 
     return $self->_get__id('TestFile' => 'test_file_id', filename => $file);
+}
+
+# These return the deflated id, see _get___id().
+sub get_source_file_id {
+    my $self = shift;
+    my ($file) = @_;
+
+    return $self->_get___id(SourceFile => 'source_file_id', filename => $file) // die "Could not get source id";
+}
+
+sub get_source_sub_id {
+    my $self = shift;
+    my ($sub) = @_;
+
+    return $self->_get___id(SourceSub => 'source_sub_id', subname => $sub) // die "Could not get sub id";
+}
+
+sub get_coverage_manager_id {
+    my $self = shift;
+    my ($package) = @_;
+
+    return $self->_get___id(CoverageManager => 'coverage_manager_id', package => $package);
 }
 
 sub add_run_fields {

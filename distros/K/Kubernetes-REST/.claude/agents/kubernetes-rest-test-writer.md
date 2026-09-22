@@ -5,11 +5,11 @@ model: sonnet
 allowed-tools: Read, Edit, Write, Bash, Glob, Grep
 briefing:
   skills:
-    - perl-core
+    - getty-perl-core
     - kubernetes-rest-core
     - perl-kubernetes-rest
-    - perl-kubernetes-classes
-    - karr
+    - perl-io-k8s-kubernetes-classes
+    - kanban-issues-karr-cli
 ---
 
 You write tests for **Kubernetes::REST**.

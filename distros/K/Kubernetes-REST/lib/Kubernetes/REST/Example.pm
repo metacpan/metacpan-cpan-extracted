@@ -1,6 +1,6 @@
 package Kubernetes::REST::Example;
 # ABSTRACT: Working examples for Kubernetes::REST with Minikube, K3s, and other clusters
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 1;
 
 __END__
@@ -15,7 +15,7 @@ Kubernetes::REST::Example - Working examples for Kubernetes::REST with Minikube,
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -795,8 +795,7 @@ This is the foundation for building Kubernetes controllers.
     $api->delete('Namespace',  'perl-test');
 
 When cleaning up a full namespace, delete dependent resources first to
-avoid errors (e.g. delete Pods and Deployments before the ServiceAccount
-they reference):
+avoid errors (e.g. delete the RoleBinding before the Role it references):
 
     for my $r (
         ['CronJob',              'scheduled-job'],

@@ -4,7 +4,7 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 # VERSION
 
-Version 0.15
+Version 0.16
 
 # SYNOPSIS
 
@@ -378,6 +378,83 @@ None.
 #### Output
 
     HashRef -- C<{ svg_id =E<gt> 'pie_chart', html =E<gt> Str }>;
+               embeddable fragment; no DOCTYPE, no page shell, no D3 CDN tag.
+
+## render\_heatmap\_snippet
+
+    my $fragment = $chart->render_heatmap_snippet(\@triples);
+    my $fragment = $chart->render_heatmap_snippet(\@triples, \%opts);
+    # $fragment->{svg_id} - always 'heatmap'
+    # $fragment->{html}   - embeddable fragment; caller must load D3 v7
+
+Generates an embeddable grid heatmap for use in existing HTML layouts.
+Each cell sits at the intersection of an X-axis label and a Y-axis label;
+its colour encodes the cell's numeric value using a sequential D3 colour
+scale.  Returns `{ svg_id => 'heatmap', html => Str }`.  The
+caller is responsible for loading D3 v7 before embedding the fragment.
+
+### Data format
+
+Each element of `\@triples` is `[$x_label, $y_label, $value]`.
+`$value` must be numeric or `undef` (`undef` rows are silently
+skipped).  Zero is a valid value and maps to the lightest cell colour.
+The caller is responsible for any aggregation: if multiple triples share
+the same (x\_label, y\_label) pair, the last one wins.
+
+### Options (`\%opts`)
+
+- `color_scheme` (string, default `'YlOrRd'`) - D3 sequential
+colour scheme.  Supported: `YlOrRd`, `Blues`, `Greens`, `Purples`,
+`RdPu`, `YlGnBu`.
+- `x_label` (string, default `''`) - Axis title below the X axis.
+- `y_label` (string, default `''`) - Axis title left of the Y axis.
+- `val_label` (string, default `'Value'`) - Tooltip value label.
+- `show_values` (bool, default 0) - Print value inside each cell.
+Auto-suppressed when any cell is narrower than 28 px.
+- `cell_padding` (int 0-8, default 2) - Gap in pixels between cells.
+- `legend` (bool, default 1) - Render a colour-scale legend bar.
+- `animated` (bool, default 0) - Fade cells in on first load.
+Respects `prefers-reduced-motion`.
+
+### Errors
+
+- Dies with `Data must be an array of arrays` when `\@triples`
+is not an ARRAY reference.
+- Dies with `Each data point must be an array reference` when a
+triple element is not an arrayref.
+- Dies with `Each data point must have at least 3 elements` when
+a triple has fewer than 3 elements.
+- Dies with `Value must be numeric` when `$value` is defined but
+not numeric.
+- Dies with `Unknown color_scheme: <name>` for an
+unsupported `color_scheme` value.
+- Dies with `cell_padding must be between 0 and 8` when
+`cell_padding` is outside the valid range.
+
+### Side Effects
+
+Appends a tooltip `div` to the page when the fragment is rendered in
+the browser.
+
+### API SPECIFICATION
+
+#### Input
+
+    {
+        data => { type => 'arrayref' },
+        opts => { type => 'hashref', optional => 1, default => {} },
+    }
+
+    Each element of C<$data> is C<[ Str, Str, Num|undef ]>.
+    Recognised C<opts> keys: C<color_scheme> (string, default C<'YlOrRd'>),
+    C<x_label> (string, default C<''>), C<y_label> (string, default C<''>),
+    C<val_label> (string, default C<'Value'>), C<show_values> (boolean,
+    default C<0>), C<cell_padding> (integer 0-8, default C<2>),
+    C<legend> (boolean, default C<1>), C<animated> (boolean, default C<0>).
+
+#### Output
+
+    HashRef -- C<{ svg_id =E<gt> 'heatmap', html =E<gt> Str }>;
                embeddable fragment; no DOCTYPE, no page shell, no D3 CDN tag.
 
 ## render\_line\_chart\_with\_tooltips
@@ -802,6 +879,32 @@ Nigel Horne <njh@nigelhorne.com>
     post opts.max_slices = N ∧ N ≥ 2 ∧ |data| > N
                             ⇒  |result_slices| = N ∧ "Other" ∈ result_labels
     post opts.separator = S ⇒  " S " ⊆ result.html (HTML legend: label S value (pct%))
+
+## render\_heatmap\_snippet
+
+    render_heatmap_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'       ⇒ die "Data must be an array of arrays"
+    pre  ∃ pt ∈ data . ref(pt) ≠ 'ARRAY'
+                                   ⇒ die "Each data point must be an array reference"
+    pre  ∃ pt ∈ data . |pt| < 3   ⇒ die "Each data point must have at least 3 elements"
+    pre  ∃ pt ∈ data . defined(pt[2]) ∧ ¬numeric(pt[2])
+                                   ⇒ die "Value must be numeric"
+    pre  opts.color_scheme = S ∧ S ∉ {YlOrRd,Blues,Greens,Purples,RdPu,YlGnBu}
+                                   ⇒ die "Unknown color_scheme: S"
+    pre  opts.cell_padding = N ∧ (N < 0 ∨ N > 8)
+                                   ⇒ die "cell_padding must be between 0 and 8"
+    pre  ∀ pt ∈ data . pt[2] = undef ⇒ pt ∉ result     -- undef rows skipped
+    pre  ∃ pt₁,pt₂ ∈ data . pt₁[0]=pt₂[0] ∧ pt₁[1]=pt₂[1]
+                                   ⇒ last-write wins
+    post result ∈ HashRef
+    post result.svg_id = "heatmap"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post "scaleSequential" ⊆ result.html
+    post opts.animated = 1         ⇒ "prefers-reduced-motion" ⊆ result.html
+    post opts.legend = 1           ⇒ "linearGradient" ⊆ result.html
 
 ## render\_line\_chart\_with\_tooltips
 

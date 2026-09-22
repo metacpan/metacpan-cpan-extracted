@@ -224,7 +224,12 @@ EOF
             #
             my $src = <<~'';
                 //ext: .c
-                int return_six() { return 6; }
+                #if defined(_WIN32)
+                #define DLLEXPORT __declspec(dllexport)
+                #else
+                #define DLLEXPORT __attribute__((visibility("default")))
+                #endif
+                DLLEXPORT int return_six() { return 6; }
 
             my $dir = Path::Tiny->tempdir;
             spew_files( $dir, 'main.c' => $src );

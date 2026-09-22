@@ -50,6 +50,6 @@ throws_ok {
 			params => { type => 'arrayref', element_type => 'number' }
 		}
 	});
-} qr/params can only contain numbers/, 'element_type number does not allow strings';
+} qr/'params'.*can only contain numbers/, 'element_type number does not allow strings';
 
 done_testing();

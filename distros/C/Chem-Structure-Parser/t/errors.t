@@ -166,14 +166,18 @@ is(structure_info_string('')->{stats}{n_atoms}, 0, 'and reads as nothing');
 			"$fn: and so does a plain string";
 		lives_ok { $f->($parse{$fn}) } "$fn: and the options may be left out entirely";
 	}
-	# a path that opens and will not read.  A directory is the one every system
-	# has: fopen() takes it and the first fread() fails, which is the error path
-	# that has to free the buffer it had already allocated (t/leaks.t watches
-	# the same path for the leak).
+	# a directory, which is the path every caller eventually mistypes.  It is
+	# refused before the open rather than left to the read, because reading one
+	# is three different things: glibc opens it and fails the first read with
+	# EISDIR, Windows will not open it at all, and NetBSD hands back the raw
+	# directory blocks, which parse as a structure with nothing in it.  0.031
+	# asked for the glibc answer here and two smokers said so -- Strawberry
+	# 5.42.0 on Win2012 ('Permission denied' from the open) and perl 5.42.3 on
+	# NetBSD 11 ('normal exit', an empty structure for a directory).
 	for my $fn (qw(_parse_file _parse_cif_file)) {
 		no strict 'refs';
-		throws_ok { &{"Chem::Structure::Parser::$fn"}($data, {}) } qr/error reading/,
-			"$fn: a path that opens and does not read dies";
+		throws_ok { &{"Chem::Structure::Parser::$fn"}($data, {}) } qr/is a directory/,
+			"$fn: a directory dies, on every system";
 	}
 }
 

@@ -1,13 +1,15 @@
 package IO::K8s::Cilium::V2::CiliumLocalRedirectPolicy;
-# ABSTRACT: Cilium local redirect policy for traffic steering
-our $VERSION = '1.107';
+# ABSTRACT: CiliumLocalRedirectPolicy is a Kubernetes Custom Resource that contains a specification to redirect traffic locally within a node.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumlocalredirectpolicies';
 with 'IO::K8s::Role::Namespaced';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec   => '+IO::K8s::Cilium::V2::CiliumLocalRedirectPolicySpec';
+k8s status => '+IO::K8s::Cilium::V2::CiliumLocalRedirectPolicyStatus';
+
+
 
 1;
 
@@ -19,25 +21,20 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Cilium::V2::CiliumLocalRedirectPolicy - Cilium local redirect policy for traffic steering
+IO::K8s::Cilium::V2::CiliumLocalRedirectPolicy - CiliumLocalRedirectPolicy is a Kubernetes Custom Resource that contains a specification to redirect traffic locally within a node.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-This namespace-scoped resource redirects traffic destined for a service to local endpoints on the same node, reducing network hops and latency. It uses API version C<cilium.io/v2>. The C<spec> and C<status> fields contain opaque CRD-specific data structures managed by the Cilium controller.
+Spec is the desired behavior of the local redirect policy.
 
-=head1 SEE ALSO
+=head2 status
 
-=over
-
-=item * L<IO::K8s::Cilium> - Main Cilium CRD namespace
-
-=item * L<https://docs.cilium.io/en/stable/network/kubernetes/local-redirect-policy/> - Upstream Cilium local redirect policy documentation
-
-=back
+Status is the most recent status of the local redirect policy.
+It is a read-only field.
 
 =head1 SUPPORT
 

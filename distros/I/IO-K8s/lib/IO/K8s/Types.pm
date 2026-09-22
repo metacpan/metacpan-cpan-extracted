@@ -1,6 +1,6 @@
 package IO::K8s::Types;
 # ABSTRACT: Type::Tiny type library for Kubernetes resources
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use Type::Library -base, -declare => qw( IntOrStr Quantity Time );
 use Type::Utils -all;
 use Types::Standard -types;
@@ -12,8 +12,11 @@ BEGIN { extends 'Types::Standard' }
 
 declare IntOrStr, as Str;
 
+# Suffix set follows apimachinery pkg/api/resource/suffix.go (decimal SI
+# n u m "" k M G T P E, binary Ki..Ei, decimal exponent e/E); note the BNF
+# in the quantity.go doc comment is stale and omits n and u.
 declare Quantity, as Str,
-    where { /\A[+-]?(\d+\.?\d*|\d*\.\d+)([eE][+-]?\d+|Ki|Mi|Gi|Ti|Pi|Ei|[mkMGTPE])?\z/ },
+    where { /\A[+-]?(\d+\.?\d*|\d*\.\d+)([eE][+-]?\d+|Ki|Mi|Gi|Ti|Pi|Ei|[numkMGTPE])?\z/ },
     message { "Value '$_' is not a valid Kubernetes Quantity" };
 
 declare Time, as Str,
@@ -96,7 +99,7 @@ IO::K8s::Types - Type::Tiny type library for Kubernetes resources
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 SYNOPSIS
 

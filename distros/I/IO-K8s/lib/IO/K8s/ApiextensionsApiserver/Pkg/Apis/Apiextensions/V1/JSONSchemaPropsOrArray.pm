@@ -1,9 +1,9 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOrArray;
 # ABSTRACT: JSONSchemaPropsOrArray represents a value that can either be a JSONSchemaProps or an array of JSONSchemaProps. Mainly here for serialization purposes.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use v5.10;
 use Moo;
-use Types::Standard qw( ArrayRef InstanceOf Maybe );
+use Types::Standard ();
 use JSON::MaybeXS ();
 
 my $PROPS = 'IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaProps';
@@ -11,17 +11,19 @@ my $PROPS = 'IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSON
 
 has schema => (
     is  => 'rw',
-    isa => Maybe[InstanceOf[$PROPS]],
+    isa => Types::Standard::Maybe[ Types::Standard::InstanceOf[$PROPS] ],
 );
 
 
 has schemas => (
     is  => 'rw',
-    isa => Maybe[ArrayRef[InstanceOf[$PROPS]]],
+    isa => Types::Standard::Maybe[
+        Types::Standard::ArrayRef[ Types::Standard::InstanceOf[$PROPS] ]
+    ],
 );
 
 
-sub _build_json {
+sub _build__json_encoder {
     return JSON::MaybeXS->new(utf8 => 1, canonical => 1, allow_nonref => 1);
 }
 
@@ -37,10 +39,10 @@ sub FROM_STRUCT {
     $k8s //= do { require IO::K8s; IO::K8s->new };
 
     return $class->new(
-        schemas => [ map { $k8s->struct_to_object($PROPS, $_) } @$struct ],
+        schemas => [ map { $k8s->_struct_to_object_expanded($PROPS, $_) } @$struct ],
     ) if ref $struct eq 'ARRAY';
 
-    return $class->new(schema => $k8s->struct_to_object($PROPS, $struct));
+    return $class->new(schema => $k8s->_struct_to_object_expanded($PROPS, $struct));
 }
 
 
@@ -68,7 +70,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::JSONSchemaPropsOr
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 

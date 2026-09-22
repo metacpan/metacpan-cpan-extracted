@@ -1,5 +1,44 @@
 Revision history for Kubernetes-REST
 
+1.108     2026-09-22 02:22:33Z
+
+ - New ensure_crd(@classes): create-or-update CustomResourceDefinitions from
+   typed IO::K8s classes, wait until Established, then invalidate_discovery.
+   Several versions of one CRD need storage => '<version>'.
+ - A Kind the cluster serves but no class resolves now inflates to
+   IO::K8s::Unstructured instead of failing closed; shipped, `with` and
+   AutoGen classes still win. build_path gains additive kind, api_version,
+   resource and namespaced arguments for such paths.
+ - The cluster resource map no longer invents IO::K8s::Api::<Group> class
+   names for CRD groups without a shipped class; those resolve through the
+   inner IO::K8s (`with` providers, then AutoGen) or fail closed.
+ - A short name served in several versions resolves to the version the
+   cluster marks preferred, not to a fixed stable-over-beta ranking.
+ - New constructor attribute `with`: external IO::K8s resource-map providers
+   (CRD bundles) passed through to the inner IO::K8s, e.g.
+   with => ['IO::K8s::GatewayAPI'].
+ - The cluster resource map comes from aggregated discovery (/api, /apis)
+   instead of /openapi/v2, now fetched lazily for schema_for/compare_schema
+   only; a failed discovery fetch warns and uses the built-in map.
+ - New invalidate_discovery: drop the cached discovery catalog and resource
+   map so a freshly installed CRD resolves without a new client.
+ - New CLI tool kube_crd2class: renders a CustomResourceDefinition (from a
+   file with -f, or from the cluster with --from_cluster <Kind>) as typed
+   IO::K8s class source, to STDOUT or a tree with -d.
+ - Fix kube_watch taking the first option as the Kind when options precede
+   it ("kube_watch -n default Pod" watched Kind "-n").
+ - New CLI tool kube_test_minikube: fetches minikube (SHA-256 verified),
+   runs a profile with its own kubeconfig, exports the live-test variables
+   and runs the given command, e.g. "kube_test_minikube prove -lr t/".
+ - Require IO::K8s 1.108 (Kubernetes v1.37 sync).
+ - inflate_list() warns once per list naming every item it drops instead of
+   discarding uninflatable items silently.
+ - expand_class() is a client method that resolves names the built-in map
+   knows without fetching the cluster resource map.
+ - Kubeconfig context()/cluster()/user() croak with a message naming what is
+   missing (no entries, no current-context, name not found) instead of an
+   uninitialized-value warning and an empty "Context not found: ".
+
 1.107     2026-08-15 16:15:27Z
 
  - New patch_status() and update_status(), writing through the /status

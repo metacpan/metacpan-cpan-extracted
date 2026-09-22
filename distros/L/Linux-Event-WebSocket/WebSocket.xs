@@ -985,6 +985,17 @@ PPCODE:
     PUSHs(sv_2mortal(newSVpv(bqws_error_str(error), 0)));
     XSRETURN(2);
 
+UV
+_memory_used(self)
+    SV *self
+PREINIT:
+    lews_bq *state;
+CODE:
+    state = lews_bq_from_sv(self);
+    RETVAL = (UV)bqws_get_memory_used(state->ws);
+OUTPUT:
+    RETVAL
+
 SV *
 flush(self)
     SV *self

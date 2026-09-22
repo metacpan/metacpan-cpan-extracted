@@ -6,8 +6,9 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options;
 use WWW::Hetzner::Cloud;
+use WWW::Hetzner::Storage;
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 
 option token => (
@@ -37,6 +38,15 @@ has cloud => (
 );
 
 
+has storage => (
+    is      => 'lazy',
+    builder => sub {
+        my ($self) = @_;
+        WWW::Hetzner::Storage->new(token => $self->token);
+    },
+);
+
+
 sub execute {
     my ($self, $args, $chain) = @_;
 
@@ -49,6 +59,7 @@ sub execute {
     print "  server           Manage cloud servers\n";
     print "  servertype       List server types\n";
     print "  image            List images\n";
+    print "  iso              List ISOs\n";
     print "  sshkey           Manage SSH keys\n";
     print "  placement-group  Manage placement groups\n";
     print "\nNetworking:\n";
@@ -57,8 +68,10 @@ sub execute {
     print "  floating-ip      Manage floating IPs\n";
     print "  primary-ip       Manage primary IPs\n";
     print "  load-balancer    Manage load balancers\n";
+    print "  load-balancer-type  List load balancer types\n";
     print "\nStorage:\n";
     print "  volume           Manage volumes\n";
+    print "  storage-box      Manage Storage Boxes\n";
     print "\nDNS:\n";
     print "  zone             Manage DNS zones\n";
     print "  record           Manage DNS records\n";
@@ -67,6 +80,7 @@ sub execute {
     print "\nInfo:\n";
     print "  location         List locations\n";
     print "  datacenter       List datacenters\n";
+    print "  pricing          Show the current price list\n";
     print "\nExamples:\n";
     print "  hcloud.pl server list\n";
     print "  hcloud.pl -t mytoken server list\n";
@@ -94,7 +108,7 @@ WWW::Hetzner::CLI - Hetzner Cloud CLI
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -122,6 +136,8 @@ options, and output should match the original tool as closely as possible.
 
 =item * L<image|WWW::Hetzner::CLI::Cmd::Image> - List images
 
+=item * L<iso|WWW::Hetzner::CLI::Cmd::Iso> - List ISOs
+
 =item * L<sshkey|WWW::Hetzner::CLI::Cmd::Sshkey> - Manage SSH keys
 
 =item * L<placement-group|WWW::Hetzner::CLI::Cmd::PlacementGroup> - Manage placement groups
@@ -142,6 +158,8 @@ options, and output should match the original tool as closely as possible.
 
 =item * L<load-balancer|WWW::Hetzner::CLI::Cmd::LoadBalancer> - Manage load balancers
 
+=item * L<load-balancer-type|WWW::Hetzner::CLI::Cmd::LoadBalancerType> - List load balancer types
+
 =back
 
 =head2 Storage
@@ -149,6 +167,8 @@ options, and output should match the original tool as closely as possible.
 =over 4
 
 =item * L<volume|WWW::Hetzner::CLI::Cmd::Volume> - Manage volumes
+
+=item * L<storage-box|WWW::Hetzner::CLI::Cmd::StorageBox> - Manage Storage Boxes
 
 =back
 
@@ -178,6 +198,8 @@ options, and output should match the original tool as closely as possible.
 
 =item * L<datacenter|WWW::Hetzner::CLI::Cmd::Datacenter> - List datacenters
 
+=item * L<pricing|WWW::Hetzner::CLI::Cmd::Pricing> - Show the current price list
+
 =back
 
 =head2 token
@@ -193,6 +215,11 @@ Output format: C<table> (default) or C<json>. Use C<--output> or C<-o> flag.
 
 L<WWW::Hetzner::Cloud> instance.
 
+=head2 storage
+
+L<WWW::Hetzner::Storage> instance, configured from the same C<--token>
+option as the Cloud client.
+
 =head2 execute
 
 Main entry point. Shows help when no subcommand is given.
@@ -204,6 +231,8 @@ Main entry point. Shows help when no subcommand is given.
 =item * L<WWW::Hetzner> - Main umbrella module
 
 =item * L<WWW::Hetzner::Cloud> - Cloud API client
+
+=item * L<WWW::Hetzner::Storage> - Storage Box API client
 
 =item * L<https://docs.hetzner.cloud/> - Official Hetzner Cloud API documentation
 
@@ -230,7 +259,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

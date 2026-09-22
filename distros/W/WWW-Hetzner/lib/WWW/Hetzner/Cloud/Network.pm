@@ -1,7 +1,7 @@
 package WWW::Hetzner::Cloud::Network;
 # ABSTRACT: Hetzner Cloud Network object
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use Carp qw(croak);
@@ -77,15 +77,7 @@ sub add_subnet {
     croak "network_zone required" unless $opts{network_zone};
     croak "type required" unless $opts{type};
 
-    my $body = {
-        ip_range     => $opts{ip_range},
-        network_zone => $opts{network_zone},
-        type         => $opts{type},
-    };
-    $body->{vswitch_id} = $opts{vswitch_id} if $opts{vswitch_id};
-
-    $self->_client->post("/networks/" . $self->id . "/actions/add_subnet", $body);
-    return $self;
+    return $self->_client->networks->add_subnet($self->id, %opts);
 }
 
 
@@ -94,10 +86,7 @@ sub delete_subnet {
     croak "Cannot modify network without ID" unless $self->id;
     croak "ip_range required" unless $ip_range;
 
-    $self->_client->post("/networks/" . $self->id . "/actions/delete_subnet", {
-        ip_range => $ip_range,
-    });
-    return $self;
+    return $self->_client->networks->delete_subnet($self->id, $ip_range);
 }
 
 
@@ -107,11 +96,7 @@ sub add_route {
     croak "destination required" unless $opts{destination};
     croak "gateway required" unless $opts{gateway};
 
-    $self->_client->post("/networks/" . $self->id . "/actions/add_route", {
-        destination => $opts{destination},
-        gateway     => $opts{gateway},
-    });
-    return $self;
+    return $self->_client->networks->add_route($self->id, %opts);
 }
 
 
@@ -121,11 +106,7 @@ sub delete_route {
     croak "destination required" unless $opts{destination};
     croak "gateway required" unless $opts{gateway};
 
-    $self->_client->post("/networks/" . $self->id . "/actions/delete_route", {
-        destination => $opts{destination},
-        gateway     => $opts{gateway},
-    });
-    return $self;
+    return $self->_client->networks->delete_route($self->id, %opts);
 }
 
 
@@ -174,7 +155,7 @@ WWW::Hetzner::Cloud::Network - Hetzner Cloud Network object
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -338,7 +319,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

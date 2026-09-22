@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::Pod;
 # ABSTRACT: Pod is a collection of containers that can run on a host. This resource is created by clients and scheduled onto hosts.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::Pod - Pod is a collection of containers that can run on 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ Most recently observed status of the pod. This data may not be up to date. Popul
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#pod-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#pod-v1-core>
 
 =head1 SUPPORT
 

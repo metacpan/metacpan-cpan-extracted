@@ -29,11 +29,12 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0
   },
   "TEST_REQUIRES" => {
+    "Path::Tiny" => 0,
     "Test::Deep" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.107",
+  "VERSION" => "1.108",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "Moo" => "2.000000",
   "Net::IP" => 0,
   "Package::Stash" => 0,
+  "Path::Tiny" => 0,
   "Scalar::Util" => 0,
   "Test::Deep" => 0,
   "Test::Exception" => 0,

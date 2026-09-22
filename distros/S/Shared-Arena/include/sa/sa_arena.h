@@ -55,6 +55,15 @@ struct sa_region {
     uint32_t    peer_epoch;
     uint64_t    peer_pid;
 
+    /* Why the last region lookup or carve on THIS handle came back empty.
+     *
+     * Diagnostic only, and on the handle rather than at file scope so two
+     * handles - or two ithreads - do not overwrite each other's answer. It
+     * exists because an empty list is not a reason: a smoker that refused two
+     * carves could not say whether the arena was full or a stripe was busy,
+     * and those want opposite responses from the caller. */
+    int         last_err;
+
     /* The waker table, carved like any other sub-region and found by name, so
      * a fork child resolves it without being told where it is. */
     uint64_t    wakers_off;
@@ -218,19 +227,44 @@ static sa_reg *sa_find(sa_region *r, const char *name, size_t nlen) {
  *
  * Still bounded, and that is not negotiable: a process that died holding a
  * stripe must not wedge everybody who comes after it. The budget is just spent
- * as a few dozen short sleeps rather than as one long burn, so the holder gets
- * a chance to run and hand it over.
+ * as sleeps rather than as one long burn, so the holder gets a chance to run
+ * and hand it over.
+ *
+ * SIXTY-FOUR FIFTY-MICROSECOND SLEEPS WAS STILL A GUESS ABOUT THE SCHEDULER,
+ * and a loaded smoker beat it: FreeBSD 15 on perl 5.42.2 refused two carves in
+ * four thousand, with room in the arena for every one of them and the serial
+ * arm of the same test passing. Three milliseconds is an ordinary amount of
+ * time not to be scheduled on a box running a dozen builds.
+ *
+ * So the wait escalates instead: a spin first, because the usual holder really
+ * is about to finish, then sleeps doubling from 50us to a 20ms ceiling. That
+ * spends about two seconds over its rounds - the same budget sa_map_open
+ * already allows a half-written header (SA_CREATE_WAIT_US), and for the same
+ * reason. An ordinary preemption becomes invisible; a process that died
+ * holding the stripe still hands everybody else a refusal rather than a hang.
+ *
+ * The retries after the first are a single test-and-set, NOT another spin:
+ * hammering the lock byte from eight waiters is what keeps the holder from
+ * reaching its own unlock. See sa_at_trylock.
  *
  * For rare operations only - carving a region, publishing a block. Anything on
  * a per-request path should use sa_at_lock and take the refusal. */
-#define SA_LOCK_ROUNDS   64
-#define SA_LOCK_STALL_US 50
+#define SA_LOCK_ROUNDS    110
+#define SA_LOCK_STALL_US  50
+#define SA_LOCK_STALL_MAX 20000
 
 static int sa_lock_wait(volatile unsigned char *locks, uint64_t h) {
     int round;
+    uint32_t us = SA_LOCK_STALL_US;
+
+    if (sa_at_lock(locks, h)) return 1;
     for (round = 0; round < SA_LOCK_ROUNDS; round++) {
-        if (sa_at_lock(locks, h)) return 1;
-        sa_stall(SA_LOCK_STALL_US);
+        sa_stall(us);
+        if (sa_at_trylock(locks, h)) return 1;
+        if (us < SA_LOCK_STALL_MAX) {
+            us *= 2;
+            if (us > SA_LOCK_STALL_MAX) us = SA_LOCK_STALL_MAX;
+        }
     }
     return 0;
 }
@@ -263,7 +297,8 @@ static sa_reg *sa_carve(sa_region *r, const char *name, size_t nlen,
      * its region. See sa_lock_wait: a pure spin refused four carves in four
      * thousand, every run, on a machine with fewer cores than carvers. */
     if (!sa_lock_wait(h->locks, hash)) {
-        if (err) *err = SA_E_FULL;
+        /* SA_E_BUSY, not SA_E_FULL: nothing here is full. */
+        if (err) *err = SA_E_BUSY;
         return NULL;
     }
 

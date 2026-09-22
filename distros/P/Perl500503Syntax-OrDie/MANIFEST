@@ -20,6 +20,7 @@ t/0007-selfcheck.t
 t/0008-new-features.t
 t/0009-clean-corpus.t
 t/0010-clean-corpus-stack.t
+t/0011-corpus-excerpt.t
 t/9001-load.t
 t/9010-encoding.t
 t/9020-perl5compat.t

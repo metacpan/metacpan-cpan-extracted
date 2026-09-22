@@ -1,0 +1,59 @@
+---
+abstract: 'Client for the SolusVM 2 API, built from its own specification'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  Exporter: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin::libs: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V1: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SolusVM-Client
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  SolusVM::Client:
+    file: lib/SolusVM/Client.pm
+    version: '0.001'
+  SolusVM::Client::Specification:
+    file: lib/SolusVM/Client/Specification.pm
+    version: '0.001'
+requires:
+  Cpanel::JSON::XS: '0'
+  File::Path: '0'
+  File::Slurper: '0'
+  File::Slurper::Temp: '0'
+  File::Spec: '0'
+  HTTP::Tiny: '0'
+  Sub::Install: '0'
+  Time::Piece: '0'
+  perl: v5.36.0
+  re: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Troglodyne-Internet-Widgets/perl-solusvm-client/issues
+  homepage: https://github.com/Troglodyne-Internet-Widgets/perl-solusvm-client
+  repository: https://github.com/Troglodyne-Internet-Widgets/perl-solusvm-client.git
+version: '0.001'
+x_contributors:
+  - 'Andy Baugh <andy@troglodyne.net>'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

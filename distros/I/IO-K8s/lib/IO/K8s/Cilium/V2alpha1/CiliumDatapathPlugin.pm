@@ -1,12 +1,12 @@
 package IO::K8s::Cilium::V2alpha1::CiliumDatapathPlugin;
-# ABSTRACT: Cilium extensible datapath plugin registration
-our $VERSION = '1.107';
+# ABSTRACT: A CiliumDatapathPlugin registers a datapath plugin with Cilium and contains information about its status and how Cilium should interact with it.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
     resource_plural => 'ciliumdatapathplugins';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec => '+IO::K8s::Cilium::V2alpha1::CiliumDatapathPluginSpec', { required => 'schema' };
+
 
 1;
 
@@ -18,25 +18,15 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Cilium::V2alpha1::CiliumDatapathPlugin - Cilium extensible datapath plugin registration
+IO::K8s::Cilium::V2alpha1::CiliumDatapathPlugin - A CiliumDatapathPlugin registers a datapath plugin with Cilium and contains information about its status and how Cilium should interact with it.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-This cluster-scoped resource registers a Cilium extensible datapath plugin, letting cloud providers extend or instrument Cilium's eBPF datapath. It uses API version C<cilium.io/v2alpha1>. The C<spec> and C<status> fields contain opaque CRD-specific data structures; upstream C<spec> carries C<attachmentPolicy> (C<Always> or C<BestEffort>) and C<version>, both managed by the Cilium datapath plugin controller.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<IO::K8s::Cilium> - Main Cilium CRD namespace
-
-=item * L<https://docs.cilium.io/en/stable/> - Upstream Cilium documentation
-
-=back
+No description in the upstream schema.
 
 =head1 SUPPORT
 

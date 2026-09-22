@@ -5,7 +5,7 @@ requires 'perl', '5.010001';
 requires 'Carp';
 requires 'DBD::SQLite', '1.70';
 requires 'DBI';
-requires 'Database::Abstraction', '0.43';
+requires 'Database::Abstraction', '0.44';
 requires 'File::Spec';
 requires 'File::Temp';
 requires 'List::Util', '1.33';

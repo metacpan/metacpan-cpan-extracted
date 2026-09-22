@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodSpec;
 # ABSTRACT: PodSpec is a description of a pod.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s activeDeadlineSeconds => Int;
@@ -25,6 +25,9 @@ k8s enableServiceLinks => Bool;
 
 
 k8s ephemeralContainers => ['Core::V1::EphemeralContainer'];
+
+
+k8s evictionResponders => ['Core::V1::EvictionResponder'];
 
 
 k8s hostAliases => ['Core::V1::HostAlias'];
@@ -143,7 +146,7 @@ IO::K8s::Api::Core::V1::PodSpec - PodSpec is a description of a pod.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 activeDeadlineSeconds
 
@@ -176,6 +179,14 @@ EnableServiceLinks indicates whether information about services should be inject
 =head2 ephemeralContainers
 
 List of ephemeral containers run in this pod. Ephemeral containers may be run in an existing pod to perform user-initiated actions such as debugging. This list cannot be specified when creating a pod, and it cannot be modified by updating the pod spec. In order to add an ephemeral container to an existing pod, use the pod's ephemeralcontainers subresource.
+
+=head2 evictionResponders
+
+evictionResponders reference responders that react to Evictions based on EvictionRequests. Responders should observe and communicate through the Eviction Resource API to help with the graceful termination of a pod. The responders are selected sequentially, according to their specified priority.
+
+Responders should periodically report on an eviction progress by updating the .status.responders[].heartbeatTime field of the Eviction object. If this field is not updated within the heartbeat deadline defined by the Eviction API (currently 20 minutes), the eviction is passed over to the next responder with a lower priority. If there is no other responder, the last default imperative-eviction.k8s.io/evictor responder with a priority of 100 will evict the pod using the imperative Eviction API (pods/<name>/eviction subresource).
+
+The maximum length of the responders list is 10. Responders are not supported when the pod is part of a PodGroup (.spec.schedulingGroup is set). This field can only be set on creation and is immutable afterwards.
 
 =head2 hostAliases
 

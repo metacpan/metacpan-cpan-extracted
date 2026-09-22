@@ -1,0 +1,21 @@
+{
+  "load_balancer_type": {
+    "id": 1,
+    "name": "lb11",
+    "description": "LB11",
+    "max_connections": 20000,
+    "max_services": 5,
+    "max_targets": 25,
+    "max_assigned_certificates": 10,
+    "deprecated": null,
+    "prices": [
+      {
+        "location": "fsn1",
+        "price_hourly": { "net": "0.0079", "gross": "0.0094" },
+        "price_monthly": { "net": "4.9000", "gross": "5.8310" },
+        "included_traffic": 21990232555520,
+        "price_per_tb_traffic": { "net": "1.0000", "gross": "1.1900" }
+      }
+    ]
+  }
+}

@@ -7,6 +7,8 @@ lib/Games/GUI/Battleship/AI.pm
 lib/Games/GUI/Battleship/AI/Hard.pm
 lib/Games/GUI/Battleship/AI/Naive.pm
 lib/Games/GUI/Battleship/AI/Parity.pm
+lib/Games/GUI/Battleship/assets/hit.wav
+lib/Games/GUI/Battleship/assets/sink.wav
 lib/Games/GUI/Battleship/Board.pm
 lib/Games/GUI/Battleship/Renderer.pm
 lib/Games/GUI/Battleship/Ship.pm

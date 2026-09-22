@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ServiceAccountTokenProjection;
 # ABSTRACT: ServiceAccountTokenProjection represents a projected service account token volume. This projection can be used to insert a service account token into the pods runtime filesystem for use against APIs (Kubernetes API Server or otherwise).
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s audience => Str;
@@ -10,6 +10,9 @@ k8s expirationSeconds => Int;
 
 
 k8s path => Str, 'required';
+
+
+k8s user => Int;
 
 
 1;
@@ -26,7 +29,7 @@ IO::K8s::Api::Core::V1::ServiceAccountTokenProjection - ServiceAccountTokenProje
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 audience
 
@@ -39,6 +42,10 @@ expirationSeconds is the requested duration of validity of the service account t
 =head2 path
 
 path is the path relative to the mount point of the file to project the token into.
+
+=head2 user
+
+user is Optional: The owner UID of the created file. If specified, the item-level user field takes precedence over defaultUser. (Alpha) This field requires the AtomicWriteVolumeUserFields feature gate to be enabled.
 
 =head1 SUPPORT
 

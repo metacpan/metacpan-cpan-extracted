@@ -1,11 +1,12 @@
 package WWW::Hetzner::CLI::Cmd::Record::Cmd::Delete;
 # ABSTRACT: Delete a DNS record
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options usage_string => 'USAGE: hcloud.pl record delete --zone <zone-id> --name <name> --type <type>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option zone => (
     is       => 'ro',
@@ -38,9 +39,11 @@ sub execute {
     my $cloud = $main->cloud;
 
     my $rrsets = $cloud->zones->rrsets($self->zone);
-    $rrsets->delete($self->name, uc($self->type));
+    my $action = $rrsets->delete($self->name, uc($self->type));
+    $self->handle_action($action);
 
-    print "Record ", $self->name, "/", uc($self->type), " deleted.\n";
+    print "Record ", $self->name, "/", uc($self->type),
+        $self->no_wait ? " delete requested.\n" : " deleted.\n";
 }
 
 1;
@@ -57,7 +60,7 @@ WWW::Hetzner::CLI::Cmd::Record::Cmd::Delete - Delete a DNS record
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -80,7 +83,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

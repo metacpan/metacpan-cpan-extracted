@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 107;
+use Test::Most tests => 120;
 use Readonly;
 use Scalar::Util qw(blessed refaddr);
 
@@ -23,7 +23,7 @@ use_ok('Database::Join');
 	sub new {
 		my ($class, %a) = @_;
 		return bless {
-			cols    => $a{cols}    // ['entry'],
+			cols => $a{cols} // ['entry'],
 			rows    => $a{rows}    // [],
 			id      => $a{id},		# may be undef to test fallback path
 			schema  => $a{schema}  // {},
@@ -140,6 +140,16 @@ use_ok('Database::Join');
 	# deliberately omits translate
 }
 
+# DA with count() defined directly — needed for backend=auto threshold tests.
+# defined &{"PathCountDA::count"} is true; inherited Database::Abstraction::count
+# is NOT used (it takes a key arg and emits uninit warnings when called bare).
+{
+	package PathCountDA;
+	use parent -norequire, 'PathDA';
+	sub count   { return scalar @{ $_[0]->{rows} } }
+	sub DESTROY {}
+}
+
 # Logger mock with set_logger/get_logger — verifies propagation paths
 {
 	package MockLogger;
@@ -153,11 +163,12 @@ use_ok('Database::Join');
 	package Database::Join::PathBox;
 	use parent -norequire, 'Database::Join';
 
-	sub expose_msg   { shift; return Database::Join::_msg(@_) }
-	sub expose_merge { shift; return Database::Join::_merge_criteria(@_) }
-	sub expose_parse { my $self = shift; return $self->_parse_query_args(@_) }
-	sub expose_part  { my $self = shift; return $self->_partition_criteria(@_) }
-	sub expose_fetch { my $self = shift; return $self->_fetch_indexed(@_) }
+	sub expose_msg         { shift; return Database::Join::_msg(@_) }
+	sub expose_merge       { shift; return Database::Join::_merge_criteria(@_) }
+	sub expose_parse       { my $self = shift; return $self->_parse_query_args(@_) }
+	sub expose_part        { my $self = shift; return $self->_partition_criteria(@_) }
+	sub expose_fetch       { my $self = shift; return $self->_fetch_indexed(@_) }
+	sub expose_cache_fresh { my $self = shift; return $self->_cache_fresh(@_) }
 }
 
 # ---------------------------------------------------------------------------
@@ -1269,6 +1280,180 @@ note '--- Section 20: add_database() undef first arg ---';
 	throws_ok { $j->add_database(undef) }
 		$ERR{invalid_db},
 		'add_database PATH-undef: undef first arg → croak invalid_db (defined() guard)';
+}
+
+# ==========================================================================
+# Section 21: _sqlite_join() backend dispatch paths
+# (PATH-sq-*: which execution path through _sqlite_join is taken)
+# Technique: bad tmpdir acts as a path oracle — array path ignores it;
+# SQLite path calls File::Temp->new(DIR=>...) and dies immediately.
+# ==========================================================================
+
+note '--- Section 21: _sqlite_join() backend dispatch paths ---';
+
+Readonly::Scalar my $BAD_DIR => '/nonexistent/__no_such_dir__';
+
+# PATH-sq-1: backend='array' → always _joined_query_array; bad tmpdir is never accessed
+{
+	my ($p, $s) = _std_dbs();
+	my $j = Database::Join->new(
+		databases => [$p, $s],
+		join_column => $JC,
+		backend  => 'array',
+		tmpdir   => $BAD_DIR,
+	);
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref() }
+		'_sqlite_join PATH-sq-1a: backend=array → array path, bad tmpdir ignored';
+	is(scalar @{$rows}, 2,
+		'_sqlite_join PATH-sq-1b: 2 rows returned via array path');
+}
+
+# PATH-sq-2: backend='sqlite' → always SQLite path; File::Temp dies on bad tmpdir
+{
+	my ($p, $s) = _std_dbs();
+	my $j = Database::Join->new(
+		databases => [$p, $s],
+		join_column => $JC,
+		backend  => 'sqlite',
+		tmpdir   => $BAD_DIR,
+	);
+	my $err;
+	eval { $j->selectall_arrayref() };
+	$err = $@;
+	my ($first_line) = split /\n/, ($err // ''), 2;
+	like($first_line, qr/does not exist|no such file|cannot|failed/i,
+		'_sqlite_join PATH-sq-2: backend=sqlite + bad tmpdir → File::Temp dies (SQLite path taken)');
+}
+
+# PATH-sq-3: backend='auto'; PathDA has no own count() → can_count=0 → array fallback
+# PathDA inherits Database::Abstraction::count but does NOT define it directly, so
+# defined &{"PathDA::count"} is false → $can_count=0 → last → array path taken.
+{
+	my ($p, $s) = _std_dbs();	# PathDA — no own count()
+	my $j = Database::Join->new(
+		databases => [$p, $s],
+		join_column => $JC,
+		backend  => 'auto',
+		tmpdir   => $BAD_DIR,
+	);
+	lives_ok { $j->selectall_arrayref() }
+		'_sqlite_join PATH-sq-3: auto + no own count() → can_count=0 → array fallback';
+}
+
+# PATH-sq-4: backend='auto'; PathCountDA has count(); total ≤ max_array_rows → array fallback
+{
+	my $p = PathCountDA->new(cols => [$JC, 'name'],
+		rows => [{ $JC => 'k1', name => 'A' }, { $JC => 'k2', name => 'B' }]);
+	my $s = PathCountDA->new(cols => [$JC, 'score'],
+		rows => [{ $JC => 'k1', score => 90 }]);
+	# total = p.count() + s.count() = 2+1 = 3 ≤ max_array_rows=10 → array path
+	my $j = Database::Join->new(
+		databases      => [$p, $s],
+		join_column    => $JC,
+		backend        => 'auto',
+		max_array_rows => 10,
+		tmpdir         => $BAD_DIR,
+	);
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref() }
+		'_sqlite_join PATH-sq-4a: auto + count<=threshold → array fallback';
+	is(scalar @{$rows}, 2,
+		'_sqlite_join PATH-sq-4b: correct 2 rows returned via array fallback');
+}
+
+# PATH-sq-5: backend='auto'; count > max_array_rows=0 → SQLite path taken
+{
+	my $p = PathCountDA->new(cols => [$JC, 'name'],
+		rows => [{ $JC => 'k1', name => 'A' }]);
+	my $s = PathCountDA->new(cols => [$JC, 'score'],
+		rows => [{ $JC => 'k1', score => 77 }]);
+	# total = 1+1 = 2 > 0 → SQLite path; default tmpdir is valid
+	my $j = Database::Join->new(
+		databases      => [$p, $s],
+		join_column    => $JC,
+		backend        => 'auto',
+		max_array_rows => 0,
+	);
+	my $rows = $j->selectall_arrayref();
+	is(scalar @{$rows}, 1,
+		'_sqlite_join PATH-sq-5: auto + count>threshold → SQLite path, 1 merged row');
+}
+
+# ==========================================================================
+# Section 22: _cache_fresh() execution paths
+# Each path through _cache_fresh is observable via expose_cache_fresh().
+# PathDA fixtures have updated()=1 by default.
+# ==========================================================================
+
+note '--- Section 22: _cache_fresh() paths ---';
+
+# PATH-cf-1: _sqlite_cache undef → // return 0 fires immediately
+{
+	my ($p, $s) = _std_dbs();
+	my $j = Database::Join::PathBox->new(databases => [$p, $s], join_column => $JC);
+	# no cache built → _sqlite_cache is undef
+	is($j->expose_cache_fresh(), 0,
+		'_cache_fresh PATH-cf-1: no cache → returns 0');
+}
+
+# PATH-cf-2: cache exists but n mismatch → return 0 on count check
+{
+	my ($p, $s) = _std_dbs();
+	my $j = Database::Join::PathBox->new(databases => [$p, $s], join_column => $JC);
+	$j->{_sqlite_cache} = { n => 99, dbh => { Active => 1 }, updated => {} };
+	is($j->expose_cache_fresh(), 0,
+		'_cache_fresh PATH-cf-2: n mismatch → returns 0');
+}
+
+# PATH-cf-3: n matches but DBI handle Active=0 → return 0 on handle check
+{
+	my ($p, $s) = _std_dbs();
+	my $j = Database::Join::PathBox->new(databases => [$p, $s], join_column => $JC);
+	$j->{_sqlite_cache} = { n => 2, dbh => { Active => 0 }, updated => {} };
+	is($j->expose_cache_fresh(), 0,
+		'_cache_fresh PATH-cf-3: DBI handle inactive → returns 0');
+}
+
+# PATH-cf-4: handle active; cached timestamp differs from current updated() → return 0
+# PathDA updated()=1; cache records 999 → mismatch
+{
+	my ($p, $s) = _std_dbs();
+	my $j = Database::Join::PathBox->new(databases => [$p, $s], join_column => $JC);
+	$j->{_sqlite_cache} = {
+		n       => 2,
+		dbh     => { Active => 1 },
+		updated => { 0 => 999, 1 => 999 },   # stale timestamps
+	};
+	is($j->expose_cache_fresh(), 0,
+		'_cache_fresh PATH-cf-4: cached ts != current updated() → returns 0');
+}
+
+# PATH-cf-5: no timestamps captured in cache (updated={}) → // next fires for every source;
+# the timestamp loop completes without returning 0 → returns 1 (all sources implicitly stable).
+{
+	my ($p, $s) = _std_dbs();
+	my $j = Database::Join::PathBox->new(databases => [$p, $s], join_column => $JC);
+	$j->{_sqlite_cache} = {
+		n       => 2,
+		dbh     => { Active => 1 },
+		updated => {},   # no timestamps → // next skips all sources
+	};
+	is($j->expose_cache_fresh(), 1,
+		'_cache_fresh PATH-cf-5: no captured timestamps → skip all → returns 1');
+}
+
+# PATH-cf-6: n, handle, and all timestamps match → returns 1 (full happy-path)
+{
+	my ($p, $s) = _std_dbs();   # both have updated()=1
+	my $j = Database::Join::PathBox->new(databases => [$p, $s], join_column => $JC);
+	$j->{_sqlite_cache} = {
+		n       => 2,
+		dbh     => { Active => 1 },
+		updated => { 0 => 1, 1 => 1 },   # matches p->updated()=1, s->updated()=1
+	};
+	is($j->expose_cache_fresh(), 1,
+		'_cache_fresh PATH-cf-6: all conditions satisfied → returns 1');
 }
 
 done_testing();

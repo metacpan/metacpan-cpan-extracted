@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::Service;
 # ABSTRACT: Service is a named abstraction of software service (for example, mysql) consisting of local port (for example 3306) that the proxy listens on, and the selector that determines which pods will answer requests sent through the proxy.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::Service - Service is a named abstraction of software ser
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ Most recently observed status of the service. Populated by the system. Read-only
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#service-v1-core>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#service-v1-core>
 
 =head1 SUPPORT
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::DownwardAPIVolumeFile;
 # ABSTRACT: DownwardAPIVolumeFile represents information to create the file containing the pod field
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s fieldRef => 'Core::V1::ObjectFieldSelector';
@@ -13,6 +13,9 @@ k8s path => Str, 'required';
 
 
 k8s resourceFieldRef => 'Core::V1::ResourceFieldSelector';
+
+
+k8s user => Int;
 
 
 1;
@@ -29,7 +32,7 @@ IO::K8s::Api::Core::V1::DownwardAPIVolumeFile - DownwardAPIVolumeFile represents
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 fieldRef
 
@@ -46,6 +49,10 @@ Required: Path is  the relative path name of the file to be created. Must not be
 =head2 resourceFieldRef
 
 Selects a resource of the container: only resources limits and requests (limits.cpu, limits.memory, requests.cpu and requests.memory) are currently supported.
+
+=head2 user
+
+user is Optional: The owner UID of the created file. If specified, the item-level user field takes precedence over defaultUser. (Alpha) This field requires the AtomicWriteVolumeUserFields feature gate to be enabled.
 
 =head1 SUPPORT
 

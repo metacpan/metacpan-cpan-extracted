@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::API::Networks;
 # ABSTRACT: Hetzner Cloud Networks API
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::Network;
 use namespace::clean;
@@ -14,6 +15,8 @@ has client => (
     required => 1,
     weak_ref => 1,
 );
+
+with 'WWW::Hetzner::Role::HasActions';
 
 sub _wrap {
     my ($self, $data) = @_;
@@ -29,12 +32,20 @@ sub _wrap_list {
 }
 
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/networks', params => \%params);
-    return $self->_wrap_list($result->{networks} // []);
+    return ($self->_wrap_list($result->{networks} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
 
 
 sub get {
@@ -103,7 +114,9 @@ sub add_subnet {
     };
     $body->{vswitch_id} = $opts{vswitch_id} if $opts{vswitch_id};
 
-    return $self->client->post("/networks/$id/actions/add_subnet", $body);
+    return $self->_wrap_action(
+        $self->client->post("/networks/$id/actions/add_subnet", $body)->{action}
+    );
 }
 
 
@@ -112,9 +125,11 @@ sub delete_subnet {
     croak "Network ID required" unless $id;
     croak "ip_range required" unless $ip_range;
 
-    return $self->client->post("/networks/$id/actions/delete_subnet", {
-        ip_range => $ip_range,
-    });
+    return $self->_wrap_action(
+        $self->client->post("/networks/$id/actions/delete_subnet", {
+            ip_range => $ip_range,
+        })->{action}
+    );
 }
 
 
@@ -124,10 +139,12 @@ sub add_route {
     croak "destination required" unless $opts{destination};
     croak "gateway required" unless $opts{gateway};
 
-    return $self->client->post("/networks/$id/actions/add_route", {
-        destination => $opts{destination},
-        gateway     => $opts{gateway},
-    });
+    return $self->_wrap_action(
+        $self->client->post("/networks/$id/actions/add_route", {
+            destination => $opts{destination},
+            gateway     => $opts{gateway},
+        })->{action}
+    );
 }
 
 
@@ -137,10 +154,12 @@ sub delete_route {
     croak "destination required" unless $opts{destination};
     croak "gateway required" unless $opts{gateway};
 
-    return $self->client->post("/networks/$id/actions/delete_route", {
-        destination => $opts{destination},
-        gateway     => $opts{gateway},
-    });
+    return $self->_wrap_action(
+        $self->client->post("/networks/$id/actions/delete_route", {
+            destination => $opts{destination},
+            gateway     => $opts{gateway},
+        })->{action}
+    );
 }
 
 
@@ -158,7 +177,7 @@ WWW::Hetzner::Cloud::API::Networks - Hetzner Cloud Networks API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -200,6 +219,15 @@ All methods return L<WWW::Hetzner::Cloud::Network> objects.
     my $networks = $cloud->networks->list(label_selector => 'env=prod');
 
 Returns arrayref of L<WWW::Hetzner::Cloud::Network> objects.
+
+=head2 list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
 
 =head2 get
 
@@ -301,7 +329,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

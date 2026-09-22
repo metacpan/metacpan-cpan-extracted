@@ -7,7 +7,7 @@ use warnings;
 
 use Kubernetes::REST::CLI::Watch;
 
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 
 my $watcher = Kubernetes::REST::CLI::Watch->new_with_options;
 $watcher->run(shift @ARGV);
@@ -24,7 +24,7 @@ kube_watch - Watch Kubernetes resources for changes
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 SYNOPSIS
 
@@ -53,10 +53,6 @@ B<kube_watch> connects to a Kubernetes cluster and watches for changes
 to resources of a given type. Events are printed as they arrive in
 real-time. The watch automatically restarts when the server-side
 timeout expires, and handles 410 Gone errors by re-listing.
-
-=head1 NAME
-
-kube_watch - Watch Kubernetes resources for changes
 
 =head1 OPTIONS
 

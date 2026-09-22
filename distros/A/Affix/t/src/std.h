@@ -49,7 +49,7 @@ void _DumpHex(const void * addr, size_t len, const char * file, int line) {
     if (perLine < 4 || perLine > 64)
         perLine = 16;
     size_t i;
-    unsigned char buff[perLine + 1];
+    unsigned char buff[65];
     const unsigned char * pc = (const unsigned char *)addr;
     if (addr == NULL) {
         fprintf(stderr, "# Dumping NULL pointer at %s line %d\n", file, line);

@@ -1,5 +1,20 @@
 Revision history for Perl extension Google::RestApi.
 
+2.2.4 2026-09-21
+        - Migrate the OAuth token creator from Google's blocked
+          out-of-band (urn:ietf:wg:oauth:2.0:oob) redirect to the loopback
+          flow. The script now starts a temporary HTTP::Daemon on
+          127.0.0.1, uses it as the redirect_uri, and captures the
+          authorisation code automatically -- no copy-and-paste. The
+          default redirect_uri in OAuth2Client changes from the dead OOB
+          value to http://localhost.
+        - Add HTTP::Daemon prerequisite; drop the now-unused Term::Prompt.
+        - Don't mutate the caller's auth hash when coercing it to an auth
+          object. RestApi::auth() deleted the 'class' key and added
+          'config_dir' directly on the hashref passed to new(), which
+          silently stripped 'class' from a caller's live config slice.
+          It now coerces a shallow copy instead.
+
 2.2.3 2026-04-30
         - Declare UTF-8 charset on JSON request bodies (Content-Type:
           application/json; charset=utf-8) so non-ASCII payloads aren't

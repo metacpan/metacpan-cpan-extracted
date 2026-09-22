@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::IPAddress;
 # ABSTRACT: IPAddress represents a single IP of a single IP Family. The object is designed to be used by APIs that operate on IP addresses. The object is used by the Service core API for allocation of IP addresses. An IP address can be represented in different formats, to guarantee the uniqueness of the IP, the name of the object is the IP address in canonical format, four decimal digits separated by dots suppressing leading zeros for IPv4 and the representation defined by RFC 5952 for IPv6. Valid: 192.168.1.5 or 2001:db8::1 or 2001:db8:aaaa:bbbb:cccc:dddd:eeee:1 Invalid: 10.01.2.3 or 2001:db8:0:0:0::1
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -20,7 +20,7 @@ IO::K8s::Api::Networking::V1::IPAddress - IPAddress represents a single IP of a 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ spec is the desired state of the IPAddress. More info: https://git.k8s.io/commun
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#ipaddress-v1-networking-k8s-io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#ipaddress-v1-networking-k8s-io>
 
 =head1 SUPPORT
 

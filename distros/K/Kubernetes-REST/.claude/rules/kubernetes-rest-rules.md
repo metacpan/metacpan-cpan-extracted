@@ -59,7 +59,7 @@ repo.
 
 - `karr list --compact` / `karr board` — open work · `karr show ID` — detail
 - `karr create "Title" --priority high --tags a,b --body '…'` · `karr edit ID -a "note"`
-  · `--claim NAME` · `--block "why"` · `karr move ID in-progress` — full surface: skill `karr`
+  · `--claim NAME` · `--block "why"` · `karr move ID in-progress` — full surface: skill `kanban-issues-karr-cli`
 
 Record drift and follow-up work as tickets rather than growing the current change. A defect
 that turns out to live in the object model belongs on **`../io-k8s-p5`**'s board, not this
@@ -118,7 +118,7 @@ specific item. Every write publishes under the maintainer's account.
 
 ## Perl conventions — reference, don't restate
 
-Module loading, Moo patterns, dependency pinning and house style live in skills `perl-core`,
-`perl-moo`, `kubernetes-rest-core`, `perl-kubernetes-rest` and `perl-release-author-getty`
+Module loading, Moo patterns, dependency pinning and house style live in skills `getty-perl-core`,
+`getty-perl-moo`, `kubernetes-rest-core`, `perl-kubernetes-rest` and `getty-perl-release-author-getty`
 (force-loaded per lane via `briefing.skills` — `.claude/agents/` defines which agent briefs
 which). Do not duplicate that content here.

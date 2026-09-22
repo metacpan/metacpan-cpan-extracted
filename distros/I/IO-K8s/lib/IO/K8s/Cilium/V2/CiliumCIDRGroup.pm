@@ -1,11 +1,12 @@
 package IO::K8s::Cilium::V2::CiliumCIDRGroup;
-# ABSTRACT: Cilium CIDR group for IP address management
-our $VERSION = '1.107';
+# ABSTRACT: CiliumCIDRGroup is a list of external CIDRs (i.e: CIDRs selecting peers outside the clusters) that can be referenced as a single entity from CiliumNetworkPolicies.
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumcidrgroups';
 
-k8s spec   => { Str => 1 };
+k8s spec => '+IO::K8s::Cilium::V2::CiliumCIDRGroupSpec', { required => 'schema' };
+
 
 1;
 
@@ -17,25 +18,15 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Cilium::V2::CiliumCIDRGroup - Cilium CIDR group for IP address management
+IO::K8s::Cilium::V2::CiliumCIDRGroup - CiliumCIDRGroup is a list of external CIDRs (i.e: CIDRs selecting peers outside the clusters) that can be referenced as a single entity from CiliumNetworkPolicies.
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-This cluster-scoped resource defines reusable sets of CIDRs that can be referenced in network policies, simplifying policy management for groups of IP ranges. It uses API version C<cilium.io/v2>. The C<spec> field contains opaque CRD-specific data structures managed by the Cilium policy controller.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<IO::K8s::Cilium> - Main Cilium CRD namespace
-
-=item * L<https://docs.cilium.io/en/stable/network/kubernetes/policy/> - Upstream Cilium network policy documentation
-
-=back
+No description in the upstream schema.
 
 =head1 SUPPORT
 

@@ -1,11 +1,12 @@
 package WWW::Hetzner::CLI::Cmd::LoadBalancer::Cmd::Create;
 # ABSTRACT: Create a load balancer
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
 use MooX::Cmd;
 use MooX::Options protect_argv => 0, usage_string => 'USAGE: hcloud.pl load-balancer create --name <name> --type <type> --location <loc>';
+with 'WWW::Hetzner::CLI::Role::WaitsForAction';
 
 option name => (
     is       => 'ro',
@@ -40,6 +41,7 @@ sub execute {
         load_balancer_type => $self->type,
         location           => $self->location,
     );
+    $self->handle_action($lb->action);
     print "Load balancer created with ID ", $lb->id, "\n";
 }
 
@@ -57,7 +59,7 @@ WWW::Hetzner::CLI::Cmd::LoadBalancer::Cmd::Create - Create a load balancer
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SUPPORT
 
@@ -80,7 +82,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

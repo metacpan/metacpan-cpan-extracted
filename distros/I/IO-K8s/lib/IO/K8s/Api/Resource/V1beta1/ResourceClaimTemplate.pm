@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1beta1::ResourceClaimTemplate;
 # ABSTRACT: ResourceClaimTemplate is used to produce ResourceClaim objects.  This is an alpha type and requires enabling the DynamicResourceAllocation feature gate.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -22,7 +22,7 @@ IO::K8s::Api::Resource::V1beta1::ResourceClaimTemplate - ResourceClaimTemplate i
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ Describes the ResourceClaim that is to be generated.  This field is immutable. A
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#resourceclaimtemplate-v1beta1-resource.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#resourceclaimtemplate-v1beta1-resource.k8s.io>
 
 =head1 SUPPORT
 

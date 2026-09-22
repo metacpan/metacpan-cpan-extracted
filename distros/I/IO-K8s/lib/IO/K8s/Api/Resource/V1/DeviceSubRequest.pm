@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1::DeviceSubRequest;
 # ABSTRACT: DeviceSubRequest describes a request for device provided in the claim.spec.devices.requests[].firstAvailable array. DeviceSubRequest is similar to ExactDeviceRequest, but doesn't expose the AdminAccess field as that one is only supported when requesting a specific device.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s allocationMode => Str;
@@ -10,6 +10,9 @@ k8s capacity => 'Resource::V1::CapacityRequirements';
 
 
 k8s count => Int;
+
+
+k8s derivedAttributes => ['Resource::V1::DeviceDerivedAttribute'];
 
 
 k8s deviceClassName => Str, 'required';
@@ -38,7 +41,7 @@ IO::K8s::Api::Resource::V1::DeviceSubRequest - DeviceSubRequest describes a requ
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 allocationMode
 
@@ -65,6 +68,18 @@ Applies to each device allocation. If Count > 1, the request fails if there aren
 =head2 count
 
 Count is used only when the count mode is "ExactCount". Must be greater than zero. If AllocationMode is ExactCount and this field is not specified, the default is one.
+
+=head2 derivedAttributes
+
+DerivedAttributes defines a set of virtual attributes computed via CEL expressions for each candidate device. These virtual attributes can be referenced in `.devices.constraints` to align and match different devices (e.g., co-allocating a GPU and a NIC on the same NUMA node) even if their drivers publish different attributes. Derived attributes are not available via `device.attributes` in the CEL environment when evaluating selector expressions.
+
+Derived attributes allow you to extract, transform, or normalize topology information (such as extracting a NUMA index from a complex topology string or renaming a vendor-specific attribute) into a common virtual attribute name at scheduling time. The scheduler then evaluates these virtual attributes exactly like static attributes when matching constraints.
+
+Every derived attribute defined in this list must be referenced by at least one MatchAttribute or DistinctAttribute constraint in the `.devices.constraints` list.
+
+The maximum number of derived attributes is 32.
+
+This is an alpha field and requires enabling the DRADerivedAttributes feature gate.
 
 =head2 deviceClassName
 

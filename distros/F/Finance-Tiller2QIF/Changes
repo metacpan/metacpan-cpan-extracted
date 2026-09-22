@@ -1,4 +1,11 @@
 Revision history for Finance-Tiller2QIF
+1.10      2026-09-22
+  - add --viewer to open preview output in an external program.
+  - add --multipreview to open the mapping file beside the preview.
+  - vscode-tiller-map extension for mapping and preview file syntax,
+    in the repository only, not shipped to CPAN.
+  - the command word may now appear after the options as well as before;
+    stray arguments on the command line are now rejected as an error.
 1.09      2026-09-08
   - tests for a challenging bakery.
   - add --version to cli

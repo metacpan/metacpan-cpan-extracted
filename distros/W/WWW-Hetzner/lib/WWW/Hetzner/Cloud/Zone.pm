@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::Zone;
 # ABSTRACT: Hetzner Cloud DNS Zone object
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::HasAction';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::API::RRSets;
 use namespace::clean;
@@ -59,8 +60,7 @@ sub delete {
     my ($self) = @_;
     croak "Cannot delete zone without ID" unless $self->id;
 
-    $self->_client->delete("/zones/" . $self->id);
-    return 1;
+    return $self->_client->zones->delete($self->id);
 }
 
 
@@ -114,7 +114,7 @@ WWW::Hetzner::Cloud::Zone - Hetzner Cloud DNS Zone object
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -192,9 +192,11 @@ Saves changes to name and labels back to the API.
 
 =head2 delete
 
-    $zone->delete;
+    my $action = $zone->delete;
 
-Deletes the zone and all its records.
+Deletes the zone and all its records. Returns the
+L<WWW::Hetzner::Action> tracking the deletion; call
+C<< $action->wait >> to block until the zone is gone.
 
 =head2 rrsets
 
@@ -251,7 +253,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -16,7 +16,7 @@ use v5.36;
 my $lib = compile_ok(<<'');
 #include "std.h"
 // ext: .c
-int poke(void * p) { return 1; }
+DLLEXPORT int poke(void * p) { return 1; }
 
 typedef 'Eventish' => Union [ motion => Struct [ x => Float, y => Float ], drop => Struct [ file => Pointer [String] ] ];
 my $buf = Affix::malloc(64);

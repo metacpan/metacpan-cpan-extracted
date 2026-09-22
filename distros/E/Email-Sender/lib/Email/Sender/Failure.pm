@@ -1,4 +1,4 @@
-package Email::Sender::Failure 2.601;
+package Email::Sender::Failure 2.603;
 # ABSTRACT: a report of failure from an email sending transport
 
 use Moo;
@@ -96,7 +96,7 @@ Email::Sender::Failure - a report of failure from an email sending transport
 
 =head1 VERSION
 
-version 2.601
+version 2.603
 
 =head1 PERL VERSION
 
@@ -154,7 +154,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo Signes.
+This software is copyright (c) 2026 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

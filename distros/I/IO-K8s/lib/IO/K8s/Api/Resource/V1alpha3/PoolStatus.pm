@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::PoolStatus;
 # ABSTRACT: PoolStatus contains status information for a single resource pool.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
 k8s allocatedDevices => Int;
@@ -18,10 +18,16 @@ k8s generation => Int, 'required';
 k8s nodeName => Str;
 
 
+k8s partitionSummary => ['Resource::V1alpha3::PartitionTypeStatus'];
+
+
 k8s poolName => Str, 'required';
 
 
 k8s resourceSliceCount => Int;
+
+
+k8s shareableSummary => 'Resource::V1alpha3::ShareableSummaryStatus';
 
 
 k8s totalDevices => Int;
@@ -47,7 +53,7 @@ IO::K8s::Api::Resource::V1alpha3::PoolStatus - PoolStatus contains status inform
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 allocatedDevices
 
@@ -69,6 +75,10 @@ Generation is the pool generation observed across all ResourceSlices in this poo
 
 NodeName is the node this pool is associated with. When omitted, the pool is not associated with a specific node. Must be a valid DNS subdomain name (RFC1123).
 
+=head2 partitionSummary
+
+PartitionSummary reports allocatability per (attribute, partition type) for a partitionable pool that publishes SharedCounters. Each entry names the grouping attribute it was resolved from: the PartitionTypeAttribute declared by a device's own slice, or for devices whose slice declares none, the default named in the request. A pool that mixes partitions declared under different attributes reports each independently. When no slice declares an attribute and the request names no default, the pool reports no partition summary.
+
 =head2 poolName
 
 PoolName is the name of the pool. Must be a valid resource pool name (DNS subdomains separated by "/").
@@ -76,6 +86,10 @@ PoolName is the name of the pool. Must be a valid resource pool name (DNS subdom
 =head2 resourceSliceCount
 
 ResourceSliceCount is the number of ResourceSlices that make up this pool. May be unset when validationError is set.
+
+=head2 shareableSummary
+
+ShareableSummary reports aggregate capacity for a pool that contains devices with AllowMultipleAllocations. It is populated only when at least one device in the pool is shareable.
 
 =head2 totalDevices
 

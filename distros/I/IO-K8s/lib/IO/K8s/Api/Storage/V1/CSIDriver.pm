@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::CSIDriver;
 # ABSTRACT: CSIDriver captures information about a Container Storage Interface (CSI) volume driver deployed on the cluster. Kubernetes attach detach controller uses this object to determine whether attach is required. Kubelet uses this object to determine whether pod information needs to be passed on mount. CSIDriver objects are non-namespaced.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -20,7 +20,7 @@ IO::K8s::Api::Storage::V1::CSIDriver - CSIDriver captures information about a Co
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ spec represents the specification of the CSI Driver.
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#csidriver-v1-storage.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#csidriver-v1-storage.k8s.io>
 
 =head1 SUPPORT
 

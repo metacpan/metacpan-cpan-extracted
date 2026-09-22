@@ -1,6 +1,6 @@
 package IO::K8s::Api::Rbac::V1::ClusterRole;
 # ABSTRACT: ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Rbac::V1::ClusterRole - ClusterRole is a cluster level, logical gr
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ Rules holds all the PolicyRules for this ClusterRole
 
 =head1 SEE ALSO
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/#clusterrole-v1-rbac.authorization.k8s.io>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/#clusterrole-v1-rbac.authorization.k8s.io>
 
 =head1 SUPPORT
 

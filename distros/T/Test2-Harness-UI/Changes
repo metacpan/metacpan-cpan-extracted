@@ -1,3 +1,9 @@
+0.000148  2026-09-21 11:47:31-07:00 America/Los_Angeles
+
+    - Write coverage, event, and reporting rows in multi-row inserts inside one transaction per flush, cutting database round trips by roughly 100x.
+    - Event stamps now keep fractional seconds.
+    - Add reporting_run_analytics and run_fields_name indexes, requested in https://github.com/Test-More/Test2-Harness/issues/457. Existing databases can apply share/schema/changes/analytics_indexes/.
+
 0.000147  2026-09-08 14:40:17-07:00 America/Los_Angeles
 
     - Add [PruneCruft] to dist.ini so build artifacts (blib/,

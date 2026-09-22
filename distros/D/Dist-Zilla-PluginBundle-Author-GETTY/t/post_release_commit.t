@@ -3,13 +3,13 @@ use warnings;
 use Test::More;
 
 use Dist::Zilla::PluginBundle::Author::GETTY;
-use Dist::Zilla::Plugin::BumpVersionAfterRelease;
 
-# @Git::VersionManager bumps the $VERSION of everything its BumpVersionAfterRelease
-# finder covers (:InstallModules *and* :ExecFiles by default), but its post-release
-# commit only allows ^lib/.*\.pm$ to be dirty. Executables under bin/ would be
-# rewritten in the working tree and never committed, leaving git with a bin/ one
-# release behind lib/. The bundle closes that gap with an extra allow_dirty_match.
+# @Git::VersionManager bumps the $VERSION of everything its configured
+# BumpVersionAfterRelease finder covers (:InstallModules and :PerlExecFiles),
+# but its post-release commit only allows ^lib/.*\.pm$ to be dirty. Perl
+# executables under bin/ would be rewritten in the working tree and never
+# committed, leaving them one release behind lib/. The bundle closes that gap
+# with an extra allow_dirty_match.
 
 sub configured_plugins {
   my (%payload) = @_;
@@ -77,24 +77,20 @@ sub git_commit {
   );
 }
 
-# Why ^bin/ is needed at all: the bump covers :ExecFiles, and with no ExecDir
-# plugin configured Dist::Zilla's default exec directory is bin.
+# Why ^bin/ is still needed: the configured bump includes Perl executables.
 {
-  my $finder = Dist::Zilla::Plugin::BumpVersionAfterRelease->meta
-    ->find_attribute_by_name('finder');
-  my $default_finders = eval {
-    $finder->default->( bless {}, 'Dist::Zilla::Plugin::BumpVersionAfterRelease' )
-  };
+  my @plugins = configured_plugins();
+  my ($bump_version) = grep {
+    $_->[1] eq 'Dist::Zilla::Plugin::BumpVersionAfterRelease'
+    || $_->[1] eq 'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional'
+  } @plugins;
 
- SKIP: {
-    skip 'cannot introspect the BumpVersionAfterRelease finder default', 1
-      unless ref $default_finders eq 'ARRAY';
-
-    ok(
-      ( grep { $_ eq ':ExecFiles' } @$default_finders ),
-      'BumpVersionAfterRelease bumps :ExecFiles by default',
-    );
-  }
+  ok($bump_version, 'BumpVersionAfterRelease (Transitional) was added');
+  is_deeply(
+    $bump_version->[2]{finder},
+    [ ':InstallModules', ':PerlExecFiles' ],
+    'BumpVersionAfterRelease bumps Perl executables by default',
+  );
 }
 
 done_testing;

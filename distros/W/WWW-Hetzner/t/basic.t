@@ -22,6 +22,7 @@ use_ok('WWW::Hetzner::Cloud::API::Servers');
 use_ok('WWW::Hetzner::Cloud::API::SSHKeys');
 use_ok('WWW::Hetzner::Cloud::API::ServerTypes');
 use_ok('WWW::Hetzner::Cloud::API::Images');
+use_ok('WWW::Hetzner::Cloud::API::ISOs');
 use_ok('WWW::Hetzner::Cloud::API::Locations');
 use_ok('WWW::Hetzner::Cloud::API::Datacenters');
 use_ok('WWW::Hetzner::Cloud::API::Zones');
@@ -34,12 +35,15 @@ use_ok('WWW::Hetzner::Cloud::API::PrimaryIPs');
 use_ok('WWW::Hetzner::Cloud::API::LoadBalancers');
 use_ok('WWW::Hetzner::Cloud::API::Certificates');
 use_ok('WWW::Hetzner::Cloud::API::PlacementGroups');
+use_ok('WWW::Hetzner::Cloud::API::LoadBalancerTypes');
+use_ok('WWW::Hetzner::Cloud::API::Pricing');
 
 # Cloud entities
 use_ok('WWW::Hetzner::Cloud::Server');
 use_ok('WWW::Hetzner::Cloud::SSHKey');
 use_ok('WWW::Hetzner::Cloud::ServerType');
 use_ok('WWW::Hetzner::Cloud::Image');
+use_ok('WWW::Hetzner::Cloud::ISO');
 use_ok('WWW::Hetzner::Cloud::Location');
 use_ok('WWW::Hetzner::Cloud::Datacenter');
 use_ok('WWW::Hetzner::Cloud::Zone');
@@ -52,6 +56,8 @@ use_ok('WWW::Hetzner::Cloud::PrimaryIP');
 use_ok('WWW::Hetzner::Cloud::LoadBalancer');
 use_ok('WWW::Hetzner::Cloud::Certificate');
 use_ok('WWW::Hetzner::Cloud::PlacementGroup');
+use_ok('WWW::Hetzner::Cloud::LoadBalancerType');
+use_ok('WWW::Hetzner::Cloud::Pricing');
 
 # Robot API
 use_ok('WWW::Hetzner::Robot');
@@ -60,11 +66,16 @@ use_ok('WWW::Hetzner::Robot::API::Keys');
 use_ok('WWW::Hetzner::Robot::API::IPs');
 use_ok('WWW::Hetzner::Robot::API::Reset');
 use_ok('WWW::Hetzner::Robot::API::Traffic');
+use_ok('WWW::Hetzner::Robot::API::Boot');
+use_ok('WWW::Hetzner::Robot::API::RDNS');
+use_ok('WWW::Hetzner::Robot::API::Failover');
 
 # Robot entities
 use_ok('WWW::Hetzner::Robot::Server');
 use_ok('WWW::Hetzner::Robot::Key');
 use_ok('WWW::Hetzner::Robot::IP');
+use_ok('WWW::Hetzner::Robot::RDNS');
+use_ok('WWW::Hetzner::Robot::Failover');
 
 # Test Cloud instantiation
 my $cloud = WWW::Hetzner::Cloud->new(token => 'test-token');

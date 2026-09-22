@@ -756,14 +756,27 @@ subtest 'new_object() vs direct Class->new() vs struct_to_object' => sub {
     is($pod2->metadata->name, 'pod2', 'direct new name');
     is($pod3->metadata->name, 'pod3', 'struct_to_object name');
 
-    # FROM_HASH calls ->new directly (no auto-inflation), so it requires
-    # pre-built objects for nested attributes with InstanceOf constraints
-    dies_ok {
-        IO::K8s::Api::Core::V1::Pod->FROM_HASH({
-            metadata => { name => 'pod4' },
-            spec     => { containers => [{ name => 'c', image => 'img' }] },
-        });
-    } 'FROM_HASH with raw hashrefs dies (no auto-inflation)';
+    # FROM_HASH now inflates nested objects through the same attribute
+    # registry as $k8s->json_to_object / struct_to_object (k59) --
+    # before 1.108 this was a bare ->new(%$hash) and died at the first
+    # object-typed field. Assert the full round-trip: raw hashrefs in,
+    # typed nested objects out, and TO_JSON matches the source struct.
+    my $pod4 = IO::K8s::Api::Core::V1::Pod->FROM_HASH({
+        metadata => { name => 'pod4' },
+        spec     => { containers => [{ name => 'c', image => 'img' }] },
+    });
+    isa_ok($pod4, 'IO::K8s::Api::Core::V1::Pod');
+    isa_ok($pod4->metadata, 'IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta');
+    is($pod4->metadata->name, 'pod4', 'FROM_HASH inflated metadata name');
+    isa_ok($pod4->spec, 'IO::K8s::Api::Core::V1::PodSpec');
+    isa_ok($pod4->spec->containers->[0], 'IO::K8s::Api::Core::V1::Container');
+    is($pod4->spec->containers->[0]->name, 'c', 'FROM_HASH inflated nested container name');
+    is_deeply($pod4->TO_JSON, {
+        kind       => 'Pod',
+        apiVersion => 'v1',
+        metadata   => { name => 'pod4' },
+        spec       => { containers => [{ name => 'c', image => 'img' }] },
+    }, 'FROM_HASH round-trips back through TO_JSON');
 };
 
 subtest 'inflate() from JSON string back to objects' => sub {

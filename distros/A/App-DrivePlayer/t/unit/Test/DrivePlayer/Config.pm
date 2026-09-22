@@ -91,6 +91,38 @@ sub auth_config : Tests(3) {
     ok exists $auth->{client_id}, 'auth_config has client_id key';
 }
 
+# A misplaced 'class' key at the google_restapi level (sibling of auth) makes
+# Google::RestApi->new reject the config. It must be stripped on load and never
+# written back, while the real auth.class key is left untouched.
+sub strips_misplaced_class_key : Tests(4) {
+    my ($self) = @_;
+
+    my $path = $self->_temp_path('stray_class.yaml');
+    DumpFile($path, {
+        google_restapi => {
+            class => 'OAuth2Client',   # misplaced sibling of auth
+            auth  => {
+                class         => 'OAuth2Client',
+                client_id     => 'cid',
+                client_secret => 'sec',
+                token_file    => 'token',
+            },
+        },
+        music_folders => [],
+    });
+
+    my $cfg = fake_config(config_file => $path);
+    is $cfg->auth_config->{class}, 'OAuth2Client', 'auth.class is preserved';
+    ok !exists $cfg->_data->{google_restapi}{class}, 'misplaced class stripped on load';
+
+    $cfg->save();
+    my $reloaded = LoadFile($path);
+    is $reloaded->{google_restapi}{auth}{class}, 'OAuth2Client',
+        'auth.class still present after save';
+    ok !exists $reloaded->{google_restapi}{class},
+        'misplaced class not written back on save';
+}
+
 # ---- music_folders ----
 
 sub music_folders_accessor : Tests(4) {

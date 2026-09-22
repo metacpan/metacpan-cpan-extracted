@@ -1,21 +1,21 @@
 package IO::K8s::Api::Core::V1::LimitRangeItem;
 # ABSTRACT: LimitRangeItem defines a min/max usage limit for any resource that matches on kind.
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 use IO::K8s::Resource;
 
-k8s default => { Str => 1 };
+k8s default => { Quantity => 1 };
 
 
-k8s defaultRequest => { Str => 1 };
+k8s defaultRequest => { Quantity => 1 };
 
 
-k8s max => { Str => 1 };
+k8s max => { Quantity => 1 };
 
 
-k8s maxLimitRequestRatio => { Str => 1 };
+k8s maxLimitRequestRatio => { Quantity => 1 };
 
 
-k8s min => { Str => 1 };
+k8s min => { Quantity => 1 };
 
 
 k8s type => Str, 'required';
@@ -35,7 +35,7 @@ IO::K8s::Api::Core::V1::LimitRangeItem - LimitRangeItem defines a min/max usage 
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head2 default
 

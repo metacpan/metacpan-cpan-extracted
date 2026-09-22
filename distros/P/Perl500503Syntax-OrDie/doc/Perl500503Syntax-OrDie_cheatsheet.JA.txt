@@ -5,7 +5,7 @@ Perl500503Syntax::OrDie チートシート（日本語）
     Perl500503Syntax::OrDie - Perl 5.005_03 ソース互換性の検証
 
 バージョン
-    0.03
+    0.05
 
 概要
     # use時に呼び出し元ファイルを自動チェック:
@@ -70,6 +70,11 @@ Perl500503Syntax::OrDie チートシート（日本語）
       sub foo :lvalue { }                  :lvalue 属性
       *name{SLOT}                          typeglobコンポーネントアクセス
       \p{} / \P{}                          正規表現内Unicodeプロパティ
+      open(my $fh, ...)                    レキシカルファイルハンドル
+      opendir(my $dh, ...)                 レキシカルディレクトリハンドル
+      binmode(FH, LAYER)                   binmodeの引数はハンドルのみ
+      use warnings / no warnings           $INC{'warnings.pm'} スタブ無しの
+                                           場合。ガード付きの記法は可
 
     Perl 5.8
       use encoding

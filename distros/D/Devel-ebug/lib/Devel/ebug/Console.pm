@@ -1,6 +1,6 @@
 package Devel::ebug::Console;
 
-our $VERSION = '0.64'; # VERSION
+our $VERSION = '0.65'; # VERSION
 
 use strict;
 use warnings;
@@ -113,9 +113,14 @@ restart Restart the program
       print "STDOUT:\n$stdout\n";
       print "STDERR:\n$stderr\n";
     } elsif ($command eq 'r') {
-      $ebug->run;
-      # TODO: Consider using this instead:
-      # eval { $ebug->run };
+      eval { $ebug->run };
+      if ($@) {
+        die $@ unless $@ =~ /^INT/;
+        # SIGINT while the program was running: the backend already
+        # dropped into the debugger, so just refresh our view of it
+        # instead of dying back out to the shell.
+        $ebug->basic;
+      }
     } elsif ($command eq 'restart') {
       $ebug->load;
     } elsif ($command =~ /^ret ?(.*)/) {
@@ -205,7 +210,7 @@ Devel::ebug::Console
 
 =head1 VERSION
 
-version 0.64
+version 0.65
 
 =head1 SYNOPSIS
 
@@ -241,7 +246,7 @@ Taisuke Yamada
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2005-2021 by Leon Brocard.
+This software is copyright (c) 2005-2026 by Leon Brocard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

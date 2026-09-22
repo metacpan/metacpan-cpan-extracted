@@ -1,9 +1,10 @@
 package WWW::Hetzner::Cloud::API::PlacementGroups;
 # ABSTRACT: Hetzner Cloud Placement Groups API
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use Moo;
+with 'WWW::Hetzner::Role::Pagination';
 use Carp qw(croak);
 use WWW::Hetzner::Cloud::PlacementGroup;
 use namespace::clean;
@@ -15,11 +16,14 @@ has client => (
     weak_ref => 1,
 );
 
+with 'WWW::Hetzner::Role::HasActions';
+
 sub _wrap {
-    my ($self, $data) = @_;
+    my ($self, $data, %extra) = @_;
     return WWW::Hetzner::Cloud::PlacementGroup->new(
         client => $self->client,
         %$data,
+        %extra,
     );
 }
 
@@ -29,12 +33,20 @@ sub _wrap_list {
 }
 
 
-sub list {
+sub _list_page {
     my ($self, %params) = @_;
 
     my $result = $self->client->get('/placement_groups', params => \%params);
-    return $self->_wrap_list($result->{placement_groups} // []);
+    return ($self->_wrap_list($result->{placement_groups} // []), $result->{meta});
 }
+
+sub list {
+    my ($self, %params) = @_;
+
+    my ($entities) = $self->_list_page(%params);
+    return $entities;
+}
+
 
 
 sub get {
@@ -60,7 +72,10 @@ sub create {
     $body->{labels} = $params{labels} if $params{labels};
 
     my $result = $self->client->post('/placement_groups', $body);
-    return $self->_wrap($result->{placement_group});
+    return $self->_wrap(
+        $result->{placement_group},
+        action => $self->_wrap_action($result->{action}),
+    );
 }
 
 
@@ -99,7 +114,7 @@ WWW::Hetzner::Cloud::API::PlacementGroups - Hetzner Cloud Placement Groups API
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -137,6 +152,15 @@ to increase availability. All methods return L<WWW::Hetzner::Cloud::PlacementGro
     my $pgs = $cloud->placement_groups->list(label_selector => 'env=prod');
 
 Returns arrayref of L<WWW::Hetzner::Cloud::PlacementGroup> objects.
+
+=head2 list_all
+
+    my $entities = $controller->list_all(per_page => 50, %filters);
+
+Returns a combined arrayref. Inherited from
+L<WWW::Hetzner::Role::Pagination/list_all>. Unlike L</list>, which fetches
+one page, it follows every subsequent page starting at page 1 or the supplied
+C<page>. It carries C<per_page>, filters, and sort values to every request.
 
 =head2 get
 
@@ -201,7 +225,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -85,6 +85,14 @@ has log_lines => (
     default => sub { {} },
 );
 
+# Record of every request seen by call(), for tests that assert the request
+# shape (method, path, body) rather than only the inflated result. Each entry
+# is { method => ..., path => ..., content => ... }.
+has requests => (
+    is => 'ro',
+    default => sub { [] },
+);
+
 sub add_response {
     my ($self, $method, $path, $data) = @_;
     my $key = lc($method) . $path;
@@ -106,6 +114,12 @@ sub call {
     # Strip query parameters for path matching
     my $clean_path = $path;
     $clean_path =~ s{\?.*}{};
+
+    push @{ $self->requests }, {
+        method  => $method,
+        path    => $clean_path,
+        content => $req->content,
+    };
 
     # Check for log lines (one-shot mode, log paths end with /log)
     if (my $lines = $self->log_lines->{$clean_path}) {

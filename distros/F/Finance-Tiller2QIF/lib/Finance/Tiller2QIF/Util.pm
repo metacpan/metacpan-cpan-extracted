@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::Util;
 # ABSTRACT: Utility functions for Tiller2QIF processing
-$Finance::Tiller2QIF::Util::VERSION = '1.09';
+$Finance::Tiller2QIF::Util::VERSION = '1.10';
 =head1 DESCRIPTION
 
 Provides utility functions for initializing the SQLite database and configuration files.
@@ -52,6 +52,7 @@ our @EXPORT_OK = qw( vPrint );
 use Path::Tiny;
 use Text::CSV;
 use Finance::Tiller2QIF::DB qw( connect_db );
+use Finance::Tiller2QIF::WriteQIF;
 use utf8;
 use warnings FATAL => 'utf8';
 use open ':std', ':encoding(UTF-8)';
@@ -97,6 +98,14 @@ my $example = q|
   # QIF date format: ymd (ISO, default), mdy (US), dmy (European)
   # "qifdate": "ymd",
 
+  # Where preview output goes: console (default) prints to the terminal,
+  # anything else names an external program, eg "less" or "code --wait"
+  # "viewer": "console",
+
+  # Open the mapping file in the viewer alongside the preview.
+  # Requires viewer and mapfile.
+  # "multipreview": true,
+
   "verbose":    false,
   "checkpoint": false,
   "confirm":    false
@@ -122,7 +131,7 @@ sub CheckConfig (%options) {
   say "Options Provided:";
   for ( sort keys %options ) {
 
-    say sprintf "  %-8s : %s", $_, $options{$_};
+    say sprintf "  %-14s : %s", $_, $options{$_};
   }
 
   say '';
@@ -152,6 +161,12 @@ sub CheckConfig (%options) {
     unless ( -w path( $options{output} )->parent ) {
       say "Problem ${options{output}} parent directory is not writable";
     }
+  }
+  if ( defined $options{viewer}
+    && lc $options{viewer} ne 'console' )
+  {
+    eval { Finance::Tiller2QIF::WriteQIF::ResolveViewer( $options{viewer} ); 1 }
+      or do { chomp( my $err = $@ ); say "Problem: $err" };
   }
 }
 

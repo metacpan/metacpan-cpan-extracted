@@ -1,12 +1,12 @@
 package IO::K8s::Cilium::V2::CiliumBGPAdvertisement;
-# ABSTRACT: Cilium BGP route advertisement
-our $VERSION = '1.107';
+# ABSTRACT: CiliumBGPAdvertisement is the Schema for the ciliumbgpadvertisements API
+our $VERSION = '1.108';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumbgpadvertisements';
 
-k8s spec   => { Str => 1 };
-k8s status => { Str => 1 };
+k8s spec => '+IO::K8s::Cilium::V2::CiliumBGPAdvertisementSpec', { required => 'schema' };
+
 
 1;
 
@@ -18,25 +18,15 @@ __END__
 
 =head1 NAME
 
-IO::K8s::Cilium::V2::CiliumBGPAdvertisement - Cilium BGP route advertisement
+IO::K8s::Cilium::V2::CiliumBGPAdvertisement - CiliumBGPAdvertisement is the Schema for the ciliumbgpadvertisements API
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
-=head1 DESCRIPTION
+=head2 spec
 
-This cluster-scoped resource defines which routes or IP addresses to advertise via BGP to external routers, controlling what network information Cilium shares with the broader network infrastructure. It uses API version C<cilium.io/v2>. The C<spec> and C<status> fields contain opaque CRD-specific data structures managed by the Cilium BGP control plane controller.
-
-=head1 SEE ALSO
-
-=over
-
-=item * L<IO::K8s::Cilium> - Main Cilium CRD namespace
-
-=item * L<https://docs.cilium.io/en/stable/network/bgp-control-plane/> - Upstream Cilium BGP control plane documentation
-
-=back
+No description in the upstream schema.
 
 =head1 SUPPORT
 

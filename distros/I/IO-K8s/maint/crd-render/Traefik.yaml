@@ -1,0 +1,188 @@
+# Traefik CRD emitter overlay (D5/D6/D7, k95, task B-Traefik).
+#
+# Read by maint/crd-drift-check.pl --render/--check for --provider Traefik.
+# `names` maps the logical path below each Kind (what
+# IO::K8s::AutoGen::class_path returns, e.g. "Spec::RateLimit") to the
+# upstream Go type name at the pinned upstream_version (v3.7.12):
+#   pkg/provider/kubernetes/crd/traefikio/v1alpha1/*.go (CRD-local types)
+#   pkg/config/dynamic/*.go ("dynamic.X" types embedded by the CRD types)
+#   pkg/types/domains.go (types.Domain), pkg/tls/tls.go (tls.GeneratedCert)
+# A Go type reused verbatim by several Kinds (Service, ServerHealthCheck,
+# PassiveServerHealthCheck, ResponseForwarding, Sticky, Cookie, IPStrategy,
+# SourceCriterion, ProxyProtocol, RootCA, Spiffe, Domain, Certificate) maps
+# to the same bare name at every occurrence -- one shared class, per D6.
+# `with`/`extra` are copied verbatim from the roots this overlay replaces.
+base: IO::K8s::Traefik
+kinds:
+  IngressRoute:
+    extra:
+    - sub _route_format { 'traefik' }
+    names:
+      Spec::RoutesItem: Route
+      Spec::RoutesItem::Observability: RouterObservabilityConfig
+      Spec::RoutesItem::ServicesItem: Service
+      Spec::RoutesItem::ServicesItem::HealthCheck: ServerHealthCheck
+      Spec::RoutesItem::ServicesItem::PassiveHealthCheck: PassiveServerHealthCheck
+      Spec::RoutesItem::ServicesItem::ResponseForwarding: ResponseForwarding
+      Spec::RoutesItem::ServicesItem::Sticky: Sticky
+      Spec::RoutesItem::ServicesItem::Sticky::Cookie: Cookie
+      Spec::Tls: TLS
+      Spec::Tls::DomainsItem: Domain
+    with:
+    - IO::K8s::Role::Namespaced
+    - IO::K8s::Role::Routable
+  IngressRouteTCP:
+    extra: []
+    names:
+      Spec::RoutesItem: RouteTCP
+      Spec::RoutesItem::ServicesItem: ServiceTCP
+      Spec::RoutesItem::ServicesItem::ProxyProtocol: ProxyProtocol
+      Spec::Tls: TLSTCP
+      Spec::Tls::DomainsItem: Domain
+    with:
+    - IO::K8s::Role::Namespaced
+  IngressRouteUDP:
+    extra: []
+    names:
+      Spec::RoutesItem: RouteUDP
+      Spec::RoutesItem::ServicesItem: ServiceUDP
+    with:
+    - IO::K8s::Role::Namespaced
+  Middleware:
+    extra: []
+    names:
+      Spec::AddPrefix: AddPrefix
+      Spec::BasicAuth: BasicAuth
+      Spec::Buffering: Buffering
+      Spec::Chain: Chain
+      Spec::CircuitBreaker: CircuitBreaker
+      Spec::Compress: Compress
+      Spec::ContentType: ContentType
+      Spec::DigestAuth: DigestAuth
+      Spec::EncodedCharacters: EncodedCharacters
+      Spec::Errors: ErrorPage
+      Spec::Errors::Service: Service
+      Spec::Errors::Service::HealthCheck: ServerHealthCheck
+      Spec::Errors::Service::PassiveHealthCheck: PassiveServerHealthCheck
+      Spec::Errors::Service::ResponseForwarding: ResponseForwarding
+      Spec::Errors::Service::Sticky: Sticky
+      Spec::Errors::Service::Sticky::Cookie: Cookie
+      Spec::ForwardAuth: ForwardAuth
+      Spec::ForwardAuth::Tls: ClientTLSWithCAOptional
+      Spec::GrpcWeb: GrpcWeb
+      Spec::Headers: Headers
+      Spec::InFlightReq: InFlightReq
+      Spec::InFlightReq::SourceCriterion: SourceCriterion
+      Spec::InFlightReq::SourceCriterion::IpStrategy: IPStrategy
+      Spec::IpAllowList: IPAllowList
+      Spec::IpAllowList::IpStrategy: IPStrategy
+      Spec::IpWhiteList: IPWhiteList
+      Spec::IpWhiteList::IpStrategy: IPStrategy
+      Spec::PassTLSClientCert: PassTLSClientCert
+      Spec::PassTLSClientCert::Info: TLSClientCertificateInfo
+      Spec::PassTLSClientCert::Info::Issuer: TLSClientCertificateIssuerDNInfo
+      Spec::PassTLSClientCert::Info::Subject: TLSClientCertificateSubjectDNInfo
+      Spec::RateLimit: RateLimit
+      Spec::RateLimit::Redis: Redis
+      Spec::RateLimit::Redis::Tls: ClientTLS
+      Spec::RateLimit::SourceCriterion: SourceCriterion
+      Spec::RateLimit::SourceCriterion::IpStrategy: IPStrategy
+      Spec::RedirectRegex: RedirectRegex
+      Spec::RedirectScheme: RedirectScheme
+      Spec::ReplacePath: ReplacePath
+      Spec::ReplacePathRegex: ReplacePathRegex
+      Spec::Retry: Retry
+      Spec::StripPrefix: StripPrefix
+      Spec::StripPrefixRegex: StripPrefixRegex
+    with:
+    - IO::K8s::Role::Namespaced
+    - IO::K8s::Role::MiddlewareBuilder
+  MiddlewareTCP:
+    extra: []
+    names:
+      Spec::InFlightConn: TCPInFlightConn
+      Spec::IpAllowList: TCPIPAllowList
+      Spec::IpWhiteList: TCPIPWhiteList
+    with:
+    - IO::K8s::Role::Namespaced
+    - IO::K8s::Role::MiddlewareTCPBuilder
+  ServersTransport:
+    extra: []
+    names:
+      Spec::ForwardingTimeouts: ForwardingTimeouts
+      Spec::RootCAsItem: RootCA
+      Spec::Spiffe: Spiffe
+    with:
+    - IO::K8s::Role::Namespaced
+  ServersTransportTCP:
+    extra: []
+    names:
+      Spec::ProxyProtocol: ProxyProtocol
+      Spec::Tls: TLSClientConfig
+      Spec::Tls::RootCAsItem: RootCA
+      Spec::Tls::Spiffe: Spiffe
+    with:
+    - IO::K8s::Role::Namespaced
+  TLSOption:
+    extra: []
+    names:
+      Spec::ClientAuth: ClientAuth
+    with:
+    - IO::K8s::Role::Namespaced
+  TLSStore:
+    extra: []
+    names:
+      Spec::CertificatesItem: Certificate
+      Spec::DefaultCertificate: Certificate
+      Spec::DefaultGeneratedCert: GeneratedCert
+      Spec::DefaultGeneratedCert::Domain: Domain
+    with:
+    - IO::K8s::Role::Namespaced
+  TraefikService:
+    extra: []
+    names:
+      Spec::Failover: Failover
+      Spec::Failover::Errors: FailoverError
+      Spec::Failover::Fallback: LoadBalancerSpec
+      Spec::Failover::Fallback::HealthCheck: ServerHealthCheck
+      Spec::Failover::Fallback::PassiveHealthCheck: PassiveServerHealthCheck
+      Spec::Failover::Fallback::ResponseForwarding: ResponseForwarding
+      Spec::Failover::Fallback::Sticky: Sticky
+      Spec::Failover::Fallback::Sticky::Cookie: Cookie
+      Spec::Failover::Service: LoadBalancerSpec
+      Spec::Failover::Service::HealthCheck: ServerHealthCheck
+      Spec::Failover::Service::PassiveHealthCheck: PassiveServerHealthCheck
+      Spec::Failover::Service::ResponseForwarding: ResponseForwarding
+      Spec::Failover::Service::Sticky: Sticky
+      Spec::Failover::Service::Sticky::Cookie: Cookie
+      Spec::HighestRandomWeight: HighestRandomWeight
+      Spec::HighestRandomWeight::ServicesItem: Service
+      Spec::HighestRandomWeight::ServicesItem::HealthCheck: ServerHealthCheck
+      Spec::HighestRandomWeight::ServicesItem::PassiveHealthCheck: PassiveServerHealthCheck
+      Spec::HighestRandomWeight::ServicesItem::ResponseForwarding: ResponseForwarding
+      Spec::HighestRandomWeight::ServicesItem::Sticky: Sticky
+      Spec::HighestRandomWeight::ServicesItem::Sticky::Cookie: Cookie
+      Spec::Mirroring: Mirroring
+      Spec::Mirroring::HealthCheck: ServerHealthCheck
+      Spec::Mirroring::MirrorsItem: MirrorService
+      Spec::Mirroring::MirrorsItem::HealthCheck: ServerHealthCheck
+      Spec::Mirroring::MirrorsItem::PassiveHealthCheck: PassiveServerHealthCheck
+      Spec::Mirroring::MirrorsItem::ResponseForwarding: ResponseForwarding
+      Spec::Mirroring::MirrorsItem::Sticky: Sticky
+      Spec::Mirroring::MirrorsItem::Sticky::Cookie: Cookie
+      Spec::Mirroring::PassiveHealthCheck: PassiveServerHealthCheck
+      Spec::Mirroring::ResponseForwarding: ResponseForwarding
+      Spec::Mirroring::Sticky: Sticky
+      Spec::Mirroring::Sticky::Cookie: Cookie
+      Spec::Weighted: WeightedRoundRobin
+      Spec::Weighted::ServicesItem: Service
+      Spec::Weighted::ServicesItem::HealthCheck: ServerHealthCheck
+      Spec::Weighted::ServicesItem::PassiveHealthCheck: PassiveServerHealthCheck
+      Spec::Weighted::ServicesItem::ResponseForwarding: ResponseForwarding
+      Spec::Weighted::ServicesItem::Sticky: Sticky
+      Spec::Weighted::ServicesItem::Sticky::Cookie: Cookie
+      Spec::Weighted::Sticky: Sticky
+      Spec::Weighted::Sticky::Cookie: Cookie
+    with:
+    - IO::K8s::Role::Namespaced
+    - IO::K8s::Role::Loadbalanced

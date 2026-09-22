@@ -1,5 +1,5 @@
 package Kubernetes::REST::Core;
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 # ABSTRACT: Compatibility helper for deprecated v0 Core calls
 use Moo;
 extends 'Kubernetes::REST::V0Group';
@@ -20,7 +20,7 @@ Kubernetes::REST::Core - Compatibility helper for deprecated v0 Core calls
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 SYNOPSIS
 
@@ -41,8 +41,6 @@ The new v1 API uses simple methods directly on the main L<Kubernetes::REST> obje
     $api->create($pod)
     $api->update($pod)
     $api->delete($pod)
-
-All calls to this module emit deprecation warnings unless C<$ENV{HIDE_KUBERNETES_REST_V0_API_WARNING}> is set.
 
 See L<Kubernetes::REST/"UPGRADING FROM 0.02"> for migration guide.
 

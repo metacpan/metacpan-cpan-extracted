@@ -8,12 +8,30 @@ use Module::Runtime qw(require_module);
 use JSON::MaybeXS;
 use Scalar::Util ();
 use IO::K8s::AutoGen;
+use IO::K8s::Resource ();
+use IO::K8s::Unstructured ();
 use namespace::clean;
 
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 
 # Track which classes we've auto-generated
 my %_autogen_cache;
+
+# Generated classes outlive their IO::K8s instance, so a freed instance's
+# reusable object address cannot identify its namespace.
+my $_autogen_namespace_sequence = 0;
+
+# Classes load_class() has already pulled in successfully.
+#
+# ONLY successes are recorded, and only after require_module has returned:
+# a failed load dies before the store, so a name that was not loadable when
+# it was first asked for is tried again on the next call. That is the whole
+# point of not writing this as a plain memo of the outcome -- a negative
+# entry would make a package that only becomes available later (defined at
+# runtime and registered in %INC, or a module installed mid-process)
+# permanently unloadable, and the resulting failure would depend on which
+# lookup happened first.
+my %_loaded_class;
 
 # Default resource map. Two kinds of key live here:
 #
@@ -41,7 +59,7 @@ my %_autogen_cache;
 # Adding a Kind: one short name pointing at the newest stable shipped
 # version, plus one qualified key per shipped version. Omitting the
 # qualified key means an explicit GVK request fails closed, even when a
-# bare compatibility alias exists for the Kind -- see karr #11 and #17.
+# bare compatibility alias exists for the Kind -- see k11 and k17.
 #
 # Deliberately absent: Kinds served only by CRD providers (those live in
 # the provider's own resource_map, opt in via
@@ -137,12 +155,13 @@ my %DEFAULT_RESOURCE_MAP = (
 
     # -- Resource (Dynamic Resource Allocation) ----------------------------
     DeviceClass                                          => 'Api::Resource::V1::DeviceClass',
-    DeviceTaintRule                                      => 'Api::Resource::V1beta2::DeviceTaintRule',
+    DeviceTaintRule                                      => 'Api::Resource::V1::DeviceTaintRule',
     ResourceClaim                                        => 'Api::Resource::V1::ResourceClaim',
     ResourceClaimTemplate                                => 'Api::Resource::V1::ResourceClaimTemplate',
     ResourcePoolStatusRequest                            => 'Api::Resource::V1alpha3::ResourcePoolStatusRequest',
     ResourceSlice                                        => 'Api::Resource::V1::ResourceSlice',
     'resource.k8s.io/v1/DeviceClass'                     => 'Api::Resource::V1::DeviceClass',
+    'resource.k8s.io/v1/DeviceTaintRule'                 => 'Api::Resource::V1::DeviceTaintRule',
     'resource.k8s.io/v1/ResourceClaim'                   => 'Api::Resource::V1::ResourceClaim',
     'resource.k8s.io/v1/ResourceClaimTemplate'           => 'Api::Resource::V1::ResourceClaimTemplate',
     'resource.k8s.io/v1/ResourceSlice'                   => 'Api::Resource::V1::ResourceSlice',
@@ -207,9 +226,11 @@ my %DEFAULT_RESOURCE_MAP = (
 
     # -- Certificates ------------------------------------------------------
     CertificateSigningRequest                           => 'Api::Certificates::V1::CertificateSigningRequest',
-    ClusterTrustBundle                                  => 'Api::Certificates::V1beta1::ClusterTrustBundle',
-    PodCertificateRequest                               => 'Api::Certificates::V1beta1::PodCertificateRequest',
+    ClusterTrustBundle                                  => 'Api::Certificates::V1::ClusterTrustBundle',
+    PodCertificateRequest                               => 'Api::Certificates::V1::PodCertificateRequest',
     'certificates.k8s.io/v1/CertificateSigningRequest'  => 'Api::Certificates::V1::CertificateSigningRequest',
+    'certificates.k8s.io/v1/ClusterTrustBundle'         => 'Api::Certificates::V1::ClusterTrustBundle',
+    'certificates.k8s.io/v1/PodCertificateRequest'      => 'Api::Certificates::V1::PodCertificateRequest',
     'certificates.k8s.io/v1alpha1/ClusterTrustBundle'   => 'Api::Certificates::V1alpha1::ClusterTrustBundle',
     'certificates.k8s.io/v1beta1/ClusterTrustBundle'    => 'Api::Certificates::V1beta1::ClusterTrustBundle',
     'certificates.k8s.io/v1beta1/PodCertificateRequest' => 'Api::Certificates::V1beta1::PodCertificateRequest',
@@ -227,12 +248,18 @@ my %DEFAULT_RESOURCE_MAP = (
     'discovery.k8s.io/v1/EndpointSlice' => 'Api::Discovery::V1::EndpointSlice',
 
     # -- Scheduling --------------------------------------------------------
-    PodGroup                              => 'Api::Scheduling::V1alpha2::PodGroup',
+    CompositePodGroup                     => 'Api::Scheduling::V1alpha3::CompositePodGroup',
+    PodGroup                              => 'Api::Scheduling::V1beta1::PodGroup',
     PriorityClass                         => 'Api::Scheduling::V1::PriorityClass',
-    Workload                              => 'Api::Scheduling::V1alpha2::Workload',
-    'scheduling.k8s.io/v1/PriorityClass'  => 'Api::Scheduling::V1::PriorityClass',
-    'scheduling.k8s.io/v1alpha2/PodGroup' => 'Api::Scheduling::V1alpha2::PodGroup',
-    'scheduling.k8s.io/v1alpha2/Workload' => 'Api::Scheduling::V1alpha2::Workload',
+    Workload                              => 'Api::Scheduling::V1beta1::Workload',
+    'scheduling.k8s.io/v1/PriorityClass'           => 'Api::Scheduling::V1::PriorityClass',
+    'scheduling.k8s.io/v1alpha2/PodGroup'          => 'Api::Scheduling::V1alpha2::PodGroup',
+    'scheduling.k8s.io/v1alpha2/Workload'          => 'Api::Scheduling::V1alpha2::Workload',
+    'scheduling.k8s.io/v1alpha3/CompositePodGroup' => 'Api::Scheduling::V1alpha3::CompositePodGroup',
+    'scheduling.k8s.io/v1alpha3/PodGroup'          => 'Api::Scheduling::V1alpha3::PodGroup',
+    'scheduling.k8s.io/v1alpha3/Workload'          => 'Api::Scheduling::V1alpha3::Workload',
+    'scheduling.k8s.io/v1beta1/PodGroup'           => 'Api::Scheduling::V1beta1::PodGroup',
+    'scheduling.k8s.io/v1beta1/Workload'           => 'Api::Scheduling::V1beta1::Workload',
 
     # -- Node --------------------------------------------------------------
     RuntimeClass                  => 'Api::Node::V1::RuntimeClass',
@@ -268,8 +295,17 @@ my %DEFAULT_RESOURCE_MAP = (
     'admissionregistration.k8s.io/v1beta1/ValidatingAdmissionPolicy'         => 'Api::Admissionregistration::V1beta1::ValidatingAdmissionPolicy',
     'admissionregistration.k8s.io/v1beta1/ValidatingAdmissionPolicyBinding'  => 'Api::Admissionregistration::V1beta1::ValidatingAdmissionPolicyBinding',
 
+    # -- Lifecycle ---------------------------------------------------------
+    # Eviction is a collision Kind: the bare short name stays with the
+    # established policy/v1 Eviction, so lifecycle.k8s.io's Eviction is
+    # reachable by its qualified GVK only.
+    EvictionRequest                             => 'Api::Lifecycle::V1alpha1::EvictionRequest',
+    'lifecycle.k8s.io/v1alpha1/Eviction'        => 'Api::Lifecycle::V1alpha1::Eviction',
+    'lifecycle.k8s.io/v1alpha1/EvictionRequest' => 'Api::Lifecycle::V1alpha1::EvictionRequest',
+
     # -- Storage version migration -----------------------------------------
-    StorageVersionMigration                                    => 'Api::Storagemigration::V1beta1::StorageVersionMigration',
+    StorageVersionMigration                                    => 'Api::Storagemigration::V1::StorageVersionMigration',
+    'storagemigration.k8s.io/v1/StorageVersionMigration'       => 'Api::Storagemigration::V1::StorageVersionMigration',
     'storagemigration.k8s.io/v1alpha1/StorageVersionMigration' => 'Api::Storagemigration::V1alpha1::StorageVersionMigration',
     'storagemigration.k8s.io/v1beta1/StorageVersionMigration'  => 'Api::Storagemigration::V1beta1::StorageVersionMigration',
 
@@ -309,6 +345,29 @@ has with => (
     default => sub { [] },
 );
 
+# Unknown-field policy for this instance's entry points (D1). 0: a field no
+# class declares is kept and emitted again by TO_JSON. 1: it dies naming the
+# class and the field. Applied by localizing $IO::K8s::Resource::STRICT in
+# inflate, new_object, json_to_object and struct_to_object, so it reaches
+# every nested constructor -- including the inline-struct coercers, which
+# never pass through _inflate_struct. load and load_yaml inherit it through
+# new_object / inflate.
+has strict => (
+    is      => 'ro',
+    default => sub { 0 },
+);
+
+# Unknown-Kind policy (D4). '': the current fail-closed default -- inflate
+# and new_object die with the GVK resolution error below when apiVersion/kind
+# resolves to no registered class (built-in, CRD-registered, or AutoGen'd).
+# 'unstructured': build an IO::K8s::Unstructured from the document instead of
+# dying. Any other value keeps the fail-closed default unchanged -- only the
+# literal string 'unstructured' opts in.
+has unknown_kinds => (
+    is      => 'ro',
+    default => sub { '' },
+);
+
 # User namespaces to search for pre-built classes (checked before IO::K8s::)
 # e.g. ['MyProject::K8s'] will look for MyProject::K8s::HelmChart before IO::K8s::...
 has class_namespaces => (
@@ -321,9 +380,8 @@ has _autogen_namespace => (
     is => 'ro',
     lazy => 1,
     default => sub {
-        my $self = shift;
-        # Create unique identifier based on object address
-        my $id = sprintf('%x', 0 + $self);
+        # A process-wide sequence remains unique after an instance is freed.
+        my $id = sprintf('%x', ++$_autogen_namespace_sequence);
         return "IO::K8s::_AUTOGEN_$id";
     },
 );
@@ -348,6 +406,12 @@ sub BUILD {
 # not known until it is merged, so those have to be introspected.
 sub _qualify_class_path {
     my ($map, $kind, $class_path) = @_;
+
+    # A key that already carries a '/' is an exact GVK request, not a bare
+    # Kind: it is meant to be registered verbatim (see the GatewayAPI
+    # ReferenceGrant and AgentSandbox entries). Re-qualifying it would build a
+    # junk "$group/$version/$group/$version/$Kind" key (k61).
+    return if $kind =~ m{/};
 
     my $full_class = $class_path =~ /^\+/
         ? substr($class_path, 1) : "IO::K8s::$class_path";
@@ -403,6 +467,37 @@ sub add {
     return $self;
 }
 
+
+sub add_crd {
+    my ($self, @inputs) = @_;
+    require IO::K8s::CRD;
+    my %opts;
+    if (@inputs > 1 && ref $inputs[-1] eq 'HASH' && !exists $inputs[-1]{kind}) {
+        %opts = %{ pop @inputs };
+    }
+    my %registered;
+    for my $input (@inputs) {
+        for my $crd (@{ IO::K8s::CRD->load($input) }) {
+            my $classes = IO::K8s::CRD->generate($crd, $self->_autogen_namespace, %opts);
+            my $kind    = $crd->{spec}{names}{kind};
+            my $storage = $classes->{storage};
+            my %map = map { ("$_/$kind" => '+' . $classes->{$_}) } grep { $_ ne 'storage' } keys %$classes;
+            $map{$kind} = '+' . $classes->{$storage};
+            $self->add(\%map);
+            # See the POD above: merge into an existing registration for this
+            # Kind (two CRDs from different groups sharing a bare Kind) rather
+            # than overwriting it -- 'storage' is left alone so it keeps the
+            # first registration's value.
+            if (my $reg = $registered{$kind}) {
+                $reg->{$_} = $classes->{$_} for grep { $_ ne 'storage' && !exists $reg->{$_} } keys %$classes;
+            } else {
+                $registered{$kind} = { %$classes };
+            }
+        }
+    }
+    return \%registered;
+}
+
 # Expand short class name to full class path
 # Supports:
 #   'Pod'                    -> lookup in resource_map -> IO::K8s::Api::Core::V1::Pod
@@ -410,10 +505,17 @@ sub add {
 #   'IO::K8s::...'           -> returned as-is
 #   '+MyApp::K8s::Resource'  -> MyApp::K8s::Resource (+ prefix = full class name)
 #
-# Search order:
-#   1. User's class_namespaces (if class exists)
-#   2. IO::K8s built-in (resource_map or relative path)
-#   3. Auto-generate from openapi_spec (if available)
+# Search order (versionless path; an explicitly supplied apiVersion takes the
+# exact-GVK path above and never falls through to these):
+#   1. '+Full::Class' / 'IO::K8s::...'  - verbatim
+#   2. resource_map, domain-qualified key then short name (via _resolve_mapped,
+#      which checks class_namespaces first)
+#   3. User's class_namespaces
+#   4. A loaded or loadable class of exactly that name -- multi-segment names
+#      only ('My::StaticWebSite'); a single-segment bare name is read as a
+#      Kubernetes Kind and skips this step (k35)
+#   5. IO::K8s relative path
+#   6. Auto-generate from openapi_spec (if available)
 sub expand_class {
     my $api_version_supplied = @_ >= 3;
     my ($self, $class, $api_version) = @_;
@@ -426,9 +528,9 @@ sub expand_class {
     # An explicitly supplied apiVersion is an exact GVK request, including
     # undef or an empty string. It never falls through to a bare Kind or
     # class-name fallback: a class that cannot confirm the requested version
-    # must not be substituted silently (karr #17). The one exception is the
+    # must not be substituted silently (k17). The one exception is the
     # resource_map's own short-name key — a legitimate GVK source when the
-    # mapped class's api_version() matches the request (karr #31). AutoGen
+    # mapped class's api_version() matches the request (k31). AutoGen
     # joins in only for an exact group/version match in the openapi_spec's
     # x-kubernetes-group-version-kind metadata and fails closed otherwise
     # (no silent fallback to another version).
@@ -439,7 +541,7 @@ sub expand_class {
             return $self->_resolve_mapped($map->{$qualified}, $class);
         }
         # No qualified key: the short-name key is a GVK source when the
-        # mapped class itself confirms the requested version (karr #31).
+        # mapped class itself confirms the requested version (k31).
         # It has priority over AutoGen — the user explicitly registered it.
         if (my $mapped_class = $self->_resolve_short_name_gvk($map, $class, $api_version)) {
             return $mapped_class;
@@ -454,15 +556,12 @@ sub expand_class {
     # Already a full IO::K8s class name - return as-is
     return $class if $class =~ /^IO::K8s::/;
 
-    # Already a loaded class (e.g. CRD class passed by ref) - return as-is
-    return $class if _class_exists($class);
-
     # Domain-qualified string: 'cilium.io/v2/NetworkPolicy'
     if ($class =~ m{/}) {
         if (exists $map->{$class}) {
             return $self->_resolve_mapped($map->{$class}, (split m{/}, $class)[-1]);
         }
-        # karr #31: same short-name fallback, apiVersion taken from the string.
+        # k31: same short-name fallback, apiVersion taken from the string.
         my ($av, $kind) = $class =~ m{\A(.*)/([^/]*)\z};
         if (my $mapped_class = $self->_resolve_short_name_gvk($map, $kind, $av)) {
             return $mapped_class;
@@ -484,11 +583,43 @@ sub expand_class {
         }
     }
 
-    # 2. Check IO::K8s relative path
+    # 2. A MULTI-SEGMENT class name that is loaded, or loadable from @INC.
+    #    This is the documented CRD case: a class named in full, e.g.
+    #    'My::StaticWebSite'. It has to load, not just test — _resolve_mapped()
+    #    returns a '+'-prefixed resource_map value without loading it, and a
+    #    consumer may name their class here before anything has pulled it in.
+    #
+    #    Must stay *below* the resource_map lookup (k34, GH #7/#8). A bare
+    #    Kind is a Kubernetes Kind first and a package name second: with this
+    #    ahead of the map, smokers that had the CPAN distributions Event or Role
+    #    installed got those back from expand_class('Event')/('Role') instead of
+    #    IO::K8s::Api::Core::V1::Event / IO::K8s::Api::Rbac::V1::Role.
+    #
+    #    Single-segment names are excluded outright (k35). Below the map
+    #    they were only reachable for a Kind the model does not know, but that
+    #    still shadowed AutoGen: with an openapi_spec defining kind 'Widget'
+    #    and a top-level Widget.pm installed, expand_class('Widget') returned
+    #    the foreign distribution instead of the generated class. A one-segment
+    #    bare name carries no namespace to tell a Kind from a package, so it is
+    #    read as a Kind: it goes on to IO::K8s::<Kind> and then to AutoGen.
+    #    Multi-segment names are unambiguous and keep the probe.
+    #
+    #    What used to force this check to also catch single-segment names was
+    #    struct_to_object() re-expanding an already-resolved class. It no
+    #    longer does — new_object()/json_to_object()/_inflate_struct() hand
+    #    their resolved name to _struct_to_object_expanded() instead (k35),
+    #    so a resource_map value of '+Widget', or new_object('+Widget'),
+    #    never reaches expand_class() a second time.
+    #
+    #    Escape hatches for a single-segment class of your own, all documented:
+    #    '+Widget', class_namespaces, or a resource_map entry.
+    return $class if $class =~ /::/ && _class_exists($class);
+
+    # 3. Check IO::K8s relative path
     my $builtin_class = 'IO::K8s::' . $class;
     return $builtin_class if _class_exists($builtin_class);
 
-    # 3. Try auto-generation for unknown types
+    # 4. Try auto-generation for unknown types
     if (ref($self) && $self->has_openapi_spec) {
         my $autogen = $self->_autogen_class_for($class);
         return $autogen if $autogen;
@@ -540,13 +671,13 @@ sub _resolve_mapped {
     return $builtin_class;
 }
 
-# karr #31: resolve a resource_map short-name key as a GVK source on the
+# k31: resolve a resource_map short-name key as a GVK source on the
 # explicit-apiVersion path. The qualified '$api_version/$Kind' key is the
 # primary lookup; this is the fallback for a map that only carries the
 # short name (e.g. a CRD registered as 'StaticWebSite => "+My::StaticWebSite"').
 #
 # Fail closed: the mapped class must exist, expose api_version(), and report
-# exactly the requested version — otherwise undef (karr #17 semantics: never
+# exactly the requested version — otherwise undef (k17 semantics: never
 # substitute a class that cannot verify the request). No class is loaded
 # unless the short-name key exists, and _class_exists short-circuits on
 # $class->can('new'), so the common qualified-key hit costs nothing.
@@ -690,11 +821,26 @@ sub _gvk_api_version {
 
 sub load_class {
     my ($self, $class) = @_;
+
+    # Memoised: this is called once per nested object on every inflate and
+    # once per hashref coercion into a named class, and require_module does
+    # real work every time -- validate the module name, rewrite '::' to '/',
+    # append '.pm', then require -- to reach a %INC hit that has been true
+    # since the first call. Measured at ~1.9us per call against ~0.05us for
+    # the lookup below, worth ~15% of a full inflate (k102 round).
+    #
+    # `defined` first: an undef $class must keep dying out of Module::Runtime
+    # with its own 'argument is not a module name' message (the k39 path),
+    # not warn about an uninitialized hash key on the way there.
+    return 1 if defined $class && $_loaded_class{$class};
     require_module $class;
+    $_loaded_class{$class} = 1;
+    return 1;
 }
 
 sub json_to_object {
     my ($self, $class_or_json, $json) = @_;
+    local $IO::K8s::Resource::STRICT = $self->strict;
 
     # If only one argument, auto-detect class from kind
     if (!defined $json) {
@@ -702,21 +848,43 @@ sub json_to_object {
     }
 
     # Two arguments: class and JSON
-    my $class = $self->expand_class($class_or_json);
+    my $class = $self->_expand_class_or_die($class_or_json);
     my $struct = $self->json->decode($json);
-    return $self->struct_to_object($class, $struct);
+    return $self->_struct_to_object_expanded($class, $struct);
 }
 
 sub struct_to_object {
     my ($self, $class_or_struct, $params) = @_;
+    local $IO::K8s::Resource::STRICT = $self->strict;
 
     # If only one argument (a hashref), auto-detect class from kind
     if (!defined $params && ref($class_or_struct) eq 'HASH') {
         return $self->inflate($class_or_struct);
     }
 
-    # Two arguments: class and params
-    my $class = $self->expand_class($class_or_struct);
+    # Two arguments: a class name that still needs resolving, plus params.
+    # This is the public entry point, so the name may be anything
+    # expand_class() accepts (a short Kind, a domain-qualified GVK string, a
+    # '+' full class). Callers that already hold a resolved class name must
+    # use _struct_to_object_expanded() instead — see k35.
+    return $self->_struct_to_object_expanded(
+        $self->_expand_class_or_die($class_or_struct), $params);
+}
+
+# struct_to_object() minus the name resolution: $class is already the final
+# class name.
+#
+# Split out for k35. new_object()/json_to_object() used to call
+# expand_class() and then hand the result to struct_to_object(), which
+# expanded it a second time. That second pass re-entered the full search
+# order, so an exactly-resolved name could be re-interpreted:
+# new_object('+Secret', ...) resolved to 'Secret', and the re-expansion found
+# 'Secret' in the resource_map and returned the core v1 Kind instead of the
+# caller's class. It also forced expand_class()'s loadable-class probe to
+# stay broad enough to catch already-resolved names, which is what kept the
+# shadow window open.
+sub _struct_to_object_expanded {
+    my ($self, $class, $params) = @_;
 
     # Already an object of the right class — pass through as-is
     return $params if Scalar::Util::blessed($params) && $params->isa($class);
@@ -734,20 +902,36 @@ sub struct_to_object {
 
 sub inflate {
     my ($self, $data) = @_;
+    local $IO::K8s::Resource::STRICT = $self->strict;
 
     # Accept both JSON string and hashref
     my $struct = ref($data) eq 'HASH' ? $data : $self->json->decode($data);
 
     my $kind = $struct->{kind}
         or die "Cannot inflate: missing 'kind' field in data";
+
+    # A List-shaped Kind ('List' itself, or any '...List') routes to the
+    # generic IO::K8s::List container rather than expand_class(): the
+    # per-Kind *List classes were removed in 1.105 in favour of it, so no
+    # resource_map entry -- qualified or bare -- will ever resolve one, and
+    # it owns its own inflation (deriving item types from its own
+    # kind/apiVersion; see IO::K8s::List::FROM_STRUCT, k46).
+    if ($kind =~ /List\z/) {
+        require IO::K8s::List;
+        return IO::K8s::List->FROM_STRUCT($struct, $self);
+    }
+
     my $api_version_supplied = exists $struct->{apiVersion};
     my $api_version = $struct->{apiVersion};
 
     my $class = $api_version_supplied
         ? $self->expand_class($kind, $api_version)
-        : $self->expand_class($kind);
-    _die_resolution_error($kind, $api_version)
-        if $api_version_supplied && !defined $class;
+        : $self->_expand_class_or_die($kind);
+    if ($api_version_supplied && !defined $class) {
+        return $self->_unstructured_from_struct($struct)
+            if $self->unknown_kinds eq 'unstructured';
+        _die_resolution_error($kind, $api_version);
+    }
     $self->load_class($class);
     my $inflated = $self->_inflate_struct($class, $struct);
     return $class->new(%$inflated);
@@ -755,6 +939,7 @@ sub inflate {
 
 sub new_object {
     my ($self, $short_class, @args) = @_;
+    local $IO::K8s::Resource::STRICT = $self->strict;
 
     # Support:
     #   ->new_object('Pod', { ... })
@@ -771,15 +956,84 @@ sub new_object {
         $params = { @args };
     }
 
+    # An apiVersion inside the params hash is an exact-GVK request too -- the
+    # same key inflate() reads and honours. new_object used to ignore it and
+    # resolve the short name to whatever version it defaults to, silently
+    # substituting a version the caller did not ask for (k62). Honour it
+    # for symmetry with inflate; when an explicit positional api_version is
+    # also given the two must agree, or it is a genuine conflict and we fail
+    # closed rather than pick one (the house line of k37/k39).
+    if (ref($params) eq 'HASH' && exists $params->{apiVersion}) {
+        my $inner = $params->{apiVersion};
+        if ($api_version_supplied) {
+            croak "new_object: conflicting apiVersion for kind '$short_class' -- "
+                . "params hash says '" . (defined $inner ? $inner : '<undef>')
+                . "', positional argument says '"
+                . (defined $api_version ? $api_version : '<undef>') . "'"
+                if (defined $inner xor defined $api_version)
+                || (defined $inner && defined $api_version && $inner ne $api_version);
+        } else {
+            $api_version = $inner;
+            $api_version_supplied = 1;
+        }
+    }
+
     my $class = $api_version_supplied
         ? $self->expand_class($short_class, $api_version)
-        : $self->expand_class($short_class);
-    _die_resolution_error($short_class, $api_version)
-        if $api_version_supplied && !defined $class;
-    if (!defined($class) && $short_class =~ m{\A(.*)/([^/]*)\z}) {
+        : $self->_expand_class_or_die($short_class);
+    if ($api_version_supplied && !defined $class) {
+        if ($self->unknown_kinds eq 'unstructured') {
+            my %struct = (ref($params) eq 'HASH') ? %$params : ();
+            $struct{kind} = $short_class unless exists $struct{kind};
+            $struct{apiVersion} = $api_version unless exists $struct{apiVersion};
+            return $self->_unstructured_from_struct(\%struct);
+        }
+        _die_resolution_error($short_class, $api_version);
+    }
+    return $self->_struct_to_object_expanded($class, $params);
+}
+
+# unknown_kinds => 'unstructured' opt-in (D4): build an untyped
+# IO::K8s::Unstructured envelope from a document instead of dying, called
+# only from the two GVK-resolution-failure sites above -- inflate()'s
+# apiVersion-supplied branch and new_object()'s equivalent. apiVersion/kind
+# land on their own typed attributes; everything else preserved through
+# FROM_HASH's normal D1 handling (an undeclared constructor key is kept in
+# _unknown_fields and re-emitted by TO_JSON).
+#
+# strict => 1 is deliberately exempted here: inflate/new_object localize
+# $IO::K8s::Resource::STRICT for the whole call, but Unstructured never
+# declares spec/status/etc, so every field beyond apiVersion/kind/metadata
+# would trip strict on the one class whose entire purpose is preserving
+# them. The exemption is scoped to this fallback alone -- a registered
+# Kind (a Pod with a bogus field, say) still dies under strict, since this
+# sub is only ever reached once resolution has already failed.
+sub _unstructured_from_struct {
+    my ($self, $struct) = @_;
+    local $IO::K8s::Resource::STRICT = 0;
+    return IO::K8s::Unstructured->FROM_HASH($struct);
+}
+
+# expand_class() for a caller-supplied name that carries no separate
+# $api_version argument, failing closed the way the explicit-apiVersion path
+# already does.
+#
+# A name with its apiVersion inside the string ('cilium.io/v2/UnknownKind') is
+# an exact GVK request just like a separate argument, so an unresolvable one
+# comes back undef. That undef must become the GVK error here: passed on, it
+# reaches load_class() and dies out of Module::Runtime with 'argument is not a
+# module name', which names neither the kind nor the apiVersion (k39).
+#
+# A name WITHOUT a domain qualifier is not an undef case and must not become
+# one: expand_class() falls back to IO::K8s::<Name> there, so an unknown bare
+# Kind keeps failing on the missing module, not on GVK resolution.
+sub _expand_class_or_die {
+    my ($self, $name) = @_;
+    my $class = $self->expand_class($name);
+    if (!defined($class) && $name =~ m{\A(.*)/([^/]*)\z}) {
         _die_resolution_error($2, $1);
     }
-    return $self->struct_to_object($class, $params);
+    return $class;
 }
 
 sub _die_resolution_error {
@@ -822,9 +1076,10 @@ sub _inflate_struct {
         my $value = $params->{$attr};
         next unless defined $value;
 
-        # Pass through opaque fields without type coercion
+        # Pass through opaque fields without type coercion -- but not as the
+        # caller's own reference (k54), see the else branch below.
         if ($opaque_fields{$attr}) {
-            $args{$attr} = $value;
+            $args{$attr} = _shallow_copy($value);
             next;
         }
 
@@ -832,22 +1087,57 @@ sub _inflate_struct {
         my $perl_name = $json_to_perl{$attr} // $attr;
         my $info = $attr_info->{$perl_name} // {};
 
+        # The registry's {class} is always a final class name: the k8s DSL
+        # runs every declared type through IO::K8s::Resource::_expand_class
+        # before storing it, and generated inline structs are named in full.
+        # So these go straight to the pre-expanded path — sending them back
+        # through expand_class() would re-interpret a name that is already
+        # resolved (k35).
         if ($info->{is_array_of_objects}) {
             my $inner_class = $info->{class};
-            $args{$attr} = [ map { $self->struct_to_object($inner_class, $_) } @$value ];
+            $args{$attr} = [ map { $self->_struct_to_object_expanded($inner_class, $_) } @$value ];
         } elsif ($info->{is_hash_of_objects}) {
             my $inner_class = $info->{class};
-            $args{$attr} = { map { $_ => $self->struct_to_object($inner_class, $value->{$_}) } keys %$value };
+            $args{$attr} = { map { $_ => $self->_struct_to_object_expanded($inner_class, $value->{$_}) } keys %$value };
         } elsif ($info->{is_object}) {
-            $args{$attr} = $self->struct_to_object($info->{class}, $value);
+            $args{$attr} = $self->_struct_to_object_expanded($info->{class}, $value);
         } elsif ($info->{is_bool}) {
-            $args{$attr} = (ref($value) eq '' && lc($value) eq 'true') || $value ? 1 : 0;
+            # Same normalization the Bool coercer in IO::K8s::Resource applies.
+            # It has to be the same one: this runs before $class->new(%args),
+            # so whatever it decides is all the coercer ever gets to see, and
+            # a wrong answer here cannot be rescued downstream (k37).
+            # On bad data it dies without naming the field; the constructor
+            # path gets that context for free from Moo's coercion wrapper,
+            # this path has to attach it itself (k42). $attr is the JSON
+            # key -- the name that appears in the caller's manifest.
+            $args{$attr} = eval { IO::K8s::Resource::_normalize_bool($value) };
+            if (my $err = $@) {
+                $err =~ s/\n\z//;
+                die "$err while inflating $class field $attr\n";
+            }
         } else {
-            $args{$attr} = $value;
+            # Arrays of scalars, hashes of scalars and anything untyped: the
+            # inflated object must not share the caller's containers, or later
+            # edits to the source struct silently rewrite the object (k54).
+            # One level only, matching the output side in
+            # IO::K8s::Role::Resource::TO_JSON: a nested structure under an
+            # opaque hash attribute (fieldsV1, a free-form HashRef) still
+            # shares its inner refs with the struct it was inflated from.
+            $args{$attr} = _shallow_copy($value);
         }
     }
 
     return \%args;
+}
+
+# One level of copying for a plain container, deliberately not deeper -- see
+# the callers above (k54). Anything that is not a plain ARRAY or HASH
+# (a scalar, a blessed value, a JSON boolean object) is returned untouched.
+sub _shallow_copy {
+    my ($value) = @_;
+    return [ @$value ] if ref $value eq 'ARRAY';
+    return { %$value } if ref $value eq 'HASH';
+    return $value;
 }
 
 sub object_to_struct {
@@ -933,7 +1223,7 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 =head1 VERSION
 
-version 1.107
+version 1.108
 
 =head1 SYNOPSIS
 
@@ -944,8 +1234,12 @@ version 1.107
   # Load .pk8s manifest files (Perl DSL)
   my $resources = $k8s->load('myapp.pk8s');
 
-  # Load and validate YAML manifests
+  # Load YAML manifests and validate declared field types
   my $resources = $k8s->load_yaml('deployment.yaml');
+
+  # Also reject fields the current model does not declare
+  my $strict_k8s = IO::K8s->new(strict => 1);
+  my $strict_resources = $strict_k8s->load_yaml('deployment.yaml');
 
   # Validate with error collection
   my ($objs, $errors) = $k8s->load_yaml($yaml, collect_errors => 1);
@@ -991,13 +1285,52 @@ version 1.107
 =head1 DESCRIPTION
 
 This module provides objects and serialization / deserialization methods that represent
-the structures found in the Kubernetes API L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/>
+the structures found in the Kubernetes API L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/>
 
 Kubernetes API is strict about input types. When a value is expected to be an integer,
 sending it as a string will cause rejection. This module ensures correct value types
 in JSON that can be sent to Kubernetes.
 
 It also inflates JSON returned by Kubernetes into typed Perl objects.
+
+=head2 add_crd
+
+    my $registered = $k8s->add_crd('crds/knobs.yaml', $crd_object, \%crd_hash, ...);
+
+Loads each argument through L<IO::K8s::CRD/load>, generates one class per
+served version in this instance's AutoGen namespace, and registers them:
+every version under its domain-qualified key (C<group/version/Kind>), the
+storage version under the bare Kind -- through L</add>, so a class already
+holding the short name (a provider merged earlier) keeps it and the CRD's
+class stays reachable by its qualified key. Returns
+C<< { $Kind => { $api_version => $class, ..., storage => $api_version } } >>.
+Classes are cached by group/version/Kind within this instance's AutoGen
+namespace (L<IO::K8s::CRD/generate>), so re-adding an edited manifest on
+the same C<$k8s> silently returns the class generated the first time --
+call C<add_crd> on a fresh instance to pick up schema changes; classes
+generated by any call live for the life of the process regardless, so a
+reload loop that builds a fresh C<$k8s> per iteration (rather than calling
+C<add_crd> again on the same one) accumulates classes rather than freeing
+the old ones -- C<add_crd> is meant to run once at startup, not inside a
+polling loop.
+
+Two CRDs can legitimately share a bare Kind across groups (their
+domain-qualified keys, not the Kind alone, are what actually disambiguate
+them) -- calling C<add_crd> for both merges the second's version entries
+into the first's return value under that Kind rather than replacing it
+outright, and C<storage> stays whichever the FIRST registration reported,
+mirroring L</add>'s own first-registration-wins rule for a short-name
+collision.
+
+A trailing hashref of options is forwarded to L<IO::K8s::CRD/generate> (and
+from there to L<IO::K8s::AutoGen/get_or_generate>) for every CRD in this
+call:
+
+    $k8s->add_crd('crds/knobs.yaml', { reuse_core => 0 });
+
+Distinguished from a CRD document by the absence of a C<kind> key -- every
+CRD hashref L<IO::K8s::CRD/load> accepts has one -- so it must be the LAST
+argument and only one is read per call.
 
 =head1 NAME
 
@@ -1008,9 +1341,11 @@ IO::K8s - Objects representing things found in the Kubernetes API
 IO::K8s uses a layered architecture. Understanding these layers helps when
 working with built-in resources or writing your own CRD classes.
 
-=head2 IO::K8s::Resource (base layer)
+=head2 IO::K8s::Resource (setup layer)
 
-All Kubernetes objects inherit from L<IO::K8s::Resource>. It provides:
+Declaring a class with C<use IO::K8s::Resource> imports L<Moo>, installs the
+C<k8s> DSL, and composes L<IO::K8s::Role::Resource>. It does not make that
+class C<isa('IO::K8s::Resource')>. It provides:
 
 =over 4
 
@@ -1036,9 +1371,9 @@ The C<k8s> DSL supports these type specifications:
 
 =head2 IO::K8s::APIObject (top-level resources)
 
-L<IO::K8s::APIObject> extends C<IO::K8s::Resource> for top-level API objects
-(Pod, Deployment, Service, etc.) by applying L<IO::K8s::Role::APIObject>.
-This adds:
+L<IO::K8s::APIObject> uses the same setup for top-level API objects
+(Pod, Deployment, Service, etc.) and additionally composes
+L<IO::K8s::Role::APIObject>. It adds:
 
 =over 4
 
@@ -1048,7 +1383,9 @@ This adds:
 
 =item * C<kind()> - derived from the last segment of the class name
 
-=item * C<resource_plural()> - returns C<undef> (auto-pluralize) by default, override for CRDs
+=item * C<resource_plural()> - the plural Kubernetes addresses the Kind by
+(C<pods>, C<networkpolicies>, C<ingresses>), from a table generated off the
+upstream spec for built-in types; CRDs declare their own
 
 =item * C<to_yaml()> - serialize to YAML suitable for C<kubectl apply -f>
 
@@ -1065,8 +1402,9 @@ C</namespaces/{ns}/>).
 =head1 WRITING CRD CLASSES
 
 To use Custom Resource Definitions with L<Kubernetes::REST>, write a Perl
-class using C<IO::K8s::APIObject>. This is the same base used by all built-in
-Kubernetes types like Pod, Deployment, and Service.
+class using C<IO::K8s::APIObject>. It gives a custom class the same Moo/DSL
+setup and top-level APIObject role composition as built-in Kubernetes types
+like Pod, Deployment, and Service.
 
 =head2 Minimal CRD class
 
@@ -1106,10 +1444,16 @@ don't follow the C<IO::K8s::Api::*> convention.
 
 =item C<resource_plural> (recommended for CRDs)
 
-The plural resource name for URL building, e.g. C<'staticwebsites'>. Must
-match the CRD's C<spec.names.plural>. If omitted, L<Kubernetes::REST>
-auto-pluralizes the kind name (C<StaticWebSite> -> C<staticwebsites>), but
-this heuristic doesn't work for all names.
+The plural resource name for URL building and RBAC C<resources:> rules,
+e.g. C<'staticwebsites'>. Must match the CRD's C<spec.names.plural>. An
+explicit value always wins over anything IO::K8s knows.
+
+Built-in Kinds do not need this: their plurals come from a table generated
+off the upstream OpenAPI spec's REST paths. CRDs do, because there is no
+spec to read them from. If omitted, C<resource_plural()> returns C<undef>
+and the caller is left to pluralize the kind name itself
+(C<StaticWebSite> -E<gt> C<staticwebsites>) -- that heuristic does not work
+for all names, which is exactly why declaring it is recommended.
 
 =back
 
@@ -1169,12 +1513,28 @@ on demand:
   # Create IO::K8s with auto-generation enabled
   my $k8s = IO::K8s->new(openapi_spec => $spec);
 
-  # Now inflate works for ANY type in the cluster
+  # An unknown Kind with an unambiguous GVK definition in this spec auto-generates a class
   my $addon = $k8s->inflate($k3s_addon_json);   # k3s.cattle.io/v1 Addon
   my $chart = $k8s->inflate($helmchart_json);   # helm.cattle.io/v1 HelmChart
 
 Auto-generated classes are placed in a unique namespace per IO::K8s instance
 (e.g., C<IO::K8s::_AUTOGEN_abc123::...>) to avoid collisions.
+
+=head2 From a CustomResourceDefinition manifest
+
+Loading a CRD manifest directly -- see L</add_crd> -- generates one class
+per served version and goes further than the OpenAPI-spec path above: every
+inline C<type: object> schema below the top level, which is how a CRD
+schema is written everywhere below its Kind, becomes its own nested class
+named after its place in the parent (C<< <Kind>::<Prop> >>, with an
+C<Item> / C<Value> suffix for array items and map values) instead of an
+opaque hash of strings, so field options and the unknown-field bag apply at
+every level. Hash-style access on such a field still works -- a Moo object
+is a blessed hash keyed by attribute name -- so code that reads
+C<< $obj->{spec}{mode} >> does not need to change either way. Only a
+property-less object and an C<additionalProperties>-only map (nothing
+underneath to attach options to) stay opaque. L<IO::K8s::CRD::Emitter>
+renders the same classes as checked-in source.
 
 =head2 Explicit generation with IO::K8s::AutoGen
 
@@ -1230,6 +1590,55 @@ When kinds collide (e.g. both core and Cilium have C<NetworkPolicy>), the
 first-registered entry keeps the short name. All entries are always reachable
 via domain-qualified names (C<api_version/Kind>).
 
+=head2 strict
+
+Optional. Boolean, default C<0>. Governs what happens when a constructor key
+matches no declared attribute, at any nesting level. With the default C<0> the
+field is kept and re-emitted by C<TO_JSON> (see
+L<IO::K8s::Role::Resource/UNKNOWN FIELDS>); with C<1> it dies instead, with
+C<Unknown field 'E<lt>nameE<gt>' for E<lt>classE<gt>>.
+
+    my $k8s = IO::K8s->new(strict => 1);
+    $k8s->new_object('Pod', { spec => { bogusField => 1 } });
+    # dies: Unknown field 'bogusField' for IO::K8s::Api::Core::V1::PodSpec
+
+C<strict> is read by L</inflate>, L</new_object>, L</json_to_object> and
+L</struct_to_object>; L</load> and L</load_yaml> inherit it because both
+build on C<inflate>/C<new_object>. It applies for the duration of that one
+call, including every nested object it constructs along the way.
+
+Since k99, L<IO::K8s::List>, the envelope a list Kind inflates to, also
+composes L<IO::K8s::Role::Resource>: its own top-level keys are preserved
+and checked under C<strict> exactly like any other resource's, alongside
+the objects inside C<items>, each through its own class.
+
+=head2 unknown_kinds
+
+Optional. String, default C<''>. Governs what L</inflate> and L</new_object>
+do when a document's C<apiVersion>/C<kind> (or an explicit C<api_version>
+argument) amount to a GVK request that resolves to no registered class --
+built-in, CRD-registered via C<add()>/C<add_crd()>, or AutoGen'd from
+C<openapi_spec>. With the default C<''> this keeps failing closed exactly as
+without the option, dying with:
+
+    Cannot resolve Kubernetes GVK: kind '<kind>', apiVersion '<apiVersion>'
+
+With C<< unknown_kinds => 'unstructured' >>, that failure instead builds an
+L<IO::K8s::Unstructured> from the document: C<apiVersion>, C<kind> and
+C<metadata> land on typed attributes, everything else round-trips through
+the C<_unknown_fields> bag (D1) exactly as an undeclared field on any other
+class does.
+
+    my $k8s = IO::K8s->new(unknown_kinds => 'unstructured');
+    my $obj = $k8s->inflate($document);   # an IO::K8s::Unstructured, not a die
+
+Any value other than the literal string C<'unstructured'> -- including one
+left unset -- keeps the fail-closed default; this is strictly opt-in. C<<
+strict => 1 >> combined with this option still dies on a registered Kind
+with an unexpected field the normal way; the C<Unstructured> envelope itself
+is exempt from C<strict>, since every field beyond
+C<apiVersion>/C<kind>/C<metadata> is precisely what it exists to preserve.
+
 =head2 openapi_spec
 
 Optional. The OpenAPI v2 specification from a Kubernetes cluster. When provided,
@@ -1246,6 +1655,16 @@ HashRef mapping short names (like C<Pod>) and domain-qualified names
 (like C<networking.k8s.io/v1/NetworkPolicy>) to class paths. Defaults to
 built-in mappings for standard Kubernetes resources. Each instance gets its
 own copy, so modifications via C<add()> do not affect other instances.
+
+=head2 json
+
+A L<JSON::MaybeXS> encoder/decoder configured with C<utf8 =E<gt> 1> and
+C<canonical =E<gt> 1>. Used by L</object_to_json>, L</json_to_object> and
+L</inflate> for their default encoding/decoding. Override at construction
+when the caller needs a different encoder (for example, to disable
+C<canonical> for tighter output, or to swap in a different backend):
+
+    my $k8s = IO::K8s->new(json => JSON::MaybeXS->new(utf8 => 1));
 
 =head1 METHODS
 
@@ -1322,13 +1741,16 @@ With CRDs (requires openapi_spec):
 Load a YAML manifest file (or YAML string) and return an ArrayRef of IO::K8s
 objects. Supports multi-document YAML (separated by C<--->).
 
-This method validates the YAML against the Kubernetes types. If a field has
-the wrong type or an unknown field is used, an error is thrown. This is useful
-for validating manifests before applying them to a cluster.
+This method validates declared fields against the Kubernetes types. A declared
+field with the wrong type throws an error. By default, an undeclared field is
+kept for forward-compatible round-tripping; construct C<IO::K8s> with
+C<< strict => 1 >> to reject it instead. This is useful for validating
+manifests before applying them to a cluster.
 
-    # Validate a manifest file
+    # Validate a manifest file and reject undeclared fields
+    my $strict_k8s = IO::K8s->new(strict => 1);
     eval {
-        my $objs = $k8s->load_yaml('deployment.yaml');
+        my $objs = $strict_k8s->load_yaml('deployment.yaml');
         say "Valid! Contains " . scalar(@$objs) . " resources";
     };
     if ($@) {
@@ -1362,10 +1784,43 @@ resources and C<errors> is an ArrayRef of error messages.
 
 Create a new Kubernetes object of the given type. The type can be a short name
 (like C<Pod>), a domain-qualified name (like C<cilium.io/v2/NetworkPolicy>),
-or a full class path.
+or a full class path (like C<My::StaticWebSite>).
+
+A bare one-word name is always read as a Kubernetes Kind, never as a package
+name, so it resolves through the resource map, C<class_namespaces>,
+C<IO::K8s::>E<lt>KindE<gt> and auto-generation -- a same-named top-level
+distribution that happens to be installed is not consulted. To name a
+single-segment class of your own, prefix it: C<< $k8s->new_object('+Widget',
+\%args) >>.
 
 An optional third argument specifies the C<api_version> to disambiguate when
 multiple providers register the same kind name.
+
+An C<apiVersion> key inside the params hash is honoured symmetrically with
+L</inflate>: it is treated as the exact GVK the caller wants, and the
+short name resolves against it instead of whichever version the class
+defaults to. When a positional C<api_version> is also given and the two
+disagree -- including one being defined and the other undef -- this
+croaks rather than picking one (k62):
+
+    new_object: conflicting apiVersion for kind 'NetworkPolicy' --
+    params hash says 'cilium.io/v2', positional argument says 'networking.k8s.io/v1'
+
+If the name is domain-qualified (like C<cilium.io/v2/NetworkPolicy>) or an
+explicit C<api_version> argument is given, it is a GVK (Group/Version/Kind)
+request. When such a request cannot be resolved to a class, the call dies
+rather than silently falling back to a different version or a similarly-named
+class:
+
+    Cannot resolve Kubernetes GVK: kind 'UnknownKind', apiVersion 'nonexistent.io/v1'
+
+A bare unqualified name is not a GVK request and is exempt from this check --
+as described above, it falls back to C<IO::K8s::>E<lt>KindE<gt>, and if that
+class doesn't exist either, the failure is Perl's own module-loading error
+(C<Can't locate ... in @INC>), not the GVK error.
+
+This same fail-closed behaviour applies uniformly across C<new_object>,
+C<inflate>, C<json_to_object> and C<struct_to_object>.
 
 =head2 inflate
 
@@ -1377,6 +1832,10 @@ auto-detected from the C<kind> field in the data. When external resource maps
 have been added via C<add()>, the C<apiVersion> field is used to disambiguate
 colliding kind names.
 
+If C<kind>/C<apiVersion> amount to a GVK request that cannot be resolved, this
+dies with the same fail-closed error as L</new_object> -- see there for the
+exact message and the bare-Kind exemption.
+
 =head2 json_to_object
 
     my $obj = $k8s->json_to_object($json_with_kind);
@@ -1385,6 +1844,11 @@ colliding kind names.
 Convert JSON to an IO::K8s object. With one argument, auto-detects the class
 from C<kind>. With two arguments, uses the specified class.
 
+When the class argument is a GVK request (domain-qualified, or paired with an
+C<api_version>) that cannot be resolved, this dies with the same fail-closed
+error as L</new_object> -- see there for the exact message and the bare-Kind
+exemption.
+
 =head2 struct_to_object
 
     my $obj = $k8s->struct_to_object(\%hashref_with_kind);
@@ -1392,6 +1856,11 @@ from C<kind>. With two arguments, uses the specified class.
 
 Convert a Perl hashref to an IO::K8s object. With one argument, auto-detects
 the class from C<kind>. With two arguments, uses the specified class.
+
+When the class argument is a GVK request (domain-qualified, or paired with an
+C<api_version>) that cannot be resolved, this dies with the same fail-closed
+error as L</new_object> -- see there for the exact message and the bare-Kind
+exemption.
 
 If the target class provides a C<FROM_STRUCT> class method, it is called as
 C<< $class->FROM_STRUCT($struct, $k8s) >> and its return value is used as-is,
@@ -1416,11 +1885,55 @@ Serialize an IO::K8s object to JSON.
 
 Convert an IO::K8s object to a plain Perl hashref.
 
+=head2 expand_class
+
+    my $class = $k8s->expand_class('Pod');
+    my $class = $k8s->expand_class('cilium.io/v2/NetworkPolicy');
+    my $class = $k8s->expand_class('NetworkPolicy', 'cilium.io/v2');
+
+Resolve a name to a Perl class. The name can be a short Kind, a
+domain-qualified C<api_version/Kind>, or a full class path (prefix with
+C<+> for a verbatim class name, or write the C<IO::K8s::> prefix in
+full). Returns the class name as a string -- this method does not load
+the class.
+
+An explicit C<api_version> makes the lookup an exact GVK request: when
+no class can confirm the requested version, returns C<undef>. The
+qualified C<api_version/Kind> form is checked first against the resource
+map, then a short-name key whose mapped class itself reports the
+requested C<api_version>, then the C<openapi_spec> for an auto-generated
+class. Anything else fails closed rather than substituting a different
+version (k17).
+
+A bare unqualified name is B<not> a GVK request: it falls through to
+C<IO::K8s::>E<lt>KindE<gt> and then to auto-generation, and a name that
+resolves to nothing fails with the usual module-loading exception, not
+the GVK error.
+
+=head2 load_class
+
+    $k8s->load_class('IO::K8s::Api::Core::V1::Pod');
+
+Load (C<< require >>) a class by name. Used internally after
+L</expand_class> to make sure the class is in C<%INC> before the caller
+hands it to C<< $class->new >>. Dies with the usual C<Can't locate ... in
+@INC> message when the class is not installable.
+
+Successful loads are remembered process-wide, so the second and every
+later call for the same name costs a hash lookup instead of a
+C<require>. Failures are B<not> remembered: a name that did not load is
+attempted again on the next call, which is what keeps a package that
+only becomes available later -- one defined at runtime and registered in
+C<%INC>, or a module installed mid-process -- reachable.
+
 =head1 CILIUM CRD SUPPORT
 
-IO::K8s includes L<IO::K8s::Cilium> with 23 Cilium CRD classes covering
-C<cilium.io/v2> (12 CRDs) and C<cilium.io/v2alpha1> (11 CRDs). These are
-not loaded by default -- opt in at construction:
+IO::K8s includes L<IO::K8s::Cilium> with 31 resource-map entries: 22
+short-name Kinds (17 C<cilium.io/v2> + 5 C<cilium.io/v2alpha1>) and 9
+domain-qualified back-compat tracks for v2alpha1 BGP/CIDR/LoadBalancerIPPool,
+CiliumBGPPeeringPolicy, and CiliumExternalWorkload. The compatibility tracks
+remain reachable for older clusters without displacing the current short-name
+Kind. These are not loaded by default -- opt in at construction:
 
   my $k8s = IO::K8s->new(with => ['IO::K8s::Cilium']);
 
@@ -1454,7 +1967,8 @@ Create a class that consumes L<IO::K8s::Role::ResourceMap>:
       };
   }
 
-See L<IO::K8s::Cilium> for a real-world example with 23 CRD classes.
+See L<IO::K8s::Cilium> for a real-world provider with 22 current short-name
+Kinds and nine domain-qualified compatibility tracks.
 
 =head2 Collision handling
 
@@ -1509,9 +2023,9 @@ from this distribution entirely. If you need the old name to fail loudly
 instead of silently resolving to a stale prior release, install
 L<IO::K8s::Deprecated>, which ships CPAN redirect stubs for all 76 of them.
 
-=item * B<Updated to Kubernetes v1.36 API>
+=item * B<Updated to Kubernetes v1.37 API>
 
-API objects have been updated from v1.14 to v1.36. Some fields may have changed,
+API objects have been updated from v1.14 to v1.37. Some fields may have changed,
 been added, or removed according to upstream Kubernetes API changes.
 
 =item * B<New Role for namespaced resources>
@@ -1528,9 +2042,14 @@ L<Kubernetes::REST> - REST client for the Kubernetes API, uses IO::K8s for typed
 
 L<IO::K8s::Deprecated> - CPAN redirect stubs for IO::K8s module names that were renamed or removed
 
+Bundled CRD providers: L<IO::K8s::Cilium>, L<IO::K8s::Traefik>,
+L<IO::K8s::CertManager>, L<IO::K8s::K3s>, L<IO::K8s::GatewayAPI>,
+L<IO::K8s::AgentSandbox>, L<IO::K8s::PrometheusOperator>,
+L<IO::K8s::VolumeSnapshot>, and L<IO::K8s::ExternalSecrets>
+
 L<Kubernetes::REST::Example> - Comprehensive examples for using Kubernetes::REST with IO::K8s against a real cluster (Minikube, K3s, etc.)
 
-L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.36/>
+L<https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.37/>
 
 =head1 BUGS and SOURCE
 

@@ -1,15 +1,60 @@
 Revision history for Chem-Structure-Parser
 
 
+0.032 2026-09-21 CDT
+
+ - A path that is a directory is refused by the parse itself, on every system.
+   structure_info() has always said so, but the XS underneath it was left to
+   whatever the C library did with one, and that is three different things:
+   glibc opens it and fails the first read, Windows will not open it at all,
+   and NetBSD hands back the raw directory blocks, which read as a structure
+   with no atoms in it and nothing said so.  Two 0.031 smokers -- Strawberry
+   5.42.0 and perl 5.42.3 on NetBSD 11 -- reported the two t/errors.t failures
+   this is the end of.
+ - The readers do not consult the locale.  perl sets LC_CTYPE from the
+   caller's environment at startup, so <ctype.h> answered for it: in a Latin-1
+   locale a stray accented byte in the atom name column counted as a letter and
+   was guessed at as an element, and in a Turkish one an mmCIF file whose tags
+   are written in capitals would not have been recognised as mmCIF at all,
+   because tolower('I') there is not 'i'.  Everything these readers classify --
+   an element symbol, a residue name, a CIF keyword -- is ASCII by definition,
+   and is now classified by perl's ASCII-only macros.  The answer for a given
+   file no longer depends on the machine's locale, and t/parse.t reads a
+   structure again under every locale the machine has to say so.
+ - mmCIF: a type_symbol that does not spell an element is no longer believed.
+   The PDB reader has always refused columns 77-78 unless they are letters,
+   because an entry from before the element column existed keeps the entry id
+   there, and guessed the element from the atom name instead; a file converted
+   from one carries the same string in type_symbol, and a writer with no symbol
+   to write sometimes writes '' rather than '.'.  Both now fall through to the
+   same guess, so the two formats agree about what the atom is made of.
+ - structure_info(file, features => { sasa => 0 }) is fatal rather than
+   ignored.  The per-feature switches belong to structure_features(); spelled
+   into structure_info() the hash is simply a true value, so every feature was
+   computed -- the surface included, which is nearly all of the time a read
+   costs -- and the caller was told nothing.
+ - The solvent-accessible surface is about 9% faster, and every number it
+   returns is unchanged to the last bit.  The kernel tests each of an atom's
+   thousand sphere points against the neighbours that might hide it and stops
+   at the first one that does, so it now tries the nearest neighbour first: a
+   nearer atom hides more of the sphere.  Which neighbour is found first is all
+   that changes -- what is counted is the points no neighbour covers at all --
+   and over a 60-structure spread of PDBbind v2020 all 369,621 atom, residue
+   and chain surfaces compare byte for byte with 0.031's.  The surface is
+   nearly all of what features cost, so a default structure_info() of a
+   directory comes out about 5% ahead.
+ - The whole-file read goes through PerlIO rather than stdio, which is the
+   layer perl's own opens use on every target, and a read that fails partway
+   through a plain file is reported rather than returned as a short one.
+
 0.031 2026-09-19 CDT
 
  - Fix for Windows: 0.03 did not compile there at all.  A local variable in
-   contacts_find() was named near, and <windows.h> -- which perl.h includes on
+   contacts_find() was named near, and <windows.h>: which perl.h includes on
    Win32 -- still defines near and far as empty macros, left over from 16-bit
    segment addressing.  The preprocessor deleted the name, the declaration
    became a syntax error, and gcc rejected every later use of it.  The
-   variable is renamed; nothing else about the contacts changes.  Reported by
-   a Strawberry Perl 5.42.2 smoker.
+   variable is renamed; nothing else about the contacts changes. http://matrix.cpantesters.org/?dist=Chem-Structure-Parser;os=mswin32;perl=5.42.2;reports=1
 
 0.03 2026-09-18 CDT
 

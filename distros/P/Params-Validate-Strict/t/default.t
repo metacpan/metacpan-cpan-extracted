@@ -13,6 +13,10 @@ my $schema = {
 
 my $result = validate_strict({ schema => $schema, args => {} });
 
-is_deeply($result, { username => 'xyzzy' }, 'default is honoured');
+is_deeply($result, { username => 'xyzzy' }, 'default is honoured when parameter is absent');
+
+my $result2 = validate_strict({ schema => $schema, args => { username => 'alice' } });
+
+is_deeply($result2, { username => 'alice' }, 'supplied value overrides default');
 
 done_testing();

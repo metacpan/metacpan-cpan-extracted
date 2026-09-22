@@ -104,7 +104,7 @@ the line does nothing — do not scatter it into files Dist::Zilla never sees.
 - `task = 1` - TaskWeaver + AutoVersion
 - `manual_version = x.x` - Manual version
 - `major_version = 2` - Major version for AutoVersion
-- `version_finder` - multi-value; forwarded as the `finder` option of RewriteVersion::Transitional + BumpVersionAfterRelease (default path) and PkgVersion (task/manual_version path). Defaults to `:MainModule` when `no_cpan` is set, otherwise unset.
+- `version_finder` - multi-value; forwarded as the `finder` option of RewriteVersion::Transitional + BumpVersionAfterRelease (default path) and PkgVersion (task/manual_version path). Defaults to `:InstallModules` + `:PerlExecFiles` for CPAN dists, or `:MainModule` when `no_cpan` is set.
 
 ### Build & Release
 - `weaver_config` - PodWeaver `config_plugin` to use (default: the bundle's own)
@@ -213,10 +213,12 @@ After `dzil release` runs:
 
 ### Every file carries its own `$VERSION`
 
-**Each file under `lib/` and `bin/` needs its own `our $VERSION = '...';`**, set to
-the version that will be released NEXT — one higher than what is on CPAN (or
-higher). A file without a `$VERSION` ships versionless and breaks consumers that
-pin against it.
+**Each module under `lib/` and each Perl executable under `bin/` needs its own
+`our $VERSION = '...';`**, set to the version that will be released NEXT — one
+higher than what is on CPAN (or higher). A Perl source file without a `$VERSION`
+ships versionless and breaks consumers that pin against it. Bash and other
+non-Perl executables are still installed from `bin/`, but are deliberately
+excluded from the PPI-based version rewrite.
 
 **Only the FIRST `our $VERSION` in a file gets rewritten.** RewriteVersion::Transitional
 and BumpVersionAfterRelease both stop after the first match, so a file holding two
@@ -230,11 +232,18 @@ split them out before releasing.
 
 **Executables belong in `bin/`, never `script/`.** The bundle sets no `ExecDir`, so
 Dist::Zilla's default of `bin` applies: files under `script/` are not installed as
-executables and their `$VERSION` is never rewritten. A distribution with a `script/`
-directory should have it renamed to `bin/` — otherwise none of the above takes
-effect.
+executables, and a Perl executable there has no `$VERSION` rewrite. A distribution
+with a `script/` directory should have it renamed to `bin/` — otherwise none of
+the executable handling takes effect.
 
 ## Release Workflow
+
+**A human runs `dzil release`, never the agent.** It uploads to CPAN, tags and pushes
+— irreversible, outward-facing, and the maintainer's call every time. Preparing a
+release is in scope (tidy `Changes`, confirm the build and interop pass, stage the
+version); running `dzil release` is not. Never run it on your own initiative, and never
+treat your own offer to run it as a yes — only an explicit instruction from the
+maintainer to release is authorization; absent that, you never assume it.
 
 ```bash
 dzil release        # Builds, tests, uploads to CPAN, bumps version, commits, tags

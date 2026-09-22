@@ -47,61 +47,57 @@ subtest 'HTTPRequest - url builder from server + uri' => sub {
 };
 
 # ============================================================================
-# REST.pm - fetch_resource_map with mock OpenAPI spec
+# REST.pm - fetch_resource_map from aggregated discovery (design D11)
+#
+# The cluster map is built from GET /api + GET /apis (APIGroupDiscoveryList),
+# not from /openapi/v2. The class-name mapping is unchanged (exception tables
+# for apiextensions/apiregistration included); only the source moved. The
+# per-instance caching, the catalog shape and the pre-1.27 fallback are pinned
+# in t/39_aggregated_discovery.t.
 # ============================================================================
 
-subtest 'fetch_resource_map - parses OpenAPI spec' => sub {
+# Build an APIGroupDiscoveryList for one group with a single served version.
+sub disco_group {
+    my ($name, $version, @resources) = @_;
+    return {
+        metadata => { name => $name },
+        versions => [ { version => $version, resources => \@resources } ],
+    };
+}
+
+sub disco_resource {
+    my ($plural, $group, $version, $kind, $scope) = @_;
+    return {
+        resource     => $plural,
+        responseKind => { group => $group, version => $version, kind => $kind },
+        scope        => $scope // 'Namespaced',
+    };
+}
+
+subtest 'fetch_resource_map - maps kinds to IO::K8s classes' => sub {
     my $api = mock_api();
 
-    # Add a mock /openapi/v2 response
-    $api->io->add_response('GET', '/openapi/v2', {
-        paths => {
-            '/api/v1/namespaces' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => '',
-                        version => 'v1',
-                        kind => 'Namespace',
-                    },
-                },
-            },
-            '/api/v1/namespaces/{namespace}/pods' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => '',
-                        version => 'v1',
-                        kind => 'Pod',
-                    },
-                },
-            },
-            '/apis/apps/v1/namespaces/{namespace}/deployments' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => 'apps',
-                        version => 'v1',
-                        kind => 'Deployment',
-                    },
-                },
-            },
-            '/apis/apiextensions.k8s.io/v1/customresourcedefinitions' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => 'apiextensions.k8s.io',
-                        version => 'v1',
-                        kind => 'CustomResourceDefinition',
-                    },
-                },
-            },
-            '/apis/apiregistration.k8s.io/v1/apiservices' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => 'apiregistration.k8s.io',
-                        version => 'v1',
-                        kind => 'APIService',
-                    },
-                },
-            },
-        },
+    $api->io->add_response('GET', '/api', {
+        kind  => 'APIGroupDiscoveryList',
+        items => [
+            disco_group('', 'v1',
+                disco_resource('namespaces', '', 'v1', 'Namespace', 'Cluster'),
+                disco_resource('pods',       '', 'v1', 'Pod',       'Namespaced'),
+            ),
+        ],
+    });
+    $api->io->add_response('GET', '/apis', {
+        kind  => 'APIGroupDiscoveryList',
+        items => [
+            disco_group('apps', 'v1',
+                disco_resource('deployments', 'apps', 'v1', 'Deployment')),
+            disco_group('apiextensions.k8s.io', 'v1',
+                disco_resource('customresourcedefinitions', 'apiextensions.k8s.io', 'v1',
+                    'CustomResourceDefinition', 'Cluster')),
+            disco_group('apiregistration.k8s.io', 'v1',
+                disco_resource('apiservices', 'apiregistration.k8s.io', 'v1',
+                    'APIService', 'Cluster')),
+        ],
     });
 
     my $map = $api->fetch_resource_map;
@@ -115,12 +111,12 @@ subtest 'fetch_resource_map - parses OpenAPI spec' => sub {
     # Apps group
     is $map->{Deployment}, 'Api::Apps::V1::Deployment', 'Deployment mapped to Apps';
 
-    # Apiextensions
+    # Apiextensions (exception table preserved)
     is $map->{CustomResourceDefinition},
         'ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinition',
         'CRD mapped to apiextensions path';
 
-    # Apiregistration
+    # Apiregistration (exception table preserved)
     is $map->{APIService},
         'KubeAggregator::Pkg::Apis::Apiregistration::V1::APIService',
         'APIService mapped to apiregistration path';
@@ -129,74 +125,65 @@ subtest 'fetch_resource_map - parses OpenAPI spec' => sub {
 subtest 'fetch_resource_map - skips List kinds' => sub {
     my $api = mock_api();
 
-    $api->io->add_response('GET', '/openapi/v2', {
-        paths => {
-            '/api/v1/pods' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => '', version => 'v1', kind => 'PodList',
-                    },
-                },
-            },
-        },
+    $api->io->add_response('GET', '/api', {
+        kind  => 'APIGroupDiscoveryList',
+        items => [
+            disco_group('', 'v1', disco_resource('pods', '', 'v1', 'PodList')),
+        ],
     });
+    $api->io->add_response('GET', '/apis',
+        { kind => 'APIGroupDiscoveryList', items => [] });
 
     my $map = $api->fetch_resource_map;
     ok !exists $map->{PodList}, 'List kinds are skipped';
 };
 
-subtest 'fetch_resource_map - prefers stable versions' => sub {
+# D17 (was "prefers stable versions"): the OLD claim was that a fixed
+# "stable beats alpha/beta" heuristic always picked the stable class,
+# regardless of which version the cluster served first. The NEW claim is that
+# the map resolves to the version the CLUSTER marks preferred. Here
+# networking.k8s.io serves ServiceCIDR in v1beta1 (listed first -> preferred)
+# and v1; both classes ship, so the short name must follow the cluster and pick
+# the beta one. (The full stop-inventing / provider-fallthrough matrix lives in
+# t/43_resolution_order.t.)
+subtest 'fetch_resource_map - resolves to the cluster preferred version' => sub {
+    plan skip_all =>
+        'IO::K8s::Api::Networking::V1beta1::ServiceCIDR not shipped by this IO::K8s'
+        unless eval { require IO::K8s::Api::Networking::V1beta1::ServiceCIDR; 1 };
+
     my $api = mock_api();
 
-    $api->io->add_response('GET', '/openapi/v2', {
-        paths => {
-            '/apis/batch/v1beta1/jobs' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => 'batch', version => 'v1beta1', kind => 'Job',
-                    },
-                },
+    $api->io->add_response('GET', '/api',
+        { kind => 'APIGroupDiscoveryList', items => [] });
+    # v1beta1 is served first (preferred), v1 second; the map follows the
+    # cluster and picks the beta version.
+    $api->io->add_response('GET', '/apis', {
+        kind  => 'APIGroupDiscoveryList',
+        items => [
+            {
+                metadata => { name => 'networking.k8s.io' },
+                versions => [
+                    { version => 'v1beta1', resources => [
+                        disco_resource('servicecidrs', 'networking.k8s.io',
+                            'v1beta1', 'ServiceCIDR', 'Cluster') ] },
+                    { version => 'v1', resources => [
+                        disco_resource('servicecidrs', 'networking.k8s.io',
+                            'v1', 'ServiceCIDR', 'Cluster') ] },
+                ],
             },
-            '/apis/batch/v1/jobs' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => 'batch', version => 'v1', kind => 'Job',
-                    },
-                },
-            },
-        },
+        ],
     });
 
     my $map = $api->fetch_resource_map;
-    is $map->{Job}, 'Api::Batch::V1::Job', 'stable v1 preferred over v1beta1';
+    is $map->{ServiceCIDR}, 'Api::Networking::V1beta1::ServiceCIDR',
+        'cluster-preferred v1beta1 chosen over stable v1';
 };
 
 subtest 'fetch_resource_map - error on 4xx' => sub {
     my $api = mock_api();
-    # Don't add a response for /openapi/v2 - will get 404
+    # No discovery response mocked - GET /api gets 404
     throws_ok { $api->fetch_resource_map } qr/Could not load resource map/,
         'throws on 404';
-};
-
-subtest 'fetch_resource_map - handles non-hash operations' => sub {
-    my $api = mock_api();
-
-    $api->io->add_response('GET', '/openapi/v2', {
-        paths => {
-            '/api/v1/pods' => {
-                get => {
-                    'x-kubernetes-group-version-kind' => {
-                        group => '', version => 'v1', kind => 'Pod',
-                    },
-                },
-                parameters => [{ name => 'pretty' }],  # non-hash entry
-            },
-        },
-    });
-
-    my $map;
-    lives_ok { $map = $api->fetch_resource_map } 'handles non-hash operations';
-    is $map->{Pod}, 'Api::Core::V1::Pod', 'Pod still mapped';
 };
 
 # ============================================================================
@@ -205,7 +192,7 @@ subtest 'fetch_resource_map - handles non-hash operations' => sub {
 
 subtest '_load_resource_map_from_cluster - falls back to defaults on error' => sub {
     my $api = mock_api();
-    # No /openapi/v2 mock → 404 → should fall back
+    # No discovery mock → GET /api 404 → should fall back
 
     my $map;
     {

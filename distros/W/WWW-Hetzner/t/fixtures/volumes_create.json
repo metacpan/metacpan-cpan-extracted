@@ -28,5 +28,16 @@
     "command": "create_volume",
     "status": "running",
     "progress": 0
-  }
+  },
+  "next_actions": [
+    {
+      "id": 1235,
+      "command": "attach_volume",
+      "status": "running",
+      "progress": 0,
+      "resources": [
+        { "id": 777, "type": "volume" }
+      ]
+    }
+  ]
 }

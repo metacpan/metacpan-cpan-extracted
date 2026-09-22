@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Regression coverage for karr ticket #4:
+# Regression coverage for k4:
 # resource.k8s.io/v1beta1 was entirely missing (no V1beta1/ directory at all)
 # and resource.k8s.io/v1beta2 shipped only 4 of its ~39 definitions (the
 # DeviceTaintRule family from an earlier ticket). Any consumer talking to a

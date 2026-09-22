@@ -19,6 +19,7 @@ no_index:
     - t
     - inc
 requires:
+  Audio::Play::Native: '0.01'
   Cairo: '1.109'
   Logic::Relational: '0.01'
   Prima: '1.74'
@@ -28,5 +29,5 @@ resources:
   bugtracker: https://github.com/mjohnson108/p5-Games-GUI-Battleship/issues
   homepage: https://github.com/mjohnson108/
   repository: https://github.com/mjohnson108/p5-Games-GUI-Battleship.git
-version: '1.0'
+version: '1.1'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

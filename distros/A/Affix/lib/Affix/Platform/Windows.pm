@@ -1,4 +1,4 @@
-package Affix::Platform::Windows v1.2.5 {
+package Affix::Platform::Windows v1.2.7 {
     use v5.40;
     use DynaLoader;
     use Win32;    # Core on Windows
