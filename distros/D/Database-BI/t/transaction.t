@@ -1954,4 +1954,535 @@ subtest 'Transaction 31 -- SQLite file with mismatched internal table name opens
 	}
 };
 
+# ======================================================================
+# TRANSACTION 32: Database::Join backend => 'auto' in the join pipeline
+#
+# Dashboard.pm passes backend => 'auto' to every Database::Join->new()
+# call (added in 0.008.0).  For datasets larger than max_array_rows
+# (default 10,000 combined rows) Database::Join spills to a temporary
+# SQLite file; smaller datasets use the existing in-memory array path.
+#
+# Phase 1   Create left/right CSV fixtures in tempdir
+# Phase 2   Database::Join backend => 'array' (control group)
+# Phase 3   Database::Join backend => 'sqlite' (SQLite disk-spill path)
+# Phase 4   Results from Phases 2 and 3 are identical (sorted by row)
+# Phase 5   columns() output identical on both backends
+# Phase 6   GET /join endpoint returns 200 with merged data
+#           (backend => 'auto' is active via Dashboard.pm)
+# Phase 7   Source-code guard: Dashboard.pm passes backend => 'auto'
+#           in exactly 2 Database::Join->new() call sites
+# ======================================================================
+
+subtest 'Transaction 32 -- Database::Join backend => auto in join pipeline' => sub {
+	my $has_dj = eval { require Database::Join; 1 };
+
+	SKIP: {
+		skip 'Database::Join not available', 9 unless $has_dj;
+
+		require Database::BI::Model::DataSource;
+
+		my $dir = tempdir(CLEANUP => 1);
+
+		# ------------------------------------------------------------------
+		# Phase 1: write the shared join fixtures to a tempdir.
+		# ------------------------------------------------------------------
+		my $left_file  = Mojo::File->new($dir)->child('t32left.csv');
+		my $right_file = Mojo::File->new($dir)->child('t32right.csv');
+		$left_file->spurt($JOIN_LEFT);
+		$right_file->spurt($JOIN_RIGHT);
+		ok(-f $left_file->to_string,  'Phase 1a: left CSV fixture exists');		# 1
+		ok(-f $right_file->to_string, 'Phase 1b: right CSV fixture exists');	# 2
+
+		my $make_src = sub {
+			my ($table) = @_;
+			Database::BI::Model::DataSource->new(directory => $dir, table => $table);
+		};
+
+		# ------------------------------------------------------------------
+		# Phase 2: array backend -- control group for result identity check.
+		# ------------------------------------------------------------------
+		my $join_array = Database::Join->new(
+			databases   => [$make_src->('t32left'), $make_src->('t32right')],
+			join_column => 'item',
+			backend     => 'array',
+		);
+		my $rows_array = $join_array->selectall_arrayref;
+		ok(ref $rows_array eq 'ARRAY' && @$rows_array == $JOIN_TOTAL_ROWS,
+			'Phase 2: array backend returns correct row count');			# 3
+
+		# ------------------------------------------------------------------
+		# Phase 3-5: sqlite backend -- available in Database::Join >= 0.004.0.
+		# Guard with eval; if the parameter is unrecognised, skip gracefully.
+		# ------------------------------------------------------------------
+		my $join_sqlite = eval {
+			Database::Join->new(
+				databases   => [$make_src->('t32left'), $make_src->('t32right')],
+				join_column => 'item',
+				backend     => 'sqlite',
+			)
+		};
+		SKIP: {
+			skip 'Database::Join sqlite backend not available (need >= 0.004.0)', 3
+				if $@ || !$join_sqlite;
+
+			my $rows_sqlite = $join_sqlite->selectall_arrayref;
+			ok(ref $rows_sqlite eq 'ARRAY' && @$rows_sqlite == $JOIN_TOTAL_ROWS,
+				'Phase 3: sqlite backend returns correct row count');		# 4
+
+			# Canonicalise each row as a sorted "key=value" string so the two
+			# result sets can be compared order-independently.
+			my $canon = sub {
+				my ($rows) = @_;
+				return [
+					sort map {
+						my $r = $_;
+						join "\x1c", map { "$_=" . ($r->{$_} // '') } sort keys %$r
+					} @$rows
+				];
+			};
+			is_deeply($canon->($rows_sqlite), $canon->($rows_array),
+				'Phase 4: SQLite backend produces identical rows to array backend');	# 5
+
+			is_deeply(
+				[sort @{ $join_sqlite->columns }],
+				[sort @{ $join_array->columns  }],
+				'Phase 5: sqlite backend columns() matches array backend',		# 6
+			);
+		}
+
+		# ------------------------------------------------------------------
+		# Phase 6: HTTP /join -- backend => 'auto' is in play via Dashboard.pm.
+		# ------------------------------------------------------------------
+		my $lspec = 'path:' . $left_file->to_string;
+		my $jspec = 'path:' . $right_file->to_string . '|item|item';
+		$t->get_ok('/join?l=' . url_escape($lspec) . '&j=' . url_escape($jspec))
+		  ->status_is(200, 'Phase 6: /join returns 200 with backend => auto active');	# 7, 8
+		$t->content_like(qr/apple/,
+			'Phase 6: /join result contains expected join data');			# 9
+	}
+
+	# Phase 7 runs regardless of Database::Join availability: it checks the
+	# source code, not the runtime behaviour of Database::Join itself.
+	my $dash = Mojo::File->new(
+		$t->app->home->child('lib/Database/BI/Controller/Dashboard.pm')
+	)->slurp;
+	my $auto_count = () = $dash =~ /backend\s*=>\s*'auto'/g;
+	is $auto_count, 2,
+		'Phase 7: Dashboard.pm passes backend => auto at both join call sites';	# 10
+};
+
+# ======================================================================
+# TRANSACTION 33: TSV file full lifecycle
+#
+# data/employees.tsv (tab-separated) is opened via /view and /open,
+# filtered, joined to a second TSV, and exported to CSV and SQLite.
+#
+# Phase 1   /view/<table> renders TSV data
+# Phase 2   /api/columns returns column list for TSV
+# Phase 3   /open?path= opens TSV by absolute path
+# Phase 4   Filter applied to TSV (/view with ?f=)
+# Phase 5   Export TSV to CSV
+# Phase 6   Export TSV to SQLite (format=sqlite)
+# Phase 7   Upload a TSV file and open via the returned path
+# ======================================================================
+subtest 'Transaction 33 -- TSV file full lifecycle' => sub {
+	my $tsv_path = $t->app->home->child('data', 'employees.tsv')->to_string;
+
+	SKIP: {
+		skip 'data/employees.tsv not found', 13 unless -f $tsv_path;
+
+		# Phase 1: /view renders data from the TSV.
+		$t->get_ok('/view/employees')
+		  ->status_is(200, 'Phase 1: /view/employees returns 200');
+		$t->content_like(qr/Alice/, 'Phase 1: data row "Alice" visible');
+		$t->content_like(qr/Engineering/, 'Phase 1: column value "Engineering" visible');
+
+		# Phase 2: /api/columns lists columns for the TSV table.
+		$t->get_ok('/api/columns?table=employees')
+		  ->status_is(200, 'Phase 2: /api/columns returns 200');
+		$t->json_has('/columns', 'Phase 2: response has columns key');
+
+		# Phase 3: /open with absolute path.
+		$t->get_ok('/open?path=' . url_escape($tsv_path))
+		  ->status_is(200, 'Phase 3: /open with absolute TSV path returns 200');
+		$t->content_like(qr/Alice/, 'Phase 3: data visible via /open');
+
+		# Phase 4: filter on a TSV column.
+		$t->get_ok('/view/employees?f=' . url_escape('Department:eq:Engineering'))
+		  ->status_is(200, 'Phase 4: filtered /view returns 200');
+		$t->content_like(qr/Alice/, 'Phase 4: filter keeps matching row');
+		$t->content_unlike(qr/Marketing/, 'Phase 4: filter removes non-matching row');
+
+		# Phase 5: export to CSV.
+		$t->get_ok('/export?l=' . url_escape('table:employees') . '&format=csv')
+		  ->status_is(200, 'Phase 5: CSV export returns 200')
+		  ->content_type_like(qr{text/csv}, 'Phase 5: content-type is text/csv')
+		  ->content_like(qr/Alice/, 'Phase 5: exported CSV contains data');
+
+		# Phase 6: export to SQLite (requires DBD::SQLite).
+		SKIP: {
+			eval { DBI->install_driver('SQLite') }
+				or skip 'DBD::SQLite not available for SQLite export', 2;
+			$t->get_ok('/export?l=' . url_escape('table:employees') . '&format=sqlite')
+			  ->status_is(200, 'Phase 6: SQLite export returns 200')
+			  ->content_type_like(qr{sqlite}, 'Phase 6: content-type contains sqlite');
+		}
+	}
+
+	# Phase 7: upload a TSV file and open it (always run if upload route works).
+	SKIP: {
+		my $tsv_body = "item\tqty\tprice\nWidget\t10\t4.99\nGadget\t5\t9.99\n";
+		$t->post_ok('/upload',
+			form => { file => { content => $tsv_body, filename => 'tmpparts.tsv' } }
+		)->status_is(200, 'Phase 7: TSV upload returns 200');
+
+		my $open_url = $t->tx->res->json('/open');
+		skip 'Upload did not return an open URL', 2 unless defined $open_url;
+
+		$t->get_ok($open_url)
+		  ->status_is(200, 'Phase 7: /open of uploaded TSV returns 200');
+		$t->content_like(qr/Widget/, 'Phase 7: uploaded TSV data visible');
+	}
+};
+
+# ======================================================================
+# TRANSACTION 34: SQLite3 (.sqlite3 extension) file lifecycle
+#
+# Verifies that a SQLite database file with the .sqlite3 extension can
+# be opened via /open, filtered, exported, and browsed -- identical to
+# the existing Transaction 31 coverage for .sql files.
+#
+# Phase 1   Create a .sqlite3 fixture in a tempdir
+# Phase 2   /open returns 200 and shows data
+# Phase 3   No error rendered (no "Could not open" or class="error")
+# Phase 4   Filter applied via ?f= query param
+# Phase 5   Export .sqlite3 source to CSV
+# Phase 6   Browse directory lists the .sqlite3 file
+# Phase 7   Idempotency -- second /open hits cached path
+# Phase 8   Table-name mismatch inside .sqlite3 is auto-corrected
+# ======================================================================
+subtest 'Transaction 34 -- SQLite3 (.sqlite3 extension) file lifecycle' => sub {
+	SKIP: {
+		eval { DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 22;
+
+		plan tests => 22;
+
+		my $dir = tempdir(CLEANUP => 1);
+
+		# Phase 1: create a .sqlite3 file whose internal table matches the stem.
+		my $db_path = Mojo::File->new($dir)->child('widgets.sqlite3')->to_string;
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$db_path", undef, undef,
+				{ RaiseError => 1, PrintError => 0 });
+			$dbh->do('CREATE TABLE widgets (id INTEGER, name TEXT, stock INTEGER)');
+			$dbh->do('INSERT INTO widgets VALUES (1, \'Sprocket\', 200)');
+			$dbh->do('INSERT INTO widgets VALUES (2, \'Flywheel\', 50)');
+			$dbh->disconnect;
+		}
+		ok(-f $db_path, 'Phase 1: .sqlite3 fixture created');
+
+		# Phase 2: /open returns 200 and renders data.
+		$t->get_ok('/open?path=' . url_escape($db_path))
+		  ->status_is(200, 'Phase 2: /open .sqlite3 returns 200');
+		$t->content_like(qr/Sprocket/, 'Phase 2a: first row visible');
+		$t->content_like(qr/Flywheel/, 'Phase 2b: second row visible');
+
+		# Phase 3: no error markup in the page.
+		# Note: "Could not open file." also appears as a JS string in the drag-
+		# and-drop handler on every page, so we match the error <p> tag instead.
+		$t->content_unlike(qr/class="error"/, 'Phase 3: no error paragraph');
+		$t->content_unlike(qr/no such table/i, 'Phase 3: no "no such table" SQL error');
+
+		# Phase 4: filter works on .sqlite3 source.
+		$t->get_ok('/open?path=' . url_escape($db_path) . '&f=' . url_escape('name:eq:Sprocket'))
+		  ->status_is(200, 'Phase 4: filtered /open returns 200');
+		$t->content_like(qr/Sprocket/, 'Phase 4: filter keeps matching row');
+		$t->content_unlike(qr/Flywheel/, 'Phase 4: filter removes non-matching row');
+
+		# Phase 5: CSV export of a .sqlite3 source.
+		$t->get_ok('/export?l=' . url_escape("path:$db_path") . '&format=csv')
+		  ->status_is(200, 'Phase 5: CSV export of .sqlite3 returns 200')
+		  ->content_type_like(qr{text/csv}, 'Phase 5: content-type is text/csv');
+
+		# Phase 6: browse directory shows the .sqlite3 file.
+		$t->get_ok('/browse?path=' . url_escape($dir))
+		  ->status_is(200, 'Phase 6: browse dir returns 200');
+		$t->content_like(qr/widgets\.sqlite3/, 'Phase 6: .sqlite3 file listed in browser');
+
+		# Phase 7: idempotency -- second request hits the cache.
+		$t->get_ok('/open?path=' . url_escape($db_path))
+		  ->status_is(200, 'Phase 7: second /open is idempotent');
+
+		# Phase 8: .sqlite3 with a mismatched internal table name is auto-corrected.
+		my $mismatch_path = Mojo::File->new($dir)->child('archive.sqlite3')->to_string;
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$mismatch_path", undef, undef,
+				{ RaiseError => 1, PrintError => 0 });
+			$dbh->do('CREATE TABLE records (ref TEXT, note TEXT)');
+			$dbh->do(q{INSERT INTO records VALUES ('REF001', 'First entry')});
+			$dbh->disconnect;
+		}
+		$t->get_ok('/open?path=' . url_escape($mismatch_path))
+		  ->status_is(200, 'Phase 8: .sqlite3 with mismatched table name opens correctly');
+		$t->content_like(qr/First entry/, 'Phase 8: data from mismatched-name table visible');
+	}
+};
+
+# ======================================================================
+# TRANSACTION 35: SQLite (.sqlite extension) file lifecycle
+#
+# Verifies that a SQLite database file with the .sqlite extension
+# behaves identically to .sql and .sqlite3: open, filter, export,
+# browse, idempotency, and table-name mismatch auto-correction.
+#
+# Phase 1   Create a .sqlite fixture in a tempdir
+# Phase 2   /open returns 200 and shows data
+# Phase 3   No error rendered
+# Phase 4   Filter applied via ?f= query param
+# Phase 5   Export .sqlite source to CSV
+# Phase 6   Browse directory lists the .sqlite file
+# Phase 7   Idempotency -- second /open returns 200
+# Phase 8   Table-name mismatch inside .sqlite is auto-corrected
+# ======================================================================
+subtest 'Transaction 35 -- SQLite (.sqlite extension) file lifecycle' => sub {
+	SKIP: {
+		eval { DBI->install_driver('SQLite') }
+			or skip 'DBD::SQLite not available', 22;
+
+		plan tests => 22;
+
+		my $dir = tempdir(CLEANUP => 1);
+
+		# Phase 1: create a .sqlite file whose internal table matches the stem.
+		my $db_path = Mojo::File->new($dir)->child('readings.sqlite')->to_string;
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$db_path", undef, undef,
+				{ RaiseError => 1, PrintError => 0 });
+			$dbh->do('CREATE TABLE readings (sensor TEXT, value REAL)');
+			$dbh->do(q{INSERT INTO readings VALUES ('Alpha', 1.23)});
+			$dbh->do(q{INSERT INTO readings VALUES ('Beta',  4.56)});
+			$dbh->disconnect;
+		}
+		ok(-f $db_path, 'Phase 1: .sqlite fixture created');
+
+		# Phase 2: /open returns 200 and renders data.
+		$t->get_ok('/open?path=' . url_escape($db_path))
+		  ->status_is(200, 'Phase 2: /open .sqlite returns 200');
+		$t->content_like(qr/Alpha/, 'Phase 2a: first row visible');
+		$t->content_like(qr/Beta/,  'Phase 2b: second row visible');
+
+		# Phase 3: no error markup in the page.
+		$t->content_unlike(qr/class="error"/, 'Phase 3: no error paragraph');
+		$t->content_unlike(qr/no such table/i, 'Phase 3: no SQL error');
+
+		# Phase 4: filter works on .sqlite source.
+		$t->get_ok('/open?path=' . url_escape($db_path) . '&f=' . url_escape('sensor:eq:Alpha'))
+		  ->status_is(200, 'Phase 4: filtered /open returns 200');
+		$t->content_like(qr/Alpha/, 'Phase 4: filter keeps matching row');
+		$t->content_unlike(qr/Beta/, 'Phase 4: filter removes non-matching row');
+
+		# Phase 5: CSV export of a .sqlite source.
+		$t->get_ok('/export?l=' . url_escape("path:$db_path") . '&format=csv')
+		  ->status_is(200, 'Phase 5: CSV export of .sqlite returns 200')
+		  ->content_type_like(qr{text/csv}, 'Phase 5: content-type is text/csv');
+
+		# Phase 6: browse directory shows the .sqlite file.
+		$t->get_ok('/browse?path=' . url_escape($dir))
+		  ->status_is(200, 'Phase 6: browse dir returns 200');
+		$t->content_like(qr/readings\.sqlite/, 'Phase 6: .sqlite file listed in browser');
+
+		# Phase 7: idempotency -- second request hits the cache.
+		$t->get_ok('/open?path=' . url_escape($db_path))
+		  ->status_is(200, 'Phase 7: second /open is idempotent');
+
+		# Phase 8: .sqlite with a mismatched internal table name is auto-corrected.
+		my $mismatch_path = Mojo::File->new($dir)->child('events.sqlite')->to_string;
+		{
+			my $dbh = DBI->connect("dbi:SQLite:dbname=$mismatch_path", undef, undef,
+				{ RaiseError => 1, PrintError => 0 });
+			$dbh->do('CREATE TABLE log (ts TEXT, msg TEXT)');
+			$dbh->do(q{INSERT INTO log VALUES ('2026-01-01', 'Boot')});
+			$dbh->disconnect;
+		}
+		$t->get_ok('/open?path=' . url_escape($mismatch_path))
+		  ->status_is(200, 'Phase 8: .sqlite with mismatched table name opens correctly');
+		$t->content_like(qr/Boot/, 'Phase 8: data from mismatched-name table visible');
+	}
+};
+
+subtest 'Transaction 37 -- Heatmap chart lifecycle' => sub {
+	plan tests => 23;
+
+	my $dir = tempdir(CLEANUP => 1);
+	my $csv = Mojo::File->new($dir)->child('heatdata.csv')->to_string;
+	Mojo::File->new($csv)->spurt(
+		"region,month,sales\n"
+		. "North,Jan,1200\n"
+		. "South,Jan,800\n"
+		. "North,Feb,1500\n"
+		. "South,Feb,950\n"
+	);
+
+	my $base = '/heatmap?l=' . url_escape("path:$csv");
+
+	# Phase 1: basic heatmap with val column.
+	$t->get_ok($base . '&x=month&y=region&val=sales')
+	  ->status_is(200, 'Phase 1: /heatmap returns 200');
+	$t->content_like(qr/id="heatmap"/,  'Phase 1: heatmap SVG element present');
+	$t->content_like(qr/Jan/,           'Phase 1: X-axis label Jan visible');
+	$t->content_like(qr/North/,         'Phase 1: Y-axis label North visible');
+
+	# Phase 2: count mode (no val param).
+	$t->get_ok($base . '&x=month&y=region')
+	  ->status_is(200, 'Phase 2: count-mode heatmap returns 200');
+	$t->content_like(qr/id="heatmap"/, 'Phase 2: heatmap SVG present in count mode');
+	$t->content_like(qr/Count by/,     'Phase 2: title reflects count mode');
+
+	# Phase 3: missing required params return 400.
+	$t->get_ok('/heatmap?l=' . url_escape("path:$csv") . '&y=region')
+	  ->status_is(400, 'Phase 3a: missing x param returns 400');
+	$t->get_ok('/heatmap?l=' . url_escape("path:$csv") . '&x=month')
+	  ->status_is(400, 'Phase 3b: missing y param returns 400');
+
+	# Phase 4: non-existent column returns 400.
+	$t->get_ok($base . '&x=month&y=no_such_col')
+	  ->status_is(400, 'Phase 4: non-existent y column returns 400');
+	$t->get_ok($base . '&x=no_such_col&y=region')
+	  ->status_is(400, 'Phase 4b: non-existent x column returns 400');
+
+	# Phase 5: idempotency -- second request serves from cache.
+	$t->get_ok($base . '&x=month&y=region&val=sales')
+	  ->status_is(200, 'Phase 5: idempotent second request returns 200');
+
+	# Phase 6: heatmap toolbar button and panel are present in the dashboard.
+	$t->get_ok('/view/sales')
+	  ->status_is(200, 'Phase 6: dashboard returns 200');
+	$t->content_like(qr/id="btn-heatmap"/,  'Phase 6: heatmap toolbar button present');
+	$t->content_like(qr/id="heatmap-panel"/, 'Phase 6: heatmap panel present');
+};
+
+subtest 'Transaction 36 -- Copy-link button lifecycle (filter bookmark feature)' => sub {
+	# Phase 1: button element is absent when no filters are active (clean view).
+	# The CSS class *name* still appears in the stylesheet, but the button element itself
+	# should not be present — guard against the stylesheet match with a tighter regex.
+	$t->get_ok('/view/sales')
+	  ->status_is(200, 'Phase 1: /view/sales returns 200');
+	$t->content_unlike(qr/id="btn-copy-link"/, 'Phase 1: no copy-link button without filters');
+
+	# Phase 2: button appears when at least one filter is active.
+	$t->get_ok('/view/sales?f=' . url_escape('region:eq:North'))
+	  ->status_is(200, 'Phase 2: filtered view returns 200');
+	$t->content_like(qr/id="btn-copy-link"/, 'Phase 2: copy-link button present with active filter');
+	$t->content_like(qr/Copy link/, 'Phase 2: button label is "Copy link"');
+
+	# Phase 3: button still appears when multiple filters are applied.
+	$t->get_ok('/view/sales?f=' . url_escape('region:eq:North') . '&f=' . url_escape('product:contains:Widget'))
+	  ->status_is(200, 'Phase 3: multi-filter view returns 200');
+	$t->content_like(qr/id="btn-copy-link"/, 'Phase 3: copy-link button present with multiple filters');
+
+	# Phase 4: the JS IIFE that drives the copy behaviour is present in the page.
+	$t->content_like(qr/btn-copy-link/, 'Phase 4: copy-link JS block is in the page');
+	$t->content_like(qr/navigator\.clipboard/, 'Phase 4: modern Clipboard API path present');
+	$t->content_like(qr/execCommand.*copy/s, 'Phase 4: legacy execCommand fallback present');
+	$t->content_like(qr/btn-copy-link--copied/, 'Phase 4: CSS feedback class referenced in JS');
+
+	# Phase 5: CSS class is defined in the stylesheet (default.html.tt inlined styles).
+	$t->content_like(qr/\.btn-copy-link\b/, 'Phase 5: .btn-copy-link CSS rule present');
+	$t->content_like(qr/btn-copy-link--copied/, 'Phase 5: copied-state CSS class present');
+};
+
+# ---------------------------------------------------------------------------
+# Transaction 39 -- Remote file path (/../hostname/dir/file.ext) lifecycle
+#
+# Tests that Database::BI can open files via the /../hostname/... path syntax.
+# Net::SFTP::Foreign is mocked so no real SSH connection is made; the test
+# exercises the parsing, validation, rendering pipeline, and the content-
+# sniffing rename path (_sniff_data_ext) for non-standard remote extensions.
+# ---------------------------------------------------------------------------
+subtest 'Transaction 39 -- Remote file path lifecycle' => sub {
+	# Override Net::SFTP::Foreign with an in-process stub so no real SSH
+	# connection is made.  The stub serves two remote files:
+	#   remote_sales.csv  -- standard CSV extension (tests normal path)
+	#   remote_sales.log  -- non-standard extension (tests _sniff_data_ext)
+	# Original methods are restored in the teardown block at the bottom.
+	require Net::SFTP::Foreign;
+	my $orig_new   = Net::SFTP::Foreign->can('new');
+	my $orig_error = Net::SFTP::Foreign->can('error');
+	my $orig_get   = Net::SFTP::Foreign->can('get');
+
+	Readonly my $CSV_BODY => "product,region,amount\nWidget,North,100\nGadget,South,200\n";
+
+	{
+		no strict 'refs';
+		no warnings 'redefine';
+		*{'Net::SFTP::Foreign::new'} = sub {
+			my ($class, $host, %opts) = @_;
+			return undef unless defined $host && $host eq 'mockhost';
+			return bless { _stub_host => $host }, $class;
+		};
+		*{'Net::SFTP::Foreign::error'} = sub { '' };
+		*{'Net::SFTP::Foreign::get'}   = sub {
+			my ($self, $remote, $local) = @_;
+			# Serve the CSV body for both the .csv and .log filenames so we
+			# can test that _sniff_data_ext renames the .log to .csv correctly.
+			return unless $remote =~ m{remote_sales\.(?:csv|log)$};
+			open(my $fh, '>', $local) or return;
+			print {$fh} $CSV_BODY;
+			close $fh;
+		};
+	}
+
+	# Phase 1: path-traversal attempt outside the /../ prefix is rejected.
+	$t->get_ok('/open?path=/' . url_escape('.') . '/../../etc/passwd')
+	  ->status_is(404, 'Phase 1: path-traversal outside /../ notation rejected');
+
+	# Phase 2: remote path whose file is not found on the mock host gives 404.
+	$t->get_ok('/open?path=' . url_escape('/../mockhost/tmp/file.php'))
+	  ->status_is(404, 'Phase 2: file not found on remote host gives 404');
+
+	# Phase 3: well-formed remote path with standard .csv extension opens correctly.
+	my $remote_path = '/../mockhost/tmp/remote_sales.csv';
+	$t->get_ok('/open?path=' . url_escape($remote_path))
+	  ->status_is(200, 'Phase 3: /../hostname/dir/file.csv returns 200')
+	  ->content_like(qr/Widget/, 'Phase 3: first data row visible')
+	  ->content_like(qr/Gadget/, 'Phase 3: second data row visible')
+	  ->content_like(qr/product/i, 'Phase 3: column header "product" present');
+
+	# Phase 4: spec-based access via _open_spec (used by join, combine, graph).
+	$t->get_ok('/api/columns?spec=' . url_escape('path:' . $remote_path))
+	  ->status_is(200, 'Phase 4: columns API resolves remote path spec')
+	  ->json_has('/columns', 'Phase 4: columns key present in JSON response');
+
+	# Phase 5: idempotency -- second request returns same columns.
+	$t->get_ok('/api/columns?spec=' . url_escape('path:' . $remote_path))
+	  ->status_is(200, 'Phase 5: second columns request is idempotent')
+	  ->json_has('/columns', 'Phase 5: columns key still present');
+
+	# Phase 6: non-standard extension (.log) -- _sniff_data_ext renames to .csv.
+	# The stub serves the same CSV body for .log; DataSource must detect the
+	# comma-separated content and open it correctly without a "Can't find a
+	# file" error.
+	my $log_path = '/../mockhost/tmp/remote_sales.log';
+	$t->get_ok('/open?path=' . url_escape($log_path))
+	  ->status_is(200, 'Phase 6: non-standard .log extension opens via content sniffing')
+	  ->content_like(qr/Widget/, 'Phase 6: first data row visible after sniff rename')
+	  ->content_like(qr/product/i, 'Phase 6: column header present after sniff rename');
+
+	# Phase 7: user@hostname syntax passes credentials to Net::SFTP::Foreign.
+	my $user_path = '/../testuser@mockhost/tmp/remote_sales.csv';
+	$t->get_ok('/open?path=' . url_escape($user_path))
+	  ->status_is(200, 'Phase 7: user@hostname syntax opens correctly')
+	  ->content_like(qr/Widget/, 'Phase 7: data visible with user@hostname path');
+
+	# Tear down: restore original Net::SFTP::Foreign methods.
+	{
+		no strict 'refs';
+		no warnings 'redefine';
+		*{'Net::SFTP::Foreign::new'}   = $orig_new   if $orig_new;
+		*{'Net::SFTP::Foreign::error'} = $orig_error if $orig_error;
+		*{'Net::SFTP::Foreign::get'}   = $orig_get   if $orig_get;
+	}
+};
+
 done_testing();

@@ -18,8 +18,11 @@ ok $id > 0, "got a client id ($id)";
 
 EV::Telegram::TDLib::_send($id, '{"@type":"getMe","@extra":"probe-1"}');
 
+# the loop has not run yet, so ev_now is still the time EV was loaded
+EV::now_update();
 my $watchdog = EV::timer 15, 0, sub { fail('timed out waiting for TDLib'); EV::break };
 EV::run;
+$watchdog->stop;
 
 ok scalar @seen, 'the loop was woken by the reader thread';
 is $seen[0][0], $id, 'messages are tagged with the originating client id';

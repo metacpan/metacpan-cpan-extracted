@@ -141,7 +141,7 @@ is $r->{invite_link}, 'https://t.me/+abc', 'scoped to one link';
 my @jr;
 $td->on_join_request(sub { push @jr, $_[0] });
 my $J = Cpanel::JSON::XS->new;
-$td->_inject_raw($J->encode({ '@type' => 'updateNewChatJoinRequest',
+$td->inject_raw($J->encode({ '@type' => 'updateNewChatJoinRequest',
     chat_id => -100, user_chat_id => 7, invite_link => { invite_link => 'x' },
     request => { '@type' => 'chatJoinRequest', user_id => 42, date => 1, bio => 'hi' } }));
 is scalar @jr, 1, 'on_join_request fired';

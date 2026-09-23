@@ -12,12 +12,15 @@ my $output_name = shift || 'fluid';    # fluidsynth
 my $filter_name = shift || 'pedal_tone';
 
 my $rtc = MIDI::RtController->new(
-    input  => $input_name,
-    output => $output_name,
+    input   => $input_name,
+    output  => $output_name,
     verbose => 1,
 );
 
-my $rtf = MIDI::RtController::Filter::Tonal->new(rtc => $rtc);
+my $rtf = MIDI::RtController::Filter::Tonal->new(
+    rtc     => $rtc,
+    verbose => 1,
+);
 
 $rtf->feedback(4);
 $rtf->delay(0.15);

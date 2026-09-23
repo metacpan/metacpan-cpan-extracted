@@ -5,6 +5,8 @@
 .claude/agents/www-openbao-worker.md
 .claude/rules/www-openbao-rules.md
 .claude/settings.json
+.claude/skills/getty-git-commit-style/SKILL.md
+.claude/skills/getty-git-usage/SKILL.md
 .claude/skills/getty-perl-core/SKILL.md
 .claude/skills/getty-perl-moo/SKILL.md
 .claude/skills/getty-perl-release-author-getty/SKILL.md
@@ -33,6 +35,11 @@ dist.ini
 lib/WWW/OpenBao.pm
 t/00-load.t
 t/10-paths.t
+t/20-request.t
+t/30-login-k8s.t
+t/40-delete-ladder.t
+t/50-health.t
+t/60-read-version.t
 t/70-secret-exists.t
 t/80-read-secret-metadata.t
 t/author-pod-syntax.t

@@ -14,9 +14,9 @@ require File::Temp;
 File::Temp->import('tempdir');
 require EV::Telegram::TDLib;
 
-# TD_DB_DIR persists the session, so a rerun skips the login code entirely;
-# without it every run authenticates afresh and adds a device to the account
-my $dir = $ENV{TD_DB_DIR}
+# TD_DATABASE_DIRECTORY persists the session, so a rerun skips the login code
+# entirely; without it every run authenticates afresh and adds a device
+my $dir = $ENV{TD_DATABASE_DIRECTORY}
     || tempdir('ev-td-live-XXXXXX', TMPDIR => 1, CLEANUP => 1);
 
 # prompts go to STDERR: STDOUT is the TAP stream

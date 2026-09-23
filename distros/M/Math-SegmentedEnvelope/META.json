@@ -1,0 +1,74 @@
+{
+   "abstract" : "create/manage/evaluate segmented (curved) envelope",
+   "author" : [
+      "Yegor Korablev <egor@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-SegmentedEnvelope",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "bench",
+         "eg",
+         "examples",
+         "t"
+      ],
+      "file" : [
+         "bench/PurePerl.pm"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::SegmentedEnvelope" : {
+         "file" : "lib/Math/SegmentedEnvelope.pm",
+         "version" : "0.03"
+      },
+      "Math::SegmentedEnvelope::Static" : {
+         "file" : "lib/Math/SegmentedEnvelope.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vividsnow/Math-SegmentedEnvelope/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vividsnow/Math-SegmentedEnvelope.git",
+         "web" : "https://github.com/vividsnow/Math-SegmentedEnvelope"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

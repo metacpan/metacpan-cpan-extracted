@@ -23,7 +23,6 @@ my %WriteMakefileArgs = (
     "List::Util" => 0,
     "MIDI::RtController" => "0.0703",
     "MIDI::RtController::Filter" => "0.0102",
-    "MIDI::RtMidi::ScorePlayer" => 0,
     "Moo" => 2,
     "Music::Chord::Note" => 0,
     "Music::Note" => 0,
@@ -46,7 +45,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0502",
+  "VERSION" => "0.0503",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,7 +62,6 @@ my %FallbackPrereqs = (
   "List::Util" => 0,
   "MIDI::RtController" => "0.0703",
   "MIDI::RtController::Filter" => "0.0102",
-  "MIDI::RtMidi::ScorePlayer" => 0,
   "Moo" => 2,
   "Music::Chord::Note" => 0,
   "Music::Note" => 0,

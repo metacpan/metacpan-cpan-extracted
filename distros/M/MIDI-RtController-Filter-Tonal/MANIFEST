@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/arp.pl
 eg/math.pl
 eg/multi.pl
 eg/patch_change.pl

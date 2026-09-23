@@ -8,8 +8,9 @@
 #
 # Tools: list_chats, history, send_message.
 #
-# Uses the session created by 01-login.pl (or a bot token). Add to an MCP
-# client's config, for example:
+# Uses the session created by 01-login.pl, and a user account only: TDLib
+# refuses the chat list and history to a bot. Add to an MCP client's
+# config, for example:
 #
 #   { "mcpServers": { "telegram": {
 #       "command": "perl",
@@ -81,6 +82,12 @@ sub reply {
     print $J->encode({ jsonrpc => '2.0', id => $id, result => $result }), "\n";
 }
 
+sub rpc_error {
+    my ($id, $code, $message) = @_;
+    print $J->encode({ jsonrpc => '2.0', id => $id,
+                       error => { code => $code, message => $message } }), "\n";
+}
+
 sub reply_text {
     my ($id, $text, $is_error) = @_;
     reply($id, {
@@ -92,7 +99,9 @@ sub reply_text {
 sub describe {
     my ($msg) = @_;
     my $c = $msg->{content} || {};
-    my $t = $c->{text}{text} // $c->{caption}{text};
+    # not $c->{text}{text}: that autovivifies an empty text hash into the
+    # cached message on every photo, sticker and call
+    my $t = ($c->{text} || {})->{text} // ($c->{caption} || {})->{text};
     unless (defined $t && length $t) {
         $t = $c->{'@type'} // 'message';
         $t =~ s/^message//;
@@ -114,13 +123,11 @@ my $td = EV::Telegram::TDLib->new(
     # never write to stdout: it carries the protocol
     on_error           => sub { warn "tdlib: $_[0]\n" },
     on_chat            => sub { $seen{ $_[0]{id} } = 1 },
-    ($ENV{TD_BOT_TOKEN}
-        ? (bot_token => $ENV{TD_BOT_TOKEN})
-        : (phone_number => env_or_die('TD_PHONE', 'phone number in international format'),
-           # stdio belongs to the protocol, so there is no way to prompt:
-           # the session has to exist already
-           on_code     => sub { warn "no session: run 01-login.pl first\n" },
-           on_password => sub { warn "no session: run 01-login.pl first\n" })),
+    phone_number       => env_or_die('TD_PHONE', 'phone number in international format'),
+    # stdio belongs to the protocol, so there is no way to prompt: the
+    # session has to exist already
+    on_code            => sub { warn "no session: run 01-login.pl first\n" },
+    on_password        => sub { warn "no session: run 01-login.pl first\n" },
 );
 
 $td->login(sub {
@@ -138,14 +145,18 @@ $td->login(sub {
 sub tool_list_chats {
     my ($id, $args) = @_;
     my $limit = $args->{limit} || 30;
+    # a closure that names itself holds a reference to itself and is never
+    # collected, so this one is cleared on every path out of the paging loop
     my $load;
     $load = sub {
         $td->load_chats(200, sub {
             my ($res, $err) = @_;
-            return reply_text($id, "load_chats: $err->{message}", 1) if $err;
+            if ($err) { undef $load; return reply_text($id, "load_chats: $err->{message}", 1) }
             return $load->() if $res;          # another page arrived
+            undef $load;                       # break the cycle before replying
             my @chats = sort {
-                ($b->{last_message}{date} // 0) <=> ($a->{last_message}{date} // 0)
+                (($b->{last_message} || {})->{date} // 0)
+                    <=> (($a->{last_message} || {})->{date} // 0)
             } grep { defined } map { $td->chat($_) } keys %seen;
             @chats = @chats[0 .. $limit - 1] if @chats > $limit;
             reply_text($id, join "\n",
@@ -214,18 +225,19 @@ sub handle {
     }
 
     return unless defined $id;
-    print $J->encode({
-        jsonrpc => '2.0', id => $id,
-        error   => { code => -32601, message => "method not found: $method" },
-    }), "\n";
+    rpc_error($id, -32601, "method not found: $method");
 }
 
 # stdin as an EV watcher, so reading the protocol never stalls the pump
 my $buf = '';
 my $stdin = EV::io *STDIN, EV::READ, sub {
+    my ($w) = @_;
     my $n = sysread STDIN, my $chunk, 65536;
     if (!defined $n) { return if $!{EAGAIN} || $!{EINTR}; $n = 0 }
     if ($n == 0) {                      # the client closed the pipe
+        # stop first: an fd at EOF stays readable, so otherwise every loop
+        # iteration lands back here and calls close() again, at full CPU
+        $w->stop;
         $td->close(sub { EV::break });
         return;
     }
@@ -233,8 +245,16 @@ my $stdin = EV::io *STDIN, EV::READ, sub {
     while ($buf =~ s/^([^\n]*)\n//) {
         my $line = $1;
         next unless length $line;
-        my $req = eval { $J->decode($line) } or next;
-        handle($req);
+        # malformed input is answered, not dropped: a client waiting for a
+        # reply to that line would otherwise wait for ever
+        my $req = eval { $J->decode($line) };
+        if (!defined $req)      { rpc_error(undef, -32700, 'parse error');     next }
+        if (ref $req ne 'HASH') { rpc_error(undef, -32600, 'invalid request'); next }
+        # a tool that dies -- the module refusing an argument, say -- must
+        # still answer, and must not strand the lines left in the buffer
+        next if eval { handle($req); 1 };
+        (my $err = $@) =~ s/ at \S+ line \d+.*//s;
+        rpc_error($req->{id}, -32603, $err) if defined $req->{id};
     }
 };
 

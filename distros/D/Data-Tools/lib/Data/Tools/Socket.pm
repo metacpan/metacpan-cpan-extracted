@@ -1,9 +1,9 @@
 ##############################################################################
 #
 #  Data::Tools::Socket perl module
-#  Copyright (c) 2013-2024 Vladi Belperchinov-Shabanski "Cade" 
+#  Copyright (c) 2013-2024 Vladi Belperchinov-Shabanski "Cade"
 #        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
-#  http://cade.noxrun.com/  
+#  http://cade.noxrun.com/
 #
 #  GPL
 #
@@ -13,7 +13,7 @@ use strict;
 use Exporter;
 use Time::HiRes qw( time );
 
-our $VERSION = '1.50';
+our $VERSION = '1.52';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -23,7 +23,7 @@ our @EXPORT = qw(
 
                   socket_read_message
                   socket_write_message
-                  
+
                   socket_can_write
                   socket_can_read
                 );
@@ -36,7 +36,7 @@ sub socket_read
    my $data    = shift;
    my $readlen = shift;
    my $timeout = shift || undef;
-   
+
    my $stime = time();
    $$data = undef;
 
@@ -45,19 +45,19 @@ sub socket_read
    while( $rlen > 0 )
      {
      return undef if ! socket_can_read( $sock, $timeout ) or ( $timeout > 0 and time() - $stime > $timeout );
-     
+
      my $part;
      my $plen = $sock->sysread( $part, $rlen );
-     
+
      return undef if $plen <= 0;
-     
+
      $$data .= $part;
      $rlen -= $plen;
 #print STDERR "SOCKET_READ: part [$part] [$plen] [$rlen]\n";
      }
 
 #print STDERR "SOCKET_READ: incoming data [$$data]\n";
-   
+
   return $readlen - $rlen;
 }
 
@@ -67,7 +67,7 @@ sub socket_write
    my $data     = shift;
    my $writelen = shift;
    my $timeout  = shift || undef;
-   
+
    my $stime = time();
 
 #print STDERR "SOCKET_WRITE: outgoing data [$data]\n";
@@ -75,16 +75,16 @@ sub socket_write
    while( $wpos < $writelen )
      {
      return undef if ! socket_can_write( $sock, $timeout ) or ( $timeout > 0 and time() - $stime > $timeout );
- 
+
      my $part;
      my $plen = $sock->syswrite( $data, $writelen - $wpos, $wpos );
 #print STDERR "SOCKET_WRITE: part [$plen]\n";
-     
+
      return undef if $plen <= 0;
-     
+
      $wpos += $plen;
      }
-   
+
 #print STDERR "SOCKET_WRITE: part [$wpos] == writelen [$writelen]\n";
   return $wpos;
 }
@@ -94,24 +94,27 @@ sub socket_print
    my $sock     = shift;
    my $data     = shift;
    my $timeout  = shift || undef;
-   
+
    return socket_write( $sock, $data, length( $data ), $timeout );
 }
 
 ##############################################################################
 
 # returns read data in scalar context:
-# return undef if cannot read incoming message length 
+# return undef if cannot read incoming message length
 # return "" if incoming length is 0, i.e. empty data
 # in list context:
 # ( read_data, read_length, error_string )
 # error_string is undef for OK (no error)
 
 sub socket_read_message
-{
+{ # OK
   my $sock    = shift;
   my $timeout = shift;
-   
+  my $maxlen  = shift;
+
+  $maxlen = 2**32 if $maxlen <= 0 or $maxlen > 2**32;
+
   my $data_len_N32;
   my $rc_data_len = socket_read( $sock, \$data_len_N32, 4, $timeout );
   if( $rc_data_len == 0 )
@@ -119,8 +122,13 @@ sub socket_read_message
     # end of comms
     return wantarray ? ( undef, 0, 'E_EOF' ) : undef;
     }
+  if( $rc_data_len != 4 )
+    {
+    # ivalid length length
+    return wantarray ? ( undef, 0, 'E_MSGLEN' ) : undef;
+    }
   my $data_len = unpack( 'N', $data_len_N32 );
-  if( $rc_data_len != 4 or $data_len < 0 or $data_len >= 2**32 )
+  if( $data_len > $maxlen )
     {
     # ivalid length
     return wantarray ? ( undef, 0, 'E_MSGLEN' ) : undef;
@@ -131,13 +139,13 @@ sub socket_read_message
     }
 
   my $read_data;
-  my $res_data_len = socket_read( $sock, \$read_data, $data_len );
+  my $res_data_len = socket_read( $sock, \$read_data, $data_len, $timeout );
   if( $res_data_len != $data_len )
     {
     # invalid data len received
-    return wantarray ? ( undef, $res_data_len ) : undef;
+    return wantarray ? ( undef, $res_data_len, 'E_SHORTREAD' ) : undef;
     }
-  
+
   return wantarray ? ( $read_data, $res_data_len, undef ) : $read_data;
 }
 
@@ -146,7 +154,7 @@ sub socket_write_message
   my $sock    = shift;
   my $data    = shift;
   my $timeout = shift;
-  
+
   # FIXME: utf?
   my $data_len = length( $data );
   my $res_data_len = socket_write( $sock, pack( 'N', $data_len ) . $data, 4 + $data_len, $timeout );
@@ -193,7 +201,7 @@ sub socket_can_read
 =head1 SYNOPSIS
 
   use Data::Tools::Socket qw( :all );  # import all functions
-  use Data::Tools::Socket;             # the same as :all :) 
+  use Data::Tools::Socket;             # the same as :all :)
   use Data::Tools::Socket qw( :none ); # do not import anything, use full package names
 
   # --------------------------------------------------------------------------
@@ -213,7 +221,7 @@ sub socket_can_read
 
 =head2 socket_read(  $socket, $data_ref, $length, $timeout )
 
-Reads $length sized data from the $socket and store it to $data_ref scalar 
+Reads $length sized data from the $socket and store it to $data_ref scalar
 reference.
 
 Returns read length (can be shorter than requested $length);
@@ -246,7 +254,7 @@ $timeout is optional, it is in seconds and can be less than 1 second.
 =head2 socket_write_message( $socket, $data, $timeout )
 
 Writes 32bit network-order integer, which is the size of the given $data to be
-written to the $socket and then writes the data 
+written to the $socket and then writes the data
 (i.e. message = 32bit-integer + data ).
 
 Returns 1 on success or undef for message or network error.
@@ -261,20 +269,19 @@ $timeout is optional, it is in seconds and can be less than 1 second.
 
 Data::Tools::Socket uses:
 
-  * IO::Select
   * Time::HiRes
 
 =head1 GITHUB REPOSITORY
 
   git@github.com:cade-vs/perl-data-tools.git
-  
+
   git clone git://github.com/cade-vs/perl-data-tools.git
-  
+
 =head1 AUTHOR
 
   Vladi Belperchinov-Shabanski "Cade"
         <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
-  http://cade.noxrun.com/  
+  http://cade.noxrun.com/
 
 
 =cut

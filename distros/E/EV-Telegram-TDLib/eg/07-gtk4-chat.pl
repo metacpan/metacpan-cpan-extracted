@@ -7,7 +7,8 @@
 # drives both the widgets and the TDLib pump, and there is no gtk_main and no
 # $app->run anywhere in this file.
 #
-# Uses the session created by 01-login.pl (or a bot token).
+# Uses the session created by 01-login.pl. A user account only: TDLib
+# refuses the chat list and history to a bot.
 #
 # The database directory (default ./tdlib-db) holds the session: it is
 # exactly as sensitive as a password.
@@ -164,7 +165,7 @@ sub preview_of {
     my ($msg) = @_;
     return '' unless $msg;
     my $c = $msg->{content} || {};
-    my $t = $c->{text}{text} // $c->{caption}{text};
+    my $t = ($c->{text} || {})->{text} // ($c->{caption} || {})->{text};
     return $t if defined $t && length $t;
     my $type = $c->{'@type'} // 'message';
     $type =~ s/^message//;
@@ -194,21 +195,31 @@ my $td = EV::Telegram::TDLib->new(
     api_hash           => env_or_die('TD_API_HASH', 'from https://my.telegram.org'),
     database_directory => $ENV{TD_DATABASE_DIRECTORY} // 'tdlib-db',
     on_error           => sub { $status->set_text(one_line($_[0], 60)) },
-    ($ENV{TD_BOT_TOKEN}
-        ? (bot_token => $ENV{TD_BOT_TOKEN})
-        : (phone_number => env_or_die('TD_PHONE', 'phone number in international format'),
-           on_code => sub {
-               my ($info, $submit) = @_;
-               print STDERR 'login code: ';
-               chomp(my $c = <STDIN> // '');
-               $submit->($c);
-           },
-           on_password => sub {
-               my ($info, $submit) = @_;
-               print STDERR '2FA password: ';
-               chomp(my $p = <STDIN> // '');
-               $submit->($p);
-           })),
+    phone_number       => env_or_die('TD_PHONE', 'phone number in international format'),
+    on_code            => sub {
+        my ($info, $submit) = @_;
+        print STDERR 'login code: ';
+        chomp(my $c = <STDIN> // '');
+        $submit->($c);
+    },
+    on_password        => sub {
+        my ($info, $submit) = @_;
+        print STDERR '2FA password: ';
+        # Echo off while it is typed, restored through a guard object
+        # so an interrupt cannot leave the terminal silent afterwards.
+        # The handler dies rather than returning: perl defers signals,
+        # and a handler that returns lets it resume the read.
+        my $p = do {
+            my $guard = EchoOff->new;
+            local $SIG{INT} = local $SIG{TERM} = local $SIG{HUP}
+                = sub { die "interrupted\n" };
+            my $line = eval { <STDIN> };
+            defined $line ? do { chomp $line; $line } : undef;
+        };
+        print STDERR "\n";
+        return warn "no password given\n" unless defined $p;
+        $submit->($p);
+    },
 );
 
 sub add_message {
@@ -364,7 +375,8 @@ $td->login(sub {
                         map  { $td->chat($_) } keys %seen;
             # newest conversation first, which is what every client does
             @chats = sort {
-                ($b->{last_message}{date} // 0) <=> ($a->{last_message}{date} // 0)
+                (($b->{last_message} || {})->{date} // 0)
+                    <=> (($a->{last_message} || {})->{date} // 0)
                     || ($a->{title} // '') cmp ($b->{title} // '')
             } @chats;
             add_chat_row($_) for @chats;
@@ -378,3 +390,29 @@ $td->login(sub {
 });
 
 EV::run;
+
+# Turns terminal echo off for as long as the object lives, and restores the
+# exact previous settings when it goes away. POSIX::Termios rather than
+# shelling out to stty so the original flags are what comes back, not a guess
+# at them; a terminal left with echo off outlives this program.
+package EchoOff;
+use POSIX qw(:termios_h);
+
+sub new {
+    my ($class) = @_;
+    return bless { }, $class unless -t STDIN;
+    my $t = POSIX::Termios->new;
+    $t->getattr(fileno STDIN) or return bless { }, $class;
+    my $self = bless { termios => $t, lflag => $t->getlflag }, $class;
+    $t->setlflag($self->{lflag} & ~ECHO);
+    $t->setattr(fileno STDIN, TCSANOW);
+    return $self;
+}
+
+sub DESTROY {
+    my ($self) = @_;
+    return unless $self->{termios};
+    $self->{termios}->setlflag($self->{lflag});
+    $self->{termios}->setattr(fileno STDIN, TCSANOW);
+    delete $self->{termios};
+}

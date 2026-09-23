@@ -21,8 +21,8 @@ WriteMakefile(
 	PREREQ_PM      => {
 		'autodie'                => 0,
 		'Carp'                     => 0,
-		'Database::Abstraction' => 0.44,
-		'DBD::SQLite'           => '1.70',
+		'Database::Abstraction' => 0.45,
+		'DBD::SQLite'      => '1.70',
 		'DBI'                   => 0,
 		'File::Spec'            => 0,
 		'File::Temp'            => 0,
@@ -44,6 +44,7 @@ WriteMakefile(
 		'Test::NoWarnings'      => 0,
 		'Test::Returns'       => '0.04',
 		'Test::Without::Module' => 0,
+		'JSON::MaybeXS'         => 0,
 		'Text::xSV::Slurp'    => 0,
 	}, META_MERGE => {
 		'meta-spec' => { version => 2 },

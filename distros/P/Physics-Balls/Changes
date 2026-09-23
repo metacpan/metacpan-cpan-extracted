@@ -1,5 +1,11 @@
 Revision history for Physics::Balls
 
+0.07	2026-09-23
+        - ABI 4 by append: advance runs the world a fixed time from rows that carry a velocity and reports every body at the horizon, for a game that ticks
+
+0.06	2026-09-22
+        - The tests require Math::BigRat 0.2613
+
 0.05	2026-09-20
         - The lane fixtures are read in ulps of a double and not bit for bit: a long double perl parses their decimals to a wider number, and a compiler the prototype was not recorded on lands an ulp away
         - t/11-kinds.t to Test2::Bundle::Numerical

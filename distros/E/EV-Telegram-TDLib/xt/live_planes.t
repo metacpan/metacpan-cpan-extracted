@@ -8,13 +8,13 @@ BEGIN {
 
 plan skip_all => 'set TD_API_ID and TD_API_HASH'
     unless $ENV{TD_API_ID} && $ENV{TD_API_HASH};
-plan skip_all => 'set TD_PHONE and a user session in TD_DATABASE_DIRECTORY'
-    unless $ENV{TD_PHONE} && $ENV{TD_DATABASE_DIRECTORY};
+plan skip_all => 'set TD_DATABASE_DIRECTORY to an authenticated user session'
+    unless $ENV{TD_DATABASE_DIRECTORY} && -d $ENV{TD_DATABASE_DIRECTORY};
 
 use EV;
 use EV::Telegram::TDLib;
 
-# The stubbed suite in t/ asserts request SHAPE. It cannot tell a wrong nested
+# The stubbed suite in t/ asserts request shape. It cannot tell a wrong nested
 # @type from a right one, because nothing parses the request but TDLib -- which
 # is how 0.03 shipped set_draft and the contact builder dead, both green. This
 # file sends the real thing and reads the result back.
@@ -26,9 +26,10 @@ use EV::Telegram::TDLib;
 my $td = EV::Telegram::TDLib->new(
     api_id             => $ENV{TD_API_ID},
     api_hash           => $ENV{TD_API_HASH},
-    phone_number       => $ENV{TD_PHONE},
     database_directory => $ENV{TD_DATABASE_DIRECTORY},
     on_error           => sub { },
+    on_code     => sub { BAIL_OUT 'user session is not authenticated' },
+    on_password => sub { BAIL_OUT 'user session is not authenticated' },
 );
 
 my $nonce = sprintf '%d_%d', $$, time;

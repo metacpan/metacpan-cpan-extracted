@@ -16,7 +16,7 @@ name: WWW-OpenBao
 provides:
   WWW::OpenBao:
     file: lib/WWW/OpenBao.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Carp: '0'
   HTTP::Tiny: '0.080'
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-www-openbao/issues
   homepage: https://github.com/Getty/p5-www-openbao
   repository: https://github.com/Getty/p5-www-openbao.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -37,6 +37,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - .karr
             - README.md
           exclude_match: []
           include_dotfiles: 1
@@ -256,8 +257,8 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
@@ -302,7 +303,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.002'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -317,8 +318,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::BumpVersionAfterRelease:
           finders:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':PerlExecFiles'
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}

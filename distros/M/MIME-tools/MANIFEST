@@ -56,6 +56,7 @@ t/ambiguous-parse.t
 t/attachment-filename-encoding.t
 t/Body.t
 t/BodyPrint.t
+t/concatenated-base64.t
 t/Decoder.t
 t/EmptyPart.t
 t/Entity.t
@@ -150,6 +151,7 @@ testmsgs/bluedot-postcard.msg
 testmsgs/bluedot-postcard.ref
 testmsgs/bluedot-simple.msg
 testmsgs/bluedot-simple.ref
+testmsgs/concatenated-base64.msg
 testmsgs/double-boundary-with-comment.msg
 testmsgs/double-boundary.msg
 testmsgs/double-content-disposition-param.msg

@@ -65,4 +65,24 @@ $err = do { local $@;
     eval { EV::Telegram::TDLib->reply_keyboard([[ { text => 'x', request_chat => 1 } ]]) }; $@ };
 like($err, qr/request_chat needs a hashref/, 'a non-hashref request_chat is refused');
 
+# --- TL bytes fields reject text rather than dying inside MIME::Base64 or
+# silently sending latin-1 for a character the caller meant as UTF-8
+{
+    my $err = '';
+    eval {
+        EV::Telegram::TDLib->inline_keyboard(
+            [ [ { text => 'b', data => "vote:\x{2713}" } ] ]);
+        1;
+    } or $err = $@;
+    like $err, qr/bytes, not text/,
+        'a wide character in callback button data croaks naming the caller';
+    unlike $err, qr/Wide character in subroutine entry/,
+        'and not from inside MIME::Base64';
+
+    my $ok = EV::Telegram::TDLib->inline_keyboard(
+        [ [ { text => 'b', data => "caf\xe9" } ] ]);
+    is $ok->{rows}[0][0]{type}{'@type'}, 'inlineKeyboardButtonTypeCallback',
+        'a byte string in the latin-1 range is still accepted';
+}
+
 done_testing;

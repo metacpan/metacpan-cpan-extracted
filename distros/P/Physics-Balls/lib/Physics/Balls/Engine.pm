@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 use Physics::Balls;
 
@@ -22,6 +22,11 @@ sub strike {
 sub strike_v1 {
 	my ($self, $layout, $shot) = @_;
 	return _strike_v1($self->{ptr}, $layout, $shot);
+}
+
+sub advance {
+	my ($self, $layout, $tick) = @_;
+	return _advance($self->{ptr}, $layout, $tick);
 }
 
 sub bad_size_refused {
@@ -47,7 +52,7 @@ Physics::Balls::Engine - the door to the C engine
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -80,6 +85,15 @@ the ABI 2 entry point, so a row may carry a kind and a shot an adjust.
 The same shot through the ABI 1 entry point, rows of three and no adjust.
 The v1 functions are wrappers over the v2 path with the v1 defaults, and
 this is how a test proves that they give the same doubles.
+
+=head2 advance
+
+    my $raw = $engine->advance(\@rows, { t => 20000 });
+
+Since 0.07, the ABI 4 entry point: rows of C<[id, x, y, kind, vx, vy]>
+advanced C<t> microseconds. The hash is the strike's plus C<state>,
+C<[[id, x, y, vx, vy, mode], ...]> at the horizon. L<Physics::Balls::Tick>
+validates and wraps it; a hot loop may call this directly.
 
 =head2 bad_size_refused
 

@@ -24,7 +24,7 @@ use v5.36;
 # the hypervisor says and not what a sleep guessed.
 
 package App::FuguVM::Guest;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use App::FuguVM::Arch;
 use App::FuguVM::Autoinstall;
@@ -649,6 +649,7 @@ sub _mirror ( $self, $proxy = undef )
 		version => $config->{version},
 		arch    => $config->{arch},
 		verify  => $config->{verify} // 1,
+		log     => $self->{log},
 		(
 			defined $config->{signify_dir}
 			? ( keys_dir => $config->{signify_dir} )

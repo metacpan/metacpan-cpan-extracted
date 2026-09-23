@@ -9,7 +9,8 @@ use IO::Socket::INET ();
 use POSIX ();
 
 our @ISA       = 'Exporter';
-our @EXPORT_OK = qw(free_ports quiet_child server_status server_reap slurp);
+our @EXPORT_OK = qw(free_ports quiet_child server_guard server_status
+                    server_reap slurp);
 
 # SIGPIPE, for the test process itself.
 #
@@ -71,9 +72,22 @@ sub free_ports {
 # mid-test, or a parent killed outright. SIGALRM's default action kills; a
 # TERM does not, because perl defers it to an op boundary the child never
 # reaches while it is wedged in accept(2) or an SSL handshake.
+#
+# A supervisor owns SIGALRM itself (its scoreboard tick), so it carries this
+# deadline rather than firing at it - 0.52; before that it cancelled it, and an
+# orphaned pool ran for ever. Either way the backstop is a last resort measured
+# in minutes: server_guard() below is what takes a pool down at once.
 sub quiet_child {
     my (%o) = @_;
     my $null = File::Spec->devnull;
+    # Which stream is the harness's, named by the pipe itself - taken BEFORE
+    # the reopen below, while STDOUT and STDERR still point at it.
+    my %tap;
+    for my $h (\*STDOUT, \*STDERR) {
+        next unless -p $h;
+        my ($dev, $ino) = (stat $h)[0, 1];
+        $tap{"$dev:$ino"} = 1 if defined $ino;
+    }
     open STDOUT, '>', $null;
     open STDERR, '>', (defined $o{stderr} ? $o{stderr} : $null);
     if (my $tb = eval { Test::Builder->new }) {
@@ -82,11 +96,77 @@ sub quiet_child {
             close $h if defined $h;
         }
     }
+    # ... and then by descriptor, because closing them by name is not enough:
+    # under a Test2-based Test::Builder those three handles are not the only
+    # dups of the TAP stream, and an orphaned server holding one write end of
+    # it makes the harness wait for an EOF that never comes - `make test` hangs
+    # after the test file itself is gone, which a smoker reports as the whole
+    # run being SIGKILLed.
+    #
+    # Only dups of THAT pipe, identified by its inode: a forked server can hold
+    # an inherited pipe it needs - the arena's wakeup descriptors are pipes
+    # made before the fork - and closing those leaves a worker deaf. Probed
+    # through a dup of its own, so anything else is left exactly as it was.
+    #
+    # And pointed at the null device rather than closed. A descriptor closed
+    # under the PerlIO handle that owns it leaves the handle live and the
+    # NUMBER free, so the next thing this server opens takes it and a later
+    # flush of that handle writes into a socket, or a mapping, that belongs to
+    # somebody else. The harness gets its EOF either way, since no write end of
+    # its pipe survives.
+    if (%tap && open my $sink, '>', $null) {
+        my $nul = fileno $sink;
+        for my $fd (3 .. 63) {
+            next if $fd == $nul;
+            my $dup = eval { POSIX::dup($fd) };
+            next unless defined $dup;
+            my $theirs = 0;
+            if (open my $probe, '<&=', $dup) {
+                my ($dev, $ino) = (stat $probe)[0, 1];
+                $theirs = defined $ino && $tap{"$dev:$ino"};
+                close $probe;
+            }
+            else { POSIX::close($dup) }
+            POSIX::dup2($nul, $fd) if $theirs;
+        }
+    }
     alarm(defined $o{alarm} ? $o{alarm} : 120);
 }
 
 # Reaped children, so a status check and a later wait agree on what happened.
 my %status;
+
+# A forked server this test process is responsible for. Register it as soon as
+# fork() returns and the END block below tears it down however the file ends -
+# including a die in the middle, which is the case the tests themselves cannot
+# cover: an assertion that fails on the way to `kill TERM` leaves a whole pool
+# running, and a pool nobody kills outlives the harness. A smoker reports that
+# as the entire run being SIGKILLed, so the report loses every test file after
+# the one that died. The pid is returned so a fork can be wrapped in place.
+my $owner = $$;
+my @guarded;
+
+sub server_guard {
+    my $pid = shift;
+    push @guarded, $pid if $pid;
+    return $pid;
+}
+
+END {
+    return unless $$ == $owner;      # never from inside a forked server
+    for my $pid (reverse @guarded) {
+        next if exists $status{$pid};
+        next unless kill 'TERM', $pid;
+        my $gone = 0;
+        for (1 .. 40) {
+            if (waitpid($pid, POSIX::WNOHANG()) == $pid) { $gone = 1; last }
+            select undef, undef, undef, 0.05;
+        }
+        next if $gone;
+        kill 'KILL', $pid;
+        waitpid $pid, 0;
+    }
+}
 
 sub _describe {
     my $st = shift;

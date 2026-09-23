@@ -77,18 +77,50 @@ like last_json(), qr/replyMarkupInlineKeyboard/, 'send_file carries reply_markup
 # --- an unknown kind is a programming error, not a silent default
 eval { $td->send_file(42, '/tmp/x.bin', kind => 'nope', sub {}) };
 like $@, qr/unknown file kind/, 'send_file rejects an unknown kind';
+
+# a hashref was waved through as an already-built inputFile whatever it was,
+# so a formattedText became the file and TDLib blamed the InputFile
+eval { $td->send_file(42, { '@type' => 'formattedText', text => 'x' }, sub {}) };
+like $@, qr/must be a path or an inputFile/, 'send_file rejects a foreign hashref';
+eval { $td->send_file(42, { path => '/tmp/x' }, sub {}) };
+like $@, qr/without an \@type/, 'and one with no @type at all';
+{
+    @sent = ();
+    $td->send_file(42, { '@type' => 'inputFileId', id => 7 }, sub {});
+    like last_json(), qr/"inputFileId"/, 'but a real inputFile passes through';
+}
+# the photo setters had their own copy of the shortcut, so the same check
+# never reached them
+eval { $td->set_profile_photo({ '@type' => 'formattedText', text => 'x' }, sub {}) };
+like $@, qr/must be a path or an inputFile/, 'set_profile_photo rejects a foreign hashref';
+eval { $td->set_chat_photo(42, undef, sub {}) };
+like $@, qr/required/, 'and a photo setter still requires a path';
 eval { $td->chat_action(42, 'nope', sub {}) };
 like $@, qr/unknown chat action/, 'chat_action rejects an unknown action';
 
-# --- read state sends openChat before viewMessages
-@sent = ();
-$td->mark_read(42, message_ids => [7], sub {});
-like $sent[0], qr/"\@type":"openChat"/, 'mark_read opens the chat first';
+# --- read state is one viewMessages, with no openChat around it
+{
+    @sent = ();
+    my @got;
+    $td->mark_read(42, message_ids => [7], sub { @got = @_ });
+    is scalar @sent, 1, 'mark_read sends one request';
+    like $sent[0], qr/"\@type":"viewMessages"/, 'and it is viewMessages';
+    like $sent[0], qr/"force_read":true/, 'with force_read, which is what makes it stick';
+    like $sent[0], qr/"messageSourceChatHistory"/, 'and an explicit source';
+    # openChat writes the chat into the account's persistent recently-opened
+    # list, which closeChat does not undo: a sweep evicted every real one
+    unlike $sent[0], qr/openChat/, 'no chat is opened';
+    my ($x) = $sent[0] =~ /"\@extra":"(\d+)"/;
+    $td->inject_raw(qq({"\@type":"ok","\@extra":"$x"}));
+    is scalar @sent, 1, 'and nothing follows the reply';
+    is $got[0]{'@type'}, 'ok', 'the caller gets the reply';
+    ok !$got[1], 'and no error';
+}
 
 # --- callback queries decode the base64 payload for the caller
 my $got;
 $td->on_callback_query(sub { $got = shift });
-$td->_inject_raw(q({"@type":"updateNewCallbackQuery","id":"99","sender_user_id":5,)
+$td->inject_raw(q({"@type":"updateNewCallbackQuery","id":"99","sender_user_id":5,)
     . q("chat_id":42,"message_id":7,)
     . q("payload":{"@type":"callbackQueryPayloadData","data":"dm90ZTp5ZXM="}}));
 is $got->{data}, 'vote:yes', 'callback payload is decoded from base64';
@@ -159,6 +191,11 @@ $td->set_profile_photo('/tmp/p.png', sub {});
 $j = last_json();
 like $j, qr/"\@type":"setProfilePhoto"/, 'set_profile_photo sends setProfilePhoto';
 like $j, qr/"\@type":"inputChatPhotoStatic"/, 'a still photo is a static chat photo';
+# is_public sets the fallback photo shown to users the privacy settings deny
+# the main one, so defaulting it on left the photo everyone sees unchanged
+like $j, qr/"is_public":false/, 'by default it is the main photo, not the public fallback';
+$td->set_profile_photo('/tmp/p.png', public => 1, sub {});
+like last_json(), qr/"is_public":true/, 'public => 1 sets the fallback';
 $td->set_profile_photo('/tmp/p.mp4', animation => 1, main_frame_timestamp => 2, sub {});
 like last_json(), qr/"\@type":"inputChatPhotoAnimation"/, 'an animated photo uses the animation type';
 
@@ -181,10 +218,10 @@ eval { $td->set_bot_name('x', sub {}) };
 like $@, qr/bot_user_id is not known/, 'a bot action without an id croaks';
 
 # --- the option cache decodes each option value type
-$td->_inject_raw(q({"@type":"updateOption","name":"t_str","value":{"@type":"optionValueString","value":"s"}}));
-$td->_inject_raw(q({"@type":"updateOption","name":"t_int","value":{"@type":"optionValueInteger","value":7}}));
-$td->_inject_raw(q({"@type":"updateOption","name":"t_bool","value":{"@type":"optionValueBoolean","value":true}}));
-$td->_inject_raw(q({"@type":"updateOption","name":"t_none","value":{"@type":"optionValueEmpty"}}));
+$td->inject_raw(q({"@type":"updateOption","name":"t_str","value":{"@type":"optionValueString","value":"s"}}));
+$td->inject_raw(q({"@type":"updateOption","name":"t_int","value":{"@type":"optionValueInteger","value":7}}));
+$td->inject_raw(q({"@type":"updateOption","name":"t_bool","value":{"@type":"optionValueBoolean","value":true}}));
+$td->inject_raw(q({"@type":"updateOption","name":"t_none","value":{"@type":"optionValueEmpty"}}));
 is $td->option('t_str'), 's', 'string option cached';
 is $td->option('t_int'), 7, 'integer option cached';
 is $td->option('t_bool'), 1, 'boolean option cached as 1';
@@ -224,8 +261,13 @@ like $p, qr/"\@type":"inputMessagePoll"/, 'send_poll sends a poll';
 like $p, qr/"\@type":"inputPollOption"/, 'poll options are inputPollOption';
 like $p, qr/"inputPollTypeRegular"/, 'a plain poll is a regular poll';
 like $p, qr/"is_anonymous":true/, 'polls are anonymous by default';
+# TDLib reads a missing allows_revoting as false: every vote was final
+like $p, qr/"allows_revoting":true/, 'a vote can be changed by default';
+$td->send_poll(42, 'Q', ['a','b'], revoting => 0, sub {});
+like last_json(), qr/"allows_revoting":false/, 'unless revoting is turned off';
 $td->send_poll(42, 'Q', ['a','b'], quiz => 1, correct => 1, sub {});
 like last_json(), qr/"inputPollTypeQuiz"/, 'quiz mode selects the quiz type';
+like last_json(), qr/"allows_revoting":false/, 'and a quiz answer is final';
 eval { $td->send_poll(42, 'Q', ['only one'], sub {}) };
 like $@, qr/at least two options/, 'send_poll needs two options';
 eval { $td->send_poll(42, 'Q', 'not-an-array', sub {}) };
@@ -239,7 +281,7 @@ like last_json(), qr/"\@type":"inputMessageContact"/, 'send_contact sends a cont
 # --- inline queries
 my $iq;
 $td->on_inline_query(sub { $iq = shift });
-$td->_inject_raw(q({"@type":"updateNewInlineQuery","id":"1234567890123456789",)
+$td->inject_raw(q({"@type":"updateNewInlineQuery","id":"1234567890123456789",)
     . q("sender_user_id":5,"query":"cats","offset":"",)
     . q("chat_type":{"@type":"chatTypePrivate"}}));
 is $iq->{query}, 'cats', 'inline query text reaches the handler';

@@ -69,6 +69,20 @@ is last_req()->{'@type'}, 'getMe', 'call works without a callback';
 $td->call('getMe');
 is last_req()->{'@type'}, 'getMe', 'and the arguments are optional too';
 
+# a callback where the arguments go croaked "call needs a hashref". The reply
+# is what proves it: a request going out would pass with the callback dropped.
+{
+    my $got;
+    $td->call('getMe', sub { $got = shift });
+    my ($x) = $sent[-1] =~ /"\@extra":"(\d+)"/;
+    $td->inject_raw(qq({"\@type":"user","id":7,"\@extra":"$x"}));
+    is $got && $got->{id}, 7, 'a callback in place of the arguments gets the reply';
+
+    $td->call('getMe', sub {}, timeout => 5);
+    ($x) = $sent[-1] =~ /"\@extra":"(\d+)"/;
+    ok $td->{pending}{$x}{timer}, 'and options after it still reach send';
+}
+
 $err = do { local $@; eval { $td->call(undef, {}) }; $@ };
 like $err, qr/required/, 'a missing function name is refused';
 

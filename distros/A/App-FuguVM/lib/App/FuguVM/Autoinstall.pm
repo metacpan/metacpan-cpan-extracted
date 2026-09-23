@@ -29,7 +29,7 @@ use v5.36;
 # origin-server mode here.
 
 package App::FuguVM::Autoinstall;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use IO::Socket::INET;
 use Fugu::File;

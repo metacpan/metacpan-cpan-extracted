@@ -13,6 +13,7 @@ use strict;
 use warnings;
 use FindBin ();
 use JSON::PP ();
+use Physics::Balls;
 use Physics::Balls::Table;
 use Physics::Balls::World;
 
@@ -67,6 +68,36 @@ sub read_json {
 }
 
 sub hex_to_nv { my ($h) = @_; return unpack 'd>', pack 'H*', $h }
+
+# Events an instant apart are one instant: the engine orders two rolls at the
+# same time by which queue entry came first, and a build whose doubles differ
+# in the last place orders them the other way. Before an index-by-index
+# comparison each run of events within $tol of its neighbour is sorted by kind
+# and participants, on both sides the same, so the contract is the order of
+# what happens and not the order of what happens at once.
+sub settle_ties {
+	my ($events, $tol) = @_;
+	my (@out, @run);
+	my $flush = sub {
+		push @out, sort { join("\0", @$a[1 .. $#$a]) cmp join("\0", @$b[1 .. $#$b]) } @run;
+		@run = ();
+	};
+	for my $e (@$events) {
+		$flush->() if @run && abs($e->[0] - $run[-1][0]) >= $tol;
+		push @run, $e;
+	}
+	$flush->();
+	return \@out;
+}
+
+# The marks that compare against recorded doubles hold only where the compiler
+# rounds every operation to a double; a build left on the x87 unit lands a few
+# ulps off in the first segment and a collision cascade carries it anywhere.
+# The reason to skip those marks, or nothing.
+sub wide_doubles {
+	my $m = Physics::Balls->float_eval_method;
+	return $m > 0 ? "FLT_EVAL_METHOD is $m: this build evaluates a double wider than a double, and the fixtures were recorded at 64 bits" : '';
+}
 
 sub geometry {
 	my ($name) = @_;

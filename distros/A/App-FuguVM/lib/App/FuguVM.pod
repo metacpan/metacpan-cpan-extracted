@@ -60,7 +60,7 @@ The OpenBSD miniroot image.
 
 =item L<App::FuguVM::Mirror>
 
-The OpenBSD mirror of one guest: the URLs, the download helper, the
+The OpenBSD mirror of one guest: the URLs, the downloader, the
 release key, and the verification.
 
 =item L<App::FuguVM::Proxy>

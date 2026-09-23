@@ -7,6 +7,7 @@ BEGIN { $ENV{EV_TDLIB_SHUTDOWN_TIMEOUT} = 0.1 }
 use EV;
 use EV::Telegram::TDLib;
 use Cpanel::JSON::XS;
+use MIME::Base64 ();
 
 my @sent;
 {
@@ -48,10 +49,30 @@ $td->search_secret_messages('x', filter => 'Photo', sub {});
 is last_req()->{filter}{'@type'}, 'searchMessagesFilterPhoto',
     'a short filter name is expanded';
 
+# new_encryption_key is TL bytes: passing the passphrase through verbatim made
+# TDLib reject the request outright for most passphrases, and silently decode
+# the base64-shaped ones into a key the caller never chose
 $td->set_database_encryption_key('hunter2', sub {});
 $r = last_req();
 is $r->{'@type'}, 'setDatabaseEncryptionKey', 'set_database_encryption_key works';
-is $r->{new_encryption_key}, 'hunter2', 'the key passed through';
+is $r->{new_encryption_key}, 'aHVudGVyMg==', 'the key is base64 encoded';
+is MIME::Base64::decode_base64($r->{new_encryption_key}), 'hunter2',
+    'and decodes back to the passphrase the caller gave';
+
+# the real TL parser is the oracle: it parses the whole request before
+# deciding the method is not synchronous
+{
+    my $res = EV::Telegram::TDLib->execute({
+        '@type' => 'setDatabaseEncryptionKey',
+        new_encryption_key => $r->{new_encryption_key} });
+    unlike $res->{message} // '', qr/Failed to parse/,
+        'and TDLib can parse the request we built';
+
+    my $bad = EV::Telegram::TDLib->execute({
+        '@type' => 'setDatabaseEncryptionKey', new_encryption_key => 'hunter2' });
+    like $bad->{message} // '', qr/Failed to parse/,
+        'where the unencoded passphrase would not parse at all';
+}
 
 # session ids are int64
 $td->session_accepts_secret_chats('7239857203948572039', 1, sub {});
@@ -85,7 +106,7 @@ like last_json(), qr/"revoke":true/, 'and can be turned on';
 $td->bot_access_settings(42, sub {});
 is last_req()->{'@type'}, 'getManagedBotAccessSettings', 'access settings getter works';
 
-$td->set_bot_access_settings(42, { '@type' => 'botManagerAccessSettings' }, sub {});
+$td->set_bot_access_settings(42, { '@type' => 'botAccessSettings' }, sub {});
 is last_req()->{'@type'}, 'setManagedBotAccessSettings', 'the setter works';
 
 $err = do { local $@; eval { $td->set_bot_access_settings(42, 'nope', sub {}) }; $@ };

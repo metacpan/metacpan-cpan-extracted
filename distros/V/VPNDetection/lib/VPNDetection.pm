@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.3.1';
+our $VERSION = '3.3.2';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -27,6 +27,13 @@ use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
 # The most addresses POST /batch takes in one call; a larger batch is sent in
 # chunks of this size.
 use constant BATCH_MAX => 1000;
+
+# Seconds before the first retry; each later one waits twice the one before.
+use constant BACKOFF_BASE => 0.25;
+
+# The longest Retry-After honored, in seconds: 2**31 - 1 ms, about 24.8 days,
+# the same bound as the .NET SDK's.
+use constant LONGEST_WAIT => 2_147_483.647;
 
 my %OPTIONS = map { $_ => 1 } qw(
     api_key base_url cache_size cache_ttl concurrency retries timeout ua
@@ -284,18 +291,31 @@ sub _settled {
 
 # Recurses through $self rather than through a self-referential closure, which
 # in Perl would be a reference cycle the interpreter never collects. $may_retry,
-# when given, can veto a retry the error alone would allow.
+# when given, can veto a retry the error alone would allow; $tries counts the
+# retries already made.
 sub _retry_p {
-    my ($self, $left, $attempt, $may_retry) = @_;
+    my ($self, $left, $attempt, $may_retry, $tries) = @_;
+    $tries //= 0;
     return $attempt->()->catch(sub {
         my $error = VPNDetection::Error->wrap(shift);
         die $error if $left <= 0 || !$error->retryable || ($may_retry && !$may_retry->());
-        # A server-supplied delay is honored with a TIMER, never a sleep: this
-        # promise shares an event loop with every other request in the batch, and
-        # sleeping here would stall all of them.
-        return Mojo::Promise->timer($error->retry_after || 0)
-            ->then(sub { $self->_retry_p($left - 1, $attempt, $may_retry) });
+        # The wait is a TIMER, never a sleep: this promise shares an event loop
+        # with every other request in the batch, and sleeping here would stall
+        # all of them.
+        return Mojo::Promise->timer(_retry_delay($error->retry_after, $tries))
+            ->then(sub { $self->_retry_p($left - 1, $attempt, $may_retry, $tries + 1) });
     });
+}
+
+# The server's Retry-After when it gave a usable one, otherwise the backoff:
+# 250 ms, doubling per retry, capped from the seventh. A Retry-After past
+# LONGEST_WAIT is waited out on the backoff too, still rate_limited, rather than
+# holding the call for as long as any server asks.
+sub _retry_delay {
+    my ($retry_after, $tries) = @_;
+    return $retry_after
+        if defined $retry_after && $retry_after > 0 && $retry_after <= LONGEST_WAIT;
+    return BACKOFF_BASE * 2**($tries < 6 ? $tries : 6);
 }
 
 # $timeout is the call's own bound, or undef for the client's.
@@ -526,6 +546,9 @@ Requests in flight during a batch. Defaults to 8, and is overridable per call.
 =item retries
 
 Attempts after a retryable failure. Defaults to 2, and is overridable per call.
+Each retry waits the server's C<Retry-After> when it sent one, otherwise a
+backoff of 250 ms that doubles per retry, up to 16 seconds. A C<Retry-After>
+longer than about 24.8 days is waited out on that backoff instead.
 
 =item timeout
 

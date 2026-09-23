@@ -1028,22 +1028,61 @@ static AV *pks_disallows(pTHX_ SV *appsv) {
     return out;
 }
 
+/* The crawlers that never read the `*` group.
+ *
+ * AdsBot-Google, AdsBot-Google-Mobile and Mediapartners-Google (AdSense) obey
+ * only a group naming their own token; Google documents the global user agent
+ * as ignored for all three. So a Disallow written for `*` alone is not a
+ * Disallow for them, and nothing says so: the file looks right, the sitemap
+ * agrees with it, and the path is crawled anyway. It costs most where it
+ * matters most, because the paths worth disallowing are the ones that should
+ * not be fetched on a schedule by anybody.
+ *
+ * Each group is written out again in full rather than as extra User-agent
+ * lines on one group. Several agents may share a group, but a parser that
+ * reads a second User-agent line as the start of a new one would then leave
+ * the `*` group with no rules in it - and of the two ways to be wrong, a
+ * silently empty `*` group is the one that opens the whole site.
+ *
+ * `agents` replaces this list, and `agents => []` asks for the `*` group
+ * alone. */
+static const char *const pks_agents[] = {
+    "AdsBot-Google",
+    "AdsBot-Google-Mobile",
+    "Mediapartners-Google",
+    NULL
+};
+
+/* One group: a blank line unless this is the first, the User-agent line, then
+ * the rules every group shares. */
+static void pks_group(pTHX_ SV *out, const char *agent, STRLEN alen,
+                      SV *rules) {
+    if (SvCUR(out)) sv_catpvs(out, "\n");
+    sv_catpvs(out, "User-agent: ");
+    sv_catpvn(out, agent, alen);
+    sv_catpvs(out, "\n");
+    sv_catsv(out, rules);
+}
+
 /* The robots.txt body (+1), advertising the sitemap at `base`. */
 static SV *pks_robots_for(pTHX_ SV *appsv, SV *base) {
     HV *app = app_hv(aTHX_ appsv);
     SV *all  = app ? app_get(aTHX_ app, "sitemap_disallow_all") : NULL;
-    SV *out = newSVpvs("User-agent: *\n");
+    SV *ags  = app ? app_get(aTHX_ app, "sitemap_agents") : NULL;
+    AV *agents = (ags && SvROK(ags) && SvTYPE(SvRV(ags)) == SVt_PVAV)
+                 ? (AV *)SvRV(ags) : NULL;
+    SV *rules = sv_2mortal(newSVpvs(""));
+    SV *out = newSVpvs("");
+    int staging = (all && SvTRUE(all)) ? 1 : 0;
 
-    if (all && SvTRUE(all)) {
+    if (staging) {
         /* A staging environment being indexed is routine, embarrassing and
          * slow to undo, and it is usually a robots.txt copied from
-         * production. No Sitemap line here: advertising a sitemap while
+         * production. No Sitemap line below: advertising a sitemap while
          * disallowing everything says two opposite things. */
-        sv_catpvs(out, "Disallow: /\n");
-        return out;
+        sv_catpvs(rules, "Disallow: /\n");
     }
-
-    {
+    else {
         AV *dis = (AV *)sv_2mortal((SV *)pks_disallows(aTHX_ appsv));
         SSize_t i, n = av_len(dis) + 1;
         for (i = 0; i < n; i++) {
@@ -1052,13 +1091,41 @@ static SV *pks_robots_for(pTHX_ SV *appsv, SV *base) {
             const char *p;
             if (!(e && *e)) continue;
             p = SvPV_const(*e, l);
-            sv_catpvs(out, "Disallow: ");
+            sv_catpvs(rules, "Disallow: ");
             /* percent-encoded, so a path with a space or a newline in it
              * cannot become a second directive */
-            pks_pct_cat(aTHX_ out, p, l);
-            sv_catpvs(out, "\n");
+            pks_pct_cat(aTHX_ rules, p, l);
+            sv_catpvs(rules, "\n");
         }
     }
+
+    pks_group(aTHX_ out, "*", 1, rules);
+
+    /* Nothing is disallowed, so there is nothing the named crawlers are
+     * missing: a group naming one of them and carrying no rule says exactly
+     * what their absence already says. */
+    if (SvCUR(rules)) {
+        if (agents) {
+            SSize_t i, n = av_len(agents) + 1;
+            for (i = 0; i < n; i++) {
+                SV **e = av_fetch(agents, i, 0);
+                STRLEN l;
+                const char *a;
+                if (!(e && *e && SvOK(*e))) continue;
+                a = SvPV_const(*e, l);
+                if (!l) continue;
+                pks_group(aTHX_ out, a, l, rules);
+            }
+        }
+        else {
+            int i;
+            for (i = 0; pks_agents[i]; i++)
+                pks_group(aTHX_ out, pks_agents[i],
+                          strlen(pks_agents[i]), rules);
+        }
+    }
+
+    if (staging) return out;
 
     /* The line most hand-written robots.txt files are missing, and the one
      * that makes a sitemap discoverable without anybody being told. */

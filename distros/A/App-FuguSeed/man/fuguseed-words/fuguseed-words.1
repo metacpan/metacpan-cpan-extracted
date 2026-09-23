@@ -1,0 +1,149 @@
+.\" Copyright (c) 2026 Dick Olsson <hi@senzilla.io>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.Dd September 19, 2026
+.Dt FUGUSEED-WORDS 1
+.Os
+.Sh NAME
+.Nm fuguseed-words
+.Nd build the printed word sheet, and check a built one
+.Sh SYNOPSIS
+.Nm
+.Cm build
+.Ar list
+.Op Fl -date Ar YYYY-MM-DD
+.Nm
+.Cm check
+.Ar sheet
+.Ar list
+.Sh DESCRIPTION
+.Nm
+builds the printed word sheet of a word list, and it proves a built
+sheet against that list.
+The sheet is the address space of three dice: one throw selects one
+word of the list, and the person does no arithmetic.
+.Pp
+.Nm
+sees no seed word.
+It reads no word of a person and it prints none, so it can run on any
+computer.
+The offline procedure that uses the sheet lives in
+.Xr fuguseed 7 .
+.Pp
+Both verbs take a word list file.
+.Nm
+computes the SHA-256 of that file, and it refuses every list but the
+English word list of BIP39.
+.Nm
+.Fl -help
+names the path of the shipped list.
+.Ss The build verb
+.Nm
+.Cm build
+.Ar list
+writes the sheet as HTML to standard output.
+The sheet is one standalone file: the build inlines the style sheet.
+.Pp
+The option
+.Fl -date Ar YYYY-MM-DD
+sets the build date of the two footers.
+Two builds of one list on one date give one file, byte for byte.
+Without the option, the build takes the date of the day, in UTC.
+.Ss The check verb
+.Nm
+.Cm check
+.Ar sheet
+.Ar list
+proves that
+.Ar sheet
+is the sheet of
+.Ar list .
+The verb reads the whole sheet as one strict grammar, from the first
+byte to the last.
+It compares the inlined style sheet with the shipped one byte for
+byte, and it compares each caption, each header, and each of the 2048
+cells with the text of its position.
+.Pp
+The verb is silent on success.
+On a failure it prints one line for each defect on standard error.
+A line names the offset of the first unexpected byte, or the block,
+the row, and the column of a cell.
+.Ss The sheet
+The sheet holds two sides for A4 paper.
+Side 1 holds the YELLOW blocks 1 to 4, and side 2 holds the YELLOW
+blocks 5 to 8.
+Each block is one table of 16 BLUE rows and 16 RED columns, so the
+eight blocks hold the 2048 words of the list.
+.Pp
+Each side holds a legend that names the three dice, and a footer that
+names the side, the standard, the SHA-256 of the list, and the build
+date.
+.Ss The print
+Print the sheet on A4 paper, on both sides of one sheet, at 100
+percent scale, and in color.
+The color of a label is a second name of the die: the captions are
+YELLOW, the column headers are RED, and the row headers are BLUE.
+A black print keeps the names, because each label holds the name of
+the color as a word.
+.Pp
+Check the print against the file before you use it.
+Each table must hold 16 rows and 16 columns, and no word may run over
+two lines.
+.Sh EXIT STATUS
+.Bl -tag -width Ds
+.It 0
+.Nm
+wrote the sheet, or the check found no defect.
+.It 1
+.Nm
+could not read a file, the list had another SHA-256, or the check
+found a defect.
+.Nm
+printed one line for each reason on standard error.
+.It 2
+The command line held no verb, a wrong argument count, or a malformed
+option value.
+.Nm
+printed the usage line on standard error.
+.El
+.Sh EXAMPLES
+Build the sheet of the shipped word list:
+.Bd -literal -offset indent
+$ fuguseed-words build english.txt > sheet.html
+.Ed
+.Pp
+Build the sheet of one date, twice, and compare the two files:
+.Bd -literal -offset indent
+$ fuguseed-words build --date 2026-01-01 english.txt > a.html
+$ fuguseed-words build --date 2026-01-01 english.txt > b.html
+$ cmp a.html b.html
+.Ed
+.Pp
+Check a sheet before you print it:
+.Bd -literal -offset indent
+$ fuguseed-words check sheet.html english.txt
+.Ed
+.Sh SEE ALSO
+.Xr fuguseed-qr 1 ,
+.Xr fuguseed 7
+.Sh STANDARDS
+The word list comes from BIP39, the mnemonic code for the generation
+of a deterministic key.
+The sheet is HTML5.
+.Sh AUTHORS
+.An Dick Olsson Aq Mt hi@senzilla.io
+.Sh CAVEATS
+The check proves the sheet, not the print.
+A printer can drop a color, cut a margin, or scale a page, and no
+program sees that.
+Compare the print with the file.

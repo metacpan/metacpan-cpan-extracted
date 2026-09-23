@@ -1,5 +1,19 @@
 Revision history for Module-Build-SysPath
 
+0.19    22 September 2026
+    - Check configuration files at install time to preserve local changes made after Build.PL.
+    - Restore active configuration files when installation fails and preserve
+      existing -old backups.
+    - Protect every sysconfdir payload file as configuration, even when it is
+      not explicitly listed in conffiles.
+    - Replace installed SPc modules atomically and abort before recording
+      checksums if rewriting fails.
+    - Handle source and destination paths literally, including paths containing
+      regular-expression metacharacters and spaces.
+    - Serialize installed SPc paths as Perl literals, including Unicode and
+      interpolation characters; support multiline and indented simple
+      accessors, and reject unsupported accessor definitions atomically.
+
 0.18    13 October 2017
     - author tests moved to xt/
 

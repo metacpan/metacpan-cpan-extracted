@@ -58,6 +58,12 @@ t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
 t/11-kinds.t
+t/13-advance.t
+lib/Physics/Balls/Tick.pm
+t/fixtures/rink/rink.json
+t/fixtures/rink/rink-tick-1.json
+t/fixtures/rink/rink-tick-2.json
+t/fixtures/rink/rink-tick-3.json
 t/12-roll.t
 t/fixtures/lane/brooklyn.json
 t/fixtures/lane/edge.json

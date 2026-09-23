@@ -390,6 +390,58 @@
     }
     .btn-secondary:hover { background: #eee; }
 
+    /* Path-field tooltip
+       Usage: wrap <input> in <div class="with-tooltip"> and add a sibling
+       <div class="tip-box" role="tooltip"> with the help text inside it.
+       Pure CSS -- no JavaScript required. */
+    .with-tooltip { position: relative; }
+    .tip-box {
+      position: absolute;
+      top: calc(100% + 7px);
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: #1a2040;
+      color: #e8ecf8;
+      border: 1px solid #3a50a0;
+      border-radius: 6px;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      box-shadow: 0 4px 14px rgba(0,0,0,.28);
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(-3px);
+      transition: opacity 0.13s, transform 0.13s;
+      white-space: normal;
+    }
+    /* Arrow pointing up to the input */
+    .tip-box::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 1rem;
+      width: 10px;
+      height: 10px;
+      background: #1a2040;
+      border-left: 1px solid #3a50a0;
+      border-top: 1px solid #3a50a0;
+      transform: rotate(45deg);
+    }
+    .tip-box code {
+      font-family: ui-monospace, 'Cascadia Code', monospace;
+      color: #7dd3fc;
+      background: rgba(255,255,255,.08);
+      padding: .05em .3em;
+      border-radius: 3px;
+      font-size: .9em;
+    }
+    .with-tooltip:hover .tip-box,
+    .with-tooltip:focus-within .tip-box {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     /* Database picker */
     .db-list {
       list-style: none;
@@ -547,7 +599,8 @@
 
     /* Line-graph button in the toolbar */
     .btn-graph,
-    .btn-pie {
+    .btn-pie,
+    .btn-heatmap {
       flex-shrink: 0;
       padding: 0.28rem 0.75rem;
       border: 1px solid #888;
@@ -560,9 +613,11 @@
       transition: background 0.12s;
     }
     .btn-graph:hover,
-    .btn-pie:hover { background: #f0f0f0; }
+    .btn-pie:hover,
+    .btn-heatmap:hover { background: #f0f0f0; }
     .btn-graph:disabled,
-    .btn-pie:disabled {
+    .btn-pie:disabled,
+    .btn-heatmap:disabled {
       opacity: 0.45;
       cursor: not-allowed;
     }
@@ -827,6 +882,21 @@
       flex-shrink: 0;
     }
     .btn-clear-filters:hover { color: #c00; text-decoration: underline; }
+
+    .btn-copy-link {
+      flex-shrink: 0;
+      padding: 0.28rem 0.75rem;
+      border: 1px solid #aac;
+      border-radius: 6px;
+      background: transparent;
+      color: #446;
+      font-size: 0.82rem;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+    }
+    .btn-copy-link:hover { background: #eef; }
+    .btn-copy-link--copied { background: #d4edda; color: #155724; border-color: #6aaf80; }
 
     /* Recently-opened file tooltip */
     .file-tooltip {
@@ -1106,7 +1176,7 @@
     <div class="drop-overlay-box">
       <div class="drop-overlay-icon" aria-hidden="true">&#x1F4C2;</div>
       <div class="drop-overlay-text" id="drop-overlay-text">Drop to open database</div>
-      <div class="drop-overlay-hint">CSV &middot; PSV &middot; XML &middot; SQLite</div>
+      <div class="drop-overlay-hint">CSV &middot; TSV &middot; PSV &middot; XML &middot; SQLite</div>
     </div>
   </div>
 

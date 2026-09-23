@@ -15,7 +15,7 @@ use Carp;
 use Data::Tools;
 use Math::BigFloat;
 
-our $VERSION = '1.50';
+our $VERSION = '1.52';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -53,10 +53,10 @@ sub num_round_trunc
   my $dot = shift; # precision
 
   return $num unless $dot >= 0;
-  my $bf = Math::BigFloat->new();
-  $bf->round_mode('trunc');
-  $bf->badd($num);
-  $num = $bf->ffround(-abs($dot))->bstr();
+  my $bf = Math::BigFloat->new($num);
+  # NOTE: round mode is given to ffround() here, setting it on the object
+  #       changes Math::BigFloat's global default and leaks into num_round()
+  $num = $bf->ffround(-abs($dot),'trunc')->bstr();
   return $num;
 }
 
@@ -98,7 +98,7 @@ Rounds $number to $precisioun places after the decimal point.
 
 =head2 num_round_trunc( $number, $precision )
 
-Same as num_trunc() but just truncates after the $precision places.
+Same as num_round() but just truncates after the $precision places.
 
 =head2 num_pow( $number, $exponent )
 

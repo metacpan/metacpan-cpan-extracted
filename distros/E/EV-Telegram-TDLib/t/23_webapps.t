@@ -28,19 +28,19 @@ sub client {
 my $td = client();
 
 # --- open parameters
-my $p = EV::Telegram::TDLib::WebApps::_open_params($td, {});
+my $p = EV::Telegram::TDLib::WebApps::open_params($td, {});
 is $p->{'@type'}, 'webAppOpenParameters', 'builds a webAppOpenParameters';
 is $p->{application_name}, 'tdesktop', 'defaults to a conventional platform';
 is $p->{mode}{'@type'}, 'webAppOpenModeFullSize', 'defaults to full size';
 ok !exists $p->{theme}, 'theme is omitted when not asked for';
 
-is(EV::Telegram::TDLib::WebApps::_open_params($td, { mode => 'compact' })
+is(EV::Telegram::TDLib::WebApps::open_params($td, { mode => 'compact' })
     ->{mode}{'@type'}, 'webAppOpenModeCompact', 'compact mode');
-is(EV::Telegram::TDLib::WebApps::_open_params($td, { mode => 'full_screen' })
+is(EV::Telegram::TDLib::WebApps::open_params($td, { mode => 'full_screen' })
     ->{mode}{'@type'}, 'webAppOpenModeFullScreen', 'full screen mode');
 
 my $err = do { local $@;
-    eval { EV::Telegram::TDLib::WebApps::_open_params($td, { mode => 'huge' }) }; $@ };
+    eval { EV::Telegram::TDLib::WebApps::open_params($td, { mode => 'huge' }) }; $@ };
 like $err, qr/unknown web app mode/, 'an unknown mode is refused';
 
 # --- application_name is the platform identifier, and charset limited.
@@ -60,13 +60,13 @@ $err = do { local $@; eval { client(application_name => "caf\x{e9}") }; $@ };
 like $err, qr/application_name/, 'a non-ASCII letter is refused';
 
 $err = do { local $@;
-    eval { EV::Telegram::TDLib::WebApps::_open_params($td, { application_name => 'bad name' }) };
+    eval { EV::Telegram::TDLib::WebApps::open_params($td, { application_name => 'bad name' }) };
     $@ };
 like $err, qr/application_name/, 'a per-call override is validated too';
 
-is(EV::Telegram::TDLib::WebApps::_open_params($td, { application_name => 'weba' })
+is(EV::Telegram::TDLib::WebApps::open_params($td, { application_name => 'weba' })
     ->{application_name}, 'weba', 'a valid override is used');
-is(EV::Telegram::TDLib::WebApps::_open_params($td, { application_name => undef })
+is(EV::Telegram::TDLib::WebApps::open_params($td, { application_name => undef })
     ->{application_name}, 'tdesktop', 'an explicit undef falls back to the default');
 
 # --- discovery
@@ -139,7 +139,7 @@ $td->on_web_app_data(sub { push @got, [@_] });
 $td->on_message(sub { push @plain, $_[0] });
 
 my $J = Cpanel::JSON::XS->new;
-$td->_inject_raw($J->encode({ '@type' => 'updateNewMessage', message => {
+$td->inject_raw($J->encode({ '@type' => 'updateNewMessage', message => {
     '@type' => 'message', id => 5, chat_id => 42,
     content => { '@type' => 'messageWebAppDataReceived',
                  button_text => 'Open probe', data => '{"n":7}' } } }));
@@ -150,7 +150,7 @@ is $got[0][1], '{"n":7}', 'payload is the second argument';
 is $got[0][2], 'Open probe', 'button text is the third argument';
 is scalar @plain, 1, 'on_message still sees the message';
 
-$td->_inject_raw($J->encode({ '@type' => 'updateNewMessage', message => {
+$td->inject_raw($J->encode({ '@type' => 'updateNewMessage', message => {
     '@type' => 'message', id => 6, chat_id => 42,
     content => { '@type' => 'messageText',
                  text => { '@type' => 'formattedText', text => 'hi' } } } }));

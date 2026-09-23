@@ -1,0 +1,5 @@
+[
+  { "entry": "A1", "name": "Alice", "tier": "gold" },
+  { "entry": "A2", "name": "Bob",   "tier": "silver" },
+  { "entry": "A3", "name": "Carol", "tier": "bronze" }
+]

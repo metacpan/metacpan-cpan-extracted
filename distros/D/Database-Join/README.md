@@ -4,7 +4,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 # VERSION
 
-Version 0.004.0
+Version 0.006.0
 
 # SYNOPSIS
 
@@ -131,6 +131,11 @@ independently through its own `Database::Abstraction` interface.  The results
 are combined using a shared key column (`join_column`).
 In effect, this means that you can view data from more than one database using
 an intuitive, non-SQL interface.
+
+Every storage format that `Database::Abstraction` supports works as a
+component database: CSV, PSV, TSV, SQLite, JSON, XML, XLSX, BerkeleyDB, HTML
+URL, JSON URL, or any custom subclass.  Component databases may mix formats
+within the same join.
 
 The module exposes the same read-only API as `Database::Abstraction`:
 `selectall_arrayref`, `selectall_array`, `fetchrow_hashref`, `count`,
@@ -338,6 +343,18 @@ preserve both values under distinct names instead.
     SQL `WHERE` clauses applied against the ATTACHed table; no row-level copy is
     performed.  (Prior to 0.005.0 the presence of any query-time criteria would
     force a spill; that restriction has been removed.)
+
+- Broadcast join-column criterion does not force secondaries into inner-join
+
+    When a caller passes a join-column criterion (e.g. `entry => 'k1'`),
+    `Database::Join` broadcasts it to all component databases so each DA can
+    filter its fetch to the requested key.  Prior to 0.006.0 this broadcast was
+    incorrectly counted as "having criteria" for secondary databases, causing
+    `left` and `outer` joins to silently behave as `inner` joins when a
+    join-column criterion was present.  The fix: only non-join-column criteria
+    (e.g. column filters from the caller or base `filters => {...}`) promote
+    a secondary to inner-join status.  The broadcast itself is now a transparent
+    key-range selector that does not affect join semantics.
 
 - Temp file directory must be writable and have free space
 

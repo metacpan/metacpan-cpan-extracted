@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguVM::Proxy;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use Fugu::Log;
 use Fugu::Proxy;
@@ -84,7 +84,7 @@ sub guest_url ($self)
 }
 
 package App::FuguVM::Proxy::Cache;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use Fugu::Log;
 use Fugu::Proxy;

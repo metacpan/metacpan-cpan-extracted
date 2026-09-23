@@ -8,8 +8,8 @@ BEGIN {
 
 plan skip_all => 'set TD_API_ID and TD_API_HASH'
     unless $ENV{TD_API_ID} && $ENV{TD_API_HASH};
-plan skip_all => 'set TD_PHONE and a user session in TD_DATABASE_DIRECTORY'
-    unless $ENV{TD_PHONE} && $ENV{TD_DATABASE_DIRECTORY};
+plan skip_all => 'set TD_DATABASE_DIRECTORY to an authenticated user session'
+    unless $ENV{TD_DATABASE_DIRECTORY} && -d $ENV{TD_DATABASE_DIRECTORY};
 plan skip_all => 'set TD_BOT_TOKEN (or TD_BOT_TOKEN_FILE)'
     unless $ENV{TD_BOT_TOKEN} || $ENV{TD_BOT_TOKEN_FILE};
 # A bot session created in a fresh database does not receive updates here:
@@ -44,8 +44,9 @@ my $URL     = $ENV{TD_WEBAPP_URL} // 'https://example.com/';
 
 my $user = EV::Telegram::TDLib->new(
     api_id => $ENV{TD_API_ID}, api_hash => $ENV{TD_API_HASH},
-    phone_number => $ENV{TD_PHONE},
-    database_directory => $ENV{TD_DATABASE_DIRECTORY}, on_error => sub {});
+    database_directory => $ENV{TD_DATABASE_DIRECTORY}, on_error => sub {},
+    on_code     => sub { BAIL_OUT 'user session is not authenticated' },
+    on_password => sub { BAIL_OUT 'user session is not authenticated' });
 my $bot = EV::Telegram::TDLib->new(
     api_id => $ENV{TD_API_ID}, api_hash => $ENV{TD_API_HASH},
     bot_token => $token, database_directory => $botdir, on_error => sub {});

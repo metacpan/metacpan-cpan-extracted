@@ -1,0 +1,26 @@
+{
+   "abstract" : "make BIP39 seed words with dice, and turn them into a SeedQR",
+   "author" : [
+      "Dick Olsson <hi@senzilla.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "scripts/dist",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "version" : 2
+   },
+   "name" : "App-FuguSeed",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Fugu" : 0,
+            "perl" : "5.034"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

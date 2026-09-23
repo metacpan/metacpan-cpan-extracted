@@ -1,13 +1,34 @@
 
 Revision history for Perl extension Data::Tools
 
+1.52 2026-09-22
+
+   - added optional formatting row with align and widths to format_ascii_table()
+   - since perl 5.40 JSON is now core module, so these are added:
+              hash_save_json
+              hash_save_json_pp
+              hash_load_json
+   - added binary protocol messages format, which does not use packing at all
+   - multiple updates and fixes to the code and cleanup in all .pm
+   - added missing POD documentation
+   - fftwalk/globs will now recognize symlink loops
+   - str2hash and _url are now with keys to gain bit of speed
+   - ascii_format_table() does not modify input data anymore
+   - utime/julian_date from/to iso and iso_ext are now implemented
+   - added test suites for all .pm in the module
+
+1.51 2026-06-15
+
+   - Data::Tools::CSV fix: execute "" -> " translation only for quoted data
+   - Data::Tools::CSV updated documentation with more known issues and details
+
 1.50 2025-10-26
 
    - Data::Tools::Socket::Protocols fixed empty message or empty payload logic
    - Data::Tools::Socket::Protocols added 'H' for simple, url-like escaped msgs
    - Data::Tools fixed str_escape()
    - Data::Tools fixed str2hash() and hash2str() for the simple slash escaping
-   - Data::Tools added str_initials() 
+   - Data::Tools added str_initials()
 
 1.47 2025-07-23
 
@@ -16,7 +37,7 @@ Revision history for Perl extension Data::Tools
                 str_capitalize
                 create_random_binary
    - added file_text_load_first_line()
-   - added FFT_DEBUG for fftwalk()             
+   - added FFT_DEBUG for fftwalk()
    - more strict url escapes
    - added str_kmg_to_num() to convert Kilo/Mega/Giga/Tera string to bytes num
    - added BCD docs
@@ -42,7 +63,7 @@ Revision history for Perl extension Data::Tools
                 utime_to_iso_ext
                 utime_from_iso_ext
                 utime_get_woy
-    
+
    - added file_lock_*() set of functions to handle advisory locking
    - added functions for handling pid files: create and remove
    - pid files creation may act as single process locking
@@ -73,7 +94,7 @@ Revision history for Perl extension Data::Tools
 1.30 2022-05-18
 
     Data::Tools::CSV
-    
+
     - added optional parameter to specify different delimiter (default ',').
 
 1.29 2022-04-17
@@ -101,21 +122,21 @@ Revision history for Perl extension Data::Tools
 1.24 2020-06-22
 
     - reimplemented str_hex/unhex to use unpack/pack (of course!)
-         thanks to String::HexConvert for reminding me that pack 
+         thanks to String::HexConvert for reminding me that pack
          is always here :)
 
-    - added separate binary and text file load/save api. 
-    
+    - added separate binary and text file load/save api.
+
       new functions:
-      
+
           # always binary data load
           file_bin_load( $file_name )
 
           # always binary data save
           file_bin_save( $file_name, @data, $data, 'data', 123 )
-          
+
       new functions:
-          
+
           # always text data load
           file_text_load( $file_name )
 
@@ -124,25 +145,25 @@ Revision history for Perl extension Data::Tools
 
           # always text data save
           file_text_save( $file_name, @data, $data, 'data', 123 )
-          
+
       the old encoding defaults to file load/save:
-      
+
           data_tools_set_file_io_encoding( 'cp1251' );
           data_tools_set_file_io_encoding( 'UTF-8'  );
           data_tools_set_file_io_utf8();
-          
+
        still works but will only relate to file_text_* functions.
-       
+
        NOTE: WARNING!
        currently old file_load()/file_save() will default to the old
        behaviour but will be switched to binary only!
-       
+
        NOTE: WARNING!
        file_text_* api will have second optional hashref with operation
        options. for saving, it is uncommon to provide hashref so it will
        be used as options if given.
-       
-          
+
+
 
 1.20 2019-01-18
 
@@ -201,26 +222,26 @@ Revision history for Perl extension Data::Tools
 1.08 2015-09-30 CADE
 
     - added:
-        file_mtime  
-        file_ctime  
-        file_atime  
-        file_size  
+        file_mtime
+        file_ctime
+        file_atime
+        file_size
 
 1.07 2015-09-24 CADE
 
     - added hash_lock_recursive()
             hash_unlock_recursive()
       to handle missing functionality until perl 5.22 etc.
-    - moved to cpan changelog syntax  
+    - moved to cpan changelog syntax
     - added glob_tree()
 
 1.06 2013-07-03 CADE
-  
+
     - added more features to hash_validate()
     - changed version to reupload to CPAN
 
 1.05 2013-07-03 CADE
-  
+
     - hash_validate()
     - more docs, "required modules", "see also"
 
@@ -229,7 +250,7 @@ Revision history for Perl extension Data::Tools
     - changed github urls
 
 1.03  2013-05-04 CADE
-  
+
     - added hash_uc()/hash_lc()
 
 1.02  2013-03-24 CADE
@@ -246,5 +267,5 @@ Revision history for Perl extension Data::Tools
 
     - history lost, initial CPAN release
 
-    
-    
+
+

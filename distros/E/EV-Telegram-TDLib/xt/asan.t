@@ -8,7 +8,7 @@ use Config;
 #   make
 # then run with AUTHOR_TESTING=1.
 #
-# The runtime is PRELOADED, not linked into the .so: an XS module is dlopened,
+# The runtime is preloaded, not linked into the .so: an XS module is dlopened,
 # and ASan refuses to start when its runtime is not first in the library list
 # ("ASan runtime does not come first"). Linking -fsanitize into the .so does not
 # help, which is also why LIBS carries no sanitizer flag.

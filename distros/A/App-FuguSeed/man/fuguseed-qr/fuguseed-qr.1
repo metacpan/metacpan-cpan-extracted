@@ -1,0 +1,166 @@
+.\" Copyright (c) 2026 Dick Olsson <hi@senzilla.io>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.Dd September 19, 2026
+.Dt FUGUSEED-QR 1
+.Os
+.Sh NAME
+.Nm fuguseed-qr
+.Nd turn 12 seed words into a Standard SeedQR
+.Sh SYNOPSIS
+.Nm
+.Sh DESCRIPTION
+.Nm
+reads 12 seed words from the first line of standard input.
+It prints a Standard SeedQR as text, zone by zone, so that a person can
+draw the code on paper.
+The program takes no option and no argument.
+.Pp
+The words enter on standard input only.
+No argument, no file name, and no environment variable carries a word.
+The program opens no file, it starts no other program, and it reads no
+environment variable.
+The three standard streams are its one contact with the computer.
+.Pp
+.Nm
+sees the seed words.
+Run it on an air-gapped computer only.
+.Ss The input
+The first line of standard input holds the 12 words, with one space
+between two words.
+Each word must be a word of the English word list of BIP39.
+.Ss The two results
+With a valid checksum,
+.Nm
+prints the SeedQR.
+Standard output holds the digit string on the first line: the 12 word
+indexes, 0-based, each as 4 decimal digits.
+The grid view of the 25 rows follows, and then the 25 zone views, from
+.Dq A-1
+to
+.Dq E-5 .
+A dark module prints as a number sign, and a light module prints as a
+period.
+A zone view holds the zone name, the 5 rows of the zone, and the count
+of the dark modules of the zone.
+.Pp
+After each zone view, the program reads one line from standard input.
+Press the return key to get the next zone.
+At the end of the input, the remaining zones print without a pause.
+.Pp
+With a wrong checksum,
+.Nm
+prints the check word.
+Standard output holds that one word, and the program prints no SeedQR
+in that run.
+The dice give the YELLOW block and the BLUE row of word 12, and the
+program finds the one word of that row that makes the checksum valid.
+Write the check word in place of word 12, and start the program again.
+.Ss The form of the code
+The output is a Standard SeedQR of 25 x 25 modules.
+It is not a Compact SeedQR:
+.Nm
+prints no Compact SeedQR.
+A Standard SeedQR decodes to the digit string, so a person can map the
+digits back to the 12 words.
+A consumer such as FuguPass reads the SeedQR with a camera, and it
+reads no typed word.
+.Ss The check of the file
+The release publishes
+.Nm
+as one file, beside the tarballs.
+The signed SHA256 manifest of the release names that file.
+Compare the digest of the file with the manifest on the air-gapped
+computer, before the first run:
+.Pp
+.Dl $ sha256 fuguseed-qr
+.Pp
+The two digests must agree.
+Do not run a file with a different digest.
+.Ss The drawing procedure
+.Sy WARNING :
+The SeedQR is the 12 words in another form.
+A person who scans the code gets the seed.
+Keep the paper as you keep the words.
+Do not photograph the code, and do not put it on a computer.
+A loss of the words is irreversible.
+.Pp
+The procedure needs an air-gapped computer, a printed 25 x 25 template,
+and a marker.
+The template is the printable 25 x 25 template of the SeedQR
+specification, or a grid with the same zones.
+The template must hold a quiet zone of 4 light modules around the code.
+Each module must be 5 mm or more, because the drawing must scan under a
+camera.
+.Pp
+Do these steps:
+.Bl -enum
+.It
+Start
+.Nm
+on the air-gapped computer, and type the 12 words.
+.It
+Find the zone of the template with the name of the zone view.
+.It
+Fill one square of that zone for each dark module of the zone view.
+.It
+Count the filled squares of the zone.
+The count must agree with the count of the zone view.
+.It
+Press the return key, and do the same for each of the other 24 zones.
+.It
+Compare the grid view with the template, row by row.
+.It
+Scan the drawing with the camera of the device.
+The device must show the 12 words, in the same order.
+.El
+.Pp
+The scan proves the drawing.
+Do the scan before you keep the paper, and before you erase the words
+from the air-gapped computer.
+.Sh EXIT STATUS
+.Bl -tag -width Ds
+.It 0
+.Nm
+printed the SeedQR, or it printed the check word.
+.It 1
+The input did not hold 12 words of the list.
+.Nm
+printed one line to standard error.
+That line names the word position or the word count, never a word.
+.It 2
+The command line held an argument.
+.Nm
+printed one usage line to standard error.
+.El
+.Sh EXAMPLES
+Start the program on the air-gapped computer:
+.Bd -literal -offset indent
+$ fuguseed-qr
+.Ed
+.Pp
+The program waits for the 12 words on standard input.
+.Sh STANDARDS
+The word list and the checksum come from BIP39, the mnemonic code for
+the generation of a deterministic key.
+The form of the code comes from the SeedQR specification of the
+SeedSigner project.
+The QR code follows ISO/IEC 18004: version 2, error correction level L,
+numeric mode, and mask pattern 0.
+.Sh AUTHORS
+.An Dick Olsson Aq Mt hi@senzilla.io
+.Sh CAVEATS
+The program prints no penalty score and it selects no mask.
+The mask is pattern 0, always.
+Every reader decodes the code, because the format information names the
+mask.

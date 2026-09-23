@@ -13,7 +13,7 @@ my $builder = Module::Build::SysPath->new(
     requires => {
     },
     conffiles => [
-        [ 'conf', 'acme-test-syspath.cfg' ],
+        [ 'share', 'share' ],
     ],
 );
 

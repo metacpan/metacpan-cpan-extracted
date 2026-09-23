@@ -128,6 +128,26 @@ subtest 'PSV format' => sub {
 };
 
 # ---------------------------------------------------------------------------
+subtest 'TSV format' => sub {
+    my $psv = File::Spec->rel2abs('data/employees.tsv');
+    plan skip_all => 'data/employees.tsv not found' unless -f $psv;
+
+    $t->get_ok('/view/employees')
+      ->status_is(200)->content_like(qr/Alice/)->content_like(qr/Engineering/);
+
+    $t->get_ok('/api/columns?table=employees')->status_is(200)->json_has('/columns');
+
+    $t->get_ok('/view/employees?f=' . url_escape('City:eq:Seattle'))
+      ->status_is(200)->content_like(qr/Alice/);
+
+    $t->get_ok('/export?l=' . url_escape('table:employees') . '&format=csv')
+      ->status_is(200)->content_type_like(qr{text/csv})->content_like(qr/Alice/);
+
+    $t->get_ok('/export?l=' . url_escape('table:employees') . '&format=sqlite')
+      ->status_is(200)->content_type_like(qr{sqlite});
+};
+
+# ---------------------------------------------------------------------------
 subtest 'XML format' => sub {
 	test_needs 'XML::Simple';
 	my $xml = File::Spec->rel2abs('data/catalog.xml');
@@ -178,6 +198,64 @@ subtest 'SQLite format (.sql extension)' => sub {
 
     $t->get_ok('/browse?path=' . url_escape($sql_dir))
       ->status_is(200)->content_like(qr/inventory\.sql/);
+};
+
+# ---------------------------------------------------------------------------
+subtest 'SQLite3 format (.sqlite3 extension)' => sub {
+	test_needs 'DBI', 'DBD::SQLite';
+
+    my $sql_dir  = File::Temp::tempdir(CLEANUP => 1);
+    my $sql_file = File::Spec->catfile($sql_dir, 'parts.sqlite3');
+
+    my $dbh = DBI->connect(
+        "dbi:SQLite:dbname=$sql_file", '', '',
+        { RaiseError => 1, AutoCommit => 1 },
+    );
+    $dbh->do('CREATE TABLE parts (partno TEXT, name TEXT, stock INTEGER)');
+    $dbh->do("INSERT INTO parts VALUES ('P001', 'Washer',  500)");
+    $dbh->do("INSERT INTO parts VALUES ('P002', 'Gasket',  150)");
+    $dbh->disconnect;
+
+    $t->get_ok('/open?path=' . url_escape($sql_file))
+      ->status_is(200)->content_like(qr/Washer/);
+
+    $t->get_ok('/open?path=' . url_escape($sql_file) . '&f=' . url_escape('partno:eq:P001'))
+      ->status_is(200)->content_like(qr/Washer/);
+
+    $t->get_ok('/export?l=' . url_escape("path:$sql_file") . '&format=csv')
+      ->status_is(200)->content_type_like(qr{text/csv})->content_like(qr/Gasket/);
+
+    $t->get_ok('/browse?path=' . url_escape($sql_dir))
+      ->status_is(200)->content_like(qr/parts\.sqlite3/);
+};
+
+# ---------------------------------------------------------------------------
+subtest 'SQLite format (.sqlite extension)' => sub {
+	test_needs 'DBI', 'DBD::SQLite';
+
+    my $sql_dir  = File::Temp::tempdir(CLEANUP => 1);
+    my $sql_file = File::Spec->catfile($sql_dir, 'sensors.sqlite');
+
+    my $dbh = DBI->connect(
+        "dbi:SQLite:dbname=$sql_file", '', '',
+        { RaiseError => 1, AutoCommit => 1 },
+    );
+    $dbh->do('CREATE TABLE sensors (id INTEGER, label TEXT, value REAL)');
+    $dbh->do("INSERT INTO sensors VALUES (1, 'Temp',     21.5)");
+    $dbh->do("INSERT INTO sensors VALUES (2, 'Humidity', 55.0)");
+    $dbh->disconnect;
+
+    $t->get_ok('/open?path=' . url_escape($sql_file))
+      ->status_is(200)->content_like(qr/Temp/);
+
+    $t->get_ok('/open?path=' . url_escape($sql_file) . '&f=' . url_escape('label:eq:Humidity'))
+      ->status_is(200)->content_like(qr/Humidity/);
+
+    $t->get_ok('/export?l=' . url_escape("path:$sql_file") . '&format=csv')
+      ->status_is(200)->content_type_like(qr{text/csv})->content_like(qr/Temp/);
+
+    $t->get_ok('/browse?path=' . url_escape($sql_dir))
+      ->status_is(200)->content_like(qr/sensors\.sqlite/);
 };
 
 # ---------------------------------------------------------------------------
@@ -493,6 +571,16 @@ subtest 'GET /api/stat -- security: non-data-extension file' => sub {
 	$t->get_ok('/api/stat?path=/tmp')
 	  ->status_is(200)
 	  ->json_is('/exists', 0);
+};
+
+# ---------------------------------------------------------------------------
+subtest 'GET /heatmap' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'heatsmoke.csv');
+	Mojo::File->new($csv)->spurt("team,week,tickets\nAlpha,W1,5\nBeta,W1,3\nAlpha,W2,7\nBeta,W2,4\n");
+	$t->get_ok('/heatmap?l=' . url_escape("path:$csv") . '&x=week&y=team&val=tickets')
+	  ->status_is(200)
+	  ->content_like(qr/id="heatmap"/, 'heatmap SVG present');
 };
 
 done_testing();

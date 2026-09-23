@@ -25,7 +25,7 @@ Readonly::Array my @_ADD_DB_KEYS => qw(database join_column filter remove_column
 # Any operator not in this set is silently skipped to prevent SQL injection.
 Readonly::Hash my %SAFE_SQL_OPS => map { $_ => 1 } qw(> < >= <= != =);
 
-our $VERSION = '0.005.0';
+our $VERSION = '0.006.0';
 
 # ---------------------------------------------------------------------------
 # KNOWN GAPS & ROADMAP (derived from gap-analysis 2026-09-21)
@@ -129,7 +129,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 =head1 VERSION
 
-Version 0.004.0
+Version 0.006.0
 
 =head1 SYNOPSIS
 
@@ -256,6 +256,11 @@ independently through its own C<Database::Abstraction> interface.  The results
 are combined using a shared key column (C<join_column>).
 In effect, this means that you can view data from more than one database using
 an intuitive, non-SQL interface.
+
+Every storage format that C<Database::Abstraction> supports works as a
+component database: CSV, PSV, TSV, SQLite, JSON, XML, XLSX, BerkeleyDB, HTML
+URL, JSON URL, or any custom subclass.  Component databases may mix formats
+within the same join.
 
 The module exposes the same read-only API as C<Database::Abstraction>:
 C<selectall_arrayref>, C<selectall_array>, C<fetchrow_hashref>, C<count>,
@@ -473,6 +478,18 @@ for columns in that database>.  The criteria are translated into parameterised
 SQL C<WHERE> clauses applied against the ATTACHed table; no row-level copy is
 performed.  (Prior to 0.005.0 the presence of any query-time criteria would
 force a spill; that restriction has been removed.)
+
+=item Broadcast join-column criterion does not force secondaries into inner-join
+
+When a caller passes a join-column criterion (e.g. C<entry =E<gt> 'k1'>),
+C<Database::Join> broadcasts it to all component databases so each DA can
+filter its fetch to the requested key.  Prior to 0.006.0 this broadcast was
+incorrectly counted as "having criteria" for secondary databases, causing
+C<left> and C<outer> joins to silently behave as C<inner> joins when a
+join-column criterion was present.  The fix: only non-join-column criteria
+(e.g. column filters from the caller or base C<filters =E<gt> {...}>) promote
+a secondary to inner-join status.  The broadcast itself is now a transparent
+key-range selector that does not affect join semantics.
 
 =item Temp file directory must be writable and have free space
 
@@ -2273,9 +2290,19 @@ sub _joined_query_array :Protected {
 
 	# Premise: the key-set resolution loop starts at i=1 (primary seeds %key_set).
 	# Conclusion: $had_criteria[0] is a dead store (D~); compute only for i >= 1.
-	# !!%hash collapses to 1 (non-empty) or '' (empty) without allocating a count.
+	#
+	# The broadcast join-column criterion (entry=>'A3' delivered to ALL databases)
+	# must NOT count as "had criteria" for secondaries.  It is a key-range selector
+	# on the merged view, not a predicate that bounds what the secondary contributes.
+	# Only base filters and non-join-column query-time criteria trigger inner-join.
 	my @had_criteria;
-	$had_criteria[$_] = !!%{ $per_db->[$_] } for 1 .. $n - 1;
+	for my $i (1 .. $n - 1) {
+		my $local_jc   = $self->{_join_map}{$i} // $join_col;
+		my $has_filter = !!%{ $self->{_filters}{$i} // {} };
+		my %q          = %{ $per_db->[$i] };
+		delete $q{$local_jc};
+		$had_criteria[$i] = $has_filter || !!%q;
+	}
 
 	# Seed the key set from the primary database.
 	# Hash-slice assignment avoids the intermediate 2K-element flat list that
@@ -2603,8 +2630,17 @@ sub _sqlite_join :Protected {
 	}
 
 	# Determine which secondary sources had effective criteria (inner-join semantics).
+	# The broadcast join-column criterion must NOT count — it is a key-range selector
+	# on the merged view, not a predicate that restricts the secondary's contribution.
+	# Base filters always count (documented: a filtered db is always inner-join).
 	my @had_criteria;
-	$had_criteria[$_] = !!%{ $per_db_full[$_] } for 1 .. $n - 1;
+	for my $i (1 .. $n - 1) {
+		my $local_jc   = $self->{_join_map}{$i} // $join_col;
+		my $has_filter = !!%{ $self->{_filters}{$i} // {} };
+		my %q          = %{ $per_db_query->[$i] };
+		delete $q{$local_jc};
+		$had_criteria[$i] = $has_filter || !!%q;
+	}
 
 	# For 'auto' mode: check total row count without fetching rows.
 	# Count(*) is used for dbi_source() sources; count() for others.
@@ -2661,12 +2697,16 @@ sub _sqlite_join :Protected {
 	# Build the WHERE clause from per-call criteria.
 	#   Spilled sources: query-only criteria (filter already applied to spilled data).
 	#   ATTACHed sources: full criteria (filter + query), since source was not filtered.
+	#   Secondary tables (i>0): the broadcast join-column criterion is omitted because
+	#   it is already enforced by the ON clause; adding it to WHERE nullifies LEFT JOIN.
 	my (@where_parts, @bind_vals);
 	for my $i (0 .. $n - 1) {
 		my $crit = $is_attached[$i] ? $per_db_full[$i] : $per_db_query->[$i];
 		next unless %{$crit};
-		my $tref = $table_refs[$i];
+		my $tref       = $table_refs[$i];
+		my $local_jc_i = $i > 0 ? ($self->{_join_map}{$i} // $join_col) : undef;
 		for my $col (sort keys %{$crit}) {
+			next if defined $local_jc_i && $col eq $local_jc_i;
 			my $val = $crit->{$col};
 			if (ref($val) eq 'HASH') {
 				for my $op (sort keys %{$val}) {

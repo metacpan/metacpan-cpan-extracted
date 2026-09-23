@@ -1,5 +1,27 @@
 Revision history for MIDI-RtController-Filter-CC
 
+0.1406 2026-09-22 20:15:59
+  - Remove the useless `in_channel` attribute.
+
+0.1405 2026-09-22 20:06:03
+  - Fix the `threshold` filter logic again. :eyeroll:
+
+0.1404 2026-09-22 14:38:39
+  - Add the `in_channel` attribute.
+
+0.1403 2026-09-22 11:52:58
+  - Improve documentation.
+  - Remove more cruft!
+
+0.1402 2026-09-22 11:45:28
+  - Remove more cruft.
+
+0.1401 2026-09-22 11:41:00
+  - Remove unused code.
+
+0.1400 2026-09-22 10:58:49
+  - Add the `program_change()` filter.
+
 0.1303 2026-09-20 22:37:58
   - Fix truthy values vs the `threshold()` filter returns.
 

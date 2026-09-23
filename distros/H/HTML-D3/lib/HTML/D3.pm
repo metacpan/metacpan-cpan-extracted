@@ -6,6 +6,8 @@ use warnings;
 
 use Carp qw(carp);
 use JSON::MaybeXS;
+
+my $_JSON = JSON::MaybeXS->new(utf8 => 0);
 use Object::Configure;
 use Params::Get;
 use Params::Validate::Strict;
@@ -17,11 +19,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 
@@ -189,7 +191,7 @@ sub render_bar_chart {
 	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
 
 	# Generate JSON representation of data
-	my $json_data = encode_json([
+	my $json_data = $_JSON->encode([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -308,7 +310,7 @@ sub render_animated_bar_chart {
 	die 'Data is not optional' if(!defined($data));
 	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
 
-	my $json_data = encode_json([
+	my $json_data = $_JSON->encode([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -423,7 +425,7 @@ sub render_line_chart {
 	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
 
 	# Generate JSON for data
-	my $json_data = encode_json([
+	my $json_data = $_JSON->encode([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -547,7 +549,7 @@ sub render_animated_line_chart {
 
 	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
 
-	my $json_data = encode_json([
+	my $json_data = $_JSON->encode([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -706,7 +708,7 @@ sub render_pie_chart {
 
 	my $separator = $opts->{separator} // '/';
 
-	my $json_data = encode_json([
+	my $json_data = $_JSON->encode([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -866,7 +868,7 @@ sub render_animated_pie_chart {
 
 	my $separator = $opts->{separator} // '/';
 
-	my $json_data = encode_json([
+	my $json_data = $_JSON->encode([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -1089,7 +1091,7 @@ sub render_pie_chart_snippet {
 		@slices = @top;
 	}
 
-	my $json_data = encode_json(\@slices);
+	my $json_data = $_JSON->encode(\@slices);
 
 	my $svg_id   = 'pie_chart';
 	my $tip_id   = 'pie_chart_tip';
@@ -1424,7 +1426,7 @@ sub render_heatmap_snippet {
 		push @triples, { x => $pt->[0], y => $pt->[1], v => $pt->[2] + 0 };
 	}
 
-	my $json_data = encode_json(\@triples);
+	my $json_data = $_JSON->encode(\@triples);
 
 	# encode_json only accepts refs; escape label strings manually for JS
 	my ($x_label_esc, $y_label_esc, $val_label_esc) = map {
@@ -1681,7 +1683,7 @@ sub render_line_chart_with_tooltips
 	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
 
 	# Generate JSON for data
-	my $json_data = encode_json([
+	my $json_data = $_JSON->encode([
 		map { { label => $_->[0], value => $_->[1] } } @$data
 	]);
 
@@ -1830,7 +1832,7 @@ sub render_line_chart_snippet
 
 	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
 
-	my $json_data = encode_json([
+	my $json_data = $_JSON->encode([
 		map {
 			my $point = { label => $_->[0], value => $_->[1] };
 			$point->{extra} = $_->[2] if ref($_->[2]) eq 'HASH';
@@ -1997,7 +1999,7 @@ sub render_zoomable_line_chart_snippet
 
 	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
 
-	my $json_data = encode_json([
+	my $json_data = $_JSON->encode([
 		map {
 			my $point = { label => $_->[0], value => $_->[1] };
 			$point->{extra} = $_->[2] if ref($_->[2]) eq 'HASH';
@@ -2276,7 +2278,7 @@ sub render_multi_series_line_chart_with_tooltips
 	# Validate input data
 	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
 
-	my $json_data = encode_json($data);
+	my $json_data = $_JSON->encode($data);
 
 	# Generate HTML and D3.js code
 	my $html = $self->_preamble();
@@ -2443,7 +2445,7 @@ sub render_multi_series_line_chart_with_animated_tooltips
 	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
 
 	# Generate JSON for data
-	my $json_data = encode_json($data);
+	my $json_data = $_JSON->encode($data);
 
 	# Generate HTML and D3.js code
 	my $html = $self->_preamble();
@@ -2613,7 +2615,7 @@ sub render_multi_series_line_chart_with_legends {
 	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
 
 	# Generate JSON for data
-	my $json_data = encode_json($data);
+	my $json_data = $_JSON->encode($data);
 
 	# Generate HTML and D3.js code
 	my $html = $self->_preamble();
@@ -2822,7 +2824,7 @@ sub render_multi_series_line_chart_with_interactive_legends
 	die 'Data must be an array of hashes' unless ref($data) eq 'ARRAY';
 
 	# Generate JSON for data
-	my $json_data = encode_json($data);
+	my $json_data = $_JSON->encode($data);
 
 	# Generate HTML and D3.js code
 	my $html = $self->_preamble();

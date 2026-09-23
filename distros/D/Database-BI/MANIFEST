@@ -4,6 +4,7 @@ data/catalog.xml
 data/cats.csv
 data/cities.csv
 data/dogs.csv
+data/employees.tsv
 data/products.psv
 data/sales.csv
 data/states.csv
@@ -31,6 +32,7 @@ t/unit.t
 templates/web/en/browse.html.tt
 templates/web/en/dashboard.html.tt
 templates/web/en/graph.html.tt
+templates/web/en/heatmap.html.tt
 templates/web/en/home.html.tt
 templates/web/en/layouts/default.html.tt
 templates/web/en/pie.html.tt

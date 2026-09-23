@@ -115,8 +115,13 @@ is_deeply [ sort keys %{ $r->{notification_settings} } ],
     'all nine scopeNotificationSettings fields are sent';
 like last_json(), qr/"use_default_mute_stories":true/,
     'stories stay at their default setting';
-is $r->{notification_settings}{story_sound_id}, "0",
-    'story sound id is an int64 string';
+# -1, not 0: the TL says 0 disables the sound and -1 asks for the app
+# default, so defaulting to 0 silenced the scope for anyone who only wanted
+# to mute it for a while
+is $r->{notification_settings}{story_sound_id}, "-1",
+    'story sound id defaults to the app default, as an int64 string';
+is $r->{notification_settings}{sound_id}, "-1",
+    'and so does the message sound';
 ok !exists $r->{notification_settings}{use_default_mute_for},
     'mute_for itself has no use_default flag, unlike a single chat';
 

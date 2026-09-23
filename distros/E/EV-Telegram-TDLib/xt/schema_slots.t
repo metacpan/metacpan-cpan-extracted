@@ -15,7 +15,7 @@ plan skip_all => 'schema has no slot table; run author/gen-schema.pl'
     unless keys %SLOT;
 
 # xt/schema_pin.t asks "does this @type name exist?". That passes for an @type
-# that exists but is WRONG FOR THE SLOT IT SITS IN, which is what shipped twice
+# that exists but is wrong for the slot it sits in, which is what shipped twice
 # in 0.03: inputMessageText where draftMessageContentText belonged, and contact
 # where importedContact belonged. This test asks the other question.
 #

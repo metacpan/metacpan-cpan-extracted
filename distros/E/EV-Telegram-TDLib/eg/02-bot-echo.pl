@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # 02-bot-echo.pl - bot that echoes every text message back to its chat
 #
 # Demonstrates: bot_token authorization (no credential callbacks needed),
@@ -13,7 +13,7 @@
 #   TD_BOT_TOKEN            bot token from BotFather
 #   TD_DATABASE_DIRECTORY   optional, default ./tdlib-bot-db
 #
-# Run: perl -Mblib eg/02-bot-echo.pl
+# Run: perl eg/02-bot-echo.pl   (add -Mblib to run from a built checkout)
 
 use strict;
 use warnings;
@@ -51,10 +51,19 @@ my $sigint = EV::signal 'INT', sub {
     $td->close(sub { EV::break });
 };
 
+# a die inside a callback is contained and reported, not propagated, so it
+# would leave the loop running and the script hanging: break out instead
+my $status = 0;
+
 $td->login(sub {
     my (undef, $err) = @_;
-    die "login failed: $err->{message}\n" if $err;
+    if ($err) {
+        warn "login failed: $err->{message}\n";
+        $status = 1;
+        return EV::break;
+    }
     print "echo bot running, Ctrl-C to stop\n";
 });
 
 EV::run;
+exit $status;

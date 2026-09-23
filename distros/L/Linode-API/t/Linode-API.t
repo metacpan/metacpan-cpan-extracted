@@ -74,6 +74,9 @@ subtest 'new' => sub {
     $req = last_request( sub { $linode->post_linode_instance( {}, json => { region => 'bogus', type => 'bogus' } ) } );
     is( $req->json, { region => 'bogus', type => 'bogus' }, 'a body the specification closes in one allOf member and opens in another is sent' );
 
+    $req = last_request( sub { $linode->get_image( { imageId => 'private/123' } ) } );
+    is( $req->url->path->to_string, '/v4/images/private/123', 'an id with a slash in it is sent with the slash, as Linode wants' );
+
     $req = last_request( sub { $linode->get_maintenance_policies( {} ) } );
     is( $req->url->path->to_string, '/v4beta/maintenance/policies', 'an operation that is only in v4beta goes there from a v4 client' );
 

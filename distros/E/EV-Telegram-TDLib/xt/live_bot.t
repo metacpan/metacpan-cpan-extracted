@@ -4,11 +4,17 @@ use Test::More;
 use File::Temp ();
 use MIME::Base64 ();
 
+# Destructive, and unlike xt/live_planes.t it does not clean up after itself.
+# It overwrites the bot's public identity -- name, short description,
+# description and profile photo -- and does not put any of them back, because
+# TDLib offers no way to read a bot's photo before replacing it. Point
+# TD_BOT_TOKEN at a throwaway bot, never at one anyone uses.
+
 plan skip_all => 'author test: set AUTHOR_TESTING=1' unless $ENV{AUTHOR_TESTING};
 plan skip_all => 'set TD_API_ID and TD_API_HASH'
     unless $ENV{TD_API_ID} && $ENV{TD_API_HASH};
-plan skip_all => 'set TD_DB_DIR to an authenticated user session'
-    unless $ENV{TD_DB_DIR} && -d $ENV{TD_DB_DIR};
+plan skip_all => 'set TD_DATABASE_DIRECTORY to an authenticated user session'
+    unless $ENV{TD_DATABASE_DIRECTORY} && -d $ENV{TD_DATABASE_DIRECTORY};
 plan skip_all => 'set TD_BOT_TOKEN (or TD_BOT_TOKEN_FILE)'
     unless $ENV{TD_BOT_TOKEN} || $ENV{TD_BOT_TOKEN_FILE};
 
@@ -48,7 +54,7 @@ my $bot = EV::Telegram::TDLib->new(
 );
 my $user = EV::Telegram::TDLib->new(
     api_id => $ENV{TD_API_ID}, api_hash => $ENV{TD_API_HASH},
-    database_directory => $ENV{TD_DB_DIR},
+    database_directory => $ENV{TD_DATABASE_DIRECTORY},
     on_error => sub { diag "user: $_[0]" },
     on_code     => sub { BAIL_OUT 'user session is not authenticated' },
     on_password => sub { BAIL_OUT 'user session is not authenticated' },
@@ -146,21 +152,25 @@ $bot->login(sub {
                     "$method is refused to a bot, cleanly";
             });
         }
-        $bot->set_bot_name("EV TDLib live $$", sub {
-            my (undef, $err) = @_;
-            if ($err) { fail "set_bot_name: $err->{message}" }
-            else      { pass 'set_bot_name accepted' }
-        });
-        $bot->set_bot_short_description('live test bot', sub {
-            my (undef, $err) = @_;
-            if ($err) { fail "set_bot_short_description: $err->{message}" }
-            else      { pass 'set_bot_short_description accepted' }
-        });
-        $bot->set_bot_description('Exercises EV::Telegram::TDLib.', sub {
-            my (undef, $err) = @_;
-            if ($err) { fail "set_bot_description: $err->{message}" }
-            else      { pass 'set_bot_description accepted' }
-        });
+        # Telegram allows a bot's public identity to change only rarely, so
+        # a second run the same day is flood-limited. That says nothing
+        # about the binding, and failing on it reddens every rerun.
+        my $identity = sub {
+            my ($what) = @_;
+            return sub {
+                my (undef, $err) = @_;
+                if ($err && ($err->{code} // 0) == 429) {
+                    diag "$what rate-limited: $err->{message}";
+                    pass "$what skipped (rate limited)";
+                } elsif ($err) { fail "$what: $err->{message}" }
+                else           { pass "$what accepted" }
+            };
+        };
+        $bot->set_bot_name("EV TDLib live $$", $identity->('set_bot_name'));
+        $bot->set_bot_short_description('live test bot',
+            $identity->('set_bot_short_description'));
+        $bot->set_bot_description('Exercises EV::Telegram::TDLib.',
+            $identity->('set_bot_description'));
         {
             my $pic = File::Temp->new(SUFFIX => '.png');
             binmode $pic;

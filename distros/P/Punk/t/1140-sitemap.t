@@ -537,6 +537,119 @@ use Punk::Plugin::Sitemap;
     is($r->[0], 200, 'it is served from the site root');
     my %hdr = @{ $r->[1] };
     is($hdr{'Content-Type'}, 'text/plain; charset=utf-8', 'as text/plain');
+
+    # ---- the crawlers that never read the `*` group --------------------------
+    # AdsBot-Google, AdsBot-Google-Mobile and Mediapartners-Google obey only a
+    # group naming their own token; Google documents the global user agent as
+    # ignored for all three. A file carrying the `*` group alone has disallowed
+    # nothing from any of them, and there is nothing to notice: the file reads
+    # correctly, the sitemap agrees with it, and the paths are crawled anyway.
+    #
+    # Asserted as "every named group carries the SAME rules as `*`" rather than
+    # as a line or two, because a group that drifted from the one it repeats
+    # would pass any assertion made of examples.
+    my $g = groups_of($txt);
+
+    ok(@{ $g->{'*'} || [] }, 'the `*` group carries the rules')
+        or diag $txt;
+
+    for my $ua (qw(AdsBot-Google AdsBot-Google-Mobile Mediapartners-Google)) {
+        ok(exists $g->{$ua}, "$ua has a group of its own - it ignores `*`");
+        is_deeply($g->{$ua}, $g->{'*'},
+            "and it is told exactly what `*` is told, not a subset");
+    }
+
+    like($txt, qr{^User-agent: \*\n(?:Disallow: \S+\n)+\nUser-agent: }m,
+        'each is a SEPARATE group rather than another User-agent line on one '
+      . 'shared group - a parser reading the second User-agent line as a new '
+      . 'group would otherwise leave `*` carrying no rules at all, which is '
+      . 'the one way to be wrong that opens the whole site');
+}
+
+# The Disallow lines of each group, keyed by user agent. A `User-agent` line
+# starts a group; the `Sitemap:` line belongs to no group and ends the last.
+sub groups_of {
+    my ($txt) = @_;
+    my (%g, $ua);
+    for my $line (split /\n/, $txt) {
+        if ($line =~ /^User-agent:\s*(\S+)\s*$/)  { $g{$ua = $1} ||= []; next }
+        if ($line =~ /^Sitemap:/)                 { undef $ua;           next }
+        push @{ $g{$ua} }, $1
+            if defined $ua && $line =~ /^Disallow:\s*(\S*)\s*$/;
+    }
+    return \%g;
+}
+
+# ---- naming the agents yourself ----------------------------------------------
+{
+    {
+        package ChosenAgentsApp;
+        use Punk;
+        use Punk::Plugin::Sitemap;
+        plugin 'Sitemap' => { base => 'https://example.com',
+                              agents => ['Bingbot'] };
+        get '/'      => sub { $_[0]->text('x') };
+        get '/admin' => sub { $_[0]->text('x') }, { sitemap => 0 };
+
+        package main;
+        ChosenAgentsApp->to_app;
+        my $g = groups_of(
+            Punk::Plugin::Sitemap->_robots(ChosenAgentsApp->punk_app));
+        is_deeply([sort keys %$g], ['*', 'Bingbot'],
+            '`agents` REPLACES the default list rather than adding to it');
+        is_deeply($g->{'Bingbot'}, $g->{'*'}, 'and it gets the same rules');
+    }
+
+    {
+        package NoAgentsApp;
+        use Punk;
+        use Punk::Plugin::Sitemap;
+        plugin 'Sitemap' => { base => 'https://example.com', agents => [] };
+        get '/'      => sub { $_[0]->text('x') };
+        get '/admin' => sub { $_[0]->text('x') }, { sitemap => 0 };
+
+        package main;
+        NoAgentsApp->to_app;
+        my $g = groups_of(
+            Punk::Plugin::Sitemap->_robots(NoAgentsApp->punk_app));
+        is_deeply([keys %$g], ['*'],
+            'an empty arrayref asks for the `*` group alone - the default is '
+          . 'a default and not a policy');
+    }
+
+    # Nothing to disallow, so there is nothing the named crawlers are missing.
+    {
+        package NothingHiddenApp;
+        use Punk;
+        use Punk::Plugin::Sitemap;
+        plugin 'Sitemap' => { base => 'https://example.com' };
+        get '/'      => sub { $_[0]->text('x') };
+        get '/about' => sub { $_[0]->text('x') };
+
+        package main;
+        NothingHiddenApp->to_app;
+        my $txt = Punk::Plugin::Sitemap->_robots(NothingHiddenApp->punk_app);
+        is_deeply([keys %{ groups_of($txt) }], ['*'],
+            'with nothing disallowed the extra groups are not written - one '
+          . 'naming a crawler and carrying no rule says what its absence '
+          . 'already says');
+        like($txt, qr{^Sitemap: https://example\.com/sitemap\.xml$}m,
+            'and the Sitemap line still stands');
+    }
+
+    my $err = do { local $@; eval {
+        package BadAgentApp;
+        use Punk;
+        use Punk::Plugin::Sitemap;
+        plugin 'Sitemap' => { base => 'https://example.com',
+                              agents => ['Mozilla/5.0 (compatible)'] };
+        get '/' => sub { $_[0]->text('x') };
+        BadAgentApp->to_app;
+    }; $@ };
+    like($err, qr/is not a user-agent token/,
+        'a full User-Agent header where a token belongs croaks at the plugin '
+      . 'line - the alternative is a directive nobody wrote, discovered as a '
+      . 'crawler that never obeyed it');
 }
 
 # ---- THE GATE: the two cannot disagree ---------------------------------------
@@ -600,6 +713,11 @@ use Punk::Plugin::Sitemap;
     unlike($txt, qr{^Sitemap:}m,
         'and it emits NO Sitemap line, because advertising a sitemap while '
       . 'disallowing everything says two opposite things');
+
+    my $g = groups_of($txt);
+    is_deeply($g->{'Mediapartners-Google'}, ['/'],
+        'the shut-out reaches the crawlers that ignore `*` as well - a '
+      . 'staging site indexed by the AdSense crawler is indexed');
 }
 
 done_testing;

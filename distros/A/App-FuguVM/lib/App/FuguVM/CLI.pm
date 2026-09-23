@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguVM::CLI;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use File::Basename;
 use File::Spec ();
@@ -854,6 +854,7 @@ sub cmd_mirror ( $self, $cli, @args )
 		version => $vm_config->{version},
 		arch    => $vm_config->{arch},
 		verify  => $verifies,
+		log     => $self->{log},
 		(
 			defined $vm_config->{signify_dir}
 			? ( keys_dir => $vm_config->{signify_dir} )

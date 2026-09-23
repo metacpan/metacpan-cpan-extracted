@@ -1,5 +1,37 @@
 Revision history for Database::Join
 
+0.006.0	Tue Sep 22 07:30:33 PM EDT 2026
+	[ Enhancements ]
+	- JSON backend support: Database::Join now works with JSON-backed
+	  Database::Abstraction objects (Database::Abstraction 0.45+,
+	  JSON::MaybeXS required).  Both array-form ([{entry:k,...},...]) and
+	  object-form ({"k":{col:val},...}) JSON files are supported.  JSON URL
+	  sources are also supported.  Component databases may now freely mix
+	  formats (CSV, TSV, SQLite, JSON, XML, XLSX, etc.) in a single join.
+	- Add use 5.010001 pragma (enforces minimum Perl version at compile time).
+	- Replace $DBI::errstr with DBI->errstr method call to eliminate the
+	  "used only once" warning under perl -c.
+	- Add _sql_quote_identifier() helper; apply to all column and table name
+	  sites in the SQLite DDL/DML, preventing SQL identifier injection from
+	  DA-supplied column names that contain embedded double-quote characters.
+	- Add t/json.t: 20 subtests covering JSON-backed joins (left/inner/outer,
+	  criteria routing, fetchrow_hashref, columns, schema, collision_prefix,
+	  add_database, updated() timestamp, SQLite backend spill path, and both
+	  array-form and object-form JSON).
+	[ Bug fixes ]
+	- Fix: left and outer joins with a join-column criterion (e.g.
+	  selectall_arrayref(entry => 'k1')) now correctly return primary-only
+	  rows.  Previously the broadcast of the join-column criterion to all
+	  secondary databases was incorrectly counted as "having criteria",
+	  promoting every secondary to inner-join status and silently dropping
+	  primary-only keys.  Only non-join-column criteria (column filters from
+	  the caller or base filters => {...}) now trigger inner-join semantics.
+	  The fix applies to both the in-memory array backend and the SQLite
+	  backend (the SQLite path also no longer adds the broadcast join-column
+	  criterion to secondary table WHERE clauses, which would have nullified
+	  LEFT JOIN at the SQL level).
+
+
 0.005.0	Mon Sep 21 02:13:04 PM EDT 2026
 	[ Enhancements ]
 	- SQLite backend now caches the spilled temporary database across query

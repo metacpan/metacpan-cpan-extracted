@@ -20,6 +20,9 @@ use_ok('App::FuguWeb::Index');
 # The sources that every subtest below shares. The names are chosen so
 # that a C sort and a case-insensitive sort disagree: MQTT comes before
 # Mdnsd only when the comparison is by byte.
+#
+# The dot-named source of man/all proves the dot rule: a group must
+# not take a name that starts with a dot.
 my %SOURCES = (
 	'man/tool/tool.1'        => 'the tool',
 	'man/tool/tool.conf.5'   => 'the configuration',
@@ -29,7 +32,9 @@ my %SOURCES = (
 	'man/all/every.1'        => 'section one',
 	'man/all/every.3p'       => 'section three p',
 	'man/all/every.5'        => 'section five',
+	'man/all/every.7'        => 'section seven',
 	'man/all/every.8'        => 'section eight',
+	'man/all/.hidden.1'      => 'a hidden source',
 	'lib/Thing/Store.pod'    => 'the persistence contract',
 	'lib/Thing/Store/Memory.pod' => 'the memory store',
 	'lib/Thing.pod'          => 'the umbrella',
@@ -145,7 +150,7 @@ subtest 'a manuals group sorts by section and then by byte' => sub {
 			'tool.1.html', 'tool.conf.5.html',
 			'toolctl.8.html'
 		],
-		'the sections come in the order 1, 3p, 5, 8'
+		'the sections come in the order 1, 5, 8'
 	);
 
 	my ($library) = grep { $_->heading eq 'Library' } $config->groups;
@@ -156,13 +161,25 @@ subtest 'a manuals group sorts by section and then by byte' => sub {
 	);
 
 	# One group that holds every section. Without it the 3p rung of
-	# the ladder is never compared against 5 or 8, and a wrong
+	# the ladder is never compared against 5, 7 or 8, and a wrong
 	# order there would pass.
 	my ($every) = grep { $_->heading eq 'Every section' } $config->groups;
 	is_deeply(
 		[ map { $_->section } $every->manuals ],
-		[qw(1 3p 5 8)],
-		'the whole section order, 3p included'
+		[qw(1 3p 5 7 8)],
+		'the whole section order, 3p and 7 included'
+	);
+
+	# The same group holds '.hidden.1'. A reader that took it would
+	# add a second page of section 1 here.
+	is_deeply(
+		[ map { $_->page } $every->manuals ],
+		[
+			'every.1.html', 'every.3p.html',
+			'every.5.html', 'every.7.html',
+			'every.8.html'
+		],
+		'a name that starts with a dot is not a manual'
 	);
 };
 
@@ -176,7 +193,7 @@ subtest 'a directory is not a manual' => sub {
 
 	my ($every) = grep { $_->heading eq 'Every section' } $config->groups;
 	is_deeply( [ map { $_->section } $every->manuals ],
-		[qw(1 3p 5 8)], 'the directory is not among the manuals' );
+		[qw(1 3p 5 7 8)], 'the directory is not among the manuals' );
 };
 
 subtest 'a project path with a glob metacharacter still finds them' => sub {

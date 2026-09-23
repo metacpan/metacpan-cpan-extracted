@@ -8,7 +8,7 @@ sub closed_update {
     q({"@type":"updateAuthorizationState","authorization_state":{"@type":"authorizationStateClosed"}})
 }
 
-# These clients are never materialised: new(), keepalive() and _inject_raw
+# These clients are never materialised: new(), keepalive() and inject_raw
 # all send nothing, and tdjson only creates a client when its first request
 # arrives. So injecting the closed update leaves nothing behind for TDLib to
 # hold, and closing these ids at exit would only materialise dead clients in
@@ -35,8 +35,8 @@ is $b->keepalive(0), 0, 'a repeated keepalive(0) spends nothing more';
 is refcnt, 1, 'still one ref left';
 
 my $cid_b = $b->{client_id};
-$b->_inject_raw(closed_update());
-ok !EV::Telegram::TDLib::_is_registered($cid_b), 'B left the registry';
+$b->inject_raw(closed_update());
+ok !EV::Telegram::TDLib::is_registered($cid_b), 'B left the registry';
 is refcnt, 1, 'close after keepalive(0) does not unref a second time';
 
 is $b->keepalive(), 0, 'a closed client reports keepalive off';
@@ -47,15 +47,15 @@ my $c = new_client('t/tmp-ka-c');
 is refcnt, 2, 'a third client takes its ref';
 $c->keepalive(0);
 is refcnt, 1, 'keepalive(0) spends it';
-$c->_inject_raw(closed_update());
+$c->inject_raw(closed_update());
 is refcnt, 1, 'closing a keepalive(0) client spends nothing';
 
-$a->_inject_raw(closed_update());
+$a->inject_raw(closed_update());
 is refcnt, 0, 'the last close releases the loop';
 
 my $d = new_client('t/tmp-ka-d');
 is refcnt, 1, 'a fresh client re-takes the ref';
-$d->_inject_raw(closed_update());
+$d->inject_raw(closed_update());
 is refcnt, 0, 'and closing it releases it again';
 
 # a truthy value that is not exactly 1 must not take a second loop reference:

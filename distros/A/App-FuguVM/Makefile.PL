@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME             => 'App::FuguVM',
-	VERSION          => '0.2.0',
+	VERSION          => '0.3.0',
 	ABSTRACT         => 'install and manage OpenBSD virtual machines under QEMU',
 	LICENSE          => 'open_source',
 	MIN_PERL_VERSION => '5.036',
@@ -49,7 +49,6 @@ WriteMakefile(
 		'lib/App/FuguVM/Remote.pod' => '$(INST_LIB)/App/FuguVM/Remote.pod',
 		'lib/App/FuguVM/State.pm' => '$(INST_LIB)/App/FuguVM/State.pm',
 		'lib/App/FuguVM/State.pod' => '$(INST_LIB)/App/FuguVM/State.pod',
-		'scripts/ftp' => '$(INST_LIB)/auto/share/dist/App-FuguVM/scripts/ftp',
 		'share/fuguvm/cache-generation' => '$(INST_LIB)/auto/share/dist/App-FuguVM/fuguvm/cache-generation',
 		'share/fuguvm/expect/autoinstall.exp' => '$(INST_LIB)/auto/share/dist/App-FuguVM/fuguvm/expect/autoinstall.exp',
 		'share/fuguvm/expect/command.exp' => '$(INST_LIB)/auto/share/dist/App-FuguVM/fuguvm/expect/command.exp',

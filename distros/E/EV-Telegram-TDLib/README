@@ -25,17 +25,26 @@ SYNOPSIS
             on_error   => sub { warn "tdlib: $_[0]\n" },
         );
 
+        # a die inside a callback is contained and reported, not propagated, so
+        # leaving the loop is what ends the program; see L</ERROR HANDLING>
+        my $status = 0;
         $td->login(sub {
             my (undef, $err) = @_;
-            die "login failed: $err->{message}\n" if $err;
+            if ($err) {
+                warn "login failed: $err->{message}\n";
+                $status = 1;
+                return EV::break;
+            }
             $td->send_message($chat_id, 'hello', sub {
                 my ($msg, $err) = @_;
-                die "send failed: $err->{message}\n" if $err;
+                warn "send failed: $err->{message}\n" if $err;
+                $status = 1 if $err;
                 $td->close(sub { EV::break });
             });
         });
 
         EV::run;
+        exit $status;
 
 DESCRIPTION
     EV::Telegram::TDLib binds TDLib's tdjson C interface to the EV event
@@ -86,7 +95,21 @@ CONSTRUCTOR
         Downloaded files directory. Defaults to database_directory.
 
     database_encryption_key
-        Encryption key for the local database. Empty by default; set it.
+        Encryption key for the local database. Empty by default; set it. Any
+        byte string will do, but it must be bytes: a character above 255 is
+        rejected while the first request is being built, which happens
+        during update dispatch, so it reaches "on_error" rather than
+        croaking out of new(). It is base64-encoded on the way out, so what
+        you pass is what keys the database.
+
+        Changed in 0.04. 0.03 sent this value raw, which TDLib refused for
+        most passphrases -- taking login with it -- while accepting one that
+        happened to look like base64 and keying the database with the
+        decoded bytes instead. If a 0.03 database opened with such a key,
+        open it now with MIME::Base64::decode_base64($old_key).
+
+        Changing it later needs set_database_encryption_key(), and losing it
+        loses the database.
 
     use_test_dc
         Use the Telegram test data centers instead of production. Always set
@@ -94,7 +117,12 @@ CONSTRUCTOR
 
     use_file_database, use_chat_info_database, use_message_database,
     use_secret_chats
-        TDLib feature switches, all defaulting to true.
+        TDLib feature switches, all defaulting to true. TDLib turns a switch
+        back on when a later one needs it -- the message database needs the
+        chat info database, which needs the file database -- so
+        "use_chat_info_database => 0" does nothing unless
+        "use_message_database => 0" too, and "use_file_database => 0" needs
+        both.
 
     application_name
         The platform identifier sent with every Mini App request, which the
@@ -127,24 +155,129 @@ CONVENTIONS
     reading 300 method signatures.
 
   Cache readers against remote getters
-    "chat($chat_id)" and "user($user_id)" are synchronous cache reads: they
-    take no callback, do no I/O, and return undef for something the client
-    has not seen. Everything else named after a noun -- "folder", "topic",
+    "chat($id)" and "user($id)" are synchronous cache reads: they take no
+    callback, do no I/O, and return undef for something the client has not
+    seen. Everything else named after a noun -- "folder", "topic",
     "secret_chat", "supergroup", "basic_group", "message", "file" -- is an
     asynchronous getter that takes a callback and asks TDLib.
 
     The two cache readers predate the rest and are kept as they are because
     renaming a method already published on CPAN would break working code.
     When you want the server's answer for a chat rather than the cached one,
-    use "fetch_chat($chat_id, $cb)".
+    use fetch_chat().
+
+  Options and handlers
+    Options are "name => value" pairs after the positional arguments. An odd
+    number of them croaks: a name that lands in a positional slot shifts
+    every pair after it, so the request ends up saying something you never
+    asked -- "install_sticker_set($id, archived => 1)" installed rather than
+    archived, because "archived" was read as the $installed positional.
+
+    A flag is any true or false value, as perl reads it, and a JSON boolean
+    object works too. "\0" is a reference, so it is true to perl, not the
+    false it is in JSON: pass 0. A flag passed straight through croaks on a
+    reference that is not an object.
+
+    The callback is the last argument and is recognised by being a coderef,
+    so an extra argument cannot displace it. Written anywhere else it croaks
+    rather than being taken for a value: before the options it would land in
+    an optional flag or number, and be dropped. send() and call() are the
+    exception, and take it before their options as well. A method that takes
+    no options croaks on anything past its positional arguments, so
+    "set_chat_title($chat, title => 'New')" is refused rather than renaming
+    the chat "title".
+
+    A handler that holds one callback -- on_update, on_error, on_message and
+    the rest of the single-slot "on_*" methods -- is a getter when called
+    with no argument, a setter when called with one, and is removed by
+    passing "undef". What counts is that an argument was passed at all, so
+    any false value removes it too: "$td->on_error($h{error})" with no
+    "error" key in %h takes the handler away, including one given to new(),
+    and errors go back to warning on stderr. Forwarding a handler you may
+    not have is the way to lose one silently, so test for it before passing
+    it. Changed in 0.04: 0.03 ignored a false value, so a handler could not
+    be removed at all. The keyed ones, on_command, on_callback_data and
+    on_upload, take the key first and remove that one entry when passed
+    "undef"; they are not getters and croak without a callback. "on_close"
+    and the login handlers ("on_code", "on_password", "on_email",
+    "on_email_code", "on_qr") are constructor options with no method of
+    their own.
+
+    Three options recur widely enough that the entries below do not repeat
+    them. "parse_mode" ("markdown" or "html") applies wherever a method
+    takes text or a caption to format, and a text that fails to parse is
+    reported to the callback with nothing sent. Wherever the text can carry
+    formatting -- a message, a caption, a poll, a gift or story text, a
+    contact note -- a formattedText hashref, which is what translate and
+    parse_markdown answer with, is also accepted and sent as it is. A
+    plain-text field such as a bio or a chat description refuses one. An
+    object that stringifies, such as a URI or a Path::Tiny path, is text
+    anywhere. Telegram limits how long a name or description may be, and
+    TDLib cuts an over-long one without an error: a chat description at 255
+    characters, a chat or topic title at 128, an account or business name
+    and a sticker set title at 64, a bio at 70 (140 for Premium), an invite
+    link name at 32 and a folder name at 12. A formatted text keeps at most
+    100 entities, links, code and pre spans first, and the rest are dropped
+    the same way. "reply_markup" takes a keyboard from
+    "inline_keyboard(\@rows)" or reply_keyboard() wherever a message is sent
+    or edited. "business_connection_id" makes a Stars or Payments call act
+    for a connected business account rather than for you -- invoice_link,
+    received_gifts, sell_gift, transfer_gift and upgrade_gift take it.
+
+  Paging
+    "limit" is a page size everywhere except invite_link and
+    edit_invite_link, where it is the link's own member limit -- how many
+    people may join through it. TDLib caps it without saying so: message
+    history, search, load_chats, profile_photos, message_reactions,
+    search_stickers and the server half of search_chats at 100,
+    supergroup_members and search_members at 200, and top_chats at 30. So
+    "limit => 500" quietly returns a hundred, and a loop that stops on a
+    short page stops early. "offset" is two different things, because TDLib
+    makes it two different things, and passing the wrong kind gets you an
+    error from the server rather than from here.
+
+    In six it is a number of entries to skip: blocked, profile_photos,
+    search_stickers, story_album_stories, supergroup_members and
+    trending_sticker_sets.
+
+    In twelve it is an opaque string cursor that the previous response gave
+    you, and the empty string asks for the first page:
+    chat_revenue_transactions, chat_story_interactions,
+    connected_affiliate_programs, inline_query, message_reactions,
+    received_gifts, search_all, search_secret_messages, star_subscriptions,
+    star_transactions, story_interactions and story_public_forwards.
+
+    In the three that walk a chat's messages -- search_messages,
+    thread_history and topic_history -- it is neither. There it works with
+    "from_message_id" and must be 0 or negative: 0 starts exactly at that
+    message, and a negative value additionally returns that many newer ones.
+    A positive value is refused by the server, and so is one larger than
+    "limit" allows: thread_history and topic_history want "offset >=
+    -limit", search_messages the stricter "limit > -offset". At the default
+    limit of 50 that is -50 to 0, and -49 to 0 respectively. thread_history
+    and topic_history also stop at -99 however large "limit" is.
+
+    Methods that page by an id of their own -- "from_message_id",
+    "from_story_id", "offset_chat_id", "offset_sticker_set_id" -- name it
+    after what it is, and take the id to start from with 0 or the empty
+    string meaning the beginning.
 
   Booleans
     A method that turns something on or off takes the flag as its last
     positional argument and defaults to true, so "pin_topic($chat, $id)"
     pins and "pin_topic($chat, $id, 0)" unpins. That covers close_topic,
     pin_topic, pin_chat, mark_unread, hide_general_topic, folder_tags,
-    pause_download, protect_content, the supergroup switches, and the
-    process_join_request pair.
+    pause_download, protect_content, default_disable_notification,
+    toggle_username, toggle_bot_username, toggle_attachment_menu,
+    session_accepts_secret_chats, the supergroup switches, the
+    process_join_request pair, and in 0.04 install_sticker_set,
+    post_story_to_page, toggle_gift_saved, edit_star_subscription and
+    pause_connected_bot.
+
+    A "name => value" pair written where the flag belongs puts the name in
+    the flag, and a name is always truthy, so the call would do the opposite
+    of what it says. Every one of them refuses that rather than acting on
+    it.
 
     Two older methods invert through an option instead ("block_user($id,
     unblock => 1)", "react(..., remove => 1)"), and a few pairs are separate
@@ -159,12 +292,80 @@ CONVENTIONS
     strings you should keep as strings. Chat, message and user ids are
     "int53" and stay numbers.
 
+    Those numeric ids are checked for shape, not just for presence, and so
+    is every other number an argument carries: a limit, an offset, a
+    duration, a coordinate, each id in a list. An integer is an optionally
+    signed run of digits, with surrounding space allowed; anything else
+    croaks rather than being coerced. That is what catches an option name
+    landing in an id slot -- "mark_unread(unread => 0)" with the chat
+    omitted put "unread" in "chat_id" -- which perl otherwise turns into a
+    zero, with a warning from inside this module and a JSON float in a slot
+    the schema declares an integer. It also catches a reference, which perl
+    turns into its memory address: "reply_to => $message", the message
+    rather than its id, sent that address, and TDLib quietly sent a plain
+    message instead of a reply.
+
+    A point in time -- "schedule", reschedule's $when, a ban's "until", an
+    emoji status's "expires" -- is a Unix time, and a small positive number
+    there croaks as the duration it almost certainly is. TDLib would read it
+    as a moment in 1970 and, without an error, send the scheduled message at
+    once, make the ban permanent or clear the status.
+
+USERS AND BOTS
+    TDLib refuses much of its API to one kind of account before anything
+    reaches the server. A user-only method called from a bot session fails
+    with "The method is not available to bots", and a bot-only one called
+    from a user session with "Only bots can use the method"; both arrive at
+    the callback like any other error. It is set out once here, as TDLib
+    1.8.66 has it, and repeated below only where it shapes how a method is
+    used.
+
+    These are for bots only: answer_callback_query, answer_inline_query,
+    answer_pre_checkout_query, answer_shipping_query, answer_web_app_query,
+    bot_access_settings, bot_token, business_account_star_amount,
+    business_connection, callback_query_message, commands, delete_commands,
+    delete_business_messages, edit_business_message_text, the edit_inline_*
+    methods, edit_message_markup, game_high_scores, inline_game_high_scores,
+    invoice_link, menu_button, read_business_message, refund_star_payment,
+    send_business_file, send_business_message, set_bot_access_settings, the
+    set_business_account_* setters, set_commands, set_default_admin_rights,
+    set_game_score, set_inline_game_score, set_menu_button, set_reactions
+    and set_updates_status. So are the updates behind on_callback_query,
+    on_inline_query, on_join_request, on_web_app_data, the pre-checkout and
+    shipping handlers and the business message handlers: a user session
+    never receives them.
+
+    Sending, editing, forwarding and deleting messages and files work for
+    both, as do creating and editing forum topics, sticker sets and proxies.
+    Chat administration is split. For both: a member's status and bans,
+    reading members and administrators, a chat's title, description, photo
+    and permissions, creating, editing and revoking an invite link, and
+    pinning. For users only: adding members, listing invite links and who
+    joined through one, the bulk deletions (delete_messages_by_sender,
+    delete_messages_by_date, delete_history), reschedule, and most
+    supergroup switches -- slow mode, auto-delete, protected content,
+    signatures, join rules, transfer_ownership and the event log.
+
+    Most of the rest is for users only, in particular anything that reads
+    the account's own view of Telegram: the chat list and history, message
+    search, contacts, folders, the forum topic list, reading, editing and
+    deleting stories (posting one works for both), sessions, privacy and
+    notification settings, and react. sell_gift, transfer_gift and
+    upgrade_gift are for users, or for a bot passing
+    "business_connection_id".
+
 METHODS
   Core
    send(\%request, $cb, %opt)
     Encodes the request, assigns a fresh @extra, and hands it to TDLib. The
     reply is delivered as "$cb->($result, $err)". Returns the assigned
     @extra sequence number.
+
+    The callback may be written after the options instead, as it is on every
+    other method: send and call are the only two that name it first, and
+    both positions are accepted. Before 0.04 only the first was, so
+    "send($request, timeout => 5, $cb)" -- the shape "CONVENTIONS" describes
+    -- croaked.
 
     send() deliberately overwrites any caller-supplied @extra: it is the
     reply correlation channel, and a collision would misroute a reply to the
@@ -175,9 +376,38 @@ METHODS
     with a warning, never delivered to a reused @extra. See "ERROR
     HANDLING".
 
+    Option: "retry", off unless asked for. See "Rate limiting: error code
+    429" for the policy and its one important limit. Pass "retry => 1" for
+    the defaults, or a hashref:
+
+        retry => { attempts => 3, max_wait => 300, factor => 2, margin => 1 }
+
+    "attempts" counts retries after the first send, so the default of 3
+    means at most four requests. "max_wait" is a give-up threshold, not a
+    clamp: if the server asks for longer than it, the 429 is returned
+    unchanged rather than retried sooner than demanded. "factor" multiplies
+    the module's own added margin on repeated 429s; it never shortens the
+    delay the server stated. "margin" is that added margin in seconds, 1 by
+    default, so the first retry waits the server's delay plus a second. A
+    retry is issued only for a 429 that carries a parseable delay, never for
+    any other error.
+
+    A retry carries a fresh @extra, so the value send() returned identifies
+    the first attempt only.
+
+    "timeout" and "retry" are options of send() and call() only. The named
+    methods have their own %opt namespace -- "kind", "caption", "wait",
+    "silent" and so on -- and do not forward transport options, so
+    "send_message($chat, $text, retry => 1, $cb)" accepts the key and
+    ignores it. A named method that takes no options at all croaks on one
+    instead. Set "retry" on the constructor to cover every request a client
+    makes, including those from the named methods; there is no per-call
+    equivalent for them.
+
     On a closed client send() sends nothing, registers nothing and returns
     undef: the callback is failed deferred with a synthetic "client is
-    closed" error.
+    closed" error. A request waiting out a retry backoff when the client
+    closes is failed too, with "client closed".
 
    execute(\%request)
     Synchronous td_execute. No network, usable before authorization, and
@@ -214,6 +444,11 @@ METHODS
     is accounted per client: close() releases it only while still held, and
     keepalive() on a closed client is a no-op that returns off.
 
+    With no argument this is a getter, like the "on_*" accessors: it reports
+    the current setting and changes nothing. Before 0.04 it took the
+    reference back, so a program that had released it re-pinned the loop
+    merely by asking whether it had.
+
    on_update($cb), on_error($cb)
     Get or set the generic update and error handlers. on_error receives
     non-fatal internal errors (undecodable frames, callback exceptions);
@@ -225,7 +460,7 @@ METHODS
     stated. Usable as a method or a plain function. See "Rate limiting:
     error code 429"; the module still performs no retry of its own.
 
-   call($function, \%args, $cb)
+   call($function, \%args, $cb, %opt)
     Sends a raw request like "send(\%request, $cb, %opt)", but checks the
     argument names first against a catalogue of every TDLib function,
     generated from the "td_api.h" that Alien::TDLib ships. The @type is
@@ -240,8 +475,97 @@ METHODS
     An unknown function is passed straight through, so a TDLib newer than
     the shipped catalogue keeps working; a missing argument is not an error,
     since TDLib supplies its own defaults. This makes call() a usable way to
-    reach the roughly 950 functions this module does not wrap by hand,
+    reach the roughly 600 functions this module does not wrap by hand,
     without losing every check.
+
+    "\%args" may be left out for a function that takes none, so
+    "$td->call(getMe => sub { ... })" works. %opt is passed through to
+    send(), so "timeout" and "retry" work here too.
+
+   on_command($name => $cb), on_callback_data($pattern => $cb)
+    Route incoming commands and inline-button presses. Both are methods, not
+    constructor options: passing either to new() croaks, because new() lifts
+    every "on_*" key onto the object and would otherwise store a callback
+    that never fires.
+
+        $td->on_command(start => sub {
+            my ($msg, $args) = @_;
+            $td->send_message($msg->{chat_id}, "hello $args");
+        });
+
+    The name is given without a leading slash, though one is accepted and
+    stripped. Matching is case sensitive. The callback receives exactly
+    "($msg, $args)", where $args is the rest of the line with leading
+    whitespace removed, and the empty string when nothing follows; split it
+    yourself if you want fields.
+
+    "/name@username" fires only when the username is this account's own.
+    That username is fetched in the background, once, either on reaching the
+    ready state or when the first handler is registered, whichever comes
+    later -- so registering handlers inside login()'s callback works. A
+    command addressed with "@" that arrives before the fetch returns does
+    not match; the plain "/name" form is never affected.
+
+    Matching uses the bot-command entity at offset 0 when TDLib supplies
+    one, so a message merely containing "/start" later in the line does not
+    fire. Outgoing messages never fire a handler, so a bot echoing help text
+    cannot trigger itself.
+
+    "on_command($name => undef)" unregisters.
+
+    on_callback_data takes a regex or a literal string. A literal is an
+    exact match, so use a regex for the conventional "prefix:value" form.
+    Handlers are tried in registration order and every match fires; the
+    callback receives the query followed by any regex captures. Callback
+    data is decoded from its wire encoding first, so patterns are written
+    against the plaintext the bot set. Game callback queries, which carry no
+    data, are skipped.
+
+    "on_callback_data($pattern => undef)" unregisters every route registered
+    with that pattern.
+
+    Both routers dispatch against a snapshot of their handlers, so a handler
+    may register or unregister routes while it runs: the change takes effect
+    from the next update, never the one being dispatched. Without that, a
+    handler that registers a route would dispatch to it immediately, and one
+    that re-registers itself would never stop.
+
+    Both routers fire in addition to "on_message($cb)" and
+    "on_callback_query($cb)": a matched command does not consume the
+    message.
+
+   ask($chat_id, $user_id, $prompt, %opt, $cb), cancel_ask($chat_id, $user_id)
+    Sends $prompt and waits for that user's next message in that chat, once.
+    The callback receives "($msg, undef)" on an answer and "(undef, $err)"
+    on failure, as everything else here does.
+
+        $td->ask($chat, $user, 'What is your name?', sub {
+            my ($reply, $err) = @_;
+            return warn "no answer: $err->{message}\n" if $err;
+            $td->send_message($chat, "hello $reply->{content}{text}{text}");
+        });
+
+    Options are those of "send_message($chat_id, $text, %opt, $cb)", plus
+    "timeout" in seconds, defaulting to 300. "timeout => 0" waits
+    indefinitely; read the next paragraph before choosing it.
+
+    While an ask is pending it shadows the command router for that user in
+    that chat: the answer goes to the ask and to on_message, but not to a
+    command handler. That is deliberate, so a reply that happens to start
+    with a slash cannot both answer the prompt and run a command. It does
+    mean an unanswered prompt suppresses that user's commands until it
+    resolves, which is why the timeout has a default and why cancel_ask
+    exists. cancel_ask fails the pending ask with an "ask cancelled" error
+    and returns whether there was one; a timeout fails it with "ask timed
+    out".
+
+    Asking the same user in the same chat again replaces the pending ask,
+    failing the old one with "ask superseded" rather than dropping it.
+    Asking from inside an answer or timeout callback is the intended way to
+    build a multi-step flow and works as expected. Anonymous and channel
+    senders never satisfy an ask, since it is keyed on a user, and neither
+    do outgoing messages. If the prompt itself fails to send, the ask fails
+    immediately rather than waiting out its timeout.
 
     send() is unaffected and stays entirely unvalidated.
 
@@ -265,12 +589,15 @@ METHODS
    set_profile_photo($path, %opt, $cb)
     Sets the account's profile photo. "animation" treats the file as a video
     avatar, with "main_frame_timestamp" (seconds, default 0) selecting the
-    still frame. "public" (default on) controls whether users who cannot see
-    the full profile get this photo. $path may be an InputFile hashref
-    instead of a path.
+    still frame. "public => 1" sets the public photo instead: the fallback
+    shown to users whom privacy settings deny the main one, which a user
+    account alone can have. $path may be an InputFile hashref instead of a
+    path. A bot sets its own photo this way too, or through set_bot_photo in
+    the Bots mixin.
 
-    Bots do not use this: a bot session is refused it with
-    BOT_FALLBACK_UNSUPPORTED. See set_bot_photo in the Bots mixin.
+    Changed in 0.04. 0.03 set the public photo, so the same call now
+    replaces the account's real one. Pass "public => 1" to keep 0.03's
+    behaviour.
 
    on_user($cb)
     Handler for updateUser, called with the decoded user after the cache is
@@ -283,9 +610,16 @@ METHODS
     users and resolve normally.
 
    set_birthdate(%opt, $cb), set_accent_color($color_id, %opt, $cb), profile_photos($user_id, %opt, $cb), delete_profile_photo($photo_id, $cb)
-    Profile details. set_birthdate takes "day", "month" and an optional
-    "year"; calling it with none clears the birthdate. Profile photo ids are
-    TL "int64" and are sent as strings.
+    Profile details. set_birthdate takes "day" and "month" and an optional
+    "year"; calling it with none of the three clears the birthdate, and a
+    day, month or year without the other two date parts croaks. The month
+    runs from 1, not from the 0 that "localtime" gives, and a date that does
+    not exist or a year outside 1800 to 3000 croaks: TDLib would take the
+    first as a request to clear the birthdate and drop the second, both
+    without an error. set_accent_color takes "background_custom_emoji_id", a
+    custom emoji shown on the reply header and link preview background;
+    omitting it clears any current one. Profile photo ids are TL "int64" and
+    are sent as strings.
 
    contacts($cb), add_contact($user_id, %opt, $cb), remove_contacts(\@user_ids, $cb), search_contacts($query, %opt, $cb), import_contacts(\@contacts, $cb)
     The address book. add_contact options are "first_name", "last_name",
@@ -293,6 +627,17 @@ METHODS
     return. import_contacts takes hashrefs of the same shape and is how you
     find which of a list of phone numbers are on Telegram; Telegram matches
     on the number, so a contact with none is simply not matched.
+
+   search_by_phone($phone_number, %opt, $cb), my_link($cb), toggle_username($username, $active, $cb)
+    Finding a user by phone number, this account's own t.me link, and
+    turning one of your usernames on or off. "local => 1" restricts the
+    phone lookup to what is already cached.
+
+   privacy($setting, $cb), set_privacy($setting, \@rules, $cb)
+    Read and write one privacy setting, named "status", "profile_photo",
+    "phone", "bio", "birthdate", "forwards", "invites", "calls" or
+    "find_by_phone". Rules are an ordered list of UserPrivacySettingRule
+    hashrefs and the first match wins, so their order is the policy.
 
   Chats mixin
    chat($id)
@@ -303,9 +648,11 @@ METHODS
    on_chat($cb)
     Handler for updateNewChat, called with the decoded chat.
 
-   load_chats($limit, $cb)
+   load_chats($limit, %opt, $cb)
     Loads more chats from TDLib (loadChats). TDLib answers with a 404 error
     once the list is exhausted; that is reported as success, not failure.
+    Takes "list", so the archive and the folders can be paged too; without
+    it only the main list is ever fetched.
 
    pin_message($chat_id, $message_id, %opt, $cb), unpin_message($chat_id, $message_id, $cb)
     Pins or unpins a message. Options: "silent" to pin without notifying,
@@ -318,13 +665,18 @@ METHODS
 
    add_chat_member($chat_id, $user_id, %opt, $cb)
     Adds a user to a chat. "forward_limit" (default 0) is how many recent
-    messages they get to see.
+    messages they get to see, in a basic group only: a supergroup or channel
+    ignores it.
 
    set_member_status($chat_id, $user_id, $status, %opt, $cb)
     Sets a member's status: "member", "left" or "banned". "left" is the
     plain kick, which leaves them free to come back; "banned" removes and
-    blocks them. "until" is a unix timestamp for a temporary ban or
-    membership, 0 (the default) meaning forever. An unknown status croaks.
+    blocks them. "until" is a unix timestamp for a temporary ban, 0 (the
+    default) meaning forever; TDLib ignores it for "member", so a membership
+    is always permanent. A temporary ban must fall between 30 seconds and
+    366 days from now: TDLib silently makes anything outside that permanent,
+    so a short cool-off computed from a config value bans for good. An
+    unknown status croaks.
 
    block_user($user_id, %opt, $cb)
     Blocks a user. "unblock" reverses it, and "stories" acts on the stories
@@ -339,10 +691,13 @@ METHODS
     searchPublicChat and caches it.
 
    mark_read($chat_id, %opt, $cb)
-    Marks messages read: openChat followed by viewMessages, which TDLib only
-    honours while the chat is open. "message_ids" defaults to the chat's
-    last message, so "$td->mark_read($chat_id, sub {})" clears a chat. Fails
-    if nothing is known to mark.
+    Marks messages read with a single viewMessages, which TDLib honours on a
+    chat that is not open because the request names its source and forces
+    the read. Opening the chat would be worse than useless: it puts the chat
+    at the top of the account's recently opened list, where closing it again
+    does not remove it. "message_ids" defaults to the chat's last message,
+    so "$td->mark_read($chat_id, sub {})" clears a chat. Fails if nothing is
+    known to mark.
 
    chat_action($chat_id, $action, $cb)
     Sends a chat action, the "typing..." class of indicator. $action is one
@@ -370,8 +725,10 @@ METHODS
     An unrecognised key croaks rather than being ignored: since absence
     means denial, a typo would quietly take a right away.
 
-   set_chat_description($chat_id, $text, $cb)
-    Sets the description shown on a group or channel's profile.
+   set_chat_description($chat_id, $description, $cb)
+    Sets the description shown on a group or channel's profile. It is plain
+    text, not formatted: pass the empty string to clear it. Leaving it out
+    croaks.
 
    invite_link($chat_id, %opt, $cb), edit_invite_link($chat_id, $link, %opt, $cb), invite_links($chat_id, %opt, $cb), revoke_invite_link($chat_id, $link, $cb), replace_primary_invite_link($chat_id, $cb), invite_link_members($chat_id, $link, %opt, $cb)
     Manage a chat's invite links. Creating and editing accept "name",
@@ -383,11 +740,16 @@ METHODS
     on_join_request($cb)". TDLib replaces the whole link on an edit, so any
     option not passed reverts to its default: renaming a link clears its
     expiry and member limit. invite_links lists them, filtered by "creator"
-    and "revoked"; invite_link_members lists who joined through one.
+    and "revoked" and paged with "offset_date", "offset_link" and "limit";
+    invite_link_members lists who joined through one, "limit" at a time (up
+    to 100), paged by passing the last member of a page as "offset_member";
+    "expired_only => 1" returns only members whose subscription has lapsed,
+    and applies only when the link is a subscription link.
 
    join_requests($chat_id, %opt, $cb), process_join_request($chat_id, $user_id, $approve, $cb), process_join_requests($chat_id, $approve, %opt, $cb), on_join_request($cb)
     The other half of a "join_request" invite link. join_requests lists who
-    is waiting, filtered by "link" and "query" and bounded by "limit";
+    is waiting, filtered by "link" and "query" and bounded by "limit"; pass
+    the last request of a page as "offset_request" for the next.
     process_join_request answers one, and the plural form answers everyone
     at once, optionally only those who used one "link". $approve defaults to
     true in both, so declining is explicit.
@@ -396,6 +758,11 @@ METHODS
     a flattened hashref carrying "chat_id", "user_id", "date", "bio",
     "invite_link" and "user_chat_id".
 
+    Which account may call what differs here. on_join_request fires only for
+    a bot, and join_requests and process_join_requests only work for a user;
+    process_join_request works for both. So a bot answers each request as it
+    arrives, and a user lists the queue.
+
    check_invite_link($link, $cb), join_by_link($link, $cb)
     Inspect or accept an invite link. These take only the link, since the
     chat is whatever it points at, and work for a chat you are not in.
@@ -403,9 +770,10 @@ METHODS
    mute($chat_id, $seconds, $cb), unmute($chat_id, $cb)
     Silences a chat for a number of seconds, or indefinitely when no
     duration is given. Notification settings are a single object in TDLib,
-    so these send every other field as "use the default" rather than
-    replacing them; muting will not quietly reset a chat's sound or preview
-    choices.
+    and a write replaces all of it, so these send the chat's cached settings
+    back with only the mute changed: a chat's own sound and preview choices
+    survive. A chat this client has not seen has nothing cached, and gets
+    "use the default" for every other field.
 
    archive($chat_id, $cb), unarchive($chat_id, $cb), pin_chat($chat_id, $pinned, %opt, $cb), mark_unread($chat_id, $unread, $cb)
     Chat list housekeeping. The $pinned and $unread flags default to true,
@@ -413,28 +781,56 @@ METHODS
     a "list" option, since a chat can be pinned separately in each list.
 
    chats(%opt, $cb), search_all($query, %opt, $cb)
-    chats lists a chat list; search_all searches messages across one, unlike
-    "search_messages($chat_id, $query, %opt, $cb)", which searches inside a
-    single chat. Both take "list" and "limit"; search_all also takes
-    "offset", "min_date" and "max_date".
+    chats lists a chat list; search_all searches messages across every chat,
+    unlike "search_messages($chat_id, $query, %opt, $cb)", which searches
+    inside a single chat. Both take "list" and "limit"; search_all also
+    takes "offset", "min_date" and "max_date".
 
     Wherever a "list" option appears it is "main" (the default), "archive",
-    or a chat folder id as a number.
+    or a chat folder id as a number. search_all is the exception: with no
+    "list" it searches every chat, archived ones included, and it can be
+    narrowed to "main" or "archive" but not to a folder, which croaks.
+
+    Changed in 0.04. search_all with no "list" searched the main list in
+    0.03, so the same call now returns archived matches too. Pass "list =>
+    'main'" for the old result.
 
    mute_scope($scope, $seconds, %opt, $cb), scope_settings($scope, $cb), reset_notifications($cb)
     Notification defaults for a whole class of chat, where $scope is
     "private", "groups" or "channels". Every scopeNotificationSettings field
-    is sent outright, and the story behaviour is left alone unless you say
-    otherwise: "mute_stories" defaults to off with the default story sound,
-    and "show_story_poster" to on. Options: "preview", "no_pinned",
-    "no_mentions", "sound_id", "mute_stories", "story_sound_id",
-    "show_story_poster". reset_notifications puts everything back, including
-    per-chat overrides.
+    is sent outright, and unlike the per-chat settings the scope ones have
+    no "use the value from elsewhere" flag at all -- its one "use_default_"
+    field means something else, that story notifications come from your top
+    contacts whatever "mute_stories" says. So every call replaces all of
+    them, and anything you do not pass reverts to this module's default
+    rather than staying as it was. Muting a scope for an hour therefore also
+    turns previews back on unless you pass "show_preview => 0" with it. Read
+    the current values with scope_settings and pass them back if you are
+    changing one thing. The defaults are: both sounds ask for the app
+    default (the TL spells that -1; 0 would disable the sound), previews and
+    the story poster shown, pinned and mention notifications enabled, and
+    story notifications left to that top-contacts rule unless you pass
+    "mute_stories" yourself. Options: "show_preview" (also accepted as
+    "preview", its original spelling), "no_pinned", "no_mentions",
+    "sound_id", "mute_stories", "story_sound_id", "show_story_poster".
+    reset_notifications puts everything back, including per-chat overrides.
 
    set_chat_reactions($chat_id, $reactions, %opt, $cb)
     Chooses which reactions a chat allows. Pass 'all' for everything the
-    chat's tier permits, or an arrayref of emoji to restrict it. Option:
-    "max" for how many a single message may carry.
+    chat's tier permits, or an arrayref to restrict it; each element is an
+    emoji string or "{ custom_emoji_id => $id }". Option: "max" for how many
+    a single message may carry.
+
+   read_all_reactions($chat_id, $cb), set_reaction_notifications(%opt, $cb)
+    Mark every reaction in a chat as read, and configure which reactions
+    raise a notification.
+
+    set_reaction_notifications takes all five fields, because TDLib offers
+    no getter for them: the current value arrives only through an update, so
+    defaulting a field would silently clear it. "message_reaction_source",
+    "story_reaction_source" and "poll_vote_source" are each 'none',
+    'contacts' or 'all'; "sound_id" is an int64 notification sound id
+    (stringified for you), and "show_preview" is a flag.
 
    blocked(%opt, $cb)
     Lists blocked senders. Options: "offset", "limit", and "stories" to read
@@ -444,8 +840,10 @@ METHODS
     Bulk membership and ownership. ban_member differs from
     "set_member_status($chat_id, $user_id, $status, %opt, $cb)" in taking
     "revoke", which also deletes what the banned member already sent, and
-    "until" for a temporary ban. transfer_ownership needs the account
-    password, which Telegram requires for an irreversible act.
+    "until" for a temporary ban. "revoke" reaches the server only for a
+    basic group; in a supergroup or channel TDLib drops it, so purge with
+    delete_messages_by_sender() instead. transfer_ownership needs the
+    account password, which Telegram requires for an irreversible act.
     set_default_admin_rights sets what a bot asks for when added as an
     administrator; "channel => 1" targets channels rather than groups.
 
@@ -453,33 +851,54 @@ METHODS
     create_group makes a supergroup by default; "channel" makes a channel
     and "forum" makes a forum. Passing "members" instead creates a basic
     group, which is a different TDLib call and needs its members up front.
-    Also takes "description" and "auto_delete". delete_history options:
-    "remove_from_list" and "revoke", which deletes for everyone rather than
-    only for you.
+    Also takes "description", "auto_delete" and "for_import", which creates
+    the group ready to receive an imported message history. delete_history
+    options: "remove_from_list" and "revoke", which deletes for everyone
+    rather than only for you.
 
    set_slow_mode($chat_id, $seconds, $cb), set_auto_delete($chat_id, $seconds, $cb), set_discussion_group($chat_id, $discussion_chat_id, $cb), protect_content($chat_id, $on, $cb)
     Group settings: how often a member may post, how long messages live,
     which group holds a channel's comments, and whether forwarding and
-    saving are blocked. Passing 0 clears the first two.
+    saving are blocked. The value is required: passing 0 clears the first
+    two and unlinks the discussion group, and leaving it out or passing
+    undef croaks rather than doing the same, since an undef from a failed
+    lookup would otherwise unlink a channel's comments.
 
    make_forum($id, $on, %opt, $cb), sign_messages($id, $on, %opt, $cb), join_by_request($id, $on, %opt, $cb), join_to_send($id, $on, $cb), all_history_available($id, $on, $cb), hide_members($id, $on, $cb), set_supergroup_username($id, $username, $cb)
     Supergroup and channel switches. make_forum is what turns an ordinary
-    supergroup into one that has topics, which "create_topic($chat_id,
-    $name, %opt, $cb)" needs.
+    supergroup into one that has topics, which create_topic() needs.
 
     These take a supergroup id, which is not the chat id you use everywhere
     else: a supergroup's chat id is -1000000000000 minus its supergroup id.
     Passing either works, because a negative id is converted for you. The
     flag defaults to true in all of them.
 
+    make_forum takes "tabs => 1" to show the forum's topics as tabs rather
+    than as a list. It is sent every time, so calling make_forum on a
+    supergroup that is already a forum with tabs, and not passing "tabs",
+    turns them off -- TDLib treats the call as setting both flags and only
+    ignores it when both already match. Read "has_forum_tabs" from
+    supergroup() first if you are toggling something else about an existing
+    forum.
+
+    sign_messages adds a sender signature to channel posts; "show_sender =>
+    1" adds a link to the sender's account with it. "show_sender" is sent
+    every time, like make_forum's "tabs", so signing a channel that already
+    shows senders without passing it takes that link away. join_by_request
+    takes "guard_bot", the user id of the bot that guards the group (0 for
+    none, and ignored when the flag is false), and "apply_to_links => 1" to
+    apply the change to existing invite links, primary links included.
+
    fetch_chat($chat_id, $cb), close_chat($chat_id, $cb), user_full_info($user_id, $cb), supergroup($id, %opt, $cb), basic_group($id, %opt, $cb), supergroup_members($id, %opt, $cb), groups_in_common($user_id, %opt, $cb)
     Reading chat and user records. fetch_chat asks TDLib, unlike
-    "chat($chat_id)", which reads the module's cache; it also loads a chat
-    the client has not seen. close_chat releases a chat that
-    "mark_read($chat_id, %opt, $cb)" opened, which nothing else does. "full
-    => 1" asks supergroup and basic_group for the fuller record.
+    "chat($id)", which reads the module's cache; it also loads a chat the
+    client has not seen. close_chat balances an openChat you sent yourself
+    through "send(\%request, $cb, %opt)"; nothing in the module opens a
+    chat. "full => 1" asks supergroup and basic_group for the fuller record.
     supergroup_members takes "filter" ("recent", "contacts",
     "administrators", "restricted", "banned", "bots"), "offset" and "limit".
+    groups_in_common pages with "limit" (up to 100) and "offset_chat_id",
+    the chat id to start from; 0 asks for the first page.
 
    chat_event_log($chat_id, %opt, $cb), chat_statistics($chat_id, %opt, $cb), pinned_message($chat_id, $cb), clear_action_bar($chat_id, $cb), message_senders($chat_id, $cb), set_message_sender($chat_id, $sender_id, $cb)
     The administrator log, with "query", "from_event_id", "limit" and
@@ -492,6 +911,17 @@ METHODS
     the channel rather than as themselves. A negative sender id is a chat, a
     positive one a user.
 
+   search_chats($query, %opt, $cb), search_public_chats($query, $cb), top_chats($category, %opt, $cb), recommended_chats($cb), recently_opened_chats(%opt, $cb)
+    Finding chats. search_chats looks through what this account already
+    knows; search_public_chats reaches Telegram's public directory.
+    top_chats takes a category: "users", "bots", "groups", "channels",
+    "inline_bots", "calls" or "forwards".
+
+   check_chat_username($chat_id, $username, $cb), report_chat($chat_id, %opt, $cb), default_disable_notification($chat_id, $on, $cb)
+    Whether a public username is free for a chat, reporting a chat with
+    "option_id", "messages" and "text", and whether messages sent to a chat
+    are silent by default.
+
   Messages mixin
    send_message($chat_id, $text, %opt, $cb)
     Sends a text message.
@@ -501,11 +931,13 @@ METHODS
     bot answering in a forum must pass the topic it was addressed in.
 
     "schedule" takes a Unix time and has the server deliver the message
-    then. Because a scheduled message is not sent now, the confirmation
-    "wait => 'sent'" waits for would not arrive until its due time, so
-    "wait" defaults to "accepted" when scheduling and asking for "sent"
-    explicitly croaks. Read pending ones back with "scheduled($chat_id,
-    $cb)".
+    then. A time less than ten seconds away, or already past, is sent at
+    once, and the callback still looks like an accepted scheduled message; a
+    bot cannot schedule at all. Because a scheduled message is not sent now,
+    the confirmation "wait => 'sent'" waits for would not arrive until its
+    due time, so "wait" defaults to "accepted" when scheduling and asking
+    for "sent" explicitly croaks. Read pending ones back with
+    "scheduled($chat_id, $cb)".
 
     TDLib will not send to a chat it has not loaded, and answers "Chat not
     found" instead. A chat id taken from an update or from
@@ -538,7 +970,10 @@ METHODS
         as soon as TDLib accepts the request.
 
     reply_to
-        Message id to reply to.
+        Message id to reply to. If that message cannot be replied to -- it
+        is in another chat, has been deleted, or has not reached the server
+        yet -- TDLib sends a plain message instead, and the callback hears
+        nothing of it.
 
     silent
         Send without a notification.
@@ -578,7 +1013,9 @@ METHODS
 
    edit_message_markup($chat_id, $message_id, $markup, $cb)
     Replaces a message's reply markup and nothing else, for updating buttons
-    after a tap. Pass an empty hashref to remove them.
+    after a tap. Omit the markup to remove the buttons: the request then
+    carries an explicit null, which is how TDLib spells "no markup". An
+    empty hashref does not work -- TDLib refuses it for having no @type.
 
     Note that "edit_message($chat_id, $message_id, $text, %opt, $cb)" takes
     "reply_markup" as an option, and an edit that omits it drops whatever
@@ -602,62 +1039,113 @@ METHODS
     the prefix. Also takes "topic" and "local", which counts only what is
     already cached.
 
-   available_reactions($chat_id, $message_id, %opt, $cb), message_reactions($chat_id, $message_id, %opt, $cb), set_default_reaction($emoji, $cb)
+   available_reactions($chat_id, $message_id, %opt, $cb), message_reactions($chat_id, $message_id, %opt, $cb), set_default_reaction($reaction, $cb)
     available_reactions lists what may be added to a message;
     message_reactions lists what already was, optionally filtered to one
-    "emoji"; set_default_reaction picks the one a long press sends. Adding
-    and removing a reaction is react().
+    "reaction" (also accepted as "emoji"); set_default_reaction picks the
+    one a long press sends. Both take the same forms as "react($chat_id,
+    $message_id, $reaction, %opt, $cb)", so a custom emoji works as well as
+    a plain one. Adding and removing a reaction is react().
+
+    available_reactions takes "row_size", the keyboard width a client would
+    lay the reactions out in, 8 by default and silently 8 again for anything
+    outside 5 to 25; message_reactions takes "offset" and "limit" (50).
 
    set_draft($chat_id, $text, %opt, $cb), clear_drafts(%opt, $cb)
     Saves an unsent message against a chat, which other clients on the same
     account will see. An empty or undefined text clears the draft, which is
-    how TDLib spells "no draft". Options: "parse_mode", "reply_to", "topic".
-    clear_drafts empties every chat, keeping secret chats unless
-    "exclude_secret" is false.
+    how TDLib spells "no draft". Options: "parse_mode", "reply_to" and
+    "topic". The draft's timestamp is not among them: TDLib stamps it from
+    its own clock when it stores the draft, which is what decides between
+    two clients that saved one. clear_drafts empties every chat, keeping
+    secret chats unless "exclude_secret" is false.
 
    send_album($chat_id, \@contents, %opt, $cb)
     Sends several media as one group. "\@contents" are InputMessageContent
     hashrefs, such as those "send_file($chat_id, $path, %opt, $cb)" builds;
     "reply_to", "topic", "silent" and "schedule" work as they do there.
+    "wait => 'sent'" is refused: the reply carries one message per item, so
+    there is no single delivery to wait for, and the callback always runs
+    once Telegram accepts the album, which is what "wait => 'accepted'"
+    says.
 
    edit_message_caption($chat_id, $message_id, $caption, %opt, $cb), edit_message_media($chat_id, $message_id, \%content, %opt, $cb), edit_message_location($chat_id, $message_id, \%location, %opt, $cb), reschedule($chat_id, $message_id, $when, $cb)
     Editing a sent message beyond its text. The caption honours "parse_mode"
     and "caption_above"; the location takes "live_period", "heading" and
     "proximity_alert_radius", which it nests in the liveLocation object
-    TDLib expects. reschedule moves a scheduled message, and sends it now
-    when $when is omitted.
+    TDLib expects. An edit without "\%location" stops sharing a live
+    location. "proximity_alert_radius" is sent every time, 0 when left out,
+    so an edit that does not repeat it switches an active proximity alert
+    off. reschedule moves a scheduled message, and sends it now when $when
+    is omitted or is less than ten seconds away.
 
-   resend_messages($chat_id, \@message_ids, $cb), delete_messages_by_sender($chat_id, $user_id, $cb), delete_messages_by_date($chat_id, $min_date, $max_date, %opt, $cb), unpin_all($chat_id, $cb), read_all_mentions($chat_id, $cb)
-    Bulk operations over a chat's messages. Deleting by date revokes for
-    everyone unless "revoke => 0".
+    Two fields are sent every time here, as they are for edit_message:
+    "caption_above", so editing the caption of a message whose caption sat
+    above the media without passing it puts the caption back below, and
+    "reply_markup", so an edit that does not pass the keyboard takes the
+    buttons away. Pass both when you mean to keep them.
+
+   resend_messages($chat_id, \@message_ids, $cb), delete_messages_by_sender($chat_id, $sender, $cb), delete_messages_by_date($chat_id, $min_date, $max_date, %opt, $cb), unpin_all($chat_id, $cb), read_all_mentions($chat_id, $cb)
+    Bulk operations over a chat's messages. $sender is a bare user id, or a
+    negative chat id for a channel posting in the group. Deleting by date
+    revokes for everyone unless "revoke => 0", which a basic group needs: it
+    refuses the revoke. A supergroup cannot be cleared by date at all. TDLib
+    moves a $max_date later than half a minute ago back to it, so a range
+    lying entirely within the last 30 seconds deletes nothing and still
+    reports success.
 
    message_thread($chat_id, $message_id, $cb), thread_history($chat_id, $message_id, %opt, $cb), read_date($chat_id, $message_id, $cb), message_viewers($chat_id, $message_id, $cb), message_properties($chat_id, $message_id, $cb), message_by_date($chat_id, $date, $cb), open_content($chat_id, $message_id, $cb)
     Reading around a message: its comment thread and that thread's history,
     when it was read and by whom, what may be done with it, the message
     nearest a timestamp. open_content marks self-destructing media as
-    opened, which starts its timer.
+    opened, which starts its timer. thread_history pages with "limit",
+    "offset" and "from_message_id", the message to read backwards from; 0
+    starts at the newest.
 
    parse_markdown($text, $cb), markdown_text(\%formatted, $cb), text_entities($text, $cb), translate($text, $to_language, %opt, $cb), link_preview($text, $cb), search_hashtags($prefix, %opt, $cb)
     Text utilities. parse_markdown turns markdown into a formattedText and
     markdown_text turns one back; text_entities finds links, mentions and
     the like in plain text without any markup. translate takes a string or a
-    formattedText and a language code. link_preview asks what Telegram would
-    show for the links in a text.
+    formattedText and a language code, and "tone", one of "formal",
+    "neutral" (the default) or "casual". link_preview asks what Telegram
+    would show for the links in a text, and fails with a 404 when the text
+    has none, which is an ordinary answer rather than a fault.
 
    scheduled($chat_id, $cb)
     Lists the messages scheduled in a chat but not yet delivered.
 
-   react($chat_id, $message_id, $emoji, %opt, $cb)
-    Adds an emoji reaction. Options: "remove" to take the reaction away
-    again, "is_big" for the animated form, "update_recent" (default on) to
-    fold the emoji into the sender's recent reactions.
+   react($chat_id, $message_id, $reaction, %opt, $cb)
+    Adds a reaction. Options: "remove" to take the reaction away again,
+    "is_big" for the animated form, "update_recent" (default on) to fold the
+    emoji into the sender's recent reactions.
+
+    $reaction is an emoji string, or a hashref "{ custom_emoji_id => $id }"
+    for a custom emoji; the id is int64 and is stringified for you. A paid
+    reaction is not reachable here -- TDLib rejects it in this call and
+    points at add_paid_reaction().
+
+   set_reactions($chat_id, $message_id, \@reactions, %opt, $cb), delete_reactions_from_sender($chat_id, $message_id, $sender, $cb), clear_recent_reactions($cb)
+    Replace the whole set of our reactions on a message at once -- the bot
+    counterpart of react, which is for users; remove every reaction a given
+    sender left ($sender is a bare user id, or a negative chat id); and
+    clear the recent-reactions list. Each element of @reactions takes the
+    same forms as react's $reaction. "is_big" applies.
+
+   add_paid_reaction($chat_id, $message_id, $star_count, %opt, $cb), commit_paid_reactions($chat_id, $message_id, $cb), remove_paid_reactions($chat_id, $message_id, $cb), set_paid_reaction_type($chat_id, $message_id, $type, $cb), paid_reaction_senders($chat_id, $cb)
+    Paid reactions are staged and then committed, which is why they are
+    separate from react: add one or more pending reactions, then commit
+    them, or drop them with remove. "type" selects who is credited:
+    'regular' (the default), 'anonymous', or a chat id to react as that
+    chat. paid_reaction_senders lists the senders available for a chat.
 
    delete_messages($chat_id, \@message_ids, %opt, $cb)
     Deletes messages. "revoke" defaults to true (delete for all
     participants).
 
    forward_messages($chat_id, $from_chat_id, \@message_ids, %opt, $cb)
-    Forwards messages. Options: "send_copy", "remove_caption", "silent".
+    Forwards messages. Options: "send_copy", "remove_caption", "silent". The
+    callback runs once Telegram accepts the forward, with the pending
+    messages; like send_album it refuses "wait => 'sent'".
 
    on_message($cb)
     Handler for updateNewMessage, called with the decoded message. Its text
@@ -669,7 +1157,7 @@ METHODS
     Sends a local file. "kind" selects the content: "document" (the
     default), "photo", "video", "audio", "animation", "voice_note",
     "video_note", "sticker"; an unknown kind croaks. $path may instead be an
-    InputFile hashref, as returned by "upload($path, %opt)". "caption" is
+    InputFile hashref, as returned by "upload($path)". "caption" is
     formatted with the same "parse_mode" rules as "send_message($chat_id,
     $text, %opt, $cb)", and "reply_to", "silent", "wait" and "reply_markup"
     behave as they do there.
@@ -697,10 +1185,15 @@ METHODS
    send_poll($chat_id, $question, \@options, %opt, $cb)
     Sends a poll, which needs at least two options. Polls are anonymous
     unless "anonymous" is turned off, which is the opposite of TDLib's own
-    default but matches what Telegram's clients create. Options: "multiple"
-    to allow several answers, "open_period" to close the poll after that
-    many seconds, "allow_adding_options", and "quiz" with "correct" (an
-    option index, default 0) and "explanation" for a quiz.
+    default but matches what Telegram's clients create. For the same reason
+    a vote can be changed or taken back unless "revoting" is turned off; in
+    a quiz it is final. Options: "multiple" to allow several answers,
+    "open_period" to close the poll after that many seconds,
+    "allow_adding_options", and "quiz" with "correct" (an option index,
+    default 0) and "explanation" for a quiz.
+
+    Changed in 0.04. 0.03 sent no re-voting setting, so every poll it
+    created refused a change of vote. Pass "revoting => 0" for that.
 
     All three of these, like the other senders, accept "reply_to", "silent",
     "reply_markup" and "wait".
@@ -724,7 +1217,9 @@ METHODS
     updateFile when nothing changed. A download that fails after starting
     (TDLib signals this only via updateFile, with is_downloading_active and
     is_downloading_completed both false) fails the callback with a synthetic
-    "download failed" error. Option: "priority" (default 1).
+    "download failed" error. Option: "priority" (default 1). "on_progress"
+    may be given without a main callback, for a download followed only
+    through its progress.
 
     One registration per file id: a second download() for the same id while
     the first is in flight fails its callback immediately with a synthetic
@@ -732,9 +1227,10 @@ METHODS
     error since nothing is sent; the first download is left alone.
 
    cancel_download($file_id)
-    Cancels a pending download and fails its callback.
+    Cancels a pending download and fails its callback. It takes no callback
+    of its own, and croaks on one.
 
-   upload($path, %opt)
+   upload($path)
     Returns an inputFileLocal hashref for use as message content or
     elsewhere in a request. It only builds the shape: nothing is sent and
     nothing is tracked. The actual upload is reported by TDLib through the
@@ -751,12 +1247,22 @@ METHODS
 
    on_upload($file_id, $cb)
     Registers $cb to fire with the decoded file on every updateFile for
-    $file_id. The registration is removed automatically once the update with
-    "remote.is_uploading_completed" true has been delivered; pass an undef
-    $cb to remove it earlier. The file id becomes known only after the send
-    is accepted: read it from the returned message content (for a document,
-    "$msg->{content}{document}{document}{id}") and register then. On close
-    the watchers are dropped silently.
+    $file_id. The registration is removed automatically once the last update
+    has been delivered: the one with "remote.is_uploading_completed" true,
+    or the one showing an upload that had started and stopped without
+    completing. Pass an undef $cb to remove it earlier; leaving the callback
+    out croaks. The file id becomes known only after the send is accepted:
+    read it from the returned message content (for a document,
+    "$msg->{content}{document}{document}{id}") and register then. Send with
+    "wait => 'accepted'" for that: the default calls back on delivery, when
+    the upload has already finished, so a watcher registered then never
+    fires and is never removed.
+
+    "Had started" means seen to start by this watcher, and TDLib reports the
+    start before the send is accepted. So an upload stopped before its first
+    progress update -- a send deleted at once, a file unreadable from the
+    first byte -- looks like one still queued, and its watcher stays: remove
+    it yourself when you cancel. On close the watchers are dropped silently.
 
     Unlike the other on_* methods, on_upload is a per-id registration, not a
     single-handler setter, and it returns nothing.
@@ -764,7 +1270,10 @@ METHODS
    file($file_id, $cb), remote_file($remote_id, %opt, $cb), delete_file($file_id, $cb), suggested_file_name($file_id, %opt, $cb)
     Local file records. remote_file resolves the persistent id that travels
     inside a message; its "file_type" must match what the file actually is,
-    and may be given with or without the "fileType" prefix.
+    and may be given with or without the "fileType" prefix. A name the
+    pinned schema does not have croaks rather than reaching the server.
+    suggested_file_name takes "directory", the directory the name is being
+    chosen for, so it can avoid colliding with what is already there.
 
    add_to_downloads($file_id, $chat_id, $message_id, %opt, $cb), remove_from_downloads($file_id, %opt, $cb), pause_download($file_id, $paused, $cb)
     The download list Telegram clients show. Options: "priority", and
@@ -773,23 +1282,36 @@ METHODS
    storage_statistics($cb), optimize_storage(%opt, $cb)
     A long-lived client accumulates gigabytes of cached media.
     optimize_storage prunes it, bounded by "size", "ttl", "count" and
-    "immunity_delay", restricted to or excluding "chats". An unset limit is
-    sent as -1, which TDLib reads as no limit rather than as zero.
+    "immunity_delay", restricted to "chats" or held back from
+    "exclude_chats", each an arrayref of chat ids. An unset limit is sent as
+    -1, which TDLib reads as its own default, not as no limit: 100 MB of
+    files in total, nothing untouched for 23 hours, 40000 files, and an hour
+    before a new file may be deleted. So optimize_storage with no options is
+    a full prune at those defaults, not a no-op. Set every limit you care
+    about.
+
+    "chat_limit" affects only the statistics that come back, never what is
+    deleted: it is the number of chats, largest usage first, reported
+    separately, with every other chat folded into an entry whose chat id is
+    0. "statistics" likewise only changes what is returned.
 
   Connection mixin
    connection_state()
     Returns the last seen connection state name, or undef before the first
     updateConnectionState arrives. One of connectionStateWaitingForNetwork,
     connectionStateConnectingToProxy, connectionStateConnecting,
-    connectionStateUpdating or connectionStateReady. Anything but the last
-    means you are offline (or catching up): requests may still be sent, but
-    they will not reach Telegram until the state returns to
-    connectionStateReady.
+    connectionStateUpdating or connectionStateReady. The first three mean
+    there is no route to Telegram, so a request waits for one.
+    connectionStateUpdating means the opposite: the connection is up and
+    TDLib is fetching what it missed, and requests go out normally, so do
+    not treat it as offline.
 
    option($name), my_id()
     TDLib reports its options as updates rather than replies, so the module
     caches them as they arrive; option() reads one back. Boolean options are
-    cached as 1 or 0 and an empty option as undef.
+    cached as 1 or 0 and an empty option as undef. An integer option is TL
+    int64 and so arrives as a string; numify one before putting it in a
+    request you build yourself.
 
     my_id() is the signed-in account's own user id, which TDLib pushes right
     after login. It is undef until then.
@@ -805,27 +1327,27 @@ METHODS
     inactivity ends a session automatically. Session ids are TL "int64" and
     are sent as strings.
 
-   search_chats($query, %opt, $cb), search_public_chats($query, $cb), top_chats($category, %opt, $cb), recommended_chats($cb), recently_opened_chats(%opt, $cb)
-    Finding chats. search_chats looks through what this account already
-    knows; search_public_chats reaches Telegram's public directory.
-    top_chats takes a category: "users", "bots", "groups", "channels",
-    "inline_bots", "calls" or "forwards".
+   add_proxy(\%proxy, %opt, $cb), proxies($cb), enable_proxy($proxy_id, $cb), disable_proxy($cb), remove_proxy($proxy_id, $cb), ping_proxy(\%proxy, $cb)
+    Proxy configuration. A proxy hashref takes "server", "port" and "type"
+    ("socks5", "http" or "mtproto"), plus "username" and "password" for the
+    first two, "http_only" for HTTP, and "secret" for MTProto. add_proxy
+    enables the proxy unless "enable => 0", and takes "comment", a label of
+    your own that TDLib stores with it.
 
-   check_chat_username($chat_id, $username, $cb), report_chat($chat_id, %opt, $cb), default_disable_notification($chat_id, $on, $cb)
-    Whether a public username is free for a chat, reporting a chat with
-    "option_id", "messages" and "text", and whether messages sent to a chat
-    are silent by default.
+   set_network_type($type, $cb), network_statistics(%opt, $cb)
+    Telling TDLib the network changed ("none", "mobile", "roaming", "wifi",
+    "other") lets it reconnect promptly rather than waiting for its own
+    timers, which matters on a laptop that sleeps or a phone that changes
+    network. network_statistics takes "current => 1" to report only the
+    current session rather than everything since the counters were last
+    reset.
 
-   search_by_phone($phone_number, %opt, $cb), my_link($cb), toggle_username($username, $active, $cb)
-    Finding a user by phone number, this account's own t.me link, and
-    turning one of your usernames on or off. "local => 1" restricts the
-    phone lookup to what is already cached.
-
-   privacy($setting, $cb), set_privacy($setting, \@rules, $cb)
-    Read and write one privacy setting, named "status", "profile_photo",
-    "phone", "bio", "birthdate", "forwards", "invites", "calls" or
-    "find_by_phone". Rules are an ordered list of UserPrivacySettingRule
-    hashrefs and the first match wins, so their order is the policy.
+   log_out($cb), password_state($cb), set_password($old, $new, %opt, $cb), account_ttl($days, $cb), register_device(\%token, %opt, $cb)
+    Account-level operations. set_password takes "hint" and
+    "recovery_email". account_ttl reads the inactivity period after which
+    Telegram deletes the account when called with no $days, and sets it when
+    given one. register_device takes a DeviceToken hashref for push
+    notifications, plus "other_users".
 
   Bots mixin
    inline_keyboard(\@rows)
@@ -853,9 +1375,15 @@ METHODS
     text => ..., request_users => \%spec }" ask the user to pick a chat or
     some users. In both, a constraint is applied only for a key you actually
     mention, so "{ bot => 0 }" means "not a bot" while leaving it out means
-    "either". request_chat takes "id", "channel", "forum", "username",
-    "created", "bot_is_member", "want_title", "want_username", "want_photo",
-    and "user_rights" / "bot_rights" as chatAdministratorRights hashrefs.
+    "either".
+
+    "channel" is the exception, because TDLib gives it no "restrict" flag of
+    its own: it always applies, so omitting it asks for a group rather than
+    for either. Pass "channel => 1" to ask for a channel.
+
+    request_chat takes "id", "channel", "forum", "username", "created",
+    "bot_is_member", "want_title", "want_username", "want_photo", and
+    "user_rights" / "bot_rights" as chatAdministratorRights hashrefs.
     request_users takes "id", "bot", "premium", "max" (default 1),
     "want_name", "want_username", "want_photo".
 
@@ -879,8 +1407,9 @@ METHODS
 
     TDLib addresses a bot by user id. These default to "option($name),
     my_id()", which is what a bot session wants; pass "bot_user_id" to act
-    on a bot from another account that owns it. All four accept
-    "language_code" for a localised value.
+    on a bot from another account that owns it. The three text setters
+    accept "language_code" for a localised value; set_bot_photo does not,
+    since TDLib keeps one photo per bot rather than one per language.
 
    on_callback_query($cb)
     Handler for updateNewCallbackQuery, called with a hashref carrying "id",
@@ -888,11 +1417,21 @@ METHODS
     "data". Answer it with "answer_callback_query($id, %opt, $cb)"; Telegram
     shows the user a spinner until you do.
 
+    A press on a message the bot sent through inline mode
+    (updateNewInlineCallbackQuery) arrives here and at the router too. It
+    has no chat: "chat_id" and "message_id" are undef, and
+    "inline_message_id" names the message for the edit_inline_* methods. So
+    does a press on a message sent for a connected business account
+    (updateNewBusinessCallbackQuery), with its "chat_id" and "message_id"
+    and the "connection_id" it came through -- which is what the
+    edit_business_message_* methods take, and they are what edits such a
+    message; the ordinary edit_message_* family addresses a different thing.
+
    on_inline_query($cb)
     Handler for updateNewInlineQuery, the typing-ahead queries an inline bot
     answers. It is called with a hashref carrying "id", "sender_user_id",
-    "query", "offset" and "chat_type". Inline mode must be turned on for the
-    bot first, through BotFather.
+    "query", "offset", "chat_type" and "user_location", a location or undef.
+    Inline mode must be turned on for the bot first, through BotFather.
 
    answer_inline_query($id, \@results, %opt, $cb)
     Answers an inline query with a list of article results. Each result is
@@ -926,7 +1465,10 @@ METHODS
     The user side of inline mode: ask a bot for results as if you had typed
     its username in a message box, then send one of them. inline_query
     options are "chat_id", "offset" and "location"; send_inline_result takes
-    "hide_via_bot". The query id is sent as a string, being a TL "int64".
+    "hide_via_bot", and "reply_to", "silent", "schedule" and "topic" as
+    send_message does, but calls back once the message is accepted and
+    refuses "wait => 'sent'". The query id is sent as a string, being a TL
+    "int64".
 
    start_bot($bot_user_id, $parameter, %opt, $cb)
     Sends the "/start" that a deep link produces, passing $parameter along.
@@ -934,22 +1476,31 @@ METHODS
 
    attachment_menu_bot($bot_user_id, $cb), toggle_attachment_menu($bot_user_id, $on, %opt, $cb)
     Read and change whether a bot sits in the attachment menu. This matters
-    for Mini Apps: "open_web_app($chat_id, $bot_user_id, $url, %opt, $cb)"
-    accepts an empty URL only for a bot that is in the menu, and answers
-    BOT_INVALID otherwise. Option: "allow_write_access".
+    for Mini Apps: open_web_app() accepts an empty URL only for a bot that
+    is in the menu, and answers BOT_INVALID otherwise. Option:
+    "allow_write_access".
 
    edit_inline_text($inline_message_id, $text, %opt, $cb), edit_inline_caption($inline_message_id, $caption, %opt, $cb), edit_inline_media($inline_message_id, \%content, %opt, $cb), edit_inline_markup($inline_message_id, \%markup, $cb), edit_inline_location($inline_message_id, \%location, %opt, $cb)
-    Edit a message a bot sent through inline mode. These address it by the
-    "inline_message_id" string that "answer_inline_query($id, \@results,
-    %opt, $cb)" results are identified by, which is a different thing from
-    the "(chat_id, message_id)" pair the edit_message_* methods take; the
-    two are not interchangeable.
+    Edit a message a bot sent through inline mode. These address it by its
+    "inline_message_id" string, which is a different thing from the
+    "(chat_id, message_id)" pair the edit_message_* methods take; the two
+    are not interchangeable. The id is not the result id you gave
+    "answer_inline_query($id, \@results, %opt, $cb)": it arrives with a
+    press on one of the message's buttons, as the callback query's
+    "inline_message_id", or in updateNewChosenInlineResult once the user
+    picks a result -- sent only when inline feedback is enabled for the bot
+    through BotFather, and carrying the id only for a result that went out
+    with buttons, which is what gives Telegram something to edit. Read that
+    update with on_update().
 
     edit_inline_text and edit_inline_caption honour "parse_mode" and hand a
     parse failure to the callback rather than to TDLib. All accept
-    "reply_markup". edit_inline_location takes "live_period", "heading" and
-    "proximity_alert_radius", which it nests in the liveLocation object
-    where TDLib expects them.
+    "reply_markup", and all send it every time, so an edit that leaves it
+    out drops the message's buttons. edit_inline_caption also takes
+    "caption_above", sent every time in the same way, as
+    edit_message_caption() does. edit_inline_location takes "live_period",
+    "heading" and "proximity_alert_radius", which it nests in the
+    liveLocation object where TDLib expects them.
 
    share_chat_with_bot($chat_id, $message_id, $button_id, $shared_chat_id, %opt, $cb), share_users_with_bot($chat_id, $message_id, $button_id, \@user_ids, %opt, $cb)
     The user's answer to a "request_chat" or "request_users" keyboard
@@ -980,7 +1531,9 @@ METHODS
    set_updates_status($pending_count, %opt, $cb), recent_inline_bots($cb), similar_bots($bot_user_id, $cb), similar_bot_count($bot_user_id, %opt, $cb), open_similar_bot($bot_user_id, $opened_bot_user_id, $cb)
     set_updates_status reports a bot's backlog to Telegram, with an optional
     "error". The rest are discovery: recently used inline bots, and bots
-    Telegram considers similar to a given one.
+    Telegram considers similar to a given one. similar_bot_count takes
+    "local => 1" to answer from what TDLib already holds rather than asking
+    the server, and then answers -1 when it holds no count at all.
 
    bot_media_previews($bot_user_id, %opt, $cb), add_bot_media_preview($bot_user_id, \%content, %opt, $cb), edit_bot_media_preview($bot_user_id, $file_id, \%content, %opt, $cb), delete_bot_media_previews($bot_user_id, \@file_ids, %opt, $cb), reorder_bot_media_previews($bot_user_id, \@file_ids, %opt, $cb)
     The sample media shown on a bot's profile, which are stored per
@@ -995,27 +1548,10 @@ METHODS
 
    set_menu_button($user_id, %opt, $cb), menu_button($user_id, $cb)
     The button beside the message box in a chat with a bot. Options "text"
-    and "url"; a Mini App URL makes it open the app. Passing user id 0 sets
-    the default for every user.
-
-   add_proxy(\%proxy, %opt, $cb), proxies($cb), enable_proxy($proxy_id, $cb), disable_proxy($cb), remove_proxy($proxy_id, $cb), ping_proxy(\%proxy, $cb)
-    Proxy configuration. A proxy hashref takes "server", "port" and "type"
-    ("socks5", "http" or "mtproto"), plus "username" and "password" for the
-    first two, "http_only" for HTTP, and "secret" for MTProto. add_proxy
-    enables the proxy unless "enable => 0".
-
-   set_network_type($type, $cb), network_statistics(%opt, $cb)
-    Telling TDLib the network changed ("none", "mobile", "roaming", "wifi",
-    "other") lets it reconnect promptly rather than waiting for its own
-    timers, which matters on a laptop that sleeps or a phone that changes
-    network.
-
-   log_out($cb), password_state($cb), set_password($old, $new, %opt, $cb), account_ttl($days, $cb), register_device(\%token, %opt, $cb)
-    Account-level operations. set_password takes "hint" and
-    "recovery_email". account_ttl reads the inactivity period after which
-    Telegram deletes the account when called with no $days, and sets it when
-    given one. register_device takes a DeviceToken hashref for push
-    notifications, plus "other_users".
+    and "url"; a Mini App URL makes it open the app. "commands => 1" puts
+    back the list of commands instead, and a call with neither a text nor a
+    url puts back Telegram's default button. A url without a text croaks,
+    since TDLib refuses that pair. Passing user id 0 sets it for every user.
 
   WebApps mixin
     Mini Apps, which Telegram also calls Web Apps. TDLib does not render
@@ -1058,15 +1594,20 @@ METHODS
     these messages too.
 
    answer_web_app_query($query_id, \%result, $cb), web_app_request($bot_user_id, $method, $parameters, $cb), web_app_placeholder($bot_user_id, $cb)
-    answer_web_app_query is the bot side of
-    "Telegram.WebApp.switchInlineQuery": it answers with one
-    InputInlineQueryResult. web_app_request sends a custom method call on
-    the Mini App's behalf, with $parameters as a JSON string.
-    web_app_placeholder fetches the outline shown while an app loads.
+    answer_web_app_query is for a bot: an app opened from an inline button,
+    the menu button or the attachment menu receives a "query_id" in its init
+    data, and the bot answers it with one InputInlineQueryResult, which
+    Telegram posts on the user's behalf; an app opened from a keyboard
+    button has no query id. web_app_request is for a user client: it sends a
+    custom method call on the Mini App's behalf, with $parameters as a JSON
+    string. web_app_placeholder fetches the outline shown while an app
+    loads.
 
   Forum mixin
-    Topics in a forum supergroup. A topic id is the id of the message that
-    opened the topic, so it is an ordinary int53 and not a separate space.
+    Topics in a forum supergroup. A topic id is the topic's
+    "forum_topic_id", an int32 of its own and not a message id: read it from
+    "$msg->{topic_id}{forum_topic_id}" or from topics(), never from the
+    message that opened the topic.
 
     To post into a topic, pass "topic" to any sending method rather than
     calling something different; see "send_message($chat_id, $text, %opt,
@@ -1076,7 +1617,8 @@ METHODS
     Create, rename and remove topics. create_topic options: "color" (an RGB
     integer) and "custom_emoji_id" for the icon, and "name_implicit".
     edit_topic options: "name" and "custom_emoji_id"; the icon is only
-    touched when "custom_emoji_id" is given, so renaming leaves it alone.
+    touched when "custom_emoji_id" is given, so renaming leaves it alone,
+    and leaving "name" out keeps the current name.
 
    topic($chat_id, $topic_id, $cb), topics($chat_id, %opt, $cb), topic_history($chat_id, $topic_id, %opt, $cb), topic_link($chat_id, $topic_id, $cb)
     Read topics and their messages. topics options: "query", "limit"
@@ -1089,6 +1631,9 @@ METHODS
     closes and "close_topic($chat, $id, 0)" reopens. hide_general_topic
     takes no topic id, since the General topic is identified by its absence.
     topic_icons lists the icons a client may offer.
+
+   read_all_topic_reactions($chat_id, $topic_id, $cb)
+    Marks every reaction in one forum topic as read.
 
   Folders mixin
     Chat folders, which Telegram's own clients show as tabs above the chat
@@ -1103,18 +1648,21 @@ METHODS
     Telegram truncates a folder name to 12 characters and does not say so,
     which is worth knowing before a longer name comes back shortened.
 
-    A folder spec takes "name" (required), "icon" (an icon name such as
-    "Work" or "Party"), "color_id", "shareable", the chat lists
-    "pinned_chat_ids", "included_chat_ids" and "excluded_chat_ids", and the
-    flags "exclude_muted", "exclude_read", "exclude_archived",
+    A folder spec takes "name" (required; a string, or a formattedText for a
+    name with custom emoji, then animated with "animate_emoji"), "icon" (an
+    icon name such as "Work" or "Party"), "color_id", "shareable", the chat
+    lists "pinned_chat_ids", "included_chat_ids" and "excluded_chat_ids",
+    and the flags "exclude_muted", "exclude_read", "exclude_archived",
     "include_contacts", "include_non_contacts", "include_bots",
-    "include_groups" and "include_channels". TDLib replaces the whole folder
-    on an edit, so any key not passed reverts to its default: editing only
-    the name empties the membership.
+    "include_groups" and "include_channels". An unknown key croaks. TDLib
+    replaces the whole folder on an edit, so any key not passed reverts to
+    its default: editing only the name empties the membership.
 
     delete_folder takes "leave_chats", the chats to leave along with the
     folder rather than merely un-filing. reorder_folders takes
-    "main_position", where the unfiled main list sits among the tabs.
+    "main_position", where the unfiled main list sits among the tabs; only a
+    Premium account can move it, and for any other TDLib puts it back first
+    without an error.
 
    recommended_folders($cb), folder_chat_count(\%spec, $cb), folder_tags($on, $cb)
     recommended_folders lists the ready-made folders Telegram suggests.
@@ -1125,14 +1673,15 @@ METHODS
     A shareable folder is handed out as a link that adds its chats to
     someone else's folder list. Creating and editing take "name" and
     "chats", the chats the link includes. TDLib replaces the whole link on
-    an edit, so leaving "chats" out empties what the link includes. The last
-    two take only the link, and "add_folder_by_link" takes "chats" to choose
-    which of the offered chats to actually join.
+    an edit, so an edit needs "chats" every time: without them it fails with
+    "At least one chat must be included". The last two take only the link,
+    and "add_folder_by_link" takes "chats" to choose which of the offered
+    chats to actually join.
 
   Payments mixin
     The seller's half of Telegram payments: offering something and answering
     the checkout. Actually paying for something is the buyer's half and is
-    not wrapped; reach it through "call($function, \%args, $cb)".
+    not wrapped; reach it through "call($function, \%args, $cb, %opt)".
 
     Amounts are integers in the currency's smallest unit, so 500 is five
     euros in "EUR". The exception is "XTR", Telegram Stars, where one unit
@@ -1162,22 +1711,19 @@ METHODS
     shown to the buyer.
 
    on_shipping_query($cb), answer_shipping_query($id, %opt, $cb)
-    Only fires for an invoice with "need_shipping => 1". The handler
-    receives "id", "sender_user_id", "payload" and "shipping_address";
-    answer with "options", an arrayref of "{ id => ..., title => ..., prices
-    => [...] }", or with an "error" to refuse delivery there.
+    Only fires for an invoice with a flexible price, "flexible => 1", which
+    is how the shipping options -- and so the final price -- get to depend
+    on the address; "need_shipping" alone collects an address and asks
+    nothing. The handler receives "id", "sender_user_id", "payload" and
+    "shipping_address"; answer with "options", an arrayref of "{ id => ...,
+    title => ..., prices => [...] }", or with an "error" to refuse delivery
+    there.
 
     The "payload" in this handler is a plain string, while the one in
     "on_pre_checkout_query($cb), answer_pre_checkout_query($id, %opt, $cb)"
     is TL "bytes". Both arrive already in their correct form; the difference
     is TDLib's, and is noted here only because it looks like an
     inconsistency worth double-checking rather than a bug.
-
-   refund_star_payment($user_id, $charge_id, $cb), star_transactions(%opt, $cb)
-    Refund a Stars payment by its "telegram_payment_charge_id", and read the
-    Stars ledger. star_transactions options: "owner" (defaults to this
-    account), "direction" ("incoming" or "outgoing"), "subscription_id",
-    "offset", "limit".
 
   Secret mixin
     End-to-end encrypted chats. A secret chat is a separate object from the
@@ -1204,6 +1750,370 @@ METHODS
     a logged-in session may accept secret chats at all. Losing the key loses
     every secret chat with it, as nothing on the server can restore them.
 
+    The key is TL "bytes" and is base64-encoded on the way out, exactly as
+    the "database_encryption_key" constructor option is -- 0.03 sent both
+    raw, so a database opened by 0.03 with a key that happened to look like
+    base64 is keyed with different bytes. See "new(%opt)" for what to pass
+    in that case.
+
+  Stories mixin
+    Stories are int32 ids scoped to the chat that posted them, so every
+    method here takes a poster chat id alongside the story id. Note the
+    asymmetry with the rest of the API: a story id is not an int64 and stays
+    a JSON number.
+
+   post_story($chat_id, $content, %opt, $cb)
+    Posts a story and, by default, waits for it to finish uploading.
+
+    TDLib answers immediately with a provisional story whose id changes once
+    the upload completes, so "wait" works exactly as it does for
+    "send_message($chat_id, $text, %opt, $cb)": "sent" (the default) calls
+    back with the final story from updateStoryPostSucceeded, and "accepted"
+    calls back at once with the provisional one. Deleting by a provisional
+    id does not work, so prefer the default unless you have a reason not to.
+
+    $content is a path for a photo story. A video story needs the explicit
+    form, because TDLib requires a duration and a cover frame timestamp and
+    neither can be inferred from a file. A story video may run no longer
+    than 60 seconds:
+
+        $td->post_story($chat, 'sunset.jpg', sub { ... });
+        $td->post_story($chat,
+            { video => 'clip.mp4', duration => 12, cover_frame_timestamp => 1.5 },
+            sub { ... });
+
+    Options: "privacy" ('everyone' by default, or 'contacts',
+    'close_friends', or an arrayref of user ids; TDLib ignores it for a
+    story posted as a supergroup or channel, which everyone in the chat
+    sees), "except" (an arrayref of user ids to exclude, for the first two),
+    "caption" with "parse_mode", "active_period" (86400 by default; other
+    values are a Premium feature), "album_ids", "post_to_page",
+    "protect_content", "areas" and "from_story".
+
+    "areas" and "from_story" reach TDLib as they are given, so they take the
+    TL objects rather than anything friendlier. "areas" is an
+    inputStoryAreas object wrapping the list, not the list itself -- passing
+    an arrayref is refused outright with "Expected Object, but receive
+    Array" -- and "from_story", which marks the story a repost, is a
+    storyFullId:
+
+        areas => { '@type' => 'inputStoryAreas', areas => [
+            { '@type'   => 'inputStoryArea',
+              position  => { '@type' => 'storyAreaPosition', ... },
+              type      => { '@type' => 'inputStoryAreaTypeLocation', ... } },
+        ] },
+        from_story => { '@type'         => 'storyFullId',
+                        poster_chat_id  => $chat_id,
+                        story_id        => $story_id },
+
+    edit_story takes "areas" in the same form.
+
+   edit_story($chat_id, $story_id, %opt, $cb), edit_story_cover($chat_id, $story_id, $timestamp, $cb), delete_story($chat_id, $story_id, $cb)
+    Change a posted story's content, caption or areas; move a video story's
+    cover frame; remove one. edit_story takes "content" in the same forms
+    post_story accepts, "caption" with "parse_mode", and "areas" as the
+    inputStoryAreas object described under post_story(). Each is sent only
+    when given, so an edit changes what you name and leaves the rest alone
+    -- with one constraint of TDLib's: areas cannot be edited unless the
+    content changes too, so pass "content" alongside them.
+
+   story($chat_id, $story_id, %opt, $cb), active_stories($chat_id, $cb), archived_stories($chat_id, %opt, $cb), page_stories($chat_id, %opt, $cb)
+    Read one story, a chat's currently active stories, its archive, or the
+    stories it has pinned to its profile page. story takes "only_local => 1"
+    to answer from what TDLib already holds rather than asking the server.
+    archived_stories and page_stories page with "limit" and "from_story_id",
+    the story to start from; 0 starts at the most recent.
+
+   load_active_stories(%opt, $cb)
+    Asks TDLib to load a story list, named by "list": 'main' by default, or
+    'archive'. The callback receives a bare Ok and no stories: they arrive
+    through updateChatActiveStories, so register on_story() family handlers
+    to see them. Call it again for more; once the list is exhausted TDLib
+    answers 404, which is reported as success with an undef result, as
+    load_chats does.
+
+   story_interactions($story_id, %opt, $cb), chat_story_interactions($chat_id, $story_id, %opt, $cb)
+    Who viewed, forwarded or reacted. The first reads our own stories and
+    takes no chat id; the second is the variant for a chat's stories and
+    takes a "reaction" option to filter by reaction type. Both page with
+    "offset" and "limit" and take "prefer_forwards => 1" to put forwards and
+    reposts first, then reactions, then other views; story_interactions also
+    takes "query" to search names, usernames and titles, "only_contacts",
+    and "prefer_with_reaction", which puts interactions carrying a reaction
+    first and is ignored when prefer_forwards is set. Without either, the
+    order is by date.
+
+   set_story_privacy($story_id, $privacy, %opt, $cb), post_story_to_page($chat_id, $story_id, $on, $cb), can_post_story($chat_id, $cb), chats_to_post_stories($cb)
+    Change who can see a story, pin it to the chat page, and ask in advance
+    whether posting is allowed at all. set_story_privacy takes the same
+    $privacy forms as post_story, with "except" an arrayref of user ids to
+    exclude from 'everyone' or 'contacts'.
+
+   open_story($chat_id, $story_id, $cb), close_story($chat_id, $story_id, $cb), report_story($chat_id, $story_id, %opt, $cb), story_public_forwards($chat_id, $story_id, %opt, $cb)
+    View bookkeeping, reporting, and public reposts of a story. Pair every
+    open_story with a close_story: while a story is open TDLib refetches it
+    every minute, and one of your own every ten seconds for its view count,
+    and only close_story stops that. report_story takes "option_id", a
+    reason id from a previous report_story reply, and "text" for the
+    free-text form some reasons ask for.
+
+   story_reactions(%opt, $cb), set_story_reaction($chat_id, $story_id, $reaction, %opt, $cb)
+    The reactions available for stories, and reacting to one. $reaction
+    takes the same forms as "react($chat_id, $message_id, $reaction, %opt,
+    $cb)". story_reactions takes "row_size", the keyboard width a client
+    would lay the reactions out in, 8 by default and silently 8 again for
+    anything outside 5 to 25. set_story_reaction takes "update_recent", on
+    by default.
+
+   story_albums($chat_id, $cb), create_story_album($chat_id, $name, \@story_ids, $cb), set_story_album_name($chat_id, $album_id, $name, $cb), delete_story_album($chat_id, $album_id, $cb)
+    Albums group posted stories on a profile.
+
+   story_album_stories($chat_id, $album_id, %opt, $cb), add_album_stories($chat_id, $album_id, \@ids, $cb), remove_album_stories($chat_id, $album_id, \@ids, $cb), reorder_album_stories($chat_id, $album_id, \@ids, $cb), reorder_story_albums($chat_id, \@album_ids, $cb)
+    Read and amend an album's contents, and order the albums themselves.
+
+   on_story($cb), on_story_deleted($cb), on_active_stories($cb)
+    Story updates. on_story receives a story object; on_story_deleted
+    receives "($poster_chat_id, $story_id)"; on_active_stories receives a
+    chatActiveStories, which is how the results of load_active_stories
+    arrive.
+
+  Stickers mixin
+    Sticker set ids and custom emoji ids are int64 and cross the JSON
+    interface as strings, including inside a vector: a list of set ids is a
+    list of strings.
+
+   sticker_set($set_id, $cb), search_sticker_set($name, %opt, $cb), search_sticker_sets($query, %opt, $cb)
+    Fetch a set by id, by its exact name, or search for sets by a query. The
+    middle one resolves a known name and takes "ignore_cache => 1" to re-ask
+    the server rather than answer from what TDLib already holds; the last is
+    the discovery call and takes "type".
+
+   installed_sticker_sets(%opt, $cb), archived_sticker_sets(%opt, $cb), trending_sticker_sets(%opt, $cb), owned_sticker_sets(%opt, $cb)
+    The sets installed, archived, trending, or created by this account. The
+    first three take "type", one of 'regular' (the default), 'mask' or
+    'custom_emoji'; owned_sticker_sets does not, since TDLib returns every
+    type you own. All but installed_sticker_sets page with "limit", and
+    archived_sticker_sets and owned_sticker_sets page with
+    "offset_sticker_set_id" while trending_sticker_sets uses a numeric
+    "offset".
+
+   stickers($query, %opt, $cb), search_stickers($emojis, %opt, $cb), custom_emoji_stickers(\@ids, $cb)
+    Find individual stickers, by query or by the emoji they represent, and
+    resolve custom emoji ids to their stickers. Both searches take "type",
+    one of 'regular' (the default), 'mask' or 'custom_emoji'. stickers also
+    takes "chat_id", which changes nothing unless "type" is 'custom_emoji':
+    it admits premium custom emoji when the chat is your own Saved Messages,
+    and returns none for an old secret chat; search_stickers takes
+    "languages", an arrayref of language codes for the emoji-to-sticker
+    mapping, and "query" to narrow the emoji match further.
+
+   favorite_stickers($cb), add_favorite_sticker($sticker, $cb), remove_favorite_sticker($sticker, $cb), recent_stickers(%opt, $cb), add_recent_sticker($sticker, %opt, $cb), remove_recent_sticker($sticker, %opt, $cb), clear_recent_stickers(%opt, $cb)
+    Favourites and recents. Each takes an InputFile, so a path works, and
+    the recents calls take "attached" to address the attached-sticker list
+    instead.
+
+   upload_sticker_file($user_id, $sticker, %opt, $cb)
+    Uploads one file for later use in a set. A set is built from uploaded
+    files rather than local paths, so this comes first; "format" is 'webp'
+    (the default), 'tgs' or 'webm'. See the cookbook for the full
+    upload-then-create sequence.
+
+   create_sticker_set($user_id, $title, $name, \@stickers, %opt, $cb)
+    Creates a set. Each element of @stickers is a hashref:
+
+        { file => $uploaded_or_path, emojis => '...', keywords => [...],
+          format => 'webp', mask_position => {...} }
+
+    "file" and "emojis" are required. %opt takes "type" ('regular', 'mask'
+    or 'custom_emoji'), "needs_repainting" and "source". $name must be
+    globally unique and, for a bot-owned set, must end in "_by_<bot
+    username>"; check it first with check_sticker_set_name().
+
+   add_sticker_to_set($user_id, $name, $sticker, $cb), replace_sticker_in_set($user_id, $name, $old, $new, $cb), remove_sticker_from_set($sticker, $cb), set_sticker_position($sticker, $position, $cb)
+    Amend a set. $sticker and $new take the same hashref as
+    create_sticker_set; $old is a plain InputFile.
+
+   set_sticker_set_title($name, $title, $cb), set_sticker_set_thumbnail($user_id, $name, $thumbnail, %opt, $cb), delete_sticker_set($name, $cb), install_sticker_set($set_id, $installed, %opt, $cb), reorder_sticker_sets(\@set_ids, %opt, $cb), check_sticker_set_name($name, $cb)
+    Set housekeeping. install_sticker_set installs by default and uninstalls
+    when passed a false second argument; "archived" archives instead.
+    delete_sticker_set removes a set you own completely.
+    set_sticker_set_thumbnail takes "format" ('webp' by default, or 'tgs' or
+    'webm'), which must match the thumbnail file. reorder_sticker_sets takes
+    "type", since each sticker type has its own order.
+
+   set_emoji_status($custom_emoji_id, %opt, $cb), default_emoji_statuses($cb)
+    Set the account's emoji status, or clear it by passing undef. "expires"
+    is the Unix time it ends; one already past clears the status instead,
+    without an error. Premium accounts only.
+
+  Stars mixin
+    Telegram Stars: gifts, subscriptions, revenue and affiliate programs.
+    The seller-side invoice and checkout flow is in the "Payments mixin"
+    instead.
+
+    Gift ids are int64 and cross as strings; a received gift id is a TL
+    string already and is passed through unchanged.
+
+   available_gifts($cb), can_send_gift($gift_id, $cb), send_gift($gift_id, $owner, %opt, $cb)
+    The gifts on offer, whether one can be sent, and sending it. $owner is a
+    bare user id or a negative chat id, coerced to the right message sender.
+    Options: "text" with "parse_mode", "private" and "pay_for_upgrade".
+
+   received_gifts($owner, %opt, $cb), received_gift($received_gift_id, $cb)
+    Gifts an account has received. $owner is required. Paging is "offset" (a
+    string cursor) and "limit"; "sort_by_price" orders the list and
+    "collection_id" narrows it to one collection. The filters are
+    "exclude_saved", "exclude_unsaved", "exclude_unlimited",
+    "exclude_upgradable", "exclude_non_upgradable", "exclude_upgraded",
+    "exclude_without_colors" and "exclude_hosted".
+
+   toggle_gift_saved($id, $saved, $cb), sell_gift($id, %opt, $cb), upgrade_gift($id, %opt, $cb), transfer_gift($id, $new_owner, %opt, $cb), gift_upgrade_preview($gift_id, $cb)
+    Display a received gift on the profile, convert it to Stars, upgrade it
+    to a unique gift, or hand it to someone else. The preview shows what an
+    upgrade would produce before paying for one. upgrade_gift takes
+    "keep_original_details => 1" to keep the original gift's text, sender
+    and receiver on the upgraded one, and "star_count", the Stars the
+    upgrade costs: pass the gift's own "upgrade_star_count", or 0 when it
+    already carries a "prepaid_upgrade_star_count". It defaults to 0, which
+    is the wrong value for a gift that was not prepaid. transfer_gift takes
+    "star_count" the same way, for a transfer the receiving side charges
+    for, and defaults it to 0 with the same trap.
+
+   set_gift_settings(%opt, $cb)
+    Which gifts this account accepts: "show_button", "unlimited", "limited",
+    "upgraded", "from_channels" and "premium_subscription". Every flag is
+    sent, so one left out is turned off -- pass the whole set, as with
+    set_permissions. An unknown name croaks.
+
+   star_transactions(%opt, $cb), star_subscriptions(%opt, $cb), edit_star_subscription($id, $canceled, $cb), reuse_star_subscription($id, $cb), star_payment_options($cb)
+    The Star ledger and recurring Star subscriptions. star_transactions
+    takes "owner" (this account by default), "direction" ('incoming' or
+    'outgoing'), "subscription_id", "offset" and "limit". star_subscriptions
+    pages with "offset" and takes "only_expiring => 1", which is narrower
+    than it sounds: it returns only subscriptions there are not enough Stars
+    to extend.
+
+   refund_star_payment($user_id, $charge_id, $cb)
+    Refunds a Star payment. The charge id comes from the successful payment
+    message.
+
+   star_revenue_statistics(%opt, $cb), chat_revenue_statistics($chat_id, %opt, $cb), chat_revenue_transactions($chat_id, %opt, $cb)
+    Earnings for an account or a channel. "dark" selects graph colours.
+    star_revenue_statistics takes "owner", a user or chat id to read instead
+    of this account.
+
+   star_withdrawal_url($owner, $star_count, $password, $cb), chat_revenue_withdrawal_url($chat_id, $password, $cb)
+    Begin a withdrawal. Both require the account's two-factor password as a
+    required argument, not an option, because omitting it would otherwise
+    read as a request that merely failed.
+
+   connected_affiliate_programs(%opt, $cb), connect_affiliate_program($bot_user_id, %opt, $cb), disconnect_affiliate_program($url, %opt, $cb)
+    Affiliate programs. "affiliate" selects who is affiliating: this account
+    by default, or "{ bot => $id }" or "{ channel => $chat_id }".
+
+  Business mixin
+    Telegram Business: connections to a business account, quick replies,
+    away and greeting messages, and acting on a connected account as a bot.
+
+    This plane is unverified against a live server and is covered by offline
+    tests only; see "LIMITATIONS" for which methods need a Business
+    subscription and which do not.
+
+    A "business_connection_id" is a string, not a number, and arrives only
+    through on_business_connection(). There is no other source for it, so a
+    bot must keep the handler registered to send anything at all.
+
+   on_business_connection($cb), on_business_message($cb)
+    Connection changes, and messages arriving in a connected business
+    account. on_business_message receives "{ connection_id => ..., message
+    => ... }", where "message" is a businessMessage: the message itself is
+    "$ev->{message}{message}", and "$ev->{message}{reply_to_message}" is the
+    one it answers. Edited and deleted business messages reach
+    "on_update($cb), on_error($cb)" rather than having hooks of their own.
+
+   business_connection($connection_id, $cb), connected_bot($cb), set_connected_bot($bot_user_id, %opt, $cb), confirm_connected_bot($bot_user_id, $cb), delete_connected_bot($bot_user_id, $cb)
+    Inspect a connection, and manage the bot connected to this business
+    account. set_connected_bot takes "rights" and "recipients", each a
+    hashref of flags; an unknown flag name croaks rather than being ignored.
+    Both are sent whole, so leaving "rights" out connects a bot that may do
+    nothing, and leaving "recipients" out selects no chats.
+
+   pause_connected_bot($chat_id, $paused, $cb), remove_connected_bot_from_chat($chat_id, $cb)
+    Suspend the connected bot in one chat, or detach it from that chat.
+
+   send_business_message($connection_id, $chat_id, $text, %opt, $cb), send_business_file($connection_id, $chat_id, $path, %opt, $cb)
+    Send as the connected business account. Options: "parse_mode",
+    "disable_preview", "silent", "protect_content", "effect_id", "reply_to"
+    and "reply_markup", plus "kind" and "caption" for the file form.
+
+    Unlike "send_message($chat_id, $text, %opt, $cb)" these take no
+    "schedule", no "wait" and no "topic": TDLib gives sendBusinessMessage
+    flat notification and protection fields rather than a message-send
+    options object, and does not promise a delivery update.
+
+   edit_business_message_text($connection_id, $chat_id, $message_id, $text, %opt, $cb), read_business_message($connection_id, $chat_id, $message_id, $cb), delete_business_messages($connection_id, \@message_ids, $cb)
+    Edit, mark read, and delete messages in a connected account.
+
+   set_business_account_name($id, $first, $last, $cb), set_business_account_bio($id, $bio, $cb), set_business_account_username($id, $username, $cb), set_business_account_photo($id, $photo, %opt, $cb), business_account_star_amount($id, $cb)
+    Change the connected account's profile, and read its Star balance.
+    set_business_account_photo takes "public => 1" to set the public photo,
+    the fallback for users whom privacy settings deny the main one, rather
+    than the main photo itself.
+
+   set_away_message($shortcut_id, %opt, $cb), set_greeting_message($shortcut_id, %opt, $cb)
+    Automatic replies, each pointing at a quick-reply shortcut.
+    set_away_message takes "schedule": 'always' (the default),
+    'outside_opening_hours', or "{ start => $ts, end => $ts }", plus
+    "offline_only". set_greeting_message takes "inactivity_days", which must
+    be 7, 14, 21 or 28 and croaks otherwise: TDLib turns the greeting off
+    for any other value and reports success. Both take "recipients", and
+    select no chat at all without it, so the replies go to nobody until you
+    say which chats they cover. $shortcut_id must name a shortcut the server
+    already has; one still being created counts as none, which turns the
+    reply off the same silent way.
+
+   set_opening_hours($time_zone_id, \@intervals, $cb), set_business_location($address, %opt, $cb), set_start_page(%opt, $cb), business_features(%opt, $cb)
+    Opening hours are minutes from the start of the week, each interval
+    either "[$start, $end]" or "{ start => .., end => .. }". An interval
+    must start before it ends and end within eight days, so one running past
+    the end of the week continues past 10080 rather than wrapping back to
+    the start. TDLib drops an invalid interval without an error, and removes
+    the opening hours altogether when none is left. set_business_location
+    takes "latitude", "longitude" and "accuracy" in metres, the first two
+    together or not at all; set_start_page takes "title", "message" and
+    "sticker". The sticker must already be on Telegram's servers, as one
+    taken from a message is: a local path is dropped without an error, and
+    with no title or message either the start page is removed.
+    business_features takes "source", the feature whose promotion screen
+    prompted the call, as a BusinessFeature name with or without its prefix
+    ("Location" or "businessFeatureLocation").
+
+   business_chat_links($cb), create_business_chat_link($text, %opt, $cb), edit_business_chat_link($link, $text, %opt, $cb), delete_business_chat_link($link, $cb), business_chat_link_info($link_name, $cb)
+    Links that open a chat with a prefilled message. The text is formatted
+    text, so "parse_mode" applies; "title" names the link.
+
+   load_quick_replies($cb), load_quick_reply_messages($shortcut_id, $cb)
+    Ask TDLib to load quick-reply shortcuts or one shortcut's messages. Both
+    call back with a bare Ok: the data arrives through updates, so watch
+    "on_update($cb), on_error($cb)" for updateQuickReplyShortcut and
+    updateQuickReplyShortcuts, and for a shortcut's own messages
+    updateQuickReplyShortcutMessages.
+
+   add_quick_reply_message($shortcut_name, $text, %opt, $cb), edit_quick_reply_message($shortcut_id, $message_id, $text, %opt, $cb), delete_quick_reply($shortcut_id, $cb), delete_quick_reply_messages($shortcut_id, \@ids, $cb)
+    Build and amend quick replies. Adding takes a shortcut name and creates
+    the shortcut if it does not exist; the rest take its id.
+    add_quick_reply_message takes "reply_to", the id of an earlier message
+    in the same shortcut to reply to.
+
+   set_quick_reply_name($shortcut_id, $name, $cb), reorder_quick_replies(\@ids, $cb), send_quick_reply($chat_id, $shortcut_id, %opt, $cb), check_quick_reply_name($name)
+    Rename, order and send a shortcut. send_quick_reply takes "sending_id",
+    a non-persistent id of your own choosing that comes back in the
+    messages' messageSendingStatePending, which is how you match them to the
+    updateNewMessage updates that follow. It calls back once Telegram
+    accepts the messages, and refuses "wait => 'sent'".
+    check_quick_reply_name is synchronous: it returns the result, and croaks
+    if given a callback.
+
 MINI APPS
     A Mini App (Telegram also calls it a Web App) is a web page a bot
     offers, opened inside a Telegram client. TDLib does not render it. It
@@ -1227,7 +2137,7 @@ MINI APPS
     Data flows back either through "send_web_app_data($bot_user_id,
     $button_text, $data, $cb)", which a client calls on the page's behalf
     and the bot receives through "on_web_app_data($cb)", or through
-    "answer_web_app_query($query_id, \%result, $cb)" for the inline variant.
+    answer_web_app_query() for the inline variant.
 
   The platform identifier
     "application_name" is not a free-form label. It is sent to Telegram as
@@ -1330,9 +2240,19 @@ UPDATES
     that reaches on_update as soon as a loop runs, before any request is
     made. Handlers must tolerate updates they do not recognize.
 
-    The chat cache is maintained against a fixed table of chat-field updates
-    (updateChatTitle, updateChatLastMessage, updateChatPosition and friends)
-    that targets the pinned TDLib 1.8.66, commit
+    The chat cache is maintained against a fixed table of chat-field
+    updates: twenty-one of the forty-one chat-field updates TDLib 1.8.66
+    sends, covering what a client normally reads -- including the chat's
+    "positions" in each list and "chat_lists", the lists it belongs to. The
+    rest -- among them updateChatUnreadReactionCount, updateChatEmojiStatus,
+    updateChatHasProtectedContent, updateChatVideoChat and the accent
+    colours -- reach on_update but are not merged. A field outside the table
+    therefore keeps whatever value it had when the chat entered the cache,
+    for as long as the client runs, and no amount of waiting refreshes it:
+    call fetch_chat() to re-read one from TDLib, or watch the update
+    yourself.
+
+    The table targets the pinned TDLib 1.8.66, commit
     022d60202e446ad1287b9fb68e687c8a0760788b. A newer TDLib that renames
     these updates would leave the cache stale; the unknown updates would
     fall through to on_update only.
@@ -1343,10 +2263,18 @@ UPDATES
     from its JSON entirely, so an absent key means the value was cleared,
     not that it stayed unchanged.
 
+    Neither cache is evicted: they hold every chat and user the client has
+    been told about, for as long as the client lives, and a chat record is
+    whatever TDLib sent. That is what makes "chat($id)" and "user($id)"
+    answer without a round trip, but it means a long-lived client in many
+    chats keeps them all resident. Nothing else accumulates: updates about
+    chats already cached, and file updates for ids nothing is watching, do
+    not grow anything.
+
 ESCAPE HATCH
-    The convenience methods cover a small fraction of the API. send() and
-    execute() take any raw TDLib request hashref, so the roughly one
-    thousand unwrapped TDLib methods remain fully usable:
+    The convenience methods cover under half the API. send() and execute()
+    take any raw TDLib request hashref, so the roughly 600 unwrapped TDLib
+    methods remain fully usable:
 
         $td->send({ '@type' => 'getCountries' }, sub {
             my ($res, $err) = @_;
@@ -1355,7 +2283,7 @@ ESCAPE HATCH
 
     Do not set @extra yourself; see "send(\%request, $cb, %opt)".
 
-    For offline tests, _inject_raw($json) feeds a JSON string through the
+    For offline tests, inject_raw($json) feeds a JSON string through the
     normal dispatch path. It is an internal test hook, not part of the
     supported API.
 
@@ -1397,6 +2325,18 @@ UNICODE
     where text enters your program: decode once at the edge, and pass
     characters from there on.
 
+    File paths are strings too, and are where this bites hardest. "readdir",
+    "glob", @ARGV and %ENV hand you octets, not characters, so a path with a
+    non-ASCII name in it goes out double-encoded and names a file that does
+    not exist -- TDLib then fails with an error about the wrong filename.
+    Decode a path before passing it to upload($path), send_file, or as
+    "database_directory" or "files_directory":
+
+        use Encode ();
+        my $path = Encode::decode('UTF-8', $bytes_from_readdir);
+
+    Paths coming back from TDLib are already characters and need nothing.
+
     Formatting entities are counted differently again: TDLib gives "offset"
     and "length" in UTF-16 code units, not characters. Use
     "entity_text($formatted_text, $entity), entity_texts($formatted_text)"
@@ -1408,6 +2348,17 @@ UNICODE
     inline query results, search queries -- and to the @extra correlation
     ids, which are generated internally and never contain anything but
     digits.
+
+    A few fields are the exception, because TDLib declares them as bytes
+    rather than text: callback button data, the data given to
+    "press($chat_id, $message_id, $data, $cb)", an invoice payload, and the
+    two database encryption keys. The module base64-encodes them for you, so
+    pass the value you mean -- a "database_encryption_key" of "hunter2" is
+    stored as exactly those seven octets. A character above 255 is rejected
+    rather than guessed at, since there is no encoding the module can pick
+    on your behalf:
+
+        data => Encode::encode('UTF-8', $label)
 
     Printing text you received to a filehandle with no encoding layer raises
     "Wide character in print". Set the layer once:
@@ -1454,6 +2405,29 @@ ERROR HANDLING
         after starting; TDLib reports a permanent download failure only
         through updateFile, never as a request reply.
 
+    *   "download of file N already in progress" -- a second download() of a
+        file whose first one has not finished.
+
+    *   "message deleted before it was sent" -- a send waiting for delivery
+        whose message TDLib deleted first. "message send failed" and "story
+        post failed" stand in for the error object on the rare failure
+        update that carries none.
+
+    *   "ask timed out", "ask cancelled" and "ask superseded" -- the
+        module's own reasons an ask() ends without an answer. A prompt that
+        TDLib refuses fails the ask with TDLib's own error, and a close
+        fails it with "client closed".
+
+    *   "@name is not a user" -- user_by_username() resolved the name to a
+        chat that is not a user; "nothing to mark read in chat N" --
+        mark_read() with no message ids and no cached last message.
+
+    *   A failed login. The module's own failures -- "client is already
+        closed", a credential callback that was not given, a state no option
+        can satisfy -- use code -1. A step TDLib refused keeps TDLib's code
+        behind a message that names the step, so retry_after() reads a login
+        flood wait.
+
   Rate limiting: error code 429
     Telegram answers too-frequent requests with error code 429 and a message
     of the form "Too Many Requests: retry after N", where N is the number of
@@ -1466,17 +2440,29 @@ ERROR HANDLING
     -- it queues and paces requests on its own -- so a 429 that reaches you
     is a hard signal, not routine operation.
 
-    The module deliberately implements no automatic retry: a wrong retry
-    policy inside a binding hides the signal and can make limiting worse.
-    The back-off policy belongs to the caller; see "Handling rate limits" in
-    EV::Telegram::TDLib::Cookbook.
+    The module never retries unless you ask it to: a retry policy imposed by
+    a binding hides the signal and can make limiting worse. Without the
+    "retry" option nothing has changed, and the back-off policy is yours to
+    write; see "Handling rate limits" in EV::Telegram::TDLib::Cookbook.
 
-    One structured exception: a failed message send surfaces through
-    updateMessageSendFailed, whose message carries a
+    Passing "retry" to "send(\%request, $cb, %opt)" or "call($function,
+    \%args, $cb, %opt)", or to the constructor as a default, opts in to a
+    capped back-off. It waits at least the delay the server stated,
+    lengthens on repeated 429s, gives up rather than retrying a delay longer
+    than "max_wait", and stops after "attempts". It fires only for a 429
+    that states a delay.
+
+    It does not cover message sends. A flood wait on a send is not a 429
+    reply at all, as the next paragraph explains, so no reply-level retry
+    can see it.
+
+    A failed message send surfaces through updateMessageSendFailed. The
+    "send_message($chat_id, $text, %opt, $cb)" callback receives that
+    update's error, a 429 whose message states the delay, so
+    "retry_after($err)" reads it there. The update's message also carries a
     messageSendingStateFailed with a numeric "retry_after" field in seconds,
-    next to "can_retry". The "send_message($chat_id, $text, %opt, $cb)"
-    callback receives only the error object; watch updateMessageSendFailed
-    via "on_update($cb), on_error($cb)" when you need the structured field.
+    next to "can_retry"; watch updateMessageSendFailed via "on_update($cb),
+    on_error($cb)" when you need the structured field.
 
   Internal failures
     Internal failures that own no request -- a TDLib frame that fails JSON
@@ -1488,10 +2474,42 @@ ERROR HANDLING
     cannot skip the remaining pending failures, the close() callbacks or
     on_close.
 
-    The containment covers dispatch context. An exception in a send()
-    timeout callback runs in an EV timer, not in the dispatch: it is not
-    contained and propagates out of EV::run like any other EV watcher
-    callback.
+    One update can reach more than one of your callbacks: a new message goes
+    to a command handler, then on_message, then on_web_app_data if it
+    carries Mini App data. How far a die travels depends on which callback
+    it is. The module guards each one it dispatches itself -- command
+    handlers, ask answers, callback data routes, on_callback_query,
+    on_inline_query and the file watchers -- so a die there is reported and
+    the rest of the update still runs; you cannot use it to stop on_message
+    from seeing the message too. A die in one of the plain handlers
+    (on_message, on_user, on_chat and the rest) skips what is left of that
+    update, on_update included. Either way the next update is unaffected.
+    The two read differently in the report: "a callback died" for a guarded
+    one, "dispatch died" for the rest.
+
+    The practical consequence is that die is not how a callback ends the
+    program. It is reported and the loop keeps running, so a script whose
+    only exit path was the die simply hangs. Leave the loop instead, and let
+    the exit status carry the failure:
+
+        $td->login(sub {
+            my (undef, $err) = @_;
+            if ($err) {
+                warn "login failed: $err->{message}\n";
+                $status = 1;
+                return EV::break;
+            }
+            ...
+        });
+
+        EV::run;
+        exit $status;
+
+    The containment covers every asynchronous delivery, not only the ones
+    that arrive through the dispatch. A callback answered from a timer -- a
+    send() timeout, an ask timing out, a deferred failure on a closed client
+    -- is guarded the same way, so a die there reaches "on_error" rather
+    than only EV's own stderr.
 
     Some errors are delivered synchronously, before the method returns: a
     parse_mode failure in "send_message($chat_id, $text, %opt, $cb)" or
@@ -1521,8 +2539,11 @@ ENVIRONMENT
         credentials only as constructor options; see "new(%opt)".
 
 EXAMPLES
-    Runnable scripts live in eg/ (from the distribution root: "perl -Mblib
-    eg/NAME.pl"; credentials come from the environment, see "ENVIRONMENT"):
+    Runnable scripts live in eg/. Once the module is installed, run one from
+    anywhere with "perl eg/NAME.pl"; from an unpacked distribution "perl
+    -Mblib eg/NAME.pl" works after "make", and not before it, since there is
+    no blib until then. Credentials come from the environment, see
+    "ENVIRONMENT":
 
     eg/01-login.pl
         user login with phone, SMS code and 2FA; creates the session
@@ -1555,13 +2576,22 @@ EXAMPLES
     eg/10-webapp-bot.pl
         offers a Mini App button and prints the data the page sends back
 
+    eg/11-command-bot.pl
+        command routing, inline button routing and ask()
+
     EV::Telegram::TDLib::Cookbook has task-oriented recipes.
 
 CAVEATS
-    *   Not fork-safe. TDLib itself is not fork-safe, so every method croaks
-        after fork. Do not fork with an open client. Forking before this
-        process has ever made one is allowed, and is how a preforking worker
-        pool should be built: the child inherits a pump that was never used.
+    *   Not fork-safe. TDLib itself is not fork-safe, so every method that
+        reaches it croaks after fork: new, send, call, close, execute and
+        every convenience method built on them. What does not croak is
+        everything answered from this process's own memory -- "chat($id)",
+        "user($id)", option() and the "on_*" accessors -- so a forked child
+        can read a plausible-looking cache and only fails when it tries to
+        do something with it. Do not fork with an open client. Forking
+        before this process has ever made one is allowed, and is how a
+        preforking worker pool should be built: the child inherits a pump
+        that was never used.
 
     *   One reader thread per process, shared by all clients. It starts with
         the first client and runs until the process ends: closing every
@@ -1574,11 +2604,25 @@ CAVEATS
         the reader thread would keep signalling the freed loop through
         ev_async_send. Close every client first.
 
+    *   Re-entering the loop from inside a callback reorders deliveries.
+        TDLib orders its updates, and this module preserves that order only
+        as long as the loop is not re-entered: the drain takes a whole batch
+        from the reader, then calls your callbacks one by one, so a nested
+        "EV::run" inside one of them -- the "wait for just this reply"
+        helper a GUI or an embedded host tends to write -- drains and
+        delivers whatever has arrived since, ahead of the rest of the batch
+        it interrupted. Nothing is lost or delivered twice, and internal
+        state stays consistent; only the order you observe changes. If order
+        matters, return from the callback and let the loop come back to you.
+
     *   Not safe with Perl ithreads. The pump initialises once per process,
-        so on a threaded perl any "threads->create" after this module is
-        loaded dies with "the pump cannot serve a second interpreter" --
-        even for a thread that never touches Telegram. Fork instead, subject
-        to the fork rules above.
+        and nothing stops a thread created after this module is loaded: perl
+        clones the interpreter without re-running XS bootstrap, so both
+        interpreters silently share one pump and the dispatch callback the
+        parent owns. The "cannot serve a second interpreter" guard only
+        fires when a second interpreter loads the module itself, which is
+        the rarer case. Do not create threads in a process that has loaded
+        this module; fork instead, subject to the fork rules above.
 
         Pinned assumption: TDLib's receive/execute buffer is thread-local.
         The no-lock design -- the reader thread copies every td_receive
@@ -1591,6 +2635,13 @@ CAVEATS
         whenever the pin moves, because a process-global buffer would make
         concurrent execute() a use-after-free race.
 
+    *   Not designed for subclassing. Hold a client in your own object
+        instead: the class is assembled from mixins, keeps its state in the
+        object hash, and calls many of its own methods internally, so a
+        subclass method of the same name replaces part of the machinery. The
+        methods documented here are the interface; anything else is internal
+        and may change.
+
     *   Clients stay registered until closed. The registry holds a strong
         reference on purpose: TDLib requires every client to be closed
         before process exit, so an object must not vanish when the caller
@@ -1599,9 +2650,18 @@ CAVEATS
         "AUTHORIZATION" for the Closed state that ends the lifecycle.
 
     *   An END block closes leftover clients and pumps the loop for a
-        bounded interval (three seconds) so TDLib flushes its database, then
-        joins the reader thread. It is a safety net, not a substitute for
-        close().
+        bounded interval (three seconds, or "EV_TDLIB_SHUTDOWN_TIMEOUT") so
+        TDLib flushes its database, then joins the reader thread. Pumping
+        the loop runs your callbacks, so a program that exits early -- from
+        a login-failure path, say, or one that never ran the loop at all --
+        still sees on_update and reply callbacks fire during global
+        destruction, after its own END blocks have run. Write them so they
+        are safe to run then, or close() before you leave. The three seconds
+        bound the pump only: the join has its own two-second wait, after
+        which it prods TDLib to wake the reader and then waits without a
+        deadline, and a reader sitting in td_receive can take up to ten
+        seconds more to notice. Shutdown is bounded, but by the sum rather
+        than by the three. It is a safety net, not a substitute for close().
 
     *   A callback that dies is contained and reported through on_error; the
         drain continues. See "ERROR HANDLING".
@@ -1611,15 +2671,47 @@ SECURITY
     account. Treat it as exactly as sensitive as a password: restrictive
     permissions, no commits, no backups to third-party storage.
 
+    TDLib creates that directory 0750 and its binlog 0600, but the sqlite
+    files are created 0644 masked by your umask, so 022 and 002 both leave
+    them world-readable and only a narrower umask changes that: 027 gives
+    0640, 077 gives 0600. The 0750 directory is what keeps other users out.
+    This module does not set a umask, which is the caller's to choose; set
+    one before creating a client if the default is not what you want. Note
+    also that the examples default to a "tdlib-db" in the working directory,
+    so running one from a checkout leaves a live session there.
+
+    Credentials stay in the object. api_id, api_hash, bot_token, the phone
+    number and the encryption key are held for the life of the client, so a
+    core dump or a process-memory read exposes them. Perl cannot reliably
+    erase a string, so this is a property to design around rather than
+    something the module can fix: disable cores where it matters.
+
     Set database_encryption_key so the local database is encrypted at rest,
     and keep the key out of source control.
 
-    api_id and api_hash identify your application to Telegram. Read them
-    from the environment (TD_API_ID, TD_API_HASH), never hardcode them.
+    api_id and api_hash identify your application to Telegram. Pass them
+    from your environment rather than hardcoding them; new() does not read
+    any environment variable itself, but the examples in eg/ take them from
+    TD_API_ID and TD_API_HASH.
+
+    The login callbacks receive credentials from wherever you choose to read
+    them. If that is a terminal, do not echo the 2FA password: it lands in
+    the scrollback, in a screen recording and in whatever the session is
+    logged to. eg/01-login.pl shows the shape -- turn echo off through a
+    guard object, so an interrupt cannot leave the terminal silent for
+    whatever runs next.
+
+    TDLib's log can carry credentials. Above the lowest levels it writes the
+    requests it makes, and those include the ones carrying your api_hash and
+    bot token; logging in with verbosity raised has been observed to put
+    both on stderr in clear. TDLib's own default is 5, so this module sets 1
+    at load, and a "TDLIB_LOG_VERBOSITY" it cannot read as a level falls
+    back to 1 rather than leaving TDLib at 5. Raise it to debug something
+    and whatever collects your stderr collects that too.
 
 REQUIREMENTS
-    *   perl 5.12 or later, built with 64-bit integers. The Makefile refuses
-        to build when ivsize is below 8: Telegram chat and user ids are
+    *   perl 5.12 or later, built with 64-bit integers. Makefile.PL refuses
+        to configure when ivsize is below 8: Telegram chat and user ids are
         int64, and message ids are shifted left by 20 bits, so they must
         never round-trip through an NV.
 
@@ -1638,18 +2730,40 @@ LIMITATIONS
 
     *   No voice or video calls.
 
-    *   No secret-chat sugar beyond the use_secret_chats switch.
+    *   No group calls or video chats.
 
-    *   Around 160 of TDLib's roughly one thousand methods have a
+    *   Around 418 of TDLib's roughly one thousand methods have a
         hand-written wrapper. For the rest, call() validates argument names
         against a shipped schema catalogue, and send() and
         "execute(\%request)" are the escape hatch (see "ESCAPE HATCH").
+
+    *   The Business plane is unverified against a live server: exercising
+        it needs a Telegram Business subscription, which the author does not
+        have. Its methods are covered by offline tests only. Note that the
+        requirement differs across the plane. The bot-side calls
+        (business_connection, send_business_message, read_business_message,
+        delete_business_messages, business_account_star_amount and the
+        set_business_account_* setters) are documented "for bots only" and
+        need no subscription on the bot itself, since the bot acts on a
+        connected business account. The TL marks eight as needing the
+        current account to hold a Business subscription: set_away_message,
+        set_greeting_message, send_quick_reply, set_business_location,
+        set_opening_hours, set_start_page, create_business_chat_link and
+        edit_business_chat_link. business_features, business_chat_link_info,
+        check_quick_reply_name, connected_bot and load_quick_replies are
+        callable by anyone.
+
+    *   Gift auctions, gift crafting and live-story streaming are not
+        wrapped.
 
     *   No log message callback (TDLib's setLogMessageCallback is not
         bound); TDLIB_LOG_VERBOSITY (see "ENVIRONMENT") is the only log
         control.
 
-    *   Linux-focused: developed and CI-tested on Linux, untested elsewhere.
+    *   Linux and macOS are CI-tested. The BSDs are unsupported:
+        Alien::TDLib ships no prebuilt TDLib for them, so a build there
+        means compiling TDLib from source, which is impractical inside a CI
+        runner.
 
     *   The default EV loop only; see "CAVEATS".
 

@@ -18,7 +18,7 @@
 use v5.36;
 
 package App::FuguVM::State;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use Fugu::File;
 use Fugu::Log;

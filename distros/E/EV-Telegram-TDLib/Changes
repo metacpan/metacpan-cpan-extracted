@@ -1,5 +1,11 @@
 Revision history for EV-Telegram-TDLib
 
+0.04    2026-09-22
+        Stories, stickers, Stars, gifts, Business, routers, ask(), 429 retry
+        SECURITY: an unusable TDLIB_LOG_VERBOSITY no longer logs credentials
+        INCOMPATIBLE: database_encryption_key is encoded; a 0.03 key needs
+        decode_base64. Invalid arguments croak, and some defaults changed
+
 0.03    2026-08-27
         Mini Apps, forum topics, chat and group management, folders,
         contacts, payments, secret chats, bot provisioning, and

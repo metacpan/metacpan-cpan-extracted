@@ -30,6 +30,14 @@ these recipes and F<eg/>, not the module's API.
 Every snippet ends up inside a running EV loop; stand-alone recipes
 finish with C<EV::run>.
 
+=item *
+
+Where a recipe writes C<die> in a callback it is shorthand for "stop
+here", not a way to end the program. A callback that dies is caught and
+reported, and the loop keeps running, so a real script warns and calls
+C<EV::break> instead. See
+L<EV::Telegram::TDLib/"ERROR HANDLING">.
+
 =back
 
 The recipes that need no credentials (formatted text, raw methods,
@@ -68,6 +76,10 @@ refuses.
         },
         on_password => sub {   # only fires when 2FA is enabled
             my ($info, $submit) = @_;
+            # a password typed here reaches the scrollback and whatever is
+            # recording the session: eg/01-login.pl reads it with terminal
+            # echo off, which is what you want anywhere it is typed rather
+            # than piped in
             print "2FA password: ";
             chomp(my $password = <STDIN>);
             $submit->($password);
@@ -138,6 +150,14 @@ new one.
             my ($link) = @_;
             print "scan as a QR code with your phone:\n$link\n";
         },
+        # an account with two-step verification still asks for the password
+        # once the scan is confirmed
+        on_password => sub {
+            my ($info, $submit) = @_;
+            print "password: ";
+            chomp(my $pw = <STDIN>);
+            $submit->($pw);
+        },
         on_error => sub { warn "tdlib: $_[0]\n" },
     );
 
@@ -181,8 +201,7 @@ and without blowing up when the markup is bad.
 C<send_message> with C<parse_mode> runs the text through the
 synchronous parseTextEntities call first. A parse error is delivered
 to your callback before C<send_message> even returns, and nothing is
-sent. A parse failure is reported synchronously, before the method
-returns, unlike every other error in the module.
+sent -- one of the few errors that do not wait for TDLib.
 
     $td->send_message($chat_id, 'bold *here*, _italic_ too',
         parse_mode => 'markdown',
@@ -250,8 +269,13 @@ chat's members.
 
     $td->send_message($chat_id, 'ack', reply_to => $msg->{id}, sub {
         my ($reply, $err) = @_;
-        warn "reply failed: $err->{message}\n" if $err;
+        warn "send failed: $err->{message}\n" if $err;
     });
+
+A reply that cannot be made -- to a message from another chat, one
+since deleted, or one of yours still being sent -- is not an error:
+TDLib sends a plain message instead. Pass the id, not the message
+itself.
 
     $td->send_message($chat_id, 'background sync done', silent => 1, sub {
         my ($sent, $err) = @_;
@@ -464,8 +488,9 @@ automatically once the completing update has been delivered;
 C<< $td->on_upload($file_id, undef) >> removes it earlier. Early
 progress updates can precede the registration -- the file id does
 not exist before the send is accepted -- so the first events may be
-missed; correctness is not affected, only the first percentage
-printed.
+missed. For a completed upload that costs only the first percentage
+printed; for one you cancel before its first progress update it
+leaves the watcher behind, so remove it when you cancel.
 
 =head2 Sending photos, animations and other media
 
@@ -553,9 +578,14 @@ encoded yourself:
             ]), sub { });
     });
 
+    use Cpanel::JSON::XS ();
+    # $data is a character string, so decode it as characters: decode_json
+    # wants UTF-8 octets and dies on the first accented letter, which the
+    # eval below would swallow
+    my $json = Cpanel::JSON::XS->new;
     $td->on_web_app_data(sub {
         my ($msg, $data, $button_text) = @_;
-        my $order = eval { decode_json($data) } or return;
+        my $order = eval { $json->decode($data) } or return;
         $td->send_message($msg->{chat_id}, "Got your order", sub { });
     });
 
@@ -566,10 +596,13 @@ Treat C<$data> as untrusted. It is whatever the page put in it, and a
 page can be opened by anyone who can reach the bot, so validate it
 before acting rather than trusting its shape.
 
-Two related methods sit on the bot side. C<answer_web_app_query>
-answers a page that called C<Telegram.WebApp.switchInlineQuery()> with
-a single inline result, and C<web_app_request> makes a custom method
-call on the app's behalf, taking its parameters as a JSON string.
+Two related methods. C<answer_web_app_query> is the bot's: an app
+opened from an inline button, the menu button or the attachment menu
+gets a C<query_id> in its init data, and the bot answers it with one
+inline result, which Telegram posts on the user's behalf. An app opened
+from a keyboard button, as here, gets no such id. C<web_app_request>
+belongs to the user side: it makes a custom method call on the app's
+behalf, taking its parameters as a JSON string.
 
 To drive the same flow from a user client, for a test or an
 automation, call
@@ -595,9 +628,14 @@ from a Web App button, a direct link short name, or the bot's main app:
     $td->open_web_app($chat_id, $bot_id, $button_url, sub {
         my ($info, $err) = @_;
         die "open: $err->{message}\n" if $err;
-        show_webview($info->{url});
-        $td->close_web_app($info->{launch_id}, sub { }) if user_closed_it();
+        show_webview($info->{url}, on_close => sub {
+            $td->close_web_app($info->{launch_id}, sub { });
+        });
     });
+
+Closing is not optional: TDLib keeps the launch alive by pinging
+Telegram every minute until close_web_app, so a launch you forget goes
+on costing a request a minute for the life of the client.
 
 There is a third route: C<main_web_app> opens the app a bot nominates
 as its main one, which is what tapping the bot's own button does. A bot
@@ -631,8 +669,12 @@ results as if you had typed its username:
     use MIME::Base64 qw(decode_base64);
     $td->on_message(sub {
         my ($msg) = @_;
-        my $rows = $msg->{reply_markup}{rows} or return;
-        my $button = $rows->[0][0];
+        my $markup = $msg->{reply_markup} or return;
+        # only an inline keyboard has buttons to press; a reply keyboard
+        # just offers text to type
+        return unless $markup->{'@type'} eq 'replyMarkupInlineKeyboard';
+        my $button = $markup->{rows}[0][0] or return;
+        return unless $button->{type}{'@type'} eq 'inlineKeyboardButtonTypeCallback';
         $td->press($msg->{chat_id}, $msg->{id},
             decode_base64($button->{type}{data}), sub {
             my ($answer, $err) = @_;
@@ -658,7 +700,8 @@ error-prone.
 
 Two reply keyboard buttons ask Telegram's own picker instead. A
 constraint applies only for a key you actually mention, so leaving one
-out means "either":
+out means "either" -- except C<channel>, which TDLib always applies, so
+omitting it asks for a group:
 
     $td->send_message($chat_id, 'Where should I post?',
         reply_markup => $td->reply_keyboard([
@@ -670,8 +713,9 @@ out means "either":
 
 C<< { bot => 0 } >> means "not a bot"; omitting C<bot> accepts either.
 The C<id> is yours to choose and comes back in the update so you can
-tell two pickers apart. Ask for extra detail with C<want_title>,
-C<want_username> and C<want_photo>.
+tell two pickers apart. Ask for extra detail with C<want_title> for a
+chat or C<want_name> for users, and C<want_username> and C<want_photo>
+for either.
 
 The other half is the answer. A user's client responds with
 C<share_chat_with_bot> or C<share_users_with_bot>, naming the message
@@ -690,16 +734,26 @@ without actually making it.
 Problem: update a message that came from an inline query result.
 
 An inline-mode message has no chat: it lives wherever the user inserted
-it, and is addressed by the C<inline_message_id> string that came with
-the result. That is a different address from the
-C<(chat_id, message_id)> pair C<edit_message_text> takes, and the two
-are not interchangeable:
+it, and is addressed by an C<inline_message_id> string. That is a
+different address from the C<(chat_id, message_id)> pair C<edit_message>
+takes, and the two are not interchangeable. The id is not the result
+id your answer gave: it comes with a press on the message's buttons,
+where the callback query carries it:
 
-    $td->edit_inline_text($inline_message_id, '*Updated*',
-        parse_mode => 'markdown',
-        reply_markup => $td->inline_keyboard([
-            [ { text => 'Again', data => 'again' } ] ]),
-        sub { my (undef, $err) = @_; warn $err->{message} if $err });
+    $td->on_callback_data(again => sub {
+        my ($q) = @_;
+        return unless defined $q->{inline_message_id};
+        $td->answer_callback_query($q->{id});
+        $td->edit_inline_text($q->{inline_message_id}, '*Updated*',
+            parse_mode => 'markdown',
+            reply_markup => $td->inline_keyboard([
+                [ { text => 'Again', data => 'again' } ] ]),
+            sub { my (undef, $err) = @_; warn $err->{message} if $err });
+    });
+
+To edit one the moment it is sent, before anyone presses anything,
+enable inline feedback for the bot in BotFather and read the id from
+updateNewChosenInlineResult through C<on_update>.
 
 C<edit_inline_caption> and C<edit_inline_media> change a media result,
 C<edit_inline_markup> only the buttons, and C<edit_inline_location> a
@@ -713,9 +767,8 @@ Problem: clear a chat's unread count, and look like a real client.
     $td->mark_read($chat_id, sub { });          # last message
     $td->mark_read($chat_id, message_ids => \@ids, sub { });
 
-TDLib only honours a read while the chat is open, so mark_read sends
-openChat and viewMessages as a pair. Without it an automated account
-accumulates unread counts forever.
+mark_read is one viewMessages, so a sweep over many chats costs one
+request each and leaves the account's recently opened list alone.
 
     $td->chat_action($chat_id, 'typing', sub { });
 
@@ -758,16 +811,18 @@ these need no argument for it:
 
 The short description is the one-liner in the profile and in search
 results; the long description is what fills an empty chat with the
-bot. Pass C<language_code> to any of them to set a localised value,
-and C<bot_user_id> to dress a bot from an account that owns it rather
-than from the bot's own session.
+bot. The three text setters and set_commands take C<language_code> for
+a localised value; the photo is one for all languages. The name,
+description and photo setters take C<bot_user_id> to dress a bot from
+an account that owns it, but set_commands works only from the bot's own
+session.
 
 The signed-in account has its own set -- C<set_name>, C<set_bio>,
 C<set_username>, C<set_profile_photo> -- which take no user id
-because they always act on the account you are logged in as. Those
-four are for user accounts only: a bot session is refused them ("The
-method is not available to bots", and BOT_FALLBACK_UNSUPPORTED for
-the photo), which is why the set_bot_* family exists at all.
+because they always act on the account you are logged in as. The
+first three are for user accounts only -- a bot session is refused
+them with "The method is not available to bots" -- which is why the
+set_bot_* family exists at all; C<set_profile_photo> works for both.
 
 =head2 Running a group
 
@@ -828,7 +883,7 @@ Problem: hand out a joinable link, with limits, and see who used it.
         print "share this: $link->{invite_link}\n" unless $err;
     });
 
-C<join_request => 1> makes the link produce requests to approve rather
+C<< join_request => 1 >> makes the link produce requests to approve rather
 than admitting people straight away. C<invite_links> lists what exists,
 C<invite_link_members> shows who came in through one, and
 C<revoke_invite_link> kills it. C<replace_primary_invite_link> rotates
@@ -869,17 +924,30 @@ handler rather than after any slow work:
         }
     });
 
-Approving is not delivery. The payment completes afterwards and arrives
-as an ordinary message whose content is a messagePaymentSuccessful, so
-watch L<EV::Telegram::TDLib/on_message($cb)> for it and hand over the
-goods there. C<refund_star_payment> undoes a charge, and
-C<star_transactions> reads the ledger.
+Approving is not delivery. The payment completes afterwards and reaches
+the bot as an ordinary message whose content is a
+B<messagePaymentSuccessfulBot> -- not messagePaymentSuccessful, which is
+the buyer's side of the same payment and carries no payload. Unlike the
+pre-checkout query, this arrives undecoded, so the payload is base64:
+
+    $td->on_message(sub {
+        my ($msg) = @_;
+        my $c = $msg->{content};
+        return unless $c->{'@type'} eq 'messagePaymentSuccessfulBot';
+        my $payload = MIME::Base64::decode_base64($c->{invoice_payload});
+        my ($order) = $payload =~ /^order-(\d+)$/ or return;
+        deliver($order, $c->{telegram_payment_charge_id});
+    });
+
+Keep C<telegram_payment_charge_id>: C<refund_star_payment> needs it to
+undo the charge. C<star_transactions> reads the ledger.
 
 For real currencies the shape is the same, plus a C<provider_token> from
-BotFather and amounts in the smallest unit -- 500 is five euros. If you
-set C<< need_shipping => 1 >> you must also answer
-C<on_shipping_query> with the options you offer, under the same
-few-second deadline.
+BotFather and amounts in the smallest unit -- 500 is five euros. To
+offer shipping options priced by address, set C<< flexible => 1 >> as
+well as C<< need_shipping => 1 >>, and answer C<on_shipping_query>
+under the same few-second deadline; without C<flexible> the address is
+collected and no query is sent.
 
 =head2 Approving join requests
 
@@ -888,28 +956,31 @@ behind it.
 
 A link created with C<< join_request => 1 >> does not admit anyone; it
 files a request you have to answer, and until you do, nothing happens.
-Watch for them and decide:
+How you hear about one depends on the account. A bot admin is told as
+each request is filed:
 
     $td->on_join_request(sub {
         my ($req) = @_;
         # bio is whatever the applicant typed; treat it as untrusted
-        my $ok = $req->{bio} =~ /invited by dave/i;
+        my $ok = ($req->{bio} // '') =~ /invited by dave/i;
         $td->process_join_request($req->{chat_id}, $req->{user_id}, $ok, sub { });
     });
 
-C<join_requests> lists whoever is already waiting, which is what you
-need on startup since requests filed while you were offline do not
-replay as updates:
+A user admin gets no such update, but can list who is waiting -- which
+a bot cannot:
 
     $td->join_requests($chat, sub {
         my ($res, $err) = @_;
+        return warn "join_requests: $err->{message}\n" if $err;
         $td->process_join_request($chat, $_->{user_id}, 1, sub { })
-            for @{ $res->{requests} || [] };
+            for @{ $res->{requests} };
     });
 
-C<process_join_requests> answers everyone at once, optionally only those
-who came through one C<link>. The approve flag defaults to true in both,
-so declining is always explicit.
+A page holds C<limit> requests (100 by default); pass the last one as
+C<offset_request> for the next. C<process_join_requests>, also for a
+user only, answers everyone at once, optionally only those who came
+through one C<link>. The approve flag defaults to true in both, so
+declining is always explicit.
 
 
 =head2 Answering in the right forum topic
@@ -932,16 +1003,18 @@ and take it from the message you are answering:
 
 C<topic> works on every sending method, not just send_message. Manage
 the topics themselves with C<create_topic>, C<edit_topic>,
-C<close_topic>, C<pin_topic> and C<delete_topic>, and list them with
-C<topics>. A topic id is the id of the message that opened it, so it is
-an ordinary message id.
+C<close_topic> and C<delete_topic>; listing them with C<topics> and
+pinning with C<pin_topic> are for a user account, not a bot. A topic id
+is the topic's own C<forum_topic_id>, as read above, not a message id.
 
 =head2 Sending a message later
 
 Problem: post at a chosen time without keeping a process alive until
 then.
 
-Hand the send a Unix time and the server holds it:
+Hand the send a Unix time and the server holds it. It must be a time,
+not a delay -- add C<time()> to a number of seconds -- and at least ten
+seconds away, or the message goes out at once:
 
     $td->send_message($chat, 'good morning', schedule => $epoch, sub {
         my ($msg, $err) = @_;
@@ -966,11 +1039,12 @@ Problem: collect answers without parsing replies.
 Polls here are anonymous unless you say otherwise -- the opposite of
 TDLib's own default, and what Telegram's clients actually create. Add
 C<multiple> for several answers, C<open_period> to close it after so
-many seconds, or C<quiz> with C<correct> for a quiz. Answers arrive as
-updateMessageContent for the poll message, carrying the new
-messagePoll content -- both updatePoll and updatePollAnswer are
-bots-only, so a user session never sees them. Watch for it with
-L<EV::Telegram::TDLib/"on_update($cb), on_error($cb)">.
+many seconds, or C<quiz> with C<correct> for a quiz. A vote can be
+changed unless C<< revoting => 0 >>; in a quiz it is final. Answers
+reach a user session as updateMessageContent for the poll message,
+carrying the new messagePoll content, and a bot as updatePoll instead,
+which is bots-only and is the only form a bot gets. Watch for either
+with L<EV::Telegram::TDLib/"on_update($cb), on_error($cb)">.
 
 =head2 Taming a noisy chat list
 
@@ -986,9 +1060,9 @@ Problem: a group will not stop talking, and your chat list is a mess.
 
 Muting deserves one note. TDLib keeps all of a chat's notification
 choices in a single object, so a naive write replaces the lot. These
-methods send every other field as "use the default", which means muting
-a chat cannot silently reset its sound or preview settings as a
-side effect.
+methods send the chat's cached settings back with only the mute
+changed, so muting keeps the chat's own sound and preview choices --
+provided the chat is in the cache, which a loaded chat list ensures.
 
 C<chats> lists a chat list, and every method taking a C<list> option
 accepts C<main> (the default), C<archive>, or a folder id as a number:
@@ -1002,16 +1076,18 @@ accepts C<main> (the default), C<archive>, or a folder id as a number:
 
 Problem: find a message when you do not know where it was.
 
-C<search_messages> looks inside one chat; C<search_all> looks across a
-whole chat list:
+C<search_messages> looks inside one chat; C<search_all> looks across
+every chat, archived ones included, unless C<list> narrows it to
+C<main> or C<archive>:
 
     $td->search_all('invoice', limit => 20, sub {
         my ($res, $err) = @_;
         printf "%d matches\n", $res->{total_count} unless $err;
     });
 
-Both page with C<offset>, and search_all also takes C<min_date> and
-C<max_date> to bound the range.
+search_all pages with C<offset>, which is an opaque cursor from the
+previous answer, and search_messages with C<from_message_id>, as above;
+search_all also takes C<min_date> and C<max_date> to bound the range.
 
 =head2 Voting in a poll, and closing it
 
@@ -1024,8 +1100,10 @@ with, and the arrayref is what makes multiple-answer polls work:
     $td->answer_poll($chat, $message_id, [0], sub { });
     $td->stop_poll($chat, $message_id, sub { });
 
-Results arrive as an C<updateMessageContent> carrying the updated poll,
-not as a poll-specific update.
+Results reach a user as an C<updateMessageContent> carrying the updated
+poll. A bot gets C<updatePoll> instead, and C<updatePollAnswer> for a
+vote it may see; both are bots-only, and no updateMessageContent
+follows. Read them with C<on_update>.
 
 =head2 Finding out which of your contacts use Telegram
 
@@ -1126,8 +1204,8 @@ L<EV::Telegram::TDLib/UNICODE> for the details.
 
 =head2 Calling a TDLib method with no wrapper
 
-Problem: use one of the roughly one thousand TDLib methods the mixins
-do not cover.
+Problem: use one of the roughly 600 TDLib methods the mixins do not
+cover.
 
 C<call> is the usual way in. It fills in the C<@type> from the method
 name and checks the argument names against a catalogue of every TDLib
@@ -1215,6 +1293,11 @@ immediate retry:
             if (defined(my $wait = $td->retry_after($err))) {
                 $wait += 1;                               # a little margin
                 warn "rate limited, retrying in ${wait}s\n";
+                # the loop's clock is only refreshed while it runs; if an
+                # earlier callback in this batch took a while, a timer armed
+                # from the stale value fires early -- the early retry this
+                # recipe exists to avoid
+                EV::now_update();
                 my $t; $t = EV::timer $wait, 0, sub {
                     undef $t;
                     send_with_backoff($req, $cb);
@@ -1230,22 +1313,24 @@ immediate retry:
         warn "getMe failed: $err->{message}\n" if $err;
     });
 
-This is a pattern for the CALLER, not module policy: the module
-retries nothing on its own, by design -- a wrong retry policy inside
-a binding hides the 429 signal and can make limiting worse. A real
-implementation should also cap the attempts and lengthen the wait on
-repeated 429s. And remember that TDLib already paces many
+You rarely need to write this yourself: send and call take a C<retry>
+option (and new() takes a default for it) that does exactly this, with
+a cap on the attempts and a growing wait. It is off unless you ask for
+it, because a retry policy you did not choose hides the 429 signal and
+can make limiting worse. The recipe is for when you want the policy in
+your own hands -- and then it should also cap the attempts and lengthen
+the wait on repeated 429s. And remember that TDLib already paces many
 operations internally, so a 429 you never see is normal operation,
 not a failure.
 
-A flood wait on a message send does not arrive as a 429 reply. With
-C<send_message> in the default C<sent> wait mode it surfaces as
-updateMessageSendFailed, whose message carries a C<sending_state>
-of type messageSendingStateFailed with a numeric C<retry_after>
-field in seconds (and C<can_retry>) -- the one place this TDLib
-offers the delay as a structured field. The send callback receives
-only the error object, so watch updateMessageSendFailed through
-C<on_update> when you want that value:
+A flood wait on a message send arrives through updateMessageSendFailed
+rather than as a reply. With C<send_message> in the default C<sent>
+wait mode the send callback receives that update's error, a 429 whose
+message carries the delay, so C<retry_after($err)> works there too. The
+update also carries the delay as a structured field -- its message's
+C<sending_state> is a messageSendingStateFailed with a numeric
+C<retry_after> in seconds, and C<can_retry> -- the only place on the
+send path that offers it that way; read it through C<on_update>:
 
     $td->on_update(sub {
         my ($obj) = @_;
@@ -1326,10 +1411,12 @@ substitute.
 
 Problem: you want a worker process doing Telegram work.
 
-Never fork with an open client. TDLib itself is not fork-safe, and
-every method of this module croaks after fork
-(C<cannot be used after fork>). Fork first, create the client in the
-child:
+Never fork once a client has existed, open or closed. TDLib itself is
+not fork-safe, and in the child every method that would reach TDLib
+croaks
+(C<cannot be used after fork>) -- though the cache readers still answer,
+from a copy that no longer changes. Fork first, create the client in
+the child:
 
     my $pid = fork();
     die "fork: $!" unless defined $pid;
@@ -1351,6 +1438,253 @@ child:
 Each process needs its own database directory: TDLib locks the
 session database, and two processes sharing one directory is as
 broken as two clients sharing one.
+
+=head2 Writing a command bot
+
+Problem: dispatch C</start>, C</help> and friends without matching
+text by hand.
+
+    $td->on_command(start => sub {
+        my ($msg, $args) = @_;
+        $td->send_message($msg->{chat_id}, 'hello');
+    });
+
+    $td->on_command(echo => sub {
+        my ($msg, $args) = @_;
+        $td->send_message($msg->{chat_id}, length $args ? $args : 'echo what?');
+    });
+
+C<$args> is the rest of the line, already stripped of the command and
+any leading space, and the empty string when there is nothing. Split it
+yourself when you want fields:
+
+    my ($first, @rest) = split ' ', $args;
+
+Three behaviours are worth knowing. A command addressed to another bot
+in a group, C</start@otherbot>, does not fire yours. A message that
+merely contains a slash later on does not fire anything, because the
+match uses the bot-command entity at offset 0. And your own outgoing
+messages never fire your handlers, so a help text that begins with
+C</start> cannot make the bot answer itself.
+
+Handlers do not consume the message: C<on_message> still sees it.
+
+=head2 Asking a question and waiting for the answer
+
+Problem: a command needs a value the user has not given yet.
+
+    $td->on_command(rename => sub {
+        my ($msg) = @_;
+        my $chat = $msg->{chat_id};
+        my $user = $msg->{sender_id}{user_id};
+        $td->ask($chat, $user, 'What should I call you?', sub {
+            my ($reply, $err) = @_;
+            return if $err;                 # timed out, cancelled or superseded
+            my $name = $reply->{content}{text}{text};
+            $td->send_message($chat, "noted, $name");
+        });
+    });
+
+Nesting another ask inside the callback is how a multi-step flow is
+built, and works as you would expect.
+
+The one thing to plan for: while an ask is pending it shadows the
+command router for that user in that chat, so their C</cancel> would be
+swallowed as the answer. Give them a way out and take it before asking:
+
+    $td->on_command(cancel => sub {
+        my ($msg) = @_;
+        my $chat = $msg->{chat_id};
+        $td->cancel_ask($chat, $msg->{sender_id}{user_id})
+            and $td->send_message($chat, 'cancelled');
+    });
+
+That handler only ever runs when nothing is pending, which is exactly
+when there is nothing to cancel -- so the useful version handles
+C</cancel> inside the ask callback instead, where it arrives as the
+answer:
+
+    $td->ask($chat, $user, 'What should I call you?', sub {
+        my ($reply, $err) = @_;
+        return if $err;
+        my $text = $reply->{content}{text}{text} // '';
+        return $td->send_message($chat, 'cancelled') if $text eq '/cancel';
+        ...
+    });
+
+Asks time out after five minutes by default, which is the backstop that
+stops a forgotten prompt disabling someone's commands for good.
+
+=head2 Routing inline button presses
+
+Problem: one handler per button, rather than one C<if> chain.
+
+    $td->on_callback_data(qr/^vote:(\w+)$/ => sub {
+        my ($query, $choice) = @_;
+        $td->answer_callback_query($query->{id}, text => "you picked $choice");
+    });
+
+Regex captures are passed after the query. A plain string pattern is an
+B<exact> match, so use a regex for the usual C<prefix:value> layout.
+Every matching route fires, in the order you registered them.
+
+The data is decoded before matching, so write patterns against the text
+your keyboard actually set, not its wire encoding.
+
+=head2 Reacting with a custom emoji
+
+Problem: react with a Premium custom emoji rather than a standard one.
+
+    $td->react($chat, $message_id, "\x{1F44D}", sub { ... });          # normal
+    $td->react($chat, $message_id,
+               { custom_emoji_id => '5312536423851630001' }, sub { ... });
+
+The id is int64 and is stringified for you; passing it as a number
+would lose precision above 2^53.
+
+react is for a user account. A bot sets its reactions with
+set_reactions instead, which takes the whole list at once and is for
+bots only. Paid reactions are separate: they are staged and then
+committed, because TDLib rejects them in the ordinary call.
+
+    $td->add_paid_reaction($chat, $message_id, 10, sub {
+        $td->commit_paid_reactions($chat, $message_id, sub { ... });
+    });
+
+=head2 Posting a story and getting its real id
+
+Problem: post a story, then delete it later.
+
+TDLib answers postStory at once with a provisional story whose id
+changes when the upload finishes, so deleting by the id you were handed
+first will not work. The default C<wait> mode already handles this:
+
+    $td->post_story($chat, 'sunset.jpg', privacy => 'contacts', sub {
+        my ($story, $err) = @_;
+        die "post failed: $err->{message}\n" if $err;
+        # $story->{id} is the final id, from updateStoryPostSucceeded
+        $td->delete_story($chat, $story->{id}, sub { ... });
+    });
+
+Pass C<< wait => 'accepted' >> only when you genuinely want the
+provisional story back immediately and will track the update yourself.
+
+A video story needs a duration and a cover frame timestamp, which
+cannot be guessed from the file:
+
+    $td->post_story($chat,
+        { video => 'clip.mp4', duration => 12, cover_frame_timestamp => 1.5 },
+        sub { ... });
+
+=head2 Creating a sticker set
+
+Problem: build a set from local image files.
+
+A set is created from B<uploaded> files, not from paths, so each
+sticker is uploaded first and the returned file is what goes into the
+set. Check the name before doing any of the work, since it is globally
+unique and a bot-owned set must end in C<_by_E<lt>bot usernameE<gt>>:
+
+    my $name = 'my_pack_by_mybot';
+
+    $td->check_sticker_set_name($name, sub {
+        my ($res, $err) = @_;
+        # the answer is a union, not a boolean: an occupied name comes back
+        # as a successful reply, so $err alone would not catch it
+        return warn "check failed: $err->{message}\n" if $err;
+        my $verdict = $res->{'@type'} // '';
+        return warn "name is $verdict\n"
+            unless $verdict eq 'checkStickerSetNameResultOk';
+
+        $td->upload_sticker_file($user_id, 'cat.webp', sub {
+            my ($file, $err) = @_;
+            return warn "upload failed: $err->{message}\n" if $err;
+
+            $td->create_sticker_set($user_id, 'My Pack', $name, [
+                { file => { '@type' => 'inputFileId', id => $file->{id} },
+                  emojis => "\x{1F431}", keywords => ['cat'] },
+            ], sub {
+                my ($set, $err) = @_;
+                return warn "create failed: $err->{message}\n" if $err;
+                print "created $set->{name}\n";
+            });
+        });
+    });
+
+C<file> and C<emojis> are required for every sticker. C<format>
+defaults to webp; use 'tgs' for animated and 'webm' for video stickers.
+
+=head2 Sending a gift
+
+Problem: send a Telegram Stars gift to a user.
+
+    $td->available_gifts(sub {
+        my ($gifts, $err) = @_;
+        die "cannot list gifts: $err->{message}\n" if $err;
+        # each element is an availableGift, which wraps the gift itself
+        my $gift = $gifts->{gifts}[0]{gift} or return;
+        $td->send_gift($gift->{id}, $user_id, text => 'congratulations', sub {
+            my (undef, $err) = @_;
+            warn "gift failed: $err->{message}\n" if $err;
+        });
+    });
+
+The owner argument takes a bare user id, or a negative chat id to gift
+a channel; it is turned into the right message sender for you. Gift ids
+are int64 and cross as strings.
+
+=head2 Acting on a connected business account
+
+Problem: a bot connected to someone's Telegram Business account needs
+to answer messages arriving there.
+
+A business connection id arrives only through an update. There is no
+call that returns one out of nowhere, so the handler is not optional:
+
+    my %connections;
+
+    $td->on_business_connection(sub {
+        my ($conn) = @_;
+        $connections{ $conn->{id} } = $conn;
+    });
+
+    $td->on_business_message(sub {
+        my ($ev) = @_;
+        my $msg = $ev->{message}{message} or return;
+        return if $msg->{is_outgoing};    # the owner's own messages, and ours
+        $td->send_business_message($ev->{connection_id}, $msg->{chat_id},
+            'thanks, we will be in touch', sub { ... });
+    });
+
+Note that send_business_message takes no C<schedule>, no C<wait> and no
+C<topic>: TDLib gives it flat notification fields rather than the
+message-send options the ordinary send uses.
+
+=head2 Letting the module handle a rate limit
+
+Problem: the hand-written back-off above is the right shape, but you
+would rather not write it in every program.
+
+Pass C<retry>. It is off unless asked for, so nothing changes for code
+that does not:
+
+    $td->send({ '@type' => 'getMe' }, sub {
+        my ($me, $err) = @_;
+        warn "failed: $err->{message}\n" if $err;
+    }, retry => 1);
+
+    # or per client
+    my $td = EV::Telegram::TDLib->new(..., retry => { attempts => 5 });
+
+C<max_wait> (300 by default) is a give-up threshold rather than a
+clamp: if Telegram asks for longer, the 429 comes back to you unchanged
+instead of being retried sooner than it asked. That is the whole point
+-- retrying early is what escalates a limit.
+
+Two limits worth knowing. A retry gets a fresh C<@extra>, so the value
+send() returned identifies only the first attempt. And this cannot help
+a message send: a flood wait there is not a 429 reply at all but an
+updateMessageSendFailed, as described above.
 
 =head1 SEE ALSO
 

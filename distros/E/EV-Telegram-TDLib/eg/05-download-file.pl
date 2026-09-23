@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # 05-download-file.pl - download a file by id with progress reporting
 #
 # Demonstrates: download() with on_progress printing a percentage, and the
@@ -16,7 +16,8 @@
 #   TD_BOT_TOKEN            bot token from BotFather, alternative to TD_PHONE
 #   TD_DATABASE_DIRECTORY   optional, default ./tdlib-db
 #
-# Run: perl -Mblib eg/05-download-file.pl FILE_ID
+# Run: perl eg/05-download-file.pl FILE_ID
+#      (add -Mblib to run from a built checkout)
 
 use strict;
 use warnings;
@@ -48,9 +49,24 @@ my $td = EV::Telegram::TDLib->new(
     on_error => sub { warn "tdlib: $_[0]\n" },
 );
 
+# a die inside a callback is contained and reported, not propagated, so it
+# would leave the loop running and the script hanging: break out instead
+my $status = 0;
+sub fail {
+    my ($what, $err) = @_;
+    warn "\n$what: $err->{message}\n";
+    $status = 1;
+    EV::break;
+    return 1;
+}
+
+# the progress line is rewritten in place, so it needs an unbuffered STDOUT
+# or nothing appears until the final newline flushes everything at once
+$| = 1;
+
 $td->login(sub {
     my (undef, $err) = @_;
-    die "login failed: $err->{message}\n" if $err;
+    return fail('login failed', $err) if $err;
     $td->download($file_id,
         on_progress => sub {
             my ($file) = @_;
@@ -61,10 +77,11 @@ $td->login(sub {
         },
         sub {
             my ($file, $err) = @_;
-            die "\ndownload failed: $err->{message}\n" if $err;
+            return fail('download failed', $err) if $err;
             print "\ndone: $file->{local}{path}\n";
             $td->close(sub { EV::break });
         });
 });
 
 EV::run;
+exit $status;

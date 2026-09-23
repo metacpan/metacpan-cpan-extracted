@@ -7,6 +7,7 @@ use HMTest qw(free_ports quiet_child);
 use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
+use POSIX ();
 
 # Process model: max_requests_per_worker recycle,
 # USR1 stats dump, bounded graceful shutdown with a hung async request,
@@ -113,6 +114,49 @@ sub get {
         Time::HiRes::sleep(0.1);
     }
     ok($found, 'USR1 produced a per-worker stats dump');
+}
+
+# ---- an alarm the caller had pending is honoured, not cancelled ----------
+# The supervisor's own clock is SIGALRM - the scoreboard tick - so taking that
+# signal over silently cancelled any alarm() the caller had set before run().
+# A watchdog is exactly what that alarm is for, and an unkilled supervisor
+# keeps a whole pool (and the descriptors it inherited) alive for ever. So a
+# pending deadline is carried: the pool goes down and SIGALRM then does what it
+# would have done. A pool of its own, on its own port, to be killed by it.
+{
+    my ($p2) = free_ports(1);
+    my $kid  = $p2 ? fork : undef;
+    die "fork: $!" if $p2 && !defined $kid;
+    if ($p2 && !$kid) {
+        quiet_child(alarm => 2);
+        require Hyperman;
+        Hyperman->run(app => sub { [ 200, [], ['x'] ] },
+                      host => '127.0.0.1', port => $p2, workers => 2);
+        exit 0;
+    }
+  SKIP: {
+        skip 'no free loopback port for the alarm pool', 3 unless $p2;
+        my ($reaped, $st) = (0, 0);
+        for (1 .. 150) {                       # the tick is three seconds
+            if (waitpid($kid, POSIX::WNOHANG()) == $kid) { $reaped = 1; $st = $?; last }
+            Time::HiRes::sleep(0.1);
+        }
+        ok($reaped, 'a supervisor whose caller set alarm() dies of it');
+        is($st & 127, POSIX::SIGALRM(), 'killed by SIGALRM, as the caller asked')
+            if $reaped;
+        # ... and it took the workers with it: one still holding the listening
+        # socket would go on answering.
+        my $refused = 0;
+        for (1 .. 50) {
+            my $s = IO::Socket::INET->new(PeerAddr => '127.0.0.1',
+                                          PeerPort => $p2, Proto => 'tcp');
+            if (!$s) { $refused = 1; last }
+            close $s;
+            Time::HiRes::sleep(0.1);
+        }
+        ok($refused, 'and no worker was left holding the port');
+        kill 'KILL', $kid unless $reaped;
+    }
 }
 
 # ---- bounded shutdown: hung awaiting request cannot stall TERM -----------

@@ -25,7 +25,7 @@ and no code in the guest inspects it before it runs.
 
 The concern of this module is the install media: the file name of a
 version, and the cached copy. The mirror facts live in
-L<App::FuguVM::Mirror>: the host, the URL, the download helper, the
+L<App::FuguVM::Mirror>: the host, the URL, the downloader, the
 release key and the verification.
 
 The module does not hold a copy of the cache layout. It asks the cache

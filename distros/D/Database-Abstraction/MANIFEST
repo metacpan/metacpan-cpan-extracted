@@ -30,6 +30,7 @@ t/data/test5.csv
 t/data/test6.xml
 t/data/test7.csv
 t/data/test8.psv
+t/data/test_json.json
 t/data/test_tsv.tsv
 t/db.t
 t/db_noentry.t
@@ -45,6 +46,8 @@ t/html.t
 t/init.t
 t/integration.t
 t/join.t
+t/json.t
+t/json_url.t
 t/lib/Database/passwd.pm
 t/lib/Database/test1.pm
 t/lib/Database/test2.pm
@@ -55,6 +58,8 @@ t/lib/Database/test5.pm
 t/lib/Database/test6.pm
 t/lib/Database/test7.pm
 t/lib/Database/test8.pm
+t/lib/Database/test_json.pm
+t/lib/Database/test_json_url.pm
 t/lib/Database/test_tsv.pm
 t/lib/MyLogger.pm
 t/locales.t

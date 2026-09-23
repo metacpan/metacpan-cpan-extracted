@@ -45,6 +45,13 @@
     margin-bottom: 0;
   }
   #reset-btn:hover { background: #f0f0f0; }
+  .chart-source {
+    margin: 0.25rem 0 0;
+    font-size: 0.82rem;
+    color: #666;
+    word-break: break-all;
+  }
+  .chart-source a { color: inherit; }
 </style>
 
 <p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a></p>
@@ -87,11 +94,46 @@
     _svg.setAttribute('viewBox', (-_pad) + ' 0 ' + (_w + _pad) + ' ' + _h);
   }, 0);
 
+  // Read source attribution from the hidden data div (present only for
+  // URL-imported data).  Reading at call time means DOM order does not matter.
+  function _getAttribution() {
+    var el = document.getElementById('chart-attribution');
+    return el ? { url: el.dataset.url, date: el.dataset.date } : null;
+  }
+
+  // Append two attribution <text> nodes to an SVG element, extending its
+  // height and viewBox to make room.  Mutates the element in place.
+  var ATTR_H = 38;
+  function _addAttrToSVG(svgEl, attr) {
+    if (!attr) return;
+    var ns = 'http://www.w3.org/2000/svg';
+    var h  = parseFloat(svgEl.getAttribute('height')) || 600;
+    svgEl.setAttribute('height', h + ATTR_H);
+    var vb = svgEl.getAttribute('viewBox');
+    if (vb) {
+      var p = vb.trim().split(/\s+/);
+      if (p.length === 4) { p[3] = parseFloat(p[3]) + ATTR_H; svgEl.setAttribute('viewBox', p.join(' ')); }
+    }
+    var maxLen = 90;
+    var urlText = attr.url.length > maxLen ? attr.url.slice(0, maxLen - 3) + '...' : attr.url;
+    var style = 'font-family:sans-serif;font-size:11px;fill:#666;';
+    var t1 = document.createElementNS(ns, 'text');
+    t1.setAttribute('x', 10); t1.setAttribute('y', h + 16); t1.setAttribute('style', style);
+    t1.textContent = 'Source: ' + urlText;
+    var t2 = document.createElementNS(ns, 'text');
+    t2.setAttribute('x', 10); t2.setAttribute('y', h + 30); t2.setAttribute('style', style);
+    t2.textContent = 'Accessed on ' + attr.date;
+    svgEl.appendChild(t1);
+    svgEl.appendChild(t2);
+  }
+
   function biExportSVG() {
     var svg = document.getElementById('chart');
     if (!svg) return;
+    var clone = svg.cloneNode(true);
+    _addAttrToSVG(clone, _getAttribution());
     var src = '<?xml version="1.0" encoding="UTF-8"?>\n'
-            + new XMLSerializer().serializeToString(svg);
+            + new XMLSerializer().serializeToString(clone);
     var a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
     a.download = 'chart.svg';
@@ -101,19 +143,30 @@
   function biExportPNG() {
     var svg = document.getElementById('chart');
     if (!svg) return;
-    var w = parseInt(svg.getAttribute('width'), 10)  || 800;
-    var h = parseInt(svg.getAttribute('height'), 10) || 600;
+    var attr   = _getAttribution();
+    var w      = parseInt(svg.getAttribute('width'),  10) || 800;
+    var h      = parseInt(svg.getAttribute('height'), 10) || 600;
+    var extraH = attr ? ATTR_H : 0;
     var canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
+    canvas.width = w; canvas.height = h + extraH;
     var ctx = canvas.getContext('2d');
     var src = new XMLSerializer().serializeToString(svg);
     var url = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
     var img = new Image();
     img.onload = function () {
       ctx.fillStyle = '#fff';
-      ctx.fillRect(0, 0, w, h);
+      ctx.fillRect(0, 0, w, h + extraH);
       ctx.drawImage(img, 0, 0);
       URL.revokeObjectURL(url);
+      if (attr) {
+        var maxLen  = 90;
+        var urlText = attr.url.length > maxLen ? attr.url.slice(0, maxLen - 3) + '...' : attr.url;
+        ctx.font         = '11px sans-serif';
+        ctx.fillStyle    = '#666';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText('Source: ' + urlText,      10, h + 16);
+        ctx.fillText('Accessed on ' + attr.date, 10, h + 30);
+      }
       var a = document.createElement('a');
       a.href = canvas.toDataURL('image/png');
       a.download = 'chart.png';
@@ -138,10 +191,27 @@
     max: [% ref_max_y %]
   };
   var LINE_DEFS = [
-    { id: 'rl-min', key: 'min', color: '#3b82f6', label: 'Min' },
+    { id: 'rl-min', key: 'min', color: '#f59e0b', label: 'Min' },
     { id: 'rl-avg', key: 'avg', color: '#10b981', label: 'Avg' },
     { id: 'rl-max', key: 'max', color: '#ef4444', label: 'Max' }
   ];
+
+  function colorDots() {
+    // Recolor circle.pt dots whose Y value matches an active reference line.
+    // Dots at REF.min get the Min color, dots at REF.max get the Max color,
+    // all others revert to steelblue.  Only recolors when the corresponding
+    // checkbox is checked so unchecking a line also resets the dot colors.
+    if (typeof chart === 'undefined') return;
+    var minCb = document.getElementById('rl-min');
+    var maxCb = document.getElementById('rl-max');
+    var showMin = minCb && minCb.checked;
+    var showMax = maxCb && maxCb.checked;
+    chart.selectAll('circle.pt').attr('fill', function (d) {
+      if (showMin && d.value === REF.min) return '#f59e0b';
+      if (showMax && d.value === REF.max) return '#ef4444';
+      return 'steelblue';
+    });
+  }
 
   function drawRefLines() {
     // `chart` and `y` and `width` are declared by HTML::D3's snippet at the
@@ -171,6 +241,7 @@
         .attr('pointer-events', 'none')
         .text(def.label);
     });
+    colorDots();
   }
 
   // Patch `redraw` (a function declaration — globally patchable) so that
@@ -232,6 +303,12 @@
   });
 }());
 </script>
+[% END %]
+
+[% IF source_url %]
+<div id="chart-attribution" data-url="[% source_url | html %]" data-date="[% source_accessed | html %]" hidden></div>
+<p class="chart-source">Source: <a href="[% source_url | html %]" rel="noopener noreferrer">[% source_url | html %]</a></p>
+<p class="chart-source">Accessed on [% source_accessed %]</p>
 [% END %]
 
 [%- END -%]

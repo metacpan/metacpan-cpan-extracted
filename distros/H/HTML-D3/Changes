@@ -1,5 +1,16 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.17	Tue Sep 22 08:45:56 PM EDT 2026
+	[ Bug Fixes ]
+	- All render_*_snippet methods now return a Perl character string (UTF-8
+	  flag set) in the {html} value instead of a UTF-8 byte string.  The
+	  previous use of encode_json() produced octets; any caller that
+	  concatenated the result with a character string (e.g. a Mojolicious
+	  Template Toolkit response) would silently double-encode non-ASCII
+	  characters, producing mojibake.  Fixed by replacing encode_json() with
+	  a module-level JSON::MaybeXS instance configured with utf8 => 0, which
+	  serialises to a character string.
+
 0.16	Mon Sep 21 07:34:35 PM EDT 2026
 	[ Enhancements ]
 	- render_heatmap_snippet: new snippet method that generates an embeddable

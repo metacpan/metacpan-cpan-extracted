@@ -236,6 +236,13 @@ effect.
 
 ## Release Workflow
 
+**A human runs `dzil release`, never the agent.** It uploads to CPAN, tags and pushes
+— irreversible, outward-facing, and the maintainer's call every time. Preparing a
+release is in scope (tidy `Changes`, confirm the build and interop pass, stage the
+version); running `dzil release` is not. Never run it on your own initiative, and never
+treat your own offer to run it as a yes — only an explicit instruction from the
+maintainer to release is authorization; absent that, you never assume it.
+
 ```bash
 dzil release        # Builds, tests, uploads to CPAN, bumps version, commits, tags
 ```

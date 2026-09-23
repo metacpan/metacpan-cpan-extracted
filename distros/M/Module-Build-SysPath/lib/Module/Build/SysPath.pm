@@ -3,7 +3,7 @@ package Module::Build::SysPath;
 use warnings;
 use strict;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use base 'Module::Build';
 use Sys::Path 0.11;
@@ -12,10 +12,119 @@ use FindBin '$Bin';
 use Digest::MD5 qw(md5_hex);
 use Text::Diff 'diff';
 use File::Spec;
-use File::Basename 'basename', 'dirname';
-use File::Path 'make_path';
+use File::Temp 'tempfile';
+use Path::Tiny 'path';
+use B 'perlstring';
 
 our $sys_path_config_name = 'SPc';
+
+sub _spc_open_source {
+    my ($builder, $filename) = @_;
+    open(my $fh, '<', $filename) or die $!;
+    return $fh;
+}
+
+sub _spc_write {
+    my ($builder, $fh, $content) = @_;
+    print {$fh} $content or die $!;
+    return;
+}
+
+sub _spc_close {
+    my ($builder, $fh) = @_;
+    close($fh) or die $!;
+    return;
+}
+
+sub _spc_rename {
+    my ($builder, $source, $destination) = @_;
+    rename($source, $destination) or die $!;
+    return;
+}
+
+sub _rewrite_spc_accessors {
+    my ($content, $path_types, $paths) = @_;
+
+    foreach my $path_type (split(m/\|/, $path_types)) {
+        die "invalid SPc path type '$path_type'"
+            if $path_type !~ m/\A[A-Za-z_]\w*\z/;
+
+        my $header = qr/^[ \t]*sub[ \t]+\Q$path_type\E\b/m;
+        my $header_count = () = $content =~ m/$header/g;
+        die "missing SPc accessor '$path_type'\n" if not $header_count;
+        die "duplicate SPc accessor '$path_type'\n" if $header_count > 1;
+
+        my $definition = qr{
+            ^[ \t]*          # Allow indentation at the start of the line.
+            sub [ \t]+       # Require a named subroutine declaration.
+            \Q$path_type\E   # Match only the requested accessor name.
+            \s*              # Allow the opening brace on a later line.
+            \{               # Start the accessor body.
+            [^{}]*           # Reject bodies containing nested blocks.
+            \}               # End the accessor body.
+            [ \t]*           # Allow whitespace before the terminator.
+            ;?               # Accept an optional statement terminator.
+            [ \t]*           # Allow trailing horizontal whitespace.
+            (?: \r?\n | \z ) # Consume the line ending or end of source.
+        }xm;
+        my $definition_count = () = $content =~ m/$definition/g;
+        die "unsupported SPc accessor '$path_type'\n"
+            if $definition_count != 1;
+
+        my $literal = perlstring(path($paths->{$path_type})->stringify);
+        my $replacement = "sub $path_type { $literal };\n";
+        $content =~ s/$definition/$replacement/;
+    }
+
+    return $content;
+}
+
+sub _rewrite_installed_spc {
+    my ($builder, $source, $destination, $path_types) = @_;
+    my $mode = (stat($destination))[2];
+    die "cannot stat '$destination': $!" if not defined $mode;
+    $mode &= oct('7777');
+
+    my ($source_fh, $temporary_fh, $temporary);
+    my $rewrite_succeeded = eval {
+        $source_fh = $builder->_spc_open_source($source);
+        my $content = '';
+        local $! = 0;
+        while (defined(my $line = <$source_fh>)) {
+            next if $line =~ m/# remove after install$/;
+            $content .= $line;
+        }
+        die "cannot read '$source': $!" if $!;
+        $builder->_spc_close($source_fh, 'source');
+        undef $source_fh;
+
+        $content = _rewrite_spc_accessors(
+            $content,
+            $path_types,
+            $builder->{'properties'}->{'spc'}->{'path'},
+        );
+
+        ($temporary_fh, $temporary) = tempfile(
+            '.SPc.pm.XXXXXX', DIR => path($destination)->parent, UNLINK => 0,
+        );
+        $builder->_spc_write($temporary_fh, $content);
+        chmod($mode, $temporary)
+            or die "cannot chmod '$temporary': $!";
+        $builder->_spc_close($temporary_fh, 'destination');
+        undef $temporary_fh;
+        $builder->_spc_rename($temporary, $destination);
+        undef $temporary;
+        1;
+    };
+    my $rewrite_error = $@;
+    if (not $rewrite_succeeded) {
+        eval { close($source_fh) } if $source_fh;
+        eval { close($temporary_fh) } if $temporary_fh;
+        unlink($temporary) if defined $temporary and -e $temporary;
+        die $rewrite_error;
+    }
+    return;
+}
 
 sub new {
 	my $class = shift;
@@ -31,25 +140,26 @@ sub new {
         eval "use $module"; die $@ if $@;
     };
     
-    my $distribution_root = Sys::Path->find_distribution_root($builder->module_name);
+    my $distribution_root = path(
+        Sys::Path->find_distribution_root($builder->module_name)
+    )->absolute;
     print 'dist root is ', $distribution_root, "\n";
     
     # map conf files to array of real paths
     my @conffiles = (
-        map { ref $_ eq 'ARRAY' ? File::Spec->catfile(@{$_}) : $_ }     # convert path array to file name strings
+        map { ref $_ eq 'ARRAY' ? path(@{$_}) : path($_) }              # convert path arrays to normalized file names
         @{$builder->{'properties'}->{'conffiles'} || []}                # all conffiles
     );
     
     my %spc_properties = (
         'path_types' => [ $module->_path_types ],
     );
-    my %rename_in_system;
-    my %conffiles_in_system;
+    my %configuration_files;
     my @writefiles_in_system;
     my @create_folders_in_system;
     foreach my $path_type ($module->_path_types) {
-        my $sys_path     = $module->$path_type;
-        my $install_path = Sys::Path->$path_type;
+        my $sys_path     = path($module->$path_type)->absolute;
+        my $install_path = path(Sys::Path->$path_type)->absolute;
         
         $builder->{'properties'}->{$path_type.'_files'} ||= {};
 
@@ -66,27 +176,32 @@ sub new {
             my %files;
             my @ignore_folders;
             foreach my $file (@{$builder->rscan_dir($sys_path)}) {
+                my $source_path = path($file)->absolute;
+                die "'$source_path' is outside distribution root '$distribution_root'"
+                    if not $distribution_root->subsumes($source_path);
+                die "'$source_path' is outside path-type root '$sys_path'"
+                    if not $sys_path->subsumes($source_path);
+
+                my $distribution_file = $source_path->relative($distribution_root);
+
                 # skip folders, but remember folders with . prefix
                 if (-d $file) {
-                    $file =~ s/$distribution_root.//;
-
                     # ignore folders with . prefix
-                    push @ignore_folders, File::Spec->catfile($file, '')    # File::Spec with empty string to add portable trailing slash
-                        if (basename($file) =~ m{^\.} and (not exists $builder->{'properties'}->{$path_type.'_files'}->{$file}));
+                    push @ignore_folders, $source_path
+                        if substr($source_path->basename, 0, 1) eq '.'
+                        and not exists $builder->{'properties'}->{$path_type.'_files'}->{"$distribution_file"};
 
                     next;
                 }
-                
-                my $blib_file = $file;
-                my $dest_file = $file;
-                $file         =~ s/$distribution_root.//;
-                $dest_file    =~ s/^$sys_path/$install_path/;
-                $blib_file    =~ s/^$sys_path.//;
-                $blib_file    = File::Spec->catfile($path_type, $blib_file);
+
+                my $path_file = $source_path->relative($sys_path);
+                my $dest_file = $install_path->child($path_file);
+                my $blib_file = path($path_type)->child($path_file);
+                $file = "$distribution_file";
                 
                 # allow empty directories to be created
-                push @create_folders_in_system, dirname($dest_file)
-                    if (basename($file) eq '.exists');
+                push @create_folders_in_system, path($dest_file)->parent
+                    if (path($file)->basename eq '.exists');
                 
                 # skip non-persistant folders, only include explicitely wanted and .exists files
                 next if
@@ -96,48 +211,26 @@ sub new {
                 
                 # skip files from .folders, only include explicitely wanted
                 next if any {
-                    ($file =~ m/^$_/)
+                    $_->subsumes($source_path)
                     and (not exists $builder->{'properties'}->{$path_type.'_files'}->{$file})
                 } @ignore_folders;
                 
                 # skip files with . prefix
                 next if
-                    (basename($file) =~ m/^\./)
-                    and (basename($file) ne '.exists')
+                    (substr($source_path->basename, 0, 1) eq '.')
+                    and ($source_path->basename ne '.exists')
                 ;
                 
                 # print 'file>  ', $file, "\n";
                 # print 'bfile> ', $blib_file, "\n";
                 # print 'dfile> ', $dest_file, "\n\n";
                 
-                if (any { $_ eq $file } @conffiles) {
-                    $conffiles_in_system{$dest_file} = md5_hex(IO::Any->slurp([$file]));
-                    
-                    my $diff;
-                    $diff = diff($file, $dest_file, { STYLE => 'Unified' })
-                        if -f $dest_file;
-                    if (
-                        $diff                                                   # prompt when files differ
-                        and Sys::Path->changed_since_install($dest_file)        # and only if the file changed on filesystem
-                    ) {
-                        # prompt if to overwrite conf or not
-                        if (
-                            # only if the distribution conffile changed since last install
-                            Sys::Path->changed_since_install($dest_file, $file)
-                            and Sys::Path->prompt_cfg_file_changed(
-                                $file,
-                                $dest_file,
-                                sub { $builder->prompt(@_) },
-                            )
-                        ) {
-                            $rename_in_system{$dest_file} = $dest_file.'-old';
-                        }
-                        else {
-                            $blib_file .= '-spc';
-                            $dest_file .= '-spc';
-                        }
-                    }
-                }
+                $configuration_files{$dest_file} = $blib_file
+                    if (path($file)->basename ne '.exists')
+                    and (
+                        $path_type eq 'sysconfdir'
+                        or any { $_ eq $file } @conffiles
+                    );
 
                 # add file the the Build.PL _files list
                 $files{$file} = $blib_file;
@@ -156,8 +249,7 @@ sub new {
         $builder->add_build_element($path_type);
     }
     $builder->{'properties'}->{'spc'} = \%spc_properties;
-    $builder->notes('rename_in_system'     => \%rename_in_system);
-    $builder->notes('conffiles_in_system'  => \%conffiles_in_system);
+    $builder->notes('configuration_files' => \%configuration_files);
     $builder->notes('writefiles_in_system' => \@writefiles_in_system);
     $builder->notes('create_folders_in_system' => \@create_folders_in_system);
     
@@ -168,25 +260,85 @@ sub ACTION_install {
     my $builder = shift;
     my $destdir = $builder->{'properties'}->{'destdir'};
 
-    # move system file for backup (only when really installing to system)
+    # Build before deciding so comparisons and checksums use the installed bytes.
+    $builder->depends_on('build');
+    my %conffiles_in_system;
+    my %backup_files;
+    my %alternate_files;
+    my @writefiles_in_system = @{$builder->notes('writefiles_in_system')};
     if (not $destdir) {
-        my %rename_in_system = %{$builder->notes('rename_in_system')};
-        while (my ($system_file, $new_system_file) = each %rename_in_system) {
-            print 'Moving ', $system_file,' -> ', $new_system_file, "\n";
-            rename($system_file, $new_system_file) or die $!;
+        my %configuration_files = %{$builder->notes('configuration_files')};
+        while (my ($dest_file, $blib_file) = each %configuration_files) {
+            my $file = File::Spec->catfile($builder->blib, $blib_file);
+            $conffiles_in_system{$dest_file} = md5_hex(IO::Any->slurp([$file]));
+            next unless -f $dest_file
+                and diff($file, $dest_file, { STYLE => 'Unified' })
+                and Sys::Path->changed_since_install($dest_file);
+
+            if (
+                Sys::Path->changed_since_install($dest_file, $file)
+                and Sys::Path->prompt_cfg_file_changed(
+                    $file, $dest_file, sub { $builder->prompt(@_) },
+                )
+            ) {
+                $backup_files{$dest_file} = $dest_file.'-old';
+            }
+            else {
+                $alternate_files{$file} = $file.'-spc';
+                @writefiles_in_system = map {
+                    $_ eq $dest_file ? $_.'-spc' : $_
+                } @writefiles_in_system;
+            }
         }
     }
-    
+
     # create requested folders
     foreach my $folder (@{$builder->notes('create_folders_in_system')}) {
         $folder = File::Spec->catdir($destdir || (), $folder);
         if (not -d $folder) {
             print 'Creating '.$folder.' folder', "\n";
-            make_path($folder);
+            path($folder)->mkdir;
         }
     }
 
-    $builder->SUPER::ACTION_install(@_);
+    # Restore ordinary build filenames even when the parent installer fails.
+    my @renamed_files;
+    my @backed_up_files;
+    my $installed = eval {
+        foreach my $backup (values %backup_files) {
+            die "configuration backup '$backup' already exists\n"
+                if -e $backup;
+        }
+        while (my ($file, $backup) = each %backup_files) {
+            print 'Moving ', $file, ' -> ', $backup, "\n";
+            rename($file, $backup) or die $!;
+            push @backed_up_files, $file;
+        }
+        while (my ($file, $alternate) = each %alternate_files) {
+            rename($file, $alternate) or die $!;
+            push @renamed_files, $file;
+        }
+        $builder->SUPER::ACTION_install(@_);
+        1;
+    };
+    my $install_error = $@;
+    my @recovery_errors;
+    foreach my $file (@renamed_files) {
+        rename($alternate_files{$file}, $file)
+            or push @recovery_errors, "cannot restore '$file': $!";
+    }
+    if (not $installed) {
+        foreach my $file (reverse @backed_up_files) {
+            if (-e $file and not unlink($file)) {
+                push @recovery_errors, "cannot remove partial '$file': $!";
+                next;
+            }
+            rename($backup_files{$file}, $file)
+                or push @recovery_errors, "cannot restore '$file': $!";
+        }
+        die join("\n", $install_error, @recovery_errors);
+    }
+    die join("\n", @recovery_errors) if @recovery_errors;
 
     my $module  = $builder->module_name;
 
@@ -212,35 +364,18 @@ sub ACTION_install {
         if not -f $module_filename;
     die 'no such file - '.$installed_module_filename
         if not -f $installed_module_filename;
-    unlink $installed_module_filename;
-    
-    # write the new version of SPc.pm
-    open(my $config_fh, '<', $module_filename) or die $!;
-    open(my $real_config_fh, '>', $installed_module_filename) or die $!;
-    while (my $line = <$config_fh>) {
-        next if ($line =~ m/# remove after install$/);
-        if ($line =~ m/^sub \s+ ($path_types) \s* {/xms) {
-            $line =
-                'sub '
-                .$1
-                ." {'"
-                .$builder->{'properties'}->{'spc'}->{'path'}->{$1}
-                ."'};\n"
-            ;
-        }
-        print $real_config_fh $line;
-    }
-    close($real_config_fh);
-    close($config_fh);
+    $builder->_rewrite_installed_spc(
+        $module_filename, $installed_module_filename, $path_types,
+    );
         
     # see https://rt.cpan.org/Ticket/Display.html?id=49579
     # ExtUtils::Install is forcing 0444 so we have to hack write permition after install :-/
-    foreach my $writefile (@{$builder->notes('writefiles_in_system')}) {
+    foreach my $writefile (@writefiles_in_system) {
         chmod 0644, File::Spec->catfile($destdir || (), $writefile) or die $!;
     }
     
     # record md5sum of new distribution conffiles (only when really installing to system)
-    Sys::Path->install_checksums(%{$builder->notes('conffiles_in_system')})
+    Sys::Path->install_checksums(%conffiles_in_system)
         if (not $destdir);
     
     return;
@@ -380,7 +515,10 @@ be prompted what to do:
 
 If N or O is selected distribution files is installed with F<-spc>
 suffix. If Y or I is selected the system C<conffile> is renamed by adding
-suffix F<-old> and distribution C<conffile> is installed.
+suffix F<-old> and distribution C<conffile> is installed. Installation aborts
+without changing either file if the F<-old> backup already exists. If the
+parent installation fails after the rename, the original C<conffile> is
+restored.
 
 =back
 
@@ -392,7 +530,7 @@ And stores the checksums of C<conffile>s.
 
 =head1 AUTHOR
 
-Jozef Kutej, C<< <jkutej at cpan.org> >>
+Jozef Kutej, <jkutej@cpan.org>
 
 =head1 CONTRIBUTORS
  
@@ -404,6 +542,7 @@ order):
     Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯
     Emmanuel Rodriguez
     Slaven Rezić
+
 
 =head1 COPYRIGHT & LICENSE
 

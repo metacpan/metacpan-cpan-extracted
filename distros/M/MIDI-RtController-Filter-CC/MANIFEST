@@ -12,6 +12,7 @@ eg/continuous.pl
 eg/filter.pl
 eg/halt.pl
 eg/multi.pl
+eg/program_change.pl
 eg/threshold.pl
 lib/MIDI/RtController/Filter/CC.pm
 t/00-compile.t

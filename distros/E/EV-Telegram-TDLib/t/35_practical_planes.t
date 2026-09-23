@@ -48,6 +48,9 @@ $r = last_req();
 is $r->{location}{'@type'}, 'liveLocation', 'the location is wrapped';
 is $r->{location}{live_period}, 60, 'with live_period inside the wrapper';
 ok !exists $r->{live_period}, 'and not at the top level';
+$td->edit_message_location(-100, 55, sub {});
+ok !defined last_req()->{location},
+    'edit_message_location without location sends null location to stop sharing';
 
 $td->resend_messages(-100, [1, 2], sub {});
 is_deeply last_req()->{message_ids}, [1, 2], 'resend_messages works';
@@ -75,11 +78,26 @@ $r = last_req();
 is $r->{'@type'}, 'deleteChatMessagesBySender', 'delete_messages_by_sender works';
 is $r->{sender_id}{'@type'}, 'messageSenderUser', 'the sender is typed';
 
-$td->delete_messages_by_date(-100, 1, 2, sub {});
+$td->delete_messages_by_date(-100, 1700000000, 1700003600, sub {});
 like last_json(), qr/"revoke":true/, 'deleting by date revokes by default';
 
 $err = do { local $@; eval { $td->send_album(-100, [], sub {}) }; $@ };
 like $err, qr/at least one/, 'an empty album is refused';
+
+# an album's reply carries one message per item, so there is no single
+# send-succeeded to wait for. Only the modes it cannot honour are refused:
+# 'accepted' describes what it already does, and croaking on that broke
+# callers who were stating the behaviour rather than asking to change it.
+for my $w (qw(sent typo)) {
+    my $e = do { local $@; eval {
+        $td->send_album(-100, [ { '@type' => 'inputMessagePhoto' } ],
+                        wait => $w, sub {}) }; $@ };
+    like $e, qr/cannot wait/, "send_album refuses wait => '$w'";
+}
+ok eval { $td->send_album(-100, [ { '@type' => 'inputMessagePhoto' } ],
+                          wait => 'accepted', sub {}); 1 },
+    "send_album accepts wait => 'accepted', which is what it does anyway"
+    or diag $@;
 
 # --- text utilities
 $td->parse_markdown('*bold*', sub {});
@@ -168,6 +186,16 @@ $r = last_req();
 is $r->{'@type'}, 'setMenuButton', 'set_menu_button works';
 is $r->{menu_button}{'@type'}, 'botMenuButton', 'the button is typed';
 is $r->{menu_button}{text}, 'Shop', 'with its text';
+# an empty text is refused unless the url is "default", and only a null
+# button brings the commands list back
+$td->set_menu_button(42, commands => 1, sub {});
+like last_json(), qr/"menu_button":null/, 'commands => 1 puts the commands list back';
+$td->set_menu_button(42, sub {});
+is last_req()->{menu_button}{url}, 'default', 'and a bare call the default button';
+# an empty text with any other url is refused by TDLib, so a url alone must
+# not fall through to the default button and wipe the one that is set
+my $mb_err = do { local $@; eval { $td->set_menu_button(42, url => 'https://x/', sub {}) }; $@ };
+like $mb_err, qr/needs a text/, 'a url with no text croaks rather than resetting the button';
 $td->menu_button(42, sub {});
 is last_req()->{'@type'}, 'getMenuButton', 'menu_button works';
 

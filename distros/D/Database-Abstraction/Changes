@@ -1,5 +1,60 @@
 Revision history for Database-Abstraction
 
+0.45	Tue Sep 22 04:56:49 PM EDT 2026
+	[ Enhancements ]
+	- JSON URL backend: when the url constructor parameter is used and the server
+	  returns Content-Type: application/json, or the URL path ends in .json, the
+	  response is parsed as JSON via JSON::MaybeXS instead of being handed to
+	  HTML::TableExtract.  HTML::TableExtract is no longer loaded for JSON URL
+	  responses.  Both array-of-objects and object-keyed-by-id JSON structures
+	  are supported, matching the file-based JSON backend.
+	  Example: url => 'https://www.cpantesters.org/show/Crypt-SelfCertificate.json'
+	- selectall_arrayref / selectall_array: added in-memory ARRAY scan path for
+	  no_entry backends that have no DBI handle (JSON, XLSX, HTML URL).  Previously
+	  any simple scalar criteria in no_entry mode fell through to the SQL path and
+	  crashed with "Can't call method prepare_cached on an undefined value".
+	  The fix mirrors the equivalent path already present in count().
+	- JSON backend: files ending .json are now detected in the probe order
+	  (after XML, before the "Can't find a file" error).  The file is slurped
+	  into memory via JSON::MaybeXS (loaded lazily; not required for other
+	  backends).  Two JSON structures are supported:
+	    * Array of row objects: [{"entry":"k","col":"v"}, ...]
+	    * Object keyed by primary-key value: {"k":{"col":"v"}, ...}
+	  In the object form the key is injected into each row under the id column
+	  (default "entry") so all normal lookups work identically to the array form.
+	  A zero-byte or whitespace-only file is treated as empty without throwing.
+	  type is set to 'JSON'; no DBI handle is created; all queries use the
+	  in-memory fast-path.  JSON::MaybeXS added to META_MERGE recommends.
+	  Remote-host probe list updated to include .json.
+	- LWP::UserAgent::Cached added to META_MERGE recommends (URL backend).
+	[ Bug Fixes ]
+	- AUTOLOAD: calling $db->col('val') in list context (wantarray) with a
+	  non-empty params hash on no-DBI backends (JSON, XLSX, HTML URL) fell
+	  through to the SQL path and died with "Can't call method prepare_cached
+	  on an undefined value".  Added an in-memory scan path for the
+	  wantarray+criteria case, mirroring the zero-params fast-path already
+	  present in the same branch.
+	[ Tests ]
+	- t/json_url.t (new): 22 tests covering JSON URL detection by Content-Type
+	  and by .json URL suffix, array-form and object-form JSON, no_entry mode
+	  with criteria filtering (CPAN Testers example), AUTOLOAD column lookup,
+	  HTTP failure croak, and fetch-once per object guard.
+	- t/json.t (new): 9 tests — AUTOLOAD scalar and list-context lookups,
+	  fetchrow_hashref, distinct/all entry values, selectall_hash, and
+	  perl-version column lookup via AUTOLOAD wantarray path; skipped when
+	  JSON::MaybeXS is absent.
+	- t/empty_files.t: EF11 (zero-byte .json) and EF12 (whitespace-only .json),
+	  each 9 assertions; skipped when JSON::MaybeXS is absent.
+	- t/extended_tests.t: EX24 — array-format .json detection, count()==2,
+	  value lookup, type eq 'JSON'.
+	[ Documentation ]
+	- FILE FORMATS section: numbered items corrected (was missing item 6
+	  duplicate); JSON added as item 8; BerkeleyDB renumbered to 9; HTML to 10.
+	  Dependency notes added to each backend entry.
+	- DESCRIPTION: JSON added to the format list.
+	- SEE ALSO: JSON::MaybeXS entry added.
+	- POD: LWP::UserAgent references corrected to LWP::UserAgent::Cached.
+
 0.44	Sat Sep 19 09:28:17 PM EDT 2026
 	[ Enhancements ]
 	- SQLite backend: .sqlite and .sqlite3 are now accepted as file extensions

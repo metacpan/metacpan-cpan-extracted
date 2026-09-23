@@ -18,10 +18,14 @@ SKIP: {
     }
     waitpid $pid, 0;
     is $? >> 8, 0, 'the child croaks with an after-fork message';
-    ok 1, 'the parent survived the child';
+    # the parent must be usable, not merely alive: the fork handler runs in
+    # the child, and poisoning the parent's pump would be invisible to a
+    # bare pass
+    ok eval { EV::Telegram::TDLib::_create_client_id(); 1 },
+        'the parent can still create a client after the child forked';
 }
 
-# deliberately no close first: shutting down WITH a live client is the
+# deliberately no close first: shutting down with a live client is the
 # case being measured here
 my $t0 = time;
 EV::Telegram::TDLib::_shutdown();

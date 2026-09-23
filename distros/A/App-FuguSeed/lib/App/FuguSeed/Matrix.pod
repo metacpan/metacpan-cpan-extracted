@@ -1,0 +1,59 @@
+=head1 NAME
+
+App::FuguSeed::Matrix - the 25 x 25 modules of a Standard SeedQR
+
+=head1 SYNOPSIS
+
+    use App::FuguSeed::Matrix;
+
+    my $matrix = App::FuguSeed::Matrix->build(\@codewords);
+    my $module = $matrix->[$row][$column];
+
+=head1 DESCRIPTION
+
+App::FuguSeed::Matrix places the function patterns, the 44 codewords,
+the mask and the format information in the grid of a QR version 2
+code. The grid is 25 x 25 modules. Module C<(0,0)> is the top left
+corner, the first index is the row, and the second is the column. A
+module is 1 when it is dark, and 0 when it is light.
+
+The function patterns are the three finder patterns with their
+separators, the two timing patterns, the one alignment pattern, and
+the dark module. Together they hold 127 dark modules, the same for
+every 25 x 25 code.
+
+The mask is pattern 0, always: a data module inverts when the sum of
+its row and its column is even. The module computes no penalty score,
+so the format information is one constant of 15 bits, and it sits in
+the two positions of the QR standard.
+
+Every method is a class method, and every method is pure: it takes
+values and it returns values. The module touches no stream, and it
+loads no module.
+
+=head2 build
+
+C<build($codewords)> returns the matrix of the codewords of the array
+reference C<$codewords>, as a reference to 25 rows of 25 modules.
+
+=head1 RETURN VALUES
+
+C<build()> returns one array reference of 25 array references.
+
+=head1 ERRORS
+
+C<build()> expects the 44 codewords of App::FuguSeed::Codewords. With
+fewer codewords, the mask alone fills each data module that the
+codewords do not reach. Such a module is dark when the sum of its row
+and its column is even.
+
+=head1 SEE ALSO
+
+L<App::FuguSeed::Codewords>, L<App::FuguSeed::Text>, and ISO/IEC
+18004, the QR standard.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

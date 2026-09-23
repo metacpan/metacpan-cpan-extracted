@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # 06-raw-method.pl - the escape hatch: send() and execute() with raw requests
 #
 # Demonstrates: calling TDLib methods the mixins do not wrap.
@@ -15,7 +15,7 @@
 # Environment: none required. TD_API_ID/TD_API_HASH are picked up if set,
 # but the requests below do not need them.
 #
-# Run: perl -Mblib eg/06-raw-method.pl
+# Run: perl eg/06-raw-method.pl   (add -Mblib to run from a built checkout)
 
 use strict;
 use warnings;
@@ -56,12 +56,21 @@ $td->call(getOption => { name => 'version' }, sub {
                : "call() reply: $res->{value}\n";
 });
 
+# a die inside a callback is contained and reported, not propagated, so it
+# would leave the loop running and the script hanging: break out instead
+my $status = 0;
+
 my $extra = $td->send({ '@type' => 'getOption', name => 'version' }, sub {
     my ($res, $err) = @_;
-    die "getOption failed: $err->{message}\n" if $err;
+    if ($err) {
+        warn "getOption failed: $err->{message}\n";
+        $status = 1;
+        return EV::break;
+    }
     print "async getOption reply: $res->{value}\n";
     $td->close(sub { EV::break });
 });
 print "request sent, assigned \@extra $extra\n";
 
 EV::run;
+exit $status;

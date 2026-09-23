@@ -3,21 +3,17 @@ abstract: 'install files to system folders according to FHS (or Sys::Path settin
 author:
   - 'Jozef Kutej <jkutej@cpan.org>'
 build_requires:
+  Capture::Tiny: '0'
+  File::Copy::Recursive: '0'
   File::Find::Rule: '0'
-  File::Temp: '0'
+  Monkey::Patch::Action: '0'
   Test::Compile: '0.08'
   Test::Dirs: '0'
   Test::More: '0'
 configure_requires:
-  Module::Build: '0.3607'
+  Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
-keywords:
-  - system
-  - paths
-  - instalation
-  - deployment
-  - applications
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,18 +22,18 @@ name: Module-Build-SysPath
 provides:
   Module::Build::SysPath:
     file: lib/Module/Build/SysPath.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   Digest::MD5: '0'
-  File::Basename: '0'
-  File::Path: '2.07'
   File::Spec: '0'
+  File::Temp: '0'
   List::MoreUtils: '0'
-  Sys::Path: '0.11'
+  Path::Tiny: '0.101'
+  Sys::Path: '0.17'
   Text::Diff: '0'
 resources:
-  bugtracker: http://github.com/jozef/Module-Build-SysPath/issues
+  bugtracker: https://github.com/jozef/Module-Build-SysPath/issues
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/jozef/Module-Build-SysPath
-version: '0.18'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+  repository: https://github.com/jozef/Module-Build-SysPath.git
+version: '0.19'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

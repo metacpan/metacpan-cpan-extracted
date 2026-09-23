@@ -53,7 +53,7 @@ log_user 1
 # Helper proc to send a response after a match
 proc respond {response} {
     sleep 0.5
-    send "$response\r"
+    send -- "$response\r"
 }
 
 # Connect to console

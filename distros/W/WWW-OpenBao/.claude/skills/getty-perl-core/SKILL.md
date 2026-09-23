@@ -55,6 +55,31 @@ The rule is "always on", never "leave them out". Omitting them from a class is c
 
 Why: bare subs hide what the call needs, can't be overridden or mocked, and force every caller to thread state by hand.
 
+### Dispatch through the invocant, never a hardcoded class name
+
+Route a class's own methods, and every collaborator it reaches for, through the invocant — never through a literal package name. Perl passes the invocant as the first argument for both `Foo->method` and `$obj->method`, so a class name is itself a valid invocant: `$self` simply *is* `$class` when nothing is instantiated. Going through it costs nothing even for a never-instantiated class, and it is the one thing that lets a subclass override the behaviour — a literal `Some::Package->helper(...)` nails the call to that exact package, and no override or mock can reach it.
+
+- **A method on the same class:** `$self->value_to_bytes($v)`, never `My::Value->value_to_bytes($v)` from inside `My::Value`.
+- **A collaborator in another class:** name the class once in an overridable resolver, then dispatch through it — never a literal at the call site.
+
+```perl
+package My::Pipe;
+
+sub backend_class { 'My::Backend::Age' }        # override point, named once
+
+sub decrypt {
+  my ( $self, %arg ) = @_;
+  my $key = $self->backend_class->unwrap( $arg{header} );  # not My::Backend::Age->unwrap
+  return $self->_finish( $key );                           # not My::Pipe->_finish
+}
+
+package My::Pipe::Vault;
+use parent -norequire, 'My::Pipe';
+sub backend_class { 'My::Backend::Vault' }       # a subclass swaps it; the pipeline follows
+```
+
+This holds for class-method-only modules too: write every method's first line as `my ( $self, ... ) = @_;` and dispatch through `$self` whether or not the class is ever instantiated. The module becomes subclassable for free, and callers that write `Thing->do(...)` keep working unchanged.
+
 ## Errors
 
 - **`croak`, never `die`.** Errors report the caller's line, not ours.

@@ -1,5 +1,18 @@
 Revision history for WWW-OpenBao
 
+0.003     2026-09-22 19:42:46Z
+
+ - New k8s_auth_mount attribute (default 'kubernetes') lets login_k8s reach
+   a Kubernetes auth method mounted at a non-default path
+ - New soft_delete_secret (level 1, reversible), undelete_secret and
+   destroy_secret (level 2) cover the rest of the KV v2 delete ladder;
+   delete_secret stays the irreversible level 3 and its POD now says so
+ - health returns the health hashref for sealed, standby and uninitialised
+   servers too; undef means only that the server gave no usable answer
+ - read_secret and read_secret_metadata take an optional version => $n to
+   read a specific KV v2 version (GET data/...?version=N)
+ - POD and README describe the 404 soft-miss contract for every method
+
 0.002     2026-09-18 02:15:17Z
 
  - secret_exists now propagates a 403 (permission denied) instead of reporting

@@ -3,24 +3,38 @@ abstract: 'create/manage/evaluate segmented (curved) envelope'
 author:
   - 'Yegor Korablev <egor@cpan.org>'
 build_requires:
-  Test::More: 0
-  strict: 0
-  warnings: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Math-SegmentedEnvelope
+no_index:
+  directory:
+    - t
+    - inc
+    - bench
+    - eg
+    - examples
+    - t
+  file:
+    - bench/PurePerl.pm
+provides:
+  Math::SegmentedEnvelope:
+    file: lib/Math/SegmentedEnvelope.pm
+    version: '0.03'
+  Math::SegmentedEnvelope::Static:
+    file: lib/Math/SegmentedEnvelope.pm
+    version: '0.03'
 requires:
-  Carp: 0
-  Clone: 0
-  Exporter::Easy: 0
-  List::Util: 0
-  Moo: 0
-  constant: 0
-  namespace::autoclean: 0
-version: 0.02
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/vividsnow/Math-SegmentedEnvelope/issues
+  repository: https://github.com/vividsnow/Math-SegmentedEnvelope.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

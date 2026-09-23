@@ -13,13 +13,15 @@ my $cid = $td->{client_id};
 my $closed = 0;
 $td->close(sub { $closed = 1; EV::break });
 
+# the loop has not run yet, so ev_now is still the time EV was loaded
+EV::now_update();
 my $watchdog = EV::timer 15, 0, sub { fail('close never completed'); EV::break };
 EV::run;
 $watchdog->stop;
 
 ok $closed, 'close callback fired';
 is $td->auth_state, 'authorizationStateClosed', 'reached the closed state';
-ok !EV::Telegram::TDLib::_is_registered($cid), 'client left the registry';
+ok !EV::Telegram::TDLib::is_registered($cid), 'client left the registry';
 
 my $td2 = EV::Telegram::TDLib->new(
     api_id => 1, api_hash => 'x', auto_auth => 0,
@@ -38,7 +40,7 @@ $watchdog2->stop;
 ok $fired{first}, 'first close callback not dropped by the second close';
 ok $fired{second}, 'second close callback fired';
 is $td2->auth_state, 'authorizationStateClosed', 'double close still reached Closed';
-ok !EV::Telegram::TDLib::_is_registered($cid2), 'second client left the registry';
+ok !EV::Telegram::TDLib::is_registered($cid2), 'second client left the registry';
 
 # --- send() on a closed client fails deferred and sends nothing
 my @sent;
@@ -52,7 +54,7 @@ my $td3 = EV::Telegram::TDLib->new(
 );
 $td3->close;
 @sent = ();
-$td3->_inject_raw(q({"@type":"updateAuthorizationState","authorization_state":{"@type":"authorizationStateClosed"}}));
+$td3->inject_raw(q({"@type":"updateAuthorizationState","authorization_state":{"@type":"authorizationStateClosed"}}));
 
 my (@res, @warn);
 my $ret = do {
@@ -85,7 +87,7 @@ my $pin = 0;
         api_id => 1, api_hash => 'x', auto_auth => 0,
         database_directory => 't/tmp-close4',
     );
-    $td4->_inject_raw(q({"@type":"updateAuthorizationState","authorization_state":{"@type":"authorizationStateClosed"}}));
+    $td4->inject_raw(q({"@type":"updateAuthorizationState","authorization_state":{"@type":"authorizationStateClosed"}}));
     $td4->close(sub { $pin = 1 });
 }
 EV::run(EV::RUN_NOWAIT);

@@ -1,0 +1,69 @@
+=head1 NAME
+
+App::FuguSeed::Words - the flow of fuguseed-words
+
+=head1 SYNOPSIS
+
+    use App::FuguSeed::Words;
+
+    exit App::FuguSeed::Words->run(@ARGV);
+
+    my $path = App::FuguSeed::Words->share('english.txt');
+
+=head1 DESCRIPTION
+
+App::FuguSeed::Words dispatches the two verbs of C<fuguseed-words>
+through C<Fugu::CLI>. The verbs are C<build> and C<check>.
+
+C<build> reads a word list file and writes the sheet as HTML to
+standard output. C<check> reads a built sheet and a word list file, and
+it proves that the sheet is correct for the list.
+
+Standard output carries the result of a verb only. Every diagnostic
+goes to standard error through the logger of the command line
+interface.
+
+The module reads the share files of the sheet, and it prints the result
+of a verb. The build and the check themselves hold no stream.
+
+The program sees no seed word, so it can run on any computer. No module
+that it loads maps 12 words to anything.
+
+=head2 run
+
+C<run(@argument)> dispatches the verb and returns the exit code of the
+program. The codes are 0 for success, 1 for a failure, and 2 for a
+usage error. A command line without a verb is a usage error.
+
+=head2 share
+
+C<share($name)> returns the path of the share file C<$name> under
+F<share/fuguseed>, in a checkout and in an installed distribution. The
+three share files are F<english.txt>, F<sheet.html>, and F<sheet.css>.
+
+=head1 RETURN VALUES
+
+C<run()> returns one of the three exit codes. C<share()> returns
+C<undef> when no tree holds the file.
+
+=head1 ERRORS
+
+A list file with another digest than the source list, a sheet that the
+program cannot read, and a defect of a sheet are recoverable errors.
+Each one prints one line on standard error and gives the failure exit
+code.
+
+A malformed value of C<--date> and a wrong argument count are usage
+errors. Each one prints the usage line of the verb on standard error.
+
+=head1 SEE ALSO
+
+L<App::FuguSeed::Sheet>, L<App::FuguSeed::Check>,
+L<App::FuguSeed::ListFile>, and the manuals C<fuguseed-words(1)> and
+C<fuguseed(7)>.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

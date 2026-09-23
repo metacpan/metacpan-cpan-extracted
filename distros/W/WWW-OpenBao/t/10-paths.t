@@ -19,6 +19,12 @@ is $bao->_kv_path('foo/bar'),
    'v1/secret/data/foo/bar',              'kv data path';
 is $bao->_kv_metadata_path('foo/bar'),
    'v1/secret/metadata/foo/bar',          'kv metadata path';
+is $bao->_kv_delete_path('foo/bar'),
+   'v1/secret/delete/foo/bar',            'kv soft-delete path';
+is $bao->_kv_undelete_path('foo/bar'),
+   'v1/secret/undelete/foo/bar',          'kv undelete path';
+is $bao->_kv_destroy_path('foo/bar'),
+   'v1/secret/destroy/foo/bar',           'kv destroy path';
 
 $bao->token('new-token');
 is $bao->token, 'new-token',              'token is writable (login flows)';

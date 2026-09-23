@@ -19,6 +19,7 @@ package Database::Abstraction;
 # TODO:	Other databases e.g., Redis, noSQL, remote databases such as MySQL, PostgreSQL
 # TODO: The no_entry/entry terminology is confusing.  Replace with no_id/id_column
 # TODO: Log queries and the time that they took to execute per database
+# TODO: Use DBD::JSON if one is ever written
 
 use warnings;
 use strict;
@@ -64,18 +65,18 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.44
+Version 0.45
 
 =cut
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 =head1 DESCRIPTION
 
 C<Database::Abstraction> is a read-only ORM for Perl that gives a uniform
-interface over CSV, PSV, XML, SQLite, DBM::Deep, BerkeleyDB, and Excel (XLSX)
-files - local, remote (via SSH), or fetched from a URL - without writing any
-SQL.
+interface over CSV, PSV, TSV, JSON, XML, SQLite, DBM::Deep, BerkeleyDB, and
+Excel (XLS/XLSX) files - local, remote (via SSH), or fetched from a URL -
+without writing any SQL.
 Effectively it allows you to access a database table, of many different
 database formats, as an object.
 
@@ -133,7 +134,7 @@ A CHI-compatible cache layer is also supported.
     use parent 'Database::Abstraction';
 
     # 2. Open the database - file is auto-detected from the class name
-    #    (looks for foo.sql / foo.sqlite / foo.sqlite3 / foo.psv / foo.csv / foo.xlsx / foo.xml / foo.db)
+    #    (looks for foo.sql / foo.sqlite / foo.sqlite3 / foo.psv / foo.tsv / foo.csv / foo.xlsx / foo.xml / foo.json / foo.db)
     my $db = Database::Foo->new(directory => '/path/to/data');
 
     # 3. Simple lookups -----------------------------------------------
@@ -238,7 +239,8 @@ The module probes the C<directory> for files in this priority order:
 
 =item 1. C<SQLite>
 
-File ending C<.sql>, C<.sqlite>, or C<.sqlite3>
+File ending C<.sql>, C<.sqlite>, or C<.sqlite3>.
+Requires L<DBD::SQLite>.
 
 =item 2. C<Deep>
 
@@ -248,20 +250,21 @@ Requires L<DBM::Deep> (loaded lazily).
 
 =item 3. C<PSV>
 
-Pipe-separated file, ending C<.psv>
+Pipe-separated file, ending C<.psv>.
 
 =item 4. C<TSV>
 
-Tab-separated file, ending C<.tsv>
+Tab-separated file, ending C<.tsv>.
 
 =item 5. C<CSV>
 
 Comma (or custom) separated file, ending C<.csv> or C<.db>; can be
-gzipped.
+gzipped (C<.csv.gz> or C<.db.gz>).
 B<Note:> the default separator is C<!> not C<,> for historical
 reasons - pass C<< sep_char => ',' >> for standard CSVs.
+Requires L<Text::xSV::Slurp> for the slurp fast-path (loaded lazily).
 
-=item 5. C<Excel> (C<.xls>) and C<XLSX> (C<.xlsx>)
+=item 6. C<Excel> (C<.xls>) and C<XLSX> (C<.xlsx>)
 
 Two separate Excel backends - one per file format:
 
@@ -283,19 +286,47 @@ For both formats, each worksheet is a separate logical table; the active
 worksheet is determined by the class-derived table name (or the C<table>
 constructor parameter).  Both modules are loaded lazily.
 
-=item 6. C<XML>
+=item 7. C<XML>
 
-File ending C<.xml>
+File ending C<.xml>.
+Requires L<XML::Simple> for the slurp fast-path (loaded lazily).
 
-=item 7. C<BerkeleyDB>
+=item 8. C<JSON>
 
-Binary key-value file ending C<.db>
+File ending C<.json>, slurped into memory via L<JSON::MaybeXS> (loaded
+lazily).
 
-=item 8. C<HTML>
+The file may contain either a JSON array of row objects:
 
-Remote HTML page fetched via a URL.  Pass C<url> instead of C<directory>; the
-module fetches the page with L<LWP::UserAgent>, parses all C<< <table> >>
-elements with L<HTML::TableExtract>, and slurps the first (or
+    [
+      { "entry": "key1", "col": "val1" },
+      { "entry": "key2", "col": "val2" }
+    ]
+
+or a JSON object whose keys are the primary-key values:
+
+    {
+      "key1": { "col": "val1" },
+      "key2": { "col": "val2" }
+    }
+
+In the object form, each key is injected into its row hash under the C<id>
+column name (default C<entry>), so all normal lookups work identically to
+the array form.
+
+A zero-byte or whitespace-only file is treated as empty - all query methods
+return 0 / C<undef> / C<[]> without throwing.
+Requires L<JSON::MaybeXS> (loaded lazily).
+
+=item 9. C<BerkeleyDB>
+
+Binary key-value file ending C<.db>.
+
+=item 10. C<HTML>
+
+HTML page fetched via a C<url>.  Pass C<url => 'https://...'> instead of
+C<directory>; the module fetches the page with L<LWP::UserAgent::Cached>, parses all
+C<< <table> >> elements with L<HTML::TableExtract>, and slurps the first (or
 C<html_table_index>-selected) table into memory.  The first row of the table
 is treated as column headers.  Both modules are loaded lazily and are not
 required for other backends.
@@ -303,7 +334,21 @@ required for other backends.
 =back
 
 Pass C<dsn> to bypass file detection entirely and connect via any DBI driver.
-Pass C<url> to fetch and slurp a remote HTML table without a local directory.
+Pass C<url> to fetch and slurp data from a remote source without a local
+directory.  When the URL returns C<Content-Type: application/json> or the URL
+path ends in C<.json>, the response is parsed as JSON (see item 8 above).
+Otherwise the response is parsed as an HTML page (item 10).
+
+Example - fetching CPAN Testers results:
+
+    package Database::cpantesters;
+    use parent 'Database::Abstraction';
+
+    my $db = Database::cpantesters->new(
+        url      => 'https://www.cpantesters.org/show/Database-Abstraction.json',
+        no_entry => 1,
+    );
+    my $passes = $db->selectall_arrayref(grade => 'PASS');
 
 =head1 QUERY CRITERIA
 
@@ -506,7 +551,7 @@ installed; it is loaded lazily (only when C<host> is given).
 A URL (C<http://> or C<https://>) pointing to an HTML page that contains one
 or more C<< <table> >> elements.  When present, C<directory> is not required.
 The first row of the selected table is used as column headers.
-Requires L<LWP::UserAgent> and L<HTML::TableExtract> (both loaded lazily).
+Requires L<LWP::UserAgent::Cached> and L<HTML::TableExtract> (both loaded lazily).
 
 =back
 
@@ -778,11 +823,11 @@ sub _open :Protected
 		return $self;
 	}
 
-	# URL-based HTML table backend — lazy-loads LWP::UserAgent and HTML::TableExtract.
-	# Both modules are optional; they are not required for file-based backends.
+	# URL-based backend — handles both JSON and HTML table responses.
+	# LWP::UserAgent::Cached is always required; JSON::MaybeXS and
+	# HTML::TableExtract are loaded lazily based on the response Content-Type.
 	if(my $url = $self->{'url'} || $defaults{'url'}) {
 		require LWP::UserAgent::Cached;
-		require HTML::TableExtract;
 
 		my $ua = $self->{ua} // LWP::UserAgent::Cached->new(timeout => 30, agent => __PACKAGE__ . '/' . $VERSION);
 		$ua->env_proxy(1);
@@ -790,44 +835,78 @@ sub _open :Protected
 		Carp::croak(ref($self), ": cannot fetch '$url': ", $response->status_line)
 			unless $response->is_success;
 
-		my $te = HTML::TableExtract->new();
-		$te->parse($response->decoded_content);
-
-		my $tidx = $self->{'html_table_index'} // $defaults{'html_table_index'} // 0;
-		my @tables = $te->tables;
-		Carp::croak(ref($self), ": no HTML tables found at '$url'")
-			unless @tables;
-		Carp::croak(ref($self), ": html_table_index $tidx out of range (", scalar @tables, " tables) at '$url'")
-			if $tidx >= @tables;
-
-		my @rows = $tables[$tidx]->rows;
-		Carp::croak(ref($self), ": empty HTML table at '$url'")
-			unless @rows;
-
-		my @headers = map { defined($_) ? "$_" : '' } @{$rows[0]};
-		my $id = $self->{'id'};
-
-		if($self->{'no_entry'}) {
+		my $content_type = $response->content_type() // '';
+		if($content_type =~ m{\bapplication/json\b}i || $url =~ /\.json(?:[?#]|\z)/i) {
+			# JSON URL backend — lazy-loads JSON::MaybeXS.
+			# Detects by Content-Type: application/json or a .json URL suffix.
+			require JSON::MaybeXS;
+			my $parsed = JSON::MaybeXS::decode_json($response->decoded_content);
 			my @data;
-			for my $i (1 .. $#rows) {
-				my %row;
-				@row{@headers} = map { defined($_) ? "$_" : undef } @{$rows[$i]};
-				push @data, \%row;
+			if(ref($parsed) eq 'ARRAY') {
+				@data = @{$parsed};
+			} elsif(ref($parsed) eq 'HASH') {
+				# Object keyed by primary-key value — inject id column into each row
+				my $id_col = $self->{'id'};
+				for my $k (sort keys %{$parsed}) {
+					my $row = $parsed->{$k};
+					if(ref($row) eq 'HASH') {
+						push @data, { $id_col => $k, %{$row} };
+					} else {
+						push @data, { $id_col => $k, value => $row };
+					}
+				}
+			} else {
+				Carp::croak(ref($self), ": JSON URL: unexpected top-level structure from '$url'");
 			}
-			$self->{'data'} = \@data;
+			if($self->{'no_entry'}) {
+				$self->{'data'} = @data ? \@data : undef;
+			} else {
+				$self->{'data'} = { map { $_->{$self->{'id'}} => $_ } @data };
+			}
+			$self->{'type'} = 'JSON';
 		} else {
-			my %data;
-			for my $i (1 .. $#rows) {
-				my %row;
-				@row{@headers} = map { defined($_) ? "$_" : undef } @{$rows[$i]};
-				my $key = $row{$id};
-				next unless defined $key;
-				$data{$key} = \%row;
+			# HTML table backend — lazy-loads HTML::TableExtract.
+			require HTML::TableExtract;
+
+			my $te = HTML::TableExtract->new();
+			$te->parse($response->decoded_content);
+
+			my $tidx = $self->{'html_table_index'} // $defaults{'html_table_index'} // 0;
+			my @tables = $te->tables;
+			Carp::croak(ref($self), ": no HTML tables found at '$url'")
+				unless @tables;
+			Carp::croak(ref($self), ": html_table_index $tidx out of range (", scalar @tables, " tables) at '$url'")
+				if $tidx >= @tables;
+
+			my @rows = $tables[$tidx]->rows;
+			Carp::croak(ref($self), ": empty HTML table at '$url'")
+				unless @rows;
+
+			my @headers = map { defined($_) ? "$_" : '' } @{$rows[0]};
+			my $id = $self->{'id'};
+
+			if($self->{'no_entry'}) {
+				my @data;
+				for my $i (1 .. $#rows) {
+					my %row;
+					@row{@headers} = map { defined($_) ? "$_" : undef } @{$rows[$i]};
+					push @data, \%row;
+				}
+				$self->{'data'} = \@data;
+			} else {
+				my %data;
+				for my $i (1 .. $#rows) {
+					my %row;
+					@row{@headers} = map { defined($_) ? "$_" : undef } @{$rows[$i]};
+					my $key = $row{$id};
+					next unless defined $key;
+					$data{$key} = \%row;
+				}
+				$self->{'data'} = \%data;
 			}
-			$self->{'data'} = \%data;
+			$self->{'type'} = 'HTML';
 		}
 
-		$self->{'type'} = 'HTML';
 		$self->{'_updated'} = time();
 		$self->_fixate($self->{'data'}) if $self->{'data'} && ref($self->{'data'}) eq 'HASH';
 		$self->{$table} = undef;	# No DBI handle; all queries use the in-memory data path
@@ -859,7 +938,7 @@ sub _open :Protected
 			my $tmpdir_obj = File::Temp->newdir(CLEANUP => 1);
 			$self->{'_remote_tmpdir'} = $tmpdir_obj;	# auto-cleans on DESTROY
 			my $tmpdir = $tmpdir_obj->dirname();
-			for my $ext (qw(sql sqlite sqlite3 dbm deep db csv.gz db.gz psv tsv xls xlsx csv xml)) {
+			for my $ext (qw(sql sqlite sqlite3 dbm deep db csv.gz db.gz psv tsv xls xlsx csv xml json)) {
 				my $remote_file = "$remote_dir/$dbname.$ext";
 				my $content = eval { scalar File::Slurp::Remote::read_remote_file($host, $remote_file) };
 				next unless defined($content) && length($content);
@@ -1199,10 +1278,55 @@ sub _open :Protected
 						$dbh->func($table, 'XML', $slurp_file, 'xmlsimple_import');
 					}
 				} else {
+					my $json_file = File::Spec->catfile($dir, "$dbname.json");
+					if(-r $json_file) {
+						if((-s $json_file) == 0) {
+							$self->{'data'} = $self->{'no_entry'} ? undef : {};
+						} else {
+							require JSON::MaybeXS;
+
+							open(my $jfh, '<', $json_file);
+							local $/;
+							my $raw = <$jfh>;
+							close $jfh;
+							if(!defined($raw) || $raw =~ /\A\s*\z/) {
+								# Whitespace-only — treat as empty, same as zero-byte
+								$self->{'data'} = $self->{'no_entry'} ? undef : {};
+							} else {
+								my $parsed = JSON::MaybeXS::decode_json($raw);
+								my @data;
+								if(ref($parsed) eq 'ARRAY') {
+									@data = @{$parsed};
+								} elsif(ref($parsed) eq 'HASH') {
+									# Hash of id => row — inject id column into each row
+									my $id_col = $self->{'id'};
+									for my $k (sort keys %{$parsed}) {
+										my $row = $parsed->{$k};
+										if(ref($row) eq 'HASH') {
+											push @data, { $id_col => $k, %{$row} };
+										} else {
+											push @data, { $id_col => $k, value => $row };
+										}
+									}
+								} else {
+									Carp::croak(ref($self), ": JSON slurp: unexpected top-level structure in $json_file");
+								}
+								if($self->{'no_entry'}) {
+									$self->{'data'} = @data ? \@data : undef;
+								} else {
+									$self->{'data'} = { map { $_->{$self->{'id'}} => $_ } @data };
+								}
+							}
+						}
+						$slurp_file = $json_file;
+						$self->_debug("read in $table from JSON $json_file");
+						$self->{'type'} = 'JSON';
+					} else {
 					# throw Error(-file => "$dir/$table");
 					$self->_fatal("Can't find a file called '$dbname' for the table $table in $dir");
+					}
 				}
-				$self->{'type'} = 'XML';
+				$self->{'type'} //= 'XML';
 			}
 		}	# end: xlsx else (xml path)
 		}	# end: xls else
@@ -1316,6 +1440,16 @@ sub selectall_arrayref {
 				my $row = $_;
 				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}) } @param_keys
 			} values %{$self->{'data'}};
+			return set_return(\@rc, { type => 'arrayref' });
+		} elsif(ref($self->{'data'}) eq 'ARRAY' && !$self->{$table}) {
+			# In-memory scan for array-backed no_entry stores (JSON, XLSX, HTML URL)
+			# where there is no DBI handle.  Mirrors the equivalent path in count().
+			$self->_debug("$table: selectall_arrayref in-memory array scan with criteria");
+			my @param_keys = keys %{$params};
+			my @rc = grep {
+				my $row = $_;
+				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}) } @param_keys
+			} @{$self->{'data'}};
 			return set_return(\@rc, { type => 'arrayref' });
 		}
 	}
@@ -1457,6 +1591,15 @@ sub selectall_array
 				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}) } @param_keys
 			} values %{$self->{'data'}};
 			return @rc;
+		} elsif(ref($self->{'data'}) eq 'ARRAY' && !$self->{$table}) {
+			# In-memory scan for array-backed no_entry stores (JSON, XLSX, HTML URL)
+			# where there is no DBI handle.  Mirrors the equivalent path in count().
+			$self->_debug("$table: selectall_array in-memory array scan with criteria");
+			my @param_keys = keys %{$params};
+			return grep {
+				my $row = $_;
+				all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params->{$_}) } @param_keys
+			} @{$self->{'data'}};
 		}
 	}
 
@@ -2172,6 +2315,16 @@ sub AUTOLOAD {
 			# Handle both HASH (keyed data) and ARRAY (no_entry CSV slurp).
 			my @_rows = ref($data) eq 'ARRAY' ? @{$data} : values %{$data};
 			return map { exists($_->{$column}) ? $_->{$column} : undef } @_rows;
+		}
+		if($self->{'data'} && !$self->{$table} && !$self->_has_complex_criteria(\%params)) {
+			# Non-DBI backends (JSON, XLSX, HTML URL): scan in-memory data with criteria.
+			my @param_keys = keys %params;
+			my @_rows = ref($self->{'data'}) eq 'ARRAY' ? @{$self->{'data'}} : values %{$self->{'data'}};
+			return map { exists($_->{$column}) ? $_->{$column} : undef }
+			       grep {
+			           my $row = $_;
+			           all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $params{$_}) } @param_keys
+			       } @_rows;
 		}
 		my $id = $self->{'id'};
 		if(($self->{'type'} eq 'CSV') && !$self->{'no_entry'}) {
@@ -3062,6 +3215,8 @@ same criteria has already populated it.
 =item * L<Database::Abstraction::Query> - chained query builder
 
 =item * L<Configure an Object at Runtime|Object::Configure>
+
+=item * L<JSON::MaybeXS> - JSON backend (optional; install for C<.json> support)
 
 =item * L<Test Dashboard|https://nigelhorne.github.io/Database-Abstraction/coverage/>
 

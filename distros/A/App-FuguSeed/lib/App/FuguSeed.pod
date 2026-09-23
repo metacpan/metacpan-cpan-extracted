@@ -1,0 +1,59 @@
+=head1 NAME
+
+App::FuguSeed - make BIP39 seed words with dice, and turn them into a SeedQR
+
+=head1 SYNOPSIS
+
+    fuguseed-qr
+
+=head1 DESCRIPTION
+
+FuguSeed makes BIP39 seed words with three dice, on paper, and turns
+them into a Standard SeedQR. C<fuguseed-qr> reads the 12 words on
+standard input and prints the SeedQR as text, zone by zone, so a
+person can draw it on paper. It sees the words, so it runs on an
+air-gapped computer only. See L<fuguseed-qr(1)> for the input, the
+two results, and the exit codes.
+
+This is the lead module of the App-FuguSeed distribution. It holds no
+code of its own. The work is split by concern:
+
+=over 4
+
+=item L<App::FuguSeed::List>
+
+The 2048 words of the English BIP39 list, and their digest.
+
+=item L<App::FuguSeed::Mnemonic>
+
+The word check, the digit string, and the check word.
+
+=item L<App::FuguSeed::Codewords>
+
+The data codewords and the error correction codewords.
+
+=item L<App::FuguSeed::Matrix>
+
+The module grid of the code.
+
+=item L<App::FuguSeed::Text>
+
+The grid view and the zone views.
+
+=item L<App::FuguSeed::QR>
+
+The flow of C<fuguseed-qr>.
+
+=back
+
+The release ships C<fuguseed-qr> as one packed file that
+C<scripts/pack> builds from these modules. That file needs no install
+step and no module outside the base of perl.
+
+=head1 SEE ALSO
+
+L<fuguseed-qr(1)>
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>

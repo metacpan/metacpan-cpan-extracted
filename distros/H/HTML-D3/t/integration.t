@@ -323,14 +323,17 @@ subtest 'snippet methods produce page-shell-free fragments in all configurations
 };
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 8. encode_json called exactly once per render invocation (spy)
+# 8. JSON serialisation present in render output (behavioural contract)
 #
-# Every render method must serialise its data exactly once.  Calling encode_json
-# more than once per invocation would be redundant; calling it zero times would
-# mean the data is hardcoded or ignored.
+# Every render method must embed the input data as JSON in its output.
+# We verify that a known label ("January") and value (1000) from SIMPLE_DATA
+# appear in the rendered HTML, confirming the data was serialised and embedded.
+# We also check the output is a Perl character string (UTF-8 flag set), not a
+# byte string -- the previous encode_json() call returned octets, which caused
+# mojibake when callers embedded the result in a character-string context.
 # ─────────────────────────────────────────────────────────────────────────────
 
-subtest 'encode_json called exactly once per render, with correct data shape' => sub {
+subtest 'render methods embed JSON data and return character strings' => sub {
 	my $chart = HTML::D3->new();
 
 	for my $pair (
@@ -356,17 +359,20 @@ subtest 'encode_json called exactly once per render, with correct data shape' =>
 			sub { $chart->render_pie_chart_snippet(\@SIMPLE_DATA) }],
 	) {
 		my ($name, $code) = @$pair;
-		my $sp = spy('HTML::D3::encode_json');
-		$code->();
-		my @calls = $sp->();
-		is(scalar @calls, 1, "$name calls encode_json exactly once");
+		my $result = $code->();
 
-		# The first argument to encode_json (after the function name in the spy log)
-		# must be a reference -- either ARRAY (simple) or a blessed object.
-		my $arg = $calls[0][1];
-		ok(ref($arg), "$name passes a reference to encode_json (not a plain scalar)");
+		# Normalise: snippet methods return a hashref {html => ...}; others return a string.
+		my $html = ref($result) eq 'HASH' ? $result->{html} : $result;
 
-		diag("$name encode_json arg type: " . ref($arg)) if $ENV{TEST_VERBOSE};
+		like($html, qr/January/, "$name: output contains label from input data");
+		like($html, qr/1000|1,000/, "$name: output contains value from input data");
+
+		# The html must be a Perl character string so callers don't get mojibake
+		# when they concatenate it with other character-string content.
+		ok(utf8::is_utf8($html) || $html !~ /[^\x00-\x7f]/,
+			"$name: output is a character string or pure ASCII");
+
+		diag("$name output length: " . length($html)) if $ENV{TEST_VERBOSE};
 	}
 };
 

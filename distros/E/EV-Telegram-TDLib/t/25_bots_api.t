@@ -76,6 +76,9 @@ is $r->{'@type'}, 'editInlineMessageLiveLocation', 'edit_inline_location sends i
 is $r->{location}{'@type'}, 'liveLocation', 'the location is wrapped as a liveLocation';
 is $r->{location}{live_period}, 60, 'live period sits inside the wrapper';
 ok !exists $r->{live_period}, 'and not at the top level, where TDLib would drop it';
+$td->edit_inline_location('abc123', sub {});
+ok !defined last_req()->{location},
+    'edit_inline_location without location sends null location to stop sharing';
 
 # a parse failure reaches the caller instead of TDLib
 my $before = scalar @sent;
@@ -124,5 +127,16 @@ like last_json(), qr/"is_added":true/, 'is_added crosses as a JSON boolean';
 
 $err = do { local $@; eval { $td->press(undef, 55, 'x', sub {}) }; $@ };
 like $err, qr/required/, 'a missing chat id is refused';
+
+# --- every other list argument checks its element shape; this one did not,
+# so a plain string died inside the builder naming a line in the module
+{
+    my $err = '';
+    eval { $td->answer_inline_query('1', ['not a hashref'], sub {}); 1 }
+        or $err = $@;
+    like $err, qr/must be a hashref/, 'a non-hashref inline result croaks';
+    unlike $err, qr/Can't use string/,
+        'rather than dying inside the builder';
+}
 
 done_testing;

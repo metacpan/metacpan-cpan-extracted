@@ -19,6 +19,20 @@
 #include "XSUB.h"
 
 #include "pb_abi.h"
+#include <float.h>
+
+/* How the compiler that built this file evaluates a double between operations,
+ * as float.h says: 0 rounds every operation to a double, 2 is the x87 unit
+ * holding 80 bits, negative is a header that does not say. pb_engine.c is
+ * compiled with the same flags, so this is the engine's arithmetic too, and
+ * the tests that compare against recorded doubles skip on anything but 0. */
+static int pb_float_eval_method(void) {
+#ifdef FLT_EVAL_METHOD
+    return FLT_EVAL_METHOD;
+#else
+    return -1;
+#endif
+}
 
 /* A flat array of doubles from an array of arrays of `width` numbers. The
  * caller frees. Rows that are short are padded with zero, never read past. */
@@ -81,6 +95,7 @@ static const char *pb_error_name(int err) {
         case PB_ERR_SIZE: return "size";
         case PB_ERR_KIND: return "kind";
         case PB_ERR_TURNS: return "turns";
+        case PB_ERR_HORIZON: return "horizon";
         default: return "memory";
     }
 }
@@ -185,6 +200,23 @@ static SV *pb_outcome_sv(pTHX_ struct pb_outcome *out, int trace) {
         av_push(list, newRV_noinc((SV *) row));
     }
     (void) hv_stores(hv, "segments", newRV_noinc((SV *) segs));
+
+    /* ABI 4: the state at the horizon, only from an advance, so a strike's
+     * hash is what it was */
+    if (out->nstate > 0) {
+        AV *state = newAV();
+        for (i = 0; i < out->nstate; i++) {
+            row = newAV();
+            av_push(row, newSViv(out->state[i].id));
+            av_push(row, newSViv(out->state[i].x));
+            av_push(row, newSViv(out->state[i].y));
+            av_push(row, newSViv(out->state[i].vx));
+            av_push(row, newSViv(out->state[i].vy));
+            av_push(row, newSViv(out->state[i].mode));
+            av_push(state, newRV_noinc((SV *) row));
+        }
+        (void) hv_stores(hv, "state", newRV_noinc((SV *) state));
+    }
 
     if (trace) {
         energy = newAV();
@@ -332,6 +364,53 @@ _strike(ptr, layout, shot)
     OUTPUT:
         RETVAL
 
+# ABI 4: one advance. layout is [[id, x, y, kind, vx, vy], ...], the velocity
+# in hundredths of a millimetre a second (a row of three or four is
+# stationary); tick is {t, trace}, t the horizon in microseconds. Returns the
+# strike's hash plus `state`, [[id, x, y, vx, vy, mode], ...] at the horizon.
+SV *
+_advance(ptr, layout, tick)
+        UV ptr
+        AV *layout
+        HV *tick
+    PREINIT:
+        struct pb_world *w;
+        struct pb_ball_in3 *balls;
+        struct pb_tick tk;
+        struct pb_outcome *out;
+        AV *row;
+        int n, i;
+        SV **rp, **v;
+    CODE:
+        w = INT2PTR(struct pb_world *, ptr);
+        if (!w) croak("Physics::Balls::Engine: no world");
+        n = av_len(layout) + 1;
+        Newxz(balls, n ? n : 1, struct pb_ball_in3);
+        for (i = 0; i < n; i++) {
+            rp = av_fetch(layout, i, 0);
+            if (!rp || !SvROK(*rp) || SvTYPE(SvRV(*rp)) != SVt_PVAV) {
+                Safefree(balls);
+                croak("Physics::Balls::Engine: layout entry %d is not [id, x, y, kind, vx, vy]", i);
+            }
+            row = (AV *) SvRV(*rp);
+            v = av_fetch(row, 0, 0); balls[i].id = v ? (int) SvIV(*v) : 0;
+            v = av_fetch(row, 1, 0); balls[i].x = v ? (long) SvIV(*v) : 0;
+            v = av_fetch(row, 2, 0); balls[i].y = v ? (long) SvIV(*v) : 0;
+            v = av_fetch(row, 3, 0); balls[i].kind = v && SvOK(*v) ? (int) SvIV(*v) : 0;
+            v = av_fetch(row, 4, 0); balls[i].vx = v && SvOK(*v) ? (long) SvIV(*v) : 0;
+            v = av_fetch(row, 5, 0); balls[i].vy = v && SvOK(*v) ? (long) SvIV(*v) : 0;
+        }
+        memset(&tk, 0, sizeof tk);
+        tk.size = (unsigned int) sizeof tk;
+        tk.dt = (long) pb_num(aTHX_ tick, "t", 20000);
+        tk.trace = (int) pb_num(aTHX_ tick, "trace", 0);
+        out = pb_advance(w, n, (const struct pb_ball_in2 *) (const void *) balls, (int) sizeof(struct pb_ball_in3), &tk);
+        Safefree(balls);
+        if (!out) croak("Physics::Balls::Engine: could not allocate an outcome");
+        RETVAL = pb_outcome_sv(aTHX_ out, tk.trace);
+    OUTPUT:
+        RETVAL
+
 # The same shot through the ABI 1 entry point, rows of three, no kind and no
 # adjust: for the test that the v1 wrappers are the v2 path with the v1
 # defaults, bit for bit.
@@ -373,7 +452,8 @@ _strike_v1(ptr, layout, shot)
         RETVAL
 
 # A v2 struct whose size is smaller than this version needs is refused: the
-# world is not built, the strike returns the size error. For t/10.
+# world is not built, the strike returns the size error, and since ABI 4 so
+# does an advance with a short tick. For t/10 and t/13.
 IV
 _bad_size_refused(ptr)
         UV ptr
@@ -381,10 +461,17 @@ _bad_size_refused(ptr)
         struct pb_desc2 d;
         struct pb_shot2 s;
         struct pb_ball_in2 one;
+        struct pb_ball_in3 three;
+        struct pb_tick tk;
         struct pb_world *w;
         struct pb_outcome *out;
         int refused = 0;
     CODE:
+        memset(&tk, 0, sizeof tk);
+        tk.size = 1; tk.dt = 20000;
+        three.id = 0; three.x = 0; three.y = 0; three.kind = 0; three.vx = 0; three.vy = 0;
+        out = pb_advance(INT2PTR(struct pb_world *, ptr), 1, (const struct pb_ball_in2 *) (const void *) &three, (int) sizeof three, &tk);
+        if (out) { if (out->error == PB_ERR_SIZE) refused++; pb_outcome_free(out); }
         memset(&d, 0, sizeof d);
         d.size = 1;
         d.base.L = 1; d.base.W = 1; d.base.R = 0.01; d.base.g = 9.81; d.base.vmax = 1;
@@ -397,7 +484,7 @@ _bad_size_refused(ptr)
         one.id = 0; one.x = 0; one.y = 0; one.kind = 0;
         out = pb_strike_ex(INT2PTR(struct pb_world *, ptr), 1, &one, (int) sizeof one, &s);
         if (out) { if (out->error == PB_ERR_SIZE) refused++; pb_outcome_free(out); }
-        RETVAL = refused == 2;
+        RETVAL = refused == 3;
     OUTPUT:
         RETVAL
 
@@ -412,5 +499,12 @@ IV
 _abi_version()
     CODE:
         RETVAL = PB_ABI_VERSION;
+    OUTPUT:
+        RETVAL
+
+IV
+_float_eval_method()
+    CODE:
+        RETVAL = pb_float_eval_method();
     OUTPUT:
         RETVAL

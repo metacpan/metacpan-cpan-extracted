@@ -1,0 +1,67 @@
+=head1 NAME
+
+App::FuguSeed::Check - prove that a word sheet is correct
+
+=head1 SYNOPSIS
+
+    use App::FuguSeed::Check;
+
+    my @defects = App::FuguSeed::Check->defects($sheet, $list, $style);
+
+=head1 DESCRIPTION
+
+App::FuguSeed::Check proves one built word sheet against one word list.
+It loads no builder module, so a defect of the builder cannot hide in
+the checker. It holds its own copy of the grammar of the sheet, and the
+tests hold the two copies to each other on each run.
+
+The check consumes the sheet as one strict grammar, from the first byte
+to the last. Every byte belongs to a literal of the grammar, to one of
+the 2048 cells, or to the digest and the date of a footer. A byte that
+the grammar does not expect ends the walk, and the defect names the
+offset of that byte. An attribute, a script, a comment, an entity, and
+a byte outside printable ASCII are therefore defects, and no rule of
+them needs a pattern of its own.
+
+The check compares the inlined style sheet with
+F<share/fuguseed/sheet.css> byte for byte, because a style rule can
+reverse or hide a row on paper while the text order stays correct.
+
+After a complete walk, the check holds each of the 2048 cells to the
+word of its position, it holds each word to one appearance, and it
+holds each footer to the digest of the list file and to one build date.
+
+Every method is a class method.
+
+=head2 defects
+
+C<defects($sheet, $list, $style)> returns each defect of the sheet
+C<$sheet> as one line. C<$list> is the list of
+App::FuguSeed::ListFile, and C<$style> is the text of
+F<share/fuguseed/sheet.css>.
+
+A defect line names a byte offset, or the block, the row, and the
+column of a cell, or the side of a footer. A line holds no line feed,
+and a byte outside printable ASCII reads as its hexadecimal value.
+
+=head1 RETURN VALUES
+
+C<defects()> returns an empty list for a correct sheet, and one string
+for each defect otherwise.
+
+=head1 ERRORS
+
+The method makes no system call and it dies on no input. A sheet of any
+bytes gives a defect list, because the grammar accepts no byte that it
+does not expect.
+
+=head1 SEE ALSO
+
+L<App::FuguSeed::Sheet>, which builds a sheet, and
+L<App::FuguSeed::ListFile>, which reads the list.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

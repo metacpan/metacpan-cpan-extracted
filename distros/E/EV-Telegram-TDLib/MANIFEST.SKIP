@@ -13,6 +13,8 @@
 ^EV-Telegram-TDLib-
 ^MANIFEST\.bak$
 ^t/tmp-
+^tdlib-db/
+^tdlib-bot-db/
 ^\.git
 ^\.github/
 ^\.claude/

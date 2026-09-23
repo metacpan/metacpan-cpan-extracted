@@ -91,7 +91,7 @@ my %req = (
     $shut_w->stop;
     ok $shut_done, 'the raw client closed before exit';
 
-    EV::Telegram::TDLib::_set_dispatch(\&EV::Telegram::TDLib::_dispatch_raw);
+    EV::Telegram::TDLib::_set_dispatch(\&EV::Telegram::TDLib::dispatch_raw);
 }
 
 # --- receive decode contract: octets in, characters out
@@ -104,13 +104,13 @@ my %req = (
         database_directory => 't/tmp-utf8',
         on_message => sub { push @msgs, $_[0] },
     );
-    $td->_inject_raw(
+    $td->inject_raw(
         '{"@type":"updateNewMessage","message":{"@type":"message","id":1,"chat_id":1,'
         . '"content":{"@type":"messageText","text":{"@type":"formattedText","text":"'
         . $oct . '"}}}}'
     );
     is scalar(@msgs), 1, 'update delivered';
-    check_text($msgs[0]{content}{text}{text}, '_inject_raw decode');
+    check_text($msgs[0]{content}{text}{text}, 'inject_raw decode');
 
     # injecting the closed update makes the module forget this client, but
     # TDLib still holds the real one, and the END-block shutdown only closes
@@ -128,10 +128,10 @@ my %req = (
     my $w = EV::timer 15, 0, sub { $late = 1; EV::break };
     EV::run(EV::RUN_ONCE) while !$shut && !$late;
     $w->stop;
-    EV::Telegram::TDLib::_set_dispatch(\&EV::Telegram::TDLib::_dispatch_raw);
+    EV::Telegram::TDLib::_set_dispatch(\&EV::Telegram::TDLib::dispatch_raw);
     ok $shut, 'the object client closed for real before exit';
 
-    $td->_inject_raw('{"@type":"updateAuthorizationState","authorization_state":{"@type":"authorizationStateClosed"}}');
+    $td->inject_raw('{"@type":"updateAuthorizationState","authorization_state":{"@type":"authorizationStateClosed"}}');
 }
 
 done_testing;

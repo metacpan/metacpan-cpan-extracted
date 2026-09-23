@@ -1,0 +1,54 @@
+=head1 NAME
+
+App::FuguSeed::ListFile - read a word list file and prove its digest
+
+=head1 SYNOPSIS
+
+    use App::FuguSeed::ListFile;
+
+    my $list = App::FuguSeed::ListFile->read($path);
+    my @words  = @{ $list->{words} };
+    my $digest = $list->{digest};
+
+=head1 DESCRIPTION
+
+App::FuguSeed::ListFile is the one reader of a word list file. Both
+verbs of C<fuguseed-words> take such a file, and each one reads it
+through this module.
+
+The module computes the SHA-256 of the bytes of the file and refuses
+every digest but the one that App::FuguSeed::List pins. That digest
+proves the whole file, so the module makes no other check: the source
+list holds 2048 lines, and each line holds one word and one line feed.
+
+Every method is a class method. The module keeps no state.
+
+=head2 read
+
+C<read($path)> reads the word list file C<$path>. The result is a hash
+reference with the 2048 words under C<words>, in list order, and the
+SHA-256 of the file as lower-case hex under C<digest>.
+
+=head1 RETURN VALUES
+
+C<read()> returns C<undef> for a file that it cannot read, and for a
+file with another digest than the source list. It reports the reason
+through the default logger of C<Fugu::Log>.
+
+=head1 ERRORS
+
+A file that no directory holds, and a file that the process cannot
+open, are recoverable errors. A list with another digest is one too:
+the caller prints no sheet and gives the failure exit code.
+
+=head1 SEE ALSO
+
+L<App::FuguSeed::List>, which pins the digest of the source list, and
+F<share/fuguseed/english.txt>, the copy that ships with the
+distribution.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

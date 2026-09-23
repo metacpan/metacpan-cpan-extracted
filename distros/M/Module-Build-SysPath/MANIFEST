@@ -1,3 +1,4 @@
+AGENTS.md
 Build.PL
 Changes
 examples/Sys-Path-Example1/.gitignore
@@ -10,7 +11,6 @@ examples/Sys-Path-Example1/etc/project/blah2.txt
 examples/Sys-Path-Example1/lib/Sys/Path/Example1.pm
 examples/Sys-Path-Example1/lib/Sys/Path/Example1/SPc.pm
 examples/Sys-Path-Example1/MANIFEST
-examples/Sys-Path-Example1/README
 examples/Sys-Path-Example1/share/sys-path-example1/.hidden/file
 examples/Sys-Path-Example1/share/sys-path-example1/.hidden2/test
 examples/Sys-Path-Example1/share/sys-path-example1/.hidden3
@@ -28,6 +28,10 @@ META.yml
 README
 t/00_compile.t
 t/01_Module-Build-SysPath.t
+t/02_path-handling.t
+t/03-spc-rewrite.t
+t/04-install-failure-detection.t
+t/lib/PostCopyFailure.pm
 t/lib/Sys/Path/SPc.pm
 t/tdirs/Acme-Test-SysPath.installed/etc/acme-test-syspath.cfg
 t/tdirs/Acme-Test-SysPath.installed/srv/srv.file
@@ -47,7 +51,6 @@ t/tdirs/Acme-Test-SysPath/lock/acme-lock/.exists
 t/tdirs/Acme-Test-SysPath/log/acme-log/.exists
 t/tdirs/Acme-Test-SysPath/MANIFEST
 t/tdirs/Acme-Test-SysPath/MANIFEST.SKIP
-t/tdirs/Acme-Test-SysPath/META.yml
 t/tdirs/Acme-Test-SysPath/run/acme-run/.exists
 t/tdirs/Acme-Test-SysPath/share/share
 t/tdirs/Acme-Test-SysPath/spool/acme-spool/.exists

@@ -840,6 +840,11 @@ SKIP: {
 	is($mirror->url('miniroot78.img'),
 	    'https://cdn.openbsd.org/pub/OpenBSD/7.8/arm64/miniroot78.img',
 	    '_mirror builds over the configured version and architecture');
+
+	# The mirror reports the fetch line of GST-MIRROR-5 through the
+	# logger of the guest, so --quiet reaches that line. A mirror
+	# without the argument would hold the process default instead.
+	is($mirror->{log}, $vm->{log}, 'and it passes the logger of the guest');
 }
 
 done_testing();

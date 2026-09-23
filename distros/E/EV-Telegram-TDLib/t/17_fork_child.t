@@ -12,7 +12,11 @@ my $id = EV::Telegram::TDLib::_create_client_id();
 ok $id > 0, 'client created in the parent';
 
 # the OO layer holds one loop ref per open client; take it by hand here,
-# since this test drives the XS layer directly
+# since this test drives the XS layer directly.
+# Two, not one: only the first takes an actual ev_ref, so a fork handler
+# that gave one back per client would leave the child's loop short, and
+# with a single ref the arithmetic happens to come out right anyway
+EV::Telegram::TDLib::_pump_ref();
 EV::Telegram::TDLib::_pump_ref();
 
 # deliberately never closed and the loop deliberately never run: a pending
@@ -26,11 +30,17 @@ my $pid = fork;
 defined $pid or die "fork: $!";
 if (!$pid) {
     alarm 10;
-    my $t = EV::timer 0.2, 0, sub { };
+    my $fired = 0;
+    # the loop never ran in this process, so ev_now is from before the sleep
+    # above: armed from it the timer was already due, fired on the first
+    # iteration, and passed whether or not the loop was a ref short
+    EV::now_update();
+    my $t = EV::timer 0.2, 0, sub { $fired = 1 };
     # the inherited pump ref and a pending async firing td_drain must not
-    # hang a child that runs the loop for its own work
+    # hang a child that runs the loop for its own work -- nor make the loop
+    # fall straight through, which is what an over-generous unref does
     EV::run;
-    POSIX::_exit(0);
+    POSIX::_exit($fired ? 0 : 3);
 }
 
 my $status;
@@ -88,7 +98,7 @@ SKIP: {
     my $w = EV::timer 15, 0, sub { $late = 1; EV::break };
     EV::run(EV::RUN_ONCE) while !$shut && !$late;
     $w->stop;
-    EV::Telegram::TDLib::_set_dispatch(\&EV::Telegram::TDLib::_dispatch_raw);
+    EV::Telegram::TDLib::_set_dispatch(\&EV::Telegram::TDLib::dispatch_raw);
     ok $shut, 'the raw client closed before exit';
 }
 

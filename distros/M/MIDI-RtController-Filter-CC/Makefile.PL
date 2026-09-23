@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "Moo" => 2,
     "Types::Common::Numeric" => 0,
     "Types::MIDI" => 0,
+    "Types::Standard" => 0,
     "constant" => 0,
     "curry" => 0,
     "namespace::clean" => 0,
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.1303",
+  "VERSION" => "0.1406",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,6 +61,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.88",
   "Types::Common::Numeric" => 0,
   "Types::MIDI" => 0,
+  "Types::Standard" => 0,
   "constant" => 0,
   "curry" => 0,
   "namespace::clean" => 0,

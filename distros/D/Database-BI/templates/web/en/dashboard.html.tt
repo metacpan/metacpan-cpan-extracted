@@ -64,6 +64,8 @@
     [%- END -%]
   </span>
   <a class="btn-clear-filters" id="btn-clear-filters" href="#">&#x2715; Clear filters</a>
+  <button class="btn-copy-link" id="btn-copy-link" type="button"
+          title="Copy the current URL to the clipboard so you can bookmark or share this filtered view">&#x1F517; Copy link</button>
   [%- END -%]
   [%- IF left_spec -%]
   <button class="btn-export-open" id="btn-export-open" type="button">&#x2193; Export&hellip;</button>
@@ -75,6 +77,8 @@
           title="Plot the current data as a line chart - choose the X and Y axes">&#x1F4C8; Line graph&hellip;</button>
   <button class="btn-pie" id="btn-pie" type="button"
           title="Plot the current data as a pie chart - choose the category and value columns">&#x25D4; Pie chart&hellip;</button>
+  <button class="btn-heatmap" id="btn-heatmap" type="button"
+          title="Plot the current data as a heatmap - choose two categorical columns and an optional value column">&#x229F; Heatmap&hellip;</button>
   [%- END -%]
   <button class="btn-dedup[% IF dedup %] btn-dedup--active[% END %]" id="btn-dedup" type="button"
           title="Remove duplicate rows from the view and from any export">[% IF dedup %]Show duplicates[% ELSE %]Hide duplicates[% END %]</button>
@@ -148,7 +152,7 @@
      data-current-label="[% title | html %]"
      hidden>
   <script>window.__biFilters = [% filters_json %];</script>
-  <form id="join-form" method="get" action="/join">
+  <form id="join-form" method="get" action="/join" novalidate>
     <input type="hidden" name="l" value="[% left_spec | html %]">
     [%- FOREACH jspec IN current_joins -%]
     <input type="hidden" name="j" value="[% jspec | html %]">
@@ -174,8 +178,18 @@
 
       <div class="join-field">
         <label for="right-path-inp">File path <span style="font-weight:400;color:#999;font-size:.78rem;">(browser or drag &amp; drop)</span></label>
-        <input type="text" id="right-path-inp" placeholder="/path/to/file.csv"
-               autocomplete="off" spellcheck="false">
+        <div class="with-tooltip">
+          <input type="text" id="right-path-inp" placeholder="/path/to/file.csv"
+                 autocomplete="off" spellcheck="false">
+          <div class="tip-box" role="tooltip">
+            Enter an absolute path to a local file, or use the remote
+            syntax to open a file via SSH:<br><br>
+            <code>/../hostname/dir/file.csv</code><br>
+            <code>/../user@hostname/dir/file.csv</code><br><br>
+            Accepted: CSV, TSV, PSV, XLSX, SQLite (.sql / .sqlite /
+            .sqlite3), Berkeley DB (.db), XML.
+          </div>
+        </div>
       </div>
 
       <div class="join-field">
@@ -214,7 +228,7 @@
 </div>
 
 <div class="combine-panel" id="combine-panel" hidden>
-  <form id="combine-form" method="get" action="/combine">
+  <form id="combine-form" method="get" action="/combine" novalidate>
     <input type="hidden" name="l" value="[% left_spec | html %]">
     [%- FOREACH cspec IN combine_specs -%]
     <input type="hidden" name="c" value="[% cspec | html %]">
@@ -245,8 +259,18 @@
 
       <div class="join-field">
         <label for="combine-path-inp">File path <span style="font-weight:400;color:#999;font-size:.78rem;">(browse or drag &amp; drop)</span></label>
-        <input type="text" id="combine-path-inp" placeholder="/path/to/file.csv"
-               autocomplete="off" spellcheck="false">
+        <div class="with-tooltip">
+          <input type="text" id="combine-path-inp" placeholder="/path/to/file.csv"
+                 autocomplete="off" spellcheck="false">
+          <div class="tip-box" role="tooltip">
+            Enter an absolute path to a local file, or use the remote
+            syntax to open a file via SSH:<br><br>
+            <code>/../hostname/dir/file.csv</code><br>
+            <code>/../user@hostname/dir/file.csv</code><br><br>
+            Accepted: CSV, TSV, PSV, XLSX, SQLite (.sql / .sqlite /
+            .sqlite3), Berkeley DB (.db), XML.
+          </div>
+        </div>
       </div>
     </div>
 
@@ -358,6 +382,74 @@
         <div class="graph-btn-row">
           <button type="submit" id="btn-do-pie" class="btn-primary" disabled>Plot</button>
           <button type="button" id="btn-cancel-pie" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="graph-panel" id="heatmap-panel" hidden>
+  <form id="heatmap-form" method="get" action="/heatmap">
+    <input type="hidden" name="l" value="[% left_spec | html %]">
+    [%- FOREACH jspec IN current_joins -%]
+    <input type="hidden" name="j" value="[% jspec | html %]">
+    [%- END -%]
+    [%- FOREACH fs IN filter_specs -%]
+    <input type="hidden" name="f" value="[% fs | html %]">
+    [%- END -%]
+    [%- IF dedup -%]
+    <input type="hidden" name="d" value="1">
+    [%- END -%]
+    <input type="hidden" name="back" id="heatmap-back-inp" value="">
+
+    <h3 class="graph-panel-title">&#x229F; Heatmap</h3>
+
+    <p class="graph-panel-desc">Choose two categorical columns for the axes. Optionally pick a numeric column to sum per cell; leave it on "Count rows" to show how many rows fall in each cell.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="heatmap-x-sel">X axis (columns)</label>
+        <select id="heatmap-x-sel" name="x" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="heatmap-y-sel">Y axis (rows)</label>
+        <select id="heatmap-y-sel" name="y" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="heatmap-val-sel">Value (cell colour)</label>
+        <select id="heatmap-val-sel" name="val">
+          <option value="" style="font-weight:bold">Count (rows)</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="heatmap-scheme-sel">Colour scheme</label>
+        <select id="heatmap-scheme-sel" name="scheme">
+          <option value="YlOrRd">Yellow-Orange-Red</option>
+          <option value="Blues">Blues</option>
+          <option value="Greens">Greens</option>
+          <option value="Purples">Purples</option>
+          <option value="RdPu">Red-Purple</option>
+          <option value="YlGnBu">Yellow-Green-Blue</option>
+        </select>
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-heatmap" class="btn-primary" disabled>Plot</button>
+          <button type="button" id="btn-cancel-heatmap" class="btn-secondary">Cancel</button>
         </div>
       </div>
     </div>
@@ -1123,6 +1215,43 @@ function parseAccounting(v) {
   btn.addEventListener('click', function () { location.reload(); });
 }());
 
+// Copy-link button — copies the current URL (including all ?f= params) to the clipboard
+// ---------------------------------------------------------------------------
+(function () {
+  var btn = document.getElementById('btn-copy-link');
+  if (!btn) return;
+  btn.addEventListener('click', function () {
+    var url = location.href;
+    // navigator.clipboard is available only in secure contexts (HTTPS or localhost).
+    // Fall back to the legacy execCommand path for plain HTTP deployments.
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function () { showCopied(); }, function () { fallbackCopy(url); });
+    } else {
+      fallbackCopy(url);
+    }
+    function fallbackCopy(text) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+      document.body.removeChild(ta);
+      showCopied();
+    }
+    function showCopied() {
+      var orig = btn.innerHTML;
+      btn.innerHTML = '&#x2714; Copied!';
+      btn.classList.add('btn-copy-link--copied');
+      setTimeout(function () {
+        btn.innerHTML = orig;
+        btn.classList.remove('btn-copy-link--copied');
+      }, 2000);
+    }
+  });
+}());
+
 // Filter bar - per-chip remove and apply-new-filter
 // ---------------------------------------------------------------------------
 (function () {
@@ -1454,6 +1583,73 @@ function parseAccounting(v) {
 
   catSel.addEventListener('change', checkPie);
   valSel.addEventListener('change', checkPie);
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Heatmap panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-heatmap');
+  var panel     = document.getElementById('heatmap-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel = document.getElementById('btn-cancel-heatmap');
+  var btnDo     = document.getElementById('btn-do-heatmap');
+  var xSel      = document.getElementById('heatmap-x-sel');
+  var ySel      = document.getElementById('heatmap-y-sel');
+  var backInp   = document.getElementById('heatmap-back-inp');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  // Rebuild val select to show only numeric columns (plus the Count placeholder).
+  function buildHeatmapValSelect() {
+    var valSel = document.getElementById('heatmap-val-sel');
+    if (!valSel) return;
+    var tbl  = document.querySelector('table[data-table]') || document.querySelector('table');
+    if (!tbl || !tbl.tHead || !tbl.tBodies[0]) return;
+    var headers = Array.from(tbl.tHead.rows[0].cells);
+    var rows    = Array.from(tbl.tBodies[0].rows);
+    var prev    = valSel.value;
+    while (valSel.options.length > 1) valSel.remove(1);
+    headers.forEach(function (th, idx) {
+      var name = th.textContent.trim();
+      var vals = rows.map(function (r) {
+        return r.cells[idx] ? r.cells[idx].textContent.trim() : '';
+      }).filter(function (v) { return v !== ''; });
+      if (vals.length === 0) return;
+      if (vals.every(function (v) {
+        return /^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v);
+      })) return;
+      if (!vals.every(function (v) { return !isNaN(parseAccounting(v)); })) return;
+      var opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      if (name === prev) opt.selected = true;
+      valSel.appendChild(opt);
+    });
+  }
+
+  function checkHeatmap() {
+    btnDo.disabled = !(xSel.value && ySel.value);
+  }
+
+  btnOpen.addEventListener('click', function () {
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    backInp.value = window.location.href;
+    buildHeatmapValSelect();
+    panel.hidden = !panel.hidden;
+    checkHeatmap();
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  xSel.addEventListener('change', checkHeatmap);
+  ySel.addEventListener('change', checkHeatmap);
 }());
 </script>
 

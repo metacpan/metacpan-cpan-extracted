@@ -1,3 +1,15 @@
+5.519	  2026-09-22  Dianne Skoll <dianne@skoll.ca>
+
+	* VERSION 5.519 RELEASED
+
+	* Some (buggy) software creates base64-encoded parts as a
+	  concatenation of multiple base64-encoded streams, and some client
+	  software decodes each stream separately and concatenates the
+	  results.  Duplicate this behavior in MIME::tools to prevent it
+	  from being used as a mechanism to sneak dangerous content past a
+	  security scanner.  Patch courtesy of Giorgio Premi
+	  <giosh94mhz@gmail.com>.
+
 5.518	  2026-08-26  Dianne Skoll <dianne@skoll.ca>
 
 	* VERSION 5.518 RELEASED

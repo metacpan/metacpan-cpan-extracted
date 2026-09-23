@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Control-change based RtController filters
 
-our $VERSION = '0.1303';
+our $VERSION = '0.1406';
 
 use v5.36;
 
@@ -16,10 +16,11 @@ use Iterator::Breathe ();
 use Moo;
 use Types::MIDI qw(Velocity);
 use Types::Common::Numeric qw(PositiveNum);
+use Types::Standard qw(Maybe Int);
 use namespace::clean;
 
 use constant KNOWN_FILTERS => qw(
-    single clock_it breathe scatter stair_step ramp_up ramp_down flicker threshold
+    single clock_it breathe scatter stair_step ramp_up ramp_down flicker threshold program_change remap
 );
 
 extends 'MIDI::RtController::Filter';
@@ -34,28 +35,28 @@ has control => (
 
 has initial_point => (
     is      => 'rw',
-    isa     => Velocity, # no CC# msg value in Types::MIDI yet
+    isa     => Velocity,
     default => 0,
 );
 
 
 has range_bottom => (
     is      => 'rw',
-    isa     => Velocity, # no CC# msg value in Types::MIDI yet
+    isa     => Velocity,
     default => 0,
 );
 
 
 has range_top => (
     is      => 'rw',
-    isa     => Velocity, # no CC# msg value in Types::MIDI yet
+    isa     => Velocity,
     default => 127,
 );
 
 
 has range_step => (
     is      => 'rw',
-    isa     => Velocity, # no CC# msg value in Types::MIDI yet
+    isa     => Velocity,
     default => 1,
 );
 
@@ -69,14 +70,14 @@ has time_step => (
 
 has step_up => (
     is      => 'rw',
-    isa     => Velocity, # no CC# in Types::MIDI yet
+    isa     => Velocity,
     default => 2,
 );
 
 
 has step_down => (
     is      => 'rw',
-    isa     => Velocity, # no CC# in Types::MIDI yet
+    isa     => Velocity,
     default => 1,
 );
 
@@ -119,6 +120,8 @@ sub single ($self, $device, $dt, $event) {
 sub clock_it ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
+    my ($ev, $chan) = $event->@*;
+
     $self->running(1);
 
     $self->rtc->send_it(['start']);
@@ -150,6 +153,7 @@ sub breathe ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
+
     return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
     return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
@@ -189,6 +193,7 @@ sub scatter ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
+
     return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
     return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
@@ -225,6 +230,7 @@ sub stair_step ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
+
     return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
     return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
@@ -281,6 +287,7 @@ sub ramp_up ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
+
     return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
     return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
@@ -326,6 +333,7 @@ sub ramp_down ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
+
     return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
     return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
@@ -371,6 +379,7 @@ sub flicker ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
+
     return 0 if defined $self->trigger && defined $note && $note != $self->trigger;
     return 0 if defined $self->value   && defined $val  && $val  != $self->value;
 
@@ -407,6 +416,7 @@ sub threshold ($self, $device, $dt, $event) {
     return 0 if $self->running;
 
     my ($ev, $chan, $note, $val) = $event->@*;
+
     return 0 unless defined $self->trigger && defined $val;
 
     my $above_only = $self->step_up   && !$self->step_down;
@@ -420,7 +430,23 @@ sub threshold ($self, $device, $dt, $event) {
     }
 
     say "Sending $note" if $self->verbose;
-    return 0; # allow: let MIDI::RtController's own fallback send_it forward it once
+    my $msg = [ $ev, $self->channel, $note, $val ];
+    $self->rtc->send_it($msg);
+
+    return $self->continue;
+}
+
+
+sub program_change ($self, $device, $dt, $event) {
+    my ($ev, $chan) = $event->@*;
+
+    return 0 unless defined $self->trigger;
+
+    my $program = $self->trigger;
+
+    $self->rtc->send_it([ 'patch_change', $self->channel, $program ]);
+
+    return $self->continue;
 }
 
 1;
@@ -437,11 +463,10 @@ MIDI::RtController::Filter::CC - Control-change based RtController filters
 
 =head1 VERSION
 
-version 0.1303
+version 0.1406
 
 =head1 SYNOPSIS
 
-  use curry;
   use MIDI::RtController ();
   use MIDI::RtController::Filter::CC ();
 
@@ -465,8 +490,8 @@ version 0.1303
 
 =head1 DESCRIPTION
 
-C<MIDI::RtController::Filter::CC> is a (growing) collection of
-control-change based L<MIDI::RtController> filters.
+C<MIDI::RtController::Filter::CC> is a (growing) collection of MIDI
+L<MIDI::RtController> filters.
 
 =head1 ATTRIBUTES
 
@@ -475,8 +500,7 @@ control-change based L<MIDI::RtController> filters.
   $control = $filter->control;
   $filter->control($number);
 
-Return or set the control change number between C<0> and C<127> that
-is the parameter to be controlled.
+Return or set the control change number between C<0> and C<127>.
 
 Default: C<1> (mod-wheel)
 
@@ -701,6 +725,13 @@ threshold, specified by the L</trigger>. If only notes I<above> are
 allowed, set the L</step_up> attribute to C<1> and set the
 L</step_down> attribute to C<0>. For notes I<below> allowed, swap
 these step attribute settings.
+
+=head2 program_change
+
+  $control->add_filter('program_change', all => $filter->curry::program_change);
+
+This filter handles MIDI program/patch change messages over the
+configured MIDI B<channel> with the B<trigger>.
 
 =head1 SEE ALSO
 

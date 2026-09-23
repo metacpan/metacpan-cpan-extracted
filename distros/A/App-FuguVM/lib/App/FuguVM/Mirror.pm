@@ -18,19 +18,25 @@
 use v5.36;
 
 package App::FuguVM::Mirror;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
+use File::Temp ();
+use Fugu::Curl 0.5.0;
 use Fugu::File;
 use Fugu::Log;
-use Fugu::Process;
-use Fugu::Signify;
+use Fugu::Signify 0.5.0;
 
 # App::FuguVM::Mirror - the OpenBSD mirror of one guest.
 #
 # The module is the one home of the mirror facts: the host, the URLs
-# of a version and an architecture, the download helper, the release
-# key, and the verification. Fugu::Signify proves the signed SHA256
-# manifest, and this module decides which manifest signs which file.
+# of a version and an architecture, the downloader, the release key,
+# and the verification. Fugu::Curl downloads each file, Fugu::Signify
+# proves the signed SHA256 manifest, and this module decides which
+# manifest signs which file.
+# The proof runs under the signify engine of that module. A release
+# of OpenBSD signs its SHA256 in the embedded form, which the perl
+# engine of Fugu::Signify does not read, so the command makes the
+# proof.
 #
 # A file must verify before it enters the cache, because the cache is
 # what a later run reads. A verification failure therefore leaves no
@@ -46,6 +52,12 @@ use constant { CDN_HOST => 'cdn.openbsd.org', };
 # is a trust decision, so a human adds each file.
 use constant { KEYS_SHARE_DIR => 'share/fuguvm/signify', };
 
+# The whole-fetch bound of one download, in seconds. A set file of
+# OpenBSD is hundreds of megabytes, and the default of Fugu::Curl is
+# too short for it. A stalled connection must not hold the tool
+# forever.
+use constant { FETCH_TIMEOUT => 3600, };
+
 # $class->new(%args):
 #	Build the mirror of one version and one architecture.
 #
@@ -55,9 +67,18 @@ use constant { KEYS_SHARE_DIR => 'share/fuguvm/signify', };
 #		arch     => 'arm64' # Required: the architecture name
 #		keys_dir => $dir    # Optional: the signify_dir directive
 #		verify   => 1       # Optional: the default is 1
+#		log      => $log    # Optional: Fugu::Log->default
 #
 #	The method dies when cache, version or arch is absent. Each
 #	one is a programming error.
+#
+#	The method builds the one downloader of the mirror. Fugu::Curl
+#	resolves its command in its own constructor, and it runs no
+#	process there, so one mirror resolves the command one time.
+#
+#	The method makes no file and no directory, so it fails for a
+#	programming error alone. The first fetch makes the private
+#	download directory of the mirror.
 sub new ( $class, %args )
 {
 	for my $required (qw(cache version arch)) {
@@ -71,6 +92,9 @@ sub new ( $class, %args )
 		arch     => $args{arch},
 		keys_dir => $args{keys_dir},
 		verify   => $args{verify} // 1,
+		log      => $args{log}    // Fugu::Log->default,
+		download => Fugu::Curl->new( timeout => FETCH_TIMEOUT ),
+		tmpdir   => undef,
 		manifest => {},
 		error    => undef,
 	}, $class;
@@ -144,38 +168,75 @@ sub key_path ($self)
 	return;
 }
 
+# $self->_tmpdir:
+#	The private download directory of the mirror, at mode 0700.
+#	The method makes it on the first call, and it holds the
+#	directory for the life of the mirror. It returns undef with
+#	the reason in error when the host refuses the directory.
+#
+#	Fugu::Curl writes a sibling file next to its destination, with
+#	a name that another process can guess, and it opens that file
+#	without O_EXCL. A download in the shared temporary directory
+#	therefore takes a file that another user made first.
+#
+#	File::Temp->newdir croaks when the temporary directory of the
+#	host is absent or unwritable. That is an environment failure,
+#	and the eval below catches the death of the library. A caller
+#	then reads the reason in error, as it reads every other
+#	failure of fetch.
+sub _tmpdir ($self)
+{
+	return $self->{tmpdir} if defined $self->{tmpdir};
+
+	my $dir = eval { File::Temp->newdir };
+	if ( !defined $dir ) {
+		my $reason = $@ || 'unknown reason';
+		$reason =~ s/\s+\z//;
+		$self->{error} = "cannot make a download directory: $reason";
+		return;
+	}
+
+	$self->{tmpdir} = $dir;
+
+	return $dir;
+}
+
 # $self->fetch($url):
-#	Download the URL to a temporary file with the scripts/ftp
-#	helper. Return the File::Temp object, or undef with the reason
-#	in error. This method is the one home of the helper call.
+#	Download the URL to a temporary file of the private download
+#	directory, through the downloader of the mirror. Return the
+#	File::Temp object, or undef with the reason in error. This
+#	method is the one home of the download call.
+#
+#	A caller must read filename of the object, and must never read
+#	the object as a filehandle. Fugu::Curl renames its own file
+#	onto the path, so the filehandle of the object holds the old
+#	inode.
+#
+#	The method reports the error of the downloader as it stands.
+#	That error names the URL after a failed fetch, and it names no
+#	URL when the constructor of the downloader found no command.
 sub fetch ( $self, $url )
 {
 	$self->{error} = undef;
 
-	my $ftp = Fugu::File->share_path(
-		'scripts/ftp',
-		from => __FILE__,
-		dist => 'App-FuguVM'
-	);
-	if ( !defined $ftp ) {
-		$self->{error} = 'cannot find the ftp helper';
+	my $download = $self->{download};
+	if ( !$download->is_available ) {
+		$self->{error} = $download->error;
 		return;
 	}
 
-	require File::Temp;
-	my $tmp = File::Temp->new;
+	my $tmpdir = $self->_tmpdir;
+	return if !defined $tmpdir;
 
-	# The helper writes its progress as it goes, and a download of
-	# a hundred megabytes is a wait that an operator wants to see.
-	# sh runs the helper: an installed share tree does not keep the
-	# exec bit.
-	my $result = Fugu::Process->run(
-		cmd         => [ 'sh', $ftp, $tmp->filename, $url ],
-		passthrough => 1,
-	);
-	if ( !$result->{success} ) {
-		$self->{error} = "download failed: $url ("
-		    . ( $result->{error} // "exit $result->{exit_code}" ) . ')';
+	my $tmp = File::Temp->new( DIR => $tmpdir );
+
+	# The downloader writes no progress, and a download of a
+	# hundred megabytes is a wait that an operator wants to see.
+	# The URL is what the operator waits for.
+	$self->{log}->info( 'Downloading %s', $url );
+
+	if ( !$download->fetch( $url, $tmp->filename ) ) {
+		$self->{error} = $download->error;
 		return;
 	}
 
@@ -215,8 +276,23 @@ sub manifest ( $self, $scope )
 	my $signature = $self->_ensure_unverified( $scope, 'SHA256.sig' );
 	return if !defined $signature;
 
-	my $signify = $self->_signify($key);
-	if ( !defined $signify->verify( $manifest, $signature ) ) {
+	# The call passes one key, and not a key set. The release
+	# directory of a numbered release carries one signature, under
+	# the base key of that release, so a second key would accept a
+	# file that the version does not own.
+	#
+	# The engine is signify, and not the perl default. A release of
+	# OpenBSD signs its SHA256 in the embedded form: the signature
+	# file carries the manifest after the two signature lines. The
+	# perl engine reads a file of two lines only, and it refuses
+	# such a pair, so the command makes the proof.
+	my $signify = Fugu::Signify->new( engine => 'signify' );
+	my $proven  = $signify->verify(
+		keys      => [$key],
+		file      => $manifest,
+		signature => $signature,
+	);
+	if ( !defined $proven ) {
 		$self->{error} = $self->_signify_error($signify);
 		return;
 	}
@@ -368,6 +444,11 @@ sub ensure ( $self, $scope, $file )
 	return $cached if defined $cached;
 
 	if ( !$self->{verify} ) {
+
+		# GST-MIRROR-3 demands this warning, and MODE_QUIET of
+		# Fugu::Log drops every level. The line therefore takes
+		# the process default logger, which no file of lib and
+		# bin makes quiet, so --quiet never drops it.
 		Fugu::Log->default->warning(
 			'Verification is off: %s enters the cache unproven',
 			$file );
@@ -564,16 +645,6 @@ sub _ensure_unverified ( $self, $scope, $file )
 	}
 
 	return $path;
-}
-
-# $self->_signify($key):
-#	Build the verifier over the one release key. The release
-#	directory of a numbered release carries one signature, under
-#	the base key of that release, so a second key would accept a
-#	file that the version does not own.
-sub _signify ( $self, $key )
-{
-	return Fugu::Signify->new( keys => [$key] );
 }
 
 # $self->_signify_error($signify):

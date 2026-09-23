@@ -25,6 +25,8 @@ my $both = sub { EV::break if @a && @b };
 $a->send({ '@type' => 'getMe' }, sub { push @a, ($_[1] // $_[0]); $both->() });
 $b->send({ '@type' => 'getMe' }, sub { push @b, ($_[1] // $_[0]); $both->() });
 
+# the loop has not run yet, so ev_now is still the time EV was loaded
+EV::now_update();
 my $watchdog = EV::timer 15, 0, sub { fail('replies never arrived'); EV::break };
 EV::run;
 $watchdog->stop;
@@ -53,8 +55,8 @@ EV::run;
 $watchdog2->stop;
 
 is $closed, 2, 'both clients closed';
-ok !EV::Telegram::TDLib::_is_registered($cid_a), 'client A left the registry';
-ok !EV::Telegram::TDLib::_is_registered($cid_b), 'client B left the registry';
+ok !EV::Telegram::TDLib::is_registered($cid_a), 'client A left the registry';
+ok !EV::Telegram::TDLib::is_registered($cid_b), 'client B left the registry';
 
 # a referenced watchdog would itself hold the loop, so the probe runs in a
 # forked child with no watchers at all: EV::run returns there only if the
@@ -66,6 +68,7 @@ SKIP: {
     defined $pid or die "fork: $!";
     if (!$pid) {
         close $rd;
+        $wr->autoflush(1);
         EV::run;
         print {$wr} "ok\n";
         exit 0;

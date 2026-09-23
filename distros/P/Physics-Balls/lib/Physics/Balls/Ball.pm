@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 has id => (
 	is => 'ro',
@@ -27,6 +27,23 @@ has kind => (
 	isa => Int,
 	default => 0
 );
+
+has vx => (
+	is => 'ro',
+	isa => Int,
+	default => 0
+);
+
+has vy => (
+	is => 'ro',
+	isa => Int,
+	default => 0
+);
+
+sub moving_row {
+	my ($self) = @_;
+	return [ $self->id, $self->x, $self->y, $self->kind, $self->vx, $self->vy ];
+}
 
 sub from_metres {
 	my ($class, $id, $x, $y, $kind) = @_;
@@ -55,7 +72,7 @@ Physics::Balls::Ball - one ball's place in a layout
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -103,5 +120,16 @@ The position as two doubles.
 
 The C<[id, x, y]> row, with the kind as a fourth element when it is not 0, so
 a layout of ordinary balls is spelled as it always was.
+
+=head2 vx
+
+=head2 vy
+
+Since 0.07: a starting velocity in hundredths of a millimetre a second, for an
+advance; default 0.
+
+=head2 moving_row
+
+The C<[id, x, y, kind, vx, vy]> row an advance takes.
 
 =cut

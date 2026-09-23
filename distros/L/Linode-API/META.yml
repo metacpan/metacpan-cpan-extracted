@@ -28,7 +28,7 @@ no_index:
 provides:
   Linode::API:
     file: lib/Linode/API.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   Cpanel::JSON::XS: '0'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/Troglodyne-Internet-Widgets/Linode-API/issues
   homepage: https://github.com/Troglodyne-Internet-Widgets/Linode-API
   repository: https://github.com/Troglodyne-Internet-Widgets/Linode-API.git
-version: '0.001'
+version: '0.002'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

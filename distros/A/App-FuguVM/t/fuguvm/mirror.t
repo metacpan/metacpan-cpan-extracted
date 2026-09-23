@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 # ex:ts=8 sw=4:
 # The mirror of one guest: the URLs, the key resolution and the
-# verification. The signify(1) subtests generate their own key pair,
-# and each one skips when the command is absent.
+# verification. The signed subtests generate their own key pair, and
+# each one skips when signify(1) is absent.
 
 use v5.36;
 use Test::More;
@@ -11,6 +11,8 @@ use lib "$RealBin/../../lib";
 use Digest::SHA ();
 use File::Path qw(make_path);
 use File::Temp qw(tempdir);
+use Fugu::Log;
+use Fugu::Signify;
 use Fugu::TestLog;
 
 use_ok('App::FuguVM::Mirror');
@@ -109,7 +111,12 @@ my $MIRROR_DIR = 'cdn.openbsd.org/pub/OpenBSD';
 # it did not make.
 {
     my $cache_dir = tempdir(CLEANUP => 1);
-    my $mirror = _mirror($cache_dir, verify => 0);
+
+    # GST-MIRROR-3 demands the warning, and --quiet must not drop
+    # it. The mirror therefore takes a quiet logger here, and the
+    # capture makes the process default write to standard error.
+    my $mirror = _mirror($cache_dir, verify => 0,
+	log => Fugu::Log->new(mode => Fugu::Log::MODE_QUIET));
 
     my $warned = _capture_stderr(sub {
 	no warnings 'redefine';
@@ -120,7 +127,8 @@ my $MIRROR_DIR = 'cdn.openbsd.org/pub/OpenBSD';
 		'https://cdn.openbsd.org/pub/OpenBSD/7.8/arm64/base78.tgz'),
 	    'ensure with verify 0 stores the file');
     });
-    like($warned, qr/unproven/i, 'and it logs one warning');
+    like($warned, qr/unproven/i,
+	'and a quiet logger of the caller keeps the warning');
 
     is($mirror->verify_file('release', 'base78.tgz', '/tmp/x'), undef,
 	'verify_file with verify 0 returns undef');
@@ -130,14 +138,137 @@ my $MIRROR_DIR = 'cdn.openbsd.org/pub/OpenBSD';
     like($mirror->error, qr/verification is off/, 'with the same reason');
 }
 
-# The signify(1) subtests. Each one generates its own key pair, writes
-# a manifest in the sha256(1) line form, signs it, and seeds the
-# cache at the mirror paths. The manifests are then local, so the
-# module fetches nothing.
-my $SIGNIFY = _find_signify();
+# The download path. A stub named curl on a private PATH serves the
+# downloader, so no subtest here reaches the network. The mirror
+# resolves its command in the constructor, so PATH must hold the stub
+# before the mirror exists.
+my $FETCH_URL = 'https://cdn.openbsd.org/pub/OpenBSD/7.8/arm64/base78.tgz';
+my $WRITE_BYTES = "printf 'set bytes' > \"\$out\"\necho 200\n";
+
+subtest 'fetch returns the temporary file of a download' => sub {
+    my $mirror = _stub_mirror($WRITE_BYTES);
+
+    my $tmp = $mirror->fetch($FETCH_URL);
+    ok(defined $tmp, 'fetch returns the temporary file') or return;
+    is(_slurp($tmp->filename), 'set bytes', 'and the file holds the bytes');
+};
+
+subtest 'fetch reports a failed download' => sub {
+    my $mirror = _stub_mirror(
+	"echo 'curl: (7) Failed to connect' >&2\nexit 7\n");
+
+    is($mirror->fetch($FETCH_URL), undef, 'fetch returns undef');
+    like($mirror->error, qr/\Q$FETCH_URL\E/, 'and error names the URL');
+};
+
+subtest 'fetch reports a download of no bytes' => sub {
+    # The stub creates the file at the path of the argument list. A
+    # stub that creates no file stops the fetch at the rename, and
+    # the zero-byte branch never runs.
+    my $mirror = _stub_mirror(": > \"\$out\"\necho 200\n");
+
+    is($mirror->fetch($FETCH_URL), undef, 'fetch returns undef');
+    like($mirror->error, qr/no bytes/, 'and error states the reason');
+};
+
+subtest 'fetch reports an absent downloader' => sub {
+    my $mirror = do {
+	local $ENV{PATH} = tempdir(CLEANUP => 1);
+	_mirror(tempdir(CLEANUP => 1));
+    };
+
+    is($mirror->fetch($FETCH_URL), undef, 'fetch returns undef');
+    like($mirror->error, qr/no executable command/,
+	'and error states the reason');
+};
+
+subtest 'the mirror holds one downloader' => sub {
+    my $mirror = _stub_mirror($WRITE_BYTES);
+    my $downloader = $mirror->{download};
+
+    # The constructor resolved the command, so a PATH that holds no
+    # downloader stops no later fetch.
+    local $ENV{PATH} = tempdir(CLEANUP => 1);
+
+    ok(defined $mirror->fetch($FETCH_URL), 'the first fetch downloads');
+    ok(defined $mirror->fetch($FETCH_URL), 'and the second one downloads');
+    is($mirror->{download}, $downloader, 'and one downloader serves both');
+};
+
+subtest 'the download lands in the private directory of the mirror' => sub {
+    my $mirror = _stub_mirror($WRITE_BYTES);
+    is($mirror->{tmpdir}, undef, 'the constructor makes no directory');
+
+    my $tmp = $mirror->fetch($FETCH_URL);
+    ok(defined $tmp, 'the fetch downloads') or return;
+
+    my $dir = "$mirror->{tmpdir}";
+    like($tmp->filename, qr{\A\Q$dir\E/},
+	'and the file lives in the directory that the fetch made');
+    is((stat $dir)[2] & 07777, 0700, 'and the directory carries mode 0700');
+
+    ok(defined $mirror->fetch($FETCH_URL), 'the second fetch downloads');
+    is("$mirror->{tmpdir}", $dir, 'and the mirror holds the one directory');
+};
+
+# File::Temp croaks when the temporary directory of the host is absent
+# or unwritable. That is an environment failure, so the fetch reports
+# it as it reports every other one, and the constructor never sees it.
+subtest 'a refused download directory is a failure of the fetch' => sub {
+    my $mirror = _stub_mirror($WRITE_BYTES);
+
+    no warnings 'redefine';
+    local *File::Temp::newdir = sub { die "no temporary directory\n" };
+
+    is($mirror->fetch($FETCH_URL), undef, 'the fetch returns undef');
+    like($mirror->error, qr/download directory/,
+	'and error names the download directory');
+    like($mirror->error, qr/no temporary directory/,
+	'and it carries the reason of File::Temp');
+};
+
+subtest 'the fetch bounds the download at 3600 seconds' => sub {
+    my $mirror = _stub_mirror($WRITE_BYTES);
+
+    ok(defined $mirror->fetch($FETCH_URL), 'the fetch downloads') or return;
+    is(_slurp($mirror->{download}->command . '.max-time'), "3600\n",
+	'and --max-time carries the bound of the mirror');
+};
+
+# The mirror logs through its own logger, so --quiet of the tool
+# reaches the line. The capture puts the noisy logger on the process
+# default, so a line through Fugu::Log->default would reach the quiet
+# capture too.
+subtest 'the fetch logs the URL through the logger of the mirror' => sub {
+    my $loud = _capture_stderr(sub {
+	my $mirror = _stub_mirror($WRITE_BYTES,
+	    log => Fugu::Log->new(mode => Fugu::Log::MODE_STDERR));
+	ok(defined $mirror->fetch($FETCH_URL), 'the loud fetch downloads');
+    });
+    like($loud, qr/\Q$FETCH_URL\E/, 'and the log line names the URL');
+
+    my $quiet = _capture_stderr(sub {
+	my $mirror = _stub_mirror($WRITE_BYTES,
+	    log => Fugu::Log->new(mode => Fugu::Log::MODE_QUIET));
+	ok(defined $mirror->fetch($FETCH_URL), 'the quiet fetch downloads');
+    });
+    unlike($quiet, qr/\Q$FETCH_URL\E/, 'and a quiet logger drops the line');
+};
+
+# The signed subtests. Each one generates its own key pair, writes a
+# manifest in the sha256(1) line form, signs it, and seeds the cache
+# at the mirror paths. The manifests are then local, so the module
+# fetches nothing.
+#
+# A key pair and a signature are private key operations, so the
+# fixture signer takes the signify engine, and its is_available then
+# reports the command. Each fixture signature carries the embedded
+# form, which is the form that a release of OpenBSD publishes.
+my $SIGNER = Fugu::Signify->new(engine => 'signify');
+my $CAN_SIGN = $SIGNER->is_available;
 
 subtest 'the release manifest and the file proofs' => sub {
-    plan skip_all => 'signify(1) not available' if !defined $SIGNIFY;
+    plan skip_all => 'signify(1) not available' if !$CAN_SIGN;
 
     my ($cache_dir, $keys_dir) = _signed_fixture(
 	release => { 'base78.tgz' => 'good bytes' });
@@ -164,8 +295,32 @@ subtest 'the release manifest and the file proofs' => sub {
 	'verify_file returns undef for a name the manifest does not hold');
 };
 
+subtest 'the embedded signature of a release verifies' => sub {
+    plan skip_all => 'signify(1) not available' if !$CAN_SIGN;
+
+    # A release of OpenBSD signs its SHA256 in the embedded form: the
+    # SHA256.sig file carries the two signature lines and then the
+    # whole manifest. The proof must read that file, because it is
+    # the only file that a release publishes. A verifier that takes a
+    # file of two lines alone refuses every real release, and
+    # 'fuguvm up' then installs no guest.
+    my ($cache_dir, $keys_dir) = _signed_fixture(
+	release => { 'base78.tgz' => 'good bytes' });
+
+    my $sig = "$cache_dir/proxy/$MIRROR_DIR/7.8/arm64/SHA256.sig";
+    my $manifest = "$cache_dir/proxy/$MIRROR_DIR/7.8/arm64/SHA256";
+    my @lines = split /\n/, _slurp($sig);
+    ok(@lines > 2, 'the signature file holds more than the two lines');
+    is(join("\n", @lines[2 .. $#lines]) . "\n", _slurp($manifest),
+	'and the manifest follows them, as a release publishes it');
+
+    my $mirror = _mirror($cache_dir, keys_dir => $keys_dir);
+    ok(defined $mirror->manifest('release'),
+	'the mirror proves an embedded signature');
+};
+
 subtest 'a repeated identical manifest line changes nothing' => sub {
-    plan skip_all => 'signify(1) not available' if !defined $SIGNIFY;
+    plan skip_all => 'signify(1) not available' if !$CAN_SIGN;
 
     # The real SHA256 of the OpenBSD 7.8 amd64 directory repeats the
     # install image lines. The digest check must accept a duplicate
@@ -175,9 +330,7 @@ subtest 'a repeated identical manifest line changes nothing' => sub {
     my $keys_dir = tempdir(CLEANUP => 1);
     my $cache_dir = tempdir(CLEANUP => 1);
 
-    system($SIGNIFY, '-G', '-n',
-	'-p', "$work/key.pub", '-s', "$work/key.sec") == 0
-	or die "signify -G failed\n";
+    _generate("$work/key");
     require File::Copy;
     File::Copy::copy("$work/key.pub", "$keys_dir/openbsd-78-base.pub")
 	or die "cannot copy the public key: $!\n";
@@ -190,9 +343,7 @@ subtest 'a repeated identical manifest line changes nothing' => sub {
     open my $fh, '>', $local or die $!;
     print $fh $line, $line;
     close $fh;
-    system($SIGNIFY, '-S', '-s', "$work/key.sec",
-	'-m', $local, '-x', "$local.sig") == 0
-	or die "signify -S failed\n";
+    _sign("$work/key.sec", $local);
 
     _seed($cache_dir, '7.8/arm64/SHA256', $line . $line);
     _seed($cache_dir, '7.8/arm64/SHA256.sig', _slurp("$local.sig"));
@@ -213,9 +364,7 @@ subtest 'a repeated identical manifest line changes nothing' => sub {
     open $fh, '>', $local or die $!;
     print $fh $conflict;
     close $fh;
-    system($SIGNIFY, '-S', '-s', "$work/key.sec",
-	'-m', $local, '-x', "$local.sig") == 0
-	or die "signify -S failed\n";
+    _sign("$work/key.sec", $local);
     _seed($cache_dir, '7.8/SHA256', $conflict);
     _seed($cache_dir, '7.8/SHA256.sig', _slurp("$local.sig"));
 
@@ -225,7 +374,7 @@ subtest 'a repeated identical manifest line changes nothing' => sub {
 };
 
 subtest 'a tampered manifest fails its signature' => sub {
-    plan skip_all => 'signify(1) not available' if !defined $SIGNIFY;
+    plan skip_all => 'signify(1) not available' if !$CAN_SIGN;
 
     my ($cache_dir, $keys_dir) = _signed_fixture(
 	release => { 'base78.tgz' => 'good bytes' });
@@ -242,7 +391,7 @@ subtest 'a tampered manifest fails its signature' => sub {
 };
 
 subtest 'ensure verifies before it stores' => sub {
-    plan skip_all => 'signify(1) not available' if !defined $SIGNIFY;
+    plan skip_all => 'signify(1) not available' if !$CAN_SIGN;
 
     my ($cache_dir, $keys_dir) = _signed_fixture(
 	release => { 'base78.tgz' => 'good bytes' });
@@ -271,7 +420,7 @@ subtest 'ensure verifies before it stores' => sub {
 };
 
 subtest 'verify_cache classifies every cached file' => sub {
-    plan skip_all => 'signify(1) not available' if !defined $SIGNIFY;
+    plan skip_all => 'signify(1) not available' if !$CAN_SIGN;
 
     my ($cache_dir, $keys_dir) = _signed_fixture(release => {
 	'base78.tgz' => 'good bytes',
@@ -297,7 +446,7 @@ subtest 'verify_cache classifies every cached file' => sub {
 };
 
 subtest 'verify_cache never skips a cached file' => sub {
-    plan skip_all => 'signify(1) not available' if !defined $SIGNIFY;
+    plan skip_all => 'signify(1) not available' if !$CAN_SIGN;
 
     # A scope whose files are cached with no manifest is what a
     # 'verify no' run produces. The files read as unknown, never as
@@ -328,7 +477,7 @@ subtest 'verify_cache never skips a cached file' => sub {
 };
 
 subtest 'a failed manifest pair leaves the cache' => sub {
-    plan skip_all => 'signify(1) not available' if !defined $SIGNIFY;
+    plan skip_all => 'signify(1) not available' if !$CAN_SIGN;
 
     my ($cache_dir, $keys_dir) = _signed_fixture(
 	release => { 'base78.tgz' => 'good bytes' });
@@ -355,7 +504,7 @@ subtest 'a failed manifest pair leaves the cache' => sub {
 };
 
 subtest 'the source manifest verifies the version directory' => sub {
-    plan skip_all => 'signify(1) not available' if !defined $SIGNIFY;
+    plan skip_all => 'signify(1) not available' if !$CAN_SIGN;
 
     my ($cache_dir, $keys_dir) = _signed_fixture(
 	source => { 'ports.tar.gz' => 'the ports tree' });
@@ -384,6 +533,41 @@ sub _mirror
 	arch    => 'arm64',
 	%args,
     );
+}
+
+# _stub_mirror($body, %args):
+#	A mirror whose downloader is a stub named curl. The base name
+#	of the command names the dialect, so the stub drives the curl
+#	dialect. PATH holds the directory of the stub alone while the
+#	constructor resolves the command. The body runs with $out set
+#	to the output argument of that dialect. The stub writes the
+#	--max-time value of each run to "$0.max-time". %args goes to
+#	the constructor of the mirror.
+sub _stub_mirror
+{
+    my ($body, %args) = @_;
+
+    my $bin = tempdir(CLEANUP => 1);
+    my $path = "$bin/curl";
+
+    open my $fh, '>', $path or die "open $path: $!";
+    print $fh <<'STUB', $body;
+#!/bin/sh
+out=
+while [ $# -gt 0 ]; do
+	case $1 in
+	--output) shift; out=$1 ;;
+	--max-time) shift; echo "$1" > "$0.max-time" ;;
+	esac
+	shift
+done
+STUB
+    close $fh;
+    chmod 0755, $path or die "chmod $path: $!";
+
+    local $ENV{PATH} = $bin;
+
+    return _mirror(tempdir(CLEANUP => 1), %args);
 }
 
 # _cache($cache_dir):
@@ -438,20 +622,44 @@ sub _temp_file
     return $tmp;
 }
 
-# _find_signify():
-#	The signify command on PATH, in the search order of
-#	Fugu::Signify, or undef.
-sub _find_signify
+# _generate($stem):
+#	A fresh key pair at $stem.pub and $stem.sec.
+sub _generate
 {
-    for my $name (qw(signify-openbsd signify)) {
-	for my $dir (split /:/, $ENV{PATH} // '') {
-	    next unless length $dir;
-	    my $path = "$dir/$name";
-	    return $path if -f $path && -x $path;
-	}
-    }
+    my ($stem) = @_;
 
-    return undef;
+    $SIGNER->generate(comment => 'a mirror test key',
+	public => "$stem.pub", secret => "$stem.sec")
+	or die 'cannot generate a key pair: ', $SIGNER->error, "\n";
+
+    return;
+}
+
+# _sign($secret, $path):
+#	Sign one file under the private half, at $path.sig, in the
+#	form that a release of OpenBSD publishes.
+#
+#	That form is the embedded one: the signature file carries the
+#	two signature lines and then the whole message. sign writes
+#	the detached form, which holds the two lines alone, so this
+#	helper appends the message. signify(1) reads the signature
+#	from the first two lines and proves the file of -m, so the
+#	proof under test meets the real shape.
+sub _sign
+{
+    my ($secret, $path) = @_;
+
+    $SIGNER->sign(secret => $secret, file => $path,
+	signature => "$path.sig")
+	or die "cannot sign $path: ", $SIGNER->error, "\n";
+
+    my $detached = _slurp("$path.sig");
+    my @lines = split /\n/, $detached;
+    open my $fh, '>', "$path.sig" or die "write $path.sig: $!";
+    print $fh join("\n", @lines[0, 1]), "\n", _slurp($path);
+    close $fh;
+
+    return;
 }
 
 # _signed_fixture(%scopes):
@@ -468,12 +676,10 @@ sub _signed_fixture
     my $keys_dir = tempdir(CLEANUP => 1);
     my $work = tempdir(CLEANUP => 1);
 
-    # signify -G wants one basename for the pair, so the pair lands
-    # in the work directory and the public half moves to the release
-    # name.
-    system($SIGNIFY, '-G', '-n',
-	'-p', "$work/key.pub", '-s', "$work/key.sec") == 0
-	or die "signify -G failed\n";
+    # The generator holds the two halves to one stem, so the pair
+    # lands in the work directory and the public half moves to the
+    # release name.
+    _generate("$work/key");
     require File::Copy;
     File::Copy::copy("$work/key.pub", "$keys_dir/openbsd-78-base.pub")
 	or die "cannot copy the public key: $!\n";
@@ -495,9 +701,7 @@ sub _signed_fixture
 	print $fh $manifest;
 	close $fh;
 
-	system($SIGNIFY, '-S', '-s', "$work/key.sec",
-	    '-m', $local, '-x', "$local.sig") == 0
-	    or die "signify -S failed\n";
+	_sign("$work/key.sec", $local);
 
 	_seed($cache_dir, "$dir/SHA256", $manifest);
 	_seed($cache_dir, "$dir/SHA256.sig", _slurp("$local.sig"));

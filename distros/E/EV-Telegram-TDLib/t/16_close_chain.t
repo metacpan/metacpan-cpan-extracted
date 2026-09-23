@@ -11,7 +11,7 @@ my @sent;
 }
 
 # one dying callback during close must not skip the rest of the chain:
-# _closed can only ever run once, so an unwound loop loses the rest
+# closed can only ever run once, so an unwound loop loses the rest
 my @errors;
 my $td = EV::Telegram::TDLib->new(
     api_id    => 1,
@@ -29,7 +29,7 @@ my $closed = 0;
 $td->close(sub { $closed = 1 });
 
 eval {
-    $td->_inject_raw(q({"@type":"updateAuthorizationState","authorization_state":{"@type":"authorizationStateClosed"}}));
+    $td->inject_raw(q({"@type":"updateAuthorizationState","authorization_state":{"@type":"authorizationStateClosed"}}));
     1;
 } or do {
     diag "injection died: $@" if $ENV{TEST_VERBOSE};

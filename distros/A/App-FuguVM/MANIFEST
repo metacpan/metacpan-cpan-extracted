@@ -36,7 +36,6 @@ lib/App/FuguVM/Remote.pod
 lib/App/FuguVM/State.pm
 lib/App/FuguVM/State.pod
 man/fuguvm/fuguvm.1
-scripts/ftp
 share/fuguvm/cache-generation
 share/fuguvm/expect/autoinstall.exp
 share/fuguvm/expect/command.exp

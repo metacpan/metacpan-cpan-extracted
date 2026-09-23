@@ -1,10 +1,10 @@
 {
-   "abstract" : "Asynchronous Telegram client on TDLib and EV",
+   "abstract" : "asynchronous Telegram client on TDLib and EV",
    "author" : [
       "vividsnow"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "perl_5"
    ],
@@ -33,14 +33,22 @@
             "ExtUtils::MakeMaker" : "6.64"
          }
       },
-      "runtime" : {
+      "develop" : {
          "requires" : {
             "Alien::TDLib" : "0",
+            "JSON::PP" : "0",
+            "Test::Kwalitee::Extra" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
             "Carp" : "0",
             "Cpanel::JSON::XS" : "4.00",
             "EV" : "4.11",
             "Encode" : "0",
             "MIME::Base64" : "0",
+            "Scalar::Util" : "0",
             "XSLoader" : "0",
             "perl" : "5.012"
          }
@@ -54,55 +62,71 @@
    "provides" : {
       "EV::Telegram::TDLib" : {
          "file" : "lib/EV/Telegram/TDLib.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::Bots" : {
          "file" : "lib/EV/Telegram/TDLib/Bots.pm",
-         "version" : "0.03"
+         "version" : "0.04"
+      },
+      "EV::Telegram::TDLib::Business" : {
+         "file" : "lib/EV/Telegram/TDLib/Business.pm",
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::Chats" : {
          "file" : "lib/EV/Telegram/TDLib/Chats.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::Connection" : {
          "file" : "lib/EV/Telegram/TDLib/Connection.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::Files" : {
          "file" : "lib/EV/Telegram/TDLib/Files.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::Folders" : {
          "file" : "lib/EV/Telegram/TDLib/Folders.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::Forum" : {
          "file" : "lib/EV/Telegram/TDLib/Forum.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::Messages" : {
          "file" : "lib/EV/Telegram/TDLib/Messages.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::Payments" : {
          "file" : "lib/EV/Telegram/TDLib/Payments.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::Schema" : {
          "file" : "lib/EV/Telegram/TDLib/Schema.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::Secret" : {
          "file" : "lib/EV/Telegram/TDLib/Secret.pm",
-         "version" : "0.03"
+         "version" : "0.04"
+      },
+      "EV::Telegram::TDLib::Stars" : {
+         "file" : "lib/EV/Telegram/TDLib/Stars.pm",
+         "version" : "0.04"
+      },
+      "EV::Telegram::TDLib::Stickers" : {
+         "file" : "lib/EV/Telegram/TDLib/Stickers.pm",
+         "version" : "0.04"
+      },
+      "EV::Telegram::TDLib::Stories" : {
+         "file" : "lib/EV/Telegram/TDLib/Stories.pm",
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::Users" : {
          "file" : "lib/EV/Telegram/TDLib/Users.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "EV::Telegram::TDLib::WebApps" : {
          "file" : "lib/EV/Telegram/TDLib/WebApps.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -116,6 +140,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-telegram-tdlib"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

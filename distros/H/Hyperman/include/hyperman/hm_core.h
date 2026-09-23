@@ -3722,6 +3722,11 @@ static volatile sig_atomic_t hm_sup_term = 0;
 static volatile sig_atomic_t hm_sup_hup  = 0;
 static volatile sig_atomic_t hm_sup_usr1 = 0;
 static volatile sig_atomic_t hm_sup_tick = 0;   /* ALRM: the liveness look */
+/* An alarm the caller had pending when run() was called: the deadline it asked
+ * for, and whether it has come due. The supervisor's tick owns SIGALRM, so the
+ * caller's is carried rather than cancelled. */
+static time_t hm_sup_alarm_at = 0;
+static int    hm_sup_alarmed  = 0;
 static void hm_sup_sig(int sig) {
     if (sig == SIGHUP || sig == SIGUSR2) hm_sup_hup = 1;
     else if (sig == SIGUSR1)             hm_sup_usr1 = 1;
@@ -4435,10 +4440,30 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
          * exits; hm_sup_sig() treats it as a no-op wakeup. */
         sigaction(SIGCHLD, &sa, NULL);
         /* ALRM is the supervisor's only clock: a look at the scoreboard every
-         * few seconds for a worker that is alive and not moving. Armed only
-         * when there is a board to look at. */
-        sigaction(SIGALRM, &sa, NULL);
-        if (hm_sa_board_live()) alarm(HM_SUP_TICK_SECS);
+         * few seconds for a worker that is alive and not moving.
+         *
+         * An alarm the CALLER already had pending is not ours to cancel. A
+         * watchdog that says `alarm(120); $server->run` has asked to be killed
+         * at that deadline, and taking SIGALRM over - a handler that only sets
+         * a flag, re-armed every tick - silently turns that into a promise
+         * nothing keeps, leaving an unsupervised pool running for ever.
+         *
+         * So the pending deadline is read out and carried on the tick, which
+         * is armed for it even with no board to watch. Letting the signal
+         * through unhandled instead would kill the supervisor where it stood
+         * and leave the workers holding the listening socket with nobody to
+         * shut them down - a watchdog that takes half the pool with it is not
+         * one. The tick is three seconds, so the deadline is met to within
+         * that, and what follows is the death the caller asked for. */
+        hm_sup_alarm_at = 0;
+        {
+            unsigned pending = alarm(0);
+            if (pending) hm_sup_alarm_at = time(NULL) + (time_t)pending;
+            if (hm_sa_board_live() || hm_sup_alarm_at) {
+                sigaction(SIGALRM, &sa, NULL);
+                alarm(HM_SUP_TICK_SECS);
+            }
+        }
 
         /* Race-free supervision: keep the acted-on signals blocked, check the
          * flags, reap without blocking, then sigsuspend() to wait for the next
@@ -4481,6 +4506,13 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
 
                 if (hm_sup_tick) {
                     hm_sup_tick = 0;
+                    /* The caller's own deadline, if it had one: take the pool
+                     * down and then let SIGALRM do what it would have done. */
+                    if (hm_sup_alarm_at && time(NULL) >= hm_sup_alarm_at) {
+                        hm_sup_alarmed = 1;
+                        hm_sup_term    = 1;
+                        continue;
+                    }
                     hm_sup_watch_board();
                     alarm(HM_SUP_TICK_SECS);
                 }
@@ -4592,6 +4624,13 @@ static void hm_run_server(pTHX_ hm_worker_cfg *cfg) {
             }
 
             sigprocmask(SIG_SETMASK, &orig, NULL);
+
+            /* The pool is down because the caller's own alarm came due, so
+             * finish the job the alarm was set to do. */
+            if (hm_sup_alarmed) {
+                signal(SIGALRM, SIG_DFL);
+                raise(SIGALRM);
+            }
         }
     }
 #endif /* !_WIN32 */

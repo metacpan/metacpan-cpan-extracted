@@ -266,12 +266,35 @@ up indexed.
     Disallow: /account/settings
     Disallow: /admin
 
+    User-agent: AdsBot-Google
+    Disallow: /account/orders/
+    Disallow: /account/settings
+    Disallow: /admin
+
+    User-agent: AdsBot-Google-Mobile
+    Disallow: /account/orders/
+    Disallow: /account/settings
+    Disallow: /admin
+
+    User-agent: Mediapartners-Google
+    Disallow: /account/orders/
+    Disallow: /account/settings
+    Disallow: /admin
+
     Sitemap: https://example.com/sitemap.xml
 
 Three sources: guarded routes, routes that said C<< sitemap => 0 >>, and
 whatever C<disallow> added. Plus the C<Sitemap:> line, which is how a crawler
 finds the sitemap without being told and is the line most hand-written
 C<robots.txt> files are missing.
+
+B<Every group is written again for the crawlers that ignore C<*>.>
+C<AdsBot-Google>, C<AdsBot-Google-Mobile> and C<Mediapartners-Google> (the
+AdSense crawler) obey only a group naming their own token: Google documents
+the global user agent as ignored for all three. A file carrying the C<*> group
+alone has therefore disallowed nothing from any of them, and there is no
+symptom to notice - the file reads correctly, the sitemap agrees with it, and
+the paths are crawled regardless. See L</agents>.
 
 B<A guarded route with a capture is disallowed as a prefix.> Nobody benefits
 from C<< Disallow: /account/orders/:id >>, so the path is truncated at the
@@ -301,12 +324,38 @@ cannot see - a mounted PSGI app, a static directory.
     User-agent: *
     Disallow: /
 
+    User-agent: AdsBot-Google
+    Disallow: /
+
+    ... and the rest of L</agents>
+
 A staging environment being indexed is routine, embarrassing and slow to undo,
 and it is usually caused by a C<robots.txt> copied from production. This is one
 flag, driven from the config that already differs between environments.
 
 No C<Sitemap:> line is emitted with it, because advertising a sitemap while
 disallowing everything says two opposite things.
+
+=head2 agents
+
+    plugin 'Sitemap' => { agents => [ 'AdsBot-Google', 'Bingbot' ] };
+    plugin 'Sitemap' => { agents => [] };        # the `*` group alone
+
+The user agents the disallow list is repeated for, beyond C<*>. Defaults to
+C<AdsBot-Google>, C<AdsBot-Google-Mobile> and C<Mediapartners-Google>, the
+three that ignore C<*>; an empty arrayref emits the C<*> group and nothing
+else.
+
+Each is a group of its own rather than another C<User-agent> line on one
+shared group. Several agents may share a group, but a parser that reads the
+second C<User-agent> line as the start of a new one would then see a C<*>
+group carrying no rules, and of the two ways to be wrong that is the one that
+opens the whole site.
+
+A token is a name - C<Googlebot>, not C<< Mozilla/5.0 (compatible; ...) >> -
+and one carrying a space, a colon or a newline croaks at the C<plugin> line.
+Matching is a case-insensitive prefix, so the token is what a crawler's
+documentation says to write and never its full C<User-Agent> header.
 
 =head2 ttl
 

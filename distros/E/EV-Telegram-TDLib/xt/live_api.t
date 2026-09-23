@@ -7,8 +7,8 @@ plan skip_all => 'author test: set AUTHOR_TESTING=1' unless $ENV{AUTHOR_TESTING}
 plan skip_all => 'set TD_API_ID and TD_API_HASH'
     unless $ENV{TD_API_ID} && $ENV{TD_API_HASH};
 # this test never authenticates: point it at a session xt/live_auth.t made
-plan skip_all => 'set TD_DB_DIR to an authenticated session directory'
-    unless $ENV{TD_DB_DIR} && -d $ENV{TD_DB_DIR};
+plan skip_all => 'set TD_DATABASE_DIRECTORY to an authenticated session directory'
+    unless $ENV{TD_DATABASE_DIRECTORY} && -d $ENV{TD_DATABASE_DIRECTORY};
 
 require EV;
 require EV::Telegram::TDLib;
@@ -20,7 +20,7 @@ my $td = EV::Telegram::TDLib->new(
     api_id             => $ENV{TD_API_ID},
     api_hash           => $ENV{TD_API_HASH},
     use_test_dc        => $ENV{TD_TEST_DC} ? 1 : 0,
-    database_directory => $ENV{TD_DB_DIR},
+    database_directory => $ENV{TD_DATABASE_DIRECTORY},
     on_error           => sub { diag "tdlib: $_[0]" },
     on_code     => sub { BAIL_OUT 'session is not authenticated; run xt/live_auth.t first' },
     on_password => sub { BAIL_OUT 'session is not authenticated; run xt/live_auth.t first' },

@@ -2,6 +2,7 @@ MANIFEST
 COPYING
 Changes
 README
+README.md
 Makefile.PL
 lib/Data/Tools.pm
 lib/Data/Tools/Socket.pm
@@ -10,6 +11,16 @@ lib/Data/Tools/Time.pm
 lib/Data/Tools/Math.pm
 lib/Data/Tools/CSV.pm
 lib/Data/Tools/Process.pm
+lib/Data/Tools/Process/Forks.pm
 lib/Data/Tools/Serialization.pm
+t/t1-data-tools.pl
+t/t2-data-tools-time.pl
+t/t3-data-tools-math.pl
+t/t4-data-tools-csv.pl
+t/t5-data-tools-process.pl
+t/t6-data-tools-process-forks.pl
+t/t7-data-tools-serialization.pl
+t/t8-data-tools-socket.pl
+t/t9-data-tools-socket-protocols.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

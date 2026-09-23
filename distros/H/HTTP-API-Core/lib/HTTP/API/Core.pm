@@ -6,12 +6,13 @@ use HTTP::Tiny;
 use JSON::PP qw(encode_json);
 use Scalar::Util qw(blessed);
 use Time::HiRes qw(sleep time);
+use Time::Local qw(timegm);
 
 use HTTP::API::Core::Response;
 use HTTP::API::Core::Error;
 use HTTP::API::Core::Pagination;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub new {
     my ($class, %args) = @_;
@@ -414,12 +415,8 @@ sub _method_is_retryable {
 sub _retry_delay {
     my ($retry, $attempt, $error) = @_;
 
-    my $retry_after = $error->retry_after;
-    if (defined($retry_after)
-        && $retry_after =~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/)
-    {
-        return 0 + $retry_after;
-    }
+    my $retry_after = _retry_after_delay($error->retry_after, time);
+    return $retry_after if defined $retry_after;
 
     my $rate_limit = $error->rate_limit;
     if ($rate_limit && $rate_limit->exhausted) {
@@ -431,6 +428,36 @@ sub _retry_delay {
     $delay = $retry->{max_delay} if $delay > $retry->{max_delay};
     $delay = rand($delay) if $retry->{jitter} && $delay > 0;
     return $delay;
+}
+
+sub _retry_after_delay {
+    my ($value, $now) = @_;
+    return undef if !defined $value;
+
+    return 0 + $value
+        if $value =~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/;
+
+    my %month = (
+        Jan => 0, Feb => 1, Mar => 2, Apr => 3,
+        May => 4, Jun => 5, Jul => 6, Aug => 7,
+        Sep => 8, Oct => 9, Nov => 10, Dec => 11,
+    );
+
+    return undef
+        if $value !~ /\A(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT\z/;
+
+    my ($day, $mon, $year, $hour, $min, $sec) =
+        ($1, $2, $3, $4, $5, $6);
+
+    return undef if $hour > 23 || $min > 59 || $sec > 60;
+
+    my $epoch = eval {
+        timegm($sec, $min, $hour, $day, $month{$mon}, $year);
+    };
+    return undef if $@ || !defined $epoch;
+
+    my $delay = $epoch - $now;
+    return $delay > 0 ? $delay : 0;
 }
 
 sub _append_query {
@@ -599,8 +626,9 @@ coderef or an arrayref of coderefs.
 =head1 RETRY POLICY
 
 The retry hash accepts C<attempts>, C<base_delay>, C<max_delay>, C<jitter>, and
-C<methods>. Exponential backoff is capped by C<max_delay>. A numeric
-C<Retry-After> response header takes precedence over the calculated delay.
+C<methods>. Exponential backoff is capped by C<max_delay>. A C<Retry-After>
+response header using either delay-seconds or an HTTP-date takes precedence
+over the calculated delay.
 
 =head1 RATE LIMITS
 
@@ -629,5 +657,9 @@ assume a universal header name.
 
 This library is free software; you may redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Shingo Kawamura E<lt>shingo@cpan.orgE<gt>
 
 =cut

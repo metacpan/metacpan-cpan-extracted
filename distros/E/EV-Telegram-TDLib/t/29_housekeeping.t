@@ -36,6 +36,27 @@ cmp_ok last_req()->{notification_settings}{mute_for}, '>', 31000000,
 $td->unmute(-100, sub {});
 is last_req()->{notification_settings}{mute_for}, 0, 'unmute clears the mute';
 
+# TDLib rebuilds every setting from the request, so "use the default" for the
+# rest reset a chat's own sound and preview: a cached chat keeps them
+$td->inject_raw(q({"@type":"updateNewChat","chat":{"@type":"chat","id":-200,)
+              . q("notification_settings":{"@type":"chatNotificationSettings",)
+              . q("use_default_mute_for":true,"mute_for":0,)
+              . q("use_default_sound":false,"sound_id":"6012345678901234567",)
+              . q("use_default_show_preview":false,"show_preview":false}}}));
+$td->mute(-200, 3600, sub {});
+my $ns = last_req()->{notification_settings};
+is $ns->{mute_for}, 3600, 'a cached chat is muted';
+is $ns->{sound_id}, '6012345678901234567', 'and keeps its own sound';
+like last_json(), qr/"use_default_sound":false/, 'which is still not the default';
+like last_json(), qr/"use_default_show_preview":false/, 'and keeps its preview choice';
+like last_json(), qr/"show_preview":false/, 'with previews still off';
+
+# an id read without a chomp is accepted everywhere; the cache lookup missed
+# it and fell back to the defaults, the very reset above
+$td->mute(" -200\n", 60, sub {});
+is last_req()->{notification_settings}{sound_id}, '6012345678901234567',
+    'a padded chat id finds the cached settings too';
+
 # --- chat list membership
 $td->archive(-100, sub {});
 $r = last_req();
@@ -78,6 +99,12 @@ $r = last_req();
 is $r->{'@type'}, 'searchMessages', 'search_all sends searchMessages';
 is $r->{query}, 'invoice', 'query passed through';
 is $r->{limit}, 10, 'limit passed through';
+# a null list is every chat; defaulting to main skipped the archive
+like last_json(), qr/"chat_list":null/, 'search_all searches every chat by default';
+$td->search_all('invoice', list => 'archive', sub {});
+is last_req()->{chat_list}{'@type'}, 'chatListArchive', 'and can be narrowed to the archive';
+$err = do { local $@; eval { $td->search_all('invoice', list => 3, sub {}) }; $@ };
+like $err, qr/cannot search a folder/, 'a folder, which TDLib cannot search, croaks';
 
 $err = do { local $@; eval { $td->search_all(undef, sub {}) }; $@ };
 like $err, qr/required/, 'a missing query is refused';

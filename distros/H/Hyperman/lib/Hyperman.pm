@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -551,6 +551,13 @@ downtime (new workers start, old ones drain gracefully), C<SIGUSR1> makes
 every worker dump its stats to stderr, and C<SIGTERM> / C<SIGINT> drain -
 bounded by C<shutdown_grace> - and exit. With C<< workers => 1 >> the server
 runs in the calling process, no supervisor.
+
+The supervisor uses C<SIGALRM> as its own clock, and carries an C<alarm> that
+was already pending when C<run> was called: at that deadline the pool is shut
+down and the process then dies of C<SIGALRM>, as it would have without a
+server. So a watchdog that sets C<alarm> before starting the server still
+gets what it asked for - the whole pool, not just the supervisor - to within
+a few seconds.
 
 =head2 timer / io_ready
 

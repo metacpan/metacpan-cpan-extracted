@@ -1,61 +1,58 @@
-
 use strict;
 use warnings;
+use ExtUtils::MakeMaker;
 
-
-
-use ExtUtils::MakeMaker 6.30;
-
-
-
-my %WriteMakefileArgs = (
-  "ABSTRACT" => "create/manage/evaluate segmented (curved) envelope",
-  "AUTHOR" => "Yegor Korablev <egor\@cpan.org>",
-  "BUILD_REQUIRES" => {
-    "Test::More" => 0,
-    "strict" => 0,
-    "warnings" => 0
-  },
-  "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.30"
-  },
-  "DISTNAME" => "Math-SegmentedEnvelope",
-  "EXE_FILES" => [],
-  "LICENSE" => "perl",
-  "NAME" => "Math::SegmentedEnvelope",
-  "PREREQ_PM" => {
-    "Carp" => 0,
-    "Clone" => 0,
-    "Exporter::Easy" => 0,
-    "List::Util" => 0,
-    "Moo" => 0,
-    "constant" => 0,
-    "namespace::autoclean" => 0
-  },
-  "VERSION" => "0.02",
-  "test" => {
-    "TESTS" => "t/*.t"
-  }
-);
-
-
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
-  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
-  my $pp = $WriteMakefileArgs{PREREQ_PM};
-  for my $mod ( keys %$br ) {
-    if ( exists $pp->{$mod} ) {
-      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
-    }
-    else {
-      $pp->{$mod} = $br->{$mod};
-    }
-  }
+# dlopen is in libc on *BSD/macOS, needs -ldl on Linux
+my $dl_lib = '';
+if ($^O !~ /^(?:openbsd|freebsd|netbsd|darwin|dragonfly)$/) {
+    $dl_lib = '-ldl';
 }
 
-delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
-
-WriteMakefile(%WriteMakefileArgs);
-
-
-
+WriteMakefile(
+    NAME             => 'Math::SegmentedEnvelope',
+    VERSION_FROM     => 'lib/Math/SegmentedEnvelope.pm',
+    ABSTRACT_FROM    => 'lib/Math/SegmentedEnvelope.pm',
+    AUTHOR           => 'Yegor Korablev <egor@cpan.org>',
+    LICENSE          => 'perl_5',
+    MIN_PERL_VERSION => '5.010',
+    PREREQ_PM        => {},
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '0',
+    },
+    TEST_REQUIRES => {
+        'Test::More' => '0',
+    },
+    XS               => { 'SegmentedEnvelope.xs' => 'SegmentedEnvelope.c' },
+    OBJECT           => 'SegmentedEnvelope$(OBJ_EXT) tinyexpr$(OBJ_EXT) morpher_jit$(OBJ_EXT)',
+    LIBS             => ["-lm $dl_lib"],
+    DEFINE           => '',
+    INC              => '-I.',
+    clean            => { FILES => 'Math-SegmentedEnvelope-* SegmentedEnvelope.c' },
+    META_MERGE       => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/vividsnow/Math-SegmentedEnvelope.git',
+                web  => 'https://github.com/vividsnow/Math-SegmentedEnvelope',
+            },
+            bugtracker => {
+                web => 'https://github.com/vividsnow/Math-SegmentedEnvelope/issues',
+            },
+        },
+        no_index => {
+            directory => [ 'bench', 'eg', 'examples', 't' ],
+            file      => [ 'bench/PurePerl.pm' ],
+        },
+        provides => {
+            'Math::SegmentedEnvelope' => {
+                file    => 'lib/Math/SegmentedEnvelope.pm',
+                version => '0.03',
+            },
+            'Math::SegmentedEnvelope::Static' => {
+                file    => 'lib/Math/SegmentedEnvelope.pm',
+                version => '0.03',
+            },
+        },
+    },
+);

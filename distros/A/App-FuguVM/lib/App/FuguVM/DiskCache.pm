@@ -28,7 +28,7 @@ use v5.36;
 # media that produced it. Neither is a cache of the other.
 
 package App::FuguVM::DiskCache;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 use Digest::SHA ();
 use Fcntl       qw(:flock);

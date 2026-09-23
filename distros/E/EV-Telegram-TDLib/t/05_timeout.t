@@ -28,6 +28,8 @@ my $extra = $td->send({ '@type' => 'getMe' }, sub { push @got, [@_] }, timeout =
 my $watchdog = EV::timer 5, 0, sub { fail('watchdog'); EV::break };
 my $stop = EV::timer 0.5, 0, sub { EV::break };
 EV::run;
+# left armed, it fired inside the stale-clock block below on a slow runner
+$watchdog->stop;
 
 is scalar @got, 1, 'the callback fired once';
 is $got[0][0], undef, 'no result';
@@ -37,9 +39,30 @@ ok !exists $td->{pending}{$extra}, 'no longer pending';
 
 my @warnings;
 local $SIG{__WARN__} = sub { push @warnings, $_[0] };
-$td->_inject_raw(qq({"\@type":"user","id":1,"\@extra":"$extra"}));
+$td->inject_raw(qq({"\@type":"user","id":1,"\@extra":"$extra"}));
 is scalar @got, 1, 'the late reply did not reach the callback again';
 like $warnings[0], qr/late reply/, 'the late reply warned';
+
+# the abandoned id is consumed by the reply it was recorded for: a second
+# arrival is an unknown id, not a second late reply, and leaving it recorded
+# would keep one entry per timed-out request for the life of the client
+ok !exists $td->{abandoned}{$extra}, 'the late reply cleared the abandoned id';
+@warnings = ();
+$td->inject_raw(qq({"\@type":"user","id":1,"\@extra":"$extra"}));
+like $warnings[0], qr/unknown request/,
+    'and a further arrival is an unknown reply, not a late one';
+
+# the record is capped, so a long-lived client that times out often does not
+# accumulate one entry per request forever
+{
+    my $c = EV::Telegram::TDLib->new(
+        api_id => 1, api_hash => 'x', database_directory => 't/tmp-abandon');
+    $c->abandon($_) for 1 .. 1200;
+    cmp_ok scalar(keys %{ $c->{abandoned} }), '<=', 1001,
+        'the abandoned record is bounded';
+    ok !exists $c->{abandoned}{1}, 'and it drops the oldest id first';
+    ok exists $c->{abandoned}{1200}, 'keeping the newest';
+}
 
 # --- a timeout scheduled after blocking outside the loop must be
 # measured from now, not from the stale ev_now: without now_update it
@@ -53,7 +76,9 @@ $td->send({ '@type' => 'getMe' }, sub {
     $fired_at = EV::now;
     EV::break;
 }, timeout => 0.4);
+my $bound = EV::timer 5, 0, sub { fail('the timeout never fired'); EV::break };
 EV::run;
+$bound->stop;
 is $got2[1]{message}, 'timeout', 'the timeout still fires';
 cmp_ok $fired_at - $t0, '>', 1.2, 'the full timeout elapsed despite the stale ev_now';
 

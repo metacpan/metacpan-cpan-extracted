@@ -1,0 +1,53 @@
+=head1 NAME
+
+App::FuguSeed::Codewords - the 44 codewords of a Standard SeedQR
+
+=head1 SYNOPSIS
+
+    use App::FuguSeed::Codewords;
+
+    my @codewords = App::FuguSeed::Codewords->encode($digits);
+
+=head1 DESCRIPTION
+
+App::FuguSeed::Codewords turns the 48 digits of a 12-word seed into
+the codewords of the QR code. The code is QR version 2, error
+correction level L, in numeric mode, with one block of 44 codewords:
+34 of data and 10 of error correction.
+
+The data bit stream holds the mode indicator, the character count, the
+16 groups of 3 digits, the terminator, and the zero bits to a codeword
+boundary. The two pad codewords fill the rest of the 34 in turn. The
+10 error correction codewords are the Reed-Solomon remainder of the
+data codewords over the field GF(256).
+
+Every method is a class method, and every method is pure: it takes
+values and it returns values. The module touches no stream, and it
+loads no module. Each constant of the QR standard sits at the top of
+the module, and a comment names the table that it comes from.
+
+=head2 encode
+
+C<encode($digits)> returns the 44 codewords of the digit string
+C<$digits>: the 34 data codewords first, then the 10 error correction
+codewords. Each codeword is a number from 0 to 255.
+
+=head1 RETURN VALUES
+
+C<encode()> returns 44 numbers.
+
+=head1 ERRORS
+
+C<encode()> expects the 48 digits of App::FuguSeed::Mnemonic. With
+another input, the caller gets a code that no reader decodes.
+
+=head1 SEE ALSO
+
+L<App::FuguSeed::Mnemonic>, L<App::FuguSeed::Matrix>, and ISO/IEC
+18004, the QR standard.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

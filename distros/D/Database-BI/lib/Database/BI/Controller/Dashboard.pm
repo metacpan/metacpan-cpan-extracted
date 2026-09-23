@@ -1,6 +1,9 @@
 package Database::BI::Controller::Dashboard;
 
-our $VERSION = '0.007.0';
+use strict;
+use warnings;
+
+our $VERSION = '0.008.1';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -21,8 +24,8 @@ use Sub::Protected;
 # ---------------------------------------------------------------------------
 
 # File extensions that Database::Abstraction can probe, in probe order.
-# Note: D::A uses ".sql" for SQLite -- NOT ".sqlite".
-Readonly my @SUPPORTED_EXT => qw( csv db sql xml psv xlsx );
+# .sql, .sqlite, and .sqlite3 are all SQLite databases; .db is Berkeley DB.
+Readonly my @SUPPORTED_EXT => qw( csv db sql sqlite sqlite3 xml tsv psv xlsx );
 # Use \z (absolute end-of-string) not $ (which permits a trailing \n before \z).
 # A query param decoded from "file.csv%0A" has basename "sales.csv\n"; without \z
 # that passes the extension guard and reaches realpath with an embedded newline.
@@ -40,6 +43,12 @@ Readonly my $TABLE_NAME_RE => qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
 # silently truncate the captured URL before the \z end-of-string anchor.
 Readonly my $URL_SPEC_RE   => qr{\Aurl:(https?://.+)\z}si;
 
+# Hostname pattern accepted in /../hostname/... remote paths.
+# Mirrors Database::Abstraction's own host validation regex.
+# Accepts 'hostname', 'user@hostname', and IPv4 addresses (IPv6 is excluded
+# because the [...] notation would be ambiguous in the path syntax).
+Readonly my $REMOTE_HOST_RE => qr/\A(?:[a-zA-Z0-9][a-zA-Z0-9._-]*\@)?[a-zA-Z0-9][a-zA-Z0-9._-]*\z/;
+
 # ---------------------------------------------------------------------------
 # I18N message dictionary for all user-visible strings in this controller.
 # To plug in a Locale::Maketext backend, extend _i18n() below.
@@ -55,7 +64,7 @@ Readonly my %MESSAGES => (
 	error_write_failed     => 'Write failed: %s',
 	error_ext_required     => 'Use a .csv, .sql, or .json filename extension',
 	error_upload_none      => 'No file received',
-	error_upload_ext       => 'Unsupported file type. Accepted: CSV, PSV, XML, SQLite (.sql), Berkeley DB (.db), XLSX',
+	error_upload_ext       => 'Unsupported file type. Accepted: CSV, TSV, PSV, XML, SQLite (.sql, .sqlite, .sqlite3), Berkeley DB (.db), XLSX',
 	error_upload_too_large => 'File too large (maximum %s MiB)',
 	error_path_required    => '"path" parameter is required',
 	error_url_required     => 'Please enter a URL',
@@ -67,8 +76,9 @@ Readonly my %MESSAGES => (
 # Maximum accepted upload body size.  Enforced both here (application layer)
 # and via Mojolicious max_request_size (transport layer) set in startup().
 # Must match $MAX_REQUEST_SIZE in BI.pm.
-Readonly my $MAX_UPLOAD_MIB   => 50;
-Readonly my $MAX_UPLOAD_BYTES => $MAX_UPLOAD_MIB * 1_048_576;
+Readonly my $MAX_UPLOAD_MIB      => 50;
+Readonly my $MAX_UPLOAD_BYTES    => $MAX_UPLOAD_MIB * 1_048_576;
+Readonly my $DEFAULT_JOIN_MAX_ROWS => 10_000;
 
 # ---------------------------------------------------------------------------
 # Protected helpers
@@ -289,7 +299,21 @@ sub _open_spec :Protected ($self, $spec) {
 		my $src = eval { $self->open_table($table, directory => $data_dir->to_string) };
 		return ($src, $table) if $src && !$@;
 	} elsif ($spec =~ /\Apath:(.+)\z/) {
-		my $file = eval { Mojo::File->new($1)->realpath };
+		my $path_arg = $1;
+		# Remote path: /../hostname/dir/file — delegate to DataSource with host param.
+		# No EXT_RE check: security comes from REMOTE_HOST_RE.  The original
+		# extension (if any) is passed as file_ext so _init_backend tries it first.
+		if ($path_arg =~ m{\A/\.\./([^/]+)((?:/.+)?)/([^/]+)\z}) {
+			my ($host, $dir_part, $file) = ($1, $2 // '', $3);
+			$dir_part = '/' unless length $dir_part;
+			return () unless $host =~ $REMOTE_HOST_RE;
+			my ($table, $ext) = $file =~ /\A(.+)\.([^.]+)\z/ ? ($1, $2) : ($file, undef);
+			my $src = eval { $self->open_table($table, directory => $dir_part, host => $host,
+				defined $ext ? (file_ext => $ext) : ()) };
+			return ($src, $file) if $src && !$@;
+			return ();
+		}
+		my $file = eval { Mojo::File->new($path_arg)->realpath };
 		if (defined $file && -f $file && $file->basename =~ $EXT_RE) {
 			my $dir = $file->dirname->to_string;
 			(my $table = $file->basename) =~ s/\.[^.]+\z//;
@@ -318,10 +342,29 @@ sub _spec_to_url :Protected ($self, $spec) {
 	return '/';
 }
 
+# _url_attribution($self) -> ($url_string, $date_string) or (undef, undef)
+#
+# Purpose: Return source URL and access date for chart attribution when the
+#          left table was imported from a web URL.  The date is the time of
+#          the current request (which is when the data is being accessed),
+#          formatted as "D Month YYYY".
+# Entry:   Reads the 'l' query param.
+# Exit:    ($url, $date) when the spec matches $URL_SPEC_RE; (undef, undef)
+#          for table: and path: specs.
+sub _url_attribution :Protected ($self) {
+	my $spec = $self->param('l') // '';
+	return (undef, undef) unless $spec =~ $URL_SPEC_RE;
+	my $url  = $1;
+	my @MON  = qw(January February March April May June July August
+	              September October November December);
+	my (undef, undef, undef, $mday, $mon, $year) = localtime;
+	return ($url, sprintf('%d %s %d', $mday, $MON[$mon], $year + 1900));
+}
+
 # _get_columns($source, $records) -> @column_names
 #
 # Purpose: Return an ordered column list from a DataSource object.
-#          For CSV/PSV the DataSource stores the original file-header order.
+#          For CSV/TSV/PSV the DataSource stores the original file-header order.
 #          For SQLite/XML where no file-header order is available, the fallback
 #          is: id_column first (only if it actually appears in the data), then
 #          the remaining columns sorted alphabetically.
@@ -617,6 +660,7 @@ sub _run_export_pipeline :Protected ($self) {
 
 	# Build the join chain lazily: each Database::Join wraps the previous source
 	# and a new right DataSource.  No data is fetched until after the loop.
+	my $max_rows = $self->app->config('join_max_rows') // $DEFAULT_JOIN_MAX_ROWS;
 	my $src = $left_src;
 	for my $jspec (@{ $self->every_param('j') }) {
 		my ($right_spec, $left_key, $right_key) = split /\|/, $jspec, 3;
@@ -637,6 +681,8 @@ sub _run_export_pipeline :Protected ($self) {
 		$src = Database::Join->new(
 			databases        => [$src, $right_src],
 			join_column      => $left_key,
+			backend          => 'auto',
+			max_array_rows   => $max_rows,
 			($left_key ne $right_key ? (join_map         => {1 => $right_key})   : ()),
 			($right_label             ? (collision_prefix => {1 => $right_label}) : ()),
 		);
@@ -673,6 +719,24 @@ sub _run_export_pipeline :Protected ($self) {
 	$records = _dedup_records($records, \@columns) if $self->param('d');
 
 	return ($records, \@columns, $left_label);
+}
+
+# _decode_cell($s) -> $character_string
+#
+# Purpose: Ensure $s is a Perl character string, not raw UTF-8 bytes.
+#          URL-fetched data (via LWP::UserAgent::Cached + D::A HTML parsing)
+#          arrives as byte strings without the UTF-8 flag set.  encode_json
+#          then treats each byte as a Latin-1 code point and re-encodes it,
+#          producing mojibake like "KÃ¶nig" for "Koenig".  This helper
+#          upgrades the flag in-place on a copy so the original hash key is
+#          unchanged but the value passed to HTML::D3 is a proper character.
+# Entry:   $s -- any defined scalar (undef returned as-is).
+# Exit:    The same string value, but with the UTF-8 flag set if it was absent.
+sub _decode_cell {
+	my $s = shift;
+	return $s unless defined $s;
+	utf8::decode($s) unless utf8::is_utf8($s);
+	$s;
 }
 
 # _serialize_csv($records, \@columns) -> $utf8_string
@@ -1011,7 +1075,7 @@ C<GET /open> -- Open a supported data file from any absolute filesystem path.
 
 =item Extension filter (C<EXT_RE>)
 
-The basename must match C<\.(?:csv|db|sql|xml|psv)\z> (case-insensitive).
+The basename must match C<\.(?:csv|db|sql|xml|tsv|psv)\z> (case-insensitive).
 The C<\z> anchor (absolute end-of-string) means a URL-encoded trailing
 newline (e.g. C<file.csv%0A> decoded to C<file.csv\n>) does NOT pass --
 the C<\n> falls after the C<\z> boundary and the extension check fails.
@@ -1019,7 +1083,7 @@ the C<\n> falls after the C<\z> boundary and the extension check fails.
 =item Valid partition
 
 C</data/sales.csv> (lowercase extension), C</tmp/REPORT.CSV> (uppercase
-extension, /i matches), any C<.db>, C<.sql>, C<.xml>, C<.psv> regular
+extension, /i matches), any C<.db>, C<.sql>, C<.xml>, C<.tsv>, C<.psv> regular
 file.
 
 =item Invalid partition
@@ -1070,6 +1134,57 @@ sub open_file ($self) {
 	my $file_path = $self->param('path');
 
 	return $self->reply->not_found unless defined $file_path;
+
+	# Remote path /../hostname/dir/file.ext: delegate opening to _open_spec
+	# and render the dashboard directly, bypassing the realpath/local-file path.
+	if ($file_path =~ m{\A/\.\./}) {
+		my $lspec = 'path:' . $file_path;
+		my ($source, $label) = $self->_open_spec($lspec);
+		return $self->reply->not_found unless $source;
+		my $filename = $label;
+		(my $table = $filename) =~ s/\.[^.]+\z//;
+		my $records;
+		eval { $records = $source->fetch_all };
+		if ($@) {
+			return $self->render(
+				template   => "$platform/$language/home",
+				handler    => 'tt',
+				format     => 'html',
+				tables     => [],
+				title      => 'Error',
+				error      => $self->_i18n('error_file_open', $filename, $@),
+				back_url   => '/',
+				back_label => 'Home',
+			);
+		}
+		my @columns  = _get_columns($source, $records);
+		my ($filtered, $filter_specs, $filters_json) = $self->_apply_filters($records);
+		my $dedup = $self->param('d') ? 1 : 0;
+		$filtered = _dedup_records($filtered, \@columns) if $dedup;
+		return $self->render(
+			template         => "$platform/$language/dashboard",
+			handler          => 'tt',
+			format           => 'html',
+			records          => $filtered,
+			columns          => \@columns,
+			table            => $table,
+			title            => $filename,
+			back_url         => '/',
+			back_label       => 'Home',
+			back2_url        => _safe_back_url($self->param('back2')),
+			back2_label      => $self->param('back2_label') // 'Back',
+			file_path        => $file_path,
+			left_spec        => $lspec,
+			combine_specs    => [],
+			current_joins    => [],
+			available_tables => $self->_scan_data_dir,
+			join_summaries   => [],
+			filter_specs     => $filter_specs,
+			filters_json     => $filters_json,
+			dedup            => $dedup,
+			export_url       => $self->_build_export_url($lspec, [], $filter_specs, undef, $dedup),
+		);
+	}
 
 	my $file = eval { Mojo::File->new($file_path)->realpath };
 	return $self->reply->not_found
@@ -1300,11 +1415,21 @@ sub columns_api ($self) {
 		$source = eval { $self->open_table(lc $table_name, directory => $data_dir->to_string) };
 	}
 	elsif (defined $path) {
-		my $file = eval { Mojo::File->new($path)->realpath };
-		if (defined $file && -f $file && $file->basename =~ $EXT_RE) {
-			my $dir = $file->dirname->to_string;
-			(my $tbl = $file->basename) =~ s/\.[^.]+\z//;
-			$source = eval { $self->open_table($tbl, directory => $dir) };
+		if ($path =~ m{\A/\.\./([^/]+)((?:/.+)?)/([^/]+)\z}) {
+			my ($host, $dir_part, $file) = ($1, $2 // '', $3);
+			$dir_part = '/' unless length $dir_part;
+			if ($host =~ $REMOTE_HOST_RE) {
+				my ($tbl, $ext) = $file =~ /\A(.+)\.([^.]+)\z/ ? ($1, $2) : ($file, undef);
+				$source = eval { $self->open_table($tbl, directory => $dir_part, host => $host,
+					defined $ext ? (file_ext => $ext) : ()) };
+			}
+		} else {
+			my $file = eval { Mojo::File->new($path)->realpath };
+			if (defined $file && -f $file && $file->basename =~ $EXT_RE) {
+				my $dir = $file->dirname->to_string;
+				(my $tbl = $file->basename) =~ s/\.[^.]+\z//;
+				$source = eval { $self->open_table($tbl, directory => $dir) };
+			}
 		}
 	}
 
@@ -1380,6 +1505,7 @@ sub join_tables ($self) {
 
 	# Build the join chain: each step wraps the previous source in a
 	# Database::Join.  Data is not fetched until after the loop.
+	my $max_rows = $self->app->config('join_max_rows') // $DEFAULT_JOIN_MAX_ROWS;
 	my $src = $left_src;
 	for my $jspec (@join_specs) {
 		my ($right_spec, $left_key, $right_key) = split /\|/, $jspec, 3;
@@ -1400,6 +1526,8 @@ sub join_tables ($self) {
 		$src = Database::Join->new(
 			databases        => [$src, $right_src],
 			join_column      => $left_key,
+			backend          => 'auto',
+			max_array_rows   => $max_rows,
 			($left_key ne $right_key ? (join_map         => {1 => $right_key})   : ()),
 			($right_label             ? (collision_prefix => {1 => $right_label}) : ()),
 		);
@@ -1604,7 +1732,7 @@ absent/undef (defaults to CSV).
 
 =item Invalid partitions (all fall back to CSV)
 
-Any value not in the valid set (e.g. C<SQLITE>, C<Json>, C<tsv>).
+Any value not in the valid set (e.g. C<SQLITE>, C<Json>).
 
 =back
 
@@ -1913,7 +2041,7 @@ concurrent uploads of files with the same name do not collide.
 
 Multipart form upload, field name: C<file>.
 
-  file   upload   Supported extensions: csv, db, sql, xml, psv.
+  file   upload   Supported extensions: csv, db, sql, xml, tsv, psv.
 
 =head4 OUTPUT
 
@@ -2061,8 +2189,8 @@ sub graph_view ($self) {
 		(my $y_num = $y) =~ s/[^\d.\-]//g;
 		$y_num = "-$y_num" if $is_acct_neg && $y_num =~ /\A\d/;
 		next unless $y_num =~ /\A-?\d+(?:\.\d+)?\z/;
-		my %extra = map { $_ => $row->{$_} } grep { $_ ne $x_col && $_ ne $y_col } @{$columns};
-		push @pairs, [$x, $y_num + 0, \%extra];
+		my %extra = map { $_ => _decode_cell($row->{$_}) } grep { $_ ne $x_col && $_ ne $y_col } @{$columns};
+		push @pairs, [_decode_cell($x), $y_num + 0, \%extra];
 	}
 
 	return $self->render(
@@ -2075,24 +2203,31 @@ sub graph_view ($self) {
 	my $max_y   = max(@y_vals);
 	my $avg_y   = sum(@y_vals) / scalar(@y_vals);
 
+	my ($source_url, $source_accessed) = $self->_url_attribution;
+
 	require HTML::D3;
 	my $title   = "$y_col vs $x_col";
 	my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580)
 		->render_zoomable_line_chart_snippet(\@pairs, { animated => 1 });
 
+	my $graph_html = $snippet->{html};
+	utf8::decode($graph_html) unless utf8::is_utf8($graph_html);
+
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
-		handler      => 'tt',
-		template     => "$platform/$language/graph",
-		format       => 'html',
-		title        => $title,
-		graph_html   => $snippet->{html},
-		back_url     => $back,
-		back_label   => 'Back to table',
-		point_count  => scalar @pairs,
-		ref_min_y    => $min_y,
-		ref_max_y    => $max_y,
-		ref_avg_y    => sprintf('%.4g', $avg_y),
+		handler          => 'tt',
+		template         => "$platform/$language/graph",
+		format           => 'html',
+		title            => $title,
+		graph_html       => $graph_html,
+		back_url         => $back,
+		back_label       => 'Back to table',
+		point_count      => scalar @pairs,
+		ref_min_y        => $min_y,
+		ref_max_y        => $max_y,
+		ref_avg_y        => sprintf('%.4g', $avg_y),
+		source_url       => $source_url,
+		source_accessed  => $source_accessed,
 	);
 }
 
@@ -2153,7 +2288,9 @@ sub pie_view ($self) {
 		status => 200,
 	) unless %totals;
 
-	my @slices = map { [$_, $totals{$_}] } sort keys %totals;
+	my @slices = map { [_decode_cell($_), $totals{$_}] } sort keys %totals;
+
+	my ($source_url, $source_accessed) = $self->_url_attribution;
 
 	require HTML::D3;
 	my $title   = $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
@@ -2166,19 +2303,112 @@ sub pie_view ($self) {
 			legend      => 1,
 		});
 
+	my $pie_html = $snippet->{html};
+	utf8::decode($pie_html) unless utf8::is_utf8($pie_html);
+
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
-		handler      => 'tt',
-		template     => "$platform/$language/pie",
-		format       => 'html',
-		title        => $title,
-		pie_html        => $snippet->{html},
-		back_url        => $back,
-		back_label      => 'Back to table',
-		slice_count     => scalar @slices,
-		cat_col         => $cat_col,
-		val_col         => $val_col,
-		currency_symbol => $currency_symbol,
+		handler          => 'tt',
+		template         => "$platform/$language/pie",
+		format           => 'html',
+		title            => $title,
+		pie_html         => $pie_html,
+		back_url         => $back,
+		back_label       => 'Back to table',
+		slice_count      => scalar @slices,
+		cat_col          => $cat_col,
+		val_col          => $val_col,
+		currency_symbol  => $currency_symbol,
+		source_url       => $source_url,
+		source_accessed  => $source_accessed,
+	);
+}
+
+sub heatmap_view ($self) {
+	my $x_col   = $self->param('x')        // '';
+	my $y_col   = $self->param('y')        // '';
+	my $val_col = $self->param('val')      // '';
+	my $scheme  = $self->param('scheme')   // 'YlOrRd';
+	my $show_v  = $self->param('show_val') ? 1 : 0;
+	my $back    = _safe_back_url($self->param('back')) // '/';
+
+	return $self->render(text => 'Missing x or y column parameter', status => 400)
+		unless length($x_col) && length($y_col);
+
+	my ($records, $columns) = $self->_run_export_pipeline;
+	return $self->render(text => 'Could not open data source', status => 404)
+		unless $records;
+
+	my %col_set = map { $_ => 1 } @{$columns};
+	return $self->render(text => "Column not found: $x_col", status => 400)
+		unless $col_set{$x_col};
+	return $self->render(text => "Column not found: $y_col", status => 400)
+		unless $col_set{$y_col};
+	return $self->render(text => "Column not found: $val_col", status => 400)
+		if length($val_col) && !$col_set{$val_col};
+
+	# Aggregate flat rows into [$x, $y, $value] triples.
+	# Preserve first-seen order for both axes so natural sort order in the
+	# source data (e.g. dates) is reflected on the chart axes.
+	my (%grid, @x_order, @y_order, %seen_y);
+	for my $row (@{$records}) {
+		my $x = $row->{$x_col} // next;
+		my $y = $row->{$y_col} // next;
+		next unless length($x) && length($y);
+		push @x_order, $x unless exists $grid{$x};
+		push @y_order, $y unless $seen_y{$y}++;
+		if (length($val_col)) {
+			my $v = $row->{$val_col} // 0;
+			my $is_acct_neg = ($v =~ /\A\s*\(/);
+			(my $v_num = $v) =~ s/[^\d.\-]//g;
+			$v_num = "-$v_num" if $is_acct_neg && $v_num =~ /\A\d/;
+			$v_num = 0 unless $v_num =~ /\A-?\d+(?:\.\d+)?\z/;
+			$grid{$x}{$y} += $v_num + 0;
+		} else {
+			$grid{$x}{$y}++;
+		}
+	}
+
+	my @triples = map {
+		my ($raw_x, $xv) = ($_, _decode_cell($_));
+		map { [$xv, _decode_cell($_), $grid{$raw_x}{$_}] } @y_order
+	} @x_order;
+
+	return $self->render(
+		text   => 'No plottable data: check that x and y columns contain values.',
+		status => 200,
+	) unless @triples;
+
+	my ($source_url, $source_accessed) = $self->_url_attribution;
+
+	require HTML::D3;
+	my $title   = length($val_col) ? "$val_col by $x_col and $y_col"
+	                                : "Count by $x_col and $y_col";
+	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500)
+		->render_heatmap_snippet(\@triples, {
+			x_label      => $x_col,
+			y_label      => $y_col,
+			val_label    => (length($val_col) ? $val_col : 'Count'),
+			color_scheme => $scheme,
+			show_values  => $show_v,
+			animated     => 1,
+		});
+
+	my $heatmap_html = $snippet->{html};
+	utf8::decode($heatmap_html) unless utf8::is_utf8($heatmap_html);
+
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler          => 'tt',
+		template         => "$platform/$language/heatmap",
+		format           => 'html',
+		title            => $title,
+		heatmap_html     => $heatmap_html,
+		cell_count       => scalar @triples,
+		back_url         => $back,
+		back_label       => 'Back to table',
+		source_url       => $source_url,
+		source_accessed  => $source_accessed,
 	);
 }
 
@@ -2607,9 +2837,11 @@ are not interchangeable.
 
 =item *
 
-Multi-table joins are delegated to C<Database::Join>.  All component tables
-are fetched into memory before the merge; this is not suitable for very large
-result sets.  C<Database::Join> operates in-memory only.
+Multi-table joins are delegated to C<Database::Join> with C<backend =E<gt> 'auto'>.
+For datasets up to C<join_max_rows> combined rows (default 10,000; configurable
+in C<database_bi.conf>) the join runs in Perl memory; larger datasets spill to
+a temporary SQLite database so peak RAM is bounded by the result set rather than
+the sum of all source tables.
 
 =item *
 

@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 
-use curry;
 use MIDI::RtController ();
 use MIDI::RtController::Filter::CC ();
 use Term::TermKey::Async qw(FORMAT_VIM KEYMOD_CTRL);

@@ -163,7 +163,7 @@ subtest 'SEC1: column-value SQL injection is neutralised by DBI bind params' => 
 	# Exploits naive string interpolation: SELECT … WHERE entry = '' OR '1'='1'
 	# Bind params prevent this; the literal string is matched literally (no rows).
 	my $rows = $db->selectall_arrayref(entry => "' OR '1'='1");
-	is(scalar @{$rows}, 0,
+	ok(!defined($rows),
 		'SEC1.1 Boolean tautology via entry value returns 0 rows (bind param)');
 
 	# 1.2 Statement-terminator injection: ; DROP TABLE

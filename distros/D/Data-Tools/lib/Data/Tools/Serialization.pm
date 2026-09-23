@@ -1,9 +1,9 @@
 ##############################################################################
 #
 #  Data::Tools::Serialization perl module
-#  Copyright (c) 2013-2024 Vladi Belperchinov-Shabanski "Cade" 
+#  Copyright (c) 2013-2024 Vladi Belperchinov-Shabanski "Cade"
 #        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
-#  http://cade.noxrun.com/  
+#  http://cade.noxrun.com/
 #
 #  GPL
 #
@@ -12,35 +12,37 @@ package Data::Tools::Serialization;
 use strict;
 use Exporter;
 use Carp;
-use Data::Tools;
-use Math::BigFloat;
+use JSON;
 
-our $VERSION = '1.50';
+our $VERSION = '1.52';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
 
                   xml2perl
                   perl2xml
-                  
+
                   json2perl
                   perl2json
 
                 );
 
 our %EXPORT_TAGS = (
-                   
+
                    'all'  => \@EXPORT,
                    'none' => [],
-                   
+
                    );
 
 ##############################################################################
 
 BEGIN
 {
-  require XML::Bare;
-  require JSON;
+  eval
+    {
+    require XML::Bare;
+    require JSON;
+    };
 }
 
 sub xml2perl
@@ -53,7 +55,7 @@ sub perl2xml
 {
   return XML::Bare::obj2xml( shift() );
 }
-                  
+
 sub json2perl
 {
   return JSON::decode_json( shift );
@@ -71,13 +73,13 @@ sub perl2json
 
 =head1 NAME
 
-  Data::Tools::Serialization provides set of high-level serialization 
+  Data::Tools::Serialization provides set of high-level serialization
   and deserialization wrapper functions.
 
 =head1 SYNOPSIS
 
   use Data::Tools::Serialization qw( :all );  # import all functions
-  use Data::Tools::Serialization;             # the same as :all :) 
+  use Data::Tools::Serialization;             # the same as :all :)
   use Data::Tools::Serialization qw( :none ); # do not import anything
 
   # --------------------------------------------------------------------------
@@ -114,21 +116,21 @@ Data::Tools::Serialization uses:
 
   * XML::Bare
   * JSON
-  
+
 all are loaded on demand and are not initial requirement nor if just other
 parts of the Data::Tools are used.
 
 =head1 GITHUB REPOSITORY
 
   git@github.com:cade-vs/perl-data-tools.git
-  
+
   git clone git://github.com/cade-vs/perl-data-tools.git
-  
+
 =head1 AUTHOR
 
   Vladi Belperchinov-Shabanski "Cade"
         <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
-  http://cade.noxrun.com/  
+  http://cade.noxrun.com/
 
 
 =cut

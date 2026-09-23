@@ -148,10 +148,45 @@ register(self, app, opts = &PL_sv_undef)
                          ? hv_fetchs((HV *)SvRV(opts), "disallow", 0) : NULL;
                 SV **da = (SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
                           ? hv_fetchs((HV *)SvRV(opts), "disallow_all", 0) : NULL;
+                SV **ag = (SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
+                          ? hv_fetchs((HV *)SvRV(opts), "agents", 0) : NULL;
                 if (d && *d && SvROK(*d) && SvTYPE(SvRV(*d)) == SVt_PVAV)
                     (void)hv_stores(h, "sitemap_disallow", newSVsv(*d));
                 if (da && *da) (void)hv_stores(h, "sitemap_disallow_all",
                                                newSViv(SvTRUE(*da) ? 1 : 0));
+                /* The user agents each group is repeated for. Checked here
+                 * rather than where the file is built, because a token with a
+                 * space in it is a typo that would otherwise be discovered as
+                 * a crawler reading a directive that was never written. */
+                if (ag && *ag) {
+                    AV *av;
+                    SSize_t i, n;
+                    if (!(SvROK(*ag) && SvTYPE(SvRV(*ag)) == SVt_PVAV))
+                        croak("Punk::Plugin::Sitemap: agents is an arrayref "
+                              "of user-agent tokens");
+                    av = (AV *)SvRV(*ag);
+                    n  = av_len(av) + 1;
+                    for (i = 0; i < n; i++) {
+                        SV **e = av_fetch(av, i, 0);
+                        STRLEN l, j;
+                        const char *s;
+                        if (!(e && *e && SvOK(*e)))
+                            croak("Punk::Plugin::Sitemap: agents holds a "
+                                  "user-agent token, not undef");
+                        s = SvPV_const(*e, l);
+                        if (!l)
+                            croak("Punk::Plugin::Sitemap: an empty user-agent "
+                                  "token names no crawler");
+                        for (j = 0; j < l; j++)
+                            if (isSPACE(s[j]) || s[j] == ':'
+                                || (unsigned char)s[j] < 0x20)
+                                croak("Punk::Plugin::Sitemap: '%.*s' is not a "
+                                      "user-agent token - a token carries no "
+                                      "space, colon or newline",
+                                      (int)l, s);
+                    }
+                    (void)hv_stores(h, "sitemap_agents", newSVsv(*ag));
+                }
                 (void)hv_stores(h, "sitemap_ttl",
                                 (t && SvOK(t) && SvNV(t) > 0)
                                     ? newSVnv(SvNV(t)) : newSVnv(3600.0));

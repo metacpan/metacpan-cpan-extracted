@@ -14,7 +14,7 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: August 23 2026 $
+.Dd $Mdocdate: September 11 2026 $
 .Dt FUGUVM 1
 .Os
 .Sh NAME
@@ -22,821 +22,824 @@
 .Nd install and manage OpenBSD virtual machines
 .Sh SYNOPSIS
 .Nm fuguvm
-.Op Fl hq
-.Op Fl Fl vm Ar name
-.Op Fl Fl project Ar dir
+.Op Fl hqv
 .Op Fl Fl emulate
+.Op Fl Fl project Ar dir
+.Op Fl Fl vm Ar name
 .Ar command
 .Op Ar argument ...
+.Nm fuguvm
+.Cm init
+.Op Ar dir
+.Nm fuguvm
+.Cm up
+.Op Fl Fl no-cache
+.Nm fuguvm
+.Cm down | destroy | start
+.Nm fuguvm
+.Cm stop
+.Op Fl f
+.Nm fuguvm
+.Cm status
+.Op Ar key
+.Nm fuguvm
+.Cm wait
+.Op Fl Fl timeout Ar seconds
+.Nm fuguvm
+.Cm ssh
+.Op Fl Fl
+.Op Ar command Op Ar argument ...
+.Nm fuguvm
+.Cm put
+.Op Fl Fl mode Ar octal
+.Ar local remote
+.Nm fuguvm
+.Cm get Ar remote local
+.Nm fuguvm
+.Cm console
+.Nm fuguvm
+.Cm expect Ar script
+.Op Ar argument ...
+.Nm fuguvm
+.Cm cache list
+.Nm fuguvm
+.Cm cache clear
+.Op Fl Fl stale
+.Nm fuguvm
+.Cm snapshot save | restore | rm Ar name
+.Nm fuguvm
+.Cm snapshot list
+.Op Fl Fl names
+.Nm fuguvm
+.Cm image export Ar path
+.Op Fl Fl format Cm qcow2 | raw
+.Nm fuguvm
+.Cm mirror fetch Ar file
+.Nm fuguvm
+.Cm mirror verify
+.Nm fuguvm
+.Cm disk check | repair | info
+.Nm fuguvm
+.Cm help
+.Op Ar command
 .Sh DESCRIPTION
 .Nm
 installs and manages
 .Ox
 virtual machines under QEMU.
-It downloads the installation image,
-creates the disk image,
-and answers the installer over the serial console.
-It then controls the machine's lifecycle,
-guest access,
-and console automation.
-You need only one command to go from nothing to a machine that accepts
-.Xr ssh 1 .
-A second run of the command does nothing.
-.Pp
-The
-.Ar arch
-directive of a VM configuration selects the guest architecture:
-.Cm amd64
-or
-.Cm arm64 .
-The default is
-.Cm arm64 .
-The value selects the QEMU binary,
-the machine type,
-the firmware,
-the installer answers,
-and the image-cache key.
-A disk belongs to one architecture for its whole life:
-after a change of the directive,
-rebuild the VM with
-.Cm destroy
-and
-.Cm up .
+It downloads the install media, creates the disk, answers the installer
+over the serial console, and caches the installed disk.
+It then drives the lifecycle of the guest: boot, wait, ssh, file
+transfer, snapshot, and shutdown.
+One command takes a project from nothing to a guest that accepts
+.Xr ssh 1 ,
+and a second run of that command changes nothing.
 .Pp
 The host does not have to run
 .Ox .
-A host that runs QEMU is sufficient,
-and
+A Linux or Darwin host that runs QEMU is sufficient, and
 .Nm
 selects the accelerator to match the host.
-Thus a Linux or Darwin workstation can build,
-test,
-or reproduce a bug on a real
-.Ox
-system without an
-.Ox
-machine on the desk.
 .Pp
-.Nm
-operates on a project:
-a directory that has an
+A project is a directory that holds a
 .Pa .fuguvmrc
-configuration file and an
+file and a
 .Pa .fuguvm/
-state directory.
-The
-.Cm init
-command creates them.
-If you do not give
+directory.
+Without
 .Fl Fl project ,
 .Nm
-searches up from the current directory for an
-.Pa .fuguvmrc
-file.
-The directory that holds this file is the project root.
+searches up from the current directory for the file.
+The directory that holds it is the project root.
+See
+.Sx CONFIGURATION .
 .Pp
-The options are:
+The options are as follows:
 .Bl -tag -width Ds
-.It Fl Fl vm Ar name
-Operate on the named VM.
-The default comes from the
-.Ar default_vm
-directive,
-or it is
-.Dq default .
-VM definitions are in
-.Pa .fuguvm/vms/ Ns Ar name Ns Pa .conf .
+.It Fl Fl emulate
+Run the guest under TCG software emulation, whatever the host can do.
+.It Fl h , Fl Fl help
+Print the usage message and exit.
 .It Fl Fl project Ar dir
 Use
 .Ar dir
-as the project root,
-and do not search for it.
+as the project root, and do not search for one.
 .It Fl q , Fl Fl quiet
-Do not show informational output.
-.It Fl Fl emulate
-Use TCG software emulation,
-not hardware acceleration.
-Without this flag,
-.Nm
-selects the accelerator automatically.
-It selects KVM or HVF only when the host machine runs the
-instruction set of the guest.
-KVM serves Linux hosts with a writable
-.Pa /dev/kvm ,
-and HVF serves Darwin hosts.
-It selects TCG in every other case.
-.It Fl h , Fl Fl help
-Show the usage message.
+Do not print informational messages.
+The data lines of
+.Cm status ,
+.Cm disk info ,
+.Cm image export ,
+.Cm mirror fetch
+and
+.Cm snapshot list Fl Fl names
+still print.
+.It Fl v , Fl Fl verbose
+Print debug messages as well.
+.It Fl Fl vm Ar name
+Operate on the named guest.
+The default is the
+.Ic default_vm
+setting, or
+.Cm default .
 .El
 .Pp
-These commands are available:
-.Bl -tag -width "expect script"
+The commands are as follows:
+.Bl -tag -width Ds
 .It Cm init Op Ar dir
 Initialize a project in
-.Ar dir
-(default: the current directory).
-The command creates
-.Ar dir
-if it is absent.
-It also creates the
+.Ar dir ,
+which defaults to the current directory.
+The command writes a
 .Pa .fuguvmrc
-project configuration,
-the
+with the three project settings, a
 .Pa .fuguvm/
 directory with the
 .Pa vms/
 and
 .Pa state/
-subdirectories,
-and a default VM configuration.
-The command is idempotent:
-it does nothing if the project is already initialized.
+subdirectories, and the declaration of the
+.Cm default
+guest.
+It does nothing when the project is initialized already.
 .It Cm up Op Fl Fl no-cache
-Make sure that the VM runs.
-The command downloads the installation image,
-creates the disk image,
-and starts the VM,
-as necessary.
-The command is idempotent.
-.Pp
-The configuration selects one of three install modes.
-Without an origin directive,
-.Cm up
-installs with the shipped expect installer.
-With
-.Ar autoinstall Ar file ,
-it installs from an
-.Xr autoinstall 8
-response file:
-a local HTTP responder serves the file to the guest on the loopback
-address,
-the guest fetches it through the QEMU gateway,
-and the file answers every installer question.
-The responder replaces each
-.Ql @PROXY_URL@
-token in the file with the guest URL of the mirror proxy.
-QEMU runs with
-.Fl no-reboot
-for that installation,
-so the reboot at the end of the install cannot start a second one.
-With
-.Ar base_disk Ar path ,
-.Cm up
-installs nothing:
-it publishes the named image as a cache entry one time,
-and overlays the working disk on it.
-The two directives contradict each other.
-.Pp
-If the installed-image cache is on,
-.Cm up
-uses both sides of that cache.
-If there is no disk image,
-.Cm up
-creates one as an overlay on a cached base that matches,
-and boots the installed system directly.
-This skips the miniroot download and the installer.
-After an installation,
-.Cm up
-publishes the newly installed disk as a new cached base.
-The cache operation is best effort:
-a failure causes a warning,
-and the VM starts,
-with an installation from scratch or with a standalone disk.
+Make sure that the guest runs.
+The command restores the disk from the image cache, or downloads the
+install media and installs the guest, and then starts it.
+It installs the
+.Ic ssh_pubkey
+when the guest does not hold it yet.
+See
+.Sx INSTALLATION .
 .Pp
 .Fl Fl no-cache
-skips the restore and the save for this run.
-This causes a fresh installation and does not change the cache.
-The flag overrides the
-.Ar image_cache
-directive.
-Use it to debug the installer itself.
+skips both the restore and the save of the image cache for this run,
+and overrides the
+.Ic image_cache
+setting.
+The guest then installs from scratch onto a standalone disk.
 .It Cm down
-Stop the VM gracefully.
+Stop the mirror proxy and the guest, and record a clean shutdown.
 .It Cm destroy
-Stop the VM and delete its disk image.
+Stop the guest and delete its disk and state.
 .It Cm start
-Start the VM in the background.
+Start the guest in the background.
+The command needs an existing disk, refuses a running guest with
+status 5, and does not start the proxy.
 .It Cm stop Op Fl f , Fl Fl force
-Stop the VM.
+Stop the guest.
+The shutdown syncs the guest filesystems, powers the guest off through
+ACPI, and forces the process to stop only after that.
+Every step is bounded.
 With
 .Fl f ,
-stop it with force.
+the command kills the process at once.
 .It Cm status Op Ar key
-Write the VM status to standard output,
-as one
+Print the state of the guest to standard output, as one
 .Ar key : value
-line for each key,
-in sorted key order.
-The lines are data,
-so
-.Fl Fl quiet
-does not suppress them.
-The key set is stable:
-.Ar accel , arch , bind_address , console_port , disk_exists ,
-.Ar installed , name , pid , proxy_url , ssh_port ,
+line for each key, in sorted key order.
+The keys are
+.Cm accel , arch , bind_address , console_port , disk_exists ,
+.Cm installed , name , pid , proxy_url , ssh_port
 and
-.Ar state .
-A value can be empty,
-and an empty value means
+.Cm state .
+An empty value means
 .Dq not now :
 a stopped guest has no
-.Ar pid ,
+.Cm pid ,
+no
+.Cm proxy_url ,
 and no port for a directive of
 .Cm auto .
-.Ar proxy_url
-is the proxy URL as the guest reaches it,
-and it is empty while the proxy does not run.
-The port changes between runs,
-so a consumer reads the value here and must not write it in a file.
 .Pp
 With
 .Ar key ,
-write the bare value of that one key,
-with no key name and no colon.
-Thus a script reads one port without a text filter.
-An unknown
-.Ar key
-causes an exit with code 2,
-and the diagnostic names every valid key.
-.Cm disk info
-follows the same
-.Ar key : value
-contract on standard output.
+print the bare value of that one key.
+An unknown key exits with status 2, and the message names every key.
+.It Cm wait Op Fl Fl timeout Ar seconds
+Block until the guest accepts an SSH connection.
+The default timeout is 120 seconds, and a timeout exits with status 7.
 .It Cm ssh Oo Fl Fl Oc Op Ar command Op Ar argument ...
-Open an interactive SSH session to the VM as root,
-or run one remote command and exit with its exit code.
-Authentication uses the SSH agent.
+Open an interactive SSH session to the guest as root, or run one
+remote command and exit with its exit status.
+The connection authenticates with the SSH agent.
 .Pp
-With arguments,
-each argument is one word of the argument vector.
-The tool quotes every word.
-Thus the remote shell performs no splitting,
-no expansion,
-and no globbing,
-and the words arrive exactly as you wrote them.
+Each argument is one word of the remote argument vector.
+The tool quotes every word, so the remote shell splits nothing,
+expands nothing, and globs nothing.
 Write
 .Fl Fl
-before any word that starts with a hyphen:
-the option parser reads such a word as an option of the tool,
-and it exits with code 2.
+before a word that starts with a hyphen.
 A caller that wants a remote shell asks for one:
 .Bd -literal -offset indent
 $ fuguvm ssh -- sh -c 'cd /src && make regress'
 .Ed
 .Pp
-The remote command gets no terminal and no standard input,
-and its output arrives when the command ends.
-The interactive form keeps the standard input of the caller.
-.It Cm put Oo Fl Fl mode Ns = Ns Ar octal Oc Ar local remote
+The remote command gets no terminal and no standard input.
+.It Cm put Oo Fl Fl mode Ar octal Oc Ar local remote
 Copy the local file or directory
 .Ar local
-into the running guest,
-at the absolute path
-.Ar remote .
+into the guest at the absolute path
+.Ar remote ,
+over SFTP.
 .Ar remote
 is never a container:
 .Ql put src /root
 writes the content of
 .Pa src
 into
-.Pa /root ,
-and it adds no
-.Pa src
-component.
-The bytes move over the SFTP channel.
+.Pa /root .
 .Pp
-The tool writes each file to a temporary name beside its destination,
+The tool writes each file to a temporary name beside its destination
 and then publishes every file with
-.Xr mv 1 .
-A failure removes every temporary file.
-Thus a failed run leaves no partial destination file.
-A directory copy is not atomic as a whole:
-a failure can leave files that an earlier batch published.
-.Pp
+.Xr mv 1 ,
+so a failure leaves no partial file.
+A directory copy is not atomic as a whole.
 .Fl Fl mode
-sets the mode of each written file,
-as 3 or 4 octal digits.
-Without the option,
-each file keeps its local permission bits,
-masked with 0777,
-so no setuid bit and no setgid bit arrives.
-The option does not apply to a directory:
-.Ql mkdir -p
-gives each directory the mode that the remote umask allows.
-.Pp
-The tool refuses a source with a symbolic link,
-a device node,
-a socket,
-or a fifo,
-and a file above 64 MiB,
-before it writes one byte.
+sets the mode of each written file, as 3 or 4 octal digits.
+Without it, each file keeps its local permission bits masked with
+0777.
+The tool refuses a symbolic link, a device node, a socket, a fifo, and
+a file above 64 MiB, before it writes one byte.
 .It Cm get Ar remote local
 Copy one regular guest file at the absolute path
 .Ar remote
 to the host file
 .Ar local .
-The tool reads the whole file first,
-and then writes
+The tool reads the whole file, at most 64 MiB, and then writes
 .Ar local
-atomically,
-mode 0644.
-Thus a failure leaves no partial local file.
-One call copies one file:
-the tool lists no remote directory.
+atomically with mode 0644.
 .Ar local
 must not be an existing directory.
-The command needs a Fugu release with
-.Ql Fugu::SSH->read_file ;
-with an older release it names the needed release and exits with
-code 1.
 .It Cm console
-Attach the terminal of the operator to the VM serial console,
-with
-.Xr telnet 1 ,
-at the connect address of the guest:
-the
-.Ar bind_address ,
-or
-.Li 127.0.0.1
-when the ports bind to
-.Li 0.0.0.0 .
-The guest never closes the console.
+Attach the terminal to the serial console of the guest with
+.Xr telnet 1 .
 End the session with the telnet escape key,
 .Ql Ctrl-\&] ,
 and then
 .Ic quit .
 The tool restores the terminal on every exit path.
-.Pp
-The console takes one client.
-An installation and
+The console takes one client, so do not attach while an installation
+or an
 .Cm expect
-each hold the same port,
-so do not attach while one runs.
+script runs.
 .It Cm expect Ar script Op Ar argument ...
 Run an
 .Xr expect 1
-script against the VM console.
-.It Cm wait Op Fl Fl timeout Ns = Ns Ar seconds
-Block until the VM accepts SSH connections
-(default timeout: 120 seconds).
-.It Cm cache Cm list | clear Op Fl Fl stale
-Manage all data under
-.Ar cache_dir :
-the installed-image cache that
-.Sx IMAGE CACHE
-describes,
-and the downloads that the built-in proxy keeps for the installer.
-.Cm list
-shows one line for each cached image
-.Pq key, size, creation time, snapshot count .
-It puts a mark on the entry that the invoked VM's configuration
-derives at this time.
-Then it shows the proxy's downloads by
+script against the serial console.
+.Ar script
+is a path, or the name of a script under
+.Pa share/fuguvm/expect/ .
+The script gets the host, the port, and each
+.Ar argument ,
+in that order.
+A shipped script reads its timeout from
+.Ev FUGUVM_TIMEOUT .
+A script that fails exits with status 9.
+.It Cm cache list
+List the image cache and the mirror cache.
+The command prints one line for each cached image, with its key, size,
+creation time, and snapshot count, and marks the entry that the
+invoked guest derives.
+It then prints the mirror downloads by
 .Ox
-version,
-and one
+version, and one
 .Ql Distfiles
-line with the size of the distfile tree and the
-.Ar distfile_cache
+line while the distfile tree holds a file.
+.It Cm cache clear Op Fl Fl stale
+Remove every cached image and every mirror download, and the temporary
+trees that an interrupted save left behind.
+With
+.Fl Fl stale ,
+keep the image that the invoked guest derives and the downloads of the
+.Ox
+version that it installs.
+The flag also keeps the distfile tree and re-applies the
+.Ic distfile_cache
 cap.
-The line stays absent while the tree is empty.
-.Cm clear
-removes each image and each download,
-the distfile tree included.
-.Fl Fl stale
-keeps only the image that the invoked VM derives,
-and only the downloads for the
-.Ox
-.Ar version
-that it installs.
-It keeps the distfile tree,
-because a distfile carries no version and a refill is expensive,
-and it re-applies the
-.Ar distfile_cache
-cap.
-Both forms also remove temporary trees that an interrupted save leaves
-behind.
 .Pp
-This removal is the only limit on the downloads.
-Their key is the
-.Ox
-version alone,
-and it has no input in common with the image keys.
-Each pattern that the proxy caches has a version scope.
-Thus,
-after a
-.Ar version
-change,
-the file sets of the previous version stay in the cache until you
-remove them,
-and nothing reads them again.
-.Pp
-The scope of
-.Fl Fl stale
-is one VM:
-the VM that
-.Fl Fl vm
-names.
-Each VM has its own
-.Ar version
-and
-.Ar disk_size
-key inputs.
-Thus a removal for one VM removes bases that a different VM can use.
-It also removes the downloads for the
-.Ox
-version that a different VM installs.
-.Pp
-.Cm clear
-does not remove an entry while a VM in this project runs on it.
-It gives a warning when a removal orphans the disk of a stopped VM
-.Pq rebuild it with Cm destroy No and Cm up .
-.Cm clear
-cannot examine the VMs of other projects that share the same
-.Ar cache_dir ,
-and the two checks do not apply to them.
-.It Cm mirror Cm fetch Ar file
-Download one file of the release of the invoked VM,
-verify it under the release key,
-store it in the proxy cache,
-and write the cached path to standard output,
-where a script can read it.
-The scope comes from the manifests:
-the release scope when the
-.Pa SHA256
-of the architecture directory names the file,
-and the source scope otherwise.
-.Ql fuguvm mirror fetch ports.tar.gz
-is the call that a consumer makes;
-the guest then reads a verified ports tree from the cache,
-over http,
-through the proxy.
-See
-.Sx MIRROR CACHE .
-.It Cm mirror Cm verify
-Verify every cached file of the version and the architecture of the
-invoked VM against the two signed manifests.
-The command writes one scope-and-name line for each file that failed
-and one summary line with the three counts
-.Pq ok, failed, unknown .
-It removes each file that failed,
-in its own scope only,
-because a file that fails a digest must not stay in a cache that a
-later run reads.
-A cached manifest whose signature fails counts as failed too,
-and the command removes it with its signature.
-A file of a scope with no proven manifest reads as unknown.
-It does not remove an unknown file:
-a name that no manifest holds is not a failure,
-and
-.Pa index.txt
-is such a name on every mirror.
-The command exits 1 when one file failed,
-and 0 otherwise.
-It is idempotent:
-a second run over a clean cache removes nothing and exits 0.
+The scope is one guest, so a removal for one guest removes the images
+of another guest with a different
+.Ic version
+or
+.Ic disk_size .
+The command refuses to remove an image that a running guest of the
+project uses, with status 5.
+It warns when a removal orphans the disk of a stopped guest.
 .It Cm snapshot Cm save | restore | rm Ar name
-.It Cm snapshot Cm list Op Fl Fl names
-Manage named snapshot layers over the cached base image.
-Use them to cache guest states that
-.Nm
-does not know about
-.Pq usually the result of a provisioning script .
+.It Cm snapshot list Op Fl Fl names
+Manage the named snapshot layers of the cache entry that the invoked
+guest derives.
 See
 .Sx IMAGE CACHE .
 .Pp
 .Cm save
-flattens the working disk into the cache,
-under the base image that the disk uses.
+flattens the stopped working disk into the cache as a layer over its
+base image.
+The guest must be installed on a cached image.
 .Cm restore
-replaces the working disk with a new overlay on
-.Ar name ,
-and reseeds the VM state that the snapshot records.
-Stop the VM before both operations:
-a live overlay is not consistent.
-.Cm save
-also needs an installed VM with a disk that is built on a cached image.
-You cannot snapshot a standalone disk
-.Pq from Fl Fl no-cache No or Ar image_cache no .
-.Cm restore
-needs no disk and no state,
-and it can run on a fresh checkout before the first
+replaces the working disk with a new overlay on the layer, and reseeds
+the recorded state.
+It needs no disk and no state, so it runs on a fresh checkout before
+the first
 .Cm up .
-.Pp
-A snapshot that is absent or unresolvable causes an exit with code 11,
-not 1.
-Thus a script can see the difference between this and a real failure:
+Both refuse a running guest with status 5.
+A layer that does not exist exits with status 11, so a script tells
+it from a failure:
 .Bd -literal -offset indent
-fuguvm snapshot restore deps-$hash || provision_from_scratch
+$ fuguvm snapshot restore deps-$hash || provision_from_scratch
 .Ed
 .Pp
-The scope of
 .Cm list
-and
-.Cm rm
-is the cache entry that the current configuration derives.
-.Cm list Fl Fl names
-writes bare snapshot names to standard output,
-one name on each line,
-for scripts.
-Without the flag,
-the output goes to standard error,
-the same as all other informational output.
-.It Cm image Cm export Ar path Op Fl Fl format Ns = Ns Cm qcow2 | raw
-Write the installed base image of the invoked VM as a full-disk image
-at
+prints one line for each layer on standard error.
+With
+.Fl Fl names ,
+it prints the bare names on standard output.
+.It Cm image export Ar path Op Fl Fl format Cm qcow2 | raw
+Write the installed base image of the invoked guest as a full-disk
+image at
 .Ar path .
-The source is the base image of the cache entry that backs the
-working disk;
-a snapshot layer resolves to the same entry.
-A standalone disk
-.Pq from Fl Fl no-cache No or Ar image_cache no
-exports the working disk itself.
+The source is the base image of the cache entry that backs the working
+disk.
+A standalone disk exports the working disk itself.
 The default format is
 .Cm qcow2 ,
 and
 .Cm raw
-writes the sparse raw form.
-Stop the VM first:
-a live overlay is not consistent,
-and the command refuses a running VM with exit code 5.
-An existing
+writes a sparse raw image.
+The command refuses a running guest with status 5, and an existing
 .Ar path
-causes exit code 1,
-because the command must not overwrite an image that an operator
-published.
-The write goes through one temporary sibling and one rename,
-so a failure leaves no partial file behind.
+with status 1.
+The write goes through one temporary sibling and one rename.
 The report on standard output follows the
-.Ar key : value
-contract of
-.Cm status ,
-with the keys
-.Ar bytes , format , key , path
+.Cm status
+contract, with the keys
+.Cm bytes , format , key , path
 and
-.Ar source .
+.Cm source .
+.It Cm mirror fetch Ar file
+Download one file of the release of the invoked guest, verify it under
+the release key, store it in the mirror cache, and print the cached
+path.
+The manifests decide the scope: the release scope when the
+.Pa SHA256
+of the architecture directory names the file, and the source scope
+otherwise.
+See
+.Sx MIRROR CACHE .
+.It Cm mirror verify
+Verify every cached file of the version and the architecture of the
+invoked guest against the two signed manifests.
+The command prints one line for each failed file and one summary line
+with the counts of ok, failed, and unknown files.
+It removes each failed file, and a cached manifest whose signature
+fails.
+A file that no proven manifest names is unknown, and the command keeps
+it.
+The command exits with status 1 when one file failed.
 .It Cm disk Cm check | repair | info
-Manage the VM disk image.
+Manage the working disk with
+.Xr qemu-img 1 .
 .Cm check
-does a check of its integrity.
+checks the integrity of the image.
 .Cm repair
-repairs errors.
-Stop the VM before you run
-.Cm repair .
+repairs it, and refuses a running guest.
 .Cm info
-shows the image details.
-.It Cm help
-Show the usage message.
+prints the image report, in the
+.Ar key : value
+form of
+.Cm status .
+.It Cm help Op Ar command
+Print the usage of the tool, or of one command.
 .El
-.Sh IMAGE CACHE
-An installation of
-.Ox
-under software emulation takes tens of minutes.
-Thus
+.Sh CONFIGURATION
 .Nm
-keeps the result:
-a clean, compacted copy of the disk.
-.Nm
-makes the copy immediately after the installation is complete.
-Later runs use the copy as the backing image of a throwaway overlay.
-With a warm cache,
-.Cm destroy
-and then
-.Cm up
-are a cheap factory reset.
-.Pp
-Entries are under
-.Ar cache_dir ,
-adjacent to the proxy cache that holds the miniroot and the install sets:
+reads two files, both named
+.Pa .fuguvmrc :
+the global file in the home directory, and the project file at the
+project root.
+The project file wins.
+A setting is one
+.Ar name Ar value
+or
+.Ar name No = Ar value
+line.
+A guest is a
+.Ic vm
+block, named by its guest name.
+A
+.Ql #
+starts a comment.
+A line that does not parse is an error that names the file and the
+line, and the tool exits with status 3.
 .Bd -literal -offset indent
-<cache_dir>/proxy/...                            miniroot, install sets
-<cache_dir>/installed/<key>/base.qcow2           mode 0400, compacted
-<cache_dir>/installed/<key>/meta.json            mode 0600
-<cache_dir>/installed/<key>/snapshots/<n>.qcow2  mode 0400
-<cache_dir>/installed/<key>/snapshots/<n>.json   mode 0600
+cache_dir  ~/.cache/fuguvm
+default_vm default
+
+vm "default" {
+	arch         arm64
+	version      7.8
+	memory       2048
+	disk_size    8G
+	ssh_port     2222
+	console_port 4444
+}
 .Ed
 .Pp
-.Ar key
-is
-.Ar version Ns - Ns Ar arch Ns - Ns Ar hash .
+The top-level settings are as follows:
+.Bl -tag -width "distfile_cache" -offset indent
+.It Ic cache_dir
+The cache directory.
+The default is
+.Pa ~/.cache/fuguvm .
+.It Ic state_dir
+The state directory, in the project file only.
+The default is
+.Pa .fuguvm/state .
+.It Ic default_vm
+The guest that
+.Fl Fl vm
+defaults to.
+The default is
+.Cm default .
+.It Ic ssh_pubkey
+The SSH public key that
+.Cm up
+installs for root.
+.It Ic qemu_version
+The pinned version of the QEMU binary, as one or more dot-separated
+numbers.
+Without it the tool checks nothing.
+See
+.Sx ARCHITECTURE .
+.It Ic distfile_cache
+The size cap of the distfile tree, as a byte count or a number with a
+.Cm K ,
+.Cm M
+or
+.Cm G
+suffix.
+The default is 0, which turns the distfile cache off.
+See
+.Sx MIRROR CACHE .
+.El
+.Pp
+The settings of a
+.Ic vm
+block are as follows.
+The first five also stand at the top level of either file, and the
+block wins.
+.Bl -tag -width "root_password_file" -offset indent
+.It Ic bind_address
+The host IPv4 address of every forwarded port, in dotted-decimal form.
+The default is
+.Li 127.0.0.1 .
+See
+.Sx ADDRESSES AND PORTS .
+.It Ic image_cache Cm yes | no
+Whether
+.Cm up
+uses the image cache.
+The default is
+.Cm yes .
+.It Ic verify Cm yes | no
+Whether the tool verifies each mirror download under the release key,
+and whether the installer verifies its sets.
+The default is
+.Cm yes .
+.It Ic signify_dir
+The directory of the signify public keys, before
+.Pa /etc/signify/
+and the shipped keys.
+.It Ic ssh_pubkey
+As above.
+.It Ic name
+The name of the guest in messages and in the disk directory.
+The default is the block name.
+.It Ic arch Cm arm64 | amd64
+The guest architecture.
+The default is
+.Cm arm64 .
+.It Ic version
 The
-.Ar hash
-part is a truncated SHA-256 over all inputs that shape an installed
-disk,
-and the inputs follow the install mode.
-The default mode hashes the
 .Ox
-version,
-the architecture,
-.Ar disk_size ,
-the mode,
-the contents of the
-.Pa install.exp
-installer script,
-and the contents of
-.Pa share/fuguvm/cache-generation .
-The autoinstall mode hashes
-.Pa autoinstall.exp
-instead of
-.Pa install.exp ,
-and the contents of the response file join the hash:
-two response files give two entries.
-The import mode hashes no script and no
-.Ar disk_size :
-no script installed the image,
-and an overlay inherits the virtual size of its base.
-Thus an imported entry survives a change to a shipped expect script,
-and every guest of a project derives the same key for one
-.Ar base_disk .
-The memory and port settings do not shape the disk,
-and the hash excludes them.
-Thus a change to them hits the same entry.
-.Pp
-An imported entry is write-once,
-like every other entry,
-and its snapshots work the same way.
-.Nm
-publishes the
-.Ar base_disk
-file into the cache with one
+release.
+The default is 7.8.
+.It Ic memory
+The memory in megabytes.
+The default is 2048.
+.It Ic disk_size
+The virtual disk size, as
 .Xr qemu-img 1
-conversion,
-one time for each host,
-and it never writes to the source file.
+reads it.
+The default is 8G.
+.It Ic ssh_port , console_port
+The forwarded SSH port and the serial console port: a number from 1 to
+65535, or
+.Cm auto .
+The defaults are 2222 and 4444.
+.It Ic autoinstall
+An
+.Xr autoinstall 8
+response file.
+.It Ic base_disk
+An existing full-disk image, qcow2 or raw.
+.It Ic root_password_file
+A file whose first line is the root password of the guest.
+.El
 .Pp
-.Pa share/fuguvm/cache-generation
-is a generation counter.
-Increase the number in the file when the procedure that drives the
-installer changes outside
+Each path value expands a leading tilde and resolves a relative path
+against the project root.
+A
+.Ic distfile_cache
+line inside a block does not apply, and a
+.Ic qemu_version
+line there is an error.
+A yes/no value that is neither gives a warning and the default.
+.Pp
+A guest resolves in this order: a
+.Ic vm
+block of the project file, a
+.Ic vm
+block of the global file, and the flat settings file
+.Pa .fuguvm/vms/ Ns Ar name Ns Pa .conf .
+.Cm init
+writes the default guest as such a file.
+.Sh INSTALLATION
+The directives of a guest select one of three install modes, and a
+disk belongs to its mode and its architecture for its whole life.
+After a change of either, rebuild the guest with
+.Cm destroy
+and
+.Cm up .
+.Pp
+Without
+.Ic autoinstall
+and
+.Ic base_disk ,
+.Cm up
+installs with the shipped
+.Xr expect 1
+script over the serial console.
+It generates a random root password, stores it in the state, and
+installs the
+.Ic ssh_pubkey
+over a password login.
+A failed script exits with status 9.
+.Pp
+With
+.Ic autoinstall ,
+.Cm up
+serves the response file to the guest from a loopback HTTP responder,
+and the file answers every installer question.
+The responder replaces each
+.Ql @PROXY_URL@
+token in the file with the guest URL of the mirror proxy.
+The tool validates no answer in the file, and QEMU runs with
+.Fl no-reboot ,
+so the reboot at the end of the install cannot start a second one.
+.Pp
+With
+.Ic base_disk ,
+.Cm up
+installs nothing.
+It publishes the image as one cache entry for the whole project, once
+for each host, and overlays the working disk on it.
+The tool never writes to the source file.
+.Ic autoinstall
+and
+.Ic base_disk
+contradict each other, and
+.Ic base_disk
+needs
+.Ic image_cache yes .
+.Pp
+Outside the default mode the tool generates no password.
+With
+.Ic ssh_pubkey
+and
+.Ic root_password_file ,
+.Cm up
+reads the password from the file and installs the key over a password
+login.
+Without
+.Ic ssh_pubkey ,
+it waits for SSH with the key of the operator, which the image must
+trust already.
+.Ic ssh_pubkey
+without
+.Ic root_password_file
+is a configuration error.
+.Pp
+Before the first boot the tool proves the release manifest under the
+release key and verifies the miniroot image.
+The installer of a numbered release verifies its own sets.
+With
+.Ic verify yes
+the install script therefore stops on the
+.Dq Continue without verification?
+prompt with status 9, because the prompt reports a broken mirror.
+With
+.Ic verify no
+the tool downloads without a proof and the installer waives its check,
+with one warning on each side.
+.Sh ARCHITECTURE
+The
+.Ic arch
+directive selects the QEMU binary, the machine type, the firmware, the
+installer answers, and the image-cache key.
+.Cm up
+and
+.Cm start
+exit with status 3 when the QEMU binary of the architecture is not on
+.Ev PATH .
+.Pp
+The accelerator follows the host.
+The tool selects KVM on a Linux host with a writable
+.Pa /dev/kvm ,
+and HVF on a Darwin host, and only when the host machine runs the
+instruction set of the guest.
+It selects TCG in every other case, and under
+.Fl Fl emulate .
+An installation under TCG takes tens of minutes.
+.Pp
+With
+.Ic qemu_version ,
+.Cm up
+and
+.Cm start
+run the binary with
+.Fl Fl version
+before the first spawn and compare component by component, over the
+components that the directive names:
+.Li 9.0
+accepts
+.Li 9.0.4
+and refuses
+.Li 9.1.0 .
+A mismatch, an absent binary, and output with no version each exit
+with status 3.
+.Sh ADDRESSES AND PORTS
+QEMU binds the forwarded SSH port and the serial console to
+.Ic bind_address .
+The default,
+.Li 127.0.0.1 ,
+lets the host alone reach a guest.
+The tool connects to the same address, or to
+.Li 127.0.0.1
+when the ports bind to
+.Li 0.0.0.0 .
+.Pp
+With
+.Cm auto ,
+.Cm up
+and
+.Cm start
+take the first free port of a fixed range of 100 ports above the
+default port of the directive, and record it.
+The probe skips every port that a sibling guest of the project holds
+or declares, running or not.
+An exhausted range exits with status 1.
+The record dies with the run:
+.Cm stop
+clears it, and a later
+.Cm start
+resolves again.
+Read the port with
+.Cm status .
+.Pp
+.Cm ssh ,
+.Cm put ,
+.Cm get
+and
+.Cm console
+refuse a stopped guest with status 1.
+.Cm expect
+and
+.Cm wait
+refuse a stopped guest with a port of
+.Cm auto
+with the same status, because such a guest has no port.
+.Sh IMAGE CACHE
+An installed disk lands in the cache as a clean, compacted base image,
+and a later
+.Cm up
+overlays a throwaway working disk on it.
+With a warm cache,
+.Cm destroy
+and
+.Cm up
+are a cheap factory reset.
+The entries sit under
+.Ic cache_dir ,
+beside the mirror cache:
+.Bd -literal -offset indent
+<cache_dir>/proxy/...                               the mirror cache
+<cache_dir>/installed/<key>/base.qcow2              mode 0400
+<cache_dir>/installed/<key>/meta.json               mode 0600
+<cache_dir>/installed/<key>/snapshots/<name>.qcow2  mode 0400
+<cache_dir>/installed/<key>/snapshots/<name>.json   mode 0600
+.Ed
+.Pp
+The key is
+.Ar version Ns - Ns Ar arch Ns - Ns Ar hash .
+The hash covers every input that shapes the installed disk of the
+mode: the version, the architecture, the mode, and the file
+.Pa share/fuguvm/cache-generation .
+The default mode adds
+.Ic disk_size
+and the content of
 .Pa install.exp .
-This makes the cached images invalid.
-Keep only the bare number in the file:
-the hash includes the whole file.
+The autoinstall mode adds
+.Ic disk_size ,
+the content of
+.Pa autoinstall.exp ,
+and the content of the response file.
+The import mode adds nothing, so every guest of a project derives one
+key for one
+.Ic base_disk .
+The memory and port settings do not shape the disk, and a change to
+them hits the same entry.
 .Pp
-Entries are immutable and write-once.
-.Nm
-builds each entry whole in a temporary directory,
-and then publishes the entry with a rename of that directory.
-Thus a reader never sees the base image of one installation adjacent to the
-metadata of a different installation.
+The generation file is a counter.
+Increase the number when the install procedure changes outside the
+scripts, and keep the bare number in the file.
 .Pp
-A snapshot is an immutable, named layer over the base image of an
-entry.
+An entry is immutable and write-once.
+The tool builds it whole in a temporary directory and publishes it with
+one rename.
+A snapshot is an immutable named layer over the base image of an
+entry, and
 .Cm snapshot save
-creates the snapshot from a stopped VM.
-.Nm
-flattens each snapshot onto
-.Pa base.qcow2 .
-Thus each snapshot is a direct child of the base,
-and the initial backing of the working disk has no effect:
+flattens the working disk onto the base:
 .Bd -literal -offset indent
 base.qcow2  <-  <name>.qcow2  <-  disk.qcow2
 .Ed
 .Pp
-Thus no snapshot is the parent of a different snapshot,
-and the removal of one snapshot cannot orphan a different snapshot.
-The snapshots are inside the entry.
-Thus each operation that makes a base invalid
-.Pq a new key, or Cm cache clear
-also makes the snapshots of that base invalid.
+No snapshot is the parent of another, so the removal of one orphans
+none.
+Each operation that invalidates a base also invalidates its snapshots.
 .Sh MIRROR CACHE
-The built-in proxy caches what an installation and a ports build fetch
-from
+A proxy on the host caches what an installation and a ports build
+fetch from
 .Lk https://cdn.openbsd.org :
-the file sets,
-the packages,
-the syspatch sets,
-the kernels,
-the miniroot images,
-the checksums,
-the source tarballs of a release
-.Pq Pa ports.tar.gz , src.tar.gz , sys.tar.gz , xenocara.tar.gz ,
-and,
-with a
-.Ar distfile_cache
-cap above zero,
-the
-.Ox
-distfile tree under
-.Pa /pub/OpenBSD/distfiles/ .
-The distfile pattern matches the path on any mirror host:
-.Lk https://cdn.openbsd.org
-carries no distfile tree,
-and
-.Lk https://ftp.openbsd.org
-does.
-The cache admits nothing else,
-and it caches no https body:
-only a guest fetch over plain http through the proxy reaches it.
+the file sets, the packages, the syspatch sets, the kernels, the
+miniroot images, the manifests, and the four source tarballs of a
+release.
+With a
+.Ic distfile_cache
+cap above zero, it also caches the distfile tree under
+.Pa /pub/OpenBSD/distfiles/
+of any mirror host.
+The proxy admits nothing else, and it caches no https body.
+The guest reaches it at the
+.Cm proxy_url
+of
+.Cm status ,
+and the port changes between runs.
 .Pp
-Every tree except the distfiles carries a version in its path,
-and the version prune of
+Every tree except the distfiles carries a version in its path, and
 .Cm cache clear Fl Fl stale
-bounds it.
-A distfile belongs to a port and not to a release,
-so no version bounds that tree.
+prunes the other versions.
 The
-.Ar distfile_cache
-cap bounds it instead:
-the proxy evicts the oldest file first,
-by modification time,
-after each distfile store.
-The default cap is 0,
-which turns the distfile cache off,
-because an unbounded tree in a home directory is the failure to
-avoid.
-A consumer that wants the cache sets a size in its
-.Pa .fuguvmrc .
+.Ic distfile_cache
+cap bounds the distfile tree instead: the proxy evicts the oldest file
+first after each store.
 .Pp
-The trust chain has five links,
-and the tool owns the first two:
-.Bl -column "ports.tar.gz and the tarballs" "signature and key" -offset indent
-.It Em content Ta Em signature Ta Em verifier
-.It sets, kernels, miniroot Ta Pa SHA256.sig No of the arch dir Ta host and guest installer
-.It Pa ports.tar.gz No and the tarballs Ta Pa SHA256.sig No of the version dir Ta host
-.It a package Ta its own signify signature Ta Xr pkg_add 1 in the guest
-.It a syspatch set Ta its own signature Ta syspatch in the guest
-.It a distfile Ta the digest in Pa distinfo Ta Ql make checksum in the guest
-.El
-.Pp
-The host verifies each download under the base key of the release,
-with
-.Xr signify 1 ,
+The host verifies each download under the base key of the release with
+.Xr signify 1
 before the file enters the cache.
-The version names the key file:
-7.8 gives
+The version names the key file: 7.8 gives
 .Pa openbsd-78-base.pub .
 The tool reads the key from
-.Ar signify_dir
-when the directive is set,
+.Ic signify_dir ,
 then from
 .Pa /etc/signify/ ,
 and then from the shipped
 .Pa share/fuguvm/signify/
-tree,
-which holds the key of the default release.
-A guest of an older release needs
-.Pa /etc/signify/
-or
-.Ar signify_dir .
-One key serves both manifests of a release,
-and the tool serves no snapshot release:
-a snapshot carries the key of the next release.
+tree, which holds the key of the default release.
+A guest of an older release needs one of the first two.
+The tool serves no snapshot release.
+Each scope holds one
+.Pa SHA256
+manifest with one signature: the architecture directory signs the sets,
+the kernels and the miniroot, and the version directory signs the
+source tarballs.
 .Pp
-The guest verifies its own sets:
-the installer of a numbered release carries the release key in
-.Pa bsd.rd .
-With
-.Ar verify yes
-the install therefore stops on the
-.Dq Continue without verification?
-prompt with exit code 9,
-because the prompt reports a broken mirror.
-With
-.Ar verify no
-the tool downloads without a proof and the installer waives its
-check,
-with one warning on each side.
-A distfile verifies in the guest too:
-the host verified the ports tree,
-the ports tree holds each
-.Pa distinfo
-digest,
-and
-.Ql make checksum
-refuses a distfile that does not match.
-.Pp
-A ports build in the guest needs two lines of guest configuration,
-and the consumer owns both.
-First,
+A ports build in the guest needs two lines of guest configuration.
 .Ev http_proxy
 must name the
-.Ar proxy_url
-value of
-.Cm status ,
-because
+.Cm proxy_url
+value, because
 .Xr ftp 1
-in the guest reads that variable.
-Second,
-the ports tree must fetch each distfile from the
+in the guest reads it.
+The ports tree must fetch each distfile over http from the
 .Ox
-distfile mirror,
-.Lk http://ftp.openbsd.org/pub/OpenBSD/distfiles/ ,
-over http,
-because an upstream https site never reaches the cache.
+distfile mirror, because an https site never reaches the cache.
+.Va SITE_BACKUP
+in
 .Xr bsd.port.mk 5
-holds one user setting for that route:
-.Ar SITE_BACKUP ,
-the list of sites that the fetch tries after the primary sites.
-An https primary site fails through the proxy,
-the fetch falls back to
-.Ar SITE_BACKUP ,
-and that fetch fills the cache.
-The fetch appends the distfile path to each entry,
-the
-.Ar DIST_SUBDIR
-component of the port included,
-and the mirror stores its distfiles under the same subdirectories:
+is that route:
 .Bd -literal -offset indent
 $ fuguvm ssh -- sh -c \e
 	"echo 'SITE_BACKUP = http://ftp.openbsd.org/pub/OpenBSD/distfiles/' \e
@@ -846,438 +849,97 @@ $ fuguvm ssh -- sh -c \e
 	"cd /usr/ports/devel/gmake && env http_proxy=$proxy make fetch"
 .Ed
 .Pp
-The proxy port changes between runs,
-so read
-.Ar proxy_url
-from
-.Cm status
-on each run,
-and do not write it in a file.
-A distfile that the
-.Ox
-mirror does not carry never enters the cache;
-a guest snapshot after the fetch saves that download,
-and
-.Cm put
-of a host copy is the other route.
+The host verified the ports tree, and
+.Ql make checksum
+verifies each distfile against its
+.Pa distinfo
+digest in the guest.
 .Sh FILES
-.Bl -tag -width ".fuguvm/vms/name.conf" -compact
+.Bl -tag -width ".fuguvm/vms/<name>.conf" -compact
+.It Pa ~/.fuguvmrc
+The global configuration.
 .It Pa .fuguvmrc
-Project configuration:
-.Ar cache_dir ,
-.Ar state_dir ,
-.Ar default_vm ,
-.Ar image_cache ,
-.Ar qemu_version ,
-.Ar bind_address ,
-.Ar verify ,
-.Ar signify_dir ,
-.Ar distfile_cache .
-.It Pa .fuguvm/vms/ Ns Ar name Ns Pa .conf
-Per-VM configuration:
-.Ar name , arch , version , memory , disk_size , ssh_port ,
-.Ar console_port , bind_address , autoinstall , base_disk ,
-.Ar root_password_file , verify , signify_dir .
-.It Pa .fuguvm/state/
-Runtime state
-.Pq PID files, sockets, disk images .
+The project configuration, at the project root.
+.It Pa .fuguvm/vms/<name>.conf
+A guest declaration outside the two configuration files.
+.It Pa .fuguvm/state/<name>/
+The state of one guest: the working disk, the JSON state, the PID
+files, and the logs.
 .It Pa ~/.cache/fuguvm/
-Default cache directory:
-downloaded installation images and the installed-image cache.
+The default cache directory.
+.It Pa share/fuguvm/expect/
+The shipped
+.Xr expect 1
+scripts.
 .It Pa share/fuguvm/cache-generation
-Generation counter for the installed-image cache.
+The generation counter of the image cache.
 .It Pa share/fuguvm/signify/
-The signify public keys of the supported releases.
+The signify public key of the default release.
 .El
-.Pp
-.Ar image_cache Cm yes | no
-.Pq default Cm yes
-switches the installed-image cache on or off.
-.Nm
-reads the directive from the project
-.Pa .fuguvmrc
-or the global
-.Pa ~/.fuguvmrc ,
-with the project first.
-The directive can also be in a
-.Ar vm
-block.
-.Fl Fl no-cache
-on
-.Cm up
-overrides all of them.
-.Pp
-.Ar ssh_port
-and
-.Ar console_port
-take a decimal number from 1 to 65535,
-or the word
-.Cm auto .
-With
-.Cm auto ,
-.Cm up
-and
-.Cm start
-take a free host port from a fixed range, and record it.
-Each range holds 100 ports.
-It starts at the default port of its directive
-.Pq 2222 for SSH, 4444 for the console .
-The probe does not take a fixed port that a VM declaration of the
-project holds, whether that guest runs now or not.
-Read the recorded port with
-.Cm status .
-The record dies with the run:
-.Cm stop
-clears it,
-and a later
-.Cm start
-resolves again.
-An exhausted range causes an exit with code 1.
-.Cm expect
-and
-.Cm wait
-against a stopped guest with a directive of
-.Cm auto
-also fail with exit code 1,
-because such a guest has no port.
-.Cm ssh ,
-.Cm put ,
-.Cm get
-and
-.Cm console
-refuse every stopped guest first,
-with the same code.
-.Pp
-.Ar bind_address
-names the host address of every forwarded port,
-as one IPv4 address in dotted-decimal form.
-The default is
-.Li 127.0.0.1 .
-A host name is invalid.
-The directive can be in a
-.Ar vm
-block,
-in the project
-.Pa .fuguvmrc ,
-or in the global
-.Pa ~/.fuguvmrc ,
-with that precedence.
-.Pp
-.Ar qemu_version
-pins the version of the QEMU system binary,
-as one or more dot-separated decimal numbers.
-.Cm up
-and
-.Cm start
-run the binary with
-.Fl Fl version
-and compare component by component,
-over the components that the directive names:
-.Li 9.0
-accepts
-.Li 9.0.4
-and refuses
-.Li 9.1.0 .
-A mismatch,
-an absent binary,
-and output with no version in it,
-each cause an exit with code 3.
-Without the directive,
-.Nm
-checks nothing and does not run the binary.
-.Nm
-reads the directive from the project
-.Pa .fuguvmrc
-or the global
-.Pa ~/.fuguvmrc ,
-with the project first.
-.Pp
-A line that the configuration grammar does not accept is an error that
-names the file and the line, and
-.Nm
-exits with 3.
-The parser never skips a line it did not understand: a typo that a
-parser ignores is a setting that silently does not apply, and the
-operator finds out weeks later from the behavior of the VM.
-.Pp
-.Ar verify Cm yes | no
-.Pq default Cm yes
-switches the mirror verification on or off.
-With
-.Cm yes ,
-.Nm
-verifies each download under the release key before the file enters
-the cache,
-and the guest installer verifies its own sets.
-.Xr signify 1
-must then exist on the host,
-and a run without it fails with a diagnostic that names the command
-and the package.
-The directive can be in a
-.Ar vm
-block,
-in the project
-.Pa .fuguvmrc ,
-or in the global
-.Pa ~/.fuguvmrc ,
-with that precedence.
-.Pp
-.Ar signify_dir
-names the directory of the signify public keys,
-before
-.Pa /etc/signify/
-and the shipped keys.
-The value is a path:
-a leading tilde expands,
-and a relative path resolves against the project root.
-A value that is not a directory is a configuration error.
-.Pp
-.Ar distfile_cache
-sets the size cap of the distfile tree,
-as a byte count or a number with a
-.Cm K ,
-.Cm M
-or
-.Cm G
-suffix
-.Pq 1024-based, either letter case .
-The default is 0,
-which turns the distfile cache off.
-The directive is a project or global setting:
-the distfile tree is one tree under
-.Ar cache_dir ,
-and each guest of a project shares it,
-so a per-guest cap would have no meaning.
-See
-.Sx MIRROR CACHE .
-.Pp
-A value for
-.Ar image_cache
-or
-.Ar verify
-that is neither yes nor no,
-and a
-.Ar distfile_cache
-value that is not a size,
-each give a warning and fall back to the default.
-An unrecognized spelling must not silently mean the opposite.
-.Pp
-.Ar autoinstall
-names an
-.Xr autoinstall 8
-response file,
-.Ar base_disk
-names an existing full-disk image
-.Pq qcow2 or raw ,
-and
-.Ar root_password_file
-names a file whose first line is the root password of the image.
-Each value is a path:
-a leading tilde expands,
-and a relative path resolves against the project root.
-The file must be readable when the configuration loads.
-The response file is an artifact of the operator,
-and
-.Nm
-validates no answer in it:
-.Xr autoinstall 8
-owns that grammar.
-Outside the default install,
-.Ar ssh_pubkey
-needs
-.Ar root_password_file ,
-so
-.Nm
-can install the key over a password login.
-A guest with no
-.Ar ssh_pubkey
-must trust the key of the operator already.
 .Sh EXIT STATUS
 .Nm
-exits with one of these values:
+exits with one of the following values:
 .Pp
 .Bl -tag -width Ds -offset indent -compact
 .It 0
 Success.
 .It 1
 General error.
-An
+A stopped guest on a connection command, a failed transfer, a failed
+download or verification, an exhausted port range, and an
 .Cm image export
-whose target exists,
-whose parent directory is absent,
-or whose guest has no installed disk,
-and a
-.Ar base_disk
-file that is absent at a cache miss,
-also give this code.
-So do a failed download,
-a failed signature,
-a failed digest,
-a
-.Cm mirror verify
-that found one bad file,
-and
-.Ar verify yes
-on a host with no
-.Xr signify 1 .
+target that exists also give this status.
 .It 2
 Invalid arguments.
-An unknown
-.Cm status
-key,
-an
-.Cm image
-call with no action,
-no path,
-or an unknown
-.Fl Fl format
-value,
-and a
-.Cm mirror
-call with no action,
-an unknown action,
-or no file,
-also give this code.
 .It 3
-Configuration error, or not in an
-.Nm
-project.
-An unknown
-.Ar arch
-value,
-an absent QEMU binary for the architecture,
-an invalid
-.Ar bind_address ,
-.Ar ssh_port ,
-.Ar console_port
-or
-.Ar qemu_version
-value,
-and a QEMU version that does not match the pinned
-.Ar qemu_version
-also give this code.
-So do a
-.Ar signify_dir
-that is not a directory,
-an absent public key for the
-.Ar version
-on a
-.Cm mirror
-call
-.Pq the same miss on Cm up No fails the image, with code 1 ,
-an absent or unreadable
-.Ar autoinstall ,
-.Ar base_disk
-or
-.Ar root_password_file
-file,
-.Ar autoinstall
-together with
-.Ar base_disk ,
-.Ar base_disk
-with
-.Ar image_cache no ,
-and
-.Ar ssh_pubkey
-without
-.Ar root_password_file
-outside the default install.
+Configuration error: no project, a line that does not parse, an
+invalid value, a missing or contradicting install directive, an
+absent QEMU binary, or a QEMU version that does not match the pin.
 .It 4
-VM not found.
+Guest not found.
 .It 5
-The VM runs.
-An
-.Cm image export
-of a running VM also gives this code.
+The guest runs.
 .It 7
-Timeout in the wait for the VM.
+Timeout in
+.Cm wait .
 .It 9
-Expect script failed,
-the install and autoinstall scripts included.
-The installer prompt
-.Dq Continue without verification?
-under
-.Ar verify yes
-also gives this code,
-because the prompt means that the mirror data is wrong.
+An
+.Xr expect 1
+script failed, the install scripts included.
 .It 11
 Snapshot not found.
 .El
 .Pp
-The
 .Cm ssh
-command with a
+with a
 .Ar command
-argument exits with the exit code of the remote command,
-once it connects.
-A remote exit code can read like a tool code:
-a remote command that exits with 4 looks like
-.Dq VM not found .
-The diagnostic on standard error tells the two apart,
-because the tool logs each failure of its own.
-The four connection verbs
-.Pq Cm ssh , put , get , console
-exit with 1 for a guest that does not run,
-and
-.Cm put
-and
-.Cm get
-exit with 1 for a failed transfer.
-They exit with 2 for a bad argument count,
-a relative remote path,
-or a bad
-.Fl Fl mode
-value.
+exits with the status of the remote command.
+A remote status can read like a tool status, and the diagnostic on
+standard error tells the two apart.
 .Sh EXAMPLES
-Initialize a project and boot the default VM:
+Initialize a project, boot the default guest, and run a command in it:
 .Bd -literal -offset indent
 $ fuguvm init
 $ fuguvm up
-$ fuguvm wait --timeout=300
-.Ed
-.Pp
-Run a command in the VM:
-.Bd -literal -offset indent
 $ fuguvm ssh -- uname -a
-OpenBSD openbsd-default.my.domain 7.8 GENERIC arm64
+OpenBSD openbsd-test.my.domain 7.8 GENERIC arm64
 .Ed
 .Pp
-Copy a source tree in,
-run a build step,
-and copy the report back out:
+Copy a source tree in, build it, and copy the report back:
 .Bd -literal -offset indent
 $ fuguvm put src /root/src
 $ fuguvm ssh -- sh -c 'cd /root/src && make regress > report.txt'
 $ fuguvm get /root/src/report.txt report.txt
 .Ed
 .Pp
-Operate on a VM other than the default:
-.Bd -literal -offset indent
-$ fuguvm --vm minimal up
-.Ed
-.Pp
-Define an amd64 VM in
-.Pa .fuguvmrc
-and verify its architecture:
+Declare an amd64 guest and a fleet of two guests with automatic ports
+in
+.Pa .fuguvmrc :
 .Bd -literal -offset indent
 vm "openbsd-amd64" {
-	arch         amd64
-	version      7.8
-	memory       2048
-	disk_size    8G
-	ssh_port     2222
-	console_port 4444
+	arch      amd64
+	disk_size 16G
 }
-
-$ fuguvm --vm openbsd-amd64 up
-$ fuguvm --vm openbsd-amd64 ssh -- uname -m
-amd64
-.Ed
-.Pp
-Declare a fleet of two guests with automatic ports,
-start one,
-and read its SSH port:
-.Bd -literal -offset indent
 vm "scenario-1" {
 	ssh_port     auto
 	console_port auto
@@ -1287,105 +949,80 @@ vm "scenario-2" {
 	console_port auto
 }
 
+$ fuguvm --vm openbsd-amd64 up
 $ fuguvm --vm scenario-1 up
 $ fuguvm --vm scenario-1 status ssh_port
 2222
 .Ed
+.Pp
+Cache a provisioned state, and restore it on the next checkout:
+.Bd -literal -offset indent
+$ fuguvm ssh -- pkg_add gmake
+$ fuguvm down
+$ fuguvm snapshot save deps
+$ fuguvm snapshot restore deps && fuguvm up
+.Ed
 .Sh SEE ALSO
 .Xr expect 1 ,
+.Xr qemu-img 1 ,
 .Xr signify 1 ,
 .Xr ssh 1 ,
-.Xr telnet 1
+.Xr telnet 1 ,
+.Xr autoinstall 8
+.Pp
+The module documentation is in the
+.Pa .pod
+sidecars beside
+.Pa lib/App/FuguVM/ .
 .Sh HISTORY
 The
 .Nm
-utility was first available in 2025.
-Its initial purpose was to run the test suite of a daemon against a
-real
+utility was first available in 2025, to run the test suite of a daemon
+against a real
 .Ox
 guest.
-It became more general from there.
 .Sh AUTHORS
 .An Dick Olsson Aq Mt hi@senzilla.io
 .Sh SECURITY CONSIDERATIONS
-.Nm
-generates a random root password for each installation and stores it
-in the VM state directory.
-When the installed image goes into the cache,
-.Nm
-also stores the password in the
+The guest permits root login with a password.
+In the default install mode the tool generates that password and
+stores it in the state directory and in the
 .Pa meta.json
-of that entry
-.Pq mode 0600 .
-The cache makes the life of this secret longer:
-the password stays after
-.Cm destroy ,
-and it changes only when the base key changes.
+of the cache entry, both with mode 0600.
+The cache makes the life of the secret longer: it survives
+.Cm destroy
+and changes only with the cache key.
 .Pp
-The guest permits password root login.
-.Cm put
-and
-.Cm get
-reach the guest as root,
-over the forwarded SSH port.
-The console port carries no authentication of its own,
-and the guest login prompt is the only gate.
-.Nm
-binds the forwarded SSH port and the telnet serial console to
-.Ar bind_address ,
-and the default is
-.Li 127.0.0.1 .
-Thus only the host itself reaches a guest.
-.Ar bind_address 0.0.0.0
-makes both ports listen on each host interface.
-Treat such a VM as open to all persons who can reach the host.
-The password is then not a localhost-only secret.
-Apply the same rule to a
-.Ar cache_dir
-that has content.
+The console port carries no authentication of its own.
+With the default
+.Ic bind_address
+only the host reaches a guest.
+With
+.Li 0.0.0.0
+both ports listen on every host interface, so treat such a guest as
+open to everyone who reaches the host, and treat a shared
+.Ic cache_dir
+the same way.
 .Pp
 An
 .Xr autoinstall 8
-response file can hold the root password of the guest.
-The responder of the autoinstall mode binds
-.Li 127.0.0.1
-only,
-and the guest reaches it through the QEMU gateway,
-so no other machine can fetch the file.
-.Nm
-never copies the file into the cache or into the state directory,
-and the image-cache key holds a digest of the file,
-not its content.
-The first line of
-.Ar root_password_file
-is a secret of the same kind:
-.Nm
-reads the file where it needs the value,
-and it warns when the file mode lets the group or another user read
-it.
+response file and a
+.Ic root_password_file
+each hold a root password.
+The responder binds the loopback address only, and the tool never
+copies either file into the cache or the state directory.
+The cache key holds a digest of the response file, not its content.
+The tool warns when the group or others can read the password file.
 .Pp
-The host verifies each mirror download under the release key,
-with
-.Xr signify 1 ,
-before the file enters the cache,
-and a file that fails leaves no copy behind.
-The guest installer verifies its own sets under the key in
-.Pa bsd.rd ,
-.Xr pkg_add 1
-verifies each package,
-and a distfile verifies against the
-.Pa distinfo
-digest of the verified ports tree,
-in the guest.
 The shipped key under
 .Pa share/fuguvm/signify/
-is a trust anchor:
-a human adds each key file,
-and the commit that adds one states the comparison against
+is a trust anchor.
+A human adds each key file, and the commit that adds one states the
+comparison against
 .Pa /etc/signify/
 on a real
 .Ox
 host of that release.
-.Ar verify no
-removes the host proof and the installer proof together;
-use it only against a mirror that something else verifies.
+.Ic verify no
+removes the host proof and the installer proof together.
+Use it only against a mirror that something else verifies.

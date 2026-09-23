@@ -119,4 +119,33 @@ my $new_bao = sub {
      'read_secret_metadata honours a non-default kv_mount';
 }
 
+#### version => N: same data/ read plus ?version=N, as read_secret takes it
+{
+  my ($bao, $stub) = $new_bao->($ok_body->());
+
+  my $meta = $bao->read_secret_metadata('app/db', version => 2);
+  is $stub->last_call->{method}, 'GET',
+     'versioned read_secret_metadata reads via GET';
+  is $stub->last_call->{url}, 'http://test/v1/secret/data/app/db?version=2',
+     'read_secret_metadata with version => N appends exactly ?version=N';
+  is $meta->{version}, 4,
+     'versioned read_secret_metadata returns the same data.metadata shape';
+
+  $bao->read_secret_metadata('app/db', version => 0);
+  is $stub->last_call->{url}, 'http://test/v1/secret/data/app/db?version=0',
+     'version => 0 is honoured as an explicit argument, not dropped as "none"';
+}
+
+#### 404 on a versioned metadata read is still a soft miss -> undef
+{
+  my ($bao, $stub) = $new_bao->({
+    status  => 404,
+    success => 0,
+    content => '{"errors":["no value found"]}',
+  });
+
+  is $bao->read_secret_metadata('app/db', version => 9), undef,
+     'read_secret_metadata returns undef on 404 for a versioned read';
+}
+
 done_testing;

@@ -13,7 +13,8 @@ use Test::More;
 # physics is right are in t/01-vectors.t.
 #
 # The contract: the event list identical in kind, order and participants with
-# times within 1e-6 s; every segment's eight numbers within 1e-9; the rest
+# times within 1e-6 s, events at one instant in any order among themselves;
+# every segment's eight numbers within 1e-9; the rest
 # layout identical to the hundredth of a millimetre; the holed list identical.
 # t/03-bitwise.t asks for more on top.
 
@@ -36,8 +37,8 @@ for my $fx (@fixtures) {
 		}
 		plan tests => 5;
 
-		my @mine = @{ $out->events };
-		my @theirs = @{ $fx->{events} };
+		my @mine = @{ Presets::settle_ties($out->events, 1e-6) };
+		my @theirs = @{ Presets::settle_ties($fx->{events}, 1e-6) };
 		my @bad;
 		push @bad, 'count ' . scalar(@mine) . ' vs ' . scalar(@theirs) if @mine != @theirs;
 		for my $i (0 .. ($#mine < $#theirs ? $#mine : $#theirs)) {

@@ -49,6 +49,7 @@ sub digest_of {
 	return $sha->hexdigest;
 }
 sub hexes { my ($seg) = @_; return join ' ', map { unpack 'H*', pack 'd>', canon($_) } @$seg }
+sub first_few { my @all = @_; return @all[0 .. ($#all < 4 ? $#all : 4)] }
 sub world_of {
 	my ($g) = @_;
 	my ($w, $hx) = ($g->{world}, $g->{hex});
@@ -77,6 +78,9 @@ sub heading_change {
 my %world = map { $_ => world_of($fx{$_}{geometry}) } keys %fx;
 my @strokes = map { @{ $fx{$_}{strokes} } } qw/curling bowls/;
 my %by_id = map { my $s = $_; ("$s->{course}/$s->{id}" => $s) } @strokes;
+# marks 1, 2 and 7 compare against doubles recorded at 64 bits, and a build
+# whose compiler holds a double wider than that between operations skips them
+my $wide = Presets::wide_doubles();
 
 plan tests => 6 * @strokes + 37;
 
@@ -88,18 +92,22 @@ for my $s (@strokes) {
 	$played{$label} = $out;
 	ok !$out->error, "$label: the engine plays it" or diag($out->message);
 
-	my @mine = map { [ $_->[1], $_->[2], (defined $_->[3] ? $_->[3] : ()) ] } @{ $out->events };
-	my @theirs = map { [ $_->[1], $_->[2], (defined $_->[3] ? $_->[3] : ()) ] } @{ $s->{events} };
+	my ($settled, $recorded) = (Presets::settle_ties($out->events, 1e-6), Presets::settle_ties($s->{events}, 1e-6));
+	my @mine = map { [ $_->[1], $_->[2], (defined $_->[3] ? $_->[3] : ()) ] } @$settled;
+	my @theirs = map { [ $_->[1], $_->[2], (defined $_->[3] ? $_->[3] : ()) ] } @$recorded;
 	my $times = @mine == @theirs;
-	for my $i (0 .. $#theirs) { $times = 0 if !defined $out->events->[$i] || abs($out->events->[$i][0] - $s->{events}[$i][0]) >= 1e-6 }
+	for my $i (0 .. $#theirs) { $times = 0 if !defined $settled->[$i] || abs($settled->[$i][0] - $recorded->[$i][0]) >= 1e-6 }
 	ok $times && eq_array(\@mine, \@theirs), "$label: the events agree in kind, order, participants and time to 1e-6 s"
 		or diag(explain { mine => $out->events, recorded => $s->{events} });
 
 	is_deeply [ $out->rest, [ map { [ $_->[0], $_->[1] ] } @{ $out->holed } ] ],
 		[ $s->{rest}, [ map { [ $_->[0], $_->[1] ] } @{ $s->{holed} } ] ], "$label: the rest layout and the holed list are identical";
 
-	is $out->error ? 'ERROR' : digest_of($out->segments), $s->{segments_sha256}, "$label: the segments are bit-identical to the prototype's (mark 7)"
-		or diag("on $Config{archname}, $Config{cc}");
+	SKIP: {
+		skip $wide, 1 if $wide;
+		is $out->error ? 'ERROR' : digest_of($out->segments), $s->{segments_sha256}, "$label: the segments are bit-identical to the prototype's (mark 7)"
+			or diag("on $Config{archname}, $Config{cc}");
+	}
 
 	my $e = $s->{expect};
 	my @claims;
@@ -140,7 +148,10 @@ for my $s (@strokes) {
 		my $raw = $course{ $s->{course} }->engine->strike_v1($s->{layout}, $s->{shot});
 		push @bad, "far-side/$s->{id}" if digest_of($raw->{segments}) ne $s->{segments_sha256};
 	}
-	is_deeply \@bad, [], 'mark 1: the 21 table fixtures and the course fixture are bit-identical through the ABI 1 entry point' or diag(join ', ', @bad);
+	SKIP: {
+		skip $wide, 1 if $wide;
+		is_deeply \@bad, [], 'mark 1: the 21 table fixtures and the course fixture are bit-identical through the ABI 1 entry point' or diag(join ', ', @bad);
+	}
 	my $f = (Presets::fixtures())[0];
 	my $v1 = $table{ $f->{table} }->engine->strike_v1($f->{layout}, $f->{shot});
 	my $v2 = $table{ $f->{table} }->engine->strike($f->{layout}, $f->{shot});
@@ -169,8 +180,11 @@ for my $s (@strokes) {
 			}
 		}
 	}
-	is_deeply \@energy, [], 'mark 2: over the curve fixtures the energy never rises by more than a millionth of the strike' or diag(join "\n", @energy[0 .. 4]);
-	is_deeply \@speed, [], "mark 2: |v| is preserved across every turn to within 4 ulps (worst $worst)" or diag(join "\n", @speed[0 .. 4]);
+	is_deeply \@energy, [], 'mark 2: over the curve fixtures the energy never rises by more than a millionth of the strike' or diag(join "\n", first_few(@energy));
+	SKIP: {
+		skip $wide, 1 if $wide;
+		is_deeply \@speed, [], "mark 2: |v| is preserved across every turn to within 4 ulps (worst $worst)" or diag(join "\n", first_few(@speed));
+	}
 }
 
 # ---- 3: the rotation is the rotation ---------------------------------------------------
@@ -207,7 +221,10 @@ for my $s (@strokes) {
 		push @bad, "after turn $n: $mine, expected " . $tan->numify if $err > $tol;
 	}
 	cmp_ok $turns, '>', 50, "mark 3: $turns equal turns of half-angle tangent 1/1000";
-	is_deeply \@bad, [], sprintf('mark 3: the heading after every turn is the exact tangent-addition composition, to four ulps a turn (worst %.2f of the tolerance)', $worst) or diag(join "\n", @bad[0 .. 4]);
+	# the expectation is Math::BigRat's, so a failure names the version: below
+	# 0.2613 a multiplication handed its second operand back changed
+	is_deeply \@bad, [], sprintf('mark 3: the heading after every turn is the exact tangent-addition composition, to four ulps a turn (worst %.2f of the tolerance)', $worst)
+		or diag(join("\n", first_few(@bad)) . "\nMath::BigRat $Math::BigRat::VERSION over Math::BigInt $Math::BigInt::VERSION on $Config{archname}");
 	is scalar(grep { $_->[1] ne 'stop' } @{ $out->events }), 0, 'mark 3: a turn is not an event: the only event is the stop';
 }
 

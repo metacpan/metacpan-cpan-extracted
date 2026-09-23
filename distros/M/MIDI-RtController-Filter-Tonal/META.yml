@@ -27,7 +27,6 @@ requires:
   List::Util: '0'
   MIDI::RtController: '0.0703'
   MIDI::RtController::Filter: '0.0102'
-  MIDI::RtMidi::ScorePlayer: '0'
   Moo: '2'
   Music::Chord::Note: '0'
   Music::Note: '0'
@@ -45,7 +44,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtController-Filter-Tonal
   repository: https://github.com/ology/MIDI-RtController-Filter-Tonal.git
-version: '0.0502'
+version: '0.0503'
 x_Dist_Zilla:
   perl:
     version: '5.042000'

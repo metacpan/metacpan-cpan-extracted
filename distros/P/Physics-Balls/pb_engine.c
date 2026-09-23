@@ -22,6 +22,23 @@
  * the 0.03 fixtures are bit-identical (t/03, t/09, t/10) and the lane fixtures
  * are bit-identical to the fork (t/11).
  *
+ * 0.07 (plan_air_hockey 02a, from plan_air_hockey/prototype/physics.js, the
+ * fork of bowling's file): ABI 4 appends advance, the same loop run from rows
+ * that may each carry a starting velocity to a horizon and stopped there, for
+ * a live game that ticks. The loop is `run`, with pb_strike_ex and pb_advance
+ * as wrappers, and every difference is behind `if (tick)`, at five sites the
+ * JavaScript marks TICK: the row parse reads the velocity; the release begins
+ * every body with one ROLLING at roll = velocity, so the strike's 0.3 m/s floor
+ * is never reached; the scan is seeded with the horizon as a cut of kind K_CUT,
+ * so the horizon bounds every root finder and a frictionless body whose end is
+ * never no longer trips the "nothing moves" exit; the cut sets tnow to the
+ * horizon exactly and breaks before the crawl check and the storm counter, so
+ * it is not an event and the window is half-open (every root test is strict,
+ * so an event at exactly the horizon is the next call's); and before the
+ * settle pass, which reads segment starts, every moving body is re-based at
+ * the cut through evalAt. The state at the horizon is reported per row. A
+ * strike executes the 0.06 instructions and its fixtures are the same doubles.
+ *
  * 0.03 (plan_curling_bowls 01): a ball may curve, by its kind, as a chain of
  * parabolas turned at capped segment boundaries; a shot may carry an adjust
  * that scales the struck ball's friction and curve once it crosses a line.
@@ -49,6 +66,7 @@
 #define K_GATE   4
 #define K_TURN   5
 #define K_ADJUST 6
+#define K_CUT    7   /* ABI 4: the horizon of an advance; not an event */
 
 static const double TOUCH    = 1e-5;
 static const double TOUCH_S  = 1e-7;
@@ -623,8 +641,11 @@ void pb_outcome_free(struct pb_outcome *out) {
     if (!out) return;
     free(out->events); free(out->rest); free(out->holed); free(out->segments); free(out->energy);
     free(out->peaks); free(out->downs);
+    free(out->state);
     free(out);
 }
+
+static struct pb_outcome *run(const struct pb_world *W, int n, const struct pb_ball_in2 *layout, int layout_stride, const struct pb_shot2 *shot2, const struct pb_tick *tick);
 
 /* The v1 entry point: the v1 rows are a v2 layout of kind 0 at their own
    stride, and the shot is a v2 shot with no adjust. */
@@ -638,33 +659,53 @@ struct pb_outcome *pb_strike(const struct pb_world *W, int n, const struct pb_ba
 }
 
 struct pb_outcome *pb_strike_ex(const struct pb_world *W, int n, const struct pb_ball_in2 *layout, int layout_stride, const struct pb_shot2 *shot2) {
+    return run(W, n, layout, layout_stride, shot2, NULL);
+}
+
+/* ABI 4: rows of struct pb_ball_in3 (or narrower, all stationary) advanced to
+   the horizon tick->dt microseconds; the state at the horizon in out->state. */
+struct pb_outcome *pb_advance(const struct pb_world *W, int n, const struct pb_ball_in2 *layout, int layout_stride, const struct pb_tick *tick) {
+    return run(W, n, layout, layout_stride, NULL, tick);
+}
+
+static struct pb_outcome *run(const struct pb_world *W, int n, const struct pb_ball_in2 *layout, int layout_stride, const struct pb_shot2 *shot2, const struct pb_tick *tick) {
     struct sim S;
     struct seglist L;
     struct pb_outcome *out;
-    const struct pb_shot *shot;
+    const struct pb_shot *shot = NULL;
     const char *rowp;
     struct pb_ball_in row;
     int i, j, k, cue, Tball, Tkind, bestK, bestI, bestJ, nc, idx, pass, moved, kind, badkind;
     double T, bestT, t, dx, dy, wx, wy, hx, hy, s0, sv, sa, lam, nx, ny, ux, uy, len, dl, p, speed, sxf, syf, sl;
     int adj = 0, adjusted = 0, adjAxis = 1, adjDir = 1, roll = 0;
     double adjAt = 0, adjMu = 1, adjCurve = 1, rk, rc, rs, rd, rho, wi, wj;
+    double tEndH = 0;
+    long vxr, vyr;
 
     out = (struct pb_outcome *) calloc(1, sizeof *out);
     if (!out) return NULL;
-    /* an ABI 2 consumer's shot stops at adjust_curve and is read as it was */
-    if (!shot2 || shot2->size < offsetof(struct pb_shot2, tx) || layout_stride < (int) sizeof(struct pb_ball_in)) { out->error = PB_ERR_SIZE; return out; }
-    shot = &shot2->base;
-    if (shot2->size >= offsetof(struct pb_shot2, spin) + sizeof(int) && shot2->spin) { roll = 1; }
-    if (shot2->adjust) {
-        adj = 1;
-        adjAt = shot2->adjust_at * 1e-5;
-        adjAxis = shot2->adjust_axis ? 1 : 0;
-        adjDir = shot2->adjust_dir < 0 ? -1 : 1;
-        adjMu = shot2->adjust_mu / 1000.0;
-        adjCurve = shot2->adjust_curve / 1000.0;
+    if (layout_stride < (int) sizeof(struct pb_ball_in)) { out->error = PB_ERR_SIZE; return out; }
+    if (tick) {
+        if (tick->size < sizeof(struct pb_tick)) { out->error = PB_ERR_SIZE; return out; }
+        if (tick->dt <= 0) { out->error = PB_ERR_HORIZON; return out; }
+        /* a division: correctly rounded, so 20000 gives the double nearest 0.02 */
+        tEndH = tick->dt / 1e6;
+    } else {
+        /* an ABI 2 consumer's shot stops at adjust_curve and is read as it was */
+        if (!shot2 || shot2->size < offsetof(struct pb_shot2, tx)) { out->error = PB_ERR_SIZE; return out; }
+        shot = &shot2->base;
+        if (shot2->size >= offsetof(struct pb_shot2, spin) + sizeof(int) && shot2->spin) { roll = 1; }
+        if (shot2->adjust) {
+            adj = 1;
+            adjAt = shot2->adjust_at * 1e-5;
+            adjAxis = shot2->adjust_axis ? 1 : 0;
+            adjDir = shot2->adjust_dir < 0 ? -1 : 1;
+            adjMu = shot2->adjust_mu / 1000.0;
+            adjCurve = shot2->adjust_curve / 1000.0;
+        }
     }
     S.W = W; S.n = n; S.out = out; S.nev = 0; S.tnow = 0; S.oom = 0; S.nturns = 0;
-    S.trace = shot->trace; S.evcap = S.segcap = S.encap = S.holcap = 0;
+    S.trace = tick ? tick->trace : shot->trace; S.evcap = S.segcap = S.encap = S.holcap = 0;
     S.zrate = 2.5 * W->musp * W->g;
     S.ids = (int *) calloc(n > 0 ? n : 1, sizeof(int));
     S.mode = (signed char *) calloc(n > 0 ? n : 1, 1);
@@ -708,7 +749,15 @@ struct pb_outcome *pb_strike_ex(const struct pb_world *W, int n, const struct pb
             S.tEnd[i] = HUGE_VAL;
             S.cx[i] = S.px0[i]; S.cy[i] = S.py0[i];
             L.head[i] = -1; L.tail[i] = -1;
-            if (S.ids[i] == shot->ball) { cue = i; }
+            /* site 1, the row parse: an advance row carries a starting velocity,
+               read only when the consumer's row is wide enough to hold one */
+            if (tick && layout_stride >= (int) (offsetof(struct pb_ball_in3, vy) + sizeof(long))) {
+                memcpy(&vxr, rowp + offsetof(struct pb_ball_in3, vx), sizeof vxr);
+                memcpy(&vyr, rowp + offsetof(struct pb_ball_in3, vy), sizeof vyr);
+                S.vx0[i] = vxr * 1e-5;
+                S.vy0[i] = vyr * 1e-5;
+            }
+            if (shot && S.ids[i] == shot->ball) { cue = i; }
             if (kind != 0 && (kind < 0 || kind >= W->nk)) { badkind = 1; }
             S.curve[i] = kind < W->nk ? W->kcurve[kind] : 0;
             S.follow[i] = kind < W->nk ? W->kfollow[kind] : 1;
@@ -723,28 +772,42 @@ struct pb_outcome *pb_strike_ex(const struct pb_world *W, int n, const struct pb
     }
     if (S.oom) { out->error = PB_ERR_MEMORY; goto done; }
     if (badkind) { out->error = PB_ERR_KIND; goto done; }
-    if (cue < 0) { out->error = PB_ERR_NO_BALL; goto done; }
-
-    dl = sqrt((double) shot->dx * (double) shot->dx + (double) shot->dy * (double) shot->dy);
-    ux = shot->dx / dl; uy = shot->dy / dl;
-    p = shot->power / 1000.0;
-    speed = 0.3 + p * p * (W->vmax - 0.3);
-    sxf = shot->sx / 1000.0; syf = shot->sy / 1000.0;
-    sl = sqrt(sxf * sxf + syf * syf);
-    if (sl > 0.5) { sxf = sxf * 0.5 / sl; syf = syf * 0.5 / sl; }
-    if (roll) {
-        /* the release roll: a direction and a size, so a ball whose roll is not
-           along its line slides on a parabola, which is the hook. Not an angle. */
-        dl = sqrt((double) shot2->tx * (double) shot2->tx + (double) shot2->ty * (double) shot2->ty);
-        sl = shot2->spin / 1000.0 * speed;
-        begin(&S, &L, cue, 0, S.px0[cue], S.py0[cue], ux * speed, uy * speed, sl * (double) shot2->tx / dl, sl * (double) shot2->ty / dl, 2.5 * sxf * speed);
+    if (tick) {
+        /* site 2, the release: every body with a velocity is released ROLLING
+           with roll = velocity, so begin() takes its rolling branch and the
+           strike's speed floor below is never reached: 0.05 m/s is legal */
+        for (i = 0; i < n; i++) {
+            if (S.vx0[i] != 0 || S.vy0[i] != 0) { begin(&S, &L, i, 0, S.px0[i], S.py0[i], S.vx0[i], S.vy0[i], S.vx0[i], S.vy0[i], 0); }
+        }
     } else {
-        begin(&S, &L, cue, 0, S.px0[cue], S.py0[cue], ux * speed, uy * speed, 2.5 * syf * ux * speed, 2.5 * syf * uy * speed, 2.5 * sxf * speed);
+        if (cue < 0) { out->error = PB_ERR_NO_BALL; goto done; }
+
+        dl = sqrt((double) shot->dx * (double) shot->dx + (double) shot->dy * (double) shot->dy);
+        ux = shot->dx / dl; uy = shot->dy / dl;
+        p = shot->power / 1000.0;
+        speed = 0.3 + p * p * (W->vmax - 0.3);
+        sxf = shot->sx / 1000.0; syf = shot->sy / 1000.0;
+        sl = sqrt(sxf * sxf + syf * syf);
+        if (sl > 0.5) { sxf = sxf * 0.5 / sl; syf = syf * 0.5 / sl; }
+        if (roll) {
+            /* the release roll: a direction and a size, so a ball whose roll is not
+               along its line slides on a parabola, which is the hook. Not an angle. */
+            dl = sqrt((double) shot2->tx * (double) shot2->tx + (double) shot2->ty * (double) shot2->ty);
+            sl = shot2->spin / 1000.0 * speed;
+            begin(&S, &L, cue, 0, S.px0[cue], S.py0[cue], ux * speed, uy * speed, sl * (double) shot2->tx / dl, sl * (double) shot2->ty / dl, 2.5 * sxf * speed);
+        } else {
+            begin(&S, &L, cue, 0, S.px0[cue], S.py0[cue], ux * speed, uy * speed, 2.5 * syf * ux * speed, 2.5 * syf * uy * speed, 2.5 * sxf * speed);
+        }
     }
     if (S.trace) { push_energy(&S, totalEnergy(&S)); }
 
     for (;;) {
         T = HUGE_VAL; Tball = -1; Tkind = K_MODE;
+        /* site 3, the scan seed: the horizon bounds every root finder, and a
+           body whose next event is past it, or a frictionless body whose end is
+           never, no longer trips the "nothing moves" exit; with no body's own
+           end before the horizon Tball is parked at 0 (unused for a cut) */
+        if (tick) { T = tEndH - S.tnow; Tkind = K_CUT; }
         for (i = 0; i < n; i++) {
             if (S.mode[i] == SLIDING || S.mode[i] == ROLLING) {
                 evalAt(&S, i, S.tnow);
@@ -752,7 +815,7 @@ struct pb_outcome *pb_strike_ex(const struct pb_world *W, int n, const struct pb
                 if (S.tTurn[i] - S.tnow < T) { T = S.tTurn[i] - S.tnow; Tball = i; Tkind = K_TURN; }
             }
         }
-        if (Tball < 0) { break; }
+        if (Tball < 0) { if (!tick) { break; } Tball = 0; }
         if (T < 0) { T = 0; }
         bestT = T; bestK = Tkind; bestI = Tball; bestJ = -1;
 
@@ -823,6 +886,11 @@ struct pb_outcome *pb_strike_ex(const struct pb_world *W, int n, const struct pb
             }
         }
 
+        /* site 4, the cut: set exactly, never tnow + bestT; before the crawl
+           check and the storm counter, so the cut is not an event and never
+           enters the storm window. Every root test is strict t < bestT, so an
+           event at exactly the horizon belongs to the next call: half-open. */
+        if (bestK == K_CUT) { S.tnow = tEndH; break; }
         S.tnow = S.tnow + bestT;
         i = bestI; j = bestJ;
         if (bestK == K_TURN) {
@@ -965,6 +1033,18 @@ struct pb_outcome *pb_strike_ex(const struct pb_world *W, int n, const struct pb
             push_down(&S, S.ids[i], (long) floor(S.cx[i] * 1e5 + 0.5), (long) floor(S.cy[i] * 1e5 + 0.5), S.tnow);
         }
     }
+    /* site 5, the re-base: the settle pass below reads px0/py0, which in a
+       strike are the rest positions stopBody wrote; at a cut a moving body's
+       segment start is where it was at its last event, so every moving body is
+       evaluated at the cut and its segment restarted there */
+    if (tick) {
+        for (i = 0; i < n; i++) {
+            if (S.mode[i] != SLIDING && S.mode[i] != ROLLING) { continue; }
+            evalAt(&S, i, S.tnow);
+            S.px0[i] = S.cx[i]; S.py0[i] = S.cy[i]; S.vx0[i] = S.cvx[i]; S.vy0[i] = S.cvy[i];
+            S.rx0[i] = S.crx[i]; S.ry0[i] = S.cry[i]; S.z0[i] = S.cz[i]; S.t0[i] = S.tnow;
+        }
+    }
     /* settle: a resting pair that crept inside each other is set apart to
        Ri + Rj, each moved by the other's share of the mass (exactly a half at
        equal mass), in a few passes; physics.js says why */
@@ -1001,6 +1081,23 @@ struct pb_outcome *pb_strike_ex(const struct pb_world *W, int n, const struct pb
         }
     }
     out->nrest = out->rest ? nc : 0;
+    /* the state at the horizon, one row per layout row in layout order, from
+       the settled positions; velocities rounded as positions are, which pairs
+       with the JavaScript's Math.round; a pocketed body carries zero velocity */
+    if (tick) {
+        out->state = (struct pb_state *) calloc(n > 0 ? n : 1, sizeof(struct pb_state));
+        if (out->state) {
+            for (i = 0; i < n; i++) {
+                out->state[i].id = S.ids[i];
+                out->state[i].x = (long) floor(S.px0[i] * 1e5 + 0.5);
+                out->state[i].y = (long) floor(S.py0[i] * 1e5 + 0.5);
+                out->state[i].vx = S.mode[i] == POCKETED ? 0 : (long) floor(S.vx0[i] * 1e5 + 0.5);
+                out->state[i].vy = S.mode[i] == POCKETED ? 0 : (long) floor(S.vy0[i] * 1e5 + 0.5);
+                out->state[i].mode = S.mode[i];
+            }
+            out->nstate = n;
+        } else { out->error = PB_ERR_MEMORY; }
+    }
     out->peaks = (struct pb_peak *) calloc(n > 0 ? n : 1, sizeof(struct pb_peak));
     if (out->peaks) {
         for (i = 0; i < n; i++) { out->peaks[i].id = S.ids[i]; out->peaks[i].v = sqrt(S.peak2[i]); }
@@ -1030,6 +1127,6 @@ done:
     return out;
 }
 
-static const struct pb_abi PB_TABLE = { PB_ABI_VERSION, pb_world_new, pb_world_free, pb_strike, pb_outcome_free, pb_world_new_ex, pb_strike_ex };
+static const struct pb_abi PB_TABLE = { PB_ABI_VERSION, pb_world_new, pb_world_free, pb_strike, pb_outcome_free, pb_world_new_ex, pb_strike_ex, pb_advance };
 
 const struct pb_abi *pb_abi_table(void) { return &PB_TABLE; }

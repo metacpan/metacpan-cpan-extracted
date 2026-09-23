@@ -43,6 +43,9 @@ for my $f (@src, @doc) {
 }
 my @bad_type = grep { !$class{$_} } sort keys %emitted;
 diag "unknown: $_ (in $emitted{$_})" for @bad_type;
+# each scan asserts its own yield: a regex that stops matching leaves the
+# bad list empty and reports everything sound
+cmp_ok scalar(keys %emitted), '>', 250, 'the @type scan found types';
 is "@bad_type", '', 'every emitted @type exists in the pinned schema';
 
 # 2. the update types the mixins route
@@ -55,6 +58,7 @@ for my $f (@src) {
 }
 my @bad_update = grep { !$class{$_} } sort keys %updates;
 diag "unknown: $_ (in $updates{$_})" for @bad_update;
+cmp_ok scalar(keys %updates), '>', 10, 'the %UPDATES scan found handlers';
 is "@bad_update", '', 'every routed update type exists in the pinned schema';
 
 # 3. the update types keyed in %CHAT_FIELDS, where most of them live
@@ -67,6 +71,7 @@ for my $f (@src) {
 }
 my @bad_chat = grep { !$class{$_} } sort keys %chat_updates;
 diag "unknown: $_ (in $chat_updates{$_})" for @bad_chat;
+cmp_ok scalar(keys %chat_updates), '>', 10, 'the %CHAT_FIELDS scan found types';
 is "@bad_chat", '', 'every %CHAT_FIELDS update type exists in the pinned schema';
 
 # 4. the type names held in lookup tables (chat actions, member statuses,
@@ -87,6 +92,7 @@ for my $f (@src) {
 my @bad_tabled = grep { !$class{$_} } sort keys %tabled;
 
 diag "unknown: $_ (in $tabled{$_})" for @bad_tabled;
+cmp_ok scalar(keys %tabled), '>', 20, 'the lookup-table scan found types';
 is "@bad_tabled", '', 'every tabled TDLib type exists in the pinned schema';
 
 diag sprintf 'checked %d emitted, %d routed, %d chat-field, %d tabled types',
@@ -102,6 +108,7 @@ for my $f (@doc) {
 }
 my @bad_prose = grep { !$class{$_} } sort keys %prose;
 diag "unknown: $_ (in $prose{$_})" for @bad_prose;
+cmp_ok scalar(keys %prose), '>', 30, 'the prose scan found update names';
 is "@bad_prose", '', 'every update type named in the docs exists in the schema';
 diag sprintf 'checked %d update names in prose', scalar keys %prose;
 

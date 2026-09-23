@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # 10-webapp-bot.pl - bot that offers a Mini App and prints what it sends back
 #
 # Demonstrates: a Web App button on a reply keyboard, and on_web_app_data,
@@ -21,7 +21,7 @@
 #   TD_WEBAPP_URL           the Mini App URL
 #   TD_DATABASE_DIRECTORY   optional, default ./tdlib-bot-db
 #
-# Run: perl -Mblib eg/10-webapp-bot.pl
+# Run: perl eg/10-webapp-bot.pl   (add -Mblib to run from a built checkout)
 
 use strict;
 use warnings;
@@ -63,10 +63,19 @@ $td->on_web_app_data(sub {
     $td->send_message($msg->{chat_id}, "Got it", sub { });
 });
 
+# a die inside a callback is contained and reported, not propagated, so it
+# would leave the loop running and the script hanging: break out instead
+my $status = 0;
+
 $td->login(sub {
     my (undef, $err) = @_;
-    die "login failed: $err->{message}\n" if $err;
+    if ($err) {
+        warn "login failed: $err->{message}\n";
+        $status = 1;
+        return EV::break;
+    }
     print "listening; send /start to the bot\n";
 });
 
 EV::run;
+exit $status;

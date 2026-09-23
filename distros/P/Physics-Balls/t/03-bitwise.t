@@ -15,7 +15,8 @@ use Digest::SHA ();
 #
 # Tolerance is the contract (t/02); this is the target on top. A failure names
 # the platform and the first differing number so it can be diagnosed rather
-# than argued with.
+# than argued with. A build whose compiler evaluates a double wider than a
+# double cannot meet the target and skips it with the reason.
 
 use Physics::Balls;
 use Presets;
@@ -58,9 +59,13 @@ sub first_difference {
 	return 'no difference in the segments themselves';
 }
 
+my $wide = Presets::wide_doubles();
 for my $fx (@fixtures) {
-	my $out = Physics::Balls->strike($world{ $fx->{table} }, layout => $fx->{layout}, %{ $fx->{shot} });
-	my $mine = $out->error ? 'ERROR ' . $out->message : digest_of($out->segments);
-	is $mine, $fx->{segments_sha256}, "$fx->{table}/$fx->{id}: the segments are bit-identical to the prototype's"
-		or diag("on $Config{archname}, $Config{cc}: " . ($out->error ? $out->message : first_difference($out->segments, $fx->{segments})));
+	SKIP: {
+		skip $wide, 1 if $wide;
+		my $out = Physics::Balls->strike($world{ $fx->{table} }, layout => $fx->{layout}, %{ $fx->{shot} });
+		my $mine = $out->error ? 'ERROR ' . $out->message : digest_of($out->segments);
+		is $mine, $fx->{segments_sha256}, "$fx->{table}/$fx->{id}: the segments are bit-identical to the prototype's"
+			or diag("on $Config{archname}, $Config{cc}: " . ($out->error ? $out->message : first_difference($out->segments, $fx->{segments})));
+	}
 }

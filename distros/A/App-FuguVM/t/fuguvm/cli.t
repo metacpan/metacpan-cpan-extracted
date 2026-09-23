@@ -5,10 +5,12 @@ use v5.36;
 use Test::More;
 use FindBin qw($RealBin);
 use lib "$RealBin/../../lib";
+use Fugu::Log;
 use Fugu::TestLog;
 use File::Path qw(make_path);
 use File::Temp qw(tempdir);
 use Cwd qw(getcwd);
+use Fugu::Signify;
 
 # The CLI depends on SSH, which requires Net::SSH2
 BEGIN {
@@ -615,6 +617,27 @@ SKIP: {
 	0, 'mirror verify over an empty cache exits 0');
 }
 
+# The mirror of the command reports through the logger of the CLI, so
+# --quiet reaches the fetch line of GST-MIRROR-5. The process default
+# of this test is quiet, and the CLI here is not, so a mirror that
+# took the default would carry the quiet mode instead.
+{
+    my $project = _cache_project();
+    my $built;
+
+    {
+	no warnings 'redefine';
+	my $new = \&App::FuguVM::Mirror::new;
+	local *App::FuguVM::Mirror::new = sub { return $built = $new->(@_) };
+	_run_captured("--project=$project", 'mirror', 'verify');
+    }
+
+    if (ok(defined $built, 'mirror verify builds one mirror')) {
+	is($built->{log}->mode, Fugu::Log::MODE_STDERR,
+	    'and the mirror takes the logger of the CLI');
+    }
+}
+
 # An absent public key for the version is a configuration error. The
 # share tree holds no key of version 6.0.
 {
@@ -634,15 +657,20 @@ SKIP: {
 # The routing, the removal, and the forced proof, over a signed
 # fixture in the project cache
 SKIP: {
-    my $signify = _find_signify();
-    skip 'signify(1) not available', 15 if !defined $signify;
+
+    # A key pair and a signature are private key operations, so the
+    # fixture signer takes the signify engine, and its is_available
+    # then reports the command. The proof of the tool runs the
+    # command too, so this block needs it on both sides.
+    my $signer = Fugu::Signify->new(engine => 'signify');
+    skip 'signify(1) not available', 15 if !$signer->is_available;
 
     # fetch routes by the manifests and never guesses: a file of the
     # release manifest reads from the release scope, a file of the
     # source manifest reads from the source scope, and a name that
     # neither holds is a refusal. Every file is cached, so no fetch
     # reaches the network.
-    my $project = _signed_project($signify);
+    my $project = _signed_project($signer);
     _fake_mirror_file($project, '7.8/arm64/base78.tgz', 'set bytes');
     _fake_mirror_file($project, '7.8/ports.tar.gz', 'tree bytes');
 
@@ -666,7 +694,7 @@ SKIP: {
     # keeps an unknown file. The two scopes share the name
     # base78.tgz: good in the release scope, tampered in the source
     # scope.
-    $project = _signed_project($signify, 'base78.tgz');
+    $project = _signed_project($signer, 'base78.tgz');
     my $good = _fake_mirror_file($project, '7.8/arm64/base78.tgz',
 	'set bytes');
     my $bad = _fake_mirror_file($project, '7.8/base78.tgz',
@@ -688,7 +716,7 @@ SKIP: {
     # The verify verb proves, whatever the verify directive says: a
     # tampered manifest under 'verify no' still fails and leaves the
     # cache.
-    $project = _signed_project($signify, undef, "verify no\n");
+    $project = _signed_project($signer, undef, "verify no\n");
     my $manifest =
 	"$project/cache/proxy/cdn.openbsd.org/pub/OpenBSD/7.8/arm64/SHA256";
     open my $mh, '>>', $manifest or die $!;
@@ -1103,22 +1131,6 @@ sub _fake_download
     return $dir;
 }
 
-# _find_signify():
-#	The signify command on PATH, in the search order of
-#	Fugu::Signify, or undef.
-sub _find_signify
-{
-    for my $name (qw(signify-openbsd signify)) {
-	for my $dir (split /:/, $ENV{PATH} // '') {
-	    next unless length $dir;
-	    my $path = "$dir/$name";
-	    return $path if -f $path && -x $path;
-	}
-    }
-
-    return undef;
-}
-
 # _fake_mirror_file($project, $relative, $bytes):
 #	One cached mirror file, seeded on disk at its mirror path.
 sub _fake_mirror_file
@@ -1134,7 +1146,7 @@ sub _fake_mirror_file
     return $path;
 }
 
-# _signed_project($signify, $source_extra, $extra_config):
+# _signed_project($signer, $source_extra, $extra_config):
 #	A cache project whose signify_dir holds a fresh key pair under
 #	the 7.8 release name, with a signed manifest seeded in each
 #	scope. The release manifest names base78.tgz with the digest
@@ -1143,7 +1155,7 @@ sub _fake_mirror_file
 #	with the digest of 'set bytes'.
 sub _signed_project
 {
-    my ($signify, $source_extra, $extra_config) = @_;
+    my ($signer, $source_extra, $extra_config) = @_;
 
     require Digest::SHA;
 
@@ -1151,10 +1163,10 @@ sub _signed_project
 	. "signify_dir keys\n");
     make_path("$project/keys");
 
-    system($signify, '-G', '-n',
-	'-p', "$project/keys/key.pub",
-	'-s', "$project/keys/key.sec") == 0
-	or die "signify -G failed\n";
+    $signer->generate(comment => 'a cli test key',
+	public => "$project/keys/key.pub",
+	secret => "$project/keys/key.sec")
+	or die 'cannot generate a key pair: ', $signer->error, "\n";
     rename "$project/keys/key.pub", "$project/keys/openbsd-78-base.pub"
 	or die "cannot rename the public key: $!\n";
 
@@ -1176,9 +1188,9 @@ sub _signed_project
 	}
 
 	my $path = _fake_mirror_file($project, "7.8/$rel", $lines);
-	system($signify, '-S', '-s', "$project/keys/key.sec",
-	    '-m', $path, '-x', "$path.sig") == 0
-	    or die "signify -S failed\n";
+	$signer->sign(secret => "$project/keys/key.sec",
+	    file => $path, signature => "$path.sig")
+	    or die "cannot sign $path: ", $signer->error, "\n";
     }
 
     return $project;

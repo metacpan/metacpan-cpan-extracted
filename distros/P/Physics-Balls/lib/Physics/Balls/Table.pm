@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 my $SQRT2 = sqrt 2;
 my $PI = 4 * atan2(1, 1);
@@ -136,7 +136,7 @@ Physics::Balls::Table - a rectangular table with six pockets, as walls, noses an
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS
 

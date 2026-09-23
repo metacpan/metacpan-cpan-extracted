@@ -39,9 +39,9 @@ send "\r"
 # Wait for login prompt or shell
 expect {
     "login:" {
-        send "$user\r"
+        send -- "$user\r"
         expect "Password:"
-        send "$password\r"
+        send -- "$password\r"
     }
     "#" {
         # Already logged in
@@ -58,7 +58,7 @@ expect {
 
 # Wait for shell
 expect "#" {
-    send "$cmd\r"
+    send -- "$cmd\r"
 }
 
 # Wait for command to complete

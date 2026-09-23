@@ -1,7 +1,7 @@
 {
    "abstract" : "Small foundation for JSON HTTP API clients",
    "author" : [
-      "unknown"
+      "SHINGO <shingo@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -37,6 +37,7 @@
             "MIME::Base64" : "0",
             "Scalar::Util" : "0",
             "Time::HiRes" : "0",
+            "Time::Local" : "0",
             "perl" : "5.010"
          }
       }
@@ -53,6 +54,6 @@
          "web" : "https://github.com/kawamurashingo/HTTP-API-Core"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

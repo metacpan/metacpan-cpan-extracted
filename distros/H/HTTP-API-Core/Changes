@@ -1,5 +1,9 @@
 Revision history for HTTP-API-Core
 
+1.02  2026-09-22
+    - Support HTTP-date values in Retry-After in addition to delay-seconds.
+    - Fall back to rate-limit reset metadata or exponential backoff for malformed Retry-After values.
+
 1.01  2026-09-17
     - Lower the minimum supported Perl version from 5.20 to 5.10.
     - Expand CI coverage to Perl 5.10, 5.12, 5.14, 5.16, and 5.18.

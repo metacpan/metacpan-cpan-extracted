@@ -1,5 +1,129 @@
 Revision history for Database-BI
 
+0.008.1	Tue Sep 22 09:13:04 PM EDT 2026
+    [ Bug Fixes ]
+    - Fixed mojibake in pie/heatmap/line-graph chart labels when the data
+      contains non-ASCII characters (e.g. author names from /import).
+      Root cause: HTML::D3 < 0.17 returned UTF-8 byte strings from its
+      render_*_snippet methods; Mojolicious::Renderer then called
+      Mojo::Util::encode('UTF-8', ...) on the TT output, which treated
+      those bytes as Latin-1 and double-encoded them (e.g. U+00F6 "o
+      umlaut" appeared as "o" + two garbage bytes).  Fixed by decoding
+      the snippet HTML to a Perl character string (utf8::decode) in
+      graph_view, pie_view, and heatmap_view before passing it to the
+      TT stash.  Requires HTML::D3 >= 0.17, which fixes the same bug
+      at the source by using JSON::MaybeXS with utf8 => 0 throughout.
+    - Fixed pie chart PNG (and SVG) export clipping long legend labels on
+      the right.  The canvas/SVG width was calculated using a hardcoded
+      240 px legend column regardless of label length.  The legend width
+      is now measured dynamically with ctx.measureText() on an off-screen
+      canvas so the export image is always wide enough for the longest
+      label, with a 10 px right-side margin.
+
+0.008.0	Tue Sep 22 02:33:40 PM EDT 2026
+    [ Enhancements ]
+    - Added support for TSV (tab separated) files.
+    - Added support for .sqlite and .sqlite3 file extensions as aliases
+      for SQLite databases.  Files with either extension are treated
+      identically to .sql: sqlite_master is probed for table names,
+      mismatched stems are auto-corrected via a symlink, and the
+      extensions appear in the filesystem browser and upload
+      accepted-types list.
+    - Multi-table joins now pass backend => 'auto' to Database::Join
+      (>= 0.004.0).  Datasets up to join_max_rows combined rows
+      (default 10,000; configurable in database_bi.conf) join in Perl
+      memory; larger datasets automatically spill to a temporary SQLite
+      file so peak RAM is bounded by the result set rather than the sum
+      of all source tables.
+    - Added a heatmap chart (GET /heatmap).  Choose two categorical columns
+      for the X and Y axes; optionally pick a numeric column to sum per cell
+      (omit to count rows).  Colour scheme is configurable (YlOrRd, Blues,
+      Greens, Purples, RdPu, YlGnBu).  A "Heatmap..." toolbar button in the
+      dashboard opens a panel to configure and launch the chart.  Uses the
+      new render_heatmap_snippet method from HTML::D3 >= 0.16.
+    - Bumped HTML::D3 minimum dependency from 0.14 to 0.16.
+    - Line graph reference lines: the Min line is now amber (#f59e0b)
+      instead of blue, so it no longer clashes with the steelblue main
+      line.  Data-point dots whose Y value equals the current REF.min are
+      recoloured amber when the Min checkbox is checked; dots at REF.max
+      are recoloured red when the Max checkbox is checked.  Unchecking a
+      reference-line checkbox immediately reverts the affected dots to
+      steelblue.  Dot colours are also updated after zoom and reset.
+    - Charts generated from URL-imported data (/graph, /pie, /heatmap) now
+      show two attribution lines below the chart: "Source: <url>" and
+      "Accessed on <date>", where the date is the time of the current
+      request (when the data was fetched/served), not necessarily today.
+      Both lines are also embedded in SVG and PNG exports: the SVG gains
+      two <text> elements appended below the chart area (height and viewBox
+      extended by 38 px); the PNG canvas is extended by the same amount and
+      the text is drawn with canvas 2D fillText.  URLs longer than 90
+      characters are truncated with "..." in exports to avoid overflow.
+      Charts from local files are unaffected.
+    - Added support for Database::Abstraction's remote file syntax:
+      paths of the form /../hostname/dir/file.ext can now be passed to
+      GET /open?path= and to path: specs in /join, /combine, /graph,
+      /pie, /heatmap, and /api/columns.  The hostname portion is
+      validated against a safe-identifier regex (same as D::A's own
+      host validation).  Only supported file extensions are accepted.
+      Net::SFTP::Foreign is loaded lazily and used to download the
+      remote file to a process-local temp directory; the temp dir is
+      kept alive for the DataSource object's lifetime and cleaned up
+      automatically on destruction.  Net::SFTP::Foreign is now a
+      declared runtime dependency.
+    - Remote files with non-standard extensions (e.g. .log, .dat) are
+      now handled correctly.  After download, DataSource sniffs the
+      file content (SQLite magic bytes, XML preamble, or first-line
+      separator) and renames the temp copy to the appropriate standard
+      extension (.db, .xml, .tsv, .psv, or .csv) so that
+      _detect_file_info and Database::Abstraction can discover it
+      automatically.  Previously, a remote file whose extension was not
+      in the recognised list caused a "Can't find a file" error even
+      when the download succeeded.
+    - Added CSS-only tooltips to all path input fields (join panel,
+      combine panel, and the home-page "Browse your files" input).
+      Hovering or focusing any of these fields shows a dark popover
+      explaining the local and remote (/../hostname/) path syntax with
+      examples.  The tooltip uses position:absolute + opacity transition
+      and is shown via :hover/:focus-within with no JavaScript.
+    - Added novalidate to the join, combine, open, and import forms so
+      that the browser's built-in "Please fill out this field" validation
+      popup no longer appears on hover; DataSource validates inputs
+      server-side instead.
+    - Added support for user@hostname syntax in the remote file path:
+      paths of the form /../user@hostname/dir/file.ext are now accepted
+      and the user portion is passed to Net::SFTP::Foreign as the login
+      name.
+    - Added a "Copy link" button to the filter toolbar.  The button
+      appears only when at least one filter is active and copies the
+      current URL (including all ?f= parameters) to the clipboard, so
+      users can bookmark or share a custom-filtered view.  Uses the
+      modern Clipboard API with an execCommand fallback for plain-HTTP
+      deployments.  Clicking briefly shows "Copied!" feedback before
+      reverting to the original label.
+
+    [ Tests ]
+    - Transaction 33: full TSV lifecycle (view, open, filter, export,
+      upload).
+    - Transaction 34: full .sqlite3 lifecycle (open, filter, export,
+      browse, idempotency, table-name mismatch auto-correction).
+    - Transaction 35: full .sqlite lifecycle (same phases as T34).
+    - Transaction 37: heatmap chart lifecycle (val mode, count mode, 400
+      for missing/invalid params, idempotency, toolbar button and panel
+      presence).
+    - Transaction 36: copy-link button lifecycle (absent without filters,
+      present with one or more filters, JS clipboard paths present, CSS
+      classes defined).
+    - Transaction 39: remote file path (/../hostname/dir/file.ext)
+      lifecycle (path parsing, hostname validation, extension guard,
+      /open rendering, /api/columns spec resolution, idempotency,
+      non-standard extension via _sniff_data_ext content detection,
+      user@hostname credential passing).
+      Net::SFTP::Foreign is stubbed in tests so no real SSH connection
+      is required.
+    - basic.t: added "GET /heatmap" smoke subtest, "SQLite3 format
+      (.sqlite3 extension)" subtest, and "SQLite format (.sqlite
+      extension)" subtest.
+
 0.007.0	Wed Sep 16 07:33:53 PM EDT 2026
     [ Enhancements ]
     - Added pie chart support via the new GET /pie route.  A "Pie chart..."

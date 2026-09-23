@@ -13,12 +13,22 @@ from source:
   TD_BOT_TOKEN   bot token from BotFather (bot login)
   TD_DATABASE_DIRECTORY  optional, overrides the default session directory
 
+01, 03 and 07-09 need a user account, 02, 10 and 11 a bot, and 04-05
+take either; 06 needs no account at all. TDLib refuses much of its API
+to one kind or the other.
+
 WARNING: the database directory holds the session. Whoever reads it owns
 the account; treat it as exactly as sensitive as a password. Do not
 commit it.
 
-Run the examples from the distribution root, e.g.:
+With the module installed, run an example from anywhere:
 
+  perl eg/01-login.pl
+
+From an unpacked distribution, build first -- there is no blib until
+you have run make:
+
+  perl Makefile.PL && make
   perl -Mblib eg/01-login.pl
 
 Scripts
@@ -33,6 +43,7 @@ Scripts
 08-tickit-chat.pl   the same two panes in a terminal, also driven by EV
 09-mcp-server.pl    exposes Telegram as MCP tools over JSON-RPC on stdio
 10-webapp-bot.pl    offers a Mini App button and prints the data it returns
+11-command-bot.pl   command routing, inline button routing and ask()
 
 07-gtk4-chat.pl needs GTK4 and Glib::Object::Introspection. It loads
 them at run time, so the file still compiles where they are absent.

@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0502';
+our $VERSION = '0.0503';
 
 use strictures 2;
 use Carp qw(croak);
@@ -13,7 +13,6 @@ use curry;
 use Array::Circular ();
 use List::SomeUtils qw(first_index);
 use List::Util qw(shuffle uniq);
-use MIDI::RtMidi::ScorePlayer ();
 use Moo;
 use Music::Scales qw(get_scale_MIDI get_scale_notes);
 use Music::Chord::Note ();
@@ -106,7 +105,7 @@ has arp => (
 has arp_types => (
     is      => 'rw',
     isa     => InstanceOf['Array::Circular'],
-    default => sub { Array::Circular->new(qw(up down random)) },
+    default => sub { Array::Circular->new(qw(up down updown random converge diverge)) },
 );
 
 
@@ -308,7 +307,7 @@ MIDI::RtController::Filter::Tonal - Tonal RtController filters
 
 =head1 VERSION
 
-version 0.0502
+version 0.0503
 
 =head1 SYNOPSIS
 
@@ -396,7 +395,7 @@ Default: C<-12>
   $key = $filter->key;
   $filter->key($number);
 
-The musical key (C<C-B>).
+The musical key (C<C>).
 
 =head2 scale
 
@@ -428,7 +427,7 @@ C<walk_tone> filters.
 A list of known arpeggiation types. This is an L<Array::Circular>
 instance.
 
-Default: C<[up, down, random]>
+Default: C<[up, down, updown, random, converge, diverge]>
 
 =head2 arp_type
 
@@ -550,8 +549,6 @@ L<List::SomeUtils>
 L<List::Util>
 
 L<MIDI::RtController::Filter>
-
-L<MIDI::RtMidi::ScorePlayer>
 
 L<Moo>
 

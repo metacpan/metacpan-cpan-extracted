@@ -44,7 +44,7 @@ send "\r"
 # Wait for login prompt
 expect {
     "login:" {
-        send "$user\r"
+        send -- "$user\r"
     }
     "#" {
         # Already logged in
@@ -63,7 +63,7 @@ expect {
 
 # Enter password
 expect "Password:" {
-    send "$password\r"
+    send -- "$password\r"
 }
 
 # Wait for shell prompt

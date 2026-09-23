@@ -35,7 +35,7 @@
             "Carp" : "0",
             "DBD::SQLite" : "1.70",
             "DBI" : "0",
-            "Database::Abstraction" : "0.44",
+            "Database::Abstraction" : "0.45",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "List::Util" : "1.33",
@@ -53,6 +53,7 @@
          "requires" : {
             "DBD::CSV" : "0",
             "IPC::System::Simple" : "0",
+            "JSON::MaybeXS" : "0",
             "Test::DescribeMe" : "0",
             "Test::Exception" : "0",
             "Test::Memory::Cycle" : "0",
@@ -78,6 +79,6 @@
          "web" : "https://github.com/nigelhorne/Database-Join"
       }
    },
-   "version" : "v0.005.0",
+   "version" : "v0.006.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

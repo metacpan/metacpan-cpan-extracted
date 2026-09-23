@@ -1,7 +1,7 @@
 ---
 abstract: 'Small foundation for JSON HTTP API clients'
 author:
-  - unknown
+  - 'SHINGO <shingo@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -23,10 +23,11 @@ requires:
   MIME::Base64: '0'
   Scalar::Util: '0'
   Time::HiRes: '0'
+  Time::Local: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/kawamurashingo/HTTP-API-Core/issues
   homepage: https://github.com/kawamurashingo/HTTP-API-Core
   repository: https://github.com/kawamurashingo/HTTP-API-Core.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

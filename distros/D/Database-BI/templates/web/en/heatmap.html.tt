@@ -1,0 +1,118 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+<style>
+  /* Allow Y-axis labels (rotated, left of the chart) to escape the container. */
+  #heatmap { overflow: visible; }
+  .heatmap-container { padding-left: 3rem; }
+  .chart-source {
+    margin: 0.25rem 0 0;
+    font-size: 0.82rem;
+    color: #666;
+    word-break: break-all;
+  }
+  .chart-source a { color: inherit; }
+</style>
+
+<p class="back-link"><a href="/">&larr; Home</a> &rsaquo; <a href="[% back_url | html %]">[% back_label || 'Back' | html %]</a></p>
+
+<h2 class="graph-title">[% title | html %]</h2>
+
+<div class="graph-export-bar">
+  <button class="btn-graph-export" onclick="biHeatmapExportSVG()">Export SVG</button>
+  <button class="btn-graph-export" onclick="biHeatmapExportPNG()">Export PNG</button>
+  <span class="graph-point-count">[% cell_count %] cell[% IF cell_count != 1 %]s[% END %]</span>
+</div>
+
+<div class="heatmap-container">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  [% heatmap_html %]
+</div>
+
+<script>
+(function () {
+  function _getAttribution() {
+    var el = document.getElementById('chart-attribution');
+    return el ? { url: el.dataset.url, date: el.dataset.date } : null;
+  }
+  var ATTR_H = 38;
+  function _addAttrToSVG(svgEl, attr) {
+    if (!attr) return;
+    var ns = 'http://www.w3.org/2000/svg';
+    var h  = parseFloat(svgEl.getAttribute('height')) || 500;
+    svgEl.setAttribute('height', h + ATTR_H);
+    var vb = svgEl.getAttribute('viewBox');
+    if (vb) {
+      var p = vb.trim().split(/\s+/);
+      if (p.length === 4) { p[3] = parseFloat(p[3]) + ATTR_H; svgEl.setAttribute('viewBox', p.join(' ')); }
+    }
+    var maxLen = 90;
+    var urlText = attr.url.length > maxLen ? attr.url.slice(0, maxLen - 3) + '...' : attr.url;
+    var style = 'font-family:sans-serif;font-size:11px;fill:#666;';
+    var t1 = document.createElementNS(ns, 'text');
+    t1.setAttribute('x', 10); t1.setAttribute('y', h + 16); t1.setAttribute('style', style);
+    t1.textContent = 'Source: ' + urlText;
+    var t2 = document.createElementNS(ns, 'text');
+    t2.setAttribute('x', 10); t2.setAttribute('y', h + 30); t2.setAttribute('style', style);
+    t2.textContent = 'Accessed on ' + attr.date;
+    svgEl.appendChild(t1);
+    svgEl.appendChild(t2);
+  }
+  function biHeatmapExportSVG() {
+    var svg = document.getElementById('heatmap');
+    if (!svg) return;
+    var clone = svg.cloneNode(true);
+    _addAttrToSVG(clone, _getAttribution());
+    var src = '<?xml version="1.0" encoding="UTF-8"?>\n'
+            + new XMLSerializer().serializeToString(clone);
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
+    a.download = 'heatmap.svg';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  function biHeatmapExportPNG() {
+    var svg = document.getElementById('heatmap');
+    if (!svg) return;
+    var attr   = _getAttribution();
+    var w      = parseInt(svg.getAttribute('width'),  10) || 900;
+    var h      = parseInt(svg.getAttribute('height'), 10) || 500;
+    var extraH = attr ? ATTR_H : 0;
+    var canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h + extraH;
+    var ctx = canvas.getContext('2d');
+    var src = new XMLSerializer().serializeToString(svg);
+    var url = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
+    var img = new Image();
+    img.onload = function () {
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, w, h + extraH);
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      if (attr) {
+        var maxLen  = 90;
+        var urlText = attr.url.length > maxLen ? attr.url.slice(0, maxLen - 3) + '...' : attr.url;
+        ctx.font         = '11px sans-serif';
+        ctx.fillStyle    = '#666';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText('Source: ' + urlText,       10, h + 16);
+        ctx.fillText('Accessed on ' + attr.date,  10, h + 30);
+      }
+      var a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'heatmap.png';
+      a.click();
+    };
+    img.src = url;
+  }
+  window.biHeatmapExportSVG = biHeatmapExportSVG;
+  window.biHeatmapExportPNG = biHeatmapExportPNG;
+}());
+</script>
+
+[% IF source_url %]
+<div id="chart-attribution" data-url="[% source_url | html %]" data-date="[% source_accessed | html %]" hidden></div>
+<p class="chart-source">Source: <a href="[% source_url | html %]" rel="noopener noreferrer">[% source_url | html %]</a></p>
+<p class="chart-source">Accessed on [% source_accessed %]</p>
+[% END %]
+
+[%- END -%]

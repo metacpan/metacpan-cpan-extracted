@@ -4,12 +4,25 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
+
+=head1 NAME
+
+EV::Telegram::TDLib::Secret - secret chat methods for EV::Telegram::TDLib
+
+=head1 DESCRIPTION
+
+One of the mixins L<EV::Telegram::TDLib> inherits from. It has no
+interface of its own and is not meant to be used directly: loading the
+main module loads this one, and its methods are called on a client.
+
+They are documented together with the rest of the API, under
+L<EV::Telegram::TDLib/"Secret mixin">.
+
+=cut
 
 sub CLONE_SKIP { 1 }
 
-sub _json_bool { EV::Telegram::TDLib::_json_bool($_[0]) }
-sub _need { EV::Telegram::TDLib::_need(@_) }
 
 our %UPDATES;
 
@@ -20,8 +33,9 @@ our %UPDATES;
 sub new_secret_chat {
     my ($self, @args) = @_;
     my $cb = ref $args[-1] eq 'CODE' ? pop @args : sub {};
-    my ($user_id, @rest) = @args;
-    _need('user_id', $user_id);
+    no_extra('new_secret_chat', 1, \@args);
+    my ($user_id) = @args;
+    need('user_id', $user_id);
     $self->send({ '@type' => 'createNewSecretChat', user_id => 0 + $user_id }, $cb);
     return;
 }
@@ -29,8 +43,9 @@ sub new_secret_chat {
 sub open_secret_chat {
     my ($self, @args) = @_;
     my $cb = ref $args[-1] eq 'CODE' ? pop @args : sub {};
-    my ($secret_chat_id, @rest) = @args;
-    _need('secret_chat_id', $secret_chat_id);
+    no_extra('open_secret_chat', 1, \@args);
+    my ($secret_chat_id) = @args;
+    need('secret_chat_id', $secret_chat_id);
     $self->send({ '@type' => 'createSecretChat',
                   secret_chat_id => 0 + $secret_chat_id }, $cb);
     return;
@@ -39,8 +54,9 @@ sub open_secret_chat {
 sub secret_chat {
     my ($self, @args) = @_;
     my $cb = ref $args[-1] eq 'CODE' ? pop @args : sub {};
-    my ($secret_chat_id, @rest) = @args;
-    _need('secret_chat_id', $secret_chat_id);
+    no_extra('secret_chat', 1, \@args);
+    my ($secret_chat_id) = @args;
+    need('secret_chat_id', $secret_chat_id);
     $self->send({ '@type' => 'getSecretChat',
                   secret_chat_id => 0 + $secret_chat_id }, $cb);
     return;
@@ -49,8 +65,9 @@ sub secret_chat {
 sub close_secret_chat {
     my ($self, @args) = @_;
     my $cb = ref $args[-1] eq 'CODE' ? pop @args : sub {};
-    my ($secret_chat_id, @rest) = @args;
-    _need('secret_chat_id', $secret_chat_id);
+    no_extra('close_secret_chat', 1, \@args);
+    my ($secret_chat_id) = @args;
+    need('secret_chat_id', $secret_chat_id);
     $self->send({ '@type' => 'closeSecretChat',
                   secret_chat_id => 0 + $secret_chat_id }, $cb);
     return;
@@ -61,14 +78,14 @@ sub search_secret_messages {
     my ($self, @args) = @_;
     my $cb = ref $args[-1] eq 'CODE' ? pop @args : sub {};
     my ($query, @rest) = @args;
-    my %opt = @rest;
+    my %opt = opts(@rest);
     my %req = ('@type' => 'searchSecretMessages',
-               chat_id => 0 + ($opt{chat_id} // 0),
-               query   => defined $query ? "$query" : '',
-               offset  => $opt{offset} // '',
-               limit   => 0 + ($opt{limit} // 50));
-    $req{filter} = { '@type' => $opt{filter} =~ /\AsearchMessagesFilter/
-                        ? $opt{filter} : "searchMessagesFilter$opt{filter}" }
+               chat_id => num('chat_id', $opt{chat_id} // 0),
+               query   => plain_text('a query', $query),
+               offset  => plain_text('an offset', $opt{offset}),
+               limit   => num('limit', $opt{limit} // 50));
+    $req{filter} = tl_class('searchMessagesFilter', 'SearchMessagesFilter',
+                             'message filter', $opt{filter})
         if defined $opt{filter};
     $self->send(\%req, $cb);
     return;
@@ -79,10 +96,12 @@ sub search_secret_messages {
 sub set_database_encryption_key {
     my ($self, @args) = @_;
     my $cb = ref $args[-1] eq 'CODE' ? pop @args : sub {};
-    my ($key, @rest) = @args;
-    _need('new_encryption_key', $key);
+    no_extra('set_database_encryption_key', 1, \@args);
+    my ($key) = @args;
+    need('new_encryption_key', $key);
     $self->send({ '@type' => 'setDatabaseEncryptionKey',
-                  new_encryption_key => "$key" }, $cb);
+                  new_encryption_key =>
+                      tl_bytes('new_encryption_key', $key) }, $cb);
     return;
 }
 
@@ -90,11 +109,12 @@ sub session_accepts_secret_chats {
     my ($self, @args) = @_;
     my $cb = ref $args[-1] eq 'CODE' ? pop @args : sub {};
     my ($session_id, $on, @rest) = @args;
-    _need('session_id', $session_id);
+    no_opts('session_accepts_secret_chats', @rest);
+    need('session_id', $session_id);
     $self->send({ '@type' => 'toggleSessionCanAcceptSecretChats',
-                  session_id => "$session_id",
+                  session_id => plain_text('a session id', $session_id),
                   can_accept_secret_chats =>
-                      _json_bool(defined $on ? $on : 1) }, $cb);
+                      json_bool(defined $on ? $on : 1) }, $cb);
     return;
 }
 

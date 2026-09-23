@@ -1,5 +1,8 @@
 package Database::BI;
 
+use strict;
+use warnings;
+
 use Mojo::Base 'Mojolicious', -strict, -signatures;
 
 use Carp qw(croak);
@@ -9,7 +12,7 @@ use Readonly;
 
 use Database::BI::Model::DataSource;
 
-our $VERSION = '0.007.0';
+our $VERSION = '0.008.1';
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -30,12 +33,12 @@ Database::BI - Web-based Business Intelligence viewer for flat data files
 
 =head1 VERSION
 
-0.007.0
+0.008.1
 
 =head1 DESCRIPTION
 
 C<Database::BI> is a self-contained L<Mojolicious> web application that reads
-arbitrary flat data files (CSV, PSV, SQLite, XML, XLSX, etc.) via
+arbitrary flat data files (CSV, PSV, TSV, SQLite, XML, XLSX, etc.) via
 L<Database::Abstraction> and presents them as styled, sortable, reorderable
 HTML tables.  It has no persistent database of its own -- it reads your files
 on every request.
@@ -92,8 +95,10 @@ set and leaving blanks where a source file lacks a column.
 
 B<Charts> -- the toolbar offers a line chart (L<HTML::D3>
 C<render_zoomable_line_chart_snippet>; brush-to-zoom, reference lines for
-min/avg/max) and a pie chart (C<render_pie_chart_snippet>; animated,
-sorted by value, capped at 12 slices, click-a-slice to filter the table).
+min/avg/max), a pie chart (C<render_pie_chart_snippet>; animated,
+sorted by value, capped at 12 slices, click-a-slice to filter the table),
+and a heatmap (C<render_heatmap_snippet>; two categorical axes, optional
+value column or row count, configurable sequential colour scheme).
 
 =item *
 
@@ -116,7 +121,7 @@ renders it in the browser without saving to disk.
 
 =head2 UTF-8 and Encoding
 
-All file data is returned as Perl character strings.  CSV/PSV files are
+All file data is returned as Perl character strings.  CSV/PSV/TSV files are
 read by L<Text::xSV::Slurp> or L<DBD::CSV>, both of which pass bytes
 through without re-encoding; the application serves the resulting page as
 C<text/html; charset=UTF-8>, so full Unicode is displayed correctly as
@@ -279,6 +284,21 @@ that category.  Parameters:
   back=<url>  URL for the "Back to table" link (optional; default "/")
   f=          result filters applied before aggregating (repeatable)
 
+=item C<GET /heatmap>
+
+Renders a D3.js v7 grid heatmap with two categorical axes.  Each cell
+colour encodes a summed or counted numeric value.  Parameters:
+
+  l=<spec>      left table (required)
+  x=<col>       X-axis column name (required; categorical)
+  y=<col>       Y-axis column name (required; categorical)
+  val=<col>     numeric column to sum per cell (optional; omit to count rows)
+  scheme=<name> colour scheme: YlOrRd Blues Greens Purples RdPu YlGnBu
+                (optional; default YlOrRd)
+  show_val=1    print the value inside each cell (optional)
+  back=<url>    URL for the "Back to table" link (optional; default "/")
+  j=, f=, d=    pipeline params (same as /join)
+
 =item C<POST /uploads/clear>
 
 Deletes every file from the C<.uploads/> staging directory.  Returns JSON
@@ -341,12 +361,13 @@ exist, the controller automatically falls back to the default language.  To
 add German support: (1) create C<templates/web/de/>, (2) copy and translate
 the C<.html.tt> files from C<templates/web/en/>, then (3) set the config.
 
-=item B<Supported data file extensions are: csv, db, sql, xml, psv, xlsx>
+=item B<Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx>
 
-The application calls C<Database::Abstraction> which recognises exactly these
-extensions.  A file called C<inventory.sqlite> is B<not> recognised -- it
-must be renamed to C<inventory.sql>.  Excel C<.xlsx> files are supported
-directly via C<DBD::Excel>; each worksheet becomes a separate table.
+The application recognises C<.csv>, C<.db>, C<.sql>, C<.sqlite>, C<.sqlite3>,
+C<.xml>, C<.psv>, C<.tsv>, and C<.xlsx> files.  All three SQLite extensions
+(C<.sql>, C<.sqlite>, C<.sqlite3>) are treated identically -- C<inventory.sqlite>
+and C<inventory.sqlite3> are both opened as SQLite databases without renaming.
+Excel C<.xlsx> files are read directly via C<Spreadsheet::ParseXLSX>.
 
 URLs will work.
 For example enter
@@ -475,6 +496,8 @@ sub startup ($self) {
 			table         => $table,
 			cache         => $chi,
 			cache_ttl_url => $cache_ttl_url,
+			exists $opts{host}     ? (host     => $opts{host})     : (),
+			exists $opts{file_ext} ? (file_ext => $opts{file_ext}) : (),
 		);
 	});
 
@@ -495,6 +518,7 @@ sub startup ($self) {
 	$r->post('/uploads/clear')->to('Dashboard#clear_uploads');
 	$r->get('/graph')->to('Dashboard#graph_view');
 	$r->get('/pie')->to('Dashboard#pie_view');
+	$r->get('/heatmap')->to('Dashboard#heatmap_view');
 
 	# Evict stale upload subdirectories on every startup so the cache cannot
 	# grow unboundedly across server restarts.  Only entries whose mtime is

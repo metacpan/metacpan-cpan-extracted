@@ -15,9 +15,9 @@ turn rate is a house law with fitted constants, not a model of ice. A world
 that declares no kinds is exactly what it was.
 
 The same inputs give the same doubles on every platform that keeps IEEE
-arithmetic honest. The build turns off fused multiply-adds for that reason, and
-the fixtures under t/ were recorded by the JavaScript prototype the engine was
-transliterated from.
+arithmetic honest. The build turns off fused multiply-adds and asks a 32-bit x86
+compiler for the SSE unit for that reason, and the fixtures under t/ were
+recorded by the JavaScript prototype the engine was transliterated from.
 
 INSTALLATION
 

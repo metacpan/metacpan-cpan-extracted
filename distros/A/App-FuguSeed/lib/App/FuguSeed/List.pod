@@ -1,0 +1,75 @@
+=head1 NAME
+
+App::FuguSeed::List - the official English word list of BIP39
+
+=head1 SYNOPSIS
+
+    use App::FuguSeed::List;
+
+    my $word   = App::FuguSeed::List->word(0);       # abandon
+    my $index  = App::FuguSeed::List->index('zoo');  # 2047
+    my @words  = App::FuguSeed::List->words;
+    my $digest = App::FuguSeed::List::DIGEST();
+
+=head1 DESCRIPTION
+
+App::FuguSeed::List holds the 2048 words of the official English word
+list of BIP39. The words sit in the module file, one word per line, so
+a person can diff them against F<share/fuguseed/english.txt>. The index
+of a word is its 0-based position in the list.
+
+Every method is a class method. The module keeps no state and never
+logs. It runs on core Perl v5.34 with no dependency, because
+F<scripts/pack> embeds it in C<fuguseed-qr>.
+
+The module opens no file. The share file is the copy that a person can
+inspect and replace, and C<fuguseed-words> reads it. The digest check
+of a list file therefore belongs to that program, not to this module.
+
+=head2 word
+
+C<word($index)> returns the word of the 0-based index C<$index>.
+
+=head2 index
+
+C<index($word)> returns the 0-based index of C<$word>.
+
+The name repeats a built-in function of Perl, so a caller reaches this
+method through the arrow only: C<< App::FuguSeed::List->index($word) >>.
+
+=head2 words
+
+C<words()> returns the 2048 words as a list, in list order.
+
+=head1 CONSTANTS
+
+=head2 DIGEST
+
+C<DIGEST> is the SHA-256 of the source list, as lower-case hex. It
+pins the embedded words and the share file to one number, and the
+tests hold both copies to it.
+
+=head1 RETURN VALUES
+
+C<word()> returns C<undef> for an index outside 0 to 2047, and for an
+index that is not a whole number. C<index()> returns C<undef> for an
+unknown word. C<words()> returns 2048 strings.
+
+=head1 ERRORS
+
+C<word()> and C<index()> die when the caller gives no argument. The
+signature of each method requires one, and Perl reports C<Too few
+arguments>. An unknown word and an index outside the list are
+recoverable errors, and the caller sees C<undef>.
+
+=head1 SEE ALSO
+
+The word list of the BIP39 specification, and
+F<share/fuguseed/english.txt>, the copy that a person can inspect and
+replace.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

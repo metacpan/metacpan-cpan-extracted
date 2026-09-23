@@ -1,17 +1,17 @@
-# NAME
+## Name
 
 Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
-# VERSION
+## Version
 
-Version 0.44
+Version 0.45
 
-# DESCRIPTION
+## Description
 
 `Database::Abstraction` is a read-only ORM for Perl that gives a uniform
-interface over CSV, PSV, XML, SQLite, DBM::Deep, BerkeleyDB, and Excel (XLSX)
-files - local, remote (via SSH), or fetched from a URL - without writing any
-SQL.
+interface over CSV, PSV, TSV, JSON, XML, SQLite, DBM::Deep, BerkeleyDB, and
+Excel (XLS/XLSX) files - local, remote (via SSH), or fetched from a URL -
+without writing any SQL.
 Effectively it allows you to access a database table, of many different
 database formats, as an object.
 
@@ -38,117 +38,126 @@ instead of pointing at a local file.
 lookups.  All DBI statement handles are cached with `prepare_cached()`.
 A CHI-compatible cache layer is also supported.
 
-# SYNOPSIS
+## Synopsis
 
-    # 1. Create a thin subclass for your table (e.g. Database/Foo.pm)
-    package Database::Foo;
-    use parent 'Database::Abstraction';
+```perl
+# 1. Create a thin subclass for your table (e.g. Database/Foo.pm)
+package Database::Foo;
+use parent 'Database::Abstraction';
 
-    # 2. Open the database - file is auto-detected from the class name
-    #    (looks for foo.sql / foo.sqlite / foo.sqlite3 / foo.psv / foo.csv / foo.xlsx / foo.xml / foo.db)
-    my $db = Database::Foo->new(directory => '/path/to/data');
+# 2. Open the database - file is auto-detected from the class name
+#    (looks for foo.sql / foo.sqlite / foo.sqlite3 / foo.psv / foo.tsv / foo.csv / foo.xlsx / foo.xml / foo.json / foo.db)
+my $db = Database::Foo->new(directory => '/path/to/data');
 
-    # 3. Simple lookups -----------------------------------------------
+# 3. Simple lookups -----------------------------------------------
 
-    # Fetch one row
-    my $row = $db->fetchrow_hashref(entry => 'key1');
+# Fetch one row
+my $row = $db->fetchrow_hashref(entry => 'key1');
 
-    # Fetch all rows matching a criterion
-    my $rows = $db->selectall_arrayref(status => 'active');
+# Fetch all rows matching a criterion
+my $rows = $db->selectall_arrayref(status => 'active');
 
-    # Column shortcut via AUTOLOAD
-    my $name = $db->name(entry => 'key1');
+# Column shortcut via AUTOLOAD
+my $name = $db->name(entry => 'key1');
 
-    # 4. Rich criteria ------------------------------------------------
+# 4. Rich criteria ------------------------------------------------
 
-    # Comparison operators
-    my $high = $db->selectall_arrayref(score => { '>' => 90 });
+# Comparison operators
+my $high = $db->selectall_arrayref(score => { '>' => 90 });
 
-    # Set membership
-    my $selected = $db->selectall_arrayref(
-        name => { -in => ['Alice', 'Bob'] }
-    );
+# Set membership
+my $selected = $db->selectall_arrayref(
+    name => { -in => ['Alice', 'Bob'] }
+);
 
-    # Range
-    my $mid = $db->selectall_arrayref(
-        score => { -between => [60, 80] }
-    );
+# Range
+my $mid = $db->selectall_arrayref(
+    score => { -between => [60, 80] }
+);
 
-    # OR grouping
-    my $either = $db->selectall_arrayref(
-        -or => [
-            { status => 'active'    },
-            { score  => { '>' => 95 } },
-        ]
-    );
+# OR grouping
+my $either = $db->selectall_arrayref(
+    -or => [
+        { status => 'active'    },
+        { score  => { '>' => 95 } },
+    ]
+);
 
-    # 5. Joins --------------------------------------------------------
+# 5. Joins --------------------------------------------------------
 
-    my $joined = $db->selectall_arrayref(
-        join => { table => 'dept', on => 'foo.dept_id = dept.id', type => 'LEFT' }
-    );
+my $joined = $db->selectall_arrayref(
+    join => { table => 'dept', on => 'foo.dept_id = dept.id', type => 'LEFT' }
+);
 
-    # 6. Chained query builder ----------------------------------------
+# 6. Chained query builder ----------------------------------------
 
-    my $results = $db->query
-        ->where(status => 'active')
-        ->where(score  => { '>=' => 80 })
-        ->order_by('score DESC')
-        ->limit(10)
-        ->all();
+my $results = $db->query
+    ->where(status => 'active')
+    ->where(score  => { '>=' => 80 })
+    ->order_by('score DESC')
+    ->limit(10)
+    ->all();
 
-    my $first = $db->query->where(name => 'Alice')->first();
-    my $count = $db->query->where(status => 'active')->count();
+my $first = $db->query->where(name => 'Alice')->first();
+my $count = $db->query->where(status => 'active')->count();
 
-    # 7. Connect via DSN (PostgreSQL, MySQL, SQLite, ...) ---------------
+# 7. Connect via DSN (PostgreSQL, MySQL, SQLite, ...) ---------------
 
-    my $db2 = Database::Foo->new(
-        dsn      => 'dbi:Pg:dbname=mydb;host=db.example.com',
-        username => 'myuser',
-        password => 's3cret',
-    );
+my $db2 = Database::Foo->new(
+    dsn      => 'dbi:Pg:dbname=mydb;host=db.example.com',
+    username => 'myuser',
+    password => 's3cret',
+);
 
-    # 8. Schema introspection -----------------------------------------
+# 8. Schema introspection -----------------------------------------
 
-    my $cols   = $db->columns();  # ['entry', 'name', 'score', ...]
-    my $schema = $db->schema();   # { name => { type=>'TEXT', nullable=>1, ... }, ... }
+my $cols   = $db->columns();  # ['entry', 'name', 'score', ...]
+my $schema = $db->schema();   # { name => { type=>'TEXT', nullable=>1, ... }, ... }
+```
 
-# QUICK START EXAMPLE
+## Quick Start Example
 
 If `/var/dat/foo.csv` contains:
 
-    "customer_id","name"
-    "plugh","John"
-    "xyzzy","Jane"
+```
+"customer_id","name"
+"plugh","John"
+"xyzzy","Jane"
+```
 
 Create a driver in `.../Database/foo.pm`:
 
-    package Database::foo;
-    use parent 'Database::Abstraction';
+```perl
+package Database::foo;
+use parent 'Database::Abstraction';
 
-    # Regular CSV: no entry column, comma-separated
-    sub new {
-        my ($class, %args) = @_;
-        return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
-    }
+# Regular CSV: no entry column, comma-separated
+sub new {
+    my ($class, %args) = @_;
+    return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
+}
+```
 
 Then query it:
 
-    my $foo = Database::foo->new(directory => '/var/dat');
+```perl
+my $foo = Database::foo->new(directory => '/var/dat');
 
-    # Prints "John"
-    print 'Customer: ', $foo->name(customer_id => 'plugh'), "\n";
+# Prints "John"
+print 'Customer: ', $foo->name(customer_id => 'plugh'), "\n";
 
-    # Returns { customer_id => 'xyzzy', name => 'Jane' }
-    my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
+# Returns { customer_id => 'xyzzy', name => 'Jane' }
+my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
+```
 
-# FILE FORMATS
+## File Formats
 
 The module probes the `directory` for files in this priority order:
 
 - 1. `SQLite`
 
-    File ending `.sql`, `.sqlite`, or `.sqlite3`
+    File ending `.sql`, `.sqlite`, or `.sqlite3`.
+    Requires [DBD::SQLite](https://metacpan.org/pod/DBD%3A%3ASQLite).
 
 - 2. `Deep`
 
@@ -158,20 +167,21 @@ The module probes the `directory` for files in this priority order:
 
 - 3. `PSV`
 
-    Pipe-separated file, ending `.psv`
+    Pipe-separated file, ending `.psv`.
 
 - 4. `TSV`
 
-    Tab-separated file, ending `.tsv`
+    Tab-separated file, ending `.tsv`.
 
 - 5. `CSV`
 
     Comma (or custom) separated file, ending `.csv` or `.db`; can be
-    gzipped.
+    gzipped (`.csv.gz` or `.db.gz`).
     **Note:** the default separator is `!` not `,` for historical
     reasons - pass `sep_char => ','` for standard CSVs.
+    Requires [Text::xSV::Slurp](https://metacpan.org/pod/Text%3A%3AxSV%3A%3ASlurp) for the slurp fast-path (loaded lazily).
 
-- 5. `Excel` (`.xls`) and `XLSX` (`.xlsx`)
+- 6. `Excel` (`.xls`) and `XLSX` (`.xlsx`)
 
     Two separate Excel backends - one per file format:
 
@@ -188,129 +198,203 @@ The module probes the `directory` for files in this priority order:
     worksheet is determined by the class-derived table name (or the `table`
     constructor parameter).  Both modules are loaded lazily.
 
-- 6. `XML`
+- 7. `XML`
 
-    File ending `.xml`
+    File ending `.xml`.
+    Requires [XML::Simple](https://metacpan.org/pod/XML%3A%3ASimple) for the slurp fast-path (loaded lazily).
 
-- 7. `BerkeleyDB`
+- 8. `JSON`
 
-    Binary key-value file ending `.db`
+    File ending `.json`, slurped into memory via [JSON::MaybeXS](https://metacpan.org/pod/JSON%3A%3AMaybeXS) (loaded
+    lazily).
 
-- 8. `HTML`
+    The file may contain either a JSON array of row objects:
 
-    Remote HTML page fetched via a URL.  Pass `url` instead of `directory`; the
-    module fetches the page with [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent), parses all `<table>`
-    elements with [HTML::TableExtract](https://metacpan.org/pod/HTML%3A%3ATableExtract), and slurps the first (or
+    ```
+    [
+      { "entry": "key1", "col": "val1" },
+      { "entry": "key2", "col": "val2" }
+    ]
+    ```
+
+    or a JSON object whose keys are the primary-key values:
+
+    ```
+    {
+      "key1": { "col": "val1" },
+      "key2": { "col": "val2" }
+    }
+    ```
+
+    In the object form, each key is injected into its row hash under the `id`
+    column name (default `entry`), so all normal lookups work identically to
+    the array form.
+
+    A zero-byte or whitespace-only file is treated as empty - all query methods
+    return 0 / `undef` / `[]` without throwing.
+    Requires [JSON::MaybeXS](https://metacpan.org/pod/JSON%3A%3AMaybeXS) (loaded lazily).
+
+- 9. `BerkeleyDB`
+
+    Binary key-value file ending `.db`.
+
+- 10. `HTML`
+
+    HTML page fetched via a `url`.  Pass `url =` 'https://...'> instead of
+    `directory`; the module fetches the page with [LWP::UserAgent::Cached](https://metacpan.org/pod/LWP%3A%3AUserAgent%3A%3ACached), parses all
+    `<table>` elements with [HTML::TableExtract](https://metacpan.org/pod/HTML%3A%3ATableExtract), and slurps the first (or
     `html_table_index`-selected) table into memory.  The first row of the table
     is treated as column headers.  Both modules are loaded lazily and are not
     required for other backends.
 
 Pass `dsn` to bypass file detection entirely and connect via any DBI driver.
-Pass `url` to fetch and slurp a remote HTML table without a local directory.
+Pass `url` to fetch and slurp data from a remote source without a local
+directory.  When the URL returns `Content-Type: application/json` or the URL
+path ends in `.json`, the response is parsed as JSON (see item 8 above).
+Otherwise the response is parsed as an HTML page (item 10).
 
-# QUERY CRITERIA
+Example - fetching CPAN Testers results:
+
+```perl
+package Database::cpantesters;
+use parent 'Database::Abstraction';
+
+my $db = Database::cpantesters->new(
+    url      => 'https://www.cpantesters.org/show/Database-Abstraction.json',
+    no_entry => 1,
+);
+my $passes = $db->selectall_arrayref(grade => 'PASS');
+```
+
+## Query Criteria
 
 All select methods (`selectall_arrayref`, `selectall_array`,
 `fetchrow_hashref`, `count`) accept the same criteria syntax.
 
-## Plain value
+### Plain Value
 
-    status => 'active'          # status = 'active'
-    name   => undef             # name IS NULL
+```perl
+status => 'active'          # status = 'active'
+name   => undef             # name IS NULL
+```
 
 Values containing `%` or `_` are matched with `LIKE`:
 
-    name => 'A%'                # name LIKE 'A%'
+```perl
+name => 'A%'                # name LIKE 'A%'
+```
 
-## Comparison operator hashref
+### Comparison Operator Hashref
 
-    score => { '>'  => 90  }   # score > 90
-    score => { '<'  => 50  }   # score < 50
-    score => { '>=' => 80  }   # score >= 80
-    score => { '<=' => 100 }   # score <= 100
-    score => { '!=' => 0   }   # score != 0
+```perl
+score => { '>'  => 90  }   # score > 90
+score => { '<'  => 50  }   # score < 50
+score => { '>=' => 80  }   # score >= 80
+score => { '<=' => 100 }   # score <= 100
+score => { '!=' => 0   }   # score != 0
+```
 
 Multiple operators on one column are ANDed:
 
-    score => { '>' => 60, '<' => 90 }   # 60 < score < 90
+```perl
+score => { '>' => 60, '<' => 90 }   # 60 < score < 90
+```
 
-## Pattern matching
+### Pattern Matching
 
-    name => { -like     => 'A%'  }   # name LIKE 'A%'
-    name => { -not_like => 'Z%'  }   # name NOT LIKE 'Z%'
+```perl
+name => { -like     => 'A%'  }   # name LIKE 'A%'
+name => { -not_like => 'Z%'  }   # name NOT LIKE 'Z%'
+```
 
-## Set membership
+### Set Membership
 
-    name => { -in     => ['Alice', 'Bob'] }   # name IN (...)
-    name => { -not_in => ['Alice', 'Bob'] }   # name NOT IN (...)
+```perl
+name => { -in     => ['Alice', 'Bob'] }   # name IN (...)
+name => { -not_in => ['Alice', 'Bob'] }   # name NOT IN (...)
+```
 
-## Range
+### Range
 
-    score => { -between => [60, 90] }   # score BETWEEN 60 AND 90
+```perl
+score => { -between => [60, 90] }   # score BETWEEN 60 AND 90
+```
 
-## Logical groupings
+### Logical Groupings
 
 `-or` and `-and` take an arrayref of condition hashrefs:
 
-    -or => [
-        { status => 'active'        },
-        { score  => { '>' => 95 }   },
-    ]
+```perl
+-or => [
+    { status => 'active'        },
+    { score  => { '>' => 95 }   },
+]
 
-    -and => [
-        { status => 'active'        },
-        { score  => { '>=' => 80 }  },
-    ]
+-and => [
+    { status => 'active'        },
+    { score  => { '>=' => 80 }  },
+]
+```
 
-## Joins
+### Joins
 
 Any select method accepts a `join` key with a hashref (or arrayref of
 hashrefs) describing the join:
 
-    join => {
-        table => 'dept',
-        on    => 'employees.dept_id = dept.id',
-        type  => 'LEFT',    # INNER (default) | LEFT | RIGHT | FULL | CROSS
-    }
+```perl
+join => {
+    table => 'dept',
+    on    => 'employees.dept_id = dept.id',
+    type  => 'LEFT',    # INNER (default) | LEFT | RIGHT | FULL | CROSS
+}
 
-    # Multiple joins
-    join => [
-        { table => 'dept',    on => 'e.dept_id   = dept.id'   },
-        { table => 'country', on => 'e.country_id = country.id' },
-    ]
+# Multiple joins
+join => [
+    { table => 'dept',    on => 'e.dept_id   = dept.id'   },
+    { table => 'country', on => 'e.country_id = country.id' },
+]
+```
 
-# SUBROUTINES/METHODS
+## Subroutines/Methods
 
-## init
+### Init
 
 Set class-level defaults shared by all instances.
 
-    Database::Abstraction::init(directory => '../data');
+```perl
+Database::Abstraction::init(directory => '../data');
+```
 
 Accepts the same parameters as ["new"](#new).  Returns a reference to the
 current defaults hash, so you can read them back:
 
-    my $defaults = Database::Abstraction::init();
-    print $defaults->{'directory'}, "\n";
+```perl
+my $defaults = Database::Abstraction::init();
+print $defaults->{'directory'}, "\n";
+```
 
-## import
+### Import
 
 The module can be initialised by the `use` directive.
 
-    use Database::Abstraction 'directory' => '/etc/data';
+```perl
+use Database::Abstraction 'directory' => '/etc/data';
+```
 
 or
 
-    use Database::Abstraction { 'directory' => '/etc/data' };
+```perl
+use Database::Abstraction { 'directory' => '/etc/data' };
+```
 
-## new
+### New
 
 Create an object pointing to a read-only database.
 
 Accepts arguments as a hash, a hashref, or - as a shortcut - a single bare
 string which is taken to be `directory`.
 
-### Connection parameters
+#### Connection Parameters
 
 - `directory`
 
@@ -371,9 +455,9 @@ string which is taken to be `directory`.
     A URL (`http://` or `https://`) pointing to an HTML page that contains one
     or more `<table>` elements.  When present, `directory` is not required.
     The first row of the selected table is used as column headers.
-    Requires [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) and [HTML::TableExtract](https://metacpan.org/pod/HTML%3A%3ATableExtract) (both loaded lazily).
+    Requires [LWP::UserAgent::Cached](https://metacpan.org/pod/LWP%3A%3AUserAgent%3A%3ACached) and [HTML::TableExtract](https://metacpan.org/pod/HTML%3A%3ATableExtract) (both loaded lazily).
 
-### Behaviour parameters
+#### Behaviour Parameters
 
 - `no_entry`
 
@@ -410,7 +494,7 @@ string which is taken to be `directory`.
     Zero-based index of the HTML `<table>` to extract when the `url`
     backend is used.  Default is `0` (the first table on the page).
 
-### Caching and logging
+#### Caching and Logging
 
 - `cache`
 
@@ -432,7 +516,7 @@ string which is taken to be `directory`.
     Path to a YAML, XML, or INI configuration file whose keys are merged into
     the constructor arguments.  Loaded via [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
 
-### Notes
+#### Notes
 
 - If no arguments are set, class-level defaults set via `init()` or `use`
 are used.
@@ -442,27 +526,31 @@ searches will be incomplete - disable slurp mode by setting
 - Passing an existing object as `$class` clones it, merging any new
 arguments.
 
-## set\_logger
+### Set\_Logger
 
 Sets the class, code reference, or file that will be used for logging.
 
-## selectall\_arrayref
+### Selectall\_Arrayref
 
 Returns a reference to an array of hash references for every row that
 matches the given criteria, or `undef` when there are no matches.
 
-    my $rows = $db->selectall_arrayref();                    # all rows
-    my $rows = $db->selectall_arrayref(status => 'active');  # exact match
-    my $rows = $db->selectall_arrayref(score => { '>' => 8 });  # operator
+```perl
+my $rows = $db->selectall_arrayref();                    # all rows
+my $rows = $db->selectall_arrayref(status => 'active');  # exact match
+my $rows = $db->selectall_arrayref(score => { '>' => 8 });  # operator
+```
 
 The full criteria syntax is described in ["QUERY CRITERIA"](#query-criteria).
 
 Pass a `join` key to combine with another table:
 
-    my $rows = $db->selectall_arrayref(
-        dept_name => 'Engineering',
-        join      => { table => 'dept', on => 'e.dept_id = dept.id' },
-    );
+```perl
+my $rows = $db->selectall_arrayref(
+    dept_name => 'Engineering',
+    join      => { table => 'dept', on => 'e.dept_id = dept.id' },
+);
+```
 
 Results are returned in the cache (if configured) and the returned array
 reference is made read-only unless `no_fixate` was set.
@@ -470,29 +558,33 @@ reference is made read-only unless `no_fixate` was set.
 **Note:** this always returns all matching rows.  Use ["selectall\_array"](#selectall_array)
 in scalar context, or `$db->query->limit(1)->all()`, to fetch just one row.
 
-### PSEUDOCODE
+#### Pseudocode
 
-    1. Parse criteria; extract and build any JOIN clause.
-    2. If data is slurped AND no joins AND criteria are simple:
-       a. No criteria -> return all rows as arrayref.
-       b. entry-only lookup -> return [$data{entry}].
-       c. Otherwise -> scan rows in-memory with _match_criterion.
-    3. Otherwise build SQL: SELECT * FROM table [JOIN] [WHERE] ORDER BY id.
-    4. Check cache; return cached arrayref on HIT.
-    5. prepare_cached + execute; fetch all rows.
-    6. Store result in cache; fixate the array; return arrayref.
+```
+1. Parse criteria; extract and build any JOIN clause.
+2. If data is slurped AND no joins AND criteria are simple:
+   a. No criteria -> return all rows as arrayref.
+   b. entry-only lookup -> return [$data{entry}].
+   c. Otherwise -> scan rows in-memory with _match_criterion.
+3. Otherwise build SQL: SELECT * FROM table [JOIN] [WHERE] ORDER BY id.
+4. Check cache; return cached arrayref on HIT.
+5. prepare_cached + execute; fetch all rows.
+6. Store result in cache; fixate the array; return arrayref.
+```
 
-## selectall\_hashref
+### Selectall\_Hashref
 
 Deprecated alias for ["selectall\_arrayref"](#selectall_arrayref).  Use `selectall_arrayref` in
 new code.
 
-## selectall\_array
+### Selectall\_Array
 
 Similar to ["selectall\_arrayref"](#selectall_arrayref) but returns a list of hash references
 rather than a reference to an array.
 
-    my @rows = $db->selectall_array(status => 'active');
+```perl
+my @rows = $db->selectall_array(status => 'active');
+```
 
 In **scalar context** it applies `LIMIT 1` and returns just the first
 matching hash reference - making it more efficient than `selectall_arrayref`
@@ -500,55 +592,65 @@ when you only need one row.  In **list context** all matching rows are returned.
 
 Accepts the same criteria and `join` parameter as ["selectall\_arrayref"](#selectall_arrayref).
 
-## selectall\_hash
+### Selectall\_Hash
 
 Deprecated alias for ["selectall\_array"](#selectall_array).  Use `selectall_array` in new
 code.
 
-## count
+### Count
 
 Returns the number of rows matching the given criteria.
 
-    my $total  = $db->count();
-    my $active = $db->count(status => 'active');
-    my $high   = $db->count(score  => { '>' => 90 });
+```perl
+my $total  = $db->count();
+my $active = $db->count(status => 'active');
+my $high   = $db->count(score  => { '>' => 90 });
+```
 
 Accepts the full criteria syntax described in ["QUERY CRITERIA"](#query-criteria).
 
-## fetchrow\_hashref
+### Fetchrow\_Hashref
 
 Returns a hash reference for the first row matching the given criteria,
 or `undef` when there is no match.  Always applies `LIMIT 1`.
 
-    my $row = $db->fetchrow_hashref(entry => 'key1');
-    my $row = $db->fetchrow_hashref(score => { '>=' => 10 });
+```perl
+my $row = $db->fetchrow_hashref(entry => 'key1');
+my $row = $db->fetchrow_hashref(score => { '>=' => 10 });
+```
 
 When `no_entry` is **not** set you may pass a single bare value and it is
 used as the `entry` key:
 
-    my $row = $db->fetchrow_hashref('key1');    # same as entry => 'key1'
+```perl
+my $row = $db->fetchrow_hashref('key1');    # same as entry => 'key1'
+```
 
 Accepts the full criteria syntax described in ["QUERY CRITERIA"](#query-criteria), including
 the `join` parameter:
 
-    my $row = $db->fetchrow_hashref(
-        name => 'Alice',
-        join => { table => 'dept', on => 'e.dept_id = dept.id' },
-    );
+```perl
+my $row = $db->fetchrow_hashref(
+    name => 'Alice',
+    join => { table => 'dept', on => 'e.dept_id = dept.id' },
+);
+```
 
 Pass `table => $other_table` to query a table other than the one
 derived from the class name.
 
-## execute
+### Execute
 
 Execute a raw SQL query on the underlying database.
 
-    # Scalar context: returns the first row as a hashref
-    my $row = $db->execute(query => 'SELECT * FROM foo WHERE id = 1');
+```perl
+# Scalar context: returns the first row as a hashref
+my $row = $db->execute(query => 'SELECT * FROM foo WHERE id = 1');
 
-    # List context: returns all rows as a list of hashrefs
-    my @rows = $db->execute(query => 'SELECT * FROM foo WHERE score > ?',
-                            args  => [80]);
+# List context: returns all rows as a list of hashrefs
+my @rows = $db->execute(query => 'SELECT * FROM foo WHERE score > ?',
+                        args  => [80]);
+```
 
 The `FROM <table>` clause is appended automatically if omitted.
 
@@ -560,17 +662,19 @@ database file directly.
 
 `args` is an arrayref of bind values (see ["execute" in DBI](https://metacpan.org/pod/DBI#execute)).
 
-## updated
+### Updated
 
 Returns the Unix timestamp of the last database update (mtime for
 file-based backends, or the time of the most recent `new()` call for
 DSN-based connections).
 
-## columns
+### Columns
 
 Returns an array reference of column names for the current table.
 
-    my $cols = $db->columns();    # e.g. ['entry', 'name', 'score', 'status']
+```perl
+my $cols = $db->columns();    # e.g. ['entry', 'name', 'score', 'status']
+```
 
 The column list is determined by the backend:
 
@@ -581,7 +685,7 @@ The column list is determined by the backend:
 
 The result is cached inside the object after the first call.
 
-## schema
+### Schema
 
 Returns a hash reference describing the schema of the current table.
 Each key is a column name; each value is a hash reference with these keys:
@@ -591,15 +695,17 @@ Each key is a column name; each value is a hash reference with these keys:
 - `default` - default value string, or `undef`
 - `pk` - `1` if this column is (part of) the primary key, `0` otherwise
 
-    my $schema = $db->schema();
+```perl
+my $schema = $db->schema();
 
-    for my $col (sort keys %{$schema}) {
-        my $info = $schema->{$col};
-        printf "%s  %s  %s\n",
-            $col,
-            $info->{type},
-            $info->{nullable} ? 'NULL' : 'NOT NULL';
-    }
+for my $col (sort keys %{$schema}) {
+    my $info = $schema->{$col};
+    printf "%s  %s  %s\n",
+        $col,
+        $info->{type},
+        $info->{nullable} ? 'NULL' : 'NOT NULL';
+}
+```
 
 The schema is determined by the backend:
 
@@ -610,43 +716,47 @@ The schema is determined by the backend:
 
 The result is cached inside the object after the first call.
 
-## query
+### Query
 
 Returns a new [Database::Abstraction::Query](https://metacpan.org/pod/Database%3A%3AAbstraction%3A%3AQuery) builder object bound to this
 database instance, for fluent method-chaining queries.
 
-    # All active rows with high scores, newest first, max 10
-    my $rows = $db->query
-        ->where(status => 'active')
-        ->where(score  => { '>' => 80 })
-        ->order_by('score DESC')
-        ->limit(10)
-        ->all();
+```perl
+# All active rows with high scores, newest first, max 10
+my $rows = $db->query
+    ->where(status => 'active')
+    ->where(score  => { '>' => 80 })
+    ->order_by('score DESC')
+    ->limit(10)
+    ->all();
 
-    # Single row
-    my $row = $db->query->where(name => 'Alice')->first();
+# Single row
+my $row = $db->query->where(name => 'Alice')->first();
 
-    # Just a count
-    my $n = $db->query->where(status => 'active')->count();
+# Just a count
+my $n = $db->query->where(status => 'active')->count();
+```
 
 See [Database::Abstraction::Query](https://metacpan.org/pod/Database%3A%3AAbstraction%3A%3AQuery) for the full API.
 
-## AUTOLOAD - column shortcut
+### AUTOLOAD - Column Shortcut
 
 Calling an unknown method whose name matches a column name performs a column
 lookup.  The method name is the column you want; the arguments are criteria.
 
-    # Scalar context: return the first match
-    my $name = $db->name(entry => 'key1');
+```perl
+# Scalar context: return the first match
+my $name = $db->name(entry => 'key1');
 
-    # List context: return all matching values
-    my @names = $db->name();
+# List context: return all matching values
+my @names = $db->name();
 
-    # Shortcut when the table has an 'entry' key column
-    my $name = $db->name('key1');    # same as name(entry => 'key1')
+# Shortcut when the table has an 'entry' key column
+my $name = $db->name('key1');    # same as name(entry => 'key1')
 
-    # Unique/distinct values
-    my @statuses = $db->status(distinct => 1);
+# Unique/distinct values
+my @statuses = $db->status(distinct => 1);
+```
 
 **In list context** the full column is returned (all rows), ordered by the
 column value.  **In scalar context** only the first match is returned
@@ -657,29 +767,31 @@ Results come from the slurp cache when available.
 Throws an error if the column does not exist (slurp mode) or if AUTOLOAD
 has been disabled with `auto_load => 0`.
 
-### PSEUDOCODE
+#### Pseudocode
 
-    1. Extract column name from $AUTOLOAD; guard on DESTROY.
-    2. Croak if auto_load => 0.
-    3. Validate $column against /^[a-zA-Z_][a-zA-Z0-9_]*$/.
-    4. If data is slurped:
-       a. List context, no params -> map column over all rows (exists guard).
-       b. entry-only param -> direct hash lookup (exists guard).
-       c. No params, scalar -> first value in hash.
-       d. no_entry set -> scan array for matching key/value pair.
-       e. Other params -> scan keyed hash for matching column.
-    5. If not slurped, build SQL:
-       - List:   SELECT column FROM table [WHERE ...] ORDER BY column
-       - Scalar: SELECT DISTINCT column FROM table [WHERE ...] LIMIT 1
-    6. Check cache; return on HIT.
-    7. prepare_cached + execute; fetch result.
-    8. Store in cache; fixate; return.
+```perl
+1. Extract column name from $AUTOLOAD; guard on DESTROY.
+2. Croak if auto_load => 0.
+3. Validate $column against /^[a-zA-Z_][a-zA-Z0-9_]*$/.
+4. If data is slurped:
+   a. List context, no params -> map column over all rows (exists guard).
+   b. entry-only param -> direct hash lookup (exists guard).
+   c. No params, scalar -> first value in hash.
+   d. no_entry set -> scan array for matching key/value pair.
+   e. Other params -> scan keyed hash for matching column.
+5. If not slurped, build SQL:
+   - List:   SELECT column FROM table [WHERE ...] ORDER BY column
+   - Scalar: SELECT DISTINCT column FROM table [WHERE ...] LIMIT 1
+6. Check cache; return on HIT.
+7. prepare_cached + execute; fetch result.
+8. Store in cache; fixate; return.
+```
 
-# AUTHOR
+## Author
 
 Nigel Horne, `<njh at nigelhorne.com>`
 
-# SUPPORT
+## Support
 
 This module is provided as-is without any warranty.
 
@@ -689,7 +801,7 @@ or through the web interface at
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-# MESSAGES
+## Messages
 
 The table below lists every error that the module can croak or carp, what
 triggers it, and how to resolve it.
@@ -758,7 +870,7 @@ triggers it, and how to resolve it.
     was called on a BerkeleyDB backend, which only supports key-value lookup
     via `fetchrow_hashref`.
 
-# KNOWN LIMITATIONS
+## Known Limitations
 
 - **Read-only.**  No INSERT, UPDATE, or DELETE is provided.  `execute()`
 runs raw read-only SQL.
@@ -780,13 +892,14 @@ Other characters will cause a croak.
 only when a prior `selectall_arrayref()` or `count()` call with the
 same criteria has already populated it.
 
-# SEE ALSO
+## See Also
 
 - [Database::Abstraction::Query](https://metacpan.org/pod/Database%3A%3AAbstraction%3A%3AQuery) - chained query builder
 - [Configure an Object at Runtime](https://metacpan.org/pod/Object%3A%3AConfigure)
+- [JSON::MaybeXS](https://metacpan.org/pod/JSON%3A%3AMaybeXS) - JSON backend (optional; install for `.json` support)
 - [Test Dashboard](https://nigelhorne.github.io/Database-Abstraction/coverage/)
 
-# LICENSE AND COPYRIGHT
+## License and Copyright
 
 Copyright 2015-2026 Nigel Horne.
 

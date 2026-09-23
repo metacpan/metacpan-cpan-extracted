@@ -142,33 +142,64 @@ static int hm_sa_board_row_of(uint64_t pid, sa_sb_reading *out) {
     return -1;
 }
 
-/* One aggregate line and one line per row, for USR1. */
+/* One aggregate line and one line per row, for USR1.
+ *
+ * ONE WRITE, not one per line. A dump is read by somebody else - a log tail, a
+ * test, another admin's USR1 - while it is being written, and a dump that
+ * reaches the stream in three writes can be read as an aggregate line with no
+ * rows behind it, which reads as a pool with no workers. So the lines are
+ * formatted into a buffer and handed over in one go; a pool too large for the
+ * buffer is flushed a bufferful at a time, always on a line boundary, so the
+ * worst case is a dump split between whole lines rather than mid-line. */
+static int hm_sa_board_row_line(char *b, size_t cap, const sa_sb_reading *rd) {
+    return snprintf(b, cap,
+                    "Hyperman worker %llu: requests=%llu accepts=%llu "
+                    "denied=%llu conns=%llu bytes_out=%llu status=%.*s%s\n",
+                    (unsigned long long)rd->pid,
+                    (unsigned long long)rd->gauges[HM_SB_REQUESTS],
+                    (unsigned long long)rd->gauges[HM_SB_ACCEPTS],
+                    (unsigned long long)rd->gauges[HM_SB_DENIED],
+                    (unsigned long long)rd->gauges[HM_SB_CONNS],
+                    (unsigned long long)rd->gauges[HM_SB_BYTES_OUT],
+                    (int)rd->statuslen, rd->status, rd->alive ? "" : " DEAD");
+}
+
 static void hm_sa_board_print(FILE *f) {
     hm_sa_pool_stats p;
     uint64_t i, n;
+    char buf[4096];
+    size_t off = 0;
+    int w;
+
     if (!hm_sa_board_pool(&p)) return;
-    fprintf(f, "Hyperman pool: workers=%llu alive=%llu requests=%llu "
-               "accepts=%llu denied=%llu conns=%llu bytes_out=%llu "
-               "datagrams=%llu h3=%llu\n",
-            (unsigned long long)p.workers, (unsigned long long)p.alive,
-            (unsigned long long)p.requests, (unsigned long long)p.accepts,
-            (unsigned long long)p.denied, (unsigned long long)p.conns,
-            (unsigned long long)p.bytes_out, (unsigned long long)p.datagrams,
-            (unsigned long long)p.h3);
+    w = snprintf(buf, sizeof buf,
+                 "Hyperman pool: workers=%llu alive=%llu requests=%llu "
+                 "accepts=%llu denied=%llu conns=%llu bytes_out=%llu "
+                 "datagrams=%llu h3=%llu\n",
+                 (unsigned long long)p.workers, (unsigned long long)p.alive,
+                 (unsigned long long)p.requests, (unsigned long long)p.accepts,
+                 (unsigned long long)p.denied, (unsigned long long)p.conns,
+                 (unsigned long long)p.bytes_out,
+                 (unsigned long long)p.datagrams, (unsigned long long)p.h3);
+    if (w < 0) return;
+    off = (size_t)w < sizeof buf ? (size_t)w : sizeof buf - 1;
+
     n = hm_sa_board_slots();
     for (i = 0; i < n; i++) {
         sa_sb_reading rd;
         if (!hm_sa_board_read((uint32_t)i, &rd)) continue;
-        fprintf(f, "Hyperman worker %llu: requests=%llu accepts=%llu "
-                   "denied=%llu conns=%llu bytes_out=%llu status=%.*s%s\n",
-                (unsigned long long)rd.pid,
-                (unsigned long long)rd.gauges[HM_SB_REQUESTS],
-                (unsigned long long)rd.gauges[HM_SB_ACCEPTS],
-                (unsigned long long)rd.gauges[HM_SB_DENIED],
-                (unsigned long long)rd.gauges[HM_SB_CONNS],
-                (unsigned long long)rd.gauges[HM_SB_BYTES_OUT],
-                (int)rd.statuslen, rd.status, rd.alive ? "" : " DEAD");
+        w = hm_sa_board_row_line(buf + off, sizeof buf - off, &rd);
+        if (w < 0) continue;
+        if ((size_t)w >= sizeof buf - off) {
+            /* No room left: hand over the whole lines we have and format this
+             * row into the empty buffer instead. */
+            if (off) { fwrite(buf, 1, off, f); fflush(f); off = 0; }
+            w = hm_sa_board_row_line(buf, sizeof buf, &rd);
+            if (w < 0 || (size_t)w >= sizeof buf) continue;
+        }
+        off += (size_t)w;
     }
+    if (off) { fwrite(buf, 1, off, f); fflush(f); }
 }
 
 /* ---- distinct clients: opt-in, on the accept path ----------------------------- */

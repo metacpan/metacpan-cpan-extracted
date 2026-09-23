@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use curry;
 use MIDI::RtController ();
 use MIDI::RtController::Filter::CC ();
 

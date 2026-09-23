@@ -1,0 +1,191 @@
+.\" Copyright (c) 2026 Dick Olsson <hi@senzilla.io>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.Dd September 19, 2026
+.Dt FUGUSEED 7
+.Os
+.Sh NAME
+.Nm fuguseed
+.Nd make 12 seed words with three dice, on paper
+.Sh DESCRIPTION
+This procedure makes 12 seed words with three dice and one printed
+word sheet.
+The dice give all of the entropy.
+No program gives entropy to a word, and no program on this page rolls
+a die.
+.Pp
+.Sy WARNING :
+The 12 words are the whole secret.
+A person who reads the words gets the seed.
+A loss of the words is irreversible: no person and no program can make
+them again.
+Keep the paper in a safe place, and show it to no other person.
+.Ss The equipment and the names
+Get these items:
+.Bl -bullet
+.It
+The word sheet of
+.Xr fuguseed-words 1 ,
+printed on A4 paper, on both sides, at 100 percent scale, and in
+color.
+.It
+Three dice: one d8 with the faces 1 to 8, and two d16 with the faces 1
+to 16.
+Give one color to each die: YELLOW to the d8, BLUE to one d16, and RED
+to the other d16.
+.It
+Two sheets of paper for the words, and a pen.
+.It
+A cup, or a box, for the throw of the dice.
+.El
+.Pp
+The names of the dice are the names on the sheet.
+YELLOW gives the block, BLUE gives the row, and RED gives the column.
+The word "device" on this page is the equipment that reads the 12
+words at the end.
+.Pp
+.Sy NOTE :
+The faces 6 and 9 of a d16 read the same upside down.
+A die with a line below the number shows which one it is.
+With a die without that line, turn the die so that the other numbers
+of the face read correctly.
+.Ss The steps before the start
+Do these steps first:
+.Bl -enum
+.It
+Find a room with no other person, no camera, and no window at your
+back.
+.It
+Print the word sheet, and check the print against the file with
+.Xr fuguseed-words 1 .
+.It
+Write the numbers 1 to 12 on the first sheet of paper, one number for
+each line.
+.It
+Throw each die 10 times, and read the results.
+A die that gives one face 5 times or more is a bad die.
+Get another die.
+.El
+.Ss How to find one word
+Each word needs one throw of the three dice.
+Do these steps for one word:
+.Bl -enum
+.It
+Put the three dice in the cup, and throw them on the table.
+.It
+Read the YELLOW die.
+It gives the block, 1 to 8.
+The blocks 1 to 4 are on side 1 of the sheet, and the blocks 5 to 8
+are on side 2.
+.It
+Find the table of that block.
+The caption of the table holds the word YELLOW and the number.
+.It
+Read the BLUE die.
+It gives the row, 1 to 16.
+Find the row with that number in the first column.
+.It
+Read the RED die.
+It gives the column, 1 to 16.
+Find the column with that number in the first row.
+.It
+Read the word in the cell of that row and that column.
+.It
+Write the word on the line of its position.
+.El
+.Pp
+Do not throw a die again because you do not like a word.
+Each throw gives one word, and the procedure keeps that word.
+.Ss The words 1 to 11
+Find the words 1 to 11 with the steps above, one word for each line.
+.Pp
+Read the 11 words again, and compare each word with the sheet.
+Each word must be complete and correct.
+.Ss The word 12
+Word 12 is the check word.
+The dice give word 12 like every other word: throw the three dice, and
+write the word of the cell.
+The checksum of the 12 words is correct for one word of the BLUE row
+of that throw only.
+One throw in 16 gives that word.
+.Pp
+Do these steps:
+.Bl -enum
+.It
+Find word 12 with the steps of "How to find one word".
+.It
+Start
+.Xr fuguseed-qr 1
+on an air-gapped computer, and type the 12 words.
+.El
+.Pp
+The program prints one word, or it prints the SeedQR.
+Both results are correct.
+.Pp
+With one word, that word is the check word of the BLUE row of your
+throw.
+Write the check word in place of word 12 on the paper.
+Start the program again, and type the 12 words again.
+The program prints the SeedQR.
+.Pp
+With the SeedQR, your throw gave the check word.
+Keep word 12 on the paper, and write no new word.
+.Pp
+The check word carries no entropy: it is a function of the other
+bits.
+The YELLOW block and the BLUE row of your throw stay the throw of the
+dice.
+.Ss The steps after the procedure
+Do these steps at the end:
+.Bl -enum
+.It
+Read the 12 words on the paper, and compare each word with the sheet.
+.It
+Write the 12 words on the second sheet of paper, and compare the two
+copies word for word.
+Keep the two copies in two places.
+.It
+Draw the SeedQR with
+.Xr fuguseed-qr 1 ,
+and scan it with the camera of the device.
+.It
+Compare the words on the device with the words on the paper, word for
+word, and in the same order.
+Do this before you use the seed.
+.It
+Do not type a BIP39 passphrase, and do not accept one from a device.
+A passphrase makes another seed, and this paper does not hold it.
+.It
+Keep the SeedQR drawing and the two copies of the words.
+Burn or shred every other paper of the procedure, and clear the table.
+.It
+Erase the words from the air-gapped computer, and close the program.
+.El
+.Pp
+Use
+.Xr fuguseed-qr 1
+for the SeedQR.
+The SeedQR is the form of the 12 words that a consumer, such as
+FuguPass, reads.
+.Sh SEE ALSO
+.Xr fuguseed-qr 1 ,
+.Xr fuguseed-words 1
+.Sh STANDARDS
+The word list and the checksum come from BIP39, the mnemonic code for
+the generation of a deterministic key.
+.Sh AUTHORS
+.An Dick Olsson Aq Mt hi@senzilla.io
+.Sh CAVEATS
+The procedure gives no protection against a person who watches you.
+The dice, the paper, and the sheet hold the seed in plain sight while
+you work.

@@ -77,16 +77,12 @@ explicitly says to handle a specific issue.
 
 ## Project-specific hazards
 
-- **A second copy of this module lives in `hi-proto`.** `~/dev/perl/hi-proto/lib/WWW/OpenBao.pm`
-  is the pre-extraction original: byte-identical code today, minus `$VERSION` and the POD,
-  and hi-proto does **not** depend on this distribution in its cpanfile. So a fix here
-  silently does not reach hi-proto, and the two only look in sync because nobody has
-  changed either yet. Any behaviour change here needs a karr ticket against `hi-proto`;
-  never edit that repo from this one.
-- **Other consumers.** `goldmine` (`Goldmine::OpenBao`, `Goldmine::Task::Role`,
-  `Goldmine::CLI::Command::Openbao`) and `hiplatform` (`HIP::OpenBao`) wrap this client. A
-  change to the croak/undef contract or to what `delete_secret` deletes lands in their
-  error handling, not in ours — ticket them.
+- **Consumers.** `goldmine` (`Goldmine::OpenBao`, `Goldmine::Task::Role`,
+  `Goldmine::CLI::Command::Openbao`), `hiplatform` (`HIP::OpenBao`) and `hi-proto`
+  (`HI::Royal`, `HI::AIP::KeyBroker`, via `requires 'WWW::OpenBao'` in its cpanfile) wrap
+  this client. A change to the croak/undef contract or to what `delete_secret` deletes
+  lands in their error handling, not in ours — ticket them; never edit those repos from
+  this one.
 - **The suite is offline by construction and must stay that way.** No live OpenBao, no
   k8s, not even localhost. `_http` is lazy precisely so it can be stubbed. A test that
   needs a running server is a release blocker, not a coverage win.

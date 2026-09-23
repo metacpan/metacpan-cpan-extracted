@@ -4,6 +4,7 @@ WriteMakefile(
   NAME             => 'HTTP::API::Core',
   VERSION_FROM     => 'lib/HTTP/API/Core.pm',
   ABSTRACT_FROM    => 'lib/HTTP/API/Core.pm',
+  AUTHOR           => 'SHINGO <shingo@cpan.org>',
   LICENSE          => 'perl_5',
   MIN_PERL_VERSION => '5.010',
   PREREQ_PM => {
@@ -12,6 +13,7 @@ WriteMakefile(
     'MIME::Base64'  => 0,
     'Scalar::Util'  => 0,
     'Time::HiRes'   => 0,
+    'Time::Local'    => 0,
   },
   META_MERGE => {
     'meta-spec' => { version => 2 },

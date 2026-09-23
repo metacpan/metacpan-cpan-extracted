@@ -25,7 +25,7 @@ use v5.36;
 # of the distribution.
 
 package App::FuguVM::Arch;
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 my %TABLE = (
 	arm64 => {

@@ -5,7 +5,7 @@ use warnings;
 
 use Object::Proto::Sugar -types;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 has t => (
 	is => 'ro',
@@ -70,6 +70,26 @@ has kinded => (
 	default => 0
 );
 
+has state => (
+	is => 'ro',
+	isa => ArrayRef,
+	default => []
+);
+
+our @MODE = qw/stationary sliding rolling pocketed/;
+
+sub state_of {
+	my ($self, $id) = @_;
+	for my $s (@{ $self->state }) { return $s if $s->[0] == $id }
+	return;
+}
+
+sub mode_of {
+	my ($self, $id) = @_;
+	my $s = $self->state_of($id) or return;
+	return $MODE[ $s->[5] ];
+}
+
 sub message {
 	my ($self) = @_;
 	return '' unless $self->error;
@@ -131,6 +151,7 @@ sub to_payload {
 		events => $self->events, rest => $self->rest, holed => $self->holed,
 		segments => $self->segments,
 		$self->kinded ? (down => $self->down, peak => $self->peak) : (),
+		@{ $self->state } ? (state => $self->state) : (),
 	};
 }
 
@@ -146,7 +167,7 @@ Physics::Balls::Outcome - what a strike did
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -216,9 +237,28 @@ C<down> and C<peak>.
 
 =head2 shot
 
-The shot that produced this.
+The shot that produced this; for an advance, C<< { t => $microseconds } >>.
+
+=head2 state
+
+Since 0.07, from an advance only: every body at the horizon, in layout order,
+as C<[id, x, y, vx, vy, mode]> in hundredths of a millimetre and hundredths of
+a millimetre a second, C<mode> 0 stationary, 1 sliding, 2 rolling, 3
+pocketed. Empty for a strike. C<to_payload> carries it when it is not empty.
 
 =head1 METHODS
+
+=head2 state_of
+
+    my $row = $out->state_of($id);
+
+A body's state row at the horizon, or undef.
+
+=head2 mode_of
+
+    my $word = $out->mode_of($id);    # 'rolling'
+
+The body's mode at the horizon as a word, or undef.
 
 =head2 message
 

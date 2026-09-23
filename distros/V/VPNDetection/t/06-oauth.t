@@ -4,6 +4,7 @@ use warnings;
 use lib 't/lib';
 
 use Mojo::Util ();
+use Scalar::Util ();
 use Test::More;
 use Time::HiRes ();
 use VPNDetection;
@@ -145,7 +146,9 @@ sub is_outcome {
         client => 'VPNDetection::Error',
     );
     is(ref $error, $class{ $want->{type} }, "$label: type");
-    return unless ref $error && $error->isa('VPNDetection::Error');
+    # A mutant can answer a plain hash where an error was due, and ->isa on it would
+    # end the whole file rather than fail here.
+    return unless Scalar::Util::blessed($error) && $error->isa('VPNDetection::Error');
     is($error->error_code, $want->{errorCode}, "$label: error_code") if exists $want->{errorCode};
     is($error->error_description, $want->{errorDescription}, "$label: error_description")
         if exists $want->{errorDescription};
@@ -231,7 +234,8 @@ subtest 'a 2xx decodes on presence: absent has no key, an empty scope is present
     for my $case (@{ $corpus->{responses}{revoke} }) {
         serve($case);
         my $outcome = settle(sub { client()->oauth->revoke('vpndetection-cli', 'mo_rt_x') });
-        ok(!ref $outcome, "revoke: $case->{name} succeeds");
+        # Nothing, rather than not-a-reference: a plain-string die is not a reference.
+        is($outcome, undef, "revoke: $case->{name} succeeds");
         is(scalar @requests, 1, "revoke: $case->{name} sent once");
     }
 };
@@ -253,6 +257,30 @@ subtest 'a 2xx that lacks a required member or does not parse is the ordinary er
     }
 };
 
+# No corpus case: every response there decodes. One member left out per case,
+# since a body missing several at once passes against a decoder that defaults
+# any single one of them.
+subtest 'an answer missing any one required member is the ordinary error' => sub {
+    my %required = (
+        metadata => [qw(issuer authorization_endpoint token_endpoint)],
+        deviceAuthorization => [qw(device_code user_code verification_uri expires_in interval)],
+        exchangeDeviceCode => [qw(access_token token_type expires_in)],
+    );
+    for my $operation (sort keys %required) {
+        for my $member (@{ $required{$operation} }) {
+            my %body = %EVERY_REQUIRED_MEMBER;
+            delete $body{$member};
+            serve({ status => 200, body => \%body });
+            my $args = { clientId => 'vpndetection-cli', deviceCode => 'mo_dc_x' };
+            my $error = settle(sub { call(client()->oauth, $operation, $args) });
+
+            my $label = "$operation without $member";
+            is(scalar @requests, 1, "$label: sent once");
+            is_outcome($error, { type => 'client', kind => 'server_error', status => 200 }, $label);
+        }
+    }
+};
+
 subtest 'a failed answer is an OAuth refusal only when it is one' => sub {
     for my $case (@{ $corpus->{errors}{cases} }) {
         serve($case);
@@ -268,7 +296,8 @@ subtest 'only what consumes nothing is retried, and never an OAuth refusal' => s
 
         is(scalar @requests, $case->{expect}{requests}, "$case->{name}: requests sent");
         if ($case->{expect}{outcome} eq 'ok') {
-            ok(!(ref $outcome && eval { $outcome->isa('VPNDetection::Error') }), "$case->{name}: succeeds");
+            # An answer, or nothing from revoke: a plain-string die is neither.
+            ok(!defined $outcome || ref $outcome eq 'HASH', "$case->{name}: succeeds");
             next;
         }
         is_outcome($outcome, { %{ $case->{expect} }, type => $case->{expect}{outcome} }, $case->{name});
@@ -304,6 +333,20 @@ subtest 'poll_device_token waits, widens and ends as the corpus says' => sub {
         }
         is_outcome($outcome, { %{ $case->{expect} }, type => $case->{expect}{outcome} }, $name);
     }
+};
+
+# A deadline already behind the clock leaves a negative remainder, which is never
+# the wait: Mojo fires a negative timer at once, but a sleep is asked for 0.
+subtest 'a poll past its deadline waits nothing, never a negative time' => sub {
+    serve({ status => 400, body => { error => 'authorization_pending' } });
+    my $oauth = client()->oauth;
+    my $waits = fake_clock($oauth);
+
+    my $outcome = settle(sub { $oauth->poll_device_token('vpndetection-cli', { %DEVICE, expires_in => -3 }) });
+
+    is_deeply($waits, [0], 'one wait, of nothing');
+    is(scalar @requests, 0, 'and no request');
+    is_outcome($outcome, { type => 'expiredToken', status => undef }, 'expires_in -3');
 };
 
 # The seam above proves the schedule; this proves the real wait is one.

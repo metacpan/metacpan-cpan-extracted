@@ -45,7 +45,7 @@
    "provides" : {
       "WWW::OpenBao" : {
          "file" : "lib/WWW/OpenBao.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -60,7 +60,7 @@
          "web" : "https://github.com/Getty/p5-www-openbao"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -71,6 +71,7 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
+                     ".karr",
                      "README.md"
                   ],
                   "exclude_match" : [],
@@ -354,8 +355,8 @@
                "Dist::Zilla::Plugin::RewriteVersion" : {
                   "add_tarball_name" : 0,
                   "finders" : [
-                     ":ExecFiles",
-                     ":InstallModules"
+                     ":InstallModules",
+                     ":PerlExecFiles"
                   ],
                   "global" : 0,
                   "skip_version_provider" : 0
@@ -416,7 +417,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.002",
+                  "tag" : "0.003",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -436,8 +437,8 @@
             "config" : {
                "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
                   "finders" : [
-                     ":ExecFiles",
-                     ":InstallModules"
+                     ":InstallModules",
+                     ":PerlExecFiles"
                   ],
                   "global" : 0,
                   "munge_makefile_pl" : 1

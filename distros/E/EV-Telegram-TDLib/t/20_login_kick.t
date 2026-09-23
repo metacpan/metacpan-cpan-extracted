@@ -44,7 +44,7 @@ is scalar @sent, $n, 'a second login() does not kick again';
 
 # a client already driven by updates must not be kicked
 my $td2 = new_client();
-$td2->_inject_raw(q({"@type":"updateAuthorizationState","authorization_state":{"@type":"authorizationStateWaitPhoneNumber"}}));
+$td2->inject_raw(q({"@type":"updateAuthorizationState","authorization_state":{"@type":"authorizationStateWaitPhoneNumber"}}));
 my $before = scalar @sent;
 $td2->login(sub {});
 my @new = @sent[$before .. $#sent];

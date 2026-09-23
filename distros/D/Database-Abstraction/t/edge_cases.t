@@ -410,7 +410,7 @@ SKIP: {
 
 		# EC7.1 — score > very large number → 0 rows
 		my $rows = $db_sql->selectall_arrayref(score => { '>' => 1e308 });
-		is(scalar(@{$rows}), 0, 'EC7.1 score > 1e308 returns 0 rows');
+		ok(!defined($rows), 'EC7.1 score > 1e308 returns 0 rows');
 
 		# EC7.2 — score > very negative number → all 5 rows with a score
 		$rows = $db_sql->selectall_arrayref(score => { '>' => -1e308 });

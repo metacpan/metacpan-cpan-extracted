@@ -18,6 +18,9 @@ t/cities.t
 t/collision-prefix.t
 t/data-flow.t
 t/data/cities.csv
+t/data/djjson_a.json
+t/data/djjson_b.json
+t/data/djjson_c.json
 t/data/djtsv_a.tsv
 t/data/djtsv_b.tsv
 t/data/states.csv
@@ -31,6 +34,9 @@ t/lib/Database/cities.pm
 t/lib/Database/djcust.pm
 t/lib/Database/djloyalty.pm
 t/lib/Database/djscore.pm
+t/lib/Database/djjson_a.pm
+t/lib/Database/djjson_b.pm
+t/lib/Database/djjson_c.pm
 t/lib/Database/djtsv_a.pm
 t/lib/Database/djtsv_b.pm
 t/lib/Database/lp_a.pm
@@ -47,6 +53,7 @@ t/sqlite-backend.t
 t/test1_2.t
 t/transaction.t
 t/transition.t
+t/json.t
 t/tsv.t
 t/unit.t
 t/xlsx.t

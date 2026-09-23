@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -29,6 +29,25 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
+      },
+      "runtime" : {
+         "recommends" : {
+            "XML::Bare" : "0"
+         },
+         "requires" : {
+            "Date::Calc" : "0",
+            "Digest::SHA1" : "0",
+            "Digest::Whirlpool" : "0",
+            "JSON" : "0",
+            "Math::BigFloat" : "0",
+            "Time::JulianDay" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -39,6 +58,6 @@
          "web" : "https://github.com/cade-vs/perl-data-tools"
       }
    },
-   "version" : "1.50",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.52",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -30,6 +30,9 @@ diag sprintf '%d added: %s',   scalar @added,   join ', ', splice @added, 0, 10 
 diag sprintf '%d removed: %s', scalar @removed, join ', ', splice @removed, 0, 10 if @removed;
 
 # Drift is expected and harmless: call() passes unknown functions through.
-# This reports rather than fails, so a TDLib bump never reddens CI.
+# This reports rather than fails, so a TDLib bump never reddens CI. The one
+# thing worth failing on is the scan itself breaking: an unmatched class
+# regex empties %live and reports every shipped function as removed.
+cmp_ok scalar(keys %live), '>', 500, 'the header scan found functions';
 ok 1, 'schema drift reported';
 done_testing;

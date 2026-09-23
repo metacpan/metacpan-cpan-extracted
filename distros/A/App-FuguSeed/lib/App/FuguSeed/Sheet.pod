@@ -1,0 +1,70 @@
+=head1 NAME
+
+App::FuguSeed::Sheet - build the printed word sheet
+
+=head1 SYNOPSIS
+
+    use App::FuguSeed::Sheet;
+
+    my $text = App::FuguSeed::Sheet->build(
+        list     => $list,
+        template => $template,
+        style    => $style,
+        date     => '2026-01-01',
+    );
+
+=head1 DESCRIPTION
+
+App::FuguSeed::Sheet builds the text of the word sheet. It opens no
+file and it writes no file: the caller reads the two share files and
+prints the result.
+
+The sheet is the address space of the dice. It holds two sides for A4
+paper, and each side holds four blocks of the YELLOW die. Each block is
+one table of 16 rows of the BLUE die and 16 columns of the RED die. The
+cell in block Y, row B, and column R holds the word of index
+C<(Y-1)*256 + (B-1)*16 + (R-1)>, so the person does no arithmetic.
+
+The sheet is class-less HTML5. It holds no class, no identifier, and no
+style attribute. It holds no script, no comment, and no entity, and
+every byte is printable ASCII, a tab, or a line feed. The build inlines
+the style sheet, so the result is one standalone file.
+
+Each side holds a legend that names the three dice and their roles, and
+a footer that names the side, the standard, the SHA-256 of the list,
+and the build date.
+
+Every method is a class method. The module keeps no state.
+
+=head2 build
+
+C<build(%argument)> returns the whole sheet as text.
+
+The arguments are C<list>, the list of App::FuguSeed::ListFile;
+C<template>, the text of F<share/fuguseed/sheet.html>; C<style>, the
+text of F<share/fuguseed/sheet.css>; and C<date>, the build date as
+C<YYYY-MM-DD>.
+
+Two builds of one list on one date give one text, byte for byte.
+
+=head1 RETURN VALUES
+
+C<build()> returns the sheet as one string.
+
+=head1 ERRORS
+
+C<build()> dies when the template holds neither of the two places that
+the build fills. Such a template is a defect of the share file, and no
+caller can recover from it.
+
+=head1 SEE ALSO
+
+L<App::FuguSeed::Check>, which proves a built sheet. The checker holds
+its own copy of the grammar of the sheet, so a defect of this module
+cannot hide in the check.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

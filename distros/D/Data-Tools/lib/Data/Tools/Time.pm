@@ -16,7 +16,7 @@ use Data::Tools;
 use Date::Calc qw(:all);
 use Time::JulianDay;
 
-our $VERSION = '1.50';
+our $VERSION = '1.52';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -292,7 +292,7 @@ sub get_local_julian_day
 
 sub get_local_year
 {
-   my ( $y ) = inverse_julian_day( local_date() );
+   my ( $y ) = inverse_julian_day( local_julian_day( time() ) );
    return $y;
 }
 
@@ -473,7 +473,40 @@ sub julian_date_month_days
 
 sub julian_date_to_iso
 {
-  return join "-", julian_date_to_ymd( shift() );
+  return sprintf( "%04d-%02d-%02d", julian_date_to_ymd( shift() ) );
+}
+
+# converts iso date to julian date. accepts exactly the same formats as
+# utime_from_iso() and utime_from_iso_ext() -- basic YYYYMMDDTHHMMSS and
+# extended YYYY-MM-DDTHH:MM:SS, zero padded, with the time part optional and
+# the 'T' of the extended form optionally a space. a time part is accepted for
+# format compatibility and must be a valid time, but a julian date holds no
+# time of day, so it is discarded. it is the exact inverse of
+# julian_date_to_iso(), which writes the zero padded extended form.
+# returns undef if the string is not a well formed and existing date
+sub julian_date_from_iso
+{
+  my $s = shift;
+
+  my ( $y, $m, $d, $hh, $mm, $ss );
+
+  if( $s =~ /^\s*(\d{4})(\d\d)(\d\d)(?:T(\d\d)(\d\d)(\d\d))?\s*$/
+   or $s =~ /^\s*(\d{4})-(\d\d)-(\d\d)(?:[T ](\d\d):(\d\d):(\d\d))?\s*$/ )
+    {
+    ( $y, $m, $d, $hh, $mm, $ss ) = ( $1, $2, $3, $4, $5, $6 );
+    }
+  else
+    {
+    return undef;
+    }
+
+  ( $y, $m, $d )    = map {   $_        + 0 } ( $y,  $m,  $d  );
+  ( $hh, $mm, $ss ) = map { ( $_ || 0 ) + 0 } ( $hh, $mm, $ss );
+
+  return undef unless check_date( $y,  $m,  $d  );
+  return undef unless check_time( $hh, $mm, $ss ); # discarded, still validated
+
+  return julian_date_from_ymd( $y, $m, $d );
 }
 
 ##############################################################################
@@ -510,14 +543,46 @@ sub utime_to_iso_ext
   return sprintf("%04d-%02d-%02dT%02d:%02d:%02d", utime_to_ymdhms( shift() ) );
 }
 
-# converts basic iso format to utime
-sub utime_from_iso
+# shared back end of utime_from_iso() and utime_from_iso_ext()
+sub __utime_from_iso_parts
 {
+  my ( $y, $m, $d, $hh, $mm, $ss ) = @_;
+
+  # numify, both to drop leading zeroes and to default a missing time part
+  ( $y, $m, $d )    = map {   $_        + 0 } ( $y,  $m,  $d  );
+  ( $hh, $mm, $ss ) = map { ( $_ || 0 ) + 0 } ( $hh, $mm, $ss );
+
+  return undef unless check_date( $y,  $m,  $d  );
+  return undef unless check_time( $hh, $mm, $ss );
+
+  return utime_from_ymdhms( $y, $m, $d, $hh, $mm, $ss );
 }
 
-# converts extended iso format to utime
+# converts basic iso format to utime -- YYYYMMDDTHHMMSS, the exact inverse of
+# utime_to_iso(). the time part is optional and defaults to midnight.
+# the string is read as local time, as utime_to_iso() writes it.
+# returns undef if the string is not a well formed and existing date/time
+sub utime_from_iso
+{
+  my $s = shift;
+
+  return undef unless $s =~ /^\s*(\d{4})(\d\d)(\d\d)(?:T(\d\d)(\d\d)(\d\d))?\s*$/;
+
+  return __utime_from_iso_parts( $1, $2, $3, $4, $5, $6 );
+}
+
+# converts extended iso format to utime -- YYYY-MM-DDTHH:MM:SS, the exact
+# inverse of utime_to_iso_ext(). the time part is optional and defaults to
+# midnight, and the 'T' separator may also be a space.
+# the string is read as local time, as utime_to_iso_ext() writes it.
+# returns undef if the string is not a well formed and existing date/time
 sub utime_from_iso_ext
 {
+  my $s = shift;
+
+  return undef unless $s =~ /^\s*(\d{4})-(\d\d)-(\d\d)(?:[T ](\d\d):(\d\d):(\d\d))?\s*$/;
+
+  return __utime_from_iso_parts( $1, $2, $3, $4, $5, $6 );
 }
 
 # returns local julian day and time from unix time
@@ -742,7 +807,7 @@ Same as unix_time_diff_in_words() but returns relative text
 
 Returns human-friendly text for the given date difference (in days).
 This function returns absolute difference text, for relative 
-(before/after/ago/in) see julian_day_diff_in_words_relative().
+(before/after/ago/in) see julian_date_diff_in_words_relative().
 
 =head2 julian_date_diff_in_words_relative( $julian_date_diff );
 

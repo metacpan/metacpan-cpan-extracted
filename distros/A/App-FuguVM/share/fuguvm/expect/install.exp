@@ -58,7 +58,7 @@ log_user 1
 # Helper proc to send a response after a match
 proc respond {response} {
     sleep 0.5
-    send "$response\r"
+    send -- "$response\r"
 }
 
 # Connect to console
@@ -146,11 +146,11 @@ expect "Network interface to configure?" { respond "done" }
 # Password for root. Wait for the actual prompt.
 expect "Password for root account?" 
 sleep 0.5
-send "$root_password\r"
+send -- "$root_password\r"
 
 expect "Password for root account? (again)" 
 sleep 0.5
-send "$root_password\r"
+send -- "$root_password\r"
 
 # Start sshd
 expect "Start sshd(8)" { respond "yes" }

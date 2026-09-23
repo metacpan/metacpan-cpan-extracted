@@ -5,7 +5,7 @@ requires 'perl', '5.010001';
 requires 'Carp';
 requires 'DBD::SQLite', '1.70';
 requires 'DBI';
-requires 'Database::Abstraction', '0.44';
+requires 'Database::Abstraction', '0.45';
 requires 'File::Spec';
 requires 'File::Temp';
 requires 'List::Util', '1.33';
@@ -20,6 +20,7 @@ requires 'autodie';
 on 'test' => sub {
 	requires 'DBD::CSV';
 	requires 'IPC::System::Simple';
+	requires 'JSON::MaybeXS';
 	requires 'Test::DescribeMe';
 	requires 'Test::Exception';
 	requires 'Test::Memory::Cycle';

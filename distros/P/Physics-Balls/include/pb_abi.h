@@ -37,6 +37,16 @@
  * with its own sizeof as the stride is a valid v2 layout of kind 0). The v1
  * entry points are thin wrappers that fill a v2 struct with the v1 defaults.
  *
+ * ABI 4 (0.07, plan_air_hockey 02a) appends ONE function, advance: the same
+ * loop run from a layout whose rows may each carry a starting velocity
+ * (struct pb_ball_in3, read through layout_stride as ever) to a HORIZON,
+ * struct pb_tick's dt microseconds, and stopped there: every body's position,
+ * velocity and mode at the horizon come back in the outcome's appended state
+ * rows. That is what a live game ticking at 50 Hz needs and what strike, which
+ * releases one ball and runs to rest, cannot give. Every difference from the
+ * strike path is behind a test of the tick argument, so a strike executes the
+ * 0.06 instructions and its fixtures are the same doubles.
+ *
  * ---- what the engine is -----------------------------------------------------
  *
  * Balls on a flat surface with friction (since ABI 3 of more than one radius
@@ -94,7 +104,7 @@
  * it is given; the caller's array may go.
  */
 
-#define PB_ABI_VERSION 3
+#define PB_ABI_VERSION 4
 
 #define PB_EV_ROLL   0   /* a sliding ball began to roll            a = ball        */
 #define PB_EV_STOP   1   /* a ball came to rest                     a = ball        */
@@ -113,6 +123,7 @@
 #define PB_ERR_SIZE    5   /* a v2 struct's size is smaller than this version needs        */
 #define PB_ERR_KIND    6   /* a layout row names a kind the world does not declare         */
 #define PB_ERR_TURNS   7   /* more than PB_MAX_TURNS turns of curving balls in one shot    */
+#define PB_ERR_HORIZON 8   /* ABI 4: an advance whose dt is not positive                   */
 
 #define PB_MAX_EVENTS 5000
 #define PB_MAX_TIME   40.0
@@ -186,6 +197,27 @@ struct pb_shot2 {
     int  spin;
 };
 
+/* ---- ABI 4 ------------------------------------------------------------------ */
+
+/* A layout row for advance: the v2 row, then a starting velocity in hundredths
+   of a millimetre a second. INTEGERS, for the reason positions are: a tick's
+   state is the next tick's row and every encoder must spell it identically. A
+   pb_ball_in2 array at its own stride is a valid all-stationary layout; the
+   velocity is read only when layout_stride reaches it. A body with a velocity
+   is released ROLLING with its roll equal to its velocity, and no speed floor
+   applies: 0.05 m/s is legal. */
+struct pb_ball_in3 { int id; long x, y; int kind; long vx, vy; };
+
+/* The horizon: dt in microseconds, an integer so a fixture carries the exact
+   value (20000 is the double nearest 0.02, by a correctly rounded division). */
+struct pb_tick { unsigned int size; long dt; int trace; };
+
+/* One row per layout row, in layout order, at the horizon: position and
+   velocity in hundredths of a millimetre (a second), and the body's mode
+   (0 stationary, 1 sliding, 2 rolling, 3 pocketed). A pocketed body carries a
+   zero velocity. Integers, so no negative zero exists on any wire. */
+struct pb_state   { int id; long x, y, vx, vy; int mode; };
+
 struct pb_event   { double t; int kind; int a; int b; };
 struct pb_segment { int id; double t0, dur, px, py, vx, vy, ax, ay; };
 struct pb_rest    { int id; long x, y; };
@@ -205,6 +237,8 @@ struct pb_outcome {
     /* ABI 3, appended: a consumer compiled against ABI 2 reads its own prefix */
     int npeaks;    struct pb_peak    *peaks;      /* one per body in the layout, in layout order */
     int ndowns;    struct pb_down    *downs;      /* in time order; a down body is in neither rest nor holed */
+    /* ABI 4, appended: filled by advance only; a strike leaves nstate 0 */
+    int nstate;    struct pb_state   *state;      /* every body at the horizon, in layout order */
 };
 
 struct pb_world;
@@ -218,6 +252,8 @@ struct pb_abi {
     /* ABI 2 */
     struct pb_world   *(*world_new_ex)(const struct pb_desc2 *desc);
     struct pb_outcome *(*strike_ex)(const struct pb_world *world, int n, const struct pb_ball_in2 *layout, int layout_stride, const struct pb_shot2 *shot);
+    /* ABI 4 */
+    struct pb_outcome *(*advance)(const struct pb_world *world, int n, const struct pb_ball_in2 *layout, int layout_stride, const struct pb_tick *tick);
 };
 
 /* The linker names, for a program that links pb_engine.c directly. */
@@ -226,6 +262,7 @@ struct pb_world   *pb_world_new_ex(const struct pb_desc2 *desc);
 void               pb_world_free(struct pb_world *world);
 struct pb_outcome *pb_strike(const struct pb_world *world, int n, const struct pb_ball_in *layout, const struct pb_shot *shot);
 struct pb_outcome *pb_strike_ex(const struct pb_world *world, int n, const struct pb_ball_in2 *layout, int layout_stride, const struct pb_shot2 *shot);
+struct pb_outcome *pb_advance(const struct pb_world *world, int n, const struct pb_ball_in2 *layout, int layout_stride, const struct pb_tick *tick);
 void               pb_outcome_free(struct pb_outcome *out);
 const struct pb_abi *pb_abi_table(void);
 

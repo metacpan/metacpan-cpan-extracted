@@ -14,7 +14,7 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: September 13 2026 $
+.Dd $Mdocdate: September 22 2026 $
 .Dt FUGUWEB 1
 .Os
 .Sh NAME
@@ -447,11 +447,12 @@ A
 group reads its directory for the plain files
 .Pa *.1 ,
 .Pa *.3p ,
-.Pa *.5
+.Pa *.5 ,
+.Pa *.7
 and
 .Pa *.8 .
-It sorts them by section, in the order 1, 3p, 5, 8, and then by file
-name.
+It sorts them by section, in the order 1, 3p, 5, 7, 8, and then by
+file name.
 The build renders each source with
 .Xr mandoc 1
 and names the page

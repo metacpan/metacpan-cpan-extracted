@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use lib "t/lib";
 use Test::More;
-use HMTest qw(free_ports quiet_child server_reap);
+use HMTest qw(free_ports quiet_child server_guard server_reap slurp);
 use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
@@ -28,7 +28,7 @@ END { Shared::Arena->destroy($NAME) if $NAME && $$ == $ME }
 
 my $errlog = File::Temp->new;
 
-my $pid = fork // die "fork: $!";
+my $pid = server_guard(fork // die "fork: $!");
 if (!$pid) {
     quiet_child(stderr => "$errlog");
     Hyperman->run(
@@ -107,17 +107,21 @@ like($pool, qr/^workers=\d+ alive=2 requests=\d+$/,
      "stats(pool => 1) sums the board ($pool)");
 
 # ---- USR1: the supervisor prints the aggregate and the rows ------------------
+# Poll for the WHOLE dump, not for its first line: the supervisor is writing
+# the log while this reads it, and a read that lands mid-dump would see an
+# aggregate line with no rows under it and call that a pool with no workers.
 kill 'USR1', $pid;
-my $log = '';
-for (1 .. 40) {
-    $log = do { local (@ARGV, $/) = ("$errlog"); <> } // '';
-    last if $log =~ /Hyperman pool:/;
+my ($log, @lines) = ('');
+for (1 .. 60) {
+    $log   = slurp("$errlog");
+    @lines = $log =~ /^(Hyperman worker \d+: requests=\d+ .*)$/mg;
+    last if $log =~ /Hyperman pool:/ && @lines >= 2;
     Time::HiRes::sleep(0.05);
 }
 like($log, qr/^Hyperman pool: workers=\d+ alive=2 requests=\d+/m,
      'USR1 printed one aggregate line');
-my @lines = $log =~ /^(Hyperman worker \d+: requests=\d+ .*)$/mg;
-is(scalar @lines, 2, 'and one line per worker');
+is(scalar @lines, 2, 'and one line per worker')
+    or diag("the USR1 dump was:\n$log");
 unlike($log, qr/DEAD/, 'with nobody dead');
 
 # ---- a worker killed outright reads as not alive ------------------------------

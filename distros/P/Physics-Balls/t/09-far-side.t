@@ -59,6 +59,7 @@ sub world_of {
 }
 
 my %world = map { $_ => world_of($fx->{geometry}{$_}) } keys %{ $fx->{geometry} };
+my $wide = Presets::wide_doubles();
 
 is scalar @{ $world{straight}->gates }, 16, 'the straight lane has a ring of sixteen gates round its cup';
 ok $world{you}->walls->[0][1] == $world{you}->walls->[0][3] && @{ $world{you}->walls } >= 8, 'the U is a concave course whose first wall is its top';
@@ -68,11 +69,12 @@ for my $s (@strokes) {
 	my $label = "$s->{course}/$s->{id}";
 	ok !$out->error, "$label: the engine plays it" or diag($out->message);
 
-	my @mine = map { [ $_->[1], $_->[2], (defined $_->[3] ? $_->[3] : ()) ] } @{ $out->events };
-	my @theirs = map { [ $_->[1], $_->[2], (defined $_->[3] ? $_->[3] : ()) ] } @{ $s->{events} };
+	my ($settled, $recorded) = (Presets::settle_ties($out->events, 1e-6), Presets::settle_ties($s->{events}, 1e-6));
+	my @mine = map { [ $_->[1], $_->[2], (defined $_->[3] ? $_->[3] : ()) ] } @$settled;
+	my @theirs = map { [ $_->[1], $_->[2], (defined $_->[3] ? $_->[3] : ()) ] } @$recorded;
 	my $times = 1;
 	for my $i (0 .. $#theirs) {
-		$times = 0 if !defined $out->events->[$i] || abs($out->events->[$i][0] - $s->{events}[$i][0]) >= 1e-6;
+		$times = 0 if !defined $settled->[$i] || abs($settled->[$i][0] - $recorded->[$i][0]) >= 1e-6;
 	}
 	ok $times && eq_array(\@mine, \@theirs), "$label: the events agree in kind, order, participants and time to 1e-6 s"
 		or diag(explain { mine => $out->events, recorded => $s->{events} });
@@ -80,8 +82,11 @@ for my $s (@strokes) {
 	is_deeply [ $out->rest, [ map { [ $_->[0], $_->[1] ] } @{ $out->holed } ] ],
 		[ $s->{rest}, [ map { [ $_->[0], $_->[1] ] } @{ $s->{holed} } ] ], "$label: the rest layout and the holed list are identical";
 
-	is $out->error ? 'ERROR' : digest_of($out->segments), $s->{segments_sha256}, "$label: the segments are bit-identical to the prototype's"
-		or diag("on $Config{archname}, $Config{cc}");
+	SKIP: {
+		skip $wide, 1 if $wide;
+		is $out->error ? 'ERROR' : digest_of($out->segments), $s->{segments_sha256}, "$label: the segments are bit-identical to the prototype's"
+			or diag("on $Config{archname}, $Config{cc}");
+	}
 
 	my $e = $s->{expect};
 	my @claims;

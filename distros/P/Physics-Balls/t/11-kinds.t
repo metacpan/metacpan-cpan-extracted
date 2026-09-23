@@ -86,6 +86,9 @@ sub lane_world {
 	);
 }
 my $world = lane_world();
+# and a build whose compiler holds a double wider than 64 bits between
+# operations is off by hundreds of ulps after the first collision: mark 2 skips
+my $wide = Presets::wide_doubles();
 
 # ---- 2: the C is the JavaScript ---------------------------------------------------------
 for my $f (@fx) {
@@ -93,8 +96,10 @@ for my $f (@fx) {
 	my $out = Physics::Balls->strike($world, layout => $f->{layout}, %{ $f->{shot} });
 	ok !$out->error, "$label: the engine plays it (" . scalar(@{ $out->events }) . ' events)' or diag($out->message);
 
-	my @mine = @{ $out->events };
-	my @theirs = @{ $f->{events} };
+	SKIP: {
+	skip $wide, 3 if $wide;
+	my @mine = @{ Presets::settle_ties($out->events, 1e-9) };
+	my @theirs = @{ Presets::settle_ties($f->{events}, 1e-9) };
 	my @bad;
 	my $worst = 0;
 	push @bad, 'count ' . scalar(@mine) . ' vs ' . scalar(@theirs) if @mine != @theirs;
@@ -157,6 +162,7 @@ for my $f (@fx) {
 	is_deeply \@seg, [],
 		sprintf('%s: the segments are the prototype\'s to %d ulps (%d segments, worst %.1f)', $label, ULPS, $n, $worst_seg)
 		or diag(join("\n", first_few(@seg)) . "\non $Config{archname}, $Config{cc}");
+	}
 }
 
 # ---- 1: the default kind is the old world ---------------------------------------------------
@@ -249,6 +255,6 @@ my %roll = (ball => 0, dx => 1_000_000, dy => 0, power => 600, sx => 0, sy => 40
 	for my $bad ([ r => -1 ], [ m => 0 ], [ mu => 'x' ], [ rs => -0.1 ], [ vfall => -1 ]) {
 		ok !eval { Physics::Balls::World->new(%{ $box->description }, kinds => [ { @$bad } ]); 1 }, "mark 7: a kind with $bad->[0] $bad->[1] is refused";
 	}
-	is(Physics::Balls->abi_version, 3, 'mark 7: abi_version is 3');
+	ok(Physics::Balls->abi_version >= 3, 'mark 7: abi_version is at least 3 (the header says >=, never ==; 0.07 made it 4)');
 	ok $box->engine->bad_size_refused, 'mark 7: a v2 description and a v2 shot with a size smaller than the struct are still refused';
 }

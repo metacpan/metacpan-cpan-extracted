@@ -1,0 +1,61 @@
+=head1 NAME
+
+App::FuguSeed::QR - the flow of fuguseed-qr
+
+=head1 SYNOPSIS
+
+    use App::FuguSeed::QR;
+
+    exit App::FuguSeed::QR->run(@ARGV);
+
+=head1 DESCRIPTION
+
+App::FuguSeed::QR holds the flow of the program C<fuguseed-qr>. It
+reads the 12 seed words from the first line of standard input, and it
+writes the SeedQR or the check word to standard output.
+
+It is the one module of the program that touches a stream. The three
+standard streams are the one contact of the program with the computer:
+no module of the program opens a file, spawns a process, or reads an
+environment variable.
+
+The program takes no option and no argument. Standard output holds the
+digit string on one line, then the grid view, then the 25 zone views.
+After each zone view, the program reads one line from standard input
+before the next zone. At the end of the input, it prints the remaining
+zones without a pause.
+
+A wrong checksum is a result, not a failure: standard output holds the
+check word on one line, and the program prints no SeedQR in that run.
+
+A failure prints one line to standard error. The line names the word
+position or the count that failed, never a word, and the check word
+leaves on standard output only.
+
+=head2 run
+
+C<run(@argument)> reads the words, prints the result, and returns the
+exit code.
+
+=head1 RETURN VALUES
+
+C<run()> returns 0 for a success, 1 for a failure, and 2 for a usage
+error.
+
+=head1 ERRORS
+
+An argument is a usage error: C<run()> prints one usage line to
+standard error and returns 2. Another count than 12 words, and a word
+outside the list, are failures: C<run()> prints one line to standard
+error and returns 1.
+
+=head1 SEE ALSO
+
+C<fuguseed-qr(1)>, L<App::FuguSeed::Mnemonic>, and
+L<App::FuguSeed::Text>.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

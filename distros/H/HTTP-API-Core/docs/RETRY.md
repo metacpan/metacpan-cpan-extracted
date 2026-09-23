@@ -41,9 +41,11 @@ A retryable error is only retried when the request method is allowed by the acti
 
 The delay before another attempt is chosen in this order:
 
-1. numeric `Retry-After`
+1. `Retry-After` (delay-seconds or HTTP-date)
 2. exhausted rate-limit reset metadata
 3. exponential backoff
+
+HTTP-date values use the IMF-fixdate form (for example, `Wed, 21 Oct 2015 07:28:00 GMT`). Dates in the past produce a zero-second delay. Malformed values are ignored so the existing rate-limit reset or exponential-backoff fallback can be used.
 
 Exponential backoff starts at `base_delay`, doubles after each failed attempt, and is capped at `max_delay`.
 

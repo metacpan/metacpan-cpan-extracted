@@ -46,7 +46,7 @@ subtest 'the C names no handle, no clock and no random' => sub {
 subtest 'the Perl names no handle, no clock and no random' => sub {
 	plan tests => 1;
 	my @caught;
-	for my $rel (qw(Balls.pm Balls/Engine.pm Balls/World.pm Balls/Table.pm Balls/Strike.pm Balls/Outcome.pm Balls/Ball.pm Balls/Error.pm)) {
+	for my $rel (qw(Balls.pm Balls/Engine.pm Balls/World.pm Balls/Table.pm Balls/Strike.pm Balls/Tick.pm Balls/Outcome.pm Balls/Ball.pm Balls/Error.pm)) {
 		my $path = "$root/lib/Physics/$rel";
 		open my $fh, '<', $path or die "$path: $!";
 		my $code = do { local $/; <$fh> };

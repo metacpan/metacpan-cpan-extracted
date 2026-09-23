@@ -152,4 +152,43 @@ for my $status (400, 401, 403, 404, 422) {
     is($calls, 2, 'lowercase configured method is normalized and retried');
 }
 
+is(
+    HTTP::API::Core::_retry_after_delay('12', 1_700_000_000),
+    12,
+    'numeric Retry-After remains a delay in seconds',
+);
+
+is(
+    HTTP::API::Core::_retry_after_delay(
+        'Wed, 21 Oct 2015 07:28:00 GMT',
+        1_445_412_470,
+    ),
+    10,
+    'HTTP-date Retry-After is converted to a delay',
+);
+
+is(
+    HTTP::API::Core::_retry_after_delay(
+        'Wed, 21 Oct 2015 07:28:00 GMT',
+        1_445_412_490,
+    ),
+    0,
+    'past HTTP-date Retry-After becomes zero delay',
+);
+
+is(
+    HTTP::API::Core::_retry_after_delay('not-a-date', 1_700_000_000),
+    undef,
+    'malformed Retry-After falls through to other delay sources',
+);
+
+is(
+    HTTP::API::Core::_retry_after_delay(
+        'Wed, 21 Oct 2015 99:28:00 GMT',
+        1_445_412_470,
+    ),
+    undef,
+    'invalid HTTP-date time is rejected',
+);
+
 done_testing;

@@ -120,7 +120,7 @@ $td->on_shipping_query(sub { push @ship, $_[0] });
 my $J = Cpanel::JSON::XS->new;
 
 # invoice_payload is TL bytes here, so it arrives base64 and must be decoded
-$td->_inject_raw($J->encode({ '@type' => 'updateNewPreCheckoutQuery',
+$td->inject_raw($J->encode({ '@type' => 'updateNewPreCheckoutQuery',
     id => '55', sender_user_id => 42, currency => 'XTR', total_amount => 100,
     invoice_payload => encode_base64('order-42', '') }));
 is scalar @pre, 1, 'on_pre_checkout_query fired';
@@ -128,7 +128,7 @@ is $pre[0]{payload}, 'order-42', 'and the bytes payload was decoded';
 is $pre[0]{total_amount}, 100, 'with the amount';
 
 # but it is a plain string in the shipping query, so decoding would corrupt it
-$td->_inject_raw($J->encode({ '@type' => 'updateNewShippingQuery',
+$td->inject_raw($J->encode({ '@type' => 'updateNewShippingQuery',
     id => '56', sender_user_id => 42, invoice_payload => 'order-42',
     shipping_address => { country_code => 'DE' } }));
 is scalar @ship, 1, 'on_shipping_query fired';

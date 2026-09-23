@@ -1,0 +1,65 @@
+=head1 NAME
+
+App::FuguSeed::Text - the views of a Standard SeedQR
+
+=head1 SYNOPSIS
+
+    use App::FuguSeed::Text;
+
+    print App::FuguSeed::Text->grid($matrix);
+
+    for my $view (App::FuguSeed::Text->zones($matrix)) {
+            print $view;
+    }
+
+=head1 DESCRIPTION
+
+App::FuguSeed::Text renders the matrix of App::FuguSeed::Matrix as
+text. A dark module prints as C<#>, and a light module prints as C<.>.
+One character is one module.
+
+The grid view holds the 25 rows, with one space between the zone
+columns and one empty line between the zone rows. The letters A to E
+label the rows of zones, and the numbers 1 to 5 label the columns of
+zones. A zone is 5 x 5 modules, and zone C<A-1> is the top left zone.
+The names are the names that SeedSigner shows.
+
+A zone view holds the zone name, the 5 rows of the zone, and the count
+of the dark modules of the zone. A person draws one zone at a time,
+and the count proves the work.
+
+Each view starts with one empty line and ends with one line feed, and
+no line carries a trailing space.
+
+Every method is a class method, and every method is pure: it takes
+values and it returns values. The module touches no stream, and it
+loads no module.
+
+=head2 grid
+
+C<grid($matrix)> returns the grid view of the matrix as one string.
+
+=head2 zones
+
+C<zones($matrix)> returns the 25 zone views, in the order C<A-1> to
+C<E-5>. Each view is one string.
+
+=head1 RETURN VALUES
+
+C<grid()> returns one string. C<zones()> returns 25 strings.
+
+=head1 ERRORS
+
+C<grid()> and C<zones()> expect the matrix of App::FuguSeed::Matrix:
+25 rows of 25 modules.
+
+=head1 SEE ALSO
+
+L<App::FuguSeed::Matrix>, L<App::FuguSeed::QR>, and
+C<fuguseed-qr(1)>.
+
+=head1 AUTHORS
+
+Dick Olsson E<lt>hi@senzilla.ioE<gt>
+
+=cut

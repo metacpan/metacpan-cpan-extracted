@@ -8,6 +8,9 @@
 #include <stdatomic.h>
 #include <time.h>
 #include <errno.h>
+/* _POSIX_MONOTONIC_CLOCK, tested below, arrives with this: today it is in
+   scope only because perl.h is included first */
+#include <unistd.h>
 #include <td/telegram/td_json_client.h>
 
 #define TD_RECEIVE_TIMEOUT 10.0
@@ -65,9 +68,13 @@ static void td_atfork_child(void) {
     /* the child can never receive and _pump_unref croaks on poison, so
        the inherited loop refs are dropped here or EV::run blocks on a
        phantom count; plain counter ops, safe in the single-threaded child */
-    while (PUMP.refcnt > 0) {
+    /* one ev_ref is outstanding however high refcnt is: _pump_ref takes it
+       on the 0->1 transition only. Giving back one per client left the
+       child's loop short, and a child with two clients saw EV::run return
+       at once without running anything of its own. */
+    if (PUMP.refcnt > 0) {
         ev_unref(EV_DEFAULT_UC);
-        PUMP.refcnt--;
+        PUMP.refcnt = 0;
     }
 }
 
@@ -155,18 +162,22 @@ static void td_drain(EV_P_ ev_async *w, int revents) {
             PUTBACK;
             call_sv(PUMP.dispatch, G_DISCARD | G_EVAL);
             SPAGAIN;
-            if (SvTRUE(ERRSV)) {
+            /* SvROK first: a blessed exception object may overload bool, and
+               testing truth would run that overload here, outside any eval */
+            if (SvROK(ERRSV) || SvTRUE(ERRSV)) {
                 /* routed to the client's on_error (warn as fallback) by
-                   _drain_error, which is written to never die: a dying
+                   drain_error, which is written to never die: a dying
                    handler or __WARN__ hook must not unwind the drain and
-                   leak the rest of the detached list */
+                   leak the rest of the detached list.
+                   The error is passed unstringified for the same reason --
+                   an overloaded "" that dies would escape from here, where
+                   nothing catches it, rather than from inside drain_error */
                 PUSHMARK(SP);
                 EXTEND(SP, 2);
                 PUSHs(sv_2mortal(newSViv(m->client_id)));
-                PUSHs(sv_2mortal(newSVpvf("dispatch died: %" SVf,
-                                          SVfARG(ERRSV))));
+                PUSHs(sv_2mortal(newSVsv(ERRSV)));
                 PUTBACK;
-                call_pv("EV::Telegram::TDLib::_drain_error",
+                call_pv("EV::Telegram::TDLib::drain_error",
                         G_DISCARD | G_EVAL);
                 SPAGAIN;
             }
@@ -224,8 +235,8 @@ static void td_pump_start(pTHX) {
     PUMP.reader_done = 0;
     atomic_store(&PUMP.closing, 0);
     atomic_store(&PUMP.stop, 0);
-    /* the reader has no perl context: block all signals across the create
-       so it inherits an empty mask and delivery stays on the main thread */
+    /* the reader has no perl context: block all signals across the create so
+       it inherits a FULL mask and delivery stays on the main thread */
     sigfillset(&all);
     pthread_sigmask(SIG_SETMASK, &all, &prev);
     rc = pthread_create(&PUMP.thread, NULL, td_reader, NULL);

@@ -8,9 +8,8 @@ released to CPAN via Dist::Zilla `[@Author::GETTY]`.
 Deliberately small: no caching, no lease renewal, no policy management. Growing that
 surface is a maintainer decision, not a patch.
 
-Consumers: `goldmine`, `hiplatform`, and `hi-proto` — which still carries a **vendored copy**
-of this module rather than depending on the distribution. See the hazards section of the
-house rules before changing behaviour.
+Consumers: `goldmine`, `hiplatform` and `hi-proto`, all depending on the distribution. See
+the hazards section of the house rules before changing behaviour.
 
 ## Delegation
 

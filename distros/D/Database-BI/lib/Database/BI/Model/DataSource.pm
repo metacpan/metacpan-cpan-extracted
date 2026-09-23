@@ -12,7 +12,7 @@ use Sub::Protected;
 use Params::Validate::Strict qw(validate_strict);
 use Params::Get		();
 
-our $VERSION = '0.007.0';
+our $VERSION = '0.008.1';
 
 =head1 NAME
 
@@ -30,7 +30,7 @@ B<Read all rows from a CSV file:>
 
     my $source = Database::BI::Model::DataSource->new(
         directory => '/path/to/data',
-        table     => 'sales',           # looks for data/sales.csv, .psv, .sql, .xml, etc.
+        table     => 'sales',           # looks for data/sales.csv, tsv, .psv, .sql, .xml, etc.
     );
 
     my $records = $source->fetch_all;   # arrayref of hashrefs -- one hashref per row
@@ -39,7 +39,7 @@ B<Read all rows from a CSV file:>
         printf "Product: %s, Amount: %s\n", $row->{product}, $row->{amount};
     }
 
-B<Get column names in the original file order (CSV/PSV only):>
+B<Get column names in the original file order (CSV/PSV/TSV only):>
 
     my $cols = $source->columns;        # returns undef for SQLite and XML
     if ($cols) {
@@ -62,6 +62,13 @@ B<Open a pipe-separated file (.psv extension):>
     my $source = Database::BI::Model::DataSource->new(
         directory => '/var/data',
         table     => 'products',        # looks for /var/data/products.psv
+    );
+
+B<Open a tab-separated file (.tsv extension):>
+
+    my $source = Database::BI::Model::DataSource->new(
+        directory => '/var/data',
+        table     => 'products',        # looks for /var/data/products.tsv
     );
 
 B<Use a custom i18n object to translate error messages:>
@@ -114,14 +121,14 @@ wraps L<Database::Abstraction> and exposes three accessors (C<fetch_all>,
 C<columns>, C<id_column>) used by the controller.
 
 L<Database::Abstraction> is a read-only ORM that discovers data files
-(CSV, PSV, SQLite, XML, etc.) automatically from a directory based on the
+(CSV, PSV, TSV, SQLite, XML, etc.) automatically from a directory based on the
 calling class name.  C<DataSource> generates an ephemeral subclass at
 construction time so callers never interact with L<Database::Abstraction>
 directly.  To swap the backend for L<Database::Join> in Phase 2, only the
 C<open_table> helper in C<Database::BI> needs to change; the controller and
 C<DataSource> are untouched.
 
-C<_detect_file_info> peeks at the first header line of CSV/PSV files to
+C<_detect_file_info> peeks at the first header line of CSV/PSV/TSV files to
 extract the correct separator character, the primary-key column name, and
 the full ordered column list.  Without this, two silent L<Database::Abstraction>
 defaults corrupt every result: C<sep_char> defaults to C<'!'> (turning a
@@ -141,7 +148,7 @@ replaceable by an i18n object at instantiation time.
 
 C<DataSource> passes cell values through as Perl character strings exactly
 as L<Database::Abstraction> and the underlying DBI driver return them.
-For CSV and PSV files smaller than 16 KB, L<Text::xSV::Slurp> is used and
+For CSV, TSV and PSV files smaller than 16 KB, L<Text::xSV::Slurp> is used and
 bytes are returned without re-encoding; for larger files the L<DBD::CSV>
 path is used.  In both cases the caller (the controller) is responsible
 for setting the correct C<Content-Type> header.
@@ -255,13 +262,32 @@ Creates and returns a new C<Database::BI::Model::DataSource> instance.
 =head4 INPUT
 
 	{
-	    directory => 'string',           # required; path to the data directory
-	    table     => 'string',           # required; bare table/file name (no extension)
-	    i18n      => { type => 'object', optional => 1, can => 'maketext' } # must implement maketext($key, @args)
+	    directory     => 'string',   # required; local dir, or remote dir when host is set
+	    table         => 'string',   # required; bare file stem (no extension)
+	    host          => 'string',   # optional; "hostname" or "user@hostname" for SFTP access
+	    file_ext      => 'string',   # optional; extension hint when remote file has non-standard suffix (e.g. "log")
+	    cache         => 'object',   # optional; CHI cache object for result caching
+	    cache_ttl_url => 'string',   # optional; CHI TTL string for URL-backed tables (default "15 min")
+	    i18n          => 'object',   # optional; must implement maketext($key, @args) for i18n
 	}
 
 Accepts a flat key/value list, a hashref, or positional arguments via
 C<Params::Get>.
+
+When C<host> is provided, C<directory> is treated as a path on the remote
+host and is not checked with C<-d> locally.  C<DataSource> downloads the
+file via SFTP (L<Net::SFTP::Foreign>) to a process-local temporary directory
+and then processes the local copy.  The temporary directory persists for the
+lifetime of the C<DataSource> object and is cleaned up automatically on
+destruction.
+
+When C<file_ext> is provided together with C<host>, it is used as the first
+candidate extension when probing the remote host for the file.  If the
+downloaded file does not have a standard extension (one of C<csv>, C<tsv>,
+C<psv>, C<xlsx>, C<xls>, C<sql>, C<sqlite>, C<sqlite3>, C<db>, C<xml>),
+the file content is sniffed (SQLite magic bytes, XML preamble, or first-line
+field separator) and the file is renamed to the correct standard extension
+before further processing.
 
 =head4 DOMAIN CONSTRAINTS
 
@@ -279,7 +305,7 @@ C<error_directory_missing>.
 =item C<table>
 
 The bare file stem (no extension).  Characters that are illegal in SQL
-identifiers — hyphens, dots, spaces, etc. — are silently replaced with
+identifiers - hyphens, dots, spaces, etc. - are silently replaced with
 underscores before the name is used internally.  A stem that starts with a
 digit is prefixed with C<_>.  Only a completely empty string croaks.
 
@@ -301,9 +327,19 @@ Returns C<$self> (a blessed hashref). Croaks on invalid arguments.
   error_directory_required    -- "directory" argument was not supplied
   error_table_required        -- "table" argument was not supplied
   error_directory_missing     -- supplied directory does not exist / is unreadable
-  error_table_name_invalid    -- table name fails the safe-identifier check
-  error_backend_init          -- Database::Abstraction subclass could not be instantiated
+  error_table_name_invalid    -- table name contains illegal characters or is empty
+  error_no_safe_id            -- no column in the file has a safe SQL identifier name;
+                                 rename at least one column header to an alphanumeric name
+  error_backend_init          -- backend initialisation failed; sub-cases:
+                                   * Net::SFTP::Foreign is not installed
+                                   * could not connect to <host> via SFTP
+                                   * could not fetch any supported file from <host>:<dir>/<stem>.*
+                                   * Database::Abstraction subclass could not be instantiated
   error_no_tables             -- SQLite file opened successfully but contains no user-defined tables
+  error_fetch_failed          -- fetch_all raised an exception (wraps the underlying DBI/D::A error)
+  error_url_invalid           -- URL passed to the url=> constructor path does not begin
+                                 with http:// or https://
+  error_url_fetch             -- fetching or parsing the HTML table at a URL failed
 
 =cut
 
@@ -320,6 +356,8 @@ sub new {
 		schema => {
 			directory     => { type => 'string' },
 			table         => { type => 'string' },
+			host          => { type => 'string', optional => 1, default => undef },
+			file_ext      => { type => 'string', optional => 1, default => undef },
 			i18n          => { type => 'object', optional => 1, default => undef, can => 'maketext' },
 			cache         => { type => 'object', optional => 1, default => undef },
 			cache_ttl_url => { type => 'string', optional => 1, default => '15 min' },
@@ -327,8 +365,10 @@ sub new {
 		input => $raw,
 	);
 
+	# For remote files (host is set), the directory is on the remote host and
+	# cannot be stat()d locally.  Only check local existence when no host is given.
 	croak _fmt('error_directory_missing', $args->{directory})
-		unless -d $args->{directory};
+		unless defined $args->{host} || -d $args->{directory};
 
 	# Reject path-traversal characters first: '/', '\', and NUL are the only
 	# characters that could let _raw_table escape the intended directory when
@@ -354,6 +394,8 @@ sub new {
 		_directory    => $args->{directory},
 		_table        => $safe_table,
 		_raw_table    => $raw_table,
+		_host         => $args->{host},
+		_file_ext     => $args->{file_ext},
 		_i18n         => $args->{i18n},
 		_cache        => $args->{cache},
 		_cache_ttl_url => $args->{cache_ttl_url},
@@ -445,7 +487,7 @@ sub _init_url_backend :Protected {
 
 # _detect_file_info( $dir, $table ) -> \%info
 #
-# Peek at the first header line of a CSV or PSV file and return a hashref:
+# Peek at the first header line of a CSV, TSV or PSV file and return a hashref:
 #   sep_char => field separator character (',' or '|')
 #   id       => first column name (used as Database::Abstraction's id key)
 #   columns  => arrayref of all column names in file order
@@ -455,7 +497,7 @@ sub _init_url_backend :Protected {
 #      per row, producing a single comma-joined string instead of columns.
 #   2. id defaults to 'entry' — the slurp filter greps on that column; if it
 #      doesn't exist every row is silently discarded.
-# Returns an empty hashref for non-CSV/PSV/XLSX/SQLite formats (XML, etc.).
+# Returns an empty hashref for non-CSV/TSV/PSV/XLSX/SQLite formats (XML, etc.).
 # For SQLite/.db files that can be opened, returns { sqlite_tables => [...] }.
 sub _detect_file_info :Protected {
 	my ($dir, $table) = @_;
@@ -523,7 +565,7 @@ sub _detect_file_info :Protected {
 		}
 	}
 
-	for my $ext (qw(csv psv)) {
+	for my $ext (qw(csv psv tsv)) {
 		my $path = File::Spec->catfile($dir, "$table.$ext");
 		next unless -r $path;
 		# "use autodie" makes open() die on failure, so "or next" would be dead
@@ -545,8 +587,10 @@ sub _detect_file_info :Protected {
 		$line =~ s/\r\z//;	# strip CR from CRLF files before any split
 
 		my $sep;
-		if ($ext eq 'psv') {
+		if($ext eq 'psv') {
 			$sep = '|';
+		} elsif($ext eq 'tsv') {
+			$sep = "\t";
 		} else {
 			# Sniff the separator: Database::Abstraction uses '!' natively and
 			# sometimes stores those files with a .csv extension.  If splitting
@@ -665,7 +709,8 @@ sub _detect_file_info :Protected {
 	# e.g. obituaries.sql whose internal table is called "deceased".  If the
 	# file is not a valid SQLite database (e.g. a Berkeley DB file) the eval
 	# fails and we return {} so _init_backend/D::A handles it natively.
-	for my $ext (qw(sql db)) {
+	# .sqlite and .sqlite3 are common alternative SQLite extensions — treated identically to .sql.
+	for my $ext (qw(sql sqlite sqlite3 db)) {
 		my $path = File::Spec->catfile($dir, "$table.$ext");
 		next unless -r $path;
 		my $tables = eval {
@@ -691,6 +736,40 @@ sub _detect_file_info :Protected {
 # _values_are_data_like( \@vals ) -> bool
 #
 # Return true when the values look like actual data (dates, numbers, free text)
+# _sniff_data_ext( $path ) -> $ext
+#
+# Peek at the content of $path and return the standard file extension that best
+# describes its format.  Used when a remote file has a non-standard extension
+# (e.g. ".log") and we need to rename it so that _detect_file_info and
+# Database::Abstraction can discover it automatically.
+#
+# Detection order:
+#   1. SQLite magic bytes ("SQLite format 3") -> 'db'
+#   2. XML preamble ("<?xml" or "<" as first non-space character) -> 'xml'
+#   3. First data line contains tabs -> 'tsv'
+#   4. First data line contains pipes -> 'psv'
+#   5. Fallback -> 'csv'
+sub _sniff_data_ext {
+	my $path = $_[0];
+	open(my $fh, '<:raw', $path) or return 'csv';
+	my $header = '';
+	read $fh, $header, 20;
+	close $fh;
+	return 'db'  if $header =~ /\ASQLite format/;
+	return 'xml' if $header =~ /\A\s*<\?xml/i;
+	return 'xml' if $header =~ /\A\s*</;
+	open(my $lh, '<', $path) or return 'csv';
+	my $line = <$lh>;
+	close $lh;
+	return 'csv' unless defined $line;
+	return 'tsv' if $line =~ /\t/;
+	return 'psv' if $line =~ /\|/;
+	return 'csv';
+}
+
+# _values_are_data_like( \@vals ) -> bool
+#
+# Returns true when the values look like a row of real data (dates / numbers)
 # rather than column headers.  Used to detect header-less CSV files where the
 # first line is a data row.  At least one value must match a date or numeric
 # pattern — a row of plain hyphenated identifiers (e.g. "First-Name") is NOT
@@ -780,6 +859,65 @@ sub _init_backend :Protected {
 	my $raw_table = $self->{_raw_table} // $table;  # original: used for file lookup and dbname
 	my $dir       = $self->{_directory};
 
+	# Remote file path (host is set): download via SFTP to a local temp directory,
+	# then proceed with normal local processing on the downloaded copy.
+	# Net::SFTP::Foreign is loaded lazily so non-remote usage has no extra deps.
+	if (defined $self->{_host}) {
+		eval { require Net::SFTP::Foreign }
+			or croak $self->_msg('error_backend_init', $table,
+				'Net::SFTP::Foreign is not installed (required for remote file access)');
+		require File::Temp;
+		# Split optional user@host into ($user, $host).
+		my ($user, $host) = $self->{_host} =~ /\A([^@]+)\@(.+)\z/
+			? ($1, $2) : (undef, $self->{_host});
+		my $tmpdir = File::Temp->newdir(CLEANUP => 1);
+		my @remote_exts = qw(csv tsv psv xlsx xls sql sqlite sqlite3 db xml);
+		# Try the caller-supplied extension first (e.g. .log), then fall back.
+		if (defined $self->{_file_ext}) {
+			my $hint = lc $self->{_file_ext};
+			@remote_exts = ($hint, grep { $_ ne $hint } @remote_exts);
+		}
+		# One SFTP connection shared across all extension attempts.
+		my $sftp = eval { Net::SFTP::Foreign->new($host,
+			defined $user ? (user => $user) : (),
+			timeout => 10,
+		) };
+		croak $self->_msg('error_backend_init', $table,
+			"could not connect to $host via SFTP: " . ($@ || ($sftp ? $sftp->error : 'unknown')))
+			unless defined $sftp && !$sftp->error;
+		my $fetched_ext;
+		for my $ext (@remote_exts) {
+			my $remote_path = "$dir/$raw_table.$ext";
+			my $local_file  = File::Spec->catfile("$tmpdir", "$raw_table.$ext");
+			$sftp->get($remote_path, $local_file);
+			# Verify the file landed on disk; sftp->error may be set on ENOENT.
+			next if $sftp->error || !-f $local_file || !-s $local_file;
+			$fetched_ext = $ext;
+			last;
+		}
+		croak $self->_msg('error_backend_init', $table,
+			"could not fetch any supported file from $self->{_host}:$dir/$raw_table.*")
+			unless defined $fetched_ext;
+		$self->{_remote_tmpdir} = $tmpdir;	# prevents cleanup until $self is destroyed
+
+		# If the downloaded file has a non-standard extension (e.g. .log), rename
+		# it to one that _detect_file_info and D::A can discover automatically.
+		# We do this by sniffing the first bytes/line for format signatures.
+		my %KNOWN_EXT = map { $_ => 1 }
+			qw(csv tsv psv xlsx xls sql sqlite sqlite3 db xml);
+		unless ($KNOWN_EXT{lc $fetched_ext}) {
+			my $orig_file = File::Spec->catfile("$tmpdir", "$raw_table.$fetched_ext");
+			my $std_ext   = _sniff_data_ext($orig_file);
+			if ($std_ext ne lc $fetched_ext) {
+				my $new_file = File::Spec->catfile("$tmpdir", "$raw_table.$std_ext");
+				{ no autodie; rename $orig_file, $new_file }
+				$fetched_ext = $std_ext;
+			}
+		}
+
+		$dir = "$tmpdir";	# switch to local temp dir for all subsequent processing
+	}
+
 	require Database::Abstraction;
 
 	my $pkg = 'Database::BI::_DB::' . ucfirst($table);
@@ -793,7 +931,7 @@ sub _init_backend :Protected {
 
 	# Probe for the actual file on disk so _cache_key can compute its mtime.
 	# This runs before the early-return paths so even empty files get a path.
-	for my $e (qw(csv psv sql xml db xlsx xls)) {
+	for my $e (qw(csv tsv psv sql sqlite sqlite3 xml db xlsx xls)) {
 		my $p = File::Spec->catfile($dir, "$raw_table.$e");
 		if (-f $p) {
 			$self->{_file_path} = File::Spec->rel2abs($p);
@@ -828,7 +966,7 @@ sub _init_backend :Protected {
 	# characters that are not safe SQL identifiers (spaces, hyphens, etc.).
 	# Falling back to the D::A default ('entry') would silently return 0 rows
 	# since no 'entry' column exists.  Croak with a human-readable message.
-	# This guard applies only to CSV/PSV/SQLite/XML -- headerless and XLSX paths
+	# This guard applies only to CSV/TSV/PSV/SQLite/XML -- headerless and XLSX paths
 	# are handled by the _headerless_data check immediately above.
 	croak $self->_msg('error_no_safe_id', $table)
 		if exists $info->{columns} && !defined $info->{id};
@@ -852,7 +990,7 @@ sub _init_backend :Protected {
 	my $da_dir = $dir;
 	if ($raw_table ne $table) {
 		my $safe_ext;
-		for my $e (qw(xlsx xls db sql xml csv psv)) {
+		for my $e (qw(xlsx xls db sql sqlite sqlite3 xml csv tsv psv)) {
 			$safe_ext = $e, last
 				if -f File::Spec->catfile($dir, "$raw_table.$e");
 		}
@@ -889,7 +1027,7 @@ sub _init_backend :Protected {
 		unless (defined $match) {
 			my $actual   = $tbls[0];
 			my ($src_ext) = grep { -f File::Spec->catfile($dir, "$raw_table.$_") }
-				qw(sql db);
+				qw(sql sqlite sqlite3 db);
 			$src_ext //= 'sql';
 			require File::Temp;
 			my $tmp     = File::Temp->newdir(CLEANUP => 1);
@@ -925,7 +1063,7 @@ sub _init_backend :Protected {
 			id             => $id_col,
 			no_entry       => 1,
 			defined($info->{sep_char})  ? (sep_char       => $info->{sep_char})  : (),
-			# Force the Text::xSV::Slurp path for CSV/PSV files: D::A's default
+			# Force the Text::xSV::Slurp path for CSV/TSV/PSV files: D::A's default
 			# slurp threshold is 16 KB; larger files fall back to DBD::CSV, which
 			# sanitizes column names (lowercases and replaces spaces with
 			# underscores).  Passing the actual file size ensures the slurp path
@@ -976,9 +1114,9 @@ sub table_name {
 =head2 columns
 
 Returns an arrayref of column names in file order, or C<undef> when no order
-is available.  For CSV and PSV files the order comes from the file header.
+is available.  For CSV, TSV and PSV files the order comes from the file header.
 For SQLite and XML, falls back to the underlying C<Database::Abstraction>
-object's C<columns()> — useful when a C<DataSource> is passed directly to
+object's C<columns()> - useful when a C<DataSource> is passed directly to
 C<Database::Join> as a component database.
 
 =cut
@@ -1103,7 +1241,7 @@ sub fetch_all {
 	return $self->{_file_data} if $self->{_file_data};
 
 	# Cache check: URL tables benefit from avoiding repeated HTTP round-trips;
-	# file tables benefit from skipping disk I/O and CSV/PSV parsing.
+	# file tables benefit from skipping disk I/O and CSV/TSV/PSV parsing.
 	my $cache = $self->{_cache};
 	if ($cache) {
 		my $key = $self->_cache_key;
@@ -1158,12 +1296,12 @@ These are the most common mistakes when using C<DataSource>.
 
 =over 4
 
-=item B<SQLite databases must use .sql as their file extension>
+=item B<SQLite databases may use .sql, .sqlite, or .sqlite3 as their file extension>
 
-C<Database::Abstraction> looks for SQLite databases with the C<.sql> extension.
-It does B<not> recognise C<.sqlite>, C<.sqlite3>, or C<.db3>.  If you have a
-file called C<inventory.sqlite>, rename it to C<inventory.sql> before passing
-it to C<DataSource>.
+C<DataSource> recognises C<.sql>, C<.sqlite>, and C<.sqlite3> as SQLite
+database files.  It does B<not> recognise C<.db3>.  If you have a file called
+C<inventory.db3>, rename it to C<inventory.sql> before passing it to
+C<DataSource>.
 
 =item B<The table name is always lowercased>
 
@@ -1194,7 +1332,7 @@ setting C<no_entry =E<gt> 1> so all rows are kept as an ordered array.
 =item B<columns() returns undef for SQLite and XML files>
 
 C<columns()> only returns an arrayref for file formats where the header order
-is visible before data is read (CSV and PSV).  For SQLite and XML files it
+is visible before data is read (CSV, TSV and PSV).  For SQLite and XML files it
 returns C<undef>.  Always check: C<if ($source-E<gt>columns) { ... }>.  The
 controller falls back to putting C<id_column> first and then sorting the rest
 alphabetically when C<columns()> is C<undef>.
@@ -1224,16 +1362,43 @@ When a table exists but contains no data rows, C<fetch_all> returns C<[]> (an
 empty arrayref), not C<undef>.  Check with C<scalar @{$records}>, not with
 C<defined $records> or C<$records>.
 
-=item B<0-byte CSV/PSV files bypass Database::Abstraction entirely>
+=item B<0-byte CSV/TSV/PSV files bypass Database::Abstraction entirely>
 
-When C<_detect_file_info> opens a CSV or PSV file and the first C<readline>
+When C<_detect_file_info> opens a CSV, TSV or PSV file and the first C<readline>
 returns C<undef> (the file is 0 bytes), it returns a C<{ _file_is_empty =E<gt>
 1 }> sentinel instead of the normal C<{ id, sep_char, columns, file_size }>
 hashref.  C<_init_backend> detects this sentinel and skips
 C<Database::Abstraction> construction; C<fetch_all> returns C<[]> immediately.
 B<No DBI connection is created for 0-byte files.>  If you mock or spy on DBI
-handles and open a 0-byte CSV, the mock will never fire — this is expected
+handles and open a 0-byte CSV, the mock will never fire - this is expected
 behaviour, not a mock misconfiguration.
+
+=item B<Remote files require Net::SFTP::Foreign; one connection per open>
+
+When C<host> is set, C<DataSource> makes one SFTP connection per C<new()>
+call.  It tries the extension list in order (the C<file_ext> hint first,
+if provided, then the full standard-extension list) and downloads the first
+file it finds.  If no file is found under any tried extension, C<new()>
+croaks C<error_backend_init>.  B<Connections are not pooled or reused>
+between C<DataSource> instances.
+
+If the remote file has a non-standard extension (e.g. C<.log>, C<.dat>),
+the content is sniffed: SQLite magic bytes map to C<.db>, an XML preamble
+to C<.xml>, a tab-delimited first line to C<.tsv>, a pipe-delimited line to
+C<.psv>, and everything else to C<.csv>.  The temp file is then renamed to
+the detected extension before further processing.
+
+=item B<DBD::CSV silently lowercases column names for files larger than 16 KB>
+
+C<Database::Abstraction> uses C<Text::xSV::Slurp> for files up to 16 KB and
+DBD::CSV for larger ones.  The DBD::CSV path lowercases column names and
+replaces spaces with underscores (C<Account Number> becomes
+C<account_number>), which causes a C<"disallowed key"> error at render time
+when the template iterates the original column names.  C<DataSource> avoids
+this by always passing C<max_slurp_size =E<gt> -s $path> to
+C<Database::Abstraction>, forcing the slurp path regardless of file size.
+If you call C<Database::Abstraction> directly, you B<must> pass this option
+yourself for any file whose column names contain spaces or mixed case.
 
 =back
 
@@ -1276,6 +1441,11 @@ the constructor.
 L<Carp>, L<Readonly>, L<Scalar::Util>, L<Params::Validate::Strict>, L<Params::Get>,
 L<Database::Abstraction>.
 
+Optional (loaded lazily):
+
+L<Net::SFTP::Foreign> -- required for remote file access (C<host =E<gt> ...>).
+L<Spreadsheet::ParseXLSX> -- required for opening C<.xlsx> files.
+
 =head1 INCOMPATIBILITIES
 
 None known.
@@ -1292,11 +1462,16 @@ Nigel Horne C<< <njh@nigelhorne.com> >>
 
 =head2 new
 
-  new == [directory : PATH; table : NAME; i18n? : I18N_OBJECT]
-         pre  (directory in dom FILE_SYSTEM /\ is_dir directory)
-              /\ table =~ TABLE_NAME_RE
+  new == [directory : PATH; table : NAME;
+          host? : HOST_STRING; file_ext? : EXT_STRING;
+          cache? : CHI_OBJECT; cache_ttl_url? : TTL_STRING;
+          i18n? : I18N_OBJECT]
+         pre  (host = undef => is_dir directory)
+              /\ (host /= undef => host =~ REMOTE_HOST_RE)
+              /\ table /= ""
          post result.class = DataSource
-              /\ result._db.class = Database::Abstraction
+              /\ (host = undef => result._db.class = Database::Abstraction)
+              /\ (host /= undef => result._remote_tmpdir /= undef)
 
 =head2 table_name
 

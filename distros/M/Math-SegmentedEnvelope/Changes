@@ -1,2 +1,24 @@
-0.02 - fix default morpher and border levels for random generator
-0.01 - fixing POD and tests
+Revision history for Math-SegmentedEnvelope
+
+0.03  2026-09-23
+    - High-performance C XS engine rewrite with fast segment caching
+    - TinyExpr formula support with JIT compilation (x86-64 / TCC)
+    - Constructors: adsr(), asr(), perc(), spline() (Catmull-Rom)
+    - Transforms: scale, stretch, offset, invert, normalize, quantize, trim,
+      lerp, resample, clamp, smooth, derivative, integrate, concat, blend,
+      add, multiply, with_duration, clone, copy
+    - Boundary modes: is_hold, is_fold_over, is_wrap_neg
+    - Scalar definite integral via area() / integral()
+    - Operator overloading: callable envelopes ($e->($t)), arithmetic (+, -, *, neg),
+      and descriptive stringification
+    - Storable support: safe freeze, thaw, and dclone
+    - Comprehensive example suite (120 examples) covering audio synthesis & DSP,
+      psychoacoustics, 3D raymarching, laser art, cymatics, physics, kinematics,
+      robotics, aerospace, and multi-dimensional envelopes
+
+0.02  2013-02-23
+    - fix default morpher and border levels for random generator
+
+0.01  2012-07-26
+    - fixing POD and tests
+

@@ -1,5 +1,11 @@
 Revision history for Punk
 
+0.54    2026-09-22
+        - FIX: robots.txt carried the `*` group alone, and AdsBot-Google,
+          AdsBot-Google-Mobile and Mediapartners-Google ignore it.
+        - ADDS: Punk::Plugin::Sitemap `agents`, the user agents the disallow
+          list is repeated for.
+
 0.53    2026-09-20
         - Requires Hyperman 0.51. A worker that could not claim a wakeup
           descriptor installed no watch and never read the bus again, so

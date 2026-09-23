@@ -1,0 +1,6 @@
+[
+  { "entry": "first",  "number": "1st" },
+  { "entry": "second", "number": "2nd" },
+  { "entry": "third",  "number": "3rd" },
+  { "entry": "5.42.3", "perl":   "5.42.3" }
+]

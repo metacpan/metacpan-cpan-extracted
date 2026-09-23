@@ -1,0 +1,65 @@
+@page {
+	size: A4 portrait;
+	margin: 8mm;
+}
+
+body {
+	background: white;
+	color: black;
+	font-family: monospace;
+	font-size: 7pt;
+	margin: 0;
+}
+
+section {
+	break-after: page;
+	page-break-after: always;
+}
+
+section:last-of-type {
+	break-after: auto;
+	page-break-after: auto;
+}
+
+h1 {
+	font-size: 11pt;
+	margin: 0 0 2mm 0;
+}
+
+ul {
+	margin: 0 0 3mm 0;
+	padding-left: 6mm;
+}
+
+table {
+	border-collapse: collapse;
+	margin: 0 0 3mm 0;
+	width: 100%;
+}
+
+caption {
+	color: #806000;
+	font-size: 9pt;
+	font-weight: bold;
+	text-align: left;
+}
+
+th,
+td {
+	border: 1px solid #000000;
+	padding: 0.4mm 0.8mm;
+	text-align: left;
+	white-space: nowrap;
+}
+
+tr:first-of-type th {
+	color: #b00000;
+}
+
+th:first-child {
+	color: #0000b0;
+}
+
+footer {
+	font-size: 6pt;
+}

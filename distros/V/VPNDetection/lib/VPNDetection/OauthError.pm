@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'VPNDetection::Error';
 
-our $VERSION = '3.3.1';
+our $VERSION = '3.3.2';
 
 # The authorization server refused an OAuth request, with the reason it gave.
 # `kind` follows the status like any other failure's. Never retryable: every
@@ -43,7 +43,7 @@ use strict;
 use warnings;
 
 our @ISA = ('VPNDetection::OauthError');
-our $VERSION = '3.3.1';
+our $VERSION = '3.3.2';
 
 package VPNDetection::OauthExpiredTokenError;
 
@@ -51,7 +51,7 @@ use strict;
 use warnings;
 
 our @ISA = ('VPNDetection::OauthError');
-our $VERSION = '3.3.1';
+our $VERSION = '3.3.2';
 
 1;
 
