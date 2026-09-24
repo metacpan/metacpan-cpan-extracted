@@ -1,24 +1,39 @@
 TYPEMAP
 int64_t		T_I64
 uint64_t	T_U64
-EV::Etcd	T_PTROBJ
-EV::Etcd::Watch	T_PTROBJ
-EV::Etcd::Keepalive	T_PTROBJ
-EV::Etcd::Observe	T_PTROBJ
+EV::Etcd	T_ETCD_CLIENT
+EV::Etcd::Watch	T_ETCD_STREAM
+EV::Etcd::Keepalive	T_ETCD_STREAM
+EV::Etcd::Observe	T_ETCD_STREAM
 
 INPUT
-T_PTROBJ
+T_ETCD_CLIENT
     if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\")) {
         IV tmp = SvIV((SV*)SvRV($arg));
         $var = INT2PTR($type, tmp);
     } else {
         croak(\"$var is not of type ${ntype}\");
     }
+    if (!$var)
+        croak(\"EV::Etcd: client already destroyed\");
+    croak_if_forked(aTHX_ $var->owner_pid);
+T_ETCD_STREAM
+    if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type, tmp);
+    } else {
+        croak(\"$var is not of type ${ntype}\");
+    }
+    if (!$var)
+        croak(\"${ntype}: handle already destroyed\");
+    croak_if_forked(aTHX_ $var->base.owner_pid);
 T_I64
     $var = SvI64($arg);
 T_U64
     $var = SvU64($arg);
 
 OUTPUT
-T_PTROBJ
+T_ETCD_CLIENT
+    sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+T_ETCD_STREAM
     sv_setref_pv($arg, \"${ntype}\", (void*)$var);

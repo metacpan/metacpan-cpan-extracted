@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.116';
+our $VERSION = '0.117';
 
 use Carp qw(croak);
 use POSIX qw(ceil isfinite);

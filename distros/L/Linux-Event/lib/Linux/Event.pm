@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.116';
+our $VERSION = '0.117';
 
 1;
 
@@ -11,7 +11,7 @@ __END__
 
 =head1 NAME
 
-Linux::Event - Linux-native reactor, I/O, and kernel event facilities
+Linux::Event - Fast event-driven programming for Linux
 
 =head1 SYNOPSIS
 
@@ -24,10 +24,12 @@ Linux::Event - Linux-native reactor, I/O, and kernel event facilities
       loop => $loop,
       host => '127.0.0.1',
       port => 9999,
-      on_data => sub ($stream, $bytes) {
+
+      on_data => sub ($self, $bytes) {
           print $bytes;
       },
-      on_error => sub ($stream, $error) {
+
+      on_error => sub ($self, $error) {
           warn "$error\n";
           $loop->stop;
       },
@@ -37,252 +39,405 @@ Linux::Event - Linux-native reactor, I/O, and kernel event facilities
 
 =head1 DESCRIPTION
 
-Linux::Event is a Linux-only asynchronous I/O distribution built around an
-XS-first epoll reactor. Its public resource model is divided into two semantic
-namespaces:
+Linux::Event is a Linux-only event system for Perl.
+
+It lets one program efficiently handle many things at the same time, such as:
 
 =over 4
 
-=item * L<Linux::Event::IO>
+=item *
 
-Application data I/O. Applications select a concrete leaf for the Linux
-facility they are using, such as a pipe, terminal, stream socket, listener, or
-datagram socket.
+network connections
 
-=item * L<Linux::Event::Kernel>
+=item *
 
-Kernel notification and state facilities such as timers, signals, eventfd
-notifications, and process lifecycle handling.
+listening servers
 
-=back
+=item *
 
-C<Linux::Event::IO> and C<Linux::Event::Kernel> are namespace categories, not
-generic objects and not public subclassing bases. Public classes are concrete
-semantic leaves. Shared buffering, framing, socket, descriptor, and lifecycle
-machinery remains private implementation detail.
+timers
 
-Every attachable resource accepts C<loop =E<gt> $loop> where supported. A
-resource may instead be constructed unattached and passed to
-C<< $loop->add($object) >>. Low-level descriptor readiness remains available
-directly from L<Linux::Event::Loop>.
+=item *
 
-=head1 CALLBACKS, SUBCLASSING, AND TUNING
+signals
 
-Public resources accept constructor callback coderefs, so an application can
-use the concrete leaf directly and capture ordinary lexical state. A
-constructor callback is resolved once per object and overrides a same-named
-subclass method.
+=item *
 
-Subclassing is a complementary performance and organization feature, not a
-requirement imposed merely to obtain a callback. A protocol subclass can
-declare native L<Linux::Event::Framer> policy, L<Linux::Event::TLS> policy,
-socket configuration, and C<stream_tuning>, C<datagram_options>, or
-C<process_options> tuning once for every instance. Named callbacks and class
-policy are validated and cached once per subclass rather than rediscovered on
-each readiness event.
+child processes
 
-The common pattern is therefore to put reusable protocol, transport, and
-tuning policy in a subclass while supplying closures for per-instance lexical
-state. Raw resources with no reusable class policy can be constructed directly.
+=item *
 
-=head1 I/O MODULES
+pipes and terminals
 
-=over 4
+=item *
 
-=item * L<Linux::Event::IO::Pipe>
+filesystem changes
 
-Ordered byte I/O for anonymous pipes, FIFOs, and child-process pipe handles.
-It may be read-only, write-only, or use separate read and write pipe handles.
+=item *
 
-=item * L<Linux::Event::IO::TTY>
-
-Ordered byte I/O for terminals and pseudo-terminals. The class validates that
-its configured handles are terminal devices.
-
-=item * L<Linux::Event::IO::Sock::Stream>
-
-Connected C<SOCK_STREAM> sockets. IPv4, IPv6, and Unix-domain sockets use the
-same leaf; address family is configuration rather than a different class.
-This leaf owns outbound C<connect>, socket options, addresses, kernel
-half-close behavior, buffering, framing, backpressure, and optional TLS.
-
-=item * L<Linux::Event::IO::Sock::Listener>
-
-Listening C<SOCK_STREAM> sockets for TCP and Unix-domain endpoints. Accepted
-connections are constructed as a chosen C<Linux::Event::IO::Sock::Stream>
-class.
-
-=item * L<Linux::Event::IO::Sock::Dgram>
-
-C<SOCK_DGRAM> sockets preserving packet boundaries and peer addresses for UDP
-and Unix-domain datagrams.
+application-generated events
 
 =back
 
-=head1 KERNEL MODULES
+The central object is a L<Linux::Event::Loop>.
 
-=over 4
+You create resources, such as a socket or timer, add them to the loop, and tell
+them what Perl code to call when something happens.
 
-=item * L<Linux::Event::Kernel::Timer>
+The loop then waits for events and dispatches them as they occur.
 
-One-shot and recurring monotonic timers with constructor or subclass callbacks.
+A typical Linux::Event program therefore follows this pattern:
 
-=item * L<Linux::Event::Kernel::Signal>
+  my $loop = Linux::Event::Loop->new;
 
-Signalfd subscriptions with constructor or subclass callbacks and native fan-out.
+  # Create sockets, timers, processes, etc.
 
-=item * L<Linux::Event::Kernel::Event>
+  $loop->run;
 
-Eventfd-backed notifications. Foreign threads or forked children can signal a
-registered object without transferring Perl callbacks or Perl values.
+Linux::Event is built specifically for Linux and uses Linux facilities such as
+epoll, timerfd, signalfd, eventfd, pidfd, and inotify.
 
-=item * L<Linux::Event::Kernel::Process>
+You normally do not need to work with those Linux interfaces directly.
+Linux::Event wraps them in Perl objects.
 
-Pidfd lifecycle notification, native process spawning, decoded exit status,
-signals, and asynchronous standard I/O.
+=head1 THE EVENT LOOP
 
-=back
+The L<Linux::Event::Loop> is the heart of a Linux::Event application.
 
-=head1 SUPPORTING MODULES
+A resource can usually be attached to a loop when it is created:
 
-=over 4
-
-=item * L<Linux::Event::Loop>
-
-XS-first epoll reactor, native descriptor registry, query-driven introspection,
-and optional profiling.
-
-=item * L<Linux::Event::Framer>
-
-Declarative native framing for ordered-byte I/O subclasses. Framing applies to
-pipe, TTY, and C<SOCK_STREAM> leaves because it is a byte-stream behavior, not
-a socket-specific feature.
-
-=item * L<Linux::Event::TLS>
-
-Declarative OpenSSL TLS policy for C<Linux::Event::IO::Sock::Stream>
-subclasses.
-
-=item * L<Linux::Event::Error>
-
-Structured errors shared by I/O, process, connection, and transport paths.
-
-=item * L<Linux::Event::Address>
-
-Lazy IPv4, IPv6, and Unix socket-address values.
-
-=back
-
-=head1 ORDERED-BYTE CALLBACK MODEL
-
-C<Linux::Event::IO::Pipe>, C<Linux::Event::IO::TTY>, and
-C<Linux::Event::IO::Sock::Stream> support both subclass methods and
-constructor-supplied coderefs for application callbacks. Constructor callbacks
-are ordinary Perl closures and may capture lexical application state. They
-override same-named class methods for that object.
-
-The ordered-byte callback names are C<on_data>, C<on_message>, C<on_messages>,
-C<on_ready>, C<on_transport_ready>, C<on_drain>, C<on_eof>, C<on_error>, and
-C<on_close>. C<IO::Sock::Stream-E<gt>connect()> accepts the same callback set as
-C<new()>.
-
-Subclassing is therefore not required merely to obtain callback scope. A raw
-stream socket, Pipe, or TTY can be used directly when no class-level protocol
-policy is needed. Class declarations remain the correct place for reusable
-policy such as C<stream_tuning()>, a L<Linux::Event::Framer> declaration,
-socket policy, or L<Linux::Event::TLS> policy.
-
-For example, framing remains class policy while message handling may be a
-constructor closure:
-
-  package LineProtocol;
-  use parent 'Linux::Event::IO::Sock::Stream';
-  use Linux::Event::Framer 'Delimiter', "\n";
-
-  package main;
-  my $connection = LineProtocol->new(
-      fh => $socket,
-      on_message => sub ($stream, $message) {
-          process_message($message);
+  my $timer = Linux::Event::Kernel::Timer->new(
+      loop => $loop,
+      after => 2,
+      on_timer => sub ($self) {
+          say "Two seconds have passed";
       },
   );
 
-The effective input callback is selected during construction and retained as
-one cached CV in native ordered-byte state. Steady-state input does not perform
-method lookup, object-hash callback lookup, or a method-versus-closure branch.
+or it can be created first and added later:
 
-A L<Linux::Event::IO::Sock::Listener> can provide the same ordered-byte
-callback options as templates for all accepted Streams. One supplied callback
-CV is reused for the accepted connections; the Listener's own C<on_accept> and
-Listener-error policy remain Listener subclass methods.
+  my $timer = Linux::Event::Kernel::Timer->new(
+      after => 2,
+      on_timer => sub ($self) {
+          say "Two seconds have passed";
+      },
+  );
 
-See F<docs/FIRST-CLASS-STREAM-CALLBACKS.md> for the full callback, precedence,
-transition, and Listener-sharing contract.
+  $loop->add($timer);
 
-=head1 PUBLIC MODEL
+Once the resources are ready, run the loop:
 
-Applications use the concrete leaf that describes the resource. Raw
-ordered-byte leaves can be constructed directly with callback coderefs; a
-subclass holds reusable framing, tuning, socket/TLS policy, or method callbacks.
+  $loop->run;
+
+The loop waits until something needs attention and then calls the appropriate
+callback.
+
+=head1 CALLBACKS
+
+Most Linux::Event resources accept callbacks in their constructors.
+
 For example:
 
-  package Protocol;
+  my $timer = Linux::Event::Kernel::Timer->new(
+      loop => $loop,
+      after => 1,
+      on_timer => sub ($self) {
+          say "Timer fired";
+      },
+  );
+
+Callbacks are ordinary Perl coderefs, so they can use lexical variables from
+the surrounding program:
+
+  my $count = 0;
+
+  my $timer = Linux::Event::Kernel::Timer->new(
+      loop => $loop,
+      after => 1,
+      on_timer => sub ($self) {
+          $count++;
+          say "Count is now $count";
+      },
+  );
+
+Many resource classes can also be subclassed and callbacks can be implemented
+as methods.
+
+Constructor callbacks are usually the simplest choice for small programs.
+Subclassing becomes useful when you want to reuse the same behavior or
+configuration for many objects.
+
+=head1 I/O
+
+Modules under C<Linux::Event::IO> represent resources used to move application
+data.
+
+=head2 Stream sockets
+
+L<Linux::Event::IO::Sock::Stream> represents a connected stream socket.
+
+It can be used for TCP, Unix-domain stream sockets, clients, and accepted
+server connections.
+
+For example:
+
+  my $client = Linux::Event::IO::Sock::Stream->connect(
+      loop => $loop,
+      host => 'example.com',
+      port => 80,
+
+      on_ready => sub ($self) {
+          $self->send("GET / HTTP/1.0\r\n\r\n");
+      },
+
+      on_data => sub ($self, $bytes) {
+          print $bytes;
+      },
+  );
+
+=head2 Listeners
+
+L<Linux::Event::IO::Sock::Listener> listens for incoming stream connections.
+
+A Listener creates a Stream for each accepted connection.
+
+=head2 Datagram sockets
+
+L<Linux::Event::IO::Sock::Dgram> provides datagram sockets, including UDP and
+Unix-domain datagrams.
+
+Unlike a Stream, each received datagram remains a separate message.
+
+=head2 Pipes
+
+L<Linux::Event::IO::Pipe> provides asynchronous byte I/O for pipes and FIFOs.
+
+It can also be used with pipes connected to child processes.
+
+=head2 Terminals
+
+L<Linux::Event::IO::TTY> provides asynchronous I/O for terminals and
+pseudo-terminals.
+
+=head1 KERNEL EVENTS
+
+Modules under C<Linux::Event::Kernel> represent notifications and services
+provided by the Linux kernel.
+
+=head2 Timers
+
+L<Linux::Event::Kernel::Timer> provides one-shot and repeating timers.
+
+=head2 Signals
+
+L<Linux::Event::Kernel::Signal> lets the event loop respond to Unix signals
+without traditional asynchronous Perl signal handlers.
+
+=head2 Processes
+
+L<Linux::Event::Kernel::Process> can start and monitor child processes.
+
+It can also connect their standard input, output, and error streams to the
+event loop.
+
+=head2 Filesystem changes
+
+L<Linux::Event::Kernel::Inotify> watches files and directories for changes.
+
+For example, an application can be notified when a file is modified, created,
+deleted, renamed, or moved.
+
+=head2 Application events
+
+L<Linux::Event::Kernel::Event> provides eventfd-backed notifications.
+
+It is useful when another thread or process needs to wake the event loop.
+
+=head1 STREAMS AND MESSAGES
+
+L<Linux::Event::IO::Sock::Stream>, L<Linux::Event::IO::Pipe>, and
+L<Linux::Event::IO::TTY> all work with ordered streams of bytes.
+
+For raw byte-oriented protocols, use C<on_data>:
+
+  on_data => sub ($self, $bytes) {
+      ...
+  }
+
+Linux::Event can also split an incoming byte stream into complete messages
+before calling your application.
+
+This is called framing.
+
+For example, a line-oriented protocol can declare that every newline ends a
+message:
+
+  package LineProtocol;
+
   use parent 'Linux::Event::IO::Sock::Stream';
   use Linux::Event::Framer 'Delimiter', "\n";
 
   sub on_message ($self, $message) {
-      $self->send($message);
+      say "Received: $message";
   }
 
-The same class method can be overridden for one object while retaining lexical
-state:
+See L<Linux::Event::Framer> for the available framing methods.
 
-  my $stream = Protocol->new(
-      fh         => $connected_socket,
-      on_message => sub ($stream, $message) {
-          store_message($database, $message);
-          $stream->send($message);
+=head1 TLS
+
+L<Linux::Event::TLS> adds TLS support to
+L<Linux::Event::IO::Sock::Stream> subclasses.
+
+TLS policy is normally declared once in a Stream subclass so every instance of
+that class uses the same TLS configuration.
+
+=head1 SUBCLASSING
+
+You do not need to create a subclass merely to use Linux::Event.
+
+For many programs, constructor callbacks are enough:
+
+  my $stream = Linux::Event::IO::Sock::Stream->new(
+      fh => $socket,
+
+      on_data => sub ($self, $bytes) {
+          ...
       },
   );
 
-Raw C<IO::Sock::Stream>, C<IO::Pipe>, and C<IO::TTY> objects similarly accept
-C<on_data>. Ordered-byte lifecycle callbacks can also be supplied to the
-constructor. See L<Linux::Event::IO::Sock::Stream> and
-F<docs/FIRST-CLASS-STREAM-CALLBACKS.md> for the complete callback matrix.
+Subclassing is useful when many objects should share the same behavior or
+configuration.
 
-A listener then uses that completed stream-socket class in its generated-Stream
-recipe:
+For example:
 
-  my $listener = Linux::Event::IO::Sock::Listener->new(
-      loop => $loop,
-      host => '0.0.0.0',
-      port => 9999,
-      stream => {
-          class      => 'Protocol',
-          on_message => sub ($stream, $message) {
-              $stream->send($message);
-          },
+  package ChatConnection;
+
+  use parent 'Linux::Event::IO::Sock::Stream';
+  use Linux::Event::Framer 'Delimiter', "\n";
+
+  sub on_message ($self, $message) {
+      ...
+  }
+
+A subclass can define reusable callbacks, framing, TLS configuration, socket
+settings, and performance tuning.
+
+Constructor callbacks can still be supplied for individual objects when
+per-object behavior is needed.
+
+=head1 DEFERRED WORK
+
+The event loop can schedule a callback to run after the current work has
+finished:
+
+  $loop->defer(sub {
+      say "This runs shortly, but not recursively inside the current callback";
+  });
+
+This is useful when work should happen soon but should not interrupt the
+callback that is currently running.
+
+See L<Linux::Event::Loop> for details.
+
+=head1 FORKING
+
+Linux::Event provides a loop-aware fork operation for applications that need
+to create child processes while Linux::Event resources already exist.
+
+  my $pid = $loop->fork(
+      share => [ $listener ],
+      move  => [ $stream ],
+      clone => [ $timer ],
+  );
+
+The disposition of a resource determines whether it remains usable in the
+parent, child, or both.
+
+Not every resource supports every disposition.
+
+See L<Linux::Event::Loop> for the complete fork rules before using this
+feature.
+
+=head1 LOW-LEVEL DESCRIPTOR WATCHING
+
+Most applications should use the resource classes described above.
+
+When necessary, L<Linux::Event::Loop> can also watch a file descriptor
+directly:
+
+  my $watch = $loop->watch(
+      fd   => $fd,
+      read => sub {
+          ...
       },
   );
 
-The category names C<IO> and C<Kernel> do not imply a Perl inheritance tree.
-Likewise, implementation sharing does not make private machinery part of the
-public API. The public name identifies the final semantic resource; internal
-layers may be reorganized without changing that leaf.
+This provides direct access to descriptor readiness without requiring a
+higher-level Linux::Event resource object.
 
-C<< $loop->watch(fd =E<gt> $fd, read =E<gt> $callback) >> remains available
-for direct descriptor readiness. It returns an opaque native registration
-handle with operations such as C<cancel>, C<enable_read>, and
-C<disable_write>. That registration is not a named public subclassing class.
+=head1 OTHER USEFUL MODULES
+
+=head2 Linux::Event::Address
+
+L<Linux::Event::Address> represents IPv4, IPv6, and Unix-domain socket
+addresses.
+
+=head2 Linux::Event::Error
+
+L<Linux::Event::Error> provides structured error objects used throughout the
+distribution.
+
+=head2 Linux::Event::Framer
+
+L<Linux::Event::Framer> turns an incoming byte stream into complete messages.
+
+=head2 Linux::Event::TLS
+
+L<Linux::Event::TLS> provides TLS configuration for Stream subclasses.
+
+=head1 WHERE TO START
+
+If you are new to Linux::Event, the most useful modules to read next are:
+
+=over 4
+
+=item 1.
+
+L<Linux::Event::Loop> - creating and running the event loop
+
+=item 2.
+
+L<Linux::Event::IO::Sock::Stream> - connected network sockets
+
+=item 3.
+
+L<Linux::Event::IO::Sock::Listener> - accepting network connections
+
+=item 4.
+
+L<Linux::Event::Kernel::Timer> - scheduling work in the future
+
+=item 5.
+
+L<Linux::Event::Kernel::Process> - running child processes
+
+=back
+
+The other modules can then be learned as your application needs them.
 
 =head1 PLATFORM
 
-Linux only. Building the complete distribution requires Linux headers with
-pidfd syscall definitions, a Linux 5.4 or newer runtime for pidfd status,
-a libc providing C<posix_spawn_file_actions_addchdir_np>, and OpenSSL 1.1.1 or
-newer development files. Perl ithreads are not required. Configuration on an
-unsupported operating system exits with an C<OS unsupported> result so
-automated smoke systems can classify the distribution as not applicable.
+Linux::Event runs only on Linux.
+
+The distribution requires Perl 5.36 or newer.
+
+Building the complete distribution also requires suitable Linux headers, a C
+compiler, OpenSSL development files, and Linux facilities used by the
+individual resource classes.
+
+A Linux 5.4 or newer runtime is required for pidfd process support.
+
+Perl ithreads are not required.
 
 =head1 LICENSE
 

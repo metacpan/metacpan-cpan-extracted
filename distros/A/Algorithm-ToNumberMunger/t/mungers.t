@@ -19,7 +19,7 @@ is_deeply(
 			conditional_access_result_enum count datetime dhcp_msgtype_enum
 			dict_enum dkim_result_enum dmarc_result_enum dns_qtype_enum
 			dns_rcode_enum entropy enum eps flow_reason_enum flow_state_enum
-			frozen_freq_map ftp_enum gemini_enum hash http_enum http_method_enum
+			frozen_freq_map ftp_enum gemini_enum geoip_country hash http_enum http_method_enum
 			http_version_enum ip_class ip_proto_enum kerberos_etype_enum length
 			log match mgcp_enum ngram nntp_enum num postfix_status_enum quantile
 			ratio risk_level_enum risk_state_enum rspamd_action_enum rtsp_enum

@@ -26,7 +26,10 @@ for my $file (sort @pod_file) {
     close $fh;
     next if $source !~ /^=head1 SYNOPSIS\s*\n(.*?)(?=^=head1\s)/ms;
 
-    my $synopsis = $1;
+    # SYNOPSIS may interleave prose with verbatim Perl paragraphs.
+    my $synopsis = join "\n\n", grep { /\A[ \t]+\S/ }
+        split /\n[ \t]*\n/, $1;
+    ok(length($synopsis), "$file SYNOPSIS contains Perl examples");
     $synopsis =~ s/^  //mg;
     $synopsis =~ s/\A\s+|\s+\z//g;
     $synopsis = "use v5.36;\n$synopsis\n";
@@ -48,8 +51,7 @@ for my $file (sort @pod_file) {
     is($status, 0, "$name SYNOPSIS compiles")
         or diag("Extracted SYNOPSIS:\n$synopsis\n$stdout$stderr");
 
-    if (!$status && ($name eq 'lib/Linux/Event/IO/Pipe.pm'
-        || $name eq 'lib/Linux/Event/IO/Sock/Stream.pm')) {
+    if (!$status && $name eq 'lib/Linux/Event/IO/Pipe.pm') {
         my $run_error = gensym;
         my $run_pid = open3(undef, my $run_output, $run_error,
             $^X, "-I$root/blib/lib", "-I$root/blib/arch", $path);
@@ -58,7 +60,7 @@ for my $file (sort @pod_file) {
         waitpid($run_pid, 0);
         is($? >> 8, 0, "$name SYNOPSIS runs")
             or diag($run_stdout . $run_stderr);
-        like($run_stdout, qr/^received: hello\n\z/,
+        like($run_stdout, qr/^Received: hello\n\z/,
             "$name SYNOPSIS produces the documented result");
     }
 }

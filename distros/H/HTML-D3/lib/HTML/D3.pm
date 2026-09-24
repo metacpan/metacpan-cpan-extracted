@@ -19,11 +19,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =head1 SYNOPSIS
 
@@ -84,6 +84,12 @@ Accepts the following optional arguments:
 
 =item * C<title> - The title of the chart (default: 'Chart').
 
+=item * C<responsive> - If true, SVG elements are rendered with
+C<viewBox> and C<width="100%" height="auto"> instead of fixed pixel
+dimensions, so the chart scales fluidly with its container.
+For snippet methods the per-call C<< opts => { responsive => 1 } >>
+takes precedence over this object-level setting (default: 0).
+
 =back
 
 =cut
@@ -106,6 +112,9 @@ sub new
 			}, title => {
 				type => 'string',
 				optional => 1,
+			}, responsive => {
+				type => 'boolean',
+				optional => 1,
 			}
 		}
 	});
@@ -125,9 +134,10 @@ sub new
 	$params = Object::Configure::configure($class, $params);
 
 	return bless {
-		width  => $params->{width}  || 800,
-		height => $params->{height} || 600,
-		title  => $params->{title}  || 'Chart',
+		width      => $params->{width}  || 800,
+		height     => $params->{height} || 600,
+		title      => $params->{title}  || 'Chart',
+		responsive => $params->{responsive} || 0,
 	}, $class;
 }
 
@@ -155,10 +165,6 @@ Returns a string containing the HTML and JavaScript code for the chart.
 =item * Throws C<Data must be an array of arrays> when C<$data> is not an ARRAY reference.
 
 =back
-
-=head3 Side Effects
-
-None.
 
 =head3 API SPECIFICATION
 
@@ -201,7 +207,7 @@ sub render_bar_chart {
 	$html .= <<"HTML";
 <body>
     <h1 style="text-align: center;">$self->{title}</h1>
-    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
 
@@ -282,10 +288,6 @@ Returns a string containing the complete HTML5 document.
 
 =back
 
-=head3 Side Effects
-
-None.
-
 =head3 API SPECIFICATION
 
 =head4 Input
@@ -319,7 +321,7 @@ sub render_animated_bar_chart {
 	$html .= <<"HTML";
 <body>
     <h1 style="text-align: center;">$self->{title}</h1>
-    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
 
@@ -397,10 +399,6 @@ Returns a string containing the HTML and JavaScript code for the chart.
 
 =back
 
-=head3 Side Effects
-
-None.
-
 =head3 API SPECIFICATION
 
 =head4 Input
@@ -435,7 +433,7 @@ sub render_line_chart {
 	$html .= <<"HTML";
 <body>
     <h1 style="text-align: center;">$self->{title}</h1>
-    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
 
@@ -521,10 +519,6 @@ Returns a string containing the complete HTML5 document.
 
 =back
 
-=head3 Side Effects
-
-None.
-
 =head3 API SPECIFICATION
 
 =head4 Input
@@ -558,7 +552,7 @@ sub render_animated_line_chart {
 	$html .= <<"HTML";
 <body>
     <h1 style="text-align: center;">$self->{title}</h1>
-    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
 
@@ -670,10 +664,6 @@ Returns a string containing the complete HTML5 document.
 
 =back
 
-=head3 Side Effects
-
-None.
-
 =head3 API SPECIFICATION
 
 =head4 Input
@@ -717,7 +707,7 @@ sub render_pie_chart {
 	$html .= <<"HTML";
 <body>
     <h1 style="text-align: center;">$self->{title}</h1>
-    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
 
@@ -831,10 +821,6 @@ Returns a string containing the complete HTML5 document.
 
 =back
 
-=head3 Side Effects
-
-None.
-
 =head3 API SPECIFICATION
 
 =head4 Input
@@ -877,7 +863,7 @@ sub render_animated_pie_chart {
 	$html .= <<"HTML";
 <body>
     <h1 style="text-align: center;">$self->{title}</h1>
-    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <script>
 	const data = $json_data;
 
@@ -1020,10 +1006,6 @@ C<Label / 12.34 (42.0%)>, C<':'> produces C<Label : 12.34 (42.0%)>).
 
 =back
 
-=head3 Side Effects
-
-None.
-
 =head3 API SPECIFICATION
 
 =head4 Input
@@ -1093,12 +1075,15 @@ sub render_pie_chart_snippet {
 
 	my $json_data = $_JSON->encode(\@slices);
 
-	my $svg_id   = 'pie_chart';
-	my $tip_id   = 'pie_chart_tip';
-	my $leg_id   = 'pie_chart_legend';
-	my $wrap_id  = 'pie_chart_wrap';
+	my $svg_id   = $opts->{id} // 'pie_chart';
+	my $tip_id   = $svg_id . '_tip';
+	my $leg_id   = $svg_id . '_legend';
+	my $wrap_id  = $svg_id . '_wrap';
 	my $width    = $self->{width};
 	my $height   = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		: qq{width="$width" height="$height"};
 
 	my $inner_radius_js = $donut ? 'radius * 0.38' : '0';
 
@@ -1207,11 +1192,15 @@ LEGEND_JS
     }
 </style>
 <div id="$wrap_id">
-    <svg id="$svg_id" width="$width" height="$height"></svg>
+    <svg id="$svg_id" $svg_attrs></svg>
 $legend_div_html</div>
 <div class="bi-pie-tooltip" id="$tip_id"></div>
 <script>
     const data = $json_data;
+
+    function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
 
     const SCHEMES = {
         tableau10:  d3.schemeTableau10,
@@ -1257,11 +1246,11 @@ $legend_div_html</div>
         .attr("data-value", d => d.data.value)
         .on("mouseover", function(event, d) {
             const pct = (d.data.value / total * 100).toFixed(1);
-            let tip = "<b>" + d.data.label + "<\\/b><br>" +
+            let tip = "<b>" + esc(d.data.label) + "<\\/b><br>" +
                       fmt(d.data.value) + " (" + pct + "%)";
             if (d.data.extra) {
                 Object.entries(d.data.extra).forEach(([k, v]) => {
-                    tip += "<br>" + k + ": " + v;
+                    tip += "<br>" + esc(k) + ": " + esc(v);
                 });
             }
             tooltip.html(tip)
@@ -1315,10 +1304,15 @@ colour scheme.  Supported: C<YlOrRd>, C<Blues>, C<Greens>, C<Purples>,
 C<RdPu>, C<YlGnBu>.
 
 =item * C<x_label> (string, default C<''>) - Axis title below the X axis.
+The value is JavaScript-escaped (backslash, double-quote, newline, carriage
+return) before being embedded in the page; other characters are taken
+literally.
 
 =item * C<y_label> (string, default C<''>) - Axis title left of the Y axis.
+Same JS-escaping as C<x_label> applies.
 
 =item * C<val_label> (string, default C<'Value'>) - Tooltip value label.
+Same JS-escaping as C<x_label> applies.
 
 =item * C<show_values> (bool, default 0) - Print value inside each cell.
 Auto-suppressed when any cell is narrower than 28 px.
@@ -1438,11 +1432,14 @@ sub render_heatmap_snippet {
 		$s
 	} ($x_label, $y_label, $val_label);
 
-	my $svg_id = 'heatmap';
-	my $tip_id = 'heatmap_tip';
+	my $svg_id = $opts->{id} // 'heatmap';
+	my $tip_id = $svg_id . '_tip';
 
 	my $width  = $self->{width};
 	my $height = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		: qq{width="$width" height="$height"};
 
 	my $margin_top    = 30;
 	my $margin_right  = $legend ? 65 : 20;
@@ -1513,7 +1510,7 @@ LEGBLOCK
 	dominant-baseline: middle;
     }
 </style>
-<svg id="$svg_id" width="$width" height="$height"></svg>
+<svg id="$svg_id" $svg_attrs></svg>
 <div id="$tip_id"></div>
 <script>
 (function() {
@@ -1626,6 +1623,459 @@ HTML
 	return { svg_id => $svg_id, html => $html };
 }
 
+=head2 render_bar_chart_snippet
+
+    my $result = $chart->render_bar_chart_snippet(\@bars);
+    my $result = $chart->render_bar_chart_snippet(\@bars, \%opts);
+
+Generates an embeddable D3.js v7 bar chart fragment.  Returns a hashref
+C<{ svg_id =E<gt> 'bar_chart', html =E<gt> $str }> where C<$str> is a
+self-contained HTML fragment (no page shell, no D3 CDN tag) that the caller
+embeds directly after loading D3.js.  C<$str> is a Perl character string
+with the UTF-8 flag set (or pure ASCII when all labels are ASCII).
+
+Each element of C<\@bars> is an array reference:
+
+    [ $label, $value ]
+    [ $label, $value, \%extra ]
+
+C<$label> is the category name (string); C<$value> is a non-negative number
+(negative values are silently converted to their absolute value); the optional
+C<\%extra> hashref supplies additional key/value pairs shown in the hover
+tooltip.  Data points with an undefined C<$value> are silently skipped.
+
+=head3 Options (C<\%opts>)
+
+=over 4
+
+=item C<orientation> (string, default C<'vertical'>)
+
+C<'vertical'> draws bars rising from a horizontal category axis.
+C<'horizontal'> draws bars extending from a vertical category axis.
+
+=item C<sort_bars> (string, default C<'none'>)
+
+Sort order applied before rendering: C<'value'> sorts descending by bar
+height, C<'label'> sorts ascending alphabetically, C<'none'> preserves the
+input order.
+
+=item C<max_bars> (integer, default C<0>)
+
+When non-zero, only the first C<max_bars> entries (after any sort) are
+rendered; the remaining entries are collapsed into a single C<Other> bar
+whose value equals their sum.  Zero means no limit.
+
+=item C<color> (string, default C<'steelblue'>)
+
+Either a CSS colour value (e.g. C<'steelblue'>, C<'#4e79a7'>) applied to all
+bars, or the special token C<'categorical'>, which colours each bar
+distinctively using D3's Tableau-10 palette.
+
+=item C<show_values> (bool, default C<0>)
+
+When true, the numeric value of each bar is printed above vertical bars or
+to the right of horizontal bars.
+
+=item C<animated> (bool, default C<0>)
+
+When true, bars grow from the baseline on page load: vertical bars rise from
+the bottom; horizontal bars extend from the left.  An 800 ms D3 transition
+with a per-bar stagger up to 100 ms is used.  The animation is suppressed
+when C<prefers-reduced-motion> is set in the viewer's OS.
+
+=item C<value_label> (string, default C<'Value'>)
+
+Label shown in the hover tooltip before the numeric value.  The value is
+JavaScript-escaped before being embedded in the page.
+
+=item C<x_label> (string, default C<''>)
+
+When non-empty, a text label is rendered below the bottom axis.  The value
+is JavaScript-escaped before being embedded in the page.
+
+=back
+
+=head3 Errors
+
+=over 4
+
+=item * Throws C<Data must be an array of arrays> when C<$data> is not an
+ARRAY reference.
+
+=item * Throws C<Each data point must be an array reference> when an element
+is not an array reference.
+
+=item * Throws C<Each data point must have at least 2 elements> when an
+element has fewer than 2 items.
+
+=item * Throws C<Value must be numeric> when a C<$value> is not a number.
+
+=item * Throws C<orientation must be 'vertical' or 'horizontal'> on an
+invalid orientation value.
+
+=item * Throws C<sort_bars must be 'value', 'label', or 'none'> on an
+invalid sort_bars value.
+
+=back
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    {
+        data => { type => 'arrayref' },
+        opts => { type => 'hashref', optional => 1 },
+	orientation => { type => 'string', memberof => [ 'vertical', 'horizontal' ], optional => 1 },
+	sort_bars => { type => 'string', memberof => [ 'value', 'label', 'none' ], optional => 1 }
+    }
+
+    Each element of C<$data>: C<[ Str, Num ]> or C<[ Str, Num, HashRef ]>;
+    undef C<$value> silently skipped; negative C<$value> becomes positive.
+
+=head4 Output
+
+    HashRef -- { svg_id => 'bar_chart', html => Str }
+    html is a Perl character string (UTF-8 flag set, or pure ASCII).
+
+=cut
+
+sub render_bar_chart_snippet {
+	my ($self, $data, $opts) = @_;
+	$opts //= {};
+
+	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+
+	my $orientation = $opts->{orientation} // 'vertical';
+	die "orientation must be 'vertical' or 'horizontal'"
+		unless $orientation eq 'vertical' || $orientation eq 'horizontal';
+
+	my $sort_bars = $opts->{sort_bars} // 'none';
+	die "sort_bars must be 'value', 'label', or 'none'"
+		unless grep { $sort_bars eq $_ } qw(value label none);
+
+	my $max_bars    = int($opts->{max_bars} // 0);
+	my $color       = $opts->{color}       // 'steelblue';
+	my $show_values = $opts->{show_values} ? 1 : 0;
+	my $animated    = $opts->{animated}    ? 1 : 0;
+	my $value_label = $opts->{value_label} // 'Value';
+	my $x_label     = $opts->{x_label}     // '';
+
+	# Normalise data points; negative values become positive (bars show magnitude)
+	my @bars;
+	for my $pt (@$data) {
+		die 'Each data point must be an array reference'
+			unless ref($pt) eq 'ARRAY';
+		die 'Each data point must have at least 2 elements'
+			unless scalar(@$pt) >= 2;
+		next unless defined $pt->[1];
+		die 'Value must be numeric' unless looks_like_number($pt->[1]);
+		push @bars, {
+			label => defined($pt->[0]) ? "$pt->[0]" : '',
+			value => abs($pt->[1] + 0),
+			(scalar(@$pt) >= 3 && ref($pt->[2]) eq 'HASH'
+				? (extra => $pt->[2]) : ()),
+		};
+	}
+
+	# Sort before optional truncation
+	if ($sort_bars eq 'value') {
+		@bars = sort { $b->{value} <=> $a->{value} } @bars;
+	} elsif ($sort_bars eq 'label') {
+		@bars = sort { $a->{label} cmp $b->{label} } @bars;
+	}
+
+	# Truncate and collapse the tail into an "Other" bar
+	if ($max_bars && scalar(@bars) > $max_bars) {
+		my @rest  = splice @bars, $max_bars;
+		my $other = 0;
+		$other += $_->{value} for @rest;
+		push @bars, { label => 'Other', value => $other } if @rest;
+	}
+
+	# Serialise to JSON for embedding in the <script> block
+	my $json_data = $_JSON->encode([map {
+		my %h = (label => $_->{label}, value => $_->{value} + 0);
+		$h{extra} = $_->{extra} if exists $_->{extra};
+		\%h;
+	} @bars]);
+
+	# Escape strings for safe embedding inside JS double-quoted string literals
+	my $js_esc = sub {
+		my $s = shift;
+		$s =~ s/\\/\\\\/g;
+		$s =~ s/"/\\"/g;
+		$s =~ s/\n/\\n/g;
+		$s =~ s/\r/\\r/g;
+		$s
+	};
+	my $value_label_esc = $js_esc->($value_label);
+	my $x_label_esc     = $js_esc->($x_label);
+
+	my $is_categorical = ($color eq 'categorical') ? 1 : 0;
+	my $color_esc      = $is_categorical ? 'steelblue' : $js_esc->($color);
+
+	my $svg_id = $opts->{id} // 'bar_chart';
+	my $tip_id = $svg_id . '_tip';
+
+	my $width  = $self->{width};
+	my $height = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		: qq{width="$width" height="$height"};
+
+	# Rotate x-axis labels when there are more than 8 vertical bars
+	my $rotate_labels = ($orientation eq 'vertical' && scalar(@bars) > 8) ? 1 : 0;
+
+	# Margins depend on orientation, label rotation, and optional features
+	my ($margin_top, $margin_right, $margin_bottom, $margin_left);
+	if ($orientation eq 'vertical') {
+		$margin_top    = 20;
+		$margin_right  = 20;
+		$margin_bottom = $rotate_labels
+			? ($x_label ? 105 : 85)
+			: ($x_label ? 55  : 40);
+		$margin_left   = 55;
+	} else {
+		$margin_top    = 20;
+		$margin_right  = $show_values ? 60 : 20;
+		$margin_bottom = $x_label ? 55 : 40;
+		$margin_left   = 130;
+	}
+	my $inner_w = $width  - $margin_left - $margin_right;
+	my $inner_h = $height - $margin_top  - $margin_bottom;
+
+	# JS colour initialiser and per-bar fill callback
+	my $color_init_js = $is_categorical
+		? 'var colorOf = d3.scaleOrdinal(d3.schemeTableau10)'
+		  . ".domain(data.map(function(d){return d.label;}));"
+		: "var colorOf = function() { return \"$color_esc\"; };";
+	my $color_func_js = 'function(d) { return colorOf(d.label); }';
+
+	# Rotate x-axis tick labels (vertical orientation with many bars only)
+	my $rotate_block = $rotate_labels ? <<"ROT" : '';
+    g.selectAll(".bc-x-axis text")
+        .attr("transform", "rotate(-45)")
+        .attr("text-anchor", "end")
+        .attr("dx", "-0.6em")
+        .attr("dy", "0.15em");
+ROT
+
+	# Optional inline value labels rendered on each bar
+	my $show_values_block = '';
+	if ($show_values) {
+		if ($orientation eq 'vertical') {
+			$show_values_block = <<"SVB";
+    g.selectAll(".bc-val-text").data(data).join("text")
+        .attr("class",        "bc-val-text")
+        .attr("x",            function(d) { return xScale(d.label) + xScale.bandwidth() / 2; })
+        .attr("y",            function(d) { return yScale(d.value) - 4; })
+        .attr("text-anchor",  "middle")
+        .attr("font-size",    "11px")
+        .attr("fill",         "#333")
+        .text(function(d) { return d.value.toLocaleString(); });
+SVB
+		} else {
+			$show_values_block = <<"SVB";
+    g.selectAll(".bc-val-text").data(data).join("text")
+        .attr("class",             "bc-val-text")
+        .attr("x",                 function(d) { return xScale(d.value) + 4; })
+        .attr("y",                 function(d) { return yScale(d.label) + yScale.bandwidth() / 2; })
+        .attr("dominant-baseline", "middle")
+        .attr("font-size",         "11px")
+        .attr("fill",              "#333")
+        .text(function(d) { return d.value.toLocaleString(); });
+SVB
+		}
+	}
+
+	# Optional text label below the bottom axis
+	my $x_label_block = '';
+	if ($x_label) {
+		my $lx = $margin_left + int($inner_w / 2);
+		my $ly = $height - 5;
+		$x_label_block = <<"XLB";
+    svg.append("text")
+        .attr("x",           $lx)
+        .attr("y",           $ly)
+        .attr("text-anchor", "middle")
+        .attr("font-size",   "12px")
+        .attr("fill",        "#555")
+        .text("$x_label_esc");
+XLB
+	}
+
+	# Optional grow-from-baseline animation on page load
+	my $anim_block = '';
+	if ($animated) {
+		if ($orientation eq 'vertical') {
+			$anim_block = <<"ANIM";
+    var noAnim = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!noAnim) {
+        var delayPer = data.length > 1 ? Math.min(100, 600 / (data.length - 1)) : 0;
+        bars.attr("height", 0).attr("y", innerH)
+            .transition().duration(800)
+            .delay(function(d, i) { return i * delayPer; })
+            .attr("height", function(d) { return Math.max(0, innerH - yScale(d.value)); })
+            .attr("y",      function(d) { return yScale(d.value); });
+    }
+ANIM
+		} else {
+			$anim_block = <<"ANIM";
+    var noAnim = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!noAnim) {
+        var delayPer = data.length > 1 ? Math.min(100, 600 / (data.length - 1)) : 0;
+        bars.attr("width", 0)
+            .transition().duration(800)
+            .delay(function(d, i) { return i * delayPer; })
+            .attr("width", function(d) { return Math.max(0, xScale(d.value)); });
+    }
+ANIM
+		}
+	}
+
+	# Orientation-specific D3 scale/axis/bar JavaScript
+	my $chart_js;
+	if ($orientation eq 'vertical') {
+		$chart_js = <<"JS";
+    var g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var xScale = d3.scaleBand()
+        .domain(data.map(function(d) { return d.label; }))
+        .range([0, innerW])
+        .padding(0.2);
+    var yMax = d3.max(data, function(d) { return d.value; }) || 0;
+    var yScale = d3.scaleLinear()
+        .domain([0, yMax]).nice()
+        .range([innerH, 0]);
+
+    g.append("g").attr("class", "bc-x-axis")
+        .attr("transform", "translate(0," + innerH + ")")
+        .call(d3.axisBottom(xScale));
+    g.append("g").attr("class", "bc-y-axis")
+        .call(d3.axisLeft(yScale));
+
+$rotate_block    var bars = g.selectAll(".bc-bar").data(data).join("rect")
+        .attr("class",  "bc-bar")
+        .attr("x",      function(d) { return xScale(d.label); })
+        .attr("y",      function(d) { return yScale(d.value); })
+        .attr("width",  xScale.bandwidth())
+        .attr("height", function(d) { return Math.max(0, innerH - yScale(d.value)); })
+        .attr("fill",   $color_func_js)
+        .attr("rx", 2)
+        .on("mouseover", function(event, d) {
+            var tc = "<strong>" + esc(d.label) + "<\\/strong><br>" + esc(valLabel) + ": " + d.value.toLocaleString();
+            if (d.extra) {
+                Object.entries(d.extra).forEach(function(kv) {
+                    tc += "<br>" + esc(kv[0]) + ": " + esc(String(kv[1]));
+                });
+            }
+            tip.html(tc)
+               .style("display", "block")
+               .style("left", (event.pageX + 12) + "px")
+               .style("top",  (event.pageY - 24) + "px");
+        })
+        .on("mousemove", function(event) {
+            tip.style("left", (event.pageX + 12) + "px")
+               .style("top",  (event.pageY - 24) + "px");
+        })
+        .on("mouseout", function() { tip.style("display", "none"); });
+
+$anim_block$show_values_block$x_label_block
+JS
+	} else {
+		$chart_js = <<"JS";
+    var g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var yScale = d3.scaleBand()
+        .domain(data.map(function(d) { return d.label; }))
+        .range([0, innerH])
+        .padding(0.2);
+    var xMax = d3.max(data, function(d) { return d.value; }) || 0;
+    var xScale = d3.scaleLinear()
+        .domain([0, xMax]).nice()
+        .range([0, innerW]);
+
+    g.append("g").attr("class", "bc-x-axis")
+        .attr("transform", "translate(0," + innerH + ")")
+        .call(d3.axisBottom(xScale));
+    g.append("g").attr("class", "bc-y-axis")
+        .call(d3.axisLeft(yScale));
+
+    var bars = g.selectAll(".bc-bar").data(data).join("rect")
+        .attr("class",  "bc-bar")
+        .attr("x",      0)
+        .attr("y",      function(d) { return yScale(d.label); })
+        .attr("width",  function(d) { return Math.max(0, xScale(d.value)); })
+        .attr("height", yScale.bandwidth())
+        .attr("fill",   $color_func_js)
+        .attr("rx", 2)
+        .on("mouseover", function(event, d) {
+            var tc = "<strong>" + esc(d.label) + "<\\/strong><br>" + esc(valLabel) + ": " + d.value.toLocaleString();
+            if (d.extra) {
+                Object.entries(d.extra).forEach(function(kv) {
+                    tc += "<br>" + esc(kv[0]) + ": " + esc(String(kv[1]));
+                });
+            }
+            tip.html(tc)
+               .style("display", "block")
+               .style("left", (event.pageX + 12) + "px")
+               .style("top",  (event.pageY - 24) + "px");
+        })
+        .on("mousemove", function(event) {
+            tip.style("left", (event.pageX + 12) + "px")
+               .style("top",  (event.pageY - 24) + "px");
+        })
+        .on("mouseout", function() { tip.style("display", "none"); });
+
+$anim_block$show_values_block$x_label_block
+JS
+	}
+
+	my $html = <<"HTML";
+<style>
+    #$svg_id { display: block; }
+    #$tip_id {
+	position: absolute;
+	background: rgba(255,255,255,0.95);
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	padding: 6px 10px;
+	font-size: 12px;
+	pointer-events: none;
+	display: none;
+	line-height: 1.6;
+    }
+    .bc-bar { cursor: default; }
+    .bc-bar:hover { opacity: 0.8; }
+    .bc-val-text { pointer-events: none; }
+</style>
+<svg id="$svg_id" $svg_attrs></svg>
+<div id="$tip_id"></div>
+<script>
+(function() {
+    var data     = $json_data;
+    var innerW   = $inner_w;
+    var innerH   = $inner_h;
+    var valLabel = "$value_label_esc";
+    var margin   = { top: $margin_top, right: $margin_right, bottom: $margin_bottom, left: $margin_left };
+    $color_init_js
+
+    function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    var svg = d3.select("#$svg_id");
+    var tip = d3.select("#$tip_id");
+
+$chart_js})();
+</script>
+HTML
+
+	return { svg_id => $svg_id, html => $html };
+}
+
 =head2 render_line_chart_with_tooltips
 
     $html = $chart->render_line_chart_with_tooltips($data);
@@ -1652,10 +2102,6 @@ letter not appear literally inside C<< <script> >> blocks.
 =item * Throws C<Data must be an array of arrays> when C<$data> is not an ARRAY reference.
 
 =back
-
-=head3 Side Effects
-
-None.
 
 =head3 API SPECIFICATION
 
@@ -1710,7 +2156,7 @@ sub render_line_chart_with_tooltips
 </head>
 <body>
     <h1 style="text-align: center;">$self->{title}</h1>
-    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
 	const data = $json_data;
@@ -1788,6 +2234,7 @@ HTML
 =head2 render_line_chart_snippet
 
     my $fragment = $chart->render_line_chart_snippet($data);
+    my $fragment = $chart->render_line_chart_snippet($data, \%opts);
     # $fragment->{svg_id} - the id attribute of the <svg> element
     # $fragment->{html}   - embeddable HTML fragment (style + svg + script)
 
@@ -1800,7 +2247,7 @@ The caller is responsible for loading D3 in the page C<<head>>, e.g.:
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
-Accepts the following arguments:
+=head3 Arguments
 
 =over 4
 
@@ -1812,23 +2259,67 @@ pairs to display in the tooltip after the label and value rows.
     [$x, $y]          # basic point
     [$x, $y, \%row]   # point with extra tooltip data
 
+=item * C<\%opts> - Optional hash reference of rendering options:
+
+=over 4
+
+=item * C<id> (string, default C<'chart'>) - Override the C<id> attribute of
+the C<<svg>> element.  Use this when embedding multiple charts on the same page.
+
+=item * C<responsive> (boolean, default C<0>) - If true, emit
+C<viewBox="0 0 W H" width="100%" height="auto"> instead of fixed pixel
+dimensions, so the chart scales with its container.  Falls back to
+C<< $self->{responsive} >> when not set per call.
+
 =back
 
-Returns a hash reference with:
+=back
+
+=head3 Return value
+
+A hash reference with:
 
 =over 4
 
 =item * C<svg_id> - The C<id> attribute used on the C<<svg>> element.
 
-=item * C<html> - The embeddable fragment string.
+=item * C<html> - The embeddable fragment string (Perl character string).
 
 =back
+
+=head3 Errors
+
+=over 4
+
+=item * Dies with C<'Data must be an array of arrays'> when C<$data> is not an
+ARRAY reference.
+
+=back
+
+=head3 Side effects
+
+None.  The method is read-only.
+
+=head3 API SPECIFICATION
+
+    {
+        data => { type => 'arrayref' },
+        opts => {
+            type     => 'hashref',
+            optional => 1,
+            keys     => {
+                id         => { type => 'string',  optional => 1 },
+                responsive => { type => 'boolean', optional => 1 },
+            },
+        },
+    }
 
 =cut
 
 sub render_line_chart_snippet
 {
-	my ($self, $data) = @_;
+	my ($self, $data, $opts) = @_;
+	$opts //= {};
 
 	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
 
@@ -1840,7 +2331,13 @@ sub render_line_chart_snippet
 		} @$data
 	]);
 
-	my $svg_id = 'chart';
+	my $svg_id  = $opts->{id} // 'chart';
+	my $tip_id  = $svg_id . '_tooltip';
+	my $w = $self->{width};
+	my $h = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $w $h" width="100%" height="auto"}
+		: qq{width="$w" height="$h" style="border: 1px solid black;"};
 
 	my $html = <<"HTML";
 <style>
@@ -1855,16 +2352,16 @@ sub render_line_chart_snippet
 	transition: opacity 0.2s ease-in-out;
     }
 </style>
-<svg id="$svg_id" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
-<div class="tooltip" id="tooltip"></div>
+<svg id="$svg_id" $svg_attrs></svg>
+<div class="tooltip" id="$tip_id"></div>
 <script>
     const data = $json_data;
 
     const svg = d3.select("#$svg_id");
-    const tooltip = d3.select("#tooltip");
+    const tooltip = d3.select("#$tip_id");
     const margin = { top: 20, right: 30, bottom: 40, left: 40 };
-    const width = $self->{width} - margin.left - margin.right;
-    const height = $self->{height} - margin.top - margin.bottom;
+    const width = $w - margin.left - margin.right;
+    const height = $h - margin.top - margin.bottom;
 
     const x = d3.scalePoint()
 	.domain(data.map(d => d.label))
@@ -1986,10 +2483,6 @@ never animated regardless of this flag.
 
 Dies with I<Data must be an array of arrays> if C<$data> is not an arrayref.
 
-=head3 Side Effects
-
-None.
-
 =cut
 
 sub render_zoomable_line_chart_snippet
@@ -2007,9 +2500,14 @@ sub render_zoomable_line_chart_snippet
 		} @$data
 	]);
 
-	my $svg_id = 'chart';
-	my $tip_id = 'tooltip';
-	my $rst_id = 'reset-btn';
+	my $svg_id = $opts->{id} // 'chart';
+	my $tip_id = $svg_id . '_tooltip';
+	my $rst_id = $svg_id . '_reset';
+	my $w      = $self->{width};
+	my $h      = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $w $h" width="100%" height="auto"}
+		: qq{width="$w" height="$h" style="border: 1px solid black;"};
 
 	# Single-quote heredoc so <\/b> is preserved verbatim in the output —
 	# double-quote would require <\\/b> to survive Perl interpolation.
@@ -2134,7 +2632,7 @@ PLAIN
     }
 </style>
 <button id="$rst_id">Reset zoom</button>
-<svg id="$svg_id" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+<svg id="$svg_id" $svg_attrs></svg>
 <div class="tooltip" id="$tip_id"></div>
 <script>
     const allData     = $json_data;
@@ -2144,8 +2642,8 @@ PLAIN
     const tooltip  = d3.select("#$tip_id");
     const resetBtn = d3.select("#$rst_id");
     const margin   = { top: 20, right: 30, bottom: 40, left: 40 };
-    const width    = $self->{width}  - margin.left - margin.right;
-    const height   = $self->{height} - margin.top  - margin.bottom;
+    const width    = $w  - margin.left - margin.right;
+    const height   = $h - margin.top  - margin.bottom;
 
     const chart = svg.append("g")
 	.attr("transform", `translate(\${margin.left},\${margin.top})`);
@@ -2249,10 +2747,6 @@ Tooltip strings use C<< <\/b> >> rather than C<< </b> >> for html-tidy complianc
 
 =back
 
-=head3 Side Effects
-
-None.
-
 =head3 API SPECIFICATION
 
 =head4 Input
@@ -2303,7 +2797,7 @@ sub render_multi_series_line_chart_with_tooltips
 </head>
 <body>
     <h1 style="text-align: center;">$self->{title}</h1>
-    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
 	const data = $json_data;
@@ -2415,10 +2909,6 @@ Tooltip strings use C<< <\/b> >> for html-tidy compliance.
 
 =back
 
-=head3 Side Effects
-
-None.
-
 =head3 API SPECIFICATION
 
 =head4 Input
@@ -2471,7 +2961,7 @@ sub render_multi_series_line_chart_with_animated_tooltips
 </head>
 <body>
     <h1 style="text-align: center;">$self->{title}</h1>
-    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
 	const data = $json_data;
@@ -2585,10 +3075,6 @@ a C<.legend> CSS class used by the D3-generated legend elements.
 
 =back
 
-=head3 Side Effects
-
-None.
-
 =head3 API SPECIFICATION
 
 =head4 Input
@@ -2649,7 +3135,7 @@ sub render_multi_series_line_chart_with_legends {
 </head>
 <body>
     <h1 style="text-align: center;">$self->{title}</h1>
-    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
         const data = $json_data;
@@ -2792,10 +3278,6 @@ handler (opacity is set to C<isVisible ? 0 : 1> on each click).
 
 =back
 
-=head3 Side Effects
-
-None.
-
 =head3 API SPECIFICATION
 
 =head4 Input
@@ -2858,7 +3340,7 @@ sub render_multi_series_line_chart_with_interactive_legends
 </head>
 <body>
     <h1 style="text-align: center;">$self->{title}</h1>
-    <svg id="chart" width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"></svg>
+    <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
     <script>
         const data = $json_data;
@@ -2977,6 +3459,477 @@ HTML
     return $html;
 }
 
+=head2 render_scatter_chart_snippet
+
+    my $fragment = $chart->render_scatter_chart_snippet($data);
+    my $fragment = $chart->render_scatter_chart_snippet($data, \%opts);
+    # $fragment->{svg_id} - the id attribute of the <svg> element
+    # $fragment->{html}   - embeddable HTML fragment (style + svg + script)
+
+Generates an embeddable HTML fragment for a scatter plot with mouseover
+tooltips.  Returns a fragment with no C<<!DOCTYPE>>, C<<html>>, C<<head>>, or
+C<<body>> wrapper; the caller is responsible for loading D3 in the page.
+
+=head3 Arguments
+
+=over 4
+
+=item * C<$data> - An array reference of data points.  Each point is an array
+reference with two required numeric elements (x, y) and an optional third
+hash reference of extra key/value pairs shown as extra tooltip rows.
+
+    [$x, $y]          # basic point
+    [$x, $y, \%row]   # point with extra tooltip data
+
+=item * C<\%opts> - Optional hash reference:
+
+=over 4
+
+=item * C<id> (string, default C<'scatter_chart'>) - C<id> of the C<<svg>> element.
+
+=item * C<color> (CSS colour or C<'categorical'>, default C<'steelblue'>) -
+Fill colour for the data points.  C<'categorical'> uses the Tableau-10 palette.
+
+=item * C<x_label> (string, default C<''>) - Label for the X axis.
+
+=item * C<y_label> (string, default C<''>) - Label for the Y axis.
+
+=item * C<value_label> (string, default C<'Value'>) - Prefix for the tooltip value row.
+
+=item * C<animated> (boolean, default 0) - If true, circles fade in from
+opacity 0 on page load (400 ms).  Respects C<prefers-reduced-motion>.
+
+=item * C<responsive> (boolean, default 0) - See C<render_bar_chart_snippet>.
+
+=back
+
+=back
+
+=head3 Return value
+
+A hash reference with C<svg_id> (string) and C<html> (Perl character string).
+
+=head3 Errors
+
+=over 4
+
+=item * Dies with C<'Data must be an array of arrays'> when C<$data> is not an ARRAY ref.
+
+=item * Dies with C<'Each data point must be an array reference'> when an element is not an ARRAY ref.
+
+=item * Dies with C<'Each data point must have at least 2 elements'> when a point has fewer than 2 items.
+
+=item * Dies with C<'X value must be numeric'> when the x element is not a number.
+
+=item * Dies with C<'Y value must be numeric'> when the y element is not a number.
+
+=back
+
+=head3 API SPECIFICATION
+
+    {
+        data => { type => 'arrayref' },
+        opts => {
+            type     => 'hashref',
+            optional => 1,
+            keys     => {
+                id          => { type => 'string',  optional => 1 },
+                color       => { type => 'string',  optional => 1, default => 'steelblue' },
+                x_label     => { type => 'string',  optional => 1, default => '' },
+                y_label     => { type => 'string',  optional => 1, default => '' },
+                value_label => { type => 'string',  optional => 1, default => 'Value' },
+                animated    => { type => 'boolean', optional => 1, default => 0 },
+                responsive  => { type => 'boolean', optional => 1, default => 0 },
+            },
+        },
+    }
+
+=cut
+
+sub render_scatter_chart_snippet
+{
+	my ($self, $data, $opts) = @_;
+	$opts //= {};
+
+	die 'Data must be an array of arrays' unless ref($data) eq 'ARRAY';
+
+	my $color       = $opts->{color}       // 'steelblue';
+	my $x_label     = $opts->{x_label}     // '';
+	my $y_label     = $opts->{y_label}     // '';
+	my $value_label = $opts->{value_label} // 'Value';
+	my $animated    = $opts->{animated}    // 0;
+
+	my $js_esc = sub {
+		my $s = shift;
+		$s =~ s/\\/\\\\/g;
+		$s =~ s/"/\\"/g;
+		$s =~ s/\n/\\n/g;
+		$s =~ s/\r/\\r/g;
+		return $s;
+	};
+
+	my @points;
+	for my $pt (@$data) {
+		die 'Each data point must be an array reference' unless ref($pt) eq 'ARRAY';
+		die 'Each data point must have at least 2 elements' unless scalar(@$pt) >= 2;
+		die 'X value must be numeric' unless looks_like_number($pt->[0]);
+		die 'Y value must be numeric' unless looks_like_number($pt->[1]);
+		my $p = { x => $pt->[0] + 0, y => $pt->[1] + 0 };
+		$p->{extra} = $pt->[2] if ref($pt->[2]) eq 'HASH';
+		push @points, $p;
+	}
+
+	my $json_data      = $_JSON->encode(\@points);
+	my $x_label_esc    = $js_esc->($x_label);
+	my $y_label_esc    = $js_esc->($y_label);
+	my $val_label_esc  = $js_esc->($value_label);
+
+	my $is_categorical = ($color eq 'categorical') ? 1 : 0;
+	my $color_esc      = $is_categorical ? 'steelblue' : $js_esc->($color);
+
+	my $svg_id = $opts->{id} // 'scatter_chart';
+	my $tip_id = $svg_id . '_tip';
+
+	my $width  = $self->{width};
+	my $height = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $width $height" width="100%" height="auto"}
+		: qq{width="$width" height="$height"};
+
+	my $margin_bottom = $x_label ? 60 : 40;
+	my $margin_left   = $y_label ? 70 : 50;
+	my $margin_top    = 20;
+	my $margin_right  = 20;
+	my $inner_w = $width  - $margin_left - $margin_right;
+	my $inner_h = $height - $margin_top  - $margin_bottom;
+
+	my $color_init_js = $is_categorical
+		? "var color = d3.scaleOrdinal(d3.schemeTableau10).domain(data.map((d, i) => i));"
+		: "var color = function() { return \"$color_esc\"; };";
+
+	my $anim_block = $animated ? <<"ANIM" : '';
+    var noAnim = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!noAnim) {
+        circles.attr("opacity", 0)
+            .transition()
+            .duration(400)
+            .delay(function(d, i) { return i * 10; })
+            .attr("opacity", 0.8);
+    } else {
+        circles.attr("opacity", 0.8);
+    }
+ANIM
+
+	my $x_label_block = $x_label ? <<"XLB" : '';
+    g.append("text")
+        .attr("class", "sc-axis-label")
+        .attr("x", $inner_w / 2)
+        .attr("y", $inner_h + ($margin_bottom - 10))
+        .attr("text-anchor", "middle")
+        .text("$x_label_esc");
+XLB
+
+	my $y_label_block = $y_label ? <<"YLB" : '';
+    g.append("text")
+        .attr("class", "sc-axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -$inner_h / 2)
+        .attr("y", -($margin_left - 15))
+        .attr("text-anchor", "middle")
+        .text("$y_label_esc");
+YLB
+
+	my $html = <<"HTML";
+<style>
+    #$tip_id {
+	position: absolute;
+	background: rgba(255,255,255,0.95);
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	padding: 6px 10px;
+	font-size: 12px;
+	pointer-events: none;
+	display: none;
+	line-height: 1.6;
+    }
+    .sc-circle { cursor: default; }
+    .sc-axis-label { font-size: 11px; fill: #555; }
+</style>
+<svg id="$svg_id" $svg_attrs></svg>
+<div id="$tip_id"></div>
+<script>
+(function() {
+    var data = $json_data;
+    var margin = { top: $margin_top, right: $margin_right, bottom: $margin_bottom, left: $margin_left };
+    var innerW = $inner_w;
+    var innerH = $inner_h;
+    var valLabel = "$val_label_esc";
+    $color_init_js
+
+    function esc(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    var svg = d3.select("#$svg_id");
+    var tip = d3.select("#$tip_id");
+
+    var g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var xExt = d3.extent(data, function(d) { return d.x; });
+    var yExt = d3.extent(data, function(d) { return d.y; });
+    var xPad = (xExt[1] - xExt[0]) * 0.05 || 1;
+    var yPad = (yExt[1] - yExt[0]) * 0.05 || 1;
+
+    var xScale = d3.scaleLinear()
+        .domain([xExt[0] - xPad, xExt[1] + xPad])
+        .range([0, innerW]);
+
+    var yScale = d3.scaleLinear()
+        .domain([yExt[0] - yPad, yExt[1] + yPad])
+        .nice()
+        .range([innerH, 0]);
+
+    g.append("g")
+        .attr("transform", "translate(0," + innerH + ")")
+        .call(d3.axisBottom(xScale).ticks(6));
+
+    g.append("g")
+        .call(d3.axisLeft(yScale).ticks(6));
+
+    var circles = g.selectAll(".sc-circle")
+        .data(data)
+        .join("circle")
+        .attr("class", "sc-circle")
+        .attr("cx", function(d) { return xScale(d.x); })
+        .attr("cy", function(d) { return yScale(d.y); })
+        .attr("r", 5)
+        .attr("fill", function(d, i) { return color(i); })
+        .attr("stroke", "white")
+        .attr("stroke-width", 0.5)
+        .on("mouseover", function(event, d) {
+            var tipHtml = "<b>" + esc(String(d.x)) + "<\\/b>, <b>" + esc(String(d.y)) + "<\\/b>";
+            if (d.extra) {
+                Object.entries(d.extra).forEach(function(kv) {
+                    tipHtml += "<br>" + esc(kv[0]) + ": " + esc(kv[1]);
+                });
+            }
+            tip.html(tipHtml)
+               .style("display", "block")
+               .style("left", (event.pageX + 12) + "px")
+               .style("top",  (event.pageY - 24) + "px");
+        })
+        .on("mousemove", function(event) {
+            tip.style("left", (event.pageX + 12) + "px")
+               .style("top",  (event.pageY - 24) + "px");
+        })
+        .on("mouseout", function() {
+            tip.style("display", "none");
+        });
+
+$anim_block$x_label_block$y_label_block})();
+</script>
+HTML
+
+	return { svg_id => $svg_id, html => $html };
+}
+
+=head2 render_table_snippet
+
+    my $fragment = $chart->render_table_snippet($data);
+    my $fragment = $chart->render_table_snippet($data, \%opts);
+    # $fragment->{table_id} - the id attribute of the <table> element
+    # $fragment->{html}     - embeddable HTML fragment (style + table + script)
+
+Generates an embeddable HTML fragment for a sortable, filterable data table.
+Returns a fragment with no page-shell wrapper; the caller loads D3 if needed.
+
+=head3 Arguments
+
+=over 4
+
+=item * C<$data> - An array reference of row array references.  The first row
+is treated as the header row.  Every subsequent row must have the same number
+of columns as the header.
+
+    [ ['Name', 'Value', 'Category'],   # header
+      ['Alpha',   300,  'A'],
+      ['Beta',    150,  'B'],
+    ]
+
+=item * C<\%opts> - Optional hash reference:
+
+=over 4
+
+=item * C<id> (string, default C<'data_table'>) - C<id> of the C<<table>> element.
+
+=item * C<sortable> (boolean, default 1) - If true, clicking a column header
+sorts the table by that column (toggle ascending/descending).
+
+=item * C<caption> (string, default C<''>) - Optional C<<caption>> element text.
+
+=back
+
+=back
+
+=head3 Return value
+
+A hash reference with C<table_id> (string) and C<html> (Perl character string).
+Note: returns C<table_id>, not C<svg_id>, because this method renders an HTML
+table rather than an SVG chart.
+
+=head3 Errors
+
+=over 4
+
+=item * Dies with C<'Data must be an array of arrays'> when C<$data> is not an ARRAY ref.
+
+=item * Dies with C<'Data must have at least one row (header row)'> when C<$data> is empty.
+
+=item * Dies with C<'Each row must be an array reference'> when a row is not an ARRAY ref.
+
+=back
+
+=head3 API SPECIFICATION
+
+    {
+        data => { type => 'arrayref' },
+        opts => {
+            type     => 'hashref',
+            optional => 1,
+            keys     => {
+                id       => { type => 'string',  optional => 1, default => 'data_table' },
+                sortable => { type => 'boolean', optional => 1, default => 1 },
+                caption  => { type => 'string',  optional => 1, default => '' },
+            },
+        },
+    }
+
+=cut
+
+sub render_table_snippet
+{
+	my ($self, $data, $opts) = @_;
+	$opts //= {};
+
+	die 'Data must be an array of arrays'          unless ref($data) eq 'ARRAY';
+	die 'Data must have at least one row (header row)' unless @$data;
+	die 'Each row must be an array reference'      unless ref($data->[0]) eq 'ARRAY';
+
+	my $sortable = exists($opts->{sortable}) ? $opts->{sortable} : 1;
+	my $caption  = $opts->{caption} // '';
+	my $table_id = $opts->{id} // 'data_table';
+
+	my $js_esc = sub {
+		my $s = shift;
+		$s =~ s/\\/\\\\/g;
+		$s =~ s/"/\\"/g;
+		$s =~ s/\n/\\n/g;
+		$s =~ s/\r/\\r/g;
+		return $s;
+	};
+
+	my $html_esc = sub {
+		my $s = shift // '';
+		$s =~ s/&/&amp;/g;
+		$s =~ s/</&lt;/g;
+		$s =~ s/>/&gt;/g;
+		return $s;
+	};
+
+	my $headers = $data->[0];
+	my @rows    = @{$data}[1 .. $#$data];
+
+	for my $row (@rows) {
+		die 'Each row must be an array reference' unless ref($row) eq 'ARRAY';
+	}
+
+	my $json_data = $_JSON->encode([
+		map {
+			my @row = @$_;
+			\@row
+		} @$data
+	]);
+
+	my $caption_html = $caption
+		? '<caption>' . $html_esc->($caption) . '</caption>'
+		: '';
+
+	my $sort_th_class   = $sortable ? ' class="dt-sortable"' : '';
+	my $sort_cursor_css = $sortable ? 'cursor:pointer; user-select:none;' : '';
+
+	my @th_cells = map { '<th' . $sort_th_class . '>' . $html_esc->($_) . '</th>' } @$headers;
+	my $thead_html = '<tr>' . join('', @th_cells) . '</tr>';
+
+	my @tbody_rows;
+	for my $row (@rows) {
+		my @tds = map { '<td>' . $html_esc->($_) . '</td>' } @$row;
+		push @tbody_rows, '<tr>' . join('', @tds) . '</tr>';
+	}
+	my $tbody_html = join("\n    ", @tbody_rows);
+
+	my $sort_script = $sortable ? <<"SORT" : '';
+    var sortState = { col: -1, asc: true };
+    var tbody = table.select('tbody');
+    table.selectAll('th.dt-sortable').on('click', function(event, colIdx) {
+        if (sortState.col === colIdx) {
+            sortState.asc = !sortState.asc;
+        } else {
+            sortState.col = colIdx;
+            sortState.asc = true;
+        }
+        var rows = tbody.selectAll('tr').data();
+        rows.sort(function(a, b) {
+            var va = a[colIdx], vb = b[colIdx];
+            var na = parseFloat(va), nb = parseFloat(vb);
+            if (!isNaN(na) && !isNaN(nb)) { va = na; vb = nb; }
+            if (va < vb) return sortState.asc ? -1 : 1;
+            if (va > vb) return sortState.asc ?  1 : -1;
+            return 0;
+        });
+        tbody.selectAll('tr').data(rows).join('tr')
+            .selectAll('td').data(function(d) { return d.slice(1); }).join('td')
+            .text(function(d) { return d; });
+        table.selectAll('th.dt-sortable')
+            .attr('data-sort', function(d, i) {
+                return i === sortState.col ? (sortState.asc ? 'asc' : 'desc') : null;
+            });
+    });
+SORT
+
+	my $html = <<"HTML";
+<style>
+    #$table_id {
+	border-collapse: collapse;
+	width: 100%;
+	font-size: 13px;
+    }
+    #$table_id caption { font-weight: bold; margin-bottom: 6px; text-align: left; }
+    #$table_id th, #$table_id td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+    #$table_id th { background: #f5f5f5; $sort_cursor_css }
+    #$table_id th[data-sort="asc"]::after  { content: " \\25B2"; font-size: 10px; }
+    #$table_id th[data-sort="desc"]::after { content: " \\25BC"; font-size: 10px; }
+    #$table_id tr:nth-child(even) { background: #fafafa; }
+    #$table_id tr:hover { background: #f0f4ff; }
+</style>
+<table id="$table_id">
+    $caption_html<thead>
+    $thead_html</thead>
+    <tbody>
+    $tbody_html</tbody>
+</table>
+<script>
+(function() {
+    var allData = $json_data;
+    var table = d3.select("#$table_id");
+    var headers = allData[0];
+$sort_script})();
+</script>
+HTML
+
+	return { table_id => $table_id, html => $html };
+}
+
 sub _preamble
 {
 	my $html = <<'HTML';
@@ -2999,6 +3952,35 @@ sub _head
 </head>
 HTML
 	return $html;
+}
+
+sub _svg_attrs
+{
+	my ($self, $override) = @_;
+	my $responsive = defined($override) ? $override : $self->{responsive};
+	return $responsive
+		? qq{viewBox="0 0 $self->{width} $self->{height}" width="100%" height="auto"}
+		: qq{width="$self->{width}" height="$self->{height}" style="border: 1px solid black;"};
+}
+
+# _render_snippet_shell($opts, $container_id, $script)
+# Used exclusively by new snippet methods (scatter, table).
+# Returns a minimal HTML fragment with a container div and the provided script block.
+sub _render_snippet_shell
+{
+	my ($self, $opts, $container_id, $script) = @_;
+	my $w = $self->{width};
+	my $h = $self->{height};
+	my $svg_attrs = ($opts->{responsive} // $self->{responsive})
+		? qq{viewBox="0 0 $w $h" width="100%" height="auto"}
+		: qq{width="$w" height="$h"};
+	return <<"SHELL";
+<div id="${container_id}_wrap" style="position:relative;">
+    <svg id="$container_id" $svg_attrs></svg>
+    <div id="${container_id}_tip" style="position:absolute;background:rgba(255,255,255,0.95);border:1px solid #ccc;border-radius:4px;padding:6px 10px;font-size:12px;pointer-events:none;display:none;line-height:1.6;"></div>
+</div>
+$script
+SHELL
 }
 
 =head1 SUPPORT
@@ -3101,11 +4083,12 @@ Nigel Horne <njh@nigelhorne.com>
 
 =head2 render_line_chart_snippet
 
-    render_line_chart_snippet : HTML::D3 × (ArrayRef | undef) → HashRef ∪ ⊥
+    render_line_chart_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
 
     pre  ref(data) ≠ 'ARRAY'  ⇒ die "Data must be an array of arrays"
     post result ∈ HashRef
-    post result.svg_id = "chart"
+    post result.svg_id = opts.id // "chart"
     post result.html ∈ Str
     post "<!DOCTYPE" ∉ result.html
 
@@ -3116,7 +4099,7 @@ Nigel Horne <njh@nigelhorne.com>
 
     pre  ref(data) ≠ 'ARRAY'  ⇒ die "Data must be an array of arrays"
     post result ∈ HashRef
-    post result.svg_id = "chart"
+    post result.svg_id = opts.id // "chart"
     post result.html ∈ Str
     post "<!DOCTYPE" ∉ result.html
     post "d3.brushX()" ⊆ result.html
@@ -3168,6 +4151,68 @@ Nigel Horne <njh@nigelhorne.com>
     post "scaleSequential" ⊆ result.html
     post opts.animated = 1         ⇒ "prefers-reduced-motion" ⊆ result.html
     post opts.legend = 1           ⇒ "linearGradient" ⊆ result.html
+
+=head2 render_bar_chart_snippet
+
+    render_bar_chart_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'       ⇒ die "Data must be an array of arrays"
+    pre  ∃ pt ∈ data . ref(pt) ≠ 'ARRAY'
+                                   ⇒ die "Each data point must be an array reference"
+    pre  ∃ pt ∈ data . |pt| < 2   ⇒ die "Each data point must have at least 2 elements"
+    pre  ∃ pt ∈ data . defined(pt[1]) ∧ ¬numeric(pt[1])
+                                   ⇒ die "Value must be numeric"
+    pre  opts.orientation ∉ {'vertical','horizontal'}
+                                   ⇒ die "orientation must be 'vertical' or 'horizontal'"
+    pre  opts.sort_bars ∉ {'value','label','none'}
+                                   ⇒ die "sort_bars must be 'value', 'label', or 'none'"
+    pre  ∀ pt ∈ data . pt[1] < 0  ⇒  pt[1] := |pt[1]|      -- negative → absolute
+    pre  ∀ pt ∈ data . pt[1] = undef ⇒ pt ∉ result          -- undef rows skipped
+    post result ∈ HashRef
+    post result.svg_id = opts.id // "bar_chart"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post "d3.scaleBand" ⊆ result.html ∧ "d3.scaleLinear" ⊆ result.html
+    post opts.animated = 1         ⇒ "prefers-reduced-motion" ⊆ result.html
+    post opts.color = 'categorical' ⇒ "schemeTableau10" ⊆ result.html
+    post opts.max_bars = N ∧ N ≥ 2 ∧ |data| > N
+                            ⇒ |result_bars| = N ∧ "Other" ∈ result_labels
+
+=head2 render_scatter_chart_snippet
+
+    render_scatter_chart_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'       ⇒ die "Data must be an array of arrays"
+    pre  ∃ pt ∈ data . ref(pt) ≠ 'ARRAY'
+                                   ⇒ die "Each data point must be an array reference"
+    pre  ∃ pt ∈ data . |pt| < 2   ⇒ die "Each data point must have at least 2 elements"
+    pre  ∃ pt ∈ data . ¬numeric(pt[0])
+                                   ⇒ die "X value must be numeric"
+    pre  ∃ pt ∈ data . ¬numeric(pt[1])
+                                   ⇒ die "Y value must be numeric"
+    post result ∈ HashRef
+    post result.svg_id = opts.id // "scatter_chart"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post "d3.scaleLinear" ⊆ result.html
+    post opts.animated = 1         ⇒ "prefers-reduced-motion" ⊆ result.html
+
+=head2 render_table_snippet
+
+    render_table_snippet :
+        HTML::D3 × (ArrayRef | undef) × (HashRef | undef) → HashRef ∪ ⊥
+
+    pre  ref(data) ≠ 'ARRAY'       ⇒ die "Data must be an array of arrays"
+    pre  |data| = 0                ⇒ die "Data must have at least one row (header row)"
+    pre  ∃ row ∈ data . ref(row) ≠ 'ARRAY'
+                                   ⇒ die "Each row must be an array reference"
+    post result ∈ HashRef
+    post result.table_id = opts.id // "data_table"
+    post result.html ∈ Str
+    post "<!DOCTYPE" ∉ result.html
+    post opts.sortable ≠ 0         ⇒ "dt-sortable" ⊆ result.html
 
 =head2 render_line_chart_with_tooltips
 

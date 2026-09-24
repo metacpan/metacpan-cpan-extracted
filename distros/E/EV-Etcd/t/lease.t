@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -31,7 +29,7 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-plan tests => 19;
+plan tests => 20;
 
 my $client = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],
@@ -40,7 +38,6 @@ my $client = EV::Etcd->new(
 my $lease_id;
 my $test_key = "/test-lease-$$-" . time();
 
-# Test 1-4: lease_grant
 $client->lease_grant(60, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'lease_grant succeeded');
@@ -56,9 +53,8 @@ my $t1 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
 SKIP: {
-    skip "no lease id", 15 unless $lease_id;
+    skip "no lease id", 16 unless $lease_id;
 
-    # Test 5-7: lease_time_to_live (basic)
     $client->lease_time_to_live($lease_id, sub {
         my ($resp, $err) = @_;
         ok(!$err, 'lease_time_to_live succeeded');
@@ -71,7 +67,6 @@ SKIP: {
     my $t2 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
     EV::run;
 
-    # Test 8: Put a key with this lease
     $client->put($test_key, "lease-test-value", { lease => $lease_id }, sub {
         my ($resp, $err) = @_;
         ok(!$err, 'put with lease succeeded');
@@ -80,7 +75,6 @@ SKIP: {
     my $t3 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
     EV::run;
 
-    # Test 9-10: lease_time_to_live with keys option
     $client->lease_time_to_live($lease_id, { keys => 1 }, sub {
         my ($resp, $err) = @_;
         ok(!$err, 'lease_time_to_live with keys succeeded');
@@ -94,7 +88,6 @@ SKIP: {
     my $t4 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
     EV::run;
 
-    # Test 11-13: lease_leases (list all leases)
     $client->lease_leases(sub {
         my ($resp, $err) = @_;
         ok(!$err, 'lease_leases succeeded');
@@ -108,13 +101,12 @@ SKIP: {
                 last;
             }
         }
-        diag("Found " . scalar(@{$resp->{leases} || []}) . " lease(s), our lease " . ($found ? "found" : "not found"));
+        ok($found, 'granted lease is listed');
         EV::break;
     });
     my $t5 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
     EV::run;
 
-    # Test 14-15: lease_keepalive (send one keepalive)
     my $keepalive_received = 0;
     $client->lease_keepalive($lease_id, sub {
         my ($resp, $err) = @_;
@@ -132,7 +124,6 @@ SKIP: {
     });
     EV::run;
 
-    # Test 16-17: lease_revoke
     $client->lease_revoke($lease_id, sub {
         my ($resp, $err) = @_;
         ok(!$err, 'lease_revoke succeeded');
@@ -143,7 +134,6 @@ SKIP: {
     my $t7 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
     EV::run;
 
-    # Test 18: Verify key was deleted when lease was revoked
     $client->get($test_key, sub {
         my ($resp, $err) = @_;
         ok(!$err, 'get after revoke succeeded');

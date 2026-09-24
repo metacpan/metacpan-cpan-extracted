@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for flat data files
 
 ## Version
 
-0.008.1
+0.009.0
 
 ## Description
 
@@ -366,6 +366,36 @@ production (morbo/hypnotoad) deployments where modules are compiled on
 startup.  Unlike the former `Sub::Private` approach, `Sub::Protected`
 does not delete stash entries, so OO dispatch `$self->_method()`
 works correctly in production without any special workarounds.
+
+## Roadmap
+
+Features planned for future releases (post-0.009.0).  Items are ordered by
+priority.
+
+- **Pagination / virtual scrolling** (High) -- Tables are rendered as a
+single HTML blob.  Files with 100 k+ rows will time out or exhaust memory.
+Add a `?page=N&limit=M` server-side slice or a JS `IntersectionObserver`
+infinite-scroll to cap peak HTML size.
+- **XLSX export** (High) -- `/export` supports CSV, SQLite, and JSON
+but not XLSX output.  `Excel::Writer::XLSX` would close the round-trip for
+users whose source data is XLSX.
+- **Copy-link button on chart pages** (Medium) -- The dashboard data
+view has a copy-link button when filters are active, but `/graph`, `/pie`,
+`/heatmap`, and `/bar` do not, even though their URLs are fully
+parameterised and users share them.
+- **Column statistics panel** (Medium) -- A per-column popover showing
+min, max, mean, median, and null-count.  `List::Util` is already in
+`PREREQ_PM`; only `Statistics::Descriptive` (or manual computation) is
+needed.
+- **Multi-sheet XLSX** (Medium) -- `_detect_file_info` reads only the
+first worksheet.  A `?sheet=` URL param with a sheet-name picker would
+expose the full workbook.
+- **`between` and `in (a,b,c)` filter operators** (Low) -- Would
+reduce multi-filter chains for common range and set queries.
+- **SSE streaming for large join results** (Low) -- The join pipeline
+blocks the HTTP response until all rows are assembled.  Mojolicious supports
+server-sent events, which could progressively stream rows to a JS table
+renderer, giving visible progress on slow joins.
 
 ## See Also
 

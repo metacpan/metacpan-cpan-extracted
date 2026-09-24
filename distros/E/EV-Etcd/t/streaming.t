@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -39,9 +37,6 @@ my $client = EV::Etcd->new(
 
 my $test_prefix = "/test-streaming-$$-" . time();
 
-# === lease_keepalive streaming tests ===
-
-# Test 1-4: lease_keepalive receives response
 my $lease_id;
 my $keepalive_count = 0;
 
@@ -54,7 +49,7 @@ $client->lease_grant(10, sub {
 });
 my $t1 = EV::timer(5, 0, sub { fail('lease_grant timeout'); EV::break });
 EV::run;
-undef $t1;  # Cancel timer
+undef $t1;
 
 SKIP: {
     skip "no lease id", 4 unless $lease_id;
@@ -75,7 +70,6 @@ SKIP: {
     ok(defined $keepalive_handle, 'lease_keepalive returns handle');
     isa_ok($keepalive_handle, 'EV::Etcd::Keepalive', 'keepalive handle');
 
-    # Wait for at least one keepalive response
     my $keepalive_timer = EV::timer 5, 0, sub {
         diag("Keepalive timer expired, received $keepalive_count responses");
         EV::break;
@@ -84,7 +78,7 @@ SKIP: {
 
     ok($keepalive_count >= 1, "received at least 1 keepalive response (got $keepalive_count)");
 
-    # Cleanup lease (this will end the keepalive)
+    # Revoking the lease also ends the keepalive stream
     $client->lease_revoke($lease_id, sub {
         my ($resp, $err) = @_;
         diag($err ? "Revoke failed" : "Lease revoked");
@@ -92,9 +86,6 @@ SKIP: {
     pass('cleanup initiated');
 }
 
-# === Watch streaming tests ===
-
-# Test 5-9: watch receives multiple events
 my $watch_key = "$test_prefix/watch-stream-test";
 my $watch_count = 0;
 my $watch_target = 3;
@@ -121,7 +112,6 @@ $watch_handle = $client->watch($watch_key, sub {
 ok(defined $watch_handle, 'watch returns handle');
 isa_ok($watch_handle, 'EV::Etcd::Watch', 'watch handle');
 
-# Send multiple put events
 for my $i (1..$watch_target) {
     $client->put($watch_key, "value-$i", sub {
         my ($resp, $err) = @_;
@@ -138,7 +128,6 @@ EV::run;
 ok($watch_count >= 1, "watch received at least 1 event (got $watch_count)");
 cmp_ok($watch_count, '>=', $watch_target, "watch received all $watch_target events (streaming works)");
 
-# Test watch cancel - uses callback-based cancel API
 my $cancel_done = 0;
 $watch_handle->cancel(sub {
     my ($resp, $err) = @_;
@@ -154,7 +143,6 @@ EV::run;
 
 ok($cancel_done, 'watch cancel completed');
 
-# Cleanup
 $client->delete("$test_prefix/", { prefix => 1 }, sub {
     diag("Cleanup completed");
 });

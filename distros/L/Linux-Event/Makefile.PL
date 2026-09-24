@@ -30,6 +30,9 @@ my @public_modules = qw(
     Linux::Event::Kernel::Timer
     Linux::Event::Kernel::Signal
     Linux::Event::Kernel::Event
+    Linux::Event::Kernel::Inotify
+    Linux::Event::Kernel::Inotify::Watch
+    Linux::Event::Kernel::Inotify::Event
     Linux::Event::Kernel::Process
     Linux::Event::Loop
     Linux::Event::TLS
@@ -59,7 +62,7 @@ WriteMakefile(
     AUTHOR           => 'Joshua S. Day <hax@cpan.org>',
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.036000',
-    DIR              => [qw(xsloop xsbytestream xstls xsconnection xsresolver xssignal xslistener xsevent xsdatagram xsprocess)],
+    DIR              => [qw(xsloop xsbytestream xstls xsconnection xsresolver xssignal xslistener xsevent xsinotify xsdatagram xsprocess)],
     CONFIGURE_REQUIRES => {
         'ExtUtils::CBuilder'  => 0,
         'ExtUtils::MakeMaker' => 0,
@@ -78,6 +81,7 @@ WriteMakefile(
         no_index => {
             package => [qw(
                 Linux::Event::_Registration
+                Linux::Event::_Deferred
                 Linux::Event::_IO
                 Linux::Event::_ByteStream
                 Linux::Event::_ByteStream::Descriptor
@@ -98,6 +102,7 @@ WriteMakefile(
                 Linux::Event::Kernel::Event::_OwnerState
                 Linux::Event::Kernel::Timer::_Descriptor
                 Linux::Event::Loop::Introspection
+                Linux::Event::Loop::_DeferService
                 Linux::Event::_Resolver
                 Linux::Event::_Resolver::_Native
                 Linux::Event::_SocketConfig

@@ -1,5 +1,9 @@
 Revision history for Perl extension Params-SomeUtil
 
+1.12 Wed 23 Sep 2026
+  - Honor PUREPERL_ONLY=1 as passed by cpanm and other cpan clients.
+    (gh#11, gh#12).
+
 1.11 Wed  9 Sep 2026
   - Updated WHY section to document new differences with Params::Util
     None of them are functional, three functions were added to a

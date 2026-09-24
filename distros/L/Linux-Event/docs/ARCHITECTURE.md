@@ -20,6 +20,7 @@ Linux::Event
     |-- Timer
     |-- Signal
     |-- Event
+    |-- Inotify
     `-- Process
 ```
 
@@ -37,6 +38,7 @@ The public leaves are deliberately concrete:
 - `Kernel::Timer` exposes timer scheduling semantics.
 - `Kernel::Signal` exposes signalfd signal semantics.
 - `Kernel::Event` exposes eventfd notification semantics.
+- `Kernel::Inotify` exposes inotify filesystem notification semantics.
 - `Kernel::Process` exposes pidfd/process lifecycle semantics.
 
 Address family is orthogonal to socket type. IPv4, IPv6, and Unix-domain
@@ -389,7 +391,8 @@ from existing Loop, timer, signal, resolver, and resource ownership state.
 Optional profiling adds timing instrumentation only when explicitly enabled.
 
 Public introspection types follow the IO/Kernel taxonomy: `pipe`, `tty`,
-`stream`, `listener`, `dgram`, `timer`, `signal`, `event`, and `process`.
+`stream`, `listener`, `dgram`, `timer`, `signal`, `event`, `inotify`,
+and `process`.
 Here `stream` means `IO::Sock::Stream`; Pipe and TTY remain distinct public
 resource types even though they share the ordered-byte engine.
 

@@ -637,7 +637,7 @@ static void hm_h3_dispatch(pTHX_ hm_qconn *qc, hm_h3_stream *st) {
     }
     env_rv = newRV_noinc((SV *)env);
     resp = hm_call_app(aTHX_ loop, env_rv);
-    loop->requests++;
+    hm_count_request(loop);
     loop->h3_requests++;
 
     if (resp && hm_is_awaitable(aTHX_ resp)) {

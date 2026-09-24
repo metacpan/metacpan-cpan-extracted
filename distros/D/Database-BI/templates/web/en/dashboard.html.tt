@@ -79,10 +79,12 @@
           title="Plot the current data as a pie chart - choose the category and value columns">&#x25D4; Pie chart&hellip;</button>
   <button class="btn-heatmap" id="btn-heatmap" type="button"
           title="Plot the current data as a heatmap - choose two categorical columns and an optional value column">&#x229F; Heatmap&hellip;</button>
+  <button class="btn-bar" id="btn-bar" type="button"
+          title="Plot the current data as a bar chart - choose a category column and an optional value column">&#x1F4CA; Bar chart&hellip;</button>
   [%- END -%]
   <button class="btn-dedup[% IF dedup %] btn-dedup--active[% END %]" id="btn-dedup" type="button"
           title="Remove duplicate rows from the view and from any export">[% IF dedup %]Show duplicates[% ELSE %]Hide duplicates[% END %]</button>
-  <label class="lbl-totals" id="lbl-totals" title="Show a totals row at the bottom of the table — sums any numeric column">
+  <label class="lbl-totals" id="lbl-totals" title="Show a totals row at the bottom of the table &mdash; sums any numeric column">
     <input type="checkbox" id="chk-totals"> Totals
   </label>
   <button class="btn-add-db" id="btn-add-db" type="button" title="Combine this table with another data file, or narrow down the rows you see by applying conditions">&#x2295; Merge data&hellip;</button>
@@ -167,7 +169,7 @@
       <div class="join-field">
         <label for="right-table-sel">Table from the data directory</label>
         <select id="right-table-sel">
-          <option value="">— select a table —</option>
+          <option value="">&mdash; select a table &mdash;</option>
           [%- FOREACH t IN available_tables -%]
           <option value="table:[% t.name | html %]">[% t.name | html %]</option>
           [%- END -%]
@@ -195,7 +197,7 @@
       <div class="join-field">
         <label for="left-key-sel">Column in <strong>[% title | html %]</strong> to join on</label>
         <select id="left-key-sel">
-          <option value="">— select a column —</option>
+          <option value="">&mdash; select a column &mdash;</option>
           [%- FOREACH col IN columns -%]
           <option value="[% col | html %]">[% col | html %]</option>
           [%- END -%]
@@ -205,7 +207,7 @@
       <div class="join-field">
         <label for="right-key-sel">Matching column in the new database</label>
         <select id="right-key-sel" disabled>
-          <option value="">— select a database first —</option>
+          <option value="">&mdash; select a database first &mdash;</option>
         </select>
       </div>
     </div>
@@ -455,9 +457,73 @@
     </div>
   </form>
 </div>
+
+<div class="graph-panel" id="bar-panel" hidden>
+  <form id="bar-form" method="get" action="/bar">
+    <input type="hidden" name="l" value="[% left_spec | html %]">
+    [%- FOREACH jspec IN current_joins -%]
+    <input type="hidden" name="j" value="[% jspec | html %]">
+    [%- END -%]
+    [%- FOREACH fs IN filter_specs -%]
+    <input type="hidden" name="f" value="[% fs | html %]">
+    [%- END -%]
+    [%- IF dedup -%]
+    <input type="hidden" name="d" value="1">
+    [%- END -%]
+    <input type="hidden" name="back" id="bar-back-inp" value="">
+
+    <h3 class="graph-panel-title">&#x1F4CA; Bar chart</h3>
+
+    <p class="graph-panel-desc">Choose a category column. Optionally pick a numeric column to sum per category; leave it on "Count rows" to show how many rows fall in each category.</p>
+
+    <div class="graph-fields-row">
+      <div class="join-field">
+        <label for="bar-cat-sel">Category (bars)</label>
+        <select id="bar-cat-sel" name="cat" required>
+          <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="bar-val-sel">Value (bar height)</label>
+        <select id="bar-val-sel" name="val">
+          <option value="" style="font-weight:bold">Count (rows)</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="bar-sort-sel">Sort bars</label>
+        <select id="bar-sort-sel" name="sort">
+          <option value="none">Original order</option>
+          <option value="value">By value (desc)</option>
+          <option value="label">By label (A-Z)</option>
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="bar-orient-sel">Orientation</label>
+        <select id="bar-orient-sel" name="orient">
+          <option value="vertical">Vertical</option>
+          <option value="h">Horizontal</option>
+        </select>
+      </div>
+      <div class="graph-btn-col">
+        <span class="graph-btn-spacer"></span>
+        <div class="graph-btn-row">
+          <button type="submit" id="btn-do-bar" class="btn-primary" disabled>Plot</button>
+          <button type="button" id="btn-cancel-bar" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
 [%- END -%]
 
 [% IF records.size %]
+<div class="table-scroll">
 <table id="bi-table" data-table="[% table | html %]">
   <thead>
     <tr>
@@ -476,13 +542,14 @@
     [%- END %]
   </tbody>
 </table>
+</div>
 [% ELSE %]
 <p class="empty-state">No records found in <strong>[% table | html %]</strong>.</p>
 [% END %]
 
 <script>
 // parseAccounting is defined at module scope (outside any IIFE) so it is
-// accessible from all script blocks on this page — the sort block uses it for
+// accessible from all script blocks on this page -- the sort block uses it for
 // numeric column detection, and the graph panel's isNumericVal delegates to it.
 function parseAccounting(v) {
   if (v === '') return NaN;
@@ -640,7 +707,7 @@ function parseAccounting(v) {
   }
 
   function deleteSelected() {
-    // Delete rows first (simpler — just remove the <tr> from the DOM).
+    // Delete rows first (simpler -- just remove the <tr> from the DOM).
     selectedRows.forEach(function (tr) { tr.parentNode.removeChild(tr); });
     selectedRows.clear();
 
@@ -936,7 +1003,7 @@ function parseAccounting(v) {
   var joinForm     = document.getElementById('join-form');
   var currentLabel = panel.dataset.currentLabel || 'current table';
 
-  // Column tracking — kept in sync as right-table columns load.
+  // Column tracking -- kept in sync as right-table columns load.
   var allColumns = Array.from(leftKeySel.options)
       .slice(1).map(function (o) { return o.value; });
 
@@ -951,9 +1018,9 @@ function parseAccounting(v) {
     ['contains', 'contains'],
     ['starts',   'starts with'],
     ['lt',       '<'],
-    ['le',       '≤'],
+    ['le',       '<='],
     ['gt',       '>'],
-    ['ge',       '≥'],
+    ['ge',       '>='],
     ['empty',    'is empty'],
     ['notempty', 'is not empty'],
   ];
@@ -962,7 +1029,7 @@ function parseAccounting(v) {
 
   function populateColSelect(sel, current) {
     var prev = current !== undefined ? current : sel.value;
-    sel.innerHTML = '<option value="">— column —</option>';
+    sel.innerHTML = '<option value="">&mdash; column &mdash;</option>';
     allColumns.forEach(function (col) {
       var opt = document.createElement('option');
       opt.value = col; opt.textContent = col;
@@ -1016,7 +1083,7 @@ function parseAccounting(v) {
     var rmBtn = document.createElement('button');
     rmBtn.type = 'button';
     rmBtn.className = 'btn-remove-filter';
-    rmBtn.textContent = '×';
+    rmBtn.textContent = 'x';
     rmBtn.addEventListener('click', function () { row.remove(); checkApply(); });
 
     row.appendChild(colSel);
@@ -1044,13 +1111,13 @@ function parseAccounting(v) {
     rightSpec  = spec;
     rightLabel = label;
     rightKeySel.disabled  = true;
-    rightKeySel.innerHTML = '<option value="">Loading…</option>';
+    rightKeySel.innerHTML = '<option value="">Loading...</option>';
 
     fetch(url)
       .then(function (r) { return r.json(); })
       .then(function (data) {
         var cols = data.columns || [];
-        rightKeySel.innerHTML = '<option value="">— select a column —</option>';
+        rightKeySel.innerHTML = '<option value="">&mdash; select a column &mdash;</option>';
         cols.forEach(function (col) {
           var opt = document.createElement('option');
           opt.value = col; opt.textContent = col;
@@ -1119,7 +1186,7 @@ function parseAccounting(v) {
   joinForm.addEventListener('submit', function (e) {
     // Remove previously-generated dynamic inputs.
     Array.from(joinForm.querySelectorAll('[data-dyn]')).forEach(function (i) { i.remove(); });
-    // Remove the preserved f inputs — we'll re-add from filter rows below.
+    // Remove the preserved f inputs -- we'll re-add from filter rows below.
     Array.from(joinForm.querySelectorAll('.f-preserved')).forEach(function (i) { i.remove(); });
 
     // Add new join spec if valid.
@@ -1182,7 +1249,7 @@ function parseAccounting(v) {
   function resetPanel() {
     rightTblSel.value     = '';
     rightPathInp.value    = '';
-    rightKeySel.innerHTML = '<option value="">— select a database first —</option>';
+    rightKeySel.innerHTML = '<option value="">&mdash; select a database first &mdash;</option>';
     rightKeySel.disabled  = true;
     leftKeySel.value      = '';
     joinDesc.hidden       = true;
@@ -1207,7 +1274,7 @@ function parseAccounting(v) {
 
 <script>
 // ---------------------------------------------------------------------------
-// Refresh button — reload the page so the server re-reads the source file(s)
+// Refresh button -- reload the page so the server re-reads the source file(s)
 // ---------------------------------------------------------------------------
 (function () {
   var btn = document.getElementById('btn-refresh');
@@ -1215,7 +1282,7 @@ function parseAccounting(v) {
   btn.addEventListener('click', function () { location.reload(); });
 }());
 
-// Copy-link button — copies the current URL (including all ?f= params) to the clipboard
+// Copy-link button -- copies the current URL (including all ?f= params) to the clipboard
 // ---------------------------------------------------------------------------
 (function () {
   var btn = document.getElementById('btn-copy-link');
@@ -1287,7 +1354,7 @@ function parseAccounting(v) {
   }
 }());
 
-// Dedup button — toggle d=1 in the URL and reload
+// Dedup button -- toggle d=1 in the URL and reload
 // ---------------------------------------------------------------------------
 (function () {
   var btn = document.getElementById('btn-dedup');
@@ -1303,7 +1370,7 @@ function parseAccounting(v) {
 
 <script>
 // ---------------------------------------------------------------------------
-// Combine panel — stack rows from another file beneath the current view
+// Combine panel -- stack rows from another file beneath the current view
 // ---------------------------------------------------------------------------
 (function () {
   var btnCombine  = document.getElementById('btn-combine');
@@ -1403,7 +1470,7 @@ function parseAccounting(v) {
 
 <script>
 // ---------------------------------------------------------------------------
-// Graph panel — line chart of X vs Y using HTML::D3 / D3.js
+// Graph panel -- line chart of X vs Y using HTML::D3 / D3.js
 // ---------------------------------------------------------------------------
 (function () {
   var btnOpen   = document.getElementById('btn-graph');
@@ -1416,7 +1483,7 @@ function parseAccounting(v) {
   var ySel      = document.getElementById('graph-y-sel');
   var backInp   = document.getElementById('graph-back-inp');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'pie-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'pie-panel', 'heatmap-panel', 'bar-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1524,7 +1591,7 @@ function parseAccounting(v) {
   var valSel    = document.getElementById('pie-val-sel');
   var backInp   = document.getElementById('pie-back-inp');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'heatmap-panel', 'bar-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1601,7 +1668,7 @@ function parseAccounting(v) {
   var ySel      = document.getElementById('heatmap-y-sel');
   var backInp   = document.getElementById('heatmap-back-inp');
 
-  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel'].map(function (id) {
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'bar-panel'].map(function (id) {
     return document.getElementById(id);
   }).filter(Boolean);
 
@@ -1651,11 +1718,73 @@ function parseAccounting(v) {
   xSel.addEventListener('change', checkHeatmap);
   ySel.addEventListener('change', checkHeatmap);
 }());
+
+// Bar chart panel
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen   = document.getElementById('btn-bar');
+  var panel     = document.getElementById('bar-panel');
+  if (!btnOpen || !panel) return;
+
+  var btnCancel = document.getElementById('btn-cancel-bar');
+  var btnDo     = document.getElementById('btn-do-bar');
+  var catSel    = document.getElementById('bar-cat-sel');
+  var backInp   = document.getElementById('bar-back-inp');
+
+  var otherPanels = ['join-panel', 'combine-panel', 'export-panel', 'graph-panel', 'pie-panel', 'heatmap-panel'].map(function (id) {
+    return document.getElementById(id);
+  }).filter(Boolean);
+
+  // Rebuild val select to show only numeric columns (plus the Count placeholder).
+  function buildBarValSelect() {
+    var valSel = document.getElementById('bar-val-sel');
+    if (!valSel) return;
+    var tbl  = document.querySelector('table[data-table]') || document.querySelector('table');
+    if (!tbl || !tbl.tHead || !tbl.tBodies[0]) return;
+    var headers = Array.from(tbl.tHead.rows[0].cells);
+    var rows    = Array.from(tbl.tBodies[0].rows);
+    var prev    = valSel.value;
+    while (valSel.options.length > 1) valSel.remove(1);
+    headers.forEach(function (th, idx) {
+      var name = th.textContent.trim();
+      var vals = rows.map(function (r) {
+        return r.cells[idx] ? r.cells[idx].textContent.trim() : '';
+      }).filter(function (v) { return v !== ''; });
+      if (vals.length === 0) return;
+      if (vals.every(function (v) {
+        return /^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v);
+      })) return;
+      if (!vals.every(function (v) { return !isNaN(parseAccounting(v)); })) return;
+      var opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      if (name === prev) opt.selected = true;
+      valSel.appendChild(opt);
+    });
+  }
+
+  function checkBar() {
+    btnDo.disabled = !catSel.value;
+  }
+
+  btnOpen.addEventListener('click', function () {
+    otherPanels.forEach(function (p) { p.hidden = true; });
+    backInp.value = window.location.href;
+    buildBarValSelect();
+    panel.hidden = !panel.hidden;
+    checkBar();
+  });
+
+  btnCancel && btnCancel.addEventListener('click', function () {
+    panel.hidden = true;
+  });
+
+  catSel.addEventListener('change', checkBar);
+}());
 </script>
 
 <script>
 // ---------------------------------------------------------------------------
-// Export panel — save to a user-chosen directory on the server filesystem
+// Export panel -- save to a user-chosen directory on the server filesystem
 // ---------------------------------------------------------------------------
 (function () {
   var btnOpen    = document.getElementById('btn-export-open');
@@ -1702,7 +1831,7 @@ function parseAccounting(v) {
       fmtBadge.textContent = 'JSON';
       fmtBadge.className   = 'export-format-badge csv';
     } else {
-      fmtBadge.textContent = 'unknown — add .csv, .sql or .json';
+      fmtBadge.textContent = 'unknown -- add .csv, .sql or .json';
       fmtBadge.className   = 'export-format-badge unknown';
     }
     btnSave.disabled = !fmt;
@@ -1710,7 +1839,7 @@ function parseAccounting(v) {
 
   function loadDir(path) {
     dirInp.value           = path;
-    dirBrowser.innerHTML   = '<span class="export-dir-msg">Loading…</span>';
+    dirBrowser.innerHTML   = '<span class="export-dir-msg">Loading...</span>';
     dirUp.disabled         = true;
 
     fetch('/api/dirs?path=' + encodeURIComponent(path))
@@ -1748,7 +1877,7 @@ function parseAccounting(v) {
     if (currentParent) loadDir(currentParent);
   });
 
-  // Typing in the directory input — debounced fetch.
+  // Typing in the directory input -- debounced fetch.
   dirInp.addEventListener('input', function () {
     clearTimeout(dirTimer);
     var val = dirInp.value.trim();
@@ -1782,7 +1911,7 @@ function parseAccounting(v) {
     if (!dir || !filename || !getFormat(filename)) return;
 
     btnSave.disabled    = true;
-    btnSave.textContent = 'Saving…';
+    btnSave.textContent = 'Saving...';
     resultEl.hidden     = true;
 
     // Collect the current view's l=, j=, f= params.
@@ -1811,7 +1940,7 @@ function parseAccounting(v) {
         btnSave.disabled    = false;
         btnSave.textContent = 'Save';
         if (data.saved) {
-          resultEl.textContent = '✓ Saved to ' + data.saved;
+          resultEl.textContent = 'Saved: ' + data.saved;
           resultEl.className   = 'export-result success';
           try {
             var savedName  = data.saved.replace(/.*[\/\\]/, '');
@@ -1836,7 +1965,7 @@ function parseAccounting(v) {
       .catch(function () {
         btnSave.disabled    = false;
         btnSave.textContent = 'Save';
-        resultEl.textContent = 'Save failed — check the server log';
+        resultEl.textContent = 'Save failed -- check the server log';
         resultEl.className   = 'export-result error';
         resultEl.hidden      = false;
       });
@@ -1895,7 +2024,7 @@ function parseAccounting(v) {
       // For drag-and-drop uploads the server stores the file under a random
       // .uploads/<tempdir>/ path.  Prefer the original local path stashed by
       // the drop handler in sessionStorage (from text/uri-list).  Fall back to
-      // the upload path when the browser does not supply a file:// URI — an
+      // the upload path when the browser does not supply a file:// URI -- an
       // imperfect but functional link is better than a missing entry.
       var filePath = el.dataset.path;
       var fileHref = '/open?path=' + encodeURIComponent(filePath);

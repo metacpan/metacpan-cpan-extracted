@@ -1,0 +1,105 @@
+---
+abstract: 'Intermediate representation of an IR remote control code'
+author:
+  - 'Brett T. Warden <bwarden@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Protocol-IR-Code
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Protocol::IR::Code:
+    file: lib/Protocol/IR/Code.pm
+    version: '1.0'
+  Protocol::IR::Converter:
+    file: lib/Protocol/IR/Converter.pm
+    version: '1.0'
+  Protocol::IR::Format::CSV:
+    file: lib/Protocol/IR/Format/CSV.pm
+    version: '1.0'
+  Protocol::IR::Format::GC:
+    file: lib/Protocol/IR/Format/GC.pm
+    version: '1.0'
+  Protocol::IR::Format::LIRC:
+    file: lib/Protocol/IR/Format/LIRC.pm
+    version: '1.0'
+  Protocol::IR::Format::Mode2:
+    file: lib/Protocol/IR/Format/Mode2.pm
+    version: '1.0'
+  Protocol::IR::Format::Pronto:
+    file: lib/Protocol/IR/Format/Pronto.pm
+    version: '1.0'
+  Protocol::IR::Format::Tasmota:
+    file: lib/Protocol/IR/Format/Tasmota.pm
+    version: '1.0'
+  Protocol::IR::Format::Wig:
+    file: lib/Protocol/IR/Format/Wig.pm
+    version: '1.0'
+  Protocol::IR::Proto::JVC:
+    file: lib/Protocol/IR/Proto/JVC.pm
+    version: '1.0'
+  Protocol::IR::Proto::JVC48:
+    file: lib/Protocol/IR/Proto/JVC48.pm
+    version: '1.0'
+  Protocol::IR::Proto::MWM:
+    file: lib/Protocol/IR/Proto/MWM.pm
+    version: '1.0'
+  Protocol::IR::Proto::NEC:
+    file: lib/Protocol/IR/Proto/NEC.pm
+    version: '1.0'
+  Protocol::IR::Proto::NEC2:
+    file: lib/Protocol/IR/Proto/NEC2.pm
+    version: '1.0'
+  Protocol::IR::Proto::NEC48:
+    file: lib/Protocol/IR/Proto/NEC48.pm
+    version: '1.0'
+  Protocol::IR::Proto::NEC482:
+    file: lib/Protocol/IR/Proto/NEC482.pm
+    version: '1.0'
+  Protocol::IR::Proto::NECX1:
+    file: lib/Protocol/IR/Proto/NECX1.pm
+    version: '1.0'
+  Protocol::IR::Proto::NECX2:
+    file: lib/Protocol/IR/Proto/NECX2.pm
+    version: '1.0'
+  Protocol::IR::Proto::Panasonic:
+    file: lib/Protocol/IR/Proto/Panasonic.pm
+    version: '1.0'
+  Protocol::IR::Proto::SAMSUNG:
+    file: lib/Protocol/IR/Proto/SAMSUNG.pm
+    version: '1.0'
+  Protocol::IR::Proto::SAMSUNG20:
+    file: lib/Protocol/IR/Proto/SAMSUNG20.pm
+    version: '1.0'
+  Protocol::IR::Proto::SAMSUNG36:
+    file: lib/Protocol/IR/Proto/SAMSUNG36.pm
+    version: '1.0'
+requires:
+  HTTP::Tiny: '0.017'
+  JSON::PP: '2.00'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/bwarden/perl-protocol-ir/issues
+  homepage: https://github.com/bwarden/perl-protocol-ir
+  repository: https://github.com/bwarden/perl-protocol-ir.git
+version: '1.0'
+x_contributors:
+  - 'Brett T. Warden <brett.warden@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

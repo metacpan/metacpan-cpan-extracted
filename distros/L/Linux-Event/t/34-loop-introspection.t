@@ -59,7 +59,7 @@ is_deeply(
     $loop->census,
     {
         pipe => 0, tty => 0, stream => 0, listener => 0, dgram => 0,
-        timer => 1, signal => 0, event => 0, process => 0,
+        timer => 1, signal => 0, event => 0, inotify => 0, process => 0,
     },
     'census includes stable public zero-valued type keys',
 );

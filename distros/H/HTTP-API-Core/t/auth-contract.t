@@ -95,6 +95,15 @@ my @matches = $no_duplicate->[1] =~ /(?:[?&])api_key=/g;
 is scalar(@matches), 1, 'query helper does not duplicate an existing key';
 like $no_duplicate->[1], qr/(?:[?&])api_key=existing(?:&|$)/, 'existing query credential is preserved';
 
+my $encoded_existing = capture_request(
+    api_key_auth(in => 'query', name => 'api key', value => 'new'),
+    query => { 'api key' => 'explicit', page => 1 },
+);
+my @encoded_matches = $encoded_existing->[1] =~ /(?:[?&])api%20key=/g;
+is scalar(@encoded_matches), 1, 'query helper recognizes an existing percent-encoded key name';
+like $encoded_existing->[1], qr/(?:[?&])api%20key=explicit(?:&|$)/,
+    'existing percent-encoded query credential is preserved';
+
 my $hook = bearer_auth('token');
 is ref($hook), 'CODE', 'bearer_auth returns a hook callback';
 $hook = basic_auth('u', 'p');

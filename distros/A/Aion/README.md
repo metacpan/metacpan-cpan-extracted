@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-aion/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion?logo=perl)](https://github.com/darviarush/perl-aion/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion.svg)](https://metacpan.org/release/Aion) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion+2.3)
+[![Actions Status](https://github.com/darviarush/perl-aion/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion?logo=perl)](https://github.com/darviarush/perl-aion/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion.svg)](https://metacpan.org/release/Aion) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion+2.4)
 # NAME
 
 Aion - постмодернистская объектная система для Perl 5, такая как «Mouse», «Moose», «Moo», «Mo» и «M», но с улучшениями
 
 # VERSION
 
-2.3
+2.4
 
 # SYNOPSIS
 
@@ -30,15 +30,97 @@ Calc->new(a => 1.1, b => 2)->result   # => 3.1
 
 # DESCRIPTION
 
-Aion — ООП-фреймворк для создания классов с **фичами**, имеет **аспекты**, **роли** и так далее.
+Aion – ООП-фреймворк для создания классов с **фичами**, имеет **аспекты**, **роли** и так далее.
 
-Свойства, объявленные через has, называются **фичами**.
+Свойства, объявленные через `has`, называются **фичами**.
 
 А `is`, `isa`, `default` и так далее в `has` называются **аспектами**.
 
 Помимо стандартных аспектов, роли могут добавлять свои собственные аспекты с помощью подпрограммы **aspect**.
 
 Сигнатура методов может проверяться с помощью атрибута `:Isa(...)`.
+
+Настройщики класса, вызываемые через `have`, называются **подстрекателями**.
+
+# USE ARGUMENTS
+
+`use Aion` имеет несколько специализированных аргументов. Остальные передаются `Aion::Types`, импорт которого происходит неявно для импортирования типов.
+
+## -role
+
+Создать роль, а не класс.
+
+```perl
+package Role::My {
+	use Aion -role;
+
+	__PACKAGE__->can('extends') # -> undef
+}
+```
+
+## extends => classes
+
+Расширяет класс.
+
+## with => roles
+
+Добавляет роль на этапе компиляции модуля. Это делается, чтобы `import_with` мог добавить функции.
+
+```perl
+package Role::ImportWithTune {
+	use Aion -role, -use_only;
+
+	sub tune (@) { shift }
+
+	sub import_with {
+		my ($module, $pkg) = @_;
+		no strict 'refs';
+		*{"$pkg\::tune"} = \&tune;
+	}
+}
+
+package Role::ImportWithCfg {
+	use Aion -role, -export => [qw/cfg/];
+
+	sub cfg (@) { shift }
+}
+
+package MyClass1 {
+	use Aion
+		with => 'Role::ImportWithTune',
+		with => 'Role::ImportWithCfg',
+	;
+
+	cfg 123;  # -> 123
+	tune 456; # -> 456
+}
+
+package MyClass2 {
+	use Aion
+		with => [qw/Role::ImportWithTune Role::ImportWithCfg/],
+	;
+
+	cfg 123;  # -> 123
+	tune 456; # -> 456
+}
+
+eval {
+	package MyClass3 {
+		use Aion;
+
+		with qw/Role::ImportWithTune Role::ImportWithCfg/;
+	}
+};
+$@ # ^-> use: use Aion with => [qw/Role::ImportWithTune Role::ImportWithCfg/]
+```
+
+# export => subroutines
+
+Экспортирует указанные подпрограммы в модули в которые будет добавлен пакет через `with` или `extends`.
+
+# -use-only
+
+Указывает, что модуль может быть импортирован только в `use Aion`.
 
 # SUBROUTINES IN CLASSES AND ROLES
 
@@ -130,7 +212,7 @@ $s->valsify	 # => a, b
 
 ## exactly ($package)
 
-Проверяет, что `$package` — это суперкласс для данного или сам этот класс.
+Проверяет, что `$package` – это суперкласс для данного или сам этот класс.
 
 Реализацию метода `isa` Aion не меняет и она находит как суперклассы, так и роли (так как и те и другие добавляются в `@ISA` пакета).
 
@@ -151,7 +233,7 @@ Ex::X->exactly("Ex::X") # -> 1
 
 ## does ($package)
 
-Проверяет, что `$package` — это роль, которая используется в классе или другой роли.
+Проверяет, что `$package` – это роль, которая используется в классе или другой роли.
 
 ```perl
 package Role::X { use Aion -role; }
@@ -197,9 +279,9 @@ $earth->moon # => Mars
 
 Создатель аспекта имеет параметры:
 
-* `$value` — значение аспекта.
-* `$feature` — метаобъект описывающий фичу (`Aion::Meta::Feature`).
-* `$aspect_name` — наименование аспекта.
+* `$value` – значение аспекта.
+* `$feature` – метаобъект описывающий фичу (`Aion::Meta::Feature`).
+* `$aspect_name` – наименование аспекта.
 
 ```perl
 package Example::Mars {
@@ -217,6 +299,33 @@ package Example::Mars {
 	has moon => (is => "rw", lvalue => 1);
 }
 ```
+
+## have ($name, @options)
+
+Вызывает хэвлок для настройки класса.
+
+```perl
+package ORM::Role::Table { use Aion -role;
+
+	havelock table => sub {
+		my ($meta, %table) = @_;
+
+		$meta->{table} = \%table;
+	};
+}
+
+package Ex::Person { use Aion;
+	with qw/ORM::Role::Table/;
+
+	have table => (name => 'person');
+}
+
+$Aion::META{'Ex::Person'}{table} # --> {name => 'person'}
+```
+
+## havelock ($meta, @options)
+
+Устанавливает обработчик для настройки класса, который вызывается из `have`.
 
 ## pleroma ()
 
@@ -332,9 +441,9 @@ package Omega3 { use Aion;
 Omega3->new->x  # -> 12
 ```
 
-## Роль наследует роль
+### Role inherits role
 
-Роль может наследовать другую роль через `with`. Так можно уточнять интерфейс: типы требующихся фичей (`req`) и методов (`:Isa`) либо остаются такими же, либо понижаются — становятся более узкими подтипами. Понижение проверяется оператором меньше (`<`): `Num < (Num | Object)`, так как `Num` — подтип объединения `Num | Object`.
+Роль может наследовать другую роль через `with`. Так можно уточнять интерфейс: типы требующихся фичей (`req`) и методов (`:Isa`) либо остаются такими же, либо понижаются – становятся более узкими подтипами. Понижение проверяется оператором меньше (`<`): `Num < (Num | Object)`, так как `Num` – подтип объединения `Num | Object`.
 
 Роль `Role::Animal` требует свойство `legs` широкого типа `Num | Object` и метод `sound` с сигнатурой `(Me => Str)`.
 
@@ -380,17 +489,17 @@ $sparrow->sound # => chirp
 
 ## is => $permissions
 
-* `ro` — создать только геттер.
-* `wo` — создать только сеттер.
-* `rw` — создать геттер и сеттер.
+* `ro` – создать только геттер.
+* `wo` – создать только сеттер.
+* `rw` – создать геттер и сеттер.
 
-По умолчанию — `rw`.
+По умолчанию – `rw`.
 
 Дополнительные разрешения:
 
-* `+` — фича обязательна в параметрах конструктора. `+` не используется с `-`.
-* `-` — фича не может быть установлена через конструктор. '-' не используется с `+`.
-* `*` — не инкрементировать счётчик ссылок на значение (применить `weaken` к значению после установки его в фичу).
+* `+` – фича обязательна в параметрах конструктора. `+` не используется с `-`.
+* `-` – фича не может быть установлена через конструктор. '-' не используется с `+`.
+* `*` – не инкрементировать счётчик ссылок на значение (применить `weaken` к значению после установки его в фичу).
 * `?` – создать предикат.
 * `!` – создать clearer.
 

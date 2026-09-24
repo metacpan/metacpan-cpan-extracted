@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Scalar::Util qw(blessed refaddr);
-my @CENSUS_TYPES = qw(pipe tty stream listener dgram timer signal event process);
+my @CENSUS_TYPES = qw(pipe tty stream listener dgram timer signal event inotify process);
 
 sub _type_of ($object) {
     return 'unknown'
@@ -18,6 +18,7 @@ sub _type_of ($object) {
     return 'timer'    if $object->isa('Linux::Event::Kernel::Timer');
     return 'signal'   if $object->isa('Linux::Event::Kernel::Signal');
     return 'event'    if $object->isa('Linux::Event::Kernel::Event');
+    return 'inotify'  if $object->isa('Linux::Event::Kernel::Inotify');
     return 'process'  if $object->isa('Linux::Event::Kernel::Process');
     return 'unknown';
 }
@@ -37,6 +38,8 @@ sub _object_snapshot ($self) {
         if Linux::Event::Kernel::Signal->can('_objects_for_loop');
     push @candidate, @{ Linux::Event::Kernel::Event->_objects_for_loop($self) }
         if Linux::Event::Kernel::Event->can('_objects_for_loop');
+    push @candidate, @{ Linux::Event::Kernel::Inotify->_objects_for_loop($self) }
+        if Linux::Event::Kernel::Inotify->can('_objects_for_loop');
     push @candidate, @{ Linux::Event::_Resolver->_objects_for_loop($self) }
         if Linux::Event::_Resolver->can('_objects_for_loop');
 
@@ -159,6 +162,11 @@ sub _inspect_object ($self, $object, $registered) {
     elsif ($type eq 'signal') {
         $result->{signals} = _value($object, 'signals');
     }
+    elsif ($type eq 'inotify') {
+        @$result{qw(fd watches)} = (
+            _value($object, 'fd'), _value($object, 'watch_count'),
+        );
+    }
     elsif ($type eq 'process') {
         @$result{qw(pid pending_stdin_bytes)} = (
             _value($object, 'pid'), _value($object, 'pending_stdin_bytes'),
@@ -167,7 +175,12 @@ sub _inspect_object ($self, $object, $registered) {
     return $result;
 }
 
-sub resources ($self) { $self->_resources_native }
+sub resources ($self) {
+    my $resource = $self->_resources_native;
+    $resource->{defer_fd} = $self->_deferred_fd;
+    $resource->{pending_deferred} = $self->_deferred_count;
+    return $resource;
+}
 
 sub why_alive ($self) {
     my @reason = map {
@@ -175,10 +188,13 @@ sub why_alive ($self) {
         $snapshot->{object} = $_;
         $snapshot;
     } @{ $self->_object_snapshot };
-    my $resources = $self->_resources_native;
+    my $resources = $self->resources;
     push @reason, map {
         +{ type => 'registration', registered => 1, fd => $_ }
     } @{ $resources->{public_registration_fds} };
+    push @reason, {
+        type => 'deferred', pending => $resources->{pending_deferred},
+    } if $resources->{pending_deferred};
     return \@reason;
 }
 

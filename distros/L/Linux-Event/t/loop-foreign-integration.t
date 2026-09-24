@@ -3,11 +3,14 @@ use strict;
 use warnings;
 
 use Test::More;
+use File::Spec;
+use File::Temp qw(tempdir);
 use IO::Select;
 use POSIX qw(SIGUSR1);
 
 use Linux::Event::Loop;
 use Linux::Event::Kernel::Event;
+use Linux::Event::Kernel::Inotify;
 use Linux::Event::Kernel::Process;
 use Linux::Event::Kernel::Signal;
 use Linux::Event::Kernel::Timer;
@@ -121,6 +124,50 @@ sub await_foreign_readable ($selector, $label, $timeout = 3) {
     is($count, 3, 'eventfd callback ran through the foreign-loop boundary');
 
     $event->cancel;
+    close $poll_fh;
+}
+
+{
+    my $loop = Linux::Event::Loop->new;
+    my ($poll_fh, $selector) = foreign_selector($loop);
+    my $dir = tempdir(CLEANUP => 1);
+    my $path = File::Spec->catfile($dir, 'foreign-inotify.txt');
+    open my $seed, '>', $path or die "open $path: $!";
+    close $seed;
+
+    my $seen = 0;
+    my $inotify = Linux::Event::Kernel::Inotify->new(loop => $loop);
+    my $watch = $inotify->watch(
+        $path,
+        on_modify => sub ($event) { $seen++ },
+    );
+
+    open my $out, '>>', $path or die "open $path: $!";
+    print {$out} "changed\n";
+    close $out;
+
+    await_foreign_readable($selector,
+        'inotify readiness makes poll_fd readable');
+    cmp_ok($loop->poll, '>=', 1, 'poll dispatches inotify readiness');
+    is($seen, 1, 'inotify callback ran through the foreign-loop boundary');
+
+    $watch->cancel;
+    $inotify->close;
+    close $poll_fh;
+}
+
+{
+    my $loop = Linux::Event::Loop->new;
+    my ($poll_fh, $selector) = foreign_selector($loop);
+    my $seen = 0;
+
+    my $pending = $loop->defer(sub { $seen++ });
+    await_foreign_readable($selector,
+        'deferred work makes poll_fd readable');
+    cmp_ok($loop->poll, '>=', 1, 'poll dispatches deferred work');
+    is($seen, 1, 'deferred callback ran through the foreign-loop boundary');
+    ok(!$pending->is_active, 'foreign-driven deferred handle completes');
+
     close $poll_fh;
 }
 

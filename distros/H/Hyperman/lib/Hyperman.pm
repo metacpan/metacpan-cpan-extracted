@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -543,6 +543,15 @@ B<h2c Upgrade.> With C<< http2 => 1 >> over cleartext, an HTTP/1.1 request
 carrying C<Upgrade: h2c> is answered with C<101 Switching Protocols> and the
 connection continues as HTTP/2 (the original request becomes stream 1) - as
 well as the prior-knowledge preface. Over TLS, h2 is chosen by ALPN instead.
+
+C<max_requests_per_worker> counts every request the worker finishes,
+whatever protocol carried it, and retires it once the count reaches N: the
+replacement is forked from the supervisor, the retired worker drains what it
+is holding and exits, and a visitor sees nothing. It bounds what a worker can
+accumulate, which is the use it is usually put to, but it is a bound on
+requests and not on memory - a worker whose growth is per connection rather
+than per request reaches the bound late or not at all. It needs a pool:
+with C<< workers => 1 >> there is nothing to retire the worker into.
 
 With C<< workers > 1 >> a supervisor process manages the pool: a crashed
 worker is respawned (exponential backoff on crash loops; clean exits respawn

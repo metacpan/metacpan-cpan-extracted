@@ -47,8 +47,10 @@ EV::run;
 - **Cluster**: member list/add/remove/update/promote
 - **Maintenance**: status, compact, defragment, alarm, hash_kv, move_leader
 - **Auth**: user/role management, authenticate, enable/disable
+- **TLS** and mutual TLS
+- **Failover** across multiple endpoints
 - **Health monitoring** with configurable interval and callback
-- **Automatic retries** for transient gRPC failures
+- **Automatic reconnection** of watch, keepalive and observe streams
 
 ## Architecture
 

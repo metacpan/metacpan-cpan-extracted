@@ -53,6 +53,14 @@ Readonly my @SIMPLE_DATA => (
 	['March',      950],
 );
 
+# Minimal heatmap dataset.
+Readonly my @HEATMAP_DATA => (
+	['Jan', 'North', 100],
+	['Jan', 'South',  50],
+	['Feb', 'North',  80],
+	['Feb', 'South',  30],
+);
+
 # Simple dataset with one annotated point (extra tooltip data).
 Readonly my @EXTRA_DATA => (
 	['January',  1_000, { Region => 'North', SKU => 'X1' }],
@@ -309,6 +317,10 @@ subtest 'snippet methods produce page-shell-free fragments in all configurations
 			$chart->render_zoomable_line_chart_snippet(\@SIMPLE_DATA)->{html}],
 		['render_pie_chart_snippet',
 			$chart->render_pie_chart_snippet(\@SIMPLE_DATA)->{html}],
+		['render_bar_chart_snippet',
+			$chart->render_bar_chart_snippet(\@SIMPLE_DATA)->{html}],
+		['render_heatmap_snippet',
+			$chart->render_heatmap_snippet(\@HEATMAP_DATA)->{html}],
 	) {
 		my ($name, $html) = @$pair;
 		unlike($html, qr/<!DOCTYPE/i, "$name: no DOCTYPE");
@@ -357,6 +369,8 @@ subtest 'render methods embed JSON data and return character strings' => sub {
 			sub { $chart->render_animated_pie_chart(\@SIMPLE_DATA) }],
 		['render_pie_chart_snippet',
 			sub { $chart->render_pie_chart_snippet(\@SIMPLE_DATA) }],
+		['render_bar_chart_snippet',
+			sub { $chart->render_bar_chart_snippet(\@SIMPLE_DATA) }],
 	) {
 		my ($name, $code) = @$pair;
 		my $result = $code->();
@@ -374,6 +388,14 @@ subtest 'render methods embed JSON data and return character strings' => sub {
 
 		diag("$name output length: " . length($html)) if $ENV{TEST_VERBOSE};
 	}
+
+	# render_heatmap_snippet uses a different data structure ($x, $y, $value triples)
+	# so it is checked separately here.
+	my $hm_html = $chart->render_heatmap_snippet(\@HEATMAP_DATA)->{html};
+	like($hm_html, qr/"x":"Jan"/, 'render_heatmap_snippet: x label in JSON');
+	like($hm_html, qr/"v":100/,  'render_heatmap_snippet: value 100 in JSON (v key)');
+	ok(utf8::is_utf8($hm_html) || $hm_html !~ /[^\x00-\x7f]/,
+		'render_heatmap_snippet: output is a character string or pure ASCII');
 };
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -499,6 +521,10 @@ subtest 'render methods do not clobber $_, $@, or $!' => sub {
 	$chart->render_multi_series_line_chart_with_interactive_legends(\@MULTI_DATA);
 	is($_, 'sentinel', '$_ is unchanged after render_multi_series_*_with_interactive_legends');
 	is($@, '',         '$@ is unchanged after render_multi_series_*_with_interactive_legends');
+
+	$chart->render_heatmap_snippet(\@HEATMAP_DATA);
+	is($_, 'sentinel', '$_ is unchanged after render_heatmap_snippet');
+	is($@, '',         '$@ is unchanged after render_heatmap_snippet');
 };
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -606,6 +632,7 @@ subtest 'D3 CDN script loaded by full-page methods, absent from fragments' => su
 		$chart->render_line_chart_snippet(\@SIMPLE_DATA)->{html},
 		$chart->render_zoomable_line_chart_snippet(\@SIMPLE_DATA)->{html},
 		$chart->render_pie_chart_snippet(\@SIMPLE_DATA)->{html},
+		$chart->render_heatmap_snippet(\@HEATMAP_DATA)->{html},
 	) {
 		unlike($html, qr/\Q$D3_CDN\E/,
 			'fragment omits D3 CDN (caller is responsible)');
@@ -652,6 +679,8 @@ subtest 'no raw </b> tag appears in any render output' => sub {
 			$chart->render_animated_pie_chart(\@SIMPLE_DATA)],
 		['render_pie_chart_snippet',
 			$chart->render_pie_chart_snippet(\@SIMPLE_DATA)->{html}],
+		['render_heatmap_snippet',
+			$chart->render_heatmap_snippet(\@HEATMAP_DATA)->{html}],
 	) {
 		my ($name, $html) = @$pair;
 		unlike($html, qr{</b>}, "$name: no raw </b> in output");
@@ -961,6 +990,208 @@ subtest 'render_zoomable_line_chart_snippet animated workflow' => sub {
 	like($h2,   qr/d3\.brushX\(\)/,   'c2 plain: zoom still intact');
 
 	diag("anim html length: " . length($anim_html)) if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# render_bar_chart_snippet: structural and option contract
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_bar_chart_snippet: structure, options, and error handling' => sub {
+	my $chart = HTML::D3->new(width => 800, height => 500, title => 'Bar');
+	my @data  = (['Alpha', 30], ['Beta', 50], ['Gamma', 20]);
+
+	# Default call: vertical orientation, steelblue, no animation
+	my $res = $chart->render_bar_chart_snippet(\@data);
+	is(ref($res),         'HASH',       'returns a hashref');
+	is($res->{svg_id},    'bar_chart',  'svg_id is bar_chart');
+	my $html = $res->{html};
+	like($html, qr/id="bar_chart"/,     'SVG id present');
+	like($html, qr/id="bar_chart_tip"/, 'tooltip div present');
+	like($html, qr/d3\.scaleBand/,      'scaleBand for category axis');
+	like($html, qr/d3\.scaleLinear/,    'scaleLinear for value axis');
+	like($html, qr/Alpha/,              'label Alpha embedded');
+	like($html, qr/50/,                 'value 50 embedded');
+	unlike($html, qr/<!DOCTYPE/i,       'no DOCTYPE shell');
+	unlike($html, qr/<html/i,           'no <html> element');
+	ok(utf8::is_utf8($html) || $html !~ /[^\x00-\x7f]/,
+		'html is a character string or pure ASCII');
+
+	# Horizontal orientation
+	my $horiz = $chart->render_bar_chart_snippet(\@data, { orientation => 'horizontal' })->{html};
+	like($horiz, qr/d3\.scaleBand/,    'horizontal: scaleBand present');
+	like($horiz, qr/d3\.scaleLinear/,  'horizontal: scaleLinear present');
+
+	# sort_bars => 'value': higher values come first in the JSON
+	my $sorted = $chart->render_bar_chart_snippet(\@data, { sort_bars => 'value' })->{html};
+	my ($pos_beta)  = ($sorted =~ /("label":"Beta".*?"value":50)/s) ? 1 : 0;
+	my ($pos_alpha) = ($sorted =~ /("label":"Alpha".*?"value":30)/s) ? 1 : 0;
+	my $beta_idx  = index($sorted, '"label":"Beta"');
+	my $alpha_idx = index($sorted, '"label":"Alpha"');
+	ok($beta_idx < $alpha_idx, 'sort_bars value: Beta (50) appears before Alpha (30)');
+
+	# sort_bars => 'label': alphabetical
+	my $alpha_sorted = $chart->render_bar_chart_snippet(\@data, { sort_bars => 'label' })->{html};
+	my $a_idx = index($alpha_sorted, '"label":"Alpha"');
+	my $b_idx = index($alpha_sorted, '"label":"Beta"');
+	my $g_idx = index($alpha_sorted, '"label":"Gamma"');
+	ok($a_idx < $b_idx && $b_idx < $g_idx, 'sort_bars label: alphabetical order');
+
+	# max_bars: only first 2 bars shown; remaining collapsed into Other.
+	# After sort by value desc: Beta(50), Alpha(30), Gamma(20).
+	# max_bars => 2 keeps Beta and Alpha; Gamma becomes Other.
+	my $maxed = $chart->render_bar_chart_snippet(\@data, {
+		sort_bars => 'value', max_bars => 2
+	})->{html};
+	like($maxed,   qr/"label":"Other"/, 'max_bars: Other bar present');
+	unlike($maxed, qr/"label":"Gamma"/, 'max_bars: Gamma collapsed into Other');
+	like($maxed,   qr/"label":"Alpha"/, 'max_bars: Alpha kept (2nd highest)');
+
+	# color => 'categorical'
+	my $cat = $chart->render_bar_chart_snippet(\@data, { color => 'categorical' })->{html};
+	like($cat, qr/schemeTableau10/, 'categorical: Tableau-10 palette used');
+
+	# show_values
+	my $vals = $chart->render_bar_chart_snippet(\@data, { show_values => 1 })->{html};
+	like($vals, qr/bc-val-text/, 'show_values: value label class present');
+
+	# animated => 1 (vertical)
+	my $anim = $chart->render_bar_chart_snippet(\@data, { animated => 1 })->{html};
+	like($anim, qr/prefers-reduced-motion/, 'animated: reduced-motion guard present');
+	like($anim, qr/transition\(\)/,          'animated: D3 transition called');
+
+	# animated => 1 (horizontal)
+	my $anim_h = $chart->render_bar_chart_snippet(\@data, {
+		animated => 1, orientation => 'horizontal'
+	})->{html};
+	like($anim_h, qr/prefers-reduced-motion/, 'animated horizontal: reduced-motion guard');
+
+	# x_label
+	my $xl = $chart->render_bar_chart_snippet(\@data, { x_label => 'Category' })->{html};
+	like($xl, qr/Category/, 'x_label: label text embedded');
+
+	# value_label
+	my $vl = $chart->render_bar_chart_snippet(\@data, { value_label => 'Count' })->{html};
+	like($vl, qr/Count/, 'value_label: custom label embedded');
+
+	# x-axis rotation for >8 bars
+	my @many = map { ["Label$_", $_ * 10] } 1 .. 10;
+	my $rotated = $chart->render_bar_chart_snippet(\@many)->{html};
+	like($rotated, qr/rotate\(-45\)/, 'rotate: x-labels rotated for >8 bars');
+	my $not_rotated = $chart->render_bar_chart_snippet(\@data)->{html};
+	unlike($not_rotated, qr/rotate\(-45\)/, 'no rotate: labels not rotated for <=8 bars');
+
+	# extra hashref appears in tooltip code
+	my @with_extra = (['Alpha', 30, { note => 'first' }]);
+	my $extra_html = $chart->render_bar_chart_snippet(\@with_extra)->{html};
+	like($extra_html, qr/d\.extra/, 'extra: tooltip extra rendering code present');
+
+	# Negative values become positive
+	my $neg = $chart->render_bar_chart_snippet([['A', -42]])->{html};
+	like($neg, qr/42/, 'negative value: converted to absolute value');
+	unlike($neg, qr/-42/, 'negative value: minus sign not in JSON');
+
+	# undef value: skipped silently
+	my $undef_res;
+	lives_ok {
+		$undef_res = $chart->render_bar_chart_snippet([['A', undef], ['B', 5]])->{html};
+	} 'undef value: silently skipped, no exception';
+	like($undef_res, qr/"label":"B"/, 'undef value: B still present after skip');
+	unlike($undef_res, qr/"label":"A"/, 'undef value: A absent (skipped)');
+
+	# Error: non-array data
+	dies_ok { $chart->render_bar_chart_snippet('not an array') }
+		'dies on non-array $data';
+
+	# Error: element not an array reference
+	dies_ok { $chart->render_bar_chart_snippet([['ok', 1], 'bad']) }
+		'dies when element is not an array reference';
+
+	# Error: too few elements
+	dies_ok { $chart->render_bar_chart_snippet([['only one']]) }
+		'dies when element has fewer than 2 items';
+
+	# Error: non-numeric value
+	dies_ok { $chart->render_bar_chart_snippet([['A', 'hello']]) }
+		'dies on non-numeric value';
+
+	# Error: bad orientation
+	dies_ok { $chart->render_bar_chart_snippet(\@data, { orientation => 'diagonal' }) }
+		'dies on invalid orientation';
+
+	# Error: bad sort_bars
+	dies_ok { $chart->render_bar_chart_snippet(\@data, { sort_bars => 'random' }) }
+		'dies on invalid sort_bars';
+
+	# Empty data: returns a valid (empty) chart
+	my $empty = $chart->render_bar_chart_snippet([])->{html};
+	like($empty, qr/id="bar_chart"/, 'empty data: SVG element still present');
+
+	diag('bar chart html length: ' . length($html)) if $ENV{TEST_VERBOSE};
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 21. render_heatmap_snippet: structural and option contract
+#
+# The heatmap snippet is the most visually complex snippet: it has a colour
+# scale, optional axis labels, a gradient legend, animated fade-in, and cell
+# padding.  This subtest verifies the cross-cutting integration properties:
+# the full option suite does not interfere, and the output obeys the fragment
+# contract (no page shell, no CDN tag, character string, scaleSequential).
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_heatmap_snippet: structure, options, and integration' => sub {
+	my $chart = HTML::D3->new(width => 800, height => 600, title => 'Heatmap Suite');
+
+	# Default call: YlOrRd scheme, legend on, no animation
+	my $res = $chart->render_heatmap_snippet(\@HEATMAP_DATA);
+	is(ref($res), 'HASH', 'returns a hashref');
+	is($res->{svg_id}, 'heatmap', 'svg_id is "heatmap"');
+	my $html = $res->{html};
+	like($html, qr/id="heatmap"/,         'SVG id present');
+	like($html, qr/scaleSequential/,      'd3.scaleSequential present');
+	like($html, qr/interpolateYlOrRd/,    'default YlOrRd scheme');
+	like($html, qr/linearGradient/,       'legend on by default');
+	unlike($html, qr/<!DOCTYPE/i,         'no DOCTYPE shell');
+	unlike($html, qr/\Q$D3_CDN\E/,       'no D3 CDN tag');
+	ok(utf8::is_utf8($html) || $html !~ /[^\x00-\x7f]/,
+		'output is a character string');
+
+	# color_scheme: each supported scheme emits its d3.interpolate counterpart
+	for my $scheme (qw(Blues Greens Purples RdPu YlGnBu)) {
+		my $s_html = $chart->render_heatmap_snippet(\@HEATMAP_DATA, { color_scheme => $scheme })->{html};
+		like($s_html, qr/interpolate\Q$scheme\E/, "color_scheme $scheme: d3.interpolate$scheme present");
+	}
+
+	# legend => 0: gradient legend must be absent
+	my $no_leg = $chart->render_heatmap_snippet(\@HEATMAP_DATA, { legend => 0 })->{html};
+	unlike($no_leg, qr/linearGradient/, 'legend => 0: legend absent');
+
+	# animated => 1: prefers-reduced-motion guard present
+	my $anim = $chart->render_heatmap_snippet(\@HEATMAP_DATA, { animated => 1 })->{html};
+	like($anim, qr/prefers-reduced-motion/, 'animated: reduced-motion guard present');
+
+	# id opt: overrides default svg_id
+	my $id_res = $chart->render_heatmap_snippet(\@HEATMAP_DATA, { id => 'my_heat' });
+	is($id_res->{svg_id}, 'my_heat', 'id opt: svg_id overridden');
+	like($id_res->{html}, qr/<svg id="my_heat"/, 'id opt: SVG element id overridden');
+
+	# x_label, y_label, val_label
+	my $labelled = $chart->render_heatmap_snippet(\@HEATMAP_DATA, {
+		x_label => 'Month', y_label => 'Region', val_label => 'Sales',
+	})->{html};
+	like($labelled, qr/Month/,  'x_label text embedded');
+	like($labelled, qr/Region/, 'y_label text embedded');
+	like($labelled, qr/Sales/,  'val_label text embedded');
+
+	# Object independence: two objects with different opts must not bleed state
+	my $c1 = HTML::D3->new(width => 800, height => 600, title => 'C1');
+	my $c2 = HTML::D3->new(width => 800, height => 600, title => 'C2');
+	my $h1 = $c1->render_heatmap_snippet(\@HEATMAP_DATA, { animated => 1 })->{html};
+	my $h2 = $c2->render_heatmap_snippet(\@HEATMAP_DATA)->{html};
+	like($h1,   qr/prefers-reduced-motion/, 'c1 animated: reduced-motion guard present');
+	unlike($h2, qr/prefers-reduced-motion/, 'c2 plain: no animation bleed from c1');
+
+	diag("heatmap html length: " . length($html)) if $ENV{TEST_VERBOSE};
 };
 
 done_testing();

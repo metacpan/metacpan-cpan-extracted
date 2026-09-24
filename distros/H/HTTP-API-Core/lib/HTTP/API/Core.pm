@@ -12,7 +12,7 @@ use HTTP::API::Core::Response;
 use HTTP::API::Core::Error;
 use HTTP::API::Core::Pagination;
 
-our $VERSION = '1.02';
+our $VERSION = '1.08';
 
 sub new {
     my ($class, %args) = @_;
@@ -23,6 +23,7 @@ sub new {
 
     my $headers = delete($args{headers}) || {};
     die "headers must be a hash reference\n" if ref($headers) ne 'HASH';
+    _validate_header_values($headers);
 
     my $timeout = exists $args{timeout} ? delete($args{timeout}) : 10;
     die "timeout must be a positive number\n"
@@ -90,7 +91,15 @@ sub request {
     die "query must be a hash reference\n" if ref($query) ne 'HASH';
     $url = _append_query($url, $query);
 
-    my %headers = (%{ $self->{headers} }, %{ delete($opts{headers}) || {} });
+    my $request_headers = exists $opts{headers} ? delete($opts{headers}) : {};
+    die "headers must be a hash reference\n" if ref($request_headers) ne 'HASH';
+    _validate_header_values($request_headers);
+    my %headers = %{ $self->{headers} };
+    for my $name (keys %$request_headers) {
+        my $wanted = lc $name;
+        delete @headers{ grep { lc($_) eq $wanted } keys %headers };
+        $headers{$name} = $request_headers->{$name};
+    }
 
     if (exists $opts{idempotency}) {
         my $idempotency = delete $opts{idempotency};
@@ -125,8 +134,8 @@ sub request {
                 message  => "failed to encode JSON request: $@",
             );
         }
-        $headers{'content-type'} ||= 'application/json';
-        $headers{'accept'}       ||= 'application/json';
+        _set_header_if_absent(\%headers, 'content-type', 'application/json');
+        _set_header_if_absent(\%headers, 'accept', 'application/json');
     }
     elsif (exists $opts{content}) {
         $content = delete $opts{content};
@@ -163,6 +172,15 @@ sub request {
 
         my $hook_error = _run_hooks($hooks->{before_request}, $context);
         die _hook_error($hook_error, $method, $url) if $hook_error;
+        die "method must be a non-empty scalar\n"
+            if !defined($context->{method}) || ref($context->{method}) || $context->{method} eq '';
+        die "url must be a defined scalar\n"
+            if !defined($context->{url}) || ref($context->{url});
+        die "headers must be a hash reference\n"
+            if ref($context->{headers}) ne 'HASH';
+        _validate_header_values($context->{headers});
+        die "content must be a scalar or undef\n"
+            if defined($context->{content}) && ref($context->{content});
 
         my $started_at = time;
         $context->{started_at} = $started_at;
@@ -251,7 +269,16 @@ sub _request_once {
         ), $elapsed);
     };
 
-    if (ref($raw) ne 'HASH' || !exists $raw->{status}) {
+    if (ref($raw) ne 'HASH'
+        || !exists($raw->{status})
+        || !defined($raw->{status})
+        || ref($raw->{status})
+        || $raw->{status} !~ /\A\d{3}\z/
+        || $raw->{status} < 100
+        || $raw->{status} > 599
+        || (defined($raw->{headers}) && ref($raw->{headers}) ne 'HASH')
+        || (defined($raw->{reason}) && ref($raw->{reason}))
+        || (defined($raw->{content}) && ref($raw->{content}))) {
         my $elapsed = time - $started_at;
         return (undef, HTTP::API::Core::Error->new(
             category  => 'transport',
@@ -470,6 +497,8 @@ sub _append_query {
 
         my @values;
         if (ref($value) eq 'ARRAY') {
+            die "query parameter array values must contain only scalars or undef\n"
+                if grep { defined($_) && ref($_) } @$value;
             @values = grep { defined $_ } @$value;
         }
         elsif (ref($value)) {
@@ -501,6 +530,19 @@ sub _uri_escape {
     utf8::encode($bytes) if utf8::is_utf8($bytes);
     $bytes =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
     return $bytes;
+}
+
+sub _validate_header_values {
+    my ($headers) = @_;
+    die "header values must be scalars or undef\n"
+        if grep { defined($_) && ref($_) } values %$headers;
+}
+
+sub _set_header_if_absent {
+    my ($headers, $name, $value) = @_;
+    my $wanted = lc $name;
+    return if grep { lc($_) eq $wanted } keys %$headers;
+    $headers->{$name} = $value;
 }
 
 sub _non_negative_number {
@@ -609,7 +651,8 @@ C<next_url>, C<page>, and C<cursor>.
 Pass C<json> to encode a Perl value as JSON, or C<content> to send raw content.
 Pass C<query> as a hash reference to append percent-encoded query parameters.
 Array-reference values produce repeated keys and undefined values are omitted.
-Per-request C<headers> override default headers. Pass C<retry =E<gt> 0> to
+Per-request C<headers> override default headers case-insensitively, preserving the
+per-request header spelling. Pass C<retry =E<gt> 0> to
 disable retry for one request, or a retry hash to override the policy. A
 C<hooks> hash can add request-local hooks after client-level hooks.
 

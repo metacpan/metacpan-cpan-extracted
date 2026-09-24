@@ -49,6 +49,17 @@
 #include "perl.h"
 
 /*
+ * Linkage for the C API below. Deliberately not PERL_CALLCONV: on Windows
+ * Perl defines that as __declspec(dllimport) for anything that is not the
+ * perl DLL itself, and MSVC refuses to define a dllimport function
+ * ("C2491: definition of dllimport function not allowed"). The symbols are
+ * exported from the DLL by FUNCLIST in Makefile.PL, not by a declspec.
+ */
+#ifndef OBJECT_API
+#  define OBJECT_API extern
+#endif
+
+/*
  * Type check function signature.
  * Return true if value passes the type check, false otherwise.
  * The function receives the value to check.
@@ -86,7 +97,7 @@ typedef SV* (*ObjectTypeCoerceFuncEx)(pTHX_ SV *val, void *data);
  * The type name can then be used in Object::Proto::define() slot specifications.
  * Type checks and coercions run as direct C function calls with no Perl overhead.
  */
-extern void object_register_type_xs(pTHX_ const char *name,
+OBJECT_API void object_register_type_xs(pTHX_ const char *name,
                                     ObjectTypeCheckFunc check,
                                     ObjectTypeCoerceFunc coerce);
 
@@ -106,7 +117,7 @@ typedef struct {
     void *data;
 } RegisteredType;
 
-extern RegisteredType* object_get_registered_type(pTHX_ const char *name);
+OBJECT_API RegisteredType* object_get_registered_type(pTHX_ const char *name);
 
 /*
  * Register a type with C-level check and coerce functions that receive user-data.
@@ -119,7 +130,7 @@ extern RegisteredType* object_get_registered_type(pTHX_ const char *name);
  *   coerce - C function to coerce values (optional, pass NULL)
  *   data   - Opaque pointer passed to check/coerce on every call
  */
-extern void object_register_type_xs_ex(pTHX_ const char *name,
+OBJECT_API void object_register_type_xs_ex(pTHX_ const char *name,
                                        ObjectTypeCheckFuncEx check,
                                        ObjectTypeCoerceFuncEx coerce,
                                        void *data);

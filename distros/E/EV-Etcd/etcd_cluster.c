@@ -1,6 +1,3 @@
-/*
- * etcd_cluster.c - Cluster operation handlers for EV::Etcd
- */
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
@@ -10,8 +7,7 @@
 #include "etcd_common.h"
 #include "etcd_cluster.h"
 
-/* Helper to convert Member to hash */
-HV *member_to_hv(pTHX_ Etcdserverpb__Member *member) {
+static HV *member_to_hv(pTHX_ Etcdserverpb__Member *member) {
     if (!member) return NULL;
 
     HV *hv = newHV();
@@ -21,23 +17,19 @@ HV *member_to_hv(pTHX_ Etcdserverpb__Member *member) {
     }
     hv_store(hv, "is_learner", 10, newSViv(member->is_learner ? 1 : 0), 0);
 
-    /* peerURLs */
     AV *peer_urls = newAV();
     if (member->n_peer_urls > 0) {
         av_extend(peer_urls, member->n_peer_urls - 1);
         for (size_t i = 0; i < member->n_peer_urls; i++) {
-            /* Handle NULL string in repeated field */
             av_push(peer_urls, member->peer_urls[i] ? newSVpv(member->peer_urls[i], 0) : newSVpvn("", 0));
         }
     }
     hv_store(hv, "peer_urls", 9, newRV_noinc((SV *)peer_urls), 0);
 
-    /* clientURLs */
     AV *client_urls = newAV();
     if (member->n_client_urls > 0) {
         av_extend(client_urls, member->n_client_urls - 1);
         for (size_t i = 0; i < member->n_client_urls; i++) {
-            /* Handle NULL string in repeated field */
             av_push(client_urls, member->client_urls[i] ? newSVpv(member->client_urls[i], 0) : newSVpvn("", 0));
         }
     }
@@ -46,7 +38,6 @@ HV *member_to_hv(pTHX_ Etcdserverpb__Member *member) {
     return hv;
 }
 
-/* Helper to add members array to result */
 static void add_members_to_hv(pTHX_ HV *result, Etcdserverpb__Member **members, size_t n_members) {
     AV *members_av = newAV();
     if (n_members > 0) {
@@ -61,7 +52,6 @@ static void add_members_to_hv(pTHX_ HV *result, Etcdserverpb__Member **members, 
     hv_store(result, "members", 7, newRV_noinc((SV *)members_av), 0);
 }
 
-/* Process MemberAddResponse */
 void process_member_add_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "member_add");
 
@@ -85,7 +75,6 @@ void process_member_add_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process MemberRemoveResponse */
 void process_member_remove_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "member_remove");
 
@@ -101,7 +90,6 @@ void process_member_remove_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process MemberUpdateResponse */
 void process_member_update_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "member_update");
 
@@ -117,7 +105,6 @@ void process_member_update_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process MemberListResponse */
 void process_member_list_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "member_list");
 
@@ -133,7 +120,6 @@ void process_member_list_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process MemberPromoteResponse */
 void process_member_promote_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "member_promote");
 

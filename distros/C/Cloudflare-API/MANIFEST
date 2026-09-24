@@ -1,0 +1,44 @@
+Changes
+LICENSE
+bin/cloudflare-api
+bin/cloudflare-api.md
+lib/Cloudflare/API.pm
+lib/Cloudflare/API.pm.md
+lib/Cloudflare/API/Accounts.pm
+lib/Cloudflare/API/Accounts.pm.md
+lib/Cloudflare/API/CLI/Completion.pm
+lib/Cloudflare/API/CLI/Completion.pm.md
+lib/Cloudflare/API/D1.pm
+lib/Cloudflare/API/D1.pm.md
+lib/Cloudflare/API/Error.pm
+lib/Cloudflare/API/Error.pm.md
+lib/Cloudflare/API/Hyperdrive.pm
+lib/Cloudflare/API/Hyperdrive.pm.md
+lib/Cloudflare/API/KV.pm
+lib/Cloudflare/API/KV.pm.md
+lib/Cloudflare/API/Queues.pm
+lib/Cloudflare/API/Queues.pm.md
+lib/Cloudflare/API/R2.pm
+lib/Cloudflare/API/R2.pm.md
+lib/Cloudflare/API/Resource.pm
+lib/Cloudflare/API/Resource.pm.md
+lib/Cloudflare/API/SecretsStore.pm
+lib/Cloudflare/API/SecretsStore.pm.md
+lib/Cloudflare/API/Workers.pm
+lib/Cloudflare/API/Workers.pm.md
+lib/Cloudflare/API/Zones.pm
+lib/Cloudflare/API/Zones.pm.md
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+doc/cloudflare-api.xml
+t/01-client.t
+t/02-resources.t
+t/03-workers.t
+t/04-cli.t
+xt/live.t
+README
+doc/cloudflare-api.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

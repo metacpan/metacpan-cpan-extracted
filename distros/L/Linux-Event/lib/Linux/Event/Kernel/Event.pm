@@ -3,10 +3,11 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.116';
+our $VERSION = '0.117';
 
 use Carp qw(croak);
 use Config ();
+use POSIX qw(getpid);
 use Scalar::Util qw(refaddr weaken);
 
 require Linux::Event::Loop;
@@ -154,6 +155,7 @@ sub loop ($self) {
     return $self->_owner_state('loop')->{loop};
 }
 sub state ($self) {
+    return $self->{fork_state} if $self->{terminal} && $self->{fork_state};
     return 'cancelled' if $self->{terminal};
     return $self->_owner_state('state')->{state};
 }
@@ -165,6 +167,29 @@ sub data ($self, @argument) {
     my $state = $self->_owner_state('data');
     $state->{data} = $argument[0] if @argument;
     return $state->{data};
+}
+
+sub _fork_preflight ($self, $mode, $loop) {
+    croak "fork(): Event does not support '$mode'" if $mode ne 'drop';
+    my $state = $OWNER_STATE{ $self->{id} };
+    croak 'fork(): Event is not active in this Loop'
+        if $self->{terminal} || !$state || !$state->{loop}
+        || refaddr($state->{loop}) != refaddr($loop)
+        || $state->{state} ne 'active';
+    return 1;
+}
+
+sub _fork_child_drop ($self, $loop) {
+    my $state = delete $OWNER_STATE{ $self->{id} };
+    $state->{watcher} = undef if $state;
+    $state->{loop} = undef if $state;
+    $state->{data} = undef if $state;
+    _close_fd(delete $self->{fd}) if defined $self->{fd};
+    delete $LIVE_HANDLE{ $self->{id} };
+    $self->{owner_pid} = getpid();
+    $self->{terminal} = 1;
+    $self->{fork_state} = 'not_inherited';
+    return;
 }
 
 sub _objects_for_loop ($class, $loop) {
@@ -228,7 +253,7 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Kernel::Event - eventfd-backed Loop notification
+Linux::Event::Kernel::Event - Wake an event loop from another execution context
 
 =head1 SYNOPSIS
 
@@ -237,96 +262,570 @@ Linux::Event::Kernel::Event - eventfd-backed Loop notification
   use Linux::Event::Kernel::Event;
 
   my $loop = Linux::Event::Loop->new;
-  my $notifications = 0;
+
   my $event = Linux::Event::Kernel::Event->new(
       loop => $loop,
-      on_event => sub ($event, $count) {
-          $notifications += $count;
-          $event->loop->stop;
+
+      on_event => sub ($self, $count) {
+          say "Received $count notification(s)";
+          $loop->stop;
       },
   );
 
-  # From a worker thread, native extension, or forked child:
   $event->signal;
+
   $loop->run;
 
 =head1 DESCRIPTION
 
-C<Linux::Event::Kernel::Event> is the public eventfd notification leaf. It lets
-another execution context make the owning Loop runnable without pretending that
-an eventfd transports arbitrary Perl values or callbacks.
+C<Linux::Event::Kernel::Event> provides an eventfd-backed notification that can
+wake a L<Linux::Event::Loop>.
 
-The eventfd carries a 64-bit counter. Application payloads belong in an
-appropriate queue, shared native structure, pipe, socket, or other IPC channel.
-Publish the payload first, then call C<signal>.
+Its main purpose is simple:
 
-=head1 CALLBACKS AND SUBCLASS POLICY
+  something outside the Loop has work ready
+          |
+          v
+      $event->signal
+          |
+          v
+      Loop wakes up
+          |
+          v
+      on_event runs normally on the Loop
 
-C<on_event =E<gt> sub ($event, $count) { ... }> may be passed directly to
-C<new>. This closure form is usually best for one object because it can capture
-lexical application state. A constructor callback overrides a same-named
-subclass method for that object.
+The producer might be:
 
-A subclass method remains useful when many Event objects share named,
-testable behavior:
+=over 4
 
-  package ResultsReady;
-  use parent 'Linux::Event::Kernel::Event';
+=item *
 
-  sub on_event ($event, $count) {
-      drain_results($event->data, $count);
+another thread
+
+=item *
+
+a native extension
+
+=item *
+
+an external C library
+
+=item *
+
+a forked child process
+
+=item *
+
+ordinary application code that wants to notify the Loop
+
+=back
+
+C<on_event> always runs as ordinary Loop dispatch.
+
+C<signal> does not execute the callback inline.
+
+=head1 EVENT IS A NOTIFICATION, NOT A MESSAGE QUEUE
+
+This distinction is important.
+
+An Event tells the Loop:
+
+  work is available
+
+It does not carry arbitrary Perl data between threads or processes.
+
+Linux C<eventfd> contains a numeric counter.
+
+It cannot safely transport:
+
+  Perl objects
+  coderefs
+  hashes
+  strings
+  arbitrary messages
+
+If another execution context has actual application data to deliver, place that
+data in an appropriate queue or IPC mechanism first and then signal the Event.
+
+Conceptually:
+
+  producer:
+      put result in queue
+      $event->signal
+
+  Loop:
+      on_event fires
+      drain queue
+
+For example:
+
+  my $event = Linux::Event::Kernel::Event->new(
+      loop => $loop,
+      data => $results,
+
+      on_event => sub ($self, $count) {
+          my $queue = $self->data;
+
+          while (my $result = next_result($queue)) {
+              process_result($result);
+          }
+      },
+  );
+
+The queue is the source of truth for the actual work.
+
+The Event is merely the wakeup notification.
+
+=head1 CREATING AN EVENT
+
+The normal constructor form is:
+
+  my $event = Linux::Event::Kernel::Event->new(
+      loop => $loop,
+
+      on_event => sub ($self, $count) {
+          ...
+      },
+  );
+
+C<on_event> is required unless the class provides an C<on_event> method.
+
+=head1 THE CALLBACK
+
+=head2 on_event
+
+The callback receives:
+
+  on_event => sub ($self, $count) {
+      ...
   }
 
-Linux::Event resolves the method once per subclass or retains the constructor
-closure once per object. Delivery uses the resulting cached CV; it does not
-perform a method lookup or choose between the two forms for every event.
+where:
 
-=head1 CONSTRUCTION AND CALLBACK
+=over 4
 
-A subclass may define, or C<new> may receive:
+=item C<$self>
 
-  sub on_event ($event, $count) { ... }
+The Event object.
 
-C<data> typically contains the application-owned queue or state associated with
-the notification. C<loop =E<gt> $loop> attaches immediately; otherwise add the
-detached object with C<< $loop->add($event) >>.
+=item C<$count>
 
-C<$count> is the counter value drained from eventfd. Multiple producer writes
-may coalesce into one callback, so the payload channel rather than C<$count> is
-the source of truth for individual work items.
+The eventfd counter value consumed for this delivery.
+
+=back
+
+For example:
+
+  my $event = Linux::Event::Kernel::Event->new(
+      loop => $loop,
+
+      on_event => sub ($self, $count) {
+          say "$count wakeup unit(s) arrived";
+      },
+  );
 
 =head1 SIGNALING
 
-C<signal> writes one to the counter. C<signal($increment)> adds an explicit
-positive increment and returns the Event object. Signaling never invokes
-C<on_event> inline; delivery occurs on the owning Loop thread.
+=head2 signal
 
-The eventfd is nonblocking and close-on-exec. Counter saturation is reported as
-a kernel write failure rather than discarding existing readiness.
+Add one to the Event counter:
 
-=head1 THREAD AND FORK BOUNDARY
+  $event->signal;
 
-Linux::Event does not require a threaded Perl. Event is useful for native worker
-threads, external libraries, and forked processes as well as Perl ithreads.
+C<signal> returns the Event object.
 
-On an ithread-enabled Perl, a cloned Event handle may signal only. It cannot
-manage the Loop, callback, or owner data. The clone uses its own descriptor
-duplicate so destruction or descriptor reuse in one interpreter cannot corrupt
-another.
+It does not call C<on_event> immediately.
 
-A forked child may signal the inherited eventfd until exec. Cross-process
-payloads still require real IPC or shared storage.
+Instead, the eventfd becomes readable and the callback runs when the owning
+Loop dispatches that readiness.
+
+=head2 signal($increment)
+
+An explicit positive increment may also be supplied:
+
+  $event->signal(5);
+
+This adds five to the eventfd counter.
+
+The increment must be a positive integer within the supported eventfd range.
+
+=head1 MULTIPLE SIGNALS MAY COALESCE
+
+Several calls to C<signal> can become one callback.
+
+For example:
+
+  $event->signal;
+  $event->signal;
+  $event->signal;
+
+may later produce:
+
+  on_event => sub ($self, $count) {
+      # $count may be 3
+  }
+
+This is normal eventfd behavior.
+
+That is another reason not to treat C<$count> as though it represented one
+specific application message.
+
+If three queue items were published and three signals were sent, the callback
+might run once with a count of three.
+
+The application should normally drain the associated queue until no work
+remains.
+
+=head1 SIGNALING BEFORE ATTACHMENT
+
+An Event owns its eventfd as soon as it is constructed.
+
+Therefore a detached Event can be signaled before it is added to a Loop:
+
+  my $event = Linux::Event::Kernel::Event->new(
+      on_event => sub ($self, $count) {
+          ...
+      },
+  );
+
+  $event->signal;
+
+  $loop->add($event);
+
+The pending eventfd counter remains available and can make the Event ready once
+it is attached.
+
+=head1 CONSTRUCTOR CALLBACKS OR SUBCLASS METHODS
+
+A constructor callback is often simplest:
+
+  my $event = Linux::Event::Kernel::Event->new(
+      on_event => sub ($self, $count) {
+          ...
+      },
+  );
+
+A reusable Event type can instead use a subclass:
+
+  package ResultsReady;
+
+  use parent 'Linux::Event::Kernel::Event';
+
+  sub on_event ($self, $count) {
+      my $queue = $self->data;
+
+      while (my $result = next_result($queue)) {
+          process_result($result);
+      }
+  }
+
+  package main;
+
+  my $event = ResultsReady->new(
+      loop => $loop,
+      data => $results,
+  );
+
+A constructor C<on_event> callback overrides the subclass method for that
+particular Event.
+
+=head1 APPLICATION DATA
+
+=head2 data
+
+Application-owned state may be associated with an Event:
+
+  my $event = Linux::Event::Kernel::Event->new(
+      loop => $loop,
+      data => $results,
+
+      on_event => sub ($self, $count) {
+          drain_results($self->data);
+      },
+  );
+
+Retrieve it with:
+
+  my $data = $event->data;
+
+While the Event is nonterminal, it may be changed:
+
+  $event->data($new_data);
+
+Cancellation releases the owner-side application data.
+
+=head1 ATTACHING TO A LOOP
+
+An Event can be attached during construction:
+
+  my $event = Linux::Event::Kernel::Event->new(
+      loop => $loop,
+
+      on_event => sub ($self, $count) {
+          ...
+      },
+  );
+
+or created detached:
+
+  my $event = Linux::Event::Kernel::Event->new(
+      on_event => sub ($self, $count) {
+          ...
+      },
+  );
+
+and added later:
+
+  $loop->add($event);
+
+=head1 CANCELLING AN EVENT
+
+=head2 cancel
+
+  $event->cancel;
+
+Cancellation:
+
+=over 4
+
+=item *
+
+removes the Event from its Loop
+
+=item *
+
+closes its owner-side eventfd
+
+=item *
+
+releases retained application data
+
+=item *
+
+makes the Event terminal
+
+=back
+
+Calling C<cancel> again is harmless.
+
+A cancelled Event cannot be signaled or attached again.
 
 =head1 LIFECYCLE
 
-C<cancel> is idempotent and terminal. It removes the Loop registration and
-releases owner-side state. Callback exceptions propagate through ordinary Loop
-dispatch and do not silently cancel the Event.
+The normal Event states are:
 
-The native eventfd extension dispatches C<on_event> directly.
+  unattached
+  active
+  cancelled
+
+=head2 state
+
+  my $state = $event->state;
+
+Return the current lifecycle state.
+
+A managed-fork child may also observe the special terminal state:
+
+  not_inherited
+
+when the parent's Event was intentionally dropped during child Loop
+reconstruction.
+
+=head2 is_active
+
+  if ($event->is_active) {
+      ...
+  }
+
+Return true while attached and active.
+
+=head2 is_terminal
+
+  if ($event->is_terminal) {
+      ...
+  }
+
+Return true once the Event can no longer be managed.
+
+=head1 LOOP
+
+=head2 loop
+
+  my $loop = $event->loop;
+
+Return the owning Loop while the Event is active.
+
+After cancellation, no owning Loop is returned.
+
+=head1 USING EVENT WITH THREADS
+
+Event is useful for waking the Loop from another thread.
+
+The important ownership rule is:
+
+  worker signals
+  owner Loop dispatches
+
+The worker does not become another owner of the Loop or callback.
+
+On an ithread-enabled Perl, a cloned Event handle may be used for signaling.
+
+It does not gain access to the owner interpreter's:
+
+=over 4
+
+=item *
+
+Loop
+
+=item *
+
+callback state
+
+=item *
+
+application C<data>
+
+=item *
+
+lifecycle management
+
+=back
+
+The owning interpreter remains responsible for the Event object itself.
+
+=head1 WHY THE EVENT DOES NOT CARRY PERL VALUES
+
+Arbitrary Perl values belong to a Perl interpreter.
+
+Allowing something like:
+
+  $event->signal($perl_object);
+
+to cross thread boundaries would require Linux::Event to define ownership,
+copying, serialization, cancellation, destruction, and exception behavior for
+arbitrary Perl state.
+
+C<Kernel::Event> deliberately avoids inventing such a model.
+
+Use the Event as the wakeup primitive and choose a payload mechanism appropriate
+to the producer.
+
+=head1 USING EVENT ACROSS FORK
+
+There are two different cases to understand.
+
+=head2 Ordinary CORE::fork
+
+A child created with ordinary C<CORE::fork> inherits the eventfd.
+
+The child may use the inherited Event handle to signal the parent's eventfd
+until C<exec> or until that inherited handle is closed.
+
+For example, conceptually:
+
+  my $pid = CORE::fork();
+
+  if ($pid == 0) {
+      publish_result_through_ipc();
+      $event->signal;
+      exit;
+  }
+
+The child does not gain ownership of the parent's Loop, callback, or application
+C<data>.
+
+Cross-process payloads still require real IPC or shared storage.
+
+The Event descriptor is close-on-exec.
+
+=head2 Linux::Event managed fork
+
+C<Linux::Event::Kernel::Event> currently supports only the default parent-only
+behavior with L<Linux::Event::Loop> managed C<fork>.
+
+It does not support:
+
+  share
+  clone
+  move
+
+Therefore an Event should not be placed in those disposition lists.
+
+For example:
+
+  my $pid = $loop->fork(
+      clone => [$timer],
+  );
+
+The Event remains active in the parent.
+
+The inherited child Event is deliberately dropped as part of rebuilding the
+child Loop and becomes terminal there.
+
+This prevents an inherited Event from accidentally being treated as a
+child-owned Loop resource.
+
+=head1 CALLBACK EXCEPTIONS
+
+If C<on_event> throws an exception, that exception propagates through ordinary
+Loop dispatch.
+
+Linux::Event does not silently convert the exception into Event cancellation.
+
+This follows the normal Linux::Event callback model.
+
+=head1 COUNTER SATURATION
+
+Linux eventfd counters have a finite range.
+
+If producers attempt to increment an already saturated counter, the
+nonblocking eventfd write fails.
+
+Linux::Event reports that failure from C<signal> rather than silently discarding
+the notification.
+
+Applications should normally use Event as a wakeup and drain their actual work
+queue promptly rather than trying to use the eventfd counter as long-term
+storage.
+
+=head1 IMPLEMENTATION MODEL
+
+Each Event owns one nonblocking, close-on-exec Linux C<eventfd>.
+
+When the counter becomes nonzero, epoll makes the Event readable.
+
+Linux::Event reads the counter and invokes C<on_event> on the owning Loop.
+
+One readiness dispatch performs one counter read.
+
+If producers signal again after that read, the eventfd remains or becomes
+readable for a later Loop turn.
+
+This prevents a continuously active producer from forcing one Event dispatch to
+drain forever.
+
+=head1 PERFORMANCE MODEL
+
+Event is intentionally small.
+
+The application callback is resolved at construction: a constructor callback is
+retained for that Event, or a subclass method is cached for its class.
+
+Normal delivery therefore consists primarily of:
+
+  eventfd readiness
+  counter read
+  cached callback
+
+without repeatedly performing method lookup or callback-style selection.
 
 =head1 SEE ALSO
 
-L<Linux::Event::Loop>, F<docs/EVENT-DESIGN.md>.
+L<Linux::Event>,
+L<Linux::Event::Loop>,
+L<Linux::Event::Kernel::Signal>,
+L<Linux::Event::Kernel::Process>,
+F<docs/EVENT-DESIGN.md>.
 
 =cut

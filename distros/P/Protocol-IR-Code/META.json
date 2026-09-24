@@ -1,0 +1,164 @@
+{
+   "abstract" : "Intermediate representation of an IR remote control code",
+   "author" : [
+      "Brett T. Warden <bwarden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.23",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Protocol-IR-Code",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0.017",
+            "JSON::PP" : "2.00",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Protocol::IR::Code" : {
+         "file" : "lib/Protocol/IR/Code.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Converter" : {
+         "file" : "lib/Protocol/IR/Converter.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Format::CSV" : {
+         "file" : "lib/Protocol/IR/Format/CSV.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Format::GC" : {
+         "file" : "lib/Protocol/IR/Format/GC.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Format::LIRC" : {
+         "file" : "lib/Protocol/IR/Format/LIRC.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Format::Mode2" : {
+         "file" : "lib/Protocol/IR/Format/Mode2.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Format::Pronto" : {
+         "file" : "lib/Protocol/IR/Format/Pronto.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Format::Tasmota" : {
+         "file" : "lib/Protocol/IR/Format/Tasmota.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Format::Wig" : {
+         "file" : "lib/Protocol/IR/Format/Wig.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::JVC" : {
+         "file" : "lib/Protocol/IR/Proto/JVC.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::JVC48" : {
+         "file" : "lib/Protocol/IR/Proto/JVC48.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::MWM" : {
+         "file" : "lib/Protocol/IR/Proto/MWM.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::NEC" : {
+         "file" : "lib/Protocol/IR/Proto/NEC.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::NEC2" : {
+         "file" : "lib/Protocol/IR/Proto/NEC2.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::NEC48" : {
+         "file" : "lib/Protocol/IR/Proto/NEC48.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::NEC482" : {
+         "file" : "lib/Protocol/IR/Proto/NEC482.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::NECX1" : {
+         "file" : "lib/Protocol/IR/Proto/NECX1.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::NECX2" : {
+         "file" : "lib/Protocol/IR/Proto/NECX2.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::Panasonic" : {
+         "file" : "lib/Protocol/IR/Proto/Panasonic.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::SAMSUNG" : {
+         "file" : "lib/Protocol/IR/Proto/SAMSUNG.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::SAMSUNG20" : {
+         "file" : "lib/Protocol/IR/Proto/SAMSUNG20.pm",
+         "version" : "1.0"
+      },
+      "Protocol::IR::Proto::SAMSUNG36" : {
+         "file" : "lib/Protocol/IR/Proto/SAMSUNG36.pm",
+         "version" : "1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bwarden/perl-protocol-ir/issues"
+      },
+      "homepage" : "https://github.com/bwarden/perl-protocol-ir",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bwarden/perl-protocol-ir.git",
+         "web" : "https://github.com/bwarden/perl-protocol-ir"
+      }
+   },
+   "version" : "1.0",
+   "x_contributors" : [
+      "Brett T. Warden <brett.warden@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
+}

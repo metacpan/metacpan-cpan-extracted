@@ -24,6 +24,17 @@ my $api = HTTP::API::Core->new(
 is $api->base_url, 'https://api.example.test', 'normalizes base url';
 is $api->timeout, 5, 'timeout retained';
 
+my $default_header_error;
+eval {
+    HTTP::API::Core->new(
+        base_url => 'https://api.example.test',
+        headers  => { 'X-Bad' => {} },
+    );
+};
+$default_header_error = $@;
+like $default_header_error, qr/header values must be scalars or undef/,
+    'client default header reference values are rejected';
+
 my $res = $api->post('/items', json => { name => 'Alice' }, headers => { 'X-Test' => 'yes' });
 is $res->status, 200, 'status';
 ok $res->is_success, 'success';

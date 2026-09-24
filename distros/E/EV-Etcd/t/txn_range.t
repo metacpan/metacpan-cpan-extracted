@@ -12,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -38,7 +37,6 @@ my $client = EV::Etcd->new(
 
 my $prefix = "/test-txn-range-$$-" . time();
 
-# Setup: put keys for range queries
 my $setup_done = 0;
 for my $i (1..3) {
     $client->put("$prefix/key$i", "val$i", sub {
@@ -49,9 +47,8 @@ for my $i (1..3) {
 my $t0 = EV::timer(5, 0, sub { fail('setup timeout'); EV::break });
 EV::run;
 
-# Test 1-5: txn with request_range in success branch
 $client->txn(
-    compare => [],  # empty compare always succeeds
+    compare => [],
     success => [
         { request_range => { key => "$prefix/key1" } }
     ],
@@ -72,8 +69,7 @@ $client->txn(
 my $t1 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 6-8: txn with request_range using range_end (prefix scan)
-# range_end for prefix: increment last byte of key
+# Prefix scan: range_end is the key with its last byte incremented
 my $range_key = "$prefix/";
 my $range_end = $range_key;
 substr($range_end, -1, 1) = chr(ord(substr($range_end, -1, 1)) + 1);
@@ -98,7 +94,6 @@ $client->txn(
 my $t2 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 9-12: txn with request_range in failure branch
 $client->txn(
     compare => [
         { key => "$prefix/key1", target => 'value', value => 'nonexistent' }
@@ -122,7 +117,6 @@ $client->txn(
 my $t3 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 13-14: txn mixing request_range with request_put
 $client->txn(
     compare => [],
     success => [
@@ -140,7 +134,6 @@ $client->txn(
 my $t4 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Cleanup
 $client->delete("$prefix/", { prefix => 1 }, sub {
     ok(!$_[1], 'cleanup succeeded');
     EV::break;

@@ -10,6 +10,12 @@ my $make_xs = undef;
 foreach ( @ARGV ) {
 	/^-pm/ and $make_xs = 0;
 	/^-xs/ and $make_xs = 1;
+	# Some cpan clients pass PERLPERL_ONLY=1 in to @ARGV
+	/^PUREPERL_ONLY=1$/ and $make_xs = 0;
+}
+# cpanm --pp sets PUREPERL_ONLY=1 in PERL_MM_OPT rather than passing it as an argument
+if ( not defined $make_xs and ( $ENV{PERL_MM_OPT} || '' ) =~ /\bPUREPERL_ONLY=1\b/ ) {
+	$make_xs = 0;
 }
 unless ( defined $make_xs ) {
 	$make_xs = can_xs();

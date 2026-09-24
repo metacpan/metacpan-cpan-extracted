@@ -169,14 +169,22 @@ static void ft_conn_arm_pto(pTHX_ ft_conn *c, double secs,
                             void (*fn)(pTHX_ struct ft_conn *c));
 
 /* Cancel a pending deadline timer (nothing to do if it already fired: the
- * fire path clears c->timer/c->timer_h/c->hm_timer before running). */
+ * fire path clears c->timer/c->timer_h/c->hm_timer before running).
+ *
+ * Nothing here may touch the loop once PL_dirty is set - see ft_conn_free. */
 static void ft_conn_cancel_timer(pTHX_ ft_conn *c) {
     if (c->hm_timer) {
         if (!PL_dirty) c->hm->timer_cancel(aTHX_ c->hm_loop, c->hm_timer);
         c->hm_timer = NULL;
     }
-    if (c->timer)   { ft_del_timer(aTHX_ c->loop, c->timer); c->timer = NULL; }
-    if (c->timer_h) { ft_loop_untimer(aTHX_ c); }
+    if (c->timer) {
+        if (!PL_dirty) ft_del_timer(aTHX_ c->loop, c->timer);
+        c->timer = NULL;
+    }
+    if (c->timer_h) {
+        if (!PL_dirty) ft_loop_untimer(aTHX_ c);
+        else { SvREFCNT_dec(c->timer_h); c->timer_h = NULL; }
+    }
 }
 
 /* Set by the UA immediately before ft_h1_start so a freshly created connection
@@ -234,14 +242,25 @@ static void ft_conn_free(pTHX_ ft_conn *c) {
     ft_h3_free(aTHX_ c);
     ft_tls_free(c);
     if (c->fd >= 0) {
-        if (c->armed) {
+        /* At global destruction the loop may be gone ALREADY: c->loop is a
+         * raw pointer to the loop struct and c->loop_sv holds an adapter
+         * object, and neither keeps the loop alive once PL_dirty is set -
+         * perl frees objects in arena order, so Fetch::Loop::Standalone's
+         * DESTROY (ft_loop_free) can run before the agent's pool is freed.
+         * Disarming through a freed loop reads l->pid, walks l->timers and
+         * calls l->be->remove_io: a use-after-free, and a SIGSEGV whenever
+         * the order comes out that way. It caught a child of t/28-fork.t on
+         * a 5.20.1 smoker and nowhere else, because the order is luck.
+         *
+         * There is nothing to disarm at that point anyway: the process is
+         * ending, ft_loop_free releases the watcher table itself, and the
+         * descriptor is closed just below. */
+        if (c->armed && !PL_dirty) {
             if (c->hm) {
-                if (!PL_dirty) {   /* at global destruction the loop may be gone */
-                    if (c->armed & HM_EV_READ)
-                        c->hm->io_unwatch(aTHX_ c->hm_loop, c->fd, HM_ABI_READ);
-                    if (c->armed & HM_EV_WRITE)
-                        c->hm->io_unwatch(aTHX_ c->hm_loop, c->fd, HM_ABI_WRITE);
-                }
+                if (c->armed & HM_EV_READ)
+                    c->hm->io_unwatch(aTHX_ c->hm_loop, c->fd, HM_ABI_READ);
+                if (c->armed & HM_EV_WRITE)
+                    c->hm->io_unwatch(aTHX_ c->hm_loop, c->fd, HM_ABI_WRITE);
             }
             else if (c->loop_sv) ft_loop_arm(aTHX_ c, 0);
             else                 ft_unwatch_io(aTHX_ c->loop, c->fd, c->armed);
@@ -1078,7 +1097,10 @@ static void ft_conn_cancel_pto(pTHX_ ft_conn *c) {
         if (!PL_dirty) c->hm->timer_cancel(aTHX_ c->hm_loop, c->hm_pto);
         c->hm_pto = NULL;
     }
-    if (c->pto) { ft_del_timer(aTHX_ c->loop, c->pto); c->pto = NULL; }
+    if (c->pto) {
+        if (!PL_dirty) ft_del_timer(aTHX_ c->loop, c->pto);
+        c->pto = NULL;
+    }
     if (c->pto_h) {
         /* the foreign-loop handle: cancelled the same way the deadline's is */
         SvREFCNT_dec(c->pto_h);

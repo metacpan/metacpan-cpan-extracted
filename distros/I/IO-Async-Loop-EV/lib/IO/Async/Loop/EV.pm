@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2012-2026 -- leonerd@leonerd.org.uk
 
-package IO::Async::Loop::EV 0.04;
+package IO::Async::Loop::EV 0.05;
 
 use v5.20;
 use warnings;
@@ -155,7 +155,7 @@ sub watch_idle ( $self, %params )
    $when eq "later" or croak "Expected 'when' to be 'later'";
 
    my $key;
-   my $w = EV::idle sub {
+   my $w = EV::timer 0, 0, sub {
       delete $self->{watch_idle}{$key};
       goto &$code;
    };

@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -39,7 +37,6 @@ my $client = EV::Etcd->new(
 
 my $prefix = "/test-kv-adv-$$-" . time();
 
-# Setup: Create keys with different values for sorting tests
 my @keys = (
     { key => "$prefix/alpha", value => "zebra" },
     { key => "$prefix/beta",  value => "apple" },
@@ -63,7 +60,7 @@ EV::run;
 is($setup_done, 4, 'setup: all 4 keys created');
 diag("Created keys with revisions: " . join(", ", @revisions));
 
-# Test 1-2: sort_order ascend (by key - default sort_target)
+# sort_target defaults to key
 $client->get("$prefix/", { prefix => 1, sort_order => 'ascend' }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'sort_order ascend succeeded');
@@ -75,7 +72,6 @@ $client->get("$prefix/", { prefix => 1, sort_order => 'ascend' }, sub {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test 3-4: sort_order descend (by key)
 $client->get("$prefix/", { prefix => 1, sort_order => 'descend' }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'sort_order descend succeeded');
@@ -87,7 +83,6 @@ $client->get("$prefix/", { prefix => 1, sort_order => 'descend' }, sub {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test 5-6: sort_target value with ascend
 $client->get("$prefix/", { prefix => 1, sort_order => 'ascend', sort_target => 'value' }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'sort by value ascend succeeded');
@@ -100,7 +95,6 @@ $client->get("$prefix/", { prefix => 1, sort_order => 'ascend', sort_target => '
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test 7-8: sort_target mod with descend (newest first)
 $client->get("$prefix/", { prefix => 1, sort_order => 'descend', sort_target => 'mod' }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'sort by mod descend succeeded');
@@ -115,7 +109,6 @@ $client->get("$prefix/", { prefix => 1, sort_order => 'descend', sort_target => 
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test 9-10: keys_only option
 $client->get("$prefix/", { prefix => 1, keys_only => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'keys_only get succeeded');
@@ -129,7 +122,6 @@ $client->get("$prefix/", { prefix => 1, keys_only => 1 }, sub {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test 11-12: serializable read
 $client->get("$prefix/alpha", { serializable => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'serializable get succeeded');
@@ -139,8 +131,7 @@ $client->get("$prefix/alpha", { serializable => 1 }, sub {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test 13-14: min_mod_revision filter
-my $mid_rev = $revisions[1];  # Second key's revision
+my $mid_rev = $revisions[1];
 $client->get("$prefix/", { prefix => 1, min_mod_revision => $mid_rev }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'min_mod_revision filter succeeded');
@@ -155,7 +146,6 @@ $client->get("$prefix/", { prefix => 1, min_mod_revision => $mid_rev }, sub {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test 15-16: max_mod_revision filter
 $client->get("$prefix/", { prefix => 1, max_mod_revision => $mid_rev }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'max_mod_revision filter succeeded');
@@ -170,8 +160,6 @@ $client->get("$prefix/", { prefix => 1, max_mod_revision => $mid_rev }, sub {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test 17-18: revision (historical read)
-# First update a key
 my $old_revision;
 $client->get("$prefix/alpha", sub {
     my ($resp, $err) = @_;
@@ -185,7 +173,6 @@ $client->put("$prefix/alpha", "new_zebra", sub { EV::break });
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Read at old revision
 $client->get("$prefix/alpha", { revision => $old_revision }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'historical revision get succeeded');
@@ -196,7 +183,6 @@ $client->get("$prefix/alpha", { revision => $old_revision }, sub {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test 19-20: Put with ignore_value (keeps existing value, updates lease/revision)
 $client->put("$prefix/alpha", "", { ignore_value => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'put with ignore_value succeeded');
@@ -213,7 +199,6 @@ $client->get("$prefix/alpha", sub {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test 21-22: Combined options
 $client->get("$prefix/", {
     prefix => 1,
     sort_order => 'descend',
@@ -228,17 +213,13 @@ $client->get("$prefix/", {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test 23-26: range_end parameter (custom key range, not prefix)
-# Create some sequential keys for range testing
 my $range_prefix = "$prefix/range";
 for my $letter ('a'..'e') {
     $client->put("$range_prefix/$letter", "value-$letter", sub { });
 }
-# Wait for all puts
 my $range_setup = EV::timer 2, 0, sub { EV::break };
 EV::run;
 
-# Test get with range_end: get keys from /range/b to /range/d (exclusive)
 $client->get("$range_prefix/b", { range_end => "$range_prefix/d" }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'get with range_end succeeded');
@@ -253,7 +234,6 @@ $client->get("$range_prefix/b", { range_end => "$range_prefix/d" }, sub {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Test delete with range_end: delete keys from /range/b to /range/d (exclusive)
 $client->delete("$range_prefix/b", { range_end => "$range_prefix/d" }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'delete with range_end succeeded');
@@ -264,7 +244,6 @@ $client->delete("$range_prefix/b", { range_end => "$range_prefix/d" }, sub {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Verify remaining keys after range delete
 $client->get("$range_prefix/", { prefix => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'get after range delete succeeded');
@@ -276,7 +255,6 @@ $client->get("$range_prefix/", { prefix => 1 }, sub {
 $t = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
-# Cleanup
 $client->delete("$prefix/", { prefix => 1 }, sub { EV::break });
 EV::run;
 

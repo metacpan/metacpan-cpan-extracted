@@ -7,7 +7,7 @@ use Carp ();
 
 use InternetData::Error;
 
-our $VERSION = '1.6.0';
+our $VERSION = '1.6.1';
 
 # The formats a database is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.

@@ -1,13 +1,11 @@
 #!/usr/bin/env perl
-# Regression test: lease_keepalive must keep renewing the lease. Pre-fix the
-# stream sent exactly one LeaseKeepAliveRequest (at setup/reconnect), so the
-# lease silently expired one TTL after stream start.
+# lease_keepalive must keep renewing: one request per stream lets the lease
+# expire one TTL after the stream starts
 use strict;
 use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -16,7 +14,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -40,8 +37,8 @@ my $client = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],
 );
 
-# TTL=5 keeps ~2 renewal periods of stall headroom (renewals at ttl/3) so the
-# test survives slow/loaded CI runners; TTL=3 flaked under artificial load.
+# Renewals run every ttl/3, so TTL=5 leaves about two stalled renewals of
+# headroom on a slow or loaded runner
 my $granted_ttl = 5;
 my $lease_id;
 
@@ -56,7 +53,6 @@ EV::run;
 
 BAIL_OUT('no lease id from lease_grant') unless $lease_id;
 
-# Keepalive ticks arrive as ($resp, $err) on each renewal response
 my $ticks = 0;
 my $keepalive = $client->lease_keepalive($lease_id, sub {
     my ($resp, $err) = @_;
@@ -65,12 +61,11 @@ my $keepalive = $client->lease_keepalive($lease_id, sub {
 });
 ok($keepalive, 'keepalive stream created');
 
-# Collect ticks for longer than one TTL — without renewal the lease would
-# expire at $granted_ttl seconds.
+# Longer than one TTL, which an unrenewed lease does not survive
 my $t1 = EV::timer($granted_ttl + 2, 0, sub { EV::break });
 EV::run;
 
-# The lease must still be alive (pre-fix: ttl reports -1 here)
+# An expired lease reports ttl -1
 my $ttl_after;
 $client->lease_time_to_live($lease_id, sub {
     my ($resp, $err) = @_;

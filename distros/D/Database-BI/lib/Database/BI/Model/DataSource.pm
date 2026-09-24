@@ -12,7 +12,7 @@ use Sub::Protected;
 use Params::Validate::Strict qw(validate_strict);
 use Params::Get		();
 
-our $VERSION = '0.008.1';
+our $VERSION = '0.009.0';
 
 =head1 NAME
 
@@ -493,9 +493,9 @@ sub _init_url_backend :Protected {
 #   columns  => arrayref of all column names in file order
 #
 # Two non-obvious defaults in Database::Abstraction make this necessary:
-#   1. sep_char defaults to '!' — so a plain CSV is read as one giant field
+#   1. sep_char defaults to '!' -- so a plain CSV is read as one giant field
 #      per row, producing a single comma-joined string instead of columns.
-#   2. id defaults to 'entry' — the slurp filter greps on that column; if it
+#   2. id defaults to 'entry' -- the slurp filter greps on that column; if it
 #      doesn't exist every row is silently discarded.
 # Returns an empty hashref for non-CSV/TSV/PSV/XLSX/SQLite formats (XML, etc.).
 # For SQLite/.db files that can be opened, returns { sqlite_tables => [...] }.
@@ -610,7 +610,7 @@ sub _detect_file_info :Protected {
 		# empty column list.  Treat that the same as a 0-byte file: return the
 		# _file_is_empty sentinel so _init_backend skips D::A entirely.
 		# Attempting to construct D::A with id => undef and an empty columns
-		# list would croak error_no_safe_id — misleading for what is effectively
+		# list would croak error_no_safe_id -- misleading for what is effectively
 		# an empty file.
 		if (!@cols) {
 			close $fh;
@@ -627,7 +627,7 @@ sub _detect_file_info :Protected {
 		# column whose value in that row is non-empty.  A simple split (same
 		# separator) is used rather than a full CSV parse; it may mis-index
 		# fields that contain the separator inside quotes, but correctly detects
-		# whether a given index position is blank — sufficient for id selection.
+		# whether a given index position is blank -- sufficient for id selection.
 		# Fall back to the first safe column in the header if the data row
 		# check is inconclusive (e.g. file has only a header line).
 		my $safe_re = qr/\A[a-zA-Z_][a-zA-Z0-9_]*\z/;
@@ -654,7 +654,7 @@ sub _detect_file_info :Protected {
 		}
 		# If no safe identifier was found in the header, check whether the first
 		# row looks like data values rather than column names.  A CSV exported
-		# from a bank or accounting system often has no header row at all — the
+		# from a bank or accounting system often has no header row at all -- the
 		# first line is already a transaction record.  When that is the case,
 		# synthesize safe column names by inferring the type of each value
 		# (date, amount, description) and pre-read the entire file so
@@ -705,11 +705,11 @@ sub _detect_file_info :Protected {
 
 	# SQLite / Berkeley DB: peek at sqlite_master to discover the internal table
 	# names.  _init_backend uses this list to auto-select the correct table when
-	# the filename stem (dbname) differs from the table name inside the file —
+	# the filename stem (dbname) differs from the table name inside the file --
 	# e.g. obituaries.sql whose internal table is called "deceased".  If the
 	# file is not a valid SQLite database (e.g. a Berkeley DB file) the eval
 	# fails and we return {} so _init_backend/D::A handles it natively.
-	# .sqlite and .sqlite3 are common alternative SQLite extensions — treated identically to .sql.
+	# .sqlite and .sqlite3 are common alternative SQLite extensions -- treated identically to .sql.
 	for my $ext (qw(sql sqlite sqlite3 db)) {
 		my $path = File::Spec->catfile($dir, "$table.$ext");
 		next unless -r $path;
@@ -728,7 +728,7 @@ sub _detect_file_info :Protected {
 		# defined $tables means the eval succeeded (even an empty list is valid)
 		return { sqlite_tables => ($tables // []), file_size => -s $path }
 			if defined $tables;
-		last;	# file found but not SQLite — do not try the other ext
+		last;	# file found but not SQLite -- do not try the other ext
 	}
 	return {};
 }
@@ -772,7 +772,7 @@ sub _sniff_data_ext {
 # Returns true when the values look like a row of real data (dates / numbers)
 # rather than column headers.  Used to detect header-less CSV files where the
 # first line is a data row.  At least one value must match a date or numeric
-# pattern — a row of plain hyphenated identifiers (e.g. "First-Name") is NOT
+# pattern -- a row of plain hyphenated identifiers (e.g. "First-Name") is NOT
 # considered data-like.
 sub _values_are_data_like {
 	my $vals = $_[0];
@@ -815,7 +815,7 @@ sub _synthesize_col_names {
 # Purpose: Derive a stable cache key for this DataSource's full result set.
 #          URL tables use a fixed key (TTL handles invalidation).
 #          File tables encode the file's mtime in the key so a changed file
-#          naturally produces a miss — the stale entry is orphaned and evicts
+#          naturally produces a miss -- the stale entry is orphaned and evicts
 #          passively when the CHI driver reclaims memory.
 # Entry:   $self->{_cache} must be defined (caller checks this before calling).
 # Exit:    Returns a non-empty string key, or undef when no key is derivable
@@ -977,8 +977,8 @@ sub _init_backend :Protected {
 	# D::A validates dbname as a SQL identifier and rejects names that contain
 	# spaces or other characters that are illegal in SQL (e.g. "transactions for
 	# Nigel").  This check fires at query time (inside selectall_arrayref) for
-	# the DBI path used by XLSX, SQLite, and XML files — after construction
-	# succeeds — so the error surfaces as error_fetch_failed, not error_backend_init.
+	# the DBI path used by XLSX, SQLite, and XML files -- after construction
+	# succeeds -- so the error surfaces as error_fetch_failed, not error_backend_init.
 	#
 	# Fix: when the original filename stem was sanitized (raw_table != table),
 	# create a temporary directory with a symlink that uses the safe name.
@@ -1019,7 +1019,7 @@ sub _init_backend :Protected {
 	# against the real table name without needing the filename to match.
 	# D::A uses 'dbname' to find the file and 'table' for the SELECT statement,
 	# so both must be set to the actual table name when a mismatch is corrected.
-	my $da_table = $table;	# D::A 'table' param — controls the SQL table name
+	my $da_table = $table;	# D::A 'table' param -- controls the SQL table name
 	if (exists $info->{sqlite_tables}) {
 		my @tbls = @{ $info->{sqlite_tables} };
 		croak $self->_msg('error_no_tables', $raw_table) unless @tbls;
@@ -1204,7 +1204,7 @@ sub selectall_arrayref {
 	return [] if $self->{_file_is_empty};
 	return $self->{_file_data} if $self->{_file_data};
 
-	# Cache only plain unfiltered calls — Database::Join passes no args for the
+	# Cache only plain unfiltered calls -- Database::Join passes no args for the
 	# full table scan; a non-empty @args means a narrowed query whose result must
 	# not be mistaken for the full-table cache entry.
 	my $cache = $self->{_cache};

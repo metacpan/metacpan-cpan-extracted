@@ -1215,6 +1215,72 @@
               5
             ]
           }
+        },
+        {
+          "name": "interval-past-the-deadline-sleeps-only-to-it",
+          "clientId": "internetdata-cli",
+          "device": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+            "expires_in": 2,
+            "interval": 2147483647
+          },
+          "why": "A sleep that would end past the local deadline ends at it, and the local expiry follows with no request sent: the outcome the full sleep reaches anyway, without asking the runtime for a sleep it may not hold (.NET's Task.Delay throws past ~49.7 days). 2147483647 is the largest interval every SDK's type holds.",
+          "responses": [
+            {
+              "status": 400,
+              "body": {
+                "error": "authorization_pending"
+              }
+            }
+          ],
+          "expect": {
+            "outcome": "expiredToken",
+            "requests": 0,
+            "waits": [
+              2
+            ],
+            "status": null
+          }
+        },
+        {
+          "name": "slow-down-past-the-deadline-sleeps-only-to-it",
+          "clientId": "internetdata-cli",
+          "device": {
+            "device_code": "mo_dc_poll",
+            "user_code": "BCDF-GHJK",
+            "verification_uri": "https://app.internetdata.io/device",
+            "verification_uri_complete": "https://app.internetdata.io/device?user_code=BCDF-GHJK",
+            "expires_in": 8,
+            "interval": 1
+          },
+          "why": "The cut applies to every sleep, a widened one included: 1, then 6 after the first slow_down, then only the 1 s left of the 8 rather than 11.",
+          "responses": [
+            {
+              "status": 400,
+              "body": {
+                "error": "slow_down"
+              }
+            },
+            {
+              "status": 400,
+              "body": {
+                "error": "slow_down"
+              }
+            }
+          ],
+          "expect": {
+            "outcome": "expiredToken",
+            "requests": 2,
+            "waits": [
+              1,
+              6,
+              1
+            ],
+            "status": null
+          }
         }
       ]
     },

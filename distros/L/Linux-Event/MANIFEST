@@ -3,10 +3,10 @@ bench/archive/anyevent_dispatch_oneshot.pl
 bench/archive/anyevent_dispatch_read_only.pl
 bench/archive/anyevent_echo_tcp.pl
 bench/archive/compare-results.pl
-bench/archive/EV-ANYEVENT-CODE-STUDY.md
 bench/archive/ev_dispatch_oneshot.pl
 bench/archive/ev_dispatch_read_only.pl
 bench/archive/ev_echo_tcp.pl
+bench/archive/EV-ANYEVENT-CODE-STUDY.md
 bench/archive/phase18_dispatch_oneshot.pl
 bench/archive/phase18_dispatch_read_only.pl
 bench/archive/phase18_dispatch_read_write.pl
@@ -39,11 +39,11 @@ bench/run-process-pipe-drain-bench.pl
 bench/run-reactor-comparison.pl
 bench/run-resolver-microbench.pl
 bench/run-signal-microbench.pl
+bench/run-stream-feedback-timer-fairness.pl
 bench/run-stream-lifecycle-bench.pl
 bench/run-stream-microbench.pl
 bench/run-stream-payload-sweep.pl
 bench/run-stream-timer-fairness.pl
-bench/run-stream-feedback-timer-fairness.pl
 bench/run-stream-transition-bench.pl
 bench/run-stream-watcher-state-bench.pl
 bench/run-timer-microbench.pl
@@ -64,6 +64,7 @@ docs/DGRAM-DESIGN.md
 docs/EVENT-DESIGN.md
 docs/FIRST-CLASS-STREAM-CALLBACKS.md
 docs/FRAMING.md
+docs/INOTIFY-DESIGN.md
 docs/INTROSPECTION.md
 docs/IO-KERNEL-ARCHITECTURE.md
 docs/LISTENER-DESIGN.md
@@ -78,6 +79,7 @@ docs/SOCKET-CONNECTIONS.md
 docs/TIMER-DESIGN.md
 docs/TRANSPORT-BOUNDARY.md
 examples/first-class-line-echo-server.pl
+examples/inotify-log.pl
 examples/line-echo-client.pl
 examples/line-echo-server.pl
 examples/process-capture.pl
@@ -115,6 +117,9 @@ lib/Linux/Event/IO/Sock/Stream.pm
 lib/Linux/Event/IO/TTY.pm
 lib/Linux/Event/Kernel.pm
 lib/Linux/Event/Kernel/Event.pm
+lib/Linux/Event/Kernel/Inotify.pm
+lib/Linux/Event/Kernel/Inotify/Event.pm
+lib/Linux/Event/Kernel/Inotify/Watch.pm
 lib/Linux/Event/Kernel/Process.pm
 lib/Linux/Event/Kernel/Signal.pm
 lib/Linux/Event/Kernel/Timer.pm
@@ -168,10 +173,10 @@ t/35-loop-introspection-types.t
 t/36-configure-platform.t
 t/37-current-doc-taxonomy.t
 t/38-pod-synopsis.t
-t/40-tuning-pod.t
-t/loop-foreign-integration.t
 t/39-example-syntax.t
 t/39-first-class-resource-callbacks.t
+t/40-tuning-pod.t
+t/41-loop-defer.t
 t/architecture-00-private-layers.t
 t/architecture-10-public-leaves.t
 t/architecture-20-native-consumer.t
@@ -181,6 +186,10 @@ t/datagram-10-udp.t
 t/datagram-11-limits.t
 t/datagram-12-ownership-and-unix.t
 t/datagram-13-benchmark-smoke.t
+t/inotify-00-api.t
+t/inotify-10-events.t
+t/inotify-11-sharing.t
+t/inotify-12-fairness.t
 t/listener-00-api.t
 t/listener-10-tcp.t
 t/listener-11-stream.t
@@ -191,6 +200,8 @@ t/listener-15-unix.t
 t/listener-16-callbacks.t
 t/listener-17-first-class-stream-callbacks.t
 t/listener-18-first-class-callback-benchmark-smoke.t
+t/loop-foreign-integration.t
+t/loop-fork.t
 t/process-00-api.t
 t/process-10-spawn.t
 t/process-11-observe-signal.t
@@ -300,8 +311,8 @@ xsbytestream/framer_netstring.c
 xsbytestream/framer_varint.c
 xsbytestream/Makefile.PL
 xsbytestream/stream_callbacks.c
-xsbytestream/stream_consumer.c
 xsbytestream/stream_consumer_abi.h
+xsbytestream/stream_consumer.c
 xsbytestream/stream_delivery.c
 xsbytestream/stream_input.c
 xsbytestream/stream_internal.h
@@ -309,8 +320,8 @@ xsbytestream/stream_read.c
 xsbytestream/stream_state.c
 xsbytestream/stream_test_consumer.c
 xsbytestream/stream_transition.c
-xsbytestream/stream_transport.c
 xsbytestream/stream_transport_abi.h
+xsbytestream/stream_transport.c
 xsbytestream/stream_write.c
 xsconnection/Connection.xs
 xsconnection/Makefile.PL
@@ -318,6 +329,8 @@ xsdatagram/Datagram.xs
 xsdatagram/Makefile.PL
 xsevent/Event.xs
 xsevent/Makefile.PL
+xsinotify/Inotify.xs
+xsinotify/Makefile.PL
 xslistener/Listener.xs
 xslistener/Makefile.PL
 xsloop/Loop.xs

@@ -1,0 +1,146 @@
+Revision history for Protocol::IR::Code
+
+1.0 2026-09-24T02:22:14Z
+
+    - Global Cache imports now preserve the per-command repeat count -- how
+      many times the whole code replays on transmission -- onto a new
+      Protocol::IR::Code send_count attribute, read from an explicit
+      "repeats" field when present and otherwise from the trailing ":N" of
+      the keycode (e.g. "G:Eufy 40 Bit:()(0x68A0000008)():3"). wig export
+      carries it as the signal's optional send_count (written only when it
+      differs from the default single press), and wig import round-trips it,
+      so a GC export converts to a wig that replays the same number of times.
+      Mirrors the TypeScript port (web-ir-remote-tools src/lib/format/gc.ts,
+      wig.ts).
+
+0.08 2026-09-24T01:29:34Z
+
+    - Moved the release pipeline to Minilla: the distribution is configured
+      by minil.toml and cpanfile, Makefile.PL/META.json/README.md are
+      generated at build time, and module versions are bumped in one step at
+      release time (minil version / minil release). The tag-triggered GitHub
+      Actions workflow rebuilds the distribution and attaches the tarball to
+      a GitHub Release, mirroring what minil release publishes to CPAN.
+    - Every module's POD now names the GitHub repository
+      (github.com/bwarden/perl-protocol-ir) for source and bug reporting
+      under a SUPPORT section.
+
+0.07    2026-09-22
+    - Global Cache imports pass signals no registered protocol recognizes through as raw UNKNOWN Pronto (lossless verbatim re-export); GC commands without a Pronto payload are skipped; ir-convert learns --from gcir/globalcache
+
+0.06    2026-09-20
+    - Protocol::IR::Proto::MWM gains an optional unbundle capability: a
+      whole A+B+A' capture that Tasmota / IRremoteESP8266 (commit 247bcdb3
+      "Decode every complete frame of a capture into one result") logs as
+      one concatenated Data value is split back into one Code per frame by
+      walking each frame's self-declared length nibble ((header & 0x0f) +
+      3, 0x9x/0xFx leading bytes); a value whose walk cannot land exactly
+      stays a single width-derived frame. decode_raw returns the bundle's
+      first frame (A), and Protocol::IR::Format::Tasmota::decode_dump
+      unwraps structured MWM records through the capability, mirroring the
+      JS port's law (web/src/lib/protocol/mwm.ts, format/tasmota.ts)
+
+0.05    dev
+    - Protocol::IR::Format::LIRC: LIRC remotes flagged REVERSE store each
+      transmitted word (pre_data, post_data, and the code value) bit-mirrored
+      within its own declared width; mirror those words back to the wire's
+      accumulated order before composing the full data word so a REVERSE
+      remote decodes to the same code as the non-REVERSE form and every other
+      database. The lirc vizio/VX37L conf (REVERSE, pre_data 0xFB04 + Power
+      0xF708) now lands on NEC 4/-1/8 with data 0x04FB08F7, byte-for-byte
+      identical to IRDB's Vizio Unknown_VX37L, instead of the bit-mirrored
+      NEC 223/239 (0xDF20EF10).
+
+0.04    dev
+    - Added Protocol::IR::Format::LIRC: import and export of LIRC remote
+      definition files (.lircd.conf), supporting both protocol-based
+      (SPACE_ENC with timing parameters and pre_data/post_data) and
+      raw_codes modes; known protocols (NEC, Samsung, JVC) get timing
+      templates for clean export, while raw-code imports preserve
+      timings for lossless re-export
+    - Renamed the distribution and every module from the IR::* namespace to
+      Protocol::IR::* (IR::Code becomes Protocol::IR::Code, IR::Format::*
+      becomes Protocol::IR::Format::*, IR::Protocol::* becomes
+      Protocol::IR::Protocol::*), so the module tree mirrors the new top
+      level. Use statements, POD, tests, examples, and the bin/ tools all
+      follow; the distribution name in Makefile.PL is now
+      Protocol::IR::Code
+    - Protocol::IR::Format::Tasmota now imports structured IRrecv lines ("Protocol =
+      ..., Bits = ..., Data = 0x..." or decimal) in addition to RawData, and
+      import_format('Tasmota', $dump) reads every signal from a multi-line
+      IRrecv/IRsend capture log, so a whole Tasmota log converts to a single
+      WIG without editing
+    - Added bin/ir-tasmota2wig: converts a Tasmota IRrecv/IRsend capture log
+      (file or stdin) to a HAIR WIG JSON file; --name and --kind set the
+      device metadata, raw signals get decoded to Pronto Hex with their
+      hex Data as an alias
+    - Added per-protocol conversion fixtures in t/data/conv-*.tsv (NEC,
+      NEC2, JVC, SAMSUNG, NECX1, NECX2) as hand-editable reference data, a
+      data-driven two-direction test (t/17) that checks both structured ->
+      Pronto and Pronto -> structured against the files, and
+      tools/gen_conversion_fixtures.pl to regenerate them wholesale
+    - Conversion fixtures document the honest timing decode for frame
+      variants that share a signature: NEC2 decodes back as NEC, and the
+      half-header NECX1/NECX2 decode as SAMSUNG with bit-reversed
+      address/command bytes
+    - Reorganized protocol handlers under Protocol::IR::Proto::* namespace
+      (Protocol::IR::Proto::NEC, Protocol::IR::Proto::JVC48, ...), keeping
+      Protocol::IR::Code as the core IR object type and Code::Converter as
+      the registration hub; all use statements, POD, tests, and MANIFEST
+      updated
+    - Added 48-bit NEC family handlers (48-NEC1 and 48-NEC2), JVC-48,
+      SAMSUNG36, and SAMSUNG20, mirroring the ir-remote-tools TypeScript
+      handlers and the IRremoteESP8266 sendNEC48/sendSamsung36 decoders
+
+0.03    2026-08-09
+    - Added two installable command-line tools (EXE_FILES):
+      ir-irdb2wig converts an IRDB CSV file to a HAIR WIG JSON file,
+      either from a local file or by downloading it from the IRDB
+      repository by device path (manufacturer/devicetype/device,subdevice,
+      as per the IRDB naming convention); ir-convert converts between the
+      supported formats (CSV, WIG, Pronto, Tasmota) from files or stdin
+    - Protocol::IR::Format::CSV now skips rows whose protocol is unregistered or
+      whose value cannot be decoded, instead of aborting the whole import;
+      real IRDB files routinely mix in protocols this distribution does
+      not handle yet
+    - Converted documentation to POD in all modules (per-module NAME,
+      SYNOPSIS, DESCRIPTION, METHODS, and LGPL-2.1 license sections) and
+      removed the top-level README.md in favor of the POD
+    - Added GitHub Actions CI (.github/workflows/ci.yml): a multi-Perl test
+      matrix that runs both install-mode and author tests plus a
+      make dist/disttest sanity check on every PR; added an optional
+      release workflow that uploads tagged releases to PAUSE
+    - Split the test suite into install-mode tests (must always pass) and
+      author tests gated by AUTHOR_TESTING=1 (POD validity, MANIFEST sync,
+      version consistency), so author-time checks can never break a user's
+      installation
+    - Ordered the tests so generic/package-wide tests come first (t/00-t/07)
+      and feature tests are appended at the end (t/08+), so a new protocol
+      or format adds a test without renumbering anything
+    - Added maint/release.sh and maint/RELEASE.md documenting the release
+      process (version bump, disttest, make dist, PAUSE upload)
+    - All modules now share a single distribution version
+
+0.02    2026-08-09
+    - Added SAMSUNG protocol handler (32-bit customer/command framing)
+    - Added Tasmota format: import compact letter and comma-separated
+      RawData (including "IRSend <freq>,<raw>" command lines), export as
+      compact or comma IRSend commands with optional frequency
+    - Protocol::IR::Code now retains raw timing data ("timings") so captures can be
+      re-exported losslessly
+    - NEC and JVC decoders validate the frame's stop bit to avoid
+      misidentifying signals from overlapping protocols
+    - Protocol::IR::Converter::export_code passes options through to format exporters
+    - Added tests for SAMSUNG (t/10), Tasmota (t/12), IRDB CSV
+      samples (t/05), and Tasmota/Pronto/WIG cross-format
+      exactness (t/04); extended the NEC/JVC/WIG/roundtrip/load tests
+    - Bundled real capture fixtures in t/data/ (Tasmota IR captures and
+      IRDB CSVs); the suite also validates any user-provided Tasmota logs
+      matching samples/tasmota*.log
+
+0.01    2026-08-09
+    - Initial release
+    - Reorganized into a standard CPAN distribution layout (lib/, t/, examples/)
+    - Added Test::More-based test suite
+    - Added WIG import/export for the HAIR Home Assistant integration (hair-wig/3)
+    - Licensed under LGPL-2.1 to permit borrowing from IRremoteESP8266

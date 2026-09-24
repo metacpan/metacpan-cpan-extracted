@@ -30,12 +30,19 @@ sub repositories_pager {
 
     return $self->paginate(
         '/user/repos',
-        mode            => 'page',
-        items           => sub { return $_[0] },
-        page_size       => $per_page,
-        page_param      => 'page',
-        page_size_param => 'per_page',
+        mode                      => 'next_url',
+        response_aware_extractors => 1,
+        items                     => sub { return $_[0] },
+        next                      => sub {
+            my ($data, $response) = @_;
+            my $link = $response->header('link') || '';
+            for my $part (split /,\s*/, $link) {
+                return $1 if $part =~ /<([^>]+)>;\s*rel="next"/;
+            }
+            return undef;
+        },
         query           => {
+            per_page    => $per_page,
             affiliation => $affiliation,
             sort        => $sort,
             direction   => $direction,

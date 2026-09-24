@@ -914,7 +914,8 @@ subtest '_resolve_language path-B: header code equals default -> return default 
 };
 
 subtest '_resolve_language path-C: header code ne default, template dir exists -> use it' => sub {
-	# Create a temporary templates/web/fr directory so CGI::Lingua can select 'fr'.
+	# Create a temporary templates/web/fr directory so _resolve_language can
+	# confirm the template exists and return 'fr'.
 	my $fr_dir = Mojo::File->new($APP_HOME)->child('templates/web/fr');
 	my $created = !-d $fr_dir;
 	$fr_dir->make_path if $created;

@@ -1,6 +1,3 @@
-/*
- * etcd_maint.c - Maintenance operation handlers for EV::Etcd
- */
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
@@ -10,7 +7,6 @@
 #include "etcd_common.h"
 #include "etcd_maint.h"
 
-/* Process StatusResponse */
 void process_status_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "status");
 
@@ -34,7 +30,6 @@ void process_status_response(pTHX_ pending_call_t *pc) {
     if (resp->n_errors > 0) {
         AV *errors_av = newAV();
         for (size_t i = 0; i < resp->n_errors; i++) {
-            /* Handle NULL string in repeated field */
             av_push(errors_av, resp->errors[i] ? newSVpv(resp->errors[i], 0) : newSVpvn("", 0));
         }
         hv_store(result, "errors", 6, newRV_noinc((SV *)errors_av), 0);
@@ -45,7 +40,6 @@ void process_status_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Helper to convert AlarmType enum to string */
 static const char* alarm_type_name(Etcdserverpb__AlarmType type) {
     switch (type) {
         case ETCDSERVERPB__ALARM_TYPE__NONE: return "NONE";
@@ -55,7 +49,6 @@ static const char* alarm_type_name(Etcdserverpb__AlarmType type) {
     }
 }
 
-/* Process AlarmResponse */
 void process_alarm_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "alarm");
 
@@ -81,7 +74,6 @@ void process_alarm_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process DefragmentResponse */
 void process_defragment_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "defragment");
 
@@ -96,7 +88,6 @@ void process_defragment_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process HashKVResponse */
 void process_hash_kv_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "hash_kv");
 
@@ -113,7 +104,6 @@ void process_hash_kv_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process MoveLeaderResponse */
 void process_move_leader_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "move_leader");
 
@@ -128,7 +118,6 @@ void process_move_leader_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process AuthStatusResponse */
 void process_auth_status_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "auth_status");
 

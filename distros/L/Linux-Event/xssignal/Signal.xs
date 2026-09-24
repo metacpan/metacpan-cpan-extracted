@@ -448,6 +448,42 @@ les_service_dispatch(pTHX_ les_service *service)
         croak_sv(first_error);
 }
 
+static int
+les_service_fork_child_drop(les_service *service)
+{
+    les_signal *signal;
+    sigset_t removals;
+    int number;
+    int error;
+    if (!service) return 0;
+    if (service->owner_pid == getpid())
+        croak("_fork_child_drop(): Signal service is not inherited");
+
+    sigemptyset(&removals);
+    for (number = 1; number < NSIG; number++) {
+        if (les_owners[number] == service) {
+            les_owners[number] = NULL;
+            if (service->restore_unblock[number])
+                sigaddset(&removals, number);
+        }
+    }
+    error = pthread_sigmask(SIG_UNBLOCK, &removals, NULL);
+
+    while ((signal = service->active_head)) {
+        les_signal *next = signal->service_next;
+        signal->state = LES_CANCELLED;
+        signal->service_previous = signal->service_next = NULL;
+        signal->service = NULL;
+        signal->cleanup_pending = 0;
+        les_signal_release_refs(signal);
+        service->active_head = next;
+        if (next) next->service_previous = NULL;
+    }
+    close(service->fd);
+    free(service);
+    return error;
+}
+
 static void
 les_service_destroy(les_service *service)
 {
@@ -541,6 +577,21 @@ new(CLASS)
     RETVAL = sv_setref_pv(newSV(0), CLASS, (void *)service);
   OUTPUT:
     RETVAL
+
+void
+_fork_child_drop(service_obj)
+    SV *service_obj
+  PREINIT:
+    les_service *service;
+    int error;
+  CODE:
+    service = les_service_from_sv(service_obj);
+    if (service) {
+        sv_setiv(SvRV(service_obj), 0);
+        error = les_service_fork_child_drop(service);
+        if (error)
+            croak("_fork_child_drop(): pthread_sigmask failed: %s", strerror(error));
+    }
 
 void
 DESTROY(service_obj)

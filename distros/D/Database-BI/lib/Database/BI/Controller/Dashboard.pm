@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.008.1';
+our $VERSION = '0.009.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -300,7 +300,7 @@ sub _open_spec :Protected ($self, $spec) {
 		return ($src, $table) if $src && !$@;
 	} elsif ($spec =~ /\Apath:(.+)\z/) {
 		my $path_arg = $1;
-		# Remote path: /../hostname/dir/file — delegate to DataSource with host param.
+		# Remote path: /../hostname/dir/file -- delegate to DataSource with host param.
 		# No EXT_RE check: security comes from REMOTE_HOST_RE.  The original
 		# extension (if any) is passed as file_ext so _init_backend tries it first.
 		if ($path_arg =~ m{\A/\.\./([^/]+)((?:/.+)?)/([^/]+)\z}) {
@@ -727,7 +727,7 @@ sub _run_export_pipeline :Protected ($self) {
 #          URL-fetched data (via LWP::UserAgent::Cached + D::A HTML parsing)
 #          arrives as byte strings without the UTF-8 flag set.  encode_json
 #          then treats each byte as a Latin-1 code point and re-encodes it,
-#          producing mojibake like "KÃ¶nig" for "Koenig".  This helper
+#          producing mojibake (e.g. an o-umlaut character displayed as two garbage bytes).  This helper
 #          upgrades the flag in-place on a copy so the original hash key is
 #          unchanged but the value passed to HTML::D3 is a proper character.
 # Entry:   $s -- any defined scalar (undef returned as-is).
@@ -1205,7 +1205,7 @@ sub open_file ($self) {
 		if ($filename =~ /\.(?:sql|db)\z/i) {
 			$hint = 'SQLite files must contain at least one user-defined table. '
 				. 'The table name inside the database does not need to match the '
-				. 'filename — the application auto-detects and uses the first table found.';
+				. 'filename -- the application auto-detects and uses the first table found.';
 		}
 		return $self->render(
 			template   => "$platform/$language/home",
@@ -1326,6 +1326,9 @@ sub import_url ($self) {
 	my $dedup = $self->param('d') ? 1 : 0;
 	$filtered = _dedup_records($filtered, \@columns) if $dedup;
 
+	my $self_url = '/import?url=' . url_escape($url);
+	$self_url   .= '&table_index=' . $idx if $idx;
+
 	$self->render(
 		template         => "$platform/$language/dashboard",
 		handler          => 'tt',
@@ -1335,8 +1338,10 @@ sub import_url ($self) {
 		table            => $label,
 		title            => $label,
 		source_url       => $url,
-		back_url         => '/',
-		back_label       => 'Choose another database',
+		back_url         => $self_url,
+		back_label       => $label,
+		back2_url        => _safe_back_url($self->param('back2')),
+		back2_label      => $self->param('back2_label') // 'Back',
 		left_spec        => $lspec,
 		combine_specs    => [],
 		current_joins    => [],
@@ -1397,7 +1402,7 @@ sub columns_api ($self) {
 	my $path       = $self->param('path');
 
 	# Accept the unified spec format used by /join and /graph:
-	# "table:name" or "path:/abs/path" — mirrors _open_spec's parsing.
+	# "table:name" or "path:/abs/path" -- mirrors _open_spec's parsing.
 	if (!defined($table_name) && !defined($path)) {
 		my $spec = $self->param('spec') // '';
 		if ($spec =~ /\Atable:([A-Za-z_][A-Za-z0-9_]*)\z/) {
@@ -2255,7 +2260,7 @@ sub pie_view ($self) {
 	return $self->render(text => "Column not found: $val_col", status => 400)
 		unless $count_mode || $col_set{$val_col};
 
-	# Detect the currency symbol (e.g. $ £ EUR) from the first non-empty raw
+	# Detect the currency symbol (e.g. $ GBP EUR) from the first non-empty raw
 	# value.  The regex captures the first character that is not a digit,
 	# whitespace, comma, period, hyphen, or open-paren -- that character is
 	# the currency prefix.  Accounting-notation values like ($1,234.56) are
@@ -2409,6 +2414,90 @@ sub heatmap_view ($self) {
 		back_label       => 'Back to table',
 		source_url       => $source_url,
 		source_accessed  => $source_accessed,
+	);
+}
+
+sub bar_view ($self) {
+	my $cat_col  = $self->param('cat')    // '';
+	my $val_col  = $self->param('val')    // '';
+	my $orient   = $self->param('orient') // 'vertical';
+	my $sort     = $self->param('sort')   // 'none';
+	my $back     = _safe_back_url($self->param('back')) // '/';
+
+	return $self->render(text => 'Missing cat column parameter', status => 400)
+		unless length($cat_col);
+
+	my ($records, $columns) = $self->_run_export_pipeline;
+	return $self->render(text => 'Could not open data source', status => 404)
+		unless $records;
+
+	my %col_set = map { $_ => 1 } @{$columns};
+	return $self->render(text => "Column not found: $cat_col", status => 400)
+		unless $col_set{$cat_col};
+
+	# '__count__' sentinel: count rows per category instead of summing a column.
+	my $count_mode = ($val_col eq '__count__' || !length($val_col));
+	return $self->render(text => "Column not found: $val_col", status => 400)
+		unless $count_mode || $col_set{$val_col};
+
+	my %totals;
+	for my $row (@{$records}) {
+		my $cat = $row->{$cat_col} // '';
+		next unless length($cat);
+		if ($count_mode) {
+			$totals{$cat}++;
+		} else {
+			my $v = $row->{$val_col} // '';
+			next unless length($v);
+			my $is_acct_neg = ($v =~ /\A\s*\(/);
+			(my $v_num = $v) =~ s/[^\d.\-]//g;
+			$v_num = "-$v_num" if $is_acct_neg && $v_num =~ /\A\d/;
+			next unless $v_num =~ /\A-?\d+(?:\.\d+)?\z/;
+			$totals{$cat} += $v_num + 0;
+		}
+	}
+
+	return $self->render(
+		text   => 'No plottable data: no rows have valid data in the selected columns.',
+		status => 200,
+	) unless %totals;
+
+	my @bars = map { [_decode_cell($_), $totals{$_}] } sort keys %totals;
+
+	my $orientation = ($orient eq 'h') ? 'horizontal' : 'vertical';
+	my $sort_bars   = ($sort eq 'value' || $sort eq 'label') ? $sort : 'none';
+
+	my ($source_url, $source_accessed) = $self->_url_attribution;
+
+	require HTML::D3;
+	my $title   = $count_mode ? "Count by $cat_col"
+	                          : "$val_col by $cat_col";
+	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480)
+		->render_bar_chart_snippet(\@bars, {
+			animated     => 1,
+			orientation  => $orientation,
+			sort_bars    => $sort_bars,
+			color        => 'categorical',
+			show_values  => 0,
+			value_label  => ($count_mode ? 'Count' : $val_col),
+		});
+
+	my $bar_html = $snippet->{html};
+	utf8::decode($bar_html) unless utf8::is_utf8($bar_html);
+
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler         => 'tt',
+		template        => "$platform/$language/bar",
+		format          => 'html',
+		title           => $title,
+		bar_html        => $bar_html,
+		bar_count       => scalar @bars,
+		cat_col         => $cat_col,
+		back_url        => $back,
+		back_label      => 'Back to table',
+		source_url      => $source_url,
+		source_accessed => $source_accessed,
 	);
 }
 

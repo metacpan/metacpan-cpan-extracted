@@ -32,8 +32,14 @@
       overflow-x: auto;
     }
 
-    table {
+    .table-scroll {
+      overflow-x: auto;
       width: 100%;
+    }
+
+    table {
+      width: max-content;
+      min-width: 100%;
       border-collapse: collapse;
       font-size: 0.9rem;
     }
@@ -600,7 +606,8 @@
     /* Line-graph button in the toolbar */
     .btn-graph,
     .btn-pie,
-    .btn-heatmap {
+    .btn-heatmap,
+    .btn-bar {
       flex-shrink: 0;
       padding: 0.28rem 0.75rem;
       border: 1px solid #888;
@@ -614,10 +621,12 @@
     }
     .btn-graph:hover,
     .btn-pie:hover,
-    .btn-heatmap:hover { background: #f0f0f0; }
+    .btn-heatmap:hover,
+    .btn-bar:hover { background: #f0f0f0; }
     .btn-graph:disabled,
     .btn-pie:disabled,
-    .btn-heatmap:disabled {
+    .btn-heatmap:disabled,
+    .btn-bar:disabled {
       opacity: 0.45;
       cursor: not-allowed;
     }

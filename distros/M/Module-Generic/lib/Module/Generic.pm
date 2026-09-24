@@ -1,16 +1,15 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.7.0
+## Version v1.7.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/07/14
+## Modified 2026/09/15
 ## All rights reserved
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 package Module::Generic;
 BEGIN
 {
@@ -118,7 +117,7 @@ BEGIN
     # shared state on the way out.
     *_in_end_phase = sub{ ${^GLOBAL_PHASE} eq 'END' };
 
-    our $VERSION   = 'v1.7.0';
+    our $VERSION   = 'v1.7.1';
 };
 
 # Load the XS shared library (Generic.so) which provides faster implementations of
@@ -165,7 +164,8 @@ $stderr_raw->autoflush( 1 );
     $false = $Module::Generic::Boolean::false;
 }
 
-# for sub in `perl -ln -E 'say "$1" if( /^sub (\w+)[[:blank:]\v]*(?:\{|\Z|[[:blank:]\v]*:[[:blank:]\v]*lvalue)/ )' ./lib/Module/Generic.pm | LC_COLLATE=C sort -uV`; do echo "sub $sub;"; done
+# NOTE: Predeclaration of available methods for autoload
+# for sub in `perl -ln -E 'say "$1" if( /^sub (\w+)[[:blank:]\v]*(?:\{|\Z|[[:blank:]\v]*:[[:blank:]\v]*lvalue)/ && $1 ne "STORABLE_freeze" && $1 ne "STORABLE_thaw" && $1 ne "STORABLE_thaw_post_processing" )' ./lib/Module/Generic.pm | LC_COLLATE=C sort -uV`; do echo "sub $sub;"; done
 sub AUTOLOAD;
 sub DEBUG;
 sub DESTROY;
@@ -236,6 +236,7 @@ sub _autoload_subs;
 sub _can;
 sub _can_overload;
 sub _dump_options;
+sub _error_callbacks;
 sub _get_args_as_array;
 sub _get_args_as_hash;
 sub _get_datetime_regexp;
@@ -267,9 +268,8 @@ sub _list_symbols;
 sub _load_class;
 sub _load_classes;
 sub _looks_like_path;
+sub _look_like_number;
 sub _lvalue;
-sub __message;
-sub __messagef;
 sub _message_check;
 sub _message_frame;
 sub _message_log;
@@ -278,6 +278,8 @@ sub _obj2h;
 sub _on_error;
 sub _parse_timestamp;
 sub _refaddr;
+sub _register_error_callback;
+sub _remove_error_callback;
 sub _set_get;
 sub _set_get_array;
 sub _set_get_array_as_object;
@@ -324,6 +326,8 @@ sub __colour_data;
 sub __create_class;
 sub __dbh;
 sub __instantiate_object;
+sub __message;
+sub __messagef;
 
 # no warnings 'redefine';
 sub import
@@ -802,6 +806,7 @@ sub deserialise
             }
             else
             {
+                $self->__message( 5, "Deserialising file '$opts->{file}'" );
                 # try-catch
                 local $@;
                 my $result = eval
@@ -812,6 +817,7 @@ sub deserialise
                 {
                     return( $self->error( "Error trying to deserialise data with $class: $@" ) );
                 }
+                $self->__message( 5, "Ok, object is deserialised, returning it." );
                 return( $result );
             }
         }
@@ -1308,6 +1314,24 @@ sub error
             {
                 $err_callback->( $self, $o );
             };
+        }
+
+        my $err_callbacks = [ reverse( @{$self->_error_callbacks || []} ) ];
+        if( scalar( @$err_callbacks ) )
+        {
+            local $SIG{__WARN__} = sub{};
+            local $SIG{__DIE__} = sub{};
+            local $@;
+            foreach my $ref ( @$err_callbacks )
+            {
+                $self->__message( 112, "Executing error callback '", ( $ref->{name} // 'undef' ), "'" );
+                my $code = $ref->{cb};
+                if( !defined( $code ) || ref( $code ) ne 'CODE' )
+                {
+                    next;
+                }
+                eval{ $code->( $self, $o ) };
+            }
         }
 
         # Get the warnings status of the caller. We use caller(1) to skip one frame further, ie our caller's caller
@@ -1836,15 +1860,16 @@ sub new_json
     my $opts = $self->_get_args_as_hash( @_ );
     $self->_load_class( 'JSON' ) || return( $self->pass_error );
     # 'allow_tags' is a real trouble-maker
-    my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed->allow_tags->relaxed;
+    # my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed->allow_tags->relaxed;
+    my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed->relaxed;
     # my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed->relaxed;
     # Same as in Module::Generic::File::unload_json()
     my $equi =
     {
-        order => 'canonical',
+        order   => 'canonical',
         ordered => 'canonical',
-        sorted => 'canonical',
-        sort => 'canonical',
+        sorted  => 'canonical',
+        sort    => 'canonical',
     };
 
     foreach my $opt ( keys( %$opts ) )
@@ -1888,7 +1913,7 @@ sub new_json_safe
         allow_nonref    => 1,
         allow_blessed   => 1,
         convert_blessed => 1,
-        allow_tags      => 1,
+        # allow_tags      => 1,
         relaxed         => 1,
     };
     foreach my $opt ( keys( %$defaults ) )
@@ -2058,7 +2083,7 @@ sub pass_error
     # called with no argument, most likely from the same class to pass on an error 
     # set up earlier by another method; or
     # with an hash containing just one argument class => 'Some::ExceptionClass'
-    if( !defined( $err ) && ( !scalar( @_ ) || defined( $ex_class ) ) )
+    if( !defined( $err ) && ( !scalar( @_ ) || defined( $ex_class ) || defined( $code ) || defined( $callback ) ) )
     {
         $self->__message( 106, "Passing on error..." );
         my $error;
@@ -2084,6 +2109,21 @@ sub pass_error
         {
             $err = ( defined( $ex_class ) ? bless( $error => $ex_class ) : $error );
             $err->code( $code ) if( defined( $code ) );
+            # Here, we do not:
+            # my $err_callback = $self->_on_error;
+            # because this callback is for new errors, whereas here, we just pass along existing error.
+            # We would not want to trigger the error callback twice.
+            if( defined( $callback ) && 
+                CORE::ref( $callback ) eq 'CODE' )
+            {
+                local $SIG{__WARN__} = sub{};
+                local $SIG{__DIE__} = sub{};
+                local $@;
+                eval
+                {
+                    $callback->( $self, $err );
+                };
+            }
         }
     }
     # An error object was provided
@@ -2116,6 +2156,24 @@ sub pass_error
             {
                 $err_callback->( $self, $this->{error} );
             };
+        }
+
+        my $err_callbacks = [ reverse( @{$self->_error_callbacks || []} ) ];
+        if( scalar( @$err_callbacks ) )
+        {
+            local $SIG{__WARN__} = sub{};
+            local $SIG{__DIE__} = sub{};
+            local $@;
+            foreach my $ref ( @$err_callbacks )
+            {
+                $self->__message( 112, "Executing error callback '", ( $ref->{name} // 'undef' ), "'" );
+                my $code = $ref->{cb};
+                if( !defined( $code ) || ref( $code ) ne 'CODE' )
+                {
+                    next;
+                }
+                eval{ $code->( $self, $this->{error} ) };
+            }
         }
 
         if( $this->{fatal} || ( defined( ${"${class}\::FATAL_ERROR"} ) && ${"${class}\::FATAL_ERROR"} ) )
@@ -7185,6 +7243,7 @@ sub _set_get_scalar_as_object : lvalue
                 CORE::exists( $callbacks->{get} ) &&
                 ref( $callbacks->{get} ) eq 'CODE' )
             {
+                $self->__message( 5, "There is a get callback for instance property '${field}'." );
                 $v = $callbacks->{get}->( $self, $v );
                 # Did the callback return a weak reference; if so, we respect it
                 $is_weak = Scalar::Util::isweak( $v ) ? 1 : 0;
@@ -8265,6 +8324,64 @@ sub _dump_options
         push( @$args, $opt, $self->_str_val( $opts->{ $opt } ) );
     }
     return( $self->Module::Generic::dump( $args ) );
+}
+PERL
+        # NOTE: _error_callbacks()
+        _error_callbacks => <<'PERL',
+# To get a specific callback by name:
+# my $code = $self->_error_callbacks( $some_name );
+# To register a bunch of error callbacks, using an hash reference:
+# $self->_error_callbacks({ $some_name => sub{ $some_callback });
+# Or, using an array of callbacks
+# $self->_error_callbacks( $some_name => sub{ $some_callback );
+# To retrieve all registered error callbacks:
+# my $array_ref = $self-_error_callbacks;
+sub _error_callbacks
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    if( @_ )
+    {
+        if( scalar( @_ ) == 1 &&
+            ref( $_[0] ) eq 'HASH' )
+        {
+            my $def = shift( @_ );
+            foreach my $k ( keys( %$def ) )
+            {
+                $self->_register_error_callback( $k => $def->{ $k } );
+            }
+        }
+        elsif( scalar( @_ ) == 1 )
+        {
+            my $name = shift( @_ );
+            return( '' ) if( !exists( $data->{_error_callbacks} ) );
+            return( '' ) if( ref( $data->{_error_callbacks} ) ne 'ARRAY' );
+            for( my $i = 0; $i < scalar( @{$data->{_error_callbacks}} ); $i++ )
+            {
+                my $ref = $data->{_error_callbacks}->[$i];
+                next unless( defined( $ref ) && ref( $ref ) eq 'HASH' );
+                if( exists( $ref->{name} ) &&
+                    defined( $ref->{name} ) &&
+                    $ref->{name} eq $name )
+                {
+                    return( $ref->{cb} // '' );
+                }
+            }
+            return( '' );
+        }
+        else
+        {
+            for( my $i = 0; $i < scalar( @_ ); $i += 2 )
+            {
+                my $name = $_[$i];
+                my $code = $_[$i + 1];
+                $self->_register_error_callback( $name => $code );
+            }
+        }
+    }
+    return( [] ) unless( exists( $data->{_error_callbacks} ) && defined( $data->{_error_callbacks} ) && ref( $data->{_error_callbacks} ) eq 'ARRAY' );
+    return( $data->{_error_callbacks} );
 }
 PERL
         # NOTE: _get_args_as_array()
@@ -10123,6 +10240,77 @@ sub _refaddr
     return( Scalar::Util::refaddr( $_[1] ) );
 }
 PERL
+        # NOTE: _register_error_callback()
+        _register_error_callback => <<'PERL',
+sub _register_error_callback
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    # No choice, but to die
+    my $name = shift( @_ ) || die( "No name for this error callback was provided." );
+    my $cb   = shift( @_ ) || die( "No error callback was provided." );
+    unless( ref( $cb ) eq 'CODE' )
+    {
+        die( "Error callback provided is not a code reference." );
+    }
+    $data->{_error_callbacks} //= [];
+    foreach my $ref ( @{$data->{_error_callbacks}} )
+    {
+        next unless( ref( $ref ) eq 'HASH' );
+        next unless( $ref->{name} && $ref->{cb} );
+        if( $ref->{namae} eq $name )
+        {
+            $ref->{cb} = $cb;
+            return( $self );
+        }
+    }
+    push( @{$data->{_error_callbacks}}, { name => $name, cb => $cb } );
+    return( $self );
+}
+PERL
+        # NOTE: _remove_error_callback()
+        _remove_error_callback => <<'PERL',
+sub _remove_error_callback
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    # No choice, but to die
+    my $name = shift( @_ ) || die( "No name for this error callback was provided." );
+    # return undef is only for errors, so instead we return false, but not undef.
+    return( '' ) if( !CORE::exists( $data->{_error_callbacks} ) );
+    if( !ref( $data->{_error_callbacks} ) && 
+        !CORE::length( $data->{_error_callbacks} ) )
+    {
+        CORE::delete( $data->{_error_callbacks} );
+        return( '' );
+    }
+    elsif( ref( $data->{_error_callbacks} ) ne 'ARRAY' )
+    {
+        warn( "Error callback repository was expected to be an array reference, but instead found a value of type '", $self->_str_val( $data->{_error_callbacks} ), "'" ) if( $self->_is_warnings_enabled() );
+        return;
+    }
+    for( my $i = 0; $i < scalar( @{$data->{_error_callbacks}} ); $i++ )
+    {
+        my $ref = $data->{_error_callbacks}->[$i];
+        next unless( defined( $ref ) );
+        next unless( ref( $ref ) eq 'HASH' );
+        next unless( $ref->{name} );
+        if( $ref->{namae} eq $name )
+        {
+            my $cb = $ref->{cb};
+            # Remove our entry
+            splice( @{$data->{_error_callbacks}}, $i, 1 );
+            # Remove the instance property '_error_callbacks' if there are no entries left.
+            CORE::delete( $data->{_error_callbacks} ) unless( scalar( @{$data->{_error_callbacks}} ) );
+            # Return the old code reference value, and make sure we do not return undef, because it would mean an error.
+            return( $cb // '' );
+        }
+    }
+    return( '' );
+}
+PERL
         # NOTE: _set_get_class_array_object()
         _set_get_class_array_object => <<'PERL',
 sub _set_get_class_array_object
@@ -10923,7 +11111,7 @@ sub _subinfo
     });
 }
 PERL
-        # NOTE: _subname
+        # NOTE: _subname()
         _subname => <<'PERL',
 # Credits: Inspired from Sub::Identify
 # Usage:
@@ -11178,6 +11366,7 @@ sub clone
         }
         elsif( !defined( $_[0] ) )
         {
+            $self->__message( 5, "The value provided to clone is undefined." );
             # So, we return undef too.
             return;
         }
@@ -13229,6 +13418,7 @@ sub FREEZE
     my $class = CORE::ref( $self );
     my $ref = $self->_obj2h;
     my %hash = %$ref;
+    delete( $hash{_error_callbacks} );
     $hash{_is_glob} = ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' ? 1 : 0;
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
@@ -13521,7 +13711,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.7.0
+    v1.7.1
 
 =head1 DESCRIPTION
 
@@ -14117,6 +14307,8 @@ Boolean. Set this to a true value if this is called within an assign method, suc
 =item * C<callback>
 
 Specify a code reference such as a reference to a subroutine. This is designed to be called upon error to do some cleanup for example.
+
+Note that you can also register more callbacks using L</_register_error_callback> or L</_error_callbacks>
 
 =item * C<class>
 
@@ -15105,6 +15297,62 @@ The options are sorted by key, converted to a flat array of key/value pairs, and
 
 If no hash reference is provided, this returns an empty string.
 
+=head2 _error_callbacks
+
+To get a specific callback by name:
+
+    my $code = $self->_error_callbacks( $some_name );
+
+To register a bunch of error callbacks, using an hash reference:
+
+    $self->_error_callbacks({ $some_name => sub{ $some_callback } });
+
+Or, using an array of callbacks
+
+    $self->_error_callbacks( $some_name => sub{ $some_callback }, $some_other => sub{ $other_callback } );
+
+To remove a bunch of error callbacks, using an hash reference:
+
+    $self->_error_callbacks({ $some_name => undef, $some_other => undef });
+
+Or, using an array of callbacks
+
+    $self->_error_callbacks( $some_name => undef, $some_other => undef );
+
+To retrieve all registered error callbacks:
+
+    my $array_ref = $self->_error_callbacks;
+
+This method sets or gets error callbacks. Since the order of callbacks may be important, this method stores the callbacks in an array reference in the property C<_error_callbacks> of the instance.
+
+If only one argument is provided, it will be treated as the callback name, and return the associated error callback if any. If there are none, it will return an empty string.
+
+You can also pass an hash reference of callback name and callback code reference, such as:
+
+    $self->_error_callbacks({
+        $some_name => sub{ $some_callback },
+        $some_other => sub{ $other_callback },
+    });
+
+And they will be registered in their alphabetical order.
+
+Or you can pass an array of callback name and callback code reference, such as:
+
+    $self->_error_callbacks(
+        $some_name => sub{ $some_callback },
+        $some_other => sub{ $other_callback },
+    );
+
+and they will be registered in the order provided.
+
+if instead of a code reference, C<undef> is provided, then it will remove the error callback for that specified name.
+
+If a value is neither C<undef> or a code reference, then this will trigger a fatal exception with C<die>.
+
+It returns the array of callback registered.
+
+See also L</_on_error>
+
 =head2 _get_args_as_array
 
 This is an on-demand private method, which means it only exist as a string, and dynamically loaded (via C<eval>) the first time it is called.
@@ -15969,6 +16217,22 @@ Example:
 The word now will set the return value to the current date and time
 
 =back
+
+=head2 _register_error_callback
+
+    $self->_register_error_callback( $name => $code_reference );
+
+This takes a callback name, and a code reference, and register the error callback for that specified name.
+
+Note that the order in which the callbacks are registered matters and they will be called by L</error> in that same order.
+
+It returns the current instance for chaining.
+
+=head2 _remove_error_callback
+
+    my $old_callback_code_reference = $self->_remove_error_callback( $name );
+
+This takes an error callback name, and remove its associated entry, and return the previously registered code reference.
 
 =head2 _set_get
 

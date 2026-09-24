@@ -252,6 +252,24 @@ struct hm_loop {
     hm_tw      *hardstop_tw;
 };
 
+/* One served request, counted, and max_requests tested - for every protocol
+ * that finishes one. The bound belongs to the worker and not to HTTP/1: a
+ * site whose browsers all negotiate h2 would otherwise never reach it, and
+ * the worker it was meant to retire grows for as long as the box lets it.
+ *
+ * Not on the 101 paths (h2c upgrade, detach, tunnel), which count their
+ * request and deliberately do not test: the socket there has just left this
+ * loop for an application that means to hold it open, and a drain decided by
+ * the request that handed it over is the one moment it must not happen.
+ *
+ * A function and not a macro because the argument is read five times. */
+static void hm_count_request(hm_loop *loop) {
+    loop->requests++;
+    if (loop->max_requests && loop->requests >= loop->max_requests
+        && !loop->stopping && loop->attached)
+        loop->recycle_pending = 1;  /* drain at the loop iteration boundary */
+}
+
 /* Does a Hyperman::Writer's tag slot hold this string? The four-element
  * writer shapes (h2 and h3) have the same arity, so they are told apart by
  * the tag and never by length - a length test routes an HTTP/3 body into an
@@ -2802,10 +2820,7 @@ static void hm_process(pTHX_ hm_conn *c) {
                                  * for itself */
         served++;
         c->nreqs++;
-        loop->requests++;
-        if (loop->max_requests && loop->requests >= loop->max_requests
-            && !loop->stopping && loop->attached)
-            loop->recycle_pending = 1;  /* drain at the loop iteration boundary */
+        hm_count_request(loop);
 
         /* async: handler returned a Future -> park and wait; hold the
          * future so a client disconnect can cancel it */

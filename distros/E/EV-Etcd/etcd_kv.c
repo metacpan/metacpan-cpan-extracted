@@ -1,6 +1,3 @@
-/*
- * etcd_kv.c - KV operation response handlers for EV::Etcd
- */
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
@@ -10,7 +7,6 @@
 #include "etcd_common.h"
 #include "etcd_kv.h"
 
-/* Process RangeResponse (get) and call Perl callback */
 void process_range_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "range");
 
@@ -36,7 +32,6 @@ void process_range_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process PutResponse and call Perl callback */
 void process_put_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "put");
 
@@ -55,7 +50,6 @@ void process_put_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process DeleteRangeResponse and call Perl callback */
 void process_delete_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "delete");
 
@@ -81,7 +75,6 @@ void process_delete_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process CompactionResponse and call Perl callback */
 void process_compact_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "compact");
 

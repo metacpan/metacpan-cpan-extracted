@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::Most tests => 33;
+use Test::Most tests => 34;
 use_ok('HTML::D3');
 
 my $chart = HTML::D3->new(
@@ -90,3 +90,6 @@ my $f_zeros;
 lives_ok { $f_zeros = $chart->render_heatmap_snippet(\@zeros) }
 	'All-zero values render without error (degenerate domain fallback)';
 ok(length($f_zeros->{html}) > 0, 'All-zero output is non-empty');
+
+throws_ok { $chart->render_heatmap_snippet(\@triples, { cell_padding => -1 }) }
+    qr/cell_padding must be between 0 and 8/, 'cell_padding negative dies correctly';

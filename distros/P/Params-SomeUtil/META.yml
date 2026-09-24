@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::CBuilder: '0.27'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/uperl/Params-SomeUtil/issues
   homepage: https://metacpan.org/pod/Params::SomeUtil
   repository: https://github.com/uperl/Params-SomeUtil.git
-version: '1.11'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

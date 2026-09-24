@@ -1549,7 +1549,169 @@ subtest 'pie_view -- accounting-notation negatives parsed as signed values' => s
 };
 
 # ============================================================================
-# PART 8: Database::BI::_evict_old_uploads -- mtime cutoff logic
+# PART 8: _safe_back_url -- XSS-safe back-link sanitiser
+#
+# _safe_back_url is a package-level function (no $self) that accepts a raw
+# URL string and returns it unchanged when it is safe to embed in an href="",
+# or undef when it is not.  Allowed: root-relative /path (but not //) and
+# absolute http(s):// URLs.  Everything else -- javascript:, data:, empty,
+# undef -- must be rejected.
+# ============================================================================
+
+subtest '_safe_back_url -- undef input returns undef' => sub {
+	# Guard against template rendering javascript: or data: URIs as href values.
+	my $fn = \&Database::BI::Controller::Dashboard::_safe_back_url;
+	is $fn->(undef), undef, 'undef input returns undef';
+};
+
+subtest '_safe_back_url -- empty string returns undef' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_safe_back_url;
+	is $fn->(''), undef, 'empty string returns undef';
+};
+
+subtest '_safe_back_url -- javascript: scheme is rejected' => sub {
+	# A javascript: URI in an href executes on click -- must be blocked.
+	my $fn = \&Database::BI::Controller::Dashboard::_safe_back_url;
+	is $fn->('javascript:alert(1)'), undef, 'javascript: URI rejected';
+	is $fn->('JAVASCRIPT:alert(1)'), undef, 'case-insensitive javascript: URI rejected';
+};
+
+subtest '_safe_back_url -- data: scheme is rejected' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_safe_back_url;
+	is $fn->('data:text/html,<script>alert(1)</script>'), undef, 'data: URI rejected';
+};
+
+subtest '_safe_back_url -- protocol-relative URL is rejected' => sub {
+	# // is not a root-relative path; /(?!/) means / NOT followed by /.
+	my $fn = \&Database::BI::Controller::Dashboard::_safe_back_url;
+	is $fn->('//evil.example.com/'), undef, 'protocol-relative // URL rejected';
+};
+
+subtest '_safe_back_url -- root-relative path is allowed' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_safe_back_url;
+	is $fn->('/view/sales'), '/view/sales', 'root-relative /view/sales allowed';
+	is $fn->('/'), '/', 'bare / allowed';
+	is $fn->('/open?path=%2Ftmp%2Ffile.csv'), '/open?path=%2Ftmp%2Ffile.csv',
+		'root-relative path with query string allowed';
+};
+
+subtest '_safe_back_url -- absolute http URL is allowed' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_safe_back_url;
+	is $fn->('http://example.com/page'), 'http://example.com/page',
+		'absolute http:// URL allowed';
+};
+
+subtest '_safe_back_url -- absolute https URL is allowed' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_safe_back_url;
+	is $fn->('https://example.com/pie?l=table:sales'), 'https://example.com/pie?l=table:sales',
+		'absolute https:// URL with query string allowed';
+	is $fn->('HTTPS://example.com/'), 'HTTPS://example.com/',
+		'case-insensitive https:// URL allowed';
+};
+
+subtest '_safe_back_url -- vbscript: scheme is rejected' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_safe_back_url;
+	is $fn->('vbscript:MsgBox(1)'), undef, 'vbscript: URI rejected';
+};
+
+# ============================================================================
+# PART 9: bar_view HTTP smoke tests
+#
+# Exercises the key code paths in bar_view:
+#   1. __count__ sentinel -- count rows per category instead of summing a column.
+#   2. Missing cat param -- must return 400.
+#   3. Unknown val col -- must return 400.
+#   4. orient=h -- horizontal orientation rendered.
+#   5. Accounting-notation negatives -- ($250.00) parsed as -250.
+#   6. No plottable data -- empty/blank values in the selected columns.
+#
+# Temp CSV files are used so tests are self-contained and do not touch data/.
+# All subtests guard on HTML::D3 availability (render_bar_chart_snippet).
+# ============================================================================
+
+subtest 'bar_view -- __count__ sentinel counts rows per category' => sub {
+	use Mojo::Util qw(url_escape);
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 3;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'items.csv');
+		$file->spew("type,amount\nFood,10.00\nFood,20.00\nDrink,5.00\n");
+		my $enc = url_escape($file->to_string);
+		$t->get_ok("/bar?l=path:$enc&cat=type&val=__count__")
+		  ->status_is(200, '__count__ mode renders bar chart without error')
+		  ->content_like(qr/Count by type/i, 'chart title includes "Count by type"');
+	}
+};
+
+subtest 'bar_view -- missing cat param returns 400' => sub {
+	# cat is required; absence is an immediate 400 before any data access.
+	$t->get_ok('/bar?l=table:sales&val=amount')
+	  ->status_is(400, 'missing cat param produces 400 Bad Request');
+};
+
+subtest 'bar_view -- unknown val column returns 400' => sub {
+	use Mojo::Util qw(url_escape);
+	my $dir  = tempdir(CLEANUP => 1);
+	my $file = Mojo::File->new($dir, 'data2.csv');
+	$file->spew("region,amount\nNorth,100\nSouth,200\n");
+	my $enc = url_escape($file->to_string);
+	$t->get_ok("/bar?l=path:$enc&cat=region&val=nonexistent_col")
+	  ->status_is(400, 'unknown val column produces 400 Bad Request');
+};
+
+subtest 'bar_view -- horizontal orientation accepted without error' => sub {
+	use Mojo::Util qw(url_escape);
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 2;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'sales2.csv');
+		$file->spew("region,amount\nNorth,100\nSouth,200\n");
+		my $enc = url_escape($file->to_string);
+		$t->get_ok("/bar?l=path:$enc&cat=region&val=amount&orient=h")
+		  ->status_is(200, 'orient=h renders bar chart without error');
+	}
+};
+
+subtest 'bar_view -- sort=value accepted without error' => sub {
+	use Mojo::Util qw(url_escape);
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 2;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'sorted.csv');
+		$file->spew("product,revenue\nA,300\nB,150\nC,450\n");
+		my $enc = url_escape($file->to_string);
+		$t->get_ok("/bar?l=path:$enc&cat=product&val=revenue&sort=value")
+		  ->status_is(200, 'sort=value renders bar chart without error');
+	}
+};
+
+subtest 'bar_view -- accounting-notation negatives parsed as signed values' => sub {
+	use Mojo::Util qw(url_escape);
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 2;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'ledger2.csv');
+		$file->spew("category,amount\nIncome,\$1000.00\nExpense,(\$250.00)\n");
+		my $enc = url_escape($file->to_string);
+		$t->get_ok("/bar?l=path:$enc&cat=category&val=amount")
+		  ->status_is(200, 'bar renders despite accounting-notation negative in amount column');
+	}
+};
+
+subtest 'bar_view -- all blank values produces no-plottable-data response' => sub {
+	use Mojo::Util qw(url_escape);
+	my $dir  = tempdir(CLEANUP => 1);
+	my $file = Mojo::File->new($dir, 'empty_vals.csv');
+	# All amount values are blank -- nothing passes the numeric guard.
+	$file->spew("region,amount\nNorth,\nSouth,\n");
+	my $enc = url_escape($file->to_string);
+	$t->get_ok("/bar?l=path:$enc&cat=region&val=amount")
+	  ->status_is(200, 'no-plottable-data responds 200 with explanatory message')
+	  ->content_like(qr/No plottable data/, 'response body explains no plottable data');
+};
+
+# ============================================================================
+# PART 10: Database::BI::_evict_old_uploads -- mtime cutoff logic
 #
 # _evict_old_uploads is a plain package-level sub in Database::BI (not a
 # method).  It walks an uploads directory and removes any entry whose mtime

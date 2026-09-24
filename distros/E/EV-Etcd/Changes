@@ -1,5 +1,13 @@
 Revision history for EV-Etcd
 
+0.10  2026-09-23
+    - Add TLS and mutual TLS (tls_* options, https:// endpoints)
+    - Fail over to the next endpoint when the current one is unreachable
+    - Keepalive pings (keepalive_time, keepalive_timeout)
+    - Forked children can use etcd if the parent held no client, else croak
+    - health_interval accepts fractions
+    - Fix crashes and leaks on client/handle destroy, txn and ithreads
+
 0.09  2026-07-21
     - Fix lease_keepalive never renewing the lease (resend at TTL/3)
     - Reconnect streams on any stream end, not only batch failure

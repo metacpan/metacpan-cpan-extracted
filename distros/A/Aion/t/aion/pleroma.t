@@ -46,7 +46,12 @@ eval {$pleroma->resolve('user')}; local ($::_g0 = $@, $::_e0 = 'user is\'nt eon!
 #>> sub name      { $_[0]{name} }
 #>> sub telescope { $_[0]{telescope} }
 #>> sub seen      { $_[0]{seen} }
-#>> sub observe   { my ($self, $body) = @_; push @{ $self->{seen} }, $body; $body }
+#>> sub observe   {
+#>> 	my ($self, $body) = @_;
+#>> 	die "body is'nt Planet!" unless $body && $body->isa('Ex::Eon::Planet');
+#>> 	push @{ $self->{seen} }, $body;
+#>> 	$body
+#>> }
 #>> 
 #>> 1;
 #@< EOF
@@ -64,17 +69,12 @@ eval {$pleroma->resolve('user')}; local ($::_g0 = $@, $::_e0 = 'user is\'nt eon!
 #>> 1;
 #@< EOF
 # 
-# Теперь конфигурация эонов. У эона-учёного `Ex::Eon::Galileo` аргументы заданы упорядоченно (`arguments` — массив), после создания вызывается метод `observe` со ссылкой на другой эон (`@Ex::Eon::Saturn`). У планет `arguments` — хеш, а аргумент `discoverer` ссылается (`@`) на эон учёного.
+# Теперь конфигурация эонов. У эона-учёного `Ex::Eon::Galileo` аргументы заданы упорядоченно (`arguments` – массив), после создания вызывается метод `observe` со ссылкой на другой эон (`@Ex::Eon::Saturn`). У планет `arguments` – хеш, а аргумент `discoverer` ссылается (`@`) на эон учёного.
 # 
-# Файл etc/aion/eon.yml:
-#@> etc/aion/eon.yml
+# Файл etc/aion/include.yml:
+#@> etc/aion/include.yml
 #>> aion:
 #>>   eon:
-#>>     Ex::Eon::Galileo:
-#>>       class: 'Ex::Eon::Astronomer'
-#>>       arguments: [ 'Galileo Galilei', 'refracting telescope' ]
-#>>       calls:
-#>>         - [observe, '@Ex::Eon::Saturn']
 #>>     Ex::Eon::Jupiter:
 #>>       class: 'Ex::Eon::Planet'
 #>>       arguments:
@@ -86,22 +86,23 @@ eval {$pleroma->resolve('user')}; local ($::_g0 = $@, $::_e0 = 'user is\'nt eon!
 #>>       arguments:
 #>>         name: 'Saturn'
 #>>         moons: 146
+#>>     Ex::Eon::Galileo:
+#>>       class: 'Ex::Eon::Astronomer'
+#>>       arguments: [ 'Galileo Galilei', 'refracting telescope' ]
+#>>       calls:
+#>>         - [observe, '@Ex::Eon::Saturn']
 #@< EOF
 # 
-# Загрузим конфигурацию из `etc/aion/eon.yml`, создадим контейнер и запросим эоны.
+# В конфигурации эон `Ex::Eon::Jupiter` описан раньше, чем `Ex::Eon::Galileo` (на которого он ссылается через `@`). Порядок описания не важен: эоны порождаются лениво при запросе, поэтому `@`-ссылка разрешается уже на готовый эон.
+# 
+# Прочитаем конфигурацию из `etc/aion/include.yml` и передадим её контейнеру.
 # 
 ::done_testing; }; subtest 'EONS FROM CONFIG' => sub { 
 use Aion::Pleroma;
 use Aion::Env::Etc ();
 
-my $etc = Aion::Env::Etc::parse('etc/aion/eon.yml');
+my $etc = Aion::Env::Etc::parse('etc/aion/include.yml');
 my $pleroma = Aion::Pleroma->new(pleroma => $etc->{aion}{eon});
-
-my $galileo = $pleroma->resolve('Ex::Eon::Galileo');
-local ($::_g0 = do {$galileo->name}, $::_e0 = "Galileo Galilei"); ::ok $::_g0 eq $::_e0, '$galileo->name  # => Galileo Galilei' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {$galileo->telescope}, $::_e0 = "refracting telescope"); ::ok $::_g0 eq $::_e0, '$galileo->telescope  # => refracting telescope' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {ref($galileo->seen->[0])}, $::_e0 = "Ex::Eon::Planet"); ::ok $::_g0 eq $::_e0, 'ref($galileo->seen->[0])  # => Ex::Eon::Planet' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
-local ($::_g0 = do {$galileo->seen->[0]->name}, $::_e0 = "Saturn"); ::ok $::_g0 eq $::_e0, '$galileo->seen->[0]->name # => Saturn' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 my $jupiter = $pleroma->resolve('Ex::Eon::Jupiter');
 local ($::_g0 = do {$jupiter->name}, $::_e0 = "Jupiter"); ::ok $::_g0 eq $::_e0, '$jupiter->name    # => Jupiter' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
@@ -109,12 +110,28 @@ local ($::_g0 = do {$jupiter->moons}, $::_e0 = "95"); ::ok $::_g0 eq $::_e0, '$j
 local ($::_g0 = do {$jupiter->discoverer->name}, $::_e0 = "Galileo Galilei"); ::ok $::_g0 eq $::_e0, '$jupiter->discoverer->name # => Galileo Galilei' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {ref($jupiter->discoverer)}, $::_e0 = "Ex::Eon::Astronomer"); ::ok $::_g0 eq $::_e0, 'ref($jupiter->discoverer)  # => Ex::Eon::Astronomer' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
+my $galileo = $pleroma->resolve('Ex::Eon::Galileo');
+local ($::_g0 = do {$galileo->name}, $::_e0 = "Galileo Galilei"); ::ok $::_g0 eq $::_e0, '$galileo->name  # => Galileo Galilei' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$galileo->telescope}, $::_e0 = "refracting telescope"); ::ok $::_g0 eq $::_e0, '$galileo->telescope  # => refracting telescope' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {ref($galileo->seen->[0])}, $::_e0 = "Ex::Eon::Planet"); ::ok $::_g0 eq $::_e0, 'ref($galileo->seen->[0])  # => Ex::Eon::Planet' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {$galileo->seen->[0]->name}, $::_e0 = "Saturn"); ::ok $::_g0 eq $::_e0, '$galileo->seen->[0]->name # => Saturn' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# ## Круговая зависимость
+# 
+# Если эоны ссылаются друг на друга, то контейнер не сможет их породить. Цикл вычисляется уже при добавлении эона (`autoware`) — на этапе сборки конфигурации — и выбрасывается исключение с цепочкой ссылок.
+# 
+::done_testing; }; subtest 'Круговая зависимость' => sub { 
+my $cnt = Aion::Pleroma->new;
+$cnt->autoware({ class => 'Ex::Eon::Galileo', arguments => [ 'Galileo Galilei', 'refracting telescope' ], calls => [[ 'observe', '@Ex::Eon::Jupiter' ]] }, 'Ex::Eon::Galileo');
+eval {$cnt->autoware({ class => 'Ex::Eon::Planet', arguments => { name => 'Jupiter', moons => 95, discoverer => '@Ex::Eon::Galileo' } }, 'Ex::Eon::Jupiter')}; local ($::_g0 = $@, $::_e0 = qr{Circular eon dependency: .+Ex::Eon::Jupiter}); ok defined($::_g0) && $::_g0 =~ $::_e0, '$cnt->autoware({ class => \'Ex::Eon::Planet\', arguments => { name => \'Jupiter\', moons => 95, discoverer => \'@Ex::Eon::Galileo\' } }, \'Ex::Eon::Jupiter\') # @~> Circular eon dependency: .+Ex::Eon::Jupiter' or ::diag defined($::_g0)? "Got:$::_g0": 'Got is undef'; undef $::_g0; undef $::_e0;
+
 # 
 # ## Eon description keys
 # 
 # Каждый эон в `aion.eon` описывается строкой или хешем.
 # 
-# Строка задаёт конструктор `'класс#метод'` (или просто `'класс'`), метод по умолчанию — `new`. Так создаются самые простые эоны без аргументов.
+# Строка задаёт конструктор `'класс#метод'` (или просто `'класс'`), метод по умолчанию – `new`. Так создаются самые простые эоны без аргументов.
 # 
 # Хеш может содержать ключи:
 # 
@@ -123,7 +140,7 @@ local ($::_g0 = do {ref($jupiter->discoverer)}, $::_e0 = "Ex::Eon::Astronomer");
 # * `arguments` – аргументы конструктора:
 #   * хеш – именованные аргументы (`new => %hash`);
 #   * массив – упорядоченные аргументы (`new => @array`).
-# * `calls` – список вызовов методов после создания эона. Каждый вызов — имя метода (без аргументов) или массив `[имя_метода, аргументы...]`.
+# * `calls` – список вызовов методов после создания эона. Каждый вызов – имя метода (без аргументов) или массив `[имя_метода, аргументы...]`.
 # 
 # Значение аргумента (или элемента вызова), начинающееся с `@`, воспринимается как ссылка на другой эон: `@ключ` заменяется порождённым эоном из контейнера.
 # 
@@ -169,7 +186,7 @@ local ($::_g0 = do {Aion::Pleroma->new->ini}, $::_e0 = "etc/annotation/eon.ann")
 #@< EOF
 # 
 ::done_testing; }; subtest 'pleroma' => sub { 
-local ($::_g0 = do {Aion::Pleroma->new->pleroma}, $::_e0 = do {{"Ex::Eon::AnimalEon" => "Ex::Eon::AnimalEon#new", "Ex::Eon::AnimalEon#dog" => "Ex::Eon::AnimalEon#dog", "ex.cat" => "Ex::Eon::AnimalEon#cat", "Aion::Pleroma" => "Aion::Pleroma#new"}}); ::is_deeply $::_g0, $::_e0, 'Aion::Pleroma->new->pleroma # --> {"Ex::Eon::AnimalEon" => "Ex::Eon::AnimalEon#new", "Ex::Eon::AnimalEon#dog" => "Ex::Eon::AnimalEon#dog", "ex.cat" => "Ex::Eon::AnimalEon#cat", "Aion::Pleroma" => "Aion::Pleroma#new"}' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {Aion::Pleroma->new->pleroma}, $::_e0 = do {{ "Ex::Eon::AnimalEon#dog" => { class => "Ex::Eon::AnimalEon", method => "dog" }, "Ex::Eon::AnimalEon" => { class => "Ex::Eon::AnimalEon", method => "new" }, "ex.cat" => { class => "Ex::Eon::AnimalEon", method => "cat" }, "Aion::Pleroma" => { class => "Aion::Pleroma", method => "new" } }}); ::is_deeply $::_g0, $::_e0, 'Aion::Pleroma->new->pleroma # --> { "Ex::Eon::AnimalEon#dog" => { class => "Ex::Eon::AnimalEon", method => "dog" }, "Ex::Eon::AnimalEon" => { class => "Ex::Eon::AnimalEon", method => "new" }, "ex.cat" => { class => "Ex::Eon::AnimalEon", method => "cat" }, "Aion::Pleroma" => { class => "Aion::Pleroma", method => "new" } }' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## eon
@@ -206,9 +223,9 @@ eval {$pleroma->resolve('e.ibex')}; local ($::_g0 = $@, $::_e0 = "e.ibex is'nt e
 local ($::_g0 = do {$pleroma->resolve('Ex::Eon::AnimalEon#dog')->role}, $::_e0 = "dog"); ::ok $::_g0 eq $::_e0, '$pleroma->resolve(\'Ex::Eon::AnimalEon#dog\')->role # => dog' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# ## autoware ($action, [$key])
+# ## autoware ($config, [$key])
 # 
-# Добавить ключ в плерому.
+# Добавить эон в плерому. `$config` – строка `'класс#метод'` (или просто `'класс'`) либо хеш с ключами `class`, `method`, а также опционально `arguments`/`calls` (см. выше). Если `$key` не задан, он выводится из конфигурации.
 # 
 # Файл lib/Ex/Eon/AstroEon.pm:
 #@> lib/Ex/Eon/AstroEon.pm
@@ -223,11 +240,13 @@ local ($::_g0 = do {$pleroma->resolve('Ex::Eon::AnimalEon#dog')->role}, $::_e0 =
 #>> 1;
 #@< EOF
 # 
-::done_testing; }; subtest 'autoware ($action, [$key])' => sub { 
+::done_testing; }; subtest 'autoware ($config, [$key])' => sub { 
 my $pleroma = Aion::Pleroma->new;
 local ($::_g0 = do {$pleroma->autoware('Ex::Eon::AstroEon')->get('Ex::Eon::AstroEon')->role}, $::_e0 = "upiter"); ::ok $::_g0 eq $::_e0, '$pleroma->autoware(\'Ex::Eon::AstroEon\')->get(\'Ex::Eon::AstroEon\')->role # => upiter' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {$pleroma->autoware('Ex::Eon::AstroEon#mars', 'ex.mars')->get('ex.mars')->role}, $::_e0 = "mars"); ::ok $::_g0 eq $::_e0, '$pleroma->autoware(\'Ex::Eon::AstroEon#mars\', \'ex.mars\')->get(\'ex.mars\')->role # => mars' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {$pleroma->autoware('Ex::Eon::AstroEon#venus')->get('Ex::Eon::AstroEon#venus')->role}, $::_e0 = "venus"); ::ok $::_g0 eq $::_e0, '$pleroma->autoware(\'Ex::Eon::AstroEon#venus\')->get(\'Ex::Eon::AstroEon#venus\')->role # => venus' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+local ($::_g0 = do {$pleroma->autoware({class => 'Ex::Eon::AstroEon', method => 'venus'})->get('Ex::Eon::AstroEon#venus')->role}, $::_e0 = "venus"); ::ok $::_g0 eq $::_e0, '$pleroma->autoware({class => \'Ex::Eon::AstroEon\', method => \'venus\'})->get(\'Ex::Eon::AstroEon#venus\')->role # => venus' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 local ($::_g0 = do {$pleroma->autoware('Ex::Eon::AstroEon')->get('Ex::Eon::AstroEon')->role}, $::_e0 = "upiter"); ::ok $::_g0 eq $::_e0, '$pleroma->autoware(\'Ex::Eon::AstroEon\')->get(\'Ex::Eon::AstroEon\')->role # => upiter' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 eval {$pleroma->autoware('Ex::Eon::AstroEon#mars', 'Ex::Eon::AstroEon#venus')}; local ($::_g0 = $@, $::_e0 = 'Added eon Ex::Eon::AstroEon#venus twice, with Ex::Eon::AstroEon#mars ne Ex::Eon::AstroEon#venus'); ok defined($::_g0) && $::_g0 =~ /^${\quotemeta $::_e0}/, '$pleroma->autoware(\'Ex::Eon::AstroEon#mars\', \'Ex::Eon::AstroEon#venus\') # @-> Added eon Ex::Eon::AstroEon#venus twice, with Ex::Eon::AstroEon#mars ne Ex::Eon::AstroEon#venus' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;

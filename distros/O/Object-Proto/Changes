@@ -1,5 +1,10 @@
 Revision history for Object-Proto
 
+0.23	2026-09-23
+	- Fix build on perl below 5.20: XopENTRYCUSTOM is not there
+	- Fix build with MSVC: PERL_CALLCONV is dllimport outside the perl DLL
+	- Fix the pre-5.14 custom op name fallback: key on the ppaddr as an IV
+
 0.22	2026-09-09
 	- Accept a registered simple custom op as a function-style accessor operand
 	- Add register_simple_custom_op

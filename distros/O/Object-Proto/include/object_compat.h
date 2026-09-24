@@ -14,6 +14,15 @@
 /* Include shared XOP compatibility for custom ops (5.14+ fallback) */
 #include "xop_compat.h"
 
+/* Linkage for the C API in object_types.h, which object.c defines. Not
+ * PERL_CALLCONV: Windows Perl defines that as __declspec(dllimport) outside
+ * the perl DLL, and MSVC refuses to define a dllimport function (C2491).
+ * Exports come from FUNCLIST in Makefile.PL. Kept identical to the copy in
+ * object_types.h, which consumers include on its own. */
+#ifndef OBJECT_API
+#  define OBJECT_API extern
+#endif
+
 /* XS_INTERNAL - available since 5.16, fallback for older Perls */
 #ifndef XS_INTERNAL
 #  define XS_INTERNAL(name) static XSPROTO(name)

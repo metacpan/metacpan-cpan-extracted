@@ -21,13 +21,10 @@ eval {
 };
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-# Verifies the dual-ownership lifetime: a Perl handle held past client-side
-# cleanup (cancellation -> RECV completion -> cleanup_watch) must remain safe
-# to call methods on. Pre-fix this would UAF.
+# Pins a UAF: a handle held past its client-side cleanup must stay callable
 
 my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
 
-# --- Watch ---
 my $key = "/test_cancel_lifetime_$$";
 my $watch = $client->watch($key, sub { });
 ok($watch, 'watch handle created');
@@ -38,19 +35,16 @@ my $t1 = EV::timer(2, 0, sub { EV::break });
 EV::run;
 ok($cancel_done, 'first cancel callback fired');
 
-# Burn an EV iteration so the cancelled RECV completion is processed
-# (this is when cleanup_watch would have freed wc pre-fix)
+# Let the cancelled RECV completion run cleanup_watch before cancelling again
 my $t2 = EV::timer(0.2, 0, sub { EV::break });
 EV::run;
 
-# Now call cancel again on the still-held handle — must not crash
 my $second = 0;
 $watch->cancel(sub { $second = 1; EV::break });
 my $t3 = EV::timer(2, 0, sub { EV::break });
 EV::run;
 ok($second, 'second cancel on already-cleaned handle is safe');
 
-# --- Keepalive ---
 my $lease_id;
 $client->lease_grant(10, sub { $lease_id = $_[0]->{id}; EV::break });
 my $tg = EV::timer(3, 0, sub { EV::break });
@@ -75,7 +69,6 @@ my $tk2 = EV::timer(2, 0, sub { EV::break });
 EV::run;
 ok($ka_second, 'second keepalive cancel is safe');
 
-# --- Observe (election) ---
 my $election_name = "test-cancel-lifetime-$$";
 my $observe = $client->election_observe($election_name, sub { });
 ok($observe, 'observe handle created');
@@ -95,7 +88,6 @@ my $to2 = EV::timer(2, 0, sub { EV::break });
 EV::run;
 ok($obs_second, 'second observe cancel is safe');
 
-# Cleanup: revoke lease, delete key
 $client->lease_revoke($lease_id, sub { EV::break });
 my $tr = EV::timer(2, 0, sub { EV::break });
 EV::run;

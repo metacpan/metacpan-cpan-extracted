@@ -12,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $c = EV::Etcd->new(endpoints => ['127.0.0.1:2379'], timeout => 2);
@@ -23,7 +22,7 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-plan tests => 4;
+plan tests => 5;
 
 my $client = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],
@@ -37,8 +36,8 @@ my $watch;
 my $events_received = 0;
 my $test_done = 0;
 my $watch_created = 0;
+my $watch_err;
 
-# Test 1: Create watch with auto_reconnect (default)
 $watch = $client->watch($test_key, {
     progress_notify => 1,
 }, sub {
@@ -46,11 +45,7 @@ $watch = $client->watch($test_key, {
     return if $test_done;
 
     if ($err) {
-        ok(ref($err) eq 'HASH', 'error is a hashref');
-        ok(exists $err->{code}, 'error has code');
-        ok(exists $err->{status}, 'error has status');
-        ok(exists $err->{message}, 'error has message');
-        ok(exists $err->{retryable}, 'error has retryable flag');
+        $watch_err = $err;
     } else {
         $watch_created ||= $resp->{created};
         $events_received++ if $resp->{events} && @{$resp->{events}};
@@ -59,22 +54,18 @@ $watch = $client->watch($test_key, {
 
 ok($watch, 'watch created with auto_reconnect');
 
-# Wait for the watch's first server response (created=1) before firing the put,
-# otherwise on a slow/loaded runner the put can land before the watch is
-# registered and the event is never delivered.
+# A put that lands before the watch is registered (created=1) is never delivered
 my $created_timeout = EV::timer(5, 0, sub { EV::break });
 my $created_check = EV::timer(0.05, 0.05, sub { EV::break if $watch_created });
 EV::run;
 undef $created_check;
 undef $created_timeout;
 
-# Test 2: Verify watch receives events
 $client->put($test_key, "test_value_$$", sub {
     my ($resp, $err) = @_;
     ok(!$err, 'put succeeded');
 });
 
-# Wait for the put's event to fan out through the watch
 my $timer = EV::timer(2, 0, sub {
     $test_done = 1;
     EV::break;
@@ -87,8 +78,8 @@ EV::run;
 undef $event_check;
 
 ok($events_received >= 1, "watch received $events_received event(s)");
+is($watch_err, undef, 'watch reported no error') or diag explain $watch_err;
 
-# Cleanup
 $watch->cancel(sub {
     $client->delete($test_key, sub {
         EV::break;

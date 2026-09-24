@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'InternetData::Error';
 
-our $VERSION = '1.6.0';
+our $VERSION = '1.6.1';
 
 # The authorization server refused an OAuth request, with the reason it gave.
 # `kind` follows the status like any other failure's. Never retryable: every
@@ -43,7 +43,7 @@ use strict;
 use warnings;
 
 our @ISA = ('InternetData::OauthError');
-our $VERSION = '1.6.0';
+our $VERSION = '1.6.1';
 
 package InternetData::OauthExpiredTokenError;
 
@@ -51,7 +51,7 @@ use strict;
 use warnings;
 
 our @ISA = ('InternetData::OauthError');
-our $VERSION = '1.6.0';
+our $VERSION = '1.6.1';
 
 1;
 

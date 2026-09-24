@@ -48,8 +48,11 @@ t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/snippet.t
+t/snippet_bar.t
 t/snippet_heatmap.t
 t/snippet_pie.t
+t/snippet_scatter.t
+t/snippet_table.t
 t/tooltip.t
 t/unit.t
 t/zoomable.t

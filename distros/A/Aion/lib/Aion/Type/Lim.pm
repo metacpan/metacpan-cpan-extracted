@@ -93,4 +93,3 @@ Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 =head1 COPYRIGHT
 
 The Aion::Type::Lim module is copyright © 2026 Yaroslav O. Kosmina. Rusland. All rights reserved.
-

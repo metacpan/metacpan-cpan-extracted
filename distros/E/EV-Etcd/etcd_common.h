@@ -1,16 +1,9 @@
-/*
- * etcd_common.h - Common types and declarations for EV::Etcd
- */
 #ifndef ETCD_COMMON_H
 #define ETCD_COMMON_H
 
-/* Need EV types for ev_async in struct definitions */
 #include <EV/EVAPI.h>
-
-/* Threading support for hybrid gRPC/EV approach */
 #include <pthread.h>
 
-/* Reconnect backoff: 0.5s * attempt (capped at 5s) */
 #define RECONNECT_BACKOFF_SECONDS(attempt) \
     ((attempt) * 0.5 > 5.0 ? 5.0 : (attempt) * 0.5)
 
@@ -23,37 +16,15 @@
 #include <grpc/byte_buffer.h>
 #include <grpc/byte_buffer_reader.h>
 
-/*
- * gRPC channel creation compatibility.
- * - New API (>= ~1.42): grpc_insecure_credentials_create + grpc_channel_create
- * - Old API (< ~1.42):  grpc_insecure_channel_create
- */
-static inline grpc_channel *
-etcd_create_insecure_channel(const char *target, const grpc_channel_args *args) {
-#ifdef HAVE_GRPC_NEW_CHANNEL_API
-    grpc_channel_credentials *creds = grpc_insecure_credentials_create();
-    grpc_channel *channel = grpc_channel_create(target, creds, args);
-    grpc_channel_credentials_release(creds);
-    return channel;
-#else
-    return grpc_insecure_channel_create(target, args, NULL);
-#endif
-}
-
 #include "kv.pb-c.h"
 #include "rpc.pb-c.h"
 #include "lock.pb-c.h"
 #include "election.pb-c.h"
 
-/*
- * Size limits for keys and values.
- * etcd defaults: MaxRequestBytes = 1.5 MiB
- * We use slightly lower limits to leave room for protobuf overhead.
- */
-#define ETCD_MAX_KEY_SIZE   (1024 * 1024)      /* 1 MiB max key size */
-#define ETCD_MAX_VALUE_SIZE (1024 * 1024)      /* 1 MiB max value size */
+/* etcd's default MaxRequestBytes is 1.5 MiB */
+#define ETCD_MAX_KEY_SIZE   (1024 * 1024)
+#define ETCD_MAX_VALUE_SIZE (1024 * 1024)
 
-/* Validation macros for input sizes */
 #define VALIDATE_KEY_SIZE(key_len) \
     do { \
         if ((key_len) > ETCD_MAX_KEY_SIZE) { \
@@ -68,9 +39,8 @@ etcd_create_insecure_channel(const char *target, const grpc_channel_args *args) 
         } \
     } while (0)
 
-/* Auth input limits - prevent DoS via oversized credentials */
-#define ETCD_MAX_USERNAME_SIZE  256   /* Reasonable username limit */
-#define ETCD_MAX_PASSWORD_SIZE  4096  /* Reasonable password limit */
+#define ETCD_MAX_USERNAME_SIZE  256
+#define ETCD_MAX_PASSWORD_SIZE  4096
 
 #define VALIDATE_USERNAME_SIZE(len) \
     do { \
@@ -86,8 +56,7 @@ etcd_create_insecure_channel(const char *target, const grpc_channel_args *args) 
         } \
     } while (0)
 
-/* URL limit for cluster member peer URLs */
-#define ETCD_MAX_URL_SIZE  2048  /* Standard URL length limit */
+#define ETCD_MAX_URL_SIZE  2048
 
 #define VALIDATE_URL_SIZE(len) \
     do { \
@@ -96,9 +65,8 @@ etcd_create_insecure_channel(const char *target, const grpc_channel_args *args) 
         } \
     } while (0)
 
-/* Call types for tag identification */
 typedef enum {
-    CALL_TYPE_NONE = 0,        /* Sentinel for fire-and-forget batches (e.g. watch cancel send) */
+    CALL_TYPE_NONE = 0,
     CALL_TYPE_RANGE = 1,
     CALL_TYPE_PUT,
     CALL_TYPE_DELETE,
@@ -149,34 +117,25 @@ typedef enum {
     CALL_TYPE_AUTH_STATUS
 } call_type_t;
 
-/* Forward declaration */
 struct ev_etcd_struct;
 
-/*
- * Queued event structure for passing gRPC completions from
- * the gRPC thread to the main EV thread.
- */
 typedef struct queued_event {
-    void *tag;              /* The tag from grpc_event */
-    int success;            /* The success flag from grpc_event */
+    void *tag;
+    int success;
     struct queued_event *next;
 } queued_event_t;
 
-/*
- * Base structure for all call types - must be first in each call struct.
- * Used as the tag for gRPC operations.
- */
+/* First member of every call struct: the struct's address is its gRPC tag */
 typedef struct call_base {
     call_type_t type;
+    unsigned channel_gen;  /* client->channel_gen when the call was created */
+    pid_t owner_pid;
 } call_base_t;
 
-/* Sentinel tag for fire-and-forget batches (e.g. watch cancel SEND_MESSAGE,
- * keepalive renewal SEND_MESSAGE). gRPC's GRPC_CQ_NEXT contract requires a
- * non-NULL tag; we use this dummy call_base_t so the completion can be
- * identified and skipped (process_grpc_event returns on CALL_TYPE_NONE). */
+/* Tag for fire-and-forget batches: GRPC_CQ_NEXT needs a non-NULL tag, and
+ * process_grpc_event skips CALL_TYPE_NONE */
 extern call_base_t cancel_sentinel;
 
-/* Pending call structure (for unary RPCs) */
 typedef struct pending_call {
     call_base_t base;  /* Must be first */
     grpc_call *call;
@@ -190,7 +149,6 @@ typedef struct pending_call {
     struct pending_call *next;
 } pending_call_t;
 
-/* Watch recovery parameters */
 typedef struct watch_params {
     char *key;
     size_t key_len;
@@ -203,7 +161,6 @@ typedef struct watch_params {
     int has_watch_id;
 } watch_params_t;
 
-/* Watch structure (for streaming watch) */
 typedef struct watch_call {
     call_base_t base;  /* Must be first */
     grpc_call *call;
@@ -220,15 +177,13 @@ typedef struct watch_call {
     int64_t last_revision;
     watch_params_t params;
     int reconnect_attempt;
-    ev_timer reconnect_timer;  /* Backoff timer for reconnection */
-    /* Dual ownership: gRPC state freed by client-side cleanup, struct freed by
-     * the last owner. Prevents use-after-free when Perl holds the handle past
-     * client cleanup. */
+    ev_timer reconnect_timer;
+    /* Dual ownership: client cleanup frees the gRPC state, the last owner
+     * frees the struct, so a Perl handle can outlive client cleanup */
     int client_owns;
     int perl_owns;
 } watch_call_t;
 
-/* Keepalive structure (for streaming lease keepalive) */
 typedef struct keepalive_call {
     call_base_t base;  /* Must be first */
     grpc_call *call;
@@ -243,19 +198,17 @@ typedef struct keepalive_call {
     struct keepalive_call *next;
     int auto_reconnect;
     int reconnect_attempt;
-    ev_timer reconnect_timer;  /* Backoff timer for reconnection */
-    ev_timer renew_timer;      /* Periodic lease renewal (ttl/3, min 0.5s) */
-    int client_owns;           /* See watch_call_t — same dual-ownership */
+    ev_timer reconnect_timer;
+    ev_timer renew_timer;
+    int client_owns;           /* dual ownership, see watch_call_t */
     int perl_owns;
 } keepalive_call_t;
 
-/* Election observe parameters for reconnection */
 typedef struct observe_params {
     char *name;
     size_t name_len;
 } observe_params_t;
 
-/* Election observe structure (for streaming election observe) */
 typedef struct observe_call {
     call_base_t base;  /* Must be first */
     grpc_call *call;
@@ -269,24 +222,22 @@ typedef struct observe_call {
     struct observe_call *next;
     int auto_reconnect;
     int reconnect_attempt;
-    ev_timer reconnect_timer;  /* Backoff timer for reconnection */
+    ev_timer reconnect_timer;
     observe_params_t params;
-    int client_owns;           /* See watch_call_t — same dual-ownership */
+    int client_owns;           /* dual ownership, see watch_call_t */
     int perl_owns;
 } observe_call_t;
 
-/* Client structure */
 typedef struct ev_etcd_struct {
     grpc_channel *channel;
     grpc_completion_queue *cq;
 
-    /* Hybrid threading: gRPC thread + ev_async for main thread notification */
-    pthread_t cq_thread;        /* Thread running gRPC CQ loop */
+    /* cq_thread hands completions to the EV thread via event_queue + cq_async */
+    pthread_t cq_thread;
     pthread_mutex_t queue_mutex; /* Protects event_queue */
-    ev_async cq_async;          /* Async watcher to wake main thread */
-    queued_event_t *event_queue; /* Queue of completed events */
-    queued_event_t *event_queue_tail; /* Tail for O(1) append */
-    volatile int thread_running; /* Flag to signal thread shutdown */
+    ev_async cq_async;
+    queued_event_t *event_queue;
+    queued_event_t *event_queue_tail;
 
     pending_call_t *pending_calls;
     watch_call_t *watches;
@@ -298,19 +249,26 @@ typedef struct ev_etcd_struct {
     size_t auth_token_len;
     int timeout_seconds;
 
-    /* Multiple endpoints for failover */
     char **endpoints;
     int endpoint_count;
     int current_endpoint;
+    unsigned channel_gen;  /* bumped on every endpoint switch */
+    /* Kept for one switch so calls queued on it end on their own terms
+     * instead of failing with "Channel Destroyed" */
+    grpc_channel *old_channel;
 
-    /* Retry configuration */
+    grpc_channel_credentials *creds;  /* NULL = insecure */
+    char *tls_server_name;
+    int keepalive_ms;          /* 0 = no keepalive pings */
+    int keepalive_timeout_ms;
+
     int max_retries;
 
-    /* Health monitoring */
     ev_timer health_timer;
     int is_healthy;
     SV *health_callback;
-    pid_t owner_pid;  /* PID of process that created this client (fork safety) */
+    pid_t owner_pid;
+    struct ev_etcd_struct *next_live;  /* this process's live clients */
 } ev_etcd_t;
 
 typedef ev_etcd_t *EV__Etcd;
@@ -318,12 +276,10 @@ typedef watch_call_t *EV__Etcd__Watch;
 typedef keepalive_call_t *EV__Etcd__Keepalive;
 typedef observe_call_t *EV__Etcd__Observe;
 
-/* Initialize a call's base structure */
 static inline void init_call_base(call_base_t *base, call_type_t type) {
     base->type = type;
 }
 
-/* Helper macro to validate callback is a code reference */
 #define VALIDATE_CALLBACK(cb) \
     do { \
         if (!SvROK(cb) || SvTYPE(SvRV(cb)) != SVt_PVCV) { \
@@ -331,10 +287,8 @@ static inline void init_call_base(call_base_t *base, call_type_t type) {
         } \
     } while (0)
 
-/* Store / fetch a 64-bit integer into a Perl HV slot without truncation on
- * 32-bit Perl (where IV/UV are 32-bit). On 32-bit Perl, NV (double) preserves
- * integers up to 2^53, which is enough for any etcd revision/lease/member id
- * the protocol can produce. */
+/* 32-bit IV perls go through NV, exact only to 2^53: fine for revisions,
+ * lossy for lease, member and cluster ids, which use all 63/64 bits */
 #if IVSIZE >= 8
 #  define newSVi64(v) newSViv((IV)(v))
 #  define newSVu64(v) newSVuv((UV)(v))
@@ -347,24 +301,22 @@ static inline void init_call_base(call_base_t *base, call_type_t type) {
 #  define SvU64(sv)   ((uint64_t)SvNV(sv))
 #endif
 
-/* Common utility functions */
 const char* grpc_status_name(grpc_status_code code);
 int is_retryable_status(grpc_status_code code);
 SV* create_error_hv(pTHX_ grpc_status_code code, const char *message, size_t message_len, const char *source);
 
-/* Helper functions */
 SV* kv_to_hashref(pTHX_ Mvccpb__KeyValue *kv);
 SV* event_to_hashref(pTHX_ Mvccpb__Event *event);
 void add_header_to_hv(pTHX_ HV *result, Etcdserverpb__ResponseHeader *header);
 
-/* Auth metadata helpers */
+grpc_channel *etcd_create_channel(ev_etcd_t *client, const char *target);
+void etcd_rotate_endpoint(ev_etcd_t *client);
+void etcd_endpoint_failed(ev_etcd_t *client, unsigned channel_gen, grpc_status_code status);
+void etcd_stream_failed(ev_etcd_t *client, unsigned channel_gen);
+
 void setup_auth_metadata(ev_etcd_t *client, grpc_op *op, grpc_metadata *auth_md);
 void cleanup_auth_metadata(ev_etcd_t *client, grpc_metadata *auth_md);
 
-/*
- * Cached gRPC method slices - static strings don't need ref counting
- * These are initialized once and reused for all calls
- */
 extern grpc_slice METHOD_KV_RANGE;
 extern grpc_slice METHOD_KV_PUT;
 extern grpc_slice METHOD_KV_DELETE;
@@ -411,16 +363,8 @@ extern grpc_slice METHOD_MAINTENANCE_HASH_KV;
 extern grpc_slice METHOD_MAINTENANCE_MOVE_LEADER;
 extern grpc_slice METHOD_AUTH_STATUS;
 
-/* Initialize cached method slices (call once at module load) */
 void init_method_slices(void);
 
-/*
- * Helper macro to serialize protobuf and create grpc_slice in one allocation.
- * Uses grpc_slice_malloc to avoid double allocation.
- *
- * Usage:
- *   SERIALIZE_PROTOBUF_TO_SLICE(slice_var, get_packed_size_func, pack_func, &request);
- */
 #define SERIALIZE_PROTOBUF_TO_SLICE(slice_var, size_func, pack_func, req_ptr) \
     do { \
         size_t _req_len = size_func(req_ptr); \
@@ -428,15 +372,7 @@ void init_method_slices(void);
         pack_func(req_ptr, GRPC_SLICE_START_PTR(slice_var)); \
     } while (0)
 
-/*
- * Helper macro to validate gRPC response status and buffer.
- * Must be used at the start of response handlers.
- * Defines _resp_slice variable for use with UNPACK_RESPONSE.
- *
- * Usage:
- *   BEGIN_RESPONSE_HANDLER(pc, "range");
- *   // _resp_slice is now available
- */
+/* Returns from the calling handler on error; declares _resp_slice */
 #define BEGIN_RESPONSE_HANDLER(pc, source) \
     if ((pc)->status != GRPC_STATUS_OK) { \
         CALL_ERROR_CALLBACK((pc)->callback, (pc)->status, (pc)->status_details, source); \
@@ -454,14 +390,7 @@ void init_method_slices(void);
     grpc_slice _resp_slice = grpc_byte_buffer_reader_readall(&_resp_reader); \
     grpc_byte_buffer_reader_destroy(&_resp_reader)
 
-/*
- * Helper macro to unpack protobuf response from _resp_slice.
- * Must be used after BEGIN_RESPONSE_HANDLER.
- *
- * Usage:
- *   Etcdserverpb__PutResponse *resp;
- *   UNPACK_RESPONSE(pc, resp, etcdserverpb__put_response__unpack);
- */
+/* Consumes _resp_slice; returns from the calling handler on a parse error */
 #define UNPACK_RESPONSE(pc, resp_var, unpack_func) \
     resp_var = unpack_func(NULL, GRPC_SLICE_LENGTH(_resp_slice), GRPC_SLICE_START_PTR(_resp_slice)); \
     grpc_slice_unref(_resp_slice); \
@@ -491,12 +420,6 @@ void init_method_slices(void);
         PUTBACK; CALL_SV_SAFE(callback, G_DISCARD); FREETMPS; LEAVE; \
     } while (0)
 
-/*
- * Helper macro for error callback with explicit status code and source.
- *
- * Usage:
- *   CALL_STATUS_ERROR_CALLBACK(callback, GRPC_STATUS_UNAVAILABLE, "Watch stream ended", "watch");
- */
 #define CALL_STATUS_ERROR_CALLBACK(callback, status, message, source) \
     do { \
         dSP; \
@@ -507,22 +430,9 @@ void init_method_slices(void);
         PUTBACK; CALL_SV_SAFE(callback, G_DISCARD); FREETMPS; LEAVE; \
     } while (0)
 
-/*
- * Helper macro for simple string error callback (INTERNAL status).
- * Returns a structured error hashref consistent with CALL_ERROR_CALLBACK.
- *
- * Usage:
- *   CALL_SIMPLE_ERROR_CALLBACK(callback, "Error message");
- */
 #define CALL_SIMPLE_ERROR_CALLBACK(callback, message) \
     CALL_STATUS_ERROR_CALLBACK(callback, GRPC_STATUS_INTERNAL, message, "internal")
 
-/*
- * Helper macro for success callback with result hashref.
- *
- * Usage:
- *   CALL_SUCCESS_CALLBACK(callback, result_hv);
- */
 #define CALL_SUCCESS_CALLBACK(callback, result_hv) \
     do { \
         dSP; \
@@ -532,22 +442,11 @@ void init_method_slices(void);
         PUTBACK; CALL_SV_SAFE(callback, G_DISCARD); FREETMPS; LEAVE; \
     } while (0)
 
-/*
- * Helper macros for unary RPC pending call initialization and cleanup.
- * Reduces boilerplate across all unary RPC implementations.
- */
-
-/*
- * Initialize a pending_call_t structure for a unary RPC.
- *
- * Usage:
- *   pending_call_t *pc;
- *   INIT_PENDING_CALL(pc, CALL_TYPE_RANGE, callback, client);
- */
 #define INIT_PENDING_CALL(pc, call_type, callback_sv, client_ref) \
     do { \
         Newxz((pc), 1, pending_call_t); \
         init_call_base(&(pc)->base, (call_type)); \
+        (pc)->base.channel_gen = (client_ref)->channel_gen; \
         (pc)->callback = newSVsv((callback_sv)); \
         (pc)->client = (client_ref); \
         grpc_metadata_array_init(&(pc)->initial_metadata); \
@@ -556,16 +455,7 @@ void init_method_slices(void);
         (pc)->status_details = grpc_empty_slice(); \
     } while (0)
 
-/*
- * Cleanup a pending_call_t on error before it's added to the pending list.
- * Use this when grpc_call_start_batch fails.
- *
- * Usage:
- *   if (err != GRPC_CALL_OK) {
- *       CLEANUP_PENDING_CALL_ON_ERROR(pc);
- *       croak("Failed to start gRPC call: %d", err);
- *   }
- */
+/* Only for a call not yet linked into client->pending_calls */
 #define CLEANUP_PENDING_CALL_ON_ERROR(pc) \
     do { \
         grpc_metadata_array_destroy(&(pc)->initial_metadata); \
@@ -577,20 +467,6 @@ void init_method_slices(void);
         Safefree((pc)); \
     } while (0)
 
-/*
- * Helper macros for streaming call reconnection to reduce code triplication
- * across watch, keepalive, and observe reconnect functions.
- */
-
-/*
- * Cleanup old streaming call state before reconnection.
- * Works with any streaming call struct that has these fields.
- *
- * Usage:
- *   STREAMING_CALL_CLEANUP(wc);  // For watch_call_t
- *   STREAMING_CALL_CLEANUP(kc);  // For keepalive_call_t
- *   STREAMING_CALL_CLEANUP(oc);  // For observe_call_t
- */
 #define STREAMING_CALL_CLEANUP(call_ptr) \
     do { \
         if ((call_ptr)->call) { \
@@ -606,12 +482,6 @@ void init_method_slices(void);
         grpc_slice_unref((call_ptr)->status_details); \
     } while (0)
 
-/*
- * Reinitialize streaming call state for reconnection.
- *
- * Usage:
- *   STREAMING_CALL_REINIT(wc);
- */
 #define STREAMING_CALL_REINIT(call_ptr) \
     do { \
         grpc_metadata_array_init(&(call_ptr)->initial_metadata); \
@@ -620,13 +490,6 @@ void init_method_slices(void);
         (call_ptr)->active = 1; \
     } while (0)
 
-/*
- * Setup standard 4-op batch for streaming call reconnection.
- * Requires: ops[4], auth_md, send_buffer, call_ptr all in scope.
- *
- * Usage:
- *   STREAMING_CALL_SETUP_OPS(client, ops, auth_md, send_buffer, wc);
- */
 #define STREAMING_CALL_SETUP_OPS(client, ops, auth_md, send_buf, call_ptr) \
     do { \
         (ops)[0].op = GRPC_OP_SEND_INITIAL_METADATA; \
@@ -639,15 +502,7 @@ void init_method_slices(void);
         (ops)[3].data.recv_message.recv_message = &(call_ptr)->recv_buffer; \
     } while (0)
 
-/*
- * Handle error after failed batch start for streaming reconnect.
- * Self-contained: also tears down the metadata arrays and status_details that
- * STREAMING_CALL_REINIT just set up, so callers don't need follow-up cleanup
- * to avoid leaks.
- *
- * Usage:
- *   STREAMING_CALL_BATCH_ERROR(wc);
- */
+/* Re-inits what it destroys: the cleanup_* that follows destroys them again */
 #define STREAMING_CALL_BATCH_ERROR(call_ptr) \
     do { \
         (call_ptr)->active = 0; \
@@ -663,9 +518,6 @@ void init_method_slices(void);
         (call_ptr)->status_details = grpc_empty_slice(); \
     } while (0)
 
-/* Finish deferred client destruction after in_callback guard.
- * Called from cq_async_callback and timer callbacks when DESTROY was
- * invoked during a Perl callback (in_callback=1 prevented immediate free). */
 void finish_client_destroy(pTHX_ ev_etcd_t *client);
 
-#endif /* ETCD_COMMON_H */
+#endif

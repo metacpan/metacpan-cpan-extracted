@@ -1,5 +1,37 @@
 Revision history for Database-BI
 
+0.009.0	Wed Sep 23 09:14:24 PM EDT 2026
+    [ Enhancements ]
+    - Added a bar chart (GET /bar).  Choose a categorical column and an
+      optional numeric value column (omit to count rows per category); the
+      chart uses HTML::D3 >= 0.18's new render_bar_chart_snippet.  A
+      "Bar chart..." toolbar button opens a configuration panel identical
+      in style to the pie/graph/heatmap panels.  Requires HTML::D3 >= 0.18.
+    - Bar chart drill-down: clicking any bar navigates to the source table
+      filtered to that category, with a "Back to bar chart" breadcrumb link
+      so the user can return to the chart.
+    - Pie and bar chart drill-down breadcrumbs now work correctly when the
+      source table was opened via GET /import (URL import).  The middle
+      breadcrumb links back to the unfiltered imported table (clearing any
+      active filter), and the third crumb links back to the chart.
+      Previously the back2/back2_label parameters were silently discarded
+      by import_url, so the chart back-link never appeared.
+    - Data tables now scroll horizontally when the number of columns exceeds
+      the screen width.  The table is wrapped in a div.table-scroll
+      container (overflow-x: auto) so the toolbar and breadcrumbs stay at
+      full width while only the table body scrolls.
+
+    [ Bug Fixes ]
+    - Fixed a test failure on CPAN testers running CGI::Lingua < 0.67 where
+      language negotiation for non-English Accept-Language headers returned
+      the wrong result.  Minimum CGI::Lingua version is now 0.85.
+    - Fixed non-ASCII EM-dash and currency characters in source comments and
+      one runtime error message in Dashboard.pm, which could produce mojibake
+      on systems that interpret .pm files as Latin-1.
+    - IPC::System::Simple is now declared as a runtime dependency (PREREQ_PM)
+      in addition to a test dependency, because DataSource.pm uses
+      "use autodie qw(:all)" at compile time on every server startup.
+
 0.008.1	Tue Sep 22 09:13:04 PM EDT 2026
     [ Bug Fixes ]
     - Fixed mojibake in pie/heatmap/line-graph chart labels when the data
@@ -512,6 +544,7 @@ Revision history for Database-BI
     - If no column header in a CSV satisfies the safe-identifier constraint,
       DataSource now croaks error_no_safe_id with a clear message asking the
       user to rename at least one column, rather than silently returning 0 rows.
+    - Bumped minimum CGI::Lingua to fix https://www.cpantesters.org/cpan/report/7dcee1d4-b74d-11f1-882f-ce9e7f79262c
 
     [ Test Improvements ]
     - Added targeted tests in t/function.t, t/path.t, and t/domain.t that

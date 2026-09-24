@@ -5,14 +5,12 @@
 
 #include "ppport.h"
 
-/* Use Perl EV's API for proper integration */
 #include <EV/EVAPI.h>
 
 #include <time.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-/* Include modular components */
 #include "etcd_common.h"
 #include "etcd_kv.h"
 #include "etcd_watch.h"
@@ -23,20 +21,140 @@
 #include "etcd_cluster.h"
 #include "etcd_txn.h"  /* For FREE_REQUEST_OPS macro */
 
-/* Types and common functions defined in etcd_common.h */
-/* KV handlers in etcd_kv.h, watch in etcd_watch.h, etc. */
-
-/* Forward declarations for functions still in this file */
 static void *cq_thread_func(void *arg);
 static void cq_async_callback(EV_P_ ev_async *w, int revents);
 static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success);
 
-/* cancel_sentinel (fire-and-forget batch tag) is defined in etcd_common.c */
+/* gRPC runs only while a client exists: the first client starts it and the
+ * last one shuts it down, so a process that forks with no live client hands
+ * the child a clean slate. gRPC's threads don't survive fork(), so a child
+ * that inherits a running gRPC can never use it. */
+static int ev_etcd_grpc_users;
+static int ev_etcd_grpc_held;      /* our grpc_init reference is taken */
+static int ev_etcd_grpc_settling;  /* released, not yet seen fully shut down */
+static int ev_etcd_grpc_stale;     /* still running at the last fork */
+static pid_t ev_etcd_grpc_pid;
 
-/* PID of the process that loaded the module — END only shuts down gRPC in
- * that process; grpc_shutdown() hangs in forked children because gRPC's
- * background threads don't survive fork(). */
-static pid_t ev_etcd_boot_pid;
+/* getpid() cached for the per-call fork check, refreshed in forked children */
+static pid_t ev_etcd_pid;
+
+/* Live clients of this process, so a forked child can disarm what it inherits */
+static ev_etcd_t *ev_etcd_clients;
+
+static void unregister_client(ev_etcd_t *client) {
+    ev_etcd_t **pp = &ev_etcd_clients;
+    while (*pp && *pp != client)
+        pp = &(*pp)->next_live;
+    if (*pp)
+        *pp = client->next_live;
+}
+
+/* With no client left, newer gRPC still finishes shutting down on its own
+ * threads for a few ms (each channel drops its own gRPC reference as it is
+ * torn down). A child using a gRPC that is still up would break the
+ * parent's connections too, so wait once per shutdown and record for
+ * grpc_acquire whether it is still up. Only where gRPC ran: in a child its
+ * lock may be held by a lost thread */
+static void ev_etcd_atfork_prepare(void) {
+    if (ev_etcd_grpc_users || ev_etcd_grpc_pid != ev_etcd_pid)
+        return;
+    if (ev_etcd_grpc_settling) {
+        for (int ms = 0; ms < 2000 && grpc_is_initialized(); ms++)
+            usleep(1000);
+        ev_etcd_grpc_settling = 0;
+    }
+    ev_etcd_grpc_stale = grpc_is_initialized();
+}
+
+/* Inherited watchers would otherwise fire in the child and drive gRPC on the
+ * parent's connections (keepalive renewals, reconnects, health checks) */
+static void ev_etcd_atfork_child(void) {
+    ev_etcd_pid = getpid();
+    for (ev_etcd_t *c = ev_etcd_clients; c; c = c->next_live) {
+        ev_timer_stop(EV_DEFAULT, &c->health_timer);
+        ev_async_stop(EV_DEFAULT, &c->cq_async);
+        for (watch_call_t *wc = c->watches; wc; wc = wc->next)
+            ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
+        for (keepalive_call_t *kc = c->keepalives; kc; kc = kc->next) {
+            ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
+            ev_timer_stop(EV_DEFAULT, &kc->renew_timer);
+        }
+        for (observe_call_t *oc = c->observes; oc; oc = oc->next)
+            ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
+    }
+    ev_etcd_clients = NULL;
+}
+
+/* Any gRPC activity in a child runs on the parent's inherited poller state,
+ * which can break the parent's connections */
+static void croak_if_forked(pTHX_ pid_t owner_pid) {
+    if (owner_pid != ev_etcd_pid)
+        croak("EV::Etcd: a client created in process %d cannot be used in forked child %d",
+              (int)owner_pid, (int)ev_etcd_pid);
+}
+
+static void grpc_acquire(pTHX) {
+    if (ev_etcd_grpc_users > 0 && ev_etcd_grpc_pid != ev_etcd_pid)
+        croak("EV::Etcd: gRPC was started by process %d, which forked this one"
+              " while holding a client; a forked child cannot use it. Create"
+              " clients only after fork(), or destroy every client before forking",
+              (int)ev_etcd_grpc_pid);
+    if (ev_etcd_grpc_stale && ev_etcd_grpc_pid != ev_etcd_pid)
+        croak("EV::Etcd: gRPC in process %d was still running when it forked"
+              " this one; a forked child cannot use it. Create clients only"
+              " after fork()", (int)ev_etcd_grpc_pid);
+    ev_etcd_grpc_users++;
+    if (!ev_etcd_grpc_held) {
+        grpc_init();
+        ev_etcd_grpc_held = 1;
+        ev_etcd_grpc_pid = ev_etcd_pid;
+    }
+}
+
+/* grpc_shutdown() may finish in a background thread (gRPC 1.30 does), and a
+ * fork() before it is done hands the child gRPC's threads mid-teardown.
+ * macOS's gRPC takes seconds to shut down and breaks when started again
+ * meanwhile, so there it stays up once started */
+static void grpc_release(void) {
+    if (--ev_etcd_grpc_users > 0)
+        return;
+#ifndef __APPLE__
+    grpc_shutdown_blocking();
+    ev_etcd_grpc_held = 0;
+    ev_etcd_grpc_settling = 1;
+#endif
+}
+
+/* Mortal, so a croak later in new() frees it */
+static SV *slurp_pem(pTHX_ const char *opt, const char *path) {
+    PerlIO *fp = PerlIO_open(path, "r");
+    if (!fp)
+        croak("EV::Etcd: cannot open %s '%s': %s", opt, path, Strerror(errno));
+    SV *sv = sv_2mortal(newSVpvs(""));
+    char buf[8192];
+    SSize_t n;
+    while ((n = PerlIO_read(fp, buf, sizeof buf)) > 0)
+        sv_catpvn(sv, buf, n);
+    int failed = n < 0 || PerlIO_error(fp);
+    PerlIO_close(fp);
+    if (failed)
+        croak("EV::Etcd: cannot read %s '%s'", opt, path);
+    return sv;
+}
+
+/* 0 for off (non-positive or NaN), else whole milliseconds capped at a day */
+static int seconds_to_ms(NV seconds) {
+    if (!(seconds > 0))
+        return 0;
+    if (seconds >= 86400)
+        return 86400000;
+    return seconds < 0.001 ? 1 : (int)(seconds * 1000);
+}
+
+static int endpoint_scheme_len(const char *ep, int *is_https) {
+    *is_https = strnEQ(ep, "https://", 8);
+    return *is_https ? 8 : strnEQ(ep, "http://", 7) ? 7 : 0;
+}
 
 static void process_txn_response(pTHX_ pending_call_t *pc);
 static void process_auth_response(pTHX_ pending_call_t *pc);
@@ -58,33 +176,13 @@ static void process_user_list_response(pTHX_ pending_call_t *pc);
 static SV* response_op_to_hashref(pTHX_ Etcdserverpb__ResponseOp *op);
 static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_ops, size_t *dst_n);
 
-/* Reconnect to the next endpoint (or same if only one) */
-static void reconnect_channel(ev_etcd_t *client) {
-    if (client->endpoint_count > 1)
-        client->current_endpoint = (client->current_endpoint + 1) % client->endpoint_count;
-
-    if (client->channel) {
-        grpc_channel_destroy(client->channel);
-        client->channel = NULL;
-    }
-    client->channel = etcd_create_insecure_channel(
-        client->endpoints[client->current_endpoint], NULL);
-}
-
-/*
- * Compute range_end for prefix queries.
- * For a prefix, range_end is the key with the last byte incremented.
- * Handles trailing 0xFF bytes by truncating and incrementing.
- * Returns allocated buffer (caller must Safefree) and sets *out_len.
- * Returns NULL if key_len is 0.
- */
+/* Caller must Safefree the result */
 static char* compute_prefix_range_end(const char *key, size_t key_len, size_t *out_len) {
     if (key_len == 0) {
         *out_len = 0;
         return NULL;
     }
 
-    /* Find first non-0xFF byte from end */
     size_t i = key_len;
     while (i > 0 && (unsigned char)key[i - 1] == 0xFF) {
         i--;
@@ -92,12 +190,11 @@ static char* compute_prefix_range_end(const char *key, size_t key_len, size_t *o
 
     char *range_end;
     if (i == 0) {
-        /* All bytes are 0xFF - use "\x00" for range_end (all keys >= key) */
+        /* range_end "\0" means every key >= key */
         Newx(range_end, 1, char);
         range_end[0] = '\0';
         *out_len = 1;
     } else {
-        /* Truncate trailing 0xFF bytes and increment last byte */
         Newx(range_end, i, char);
         memcpy(range_end, key, i);
         ((unsigned char *)range_end)[i - 1]++;
@@ -107,7 +204,6 @@ static char* compute_prefix_range_end(const char *key, size_t key_len, size_t *o
     return range_end;
 }
 
-/* Health timer callback - performs periodic health checks */
 static void health_timer_callback(struct ev_loop *loop, ev_timer *w, int revents) {
     dTHX;
     ev_etcd_t *client = (ev_etcd_t *)((char *)w - offsetof(ev_etcd_t, health_timer));
@@ -119,21 +215,19 @@ static void health_timer_callback(struct ev_loop *loop, ev_timer *w, int revents
         return;
     }
 
-    /* Check channel connectivity state */
     grpc_connectivity_state state = grpc_channel_check_connectivity_state(client->channel, 0);
 
     int was_healthy = client->is_healthy;
-    int is_healthy = (state == GRPC_CHANNEL_READY || state == GRPC_CHANNEL_IDLE);
+    int is_healthy = state != GRPC_CHANNEL_TRANSIENT_FAILURE && state != GRPC_CHANNEL_SHUTDOWN;
+    int checked = client->current_endpoint;
 
     if (was_healthy != is_healthy) {
         client->is_healthy = is_healthy;
 
-        /* If unhealthy, try reconnecting to next endpoint */
         if (!is_healthy && client->endpoint_count > 1) {
-            reconnect_channel(client);
+            etcd_rotate_endpoint(client);
         }
 
-        /* Call health callback if provided */
         if (client->health_callback) {
             dSP;
             ENTER;
@@ -141,14 +235,14 @@ static void health_timer_callback(struct ev_loop *loop, ev_timer *w, int revents
             PUSHMARK(SP);
             EXTEND(SP, 2);
             PUSHs(sv_2mortal(newSViv(is_healthy)));
-            PUSHs(sv_2mortal(newSVpv(client->endpoints[client->current_endpoint], 0)));
+            PUSHs(sv_2mortal(newSVpv(client->endpoints[checked], 0)));
             PUTBACK;
-            client->in_callback = 1;
+            client->in_callback++;
             CALL_SV_SAFE(client->health_callback, G_DISCARD);
             FREETMPS;
             LEAVE;
-            client->in_callback = 0;
-            if (!client->active) {
+            client->in_callback--;
+            if (!client->in_callback && !client->active) {
                 finish_client_destroy(aTHX_ client);
                 return;
             }
@@ -156,20 +250,15 @@ static void health_timer_callback(struct ev_loop *loop, ev_timer *w, int revents
     }
 }
 
-/*
- * gRPC completion queue thread function.
- * Runs in a separate thread, polls the CQ for events, and signals the main thread.
- */
+/* Runs on its own thread: no Perl here, events reach the main thread via cq_async.
+ * Runs until GRPC_QUEUE_SHUTDOWN, i.e. until every batch has completed: gRPC
+ * holds on to calls whose completions are never read, and cannot shut down */
 static void *cq_thread_func(void *arg) {
     ev_etcd_t *client = (ev_etcd_t *)arg;
 
-    while (client->thread_running) {
-        /* Poll with 100ms timeout to allow checking thread_running periodically */
-        gpr_timespec deadline = gpr_time_add(
-            gpr_now(GPR_CLOCK_REALTIME),
-            gpr_time_from_millis(100, GPR_TIMESPAN));
-
-        grpc_event event = grpc_completion_queue_next(client->cq, deadline, NULL);
+    for (;;) {
+        grpc_event event = grpc_completion_queue_next(client->cq,
+            gpr_inf_future(GPR_CLOCK_REALTIME), NULL);
 
         if (event.type == GRPC_QUEUE_SHUTDOWN) {
             break;
@@ -179,11 +268,8 @@ static void *cq_thread_func(void *arg) {
             continue;
         }
 
-        /* Queue the event for the main thread */
         queued_event_t *qe = (queued_event_t *)malloc(sizeof(queued_event_t));
         if (!qe) {
-            /* OOM is extremely rare but would cause callbacks to never fire.
-             * Log to stderr since we can't call Perl from this thread. */
             fprintf(stderr, "EV::Etcd: CRITICAL - malloc failed in gRPC thread, event dropped\n");
             continue;
         }
@@ -201,20 +287,15 @@ static void *cq_thread_func(void *arg) {
         client->event_queue_tail = qe;
         pthread_mutex_unlock(&client->queue_mutex);
 
-        /* Signal main thread */
         ev_async_send(EV_DEFAULT, &client->cq_async);
     }
 
     return NULL;
 }
 
-/*
- * Finish deferred client destruction.
- * Called after in_callback is cleared and client->active is false,
- * meaning DESTROY ran during a callback but deferred the final cleanup.
- */
+/* The cleanup DESTROY deferred because it ran inside a callback: call once
+ * in_callback is back to 0 with active cleared */
 void finish_client_destroy(pTHX_ ev_etcd_t *client) {
-    /* Free any remaining call structures */
     while (client->pending_calls) {
         pending_call_t *pc = client->pending_calls;
         client->pending_calls = pc->next;
@@ -235,27 +316,10 @@ void finish_client_destroy(pTHX_ ev_etcd_t *client) {
     while (client->observes) {
         cleanup_observe(aTHX_ client->observes);
     }
-
-    /* Free client-level resources (mirrors free_perl_resources in DESTROY) */
-    if (client->health_callback)
-        SvREFCNT_dec(client->health_callback);
-    if (client->auth_token) {
-        memset(client->auth_token, 0, client->auth_token_len);
-        Safefree(client->auth_token);
-    }
-    if (client->endpoints) {
-        for (int i = 0; i < client->endpoint_count; i++)
-            if (client->endpoints[i]) Safefree(client->endpoints[i]);
-        Safefree(client->endpoints);
-    }
-
+    grpc_release();
     Safefree(client);
 }
 
-/*
- * ev_async callback - runs in main thread when signaled by gRPC thread.
- * Drains the event queue and processes each event.
- */
 static void cq_async_callback(struct ev_loop *loop, ev_async *w, int revents) {
     dTHX;
     (void)loop;
@@ -263,36 +327,33 @@ static void cq_async_callback(struct ev_loop *loop, ev_async *w, int revents) {
 
     ev_etcd_t *client = (ev_etcd_t *)((char *)w - offsetof(ev_etcd_t, cq_async));
 
-    /* Don't process if client is being destroyed */
     if (!client->active) {
         return;
     }
 
-    /* Drain the queue under lock, then process without lock */
+    /* Callbacks run without queue_mutex held */
     pthread_mutex_lock(&client->queue_mutex);
     queued_event_t *queue = client->event_queue;
     client->event_queue = NULL;
     client->event_queue_tail = NULL;
     pthread_mutex_unlock(&client->queue_mutex);
 
-    /* Guard against client being freed during event processing */
-    client->in_callback = 1;
+    /* Defers a DESTROY from any callback below to finish_client_destroy */
+    client->in_callback++;
 
-    /* Process all queued events */
     while (queue) {
         queued_event_t *qe = queue;
         queue = qe->next;
 
-        /* Defensive NULL guard — every code path uses a real tag (see cancel_sentinel) */
+        /* Never NULL: fire-and-forget batches are tagged with cancel_sentinel */
         if (qe->tag) {
             process_grpc_event(aTHX_ client, qe->tag, qe->success);
         }
 
         free(qe);
 
-        /* Check if client was destroyed during callback processing */
-        if (!client->active) {
-            /* Free remaining queued events */
+        /* Destroyed by a callback, or a callback forked and this is the child */
+        if (!client->active || client->owner_pid != ev_etcd_pid) {
             while (queue) {
                 qe = queue;
                 queue = qe->next;
@@ -302,31 +363,25 @@ static void cq_async_callback(struct ev_loop *loop, ev_async *w, int revents) {
         }
     }
 
-    client->in_callback = 0;
+    client->in_callback--;
 
-    /* If DESTROY was called during event processing, finish the deferred cleanup */
-    if (!client->active) {
+    if (!client->in_callback && !client->active) {
         finish_client_destroy(aTHX_ client);
     }
 }
 
-/*
- * Process a single gRPC event. Called from the main thread.
- */
 static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) {
     call_base_t *base = (call_base_t *)tag;
 
-    /* Fire-and-forget cancel batch — nothing to do */
+    /* Fire-and-forget cancel batch */
     if (base->type == CALL_TYPE_NONE) return;
 
     if (base->type == CALL_TYPE_WATCH_RECV) {
-            /* Watch receive completion */
             watch_call_t *wc = (watch_call_t *)base;
 
             if (success && wc->active && wc->recv_buffer) {
                     process_watch_response(aTHX_ wc);
                     if (!client->active) return; /* DESTROY called in callback */
-                    /* Re-arm receive if still active */
                     if (wc->active) {
                         watch_rearm_recv(aTHX_ wc);
                     } else {
@@ -334,18 +389,14 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                         cleanup_watch(aTHX_ wc);
                     }
                 } else if (wc->active) {
-                    /* Batch failed, or stream ended without a message — every
-                     * real disconnect (FIN/RST/GOAWAY) surfaces as success=1
-                     * with a NULL recv_buffer, so both routes reconnect
-                     * (clientv3 semantics) */
+                    /* A real disconnect (FIN/RST/GOAWAY) completes as success=1
+                     * with a NULL recv_buffer, so it reconnects like a failed batch */
                     wc->active = 0;
-                    /* Try automatic reconnection */
                     if (try_reconnect_watch(aTHX_ wc)) {
                         /* Reconnection initiated, don't notify callback yet */
                     } else {
-                        /* Reconnection failed or disabled, notify callback and cleanup */
                         CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_UNAVAILABLE, "Watch stream ended", "watch");
-                        if (!client->active) return; /* DESTROY called in callback */
+                        if (!client->active) return;
                         cleanup_watch(aTHX_ wc);
                     }
                 } else {
@@ -353,15 +404,13 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     cleanup_watch(aTHX_ wc);
                 }
             } else if (base->type == CALL_TYPE_WATCH) {
-            /* Initial watch setup complete - process first message if any */
             watch_call_t *wc = (watch_call_t *)base;
             if (success) {
-                    /* Process the first message that was received in the initial batch */
+                    /* The setup batch also received the first message */
                     if (wc->recv_buffer && wc->active) {
                         process_watch_response(aTHX_ wc);
                         if (!client->active) return;
                     }
-                    /* Re-arm to receive more messages */
                     if (wc->active) {
                         watch_rearm_recv(aTHX_ wc);
                     } else {
@@ -369,9 +418,8 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     }
                 } else {
                     if (wc->active) {
-                        /* Setup/reconnect batch failed (e.g. server still
-                         * down) — chain into the retry budget instead of
-                         * terminating on the first failed attempt */
+                        /* A failed setup/reconnect batch spends the retry
+                         * budget rather than ending the watch */
                         wc->active = 0;
                         if (try_reconnect_watch(aTHX_ wc)) {
                             /* Next attempt scheduled, don't notify yet */
@@ -385,13 +433,11 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     }
                 }
             } else if (base->type == CALL_TYPE_LEASE_KEEPALIVE_RECV) {
-            /* Keepalive receive completion */
             keepalive_call_t *kc = (keepalive_call_t *)base;
 
             if (success && kc->active && kc->recv_buffer) {
                     process_keepalive_response(aTHX_ kc);
                     if (!client->active) return;
-                    /* Re-arm receive if still active */
                     if (kc->active) {
                         keepalive_rearm_recv(aTHX_ kc);
                     } else {
@@ -399,16 +445,12 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                         cleanup_keepalive(aTHX_ kc);
                     }
                 } else if (kc->active) {
-                    /* Batch failed, or stream ended without a message — every
-                     * real disconnect (FIN/RST/GOAWAY) surfaces as success=1
-                     * with a NULL recv_buffer, so both routes reconnect
-                     * (clientv3 semantics) */
+                    /* A real disconnect (FIN/RST/GOAWAY) completes as success=1
+                     * with a NULL recv_buffer, so it reconnects like a failed batch */
                     kc->active = 0;
-                    /* Try automatic reconnection */
                     if (try_reconnect_keepalive(aTHX_ kc)) {
                         /* Reconnection initiated, don't notify callback yet */
                     } else {
-                        /* Reconnection failed or disabled, notify callback and cleanup */
                         CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_UNAVAILABLE, "Keepalive stream ended", "keepalive");
                         if (!client->active) return;
                         cleanup_keepalive(aTHX_ kc);
@@ -418,15 +460,12 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     cleanup_keepalive(aTHX_ kc);
                 }
             } else if (base->type == CALL_TYPE_LEASE_KEEPALIVE) {
-            /* Initial keepalive setup complete - process first message if any */
             keepalive_call_t *kc = (keepalive_call_t *)base;
             if (success) {
-                    /* Process the first message that was received in the initial batch */
                     if (kc->recv_buffer && kc->active) {
                         process_keepalive_response(aTHX_ kc);
                         if (!client->active) return;
                     }
-                    /* Re-arm to receive more messages */
                     if (kc->active) {
                         keepalive_rearm_recv(aTHX_ kc);
                     } else {
@@ -435,9 +474,6 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     }
                 } else {
                     if (kc->active) {
-                        /* Setup/reconnect batch failed (e.g. server still
-                         * down) — chain into the retry budget instead of
-                         * terminating on the first failed attempt */
                         kc->active = 0;
                         if (try_reconnect_keepalive(aTHX_ kc)) {
                             /* Next attempt scheduled, don't notify yet */
@@ -451,30 +487,23 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     }
                 }
             } else if (base->type == CALL_TYPE_ELECTION_OBSERVE_RECV) {
-            /* Election observe receive completion */
             observe_call_t *oc = (observe_call_t *)base;
 
             if (success && oc->active && oc->recv_buffer) {
                     process_observe_response(aTHX_ oc);
                     if (!client->active) return;
-                    /* Re-arm receive if still active */
                     if (oc->active) {
                         observe_rearm_recv(aTHX_ oc);
                     } else {
-                        /* Response handler set active=0 */
                         cleanup_observe(aTHX_ oc);
                     }
                 } else if (oc->active) {
-                    /* Batch failed, or stream ended without a message — every
-                     * real disconnect (FIN/RST/GOAWAY) surfaces as success=1
-                     * with a NULL recv_buffer, so both routes reconnect
-                     * (clientv3 semantics) */
+                    /* A real disconnect (FIN/RST/GOAWAY) completes as success=1
+                     * with a NULL recv_buffer, so it reconnects like a failed batch */
                     oc->active = 0;
-                    /* Try automatic reconnection */
                     if (try_reconnect_observe(aTHX_ oc)) {
                         /* Reconnection initiated, don't notify callback yet */
                     } else {
-                        /* Reconnection failed or disabled, notify callback and cleanup */
                         CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_UNAVAILABLE, "Observe stream ended", "observe");
                         if (!client->active) return;
                         cleanup_observe(aTHX_ oc);
@@ -484,26 +513,19 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     cleanup_observe(aTHX_ oc);
                 }
             } else if (base->type == CALL_TYPE_ELECTION_OBSERVE) {
-            /* Initial observe setup complete - process first message if any */
             observe_call_t *oc = (observe_call_t *)base;
             if (success) {
-                    /* Process the first message that was received in the initial batch */
                     if (oc->recv_buffer && oc->active) {
                         process_observe_response(aTHX_ oc);
                         if (!client->active) return;
                     }
-                    /* Re-arm to receive more messages */
                     if (oc->active) {
                         observe_rearm_recv(aTHX_ oc);
                     } else {
-                        /* First response set active=0 */
                         cleanup_observe(aTHX_ oc);
                     }
                 } else {
                     if (oc->active) {
-                        /* Setup/reconnect batch failed (e.g. server still
-                         * down) — chain into the retry budget instead of
-                         * terminating on the first failed attempt */
                         oc->active = 0;
                         if (try_reconnect_observe(aTHX_ oc)) {
                             /* Next attempt scheduled, don't notify yet */
@@ -517,11 +539,10 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     }
                 }
             } else {
-            /* Unary RPC completion */
             pending_call_t *pc = (pending_call_t *)base;
 
-            /* Remove from pending list BEFORE calling handler to prevent
-             * use-after-free if the callback triggers DESTROY */
+            /* Unlink before the handler runs: its callback may trigger DESTROY,
+             * which frees everything still on pending_calls */
             pending_call_t **pp = &client->pending_calls;
             while (*pp) {
                 if (*pp == pc) {
@@ -530,6 +551,13 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                 }
                 pp = &(*pp)->next;
             }
+
+            /* A failed batch may leave status unset (GRPC_STATUS_OK from
+             * Newxz zero-init); treat that as a network-level failure */
+            grpc_status_code status = !success && pc->status == GRPC_STATUS_OK
+                ? GRPC_STATUS_UNAVAILABLE : pc->status;
+            /* Before the callback, so a retry from it reaches the next endpoint */
+            etcd_endpoint_failed(client, pc->base.channel_gen, status);
 
             if (success) {
                 switch (pc->base.type) {
@@ -663,16 +691,9 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                             break;
                     }
                 } else {
-                    /* Call failed - use status code if available.
-                     * If batch failed before status was populated, status remains
-                     * GRPC_STATUS_OK (from Newxz zero-init) which is misleading.
-                     * Use UNAVAILABLE as fallback for network-level failures. */
-                    grpc_status_code effective_status = pc->status == GRPC_STATUS_OK
-                        ? GRPC_STATUS_UNAVAILABLE : pc->status;
-                    CALL_ERROR_CALLBACK(pc->callback, effective_status, pc->status_details, "grpc_call");
+                    CALL_ERROR_CALLBACK(pc->callback, status, pc->status_details, "grpc_call");
                 }
 
-                /* Cleanup unary call (already removed from pending list above) */
                 grpc_metadata_array_destroy(&pc->initial_metadata);
                 grpc_metadata_array_destroy(&pc->trailing_metadata);
                 if (pc->recv_buffer) {
@@ -685,7 +706,6 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
             }
 }
 
-/* Helper to convert ResponseOp to hashref */
 static SV* response_op_to_hashref(pTHX_ Etcdserverpb__ResponseOp *op) {
     HV *hv = newHV();
 
@@ -737,13 +757,8 @@ static SV* response_op_to_hashref(pTHX_ Etcdserverpb__ResponseOp *op) {
     return newRV_noinc((SV *)hv);
 }
 
-/* Helper to parse Perl array of RequestOps into C structures */
-/* Validate all key/value sizes in a request-ops array. Must run (and croak)
- * BEFORE any allocation in the caller, otherwise a longjmp from
- * VALIDATE_*_SIZE leaks whatever was allocated first. txn() calls this for
- * its success/failure arrays up front, before allocating the compare array;
- * parse_request_ops also calls it so non-txn callers stay validated.
- * Uses SvPV() (not SvCUR) so non-POK SVs get stringified to a real length. */
+/* Must run before the caller allocates anything, or a croak from
+ * VALIDATE_*_SIZE leaks it. SvPV, not SvCUR, so non-POK SVs get a real length */
 static void validate_request_ops(pTHX_ SV *src_av) {
     if (!SvROK(src_av) || SvTYPE(SvRV(src_av)) != SVt_PVAV) return;
     AV *av = (AV *)SvRV(src_av);
@@ -799,9 +814,6 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
     AV *av = (AV *)SvRV(src_av);
     size_t n = av_len(av) + 1;
     if (n == 0) return;
-
-    /* Pre-validate sizes up front (croaks before any allocation). */
-    validate_request_ops(aTHX_ src_av);
 
     Newxz(*dst_ops, n, Etcdserverpb__RequestOp *);
     *dst_n = n;
@@ -899,7 +911,6 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
     }
 }
 
-/* Process TxnResponse and call Perl callback */
 static void process_txn_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "txn");
 
@@ -922,25 +933,21 @@ static void process_txn_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process AuthenticateResponse and call Perl callback */
 static void process_auth_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "authenticate");
 
     Etcdserverpb__AuthenticateResponse *resp;
     UNPACK_RESPONSE(pc, resp, etcdserverpb__authenticate_response__unpack);
 
-    /* Store the token in the client */
     ev_etcd_t *client = pc->client;
     if (resp->token) {
         size_t token_len = strlen(resp->token);
         if (token_len > 0) {
-            /* Validate token size to prevent memory exhaustion */
             if (token_len > ETCD_MAX_VALUE_SIZE) {
                 CALL_STATUS_ERROR_CALLBACK(pc->callback, GRPC_STATUS_INTERNAL, "auth token too large", "authenticate");
                 etcdserverpb__authenticate_response__free_unpacked(resp, NULL);
                 return;
             }
-            /* Securely free old token if exists */
             if (client->auth_token) {
                 memset(client->auth_token, 0, client->auth_token_len);
                 Safefree(client->auth_token);
@@ -963,7 +970,6 @@ static void process_auth_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Helper macro for simple header-only responses */
 #define PROCESS_HEADER_ONLY_RESPONSE(func_name, response_type, unpack_func, free_func, source) \
 static void func_name(pTHX_ pending_call_t *pc) { \
     BEGIN_RESPONSE_HANDLER(pc, source); \
@@ -998,7 +1004,6 @@ PROCESS_HEADER_ONLY_RESPONSE(process_auth_enable_response,
     etcdserverpb__auth_enable_response__unpack,
     etcdserverpb__auth_enable_response__free_unpacked, "auth_enable")
 
-/* auth_disable needs to clear the stored auth token */
 static void process_auth_disable_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "auth_disable");
 
@@ -1049,7 +1054,6 @@ PROCESS_HEADER_ONLY_RESPONSE(process_user_revoke_role_response,
     etcdserverpb__auth_user_revoke_role_response__unpack,
     etcdserverpb__auth_user_revoke_role_response__free_unpacked, "user_revoke_role")
 
-/* Process role_get response - returns permissions */
 static void process_role_get_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "role_get");
 
@@ -1089,7 +1093,6 @@ static void process_role_get_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process role_list response - returns roles list */
 static void process_role_list_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "role_list");
 
@@ -1110,7 +1113,6 @@ static void process_role_list_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process user_get response - returns roles assigned to user */
 static void process_user_get_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "user_get");
 
@@ -1131,7 +1133,6 @@ static void process_user_get_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process user_list response - returns users list */
 static void process_user_list_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "user_list");
 
@@ -1161,9 +1162,9 @@ BOOT:
     watch_init_ev_api(aTHX);
     lease_init_ev_api(aTHX);
     election_init_ev_api(aTHX);
-    grpc_init();
     init_method_slices();
-    ev_etcd_boot_pid = getpid();
+    ev_etcd_pid = getpid();
+    pthread_atfork(ev_etcd_atfork_prepare, NULL, ev_etcd_atfork_child);
 
 EV::Etcd
 ev_etcd_new(class, ...)
@@ -1172,18 +1173,21 @@ CODE:
 {
     ev_etcd_t *client;
     AV *endpoints_av = NULL;
-    int timeout_seconds = 30;  /* Default timeout */
-    int max_retries = 3;       /* Default max retries */
-    int health_interval = 0;   /* Default: disabled */
+    int timeout_seconds = 30;
+    int max_retries = 3;
+    NV health_interval = 0;
+    NV keepalive_time = 10, keepalive_timeout = 10;
     SV *health_callback = NULL;
     char *init_auth_token = NULL;
     STRLEN init_auth_token_len = 0;
+    int tls = 0, saw_http = 0;
+    const char *tls_ca_file = NULL, *tls_cert_file = NULL, *tls_key_file = NULL;
+    const char *tls_server_name = NULL;
+    SV *ca_pem = NULL, *cert_pem = NULL, *key_pem = NULL;
     int i;
 
-    /* Reject a trailing key with no value instead of silently dropping it */
     if ((items - 1) % 2) croak("Odd number of options in EV::Etcd->new");
 
-    /* Parse options */
     for (i = 1; i < items; i += 2) {
         if (i + 1 < items) {
             const char *key = SvPV_nolen(ST(i));
@@ -1194,7 +1198,7 @@ CODE:
             } else if (strEQ(key, "timeout")) {
                 timeout_seconds = SvIV(ST(i + 1));
                 if (timeout_seconds < 1) {
-                    timeout_seconds = 1;  /* Minimum 1 second */
+                    timeout_seconds = 1;
                 }
             } else if (strEQ(key, "max_retries")) {
                 max_retries = SvIV(ST(i + 1));
@@ -1202,8 +1206,8 @@ CODE:
                     max_retries = 0;
                 }
             } else if (strEQ(key, "health_interval")) {
-                health_interval = SvIV(ST(i + 1));
-                if (health_interval < 0) {
+                health_interval = SvNV(ST(i + 1));
+                if (!(health_interval > 0)) {
                     health_interval = 0;
                 }
             } else if (strEQ(key, "on_health_change")) {
@@ -1214,6 +1218,20 @@ CODE:
                 if (SvPOK(ST(i + 1))) {
                     init_auth_token = SvPV(ST(i + 1), init_auth_token_len);
                 }
+            } else if (strEQ(key, "tls")) {
+                tls = SvTRUE(ST(i + 1));
+            } else if (strEQ(key, "tls_ca_file")) {
+                if (SvOK(ST(i + 1))) tls_ca_file = SvPV_nolen(ST(i + 1));
+            } else if (strEQ(key, "tls_cert_file")) {
+                if (SvOK(ST(i + 1))) tls_cert_file = SvPV_nolen(ST(i + 1));
+            } else if (strEQ(key, "tls_key_file")) {
+                if (SvOK(ST(i + 1))) tls_key_file = SvPV_nolen(ST(i + 1));
+            } else if (strEQ(key, "tls_server_name")) {
+                if (SvOK(ST(i + 1))) tls_server_name = SvPV_nolen(ST(i + 1));
+            } else if (strEQ(key, "keepalive_time")) {
+                keepalive_time = SvNV(ST(i + 1));
+            } else if (strEQ(key, "keepalive_timeout")) {
+                keepalive_timeout = SvNV(ST(i + 1));
             }
         }
     }
@@ -1224,14 +1242,30 @@ CODE:
         for (i = 0; i < count; i++) {
             SV **ep = av_fetch(endpoints_av, i, 0);
             if (ep && SvPOK(*ep)) {
+                int is_https;
                 VALIDATE_URL_SIZE(SvCUR(*ep));
+                if (!endpoint_scheme_len(SvPVX(*ep), &is_https))
+                    continue;
+                if (is_https)
+                    tls = 1;
+                else
+                    saw_http = 1;
             }
         }
     }
 
+    if (tls_ca_file || tls_cert_file || tls_key_file || tls_server_name)
+        tls = 1;
+    if (tls && saw_http)
+        croak("EV::Etcd: http:// endpoint on a TLS client");
+    if (!tls_cert_file != !tls_key_file)
+        croak("EV::Etcd: tls_cert_file and tls_key_file must be given together");
+    if (tls_ca_file) ca_pem = slurp_pem(aTHX_ "tls_ca_file", tls_ca_file);
+    if (tls_cert_file) cert_pem = slurp_pem(aTHX_ "tls_cert_file", tls_cert_file);
+    if (tls_key_file) key_pem = slurp_pem(aTHX_ "tls_key_file", tls_key_file);
+
     Newxz(client, 1, ev_etcd_t);
 
-    /* Store endpoints */
     if (endpoints_av && av_len(endpoints_av) >= 0) {
         int count = av_len(endpoints_av) + 1;
         Newx(client->endpoints, count, char *);
@@ -1240,46 +1274,67 @@ CODE:
             SV **ep = av_fetch(endpoints_av, i, 0);
             if (ep && SvPOK(*ep)) {
                 STRLEN len;
+                int is_https;
                 const char *str = SvPV(*ep, len);
+                int skip = endpoint_scheme_len(str, &is_https);
+                str += skip;
+                len -= skip;
                 Newx(client->endpoints[i], len + 1, char);
                 Copy(str, client->endpoints[i], len + 1, char);
             } else {
-                /* Default endpoint for invalid entries */
                 client->endpoints[i] = savepv("127.0.0.1:2379");
             }
         }
     } else {
-        /* Default single endpoint */
         Newx(client->endpoints, 1, char *);
         client->endpoints[0] = savepv("127.0.0.1:2379");
         client->endpoint_count = 1;
     }
     client->current_endpoint = 0;
+    client->keepalive_ms = seconds_to_ms(keepalive_time);
+    client->keepalive_timeout_ms = seconds_to_ms(keepalive_timeout);
+    if (!client->keepalive_timeout_ms)
+        client->keepalive_timeout_ms = 10000;
 
-    /* Create gRPC channel to first endpoint */
-    client->channel = etcd_create_insecure_channel(client->endpoints[0], NULL);
+    /* After the endpoint copy, whose SvPV can croak via magic, so that croak
+     * cannot leak a gRPC reference */
+    grpc_acquire(aTHX);
+
+    if (tls) {
+        grpc_ssl_pem_key_cert_pair pair;
+        if (cert_pem) {
+            pair.private_key = SvPV_nolen(key_pem);
+            pair.cert_chain = SvPV_nolen(cert_pem);
+        }
+        client->creds = grpc_ssl_credentials_create(
+            ca_pem ? SvPV_nolen(ca_pem) : NULL, cert_pem ? &pair : NULL, NULL, NULL);
+        if (key_pem)
+            memset(SvPVX(key_pem), 0, SvCUR(key_pem));
+        if (tls_server_name)
+            client->tls_server_name = savepv(tls_server_name);
+    }
+
+    client->channel = etcd_create_channel(client, client->endpoints[0]);
 
     if (!client->channel) {
         for (int j = 0; j < client->endpoint_count; j++) {
             Safefree(client->endpoints[j]);
         }
         Safefree(client->endpoints);
+        if (client->creds) grpc_channel_credentials_release(client->creds);
+        Safefree(client->tls_server_name);
         Safefree(client);
+        grpc_release();
         croak("Failed to create gRPC channel");
     }
 
-    /* Create completion queue for polling */
     client->cq = grpc_completion_queue_create_for_next(NULL);
 
-    /* Initialize threading for hybrid gRPC/EV approach */
     pthread_mutex_init(&client->queue_mutex, NULL);
-    client->thread_running = 1;
 
-    /* Initialize ev_async watcher for main thread notification */
     ev_async_init(&client->cq_async, cq_async_callback);
     ev_async_start(EV_DEFAULT, &client->cq_async);
 
-    /* Start gRPC completion queue thread */
     if (pthread_create(&client->cq_thread, NULL, cq_thread_func, client) != 0) {
         ev_async_stop(EV_DEFAULT, &client->cq_async);
         pthread_mutex_destroy(&client->queue_mutex);
@@ -1289,12 +1344,14 @@ CODE:
             ;
         grpc_completion_queue_destroy(client->cq);
         grpc_channel_destroy(client->channel);
-        /* Free endpoints */
         for (int j = 0; j < client->endpoint_count; j++) {
             Safefree(client->endpoints[j]);
         }
         Safefree(client->endpoints);
+        if (client->creds) grpc_channel_credentials_release(client->creds);
+        Safefree(client->tls_server_name);
         Safefree(client);
+        grpc_release();
         croak("Failed to create gRPC completion queue thread");
     }
 
@@ -1306,18 +1363,18 @@ CODE:
     }
     client->timeout_seconds = timeout_seconds;
     client->active = 1;
-    client->owner_pid = getpid();
+    client->owner_pid = ev_etcd_pid;
+    client->next_live = ev_etcd_clients;
+    ev_etcd_clients = client;
     client->max_retries = max_retries;
-    client->is_healthy = 1;  /* Assume healthy initially */
+    client->is_healthy = 1;
     if (health_callback)
         client->health_callback = SvREFCNT_inc(health_callback);
 
-    /* Initialize health timer (stopped initially) */
     ev_timer_init(&client->health_timer, health_timer_callback, 0.0, 0.0);
 
-    /* Start health monitoring if interval > 0 */
     if (health_interval > 0) {
-        ev_timer_set(&client->health_timer, (double)health_interval, (double)health_interval);
+        ev_timer_set(&client->health_timer, health_interval, health_interval);
         ev_timer_start(EV_DEFAULT, &client->health_timer);
     }
 
@@ -1332,15 +1389,12 @@ ev_etcd_get(client, key, ...)
     SV *key
 CODE:
 {
-    /* Parse arguments: get(key, [opts,] callback) */
     SV *opts = NULL;
     SV *callback;
 
     if (items == 3) {
-        /* get(key, callback) */
         callback = ST(2);
     } else if (items == 4) {
-        /* get(key, opts, callback) */
         opts = ST(2);
         callback = ST(3);
     } else {
@@ -1363,24 +1417,19 @@ CODE:
         }
     }
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_RANGE, callback, client);
 
-    /* Build RangeRequest */
     Etcdserverpb__RangeRequest req = ETCDSERVERPB__RANGE_REQUEST__INIT;
     req.key.data = (uint8_t *)key_str;
     req.key.len = key_len;
 
-    /* Storage for range_end to ensure it persists through serialization */
     char *range_end_copy = NULL;
 
-    /* Parse options if provided */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
         HV *hv = (HV *)SvRV(opts);
         SV **svp;
 
-        /* range_end - for range queries or prefix queries */
         if ((svp = hv_fetchs(hv, "range_end", 0)) && SvOK(*svp)) {
             STRLEN range_end_len;
             const char *range_end_str = SvPV(*svp, range_end_len);
@@ -1391,9 +1440,7 @@ CODE:
             req.range_end.len = range_end_len;
         }
 
-        /* prefix - convenience option to get all keys with given prefix */
         if ((svp = hv_fetchs(hv, "prefix", 0)) && SvTRUE(*svp)) {
-            /* Don't override if range_end was explicitly provided */
             if (!range_end_copy && key_len > 0) {
                 size_t range_len;
                 range_end_copy = compute_prefix_range_end(key_str, key_len, &range_len);
@@ -1404,32 +1451,26 @@ CODE:
             }
         }
 
-        /* limit */
         if ((svp = hv_fetchs(hv, "limit", 0)) && SvOK(*svp)) {
             req.limit = SvI64(*svp);
         }
 
-        /* revision */
         if ((svp = hv_fetchs(hv, "revision", 0)) && SvOK(*svp)) {
             req.revision = SvI64(*svp);
         }
 
-        /* keys_only */
         if ((svp = hv_fetchs(hv, "keys_only", 0)) && SvTRUE(*svp)) {
             req.keys_only = 1;
         }
 
-        /* count_only */
         if ((svp = hv_fetchs(hv, "count_only", 0)) && SvTRUE(*svp)) {
             req.count_only = 1;
         }
 
-        /* serializable */
         if ((svp = hv_fetchs(hv, "serializable", 0)) && SvTRUE(*svp)) {
             req.serializable = 1;
         }
 
-        /* sort_order: NONE=0, ASCEND=1, DESCEND=2 */
         if ((svp = hv_fetchs(hv, "sort_order", 0)) && SvOK(*svp)) {
             const char *order = SvPV_nolen(*svp);
             if (strEQ(order, "ascend") || strEQ(order, "ASCEND")) {
@@ -1439,7 +1480,6 @@ CODE:
             }
         }
 
-        /* sort_target: KEY=0, VERSION=1, CREATE=2, MOD=3, VALUE=4 */
         if ((svp = hv_fetchs(hv, "sort_target", 0)) && SvOK(*svp)) {
             const char *target = SvPV_nolen(*svp);
             if (strEQ(target, "version") || strEQ(target, "VERSION")) {
@@ -1453,28 +1493,23 @@ CODE:
             }
         }
 
-        /* min_mod_revision */
         if ((svp = hv_fetchs(hv, "min_mod_revision", 0)) && SvOK(*svp)) {
             req.min_mod_revision = SvI64(*svp);
         }
 
-        /* max_mod_revision */
         if ((svp = hv_fetchs(hv, "max_mod_revision", 0)) && SvOK(*svp)) {
             req.max_mod_revision = SvI64(*svp);
         }
 
-        /* min_create_revision */
         if ((svp = hv_fetchs(hv, "min_create_revision", 0)) && SvOK(*svp)) {
             req.min_create_revision = SvI64(*svp);
         }
 
-        /* max_create_revision */
         if ((svp = hv_fetchs(hv, "max_create_revision", 0)) && SvOK(*svp)) {
             req.max_create_revision = SvI64(*svp);
         }
     }
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__range_request__get_packed_size,
@@ -1485,7 +1520,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -1493,13 +1527,13 @@ CODE:
 
     pc->call = grpc_channel_create_call(
         client->channel,
-        NULL,  /* parent call */
+        NULL,
         GRPC_PROPAGATE_DEFAULTS,
         client->cq,
         METHOD_KV_RANGE,
-        NULL,  /* host */
+        NULL,
         deadline,
-        NULL   /* reserved */
+        NULL
     );
 
     if (!pc->call) {
@@ -1508,48 +1542,38 @@ CODE:
         croak("Failed to create gRPC call for range");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
-    /* Send initial metadata (with auth token if available) */
     ops[0].op = GRPC_OP_SEND_INITIAL_METADATA;
     setup_auth_metadata(client, &ops[0], &auth_md);
 
-    /* Send message */
     ops[1].op = GRPC_OP_SEND_MESSAGE;
     ops[1].data.send_message.send_message = send_buffer;
 
-    /* Send close */
     ops[2].op = GRPC_OP_SEND_CLOSE_FROM_CLIENT;
 
-    /* Receive initial metadata */
     ops[3].op = GRPC_OP_RECV_INITIAL_METADATA;
     ops[3].data.recv_initial_metadata.recv_initial_metadata = &pc->initial_metadata;
 
-    /* Receive message */
     ops[4].op = GRPC_OP_RECV_MESSAGE;
     ops[4].data.recv_message.recv_message = &pc->recv_buffer;
 
-    /* Receive status */
     ops[5].op = GRPC_OP_RECV_STATUS_ON_CLIENT;
     ops[5].data.recv_status_on_client.trailing_metadata = &pc->trailing_metadata;
     ops[5].data.recv_status_on_client.status = &pc->status;
     ops[5].data.recv_status_on_client.status_details = &pc->status_details;
 
-    /* Start batch */
     grpc_call_error err = grpc_call_start_batch(pc->call, ops, 6, &pc->base, NULL);
 
     cleanup_auth_metadata(client, &auth_md);
     grpc_byte_buffer_destroy(send_buffer);
 
     if (err != GRPC_CALL_OK) {
-        /* Cleanup on error */
         CLEANUP_PENDING_CALL_ON_ERROR(pc);
         croak("Failed to start gRPC call: %d", err);
     }
 
-    /* Add to pending list */
     pc->next = client->pending_calls;
     client->pending_calls = pc;
 }
@@ -1561,15 +1585,12 @@ ev_etcd_put(client, key, value, ...)
     SV *value
 CODE:
 {
-    /* Parse arguments: put(key, value, [opts,] callback) */
     SV *opts = NULL;
     SV *callback;
 
     if (items == 4) {
-        /* put(key, value, callback) */
         callback = ST(3);
     } else if (items == 5) {
-        /* put(key, value, opts, callback) */
         opts = ST(3);
         callback = ST(4);
     } else {
@@ -1584,44 +1605,36 @@ CODE:
     VALIDATE_KEY_SIZE(key_len);
     VALIDATE_VALUE_SIZE(value_len);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_PUT, callback, client);
 
-    /* Build PutRequest */
     Etcdserverpb__PutRequest req = ETCDSERVERPB__PUT_REQUEST__INIT;
     req.key.data = (uint8_t *)key_str;
     req.key.len = key_len;
     req.value.data = (uint8_t *)value_str;
     req.value.len = value_len;
 
-    /* Parse options if provided */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
         HV *hv = (HV *)SvRV(opts);
         SV **svp;
 
-        /* lease - lease ID to associate with key */
         if ((svp = hv_fetchs(hv, "lease", 0)) && SvOK(*svp)) {
             req.lease = SvI64(*svp);
         }
 
-        /* prev_kv - return previous key-value pair */
         if ((svp = hv_fetchs(hv, "prev_kv", 0)) && SvTRUE(*svp)) {
             req.prev_kv = 1;
         }
 
-        /* ignore_value - update lease without changing value */
         if ((svp = hv_fetchs(hv, "ignore_value", 0)) && SvTRUE(*svp)) {
             req.ignore_value = 1;
         }
 
-        /* ignore_lease - update value without changing lease */
         if ((svp = hv_fetchs(hv, "ignore_lease", 0)) && SvTRUE(*svp)) {
             req.ignore_lease = 1;
         }
     }
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__put_request__get_packed_size,
@@ -1629,7 +1642,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -1637,13 +1649,13 @@ CODE:
 
     pc->call = grpc_channel_create_call(
         client->channel,
-        NULL,  /* parent call */
+        NULL,
         GRPC_PROPAGATE_DEFAULTS,
         client->cq,
         METHOD_KV_PUT,
-        NULL,  /* host */
+        NULL,
         deadline,
-        NULL   /* reserved */
+        NULL
     );
 
     if (!pc->call) {
@@ -1652,48 +1664,38 @@ CODE:
         croak("Failed to create gRPC call for put");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
-    /* Send initial metadata (with auth token if available) */
     ops[0].op = GRPC_OP_SEND_INITIAL_METADATA;
     setup_auth_metadata(client, &ops[0], &auth_md);
 
-    /* Send message */
     ops[1].op = GRPC_OP_SEND_MESSAGE;
     ops[1].data.send_message.send_message = send_buffer;
 
-    /* Send close */
     ops[2].op = GRPC_OP_SEND_CLOSE_FROM_CLIENT;
 
-    /* Receive initial metadata */
     ops[3].op = GRPC_OP_RECV_INITIAL_METADATA;
     ops[3].data.recv_initial_metadata.recv_initial_metadata = &pc->initial_metadata;
 
-    /* Receive message */
     ops[4].op = GRPC_OP_RECV_MESSAGE;
     ops[4].data.recv_message.recv_message = &pc->recv_buffer;
 
-    /* Receive status */
     ops[5].op = GRPC_OP_RECV_STATUS_ON_CLIENT;
     ops[5].data.recv_status_on_client.trailing_metadata = &pc->trailing_metadata;
     ops[5].data.recv_status_on_client.status = &pc->status;
     ops[5].data.recv_status_on_client.status_details = &pc->status_details;
 
-    /* Start batch */
     grpc_call_error err = grpc_call_start_batch(pc->call, ops, 6, &pc->base, NULL);
 
     cleanup_auth_metadata(client, &auth_md);
     grpc_byte_buffer_destroy(send_buffer);
 
     if (err != GRPC_CALL_OK) {
-        /* Cleanup on error */
         CLEANUP_PENDING_CALL_ON_ERROR(pc);
         croak("Failed to start gRPC call: %d", err);
     }
 
-    /* Add to pending list */
     pc->next = client->pending_calls;
     client->pending_calls = pc;
 }
@@ -1704,15 +1706,12 @@ ev_etcd_delete(client, key, ...)
     SV *key
 CODE:
 {
-    /* Parse arguments: delete(key, [opts,] callback) */
     SV *opts = NULL;
     SV *callback;
 
     if (items == 3) {
-        /* delete(key, callback) */
         callback = ST(2);
     } else if (items == 4) {
-        /* delete(key, opts, callback) */
         opts = ST(2);
         callback = ST(3);
     } else {
@@ -1735,24 +1734,19 @@ CODE:
         }
     }
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_DELETE, callback, client);
 
-    /* Build DeleteRangeRequest */
     Etcdserverpb__DeleteRangeRequest req = ETCDSERVERPB__DELETE_RANGE_REQUEST__INIT;
     req.key.data = (uint8_t *)key_str;
     req.key.len = key_len;
 
-    /* Storage for range_end to ensure it persists through serialization */
     char *range_end_copy = NULL;
 
-    /* Parse options if provided */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
         HV *hv = (HV *)SvRV(opts);
         SV **svp;
 
-        /* range_end - for range deletion */
         if ((svp = hv_fetchs(hv, "range_end", 0)) && SvOK(*svp)) {
             STRLEN range_end_len;
             const char *range_end_str = SvPV(*svp, range_end_len);
@@ -1763,9 +1757,7 @@ CODE:
             req.range_end.len = range_end_len;
         }
 
-        /* prefix - convenience option to delete all keys with given prefix */
         if ((svp = hv_fetchs(hv, "prefix", 0)) && SvTRUE(*svp)) {
-            /* Don't override if range_end was explicitly provided */
             if (!range_end_copy && key_len > 0) {
                 size_t range_len;
                 range_end_copy = compute_prefix_range_end(key_str, key_len, &range_len);
@@ -1776,13 +1768,11 @@ CODE:
             }
         }
 
-        /* prev_kv - return deleted keys */
         if ((svp = hv_fetchs(hv, "prev_kv", 0)) && SvTRUE(*svp)) {
             req.prev_kv = 1;
         }
     }
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__delete_range_request__get_packed_size,
@@ -1793,7 +1783,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -1801,13 +1790,13 @@ CODE:
 
     pc->call = grpc_channel_create_call(
         client->channel,
-        NULL,  /* parent call */
+        NULL,
         GRPC_PROPAGATE_DEFAULTS,
         client->cq,
         METHOD_KV_DELETE,
-        NULL,  /* host */
+        NULL,
         deadline,
-        NULL   /* reserved */
+        NULL
     );
 
     if (!pc->call) {
@@ -1816,48 +1805,38 @@ CODE:
         croak("Failed to create gRPC call for delete");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
-    /* Send initial metadata (with auth token if available) */
     ops[0].op = GRPC_OP_SEND_INITIAL_METADATA;
     setup_auth_metadata(client, &ops[0], &auth_md);
 
-    /* Send message */
     ops[1].op = GRPC_OP_SEND_MESSAGE;
     ops[1].data.send_message.send_message = send_buffer;
 
-    /* Send close */
     ops[2].op = GRPC_OP_SEND_CLOSE_FROM_CLIENT;
 
-    /* Receive initial metadata */
     ops[3].op = GRPC_OP_RECV_INITIAL_METADATA;
     ops[3].data.recv_initial_metadata.recv_initial_metadata = &pc->initial_metadata;
 
-    /* Receive message */
     ops[4].op = GRPC_OP_RECV_MESSAGE;
     ops[4].data.recv_message.recv_message = &pc->recv_buffer;
 
-    /* Receive status */
     ops[5].op = GRPC_OP_RECV_STATUS_ON_CLIENT;
     ops[5].data.recv_status_on_client.trailing_metadata = &pc->trailing_metadata;
     ops[5].data.recv_status_on_client.status = &pc->status;
     ops[5].data.recv_status_on_client.status_details = &pc->status_details;
 
-    /* Start batch */
     grpc_call_error err = grpc_call_start_batch(pc->call, ops, 6, &pc->base, NULL);
 
     cleanup_auth_metadata(client, &auth_md);
     grpc_byte_buffer_destroy(send_buffer);
 
     if (err != GRPC_CALL_OK) {
-        /* Cleanup on error */
         CLEANUP_PENDING_CALL_ON_ERROR(pc);
         croak("Failed to start gRPC call: %d", err);
     }
 
-    /* Add to pending list */
     pc->next = client->pending_calls;
     client->pending_calls = pc;
 }
@@ -1868,15 +1847,12 @@ ev_etcd_watch(client, key, ...)
     SV *key
 CODE:
 {
-    /* Parse arguments: watch(key, [opts,] callback) */
     SV *opts = NULL;
     SV *callback;
 
     if (items == 3) {
-        /* watch(key, callback) */
         callback = ST(2);
     } else if (items == 4) {
-        /* watch(key, opts, callback) */
         opts = ST(2);
         callback = ST(3);
     } else {
@@ -1899,46 +1875,41 @@ CODE:
         }
     }
 
-    /* Create watch structure (Newxz zeroes everything; only set non-zero fields) */
     watch_call_t *wc;
     Newxz(wc, 1, watch_call_t);
     init_call_base(&wc->base, CALL_TYPE_WATCH);
+    wc->base.owner_pid = client->owner_pid;
     wc->callback = newSVsv(callback);
     wc->client = client;
     wc->active = 1;
     wc->watch_id = -1;
-    wc->auto_reconnect = 1;  /* Enable by default */
+    wc->auto_reconnect = 1;
     wc->client_owns = 1;
     wc->perl_owns = 1;
     grpc_metadata_array_init(&wc->initial_metadata);
     grpc_metadata_array_init(&wc->trailing_metadata);
     wc->status_details = grpc_empty_slice();
 
-    /* Store key for recovery */
+    /* params re-create the watch on reconnect */
     Newx(wc->params.key, key_len + 1, char);
     Copy(key_str, wc->params.key, key_len, char);
     wc->params.key[key_len] = '\0';
     wc->params.key_len = key_len;
 
-    /* Build WatchCreateRequest wrapped in WatchRequest */
     Etcdserverpb__WatchCreateRequest create_req = ETCDSERVERPB__WATCH_CREATE_REQUEST__INIT;
     create_req.key.data = (uint8_t *)key_str;
     create_req.key.len = key_len;
 
-    /* Storage for range_end to ensure it persists through serialization */
     char *range_end_copy = NULL;
 
-    /* Parse options if provided */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
         HV *hv = (HV *)SvRV(opts);
         SV **svp;
 
-        /* auto_reconnect - enable/disable automatic reconnection (default: true) */
         if ((svp = hv_fetchs(hv, "auto_reconnect", 0))) {
             wc->auto_reconnect = SvTRUE(*svp) ? 1 : 0;
         }
 
-        /* range_end - explicit end of key range to watch */
         if ((svp = hv_fetchs(hv, "range_end", 0)) && SvOK(*svp)) {
             STRLEN range_end_len;
             const char *range_end_str = SvPV(*svp, range_end_len);
@@ -1946,23 +1917,19 @@ CODE:
             memcpy(range_end_copy, range_end_str, range_end_len);
             create_req.range_end.data = (uint8_t *)range_end_copy;
             create_req.range_end.len = range_end_len;
-            /* Store for recovery */
             Newx(wc->params.range_end, range_end_len + 1, char);
             Copy(range_end_str, wc->params.range_end, range_end_len, char);
             wc->params.range_end[range_end_len] = '\0';
             wc->params.range_end_len = range_end_len;
         }
 
-        /* prefix - convenience option to watch all keys with given prefix */
         if ((svp = hv_fetchs(hv, "prefix", 0)) && SvTRUE(*svp)) {
-            /* Don't override if range_end was explicitly provided */
             if (!range_end_copy && key_len > 0) {
                 size_t range_len;
                 range_end_copy = compute_prefix_range_end(key_str, key_len, &range_len);
                 if (range_end_copy) {
                     create_req.range_end.data = (uint8_t *)range_end_copy;
                     create_req.range_end.len = range_len;
-                    /* Store for recovery */
                     Newx(wc->params.range_end, range_len + 1, char);
                     Copy(range_end_copy, wc->params.range_end, range_len, char);
                     wc->params.range_end[range_len] = '\0';
@@ -1971,25 +1938,21 @@ CODE:
             }
         }
 
-        /* start_revision - watch from specific revision */
         if ((svp = hv_fetchs(hv, "start_revision", 0)) && SvOK(*svp)) {
             create_req.start_revision = SvI64(*svp);
             wc->params.start_revision = create_req.start_revision;
         }
 
-        /* progress_notify - receive periodic progress notifications */
         if ((svp = hv_fetchs(hv, "progress_notify", 0)) && SvTRUE(*svp)) {
             create_req.progress_notify = 1;
             wc->params.progress_notify = 1;
         }
 
-        /* prev_kv - include previous key-value in events */
         if ((svp = hv_fetchs(hv, "prev_kv", 0)) && SvTRUE(*svp)) {
             create_req.prev_kv = 1;
             wc->params.prev_kv = 1;
         }
 
-        /* watch_id - optional explicit watch ID */
         if ((svp = hv_fetchs(hv, "watch_id", 0)) && SvOK(*svp)) {
             create_req.watch_id = SvI64(*svp);
             wc->params.watch_id = create_req.watch_id;
@@ -2001,7 +1964,6 @@ CODE:
     req.request_union_case = ETCDSERVERPB__WATCH_REQUEST__REQUEST_UNION_CREATE_REQUEST;
     req.create_request = &create_req;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__watch_request__get_packed_size,
@@ -2010,18 +1972,18 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create streaming call */
-    gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);  /* No timeout for watch */
+    gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
 
+    wc->base.channel_gen = client->channel_gen;
     wc->call = grpc_channel_create_call(
         client->channel,
-        NULL,  /* parent call */
+        NULL,
         GRPC_PROPAGATE_DEFAULTS,
         client->cq,
         METHOD_WATCH,
-        NULL,  /* host */
+        NULL,
         deadline,
-        NULL   /* reserved */
+        NULL
     );
 
     if (!wc->call) {
@@ -2036,27 +1998,23 @@ CODE:
         croak("Failed to create gRPC call for watch");
     }
 
-    /* Start the call with initial operations */
     grpc_op ops[4] = {0};
     grpc_metadata auth_md;
 
-    /* Send initial metadata (with auth token if available) */
     ops[0].op = GRPC_OP_SEND_INITIAL_METADATA;
     setup_auth_metadata(client, &ops[0], &auth_md);
 
-    /* Receive initial metadata */
     ops[1].op = GRPC_OP_RECV_INITIAL_METADATA;
     ops[1].data.recv_initial_metadata.recv_initial_metadata = &wc->initial_metadata;
 
-    /* Send the watch create request */
     ops[2].op = GRPC_OP_SEND_MESSAGE;
     ops[2].data.send_message.send_message = send_buffer;
 
-    /* Receive the first response (WatchResponse with created=true) */
+    /* The first response is the WatchResponse with created=true */
     ops[3].op = GRPC_OP_RECV_MESSAGE;
     ops[3].data.recv_message.recv_message = &wc->recv_buffer;
 
-    /* Start batch - status receive is handled separately when stream ends */
+    /* No RECV_STATUS: stream end surfaces as a RECV with a NULL recv_buffer */
     grpc_call_error err = grpc_call_start_batch(wc->call, ops, 4, &wc->base, NULL);
 
     cleanup_auth_metadata(client, &auth_md);
@@ -2068,7 +2026,6 @@ CODE:
         grpc_slice_unref(wc->status_details);
         grpc_call_unref(wc->call);
         SvREFCNT_dec(wc->callback);
-        /* Free watch params allocated for recovery */
         if (wc->params.key) {
             Safefree(wc->params.key);
         }
@@ -2076,11 +2033,10 @@ CODE:
             Safefree(wc->params.range_end);
         }
         Safefree(wc);
-        /* Note: range_end_copy already freed before call creation */
+        /* range_end_copy was already freed after serializing */
         croak("Failed to start watch call: %d", err);
     }
 
-    /* Add to watches list */
     wc->next = client->watches;
     client->watches = wc;
 
@@ -2098,15 +2054,12 @@ CODE:
 {
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_LEASE_GRANT, callback, client);
 
-    /* Build LeaseGrantRequest */
     Etcdserverpb__LeaseGrantRequest req = ETCDSERVERPB__LEASE_GRANT_REQUEST__INIT;
     req.ttl = ttl;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__lease_grant_request__get_packed_size,
@@ -2114,7 +2067,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -2137,7 +2089,6 @@ CODE:
         croak("Failed to create gRPC call for lease_grant");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -2183,15 +2134,12 @@ CODE:
 {
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_LEASE_REVOKE, callback, client);
 
-    /* Build LeaseRevokeRequest */
     Etcdserverpb__LeaseRevokeRequest req = ETCDSERVERPB__LEASE_REVOKE_REQUEST__INIT;
     req.id = lease_id;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__lease_revoke_request__get_packed_size,
@@ -2199,7 +2147,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -2222,7 +2169,6 @@ CODE:
         croak("Failed to create gRPC call for lease_revoke");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -2265,15 +2211,12 @@ ev_etcd_lease_time_to_live(client, lease_id, ...)
     int64_t lease_id
 CODE:
 {
-    /* Parse arguments: lease_time_to_live(lease_id, [opts,] callback) */
     SV *opts = NULL;
     SV *callback;
 
     if (items == 3) {
-        /* lease_time_to_live(lease_id, callback) */
         callback = ST(2);
     } else if (items == 4) {
-        /* lease_time_to_live(lease_id, opts, callback) */
         opts = ST(2);
         callback = ST(3);
     } else {
@@ -2282,26 +2225,21 @@ CODE:
 
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_LEASE_TIME_TO_LIVE, callback, client);
 
-    /* Build LeaseTimeToLiveRequest */
     Etcdserverpb__LeaseTimeToLiveRequest req = ETCDSERVERPB__LEASE_TIME_TO_LIVE_REQUEST__INIT;
     req.id = lease_id;
 
-    /* Parse options if provided */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
         HV *hv = (HV *)SvRV(opts);
         SV **svp;
 
-        /* keys - if true, also return the keys attached to this lease */
         if ((svp = hv_fetchs(hv, "keys", 0)) && SvTRUE(*svp)) {
             req.keys = 1;
         }
     }
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__lease_time_to_live_request__get_packed_size,
@@ -2309,7 +2247,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -2332,7 +2269,6 @@ CODE:
         croak("Failed to create gRPC call for lease_ttl");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -2377,14 +2313,11 @@ CODE:
 {
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_LEASE_LEASES, callback, client);
 
-    /* Build LeaseLeasesRequest (empty message) */
     Etcdserverpb__LeaseLeasesRequest req = ETCDSERVERPB__LEASE_LEASES_REQUEST__INIT;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__lease_leases_request__get_packed_size,
@@ -2392,7 +2325,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -2415,7 +2347,6 @@ CODE:
         croak("Failed to create gRPC call for lease_leases");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -2458,15 +2389,12 @@ ev_etcd_compact(client, revision, ...)
     int64_t revision
 CODE:
 {
-    /* Parse arguments: compact(revision, [opts,] callback) */
     SV *opts = NULL;
     SV *callback;
 
     if (items == 3) {
-        /* compact(revision, callback) */
         callback = ST(2);
     } else if (items == 4) {
-        /* compact(revision, opts, callback) */
         opts = ST(2);
         callback = ST(3);
     } else {
@@ -2475,26 +2403,21 @@ CODE:
 
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_COMPACT, callback, client);
 
-    /* Build CompactionRequest */
     Etcdserverpb__CompactionRequest req = ETCDSERVERPB__COMPACTION_REQUEST__INIT;
     req.revision = revision;
 
-    /* Parse options if provided */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
         HV *hv = (HV *)SvRV(opts);
         SV **svp;
 
-        /* physical - if true, wait until compaction is physically applied */
         if ((svp = hv_fetchs(hv, "physical", 0)) && SvTRUE(*svp)) {
             req.physical = 1;
         }
     }
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__compaction_request__get_packed_size,
@@ -2502,7 +2425,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -2525,7 +2447,6 @@ CODE:
         croak("Failed to create gRPC call for compact");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -2570,14 +2491,11 @@ CODE:
 {
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_STATUS, callback, client);
 
-    /* Build StatusRequest (empty message) */
     Etcdserverpb__StatusRequest req = ETCDSERVERPB__STATUS_REQUEST__INIT;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__status_request__get_packed_size,
@@ -2585,7 +2503,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -2608,7 +2525,6 @@ CODE:
         croak("Failed to create gRPC call for status");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -2651,7 +2567,6 @@ ev_etcd_lease_keepalive(client, lease_id, ...)
     int64_t lease_id
 CODE:
 {
-    /* Parse arguments: lease_keepalive(lease_id, [opts,] callback) */
     SV *opts = NULL;
     SV *callback;
 
@@ -2666,14 +2581,14 @@ CODE:
 
     VALIDATE_CALLBACK(callback);
 
-    /* Create keepalive structure (Newxz zeroes everything; only set non-zero fields) */
     keepalive_call_t *kc;
     Newxz(kc, 1, keepalive_call_t);
     init_call_base(&kc->base, CALL_TYPE_LEASE_KEEPALIVE);
+    kc->base.owner_pid = client->owner_pid;
     kc->callback = newSVsv(callback);
     kc->client = client;
     kc->active = 1;
-    kc->auto_reconnect = 1;  /* Enable by default */
+    kc->auto_reconnect = 1;
     kc->lease_id = lease_id;
     kc->client_owns = 1;
     kc->perl_owns = 1;
@@ -2690,11 +2605,9 @@ CODE:
     grpc_metadata_array_init(&kc->trailing_metadata);
     kc->status_details = grpc_empty_slice();
 
-    /* Build LeaseKeepAliveRequest */
     Etcdserverpb__LeaseKeepAliveRequest req = ETCDSERVERPB__LEASE_KEEP_ALIVE_REQUEST__INIT;
     req.id = lease_id;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__lease_keep_alive_request__get_packed_size,
@@ -2702,9 +2615,9 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create streaming call */
     gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
 
+    kc->base.channel_gen = client->channel_gen;
     kc->call = grpc_channel_create_call(
         client->channel,
         NULL,
@@ -2726,7 +2639,6 @@ CODE:
         croak("Failed to create gRPC call for lease_keepalive");
     }
 
-    /* Start the call with initial operations */
     grpc_op ops[4] = {0};
     grpc_metadata auth_md;
 
@@ -2739,7 +2651,6 @@ CODE:
     ops[2].op = GRPC_OP_SEND_MESSAGE;
     ops[2].data.send_message.send_message = send_buffer;
 
-    /* Receive the first response */
     ops[3].op = GRPC_OP_RECV_MESSAGE;
     ops[3].data.recv_message.recv_message = &kc->recv_buffer;
 
@@ -2783,36 +2694,31 @@ CODE:
         size_t n = av_len(av) + 1;
         for (size_t i = 0; i < n; i++) {
             SV **elem = av_fetch(av, i, 0);
-            if (elem && SvROK(*elem) && SvTYPE(SvRV(*elem)) == SVt_PVHV) {
-                HV *hv = (HV *)SvRV(*elem);
-                STRLEN _l;
-                SV **key_sv = hv_fetch(hv, "key", 3, 0);
-                if (key_sv && SvOK(*key_sv)) {
-                    (void)SvPV(*key_sv, _l);
-                    VALIDATE_KEY_SIZE(_l);
-                }
-                SV **value_sv = hv_fetch(hv, "value", 5, 0);
-                if (value_sv && SvOK(*value_sv)) {
-                    (void)SvPV(*value_sv, _l);
-                    VALIDATE_VALUE_SIZE(_l);
-                }
+            if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV)
+                croak("txn: compare element %d is not a hash reference", (int)i);
+            HV *hv = (HV *)SvRV(*elem);
+            STRLEN _l;
+            SV **key_sv = hv_fetch(hv, "key", 3, 0);
+            if (key_sv && SvOK(*key_sv)) {
+                (void)SvPV(*key_sv, _l);
+                VALIDATE_KEY_SIZE(_l);
+            }
+            SV **value_sv = hv_fetch(hv, "value", 5, 0);
+            if (value_sv && SvOK(*value_sv)) {
+                (void)SvPV(*value_sv, _l);
+                VALIDATE_VALUE_SIZE(_l);
             }
         }
     }
 
-    /* Pre-validate success/failure op sizes too, before any allocation, so a
-     * croak from an oversized key/value can't leak the compare array below. */
     validate_request_ops(aTHX_ success_av);
     validate_request_ops(aTHX_ failure_av);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_TXN, callback, client);
 
-    /* Build TxnRequest */
     Etcdserverpb__TxnRequest req = ETCDSERVERPB__TXN_REQUEST__INIT;
 
-    /* Parse compare array */
     size_t n_compare = 0;
     Etcdserverpb__Compare **compares = NULL;
 
@@ -2823,12 +2729,13 @@ CODE:
             Newxz(compares, n_compare, Etcdserverpb__Compare *);
             for (size_t i = 0; i < n_compare; i++) {
                 SV **elem = av_fetch(av, i, 0);
+                /* Unconditionally: overload or tie code run by the checks above
+                 * can change the array, and a NULL entry crashes the packer */
+                Newxz(compares[i], 1, Etcdserverpb__Compare);
+                etcdserverpb__compare__init(compares[i]);
                 if (elem && SvROK(*elem) && SvTYPE(SvRV(*elem)) == SVt_PVHV) {
                     HV *hv = (HV *)SvRV(*elem);
-                    Newxz(compares[i], 1, Etcdserverpb__Compare);
-                    etcdserverpb__compare__init(compares[i]);
 
-                    /* key */
                     SV **key_sv = hv_fetch(hv, "key", 3, 0);
                     if (key_sv && SvOK(*key_sv)) {
                         STRLEN len;
@@ -2837,7 +2744,6 @@ CODE:
                         compares[i]->key.len = len;
                     }
 
-                    /* target: version, create, mod, value, lease */
                     SV **target_sv = hv_fetch(hv, "target", 6, 0);
                     if (target_sv && SvPOK(*target_sv)) {
                         char *target = SvPV_nolen(*target_sv);
@@ -2853,7 +2759,6 @@ CODE:
                             compares[i]->target = ETCDSERVERPB__COMPARE__COMPARE_TARGET__LEASE;
                     }
 
-                    /* result: =, !=, <, > */
                     SV **result_sv = hv_fetch(hv, "result", 6, 0);
                     if (result_sv && SvPOK(*result_sv)) {
                         char *result = SvPV_nolen(*result_sv);
@@ -2867,7 +2772,6 @@ CODE:
                             compares[i]->result = ETCDSERVERPB__COMPARE__COMPARE_RESULT__GREATER;
                     }
 
-                    /* target_union value based on target - auto-set target if not specified */
                     SV **version_sv = hv_fetch(hv, "version", 7, 0);
                     if (version_sv && SvOK(*version_sv)) {
                         compares[i]->target_union_case = ETCDSERVERPB__COMPARE__TARGET_UNION_VERSION;
@@ -2899,7 +2803,6 @@ CODE:
                         compares[i]->target_union_case = ETCDSERVERPB__COMPARE__TARGET_UNION_VALUE;
                         compares[i]->value.data = (uint8_t *)str;
                         compares[i]->value.len = len;
-                        /* Auto-set target to VALUE if not explicitly specified */
                         if (!target_sv)
                             compares[i]->target = ETCDSERVERPB__COMPARE__COMPARE_TARGET__VALUE;
                     }
@@ -2908,7 +2811,6 @@ CODE:
                     if (lease_sv && SvOK(*lease_sv)) {
                         compares[i]->target_union_case = ETCDSERVERPB__COMPARE__TARGET_UNION_LEASE;
                         compares[i]->lease = SvI64(*lease_sv);
-                        /* Auto-set target to LEASE if not explicitly specified */
                         if (!target_sv)
                             compares[i]->target = ETCDSERVERPB__COMPARE__COMPARE_TARGET__LEASE;
                     }
@@ -2919,39 +2821,34 @@ CODE:
     req.n_compare = n_compare;
     req.compare = compares;
 
-    /* Parse success operations */
     size_t n_success;
     Etcdserverpb__RequestOp **success_ops;
     parse_request_ops(aTHX_ success_av, &success_ops, &n_success);
     req.n_success = n_success;
     req.success = success_ops;
 
-    /* Parse failure operations */
     size_t n_failure;
     Etcdserverpb__RequestOp **failure_ops;
     parse_request_ops(aTHX_ failure_av, &failure_ops, &n_failure);
     req.n_failure = n_failure;
     req.failure = failure_ops;
 
-    /* Serialize request directly to grpc_slice */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__txn_request__get_packed_size,
         etcdserverpb__txn_request__pack, &req);
 
-    /* Free allocated structures (data pointers point to Perl SVs, don't free those) */
+    /* Structs only: their data pointers borrow the Perl SVs' buffers */
     for (size_t i = 0; i < n_compare; i++) {
         Safefree(compares[i]);
     }
     if (compares) Safefree(compares);
 
-    /* Free request_ops arrays using helper macro */
     FREE_REQUEST_OPS(success_ops, n_success);
     FREE_REQUEST_OPS(failure_ops, n_failure);
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -2974,7 +2871,6 @@ CODE:
         croak("Failed to create gRPC call for txn");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -3034,16 +2930,13 @@ CODE:
     Copy(pass_src, pass_str, pass_len, char);
     pass_str[pass_len] = '\0';
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_AUTH, callback, client);
 
-    /* Build AuthenticateRequest */
     Etcdserverpb__AuthenticateRequest req = ETCDSERVERPB__AUTHENTICATE_REQUEST__INIT;
     req.name = user_str;
     req.password = pass_str;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__authenticate_request__get_packed_size,
@@ -3051,11 +2944,9 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Zero and free password buffer */
     memset(pass_str, 0, pass_len);
     Safefree(pass_str);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -3078,7 +2969,6 @@ CODE:
         croak("Failed to create gRPC call for authenticate");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -3138,16 +3028,13 @@ CODE:
     Copy(pass_src, pass_str, pass_len, char);
     pass_str[pass_len] = '\0';
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_USER_ADD, callback, client);
 
-    /* Build AuthUserAddRequest */
     Etcdserverpb__AuthUserAddRequest req = ETCDSERVERPB__AUTH_USER_ADD_REQUEST__INIT;
     req.name = user_str;
     req.password = pass_str;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__auth_user_add_request__get_packed_size,
@@ -3155,11 +3042,9 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Zero and free password buffer */
     memset(pass_str, 0, pass_len);
     Safefree(pass_str);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -3182,7 +3067,6 @@ CODE:
         croak("Failed to create gRPC call for user_add");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -3232,15 +3116,12 @@ CODE:
     char *user_str = SvPV(username, user_len);
     VALIDATE_USERNAME_SIZE(user_len);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_USER_DELETE, callback, client);
 
-    /* Build AuthUserDeleteRequest */
     Etcdserverpb__AuthUserDeleteRequest req = ETCDSERVERPB__AUTH_USER_DELETE_REQUEST__INIT;
     req.name = user_str;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__auth_user_delete_request__get_packed_size,
@@ -3248,7 +3129,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -3271,7 +3151,6 @@ CODE:
         croak("Failed to create gRPC call for user_delete");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -3331,16 +3210,13 @@ CODE:
     Copy(pass_src, pass_str, pass_len, char);
     pass_str[pass_len] = '\0';
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_USER_CHANGE_PASSWORD, callback, client);
 
-    /* Build AuthUserChangePasswordRequest */
     Etcdserverpb__AuthUserChangePasswordRequest req = ETCDSERVERPB__AUTH_USER_CHANGE_PASSWORD_REQUEST__INIT;
     req.name = user_str;
     req.password = pass_str;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__auth_user_change_password_request__get_packed_size,
@@ -3348,11 +3224,9 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Zero and free password buffer */
     memset(pass_str, 0, pass_len);
     Safefree(pass_str);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -3375,7 +3249,6 @@ CODE:
         croak("Failed to create gRPC call for user_change_password");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -3420,14 +3293,11 @@ CODE:
 {
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_AUTH_ENABLE, callback, client);
 
-    /* Build AuthEnableRequest (empty message) */
     Etcdserverpb__AuthEnableRequest req = ETCDSERVERPB__AUTH_ENABLE_REQUEST__INIT;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__auth_enable_request__get_packed_size,
@@ -3435,7 +3305,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -3458,7 +3327,6 @@ CODE:
         croak("Failed to create gRPC call for auth_enable");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -3503,14 +3371,11 @@ CODE:
 {
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_AUTH_DISABLE, callback, client);
 
-    /* Build AuthDisableRequest (empty message) */
     Etcdserverpb__AuthDisableRequest req = ETCDSERVERPB__AUTH_DISABLE_REQUEST__INIT;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__auth_disable_request__get_packed_size,
@@ -3518,7 +3383,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -3541,7 +3405,6 @@ CODE:
         croak("Failed to create gRPC call for auth_disable");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -3886,7 +3749,6 @@ CODE:
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_ROLE_GRANT_PERMISSION, callback, client);
 
-    /* Parse permission type */
     Etcdserverpb__Permission__Type pt = ETCDSERVERPB__PERMISSION__TYPE__READ;
     if (strEQ(type_str, "WRITE") || strEQ(type_str, "write")) {
         pt = ETCDSERVERPB__PERMISSION__TYPE__WRITE;
@@ -4365,7 +4227,7 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Lock blocks until acquired — use infinite deadline */
+    /* Lock blocks until acquired, so no deadline */
     gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
 
     pc->call = grpc_channel_create_call(
@@ -4516,7 +4378,7 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Campaign blocks until elected — use infinite deadline */
+    /* Campaign blocks until elected, so no deadline */
     gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
 
     pc->call = grpc_channel_create_call(
@@ -4832,7 +4694,6 @@ ev_etcd_election_observe(client, name, ...)
     SV *name
 CODE:
 {
-    /* Parse arguments: election_observe(name, [opts,] callback) */
     SV *opts = NULL;
     SV *callback;
 
@@ -4860,10 +4721,10 @@ CODE:
         }
     }
 
-    /* Newxz zeroes everything; only set non-zero fields */
     observe_call_t *oc;
     Newxz(oc, 1, observe_call_t);
     init_call_base(&oc->base, CALL_TYPE_ELECTION_OBSERVE);
+    oc->base.owner_pid = client->owner_pid;
     oc->callback = newSVsv(callback);
     oc->client = client;
     oc->active = 1;
@@ -4891,9 +4752,9 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Use infinite deadline for streaming call */
     gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
 
+    oc->base.channel_gen = client->channel_gen;
     oc->call = grpc_channel_create_call(
         client->channel, NULL, GRPC_PROPAGATE_DEFAULTS,
         client->cq, METHOD_ELECTION_OBSERVE, NULL, deadline, NULL
@@ -4922,11 +4783,8 @@ CODE:
     ops[2].op = GRPC_OP_SEND_MESSAGE;
     ops[2].data.send_message.send_message = send_buffer;
 
-    /* Observe is server-streaming: the client sends one LeaderRequest and the
-     * server streams LeaderResponses. Half-close the client side so etcd's
-     * handler receives the completed request and begins streaming; without it
-     * the stream is established but never delivers an event. (Watch/keepalive
-     * are bidi and deliberately stay open, so they must NOT half-close.) */
+    /* Server-streaming: etcd delivers no event until the client half-closes.
+     * Watch and keepalive are bidi and must not half-close */
     ops[3].op = GRPC_OP_SEND_CLOSE_FROM_CLIENT;
 
     ops[4].op = GRPC_OP_RECV_MESSAGE;
@@ -4947,7 +4805,6 @@ CODE:
         croak("Failed to start gRPC call: %d", err);
     }
 
-    /* Add to observes list */
     oc->next = client->observes;
     client->observes = oc;
 
@@ -5047,15 +4904,12 @@ ev_etcd_member_add(client, peer_urls, ...)
     SV *peer_urls
 CODE:
 {
-    /* Parse arguments: member_add(peer_urls, [opts,] callback) */
     SV *opts = NULL;
     SV *callback;
 
     if (items == 3) {
-        /* member_add(peer_urls, callback) */
         callback = ST(2);
     } else if (items == 4) {
-        /* member_add(peer_urls, opts, callback) */
         opts = ST(2);
         callback = ST(3);
     } else {
@@ -5413,15 +5267,12 @@ ev_etcd_alarm(client, action, ...)
     char *action
 CODE:
 {
-    /* Parse arguments: alarm(action, [opts,] callback) */
     SV *opts = NULL;
     SV *callback;
 
     if (items == 3) {
-        /* alarm(action, callback) */
         callback = ST(2);
     } else if (items == 4) {
-        /* alarm(action, opts, callback) */
         opts = ST(2);
         callback = ST(3);
     } else {
@@ -5442,25 +5293,20 @@ CODE:
         croak("Invalid alarm action: %s (expected GET, ACTIVATE, or DEACTIVATE)", action);
     }
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_ALARM, callback, client);
 
-    /* Build AlarmRequest */
     Etcdserverpb__AlarmRequest req = ETCDSERVERPB__ALARM_REQUEST__INIT;
     req.action = alarm_action;
 
-    /* Parse options if provided */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
         HV *hv = (HV *)SvRV(opts);
         SV **svp;
 
-        /* member_id - optional member ID (0 means all members) */
         if ((svp = hv_fetchs(hv, "member_id", 0))) {
             req.memberid = SvU64(*svp);
         }
 
-        /* alarm - alarm type (NOSPACE, CORRUPT) */
         if ((svp = hv_fetchs(hv, "alarm", 0))) {
             char *alarm_str = SvPV_nolen(*svp);
             if (strcasecmp(alarm_str, "NOSPACE") == 0) {
@@ -5473,7 +5319,6 @@ CODE:
         }
     }
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__alarm_request__get_packed_size,
@@ -5481,7 +5326,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -5504,7 +5348,6 @@ CODE:
         croak("Failed to create gRPC call for alarm");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -5549,14 +5392,11 @@ CODE:
 {
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_DEFRAGMENT, callback, client);
 
-    /* Build DefragmentRequest (empty message) */
     Etcdserverpb__DefragmentRequest req = ETCDSERVERPB__DEFRAGMENT_REQUEST__INIT;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__defragment_request__get_packed_size,
@@ -5564,7 +5404,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -5587,7 +5426,6 @@ CODE:
         croak("Failed to create gRPC call for defragment");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -5629,15 +5467,12 @@ ev_etcd_hash_kv(client, ...)
     EV::Etcd client
 CODE:
 {
-    /* Parse arguments: hash_kv([revision,] callback) */
     int64_t revision = 0;
     SV *callback;
 
     if (items == 2) {
-        /* hash_kv(callback) */
         callback = ST(1);
     } else if (items == 3) {
-        /* hash_kv(revision, callback) */
         revision = SvI64(ST(1));
         callback = ST(2);
     } else {
@@ -5646,15 +5481,12 @@ CODE:
 
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_HASH_KV, callback, client);
 
-    /* Build HashKVRequest */
     Etcdserverpb__HashKVRequest req = ETCDSERVERPB__HASH_KV_REQUEST__INIT;
     req.revision = revision;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__hash_kv_request__get_packed_size,
@@ -5662,7 +5494,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -5685,7 +5516,6 @@ CODE:
         croak("Failed to create gRPC call for hash_kv");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -5731,15 +5561,12 @@ CODE:
 {
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_MOVE_LEADER, callback, client);
 
-    /* Build MoveLeaderRequest */
     Etcdserverpb__MoveLeaderRequest req = ETCDSERVERPB__MOVE_LEADER_REQUEST__INIT;
     req.targetid = target_id;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__move_leader_request__get_packed_size,
@@ -5747,7 +5574,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -5770,7 +5596,6 @@ CODE:
         croak("Failed to create gRPC call for move_leader");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -5815,14 +5640,11 @@ CODE:
 {
     VALIDATE_CALLBACK(callback);
 
-    /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_AUTH_STATUS, callback, client);
 
-    /* Build AuthStatusRequest (empty message) */
     Etcdserverpb__AuthStatusRequest req = ETCDSERVERPB__AUTH_STATUS_REQUEST__INIT;
 
-    /* Serialize request */
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
         etcdserverpb__auth_status_request__get_packed_size,
@@ -5830,7 +5652,6 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call */
     gpr_timespec deadline = gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME),
         gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
@@ -5853,7 +5674,6 @@ CODE:
         croak("Failed to create gRPC call for auth_status");
     }
 
-    /* Set up operations */
     grpc_op ops[6] = {0};
     grpc_metadata auth_md;
 
@@ -5891,19 +5711,28 @@ CODE:
 }
 
 void
-ev_etcd_DESTROY(client)
-    EV::Etcd client
+ev_etcd_DESTROY(self)
+    SV *self
 CODE:
 {
-    /* Fork safety: in a child process, the gRPC thread and completion queue
-     * are in undefined state. Skip gRPC cleanup, just free Perl-side resources. */
-    if (client->owner_pid != getpid()) {
-        warn("EV::Etcd: client destroyed in forked child (pid %d, created in %d)"
-             " -- skipping gRPC cleanup", (int)getpid(), (int)client->owner_pid);
+    /* Converted by hand: the EV::Etcd typemap refuses forked children */
+    if (!(SvROK(self) && sv_derived_from(self, "EV::Etcd")))
+        croak("client is not of type EV::Etcd");
+    ev_etcd_t *client = INT2PTR(ev_etcd_t *, SvIV(SvRV(self)));
+    if (!client)
+        XSRETURN_EMPTY;
+    sv_setiv(SvRV(self), 0);
 
-        /* Free SV callbacks and Safefree'd params only; don't touch gRPC objects.
-         * Honor dual-ownership: if Perl handle is still alive we leave the struct
-         * for *_DESTROY to free. */
+    /* A forked child has no gRPC thread and must not touch gRPC objects */
+    if (client->owner_pid != ev_etcd_pid) {
+        warn("EV::Etcd: client destroyed in forked child (pid %d, created in %d)"
+             " -- skipping gRPC cleanup", (int)ev_etcd_pid, (int)client->owner_pid);
+
+        /* A callback that forked is still running on these structs; leak them */
+        if (client->in_callback)
+            XSRETURN_EMPTY;
+
+        /* A stream struct whose Perl handle is still alive is left for its DESTROY */
         pending_call_t *pc = client->pending_calls;
         while (pc) {
             pending_call_t *next = pc->next;
@@ -5956,19 +5785,15 @@ CODE:
         goto free_perl_resources;
     }
 
-    /* Mark client as inactive first to prevent callbacks from accessing freed memory */
+    /* First, so no callback reaches what is freed below */
     client->active = 0;
+    unregister_client(client);
 
-    /* Stop ev_async watcher */
     if (ev_is_active(&client->cq_async)) {
         ev_async_stop(EV_DEFAULT, &client->cq_async);
     }
 
-    /* Signal the gRPC thread to stop and wait for it */
-    client->thread_running = 0;
-
-    /* Mark every streaming call inactive and cancel its gRPC call so pending
-     * batches complete promptly with success=0. */
+    /* Cancelled calls complete their pending batches promptly with success=0 */
     watch_call_t *wc = client->watches;
     while (wc) {
         wc->active = 0;
@@ -6000,7 +5825,6 @@ CODE:
         oc = oc->next;
     }
 
-    /* Cancel pending unary calls */
     pending_call_t *pc = client->pending_calls;
     while (pc) {
         if (pc->call) {
@@ -6009,15 +5833,12 @@ CODE:
         pc = pc->next;
     }
 
-    /* Shutdown the completion queue - this will cause the thread to exit */
     if (client->cq) {
         grpc_completion_queue_shutdown(client->cq);
     }
 
-    /* Wait for the gRPC thread to finish */
     pthread_join(client->cq_thread, NULL);
 
-    /* Clean up the event queue (any remaining queued events) */
     pthread_mutex_lock(&client->queue_mutex);
     queued_event_t *qe = client->event_queue;
     while (qe) {
@@ -6029,17 +5850,14 @@ CODE:
     client->event_queue_tail = NULL;
     pthread_mutex_unlock(&client->queue_mutex);
 
-    /* Destroy the mutex */
     pthread_mutex_destroy(&client->queue_mutex);
 
-    /* Destroy the completion queue */
     if (client->cq) {
         grpc_completion_queue_destroy(client->cq);
     }
 
-    /* Cleanup call structures - skip if called during event processing
-     * (the currently-processing call struct would be a use-after-free).
-     * Deferred to cq_async_callback when in_callback is set. */
+    /* Inside a callback this would free the call being processed under it;
+     * finish_client_destroy does it once in_callback drops to 0 */
     if (!client->in_callback) {
         pc = client->pending_calls;
         while (pc) {
@@ -6058,36 +5876,41 @@ CODE:
             pc = next;
         }
 
-        /* Streaming-call cleanup honors dual-ownership: cleanup_* unlinks and
-         * frees gRPC state, then frees the struct only if the Perl handle has
-         * already been released. Otherwise the struct lives until *_DESTROY. */
+        /* cleanup_* frees the struct only if its Perl handle is gone, else *_DESTROY does */
         while (client->watches) cleanup_watch(aTHX_ client->watches);
         while (client->keepalives) cleanup_keepalive(aTHX_ client->keepalives);
         while (client->observes) cleanup_observe(aTHX_ client->observes);
     }
 
-    /* Stop health timer */
     ev_timer_stop(EV_DEFAULT, &client->health_timer);
 
     if (client->channel) {
         grpc_channel_destroy(client->channel);
     }
+    if (client->old_channel)
+        grpc_channel_destroy(client->old_channel);
+    if (client->creds) {
+        grpc_channel_credentials_release(client->creds);
+        client->creds = NULL;
+    }
+    if (!client->in_callback)
+        grpc_release();
 
     free_perl_resources:
-    /* Free health callback */
     if (client->health_callback) {
         SvREFCNT_dec(client->health_callback);
         client->health_callback = NULL;
     }
 
-    /* Free auth token - securely zero before freeing */
     if (client->auth_token) {
         memset(client->auth_token, 0, client->auth_token_len);
         Safefree(client->auth_token);
         client->auth_token = NULL;
     }
 
-    /* Free endpoints */
+    Safefree(client->tls_server_name);
+    client->tls_server_name = NULL;
+
     if (client->endpoints) {
         int i;
         for (i = 0; i < client->endpoint_count; i++) {
@@ -6099,7 +5922,7 @@ CODE:
         client->endpoints = NULL;
     }
 
-    /* If called during event processing, defer struct free to cq_async_callback */
+    /* Inside a callback, finish_client_destroy frees it later */
     if (!client->in_callback) {
         Safefree(client);
     }
@@ -6122,19 +5945,15 @@ CODE:
         return;
     }
 
-    /* A fired one-shot timer is inactive-but-PENDING until its callback
-     * runs; treat pending as armed (reconnect_cb has not run, so no batch
-     * is in flight) and stop unconditionally so the pending callback
-     * cannot resurrect the stream after this cancel. */
+    /* A fired one-shot timer stays pending until its callback runs: count that
+     * as armed (no batch in flight yet) and stop it so it cannot resurrect the stream */
     int timer_was_armed = ev_is_active(&wc->reconnect_timer)
                        || ev_is_pending(&wc->reconnect_timer);
     ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
 
     if (!wc->active) {
-        /* timer armed == reconnect backoff: stream batch already completed,
-         * none in flight, so the struct is safe to reap; otherwise a cancel
-         * is already in progress and the pending RECV completion owns
-         * cleanup. */
+        /* Armed timer means reconnect backoff with no batch in flight, so reap;
+         * otherwise a cancel is under way and the pending RECV completion cleans up */
         if (timer_was_armed)
             cleanup_watch(aTHX_ wc);
         CALL_SUCCESS_CALLBACK(callback, newHV());
@@ -6143,7 +5962,6 @@ CODE:
 
     wc->active = 0;
 
-    /* If we have a watch_id, send cancel request */
     if (wc->watch_id >= 0) {
         Etcdserverpb__WatchCancelRequest cancel_req = ETCDSERVERPB__WATCH_CANCEL_REQUEST__INIT;
         cancel_req.watch_id = wc->watch_id;
@@ -6175,10 +5993,16 @@ CODE:
 }
 
 void
-ev_etcd_watch_DESTROY(watch)
-    EV::Etcd::Watch watch
+ev_etcd_watch_DESTROY(self)
+    SV *self
 CODE:
 {
+    if (!(SvROK(self) && sv_derived_from(self, "EV::Etcd::Watch")))
+        croak("handle is not of type EV::Etcd::Watch");
+    watch_call_t *watch = INT2PTR(watch_call_t *, SvIV(SvRV(self)));
+    if (!watch)
+        XSRETURN_EMPTY;
+    sv_setiv(SvRV(self), 0);
     watch_call_perl_release(aTHX_ watch);
 }
 
@@ -6199,20 +6023,16 @@ CODE:
         return;
     }
 
-    /* A fired one-shot timer is inactive-but-PENDING until its callback
-     * runs; treat pending as armed (reconnect_cb has not run, so no batch
-     * is in flight) and stop unconditionally so the pending callback
-     * cannot resurrect the stream after this cancel. */
+    /* A fired one-shot timer stays pending until its callback runs: count that
+     * as armed (no batch in flight yet) and stop it so it cannot resurrect the stream */
     int timer_was_armed = ev_is_active(&kc->reconnect_timer)
                        || ev_is_pending(&kc->reconnect_timer);
     ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
     ev_timer_stop(EV_DEFAULT, &kc->renew_timer);
 
     if (!kc->active) {
-        /* timer armed == reconnect backoff: stream batch already completed,
-         * none in flight, so the struct is safe to reap; otherwise a cancel
-         * is already in progress and the pending RECV completion owns
-         * cleanup. */
+        /* Armed timer means reconnect backoff with no batch in flight, so reap;
+         * otherwise a cancel is under way and the pending RECV completion cleans up */
         if (timer_was_armed)
             cleanup_keepalive(aTHX_ kc);
         CALL_SUCCESS_CALLBACK(callback, newHV());
@@ -6228,10 +6048,16 @@ CODE:
 }
 
 void
-ev_etcd_keepalive_DESTROY(keepalive)
-    EV::Etcd::Keepalive keepalive
+ev_etcd_keepalive_DESTROY(self)
+    SV *self
 CODE:
 {
+    if (!(SvROK(self) && sv_derived_from(self, "EV::Etcd::Keepalive")))
+        croak("handle is not of type EV::Etcd::Keepalive");
+    keepalive_call_t *keepalive = INT2PTR(keepalive_call_t *, SvIV(SvRV(self)));
+    if (!keepalive)
+        XSRETURN_EMPTY;
+    sv_setiv(SvRV(self), 0);
     keepalive_call_perl_release(aTHX_ keepalive);
 }
 
@@ -6252,19 +6078,15 @@ CODE:
         return;
     }
 
-    /* A fired one-shot timer is inactive-but-PENDING until its callback
-     * runs; treat pending as armed (reconnect_cb has not run, so no batch
-     * is in flight) and stop unconditionally so the pending callback
-     * cannot resurrect the stream after this cancel. */
+    /* A fired one-shot timer stays pending until its callback runs: count that
+     * as armed (no batch in flight yet) and stop it so it cannot resurrect the stream */
     int timer_was_armed = ev_is_active(&oc->reconnect_timer)
                        || ev_is_pending(&oc->reconnect_timer);
     ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
 
     if (!oc->active) {
-        /* timer armed == reconnect backoff: stream batch already completed,
-         * none in flight, so the struct is safe to reap; otherwise a cancel
-         * is already in progress and the pending RECV completion owns
-         * cleanup. */
+        /* Armed timer means reconnect backoff with no batch in flight, so reap;
+         * otherwise a cancel is under way and the pending RECV completion cleans up */
         if (timer_was_armed)
             cleanup_observe(aTHX_ oc);
         CALL_SUCCESS_CALLBACK(callback, newHV());
@@ -6280,19 +6102,16 @@ CODE:
 }
 
 void
-ev_etcd_observe_DESTROY(observe)
-    EV::Etcd::Observe observe
+ev_etcd_observe_DESTROY(self)
+    SV *self
 CODE:
 {
+    if (!(SvROK(self) && sv_derived_from(self, "EV::Etcd::Observe")))
+        croak("handle is not of type EV::Etcd::Observe");
+    observe_call_t *observe = INT2PTR(observe_call_t *, SvIV(SvRV(self)));
+    if (!observe)
+        XSRETURN_EMPTY;
+    sv_setiv(SvRV(self), 0);
     observe_call_perl_release(aTHX_ observe);
 }
 
-MODULE = EV::Etcd  PACKAGE = EV::Etcd  PREFIX = ev_etcd_
-
-void
-END()
-CODE:
-    /* Only the process that loaded the module shuts down gRPC — in forked
-     * children grpc_shutdown() blocks forever (see ev_etcd_boot_pid). */
-    if (getpid() == ev_etcd_boot_pid)
-        grpc_shutdown();

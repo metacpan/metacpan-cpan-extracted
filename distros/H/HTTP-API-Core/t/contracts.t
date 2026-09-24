@@ -103,10 +103,15 @@ is($calls[0][1], 'https://api.example.test/items', 'request joins relative path 
 is($calls[0][2]{content}, 'raw', 'request forwards raw content');
 is($calls[0][2]{headers}{'X-Default'}, 'yes', 'request includes default headers');
 
+$request_api->get('/headers', headers => { 'x-default' => 'request', 'X-Only' => 'yes' });
+is($calls[1][2]{headers}{'x-default'}, 'request', 'request header overrides differently-cased default');
+ok(!exists $calls[1][2]{headers}{'X-Default'}, 'overridden default header spelling is removed');
+is($calls[1][2]{headers}{'X-Only'}, 'yes', 'unrelated request header is preserved');
+
 $request_api->post('/json', json => { ok => 1 });
-is($calls[1][2]{headers}{'content-type'}, 'application/json', 'json request sets content type');
-is($calls[1][2]{headers}{accept}, 'application/json', 'json request sets accept header');
-like($calls[1][2]{content}, qr/"ok"\s*:\s*1/, 'json request encodes content');
+is($calls[2][2]{headers}{'content-type'}, 'application/json', 'json request sets content type');
+is($calls[2][2]{headers}{accept}, 'application/json', 'json request sets accept header');
+like($calls[2][2]{content}, qr/"ok"\s*:\s*1/, 'json request encodes content');
 
 dies_like(
     sub { $request_api->request('', '/x') },

@@ -1,5 +1,40 @@
 Revision history for HTTP-API-Core
 
+1.08  2026-09-23
+    - Add opt-in response-aware pagination extractors for continuation metadata in response headers.
+    - Update the GitHub example to follow Link-header rel=next continuation URLs.
+    - Reject cross-origin absolute pagination continuations by default, with an explicit opt-in.
+    - Revalidate mutable before_request method, URL, headers, and content before transport.
+    - Refresh real API validation guidance from the 1.08 cross-service review.
+
+1.07  2026-09-23
+    - Include the query API-key fragment regression test in packaged releases.
+    - Recognize percent-encoded existing query API-key names without adding duplicate credentials.
+    - Make per-request header overrides case-insensitive.
+    - Validate request header values, including headers mutated by before_request hooks.
+    - Reject reference values inside array-valued request and pagination query parameters.
+
+1.06  2026-09-23
+    - Reject unsupported nested reference values in form_urlencode instead of stringifying them.
+    - Validate transport response headers before response normalization.
+    - Validate transport response reason and content as scalar fields.
+
+1.05  2026-09-23
+    - Preserve URL fragments when query API-key authentication appends credentials.
+    - Align pagination query validation and encoding with direct request queries.
+    - Honor explicit JSON Content-Type and Accept headers case-insensitively.
+
+1.04  2026-09-23
+    - Document and protect the form_urlencode helper as part of the public 1.x API.
+    - Preserve URL fragments when pagination appends query parameters.
+    - Validate transport response status values before response normalization.
+    - Validate per-request headers before merging them with client defaults.
+
+1.03  2026-09-23
+    - Add interoperability examples for HTTP::Tiny, LWP::UserAgent, Mojo::UserAgent, and Furl.
+    - Add real-world API validation recipes for Stripe and GitLab.
+    - Add reusable UTF-8-aware application/x-www-form-urlencoded encoding.
+
 1.02  2026-09-22
     - Support HTTP-date values in Retry-After in addition to delay-seconds.
     - Fall back to rate-limit reset metadata or exponential backoff for malformed Retry-After values.

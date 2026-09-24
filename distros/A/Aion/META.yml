@@ -39,7 +39,7 @@ no_index:
 provides:
   Aion:
     file: lib/Aion.pm
-    version: '2.3'
+    version: '2.4'
   Aion::Meta::Feature:
     file: lib/Aion/Meta/Feature.pm
   Aion::Meta::FeatureConstruct:
@@ -56,6 +56,10 @@ provides:
     file: lib/Aion/Pleroma.pm
   Aion::Type:
     file: lib/Aion/Type.pm
+  Aion::Type::DNF:
+    file: lib/Aion/Type/DNF.pm
+  Aion::Type::Espresso:
+    file: lib/Aion/Type/Espresso.pm
   Aion::Type::Lim:
     file: lib/Aion/Type/Lim.pm
   Aion::Types:
@@ -80,7 +84,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion/issues
   homepage: https://github.com/darviarush/perl-aion
   repository: https://github.com/darviarush/perl-aion.git
-version: '2.3'
+version: '2.4'
 x_authority: cpan:DART
 x_contributors:
   - 'Iaroslav O. Kosmina <darviarush@mail.ru>'

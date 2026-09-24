@@ -1,5 +1,49 @@
 Revision history for Linux-Event
 
+0.117  2026-09-24
+    - Rewrite public POD with clearer constructor placement, callback
+      signatures, lifecycle explanations, and practical examples. Keep
+      SYNOPSIS examples compilable and validate code separately from prose.
+    - Exclude generated Inotify build files from distribution packaging.
+    - Make IO::TTY borrow supplied terminal handles by default so wrapping
+      STDIN/STDOUT does not make TTY close destroy the process standard
+      handles. Capture and temporarily apply nonblocking/close-on-exec
+      descriptor state, never close caller-owned handles on explicit close,
+      directional close, graceful end, or EOF, restore captured flags when the
+      complete borrowed TTY becomes terminal or detaches, and add
+      owns_handles => 1 for explicit ownership. Preserve Pipe and Stream
+      ownership semantics.
+    - Add an explicit Loop-aware fork contract with strict per-resource
+      dispositions. Loop->fork() is quiescent-only, rejects unsupported
+      combinations before the syscall where foreseeable, gives the child a
+      fresh epoll/timer reactor, and makes unlisted resources parent-only.
+      Listener supports share/move, Timer supports clone/move with preserved
+      absolute deadlines, Inotify supports independent clone or inherited
+      move, and established plain socket Stream supports move. Moved parent
+      objects become terminal/inert. A parent/child reconstruction handshake
+      prevents parent-side move teardown until the child is ready.
+    - Make accidental reuse of an inherited Loop after ordinary CORE::fork()
+      fail by process ownership checks across driving, registration,
+      introspection, statistics, and tuning operations. Deferred queues are
+      not inherited. Signal services are dismantled child-side without
+      modifying the parent's inherited signalfd state, and idle resolver
+      worker services are quiesced before managed fork; active resolution is
+      rejected.
+    - Add Linux::Event::Kernel::Inotify with explicit Loop attachment,
+      logical child Watch objects, decoded immutable Event values, named
+      per-event callbacks plus on_event, parent-level overflow/error handling,
+      shared-inode watch fan-out, rename-cookie preservation, reentrant-safe
+      cancellation/close, and bounded burst dispatch through Loop->defer().
+      Detached watches remain specifications until attachment; live watch
+      installation and failed attachment are synchronous and transactional.
+    - Add Loop->defer() for owner-interpreter, non-reentrant next-turn work.
+      Deliver eligible callbacks FIFO, force work queued during a deferred
+      drain to a later turn, provide an opaque cancelable one-shot handle,
+      retain pending work at Loop scope, preserve later work across callback
+      exceptions, and bound each drain to 1,024 queue entries. Use a lazy
+      private eventfd so deferred work participates in poll_fd()/poll()
+      foreign-loop integration without becoming a cross-thread callback queue.
+
 0.116  2026-09-20
     - Allow transition_to() to retire a live native consumer into an ordinary
       Perl Stream input sink while preserving unread ordered input natively

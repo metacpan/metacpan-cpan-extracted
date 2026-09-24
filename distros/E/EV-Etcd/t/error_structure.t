@@ -16,9 +16,8 @@ plan tests => 8;
 
 use_ok('EV::Etcd');
 
-# Test error structure when connecting to a non-existent endpoint
 my $client = EV::Etcd->new(
-    endpoints => ['127.0.0.1:29999'],  # Non-existent port
+    endpoints => ['127.0.0.1:29999'],
     timeout => 2,
     max_retries => 0,  # No retries to make test faster
 );
@@ -28,7 +27,6 @@ ok($client, 'client created with bad endpoint');
 my $error_received;
 my $got_response = 0;
 
-# Try a get operation - should fail with connection error
 $client->get('/test/key', sub {
     my ($resp, $err) = @_;
     $got_response = 1;
@@ -36,7 +34,6 @@ $client->get('/test/key', sub {
     EV::break;
 });
 
-# Timeout after 5 seconds
 my $timer = EV::timer(5, 0, sub {
     EV::break;
 });

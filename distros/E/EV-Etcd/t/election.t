@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -41,7 +39,6 @@ my $election_name = "test-election-$$-" . time();
 my $lease_id;
 my $leader_key;
 
-# Test 1-2: Grant a lease for the election
 $client->lease_grant(30, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'lease_grant succeeded');
@@ -55,7 +52,6 @@ EV::run;
 SKIP: {
     skip "no lease id", 15 unless $lease_id;
 
-    # Test 3-6: Campaign for leadership
     $client->election_campaign($election_name, $lease_id, "initial-value", sub {
         my ($resp, $err) = @_;
         ok(!$err, 'election_campaign succeeded');
@@ -81,7 +77,6 @@ SKIP: {
     SKIP: {
         skip "no leader key", 11 unless $leader_key;
 
-        # Test 7-9: Get current leader
         $client->election_leader($election_name, sub {
             my ($resp, $err) = @_;
             ok(!$err, 'election_leader succeeded');
@@ -99,7 +94,6 @@ SKIP: {
         my $t3 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
         EV::run;
 
-        # Test 10-11: Proclaim new value
         $client->election_proclaim($leader_key, "updated-value", sub {
             my ($resp, $err) = @_;
             ok(!$err, 'election_proclaim succeeded');
@@ -109,7 +103,6 @@ SKIP: {
         my $t4 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
         EV::run;
 
-        # Test 12-13: Verify updated value
         $client->election_leader($election_name, sub {
             my ($resp, $err) = @_;
             ok(!$err, 'election_leader after proclaim succeeded');
@@ -123,7 +116,6 @@ SKIP: {
         my $t5 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
         EV::run;
 
-        # Test 14-15: Resign leadership
         $client->election_resign($leader_key, sub {
             my ($resp, $err) = @_;
             ok(!$err, 'election_resign succeeded');
@@ -133,7 +125,6 @@ SKIP: {
         my $t6 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
         EV::run;
 
-        # Test 16: Verify no leader after resign
         $client->election_leader($election_name, sub {
             my ($resp, $err) = @_;
             ok($err, 'election_leader after resign returns error (no leader)');
@@ -147,14 +138,12 @@ SKIP: {
     }
 }
 
-# Test 17-22: election_observe streaming test
 {
     my $observe_election = "observe-test-$$-" . time();
     my $observe_lease_id;
     my @observed_events;
     my $observe_leader_key;
 
-    # Grant a lease for this test
     $client->lease_grant(30, sub {
         my ($resp, $err) = @_;
         $observe_lease_id = $resp->{id} if !$err;
@@ -166,7 +155,6 @@ SKIP: {
     SKIP: {
         skip "no observe lease id", 6 unless $observe_lease_id;
 
-        # Test 17-18: Start observing the election
         my $observe_handle = $client->election_observe($observe_election, sub {
             my ($resp, $err) = @_;
             if ($err) {
@@ -184,7 +172,6 @@ SKIP: {
         my $setup_wait = EV::timer(0.2, 0, sub { EV::break });
         EV::run;
 
-        # Test 18-19: Campaign for leadership (should trigger observe callback)
         $client->election_campaign($observe_election, $observe_lease_id, "observed-value", sub {
             my ($resp, $err) = @_;
             ok(!$err, 'election_campaign for observe test succeeded');
@@ -199,7 +186,6 @@ SKIP: {
         my $t8 = EV::timer(5, 0, sub { fail('timeout in observe campaign'); EV::break });
         EV::run;
 
-        # Wait for observe callback to fire - use a check watcher to poll
         my $wait_count = 0;
         my $check_timer;
         $check_timer = EV::timer(0.1, 0.1, sub {
@@ -212,19 +198,16 @@ SKIP: {
         my $timeout = EV::timer(3, 0, sub { undef $check_timer; EV::break });
         EV::run;
 
-        # Test 20: Verify we received at least one observed event
         ok(scalar(@observed_events) >= 1, 'received at least one observe event');
         if (@observed_events && $observed_events[0]->{kv}) {
             diag("First observed value: $observed_events[0]->{kv}{value}");
         }
 
-        # Test 21: Verify observed event has correct structure
         SKIP: {
             skip "no observed events", 1 unless @observed_events && $observed_events[0]->{kv};
             is($observed_events[0]->{kv}{value}, "observed-value", 'observed value matches campaign value');
         }
 
-        # Cleanup - resign and revoke lease
         if ($observe_leader_key) {
             $client->election_resign($observe_leader_key, sub { EV::break });
             my $t9 = EV::timer(2, 0, sub { EV::break });
@@ -239,7 +222,6 @@ SKIP: {
     }
 }
 
-# Cleanup - revoke the lease
 if ($lease_id) {
     $client->lease_revoke($lease_id, sub { EV::break });
     my $t8 = EV::timer(2, 0, sub { EV::break });

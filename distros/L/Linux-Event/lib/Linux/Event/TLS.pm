@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.116';
+our $VERSION = '0.117';
 
 use Carp qw(croak);
 use POSIX qw(isfinite);
@@ -335,89 +335,826 @@ __END__
 
 =head1 NAME
 
-Linux::Event::TLS - OpenSSL transport for Linux::Event stream sockets
+Linux::Event::TLS - OpenSSL TLS transport for Linux::Event Stream sockets
 
-=head1 DESCRIPTION
+=head1 SYNOPSIS
 
-TLS is transport policy for L<Linux::Event::IO::Sock::Stream>. It does not
-change framing, buffering, backpressure, or callback semantics.
+For a TLS server, configure TLS in the Listener's Stream recipe:
 
-For servers, normal application code configures TLS in the Listener's generated
-Stream recipe and does not need to C<use Linux::Event::TLS> directly:
+  use Linux::Event::Loop;
+  use Linux::Event::IO::Sock::Listener;
+
+  my $loop = Linux::Event::Loop->new;
 
   my $listener = Linux::Event::IO::Sock::Listener->new(
       loop => $loop,
       host => '0.0.0.0',
       port => 443,
+
       stream => {
           tls => {
-              cert_file => '/etc/app/server.crt',
-              key_file  => '/etc/app/server.key',
-              alpn      => ['h2', 'http/1.1'],
+              cert_file => '/etc/myapp/server.crt',
+              key_file  => '/etc/myapp/server.key',
+              alpn      => ['http/1.1'],
           },
-          on_data => sub ($stream, $bytes) { ... },
+
+          on_data => sub ($self, $bytes) {
+              ...
+          },
       },
   );
 
-The Listener validates the TLS recipe and builds one reusable OpenSSL
-C<SSL_CTX>. Every accepted connection creates only fresh per-connection
-C<SSL> state and binds it to the accepted file descriptor. The shared context
-uses OpenSSL reference counting, so established TLS Streams remain valid even
-if the Listener closes.
+For an outbound TLS client, declare TLS policy on a Stream subclass:
 
-A Stream subclass may provide ordinary C<tls_defaults()> policy without
-becoming a special TLS class:
+  package SecureClient;
+
+  use parent 'Linux::Event::IO::Sock::Stream';
+  use Linux::Event::TLS
+      verify => 1,
+      alpn   => ['http/1.1'];
+
+  sub on_data ($self, $bytes) {
+      ...
+  }
+
+  package main;
+
+  my $stream = SecureClient->connect(
+      loop => $loop,
+      host => 'example.com',
+      port => 443,
+
+      on_ready => sub ($self) {
+          $self->write("hello");
+      },
+  );
+
+=head1 DESCRIPTION
+
+C<Linux::Event::TLS> adds OpenSSL TLS transport to
+L<Linux::Event::IO::Sock::Stream>.
+
+TLS changes how bytes travel across the socket.
+
+It does not change the Stream's application model.
+
+A TLS Stream still uses the normal:
+
+  on_ready
+  on_data
+  on_message
+  write
+  send
+  backpressure
+  deadlines
+  close
+  end
+
+interfaces.
+
+Application callbacks see plaintext.
+
+If framing is enabled, the framer also sees plaintext.
+
+Conceptually:
+
+  socket
+    -> TLS encryption/decryption
+    -> ordered plaintext bytes
+    -> optional framing
+    -> application callback
+
+TLS is therefore transport policy, not a different public Stream class.
+
+=head1 THE NORMAL SERVER API
+
+Most TLS servers should configure TLS through
+L<Linux::Event::IO::Sock::Listener>.
+
+For example:
+
+  my $listener = Linux::Event::IO::Sock::Listener->new(
+      loop => $loop,
+      host => '0.0.0.0',
+      port => 9443,
+
+      stream => {
+          class => 'MyConnection',
+
+          tls => {
+              cert_file => '/etc/myapp/server.crt',
+              key_file  => '/etc/myapp/server.key',
+          },
+
+          on_data => sub ($self, $bytes) {
+              ...
+          },
+      },
+  );
+
+Ordinary server applications do not need to load C<Linux::Event::TLS>
+directly.
+
+The Listener loads the TLS provider when its Stream recipe contains:
+
+  tls => { ... }
+
+Without that C<tls> key, accepted Streams are plain.
+
+=head1 TLS DOES NOT CHANGE THE STREAM CLASS
+
+The same Stream subclass may be used by both plain and TLS Listeners.
+
+For example:
+
+  package MyConnection;
+
+  use parent 'Linux::Event::IO::Sock::Stream';
+
+  sub on_data ($self, $bytes) {
+      ...
+  }
+
+One Listener can use it plainly:
+
+  stream => {
+      class => 'MyConnection',
+  }
+
+while another can use TLS:
+
+  stream => {
+      class => 'MyConnection',
+
+      tls => {
+          cert_file => $cert_file,
+          key_file  => $key_file,
+      },
+  }
+
+The class describes application Stream behavior.
+
+The Listener recipe selects whether accepted connections use TLS.
+
+=head1 SERVER CERTIFICATE AND KEY
+
+A TLS server requires both:
+
+  cert_file
+  key_file
+
+For example:
+
+  tls => {
+      cert_file => '/etc/myapp/server.crt',
+      key_file  => '/etc/myapp/server.key',
+  }
+
+They must be supplied together.
+
+The Listener validates server TLS configuration before it begins accepting
+connections.
+
+Certificate and key loading therefore happens during Listener setup rather than
+being rediscovered independently for every accepted connection.
+
+=head1 PREPARED SERVER CONTEXT
+
+A TLS Listener prepares one reusable OpenSSL server context.
+
+Each accepted connection then creates its own per-connection TLS state while
+sharing the prepared server context.
+
+This means expensive server certificate and context setup does not need to be
+repeated from scratch for every accepted socket.
+
+Established connections remain valid if the Listener later closes because the
+shared OpenSSL context uses normal OpenSSL reference counting.
+
+=head1 SERVER TLS DEFAULTS
+
+A Stream subclass may define reusable server TLS defaults:
 
   package SecureConnection;
+
   use parent 'Linux::Event::IO::Sock::Stream';
 
   sub tls_defaults ($class) {
       return (
-          alpn              => ['echo/1'],
+          alpn              => ['my-protocol/1'],
           handshake_timeout => 10,
           shutdown_timeout  => 5,
       );
   }
 
-  sub on_data ($self, $bytes) { ... }
+These defaults are consulted when a Listener explicitly selects TLS:
 
-Listener C<stream =E<gt> { tls =E<gt> {...} }> values override those defaults.
-C<tls_defaults()> does not activate TLS by itself: an accepted connection is TLS
-only when its Listener recipe contains a C<tls> key. Certificate and key paths
-are normally deployment values in that Listener recipe. A Listener without a
-C<tls> recipe generates plain Streams and allocates no TLS state even when the
-Stream class defines C<tls_defaults()>.
+  stream => {
+      class => 'SecureConnection',
+
+      tls => {
+          cert_file => $cert_file,
+          key_file  => $key_file,
+      },
+  }
+
+Values in the Listener's C<tls> hash override C<tls_defaults()>.
+
+C<tls_defaults()> does B<not> activate TLS by itself.
+
+A Listener without:
+
+  tls => { ... }
+
+still produces plain Streams even when the Stream class defines
+C<tls_defaults()>.
+
+Certificate and key paths are therefore normally deployment configuration in
+the Listener recipe rather than hard-coded into a protocol class.
 
 =head1 SERVER TLS OPTIONS
 
-Listener server TLS accepts C<cert_file>, C<key_file>, C<alpn>,
-C<handshake_timeout>, and C<shutdown_timeout>. The certificate and key are
-required together. Handshake and shutdown timeouts default to 10 and 5 seconds;
-zero disables the corresponding timeout.
+The normal Listener C<tls> recipe accepts:
 
-C<on_ready> runs only after the handshake succeeds. Application data callbacks
-receive plaintext. C<selected_alpn>, C<tls_protocol>, C<tls_cipher>, and
-C<tls_stats> on the Stream report the established transport.
+  cert_file
+  key_file
+  alpn
+  handshake_timeout
+  shutdown_timeout
 
-=head1 CLIENT AND DIRECT TRANSPORT API
+C<cert_file> and C<key_file> are required.
 
-C<< Linux::Event::TLS->client(...) >> and C<< Linux::Event::TLS->server(...) >>
-remain available when an application wants to construct a transport object
-directly. Existing subclass declarations with C<use Linux::Event::TLS ...> also
-remain supported for explicit class-level acquisition policy, including
-outbound client verification.
+=head1 OUTBOUND TLS CLIENTS
 
-Client verification is enabled by default. C<server_name> is required by the
-direct client constructor; C<ca_file> and C<ca_path> optionally override trust
-roots. C<alpn>, C<handshake_timeout>, and C<shutdown_timeout> work in both
-roles.
+For outbound connections, TLS policy can be declared on the Stream subclass:
 
-=head1 TRANSPORT MODEL
+  package HTTPSConnection;
 
-OpenSSL owns handshake state, cryptography, verification, ALPN, retry
-direction, and TLS close notification. Linux::Event's ordered-byte engine owns
-readiness, plaintext buffering, framing, backpressure, protocol transitions,
-and established Stream deadlines.
+  use parent 'Linux::Event::IO::Sock::Stream';
+  use Linux::Event::TLS
+      verify => 1,
+      alpn   => ['http/1.1'];
 
-TLS uses the native transport ABI directly. It does not install a per-I/O Perl
-callback layer.
+Then connect normally:
+
+  my $stream = HTTPSConnection->connect(
+      loop => $loop,
+      host => 'example.com',
+      port => 443,
+
+      on_ready => sub ($self) {
+          ...
+      },
+  );
+
+The same Stream object exists through:
+
+  DNS resolution
+  socket connection
+  TLS handshake
+  certificate verification
+  normal application I/O
+  final close
+
+Linux::Event does not replace it with a second TLS-specific application object.
+
+=head1 CLIENT SERVER NAME
+
+TLS clients need a server identity for SNI and hostname verification.
+
+When a TLS-declared Stream uses:
+
+  ->connect(
+      host => 'example.com',
+      port => 443,
+  )
+
+the connection host is used as the TLS server name by default.
+
+Usually no additional option is necessary.
+
+Use an explicit class declaration only when the verified TLS identity must
+differ from the connection host:
+
+  use Linux::Event::TLS
+      server_name => 'service.example.com';
+
+Bracketed IPv6-style server names are normalized before use.
+
+An empty server name is rejected.
+
+=head1 CLIENT VERIFICATION
+
+Client certificate verification is enabled by default:
+
+  verify => 1
+
+This includes certificate-chain and hostname verification.
+
+It may be disabled explicitly:
+
+  verify => 0
+
+Disabling verification removes an important security property and should only
+be done when the application deliberately provides some other trust model.
+
+A verification failure is reported as a structured
+L<Linux::Event::Error> with TLS context rather than allowing the connection to
+become application-ready.
+
+=head1 CUSTOM TRUST ROOTS
+
+A TLS client may override the trust roots with:
+
+  ca_file => '/path/to/ca.pem'
+
+or:
+
+  ca_path => '/path/to/ca-directory'
+
+For example:
+
+  package InternalClient;
+
+  use parent 'Linux::Event::IO::Sock::Stream';
+  use Linux::Event::TLS
+      ca_file => '/etc/myapp/private-ca.pem';
+
+These options affect client verification.
+
+=head1 WHEN ON_READY RUNS
+
+For a plain outbound Stream, C<on_ready> means the socket connection has been
+established.
+
+For a TLS Stream, C<on_ready> runs only after:
+
+  socket connection
+  TLS handshake
+  required certificate verification
+  hostname verification
+
+have succeeded.
+
+For example:
+
+  on_ready => sub ($self) {
+      $self->write("application data");
+  }
+
+can begin the application protocol without separately checking whether the TLS
+handshake has finished.
+
+The same rule applies to accepted TLS Streams.
+
+A Listener's C<on_accept> runs before the accepted TLS Stream has necessarily
+completed its handshake.
+
+The Stream's C<on_ready> is the application-level notification that the TLS
+transport is ready.
+
+=head1 PLAINTEXT CALLBACKS
+
+Application input callbacks receive decrypted bytes:
+
+  on_data => sub ($self, $bytes) {
+      ...
+  }
+
+A framed TLS Stream also frames plaintext:
+
+  socket ciphertext
+      ->
+  OpenSSL
+      ->
+  plaintext ordered bytes
+      ->
+  Linux::Event::Framer
+      ->
+  on_message
+
+Applications do not need separate TLS-aware framing logic.
+
+=head1 WRITING BEFORE THE HANDSHAKE
+
+The normal Stream output queue remains available while a TLS connection is
+being established.
+
+For example:
+
+  my $stream = SecureClient->connect(
+      host => 'example.com',
+      port => 443,
+      ...
+  );
+
+  $stream->write("hello");
+
+can queue plaintext before C<on_ready>.
+
+The queued bytes are not sent as plaintext on the socket.
+
+They remain ordered Stream output and are processed by the TLS transport once
+the connection becomes usable.
+
+Backpressure and hard pending-output limits continue to apply.
+
+=head1 ALPN
+
+TLS server and client policy may include:
+
+  alpn => ['h2', 'http/1.1']
+
+Each ALPN protocol name must be a byte string between 1 and 255 bytes.
+
+The complete encoded ALPN list must fit within 65,535 bytes.
+
+After negotiation, a Stream can inspect the selected protocol:
+
+  my $protocol = $stream->selected_alpn;
+
+If no protocol was selected, the result may be undefined.
+
+=head1 TLS INFORMATION
+
+An established TLS Stream provides transport information without requiring
+application code to reach into the OpenSSL provider.
+
+=head2 selected_alpn
+
+  my $alpn = $stream->selected_alpn;
+
+Return the negotiated ALPN protocol when one was selected.
+
+=head2 tls_protocol
+
+  my $version = $stream->tls_protocol;
+
+Return the negotiated TLS protocol version, such as:
+
+  TLSv1.3
+
+=head2 tls_cipher
+
+  my $cipher = $stream->tls_cipher;
+
+Return the negotiated TLS cipher description when available.
+
+=head2 tls_stats
+
+  my $stats = $stream->tls_stats;
+
+Return native TLS statistics for the Stream.
+
+This is primarily useful for diagnostics, testing, and performance
+investigation.
+
+=head1 HANDSHAKE TIMEOUT
+
+=head2 handshake_timeout
+
+The TLS handshake timeout defaults to:
+
+  10
+
+seconds.
+
+For example:
+
+  tls => {
+      cert_file         => $cert_file,
+      key_file          => $key_file,
+      handshake_timeout => 5,
+  }
+
+or for a client declaration:
+
+  use Linux::Event::TLS
+      handshake_timeout => 5;
+
+The value is a non-negative number of seconds.
+
+Fractional values are allowed.
+
+A value of:
+
+  0
+
+disables the handshake timeout.
+
+This timeout belongs specifically to TLS handshake progress.
+
+It is separate from the Stream connection-acquisition timeout and from
+established Stream idle/read/write deadlines.
+
+=head1 SHUTDOWN TIMEOUT
+
+=head2 shutdown_timeout
+
+Graceful TLS shutdown has its own timeout.
+
+The default is:
+
+  5
+
+seconds.
+
+A value of zero disables it.
+
+This timeout is used when Linux::Event performs the TLS close-notification
+exchange during graceful Stream shutdown.
+
+=head1 TIMEOUT LAYERS
+
+The lifecycle deliberately has separate timeout ownership:
+
+  resolve/connect
+      ->
+  TLS handshake
+      ->
+  established Stream I/O
+      ->
+  TLS shutdown
+
+The Stream connection C<timeout> covers connection acquisition.
+
+C<handshake_timeout> covers TLS negotiation.
+
+Established C<idle_timeout>, C<read_timeout>, C<write_timeout>, and explicit
+Stream deadlines apply after the transport becomes ready.
+
+C<shutdown_timeout> covers graceful TLS shutdown.
+
+Keeping these separate makes timeout errors identify the actual lifecycle stage
+that failed.
+
+=head1 PAUSING APPLICATION INPUT
+
+C<pause_read> pauses application plaintext delivery.
+
+It does not prevent TLS from processing control traffic required for:
+
+  handshake progress
+  pending writes
+  graceful shutdown
+
+For example:
+
+  $stream->pause_read;
+
+can withhold application C<on_data> callbacks while OpenSSL still makes the
+protocol progress needed to establish or maintain the transport.
+
+C<resume_read> later resumes plaintext application delivery.
+
+=head1 GRACEFUL SHUTDOWN
+
+C<end> retains the ordinary Stream meaning:
+
+  $stream->end;
+
+Accepted plaintext output is drained in order.
+
+Linux::Event then performs the TLS transport's graceful writable shutdown,
+including TLS C<close_notify> handling.
+
+A peer C<close_notify> becomes normal readable EOF.
+
+C<close> remains immediate:
+
+  $stream->close;
+
+It does not promise that queued output or a graceful TLS shutdown exchange will
+finish first.
+
+=head1 UNCLEAN TLS EOF
+
+TLS distinguishes a proper protocol close from the underlying socket simply
+disappearing.
+
+A valid peer C<close_notify> enters the normal Stream EOF lifecycle.
+
+If the underlying socket reaches EOF without the required TLS close semantics,
+Linux::Event reports a TLS read error instead of silently treating that as a
+clean encrypted shutdown.
+
+=head1 TLS ERRORS
+
+TLS failures are reported using L<Linux::Event::Error>.
+
+For example, certificate verification failure produces an error with:
+
+  type       tls
+  operation  handshake
+
+Other TLS failures may identify operations such as:
+
+  read
+  write
+  shutdown
+
+The error message retains the useful OpenSSL diagnostic where available.
+
+=head1 CLASS-LEVEL TLS DECLARATIONS
+
+The declaration form:
+
+  package SecureClient;
+
+  use parent 'Linux::Event::IO::Sock::Stream';
+  use Linux::Event::TLS
+      verify => 1;
+
+must appear after the Stream parent has been established.
+
+This is invalid:
+
+  package SecureClient;
+
+  use Linux::Event::TLS;
+  use parent 'Linux::Event::IO::Sock::Stream';
+
+because Linux::Event must first know that the target class is a Stream subclass.
+
+A concrete Stream class may declare TLS only once.
+
+=head1 CLASS DECLARATION OPTIONS
+
+A class-level C<use Linux::Event::TLS ...> declaration recognizes:
+
+  cert_file
+  key_file
+  server_name
+  verify
+  ca_file
+  ca_path
+  alpn
+  handshake_timeout
+  shutdown_timeout
+
+Unknown options are rejected during class setup.
+
+C<cert_file> and C<key_file> must appear together when supplied.
+
+For normal accepted server connections, prefer the Listener C<tls> recipe
+rather than embedding deployment credentials in the Stream class.
+
+=head1 DIRECT CLIENT TRANSPORT
+
+Advanced code may create a TLS client transport object directly:
+
+  my $tls = Linux::Event::TLS->client(
+      server_name => 'localhost',
+      ca_file     => $ca_file,
+      alpn        => ['my-protocol/1'],
+  );
+
+and supply it to an already-connected Stream:
+
+  my $stream = MyStream->new(
+      loop      => $loop,
+      fh        => $socket,
+      transport => $tls,
+  );
+
+The direct client API requires C<server_name> explicitly.
+
+It accepts:
+
+  server_name
+  verify
+  ca_file
+  ca_path
+  alpn
+  handshake_timeout
+  shutdown_timeout
+
+Verification defaults to enabled.
+
+Most ordinary outbound applications should use a TLS-declared Stream subclass
+and C<connect()> instead.
+
+=head1 DIRECT SERVER TRANSPORT
+
+Advanced code may construct a server transport directly:
+
+  my $tls = Linux::Event::TLS->server(
+      cert_file => $cert_file,
+      key_file  => $key_file,
+      alpn      => ['my-protocol/1'],
+  );
+
+and bind it to an already-connected Stream:
+
+  my $stream = MyStream->new(
+      loop      => $loop,
+      fh        => $accepted_socket,
+      transport => $tls,
+  );
+
+The direct server API accepts:
+
+  cert_file
+  key_file
+  alpn
+  handshake_timeout
+  shutdown_timeout
+
+For normal listening servers, the Listener recipe is simpler and more
+efficient because it prepares reusable server context before connections are
+accepted.
+
+=head1 ADOPTED TLS SOCKETS
+
+A Stream class with explicit TLS acquisition policy cannot guess whether an
+already-connected adopted handle should perform the client or server handshake.
+
+Advanced adopted-handle use must therefore supply the appropriate transport or
+explicit TLS role required by the Stream API.
+
+Normal C<connect()> and Listener acceptance do not have this ambiguity because
+the role is known from how the socket was acquired.
+
+=head1 DETACHING
+
+A live encrypted Stream cannot be detached as though its file descriptor were a
+plain socket:
+
+  $stream->detach;
+
+is rejected while a non-plain TLS transport is active.
+
+The OpenSSL state and the socket descriptor together represent the transport;
+returning only the bare descriptor would lose required TLS state.
+
+=head1 PROTOCOL TRANSITIONS
+
+C<transition_to()> changes application protocol policy while keeping the current
+byte transport.
+
+For a TLS Stream, that means TLS remains TLS across the transition.
+
+For example:
+
+  TLS socket
+      ->
+  HTTP parser
+      ->
+  WebSocket parser
+
+can change application protocol handling without recreating the socket or
+discarding encryption.
+
+Transport replacement itself is not currently a public protocol-transition
+operation.
+
+=head1 PERFORMANCE MODEL
+
+TLS uses Linux::Event's native transport ABI.
+
+OpenSSL handles:
+
+  handshake
+  encryption and decryption
+  certificate verification
+  hostname verification
+  ALPN
+  TLS retry direction
+  close notification
+
+Linux::Event continues to handle:
+
+  epoll readiness
+  plaintext buffering
+  framing
+  output ordering
+  backpressure
+  protocol transitions
+  established Stream deadlines
+
+TLS does not install a Perl callback between every encrypted read or write.
+
+Plain Streams do not allocate TLS state and retain their direct native socket
+path.
+
+=head1 OPENSSL REQUIREMENT
+
+Linux::Event's TLS extension is built against OpenSSL 1.1.1 or newer.
+
+The OpenSSL dependency is isolated to the TLS extension.
+
+The reactor and plain ordered-byte engine do not require OpenSSL for ordinary
+plain I/O.
+
+=head1 SEE ALSO
+
+L<Linux::Event>,
+L<Linux::Event::Loop>,
+L<Linux::Event::IO::Sock::Stream>,
+L<Linux::Event::IO::Sock::Listener>,
+L<Linux::Event::Framer>,
+L<Linux::Event::Error>,
+F<docs/TRANSPORT-BOUNDARY.md>,
+F<docs/SOCKET-CONNECTIONS.md>.
+
+=cut

@@ -69,9 +69,11 @@ t/concurrent.t
 t/election.t
 t/encoding.t
 t/error_structure.t
+t/failover.t
 t/fork.t
 t/kv.t
 t/kv_advanced.t
+t/keepalive.t
 t/keepalive_renewal.t
 t/lease.t
 t/limits.t
@@ -82,6 +84,8 @@ t/parameters.t
 t/reconnect_drop.t
 t/retry_config.t
 t/streaming.t
+t/threads.t
+t/tls.t
 t/txn.t
 t/txn_range.t
 t/watch_prev_kv.t

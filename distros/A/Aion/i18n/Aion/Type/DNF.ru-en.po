@@ -1,0 +1,62 @@
+msgid "Aion::Type::DNF - приведение типа-выражения к ДНФ эквивалентными преобразованиями"
+msgstr "Aion::Type::DNF - casting an expression type to DNF by equivalent conversions"
+
+msgid "Это роль, которую включает в себя `Aion::Type`. Содержит служебные методы для развёртки типа-выражения (комбинации `&`, `|`, `~`) в **ДНФ — дизъюнктивную нормальную форму**."
+msgstr "This is the role that `Aion::Type` includes. Contains utility methods for expanding an expression type (combinations `&`, `|`, `~`) into **DNF - disjunctive normal form**."
+
+msgid "Этот модуль реализует алгоритм №1 из списка способов построения ДНФ:"
+msgstr "This module implements algorithm No. 1 from the list of methods for constructing DNFs:"
+
+msgid ""
+"1. **Эквивалентные преобразования на основе законов булевой алгебры** ✅ (реализовано здесь).\n"
+"2. Метод таблиц истинности (построение СДНФ).\n"
+"3. Алгоритм Цейтина (введение «мусорных» переменных).\n"
+"4. Алгоритмы на основе BDD (Binary Decision Diagrams)."
+msgstr ""
+"1. **Equivalent transformations based on the laws of Boolean algebra** ✅ (implemented here).\n"
+"2. Truth table method (construction of SDNF).\n"
+"3. Tseitin’s algorithm (introduction of “garbage” variables).\n"
+"4. Algorithms based on BDD (Binary Decision Diagrams)."
+
+msgid "Пояснение остальных вариантов (для контекста):"
+msgstr "Explanation of the remaining options (for context):"
+
+msgid ""
+"* **Метод таблиц истинности (СДНФ)** — перебирает все наборы значений переменных и собирает совершенную ДНФ по единицам функции. Экспоненциален по числу переменных и потому неприменим к «большим» типам.\n"
+"* **Алгоритм Цейтина** — вводит вспомогательные переменные и строит КНФ с линейным размером (в основном для SAT-решателей), а не ДНФ.\n"
+"* **BDD** — сворачивает дерево решений, разделяя одинаковые поддеревья."
+msgstr ""
+"* **Truth Table Method (TRMT)** - iterates through all sets of variable values and collects a perfect DNF based on the units of the function. It is exponential in the number of variables and therefore is not applicable to “large” types.\n"
+"* **Tseitin's algorithm** - introduces auxiliary variables and builds CNF with linear size (mainly for SAT solvers), rather than DNF.\n"
+"* **BDD** - collapses the decision tree, separating identical subtrees."
+
+msgid "Здесь же ДНФ получается чисто алгебраически: раскрытием скобок по закону дистрибутивности."
+msgstr "Here the DNF is obtained purely algebraically: by opening the brackets according to the law of distributivity."
+
+msgid "Общая цепочка преобразований (см. метод `_simplify` в `Aion::Type`):"
+msgstr "General chain of transformations (see `_simplify` method in `Aion::Type`):"
+
+msgid "Каждый шаг — эквивалентное преобразование по законам булевой алгебры:"
+msgstr "Each step is an equivalent transformation according to the laws of Boolean algebra:"
+
+msgid ""
+"- **`_unfolding`** — раскрывает цепочку ограничивающих типов `A as B as C` в эквивалентное пересечение `A & B & C` «в лоб», не допуская совмещения с уже множественно-теоретическими операциями.\n"
+"- **`_pushing`** — «проталкивает» отрицания к термам по законам де Моргана и инверсии диапазонов/перечислений: `~(A | B) => ~A & ~B`, `~(A & B) => ~A | ~B`, `~~A => A`.\n"
+"- **`_distribute`** — применяет закон дистрибутивности и раскрывает пересечение объединений в объединение пересечений (ДНФ):"
+msgstr ""
+"- **`_unfolding`** - opens the chain of limiting types `A as B as C` into an equivalent intersection of `A & B & C` “head-on”, preventing combination with already set-theoretical operations.\n"
+"- **`_pushing`** — “pushes” negations to terms according to De Morgan’s laws and inversion of ranges/enumerations: `~(A | B) => ~A & ~B`, `~(A & B) => ~A | ~B`, `~~A => A`.\n"
+"- **`_distribute`** - applies the law of distributivity and expands the intersection of unions into an intersection union (DNF):"
+
+msgid "  Пересечения/объединения затем сворачиваются вспомогательными функциями `_intersection` и `_union`, которые приводят термы (по диапазонам — `_intersection_ranges`/`_union_ranges`, по перечислениям — `_union_enums`/`_intersection_enums`)."
+msgstr "Intersections/unions are then collapsed by auxiliary functions `_intersection` and `_union`, which result in terms (by ranges - `_intersection_ranges`/`_union_ranges`, by enumerations - `_union_enums`/`_intersection_enums`)."
+
+msgid "Терм считается атомом: тип без множественно-теоретических операторов либо явно выделенные «куски» после `_unfolding` и `_pushing`."
+msgstr "A term is considered an atom: a type without set-theoretic operators or explicitly allocated \"chunks\" after `_unfolding` and `_pushing`."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Type::DNF module is copyright © 2026 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Type::DNF module is copyright © 2026 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

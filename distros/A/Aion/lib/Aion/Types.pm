@@ -859,14 +859,14 @@ C<coerce> throws exceptions:
 
 Standard casts:
 
-	# Str from Undef — empty string
+	# Str from Undef – empty string
 	Str->coerce(undef) # -> ""
 	
-	# Int from Num — rounded integer
+	# Int from Num – rounded integer
 	Int->coerce(2.5)  # -> 3
 	Int->coerce(-2.5) # -> -3
 	
-	# Bool from Any — 1 or ""
+	# Bool from Any – 1 or ""
 	Bool->coerce([]) # -> 1
 	Bool->coerce(0)  # -> ""
 

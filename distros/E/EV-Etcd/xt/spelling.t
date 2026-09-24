@@ -6,7 +6,6 @@ use Test::More;
 eval "use Test::Spelling 0.20; 1"
     or plan skip_all => 'Test::Spelling 0.20 required';
 
-# Project-specific terms that aren't in any dictionary
 add_stopwords(qw(
     Async EV NOSPACE READWRITE
     async backoff defragment reconnection ttl txn
@@ -19,7 +18,8 @@ add_stopwords(qw(
     learner linearizable longjmp memberid mTLS mvccpb
     namespace observe param params pre prev_kv prev_kvs proclaim
     progress_notify protobufs raft RPC RPCs runtime serializable
-    serialize Sub-packages subkey subprocess SvUTF8 sync TLS TTL
+    serialize Sub-packages subkey subprocess SvUTF8 sync TLS tls TTL
+    PEM SNI macOS
     UTF UV-cant userland vmactions watch_id YK
     Yegor Korablev vividsnow
 ));

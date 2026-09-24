@@ -31,12 +31,11 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Time::Piece" : "0"
-         },
          "requires" : {
             "Carp" : "0",
+            "IP::Geolocation::MMDB" : "0",
             "Scalar::Util" : "0",
+            "Time::Piece" : "0",
             "perl" : "5.006"
          }
       },
@@ -54,6 +53,6 @@
          "web" : "https://github.com/vvelox/Algorithm-ToNumberMunger"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.1.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

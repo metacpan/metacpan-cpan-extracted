@@ -575,7 +575,7 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
     }
     env_rv = newRV_noinc((SV *)env);
     resp = hm_call_app(aTHX_ loop, env_rv);
-    loop->requests++;
+    hm_count_request(loop);
 
     if (resp && hm_is_awaitable(aTHX_ resp)) {
         SV *cb = hm_closure(aTHX_ hm_xs_h2park_cb, NULL, NULL, NULL,

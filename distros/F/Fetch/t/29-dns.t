@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Test::More;
 use Fetch;
-use IO::Socket::IP;
 use Time::HiRes ();
 
 # Resolving a name without stopping the loop (include/fetch/ft_dns.h).
@@ -59,15 +58,18 @@ plan skip_all => 'name resolution is inline in this build (no pthreads)'
 #
 # Bound through the name rather than the number, so the request has to go
 # through the resolver to find it at all. IO::Socket::IP so that whichever
-# family localhost prefers here is the one we listen on.
+# family localhost prefers here is the one we listen on - it is core from
+# 5.20 only, and this dist runs back to 5.8, so the block skips without it.
 SKIP: {
+    skip 'IO::Socket::IP not installed', 3
+        unless eval { require IO::Socket::IP; 1 };
     my $srv = IO::Socket::IP->new(LocalHost => 'localhost', LocalPort => 0,
                                   Listen => 5, ReuseAddr => 1);
-    skip 'cannot bind localhost', 2 unless $srv;
+    skip 'cannot bind localhost', 3 unless $srv;
     my $port = $srv->sockport;
 
     my $pid = fork;
-    skip "fork: $!", 2 unless defined $pid;
+    skip "fork: $!", 3 unless defined $pid;
     if (!$pid) {
         # Nothing in a forked child may hold the harness's TAP pipe, or the
         # harness reads until an EOF that never comes.

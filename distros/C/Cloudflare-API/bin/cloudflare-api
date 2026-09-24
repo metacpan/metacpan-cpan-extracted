@@ -1,0 +1,1117 @@
+#!/usr/bin/env perl
+#
+#  This file is part of Cloudflare::API.
+#
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
+#
+#  Full license text is available at:
+#
+#  <http://dev.perl.org/licenses/>
+#
+
+
+#
+#  Call Cloudflare management API methods from the command line
+#
+package main;
+
+
+#  Compiler pragmas
+#
+use strict qw(vars);
+use vars   qw($VERSION);
+use warnings;
+
+
+#  Use the base module
+#
+use Cloudflare::API;
+
+
+#  External modules
+#
+use Getopt::Long;
+use Pod::Usage;
+use JSON::PP;
+use Data::Dumper;
+use FindBin qw($Script);
+use IPC::Open3;
+use File::Spec;
+
+
+#  Local customisation
+#
+local $Data::Dumper::Indent=1;
+local $Data::Dumper::Sortkeys=1;
+
+
+#  Version Info, must be all one line for MakeMaker, CPAN.
+#
+$VERSION='1.010';
+
+
+#  Only supported resource methods may be called by name. Each method records
+#  the minimum and maximum number of positional --arg values it accepts.
+#
+my %resource_method=(
+    accounts => {
+        list => [0, 0], get => [1, 1]
+    },
+    zones => {
+        list => [0, 0], get => [1, 1]
+    },
+    workers => {
+        list_scripts        => [0, 0], search_scripts      => [0, 0],
+        inspect_script      => [0, 0], get_settings        => [1, 1],
+        get_script_settings => [1, 1], upload_script       => [1, 1],
+        upload_version      => [1, 1], list_versions       => [1, 1],
+        get_version         => [2, 2], upload_assets       => [2, 2],
+        delete_script       => [1, 1], list_deployments    => [1, 1],
+        create_deployment   => [2, 2], get_deployment      => [2, 2],
+        list_secrets        => [1, 1], add_secret          => [2, 2],
+        delete_secret       => [2, 2], get_subdomain       => [1, 1],
+        set_subdomain       => [2, 2], list_routes         => [1, 1],
+        create_route        => [2, 2], update_route        => [3, 3],
+        delete_route        => [2, 2]
+    },
+    r2 => {
+        list_buckets => [0, 0], get_bucket    => [1, 1],
+        create_bucket => [1, 1], update_bucket => [2, 2],
+        delete_bucket => [1, 1]
+    },
+    kv => {
+        list_namespaces => [0, 0], get_namespace    => [1, 1],
+        create_namespace => [1, 1], rename_namespace => [2, 2],
+        delete_namespace => [1, 1], list_keys        => [1, 1],
+        get_value        => [2, 2], put_value        => [3, 3],
+        delete_value     => [2, 2]
+    },
+    d1 => {
+        list_databases => [0, 0], get_database   => [1, 1],
+        create_database => [1, 1], delete_database => [1, 1],
+        update_database => [2, 2], query_database => [2, 2],
+        query_sql       => [2, 3]
+    },
+    queues => {
+        list_queues     => [0, 0], get_queue       => [1, 1],
+        create_queue    => [1, 1], delete_queue    => [1, 1],
+        update_queue    => [2, 2], list_consumers  => [1, 1],
+        create_consumer => [2, 2], delete_consumer => [2, 2]
+    },
+    hyperdrive => {
+        list_configs => [0, 0], get_config    => [1, 1],
+        create_config => [1, 1], replace_config => [2, 2],
+        update_config => [2, 2], delete_config  => [1, 1]
+    },
+    secrets_store => {
+        list_stores   => [0, 0], get_store     => [1, 1],
+        create_store  => [1, 1], delete_store  => [1, 1],
+        list_secrets  => [1, 1], get_secret    => [2, 2],
+        create_secret => [2, 2], update_secret => [3, 3],
+        delete_secret => [2, 2], get_quota     => [0, 0]
+    }
+);
+
+
+#  Completion metadata is kept beside the parser it describes. The renderer is
+#  loaded only when completion output is requested.
+#
+my $completion_option_ar=[
+    ['--resource',             'resource', 'Cloudflare resource'],
+    ['--action',               'action',   'resource action'],
+    ['--method',               'method',   'raw HTTP method'],
+    ['--path',                 'value',    'raw API path'],
+    ['--account-id',           'value',    'Cloudflare account ID'],
+    ['--auth',                 'auth',     'authentication source'],
+    ['--output',               'output',   'output format'],
+    ['--full-response',        'flag',     'retain the Cloudflare response envelope'],
+    ['--no-full-response',     'flag',     'unwrap the Cloudflare result'],
+    ['--paginate',             'flag',     'follow result pages'],
+    ['--no-paginate',          'flag',     'do not follow result pages'],
+    ['--max-pages',            'value',    'maximum pages'],
+    ['--per-page',             'value',    'results per page'],
+    ['--help',                 'flag',     'show usage'],
+    ['-h',                     'flag',     'show usage'],
+    ['-?',                     'flag',     'show usage'],
+    ['--man',                  'flag',     'show the manual'],
+    ['--version',              'flag',     'show the version'],
+    ['--dump-opt',             'flag',     'show parsed arguments without a request'],
+    ['--asset',                'file',     'add a Worker asset file'],
+    ['--asset-list-json',      'file',     'read a JSON asset list'],
+    ['--asset-list-text',      'file',     'read a line-based asset list'],
+    ['--asset-list-stdin',     'flag',     'read an asset list from standard input'],
+    ['--arg',                  'value',    'append a string argument'],
+    ['--arg-bool',             'bool',     'append a boolean argument'],
+    ['--arg-array',            'value',    'append a JSON array argument'],
+    ['--arg-hash',             'value',    'append a JSON object argument'],
+    ['--arg-json',             'value',    'append a JSON argument'],
+    ['--arg-json-file',        'file',     'read a JSON argument from a file'],
+    ['--arg-dumper-file',      'file',     'read a Data::Dumper argument from a file'],
+    ['--param',                'value',    'set a string named parameter'],
+    ['--param-bool',           'value',    'set a boolean named parameter'],
+    ['--param-json',           'value',    'set a JSON named parameter'],
+    ['--param-json-file',      'file',     'read a JSON named parameter from a file'],
+    ['--param-dumper-file',    'file',     'read a Data::Dumper parameter from a file'],
+    ['--generate-completion',  'shell',    'generate offline shell completion']
+];
+
+
+#  Run main. Keep the script loadable by the local test suite.
+#
+exit main(\@ARGV) unless caller();
+
+
+#============================================================================
+
+
+sub main {
+
+
+    #  Get arguments and command line options
+    #
+    my $argv_ar=shift();
+    my (%opt, @arg, %param, @asset_source, @argument_source);
+    my $getopt_or=Getopt::Long::Parser->new(config => [qw(permute)]);
+    $getopt_or->getoptionsfromarray(
+        $argv_ar,
+        \%opt,
+        my @opt=(
+        'resource=s',
+        'action=s',
+        'method=s',
+        'path=s',
+        'account-id=s',
+        'auth=s',
+        'output=s',
+        'full-response!',
+        'paginate!',
+        'max-pages=i',
+        'per-page=i',
+        'help|h|?',
+        'man',
+        'version',
+        'generate-completion=s',
+        'dump_opt|dump-opt|opt',
+        'asset=s' => sub { push(@asset_source, ['file', $_[1]]) },
+        'asset-list-json=s' => sub { push(@asset_source, ['json', $_[1]]) },
+        'asset-list-text=s' => sub { push(@asset_source, ['text', $_[1]]) },
+        'asset-list-stdin' => sub { push(@asset_source, ['stdin']) },
+        'arg=s' => sub { push(@argument_source, ['argument', typed_value('string', $_[1])]) },
+        'arg-bool=s' => sub { push(@argument_source, ['argument', typed_value('bool', $_[1])]) },
+        'arg-array=s' => sub { push(@argument_source, ['argument', typed_value('array', $_[1])]) },
+        'arg-hash=s' => sub { push(@argument_source, ['argument', typed_value('hash', $_[1])]) },
+        'arg-json=s' => sub { push(@argument_source, ['argument', typed_value('json', $_[1])]) },
+        'arg-json-file=s' => sub { push(@argument_source, ['argument', typed_value('json-file', $_[1])]) },
+        'arg-dumper-file=s' => sub { push(@argument_source, ['argument', typed_value('dumper-file', $_[1])]) },
+        'param=s' => sub { my ($key, $value)=parse_named('string', $_[1]); $param{$key}=$value },
+        'param-bool=s' => sub { my ($key, $value)=parse_named('bool', $_[1]); $param{$key}=$value },
+        'param-json=s' => sub { my ($key, $value)=parse_named('json', $_[1]); $param{$key}=$value },
+        'param-json-file=s' => sub { my ($key, $value)=parse_named('json-file', $_[1]); $param{$key}=$value },
+        'param-dumper-file=s' => sub { my ($key, $value)=parse_named('dumper-file', $_[1]); $param{$key}=$value },
+        '<>' => sub { push(@argument_source, ['bare', $_[0]]) }
+        )
+    ) || pod2usage(2);
+    pod2usage(1) if $opt{'help'};
+    pod2usage(-verbose => 2, -exitval => 0) if $opt{'man'};
+    $opt{'version'} && do {print "$Script $VERSION\n"; return 0};
+
+
+
+    #  Generate completion before validating a request or resolving credentials
+    #
+    if (defined($opt{'generate-completion'})) {
+        require Cloudflare::API::CLI::Completion;
+        print Cloudflare::API::CLI::Completion::generate(
+            $opt{'generate-completion'}, {
+                resources => \%resource_method,
+                options   => $completion_option_ar
+            }
+        );
+        return 0;
+    }
+
+
+
+    #  Resolve bare selection operands, then retain later operands as arguments
+    #
+    my $raw_fg=defined($opt{'method'})||defined($opt{'path'});
+    push(@argument_source, map { ['bare', $_] } @$argv_ar);
+    @$argv_ar=();
+    foreach my $source_ar (@argument_source) {
+        my ($type, $value)=@$source_ar;
+        die "unexpected positional arguments\n" if $raw_fg&&$type eq 'bare';
+        if ($type eq 'bare'&&!defined($opt{'resource'})) {
+            $opt{'resource'}=$value;
+        }
+        elsif ($type eq 'bare'&&!defined($opt{'action'})) {
+            $opt{'action'}=$value;
+        }
+        else {
+            push(@arg, $value);
+        }
+    }
+
+
+    #  Check the output format and pagination limits before making a request
+    #
+    $opt{'output'}='json' unless defined($opt{'output'});
+    die "output must be json or dumper\n" unless $opt{'output'}=~/\A(?:json|dumper)\z/;
+    die "auth must be wrangler\n" if defined($opt{'auth'})&&$opt{'auth'} ne 'wrangler';
+    die "max-pages must be positive\n" if defined($opt{'max-pages'})&&$opt{'max-pages'}<1;
+    die "per-page must be positive\n" if defined($opt{'per-page'})&&$opt{'per-page'}<1;
+    $param{'per_page'}=$opt{'per-page'} if defined($opt{'per-page'});
+
+
+    #  Accept either a raw API request or a supported named resource method
+    #
+    if ($raw_fg) {
+        die "--method and --path are both required\n"
+            unless defined($opt{'method'})&&defined($opt{'path'});
+        die "--resource and --action cannot accompany --method\n"
+            if defined($opt{'resource'})||defined($opt{'action'});
+        die "raw request accepts at most one body argument\n" if @arg>1;
+    }
+    else {
+        my ($resource, $action)=@opt{qw(resource action)};
+        my $resource_list=join(', ', sort(keys(%resource_method)));
+        die "resource is required; valid resources: $resource_list\n"
+            unless defined($resource);
+        die "unknown resource '$resource'; valid resources: $resource_list\n"
+            unless exists($resource_method{$resource});
+        my $action_list=join(', ', sort(keys(%{$resource_method{$resource}})));
+        die "action is required for resource '$resource'; valid actions: $action_list\n"
+            unless defined($action);
+        die "unknown action '$action' for resource '$resource'; valid actions: $action_list\n"
+            unless exists($resource_method{$resource}{$action});
+    }
+    die "--paginate requires a list or search action\n"
+        if $opt{'paginate'}&&($raw_fg||
+            $opt{'action'}!~/\A(?:list(?:_|\z)|search_scripts\z)/);
+    die "--max-pages requires --paginate\n" if defined($opt{'max-pages'})&&!$opt{'paginate'};
+
+
+    #  Combine asset sources only for the named Worker asset upload action
+    #
+    if (@asset_source) {
+        die "asset list options require --resource workers --action upload_assets\n"
+            if $raw_fg||$opt{'resource'} ne 'workers'||$opt{'action'} ne 'upload_assets';
+        die "asset list options require one Worker name and no other source argument\n"
+            unless @arg==1&&defined($arg[0])&&!ref($arg[0]);
+        die "--asset-list-stdin may be used only once\n"
+            if 1<grep { $_->[0] eq 'stdin' } @asset_source;
+        my @asset;
+        foreach my $source_ar (@asset_source) {
+            my ($type, $value)=@$source_ar;
+            if ($type eq 'file') {
+                push(@asset, $value);
+            }
+            elsif ($type eq 'json') {
+                push(@asset, @{typed_value('array', read_file($value))});
+            }
+            elsif ($type eq 'text') {
+                open(my $asset_fh, '<', $value) || die "unable to open $value: $!\n";
+                push(@asset, @{read_asset_lines($asset_fh)});
+                close($asset_fh) || die "unable to close $value: $!\n";
+            }
+            else {
+                push(@asset, @{read_asset_lines(\*STDIN)});
+            }
+        }
+        die "asset list is empty\n" unless @asset;
+        push(@arg, \@asset);
+    }
+
+
+
+    #  Reject missing or excess method arguments before authentication or I/O
+    #
+    unless ($raw_fg) {
+        my $method_arg_ar=$resource_method{$opt{'resource'}}{$opt{'action'}};
+        my ($minimum, $maximum)=@$method_arg_ar;
+        die "action '$opt{'action'}' for resource '$opt{'resource'}' requires at least " .
+            "$minimum --arg value".($minimum==1 ? '' : 's')."; ".scalar(@arg)." supplied\n"
+            if @arg<$minimum;
+        die "action '$opt{'action'}' for resource '$opt{'resource'}' accepts at most " .
+            "$maximum --arg value".($maximum==1 ? '' : 's')."; ".scalar(@arg)." supplied\n"
+            if @arg>$maximum;
+    }
+
+
+
+    #  Validate the composite Worker inspection before resolving credentials
+    #
+    if (!$raw_fg&&$opt{'resource'} eq 'workers'&&$opt{'action'} eq 'inspect_script') {
+        die "full_response is unavailable for inspect_script\n" if $opt{'full-response'};
+        my @unknown=sort(grep { $_!~/\A(?:name|tag|etag)\z/ } keys(%param));
+        die "unknown inspect selector: $unknown[0]\n" if @unknown;
+        my @selector=grep { exists($param{$_}) } qw(name tag etag);
+        die "inspect_script requires exactly one of name, tag, or etag\n"
+            unless @selector==1;
+        my $selector=$selector[0];
+        my $value=$param{$selector};
+        die "$selector must be a non-empty scalar\n"
+            unless defined($value)&&!ref($value)&&length($value);
+    }
+
+
+    #  Dump parsed options without needing a Cloudflare token
+    #
+    if ($opt{'dump_opt'}) {
+        die "dump_opt is unsafe for secret-bearing actions\n"
+            if !$raw_fg&&(($opt{'resource'} eq 'secrets_store'&&
+                $opt{'action'}=~/\A(?:create_secret|update_secret)\z/)||
+                ($opt{'resource'} eq 'workers'&&$opt{'action'} eq 'add_secret')||
+                ($opt{'resource'} eq 'hyperdrive'&&
+                $opt{'action'}=~/\A(?:create_config|replace_config|update_config)\z/));
+        my $out_hr={ options => \%opt, arguments => \@arg, parameters => \%param };
+        print Data::Dumper::Dumper($out_hr);
+        return 0;
+    }
+
+
+    #  Resolve optional Wrangler authentication before creating the client
+    #
+    my %client_opt;
+    $client_opt{'account_id'}=$opt{'account-id'} if defined($opt{'account-id'});
+    if (defined($opt{'auth'})) {
+        $client_opt{'token'}=wrangler_token();
+        $client_opt{'account_id'}=wrangler_account_id()
+            if !$raw_fg&&$opt{'resource'}!~/\A(?:accounts|zones)\z/&&
+                !($opt{'resource'} eq 'workers'&&
+                    $opt{'action'}=~/\A(?:list|create|update|delete)_route(?:s)?\z/)&&
+                !defined($opt{'account-id'})&&!defined($ENV{'CLOUDFLARE_ACCOUNT_ID'});
+    }
+    my $api_or=Cloudflare::API->new(%client_opt);
+    my $invoke_cr=sub {
+        my ($query_hr, $full)=@_;
+        if ($raw_fg) {
+            my %request=(query => $query_hr, full_response => $full);
+            $request{'json'}=$arg[0] if @arg;
+            return $api_or->request(uc($opt{'method'}), $opt{'path'}, %request);
+        }
+        my $resource=$opt{'resource'};
+        my $object_or=$api_or->$resource();
+        my $action=$opt{'action'};
+        return $object_or->$action(@arg, %$query_hr, full_response => $full);
+    };
+
+
+    #  Follow list pages when requested, retaining each page boundary
+    #
+    my $result;
+    if ($opt{'paginate'}) {
+        my @pages;
+        my $query_hr={ %param };
+        my %seen;
+        my $page=defined($query_hr->{'page'}) ? $query_hr->{'page'} : 1;
+        while (1) {
+            my $envelope_hr=$invoke_cr->($query_hr, 1);
+            push(@pages, $opt{'full-response'} ? $envelope_hr : $envelope_hr->{'result'});
+            last if defined($opt{'max-pages'})&&@pages>=$opt{'max-pages'};
+            my $next_hr=next_query($query_hr, $envelope_hr, $page, \%seen);
+            last unless $next_hr;
+            $query_hr=$next_hr;
+            $page=defined($query_hr->{'page'}) ? $query_hr->{'page'} : $page+1;
+        }
+        $result=\@pages;
+    }
+    else {
+        $result=$invoke_cr->(\%param, $opt{'full-response'});
+    }
+
+
+    #  Print the result in the requested format
+    #
+    if ($opt{'output'} eq 'dumper') {
+        print Data::Dumper::Dumper($result);
+    }
+    else {
+        print JSON::PP->new()->canonical()->pretty()->encode($result);
+    }
+
+
+    #  Done
+    #
+    return 0;
+
+}
+
+
+sub wrangler_token {
+
+
+    #  Ask Wrangler to refresh its login and return the selected bearer token
+    #
+    my $credential_hr=wrangler_json('auth token', qw(auth token --json));
+    die "wrangler auth token returned unsupported credential type\n"
+        unless defined($credential_hr->{'type'})&&
+            $credential_hr->{'type'}=~/\A(?:api_token|oauth)\z/;
+    my $token=$credential_hr->{'token'};
+    die "wrangler auth token returned no usable token\n"
+        unless defined($token)&&!ref($token)&&$token=~/\A[^\x00-\x20\x7f]+\z/;
+    return $token;
+
+}
+
+
+sub wrangler_account_id {
+
+
+    #  Select the only account available through the active Wrangler login
+    #
+    my $user_hr=wrangler_json('whoami', qw(whoami --json));
+    my $account_ar=$user_hr->{'accounts'};
+    die "wrangler whoami returned no account list\n" unless ref($account_ar) eq 'ARRAY';
+    die "wrangler authentication has no available accounts\n" unless @$account_ar;
+    die "wrangler authentication has multiple accounts; use --account-id or CLOUDFLARE_ACCOUNT_ID\n"
+        if @$account_ar>1;
+    my $account_hr=$account_ar->[0];
+    die "wrangler whoami returned an invalid account\n" unless ref($account_hr) eq 'HASH';
+    my $account_id=$account_hr->{'id'};
+    die "wrangler whoami returned no usable account ID\n"
+        unless defined($account_id)&&!ref($account_id)&&
+            $account_id=~/\A[^\x00-\x20\x7f]+\z/;
+    return $account_id;
+
+}
+
+
+sub wrangler_json {
+
+
+    #  Run a Wrangler JSON command without a shell or exposing diagnostic output
+    #
+    my ($description, @arg)=@_;
+    my $null_fn=File::Spec->devnull();
+    open(my $error_fh, '>', $null_fn) || die "unable to open null device: $!\n";
+    my $output_fh;
+    my $pid=eval { open3(undef, $output_fh, $error_fh, 'wrangler', @arg) };
+    die "unable to start wrangler $description\n" if $@;
+    local $/;
+    my $output=<$output_fh>;
+    close($output_fh);
+    waitpid($pid, 0);
+    die "wrangler $description failed; check Wrangler login and configuration\n" if $?;
+
+    my $result_hr=eval { JSON::PP->new()->decode($output) };
+    die "wrangler $description returned invalid JSON\n"
+        if $@||ref($result_hr) ne 'HASH';
+    return $result_hr;
+
+}
+
+
+sub read_file {
+
+    #  Read JSON or a trusted Data::Dumper file as a single value
+    #
+    my $path_fn=shift();
+    open(my $file_fh, '<', $path_fn) || die "unable to open $path_fn: $!\n";
+    local $/;
+    my $content=<$file_fh>;
+    close($file_fh) || die "unable to close $path_fn: $!\n";
+    return $content;
+
+}
+
+
+sub read_asset_lines {
+
+
+    #  Keep filename whitespace intact; only empty lines are separators
+    #
+    my $file_fh=shift();
+    my @file;
+    while (my $path_fn=<$file_fh>) {
+        chomp($path_fn);
+        $path_fn=~s/\r\z//;
+        next unless length($path_fn);
+        push(@file, $path_fn);
+    }
+    die "unable to read asset list: $!\n" if !eof($file_fh);
+    return \@file;
+
+}
+
+
+sub typed_value {
+
+    #  Keep strings literal; decode structured and boolean arguments
+    #
+    my ($type, $value)=@_;
+    return $value if $type eq 'string';
+    if ($type eq 'bool') {
+        die "boolean must be true or false\n" unless $value=~/\A(?:true|false)\z/i;
+        return $value=~/\Atrue\z/i ? JSON::PP::true : JSON::PP::false;
+    }
+    if ($type eq 'json-file') {
+        $value=read_file($value);
+        $type='json';
+    }
+    if ($type eq 'dumper-file') {
+        #  This executes Perl, so the caller must supply a trusted file
+        #
+        my $source=read_file($value);
+        my $result=eval 'no strict; my $VAR1; '.$source;
+        die "unable to evaluate trusted Data::Dumper file $value: $@\n" if $@;
+        return $result;
+    }
+    my $decoded=eval { JSON::PP->new()->decode($value) };
+    die "invalid JSON: $@\n" if $@;
+    die "$type requires a JSON array\n" if $type eq 'array'&&ref($decoded) ne 'ARRAY';
+    die "$type requires a JSON object\n" if $type eq 'hash'&&ref($decoded) ne 'HASH';
+    return $decoded;
+
+}
+
+
+sub parse_named {
+
+    #  Split only at the first equals sign so values can contain equals signs
+    #
+    my ($type, $input)=@_;
+    my ($name, $value)=split(/=/, $input, 2);
+    die "named parameter must be NAME=VALUE\n"
+        unless defined($value)&&$name=~/\A[A-Za-z_][A-Za-z0-9_]*\z/;
+    return ($name, typed_value($type, $value));
+
+}
+
+
+sub next_query {
+
+    #  Prefer a cursor when Cloudflare supplies one
+    #
+    my ($query_hr, $envelope_hr, $page, $seen_hr)=@_;
+    my $info_hr=$envelope_hr->{'result_info'};
+    return unless ref($info_hr) eq 'HASH';
+    if (defined($info_hr->{'cursor'})&&length($info_hr->{'cursor'})) {
+        my $cursor=$info_hr->{'cursor'};
+        die "pagination cursor repeated\n" if $seen_hr->{$cursor}++;
+        return { %$query_hr, cursor => $cursor };
+    }
+
+
+    #  Otherwise calculate the next numbered page, if any
+    #
+    my $total=$info_hr->{'total_pages'};
+    if (!defined($total)&&defined($info_hr->{'total_count'})&&defined($info_hr->{'per_page'})&&
+        $info_hr->{'per_page'}>0) {
+        $total=int(($info_hr->{'total_count'}+$info_hr->{'per_page'}-1)/$info_hr->{'per_page'});
+    }
+    return unless defined($total)&&$page<$total;
+    return { %$query_hr, page => $page+1 };
+
+}
+
+
+1;
+
+__END__
+
+=encoding utf8
+
+=begin markdown
+
+# cloudflare-api #
+
+# NAME #
+
+cloudflare-api - call Cloudflare::API resource methods from the command line
+
+# SYNOPSIS #
+
+```sh
+cloudflare-api zones list --param status=active
+cloudflare-api workers inspect_script --param name=my-worker
+cloudflare-api workers list_deployments my-worker
+cloudflare-api --resource r2 --action list_buckets --paginate --max-pages 2
+cloudflare-api --resource kv --action create_namespace --arg-json '{"title":"demo"}'
+cloudflare-api --resource workers --action upload_assets --arg my-app --arg dist --param prefix=/docs
+cloudflare-api --method GET --path /accounts --full-response
+cloudflare-api --generate-completion=zsh > ~/.zfunc/_cloudflare-api
+```
+
+# DESCRIPTION #
+
+`cloudflare-api` calls a supported `Cloudflare::API` resource method or makes a low-level JSON request. It reads `CLOUDFLARE_API_TOKEN` and, for account-scoped methods, `CLOUDFLARE_ACCOUNT_ID` from the environment. It prints the decoded Cloudflare `result` as pretty JSON by default; `--full-response` retains the entire Cloudflare envelope. The script does not build Worker code or transfer R2 objects.
+
+Choose one mode: `RESOURCE ACTION [ARG ...]` (or `--resource NAME --action NAME`) for a named method, or `--method VERB --path /relative/path` for a low-level request. The resource or action may be given positionally when its named option is omitted. Further bare operands become literal string method arguments, equivalent to `--arg`; they retain their command-line order when mixed with typed `--arg*` options. Named arguments supplied with `--param*` become method options, or query parameters in low-level mode. Bare arguments remain unavailable in low-level request mode.
+
+# OPTIONS #
+
+## Selection and authentication ##
+
+* **RESOURCE ACTION [ARG ...], --resource NAME, --action NAME**
+
+    Call a named method on `accounts`, `zones`, `workers`, `r2`, `kv`, `d1`, `queues`, `hyperdrive`, or `secrets_store`. The resource and action can be two positional operands, two named options, or one of each. Subsequent bare operands become string method arguments. Only methods in the script's allowlist can be called; missing or unknown selections list the valid resources or actions. Consult the resource module sidecars for arguments and results. The script does not expose every module method, including `workers()->download_script()`, whose body is not JSON.
+
+* **--method VERB, --path /relative/path**
+
+    Call a low-level JSON endpoint through `Cloudflare::API->request()`. Both options are required and cannot be combined with `--resource` or `--action`. The method is uppercased. The path must begin with exactly one slash and cannot be an absolute URL. At most one body argument supplied with `--arg*` is accepted; named parameters become query parameters. Bare operands are rejected. Dynamic path segments must be percent-encoded by the caller.
+
+* **--account-id ID**
+
+    Override `CLOUDFLARE_ACCOUNT_ID` and Wrangler account discovery for this invocation. Account-scoped methods require an ID; account and zone lookups do not.
+
+* **--auth=wrangler**
+
+    Run `wrangler auth token --json` and use its API token or refreshed OAuth token instead of the environment token. For an account-scoped named method, also run `wrangler whoami --json` and use the account ID when exactly one account is available. Select among multiple accounts with `--account-id` or `CLOUDFLARE_ACCOUNT_ID`; these explicit values take precedence and skip account discovery. Wrangler must be installed and logged in. Run `wrangler login` separately if necessary. Wrangler itself prioritizes an existing `CLOUDFLARE_API_TOKEN` over its OAuth login. API key and email credentials are not supported. No token option is accepted on the command line.
+
+## Positional and named arguments ##
+
+* **--arg VALUE**
+
+    Append a literal string method argument. Repeat to supply several arguments in order. For named resource actions, bare operands after the resource and action are equivalent; use `--arg` or `--` when a value could be mistaken for an option.
+
+* **--arg-bool true|false, --arg-array JSON, --arg-hash JSON, --arg-json JSON, --arg-json-file FILE**
+
+    Append a typed positional argument. Boolean values are case-insensitive; array and hash forms require the matching JSON container. The JSON forms accept any JSON value, directly or read from a file. To pass a private JSON body without putting it in the process arguments, pipe it to `--arg-json-file /dev/stdin`.
+
+* **--arg-dumper-file FILE**
+
+    Evaluate a trusted Data::Dumper file as Perl and append its result. The file can execute arbitrary Perl code; use JSON for data from other sources.
+
+* **--param NAME=VALUE**
+
+    Pass one literal string named argument. The first `=` separates the name from the value, so a value may contain further equals signs. Names must begin with a letter or underscore and contain only letters, digits, or underscores. A repeated name replaces its earlier value.
+
+* **--param-bool NAME=true|false, --param-json NAME=JSON, --param-json-file NAME=FILE**
+
+    Pass a typed named argument. JSON file content is decoded before the method call. For list actions these usually become Cloudflare query filters; for other actions they can be method options such as `metadata` and `files` for a Worker upload.
+
+* **--param-dumper-file NAME=FILE**
+
+    Evaluate a trusted Data::Dumper file as Perl and pass its result under `NAME`. This can execute arbitrary Perl code; prefer JSON for untrusted input.
+
+## Worker static assets ##
+
+* **--asset FILE**
+
+    Append a local file to the asset source list. Repeat as needed. A bare filename uses its basename as its URL path.
+
+* **--asset-list-json FILE**
+
+    Append entries from a JSON array of filenames or objects with `path`, optional URL `name`, and optional `content_type`. Repeat for multiple files.
+
+* **--asset-list-text FILE, --asset-list-stdin**
+
+    Append one filename per line from a text file or standard input. Empty lines are ignored; spaces in filenames are preserved. The stdin option may appear only once. Sources combine in option order.
+
+    All four asset-list options require `--resource workers --action upload_assets` and exactly one string `--arg` naming the Worker. They create the method's second positional argument as a file array; do not also pass a directory, array, or path-map source argument. The array cannot be empty. Alternatively, pass a directory with a second `--arg`, or an asset array with `--arg-json-file`. `--param prefix=/docs` sets a URL prefix. The command prints the manifest and short-lived completion JWT returned by `upload_assets()`; asset upload alone does not deploy a Worker. Treat the JWT as a credential.
+
+## Output and pagination ##
+
+* **--output json|dumper**
+
+    Print pretty, canonical JSON (the default) or Perl Data::Dumper output to standard output.
+
+* **--full-response, --no-full-response**
+
+    Select the complete decoded Cloudflare envelope or its `result`. The default is the unwrapped `result`. With pagination, the selection applies to each page; the output is still an array. `upload_assets()` returns its own manifest and JWT structure rather than a Cloudflare envelope.
+
+* **--paginate, --no-paginate**
+
+    Follow cursor-based or numbered pages for named actions starting with `list`, and for `workers search_scripts`. The output is an array of page results, preserving page boundaries. Without a limit, every page reported by Cloudflare is fetched. Pagination is unavailable for raw requests and other actions.
+
+* **--max-pages N, --per-page N**
+
+    Limit pagination to a positive number of pages, or send positive `per_page=N` as a named list filter. `--max-pages` requires `--paginate`. Pagination stops when Cloudflare supplies no next page; a repeated cursor causes an error.
+
+## Help and diagnostics ##
+
+* **--help, -h, -?**
+
+    Print brief help and exit.
+
+* **--man**
+
+    Print the script's embedded manual and exit.
+
+* **--version**
+
+    Print the script name and `Cloudflare::API` version and exit.
+
+* **--dump-opt, --dump_opt, --opt**
+
+    Print parsed options, arguments, and parameters as Data::Dumper without creating a client or requiring a token. This output can disclose values. The script rejects this mode for selected Secrets Store, Worker secret, and Hyperdrive write actions, but other actions may also carry private data; do not use it with secrets.
+
+* **--generate-completion bash|zsh|fish**
+
+    Print a self-contained completion script for the selected shell and exit. Completion covers resources, their supported actions, command options, enumerated option values, and filenames accepted by file options. It performs no authentication, network access, or Cloudflare resource discovery. Generate the file once and load it through the shell's normal completion mechanism:
+
+    ```sh
+    cloudflare-api --generate-completion=bash > ~/.local/share/bash-completion/completions/cloudflare-api
+    cloudflare-api --generate-completion=zsh > ~/.zfunc/_cloudflare-api
+    cloudflare-api --generate-completion=fish > ~/.config/fish/completions/cloudflare-api.fish
+    ```
+
+    The destination directories must already be configured for the relevant shell. Regenerate the file after upgrading `Cloudflare::API` so that newly supported resources, actions, or options are included.
+
+# ENVIRONMENT #
+
+* **CLOUDFLARE_API_TOKEN** — Bearer token used unless `--auth=wrangler` is supplied. Obtain a token with only the permissions needed for the requested action.
+* **CLOUDFLARE_ACCOUNT_ID** — Default account ID for account-scoped resource methods; overridden by `--account-id` and used in preference to Wrangler account discovery.
+
+# EXAMPLES #
+
+```sh
+cloudflare-api zones list --param status=active
+cloudflare-api workers search_scripts --param name=orders --paginate
+cloudflare-api workers list_scripts --param tags=production:yes
+cloudflare-api workers inspect_script --param name=orders-api
+cloudflare-api workers inspect_script --param tag=IMMUTABLE_WORKER_ID
+cloudflare-api workers inspect_script --param etag=CONTENT_HASH
+cloudflare-api workers get_settings orders-api
+cloudflare-api workers list_deployments orders-api
+cloudflare-api --resource kv --action list_namespaces \
+    --paginate --per-page 20 --max-pages 2 --full-response
+cloudflare-api --resource workers --action upload_assets \
+    --arg my-app --asset dist/index.html --asset-list-text images.txt \
+    --param prefix=/docs
+cloudflare-api --resource secrets_store --action create_secret \
+    --arg my-store --arg-json-file /dev/stdin < secrets.json
+```
+
+For a Worker version upload, pass the Worker name through `--arg` and prepared `metadata` and `files` through `--param-json-file NAME=FILE`. Version upload does not activate a deployment; consult `Cloudflare::API::Workers` for the staging and deployment sequence. A secret body supplied through standard input still appears in the command's output if Cloudflare returns it; handle the output accordingly.
+
+Worker inspection accepts exactly one of `--param name=...`, `--param tag=...`, or `--param etag=...`. The name is the `id` printed by `list_scripts`; `tag` is Cloudflare's immutable Worker ID, while `etag` identifies current script content. Inspection returns the matching inventory entry, combined script/version settings, and Worker-level settings. It does not download source or include versions and deployments.
+
+# RETURN VALUES AND ERRORS #
+
+Successful requests print the result followed by a newline and exit with status zero. JSON output preserves Cloudflare's response shape; a paginated list prints an array of pages. The CLI checks the number of `--arg` values required by supported methods before authentication or network access. Input validation, missing credentials or account context, HTTP and transport errors, and Cloudflare responses reporting failure terminate with a non-zero status and a diagnostic on standard error. No write is automatically rolled back.
+
+# SEE ALSO #
+
+[Cloudflare::API](../lib/Cloudflare/API.pm.md), [Cloudflare::API::Workers](../lib/Cloudflare/API/Workers.pm.md), the other resource module sidecars, and `cloudflare-api --man`.
+
+# AUTHOR #
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of Cloudflare::API.
+
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
+
+
+=end markdown
+
+
+=head1 NAME
+
+cloudflare-api - call Cloudflare::API resource methods from the command line
+
+
+=head1 SYNOPSIS
+
+
+ cloudflare-api zones list --param status=active
+ cloudflare-api workers inspect_script --param name=my-worker
+ cloudflare-api workers list_deployments my-worker
+ cloudflare-api --resource r2 --action list_buckets --paginate --max-pages 2
+ cloudflare-api --resource kv --action create_namespace --arg-json '{"title":"demo"}'
+ cloudflare-api --resource workers --action upload_assets --arg my-app --arg dist --param prefix=/docs
+ cloudflare-api --method GET --path /accounts --full-response
+ cloudflare-api --generate-completion=zsh > ~/.zfunc/_cloudflare-api
+
+=head1 DESCRIPTION
+
+C<cloudflare-api> calls a supported C<Cloudflare::API> resource method or makes a low-level JSON request. It reads C<CLOUDFLARE_API_TOKEN> and, for account-scoped methods, C<CLOUDFLARE_ACCOUNT_ID> from the environment. It prints the decoded Cloudflare C<result> as pretty JSON by default; C<--full-response> retains the entire Cloudflare envelope. The script does not build Worker code or transfer R2 objects.
+
+Choose one mode: C<RESOURCE ACTION [ARG ...]> (or C<--resource NAME --action NAME>) for a named method, or C<--method VERB --path /relative/path> for a low-level request. The resource or action may be given positionally when its named option is omitted. Further bare operands become literal string method arguments, equivalent to C<--arg>; they retain their command-line order when mixed with typed C<--arg*> options. Named arguments supplied with C<--param*> become method options, or query parameters in low-level mode. Bare arguments remain unavailable in low-level request mode.
+
+
+=head1 OPTIONS
+
+
+=head2 Selection and authentication
+
+=over
+
+=item *
+
+B<RESOURCE ACTION [ARG ...], --resource NAME, --action NAME>
+
+Call a named method on C<accounts>, C<zones>, C<workers>, C<r2>, C<kv>, C<d1>, C<queues>, C<hyperdrive>, or C<secrets_store>. The resource and action can be two positional operands, two named options, or one of each. Subsequent bare operands become string method arguments. Only methods in the script's allowlist can be called; missing or unknown selections list the valid resources or actions. Consult the resource module sidecars for arguments and results. The script does not expose every module method, including C<<< workers()->download_script() >>>, whose body is not JSON.
+
+
+
+=item *
+
+B<--method VERB, --path /relative/path>
+
+Call a low-level JSON endpoint through C<<< Cloudflare::API->request() >>>. Both options are required and cannot be combined with C<--resource> or C<--action>. The method is uppercased. The path must begin with exactly one slash and cannot be an absolute URL. At most one body argument supplied with C<--arg*> is accepted; named parameters become query parameters. Bare operands are rejected. Dynamic path segments must be percent-encoded by the caller.
+
+
+
+=item *
+
+B<--account-id ID>
+
+Override C<CLOUDFLARE_ACCOUNT_ID> and Wrangler account discovery for this invocation. Account-scoped methods require an ID; account and zone lookups do not.
+
+
+
+=item *
+
+B<--auth=wrangler>
+
+Run C<wrangler auth token --json> and use its API token or refreshed OAuth token instead of the environment token. For an account-scoped named method, also run C<wrangler whoami --json> and use the account ID when exactly one account is available. Select among multiple accounts with C<--account-id> or C<CLOUDFLARE_ACCOUNT_ID>; these explicit values take precedence and skip account discovery. Wrangler must be installed and logged in. Run C<wrangler login> separately if necessary. Wrangler itself prioritizes an existing C<CLOUDFLARE_API_TOKEN> over its OAuth login. API key and email credentials are not supported. No token option is accepted on the command line.
+
+
+
+=back
+
+
+=head2 Positional and named arguments
+
+=over
+
+=item *
+
+B<--arg VALUE>
+
+Append a literal string method argument. Repeat to supply several arguments in order. For named resource actions, bare operands after the resource and action are equivalent; use C<--arg> or C<--> when a value could be mistaken for an option.
+
+
+
+=item *
+
+B<--arg-bool true|false, --arg-array JSON, --arg-hash JSON, --arg-json JSON, --arg-json-file FILE>
+
+Append a typed positional argument. Boolean values are case-insensitive; array and hash forms require the matching JSON container. The JSON forms accept any JSON value, directly or read from a file. To pass a private JSON body without putting it in the process arguments, pipe it to C<--arg-json-file /dev/stdin>.
+
+
+
+=item *
+
+B<--arg-dumper-file FILE>
+
+Evaluate a trusted Data::Dumper file as Perl and append its result. The file can execute arbitrary Perl code; use JSON for data from other sources.
+
+
+
+=item *
+
+B<--param NAME=VALUE>
+
+Pass one literal string named argument. The first C<=> separates the name from the value, so a value may contain further equals signs. Names must begin with a letter or underscore and contain only letters, digits, or underscores. A repeated name replaces its earlier value.
+
+
+
+=item *
+
+B<--param-bool NAME=true|false, --param-json NAME=JSON, --param-json-file NAME=FILE>
+
+Pass a typed named argument. JSON file content is decoded before the method call. For list actions these usually become Cloudflare query filters; for other actions they can be method options such as C<metadata> and C<files> for a Worker upload.
+
+
+
+=item *
+
+B<--param-dumper-file NAME=FILE>
+
+Evaluate a trusted Data::Dumper file as Perl and pass its result under C<NAME>. This can execute arbitrary Perl code; prefer JSON for untrusted input.
+
+
+
+=back
+
+
+=head2 Worker static assets
+
+=over
+
+=item *
+
+B<--asset FILE>
+
+Append a local file to the asset source list. Repeat as needed. A bare filename uses its basename as its URL path.
+
+
+
+=item *
+
+B<--asset-list-json FILE>
+
+Append entries from a JSON array of filenames or objects with C<path>, optional URL C<name>, and optional C<content_type>. Repeat for multiple files.
+
+
+
+=item *
+
+B<--asset-list-text FILE, --asset-list-stdin>
+
+Append one filename per line from a text file or standard input. Empty lines are ignored; spaces in filenames are preserved. The stdin option may appear only once. Sources combine in option order.
+
+All four asset-list options require C<--resource workers --action upload_assets> and exactly one string C<--arg> naming the Worker. They create the method's second positional argument as a file array; do not also pass a directory, array, or path-map source argument. The array cannot be empty. Alternatively, pass a directory with a second C<--arg>, or an asset array with C<--arg-json-file>. C<--param prefix=/docs> sets a URL prefix. The command prints the manifest and short-lived completion JWT returned by C<upload_assets()>; asset upload alone does not deploy a Worker. Treat the JWT as a credential.
+
+
+
+=back
+
+
+=head2 Output and pagination
+
+=over
+
+=item *
+
+B<--output json|dumper>
+
+Print pretty, canonical JSON (the default) or Perl Data::Dumper output to standard output.
+
+
+
+=item *
+
+B<--full-response, --no-full-response>
+
+Select the complete decoded Cloudflare envelope or its C<result>. The default is the unwrapped C<result>. With pagination, the selection applies to each page; the output is still an array. C<upload_assets()> returns its own manifest and JWT structure rather than a Cloudflare envelope.
+
+
+
+=item *
+
+B<--paginate, --no-paginate>
+
+Follow cursor-based or numbered pages for named actions starting with C<list>, and for C<workers search_scripts>. The output is an array of page results, preserving page boundaries. Without a limit, every page reported by Cloudflare is fetched. Pagination is unavailable for raw requests and other actions.
+
+
+
+=item *
+
+B<--max-pages N, --per-page N>
+
+Limit pagination to a positive number of pages, or send positive C<per_page=N> as a named list filter. C<--max-pages> requires C<--paginate>. Pagination stops when Cloudflare supplies no next page; a repeated cursor causes an error.
+
+
+
+=back
+
+
+=head2 Help and diagnostics
+
+=over
+
+=item *
+
+B<--help, -h, -?>
+
+Print brief help and exit.
+
+
+
+=item *
+
+B<--man>
+
+Print the script's embedded manual and exit.
+
+
+
+=item *
+
+B<--version>
+
+Print the script name and C<Cloudflare::API> version and exit.
+
+
+
+=item *
+
+B<--dump-opt, --dump_opt, --opt>
+
+Print parsed options, arguments, and parameters as Data::Dumper without creating a client or requiring a token. This output can disclose values. The script rejects this mode for selected Secrets Store, Worker secret, and Hyperdrive write actions, but other actions may also carry private data; do not use it with secrets.
+
+
+
+=item *
+
+B<--generate-completion bash|zsh|fish>
+
+Print a self-contained completion script for the selected shell and exit. Completion covers resources, their supported actions, command options, enumerated option values, and filenames accepted by file options. It performs no authentication, network access, or Cloudflare resource discovery. Generate the file once and load it through the shell's normal completion mechanism:
+
+
+ cloudflare-api --generate-completion=bash > ~/.local/share/bash-completion/completions/cloudflare-api
+ cloudflare-api --generate-completion=zsh > ~/.zfunc/_cloudflare-api
+ cloudflare-api --generate-completion=fish > ~/.config/fish/completions/cloudflare-api.fish
+The destination directories must already be configured for the relevant shell. Regenerate the file after upgrading C<Cloudflare::API> so that newly supported resources, actions, or options are included.
+
+
+
+=back
+
+
+=head1 ENVIRONMENT
+
+=over
+
+=item *
+
+B<CLOUDFLARE_API_TOKEN> — Bearer token used unless C<--auth=wrangler> is supplied. Obtain a token with only the permissions needed for the requested action.
+
+
+=item *
+
+B<CLOUDFLARE_ACCOUNT_ID> — Default account ID for account-scoped resource methods; overridden by C<--account-id> and used in preference to Wrangler account discovery.
+
+
+=back
+
+
+=head1 EXAMPLES
+
+
+ cloudflare-api zones list --param status=active
+ cloudflare-api workers search_scripts --param name=orders --paginate
+ cloudflare-api workers list_scripts --param tags=production:yes
+ cloudflare-api workers inspect_script --param name=orders-api
+ cloudflare-api workers inspect_script --param tag=IMMUTABLE_WORKER_ID
+ cloudflare-api workers inspect_script --param etag=CONTENT_HASH
+ cloudflare-api workers get_settings orders-api
+ cloudflare-api workers list_deployments orders-api
+ cloudflare-api --resource kv --action list_namespaces \
+     --paginate --per-page 20 --max-pages 2 --full-response
+ cloudflare-api --resource workers --action upload_assets \
+     --arg my-app --asset dist/index.html --asset-list-text images.txt \
+     --param prefix=/docs
+ cloudflare-api --resource secrets_store --action create_secret \
+     --arg my-store --arg-json-file /dev/stdin < secrets.json
+For a Worker version upload, pass the Worker name through C<--arg> and prepared C<metadata> and C<files> through C<--param-json-file NAME=FILE>. Version upload does not activate a deployment; consult C<Cloudflare::API::Workers> for the staging and deployment sequence. A secret body supplied through standard input still appears in the command's output if Cloudflare returns it; handle the output accordingly.
+
+Worker inspection accepts exactly one of C<--param name=...>, C<--param tag=...>, or C<--param etag=...>. The name is the C<id> printed by C<list_scripts>; C<tag> is Cloudflare's immutable Worker ID, while C<etag> identifies current script content. Inspection returns the matching inventory entry, combined script/version settings, and Worker-level settings. It does not download source or include versions and deployments.
+
+
+=head1 RETURN VALUES AND ERRORS
+
+Successful requests print the result followed by a newline and exit with status zero. JSON output preserves Cloudflare's response shape; a paginated list prints an array of pages. The CLI checks the number of C<--arg> values required by supported methods before authentication or network access. Input validation, missing credentials or account context, HTTP and transport errors, and Cloudflare responses reporting failure terminate with a non-zero status and a diagnostic on standard error. No write is automatically rolled back.
+
+
+=head1 SEE ALSO
+
+L<Cloudflare::API|Cloudflare::API>, L<Cloudflare::API::Workers|Cloudflare::API::Workers>, the other resource module sidecars, and C<cloudflare-api --man>.
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE and COPYRIGHT
+
+Copyright (c) 2026 Andrew Speer. This software is free software under the same terms as Perl 5.
+
+=cut

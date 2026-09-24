@@ -67,6 +67,36 @@ Readonly my @MULTI_DATA => (
 	},
 );
 
+# Valid data for heatmap methods.
+Readonly my @HEATMAP_DATA => (
+	['Jan', 'North', 100],
+	['Jan', 'South',  50],
+	['Feb', 'North',  80],
+	['Feb', 'South',  30],
+);
+
+# Valid data for bar-chart snippet.
+Readonly my @BAR_DATA => (
+	['Alpha',  300],
+	['Beta',   150],
+	['Gamma',  450],
+	['Delta',  200],
+);
+
+# Valid data for scatter chart snippet.
+Readonly my @SCATTER_DATA => (
+	[10, 20],
+	[30, 40],
+	[50, 15],
+);
+
+# Valid data for table snippet (first row = header).
+Readonly my @TABLE_DATA => (
+	['Name', 'Value'],
+	['Alpha',   300],
+	['Beta',    150],
+);
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Exhaustive API Contract Ledger
 #
@@ -263,6 +293,108 @@ my %LEDGER = (
 	'ms-int: legend CSS class in stylesheet'           => 1,
 	'ms-int: no raw </b>'                              => 1,
 	'ms-int: escaped <\/b> present'                    => 1,
+
+	# render_heatmap_snippet
+	'heatmap-snip: die non-array data'                 => 1,
+	'heatmap-snip: die non-arrayref element'           => 1,
+	'heatmap-snip: die fewer than 3 elements'          => 1,
+	'heatmap-snip: die non-numeric value'              => 1,
+	'heatmap-snip: die unknown color_scheme'           => 1,
+	'heatmap-snip: die cell_padding out of range'      => 1,
+	'heatmap-snip: returns hashref'                    => 1,
+	'heatmap-snip: svg_id is heatmap'                  => 1,
+	'heatmap-snip: html is non-empty string'           => 1,
+	'heatmap-snip: no DOCTYPE'                         => 1,
+	'heatmap-snip: no html wrapper'                    => 1,
+	'heatmap-snip: no D3 CDN'                          => 1,
+	'heatmap-snip: d3.scaleSequential present'         => 1,
+	'heatmap-snip: default YlOrRd interpolator'        => 1,
+	'heatmap-snip: d3.scaleBand present'               => 1,
+	'heatmap-snip: legend linearGradient by default'   => 1,
+	'heatmap-snip: legend absent when legend => 0'     => 1,
+	'heatmap-snip: animated prefers-reduced-motion'    => 1,
+	'heatmap-snip: undef value skipped'                => 1,
+	'heatmap-snip: degenerate domain fallback'         => 1,
+
+	# render_bar_chart_snippet
+	'bar-snip: die non-array data'                     => 1,
+	'bar-snip: die non-arrayref element'               => 1,
+	'bar-snip: die fewer than 2 elements'              => 1,
+	'bar-snip: die non-numeric value'                  => 1,
+	'bar-snip: die invalid orientation'                => 1,
+	'bar-snip: die invalid sort_bars'                  => 1,
+	'bar-snip: returns hashref'                        => 1,
+	'bar-snip: svg_id is bar_chart'                    => 1,
+	'bar-snip: html is non-empty string'               => 1,
+	'bar-snip: no DOCTYPE'                             => 1,
+	'bar-snip: no html wrapper'                        => 1,
+	'bar-snip: no D3 CDN'                              => 1,
+	'bar-snip: default vertical scaleBand on x'        => 1,
+	'bar-snip: horizontal scaleBand on y'              => 1,
+	'bar-snip: default color steelblue'                => 1,
+	'bar-snip: categorical color schemeTableau10'      => 1,
+	'bar-snip: sort by value descending'               => 1,
+	'bar-snip: max_bars collapses tail into Other'     => 1,
+	'bar-snip: show_values D3 block present'           => 1,
+	'bar-snip: animated transition present'            => 1,
+	'bar-snip: animated prefers-reduced-motion'        => 1,
+	'bar-snip: undef value skipped'                    => 1,
+	'bar-snip: negative value absolutised'             => 1,
+	'bar-snip: extra tooltip data'                     => 1,
+	'bar-snip: rotate labels above 8 bars'             => 1,
+	'bar-snip: x_label embedded'                       => 1,
+	'bar-snip: value_label embedded'                   => 1,
+
+	# render_pie_chart_snippet -- XSS fix
+	'pie-snip: esc function present'                   => 1,
+
+	# id opt -- all snippet methods honour id override
+	'id-opt: pie_chart_snippet custom id'              => 1,
+	'id-opt: heatmap_snippet custom id'                => 1,
+	'id-opt: bar_chart_snippet custom id'              => 1,
+	'id-opt: line_chart_snippet custom id'             => 1,
+	'id-opt: zoomable_line_chart_snippet custom id'    => 1,
+	'id-opt: scatter_chart_snippet custom id'          => 1,
+	'id-opt: table_snippet custom id'                  => 1,
+
+	# responsive opt -- viewBox emitted when true
+	'responsive-opt: no viewBox by default (snippet)'  => 1,
+	'responsive-opt: viewBox when responsive true'     => 1,
+	'responsive-opt: full-page viewBox via constructor' => 1,
+
+	# render_scatter_chart_snippet
+	'scatter-snip: die non-array data'                 => 1,
+	'scatter-snip: die non-arrayref element'           => 1,
+	'scatter-snip: die fewer than 2 elements'          => 1,
+	'scatter-snip: die non-numeric X'                  => 1,
+	'scatter-snip: die non-numeric Y'                  => 1,
+	'scatter-snip: returns hashref'                    => 1,
+	'scatter-snip: svg_id is scatter_chart'            => 1,
+	'scatter-snip: html is non-empty string'           => 1,
+	'scatter-snip: no DOCTYPE'                         => 1,
+	'scatter-snip: no html wrapper'                    => 1,
+	'scatter-snip: no D3 CDN'                          => 1,
+	'scatter-snip: d3.scaleLinear present'             => 1,
+	'scatter-snip: sc-circle class present'            => 1,
+	'scatter-snip: esc function present'               => 1,
+	'scatter-snip: animated prefers-reduced-motion'    => 1,
+
+	# render_table_snippet
+	'table-snip: die non-array data'                   => 1,
+	'table-snip: die empty data'                       => 1,
+	'table-snip: die non-arrayref row'                 => 1,
+	'table-snip: returns hashref'                      => 1,
+	'table-snip: table_id is data_table'               => 1,
+	'table-snip: no svg_id key'                        => 1,
+	'table-snip: html is non-empty string'             => 1,
+	'table-snip: no DOCTYPE'                           => 1,
+	'table-snip: no html wrapper'                      => 1,
+	'table-snip: table element present'                => 1,
+	'table-snip: sortable class present by default'    => 1,
+	'table-snip: sortable absent when 0'               => 1,
+	'table-snip: caption present when provided'        => 1,
+	'table-snip: XSS headers escaped'                  => 1,
+	'table-snip: XSS cells escaped'                    => 1,
 );
 
 # Marks a ledger entry as verified.  Calling with an unknown key catches typos.
@@ -1117,6 +1249,551 @@ subtest 'render_multi_series_line_chart_with_interactive_legends() -- output' =>
 
 	like($html, qr{<\\/b>}, 'escaped <\/b> present');
 	mark('ms-int: escaped <\/b> present');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# render_heatmap_snippet()
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_heatmap_snippet() -- validation errors' => sub {
+	my $chart = HTML::D3->new(width => 600, height => 400);
+
+	throws_ok(
+		sub { $chart->render_heatmap_snippet('not_an_array') },
+		qr/Data must be an array of arrays/,
+		'non-arrayref data dies with documented message',
+	);
+	mark('heatmap-snip: die non-array data');
+
+	throws_ok(
+		sub { $chart->render_heatmap_snippet(['scalar']) },
+		qr/Each data point must be an array reference/,
+		'non-arrayref element dies with documented message',
+	);
+	mark('heatmap-snip: die non-arrayref element');
+
+	throws_ok(
+		sub { $chart->render_heatmap_snippet([['x', 'y']]) },
+		qr/Each data point must have at least 3 elements/,
+		'two-element triple dies with documented message',
+	);
+	mark('heatmap-snip: die fewer than 3 elements');
+
+	throws_ok(
+		sub { $chart->render_heatmap_snippet([['x', 'y', 'not_a_number']]) },
+		qr/Value must be numeric/,
+		'non-numeric value dies with documented message',
+	);
+	mark('heatmap-snip: die non-numeric value');
+
+	throws_ok(
+		sub { $chart->render_heatmap_snippet(\@HEATMAP_DATA, { color_scheme => 'Viridis' }) },
+		qr/Unknown color_scheme: Viridis/,
+		'unknown color_scheme dies with documented message',
+	);
+	mark('heatmap-snip: die unknown color_scheme');
+
+	throws_ok(
+		sub { $chart->render_heatmap_snippet(\@HEATMAP_DATA, { cell_padding => 9 }) },
+		qr/cell_padding must be between 0 and 8/,
+		'cell_padding > 8 dies with documented message',
+	);
+	mark('heatmap-snip: die cell_padding out of range');
+};
+
+subtest 'render_heatmap_snippet() -- return structure and page-shell isolation' => sub {
+	my $result = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA);
+
+	returns_ok($result, { type => 'hashref' }, 'return value is a hashref');
+	mark('heatmap-snip: returns hashref');
+
+	is($result->{svg_id}, 'heatmap', 'svg_id is "heatmap"');
+	mark('heatmap-snip: svg_id is heatmap');
+
+	ok(defined $result->{html} && length($result->{html}) > 0, 'html field is a non-empty string');
+	mark('heatmap-snip: html is non-empty string');
+
+	my $html = $result->{html};
+	unlike($html, qr/<!DOCTYPE/i,        'no DOCTYPE in snippet');
+	mark('heatmap-snip: no DOCTYPE');
+
+	unlike($html, qr/<html/i,            'no <html> wrapper');
+	mark('heatmap-snip: no html wrapper');
+
+	unlike($html, qr{https://d3js\.org}, 'no D3 CDN tag -- caller loads D3');
+	mark('heatmap-snip: no D3 CDN');
+};
+
+subtest 'render_heatmap_snippet() -- D3 idioms and default color scheme' => sub {
+	my $html = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA)->{html};
+
+	like($html, qr/scaleSequential/, 'd3.scaleSequential present for continuous colour mapping');
+	mark('heatmap-snip: d3.scaleSequential present');
+
+	# POD default is YlOrRd; the D3 interpolator name must appear verbatim.
+	like($html, qr/interpolateYlOrRd/, 'default interpolateYlOrRd present');
+	mark('heatmap-snip: default YlOrRd interpolator');
+
+	like($html, qr/scaleBand/, 'd3.scaleBand present for categorical axes');
+	mark('heatmap-snip: d3.scaleBand present');
+};
+
+subtest 'render_heatmap_snippet() -- legend Perl-side conditional' => sub {
+	# The legend block is generated in Perl, so linearGradient must be absent
+	# from the HTML *source* when legend => 0 (not just hidden at JS runtime).
+	my $html_on  = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA)->{html};
+	my $html_off = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA, { legend => 0 })->{html};
+
+	like($html_on, qr/linearGradient/, 'linearGradient present when legend on (default)');
+	mark('heatmap-snip: legend linearGradient by default');
+
+	unlike($html_off, qr/linearGradient/, 'linearGradient absent from source when legend => 0');
+	mark('heatmap-snip: legend absent when legend => 0');
+};
+
+subtest 'render_heatmap_snippet() -- animated => 1 emits prefers-reduced-motion guard' => sub {
+	my $html = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA, { animated => 1 })->{html};
+
+	like($html, qr/prefers-reduced-motion/, 'prefers-reduced-motion media-query guard present');
+	mark('heatmap-snip: animated prefers-reduced-motion');
+};
+
+subtest 'render_heatmap_snippet() -- undef values skipped; degenerate domain' => sub {
+	# POD: "undef values are silently skipped"
+	my @with_undef = (['Mar', 'East', undef], ['Mar', 'West', 25]);
+	my $html;
+	lives_ok { $html = HTML::D3->new()->render_heatmap_snippet(\@with_undef)->{html} }
+		'renders without error when a value is undef';
+
+	like($html, qr/"y":"West"/, 'defined sibling West retained in JSON');
+	unlike($html, qr/"y":"East".*"v":/, 'undef East entry absent from JSON data');
+	mark('heatmap-snip: undef value skipped');
+
+	# POD: "maxV === 0 ? [0, 1] : [0, maxV]" -- all-zero data must not produce an empty domain
+	my @zeros = (['A', 'X', 0], ['B', 'Y', 0]);
+	my $z;
+	lives_ok { $z = HTML::D3->new()->render_heatmap_snippet(\@zeros)->{html} }
+		'all-zero data renders without error';
+	like($z, qr/maxV\s*===\s*0\s*\?.*\[0,\s*1\]/s, 'degenerate-domain fallback [0,1] present in JS');
+	mark('heatmap-snip: degenerate domain fallback');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# render_bar_chart_snippet()
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_bar_chart_snippet() -- validation errors' => sub {
+	my $chart = HTML::D3->new(width => 600, height => 400);
+
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet('not_an_array') },
+		qr/Data must be an array of arrays/,
+		'non-arrayref data dies with documented message',
+	);
+	mark('bar-snip: die non-array data');
+
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet(['scalar']) },
+		qr/Each data point must be an array reference/,
+		'non-arrayref element dies with documented message',
+	);
+	mark('bar-snip: die non-arrayref element');
+
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet([['only_label']]) },
+		qr/Each data point must have at least 2 elements/,
+		'single-element data point dies with documented message',
+	);
+	mark('bar-snip: die fewer than 2 elements');
+
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet([['A', 'not_a_number']]) },
+		qr/Value must be numeric/,
+		'non-numeric value dies with documented message',
+	);
+	mark('bar-snip: die non-numeric value');
+
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet(\@BAR_DATA, { orientation => 'diagonal' }) },
+		qr/orientation must be 'vertical' or 'horizontal'/,
+		'invalid orientation dies with documented message',
+	);
+	mark('bar-snip: die invalid orientation');
+
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet(\@BAR_DATA, { sort_bars => 'random' }) },
+		qr/sort_bars must be 'value', 'label', or 'none'/,
+		'invalid sort_bars dies with documented message',
+	);
+	mark('bar-snip: die invalid sort_bars');
+};
+
+subtest 'render_bar_chart_snippet() -- return structure and page-shell isolation' => sub {
+	my $result = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA);
+
+	returns_ok($result, { type => 'hashref' }, 'return value is a hashref');
+	mark('bar-snip: returns hashref');
+
+	is($result->{svg_id}, 'bar_chart', 'svg_id is "bar_chart"');
+	mark('bar-snip: svg_id is bar_chart');
+
+	ok(defined $result->{html} && length($result->{html}) > 0, 'html field is a non-empty string');
+	mark('bar-snip: html is non-empty string');
+
+	my $html = $result->{html};
+	unlike($html, qr/<!DOCTYPE/i,        'no DOCTYPE in snippet');
+	mark('bar-snip: no DOCTYPE');
+
+	unlike($html, qr/<html/i,            'no <html> wrapper');
+	mark('bar-snip: no html wrapper');
+
+	unlike($html, qr{https://d3js\.org}, 'no D3 CDN tag -- caller loads D3');
+	mark('bar-snip: no D3 CDN');
+};
+
+subtest 'render_bar_chart_snippet() -- orientation and axis scaling' => sub {
+	# Vertical (default): x-axis is categorical (scaleBand), y-axis is linear.
+	my $html_v = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
+	like($html_v, qr/xScale\s*=\s*d3\.scaleBand/,   'vertical: xScale is d3.scaleBand');
+	mark('bar-snip: default vertical scaleBand on x');
+
+	# Horizontal: y-axis is categorical (scaleBand), x-axis is linear.
+	my $html_h = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { orientation => 'horizontal' })->{html};
+	like($html_h, qr/yScale\s*=\s*d3\.scaleBand/, 'horizontal: yScale is d3.scaleBand');
+	mark('bar-snip: horizontal scaleBand on y');
+};
+
+subtest 'render_bar_chart_snippet() -- color options' => sub {
+	# Default color is steelblue (solid fill applied to all bars).
+	my $html_def = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
+	like($html_def,   qr/steelblue/,         'default fill colour steelblue present');
+	mark('bar-snip: default color steelblue');
+
+	# Categorical color uses the D3 Tableau-10 palette.
+	my $html_cat = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { color => 'categorical' })->{html};
+	like($html_cat, qr/schemeTableau10/, 'categorical color emits schemeTableau10');
+	mark('bar-snip: categorical color schemeTableau10');
+};
+
+subtest 'render_bar_chart_snippet() -- sorting and truncation' => sub {
+	# sort_bars => 'value' sorts descending; highest bar (Gamma=450) must precede
+	# the next-highest (Alpha=300) in the serialised JSON data.
+	my $html_sv = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { sort_bars => 'value' })->{html};
+	like($html_sv, qr/"label":"Gamma".*"label":"Alpha"/s, 'Gamma (highest) precedes Alpha after value sort');
+	mark('bar-snip: sort by value descending');
+
+	# max_bars => 2 with value sort keeps Gamma + Delta, collapses Alpha + Beta into "Other".
+	my $html_mb = HTML::D3->new()->render_bar_chart_snippet(
+		\@BAR_DATA, { max_bars => 2, sort_bars => 'value' },
+	)->{html};
+	like($html_mb, qr/"label":"Other"/, '"Other" label present when max_bars exceeded');
+	mark('bar-snip: max_bars collapses tail into Other');
+};
+
+subtest 'render_bar_chart_snippet() -- show_values, animated, and rotate_labels' => sub {
+	# show_values => 1 emits D3 code that creates .bc-val-text text elements.
+	my $html_sv = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { show_values => 1 })->{html};
+	like($html_sv, qr/selectAll\(["']\.bc-val-text["']\)/, 'bc-val-text D3 selectAll present when show_values => 1');
+	mark('bar-snip: show_values D3 block present');
+
+	# animated => 1 uses a D3 transition (800 ms) for bar growth.
+	my $html_a = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { animated => 1 })->{html};
+	like($html_a, qr/\.transition\(\).*\.duration\(800\)/s, 'd3 transition with 800 ms duration present');
+	mark('bar-snip: animated transition present');
+
+	like($html_a, qr/prefers-reduced-motion/, 'prefers-reduced-motion guard present for animation');
+	mark('bar-snip: animated prefers-reduced-motion');
+
+	# rotate labels when > 8 vertical bars (Perl-side conditional on $rotate_labels).
+	my @many = map { ["Item$_", $_ * 10] } 1..9;
+	my $html_rot = HTML::D3->new()->render_bar_chart_snippet(\@many)->{html};
+	like($html_rot, qr/rotate\(-45\)/, 'x-axis labels rotated -45 degrees for > 8 bars');
+	mark('bar-snip: rotate labels above 8 bars');
+};
+
+subtest 'render_bar_chart_snippet() -- data normalisation and extra fields' => sub {
+	# undef value: the data point is silently skipped (not encoded in JSON).
+	my $html_undef = HTML::D3->new()->render_bar_chart_snippet(
+		[['Present', 99], ['Missing', undef]],
+	)->{html};
+	like($html_undef,   qr/"label":"Present"/, 'defined entry Present encoded in JSON');
+	unlike($html_undef, qr/"label":"Missing"/, 'undef entry Missing absent from JSON');
+	mark('bar-snip: undef value skipped');
+
+	# Negative value is silently absolutised: -250 becomes 250 in JSON.
+	my $html_neg = HTML::D3->new()->render_bar_chart_snippet([['Loss', -250]])->{html};
+	like($html_neg,   qr/"value":250/,  'negative value encoded as 250 (absolute)');
+	unlike($html_neg, qr/"value":-250/, 'negative sign absent from JSON');
+	mark('bar-snip: negative value absolutised');
+
+	# Optional \%extra hashref is serialised into JSON and accessed via d.extra in JS.
+	my $html_ex = HTML::D3->new()->render_bar_chart_snippet(
+		[['Widget', 500, { Region => 'EMEA', SKU => 'W-001' }]],
+	)->{html};
+	like($html_ex, qr/"extra":/, '"extra" key present in JSON');
+	like($html_ex, qr/d\.extra/,  'd.extra accessed in mouseover handler');
+	mark('bar-snip: extra tooltip data');
+};
+
+subtest 'render_bar_chart_snippet() -- x_label and value_label embedding' => sub {
+	# x_label: rendered as a text node below the bottom axis when non-empty.
+	my $html_xl = HTML::D3->new()->render_bar_chart_snippet(
+		\@BAR_DATA, { x_label => 'Category Axis' },
+	)->{html};
+	like($html_xl, qr/Category Axis/, 'x_label text present in generated HTML');
+	mark('bar-snip: x_label embedded');
+
+	# value_label: embedded as valLabel in the JS closure.
+	my $html_vl = HTML::D3->new()->render_bar_chart_snippet(
+		\@BAR_DATA, { value_label => 'Revenue' },
+	)->{html};
+	like($html_vl, qr/var valLabel\s*=\s*"Revenue"/, 'custom value_label embedded as valLabel');
+	mark('bar-snip: value_label embedded');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# render_pie_chart_snippet() -- XSS fix
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_pie_chart_snippet() -- esc() XSS function present' => sub {
+	my $html = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA)->{html};
+	like($html, qr/function esc\(/, 'esc() XSS helper function present in pie snippet');
+	mark('pie-snip: esc function present');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# id opt -- all snippet methods honour custom id
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'id opt -- pie_chart_snippet' => sub {
+	my $res = HTML::D3->new()->render_pie_chart_snippet(\@SIMPLE_DATA, { id => 'my_pie' });
+	is($res->{svg_id}, 'my_pie', 'pie_chart_snippet returns custom svg_id');
+	like($res->{html}, qr/id="my_pie"/, 'custom id appears in pie SVG element');
+	mark('id-opt: pie_chart_snippet custom id');
+};
+
+subtest 'id opt -- heatmap_snippet' => sub {
+	my $res = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA, { id => 'my_heat' });
+	is($res->{svg_id}, 'my_heat', 'heatmap_snippet returns custom svg_id');
+	like($res->{html}, qr/id="my_heat"/, 'custom id appears in heatmap SVG element');
+	mark('id-opt: heatmap_snippet custom id');
+};
+
+subtest 'id opt -- bar_chart_snippet' => sub {
+	my $res = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { id => 'my_bar' });
+	is($res->{svg_id}, 'my_bar', 'bar_chart_snippet returns custom svg_id');
+	like($res->{html}, qr/id="my_bar"/, 'custom id appears in bar SVG element');
+	mark('id-opt: bar_chart_snippet custom id');
+};
+
+subtest 'id opt -- line_chart_snippet' => sub {
+	my $res = HTML::D3->new()->render_line_chart_snippet(\@SIMPLE_DATA, { id => 'my_line' });
+	is($res->{svg_id}, 'my_line', 'line_chart_snippet returns custom svg_id');
+	like($res->{html}, qr/id="my_line"/, 'custom id appears in line SVG element');
+	mark('id-opt: line_chart_snippet custom id');
+};
+
+subtest 'id opt -- zoomable_line_chart_snippet' => sub {
+	my $res = HTML::D3->new()->render_zoomable_line_chart_snippet(\@SIMPLE_DATA, { id => 'my_zoom' });
+	is($res->{svg_id}, 'my_zoom', 'zoomable_line_chart_snippet returns custom svg_id');
+	like($res->{html}, qr/id="my_zoom"/, 'custom id appears in zoomable SVG element');
+	mark('id-opt: zoomable_line_chart_snippet custom id');
+};
+
+subtest 'id opt -- scatter_chart_snippet' => sub {
+	my $res = HTML::D3->new()->render_scatter_chart_snippet(\@SCATTER_DATA, { id => 'my_scatter' });
+	is($res->{svg_id}, 'my_scatter', 'scatter_chart_snippet returns custom svg_id');
+	like($res->{html}, qr/id="my_scatter"/, 'custom id appears in scatter SVG element');
+	mark('id-opt: scatter_chart_snippet custom id');
+};
+
+subtest 'id opt -- table_snippet' => sub {
+	my $res = HTML::D3->new()->render_table_snippet(\@TABLE_DATA, { id => 'my_table' });
+	is($res->{table_id}, 'my_table', 'table_snippet returns custom table_id');
+	like($res->{html}, qr/id="my_table"/, 'custom id appears in table element');
+	mark('id-opt: table_snippet custom id');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# responsive opt
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'responsive opt -- snippet methods' => sub {
+	my $html_def  = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
+	unlike($html_def, qr/viewBox/, 'no viewBox by default in snippet');
+	mark('responsive-opt: no viewBox by default (snippet)');
+
+	my $html_resp = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { responsive => 1 })->{html};
+	like($html_resp, qr/viewBox/, 'viewBox present when responsive => 1 in snippet');
+	mark('responsive-opt: viewBox when responsive true');
+};
+
+subtest 'responsive opt -- full-page via constructor' => sub {
+	my $chart = HTML::D3->new(responsive => 1);
+	my $html  = $chart->render_bar_chart(\@SIMPLE_DATA);
+	like($html, qr/viewBox/, 'viewBox present in full-page output when constructor responsive => 1');
+	mark('responsive-opt: full-page viewBox via constructor');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# render_scatter_chart_snippet()
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_scatter_chart_snippet() -- validation errors' => sub {
+	my $chart = HTML::D3->new();
+
+	throws_ok(
+		sub { $chart->render_scatter_chart_snippet('not an array') },
+		qr/Data must be an array of arrays/,
+		'string data dies',
+	);
+	mark('scatter-snip: die non-array data');
+
+	throws_ok(
+		sub { $chart->render_scatter_chart_snippet(['not_arr']) },
+		qr/Each data point must be an array reference/,
+		'non-arrayref element dies',
+	);
+	mark('scatter-snip: die non-arrayref element');
+
+	throws_ok(
+		sub { $chart->render_scatter_chart_snippet([[42]]) },
+		qr/Each data point must have at least 2 elements/,
+		'one-element point dies',
+	);
+	mark('scatter-snip: die fewer than 2 elements');
+
+	throws_ok(
+		sub { $chart->render_scatter_chart_snippet([['x', 20]]) },
+		qr/X value must be numeric/,
+		'non-numeric X dies',
+	);
+	mark('scatter-snip: die non-numeric X');
+
+	throws_ok(
+		sub { $chart->render_scatter_chart_snippet([[10, 'y']]) },
+		qr/Y value must be numeric/,
+		'non-numeric Y dies',
+	);
+	mark('scatter-snip: die non-numeric Y');
+};
+
+subtest 'render_scatter_chart_snippet() -- output content' => sub {
+	my $chart = HTML::D3->new(width => 800, height => 600);
+	my $res   = $chart->render_scatter_chart_snippet(\@SCATTER_DATA);
+
+	returns_ok($res, { type => 'hashref' }, 'returns a hashref');
+	mark('scatter-snip: returns hashref');
+
+	is($res->{svg_id}, 'scatter_chart', 'svg_id is scatter_chart');
+	mark('scatter-snip: svg_id is scatter_chart');
+
+	my $html = $res->{html};
+	ok(length($html) > 0, 'html is non-empty string');
+	mark('scatter-snip: html is non-empty string');
+
+	unlike($html, qr/<!DOCTYPE/i, 'no DOCTYPE in snippet');
+	mark('scatter-snip: no DOCTYPE');
+
+	unlike($html, qr/<html/i, 'no html wrapper in snippet');
+	mark('scatter-snip: no html wrapper');
+
+	unlike($html, qr{https://d3js\.org}, 'no D3 CDN in snippet');
+	mark('scatter-snip: no D3 CDN');
+
+	like($html, qr/d3\.scaleLinear/, 'd3.scaleLinear present');
+	mark('scatter-snip: d3.scaleLinear present');
+
+	like($html, qr/sc-circle/, 'sc-circle class present');
+	mark('scatter-snip: sc-circle class present');
+
+	like($html, qr/function esc\(/, 'esc() XSS helper present');
+	mark('scatter-snip: esc function present');
+
+	my $anim_html = $chart->render_scatter_chart_snippet(\@SCATTER_DATA, { animated => 1 })->{html};
+	like($anim_html, qr/prefers-reduced-motion/, 'animated: prefers-reduced-motion guard present');
+	mark('scatter-snip: animated prefers-reduced-motion');
+};
+
+# ─────────────────────────────────────────────────────────────────────────────
+# render_table_snippet()
+# ─────────────────────────────────────────────────────────────────────────────
+
+subtest 'render_table_snippet() -- validation errors' => sub {
+	my $chart = HTML::D3->new();
+
+	throws_ok(
+		sub { $chart->render_table_snippet('not an array') },
+		qr/Data must be an array of arrays/,
+		'non-arrayref data dies',
+	);
+	mark('table-snip: die non-array data');
+
+	throws_ok(
+		sub { $chart->render_table_snippet([]) },
+		qr/Data must have at least one row/,
+		'empty array dies',
+	);
+	mark('table-snip: die empty data');
+
+	throws_ok(
+		sub { $chart->render_table_snippet(['not_a_row']) },
+		qr/Each row must be an array reference/,
+		'non-arrayref row dies',
+	);
+	mark('table-snip: die non-arrayref row');
+};
+
+subtest 'render_table_snippet() -- output content' => sub {
+	my $chart = HTML::D3->new();
+	my $res   = $chart->render_table_snippet(\@TABLE_DATA);
+
+	returns_ok($res, { type => 'hashref' }, 'returns a hashref');
+	mark('table-snip: returns hashref');
+
+	is($res->{table_id}, 'data_table', 'table_id is data_table');
+	mark('table-snip: table_id is data_table');
+
+	ok(!exists($res->{svg_id}), 'no svg_id key in return hashref');
+	mark('table-snip: no svg_id key');
+
+	my $html = $res->{html};
+	ok(length($html) > 0, 'html is non-empty string');
+	mark('table-snip: html is non-empty string');
+
+	unlike($html, qr/<!DOCTYPE/i, 'no DOCTYPE in snippet');
+	mark('table-snip: no DOCTYPE');
+
+	unlike($html, qr/<html/i, 'no html wrapper in snippet');
+	mark('table-snip: no html wrapper');
+
+	like($html, qr/<table/, 'table element present');
+	mark('table-snip: table element present');
+
+	like($html, qr/dt-sortable/, 'sortable class present by default');
+	mark('table-snip: sortable class present by default');
+
+	my $nosort = $chart->render_table_snippet(\@TABLE_DATA, { sortable => 0 })->{html};
+	unlike($nosort, qr/dt-sortable/, 'sortable class absent when sortable => 0');
+	mark('table-snip: sortable absent when 0');
+
+	my $cap_html = $chart->render_table_snippet(\@TABLE_DATA, { caption => 'Sales Q1' })->{html};
+	like($cap_html, qr/<caption>Sales Q1<\/caption>/, 'caption element present when provided');
+	mark('table-snip: caption present when provided');
+};
+
+subtest 'render_table_snippet() -- XSS escaping' => sub {
+	my $chart = HTML::D3->new();
+	my $html  = $chart->render_table_snippet([
+		['Col<b>Hdr</b>', 'Val'],
+		['<em>cell</em>', '&data'],
+	])->{html};
+
+	like($html, qr/Col&lt;b&gt;Hdr&lt;\/b&gt;/, 'HTML tags in header escaped');
+	mark('table-snip: XSS headers escaped');
+
+	like($html, qr/&lt;em&gt;cell&lt;\/em&gt;/, 'HTML tags in cell escaped');
+	mark('table-snip: XSS cells escaped');
 };
 
 # ─────────────────────────────────────────────────────────────────────────────

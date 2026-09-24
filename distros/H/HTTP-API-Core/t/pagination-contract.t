@@ -12,6 +12,7 @@ use HTTP::API::Core::Pagination;
 {
     package T::PagerClient;
     sub new { bless { calls => [], pages => $_[1] || {} }, $_[0] }
+    sub base_url { 'https://api.example.com' }
     sub get {
         my ($self, $url, %opts) = @_;
         push @{ $self->{calls} }, [$url, { %opts }];
@@ -178,5 +179,43 @@ dies_like(
     qr/pagination continuation repeated: url:\/r/,
     'repeated continuation is rejected',
 );
+
+my $cross_origin_client = T::PagerClient->new({
+    '/origin' => { items => [1], next => 'https://evil.example/items?page=2' },
+});
+my $cross_origin = HTTP::API::Core::Pagination->new(
+    client => $cross_origin_client,
+    path   => '/origin',
+);
+dies_like(
+    sub { $cross_origin->all },
+    qr/cross-origin pagination continuation rejected/,
+    'cross-origin absolute continuation is rejected by default',
+);
+is scalar(@{ $cross_origin_client->{calls} }), 1,
+    'cross-origin continuation is rejected before a second request';
+
+my $same_origin_client = T::PagerClient->new({
+    '/same' => { items => [1], next => 'https://api.example.com/items?page=2' },
+    'https://api.example.com/items?page=2' => { items => [2], next => undef },
+});
+my $same_origin = HTTP::API::Core::Pagination->new(
+    client => $same_origin_client,
+    path   => '/same',
+);
+is_deeply(scalar($same_origin->all), [1, 2],
+    'same-origin absolute continuation is allowed');
+
+my $allowed_cross_origin_client = T::PagerClient->new({
+    '/allowed' => { items => [1], next => 'https://cdn.example/items?page=2' },
+    'https://cdn.example/items?page=2' => { items => [2], next => undef },
+});
+my $allowed_cross_origin = HTTP::API::Core::Pagination->new(
+    client             => $allowed_cross_origin_client,
+    path               => '/allowed',
+    allow_cross_origin => 1,
+);
+is_deeply(scalar($allowed_cross_origin->all), [1, 2],
+    'cross-origin continuation can be explicitly enabled');
 
 done_testing;

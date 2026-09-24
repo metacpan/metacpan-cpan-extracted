@@ -1,6 +1,11 @@
 Changelog for DBIx-ParseError-MySQL
 
-v1.0.6 2026-09-18T16:26:05
+v1.0.7 2026-09-23T22:30:00
+ - Pull request #8: SM-6891 b (Brendan Byrd)
+ - Add stale statement handler and re-prepare errors as transient (Brendan
+   Byrd)
+
+v1.0.6 2026-09-18T16:25:51
  - Update README (Brendan Byrd)
  - Pull request #7: SM-6891 a (Brendan Byrd)
  - Add packet corruption, table definition change, and writer capacity

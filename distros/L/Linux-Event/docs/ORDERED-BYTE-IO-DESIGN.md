@@ -55,9 +55,17 @@ its handles.
 `read_fh` or `write_fh`. For split objects, `fh()` is undefined while
 `read_fh`, `write_fh`, `read_fd`, and `write_fd` remain unambiguous.
 
-Every unique descriptor is made nonblocking and close-on-exec. One shared
-descriptor uses one Loop registration. Split read/write descriptors use two
-registrations that point at the same native ordered-byte state.
+Every unique descriptor is made nonblocking and close-on-exec while managed.
+One shared descriptor uses one Loop registration. Split read/write descriptors
+use two registrations that point at the same native ordered-byte state.
+
+Pipe and connected Stream handles use owning lifecycle semantics. TTY is the
+deliberate exception: supplied terminal handles are borrowed by default so
+wrapping `STDIN`/`STDOUT` does not make terminal close destroy the process's
+standard handles. TTY captures their original file-status and descriptor flags,
+temporarily applies the ordered-byte requirements, and restores the captured
+flags when the complete TTY closes or detaches. `owns_handles => 1` opts into
+the owning behavior.
 
 ## Native state
 
@@ -163,8 +171,11 @@ Read and write termination are independent normal states.
 - `on_close` runs once when the complete configured resource becomes terminal.
 - `pause_read` and `resume_read` affect only input.
 
-For distinct pipe or terminal handles, ending a direction can close that
-specific descriptor.
+For distinct Pipe handles, ending a direction can close that specific
+descriptor. A borrowed TTY instead stops managing the direction without closing
+the caller's handle. Because duplicated terminal descriptors may share one Linux
+open-file description, borrowed flag restoration waits until the complete TTY
+becomes terminal if another direction remains active.
 
 A shared non-socket descriptor has no universal half-close syscall. The
 ordered-byte engine therefore records logical write completion without
@@ -175,8 +186,11 @@ appropriate.
 
 ## Detach
 
-Plain ordered-byte resources can transfer descriptor ownership only when the
-resource-specific contract permits it and pending output has drained.
+Plain ordered-byte resources can detach only when the resource-specific
+contract permits it and pending output has drained. For owning resources,
+detach transfers descriptor ownership. For a default borrowed TTY, detach ends
+management and restores the caller's captured descriptor flags before returning
+the still-caller-owned handles.
 
 The private engine can represent the returned directional handles as:
 

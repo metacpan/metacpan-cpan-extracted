@@ -1,0 +1,64 @@
+{
+   "abstract" : "Manage Cloudflare compute and storage resources from Perl",
+   "author" : [
+      "Andrew Speer <andrew.speer@isolutions.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Cloudflare-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "HTTP::API::Core" : "1.01",
+            "IO::Socket::SSL" : "0",
+            "JSON::PP" : "0",
+            "MIME::Base64" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aspeer/pm-Cloudflare-API/issues"
+      },
+      "homepage" : "https://github.com/aspeer/pm-Cloudflare-API",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aspeer/pm-Cloudflare-API.git",
+         "web" : "https://github.com/aspeer/pm-Cloudflare-API"
+      }
+   },
+   "version" : "1.010",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

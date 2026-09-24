@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.116';
+our $VERSION = '0.117';
 
 use parent 'Linux::Event::_Socket::Listener';
 use Carp qw(croak);
@@ -28,7 +28,7 @@ __END__
 
 =head1 NAME
 
-Linux::Event::IO::Sock::Listener - asynchronous listening C<SOCK_STREAM> socket
+Linux::Event::IO::Sock::Listener - Accept asynchronous stream connections
 
 =head1 SYNOPSIS
 
@@ -37,211 +37,444 @@ Linux::Event::IO::Sock::Listener - asynchronous listening C<SOCK_STREAM> socket
   use Linux::Event::IO::Sock::Listener;
 
   my $loop = Linux::Event::Loop->new;
+
   my $listener = Linux::Event::IO::Sock::Listener->new(
       loop => $loop,
       host => '127.0.0.1',
       port => 9999,
 
       stream => {
-          on_data => sub ($stream, $bytes) {
-              $stream->write($bytes);
+          on_data => sub ($self, $bytes) {
+              $self->write($bytes);
           },
       },
   );
+
+  say "Listening on port " . $listener->port;
 
   $loop->run;
 
 =head1 DESCRIPTION
 
-C<Linux::Event::IO::Sock::Listener> owns a listening Linux C<SOCK_STREAM>
-socket and is a generator of connected L<Linux::Event::IO::Sock::Stream>
-objects. Listener options configure bind/listen/accept behavior. The nested
-C<stream =E<gt> {...}> recipe describes the Streams generated for accepted
-connections and is resolved once when the Listener is constructed.
+C<Linux::Event::IO::Sock::Listener> represents a listening stream socket.
 
-TCP and Unix-domain listeners share this class. Socket family is selected by
-constructor options, not by subclass hierarchy.
+It accepts incoming connections and creates a
+L<Linux::Event::IO::Sock::Stream> object for each one.
 
-=head1 STREAM RECIPE
+A Listener can listen on:
 
-The C<stream> hash may contain C<class>, C<tuning>, C<tls>, C<data>, and Stream
-callbacks. C<class> defaults to C<Linux::Event::IO::Sock::Stream>, so a simple
-raw server does not require a connection subclass:
+=over 4
+
+=item *
+
+TCP over IPv4
+
+=item *
+
+TCP over IPv6
+
+=item *
+
+Unix-domain stream sockets
+
+=item *
+
+an already-created listening socket supplied by the application
+
+=back
+
+The most important Listener option is C<stream>.
+
+The C<stream> hash describes what kind of Stream should be created for each
+accepted connection and how that Stream should behave.
+
+For example, this creates a simple echo server:
 
   my $listener = Linux::Event::IO::Sock::Listener->new(
       loop => $loop,
       host => '0.0.0.0',
       port => 9000,
+
       stream => {
-          on_data => sub ($stream, $bytes) {
-              $stream->write($bytes);
+          on_data => sub ($self, $bytes) {
+              $self->write($bytes);
           },
       },
   );
 
-A reusable connection subclass remains the preferred place for framing, named
-callback methods, socket policy, and class tuning defaults:
+Every new client gets its own Stream object, and that Stream uses the supplied
+C<on_data> callback.
 
-  package ServerConnection;
-  use parent 'Linux::Event::IO::Sock::Stream';
+=head1 CREATING A TCP LISTENER
 
-  sub stream_tuning ($class) {
-      return (
-          read_size         => 65_536,
-          read_budget_bytes => 262_144,
-          idle_timeout      => 60,
-      );
-  }
+A normal TCP server looks like this:
 
-  sub on_data ($self, $bytes) {
-      $self->write($bytes);
-  }
-
-  package main;
   my $listener = Linux::Event::IO::Sock::Listener->new(
+      loop => $loop,
       host => '0.0.0.0',
-      port => 9000,
+      port => 5000,
+
       stream => {
-          class => 'ServerConnection',
-          tuning => {
-              read_size    => 131_072,
-              idle_timeout => 30,
+          on_data => sub ($self, $bytes) {
+              ...
           },
       },
   );
 
-Recipe tuning overrides C<stream_tuning()> defaults for every Stream generated
-by that Listener. A live Stream may subsequently change its own effective
-operating values with C<< $stream->tune(...) >>.
+=head2 host
 
-C<data> is the initial C<data> value supplied to each generated Stream.
-Supported Stream callbacks are C<on_data>, C<on_message>, C<on_messages>,
-C<on_ready>, C<on_transport_ready>, C<on_drain>, C<on_eof>, C<on_error>, and
-C<on_close>. Callback CVs are retained by the resolved recipe; Linux::Event does
-not rebuild the configuration for every accept or every I/O event.
+  host => '0.0.0.0'
 
-A readable raw Stream must have an effective C<on_data> sink. A framed Stream
-must have the message sink required by its effective batching policy, unless a
-native consumer supplies that sink. These predictable errors are rejected while
-the Listener is being constructed, before any client can be accepted.
+The local address to bind.
 
-=head2 Listener acceptance tuning
+For example:
 
-Listener settings remain top-level because they configure the listening
-resource itself rather than the Streams it generates:
+  '127.0.0.1'
+
+listens only on the local IPv4 loopback interface, while:
+
+  '0.0.0.0'
+
+requests all IPv4 interfaces.
+
+IPv6 addresses may also be used.
+
+=head2 port
+
+  port => 5000
+
+The TCP port to bind.
+
+Use zero to let the kernel select an available port:
+
+  port => 0
+
+The selected port can then be read with:
+
+  my $port = $listener->port;
+
+This is particularly useful in tests.
+
+=head2 loop
+
+  loop => $loop
+
+Attach the Listener to the Loop immediately.
+
+The option is not required.
+
+A Listener may instead be created detached:
 
   my $listener = Linux::Event::IO::Sock::Listener->new(
-      loop                => $loop,
-      host                => '0.0.0.0',
-      port                => 9999,
-      backlog             => 8_192,
-      max_accept_per_tick => 512,
-      stream              => {
-          class => 'ServerConnection',
+      host => '127.0.0.1',
+      port => 5000,
+      stream => { ... },
+  );
+
+and attached later:
+
+  $loop->add($listener);
+
+=head1 UNIX-DOMAIN LISTENERS
+
+Use C<unix> instead of C<host> and C<port>:
+
+  my $listener = Linux::Event::IO::Sock::Listener->new(
+      loop => $loop,
+      unix => '/run/my-service.sock',
+
+      stream => {
+          on_data => sub ($self, $bytes) {
+              ...
+          },
       },
   );
+
+This creates a Unix-domain C<SOCK_STREAM> listener.
+
+Linux::Event uses the same Listener and Stream APIs for TCP and Unix-domain
+connections.
+
+=head1 THE STREAM RECIPE
+
+The nested C<stream> hash describes the Stream that should be created for every
+accepted connection.
+
+The simplest form supplies callbacks directly:
+
+  stream => {
+      on_data => sub ($self, $bytes) {
+          $self->write($bytes);
+      },
+  }
+
+The default Stream class is:
+
+  Linux::Event::IO::Sock::Stream
+
+so a simple server does not need to define its own connection subclass.
+
+The recipe may contain:
 
 =over 4
 
-=item * C<backlog> (default 4,096)
+=item *
 
-Positive listen backlog requested from the kernel.
+C<class>
 
-=item * C<max_accept_per_tick> (default 256)
+=item *
 
-Non-negative accept fairness limit. Zero drains until C<EAGAIN> and is required
-when C<edge_triggered> is enabled.
+Stream callbacks
 
-=item * C<edge_triggered> (default 0)
+=item *
 
-Boolean selecting edge-triggered accept readiness.
+C<data>
 
-=item * C<reuseaddr> (default 1)
+=item *
 
-Boolean controlling C<SO_REUSEADDR> for a created listener.
+C<tuning>
 
-=item * C<reuseport> (default 0)
+=item *
 
-Boolean controlling C<SO_REUSEPORT> for a created listener.
-
-=item * C<v6only> (default unspecified)
-
-Optional boolean controlling C<IPV6_V6ONLY> for a created IPv6 listener.
-
-=item * C<bind_device> (default unspecified)
-
-Optional non-empty interface name used with C<SO_BINDTODEVICE> for an Internet
-listener.
+C<tls>
 
 =back
 
-Unix listener ownership controls are C<unlink> (default false),
-C<unlink_on_close> (default true), and optional C<permissions>. C<owns_socket>
-controls ownership of an adopted listening C<fh>. These are construction and
-ownership settings, not Stream tuning.
+=head2 Stream callbacks
 
-Exactly one listener source is selected:
+Callbacks inside C<stream> belong to the accepted connection:
 
-  Linux::Event::IO::Sock::Listener->new(
-      host => '0.0.0.0', port => 9999, stream => { ... },
+  stream => {
+      on_ready => sub ($self) {
+          ...
+      },
+
+      on_data => sub ($self, $bytes) {
+          ...
+      },
+
+      on_error => sub ($self, $error) {
+          ...
+      },
+
+      on_close => sub ($self) {
+          ...
+      },
+  }
+
+The available Stream callbacks are:
+
+  on_data
+  on_message
+  on_messages
+  on_ready
+  on_transport_ready
+  on_drain
+  on_eof
+  on_error
+  on_close
+
+See L<Linux::Event::IO::Sock::Stream> for their behavior.
+
+=head2 class
+
+A server may use a Stream subclass for its accepted connections:
+
+  package ChatConnection;
+
+  use parent 'Linux::Event::IO::Sock::Stream';
+  use Linux::Event::Framer 'Delimiter', "\n";
+
+  sub on_message ($self, $message) {
+      ...
+  }
+
+  package main;
+
+  my $listener = Linux::Event::IO::Sock::Listener->new(
+      loop => $loop,
+      host => '0.0.0.0',
+      port => 5000,
+
+      stream => {
+          class => 'ChatConnection',
+      },
   );
 
-  Linux::Event::IO::Sock::Listener->new(
-      unix => '/run/example.sock', stream => { ... },
-  );
+This is useful when all connections share a protocol, framing rule, TLS
+defaults, socket policy, tuning, or callback methods.
 
-  Linux::Event::IO::Sock::Listener->new(
-      fh => $existing_listener, stream => { ... },
-  );
+=head2 Mixing subclass methods and callbacks
 
-C<loop =E<gt> $loop> attaches immediately; otherwise add the detached Listener
-with C<< $loop->add($listener) >>.
+The Stream recipe may still provide callbacks when a Stream subclass is used:
+
+  stream => {
+      class => 'ChatConnection',
+
+      on_close => sub ($self) {
+          remove_connection($self);
+      },
+  }
+
+A constructor-style callback in the recipe overrides the same-named subclass
+method for Streams created by that Listener.
+
+This lets a reusable protocol class be combined with application-specific
+behavior.
+
+=head2 data
+
+  stream => {
+      data => $value,
+      ...
+  }
+
+Set the initial C<data> value for each accepted Stream.
+
+The supplied value becomes the connection's application data.
+
+=head1 WHEN A CONNECTION IS ACCEPTED
+
+Linux::Event accepts the socket, creates the configured Stream object, attaches
+that Stream to the same Loop as the Listener, and prepares it for asynchronous
+I/O.
+
+For a plain connection, C<on_ready> follows when the Stream is ready for
+application use.
+
+For a TLS connection, C<on_ready> waits until the TLS handshake and verification
+have completed.
 
 =head1 LISTENER CALLBACKS
 
-C<on_accept> and C<on_error> at the top level belong to the Listener. Stream
-C<on_error> belongs inside the C<stream> recipe.
+The Listener itself also has callbacks.
+
+These are different from callbacks inside the C<stream> recipe.
+
+=head2 on_accept
+
+  on_accept => sub ($self, $stream) {
+      say "Accepted a new connection";
+  }
+
+Called after a new Stream has been created for an accepted socket.
+
+The second argument is the actual Stream object representing that connection.
+
+This is useful for tasks such as:
+
+=over 4
+
+=item *
+
+keeping a list of connected clients
+
+=item *
+
+assigning application identity to a new connection
+
+=item *
+
+logging connection activity
+
+=item *
+
+performing application-level setup that belongs to the server rather than the
+protocol class
+
+=back
+
+For example:
+
+  my %clients;
 
   my $listener = Linux::Event::IO::Sock::Listener->new(
+      loop => $loop,
       host => '0.0.0.0',
-      port => 9999,
+      port => 5000,
+
       stream => {
-          on_data => sub ($stream, $bytes) { ... },
-          on_error => sub ($stream, $error) { ... },
+          on_data => sub ($self, $bytes) {
+              ...
+          },
       },
-      on_accept => sub ($listener, $stream) { ... },
-      on_error  => sub ($listener, $error)  { ... },
+
+      on_accept => sub ($self, $stream) {
+          $clients{$stream} = 1;
+      },
   );
 
-A Listener subclass may define the same callback methods as reusable defaults.
-Constructor callbacks override those methods for that Listener instance.
+=head2 on_error
 
-=head1 ACCEPTANCE
+  on_error => sub ($self, $error) {
+      warn "Listener error: $error\n";
+  }
 
-Native code drains C<accept4> with nonblocking and close-on-exec flags.
-C<max_accept_per_tick> bounds level-triggered acceptance for fairness; zero
-drains until C<EAGAIN> and is required with edge-triggered operation.
+Called when an asynchronous error belongs to the Listener itself.
 
-For every accepted socket Linux::Event constructs the resolved Stream class
-with the already-prepared recipe descriptor, attaches it to the same Loop, and
-then invokes optional C<on_accept($listener, $stream)>. A plain Stream's
-C<on_ready> follows. For TLS, C<on_ready> waits for handshake and verification.
+This is separate from a Stream's C<on_error>.
 
-An C<on_accept> exception closes only that accepted connection and is reported
-through the Listener C<on_error> callback.
-
-=head1 TLS
-
-TLS is generated-Stream acquisition policy and therefore belongs under
-C<stream =E<gt> { tls =E<gt> {...} }>. A Stream class does not need to be a
-special TLS subclass. TLS configuration is resolved when the Listener is
-constructed and plain listeners allocate no OpenSSL connection state.
+For example:
 
   my $listener = Linux::Event::IO::Sock::Listener->new(
+      ...
+
+      stream => {
+          on_error => sub ($self, $error) {
+              warn "Client connection error: $error\n";
+          },
+      },
+
+      on_error => sub ($self, $error) {
+          warn "Listening socket error: $error\n";
+      },
+  );
+
+The inner C<on_error> handles connection errors.
+
+The outer C<on_error> handles Listener errors.
+
+=head2 Errors from on_accept
+
+If C<on_accept> dies, Linux::Event closes only the newly accepted connection.
+
+The Listener remains alive.
+
+The error is reported through the Listener's C<on_error> callback.
+
+=head1 USING A LISTENER SUBCLASS
+
+Listener callbacks can also be methods:
+
+  package MyListener;
+
+  use parent 'Linux::Event::IO::Sock::Listener';
+
+  sub on_accept ($self, $stream) {
+      say "New client";
+  }
+
+A constructor callback overrides the same-named method for that particular
+Listener.
+
+For most applications, constructor callbacks are the simpler choice unless
+Listener behavior itself is reusable.
+
+=head1 TLS SERVERS
+
+TLS belongs inside the C<stream> recipe because TLS is a property of each
+accepted connection.
+
+For example:
+
+  my $listener = Linux::Event::IO::Sock::Listener->new(
+      loop => $loop,
       host => '0.0.0.0',
       port => 9443,
+
       stream => {
           class => 'ServerConnection',
+
           tls => {
               cert_file => '/etc/myapp/server-cert.pem',
               key_file  => '/etc/myapp/server-key.pem',
@@ -249,21 +482,338 @@ constructed and plain listeners allocate no OpenSSL connection state.
       },
   );
 
-The Listener prepares reusable server TLS context and policy once. Each accepted
-TLS Stream receives independent connection state while sharing that prepared
-server context. Ordinary server code does not need to load C<Linux::Event::TLS>
-directly.
+The Listener prepares reusable server TLS configuration once.
 
-=head1 METHODS AND LIFECYCLE
+Each accepted Stream receives its own TLS connection state.
 
-C<port> reports the bound TCP port, including the kernel-selected value after
-C<port =E<gt> 0>. C<family>, C<family_number>, C<is_tcp>, and C<is_unix>
-identify the listening socket family.
+Application callbacks see plaintext rather than encrypted wire bytes.
 
-C<pause> and C<resume> control acceptance while retaining the listening socket.
-C<close> ends ownership. C<detach> returns the still-open listening handle and
-is terminal. C<state> reports lifecycle such as C<unattached>, C<listening>,
-C<paused>, C<closed>, C<failed>, or C<detached>.
+A Stream class does not need to be a special TLS subclass merely because one
+Listener uses it with TLS.
 
-Runtime errors are L<Linux::Event::Error> values. Resource exhaustion pauses
-acceptance before error delivery to prevent a readable-backlog error spin.
+For example, the same C<ServerConnection> class could be used by:
+
+  port => 8080
+
+without C<tls>, and by:
+
+  port => 8443
+
+with C<tls>.
+
+See L<Linux::Event::TLS> for the complete TLS configuration.
+
+=head1 STREAM TUNING FOR ACCEPTED CONNECTIONS
+
+A Stream subclass may define its normal C<stream_tuning> defaults.
+
+A particular Listener can override those defaults for every connection it
+accepts:
+
+  stream => {
+      class => 'ServerConnection',
+
+      tuning => {
+          idle_timeout   => 30,
+          high_watermark => 2_097_152,
+          low_watermark  => 524_288,
+      },
+  }
+
+These values apply to Streams created by this Listener.
+
+An individual Stream may later change its mutable settings with:
+
+  $stream->tune(...);
+
+The precedence is therefore:
+
+  Stream subclass defaults
+      then Listener stream tuning
+          then live Stream tune()
+
+See L<Linux::Event::IO::Sock::Stream> for all tuning options.
+
+=head1 LISTENER ACCEPTANCE TUNING
+
+Listener acceptance settings are B<top-level constructor options>.
+
+They belong alongside C<host>, C<port>, and C<stream>. They do not go inside
+the Stream recipe and they do not use a separate C<tuning> hash.
+
+For example:
+
+  my $listener = Linux::Event::IO::Sock::Listener->new(
+      loop => $loop,
+      host => '0.0.0.0',
+      port => 9999,
+
+      backlog             => 8_192,
+      max_accept_per_tick => 512,
+      reuseaddr           => 1,
+      reuseport           => 1,
+
+      stream => {
+          class => 'ServerConnection',
+
+          tuning => {
+              idle_timeout   => 30,
+              high_watermark => 2_097_152,
+          },
+      },
+  );
+
+In this example:
+
+  backlog
+  max_accept_per_tick
+  reuseaddr
+  reuseport
+
+configure the B<Listener>, while:
+
+  idle_timeout
+  high_watermark
+
+configure each accepted B<Stream>.
+
+The following settings affect the listening socket itself rather than the
+Streams it creates.
+
+Most applications should leave their defaults unchanged.
+
+=head2 backlog
+
+Default: 4,096.
+
+  backlog => 8192
+
+Requested kernel listen backlog.
+
+It must be a positive integer.
+
+=head2 max_accept_per_tick
+
+Default: 256.
+
+  max_accept_per_tick => 512
+
+Maximum number of connections Linux::Event accepts during one readiness turn.
+
+This exists for fairness.
+
+A busy listening socket should not indefinitely prevent existing connections,
+timers, and other resources from running.
+
+A value of zero means to continue accepting until the kernel reports that no
+more connections are immediately available.
+
+Zero is required when edge-triggered acceptance is enabled.
+
+=head2 edge_triggered
+
+Default: false.
+
+  edge_triggered => 1
+
+Use edge-triggered accept readiness.
+
+This is an advanced option.
+
+When enabled, C<max_accept_per_tick> must be zero so the accept queue is drained
+until it would block.
+
+=head2 reuseaddr
+
+Default: true.
+
+  reuseaddr => 1
+
+Controls C<SO_REUSEADDR> for a Listener created by Linux::Event.
+
+=head2 reuseport
+
+Default: false.
+
+  reuseport => 1
+
+Controls C<SO_REUSEPORT> for a Listener created by Linux::Event.
+
+=head2 v6only
+
+For an IPv6 Listener:
+
+  v6only => 1
+
+controls C<IPV6_V6ONLY>.
+
+When unspecified, the operating-system default is used.
+
+=head2 bind_device
+
+  bind_device => 'eth0'
+
+Bind an Internet Listener to a particular Linux network interface using
+C<SO_BINDTODEVICE>.
+
+This is normally unnecessary.
+
+=head1 UNIX SOCKET FILE OPTIONS
+
+Unix-domain listeners have several options relating to the filesystem socket
+path.
+
+=head2 unlink
+
+  unlink => 1
+
+Allow an existing socket path to be removed as part of Listener setup.
+
+The default is false.
+
+=head2 unlink_on_close
+
+  unlink_on_close => 1
+
+Remove the owned Unix socket path when the Listener closes.
+
+The default is true.
+
+=head2 permissions
+
+Set filesystem permissions for a newly created Unix-domain socket path.
+
+=head1 ADOPTING AN EXISTING LISTENING SOCKET
+
+A Listener can take an already-created listening socket:
+
+  my $listener = Linux::Event::IO::Sock::Listener->new(
+      loop => $loop,
+      fh   => $socket,
+
+      stream => {
+          on_data => sub ($self, $bytes) {
+              ...
+          },
+      },
+  );
+
+This is useful when socket creation or activation is managed elsewhere.
+
+C<owns_socket> controls whether the Listener owns the adopted socket's
+lifecycle.
+
+=head1 PAUSING AND RESUMING ACCEPTANCE
+
+=head2 pause
+
+  $listener->pause;
+
+Temporarily stop accepting new connections while keeping the listening socket
+open.
+
+Existing accepted Streams continue operating normally.
+
+=head2 resume
+
+  $listener->resume;
+
+Resume accepting new connections.
+
+This can be useful when the application intentionally wants to limit admission
+without shutting down the server.
+
+=head1 CLOSING A LISTENER
+
+=head2 close
+
+  $listener->close;
+
+Stop listening and end the Listener's ownership of the socket.
+
+Existing accepted Streams are separate resources and are not automatically
+closed merely because the Listener closes.
+
+=head2 detach
+
+  my $fh = $listener->detach;
+
+Remove the listening socket from Linux::Event and return the still-open socket
+handle.
+
+Detachment is terminal for the Listener object.
+
+=head1 INFORMATION METHODS
+
+=head2 port
+
+  my $port = $listener->port;
+
+Return the bound TCP port.
+
+This is especially useful when the Listener was created with:
+
+  port => 0
+
+and the kernel selected the actual port.
+
+=head2 family
+
+Return the socket family in descriptive form.
+
+=head2 family_number
+
+Return the numeric socket family.
+
+=head2 is_tcp
+
+Return true for an Internet TCP Listener.
+
+=head2 is_unix
+
+Return true for a Unix-domain Listener.
+
+=head2 state
+
+Return the Listener's current lifecycle state.
+
+Possible states include:
+
+  unattached
+  listening
+  paused
+  closed
+  failed
+  detached
+
+=head1 RESOURCE EXHAUSTION
+
+If the process temporarily runs out of resources while accepting connections,
+Linux::Event pauses acceptance before reporting the error.
+
+This prevents a busy readable listening socket from repeatedly generating the
+same failure in a tight loop.
+
+The failure is then delivered through the Listener's C<on_error> callback.
+
+=head1 PERFORMANCE MODEL
+
+The Stream recipe is prepared when the Listener is constructed.
+
+Linux::Event does not rebuild the Stream class, callback, TLS, and tuning
+configuration from scratch every time a connection is accepted.
+
+This allows accepted connections to use the same convenient callback and
+subclass APIs without adding repeated configuration work to the accept path.
+
+=head1 SEE ALSO
+
+L<Linux::Event>,
+L<Linux::Event::Loop>,
+L<Linux::Event::IO::Sock::Stream>,
+L<Linux::Event::TLS>,
+L<Linux::Event::Error>,
+F<docs/SOCKET-CONNECTIONS.md>,
+F<docs/SOCKET-CONFIGURATION.md>.
+
+=cut

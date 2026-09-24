@@ -2,7 +2,7 @@ NAME
     Mojolicious::Plugin::BasicAuthPlus - Basic HTTP Auth Helper Plus
 
 VERSION
-    Version 0.11.3
+    Version 1.0
 
 SYNOPSIS
       # Mojolicious::Lite
@@ -396,12 +396,14 @@ CONTRIBUTORS
 
       Jan Paul Schmidt
 
+      José Joaquín Atria
+
 SEE ALSO
     Mojolicious, Mojolicious::Guides, <http://mojolicio.us>,
     Authen::Simple::Password, Authen::Simple::Passwd, Net::LDAP
 
 COPYRIGHT
-    Copyright (c) 2013-2018 by Brad Robertson.
+    Copyright (c) 2013-2026 by Brad Robertson.
 
 LICENSE
     This program is free software; you can redistribute it and/or modify it

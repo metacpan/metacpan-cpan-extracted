@@ -1,0 +1,176 @@
+{
+   "abstract" : "Object::Pad based POSIX compatible options processor",
+   "author" : [
+      "davenonymous <perl@davenonymous.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Getopt-Pad",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Term::ReadKey" : "0",
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "Feature::Compat::Try" : "0",
+            "Getopt::Long" : "2.50",
+            "JSON::PP" : "0",
+            "Object::Pad" : "0.800",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Getopt::Pad" : {
+         "file" : "lib/Getopt/Pad.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Completion" : {
+         "file" : "lib/Getopt/Pad/Completion.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Config" : {
+         "file" : "lib/Getopt/Pad/Config.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Config::Format" : {
+         "file" : "lib/Getopt/Pad/Config/Format.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Config::Format::Json" : {
+         "file" : "lib/Getopt/Pad/Config/Format/Json.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Config::Format::Yaml" : {
+         "file" : "lib/Getopt/Pad/Config/Format/Yaml.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Error" : {
+         "file" : "lib/Getopt/Pad/Error.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::ExitRequest" : {
+         "file" : "lib/Getopt/Pad/ExitRequest.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Help" : {
+         "file" : "lib/Getopt/Pad/Help.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Parser" : {
+         "file" : "lib/Getopt/Pad/Parser.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Registry" : {
+         "file" : "lib/Getopt/Pad/Registry.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Result" : {
+         "file" : "lib/Getopt/Pad/Result.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Result::Generator" : {
+         "file" : "lib/Getopt/Pad/Result/Generator.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Spec" : {
+         "file" : "lib/Getopt/Pad/Spec.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Spec::Arg" : {
+         "file" : "lib/Getopt/Pad/Spec/Arg.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Spec::Config" : {
+         "file" : "lib/Getopt/Pad/Spec/Config.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Spec::Level" : {
+         "file" : "lib/Getopt/Pad/Spec/Level.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Spec::Option" : {
+         "file" : "lib/Getopt/Pad/Spec/Option.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Type" : {
+         "file" : "lib/Getopt/Pad/Type.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Type::Dir" : {
+         "file" : "lib/Getopt/Pad/Type/Dir.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Type::File" : {
+         "file" : "lib/Getopt/Pad/Type/File.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Type::Float" : {
+         "file" : "lib/Getopt/Pad/Type/Float.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Type::Int" : {
+         "file" : "lib/Getopt/Pad/Type/Int.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Type::Number" : {
+         "file" : "lib/Getopt/Pad/Type/Number.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Type::Path" : {
+         "file" : "lib/Getopt/Pad/Type/Path.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Type::Url" : {
+         "file" : "lib/Getopt/Pad/Type/Url.pm",
+         "version" : "0.02"
+      },
+      "Getopt::Pad::Util" : {
+         "file" : "lib/Getopt/Pad/Util.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davenonymous/perl-getopt-pad/issues"
+      },
+      "homepage" : "https://github.com/davenonymous/perl-getopt-pad",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davenonymous/perl-getopt-pad.git",
+         "web" : "https://github.com/davenonymous/perl-getopt-pad"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

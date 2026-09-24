@@ -55,6 +55,8 @@
 #include <stdint.h>
 #include <time.h>
 #include <limits.h>
+#include <sys/types.h>
+#include <pthread.h>
 
 #ifndef EPOLLRDHUP
 #define EPOLLRDHUP 0x2000
@@ -80,6 +82,13 @@ typedef struct le_watcher_s le_watcher_t;
 typedef struct le_registration_s le_registration_t;
 typedef struct le_timer_s le_timer_t;
 typedef struct le_timer_descriptor_s le_timer_descriptor_t;
+
+static pid_t le_process_pid;
+static int le_atfork_registered;
+
+static void le_process_after_fork_child(void) {
+    le_process_pid = getpid();
+}
 
 struct le_timer_descriptor_s {
     SV *callback_cv;
@@ -164,6 +173,7 @@ struct le_watcher_s {
  */
 struct le_loop_s {
     int epoll_fd;
+    pid_t owner_pid;
     int stop_flag;
     size_t event_cap;
     struct epoll_event *events;
@@ -305,6 +315,14 @@ static int le_epoll_ctl_timed(le_loop_t *loop, int op, int fd, struct epoll_even
 static le_loop_t *le_loop_from_sv(SV *sv) {
     if (!sv_isobject(sv) || !SvROK(sv)) croak("not a loop object");
     return INT2PTR(le_loop_t *, SvIV((SV*)SvRV(sv)));
+}
+
+static void le_loop_assert_owner(le_loop_t *loop, const char *operation) {
+    pid_t current = le_process_pid;
+    if (!loop) croak("%s(): Loop is closed", operation);
+    if (loop->owner_pid != current)
+        croak("%s(): Loop belongs to PID %ld and cannot be used in PID %ld after fork",
+            operation, (long)loop->owner_pid, (long)current);
 }
 
 static le_registration_t *le_registration_from_sv(SV *sv) {
@@ -878,6 +896,95 @@ static void le_timer_loop_cancel_all(le_loop_t *loop) {
     }
 }
 
+static void le_loop_child_detach_timers(le_loop_t *loop) {
+    size_t index;
+    if (!loop || !loop->timer_heap_size) return;
+    for (index = 0; index < loop->timer_heap_size; index++) {
+        le_timer_t *timer = loop->timer_heap[index];
+        SV *loop_sv;
+        SV *self_sv;
+        if (!timer) continue;
+        loop_sv = timer->loop_sv;
+        self_sv = timer->self_sv;
+        timer->loop = NULL;
+        timer->loop_sv = NULL;
+        timer->self_sv = NULL;
+        timer->heap_index = LE_HEAP_NONE;
+        timer->initial_absolute = 1;
+        timer->initial_ns = timer->deadline_ns;
+        timer->sequence = 0;
+        timer->state = LE_TIMER_UNATTACHED;
+        timer->cleanup_pending = 0;
+        if (loop_sv) SvREFCNT_dec(loop_sv);
+        if (self_sv) SvREFCNT_dec(self_sv);
+        loop->timer_heap[index] = NULL;
+    }
+    loop->timer_heap_size = 0;
+}
+
+static void le_loop_child_discard_watchers(le_loop_t *loop) {
+    size_t index;
+    le_watcher_t *watcher;
+    if (!loop) return;
+    if (loop->registry) {
+        for (index = 0; index < loop->reg_cap; index++) {
+            watcher = loop->registry[index];
+            if (!watcher) continue;
+            loop->registry[index] = NULL;
+            watcher->active = 0;
+            le_watcher_destroy(watcher);
+        }
+    }
+    while ((watcher = loop->watcher_pending) != NULL) {
+        loop->watcher_pending = watcher->next_free;
+        le_watcher_destroy(watcher);
+    }
+    while ((watcher = loop->watcher_freelist) != NULL) {
+        loop->watcher_freelist = watcher->next_free;
+        le_watcher_destroy(watcher);
+    }
+    while ((watcher = loop->watcher_retired) != NULL) {
+        loop->watcher_retired = watcher->next_retired;
+        le_watcher_destroy(watcher);
+    }
+    loop->watcher_freelist_depth = 0;
+}
+
+static void le_loop_child_reset(le_loop_t *loop) {
+    int new_epoll_fd;
+    int old_epoll_fd;
+    int old_timer_fd;
+    pid_t current = le_process_pid;
+    if (!loop) croak("fork(): Loop is closed");
+    if (loop->owner_pid == current)
+        croak("fork(): child Loop reset requires an inherited Loop");
+    if (loop->driver_depth || loop->in_dispatch_batch || loop->in_timer_dispatch)
+        croak("fork(): Loop must be quiescent before fork");
+
+    new_epoll_fd = epoll_create1(EPOLL_CLOEXEC);
+    if (new_epoll_fd < 0)
+        croak("fork(): child epoll_create1 failed: %s", strerror(errno));
+
+    old_epoll_fd = loop->epoll_fd;
+    old_timer_fd = loop->timer_fd;
+    le_loop_child_detach_timers(loop);
+    le_loop_child_discard_watchers(loop);
+
+    loop->timer_fd = -1;
+    loop->timer_source = NULL;
+    if (old_timer_fd >= 0) close(old_timer_fd);
+    if (old_epoll_fd >= 0) close(old_epoll_fd);
+    loop->epoll_fd = new_epoll_fd;
+    loop->owner_pid = current;
+    loop->stop_flag = 0;
+    loop->driver_depth = 0;
+    loop->in_dispatch_batch = 0;
+    loop->in_timer_dispatch = 0;
+    loop->current_timer = NULL;
+    if (loop->events)
+        memset(loop->events, 0, loop->event_cap * sizeof(struct epoll_event));
+}
+
 static void le_loop_destroy(le_loop_t *loop) {
     if (!loop) return;
     le_timer_loop_cancel_all(loop);
@@ -1312,6 +1419,16 @@ static int le_fd_from_sv(SV *value, const char *method) {
 MODULE = Linux::Event::Loop    PACKAGE = Linux::Event::Loop
 PROTOTYPES: DISABLE
 
+BOOT:
+    le_process_pid = getpid();
+    if (!le_atfork_registered) {
+        int error = pthread_atfork(NULL, NULL, le_process_after_fork_child);
+        if (error)
+            croak("pthread_atfork failed: %s", strerror(error));
+        le_atfork_registered = 1;
+    }
+
+
 SV *
 new(CLASS)
     const char *CLASS
@@ -1319,6 +1436,7 @@ new(CLASS)
     le_loop_t *loop = (le_loop_t *)calloc(1, sizeof(le_loop_t));
     if (!loop) croak("calloc loop failed");
     loop->timer_fd = -1;
+    loop->owner_pid = le_process_pid;
     loop->epoll_fd = epoll_create1(EPOLL_CLOEXEC);
     if (loop->epoll_fd < 0) { int err = errno; free(loop); croak("epoll_create1 failed: %s", strerror(err)); }
     loop->event_cap = LE_INITIAL_EVENTS;
@@ -1348,14 +1466,43 @@ DESTROY(loop_obj)
 void
 stop(loop_obj)
     SV *loop_obj
+  PREINIT:
+    le_loop_t *loop;
   CODE:
-    le_loop_from_sv(loop_obj)->stop_flag = 1;
+    loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "stop");
+    loop->stop_flag = 1;
+
+void
+_assert_owner_native(loop_obj, operation)
+    SV *loop_obj
+    const char *operation
+  CODE:
+    le_loop_assert_owner(le_loop_from_sv(loop_obj), operation);
+
+IV
+_owner_pid_native(loop_obj)
+    SV *loop_obj
+  CODE:
+    RETVAL = (IV)le_loop_from_sv(loop_obj)->owner_pid;
+  OUTPUT:
+    RETVAL
+
+void
+_fork_child_reset(loop_obj)
+    SV *loop_obj
+  CODE:
+    le_loop_child_reset(le_loop_from_sv(loop_obj));
 
 int
 running(loop_obj)
     SV *loop_obj
+  PREINIT:
+    le_loop_t *loop;
   CODE:
-    RETVAL = le_loop_from_sv(loop_obj)->driver_depth > 0 ? 1 : 0;
+    loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "running");
+    RETVAL = loop->driver_depth > 0 ? 1 : 0;
   OUTPUT:
     RETVAL
 
@@ -1368,6 +1515,7 @@ _object_candidates_native(loop_obj)
     size_t index;
   CODE:
     loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "objects");
     objects = newAV();
     for (index = 0; index < loop->reg_cap; index++) {
         le_watcher_t *watcher = loop->registry[index];
@@ -1398,6 +1546,7 @@ _resources_native(loop_obj)
     size_t index;
   CODE:
     loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "resources");
     result = newHV();
     public_fds = newAV();
     for (index = 0; index < loop->reg_cap; index++) {
@@ -1433,7 +1582,9 @@ stats(loop_obj)
     SV *loop_obj
   CODE:
     le_loop_t *loop = le_loop_from_sv(loop_obj);
-    HV *hv = newHV();
+    HV *hv;
+    le_loop_assert_owner(loop, "stats");
+    hv = newHV();
     hv_stores(hv, "event_capacity", newSVuv(loop->event_cap));
     hv_stores(hv, "epoll_wait_calls", newSVuv(loop->epoll_wait_calls));
     hv_stores(hv, "epoll_wait_empty_calls", newSVuv(loop->epoll_wait_empty_calls));
@@ -1515,8 +1666,12 @@ SV *
 profile(loop_obj, enabled)
     SV *loop_obj
     int enabled
+  PREINIT:
+    le_loop_t *loop;
   CODE:
-    le_loop_from_sv(loop_obj)->profile_enabled = enabled ? 1 : 0;
+    loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "profile");
+    loop->profile_enabled = enabled ? 1 : 0;
     RETVAL = newSVsv(loop_obj);
   OUTPUT:
     RETVAL
@@ -1525,15 +1680,23 @@ void
 enable_watcher_reclaim(loop_obj, enabled = 1)
     SV *loop_obj
     int enabled
+  PREINIT:
+    le_loop_t *loop;
   CODE:
-    le_loop_from_sv(loop_obj)->watcher_reclaim_enabled = enabled ? 1 : 0;
+    loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "enable_watcher_reclaim");
+    loop->watcher_reclaim_enabled = enabled ? 1 : 0;
 
 
 unsigned int
 event_capacity(loop_obj)
     SV *loop_obj
+  PREINIT:
+    le_loop_t *loop;
   CODE:
-    RETVAL = (unsigned int)le_loop_from_sv(loop_obj)->event_cap;
+    loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "event_capacity");
+    RETVAL = (unsigned int)loop->event_cap;
   OUTPUT:
     RETVAL
 
@@ -1544,6 +1707,7 @@ set_event_capacity(loop_obj, capacity)
   CODE:
     le_loop_t *loop = le_loop_from_sv(loop_obj);
     struct epoll_event *events;
+    le_loop_assert_owner(loop, "set_event_capacity");
     if (capacity < 1) croak("event capacity must be >= 1");
     if (capacity > 1048576) croak("event capacity too large");
     if (loop->driver_depth || loop->in_dispatch_batch)
@@ -1557,8 +1721,12 @@ set_event_capacity(loop_obj, capacity)
 unsigned int
 callback_scope_limit(loop_obj)
     SV *loop_obj
+  PREINIT:
+    le_loop_t *loop;
   CODE:
-    RETVAL = le_loop_from_sv(loop_obj)->callback_scope_limit;
+    loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "callback_scope_limit");
+    RETVAL = loop->callback_scope_limit;
   OUTPUT:
     RETVAL
 
@@ -1566,15 +1734,20 @@ void
 set_callback_scope_limit(loop_obj, limit)
     SV *loop_obj
     unsigned int limit
+  PREINIT:
+    le_loop_t *loop;
   CODE:
+    loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "set_callback_scope_limit");
     if (limit > 1048576) croak("callback scope limit too large");
-    le_loop_from_sv(loop_obj)->callback_scope_limit = limit;
+    loop->callback_scope_limit = limit;
 
 void
 reset_stats(loop_obj)
     SV *loop_obj
   CODE:
     le_loop_t *loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "reset_stats");
     loop->epoll_wait_calls = 0;
     loop->epoll_wait_empty_calls = 0;
     loop->epoll_wait_full_batches = 0;
@@ -1656,6 +1829,7 @@ watch(loop_obj, ...)
     le_watch_opts_t opt;
   CODE:
     loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "watch");
     if (items < 3 || ((items - 1) % 2) != 0)
         croak("watch requires key/value pairs including exactly one of fh or fd");
     le_watch_opts_init(&opt);
@@ -1697,6 +1871,7 @@ watch_fd(loop_obj, fd_sv, ...)
     le_watch_opts_t opt;
   CODE:
     loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "watch_fd");
     fd = le_fd_from_sv(fd_sv, "watch_fd");
     if (items < 2 || ((items - 2) % 2) != 0)
         croak("watch_fd requires fd plus key/value pairs");
@@ -1720,6 +1895,7 @@ unwatch_fd(loop_obj, fd_sv)
     int fd;
   CODE:
     le_loop_t *loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "unwatch_fd");
     fd = le_fd_from_sv(fd_sv, "unwatch_fd");
     if (fd < 0 || (size_t)fd >= loop->reg_cap) XSRETURN_EMPTY;
     le_watcher_t *w = loop->registry[fd];
@@ -1733,8 +1909,12 @@ unwatch_fd(loop_obj, fd_sv)
 int
 poll_fd(loop_obj)
     SV *loop_obj
+  PREINIT:
+    le_loop_t *loop;
   CODE:
-    RETVAL = le_loop_from_sv(loop_obj)->epoll_fd;
+    loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "poll_fd");
+    RETVAL = loop->epoll_fd;
   OUTPUT:
     RETVAL
 
@@ -1748,6 +1928,7 @@ poll(loop_obj)
     unsigned long long dispatch_t0;
   CODE:
     loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "poll");
     loop->poll_calls++;
     le_loop_driver_enter(aTHX_ loop);
     ENTER;
@@ -1782,6 +1963,7 @@ run_once(loop_obj, timeout_value = -1)
         croak("run_once timeout is too large");
     timeout_ms = timeout_value < 0 ? -1 : (int)timeout_value;
     loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "run_once");
     loop->run_once_calls++;
     le_loop_driver_enter(aTHX_ loop);
     ENTER;
@@ -1814,6 +1996,7 @@ run(loop_obj)
     unsigned long long dispatch_t0;
   CODE:
     loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "run");
     loop->run_calls++;
     le_loop_driver_enter(aTHX_ loop);
     ENTER;
@@ -1856,6 +2039,7 @@ run_for(loop_obj, seconds)
         croak("run_for deadline overflow");
     deadline_ns = now_ns + duration_ns;
     loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "run_for");
     loop->run_for_calls++;
     le_loop_driver_enter(aTHX_ loop);
     ENTER;
@@ -1973,6 +2157,7 @@ _attach_to_loop(timer_obj, loop_obj)
   CODE:
     le_timer_t *timer = le_timer_from_sv(timer_obj);
     le_loop_t *loop = le_loop_from_sv(loop_obj);
+    le_loop_assert_owner(loop, "add");
     le_timer_activate(timer_obj, timer, loop_obj, loop);
     RETVAL = newSVsv(timer_obj);
   OUTPUT:
@@ -1986,9 +2171,13 @@ _reschedule_native(timer_obj, absolute, first_seconds, interval_seconds)
     double interval_seconds
   CODE:
     le_timer_t *timer = le_timer_from_sv(timer_obj);
-    unsigned long long first_ns = le_seconds_to_ns(
+    unsigned long long first_ns;
+    unsigned long long interval_ns;
+    if (timer->loop)
+        le_loop_assert_owner(timer->loop, "reschedule");
+    first_ns = le_seconds_to_ns(
         first_seconds, 1, absolute ? "at" : "after");
-    unsigned long long interval_ns = interval_seconds == 0.0
+    interval_ns = interval_seconds == 0.0
         ? 0 : le_seconds_to_ns(interval_seconds, 0, "every");
     le_timer_reschedule_native(timer, absolute, first_ns, interval_ns);
     RETVAL = newSVsv(timer_obj);
@@ -1998,8 +2187,13 @@ _reschedule_native(timer_obj, absolute, first_seconds, interval_seconds)
 SV *
 cancel(timer_obj)
     SV *timer_obj
+  PREINIT:
+    le_timer_t *timer;
   CODE:
-    le_timer_cancel_native(le_timer_from_sv(timer_obj));
+    timer = le_timer_from_sv(timer_obj);
+    if (timer->loop)
+        le_loop_assert_owner(timer->loop, "cancel");
+    le_timer_cancel_native(timer);
     RETVAL = newSVsv(timer_obj);
   OUTPUT:
     RETVAL

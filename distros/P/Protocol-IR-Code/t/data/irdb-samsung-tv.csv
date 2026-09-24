@@ -1,0 +1,8 @@
+functionname,protocol,device,subdevice,function
+POWER,NECx2,7,7,2
+1,NECx2,7,7,4
+2,NECx2,7,7,5
+VOLUME +,NECx2,7,7,7
+MUTE,NECx2,7,7,15
+CHANNEL -,NECx2,7,7,16
+ENTER,NECx2,7,7,104

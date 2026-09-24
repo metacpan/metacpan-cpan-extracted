@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -31,9 +29,7 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-# Note: These tests are designed to work whether auth is enabled or not.
-# We test user/role management which works regardless of auth state.
-# We intentionally avoid enabling/disabling auth to not disrupt the cluster.
+# Never toggles auth; t/auth_enable_disable.t does that
 
 plan tests => 30;
 
@@ -44,7 +40,6 @@ my $client = EV::Etcd->new(
 my $test_user = "test-user-$$-" . time();
 my $test_role = "test-role-$$-" . time();
 
-# Test 1-2: auth_status
 $client->auth_status(sub {
     my ($resp, $err) = @_;
     ok(!$err, 'auth_status succeeded');
@@ -55,7 +50,6 @@ $client->auth_status(sub {
 my $t1 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 3-4: role_add
 $client->role_add($test_role, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'role_add succeeded');
@@ -66,7 +60,6 @@ $client->role_add($test_role, sub {
 my $t2 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 5-7: role_list
 $client->role_list(sub {
     my ($resp, $err) = @_;
     ok(!$err, 'role_list succeeded');
@@ -80,7 +73,6 @@ $client->role_list(sub {
 my $t3 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 8-9: role_grant_permission
 $client->role_grant_permission($test_role, 'READWRITE', '/test/', '/test0', sub {
     my ($resp, $err) = @_;
     ok(!$err, 'role_grant_permission succeeded');
@@ -91,7 +83,6 @@ $client->role_grant_permission($test_role, 'READWRITE', '/test/', '/test0', sub 
 my $t4 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 10-11: role_get (verify permission was granted)
 $client->role_get($test_role, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'role_get succeeded');
@@ -105,7 +96,6 @@ $client->role_get($test_role, sub {
 my $t5 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 12-13: role_revoke_permission
 $client->role_revoke_permission($test_role, '/test/', '/test0', sub {
     my ($resp, $err) = @_;
     ok(!$err, 'role_revoke_permission succeeded');
@@ -116,7 +106,6 @@ $client->role_revoke_permission($test_role, '/test/', '/test0', sub {
 my $t5b = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 14-15: role_get (verify permission was revoked)
 $client->role_get($test_role, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'role_get after revoke succeeded');
@@ -128,7 +117,6 @@ $client->role_get($test_role, sub {
 my $t5c = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 16-17: user_add
 $client->user_add($test_user, 'test-password-123', sub {
     my ($resp, $err) = @_;
     ok(!$err, 'user_add succeeded');
@@ -139,9 +127,7 @@ $client->user_add($test_user, 'test-password-123', sub {
 my $t6 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 18-19: authenticate() method
-# When auth is disabled, authenticate returns an error (auth not enabled)
-# When auth is enabled, authenticate returns a token
+# authenticate errors while auth is disabled and returns a token once enabled
 {
     my $auth_result;
     my $auth_err;
@@ -154,22 +140,18 @@ EV::run;
     my $t_auth = EV::timer(5, 0, sub { fail('timeout'); EV::break });
     EV::run;
 
-    # authenticate() should either succeed (auth enabled) or fail with specific error (auth disabled)
     if ($auth_err) {
-        # Auth disabled - expect "authentication is not enabled" error
         like($auth_err->{message} // $auth_err, qr/auth|not enabled|UNAUTHENTICATED/i,
             'authenticate returns expected error when auth disabled');
         pass('authenticate error handling works');
         diag("authenticate() error (expected when auth disabled): " . ($auth_err->{message} // $auth_err));
     } else {
-        # Auth enabled - expect token in response
         ok($auth_result, 'authenticate succeeded');
         ok(defined $auth_result->{token}, 'authenticate response has token');
         diag("authenticate() returned token (auth is enabled)");
     }
 }
 
-# Test 20: authenticate() with wrong password
 {
     my $wrong_err;
     $client->authenticate($test_user, 'wrong-password', sub {
@@ -180,12 +162,11 @@ EV::run;
     my $t_wrong = EV::timer(5, 0, sub { fail('timeout'); EV::break });
     EV::run;
 
-    # Should return an error (either auth not enabled, or invalid credentials)
+    # Auth not enabled or invalid credentials: an error either way
     ok($wrong_err, 'authenticate with wrong password returns error');
     diag("Wrong password error: " . ($wrong_err->{message} // $wrong_err));
 }
 
-# Test 21-22: user_change_password
 {
     my $change_result;
     my $change_err;
@@ -203,7 +184,6 @@ EV::run;
     diag("Changed password for user: $test_user");
 }
 
-# Test 23-24: user_list
 $client->user_list(sub {
     my ($resp, $err) = @_;
     ok(!$err, 'user_list succeeded');
@@ -216,7 +196,6 @@ $client->user_list(sub {
 my $t7 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 25: user_grant_role
 $client->user_grant_role($test_user, $test_role, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'user_grant_role succeeded');
@@ -226,7 +205,6 @@ $client->user_grant_role($test_user, $test_role, sub {
 my $t8 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 26-27: user_get
 $client->user_get($test_user, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'user_get succeeded');
@@ -237,9 +215,6 @@ $client->user_get($test_user, sub {
 my $t9 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Cleanup (Test 28-30): revoke role from user, delete user, delete role
-
-# Test 28: user_revoke_role
 $client->user_revoke_role($test_user, $test_role, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'user_revoke_role succeeded');
@@ -248,7 +223,6 @@ $client->user_revoke_role($test_user, $test_role, sub {
 my $t10 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 29: user_delete
 $client->user_delete($test_user, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'user_delete succeeded');
@@ -258,7 +232,6 @@ $client->user_delete($test_user, sub {
 my $t11 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 30: role_delete
 $client->role_delete($test_role, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'role_delete succeeded');

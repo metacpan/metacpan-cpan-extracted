@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
-# Cheap SV-leak smoke test for the dual-ownership streaming-handle path:
-# loop new/watch/cancel/DESTROY many times and assert refcounts don't grow.
+# SV-leak smoke test for the streaming-handle path: many new/watch/cancel/DESTROY
+# cycles must not grow the SV count
 use strict;
 use warnings;
 use lib 'blib/lib', 'blib/arch';
@@ -23,7 +23,7 @@ plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $available;
 
 my $iterations = $ENV{LEAK_ITER} || 100;
 
-# Warm up — the first iteration loads code and primes Perl's arena
+# The first cycles load code and prime Perl's arenas
 for (1 .. 5) { run_cycle() }
 
 my $handle;

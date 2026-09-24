@@ -15,6 +15,7 @@
 ^xsresolver/(?:Makefile$|MYMETA\.(?:json|yml)$|Resolver\.(?:c|o|bs|xsc)$|_Resolver\.bs$|blib(?:/|$))
 ^xssignal/(?:Makefile$|MYMETA\.(?:json|yml)$|Signal\.(?:c|o|bs|xsc)$|blib(?:/|$))
 ^xsevent/(?:Makefile$|MYMETA\.(?:json|yml)$|Event\.(?:c|o|bs|xsc)$|blib(?:/|$))
+^xsinotify/(?:Makefile$|MYMETA\.(?:json|yml)$|Inotify\.(?:c|o|bs|xsc)$|blib(?:/|$))
 ^xsdatagram/(?:Makefile$|MYMETA\.(?:json|yml)$|(?:Datagram|Dgram)\.(?:c|o|bs|xsc)$|blib(?:/|$))
 ^xsprocess/(?:Makefile$|MYMETA\.(?:json|yml)$|Process\.(?:c|o|bs|xsc)$|check_spawn_chdir(?:\.o)?$|blib(?:/|$))
 ^Linux-Event-[^/]+(?:/|\.tar(?:\.gz)?$)

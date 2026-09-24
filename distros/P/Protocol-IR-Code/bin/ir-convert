@@ -1,0 +1,144 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use v5.10;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Getopt::Long qw(GetOptions :config no_ignore_case);
+use Protocol::IR::Converter;
+
+my $USAGE = <<'USAGE';
+ir-convert - convert IR remote codes between the formats Protocol::IR::Code supports
+
+Reads a signal (or set of signals) in one registered format and writes it
+out in another. Every code is normalized to an Protocol::IR::Code object in between,
+so decoded signals survive the trip losslessly.
+
+Formats:
+    csv          IRDB-style button listing (import only)
+    wig          HAIR hair-wig/3 JSON, one file per remote (import/export)
+    pronto       Raw Pronto Hex, one signal per code (import/export)
+    tasmota      Tasmota IRsend raw data, one signal per line (import/export)
+    mode2        LIRC mode2 pulse/space capture, one timing per line (import/export)
+    lirc         LIRC remote definition (.lircd.conf), protocol or raw codes
+    gcir         Global Cache IR JSON, "--device" control commands (import only)
+    globalcache  Alias for gcir
+
+Usage:
+    ir-convert [options] --from FORMAT --to FORMAT
+
+Options:
+    --from FORMAT   Input format (required): csv, wig, pronto, tasmota, mode2, lirc, gcir
+    --to FORMAT     Output format (required): wig, pronto, tasmota, mode2, lirc
+    --in FILE       Read input from FILE instead of stdin
+    --out FILE      Write output to FILE instead of stdout
+    --name NAME     wig remote name (default: Untitled)
+    --brand BRAND   wig manufacturer/brand
+    --model MODEL   wig model
+    --kind KIND     wig device kind slug, e.g. tv, soundbar, ac
+    --notes TEXT    wig free-form notes
+    --overwrite     Allow --out to overwrite an existing file
+    -h, --help      Show this help
+
+Examples:
+    ir-convert --from csv --to wig --in remote.csv --out remote.wig.json \
+        --name "Acme TV" --brand Acme --kind tv
+    cat capture.tasmota | ir-convert --from tasmota --to pronto
+    ir-convert --from wig --to tasmota --in remote.wig.json
+    ir-convert --from lirc --to pronto --in remote.lircd.conf
+    ir-convert --from gcir --to wig --in gc.json --name "Vacuum"
+USAGE
+
+my %opt;
+GetOptions(
+    'from=s'     => \$opt{from},
+    'to=s'       => \$opt{to},
+    'in=s'       => \$opt{in},
+    'out=s'      => \$opt{out},
+    'name=s'     => \$opt{name},
+    'brand=s'    => \$opt{brand},
+    'model=s'    => \$opt{model},
+    'kind=s'     => \$opt{kind},
+    'notes=s'    => \$opt{notes},
+    'overwrite!' => \$opt{overwrite},
+    'help|h'     => \$opt{help},
+) or usage_error();
+
+if ($opt{help}) {
+    print $USAGE;
+    exit 0;
+}
+usage_error("--from and --to are required")    unless $opt{from} && $opt{to};
+
+my %importable = map { $_ => 1 } qw(csv wig pronto tasmota mode2 lirc gcir globalcache);
+my %exportable = map { $_ => 1 } qw(wig pronto tasmota mode2 lirc);
+
+usage_error("unsupported --from '" . $opt{from} . "' (choose: csv, wig, pronto, tasmota, mode2, lirc, gcir)")
+    unless $importable{lc $opt{from}};
+usage_error("unsupported or non-exportable --to '" . $opt{to} . "' (choose: wig, pronto, tasmota, mode2, lirc)")
+    unless $exportable{lc $opt{to}};
+
+my $converter = Protocol::IR::Converter->new();
+my $to        = lc $opt{to};
+
+my $codes = $converter->import_format(lc $opt{from}, read_input($opt{in}));
+$codes = [ $codes ] unless ref $codes eq 'ARRAY';
+die "No signals decoded from the input\n" unless @$codes;
+
+my $output;
+if ($to eq 'wig') {
+    my %meta = (origin => 'converted:ir-convert', name => $opt{name} // 'Untitled');
+    for my $k (qw(brand model kind notes)) {
+        $meta{$k} = $opt{$k} if defined $opt{$k};
+    }
+    $output = $converter->export_codes('wig', $codes, %meta);
+} elsif ($to eq 'pronto') {
+    $output = join("\n", map { $converter->export_code($_, 'Pronto') } @$codes) . "\n";
+} elsif ($to eq 'tasmota') {
+    $output = join("\n", map { $converter->export_code($_, 'Tasmota') } @$codes) . "\n";
+} elsif ($to eq 'mode2') {
+    $output = $converter->export_codes('Mode2', $codes);
+} elsif ($to eq 'lirc') {
+    $output = $converter->export_codes('LIRC', $codes, name => $opt{name} // 'converted');
+}
+
+write_output($output, $opt{out}, $opt{overwrite});
+exit 0;
+
+# ----------------------------------------------------------------------
+
+sub read_input {
+    my ($file) = @_;
+    if (defined $file) {
+        open my $fh, '<:raw', $file or die "Cannot open '$file': $!\n";
+        local $/;
+        my $text = <$fh>;
+        close $fh;
+        return $text;
+    }
+    local $/;
+    return scalar <STDIN>;
+}
+
+sub write_output {
+    my ($text, $out, $overwrite) = @_;
+    if (defined $out) {
+        die "Refusing to overwrite '$out' (use --overwrite)\n"
+            if -e $out && !$overwrite;
+        open my $fh, '>:utf8', $out or die "Cannot write '$out': $!\n";
+        print {$fh} $text;
+        close $fh;
+    } else {
+        binmode STDOUT, ':utf8';
+        print $text;
+    }
+}
+
+sub usage_error {
+    my ($msg) = @_;
+    print STDERR "$msg\n\n" if $msg;
+    print STDERR $USAGE;
+    exit 2;
+}

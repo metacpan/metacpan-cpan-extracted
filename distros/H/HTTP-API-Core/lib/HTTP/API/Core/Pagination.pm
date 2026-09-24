@@ -23,6 +23,8 @@ sub new {
         items           => $items,
         next            => exists($args{next}) ? delete($args{next}) : ($mode eq 'cursor' ? 'next_cursor' : 'next'),
         has_more        => delete($args{has_more}),
+        response_aware_extractors => delete($args{response_aware_extractors}) ? 1 : 0,
+        allow_cross_origin => delete($args{allow_cross_origin}) ? 1 : 0,
         page_param      => delete($args{page_param}) || 'page',
         page_size_param => delete($args{page_size_param}) || 'per_page',
         page_size       => delete($args{page_size}),
@@ -73,24 +75,25 @@ sub _fetch_page {
     my $url = $self->_request_url;
     my $response = $self->{client}->get($url, %{ $self->{request} });
     my $data = $response->json;
-    my $items = _extract($data, $self->{items});
+    my $items = _extract($data, $self->{items}, $response, $self->{response_aware_extractors});
 
     die "pagination items extractor must return an array reference\n" if ref($items) ne 'ARRAY';
     $self->{buffer} = [ @$items ];
     $self->{started} = 1;
 
     if ($self->{mode} eq 'next_url') {
-        my $next = _extract($data, $self->{next});
+        my $next = _extract($data, $self->{next}, $response, $self->{response_aware_extractors});
         if (!defined($next) || $next eq '') {
             $self->{finished} = 1;
         }
         else {
+            $self->_guard_next_url_origin($next);
             $self->_guard_continuation("url:$next");
             $self->{path} = $next;
         }
     }
     elsif ($self->{mode} eq 'cursor') {
-        my $next = _extract($data, $self->{next});
+        my $next = _extract($data, $self->{next}, $response, $self->{response_aware_extractors});
         if (!defined($next) || $next eq '') {
             $self->{finished} = 1;
         }
@@ -102,7 +105,7 @@ sub _fetch_page {
     else {
         my $has_more;
         if (defined $self->{has_more}) {
-            $has_more = _extract($data, $self->{has_more}) ? 1 : 0;
+            $has_more = _extract($data, $self->{has_more}, $response, $self->{response_aware_extractors}) ? 1 : 0;
         }
         elsif (defined $self->{page_size}) {
             $has_more = @$items >= $self->{page_size} ? 1 : 0;
@@ -138,14 +141,30 @@ sub _request_url {
     return _append_query($self->{path}, \%query);
 }
 
+sub _guard_next_url_origin {
+    my ($self, $next) = @_;
+    return if $self->{allow_cross_origin};
+    return if $next !~ m{\Ahttps?://}i;
+
+    my $base = $self->{client}->base_url;
+    return if !defined($base) || $base !~ m{\A(https?)://([^/]+)}i;
+    my ($base_scheme, $base_authority) = (lc($1), lc($2));
+
+    $next =~ m{\A(https?)://([^/]+)}i;
+    my ($next_scheme, $next_authority) = (lc($1), lc($2));
+    die "cross-origin pagination continuation rejected: $next\n"
+        if $base_scheme ne $next_scheme || $base_authority ne $next_authority;
+}
+
 sub _guard_continuation {
     my ($self, $key) = @_;
     die "pagination continuation repeated: $key\n" if $self->{seen}{$key}++;
 }
 
 sub _extract {
-    my ($data, $extractor) = @_;
-    return $extractor->($data) if ref($extractor) eq 'CODE';
+    my ($data, $extractor, $response, $response_aware) = @_;
+    return $response_aware ? $extractor->($data, $response) : $extractor->($data)
+        if ref($extractor) eq 'CODE';
     return $data if !defined($extractor) || $extractor eq '';
 
     my $value = $data;
@@ -168,13 +187,33 @@ sub _append_query {
     my ($url, $query) = @_;
     my @pairs;
     for my $key (sort keys %$query) {
-        next if !defined $query->{$key};
-        my @values = ref($query->{$key}) eq 'ARRAY' ? @{ $query->{$key} } : ($query->{$key});
+        my $value = $query->{$key};
+        next if !defined $value;
+
+        my @values;
+        if (ref($value) eq 'ARRAY') {
+            die "query parameter array values must contain only scalars or undef\n"
+                if grep { defined($_) && ref($_) } @$value;
+            @values = grep { defined $_ } @$value;
+        }
+        elsif (ref($value)) {
+            die "query values must be scalars, array references, or undef\n";
+        }
+        else {
+            @values = ($value);
+        }
+
         push @pairs, map { _escape($key) . '=' . _escape($_) } @values;
     }
     return $url if !@pairs;
+
+    my $fragment = '';
+    if ($url =~ s/(#.*)\z//) {
+        $fragment = $1;
+    }
+
     my $sep = index($url, '?') >= 0 ? '&' : '?';
-    return $url . $sep . join('&', @pairs);
+    return $url . $sep . join('&', @pairs) . $fragment;
 }
 
 sub _escape {

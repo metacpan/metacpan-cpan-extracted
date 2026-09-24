@@ -67,9 +67,9 @@ typedef struct {
 
 static void xop_compat_register_custom_op(pTHX_ Perl_ppaddr_t ppfunc, XOP *xop) {
     /*
-     * The deprecated PL_custom_op_names/PL_custom_op_descs interface
-     * uses the pp function pointer address as the hash key.
-     * This interface is still supported but discouraged in newer Perls.
+     * The deprecated PL_custom_op_names/PL_custom_op_descs interface keys on
+     * the pp function pointer cast to an IV, fetched with hv_fetch_ent: see
+     * Perl_custom_op_name in pre-5.14 op.c. A raw-byte key is never found.
      */
     if (!PL_custom_op_names) {
         PL_custom_op_names = newHV();
@@ -77,11 +77,50 @@ static void xop_compat_register_custom_op(pTHX_ Perl_ppaddr_t ppfunc, XOP *xop) 
     if (!PL_custom_op_descs) {
         PL_custom_op_descs = newHV();
     }
-    hv_store(PL_custom_op_names, (char*)&ppfunc, sizeof(ppfunc), newSVpv(xop->xop_name, 0), 0);
-    hv_store(PL_custom_op_descs, (char*)&ppfunc, sizeof(ppfunc), newSVpv(xop->xop_desc, 0), 0);
+    hv_store_ent(PL_custom_op_names, sv_2mortal(newSViv(PTR2IV(ppfunc))),
+                 newSVpv(xop->xop_name, 0), 0);
+    hv_store_ent(PL_custom_op_descs, sv_2mortal(newSViv(PTR2IV(ppfunc))),
+                 newSVpv(xop->xop_desc, 0), 0);
+}
+
+/* Read back a name or description stored the same way, mirroring what
+ * Perl_custom_op_name does on these Perls. Returns the generic "custom" when
+ * the op belongs to nobody we know about. */
+static const char *xop_compat_custom_op_field(pTHX_ const OP *o, HV *table) {
+    SV *keysv;
+    HE *he;
+
+    if (!table) return PL_op_name[OP_CUSTOM];
+
+    keysv = sv_2mortal(newSViv(PTR2IV(o->op_ppaddr)));
+    he = hv_fetch_ent(table, keysv, 0, 0);
+    if (!he) return PL_op_name[OP_CUSTOM];
+
+    return SvPV_nolen(HeVAL(he));
 }
 
 #endif /* PERL_VERSION_GE(5,14,0) */
+
+/* ============================================
+   XopENTRYCUSTOM (5.20+)
+   Reading a custom op's registered fields arrived six releases after the XOP
+   API itself, so 5.14 through 5.18 have XOPs and no XopENTRYCUSTOM. Going
+   through custom_op_name instead would not do: it is deprecated and gone from
+   recent Perls, so a future release could leave us with neither.
+   ============================================ */
+
+#ifndef XopENTRYCUSTOM
+#  if XOP_COMPAT_HAS_XOP
+#    define XopENTRYCUSTOM(o, which) \
+        XopENTRY(Perl_custom_op_xop(aTHX_ (const OP *)(o)), which)
+#  else
+#    define XopENTRYCUSTOM(o, which) XOP_COMPAT_CUSTOM_##which(o)
+#    define XOP_COMPAT_CUSTOM_xop_name(o) \
+        xop_compat_custom_op_field(aTHX_ (const OP *)(o), PL_custom_op_names)
+#    define XOP_COMPAT_CUSTOM_xop_desc(o) \
+        xop_compat_custom_op_field(aTHX_ (const OP *)(o), PL_custom_op_descs)
+#  endif
+#endif
 
 /* ============================================
    Call checker compatibility (5.14+)

@@ -2,7 +2,7 @@ package Aion;
 
 use common::sense;
 
-our $VERSION = "2.3";
+our $VERSION = "2.4";
 
 use Aion::Types qw//;
 use Aion::Meta::RequiresAnyFunction;
@@ -18,32 +18,50 @@ use Aion::Meta::Subroutine;
 use Aion::Env AION_ISA => (default => 'rw');
 
 sub export($@);
+sub extends(@);
+sub inherits($$@);
+sub with(@);
 
 # Классы в которых подключён Aion с метаинформацией
 our %META;
 
+my @EXPORT_BASE = qw/with has aspect does exactly have havelock/;
+my @EXPORT_IN_CLASS = qw/extends/;
+my @EXPORT_IN_ROLE = qw/requires req/;
+
 # Вызывается из другого пакета, для импорта данного
 sub import {
-	my (undef, $attr) = @_;
+	my (undef, @attrs) = @_;
 	my $pkg = caller;
 
 	*{"$pkg\::DOES"} = \&does if \&does != $pkg->can('DOES');
 
-	if($attr ne '-role') {  # Класс
-		export $pkg, qw/extends/;
-		*{"${pkg}::new"} = \&initialize;
-	} else {	# Роль
-		export $pkg, qw/requires req/;
+	my $is_role; my @type_attrs;
+	my @with; my @extends;
+	my @export; my $use_only;
+	while(local $_ = shift @attrs) {
+		given($_) {
+			$is_role = 1 when '-role';
+			$use_only = 1 when '-use_only';
+			push @export, ref($_ = shift @attrs)? @$_: $_ when '-export';
+			push @with, ref($_ = shift @attrs)? @$_: $_ when 'with';
+			push @extends, ref($_ = shift @attrs)? @$_: $_ when 'extends';
+			default { push @type_attrs, $_ }
+		}
 	}
-
-	export $pkg, qw/with has aspect does exactly/;
 
 	# Метаинформация
 	$META{$pkg} = {
 		order => scalar keys %META,
+		is_role => $is_role,
+		with => [],
+		extends => [],
+		export => \@export,
+		use_only => ($use_only || !!@export),
 		require => {},
 		feature => {},
 		subroutine => {},
+		havelock => {},
 		aspect => {
 			is        => \&is_aspect,
 			isa       => \&isa_aspect,
@@ -63,15 +81,37 @@ sub import {
 		}
 	};
 
-	eval "package $pkg; use Aion::Types; 1" or die;
+	if(@extends) {
+		die "Extends role!" if $is_role;
+		inherits $pkg, 0, @extends;
+	}
+
+	if(@with) {
+		inherits $pkg, 1, @with;
+	}
+
+	unless($is_role) {  # Класс
+		export $pkg, @EXPORT_IN_CLASS;
+		*{"${pkg}::new"} = \&initialize;
+	} else {	# Роль
+		export $pkg, @EXPORT_IN_ROLE;
+	}
+
+	export $pkg, @EXPORT_BASE;
+	
+	my $attrs = @type_attrs? "qw{${\join ' ', @type_attrs}}": '';
+	eval "package $pkg; use Aion::Types@type_attrs; 1" or die;
 }
 
 # Удаляет добавленные символы
 sub unimport {
 	my $pkg = caller;
+
+	my $meta = $META{$pkg};
 	
-	undef &{"${pkg}::$_"} for qw/extends with aspect requires req/;
-	
+	undef &{"${pkg}::$_"} for @EXPORT_BASE,
+		$meta->{is_role}? @EXPORT_IN_ROLE: (@EXPORT_IN_CLASS, 'new');
+
 	eval "package $pkg; no Aion::Types; 1" or die;
 }
 
@@ -303,18 +343,36 @@ sub inherits($$@) {
 
 	is_aion $pkg;
 
-	my $FEATURE = $Aion::META{$pkg}{feature};
-	my $ASPECT = $Aion::META{$pkg}{aspect};
-	my $REQUIRE = $Aion::META{$pkg}{require} //= {};
+	my $own_meta = $Aion::META{$pkg};
 
+	push @{"${pkg}::ISA"}, @_;
+	push @{$is_with? $own_meta->{with}: $own_meta->{extends}}, @_;
+
+	my @use_only;
+	
+	if(${^GLOBAL_PHASE} eq 'RUN') {
+		for my $module (@_) {
+			my $meta = $Aion::META{$module};
+			push @use_only, $module if $meta && $meta->{use_only};
+		}
+	}
+	
+	die "use: use Aion ${\($is_with? 'with': 'extends')} => [qw/@use_only/];" if @use_only;
+	
 	# Добавляем наследуемые свойства и атрибуты
 	for my $module (@_) {
 		eval "require $module" or die unless $module->can('with') || $module->can('new');
 
 		if(my $meta = $Aion::META{$module}) {
-			%$FEATURE = (%$FEATURE, %{$meta->{feature}}) ;
-			%$ASPECT = (%$ASPECT, %{$meta->{aspect}});
-			%$REQUIRE = (%$REQUIRE, %{$meta->{require}});
+			for my $property (qw/aspect feature require havelock/) {
+				my $inherit_property_href = $meta->{$property} // next;
+				my $own_property_href = $own_meta->{$property} //= {};
+				%$own_property_href = (%$own_property_href, %$inherit_property_href);
+			}
+
+			for my $sub (@{$meta->{export}}) {
+				*{"$pkg\::$sub"} = $module->can($sub);
+			}
 		}
 	}
 
@@ -329,28 +387,42 @@ sub inherits($$@) {
 
 # Наследование классов
 sub extends(@) {
-	my $pkg = caller;
-
-	is_aion $pkg;
-
-	push @{"${pkg}::ISA"}, @_;
-	push @{$Aion::META{$pkg}{extends}}, @_;
-
-	unshift @_, $pkg, 0;
+	unshift @_, scalar caller, 0;
 	goto &inherits;
 }
 
 # Расширение ролями
 sub with(@) {
+	unshift @_, scalar caller, 1;
+	goto &inherits;
+}
+
+# Вызывает подстрекателя для настройки класса
+sub have(@) {
+	my ($name, @options) = @_;
 	my $pkg = caller;
 
 	is_aion $pkg;
 
-	push @{"${pkg}::ISA"}, @_;
-	push @{$Aion::META{$pkg}{with}}, @_;
+	my $meta = $Aion::META{$pkg};
+	my $inciter_sub = $meta->{havelock}{$name} // die "Havelock `$name` not exists!";
 
-	unshift @_, $pkg, 1;
-	goto &inherits;
+	local $meta->{have} = $name;
+	$inciter_sub->($meta, @options);
+	return;
+}
+
+# Устанавливает подстрекатель для настройки класса
+sub havelock($$) {
+	my ($name, $sub) = @_;
+	my $pkg = caller;
+
+	is_aion $pkg;
+
+	my $havelock = $Aion::META{$pkg}{havelock} //= {};
+	die "Havelock `$name` exists!" if exists $havelock->{$name};
+	$havelock->{$name} = $sub;
+	return;
 }
 
 sub requires(@) {
@@ -539,7 +611,7 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 =head1 VERSION
 
-2.3
+2.4
 
 =head1 SYNOPSIS
 
@@ -564,13 +636,91 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 Aion is OOP-framework for creating classes with B<features>, has B<aspects>, B<roles> and so on.
 
-The properties declared through HAS are called B<features>.
+Properties declared with C<has> are called B<features>.
 
 And C<is>,C<isa>, C<default>, and so on inC<has> are called B<aspects>.
 
 In addition to standard aspects, roles can add their own aspects using the B<aspect> subprogram.
 
 The signature of the methods can be checked using the attribute C<:Isa(...)>.
+
+Class customizers called via C<have> are called B<instigators>.
+
+=head1 USE ARGUMENTS
+
+C<use Aion> has several specialized arguments. The rest are passed to C<Aion::Types>, which is imported implicitly to import types.
+
+=head2 -role
+
+Create a role, not a class.
+
+	package Role::My {
+		use Aion -role;
+	
+		__PACKAGE__->can('extends') # -> undef
+	}
+
+=head2 extends => classes
+
+Extends a class.
+
+=head2 with => roles
+
+Adds a role at the module compilation stage. This is done so that C<import_with> can add features.
+
+	package Role::ImportWithTune {
+		use Aion -role, -use_only;
+	
+		sub tune (@) { shift }
+	
+		sub import_with {
+			my ($module, $pkg) = @_;
+			no strict 'refs';
+			*{"$pkg\::tune"} = \&tune;
+		}
+	}
+	
+	package Role::ImportWithCfg {
+		use Aion -role, -export => [qw/cfg/];
+	
+		sub cfg (@) { shift }
+	}
+	
+	package MyClass1 {
+		use Aion
+			with => 'Role::ImportWithTune',
+			with => 'Role::ImportWithCfg',
+		;
+	
+		cfg 123;  # -> 123
+		tune 456; # -> 456
+	}
+	
+	package MyClass2 {
+		use Aion
+			with => [qw/Role::ImportWithTune Role::ImportWithCfg/],
+		;
+	
+		cfg 123;  # -> 123
+		tune 456; # -> 456
+	}
+	
+	eval {
+		package MyClass3 {
+			use Aion;
+	
+			with qw/Role::ImportWithTune Role::ImportWithCfg/;
+		}
+	};
+	$@ # ^-> use: use Aion with => [qw/Role::ImportWithTune Role::ImportWithCfg/]
+
+=head1 export => subroutines
+
+Exports the specified routines to modules into which the package will be added via C<with> or C<extends>.
+
+=head1 -use-only
+
+Indicates that the module can only be imported into C<use Aion>.
 
 =head1 SUBROUTINES IN CLASSES AND ROLES
 
@@ -744,6 +894,31 @@ The creator of the aspect has the parameters:
 		has moon => (is => "rw", lvalue => 1);
 	}
 
+=head2 have ($name, @options)
+
+Calls a havelock to configure the class.
+
+	package ORM::Role::Table { use Aion -role;
+	
+		havelock table => sub {
+			my ($meta, %table) = @_;
+	
+			$meta->{table} = \%table;
+		};
+	}
+	
+	package Ex::Person { use Aion;
+		with qw/ORM::Role::Table/;
+	
+		have table => (name => 'person');
+	}
+	
+	$Aion::META{'Ex::Person'}{table} # --> {name => 'person'}
+
+=head2 havelock ($meta, @options)
+
+Sets up a handler for setting up the class that is called from C<have>.
+
 =head2 pleroma ()
 
 Returns the locator.
@@ -854,7 +1029,7 @@ Checks that classes using this role have the specified features with the specifi
 	
 	Omega3->new->x  # -> 12
 
-=head2 Role inherits role
+=head3 Role inherits role
 
 A role can inherit another role via C<with>. This way you can refine the interface: the types of required features (C<req>) and methods (C<:Isa>) either remain the same or are lowered - they become narrower subtypes. Demotion is checked by the less-than operator (C<< E<lt> >>): C<< Num E<lt> (Num | Object) >>, since C<Num> is a subtype of the union C<Num | Object>.
 

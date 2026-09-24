@@ -1,5 +1,64 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.18	Wed Sep 23 11:10:09 AM EDT 2026
+	[ Enhancements ]
+	- render_bar_chart_snippet: new snippet method that generates an embeddable
+	  D3 v7 bar chart. Accepts an array of [$label, $value] (or
+	  [$label, $value, \%extra]) pairs and an optional \%opts hashref with keys:
+	  orientation ('vertical'/'horizontal', default 'vertical'),
+	  sort_bars ('value'/'label'/'none', default 'none'),
+	  max_bars (int, default 0; collapses tail into "Other"),
+	  color (CSS colour or 'categorical' for Tableau-10 palette, default
+	  'steelblue'), show_values (bool, default 0; prints values on bars),
+	  animated (bool, default 0; bars grow from baseline with 800 ms stagger;
+	  respects prefers-reduced-motion), value_label (tooltip label, default
+	  'Value'), x_label (bottom-axis label, default ''). Returns
+	  { svg_id => 'bar_chart', html => Str }. Negative values are silently
+	  converted to their absolute value; undef values are silently skipped.
+	  X-axis labels are rotated -45 degrees when more than 8 bars are shown in
+	  vertical orientation. Extra \%extra fields appear as additional tooltip
+	  rows. Returns a Perl character string (UTF-8 flag set).
+	- render_scatter_chart_snippet: new snippet method that generates an
+	  embeddable D3 v7 scatter chart. Accepts an array of [$x, $y] (or
+	  [$x, $y, \%extra]) pairs; both x and y must be numeric. Optional \%opts:
+	  id (default 'scatter_chart'), color (CSS colour, default 'steelblue'),
+	  x_label, y_label, value_label (tooltip label, default 'Value'), animated
+	  (bool; circles fade in from opacity 0; respects prefers-reduced-motion),
+	  responsive. Returns { svg_id => Str, html => Str }. Uses d3.scaleLinear
+	  for both axes; includes esc() XSS helper in generated JavaScript.
+	- render_table_snippet: new snippet method that generates an embeddable HTML
+	  table with optional D3-powered column sorting. Accepts an array of array
+	  references; the first row is the header. Optional \%opts: id (default
+	  'data_table'), sortable (bool, default 1; adds clickable column headers
+	  with D3 sort), caption (string; emits a <caption> element). Returns
+	  { table_id => Str, html => Str } (note: table_id, not svg_id). All header
+	  and cell content is HTML-escaped.
+	- id opt: all five existing snippet methods (render_line_chart_snippet,
+	  render_zoomable_line_chart_snippet, render_pie_chart_snippet,
+	  render_heatmap_snippet, render_bar_chart_snippet) now accept an id key in
+	  \%opts that overrides the default svg_id. The returned svg_id reflects the
+	  override. Derived element ids (tooltip div, legend div, etc.) are computed
+	  from the svg_id string. Fully backward-compatible: omitting id gives the
+	  same default id as before.
+	- responsive opt: all render methods now support a responsive display mode.
+	  Pass responsive => 1 to the constructor to make all full-page renders emit
+	  viewBox="0 0 W H" width="100%" height="auto" instead of fixed pixel
+	  dimensions on the SVG element. Snippet methods additionally accept
+	  responsive in their per-call \%opts (takes precedence over the constructor
+	  setting). Default is 0 (fixed dimensions), so existing callers are
+	  unaffected. Uses new private helper _svg_attrs().
+
+	[ Bug Fixes ]
+	- render_pie_chart_snippet: tooltip handler was missing HTML sanitisation.
+	  Added esc() JavaScript helper (same as bar/heatmap/scatter snippets) and
+	  applied it to slice labels and extra-field keys and values in the
+	  mouseover handler. Prevents XSS when label or extra fields contain HTML
+	  special characters.
+	- render_line_chart_snippet: completed API documentation (Arguments, Options,
+	  Return value, Errors, Side effects, API SPECIFICATION). Now accepts an
+	  optional second argument \%opts with id and responsive keys.
+
+
 0.17	Tue Sep 22 08:45:56 PM EDT 2026
 	[ Bug Fixes ]
 	- All render_*_snippet methods now return a Perl character string (UTF-8

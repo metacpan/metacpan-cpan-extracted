@@ -71,9 +71,9 @@ api_key_auth(
 
 The key name must be a defined, non-reference, non-empty scalar. The value must be a defined scalar and may be an empty string.
 
-Query API keys are appended to the request URL after ordinary request query parameters have been encoded. Both the key name and value are percent-encoded as UTF-8 bytes using unreserved URI characters unchanged.
+Query API keys are appended to the request URL after ordinary request query parameters have been encoded. Existing URL fragments are preserved, with the API-key parameter inserted before the fragment. Both the key name and value are percent-encoded as UTF-8 bytes using unreserved URI characters unchanged.
 
-If the exact query parameter name is already present in the URL, the helper leaves the URL unchanged instead of adding a second credential.
+If the exact query parameter name is already present in the URL, including its UTF-8 percent-encoded form, the helper leaves the URL unchanged instead of adding a second credential.
 
 ## Composition and precedence
 

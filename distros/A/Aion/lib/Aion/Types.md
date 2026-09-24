@@ -52,9 +52,9 @@ IntOrArrayRef([35, Str])->coerce(5.5) # => 6
 
 Этот модуль экспортирует подпрограммы:
 
-* `subtype`, `as`, `init_where`, `where`, `awhere`, `message` — для создания валидаторов.
-* `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` — для использования в валидаторах типа и его аргументов.
-* `coerce`, `from`, `via` — для создания конвертора значений из одного класса в другой.
+* `subtype`, `as`, `init_where`, `where`, `awhere`, `message` – для создания валидаторов.
+* `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` – для использования в валидаторах типа и его аргументов.
+* `coerce`, `from`, `via` – для создания конвертора значений из одного класса в другой.
 
 Иерархия валидаторов:
 
@@ -164,7 +164,7 @@ BEGIN {
 eval { One->validate(0) }; $@ # ~> Actual 1 only!
 ```
 
-`where` и `message` — это синтаксический сахар, а `subtype` можно использовать без них.
+`where` и `message` – это синтаксический сахар, а `subtype` можно использовать без них.
 
 ```perl
 BEGIN {
@@ -250,7 +250,7 @@ BEGIN {
 
 Используется с `subtype`.
 
-Если тип может быть с аргументами и без, то используется для проверки набора с аргументами, а `where` — без.
+Если тип может быть с аргументами и без, то используется для проверки набора с аргументами, а `where` – без.
 
 ```perl
 BEGIN {
@@ -396,14 +396,14 @@ eval {coerce Int, (from=>Num, via=>"x")}; $@  # ~> coerce Int: via is not subrou
 Стандартные приведения:
 
 ```perl
-# Str from Undef — empty string
+# Str from Undef – empty string
 Str->coerce(undef) # -> ""
 
-# Int from Num — rounded integer
+# Int from Num – rounded integer
 Int->coerce(2.5)  # -> 3
 Int->coerce(-2.5) # -> -3
 
-# Bool from Any — 1 or ""
+# Bool from Any – 1 or ""
 Bool->coerce([]) # -> 1
 Bool->coerce(0)  # -> ""
 ```
@@ -717,7 +717,7 @@ do {no utf8; "↭" ~~ Bin }   # -> ""
 
 ## Tel
 
-Формат телефонов — знак плюс и семь или больше цифр.
+Формат телефонов – знак плюс и семь или больше цифр.
 
 ```perl
 "+1234567" ~~ Tel  # -> 1
@@ -728,7 +728,7 @@ do {no utf8; "↭" ~~ Bin }   # -> ""
 
 ## Url
 
-URL-адреса веб-сайтов — это строка с префиксом http:// или https://.
+URL-адреса веб-сайтов – это строка с префиксом http:// или https://.
 
 ```perl
 "http://" ~~ Url # -> 1
@@ -785,7 +785,7 @@ HTML начинается с `<!doctype html` или `<html`.
 
 ## ClassName
 
-Имя класса — это пакет с методом `new`.
+Имя класса – это пакет с методом `new`.
 
 ```perl
 'Aion::Type' ~~ ClassName  # -> 1
@@ -794,7 +794,7 @@ HTML начинается с `<!doctype html` или `<html`.
 
 ## RoleName
 
-Имя роли — это пакет без метода `new`, с `@ISA` или с одним любым методом.
+Имя роли – это пакет без метода `new`, с `@ISA` или с одним любым методом.
 
 ```perl
 package ExRole1 {

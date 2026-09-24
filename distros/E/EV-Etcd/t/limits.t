@@ -1,13 +1,11 @@
 #!/usr/bin/env perl
-# Verify the VALIDATE_KEY_SIZE / VALIDATE_VALUE_SIZE boundaries (1 MiB) —
-# exactly at the limit must succeed at the API surface (etcd may still reject
-# its own MaxRequestBytes); just over the limit must croak client-side.
+# 1 MiB key/value limits: just over croaks client-side, just under goes through
 use strict;
 use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Minimal local Test::Fatal::exception so we don't need an extra TEST_REQUIRES.
+# Local Test::Fatal::exception, to spare a TEST_REQUIRES
 sub exception (&) {
     my ($code) = @_;
     local $@;
@@ -31,7 +29,6 @@ plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $available;
 my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
 my $MAX = 1024 * 1024;  # ETCD_MAX_KEY_SIZE / ETCD_MAX_VALUE_SIZE
 
-# Just-over key: client-side croak before any RPC
 my $oversize_key   = "k" . ("x" x $MAX);  # MAX + 1
 my $oversize_value = "v" . ("x" x $MAX);
 my $undersize_key  = "/limits-$$/" . ("x" x 64);
@@ -57,7 +54,6 @@ like(
     'delete: oversize key croaks client-side',
 );
 
-# Watch and txn paths use the same validation
 like(
     exception { $client->watch($oversize_key, sub { }) },
     qr/key too large/,
@@ -88,7 +84,6 @@ like(
     'txn: oversize put value croaks client-side',
 );
 
-# A value just under the limit must succeed end-to-end
 my $under = "v" x ($MAX - 1);
 my $put_ok;
 $client->put("/limits-$$/under", $under, sub { $put_ok = !$_[1]; EV::break });

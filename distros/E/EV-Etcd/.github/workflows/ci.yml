@@ -14,13 +14,23 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04, ubuntu-22.04-arm, ubuntu-24.04-arm]
         perl: ['5.28', '5.38', '5.40']
-    name: Linux ${{ matrix.os }} / Perl ${{ matrix.perl }}
+        threads: [false]
+        include:
+          - os: ubuntu-24.04
+            perl: '5.40'
+            threads: true
+    name: Linux ${{ matrix.os }} / Perl ${{ matrix.perl }}${{ matrix.threads && ' / threads' || '' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl }}
+          multi-thread: ${{ matrix.threads }}
+
+      - name: Check perl threads
+        if: matrix.threads
+        run: perl -MConfig -e 'exit !$Config{useithreads}'
 
       - name: Install system dependencies
         run: |
@@ -58,12 +68,9 @@ jobs:
     runs-on: ubuntu-latest
     container: debian:bookworm
     name: Debian bookworm
-    # etcd 3.5 in Debian-bookworm-in-container has issues with member
-    # mutation operations (cluster.t fails) — known platform quirk, the
-    # build/unit tests are the value here.
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Install system dependencies
         run: |
@@ -108,7 +115,7 @@ jobs:
         perl: ['5.38', '5.40']
     name: macOS / Perl ${{ matrix.perl }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: shogo82148/actions-setup-perl@v1
         with:
@@ -149,7 +156,7 @@ jobs:
     runs-on: ubuntu-latest
     name: FreeBSD 14.2
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: vmactions/freebsd-vm@v1
         with:
           release: "14.2"
@@ -172,7 +179,7 @@ jobs:
     name: OpenBSD
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: vmactions/openbsd-vm@v1
         with:
           usesh: true
@@ -189,7 +196,7 @@ jobs:
     name: NetBSD
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: vmactions/netbsd-vm@v1
         with:
           usesh: true

@@ -123,6 +123,9 @@ subtest 'TTY transitions remain TTY transitions' => sub {
         'same-kind TTY protocol transition succeeds');
 
     $tty->close;
+    ok(defined fileno($pty_fh),
+        'same-kind TTY transition retains borrowed handle ownership');
+    close $pty_fh;
 };
 
 done_testing;

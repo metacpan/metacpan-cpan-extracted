@@ -1,0 +1,138 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use v5.10;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Getopt::Long qw(GetOptions :config no_ignore_case);
+use Protocol::IR::Converter;
+use Protocol::IR::Format::Tasmota;
+
+my $USAGE = <<'USAGE';
+ir-tasmota2wig - convert a Tasmota IR capture dump to a HAIR wig JSON file
+
+Reads a Tasmota console log (or a file of IRrecv lines) and converts every
+captured signal into HAIR's portable hair-wig/3 JSON format
+(https://github.com/DAB-LABS/HAIR): one wig file, one remote, raw Pronto
+hex as the signal payload.
+
+Both Tasmota capture styles are recognized, on any mix of lines:
+
+    protocol-structured   IRrecv: Protocol = NEC, Bits = 32, Data = 0x10EF00FF
+    raw timing data       IRrecv: RawData = +9185-4490+650-500+655dE-...
+                          IRrecv: RawData = 9185,4490,650,500,...
+
+"IRsend <freq>,<rawdata>" command lines are accepted too. Timestamps and
+other log noise are ignored.
+
+Captured signals have no button names, so each wig signal's alias (the key
+HAIR shows) is set to the signal's Data hex value -- e.g. 0x10EF00FF -- and
+is easy to rename after importing the wig in HAIR.
+
+Usage:
+    ir-tasmota2wig [options] <dump-file>
+    cat dump.log | ir-tasmota2wig [options]
+
+Options:
+    --name NAME     Remote name for the wig (default: Untitled)
+    --brand BRAND   Manufacturer/brand
+    --model MODEL   Model
+    --kind KIND     HAIR device kind slug, e.g. tv, soundbar, ac
+    --notes TEXT    Free-form notes
+    --out FILE      Write the wig to FILE instead of stdout
+    --overwrite     Allow --out to overwrite an existing file
+    --quiet         Suppress the "skipped signals" warning
+    -h, --help      Show this help
+
+Examples:
+    ir-tasmota2wig tasmota.log --name "Acme TV" --kind tv
+    cat tasmota.log | ir-tasmota2wig --out remote.wig.json
+USAGE
+
+my %opt;
+GetOptions(
+    'name=s'     => \$opt{name},
+    'brand=s'    => \$opt{brand},
+    'model=s'    => \$opt{model},
+    'kind=s'     => \$opt{kind},
+    'notes=s'    => \$opt{notes},
+    'out=s'      => \$opt{out},
+    'overwrite!' => \$opt{overwrite},
+    'quiet!'     => \$opt{quiet},
+    'help|h'     => \$opt{help},
+) or usage_error();
+
+if ($opt{help}) {
+    print $USAGE;
+    exit 0;
+}
+usage_error("too many arguments") if @ARGV > 1;
+
+my $text = read_input(@ARGV ? $ARGV[0] : undef);
+
+my $converter = Protocol::IR::Converter->new();
+my $codes     = Protocol::IR::Format::Tasmota->decode_dump($text, $converter);
+die "No decodable IR signals in the input\n" unless @$codes;
+
+my $total   = count_signal_lines($text);
+my $skipped = $total - @$codes;
+if ($skipped > 0 && !$opt{quiet}) {
+    warn "Skipped $skipped of $total IR signal lines "
+       . "(unrecognized raw data or unsupported protocol)\n";
+}
+
+my %meta = (name => $opt{name} // 'Untitled', origin => 'converted:tasmota');
+for my $k (qw(brand model kind notes)) {
+    $meta{$k} = $opt{$k} if defined $opt{$k};
+}
+my $wig = $converter->export_codes('wig', $codes, %meta);
+write_output($wig, $opt{out}, $opt{overwrite});
+exit 0;
+
+# ----------------------------------------------------------------------
+
+sub read_input {
+    my ($file) = @_;
+    if (defined $file) {
+        open my $fh, '<:raw', $file or die "Cannot open '$file': $!\n";
+        local $/;
+        my $text = <$fh>;
+        close $fh;
+        return $text;
+    }
+    local $/;
+    return scalar <STDIN>;
+}
+
+# Number of IRrecv/IRsend signal lines, to warn about skipped ones.
+sub count_signal_lines {
+    my ($text) = @_;
+    my $n = 0;
+    for my $line (split /\r?\n/, $text) {
+        $n++ if $line =~ /IRrecv|IRsend/i;
+    }
+    return $n;
+}
+
+sub write_output {
+    my ($text, $out, $overwrite) = @_;
+    if (defined $out) {
+        die "Refusing to overwrite '$out' (use --overwrite)\n"
+            if -e $out && !$overwrite;
+        open my $fh, '>:utf8', $out or die "Cannot write '$out': $!\n";
+        print {$fh} $text;
+        close $fh;
+    } else {
+        binmode STDOUT, ':utf8';
+        print $text;
+    }
+}
+
+sub usage_error {
+    my ($msg) = @_;
+    print STDERR "$msg\n\n" if $msg;
+    print STDERR $USAGE;
+    exit 2;
+}

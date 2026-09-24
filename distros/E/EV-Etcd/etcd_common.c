@@ -1,6 +1,3 @@
-/*
- * etcd_common.c - Common utility functions for EV::Etcd
- */
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
@@ -11,11 +8,8 @@
 
 #include "etcd_common.h"
 
-/* See etcd_common.h — defined here so all modules can tag fire-and-forget
- * batches (watch cancel send, keepalive renewal send). */
 call_base_t cancel_sentinel = { CALL_TYPE_NONE };
 
-/* gRPC status code names for error reporting - O(1) lookup table */
 static const char * const grpc_status_names[] = {
     [GRPC_STATUS_OK] = "OK",
     [GRPC_STATUS_CANCELLED] = "CANCELLED",
@@ -44,7 +38,6 @@ const char* grpc_status_name(grpc_status_code code) {
     return "UNKNOWN_CODE";
 }
 
-/* Check if a status code is retryable */
 int is_retryable_status(grpc_status_code code) {
     switch (code) {
         case GRPC_STATUS_UNAVAILABLE:
@@ -57,7 +50,86 @@ int is_retryable_status(grpc_status_code code) {
     }
 }
 
-/* Create error hashref for callbacks */
+static void set_int_arg(grpc_arg *arg, const char *key, int value) {
+    arg->type = GRPC_ARG_INTEGER;
+    arg->key = (char *)key;
+    arg->value.integer = value;
+}
+
+grpc_channel *etcd_create_channel(ev_etcd_t *client, const char *target) {
+    grpc_arg arg[7];
+    grpc_channel_args args = { 0, arg };
+    if (client->tls_server_name) {
+        arg[args.num_args].type = GRPC_ARG_STRING;
+        arg[args.num_args].key = (char *)"grpc.ssl_target_name_override";
+        arg[args.num_args++].value.string = client->tls_server_name;
+    }
+    if (client->keepalive_ms) {
+        /* Pings only with calls open: etcd's default enforcement (5s min time,
+         * none without streams) answers others with a too_many_pings GOAWAY.
+         * max_pings_without_data/min_time lift gRPC's own throttles that would
+         * hide a dead idle watch; newer gRPC times a ping out by
+         * ping_timeout_ms (default 60s), not keepalive_timeout_ms. */
+        set_int_arg(&arg[args.num_args++], "grpc.keepalive_time_ms", client->keepalive_ms);
+        set_int_arg(&arg[args.num_args++], "grpc.keepalive_timeout_ms", client->keepalive_timeout_ms);
+        set_int_arg(&arg[args.num_args++], "grpc.keepalive_permit_without_calls", 0);
+        set_int_arg(&arg[args.num_args++], "grpc.http2.max_pings_without_data", 0);
+        set_int_arg(&arg[args.num_args++], "grpc.http2.min_time_between_pings_ms", client->keepalive_ms);
+        set_int_arg(&arg[args.num_args++], "grpc.http2.ping_timeout_ms", client->keepalive_timeout_ms);
+    }
+    /* grpc_channel_create/grpc_insecure_credentials_create arrived in gRPC ~1.42;
+     * older releases have the per-security-mode channel constructors */
+#ifdef HAVE_GRPC_NEW_CHANNEL_API
+    if (client->creds)
+        return grpc_channel_create(target, client->creds, &args);
+    grpc_channel_credentials *creds = grpc_insecure_credentials_create();
+    grpc_channel *channel = grpc_channel_create(target, creds, &args);
+    grpc_channel_credentials_release(creds);
+    return channel;
+#else
+    if (client->creds)
+        return grpc_secure_channel_create(client->creds, target, &args, NULL);
+    return grpc_insecure_channel_create(target, &args, NULL);
+#endif
+}
+
+void etcd_rotate_endpoint(ev_etcd_t *client) {
+    if (client->endpoint_count > 1)
+        client->current_endpoint = (client->current_endpoint + 1) % client->endpoint_count;
+
+    if (client->old_channel)
+        grpc_channel_destroy(client->old_channel);
+    client->old_channel = client->channel;
+    client->channel = etcd_create_channel(client, client->endpoints[client->current_endpoint]);
+    client->channel_gen++;
+}
+
+static int failed_on_current(ev_etcd_t *client, unsigned channel_gen) {
+    return client->endpoint_count > 1 && channel_gen == client->channel_gen;
+}
+
+static int connected(ev_etcd_t *client) {
+    return grpc_channel_check_connectivity_state(client->channel, 0) == GRPC_CHANNEL_READY;
+}
+
+/* Calls made on an older channel are ignored, so a burst of failures from one
+ * dead endpoint moves the client once. DEADLINE_EXCEEDED on a connected channel
+ * is a slow request, not a dead endpoint. */
+void etcd_endpoint_failed(ev_etcd_t *client, unsigned channel_gen, grpc_status_code status) {
+    if (!failed_on_current(client, channel_gen))
+        return;
+    if (status == GRPC_STATUS_UNAVAILABLE
+        || (status == GRPC_STATUS_DEADLINE_EXCEEDED && !connected(client)))
+        etcd_rotate_endpoint(client);
+}
+
+/* Streams end without a status; one that ends while the connection is still
+ * up was ended by the server (auth, oversized message), not by the endpoint */
+void etcd_stream_failed(ev_etcd_t *client, unsigned channel_gen) {
+    if (failed_on_current(client, channel_gen) && !connected(client))
+        etcd_rotate_endpoint(client);
+}
+
 SV* create_error_hv(pTHX_ grpc_status_code code, const char *message, size_t message_len, const char *source) {
     HV *err = newHV();
     hv_store(err, "code", 4, newSViv(code), 0);
@@ -72,11 +144,10 @@ SV* create_error_hv(pTHX_ grpc_status_code code, const char *message, size_t mes
     return newRV_noinc((SV *)err);
 }
 
-/* Convert KeyValue protobuf to Perl hashref */
 SV* kv_to_hashref(pTHX_ Mvccpb__KeyValue *kv) {
     HV *hv = newHV();
 
-    /* Handle NULL data pointers for empty bytes fields */
+    /* protobuf-c leaves .data NULL for empty bytes, and newSVpvn(NULL, 0) is undef */
     hv_store(hv, "key", 3,
              kv->key.data ? newSVpvn((char *)kv->key.data, kv->key.len) : newSVpvn("", 0), 0);
     hv_store(hv, "value", 5,
@@ -89,7 +160,6 @@ SV* kv_to_hashref(pTHX_ Mvccpb__KeyValue *kv) {
     return newRV_noinc((SV *)hv);
 }
 
-/* Convert Event protobuf to Perl hashref */
 SV* event_to_hashref(pTHX_ Mvccpb__Event *event) {
     HV *hv = newHV();
 
@@ -107,7 +177,6 @@ SV* event_to_hashref(pTHX_ Mvccpb__Event *event) {
     return newRV_noinc((SV *)hv);
 }
 
-/* Add ResponseHeader to a result hashref */
 void add_header_to_hv(pTHX_ HV *result, Etcdserverpb__ResponseHeader *header) {
     if (!header) return;
 
@@ -119,7 +188,6 @@ void add_header_to_hv(pTHX_ HV *result, Etcdserverpb__ResponseHeader *header) {
     hv_store(result, "header", 6, newRV_noinc((SV *)hv), 0);
 }
 
-/* Setup auth metadata for gRPC call */
 void setup_auth_metadata(ev_etcd_t *client, grpc_op *op, grpc_metadata *auth_md) {
     if (client->auth_token && client->auth_token_len > 0) {
         auth_md->key = grpc_slice_from_static_string("authorization");
@@ -132,17 +200,12 @@ void setup_auth_metadata(ev_etcd_t *client, grpc_op *op, grpc_metadata *auth_md)
     }
 }
 
-/* Cleanup auth metadata after call start */
 void cleanup_auth_metadata(ev_etcd_t *client, grpc_metadata *auth_md) {
     if (client->auth_token && client->auth_token_len > 0) {
         grpc_slice_unref(auth_md->value);
     }
 }
 
-/*
- * Cached gRPC method slices - initialized once, reused for all calls.
- * Static slices don't need reference counting.
- */
 grpc_slice METHOD_KV_RANGE;
 grpc_slice METHOD_KV_PUT;
 grpc_slice METHOD_KV_DELETE;
@@ -189,7 +252,6 @@ grpc_slice METHOD_MAINTENANCE_HASH_KV;
 grpc_slice METHOD_MAINTENANCE_MOVE_LEADER;
 grpc_slice METHOD_AUTH_STATUS;
 
-/* Initialize all cached method slices (called once from BOOT) */
 void init_method_slices(void) {
     static int initialized = 0;
     if (initialized) return;

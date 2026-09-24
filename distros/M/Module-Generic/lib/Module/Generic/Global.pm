@@ -2660,6 +2660,8 @@ It is usually not necessary to call this explicitly, because when the lock set p
 
 =for Pod::Coverage USE_MUTEX
 
+=for Pod::Coverage BROKEN_SHARED_ABI
+
 =head1 CONSTANTS
 
 The constants can be imported into your namespace with:

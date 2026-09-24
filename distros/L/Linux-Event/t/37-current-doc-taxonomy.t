@@ -18,6 +18,7 @@ my @current_docs = qw(
     docs/FIRST-CLASS-STREAM-CALLBACKS.md
     docs/FRAMING.md
     docs/INTROSPECTION.md
+    docs/INOTIFY-DESIGN.md
     docs/IO-KERNEL-ARCHITECTURE.md
     docs/LISTENER-DESIGN.md
     docs/OBJECT-LIFECYCLE.md
@@ -103,6 +104,15 @@ like($current_text{'README.md'},
     qr/\bpoll_fd\(\).*?\bpoll\(\)/s,
     'README surfaces the foreign-loop integration boundary');
 like($current_text{'README.md'},
+    qr/non-reentrant.*?\bdefer\(\)/s,
+    'README surfaces owner-interpreter deferred work');
+like($current_text{'README.md'},
+    qr/Linux::Event::Kernel::Inotify.*?\$loop->add\(\$inotify\)/s,
+    'README surfaces explicit Inotify Loop attachment');
+like($current_text{'README.md'},
+    qr/on_modify.*?on_event/s,
+    'README surfaces specific Inotify callbacks plus catch-all on_event');
+like($current_text{'README.md'},
     qr/docs\/ORDERED-BYTE-CONSUMER-ABI\.md/,
     'README links the native consumer ABI contract');
 like($current_text{'docs/FRAMING.md'},
@@ -114,6 +124,21 @@ like($current_text{'docs/FRAMING.md'},
 like($current_text{'docs/ORDERED-BYTE-CONSUMER-ABI.md'},
     qr/Adding a native consumer to an already-ordinary live object remains rejected/s,
     'consumer ABI guide keeps the reverse live transition explicitly unsupported');
+like($current_text{'docs/INOTIFY-DESIGN.md'},
+    qr/detached.*?No inotify instance or kernel watch exists until/s,
+    'Inotify design documents delayed activation');
+like($current_text{'docs/INOTIFY-DESIGN.md'},
+    qr/Multiple pathnames.*?one kernel watch descriptor/s,
+    'Inotify design documents shared-inode watch fan-out');
+like($current_text{'docs/INOTIFY-DESIGN.md'},
+    qr/on_create.*?on_ignored.*?on_event/s,
+    'Inotify design fixes specific callback order with on_event last');
+like($current_text{'docs/INOTIFY-DESIGN.md'},
+    qr/IN_Q_OVERFLOW.*?on_overflow/s,
+    'Inotify design documents parent-level queue overflow');
+like($current_text{'docs/INOTIFY-DESIGN.md'},
+    qr/256 decoded records.*?Loop->defer/s,
+    'Inotify design documents bounded burst fairness');
 like($current_text{'docs/FIRST-CLASS-STREAM-CALLBACKS.md'},
     qr/(?:constructor callback|callback supplied at construction).*overrides/is,
     'current callback contract documents constructor precedence');

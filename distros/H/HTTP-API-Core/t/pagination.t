@@ -73,6 +73,27 @@ is_deeply(
     'cursor and query parameters encoded',
 );
 
+my $fragment_client = T::Client->new({
+    '/users?filter=active&page=1&per_page=2#results' => { items => [qw(a b)] },
+    '/users?filter=active&page=2&per_page=2#results' => { items => ['c'] },
+});
+my $fragment_page = HTTP::API::Core::Pagination->new(
+    client    => $fragment_client,
+    path      => '/users?filter=active#results',
+    mode      => 'page',
+    items     => 'items',
+    page_size => 2,
+);
+is_deeply(scalar($fragment_page->all), [qw(a b c)], 'page pagination preserves URL fragment');
+is_deeply(
+    $fragment_client->{calls},
+    [
+        '/users?filter=active&page=1&per_page=2#results',
+        '/users?filter=active&page=2&per_page=2#results',
+    ],
+    'pagination parameters are inserted before fragment',
+);
+
 my $repeat_client = T::Client->new({
     '/x' => { items => [1], next => '/x' },
 });
@@ -114,5 +135,92 @@ is_deeply(
     ],
     'client joins paginated URLs against base URL',
 );
+
+my $query_validation_client = T::Client->new({
+    '/users?page=1&tag=admin&tag=staff' => { items => [] },
+});
+my $query_validation = HTTP::API::Core::Pagination->new(
+    client => $query_validation_client,
+    path   => '/users',
+    mode   => 'page',
+    items  => 'items',
+    query  => { tag => ['admin', undef, 'staff'], skip => undef },
+);
+is_deeply(scalar($query_validation->all), [], 'pagination omits undefined query values');
+is_deeply(
+    $query_validation_client->{calls},
+    ['/users?page=1&tag=admin&tag=staff'],
+    'pagination omits undefined array entries while preserving repeated keys',
+);
+
+my $bad_query = HTTP::API::Core::Pagination->new(
+    client => T::Client->new({}),
+    path   => '/users',
+    mode   => 'page',
+    query  => { nested => { x => 1 } },
+);
+my $query_error;
+eval { $bad_query->next; 1 } or $query_error = $@;
+like $query_error, qr/query values must be scalars/, 'pagination rejects nested query references';
+
+my $bad_array_query = HTTP::API::Core::Pagination->new(
+    client => T::Client->new({}),
+    path   => '/users',
+    mode   => 'page',
+    query  => { tag => ['ok', {}] },
+);
+eval { $bad_array_query->next; 1 } or $query_error = $@;
+like $query_error, qr/query parameter array values must contain only scalars or undef/,
+    'pagination rejects references inside query arrays';
+
+my $response_aware_client = T::Client->new({
+    '/headers' => { items => [1] },
+});
+{
+    package T::HeaderResponse;
+    sub new { bless { data => $_[1], headers => $_[2] }, $_[0] }
+    sub json { $_[0]{data} }
+    sub header { $_[0]{headers}{lc $_[1]} }
+}
+{
+    package T::HeaderClient;
+    sub new { bless { calls => [] }, $_[0] }
+    sub get {
+        my ($self, $url) = @_;
+        push @{ $self->{calls} }, $url;
+        return T::HeaderResponse->new(
+            { items => $url =~ /page=2/ ? [2] : [1] },
+            { link => $url =~ /page=2/ ? '' : '</headers?page=2>; rel="next"' },
+        );
+    }
+}
+my $header_client = T::HeaderClient->new;
+my $header_pager = HTTP::API::Core::Pagination->new(
+    client => $header_client,
+    path   => '/headers',
+    mode   => 'next_url',
+    response_aware_extractors => 1,
+    items  => 'items',
+    next   => sub {
+        my ($data, $response) = @_;
+        my $link = $response->header('link') || '';
+        return $1 if $link =~ /<([^>]+)>;\s*rel="next"/;
+        return undef;
+    },
+);
+is_deeply(scalar($header_pager->all), [1, 2],
+    'pagination extractor can inspect response headers');
+
+my $fixed_arity_calls = 0;
+my $fixed_arity = HTTP::API::Core::Pagination->new(
+    client => T::Client->new({ '/fixed' => { items => [] } }),
+    path   => '/fixed',
+    mode   => 'next_url',
+    items  => sub { $fixed_arity_calls++; return $_[0]{items} },
+    next   => sub { return undef },
+);
+is_deeply(scalar($fixed_arity->all), [],
+    'existing one-argument-style extractors remain compatible by default');
+is $fixed_arity_calls, 1, 'default extractor is invoked once';
 
 done_testing;

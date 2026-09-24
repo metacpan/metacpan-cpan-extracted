@@ -9,10 +9,8 @@ use File::Glob ':bsd_glob';
 eval "use Test::Kwalitee 1.28 'kwalitee_ok'; 1"
     or plan skip_all => 'Test::Kwalitee 1.28 required';
 
-# Test::Kwalitee runs against the working directory and expects META.yml /
-# META.json there. MakeMaker writes those into the dist staging dir on
-# `make distmeta`, not the project root. Stage them at the root for the
-# duration of the test so we don't need a full `make dist` to run kwalitee.
+# Test::Kwalitee reads META.yml/META.json from the cwd, but make distmeta
+# writes them into the staging dir, so they are copied up for the run
 my $had_meta = -e 'META.yml' && -e 'META.json';
 unless ($had_meta) {
     plan skip_all => 'no Makefile — run perl Makefile.PL first' unless -e 'Makefile';
@@ -32,13 +30,10 @@ kwalitee_ok();
 done_testing();
 
 END {
-    # Always tear down the dist staging dir — `make distmeta` leaves it behind
-    # and a stale copy from a prior run shadows the next one.
+    # A staging dir left behind by make distmeta would shadow the next run's
     for my $d (bsd_glob('EV-Etcd-*/')) {
         system('rm', '-rf', $d);
     }
-    # Only remove META.{yml,json} if WE generated them — preserve any
-    # pre-existing copies.
     unless ($had_meta) {
         unlink 'META.yml', 'META.json';
     }

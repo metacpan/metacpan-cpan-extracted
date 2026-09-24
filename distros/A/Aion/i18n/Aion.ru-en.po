@@ -1,11 +1,11 @@
 msgid "Aion - постмодернистская объектная система для Perl 5, такая как «Mouse», «Moose», «Moo», «Mo» и «M», но с улучшениями"
 msgstr "Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, “Moo”, “Mo” and “M”, but with improvements"
 
-msgid "Aion — ООП-фреймворк для создания классов с **фичами**, имеет **аспекты**, **роли** и так далее."
+msgid "Aion – ООП-фреймворк для создания классов с **фичами**, имеет **аспекты**, **роли** и так далее."
 msgstr "Aion is OOP-framework for creating classes with **features**, has **aspects**, **roles** and so on."
 
-msgid "Свойства, объявленные через has, называются **фичами**."
-msgstr "The properties declared through HAS are called **features**."
+msgid "Свойства, объявленные через `has`, называются **фичами**."
+msgstr "Properties declared with `has` are called **features**."
 
 msgid "А `is`, `isa`, `default` и так далее в `has` называются **аспектами**."
 msgstr "And `is`,` isa`, `default`, and so on in` has` are called **aspects**."
@@ -15,6 +15,27 @@ msgstr "In addition to standard aspects, roles can add their own aspects using t
 
 msgid "Сигнатура методов может проверяться с помощью атрибута `:Isa(...)`."
 msgstr "The signature of the methods can be checked using the attribute `:Isa(...)`."
+
+msgid "Настройщики класса, вызываемые через `have`, называются **подстрекателями**."
+msgstr "Class customizers called via `have` are called **instigators**."
+
+msgid "`use Aion` имеет несколько специализированных аргументов. Остальные передаются `Aion::Types`, импорт которого происходит неявно для импортирования типов."
+msgstr "`use Aion` has several specialized arguments. The rest are passed to `Aion::Types`, which is imported implicitly to import types."
+
+msgid "Создать роль, а не класс."
+msgstr "Create a role, not a class."
+
+msgid "Расширяет класс."
+msgstr "Extends a class."
+
+msgid "Добавляет роль на этапе компиляции модуля. Это делается, чтобы `import_with` мог добавить функции."
+msgstr "Adds a role at the module compilation stage. This is done so that `import_with` can add features."
+
+msgid "Экспортирует указанные подпрограммы в модули в которые будет добавлен пакет через `with` или `extends`."
+msgstr "Exports the specified routines to modules into which the package will be added via `with` or `extends`."
+
+msgid "Указывает, что модуль может быть импортирован только в `use Aion`."
+msgstr "Indicates that the module can only be imported into `use Aion`."
 
 msgid "`use Aion` импортирует типы из модуля `Aion::Types` и следующие подпрограммы:"
 msgstr "`Use Aion` imports types from the module`Aion::Types` and the following subprograms:"
@@ -37,13 +58,13 @@ msgstr "File lib/Role/Values/Stringify.pm:"
 msgid "Файл lib/Class/All/Stringify.pm:"
 msgstr "File lib/Class/All/Stringify.pm:"
 
-msgid "Проверяет, что `$package` — это суперкласс для данного или сам этот класс."
+msgid "Проверяет, что `$package` – это суперкласс для данного или сам этот класс."
 msgstr "Checks that `$package` is a super class for a given or this class itself."
 
 msgid "Реализацию метода `isa` Aion не меняет и она находит как суперклассы, так и роли (так как и те и другие добавляются в `@ISA` пакета)."
 msgstr "Aion does not change the implementation of the `isa` method and it finds both superclasses and roles (since both are added to the `@ISA` package)."
 
-msgid "Проверяет, что `$package` — это роль, которая используется в классе или другой роли."
+msgid "Проверяет, что `$package` – это роль, которая используется в классе или другой роли."
 msgstr "Checks that `$package` is a role that is used in a class or another role."
 
 msgid "Добавляет аспект к `has` в текущем классе и его классам-наследникам или текущей роли и применяющим её классам."
@@ -56,13 +77,19 @@ msgid "Создатель аспекта имеет параметры:"
 msgstr "The creator of the aspect has the parameters:"
 
 msgid ""
-"* `$value` — значение аспекта.\n"
-"* `$feature` — метаобъект описывающий фичу (`Aion::Meta::Feature`).\n"
-"* `$aspect_name` — наименование аспекта."
+"* `$value` – значение аспекта.\n"
+"* `$feature` – метаобъект описывающий фичу (`Aion::Meta::Feature`).\n"
+"* `$aspect_name` – наименование аспекта."
 msgstr ""
 "* `$value` – aspect value.\n"
 "* `$feature` – meta-object describing the feature (`Aion::Meta::Feature`).\n"
 "* `$aspect_name` – aspect name."
+
+msgid "Вызывает хэвлок для настройки класса."
+msgstr "Calls a havelock to configure the class."
+
+msgid "Устанавливает обработчик для настройки класса, который вызывается из `have`."
+msgstr "Sets up a handler for setting up the class that is called from `have`."
 
 msgid "Возвращает локатор."
 msgstr "Returns the locator."
@@ -88,10 +115,7 @@ msgstr "Checks that classes using this role have the specified routines or featu
 msgid "Проверяет, что в классах, использующих эту роль, есть указанные фичи с указанными аспектами."
 msgstr "Checks that classes using this role have the specified features with the specified aspects."
 
-msgid "## Роль наследует роль"
-msgstr "## Role inherits role"
-
-msgid "Роль может наследовать другую роль через `with`. Так можно уточнять интерфейс: типы требующихся фичей (`req`) и методов (`:Isa`) либо остаются такими же, либо понижаются — становятся более узкими подтипами. Понижение проверяется оператором меньше (`<`): `Num < (Num | Object)`, так как `Num` — подтип объединения `Num | Object`."
+msgid "Роль может наследовать другую роль через `with`. Так можно уточнять интерфейс: типы требующихся фичей (`req`) и методов (`:Isa`) либо остаются такими же, либо понижаются – становятся более узкими подтипами. Понижение проверяется оператором меньше (`<`): `Num < (Num | Object)`, так как `Num` – подтип объединения `Num | Object`."
 msgstr "A role can inherit another role via `with`. This way you can refine the interface: the types of required features (`req`) and methods (`:Isa`) either remain the same or are lowered - they become narrower subtypes. Demotion is checked by the less-than operator (`<`): `Num < (Num | Object)`, since `Num` is a subtype of the union `Num | Object`."
 
 msgid "Роль `Role::Animal` требует свойство `legs` широкого типа `Num | Object` и метод `sound` с сигнатурой `(Me => Str)`."
@@ -107,24 +131,24 @@ msgid "`use Aion` включает в модуль следующие аспек
 msgstr "`use Aion` includes the following aspects in the module for use in `has`:"
 
 msgid ""
-"* `ro` — создать только геттер.\n"
-"* `wo` — создать только сеттер.\n"
-"* `rw` — создать геттер и сеттер."
+"* `ro` – создать только геттер.\n"
+"* `wo` – создать только сеттер.\n"
+"* `rw` – создать геттер и сеттер."
 msgstr ""
 "* `ro` - create only a gutter.\n"
 "* `wo` - create only a setter.\n"
 "* `rw` - Create getter and setter."
 
-msgid "По умолчанию — `rw`."
+msgid "По умолчанию – `rw`."
 msgstr "By default - `rw`."
 
 msgid "Дополнительные разрешения:"
 msgstr "Additional permits:"
 
 msgid ""
-"* `+` — фича обязательна в параметрах конструктора. `+` не используется с `-`.\n"
-"* `-` — фича не может быть установлена через конструктор. '-' не используется с `+`.\n"
-"* `*` — не инкрементировать счётчик ссылок на значение (применить `weaken` к значению после установки его в фичу).\n"
+"* `+` – фича обязательна в параметрах конструктора. `+` не используется с `-`.\n"
+"* `-` – фича не может быть установлена через конструктор. '-' не используется с `+`.\n"
+"* `*` – не инкрементировать счётчик ссылок на значение (применить `weaken` к значению после установки его в фичу).\n"
 "* `?` – создать предикат.\n"
 "* `!` – создать clearer."
 msgstr ""

@@ -3,23 +3,19 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
-# Find EV module's include path for EVAPI.h
 use EV;
 use File::Basename;
-my $ev_inc = dirname($INC{'EV.pm'});  # Directory containing EV.pm (with EV/ subdir)
+my $ev_inc = dirname($INC{'EV.pm'});
 my $ev_inc_path = "-I$ev_inc";
 
-# Try pkg-config for grpc
 my $grpc_cflags = `pkg-config --cflags grpc 2>/dev/null` || '';
 my $grpc_libs = `pkg-config --libs grpc 2>/dev/null` || '-lgrpc';
 chomp($grpc_cflags, $grpc_libs);
 
-# Try pkg-config for libprotobuf-c
 my $protobuf_c_cflags = `pkg-config --cflags libprotobuf-c 2>/dev/null` || '';
 my $protobuf_c_libs = `pkg-config --libs libprotobuf-c 2>/dev/null` || '-lprotobuf-c';
 chomp($protobuf_c_cflags, $protobuf_c_libs);
 
-# Detect gRPC API version for channel creation compatibility
 # - gRPC >= ~1.42: grpc_insecure_credentials_create() + grpc_channel_create()
 # - gRPC <  ~1.42: grpc_insecure_channel_create()
 # The new API header moved from grpc_security.h to credentials.h in ~1.65
@@ -38,7 +34,6 @@ sub try_compile {
 
 my $all_cflags = "$grpc_cflags $protobuf_c_cflags";
 
-# Verify grpc and protobuf-c headers are available
 unless (try_compile($all_cflags, <<'END')) {
 #include <grpc/grpc.h>
 #include <protobuf-c/protobuf-c.h>
@@ -58,7 +53,6 @@ MSG
     exit 0;  # exit 0 = NA on CPAN Testers (not a test failure)
 }
 
-# Check for grpc/credentials.h (gRPC >= ~1.65)
 if (try_compile($all_cflags, <<'END')) {
 #include <grpc/credentials.h>
 int main(void) { return 0; }
@@ -67,7 +61,6 @@ END
     print "Detected <grpc/credentials.h>\n";
 }
 
-# Check for new credentials-based channel API
 my $creds_test_header = ($grpc_api_defines =~ /HAVE_GRPC_CREDENTIALS_H/)
     ? '#include <grpc/credentials.h>' : '#include <grpc/grpc_security.h>';
 if (try_compile("$all_cflags $grpc_api_defines", <<"END")) {
@@ -90,8 +83,7 @@ WriteMakefile(
     LICENSE           => 'perl_5',
     MIN_PERL_VERSION  => '5.010',
 
-    # Explicit module map — without this, MakeMaker's auto-detection picks
-    # up the top-level bench.pl script and tries to install it as a library.
+    # Without it MakeMaker would install the top-level bench.pl as a library
     PM => {
         'lib/EV/Etcd.pm' => '$(INST_LIB)/EV/Etcd.pm',
     },

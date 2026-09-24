@@ -1,6 +1,3 @@
-/*
- * etcd_lease.c - Lease operation handlers for EV::Etcd
- */
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
@@ -10,14 +7,12 @@
 #include "etcd_common.h"
 #include "etcd_lease.h"
 
-/* EVAPI.h's GEVAPI function table is a per-translation-unit static: every
- * file that calls into EV must bind its own copy, or ev_timer_start & co
- * dereference a NULL table. Called once from BOOT in Etcd.xs. */
+/* EVAPI.h's GEVAPI is a per-translation-unit static: each file calling EV must
+ * bind its own (from BOOT), or ev_timer_start & co dereference a NULL table */
 void lease_init_ev_api(pTHX) {
     I_EV_API("EV::Etcd");
 }
 
-/* Process LeaseGrantResponse */
 void process_lease_grant_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "lease_grant");
 
@@ -39,7 +34,6 @@ void process_lease_grant_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process LeaseRevokeResponse */
 void process_lease_revoke_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "lease_revoke");
 
@@ -53,7 +47,6 @@ void process_lease_revoke_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process LeaseTimeToLiveResponse */
 void process_lease_time_to_live_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "lease_ttl");
 
@@ -70,7 +63,6 @@ void process_lease_time_to_live_response(pTHX_ pending_call_t *pc) {
         AV *keys_av = newAV();
         av_extend(keys_av, resp->n_keys - 1);
         for (size_t i = 0; i < resp->n_keys; i++) {
-            /* Handle NULL data pointer for empty bytes field */
             av_push(keys_av, resp->keys[i].data
                 ? newSVpvn((char *)resp->keys[i].data, resp->keys[i].len)
                 : newSVpvn("", 0));
@@ -83,7 +75,6 @@ void process_lease_time_to_live_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process LeaseLeasesResponse */
 void process_lease_leases_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "lease_leases");
 
@@ -109,7 +100,6 @@ void process_lease_leases_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Re-arm keepalive to receive next message */
 void keepalive_rearm_recv(pTHX_ keepalive_call_t *kc) {
     if (!kc->active) return;
 
@@ -137,7 +127,6 @@ static void keepalive_call_free(pTHX_ keepalive_call_t *kc) {
     Safefree(kc);
 }
 
-/* See cleanup_watch — same dual-ownership pattern */
 void cleanup_keepalive(pTHX_ keepalive_call_t *kc) {
     if (!kc->client_owns) return;
 
@@ -175,11 +164,8 @@ void keepalive_call_perl_release(pTHX_ keepalive_call_t *kc) {
     if (!kc->client_owns) keepalive_call_free(aTHX_ kc);
 }
 
-/* Renew timer callback: send the next LeaseKeepAliveRequest on the open
- * stream. Fire-and-forget (cancel_sentinel tag; the completion is discarded
- * by process_grpc_event). A failed batch just skips this tick — a pending
- * previous SEND can legitimately yield TOO_MANY_OPERATIONS — and never
- * tears down the stream. */
+/* A failed batch only skips this tick: a still-pending previous SEND yields
+ * TOO_MANY_OPERATIONS, which must not tear down the stream */
 static void keepalive_renew_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     dTHX;
     (void)loop;
@@ -208,7 +194,6 @@ static void keepalive_renew_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     grpc_byte_buffer_destroy(send_buffer);
 }
 
-/* Process LeaseKeepAliveResponse */
 void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
     if (!kc->recv_buffer) {
         kc->active = 0;
@@ -245,9 +230,7 @@ void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
         return;
     }
 
-    /* Re-arm the renewal timer at ttl/3 (min 0.5s), repeating. Re-arming on
-     * each response keeps the period fresh if the server changes the ttl.
-     * Armed before the callback so a re-entrant cancel() can stop it. */
+    /* Armed before the callback so a re-entrant cancel() can stop it */
     {
         ev_tstamp renew_period = (ev_tstamp)resp->ttl / 3.0;
         if (renew_period < 0.5) renew_period = 0.5;
@@ -265,7 +248,6 @@ void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
     CALL_SUCCESS_CALLBACK(kc->callback, result);
 }
 
-/* Perform keepalive reconnection (called from timer callback) */
 static void keepalive_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     dTHX;
     (void)loop;
@@ -279,11 +261,9 @@ static void keepalive_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revent
         return;
     }
 
-    /* Cleanup and reinitialize streaming state */
     STREAMING_CALL_CLEANUP(kc);
     STREAMING_CALL_REINIT(kc);
 
-    /* Build keepalive request */
     Etcdserverpb__LeaseKeepAliveRequest keep_req = ETCDSERVERPB__LEASE_KEEP_ALIVE_REQUEST__INIT;
     keep_req.id = kc->lease_id;
 
@@ -294,8 +274,8 @@ static void keepalive_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revent
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call and setup ops */
     gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
+    kc->base.channel_gen = client->channel_gen;
     kc->call = grpc_channel_create_call(
         client->channel, NULL, GRPC_PROPAGATE_DEFAULTS,
         client->cq, METHOD_LEASE_KEEPALIVE, NULL, deadline, NULL);
@@ -303,10 +283,10 @@ static void keepalive_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revent
     if (!kc->call) {
         grpc_byte_buffer_destroy(send_buffer);
         kc->active = 0;
-        client->in_callback = 1;
+        client->in_callback++;
         CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "Keepalive reconnect failed", "keepalive");
-        client->in_callback = 0;
-        if (!client->active) {
+        client->in_callback--;
+        if (!client->in_callback && !client->active) {
             finish_client_destroy(aTHX_ client);
             return;
         }
@@ -325,10 +305,10 @@ static void keepalive_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revent
 
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(kc);
-        client->in_callback = 1;
+        client->in_callback++;
         CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "Keepalive reconnect batch failed", "keepalive");
-        client->in_callback = 0;
-        if (!client->active) {
+        client->in_callback--;
+        if (!client->in_callback && !client->active) {
             finish_client_destroy(aTHX_ client);
             return;
         }
@@ -339,11 +319,14 @@ static void keepalive_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revent
 int try_reconnect_keepalive(pTHX_ keepalive_call_t *kc) {
     ev_etcd_t *client = kc->client;
 
-    if (!kc->auto_reconnect || !client->active || kc->lease_id <= 0) {
+    if (!client->active) {
         return 0;
     }
 
-    if (kc->reconnect_attempt >= client->max_retries) {
+    etcd_stream_failed(client, kc->base.channel_gen);
+
+    if (!kc->auto_reconnect || kc->lease_id <= 0
+        || kc->reconnect_attempt >= client->max_retries) {
         return 0;
     }
 

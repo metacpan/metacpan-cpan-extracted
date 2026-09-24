@@ -12,6 +12,7 @@ WriteMakefile(
     PM               => {},
     XS               => { 'Loop.xs' => 'Loop.c' },
     OBJECT           => 'Loop$(OBJ_EXT)',
+    LIBS             => ['-lpthread'],
     TYPEMAPS         => ['typemap'],
     clean            => { FILES => 'Loop.c' },
 );

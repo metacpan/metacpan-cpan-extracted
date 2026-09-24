@@ -22,10 +22,6 @@ meta-spec:
 name: Google-Ads-GoogleAds-Client
 no_index:
   namespace:
-    - Google::Ads::GoogleAds::V22::Enums
-    - Google::Ads::GoogleAds::V22::Common
-    - Google::Ads::GoogleAds::V22::Resources
-    - Google::Ads::GoogleAds::V22::Services
     - Google::Ads::GoogleAds::V23::Enums
     - Google::Ads::GoogleAds::V23::Common
     - Google::Ads::GoogleAds::V23::Resources
@@ -80,5 +76,5 @@ resources:
   bugtracker: https://github.com/googleads/google-ads-perl/issues
   license: http://www.apache.org/licenses/LICENSE-2.0.txt
   repository: https://github.com/googleads/google-ads-perl
-version: v35.0.0
+version: v35.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

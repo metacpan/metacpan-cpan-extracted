@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -33,14 +31,12 @@ plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
 plan tests => 11;
 
-# Test 1-2: Client creation with default retry settings
 {
     my $client = EV::Etcd->new(
         endpoints => ['127.0.0.1:2379'],
     );
     ok($client, 'client created with default retry settings');
 
-    # Verify it works
     my $works = 0;
     $client->status(sub {
         my ($resp, $err) = @_;
@@ -53,7 +49,6 @@ plan tests => 11;
     ok($works, 'client with default retries works');
 }
 
-# Test 3-4: Client creation with custom retry settings
 {
     my $client = EV::Etcd->new(
         endpoints => ['127.0.0.1:2379'],
@@ -61,7 +56,6 @@ plan tests => 11;
     );
     ok($client, 'client created with custom retry settings');
 
-    # Verify it works
     my $works = 0;
     $client->status(sub {
         my ($resp, $err) = @_;
@@ -74,7 +68,6 @@ plan tests => 11;
     ok($works, 'client with custom retries works');
 }
 
-# Test 5-6: Client with zero retries (no retries)
 {
     my $client = EV::Etcd->new(
         endpoints => ['127.0.0.1:2379'],
@@ -82,7 +75,6 @@ plan tests => 11;
     );
     ok($client, 'client created with max_retries=0');
 
-    # Verify it works
     my $works = 0;
     $client->status(sub {
         my ($resp, $err) = @_;
@@ -95,7 +87,6 @@ plan tests => 11;
     ok($works, 'client with no retries works');
 }
 
-# Test 7-8: Watch with auto_reconnect enabled (default)
 {
     my $client = EV::Etcd->new(
         endpoints => ['127.0.0.1:2379'],
@@ -115,13 +106,11 @@ plan tests => 11;
 
     ok($watch, 'watch created with auto_reconnect');
 
-    # Fire an event
     my $put_done = 0;
     $client->put("$prefix/key", "value", sub {
         $put_done = 1;
     });
 
-    # Wait for event
     my $check;
     $check = EV::timer(0.1, 0.1, sub {
         EV::break if $events > 0 || !$watch_active;
@@ -138,7 +127,6 @@ plan tests => 11;
     EV::run;
 }
 
-# Test 9-10: Watch with auto_reconnect disabled
 {
     my $client = EV::Etcd->new(
         endpoints => ['127.0.0.1:2379'],
@@ -151,9 +139,7 @@ plan tests => 11;
     my $watch = $client->watch("$prefix/key", { auto_reconnect => 0 }, sub {
         my ($resp, $err) = @_;
         return if $err;
-        # The created confirmation surfaces as the first callback (created=1,
-        # empty events) — only put once the watch is registered server-side,
-        # otherwise the put can commit before registration and be missed.
+        # A put committed before the watch is registered (created=1) is missed
         if ($resp->{created} && !$put_sent) {
             $put_sent = 1;
             $client->put("$prefix/key", "value", sub {});
@@ -164,7 +150,6 @@ plan tests => 11;
 
     ok($watch, 'watch created with auto_reconnect disabled');
 
-    # Wait for event
     my $check;
     $check = EV::timer(0.1, 0.1, sub {
         EV::break if $events > 0;
@@ -181,9 +166,7 @@ plan tests => 11;
     EV::run;
 }
 
-# Test 11: Verify error has retryable flag set correctly
 {
-    # Connect to invalid endpoint
     my $client = EV::Etcd->new(
         endpoints => ['127.0.0.1:29999'],
         timeout => 1,

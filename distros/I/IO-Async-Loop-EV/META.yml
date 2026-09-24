@@ -17,7 +17,7 @@ name: IO-Async-Loop-EV
 provides:
   IO::Async::Loop::EV:
     file: lib/IO/Async/Loop/EV.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   EV: '0'
   IO::Async::Loop: '0.49'
@@ -25,5 +25,5 @@ requires:
   perl: '5.020'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

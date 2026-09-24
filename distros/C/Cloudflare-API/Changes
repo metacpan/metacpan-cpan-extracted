@@ -1,0 +1,24 @@
+Revision history for Cloudflare::API
+
+1.009  2026-09-24
+    Add Worker search and configuration inspection by script name, immutable
+    tag, or ETag, with direct combined script/version and Worker-level settings
+    access.
+    Accept resource, action, and subsequent string method arguments as
+    positional CLI operands, preserving order when mixed with typed --arg
+    options.
+    Generate self-contained Bash, Zsh, and Fish command completion without
+    authentication or network access.
+    Validate action argument counts and Worker inspection selectors before
+    authentication, and list valid resources or actions in selection errors.
+    Add GitHub Actions CI and signed CPAN/GitHub release automation with build
+    provenance, and correct documentation and repository links.
+
+0.01  2026-09-23
+    Initial client for Accounts, Zones, Workers, R2, KV, D1, Queues,
+    Hyperdrive, and Secrets Store.
+    Manage Worker scripts, versions, deployments, secrets, subdomains, routes,
+    and static assets.
+    Add a typed command-line client with JSON or Data::Dumper output,
+    pagination, file and asset inputs, and Wrangler authentication with account
+    discovery.

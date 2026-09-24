@@ -567,6 +567,56 @@ sub on_error ($self, $error) {
 
 sub CLONE_SKIP ($class) { 1 }
 
+sub _fork_preflight ($self, $mode, $loop) {
+    croak "fork(): Listener is not active in this Loop"
+        if !$self->{loop} || Scalar::Util::refaddr($self->{loop}) != Scalar::Util::refaddr($loop)
+        || !$self->is_running;
+    croak "fork(): Listener does not support '$mode'"
+        if $mode ne 'drop' && $mode ne 'share' && $mode ne 'move';
+    return 1;
+}
+
+sub _fork_child_rebind ($self, $loop, $mode) {
+    my $paused = $self->{state} eq 'paused';
+    $self->{watcher} = undef;
+    $self->{loop} = undef;
+    $self->{state} = 'unattached';
+    $self->_attach_to_loop($loop);
+    $self->pause if $paused;
+    $self->{unlink_on_close} = 0 if $mode eq 'share';
+    return;
+}
+
+sub _fork_child_share ($self, $loop) {
+    $self->_fork_child_rebind($loop, 'share');
+}
+
+sub _fork_child_move ($self, $loop) {
+    $self->_fork_child_rebind($loop, 'move');
+}
+
+sub _fork_child_drop ($self, $loop) {
+    $self->{watcher} = undef;
+    my $fh = delete $self->{fh};
+    close $fh if defined($fh) && $self->{owns_socket};
+    $self->{unlink_on_close} = 0;
+    $self->{loop} = undef;
+    $self->{state} = 'not_inherited';
+    return;
+}
+
+sub _fork_parent_move ($self, $child_pid) {
+    if (my $watcher = delete $self->{watcher}) {
+        $watcher->cancel;
+    }
+    my $fh = delete $self->{fh};
+    close $fh if defined($fh) && $self->{owns_socket};
+    $self->{unlink_on_close} = 0;
+    $self->{loop} = undef;
+    $self->{state} = 'moved';
+    return;
+}
+
 sub _attach_to_loop ($self, $loop) {
     croak 'add(): Listener is not unattached'
         if $self->{state} ne 'unattached' || $self->{loop};
@@ -623,7 +673,8 @@ sub is_running  ($self) {
 }
 sub is_terminal ($self) {
     return $self->{state} eq 'closed' || $self->{state} eq 'failed'
-        || $self->{state} eq 'detached';
+        || $self->{state} eq 'detached' || $self->{state} eq 'moved'
+        || $self->{state} eq 'not_inherited';
 }
 
 sub data ($self, @arg) {

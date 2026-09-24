@@ -33,19 +33,28 @@ msgstr "File lib/Ex/Eon/Astronomer.pm:"
 msgid "Файл lib/Ex/Eon/Planet.pm:"
 msgstr "File lib/Ex/Eon/Planet.pm:"
 
-msgid "Теперь конфигурация эонов. У эона-учёного `Ex::Eon::Galileo` аргументы заданы упорядоченно (`arguments` — массив), после создания вызывается метод `observe` со ссылкой на другой эон (`@Ex::Eon::Saturn`). У планет `arguments` — хеш, а аргумент `discoverer` ссылается (`@`) на эон учёного."
+msgid "Теперь конфигурация эонов. У эона-учёного `Ex::Eon::Galileo` аргументы заданы упорядоченно (`arguments` – массив), после создания вызывается метод `observe` со ссылкой на другой эон (`@Ex::Eon::Saturn`). У планет `arguments` – хеш, а аргумент `discoverer` ссылается (`@`) на эон учёного."
 msgstr "Now the configuration of the eons. The eon-scientist `Ex::Eon::Galileo` has arguments specified in order (`arguments` is an array), after creation the `observe` method is called with a link to another eon (`@Ex::Eon::Saturn`). For planets, `arguments` is a hash, and the `discoverer` argument refers (`@`) to the scientist's eon."
 
-msgid "Файл etc/aion/eon.yml:"
-msgstr "File etc/aion/eon.yml:"
+msgid "Файл etc/aion/include.yml:"
+msgstr "File etc/aion/include.yml:"
 
-msgid "Загрузим конфигурацию из `etc/aion/eon.yml`, создадим контейнер и запросим эоны."
-msgstr "Let's load the configuration from `etc/aion/eon.yml`, create a container and request eons."
+msgid "В конфигурации эон `Ex::Eon::Jupiter` описан раньше, чем `Ex::Eon::Galileo` (на которого он ссылается через `@`). Порядок описания не важен: эоны порождаются лениво при запросе, поэтому `@`-ссылка разрешается уже на готовый эон."
+msgstr "In the configuration, the eon `Ex::Eon::Jupiter` is described before `Ex::Eon::Galileo` (which it refers to via `@`). The order of description is not important: eons are generated lazily when requested, so the `@` link is resolved to a ready-made eon."
+
+msgid "Прочитаем конфигурацию из `etc/aion/include.yml` и передадим её контейнеру."
+msgstr "Let's read the configuration from `etc/aion/include.yml` and pass it to the container."
+
+msgid "## Круговая зависимость"
+msgstr "## Circular dependency"
+
+msgid "Если эоны ссылаются друг на друга, то контейнер не сможет их породить. Цикл вычисляется уже при добавлении эона (`autoware`) — на этапе сборки конфигурации — и выбрасывается исключение с цепочкой ссылок."
+msgstr "If eons refer to each other, then the container will not be able to spawn them. The cycle is calculated already when adding an eon (`autoware`) - at the stage of assembling the configuration - and an exception with a chain of references is thrown."
 
 msgid "Каждый эон в `aion.eon` описывается строкой или хешем."
 msgstr "Each eon in `aion.eon` is described by a string or hash."
 
-msgid "Строка задаёт конструктор `'класс#метод'` (или просто `'класс'`), метод по умолчанию — `new`. Так создаются самые простые эоны без аргументов."
+msgid "Строка задаёт конструктор `'класс#метод'` (или просто `'класс'`), метод по умолчанию – `new`. Так создаются самые простые эоны без аргументов."
 msgstr "The line specifies the constructor `'class#method'` (or just `'class'`), the default method is `new`. This is how the simplest eons are created without arguments."
 
 msgid "Хеш может содержать ключи:"
@@ -57,7 +66,7 @@ msgid ""
 "* `arguments` – аргументы конструктора:\n"
 "  * хеш – именованные аргументы (`new => %hash`);\n"
 "  * массив – упорядоченные аргументы (`new => @array`).\n"
-"* `calls` – список вызовов методов после создания эона. Каждый вызов — имя метода (без аргументов) или массив `[имя_метода, аргументы...]`."
+"* `calls` – список вызовов методов после создания эона. Каждый вызов – имя метода (без аргументов) или массив `[имя_метода, аргументы...]`."
 msgstr ""
 "* `class` – class (package) of the eon. If not specified and the eon key is similar to the class name (`/^[\\w:]+$/`), the key itself is used.\n"
 "* `method` – method of the constructor class. Defaults to `new`.\n"
@@ -90,8 +99,8 @@ msgstr "Receive an eon from the container."
 msgid "Получить эон из контейнера или исключение, если его там нет."
 msgstr "Get an eon from the container or an exception if it is not there."
 
-msgid "Добавить ключ в плерому."
-msgstr "Add a key to the pleroma."
+msgid "Добавить эон в плерому. `$config` – строка `'класс#метод'` (или просто `'класс'`) либо хеш с ключами `class`, `method`, а также опционально `arguments`/`calls` (см. выше). Если `$key` не задан, он выводится из конфигурации."
+msgstr "Add an aeon to the pleroma. `$config` – the string `'class#method'` (or just `'class'`) or a hash with the keys `class`, `method`, and optionally `arguments`/`calls` (see above). If `$key` is not specified, it is output from the configuration."
 
 msgid "Файл lib/Ex/Eon/AstroEon.pm:"
 msgstr "File lib/Ex/Eon/AstroEon.pm:"

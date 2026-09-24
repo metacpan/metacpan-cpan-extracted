@@ -83,6 +83,28 @@ use HTTP::API::Core::Error;
 }
 
 {
+    for my $case (
+        ['content', []],
+        ['reason', {}],
+    ) {
+        my ($field, $value) = @$case;
+        my $api = HTTP::API::Core->new(
+            base_url => 'https://api.example.test',
+            retry => { attempts => 1 },
+            transport => sub {
+                return { status => 200, $field => $value };
+            },
+        );
+
+        my $error;
+        eval { $api->get('/invalid-scalar'); 1 } or $error = $@;
+        isa_ok $error, 'HTTP::API::Core::Error';
+        is $error->category, 'transport', "reference $field uses transport category";
+        ok $error->retryable, "reference $field is a retryable malformed transport response";
+    }
+}
+
+{
     my $original = HTTP::API::Core::Error->new(
         category => 'transport',
         method => 'GET',

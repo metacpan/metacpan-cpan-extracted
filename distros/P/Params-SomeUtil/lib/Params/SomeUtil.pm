@@ -137,7 +137,7 @@ require DynaLoader;
 
 use vars qw{$VERSION @ISA @EXPORT_OK %EXPORT_TAGS};
 
-$VERSION   = '1.11';
+$VERSION   = '1.12';
 @ISA       = qw{
 	Exporter
 	DynaLoader

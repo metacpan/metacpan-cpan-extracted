@@ -2417,7 +2417,35 @@ static OP* accessor_typed_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *cko
     if (argop != selfop) {
         /* Setter: $obj->name($value) - use typed setter */
         OP *valop = OpSIBLING(selfop);
-        
+        SlotSpec *spec = data->meta->slots[idx];
+
+        /* When the value is already known at compile time, the type check can
+         * be settled here instead of on every call. That is only equivalent if
+         * a type check is the sole thing the typed setter would have done:
+         * pp_object_set handles the frozen check and the store, but not
+         * readonly, required, coercion, triggers or weak refs. A value that
+         * fails falls through to the runtime path, so a type error is still
+         * reported where it always was. */
+        if (valop->op_type == OP_CONST
+            && spec->has_type
+            && !spec->has_checks
+            && !spec->has_trigger
+            && !spec->is_weak
+            && check_slot_type(aTHX_ cSVOPx_sv(valop), spec))
+        {
+            OpMORESIB_set(pushop, cvop);
+            OpLASTSIB_set(valop, NULL);
+            OpLASTSIB_set(selfop, NULL);
+
+            newop = newBINOP(OP_NULL, 0, selfop, valop);
+            newop->op_type = OP_CUSTOM;
+            newop->op_ppaddr = pp_object_set;
+            newop->op_targ = idx;
+
+            op_free(entersubop);
+            return newop;
+        }
+
         OpMORESIB_set(pushop, cvop);
         OpLASTSIB_set(valop, NULL);
         OpLASTSIB_set(selfop, NULL);
@@ -4177,7 +4205,7 @@ static void object_cleanup_globals(pTHX_ void *data) {
 
 /* C-level registration for external XS modules (called from BOOT)
    This is the fast path - no Perl callback overhead */
-PERL_CALLCONV void object_register_type_xs(pTHX_ const char *name, 
+OBJECT_API void object_register_type_xs(pTHX_ const char *name, 
                                            ObjectTypeCheckFunc check,
                                            ObjectTypeCoerceFunc coerce) {
     RegisteredType *type;
@@ -4211,7 +4239,7 @@ PERL_CALLCONV void object_register_type_xs(pTHX_ const char *name,
 
 /* C-level registration with user-data for external XS modules (called from BOOT)
    Allows a single pair of C functions to serve multiple dynamically-created types */
-PERL_CALLCONV void object_register_type_xs_ex(pTHX_ const char *name,
+OBJECT_API void object_register_type_xs_ex(pTHX_ const char *name,
                                               ObjectTypeCheckFuncEx check,
                                               ObjectTypeCoerceFuncEx coerce,
                                               void *data) {
@@ -4244,7 +4272,7 @@ PERL_CALLCONV void object_register_type_xs_ex(pTHX_ const char *name,
 }
 
 /* Getter for external modules to look up a registered type */
-PERL_CALLCONV RegisteredType* object_get_registered_type(pTHX_ const char *name) {
+OBJECT_API RegisteredType* object_get_registered_type(pTHX_ const char *name) {
     STRLEN name_len = strlen(name);
     if (!g_type_registry) return NULL;
     

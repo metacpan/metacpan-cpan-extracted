@@ -352,6 +352,59 @@ subtest 'a Retry-After wait does not block the event loop' => sub {
     cmp_ok($ticks, '>=', 5, "the loop kept running through the wait (ticked $ticks times)");
 };
 
+subtest 'a retry without Retry-After backs off, doubling' => sub {
+    my @at;
+    my $origin = InternetDataTest::Origin->new(sub {
+        push @at, Time::HiRes::time();
+        shift->render(json => { rc => 'ERROR' }, status => 503);
+    });
+    my $client = InternetData->new(base_url => $origin->url, api_key => 'k', retries => 2);
+
+    eval { $client->database->list };
+    my $error = $@;
+    is(ref $error && $error->kind, 'server_error', 'the call failed as the server did');
+    is(scalar @at, 3, 'one attempt plus two retries');
+    my ($first, $second) = ($at[1] - $at[0], $at[2] - $at[1]);
+    cmp_ok($first, '>=', 0.24, sprintf 'the first retry waited %.3f s, at least 250 ms', $first);
+    cmp_ok($first, '<', 0.45, 'and not the doubled wait');
+    cmp_ok($second, '>=', 0.49, sprintf 'the second waited %.3f s, at least 500 ms', $second);
+};
+
+subtest 'the retry schedule, and the longest Retry-After honored' => sub {
+    my @backoff = map { InternetData::_retry_delay(undef, $_) } 0 .. 7;
+    is_deeply(\@backoff, [0.25, 0.5, 1, 2, 4, 8, 16, 16], 'doubling from 250 ms, capped from the seventh');
+    is(InternetData::_retry_delay(3, 4), 3, 'a Retry-After is waited as given');
+    is(InternetData::_retry_delay(0, 1), 0.5, 'a Retry-After of 0 waits the backoff');
+    is(InternetData::_retry_delay(2_147_483.647, 0), 2_147_483.647, 'up to 2**31 - 1 ms');
+    is(InternetData::_retry_delay(2_147_484, 0), 0.25, 'and one past it waits the backoff');
+    is(InternetData::_retry_delay(9223372036854775807, 1), 0.5, 'as does one no timer should hold');
+};
+
+subtest 'a Retry-After past the bound is waited out on the backoff' => sub {
+    my $attempts = 0;
+    my $origin = InternetDataTest::Origin->new(sub {
+        my ($c) = @_;
+        if (++$attempts == 1) {
+            $c->res->headers->header('Retry-After' => '9223372036854775807');
+            return $c->render(json => { rc => 'RATE_LIMITED' }, status => 429);
+        }
+        $c->render(json => { databases => [] });
+    });
+    my $client = InternetData->new(base_url => $origin->url, api_key => 'k', retries => 1);
+
+    # Raced against a timer: honored as given, this wait would never end.
+    my ($databases, $timed_out);
+    my $started = Time::HiRes::time();
+    Mojo::Promise->race(
+        $client->database->list_p->then(sub { $databases = shift }),
+        Mojo::Promise->timer(5)->then(sub { $timed_out = 1 }),
+    )->wait;
+    ok(!$timed_out, 'the call did not wait on the server');
+    is_deeply($databases, [], 'the retry succeeded');
+    is($origin->count, 2, 'after exactly one retry');
+    cmp_ok(Time::HiRes::time() - $started, '<', 2, 'having waited the backoff');
+};
+
 subtest 'the download redirect is never followed' => sub {
     my $origin = InternetDataTest::Origin->new(sub {
         my ($c, $o) = @_;

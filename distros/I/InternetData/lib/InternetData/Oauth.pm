@@ -12,7 +12,7 @@ use Scalar::Util ();
 use InternetData::Error;
 use InternetData::OauthError;
 
-our $VERSION = '1.6.0';
+our $VERSION = '1.6.1';
 
 use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code';
 
@@ -172,9 +172,14 @@ sub _new {
 
 # One wait, then one exchange. Recurses through $self rather than a
 # self-referential closure, which would be a cycle the interpreter never collects.
+# No wait runs past the deadline: an interval that would end after it, served
+# that way or widened by slow_down, waits only the time left, and the local
+# expiry follows with no request sent.
 sub _poll_p {
     my ($self, $poll) = @_;
-    return $self->{sleep_p}->($poll->{interval})->then(sub {
+    my $left = $poll->{deadline} - $self->{now}->();
+    my $wait = $poll->{interval} < $left ? $poll->{interval} : $left > 0 ? $left : 0;
+    return $self->{sleep_p}->($wait)->then(sub {
         die InternetData::OauthExpiredTokenError->new(error_code => 'expired_token')
             if $self->{now}->() >= $poll->{deadline};
         return $self->_exchange_p({
@@ -374,8 +379,9 @@ which is how a program signs the machine out; an access token ends only itself.
 
 Waits for the person to approve, and returns the tokens. It waits C<interval>
 seconds (5 when that is below 1) before EVERY request, the first included, and 5
-more for the rest of the call each time the server answers C<slow_down>. It ends
-at the first answer that is neither: a denial dies with
+more for the rest of the call each time the server answers C<slow_down>, but
+never past C<expires_in>: a wait that would end later ends then. It ends at the
+first answer that is neither: a denial dies with
 C<InternetData::OauthAccessDeniedError>, a code that ran out with
 C<InternetData::OauthExpiredTokenError> - as does outliving C<expires_in>, counted
 from this call, with no C<status> - and any other failure as it came. The timeout

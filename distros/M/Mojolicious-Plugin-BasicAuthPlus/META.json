@@ -4,7 +4,7 @@
       "Brad Robertson <blr@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "perl_5"
    ],
@@ -54,6 +54,6 @@
          "url" : "http://github.com/stregone/mojolicious-plugin-basicauthplus"
       }
    },
-   "version" : "v0.11.3",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

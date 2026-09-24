@@ -4,11 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# This test requires a multi-member etcd cluster.
-# Start with: ./scripts/local_cluster.sh start
-#
-# Skip if cluster not available or ETCD_TEST_MOVE_LEADER not set
-
 BEGIN {
     unless ($ENV{ETCD_TEST_MOVE_LEADER}) {
         plan skip_all => 'Set ETCD_TEST_MOVE_LEADER=1 to run move_leader test (requires 3-node cluster)';
@@ -27,7 +22,6 @@ my @endpoints = (
     '127.0.0.1:32379',
 );
 
-# Check if cluster is available with all 3 nodes
 my $healthy_count = 0;
 
 for my $ep (@endpoints) {
@@ -51,7 +45,6 @@ diag("Cluster has $healthy_count healthy nodes");
 
 my $client = EV::Etcd->new(endpoints => \@endpoints);
 
-# Test 1-2: Get member list
 my @members;
 my $current_leader_id;
 
@@ -69,7 +62,6 @@ $client->member_list(sub {
 my $t1 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 3-4: Get current leader via status
 my $leader_endpoint;
 
 $client->status(sub {
@@ -83,11 +75,9 @@ $client->status(sub {
 my $t2 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Find leader endpoint and a non-leader member to transfer leadership to
 my $target_id;
 for my $m (@members) {
     if ($m->{id} eq $current_leader_id) {
-        # Extract endpoint from client URLs
         if ($m->{client_urls} && @{$m->{client_urls}}) {
             my $url = $m->{client_urls}[0];
             $url =~ s|^http://||;
@@ -105,10 +95,9 @@ SKIP: {
 
     diag("Will transfer leadership to: $target_id");
 
-    # Create client connected directly to the leader (move_leader must go to leader)
+    # move_leader must be sent to the current leader
     my $leader_client = EV::Etcd->new(endpoints => [$leader_endpoint]);
 
-    # Test 5-6: move_leader
     $leader_client->move_leader($target_id, sub {
         my ($resp, $err) = @_;
         ok(!$err, 'move_leader succeeded');
@@ -127,7 +116,6 @@ SKIP: {
     my $delay = EV::timer(1, 0, sub { EV::break });
     EV::run;
 
-    # Test 7-8: Verify leader changed
     my $new_leader_id;
     $client->status(sub {
         my ($resp, $err) = @_;

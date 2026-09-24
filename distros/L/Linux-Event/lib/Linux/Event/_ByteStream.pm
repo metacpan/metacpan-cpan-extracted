@@ -38,6 +38,11 @@ sub new ($class, %opt) {
     my $pending = delete($opt{_pending}) // 0;
     my $data = delete $opt{data};
     my $transport = delete $opt{_transport};
+    my $owns_handles = delete $opt{_owns_handles};
+    $owns_handles = 1 if !defined $owns_handles;
+    croak 'new(): internal owns_handles must be zero or one'
+        if ref($owns_handles) || $owns_handles !~ /\A[01]\z/;
+    $owns_handles = $owns_handles ? 1 : 0;
     my $callback = _take_callbacks('new', \%opt);
     my %timeout_override;
     for my $name (qw(idle_timeout read_timeout write_timeout)) {
@@ -84,6 +89,8 @@ sub new ($class, %opt) {
         write_fh    => $write_fh,
         read_capable => defined($read_fh) ? 1 : 0,
         write_capable => defined($write_fh) ? 1 : 0,
+        owns_handles => $owns_handles,
+        borrowed_handle_flags => {},
         read_watcher => undef,
         write_watcher => undef,
         data        => $data,
@@ -140,6 +147,84 @@ sub connect ($class, %opt) {
     croak 'connect(): available only on Linux::Event::IO::Sock::Stream subclasses';
 }
 
+sub _fork_preflight ($self, $mode, $loop) {
+    croak 'fork(): ordered-byte resource is not active in this Loop'
+        if $self->{closed} || !$self->{loop}
+        || refaddr($self->{loop}) != refaddr($loop);
+    croak 'fork(): cannot fork while an ordered-byte connection is pending'
+        if $self->{connection};
+    return 1 if $mode eq 'drop';
+    croak "fork(): ordered-byte resource does not support '$mode'"
+        if $mode ne 'move';
+    croak 'fork(): only established socket Streams support move'
+        if !$self->isa('Linux::Event::IO::Sock::Stream');
+    croak 'fork(): only plain socket Streams support move initially'
+        if ($self->transport_name // 'plain') ne 'plain';
+    return 1;
+}
+
+sub _fork_child_move ($self, $loop) {
+    $self->{read_watcher} = undef;
+    $self->{write_watcher} = undef;
+    $self->{transport_deadline_watcher} = undef;
+    $self->{loop} = $loop;
+
+    if (my $timer = $self->{deadline_timer}) {
+        $loop->add($timer) if !$timer->is_terminal;
+    }
+
+    my $interest = 0;
+    if (defined($self->{read_fh}) && !$self->{read_closed} && !$self->{read_eof}
+            && !$self->{read_paused}
+            && !($self->{xs_state} && $self->{xs_state}->consumer_paused
+                && $self->{xs_state}->transport_ready)) {
+        $interest |= 0x01;
+    }
+    $interest |= 0x02
+        if defined($self->{write_fh}) && $self->pending_bytes > 0;
+    $self->{initial_interest} = $interest;
+    $self->_register_handles;
+    return;
+}
+
+sub _fork_child_drop ($self, $loop) {
+    $self->{read_watcher} = undef;
+    $self->{write_watcher} = undef;
+    $self->{transport_deadline_watcher} = undef;
+    if (my $timer = delete $self->{deadline_timer}) {
+        eval { $timer->cancel; 1 } if !$timer->is_terminal;
+    }
+    delete $self->{xs_state};
+    if ($self->{owns_handles}) {
+        $self->_close_handles;
+    } else {
+        # Borrowed descriptor status flags belong to the same open-file
+        # descriptions inherited by the parent. Restoring them in the child
+        # would therefore change the still-active parent TTY as well.
+        delete $self->{borrowed_handle_flags};
+        $self->{read_fh} = undef;
+        $self->{write_fh} = undef;
+    }
+    $self->{loop} = undef;
+    $self->{closed} = 1;
+    $self->{fork_state} = 'not_inherited';
+    return;
+}
+
+sub _fork_parent_move ($self, $child_pid) {
+    if (my $timer = delete $self->{deadline_timer}) {
+        $timer->cancel if !$timer->is_terminal;
+    }
+    $self->{transport_deadline_watcher} = undef;
+    $self->_cancel_io_watchers;
+    delete $self->{xs_state};
+    $self->_close_handles;
+    $self->{loop} = undef;
+    $self->{closed} = 1;
+    $self->{fork_state} = 'moved';
+    return;
+}
+
 sub CLONE ($class) {
     Linux::Event::_ByteStream::Descriptor::clear_cache();
     return;
@@ -179,6 +264,7 @@ sub has_write ($self) { !!$self->{write_capable} }
 sub loop ($self) { $self->{loop} }
 
 sub state ($self) {
+    return $self->{fork_state} if $self->{closed} && $self->{fork_state};
     return 'detached' if $self->{closed} && $self->{detached};
     return 'closed' if $self->{closed};
     return 'unattached' if !$self->{loop};
@@ -550,6 +636,8 @@ sub detach ($self) {
         _teardown_step(\$failure, sub { $xs_state->_close(5) });
     }
     _teardown_step(\$failure, sub { $self->_cancel_io_watchers });
+    _teardown_step(\$failure, sub { $self->_restore_borrowed_handles })
+        if !$self->{owns_handles};
     $self->{closed} = 1;
     delete @$self{qw(
         callbacks callback_overrides _input_callbacks
@@ -831,7 +919,14 @@ sub _prepare_handles ($self) {
     for my $handle (grep { defined } ($read_fh, $write_fh)) {
         my $fd = fileno($handle);
         next if $prepared{$fd}++;
-        _set_nonblocking($handle);
+        my ($status_flags, $descriptor_flags) = _set_nonblocking($handle);
+        if (!$self->{owns_handles}) {
+            $self->{borrowed_handle_flags}{$fd} = {
+                fh               => $handle,
+                status_flags     => $status_flags,
+                descriptor_flags => $descriptor_flags,
+            };
+        }
     }
     my $descriptor = $self->{descriptor};
     my $read_fd = defined($read_fh) ? fileno($read_fh) : -1;
@@ -1217,7 +1312,7 @@ sub _release_read_side ($self) {
     my $read_fh = $self->{read_fh};
     if (defined($read_fh) && (!$self->{write_fh}
         || fileno($read_fh) != fileno($self->{write_fh}))) {
-        CORE::close($read_fh);
+        CORE::close($read_fh) if $self->{owns_handles};
         $self->{read_fh} = undef;
     }
     return;
@@ -1236,7 +1331,7 @@ sub _release_write_side ($self) {
     my $write_fh = $self->{write_fh};
     if (defined($write_fh) && (!$self->{read_fh}
         || fileno($write_fh) != fileno($self->{read_fh}))) {
-        CORE::close($write_fh);
+        CORE::close($write_fh) if $self->{owns_handles};
         $self->{write_fh} = undef;
     }
     return;
@@ -1270,7 +1365,7 @@ sub _finish_write_side ($self) {
         || fileno($self->{write_fh}) != fileno($self->{read_fh}))) {
         my $watcher = delete $self->{write_watcher};
         $watcher->cancel if $watcher;
-        CORE::close($self->{write_fh});
+        CORE::close($self->{write_fh}) if $self->{owns_handles};
         $self->{write_fh} = undef;
     }
     $self->_clear_transport_deadline;
@@ -1332,7 +1427,7 @@ sub _mark_eof ($self) {
     }
     if (defined($self->{read_fh}) && (!$self->{write_fh}
         || fileno($self->{read_fh}) != fileno($self->{write_fh}))) {
-        CORE::close($self->{read_fh});
+        CORE::close($self->{read_fh}) if $self->{owns_handles};
         $self->{read_fh} = undef;
     }
     $self->_rearm_stream_deadline
@@ -1427,7 +1522,45 @@ sub _cancel_io_watchers ($self) {
     return;
 }
 
+sub _restore_borrowed_handles ($self) {
+    return if $self->{owns_handles};
+    my $saved = delete $self->{borrowed_handle_flags} // {};
+    my $failure;
+
+    for my $fd (sort { $a <=> $b } keys %$saved) {
+        my $entry = $saved->{$fd};
+        my $fh = $entry->{fh};
+        my $current_fd = defined($fh) ? fileno($fh) : undef;
+        next if !defined($current_fd) || $current_fd != $fd;
+
+        my $restored_status = fcntl(
+            $fh, F_SETFL, $entry->{status_flags},
+        );
+        $failure //= "restore borrowed handle $fd status flags: $!"
+            if !$restored_status;
+
+        my $restored_descriptor = fcntl(
+            $fh, F_SETFD, $entry->{descriptor_flags},
+        );
+        $failure //= "restore borrowed handle $fd descriptor flags: $!"
+            if !$restored_descriptor;
+    }
+
+    croak $failure if defined $failure;
+    return;
+}
+
 sub _close_handles ($self) {
+    if (!$self->{owns_handles}) {
+        my $failure;
+        my $restored = eval { $self->_restore_borrowed_handles; 1 };
+        $failure = $@ if !$restored;
+        $self->{read_fh} = undef;
+        $self->{write_fh} = undef;
+        die $failure if defined $failure;
+        return;
+    }
+
     my $read = delete $self->{read_fh};
     my $write = delete $self->{write_fh};
     my $read_fd = defined($read) ? fileno($read) : undef;
@@ -1441,16 +1574,29 @@ sub _close_handles ($self) {
 sub _set_nonblocking ($fh) {
     my $flags = fcntl($fh, F_GETFL, 0);
     croak "new(): fcntl(F_GETFL): $!" if !defined $flags;
-    if (!($flags & O_NONBLOCK)) {
+
+    my $changed_status = !($flags & O_NONBLOCK);
+    if ($changed_status) {
         fcntl($fh, F_SETFL, $flags | O_NONBLOCK)
             or croak "new(): fcntl(F_SETFL O_NONBLOCK): $!";
     }
+
     my $descriptor_flags = fcntl($fh, F_GETFD, 0);
-    croak "new(): fcntl(F_GETFD): $!" if !defined $descriptor_flags;
-    if (!($descriptor_flags & FD_CLOEXEC)) {
-        fcntl($fh, F_SETFD, $descriptor_flags | FD_CLOEXEC)
-            or croak "new(): fcntl(F_SETFD FD_CLOEXEC): $!";
+    if (!defined $descriptor_flags) {
+        my $message = "$!";
+        fcntl($fh, F_SETFL, $flags) if $changed_status;
+        croak "new(): fcntl(F_GETFD): $message";
     }
+
+    if (!($descriptor_flags & FD_CLOEXEC)) {
+        if (!fcntl($fh, F_SETFD, $descriptor_flags | FD_CLOEXEC)) {
+            my $message = "$!";
+            fcntl($fh, F_SETFL, $flags) if $changed_status;
+            croak "new(): fcntl(F_SETFD FD_CLOEXEC): $message";
+        }
+    }
+
+    return ($flags, $descriptor_flags);
 }
 
 1;

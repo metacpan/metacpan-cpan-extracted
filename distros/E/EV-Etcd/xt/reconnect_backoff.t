@@ -1,10 +1,6 @@
 #!/usr/bin/env perl
-# Assert the 0.09 reconnect semantics end-to-end through an RST-capable TCP
-# proxy: an abrupt mid-stream drop (which completes the pending RECV batch as
-# success=1 with a NULL message — the form every real disconnect takes) must
-# arm the backoff and reconnect silently, keepalive ticks and watch events
-# must resume once the proxy accepts again, and cancel() during the backoff
-# window must reap the handle so no callbacks ever fire afterwards (0.09).
+# Reconnect through an RST-capable proxy. An abrupt drop completes the pending
+# RECV as success=1 with a NULL message, the form every real disconnect takes.
 use strict;
 use warnings;
 use lib 'blib/lib', 'blib/arch';
@@ -29,7 +25,7 @@ eval {
 };
 plan skip_all => "etcd not available on $ETCD" unless $available;
 
-# --- RST-capable TCP proxy (forked before any gRPC state exists) ---
+# The proxy is forked before any gRPC state exists
 my $listener = IO::Socket::INET->new(
     LocalAddr => '127.0.0.1', LocalPort => 0,
     Listen => 5, ReuseAddr => 1,
@@ -89,7 +85,6 @@ note("abrupt RST surfaced as: $mode"
         ? " (watch: @watch_errmsgs; keepalive: @ka_errmsgs)" : ''));
 
 if ($mode eq 'backoff') {
-    # Reconnect engaged silently — assert it completes end-to-end.
     wait_for(sub { $ticks > $ticks0 }, 8);
     cmp_ok($ticks, '>', $ticks0, 'keepalive ticks resumed after reconnect');
 
@@ -105,7 +100,7 @@ if ($mode eq 'backoff') {
     $ka1->cancel(sub { $done++ });
     wait_for(sub { $done == 2 }, 3);
 
-    # --- Phase 2: cancel DURING backoff (the 0.09 reap branch) ---
+    # --- Phase 2: cancel during the backoff ---
     my ($created2, $ticks2, $errs2) = (0, 0, 0);
     my $ka2 = $proxied->lease_keepalive($lease_id, sub {
         my ($r, $e) = @_;
@@ -131,16 +126,13 @@ if ($mode eq 'backoff') {
     $ka2->cancel(sub { $cancelled++ });
     is($cancelled, 2, 'both cancels succeeded synchronously mid-backoff');
 
-    # Reaped structs must never fire again (callback SVs were released).
     my ($t2_snap, $e2_snap) = ($ticks2, $errs2);
     wait_for(sub { 0 }, 1.5);
     is($errs2, $e2_snap,  'no error callbacks after mid-backoff cancel');
     is($ticks2, $t2_snap, 'no keepalive ticks after mid-backoff cancel');
 
-    # --- Phase 3: retry exhaustion — server stays down past every backoff ---
-    # max_retries=2 gives attempts at ~0.5s and ~1.5s; the terminal error must
-    # come after the full budget (not after the first failed attempt), exactly
-    # once per stream, with a retryable UNAVAILABLE status.
+    # --- Phase 3: retry exhaustion, server down past every backoff ---
+    # max_retries=2 retries at about 0.5s and 1.5s, hence the 1.2s floor below
     my $client3 = EV::Etcd->new(endpoints => [$PROXY], max_retries => 2);
     my ($lease3, $created3, $ticks3) = (undef, 0, 0);
     my (@werr3, @kerr3);
@@ -187,7 +179,6 @@ if ($mode eq 'backoff') {
         is($kerr3[0][1]{status}, 'UNAVAILABLE', 'keepalive exhaustion status is UNAVAILABLE');
     }
 
-    # No stragglers, and dead handles cancel cleanly.
     my ($w3_snap, $k3_snap) = (scalar @werr3, scalar @kerr3);
     wait_for(sub { 0 }, 1.5);
     is(@werr3 + @kerr3, $w3_snap + $k3_snap, 'no further callbacks after exhaustion');
@@ -198,15 +189,11 @@ if ($mode eq 'backoff') {
     $direct->lease_revoke($lease3, sub { });
 }
 else {
-    # Since 0.09 a stream ending without a message must arm the backoff and
-    # reconnect silently; an immediate error callback is a regression to the
-    # pre-0.09 terminal-error behavior.
     fail('abrupt connection drop arms the reconnect backoff path');
     diag("watch errors: @watch_errmsgs");
     diag("keepalive errors: @ka_errmsgs");
 }
 
-# --- Cleanup ---
 $direct->lease_revoke($lease_id, sub { EV::break }) if $lease_id;
 my $tc = EV::timer(3, 0, sub { EV::break });
 EV::run;
@@ -221,7 +208,6 @@ if ($proxy_pid) {
 
 done_testing();
 
-# Pump the EV loop until $cond returns true or $seconds elapse.
 sub wait_for {
     my ($cond, $seconds) = @_;
     my $poll  = EV::timer(0.05, 0.05, sub { EV::break if $cond->() });

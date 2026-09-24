@@ -4,12 +4,12 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-	NAME             => 'Algorithm::ToNumberMunger',
-	AUTHOR           => q{Zane C. Bowers-Hadley <vvelox@vvelox.net>},
-	VERSION_FROM     => 'lib/Algorithm/ToNumberMunger.pm',
-	ABSTRACT_FROM    => 'lib/Algorithm/ToNumberMunger.pm',
-	LICENSE          => 'lgpl_2_1',
-	MIN_PERL_VERSION => '5.006',
+	NAME               => 'Algorithm::ToNumberMunger',
+	AUTHOR             => q{Zane C. Bowers-Hadley <vvelox@vvelox.net>},
+	VERSION_FROM       => 'lib/Algorithm/ToNumberMunger.pm',
+	ABSTRACT_FROM      => 'lib/Algorithm/ToNumberMunger.pm',
+	LICENSE            => 'lgpl_2_1',
+	MIN_PERL_VERSION   => '5.006',
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => '0',
 	},
@@ -17,8 +17,10 @@ my %WriteMakefileArgs = (
 		'Test::More' => '0',
 	},
 	PREREQ_PM => {
-		'Carp'         => '0',
-		'Scalar::Util' => '0',
+		'Carp'                  => '0',
+		'Scalar::Util'          => '0',
+		'Time::Piece'           => '0',
+		'IP::Geolocation::MMDB' => '0',
 	},
 	META_MERGE => {
 		'meta-spec' => { version => 2 },
@@ -27,17 +29,6 @@ my %WriteMakefileArgs = (
 				type => 'git',
 				url  => 'https://github.com/vvelox/Algorithm-ToNumberMunger.git',
 				web  => 'https://github.com/vvelox/Algorithm-ToNumberMunger',
-			},
-		},
-		prereqs => {
-			runtime => {
-				# The 'datetime' munger loads Time::Piece lazily (core since
-				# 5.9.5) and the IPv6 path in 'ip_class'/'cidr' loads Socket;
-				# neither is needed unless that munger is used, so they are
-				# recommendations, not hard requirements.
-				recommends => {
-					'Time::Piece' => '0',
-				},
 			},
 		},
 	},

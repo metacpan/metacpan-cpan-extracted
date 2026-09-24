@@ -7255,6 +7255,18 @@ It returns true upon success and C<undef> upon failure. The error, if any, can b
 
 Sets or gets the maximum recursion limit.
 
+=head2 mime_type
+
+Get the mime type for the underlying file.
+
+=head2 mimetype
+
+Alias for L</mime_type>
+
+=head2 mtype
+
+Alias for L</mime_type>
+
 =head2 mkpath
 
 This takes an optional code reference that is used as a callback.

@@ -1,5 +1,10 @@
 Revision history for Fetch
 
+0.28    2026-09-24
+        - Tear a connection down at global destruction without disarming it
+          through a loop perl may already have freed.
+        - Skip t/29-dns.t's localhost case without IO::Socket::IP.
+
 0.27    2026-09-10
         - fixes the Windows build: the Alt-Svc cache called clock_gettime,
           which no Windows toolchain has

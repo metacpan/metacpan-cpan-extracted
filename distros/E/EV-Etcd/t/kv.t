@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -39,7 +37,6 @@ my $client = EV::Etcd->new(
 
 my $prefix = "/test-kv-$$-" . time();
 
-# Test 1-3: Basic put
 $client->put("$prefix/key1", "value1", sub {
     my ($resp, $err) = @_;
     ok(!$err, 'put succeeded');
@@ -51,7 +48,6 @@ $client->put("$prefix/key1", "value1", sub {
 my $t1 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 4-9: Basic get
 $client->get("$prefix/key1", sub {
     my ($resp, $err) = @_;
     ok(!$err, 'get succeeded');
@@ -70,7 +66,6 @@ $client->get("$prefix/key1", sub {
 my $t2 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 10-11: Get non-existent key
 $client->get("$prefix/nonexistent", sub {
     my ($resp, $err) = @_;
     ok(!$err, 'get non-existent key succeeded (no error)');
@@ -80,7 +75,6 @@ $client->get("$prefix/nonexistent", sub {
 my $t3 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 12-14: Put with prev_kv option
 $client->put("$prefix/key1", "value1-updated", { prev_kv => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'put with prev_kv succeeded');
@@ -94,7 +88,6 @@ $client->put("$prefix/key1", "value1-updated", { prev_kv => 1 }, sub {
 my $t4 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Setup multiple keys for prefix/range tests
 my $setup_done = 0;
 for my $i (2..5) {
     $client->put("$prefix/key$i", "value$i", sub {
@@ -105,7 +98,6 @@ for my $i (2..5) {
 my $t5 = EV::timer(5, 0, sub { fail('setup timeout'); EV::break });
 EV::run;
 
-# Test 15-17: Prefix query
 $client->get("$prefix/", { prefix => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'prefix get succeeded');
@@ -117,7 +109,6 @@ $client->get("$prefix/", { prefix => 1 }, sub {
 my $t6 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 18-19: Range with limit
 $client->get("$prefix/", { prefix => 1, limit => 2 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'limited prefix get succeeded');
@@ -127,7 +118,6 @@ $client->get("$prefix/", { prefix => 1, limit => 2 }, sub {
 my $t7 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 20-21: count_only option
 $client->get("$prefix/", { prefix => 1, count_only => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'count_only get succeeded');
@@ -138,7 +128,6 @@ $client->get("$prefix/", { prefix => 1, count_only => 1 }, sub {
 my $t8 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 22-24: Delete single key
 $client->delete("$prefix/key5", sub {
     my ($resp, $err) = @_;
     ok(!$err, 'delete succeeded');
@@ -150,7 +139,6 @@ $client->delete("$prefix/key5", sub {
 my $t9 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 25-27: Delete with prev_kv
 $client->delete("$prefix/key4", { prev_kv => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'delete with prev_kv succeeded');
@@ -163,7 +151,6 @@ $client->delete("$prefix/key4", { prev_kv => 1 }, sub {
 my $t10 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 28-29: Delete with prefix
 $client->delete("$prefix/", { prefix => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'prefix delete succeeded');
@@ -174,7 +161,6 @@ $client->delete("$prefix/", { prefix => 1 }, sub {
 my $t11 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 30-31: Verify all keys deleted
 $client->get("$prefix/", { prefix => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'verify get succeeded');

@@ -157,4 +157,45 @@ my $preserved;
 eval { $preserving->get('/preserved'); 1 } or $preserved = $@;
 is $preserved, $original, 'existing HTTP::API::Core::Error is preserved';
 
+my $bad_hook_transport_called = 0;
+my $bad_hook_api = HTTP::API::Core->new(
+    base_url => 'https://api.example.test',
+    hooks => {
+        before_request => sub {
+            $_[0]{headers}{'X-Bad'} = [];
+        },
+    },
+    transport => sub {
+        $bad_hook_transport_called++;
+        return { status => 200, headers => {}, content => '{}' };
+    },
+);
+my $bad_hook_error;
+eval { $bad_hook_api->get('/bad-header'); 1 } or $bad_hook_error = $@;
+like $bad_hook_error, qr/header values must be scalars or undef/,
+    'reference-valued header added by before_request is rejected';
+is $bad_hook_transport_called, 0,
+    'invalid hook-mutated headers are rejected before transport';
+
+for my $case (
+    ['method', sub { $_[0]{method} = [] }, qr/method must be a non-empty scalar/],
+    ['url', sub { $_[0]{url} = {} }, qr/url must be a defined scalar/],
+    ['content', sub { $_[0]{content} = [] }, qr/content must be a scalar or undef/],
+) {
+    my ($name, $mutate, $pattern) = @$case;
+    my $called = 0;
+    my $api = HTTP::API::Core->new(
+        base_url => 'https://api.example.test',
+        hooks => { before_request => $mutate },
+        transport => sub {
+            $called++;
+            return { status => 200, headers => {}, content => '{}' };
+        },
+    );
+    my $error;
+    eval { $api->get('/bad-context'); 1 } or $error = $@;
+    like $error, $pattern, "invalid hook-mutated $name is rejected";
+    is $called, 0, "invalid hook-mutated $name is rejected before transport";
+}
+
 done_testing;

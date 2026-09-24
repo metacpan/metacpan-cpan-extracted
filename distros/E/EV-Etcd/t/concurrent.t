@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -39,7 +37,6 @@ my $client = EV::Etcd->new(
 
 my $prefix = "/test-concurrent-$$-" . time();
 
-# Test 1-2: Pipelined puts (fire all, then wait)
 {
     my $count = 50;
     my $completed = 0;
@@ -61,7 +58,6 @@ my $prefix = "/test-concurrent-$$-" . time();
     is($errors, 0, 'no errors in pipelined puts');
 }
 
-# Test 3-4: Pipelined gets
 {
     my $count = 50;
     my $completed = 0;
@@ -88,7 +84,6 @@ my $prefix = "/test-concurrent-$$-" . time();
     is($values_correct, $count, 'all values retrieved correctly');
 }
 
-# Test 5-7: Interleaved watch + KV operations
 {
     my $watch_key = "$prefix/watch_interleave";
     my $events_received = 0;
@@ -96,7 +91,6 @@ my $prefix = "/test-concurrent-$$-" . time();
     my $watch_error = 0;
     my $target_events = 10;
 
-    # Start watch
     my $watch = $client->watch($watch_key, {}, sub {
         my ($resp, $err) = @_;
         if ($err) {
@@ -110,7 +104,6 @@ my $prefix = "/test-concurrent-$$-" . time();
 
     # Wait for watch to establish
     my $wait = EV::timer(0.1, 0, sub {
-        # Fire puts while watch is active
         for my $i (1..$target_events) {
             $client->put($watch_key, "event$i", sub {
                 my ($resp, $err) = @_;
@@ -119,7 +112,6 @@ my $prefix = "/test-concurrent-$$-" . time();
         }
     });
 
-    # Wait for all events
     my $check;
     $check = EV::timer(0.1, 0.1, sub {
         if ($events_received >= $target_events && $puts_completed >= $target_events) {
@@ -134,18 +126,15 @@ my $prefix = "/test-concurrent-$$-" . time();
     is($puts_completed, $target_events, "all $target_events puts completed during watch");
     cmp_ok($events_received, '>=', $target_events, "received at least $target_events watch events");
 
-    # Cancel watch
     $watch->cancel(sub { EV::break });
     EV::run(EV::RUN_ONCE);
 }
 
-# Test 8-9: Mixed put/get/delete operations
 {
     my $ops_count = 30;  # 10 puts + 10 gets + 10 deletes
     my $completed = 0;
     my $errors = 0;
 
-    # Fire puts
     for my $i (1..10) {
         $client->put("$prefix/mixed$i", "mixval$i", sub {
             my ($resp, $err) = @_;
@@ -155,7 +144,7 @@ my $prefix = "/test-concurrent-$$-" . time();
         });
     }
 
-    # Fire gets (for keys from pipelined test)
+    # Keys written by the pipelined puts above
     for my $i (1..10) {
         $client->get("$prefix/pipe$i", sub {
             my ($resp, $err) = @_;
@@ -165,7 +154,6 @@ my $prefix = "/test-concurrent-$$-" . time();
         });
     }
 
-    # Fire deletes
     for my $i (1..10) {
         $client->delete("$prefix/mixed$i", sub {
             my ($resp, $err) = @_;
@@ -182,7 +170,6 @@ my $prefix = "/test-concurrent-$$-" . time();
     is($errors, 0, 'no errors in mixed operations');
 }
 
-# Test 10-12: Rapid sequential operations (stress test)
 {
     my $count = 100;
     my $completed = 0;
@@ -201,7 +188,6 @@ my $prefix = "/test-concurrent-$$-" . time();
     is($completed, $count, "all $count rapid sequential puts completed");
     is($errors, 0, 'no errors in rapid sequential puts');
 
-    # Verify a sample
     my $sample_ok = 0;
     $client->get("$prefix/rapid50", sub {
         my ($resp, $err) = @_;
@@ -213,7 +199,6 @@ my $prefix = "/test-concurrent-$$-" . time();
     ok($sample_ok, 'sample value verified after rapid puts');
 }
 
-# Cleanup
 $client->delete("$prefix/", { prefix => 1 }, sub { EV::break });
 EV::run;
 

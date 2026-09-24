@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -41,7 +39,6 @@ my $lock_name = "test-lock-$$-" . time();
 my $lease_id;
 my $lock_key;
 
-# Test 1: Grant a lease for the lock
 $client->lease_grant(30, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'lease_grant succeeded');
@@ -55,7 +52,6 @@ EV::run;
 SKIP: {
     skip "no lease id", 6 unless $lease_id;
 
-    # Test 2: Acquire a lock
     $client->lock($lock_name, $lease_id, sub {
         my ($resp, $err) = @_;
         ok(!$err, 'lock succeeded');
@@ -70,7 +66,6 @@ SKIP: {
     SKIP: {
         skip "no lock key", 4 unless $lock_key;
 
-        # Test 3: Verify the lock key exists in etcd
         $client->get($lock_key, sub {
             my ($resp, $err) = @_;
             ok(!$err, 'get lock key succeeded');
@@ -80,7 +75,6 @@ SKIP: {
         my $t3 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
         EV::run;
 
-        # Test 4: Unlock
         $client->unlock($lock_key, sub {
             my ($resp, $err) = @_;
             ok(!$err, 'unlock succeeded');
@@ -92,7 +86,6 @@ SKIP: {
     }
 }
 
-# Cleanup - revoke the lease
 if ($lease_id) {
     $client->lease_revoke($lease_id, sub { EV::break });
     my $t5 = EV::timer(2, 0, sub { EV::break });

@@ -330,6 +330,20 @@ subtest 'poll_device_token waits, widens and ends as the corpus says' => sub {
     }
 };
 
+# A deadline already behind the clock leaves a negative remainder, which is never
+# the wait: Mojo fires a negative timer at once, but a sleep is asked for 0.
+subtest 'a poll past its deadline waits nothing, never a negative time' => sub {
+    serve({ status => 400, body => { error => 'authorization_pending' } });
+    my $oauth = client()->oauth;
+    my $waits = fake_clock($oauth);
+
+    my $outcome = settle(sub { $oauth->poll_device_token('internetdata-cli', { %DEVICE, expires_in => -3 }) });
+
+    is_deeply($waits, [0], 'one wait, of nothing');
+    is(scalar @requests, 0, 'and no request');
+    is_outcome($outcome, { type => 'expiredToken', status => undef }, 'expires_in -3');
+};
+
 # The seam above proves the schedule; this proves the real wait is one.
 subtest 'a poll on the real clock waits before its first request' => sub {
     serve({ status => 200, body => \%EVERY_REQUIRED_MEMBER });

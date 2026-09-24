@@ -1,6 +1,3 @@
-/*
- * etcd_election.c - Election operation handlers for EV::Etcd
- */
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
@@ -10,19 +7,16 @@
 #include "etcd_common.h"
 #include "etcd_election.h"
 
-/* EVAPI.h's GEVAPI function table is a per-translation-unit static: every
- * file that calls into EV must bind its own copy, or ev_timer_start & co
- * dereference a NULL table. Called once from BOOT in Etcd.xs. */
+/* EVAPI.h's GEVAPI is a per-translation-unit static: each file calling EV must
+ * bind its own (from BOOT), or ev_timer_start & co dereference a NULL table */
 void election_init_ev_api(pTHX) {
     I_EV_API("EV::Etcd");
 }
 
-/* Helper to convert LeaderKey to hash */
-HV *leader_key_to_hv(pTHX_ V3electionpb__LeaderKey *lk) {
+static HV *leader_key_to_hv(pTHX_ V3electionpb__LeaderKey *lk) {
     if (!lk) return NULL;
 
     HV *hv = newHV();
-    /* Handle NULL data pointers for empty bytes fields */
     hv_store(hv, "name", 4,
              lk->name.data ? newSVpvn((const char *)lk->name.data, lk->name.len) : newSVpvn("", 0), 0);
     hv_store(hv, "key", 3,
@@ -32,7 +26,6 @@ HV *leader_key_to_hv(pTHX_ V3electionpb__LeaderKey *lk) {
     return hv;
 }
 
-/* Process CampaignResponse */
 void process_campaign_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "campaign");
 
@@ -52,7 +45,6 @@ void process_campaign_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process ProclaimResponse */
 void process_proclaim_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "proclaim");
 
@@ -67,7 +59,6 @@ void process_proclaim_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process LeaderResponse */
 void process_leader_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "leader");
 
@@ -86,7 +77,6 @@ void process_leader_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* Process ResignResponse */
 void process_resign_response(pTHX_ pending_call_t *pc) {
     BEGIN_RESPONSE_HANDLER(pc, "resign");
 
@@ -101,9 +91,6 @@ void process_resign_response(pTHX_ pending_call_t *pc) {
     CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
-/* === Election Observe (Streaming) Functions === */
-
-/* Re-arm observe to receive next message */
 void observe_rearm_recv(pTHX_ observe_call_t *oc) {
     if (!oc->active) return;
 
@@ -132,7 +119,6 @@ static void observe_call_free(pTHX_ observe_call_t *oc) {
     Safefree(oc);
 }
 
-/* See cleanup_watch — same dual-ownership pattern */
 void cleanup_observe(pTHX_ observe_call_t *oc) {
     if (!oc->client_owns) return;
 
@@ -169,7 +155,6 @@ void observe_call_perl_release(pTHX_ observe_call_t *oc) {
     if (!oc->client_owns) observe_call_free(aTHX_ oc);
 }
 
-/* Process LeaderResponse for observe stream */
 void process_observe_response(pTHX_ observe_call_t *oc) {
     if (!oc->recv_buffer) {
         oc->active = 0;
@@ -197,7 +182,6 @@ void process_observe_response(pTHX_ observe_call_t *oc) {
         return;
     }
 
-    /* Reset reconnect attempt on successful response */
     oc->reconnect_attempt = 0;
 
     HV *result = newHV();
@@ -212,7 +196,6 @@ void process_observe_response(pTHX_ observe_call_t *oc) {
     CALL_SUCCESS_CALLBACK(oc->callback, result);
 }
 
-/* Perform observe reconnection (called from timer callback) */
 static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     dTHX;
     (void)loop;
@@ -226,11 +209,9 @@ static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents)
         return;
     }
 
-    /* Cleanup and reinitialize streaming state */
     STREAMING_CALL_CLEANUP(oc);
     STREAMING_CALL_REINIT(oc);
 
-    /* Create LeaderRequest for observe */
     V3electionpb__LeaderRequest req = V3ELECTIONPB__LEADER_REQUEST__INIT;
     req.name.data = (uint8_t *)oc->params.name;
     req.name.len = oc->params.name_len;
@@ -242,8 +223,8 @@ static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents)
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call and setup ops */
     gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
+    oc->base.channel_gen = client->channel_gen;
     oc->call = grpc_channel_create_call(
         client->channel, NULL, GRPC_PROPAGATE_DEFAULTS,
         client->cq, METHOD_ELECTION_OBSERVE, NULL, deadline, NULL);
@@ -251,10 +232,10 @@ static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents)
     if (!oc->call) {
         grpc_byte_buffer_destroy(send_buffer);
         oc->active = 0;
-        client->in_callback = 1;
+        client->in_callback++;
         CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "Observe reconnect failed", "observe");
-        client->in_callback = 0;
-        if (!client->active) {
+        client->in_callback--;
+        if (!client->in_callback && !client->active) {
             finish_client_destroy(aTHX_ client);
             return;
         }
@@ -266,10 +247,9 @@ static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents)
     grpc_metadata auth_md;
     STREAMING_CALL_SETUP_OPS(client, ops, auth_md, send_buffer, oc);
 
-    /* Observe is server-streaming: the shared macro lays out bidi ops (no
-     * half-close, RECV_MESSAGE at ops[3]). Replace ops[3] with the client
-     * half-close and move RECV_MESSAGE to ops[4], matching the initial setup,
-     * so the reconnected stream actually delivers events. */
+    /* Observe is server-streaming: add the half-close the bidi macro omits and
+     * move RECV_MESSAGE to ops[4], as the initial call does, or the
+     * reconnected stream delivers no events */
     ops[3].op = GRPC_OP_SEND_CLOSE_FROM_CLIENT;
     ops[4].op = GRPC_OP_RECV_MESSAGE;
     ops[4].data.recv_message.recv_message = &oc->recv_buffer;
@@ -281,10 +261,10 @@ static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents)
 
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(oc);
-        client->in_callback = 1;
+        client->in_callback++;
         CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "Observe reconnect batch failed", "observe");
-        client->in_callback = 0;
-        if (!client->active) {
+        client->in_callback--;
+        if (!client->in_callback && !client->active) {
             finish_client_destroy(aTHX_ client);
             return;
         }
@@ -295,11 +275,13 @@ static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents)
 int try_reconnect_observe(pTHX_ observe_call_t *oc) {
     ev_etcd_t *client = oc->client;
 
-    if (!oc->auto_reconnect || !client->active) {
+    if (!client->active) {
         return 0;
     }
 
-    if (oc->reconnect_attempt >= client->max_retries) {
+    etcd_stream_failed(client, oc->base.channel_gen);
+
+    if (!oc->auto_reconnect || oc->reconnect_attempt >= client->max_retries) {
         return 0;
     }
 

@@ -15,6 +15,7 @@ i18n/Aion/Meta/Subroutine.ru-en.po
 i18n/Aion/Meta/Util.ru-en.po
 i18n/Aion/Pleroma.ru-en.po
 i18n/Aion/Type.ru-en.po
+i18n/Aion/Type/DNF.ru-en.po
 i18n/Aion/Types.ru-en.po
 lib/Aion.md
 lib/Aion.pm
@@ -34,6 +35,9 @@ lib/Aion/Pleroma.md
 lib/Aion/Pleroma.pm
 lib/Aion/Type.md
 lib/Aion/Type.pm
+lib/Aion/Type/DNF.md
+lib/Aion/Type/DNF.pm
+lib/Aion/Type/Espresso.pm
 lib/Aion/Type/Lim.md
 lib/Aion/Type/Lim.pm
 lib/Aion/Types.md
@@ -50,6 +54,7 @@ t/aion/meta/subroutine.t
 t/aion/meta/util.t
 t/aion/pleroma.t
 t/aion/type.t
+t/aion/type/d-n-f.t
 t/aion/type/lim.t
 t/aion/types.t
 META.yml

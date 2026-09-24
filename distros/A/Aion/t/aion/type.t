@@ -44,12 +44,12 @@ local ($::_g0 = do {5   ~~ ~$Int;}, $::_e0 = do {""}); ::ok defined($::_g0) == d
 # 
 # ### ARGUMENTS
 # 
-# * name (Str) — Название типа.
-# * args (ArrayRef) — Список аргументов типа.
-# * init (CodeRef) — Инициализатор типа.
-# * test (CodeRef) — Чекер.
-# * a_test (CodeRef) — Чекер значений для типов с необязательными аргументами.
-# * coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) — Массив пар: тип и переход.
+# * name (Str) – Название типа.
+# * args (ArrayRef) – Список аргументов типа.
+# * init (CodeRef) – Инициализатор типа.
+# * test (CodeRef) – Чекер.
+# * a_test (CodeRef) – Чекер значений для типов с необязательными аргументами.
+# * coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) – Массив пар: тип и переход.
 # 
 # ## stringify
 # 
@@ -76,7 +76,7 @@ local ($::_g0 = do {($Int | $Char)->stringify}, $::_e0 = "( Int[3, 5] | Char )")
 local ($::_g0 = do {(~$Int)->stringify}, $::_e0 = "~Int[3, 5]"); ::ok $::_g0 eq $::_e0, '(~$Int)->stringify		  # => ~Int[3, 5]' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
-# Операции — это объекты `Aion::Type` со специальными именами:
+# Операции – это объекты `Aion::Type` со специальными именами:
 # 
 
 local ($::_g0 = do {Aion::Type->new(name => "Exclude", args => [$Char])->stringify}, $::_e0 = "~Char"); ::ok $::_g0 eq $::_e0, 'Aion::Type->new(name => "Exclude", args => [$Char])->stringify   # => ~Char' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;

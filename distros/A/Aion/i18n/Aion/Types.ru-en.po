@@ -5,9 +5,9 @@ msgid "Этот модуль экспортирует подпрограммы:"
 msgstr "This module exports routines:"
 
 msgid ""
-"* `subtype`, `as`, `init_where`, `where`, `awhere`, `message` — для создания валидаторов.\n"
-"* `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` — для использования в валидаторах типа и его аргументов.\n"
-"* `coerce`, `from`, `via` — для создания конвертора значений из одного класса в другой."
+"* `subtype`, `as`, `init_where`, `where`, `awhere`, `message` – для создания валидаторов.\n"
+"* `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` – для использования в валидаторах типа и его аргументов.\n"
+"* `coerce`, `from`, `via` – для создания конвертора значений из одного класса в другой."
 msgstr ""
 "* `subtype`, `as`, `init_where`, `where`, `awhere`, `message` - for creating validators.\n"
 "* `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` - for use in validators of a type and its arguments.\n"
@@ -19,7 +19,7 @@ msgstr "Validator hierarchy:"
 msgid "Создаёт новый тип."
 msgstr "Creates a new type."
 
-msgid "`where` и `message` — это синтаксический сахар, а `subtype` можно использовать без них."
+msgid "`where` и `message` – это синтаксический сахар, а `subtype` можно использовать без них."
 msgstr "`where` and `message` are syntactic sugar, and `subtype` can be used without them."
 
 msgid "Используется с `subtype` для расширения создаваемого типа `$super_type`."
@@ -40,7 +40,7 @@ msgstr "Uses `$code` as a test. The value for the test is passed to `$_`."
 msgid "Используется с `subtype`."
 msgstr "Used with `subtype`."
 
-msgid "Если тип может быть с аргументами и без, то используется для проверки набора с аргументами, а `where` — без."
+msgid "Если тип может быть с аргументами и без, то используется для проверки набора с аргументами, а `where` – без."
 msgstr "If the type can be with or without arguments, then it is used to check the set with arguments, and `where` - without."
 
 msgid "Необходимо, если аргументы необязательны."
@@ -175,10 +175,10 @@ msgstr "A string containing one or more non-blank characters."
 msgid "Строки с `@`."
 msgstr "Lines with `@`."
 
-msgid "Формат телефонов — знак плюс и семь или больше цифр."
+msgid "Формат телефонов – знак плюс и семь или больше цифр."
 msgstr "The telephone format is a plus sign and seven or more digits."
 
-msgid "URL-адреса веб-сайтов — это строка с префиксом http:// или https://."
+msgid "URL-адреса веб-сайтов – это строка с префиксом http:// или https://."
 msgstr "Website URLs are a string prefixed with http:// or https://."
 
 msgid "Пути начинаются с косой черты."
@@ -196,10 +196,10 @@ msgstr "Date and time in the format `yyyy-mm-dd HH:MM:SS`."
 msgid "Сопоставляет строку с регулярным выражением."
 msgstr "Matches a string against a regular expression."
 
-msgid "Имя класса — это пакет с методом `new`."
+msgid "Имя класса – это пакет с методом `new`."
 msgstr "The class name is a package with a `new` method."
 
-msgid "Имя роли — это пакет без метода `new`, с `@ISA` или с одним любым методом."
+msgid "Имя роли – это пакет без метода `new`, с `@ISA` или с одним любым методом."
 msgstr "The role name is a package without the `new` method, with `@ISA`, or with any one method."
 
 msgid "Строковое представление рациональных чисел."

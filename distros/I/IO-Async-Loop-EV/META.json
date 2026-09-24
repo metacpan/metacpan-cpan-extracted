@@ -37,7 +37,7 @@
    "provides" : {
       "IO::Async::Loop::EV" : {
          "file" : "lib/IO/Async/Loop/EV.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

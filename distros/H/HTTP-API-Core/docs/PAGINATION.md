@@ -47,6 +47,8 @@ After the first page, continuation URLs are requested as returned by the API. Re
 
 An undefined or empty continuation marks the pagination sequence complete.
 
+Absolute continuation URLs are restricted to the client's configured origin by default. This prevents client-level credentials and other default headers from being forwarded to an unrelated origin when a continuation URL comes from a response. Set `allow_cross_origin => 1` only when the API intentionally paginates across origins and forwarding the client's request configuration is expected.
+
 ### `page`
 
 Page-number mode adds a page parameter to each request.
@@ -124,7 +126,7 @@ query => {
 }
 ```
 
-Pagination-generated page or cursor parameters are merged with these values. Values are URI-escaped, and keys are emitted deterministically.
+Pagination-generated page or cursor parameters are merged with these values. Scalar values are URI-escaped, array references generate repeated keys, and undefined values (including undefined array entries) are omitted. Other reference values are rejected. Keys are emitted deterministically. Existing query strings are preserved, and generated parameters are inserted before URL fragments.
 
 ## Request options
 
@@ -165,3 +167,9 @@ Across the 1.x series, the project intends to preserve:
 - documented validation behavior
 
 New optional pagination capabilities may be added in minor releases, but existing documented behavior should not require downstream client changes.
+
+## Response-aware extractors
+
+By default, code-reference extractors keep the 1.x calling convention and receive only the decoded response body. Set `response_aware_extractors => 1` on the paginator to opt in to a second argument containing the `HTTP::API::Core::Response` object. This explicit opt-in preserves compatibility with fixed-arity one-argument callbacks.
+
+This allows service layers to follow continuation metadata carried in response headers, such as an HTTP `Link` header, without adding service-specific header parsing to the core.

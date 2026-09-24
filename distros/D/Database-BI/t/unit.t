@@ -107,6 +107,25 @@ my %ledger = (
 	'GET./pie.200.count_mode'    => 'GET /pie?val=__count__ -> 200 count-mode chart title',
 	'GET./pie.200.donut'         => 'GET /pie?donut=1 -> 200 HTML donut chart',
 	'GET./pie.200.currency'      => 'GET /pie with $ amounts -> data-currency attribute present',
+
+	# heatmap_view action (added 0.008.0) -- all documented return paths
+	'GET./heatmap.200'               => 'GET /heatmap?l=...&x=...&y=... 200 HTML heatmap',
+	'GET./heatmap.400.missing_param' => 'GET /heatmap missing x= or y= param -> 400 plain text',
+	'GET./heatmap.400.col_not_found' => 'GET /heatmap with unknown column -> 400 plain text',
+	'GET./heatmap.404.no_source'     => 'GET /heatmap (no l=) -> 404 plain text',
+	'GET./heatmap.200.no_plottable'  => 'GET /heatmap all-empty grid -> 200 No plottable data',
+	'GET./heatmap.200.count_mode'    => 'GET /heatmap without val= -> 200 count-mode title',
+
+	# bar_view action (added 0.009.0) -- all documented return paths
+	'GET./bar.200'               => 'GET /bar?l=...&cat=... 200 HTML bar chart',
+	'GET./bar.400.missing_param' => 'GET /bar missing cat= param -> 400 plain text',
+	'GET./bar.400.col_not_found' => 'GET /bar with unknown cat/val column -> 400 plain text',
+	'GET./bar.404.no_source'     => 'GET /bar (no l=) -> 404 plain text',
+	'GET./bar.200.no_plottable'  => 'GET /bar all-blank category cells -> 200 No plottable data',
+	'GET./bar.200.count_mode'    => 'GET /bar?val=__count__ -> 200 count-mode chart title',
+
+	# _safe_back_url: XSS-unsafe back= must not reach the rendered page
+	'GET./bar.200.back_rejected' => 'GET /bar?back=javascript:alert(1) renders back_url as /',
 );
 
 # ---------------------------------------------------------------------------
@@ -846,6 +865,171 @@ subtest 'GET /pie -- dollar amounts detected: data-currency="$" in page' => sub 
 		  ->content_like(qr/data-currency="\$"/, 'dollar sign embedded in data-currency attribute');
 	}
 	delete $ledger{'GET./pie.200.currency'};
+};
+
+# ---------------------------------------------------------------------------
+# GET /heatmap -- heatmap_view action (added 0.008.0)
+#
+# heatmap_view documented return paths:
+#   400 -- missing x= or y= param
+#   400 -- named column not found in result set
+#   404 -- no data source (no l=)
+#   200 -- happy path: HTML heatmap chart
+#   200 -- without val=: count mode, title "Count by x and y"
+#   200 -- all-empty x/y cells: "No plottable data" plain-text body
+# ---------------------------------------------------------------------------
+
+subtest 'GET /heatmap -- missing x= or y= each return 400' => sub {
+	# Both params are required; absence of either triggers the same 400.
+	$t->get_ok("/heatmap?l=table:$SALES_TABLE&y=region")
+	  ->status_is(400, 'missing x= produces 400')
+	  ->content_like(qr/Missing x or y column parameter/, 'correct error for missing x');
+
+	$t->get_ok("/heatmap?l=table:$SALES_TABLE&x=region")
+	  ->status_is(400, 'missing y= produces 400')
+	  ->content_like(qr/Missing x or y column parameter/, 'correct error for missing y');
+
+	delete $ledger{'GET./heatmap.400.missing_param'};
+};
+
+subtest 'GET /heatmap?x=no_such_col -- 400 Column not found' => sub {
+	$t->get_ok("/heatmap?l=table:$SALES_TABLE&x=no_such_col_xyz&y=region")
+	  ->status_is(400, 'unknown x column returns 400')
+	  ->content_like(qr/Column not found/, 'error text matches POD');
+	delete $ledger{'GET./heatmap.400.col_not_found'};
+};
+
+subtest 'GET /heatmap (no l= param) -- 404 Could not open data source' => sub {
+	$t->get_ok('/heatmap?x=region&y=product')
+	  ->status_is(404, 'missing l= returns 404')
+	  ->content_like(qr/Could not open data source/, 'error text matches POD');
+	delete $ledger{'GET./heatmap.404.no_source'};
+};
+
+subtest 'GET /heatmap -- all-empty x/y cells returns 200 No plottable data' => sub {
+	# Rows where x or y is empty are skipped; if all rows are skipped the
+	# controller returns 200 with a friendly message rather than an error.
+	my $dir  = tempdir(CLEANUP => 1);
+	my $file = Mojo::File->new($dir, 'hmempty.csv');
+	$file->spew("x,y\n,\n,\n");
+	$t->get_ok('/heatmap?l=path:' . url_escape($file->to_string) . '&x=x&y=y')
+	  ->status_is(200, 'empty grid returns 200 not 4xx')
+	  ->content_like(qr/No plottable data/i, '"No plottable data" message rendered');
+	delete $ledger{'GET./heatmap.200.no_plottable'};
+};
+
+subtest 'GET /heatmap?l=...&x=...&y=...&val=... -- 200 HTML heatmap chart' => sub {
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 2;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'hm.csv');
+		$file->spew("team,week,tickets\nAlpha,W1,5\nBeta,W1,3\nAlpha,W2,7\n");
+		$t->get_ok('/heatmap?l=path:' . url_escape($file->to_string) . '&x=week&y=team&val=tickets')
+		  ->status_is(200, 'valid heatmap request returns 200')
+		  ->content_type_like(qr{text/html}, 'response is text/html');
+	}
+	delete $ledger{'GET./heatmap.200'};
+};
+
+subtest 'GET /heatmap without val= -- count mode renders 200 with count-by title' => sub {
+	# Omitting val= activates count mode: rows are tallied per (x,y) cell and
+	# the chart title becomes "Count by <x_col> and <y_col>".
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 3;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'hmcnt.csv');
+		$file->spew("team,week\nAlpha,W1\nBeta,W1\nAlpha,W2\n");
+		$t->get_ok('/heatmap?l=path:' . url_escape($file->to_string) . '&x=week&y=team')
+		  ->status_is(200, 'count-mode heatmap returns 200')
+		  ->content_type_like(qr{text/html}, 'response is HTML')
+		  ->content_like(qr/Count by week and team/i, 'count-mode title present');
+	}
+	delete $ledger{'GET./heatmap.200.count_mode'};
+};
+
+# ---------------------------------------------------------------------------
+# GET /bar -- bar_view action (added 0.009.0)
+#
+# bar_view documented return paths:
+#   400 -- missing cat= param
+#   400 -- named column not found in result set
+#   404 -- no data source (no l=)
+#   200 -- happy path: HTML bar chart
+#   200 -- val=__count__: count rows per category
+#   200 -- all-blank category cells: "No plottable data"
+# Plus: unsafe back= URL must not reach the rendered page (_safe_back_url contract)
+# ---------------------------------------------------------------------------
+
+subtest 'GET /bar -- missing cat= returns 400' => sub {
+	$t->get_ok("/bar?l=table:$SALES_TABLE&val=amount")
+	  ->status_is(400, 'missing cat= produces 400')
+	  ->content_like(qr/Missing cat column parameter/, 'correct error for missing cat');
+	delete $ledger{'GET./bar.400.missing_param'};
+};
+
+subtest 'GET /bar?cat=no_such_col -- 400 Column not found' => sub {
+	$t->get_ok("/bar?l=table:$SALES_TABLE&cat=no_such_col_xyz&val=amount")
+	  ->status_is(400, 'unknown cat column returns 400')
+	  ->content_like(qr/Column not found/, 'error text matches POD');
+	delete $ledger{'GET./bar.400.col_not_found'};
+};
+
+subtest 'GET /bar (no l= param) -- 404 Could not open data source' => sub {
+	$t->get_ok('/bar?cat=region&val=amount')
+	  ->status_is(404, 'missing l= returns 404')
+	  ->content_like(qr/Could not open data source/, 'error text matches POD');
+	delete $ledger{'GET./bar.404.no_source'};
+};
+
+subtest 'GET /bar -- all-blank category cells returns 200 No plottable data' => sub {
+	# Rows with an empty cat value are skipped; when every row is skipped the
+	# controller returns 200 with "No plottable data" rather than a 4xx error.
+	my $dir  = tempdir(CLEANUP => 1);
+	my $file = Mojo::File->new($dir, 'blanks.csv');
+	$file->spew("cat,val\n,10\n,20\n");
+	$t->get_ok('/bar?l=path:' . url_escape($file->to_string) . '&cat=cat&val=val')
+	  ->status_is(200, 'blank-category data returns 200 not 4xx')
+	  ->content_like(qr/No plottable data/i, '"No plottable data" message rendered');
+	delete $ledger{'GET./bar.200.no_plottable'};
+};
+
+subtest 'GET /bar?l=table:sales&cat=region&val=amount -- 200 HTML bar chart' => sub {
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 2;
+		$t->get_ok("/bar?l=table:$SALES_TABLE&cat=region&val=amount")
+		  ->status_is(200, 'valid bar request returns 200')
+		  ->content_type_like(qr{text/html}, 'response is text/html');
+	}
+	delete $ledger{'GET./bar.200'};
+};
+
+subtest 'GET /bar?val=__count__ -- count mode renders 200 with count-by title' => sub {
+	# The "__count__" sentinel skips summing a numeric column and instead counts
+	# rows per category.  The chart title must become "Count by <cat_col>".
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 3;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = Mojo::File->new($dir, 'barcnt.csv');
+		$file->spew("type,score\nFood,10\nFood,20\nDrink,5\n");
+		$t->get_ok('/bar?l=path:' . url_escape($file->to_string) . '&cat=type&val=__count__')
+		  ->status_is(200, '__count__ mode returns 200')
+		  ->content_type_like(qr{text/html}, 'response is HTML')
+		  ->content_like(qr/Count by type/i, 'chart title says "Count by <cat_col>"');
+	}
+	delete $ledger{'GET./bar.200.count_mode'};
+};
+
+subtest 'GET /bar?back=javascript:alert(1) -- XSS-unsafe back= falls back to /' => sub {
+	# _safe_back_url rejects javascript: and other unsafe schemes; the rendered
+	# page must not reflect the hostile URL in any href attribute.
+	SKIP: {
+		eval { require HTML::D3 } or skip 'HTML::D3 not available', 2;
+		$t->get_ok("/bar?l=table:$SALES_TABLE&cat=region&val=amount"
+		           . '&back=javascript%3Aalert%281%29')
+		  ->status_is(200, 'bar with javascript: back= still renders 200')
+		  ->content_unlike(qr/href="javascript:/i, 'javascript: URL not in page href attributes');
+	}
+	delete $ledger{'GET./bar.200.back_rejected'};
 };
 
 # ---------------------------------------------------------------------------

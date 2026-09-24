@@ -1,0 +1,18 @@
+requires 'perl', '5.012';
+
+requires 'Class::Inspector';
+requires 'Class::Method::Modifiers';
+requires 'experimental';
+requires 'Feature::Compat::Try', '0.05';
+requires 'JSON::PP';
+requires 'Mango';
+requires 'Mojolicious';
+requires 'OpenTelemetry';
+requires 'Syntax::Keyword::Dynamically';
+
+on test => sub {
+    requires 'Test::More', '0.96';
+    requires 'Test2::V0';
+    requires 'Test2::Require::Module';
+    requires 'Test::Mock::Mango';
+};

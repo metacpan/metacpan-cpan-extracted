@@ -1,0 +1,237 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use v5.10;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Getopt::Long qw(GetOptions :config no_ignore_case);
+use HTTP::Tiny;
+use Protocol::IR::Converter;
+
+my $USAGE = <<'USAGE';
+ir-irdb2wig - convert an IRDB CSV file to a HAIR wig JSON file
+
+IRDB (https://github.com/probonopd/irdb) stores remote control codes as
+CSV files named <manufacturer>/<devicetype>/<device>,<subdevice>.csv.
+This tool converts such a file to HAIR's portable hair-wig/3 JSON format
+(https://github.com/DAB-LABS/HAIR): one wig file, one remote, raw Pronto
+hex as the signal payload.
+
+Usage:
+    ir-irdb2wig [options] <csv-file | url | device-path>
+
+The input may be:
+    a local CSV file                    ir-irdb2wig remote.csv
+    an http(s) URL to a CSV file        ir-irdb2wig https://example.org/remote.csv
+    a path in the IRDB repository       ir-irdb2wig Samsung/TV/7,7.csv
+                                        ir-irdb2wig codes/Samsung/TV/7,7.csv
+
+For a repository path the manufacturer and model/device are taken from the
+path (as per the IRDB naming convention) and the file is downloaded.
+
+Options:
+    --base URL      Base URL of the IRDB codes tree (default:
+                    https://cdn.jsdelivr.net/gh/probonopd/irdb@master/codes)
+    --name NAME     Remote name for the wig (default: "<brand> <model>")
+    --brand BRAND   Manufacturer/brand (default: from a repository path)
+    --model MODEL   Model (default: the "device,subdevice" file stem)
+    --kind KIND     HAIR device kind slug, e.g. tv, soundbar, ac
+    --notes TEXT    Free-form notes
+    --out FILE      Write the wig to FILE instead of stdout
+    --overwrite     Allow --out to overwrite an existing file
+    --quiet         Suppress progress and skip warnings on stderr
+    -h, --help      Show this help
+
+Examples:
+    ir-irdb2wig Samsung/TV/7,7.csv --out samsung_tv.wig.json
+    ir-irdb2wig remote.csv --brand Acme --model RM-100 --kind vcr
+USAGE
+
+my %opt = (base => 'https://cdn.jsdelivr.net/gh/probonopd/irdb@master/codes');
+GetOptions(
+    'base=s'     => \$opt{base},
+    'name=s'     => \$opt{name},
+    'brand=s'    => \$opt{brand},
+    'model=s'    => \$opt{model},
+    'kind=s'     => \$opt{kind},
+    'notes=s'    => \$opt{notes},
+    'out=s'      => \$opt{out},
+    'overwrite!' => \$opt{overwrite},
+    'quiet!'     => \$opt{quiet},
+    'help|h'     => \$opt{help},
+) or usage_error();
+
+if ($opt{help}) {
+    print $USAGE;
+    exit 0;
+}
+usage_error()            unless @ARGV == 1;
+usage_error("--base must be an http(s) URL") if $opt{base} !~ m{^https?://};
+
+my ($csv_text, $src_meta) = fetch_input($ARGV[0], \%opt);
+
+my $converter = Protocol::IR::Converter->new();
+my $codes     = $converter->import_format('CSV', $csv_text);
+die "No decodable IR signals in the input (are the protocols supported?)\n"
+    unless @$codes;
+
+my $rows = count_rows($csv_text);
+if ($rows > @$codes) {
+    warn "Skipped " . ($rows - @$codes) . " of $rows rows "
+       . "(unsupported protocol or unparseable)\n"
+        unless $opt{quiet};
+}
+
+my $meta = derive_meta(\%opt, $src_meta);
+my $wig  = $converter->export_codes('wig', $codes, %$meta);
+write_output($wig, $opt{out}, $opt{overwrite});
+exit 0;
+
+# ----------------------------------------------------------------------
+
+# Return (text, metadata) for the positional input: a local file, an
+# http(s) URL, or a path inside the IRDB repository (downloaded).
+sub fetch_input {
+    my ($spec, $opt) = @_;
+
+    if (-e $spec) {
+        open my $fh, '<:raw', $spec or die "Cannot open '$spec': $!\n";
+        local $/;
+        my $text = <$fh>;
+        close $fh;
+        return ($text, {});
+    }
+
+    my $url;
+    my %src_meta;
+    if ($spec =~ m{^https?://}) {
+        $url = $spec;
+    } else {
+        my $path = repo_path($spec);
+        $url = $opt->{base} . '/' . $path;
+        %src_meta = %{ meta_from_path($path) };
+        warn "Fetching $url\n" unless $opt->{quiet};
+    }
+    return (fetch_url($url), \%src_meta);
+}
+
+# Normalize a repository path: tolerate a leading "codes/" (as in the
+# index file) and a missing ".csv" extension.
+sub repo_path {
+    my ($spec) = @_;
+    my $path = $spec;
+    $path =~ s{^/}{};
+    $path =~ s{^codes/}{};
+    $path =~ s{/$}{};
+    $path .= '.csv' unless $path =~ /\.csv$/i;
+    die "Expected MANUFACTURER/DEVICETYPE/DEVICE,SUBDEVICE.csv, got: $spec\n"
+        unless $path =~ m{^[^/]+/[^/]+/[^/]+\.csv$}i;
+    return $path;
+}
+
+# Manufacturer and model/device from an IRDB path, per the repo's
+# naming convention <manufacturer>/<devicetype>/<device>,<subdevice>.csv.
+sub meta_from_path {
+    my ($path) = @_;
+    my ($man, $devtype, $stem) = $path =~ m{^([^/]+)/([^/]+)/([^/]+)\.csv$}i;
+    my %meta = (brand => $man, model => $stem);
+    my $kind = kind_for_devicetype($devtype);
+    $meta{kind} = $kind if defined $kind;
+    return \%meta;
+}
+
+# Map IRDB device-type directories to HAIR kind slugs; fall back to a
+# lowercased slug when there is no known mapping.
+my %KIND = (
+    TV                 => 'tv',
+    AC                 => 'ac',
+    AIRCONDITIONER     => 'ac',
+    'AIR CONDITIONER'  => 'ac',
+    AMPLIFIER          => 'amplifier',
+    AMP                => 'amplifier',
+    AUDIO              => 'audio',
+    BLURAY             => 'bluray',
+    'BLU-RAY'          => 'bluray',
+    DVD                => 'dvd',
+    DVR                => 'dvr',
+    GAME               => 'console',
+    'GAME CONSOLE'     => 'console',
+    PROJECTOR          => 'projector',
+    RECEIVER           => 'receiver',
+    SAT                => 'satellite',
+    SATELITE           => 'satellite',
+    SATELLITE          => 'satellite',
+    SOUNDBAR           => 'soundbar',
+    STB                => 'stb',
+    VCR                => 'vcr',
+);
+sub kind_for_devicetype {
+    my ($devtype) = @_;
+    my $up = uc $devtype;
+    return $KIND{$up} if exists $KIND{$up};
+    (my $slug = lc $devtype) =~ s/[^a-z0-9]+/_/g;
+    $slug =~ s/^_+|_+$//g;
+    return length($slug) ? $slug : undef;
+}
+
+sub fetch_url {
+    my ($url) = @_;
+    my $http = HTTP::Tiny->new(timeout => 60, verify_SSL => 1);
+    my $res  = $http->get($url);
+    unless ($res->{success}) {
+        if ($res->{status} == 599) {
+            die "Cannot fetch $url: $res->{reason}\n"
+              . "  https URLs need IO::Socket::SSL (cpanm IO::Socket::SSL);\n"
+              . "  alternatively pass --base with an http:// URL.\n";
+        }
+        die "Cannot fetch $url: $res->{status} $res->{reason}\n";
+    }
+    return $res->{content};
+}
+
+# Count non-empty data rows (ignoring the header) so we can warn when
+# rows were skipped during conversion.
+sub count_rows {
+    my ($text) = @_;
+    my @lines = grep { /\S/ } split /\r?\n/, $text;
+    shift @lines if @lines && $lines[0] =~ /^functionname\b/i;
+    return scalar @lines;
+}
+
+# Merge command-line metadata over what was derived from a repository
+# path, and default the remote name from brand/model.
+sub derive_meta {
+    my ($opt, $src) = @_;
+    my $brand = $opt->{brand} // $src->{brand};
+    my $model = $opt->{model} // $src->{model};
+    my $name  = $opt->{name}
+        // (($brand && $model) ? "$brand $model" : ($brand // 'Untitled'));
+    my %meta = (name => $name, origin => 'converted:irdb');
+    $meta{brand} = $brand if defined $brand;
+    $meta{model} = $model if defined $model;
+    my $kind = $opt->{kind} // $src->{kind};
+    $meta{kind} = $kind if defined $kind && length $kind;
+    $meta{notes} = $opt->{notes} if defined $opt->{notes};
+    return \%meta;
+}
+
+sub write_output {
+    my ($text, $out, $overwrite) = @_;
+    if (defined $out) {
+        die "Refusing to overwrite '$out' (use --overwrite)\n"
+            if -e $out && !$overwrite;
+        open my $fh, '>:utf8', $out or die "Cannot write '$out': $!\n";
+        print {$fh} $text;
+        close $fh;
+    } else {
+        binmode STDOUT, ':utf8';
+        print $text;
+    }
+}
+
+sub usage_error {
+    print STDERR $USAGE;
+    exit 2;
+}

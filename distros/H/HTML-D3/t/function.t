@@ -69,6 +69,16 @@ Readonly my $ERR_EACH_POINT_ARRAYREF => 'Each data point must be an array refere
 Readonly my $ERR_EACH_POINT_3_ELEMS  => 'Each data point must have at least 3 elements';
 Readonly my $ERR_VALUE_NUMERIC       => 'Value must be numeric';
 Readonly my $ERR_CELL_PADDING_RANGE  => 'cell_padding must be between 0 and 8';
+Readonly my $ERR_EACH_POINT_2_ELEMS  => 'Each data point must have at least 2 elements';
+Readonly my $ERR_ORIENTATION         => "orientation must be 'vertical' or 'horizontal'";
+Readonly my $ERR_SORT_BARS           => "sort_bars must be 'value', 'label', or 'none'";
+
+Readonly my @BAR_DATA => (
+	['Alpha',   300],
+	['Beta',    150],
+	['Gamma',   450],
+	['Delta',   200],
+);
 
 # ---------------------------------------------------------------------------
 # new()
@@ -80,7 +90,7 @@ subtest 'new - defaults applied when no args given' => sub {
 	mock('Params::Get::get_params'       => sub { {} });
 	mock('Object::Configure::configure'  => sub { $_[1] });	# transparent pass-through
 
-	my $chart = HTML::D3->new();
+	my $chart = new_ok('HTML::D3');
 
 	isa_ok($chart, 'HTML::D3', 'new() returns an HTML::D3 object');
 	is($chart->{width},  $DEFAULT_WIDTH,  'default width applied');
@@ -1202,6 +1212,542 @@ subtest 'render_multi_series_line_chart_with_interactive_legends' => sub {
 	like($html, qr/isVisible\s*\?\s*0\s*:\s*1/, 'opacity toggled based on isVisible');
 	like($html, qr/\.legend\s*\{/, 'legend CSS class defined in stylesheet');
 	unlike($html, qr{</b>}, 'raw </b> absent');
+};
+
+# ---------------------------------------------------------------------------
+# render_bar_chart_snippet
+# ---------------------------------------------------------------------------
+
+subtest 'render_bar_chart_snippet - validation: all documented error conditions' => sub {
+	my $chart = HTML::D3->new(width => 600, height => 400);
+
+	# Non-arrayref data
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet('not an array') },
+		qr/\Q$ERR_ARRAY_OF_ARRAY\E/,
+		'non-arrayref data dies with correct message',
+	);
+
+	# Element that is not an arrayref
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet(['scalar_element']) },
+		qr/\Q$ERR_EACH_POINT_ARRAYREF\E/,
+		'non-arrayref element dies with correct message',
+	);
+
+	# Element with only one item
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet([['only_one']]) },
+		qr/\Q$ERR_EACH_POINT_2_ELEMS\E/,
+		'single-element data point dies with correct message',
+	);
+
+	# Non-numeric value
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet([['A', 'not_a_number']]) },
+		qr/\Q$ERR_VALUE_NUMERIC\E/,
+		'non-numeric value dies with correct message',
+	);
+
+	# Invalid orientation
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet(\@BAR_DATA, { orientation => 'diagonal' }) },
+		qr/\Q$ERR_ORIENTATION\E/,
+		'invalid orientation dies with correct message',
+	);
+
+	# Invalid sort_bars
+	throws_ok(
+		sub { $chart->render_bar_chart_snippet(\@BAR_DATA, { sort_bars => 'random' }) },
+		qr/\Q$ERR_SORT_BARS\E/,
+		'invalid sort_bars dies with correct message',
+	);
+};
+
+subtest 'render_bar_chart_snippet - return structure' => sub {
+	my $chart  = HTML::D3->new(width => 600, height => 400);
+	my $result = $chart->render_bar_chart_snippet(\@BAR_DATA);
+
+	returns_ok($result, { type => 'hashref' }, 'returns a hashref');
+	is($result->{svg_id}, 'bar_chart',  'svg_id is "bar_chart"');
+	ok(defined $result->{html} && length($result->{html}) > 0, 'html field is a non-empty string');
+};
+
+subtest 'render_bar_chart_snippet - fragment must not contain page-shell elements' => sub {
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
+
+	unlike($html, qr/<!DOCTYPE/i,        'no DOCTYPE in snippet');
+	unlike($html, qr/<html/i,            'no <html> element');
+	unlike($html, qr/<head/i,            'no <head> element');
+	unlike($html, qr/<body/i,            'no <body> element');
+	unlike($html, qr{https://d3js\.org}, 'no D3 CDN tag — caller loads D3');
+};
+
+subtest 'render_bar_chart_snippet - default vertical orientation uses x-axis scaleBand' => sub {
+	# Vertical: x is the category (scaleBand), y is the value (scaleLinear)
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
+
+	like($html, qr/xScale\s*=\s*d3\.scaleBand/,   'xScale is d3.scaleBand (vertical)');
+	like($html, qr/yScale\s*=\s*d3\.scaleLinear/, 'yScale is d3.scaleLinear (vertical)');
+	like($html, qr/bc-x-axis/,                    'x-axis class bc-x-axis present');
+	like($html, qr/bc-y-axis/,                    'y-axis class bc-y-axis present');
+};
+
+subtest 'render_bar_chart_snippet - horizontal orientation uses y-axis scaleBand' => sub {
+	# Horizontal flips axes: y is the category (scaleBand), x is the value (scaleLinear)
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { orientation => 'horizontal' })->{html};
+
+	like($html, qr/yScale\s*=\s*d3\.scaleBand/,   'yScale is d3.scaleBand (horizontal)');
+	like($html, qr/xScale\s*=\s*d3\.scaleLinear/, 'xScale is d3.scaleLinear (horizontal)');
+};
+
+subtest 'render_bar_chart_snippet - default color is steelblue' => sub {
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
+
+	like($html, qr/steelblue/, 'default fill color steelblue is present');
+	unlike($html, qr/schemeTableau10/, 'schemeTableau10 absent for solid-color chart');
+};
+
+subtest 'render_bar_chart_snippet - color => categorical emits Tableau-10 palette' => sub {
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { color => 'categorical' })->{html};
+
+	like($html, qr/schemeTableau10/,   'schemeTableau10 present for categorical coloring');
+	like($html, qr/d3\.scaleOrdinal/, 'd3.scaleOrdinal present for categorical coloring');
+};
+
+subtest 'render_bar_chart_snippet - sort_bars => value sorts JSON data descending by value' => sub {
+	# Perl sorts @bars before encoding JSON, so the first data item in the
+	# serialised array must have the highest value (Gamma = 450 in @BAR_DATA).
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { sort_bars => 'value' })->{html};
+
+	# Gamma (450) must appear before Alpha (300) in the serialised data array.
+	my ($gamma_pos) = $html =~ /("label":"Gamma")/g;
+	ok(defined $gamma_pos, 'Gamma present after value sort');
+
+	# JSON order reflects the Perl-side sort; highest value label comes first in the string.
+	like($html, qr/"label":"Gamma".*"label":"Alpha"/s, 'Gamma (highest) precedes Alpha in sorted JSON');
+};
+
+subtest 'render_bar_chart_snippet - sort_bars => label sorts JSON alphabetically' => sub {
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { sort_bars => 'label' })->{html};
+
+	# Alpha < Beta < Delta < Gamma alphabetically
+	like($html, qr/"label":"Alpha".*"label":"Beta"/s,  'Alpha precedes Beta in label-sorted JSON');
+	like($html, qr/"label":"Beta".*"label":"Delta"/s,  'Beta precedes Delta in label-sorted JSON');
+	like($html, qr/"label":"Delta".*"label":"Gamma"/s, 'Delta precedes Gamma in label-sorted JSON');
+};
+
+subtest 'render_bar_chart_snippet - max_bars collapses tail into Other slice' => sub {
+	# With max_bars => 2 and sort_bars => value, Alpha (300) and Beta (150) are
+	# the tail after the top 2 (Gamma=450, Delta=200); they collapse to "Other".
+	my $html = HTML::D3->new()->render_bar_chart_snippet(
+		\@BAR_DATA,
+		{ max_bars => 2, sort_bars => 'value' },
+	)->{html};
+
+	like($html, qr/"label":"Other"/, '"Other" label appears in JSON when max_bars exceeded');
+	like($html, qr/"label":"Gamma"/, 'top bar Gamma still present');
+	unlike($html, qr/"label":"Beta"/, 'Beta collapsed into Other');
+};
+
+subtest 'render_bar_chart_snippet - show_values => 1 emits bc-val-text block' => sub {
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { show_values => 1 })->{html};
+
+	like($html, qr/bc-val-text/, 'bc-val-text class present when show_values => 1');
+	like($html, qr/toLocaleString/, 'toLocaleString call present in value label');
+};
+
+subtest 'render_bar_chart_snippet - show_values => 0 (default) omits bc-val-text D3 block' => sub {
+	# The CSS class .bc-val-text is always defined in <style>; what must be absent
+	# when show_values is off is the D3 selectAll call that actually creates the
+	# text elements — that is the Perl-side conditional block.
+	my $html_default = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
+	my $html_off     = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { show_values => 0 })->{html};
+
+	unlike($html_default, qr/selectAll\(["']\.bc-val-text["']\)/, 'D3 bc-val-text selectAll absent by default');
+	unlike($html_off,     qr/selectAll\(["']\.bc-val-text["']\)/, 'D3 bc-val-text selectAll absent when show_values => 0');
+};
+
+subtest 'render_bar_chart_snippet - animated => 1 emits transition with prefers-reduced-motion guard' => sub {
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { animated => 1 })->{html};
+
+	like($html, qr/prefers-reduced-motion/, 'prefers-reduced-motion media-query guard present');
+	like($html, qr/\.transition\(\)/,       'd3 .transition() present for bar animation');
+	like($html, qr/\.duration\(800\)/,      '800 ms duration present');
+	like($html, qr/noAnim/,                 'noAnim variable gate present');
+};
+
+subtest 'render_bar_chart_snippet - animated => 0 (default) omits animation code' => sub {
+	my $html_default = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
+	my $html_off     = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { animated => 0 })->{html};
+
+	unlike($html_default, qr/prefers-reduced-motion/, 'no prefers-reduced-motion by default');
+	unlike($html_off,     qr/prefers-reduced-motion/, 'no prefers-reduced-motion when animated => 0');
+};
+
+subtest 'render_bar_chart_snippet - undef value silently skipped; defined sibling retained' => sub {
+	my @with_undef = (['Present', 99], ['Missing', undef], ['Also', 42]);
+	my $html;
+	lives_ok { $html = HTML::D3->new()->render_bar_chart_snippet(\@with_undef)->{html} }
+		'renders without error when one value is undef';
+
+	like($html,   qr/"label":"Present"/, 'defined entry Present is in JSON');
+	like($html,   qr/"label":"Also"/,    'defined entry Also is in JSON');
+	unlike($html, qr/"label":"Missing"/, 'undef entry Missing is absent from JSON');
+};
+
+subtest 'render_bar_chart_snippet - negative value silently absolutised' => sub {
+	my @neg = (['Loss', -250]);
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@neg)->{html};
+
+	# The encoded value must be 250 (positive), not -250
+	like($html,   qr/"value":250/,  'negative value encoded as its absolute value (250)');
+	unlike($html, qr/"value":-250/, 'negative sign absent from encoded value');
+};
+
+subtest 'render_bar_chart_snippet - extra hashref supplies additional tooltip data' => sub {
+	my @with_extra = (['Widget', 500, { Region => 'EMEA', SKU => 'W-001' }]);
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@with_extra)->{html};
+
+	like($html, qr/"extra":/,  '"extra" key serialised in JSON data');
+	like($html, qr/d\.extra/,  'd.extra accessed in mouseover handler');
+	like($html, qr/Object\.entries/, 'Object.entries loop iterates extra fields');
+};
+
+subtest 'render_bar_chart_snippet - rotate labels when more than 8 vertical bars' => sub {
+	# rotate(-45) is emitted only for vertical orientation with > 8 bars
+	my @many = map { ["Item$_", $_ * 10] } 1..9;
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@many)->{html};
+
+	like($html, qr/rotate\(-45\)/, 'x-axis labels rotated -45° when > 8 vertical bars');
+
+	# Fewer than 9 bars must NOT rotate
+	my $html_few = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
+	unlike($html_few, qr/rotate\(-45\)/, 'labels not rotated when 4 bars (≤ 8)');
+};
+
+subtest 'render_bar_chart_snippet - x_label appears in output when provided' => sub {
+	my $html = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { x_label => 'Category Axis' })->{html};
+
+	like($html, qr/Category Axis/, 'x_label text present in generated HTML');
+
+	# Default (empty x_label) must produce no label text node
+	my $html_no = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
+	unlike($html_no, qr/Category Axis/, 'no stray label when x_label not set');
+};
+
+subtest 'render_bar_chart_snippet - value_label embedded in JS as valLabel' => sub {
+	my $html_default = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA)->{html};
+	like($html_default, qr/var valLabel\s*=\s*"Value"/, 'default value_label is "Value"');
+
+	my $html_custom = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { value_label => 'Amount' })->{html};
+	like($html_custom, qr/var valLabel\s*=\s*"Amount"/, 'custom value_label "Amount" embedded correctly');
+};
+
+subtest 'render_bar_chart_snippet - no circular references in returned hashref' => sub {
+	my $result = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA);
+	memory_cycle_ok($result, 'no circular references in basic result hashref');
+};
+
+subtest 'render_bar_chart_snippet - no circular references with combined opts' => sub {
+	my $result = HTML::D3->new()->render_bar_chart_snippet(
+		\@BAR_DATA,
+		{
+			orientation  => 'horizontal',
+			sort_bars    => 'value',
+			max_bars     => 3,
+			color        => 'categorical',
+			show_values  => 1,
+			animated     => 1,
+			value_label  => 'Qty',
+			x_label      => 'Units',
+		},
+	);
+	memory_cycle_ok($result, 'no circular references with all opts combined');
+};
+
+# ---------------------------------------------------------------------------
+# render_pie_chart_snippet -- XSS (esc function)
+# ---------------------------------------------------------------------------
+
+subtest 'render_pie_chart_snippet - esc() function present in output' => sub {
+	my $html = HTML::D3->new()->render_pie_chart_snippet(
+		[['Alpha', 300], ['Beta', 150]],
+	)->{html};
+	like($html, qr/function esc\(/, 'esc() helper present in pie snippet output');
+};
+
+# ---------------------------------------------------------------------------
+# id opt -- all five snippet methods honour the id override
+# ---------------------------------------------------------------------------
+
+subtest 'id opt - render_pie_chart_snippet custom id' => sub {
+	my $res = HTML::D3->new()->render_pie_chart_snippet(
+		[['A', 1], ['B', 2]], { id => 'my_pie' },
+	);
+	is($res->{svg_id}, 'my_pie', 'svg_id set to custom value');
+	like($res->{html}, qr/id="my_pie"/, 'custom id present in SVG element');
+};
+
+subtest 'id opt - render_heatmap_snippet custom id' => sub {
+	my $res = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA, { id => 'my_heat' });
+	is($res->{svg_id}, 'my_heat', 'svg_id set to custom value');
+	like($res->{html}, qr/id="my_heat"/, 'custom id present in SVG element');
+};
+
+subtest 'id opt - render_bar_chart_snippet custom id' => sub {
+	my $res = HTML::D3->new()->render_bar_chart_snippet(\@BAR_DATA, { id => 'my_bar' });
+	is($res->{svg_id}, 'my_bar', 'svg_id set to custom value');
+	like($res->{html}, qr/id="my_bar"/, 'custom id present in SVG element');
+};
+
+subtest 'id opt - render_line_chart_snippet custom id' => sub {
+	my $res = HTML::D3->new()->render_line_chart_snippet(\@SIMPLE_DATA, { id => 'my_line' });
+	is($res->{svg_id}, 'my_line', 'svg_id set to custom value');
+	like($res->{html}, qr/id="my_line"/, 'custom id present in SVG element');
+};
+
+subtest 'id opt - render_zoomable_line_chart_snippet custom id' => sub {
+	my $res = HTML::D3->new()->render_zoomable_line_chart_snippet(\@SIMPLE_DATA, { id => 'my_zoom' });
+	is($res->{svg_id}, 'my_zoom', 'svg_id set to custom value');
+	like($res->{html}, qr/id="my_zoom"/, 'custom id present in SVG element');
+};
+
+# ---------------------------------------------------------------------------
+# responsive opt
+# ---------------------------------------------------------------------------
+
+subtest 'responsive opt - snippet per-call override' => sub {
+	my $chart    = HTML::D3->new();
+	my $def_html = $chart->render_bar_chart_snippet(\@BAR_DATA)->{html};
+	unlike($def_html, qr/viewBox/, 'no viewBox by default in bar snippet');
+
+	my $resp_html = $chart->render_bar_chart_snippet(\@BAR_DATA, { responsive => 1 })->{html};
+	like($resp_html, qr/viewBox/, 'viewBox present when responsive => 1');
+};
+
+subtest 'responsive opt - per-call on heatmap snippet' => sub {
+	my $html = HTML::D3->new()->render_heatmap_snippet(\@HEATMAP_DATA, { responsive => 1 })->{html};
+	like($html, qr/viewBox/, 'viewBox present in responsive heatmap snippet');
+};
+
+subtest 'responsive opt - constructor sets full-page default' => sub {
+	my $chart = HTML::D3->new(responsive => 1);
+	my $html  = $chart->render_bar_chart(\@SIMPLE_DATA);
+	like($html, qr/viewBox/, 'viewBox present in full-page render when constructor responsive');
+};
+
+subtest 'responsive opt - constructor applies to snippet unless overridden' => sub {
+	my $chart = HTML::D3->new(responsive => 1);
+	my $html  = $chart->render_bar_chart_snippet(\@BAR_DATA)->{html};
+	like($html, qr/viewBox/, 'constructor responsive => 1 propagates to snippet');
+
+	# Per-call responsive => 0 overrides constructor setting
+	my $html_off = $chart->render_bar_chart_snippet(\@BAR_DATA, { responsive => 0 })->{html};
+	unlike($html_off, qr/viewBox/, 'per-call responsive => 0 overrides constructor');
+};
+
+# ---------------------------------------------------------------------------
+# render_scatter_chart_snippet
+# ---------------------------------------------------------------------------
+
+subtest 'render_scatter_chart_snippet - validation: documented error conditions' => sub {
+	my $chart = HTML::D3->new();
+
+	throws_ok(
+		sub { $chart->render_scatter_chart_snippet('not an array') },
+		qr/Data must be an array of arrays/,
+		'non-arrayref data dies',
+	);
+
+	throws_ok(
+		sub { $chart->render_scatter_chart_snippet(['scalar']) },
+		qr/Each data point must be an array reference/,
+		'non-arrayref element dies',
+	);
+
+	throws_ok(
+		sub { $chart->render_scatter_chart_snippet([[99]]) },
+		qr/Each data point must have at least 2 elements/,
+		'single-element point dies',
+	);
+
+	throws_ok(
+		sub { $chart->render_scatter_chart_snippet([['not_num', 5]]) },
+		qr/X value must be numeric/,
+		'non-numeric X dies',
+	);
+
+	throws_ok(
+		sub { $chart->render_scatter_chart_snippet([[5, 'not_num']]) },
+		qr/Y value must be numeric/,
+		'non-numeric Y dies',
+	);
+};
+
+subtest 'render_scatter_chart_snippet - return structure' => sub {
+	my $chart  = HTML::D3->new(width => 600, height => 400);
+	Readonly my @SC_DATA => ([10, 20], [30, 40], [50, 15]);
+	my $result = $chart->render_scatter_chart_snippet(\@SC_DATA);
+
+	returns_ok($result, { type => 'hashref' }, 'returns a hashref');
+	is($result->{svg_id}, 'scatter_chart', 'svg_id is "scatter_chart"');
+	ok(defined $result->{html} && length($result->{html}) > 0, 'html is non-empty');
+};
+
+subtest 'render_scatter_chart_snippet - fragment has no page-shell elements' => sub {
+	Readonly my @SC_DATA => ([10, 20], [30, 40]);
+	my $html = HTML::D3->new()->render_scatter_chart_snippet(\@SC_DATA)->{html};
+
+	unlike($html, qr/<!DOCTYPE/i,        'no DOCTYPE');
+	unlike($html, qr/<html/i,            'no html wrapper');
+	unlike($html, qr/<head/i,            'no head element');
+	unlike($html, qr/<body/i,            'no body element');
+	unlike($html, qr{https://d3js\.org}, 'no D3 CDN tag');
+};
+
+subtest 'render_scatter_chart_snippet - key JS patterns' => sub {
+	Readonly my @SC_DATA => ([10, 20], [30, 40], [50, 60]);
+	my $html = HTML::D3->new()->render_scatter_chart_snippet(\@SC_DATA)->{html};
+
+	like($html, qr/d3\.scaleLinear/, 'd3.scaleLinear present');
+	like($html, qr/sc-circle/,       'sc-circle class present');
+	like($html, qr/function esc\(/, 'esc() XSS helper present');
+	like($html, qr/mouseover/,       'mouseover handler present');
+};
+
+subtest 'render_scatter_chart_snippet - animated => 1 code paths' => sub {
+	Readonly my @SC_DATA => ([1, 2], [3, 4]);
+	my $html = HTML::D3->new()->render_scatter_chart_snippet(\@SC_DATA, { animated => 1 })->{html};
+	like($html, qr/prefers-reduced-motion/, 'prefers-reduced-motion guard present');
+	like($html, qr/opacity.*0/,             'circles start at opacity 0');
+};
+
+subtest 'render_scatter_chart_snippet - x_label and y_label' => sub {
+	Readonly my @SC_DATA => ([1, 2], [3, 4]);
+	my $html = HTML::D3->new()->render_scatter_chart_snippet(\@SC_DATA, {
+		x_label => 'Time (s)', y_label => 'Velocity',
+	})->{html};
+	like($html, qr/Time \(s\)/, 'x_label present');
+	like($html, qr/Velocity/,   'y_label present');
+};
+
+subtest 'render_scatter_chart_snippet - extra hashref in tooltip' => sub {
+	my $html = HTML::D3->new()->render_scatter_chart_snippet(
+		[[10, 20, { label => 'Alpha' }]],
+	)->{html};
+	like($html, qr/d\.extra/, 'd.extra rendering code present');
+};
+
+subtest 'render_scatter_chart_snippet - id opt and responsive opt' => sub {
+	Readonly my @SC_DATA => ([1, 2], [3, 4]);
+
+	my $id_res  = HTML::D3->new()->render_scatter_chart_snippet(\@SC_DATA, { id => 'sc2' });
+	is($id_res->{svg_id}, 'sc2', 'custom id in svg_id');
+	like($id_res->{html}, qr/id="sc2"/, 'custom id in SVG element');
+
+	my $resp_html = HTML::D3->new()->render_scatter_chart_snippet(\@SC_DATA, { responsive => 1 })->{html};
+	like($resp_html, qr/viewBox/, 'viewBox present when responsive');
+};
+
+subtest 'render_scatter_chart_snippet - no circular references' => sub {
+	Readonly my @SC_DATA => ([1, 2], [3, 4], [5, 6]);
+	my $result = HTML::D3->new()->render_scatter_chart_snippet(\@SC_DATA);
+	memory_cycle_ok($result, 'no circular refs in scatter snippet result');
+};
+
+# ---------------------------------------------------------------------------
+# render_table_snippet
+# ---------------------------------------------------------------------------
+
+Readonly my @TABLE_HEADERS => ('Name', 'Value', 'Category');
+Readonly my @TABLE_ROWS    => (['Alpha', 300, 'A'], ['Beta', 150, 'B']);
+
+subtest 'render_table_snippet - validation: documented error conditions' => sub {
+	my $chart = HTML::D3->new();
+
+	throws_ok(
+		sub { $chart->render_table_snippet('not an array') },
+		qr/Data must be an array of arrays/,
+		'non-arrayref data dies',
+	);
+
+	throws_ok(
+		sub { $chart->render_table_snippet([]) },
+		qr/Data must have at least one row/,
+		'empty data dies',
+	);
+
+	throws_ok(
+		sub { $chart->render_table_snippet(['not_a_row']) },
+		qr/Each row must be an array reference/,
+		'non-arrayref header row dies',
+	);
+
+	throws_ok(
+		sub { $chart->render_table_snippet([['H1', 'H2'], 'bad_row']) },
+		qr/Each row must be an array reference/,
+		'non-arrayref data row dies',
+	);
+};
+
+subtest 'render_table_snippet - return structure' => sub {
+	my $data   = [[@TABLE_HEADERS], @TABLE_ROWS];
+	my $result = HTML::D3->new()->render_table_snippet($data);
+
+	returns_ok($result, { type => 'hashref' }, 'returns a hashref');
+	is($result->{table_id}, 'data_table', 'table_id is "data_table"');
+	ok(!exists $result->{svg_id}, 'no svg_id key');
+	ok(defined $result->{html} && length($result->{html}) > 0, 'html is non-empty');
+};
+
+subtest 'render_table_snippet - fragment has no page-shell elements' => sub {
+	my $html = HTML::D3->new()->render_table_snippet([[@TABLE_HEADERS], @TABLE_ROWS])->{html};
+
+	unlike($html, qr/<!DOCTYPE/i, 'no DOCTYPE');
+	unlike($html, qr/<html/i,     'no html wrapper');
+	unlike($html, qr/<head/i,     'no head element');
+	unlike($html, qr/<body/i,     'no body element');
+};
+
+subtest 'render_table_snippet - sortable default and override' => sub {
+	my $data = [[@TABLE_HEADERS], @TABLE_ROWS];
+	my $html_on  = HTML::D3->new()->render_table_snippet($data)->{html};
+	like($html_on, qr/dt-sortable/, 'dt-sortable class present by default');
+	like($html_on, qr/d3\.select/,  'd3.select present when sortable');
+
+	my $html_off = HTML::D3->new()->render_table_snippet($data, { sortable => 0 })->{html};
+	unlike($html_off, qr/dt-sortable/, 'dt-sortable class absent when sortable => 0');
+};
+
+subtest 'render_table_snippet - caption opt' => sub {
+	my $html = HTML::D3->new()->render_table_snippet(
+		[[@TABLE_HEADERS], @TABLE_ROWS], { caption => 'Q1 Report' },
+	)->{html};
+	like($html, qr/<caption>Q1 Report<\/caption>/, 'caption element present');
+};
+
+subtest 'render_table_snippet - id opt changes table_id and element id' => sub {
+	my $result = HTML::D3->new()->render_table_snippet(
+		[[@TABLE_HEADERS], @TABLE_ROWS], { id => 'custom_tbl' },
+	);
+	is($result->{table_id}, 'custom_tbl', 'table_id set to custom value');
+	like($result->{html}, qr/id="custom_tbl"/, 'custom id in table element');
+};
+
+subtest 'render_table_snippet - XSS escaping in headers and cells' => sub {
+	my $html = HTML::D3->new()->render_table_snippet([
+		['Col<b>Header</b>', 'Val'],
+		['<em>cell</em>', '&amp;data'],
+	])->{html};
+	like($html, qr/Col&lt;b&gt;Header&lt;\/b&gt;/, 'HTML tags in header escaped');
+	like($html, qr/&lt;em&gt;cell&lt;\/em&gt;/,    'HTML tags in cell escaped');
+	unlike($html, qr/<th[^>]*>Col<b>/,              'raw HTML tags absent from th');
+};
+
+subtest 'render_table_snippet - no circular references' => sub {
+	my $result = HTML::D3->new()->render_table_snippet([[@TABLE_HEADERS], @TABLE_ROWS]);
+	memory_cycle_ok($result, 'no circular refs in table snippet result');
 };
 
 # ---------------------------------------------------------------------------

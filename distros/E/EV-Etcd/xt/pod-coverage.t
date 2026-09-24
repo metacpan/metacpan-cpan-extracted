@@ -8,12 +8,8 @@ eval "use Test::Pod::Coverage 1.08; 1"
 eval "use Pod::Coverage 0.18; 1"
     or plan skip_all => 'Pod::Coverage 0.18 required';
 
-# Coverage check on EV::Etcd only. The streaming-handle sub-packages
-# (EV::Etcd::Watch / Keepalive / Observe) are XS-defined with no .pm of
-# their own and only expose cancel + DESTROY — both documented as
-# =head3 cancel under their parent service section in lib/EV/Etcd.pm.
-# Pod::Coverage can't follow that cross-module reference, so we skip
-# them rather than emit false negatives.
+# EV::Etcd only: the XS handle packages (Watch, Keepalive, Observe) have cancel
+# documented in lib/EV/Etcd.pm, which Pod::Coverage cannot follow
 pod_coverage_ok(
     'EV::Etcd',
     { trustme => [qr/^txn$/] },   # txn is wrapped in pure-Perl, doc'd via XS path

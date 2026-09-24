@@ -75,6 +75,7 @@ t/27-awaitable-conformance.t
 t/28-fork.t
 t/29-dns.t
 t/30-h3.t
+t/31-exit-in-callback.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

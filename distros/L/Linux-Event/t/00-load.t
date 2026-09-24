@@ -28,6 +28,9 @@ use_ok('Linux::Event::Kernel');
 use_ok('Linux::Event::Kernel::Timer');
 use_ok('Linux::Event::Kernel::Signal');
 use_ok('Linux::Event::Kernel::Event');
+use_ok('Linux::Event::Kernel::Inotify');
+use_ok('Linux::Event::Kernel::Inotify::Watch');
+use_ok('Linux::Event::Kernel::Inotify::Event');
 use_ok('Linux::Event::Kernel::Process');
 
 use_ok('Linux::Event::TLS');

@@ -30,6 +30,7 @@ Use `HTTP::API::Core` when you are building an API client or small SDK and do no
 
 * JSON request and response handling
 * query parameter encoding
+* `application/x-www-form-urlencoded` request-body encoding
 * structured errors
 * safe retries and `Retry-After`
 * rate-limit handling
@@ -148,6 +149,24 @@ my $response = $api->get('/users',
 ```
 
 Values are percent-encoded, array references generate repeated keys, undefined values are omitted, and existing query strings and fragments are handled correctly.
+
+### Form request bodies
+
+Use the form helper when an API expects `application/x-www-form-urlencoded` data:
+
+```perl
+use HTTP::API::Core::Form qw(form_urlencode);
+
+my $response = $api->post('/token',
+    headers => { 'content-type' => 'application/x-www-form-urlencoded' },
+    content => form_urlencode({
+        grant_type => 'client_credentials',
+        scope      => 'read write',
+    }),
+);
+```
+
+The helper uses UTF-8-aware form encoding, deterministic key ordering, and repeated keys for array-reference values. Parameter values may be scalars, array references containing scalars, or `undef`; unsupported nested references are rejected instead of being stringified. `undef` is encoded as an empty form value. Content-Type remains explicit so request policy stays visible at the call site.
 
 ### Authentication
 

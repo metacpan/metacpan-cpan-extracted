@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -31,7 +29,7 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-plan tests => 22;
+plan tests => 25;
 
 my $client = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],
@@ -40,7 +38,6 @@ my $client = EV::Etcd->new(
 my $prefix = "/test-txn-$$-" . time();
 my $counter_key = "$prefix/counter";
 
-# Setup: put initial counter value
 $client->put($counter_key, "0", sub {
     my ($resp, $err) = @_;
     ok(!$err, 'setup: put initial counter succeeded');
@@ -49,7 +46,6 @@ $client->put($counter_key, "0", sub {
 my $t1 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 1-3: Simple txn that should succeed (compare matches)
 $client->txn(
     compare => [
         { key => $counter_key, target => 'value', value => '0' }
@@ -70,7 +66,6 @@ $client->txn(
 my $t2 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 4: Verify the counter was incremented
 $client->get($counter_key, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'get counter succeeded');
@@ -80,10 +75,9 @@ $client->get($counter_key, sub {
 my $t3 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 5-6: Txn that should fail (compare does not match)
 $client->txn(
     compare => [
-        { key => $counter_key, target => 'value', value => '0' }  # no longer 0
+        { key => $counter_key, target => 'value', value => '0' }
     ],
     success => [
         { request_put => { key => $counter_key, value => '2' } }
@@ -102,7 +96,6 @@ $client->txn(
 my $t4 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 7-8: Verify failure branch was executed
 $client->get("$prefix/txn-failed", sub {
     my ($resp, $err) = @_;
     ok(!$err, 'get txn-failed key succeeded');
@@ -112,7 +105,6 @@ $client->get("$prefix/txn-failed", sub {
 my $t5 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 9: Counter still has old value (success branch not executed)
 $client->get($counter_key, sub {
     my ($resp, $err) = @_;
     is($resp->{kvs}[0]{value}, '1', 'counter still 1 (success branch not executed)');
@@ -121,7 +113,6 @@ $client->get($counter_key, sub {
 my $t6 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 10-11: Txn using positional arguments
 $client->txn(
     [{ key => $counter_key, target => 'value', value => '1' }],  # compare
     [{ request_put => { key => $counter_key, value => '2' } }],  # success
@@ -136,7 +127,6 @@ $client->txn(
 my $t7 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 12: Verify positional txn worked
 $client->get($counter_key, sub {
     my ($resp, $err) = @_;
     is($resp->{kvs}[0]{value}, '2', 'counter now 2 from positional txn');
@@ -145,7 +135,6 @@ $client->get($counter_key, sub {
 my $t8 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 13-14: Txn with version compare
 my $current_version;
 $client->get($counter_key, sub {
     my ($resp, $err) = @_;
@@ -174,13 +163,12 @@ $client->txn(
 my $t10 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 15-16: Txn with request_delete_range in success
 $client->put("$prefix/to-delete", "deleteme", sub { EV::break });
 my $t11 = EV::timer(5, 0, sub { EV::break });
 EV::run;
 
 $client->txn(
-    compare => [],  # Empty compare always succeeds
+    compare => [],
     success => [
         { request_delete_range => { key => "$prefix/to-delete" } }
     ],
@@ -195,7 +183,6 @@ $client->txn(
 my $t12 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 17: Verify key was deleted
 $client->get("$prefix/to-delete", sub {
     my ($resp, $err) = @_;
     is(scalar(@{$resp->{kvs} || []}), 0, 'key was deleted by txn');
@@ -204,9 +191,7 @@ $client->get("$prefix/to-delete", sub {
 my $t13 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Oversized key/value in a success/failure op is rejected up front (and the
-# rejection must happen before the compare array is allocated, so it cannot
-# leak it -- see validate_request_ops in Etcd.xs).
+# Must croak before the compare array is allocated, or it leaks (validate_request_ops)
 {
     my $big = 'x' x (2 * 1024 * 1024);   # over ETCD_MAX_KEY_SIZE
     my $ok = eval {
@@ -223,7 +208,6 @@ EV::run;
     ok(!$ok && $@, 'txn croaks on oversized value in a failure op');
 }
 
-# Cleanup
 $client->delete($prefix, { prefix => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'cleanup delete succeeded');
@@ -232,5 +216,11 @@ $client->delete($prefix, { prefix => 1 }, sub {
 });
 my $t14 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
+
+for my $bad ('key', undef, [1]) {
+    eval { $client->txn(compare => [$bad], success => [], failure => [], callback => sub {}) };
+    like($@, qr/compare element 0 is not a hash reference/,
+        'non-hash compare element croaks');
+}
 
 done_testing();

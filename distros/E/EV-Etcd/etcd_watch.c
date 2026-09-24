@@ -1,6 +1,3 @@
-/*
- * etcd_watch.c - Watch operation handlers for EV::Etcd
- */
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
@@ -10,14 +7,12 @@
 #include "etcd_common.h"
 #include "etcd_watch.h"
 
-/* EVAPI.h's GEVAPI function table is a per-translation-unit static: every
- * file that calls into EV must bind its own copy, or ev_timer_start & co
- * dereference a NULL table. Called once from BOOT in Etcd.xs. */
+/* EVAPI.h's GEVAPI is a per-translation-unit static: each file calling EV must
+ * bind its own (from BOOT), or ev_timer_start & co dereference a NULL table */
 void watch_init_ev_api(pTHX) {
     I_EV_API("EV::Etcd");
 }
 
-/* Re-arm watch to receive next message */
 void watch_rearm_recv(pTHX_ watch_call_t *wc) {
     if (!wc->active) return;
 
@@ -41,17 +36,12 @@ void watch_rearm_recv(pTHX_ watch_call_t *wc) {
     }
 }
 
-/* Free struct memory and key buffers — final step once both owners released */
 static void watch_call_free(pTHX_ watch_call_t *wc) {
     if (wc->params.key) Safefree(wc->params.key);
     if (wc->params.range_end) Safefree(wc->params.range_end);
     Safefree(wc);
 }
 
-/* Client-side cleanup: free gRPC state, unlink from list, drop client ownership.
- * If Perl side already released, free the struct. Otherwise leave it alive and
- * inert for the Perl handle's DESTROY to free later — prevents UAF when the
- * user holds the handle past cancellation. */
 void cleanup_watch(pTHX_ watch_call_t *wc) {
     if (!wc->client_owns) return;
 
@@ -83,13 +73,11 @@ void cleanup_watch(pTHX_ watch_call_t *wc) {
     if (!wc->perl_owns) watch_call_free(aTHX_ wc);
 }
 
-/* Perl-side cleanup: drop perl ownership; free struct if client side already done */
 void watch_call_perl_release(pTHX_ watch_call_t *wc) {
     wc->perl_owns = 0;
     if (!wc->client_owns) watch_call_free(aTHX_ wc);
 }
 
-/* Process WatchResponse and call Perl callback */
 void process_watch_response(pTHX_ watch_call_t *wc) {
     if (!wc->recv_buffer) {
         wc->active = 0;
@@ -141,9 +129,6 @@ void process_watch_response(pTHX_ watch_call_t *wc) {
 
     hv_store(result, "watch_id", 8, newSVi64(resp->watch_id), 0);
     hv_store(result, "created", 7, newSViv(resp->created ? 1 : 0), 0);
-    /* canceled / compact_revision are server-cancellation signals — handled
-     * via the early-return error path above (resp->canceled) and never
-     * appear in the success hash, so we don't store them here. */
 
     AV *events = newAV();
     if (resp->n_events > 0) {
@@ -159,7 +144,6 @@ void process_watch_response(pTHX_ watch_call_t *wc) {
     CALL_SUCCESS_CALLBACK(wc->callback, result);
 }
 
-/* Perform the actual watch reconnection (called from timer callback) */
 static void watch_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     dTHX;
     (void)loop;
@@ -173,11 +157,9 @@ static void watch_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
         return;
     }
 
-    /* Cleanup and reinitialize streaming state */
     STREAMING_CALL_CLEANUP(wc);
     STREAMING_CALL_REINIT(wc);
 
-    /* Build watch create request */
     Etcdserverpb__WatchCreateRequest create_req = ETCDSERVERPB__WATCH_CREATE_REQUEST__INIT;
     create_req.key.data = (uint8_t *)wc->params.key;
     create_req.key.len = wc->params.key_len;
@@ -209,8 +191,8 @@ static void watch_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    /* Create call and setup ops */
     gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
+    wc->base.channel_gen = client->channel_gen;
     wc->call = grpc_channel_create_call(
         client->channel, NULL, GRPC_PROPAGATE_DEFAULTS,
         client->cq, METHOD_WATCH, NULL, deadline, NULL);
@@ -218,10 +200,10 @@ static void watch_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     if (!wc->call) {
         grpc_byte_buffer_destroy(send_buffer);
         wc->active = 0;
-        client->in_callback = 1;
+        client->in_callback++;
         CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "Watch reconnect failed", "watch");
-        client->in_callback = 0;
-        if (!client->active) {
+        client->in_callback--;
+        if (!client->in_callback && !client->active) {
             finish_client_destroy(aTHX_ client);
             return;
         }
@@ -240,10 +222,10 @@ static void watch_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
 
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(wc);
-        client->in_callback = 1;
+        client->in_callback++;
         CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "Watch reconnect batch failed", "watch");
-        client->in_callback = 0;
-        if (!client->active) {
+        client->in_callback--;
+        if (!client->in_callback && !client->active) {
             finish_client_destroy(aTHX_ client);
             return;
         }
@@ -251,15 +233,16 @@ static void watch_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     }
 }
 
-/* Try to reconnect a watch after stream ended (with backoff delay) */
 int try_reconnect_watch(pTHX_ watch_call_t *wc) {
     ev_etcd_t *client = wc->client;
 
-    if (!wc->auto_reconnect || !client->active) {
+    if (!client->active) {
         return 0;
     }
 
-    if (wc->reconnect_attempt >= client->max_retries) {
+    etcd_stream_failed(client, wc->base.channel_gen);
+
+    if (!wc->auto_reconnect || wc->reconnect_attempt >= client->max_retries) {
         return 0;
     }
 

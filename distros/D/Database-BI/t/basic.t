@@ -583,4 +583,13 @@ subtest 'GET /heatmap' => sub {
 	  ->content_like(qr/id="heatmap"/, 'heatmap SVG present');
 };
 
+subtest 'GET /bar' => sub {
+	my $dir = File::Temp->newdir;
+	my $csv = File::Spec->catfile("$dir", 'barsmoke.csv');
+	Mojo::File->new($csv)->spurt("region,amount\nNorth,100\nSouth,200\nEast,150\n");
+	$t->get_ok('/bar?l=' . url_escape("path:$csv") . '&cat=region&val=amount')
+	  ->status_is(200)
+	  ->content_like(qr/id="bar_chart"/, 'bar chart SVG present');
+};
+
 done_testing();

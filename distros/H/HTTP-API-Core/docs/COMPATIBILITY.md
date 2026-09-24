@@ -17,6 +17,7 @@ compatible throughout the 1.x series:
 - retry policy configuration and safe-method defaults
 - lifecycle hook names and callback contracts
 - query parameter handling
+- `HTTP::API::Core::Form::form_urlencode` form request encoding
 - authentication helper functions
 - idempotency request configuration
 - the documented transport adapter contract

@@ -5,6 +5,7 @@ use Test::More;
 use HTTP::API::Core;
 use HTTP::API::Core::Auth ();
 use HTTP::API::Core::Error;
+use HTTP::API::Core::Form ();
 use HTTP::API::Core::Pagination;
 use HTTP::API::Core::RateLimit;
 use HTTP::API::Core::Response;
@@ -34,6 +35,14 @@ can_ok 'HTTP::API::Core::RateLimit', qw(
 can_ok 'HTTP::API::Core::Auth', qw(
     bearer_auth basic_auth api_key_auth
 );
+
+can_ok 'HTTP::API::Core::Form', qw(form_urlencode);
+
+{
+    package HTTPAPICoreFormImportTest;
+    HTTP::API::Core::Form->import('form_urlencode');
+}
+can_ok 'HTTPAPICoreFormImportTest', qw(form_urlencode);
 
 my $api = HTTP::API::Core->new(
     base_url => 'https://api.example.test/',

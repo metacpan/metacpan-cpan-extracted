@@ -1,16 +1,9 @@
-/*
- * etcd_txn.h - Transaction operation handlers for EV::Etcd
- */
 #ifndef ETCD_TXN_H
 #define ETCD_TXN_H
 
 #include "etcd_common.h"
 
-/* Note: process_txn_response, response_op_to_hashref and parse_request_ops
- * are static helpers in Etcd.xs and not declared here to avoid conflicts. */
-
-/* Helper macro to free request_ops array allocated by parse_request_ops.
- * Used for cleanup on error paths in txn(). */
+/* Frees what parse_request_ops allocated; key/value data borrows Perl SV buffers */
 #define FREE_REQUEST_OPS(ops, n_ops) \
     do { \
         if ((ops)) { \
@@ -36,4 +29,4 @@
         } \
     } while (0)
 
-#endif /* ETCD_TXN_H */
+#endif

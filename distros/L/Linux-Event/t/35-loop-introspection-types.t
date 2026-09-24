@@ -11,6 +11,7 @@ use Linux::Event::IO::Sock::Dgram;
 use Linux::Event::IO::Sock::Listener;
 use Linux::Event::IO::Sock::Stream;
 use Linux::Event::Kernel::Event;
+use Linux::Event::Kernel::Inotify;
 use Linux::Event::Kernel::Process;
 use Linux::Event::Kernel::Signal;
 use Linux::Event::Kernel::Timer;
@@ -84,6 +85,7 @@ $object{signal} = T::InspectSignal->new(
     loop => $loop, signals => [SIGUSR1],
 );
 $object{event} = T::InspectEvent->new(loop => $loop);
+$object{inotify} = Linux::Event::Kernel::Inotify->new(loop => $loop);
 $object{process} = T::InspectProcess->spawn(
     loop => $loop, command => [$^X, '-e', 'exit 0'],
 );
@@ -92,11 +94,11 @@ is_deeply(
     $loop->census,
     {
         pipe => 1, tty => 0, stream => 1, listener => 1, dgram => 1,
-        timer => 1, signal => 1, event => 1, process => 1,
+        timer => 1, signal => 1, event => 1, inotify => 1, process => 1,
     },
     'census discovers public IO and Kernel types from authoritative state',
 );
-is($loop->count, 8, 'count excludes private backing objects and registrations');
+is($loop->count, 9, 'count excludes private backing objects and registrations');
 
 my %seen = map { refaddr($_) => 1 } @{ $loop->objects };
 for my $type (sort keys %object) {
@@ -127,6 +129,10 @@ ok(exists $loop->inspect($object{dgram})->{pending_datagrams},
     'Dgram inspection includes packet queue state');
 is_deeply($loop->inspect($object{signal})->{signals}, [SIGUSR1],
     'Signal inspection includes subscribed numbers');
+is($loop->inspect($object{inotify})->{watches}, 0,
+    'Inotify inspection includes logical watch count');
+ok(defined($loop->inspect($object{inotify})->{fd}),
+    'Inotify inspection includes source fd');
 is($loop->inspect($object{process})->{pid}, $object{process}->pid,
     'Process inspection includes pid');
 
@@ -137,6 +143,7 @@ ok($reason{$_}, "why_alive contains $_ reason")
 $object{timer}->cancel;
 $object{signal}->cancel;
 $object{event}->cancel;
+$object{inotify}->close;
 $object{listener}->close;
 $object{dgram}->close;
 $object{stream}->close;

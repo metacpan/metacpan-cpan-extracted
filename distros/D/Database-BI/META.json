@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "CGI::Info" : "0",
-            "CGI::Lingua" : "0",
+            "CGI::Lingua" : "0.85",
             "CHI" : "0",
             "Carp" : "0",
             "DBI" : "0",
@@ -41,12 +41,14 @@
             "Database::Join" : "v0.4.0",
             "File::Spec" : "3.40",
             "File::Temp" : "0.22",
-            "HTML::D3" : "0.17",
+            "HTML::D3" : "0.18",
             "HTML::TableExtract" : "0",
+            "IPC::System::Simple" : "0",
             "LWP::UserAgent" : "0",
             "LWP::UserAgent::Cached" : "0",
             "List::Util" : "1.40",
             "Mojo::Base" : "0",
+            "Mojo::JSON" : "0",
             "Mojolicious" : "9.49",
             "Mojolicious::Plugin::TemplateToolkit" : "0",
             "Net::SFTP::Foreign" : "0",
@@ -64,7 +66,6 @@
             "DBD::CSV" : "0",
             "Encode" : "0",
             "Excel::Writer::XLSX" : "0",
-            "IPC::System::Simple" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0",
             "Test::Mojo" : "0",
@@ -88,6 +89,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "v0.008.1",
+   "version" : "v0.009.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

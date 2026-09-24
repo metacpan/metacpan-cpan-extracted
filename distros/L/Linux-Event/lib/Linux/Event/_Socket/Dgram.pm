@@ -1122,6 +1122,34 @@ sub _error_ready ($self) {
     return;
 }
 
+sub _fork_preflight ($self, $mode, $loop) {
+    croak "fork(): Datagram does not support '$mode'" if $mode ne 'drop';
+    croak 'fork(): Datagram must be active before fork'
+        if $self->{state} ne 'active' || !$self->{loop}
+        || Scalar::Util::refaddr($self->{loop}) != Scalar::Util::refaddr($loop);
+    return 1;
+}
+
+sub _fork_child_drop ($self, $loop) {
+    $self->{watcher} = undef;
+    delete $self->{resolver_request};
+    delete $self->{resolver};
+    if (my $timer = delete $self->{ready_timer}) {
+        eval { $timer->cancel; 1 } if !$timer->is_terminal;
+    }
+    if (my $fh = delete $self->{fh}) {
+        close $fh if $self->{owns_socket};
+    }
+    $self->{unlink_on_close} = 0;
+    $self->{queue} = [];
+    $self->{pending_bytes} = 0;
+    $self->{above_high} = 0;
+    $self->{loop} = undef;
+    $self->{descriptor} = undef;
+    $self->{state} = 'not_inherited';
+    return;
+}
+
 sub _shutdown ($self, $state, $fire_close = 1, $retain_loop = 0) {
     return if $self->is_terminal;
     $self->{state} = $state;
@@ -1238,7 +1266,8 @@ sub is_read_paused ($self) { !!$self->{read_paused} }
 sub is_active ($self) { $self->{state} eq 'active' }
 sub is_terminal ($self) {
     return $self->{state} eq 'closed' || $self->{state} eq 'failed'
-        || $self->{state} eq 'detached';
+        || $self->{state} eq 'detached' || $self->{state} eq 'not_inherited'
+        || $self->{state} eq 'moved';
 }
 
 sub data ($self, @argument) {

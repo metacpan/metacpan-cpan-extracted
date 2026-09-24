@@ -5,7 +5,6 @@ use lib 'blib/lib', 'blib/arch';
 use Test::More;
 use Encode qw(encode_utf8);
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -14,7 +13,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -40,10 +38,9 @@ my $client = EV::Etcd->new(
 
 my $prefix = "/test-binary-$$-" . time();
 
-# Test 1-3: UTF-8 key and value
 {
-    my $utf8_key = "$prefix/utf8-\x{4e2d}\x{6587}";  # Chinese characters
-    my $utf8_value = "value-\x{65e5}\x{672c}\x{8a9e}";  # Japanese characters
+    my $utf8_key = "$prefix/utf8-\x{4e2d}\x{6587}";
+    my $utf8_value = "value-\x{65e5}\x{672c}\x{8a9e}";
 
     my $put_ok = 0;
     $client->put(encode_utf8($utf8_key), encode_utf8($utf8_value), sub {
@@ -72,10 +69,9 @@ my $prefix = "/test-binary-$$-" . time();
     diag("UTF-8 test: stored and retrieved CJK characters");
 }
 
-# Test 4-6: Binary data with null bytes
 {
     my $binary_key = "$prefix/binary-key";
-    my $binary_value = "before\x00middle\x00after";  # Contains null bytes
+    my $binary_value = "before\x00middle\x00after";
 
     my $put_ok = 0;
     $client->put($binary_key, $binary_value, sub {
@@ -105,10 +101,9 @@ my $prefix = "/test-binary-$$-" . time();
     diag("Binary test: stored and retrieved value with embedded nulls");
 }
 
-# Test 7-9: High bytes (0x80-0xFF range)
 {
     my $high_key = "$prefix/high-bytes";
-    my $high_value = "\x80\x81\xFE\xFF";  # High byte values
+    my $high_value = "\x80\x81\xFE\xFF";
 
     my $put_ok = 0;
     $client->put($high_key, $high_value, sub {
@@ -137,10 +132,9 @@ my $prefix = "/test-binary-$$-" . time();
     diag("High-byte test: stored and retrieved 0x80-0xFF range");
 }
 
-# Test 10-12: Emoji (4-byte UTF-8)
 {
     my $emoji_key = "$prefix/emoji";
-    my $emoji_value = encode_utf8("\x{1F600}\x{1F60D}\x{1F389}");  # Grinning, heart-eyes, party
+    my $emoji_value = encode_utf8("\x{1F600}\x{1F60D}\x{1F389}");
 
     my $put_ok = 0;
     $client->put($emoji_key, $emoji_value, sub {
@@ -169,7 +163,6 @@ my $prefix = "/test-binary-$$-" . time();
     diag("Emoji test: stored and retrieved 4-byte UTF-8 sequences");
 }
 
-# Test 13-15: Mixed binary and text
 {
     my $mixed_key = "$prefix/mixed";
     my $mixed_value = "text\x00\xFF\x{00}binary\xFEend";
@@ -201,7 +194,6 @@ my $prefix = "/test-binary-$$-" . time();
     diag("Mixed test: stored and retrieved mixed binary/text data");
 }
 
-# Cleanup
 $client->delete("$prefix/", { prefix => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'cleanup succeeded');

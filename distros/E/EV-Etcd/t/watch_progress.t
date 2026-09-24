@@ -1,10 +1,6 @@
 #!/usr/bin/env perl
-# Server-side progress notifications for an idle watch: with progress_notify
-# the server sends periodic empty WatchResponses so the client can keep its
-# revision cursor fresh. We can't control the server's interval (etcd issues
-# them periodically), but the watch's `created` first response always arrives
-# and any later progress messages should carry an empty events array and
-# advancing header revisions.
+# progress_notify on an idle watch. etcd's default progress interval is about
+# 10 minutes, so no progress tick is expected here; only the created response is.
 use strict;
 use warnings;
 use lib 'blib/lib', 'blib/arch';
@@ -34,7 +30,6 @@ my $watch = $client->watch($key, { progress_notify => 1 }, sub {
 });
 ok($watch, 'watch with progress_notify created');
 
-# First response: created=1
 my $tcreated = EV::timer(0.05, 0.05, sub {
     EV::break if @messages && $messages[0]{created};
 });
@@ -48,22 +43,15 @@ SKIP: {
     ok(exists $messages[0]{header}, 'first message has a header');
 }
 
-# Force the server to advance global revision by writing to *another* key — the
-# watcher should NOT see an event (filtered out by key) but a subsequent
-# progress message under progress_notify will reflect the new revision.
+# Moves the revision through another key, outside this watch
 $client->put("/test_progress_other_$$", "x", sub { EV::break });
 my $tput = EV::timer(2, 0, sub { EV::break });
 EV::run;
 
-# Wait for either a progress message (empty events, advanced revision) or
-# the wall clock; etcd's default progress interval is ~10 minutes, so we
-# can only test that progress_notify doesn't break the watch — we don't
-# require a progress tick to land in the test window.
 $client->delete("/test_progress_other_$$", sub { EV::break });
 my $tcd = EV::timer(2, 0, sub { EV::break });
 EV::run;
 
-# Verify the watch survived and first-message contract held
 ok($watch, 'watch handle still valid after activity');
 
 $watch->cancel(sub { EV::break });

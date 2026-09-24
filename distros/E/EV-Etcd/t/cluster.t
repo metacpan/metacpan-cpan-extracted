@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -40,7 +38,6 @@ my $client = EV::Etcd->new(
 my @members;
 my $self_member_id;
 
-# Test 1-4: member_list
 $client->member_list(sub {
     my ($resp, $err) = @_;
     ok(!$err, 'member_list succeeded');
@@ -63,7 +60,6 @@ $client->member_list(sub {
 my $t1 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 5-6: Verify member structure
 SKIP: {
     skip "no members returned", 2 unless @members;
 
@@ -72,16 +68,11 @@ SKIP: {
     ok(ref($member->{peer_urls}) eq 'ARRAY', 'member has peer_urls array');
 }
 
-# Test 7-9: member_add (adding a learner member). Run before the
-# invalid-id tests below — etcd 3.5 in some containers (Debian bookworm)
-# closes the gRPC connection on member_remove/update with an invalid id,
-# which would derail any subsequent legitimate cluster op.
-# Cleanup happens in END block so the learner is removed even if a later
-# step times out.
+# Before the invalid-id calls below: some etcd 3.5 builds (Debian bookworm)
+# drop the gRPC connection on member_remove/update with an invalid id
 our $added_member_id;
 our $cluster_client = $client;
-# Per-run peer URL: it is never bound (the learner is never started), it
-# just must not collide with leftover members or other etcd instances.
+# Never bound, as the learner never starts; per-run to avoid leftover members
 my $peer_url = sprintf 'http://127.0.0.1:%d', 20000 + $$ % 10000;
 $client->member_add([$peer_url], { is_learner => 1 }, sub {
     my ($resp, $err) = @_;
@@ -100,8 +91,7 @@ $client->member_add([$peer_url], { is_learner => 1 }, sub {
 my $t1b = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 10-12: member_promote (promoting a learner requires it to be caught up)
-# Since our learner is fake (not actually running), this should fail gracefully.
+# Promotion requires a caught-up learner, and this one never runs
 SKIP: {
     skip "no learner member to promote", 3 unless $added_member_id;
 
@@ -117,7 +107,6 @@ SKIP: {
     EV::run;
 }
 
-# Test 13-15: member_remove with invalid ID (should fail gracefully)
 my $fake_member_id = 999999999;
 $client->member_remove($fake_member_id, sub {
     my ($resp, $err) = @_;
@@ -130,7 +119,6 @@ $client->member_remove($fake_member_id, sub {
 my $t2 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 16-18: member_update with invalid ID (should fail gracefully)
 $client->member_update($fake_member_id, ['http://127.0.0.1:12345'], sub {
     my ($resp, $err) = @_;
     ok($err, 'member_update with invalid ID returns error');
@@ -142,7 +130,7 @@ $client->member_update($fake_member_id, ['http://127.0.0.1:12345'], sub {
 my $t3 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Guaranteed learner cleanup — fires even if member_promote timed out above.
+# Removes the learner even if a step above timed out
 END {
     if ($added_member_id && $cluster_client) {
         $cluster_client->member_remove($added_member_id, sub {

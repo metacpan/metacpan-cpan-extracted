@@ -52,9 +52,9 @@ local ($::_g0 = do {(Tel & Len[9]) < (Tel & Len[10])}, $::_e0 = "1"); ::ok $::_g
 # 
 # Этот модуль экспортирует подпрограммы:
 # 
-# * `subtype`, `as`, `init_where`, `where`, `awhere`, `message` — для создания валидаторов.
-# * `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` — для использования в валидаторах типа и его аргументов.
-# * `coerce`, `from`, `via` — для создания конвертора значений из одного класса в другой.
+# * `subtype`, `as`, `init_where`, `where`, `awhere`, `message` – для создания валидаторов.
+# * `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` – для использования в валидаторах типа и его аргументов.
+# * `coerce`, `from`, `via` – для создания конвертора значений из одного класса в другой.
 # 
 # Иерархия валидаторов:
 # 
@@ -164,7 +164,7 @@ local ($::_g0 = do {0 ~~ One}, $::_e0 = do {""}); ::ok defined($::_g0) == define
 ::like scalar do {eval { One->validate(0) }; $@}, qr{Actual 1 only\!}, 'eval { One->validate(0) }; $@ # ~> Actual 1 only!'; undef $::_g0; undef $::_e0;
 
 # 
-# `where` и `message` — это синтаксический сахар, а `subtype` можно использовать без них.
+# `where` и `message` – это синтаксический сахар, а `subtype` можно использовать без них.
 # 
 
 BEGIN {
@@ -250,7 +250,7 @@ local ($::_g0 = do {3 ~~ Two}, $::_e0 = do {""}); ::ok defined($::_g0) == define
 # 
 # Используется с `subtype`.
 # 
-# Если тип может быть с аргументами и без, то используется для проверки набора с аргументами, а `where` — без.
+# Если тип может быть с аргументами и без, то используется для проверки набора с аргументами, а `where` – без.
 # 
 ::done_testing; }; subtest 'awhere ($code)' => sub { 
 BEGIN {
@@ -396,14 +396,14 @@ local ($::_g0 = do {1 >> Plus[5]}, $::_e0 = do {6}); ::ok defined($::_g0) == def
 # Стандартные приведения:
 # 
 
-# Str from Undef — empty string
+# Str from Undef – empty string
 local ($::_g0 = do {Str->coerce(undef)}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Str->coerce(undef) # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-# Int from Num — rounded integer
+# Int from Num – rounded integer
 local ($::_g0 = do {Int->coerce(2.5)}, $::_e0 = do {3}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Int->coerce(2.5)  # -> 3' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {Int->coerce(-2.5)}, $::_e0 = do {-3}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Int->coerce(-2.5) # -> -3' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
-# Bool from Any — 1 or ""
+# Bool from Any – 1 or ""
 local ($::_g0 = do {Bool->coerce([])}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Bool->coerce([]) # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 local ($::_g0 = do {Bool->coerce(0)}, $::_e0 = do {""}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, 'Bool->coerce(0)  # -> ""' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
@@ -717,7 +717,7 @@ local ($::_g0 = do {'a.a' ~~ Email}, $::_e0 = do {""}); ::ok defined($::_g0) == 
 # 
 # ## Tel
 # 
-# Формат телефонов — знак плюс и семь или больше цифр.
+# Формат телефонов – знак плюс и семь или больше цифр.
 # 
 ::done_testing; }; subtest 'Tel' => sub { 
 local ($::_g0 = do {"+1234567" ~~ Tel}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"+1234567" ~~ Tel  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
@@ -728,7 +728,7 @@ local ($::_g0 = do {"+1234567 " ~~ Tel}, $::_e0 = do {""}); ::ok defined($::_g0)
 # 
 # ## Url
 # 
-# URL-адреса веб-сайтов — это строка с префиксом http:// или https://.
+# URL-адреса веб-сайтов – это строка с префиксом http:// или https://.
 # 
 ::done_testing; }; subtest 'Url' => sub { 
 local ($::_g0 = do {"http://" ~~ Url}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '"http://" ~~ Url # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
@@ -785,7 +785,7 @@ local ($::_g0 = do {' abbc ' ~~ StrMatch[qr/abc/]}, $::_e0 = do {""}); ::ok defi
 # 
 # ## ClassName
 # 
-# Имя класса — это пакет с методом `new`.
+# Имя класса – это пакет с методом `new`.
 # 
 ::done_testing; }; subtest 'ClassName' => sub { 
 local ($::_g0 = do {'Aion::Type' ~~ ClassName}, $::_e0 = do {1}); ::ok defined($::_g0) == defined($::_e0) && $::_g0 eq $::_e0, '\'Aion::Type\' ~~ ClassName  # -> 1' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
@@ -794,7 +794,7 @@ local ($::_g0 = do {'Aion::Types' ~~ ClassName}, $::_e0 = do {""}); ::ok defined
 # 
 # ## RoleName
 # 
-# Имя роли — это пакет без метода `new`, с `@ISA` или с одним любым методом.
+# Имя роли – это пакет без метода `new`, с `@ISA` или с одним любым методом.
 # 
 ::done_testing; }; subtest 'RoleName' => sub { 
 package ExRole1 {

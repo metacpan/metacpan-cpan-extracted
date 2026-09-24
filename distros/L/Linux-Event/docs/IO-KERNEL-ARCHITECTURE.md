@@ -27,6 +27,7 @@ Linux::Event
 |   |-- Timer
 |   |-- Signal
 |   |-- Event
+|   |-- Inotify
 |   `-- Process
 |
 |-- Loop
@@ -56,9 +57,12 @@ the same Linux pipe semantics through `Kernel::Process`.
 ### IO::TTY
 
 Represents terminal and pseudo-terminal ordered-byte I/O. It may have a
-readable handle, a writable handle, or both. Terminal configuration remains a
-terminal concern rather than a reason to duplicate the common ordered-byte
-engine.
+readable handle, a writable handle, or both. Supplied handles are borrowed by
+default: Linux::Event temporarily applies nonblocking/close-on-exec descriptor
+state and restores the captured state on terminal close or detach.
+`owns_handles => 1` explicitly transfers ownership instead. Terminal
+configuration remains a terminal concern rather than a reason to duplicate the
+common ordered-byte engine.
 
 ### IO::Sock::Stream
 
@@ -93,6 +97,7 @@ while the backing fd mechanism remains an implementation fact.
 - `Kernel::Timer` uses timerfd-backed scheduling machinery.
 - `Kernel::Signal` uses signalfd-backed signal delivery.
 - `Kernel::Event` uses eventfd-backed counter/notification semantics.
+- `Kernel::Inotify` owns one inotify instance and logical filesystem watches.
 - `Kernel::Process` uses pidfd lifecycle observation and also owns Linux::Event
   process spawning and asynchronous stdio behavior.
 

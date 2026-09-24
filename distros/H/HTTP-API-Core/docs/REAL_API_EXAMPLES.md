@@ -18,8 +18,10 @@ use lib 'examples';
 ## GitHub
 
 GitHub's authenticated-repositories endpoint returns a top-level JSON array and
-uses `page` plus `per_page`. A code-reference item extractor maps the top-level
-array into the common pager interface.
+advertises continuation through the HTTP `Link` header. The example opts in to
+response-aware extractors, maps the top-level array into the common pager
+interface, and follows the exact `rel="next"` URL while keeping Link parsing in
+the GitHub service layer.
 
 ```perl
 use HTTP::API::Core::Example::GitHub;
@@ -100,3 +102,74 @@ while (my $zone = $pager->next) {
 ```
 
 API reference: <https://developers.cloudflare.com/api/resources/zones/methods/list/>
+
+
+## Stripe
+
+Stripe combines bearer authentication, form-encoded request bodies,
+`Idempotency-Key`, request IDs, and cursor pagination. The example maps list
+pagination by extracting the last object's `id` when `has_more` is true and
+feeding it back as `starting_after`.
+
+```perl
+use HTTP::API::Core::Example::Stripe;
+
+my $stripe = HTTP::API::Core::Example::Stripe->new(
+    token => $ENV{STRIPE_SECRET_KEY},
+);
+
+my $pager = $stripe->customers_pager(limit => 100);
+while (my $customer = $pager->next) {
+    print "$customer->{id}\n";
+}
+```
+
+The validation found no need for a Stripe-specific core primitive. Form encoding
+is intentionally service-layer behavior; generic idempotency and cursor
+pagination already compose with it.
+
+API reference: <https://docs.stripe.com/api>
+
+## GitLab
+
+GitLab's REST API is a useful contrast: private-token authentication, top-level
+JSON arrays, ordinary page/per-page query pagination, request IDs, and
+rate-limit headers all fit existing core primitives.
+
+```perl
+use HTTP::API::Core::Example::GitLab;
+
+my $gitlab = HTTP::API::Core::Example::GitLab->new(
+    token => $ENV{GITLAB_TOKEN},
+);
+
+my $pager = $gitlab->projects_pager(
+    membership => 'true',
+    per_page => 50,
+);
+```
+
+This validation likewise did not expose a new generic core requirement.
+
+API reference: <https://docs.gitlab.com/api/rest/>
+
+## Validation notes
+
+Across GitHub, Slack, Cloudflare, Stripe, and GitLab, the recurring shapes are
+covered by the transport-independent primitives: header authentication, query
+encoding, page/cursor/next-URL pagination, response-aware pagination extractors,
+generic idempotency headers, normalized rate-limit metadata, request IDs, and
+structured HTTP/transport errors.
+
+The 1.08 review also hardened two generic boundaries exposed by those recipes:
+cross-origin absolute pagination continuations are rejected by default to avoid
+forwarding client credentials unexpectedly, and mutable `before_request` context
+fields are revalidated before transport.
+
+Two patterns remain deliberately service-specific:
+
+- application-level success/failure envelopes such as Slack's `ok: false`
+- request body encodings and nested parameter conventions such as Stripe form data
+
+Neither pattern currently justifies adding behavior to the core because their
+semantics vary by service.

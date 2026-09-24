@@ -44,12 +44,12 @@ eval { $Int->validate("a", "..Eval..") }; $@ # ~> ..Eval.. must have the type In
 
 ### ARGUMENTS
 
-* name (Str) — Название типа.
-* args (ArrayRef) — Список аргументов типа.
-* init (CodeRef) — Инициализатор типа.
-* test (CodeRef) — Чекер.
-* a_test (CodeRef) — Чекер значений для типов с необязательными аргументами.
-* coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) — Массив пар: тип и переход.
+* name (Str) – Название типа.
+* args (ArrayRef) – Список аргументов типа.
+* init (CodeRef) – Инициализатор типа.
+* test (CodeRef) – Чекер.
+* a_test (CodeRef) – Чекер значений для типов с необязательными аргументами.
+* coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) – Массив пар: тип и переход.
 
 ## stringify
 
@@ -76,7 +76,7 @@ $Int->stringify  #=> Int[3, 5]
 (~$Int)->stringify		  # => ~Int[3, 5]
 ```
 
-Операции — это объекты `Aion::Type` со специальными именами:
+Операции – это объекты `Aion::Type` со специальными именами:
 
 ```perl
 Aion::Type->new(name => "Exclude", args => [$Char])->stringify   # => ~Char

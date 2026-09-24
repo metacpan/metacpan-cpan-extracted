@@ -13,11 +13,11 @@ Algorithm::ToNumberMunger - Compile declarative specs into closures that munge r
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 # Feature hashing (the 'hash' munger) is a tight per-byte FNV-1a loop with a
 # 32-bit modular multiply. That is exactly the kind of work XS is good at and
@@ -117,6 +117,7 @@ my %BUILDERS = (
 	bit             => \&_build_bit,
 	ip_class        => \&_build_ip_class,
 	cidr            => \&_build_cidr,
+	geoip_country   => \&_build_geoip_country,
 	datetime        => \&_build_datetime,
 	hash            => \&_build_hash,
 	chain           => \&_build_chain,
@@ -3018,6 +3019,179 @@ sub _build_cidr {
 		croak "cidr munger$where: '" . ( defined $v ? $v : 'undef' ) . "' is not a parseable IP address";
 	}; ## end sub
 } ## end sub _build_cidr
+
+=head2 geoip_country
+
+    { munger => 'geoip_country', default => -1 }
+    { munger => 'geoip_country',
+      mmdb    => '/var/db/GeoIP/GeoLite2-Country.mmdb',
+      default => -1 }
+
+Look an IPv4 or IPv6 address up in a MaxMind DB and emit its country as a
+number. Where L</ip_class> answers "what kind of address" and L</cidr> "which
+of my networks", this answers "whose country". The number is derived
+arithmetically from the ISO 3166-1 alpha-2 code the database reports --
+C<(letter1 * 26) + letter2> with C<A> as C<0>, so C<AA> is C<0>, C<GB> is
+C<157>, C<SE> is C<472>, C<ZZ> is C<675> -- rather than looked up in a
+baked-in registry table: every possible two-letter code (including
+user-assigned ones like Kosovo's C<XK>) has a stable number without this
+module ever needing a registry update. The encoding is purely categorical;
+the magnitude carries no meaning.
+
+The database file is found by trying, in order:
+
+=over 4
+
+=item 1. C<mmdb> in the spec, when given;
+
+=item 2. the C<TONUMBERMUNGER_GEOIP_MMDB> environment variable;
+
+=item 3. C<$Algorithm::ToNumberMunger::GEOIP_COUNTRY_MMDB>, for an app to set
+once at startup;
+
+=item 4. the usual geoipupdate install locations -- C<GeoIP2-Country.mmdb>
+then C<GeoLite2-Country.mmdb> in each of C</var/db/GeoIP>, C</var/lib/GeoIP>,
+C</usr/share/GeoIP>, and C</usr/local/share/GeoIP>.
+
+=back
+
+So a spec normally names no path at all -- where the db lives is deployment
+detail, not configuration -- and on a host with a stock geoipupdate setup it
+just works. A country-level db is the natural fit, but any MaxMind db whose
+records carry a C<country> section (the City dbs do) works. The record's
+C<country> is used first, falling back to C<registered_country> when
+geolocation data is absent (anonymous-proxy and satellite networks often only
+have a registration). An input that is not a parseable address, or that
+resolves to no country -- private and unallocated space never does -- croaks,
+or yields the numeric C<default> when one is given; since every feed contains
+internal addresses, a C<default> is the usual configuration.
+
+The database is opened once at build time (no db found anywhere, or an
+unreadable file, fails there rather than per row) via
+L<IP::Geolocation::MMDB>, which is loaded lazily the way L</datetime> loads
+Time::Piece -- it is only a dependency if this munger is used.
+
+=cut
+
+# App-settable default database path for geoip_country, consulted after the
+# TONUMBERMUNGER_GEOIP_MMDB environment variable and before the well-known
+# geoipupdate locations.
+our $GEOIP_COUNTRY_MMDB;
+
+# The well-known geoipupdate install locations _resolve_geoip_mmdb scans last:
+# every directory is tried against every name, commercial db first.
+my @GEOIP_MMDB_DIRS  = qw(/var/db/GeoIP /var/lib/GeoIP /usr/share/GeoIP /usr/local/share/GeoIP);
+my @GEOIP_MMDB_NAMES = qw(GeoIP2-Country.mmdb GeoLite2-Country.mmdb);
+
+# Resolve which MaxMind db file a geoip_country build should open, per the
+# order the POD promises: spec, environment, package variable, well-known
+# paths.
+#
+# Args:
+#   spec  - the munger spec hashref; only its optional 'mmdb' (path string)
+#           is consulted
+#   where - the " for tag '...'"/'' suffix used to sharpen croak messages
+#
+# Returns the path string of the first existing candidate. A candidate named
+# by spec/env/package variable that does not exist is a configuration error
+# and croaks (naming its source) rather than being silently skipped; croaks
+# too when nothing names a db and no well-known path has one.
+#
+#   my $path = _resolve_geoip_mmdb( { munger => 'geoip_country' }, '' );
+sub _resolve_geoip_mmdb {
+	my ( $spec, $where ) = @_;
+
+	my @named = (
+		[ "'mmdb' in the spec",                             $spec->{mmdb} ],
+		[ 'the TONUMBERMUNGER_GEOIP_MMDB env variable',     $ENV{TONUMBERMUNGER_GEOIP_MMDB} ],
+		[ '$Algorithm::ToNumberMunger::GEOIP_COUNTRY_MMDB', $GEOIP_COUNTRY_MMDB ],
+	);
+	for my $candidate (@named) {
+		my ( $source, $path ) = @$candidate;
+		next unless defined $path && length $path;
+		croak "geoip_country munger$where: mmdb file '$path' (from $source) does not exist"
+			unless -f $path;
+		return $path;
+	}
+
+	for my $dir (@GEOIP_MMDB_DIRS) {
+		for my $name (@GEOIP_MMDB_NAMES) {
+			return "$dir/$name" if -f "$dir/$name";
+		}
+	}
+
+	croak "geoip_country munger$where: no mmdb database found -- none named by "
+		. "the spec, TONUMBERMUNGER_GEOIP_MMDB, or "
+		. '$Algorithm::ToNumberMunger::GEOIP_COUNTRY_MMDB, and no '
+		. 'GeoIP2-Country.mmdb/GeoLite2-Country.mmdb under '
+		. join( ', ', @GEOIP_MMDB_DIRS );
+} ## end sub _resolve_geoip_mmdb
+
+# Builder for the geoip_country munger. Resolves and opens the MaxMind db up
+# front, then returns the per-value closure.
+#
+# Args (from the spec hash):
+#   mmdb    - path to a MaxMind DB file whose records carry a 'country'
+#             section; optional, see _resolve_geoip_mmdb for the fallbacks
+#             tried when absent
+#   default - number emitted when a value cannot be resolved to a country
+#             (unparseable address, address not in the db, or a malformed
+#             country code in the db); optional -- without it such a value
+#             croaks
+#
+# Returns a coderef mapping one address string to its country's number,
+# preferring the record's geolocated 'country' section and falling back to
+# 'registered_country'. The number is (letter1 * 26) + letter2 of the ISO
+# 3166-1 alpha-2 code with 'A' as 0 -- stable for any two-letter code with no
+# registry table to maintain.
+#
+#   my $code = _build_geoip_country(
+#       { munger => 'geoip_country', default => -1 },
+#       " for tag 'src_country'" );
+#   $code->('81.2.69.160');   # 157 (GB)
+#   $code->('10.0.0.1');      # -1  (private space resolves to no country)
+sub _build_geoip_country {
+	my ( $spec, $where ) = @_;
+
+	my $mmdb = _resolve_geoip_mmdb( $spec, $where );
+
+	# Lazy like datetime's Time::Piece: only a geoip_country build pays for
+	# (or needs) IP::Geolocation::MMDB.
+	eval { require IP::Geolocation::MMDB; 1 }
+		or croak "geoip_country munger$where requires IP::Geolocation::MMDB, " . "which failed to load: $@";
+
+	my $db = eval { IP::Geolocation::MMDB->new( file => $mmdb ) };
+	croak "geoip_country munger$where: could not open mmdb file '$mmdb': $@"
+		unless $db;
+
+	my $has_default = exists $spec->{default};
+	my $default     = $spec->{default};
+	croak "geoip_country munger$where: 'default' must be numeric"
+		if $has_default && !looks_like_number($default);
+
+	return sub {
+		my ($v) = @_;
+		if ( defined $v ) {
+			my $record = eval { $db->record_for_address("$v") };
+			if ($@) {
+				return $default if $has_default;
+				croak "geoip_country munger$where: '$v' is not a parseable IP address";
+			}
+			if ( ref $record eq 'HASH' ) {
+				# Prefer where the address IS over where it is merely
+				# registered; proxy/satellite records often lack the former.
+				for my $section (qw(country registered_country)) {
+					next unless ref $record->{$section} eq 'HASH';
+					my $alpha2 = $record->{$section}{iso_code};
+					next unless defined $alpha2 && uc($alpha2) =~ /\A([A-Z])([A-Z])\z/;
+					return ( ord($1) - 65 ) * 26 + ( ord($2) - 65 );
+				}
+			} ## end if ( ref $record eq 'HASH' )
+		} ## end if ( defined $v )
+		return $default if $has_default;
+		croak "geoip_country munger$where: '" . ( defined $v ? $v : 'undef' ) . "' resolves to no country";
+	}; ## end sub
+} ## end sub _build_geoip_country
 
 =head2 datetime
 

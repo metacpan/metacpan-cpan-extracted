@@ -4,3 +4,4 @@ README.pod
 ^blib
 ^pm_to_blib
 ignore.txt
+.git

@@ -2485,4 +2485,159 @@ subtest 'Transaction 39 -- Remote file path lifecycle' => sub {
 	}
 };
 
+subtest 'Transaction 40 -- Bar chart lifecycle' => sub {
+	plan tests => 37;
+
+	my $dir = tempdir(CLEANUP => 1);
+	my $csv = Mojo::File->new($dir)->child('bardata.csv')->to_string;
+	Mojo::File->new($csv)->spurt(
+		"tester,result,score\n"
+		. "Alice,pass,95\n"
+		. "Bob,fail,42\n"
+		. "Alice,pass,88\n"
+		. "Carol,pass,76\n"
+		. "Bob,pass,61\n"
+	);
+
+	my $base = '/bar?l=' . url_escape("path:$csv");
+
+	# Phase 1: count mode (no val param) -- count rows per category.
+	$t->get_ok($base . '&cat=tester')
+	  ->status_is(200, 'Phase 1: /bar count mode returns 200');
+	$t->content_like(qr/id="bar_chart"/,  'Phase 1: bar_chart SVG element present');
+	$t->content_like(qr/Count by tester/, 'Phase 1: title reflects count mode');
+
+	# Phase 2: value mode -- sum score per tester.
+	$t->get_ok($base . '&cat=tester&val=score')
+	  ->status_is(200, 'Phase 2: /bar value mode returns 200');
+	$t->content_like(qr/id="bar_chart"/,  'Phase 2: bar_chart SVG element present');
+	$t->content_like(qr/score by tester/, 'Phase 2: title reflects value mode');
+
+	# Phase 3: missing required cat param returns 400.
+	$t->get_ok('/bar?l=' . url_escape("path:$csv"))
+	  ->status_is(400, 'Phase 3: missing cat param returns 400');
+
+	# Phase 4: non-existent column returns 400.
+	$t->get_ok($base . '&cat=no_such_col')
+	  ->status_is(400, 'Phase 4: non-existent cat column returns 400');
+
+	# Phase 5: horizontal orientation.
+	$t->get_ok($base . '&cat=tester&orient=h')
+	  ->status_is(200, 'Phase 5: horizontal orientation returns 200');
+	$t->content_like(qr/id="bar_chart"/, 'Phase 5: bar chart SVG present in horizontal mode');
+
+	# Phase 6: sort by value.
+	$t->get_ok($base . '&cat=tester&sort=value')
+	  ->status_is(200, 'Phase 6: sort=value returns 200');
+
+	# Phase 7: idempotency -- second count-mode request serves same result.
+	$t->get_ok($base . '&cat=tester')
+	  ->status_is(200, 'Phase 7: idempotent second request returns 200');
+	$t->content_like(qr/id="bar_chart"/, 'Phase 7: bar chart still present on repeat');
+
+	# Phase 8: bar chart toolbar button and panel present in dashboard.
+	$t->get_ok('/view/sales')
+	  ->status_is(200, 'Phase 8: dashboard returns 200');
+	$t->content_like(qr/id="btn-bar"/,  'Phase 8: bar chart toolbar button present');
+	$t->content_like(qr/id="bar-panel"/, 'Phase 8: bar chart panel present');
+
+	# Phase 9: drill-down metadata present in bar chart page.
+	$t->get_ok($base . '&cat=tester')
+	  ->status_is(200, 'Phase 9: bar chart page returns 200');
+	$t->content_like(qr/id="bar-meta"/, 'Phase 9: bar-meta div present');
+	$t->content_like(qr/data-cat-col="tester"/, 'Phase 9: cat column encoded in bar-meta');
+	$t->content_like(qr/drillDown/, 'Phase 9: drillDown JS function present');
+	$t->content_like(qr/encodeURIComponent/, 'Phase 9: URL encoding used in drill-down');
+	$t->content_like(qr/back2/, 'Phase 9: back2 param present in drillDown');
+	$t->content_like(qr/back2_label/, 'Phase 9: back2_label param present in drillDown');
+	$t->content_like(qr/Back to bar chart/, 'Phase 9: back2_label text is correct');
+
+	# Phase 10: full breadcrumb round-trip -- simulate a drill-down navigation
+	# by passing back2 and back2_label to /view/sales (as drillDown() would).
+	# The view action must promote back2 -> back_url and back2_label -> back_label
+	# so the dashboard renders "Back to bar chart" rather than "Choose another database".
+	my $bar_back = '/bar?l=table%3Asales&cat=region';
+	$t->get_ok('/view/sales?back2=' . url_escape($bar_back) . '&back2_label=' . url_escape('Back to bar chart'))
+	  ->status_is(200, 'Phase 10: drilled-down table returns 200');
+	$t->content_like(qr/Back to bar chart/, 'Phase 10: breadcrumb shows Back to bar chart');
+	$t->content_unlike(qr/Choose another database/, 'Phase 10: default breadcrumb replaced by chart back-link');
+};
+
+# Transaction 41: Pie chart drill-down breadcrumb lifecycle
+# Regression test: after clicking a pie slice, the drilled-down table must show
+# "Back to pie chart" breadcrumb, not "Choose another database".
+subtest 'Transaction 41 -- Pie chart drill-down breadcrumb lifecycle' => sub {
+	plan tests => 13;
+
+	# Phase 1: pie chart page renders with data-back-url and drillDown JS.
+	my $back_url  = '/view/sales';
+	my $pie_url   = '/pie?l=table%3Asales&cat=region&val=amount&back=' . url_escape($back_url);
+	$t->get_ok($pie_url)
+	  ->status_is(200, 'Phase 1: pie chart page returns 200');
+	$t->content_like(qr/data-back-url/, 'Phase 1: data-back-url attribute present in pie-meta');
+	$t->content_like(qr/drillDown/,     'Phase 1: drillDown JS function present in pie page');
+	$t->content_like(qr/back2/,         'Phase 1: back2 param referenced in drillDown');
+	$t->content_like(qr/Back to pie chart/, 'Phase 1: back2_label text is Back to pie chart');
+
+	# Phase 2: simulate the drill-down navigation produced by drillDown().
+	# drillDown() appends back2=<pieUrl>&back2_label=Back+to+pie+chart to backUrl.
+	# The view action must promote back2 -> back_url so the dashboard renders the
+	# "Back to pie chart" breadcrumb instead of "Choose another database".
+	my $pie_abs = 'http://localhost:3000' . $pie_url;
+	$t->get_ok('/view/sales?f=' . url_escape('region:eq:West')
+		. '&back2='       . url_escape($pie_abs)
+		. '&back2_label=' . url_escape('Back to pie chart'))
+	  ->status_is(200, 'Phase 2: drilled-down filtered table returns 200');
+	$t->content_like(qr/Back to pie chart/,    'Phase 2: breadcrumb shows Back to pie chart');
+	$t->content_unlike(qr/Choose another database/, 'Phase 2: default breadcrumb replaced by chart back-link');
+
+	# Phase 3: root-relative pie URL also works (browser may serve relative links).
+	$t->get_ok('/view/sales?f=' . url_escape('region:eq:West')
+		. '&back2='       . url_escape($pie_url)
+		. '&back2_label=' . url_escape('Back to pie chart'))
+	  ->status_is(200, 'Phase 3: root-relative back2 also returns 200');
+	$t->content_like(qr/Back to pie chart/, 'Phase 3: breadcrumb shows Back to pie chart for root-relative back2');
+};
+
+subtest 'Transaction 42 -- import_url drill-down breadcrumb lifecycle' => sub {
+	# Regression: import_url rendered back_url=>'/' with no back2 handling,
+	# so pie/bar drill-downs from URL-backed tables never showed the chart link.
+	eval { require LWP::UserAgent } or plan skip_all => 'LWP::UserAgent not available';
+	eval { require HTML::TableExtract } or plan skip_all => 'HTML::TableExtract not available';
+	eval { require HTTP::Response } or plan skip_all => 'HTTP::Response not available';
+	plan tests => 7;
+
+	my $html = '<table>'
+	         . '<tr><th>tester</th><th>result</th></tr>'
+	         . '<tr><td>Alice</td><td>PASS</td></tr>'
+	         . '<tr><td>Bob</td><td>FAIL</td></tr>'
+	         . '</table>';
+
+	no warnings 'redefine';
+	local *LWP::UserAgent::get = sub {
+		my ($self, $url) = @_;
+		return HTTP::Response->new(200, 'OK', [], $html);
+	};
+
+	my $import_url = 'http://example.com/test-results';
+	my $pie_back   = '/pie?l=' . url_escape("url:$import_url") . '&cat=tester&val=result';
+
+	# Phase 1: unfiltered import shows table name as the back label (not "Choose another database").
+	# Clicking that link returns to the same table without filters.
+	$t->get_ok('/import?url=' . url_escape($import_url))
+	  ->status_is(200, 'Phase 1: import renders 200');
+	$t->content_like(qr{href="/import\?url=}, 'Phase 1: back_url is self-link to unfiltered import');
+
+	# Phase 2: import with back2 (pie drill-down) shows 3-level breadcrumb:
+	# Home > <table name> > Back to pie chart.
+	$t->get_ok('/import?url='       . url_escape($import_url)
+	         . '&f='                . url_escape('result:eq:PASS')
+	         . '&back2='            . url_escape($pie_back)
+	         . '&back2_label='      . url_escape('Back to pie chart'))
+	  ->status_is(200, 'Phase 2: drill-down import renders 200');
+	$t->content_like(qr/Back to pie chart/, 'Phase 2: breadcrumb shows Back to pie chart');
+	$t->content_like(qr/<a [^>]*>Back to pie chart<\/a>/,
+	                    'Phase 2: Back to pie chart is a rendered anchor link');
+};
+
 done_testing();

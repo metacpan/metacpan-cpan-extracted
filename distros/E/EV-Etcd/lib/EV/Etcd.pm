@@ -4,21 +4,25 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use EV ();
 require XSLoader;
 XSLoader::load('EV::Etcd', $VERSION);
 
-# Save reference to XS txn before we override it
+# A cloned ithread would DESTROY the same C structs a second time
+sub CLONE_SKIP { 1 }
+{
+    no strict 'refs';
+    *{"EV::Etcd::${_}::CLONE_SKIP"} = \&CLONE_SKIP for qw(Watch Keepalive Observe);
+}
+
 my $_xs_txn = \&txn;
 
-# Wrapper for txn to accept named parameters
 no warnings 'redefine';
 *txn = sub {
     my $self = shift;
 
-    # Positional fast-path: (\@compare, \@success, \@failure, $cb)
     if (@_ == 4
         && ref($_[0]) eq 'ARRAY'
         && ref($_[1]) eq 'ARRAY'
@@ -27,7 +31,6 @@ no warnings 'redefine';
         return $_xs_txn->($self, @_);
     }
 
-    # Extract trailing bare coderef only if arg count is odd
     my $callback;
     if (@_ % 2 == 1 && ref($_[-1]) eq 'CODE') {
         $callback = pop;
@@ -53,8 +56,6 @@ use warnings 'redefine';
 1;
 
 __END__
-
-=encoding utf8
 
 =head1 NAME
 
@@ -113,12 +114,27 @@ Options:
 =item endpoints
 
 ArrayRef of etcd endpoints (host:port). Optional; defaults to
-C<['127.0.0.1:2379']>. When more than one is provided, the client uses the
-first endpoint and rotates to subsequent endpoints on connection failure.
+C<['127.0.0.1:2379']>. An endpoint may carry an C<http://> or C<https://>
+scheme, as etcd prints its client URLs; C<https://> turns on C<tls>.
+When more than one is provided, the client starts on
+the first and moves to the next when its current endpoint cannot be
+reached: a unary call fails with UNAVAILABLE, or with DEADLINE_EXCEEDED
+before a connection was established, or a streaming call has to reconnect
+because its connection is down. An endpoint that stops answering on an open
+connection is found by the keepalive pings (see C<keepalive_time>). The call
+that hit the dead endpoint still reports its error; retrying it reaches the
+next endpoint. Several calls failing on the same endpoint move the client
+only once. etcd also answers UNAVAILABLE from a member that has lost its
+leader, which moves the client on as well.
+
+An endpoint may also be a gRPC target listing several IP addresses, such as
+C<ipv4:10.0.0.1:2379,10.0.0.2:2379>; gRPC then fails over between them
+within one connection, so a refused address does not fail any call.
 
 =item timeout
 
-RPC timeout in seconds. Default is 30 seconds. Minimum value is 1 second.
+RPC timeout in whole seconds. Default is 30 seconds. Minimum value is 1
+second.
 
 =item max_retries
 
@@ -126,17 +142,38 @@ Maximum number of reconnection attempts for streaming operations (watch,
 lease_keepalive, election_observe) after a connection failure. Default is 3.
 Set to 0 to disable automatic reconnection.
 
+=item keepalive_time
+
+Seconds between keepalive pings while calls or streams are open; fractions
+are allowed. Default is 10; 0 disables the pings. An endpoint that leaves a
+ping unanswered for C<keepalive_timeout> has its connection closed, which
+fails the calls on it with UNAVAILABLE and moves a client with several
+endpoints to the next one. Without pings, an endpoint that stops answering
+on an open connection (a hung host, a silent partition) goes unnoticed until
+the operating system gives up on the connection. etcd answers pings more
+frequent than its C<--grpc-keepalive-min-time> (default 5 seconds) by
+closing the connection.
+
+=item keepalive_timeout
+
+Seconds to wait for a keepalive ping reply. Default is 10.
+
 =item health_interval
 
-Interval in seconds for health monitoring. Default is 0 (disabled).
-When enabled, the client periodically checks the gRPC channel connectivity
-state and calls the on_health_change callback when the connection state changes.
+Interval in seconds for health monitoring; fractions are allowed. Default is
+0 (disabled). When enabled, the client periodically checks the gRPC channel
+connectivity state, without sending a request, and calls the on_health_change
+callback when the connection state changes. Only a failed connection attempt
+counts as unhealthy; a connection that is idle or still being opened counts
+as healthy. With several endpoints, a change to unhealthy also moves the
+client to the next endpoint.
 
 =item on_health_change
 
 Callback called when the connection health status changes. Receives two
 arguments: a boolean indicating health status (1=healthy, 0=unhealthy) and
-the current endpoint string.
+the endpoint that was checked. Switching endpoints after a failed call is
+not reported.
 
     my $client = EV::Etcd->new(
         endpoints => ['127.0.0.1:2379'],
@@ -158,6 +195,40 @@ token from a previous session.
         auth_token => $saved_token,
     );
 
+=item tls
+
+Connect with TLS. Default is off; any of the other C<tls_*> options and an
+C<https://> endpoint turn it on. Without C<tls_ca_file>, gRPC's default
+root certificates are used; the C<GRPC_DEFAULT_SSL_ROOTS_FILE_PATH>
+environment variable can point gRPC at a PEM bundle instead.
+
+    my $client = EV::Etcd->new(
+        endpoints     => ['https://10.0.0.1:2379', 'https://10.0.0.2:2379'],
+        tls_ca_file   => '/etc/etcd/ca.crt',
+        tls_cert_file => '/etc/etcd/client.crt',
+        tls_key_file  => '/etc/etcd/client.key',
+    );
+
+=item tls_ca_file
+
+PEM file with the CA certificates that signed the etcd server certificates
+(etcd's C<--trusted-ca-file>). Replaces the default roots. Verification
+cannot be switched off; for a self-signed server, give its certificate
+here.
+
+=item tls_cert_file
+
+=item tls_key_file
+
+PEM client certificate and private key, for servers started with
+C<--client-cert-auth>. Both must be given together.
+
+=item tls_server_name
+
+Name to verify the server certificate against, and to send as SNI, in place
+of the endpoint's host: for connecting by an address the certificate does
+not list.
+
 =back
 
 =head1 ENCODING
@@ -166,8 +237,8 @@ Keys and values are stored by etcd as raw bytes; this module does not perform
 any character encoding. If you pass a Perl string with the UTF-8 flag set
 (e.g. a literal containing non-ASCII characters under C<use utf8>), the UTF-8
 byte representation is what gets stored. Values returned by C<get> are byte
-strings without the UTF-8 flag — string-equality with the original literal
-will fail unless you decode explicitly.
+strings without the UTF-8 flag, so string-equality with the original literal
+fails unless you decode explicitly.
 
 For character data, encode/decode at the boundary using L<Encode>:
 
@@ -194,18 +265,21 @@ Errors are returned as hash references with the following structure:
 The C<retryable> field indicates whether the error is transient (status codes:
 UNAVAILABLE, RESOURCE_EXHAUSTED, ABORTED, DEADLINE_EXCEEDED).
 Streaming operations (watch, keepalive, observe) automatically reconnect
-with linear backoff whenever the stream ends for any reason other than an
-explicit cancel — connection loss, server restart, graceful close — up to
+with linear backoff whenever the stream ends (connection loss, server
+restart, graceful close) for any reason other than an explicit cancel, up to
 C<max_retries> attempts (the attempt counter resets as the stream makes
 progress). The error callback fires once reconnection is disabled or
-exhausted. Errors the server sends I<on> the stream — a watch cancelled or
-compacted away, an expired lease — are reported immediately and do not
+exhausted. Errors the server sends I<on> the stream (a watch cancelled or
+compacted away, an expired lease) are reported immediately and do not
 reconnect. A fully silent network partition (no FIN/RST reaching the
-client) is indistinguishable from an idle stream: no gRPC keepalive pings
-are configured, so such an outage surfaces only once connectivity returns
-or the OS abandons the connection. Unary RPCs (get, put, delete, etc.) do
+client) is found by the keepalive pings within C<keepalive_time> plus
+C<keepalive_timeout> while calls or streams are open; with the pings
+disabled it surfaces only once connectivity returns or the OS abandons the
+connection. Unary RPCs (get, put, delete, etc.) do
 not retry automatically; use the C<retryable> field to implement
-application-level retry logic.
+application-level retry logic. With several endpoints, both reconnects and
+retries go to the next endpoint once the current one has failed (see
+C<endpoints> under L</new>).
 
 =head1 CALLBACK LIFETIMES
 
@@ -332,7 +406,7 @@ C<mod_revision>, C<version>, C<lease>).
 
 =item count
 
-Total number of keys matched (may exceed C<scalar @{$resp->{kvs}}> when
+Total number of keys matched (may exceed C<< scalar @{$resp->{kvs}} >> when
 C<limit> is in effect).
 
 =item more
@@ -411,8 +485,8 @@ Cluster response header.
 =back
 
 Server-side cancellation (including compaction-induced) is delivered through
-the I<error> callback path, not as a success response — C<$err->{source}>
-will be C<"watch"> and C<$err->{message}> will contain the server's reason
+the I<error> callback path, not as a success response: C<< $err->{source} >>
+will be C<"watch"> and C<< $err->{message} >> will contain the server's reason
 (typically including the compact revision when relevant).
 
 Options:
@@ -612,7 +686,7 @@ Standard response header.
     $client->lease_leases($callback);
 
 List all active leases. The callback receives C<($response, $error)>.
-Response keys: C<header>, and C<leases> — an array of hashrefs each with an
+Response keys: C<header>, and C<leases>, an array of hashrefs each with an
 C<id> key.
 
 =head1 LOCK SERVICE
@@ -1216,7 +1290,7 @@ Standard response header.
 Compact the key-value store up to the given revision. All revisions older
 than C<$revision> are discarded.
 
-B<Warning>: compaction is irreversible — historical reads of older revisions
+B<Warning>: compaction is irreversible; historical reads of older revisions
 fail after the compact completes.
 
 Options:
@@ -1545,7 +1619,7 @@ Example:
                 return;
             }
             say "Elected as leader!";
-            my $leader = $resp->{leader};   # hashref — pass to proclaim/resign
+            my $leader = $resp->{leader};   # hashref: pass to proclaim/resign
         });
     });
 
@@ -1609,7 +1683,8 @@ Arguments:
 
 =item leader
 
-The leader hashref returned in C<< $resp->{leader} >> from C<election_campaign>.
+The leader hashref returned in C<< $resp->{leader} >> from
+C<election_campaign>.
 
 =item value
 
@@ -1640,7 +1715,8 @@ Arguments:
 
 =item leader
 
-The leader hashref returned in C<< $resp->{leader} >> from C<election_campaign>.
+The leader hashref returned in C<< $resp->{leader} >> from
+C<election_campaign>.
 
 =item callback
 
@@ -1747,7 +1823,7 @@ Options:
 =item linearizable
 
 If true, perform a linearizable (strongly consistent) read. Default is 0
-(serializable read — faster but may be slightly stale).
+(serializable read: faster, but may be slightly stale).
 
 =back
 
@@ -1885,8 +1961,9 @@ The optional C<result> field controls the comparison operator (default: C<=>):
     result => '<'    # LESS
     result => '>'    # GREATER
 
-Note: Specify exactly one target field (value/version/create_revision/mod_revision/lease)
-per compare operation. If multiple are provided, the last one processed takes precedence.
+Note: Specify exactly one target field (value, version, create_revision,
+mod_revision or lease) per compare operation. If multiple are provided, the
+last one processed takes precedence.
 
 Request operations (for success/failure):
 
@@ -1918,11 +1995,25 @@ Example:
 
 =head1 CAVEATS
 
-B<Fork safety:> EV::Etcd clients must not be used after C<fork()>.
-The background gRPC thread does not survive into the child process.
-Inherited client objects will be safely cleaned up on destruction
-(with a warning), but cannot perform any operations.
-Create a new client in the child process if needed.
+B<Fork safety:> gRPC's threads do not survive C<fork()>. EV::Etcd starts
+gRPC with the first client and shuts it down when the last one is
+destroyed, so a process that holds no client when it forks, including one
+that only loaded the module or used a client and dropped it, leaves the
+child free to create its own clients. Newer gRPC releases finish shutting
+down on their own threads after the last client is gone, within milliseconds
+on Linux; the first C<fork()> after that waits for them, for at most two
+seconds. On macOS gRPC does not shut down promptly, so EV::Etcd leaves it
+running once started, and a child of a process that has used EV::Etcd
+croaks in C<new>. If the parent holds a client when it
+forks, the child cannot use etcd at all: C<new> croaks there, and so does
+any call on an inherited client or stream handle, because gRPC activity in
+the child can break the parent's connections. Inherited clients are inert
+in the child: their timers and watchers are stopped at the fork, so they
+neither fire nor keep the child's event loop running. Destroying one in the
+child only frees its Perl-side resources (with a warning). In a server that
+forks workers, create clients in the workers, or drop the master's clients
+before it forks. A child forked from inside an EV::Etcd callback must exec
+or exit rather than return from that callback.
 
 =head1 AUTHOR
 

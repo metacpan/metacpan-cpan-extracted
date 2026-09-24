@@ -4,7 +4,6 @@ use warnings;
 use lib 'blib/lib', 'blib/arch';
 use Test::More;
 
-# Skip if EV not available
 BEGIN {
     eval { require EV };
     plan skip_all => 'EV required' if $@;
@@ -13,7 +12,6 @@ BEGIN {
 use EV;
 use EV::Etcd;
 
-# Check if etcd is available
 my $etcd_available = 0;
 eval {
     my $client = EV::Etcd->new(
@@ -31,18 +29,16 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-plan tests => 8;
+plan tests => 19;
 
 my $test_prefix = "/test-cleanup-$$-" . time();
 
-# Test 1-2: Client DESTROY without pending operations
 {
     my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
     ok($client, 'created client for DESTROY test');
 }
 pass('client DESTROY completed without crash');
 
-# Test 3-4: Client DESTROY with completed operation
 {
     my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
     my $done = 0;
@@ -56,7 +52,6 @@ pass('client DESTROY completed without crash');
 }
 pass('client DESTROY after operation completed without crash');
 
-# Test 5-6: Watch DESTROY without explicit cancel
 {
     my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
     my $watch_created = 0;
@@ -73,22 +68,84 @@ pass('client DESTROY after operation completed without crash');
     EV::run;
 
     ok($watch_created, 'watch created before letting it go out of scope');
-    # Let $watch go out of scope without calling cancel()
 }
 pass('watch DESTROY without explicit cancel completed without crash');
 
-# Test 7-8: Multiple clients created and destroyed
 {
     my @clients;
     for my $i (1..5) {
         push @clients, EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
     }
     ok(scalar(@clients) == 5, 'created 5 clients');
-    # Let all clients go out of scope at once
 }
 pass('multiple clients DESTROY completed without crash');
 
-# Cleanup
+# Explicit DESTROY, then the implicit one at scope exit: the second must be a
+# no-op, or the gRPC client count drops twice and the next client skips grpc_init
+{
+    my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
+    $client->DESTROY;
+    eval { $client->put("$test_prefix/x", 'v', sub {}) };
+    like($@, qr/already destroyed/, 'method on an explicitly destroyed client croaks');
+}
+{
+    my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
+    my $err = 'no callback';
+    $client->put("$test_prefix/after", 'v', sub { $err = $_[1]; EV::break });
+    my $t = EV::timer(3, 0, sub { EV::break });
+    EV::run;
+    is($err, undef, 'client after a double DESTROY works');
+}
+pass('double DESTROY completed without crash');
+
+# Client dropped in callback after nested EV::run must not clear in_callback early
+{
+    my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
+    my $nested_done = 0;
+    $client->get("$test_prefix/nested-1", sub {
+        $client->get("$test_prefix/nested-2", sub {
+            $nested_done = 1;
+            EV::break;
+        });
+        EV::run;
+        undef $client;
+    });
+    EV::run;
+    ok($nested_done, 'nested get completed');
+}
+pass('client dropped after nested EV::run in callback completed without crash');
+
+{
+    my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
+    my $w = $client->watch("$test_prefix/w", sub {});
+    undef $client;
+    $w->DESTROY;
+    $w->DESTROY;
+    eval { $w->cancel(sub {}); };
+    like($@, qr/already destroyed/, 'watch cancel after DESTROY throws error');
+}
+pass('watch double DESTROY completed without crash');
+{
+    my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
+    my $k = $client->lease_keepalive(1, sub {});
+    undef $client;
+    $k->DESTROY;
+    $k->DESTROY;
+    eval { $k->cancel(sub {}); };
+    like($@, qr/already destroyed/, 'keepalive cancel after DESTROY throws error');
+}
+pass('keepalive double DESTROY completed without crash');
+{
+    my $client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
+    my $o = $client->election_observe("test-lead", sub {});
+    undef $client;
+    $o->DESTROY;
+    $o->DESTROY;
+    eval { $o->cancel(sub {}); };
+    like($@, qr/already destroyed/, 'observe cancel after DESTROY throws error');
+}
+pass('observe double DESTROY completed without crash');
+
 my $cleanup_client = EV::Etcd->new(endpoints => ['127.0.0.1:2379']);
 $cleanup_client->delete("$test_prefix/", { prefix => 1 }, sub {
     diag("Cleanup completed");

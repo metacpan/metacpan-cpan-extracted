@@ -10,7 +10,10 @@ t/manifest.t
 t/mungers.t
 t/mungers-datetime-fast.t
 t/mungers-datetime-strptime.t
+t/mmdb/GeoLite2-Country-Test.mmdb
+t/mmdb/README.md
 t/mungers-eps.t
+t/mungers-geoip-country.t
 t/mungers-plan.t
 t/pod-coverage.t
 t/pod.t

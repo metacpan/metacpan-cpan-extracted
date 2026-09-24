@@ -1,8 +1,14 @@
 Revision history for Hyperman
 
+0.53	2026-09-24
+        - FIX: max_requests_per_worker was only tested on the HTTP/1 path, so
+          a worker serving HTTP/2 or HTTP/3 counted its requests and never
+          retired. A pool whose clients are browsers never recycled at all.
+        - t/54 covers the recycle over HTTP/1.1, HTTP/2 and HTTP/3.
+
 0.52	2026-09-22
         - FIX: an alarm() already pending when run() is called is carried, not
-          cancelled. 
+          cancelled.
         - The USR1 dump is written in one piece. Read while it was being
           written, its three writes could show an aggregate line with no worker
           rows under it.

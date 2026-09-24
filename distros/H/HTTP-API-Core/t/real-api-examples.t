@@ -14,15 +14,17 @@ subtest github => sub {
         transport => sub {
             my ($method, $url, $opts) = @_;
             push @calls, [$method, $url, $opts];
-            my $content = $url =~ /page=1(?:&|$)/
-                ? '[{"full_name":"example/one"},{"full_name":"example/two"}]'
-                : '[]';
+            my $second = $url =~ /(?:[?&])page=2(?:&|$)/;
+            my $content = $second
+                ? '[{"full_name":"example/three"}]'
+                : '[{"full_name":"example/one"},{"full_name":"example/two"}]';
             return {
                 status  => 200,
                 headers => {
                     'Content-Type'          => 'application/json',
                     'X-RateLimit-Limit'     => '5000',
                     'X-RateLimit-Remaining' => '4999',
+                    'Link' => $second ? '' : '<https://api.github.com/user/repos?page=2&per_page=2>; rel="next", <https://api.github.com/user/repos?page=2&per_page=2>; rel="last"',
                 },
                 content => $content,
             };
@@ -31,9 +33,12 @@ subtest github => sub {
 
     my @repos = $client->repositories_pager(per_page => 2)->all;
     is_deeply [map { $_->{full_name} } @repos],
-        ['example/one', 'example/two'], 'reads a top-level array across pages';
-    like $calls[0][1], qr{/user/repos\?page=1&per_page=2},
-        'uses GitHub page parameters';
+        ['example/one', 'example/two', 'example/three'], 'follows GitHub Link pagination';
+    like $calls[0][1], qr{/user/repos\?per_page=2},
+        'uses GitHub per_page parameter';
+    is $calls[1][1], 'https://api.github.com/user/repos?page=2&per_page=2',
+        'follows the exact GitHub rel=next URL';
+    is scalar(@calls), 2, 'stops when GitHub omits rel=next';
     is $calls[0][2]{headers}{Authorization}, 'Bearer github-token',
         'sends GitHub bearer token';
 };
