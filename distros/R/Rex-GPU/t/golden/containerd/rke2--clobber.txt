@@ -1,0 +1,16 @@
+# golden: containerd/rke2--clobber
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+can_run: nvidia-container-runtime
+run: cat /var/lib/rancher/rke2/agent/etc/containerd/config.toml.tmpl 2>/dev/null
+run: rm -f /var/lib/rancher/rke2/agent/etc/containerd/config.toml.tmpl
+file: /var/lib/rancher/rke2/agent/etc/containerd/config-v3.toml.d ensure=directory
+file: /var/lib/rancher/rke2/agent/etc/containerd/config-v3.toml.d/99-nvidia.toml
+  | version = 3
+  | 
+  | [plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.'nvidia']
+  |   runtime_type = "io.containerd.runc.v2"
+  | 
+  | [plugins.'io.containerd.cri.v1.runtime'.containerd.runtimes.'nvidia'.options]
+  |   BinaryName = "/usr/bin/nvidia-container-runtime"
+  |   SystemdCgroup = true

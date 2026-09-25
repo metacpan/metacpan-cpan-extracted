@@ -26,7 +26,7 @@ our @EXPORT_OK = qw(
   to_snake_case
 );
 
-our $VERSION = '2.2.2';
+our $VERSION = '2.2.3';
 
 sub toPascalCase { goto &_toCamelCase; }
 sub ToCamelCase  { goto &_toCamelCase; }
@@ -266,7 +266,7 @@ file or an open file handle.
 
 =head1 VERSION
 
-This documentation referes to version 2.2.2
+This documentation referes to version 2.2.3
 
 =head1 LICENSE AND COPYRIGHT
 

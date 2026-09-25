@@ -57,6 +57,11 @@ sub new {
     my $uri = URI->new( "http://" . $r->hostname . $r->unparsed_uri );
     $env->{PATH_INFO} = uri_unescape( $uri->path );
 
+    # Access control is decided on the URI httpd routed on ($r->uri, decoded
+    # and normalized), not on PATH_INFO, which is rebuilt here from the raw
+    # unparsed URI and where dot segments survive
+    $env->{ACCESS_CONTROL_URI} = $uri_full;
+
     my $self = Lemonldap::NG::Common::PSGI::Request->new($env);
     bless $self, $class;
     return $self;

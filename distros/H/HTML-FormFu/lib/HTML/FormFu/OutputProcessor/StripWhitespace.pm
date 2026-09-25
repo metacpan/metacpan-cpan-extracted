@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::OutputProcessor::StripWhitespace;
-$HTML::FormFu::OutputProcessor::StripWhitespace::VERSION = '2.07';
+$HTML::FormFu::OutputProcessor::StripWhitespace::VERSION = '2.09';
 # ABSTRACT: Strip shitespace from HTML output
 
 use Moose;
@@ -126,7 +126,7 @@ __PACKAGE__->meta->make_immutable;
 use strict;
 
 package HTML::FormFu::OutputProcessor::StripWhitespace::_iter;
-$HTML::FormFu::OutputProcessor::StripWhitespace::_iter::VERSION = '2.07';
+$HTML::FormFu::OutputProcessor::StripWhitespace::_iter::VERSION = '2.09';
 use Moose;
 use MooseX::Attribute::Chained;
 
@@ -180,7 +180,7 @@ HTML::FormFu::OutputProcessor::StripWhitespace - Strip shitespace from HTML outp
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -215,7 +215,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

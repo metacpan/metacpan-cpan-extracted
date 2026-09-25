@@ -15,6 +15,7 @@ use Digest::SHA qw/sha1 hmac_sha256_base64 sha256 sha384 sha512 sha256_base64/;
 use JSON;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::OpenIDConnect::Constants;
+use Lemonldap::NG::Common::Session 'id2storage';
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::JWT
   qw(getAccessTokenSessionId getJWTPayload getJWTHeader getJWTSignature getJWTSignedData);
@@ -28,7 +29,7 @@ use URI::QueryParam;
 use Lemonldap::NG::Portal::Main::Constants
   qw(PE_OK PE_REDIRECT PE_ERROR portalConsts);
 
-our $VERSION = '2.23.1';
+our $VERSION = '2.23.4';
 
 use constant oidcErrorLevel => {
     server_error     => 'error',
@@ -682,12 +683,32 @@ sub sendFragmentResponse {
     return $self->_redirectToUrl( $req, $response_uri );
 }
 
+# Add parameters to the query string of an URI object
+#
+# URI::QueryParam::query_param() silently drops the existing query string
+# when it does not contain any "=" (URI treats it as an "isindex" query).
+# Keep such parameters, they are part of the registered redirect URI (#3707)
+# @param uri URI object, modified in place
+# @param response_params Hashref of parameters to add
+sub _addQueryParams {
+    my ( $self, $uri, $response_params ) = @_;
+
+    my $query = $uri->query;
+    if ( defined $query and length $query and $query !~ /=/ ) {
+        $uri->query( $query . '&' . build_urlencoded(%$response_params) );
+    }
+    else {
+        $uri->query_param( $_, $response_params->{$_} )
+          for ( keys %$response_params );
+    }
+
+    return $uri;
+}
+
 sub getQueryResponse {
     my ( $self, $redirect_uri, $response_params ) = @_;
     my $uri = URI->new($redirect_uri);
-    for ( keys %$response_params ) {
-        $uri->query_param( $_, $response_params->{$_} );
-    }
+    $self->_addQueryParams( $uri, $response_params );
     return $uri;
 }
 
@@ -698,9 +719,7 @@ sub getFragmentResponse {
    # Use a temporary URL so we can use QueryParam features to build the fragment
     my $tmp = URI->new;
     $tmp->query( $uri->fragment );
-    for ( keys %$response_params ) {
-        $tmp->query_param( $_, $response_params->{$_} );
-    }
+    $self->_addQueryParams( $tmp, $response_params );
 
     $uri->fragment( $tmp->query );
 
@@ -1742,7 +1761,7 @@ sub decodeJWT {
                 "Cannot verify $alg signature: no JWKS data found");
             return;
         }
-        unless ($jwks->{keys}
+        unless ( $jwks->{keys}
             and ref( $jwks->{keys} ) eq 'ARRAY'
             and @{ $jwks->{keys} } )
         {
@@ -2020,8 +2039,33 @@ sub checkEndPointAuthenticationCredentials {
 
     # Check client_secret
     if ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsPublic} ) {
-        $self->logger->debug(
-            "Relying Party $rp is public, do not check client secret");
+
+        # A public client is only authenticated by the client secret
+        # registered for it: else endpoints must not consider it as such. A
+        # wrong secret is rejected, but a secret given to a public client
+        # without registered secret is ignored, as before. JWS methods
+        # (client_secret_jwt, private_key_jwt) are kept: their signature was
+        # already verified by getEndPointAuthenticationCredentials
+        if ( $method =~ /^client_secret_(?:basic|post)$/ ) {
+            my $secret =
+              $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientSecret}
+              // '';
+            if ( !length $secret ) {
+                $self->logger->debug( "Relying Party $rp is public without"
+                      . " client secret, given secret is ignored" )
+                  if length( $client_secret // '' );
+                $method = 'none';
+            }
+            elsif ( !length( $client_secret // '' ) ) {
+                $self->logger->debug(
+                    "Relying Party $rp is public, no client secret given");
+                $method = 'none';
+            }
+            elsif ( $client_secret ne $secret ) {
+                $self->logger->error("Wrong credentials for $rp");
+                return undef;
+            }
+        }
     }
     else {
         if ( $method eq "none" ) {
@@ -3013,9 +3057,17 @@ sub generateNonce {
 
 sub getSidFromSession {
     my ( $self, $rp, $sessionInfo ) = @_;
-    return $sessionInfo->{_oidc_sid}
-      || Digest::SHA::hmac_sha256_base64(
-        $sessionInfo->{_session_id} . ':' . $rp );
+    return $sessionInfo->{_oidc_sid} if $sessionInfo->{_oidc_sid};
+
+    # sid is computed from the storage ID: it is the only one available when
+    # the session is read by its storage ID (GlobalLogout, SingleSession)
+    my $storageId = $sessionInfo->{_session_storage_id};
+    unless ( defined $storageId ) {
+        $storageId = $sessionInfo->{_session_id};
+        $storageId = id2storage($storageId)
+          if $self->conf->{hashedSessionStore};
+    }
+    return Digest::SHA::hmac_sha256_base64( $storageId . ':' . $rp );
 }
 
 sub decryptJwt {

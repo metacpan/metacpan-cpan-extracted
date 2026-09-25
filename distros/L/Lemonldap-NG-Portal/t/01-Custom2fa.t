@@ -347,7 +347,7 @@ subtest "Delete 2FA" => sub {
         ),
         'Post delete 2FA with missing epoch param'
     );
-    expectReject( $res, 400, 'test2f: "epoch" parameter is missing' );
+    expectReject( $res, 400, 'PE24' );
 
     # Testing sucessful delete of device
     ok(

@@ -11,16 +11,11 @@ my $MSGS     = $ENV{STRESS_MSGS}     || 2_000;
 my $WORKERS  = $ENV{STRESS_WORKERS}  || 4;
 my $CLIENTS  = $ENV{STRESS_CLIENTS}  || 4;
 my $CANCEL   = $ENV{STRESS_CANCEL}   || 20;
-# Generous client-side per-request timeout: an oversubscribed CI runner (2 cores
-# under `prove -j2` plus this test's forked workers/clients) can deschedule a
-# client for seconds, so a tight cap fails spuriously though the work is correct.
+# An oversubscribed CI runner can deschedule a client for seconds.
 my $CTMO     = $ENV{STRESS_TIMEOUT}  || 30;
 
 diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CANCEL, ctmo ${CTMO}s";
 
-# ============================================================
-# 1. MPMC Int: N clients, M workers, full round-trip
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared::Int->new($path, 4096, 256);
@@ -79,9 +74,6 @@ diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every 
     $srv->unlink;
 }
 
-# ============================================================
-# 2. Lock-free contention: many producers, one consumer
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared::Int->new($path, 4096, 256);
@@ -99,7 +91,6 @@ diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every 
         push @ppids, $pid;
     }
 
-    # single server
     my $t0 = time;
     my $total = $CLIENTS * $MSGS;
     my $processed = 0;
@@ -119,9 +110,6 @@ diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every 
     $srv->unlink;
 }
 
-# ============================================================
-# 3. Variable values: verify no corruption under concurrency
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared::Int->new($path, 1024, 64);
@@ -148,12 +136,9 @@ diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every 
     $srv->unlink;
 }
 
-# ============================================================
-# 4. Slot exhaustion under load: resp_slots < concurrent clients
-# ============================================================
 {
     my $path = tmpnam();
-    my $srv = Data::ReqRep::Shared::Int->new($path, 1024, 8);  # only 8 slots
+    my $srv = Data::ReqRep::Shared::Int->new($path, 1024, 8);
 
     my $spid = fork // die "fork: $!";
     if ($spid == 0) {
@@ -163,7 +148,6 @@ diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every 
         exit 0;
     }
 
-    # 4 clients with 8 slots = contention on slots
     my @cpids;
     for my $c (1..4) {
         my $pid = fork // die "fork: $!";

@@ -1,3 +1,30 @@
+Thu Sep 24 16:11:55 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.2.3]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.2.3.md: new
+	* README.md: generated
+	* VERSION: bump
+	* .includes/bootstrap.mk: added by CPAN::Maker::Bootsrapper
+	* .includes/perl.mk: updated by CPAN::Maker::Bootsrapper
+	* .includes/update.mk: likewise
+	* Makefile: likewise
+	* builder: likewise
+	* buildspec.yml: removed -provides: section (unnecessary)
+	* cpanfile: Role::Tiny 2.002005
+	* lib/CLI/Simple.pm.in
+	(new)
+	- initialize help sections from default
+	(_pod_has_section): new
+	(_get_help_sections): new
+	(usage)
+	- set sections dynamically
+	* lib/CLI/Simple/Constants.pm.in
+	(@DEFAULT_HELP_SECTION): new
+	* t/04-cli-simple-help.t
+	- new tests for pod sections (synopsis vs usage)
+	* test-requires: Role::Tiny 2.002005
+
 Tue Aug 18 10:39:25 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.2.2]:

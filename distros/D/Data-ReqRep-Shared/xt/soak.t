@@ -9,11 +9,6 @@ use Data::ReqRep::Shared::Client;
 use Data::ReqRep::Shared::Int;
 use Data::ReqRep::Shared::Int::Client;
 
-# Clients and workers contend for a small slot pool while one of them is
-# SIGKILLed every second and every twentieth request is cancelled. No client may
-# get a reply meant for another request, and once everyone is gone every slot
-# must be recoverable. SOAK_DURATION=N runs it for N seconds.
-
 plan skip_all => 'Linux only' unless $^O eq 'linux';
 
 my $duration = $ENV{SOAK_DURATION} || ($ENV{AUTHOR_TESTING} ? 15 : 5);

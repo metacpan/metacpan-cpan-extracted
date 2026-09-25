@@ -59,6 +59,7 @@ t/51-Lemonldap-NG-Handler-Zimbra.t
 t/60-Lemonldap-NG-Handler-PSGI-unprotected.t
 t/60-Lemonldap-NG-Handler-PSGI.t
 t/61-Lemonldap-NG-Handler-PSGI-Server.t
+t/62-Lemonldap-NG-Handler-Apache.t
 t/62-Lemonldap-NG-Handler-Nginx.t
 t/62-Lemonldap-NG-Handler-Traefik.t
 t/63-Lemonldap-NG-Handler-PSGI-Try.t
@@ -76,6 +77,7 @@ t/68-Lemonldap-NG-Handler-PSGI-Zimbra.t
 t/69-Lemonldap-NG-Handler-PSGI-SecureToken.t
 t/70-Lemonldap-NG-Handler-PSGI-AuthBasic.t
 t/71-Lemonldap-NG-Handler-PSGI-OAuth2.t
+t/72-Lemonldap-NG-Handler-canonicalUri.t
 t/99-pod.t
 t/custom.pm
 t/lmConf-1.json

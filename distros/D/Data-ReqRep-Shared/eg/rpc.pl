@@ -9,10 +9,9 @@ use File::Temp 'tmpnam';
 my $path = tmpnam();
 my $srv = Data::ReqRep::Shared->new($path, 256, 32, 4096);
 
-# RPC handlers
 my %handlers = (
-    add  => sub { my ($a, $b) = split /,/, $_[0]; $a + $b },
-    mul  => sub { my ($a, $b) = split /,/, $_[0]; $a * $b },
+    add  => sub { my ($x, $y) = split /,/, $_[0]; $x + $y },
+    mul  => sub { my ($x, $y) = split /,/, $_[0]; $x * $y },
     echo => sub { $_[0] },
     rev  => sub { scalar reverse $_[0] },
     time => sub { time() },
@@ -20,7 +19,6 @@ my %handlers = (
 
 my $pid = fork // die "fork: $!";
 if ($pid == 0) {
-    # Server: dispatch on "op:args" format
     while (my ($req, $id) = $srv->recv_wait(5.0)) {
         my ($op, $args) = split /:/, $req, 2;
         $args //= '';

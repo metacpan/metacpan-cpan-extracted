@@ -446,15 +446,44 @@ exit 0;
 sub load_extension {
     my ($file) = @_;
 
+    my $ext;
     if ( $file =~ /\.json$/i ) {
-        return load_json_extension($file);
+        $ext = load_json_extension($file);
     }
     elsif ( $file =~ /\.pm$/i ) {
-        return load_perl_extension($file);
+        $ext = load_perl_extension($file);
     }
     else {
         warn "Unknown extension file type: $file\n";
         return {};
+    }
+    compile_attribute_tests( $ext->{attributes}, $file );
+    return $ext;
+}
+
+# Manager::Conf::Parser::_execTest() only accepts a Regexp ref, a code ref
+# or a hash ref for `test` / `keyTest`; a plain string makes it die at
+# configuration save time with:
+#   Malformed test for <attr>/<key>: only regexp ref or sub are accepted
+# JSON extensions cannot carry a qr// so they express those tests as
+# strings; compile them here (a .pm extension may also use a string).
+sub compile_attribute_tests {
+    my ( $attributes, $file ) = @_;
+    return unless ref $attributes eq 'HASH';
+
+    for my $name ( sort keys %$attributes ) {
+        my $attr = $attributes->{$name};
+        next unless ref $attr eq 'HASH';
+        for my $field (qw(test keyTest)) {
+            my $value = $attr->{$field};
+            next unless defined $value;
+            next if ref $value;    # already a Regexp / CODE / HASH ref
+            my $re = eval { qr/$value/ };
+            die "Error [$file]: $name: invalid regexp in '$field': $@"
+              if $@;
+            $attr->{$field} = $re;
+            verbose "  Compiled $name/$field as regexp\n";
+        }
     }
 }
 

@@ -17,10 +17,16 @@
 
 #include "XSParseInfix.h"
 
+#if HAVE_PERL_VERSION(5,45,3)
+#  define HAVE_UNDEF_AWARE_EQUALITY
+#endif
+
 enum Inop_Operator {
   INOP_CUSTOM,
   INOP_NUMBER,
+  INOP_NUMBER_UNDEF,
   INOP_STRING,
+  INOP_STRING_UNDEF,
 };
 
 static OP *pp_in(pTHX)
@@ -52,6 +58,24 @@ static OP *pp_in(pTHX)
       cmpop.op_flags = 0;
       cmpop.op_ppaddr = PL_ppaddr[OP_SEQ];
       break;
+
+#ifdef HAVE_UNDEF_AWARE_EQUALITY
+    case INOP_NUMBER_UNDEF:
+      cmpop.op_type = OP_EQU;
+      cmpop.op_flags = 0;
+      cmpop.op_ppaddr = PL_ppaddr[OP_EQU];
+      break;
+
+    case INOP_STRING_UNDEF:
+      cmpop.op_type = OP_SEQU;
+      cmpop.op_flags = 0;
+      cmpop.op_ppaddr = PL_ppaddr[OP_SEQU];
+      break;
+#else
+    case INOP_NUMBER_UNDEF:
+    case INOP_STRING_UNDEF:
+      croak("TODO: This perl cannot handle undef-aware equality");
+#endif
   }
 
   SV *lhs = *MARK;
@@ -92,14 +116,6 @@ static OP *pp_in(pTHX)
   RETURN;
 }
 
-#ifndef isIDCONT_utf8_safe
-/* It doesn't really matter that this is not "safe", because the function is
- * only ever called on perls new enough to have PL_infix_plugin, and in that
- * case they'll have the _safe version anyway
- */
-#  define isIDCONT_utf8_safe(s, e)  isIDCONT_utf8(s)
-#endif
-
 static void parse_in(pTHX_ U32 flags, SV **parsedata, void *hookdata)
 {
   bool using_circumfix = false;
@@ -131,6 +147,14 @@ static void parse_in(pTHX_ U32 flags, SV **parsedata, void *hookdata)
   else if(info->opcode == OP_SEQ) {
     av_push(parsedata_av, newSViv(INOP_STRING));
   }
+#ifdef HAVE_UNDEF_AWARE_EQUALITY
+  else if(info->opcode == OP_EQU) {
+    av_push(parsedata_av, newSViv(INOP_NUMBER_UNDEF));
+  }
+  else if(info->opcode == OP_SEQU) {
+    av_push(parsedata_av, newSViv(INOP_STRING_UNDEF));
+  }
+#endif
   else if(info->opcode == OP_CUSTOM) {
     if(info->hooks->new_op)
       croak("TODO: handle custom op using the new_op function for '%s'", info->opname);
@@ -163,7 +187,9 @@ static OP *newop_in(pTHX_ U32 flags, OP *lhs, OP *rhs, SV **parsedata, void *hoo
       break;
 
     case INOP_NUMBER:
+    case INOP_NUMBER_UNDEF:
     case INOP_STRING:
+    case INOP_STRING_UNDEF:
       ret = newBINOP_CUSTOM(&pp_in, 0, lhs, rhs);
       ret->op_private = operator;
       break;
@@ -219,7 +245,7 @@ struct XSParseInfixHooks infix_elem_num = {
 MODULE = Syntax::Operator::In    PACKAGE = Syntax::Operator::In
 
 BOOT:
-  boot_xs_parse_infix(0.44);
+  boot_xs_parse_infix(0.51);
 
   register_xs_parse_infix("Syntax::Operator::In::in", &infix_in, NULL);
 

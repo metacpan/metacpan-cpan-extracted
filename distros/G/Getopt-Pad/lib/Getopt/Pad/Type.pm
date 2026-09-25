@@ -9,7 +9,7 @@ use Object::Pad;
 use Getopt::Pad::Registry;
 use Getopt::Pad::Util qw(specError);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my @builtins = map { "Getopt::Pad::Type::$_" } qw(Flag Bool Counter String Int Float File Dir Url);
 my $registry;
@@ -61,6 +61,7 @@ class Getopt::Pad::Type :abstract {
 		$suffix =~ s/^=/:/ if $flags{optionalValue};
 		my $glSpec = $names . $suffix;
 		$glSpec .= '@' if $flags{multiple};
+		$glSpec .= '%' if $flags{hash};
 		return $glSpec;
 	}
 
@@ -69,6 +70,14 @@ class Getopt::Pad::Type :abstract {
 	}
 
 	method check($value) {
+		return undef;
+	}
+
+	# Runs once per parse on every scalar of an option's or arg's effective
+	# value, after the value pipeline, for types whose values need the
+	# world arranged (a path created on demand). Return a problem
+	# description without the option name, or undef.
+	method prepare($value) {
 		return undef;
 	}
 
@@ -147,9 +156,9 @@ Getopt::Pad::Type - option type base class and registry
 
 =head1 DESCRIPTION
 
-Abstract base class for option types and home of the type Registry. Subclass it, provide a NAMES constant and glSuffix, optionally check/coerce/label/constraintNotes and SPEC_KEYS, then call Getopt::Pad::Type::registerType with your class. Getopt::Pad::Type::takeFromSpec($spec, $defaultName, $owner) is how an option or arg spec gets its type: it resolves the spec's type name (or the default), takes that name and the type's SPEC_KEYS out of the spec hash, lets the type check those keys through the class method checkSpecKeys (a problem is reported as a spec error for $owner, e.g. "option 'retries'"), and returns the constructed type with the name it answered to, so the SPEC_KEYS handshake lives here and nowhere else.
+Abstract base class for option types and home of the type Registry. Subclass it, provide a NAMES constant and glSuffix, optionally check/coerce/prepare/label/constraintNotes and SPEC_KEYS, then call Getopt::Pad::Type::registerType with your class. Getopt::Pad::Type::takeFromSpec($spec, $defaultName, $owner) is how an option or arg spec gets its type: it resolves the spec's type name (or the default), takes that name and the type's SPEC_KEYS out of the spec hash, lets the type check those keys through the class method checkSpecKeys (a problem is reported as a spec error for $owner, e.g. "option 'retries'"), and returns the constructed type with the name it answered to, so the SPEC_KEYS handshake lives here and nowhere else.
 
-completes names the shell's own completion a value of the type gets when the user presses tab (C<files>, C<dirs> or undef); the path types use it. glSuffix is the Getopt::Long option-spec suffix the type contributes (C<''> plain flag, C<'!'> negatable, C<'+'> counter, C<'=s'> takes a value); value-taking types return C<'=s'> even for numbers and validate in check() so all errors speak with one voice. It is the only place Getopt::Long spelling enters a type: the base class derives takesValue and negatable from it and assembles the full option specification in glSpec, so overriding those is rarely useful. The full contract with a worked example is documented under "EXTENDING" in L<Getopt::Pad>.
+completes names the shell's own completion a value of the type gets when the user presses tab (C<files>, C<dirs> or undef); the path types use it. glSuffix is the Getopt::Long option-spec suffix the type contributes (C<''> plain flag, C<'!'> negatable, C<'+'> counter, C<'=s'> takes a value); value-taking types return C<'=s'> even for numbers and validate in check() so all errors speak with one voice. It is the only place Getopt::Long spelling enters a type: the base class derives takesValue and negatable from it and assembles the full option specification in glSpec (appending C<@> for a C<multiple> option and C<%> for a C<hash> option), so overriding those is rarely useful. The full contract with a worked example is documented under "EXTENDING" in L<Getopt::Pad>.
 
 The small built-in types live in this file: Flag (C<flag>) and its subclass Bool (C<!>) accept only JSON or YAML booleans, 1, 0 and C<''> and store 1 or 0; Counter (C<+>) accepts only non-negative integers; String (C<s>) accepts any single value. The built-ins with more behaviour (Int, Float, File, Dir, Url) have modules of their own.
 

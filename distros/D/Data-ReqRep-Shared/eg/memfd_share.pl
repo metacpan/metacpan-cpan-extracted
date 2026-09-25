@@ -11,7 +11,6 @@ print "memfd=$fd (no filesystem path)\n";
 
 my $pid = fork // die "fork: $!";
 if ($pid == 0) {
-    # Child: open channel from inherited fd
     my $cli = Data::ReqRep::Shared::Client->new_from_fd($fd);
     for my $i (1..5) {
         my $resp = $cli->req("hello from child ($i)");
@@ -20,7 +19,6 @@ if ($pid == 0) {
     exit 0;
 }
 
-# Parent: serve requests
 for (1..5) {
     my ($req, $id) = $srv->recv_wait(5.0);
     last unless defined $req;

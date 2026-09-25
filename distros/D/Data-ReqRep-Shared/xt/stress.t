@@ -10,26 +10,17 @@ use Data::ReqRep::Shared::Client;
 my $MSGS     = $ENV{STRESS_MSGS}     || 2_000;
 my $WORKERS  = $ENV{STRESS_WORKERS}  || 4;
 my $CLIENTS  = $ENV{STRESS_CLIENTS}  || 4;
-my $CANCEL   = $ENV{STRESS_CANCEL}   || 20;  # cancel every Nth request
-# Generous client-side per-request timeout: on an oversubscribed CI runner
-# (2 cores running `prove -j2` alongside this test's forked workers/clients) a
-# client process can be descheduled for several seconds, so a tight 5s cap
-# causes spurious failures even though the work completes correctly. Requests
-# are milliseconds normally; a request exceeding this genuinely indicates a stall.
+my $CANCEL   = $ENV{STRESS_CANCEL}   || 20;
+# An oversubscribed CI runner can deschedule a client process for several seconds.
 my $CTMO     = $ENV{STRESS_TIMEOUT}  || 30;
 
 diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CANCEL, ctmo ${CTMO}s";
 
-# ============================================================
-# 1. High-volume MPMC: N clients, M workers, full round-trip
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 4096, 256, 4096);
 
-    # spawn workers.  Idle timeout must exceed the client's per-request timeout:
-    # a worker that gives up first would starve still-running clients and cascade
-    # into spurious client timeouts.  The parent TERMs them once clients are done.
+    # Idle timeout must exceed the client's per-request timeout, or a worker gives up first.
     my @wpids;
     for my $w (1..$WORKERS) {
         my $pid = fork // die "fork: $!";
@@ -43,11 +34,11 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
         push @wpids, $pid;
     }
 
-    # spawn clients
     my @cpids;
     for my $c (1..$CLIENTS) {
         my $pid = fork // die "fork: $!";
         if ($pid == 0) {
+            local $SIG{__DIE__} = sub { print STDERR @_; exit 4 };
             my $cli = Data::ReqRep::Shared::Client->new($path);
             my ($ok, $wrong, $late) = (0, 0, 0);
             my $cancel_ok = 0;
@@ -60,10 +51,6 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
                     if    (!defined $resp)                       { $late++  }
                     elsif ($resp =~ /^w\d+:c${c}m${i}$/)         { $ok++    }
                     else {
-                        # Record what actually came back. A bare count cannot
-                        # distinguish a stale reply to this client's own earlier
-                        # request from another client's payload, and those have
-                        # different causes -- so keep the first one.
                         $wrong++;
                         if ( $wrong == 1 && open my $wfh, '>', "$path.wrong.$c" ) {
                             print $wfh "sent c${c}m$i got $resp\n";
@@ -72,15 +59,6 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
                     }
                 }
             }
-            # A WRONG answer (mismatched or cross-talked response) is always a bug.
-            # A missing one only means this process lost the CPU long enough to blow
-            # a 30s per-request timeout, which an oversubscribed runner does cause --
-            # report it separately so load cannot masquerade as a correctness failure.
-            #
-            # Exit 3, not 1: an uncaught die exits with $! when errno is non-zero,
-            # so a client dying while errno happened to be EPERM would otherwise be
-            # indistinguishable from a genuine wrong answer. 2 and 3 cannot collide
-            # with that, since die never produces them from a zero/EPERM errno.
             exit 3 if $wrong;
             exit($late ? 2 : 0);
         }
@@ -94,19 +72,14 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
         my $code = $? >> 8;
         $wrong_clients++ if $code == 3;
         $late_clients++  if $code == 2;
-        # anything else non-zero is a client that died, which is neither a wrong
-        # answer nor a timeout and must not be reported as either
-        $died_clients++  if $code && $code != 2 && $code != 3;
+        $died_clients++  if $? && $code != 2 && $code != 3;
     }
     my $dt = time - $t0;
-    kill 'TERM', @wpids;          # clients are done; do not wait out the idle timeout
+    kill 'TERM', @wpids;
     waitpid($_, 0) for @wpids;
 
     ok !$wrong_clients, "mpmc: every response received was the right one";
     if ($wrong_clients) {
-        # Print what each offending client actually received: without it a
-        # failure here says only "something mismatched", which is not enough to
-        # tell a real cross-talk bug from a test artifact after the fact.
         for my $c (1 .. $CLIENTS) {
             next unless open my $wfh, '<', "$path.wrong.$c";
             chomp( my $line = <$wfh> // '' );
@@ -115,8 +88,7 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
         }
     }
     unlink "$path.wrong.$_" for 1 .. $CLIENTS;
-    diag "note: $died_clients/$CLIENTS client(s) exited abnormally (neither a wrong "
-       . "answer nor a timeout)" if $died_clients;
+    is $died_clients, 0, "mpmc: no client died";
     diag "note: $late_clients/$CLIENTS client(s) had a request exceed ${CTMO}s -- "
        . "runner oversubscription, not a correctness failure" if $late_clients;
 
@@ -129,9 +101,6 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
     $srv->unlink;
 }
 
-# ============================================================
-# 2. Batch recv under load: 1 server using recv_multi
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 4096, 256, 4096);
@@ -149,7 +118,6 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
         push @cpids, $pid;
     }
 
-    # server uses recv_multi for throughput
     my $t0 = time;
     my $total = $CLIENTS * $MSGS;
     my $processed = 0;
@@ -172,9 +140,6 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
     $srv->unlink;
 }
 
-# ============================================================
-# 3. Variable-size messages: verify data integrity
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 1024, 64, 8192, 1 << 20);
@@ -182,7 +147,7 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
     my $pid = fork // die "fork: $!";
     if ($pid == 0) {
         while (my ($req, $id) = $srv->recv_wait(5.0)) {
-            $srv->reply($id, $req);  # echo back
+            $srv->reply($id, $req);
         }
         exit 0;
     }
@@ -190,7 +155,6 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
     my $cli = Data::ReqRep::Shared::Client->new($path);
     my $ok = 0;
     for my $i (1..($MSGS / 2)) {
-        # variable size: 1 to 5000 bytes
         my $len = 1 + ($i * 37) % 5000;
         my $msg = chr(65 + ($i % 26)) x $len;
         my $resp = $cli->req_wait($msg, $CTMO);
@@ -203,16 +167,12 @@ diag "stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every $CAN
     $srv->unlink;
 }
 
-# ============================================================
-# 4. eventfd notification under load
-# ============================================================
 {
     my $srv = Data::ReqRep::Shared->new_memfd("stress_efd", 1024, 64, 4096);
     my $req_fd = $srv->eventfd;
 
     my $pid = fork // die "fork: $!";
     if ($pid == 0) {
-        # EV-less server: select on eventfd
         my $processed = 0;
         while ($processed < $MSGS) {
             my $rin = '';

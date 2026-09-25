@@ -490,6 +490,18 @@ subtest 'put_object' => sub {
   like $@, qr/key is required/, 'croaks without key';
   eval { $s3->put_object( 'b', 'k' ) };
   like $@, qr/data is required/, 'croaks without data';
+
+  # custom headers
+  local *Amazon::S3::Lite::_request = mock_request(
+    headers => { etag => '"x"' },
+    capture => \$captured,
+  );
+  $s3->put_object( 'test-bucket', 'k', 'data', headers => { 'If-None-Match' => q{*} }, );
+  is $captured->{headers}{'If-None-Match'}, q{*}, 'custom header set';
+
+  eval { $s3->put_object( 'test-bucket', 'k', 'data', headers => [] ) };
+  like $@, qr/headers must be a hash ref/, 'custom headers require hashref';
+
 };
 
 subtest 'delete_object' => sub {
@@ -526,6 +538,15 @@ subtest 'delete_object' => sub {
   like $@, qr/bucket is required/, 'croaks without bucket';
   eval { $s3->delete_object('b') };
   like $@, qr/key is required/, 'croaks without key';
+
+  # custom headers
+  local *Amazon::S3::Lite::_request = mock_request(
+    status  => 204,
+    capture => \$captured,
+  );
+  $s3->delete_object( 'test-bucket', 'hello.txt', headers => { 'If-Match' => 'etag-123' }, );
+  is $captured->{headers}{'If-Match'}, 'etag-123', 'custom delete header set';
+
 };
 
 subtest 'copy_object' => sub {

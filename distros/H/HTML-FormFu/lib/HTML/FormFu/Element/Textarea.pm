@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Textarea;
-$HTML::FormFu::Element::Textarea::VERSION = '2.07';
+$HTML::FormFu::Element::Textarea::VERSION = '2.09';
 # ABSTRACT: Textarea form field
 
 use Moose;
@@ -36,10 +36,13 @@ sub _string_field {
 
     # textarea_tag template
 
-    my $html = sprintf qq{<textarea name="%s"%s>},
-        $render->{nested_name},
-        process_attrs( $render->{attributes} ),
-        ;
+    my $html = "<textarea";
+
+    if ( defined $render->{nested_name} ) {
+        $html .= sprintf qq{ name="%s"}, $render->{nested_name};
+    }
+
+    $html .= sprintf "%s>", process_attrs( $render->{attributes} );
 
     if ( defined $render->{value} ) {
         $html .= $render->{value};
@@ -66,7 +69,7 @@ HTML::FormFu::Element::Textarea - Textarea form field
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -117,7 +120,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

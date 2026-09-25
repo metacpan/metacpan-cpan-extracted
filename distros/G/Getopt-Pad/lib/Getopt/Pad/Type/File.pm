@@ -5,8 +5,10 @@ use Getopt::Pad::Type::Path;
 
 class Getopt::Pad::Type::File :isa(Getopt::Pad::Type::Path) :strict(params) {
 	use constant NAMES => ['file'];
+	use File::Basename ();
+	use File::Path     ();
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	method label() { return 'File Path' }
 
@@ -15,6 +17,18 @@ class Getopt::Pad::Type::File :isa(Getopt::Pad::Type::Path) :strict(params) {
 	method completes() { return 'files' }
 
 	method pathExists($value) { return -f $value }
+
+	# The parent directories are created along with the empty file.
+	method createPath($value) {
+		File::Path::make_path(File::Basename::dirname($value), { error => \my $errors });
+		if ($errors->@*) {
+			my ($path, $reason) = $errors->[0]->%*;
+			return $reason;
+		}
+		open my $handle, '>>', $value or return "$!";
+		close $handle;
+		return undef;
+	}
 }
 
 1;
@@ -29,7 +43,7 @@ Getopt::Pad::Type::File - file path type
 
 =head1 DESCRIPTION
 
-File path, optionally required to exist via C<mustExist>.
+File path, optionally required to exist via C<mustExist>, or created empty with its parent directories on demand via C<createPathIfMissing>.
 
 Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
 

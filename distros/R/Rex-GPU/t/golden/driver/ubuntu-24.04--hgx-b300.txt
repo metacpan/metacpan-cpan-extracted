@@ -1,0 +1,54 @@
+# golden: driver/ubuntu-24.04--hgx-b300
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: dpkg --print-architecture
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: apt-cache search '^nvidia-driver-[0-9].*-server-open$' 2>/dev/null | sort -t- -k3 -n | tail -1 | awk '{print $1}'
+run: LC_ALL=C apt-cache policy nvidia-fabricmanager-590 2>/dev/null
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y linux-headers-6.8.0-85-generic linux-headers-generic nvidia-driver-590-server-open
+run: dpkg -l nvidia-driver-590-server-open 2>/dev/null | grep -q '^ii'
+run: dpkg-query -W -f='${Version}' nvidia-driver-590-server-open 2>/dev/null
+run: apt-cache madison nvidia-fabricmanager-590 2>/dev/null
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y nvidia-fabricmanager-590=590.48.01-0ubuntu0.24.04.1
+run: dpkg -l nvidia-fabricmanager-590 2>/dev/null | grep -q '^ii'
+run: dpkg-query -W -f='${Version}' nvidia-fabricmanager-590 2>/dev/null
+run: systemctl enable nvidia-fabricmanager.service
+run: dpkg -l cuda-keyring 2>/dev/null | grep -q '^ii'
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y --no-upgrade curl
+run: dpkg -l curl 2>/dev/null | grep -q '^ii'
+run: t=$(mktemp -d) && curl -fsSL -o "$t/cuda-keyring.deb" https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb && dpkg-deb --fsys-tarfile "$t/cuda-keyring.deb" | tar -xO ./usr/share/keyrings/cuda-archive-keyring.gpg > "$t/key.gpg" && test -s "$t/key.gpg" && install -m 0644 "$t/key.gpg" /usr/share/keyrings/cuda-archive-keyring.gpg; rc=$?; rm -rf "$t"; exit $rc
+file: /etc/apt/preferences.d/rex-gpu-nvlsm.pref mode=644
+  | Explanation: Rex::GPU (HGX B200/B300): NVIDIA's CUDA repository is here for nvlsm only.
+  | Explanation: Nothing else is installed or upgraded from it; the NVIDIA driver stays Ubuntu's.
+  | Package: *
+  | Pin: origin developer.download.nvidia.com
+  | Pin-Priority: -1
+  | 
+  | Package: nvlsm
+  | Pin: origin developer.download.nvidia.com
+  | Pin-Priority: 500
+file: /etc/apt/sources.list.d/rex-gpu-nvlsm.list mode=644
+  | deb [signed-by=/usr/share/keyrings/cuda-archive-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/ /
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y nvlsm infiniband-diags libibumad3 linux-modules-extra-6.8.0-85-generic
+run: dpkg -l nvlsm 2>/dev/null | grep -q '^ii'
+run: dpkg -l infiniband-diags 2>/dev/null | grep -q '^ii'
+run: dpkg -l libibumad3 2>/dev/null | grep -q '^ii'
+run: dpkg -l linux-modules-extra-6.8.0-85-generic 2>/dev/null | grep -q '^ii'
+file: /etc/modules-load.d/ib_umad.conf
+  | ib_umad
+run: modprobe ib_umad
+file: /etc/modprobe.d/blacklist-nouveau.conf
+  | blacklist nouveau
+  | options nouveau modeset=0
+run: update-initramfs -u 2>/dev/null
+run: modprobe nvidia
+run: systemctl start nvidia-fabricmanager.service
+run: systemctl is-active --quiet nvidia-fabricmanager.service
+run: lsmod | grep '^nvidia '
+run: nvidia-smi -L 2>&1
+run: /sbin/ldconfig -p 2>/dev/null | grep -q '^[[:space:]]*libcuda\.so\.1 '
+run: nvidia-smi -q 2>&1

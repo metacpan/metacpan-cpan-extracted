@@ -8,7 +8,9 @@ our $VERSION = '2.19.0';
 
 sub run {
     my ( $class, $req, $rule, $protection ) = @_;
-    my $uri = $req->{env}->{REQUEST_URI};
+
+    # Use the routed URI: an encoded '?' would hide the CDA parameter here
+    my $uri = $req->access_control_uri;
     my $cn  = $class->tsv->{cookieName};
     my ( $id, $session );
     if ( $uri =~ m/[\?&;]${cn}cda=(\w+)/i ) {

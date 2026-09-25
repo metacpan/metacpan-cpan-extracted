@@ -14,7 +14,7 @@ use Mojo::JSON       qw(to_json);
 use Mojo::Util       qw(encode extract_usage getopt);
 use Time::HiRes      ();
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has client => sub { Cavil::CLI::Client->new };
 

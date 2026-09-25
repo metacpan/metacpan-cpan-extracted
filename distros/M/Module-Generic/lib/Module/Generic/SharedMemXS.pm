@@ -1,12 +1,11 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.3.4
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.4.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2026/01/22
+## Modified 2026/09/25
 ## All rights reserved
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -112,7 +111,7 @@ EOT
         lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
         'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.3.4';
+    our $VERSION = 'v0.4.1';
 };
 
 use strict;
@@ -142,6 +141,7 @@ sub init
     # I leave the feature of using it as a choice to the user, but defaults to JSON
     $self->{_packing_method} = 'json';
     $self->SUPER::init( @_ ) || return( $self->pass_error );
+    $self->{destroy_semaphore} = 1 if( $self->{destroy} );
     $self->{owner}      = $$;
     $self->{locked}     = 0;
     return( $self );
@@ -211,6 +211,7 @@ sub destroy
     {
         my $val = shift( @_ );
         $self->_set_get_boolean( 'destroy', $val );
+        $self->_set_get_boolean( 'destroy_semaphore', 1 ) if( $val );
     }
     return( $self->_set_get_boolean( 'destroy' ) );
 }
@@ -259,9 +260,12 @@ sub exists
             return( $self->pass_error );
         $key = $self->_str2key( $key_val );
     }
-    my $flags = $self->flags({ mode => 0644 });
+    my $flags = $self->flags({
+        create    => 0,
+        exclusive => 0,
+        mode      => 0644,
+    });
     no strict 'subs';
-    $flags = ( $flags ^ &IPC::SysV::IPC_CREAT );
 
     my $shm;
     # try-catch
@@ -288,7 +292,7 @@ sub exists
     # No key is specified, thus we would be using IPC_PRIVATE, which would mean 
     # creating a new shared memory
     return(0) if( !defined( $shm ) );
-    return( $shm->id );
+    return(1);
 }
 
 sub flags
@@ -303,7 +307,8 @@ sub flags
     my $flags  = 0;
     $flags    |= &IPC::SysV::IPC_CREAT if( $opts->{create} );
     $flags    |= &IPC::SysV::IPC_EXCL  if( $opts->{exclusive} );
-    $flags    |= ( $opts->{mode} || 0666 );
+    my $mode = length( $opts->{mode} ) ? $opts->{mode} : 0666;
+    $flags    |= $mode;
     return( $flags );
 }
 
@@ -404,20 +409,21 @@ sub open
     $opts->{size} = int( $opts->{size} );
     $opts->{mode} //= '';
     $opts->{key} //= $self->key // '';
-    my $key;
-    if( length( $opts->{key} ) )
-    {
-        my $key_val = $self->_verify_key( $opts->{key} ) ||
-            return( $self->pass_error );
-        $key = $self->_str2key( $key_val ) || 
-            return( $self->error( "Cannot get serial from key '", ( $self->_is_array( $key_val ) ? join( "', '", @$key_val ) : $key_val ), "': ", $self->error ) );
-    }
+
     my $create = 0;
-    if( $opts->{mode} eq 'w' || $opts->{key} =~ s/^>// )
+    if( $opts->{mode} eq 'w' )
     {
         $create++;
     }
-    elsif( $opts->{mode} eq 'r' || $opts->{key} =~ s/^<// )
+    elsif( $opts->{mode} eq 'r' )
+    {
+        $create = 0;
+    }
+    elsif( !ref( $opts->{key} ) && $opts->{key} =~ s/^>// )
+    {
+        $create++;
+    }
+    elsif( !ref( $opts->{key} ) && $opts->{key} =~ s/^<// )
     {
         $create = 0;
     }
@@ -425,7 +431,20 @@ sub open
     {
         $create = $self->create;
     }
-    my $flags = $self->flags( create => $create, ( $opts->{mode} =~ /^\d+$/ ? $opts->{mode} : () ) );
+
+    my $key;
+    if( length( $opts->{key} ) )
+    {
+        my $key_val = $self->_verify_key( $opts->{key} ) ||
+            return( $self->pass_error );
+        $key = $self->_str2key( $key_val ) ||
+            return( $self->error( "Cannot get serial from key '", ( $self->_is_array( $key_val ) ? join( "', '", @$key_val ) : $key_val ), "': ", $self->error ) );
+    }
+
+    my $flags = $self->flags(
+        create => $create,
+        ( $opts->{mode} =~ /^\d+$/ ? ( mode => $opts->{mode} ) : () ),
+    );
 
     my $shm;
     # try-catch
@@ -467,6 +486,8 @@ sub open
         debug   => $self->debug,
         mode    => $self->mode,
         destroy => $self->destroy,
+        destroy_semaphore => $self->destroy_semaphore,
+        exclusive => $self->exclusive,
         _packing_method => $self->_packing_method,
     ) || return( $self->error( "Cannot create object with key '", ( $self->_is_array( $opts->{key} ) ? join( "', '", @{$opts->{key}} ) : $opts->{key} ), "': ", $self->error ) );
     $new->{base64} = $self->base64;
@@ -520,7 +541,7 @@ sub op
     my $sem = $self->_sem ||
         return( $self->error( "No IPC::Semaphore object set. Have you opened the shared memory?" ) );
     my $id = $sem->id;
-    return( $self->error( "No semaphore set yet. You must open the shared memory first to set the semaphore." ) ) if( !length( $id ) );
+    return( $self->error( "No semaphore set yet. You must open the shared memory first to set the semaphore." ) ) if( !defined( $id ) );
     my $rv;
     # try-catch
     local $@;
@@ -581,7 +602,7 @@ sub read
     $size //= ( $self->size || SHM_BUFSIZ );
     $size = int( $size );
     my $id = $shm->id;
-    return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !length( $id ) );
+    return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !defined( $id ) );
     my $buffer;
     # try-catch
     local $@;
@@ -988,7 +1009,8 @@ sub write
     }
     my $shm = $self->_ipc_shared ||
         return( $self->error( "No IPC::SharedMem object set. Have you opened the shared memory?" ) );
-    my $id = $self->id || return( $self->error( "No shared memory id set yet. You must open the shared memory first to write." ) );
+    my $id = $self->id;
+    return( $self->error( "No shared memory id set yet. You must open the shared memory first to write." ) ) if( !defined( $id ) );
     my $size = int( $self->size() ) || SHM_BUFSIZ;
     my $packing = $self->_packing_method;
     my $encoded;
@@ -1243,9 +1265,10 @@ sub _str2key
     {
         return( &IPC::SysV::IPC_PRIVATE );
     }
+
     my $path;
     ( $key, $path ) = ref( $key ) eq 'ARRAY' ? @$key : ( $key, [getpwuid($>)]->[7] );
-    $path = [getpwuid($path)]->[7] if( $path =~ /^\d+$/ );
+    $path = [getpwuid($path)]->[7] if( defined( $path ) && $path =~ /^\d+$/ );
     $path ||= File::Spec->rootdir();
     if( $key =~ /^\d+$/ )
     {
@@ -1253,19 +1276,17 @@ sub _str2key
             return( $self->error( "Unable to get a key using IPC::SysV::ftok: $!" ) );
         return( $id );
     }
-    else
-    {
-        # my $id = 0;
-        # $id += $_ for( unpack( "C*", $key ) );
-        $self->_load_class( 'Digest::SHA' ) || return( $self->pass_error );
-        my $hash = Digest::SHA::sha1_base64( $key );
-        my $id = ord( substr( $hash, 0, 1 ) );
-        # We use the root as a reliable and stable path.
-        # I initially thought about using __FILE__, but during testing this would be in ./blib/lib and beside one user might use a version of this module somewhere while the one used under Apache/mod_perl2 could be somewhere else and this would render the generation of the IPC key unreliable and unrepeatable
-        # my $val = &IPC::SysV::ftok( File::Spec->rootdir(), $id );
-        my $val = &IPC::SysV::ftok( $path, $id );
-        return( $val );
-    }
+    $self->_load_class( 'Digest::SHA' ) || return( $self->pass_error );
+    # ftok() only uses the low 8 bits of its project id, so reducing an arbitrary
+    # string to a single project-id byte creates a very small key space and makes
+    # collisions likely. Derive a stable positive 31-bit SysV key directly from
+    # the SHA-1 digest instead. Include the path in the digest so array-form keys
+    # keep the path component as part of their identity.
+    my $seed = join( "\0", $path, $key );
+    my $hash = Digest::SHA::sha1( $seed );
+    my $val = unpack( 'N', substr( $hash, 0, 4 ) ) & 0x7fffffff;
+    $val = 1 if( !$val );
+    return( $val );
 }
 
 sub _verify_key
@@ -1306,20 +1327,24 @@ sub DESTROY
 
     # For non-object context, we need to call cleanup to ensure there is no leftover
     my $class = CORE::ref( $self );
-    my $id    = $shm->id if( $shm );
-    my $shem_repo   = Module::Generic::Global->new( 'shem_repo' => $class, key => $class );
+    my $id;
+    {
+        local $@;
+        $id = eval{ $shm->id };
+    }
+    my $shem_repo = Module::Generic::Global->new( 'shem_repo' => $class, key => $class );
     $shem_repo->cleanup;
-    if( $id )
+    if( CORE::defined( $id ) )
     {
         my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => $class, key => $id );
         $id2obj_repo->cleanup;
     }
 
-    CORE::return if( $shm->id );
+    CORE::return if( !CORE::defined( $id ) );
 
-    $self->unlock;
+    $self->unlock if( $self->locked );
     $self->detach;
-    my $rv = $self->remove_semaphore;
+
     if( $self->destroy )
     {
         my $stat = $self->shmstat();
@@ -1329,7 +1354,11 @@ sub DESTROY
             $self->remove;
         }
     }
-};
+    elsif( $self->destroy_semaphore )
+    {
+        $self->remove_semaphore;
+    }
+}
 
 sub FREEZE
 {
@@ -1568,7 +1597,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.3.4
+    v0.4.1
 
 =head1 DESCRIPTION
 
@@ -1968,7 +1997,7 @@ Returns the serial number used to create or access the shared memory segment.
 
 This serial is created based on the I<key> parameter provided either upon object instantiation or upon using the L</open> method.
 
-The serial is created by calling L<IPC::SysV/ftok> to provide a reliable and repeatable numeric identifier.
+For numeric keys, the serial is created with L<IPC::SysV/ftok>. For string keys, a stable positive 31-bit System V IPC key is derived from the SHA-1 digest of the key and its path component. This avoids the very small collision space imposed by C<ftok()> project identifiers.
 
 =head2 serialiser
 

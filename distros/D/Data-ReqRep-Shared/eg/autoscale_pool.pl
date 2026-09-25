@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 # Auto-scaling worker pool driven by EV event loop
-#
 # EV::io on request eventfd → scale up when backlog grows
 # EV::child per worker → reap + maintain minimum on exit
 # Workers self-exit after idle timeout (natural shrink)
@@ -32,7 +31,6 @@ sub spawn_worker {
         }
         exit 0;
     }
-    # EV::child fires when this worker exits
     $workers{$pid} = EV::child $pid, 0, sub {
         delete $workers{$pid};
         printf "[pool] -%d (workers=%d)\n", $pid, scalar keys %workers;
@@ -43,7 +41,6 @@ sub spawn_worker {
 
 spawn_worker() for 1..$MIN_WORKERS;
 
-# Scale up when request backlog grows
 my $req_w = EV::io $req_fd, EV::READ, sub {
     $srv->eventfd_consume;
     my $depth = $srv->size;
@@ -55,7 +52,6 @@ my $req_w = EV::io $req_fd, EV::READ, sub {
     }
 };
 
-# Client in child
 my $cli_pid = fork // die "fork: $!";
 if ($cli_pid == 0) {
     my $cli = Data::ReqRep::Shared::Client->new($path);
@@ -64,13 +60,13 @@ if ($cli_pid == 0) {
     print "--- phase 1: light (10 sequential) ---\n";
     for (1..10) {
         my $id = $cli->send_wait_notify("light-$_", 5.0);
-        $cli->get_wait($id, 5.0) if defined $id;
+        $cli->get_wait($id, 5.0) // $cli->cancel($id) if defined $id;
     }
 
     print "--- phase 2: burst (50 pipelined) ---\n";
     my @ids;
     push @ids, $cli->send_wait_notify("burst-$_", 5.0) for 1..50;
-    for my $id (@ids) { $cli->get_wait($id, 5.0) if defined $id }
+    for my $id (@ids) { $cli->get_wait($id, 5.0) // $cli->cancel($id) if defined $id }
 
     print "--- phase 3: quiet 3s (workers shrink) ---\n";
     select(undef, undef, undef, 3.0);
@@ -78,14 +74,13 @@ if ($cli_pid == 0) {
     print "--- phase 4: resume (10 sequential) ---\n";
     for (1..10) {
         my $id = $cli->send_wait_notify("resume-$_", 5.0);
-        $cli->get_wait($id, 5.0) if defined $id;
+        $cli->get_wait($id, 5.0) // $cli->cancel($id) if defined $id;
     }
 
     print "--- done ---\n";
     exit 0;
 }
 
-# Stop when client exits
 my $cli_w = EV::child $cli_pid, 0, sub {
     my $s = $srv->stats;
     printf "[pool] client done: %d requests, %d replies\n",
@@ -94,4 +89,7 @@ my $cli_w = EV::child $cli_pid, 0, sub {
 };
 
 EV::run;
+my @left = keys %workers;
+kill TERM => @left;
+waitpid $_, 0 for @left;
 $srv->unlink;

@@ -1,0 +1,5 @@
+# golden: driver/ubuntu-24.04--vgpu-a10+ada
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+DIE: NVIDIA vGPU guest (type NVIDIA A10-2Q, 10de:2236 sub 14b9) next to NVIDIA GPU 'AD104GL [RTX 4000 SFF Ada Generation]' (10de:27b0, not a vGPU): one NVIDIA kernel module drives every GPU of the host, and the driver Rex::GPU installs does not drive a vGPU: install the licensed NVIDIA vGPU guest driver, then run again. No driver package was installed and no package source was added

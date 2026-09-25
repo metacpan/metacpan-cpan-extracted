@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Select;
-$HTML::FormFu::Element::Select::VERSION = '2.07';
+$HTML::FormFu::Element::Select::VERSION = '2.09';
 # ABSTRACT: Select form field
 
 use Moose;
@@ -62,9 +62,13 @@ sub _string_field {
 
     # select_tag template
 
-    my $html .= sprintf qq{<select name="%s"%s>\n},
-        $render->{nested_name},
-        process_attrs( $render->{attributes} );
+    my $html = "<select";
+
+    if ( defined $render->{nested_name} ) {
+        $html .= sprintf qq{ name="%s"}, $render->{nested_name};
+    }
+
+    $html .= sprintf "%s>\n", process_attrs( $render->{attributes} );
 
     for my $option ( @{ $render->{options} } ) {
         if ( exists $option->{group} ) {
@@ -116,7 +120,7 @@ HTML::FormFu::Element::Select - Select form field
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -183,7 +187,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

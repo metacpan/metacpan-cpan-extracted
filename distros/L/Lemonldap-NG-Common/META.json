@@ -4,7 +4,7 @@
       "Xavier Guimard <x.guimard@free.fr>, Clement Oudot <clement@oodo.net>, Christophe Maudoux <chrmdx@gmail.com>, Maxime Besson <maxime.besson@worteks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -29,6 +29,7 @@
             "DBI" : "0",
             "Date::Parse" : "0",
             "Email::Address::XS" : "0",
+            "Email::Sender" : "0",
             "IO::String" : "0",
             "LWP::Protocol::PSGI" : "0",
             "LWP::Protocol::https" : "0",
@@ -55,6 +56,7 @@
             "DBI" : "0",
             "Date::Parse" : "0",
             "Email::Address::XS" : "0",
+            "Email::Sender" : "0",
             "LWP::Protocol::https" : "0",
             "Net::LDAP" : "0",
             "SOAP::Lite" : "0",
@@ -97,6 +99,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.23.3",
+   "version" : "v2.23.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

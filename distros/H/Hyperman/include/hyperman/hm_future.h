@@ -97,9 +97,23 @@ static AV *hmf_values_av(pTHX_ SV *self) {
 
 /* ---- trampoline ---------------------------------------------------------- */
 
+/* SAVETMPS/FREETMPS around the drain, and they are the difference between a
+ * server that runs for a week and one the kernel kills.
+ *
+ * The pair below is mortalised out of the queue, so without a temps frame of
+ * its own the pump hangs them on whichever frame it was entered from. For a
+ * timer that is the worker's event loop, which does not return while the
+ * server is up: every Future ever resolved, and every callback attached to
+ * one, is then held for the life of the process. A caller that reschedules
+ * from its own callback - the shape every clock in an application has -
+ * leaks one Future and one closure per tick, for ever.
+ *
+ * SAVETMPS sets a new floor rather than freeing what the caller mortalised
+ * before calling in, so a caller's own temporaries are untouched. */
 static void hmf_pump(pTHX) {
     if (hm_fq_active) return;
     ENTER;
+    SAVETMPS;
     SAVEINT(hm_fq_active);
     hm_fq_active = 1;
     while (av_len(hm_fq) >= 0) {
@@ -111,6 +125,7 @@ static void hmf_pump(pTHX) {
         PUTBACK;
         call_sv(cb, G_DISCARD);
     }
+    FREETMPS;
     LEAVE;
 }
 

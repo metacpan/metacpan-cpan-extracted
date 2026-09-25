@@ -2,7 +2,7 @@ package Protocol::IR::Format::Tasmota;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 use Protocol::IR::Code;
 
@@ -322,7 +322,7 @@ Protocol::IR::Format::Tasmota - Tasmota RawData import and IRSend export
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -349,6 +349,25 @@ version 1.0
 
 C<Protocol::IR::Format::Tasmota> imports Tasmota "RawData" IR captures and exports
 Tasmota C<IRSend> commands.
+
+=over 4
+
+=item Example RawData captures (a NEC transmission)
+
+Compact letter-coded form (as logged by Tasmota's IRrecv):
+
+    +9185-4490+650-500+655dE-1630C-505+630-525Ed...
+
+Comma-separated mark/space form:
+
+    +9185,-4490,+650,-500,+655,...
+
+=back
+
+Tasmota renders IR captures with the IRremoteESP8266 library
+(L<https://github.com/crankyoldgit/IRremoteESP8266>); full command
+documentation lives in the Tasmota manual
+(L<https://tasmota.github.io/docs/Tasmota-IR/>).
 
 =head2 Decode input forms
 

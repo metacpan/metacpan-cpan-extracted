@@ -13,7 +13,6 @@ my $NREQS    = 20;
 my $path = tmpnam();
 my $srv = Data::ReqRep::Shared->new($path, 256, 64, 8192);
 
-# Fork workers
 my @workers;
 for my $w (1..$NWORKERS) {
     my $pid = fork // die "fork: $!";
@@ -28,13 +27,11 @@ for my $w (1..$NWORKERS) {
     push @workers, $pid;
 }
 
-# Client sends requests
 my $cli = Data::ReqRep::Shared::Client->new($path);
 for my $i (1..$NREQS) {
     my $resp = $cli->req("job$i");
     print "job$i -> $resp\n";
 }
 
-# Wait for workers to drain
 waitpid($_, 0) for @workers;
 $srv->unlink;

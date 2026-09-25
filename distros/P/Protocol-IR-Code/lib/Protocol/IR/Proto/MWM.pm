@@ -2,7 +2,7 @@ package Protocol::IR::Proto::MWM;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 use Math::BigInt;
 use Protocol::IR::Code;
@@ -13,7 +13,7 @@ use Protocol::IR::Code;
 #
 # The signal is 2400 bps serial over a 38 kHz carrier: 1 start bit (mark),
 # 8 data bits (space=1, mark=0, LSB-first), 1 stop bit (space), repeated per
-# byte with no header, each logical bit one 417 us tick (up to 9 ticks may
+# byte with no header, each logical bit one 417 µs tick (up to 9 ticks may
 # merge into one measured run). Messages are 3-18 bytes (24-144 bits); the
 # byte count is implied by the message body: state[0] carries a 4-bit payload
 # length in the high nibble for command frames (0x9x/0xFx), and show commands
@@ -305,8 +305,8 @@ sub decode_timing {
     );
 }
 
-# Encode the frame: per byte a 417 us start mark, the 8 data bits LSB-first
-# (space = 1) and a 417 us stop space, then the 30000 us inter-command gap.
+# Encode the frame: per byte a 417 µs start mark, the 8 data bits LSB-first
+# (space = 1) and a 417 µs stop space, then the 30000 µs inter-command gap.
 # Consecutive same-sign ticks merge into a single measured run.
 sub to_pronto {
     my ($class, $code) = @_;
@@ -365,13 +365,15 @@ sub to_pronto {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Proto::MWM - MWM protocol handler (Disney "Made With Magic")
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -389,8 +391,8 @@ version 1.0
 
 The MWM protocol ("Made With Magic", used by Disney light-up products such
 as Glow With The Show) is 2400 bps serial over a 38 kHz carrier, with no
-header. Each byte is a B<417 us> start mark, B<8 data bits> (space = 1,
-mark = 0, LSB-first), and a B<417 us> stop space; up to 9 same-sign bits may
+header. Each byte is a B<417 µs> start mark, B<8 data bits> (space = 1,
+mark = 0, LSB-first), and a B<417 µs> stop space; up to 9 same-sign bits may
 merge into one measured run. Messages are B<3 to 18 bytes> (24-144 bits) and
 the byte count is implied by the message body: command frames carry a 4-bit
 payload length in the high nibble of the first byte (B<0x9x>/B<0xFx>), while

@@ -2,7 +2,7 @@ package Protocol::IR::Proto::SAMSUNG20;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::SAMSUNG20 is the SAMSUNG20 protocol handler
@@ -11,7 +11,7 @@ use Protocol::IR::Code;
 #   {38.4k,564}<1,-1|1,-3>(8,-8,D:6,S:6,F:8,1,-44)
 #
 # A 20-bit frame carries a 6-bit device, a 6-bit subdevice, and an 8-bit
-# function, transmitted LSB-first within each field behind a 4512/4512 us
+# function, transmitted LSB-first within each field behind a 4512/4512 µs
 # header (the same header Samsung's 32-bit protocol uses). The whole frame is
 # sent once, so a capture is header + 20 bits + stop. IRDB uses it for Samsung
 # air-conditioner handsets.
@@ -78,7 +78,7 @@ sub decode_timing {
 
     my ($hdr_mark, $hdr_space) = @{$burst_pairs->[0]};
 
-    # SAMSUNG20 Header Check: ~4512us mark, ~4512us space
+    # SAMSUNG20 Header Check: ~4512 µs mark, ~4512 µs space
     return undef unless ($hdr_mark >= 3800 && $hdr_mark <= 5200) &&
                         ($hdr_space >= 3800 && $hdr_space <= 5200);
 
@@ -87,7 +87,7 @@ sub decode_timing {
         my $pair  = $burst_pairs->[$i + 1];
         my $space = $pair->[1];
 
-        # Space ~1692us = 1, ~564us = 0
+        # Space ~1692 µs = 1, ~564 µs = 0
         my $bit = ($space > 1100) ? 1 : 0;
         $value |= ($bit << $i); # LSB-first
     }
@@ -139,7 +139,7 @@ sub to_pronto {
         ];
     }
 
-    # The trailing mark and ~25ms inter-frame space (1,-44 of 564us).
+    # The trailing mark and ~25ms inter-frame space (1,-44 of 564 µs).
     push @burst_pairs, [$us_to_pulses->(564), $us_to_pulses->(24816)];
 
     my $seq1_pairs = scalar @burst_pairs;
@@ -152,13 +152,15 @@ sub to_pronto {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Proto::SAMSUNG20 - SAMSUNG20 protocol handler (20-bit AC)
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -175,7 +177,7 @@ version 1.0
 
 The C<SAMSUNG20> protocol transmits 20-bit frames at B<38.4 kHz>: a 6-bit
 B<device>, a 6-bit B<subdevice>, and an 8-bit B<function>, transmitted
-LSB-first within each field behind a B<4512/4512 us> header (the same header
+LSB-first within each field behind a B<4512/4512 µs> header (the same header
 Samsung's 32-bit protocol uses). The whole frame is sent once, so a capture
 is header + 20 bits + stop. IRDB uses it for Samsung air-conditioner
 handsets.

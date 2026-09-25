@@ -33,19 +33,19 @@ WriteMakefile(
       'IO::Interactive' => '1.027',
       'JSON' => '4.10',
       'Readonly' => '2.05',
-      'Role::Tiny' => '2.002004',
+      'Role::Tiny' => '2.002005',
       'YAML::Tiny' => '1.76'
     },
   BUILD_REQUIRES   => {
-    'ExtUtils::MakeMaker'     => '6.64',
-    'File::ShareDir::Install' => 0,
+      'ExtUtils::MakeMaker' => '6.64',
+      'File::ShareDir::Install' => 0
     },
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker'     => '6.64',
     'File::ShareDir::Install' => 0,
     },
   TEST_REQUIRES => {
-      'Role::Tiny' => '2.002004',
+      'Role::Tiny' => '2.002005',
       'Test::Exit' => '0.11',
       'Test::Output' => '1.036',
       'YAML::Tiny' => '1.76'
@@ -66,11 +66,11 @@ WriteMakefile(
       'provides'=>{
                       'CLI::Simple'=>{
                                          'file'=>'lib/CLI/Simple.pm',
-                                         'version'=>'2.2.2'
+                                         'version'=>'2.2.3'
                                        },
                       'CLI::Simple::Constants'=>{
                                                     'file'=>'lib/CLI/Simple/Constants.pm',
-                                                    'version'=>'2.2.2'
+                                                    'version'=>'2.2.3'
                                                   },
                       'CLI::Simple::DumpSpec'=>{
                                                    'file'=>'lib/CLI/Simple/DumpSpec.pm',
@@ -98,7 +98,7 @@ WriteMakefile(
                                               },
                       'CLI::Simple::Utils'=>{
                                                 'file'=>'lib/CLI/Simple/Utils.pm',
-                                                'version'=>'2.2.2'
+                                                'version'=>'2.2.3'
                                               }
                     },
       'resources'=>{

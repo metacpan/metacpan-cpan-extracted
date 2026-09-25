@@ -1,0 +1,4 @@
+---
+distro: Perl-Critic-Policy-BuiltinFunctions-ProhibitChainingSameListSub
+version: 0.001
+author_path: T/TE/TEODESIAN/Perl-Critic-Policy-BuiltinFunctions-ProhibitChainingSameListSub-0.001.tar.gz

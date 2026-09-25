@@ -3,34 +3,44 @@ package ForgeOps::Tracker::SpanBuffer;
 use strict;
 use warnings;
 use POSIX qw(strftime);
+use ForgeOps::Tracker::TraceParent;
 
 # One trace's worth of spans (a request's own call tree), sharing a single trace id. Held in a
 # plain package variable on ForgeOps::Tracker for the same one-process-per-worker reasoning its
 # $current_user and @current_breadcrumbs document. Nesting comes from a stack of open span ids: a
 # span opened while another is open becomes its child, and anything else parents under the root.
+#
+# The trace id and remote parent span id come from the request's context (see
+# ForgeOps::Tracker::start_trace), so a trace this sends and an error event from the same request
+# always agree on which trace they belong to. When the request continued another service's trace,
+# the root span's parent_span_id is that service's span, which ForgeOps treats as a remote parent.
 use constant MAX_SPANS => 500;
 
 # The kinds the ingestion API accepts; anything else would fail validation for the whole trace,
 # so an unknown kind is sent as "other" instead.
 my %KINDS = map { $_ => 1 } qw(controller service database redis http job other);
 
+# new($configuration, trace_id => ..., remote_parent_span_id => ...): both optional; a fresh W3C
+# trace id is generated when none is given.
 sub new {
-    my ($class, $configuration) = @_;
+    my ($class, $configuration, %options) = @_;
     return bless {
-        configuration => $configuration,
-        trace_id      => _random_hex(16),
-        root_span_id  => _random_hex(8),
-        spans         => [],
-        open          => [],
+        configuration         => $configuration,
+        trace_id              => defined $options{trace_id} ? $options{trace_id} : ForgeOps::Tracker::TraceParent::generate_trace_id(),
+        remote_parent_span_id => $options{remote_parent_span_id},
+        root_span_id          => ForgeOps::Tracker::TraceParent::generate_span_id(),
+        spans                 => [],
+        open                  => [],
     }, $class;
 }
 
 sub trace_id { $_[0]{trace_id} }
 
-# Opens a span and returns its id; pair with finish().
+# Opens a span and returns its id; pair with finish(). $id is one generated beforehand, as
+# ForgeOps::Tracker::http_span does so its outgoing traceparent header can name the span.
 sub open_span {
-    my ($self) = @_;
-    my $id = _random_hex(8);
+    my ($self, $id) = @_;
+    $id = ForgeOps::Tracker::TraceParent::generate_span_id() unless defined $id;
     push @{ $self->{open} }, $id;
     return $id;
 }
@@ -45,7 +55,7 @@ sub finish {
 # Records an already-finished span as a child of whatever is currently open.
 sub record_leaf {
     my ($self, $name, $kind, $started_at, $duration_ms, $data) = @_;
-    $self->_record(_random_hex(8), $self->_current_parent, $name, $kind, $started_at, $duration_ms, $data);
+    $self->_record(ForgeOps::Tracker::TraceParent::generate_span_id(), $self->_current_parent, $name, $kind, $started_at, $duration_ms, $data);
 }
 
 sub _current_parent {
@@ -87,15 +97,17 @@ sub _build {
 }
 
 # The wire payload once the trace is over: the root span plus everything recorded beneath it, or
-# undef when the root was faster than trace_capture_threshold (seconds).
+# undef when the root was faster than trace_capture_threshold (seconds) and the request didn't
+# error. An errored request's trace is always sent, however fast it was, since the waterfall of
+# what led up to an error is exactly what an issue page wants to show next to it.
 sub finish_trace {
-    my ($self, $root_name, $started_at, $duration_ms) = @_;
-    return undef if $duration_ms < $self->{configuration}{trace_capture_threshold} * 1000;
+    my ($self, $root_name, $started_at, $duration_ms, $errored) = @_;
+    return undef if !$errored && $duration_ms < $self->{configuration}{trace_capture_threshold} * 1000;
 
     return {
         trace_id => $self->{trace_id},
         spans    => [
-            $self->_build($self->{root_span_id}, undef, $root_name, 'controller', $started_at, $duration_ms, {}),
+            $self->_build($self->{root_span_id}, $self->{remote_parent_span_id}, $root_name, 'controller', $started_at, $duration_ms, {}),
             @{ $self->{spans} },
         ],
     };
@@ -106,20 +118,6 @@ sub _format_time {
     my ($epoch_seconds) = @_;
     my $whole = int($epoch_seconds);
     return strftime('%Y-%m-%dT%H:%M:%S', gmtime($whole)) . sprintf('.%03dZ', int(($epoch_seconds - $whole) * 1000));
-}
-
-sub _random_hex {
-    my ($bytes) = @_;
-    my $hex = '';
-    if (open my $fh, '<:raw', '/dev/urandom') {
-        read($fh, my $raw, $bytes);
-        close $fh;
-        $hex = unpack('H*', $raw) if defined $raw && length($raw) == $bytes;
-    }
-    # No /dev/urandom (Windows) or a short read: fall back to rand, which is fine for an id that
-    # only has to be unique within one project's traces, not unpredictable.
-    $hex = join('', map { sprintf('%02x', int(rand(256))) } 1 .. $bytes) unless length $hex;
-    return $hex;
 }
 
 1;

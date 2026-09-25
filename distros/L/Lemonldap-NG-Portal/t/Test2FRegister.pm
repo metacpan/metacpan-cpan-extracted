@@ -46,7 +46,7 @@ sub register {
             return $self->p->sendJSONresponse( $req, { result => 1 } );
         }
         else {
-            return $self->failResponse( $req, "PE$res" );
+            return $self->failResponse( $req, $res );
         }
     }
 }

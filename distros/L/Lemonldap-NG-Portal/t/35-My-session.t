@@ -2,6 +2,8 @@ use warnings;
 use Test::More;
 use strict;
 use IO::String;
+use MIME::Base64;
+use URI::Escape;
 
 BEGIN {
     require 't/test-lib.pm';
@@ -92,6 +94,45 @@ ok(
     ' URI app2 found'
 );
 count(5);
+
+# authorizationfor: the URL is percent-decoded and normalized by the web
+# server before the request is routed to the application, so rules must be
+# tested against the same canonical value, else they can be bypassed with an
+# encoded URL (#3723)
+sub authorizationfor {
+    my ($url) = @_;
+    ok(
+        my $res = $client->_get(
+            '/mysession',
+            query => 'authorizationfor='
+              . uri_escape( encode_base64( $url, '' ) ),
+            cookie => "lemonldap=$id"
+        ),
+        "Check for $url"
+    );
+    count(1);
+    expectOK($res);
+    return JSON::from_json( $res->[2]->[0] );
+}
+
+foreach my $url (
+    'http://test1.example.com/deny',           # no encoding
+    'http://test1.example.com/%64eny',         # "d" encoded
+    'http://test1.example.com/den%79',         # "y" encoded
+    'http://test1.example.com/./deny',         # dot segment
+    'http://test1.example.com/foo/../deny',    # dot segment
+    'http://test1.example.com//deny',          # duplicate slash
+    'http://test1.example.com/%2Fdeny',        # encoded slash
+  )
+{
+    is( authorizationfor($url)->{result}, 0, " $url is refused" );
+    count(1);
+}
+
+# Decoded as /denY: the rule ^/deny doesn't apply
+is( authorizationfor('http://test1.example.com/den%59')->{result},
+    1, ' http://test1.example.com/den%59 is granted' );
+count(1);
 
 # Test logout
 $client->logout($id);

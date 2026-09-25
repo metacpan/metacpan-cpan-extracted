@@ -1,0 +1,11 @@
+# golden: driver/debian-12--blackwell--keyring-failed
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: dpkg --print-architecture
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+pkg: curl ensure=present
+run: t=$(mktemp -d) && curl -fsSL -o "$t/cuda-keyring.deb" https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb && DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y "$t/cuda-keyring.deb"; rm -rf "$t"
+run: dpkg -l cuda-keyring 2>/dev/null | grep -q '^ii'
+DIE: cuda-keyring not installed — cannot add NVIDIA's CUDA repo (https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb)

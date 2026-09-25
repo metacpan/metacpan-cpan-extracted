@@ -231,6 +231,39 @@ subtest "Public PKCE-or-secret mode/with secret (no PKCE) succeeds" => sub {
         "Access token was provided for public client with secret" );
 };
 
+subtest "Public PKCE-or-secret mode/with wrong secret (no PKCE) fails" => sub {
+    my $code = codeAuthorize(
+        $op, $id,
+        {
+            %test_authorize_params,
+            client_id => "rp_public_pkce_or_secret",
+
+            # No code_challenge
+        }
+    );
+
+    # A wrong secret must not replace PKCE
+    my $query = buildForm( {
+            grant_type   => "authorization_code",
+            code         => $code,
+            redirect_uri => "http://rp.com/",
+        }
+    );
+    my $res = $op->_post(
+        "/oauth2/token",
+        IO::String->new($query),
+        accept => 'application/json',
+        length => length($query),
+        custom => {
+            HTTP_AUTHORIZATION => "Basic "
+              . MIME::Base64::encode_base64(
+                "rp_public_pkce_or_secret:wrong", ''
+              ),
+        },
+    );
+    expectReject( $res, 401, "invalid_client" );
+};
+
 subtest "Public PKCE-or-secret mode/without PKCE or secret fails" => sub {
     my $code = codeAuthorize(
         $op, $id,

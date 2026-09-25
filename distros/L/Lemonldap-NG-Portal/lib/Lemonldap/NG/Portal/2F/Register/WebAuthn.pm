@@ -3,7 +3,7 @@ package Lemonldap::NG::Portal::2F::Register::WebAuthn;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
+use Lemonldap::NG::Portal::Main::Constants ':all';
 use JSON         qw(from_json to_json);
 use MIME::Base64 qw(encode_base64url decode_base64url);
 use Crypt::URandom;
@@ -136,12 +136,12 @@ sub _registrationchallenge {
             id          => $self->getRegistrationUserHandle($req),
             displayName => $displayName,
         },
-        challenge              => $challenge_base64,
-        attestation            => $attestation,
-        pubKeyCredParams       => [
-            { type => 'public-key', alg => -7   },    # ES256
+        challenge        => $challenge_base64,
+        attestation      => $attestation,
+        pubKeyCredParams => [
+            { type => 'public-key', alg => -7 },      # ES256
             { type => 'public-key', alg => -257 },    # RS256
-            { type => 'public-key', alg => -37  },    # PS256
+            { type => 'public-key', alg => -37 },     # PS256
         ],
         authenticatorSelection => { (
                 $userVerification ? ( userVerification => $userVerification )
@@ -184,7 +184,7 @@ sub _registration {
     unless ( $state_data = $self->ott->getToken($state_id) ) {
         $self->logger->error( $self->prefix
               . "2f: expired or invalid state ID in response: $state_id" );
-        return $self->failResponse( $req, 'PE82', 400 );
+        return $self->failResponse( $req, PE_TOKENEXPIRED, 400 );
     }
     my $registration_options = ( $state_data->{registration_options} );
     unless ($registration_options) {
@@ -270,7 +270,7 @@ sub _registration {
     }
     else {
         $self->logger->error( $self->prefix . '2f: unable to add device' );
-        return $self->failResponse( $req, "PE$res" );
+        return $self->failResponse( $req, $res );
     }
 }
 
@@ -329,7 +329,7 @@ sub _verification {
     unless ( $state_data = $self->ott->getToken($state_id) ) {
         $self->logger->error( $self->prefix
               . "2f: expired or invalid state ID in response ($state_id)" );
-        return $self->failResponse( $req, 'PE82', 400 );
+        return $self->failResponse( $req, PE_TOKENEXPIRED, 400 );
     }
 
     my $signature_options = ( $state_data->{authentication_options} );

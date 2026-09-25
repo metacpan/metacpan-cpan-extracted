@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::Grooves;
-$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7101';
+$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7102';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Common drum grooves
@@ -14,6 +14,22 @@ use MIDI::Drummer::Tiny ();
 use namespace::clean;
 
 extends 'MIDI::Drummer::Tiny';
+
+use constant INSTRUMENTS => (
+    BD => 'kick',
+    SN => 'snare',
+    RS => 'rimshot',
+    CH => 'closed',
+    OH => 'open',
+    CY => 'crash',
+    CB => 'cowbell',
+    CL => 'clap',
+    SH => 'shaker',
+    HT => 'hi_tom',
+    MT => 'mid_tom',
+    LT => 'low_tom',
+    HC => 'conga',
+);
 
 #pod =head1 SYNOPSIS
 #pod
@@ -41,12 +57,12 @@ extends 'MIDI::Drummer::Tiny';
 #pod
 #pod   my $density = $grooves->density($groove);
 #pod
-#pod   print "42. Density: $density, $groove->{cat}\n$groove->{name}";
+#pod   print "42. $groove->{cat}\n$groove->{name}, Density: $density";
 #pod
 #pod   # searching
 #pod   $set = $grooves->search({ cat => 'house' });
 #pod   $set = $grooves->search({ name => 'deep' }, $set); # refine search
-#pod   $set = $grooves->search({ cat => 'house', name => 'deep' }); # same
+#pod   $set = $grooves->search({ cat => 'house', name => 'deep' }, $set); # same
 #pod
 #pod   # funk and soul patterns have WAY too much crashing imho:
 #pod   $set = $grooves->search({ cat => 'funk' });
@@ -205,21 +221,7 @@ has _grooves => (
 );
 sub _build__grooves {
     my ($self) = @_;
-    my %mapping = (
-        BD => 'kick',
-        SN => 'snare',
-        RS => 'rimshot',
-        CH => 'closed',
-        OH => 'open',
-        CY => 'crash',
-        CB => 'cowbell',
-        CL => 'clap',
-        SH => 'shaker',
-        HT => 'hi_tom',
-        MT => 'mid_tom',
-        LT => 'low_tom',
-        HC => 'conga',
-    );
+    my %mapping = INSTRUMENTS;
     my $path = $self->share_file;
     my @contents = path($path)->lines;
     my (%grooves, $cat, $name, %patterns);
@@ -255,21 +257,7 @@ sub _build__grooves {
     return \%grooves;
 }
 
-for my $patch (qw(
-    kick
-    rimshot
-    snare
-    clap
-    conga
-    cowbell
-    shaker
-    closed
-    open
-    crash
-    hi_tom
-    mid_tom
-    low_tom
-)) {
+for my $patch (values INSTRUMENTS) {
     has $patch => (
         is      => 'lazy',
         builder => '_build_' . $patch,
@@ -446,7 +434,7 @@ MIDI::Drummer::Tiny::Grooves - Common drum grooves
 
 =head1 VERSION
 
-version 0.7101
+version 0.7102
 
 =head1 SYNOPSIS
 
@@ -474,12 +462,12 @@ version 0.7101
 
   my $density = $grooves->density($groove);
 
-  print "42. Density: $density, $groove->{cat}\n$groove->{name}";
+  print "42. $groove->{cat}\n$groove->{name}, Density: $density";
 
   # searching
   $set = $grooves->search({ cat => 'house' });
   $set = $grooves->search({ name => 'deep' }, $set); # refine search
-  $set = $grooves->search({ cat => 'house', name => 'deep' }); # same
+  $set = $grooves->search({ cat => 'house', name => 'deep' }, $set); # same
 
   # funk and soul patterns have WAY too much crashing imho:
   $set = $grooves->search({ cat => 'funk' });

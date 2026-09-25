@@ -1,0 +1,17 @@
+# golden: driver/debian-12--ada--not-installed
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: dpkg --print-architecture
+run: cat /etc/apt/sources.list 2>/dev/null
+file: /etc/apt/sources.list mode=644
+  | deb http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware
+  | deb http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware
+  | deb http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
+run: ls -1 /etc/apt/sources.list.d/ 2>/dev/null
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y linux-headers-6.1.0-37-amd64 nvidia-driver nvidia-smi libcuda1
+run: dpkg -l nvidia-driver 2>/dev/null | grep -q '^ii'
+DIE: nvidia-driver not installed after apt-get install — check apt output

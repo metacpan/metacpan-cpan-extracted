@@ -12,7 +12,7 @@ MIDI::Drummer::Tiny::Tutorial::Basics
 
 =head1 VERSION
 
-version 0.7101
+version 0.7102
 
 =head1 Methods and Techniques
 

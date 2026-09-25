@@ -2,7 +2,7 @@ package Protocol::IR::Format::Mode2;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 use Protocol::IR::Code;
 
@@ -12,7 +12,7 @@ use Protocol::IR::Code;
 # A mode2 capture is one timing per line: "pulse 417" and "space 1251", in
 # microseconds, strictly alternating. Consecutive messages are separated by an
 # inter-message space far wider than any in-frame timing; the log splits on a
-# space of 10000 us or more (lirc's default gap), keeping the separator in the
+# space of 10000 µs or more (lirc's default gap), keeping the separator in the
 # message so the final space is part of the decoded signal.
 #
 # decode() reads the whole capture, splits it into messages, decodes each
@@ -23,7 +23,7 @@ use Protocol::IR::Code;
 # because a capture is a record of what was on the air, not a filter.
 #
 # export() writes one message as alternating pulse/space lines, ensuring the
-# message ends on a space wide enough (>= 10000 us) that re-importing the file
+# message ends on a space wide enough (>= 10000 µs) that re-importing the file
 # splits messages back at the same boundaries.
 
 # lirc's default inter-message gap: any space this wide separates messages.
@@ -145,13 +145,15 @@ sub export {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Format::Mode2 - LIRC mode2 pulse/space capture import and export
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -173,8 +175,25 @@ format of the LIRC C<mode2> tool (and the MQTT IR test rig's receiver topic):
 one timing per line, C<pulse N> or C<space N>, in microseconds, strictly
 alternating.
 
+=over 4
+
+=item Example capture (what C<mode2> puts on stdout)
+
+    pulse 4514
+    space 4514
+    pulse 549
+    space 1708
+    pulse 549
+    space 1647
+    ...
+    space 100000
+
+=back
+
+C<mode2> is part of LIRC (L<https://www.lirc.org/>).
+
 C<decode> reads a whole capture, splits it into messages on spaces of
-B<10000 us> or more (lirc's default inter-message gap, keeping the separator
+B<10000 µs> or more (lirc's default inter-message gap, keeping the separator
 in the message that precedes it), decodes each message through every
 registered protocol decoder, and returns one L<Protocol::IR::Code> per message.
 Every code keeps its raw timings so a re-export is lossless. Messages with no
@@ -184,8 +203,8 @@ because a capture is a record of what was on the air. Codes that decode to a
 known protocol get their C<alias> set to the signal's Data hex value.
 
 C<export> writes one message per code as alternating pulse/space lines,
-ensuring each message ends on a space wide enough (B<100000 us>, or its
-existing trailing space when already B<E<gt>= 10000 us>) that re-importing
+ensuring each message ends on a space wide enough (B<100000 µs>, or its
+existing trailing space when already B<E<gt>= 10000 µs>) that re-importing
 the output splits messages back at the same boundaries. When a code carries
 no raw timings (e.g. one built with C<import_code>), they are derived by
 round-tripping the code through the protocol encoder's Pronto output, so the

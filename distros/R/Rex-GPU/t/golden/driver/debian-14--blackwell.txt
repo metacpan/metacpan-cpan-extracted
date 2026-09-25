@@ -1,0 +1,7 @@
+# golden: driver/debian-14--blackwell
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: dpkg --print-architecture
+DIE: No NVIDIA driver source on this Debian 14.0 host fits GB202 [GeForce RTX 5090] (Blackwell, 10de:2b85) (open kernel module, driver branch 570 or newer) -- debian-nonfree: proprietary kernel module, the open one is needed; nvidia-cuda-repo: NVIDIA's CUDA repo only covers Debian 12 and 13, not release '14.0'. No driver package was installed and no package source was added. Install the driver yourself; once `nvidia-smi -L` lists the GPU and libcuda.so.1 is in the linker cache, install_driver skips the driver step

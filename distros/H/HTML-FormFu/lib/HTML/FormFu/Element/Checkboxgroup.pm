@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Checkboxgroup;
-$HTML::FormFu::Element::Checkboxgroup::VERSION = '2.07';
+$HTML::FormFu::Element::Checkboxgroup::VERSION = '2.09';
 # ABSTRACT: Group of checkbox form fields
 
 use Moose;
@@ -150,6 +150,11 @@ sub _string_field {
 
     # radiogroup_tag template
 
+    my $name_attr
+        = defined $render->{nested_name}
+        ? sprintf( qq{ name="%s"}, $render->{nested_name} )
+        : q{};
+
     my $html .= sprintf "<span%s>\n", process_attrs( $render->{attributes} );
 
     for my $option ( @{ $render->{options} } ) {
@@ -174,8 +179,8 @@ sub _string_field {
                     ;
 
                 my $input = sprintf
-                    qq{<input name="%s" type="%s" value="%s"%s />\n},
-                    $render->{nested_name},
+                    qq{<input%s type="%s" value="%s"%s />\n},
+                    $name_attr,
                     $render->{input_type},
                     $item->{value},
                     process_attrs( $item->{attributes} ),
@@ -205,8 +210,8 @@ sub _string_field {
                 ;
 
             my $input = sprintf
-                qq{<input name="%s" type="%s" value="%s"%s />\n},
-                $render->{nested_name},
+                qq{<input%s type="%s" value="%s"%s />\n},
+                $name_attr,
                 $render->{input_type},
                 $option->{value},
                 process_attrs( $option->{attributes} ),
@@ -244,7 +249,7 @@ HTML::FormFu::Element::Checkboxgroup - Group of checkbox form fields
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -331,7 +336,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

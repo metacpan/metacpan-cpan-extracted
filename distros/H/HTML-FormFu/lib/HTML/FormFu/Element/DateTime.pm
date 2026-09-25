@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::DateTime;
-$HTML::FormFu::Element::DateTime::VERSION = '2.07';
+$HTML::FormFu::Element::DateTime::VERSION = '2.09';
 # ABSTRACT: Date / Time combo field
 
 use Moose;
@@ -188,7 +188,7 @@ HTML::FormFu::Element::DateTime - Date / Time combo field
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -244,7 +244,7 @@ start of the select menu.
 Each value is localized and then only used as the label for a select item
 - the value for each of these items is always the empty string C<''>.
 
-Use C<prefix_loc> insted of C<prefix>.
+Use C<prefix_loc> instead of C<prefix>.
 
 =head2 minute
 
@@ -284,7 +284,7 @@ start of the select menu.
 Each value is localized and then only used as the label for a select item
 - the value for each of these items is always the empty string C<''>.
 
-Use C<prefix_loc> insted of C<prefix>.
+Use C<prefix_loc> instead of C<prefix>.
 
 =head2 second
 
@@ -324,7 +324,7 @@ start of the select menu.
 Each value is localized and then only used as the label for a select item
 - the value for each of these items is always the empty string C<''>.
 
-Use C<prefix_loc> insted of C<prefix>.
+Use C<prefix_loc> instead of C<prefix>.
 
 =head2 field_order
 
@@ -376,7 +376,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

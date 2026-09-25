@@ -1,5 +1,67 @@
 Revision history for Rex-Rancher
 
+0.002     2026-09-24 20:39:38Z
+  - Cilium is the only CNI and replaces kube-proxy unless cilium => 0: rke2
+    gets cni: none and disable-kube-proxy; k3s now gets flannel-backend:
+    none, disable-network-policy, disable-kube-proxy and cluster-cidr
+    10.42.0.0/16, and Cilium runs with kubeProxyReplacement, its
+    cluster-pool on that range and k8sServiceHost at the new
+    k8s_service_host (default: first tls_san; a k3s deploy without one
+    dies before touching the host). gateway_api works on k3s too. Before,
+    k3s ran Flannel and kube-proxy under Cilium; re-running an existing k3s
+    cluster switches both off, and install_cilium with a kubeconfig dies
+    rather than change a deployed release's ipam.mode, so redeploy it
+    instead. cilium => 0 skips Cilium and leaves the distribution's CNI;
+    cilium_*/gateway_api/k8s_service_host options with it die. K3s carries
+    the configuration kubernetes-ocp verified live but is not yet run live
+    through Rex::Rancher; RKE2 is the supported distribution.
+  - k3s servers and agents are no longer started by the install script
+    (its blocking restart hung on an unreachable server) but restarted with
+    --no-block and waited on for at most 10 minutes, like rke2.
+  - install_cilium reads the Helm release via kubeconfig: install, upgrade,
+    purge a stale release or no-op. New helm_values and gateway_api options
+    (gateway_api_version; gateway_api_channel, default experimental so
+    Cilium up to 1.16 keeps TLSRoute), passed through by
+    rancher_deploy_server. gateway_api on rke2 disables RKE2 v1.37's
+    rke2-gateway-api-crd chart; install_cilium dies while it owns the CRDs.
+  - New install_server/rancher_deploy_server options version, node_name and
+    disable; install_method => 'artifact' (checksum-verified download) for
+    server and agent. Pinned versions are verified after install; a service
+    that fails to start dies with its journal tail.
+  - Default disables: rke2 rke2-ingress-nginx, rke2-traefik, rke2-traefik-crd
+    (RKE2 v1.36+ ships Traefik); k3s traefik, servicelb via config.yaml.
+  - Tokens: without one, install_server reuses the host's existing server
+    token instead of rotating it; K3s gets it via config.yaml only.
+    config.yaml and registries.yaml are written 0600 root:root.
+  - New gpu_setup and gpu_device_plugin options (default on) for gpu => 1,
+    to leave the host setup and/or device plugin to the NVIDIA GPU Operator
+    (Rex::GPU is then not needed), and nvidia_runtime_path (rke2, on for
+    gpu_setup => 0) for a host-installed NVIDIA runtime (DGX OS).
+  - Document gpu => 1 with newer Rex::GPU ("GPU hardware support"):
+    generation-based driver choice, Kepler-only nodes deploy without a GPU,
+    vGPU guests without a working licensed driver die, B200/B300 warn about
+    the NVLink fabric; a die comes before any driver package is installed,
+    but not necessarily before every host change.
+  - New rancher_scan_known_hosts($host) seeds known_hosts via ssh-keyscan for
+    Rex::LibSSH >= 0.004's host-key check (CWE-322), used from a 'before ALL'
+    hook; see eg/hetzner-gpu.Rexfile.
+  - Warn when the saved kubeconfig would still point at 127.0.0.1.
+  - rancher_deploy_agent dies on a missing server or token before touching
+    the host, and dies with the LibSSH hint on an SFTP-less host like
+    rancher_deploy_server.
+  - New install_agent/rancher_deploy_agent option node_labels (node-label in
+    the agent's config.yaml, as on the server).
+  - Requires Kubernetes::REST and IO::K8s 1.108; declare
+    YAML::PP and JSON::MaybeXS. Rex::LibSSH is now only recommended: needed
+    for SFTP-less hosts, not for hosts with SFTP (Rex's OpenSSH backend).
+  - rancher_deploy_server with kubeconfig_file dies, naming the cause, when
+    the kubeconfig cannot be fetched or written or the API does not answer
+    within wait_for_api's timeout, instead of carrying on to Cilium and the
+    device plugin.
+  - openSUSE/SLES documented as unverified; agent options and node
+    preparation steps documented accurately.
+  - eg/hetzner-gpu.Rexfile reduced to working tasks.
+
 0.001     2026-03-29 04:21:30Z
   - Initial release
   - RKE2 and K3s server/agent installation with unified config interface

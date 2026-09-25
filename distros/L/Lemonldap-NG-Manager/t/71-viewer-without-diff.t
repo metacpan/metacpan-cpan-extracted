@@ -81,5 +81,18 @@ ok( $res->{value} eq '_Hidden_', 'Browser is NOT allowed' )
   or print STDERR Dumper($res);
 count(2);
 
+# The whitelist applies to the routed path: neither an extra path segment
+# nor a query string ending with an allowed URI may open the browser gate
+$res = $client2->jsonResponse('/view/2/globalStorageOptions/x');
+ok( $res->{value} eq '_Hidden_', 'Deep path is NOT allowed' )
+  or print STDERR Dumper($res);
+count(1);
+
+$res = $client2->jsonResponse( '/view/2/globalStorageOptions/x',
+    'y=/view/latest' );
+ok( $res->{value} eq '_Hidden_', 'Query string does not open the gate' )
+  or print STDERR Dumper($res);
+count(1);
+
 done_testing( count() );
 

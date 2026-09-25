@@ -1,3 +1,66 @@
+Wed Sep 23 09:34:36 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.1.1]:
+	* README.md: generated
+	* VERSION: bump
+	* release-notes.md: updated
+	* release-notes/release-notes-2.1.1.md: new
+	* .github/workflows/build.yml: modified
+	* .gitignore: modified
+	* bin/amzn-s3-cli.in: new
+	* bin/run-test.in: deleted
+	* requires: JSON::PP
+	* suggests: +File::MimeInfo::Magic, +Text::ASCIITable, -Text::ASCIITable::EasyTable
+	* deps.mk: generated
+	* cpanfile: likewise
+	* Makefile: updated by CPAN::Maker::Bootstrapper
+	* lib/Amazon/S3/CLI.pm.in: new
+	* lib/Amazon/S3.pm.in
+	- new option endpoint_url
+	- pod updates
+	(new)
+	- handle new endpoint_url option
+	(_parse_endpoint): new
+	(region)
+	- only add region if host was not populated from endpoint_url
+	(empty_bucket): new
+	(list_bucket_all)
+	- change $bucket to $bucket_name to avoid confusion
+	(is_json_response): new
+	(decode_response)
+	- decode JSON payloads with fallback
+	- fix call to _handle_response_error
+	* lib/Amazon/S3/Bucket.pm.in
+	- pod updates
+	(_add_key): new
+	(add_key)
+	- refactored to allow callbacks
+	(add_key_filename): likewise
+	(_state_upload_source): new
+	* lib/Amazon/S3/BucketV2.pm.in
+	- pod updates
+	(@LIST_BUCKET_METHODS): new
+	(@DELETE_OBJECT_METHODS)
+	- +abort_multipart_upload
+	* lib/Amazon/S3/CLI.pm.in: modified
+	* requires: modified
+	* suggests: modified
+	* t/10-endpoint-url.t
+	- new subtest 'host as url'
+	* t/lib/S3TestUtils.pm
+	(set_s3_host)
+	- allow passing of host
+	- set host from environment first
+	- check LocalStack services if LocalStack
+	(get_s3_service)
+	- add raise_error parameter
+	- require host
+	- die if error creating service
+	* test-requires: +JSON, +HTTP::Tiny, JSON::PP
+	* t/11-empty-bucket.t: new
+	* t/12-add-key-sources.t: new
+	* t/13-response-decode.t: new
+
 Thu Sep 17 11:58:02 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.1.0]: autoconf migration

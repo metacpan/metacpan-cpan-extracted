@@ -1,3 +1,40 @@
+Thu Sep 24 15:06:45 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.6]:
+	* release-notes.md: modified
+	* release-note/release-notes-1.0.6.md: new
+	* VERSION: bump
+	* .includes/bootstrap.mk: updated by CPAN::Maker::Bootstrapper
+	* .includes/perl.mk: likewise
+	* .includes/update.mk: likewise
+	* Makefile: likewise
+	* lib/Amazon/Signature4/Lite.pm.in
+	- update pod
+	(sign)
+	- add payload_hash to request if present
+	* t/01-signature4-lite.t
+	- new tests for md5 hash for streaming
+
+Sun Sep  6 08:11:49 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.5]:
+	* README.md: generated
+	* VERSION: bump
+	* release-notes.md: modified
+	* release-note/release-notes-1.0.5.md: new
+	* Makefile: updated by CPAN::Maker::Bootstrapper
+	* builder: likewise
+	* lib/Amazon/Signature4/Lite.pm.in
+	(new)
+	- +disable_double_encoding option, default: 0 unless s3 then 1
+	(sign)
+	- use above option
+	* t/01-signature4-lite.t
+	- tests for above update
+	* t/02-s3-path-encoding.t: modified
+	- additional sanity checks with requests
+	- verify encoding after signing
+
 Sat Aug 22 05:21:15 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.0.4]:

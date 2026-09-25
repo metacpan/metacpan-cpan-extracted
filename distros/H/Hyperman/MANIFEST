@@ -89,6 +89,7 @@ t/51-leader.t
 t/52-distinct.t
 t/53-respawn-waker.t
 t/54-recycle-protocols.t
+t/55-future-temps.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

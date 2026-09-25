@@ -86,6 +86,28 @@ subtest 'file and dir' => sub {
 	like Getopt::Pad::Type::Dir->new(mustExist => 1)->check($file), qr/does not exist/, 'file is not a dir';
 };
 
+subtest 'paths created on demand' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+
+	my $dirType = Getopt::Pad::Type::Dir->new(createPathIfMissing => 1);
+	is $dirType->prepare("$dir/a/b"), undef, 'nested directory created';
+	ok -d "$dir/a/b", 'directory exists afterwards';
+	is $dirType->prepare($dir), undef, 'an existing directory is left alone';
+	open my $blocker, '>', "$dir/blocker" or die $!;
+	close $blocker;
+	like $dirType->prepare("$dir/blocker/sub"), qr/cannot create directory '.*blocker\/sub': \w/, 'creation failure reported';
+	is [$dirType->constraintNotes], ['created if missing'], 'constraint note';
+
+	my $fileType = Getopt::Pad::Type::File->new(createPathIfMissing => 1);
+	is $fileType->prepare("$dir/c/d.txt"), undef, 'file created with its parent';
+	ok -f "$dir/c/d.txt", 'file exists afterwards';
+	like $fileType->prepare("$dir/a"), qr/cannot create file '.*': \w/, 'a directory in the way is reported';
+	is Getopt::Pad::Type::File->new->prepare("$dir/untouched"), undef, 'nothing created without the key';
+	ok !-e "$dir/untouched", 'path still missing';
+
+	like Getopt::Pad::Type::File->checkSpecKeys(mustExist => 1, createPathIfMissing => 1), qr/mutually exclusive/, 'mustExist and createPathIfMissing exclude each other';
+};
+
 subtest 'url' => sub {
 	my $url = Getopt::Pad::Type::Url->new;
 	is $url->check('https://example.com/x'), undef, 'https url';

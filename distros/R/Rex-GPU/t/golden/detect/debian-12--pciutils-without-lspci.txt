@@ -1,0 +1,7 @@
+# golden: detect/debian-12--pciutils-without-lspci
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: command -v lspci >/dev/null 2>&1
+is_installed: pciutils
+run: command -v lspci >/dev/null 2>&1
+DIE: lspci not found on the host after installing pciutils -- GPU detection needs lspci on the PATH

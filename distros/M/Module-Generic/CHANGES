@@ -1,5 +1,48 @@
 Revision history for Perl module Module::Generic
 
+v1.8.1 2026-09-25T12:22:28+0900
+    [Bug fixes]
+    - Fixed Module::Generic::SharedMem and Module::Generic::SharedMemXS handling of
+      System V shared-memory and semaphore identifiers. An identifier of 0 is valid, but
+      several code paths incorrectly treated it as false or absent.
+      Presence checks now test definedness instead.
+    - Fixed Module::Generic::SharedMemXS::write() incorrectly rejecting a valid
+      shared-memory segment whose shmid is 0.
+    - Fixed Module::Generic::SharedMemXS::exists() to return a proper boolean value when
+      an existing shared-memory segment has shmid 0.
+    - Fixed Module::Generic::SharedMemXS::exists() to construct non-creating IPC flags
+      explicitly instead of toggling IPC_CREAT with XOR.
+    - Added an explicit definedness check for the shared-memory identifier in
+      Module::Generic::SharedMem::write().
+
+v1.8.0 2026-09-25T00:38:37+0900
+    [Bug fixes]
+    - Fixed Module::Generic::SharedMemXS and Module::Generic::SharedMem string-key
+      handling to derive stable 31-bit System V IPC keys directly from the configured
+      path and key, instead of reducing arbitrary string keys to the limited project-id
+      space used by ftok(). This substantially reduces avoidable shared-memory key
+      collisions.
+    - Fixed shared-memory open() handling so read/write key prefixes are normalised
+      before the IPC key is derived, and numeric modes are passed correctly to flags().
+    - Fixed Module::Generic::SharedMem exists() to build non-creating flags explicitly
+      instead of toggling IPC_CREAT with XOR.
+    - Fixed Module::Generic::SharedMem open() fallback behaviour that could advance the
+      stored serial after a successful shmget(), causing the shared-memory segment and
+      its semaphore to use different keys.
+    - Fixed handling of valid shared-memory and semaphore identifier 0 in several code
+      paths.
+    - Fixed DESTROY cleanup in Module::Generic::SharedMemXS and Module::Generic::SharedMem
+      so cleanup is no longer skipped for a valid shared-memory id and semaphore removal
+      respects destroy_semaphore.
+    - Fixed explicit mode 0 handling in flags(), which was previously replaced by the
+      default mode 0666.
+
+    [Improvements]
+    - Shared-memory objects returned by open() now preserve relevant object state such
+      as exclusive, destroy_semaphore, and base64 where applicable.
+    - Updated SharedMem documentation to describe the revised string-key derivation and
+      shared-memory key semantics.
+
 v1.7.1 2026-09-15T11:05:06+0900
     [New features]
     - Added _register_error_callback(), _remove_error_callback() and _error_callbacks()

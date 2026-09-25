@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Role::Element::Field;
-$HTML::FormFu::Role::Element::Field::VERSION = '2.07';
+$HTML::FormFu::Role::Element::Field::VERSION = '2.09';
 # ABSTRACT: Role for all form-field elements
 
 use Moose::Role;
@@ -80,7 +80,7 @@ after BUILD => sub {
     $self->label_attributes(           {} );
     $self->error_attributes(           {} );
     $self->error_container_attributes( {} );
-    $self->label_filename('label');
+    $self->label_filename('field_layout_label');
     $self->label_tag('label');
     $self->container_tag('div');
     $self->is_field(1);
@@ -385,6 +385,9 @@ sub process_input {
     my $default   = $self->default;
     my $original  = $self->value;
     my $name      = $self->nested_name;
+
+    # a field without a name has no input to process
+    return if !defined $name;
 
     # set input to default value (defined before calling FormFu->process)
     if ( $submitted && $self->force_default && defined $default ) {
@@ -1155,7 +1158,7 @@ HTML::FormFu::Role::Element::Field - Role for all form-field elements
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 DESCRIPTION
 
@@ -1806,7 +1809,7 @@ Must be set by more specific field classes.
 
 The template filename to be used to render the label.
 
-Defaults to C<label>.
+Defaults to C<field_layout_label>.
 
 =head1 ERROR HANDLING
 
@@ -1923,7 +1926,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

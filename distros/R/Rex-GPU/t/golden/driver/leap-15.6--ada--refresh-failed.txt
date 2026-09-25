@@ -1,0 +1,18 @@
+# golden: driver/leap-15.6--ada--refresh-failed
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: rpm -e $(rpm -qa | grep -E '^(nvidia|libnvidia)' | grep -v 'container') 2>/dev/null || true
+run: ZYPP_LOCK_TIMEOUT=120 zypper rr nvidia-gfx 2>/dev/null || true
+run: ZYPP_LOCK_TIMEOUT=120 zypper addrepo --refresh https://download.nvidia.com/opensuse/leap/15.6/ nvidia-gfx 2>&1
+run: ZYPP_LOCK_TIMEOUT=120 zypper --gpg-auto-import-keys refresh nvidia-gfx 2>&1
+run: ZYPP_LOCK_TIMEOUT=120 zypper rr nvidia-gfx 2>/dev/null || true
+DIE: zypper refresh of repository nvidia-gfx (https://download.nvidia.com/opensuse/leap/15.6/) failed (exit 4): Retrieving repository 'nvidia-gfx' metadata [.error]
+Repository 'nvidia-gfx' is invalid.
+[nvidia-gfx|https://download.nvidia.com/opensuse/leap/15.6/] Failed to retrieve new repository metadata.
+History:
+ - [nvidia-gfx|https://download.nvidia.com/opensuse/leap/15.6/] Repository type can't be determined.
+Please check if the URIs defined for this repository are pointing to a valid repository.
+Skipping repository 'nvidia-gfx' because of the above error.
+Could not refresh the repositories because of errors.; the repository was removed again; nothing was installed from it

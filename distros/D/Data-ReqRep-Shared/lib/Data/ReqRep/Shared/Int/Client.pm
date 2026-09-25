@@ -1,7 +1,7 @@
 package Data::ReqRep::Shared::Int::Client;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use Data::ReqRep::Shared ();
 1;
 

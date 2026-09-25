@@ -3,17 +3,12 @@ use warnings;
 use Test::More;
 use Config;
 use File::Temp 'tmpnam';
+use Time::HiRes ();
 
 use Data::ReqRep::Shared;
 use Data::ReqRep::Shared::Client;
 
 plan skip_all => 'fork required' unless $Config{d_fork};
-
-# Argument magic that explicitly calls $obj->DESTROY frees the C handle
-# mid-method.  Before the REEXTRACT_HANDLE fix the method dereferenced the
-# freed pointer and SEGFAULTED; after it, the method must croak cleanly.
-# Exit codes in the child: 0 = croaked (correct), 7 = ran on through freed
-# memory (REEXTRACT removed or ineffective).
 
 {
     package Evil;
@@ -27,27 +22,44 @@ my $path = tmpnam();
 my $srv  = Data::ReqRep::Shared->new($path, 8, 4, 256);
 
 my @cases = (
-    [ 'Client::send' => sub {           # magic runs on payload (SvPV)
+    [ 'Client::send' => sub {
         my $cli  = Data::ReqRep::Shared::Client->new($path);
         my $evil = bless [$cli], 'Evil';
         return eval { $cli->send($evil); 1 };
     } ],
-    [ 'reply' => sub {                  # magic runs on payload (SvPV)
+    [ 'reply' => sub {
         my $cli = Data::ReqRep::Shared::Client->new($path);
         $cli->send('x');
-        my (undef, $rid) = $srv->recv;  # valid request id
+        my (undef, $rid) = $srv->recv;
         my $evil = bless [$srv], 'Evil';
         return eval { $srv->reply($rid, $evil); 1 };
     } ],
-    [ 'recv_wait' => sub {              # magic runs on timeout (SvNV)
+    [ 'recv_wait' => sub {
         my $evil = bless [$srv], 'Evil';
         return eval { $srv->recv_wait($evil); 1 };
     } ],
-    [ 'drain' => sub {                  # magic runs on max_count (SvUV)
+    [ 'drain' => sub {
         my $evil = bless [$srv], 'Evil';
         return eval { $srv->drain($evil); 1 };
     } ],
 );
+
+# A signal interrupts the wait and the payload is read again: that second read destroys the handle.
+{
+    package Late;
+    use overload '""' => sub { $_[0]{cli}->DESTROY if ++$_[0]{n} == 2; 'k' }, fallback => 1;
+}
+for my $meth (qw(send_wait send_wait_notify req req_wait)) {
+    push @cases, [ "Client::$meth after a signal" => sub {
+        my $s = Data::ReqRep::Shared->new(undef, 2, 8, 64);
+        my $cli = Data::ReqRep::Shared::Client->new_from_fd($s->memfd);
+        if ($meth =~ /^send_wait/) { $cli->send("fill$_") for 1 .. 2 }
+        my $late = bless { n => 0, cli => $cli }, 'Late';
+        local $SIG{ALRM} = sub {};
+        Time::HiRes::ualarm(100_000);
+        return eval { $cli->$meth($late, $meth eq 'req' ? () : 1); 1 };
+    } ];
+}
 
 for my $case (@cases) {
     my ($method, $code) = @$case;

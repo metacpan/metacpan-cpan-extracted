@@ -26,18 +26,18 @@ my %WriteMakefileArgs = (
         'strict'                => 0,
         'vars'                  => 0,
         'warnings'              => 0,
-        'Clone'                 => '0.45',
+        'Clone'                 => '0.43',
         'Config'                => 0,
         'Errno'                 => 0,
     	'Filter::Util::Call'    => '1.59',
-        'Module::Generic'       => 'v1.0.2',
+        'Module::Generic'       => 'v1.8.1',
         'PPI'                   => '1.278',
         'POSIX'                 => 0,
         'Scalar::Util'          => '1.50',
         # 'Storable'      => '3.15',
         'Storable::Improved'    => 'v0.1.3',
         'Time::HiRes'           => 'v0.1.3',
-        'Wanted'                => 'v0.1.0',
+        'Wanted'                => 'v0.1.2',
     },
     TEST_REQUIRES =>
     {
@@ -59,12 +59,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@gitlab.com:jackdeguest/Promise-Me.git',
-                web         => 'https://gitlab.com/jackdeguest/Promise-Me',
+                url         => 'git@gitlab.com:deguest/Promise-Me.git',
+                web         => 'https://gitlab.com/deguest/Promise-Me',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://gitlab.com/jackdeguest/Promise-Me/issues',
+                web         => 'https://gitlab.com/deguest/Promise-Me/issues',
             },
         },
     }) : ()),

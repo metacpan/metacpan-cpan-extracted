@@ -15,7 +15,6 @@ my $BATCH = 100;
 
 my $pid = fork // die "fork: $!";
 if ($pid == 0) {
-    # Server: batch recv + batch reply
     my $processed = 0;
     while ($processed < $TOTAL) {
         my @batch = $srv->recv_wait_multi(100, 5.0);
@@ -35,15 +34,13 @@ my $t0 = time();
 
 for (my $sent = 0; $sent < $TOTAL; $sent += $BATCH) {
     my $n = ($sent + $BATCH <= $TOTAL) ? $BATCH : $TOTAL - $sent;
-    # fire batch
     my @ids;
     for (1..$n) {
         my $id = $cli->send_wait("msg", 5.0);
         push @ids, $id if defined $id;
     }
-    # collect batch
     for my $id (@ids) {
-        $cli->get_wait($id, 5.0);
+        $cli->get_wait($id, 5.0) // $cli->cancel($id);
     }
 }
 

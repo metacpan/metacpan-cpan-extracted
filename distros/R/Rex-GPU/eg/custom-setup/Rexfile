@@ -1,0 +1,71 @@
+#!/usr/bin/env perl
+# Example: a custom NVIDIA driver setup class dropped into the project.
+#
+# Layout:
+#   eg/custom-setup/Rexfile
+#   eg/custom-setup/lib/My/GPU/Setup.pm   <- the class; Rex puts lib/ on @INC
+#   eg/custom-setup/lib/My/GPU/DebianMirror.pm  <- Debian: a mirror of your own
+#
+# Usage (Ubuntu hosts -- My::GPU::Setup extends the Ubuntu setup):
+#   rex -f eg/custom-setup/Rexfile -H <host> setup
+#   rex -f eg/custom-setup/Rexfile -H <host> setup_mirror --apt_line='deb [...] http://... noble main restricted'
+#   rex -f eg/custom-setup/Rexfile -H <debian-host> setup_debian_mirror
+#
+# Two ways to choose the class, the first wins:
+#   1. gpu_setup(setup => 'My::GPU::Setup') or setup => My::GPU::Setup->new(...)
+#   2. set gpu_nvidia_setup => 'My::GPU::Setup' -- below. It also reaches
+#      Rex::Rancher's gpu => 1, which calls gpu_setup without a setup option.
+# With neither, Rex::GPU picks its own class by OS.
+#
+# Testing the WORKING TREE: see eg/Rexfile -- prepend PERL5LIB=$PWD/lib.
+use Rex -feature => ['1.4'];
+use Rex::LibSSH;
+use Rex::GPU;
+
+my $key  = $ENV{REX_KEY}  || "$ENV{HOME}/.ssh/id_ed25519";
+my $user = $ENV{REX_USER} || 'root';
+
+set connection  => 'LibSSH';
+set user        => $user;
+set private_key => $key;
+set public_key  => "$key.pub";
+set auth        => 'key';
+
+# Every gpu_setup / install_driver in this Rexfile uses the project's class.
+set gpu_nvidia_setup => 'My::GPU::Setup';
+
+desc 'GPU setup with My::GPU::Setup (chosen by set gpu_nvidia_setup)';
+task 'setup', sub {
+  my ($params) = @_;
+  gpu_setup(
+    containerd_config => ($params->{runtime} // 'rke2'),
+    reboot            => ($params->{reboot}  // 0),
+  );
+};
+
+desc 'GPU setup with a configured My::GPU::Setup object and a tighter requirement';
+task 'setup_mirror', sub {
+  my ($params) = @_;
+  die "apt_line= required\n" unless $params->{apt_line};
+  gpu_setup(
+    containerd_config => ($params->{runtime} // 'rke2'),
+    reboot            => ($params->{reboot}  // 0),
+    # an object wins over set gpu_nvidia_setup; it gets the detected GPUs
+    setup             => My::GPU::Setup->new(apt_line => $params->{apt_line}),
+    # intersected with what the GPUs need: can only tighten
+    requirement       => { min_branch => 580 },
+  );
+};
+
+desc 'GPU setup on a Debian host whose sources point at a mirror of your own';
+task 'setup_debian_mirror', sub {
+  my ($params) = @_;
+  gpu_setup(
+    containerd_config => ($params->{runtime} // 'rke2'),
+    reboot            => ($params->{reboot}  // 0),
+    # a class name wins over set gpu_nvidia_setup
+    setup             => 'My::GPU::DebianMirror',
+  );
+};
+
+1;

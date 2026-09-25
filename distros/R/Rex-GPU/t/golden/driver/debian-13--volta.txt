@@ -1,0 +1,34 @@
+# golden: driver/debian-13--volta
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: dpkg --print-architecture
+run: cat /etc/apt/sources.list 2>/dev/null
+run: ls -1 /etc/apt/sources.list.d/ 2>/dev/null
+run: cat /etc/apt/sources.list.d/debian.sources 2>/dev/null
+file: /etc/apt/sources.list.d/debian.sources mode=644
+  | Types: deb
+  | URIs: http://deb.debian.org/debian/
+  | Suites: trixie trixie-updates
+  | Components: main non-free-firmware contrib non-free
+  | Signed-By: /usr/share/keyrings/debian-archive-keyring.pgp
+  | 
+  | Types: deb
+  | URIs: http://security.debian.org/debian-security/
+  | Suites: trixie-security
+  | Components: main non-free-firmware contrib non-free
+  | Signed-By: /usr/share/keyrings/debian-archive-keyring.pgp
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y linux-headers-6.12.48+deb13-amd64 nvidia-driver nvidia-smi libcuda1
+run: dpkg -l nvidia-driver 2>/dev/null | grep -q '^ii'
+run: dpkg -l libcuda1 2>/dev/null | grep -q '^ii'
+file: /etc/modprobe.d/blacklist-nouveau.conf
+  | blacklist nouveau
+  | options nouveau modeset=0
+run: update-initramfs -u 2>/dev/null
+run: modprobe nvidia
+run: lsmod | grep '^nvidia '
+run: nvidia-smi -L 2>&1
+run: /sbin/ldconfig -p 2>/dev/null | grep -q '^[[:space:]]*libcuda\.so\.1 '

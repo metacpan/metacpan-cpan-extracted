@@ -1,0 +1,10 @@
+# golden: toolkit/rocky-9
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+can_run: nvidia-ctk
+run: curl -fsSL https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo -o /etc/yum.repos.d/nvidia-container-toolkit.repo.tmp
+run: grep -q '^\[nvidia-container-toolkit\]' /etc/yum.repos.d/nvidia-container-toolkit.repo.tmp && chmod 0644 /etc/yum.repos.d/nvidia-container-toolkit.repo.tmp && mv -f /etc/yum.repos.d/nvidia-container-toolkit.repo.tmp /etc/yum.repos.d/nvidia-container-toolkit.repo
+run: rm -f /etc/yum.repos.d/nvidia-container-toolkit.repo.tmp
+run: dnf clean expire-cache
+run: dnf install -y nvidia-container-toolkit
+run: rpm -q nvidia-container-toolkit 2>&1

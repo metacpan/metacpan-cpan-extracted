@@ -1,0 +1,28 @@
+# golden: driver/rocky-10--hgx-h100
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: cat /etc/os-release 2>/dev/null
+pkg: epel-release ensure=present
+run: dnf config-manager --set-enabled crb 2>/dev/null || true
+run: uname -m
+run: dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel10/x86_64/cuda-rhel10.repo 2>&1
+run: dnf clean expire-cache
+run: dnf install -y kernel-devel-matched kernel-headers kmod-nvidia-open-dkms nvidia-driver nvidia-driver-cuda
+run: rpm -q nvidia-driver 2>&1
+run: rpm -q --qf '%{VERSION}' nvidia-driver 2>&1
+run: dnf install -y nvidia-fabricmanager-580.95.05
+run: rpm -q nvidia-fabricmanager 2>&1
+run: rpm -q --qf '%{VERSION}' nvidia-fabricmanager 2>&1
+run: systemctl enable nvidia-fabricmanager.service
+file: /etc/modprobe.d/blacklist-nouveau.conf
+  | blacklist nouveau
+  | options nouveau modeset=0
+run: dracut --force 2>/dev/null
+run: modprobe nvidia
+run: systemctl start nvidia-fabricmanager.service
+run: systemctl is-active --quiet nvidia-fabricmanager.service
+run: lsmod | grep '^nvidia '
+run: nvidia-smi -L 2>&1
+run: /sbin/ldconfig -p 2>/dev/null | grep -q '^[[:space:]]*libcuda\.so\.1 '

@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+# Example: the Ubuntu driver package chosen by `ubuntu-drivers list --gpgpu`
+# instead of Rex::GPU's apt-cache search, through a custom setup class.
+#
+# Layout:
+#   eg/ubuntu-drivers/Rexfile
+#   eg/ubuntu-drivers/lib/My/GPU/UbuntuDrivers.pm   <- the class; Rex puts lib/ on @INC
+#
+# Usage (Ubuntu hosts only):
+#   rex -f eg/ubuntu-drivers/Rexfile -H <host> setup
+#   rex -f eg/ubuntu-drivers/Rexfile -H <host> driver --device_id=2b85 --name='RTX 5090'
+#
+# `driver` is install_driver alone, with a GPU the caller found itself -- no
+# lspci, no pciutils: only device_id (four hex digits, no 0x) and name are
+# read. Testing the WORKING TREE: see eg/Rexfile -- prepend PERL5LIB=$PWD/lib.
+use Rex -feature => ['1.4'];
+use Rex::LibSSH;
+use Rex::GPU;
+use Rex::GPU::NVIDIA;
+
+my $key  = $ENV{REX_KEY}  || "$ENV{HOME}/.ssh/id_ed25519";
+my $user = $ENV{REX_USER} || 'root';
+
+set connection  => 'LibSSH';
+set user        => $user;
+set private_key => $key;
+set public_key  => "$key.pub";
+set auth        => 'key';
+
+set gpu_nvidia_setup => 'My::GPU::UbuntuDrivers';
+
+desc 'GPU setup, driver package named by ubuntu-drivers';
+task 'setup', sub {
+  my ($params) = @_;
+  gpu_setup(
+    containerd_config => ($params->{runtime} // 'rke2'),
+    reboot            => ($params->{reboot}  // 0),
+  );
+};
+
+desc 'Driver only, for a GPU given on the command line (no lspci)';
+task 'driver', sub {
+  my ($params) = @_;
+  die "device_id= required (four hex digits, e.g. 2b85)\n" unless $params->{device_id};
+  Rex::GPU::NVIDIA::install_driver(
+    gpu    => { device_id => $params->{device_id}, name => ($params->{name} // 'NVIDIA GPU') },
+    reboot => ($params->{reboot} // 0),
+  );
+};
+
+1;

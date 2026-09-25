@@ -103,7 +103,7 @@ Module::Generic::SharedMem - Shared Memory Manipulation
 
 =head1 VERSION
 
-    v0.5.6
+    v0.6.1
 
 =head1 DESCRIPTION
 
@@ -174,11 +174,11 @@ The shared memory key identifier to use. It defaults to C<IPC::SysV::IPC_PRIVATE
 
 If you provide an empty value, it will revert to C<IPC::SysV::IPC_PRIVATE>.
 
-If you provide a number, it will be used to call L<IPC::SysV/ftok>.
+If you provide a number, it will be used as the project id passed to L<IPC::SysV/ftok>.
 
-Otherwise, if you provide a key as string, the characters in the string will be converted to their numeric value and added up. The resulting id, called C<project id> by L<IPC::SysV>, will be used to call L<IPC::SysV/ftok> and will produce an hopefully unique and repeatable value.
+If you provide a string key, a stable positive 31-bit System V IPC key is derived from the string together with the selected path. This avoids reducing arbitrary string keys to the small project-id space used by C<ftok()> and therefore substantially reduces avoidable key collisions.
 
-Either way, the resulting value is used to create a shared memory segment and a semaphore by L</open>.
+Either way, the resulting numeric value is used to create or access a shared memory segment and its semaphore by L</open>.
 
 =item * C<mode>
 
@@ -503,7 +503,7 @@ Returns the serial number used to create or access the shared memory segment.
 
 This serial is created based on the C<key> parameter provided either upon object instantiation or upon using the L</open> method.
 
-The serial is created by calling L<IPC::SysV/ftok> to provide a reliable and repeatable numeric identifier.
+For numeric keys, the serial is created with L<IPC::SysV/ftok>. For string keys, it is derived directly as a stable positive 31-bit System V IPC key from the configured path and string key.
 
 =head2 serialiser
 

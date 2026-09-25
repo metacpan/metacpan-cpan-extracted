@@ -30,6 +30,10 @@ sub _run {
         my $env = $_[0];
         $env->{HTTP_HOST}   = $env->{HTTP_X_FORWARDED_HOST};
         $env->{REQUEST_URI} = $env->{HTTP_X_FORWARDED_URI};
+
+        # Traefik/Caddy don't expose the routed URI: X-Forwarded-Uri is all
+        # we have, so it is the source of the access control URI
+        $self->api->setAccessControlUri($env);
         return $app->($env);
     }
 }

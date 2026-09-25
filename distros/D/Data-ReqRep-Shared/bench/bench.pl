@@ -16,7 +16,6 @@ sub fmt_rate {
     return sprintf("%.0f", $r);
 }
 
-# --- Single-process echo ---
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 1024, 64, 4096);
@@ -43,7 +42,6 @@ sub fmt_rate {
     $srv->unlink;
 }
 
-# --- Cross-process echo ---
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 1024, 64, 4096);
@@ -70,7 +68,6 @@ sub fmt_rate {
     $srv->unlink;
 }
 
-# --- Batch recv echo ---
 {
     my $batch = 100;
     my $iters = int($N / $batch);
@@ -108,7 +105,6 @@ sub fmt_rate {
     $srv->unlink;
 }
 
-# --- req_wait with timeout ---
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 1024, 64, 4096);

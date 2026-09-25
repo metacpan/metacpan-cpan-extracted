@@ -2,10 +2,12 @@ package Protocol::IR::Proto::Panasonic;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 use Protocol::IR::Code;
 
 =pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -13,7 +15,7 @@ Protocol::IR::Proto::Panasonic - Panasonic (Kaseikyo) protocol handler
 
 =head1 VERSION
 
-Version 1.0
+Version 1.1
 
 =head1 DESCRIPTION
 
@@ -23,7 +25,7 @@ from the DecodeIR definition:
   {36k,432}<1,-1|1,-3>(8,-4,M:8,ID:8,D:8,S:8,F:8,(D^S^F):8,1,-173)+
 
 Six bytes are transmitted in order (Mfg_hi=0x40, Mfg_lo=0x04, device,
-subdevice, function, checksum) behind a 3456/1728 us header.  The frame is
+subdevice, function, checksum) behind a 3456/1728 µs header.  The frame is
 structured identically to JVC-48 (Kaseikyo family) with different OEM codes.
 Each byte is sent MSB-first on the wire, so the value a receiver accumulates
 (Tasmota's DataLSB) has per-byte bit-reversed OEM and device/function bytes.
@@ -149,7 +151,7 @@ sub decode_timing {
 
     my ($hdr_mark, $hdr_space) = @{$burst_pairs->[0]};
 
-    # Panasonic Header Check: ~3456us mark, ~1728us space (8/-4 of 432us).
+    # Panasonic Header Check: ~3456 µs mark, ~1728 µs space (8/-4 of 432 µs).
     return undef unless ($hdr_mark >= 2800 && $hdr_mark <= 4100) &&
                         ($hdr_space >= 1300 && $hdr_space <= 2100);
 
@@ -158,7 +160,7 @@ sub decode_timing {
         my $pair  = $burst_pairs->[$i + 1];
         my $space = $pair->[1];
 
-        # Space ~1296us = 1, ~432us = 0
+        # Space ~1296 µs = 1, ~432 µs = 0
         my $bit = ($space > 800) ? 1 : 0;
         my $byte_idx = int($i / 8);
         my $bit_idx  = $i % 8; # LSB-first

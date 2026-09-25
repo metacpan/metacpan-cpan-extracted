@@ -1,0 +1,54 @@
+{
+   "abstract" : "authenticated symmetric and hybrid RSA encryption and signatures, one common API",
+   "author" : [
+      "Vladi Belperchinov-Shabanski \"Cade\" <cade@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Tools-Crypto",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CryptX" : "0.048",
+            "Data::Tools" : "0",
+            "Encode" : "0",
+            "Exception::Sink" : "0",
+            "JSON" : "4.0",
+            "MIME::Base64" : "3.11"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cade-vs/perl-data-tools-crypto.git",
+         "web" : "https://github.com/cade-vs/perl-data-tools-crypto"
+      }
+   },
+   "version" : "1.53",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

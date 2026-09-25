@@ -69,8 +69,22 @@ sub new {
         # it (when slow) to /spans. span() and record_span() only record inside a trace, so this
         # gates the whole feature. On by default.
         track_tracing => 1,
-        # A trace is only sent when its root span took at least this many seconds.
+        # A trace is only sent when its root span took at least this many seconds, or the request
+        # errored.
         trace_capture_threshold => 1,
+        # Whether ForgeOps::Tracker::http_span hands its code a W3C `traceparent` header
+        # (https://www.w3.org/TR/trace-context/) for the outgoing request, so the service being
+        # called can continue this request's trace instead of starting its own. On by default, and
+        # independent of track_tracing: the header also carries the trace id that links an error
+        # here to an error there, which is useful with or without spans.
+        propagate_traces => 1,
+        # Which hosts get that header: undef (the default) means every host. Otherwise an arrayref
+        # where each entry is either a host string, matching that host and its subdomains on a dot
+        # boundary, ignoring case and a leading dot ("example.com" matches "api.example.com" but
+        # not "badexample.com"), or a qr// regular expression matched against the host. Useful for
+        # third-party APIs that reject unknown headers, or that shouldn't learn this app's trace
+        # ids at all.
+        trace_propagation_targets => undef,
     }, $class;
 }
 
@@ -148,6 +162,30 @@ sub spans_uri {
 
     (my $swapped = $uri) =~ s{/events\z}{/spans};
     return $swapped;
+}
+
+# Whether an outgoing request to $host should carry a traceparent header; see propagate_traces and
+# trace_propagation_targets above. Case-insensitive, since hostnames are.
+sub should_propagate_trace {
+    my ($self, $host) = @_;
+    return 0 unless $self->{propagate_traces};
+
+    my $targets = $self->{trace_propagation_targets};
+    return 1 unless defined $targets;
+    return 0 unless defined $host && length $host;
+
+    $host = lc $host;
+    for my $target (ref $targets eq 'ARRAY' ? @$targets : ($targets)) {
+        next unless defined $target;
+        if (ref $target eq 'Regexp') {
+            return 1 if $host =~ $target;
+            next;
+        }
+        (my $name = lc $target) =~ s/\A\.//;
+        next unless length $name;
+        return 1 if $host eq $name || substr($host, -length(".$name")) eq ".$name";
+    }
+    return 0;
 }
 
 sub is_enabled {

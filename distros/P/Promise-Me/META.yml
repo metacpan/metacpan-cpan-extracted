@@ -24,17 +24,17 @@ no_index:
     - t
     - inc
 requires:
-  Clone: '0.45'
+  Clone: '0.43'
   Config: '0'
   Errno: '0'
   Filter::Util::Call: '1.59'
-  Module::Generic: v1.0.2
+  Module::Generic: v1.8.1
   POSIX: '0'
   PPI: '1.278'
   Scalar::Util: '1.50'
   Storable::Improved: v0.1.3
   Time::HiRes: v0.1.3
-  Wanted: v0.1.0
+  Wanted: v0.1.2
   curry: '0'
   parent: '0'
   perl: '5.014000'
@@ -42,7 +42,7 @@ requires:
   vars: '0'
   warnings: '0'
 resources:
-  bugtracker: https://gitlab.com/jackdeguest/Promise-Me/issues
-  repository: https://gitlab.com/jackdeguest/Promise-Me
-version: v0.6.0
+  bugtracker: https://gitlab.com/deguest/Promise-Me/issues
+  repository: https://gitlab.com/deguest/Promise-Me
+version: v0.6.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

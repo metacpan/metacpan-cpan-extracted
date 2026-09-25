@@ -1,12 +1,11 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.6.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.6.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2025/07/24
+## Modified 2026/09/25
 ## All rights reserved
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -91,7 +90,7 @@ BEGIN
     our $OBJECTS_REPO = [];
     our $EXCEPTION_CLASS = 'Module::Generic::Exception';
     our $SERIALISER = 'storable';
-    our $VERSION = 'v0.6.0';
+    our $VERSION = 'v0.6.1';
 };
 
 use strict;
@@ -2168,7 +2167,7 @@ sub SHIFT
     }
     else
     {
-        $self->load( $self->{data} ) || return( $self->pass_error );
+        $self->unload( $self->{data} ) || return( $self->pass_error );
     }
     return( $val );
 }
@@ -2307,7 +2306,7 @@ sub load
     warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled( 'Promise::Me' ) );
     my $addr = $self->addr || return( $self->error( "No variable address found!" ) );
     my $data = $repo->{ $addr };
-    if( my $obj = tied( $self->{type} eq 'array' ? @$data : $self->{type} eq 'hash' ? @$data : $$data ) )
+    if( my $obj = tied( $self->{type} eq 'array' ? @$data : $self->{type} eq 'hash' ? %$data : $$data ) )
     {
         die( "Data received ($data) is tied to class '", ref( $obj ), "'!\n" );
     }
@@ -2657,7 +2656,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.6.0
+    v0.6.1
 
 =head1 DESCRIPTION
 

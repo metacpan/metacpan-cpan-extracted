@@ -25,7 +25,21 @@ use ForgeOps::Tracker;
 #
 # Also starts a trace per request in before_request and finishes it in after_request (root span
 # named like the transaction), so a slow request's own breakdown reaches /spans; there is no
-# automatic database or HTTP span, add those by hand with ForgeOps::Tracker::span.
+# automatic database or HTTP span, add those by hand with ForgeOps::Tracker::span (and
+# ForgeOps::Tracker::http_span for an outgoing HTTP call, which also hands it the traceparent
+# header to send).
+#
+# The trace continues the caller's when the request arrived with a usable W3C `traceparent` header
+# (see ForgeOps::Tracker::TraceParent), and its trace id exists even with track_tracing off, since
+# every error reported during the request carries it. Dancer2 has already matched the route when
+# before_request fires, so the request is named there (transaction name and endpoint, both
+# "GET /users/:id"), before the route runs: an error reported from inside the route carries both.
+#
+# A route that dies never reaches after_request (see below), so an on_route_exception hook
+# finishes its trace instead, marked errored so it's sent however fast it was. It remembers the
+# request's context for that error first (ForgeOps::Tracker::snapshot_onto): Dancer2 runs the two
+# plugins' on_route_exception hooks in load order, and Integrations::Dancer2's report has to find
+# the trace id either way.
 #
 # The transaction name is the matched route's own spec_route (e.g. "/users/:id", the pattern as
 # originally declared): Dancer2 sets this on the request during route matching, before the route
@@ -47,9 +61,31 @@ sub BUILD {
         name => 'before_request',
         code => sub {
             ForgeOps::Tracker::clear_breadcrumbs();
-            ForgeOps::Tracker::start_trace();
             my $request = $app->request;
-            $request->var($STARTED_AT_KEY, Time::HiRes::time) if $request;
+            ForgeOps::Tracker::start_trace($request ? scalar $request->header('traceparent') : undef);
+            return unless $request;
+
+            $request->var($STARTED_AT_KEY, Time::HiRes::time);
+            my $route = $request->route;
+            if ($route) {
+                my $name = $request->method . ' ' . $route->spec_route;
+                ForgeOps::Tracker::set_request_route($name, $name);
+            }
+        },
+    ));
+
+    $app->add_hook(Dancer2::Core::Hook->new(
+        name => 'on_route_exception',
+        code => sub {
+            my (undef, $error) = @_;
+            my $request = $app->request;
+            ForgeOps::Tracker::snapshot_onto($error);
+            my $started_at = $request ? $request->var($STARTED_AT_KEY) : undef;
+            return unless defined $started_at;
+
+            ForgeOps::Tracker::finish_trace(
+                _transaction_name($request), $started_at, (Time::HiRes::time - $started_at) * 1000,
+            );
         },
     ));
 
@@ -63,9 +99,7 @@ sub BUILD {
             return unless defined $started_at;
 
             my $duration_ms = (Time::HiRes::time - $started_at) * 1000;
-            my $route = $request->route;
-            my $pattern = $route ? $route->spec_route : undef;
-            my $transaction_name = $request->method . ' ' . (defined $pattern ? "$pattern" : $request->path);
+            my $transaction_name = _transaction_name($request);
 
             ForgeOps::Tracker::record_performance($transaction_name, $duration_ms);
             ForgeOps::Tracker::finish_trace($transaction_name, $started_at, $duration_ms);
@@ -76,6 +110,13 @@ sub BUILD {
             );
         },
     ));
+}
+
+sub _transaction_name {
+    my ($request) = @_;
+    my $route = $request->route;
+    my $pattern = $route ? $route->spec_route : undef;
+    return $request->method . ' ' . (defined $pattern ? "$pattern" : $request->path);
 }
 
 1;

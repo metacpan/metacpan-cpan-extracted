@@ -1,0 +1,10 @@
+# golden: driver/ubuntu-24.04--volta--no-candidate
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: dpkg --print-architecture
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: LC_ALL=C apt-cache policy nvidia-driver-580-server 2>/dev/null
+DIE: The NVIDIA driver source ubuntu-server-580 chosen for GV100GL [Tesla V100 PCIe 16GB] (Maxwell/Pascal/Volta, 10de:1db4) (proprietary kernel module, driver branch 580 or older) has nothing to install on this Ubuntu 24.04 host: nvidia-driver-580-server has no installation candidate after apt-get update, and no other package is substituted. No driver package was installed, only the package sources were prepared. Install the driver yourself; once `nvidia-smi -L` lists the GPU and libcuda.so.1 is in the linker cache, install_driver skips the driver step

@@ -5,11 +5,15 @@
  *   https://rt.cpan.org/Ticket/Display.html?id=128562
  */
 
-#define newOP_CUSTOM(func, flags)                   S_newOP_CUSTOM(aTHX_ func, flags)
-#define newUNOP_CUSTOM(func, flags, first)          S_newUNOP_CUSTOM(aTHX_ func, flags, first)
-#define newSVOP_CUSTOM(func, flags, sv)             S_newSVOP_CUSTOM(aTHX_ func, flags, sv)
-#define newBINOP_CUSTOM(func, flags, first, last)   S_newBINOP_CUSTOM(aTHX_ func, flags, first, last)
-#define newLOGOP_CUSTOM(func, flags, first, other)  S_newLOGOP_CUSTOM(aTHX_ func, flags, first, other)
+#define newOP_CUSTOM(func, flags)                    S_newOP_CUSTOM(aTHX_ func, flags)
+#define newUNOP_CUSTOM(func, flags, first)           S_newUNOP_CUSTOM(aTHX_ func, flags, first)
+#if HAVE_PERL_VERSION(5, 22, 0)
+#  define newUNOP_AUX_CUSTOM(func, flags, first, aux)  S_newUNOP_AUX_CUSTOM(aTHX_ func, flags, first, aux)
+#endif
+#define newSVOP_CUSTOM(func, flags, sv)              S_newSVOP_CUSTOM(aTHX_ func, flags, sv)
+#define newBINOP_CUSTOM(func, flags, first, last)    S_newBINOP_CUSTOM(aTHX_ func, flags, first, last)
+#define newLISTOP_CUSTOM(func, flags, first, last)   S_newLISTOP_CUSTOM(aTHX_ func, flags, first, last)
+#define newLOGOP_CUSTOM(func, flags, first, other)   S_newLOGOP_CUSTOM(aTHX_ func, flags, first, other)
 
 static OP *S_newOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags)
 {
@@ -33,6 +37,20 @@ static OP *S_newUNOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first)
   unop->op_ppaddr = func;
   return (OP *)unop;
 }
+
+#if HAVE_PERL_VERSION(5, 22, 0)
+static OP *S_newUNOP_AUX_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, UNOP_AUX_item *aux)
+{
+  UNOP_AUX *unop;
+#if HAVE_PERL_VERSION(5,22,0)
+  unop = (UNOP_AUX *)newUNOP_AUX(OP_CUSTOM, flags, first, aux);
+#else
+  croak("TODO: create newUNOP_AUX_CUSTOM");
+#endif
+  unop->op_ppaddr = func;
+  return (OP *)unop;
+}
+#endif
 
 static OP *S_newSVOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, SV *sv)
 {
@@ -69,6 +87,30 @@ static OP *S_newBINOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, OP *
   return (OP *)binop;
 }
 
+static OP *S_newLISTOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, OP *last)
+{
+  LISTOP *listop;
+#if HAVE_PERL_VERSION(5,22,0)
+  listop = (LISTOP *)newLISTOP(OP_CUSTOM, flags, first, last);
+#else
+  NewOp(1101, listop, 1, LISTOP);
+  listop->op_type = (OPCODE)OP_CUSTOM;
+  listop->op_first = first;
+  if(first)
+    first->op_sibling = last;
+  listop->op_last = last;
+  listop->op_flags = (U8)(flags | OPf_KIDS);
+  if(last)
+    listop->op_private = (U8)(2 | (flags >> 8));
+  else if(first)
+    listop->op_private = (U8)(1 | (flags >> 8));
+  else
+    listop->op_private = (U8)(flags >> 8);
+#endif
+  listop->op_ppaddr = func;
+  return (OP *)listop;
+}
+
 static OP *S_newLOGOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, OP *other)
 {
   OP *o;
@@ -88,7 +130,7 @@ static OP *S_newLOGOP_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, OP *
   logop->op_first = first;
   logop->op_flags = (U8)(flags | OPf_KIDS);
   logop->op_other = LINKLIST(other);
-  /* logop->op_private has nothing interesting for OP_CUSTOM */
+  logop->op_private = (U8)(1 | (flags >> 8));
 
   /* Link in postfix order */
   logop->op_next = LINKLIST(first);

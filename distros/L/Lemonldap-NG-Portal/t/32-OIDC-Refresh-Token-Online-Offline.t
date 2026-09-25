@@ -67,7 +67,7 @@ subtest "Without offline_access scope: online refresh token" => sub {
     ok( $refresh_token, "Got refresh token" );
 
     # Verify it is an online refresh token (has user_session_id)
-    my $rt_session = getSamlSession($refresh_token);
+    my $rt_session = getOidcSession($refresh_token);
     ok(
         $rt_session->{data}->{user_session_id},
         "Refresh token has user_session_id (== online)"
@@ -106,7 +106,7 @@ subtest "With offline_access scope: offline refresh token" => sub {
     ok( $refresh_token, "Got refresh token" );
 
     # Verify it is an offline refresh token (no user_session_id)
-    my $rt_session = getSamlSession($refresh_token);
+    my $rt_session = getOidcSession($refresh_token);
     ok(
         !$rt_session->{data}->{user_session_id},
         "Refresh token has no user_session_id (offline)"

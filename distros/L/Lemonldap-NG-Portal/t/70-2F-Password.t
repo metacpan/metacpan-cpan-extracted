@@ -20,6 +20,18 @@ my $client = LLNG::Manager::Test->new( {
 );
 my $res;
 
+# Capture audit logs
+my @audit;
+{
+    no warnings 'redefine';
+    my $orig = \&Lemonldap::NG::Common::PSGI::auditLog;
+    *Lemonldap::NG::Common::PSGI::auditLog = sub {
+        my ( $self, $req, %info ) = @_;
+        push @audit, \%info;
+        goto &$orig;
+    };
+}
+
 subtest 'Register Password 2FA' => sub {
 
     # Try to authenticate
@@ -79,6 +91,10 @@ subtest 'Register Password 2FA' => sub {
         'Post registration (mismatched)'
     );
     is( $res->{error}, 'PE34' );
+    my ($failure) =
+      grep { ( $_->{code} // '' ) eq '2FA_DEVICE_REGISTRATION_FAILED' } @audit;
+    is( $failure->{portal_error}, 'PE_PASSWORD_MISMATCH',
+        'Audit log reports portal error' );
 
     $s = "password=&passwordverify=";
     ok(

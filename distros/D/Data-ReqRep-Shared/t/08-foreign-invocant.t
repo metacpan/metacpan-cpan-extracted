@@ -5,20 +5,14 @@ use Config;
 use POSIX ();
 use Data::ReqRep::Shared;
 
-# DESTROY takes its invocant and dereferences it as our handle struct. Guarding
-# with SvROK/SvOBJECT alone accepts ANY blessed reference, so a foreign object
-# reached INT2PTR and was read through as our struct -- a hard SIGSEGV, not a
-# Perl exception. The guard has to be sv_derived_from against this class.
-# Isolated in a forked child so a regression is reported rather than taking the
-# whole test run down with it.
+# Isolated in a forked child so a crash is reported rather than taking the test run down.
 plan skip_all => 'fork required' unless $Config{d_fork};
 
 my $pid = fork;
 plan skip_all => "fork: $!" unless defined $pid;
 unless ($pid) {
     my $foreign = bless \( my $x = 0x5 ), 'Some::Foreign::Class';
-    # A destructor must not throw, so surviving -- not croaking -- is the
-    # contract here; eval only keeps a future croak from confusing the exit code.
+    # eval only keeps a future croak from confusing the exit code.
     eval { Data::ReqRep::Shared::DESTROY($foreign) };
     POSIX::_exit(0);
 }

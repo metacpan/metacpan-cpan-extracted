@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NEC;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::NEC is the base class for the whole NEC protocol family.
@@ -10,9 +10,9 @@ use Protocol::IR::Code;
 # taken from the MakeHex IRP files IRDB builds on (nec1.irp, nec2.irp,
 # NECx1.irp, NECx2.irp):
 #
-#   header        NEC1/NEC2 use the full 9024/4512 us preamble
+#   header        NEC1/NEC2 use the full 9024/4512 µs preamble
 #                 (Prefix=16,-8); NECx1/NECx2 use the half header
-#                 4512/4512 us (Prefix=8,-8, see _half_header).
+#                 4512/4512 µs (Prefix=8,-8, see _half_header).
 #   subaddress    NEC1/NEC2 expect the subaddress byte to be the one's
 #                 complement of the address (Default S=~D); NECx1/NECx2 use
 #                 it as the low byte of a real 16-bit address (Default S=D),
@@ -28,8 +28,8 @@ use Protocol::IR::Code;
 # override this (NEC2, NECX1, NECX2).
 sub _protocol_name { 'NEC' }
 
-# True for the half-header (4512/4512 us) NECx1/NECx2 framing; false for
-# the full-header (9024/4512 us) NEC1/NEC2 framing.
+# True for the half-header (4512/4512 µs) NECx1/NECx2 framing; false for
+# the full-header (9024/4512 µs) NEC1/NEC2 framing.
 sub _half_header { 0 }
 
 # True when an omitted subaddress means the one's complement of the address
@@ -151,11 +151,11 @@ sub decode_timing {
     my ($hdr_mark, $hdr_space) = @{$burst_pairs->[0]};
 
     if ($class->_half_header) {
-        # NECx1/NECx2 Header Check: ~4500us mark, ~4500us space
+        # NECx1/NECx2 Header Check: ~4500 µs mark, ~4500 µs space
         return undef unless ($hdr_mark >= 3800 && $hdr_mark <= 5200) &&
                             ($hdr_space >= 3800 && $hdr_space <= 5200);
     } else {
-        # NEC1/NEC2 Header Check: ~9000us mark, ~4500us space
+        # NEC1/NEC2 Header Check: ~9000 µs mark, ~4500 µs space
         return undef unless ($hdr_mark >= 7500 && $hdr_mark <= 10500) &&
                             ($hdr_space >= 3500 && $hdr_space <= 5500);
     }
@@ -165,7 +165,7 @@ sub decode_timing {
         my $pair = $burst_pairs->[$i + 1];
         my $space = $pair->[1];
 
-        # Space ~1687us = 1, ~562us = 0
+        # Space ~1687 µs = 1, ~562 µs = 0
         my $bit = ($space > 1100) ? 1 : 0;
         my $byte_idx = int($i / 8);
         my $bit_idx  = $i % 8; # LSB-first
@@ -175,8 +175,8 @@ sub decode_timing {
 
     my ($addr, $subaddr_raw, $cmd, $inv_cmd) = @bytes;
 
-    # Stop bit: a short mark (~562us) followed by the long inter-message
-    # space (~40000us, or the shorter repeat gap). This distinguishes NEC
+    # Stop bit: a short mark (~562 µs) followed by the long inter-message
+    # space (~40000 µs, or the shorter repeat gap). This distinguishes NEC
     # frames from multi-frame captures of other protocols whose header
     # overlaps NEC's (e.g. JVC).
     my ($stop_mark, $stop_space) = @{$burst_pairs->[33]};
@@ -201,7 +201,7 @@ sub to_pronto {
     my ($class, $code) = @_;
     my $carrier_hz = 38000;
 
-    # The Pronto frequency word is the carrier period in 0.241246 us units,
+    # The Pronto frequency word is the carrier period in 0.241246 µs units,
     # rounded to an integer. Pronto parsers decode pulses using that rounded
     # word (freq_word * 0.241246), and MakeHex converts IRP timings to
     # pulses the same way, so build the pulse conversion period from it.
@@ -245,7 +245,7 @@ sub to_pronto {
         ];
     }
 
-    # Suffix=1,-78: a 564 us stop mark and the inter-message space
+    # Suffix=1,-78: a 564 µs stop mark and the inter-message space
     # (78*564 = ~44 ms), matching the MakeHex reference output.
     push @burst_pairs, [$us_to_pulses->(564), $us_to_pulses->(43992)];
 
@@ -259,13 +259,15 @@ sub to_pronto {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Proto::NEC - NEC protocol handler (32-bit) and NEC-family base class
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -291,13 +293,13 @@ IRDB (via the MakeHex IRP files) distinguishes four single-frame formats:
 
 =over 4
 
-=item * C<NEC1> (this class) -- full 9000/4500 us header, subaddress is the
+=item * C<NEC1> (this class) -- full 9000/4500 µs header, subaddress is the
 one's complement of the address (Default S=~D), short header+gap repeat.
 
 =item * C<NEC2> (L<Protocol::IR::Proto::NEC2>) -- identical single-frame timing to
 NEC1; only the repeat differs (it re-transmits the whole frame).
 
-=item * C<NECx1> (L<Protocol::IR::Proto::NECX1>) -- half 4500/4500 us header,
+=item * C<NECx1> (L<Protocol::IR::Proto::NECX1>) -- half 4500/4500 µs header,
 subaddress is the low byte of a real 16-bit address (Default S=D), short
 repeat.
 
@@ -318,10 +320,10 @@ case for standard NEC frames), C<subaddress> is normalized to C<-1> on the
 resulting L<Protocol::IR::Code>. NECx1/NECx2 never normalize: their subaddress byte
 is a real part of the 16-bit address.
 
-Frame timing: header mark/space of B<9024/4512 us> (NEC1/NEC2, the IRP
-B<Prefix=16,-8> at a 564 us time base) or B<4512/4512 us> (NECx1/NECx2,
-B<Prefix=8,-8>); each bit is a B<562.5 us> mark followed by a space of
-B<562.5 us> for 0 or B<1687.5 us> for 1. A B<564 us> stop mark and the
+Frame timing: header mark/space of B<9024/4512 µs> (NEC1/NEC2, the IRP
+B<Prefix=16,-8> at a 564 µs time base) or B<4512/4512 µs> (NECx1/NECx2,
+B<Prefix=8,-8>); each bit is a B<562.5 µs> mark followed by a space of
+B<562.5 µs> for 0 or B<1687.5 µs> for 1. A B<564 µs> stop mark and the
 inter-message space of B<~44 ms> (IRP B<Suffix=1,-78>) end the frame,
 matching the MakeHex reference output for these IRPs.
 

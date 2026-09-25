@@ -4,7 +4,7 @@ use Object::Pad qw(:experimental(mop));
 class Getopt::Pad::Result {
 	use Carp qw(croak);
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	# Names Perl looks up on an object by itself; a Reader by one of these
 	# would run at the wrong time with the wrong arguments.

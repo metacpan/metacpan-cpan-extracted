@@ -7,8 +7,7 @@ use Data::ReqRep::Shared::Client;
 use Data::ReqRep::Shared::Int;
 use Data::ReqRep::Shared::Int::Client;
 
-# Needs to hand a file to another user. Without real root:
-#   unshare --user --map-auto --map-root-user prove -b xt/foreign_owner.t
+# Without real root: unshare --user --map-auto --map-root-user prove -b xt/foreign_owner.t
 plan skip_all => 'needs root (or a user namespace) to give a file to another user'
     unless $> == 0;
 

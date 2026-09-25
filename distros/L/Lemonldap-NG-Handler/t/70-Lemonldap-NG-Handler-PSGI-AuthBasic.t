@@ -70,6 +70,9 @@ LWP::Protocol::PSGI->register(
         my $session = Lemonldap::NG::Common::Session->new( {
                 storageModule        => 'Apache::Session::File',
                 storageModuleOptions => { Directory => 't/sessions' },
+
+                # SSO sessions are hashed by the REST session server we mock
+                hashStore            => $ENV{LLNG_HASHED_SESSION_STORE},
                 id                   => $id,
                 force                => 1,
                 kind                 => 'SSO',

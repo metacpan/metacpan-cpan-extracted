@@ -16,7 +16,7 @@ use Protocol::IR::Proto::MWM;
 
 # MWM (Disney "Made With Magic" / Glow With The Show) protocol: 2400 bps
 # serial over 38 kHz, 3-18 byte frames (24-144 bits) with no header, each
-# byte a 417 us start mark + 8 LSB-first data bits (space = 1) + a 417 us
+# byte a 417 µs start mark + 8 LSB-first data bits (space = 1) + a 417 µs
 # stop space. The frame length is implied by the message body: command frames
 # carry a 4-bit payload length in the high nibble of byte 0 (0x9x/0xFx), and
 # show commands open with 0x55 0xAA. Tasmota's "Data" field is the display

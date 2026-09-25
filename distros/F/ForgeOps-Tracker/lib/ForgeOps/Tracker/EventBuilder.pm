@@ -36,8 +36,14 @@ sub new {
 #     parsed below into real backtrace frames rather than left as one opaque string, verified
 #     directly against real confess()/die output before relying on the format, not assumed from
 #     documentation alone.
+#
+# \%request describes the request the error happened in: transaction_name (the same
+# "GET /users/:id" name the request's root span and performance sample use), endpoint (the HTTP
+# method plus the route pattern), and trace_id (the request's 32-character lowercase hex W3C trace
+# id, which is also what links this error to errors other services reported for the same trace).
+# Each is left out of the payload when undef, and all three are undef outside a request.
 sub build {
-    my ($self, $error, $context, $user, $breadcrumbs) = @_;
+    my ($self, $error, $context, $user, $breadcrumbs, $request) = @_;
     $context ||= {};
     my $config = $self->{configuration};
 
@@ -58,6 +64,9 @@ sub build {
     $payload{user} = { %$user } if $user && %$user;
     # Omitted entirely (never sent as an empty array) when there's nothing to report.
     $payload{breadcrumbs} = [ map { { %$_ } } @$breadcrumbs ] if $breadcrumbs && @$breadcrumbs;
+    for my $key (qw(transaction_name endpoint trace_id)) {
+        $payload{$key} = $request->{$key} if $request && defined $request->{$key};
+    }
     $self->_attach_sql(\%payload, $error);
 
     return $config->{scrub_pii} ? $self->_scrub_payload(\%payload) : \%payload;
@@ -200,9 +209,10 @@ sub _truncate_line {
     return substr($line, 0, $MAX_CONTEXT_LINE_LENGTH) . '...';
 }
 
-# exception_class/occurred_at/environment/release/server_name/sdk_name/user are left alone:
-# structured fields this client or the host app sets deliberately, not free text an exception or
-# its context could accidentally spill sensitive data into. user specifically is a deliberate
+# exception_class/occurred_at/environment/release/server_name/sdk_name/user/transaction_name/
+# endpoint/trace_id are left alone: structured fields this client or the host app sets
+# deliberately, not free text an exception or its context could accidentally spill sensitive data
+# into (endpoint in particular is a declared route pattern, never the literal path). user specifically is a deliberate
 # exemption, not an oversight: scrub_string's own email pattern would otherwise redact the exact
 # thing this field exists to carry (the %scrubbed copy below never touches it either way).
 sub _scrub_payload {

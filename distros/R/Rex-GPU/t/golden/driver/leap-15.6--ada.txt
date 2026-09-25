@@ -1,0 +1,21 @@
+# golden: driver/leap-15.6--ada
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: rpm -e $(rpm -qa | grep -E '^(nvidia|libnvidia)' | grep -v 'container') 2>/dev/null || true
+run: ZYPP_LOCK_TIMEOUT=120 zypper rr nvidia-gfx 2>/dev/null || true
+run: ZYPP_LOCK_TIMEOUT=120 zypper addrepo --refresh https://download.nvidia.com/opensuse/leap/15.6/ nvidia-gfx 2>&1
+run: ZYPP_LOCK_TIMEOUT=120 zypper --gpg-auto-import-keys refresh nvidia-gfx 2>&1
+run: ZYPP_LOCK_TIMEOUT=120 zypper install -y nvidia-open-driver-G06-signed-kmp-meta
+run: ZYPP_LOCK_TIMEOUT=120 zypper addlock libnvidia-ml libnvidia-cfg 2>/dev/null || true
+run: rpm -q --whatprovides nvidia-open-driver-G06-signed-kmp-meta 2>&1
+run: rpm -q --whatprovides nvidia-open-driver-G06-signed-kmp 2>&1
+file: /etc/modprobe.d/blacklist-nouveau.conf
+  | blacklist nouveau
+  | options nouveau modeset=0
+run: dracut --force 2>/dev/null
+run: modprobe nvidia
+run: lsmod | grep '^nvidia '
+run: nvidia-smi -L 2>&1
+run: /sbin/ldconfig -p 2>/dev/null | grep -q '^[[:space:]]*libcuda\.so\.1 '

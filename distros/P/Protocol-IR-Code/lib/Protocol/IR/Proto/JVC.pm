@@ -2,7 +2,7 @@ package Protocol::IR::Proto::JVC;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 use Protocol::IR::Code;
 
 sub _parse_int {
@@ -84,7 +84,7 @@ sub decode_timing {
 
     my ($hdr_mark, $hdr_space) = @{$burst_pairs->[0]};
 
-    # JVC Header Check: ~8400us mark, ~4200us space
+    # JVC Header Check: ~8400 µs mark, ~4200 µs space
     return undef unless ($hdr_mark >= 7000 && $hdr_mark <= 9800) &&
                         ($hdr_space >= 3200 && $hdr_space <= 5200);
 
@@ -93,7 +93,7 @@ sub decode_timing {
         my $pair = $burst_pairs->[$i + 1];
         my $space = $pair->[1];
 
-        # Space ~1578us = 1, ~526us = 0
+        # Space ~1578 µs = 1, ~526 µs = 0
         my $bit = ($space > 1000) ? 1 : 0;
         my $byte_idx = int($i / 8);
         my $bit_idx  = $i % 8; # LSB-first
@@ -104,8 +104,8 @@ sub decode_timing {
     my ($addr, $cmd) = @bytes;
     my $data = ($addr << 8) | $cmd;
 
-    # Stop bit: a short mark followed by the inter-frame gap (~17080us for
-    # repeated frames, ~42000us for a lone frame). Single-frame captures may
+    # Stop bit: a short mark followed by the inter-frame gap (~17080 µs for
+    # repeated frames, ~42000 µs for a lone frame). Single-frame captures may
     # end on a bare trailing mark with no space. This rejects signals whose
     # header overlaps JVC's but have a different frame structure.
     my ($stop_mark, $stop_space) = @{$burst_pairs->[17]};
@@ -160,13 +160,15 @@ sub to_pronto {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Proto::JVC - JVC protocol handler (16-bit)
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -186,10 +188,10 @@ followed by a B<command> byte, each sent LSB-first. The C<data> value has
 the address in bits 8-15 and the command in bits 0-7, matching Tasmota's
 C<Data> field. JVC has no subaddress; C<subaddress> is set to C<-1>.
 
-Frame timing: B<8400 us> header mark and B<4200 us> header space; each bit
-is a B<526 us> mark followed by a space of B<526 us> for 0 or B<1578 us>
-for 1; a B<526 us> stop mark ends the frame. The inter-frame gap is about
-B<17080 us> for repeated frames or B<42000 us> for a lone frame.
+Frame timing: B<8400 µs> header mark and B<4200 µs> header space; each bit
+is a B<526 µs> mark followed by a space of B<526 µs> for 0 or B<1578 µs>
+for 1; a B<526 µs> stop mark ends the frame. The inter-frame gap is about
+B<17080 µs> for repeated frames or B<42000 µs> for a lone frame.
 
 The C<decode_timing> decoder validates both the header and the stop bit, so
 a capture from a protocol whose header overlaps JVC's but has a different

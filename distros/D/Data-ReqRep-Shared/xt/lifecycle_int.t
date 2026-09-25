@@ -6,9 +6,6 @@ use File::Temp 'tmpnam';
 use Data::ReqRep::Shared::Int;
 use Data::ReqRep::Shared::Int::Client;
 
-# ============================================================
-# 1. Rapid server create/destroy
-# ============================================================
 {
     for (1..1000) {
         my $srv = Data::ReqRep::Shared::Int->new(undef, 8, 4);
@@ -16,9 +13,6 @@ use Data::ReqRep::Shared::Int::Client;
     pass '1000 anonymous Int server create/destroy';
 }
 
-# ============================================================
-# 2. Rapid client create/destroy
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared::Int->new($path, 16, 8);
@@ -29,9 +23,6 @@ use Data::ReqRep::Shared::Int::Client;
     $srv->unlink;
 }
 
-# ============================================================
-# 3. Rapid send/cancel — no slot leak
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared::Int->new($path, 256, 4);
@@ -45,7 +36,6 @@ use Data::ReqRep::Shared::Int::Client;
 
     is $cli->pending, 0, 'int send/cancel x5000: no slot leak';
 
-    # drain + verify functional
     while (my ($v, $ri) = $srv->recv) { $srv->reply($ri, 0) }
     my $id = $cli->send(999);
     ok defined $id, 'int: send works after 5000 cancel cycles';
@@ -56,9 +46,6 @@ use Data::ReqRep::Shared::Int::Client;
     $srv->unlink;
 }
 
-# ============================================================
-# 4. 10K round-trip cycles — no leak
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared::Int->new($path, 64, 4);
@@ -78,9 +65,6 @@ use Data::ReqRep::Shared::Int::Client;
     $srv->unlink;
 }
 
-# ============================================================
-# 5. Server DESTROY before client — no crash
-# ============================================================
 {
     my $path = tmpnam();
     my $cli;
@@ -95,9 +79,6 @@ use Data::ReqRep::Shared::Int::Client;
     unlink $path;
 }
 
-# ============================================================
-# 6. Multiple clients — independent handles
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared::Int->new($path, 64, 16);
@@ -125,9 +106,6 @@ use Data::ReqRep::Shared::Int::Client;
     $srv->unlink;
 }
 
-# ============================================================
-# 7. memfd handle lifecycle
-# ============================================================
 {
     my $srv = Data::ReqRep::Shared::Int->new_memfd("int_lc", 8, 4);
     my $fd = $srv->memfd;
@@ -144,15 +122,11 @@ use Data::ReqRep::Shared::Int::Client;
     pass 'int: 500 memfd client cycles';
 }
 
-# ============================================================
-# 8. clear under concurrent send/recv
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared::Int->new($path, 64, 16);
     my $cli = Data::ReqRep::Shared::Int::Client->new($path);
 
-    # fill queue
     my @ids;
     push @ids, $cli->send($_) for 1..10;
     is $cli->pending, 10, 'int clear: 10 pending before clear';

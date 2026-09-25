@@ -1,0 +1,15 @@
+# golden: driver/rocky-9--ada--not-installed
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: cat /etc/os-release 2>/dev/null
+pkg: epel-release ensure=present
+run: dnf config-manager --set-enabled crb 2>/dev/null || true
+run: uname -m
+run: dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo 2>&1
+run: dnf clean expire-cache
+run: dnf module enable nvidia-driver:open-dkms -y 2>/dev/null || true
+run: dnf install -y kernel-devel-matched kernel-headers nvidia-open
+run: rpm -q nvidia-driver 2>&1
+DIE: nvidia-driver not installed after dnf install — check dnf output

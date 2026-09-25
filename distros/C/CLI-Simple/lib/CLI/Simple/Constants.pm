@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Exporter);
 
-our $VERSION = '2.2.2';
+our $VERSION = '2.2.3';
 
 use Readonly;
 
@@ -135,8 +135,18 @@ Readonly::Array our @VALID_OPTIONS => qw(
   validate_command
 );
 
+Readonly::Array our @DEFAULT_HELP_SECTIONS => qw(
+  SYNOPSIS
+  DESCRIPTION/Commands
+  DESCRIPTION/Options
+  OPTIONS
+  USAGE
+);
+
 foreach my $k ( keys %EXPORT_TAGS ) {
-  push @EXPORT_OK, @{ $EXPORT_TAGS{$k} }, '@VALID_OPTIONS', qw(
+  push @EXPORT_OK, @{ $EXPORT_TAGS{$k} }, qw(
+    @VALID_OPTIONS
+    @DEFAULT_HELP_SECTIONS
     $LOG4PERL_CONF
     $LOG4PERL_COLOR_DEBUG
     $LOG4PERL_COLOR_INFO

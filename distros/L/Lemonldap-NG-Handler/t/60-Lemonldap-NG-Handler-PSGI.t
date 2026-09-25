@@ -304,6 +304,20 @@ ok(
 ok( $res->[0] == 200, ' Code is 200' ) or explain( $res, 200 );
 count(2);
 
+# Encoded URLs (#3723): on LLNG's own PSGI vhosts (portal, manager, api),
+# REQUEST_URI is raw and PATH_INFO is the decoded path the web server routes
+# on, so rules are tested against PATH_INFO - the value the router uses
+ok(
+    $res = $client->_get(
+        '/deny', undef, undef, "lemonldap=$sessionId",
+        X_ORIGINAL_URI => undef,
+        REQUEST_URI    => '/%64eny'
+    ),
+    'Self-protected vhost: /%64eny'
+);
+ok( $res->[0] == 403, ' Code is 403' ) or explain( $res->[0], 403 );
+count(2);
+
 done_testing( count() );
 
 clean();

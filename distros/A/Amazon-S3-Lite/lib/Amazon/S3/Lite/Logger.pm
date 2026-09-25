@@ -7,7 +7,7 @@ package Amazon::S3::Lite::Logger;
 use strict;
 use warnings;
 
-our $VERSION = '1.3.2';
+our $VERSION = '1.3.3';
 
 use Readonly;
 Readonly::Scalar our $LEVELS => {

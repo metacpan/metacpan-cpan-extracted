@@ -3,10 +3,6 @@ use warnings;
 use Test::More;
 use Time::HiRes qw(time);
 
-# Throughput guard: catches regressions in critical-path latency that
-# wouldn't show up in unit tests. Fails if throughput drops below a
-# conservative floor; doesn't pin an upper bound (hardware varies).
-
 use Data::ReqRep::Shared;
 
 my $N = 1000;

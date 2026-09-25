@@ -66,156 +66,184 @@ LWP::Protocol::PSGI->register(
     }
 );
 
-# Initialization
-ok( $op = register( 'op', sub { op() } ), 'OP portal' );
-
-ok( $res = $op->_get('/oauth2/jwks'), 'Get JWKS' );
-expectOK($res);
-my $jwks = $res->[2]->[0];
-
-ok( $res = $op->_get('/.well-known/openid-configuration'), 'Get metadata' );
-expectOK($res);
-my $metadata = $res->[2]->[0];
-count(3);
-
-&Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-ok( $rp = register( 'rp', sub { rp( $jwks, $metadata ) } ), 'RP portal' );
-count(1);
-
-# Create sessions
-ok(
-    $res = $op->_post(
-        '/',
-        IO::String->new('user=french&password=french'),
-        length => 27,
-        accept => 'text/html',
-    ),
-    'First OP authentication'
-);
-count(1);
-my $idpId1 = expectCookie($res);
-expectRedirection( $res, 'http://auth.op.com/' );
-
-ok(
-    $res = $op->_post(
-        '/',
-        IO::String->new('user=french&password=french'),
-        length => 27,
-        accept => 'text/html',
-    ),
-    'Second OP authentication'
-);
-count(1);
-my $idpId2 = expectCookie($res);
-expectRedirection( $res, 'http://auth.op.com/' );
-
-my $nbr = count_sessions();
-ok( $nbr == 2, "Two SSO sessions found" )
-  or explain("Number of session(s) found = $nbr");
-count(1);
-
-ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth RP request' );
-count(1);
-my ( $url, $query ) =
-  expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
-
-ok(
-    $res = $op->_get(
-        $url,
-        query  => $query,
-        cookie => "lemonldap=$idpId1",
-        accept => 'text/html'
-    ),
-    "Push request to OP"
-);
-count(1);
-
-my ( $host, $tmp );
-( $host, $tmp, $query ) = expectForm( $res, '#', undef, 'confirm' );
-
-ok(
-    $res = $op->_post(
-        $url,
-        IO::String->new($query),
-        accept => 'text/html',
-        cookie => "lemonldap=$idpId1",
-        length => length($query),
-    ),
-    "Post confirmation"
-);
-count(1);
-
-($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
-
-ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
-    'Complete OIDC callback on RP' );
-count(1);
-my $rpId = expectCookie($res);
-
-ok( $res = $rp->_get( '/', cookie => "lemonldap=$rpId" ),
-    'Verify RP session is valid' );
-count(1);
-expectOK($res);
-
-# Call globalLogout
-@bclReceived = ();
-ok(
-    $res = $op->_get(
-        '/',
-        query  => 'logout',
-        cookie => "lemonldap=$idpId2",
-        accept => 'text/html'
-    ),
-    'Session 2 initiates logout with GlobalLogout'
-);
-count(1);
-
-my $formQuery;
-( $host, $url, $formQuery ) =
-  expectForm( $res, undef, '/globallogout?all=1', 'token' );
-ok( $res->[2]->[0] =~ m%<span trspan="globalLogout">%,
-    'Found GlobalLogout form' );
-count(1);
-
-$formQuery .= '&all=1';
-ok(
-    $res = $op->_post(
-        '/globallogout',
-        IO::String->new($formQuery),
-        cookie => "lemonldap=$idpId2",
-        length => length($formQuery),
-        accept => 'text/html',
-    ),
-    'Confirm GlobalLogout'
-);
-count(1);
-ok( $res->[2]->[0] =~ m%<span trmsg="47"></span>%, 'Found PE_LOGOUT_OK' );
-count(1);
-
-ok( scalar(@bclReceived) >= 1, 'At least one BCL request sent to RP' )
-  or explain( \@bclReceived, 'Expected BCL requests' );
-count(1);
-
-ok(
-    $res = $rp->_get(
-        '/',
-        cookie => "lemonldap=$rpId",
-        accept => 'text/html'
-    ),
-    'Check RP session after GlobalLogout BCL'
-);
-count(1);
-expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
-
-$nbr = count_sessions();
-ok( $nbr == 0, "No SSO sessions remaining" )
-  or explain("Number of session(s) found = $nbr");
-count(1);
+# Other sessions of the user are read by their storage ID when
+# hashedSessionStore is set: run the whole scenario in both modes (#3717)
+foreach my $hashed ( 0, 1 ) {
+    note("Running with hashedSessionStore => $hashed");
+    reset_tmpdir();
+    runScenario($hashed);
+}
 
 clean_sessions();
+
 done_testing( count() );
 
+sub runScenario {
+    my ($hashed) = @_;
+
+    &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
+
+    # Initialization
+    ok( $op = register( 'op', sub { op($hashed) } ), 'OP portal' );
+
+    ok( $res = $op->_get('/oauth2/jwks'), 'Get JWKS' );
+    expectOK($res);
+    my $jwks = $res->[2]->[0];
+
+    ok( $res = $op->_get('/.well-known/openid-configuration'), 'Get metadata' );
+    expectOK($res);
+    my $metadata = $res->[2]->[0];
+    count(3);
+
+    &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
+    ok( $rp = register( 'rp', sub { rp( $jwks, $metadata ) } ), 'RP portal' );
+    count(1);
+
+    # Create sessions
+    ok(
+        $res = $op->_post(
+            '/',
+            IO::String->new('user=french&password=french'),
+            length => 27,
+            accept => 'text/html',
+        ),
+        'First OP authentication'
+    );
+    count(1);
+    my $idpId1 = expectCookie($res);
+    expectRedirection( $res, 'http://auth.op.com/' );
+
+    ok(
+        $res = $op->_post(
+            '/',
+            IO::String->new('user=french&password=french'),
+            length => 27,
+            accept => 'text/html',
+        ),
+        'Second OP authentication'
+    );
+    count(1);
+    my $idpId2 = expectCookie($res);
+    expectRedirection( $res, 'http://auth.op.com/' );
+
+    my $nbr = count_sessions();
+    ok( $nbr == 2, "Two SSO sessions found" )
+      or explain("Number of session(s) found = $nbr");
+    count(1);
+
+    ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth RP request' );
+    count(1);
+    my ( $url, $query ) =
+      expectRedirection( $res,
+        qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
+
+    ok(
+        $res = $op->_get(
+            $url,
+            query  => $query,
+            cookie => "lemonldap=$idpId1",
+            accept => 'text/html'
+        ),
+        "Push request to OP"
+    );
+    count(1);
+
+    my ( $host, $tmp );
+    ( $host, $tmp, $query ) = expectForm( $res, '#', undef, 'confirm' );
+
+    ok(
+        $res = $op->_post(
+            $url,
+            IO::String->new($query),
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId1",
+            length => length($query),
+        ),
+        "Post confirmation"
+    );
+    count(1);
+
+    ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
+
+    ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
+        'Complete OIDC callback on RP' );
+    count(1);
+    my $rpId = expectCookie($res);
+
+    ok( $res = $rp->_get( '/', cookie => "lemonldap=$rpId" ),
+        'Verify RP session is valid' );
+    count(1);
+    expectOK($res);
+
+    $nbr = count_sessions( 'SSO', "$main::tmpDir/rp" );
+    ok( $nbr == 1, "One SSO session found on RP" )
+      or explain("Number of session(s) found = $nbr");
+    count(1);
+
+    # Call globalLogout
+    @bclReceived = ();
+    ok(
+        $res = $op->_get(
+            '/',
+            query  => 'logout',
+            cookie => "lemonldap=$idpId2",
+            accept => 'text/html'
+        ),
+        'Session 2 initiates logout with GlobalLogout'
+    );
+    count(1);
+
+    my $formQuery;
+    ( $host, $url, $formQuery ) =
+      expectForm( $res, undef, '/globallogout?all=1', 'token' );
+    ok( $res->[2]->[0] =~ m%<span trspan="globalLogout">%,
+        'Found GlobalLogout form' );
+    count(1);
+
+    $formQuery .= '&all=1';
+    ok(
+        $res = $op->_post(
+            '/globallogout',
+            IO::String->new($formQuery),
+            cookie => "lemonldap=$idpId2",
+            length => length($formQuery),
+            accept => 'text/html',
+        ),
+        'Confirm GlobalLogout'
+    );
+    count(1);
+    ok( $res->[2]->[0] =~ m%<span trmsg="47"></span>%, 'Found PE_LOGOUT_OK' );
+    count(1);
+
+    ok( scalar(@bclReceived) >= 1, 'At least one BCL request sent to RP' )
+      or explain( \@bclReceived, 'Expected BCL requests' );
+    count(1);
+
+    ok(
+        $res = $rp->_get(
+            '/',
+            cookie => "lemonldap=$rpId",
+            accept => 'text/html'
+        ),
+        'Check RP session after GlobalLogout BCL'
+    );
+    count(1);
+    expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
+
+    $nbr = count_sessions();
+    ok( $nbr == 0, "No SSO sessions remaining" )
+      or explain("Number of session(s) found = $nbr");
+    count(1);
+
+    # RP sessions are stored apart: only the back-channel logout can remove them
+    $nbr = count_sessions( 'SSO', "$main::tmpDir/rp" );
+    ok( $nbr == 0, "No SSO sessions remaining on RP" )
+      or explain("Number of session(s) found = $nbr");
+    count(1);
+}
+
 sub op {
+    my ($hashed) = @_;
     return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
@@ -226,6 +254,7 @@ sub op {
                 issuerDBOpenIDConnectActivation => 1,
                 globalLogoutRule                => 1,
                 globalLogoutTimer               => 10,
+                hashedSessionStore              => $hashed,
                 oidcRPMetaDataExportedVars      => {
                     rp => {
                         email       => "mail",
@@ -273,6 +302,8 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
+    mkdir "$main::tmpDir/rp";
+    mkdir "$main::tmpDir/rp/lock";
     return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
@@ -290,7 +321,16 @@ sub rp {
                     }
                 },
                 oidcServiceMetaDataBackChannelURI => 'blogout',
-                oidcOPMetaDataOptions             => {
+
+                # Keep RP sessions apart, else GlobalLogout would remove them
+                # directly on the OP side, hiding back-channel logout failures
+                globalStorageOptions => {
+                    Directory      => "$main::tmpDir/rp",
+                    LockDirectory  => "$main::tmpDir/rp/lock",
+                    generateModule =>
+'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
+                },
+                oidcOPMetaDataOptions => {
                     op => {
                         oidcOPMetaDataOptionsCheckJWTSignature => 1,
                         oidcOPMetaDataOptionsJWKSTimeout       => 0,

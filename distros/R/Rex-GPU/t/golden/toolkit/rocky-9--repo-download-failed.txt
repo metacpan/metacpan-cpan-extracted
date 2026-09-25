@@ -1,0 +1,7 @@
+# golden: toolkit/rocky-9--repo-download-failed
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+can_run: nvidia-ctk
+run: curl -fsSL https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo -o /etc/yum.repos.d/nvidia-container-toolkit.repo.tmp
+run: rm -f /etc/yum.repos.d/nvidia-container-toolkit.repo.tmp
+DIE: Could not download the NVIDIA Container Toolkit repository file (https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo)

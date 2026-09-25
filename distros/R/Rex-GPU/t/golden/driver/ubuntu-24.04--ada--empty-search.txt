@@ -1,0 +1,10 @@
+# golden: driver/ubuntu-24.04--ada--empty-search
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: dpkg --print-architecture
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: apt-cache search '^nvidia-driver-[0-9].*-server$' 2>/dev/null | sort -t- -k3 -n | tail -1 | awk '{print $1}'
+DIE: The NVIDIA driver source ubuntu-server chosen for AD104GL [RTX 4000 SFF Ada Generation] (Turing/Ampere/Ada/Hopper, 10de:27b0) (any kernel module, any driver branch) has nothing to install on this Ubuntu 24.04 host: apt-cache search '^nvidia-driver-[0-9].*-server$' finds no package after apt-get update (did the update fail, or is the restricted component missing from the apt sources?). No driver package was installed, only the package sources were prepared. Install the driver yourself; once `nvidia-smi -L` lists the GPU and libcuda.so.1 is in the linker cache, install_driver skips the driver step

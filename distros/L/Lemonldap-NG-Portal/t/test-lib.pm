@@ -242,6 +242,25 @@ sub getSamlSession {
     );
 }
 
+# OIDC sessions (tokens) are stored beside SAML ones in tests, but unlike SAML
+# they honour hashedSessionStore
+sub getOidcSession {
+    my $id = shift;
+    $id = $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($id) : $id;
+    my @sessionsOpts = (
+        storageModule        => "Apache::Session::File",
+        storageModuleOptions => {
+            Directory     => "$tmpDir/saml",
+            LockDirectory => "$tmpDir/saml/lock",
+        },
+    );
+
+    return Lemonldap::NG::Common::Session->new( {
+            @sessionsOpts, id => $id,
+        }
+    );
+}
+
 sub getTotp {
     require Lemonldap::NG::Common::TOTP;
     my ( $key, %args ) = @_;

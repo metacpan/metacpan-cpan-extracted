@@ -1,3 +1,4 @@
+CHANGELOG.md
 cpanfile
 lib/ForgeOps/Tracker.pm
 lib/ForgeOps/Tracker/Client.pm
@@ -14,8 +15,9 @@ lib/ForgeOps/Tracker/PerformanceFlusher.pm
 lib/ForgeOps/Tracker/PiiScrubber.pm
 lib/ForgeOps/Tracker/Reporter.pm
 lib/ForgeOps/Tracker/SpanBuffer.pm
-lib/ForgeOps/Tracker/SpanDelivery.pm
 lib/ForgeOps/Tracker/SqlStatement.pm
+lib/ForgeOps/Tracker/SpanDelivery.pm
+lib/ForgeOps/Tracker/TraceParent.pm
 LICENSE.txt
 Makefile.PL
 MANIFEST			This list of files
@@ -35,6 +37,7 @@ t/performance_flusher.t
 t/pii_scrubber.t
 t/reporter.t
 t/sql_statement.t
+t/trace_context.t
 t/tracing.t
 t/tracker.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

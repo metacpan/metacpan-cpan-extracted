@@ -1,5 +1,69 @@
 Revision history for Rex-GPU
 
+0.002     2026-09-24 21:34:32Z
+  - None of the changes below has run on GPU hardware yet; they are
+    checked against the commands they send to the host.
+
+  [Detection]
+  - A GPU counts as compute by its PCI device ID generation, not its name:
+    every Maxwell or newer NVIDIA GPU (GeForce included) now gets a driver.
+    Kepler and older are compute => 0 with a warning.
+  - A virtual display (virtio, QXL, VMware, VirtualBox) no longer hides a
+    real GPU on passthrough hosts and cloud GPU VMs.
+  - New keys: nvswitch (HGX NVSwitch bridges) and per GPU vgpu, vgpu_type,
+    subsystem_vendor_id, subsystem_id (NVIDIA vGPU guests).
+  - pciutils is installed only when lspci is missing, also on Rocky, Alma
+    and CentOS Stream; detection dies if lspci is still missing.
+
+  [Driver]
+  - gpu_setup installs one driver that fits all compute GPUs (new option
+    gpus => [...]). It dies before any driver package is installed when
+    they cannot share one, for a Kepler GPU, or for a vGPU guest without a
+    working driver.
+  - The driver fits the GPU generation: Blackwell (B200/B300, RTX 50xx,
+    RTX PRO, GB10) gets the open kernel module, on Debian 12/13 from
+    NVIDIA's CUDA repository; Maxwell/Pascal/Volta stay on the proprietary
+    580 branch. GB10 (DGX Spark) needs 580 or newer.
+  - A host with a working driver (nvidia-smi lists a GPU, libcuda is
+    present) is left alone: no reinstall, no reboot.
+  - HGX hosts with NVSwitch get NVIDIA Fabric Manager; HGX B200/B300 also
+    get the NVLink fabric (nvlsm, ib_umad). An existing driver gets a
+    missing Fabric Manager from the host's own package sources.
+  - Ubuntu: the newest nvidia-driver-NNN-server package is picked after
+    apt-get update; no silent fallback to 570.
+  - Debian: contrib/non-free are enabled on every Debian archive entry,
+    deb822 .sources included. An own mirror counts when it is signed-by the
+    Debian archive keyring.
+  - RHEL family: Rocky, Alma and CentOS Stream work under their lsb_release
+    names; RHEL gets EPEL and CodeReady Builder; aarch64 uses NVIDIA's sbsa
+    repository; a CUDA repository that cannot be added dies early.
+  - reboot => 1 waits until the host answers a command again.
+  - Own driver setup: setup => 'My::Setup' or set gpu_nvidia_setup, plus
+    requirement => { kernel_module, min_branch, max_branch }. Setup classes
+    and Rex::GPU::NVIDIA::Requirement are experimental API; examples in
+    eg/custom-setup/ and eg/ubuntu-drivers/.
+
+  [Container toolkit, CDI, containerd]
+  - install_container_toolkit skips an installed toolkit, survives the
+    dpkg lock after a reboot, and dies on a failed key or repository
+    download instead of installing from a broken source.
+  - generate_cdi_specs leaves CDI to nvidia-cdi-refresh when the toolkit
+    ships it, so nvidia.com/gpu is no longer defined twice.
+  - configure_containerd adds the nvidia runtime to RKE2/K3s's own config
+    instead of replacing it (SystemdCgroup, sandbox image and registry
+    config were lost). A template written by 0.001 is removed with a
+    warning; restart rke2/k3s to regenerate the config.
+  - An unknown containerd_config dies before anything runs on the host.
+
+  [openSUSE (unverified, unsupported)]
+  - Leap 15.x gets the Leap 15 repository and G06 driver again (it got
+    Leap 16's). zypper waits for the zypp lock, repository failures die,
+    and every install is verified.
+
+  [Examples]
+  - eg/ keeps SSH host-key verification on and scans the new host into
+    known_hosts first.
+
 0.001     2026-03-29 04:20:30Z
   - Initial release
   - GPU hardware detection via PCI class codes (NVIDIA, AMD)

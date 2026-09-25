@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Deflator::CompoundSplit;
-$HTML::FormFu::Deflator::CompoundSplit::VERSION = '2.07';
+$HTML::FormFu::Deflator::CompoundSplit::VERSION = '2.09';
 # ABSTRACT: CompoundSplit deflator
 
 use Moose;
@@ -89,7 +89,7 @@ HTML::FormFu::Deflator::CompoundSplit - CompoundSplit deflator
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -187,7 +187,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,7 @@
+Version 0.023 - 2026-09-24
+ - Fix bug in 0.022 that broke back-compat in detect_input_format when
+   the user *didn't* provide a hashref per the new API.
+
 Version 0.022 - 2026-08-05
  - Support various web framework Upload objects being used as ->input
  - Use content_type if available in preference to file extension or

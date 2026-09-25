@@ -1,0 +1,47 @@
+---
+abstract: 'Do not empty a lexical that nothing reads again before it goes out of scope.'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Perl::Critic: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-Variables-ProhibitUselessVarClearing
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  Perl::Critic::Policy::Variables::ProhibitUselessVarClearing:
+    file: lib/Perl/Critic/Policy/Variables/ProhibitUselessVarClearing.pm
+    version: '0.001'
+requires:
+  List::Util: '0'
+  Perl::Critic::Policy: '0'
+  Perl::Critic::Utils: '0'
+  Readonly: '0'
+  parent: '0'
+  perl: '5.014'
+  re: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/teodesian/perl-critic-policy-prohibituselessvarclearing/issues
+  homepage: https://github.com/teodesian/perl-critic-policy-prohibituselessvarclearing
+  repository: https://github.com/teodesian/perl-critic-policy-prohibituselessvarclearing.git
+version: '0.001'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

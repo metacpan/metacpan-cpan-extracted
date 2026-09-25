@@ -76,7 +76,7 @@ sub register {
         }
         else {
             $self->logger->debug( $self->prefix . "2f: unable to add device" );
-            return $self->failResponse( $req, "PE$res" );
+            return $self->failResponse( $req, $res );
         }
     }
     else {

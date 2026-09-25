@@ -2,11 +2,60 @@ use ExtUtils::MakeMaker;
 use Config;
 
 unless ($^O eq 'linux') {
-    print "NA: Data::ReqRep::Shared requires Linux\n";
+    print "OS unsupported: Data::ReqRep::Shared requires Linux\n";
     exit 0;
 }
 if ($Config{ivsize} < 8) {
-    print "NA: Data::ReqRep::Shared requires 64-bit integers (ivsize >= 8)\n";
+    print "OS unsupported: Data::ReqRep::Shared requires 64-bit integers (ivsize >= 8)\n";
+    exit 0;
+}
+sub env_on {
+    my $v = $ENV{$_[0]};
+    return 0 unless defined $v && $v =~ /\S/;
+    $v =~ s/^\s+|\s+$//g;
+    return 0 if $v =~ /^(?:false|no|off)$/i;
+    return 1 unless $v =~ /^[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?$/;
+    return $v != 0;
+}
+unless (env_on('DATA_REQREP_SHARED_UNSAFE_PIDNS')
+        || (stat '/proc/self/ns/pid' && -r '/proc/sys/kernel/random/boot_id')) {
+    print "OS unsupported: Data::ReqRep::Shared requires /proc (/proc/self/ns/pid, boot_id)\n";
+    exit 0;
+}
+
+my ($cc) = map { /^CC=(.*)/ ? $1 : () } @ARGV;   # honour a smoker's CC=
+$cc ||= $Config{cc};
+my $ccflags = $Config{ccflags};
+sub compiles {
+    my ($code, $flags) = @_;
+    my $probe = "reqrep_probe_$$";
+    open my $fh, '>', "$probe.c" or return 0;
+    print $fh $code;
+    close $fh;
+    my $ok = system("$cc $flags -D_GNU_SOURCE -o $probe $probe.c >/dev/null 2>&1") == 0;
+    unlink "$probe.c", $probe;
+    return $ok;
+}
+
+compiles("int main(void) { return 0; }\n", $ccflags)
+    or die "Cannot build a trivial C program with $cc\n";
+
+# Compilers older than GCC 5 default to gnu89, where the C99 declarations are errors.
+my $c99 = "int main(void) { for (int i = 0; i < 1; i++) {} return 0; }\n";
+if (!compiles($c99, $ccflags) && compiles($c99, "$ccflags -std=gnu99")) {
+    $ccflags .= ' -std=gnu99';
+    print "Compiler defaults to C89; adding -std=gnu99\n";
+}
+unless (compiles(<<'C', $ccflags)) {
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <linux/futex.h>
+int main(void) {
+    int fd = memfd_create("probe", MFD_CLOEXEC | MFD_ALLOW_SEALING);
+    return fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW) + FUTEX_WAKE;
+}
+C
+    print "OS unsupported: Data::ReqRep::Shared requires memfd_create, file sealing and the Linux headers\n";
     exit 0;
 }
 
@@ -28,7 +77,8 @@ WriteMakefile(
     AUTHOR            => 'vividsnow',
     LICENSE           => 'perl_5',
     MIN_PERL_VERSION  => '5.022',
-    LIBS              => [''],
+    LIBS              => ['-lpthread'],
+    CCFLAGS           => $ccflags,
     DEFINE            => '-D_GNU_SOURCE',
     INC               => '-I.',
     XS                => { 'Shared.xs' => 'Shared.c' },

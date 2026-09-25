@@ -1,9 +1,9 @@
 ##############################################################################
 #
 #  Exception::Sink::Class
-#  Copyright (c) 2006-2024 Vladi Belperchinov-Shabanski "Cade" 
+#  Copyright (c) 2006-2026 Vladi Belperchinov-Shabanski "Cade"
 #        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
-#  http://cade.noxrun.com/  
+#  http://cade.noxrun.com/
 #
 #  GPLv2
 #
@@ -13,8 +13,7 @@
 #
 ##############################################################################
 package Exception::Sink::Class;
-use Exception::Sink;
-use overload ( '""' => 'stringify' );
+use overload ( '""' => 'stringify', 'bool' => sub { 1 }, 'fallback' => 1 );
 use strict;
 
 ##############################################################################
@@ -31,7 +30,10 @@ sub new
 sub stringify
 {
   my $self = shift;
-  return $self->{ 'ORG' };
+  my $org  = $self->{ 'ORG' };
+  # like die(): text without trailing newline gets the origin appended
+  return $org if $org =~ /\n$/;
+  return "$org at $self->{ 'FILE' } line $self->{ 'LINE' }.\n";
 }
 
 1;

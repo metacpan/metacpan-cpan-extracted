@@ -343,6 +343,18 @@ subtest 'Samsung LIRC roundtrip' => sub {
     is($p2->data, $p1->data, 'POWER data survives roundtrip');
 };
 
+subtest 'roundtrip with empty alias' => sub {
+    my $code = $converter->import_code('NEC', '0x10EF00FF');
+    ok($code && !$code->alias, 'built code has no alias');
+
+    my $lirc = $converter->export_code($code, 'LIRC');
+    like($lirc, qr/UNKNOWN\s+0x10EF00FF/, 'exports an UNKNOWN placeholder name');
+
+    my $back = $converter->import_format('LIRC', $lirc);
+    is(scalar @$back, 1, 'roundtrip recovers the code');
+    is($back->[0]->data, $code->data, 'data survives roundtrip');
+};
+
 # --- CLI integration -----------------------------------------------------
 
 sub _run_ir_convert {

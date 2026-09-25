@@ -12,6 +12,8 @@ use ForgeOps::Tracker::PerformanceFlusher;
 use ForgeOps::Tracker::Reporter;
 use ForgeOps::Tracker::SpanBuffer;
 use ForgeOps::Tracker::SpanDelivery;
+use ForgeOps::Tracker::TraceParent;
+use Scalar::Util ();
 use Time::HiRes ();
 
 # 0.2.0 was never bumped past: that exact tarball was uploaded to PAUSE once (2026-09-11) but
@@ -20,7 +22,7 @@ use Time::HiRes ();
 # directly: retrying the identical 0.2.0 tarball came back 409 Conflict, not the original success
 # response repeated). No functional change from 0.2.0; this bump exists solely to get a fresh,
 # uploadable version number.
-our $VERSION = '0.8.0';
+our $VERSION = '0.9.0';
 
 my $configuration;
 my $reporter;
@@ -53,6 +55,20 @@ our @current_breadcrumbs;
 # PSGI server should `local`-ize it instead.
 our $current_trace;
 
+# The current request's context, if one is running: { trace_id, parent_span_id, transaction_name,
+# endpoint, errored }. Set by start_trace() whether or not span tracing is on (the trace id is also
+# what links an error to errors in other services), cleared by finish_trace(), and a plain package
+# variable for the same reason as $current_trace above (`local`-ize it the same way under a
+# threaded or event-loop PSGI server).
+our $current_request;
+
+# Request context remembered for an error that escaped a request (see snapshot_onto), for when it
+# is only reported after finish_trace() has already cleared $current_request: the PSGI error
+# middleware sits outside the performance one, and Dancer2 runs its on_route_exception hooks in
+# whatever order the plugins were loaded. A short list rather than something attached to the
+# error itself, since a Perl error is as often a plain string as an object; newest first.
+my @escaped;
+my $MAX_ESCAPED = 8;
 sub _configuration {
     $configuration ||= ForgeOps::Tracker::Configuration->new;
     return $configuration;
@@ -126,11 +142,88 @@ sub init {
 #
 # \%user defaults to whatever set_user() last set (undef if nothing did); pass one explicitly to
 # override that for this one report.
+#
+# During a request (between start_trace and finish_trace), the event also carries the request's
+# trace_id, transaction_name and endpoint, and the request is marked errored so its trace is sent
+# however fast it was. An error one of the integrations saw escape a request falls back to what
+# snapshot_onto remembered for it (along with the user and breadcrumb trail), for when it's
+# reported only after the request's own state is gone.
 sub report {
     my ($error, $context, $user) = @_;
+    my $snapshot = $current_request ? undef : _snapshot_for($error);
+    $current_request->{errored} = 1 if $current_request;
+
+    my $source = $current_request || $snapshot || {};
     $user = $current_user unless defined $user;
-    _reporter()->report($error, $context, $user, [ @current_breadcrumbs ]);
+    $user = $snapshot->{user} if !defined $user && $snapshot;
+    my @breadcrumbs = @current_breadcrumbs;
+    @breadcrumbs = @{ $snapshot->{breadcrumbs} } if !@breadcrumbs && $snapshot;
+
+    _reporter()->report($error, $context, $user, \@breadcrumbs, {
+        map { $_ => $source->{$_} } qw(transaction_name endpoint trace_id)
+    });
     return;
+}
+
+# current_trace_id(): the current request's W3C trace id (32 lowercase hex characters), or undef
+# outside a request. Handy for your own logs: it's the id ForgeOps links errors across services
+# with.
+sub current_trace_id {
+    return $current_request ? $current_request->{trace_id} : undef;
+}
+
+# set_request_route($transaction_name, $endpoint): names the current request once its route is
+# known. $transaction_name is the same name its performance sample and root span use, $endpoint
+# the HTTP method plus the route pattern ("GET /users/:id"), never the literal path. The Dancer2
+# performance plugin calls this as soon as Dancer2 has matched the route, so an error reported
+# from inside the route already carries both; plain PSGI has no route pattern of its own, so a
+# PSGI app that has one (from its own router) can call this itself. Does nothing outside a request.
+sub set_request_route {
+    my ($transaction_name, $endpoint) = @_;
+    return unless $current_request;
+    $current_request->{transaction_name} = $transaction_name;
+    $current_request->{endpoint} = $endpoint;
+    return;
+}
+
+# snapshot_onto($error): remembers the current request's trace id, transaction name and endpoint,
+# plus the affected user and breadcrumb trail, for $error, and marks the request errored. Called by
+# the PSGI/Dancer2 performance integrations when an error escapes a request, just before they
+# finish its trace, so a report made afterward (see report) still has all of it. The first snapshot
+# for the same error wins: the innermost one saw the request closest to where it failed. Never
+# dies. Not something app code normally calls directly.
+sub snapshot_onto {
+    my ($error) = @_;
+    eval {
+        return unless $current_request && defined $error;
+        $current_request->{errored} = 1;
+        return if _snapshot_for($error);
+
+        my $entry = {
+            (ref $error ? (address => Scalar::Util::refaddr($error), error => $error) : (text => "$error")),
+            user        => $current_user,
+            breadcrumbs => [ map { { %$_ } } @current_breadcrumbs ],
+            map { $_ => $current_request->{$_} } qw(transaction_name endpoint trace_id),
+        };
+        Scalar::Util::weaken($entry->{error}) if ref $error;
+        unshift @escaped, $entry;
+        splice @escaped, $MAX_ESCAPED if @escaped > $MAX_ESCAPED;
+        1;
+    };
+    return;
+}
+
+sub _snapshot_for {
+    my ($error) = @_;
+    return undef unless defined $error;
+    for my $entry (@escaped) {
+        if (ref $error) {
+            return $entry if defined $entry->{error} && $entry->{address} == Scalar::Util::refaddr($error);
+        } elsif (defined $entry->{text} && $entry->{text} eq $error) {
+            return $entry;
+        }
+    }
+    return undef;
 }
 
 # set_user(%user): manually attaches an affected user to whatever gets reported for the rest of
@@ -190,28 +283,49 @@ sub record_performance {
     return;
 }
 
-# start_trace(): starts a fresh trace on this process, discarding any earlier one. The PSGI/Dancer2
-# performance integrations call this at the start of every request; call it (with finish_trace)
-# yourself to trace anything else, e.g. a queue job. Does nothing when track_tracing is off or the
-# client isn't enabled.
+# start_trace($traceparent): starts a fresh trace on this process, discarding any earlier one. The
+# PSGI/Dancer2 performance integrations call this at the start of every request with the request's
+# own `traceparent` header: a usable W3C value continues the caller's trace (same trace id, and the
+# root span's parent is the caller's span), anything else (undef, blank, malformed) starts a new
+# one. Call it (with finish_trace) yourself to trace anything else, e.g. a queue job.
+#
+# The trace id exists whenever the client is enabled, even with track_tracing off, since errors
+# reported before finish_trace carry it and http_span propagates it; only span recording is gated
+# on track_tracing. Does nothing when the client isn't enabled.
 sub start_trace {
+    my ($traceparent) = @_;
     my $config = _configuration();
-    $current_trace = ($config->{track_tracing} && $config->is_enabled)
-        ? ForgeOps::Tracker::SpanBuffer->new($config)
-        : undef;
+    $current_trace = undef;
+    $current_request = undef;
+    return unless $config->is_enabled;
+
+    my $incoming = ForgeOps::Tracker::TraceParent::parse($traceparent);
+    $current_request = {
+        trace_id       => $incoming ? $incoming->{trace_id} : ForgeOps::Tracker::TraceParent::generate_trace_id(),
+        parent_span_id => $incoming ? $incoming->{parent_span_id} : undef,
+        errored        => 0,
+    };
+    $current_trace = ForgeOps::Tracker::SpanBuffer->new(
+        $config,
+        trace_id              => $current_request->{trace_id},
+        remote_parent_span_id => $current_request->{parent_span_id},
+    ) if $config->{track_tracing};
     return;
 }
 
 # finish_trace($name, $started_at, $duration_ms): ends the current trace, queueing it for delivery
-# when the root took at least trace_capture_threshold seconds, and always clears it. $started_at
-# is an epoch-seconds float (Time::HiRes::time).
+# when the root took at least trace_capture_threshold seconds or the request errored (an error was
+# reported during it, or escaped it), and always clears it along with the request context.
+# $started_at is an epoch-seconds float (Time::HiRes::time).
 sub finish_trace {
     my ($name, $started_at, $duration_ms) = @_;
     my $trace = $current_trace;
+    my $errored = $current_request && $current_request->{errored};
     $current_trace = undef;
+    $current_request = undef;
     return unless $trace;
 
-    my $payload = $trace->finish_trace($name, $started_at, $duration_ms);
+    my $payload = $trace->finish_trace($name, $started_at, $duration_ms, $errored);
     _span_queue()->push($payload) if $payload;
     return;
 }
@@ -243,6 +357,58 @@ sub span {
     }
     $trace->finish(
         $id, $name, defined $options{kind} ? $options{kind} : 'service',
+        $started_at, (Time::HiRes::time - $started_at) * 1000, $options{data},
+    );
+    die $error if $failed;
+    return $wantarray ? @result : $result[0];
+}
+
+# http_span($method, $url, $code, data => {}): makes one outgoing HTTP call inside the current
+# trace. Records it as an "http" span named "<METHOD> <host>" (never the path or query, which could
+# carry an id or a token) and calls $code with a hashref of headers to add to the request,
+# currently a W3C `traceparent` whose parent id is that span's own id, so the called service's
+# root span nests under it. Returns what $code returned; the span is recorded even if $code dies,
+# which is re-raised unchanged, e.g.:
+#
+#   my $response = ForgeOps::Tracker::http_span(POST => $url, sub {
+#       my ($headers) = @_;
+#       $http->post($url, { headers => { %$headers, 'Content-Type' => 'application/json' }, content => $body });
+#   });
+#
+# The headers are empty outside a request, when propagate_traces is off, or when the host isn't in
+# trace_propagation_targets; outside a request no span is recorded either. With track_tracing off
+# the header is still sent (the trace id links errors across services) but no span is kept.
+sub http_span {
+    my ($method, $url, $code, %options) = @_;
+    my $request = $current_request;
+    return $code->({}) unless $request;
+
+    my ($host) = (defined $url ? $url : '') =~ m{\A[A-Za-z][A-Za-z0-9+.-]*://(?:[^/?#\@]*\@)?(\[[^\]]*\]|[^:/?#]+)};
+    $host = lc $host if defined $host;
+    my $span_id = ForgeOps::Tracker::TraceParent::generate_span_id();
+    my %headers = _configuration()->should_propagate_trace($host)
+        ? (ForgeOps::Tracker::TraceParent::HEADER() => ForgeOps::Tracker::TraceParent::build($request->{trace_id}, $span_id))
+        : ();
+
+    my $trace = $current_trace;
+    return $code->(\%headers) unless $trace;
+
+    my $wantarray = wantarray;
+    $trace->open_span($span_id);
+    my $started_at = Time::HiRes::time;
+    my (@result, $failed, $error);
+    {
+        local $@;
+        $failed = !eval {
+            if ($wantarray) { @result = $code->(\%headers) }
+            elsif (defined $wantarray) { $result[0] = $code->(\%headers) }
+            else { $code->(\%headers) }
+            1;
+        };
+        $error = $@;
+    }
+    $trace->finish(
+        $span_id, uc($method) . ' ' . (defined $host ? $host : 'unknown'), 'http',
         $started_at, (Time::HiRes::time - $started_at) * 1000, $options{data},
     );
     die $error if $failed;
@@ -313,6 +479,8 @@ sub _reset_for_testing {
     $metric_buffer = undef;
     $infrastructure_metric_buffer = undef;
     $current_trace = undef;
+    $current_request = undef;
+    @escaped = ();
     $current_user = undef;
     @current_breadcrumbs = ();
     return;

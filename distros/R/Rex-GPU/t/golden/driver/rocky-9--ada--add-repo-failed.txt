@@ -1,0 +1,13 @@
+# golden: driver/rocky-9--ada--add-repo-failed
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: cat /etc/os-release 2>/dev/null
+pkg: epel-release ensure=present
+run: dnf config-manager --set-enabled crb 2>/dev/null || true
+run: uname -m
+run: dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo 2>&1
+DIE: dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo failed (exit 1): Adding repo from: https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo
+Curl error (22): HTTP response code said error for https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo [The requested URL returned error: 404]
+Error: Configuration of repo failed; no driver was installed

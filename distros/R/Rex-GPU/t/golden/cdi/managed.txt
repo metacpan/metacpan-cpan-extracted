@@ -1,0 +1,7 @@
+# golden: cdi/managed
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: systemctl is-enabled nvidia-cdi-refresh.path 2>/dev/null
+run: systemctl is-active nvidia-cdi-refresh.path 2>/dev/null
+run: test -f /run/cdi/nvidia.yaml
+run: systemctl start nvidia-cdi-refresh.service 2>/dev/null

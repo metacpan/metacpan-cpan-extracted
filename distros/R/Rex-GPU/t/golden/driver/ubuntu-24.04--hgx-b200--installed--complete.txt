@@ -1,0 +1,15 @@
+# golden: driver/ubuntu-24.04--hgx-b200--installed--complete
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run: /sbin/ldconfig -p 2>/dev/null | grep -q '^[[:space:]]*libcuda\.so\.1 '
+run: nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>&1
+run: dpkg-query -W -f='${Package} ${db:Status-Abbrev} ${Version}\n' 'nvidia-fabric*manager*' 2>/dev/null
+run(auto_die=default): uname -r
+run: dpkg -l nvlsm 2>/dev/null | grep -q '^ii'
+run: dpkg -l infiniband-diags 2>/dev/null | grep -q '^ii'
+run: dpkg -l libibumad3 2>/dev/null | grep -q '^ii'
+run: dpkg -l linux-modules-extra-6.8.0-85-generic 2>/dev/null | grep -q '^ii'
+run: lsmod | grep -q '^ib_umad '
+run: systemctl is-active --quiet nvidia-fabricmanager.service
+run: nvidia-smi -q 2>&1

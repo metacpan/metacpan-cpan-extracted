@@ -1,3 +1,7 @@
+0.000149  2026-09-24 14:32:20-07:00 America/Los_Angeles
+
+    - Database sync no longer tries to copy a run that already exists in the destination, whatever its status.
+
 0.000148  2026-09-21 11:47:31-07:00 America/Los_Angeles
 
     - Write coverage, event, and reporting rows in multi-row inserts inside one transaction per flush, cutting database round trips by roughly 100x.

@@ -36,12 +36,26 @@ Amazon::Signature4::Lite - Lightweight AWS Signature Version 4 signing
     # Authorization, x-amz-date, x-amz-content-sha256,
     # x-amz-security-token (if session_token provided), host
 
+    # For streamed content, supply a precomputed SHA-256 hash instead of #
+    # passing the complete payload to the signer.
+
+    my $signed = $signer->sign(
+      method       => 'PUT',
+      url          => 'https://s3.amazonaws.com/my-bucket/my-key',
+      headers      => { 'Content-Type' => 'application/octet-stream', 'Content-Length' => $content_length, },
+      payload_hash => $payload_hash,
+    );
+
 # DESCRIPTION
 
 A minimal, dependency-free AWS Signature Version 4 implementation for
 signing S3 and other AWS API requests. Unlike [AWS::Signature4](https://metacpan.org/pod/AWS%3A%3ASignature4), this
 module does not depend on [LWP](https://metacpan.org/pod/LWP) or [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest) - it works
 directly with the plain scalars and hashrefs that [HTTP::Tiny](https://metacpan.org/pod/HTTP%3A%3ATiny) uses.
+
+For large or streamed request bodies, callers may provide a precomputed
+SHA-256 payload hash, allowing the request to be signed without holding
+the complete payload in memory.
 
 # METHODS
 
@@ -62,13 +76,74 @@ Optional: `session_token` (for temporary credentials), `service`
     my $headers = $signer->sign(
       method  => 'GET',
       url     => $url,
-      headers => \%extra_headers,
+      headers => %extra_headers,
       payload => $body,
     );
 
-Returns a hashref of HTTP headers including `Authorization`,
-`x-amz-date`, `x-amz-content-sha256`, and `host`. Merge these
-into your [HTTP::Tiny](https://metacpan.org/pod/HTTP%3A%3ATiny) request headers.
+Signs an AWS request and returns a hash reference containing the HTTP
+headers required for the request.
+
+Arguments:
+
+- method
+
+    HTTP request method. Defaults to `GET`.
+
+- url
+
+    The complete request URL. Required.
+
+- headers
+
+    Optional hash reference containing additional request headers to include
+    in the signature.
+
+- payload
+
+    The request body. The SHA-256 hash used in the canonical request is
+    calculated from this value.
+
+    If neither `payload` nor `payload_hash` is supplied, the payload is
+    treated as an empty string.
+
+- payload\_hash
+
+    An optional precomputed SHA-256 hash of the request body.
+
+    When supplied, `payload_hash` is used directly in the canonical request
+    and, by default, as the value of the `x-amz-content-sha256` header. The
+    `payload` value is not hashed.
+
+    This is useful when the request body will be streamed and holding the
+    complete payload in memory solely for signing would be undesirable. The
+    caller is responsible for ensuring that `payload_hash` corresponds
+    exactly to the content that will be transmitted.
+
+    my $headers = $signer->sign(
+    method       => 'PUT',
+    url          => $url,
+    headers      => %extra\_headers,
+    payload\_hash => $sha256,
+    );
+
+- add\_sha256\_header
+
+    Controls whether `x-amz-content-sha256` is included in the returned
+    headers. Defaults to true.
+
+- time
+
+    Optional Unix timestamp used when generating the signing timestamp.
+    When omitted, the current time is used. This is primarily useful for
+    testing or applications that need to control the signing time.
+
+The returned hash reference includes `Authorization`, `x-amz-date`,
+`host`, and, by default, `x-amz-content-sha256`. It also includes
+`x-amz-security-token` when the signer was constructed with a session
+token.
+
+The returned hash reference can be passed directly as the headers for an
+[HTTP::Tiny](https://metacpan.org/pod/HTTP%3A%3ATiny) request.
 
 ## parse\_service\_url(%args)
 

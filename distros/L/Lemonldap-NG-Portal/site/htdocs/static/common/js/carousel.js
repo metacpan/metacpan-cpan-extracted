@@ -85,9 +85,15 @@
       carouselIndicators.append(notificationIndicator);
     });
     // Append the carousel inner to the carousel container
+    var carousel = $("div.carousel");
     var previousButton = $("<a class=\"carousel-control-prev\" href=\"#carousel\" role=\"button\" data-slide=\"prev\">\n        <span class=\"carousel-control-prev-icon\" aria-hidden=\"true\"></span>\n        <span class=\"sr-only\">Previous</span>\n      </a>");
     var nextButton = $("<a class=\"carousel-control-next\" href=\"#carousel\" role=\"button\" data-slide=\"next\">\n    <span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span>\n    <span class=\"sr-only\">Next</span>\n  </a>");
-    $("div.carousel").append(carouselIndicators, carouselInner, previousButton, nextButton);
+    if (carousel.hasClass("initialized")) {
+      return;
+    }
+    console.debug('Append carousel');
+    carousel.addClass("initialized");
+    carousel.append(carouselIndicators, carouselInner, previousButton, nextButton);
   });
 
 })();

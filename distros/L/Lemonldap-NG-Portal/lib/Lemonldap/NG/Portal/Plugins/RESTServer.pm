@@ -458,7 +458,7 @@ sub mysession {
         my ( $host, $uri );
         if ( $req->urldc =~ URIRE ) {
             ( $host, $uri ) = ( $3 . ( $4 ? ":$4" : '' ), $5 );
-            $uri ||= '/';
+            $uri = $self->p->HANDLER->canonicalUri($uri);
             return $self->p->sendError( $req, "Bad URL $req->{urldc}", 400 )
               unless ($host);
         }

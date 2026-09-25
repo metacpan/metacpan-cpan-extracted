@@ -14,7 +14,6 @@ my $rep_fd = $srv->reply_eventfd;
 
 my $pid = fork // die "fork: $!";
 if ($pid == 0) {
-    # Child: EV-driven server
     my $done = 0;
     my $w = EV::io $req_fd, EV::READ, sub {
         $srv->eventfd_consume;
@@ -34,7 +33,6 @@ if ($pid == 0) {
     exit 0;
 }
 
-# Parent: client with eventfd notifications
 my $cli = Data::ReqRep::Shared::Client->new($path);
 $cli->req_eventfd_set($req_fd);
 $cli->eventfd_set($rep_fd);

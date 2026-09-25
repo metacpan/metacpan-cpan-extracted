@@ -40,6 +40,21 @@ sub data { return $_[0]->{data} }
 
 sub uri { return $_[0]->{uri} }
 
+# URI tested by locationRules. It must be the path the request is really
+# served at, else rules can be bypassed with an encoded URL:
+#  - handlers protecting another application (Nginx, Traefik, mod_perl) set it
+#    in ACCESS_CONTROL_URI, see Handler::Server::Main::setAccessControlUri()
+#    and Handler::ApacheMP2::Request
+#  - otherwise (portal, manager, api), it is PATH_INFO, the path the LLNG
+#    router uses, followed by the query string as received
+sub access_control_uri {
+    my ($self) = @_;
+    my $env = $self->env;
+    return $env->{ACCESS_CONTROL_URI} if defined $env->{ACCESS_CONTROL_URI};
+    my $qs = $env->{QUERY_STRING};
+    return $env->{PATH_INFO} . ( defined $qs && length $qs ? "?$qs" : '' );
+}
+
 sub request_id { return $_[0]->{request_id} }
 
 sub userData {
@@ -209,6 +224,14 @@ modify a GET parameter value
 =head2 uri
 
 REQUEST_URI environment variable decoded.
+
+=head2 access_control_uri
+
+URI tested by L<locationRules>: the path the request is really served at.
+Handlers protecting another application set it in the C<ACCESS_CONTROL_URI>
+environment variable (see L<Lemonldap::NG::Handler::Server::Main> and
+L<Lemonldap::NG::Handler::ApacheMP2::Request>); otherwise it is PATH_INFO,
+the path used by the LLNG router, followed by the query string as received.
 
 =head2 user
 

@@ -6,7 +6,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json to_json);
 use Lemonldap::NG::Common::Crypto;
-use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
+use Lemonldap::NG::Portal::Main::Constants ':all';
 
 our $VERSION = '2.23.0';
 
@@ -54,7 +54,7 @@ sub sendcode {
     my $generic = $req->param('generic');
 
     unless ($generic) {
-        return $self->failResponse( $req, 'PE79', 200 );
+        return $self->failResponse( $req, PE_REGISTERFORMEMPTY, 200 );
     }
 
     return $self->failResponse( $req, 'csrfError', 400 )
@@ -104,7 +104,7 @@ sub verify {
     my $token = $self->ott->getToken( $tokenid, 1 );
     my $res   = $self->verificationModule->verify_supplied_code( $req, $token,
         $genericcode );
-    return $self->failResponse( $req, "PE$res", 400 )
+    return $self->failResponse( $req, $res, 400 )
       unless ( $res == PE_OK );
 
     # Now generic is verified, let's store it in persistent data
@@ -140,7 +140,7 @@ sub verify {
     }
     else {
         $self->logger->error( $self->prefix . "2f: unable to add device" );
-        return $self->failResponse( $req, "PE$res" );
+        return $self->failResponse( $req, $res );
     }
 }
 

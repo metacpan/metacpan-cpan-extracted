@@ -62,6 +62,31 @@ is(
   );
 
 count(7);
+
+# grant() called for another vhost (menu, REST/SOAP authorizationfor,
+# CheckUser) must use the authentication level of that vhost, not the one of
+# the current request
+{
+    my $session = { authenticationLevel => 1 };
+    my $req     = Lemonldap::NG::Common::PSGI::Request->new(
+        { HTTP_HOST => 'test1.example.com', REQUEST_URI => '/' } );
+    ok(
+        !Lemonldap::NG::Handler::Main->grant(
+            $req, $session, '/', undef, 'test3.example.com'
+        ),
+        'test3 (level 3) refused from test1 (level 1)'
+    );
+    $req = Lemonldap::NG::Common::PSGI::Request->new(
+        { HTTP_HOST => 'test3.example.com', REQUEST_URI => '/' } );
+    ok(
+        Lemonldap::NG::Handler::Main->grant(
+            $req, $session, '/', undef, 'test1.example.com'
+        ),
+        'test1 (level 1) granted from test3 (level 3)'
+    );
+    count(2);
+}
+
 done_testing( count() );
 clean();
 

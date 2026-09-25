@@ -1,5 +1,12 @@
 Revision history for Perl module Promise::Me
 
+v0.6.1 2026-09-25T12:42:24+0900
+    [Bug fixes]
+    - Fixed Promise::Me::Share::SHIFT() using load() instead of unload() when
+      persisting modified shared array data.
+    - Fixed Promise::Me::Share::load() using array dereferencing instead of hash
+      dereferencing for tied hash data.
+
 v0.6.0 2025-04-23T06:02:17+0900
     - Improved module for thread safety
     - Asynchronous exception handling improvement

@@ -10,11 +10,12 @@ use Amazon::S3::Lite::Constants qw(:booleans);
 use Carp qw(croak);
 use Data::Dumper;
 use Digest::MD5 qw(md5_base64 md5);
+use Digest::SHA qw(sha256_hex);
 use English qw(-no_match_vars);
 use HTTP::Tiny;
 use List::Util qw(pairs);
 use MIME::Base64 qw(encode_base64);
-use Scalar::Util qw(blessed openhandle);
+use Scalar::Util qw(blessed openhandle reftype);
 use URI::Escape qw(uri_escape_utf8);
 use XML::Twig;
 use JSON::PP;
@@ -22,7 +23,7 @@ use JSON::PP;
 use Role::Tiny::With;
 with 'Amazon::S3::Lite::Policies';
 
-our $VERSION = '1.3.2';
+our $VERSION = '1.3.3';
 
 ########################################################################
 sub new {
@@ -261,10 +262,11 @@ sub _request {
 
   # sign â returns merged headers ready for HTTP::Tiny
   my $signed = $self->_signer($region)->sign(
-    method  => $method,
-    url     => $url,
-    headers => $headers,
-    payload => $content_is_coderef ? q{} : $content,
+    method       => $method,
+    url          => $url,
+    headers      => $headers,
+    payload      => $content_is_coderef ? q{} : $content,
+    payload_hash => $extra->{payload_hash},
   );
 
   # HTTP::Tiny sets Host itself â remove to avoid duplicate header error
@@ -662,7 +664,7 @@ sub _parse_copy_response {
 # put_object( $bucket, $key, $data, %options )
 #
 # Stores an object in S3. $data may be a scalar string, a reference to
-# a scalar, or an open filehandle / IO::File object.
+# a scalar, or a seekable open filehandle / IO::File object.
 #
 # Options: content_type, content_length, metadata (hashref), acl
 #
@@ -710,6 +712,7 @@ sub put_object {
   }
 
   my $body;
+  my $payload_hash;
 
   if ( openhandle($data) || ( blessed($data) && $data->can('read') ) ) {
     # --- Filehandle path ---
@@ -717,6 +720,8 @@ sub put_object {
 
     # Try to stat the handle for real files; suppress warning on
     # in-memory handles (IO::Scalar etc.) that have no underlying fd
+    my $position = tell $data;
+
     if ( !defined $content_length ) {
       my $fd = eval { return fileno $data };
 
@@ -724,7 +729,7 @@ sub put_object {
         my @st = stat $data;
 
         if ( @st && defined $st[7] ) {
-          $content_length = $st[7];
+          $content_length = $st[7] - $position;
         }
       }
     }
@@ -733,6 +738,17 @@ sub put_object {
       if !defined $content_length;
 
     $headers{'Content-Length'} = $content_length;
+
+    croak 'filehandle must be seekable for streaming upload'
+      if !defined $position;
+
+    my $sha256 = Digest::SHA->new(256);
+    $sha256->addfile($data);
+
+    $payload_hash = $sha256->hexdigest;
+
+    seek $data, $position, 0
+      or croak "could not rewind filehandle: $OS_ERROR";
 
     # Wrap filehandle in a code ref for HTTP::Tiny streaming
     my $chunk_size = 1024 * 64;  # 64KB chunks
@@ -760,7 +776,12 @@ sub put_object {
     $headers{'Content-MD5'}    = encode_base64( md5($body), q{} );
   }
 
-  my $response = $self->_request( 'PUT', $url, \%headers, $body );
+  my %extra = ( defined $payload_hash ? ( payload_hash => $payload_hash ) : () );
+
+  my $response = $self->_request(
+    PUT => $url,
+    \%headers, $body, \%extra
+  );
 
   $self->_croak_on_error( $response, 'put_object' );
 
@@ -1857,15 +1878,23 @@ Stores C<$data> at C<$key> in C<$bucket>. C<$data> may be:
 
 =item * A reference to a scalar (avoids copying large strings)
 
-=item * An open filehandle or L<IO::File> object (body is read to EOF)
+=item * A seekable open filehandle or L<IO::File> object
 
 =back
 
-When passing a filehandle, C<content_length> becomes required unless
-HTTP::Tiny can determine the size from the handle (i.e. the handle is
-backed by a real file). For in-memory handles (C<IO::Scalar>, etc.)
-you must supply C<content_length> explicitly, or the method will
-croak.
+When passing a filehandle, the handle must be seekable. The method
+computes the SHA-256 hash required for AWS Signature Version 4 from the
+current file position through EOF, then restores the original position
+before streaming the content to S3.
+
+I<Note: The effective uploaded payload is from the current position to EOF.>
+
+C<content_length> is required unless the size can be determined from the
+handle (for example, when the handle is backed by a real file). For
+in-memory handles such as C<IO::Scalar>, supply C<content_length>
+explicitly.
+
+The filehandle is not closed by C<put_object>.
 
   # Scalar
   $s3->put_object('my-bucket', 'hello.txt', 'Hello, world!',
@@ -1888,8 +1917,10 @@ MIME type for the object. Defaults to C<application/octet-stream>.
 
 =item content_length
 
-Required when C<$data> is an in-memory filehandle. Optional (and
-ignored) for scalar data, where length is computed automatically.
+Required for filehandles whose size cannot be determined automatically.
+For handles backed by regular files, the size is determined from the
+file. Ignored for scalar data, where the length is computed
+automatically.
 
 =item metadata
 

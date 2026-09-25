@@ -1,7 +1,7 @@
 # ABSTRACT: Linux node preparation for Rancher Kubernetes distributions (RKE2/K3s)
 
 package Rex::Rancher::Node;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use v5.14.4;
 use warnings;
 
@@ -153,7 +153,7 @@ Rex::Rancher::Node - Linux node preparation for Rancher Kubernetes distributions
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -166,7 +166,8 @@ version 0.001
     timezone => 'Europe/Berlin',
   );
 
-  # Minimal preparation — leave hostname and locale at OS defaults
+  # Minimal preparation — hostname left unchanged; timezone UTC and
+  # locale en_US.UTF-8 are still set (the defaults), chrony installed
   prepare_node();
 
   # Skip NTP (e.g. host is a VM with hypervisor time sync)
@@ -179,9 +180,11 @@ version 0.001
 =head1 DESCRIPTION
 
 L<Rex::Rancher::Node> prepares a Linux node for Rancher Kubernetes
-distributions (RKE2 and K3s). It is distribution-agnostic — the same
-L</prepare_node> call works on Debian, Ubuntu, RHEL/Rocky/Alma, and
-openSUSE Leap.
+distributions (RKE2 and K3s). The same L</prepare_node> call is verified on
+Debian, Ubuntu, and RHEL/Rocky/Alma — the supported set. openSUSE Leap / SLES
+is B<unverified>: the base-package step there falls through to Rex's generic
+C<pkg> abstraction (zypper) and has never been exercised on real SUSE
+hardware, so it is unsupported and best-effort only.
 
 The module sets OS-level configuration that Kubernetes requires:
 
@@ -210,6 +213,11 @@ Prepare a Linux node for Kubernetes. Performs all OS-level configuration
 required before installing RKE2 or K3s:
 
 =over
+
+=item * On Debian/Ubuntu, stop C<unattended-upgrades>, C<apt-daily.service>
+and C<apt-daily-upgrade.service> (they hold the apt lock on a fresh boot)
+and run C<apt-get update>. They are B<not> restarted afterwards; their
+timers bring them back on schedule, C<unattended-upgrades> at the next boot.
 
 =item * Install C<curl> and C<ca-certificates>
 

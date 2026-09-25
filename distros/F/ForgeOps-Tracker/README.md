@@ -272,12 +272,13 @@ failure.
 A slow request's own breakdown: which pieces of your code (or calls you wrap) the time went to,
 shown as a span tree on ForgeOps. On by default with `PSGIPerformance` or `Dancer2Performance`
 enabled: each starts a trace per request (root span named like the performance transaction) and,
-once the request finishes, sends it only when it took at least `trace_capture_threshold` seconds
-(1 by default), so fast requests cost nothing on the wire. Delivered on the same background thread
-and bounded queue as error reports. Traces are per service; nothing is propagated across services.
+once the request finishes, sends it when it took at least `trace_capture_threshold` seconds (1 by
+default) or when an error was reported during it, so fast, successful requests cost nothing on the
+wire. Delivered on the same background thread and bounded queue as error reports.
 
 There is no automatic database or outbound HTTP span (no DBI or HTTP::Tiny hook in this client), so
-the request itself is the only automatic span; add the rest by hand:
+the request itself is the only automatic span; add the rest by hand (for outbound HTTP, prefer
+`http_span`, below):
 
 ```perl
 my $order = ForgeOps::Tracker::span('charge card', sub { $gateway->charge($id) },
@@ -294,6 +295,76 @@ records even when the code dies (re-raising unchanged), and just runs the code o
 trace something that is not a request, call `ForgeOps::Tracker::start_trace()` and
 `finish_trace($name, $started_at, $duration_ms)` yourself. A trace holds at most 500 spans. Configure
 with `track_tracing => 0` and `trace_capture_threshold => 2.5`.
+
+### Following a request across services
+
+Traces use the [W3C Trace Context](https://www.w3.org/TR/trace-context/) standard (a `traceparent`
+header), so an error or a slow call can be followed from one service into the next.
+
+**Incoming**: automatic with `PSGIPerformance` or `Dancer2Performance`. A request that arrives with
+a valid `traceparent` header continues that trace (same trace id), and its root span records the
+caller's span as its parent. A missing or malformed header just starts a new trace.
+
+**Outgoing**: wrap each HTTP call you make during a request in `http_span`. It records the call as
+an `http` span named after the method and host (never the path or query) and hands your code a
+hashref of headers to add; the header's parent id is that span's own id, so the called service's
+spans nest under it. It works with any HTTP client, records the span even when the call dies
+(re-raising unchanged), and returns what your code returned:
+
+```perl
+use HTTP::Tiny;
+
+my $http = HTTP::Tiny->new;
+my $response = ForgeOps::Tracker::http_span(POST => $url, sub {
+    my ($headers) = @_; # { traceparent => '00-...' }
+    $http->post($url, { headers => { %$headers, 'Content-Type' => 'application/json' }, content => $body });
+});
+```
+
+Outside a request your code gets an empty hashref and nothing is recorded, so the same code works in
+a cron job. `ForgeOps::Tracker::current_trace_id()` returns the current request's trace id, for your
+own logs. To trace work that isn't a request but continues one (a job carrying the header it was
+queued with, say), pass that header to `ForgeOps::Tracker::start_trace($traceparent)`.
+
+A trace id exists for every request even with `track_tracing => 0`, and the header is still sent,
+since the trace id is also what links an error here to an error in the service you called (see
+[Where an error happened](#where-an-error-happened)); only span reporting stops. The service on the
+other end must also report to ForgeOps, and both projects must be linked in ForgeOps to see their
+errors and traces connected.
+
+Narrow or turn off where the header goes, for example if a third-party API rejects unknown headers:
+
+```perl
+ForgeOps::Tracker::init(
+    dsn              => '...',
+    propagate_traces => 0, # never send traceparent (default 1)
+
+    # Default undef: every host. A string matches that host and its subdomains on a dot boundary
+    # ("internal.example" matches "orders.internal.example", not "notinternal.example"); a qr//
+    # regular expression is matched against the host.
+    trace_propagation_targets => ['internal.example', qr/\A10\.0\./],
+);
+```
+
+### Where an error happened
+
+An error reported during a request (from `Integrations::PSGI`/`Integrations::Dancer2`, or your own
+`report` call from inside a route) carries up to three extra fields:
+
+- `trace_id`: the request's W3C trace id, which ForgeOps uses to link this error to errors that
+  other services reported for the same trace.
+- `transaction_name`: the same name performance monitoring and traces use, `"GET /users/:id"`.
+- `endpoint`: the HTTP method and the route as declared, `"GET /users/:id"`. Never the literal
+  path, so an id or a token in the URL never ends up here.
+
+`Dancer2Performance` fills in all three as soon as Dancer2 has matched the route, before the route
+itself runs. `PSGIPerformance` fills in only `trace_id`, since plain PSGI has no route pattern (a
+raw path is neither a transaction name nor an endpoint); if your PSGI app has its own router, name
+the request yourself with `ForgeOps::Tracker::set_request_route('GET /users/:id', 'GET /users/:id')`.
+They need one of the performance integrations enabled, are left out entirely outside a request, and
+are never PII-scrubbed: they're structured fields, not free text. An error that escapes the request
+keeps them (and the affected user and breadcrumb trail) even though `Integrations::PSGI` sits outside
+`PSGIPerformance` and reports it after the request's own state has been cleared.
 
 ## Custom metrics and infrastructure monitoring
 

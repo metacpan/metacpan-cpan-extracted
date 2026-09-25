@@ -34,6 +34,40 @@ subtest 'multiple options' => sub {
 
 	push $tag->readerValue()->@*, 'b';
 	is $tag->readerValue(), ['a'], 'each parse gets its own copy of the default';
+	is option('tag', type => 's', multiple => 1)->readerValue(), [], 'absent without a default is an empty list';
+};
+
+subtest 'csv options' => sub {
+	my $tag = option('tag', type => 's', multiple => 1, csv => 1);
+	is $tag->readerValue(config => { tag => 'a, b' }), ['a', 'b'], 'a lone config value is split';
+	is $tag->readerValue(config => { tag => ['a,b', 'c'] }), ['a,b', 'c'], 'a config list is taken as given';
+	like dies { $tag->readerValue(config => { tag => undef }) }, qr/^config value for 'tag': no value given/, 'a null config value is still reported as missing';
+};
+
+subtest 'objectlist options' => sub {
+	my $server = option('server', type => 'i', objectlist => 1, default => [{ port => '80' }]);
+	is $server->readerValue(config => { server => [{ port => '81' }, { port => '82' }] }), [{ port => 81 }, { port => 82 }], 'a config list of mappings passes through, values coerced';
+	is $server->readerValue(commandLine => { server => { '0.port' => '8080' } }), [{ port => 8080 }], 'command line pairs are collected';
+
+	$server->readerValue()->[0]{port} = 9;
+	is $server->readerValue(), [{ port => 80 }], 'each parse gets its own copy of the default, entries included';
+
+	like dies { $server->readerValue(config => { server => { port => 1 } }) }, qr/^config value for 'server': expected a list of mappings/, 'mapping for an objectlist option';
+	like dies { $server->readerValue(config => { server => ['x'] }) }, qr/^config value for 'server': entry 0: expected a mapping of keys to values/, 'scalar entry';
+};
+
+subtest 'hash options' => sub {
+	my $define = option('define', type => 'i', hash => 1, default => { a => '1' });
+	is $define->readerValue(commandLine => { define => { b => '2' } }), { b => 2 }, 'the given mapping replaces the default, values coerced';
+	is $define->readerValue(config => { define => { c => '3' } }), { c => 3 }, 'a config mapping passes through';
+
+	$define->readerValue()->{x} = 9;
+	is $define->readerValue(), { a => 1 }, 'each parse gets its own copy of the default';
+	is option('define', type => 's', hash => 1)->readerValue(), {}, 'absent without a default is an empty mapping';
+
+	like dies { $define->readerValue(config => { define => 'a=1' }) }, qr/^config value for 'define': expected a mapping of keys to values/, 'scalar for a hash option';
+	like dies { $define->readerValue(config => { define => { a => undef } }) }, qr/^config value for 'define': key 'a': no value given/, 'null value names its key';
+	like dies { $define->readerValue(config => { define => { '' => 1 } }) }, qr/^config value for 'define': empty key/, 'empty key';
 };
 
 subtest 'config values need the right shape' => sub {

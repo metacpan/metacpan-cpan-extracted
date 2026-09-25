@@ -8,6 +8,8 @@ use English qw(-no_match_vars);
 use List::Util qw(any);
 use Readonly;
 use Test::More;
+use Amazon::S3;
+use HTTP::Tiny;
 
 use parent qw(Exporter);
 
@@ -120,6 +122,8 @@ sub check_test_bucket {
   my ( $owner_id, $owner_displayname )
     = @{$response}{qw(owner_id owner_displayname)};
 
+  $owner_displayname //= q{};
+
   my $bucket_name = make_bucket_name();
 
   my @buckets = map { $_->{bucket} } @{ $response->{buckets} };
@@ -134,34 +138,40 @@ sub check_test_bucket {
 ########################################################################
 sub set_s3_host {
 ########################################################################
-  my $host = $ENV{AMAZON_S3_HOST};
+  my ($host) = @_;
 
-  $host //= 's3.amazonaws.com';
+  $host //= $ENV{AMAZON_S3_HOST};
 
-  ## no critic (RequireLocalizedPunctuationVars)
-
-  if ( $ENV{AMAZON_S3_LOCALSTACK} ) {
-
+  if ( defined $ENV{AMAZON_S3_LOCALSTACK} ) {
     $host //= $DEFAULT_LOCAL_STACK_HOST;
 
-    $ENV{AWS_ACCESS_KEY_ID} = 'test';
-
-    $ENV{AWS_SECRET_ACCESS_KEY} = 'test';
-
-    $ENV{AMAZON_S3_SKIP_ACLS} = $TRUE;
-
+    $ENV{AWS_ACCESS_KEY_ID}         = 'test';
+    $ENV{AWS_SECRET_ACCESS_KEY}     = 'test';
+    $ENV{AMAZON_S3_SKIP_ACLS}       = $TRUE;
     $ENV{AMAZON_S3_EXPENSIVE_TESTS} = $TRUE;
+
+    my $rsp = HTTP::Tiny->new->get( 'http://' . "$host/_localstack/health" );
+
+    die "ERROR: localstack is not available\n"
+      if !$rsp->{success};
+
+    require JSON;
+
+    my $services = JSON->new->decode( $rsp->{content} );
+
+    die "S3 not available\n"
+      if $services->{services}{s3} ne 'running';
   }
-  elsif ( exists $ENV{AMAZON_S3_MINIO} ) {
+  elsif ( defined $ENV{AMAZON_S3_MINIO} ) {
 
     $host //= $DEFAULT_MINIO_HOST;
 
-    $ENV{AMAZON_S3_SKIP_ACLS} = $TRUE;
-
-    $ENV{AMAZON_S3_EXPENSIVE_TESTS} = $TRUE;
-
+    $ENV{AMAZON_S3_SKIP_ACLS}                   = $TRUE;
+    $ENV{AMAZON_S3_EXPENSIVE_TESTS}             = $TRUE;
     $ENV{AMAZON_S3_SKIP_REGION_CONSTRAINT_TEST} = $TRUE;
   }
+
+  $host //= 's3.amazonaws.com';
 
   return $host;
 }
@@ -169,7 +179,10 @@ sub set_s3_host {
 ########################################################################
 sub get_s3_service {
 ########################################################################
-  my ($host) = @_;
+  my ( $host, $raise_error ) = @_;
+
+  die "ERROR: usage: get_s3_service(host)\n"
+    if !$host;
 
   my $s3 = eval {
 
@@ -182,6 +195,7 @@ sub get_s3_service {
           secure           => is_aws(),
           dns_bucket_names => $ENV{AMAZON_S3_DNS_BUCKET_NAMES},
           level            => $ENV{DEBUG} ? 'trace' : 'error',
+          raise_error      => $raise_error,
         }
       );
 
@@ -195,10 +209,15 @@ sub get_s3_service {
           secure                => is_aws(),
           dns_bucket_names      => $ENV{AMAZON_S3_DNS_BUCKET_NAMES},
           level                 => $ENV{DEBUG} ? 'trace' : 'error',
+          raise_error           => $raise_error,
+          debug                 => $ENV{DEBUG},
         }
       );
     }
   };
+
+  die $EVAL_ERROR
+    if $EVAL_ERROR;
 
   return $s3;
 }

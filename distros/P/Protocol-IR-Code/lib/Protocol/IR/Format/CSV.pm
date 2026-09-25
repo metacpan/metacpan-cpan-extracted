@@ -2,19 +2,59 @@ package Protocol::IR::Format::CSV;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
-# Parse a single CSV line with quoted value support
+# Parse a single CSV line with full RFC-style quoting: a field wrapped in
+# double quotes may hold commas, quotes, and newlines, with a literal quote
+# written as a doubled "" exactly as the reference TypeScript parser accepts
+# (the web-ir-remote-tools port emits such files). Unquoted fields are
+# trimmed of surrounding whitespace, again matching the TS port so the two
+# agree on every file. A hand-rolled parser stays because IRDB files are not
+# strict RFC 4180 - header fields can be tab-joined, rows arrive headerless,
+# and quoted values may carry leading/trailing whitespace the strict library
+# parsers reject - and Text::CSV_XS would add a compiled dependency for a
+# format that mostly does not need it.
 sub _parse_csv_line {
     my ($line) = @_;
+    return () unless defined $line;
     $line =~ s/[\r\n]+$//;
     my @fields;
-    while ($line =~ /\s*(?:"([^"]*)"|([^,]*))\s*(?:,|$)/g) {
-        my $val = defined $1 ? $1 : $2;
-        push @fields, $val;
-        last if pos($line) == length($line);
+    my ($field, $in_quotes, $quoted) = ('', 0, 0);
+    for (my $i = 0; $i < length $line; $i++) {
+        my $c = substr($line, $i, 1);
+        if ($in_quotes) {
+            if ($c eq '"') {
+                if (substr($line, $i + 1, 1) eq '"') {
+                    $field .= '"';
+                    $i++;
+                } else {
+                    $in_quotes = 0;
+                }
+            } else {
+                $field .= $c;
+            }
+        } elsif ($c eq '"' && $field eq '') {
+            $in_quotes = 1;
+            $quoted = 1;
+        } elsif ($c eq ',') {
+            push @fields, _field_value($field, $quoted);
+            $field = '';
+            $quoted = 0;
+        } else {
+            $field .= $c;
+        }
     }
+    push @fields, _field_value($field, $quoted);
     return @fields;
+}
+
+# Quoted fields keep their bytes verbatim; unquoted fields are trimmed to
+# match the TypeScript parser's String.trim().
+sub _field_value {
+    my ($value, $quoted) = @_;
+    return $value if $quoted;
+    $value =~ s/^\s+|\s+$//g;
+    return $value;
 }
 
 # Normalize protocol aliases commonly found in IRDB.
@@ -124,15 +164,49 @@ sub decode {
     return \@decoded_codes;
 }
 
+# Serialize decoded codes as canonical IRDB rows. Only addressable,
+# registered-protocol codes can be represented: a code whose protocol is
+# unknown has nothing to key a row on, so it is skipped (the same set the
+# importer drops). Each row carries the decoded fields the importer turns
+# back into a code, so CSV -> Code -> CSV is lossless for addressable
+# codes; the aliased device/subdevice/function columns cannot express every
+# raw word of every protocol (e.g. Samsung20), which is inherent to IRDB's
+# keyed schema, not to this export.
+sub export {
+    my ($class, $codes, $registry, %opts) = @_;
+    $codes = [$codes] unless ref $codes eq 'ARRAY';
+
+    my @lines = ('functionname,protocol,device,subdevice,function');
+    for my $code (@$codes) {
+        my $protocol = $code->protocol // 'UNKNOWN';
+        next if $protocol eq 'UNKNOWN';
+
+        my $alias = (defined $code->alias && $code->alias =~ /\S/) ? $code->alias : 'UNKNOWN';
+        if ($alias =~ /[",\n\r]/) {
+            $alias =~ s/"/""/g;
+            $alias = qq{"$alias"};
+        }
+
+        push @lines, join(',',
+            $alias,
+            $protocol,
+            $code->address    // 0,
+            $code->subaddress // -1,
+            $code->command    // 0,
+        );
+    }
+    return join("\n", @lines) . "\n";
+}
+
 1;
 
 =head1 NAME
 
-Protocol::IR::Format::CSV - IRDB CSV importer
+Protocol::IR::Format::CSV - IRDB CSV importer and exporter
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -155,8 +229,22 @@ version 1.0
 
 =head1 DESCRIPTION
 
-C<Protocol::IR::Format::CSV> imports IRDB-style CSV button listings into L<Protocol::IR::Code>
-objects. It accepts either a CSV string or the path to a CSV file.
+C<Protocol::IR::Format::CSV> imports and exports IRDB-style CSV button listings as
+L<Protocol::IR::Code> objects. It accepts either a CSV string or the path to a CSV file.
+
+=over 4
+
+=item Example IRDB CSV (Samsung TV, NECx2 variant)
+
+    functionname,protocol,device,subdevice,function
+    POWER,NECx2,7,7,2
+    1,NECx2,7,7,4
+    2,NECx2,7,7,5
+
+=back
+
+This is the delimited Remotec ZXT-120 style CSV used by the IRDB project
+(L<https://github.com/probonopd/irdb>).
 
 Column headers are detected automatically. Recognized header aliases:
 
@@ -192,6 +280,17 @@ C<alias> set from the button name column.
 
 Parses a CSV string or file and returns an arrayref of L<Protocol::IR::Code> objects.
 Rows with an unregistered or unrecognized protocol are skipped.
+
+=head2 export
+
+    my $csv = $class->export($codes, $registry);
+
+Serializes a L<Protocol::IR::Code> or an arrayref of codes as canonical IRDB
+CSV: a C<functionname,protocol,device,subdevice,function> header followed by
+one row per code. A code with no addressable decoded fields (an C<UNKNOWN>
+protocol) is skipped. Button names are quoted - with embedded quotes doubled -
+when they contain a comma, double quote, or newline. Round-tripping through
+C<decode> reproduces the decoded fields.
 
 =head1 SUPPORT
 

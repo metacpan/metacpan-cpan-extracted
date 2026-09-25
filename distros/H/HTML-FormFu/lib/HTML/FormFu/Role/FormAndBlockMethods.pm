@@ -2,7 +2,7 @@ use strict;
 
 package HTML::FormFu::Role::FormAndBlockMethods;
 # ABSTRACT: role for form and block methods
-$HTML::FormFu::Role::FormAndBlockMethods::VERSION = '2.07';
+$HTML::FormFu::Role::FormAndBlockMethods::VERSION = '2.09';
 use Moose::Role;
 
 use HTML::FormFu::Util qw( _merge_hashes );
@@ -135,13 +135,13 @@ sub _add_constraint_max_length {
 }
 
 sub _add_constraint_integer {
-    my ( $self, $fields, $info ) = @_;
+    my ( $self, $fields ) = @_;
 
     map { $_->constraint( { type => 'Integer', } ) } @$fields;
 }
 
 sub _add_constraint_unsigned {
-    my ( $self, $fields, $info ) = @_;
+    my ( $self, $fields ) = @_;
 
     map { $_->constraint( { type => 'Range', min => 0, } ) } @$fields;
 }
@@ -154,7 +154,7 @@ sub _add_constraint_set {
 }
 
 sub _add_constraint_bool {
-    my ( $self, $fields, $info ) = @_;
+    my ( $self, $fields ) = @_;
 
     map { $_->constraint( { type => 'Set', set => [ 0, 1 ] } ) } @$fields;
 }
@@ -202,7 +202,7 @@ HTML::FormFu::Role::FormAndBlockMethods - role for form and block methods
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 AUTHOR
 
@@ -210,7 +210,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

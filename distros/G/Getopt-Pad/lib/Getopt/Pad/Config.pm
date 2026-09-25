@@ -8,7 +8,7 @@ class Getopt::Pad::Config :strict(params) {
 	use Feature::Compat::Try;
 	use Getopt::Pad::Util qw(expandTilde);
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	field $format      :param;
 	field $formatName  :param;
@@ -67,13 +67,16 @@ class Getopt::Pad::Config :strict(params) {
 
 	# Creates the file exclusively: an existing file, or a symlink to
 	# anywhere, is refused by the open itself, so nothing can slip in
-	# between a check and the creation.
+	# between a check and the creation. Windows follows a dangling symlink
+	# even then, so symlinks are refused up front as well. The file is
+	# written raw under the encoding layer: LF line endings everywhere.
 	method createFile($path, $expanded, $text) {
+		Getopt::Pad::Error->throw("config file '%s' already exists", $path) if -l $expanded;
 		sysopen(my $handle, $expanded, O_WRONLY | O_CREAT | O_EXCL) or do {
 			Getopt::Pad::Error->throw("config file '%s' already exists", $path) if $!{EEXIST};
 			Getopt::Pad::Error->throw("cannot write config file '%s': %s", $path, $!);
 		};
-		binmode $handle, $fileLayer;
+		binmode $handle, ":raw$fileLayer";
 		print {$handle} $text;
 		close $handle or Getopt::Pad::Error->throw("cannot write config file '%s': %s", $path, $!);
 		return;
@@ -126,7 +129,7 @@ Getopt::Pad::Config - grouped config file reader and writer
 
 =head1 DESCRIPTION
 
-The one owner of the grouped config file structure (group, then option name, then value): loads a file named by an explicit --config (falling back to the defaultPath), merges the autoload chain (later paths override earlier ones), validates group membership while flattening to option/value pairs, and writes the default config file for --create-default-config. It also owns the files themselves: every config file is read and written here as UTF-8, and the Format only translates between that text and the data structure. The default config file is created exclusively (O_EXCL), so an existing file or a symlink at the target is refused without a check-then-create gap, and a parse error is reported without the Perl source location the parser appended. Handed out by the config block via its io reader.
+The one owner of the grouped config file structure (group, then option name, then value): loads a file named by an explicit --config (falling back to the defaultPath), merges the autoload chain (later paths override earlier ones), validates group membership while flattening to option/value pairs, and writes the default config file for --create-default-config. It also owns the files themselves: every config file is read and written here as UTF-8, and the Format only translates between that text and the data structure. The default config file is created exclusively (O_EXCL), so an existing file or a symlink at the target is refused without a check-then-create gap (a symlink is also refused explicitly, since Windows follows a dangling one even with O_EXCL), and written with LF line endings on every platform. A parse error is reported without the Perl source location the parser appended. Handed out by the config block via its io reader.
 
 Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
 

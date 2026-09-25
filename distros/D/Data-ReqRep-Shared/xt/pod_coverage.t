@@ -5,10 +5,8 @@ use Test::More;
 plan skip_all => 'Test::Pod::Coverage required'
     unless eval { require Test::Pod::Coverage; 1 };
 
-# Public API is documented in prose under =head2 Server API / Client API
-# / eventfd / etc., not per-method =head/=item entries. Trust the current
-# surface; add new methods here as they're added so reviews catch any
-# truly undocumented additions.
+# Public API is documented in prose, not per-method =head/=item entries;
+# add new methods here as they're added.
 my $api = qr/^(
     DESTROY|AUTOLOAD|import|BEGIN
   | new | new_memfd | new_from_fd
@@ -21,12 +19,11 @@ my $api = qr/^(
   | reply_eventfd | reply_eventfd_set | reply_eventfd_consume
   | reply_fileno  | reply_notify
   | req_eventfd_set | req_fileno
+  | ready_fd | ready
 )$/x;
 
-Test::Pod::Coverage::pod_coverage_ok('Data::ReqRep::Shared',
-    { trustme => [$api] });
-
-Test::Pod::Coverage::pod_coverage_ok('Data::ReqRep::Shared::Client',
-    { trustme => [$api] });
+Test::Pod::Coverage::pod_coverage_ok($_, { trustme => [$api] })
+    for qw(Data::ReqRep::Shared Data::ReqRep::Shared::Client
+           Data::ReqRep::Shared::Int Data::ReqRep::Shared::Int::Client);
 
 done_testing;

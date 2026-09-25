@@ -1,11 +1,14 @@
 use strict;
 use warnings;
+use open IO => ":raw";
 use Test::More;
 use File::Temp qw(tempdir);
-use Fcntl qw(:flock O_RDONLY);
+use Fcntl qw(:flock);
 use POSIX ();
 use Data::ReqRep::Shared;
 use Data::ReqRep::Shared::Client;
+use Data::ReqRep::Shared::Int;
+use Data::ReqRep::Shared::Int::Client;
 
 my $dir = tempdir(CLEANUP => 1);
 my $n   = 0;
@@ -16,12 +19,12 @@ sub poke {
     open my $f, '+<', $path or die "$path: $!";
     binmode $f;
     seek $f, $off, 0 or die $!;
-    print {$f} pack('L<', $u32) or die $!;
+    print {$f} pack('L', $u32) or die $!;
     close $f or die $!;
 }
 
 # Header is 256 bytes, then 24-byte request slots; resp_slot is at offset 12.
-use constant { MUTEX => 192, ARENA_WPOS => 200, SLOT0_RESP_SLOT => 256 + 12 };
+use constant { MUTEX => 192, INT_SLOT0_SEQ => 256, ARENA_WPOS => 208, SLOT0_RESP_SLOT => 256 + 12 };
 
 subtest 'a request with an out-of-range reply id does not kill the server' => sub {
     my ($p, $s) = fresh();
@@ -62,7 +65,8 @@ subtest 'a stray shared-lock holder does not block attaching' => sub {
 
 subtest 'eventfd_set keeps its own descriptor' => sub {
     my ($p, $s) = fresh();
-    my $fd = POSIX::open('/dev/null', O_RDONLY);
+    my $src = Data::ReqRep::Shared->new(undef, 4, 2, 64);
+    my $fd  = POSIX::dup($src->eventfd);
     $s->eventfd_set($fd);
     POSIX::close($fd);
     open my $mine, '<', $0 or die $!;
@@ -106,6 +110,19 @@ subtest 'a lock word naming no process is recovered' => sub {
     for (1 .. 100) { last if $done = waitpid($pid, POSIX::WNOHANG()) > 0; select undef, undef, undef, 0.1 }
     unless ($done) { kill KILL => $pid; waitpid $pid, 0 }
     ok $done && $? == 0, 'a send gets through once the lock is recovered';
+};
+
+subtest 'a corrupt queue sequence fails the send instead of spinning' => sub {
+    my $p = "$dir/i" . ++$n . '.shm';
+    my $s = Data::ReqRep::Shared::Int->new($p, 16, 4);
+    poke($p, INT_SLOT0_SEQ, 0xFFFF);
+    my $pid = fork // die $!;
+    if (!$pid) { POSIX::_exit(defined Data::ReqRep::Shared::Int::Client->new($p)->send(7) ? 0 : 1) }
+    my $done;
+    for (1 .. 100) { last if $done = waitpid($pid, POSIX::WNOHANG()) > 0; select undef, undef, undef, 0.1 }
+    unless ($done) { kill KILL => $pid; waitpid $pid, 0 }
+    ok $done, 'the send returns instead of spinning';
+    is $? >> 8, 1, '  reporting the queue full' if $done;
 };
 
 done_testing;

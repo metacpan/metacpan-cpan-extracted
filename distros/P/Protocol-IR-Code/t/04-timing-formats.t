@@ -39,10 +39,11 @@ for my $code (@codes) {
         is($decoded->command,  $code->command,      "$proto command survives $fmt roundtrip");
     }
 
-    # Pronto and Tasmota must generate the same timing sequence for a code,
-    # so re-exporting the Pronto-decoded code yields the same RawData.
-    my $tas_from_pronto = $converter->export_code($from_pronto, 'Tasmota', style => 'comma');
-    is($tas_from_pronto, $tas, "$proto Pronto and Tasmota generate identical timings");
+    # A Pronto-decoded code keeps its original hex verbatim, so the Pronto
+    # re-export is byte-identical (the lossless guarantee) rather than
+    # re-quantized through the protocol encoder.
+    is($converter->export_code($from_pronto, 'Pronto'), $pronto,
+       "$proto Pronto re-export is byte-identical");
 }
 
 # --- captured data across timing formats ---------------------------------

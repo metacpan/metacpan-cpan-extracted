@@ -2,7 +2,7 @@ package Protocol::IR::Code;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 sub new {
     my ($class, %args) = @_;
@@ -83,13 +83,15 @@ sub reverse_byte {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Code - Intermediate representation of an IR remote control code
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -171,16 +173,34 @@ Flag marking that a wig should bypass protocol-aware repeat behavior.
 
 =item timings
 
-When a signal is decoded from raw timing data (Pronto or Tasmota), the
-individual mark/space timings are retained here so the capture can be
-re-exported losslessly. C<undef> for codes built from decoded fields.
+The raw waveform as a flat list of signed microsecond durations, alternating
+mark (positive) and space (negative), exactly as captured: C<[+9185, -4490,
++650, -500, ...]>. It is set whenever a signal enters through a timing
+format -- Tasmota C<RawData>, a mode2 capture, LIRC C<raw_codes>, or any
+Pronto Hex string -- so the capture can be re-exported losslessly to any
+timing format. C<undef> for codes built from decoded fields.
+
+The values are quantized to the source format's grid: Pronto durations are
+integer carrier cycles times the period derived from the frequency word
+(about 26.3 µs at 38 kHz), Tasmota compact timings are multiples of 5 µs, and
+mode2/LIRC carry integer microseconds as measured. Protocol encoders emit
+Pronto quantized to their nominal carrier, so a signal decoded from Pronto
+re-encodes to the same pulse counts.
 
 =item pronto
 
-The original raw Pronto Hex payload of a signal no registered protocol
-recognized, stashed verbatim so the code re-exports losslessly as a raw
-(protocol C<UNKNOWN>, C<bypass_protocol> set) signal. C<undef> for codes
-built from decoded fields.
+The verbatim Pronto Hex string the code was decoded from, when any, kept so
+the code re-exports byte-identically through any Pronto output or
+Pronto-passthrough container format (wig, Global Cache) without
+re-quantizing. On a signal no registered protocol recognizes (protocol
+C<UNKNOWN>, C<bypass_protocol> set) this is alongside C<timings>. C<undef>
+for codes built from decoded fields.
+
+C<timings> and C<pronto> are kept together on a decoded code because the two
+format families each need their own lossless view: C<timings> feeds the
+microsecond timing formats (Tasmota, mode2, LIRC), C<pronto> the hex container
+formats (wig, Global Cache, a Pronto re-export). Deriving either from the
+other would re-quantize and could change silent fractions.
 
 =back
 
@@ -213,6 +233,27 @@ C<< Protocol::IR::Code::reverse_byte($val) >>.
 Source code: L<https://github.com/bwarden/perl-protocol-ir>
 
 Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
+
+=head1 RELATED PROJECTS
+
+L<Protocol::IR::Code> trades formats with the IR ecosystem rather than
+reinventing it:
+
+=over 4
+
+=item * LIRC -- L<remote definitions|https://www.lirc.org/>, and the L<mode2|Protocol::IR::Format::Mode2> capture tool
+
+=item * Tasmota -- L<IR send/receive and RawData|https://tasmota.github.io/docs/Tasmota-IR/>, built on L<IRremoteESP8266|https://github.com/crankyoldgit/IRremoteESP8266>
+
+=item * IRDB -- L<the community button/CSV database|https://github.com/probonopd/irdb>
+
+=item * HAIR -- L<the Home Assistant IR integration and wig format|https://github.com/DAB-LABS/HAIR>
+
+=item * Global Cache -- L<IR database exports|https://www.globalcache.com/>
+
+=item * IR Scrutinizer -- L<Pronto Hex format glossary|http://www.harctoolbox.org/Glossary.html>
+
+=back
 
 =head1 AUTHOR
 

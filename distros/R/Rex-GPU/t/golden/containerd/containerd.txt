@@ -1,0 +1,6 @@
+# golden: containerd/containerd
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+can_run: nvidia-container-runtime
+run: nvidia-ctk runtime configure --runtime=containerd 2>&1
+run: systemctl restart containerd 2>/dev/null

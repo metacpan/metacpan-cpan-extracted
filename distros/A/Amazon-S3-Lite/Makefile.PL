@@ -24,7 +24,7 @@ WriteMakefile(
   MAN1PODS         =>     {}
 ,
   PREREQ_PM        => {
-      'Amazon::Signature4::Lite' => '1.0.4',
+      'Amazon::Signature4::Lite' => '1.0.6',
       'HTTP::Tiny' => '0.088',
       'IO::Socket::SSL' => '0',
       'JSON' => '4.10',
@@ -48,6 +48,7 @@ WriteMakefile(
   TEST_REQUIRES => {
       'HTTP::Tiny' => '0',
       'IO::Scalar' => '0',
+      'JSON' => '4.10',
       'JSON::PP' => '4.16'
     },
   META_MERGE =>    {
@@ -65,7 +66,7 @@ WriteMakefile(
       'provides'=>{
                       'Amazon::S3::Lite'=>{
                                               'file'=>'lib/Amazon/S3/Lite.pm',
-                                              'version'=>'1.3.2'
+                                              'version'=>'1.3.3'
                                             },
                       'Amazon::S3::Lite::Constants'=>{
                                                          'file'=>'lib/Amazon/S3/Lite/Constants.pm',
@@ -73,11 +74,11 @@ WriteMakefile(
                                                        },
                       'Amazon::S3::Lite::Credentials'=>{
                                                            'file'=>'lib/Amazon/S3/Lite/Credentials.pm',
-                                                           'version'=>'1.3.2'
+                                                           'version'=>'1.3.3'
                                                          },
                       'Amazon::S3::Lite::Lock'=>{
                                                     'file'=>'lib/Amazon/S3/Lite/Lock.pm',
-                                                    'version'=>'undef'
+                                                    'version'=>'1.3.3'
                                                   },
                       'Amazon::S3::Lite::Lock::Guard'=>{
                                                            'file'=>'lib/Amazon/S3/Lite/Lock/Guard.pm',
@@ -85,7 +86,7 @@ WriteMakefile(
                                                          },
                       'Amazon::S3::Lite::Logger'=>{
                                                       'file'=>'lib/Amazon/S3/Lite/Logger.pm',
-                                                      'version'=>'1.3.2'
+                                                      'version'=>'1.3.3'
                                                     },
                       'Amazon::S3::Lite::Policies'=>{
                                                         'file'=>'lib/Amazon/S3/Lite/Policies.pm',

@@ -21,7 +21,6 @@ sub fmt_rate {
 
 print "Cross-process echo round-trip, $N iterations\n\n";
 
-# --- Data::ReqRep::Shared (Str) ---
 for my $size (@sizes) {
     my $msg = "x" x $size;
     my $path = tmpnam();
@@ -55,7 +54,6 @@ for my $size (@sizes) {
     $srv->unlink;
 }
 
-# --- Data::ReqRep::Shared::Int (lock-free) ---
 {
     require Data::ReqRep::Shared::Int;
     require Data::ReqRep::Shared::Int::Client;
@@ -86,7 +84,6 @@ for my $size (@sizes) {
     $srv->unlink;
 }
 
-# --- Unix socketpair ---
 print "\n";
 for my $size (@sizes) {
     my $msg = "x" x $size;
@@ -128,7 +125,6 @@ for my $size (@sizes) {
         "Unix socketpair", fmt_rate($N / $el), $size;
 }
 
-# --- Unix socketpair via broker (client -> broker -> worker -> broker -> client) ---
 print "\n";
 for my $size (@sizes) {
     my $msg = "x" x $size;
@@ -140,7 +136,6 @@ for my $size (@sizes) {
     socketpair(my $bw_b, my $bw_w, AF_UNIX, SOCK_STREAM, 0) or die "socketpair: $!";
     $_->autoflush(1) for ($cb_c, $cb_b, $bw_b, $bw_w);
 
-    # worker: read from bw_w, echo back
     my $worker = fork // die "fork: $!";
     if ($worker == 0) {
         close $cb_c; close $cb_b; close $bw_b;
@@ -151,7 +146,6 @@ for my $size (@sizes) {
         exit 0;
     }
 
-    # broker: read from cb_b, forward to bw_b, read reply, forward back
     my $broker = fork // die "fork: $!";
     if ($broker == 0) {
         close $cb_c; close $bw_w;
@@ -187,7 +181,6 @@ for my $size (@sizes) {
         "Socketpair via broker", fmt_rate($N / $el), $size;
 }
 
-# --- Pipe pair ---
 print "\n";
 for my $size (@sizes) {
     my $msg = "x" x $size;
@@ -227,7 +220,6 @@ for my $size (@sizes) {
         "Pipe pair", fmt_rate($N / $el), $size;
 }
 
-# --- TCP loopback ---
 print "\n";
 for my $size (@sizes) {
     my $msg = "x" x $size;
@@ -275,7 +267,6 @@ for my $size (@sizes) {
         "TCP loopback", fmt_rate($N / $el), $size;
 }
 
-# --- SysV message queues (if available) ---
 if (eval { require IPC::SysV; require IPC::Msg; 1 }) {
     print "\n";
     my $IPC_PRIVATE = IPC::SysV::IPC_PRIVATE();
@@ -323,7 +314,6 @@ if (eval { require IPC::SysV; require IPC::Msg; 1 }) {
     }
 }
 
-# --- MCE::Channel (req/rep via send/recv pair) ---
 if (eval { require MCE::Channel; 1 }) {
     print "\n";
     for my $size (@sizes) {
@@ -354,7 +344,6 @@ if (eval { require MCE::Channel; 1 }) {
     }
 }
 
-# --- Forks::Queue (Shmem, two queues) ---
 if (eval { require Forks::Queue; 1 }) {
     print "\n";
     for my $size (@sizes) {

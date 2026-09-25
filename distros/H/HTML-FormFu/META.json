@@ -4,7 +4,7 @@
       "Carl Franks <cpan@fireartist.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,12 +36,16 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::EOF" : "0",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::More" : "0.88",
+            "Test::NoBreakpoints" : "0.15",
+            "Test::NoTabs" : "0",
             "Test::PAUSE::Permissions" : "0",
             "Test::Perl::Critic" : "0",
-            "Test::Pod" : "1.41"
+            "Test::Pod" : "1.41",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -73,7 +77,7 @@
             "Hash::Flatten" : "0",
             "IO::File" : "0",
             "JSON::MaybeXS" : "0",
-            "List::MoreUtils" : "0",
+            "List::SomeUtils" : "0",
             "List::Util" : "1.45",
             "Locale::Maketext" : "0",
             "Module::Pluggable" : "0",
@@ -90,7 +94,7 @@
             "Storable" : "0",
             "Task::Weaken" : "0",
             "YAML::XS" : "0.32",
-            "perl" : "5.010"
+            "perl" : "5.012"
          }
       },
       "test" : {
@@ -101,8 +105,12 @@
             "CGI" : "3.37",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "POSIX" : "0",
             "Regexp::Assemble" : "0",
+            "Template" : "0",
+            "Test::CPAN::Meta" : "0",
             "Test::Exception" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0.92",
@@ -113,690 +121,694 @@
    "provides" : {
       "HTML::FormFu" : {
          "file" : "lib/HTML/FormFu.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Attribute" : {
          "file" : "lib/HTML/FormFu/Attribute.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constants" : {
          "file" : "lib/HTML/FormFu/Constants.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint" : {
          "file" : "lib/HTML/FormFu/Constraint.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::ASCII" : {
          "file" : "lib/HTML/FormFu/Constraint/ASCII.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::AllOrNone" : {
          "file" : "lib/HTML/FormFu/Constraint/AllOrNone.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::AutoSet" : {
          "file" : "lib/HTML/FormFu/Constraint/AutoSet.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Bool" : {
          "file" : "lib/HTML/FormFu/Constraint/Bool.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Callback" : {
          "file" : "lib/HTML/FormFu/Constraint/Callback.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::CallbackOnce" : {
          "file" : "lib/HTML/FormFu/Constraint/CallbackOnce.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::DateTime" : {
          "file" : "lib/HTML/FormFu/Constraint/DateTime.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::DependOn" : {
          "file" : "lib/HTML/FormFu/Constraint/DependOn.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Email" : {
          "file" : "lib/HTML/FormFu/Constraint/Email.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Equal" : {
          "file" : "lib/HTML/FormFu/Constraint/Equal.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::File" : {
          "file" : "lib/HTML/FormFu/Constraint/File.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::File::MIME" : {
          "file" : "lib/HTML/FormFu/Constraint/File/MIME.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::File::MaxSize" : {
          "file" : "lib/HTML/FormFu/Constraint/File/MaxSize.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::File::MinSize" : {
          "file" : "lib/HTML/FormFu/Constraint/File/MinSize.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::File::Size" : {
          "file" : "lib/HTML/FormFu/Constraint/File/Size.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Integer" : {
          "file" : "lib/HTML/FormFu/Constraint/Integer.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::JSON" : {
          "file" : "lib/HTML/FormFu/Constraint/JSON.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Length" : {
          "file" : "lib/HTML/FormFu/Constraint/Length.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::MaxLength" : {
          "file" : "lib/HTML/FormFu/Constraint/MaxLength.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::MaxRange" : {
          "file" : "lib/HTML/FormFu/Constraint/MaxRange.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::MinLength" : {
          "file" : "lib/HTML/FormFu/Constraint/MinLength.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::MinMaxFields" : {
          "file" : "lib/HTML/FormFu/Constraint/MinMaxFields.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::MinRange" : {
          "file" : "lib/HTML/FormFu/Constraint/MinRange.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Number" : {
          "file" : "lib/HTML/FormFu/Constraint/Number.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Printable" : {
          "file" : "lib/HTML/FormFu/Constraint/Printable.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Range" : {
          "file" : "lib/HTML/FormFu/Constraint/Range.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Regex" : {
          "file" : "lib/HTML/FormFu/Constraint/Regex.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Repeatable::Any" : {
          "file" : "lib/HTML/FormFu/Constraint/Repeatable/Any.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Required" : {
          "file" : "lib/HTML/FormFu/Constraint/Required.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Set" : {
          "file" : "lib/HTML/FormFu/Constraint/Set.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::SingleValue" : {
          "file" : "lib/HTML/FormFu/Constraint/SingleValue.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Constraint::Word" : {
          "file" : "lib/HTML/FormFu/Constraint/Word.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Deflator" : {
          "file" : "lib/HTML/FormFu/Deflator.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Deflator::Callback" : {
          "file" : "lib/HTML/FormFu/Deflator/Callback.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Deflator::CompoundDateTime" : {
          "file" : "lib/HTML/FormFu/Deflator/CompoundDateTime.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Deflator::CompoundSplit" : {
          "file" : "lib/HTML/FormFu/Deflator/CompoundSplit.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Deflator::FormatNumber" : {
          "file" : "lib/HTML/FormFu/Deflator/FormatNumber.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Deflator::PathClassFile" : {
          "file" : "lib/HTML/FormFu/Deflator/PathClassFile.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Deflator::Strftime" : {
          "file" : "lib/HTML/FormFu/Deflator/Strftime.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Deploy" : {
          "file" : "lib/HTML/FormFu/Deploy.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element" : {
          "file" : "lib/HTML/FormFu/Element.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Blank" : {
          "file" : "lib/HTML/FormFu/Element/Blank.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Block" : {
          "file" : "lib/HTML/FormFu/Element/Block.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Button" : {
          "file" : "lib/HTML/FormFu/Element/Button.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Checkbox" : {
          "file" : "lib/HTML/FormFu/Element/Checkbox.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Checkboxgroup" : {
          "file" : "lib/HTML/FormFu/Element/Checkboxgroup.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::ComboBox" : {
          "file" : "lib/HTML/FormFu/Element/ComboBox.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::ContentButton" : {
          "file" : "lib/HTML/FormFu/Element/ContentButton.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Date" : {
          "file" : "lib/HTML/FormFu/Element/Date.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::DateTime" : {
          "file" : "lib/HTML/FormFu/Element/DateTime.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Email" : {
          "file" : "lib/HTML/FormFu/Element/Email.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Fieldset" : {
          "file" : "lib/HTML/FormFu/Element/Fieldset.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::File" : {
          "file" : "lib/HTML/FormFu/Element/File.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Hidden" : {
          "file" : "lib/HTML/FormFu/Element/Hidden.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Hr" : {
          "file" : "lib/HTML/FormFu/Element/Hr.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Image" : {
          "file" : "lib/HTML/FormFu/Element/Image.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Label" : {
          "file" : "lib/HTML/FormFu/Element/Label.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Multi" : {
          "file" : "lib/HTML/FormFu/Element/Multi.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Number" : {
          "file" : "lib/HTML/FormFu/Element/Number.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Password" : {
          "file" : "lib/HTML/FormFu/Element/Password.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Radio" : {
          "file" : "lib/HTML/FormFu/Element/Radio.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Radiogroup" : {
          "file" : "lib/HTML/FormFu/Element/Radiogroup.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Repeatable" : {
          "file" : "lib/HTML/FormFu/Element/Repeatable.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Reset" : {
          "file" : "lib/HTML/FormFu/Element/Reset.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Select" : {
          "file" : "lib/HTML/FormFu/Element/Select.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::SimpleTable" : {
          "file" : "lib/HTML/FormFu/Element/SimpleTable.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Src" : {
          "file" : "lib/HTML/FormFu/Element/Src.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Submit" : {
          "file" : "lib/HTML/FormFu/Element/Submit.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Text" : {
          "file" : "lib/HTML/FormFu/Element/Text.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::Textarea" : {
          "file" : "lib/HTML/FormFu/Element/Textarea.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Element::URL" : {
          "file" : "lib/HTML/FormFu/Element/URL.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Exception" : {
          "file" : "lib/HTML/FormFu/Exception.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Exception::Constraint" : {
          "file" : "lib/HTML/FormFu/Exception/Constraint.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Exception::Inflator" : {
          "file" : "lib/HTML/FormFu/Exception/Inflator.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Exception::Input" : {
          "file" : "lib/HTML/FormFu/Exception/Input.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Exception::Transformer" : {
          "file" : "lib/HTML/FormFu/Exception/Transformer.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Exception::Validator" : {
          "file" : "lib/HTML/FormFu/Exception/Validator.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::FakeQuery" : {
          "file" : "lib/HTML/FormFu/FakeQuery.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter" : {
          "file" : "lib/HTML/FormFu/Filter.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::Callback" : {
          "file" : "lib/HTML/FormFu/Filter/Callback.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::CompoundJoin" : {
          "file" : "lib/HTML/FormFu/Filter/CompoundJoin.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::CompoundSprintf" : {
          "file" : "lib/HTML/FormFu/Filter/CompoundSprintf.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::CopyValue" : {
          "file" : "lib/HTML/FormFu/Filter/CopyValue.pm",
-         "version" : "2.07"
+         "version" : "2.09"
+      },
+      "HTML::FormFu::Filter::Default" : {
+         "file" : "lib/HTML/FormFu/Filter/Default.pm",
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::Encode" : {
          "file" : "lib/HTML/FormFu/Filter/Encode.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::ForceListValue" : {
          "file" : "lib/HTML/FormFu/Filter/ForceListValue.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::FormatNumber" : {
          "file" : "lib/HTML/FormFu/Filter/FormatNumber.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::HTMLEscape" : {
          "file" : "lib/HTML/FormFu/Filter/HTMLEscape.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::HTMLScrubber" : {
          "file" : "lib/HTML/FormFu/Filter/HTMLScrubber.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::LowerCase" : {
          "file" : "lib/HTML/FormFu/Filter/LowerCase.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::NonNumeric" : {
          "file" : "lib/HTML/FormFu/Filter/NonNumeric.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::Regex" : {
          "file" : "lib/HTML/FormFu/Filter/Regex.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::Split" : {
          "file" : "lib/HTML/FormFu/Filter/Split.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::TrimEdges" : {
          "file" : "lib/HTML/FormFu/Filter/TrimEdges.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::UpperCase" : {
          "file" : "lib/HTML/FormFu/Filter/UpperCase.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Filter::Whitespace" : {
          "file" : "lib/HTML/FormFu/Filter/Whitespace.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N" : {
          "file" : "lib/HTML/FormFu/I18N.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::bg" : {
          "file" : "lib/HTML/FormFu/I18N/bg.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::cs" : {
          "file" : "lib/HTML/FormFu/I18N/cs.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::da" : {
          "file" : "lib/HTML/FormFu/I18N/da.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::de" : {
          "file" : "lib/HTML/FormFu/I18N/de.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::en" : {
          "file" : "lib/HTML/FormFu/I18N/en.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::es" : {
          "file" : "lib/HTML/FormFu/I18N/es.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::fr" : {
          "file" : "lib/HTML/FormFu/I18N/fr.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::hu" : {
          "file" : "lib/HTML/FormFu/I18N/hu.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::it" : {
          "file" : "lib/HTML/FormFu/I18N/it.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::ja" : {
          "file" : "lib/HTML/FormFu/I18N/ja.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::no" : {
          "file" : "lib/HTML/FormFu/I18N/no.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::pt_br" : {
          "file" : "lib/HTML/FormFu/I18N/pt_br.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::pt_pt" : {
          "file" : "lib/HTML/FormFu/I18N/pt_pt.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::ro" : {
          "file" : "lib/HTML/FormFu/I18N/ro.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::ru" : {
          "file" : "lib/HTML/FormFu/I18N/ru.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::tr" : {
          "file" : "lib/HTML/FormFu/I18N/tr.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::ua" : {
          "file" : "lib/HTML/FormFu/I18N/ua.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::I18N::zh_cn" : {
          "file" : "lib/HTML/FormFu/I18N/zh_cn.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Inflator" : {
          "file" : "lib/HTML/FormFu/Inflator.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Inflator::Callback" : {
          "file" : "lib/HTML/FormFu/Inflator/Callback.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Inflator::CompoundDateTime" : {
          "file" : "lib/HTML/FormFu/Inflator/CompoundDateTime.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Inflator::DateTime" : {
          "file" : "lib/HTML/FormFu/Inflator/DateTime.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Literal" : {
          "file" : "lib/HTML/FormFu/Literal.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Localize" : {
          "file" : "lib/HTML/FormFu/Localize.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Model" : {
          "file" : "lib/HTML/FormFu/Model.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Model::HashRef" : {
          "file" : "lib/HTML/FormFu/Model/HashRef.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::ObjectUtil" : {
          "file" : "lib/HTML/FormFu/ObjectUtil.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::OutputProcessor" : {
          "file" : "lib/HTML/FormFu/OutputProcessor.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::OutputProcessor::Indent" : {
          "file" : "lib/HTML/FormFu/OutputProcessor/Indent.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::OutputProcessor::StripWhitespace" : {
          "file" : "lib/HTML/FormFu/OutputProcessor/StripWhitespace.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Plugin" : {
          "file" : "lib/HTML/FormFu/Plugin.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Plugin::StashValid" : {
          "file" : "lib/HTML/FormFu/Plugin/StashValid.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Preload" : {
          "file" : "lib/HTML/FormFu/Preload.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Processor" : {
          "file" : "lib/HTML/FormFu/Processor.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::QueryType::CGI" : {
          "file" : "lib/HTML/FormFu/QueryType/CGI.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::QueryType::CGI::Simple" : {
          "file" : "lib/HTML/FormFu/QueryType/CGI/Simple.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::QueryType::Catalyst" : {
          "file" : "lib/HTML/FormFu/QueryType/Catalyst.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Constraint::Others" : {
          "file" : "lib/HTML/FormFu/Role/Constraint/Others.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::ContainsElements" : {
          "file" : "lib/HTML/FormFu/Role/ContainsElements.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::ContainsElementsSharedWithField" : {
          "file" : "lib/HTML/FormFu/Role/ContainsElementsSharedWithField.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::CreateChildren" : {
          "file" : "lib/HTML/FormFu/Role/CreateChildren.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::CustomRoles" : {
          "file" : "lib/HTML/FormFu/Role/CustomRoles.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Element::Coercible" : {
          "file" : "lib/HTML/FormFu/Role/Element/Coercible.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Element::Field" : {
          "file" : "lib/HTML/FormFu/Role/Element/Field.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Element::FieldMethods" : {
          "file" : "lib/HTML/FormFu/Role/Element/FieldMethods.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Element::Group" : {
          "file" : "lib/HTML/FormFu/Role/Element/Group.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Element::Input" : {
          "file" : "lib/HTML/FormFu/Role/Element/Input.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Element::Layout" : {
          "file" : "lib/HTML/FormFu/Role/Element/Layout.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Element::MultiElement" : {
          "file" : "lib/HTML/FormFu/Role/Element/MultiElement.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Element::NonBlock" : {
          "file" : "lib/HTML/FormFu/Role/Element/NonBlock.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Element::ProcessOptionsFromModel" : {
          "file" : "lib/HTML/FormFu/Role/Element/ProcessOptionsFromModel.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Element::SingleValueField" : {
          "file" : "lib/HTML/FormFu/Role/Element/SingleValueField.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Filter::Compound" : {
          "file" : "lib/HTML/FormFu/Role/Filter/Compound.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::FormAndBlockMethods" : {
          "file" : "lib/HTML/FormFu/Role/FormAndBlockMethods.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::FormAndElementMethods" : {
          "file" : "lib/HTML/FormFu/Role/FormAndElementMethods.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::FormBlockAndFieldMethods" : {
          "file" : "lib/HTML/FormFu/Role/FormBlockAndFieldMethods.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::GetProcessors" : {
          "file" : "lib/HTML/FormFu/Role/GetProcessors.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::HasParent" : {
          "file" : "lib/HTML/FormFu/Role/HasParent.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::NestedHashUtils" : {
          "file" : "lib/HTML/FormFu/Role/NestedHashUtils.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Populate" : {
          "file" : "lib/HTML/FormFu/Role/Populate.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Role::Render" : {
          "file" : "lib/HTML/FormFu/Role/Render.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Transformer" : {
          "file" : "lib/HTML/FormFu/Transformer.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Transformer::Callback" : {
          "file" : "lib/HTML/FormFu/Transformer/Callback.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Upload" : {
          "file" : "lib/HTML/FormFu/Upload.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::UploadParam" : {
          "file" : "lib/HTML/FormFu/UploadParam.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Util" : {
          "file" : "lib/HTML/FormFu/Util.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Validator" : {
          "file" : "lib/HTML/FormFu/Validator.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       },
       "HTML::FormFu::Validator::Callback" : {
          "file" : "lib/HTML/FormFu/Validator/Callback.pm",
-         "version" : "2.07"
+         "version" : "2.09"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/FormFu/HTML-FormFu",
+      "homepage" : "https://github.com/uperl/HTML-FormFu",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/FormFu/HTML-FormFu.git",
-         "web" : "https://github.com/FormFu/HTML-FormFu"
+         "url" : "https://github.com/uperl/HTML-FormFu.git",
+         "web" : "https://github.com/uperl/HTML-FormFu"
       }
    },
-   "version" : "2.07",
+   "version" : "2.09",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.014004"
+         "version" : "5.042003"
       },
       "plugins" : [
          {
@@ -808,7 +820,7 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -819,22 +831,50 @@
                }
             },
             "name" : "TestRequires",
-            "version" : "6.011"
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Encoding",
+            "name" : "Encoding",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Compile" : {
+                  "bail_out_on_fail" : 0,
+                  "fail_on_warning" : "author",
+                  "fake_home" : 0,
+                  "filename" : "t/00-compile.t",
+                  "module_finder" : [
+                     ":InstallModules"
+                  ],
+                  "needs_display" : 0,
+                  "phase" : "test",
+                  "script_finder" : [
+                     ":PerlExecFiles"
+                  ],
+                  "skips" : [],
+                  "switch" : []
+               }
+            },
+            "name" : "Test::Compile",
+            "version" : "2.059"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
             "name" : "Test::Perl::Critic",
-            "version" : "3.001"
+            "version" : "3.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaTests",
             "name" : "MetaTests",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "PkgVersion",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -842,94 +882,94 @@
                "Dist::Zilla::Plugin::PodWeaver" : {
                   "finder" : [
                      ":InstallModules",
-                     ":ExecFiles"
+                     ":PerlExecFiles"
                   ],
                   "plugins" : [
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@Default/SingleEncoding",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@Default/Name",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@Default/Version",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Default/prelude",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "SYNOPSIS",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "DESCRIPTION",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "OVERVIEW",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "ATTRIBUTES",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "METHODS",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "FUNCTIONS",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@Default/Leftovers",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Default/postlude",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@Default/Authors",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@Default/Legal",
-                        "version" : "4.015"
+                        "version" : "4.020"
                      }
                   ]
                }
             },
             "name" : "PodWeaver",
-            "version" : "4.008"
+            "version" : "4.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
@@ -940,7 +980,17 @@
                }
             },
             "name" : "Test::Kwalitee",
-            "version" : "2.12"
+            "version" : "2.13"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::EOF",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::EOF" : {
+                  "filename" : "xt/author/eof.t"
+               }
+            },
+            "name" : "Test::EOF",
+            "version" : "0.0600"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::EOL",
@@ -957,6 +1007,41 @@
             "version" : "0.19"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Test::NoTabs",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::NoTabs" : {
+                  "filename" : "xt/author/no-tabs.t",
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles",
+                     ":TestFiles"
+                  ]
+               }
+            },
+            "name" : "Test::NoTabs",
+            "version" : "0.15"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::NoBreakpoints",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::NoBreakpoints" : {
+                  "filename" : "xt/author/no-breakpoints.t",
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles",
+                     ":TestFiles"
+                  ]
+               }
+            },
+            "name" : "Test::NoBreakpoints",
+            "version" : "0.0.2"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::UnusedVars",
+            "name" : "Test::UnusedVars",
+            "version" : "2.001001"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Test::PAUSE::Permissions",
             "name" : "Test::PAUSE::Permissions",
             "version" : "0.003"
@@ -964,12 +1049,12 @@
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
             "name" : "GithubMeta",
-            "version" : "0.54"
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "NextRelease",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
@@ -977,7 +1062,6 @@
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [],
                   "exclude_match" : [],
-                  "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",
                   "prune_directory" : [],
@@ -988,7 +1072,7 @@
                }
             },
             "name" : "Git::GatherDir",
-            "version" : "2.043"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::NextVersion",
@@ -999,23 +1083,23 @@
                   "version_regexp" : "(?^:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "1.9.1",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                }
             },
             "name" : "Git::NextVersion",
-            "version" : "2.043"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "1.9.1",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                }
             },
             "name" : "Git::CheckFor::CorrectBranch",
-            "version" : "0.014"
+            "version" : "0.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Remote::Check",
@@ -1023,66 +1107,43 @@
             "version" : "0.1.2"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PruneCruft",
-            "name" : "@Starter/PruneCruft",
-            "version" : "6.011"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ManifestSkip",
-            "name" : "@Starter/ManifestSkip",
-            "version" : "6.011"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::MetaConfig",
-            "name" : "@Starter/MetaConfig",
-            "version" : "6.011"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
-               "Dist::Zilla::Plugin::MetaProvides::Package" : {
-                  "finder_objects" : [
-                     {
-                        "class" : "Dist::Zilla::Plugin::FinderCode",
-                        "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.011"
-                     }
-                  ],
-                  "include_underscores" : 0
-               },
-               "Dist::Zilla::Role::MetaProvider::Provider" : {
-                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
-                  "inherit_missing" : 1,
-                  "inherit_version" : 1,
-                  "meta_noindex" : 1
-               },
-               "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
-                  "version" : "0.005"
+               "Dist::Zilla::Plugin::Git::Contributors" : {
+                  "git_version" : "2.53.0",
+                  "include_authors" : 0,
+                  "include_releaser" : 1,
+                  "order_by" : "name",
+                  "paths" : []
                }
             },
-            "name" : "@Starter/MetaProvides::Package",
-            "version" : "2.004003"
+            "name" : "Git::Contributors",
+            "version" : "0.039"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
-            "name" : "@Starter/MetaNoIndex",
-            "version" : "6.011"
+            "class" : "Dist::Zilla::Plugin::ContributorsFile",
+            "name" : "ContributorsFile",
+            "version" : "0.4.0"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
+            "name" : "CopyrightYearFromGit",
+            "version" : "0.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Starter/MetaYAML",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Starter/MetaJSON",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Starter/License",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -1095,24 +1156,14 @@
             "version" : "0.163250"
          },
          {
-            "class" : "Dist::Zilla::Plugin::ExecDir",
-            "name" : "@Starter/ExecDir",
-            "version" : "6.011"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ShareDir",
-            "name" : "@Starter/ShareDir",
-            "version" : "6.011"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Starter/PodSyntaxTests",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
             "name" : "@Starter/Test::ReportPrereqs",
-            "version" : "0.027"
+            "version" : "0.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -1135,7 +1186,7 @@
                }
             },
             "name" : "@Starter/Test::Compile",
-            "version" : "2.058"
+            "version" : "2.059"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -1145,17 +1196,22 @@
                }
             },
             "name" : "@Starter/MakeMaker",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Starter/Manifest",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
-            "class" : "Dist::Zilla::Plugin::TestRelease",
-            "name" : "@Starter/TestRelease",
-            "version" : "6.011"
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Starter/PruneCruft",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Starter/ManifestSkip",
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
@@ -1168,14 +1224,66 @@
             "version" : "0.029"
          },
          {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Starter/TestRelease",
+            "version" : "6.037"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Starter/ConfirmRelease",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Starter/UploadToCPAN",
-            "version" : "6.011"
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@Starter/MetaConfig",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "@Starter/MetaNoIndex",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.037"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000038",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Starter/MetaProvides::Package",
+            "version" : "2.004003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Starter/ShareDir",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Starter/ExecDir",
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -1203,19 +1311,20 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "1.9.1",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                }
             },
             "name" : "@Git/Check",
-            "version" : "2.043"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "v%v%t - %d%n%n%c"
+                  "commit_msg" : "v%v%t - %d%n%n%c",
+                  "signoff" : 0
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -1227,7 +1336,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "1.9.1",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1235,7 +1344,7 @@
                }
             },
             "name" : "@Git/Commit",
-            "version" : "2.043"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -1244,12 +1353,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v2.07",
+                  "tag" : "v2.09",
                   "tag_format" : "v%v%t",
                   "tag_message" : "v%v%t - %d"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "1.9.1",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1257,7 +1366,7 @@
                }
             },
             "name" : "@Git/Tag",
-            "version" : "2.043"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -1269,67 +1378,67 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "1.9.1",
+                  "git_version" : "2.53.0",
                   "repo_root" : "."
                }
             },
             "name" : "@Git/Push",
-            "version" : "2.043"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.011"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.011"
+            "version" : "6.037"
          }
       ],
       "zilla" : {
@@ -1337,9 +1446,58 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.011"
+         "version" : "6.037"
       }
    },
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_contributors" : [
+      "Adam Prime <dsaljurator@gmail.com>",
+      "Andrew Grangaard <granny-github@ofb.net>",
+      "anna <anna-pc>",
+      "Ansgar Burchardt <ansgar@debian.org>",
+      "Brian Cassidy <bricas@cpan.org>",
+      "bricas <brian.cassidy@gmail.com>",
+      "Colin Newell <colin.newell@gmail.com>",
+      "Dan Dascalescu <ddascalescu+github@gmail.com>",
+      "dandv <ddascalescu@gmail.com>",
+      "Dean Hamstead <dean@fragfest.com.au>",
+      "diegok <relampago@gmail.com>",
+      "Felix Ostmann <felix.ostmann@thewar.de>",
+      "Ferruccio Zamuner <nonsolosoft@diff.org>",
+      "fireartist <fireartist@gmail.com>",
+      "Florian Schlichting <fsfs@debian.org>",
+      "Gerda Shank <gshank@campusexplorer.com>",
+      "Graham Ollis <gollis@fastly.com>",
+      "Graham Ollis <plicease@cpan.org>",
+      "gregor herrmann <gregoa@debian.org>",
+      "H\u00e5kon H\u00e6gland <hakon.hagland@gmail.com>",
+      "halaszg <halasz.g@freemail.hu>",
+      "Jens Gassmann <jens.gassmann@atomix.de>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Kivanc Yazan <kyzn@cpan.org>",
+      "lestrrat <lestrrat+github@gmail.com>",
+      "lordarthas <mb@italpro.net>",
+      "marcusramberg <marcus.ramberg@gmail.com>",
+      "mariominati <mario.minati@googlemail.com>",
+      "Mark A. Stratman <stratman@gmail.com>",
+      "Matthias Dietrich <perl@rb.ly>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Moritz Onken <1nd@gmx.de>",
+      "Nigel Metheringham <nigelm@cpan.org>",
+      "nigelm <nigel.metheringham@gmail.com>",
+      "omega <andreas.marienborg@gmail.com>",
+      "Peter Oliver <git@mavit.org.uk>",
+      "Ronald J Kimball <JackNapis@gmail.com>",
+      "Shlomi Fish <shlomif@shlomifish.org>",
+      "Steve Rogerson <steve.git@woodsideendurance.co.uk>",
+      "sunnavy <sunnavy@gmail.com>",
+      "vividsnow <vividsnow@gmail.com>",
+      "vti <viacheslav.t@gmail.com>",
+      "wdh <wdhawes@gmail.com>",
+      "Yusuke Watase <ywatase@gmail.com>",
+      "zby <zzbbyy@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.42.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

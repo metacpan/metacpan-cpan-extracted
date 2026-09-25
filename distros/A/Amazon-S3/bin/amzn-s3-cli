@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#-*- mode: sh; -*-
+# modulino invocation
+
+MODULINO_WRAPPER=amzn-s3-cli
+MODULINO_MODULE_NAME=Amazon::S3::CLI
+MODULE_PATH=$(
+  MODULE_PATH="${MODULINO_MODULE_NAME//:://}.pm" \
+    perl -M$MODULINO_MODULE_NAME -e 'print $INC{$ENV{MODULE_PATH}};'
+)
+
+MODULINO_WRAPPER=$MODULINO_WRAPPER perl $MODULE_PATH "$@"

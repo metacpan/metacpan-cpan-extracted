@@ -2,7 +2,7 @@ package Data::TableReader::Decoder;
 use Moo 2;
 
 # ABSTRACT: Base class for table decoders
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 
 has file_handle      => ( is => 'ro', required => 1 );
@@ -54,7 +54,7 @@ Data::TableReader::Decoder - Base class for table decoders
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 DESCRIPTION
 

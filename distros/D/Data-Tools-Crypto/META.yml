@@ -1,0 +1,30 @@
+---
+abstract: 'authenticated symmetric and hybrid RSA encryption and signatures, one common API'
+author:
+  - 'Vladi Belperchinov-Shabanski "Cade" <cade@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Tools-Crypto
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CryptX: '0.048'
+  Data::Tools: '0'
+  Encode: '0'
+  Exception::Sink: '0'
+  JSON: '4.0'
+  MIME::Base64: '3.11'
+resources:
+  repository: https://github.com/cade-vs/perl-data-tools-crypto.git
+version: '1.53'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

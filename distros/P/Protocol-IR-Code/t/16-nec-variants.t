@@ -14,16 +14,16 @@ use Protocol::IR::Proto::SAMSUNG;
 # The NEC family as defined by the MakeHex IRP files IRDB builds on
 # (protocols/nec1.irp, nec2.irp, NECx1.irp, NECx2.irp in MakeHex):
 #
-#   NEC1  header 16,-8 (9000/4500 us),  S = ~D, repeat is a short
+#   NEC1  header 16,-8 (9000/4500 µs),  S = ~D, repeat is a short
 #         header+gap frame
 #   NEC2  identical single-frame timing to NEC1; only the repeat differs
 #         (it re-transmits the entire 32-bit frame)
-#   NECx1 header 8,-8 (4500/4500 us),    S = D (a real second address
+#   NECx1 header 8,-8 (4500/4500 µs),    S = D (a real second address
 #         byte, not an inversion), repeat is a short frame
 #   NECx2 identical single-frame timing to NECx1; whole-frame repeat
 #
 # All four share the 32-bit D:S:F:~F layout, each byte LSB-first on the
-# wire, and the same 562.5 us mark / 562.5 us (0) / 1687.5 us (1) bit
+# wire, and the same 562.5 µs mark / 562.5 µs (0) / 1687.5 µs (1) bit
 # times. The data value always packs as
 #   data = (address << 24) | (subaddress << 16) | (command << 8) | ~command
 # matching the MakeHex wire output (verified against a built MakeHex for

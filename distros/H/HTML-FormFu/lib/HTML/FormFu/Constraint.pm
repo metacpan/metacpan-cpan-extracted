@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint;
-$HTML::FormFu::Constraint::VERSION = '2.07';
+$HTML::FormFu::Constraint::VERSION = '2.09';
 # ABSTRACT: Constrain User Input
 
 use Moose;
@@ -259,29 +259,21 @@ sub _process_when {
         croak "'fields' is set to an empty list" if !@$when_fields;
 
         for my $name (@$when_fields) {
-            my $value = $self->get_nested_hash_value( $params, $name );
-
-            push @when_fields_value, $value
-                if defined $value;
+            push @when_fields_value,
+                $self->get_nested_hash_value( $params, $name );
         }
     }
     else {
-
-        # nothing to constrain if field doesn't exist
-        my $value = $self->get_nested_hash_value( $params, $when_field );
-
-        push @when_fields_value, $value
-            if defined $value;
+        push @when_fields_value,
+            $self->get_nested_hash_value( $params, $when_field );
     }
+
+    # a field missing from the submission (e.g. an unchecked Checkbox) has
+    # an undefined value, which is treated as not matching - so with 'not'
+    # set, the condition is fulfilled and the constraint is applied. RT#45409
 
     DEBUG_CONSTRAINTS_WHEN
         && debug( 'WHEN_FIELDS_VALUES' => \@when_fields_value );
-
-    if ( !@when_fields_value ) {
-        DEBUG_CONSTRAINTS_WHEN
-            && debug("No 'when' fields values exist - returning false");
-        return 0;
-    }
 
     my @values;
 
@@ -297,12 +289,13 @@ sub _process_when {
 
     if (@values) {
         for my $value (@when_fields_value) {
-            push @ok, any { $value eq $_ } @values;
+            push @ok,
+                ( defined $value && any { $value eq $_ } @values ) ? 1 : 0;
         }
     }
     else {
         for my $value (@when_fields_value) {
-            push @ok, $value ? 1 : 0;
+            push @ok, ( defined $value && $value ) ? 1 : 0;
         }
     }
 
@@ -358,7 +351,7 @@ HTML::FormFu::Constraint - Constrain User Input
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -504,10 +497,14 @@ Nested-name of form field that shall be checked against - if C<< when->{value} >
 is set, the C<when> condition passes if the named field's value matches that,
 otherwise the C<when> condition passes if the named field's value is true.
 
+If the named field is missing from the submission altogether (as an unchecked
+Checkbox is), its value is treated as not matching.
+
 =item fields
 
 Array-ref of nested-names that shall be checked. The C<when> condition passes
 if all named-fields' values pass, using the same rules as C<field> above.
+A field missing from the submission does not pass.
 
 =item any_field
 
@@ -524,7 +521,9 @@ Array of multiple values, one must match to fulfill the condition
 
 =item not
 
-Inverts the when condition - value(s) must not match
+Inverts the when condition - value(s) must not match. A field missing from the
+submission counts as not matching, so a constraint with C<not> set is applied
+when, for example, the named Checkbox is unchecked.
 
 =item callback
 
@@ -666,7 +665,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

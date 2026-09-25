@@ -5,7 +5,7 @@ use IO::Handle;
 extends 'Data::TableReader::Decoder';
 
 # ABSTRACT: Access rows of a comma-delimited text file
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 our @csv_probe_modules= ( ['Text::CSV_XS' => 1.06], ['Text::CSV' => 1.91] );
 our $default_csv_module;
@@ -208,7 +208,7 @@ Data::TableReader::Decoder::CSV - Access rows of a comma-delimited text file
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 DESCRIPTION
 

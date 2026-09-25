@@ -1,10 +1,10 @@
 {
-   "abstract" : "A PSGI engine for Perl based on EV/libev",
+   "abstract" : "A fast PSGI/HTTP server for Perl based on EV/libev",
    "author" : [
       "Jeremy Stashewsky <stash@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
       "perl_5"
    ],
@@ -18,48 +18,101 @@
          "t",
          "inc",
          "eg",
-         "picohttpparser-git"
+         "picohttpparser-git",
+         "picotls-git"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
             "AnyEvent" : "5.261",
-            "Guard" : "1.012",
             "Test::Fatal" : "0.003",
-            "Test::LeakTrace" : "0.13",
-            "Test::More" : "0.94",
-            "Test::SharedFork" : "0.25",
-            "Test::TCP" : "1.12"
+            "Test::More" : "0.94"
          }
       },
       "configure" : {
          "requires" : {
             "EV" : "4",
+            "EV::MakeMaker" : "0",
+            "ExtUtils::CBuilder" : "0",
             "ExtUtils::MakeMaker" : "6.51"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Perl::Critic" : "1.098",
+            "Pod::Simple" : "3.07",
+            "Test::DistManifest" : "1.003",
+            "Test::Fixme" : "0.04",
+            "Test::Perl::Critic" : "1.01",
+            "Test::Pod" : "1.26",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
       "runtime" : {
-         "recommends" : {},
+         "recommends" : {
+            "Alien::OpenSSL" : "0",
+            "Alien::nghttp2" : "0",
+            "Plack" : "0.995"
+         },
          "requires" : {
             "EV" : "4",
-            "HTTP::Entity::Parser" : "0.20",
-            "JSON::XS" : "2",
-            "Plack" : "0.995",
-            "Scalar::Util" : "1.19"
+            "File::Spec" : "0",
+            "Guard" : "1.012",
+            "List::Util" : "1.33",
+            "Scalar::Util" : "1.19",
+            "perl" : "5.014"
          }
+      },
+      "test" : {
+         "recommends" : {
+            "IO::Socket::SSL" : "0",
+            "JSON::XS" : "2",
+            "Net::SSLeay" : "0",
+            "Test::LeakTrace" : "0.13",
+            "Test::SharedFork" : "0.25",
+            "Test::TCP" : "1.12"
+         }
+      }
+   },
+   "provides" : {
+      "Feersum" : {
+         "file" : "lib/Feersum.pm",
+         "version" : "1.507"
+      },
+      "Feersum::Connection" : {
+         "file" : "lib/Feersum/Connection.pm"
+      },
+      "Feersum::Connection::Handle" : {
+         "file" : "lib/Feersum/Connection/Handle.pm"
+      },
+      "Feersum::Connection::Reader" : {
+         "file" : "lib/Feersum/Connection/Handle.pm"
+      },
+      "Feersum::Connection::Writer" : {
+         "file" : "lib/Feersum/Connection/Handle.pm"
+      },
+      "Feersum::Runner" : {
+         "file" : "lib/Feersum/Runner.pm"
+      },
+      "Plack::Handler::Feersum" : {
+         "file" : "lib/Plack/Handler/Feersum.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stash/Feersum/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/stash/Feersum.git"
+         "url" : "https://github.com/vividsnow/Feersum.git",
+         "web" : "https://github.com/vividsnow/Feersum"
       }
    },
-   "version" : "1.505",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "1.507",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

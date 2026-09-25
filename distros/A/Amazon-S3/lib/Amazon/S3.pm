@@ -47,6 +47,7 @@ __PACKAGE__->mk_accessors(
     credentials
     dns_bucket_names
     digest
+    endpoint_url
     err
     errstr
     error
@@ -67,7 +68,7 @@ __PACKAGE__->mk_accessors(
   ),
 );
 
-our $VERSION = '2.1.0'; ## no critic (RequireInterpolation)
+our $VERSION = '2.1.1'; ## no critic (RequireInterpolation)
 
 our @EXPORT_OK = qw(is_domain_bucket);
 
@@ -86,34 +87,27 @@ sub new {
   $options{checksum_algorithm} //= 'crc64nvme';
   $options{raise_error}        //= $FALSE;
 
-  if ( my $endpoint_url = delete $options{endpoint_url} ) {
-    croak "ERROR: use endpoint_url or host but not both\n"
-      if $options{host};
+  croak "ERROR: pass endpoint_url or host but not both\n"
+    if $options{endpoint_url} && $options{host};
 
-    croak "ERROR: use endpoint_url or secure but not both\n"
-      if defined $options{secure};
+  if ( my $endpoint_url = $options{endpoint_url} ) {
+    @options{qw(secure host)} = _parse_endpoint($endpoint_url);
+  }
+  elsif ( $options{host} ) {
+    if ( $options{host} =~ m{\Ahttps?://}xsm ) {
+      warn "host containing a URL is deprecated; use endpoint_url instead\n";
 
-    my $uri    = URI->new($endpoint_url);
-    my $scheme = $uri->scheme;
-
-    croak "ERROR: endpoint_url must include a host\n"
-      if !defined $uri->host || !length $uri->host;
-
-    croak "ERROR: endpoint_url must use http or https\n"
-      if !defined $scheme || ( $scheme ne 'http' && $scheme ne 'https' );
-
-    croak "ERROR: endpoint_url must not contain a query or fragment\n"
-      if defined $uri->query || defined $uri->fragment;
-
-    croak "ERROR: endpoint_url must not contain a path\n"
-      if $uri->path && $uri->path ne $SLASH;
-
-    $options{secure} = $scheme eq 'https' ? $TRUE : $FALSE;
-    $options{host}   = $uri->host_port;
+      @options{qw(secure host)} = _parse_endpoint( $options{host} );
+    }
+    else {
+      $options{secure} //= $TRUE;
+    }
+  }
+  else {
+    $options{secure} = $TRUE;
+    $options{host}   = $DEFAULT_HOST;
   }
 
-  $options{secure}           //= $TRUE;
-  $options{host}             //= $DEFAULT_HOST;
   $options{dns_bucket_names} //= $TRUE;
 
   croak sprintf "ERROR: invalid checksum_algorithm: '%s'\nMust be one of: %s\n", $options{checksum_algorithm}, join q{,},
@@ -207,6 +201,33 @@ sub new {
   $self->_init_checksum_types;
 
   return $self;
+}
+
+########################################################################
+sub _parse_endpoint {
+########################################################################
+  my ($endpoint_url) = @_;
+
+  my $uri = URI->new($endpoint_url);
+
+  my $scheme = $uri->scheme;
+
+  croak "ERROR: endpoint_url must include a host\n"
+    if !defined $uri->host || !length $uri->host;
+
+  croak "ERROR: endpoint_url must use http or https\n"
+    if !defined $scheme || ( $scheme ne 'http' && $scheme ne 'https' );
+
+  croak "ERROR: endpoint_url must not contain a query or fragment\n"
+    if defined $uri->query || defined $uri->fragment;
+
+  croak "ERROR: endpoint_url must not contain a path\n"
+    if $uri->path && $uri->path ne $SLASH;
+
+  my $secure = $scheme eq 'https' ? $TRUE : $FALSE;
+  my $host   = $uri->host_port;
+
+  return ( $secure, $host );
 }
 
 ########################################################################
@@ -431,7 +452,8 @@ sub region {
     my $host = $self->host;
     $self->get_logger->debug( sub { return 'host: ' . $self->host } );
 
-    if ( $host =~ /\As3[.](.*)?amazonaws/xsm ) {
+    # only add region if host was not populated from endpoint_url
+    if ( !$self->endpoint_url && $host =~ /\As3[.](.*)?amazonaws/xsm ) {
       $self->host( sprintf 's3.%s.amazonaws.com', $self->_region );
     }
   }
@@ -846,6 +868,7 @@ sub list_bucket {
 
   return $bucket_list;
 }
+
 ########################################################################
 sub list_bucket_all_v2 {
 ########################################################################
@@ -858,15 +881,208 @@ sub list_bucket_all_v2 {
 }
 
 ########################################################################
+sub empty_bucket {
+########################################################################
+  my ( $self, $bucket_name, $options ) = @_;
+
+  croak 'must specify bucket'
+    if !$bucket_name;
+
+  $options //= {};
+
+  my $headers = $options->{headers};
+  my $report  = $options->{report};
+
+  croak 'report must be a code reference'
+    if defined $report && ( !ref $report || reftype($report) ne 'CODE' );
+
+  my $bucket = $self->bucketv2( bucket => $bucket_name );
+
+  my $raise_error = $self->raise_error;
+
+  my $result = {
+    versions_deleted          => 0,
+    delete_markers_deleted    => 0,
+    multipart_uploads_aborted => 0,
+    total                     => 0,
+  };
+
+  $self->raise_error($TRUE);
+
+  eval {
+
+    # Delete object versions and delete markers.
+    while ($TRUE) {
+      my $response = $bucket->ListObjectVersions(
+        headers   => $headers,
+        uri_param => { 'max-keys' => 1000, },
+      );
+
+      my $versions = $response->{Version}      // [];
+      my $markers  = $response->{DeleteMarker} // [];
+
+      if ( ref $versions && reftype($versions) ne 'ARRAY' ) {
+        $versions = [$versions];
+      }
+
+      if ( ref $markers && reftype($markers) ne 'ARRAY' ) {
+        $markers = [$markers];
+      }
+
+      my @objects;
+      my %object_type;
+
+      foreach my $version ( @{$versions} ) {
+        my $object = {
+          Key       => $version->{Key},
+          VersionId => $version->{VersionId},
+        };
+
+        push @objects, $object;
+
+        my $id = join "\0", $object->{Key}, $object->{VersionId};
+        $object_type{$id} = 'version';
+      }
+
+      foreach my $marker ( @{$markers} ) {
+        my $object = {
+          Key       => $marker->{Key},
+          VersionId => $marker->{VersionId},
+        };
+
+        push @objects, $object;
+
+        my $id = join "\0", $object->{Key}, $object->{VersionId};
+        $object_type{$id} = 'delete_marker';
+      }
+
+      last
+        if !@objects;
+
+      my $delete_response = $bucket->DeleteObjects(
+        headers => $headers,
+        body    => { Delete => { Object => \@objects, }, },
+      );
+
+      my $deleted = $delete_response->{Deleted} // [];
+      my $errors  = $delete_response->{Error}   // [];
+
+      if ( ref $deleted && reftype($deleted) ne 'ARRAY' ) {
+        $deleted = [$deleted];
+      }
+
+      if ( ref $errors && reftype($errors) ne 'ARRAY' ) {
+        $errors = [$errors];
+      }
+
+      my %failed;
+
+      foreach my $error ( @{$errors} ) {
+        my $id = join "\0", $error->{Key}, $error->{VersionId} // $EMPTY;
+
+        $failed{$id} = $TRUE;
+      }
+
+      foreach my $object (@objects) {
+        my $id = join "\0", $object->{Key}, $object->{VersionId};
+
+        next if $failed{$id};
+
+        my $type = $object_type{$id};
+
+        if ( $type eq 'version' ) {
+          ++$result->{versions_deleted};
+        }
+        elsif ( $type eq 'delete_marker' ) {
+          ++$result->{delete_markers_deleted};
+        }
+
+        ++$result->{total};
+
+        if ($report) {
+          $report->(
+            { type       => $type,
+              key        => $object->{Key},
+              version_id => $object->{VersionId},
+            }
+          );
+        }
+      }
+
+      if ( @{$errors} ) {
+        my $error = $errors->[0];
+
+        croak sprintf 'failed to delete %s version %s: %s - %s',
+          $error->{Key},
+          $error->{VersionId} // $EMPTY,
+          $error->{Code}      // 'unknown error',
+          $error->{Message}   // $EMPTY;
+      }
+    }
+
+    # Abort incomplete multipart uploads.
+    while ($TRUE) {
+      my $response = $bucket->ListMultipartUploads(
+        headers   => $headers,
+        uri_param => { 'max-uploads' => 1000, },
+      );
+
+      my $uploads = $response->{Upload} // [];
+
+      if ( ref $uploads && reftype($uploads) ne 'ARRAY' ) {
+        $uploads = [$uploads];
+      }
+
+      last
+        if !@{$uploads};
+
+      foreach my $upload ( @{$uploads} ) {
+        $bucket->AbortMultipartUpload(
+          key       => $upload->{Key},
+          headers   => $headers,
+          uri_param => { uploadId => $upload->{UploadId}, },
+        );
+
+        ++$result->{multipart_uploads_aborted};
+        ++$result->{total};
+
+        if ($report) {
+          $report->(
+            { type      => 'multipart_upload',
+              key       => $upload->{Key},
+              upload_id => $upload->{UploadId},
+            }
+          );
+        }
+      }
+    }
+
+    return $TRUE;
+  };
+
+  my $error = $EVAL_ERROR;
+
+  $self->raise_error($raise_error);
+
+  if ($error) {
+    chomp $error;
+
+    die sprintf "%s\n%d items removed\n", $error, $result->{total};
+  }
+
+  return $result;
+}
+
+########################################################################
 sub list_bucket_all {
 ########################################################################
   my ( $self, $conf ) = @_;
   $conf ||= {};
 
-  my $bucket = $conf->{bucket};
+  my $bucket_name = $conf->{bucket};
 
   croak 'must specify bucket'
-    if !$bucket;
+    if !$bucket_name;
 
   my $response = $self->list_bucket($conf);
 
@@ -883,7 +1099,7 @@ sub list_bucket_all {
       || $response->{keys}->[-1]->{key};
 
     $conf->{marker} = $next_marker;
-    $conf->{bucket} = $bucket;
+    $conf->{bucket} = $bucket_name;
 
     $response = $self->list_bucket($conf);
 
@@ -1251,19 +1467,52 @@ sub send_request {
 }
 
 ########################################################################
+sub is_json_response {
+########################################################################
+  my ($rsp) = @_;
+
+  return $FALSE
+    if !$rsp->content;
+
+  my $content_type = $rsp->content_type // $EMPTY;
+
+  return $TRUE
+    if $content_type eq 'application/json';
+
+  return $TRUE
+    if $content_type =~ m{\Aapplication/[^/]+\+json\z}xsm;
+
+  return $FALSE;
+}
+
+########################################################################
 sub _decode_response {
 ########################################################################
   my ( $self, $response, $keep_root ) = @_;
 
-  my $content;
-
   if ( $response->code !~ /\A2\d{2}\z/xsm ) {
     $self->_handle_response_error($response);
-    $content = undef;
+    return;
   }
-  elsif ( is_xml_response($response) ) {
-    $content = $self->_xpc_of_content( $response->content, $keep_root );
+
+  return
+    if !$response->content;
+
+  my $content;
+
+  if ( is_xml_response($response) && $response->content =~ /\A\s*</xsm ) {
+    $content = eval { return $self->_xpc_of_content( $response->content, $keep_root, ); };
   }
+  elsif ( is_json_response($response) ) {
+    $content = eval { return JSON::PP->new->decode( $response->content ); };
+  }
+
+  if ( !defined $content || $EVAL_ERROR ) {
+    $content = eval { return JSON::PP->new->decode( $response->content ); };
+  }
+
+  return $response->content
+    if !defined $content || $EVAL_ERROR;
 
   return $content;
 }
@@ -2285,11 +2534,11 @@ L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-buckets-overvi
 
 =head1 ERROR HANDLING
 
-C[Amazon::S3](Amazon::S3) uses both return-value errors and exceptions.
+C<Amazon::S3> uses both return-value errors and exceptions.
 
 For backward compatibility, many service operations return C<undef> or
 a false value when an S3 request fails and record information about the
-most recent error on the C[Amazon::S3](Amazon::S3) object.
+most recent error on the C<Amazon::S3> object.
 
 The primary error accessors are:
 
@@ -2340,7 +2589,7 @@ These accessors are especially useful when diagnosing signing,
 endpoint, header, or protocol problems.
 
 C<raise_error> defaults to false to preserve the historical
-C[Amazon::S3](Amazon::S3) interface. New applications may prefer to enable it when
+C<Amazon::S3> interface. New applications may prefer to enable it when
 they want request failures to be impossible to overlook.
 
 =head1 METHODS AND SUBROUTINES
@@ -2472,16 +2721,30 @@ request path instead.
 
 =item endpoint_url
 
-A fully qualified HTTP or HTTPS service endpoint. The URL may include a
-port. This constructor option is a convenience for setting C<host> and
-C<secure> together.
+Optional explicit S3 service endpoint.
+
+When C<endpoint_url> is supplied, C<Amazon::S3> uses that endpoint as
+specified and does not rewrite the host when the configured region
+changes.
+
+The C<region> setting still controls the AWS signing region.
+
+This is useful for S3-compatible services, local test environments, and
+other cases where the caller must select the service endpoint explicitly.
 
 For example:
 
-  endpoint_url => 'http://localhost:4566'
+  my $s3 = Amazon::S3->new(
+    { endpoint_url => 'http://localhost:4566',
+      region       => 'us-east-1',
+      ...
+    }
+  );
 
-C<endpoint_url> cannot be used together with C<host> or C<secure> and
-must not contain a path.
+When C<endpoint_url> is not supplied, C<Amazon::S3> may derive the
+standard AWS S3 endpoint from the configured region.
+
+C<endpoint_url> and C<host> may not both be supplied.
 
 =item host
 
@@ -3131,6 +3394,34 @@ This operation may be required before applying public ACLs or public
 bucket policies to buckets whose public access block settings prohibit
 them.
 
+=head3 empty_bucket
+
+my $count = $s3->empty_bucket($bucket_name);
+
+my $count = $s3->empty_bucket($bucket_name, $headers);
+
+Deletes all object versions currently listed in the specified bucket.
+
+Returns the number of object versions and delete markers removed. For
+an unversioned bucket this is equivalent to the number of objects
+deleted.
+
+Objects are listed and deleted in batches until the bucket contains no
+remaining objects. The optional C<$headers> hash reference is passed to
+the listing requests.
+
+A return value of C<0> means that the operation succeeded but the
+bucket contained no objects. The return value is therefore a count and
+should not be used as a boolean indication of success or failure.
+
+This method always throws an exception if an error occurs while listing
+or deleting objects, regardless of the C<raise_error> setting. If some
+objects were successfully deleted before the failure occurred, the
+exception includes the number of objects deleted before the error.
+
+B<WARNING: This method permanently deletes all objects returned by the
+bucket listing. Use with caution.>
+
 =head3 get_bucket_location
 
   my $region = $s3->get_bucket_location($bucket_name);
@@ -3237,38 +3528,25 @@ On success, returns the combined normalized listing result.
 On a pagination failure, the method throws an exception.
 
 See L</LISTING OBJECTS>.
-=head3 list_bucket_all_v2
 
-  my $response = $s3->list_bucket_all_v2(\%parameters);
-
-Lists all matching objects using ListObjectsV2.
-
-The accepted parameters are the same as for C<list_bucket_v2()>.
-
-The method follows pagination automatically and can therefore make
-multiple S3 requests.
-
-On success, returns the combined normalized listing result.
-
-On a pagination failure, the method throws an exception.
-
-See L</LISTING OBJECTS>.
 =head3 list_bucket_v2
 
-  my $response = $s3->list_bucket_v2(\%parameters);
+my $response = $s3->list_bucket_v2(%parameters);
 
-Lists objects using the S3 ListObjectsV2 API.
+Lists objects in a bucket using the S3 ListObjectsV2 API.
 
-The argument is a hash reference. C<bucket> is required. Other defined
-entries are sent as ListObjectsV2 query parameters.
+C<%parameters> describes the bucket to list and the ListObjectsV2
+request parameters. C<bucket> is required. C<headers>, when supplied,
+is used as the request-header hash. All other defined entries are sent
+to S3 as query parameters.
 
-Common parameters are:
+Supported parameters include:
 
 =over 4
 
 =item bucket
 
-Required. Bucket name.
+Required. Name of the bucket to list.
 
 =item continuation-token
 
@@ -3277,31 +3555,37 @@ request.
 
 =item delimiter
 
-Optional delimiter used to group matching keys into common prefixes.
+Optional delimiter used to group keys into common prefixes.
 
 =item encoding-type
 
-Optional S3 response encoding type.
+Optional encoding type requested for keys returned by S3.
 
 =item fetch-owner
 
-Optional boolean controlling whether owner information is returned.
+Optional value controlling whether owner information is returned.
 
 =item headers
 
-Optional hash reference containing additional request headers.
+Optional hash reference containing additional HTTP request headers.
+
+This value is used for the request itself and is not sent as a query
+parameter.
 
 =item marker
 
 Compatibility alias for C<continuation-token>.
 
+When supplied, C<Amazon::S3> converts this value to the appropriate
+ListObjectsV2 continuation parameter.
+
 =item max-keys
 
-Optional maximum number of results returned by S3.
+Optional maximum number of keys returned by a single S3 request.
 
 =item prefix
 
-Optional prefix used to restrict returned keys.
+Optional prefix used to restrict the returned keys.
 
 =item start-after
 
@@ -3309,13 +3593,63 @@ Optional key after which S3 should begin the listing.
 
 =back
 
+For example:
+
+my $response = $s3->list_bucket_v2(
+{
+bucket     => 'example-bucket',
+prefix     => 'logs/',
+delimiter  => '/',
+'max-keys' => 100,
+}
+);
+
 On success, returns the normalized listing structure described in
 L</LISTING OBJECTS>.
+
+If S3 indicates that additional results are available,
+C<next_marker> contains the continuation value that can be passed as
+C<marker> on a subsequent call.
 
 On failure, returns C<undef> and records error information on the
 client.
 
 See L</LISTING OBJECTS>.
+
+=head3 list_bucket_all_v2
+
+my $response = $s3->list_bucket_all_v2(%parameters);
+
+Lists all matching objects in a bucket using the S3 ListObjectsV2 API.
+
+C<%parameters> accepts the same request parameters as
+C<list_bucket_v2()>. C<bucket> is required.
+
+For example:
+
+my $response = $s3->list_bucket_all_v2(
+{
+bucket => 'example-bucket',
+prefix => 'logs/',
+}
+);
+
+Unlike C<list_bucket_v2()>, this method follows S3 pagination
+automatically. It repeatedly requests additional pages until all
+matching objects have been retrieved, and can therefore make multiple
+S3 requests.
+
+C<max-keys>, when supplied, controls the maximum number of objects
+requested from S3 per request; it does not limit the total number of
+objects returned by this method.
+
+On success, returns a single normalized listing containing the objects
+collected from all pages.
+
+On a pagination failure, the method throws an exception.
+
+See L</list_bucket_v2> and L</LISTING OBJECTS>.
+
 =head3 list_object_versions
 
   my $response = $s3->list_object_versions(\%parameters);

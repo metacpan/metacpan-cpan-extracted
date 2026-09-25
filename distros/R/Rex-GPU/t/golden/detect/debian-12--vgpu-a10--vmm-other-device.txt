@@ -1,0 +1,7 @@
+# golden: detect/debian-12--vgpu-a10--vmm-other-device
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: command -v lspci >/dev/null 2>&1
+run: lspci -nn 2>&1 | grep -E '\[03(00|02)\]'
+run: lspci -nn -d 10de: 2>/dev/null | grep -F '[0680]'
+run: lspci -vmmnn -d 10de: 2>/dev/null

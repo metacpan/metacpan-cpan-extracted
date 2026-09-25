@@ -384,8 +384,8 @@ sub _filterHash {
               || "auto";
             $apphash->{$key}->{options}->{uri} =~ URIRE;
             my ( $vhost, $appuri ) = ( $3, $5 );
-            $vhost = $self->p->HANDLER->resolveAlias($vhost);
-            $appuri ||= '/';
+            $vhost  = $self->p->HANDLER->resolveAlias($vhost);
+            $appuri = $self->p->HANDLER->canonicalUri($appuri);
 
             # Remove if display is "no" or "off"
             delete $apphash->{$key} and next if ( $appdisplay =~ /^(no|off)$/ );

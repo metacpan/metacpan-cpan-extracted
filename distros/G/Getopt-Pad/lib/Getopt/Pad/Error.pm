@@ -4,7 +4,7 @@ use Object::Pad;
 class Getopt::Pad::Error {
 	use overload '""' => sub { $_[0]->message }, fallback => 1;
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	field $message :param :reader;
 	field $level   :param :reader = undef;

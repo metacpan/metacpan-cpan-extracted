@@ -21,8 +21,8 @@ use Protocol::IR::Proto::SAMSUNG36;
 #
 # Unlike the 32-bit family, each of these carries its whole word in a single
 # frame: 48-NEC1/2 send all six bytes (D:S:F:~F:E:~E) behind the usual
-# 9000/4500 us header; JVC-48 sends OEM1:OEM2:D:S:F:checksum behind a
-# 3456/1728 us header; SAMSUNG20 sends D:6:S:6:F:8 behind a 4512/4512 us
+# 9000/4500 µs header; JVC-48 sends OEM1:OEM2:D:S:F:checksum behind a
+# 3456/1728 µs header; SAMSUNG20 sends D:6:S:6:F:8 behind a 4512/4512 µs
 # header; SAMSUNG36 sends the 16-bit address then the 20-bit command in two
 # MSB-first blocks. None of them accumulates across frames.
 
@@ -175,7 +175,7 @@ my $s36_pronto = $converter->export_code($s36, 'Pronto');
 like($s36_pronto, qr/^0000 006D/, 'SAMSUNG36 Pronto carries 38 kHz word');
 my @s36_pairs = @{ pronto_to_pairs($s36_pronto) };
 is(scalar(@s36_pairs), 39, 'SAMSUNG36 Pronto has header + both blocks + stops');
-# Mid-block footer: a short mark and a ~4438 us space after the 16 address bits.
+# Mid-block footer: a short mark and a ~4438 µs space after the 16 address bits.
 is($s36_pairs[17][0] >= 400 && $s36_pairs[17][0] <= 900, 1, 'SAMSUNG36 mid-block mark');
 is($s36_pairs[17][1] >= 3800 && $s36_pairs[17][1] <= 5200, 1, 'SAMSUNG36 mid-block space');
 my $s36_back = $converter->import_format('Pronto', $s36_pronto);

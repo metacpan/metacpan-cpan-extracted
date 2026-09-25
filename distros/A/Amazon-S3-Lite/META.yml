@@ -7,6 +7,7 @@ build_requires:
   File::ShareDir::Install: '0'
   HTTP::Tiny: '0'
   IO::Scalar: '0'
+  JSON: '4.10'
   JSON::PP: '4.16'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
@@ -25,27 +26,27 @@ no_index:
 provides:
   Amazon::S3::Lite:
     file: lib/Amazon/S3/Lite.pm
-    version: v1.3.2
+    version: v1.3.3
   Amazon::S3::Lite::Constants:
     file: lib/Amazon/S3/Lite/Constants.pm
     version: '0'
   Amazon::S3::Lite::Credentials:
     file: lib/Amazon/S3/Lite/Credentials.pm
-    version: v1.3.2
+    version: v1.3.3
   Amazon::S3::Lite::Lock:
     file: lib/Amazon/S3/Lite/Lock.pm
-    version: '0'
+    version: v1.3.3
   Amazon::S3::Lite::Lock::Guard:
     file: lib/Amazon/S3/Lite/Lock/Guard.pm
     version: '0'
   Amazon::S3::Lite::Logger:
     file: lib/Amazon/S3/Lite/Logger.pm
-    version: v1.3.2
+    version: v1.3.3
   Amazon::S3::Lite::Policies:
     file: lib/Amazon/S3/Lite/Policies.pm
     version: '0'
 requires:
-  Amazon::Signature4::Lite: v1.0.4
+  Amazon::Signature4::Lite: v1.0.6
   HTTP::Tiny: '0.088'
   IO::Socket::SSL: '0'
   JSON: '4.10'
@@ -62,5 +63,5 @@ resources:
   bugtracker: http://github.com/rlauer6/Amazon-S3-Lite/issues
   homepage: http://github.com/rlauer6/Amazon-S3-Lite.git
   repository: git://github.com/rlauer6/Amazon-S3-Lite.git
-version: v1.3.2
+version: v1.3.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

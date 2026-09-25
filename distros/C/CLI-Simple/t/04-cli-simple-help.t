@@ -1,61 +1,121 @@
 #!/usr/bin/env perl
 
 # Test::Exit must be compiled before other code that calls exit
+use English qw(-no_match_vars);
 use Test::Exit;
 use Test::More;
-use Test::Output;
-use Pod::Usage;
+
+use lib 't/lib';
+
+use CLISimpleHelpBoth;
+use CLISimpleHelpSynopsis;
+use CLISimpleHelpUsage;
 
 BEGIN {
-  use_ok( qw(CLI::Simple), qw($AUTO_HELP) );
+  use_ok( qw(CLI::Simple), qw($AUTO_HELP $PAGER) );
 }
 
-package Foo;
+$PAGER = 0;
 
-use strict;
-use warnings;
+########################################################################
+sub capture_usage {
+########################################################################
+  my ( $cli, $module ) = @_;
 
-our @ISA = qw(CLI::Simple);
+  my $output = q{};
 
-=pod
+  open my $stdout, '>', \$output
+    or die "Could not open scalar filehandle: $OS_ERROR";
 
-=head1 USAGE
+  $cli->set__program( $INC{$module} );
 
-Some usage 
+  {
+    local *STDOUT = $stdout;
 
-=head2 Options
+    exits_ok {
+      $cli->usage();
+    }
+    'usage exits';
+  }
 
- blah blah
+  close $stdout
+    or die "Could not close scalar filehandle: $OS_ERROR";
 
-=cut
-
-package main;
-
-use strict;
-use warnings;
-
-local @ARGV = qw(--help);
-
-local $ENV{PAGER}   = q{};
-local $ENV{PERLDOC} = q{};
-
-BEGIN {
-  use_ok( qw(CLI::Simple), qw($AUTO_HELP) );
+  return $output;
 }
 
 ########################################################################
-subtest 'help' => sub {
+subtest 'USAGE is legacy fallback' => sub {
 ########################################################################
-  $AUTO_HELP = 1;
+  local @ARGV;
 
-  stdout_like(
-    sub {
-      exits_ok {
-        Foo->new( commands => { foo => \&foo }, option_specs => ['help'] );
-      }, 'exits ok';
-    },
-    qr/^Usage/xsmi
+  my $cli = CLISimpleHelpUsage->new(
+    commands     => { foo => \&CLISimpleHelpUsage::cmd_foo },
+    option_specs => [],
   );
+
+  my $output = capture_usage( $cli, 'CLISimpleHelpUsage.pm' );
+
+  like( $output, qr/LEGACY USAGE TEXT/sm, 'USAGE content displayed when SYNOPSIS is absent', );
+
+  return;
+};
+
+########################################################################
+subtest 'SYNOPSIS is used for default help' => sub {
+########################################################################
+  local @ARGV;
+
+  my $cli = CLISimpleHelpSynopsis->new(
+    commands     => { foo => \&CLISimpleHelpSynopsis::cmd_foo },
+    option_specs => [],
+  );
+
+  my $output = capture_usage( $cli, 'CLISimpleHelpSynopsis.pm' );
+
+  like( $output, qr/SYNOPSIS TEXT/sm, 'SYNOPSIS content displayed', );
+
+  return;
+};
+
+########################################################################
+subtest 'SYNOPSIS takes precedence over USAGE' => sub {
+########################################################################
+  local @ARGV;
+
+  my $cli = CLISimpleHelpBoth->new(
+    commands     => { foo => \&CLISimpleHelpBoth::cmd_foo },
+    option_specs => [],
+  );
+
+  my $output = capture_usage( $cli, 'CLISimpleHelpBoth.pm' );
+
+  like( $output, qr/SYNOPSIS TEXT/sm, 'SYNOPSIS content displayed', );
+
+  unlike( $output, qr/LEGACY USAGE TEXT/sm, 'USAGE content suppressed', );
+
+  return;
+};
+
+########################################################################
+subtest 'explicit help_sections are honored' => sub {
+########################################################################
+  local @ARGV;
+
+  my $cli = CLISimpleHelpBoth->new(
+    commands     => { foo => \&CLISimpleHelpBoth::cmd_foo },
+    option_specs => [],
+  );
+
+  $cli->set_help_sections( [qw(SYNOPSIS USAGE)] );
+
+  my $output = capture_usage( $cli, 'CLISimpleHelpBoth.pm' );
+
+  like( $output, qr/SYNOPSIS TEXT/sm, 'SYNOPSIS content displayed', );
+
+  like( $output, qr/LEGACY USAGE TEXT/sm, 'explicit USAGE content displayed', );
+
+  return;
 };
 
 done_testing;

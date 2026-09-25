@@ -2,11 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 
-# Arena fragmentation soak: random-size send/recv cycles must return
-# arena_used to baseline after full drain. Catches slow leaks where
-# a code path fails to release arena bytes (e.g. off-by-one, cancel
-# path omitting arena_skip).
-
 use Data::ReqRep::Shared;
 
 my $seed = $ENV{FUZZ_SEED} || time;
@@ -48,7 +43,6 @@ my $final = $rr->stats->{arena_used} // 0;
 cmp_ok $final, '<=', $baseline + 256,
     "arena_used returns to near-baseline ($baseline → $final)";
 
-# wind down server
 waitpid $server, 0;
 
 done_testing;

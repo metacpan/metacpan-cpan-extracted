@@ -1,5 +1,26 @@
 Revision history for Getopt::Pad
 
+0.03    2026-09-24
+        - Add hash options: with hash => 1 an option takes --name key=value
+          pairs and its reader returns a hashref. Every value passes the
+          usual checks. Help shows the key=value syntax and completion
+          fills in the value behind the typed key
+        - Absent multiple options and slurpy args now read as an empty
+          arrayref, an absent hash option as an empty hashref
+        - Add csv => 1 for multiple options: every given value is split
+          at commas, the items are trimmed and an empty item is rejected
+        - Add typehint to option and arg specs: the tag rendered after
+          the help text in place of the type's own label
+        - Add objectlist options: with objectlist => 1 an option takes
+          --name INDEX.FIELD=VALUE words and its reader returns a list of
+          hashrefs. The indices must form 0..n-1
+        - Add createPathIfMissing to the file and dir types: the path is
+          created, parents included, once the parse settles on it
+        - --create-default-config writes LF line endings on every platform
+          and refuses a symlink target on Windows as well, where O_EXCL
+          follows a dangling link
+        - Tests pass on Windows
+
 0.02    2026-09-23
         - Fix the release target packing build artefacts (blib/) into the
           tarball, which stopped PAUSE from indexing 0.01

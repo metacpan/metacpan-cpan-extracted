@@ -32,6 +32,7 @@ my %options = (
 	'owner'     => { type => 's' },
 	'log-level' => { type => 's', default => 'info', valid => [qw(debug info warn)] },
 	'tag'       => { type => 's', multiple => 1 },
+	'define'    => { type => 'i', hash => 1 },
 );
 
 sub parseWith($argv, %raw) {
@@ -122,6 +123,14 @@ subtest 'config values run the normal pipeline' => sub {
 	my $listTag = writeFile("$dir/list-tag.yaml", "Options:\n  tag:\n    - a\n    - b\n");
 	my $list = parseWith([], options => {%options}, config => { format => 'yaml', paths => [$listTag] });
 	is $list->tag, ['a', 'b'], 'list for a multiple option passes through';
+
+	my $mapping = writeFile("$dir/mapping.yaml", "Options:\n  define:\n    cpu: 2\n    mem: 512\n");
+	my $hash = parseWith([], options => {%options}, config => { format => 'yaml', paths => [$mapping] });
+	is $hash->define, { cpu => 2, mem => 512 }, 'mapping for a hash option passes through';
+
+	my $scalarDefine = writeFile("$dir/scalar-define.yaml", "Options:\n  define: cpu=2\n");
+	like dies { parseWith([], options => {%options}, config => { format => 'yaml', paths => [$scalarDefine] }) },
+		qr/config value for 'define': expected a mapping of keys to values/, 'scalar for a hash option rejected';
 
 	my $notMapping = writeFile("$dir/list.yaml", "- a\n- b\n");
 	like dies { parseWith([], options => {%options}, config => { format => 'yaml', paths => [$notMapping] }) },
@@ -285,10 +294,12 @@ subtest '--create-default-config through other formats and at odd targets' => su
 	ok !-e "$dir/nope.ro", 'and creates no file';
 
 	my $linkPath = "$dir/dangling.json";
-	symlink("$dir/elsewhere.json", $linkPath) or die $!;
-	like dies { parseWith(['--create-default-config', $linkPath], options => {%options}, config => { format => 'json' }) },
-		qr/config file '.*dangling\.json' already exists/, 'a dangling symlink is refused';
-	ok !-e "$dir/elsewhere.json", 'the link target is not created';
+	SKIP: {
+		skip 'this process may not create symlinks', 2 if !symlink("$dir/elsewhere.json", $linkPath);
+		like dies { parseWith(['--create-default-config', $linkPath], options => {%options}, config => { format => 'json' }) },
+			qr/config file '.*dangling\.json' already exists/, 'a dangling symlink is refused';
+		ok !-e "$dir/elsewhere.json", 'the link target is not created';
+	}
 };
 
 subtest 'config files set top-level options only' => sub {
@@ -307,7 +318,9 @@ subtest 'yaml loading never blesses' => sub {
 };
 
 subtest 'a missing YAML::XS is a spec error' => sub {
-	my $code = 'BEGIN { unshift @INC, sub { die "hidden\n" if $_[1] eq "YAML/XS.pm"; return } }'
+	# No double quotes in a -e snippet: Windows passes such an argument
+	# unquoted and the child sees it split at every space.
+	my $code = 'BEGIN { unshift @INC, sub { die qq(hidden\n) if $_[1] eq q(YAML/XS.pm); return } }'
 		. ' use Getopt::Pad; GetOptions(argv => [], options => {}, config => { format => q(yaml) }); print q(unreached);';
 	my $pid = open3(my $stdinHandle, my $outputHandle, undef, $^X, '-I' . File::Spec->rel2abs('lib'), '-e', $code);
 	close $stdinHandle;

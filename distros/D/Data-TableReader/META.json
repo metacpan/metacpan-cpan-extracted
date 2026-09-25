@@ -4,7 +4,7 @@
       "Michael Conrad <mike@nrdvana.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -76,14 +76,14 @@
          "web" : "https://github.com/nrdvana/perl-Data-TableReader"
       }
    },
-   "version" : "0.022",
+   "version" : "0.023",
    "x_contributors" : [
       "Christian Walde <walde.christian@gmail.com>",
       "\u00c9tienne Mollier <emollier@debian.org>",
       "Michael Conrad <mconrad@intellitree.com>"
    ],
-   "x_generated_by_perl" : "v5.40.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

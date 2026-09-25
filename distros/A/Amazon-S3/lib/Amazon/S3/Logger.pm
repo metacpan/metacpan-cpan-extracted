@@ -10,7 +10,7 @@ use POSIX;
 use Readonly;
 use Scalar::Util qw{ reftype };
 
-our $VERSION = '2.1.0'; ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '2.1.1'; ## no critic (RequireInterpolationOfMetachars)
 
 Readonly::Hash our %LOG_LEVELS => (
   trace => 5,

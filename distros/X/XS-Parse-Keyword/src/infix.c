@@ -33,6 +33,10 @@
 #  define HAVE_ASSERT_AS_EXPRESSION
 #endif
 
+#if HAVE_PERL_VERSION(5,45,3)
+#  define HAVE_UNDEF_AWARE_EQUALITY
+#endif
+
 /* These only became full API macros at perl v5.22, but they're available as
  * the full Perl_... name before that
  */
@@ -1211,6 +1215,10 @@ void XSParseInfix_boot(pTHX)
   reg_builtin(aTHX_ "ge", XPI_CLS_RELATION, OP_SGE);
   reg_builtin(aTHX_ "gt", XPI_CLS_RELATION, OP_SGT);
   reg_builtin(aTHX_ "cmp", XPI_CLS_ORDERING, OP_SCMP);
+#ifdef HAVE_UNDEF_AWARE_EQUALITY
+  reg_builtin(aTHX_ "equ", XPI_CLS_EQUALITY, OP_SEQU);
+  reg_builtin(aTHX_ "neu", XPI_CLS_EQUALITY, OP_SNEU);
+#endif
 
   /* numerical relations */
   reg_builtin(aTHX_ "==", XPI_CLS_EQUALITY, OP_EQ);
@@ -1220,6 +1228,10 @@ void XSParseInfix_boot(pTHX)
   reg_builtin(aTHX_ ">=", XPI_CLS_RELATION, OP_GE);
   reg_builtin(aTHX_ ">",  XPI_CLS_RELATION, OP_GT);
   reg_builtin(aTHX_ "<=>", XPI_CLS_ORDERING, OP_NCMP);
+#ifdef HAVE_UNDEF_AWARE_EQUALITY
+  reg_builtin(aTHX_ "===", XPI_CLS_EQUALITY, OP_EQU);
+  reg_builtin(aTHX_ "!==", XPI_CLS_EQUALITY, OP_NEU);
+#endif
 
   /* other predicates */
 #ifdef OP_SMARTMATCH /* removed in perl 5.41.3 */

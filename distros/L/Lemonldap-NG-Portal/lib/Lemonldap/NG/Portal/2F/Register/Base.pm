@@ -2,7 +2,8 @@
 package Lemonldap::NG::Portal::2F::Register::Base;
 
 use strict;
-use Lemonldap::NG::Portal::Main::Constants qw/PE_OK PE_ERROR/;
+use Lemonldap::NG::Portal::Main::Constants ':all';
+use Scalar::Util 'looks_like_number';
 use Mouse;
 
 our $VERSION = '2.23.0';
@@ -106,7 +107,7 @@ sub markRegistered {
 sub run {
     my ( $self, $req, $action ) = @_;
     my $user = $req->userData->{ $self->conf->{whatToTrace} };
-    return $self->p->sendError( $req, 'PE82', 400 )
+    return $self->errorResponse( $req, pe_status => PE_TOKENEXPIRED )
       unless $user;
 
     if ( $self->can('supportedActions')
@@ -117,7 +118,7 @@ sub run {
         }
     }
     $self->logger->error( $self->prefix . "2f: unknown action ($action)" );
-    return $self->p->sendError( $req, 'unknownAction', 400 );
+    return $self->errorResponse( $req, label => 'unknownAction' );
 }
 
 sub delete {
@@ -125,15 +126,18 @@ sub delete {
     my $user = $req->userData->{ $self->conf->{whatToTrace} };
 
     # Check if unregistration is allowed
-    return $self->p->sendError( $req, 'notAuthorized', 400 )
+    return $self->errorResponse( $req, label => 'notAuthorized' )
       unless $self->userCanRemove;
 
     $self->checkCsrf($req)
-      or return $self->p->sendError( $req, 'csrfError', 400 );
+      or return $self->errorResponse( $req, label => 'csrfError' );
 
-    my $epoch = $req->param('epoch')
-      or return $self->p->sendError( $req,
-        $self->prefix . '2f: "epoch" parameter is missing', 400 );
+    my $epoch = $req->param('epoch');
+    if ( !$epoch ) {
+        $self->logger->error(
+            $self->prefix . '2f: "epoch" parameter is missing' );
+        return $self->errorResponse($req);
+    }
 
     my $registration_state = { module => $self };
 
@@ -148,7 +152,7 @@ sub delete {
         $self->logger->error( $self->prefix
               . "2f: error in sfDeleteDevice hook: "
               . $errorLabel );
-        return $self->p->sendError( $req, $errorLabel, 400 );
+        return $self->errorResponse( $req, label => $errorLabel );
     }
 
     if ( $self->del2fDevice( $req, $req->userData, $self->type, $epoch ) ) {
@@ -157,7 +161,7 @@ sub delete {
     else {
         $self->logger->error(
             $self->prefix . "2f: unable to delete device: 2FDeviceNotFound" );
-        return $self->p->sendError( $req, '2FDeviceNotFound', 400 );
+        return $self->errorResponse( $req, label => '2FDeviceNotFound' );
     }
 }
 
@@ -166,14 +170,20 @@ sub modify {
     my $user = $req->userData->{ $self->conf->{whatToTrace} };
 
     $self->checkCsrf($req)
-      or return $self->p->sendError( $req, 'csrfError', 400 );
+      or return $self->errorResponse( $req, label => 'csrfError' );
 
-    my $epoch = $req->param('epoch')
-      or return $self->p->sendError( $req,
-        $self->prefix . '2f: "epoch" parameter is missing', 400 );
-    my $label = $req->param('label')
-      or return $self->p->sendError( $req,
-        $self->prefix . '2f: "label" parameter is missing', 400 );
+    my $epoch = $req->param('epoch');
+    if ( !$epoch ) {
+        $self->logger->error(
+            $self->prefix . '2f: "epoch" parameter is missing' );
+        return $self->errorResponse($req);
+    }
+    my $label = $req->param('label');
+    if ( !$label ) {
+        $self->logger->error(
+            $self->prefix . '2f: "label" parameter is missing', 400 );
+        return $self->errorResponse($req);
+    }
     $self->logger->debug( "Modifying 2FA device with the label " . $label );
     if (
         $self->update2fDevice(
@@ -185,28 +195,37 @@ sub modify {
         return $self->p->sendJSONresponse( $req, { result => 1 } );
     }
     $self->logger->error( $self->prefix . "2f: device not found" );
-    return $self->p->sendError( $req, '2FDeviceNotFound', 400 );
+    return $self->errorResponse( $req, label => '2FDeviceNotFound' );
 }
 
 sub failHtmlResponse {
     my ( $self, $req, $error ) = @_;
     my $uid = $req->userData->{ $self->conf->{whatToTrace} };
 
+    my $pe;
+    my $loglabel = $error;
+    my $label    = $error;
+    if ( looks_like_number($error) ) {
+        $pe       = portalConsts->{$error};
+        $loglabel = $pe;
+        $label    = "PE" . $error;
+    }
+
     $self->auditLog(
         $req,
         message => (
-            $self->type . " 2F device registration failed for $uid : $error"
+            $self->type . " 2F device registration failed for $uid : $loglabel"
         ),
-        code         => "2FA_DEVICE_REGISTRATION_FAILED",
-        type         => $self->prefix,
-        portal_error => $error,
-        user         => $uid,
+        code => "2FA_DEVICE_REGISTRATION_FAILED",
+        type => $self->prefix,
+        ( $pe ? ( portal_error => $pe ) : ( error => $error ) ),
+        user => $uid,
     );
 
     return $self->p->sendHtml(
         $req, 'error',
         params => {
-            RAW_ERROR       => $error,
+            RAW_ERROR       => $label,
             AUTH_ERROR_TYPE => 'error',
         }
     );
@@ -216,23 +235,45 @@ sub failResponse {
     my ( $self, $req, $error, $code ) = @_;
     my $uid = $req->userData->{ $self->conf->{whatToTrace} };
 
+    my $pe;
+    my $loglabel = $error;
+    my $label    = $error;
+    if ( looks_like_number($error) ) {
+        $pe       = portalConsts->{$error};
+        $loglabel = $pe;
+        $label    = "PE" . $error;
+    }
+
     $self->auditLog(
         $req,
         message => (
-            $self->type . " 2F device registration failed for $uid : $error"
+            $self->type . " 2F device registration failed for $uid : $loglabel"
         ),
-        code         => "2FA_DEVICE_REGISTRATION_FAILED",
-        type         => $self->prefix,
-        portal_error => $error,
-        user         => $uid,
+        code => "2FA_DEVICE_REGISTRATION_FAILED",
+        type => $self->prefix,
+        ( $pe ? ( portal_error => $pe ) : ( error => $error ) ),
+        user => $uid,
     );
 
-    return $self->p->sendError( $req, $error, $code );
+    $code ||= 500;
+    return $self->sendJSONresponse( $req, { error => $label }, code => $code );
 }
 
 sub successResponse {
     my ( $self, $req, $info ) = @_;
     return $self->p->sendJSONresponse( $req, $info );
+}
+
+sub errorResponse {
+    my ( $self, $req, %args ) = @_;
+
+    my $code   = $args{code} || 400;
+    my $status = $args{pe_status} // PE_ERROR;
+    my $err    = "PE" . $status;
+    if ( $args{label} ) {
+        $err = $args{label};
+    }
+    return $self->sendJSONresponse( $req, { error => $err }, code => $code );
 }
 
 sub registerDevice {

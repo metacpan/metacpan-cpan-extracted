@@ -17,7 +17,7 @@ out in another. Every code is normalized to an Protocol::IR::Code object in betw
 so decoded signals survive the trip losslessly.
 
 Formats:
-    csv          IRDB-style button listing (import only)
+    csv          IRDB-style button listing (import/export)
     wig          HAIR hair-wig/3 JSON, one file per remote (import/export)
     pronto       Raw Pronto Hex, one signal per code (import/export)
     tasmota      Tasmota IRsend raw data, one signal per line (import/export)
@@ -31,7 +31,7 @@ Usage:
 
 Options:
     --from FORMAT   Input format (required): csv, wig, pronto, tasmota, mode2, lirc, gcir
-    --to FORMAT     Output format (required): wig, pronto, tasmota, mode2, lirc
+    --to FORMAT     Output format (required): csv, wig, pronto, tasmota, mode2, lirc
     --in FILE       Read input from FILE instead of stdin
     --out FILE      Write output to FILE instead of stdout
     --name NAME     wig remote name (default: Untitled)
@@ -73,11 +73,11 @@ if ($opt{help}) {
 usage_error("--from and --to are required")    unless $opt{from} && $opt{to};
 
 my %importable = map { $_ => 1 } qw(csv wig pronto tasmota mode2 lirc gcir globalcache);
-my %exportable = map { $_ => 1 } qw(wig pronto tasmota mode2 lirc);
+my %exportable = map { $_ => 1 } qw(csv wig pronto tasmota mode2 lirc);
 
 usage_error("unsupported --from '" . $opt{from} . "' (choose: csv, wig, pronto, tasmota, mode2, lirc, gcir)")
     unless $importable{lc $opt{from}};
-usage_error("unsupported or non-exportable --to '" . $opt{to} . "' (choose: wig, pronto, tasmota, mode2, lirc)")
+usage_error("unsupported or non-exportable --to '" . $opt{to} . "' (choose: csv, wig, pronto, tasmota, mode2, lirc)")
     unless $exportable{lc $opt{to}};
 
 my $converter = Protocol::IR::Converter->new();
@@ -94,6 +94,8 @@ if ($to eq 'wig') {
         $meta{$k} = $opt{$k} if defined $opt{$k};
     }
     $output = $converter->export_codes('wig', $codes, %meta);
+} elsif ($to eq 'csv') {
+    $output = $converter->export_codes('CSV', $codes);
 } elsif ($to eq 'pronto') {
     $output = join("\n", map { $converter->export_code($_, 'Pronto') } @$codes) . "\n";
 } elsif ($to eq 'tasmota') {

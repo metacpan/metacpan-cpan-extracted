@@ -9,7 +9,7 @@ class Getopt::Pad::Parser :strict(params) {
 	use Feature::Compat::Try;
 	use Scalar::Util ();
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	field $spec :param;
 	field $argv :param;
@@ -103,7 +103,11 @@ class Getopt::Pad::Parser :strict(params) {
 	method validatedArgValue($arg, $value) {
 		my $problem = $arg->type->check($value);
 		Getopt::Pad::Error->throw("argument <%s>: %s", $arg->short, $problem) if defined $problem;
-		return $arg->type->coerce($value);
+
+		my $coerced = $arg->type->coerce($value);
+		$problem = $arg->type->prepare($coerced);
+		Getopt::Pad::Error->throw("argument <%s>: %s", $arg->short, $problem) if defined $problem;
+		return $coerced;
 	}
 
 	method consumeArgs($level, $words) {
@@ -116,7 +120,7 @@ class Getopt::Pad::Parser :strict(params) {
 			if ($arg->multiple) {
 				my @rest = splice($words->@*);
 				Getopt::Pad::Error->throw("missing required argument <%s>", $arg->short) if !@rest && $arg->required;
-				$readerValues{$arg->reader} = [map { $self->validatedArgValue($arg, $_) } @rest] if @rest;
+				$readerValues{$arg->reader} = [map { $self->validatedArgValue($arg, $_) } @rest];
 				next;
 			}
 

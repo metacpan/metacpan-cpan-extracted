@@ -822,6 +822,7 @@ t/32-OIDC-RP-rule.t
 t/32-OIDC-strict-JWS-private_key_jwt.t
 t/32-OIDC-Token-Exchange.t
 t/32-OIDC-Token-Introspection-JWT.t
+t/32-OIDC-Token-Introspection-public-client.t
 t/32-OIDC-Token-Introspection.t
 t/32-OIDC-Token-Security.t
 t/32-RemoveOIDCToken.t
@@ -1053,6 +1054,8 @@ t/91-no-console.log.t
 t/92-Required-Auth-Methods.t
 t/92-Required-Issuer-Methods.t
 t/92-Required-UserDB-Methods.t
+t/93-locationRules-encoded-urls.t
+t/95-soap-isAuthorizedURI.t
 t/99-Bad-logLevel.t
 t/99-Dont-load-Dumper.t
 t/99-pod.t

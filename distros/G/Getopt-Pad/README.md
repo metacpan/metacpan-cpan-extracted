@@ -8,15 +8,19 @@ option and positional argument.
 ## Features
 
 - Typed options (`bool`, `counter`, `string`, `int`, `float`, `file`, `dir`,
-  `url`) with per-type constraints (`mustExist`, `min`/`max`) and a pluggable
+  `url`) with per-type constraints (`mustExist`, `createPathIfMissing`,
+  `min`/`max`) and a pluggable
   type registry
+- Value shapes beyond a single value: repeatable options (`multiple`, with
+  `csv` to split at commas), `key=value` mappings (`hash`) and lists of
+  records (`objectlist`), with defaults and config values in the same shape
 - Positional arguments with the same type pipeline, including a slurpy last
   argument
 - Nested subcommands with per-level options and chained result objects
 - Config files (YAML, JSON, pluggable formats) with command line > config >
   default precedence, an automatic `--config` option, and
   `--create-default-config` to write a starter config from the spec defaults
-- Generated `--help` output: grouped options, annotations, examples,
+- Generated `--help` output: grouped options, annotations, `typehint` tags, examples,
   terminal-width wrapping, color on a tty. An automatic `--version` comes
   with it
 - Shell completion for bash and zsh via `--create-completions`: commands,

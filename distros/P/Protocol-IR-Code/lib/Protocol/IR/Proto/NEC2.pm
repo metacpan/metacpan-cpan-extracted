@@ -2,13 +2,13 @@ package Protocol::IR::Proto::NEC2;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 use parent 'Protocol::IR::Proto::NEC';
 
 # NEC2 is the MakeHex nec2.irp protocol: 'Like NEC1, but repeats entire
 # pattern'. For a single frame its timing and data layout are identical to
-# NEC1 (full 9000/4500 us header, Default S=~D), so this class only changes
+# NEC1 (full 9000/4500 µs header, Default S=~D), so this class only changes
 # the protocol name. The repeat difference is invisible to the single-frame
 # decoders; preserving the name keeps the whole-frame repeat semantics
 # through conversions.
@@ -16,13 +16,15 @@ sub _protocol_name { 'NEC2' }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Proto::NEC2 - NEC2 protocol handler (repeats the whole frame)
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -40,7 +42,7 @@ version 1.0
 =head1 DESCRIPTION
 
 The NEC2 protocol (MakeHex F<nec2.irp>) transmits the same 32-bit frame as
-L<Protocol::IR::Proto::NEC> with the same full 9000/4500 us header and the same
+L<Protocol::IR::Proto::NEC> with the same full 9000/4500 µs header and the same
 "Default S=~D" subaddress rule. The only difference from NEC1 is the repeat
 frame: NEC1 repeats a short header+gap, NEC2 repeats the whole data frame.
 That difference is not observable in any single frame, so the timing

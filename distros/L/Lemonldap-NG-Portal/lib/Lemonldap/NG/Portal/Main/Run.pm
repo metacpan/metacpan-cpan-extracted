@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.23.3';
+our $VERSION = '2.23.4';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -1595,6 +1595,11 @@ sub _triggerBackChannelLogout {
     my ( $self, $req, $sessionData ) = @_;
 
     return PE_OK unless $sessionData && ref($sessionData) eq 'HASH';
+
+    # Sessions given here are read by their storage ID, then _session_id is
+    # already a storage ID (used to compute OIDC sid)
+    $sessionData =
+      { %$sessionData, _session_storage_id => $sessionData->{_session_id} };
 
     $self->logger->debug(
         "Triggering back-channel logout for session $sessionData->{_session_id}"

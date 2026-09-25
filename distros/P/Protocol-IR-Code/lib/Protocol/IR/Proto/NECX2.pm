@@ -2,12 +2,12 @@ package Protocol::IR::Proto::NECX2;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 use parent 'Protocol::IR::Proto::NEC';
 
 # NECx2 is the MakeHex NECx2.irp protocol: a 16-bit address with a half
-# (4500/4500 us) header, repeating the entire frame. Single-frame timing
+# (4500/4500 µs) header, repeating the entire frame. Single-frame timing
 # is identical to NECx1; only the protocol name differs.
 sub _protocol_name  { 'NECX2' }
 sub _half_header    { 1 }
@@ -32,13 +32,15 @@ sub as_samsung_params {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Proto::NECX2 - NECx2 protocol handler (extended NEC, whole-frame repeat)
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -46,7 +48,7 @@ version 1.0
 
     my $converter = Protocol::IR::Converter->new();
 
-    # NECx2 is the framing used by Samsung TVs: half 4500/4500 us header
+    # NECx2 is the framing used by Samsung TVs: half 4500/4500 µs header
     # and a real 16-bit address (device + subdevice bytes).
     my $code = $converter->import_code('NECX2',
         { device => 7, subdevice => 7, command => 2 });
@@ -54,7 +56,7 @@ version 1.0
 =head1 DESCRIPTION
 
 The NECx2 protocol (MakeHex F<NECx2.irp>) transmits the same frame as
-L<Protocol::IR::Proto::NECX1> -- half B<4500/4500 us> header, 16-bit address
+L<Protocol::IR::Proto::NECX1> -- half B<4500/4500 µs> header, 16-bit address
 (Default S=D) -- but repeats the B<entire> frame instead of a short
 header+gap ditto. For a single frame the two are timing-identical, so this
 class only changes the protocol name. Samsung TV IRDB files (for example)
@@ -97,7 +99,7 @@ available for direct use when matching captures against IRDB entries.
 =head1 CROSS-PROTOCOL MAPPING
 
 NECX2 shares identical timing with L<Protocol::IR::Proto::SAMSUNG>: both use
-a B<4500/4500 us> half header, B<560/1680 us> bit timing, 32 bits, per-byte
+a B<4500/4500 µs> half header, B<560/1680 µs> bit timing, 32 bits, per-byte
 LSB-first.  They are distinguished only by the byte structure on the wire:
 Samsung repeats the address byte and follows the command with its one's
 complement (C<addr, addr, cmd, ~cmd>), while NECX2 carries a real subaddress

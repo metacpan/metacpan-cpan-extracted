@@ -8,24 +8,19 @@ use Data::ReqRep::Shared::Client;
 use Data::ReqRep::Shared::Int;
 use Data::ReqRep::Shared::Int::Client;
 
-# A request whose deadline expires while the server is replying used to leave
-# its slot held: the reply was mid-copy (RESP_WRITING), where neither cancel
-# nor the drain could see it, and a stale reply's transient WRITING also made
-# an unused slot's release give up. Each strands a slot under a live owner,
-# which death-based recovery never reclaims -- enough of them and every send
-# fails with "no slots". pending() must be back to 0 after every req_wait.
-
 my $dir = tempdir(CLEANUP => 1);
 
 sub server_loop {
     my ($srv, $reply) = @_;
+    my $parent = $$;
     my $pid = fork // die "fork: $!";
     return $pid if $pid;
     $SIG{TERM} = sub { exit 0 };
-    while (1) {
-        my ($v, $id) = $srv->recv;
+    while (getppid == $parent) {
+        my ($v, $id) = $srv->recv_wait(1);
         $srv->reply($id, $reply->($v)) if defined $id;
     }
+    exit 0;
 }
 
 {
@@ -53,6 +48,19 @@ sub server_loop {
     is $cli->pending, 0, 'Str: no slot left held when deadlines expire mid-copy';
     is $noslot, 0, 'Str: the slots never ran out';
     kill TERM => $pid; waitpid $pid, 0;
+}
+
+for my $int (0, 1) {
+    my $name = $int ? 'Int' : 'Str';
+    my $srv = $int ? Data::ReqRep::Shared::Int->new("$dir/late$int.shm", 4, 1)
+                   : Data::ReqRep::Shared->new("$dir/late$int.shm", 4, 1, 64);
+    my $cli = ($int ? 'Data::ReqRep::Shared::Int::Client' : 'Data::ReqRep::Shared::Client')->new("$dir/late$int.shm");
+    my $msg = $int ? 7 : 'x';
+    my $id = $cli->send($msg);
+    my (undef, $rid) = $srv->recv;
+    $srv->reply($rid, $msg);
+    $cli->cancel($id);
+    ok defined $cli->send($msg), "$name: cancelling after the reply arrived frees the only slot";
 }
 
 done_testing;

@@ -13,8 +13,9 @@ sub runScript($code, @argv) {
 	my $pid = open3(my $stdinHandle, my $stdoutHandle, $stderrHandle, $^X, "-I$libDir", '-MGetopt::Pad', '-e', $code, '--', @argv);
 	close $stdinHandle;
 	local $/;
-	my $stdout = readline($stdoutHandle) // '';
-	my $stderr = readline($stderrHandle) // '';
+	# The child's handles are in text mode on Windows: normalize its CRLF.
+	my $stdout = (readline($stdoutHandle) // '') =~ s/\r\n/\n/gr;
+	my $stderr = (readline($stderrHandle) // '') =~ s/\r\n/\n/gr;
 	waitpid $pid, 0;
 	return ($? >> 8, $stdout, $stderr);
 }

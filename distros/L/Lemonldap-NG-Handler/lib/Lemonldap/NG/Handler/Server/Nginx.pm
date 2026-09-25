@@ -31,6 +31,9 @@ sub _run {
     return $self->psgiAdapter(
         sub {
             my $req = $_[0];
+
+            # Nginx gives the request URI it routed on in X_ORIGINAL_URI
+            $self->api->setAccessControlUri( $req->{env} );
             my $res = $self->_authAndTrace($req);
 
             # Transform 302 responses in 401 since Nginx refuse it

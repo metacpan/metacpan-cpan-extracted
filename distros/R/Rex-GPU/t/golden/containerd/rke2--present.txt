@@ -1,0 +1,8 @@
+# golden: containerd/rke2--present
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+can_run: nvidia-container-runtime
+run: cat /var/lib/rancher/rke2/agent/etc/containerd/config.toml.tmpl 2>/dev/null
+run: cat /var/lib/rancher/rke2/agent/etc/containerd/config.toml 2>/dev/null
+run: test -f /var/lib/rancher/rke2/agent/etc/containerd/config-v3.toml.tmpl
+run: test -d /var/lib/rancher/rke2/agent/etc/containerd/config-v3.toml.d

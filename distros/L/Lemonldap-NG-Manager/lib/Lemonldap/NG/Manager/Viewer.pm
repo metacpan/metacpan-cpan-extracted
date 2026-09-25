@@ -169,7 +169,9 @@ sub viewKey {
         $self->SUPER::getKey( $req, @args );
     }
     else {
-        if ( $req->{env}->{REQUEST_URI} =~ m%/view/(?:latest|\d+/\w+)$% ) {
+        # Compare the routed path (and not REQUEST_URI, which also contains
+        # the query string: it could satisfy the whitelist from there)
+        if ( $req->path =~ m%^/view/(?:latest|\d+/\w+)$% ) {
             $self->logger->debug(" $req->{env}->{REQUEST_URI} -> URI allowed");
             $self->SUPER::getKey( $req, @args );
         }

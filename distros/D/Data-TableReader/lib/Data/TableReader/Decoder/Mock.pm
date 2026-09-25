@@ -7,7 +7,7 @@ require MRO::Compat if $] < '5.010';
 extends 'Data::TableReader::Decoder';
 
 # ABSTRACT: Decoder that returns supplied data without decoding anything
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 
 sub BUILDARGS {
@@ -123,7 +123,7 @@ Data::TableReader::Decoder::Mock - Decoder that returns supplied data without de
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

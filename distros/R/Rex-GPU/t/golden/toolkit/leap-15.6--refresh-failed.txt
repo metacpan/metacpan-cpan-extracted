@@ -1,0 +1,20 @@
+# golden: toolkit/leap-15.6--refresh-failed
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+can_run: nvidia-ctk
+run: uname -m
+run: rpm --import https://nvidia.github.io/libnvidia-container/gpgkey 2>/dev/null
+run: ZYPP_LOCK_TIMEOUT=120 zypper rr nvidia-container-toolkit 2>/dev/null || true
+run: ZYPP_LOCK_TIMEOUT=120 zypper addrepo --refresh https://nvidia.github.io/libnvidia-container/stable/rpm/x86_64 nvidia-container-toolkit 2>&1
+run: ZYPP_LOCK_TIMEOUT=120 zypper --gpg-auto-import-keys refresh nvidia-container-toolkit 2>&1
+run: ZYPP_LOCK_TIMEOUT=120 zypper rr nvidia-container-toolkit 2>/dev/null || true
+DIE: zypper refresh of repository nvidia-container-toolkit (https://nvidia.github.io/libnvidia-container/stable/rpm/x86_64) failed (exit 4): Retrieving repository 'nvidia-container-toolkit' metadata [.error]
+Repository 'nvidia-container-toolkit' is invalid.
+[nvidia-container-toolkit|https://nvidia.github.io/libnvidia-container/stable/rpm/x86_64] Failed to retrieve new repository metadata.
+History:
+ - [|] Error trying to read from 'https://nvidia.github.io/libnvidia-container/stable/rpm/x86_64'
+ - Download (curl) error for 'https://nvidia.github.io/libnvidia-container/stable/rpm/x86_64/content':
+   Error code: Connection failed
+   Error message: Could not resolve host: nvidia.github.io
+Skipping repository 'nvidia-container-toolkit' because of the above error.
+Could not refresh the repositories because of errors.; the repository was removed again; nothing was installed from it

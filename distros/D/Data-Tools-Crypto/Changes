@@ -1,0 +1,52 @@
+
+Revision history for Perl extension Data::Tools::Crypto
+
+1.53 2026-09-24
+
+   - the base class Data::Tools::Crypto::Base is renamed to Data::Tools::Crypto.
+     PAUSE indexes a distribution only when it contains a package matching the
+     distribution name, and 1.52 had none, so it was never indexed. no released
+     version ever had the old name, nothing depends on it.
+
+1.52 2026-09-23
+
+   - first release as a separate distribution, these modules were developed
+     inside Data::Tools and are split out because they need CryptX, which is
+     large, and Exception::Sink, neither of which should be required just to
+     use the rest of Data::Tools. no released Data::Tools ever contained them.
+     the version starts at 1.52, the Data::Tools version they were split from.
+
+   - Data::Tools::Crypto::Base holds the API shared by the others and is never
+     used on its own, it has no encryption of its own. it provides
+     encrypt/decrypt in raw, hex, base64 and base64url forms, and freeze/thaw
+     which carry any plain perl data structure through JSON in one step.
+
+   - Data::Tools::Crypto::Symmetric encrypts with a shared secret key using
+     ChaCha20-Poly1305, which is authenticated: data modified in any way does
+     not decrypt at all, rather than decrypting to something wrong. a fresh
+     random nonce is used for every message and utf8 strings are carried
+     transparently, a character string comes back a character string and a
+     byte string comes back bytes.
+
+   - Data::Tools::Crypto::RSA uses a public/private key pair and also provides
+     RSA-PSS sign() and verify(), with hex, base64 and base64url forms of the
+     signature in sign_hex()/verify_hex(), sign_base64()/verify_base64() and
+     sign_base64url()/verify_base64url().
+     RSA encryption is hybrid. RSA alone can only encrypt
+     keysize-2*hashsize-2 bytes, which is 190 for a 2048 bit key with SHA256
+     and far too little for real data, so the data never passes through RSA at
+     all: a fresh symmetric key is generated for every message, the message is
+     encrypted with Data::Tools::Crypto::Symmetric and only that key, 32 bytes,
+     is wrapped with RSA. the cryptotext is the wrapped key followed by the
+     symmetric cryptotext. this removes the size limit entirely and the payload
+     is authenticated exactly as it is in Symmetric. note that anyone holding
+     the public key can still produce a well formed message, encryption alone
+     proves nothing about origin, only sign()/verify() does that.
+
+   - errors are reported in two ways which are never confused: a caller or
+     configuration error (bad or missing key, unknown option, undefined
+     argument, private operation on a public key) raises an exception with
+     boom(), data which does not decrypt or verify returns undef or false.
+     options are honoured or refused, never silently ignored. reinit() clears
+     all state first, so an object whose reinit() failed is not usable and
+     booms on every call until a later reinit() succeeds.

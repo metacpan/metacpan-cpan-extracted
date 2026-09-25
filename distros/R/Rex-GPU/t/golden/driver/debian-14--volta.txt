@@ -1,0 +1,7 @@
+# golden: driver/debian-14--volta
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: dpkg --print-architecture
+DIE: No NVIDIA driver source on this Debian 14.0 host fits GV100GL [Tesla V100 PCIe 16GB] (Maxwell/Pascal/Volta, 10de:1db4) (proprietary kernel module, driver branch 580 or older) -- debian-nonfree: driver branch not known, 580 or older is needed; nvidia-cuda-repo: NVIDIA's CUDA repo only covers Debian 12 and 13, not release '14.0'. No driver package was installed and no package source was added. Install the driver yourself; once `nvidia-smi -L` lists the GPU and libcuda.so.1 is in the linker cache, install_driver skips the driver step

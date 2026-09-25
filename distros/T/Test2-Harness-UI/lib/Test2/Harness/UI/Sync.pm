@@ -8,7 +8,7 @@ use Carp qw/croak/;
 use Test2::Harness::Util::JSON qw/encode_json decode_json/;
 use Test2::Harness::UI::UUID qw/uuid_inflate gen_uuid/;
 
-our $VERSION = '0.000148';
+our $VERSION = '0.000149';
 
 use Test2::Harness::UI::Util::HashBase;
 
@@ -16,19 +16,43 @@ sub run_delta {
     my $self = shift;
     my ($dbh_a, $dbh_b) = @_;
 
-    my $refa = ref($dbh_a);
-    my $refb = ref($dbh_b);
+    my ($a_runs, $a_all) = $self->_delta_runs($dbh_a);
+    my ($b_runs, $b_all) = $self->_delta_runs($dbh_b);
 
-    my $a_runs = $refa eq 'ARRAY' ? $dbh_a : $self->get_runs($dbh_a);
-    my $b_runs = $refb eq 'ARRAY' ? $dbh_b : $self->get_runs($dbh_b);
+    # A run that exists on the other side in any state must not be synced,
+    # otherwise we try to insert a duplicate run_id. Only the list of runs to
+    # copy is filtered by status.
+    my %all_a = map { ($_ => 1) } @$a_all;
+    my %all_b = map { ($_ => 1) } @$b_all;
+    my %map_a = map { ($_ => 1) } @$a_runs;
+    my %map_b = map { ($_ => 1) } @$b_runs;
 
-    my %map_a = map {($_ => 1)} @$a_runs;
-    my %map_b = map {($_ => 1)} @$b_runs;
+    for my $run_id (@$a_runs) {
+        next if $map_b{$run_id} || !$all_b{$run_id};
+        warn "Run '$run_id' is finished in database A, but is pending, running, or broken in database B, not syncing it.\n";
+    }
+
+    for my $run_id (@$b_runs) {
+        next if $map_a{$run_id} || !$all_a{$run_id};
+        warn "Run '$run_id' is finished in database B, but is pending, running, or broken in database A, not syncing it.\n";
+    }
 
     return {
-        missing_in_a => [grep { !$map_a{$_} } @$b_runs],
-        missing_in_b => [grep { !$map_b{$_} } @$a_runs],
+        missing_in_a => [grep { !$all_a{$_} } @$b_runs],
+        missing_in_b => [grep { !$all_b{$_} } @$a_runs],
     };
+}
+
+sub _delta_runs {
+    my $self = shift;
+    my ($in) = @_;
+
+    return ($in, $in) if ref($in) eq 'ARRAY';
+
+    my $runs = $self->get_runs($in);
+    return ($runs, $runs) if $in =~ m/\.jsonl$/ && -f $in;
+
+    return ($runs, $self->get_runs($in, all => 1));
 }
 
 sub sync {
@@ -110,12 +134,12 @@ sub wait_on {
 
 sub get_runs {
     my $self = shift;
-    my ($dbh_or_file) = @_;
+    my ($dbh_or_file, %params) = @_;
 
     return $self->_get_jsonl_runs($dbh_or_file)
         if $dbh_or_file =~ m/\.jsonl$/ && -f $dbh_or_file;
 
-    return $self->_get_dbh_runs($dbh_or_file);
+    return $self->_get_dbh_runs($dbh_or_file, %params);
 }
 
 sub _get_jsonl_runs {
@@ -137,12 +161,14 @@ sub _get_jsonl_runs {
 
 sub _get_dbh_runs {
     my $self = shift;
-    my ($dbh) = @_;
+    my ($dbh, %params) = @_;
+
+    my $where = $params{all} ? '' : "WHERE  status NOT IN ('pending', 'running', 'broken')";
 
     my $sth = $dbh->prepare(<<"    EOT");
         SELECT run_id
         FROM   runs
-        WHERE  status NOT IN ('pending', 'running', 'broken')
+        $where
         ORDER  BY added ASC
     EOT
 
@@ -250,6 +276,14 @@ sub read_sync {
                 next;
             }
 
+            # The run may have been added to the destination after the delta
+            # was calculated, never overwrite or duplicate it.
+            if ($new_run_id && $self->run_exists($dbh, $uuidf, $new_run_id)) {
+                warn "Run '$new_run_id' already exists in the destination database, skipping it.\n";
+                $last_run_id = undef;
+                next;
+            }
+
             $last_run_id = $new_run_id;
             $counter++;
         }
@@ -272,6 +306,15 @@ sub read_sync {
     $dbh->disconnect();
 
     return;
+}
+
+sub run_exists {
+    my $self = shift;
+    my ($dbh, $uuidf, $run_id) = @_;
+
+    my $sth = $dbh->prepare("SELECT 1 FROM runs WHERE run_id = ?");
+    $sth->execute(uuid_inflate($run_id)->$uuidf) or die "MySQL Error: " . $dbh->errstr;
+    return $sth->fetchrow_arrayref() ? 1 : 0;
 }
 
 sub get_or_create_id {
@@ -688,13 +731,20 @@ Get a list of tables that can be synced.
 
 =item $run_ids = $sync->get_runs($dbh)
 
+=item $run_ids = $sync->get_runs($dbh, all => 1)
+
 =item $run_ids = $sync->get_runs($jsonl_file)
 
-Get all the run_ids from a database or jsonl file.
+Get all the run_ids from a database or jsonl file. When reading from a
+database runs that are pending, running, or broken are omitted unless the
+C<< all => 1 >> option is given.
 
 =item $delta = $sync->run_delta($dbh_a, $dbh_b)
 
 Get lists of run_ids that exist in only one of the two provided databases.
+Only runs that are not pending, running, or broken are listed, but a run that
+exists in the other database in any state is never listed. A warning is issued
+for runs that are finished on one side but not on the other.
 
     {
         missing_in_a => \@run_ids_a,
@@ -754,6 +804,10 @@ Create or find a common link in the database (think project, user, etc).
         users    => 'user_id',
         username => 'bob',
     );
+
+=item $bool = $sync->run_exists($dbh, $uuidf, $run_id)
+
+Check if the run_id is present in the database in any state.
 
 =item $sync->insert($dbh, $uuidf, $table, $data)
 

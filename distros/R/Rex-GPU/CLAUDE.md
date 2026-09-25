@@ -1,62 +1,38 @@
 # Rex::GPU
 
-GPU detection and driver management for Rex. Works with any Kubernetes setup
-(RKE2, K3s, kubeadm, standalone containerd) or standalone.
+GPU detection and NVIDIA driver management for [Rex](https://www.rexify.org/). A single
+`gpu_setup()` call takes a bare-metal host from bare PCI to GPU-ready for Kubernetes:
+detect → NVIDIA driver → container toolkit → CDI specs → containerd runtime config. Works
+with RKE2, K3s, standalone containerd, or drivers-only. Targets SFTP-less Hetzner dedicated
+servers via `Rex::LibSSH`.
 
-## Module Structure
+Full architecture, the per-distro driver matrix, the detection contract and the
+Rex::Pkg-bypass invariant live in skill `rex-gpu-core` (force-loaded for the agents).
+README.md is the user-facing overview; POD in `lib/` is the API reference.
 
-```
-Rex::GPU              — gpu_detect(), gpu_setup() — main entry points
-Rex::GPU::Detect      — PCI class code based GPU detection (NVIDIA, AMD)
-Rex::GPU::NVIDIA — NVIDIA driver, container toolkit, CDI specs, containerd config
-```
+## Delegation
 
-Requires `Rex::LibSSH` for deployment to hosts without SFTP (e.g. Hetzner
-dedicated servers). Use `set connection => 'LibSSH'` in your Rexfile.
+Delegate behavior-relevant code to the right agent instead of touching it yourself —
+principle and lane are in `.claude/rules/rex-gpu-rules.md`.
 
-## Usage
+| Task | Agent |
+|---|---|
+| Implement / refactor / debug anything under `lib/` | `rex-gpu-worker` (default) |
+| New tests, regression tests, failure-path coverage, golden harness | `rex-gpu-test-writer` |
+| New GPU / driver branch / NVIDIA support list: generation rows, name rules, NVSwitch/NVLink IDs, vGPU table | `rex-gpu-hardware-curator` |
+| Pre-release audit | `rex-gpu-release-checker` |
 
-```perl
-use Rex::GPU;
+The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main agent
+delegates rather than loading them. Skill sources live under `.claude/skills/` —
+`rex-gpu-core` is owned here, the rest are hardlinks (`manage-skills sync` after a clone).
 
-# Detect GPUs
-my $gpus = gpu_detect();
-# { nvidia => [{name => "RTX 4000 SFF Ada", compute => 1}], amd => [...] }
-
-# Full setup: drivers + toolkit + CDI + containerd runtime config
-gpu_setup(containerd_config => 'rke2');  # or 'k3s', 'containerd', 'none'
-gpu_setup(containerd_config => 'rke2', reboot => 1);
-```
-
-## Supported Distros
-
-| Distro | Notes |
-|--------|-------|
-| Debian 12/13 | non-free repo required (Hetzner image has it pre-enabled) |
-| Ubuntu 22.04/24.04 | auto-detect nvidia-driver-NNN-server; no nvidia-smi (virtual pkg on 24.04) |
-| RHEL/Rocky/Alma 8-10 | EPEL + CUDA repo; kmod-nvidia-open-dkms on RHEL 10+ |
-| openSUSE Leap 15.6/16.0 | nvidia-open-driver-G06/G07-signed-kmp-meta |
-
-## Key Implementation Details
-
-- All NVIDIA installs use `run "apt-get/dnf install -y ..."` directly, NOT Rex::Pkg —
-  Rex::Pkg dies on non-zero exit from DKMS/grub/initramfs post-install scripts
-- `DPkg::Lock::Timeout=120` on all apt-get calls — prevents failures on fresh-boot
-  systems where unattended-upgrades/cloud-init holds the dpkg lock
-- `apt-get update` uses `auto_die => 0` — returns non-zero on snap/PPA repo warnings
-
-## Testing
+## Build and test
 
 ```bash
-prove -l t/
+prove -lr t/     # compile check + offline unit/golden tests of emitted commands; no hardware exercised
+dzil build
+dzil test
 ```
 
-## Build
-
-```bash
-dzil build && dzil test && dzil release
-```
-
-## Used By
-
-- `Rex::Rancher` — optional GPU support via `gpu => 1`
+No detection, install, containerd or reboot path runs without a real GPU host; a green
+`prove` checks the emitted commands, not that a behavior change works on a host.

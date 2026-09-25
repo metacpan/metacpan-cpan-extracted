@@ -124,7 +124,8 @@ sub controlUrl {
     return $ret unless %{ $self->filters };
 
     # Use matchScenario to find matching scenario (with whitelist check)
-    my $uri = $req->env->{REQUEST_URI};
+    # Use the routed URI: an encoded URL would avoid the scenarios below
+    my $uri = $req->access_control_uri;
     my ( $scenario, $cat, $maxFailures, $banDuration, $timeWindow ) =
       $self->matchScenario($uri);
 

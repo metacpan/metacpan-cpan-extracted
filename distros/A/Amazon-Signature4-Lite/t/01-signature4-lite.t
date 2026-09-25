@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Digest::SHA qw(sha256_hex);
 
 use_ok(qw( Amazon::Signature4::Lite));
 
@@ -35,7 +36,9 @@ sub new_signer {
 # constructor
 ########################################################################
 
+########################################################################
 subtest 'constructor' => sub {
+########################################################################
   # required args
   eval { Amazon::Signature4::Lite->new( secret_key => 'x', region => 'us-east-1' ) };
   like $@, qr/access_key is required/, 'croaks without access_key';
@@ -67,7 +70,9 @@ subtest 'constructor' => sub {
 # https://docs.aws.amazon.com/general/latest/gr/sigv4-test-suite.html
 ########################################################################
 
+########################################################################
 subtest 'AWS test suite - get-vanilla' => sub {
+########################################################################
   my $signer = new_signer();
 
   my $signed = $signer->sign(
@@ -299,7 +304,9 @@ subtest 'error handling' => sub {
   like $@, qr/url is required/, 'croaks without url';
 };
 
+########################################################################
 subtest 'AWS test suite - get-vanilla exact signature' => sub {
+########################################################################
   my $signer = new_signer();
 
   my $signed = $signer->sign(
@@ -315,4 +322,94 @@ subtest 'AWS test suite - get-vanilla exact signature' => sub {
     'exact Authorization header matches AWS test suite get-vanilla';
 };
 
+my %common = (
+  access_key => $TEST_ACCESS_KEY,
+  secret_key => $TEST_SECRET_KEY,
+  region     => $TEST_REGION,
+);
+
+my $s3 = Amazon::Signature4::Lite->new( %common, service => 's3', );
+
+ok( $s3->{disable_double_encoding}, 'S3 disables double encoding by default', );
+
+my $sqs = Amazon::Signature4::Lite->new( %common, service => 'sqs', );
+
+ok( !$sqs->{disable_double_encoding}, 'non-S3 services double encode by default', );
+
+my $s3_explicit = Amazon::Signature4::Lite->new(
+  access_key              => 'k',
+  secret_key              => 's',
+  region                  => 'us-east-1',
+  service                 => 's3',
+  disable_double_encoding => 0,
+);
+
+ok( !$s3_explicit->{disable_double_encoding}, 'explicit disable_double_encoding overrides S3 default', );
+
+my $outposts = Amazon::Signature4::Lite->new(
+  access_key              => 'k',
+  secret_key              => 's',
+  region                  => 'us-east-1',
+  service                 => 's3-outposts',
+  disable_double_encoding => 1,
+);
+
+ok( $outposts->{disable_double_encoding}, 'explicit disable_double_encoding overrides non-S3 default', );
+
+my $signer = Amazon::Signature4::Lite->new(
+  access_key => 'AKIDEXAMPLE',
+  secret_key => 'SECRET',
+  region     => 'us-east-1',
+  service    => 's3',
+);
+
+########################################################################
+subtest 'precomputed payload hash' => sub {
+########################################################################
+
+  my $payload = 'Hello World';
+
+  my $payload_hash = sha256_hex($payload);
+
+  my %args = (
+    method  => 'PUT',
+    url     => 'https://s3.amazonaws.com/test-bucket/test-key',
+    headers => { 'Content-Type' => 'text/plain', },
+    time    => 1_700_000_000,
+  );
+
+  my $from_payload = $signer->sign( %args, payload => $payload, );
+
+  my $from_hash = $signer->sign( %args, payload_hash => $payload_hash, );
+
+  is( $from_hash->{'x-amz-content-sha256'}, $payload_hash, 'precomputed payload hash used for x-amz-content-sha256', );
+
+  is( $from_hash->{Authorization}, $from_payload->{Authorization}, 'precomputed hash produces same signature as payload', );
+
+  is_deeply( $from_hash, $from_payload, 'precomputed hash produces identical signed headers', );
+
+  return;
+};
+
+########################################################################
+subtest 'payload_hash takes precedence over payload' => sub {
+########################################################################
+
+  my $payload_hash = sha256_hex('actual streamed content');
+
+  my $signed = $signer->sign(
+    method       => 'PUT',
+    url          => 'https://s3.amazonaws.com/test-bucket/test-key',
+    payload      => 'this value must not be hashed',
+    payload_hash => $payload_hash,
+    time         => 1_700_000_000,
+  );
+
+  is( $signed->{'x-amz-content-sha256'}, $payload_hash, 'payload_hash takes precedence over payload', );
+
+  return;
+};
+
 done_testing;
+
+1;

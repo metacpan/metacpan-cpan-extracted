@@ -355,6 +355,20 @@ sub locationRulesInit {
                 next;
             }
 
+            # The path of the URL is tested against its canonical form
+            # (decoded and normalized), so percent-encoded characters can't
+            # match any more there. The query string is left untouched, so
+            # only look at the part before the '?' of the rule, which is
+            # escaped since rules are regular expressions (see canonicalUri())
+            my $rulePath = $url;
+            $rulePath =~ s/\\\?.*$//s;
+            if ( $rulePath =~ /%[0-9A-Fa-f]{2}/ ) {
+                $class->logger->warn(
+                        "Rule '$url' of virtual host $vhost contains "
+                      . "percent-encoded characters in its path: it can't "
+                      . "match, rules are tested against the decoded URL" );
+            }
+
             if ( $url eq 'default' ) {
                 $class->tsv->{defaultCondition}->{$vhost}  = $cond;
                 $class->tsv->{defaultProtection}->{$vhost} = $prot;

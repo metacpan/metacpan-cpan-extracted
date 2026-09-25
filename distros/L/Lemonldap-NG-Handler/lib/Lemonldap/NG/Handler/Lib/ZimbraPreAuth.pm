@@ -23,7 +23,7 @@ sub run {
     return $ret unless ( $ret == $class->OK );
 
     # Get current URI
-    my $uri = $req->{env}->{REQUEST_URI};
+    my $uri = $req->access_control_uri;
 
     # Get Zimbra parameters
     my $localConfig      = $class->localConfig;

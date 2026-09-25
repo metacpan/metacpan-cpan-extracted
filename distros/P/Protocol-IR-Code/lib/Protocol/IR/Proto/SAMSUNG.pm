@@ -2,13 +2,13 @@ package Protocol::IR::Proto::SAMSUNG;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 use Protocol::IR::Code;
 
 # Timing and bit ordering follow IRremoteESP8266 (Copyright David Conran et al.,
 # GPLv2, https://github.com/crankyoldgit/IRremoteESP8266):
-#   kSamsungHdrMark/Space = 8 * 560us, kSamsungBitMark = 560us,
-#   kSamsungOneSpace = 3 * 560us, kSamsungZeroSpace = 560us, 32 bits.
+#   kSamsungHdrMark/Space = 8 * 560 µs, kSamsungBitMark = 560 µs,
+#   kSamsungOneSpace = 3 * 560 µs, kSamsungZeroSpace = 560 µs, 32 bits.
 # The 32-bit value is transmitted with the most significant byte first and
 # each byte LSB-first within, so the value collected from a capture (and
 # stored in ->data) matches Tasmota's DataLSB field. The customer (address)
@@ -102,7 +102,7 @@ sub decode_timing {
 
     my ($hdr_mark, $hdr_space) = @{$burst_pairs->[0]};
 
-    # SAMSUNG Header Check: ~4500us mark, ~4500us space
+    # SAMSUNG Header Check: ~4500 µs mark, ~4500 µs space
     return undef unless ($hdr_mark >= 3800 && $hdr_mark <= 5200) &&
                         ($hdr_space >= 3800 && $hdr_space <= 5200);
 
@@ -110,7 +110,7 @@ sub decode_timing {
     for my $i (0 .. 31) {
         my $space = $burst_pairs->[$i + 1]->[1];
 
-        # Space ~1680us = 1, ~560us = 0
+        # Space ~1680 µs = 1, ~560 µs = 0
         my $bit = ($space > 1000) ? 1 : 0;
         my $byte_idx = int($i / 8);
         my $bit_idx  = $i % 8; # LSB-first
@@ -127,7 +127,7 @@ sub decode_timing {
     # its one's complement, so the frame bytes read back as addr, addr, cmd,
     # ~cmd. Enforce that structure (matching IRremoteESP8266's strict
     # decodeSAMSUNG compliance checks) so half-header NECx frames, which
-    # share the 4480/4480 us header and per-byte LSB-first bit timing but
+    # share the 4480/4480 µs header and per-byte LSB-first bit timing but
     # carry a real subaddress byte instead of a repeated address, are not
     # mislabelled as SAMSUNG. The reference decoder reports those as UNKNOWN.
     return undef unless $bytes[0] == $bytes[1] &&
@@ -215,13 +215,15 @@ sub to_pronto {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Proto::SAMSUNG - SAMSUNG protocol handler (32-bit)
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -246,14 +248,14 @@ C<Data> field). The customer and command bytes are bit-reversed on the wire
 relative to their logical values. SAMSUNG has no subaddress;
 C<subaddress> is set to C<-1>.
 
-Frame timing: B<4480 us> header mark and B<4480 us> header space; each bit
-is a B<560 us> mark followed by a space of B<560 us> for 0 or B<1680 us>
-for 1; a B<560 us> stop mark ends the frame.
+Frame timing: B<4480 µs> header mark and B<4480 µs> header space; each bit
+is a B<560 µs> mark followed by a space of B<560 µs> for 0 or B<1680 µs>
+for 1; a B<560 µs> stop mark ends the frame.
 
 Timing and bit ordering follow IRremoteESP8266 (David Conran et al., GPLv2,
 L<https://github.com/crankyoldgit/IRremoteESP8266>): C<kSamsungHdrMark>/
-C<kSamsungHdrSpace> = 8 * 560 us, C<kSamsungBitMark> = 560 us,
-C<kSamsungOneSpace> = 3 * 560 us, C<kSamsungZeroSpace> = 560 us, 32 bits.
+C<kSamsungHdrSpace> = 8 * 560 µs, C<kSamsungBitMark> = 560 µs,
+C<kSamsungOneSpace> = 3 * 560 µs, C<kSamsungZeroSpace> = 560 µs, 32 bits.
 
 =head1 METHODS
 
@@ -327,7 +329,7 @@ available for direct use when building IRDB lookup tables.
 =head1 CROSS-PROTOCOL MAPPING
 
 The SAMSUNG protocol shares identical timing with L<Protocol::IR::Proto::NECX2>:
-both use a B<4500/4500 us> half header, B<560/1680 us> bit timing, 32 bits,
+both use a B<4500/4500 µs> half header, B<560/1680 µs> bit timing, 32 bits,
 per-byte LSB-first.  The two protocols differ only in field naming:
 
 =over 4

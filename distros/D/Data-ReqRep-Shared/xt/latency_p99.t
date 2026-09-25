@@ -3,9 +3,6 @@ use warnings;
 use Test::More;
 use Time::HiRes qw(time);
 
-# p99/p50 latency guard: catches tail-latency regressions from
-# futex-wake storms, lock-convoy patterns, or accidental serialization.
-
 use Data::ReqRep::Shared;
 
 plan tests => 4;
@@ -28,7 +25,6 @@ if (!$server) {
     exit 0;
 }
 
-# Client: measure roundtrip for each call
 my $c = Data::ReqRep::Shared::Client->new_from_fd($rr->memfd);
 
 my @latencies;

@@ -59,6 +59,36 @@ subtest 'spec errors fail loudly' => sub {
 	like dies { buildSpec(options => { verbose => { type => '!', multiple => 1 } }) },
 		qr/multiple requires a value-taking type/, 'multiple on a bool';
 
+	like dies { buildSpec(options => { verbose => { type => '!', hash => 1 } }) },
+		qr/hash requires a value-taking type/, 'hash on a bool';
+
+	like dies { buildSpec(options => { define => { type => 's', multiple => 1, hash => 1 } }) },
+		qr/multiple and hash are mutually exclusive/, 'multiple plus hash';
+
+	like dies { buildSpec(options => { tag => { type => 's', csv => 1 } }) },
+		qr/option 'tag': csv requires multiple/, 'csv without multiple';
+
+	like dies { buildSpec(options => { define => { type => 's', hash => 1, default => ['a'] } }) },
+		qr/option 'define': default value: expected a mapping of keys to values/, 'list default for a hash option';
+
+	like dies { buildSpec(options => { verbose => { type => '+', objectlist => 1 } }) },
+		qr/objectlist requires a value-taking type/, 'objectlist on a counter';
+
+	like dies { buildSpec(options => { server => { type => 's', hash => 1, objectlist => 1 } }) },
+		qr/hash and objectlist are mutually exclusive/, 'hash plus objectlist';
+
+	like dies { buildSpec(options => { server => { type => 's', objectlist => 1, default => { host => 'a' } } }) },
+		qr/option 'server': default value: expected a list of mappings/, 'mapping default for an objectlist option';
+
+	like dies { buildSpec(options => { server => { type => 'i', objectlist => 1, default => [{ port => 80 }, 'b'] } }) },
+		qr/option 'server': default value: entry 1: expected a mapping of keys to values/, 'objectlist default entries must be mappings';
+
+	like dies { buildSpec(options => { tag => { type => 's', multiple => 1, default => 'a' } }) },
+		qr/option 'tag': default value: expected a list of values/, 'scalar default for a multiple option';
+
+	like dies { buildSpec(options => { define => { type => 'i', hash => 1, default => { os => 'linux' } } }) },
+		qr/option 'define': default value: key 'os': 'linux' is not an integer/, 'hash default values validated';
+
 	like dies { buildSpec(options => { help => { type => 's' } }) },
 		qr/reader 'help' collides/, 'reserved reader';
 
@@ -97,6 +127,12 @@ subtest 'spec errors fail loudly' => sub {
 
 	like dies { buildSpec(options => { owner => { type => 's', valid => 'nope' } }) },
 		qr/valid must be an array or code reference/, 'invalid valid';
+
+	like dies { buildSpec(options => { owner => { type => 's', typehint => '' } }) },
+		qr/option 'owner': typehint must be a non-empty string/, 'empty typehint';
+
+	like dies { buildSpec(args => [{ short => 'source', typehint => ['x'] }]) },
+		qr/arg 'source': typehint must be a non-empty string/, 'non-string typehint on an arg';
 
 	like dies { buildSpec(typo => 1) },
 		qr/spec: unknown key\(s\): typo/, 'unknown top-level key';

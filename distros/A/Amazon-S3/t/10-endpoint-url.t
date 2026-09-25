@@ -55,6 +55,31 @@ subtest 'default host' => sub {
   is( $s3->host, 's3.us-east-1.amazonaws.com', 'default host' );
 };
 
+########################################################################
+subtest 'host as url' => sub {
+########################################################################
+  my %options = (
+    aws_access_key_id     => 'test',
+    aws_secret_access_key => 'test',
+    host                  => 'http://localhost:4566',
+  );
+
+  my $s3 = eval { Amazon::S3->new(%options); };
+
+  is( $s3->host, 'localhost:4566', 'host portion' );
+  ok( !$s3->secure, 'protocol portion' );
+
+  $options{host} = 'https://s3.amazonaws.com';
+
+  $s3 = eval { Amazon::S3->new(%options); };
+  is( $s3->host, 's3.us-east-1.amazonaws.com', 'host portion' );
+  ok( $s3->secure, 'protocol portion' );
+
+  $s3 = eval { Amazon::S3->new( %options, region => 'us-west-2' ); };
+  is( $s3->host, 's3.us-west-2.amazonaws.com', 'host portion' );
+  ok( $s3->secure, 'protocol portion' );
+};
+
 done_testing;
 
 1;

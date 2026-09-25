@@ -1,0 +1,11 @@
+# golden: toolkit/leap-15.6
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+can_run: nvidia-ctk
+run: uname -m
+run: rpm --import https://nvidia.github.io/libnvidia-container/gpgkey 2>/dev/null
+run: ZYPP_LOCK_TIMEOUT=120 zypper rr nvidia-container-toolkit 2>/dev/null || true
+run: ZYPP_LOCK_TIMEOUT=120 zypper addrepo --refresh https://nvidia.github.io/libnvidia-container/stable/rpm/x86_64 nvidia-container-toolkit 2>&1
+run: ZYPP_LOCK_TIMEOUT=120 zypper --gpg-auto-import-keys refresh nvidia-container-toolkit 2>&1
+run: ZYPP_LOCK_TIMEOUT=120 zypper install -y nvidia-container-toolkit
+run: rpm -q nvidia-container-toolkit 2>&1

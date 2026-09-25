@@ -9,9 +9,9 @@ use POSIX qw(strftime);
 use URI::Escape qw(uri_escape_utf8 uri_unescape);
 use Data::Dumper;
 
-our $VERSION   = '1.0.4';
-our $GIT_SHA   = '92054eb3c4551c39ca745ea06442f8fe01469900';
-our $GIT_DIRTY = '92054eb3c4551c39ca745ea06442f8fe01469900';
+our $VERSION   = '1.0.6';
+our $GIT_SHA   = '7e3c11129f8deca2d6b9b720993914cc7b9ad559';
+our $GIT_DIRTY = '7e3c11129f8deca2d6b9b720993914cc7b9ad559';
 
 my @SERVICE_URL_PATTERNS = (
   qr/(s3)[.]amazonaws[.]com\z/xsm,
@@ -31,12 +31,17 @@ sub new {
   die "secret_key is required\n" if !$args{secret_key};
   die "region is required\n"     if !$args{region};
 
+  my $service = $args{service} // 's3';
+
+  my $disable_double_encoding = exists $args{disable_double_encoding} ? $args{disable_double_encoding} : $service eq 's3';
+
   return bless {
-    access_key    => $args{access_key},
-    secret_key    => $args{secret_key},
-    session_token => $args{session_token},
-    region        => $args{region},
-    service       => $args{service} // 's3',
+    access_key              => $args{access_key},
+    secret_key              => $args{secret_key},
+    session_token           => $args{session_token},
+    region                  => $args{region},
+    service                 => $args{service} // 's3',
+    disable_double_encoding => $disable_double_encoding,
   }, $class;
 }
 
@@ -68,10 +73,12 @@ sub sign {
 ########################################################################
   my ( $self, %args ) = @_;
 
-  my $method            = uc( $args{method} // 'GET' );
-  my $url               = $args{url} or die "url is required\n";
-  my $headers           = $args{headers}           // {};
-  my $payload           = $args{payload}           // q{};
+  my $method       = uc( $args{method} // 'GET' );
+  my $url          = $args{url} or die "url is required\n";
+  my $headers      = $args{headers} // {};
+  my $payload      = $args{payload} // q{};
+  my $payload_hash = $args{payload_hash};
+
   my $add_sha256_header = $args{add_sha256_header} // 1;
 
   # parse url into components
@@ -86,7 +93,7 @@ sub sign {
   my ($date)   = $datetime =~ /\A(\d{8})/xsm;
 
   # payload hash
-  my $payload_hash = sha256_hex( ref $payload ? ${$payload} : $payload );
+  $payload_hash //= sha256_hex( ref $payload ? ${$payload} : $payload );
 
   # canonical headers - must include host and x-amz-date at minimum
   my %sign_headers = (
@@ -123,8 +130,7 @@ sub sign {
   # other services we apply the second encoding via _encode_path.
   # Re-encoding an already-encoded S3 key (e.g. %23 -> %2523) is what
   # produces SignatureDoesNotMatch on keys with reserved characters.
-  my $canon_path
-    = ( $self->{service} eq 's3' ) ? $path : _encode_path($path);
+  my $canon_path = $self->{disable_double_encoding} ? $path : _encode_path($path);
 
   my $canon_request = join "\n", $method, $canon_path, $canon_query, $canon_headers, $signed_headers, $payload_hash;
 
@@ -192,12 +198,26 @@ Amazon::Signature4::Lite - Lightweight AWS Signature Version 4 signing
   # Authorization, x-amz-date, x-amz-content-sha256,
   # x-amz-security-token (if session_token provided), host
 
+  # For streamed content, supply a precomputed SHA-256 hash instead of #
+  # passing the complete payload to the signer.
+
+  my $signed = $signer->sign(
+    method       => 'PUT',
+    url          => 'https://s3.amazonaws.com/my-bucket/my-key',
+    headers      => { 'Content-Type' => 'application/octet-stream', 'Content-Length' => $content_length, },
+    payload_hash => $payload_hash,
+  );
+
 =head1 DESCRIPTION
 
 A minimal, dependency-free AWS Signature Version 4 implementation for
 signing S3 and other AWS API requests. Unlike L<AWS::Signature4>, this
 module does not depend on L<LWP> or L<HTTP::Request> - it works
 directly with the plain scalars and hashrefs that L<HTTP::Tiny> uses.
+
+For large or streamed request bodies, callers may provide a precomputed
+SHA-256 payload hash, allowing the request to be signed without holding
+the complete payload in memory.
 
 =head1 METHODS
 
@@ -218,13 +238,78 @@ Optional: C<session_token> (for temporary credentials), C<service>
   my $headers = $signer->sign(
     method  => 'GET',
     url     => $url,
-    headers => \%extra_headers,
+    headers => %extra_headers,
     payload => $body,
   );
 
-Returns a hashref of HTTP headers including C<Authorization>,
-C<x-amz-date>, C<x-amz-content-sha256>, and C<host>. Merge these
-into your L<HTTP::Tiny> request headers.
+Signs an AWS request and returns a hash reference containing the HTTP
+headers required for the request.
+
+Arguments:
+
+=over 4
+
+=item method
+
+HTTP request method. Defaults to C<GET>.
+
+=item url
+
+The complete request URL. Required.
+
+=item headers
+
+Optional hash reference containing additional request headers to include
+in the signature.
+
+=item payload
+
+The request body. The SHA-256 hash used in the canonical request is
+calculated from this value.
+
+If neither C<payload> nor C<payload_hash> is supplied, the payload is
+treated as an empty string.
+
+=item payload_hash
+
+An optional precomputed SHA-256 hash of the request body.
+
+When supplied, C<payload_hash> is used directly in the canonical request
+and, by default, as the value of the C<x-amz-content-sha256> header. The
+C<payload> value is not hashed.
+
+This is useful when the request body will be streamed and holding the
+complete payload in memory solely for signing would be undesirable. The
+caller is responsible for ensuring that C<payload_hash> corresponds
+exactly to the content that will be transmitted.
+
+my $headers = $signer->sign(
+method       => 'PUT',
+url          => $url,
+headers      => %extra_headers,
+payload_hash => $sha256,
+);
+
+=item add_sha256_header
+
+Controls whether C<x-amz-content-sha256> is included in the returned
+headers. Defaults to true.
+
+=item time
+
+Optional Unix timestamp used when generating the signing timestamp.
+When omitted, the current time is used. This is primarily useful for
+testing or applications that need to control the signing time.
+
+=back
+
+The returned hash reference includes C<Authorization>, C<x-amz-date>,
+C<host>, and, by default, C<x-amz-content-sha256>. It also includes
+C<x-amz-security-token> when the signer was constructed with a session
+token.
+
+The returned hash reference can be passed directly as the headers for an
+L<HTTP::Tiny> request.
 
 =head2 parse_service_url(%args)
 

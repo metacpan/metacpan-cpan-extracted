@@ -1,12 +1,11 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.5.6
+## Version v0.6.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2026/07/06
+## Modified 2026/09/25
 ## All rights reserved
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -121,7 +120,7 @@ EOT
         lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
         'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.5.6';
+    our $VERSION = 'v0.6.1';
 };
 
 # use strict;
@@ -173,7 +172,7 @@ sub attach
     my $addr = $self->addr;
     return( $addr ) if( defined( $addr ) );
     my $id = $self->id;
-    return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !length( $id ) );
+    return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !defined( $id ) );
     $addr = shmat( $id, undef(), $flags );
     return( $self->error( "Unable to attach to shared memory: $!" ) ) if( !defined( $addr ) );
     $self->addr( $addr );
@@ -242,10 +241,12 @@ sub exists
         $serial = $self->serial;
         # $serial = $self->key;
     }
-    my $flags = $self->flags({ mode => 0644 });
-    # Remove the create bit
+    my $flags = $self->flags({
+        create    => 0,
+        exclusive => 0,
+        mode      => 0644,
+    });
     no strict 'subs';
-    $flags = ( $flags ^ &IPC::SysV::IPC_CREAT );
     my $semid;
     # try-catch
     local $@;
@@ -268,7 +269,7 @@ sub exists
     {
         # warn( "Trying to access shared memory triggered error: $e" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
         my $arg = 0;
-        if( $semid )
+        if( defined( $semid ) )
         {
             # try-catch
             local $@;
@@ -300,7 +301,7 @@ sub flags
     my $flags  = 0;
     $flags    |= &IPC::SysV::IPC_CREAT if( $opts->{create} );
     $flags    |= &IPC::SysV::IPC_EXCL  if( $opts->{exclusive} );
-    $flags    |= ( $opts->{mode} || 0666 );
+    $flags    |= ( defined( $opts->{mode} ) ? $opts->{mode} : 0666 );
     return( $flags );
 }
 
@@ -383,7 +384,7 @@ sub op
     return( $self->error( "No argument was provided!" ) ) if( !scalar( @_ ) );
     return( $self->error( "Invalid number of argument: '", join( ', ', @_ ), "'." ) ) if( @_ % 3 );
     my $id = $self->semid;
-    return( $self->error( "No semaphore set yet. You must open the shared memory first to set the semaphore." ) ) if( !length( $id ) );
+    return( $self->error( "No semaphore set yet. You must open the shared memory first to set the semaphore." ) ) if( !defined( $id ) );
     my $data = pack( "s$N*", @_ );
     my $rv;
     no strict 'subs';
@@ -419,33 +420,57 @@ sub open
     $opts->{key} //= $self->key // '';
     $opts->{semid} //= undef;
     no strict 'subs';
-    my $serial;
-    if( length( $opts->{key} ) )
+
+    my $create;
+    if( $opts->{mode} eq 'w' )
     {
-        my $key_val = $self->_verify_key( $opts->{key} ) ||
-            return( $self->pass_error );
-        $serial = $self->_str2key( $key_val ) || 
-            return( $self->error( "Cannot get serial from key '", ( $self->_is_array( $key_val ) ? join( "', '", @$key_val ) : $key_val ), "': ", $self->error ) );
+        $create = 1;
     }
-    else
-    {
-        $serial = $self->serial;
-    }
-    die( "There is no serial!!\n" ) if( !CORE::length( $serial ) );
-    my $create = 0;
-    if( $opts->{mode} eq 'w' || $opts->{key} =~ s/^>// )
-    {
-        $create++;
-    }
-    elsif( $opts->{mode} eq 'r' || $opts->{key} =~ s/^<// )
+    elsif( $opts->{mode} eq 'r' )
     {
         $create = 0;
+    }
+    elsif( !ref( $opts->{key} ) || $self->_can_overload( $opts->{key} => '""' ) )
+    {
+        my $key = "$opts->{key}";
+        if( $key =~ s/^>// )
+        {
+            $opts->{key} = $key;
+            $create = 1;
+        }
+        elsif( $key =~ s/^<// )
+        {
+            $opts->{key} = $key;
+            $create = 0;
+        }
+        else
+        {
+            $create = $self->create;
+        }
     }
     else
     {
         $create = $self->create;
     }
-    my $flags = $self->flags( create => $create, ( $opts->{mode} =~ /^\d+$/ ? $opts->{mode} : () ) );
+
+    my $serial;
+    if( length( $opts->{key} ) )
+    {
+        my $key_val = $self->_verify_key( $opts->{key} ) ||
+            return( $self->pass_error );
+        $serial = $self->_str2key( $key_val );
+        return( $self->error( "Cannot get serial from key '", ( $self->_is_array( $key_val ) ? join( "', '", @$key_val ) : $key_val ), "': ", $self->error ) ) if( !defined( $serial ) );
+    }
+    else
+    {
+        $serial = $self->serial;
+    }
+    return( $self->error( "There is no serial." ) ) if( !defined( $serial ) || !CORE::length( "$serial" ) );
+
+    my $flags = $self->flags(
+        create => $create,
+        ( $opts->{mode} =~ /^\d+$/ ? ( mode => $opts->{mode} ) : () ),
+    );
 
     my $id;
     # try-catch
@@ -453,23 +478,7 @@ sub open
     eval
     {
         $id = shmget( $serial, $opts->{size}, $flags );
-        if( defined( $id ) )
-        {
-            # All is ok.
-        }
-        else
-        {
-            my $newflags = ( $flags & &IPC::SysV::IPC_CREAT ) ? $flags : ( $flags | &IPC::SysV::IPC_CREAT );
-            my $limit = ( $serial + 10 );
-            while( $serial <= $limit )
-            {
-                $id = shmget( $serial, $opts->{size}, $newflags | &IPC::SysV::IPC_CREAT );
-                $serial++;
-                last if( defined( $id ) );
-            }
-        }
     };
-
     if( $@ )
     {
         if( $@ =~ /shmget[[:blank:]\h]+not[[:blank:]\h]+implemented/i )
@@ -484,7 +493,7 @@ sub open
 
     if( !defined( $id ) )
     {
-        return( $self->error( "Unable to create shared memory id with key \"$serial\" and flags \"$flags\": $!" ) );
+        return( $self->error( "Unable to ", ( $create ? 'create or open' : 'open' ), " shared memory id with key \"$serial\", size \"$opts->{size}\" and flags \"$flags\": $!" ) );
     }
     $self->serial( $serial );
 
@@ -495,17 +504,14 @@ sub open
     {
         my $serial2semid_repo = Module::Generic::Global->new( 'serial2semid' => CORE::ref( $self ), key => $serial );
         my $serial2semid = $serial2semid_repo->get;
-        # The user passed it explicitly
         if( defined( $opts->{semid} ) )
         {
             $semid = $opts->{semid};
         }
-        # We are called on a shared memory object that has already been opened, so we get the semaphore ID from it.
-        elsif( !$create && ( my $semaphore_id = $self->semid ) )
+        elsif( !$create && defined( my $semaphore_id = $self->semid ) )
         {
             $semid = $semaphore_id;
         }
-        # The semaphore ID is stored in the global shared hash
         elsif( !$create && defined( $serial2semid ) )
         {
             $semid = $serial2semid;
@@ -548,15 +554,14 @@ sub open
         mode    => $self->mode,
         destroy => $self->destroy,
         destroy_semaphore => $self->destroy_semaphore,
+        exclusive => $self->exclusive,
         _packing_method => $self->_packing_method,
+        ( defined( $self->{base64} ) ? ( base64 => $self->{base64} ) : () ),
     ) || return( $self->error( "Cannot create object with key '", ( $self->_is_array( $opts->{key} ) ? join( "', '", @{$opts->{key}} ) : $opts->{key} ), "': ", $self->error ) );
-    # $new->key( $self->key );
     $new->serial( $serial );
     $new->id( $id );
     $new->semid( $semid );
 
-    # Array to maintain the order in which shared memory object were created, so they can
-    # be removed in that order
     my $shem_repo = Module::Generic::Global->new( 'shem_repo' => CORE::ref( $self ), key => CORE::ref( $self ) );
     my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => CORE::ref( $self ), key => $id );
     $shem_repo->lock;
@@ -578,7 +583,6 @@ sub open
     $new->size( $opts->{size} );
     if( $there == SHM_EXISTS )
     {
-        # Binding to existing segment
     }
     else
     {
@@ -596,8 +600,8 @@ sub pid
 {
     my $self = shift( @_ );
     my $sem  = shift( @_ );
-    my $semid = $self->semid ||
-        return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) );
+    my $semid = $self->semid;
+    return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) ) if( !defined( $semid ) );
     no strict 'subs';
     my $arg = 0;
     # try-catch
@@ -746,9 +750,9 @@ sub remove
     my $self = shift( @_ );
     return(1) if( $self->removed );
     my $id   = $self->id();
-    return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !length( $id // '' ) );
+    return( $self->error( "No shared memory id! Have you opened it first?" ) ) if( !defined( $id ) );
     my $semid = $self->semid;
-    return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid // '' ) );
+    return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) ) if( !defined( $semid ) );
     $self->unlock();
     no strict 'subs';
     # Remove share memory segment
@@ -806,9 +810,10 @@ sub remove_semaphore
 {
     my $self = shift( @_ );
     return(1) if( $self->removed_semaphore );
-    my $id   = shift( @_ ) || $self->id || return( $self->error( "No shared memory id provided nor found." ) );
-    my $semid = shift( @_ ) || $self->semid;
-    return( $self->error( "No semaphore id provided nor found for shared memory id '$id'. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid // '' ) );
+    my $id = @_ ? shift( @_ ) : $self->id;
+    return( $self->error( "No shared memory id provided nor found." ) ) if( !defined( $id ) );
+    my $semid = @_ ? shift( @_ ) : $self->semid;
+    return( $self->error( "No semaphore id provided nor found for shared memory id '$id'. You must open the shared memory first to remove semaphore." ) ) if( !defined( $semid ) );
     my $serial = $self->serial;
     my $serial2semid_repo = Module::Generic::Global->new( 'serial2semid' => CORE::ref( $self ), key => $serial );
     $serial2semid_repo->lock;
@@ -908,7 +913,8 @@ sub shmstat
 {
     my $self = shift( @_ );
     my $data = '';
-    my $id = $self->id || return( $self->error( "No shared memory id set!" ) );
+    my $id = $self->id;
+    return( $self->error( "No shared memory id set!" ) ) if( !defined( $id ) );
     no strict 'subs';
     shmctl( $id, &IPC::SysV::IPC_STAT, $data ) or
         return( $self->error( "Unable to stat shared memory with id '$id': $!" ) );
@@ -921,7 +927,7 @@ sub stat
 {
     my $self = shift( @_ );
     my $id   = $self->semid;
-    return( $self->error( "No semaphore set yet. You must open the shared memory first to set the semaphore." ) ) if( !length( $id // '' ) );
+    return( $self->error( "No semaphore set yet. You must open the shared memory first to set the semaphore." ) ) if( !defined( $id ) );
     no strict 'subs';
     if( @_ )
     {
@@ -996,7 +1002,7 @@ sub unlock
     my $self = shift( @_ );
     return(1) if( !$self->locked );
     my $semid = $self->semid;
-    return( $self->error( "No semaphore set yet. You must open the shared memory first to unlock semaphore." ) ) if( !length( $semid ) );
+    return( $self->error( "No semaphore set yet. You must open the shared memory first to unlock semaphore." ) ) if( !defined( $semid ) );
     my $type = ( $self->locked | LOCK_UN );
     $type ^= LOCK_NB if( $type & LOCK_NB );
     if( !defined( $self->op( @{$SEMOP_ARGS->{ $type }} ) ) )
@@ -1019,7 +1025,8 @@ sub write
     {
         $data = \join( '', @_ );
     }
-    my $id   = $self->id();
+    my $id = $self->id();
+    return( $self->error( "No shared memory id set yet. You must open the shared memory first to write." ) ) if( !defined( $id ) );
     my $size = int( $self->size() ) || SHM_BUFSIZ;
     # my @callinfo = caller;
     my $packing = $self->_packing_method;
@@ -1267,29 +1274,35 @@ sub _str2key
     {
         return( &IPC::SysV::IPC_PRIVATE );
     }
+
     my $path;
     ( $key, $path ) = ref( $key ) eq 'ARRAY' ? @$key : ( $key, [getpwuid($>)]->[7] );
-    $path = [getpwuid($path)]->[7] if( $path =~ /^\d+$/ );
+    if( defined( $path ) && $path =~ /^\d+$/ )
+    {
+        $path = [getpwuid($path)]->[7];
+    }
     $path ||= File::Spec->rootdir();
+
     if( $key =~ /^\d+$/ )
     {
-        my $id = &IPC::SysV::ftok( $path, $key ) ||
-            return( $self->error( "Unable to get a key using IPC::SysV::ftok: $!" ) );
+        my $id = &IPC::SysV::ftok( $path, $key );
+        return( $self->error( "Unable to get a key using IPC::SysV::ftok: $!" ) ) if( !defined( $id ) );
         return( $id );
     }
-    else
-    {
-        # my $id = 0;
-        # $id += $_ for( unpack( "C*", $key ) );
-        $self->_load_class( 'Digest::SHA' ) || return( $self->pass_error );
-        my $hash = Digest::SHA::sha1_base64( $key );
-        my $id = ord( substr( $hash, 0, 1 ) );
-        # We use the root as a reliable and stable path.
-        # I initially though about using __FILE__, but during testing this would be in ./blib/lib and beside one user might use a version of this module somewhere while the one used under Apache/mod_perl2 could be somewhere else and this would render the generation of the IPC key unreliable and unrepeatable
-        # my $val = &IPC::SysV::ftok( File::Spec->rootdir(), $id );
-        my $val = &IPC::SysV::ftok( $path, $id );
-        return( $val );
-    }
+
+    $self->_load_class( 'Digest::SHA' ) || return( $self->pass_error );
+
+    # ftok() only retains a very small project-id space. Deriving the project
+    # id from a single byte of a digest therefore creates a high collision
+    # probability for arbitrary string keys. For string keys, derive a stable
+    # positive 31-bit SysV key directly from the path and key instead.
+    my $seed = join( "\0", $path, $key );
+    my $hash = Digest::SHA::sha1( $seed );
+    my $val = unpack( 'N', substr( $hash, 0, 4 ) ) & 0x7fffffff;
+
+    # Reserve zero for IPC_PRIVATE semantics.
+    $val = 1 if( !$val );
+    return( $val );
 }
 
 sub _verify_key
@@ -1325,37 +1338,43 @@ sub DESTROY
     CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
-    CORE::return unless( $self->{id} );
+    CORE::return if( !CORE::defined( $self->{id} ) );
 
     # For non-object context, we need to call cleanup to ensure there is no leftover
     my $class  = CORE::ref( $self );
     my $serial = $self->serial;
-    if( $serial )
+    if( defined( $serial ) && CORE::length( "$serial" ) )
     {
         my $serial2semid_repo = Module::Generic::Global->new( 'serial2semid' => $class, key => $serial );
         $serial2semid_repo->cleanup;
     }
+
     my $shem_repo = Module::Generic::Global->new( 'shem_repo' => $class, key => $class );
     $shem_repo->cleanup;
-    if( $self->{id} )
+
+    if( CORE::defined( $self->{id} ) )
     {
         my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => $class, key => $self->{id} );
         $id2obj_repo->cleanup;
     }
 
-    $self->unlock;
+    $self->unlock if( $self->locked );
     $self->detach;
-    my $rv = $self->remove_semaphore;
+
+    if( $self->destroy_semaphore )
+    {
+        $self->remove_semaphore;
+    }
+
     if( $self->destroy )
     {
         my $stat = $self->shmstat();
-        # number of processes attached to the associated shared memory segment.
         if( defined( $stat ) && ( $stat->nattch() == 0 ) )
         {
             $self->remove;
         }
     }
-};
+}
 
 sub FREEZE
 {

@@ -7,7 +7,7 @@ use experimental 'signatures';
 
 use Exporter qw(import);
 
-our $VERSION   = '0.02';
+our $VERSION   = '0.03';
 our @EXPORT_OK = qw(camelize specError expandTilde useColor isValidName);
 
 sub useColor($handle) {

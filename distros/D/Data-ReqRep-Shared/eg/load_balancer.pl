@@ -14,7 +14,6 @@ my $PER_CLIENT = 100;
 my $path = tmpnam();
 my $srv = Data::ReqRep::Shared->new($path, 1024, 128, 4096);
 
-# Fork workers — all compete on the same channel
 my @workers;
 for my $w (1..$NWORKERS) {
     my $pid = fork // die "fork: $!";
@@ -30,7 +29,6 @@ for my $w (1..$NWORKERS) {
     push @workers, $pid;
 }
 
-# Fork clients — all send to the same channel
 my @clients;
 for my $c (1..$NCLIENTS) {
     my $pid = fork // die "fork: $!";

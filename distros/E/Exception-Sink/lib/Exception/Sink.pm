@@ -31,7 +31,7 @@ our @EXPORT_OK   = qw(
                      );
 
 our %EXPORT_TAGS = ( 'none' => [ ] );
-our $VERSION     = '3.10';
+our $VERSION     = '3.11';
 use Exception::Sink::Class;
 use strict;
 
@@ -46,19 +46,29 @@ our $DEBUG_SINK = 0;
 sub sink($)
 {
   my $msg = shift;
+  $msg = '' unless defined $msg;
 
   my $org = $msg;
 
-  my $class = 'UNKNOWN';
+  my $class = 'SINK';
   my $id    = 'UNKNOWN';
 
-  $class = $1 || $2 if $msg =~ s/^([a-z0-9_]+)\s*:\s*|^([a-z0-9_]+)$//i;
-  $id    = $1       if $msg =~ s/^([a-z0-9_]+)\s*:\s*|^([a-z0-9_]+)$//i;
+  $class = uc( $1 || $2 ) if $msg =~ s/^([a-z0-9_]+)\s*:(?!:)\s*|^([a-z0-9_]+)$//i;
+  $id    = uc( $1       ) if $msg =~ s/^([a-z0-9_]+)\s*:(?!:)\s*//i;
 
-  $msg =~ s/\s+at\s+\/\S+.+$//;
+  # strip perl die() location suffix: " at FILE line N." with optional ", <FH> line N."
+  $msg =~ s/\s+at\s+\S+\s+line\s+\d+(?:,\s*<[^>]*>\s+(?:line|chunk)\s+\d+)?\.?\s*$//;
   chomp( $msg );
 
-  my ( $p, $f, $l ) = caller();
+  # origin is the first frame outside this package, so boom() and re-sinks
+  # from dive()/surface() report the user's call site, not Sink.pm
+  my ( $p, $f, $l );
+  my $cl = 0;
+  while( ( $p, $f, $l ) = caller( $cl++ ) )
+    {
+    last if $p ne __PACKAGE__;
+    }
+  ( $p, $f, $l ) = caller() unless defined $p;
   $f =~ s/^(.*\/)([^\/]+)$/$2/;
 
   $class = uc $class;
@@ -86,12 +96,21 @@ sub dive()
 {
   print STDERR "dive: pre: $@\n" if $DEBUG_SINK;
   return 0 unless $@;
-  if( !ref($@) )
+  if( ! UNIVERSAL::isa( $@, 'Exception::Sink::Class' ) )
     {
     print STDERR "dive: non-ship, resink: $@\n" if $DEBUG_SINK;
     # re-sink, non-ship
     my $AT=$@;
-    eval { sink "SINK: $AT"; }
+    if( ref $AT )
+      {
+      # foreign reference: keep its text intact, explicit ID stops parsing
+      eval { sink "SINK: UNKNOWN: $AT"; }
+      }
+    else
+      {
+      eval { sink "SINK: $AT"; }
+      }
+    $@->{ 'OBJ' } = $AT if ref $AT; # original foreign exception
     };
 
   print STDERR "dive: $@->{CLASS}\n" if $DEBUG_SINK;
@@ -110,19 +129,25 @@ sub surface(@)
   print STDERR "surface: enter: $@ -> @_\n" if $DEBUG_SINK;
   return 0 unless $@;
   return 1 unless @_; # catch all
-  if( !ref($@) )
+  if( ! UNIVERSAL::isa( $@, 'Exception::Sink::Class' ) )
     {
     print STDERR "surface: non-ship, resink: $@\n" if $DEBUG_SINK;
     # re-sink, non-ship
     my $AT=$@;
-    if( $AT =~ /^[A-Z0-9_]+\:/ )
+    if( $AT =~ /^[A-Z0-9_]+\s*:(?!:)/i ) # "CLASS: ..." prefix, but not "Pkg::Name=HASH(...)"
       {
       eval { sink $AT; }
+      }
+    elsif( ref $AT )
+      {
+      # foreign reference: keep its text intact, explicit ID stops parsing
+      eval { sink "SINK: UNKNOWN: $AT"; }
       }
     else
       {
       eval { sink "SINK: $AT"; }
       }
+    $@->{ 'OBJ' } = $AT if ref $AT; # original foreign exception
     };
 
   print STDERR "surface: $@->{CLASS} -> @_?\n" if $DEBUG_SINK;
@@ -160,12 +185,13 @@ sub boom_skip($$)
 
 sub boom($)
 {
-  boom_skip($_[0],0);
+  boom_skip($_[0],1);
 }
 
 sub get_stack_trace
 {
-  my $skip = shift;
+  my $skip = shift || 0;
+  $skip = 0 if $skip < 0;
 
   my @st;
   my $i;
@@ -235,8 +261,8 @@ Exception::Sink - general purpose compact exception handling.
     # if we don't want to handle, we can still dive forward:
     dive(); # this is the last handler so diving here will stop the program
     }
-  # only FATAL:EXAMPLE will reach here but will not be reported since simple
-  # hashrefs has no stringification method
+  # only FATAL:EXAMPLE will reach here and will be reported by perl using
+  # the original sink() text, since exception objects stringify to it
 
 =head1 FUNCTIONS
 
@@ -246,15 +272,23 @@ Exception::Sink - general purpose compact exception handling.
 
      "CLASS: ID: description"
      "CLASS: description"
+     "CLASS"
      "description"
 
   exception will have accordingly:
 
      CLASS and ID
-     CLASS only
-     CLASS will be 'SINK'
+     CLASS only, ID will be 'UNKNOWN'
+     CLASS only, empty description
+     CLASS will be 'SINK', ID will be 'UNKNOWN'
 
-  then it will throw (sink/dive) an exception hash ref.
+  CLASS and ID may contain only letters, digits and underscore. CLASS is
+  converted to upper case. a single word with no colon is taken as CLASS,
+  not as description. a trailing perl die() location (" at FILE line N.")
+  is removed from the description but kept in the original text (see
+  EXCEPTION STRUCTURE below).
+
+  then it will throw (sink/dive) an Exception::Sink::Class object.
 
 =head2 surface(@)
 
@@ -297,40 +331,78 @@ Exception::Sink - general purpose compact exception handling.
 
   if you are not sure what this means, just ignore it :)
 
-=head2 get_stack_trace()
+=head2 get_stack_trace( [ $skip ] )
 
-  this is utility function, which returns array with formatted stack trace
-  lines, containing package, function names, file with line number. it can
-  be called at any time, usually for debug purpose. it is not exported by
-  default!
+  this is utility function, which returns list with formatted stack trace
+  lines, containing function names, file with line number. in scalar
+  context it returns the lines joined in a single string. optional $skip
+  argument skips the first N frames of the trace. it can be called at any
+  time, usually for debug purpose. it is not exported by default!
+
+    use Exception::Sink qw( :DEFAULT get_stack_trace );
+    print get_stack_trace();
 
 =head1 EXCEPTION STRUCTURE
 
   Executing this:
 
-  sink "SINK: UNKNWON: here is the text of the exception";
+  sink "SINK: UNKNOWN: here is the text of the exception";
 
-  will create this exception data hash:
+  will create this exception object (Exception::Sink::Class, a blessed hash):
 
   $@ = {
           'CLASS'   => 'SINK',      # exception class, used by surface()
           'ID'      => 'UNKNOWN',   # this is optional error-id
-          'FILE'    => 'Sink.pm',   # file where sink started
-          'LINE'    => 87           # line where sink started
-          'PACKAGE' => 'Sink',      # package where sink started
+          'FILE'    => 'main.pl',   # file where sink started
+          'LINE'    => 87,          # line where sink started
+          'PACKAGE' => 'main',      # package where sink started
           'MSG'     => 'here is the text of the exception',
+          'ORG'     => 'SINK: UNKNOWN: here is the text of the exception',
        };
 
   'CLASS' is used by surface() to filter which exceptions should be handled.
   'ID'    is used only by the exception handling code to figure what exactly
           has happened.
+  'ORG'   is the original, unparsed text given to sink().
+  'OBJ'   exists only when surface()/dive() re-sink a foreign exception
+          reference (any die() with a reference which is not an
+          Exception::Sink::Class object). it holds the original reference.
 
-  The other attributes are for information puproses (debugging).
+  'FILE', 'LINE' and 'PACKAGE' are the user code location which started the
+  exception: the sink()/boom() call, or the dive()/surface() call which
+  re-sunk a die() text or foreign reference.
+
+  Exception objects stringify like die() text: "$@" gives 'ORG' and, if it
+  does not end with a newline, " at FILE line LINE.\n" is appended. this is
+  what an uncaught exception prints. use $@->{ 'ORG' } for the bare text:
+
+    sink "FOO: bar";      # "$@" is "FOO: bar at main.pl line 12.\n"
+    sink "FOO: bar\n";    # "$@" is "FOO: bar\n"
+
+  The other attributes are for information purposes (debugging).
+
+  exception objects are always true in boolean context, even when the
+  message is empty. all other string operations (eq, cmp, sort, hash keys,
+  regex match) use the stringified text described above.
 
 =head1 NOTES
 
   You may freely use die() instead of sink(). The following surface()/dive()
-  will resink into hash reference.
+  will resink into Exception::Sink::Class object. surface() keeps "CLASS: ..."
+  prefix of the die() text as exception class (upper case only), dive()
+  always uses class 'SINK'.
+
+  Exceptions thrown as references by other code (objects of other exception
+  classes, plain hash refs, etc.) are re-sunk the same way. Their text is
+  the stringified reference, class is 'SINK' (or the "CLASS: ..." prefix of
+  the stringification if the object overloads it) and the original reference
+  is kept in 'OBJ':
+
+    eval { Some::Module::call() }; # dies with Some::Error object
+    if( surface 'SINK' )
+      {
+      my $err = $@->{ 'OBJ' }; # the original Some::Error object
+      }
 
   surface() will not dive/sink more if exception did not match class list.
   If you want surface() to handle class or otherwise to continue dive/sink,
@@ -372,9 +444,9 @@ Exception::Sink - general purpose compact exception handling.
 
   Vladi Belperchinov-Shabanski "Cade"
 
-  <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
+  <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
 
-  http://cade.datamax.bg
+  http://cade.noxrun.com/
 
 =cut
 

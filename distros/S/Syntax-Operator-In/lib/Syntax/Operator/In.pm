@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::In 0.10;
+package Syntax::Operator::In 0.11;
 
-use v5.14;
+use v5.20;
 use warnings;
 
 use Carp;
@@ -18,6 +18,8 @@ XSLoader::load( __PACKAGE__, our $VERSION );
 C<Syntax::Operator::In> - infix element-of-list meta-operator
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
 On Perl v5.38 or later:
 

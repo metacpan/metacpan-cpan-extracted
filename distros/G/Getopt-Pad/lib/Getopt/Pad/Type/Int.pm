@@ -6,7 +6,7 @@ use Getopt::Pad::Type::Number;
 class Getopt::Pad::Type::Int :isa(Getopt::Pad::Type::Number) :strict(params) {
 	use constant NAMES => ['i', 'int', 'integer'];
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	method checkFormat($value) {
 		return $value =~ /\A[+-]?[0-9]+\z/ ? undef : sprintf("'%s' is not an integer", $value);

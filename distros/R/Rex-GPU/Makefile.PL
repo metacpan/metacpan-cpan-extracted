@@ -17,12 +17,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014004",
   "NAME" => "Rex::GPU",
   "PREREQ_PM" => {
-    "Rex" => "1.14.0"
+    "Module::Runtime" => 0,
+    "Moo" => 0,
+    "Rex" => "1.14.0",
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
+    "Path::Tiny" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,8 +34,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Module::Runtime" => 0,
+  "Moo" => 0,
+  "Path::Tiny" => 0,
   "Rex" => "1.14.0",
-  "Test::More" => "0.98"
+  "Test::More" => "0.98",
+  "namespace::autoclean" => 0
 );
 
 

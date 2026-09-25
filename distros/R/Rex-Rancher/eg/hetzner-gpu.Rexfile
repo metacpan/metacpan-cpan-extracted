@@ -1,20 +1,20 @@
 # Hetzner bare-metal GPU server → single-node RKE2 cluster
 #
 # Usage:
-#   rex -f eg/hetzner-gpu-rke2.Rexfile -H <IP> deploy
-#   rex -f eg/hetzner-gpu-rke2.Rexfile -H <IP> status
-#   rex -f eg/hetzner-gpu-rke2.Rexfile -H <IP> untaint
-#   rex -f eg/hetzner-gpu-rke2.Rexfile -H <IP> get_token
+#   rex -f eg/hetzner-gpu.Rexfile -H <IP> deploy
+#   rex -f eg/hetzner-gpu.Rexfile -H <IP> status
+#   rex -f eg/hetzner-gpu.Rexfile -H <IP> untaint
+#   rex -f eg/hetzner-gpu.Rexfile -H <IP> gpu
+#   rex -f eg/hetzner-gpu.Rexfile -H <IP> gpu_status
 #
 # Prerequisites:
-#   - Fresh Debian/Ubuntu/openSUSE on Hetzner dedicated server with NVIDIA GPU
+#   - Fresh Debian/Ubuntu on Hetzner dedicated server with NVIDIA GPU (openSUSE/SLES unverified)
 #   - SSH root access (key-based), Rex::LibSSH for SFTP-less hosts
 #   - cpanm Rex::GPU Rex::Rancher (or -Ilib paths for dev)
 #
 # For development (both repos checked out):
-#   rex -f eg/hetzner-gpu-rke2.Rexfile \
-#       -I ../rex-gpu/lib -I lib \
-#       -H <IP> deploy
+#   PERL5LIB=lib:../rex-gpu/lib:$PERL5LIB \
+#     rex -f eg/hetzner-gpu.Rexfile -H <IP> deploy
 
 use Rex -feature => ['1.4'];
 use Rex::LibSSH;
@@ -69,36 +69,9 @@ task "deploy", sub {
 #  Individual steps (for debugging / re-running)
 # ============================================================
 
-desc "Step 1: Prepare node only";
-task "prepare", sub {
-  prepare_node(
-    hostname => $HOSTNAME,
-    domain   => $DOMAIN,
-    timezone => $TIMEZONE,
-  );
-};
-
-desc "Step 2: GPU detect + install (with reboot)";
+desc "GPU detect + install only (with reboot)";
 task "gpu", sub {
   gpu_setup(containerd_config => 'rke2', reboot => 1);
-};
-
-desc "Step 3: RKE2 + Cilium + device plugin (node must be prepared)";
-task "rke2", sub {
-  my $host = connection->server;
-  my $tls  = $ENV{RKE2_TLS_SAN} || $host;
-
-  install_server(
-    distribution    => 'rke2',
-    token           => $TOKEN,
-    tls_san         => $tls,
-    kubeconfig_file => $KUBECONFIG,
-  );
-
-  wait_for_api(kubeconfig => $KUBECONFIG);
-  install_cilium(distribution => 'rke2');
-  deploy_nvidia_device_plugin(kubeconfig => $KUBECONFIG);
-  untaint_node(kubeconfig => $KUBECONFIG);
 };
 
 desc "Untaint control-plane node (allow workload scheduling)";
@@ -107,37 +80,8 @@ task "untaint", sub {
 };
 
 # ============================================================
-#  Post-deploy: registry update
-# ============================================================
-
-desc "Update registries.yaml (after deploying registry into cluster)";
-task "add_registry", sub {
-  my $registry_ip = $ENV{REGISTRY_IP} or die "Set REGISTRY_IP env var\n";
-
-  update_registries(
-    distribution => 'rke2',
-    registries   => {
-      mirrors => {
-        'docker.io' => {
-          endpoint => ["http://$registry_ip:5000"],
-        },
-        'registry.internal' => {
-          endpoint => ["http://$registry_ip:5000"],
-        },
-      },
-    },
-  );
-  say "Registries updated — docker.io and registry.internal → $registry_ip:5000";
-};
-
-# ============================================================
 #  Info / status tasks
 # ============================================================
-
-desc "Get node join token";
-task "get_token", sub {
-  say get_token('rke2');
-};
 
 desc "Check GPU status on the host";
 task "gpu_status", sub {
@@ -150,8 +94,8 @@ task "gpu_status", sub {
   say "\n=== Container toolkit ===";
   say run("nvidia-ctk --version 2>&1", auto_die => 0) || "(not installed)";
 
-  say "\n=== containerd nvidia config ===";
-  say run("cat /etc/containerd/conf.d/99-nvidia.toml 2>/dev/null || echo '(not configured)'", auto_die => 0);
+  say "\n=== containerd nvidia runtime (generated RKE2 config) ===";
+  say run("grep -A3 nvidia /var/lib/rancher/rke2/agent/etc/containerd/config.toml 2>/dev/null || echo '(no nvidia runtime configured)'", auto_die => 0);
 };
 
 desc "Check cluster + GPU status via K8s API (uses local kubeconfig)";
@@ -181,10 +125,30 @@ task "status", sub {
   }
 
   say "\n=== Cilium ===";
-  say run("KUBECONFIG=$KUBECONFIG cilium status --brief 2>/dev/null || echo '(cilium CLI not available)'", auto_die => 0);
+  say run("KUBECONFIG=/etc/rancher/rke2/rke2.yaml cilium status --brief 2>/dev/null || echo '(cilium CLI not available)'", auto_die => 0);
 
   say "\n=== Registries ===";
   say run("cat /etc/rancher/rke2/registries.yaml 2>/dev/null || echo '(not configured)'", auto_die => 0);
+};
+
+# ============================================================
+#  Pre-connect host-key scan (Rex::LibSSH >= 0.004)
+# ============================================================
+#
+# Rex::LibSSH >= 0.004 verifies the server host key against known_hosts
+# (CWE-322 fix); before that it never checked. A freshly-installed Hetzner
+# box has no known_hosts entry, so the FIRST verified connect would die with
+# "host key is not in known_hosts and strict_hostkeycheck is on". This
+# 'before ALL' hook runs on the LOCAL machine BEFORE Rex opens the SSH
+# connection for any task (Rex runs before-hooks ahead of ->connect) and
+# ssh-keyscans the target into known_hosts — which KEEPS host-key
+# verification on, rather than disabling it.
+#
+# It must come after the task definitions: 'before' attaches to tasks that
+# already exist.
+before 'ALL' => sub {
+  my ($server) = @_;
+  rancher_scan_known_hosts($server);
 };
 
 1;

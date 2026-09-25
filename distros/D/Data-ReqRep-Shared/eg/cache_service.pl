@@ -11,7 +11,6 @@ my $srv = Data::ReqRep::Shared->new($path, 256, 32, 8192);
 
 my $pid = fork // die "fork: $!";
 if ($pid == 0) {
-    # Cache server
     my %cache;
     while (my ($req, $id) = $srv->recv_wait(5.0)) {
         my ($op, $key, $val) = split /\t/, $req, 3;
@@ -34,7 +33,6 @@ if ($pid == 0) {
 
 my $cli = Data::ReqRep::Shared::Client->new($path);
 
-# Helper subs
 sub cache_set { $cli->req("set\t$_[0]\t$_[1]") }
 sub cache_get { $cli->req("get\t$_[0]") }
 sub cache_del { $cli->req("del\t$_[0]") }

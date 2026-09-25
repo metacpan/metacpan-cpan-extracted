@@ -24,7 +24,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SLO_ERROR
 );
 
-our $VERSION = '2.23.1';
+our $VERSION = '2.23.4';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Issuer
@@ -44,7 +44,7 @@ use constant hook => { updateSessionId => 'updateOidcSecondarySessions' };
 
 use constant sessionKind => 'OIDCI';
 
-has rule => ( is => 'rw' );
+has rule        => ( is => 'rw' );
 has ssoMatchUrl => ( is => 'rw' );
 
 has iss => (

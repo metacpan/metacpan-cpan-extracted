@@ -6,7 +6,7 @@ use Getopt::Pad::Type;
 class Getopt::Pad::Type::Url :isa(Getopt::Pad::Type) :strict(params) {
 	use constant NAMES => ['url', 'uri'];
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	method glSuffix() { return '=s' }
 

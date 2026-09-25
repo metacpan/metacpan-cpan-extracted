@@ -83,6 +83,16 @@ is($round->address,    131,           'round-trip keeps address');
 is($round->command,    0,             'round-trip keeps command');
 is($round->data,       0x830000FF,    'round-trip keeps data');
 
+# Decoded GC commands export as IRDB CSV rows; a code no registered protocol
+# decoded (Eufy 40 Bit) has no keyable address and is skipped.
+my $csv = $converter->export_codes('CSV', [$power, $vol, (grep { $_->alias eq 'Auto' } @$codes)[0]]);
+is($csv, "functionname,protocol,device,subdevice,function\n"
+       . "PowerToggle,NEC,131,0,0\n"
+       . "VolumeUp,NEC,131,0,2\n", 'GC codes export as IRDB rows');
+my $csv_back = $converter->import_format('CSV', $csv);
+is(scalar(@$csv_back), 2, 'CSV export re-imports');
+is($csv_back->[1]->command, 2, 'round-trip keeps the command');
+
 # Import from a file path.
 my ($fh, $path) = tempfile();
 print {$fh} $gc_json;

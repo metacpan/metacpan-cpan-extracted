@@ -7,7 +7,7 @@ use Getopt::Pad::Result;
 class Getopt::Pad::Spec::Arg :strict(params) {
 	use Getopt::Pad::Util qw(camelize specError isValidName);
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	field $raw :param;
 
@@ -18,6 +18,7 @@ class Getopt::Pad::Spec::Arg :strict(params) {
 	field $required :reader = 0;
 	field $multiple :reader = 0;
 	field $help     :reader = '';
+	field $typehint :reader;
 
 	ADJUST {
 		specError("arg: spec must be a hash reference") if ref $raw ne 'HASH';
@@ -34,8 +35,16 @@ class Getopt::Pad::Spec::Arg :strict(params) {
 		$required = delete $spec{required} ? 1 : 0;
 		$multiple = delete $spec{multiple} ? 1 : 0;
 		$help     = delete $spec{help} // '';
+		$typehint = delete $spec{typehint};
 
 		specError("arg '%s': unknown key(s): %s", $short, join(', ', sort keys %spec)) if %spec;
+		specError("arg '%s': typehint must be a non-empty string", $short) if defined $typehint && (ref $typehint || $typehint eq '');
+	}
+
+	# The tag the help output renders after the help text: the spec's
+	# typehint, or what the type calls itself.
+	method typeLabel() {
+		return $typehint // $type->label;
 	}
 }
 
@@ -51,7 +60,7 @@ Getopt::Pad::Spec::Arg - one positional arg spec
 
 =head1 DESCRIPTION
 
-A single validated positional arg spec: short name, type instance, reader name, required/multiple/help settings.
+A single validated positional arg spec: short name, type instance, reader name, required/multiple/help/typehint settings. typeLabel is the tag the help output shows for the arg: the typehint, or the type's own label.
 
 Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
 

@@ -1,0 +1,4 @@
+---
+distro: Perl-Critic-Policy-RegularExpressions-ProhibitRegexToStripAffix
+version: 0.001
+author_path: T/TE/TEODESIAN/Perl-Critic-Policy-RegularExpressions-ProhibitRegexToStripAffix-0.001.tar.gz

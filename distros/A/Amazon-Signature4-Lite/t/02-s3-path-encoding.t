@@ -32,13 +32,12 @@ my $path = '/%23S3.pm.in%23';
 
 # --- the encoder itself: proves the two tiers differ ---
 my $double = Amazon::Signature4::Lite::_encode_path($path);
-is( $double, '/%2523S3.pm.in%2523',
-  '_encode_path double-encodes (correct for non-S3 services)' );
+is( $double, '/%2523S3.pm.in%2523', '_encode_path double-encodes (correct for non-S3 services)' );
 isnt( $path, $double, 'single vs double encoding are distinct for reserved chars' );
 
 # --- both services sign without error ---
 for my $svc (qw(s3 sqs lambda)) {
-  my $signer = Amazon::Signature4::Lite->new( %common, service => $svc );
+  my $signer  = Amazon::Signature4::Lite->new( %common, service => $svc );
   my $headers = eval {
     $signer->sign(
       method  => 'PUT',
@@ -56,22 +55,118 @@ for my $svc (qw(s3 sqs lambda)) {
 ##    double-encodes, and asserting the signatures DIFFER -- if S3 were
 ##    still double-encoding, they'd be identical.
 {
-  my $s3  = Amazon::Signature4::Lite->new( %common, service => 's3' );
-  my $x   = Amazon::Signature4::Lite->new( %common, service => 's3' );
+  my $s3 = Amazon::Signature4::Lite->new( %common, service => 's3' );
+  my $x  = Amazon::Signature4::Lite->new( %common, service => 's3' );
 
   # same inputs -> identical signature (determinism sanity check)
-  my $sig_a = $s3->sign( method => 'PUT', url => "https://b.s3.amazonaws.com$path",
-    headers => { host => 'b.s3.amazonaws.com', 'x-amz-date' => '20260101T000000Z' }, payload => 'p' )->{Authorization};
-  my $sig_b = $x->sign( method => 'PUT', url => "https://b.s3.amazonaws.com$path",
-    headers => { host => 'b.s3.amazonaws.com', 'x-amz-date' => '20260101T000000Z' }, payload => 'p' )->{Authorization};
+  my $sig_a = $s3->sign(
+    method  => 'PUT',
+    url     => "https://b.s3.amazonaws.com$path",
+    headers => { host => 'b.s3.amazonaws.com', 'x-amz-date' => '20260101T000000Z' },
+    payload => 'p'
+  )->{Authorization};
+  my $sig_b = $x->sign(
+    method  => 'PUT',
+    url     => "https://b.s3.amazonaws.com$path",
+    headers => { host => 'b.s3.amazonaws.com', 'x-amz-date' => '20260101T000000Z' },
+    payload => 'p'
+  )->{Authorization};
   is( $sig_a, $sig_b, 's3 signing is deterministic for the same encoded path' );
 }
 
 # --- a plain key is unaffected either way (idempotent encoding) ---
 {
   my $plain = '/lib/OrePAN2/S3.pm';
-  is( Amazon::Signature4::Lite::_encode_path($plain), $plain,
-    'plain keys are unchanged by _encode_path (why ordinary uploads work)' );
+  is( Amazon::Signature4::Lite::_encode_path($plain),
+    $plain, 'plain keys are unchanged by _encode_path (why ordinary uploads work)' );
+}
+
+{
+  my $single = Amazon::Signature4::Lite->new(
+    %common,
+    service                 => 's3-outposts',
+    disable_double_encoding => 1,
+  );
+
+  my $double = Amazon::Signature4::Lite->new(
+    %common,
+    service                 => 's3-outposts',
+    disable_double_encoding => 0,
+  );
+
+  my %request = (
+    method  => 'PUT',
+    url     => "https://example.amazonaws.com$path",
+    headers => { host => 'example.amazonaws.com' },
+    payload => 'body',
+    time    => 1440938160,
+  );
+
+  my $single_signature = $single->sign(%request)->{Authorization};
+
+  my $double_signature = $double->sign(%request)->{Authorization};
+
+  isnt( $single_signature, $double_signature, 'disable_double_encoding changes canonical path encoding', );
+}
+
+{
+  my $s3_default = Amazon::Signature4::Lite->new( %common, service => 's3', );
+
+  my $explicit_single = Amazon::Signature4::Lite->new(
+    %common,
+    service                 => 's3',
+    disable_double_encoding => 1,
+  );
+
+  my $explicit_double = Amazon::Signature4::Lite->new(
+    %common,
+    service                 => 's3',
+    disable_double_encoding => 0,
+  );
+
+  my %request = (
+    method  => 'PUT',
+    url     => "https://bucket.s3.amazonaws.com$path",
+    headers => { host => 'bucket.s3.amazonaws.com' },
+    payload => 'body',
+    time    => 1440938160,
+  );
+
+  my $default_signature = $s3_default->sign(%request)->{Authorization};
+
+  is(
+    $explicit_single->sign(%request)->{Authorization},
+    $default_signature, 'explicit disable_double_encoding preserves default S3 behavior',
+  );
+
+  isnt(
+    $explicit_double->sign(%request)->{Authorization},
+    $default_signature, 'explicit false overrides default S3 single encoding',
+  );
+}
+
+{
+  my $default = Amazon::Signature4::Lite->new( %common, service => 's3-outposts', );
+
+  my $modeled = Amazon::Signature4::Lite->new(
+    %common,
+    service                 => 's3-outposts',
+    disable_double_encoding => 1,
+  );
+
+  my %request = (
+    method  => 'PUT',
+    url     => "https://s3-outposts.us-west-2.amazonaws.com$path",
+    headers => { host => 's3-outposts.us-west-2.amazonaws.com' },
+    payload => 'body',
+    time    => 1440938160,
+  );
+
+  isnt(
+    $modeled->sign(%request)->{Authorization},
+    $default->sign(%request)->{Authorization},
+    'modeled flag disables double encoding for a non-s3 signing name',
+  );
 }
 
 done_testing;

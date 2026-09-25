@@ -460,7 +460,8 @@ sub isAuthorizedURI {
     die 'uri is required' unless ($url);
     my ( $host, $uri );
     if ( $url =~ URIRE ) {
-        ( $host, $uri ) = ( $1, $2 );
+        ( $host, $uri ) = ( $3 . ( $4 ? ":$4" : '' ), $5 );
+        $uri = $self->p->HANDLER->canonicalUri($uri);
     }
     else {
         die 'Bad uri';

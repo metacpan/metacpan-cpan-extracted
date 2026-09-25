@@ -1,5 +1,10 @@
 Revision history for Hyperman
 
+0.54	2026-09-24
+        - FIX: a resolved Future and its callbacks were held for the life of
+          the process. 
+        - t/55 counts callbacks released while the loop is still running.
+
 0.53	2026-09-24
         - FIX: max_requests_per_worker was only tested on the HTTP/1 path, so
           a worker serving HTTP/2 or HTTP/3 counted its requests and never

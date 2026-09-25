@@ -141,7 +141,7 @@ sub run {
     }
 
     # Authentication process
-    my $uri = $req->{env}->{REQUEST_URI};
+    my $uri = $req->access_control_uri;
     my ($cond);
 
     ( $cond, $protection ) = $class->conditionSub($rule) if ($rule);
@@ -330,10 +330,64 @@ sub checkMaintenanceMode {
     return 0;
 }
 
+## @rmethod string canonicalUri(string uri)
+# Return the canonical form of an URI: as web servers do before routing
+# requests to applications, the path is percent-decoded and normalized
+# (dot segments and duplicate slashes removed). The query string is left
+# untouched since some rules contain GET parameters.
+#
+# This is only a guess of the path the web server will route on: each server
+# has its own rules (encoded slashes, duplicate slashes, dot segments,...).
+# Don't use it when the server gives this path (X_ORIGINAL_URI with Nginx,
+# $r->uri with mod_perl, PATH_INFO for LLNG's own applications, see
+# access_control_uri()): only when LL::NG receives the URI as sent by the
+# client (forward-auth) or a URL given by the caller (menu, authorizationfor,
+# CheckUser, urldc,...).
+#
+# @param $uri URI to canonicalize
+# @return canonical URI
+sub canonicalUri {
+    my ( $class, $uri ) = @_;
+    return '/' unless defined $uri;
+
+    # Absolute-URI form (RFC 7230 5.3.2): applications only see the path
+    $uri =~ s#^[a-zA-Z][a-zA-Z0-9+.\-]*://[^/?]*/?#/#;
+
+    # An empty path is "/" (RFC 3986 6.2.3)
+    $uri = "/$uri" if $uri =~ /^(?:\?|\z)/;
+
+    my ( $path, $query ) = ( $uri, undef );
+    if ( $uri =~ /^([^?]*)\?(.*)$/s ) {
+        ( $path, $query ) = ( $1, $2 );
+    }
+
+    # Only absolute paths are normalized, others (OPTIONS *, ...) are kept as is
+    if ( $path =~ m{^/} ) {
+        $path = uri_unescape($path);
+
+        # A path ending with "/", "/." or "/.." keeps its trailing slash
+        my $trailingSlash = ( $path =~ m{(?:/|/\.\.?)$} );
+        my @segments;
+        foreach my $segment ( split m{/+}, $path ) {
+            next if ( $segment eq '' or $segment eq '.' );
+            if ( $segment eq '..' ) {
+                pop @segments;
+            }
+            else {
+                push @segments, $segment;
+            }
+        }
+        $path = '/' . join( '/', @segments );
+        $path .= '/' if ( $trailingSlash and $path ne '/' );
+    }
+
+    return defined $query ? "$path?$query" : $path;
+}
+
 ## @rmethod int getLevel(string uri, string $vhost)
 # Return required authentication level for this URI
 # default to vhost authentication level
-# @param $uri URI
+# @param $uri URI, must be canonical (see canonicalUri())
 # @param $vhost vhost name, default to current request
 sub getLevel {
     my ( $class, $req, $uri, $vhost ) = @_;
@@ -364,7 +418,7 @@ sub getLevel {
 
 ## @rmethod boolean grant(string uri, string cond)
 # Grant or refuse client using compiled regexp and functions
-# @param $uri URI
+# @param $uri URI, must be canonical (see canonicalUri())
 # @param $cond optional Function granting access
 # @return True if the user is granted access to the current URL
 sub grant {
@@ -373,7 +427,7 @@ sub grant {
     return $cond->( $req, $session ) if $cond;
 
     $vhost ||= $class->resolveAlias($req);
-    my $level = $class->getLevel( $req, $uri );
+    my $level = $class->getLevel( $req, $uri, $vhost );
 
     # Using VH authentification level if exists
     if ($level) {
@@ -742,7 +796,7 @@ sub _buildUrl {
 }
 
 ## @rmethod protected int isUnprotected()
-# @param $uri URI
+# @param $uri URI, as the request is routed on (see access_control_uri())
 # @return 0 if URI is protected,
 # $class->UNPROTECT if it is unprotected by "unprotect",
 # SKIP if unprotected by "skip"

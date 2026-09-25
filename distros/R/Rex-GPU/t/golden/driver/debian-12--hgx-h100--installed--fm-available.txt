@@ -1,0 +1,18 @@
+# golden: driver/debian-12--hgx-h100--installed--fm-available
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run: /sbin/ldconfig -p 2>/dev/null | grep -q '^[[:space:]]*libcuda\.so\.1 '
+run: nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>&1
+run: dpkg-query -W -f='${Package} ${db:Status-Abbrev} ${Version}\n' 'nvidia-fabric*manager*' 2>/dev/null
+run: dpkg --print-architecture
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: apt-cache madison nvidia-fabricmanager 2>/dev/null
+run: LC_ALL=C apt-get -o DPkg::Lock::Timeout=120 -s install nvidia-fabricmanager=580.95.05-1 2>&1
+run: apt-cache madison nvidia-fabricmanager 2>/dev/null
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y nvidia-fabricmanager=580.95.05-1
+run: dpkg -l nvidia-fabricmanager 2>/dev/null | grep -q '^ii'
+run: dpkg-query -W -f='${Version}' nvidia-fabricmanager 2>/dev/null
+run: systemctl enable nvidia-fabricmanager.service
+run: systemctl start nvidia-fabricmanager.service
+run: systemctl is-active --quiet nvidia-fabricmanager.service

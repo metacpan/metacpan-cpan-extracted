@@ -18,5 +18,6 @@ t/01in-stringy.t
 t/02elem-numbery.t
 t/02elem-stringy.t
 t/11func.t
+t/70in+core-equ.t
 t/80in+equ.t
 t/99pod.t

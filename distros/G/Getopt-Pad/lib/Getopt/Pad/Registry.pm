@@ -5,7 +5,7 @@ class Getopt::Pad::Registry {
 	use Carp qw(croak);
 	use Getopt::Pad::Util qw(specError);
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	# Registration errors are reported at the registerType/registerFormat
 	# caller, not inside those one-line forwarders.

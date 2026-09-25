@@ -26,7 +26,7 @@ our @EXPORT_OK = qw(
   get_parameters
 );
 
-our $VERSION = '2.1.0';
+our $VERSION = '2.1.1';
 
 our %EXPORT_TAGS;
 

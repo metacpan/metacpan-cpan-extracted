@@ -148,7 +148,7 @@ sub sendLogs {
             }
             my $tmp = <$fh>;
             unless ($tmp) {
-                warning "Empty file $fn";
+                debug "Empty file $fn";
                 goto END;
             }
             chomp $tmp;

@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Keyword
 
+0.51    2026-09-24
+        [CHANGES]
+         * Recognise the new undef-aware equality operators on Perl 5.45.3
+           onwards (PPC0030)
+
 0.50    2026-09-10
         [BUGFIXES]
          * Use `SvROK` not `SvRV` to check for values being references

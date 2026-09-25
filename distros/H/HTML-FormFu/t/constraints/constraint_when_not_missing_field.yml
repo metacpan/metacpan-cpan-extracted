@@ -1,0 +1,65 @@
+---
+elements:
+    # RT#45409 - 'not' must apply when the checkbox is unchecked,
+    # i.e. missing from the submission, without needing
+    # default_empty_value on the checkbox
+    - name: fieldname
+      constraints:
+        - type: Required
+          when:
+            field: some_checkbox
+            values: ['it_is_checked']
+            not: 1
+
+    - type: Checkbox
+      name: some_checkbox
+      value: it_is_checked
+
+    # 'fields' + 'not' - all named fields must not match
+    - name: baz
+      constraints:
+        - type: Required
+          when:
+            fields: [c1, c2]
+            value: 1
+            not: 1
+
+    - type: Checkbox
+      name: c1
+      value: 1
+
+    - type: Checkbox
+      name: c2
+      value: 1
+
+    # 'any_field' + 'not' - any named field must not match
+    - name: quux
+      constraints:
+        - type: Required
+          when:
+            any_field: [d1, d2]
+            value: 1
+            not: 1
+
+    - type: Checkbox
+      name: d1
+      value: 1
+
+    - type: Checkbox
+      name: d2
+      value: 1
+
+    # 'fields' without 'not' - a missing field does not pass
+    - name: qux
+      constraints:
+        - type: Required
+          when:
+            fields: [e1, e2]
+
+    - type: Checkbox
+      name: e1
+      value: 1
+
+    - type: Checkbox
+      name: e2
+      value: 1

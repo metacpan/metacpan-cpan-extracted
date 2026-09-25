@@ -1,0 +1,6 @@
+# golden: toolkit/ubuntu-24.04--already-present
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+can_run: nvidia-ctk
+run: nvidia-ctk --version 2>&1
+run: dpkg -l nvidia-container-toolkit 2>/dev/null | grep -q '^[hi]i'

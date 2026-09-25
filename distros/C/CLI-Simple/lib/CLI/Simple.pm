@@ -4,7 +4,7 @@ package CLI::Simple;
 use strict;
 use warnings;
 
-use CLI::Simple::Constants qw(:booleans :chars :log-levels @VALID_OPTIONS :color-config);
+use CLI::Simple::Constants qw(:booleans :chars :log-levels @VALID_OPTIONS @DEFAULT_HELP_SECTIONS :color-config);
 use CLI::Simple::Utils qw(normalize_options slurp dmp choose);
 use CLI::Simple::DumpSpec qw(_cmd_dump_spec);
 use CLI::Simple::Migrate qw(_cmd_migrate);
@@ -23,7 +23,7 @@ use IO::Interactive;
 use List::Util qw(zip none pairs any);
 use Scalar::Util qw(reftype);
 
-our $VERSION = '2.2.2';
+our $VERSION = '2.2.3';
 
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
@@ -417,7 +417,7 @@ sub new {
     $help_sections //= $self->get_help_sections;
   }
 
-  $help_sections //= [qw( SYNOPSIS DESCRIPTION/Commands DESCRIPTION/Options OPTIONS USAGE )];
+  $help_sections //= [@DEFAULT_HELP_SECTIONS];
 
   $self->set_help_sections($help_sections);
 
@@ -452,6 +452,8 @@ sub new {
 
   $self->set__commands($commands);
 
+  $self->set__program("$RealBin/$RealScript");
+
   if ( $command eq 'help' || ( $self->can('get_help') && $self->get_help ) ) {
     # custom help function?
 
@@ -471,8 +473,6 @@ sub new {
 
   $self->set__abbreviations( $abbreviations // $FALSE );
 
-  $self->set__program("$RealBin/$RealScript");
-
   $self->validate_command;
 
   $self->init_logger;
@@ -480,6 +480,43 @@ sub new {
   $self->can('init') && $self->init();
 
   return $self;
+}
+
+########################################################################
+sub _pod_has_section {
+########################################################################
+  my ( $filename, $section ) = @_;
+
+  open my $fh, '<', $filename
+    or return $FALSE;
+
+  while ( my $line = <$fh> ) {
+    return $TRUE
+      if $line =~ /\A=head1\s+\Q$section\E\s*\z/xsm;
+  }
+
+  return $FALSE;
+}
+
+########################################################################
+sub _get_help_sections {
+########################################################################
+  my ( $self, $input ) = @_;
+
+  my $sections = $self->get_help_sections;
+
+  return $sections
+    if @{$sections} != @DEFAULT_HELP_SECTIONS;
+
+  for my $idx ( 0 .. $#DEFAULT_HELP_SECTIONS ) {
+    return $sections
+      if $sections->[$idx] ne $DEFAULT_HELP_SECTIONS[$idx];
+  }
+
+  return [ _pod_has_section( $input, 'SYNOPSIS' )
+    ? 'SYNOPSIS'
+    : 'USAGE',
+    'DESCRIPTION/Commands', 'DESCRIPTION/Options', 'OPTIONS', ];
 }
 
 ########################################################################
@@ -638,12 +675,14 @@ sub usage {
     };
   }
 
+  my $sections = $self->_get_help_sections($input);
+
   Pod::Usage::pod2usage(
     -noperldoc => 1,
     -exitval   => 'NOEXIT',
     -input     => $input,
     -verbose   => 99,
-    -sections  => $self->get_help_sections,
+    -sections  => $sections,
   );
 
   return _leave($FAILURE);
@@ -999,7 +1038,7 @@ distribution in one step.
 
 =head1 VERSION
 
-This documentation refers to version 2.2.2.
+This documentation refers to version 2.2.3.
 
 =head1 FEATURES
 

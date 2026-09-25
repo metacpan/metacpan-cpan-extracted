@@ -7,7 +7,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000148';
+our $VERSION = '0.000149';
 
 use Test2::Harness::UI::UUID qw/gen_uuid/;
 use Carp qw/croak/;

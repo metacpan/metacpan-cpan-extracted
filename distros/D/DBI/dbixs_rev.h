@@ -1,4 +1,4 @@
-/* Wed Sep  9 16:01:22 2026 */
+/* Fri Sep 25 11:28:29 2026 */
 #define DBIXS_RELEASE  1
-#define DBIXS_VERSION  653
-#define DBIXS_REVISION 1831
+#define DBIXS_VERSION  654
+#define DBIXS_REVISION 1837

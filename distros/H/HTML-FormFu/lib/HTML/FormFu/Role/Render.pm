@@ -2,7 +2,7 @@ use strict;
 
 package HTML::FormFu::Role::Render;
 # ABSTRACT: Render role
-$HTML::FormFu::Role::Render::VERSION = '2.07';
+$HTML::FormFu::Role::Render::VERSION = '2.09';
 use HTML::FormFu::Util qw( process_attrs );
 use Carp qw( croak );
 use Scalar::Util qw( reftype );
@@ -118,7 +118,7 @@ sub _share_dir {
         my $path = File::ShareDir::dist_file( 'HTML-FormFu',
             'templates/tt/xhtml/form' );
 
-        my ( $volume, $dirs, $file ) = File::Spec->splitpath($path);
+        my ( $volume, $dirs ) = File::Spec->splitpath($path);
 
         $SHARE_DIR = File::Spec->catpath( $volume, $dirs, '' );
     };
@@ -146,7 +146,7 @@ HTML::FormFu::Role::Render - Render role
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 AUTHOR
 
@@ -154,7 +154,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

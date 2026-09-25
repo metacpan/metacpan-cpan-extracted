@@ -1,5 +1,26 @@
 Revision history for Protocol::IR::Code
 
+1.1 2026-09-25T00:50:13Z
+
+    - Protocol::IR::Format::CSV gains an export method that serializes decoded
+      codes as canonical IRDB rows (functionname,protocol,device,subdevice,
+      function), and ir-convert --to csv accepts the format, so a Global Cache
+      import (--from gcir) now converts straight to an IRDB button listing.
+      Codes no registered protocol decoded have nothing to key a row on and
+      are skipped. Mirrors the TypeScript port (web-ir-remote-tools
+      src/lib/format/csv.ts).
+    - The CSV parser now reads RFC-style "" quoting (a literal double quote
+      inside a quoted value) and trims unquoted fields, matching the
+      web-ir-remote-tools exporter and parser so files round-trip between the
+      two ports; export quotes and escapes button names the same way.
+    - Pronto decodes now retain the captured hex and timings on every decode
+      path, not just the ones that decode cleanly.
+    - LIRC export names a button with no alias UNKNOWN instead of emitting an
+      empty button name, so a remote with unnamed buttons survives a
+      config round trip.
+    - The protocol documentation spells out clock timings in microseconds
+      and gives each format a worked example.
+
 1.0 2026-09-24T02:22:14Z
 
     - Global Cache imports now preserve the per-command repeat count -- how

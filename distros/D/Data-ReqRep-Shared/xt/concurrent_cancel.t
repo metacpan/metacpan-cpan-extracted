@@ -8,10 +8,6 @@ use POSIX ();
 use Data::ReqRep::Shared;
 use Data::ReqRep::Shared::Client;
 
-# ============================================================
-# 1. cancel + get_wait race: cancel fires while get_wait is blocked
-#    Verify get_wait unblocks promptly (does not hang).
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 16, 4, 256);
@@ -23,7 +19,6 @@ use Data::ReqRep::Shared::Client;
 
         my $pid = fork // die "fork: $!";
         if ($pid == 0) {
-            # child cancels after small random delay
             sleep(0.001 + rand() * 0.01);
             $cli->cancel($id);
             POSIX::_exit(0);
@@ -33,22 +28,16 @@ use Data::ReqRep::Shared::Client;
         my $resp = $cli->get_wait($id, 2.0);
         my $dt = time - $t0;
 
-        # get_wait should return within ~50ms (cancel delay + scheduling)
         ok $dt < 2.0, sprintf("cancel+get race trial %d: unblocked in %.3fs", $trial, $dt);
         ok !defined $resp, "cancel+get race trial $trial: returns undef";
 
         waitpid $pid, 0;
     }
 
-    # drain all queued requests
     while (my ($r, $ri) = $srv->recv) { $srv->reply($ri, "ok") }
     $srv->unlink;
 }
 
-# ============================================================
-# 2. cancel + reply race: server replies at the same moment client cancels
-#    Exactly one should win — no data corruption.
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 64, 16, 256);
@@ -63,62 +52,36 @@ use Data::ReqRep::Shared::Client;
 
         my $pid = fork // die "fork: $!";
         if ($pid == 0) {
-            # child cancels immediately
             $cli->cancel($id);
             POSIX::_exit(0);
         }
 
-        # parent replies immediately — race with child's cancel
         my $ok = $srv->reply($ri, "resp$trial");
         waitpid $pid, 0;
-
-        if ($ok) {
-            # reply won the CAS — response should be readable
-            my $resp = $cli->get($id);
-            if (defined $resp) {
-                is $resp, "resp$trial", "reply won trial $trial: data correct";
-                $reply_won++;
-            } else {
-                # cancel won but reply CAS also succeeded? shouldn't happen
-                # with CAS ACQUIRED→READY in reply
-                fail "reply succeeded but get returned undef in trial $trial";
-            }
-        } else {
-            # cancel won the CAS — slot freed, reply returned false
-            $cancel_won++;
-            pass "cancel won trial $trial";
-        }
+        $ok ? $reply_won++ : $cancel_won++;
+        ok !defined $cli->get($id), "cancel+reply race trial $trial: a cancelled request yields no reply";
     }
+    is $cli->pending, 0, 'cancel+reply race: every slot came free';
 
     diag sprintf "cancel won %d/%d, reply won %d/%d",
         $cancel_won, 50, $reply_won, 50;
 
-    # at least one of each should have won (probabilistic but very likely)
-    # don't assert — timing dependent. Just report.
-
     $srv->unlink;
 }
 
-# ============================================================
-# 3. cancel + clear race: clear fires while requests are in-flight
-#    All get_wait callers must unblock.
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 64, 16, 256);
     my $cli = Data::ReqRep::Shared::Client->new($path);
 
-    # Send several requests, don't process them
     my @ids;
     push @ids, $cli->send("clear$_") for 1..8;
 
-    # Fork children that each get_wait on their request
     my @pids;
     for my $i (0..3) {
         my $pid = fork // die "fork: $!";
         if ($pid == 0) {
             my $resp = $cli->get_wait($ids[$i], 5.0);
-            # should return undef after clear
             POSIX::_exit(defined $resp ? 1 : 0);
         }
         push @pids, $pid;
@@ -127,27 +90,22 @@ use Data::ReqRep::Shared::Client;
     # Give children time to enter get_wait
     sleep(0.05);
 
-    # Clear — should unblock all get_wait callers
     my $t0 = time;
     $srv->clear;
 
     for my $pid (@pids) {
         waitpid $pid, 0;
-        is $? >> 8, 0, "clear race: child $pid unblocked and got undef";
+        is $?, 0, "clear race: child $pid unblocked and got undef";
     }
     my $dt = time - $t0;
-    ok $dt < 2.0, sprintf("clear race: all children unblocked in %.3fs", $dt);
+    ok $dt < 1, sprintf("clear race: all children unblocked in %.3fs", $dt);   # below the 2 s tick
 
     $srv->unlink;
 }
 
-# ============================================================
-# 4. Rapid cancel/send on same slot: verify generation prevents ABA
-#    across many iterations with minimal slot count
-# ============================================================
 {
     my $path = tmpnam();
-    my $srv = Data::ReqRep::Shared->new($path, 256, 1, 64);  # 1 slot!
+    my $srv = Data::ReqRep::Shared->new($path, 256, 1, 64);
     my $cli = Data::ReqRep::Shared::Client->new($path);
 
     my $aba_detected = 0;
@@ -161,7 +119,6 @@ use Data::ReqRep::Shared::Client;
         my $id2 = $cli->send("second$i");
         next unless defined $id2;
 
-        # Server processes both — first reply should fail (gen mismatch)
         my ($rq1, $ri1) = $srv->recv;
         my $r1 = $srv->reply($ri1, "bad");
         $aba_detected++ unless $r1;

@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NEC48;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::NEC48 is the base class for the 48-bit NEC family
@@ -12,7 +12,7 @@ use Protocol::IR::Code;
 #   48-NEC2: {38.0k,564}<1,-1|1,-3>(16,-8,D:8,S:8,F:8,~F:8,E:8,~E:8,1,^108m)+
 #
 # A single frame carries all six bytes (D, S, F, ~F, E, ~E) behind a
-# 9024/4512 us header; the trailing '+'/'*' repeats that whole frame, which is
+# 9024/4512 µs header; the trailing '+'/'*' repeats that whole frame, which is
 # invisible to the single-frame decoders here. Like the 32-bit NEC family, the
 # '2' variant only differs in repeat structure, so its name is preserved only
 # so repeat behavior survives conversion. The trailing E byte is not part of
@@ -117,7 +117,7 @@ sub decode_timing {
 
     my ($hdr_mark, $hdr_space) = @{$burst_pairs->[0]};
 
-    # NEC Header Check: ~9000us mark, ~4500us space
+    # NEC Header Check: ~9000 µs mark, ~4500 µs space
     return undef unless ($hdr_mark >= 7500 && $hdr_mark <= 10500) &&
                         ($hdr_space >= 3500 && $hdr_space <= 5500);
 
@@ -126,7 +126,7 @@ sub decode_timing {
         my $pair  = $burst_pairs->[$i + 1];
         my $space = $pair->[1];
 
-        # Space ~1690us = 1, ~560us = 0
+        # Space ~1690 µs = 1, ~560 µs = 0
         my $bit = ($space > 1100) ? 1 : 0;
         my $byte_idx = int($i / 8);
         my $bit_idx  = $i % 8; # LSB-first
@@ -189,7 +189,7 @@ sub to_pronto {
         ];
     }
 
-    # Suffix: a 560 us stop mark and the ~108ms inter-frame space
+    # Suffix: a 560 µs stop mark and the ~108ms inter-frame space
     # (^108m of the IRP).
     push @burst_pairs, [$us_to_pulses->(560), $us_to_pulses->(108000)];
 
@@ -203,13 +203,15 @@ sub to_pronto {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Proto::NEC48 - 48-NEC1 protocol handler (48-bit NEC family base)
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -227,7 +229,7 @@ version 1.0
 The 48-bit NEC family transmits 48-bit frames at 38 kHz: six bytes --
 B<address> (device), B<subaddress>, B<command>, the command's one's
 complement, an extended B<E> byte, and E's one's complement -- each sent
-LSB-first, preceded by a B<9024/4512 us> header and followed by a stop mark.
+LSB-first, preceded by a B<9024/4512 µs> header and followed by a stop mark.
 A single frame carries all six bytes; the repeat is a whole-frame
 retransmission invisible to the single-frame decoders here.
 

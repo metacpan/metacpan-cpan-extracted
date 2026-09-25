@@ -2,7 +2,7 @@ use strict;
 
 package HTML::FormFu::Util;
 # ABSTRACT: various utilities
-$HTML::FormFu::Util::VERSION = '2.07';
+$HTML::FormFu::Util::VERSION = '2.09';
 use warnings;
 
 use HTML::FormFu::Constants qw( $SPACE );
@@ -522,8 +522,8 @@ sub _merge_hashes {
 
         if ( exists $lefthash->{$key} ) {
 
-            my $is_left_ref = exists $lefthash->{$key}
-                && ref $lefthash->{$key} eq 'HASH';
+            # my $is_left_ref = exists $lefthash->{$key}
+            #     && ref $lefthash->{$key} eq 'HASH';
 
             if ( ref $left_value eq 'HASH' && ref $right_value eq 'ARRAY' ) {
                 $merged{$key} = _merge_hash_array( $left_value, $right_value );
@@ -582,7 +582,7 @@ HTML::FormFu::Util - various utilities
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 AUTHOR
 
@@ -590,7 +590,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

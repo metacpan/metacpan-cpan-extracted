@@ -431,4 +431,18 @@ for my $t (@tests) {
 	};
 }
 
+subtest 'detect format from input without explicit hints' => sub {
+	for my $case (
+		[ 'CSV', "name,description\nalpha,first\n" ],
+		[ 'TSV', "name\tdescription\nalpha\tfirst\n" ],
+	) {
+		my ($expected, $content)= @$case;
+		my $tr= Data::TableReader->new(input => \$content, fields => []);
+		is_deeply([ $tr->detect_input_format ], [ $expected ], "$expected detected with no arguments");
+		isa_ok($tr->decoder, "Data::TableReader::Decoder::$expected", "$expected decoder built");
+		is_deeply([ $tr->detect_input_format(undef, undef) ], [ $expected ],
+			"$expected detected with undefined legacy arguments");
+	}
+};
+
 done_testing;

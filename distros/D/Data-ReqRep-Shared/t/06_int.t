@@ -8,7 +8,6 @@ use Data::ReqRep::Shared::Int::Client;
 
 my $path = tmpnam();
 
-# Create / open
 my $srv = Data::ReqRep::Shared::Int->new($path, 64, 16);
 ok $srv, 'int server created';
 is $srv->capacity, 64, 'capacity';
@@ -17,7 +16,6 @@ is $srv->resp_slots, 16, 'resp_slots';
 my $cli = Data::ReqRep::Shared::Int::Client->new($path);
 ok $cli, 'int client created';
 
-# Basic round-trip
 my $id = $cli->send(42);
 ok defined $id, 'int send';
 my ($val, $rid) = $srv->recv;
@@ -27,7 +25,6 @@ $srv->reply($rid, 99);
 my $resp = $cli->get($id);
 is $resp, 99, 'int get response';
 
-# Negative values
 {
     my $id2 = $cli->send(-12345);
     my ($v, $ri) = $srv->recv;
@@ -36,7 +33,6 @@ is $resp, 99, 'int get response';
     is $cli->get($id2), -99999, 'negative response';
 }
 
-# Multiple concurrent
 {
     my @ids = map { $cli->send($_) } (100..104);
     is $srv->size, 5, '5 pending int requests';
@@ -53,7 +49,6 @@ is $resp, 99, 'int get response';
     }
 }
 
-# Cancel
 {
     my $cid = $cli->send(777);
     $cli->cancel($cid);
@@ -62,7 +57,6 @@ is $resp, 99, 'int get response';
     ok !$ok, 'int: reply to cancelled slot fails';
 }
 
-# Blocking
 {
     my $id3 = $cli->send_wait(55, 1.0);
     ok defined $id3, 'int send_wait';
@@ -72,13 +66,12 @@ is $resp, 99, 'int get response';
     is $cli->get_wait($id3, 1.0), 66, 'int get_wait';
 }
 
-# req (sync)
 {
     my $pid = fork();
     if ($pid == 0) {
         my $s = Data::ReqRep::Shared::Int->new($path, 64, 16);
         for (1..5) {
-            my ($v, $ri) = $s->recv_wait(2.0);
+            my ($v, $ri) = $s->recv_wait(30);
             last unless defined $v;
             $s->reply($ri, $v * 2);
         }
@@ -91,14 +84,12 @@ is $resp, 99, 'int get response';
     waitpid $pid, 0;
 }
 
-# req_wait with timeout
 {
     my $r = $cli->req_wait(1, 0.01);
     ok !defined $r, 'int req_wait timeout';
-    $srv->recv;  # drain
+    $srv->recv;
 }
 
-# is_empty, stats, pending
 {
     ok $srv->is_empty, 'int is_empty';
     my $s = $srv->stats;
@@ -109,10 +100,27 @@ is $resp, 99, 'int get response';
     ok $cli->is_empty, 'int client is_empty';
 }
 
-# ABA — generation prevents reply to recycled slot
+{
+    my $s = Data::ReqRep::Shared::Int->new_memfd('stats', 2, 4);
+    my $c = Data::ReqRep::Shared::Int::Client->new_from_fd($s->memfd);
+    $c->send($_) for 1, 2;
+    ok !defined $c->send(3), 'int stats: a send finds the queue full';
+    is $c->pending, 2, '  and holds no slot after';
+    my ($v, $i) = $s->recv;
+    $s->reply($i, $v);
+    $s->recv;
+    ok !(my @none = $s->recv), 'int stats: a recv finds the queue empty';
+    my $st = $s->stats;
+    is $st->{requests}, 2, 'int stats: requests';
+    is $st->{replies}, 1, 'int stats: replies';
+    cmp_ok $st->{send_full}, '>=', 1, 'int stats: send_full';
+    cmp_ok $st->{recv_empty}, '>=', 1, 'int stats: recv_empty';
+    is $st->{recoveries}, 0, 'int stats: recoveries';
+}
+
 {
     my $ap = tmpnam();
-    my $as = Data::ReqRep::Shared::Int->new($ap, 8, 1);  # 1 slot
+    my $as = Data::ReqRep::Shared::Int->new($ap, 8, 1);
     my $ac = Data::ReqRep::Shared::Int::Client->new($ap);
 
     my $id1 = $ac->send(100);
@@ -133,10 +141,9 @@ is $resp, 99, 'int get response';
     $as->unlink;
 }
 
-# Slot exhaustion
 {
     my $sp = tmpnam();
-    my $ss = Data::ReqRep::Shared::Int->new($sp, 32, 2);  # 2 slots
+    my $ss = Data::ReqRep::Shared::Int->new($sp, 32, 2);
     my $sc = Data::ReqRep::Shared::Int::Client->new($sp);
 
     my $s1 = $sc->send(1);
@@ -145,23 +152,20 @@ is $resp, 99, 'int get response';
     my $s3 = $sc->send(3);
     ok !defined $s3, 'int slot exhaustion: 3rd send fails';
 
-    # free a slot
     my ($v, $ri) = $ss->recv;
     $ss->reply($ri, $v);
     $sc->get($s1);
     $s3 = $sc->send(3);
     ok defined $s3, 'int slot exhaustion: send ok after freeing';
 
-    # cleanup
     ($v, $ri) = $ss->recv; $ss->reply($ri, $v); $sc->get($s2);
     ($v, $ri) = $ss->recv; $ss->reply($ri, $v); $sc->get($s3);
     $ss->unlink;
 }
 
-# Queue full
 {
     my $qp = tmpnam();
-    my $qs = Data::ReqRep::Shared::Int->new($qp, 2, 8);  # cap=2
+    my $qs = Data::ReqRep::Shared::Int->new($qp, 2, 8);
     my $qc = Data::ReqRep::Shared::Int::Client->new($qp);
 
     my $q1 = $qc->send(10);
@@ -170,7 +174,6 @@ is $resp, 99, 'int get response';
     my $q3 = $qc->send(30);
     ok !defined $q3, 'int queue full: 3rd send fails (queue full)';
 
-    # cleanup
     for ($q1, $q2) {
         my ($v, $ri) = $qs->recv;
         $qs->reply($ri, $v);
@@ -179,7 +182,6 @@ is $resp, 99, 'int get response';
     $qs->unlink;
 }
 
-# clear releases slots
 {
     my $cp = tmpnam();
     my $cs = Data::ReqRep::Shared::Int->new($cp, 16, 4);
@@ -191,7 +193,6 @@ is $resp, 99, 'int get response';
     is $cs->size, 0, 'int clear: queue empty';
     is $cc->pending, 0, 'int clear: slots released';
 
-    # new request works
     my $cid = $cc->send(99);
     ok defined $cid, 'int clear: send after clear ok';
     my ($cv, $cri) = $cs->recv;
@@ -202,7 +203,6 @@ is $resp, 99, 'int get response';
     $cs->unlink;
 }
 
-# Boundary values
 {
     for my $val (0, -1, 2147483647, -2147483648) {
         my $id = $cli->send($val);
@@ -213,7 +213,6 @@ is $resp, 99, 'int get response';
     }
 }
 
-# memfd
 {
     my $ms = Data::ReqRep::Shared::Int->new_memfd("int_test", 16, 4);
     ok $ms, 'int memfd created';
@@ -221,12 +220,10 @@ is $resp, 99, 'int get response';
     my $ms2 = Data::ReqRep::Shared::Int->new_from_fd($mfd);
     ok $ms2, 'int new_from_fd';
 
-    # Int::Client new_from_fd
     my $mc = Data::ReqRep::Shared::Int::Client->new_from_fd($mfd);
     ok $mc, 'int client new_from_fd';
 }
 
-# eventfd
 {
     my $efd = $srv->eventfd;
     ok $efd >= 0, 'int eventfd created';
@@ -236,6 +233,55 @@ is $resp, 99, 'int get response';
 
     my $cefd = $cli->eventfd;
     ok $cefd >= 0, 'int client eventfd';
+}
+
+{
+    my $p = tmpnam();
+    my $s = Data::ReqRep::Shared::Int->new($p, 16, 4);
+    my $c = Data::ReqRep::Shared::Int::Client->new($p);
+    is $s->fileno, -1, 'no request eventfd yet';
+    is $s->reply_fileno, -1, '  nor a reply one';
+    is $c->fileno, -1, '  nor on the client';
+    is $c->req_fileno, -1, '  either way';
+    is $s->eventfd_consume, undef, 'consume without an eventfd gives undef';
+    is $s->reply_eventfd_consume, undef, '  for replies too';
+    is $c->eventfd_consume, undef, '  and on the client';
+    ok eval { $c->notify; $s->notify; $s->reply_notify; 1 }, 'notify without an eventfd does nothing';
+
+    my $req_fd = $s->eventfd;
+    my $rep_fd = $s->reply_eventfd;
+    is $s->fileno, $req_fd, 'fileno is the request eventfd';
+    is $s->reply_fileno, $rep_fd, 'reply_fileno is the reply eventfd';
+    $c->req_eventfd_set($req_fd);
+    $c->eventfd_set($rep_fd);
+    ok $c->req_fileno >= 0 && $c->req_fileno != $req_fd, 'req_eventfd_set keeps a duplicate';
+    ok $c->fileno >= 0 && $c->fileno != $rep_fd, 'eventfd_set keeps a duplicate';
+
+    $c->notify for 1 .. 2;
+    my $id = $c->send(7);
+    is $s->eventfd_consume, 2, 'the server sees both client notifications';
+    is $s->eventfd_consume, undef, '  and nothing after';
+    my ($v, $rid) = $s->recv;
+    is $v, 7, 'the request arrives';
+    ok $s->reply($rid, 8), 'reply';
+    $s->reply_notify for 1 .. 3;
+    is $c->eventfd_consume, 3, 'the client sees the three reply notifications';
+    is $c->get($id), 8, '  and gets the reply';
+
+    my $cfd = $c->eventfd;
+    is $c->fileno, $cfd, 'a client eventfd of its own replaces the set one';
+    $s->eventfd_set($c->req_fileno);
+    $s->reply_eventfd_set($cfd);
+    $c->notify;
+    is $s->eventfd_consume, 1, 'eventfd_set on the server takes the client request eventfd';
+    $s->reply_notify;
+    is $c->eventfd_consume, 1, 'reply_eventfd_set takes the client reply eventfd';
+
+    ok !eval { $s->eventfd_set(99999); 1 }, 'eventfd_set croaks on a closed descriptor';
+    like $@, qr/Int->eventfd_set: \S/, '  with the reason';
+    ok !eval { $c->req_eventfd_set(0); 1 }, 'req_eventfd_set croaks on a descriptor that is not an eventfd';
+    like $@, qr/fd 0 is not an eventfd/, '  with the reason';
+    $s->unlink;
 }
 
 $srv->unlink;

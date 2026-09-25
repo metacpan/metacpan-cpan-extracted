@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.23.0';
+our $VERSION = '2.23.4';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -166,9 +166,9 @@ sub display {
             CHOICE_VALUE => $req->data->{_authChoice},
             CHECK_LOGINS => $self->conf->{portalCheckLogins}
               && $req->data->{login},
-            ASK_LOGINS => $req->param('checkLogins')
+            ASK_LOGINS => scalar $req->param('checkLogins')
               || 0,
-            ASK_STAYCONNECTED => $req->param('stayconnected')
+            ASK_STAYCONNECTED => scalar $req->param('stayconnected')
               || 0,
             CONFIRMKEY => $self->stamp(),
             (
@@ -195,8 +195,8 @@ sub display {
             CHOICE_VALUE  => $req->data->{_authChoice},
             CHECK_LOGINS  => $self->conf->{portalCheckLogins}
               && $req->data->{login},
-            ASK_LOGINS        => $req->param('checkLogins')   || 0,
-            ASK_STAYCONNECTED => $req->param('stayconnected') || 0,
+            ASK_LOGINS        => scalar $req->param('checkLogins')   || 0,
+            ASK_STAYCONNECTED => scalar $req->param('stayconnected') || 0,
             CONFIRMKEY        => $self->stamp(),
             LIST              => $req->data->{list} || [],
             LOGIN_HINT        => $req->data->{suggestedLogin},
@@ -427,8 +427,8 @@ sub display {
             ACTIVE_FORM           => 1,
             DONT_STORE_PASSWORD   => $self->conf->{browsersDontStorePassword},
             CHECK_LOGINS          => $self->conf->{portalCheckLogins},
-            ASK_LOGINS            => $req->param('checkLogins')   || 0,
-            ASK_STAYCONNECTED     => $req->param('stayconnected') || 0,
+            ASK_LOGINS            => scalar $req->param('checkLogins')   || 0,
+            ASK_STAYCONNECTED     => scalar $req->param('stayconnected') || 0,
             DISPLAY_RESETPASSWORD => $self->conf->{portalDisplayResetPassword},
             DISPLAY_REGISTER      => $self->conf->{portalDisplayRegister},
             DISPLAY_UPDATECERTIF  =>

@@ -195,6 +195,34 @@ ok(
   );
 count(3);
 
+# Encoded URLs (#3723)
+# --------------------
+# Forward-auth: the handler receives a GET on the forwardAuth address (PATH_INFO
+# is usually "/") and the requested URI, as sent by the client, travels in
+# X-Forwarded-Uri. It is decoded and normalized before testing the rules.
+foreach my $t (
+    [ '/deny',           403, $sessionId ],
+    [ '/%64eny',         403, $sessionId ],
+    [ '/./deny',         403, $sessionId ],
+    [ '/foo/../deny',    403, $sessionId ],
+    [ '/%2Fdeny',        403, $sessionId ],
+    [ '/%61lwaysskip',   200 ],
+    [ '/%2561lwaysskip', 302 ],    # decoded once only
+  )
+{
+    my ( $uri, $code, $id ) = @$t;
+    ok(
+        $res = $client->_get(
+            '/', undef, undef, ( $id ? "lemonldap=$id" : undef ),
+            X_ORIGINAL_URI       => undef,
+            HTTP_X_FORWARDED_URI => $uri
+        ),
+        "X-Forwarded-Uri $uri"
+    );
+    ok( $res->[0] == $code, " Code is $code" ) or explain( $res->[0], $code );
+    count(2);
+}
+
 done_testing( count() );
 
 clean();

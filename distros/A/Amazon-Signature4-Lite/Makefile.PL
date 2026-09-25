@@ -27,8 +27,8 @@ WriteMakefile(
       'URI::Escape' => '5.34'
     },
   BUILD_REQUIRES   => {
-    'ExtUtils::MakeMaker'     => '6.64',
-    'File::ShareDir::Install' => 0,
+      'ExtUtils::MakeMaker' => '6.64',
+      'File::ShareDir::Install' => 0
     },
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker'     => '6.64',
@@ -42,7 +42,7 @@ WriteMakefile(
       'provides'=>{
                       'Amazon::Signature4::Lite'=>{
                                                       'file'=>'lib/Amazon/Signature4/Lite.pm',
-                                                      'version'=>'1.0.4'
+                                                      'version'=>'1.0.6'
                                                     }
                     },
       'resources'=>{

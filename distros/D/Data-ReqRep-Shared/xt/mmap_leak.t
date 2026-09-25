@@ -17,8 +17,6 @@ sub maps_count {
 
 my $baseline = maps_count();
 
-# Create + destroy 50 handles. Each handle does 1 mmap; all should be
-# released on DESTROY.
 for (1..50) {
     my $h = Data::ReqRep::Shared->new(undef, 64, 32, 64);
     undef $h;

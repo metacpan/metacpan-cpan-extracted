@@ -1,0 +1,18 @@
+# What is not shipped. REGEXES, not globs.
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib$
+^MYMETA\.
+^MANIFEST\.bak$
+# Install/Files.pm is regenerated on every configure and records THIS machine's
+# absolute include path. Shipping it pins one machine's paths into the tarball.
+^Install/
+\.o$
+\.bs$
+# Mahjong.c is generated from Mahjong.xs by xsubpp.
+^Mahjong\.c$
+^Game-Mahjong-
+\.tar\.gz$
+^\.git
+~$

@@ -7,6 +7,7 @@ package Amazon::S3::Lite::Lock::Guard;
 
 use strict;
 use warnings;
+use English qw(-no_match_vars);
 
 ########################################################################
 sub new {
@@ -27,12 +28,27 @@ sub release {
 
   # DELETE If-Match:<our etag> â never clobber a lock that was stolen
   # from us after our TTL lapsed.
-  eval {
+  my $ok = eval {
+    my $etag = sprintf '"%s"', $self->{etag};
     $self->{s3}->delete_object(
       $self->{bucket}, $self->{key},
-      headers => { 'If-Match' => $self->{etag} },  # <-- needs delete_object to accept headers
+      headers => { 'If-Match' => $etag },  # <-- needs delete_object to accept headers
     );
+
+    return 1;
   };
+
+  my $err = $EVAL_ERROR;
+
+  if ( !$ok ) {
+    $self->{s3}->logger->debug(
+      sprintf "lock release: bucket=%s key=%s etag=%s status=%s error=%s\n",
+      $self->{bucket}, $self->{key},
+      $self->{etag}            // q{},
+      $self->{s3}->last_status // q{},
+      $err                     // q{},
+    );
+  }
 
   return;
 }

@@ -50,6 +50,18 @@ static PADNAME *S_newPADNAMEpvn(pTHX_ const char *pv, STRLEN n)
 #  define av_count(av)           (AvFILL(av) + 1)
 #endif
 
+#ifndef av_fetch_simple
+#  define av_fetch_simple(av, idx, lval)  av_fetch(av, idx, lval)
+#endif
+
+#ifndef av_push_simple
+#  define av_push_simple(av, sv)  av_push(av, sv)
+#endif
+
+#ifndef av_store_simple
+#  define av_store_simple(av, key, sv)  av_store(av, key, sv)
+#endif
+
 #ifndef av_top_index
 #  define av_top_index(av)       AvFILL(av)
 #endif
@@ -102,7 +114,7 @@ static PADNAME *S_newPADNAMEpvn(pTHX_ const char *pv, STRLEN n)
 
 #ifndef OpLASTSIB_set
    /* older perls don't need to store this at all */
-#  define OpLASTSIB_set(op,parent)
+#  define OpLASTSIB_set(op,parent) ((op)->op_sibling = NULL)
 #endif
 
 #ifndef op_convert_list
@@ -160,8 +172,9 @@ static PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, 
 #endif
 
 #if !HAVE_PERL_VERSION(5, 26, 0)
-#  define isIDFIRST_utf8_safe(s, e)  (PERL_UNUSED_ARG(e), isIDFIRST_utf8(s))
-#  define isIDCONT_utf8_safe(s, e)   (PERL_UNUSED_ARG(e), isIDCONT_utf8(s))
+/* PERL_UNUSED_ARG() isn't usable to fix this on early perl versions */
+#  define isIDFIRST_utf8_safe(s, e)  ((void)sizeof(e), isIDFIRST_utf8(s))
+#  define isIDCONT_utf8_safe(s, e)   ((void)sizeof(e), isIDCONT_utf8(s))
 #endif
 
 #ifndef CXp_EVALBLOCK
@@ -183,6 +196,16 @@ static AV *S_newAVav(pTHX_ AV *av)
   for(i = 0; i < count; i++)
     av_push(ret, newSVsv(AvARRAY(av)[i]));
   return ret;
+}
+#endif
+
+#ifndef newAV_alloc_x
+#  define newAV_alloc_x(n)  S_newAV_alloc_x(aTHX_ n)
+static AV *S_newAV_alloc_x(pTHX_ SSize_t n)
+{
+  AV *av = newAV();
+  av_extend(av, n-1);
+  return av;
 }
 #endif
 

@@ -1,0 +1,4 @@
+# golden: containerd/bogus
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+DIE: Unknown containerd runtime: bogus (valid: rke2, k3s, containerd)

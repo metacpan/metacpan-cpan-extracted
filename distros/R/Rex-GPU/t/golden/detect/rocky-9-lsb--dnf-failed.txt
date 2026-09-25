@@ -1,0 +1,7 @@
+# golden: detect/rocky-9-lsb--dnf-failed
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: command -v lspci >/dev/null 2>&1
+run: dnf install -y pciutils
+run: rpm -q pciutils 2>&1
+DIE: pciutils not installed after dnf install -- check dnf output; GPU detection needs lspci

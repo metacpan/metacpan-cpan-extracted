@@ -9,10 +9,6 @@ use File::Temp 'tmpnam';
 use Data::ReqRep::Shared;
 use Data::ReqRep::Shared::Client;
 
-# ============================================================
-# 1. Mutex recovery: child crashes while holding the mutex
-#    (inside send with a large arena write)
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 1024, 64, 4096, 1 << 20);
@@ -40,10 +36,8 @@ use Data::ReqRep::Shared::Client;
     waitpid($pid, 0);
     diag "child $pid killed";
 
-    # Drain stale requests from the crashed child
     while (my ($r, $ri) = $srv->recv) { $srv->reply($ri, "stale") }
 
-    # Parent should recover the mutex within ~2 seconds
     my $cli = Data::ReqRep::Shared::Client->new($path);
     my $t0 = time;
     my $id = $cli->send_wait("after_crash", 10.0);
@@ -60,7 +54,6 @@ use Data::ReqRep::Shared::Client;
         pass 'child completed before kill (timing-dependent)';
     }
 
-    # verify round-trip still works
     my ($req, $rid) = $srv->recv;
     is $req, 'after_crash', 'post-crash recv ok';
     $srv->reply($rid, 'recovered');
@@ -69,27 +62,19 @@ use Data::ReqRep::Shared::Client;
     $srv->unlink;
 }
 
-# ============================================================
-# 2. Response slot recovery: child crashes after acquiring a slot
-#    (before sending the request). Slot should be recovered by
-#    stale PID detection on next acquire.
-# ============================================================
 {
     my $path = tmpnam();
-    my $srv = Data::ReqRep::Shared->new($path, 16, 2, 64);  # only 2 slots
+    my $srv = Data::ReqRep::Shared->new($path, 16, 2, 64);
 
     my $pid = fork // die "fork: $!";
     if ($pid == 0) {
         my $cli = Data::ReqRep::Shared::Client->new($path);
-        # Acquire both slots
         $cli->send("occupy1");
         $cli->send("occupy2");
-        # Crash without releasing
         _exit(0);
     }
     waitpid($pid, 0);
 
-    # Both slots are now held by a dead PID
     my $cli = Data::ReqRep::Shared::Client->new($path);
     my $id = $cli->send("after_slot_crash");
 
@@ -97,7 +82,6 @@ use Data::ReqRep::Shared::Client;
     my $stats = $srv->stats;
     ok $stats->{recoveries} > 0, "slot recovery: recoveries=$stats->{recoveries}";
 
-    # drain stale requests and process the live one
     while (my ($req, $rid) = $srv->recv) {
         my $ok = $srv->reply($rid, "re:$req");
         diag "recv '$req' reply_ok=$ok";
@@ -106,9 +90,6 @@ use Data::ReqRep::Shared::Client;
     $srv->unlink;
 }
 
-# ============================================================
-# 3. Multiple crash cycles — mutex recovers each time
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 256, 32, 4096, 1 << 20);
@@ -135,7 +116,6 @@ use Data::ReqRep::Shared::Client;
         kill 9, $pid;
         waitpid($pid, 0);
 
-        # drain queue, verify send still works
         while (my ($r, $ri) = $srv->recv) { $srv->reply($ri, "ok") }
         my $cli = Data::ReqRep::Shared::Client->new($path);
         my $t0 = time;

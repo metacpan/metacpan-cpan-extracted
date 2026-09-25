@@ -16,7 +16,8 @@ $tree->child('node_modules', 'dep')->make_path->child('index.js')->spew("module.
 $tree->child('.gitignore')->spew("node_modules/\n");    # a real directory pattern, trailing slash and all
 $tree->child('secret.env')->spew("TOKEN=xyz\n");
 $tree->child('.cavilignore')->spew("*secret.env\n");
-system('git', '-C', $tree->to_string, 'init', '-q');
+my $have_git = have_tool('git');
+system('git', '-C', $tree->to_string, 'init', '-q') if $have_git;
 
 my $outdir = tempdir;
 my $out    = $outdir->child('archive.tar.gz')->to_string;
@@ -33,6 +34,7 @@ subtest 'packages vendored deps, drops .git and .cavilignore entries' => sub {
 };
 
 subtest '--respect-gitignore also drops gitignored paths' => sub {
+  plan skip_all => 'git is not installed' unless $have_git;
   Cavil::CLI::Archive->new(dir => $tree->to_string, respect_gitignore => 1)->build($out);
   my @members = members($out);
   ok(!(grep {m!node_modules!} @members), 'node_modules dropped when honouring .gitignore');

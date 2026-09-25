@@ -1,5 +1,32 @@
 Revision history for Perl extension Exception::Sink.
 
+3.11  2026.09.24
+
+    1. sink(): fixed ID parsing, single word after CLASS is now the message,
+       not an undefined ID
+    2. sink(): missing CLASS now defaults to SINK as documented
+    3. sink(): die() location suffix is stripped for relative file names and
+       for the ", <FH> line N." form too; plain " at /path" text is kept
+    4. exception objects are always true in boolean context, so empty or "0"
+       messages are no longer swallowed by dive() and surface()
+    5. COPYING added to MANIFEST
+    6. surface() and dive() re-sink any non Exception::Sink::Class reference
+       (third party exception objects, plain refs), original reference is
+       kept in OBJ attribute
+    7. "Pkg::Name" text is no longer parsed as CLASS or ID
+    8. exception objects compare as strings (eq, ne, cmp, sort, hash keys),
+       previously these operations died with "no method found"
+    9. get_stack_trace() treats negative skip as 0
+   10. sink(undef) is the same as sink("")
+   11. FILE, LINE and PACKAGE point to the user code which called sink(),
+       boom(), dive() or surface(), not to Sink.pm internals
+   12. exception objects stringify like die() text: " at FILE line N.\n" is
+       appended unless the text already ends with a newline. uncaught
+       exceptions now print their origin. use $993>{ORG} for the bare text
+   13. boom() hides its internal boom_skip() frame from the stack trace,
+       trace starts with the boom() call site
+   14. docs updated
+
 3.10  2026.09.20
 
     1. fixed $pack::
@@ -11,7 +38,7 @@ Revision history for Perl extension Exception::Sink.
 
 3.08  2024.07.08
 
-    1. added book_skip($$) and optional skip argument to get_stack_trace()
+    1. added boom_skip($$) and optional skip argument to get_stack_trace()
 
 3.07  2016.07.04
 

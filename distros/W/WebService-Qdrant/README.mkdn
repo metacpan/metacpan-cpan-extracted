@@ -1,0 +1,146 @@
+# NAME
+
+WebService::Qdrant - Easy client for Qdrant servers
+
+# VERSION
+
+version 0.0001
+
+# SYNOPSIS
+
+    my $qdrant = WebService::Qdrant->new;
+
+    my $remote = WebService::Qdrant->new(
+        base_url => 'https://qdrant.example.com:6333',
+        api_key  => $api_key,
+        timeout  => 60,
+    );
+
+# DESCRIPTION
+
+A small synchronous client for Qdrant's collection and point APIs. All API
+methods return [WebService::Qdrant::Response](https://metacpan.org/pod/WebService%3A%3AQdrant%3A%3AResponse), including HTTP errors.
+Transport failures and invalid local arguments throw exceptions.
+
+Each wrapper requires `collection_name`. Collection names are escaped as
+one URL path segment. Body fields use Qdrant's API names and ordinary Perl
+hashes and arrays; use JSON::MaybeXS booleans for JSON boolean values.
+Body schemas are validated by Qdrant rather than duplicated in this client.
+
+# SUBROUTINES/METHODS
+
+## collection\_exists
+
+    my $response = $qdrant->collection_exists(collection_name => 'notes');
+    my $exists = $response->result->{exists} if $response->is_success;
+
+Checks existence. Returns a response object, not a bare boolean.
+
+## create\_collection
+
+    my $response = $qdrant->create_collection(
+        collection_name => 'notes',
+        vectors => { size => 3, distance => 'Cosine' },
+        timeout => 10,
+    );
+
+Creates a collection. Optional `timeout` goes in the URL. Remaining fields,
+including named vectors, sparse vectors, and collection configuration,
+are passed through as the JSON body.
+
+## delete\_collection
+
+    my $response = $qdrant->delete_collection(collection_name => 'notes');
+
+Deletes the collection and its data. Accepts optional `timeout`.
+
+## delete\_points
+
+    my $response = $qdrant->delete_points(
+        collection_name => 'notes', points => [0, 42],
+        wait => JSON::MaybeXS::true(),
+    );
+
+Deletes points selected by `points` (IDs) or `filter`. Optional `wait`,
+`ordering`, and `timeout` go in the URL. Remaining fields form the body.
+
+## get\_collection
+
+    my $response = $qdrant->get_collection(collection_name => 'notes');
+
+Retrieves collection configuration and statistics under `result`.
+
+## new
+
+Constructs a client without making a network request. Accepts the attributes
+below as named arguments.
+
+## query\_points
+
+    my $response = $qdrant->query_points(
+        collection_name => 'notes', query => [0.1, 0.2, 0.3],
+        limit => 5, with_payload => JSON::MaybeXS::true(),
+    );
+
+Queries points; matches are under `$response->result->{points}`.
+Optional `consistency` and `timeout` go in the URL. Remaining fields,
+including `query`, `filter`, `prefetch`, and result options, form the body.
+`query` may be omitted for Qdrant's default query behavior.
+
+## upsert
+
+    my $response = $qdrant->upsert(
+        collection_name => 'notes',
+        points => [{ id => 0, vector => [0.1, 0.2, 0.3],
+                     payload => { source => 'notes.md' } }],
+        wait => JSON::MaybeXS::true(),
+    );
+
+Inserts or replaces points. Accepts `points` or the Qdrant `batch` format.
+Optional `wait`, `ordering`, and `timeout` go in the URL. Other fields
+form the JSON body. An acknowledged operation may still be pending unless
+`wait` was requested; inspect the returned operation status.
+
+# ATTRIBUTES
+
+## base\_url
+
+Qdrant service URL. Defaults to `http://localhost:6333`.
+
+## api\_key
+
+Optional authentication key, sent in the `api-key` HTTP header.
+
+## timeout
+
+HTTP timeout in seconds. Defaults to `30`. This configures LWP::UserAgent
+and is separate from Qdrant's per-operation timeout parameter.
+
+## ua
+
+Optional transport object, normally a [WebService::Qdrant::UA](https://metacpan.org/pod/WebService%3A%3AQdrant%3A%3AUA) instance.
+Useful for tests or custom HTTP configuration. An injected transport is used
+as supplied; configure its authentication and timeout on that object.
+
+# DIAGNOSTICS
+
+Missing, empty, or reference-valued collection names throw before HTTP.
+Collection inspection and deletion methods reject unknown arguments.
+See [WebService::Qdrant::UA](https://metacpan.org/pod/WebService%3A%3AQdrant%3A%3AUA) for transport errors and
+[WebService::Qdrant::Response](https://metacpan.org/pod/WebService%3A%3AQdrant%3A%3AResponse) for HTTP errors and JSON diagnostics.
+
+# SEE ALSO
+
+[https://api.qdrant.tech/v-1-18-x/api-reference](https://api.qdrant.tech/v-1-18-x/api-reference),
+[WebService::Qdrant::UA](https://metacpan.org/pod/WebService%3A%3AQdrant%3A%3AUA), [WebService::Qdrant::Response](https://metacpan.org/pod/WebService%3A%3AQdrant%3A%3AResponse)
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

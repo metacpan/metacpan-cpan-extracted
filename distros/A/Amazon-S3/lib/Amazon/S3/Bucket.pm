@@ -12,6 +12,7 @@ use Digest::MD5 qw(md5 md5_hex);
 use Digest::MD5::File qw(file_md5 file_md5_hex);
 use English qw(-no_match_vars);
 use File::stat;
+use File::Temp qw(tempfile);
 use IO::File;
 use IO::Scalar;
 use List::Util qw(none pairs any);
@@ -22,7 +23,7 @@ use XML::Simple; ## no critic (DiscouragedModules)
 
 use parent qw(Exporter Class::Accessor::Fast);
 
-our $VERSION = '2.1.0'; ## no critic (RequireInterpolation)
+our $VERSION = '2.1.1'; ## no critic (RequireInterpolation)
 
 __PACKAGE__->mk_accessors(
   qw(
@@ -101,84 +102,6 @@ sub _uri {
 }
 
 ########################################################################
-sub add_key {
-########################################################################
-  my ( $self, $key, $value, $conf ) = @_;
-
-  croak 'must specify key'
-    if !$key || !length $key;
-
-  $conf //= {};
-
-  my $account = $self->account;
-
-  my $headers = delete $conf->{headers};
-  $headers //= {};
-
-  if ( $conf->{acl_short} ) {
-    $account->_validate_acl_short( $conf->{acl_short} );
-
-    $conf->{'x-amz-acl'} = $conf->{acl_short};
-
-    delete $conf->{acl_short};
-  }
-
-  $headers = { %{$conf}, %{$headers} };
-
-  set_md5_header( data => $value, headers => $headers );
-
-  my $algorithm      = lc $account->checksum_algorithm;
-  my $checksum_types = $account->checksum_types;
-
-  if ( exists $checksum_types->{$algorithm} ) {
-    my %digest_parameters;
-
-    if ( ref $value ) {
-      $digest_parameters{filename} = ${$value};
-    }
-    else {
-      $digest_parameters{data} = $value;
-    }
-
-    my $digest = $checksum_types->{$algorithm}->(%digest_parameters);
-
-    $headers->{ 'x-amz-checksum-' . $algorithm } = encode_base64( $digest, $EMPTY );
-  }
-
-  if ( ref $value ) {
-    $value = _content_sub( ${$value}, $self->buffer_size );
-
-    $headers->{'x-amz-content-sha256'} = 'UNSIGNED-PAYLOAD';
-  }
-
-  # If we're pushing to a bucket that's under
-  # DNS flux, we might get a 307 Since LWP doesn't support actually
-  # waiting for a 100 Continue response, we'll just send a HEAD first
-  # to see what's going on
-  my $retval = eval { return $self->_add_key( { headers => $headers, data => $value, key => $key, }, ); };
-
-  # one more try? if someone specified the wrong region, we'll get a
-  # 301 and you'll only know the region of redirection - no location
-  # header provided...
-  if ($EVAL_ERROR) {
-    my $rsp = $account->last_response;
-
-    if ( $rsp->code eq $HTTP_MOVED_PERMANENTLY ) {
-      $self->region( $rsp->headers->{'x-amz-bucket-region'} );
-    }
-
-    $retval = $self->_add_key(
-      { headers => $headers,
-        data    => $value,
-        key     => $key,
-      },
-    );
-  }
-
-  return $retval;
-}
-
-########################################################################
 sub _add_key {
 ########################################################################
   my ( $self, @args ) = @_;
@@ -202,11 +125,235 @@ sub _add_key {
 }
 
 ########################################################################
+sub add_key {
+########################################################################
+  my ( $self, @args ) = @_;
+
+  my ( $key, $value, $conf, $source );
+
+  if ( @args == 1 && ref $args[0] && reftype( $args[0] ) eq 'HASH' ) {
+    my $parameters = { %{ $args[0] } };
+
+    $key = delete $parameters->{key};
+
+    $source = $self->_stage_upload_source($parameters);
+
+    if ( exists $source->{data} ) {
+      $value = $source->{data};
+    }
+    else {
+      $value = \$source->{filename};
+    }
+
+    delete @{$parameters}{qw(data filename fh callback)};
+
+    $conf = $parameters;
+  }
+  else {
+    ( $key, $value, $conf ) = @args;
+  }
+
+  croak 'must specify key'
+    if !$key || !length $key;
+
+  $conf //= {};
+
+  my $account = $self->account;
+
+  my $retval;
+
+  eval {
+    my $headers = delete $conf->{headers};
+    $headers //= {};
+
+    if ( $conf->{acl_short} ) {
+      $account->_validate_acl_short( $conf->{acl_short} );
+
+      $conf->{'x-amz-acl'} = $conf->{acl_short};
+
+      delete $conf->{acl_short};
+    }
+
+    $headers = { %{$conf}, %{$headers} };
+
+    set_md5_header( data => $value, headers => $headers );
+
+    my $algorithm      = lc $account->checksum_algorithm;
+    my $checksum_types = $account->checksum_types;
+
+    if ( exists $checksum_types->{$algorithm} ) {
+      my %digest_parameters;
+
+      if ( ref $value ) {
+        $digest_parameters{filename} = ${$value};
+      }
+      else {
+        $digest_parameters{data} = $value;
+      }
+
+      my $digest = $checksum_types->{$algorithm}->(%digest_parameters);
+
+      $headers->{ 'x-amz-checksum-' . $algorithm } = encode_base64( $digest, $EMPTY );
+    }
+
+    if ( ref $value ) {
+      $value = _content_sub( ${$value}, $self->buffer_size );
+
+      $headers->{'x-amz-content-sha256'} = 'UNSIGNED-PAYLOAD';
+    }
+
+    my $request_error;
+
+    eval { $retval = $self->_add_key( { headers => $headers, data => $value, key => $key, }, ); };
+
+    $request_error = $EVAL_ERROR;
+
+    if ($request_error) {
+      my $rsp = $account->last_response;
+
+      if ( $rsp && $rsp->code eq $HTTP_MOVED_PERMANENTLY ) {
+        $self->region( $rsp->headers->{'x-amz-bucket-region'} );
+      }
+
+      $retval = $self->_add_key(
+        { headers => $headers,
+          data    => $value,
+          key     => $key,
+        },
+      );
+    }
+  };
+
+  my $error = $EVAL_ERROR;
+
+  if ( $source && $source->{temporary} ) {
+    my $filename = $source->{filename};
+
+    if ( !unlink $filename ) {
+      warn "Could not remove temporary upload file $filename: $OS_ERROR\n";
+    }
+  }
+
+  die $error
+    if $error;
+
+  return $retval;
+}
+
+########################################################################
 sub add_key_filename {
 ########################################################################
-  my ( $self, $key, $value, $conf ) = @_;
+  my ( $self, $key, $filename, $conf ) = @_;
 
-  return $self->add_key( $key, \$value, $conf );
+  $conf //= {};
+
+  return $self->add_key(
+    { %{$conf},
+      key      => $key,
+      filename => $filename,
+    }
+  );
+}
+
+########################################################################
+sub _stage_upload_source {
+########################################################################
+  my ( $self, $parameters ) = @_;
+
+  my @sources;
+
+  foreach my $name (qw(data filename fh callback)) {
+    if ( $name eq 'data' ) {
+      push @sources, $name
+        if exists $parameters->{$name};
+
+      next;
+    }
+
+    push @sources, $name
+      if defined $parameters->{$name};
+  }
+
+  croak 'one of data, filename, fh or callback must be specified'
+    if !@sources;
+
+  croak 'only one of data, filename, fh or callback may be specified'
+    if @sources > 1;
+
+  my $source_type = $sources[0];
+
+  if ( $source_type eq 'data' ) {
+    return { data => $parameters->{data}, };
+  }
+
+  if ( $source_type eq 'filename' ) {
+    return { filename => $parameters->{filename}, };
+  }
+
+  my $callback;
+
+  if ( $source_type eq 'fh' ) {
+    my $fh = $parameters->{fh};
+
+    $callback = sub {
+      my $buffer;
+
+      my $read = $fh->read( $buffer, $self->buffer_size );
+
+      croak "Error while reading upload content: $OS_ERROR"
+        if !defined $read;
+
+      return
+        if !$read;
+
+      return \$buffer;
+    };
+  }
+  else {
+    $callback = $parameters->{callback};
+
+    croak 'callback must be a reference to a subroutine'
+      if !ref $callback || reftype($callback) ne 'CODE';
+  }
+
+  my ( $tmp_fh, $filename ) = tempfile( UNLINK => $FALSE );
+
+  $tmp_fh->binmode;
+
+  eval {
+    while ($TRUE) {
+      my $buffer = $callback->();
+
+      last
+        if !defined $buffer;
+
+      croak 'upload callback must return a scalar reference'
+        if !ref $buffer || reftype($buffer) ne 'SCALAR';
+
+      print {$tmp_fh} ${$buffer}
+        or croak "Could not write temporary upload file: $OS_ERROR";
+    }
+
+    $tmp_fh->close
+      or croak "Could not close temporary upload file: $OS_ERROR";
+  };
+
+  my $error = $EVAL_ERROR;
+
+  if ($error) {
+    eval { $tmp_fh->close; };
+
+    if ( -e $filename && !unlink $filename ) {
+      warn "Could not remove temporary upload file $filename: $OS_ERROR\n";
+    }
+
+    die $error;
+  }
+
+  return {
+    filename  => $filename,
+    temporary => $TRUE,
+  };
 }
 
 ########################################################################
@@ -1516,15 +1663,46 @@ bucket region when no region is supplied.
 
 =head3 add_key
 
-  my $ok = $bucket->add_key($key, $value);
+  my $ok = $bucket->add_key( $key, $value );
+
+  my $ok = $bucket->add_key( $key, $value, %configuration, );
 
   my $ok = $bucket->add_key(
-    $key,
-    $value,
-    \%configuration,
+    { key     => $key,
+      data    => $data,
+      headers => %headers,
+    }
   );
 
+  my $ok = $bucket->add_key(
+    { key      => $key,
+      filename => $filename,
+      headers  => %headers,
+    }
+  );
+
+  my $ok = $bucket->add_key(
+    { key     => $key,
+      fh      => $fh,
+      headers => %headers,
+    }
+  );
+
+  my $ok = $bucket->add_key(
+    { key      => $key,
+      callback => $callback,
+      headers  => %headers,
+    }
+  );
+  
 Creates or replaces an object.
+
+The traditional positional interface and the hash-reference interface are
+both supported.
+
+=head4 Positional interface
+
+The positional interface accepts:
 
 =over 4
 
@@ -1538,8 +1716,8 @@ Required. Object content.
 
 A scalar value is uploaded directly.
 
-A scalar reference is interpreted as a filename and the referenced
-file is streamed to S3.
+A scalar reference is interpreted as a filename and the referenced file
+is streamed to S3.
 
 Use C<add_key_filename()> when uploading a file by name.
 
@@ -1557,43 +1735,118 @@ canned ACL value.
 
 =back
 
-C<Content-MD5> is added automatically.
+=head4 Hash-reference interface
+
+The hash-reference interface requires C<key> and exactly one upload
+source.
+
+Supported upload sources are:
+
+=over 4
+
+=item data
+
+Scalar object content.
+
+=item filename
+
+Name of a local file containing the object data.
+
+The supplied file is used directly and is not copied to temporary
+storage.
+
+=item fh
+
+Filehandle from which object data is read.
+
+The complete contents of the filehandle are staged in a temporary file
+before the request is sent.
+
+=item callback
+
+Code reference that supplies object data.
+
+The callback is repeatedly invoked until it returns C<undef>. Each
+successful invocation must return a scalar reference containing the next
+chunk of object data.
+
+For example:
+
+  my $callback = sub {
+    return
+      if !@chunks;
+
+    my $chunk = shift @chunks;
+  
+    return \$chunk;
+  };
+
+The complete contents produced by the callback are staged in a temporary
+file before the request is sent.
+
+=back
+
+Only one of C<data>, C<filename>, C<fh>, or C<callback> may be supplied.
+
+Other entries in the hash reference are treated in the same manner as
+the positional C<configuration> hash.
+
+=head4 Temporary storage
+
+Uploads using C<fh> or C<callback> are staged completely in a temporary
+file before the S3 request begins.
+
+Staging allows C[Amazon::S3](Amazon::S3) to determine the complete object size,
+calculate request checksums, and replay the upload if necessary.
+
+The system temporary directory must therefore be writable and must have
+sufficient free space to hold the complete object. An upload using
+C<fh> or C<callback> may fail before contacting S3 if temporary storage
+cannot be created or written.
+
+Uploads using C<data> do not require temporary storage.
+
+Uploads using C<filename> use the supplied file directly and do not
+create an additional temporary copy.
+
+Temporary files created for C<fh> or C<callback> uploads are removed
+after the upload completes or fails.
+
+=head4 Checksums
 
 C<Content-MD5> is added automatically.
 
-C<Amazon::S3> also calculates and sends an S3 checksum automatically.
+C[Amazon::S3](Amazon::S3) also calculates and sends an S3 checksum automatically.
 By default, CRC64NVME is used. Most applications do not need to select
 or calculate a checksum explicitly.
 
 The checksum algorithm can be changed using the associated
-L<Amazon::S3> object's C<checksum_algorithm> setting.
+L[Amazon::S3](Amazon::S3) object's C<checksum_algorithm> setting.
 
-See L<Amazon::S3/CHECKSUMS>.
+See L[Amazon::S3/CHECKSUMS](Amazon::S3/CHECKSUMS).
+
+=head4 Return Value
 
 On success, returns a true value.
 
 On failure, returns C<undef> or throws an exception depending on the
 underlying request failure.
 
-See L<Amazon::S3/CHECKSUMS>.
-
 =head3 add_key_filename
 
-  my $ok = $bucket->add_key_filename(
-    $key,
-    $filename,
-    \%configuration,
-  );
+  my $ok = $bucket->add_key_filename($key, $filename, %configuration,);
 
-Creates or replaces an object by streaming the contents of a local
-file.
+Creates or replaces an object using the contents of a local file.
 
-The arguments are the same as C<add_key()> except that C<filename> is
-the local file to upload.
+This is a convenience wrapper around the C<filename> form of
+C<add_key()>.
 
-The file is streamed rather than read into memory as one scalar.
+The supplied file is streamed directly and is not copied to temporary
+storage.
 
 Returns the same value as C<add_key()>.
+
+See L</add_key>.
 
 =head3 copy_object
 
@@ -1981,76 +2234,229 @@ Other request errors throw an exception.
 
 =head3 list
 
-  my $response = $bucket->list;
+my $response = $bucket->list;
 
-  my $response = $bucket->list(\%parameters);
+my $response = $bucket->list(%parameters);
 
-Lists objects in this bucket using the original S3 ListObjects API.
-
-The supplied parameters are passed to
-L<Amazon::S3/list_bucket>; the bucket name is supplied automatically.
-
-Returns the same normalized result as
-L<Amazon::S3/list_bucket>.
-
-See L<Amazon::S3/LISTING OBJECTS>.
-
-=head3 list_all
-
-  my $response = $bucket->list_all;
-
-  my $response = $bucket->list_all(\%parameters);
-
-Lists all matching objects in this bucket using the original
+Lists one page of objects in this bucket using the original S3
 ListObjects API.
 
-The supplied parameters are passed to
-L<Amazon::S3/list_bucket_all>; the bucket name is supplied
+The bucket name is supplied automatically. C<%parameters> may contain
+the same listing options accepted by L[Amazon::S3/list_bucket](Amazon::S3/list_bucket),
+including:
+
+=over 4
+
+=item delimiter
+
+Optional delimiter used to group keys into common prefixes.
+
+=item headers
+
+Optional hash reference containing additional HTTP request headers.
+
+=item marker
+
+Optional key from which listing should continue.
+
+=item max-keys
+
+Optional maximum number of objects returned by this request.
+
+=item prefix
+
+Optional prefix used to restrict the returned keys.
+
+=back
+
+This method retrieves a single page of results. If S3 indicates that
+additional objects are available, the returned structure contains the
+marker needed to request the next page.
+
+Use C<list_all()> when all matching objects should be retrieved
 automatically.
 
-Pagination is followed automatically.
-
-Returns the same normalized result as
-L<Amazon::S3/list_bucket_all>.
-
-See L<Amazon::S3/LISTING OBJECTS>.
-
-=head3 list_all_v2
-
-  my $response = $bucket->list_all_v2;
-
-  my $response = $bucket->list_all_v2(\%parameters);
-
-Lists all matching objects in this bucket using ListObjectsV2.
-
-The supplied parameters are passed to
-L<Amazon::S3/list_bucket_all_v2>; the bucket name is supplied
-automatically.
-
-Pagination is followed automatically.
-
-Returns the same normalized result as
-L<Amazon::S3/list_bucket_all_v2>.
+Returns the same normalized result as L[Amazon::S3/list_bucket](Amazon::S3/list_bucket).
 
 See L<Amazon::S3/LISTING OBJECTS>.
 
 =head3 list_v2
 
-  my $response = $bucket->list_v2;
+my $response = $bucket->list_v2;
 
-  my $response = $bucket->list_v2(\%parameters);
+my $response = $bucket->list_v2(%parameters);
 
-Lists objects in this bucket using ListObjectsV2.
+Lists one page of objects in this bucket using the S3 ListObjectsV2
+API.
 
-The supplied parameters are passed to
-L<Amazon::S3/list_bucket_v2>; the bucket name is supplied
+The bucket name is supplied automatically. C<%parameters> may contain
+the same listing options accepted by L[Amazon::S3/list_bucket_v2](Amazon::S3/list_bucket_v2),
+including:
+
+=over 4
+
+=item continuation-token
+
+Optional continuation token returned by a previous ListObjectsV2
+request.
+
+=item delimiter
+
+Optional delimiter used to group keys into common prefixes.
+
+=item encoding-type
+
+Optional encoding type requested for returned keys.
+
+=item fetch-owner
+
+Optional value controlling whether owner information is returned.
+
+=item headers
+
+Optional hash reference containing additional HTTP request headers.
+
+=item marker
+
+Compatibility alias for C<continuation-token>.
+
+=item max-keys
+
+Optional maximum number of objects returned by this request.
+
+=item prefix
+
+Optional prefix used to restrict the returned keys.
+
+=item start-after
+
+Optional key after which S3 should begin the listing.
+
+=back
+
+This method retrieves a single page of results. C[Amazon::S3](Amazon::S3) presents
+the ListObjectsV2 continuation value through its normalized marker
+interface so that callers can paginate consistently with the original
+listing API.
+
+Use C<list_all_v2()> when all matching objects should be retrieved
 automatically.
 
-C<marker> is accepted as a compatibility alias for
-C<continuation-token>.
+Returns the same normalized result as L[Amazon::S3/list_bucket_v2](Amazon::S3/list_bucket_v2).
+
+See L<Amazon::S3/LISTING OBJECTS>.
+
+=head3 list_all
+
+my $response = $bucket->list_all;
+
+my $response = $bucket->list_all(%parameters);
+
+Lists all matching objects in this bucket using the original S3
+ListObjects API.
+
+The bucket name is supplied automatically. C<%parameters> may contain
+the same listing options accepted by
+L[Amazon::S3/list_bucket_all](Amazon::S3/list_bucket_all), including:
+
+=over 4
+
+=item delimiter
+
+Optional delimiter used to group keys into common prefixes.
+
+=item headers
+
+Optional hash reference containing additional HTTP request headers.
+
+=item marker
+
+Optional key from which listing should continue.
+
+=item max-keys
+
+Optional maximum number of objects requested from S3 per request.
+
+Because this method follows pagination automatically, C<max-keys>
+limits the size of each request rather than the total number of objects
+returned.
+
+=item prefix
+
+Optional prefix used to restrict the returned keys.
+
+=back
+
+Pagination is followed automatically until all matching objects have
+been retrieved.
 
 Returns the same normalized result as
-L<Amazon::S3/list_bucket_v2>.
+L[Amazon::S3/list_bucket_all](Amazon::S3/list_bucket_all).
+
+See L<Amazon::S3/LISTING OBJECTS>.
+
+=head3 list_all_v2
+
+my $response = $bucket->list_all_v2;
+
+my $response = $bucket->list_all_v2(%parameters);
+
+Lists all matching objects in this bucket using the S3 ListObjectsV2
+API.
+
+The bucket name is supplied automatically. C<%parameters> may contain
+the same listing options accepted by
+L[Amazon::S3/list_bucket_all_v2](Amazon::S3/list_bucket_all_v2), including:
+
+=over 4
+
+=item continuation-token
+
+Optional continuation token returned by S3.
+
+=item delimiter
+
+Optional delimiter used to group keys into common prefixes.
+
+=item encoding-type
+
+Optional encoding type requested for returned keys.
+
+=item fetch-owner
+
+Optional value controlling whether owner information is returned.
+
+=item headers
+
+Optional hash reference containing additional HTTP request headers.
+
+=item marker
+
+Compatibility alias for C<continuation-token>.
+
+=item max-keys
+
+Optional maximum number of objects requested from S3 per request.
+
+Because this method follows pagination automatically, C<max-keys>
+limits the size of each request rather than the total number of objects
+returned.
+
+=item prefix
+
+Optional prefix used to restrict the returned keys.
+
+=item start-after
+
+Optional key after which S3 should begin the listing.
+
+=back
+
+Pagination is followed automatically until all matching objects have
+been retrieved.
+
+Returns the same normalized result as
+L[Amazon::S3/list_bucket_all_v2](Amazon::S3/list_bucket_all_v2).
 
 See L<Amazon::S3/LISTING OBJECTS>.
 

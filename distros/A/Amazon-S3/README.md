@@ -52,10 +52,14 @@
     * [bucketv2](#bucketv2)
     * [delete\_bucket](#delete\bucket)
     * [delete\_public\_access\_block](#delete\public\access\block)
+    * [empty\_bucket](#empty\bucket)
     * [get\_bucket\_location](#get\bucket\location)
     * [list\_directory\_buckets](#list\directory\buckets)
   * [OBJECT LISTING AND VERSIONING](#object-listing-and-versioning)
     * [list\_bucket](#list\bucket)
+    * [list\_bucket\_v2](#list\bucket\v2)
+    * [list\_bucket\_all\_v2](#list\bucket\all\v2)
+    * [list\_object\_versions](#list\object\versions)
     * [turn\_off\_special\_retry](#turn\off\special\retry)
     * [turn\_on\_special\_retry](#turn\on\special\retry)
 * [LOGGING AND DEBUGGING](#logging-and-debugging)
@@ -500,11 +504,11 @@ See
 
 # ERROR HANDLING
 
-C\[Amazon::S3\](Amazon::S3) uses both return-value errors and exceptions.
+`Amazon::S3` uses both return-value errors and exceptions.
 
 For backward compatibility, many service operations return `undef` or
 a false value when an S3 request fails and record information about the
-most recent error on the C\[Amazon::S3\](Amazon::S3) object.
+most recent error on the `Amazon::S3` object.
 
 The primary error accessors are:
 
@@ -555,7 +559,7 @@ These accessors are especially useful when diagnosing signing,
 endpoint, header, or protocol problems.
 
 `raise_error` defaults to false to preserve the historical
-C\[Amazon::S3\](Amazon::S3) interface. New applications may prefer to enable it when
+`Amazon::S3` interface. New applications may prefer to enable it when
 they want request failures to be impossible to overlook.
 
 # METHODS AND SUBROUTINES
@@ -676,16 +680,30 @@ The following options are supported:
 
 - endpoint\_url
 
-    A fully qualified HTTP or HTTPS service endpoint. The URL may include a
-    port. This constructor option is a convenience for setting `host` and
-    `secure` together.
+    Optional explicit S3 service endpoint.
+
+    When `endpoint_url` is supplied, `Amazon::S3` uses that endpoint as
+    specified and does not rewrite the host when the configured region
+    changes.
+
+    The `region` setting still controls the AWS signing region.
+
+    This is useful for S3-compatible services, local test environments, and
+    other cases where the caller must select the service endpoint explicitly.
 
     For example:
 
-        endpoint_url => 'http://localhost:4566'
+        my $s3 = Amazon::S3->new(
+          { endpoint_url => 'http://localhost:4566',
+            region       => 'us-east-1',
+            ...
+          }
+        );
 
-    `endpoint_url` cannot be used together with `host` or `secure` and
-    must not contain a path.
+    When `endpoint_url` is not supplied, `Amazon::S3` may derive the
+    standard AWS S3 endpoint from the configured region.
+
+    `endpoint_url` and `host` may not both be supplied.
 
 - host
 
@@ -1289,6 +1307,34 @@ This operation may be required before applying public ACLs or public
 bucket policies to buckets whose public access block settings prohibit
 them.
 
+### empty\_bucket
+
+my $count = $s3->empty\_bucket($bucket\_name);
+
+my $count = $s3->empty\_bucket($bucket\_name, $headers);
+
+Deletes all object versions currently listed in the specified bucket.
+
+Returns the number of object versions and delete markers removed. For
+an unversioned bucket this is equivalent to the number of objects
+deleted.
+
+Objects are listed and deleted in batches until the bucket contains no
+remaining objects. The optional `$headers` hash reference is passed to
+the listing requests.
+
+A return value of `0` means that the operation succeeded but the
+bucket contained no objects. The return value is therefore a count and
+should not be used as a boolean indication of success or failure.
+
+This method always throws an exception if an error occurs while listing
+or deleting objects, regardless of the `raise_error` setting. If some
+objects were successfully deleted before the failure occurred, the
+exception includes the number of objects deleted before the error.
+
+**WARNING: This method permanently deletes all objects returned by the
+bucket listing. Use with caution.**
+
 ### get\_bucket\_location
 
     my $region = $s3->get_bucket_location($bucket_name);
@@ -1391,36 +1437,23 @@ On success, returns the combined normalized listing result.
 On a pagination failure, the method throws an exception.
 
 See ["LISTING OBJECTS"](#listing-objects).
-&#x3d;head3 list\_bucket\_all\_v2
 
-    my $response = $s3->list_bucket_all_v2(\%parameters);
+### list\_bucket\_v2
 
-Lists all matching objects using ListObjectsV2.
+my $response = $s3->list\_bucket\_v2(%parameters);
 
-The accepted parameters are the same as for `list_bucket_v2()`.
+Lists objects in a bucket using the S3 ListObjectsV2 API.
 
-The method follows pagination automatically and can therefore make
-multiple S3 requests.
+`%parameters` describes the bucket to list and the ListObjectsV2
+request parameters. `bucket` is required. `headers`, when supplied,
+is used as the request-header hash. All other defined entries are sent
+to S3 as query parameters.
 
-On success, returns the combined normalized listing result.
-
-On a pagination failure, the method throws an exception.
-
-See ["LISTING OBJECTS"](#listing-objects).
-&#x3d;head3 list\_bucket\_v2
-
-    my $response = $s3->list_bucket_v2(\%parameters);
-
-Lists objects using the S3 ListObjectsV2 API.
-
-The argument is a hash reference. `bucket` is required. Other defined
-entries are sent as ListObjectsV2 query parameters.
-
-Common parameters are:
+Supported parameters include:
 
 - bucket
 
-    Required. Bucket name.
+    Required. Name of the bucket to list.
 
 - continuation-token
 
@@ -1429,44 +1462,100 @@ Common parameters are:
 
 - delimiter
 
-    Optional delimiter used to group matching keys into common prefixes.
+    Optional delimiter used to group keys into common prefixes.
 
 - encoding-type
 
-    Optional S3 response encoding type.
+    Optional encoding type requested for keys returned by S3.
 
 - fetch-owner
 
-    Optional boolean controlling whether owner information is returned.
+    Optional value controlling whether owner information is returned.
 
 - headers
 
-    Optional hash reference containing additional request headers.
+    Optional hash reference containing additional HTTP request headers.
+
+    This value is used for the request itself and is not sent as a query
+    parameter.
 
 - marker
 
     Compatibility alias for `continuation-token`.
 
+    When supplied, `Amazon::S3` converts this value to the appropriate
+    ListObjectsV2 continuation parameter.
+
 - max-keys
 
-    Optional maximum number of results returned by S3.
+    Optional maximum number of keys returned by a single S3 request.
 
 - prefix
 
-    Optional prefix used to restrict returned keys.
+    Optional prefix used to restrict the returned keys.
 
 - start-after
 
     Optional key after which S3 should begin the listing.
 
+For example:
+
+my $response = $s3->list\_bucket\_v2(
+{
+bucket     => 'example-bucket',
+prefix     => 'logs/',
+delimiter  => '/',
+'max-keys' => 100,
+}
+);
+
 On success, returns the normalized listing structure described in
 ["LISTING OBJECTS"](#listing-objects).
+
+If S3 indicates that additional results are available,
+`next_marker` contains the continuation value that can be passed as
+`marker` on a subsequent call.
 
 On failure, returns `undef` and records error information on the
 client.
 
 See ["LISTING OBJECTS"](#listing-objects).
-&#x3d;head3 list\_object\_versions
+
+### list\_bucket\_all\_v2
+
+my $response = $s3->list\_bucket\_all\_v2(%parameters);
+
+Lists all matching objects in a bucket using the S3 ListObjectsV2 API.
+
+`%parameters` accepts the same request parameters as
+`list_bucket_v2()`. `bucket` is required.
+
+For example:
+
+my $response = $s3->list\_bucket\_all\_v2(
+{
+bucket => 'example-bucket',
+prefix => 'logs/',
+}
+);
+
+Unlike `list_bucket_v2()`, this method follows S3 pagination
+automatically. It repeatedly requests additional pages until all
+matching objects have been retrieved, and can therefore make multiple
+S3 requests.
+
+`max-keys`, when supplied, controls the maximum number of objects
+requested from S3 per request; it does not limit the total number of
+objects returned by this method.
+
+On success, returns a single normalized listing containing the objects
+collected from all pages.
+
+On a pagination failure, the method throws an exception.
+
+See ["list\_bucket\_v2"](#list_bucket_v2) and ["LISTING OBJECTS"](#listing-objects).
+
+### list\_object\_versions
 
     my $response = $s3->list_object_versions(\%parameters);
 

@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+use 5.010;
+use strict;
+use warnings;
+use Getopt::Long ();
+
+use Game::Mahjong;
+use Game::Mahjong::Terminal;
+
+my %o = (level => 2, seat => 0, colour => (-t STDOUT ? 1 : 0), glyphs => 0, auto => 0,
+         ascii => 0, clear => (-t STDOUT ? 1 : 0));
+Getopt::Long::GetOptions(
+	'seed=s'   => \$o{seed},
+	'level=i'  => \$o{level},
+	'seat=i'   => \$o{seat},
+	'glyphs!'  => \$o{glyphs},
+	'colour!'  => \$o{colour},
+	'color!'   => \$o{colour},
+	'auto'     => \$o{auto},
+	'ascii!'   => \$o{ascii},
+	'clear!'   => \$o{clear},
+	'help|h'   => \$o{help},
+) or usage(1);
+usage(0) if $o{help};
+
+$o{seed} //= sprintf('%s-%d', scalar(localtime), $$);
+
+binmode STDOUT, ':encoding(UTF-8)' unless $o{ascii};
+
+my $t = Game::Mahjong::Terminal->new(
+	seed => $o{seed}, level => $o{level}, seat => $o{seat},
+	in => \*STDIN, out => \*STDOUT, colour => $o{colour}, glyphs => $o{glyphs}, auto => $o{auto},
+	ascii => $o{ascii}, clear => $o{clear},
+);
+$t->run;
+
+sub usage {
+	my ($code) = @_;
+	print <<'USAGE';
+mahjong: a game against three bots under the Chinese Official rules
+
+  --seed STRING     the game (the same seed deals the same tiles); a fresh one by default
+  --level 1..3      the bots' strength, 2 by default
+  --seat 0..3       your seat, 0 by default (seat 0 deals the first hand)
+  --glyphs          put the Unicode Mahjong Tiles block on the tile faces
+  --ascii           draw the tile frames with + - | for a terminal without box drawing
+  --no-clear        do not clear the screen before each table
+  --no-colour       plain text (colour is on when standard output is a terminal)
+  --auto            four bots, no prompt: watch a game
+  --help            this
+
+At the prompt: a number discards that tile, "help" lists the rest.
+USAGE
+	exit $code;
+}
+
+__END__
+
+=head1 NAME
+
+mahjong - play Mahjong against three bots at the keyboard
+
+=head1 SYNOPSIS
+
+    mahjong
+    mahjong --seed evening --level 3 --glyphs
+    mahjong --auto
+
+=head1 DESCRIPTION
+
+See L<Game::Mahjong::Terminal>.
+
+=cut

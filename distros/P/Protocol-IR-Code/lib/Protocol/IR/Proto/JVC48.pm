@@ -2,7 +2,7 @@ package Protocol::IR::Proto::JVC48;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::JVC48 is the JVC-48 protocol handler (48-bit,
@@ -11,7 +11,7 @@ use Protocol::IR::Code;
 #   {37k,432}<1,-1|1,-3>(8,-4,3:8,1:8,D:8,S:8,F:8,(D^S^F):8,1,-173)+
 #
 # Six bytes are transmitted in order (OEM1=3, OEM2=1, device, subdevice,
-# function, checksum) behind a 3456/1728 us header. Each byte is sent
+# function, checksum) behind a 3456/1728 µs header. Each byte is sent
 # LSB-first, so the value a receiver accumulates is the first byte in the
 # most significant position (Tasmota's DataLSB). The checksum byte is
 # device^subdevice^function, the same rule the Panasonic member of the
@@ -110,7 +110,7 @@ sub decode_timing {
 
     my ($hdr_mark, $hdr_space) = @{$burst_pairs->[0]};
 
-    # JVC-48 Header Check: ~3456us mark, ~1728us space (8/-4 of 432us)
+    # JVC-48 Header Check: ~3456 µs mark, ~1728 µs space (8/-4 of 432 µs)
     return undef unless ($hdr_mark >= 2800 && $hdr_mark <= 4100) &&
                         ($hdr_space >= 1300 && $hdr_space <= 2100);
 
@@ -119,7 +119,7 @@ sub decode_timing {
         my $pair  = $burst_pairs->[$i + 1];
         my $space = $pair->[1];
 
-        # Space ~1296us = 1, ~432us = 0
+        # Space ~1296 µs = 1, ~432 µs = 0
         my $bit = ($space > 800) ? 1 : 0;
         my $byte_idx = int($i / 8);
         my $bit_idx  = $i % 8; # LSB-first
@@ -179,7 +179,7 @@ sub to_pronto {
         ];
     }
 
-    # The trailing mark and ~74ms gap (1,-173 of 432us).
+    # The trailing mark and ~74ms gap (1,-173 of 432 µs).
     push @burst_pairs, [$us_to_pulses->(432), $us_to_pulses->(74736)];
 
     my $seq1_pairs = scalar @burst_pairs;
@@ -192,13 +192,15 @@ sub to_pronto {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Proto::JVC48 - JVC-48 protocol handler (48-bit Kaseikyo, OEM 3/1)
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -215,7 +217,7 @@ version 1.0
 
 The C<JVC-48> protocol transmits 48-bit frames at B<37 kHz>: six bytes --
 OEM code B<3>, OEM code B<1>, B<device>, B<subdevice>, B<function>, and a
-checksum -- each sent LSB-first, preceded by a B<3456/1728 us> header and
+checksum -- each sent LSB-first, preceded by a B<3456/1728 µs> header and
 followed by a stop mark. A single frame carries all six bytes; the repeat is
 a whole-frame retransmission invisible to the single-frame decoder here. The
 checksum byte is B<device ^ subdevice ^ function>, the same rule the

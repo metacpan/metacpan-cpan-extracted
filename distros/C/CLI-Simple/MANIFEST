@@ -25,5 +25,8 @@ t/04-cli-simple-help.t
 t/05-cli-simple-args.t
 t/06-cli-simple-default.t
 t/cli-simple-manifest.t
+t/lib/CLISimpleHelpBoth.pm
+t/lib/CLISimpleHelpSynopsis.pm
+t/lib/CLISimpleHelpUsage.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

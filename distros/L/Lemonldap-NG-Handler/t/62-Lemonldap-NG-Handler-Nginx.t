@@ -298,6 +298,50 @@ foreach (qw(Cookie HTTP_COOKIE Auth-User HTTP_AUTH_USER)) {
     count(2);
 }
 
+# Encoded URLs (#3723)
+# --------------------
+# Nginx gives in X_ORIGINAL_URI the URI it routed on ($original_uri, already
+# decoded and normalized), while the other variables are those of the /lmauth
+# subrequest: rules are tested against X_ORIGINAL_URI as is. Nginx transforms
+# 302 redirections in 401.
+foreach my $t (
+    [ '/deny',         403, $sessionId ],
+    [ '/alwaysskip',   200 ],
+    [ '/%61lwaysskip', 401 ],    # Nginx value for /%2561lwaysskip
+  )
+{
+    my ( $uri, $code, $id ) = @$t;
+    ok(
+        $res = $client->_get(
+            '/lmauth', undef, undef,
+            ( $id ? "lemonldap=$id" : undef ),
+            X_ORIGINAL_URI => $uri
+        ),
+        "X_ORIGINAL_URI $uri"
+    );
+    ok( $res->[0] == $code, " Code is $code" ) or explain( $res->[0], $code );
+    count(2);
+}
+
+# Without X_ORIGINAL_URI, REQUEST_URI is the URI as sent by the client: it is
+# decoded and normalized before testing the rules
+foreach my $uri (
+    '/deny',        '/%64eny', '/den%79', '/./deny',
+    '/foo/../deny', '//deny',  '/%2Fdeny'
+  )
+{
+    ok(
+        $res = $client->_get(
+            '/lmauth', undef, undef, "lemonldap=$sessionId",
+            X_ORIGINAL_URI => undef,
+            REQUEST_URI    => $uri
+        ),
+        "REQUEST_URI $uri"
+    );
+    ok( $res->[0] == 403, " Code is 403" ) or explain( $res->[0], 403 );
+    count(2);
+}
+
 done_testing( count() );
 
 clean();

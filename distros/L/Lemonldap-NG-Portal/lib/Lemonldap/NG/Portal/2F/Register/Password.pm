@@ -2,7 +2,7 @@
 package Lemonldap::NG::Portal::2F::Register::Password;
 
 use strict;
-use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
+use Lemonldap::NG::Portal::Main::Constants ':all';
 use Mouse;
 use JSON qw(from_json to_json);
 use Lemonldap::NG::Common::Crypto;
@@ -73,7 +73,7 @@ sub verify {
     # Invalid try is returned with a 200 code. Javascript will read error
     # and propose to retry
     if ( $password ne $passwordverify ) {
-        return $self->failResponse( $req, 'PE34', 200 );
+        return $self->failResponse( $req, PE_PASSWORD_MISMATCH, 200 );
     }
     $self->logger->debug( $self->prefix . '2f: code verified' );
 
@@ -113,7 +113,7 @@ sub verify {
     }
     else {
         $self->logger->error( $self->prefix . "2f: unable to add password" );
-        return $self->failResponse( $req, "PE$res" );
+        return $self->failResponse( $req, $res );
     }
 }
 

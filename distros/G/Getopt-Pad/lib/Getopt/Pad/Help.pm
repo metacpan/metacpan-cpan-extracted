@@ -8,7 +8,7 @@ class Getopt::Pad::Help :strict(params) {
 	use Getopt::Pad::Util qw(useColor);
 	use Text::Wrap ();
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	field $level       :param;
 	field $version     :param = undef;
@@ -123,7 +123,7 @@ class Getopt::Pad::Help :strict(params) {
 			my @parts;
 			push @parts, ['[REQ]', $palette{annotation}] if $arg->required;
 			push @parts, [$arg->help, undef] if $arg->help ne '';
-			push @parts, [sprintf('[%s]', $arg->type->label), $palette{typeLabel}] if defined $arg->type->label;
+			push @parts, [sprintf('[%s]', $arg->typeLabel), $palette{typeLabel}] if defined $arg->typeLabel;
 			push @lines, $self->entryLines($self->argLabel($arg), \@parts);
 		}
 		return join("\n", @lines);
@@ -141,7 +141,7 @@ class Getopt::Pad::Help :strict(params) {
 				push @parts, ['[REQ]', $palette{annotation}] if $option->required;
 				push @parts, map { [sprintf('[%s]', $_), $palette{annotation}] } $option->type->constraintNotes;
 				push @parts, [$option->help, undef] if $option->help ne '';
-				push @parts, [sprintf('[%s]', $option->type->label), $palette{typeLabel}] if defined $option->type->label;
+				push @parts, [sprintf('[%s]', $option->typeLabel), $palette{typeLabel}] if defined $option->typeLabel;
 				push @lines, $self->entryLines($self->optionLabel($option), \@parts);
 
 				my $subIndent = ' ' x ($self->labelWidth + 4);
@@ -179,7 +179,10 @@ class Getopt::Pad::Help :strict(params) {
 
 	method optionLabel($option) {
 		my $label = sprintf($option->negatable ? '--[no-]%s' : '--%s', $option->name);
-		$label .= ' <>' if $option->type->takesValue;
+		return $label . ' <key=value>'   if $option->hash;
+		return $label . ' <N.key=value>' if $option->objectlist;
+		return $label . ' <a,b,...>'     if $option->csv;
+		return $label . ' <>'          if $option->type->takesValue;
 		return $label;
 	}
 
@@ -229,8 +232,16 @@ class Getopt::Pad::Help :strict(params) {
 	}
 
 	method stringifyDefault($default) {
-		return join(', ', $default->@*) if ref $default eq 'ARRAY';
-		return $default;
+		return $default if !ref $default;
+		return join(', ', map { sprintf('%s=%s', $_, $default->{$_}) } sort keys $default->%*) if ref $default eq 'HASH';
+		return join(', ', map { $self->stringifyEntry($default->[$_], $_) } 0 .. $#$default);
+	}
+
+	# A list entry: the value itself, or for an objectlist the entry's pairs
+	# prefixed with its index.
+	method stringifyEntry($entry, $index) {
+		return $entry if ref $entry ne 'HASH';
+		return $self->stringifyDefault({ map { (sprintf('%d.%s', $index, $_) => $entry->{$_}) } keys $entry->%* });
 	}
 }
 

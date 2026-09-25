@@ -5,8 +5,9 @@ use Getopt::Pad::Type::Path;
 
 class Getopt::Pad::Type::Dir :isa(Getopt::Pad::Type::Path) :strict(params) {
 	use constant NAMES => ['dir', 'directory'];
+	use File::Path ();
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	method label() { return 'Path' }
 
@@ -15,6 +16,13 @@ class Getopt::Pad::Type::Dir :isa(Getopt::Pad::Type::Path) :strict(params) {
 	method completes() { return 'dirs' }
 
 	method pathExists($value) { return -d $value }
+
+	method createPath($value) {
+		File::Path::make_path($value, { error => \my $errors });
+		return undef if !$errors->@*;
+		my ($path, $reason) = $errors->[0]->%*;
+		return $reason;
+	}
 }
 
 1;
@@ -29,7 +37,7 @@ Getopt::Pad::Type::Dir - directory path type
 
 =head1 DESCRIPTION
 
-Directory path, optionally required to exist via C<mustExist>.
+Directory path, optionally required to exist via C<mustExist>, or created with its parents on demand via C<createPathIfMissing>.
 
 Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
 

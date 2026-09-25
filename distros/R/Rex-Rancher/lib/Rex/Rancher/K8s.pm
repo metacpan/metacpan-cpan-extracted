@@ -1,7 +1,7 @@
 # ABSTRACT: Kubernetes API operations for Rex::Rancher (device plugin, readiness)
 
 package Rex::Rancher::K8s;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use v5.14.4;
 use warnings;
 
@@ -57,51 +57,7 @@ sub deploy_nvidia_device_plugin {
   my $api = _api($kubeconfig);
 
   my $ds = $api->new_object(DaemonSet =>
-    metadata => {
-      name      => 'nvidia-device-plugin-daemonset',
-      namespace => 'kube-system',
-    },
-    spec => {
-      selector => {
-        matchLabels => { name => 'nvidia-device-plugin-ds' },
-      },
-      updateStrategy => { type => 'RollingUpdate' },
-      template => {
-        metadata => {
-          labels => { name => 'nvidia-device-plugin-ds' },
-        },
-        spec => {
-          runtimeClassName  => 'nvidia',
-          priorityClassName => 'system-node-critical',
-          tolerations => [{
-            key      => 'nvidia.com/gpu',
-            operator => 'Exists',
-            effect   => 'NoSchedule',
-          }],
-          containers => [{
-            name  => 'nvidia-device-plugin-ctr',
-            image => "nvcr.io/nvidia/k8s-device-plugin:$version",
-            env   => [{
-              name  => 'FAIL_ON_INIT_ERROR',
-              value => 'false',
-            }],
-            securityContext => {
-              allowPrivilegeEscalation => \0,
-              capabilities            => { drop => ['ALL'] },
-            },
-            volumeMounts => [{
-              name      => 'device-plugin',
-              mountPath => '/var/lib/kubelet/device-plugins',
-            }],
-          }],
-          volumes => [{
-            name     => 'device-plugin',
-            hostPath => { path => '/var/lib/kubelet/device-plugins' },
-          }],
-        },
-      },
-    },
-  );
+    %{ _nvidia_device_plugin_daemonset_spec($version) });
 
   eval { $api->create($ds) };
   if ($@) {
@@ -160,6 +116,62 @@ sub _api {
   )->api;
 }
 
+# The nvidia-device-plugin DaemonSet as a plain hashref, split out verbatim
+# from deploy_nvidia_device_plugin so its shape can be unit-tested offline —
+# no cluster, no kubeconfig, no Kubernetes::REST client. $version is the only
+# value that varies; the caller resolves the DEVICE_PLUGIN_VERSION default
+# before calling. new_object(DaemonSet => %{ ... }) receives exactly the same
+# named args as the previous inline literal.
+sub _nvidia_device_plugin_daemonset_spec {
+  my ($version) = @_;
+  return {
+    metadata => {
+      name      => 'nvidia-device-plugin-daemonset',
+      namespace => 'kube-system',
+    },
+    spec => {
+      selector => {
+        matchLabels => { name => 'nvidia-device-plugin-ds' },
+      },
+      updateStrategy => { type => 'RollingUpdate' },
+      template => {
+        metadata => {
+          labels => { name => 'nvidia-device-plugin-ds' },
+        },
+        spec => {
+          runtimeClassName  => 'nvidia',
+          priorityClassName => 'system-node-critical',
+          tolerations => [{
+            key      => 'nvidia.com/gpu',
+            operator => 'Exists',
+            effect   => 'NoSchedule',
+          }],
+          containers => [{
+            name  => 'nvidia-device-plugin-ctr',
+            image => "nvcr.io/nvidia/k8s-device-plugin:$version",
+            env   => [{
+              name  => 'FAIL_ON_INIT_ERROR',
+              value => 'false',
+            }],
+            securityContext => {
+              allowPrivilegeEscalation => \0,
+              capabilities            => { drop => ['ALL'] },
+            },
+            volumeMounts => [{
+              name      => 'device-plugin',
+              mountPath => '/var/lib/kubelet/device-plugins',
+            }],
+          }],
+          volumes => [{
+            name     => 'device-plugin',
+            hostPath => { path => '/var/lib/kubelet/device-plugins' },
+          }],
+        },
+      },
+    },
+  };
+}
+
 sub _wait_for_gpu_resource {
   my ($api) = @_;
 
@@ -200,7 +212,7 @@ Rex::Rancher::K8s - Kubernetes API operations for Rex::Rancher (device plugin, r
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -263,7 +275,7 @@ Required options:
 
 =item C<kubeconfig>
 
-Absolute path to the kubeconfig file saved locally. This file must have the
+Path to the kubeconfig file saved locally. This file must have the
 real server address (not C<127.0.0.1>) — L<Rex::Rancher/rancher_deploy_server>
 patches the address automatically.
 
@@ -283,8 +295,12 @@ The DaemonSet is created with:
 
 =over
 
-=item * C<runtimeClassName: nvidia> — uses the NVIDIA container runtime
-(registered by L<Rex::GPU::NVIDIA/configure_containerd>) to enumerate devices.
+=item * C<runtimeClassName: nvidia> — uses the NVIDIA container runtime to
+enumerate devices. With L<Rex::GPU>'s C<gpu_setup> it is registered by
+L<Rex::GPU::NVIDIA/configure_containerd>; with C<gpu_setup =E<gt> 0> it must
+come from the host (a preinstalled toolkit, see C<nvidia_runtime_path> in
+L<Rex::Rancher/rancher_deploy_server>) or the GPU Operator's toolkit, which
+RKE2/K3s pick up at service start along with the C<nvidia> RuntimeClass.
 
 =item * C<priorityClassName: system-node-critical> — ensures the plugin
 pod is scheduled even under resource pressure.

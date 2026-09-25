@@ -70,6 +70,7 @@ $(window).on("load", function() {
     carouselIndicators.append(notificationIndicator);
   });
   // Append the carousel inner to the carousel container
+  const carousel = $("div.carousel");
   const previousButton =
     $(`<a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -80,8 +81,12 @@ $(window).on("load", function() {
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
     <span class="sr-only">Next</span>
   </a>`);
-
-  $("div.carousel").append(
+  if (carousel.hasClass("initialized")) {
+    return;
+  }
+  console.debug('Append carousel');
+  carousel.addClass("initialized");
+  carousel.append(
     carouselIndicators,
     carouselInner,
     previousButton,

@@ -11,7 +11,7 @@ use Protocol::IR::Code;
 # Mode2 pulse/space capture format, the native format of the LIRC `mode2`
 # tool and the MQTT IR test rig's receiver topic ("hear back timings"): one
 # timing per line, "pulse N" or "space N", in microseconds, strictly
-# alternating. Messages split on a space of 10000 us or more (lirc's default
+# alternating. Messages split on a space of 10000 µs or more (lirc's default
 # inter-message gap).
 
 my $converter = Protocol::IR::Converter->new();

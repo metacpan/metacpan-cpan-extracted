@@ -1,0 +1,5 @@
+# golden: driver/ubuntu-24.04--volta+b200
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+DIE: No single NVIDIA driver supports all GPUs on this host: GB100 [B200] (Blackwell, 10de:2901) needs the open kernel module, but GV100GL [Tesla V100 PCIe 16GB] (Maxwell/Pascal/Volta, 10de:1db4) needs the proprietary one. No driver package was installed and no package source was added. Install the driver yourself; once `nvidia-smi -L` lists the GPUs and libcuda.so.1 is in the linker cache, install_driver skips the driver step

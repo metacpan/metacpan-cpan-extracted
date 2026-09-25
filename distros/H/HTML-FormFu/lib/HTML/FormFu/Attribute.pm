@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Attribute;
-$HTML::FormFu::Attribute::VERSION = '2.07';
+$HTML::FormFu::Attribute::VERSION = '2.09';
 # ABSTRACT: accessor class
 
 use warnings;
@@ -79,7 +79,7 @@ sub mk_attrs {
                 literal( $self->form->localize( $mess, @args ) ) );
         };
 
-        my $loc_method = Class::MOP::Method->wrap(
+        Class::MOP::Method->wrap(
             body         => $loc_sub,
             name         => "${name}_loc",
             package_name => $class,
@@ -383,7 +383,7 @@ sub mk_inherited_accessors {
         };
 
         my $no_inherit_sub = sub {
-            my ( $self, $value ) = @_;
+            my ( $self ) = @_;
 
             if ( @_ > 1 ) {
                 croak "Cannot call ${name}_no_inherit as a setter";
@@ -569,7 +569,7 @@ HTML::FormFu::Attribute - accessor class
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -595,7 +595,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

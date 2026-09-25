@@ -88,7 +88,7 @@ sub runTest {
     my $refresh_token = $json->{refresh_token};
 
     # Make sure refresh token session has no _lastSeen to avoid purge
-    ok( !getSamlSession($refresh_token)->{data}->{_lastSeen},
+    ok( !getOidcSession($refresh_token)->{data}->{_lastSeen},
         "session has no _lastSeen" );
 
     count(1);

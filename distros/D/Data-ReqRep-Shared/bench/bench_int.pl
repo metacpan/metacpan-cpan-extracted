@@ -21,7 +21,6 @@ sub fmt_rate {
 
 print "ReqRep Int vs Str, $N iterations\n\n";
 
-# --- Single-process Int ---
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared::Int->new($path, 1024, 64);
@@ -46,7 +45,6 @@ print "ReqRep Int vs Str, $N iterations\n\n";
     $srv->unlink;
 }
 
-# --- Single-process Str ---
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 1024, 64, 4096);
@@ -72,7 +70,6 @@ print "ReqRep Int vs Str, $N iterations\n\n";
     $srv->unlink;
 }
 
-# --- Cross-process Int ---
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared::Int->new($path, 1024, 64);
@@ -98,7 +95,6 @@ print "ReqRep Int vs Str, $N iterations\n\n";
     $srv->unlink;
 }
 
-# --- Cross-process Str ---
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 1024, 64, 4096);

@@ -45,7 +45,8 @@ my $op = LLNG::Manager::Test->new( {
                     oidcRPMetaDataOptionsUserIDAttr            => "",
                     oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                     oidcRPMetaDataOptionsBypassConsent         => 1,
-                    oidcRPMetaDataOptionsRedirectUris => "http://rp.com/",
+                    oidcRPMetaDataOptionsRedirectUris          =>
+                      "http://rp.com/ http://rp.com/?oidc",
                 },
             },
             oidcServiceMetaDataAuthnContext => {
@@ -314,6 +315,49 @@ subtest "Form POST response mode for Hybrid grant" => sub {
         }
     );
     formPostResponseMode( $res, [ "id_token", "code" ] );
+};
+
+# A redirect URI whose query string holds no "=" is seen as an "isindex"
+# query by URI, and used to be dropped when adding response parameters (#3707)
+subtest "Valueless redirect URI parameter for Authorization Code grant" => sub {
+    my $res = authorize(
+        $op, $idpId,
+        {
+            response_type => 'code',
+            scope         => 'openid profile email',
+            client_id     => 'rpid',
+            state         => 'af0ifjsldkj',
+            redirect_uri  => 'http://rp.com/?oidc',
+        }
+    );
+    my ( $uri, $params ) = queryGetParam($res);
+    validateSuccessParam( $uri, $params, ["code"] );
+    like( $uri->query, qr/(?:^|&)oidc(?:&|$)/,
+        "Valueless redirect URI parameter is preserved" );
+};
+
+subtest "Valueless redirect URI parameter for Implicit grant" => sub {
+    my $res = authorize(
+        $op, $idpId,
+        {
+            response_type => 'id_token token',
+            scope         => 'openid profile email',
+            client_id     => 'rpid',
+            state         => 'af0ifjsldkj',
+            nonce         => 123,
+            redirect_uri  => 'http://rp.com/?oidc',
+        }
+    );
+    my ($url) = expectRedirection( $res, qr,(.*), );
+    my $uri = URI->new($url);
+    ok( $uri->fragment, "Fragment found" );
+    is( $uri->query, "oidc", "Valueless redirect URI parameter is preserved" );
+
+    # Copy fragment into query so we can extract it as a hash
+    my $tmp = URI->new;
+    $tmp->query( $uri->fragment );
+    validateSuccessParam( $uri, $tmp->query_form_hash,
+        [ "id_token", "access_token" ] );
 };
 
 clean_sessions();

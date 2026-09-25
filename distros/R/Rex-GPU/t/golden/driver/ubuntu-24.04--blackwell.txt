@@ -1,0 +1,19 @@
+# golden: driver/ubuntu-24.04--blackwell
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: dpkg --print-architecture
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: apt-cache search '^nvidia-driver-[0-9].*-server-open$' 2>/dev/null | sort -t- -k3 -n | tail -1 | awk '{print $1}'
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y linux-headers-6.8.0-85-generic linux-headers-generic nvidia-driver-590-server-open
+run: dpkg -l nvidia-driver-590-server-open 2>/dev/null | grep -q '^ii'
+file: /etc/modprobe.d/blacklist-nouveau.conf
+  | blacklist nouveau
+  | options nouveau modeset=0
+run: update-initramfs -u 2>/dev/null
+run: modprobe nvidia
+run: lsmod | grep '^nvidia '
+run: nvidia-smi -L 2>&1
+run: /sbin/ldconfig -p 2>/dev/null | grep -q '^[[:space:]]*libcuda\.so\.1 '

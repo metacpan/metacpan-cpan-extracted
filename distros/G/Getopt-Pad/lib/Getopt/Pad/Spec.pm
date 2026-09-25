@@ -11,7 +11,7 @@ use Getopt::Pad::Completion;
 class Getopt::Pad::Spec :strict(params) {
 	use Getopt::Pad::Util qw(specError);
 
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 
 	use constant CONFIG_OPTION => 'config';
 

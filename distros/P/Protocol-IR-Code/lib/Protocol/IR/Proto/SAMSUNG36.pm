@@ -2,7 +2,7 @@ package Protocol::IR::Proto::SAMSUNG36;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::SAMSUNG36 is the SAMSUNG36 protocol handler (36-bit),
@@ -11,10 +11,10 @@ use Protocol::IR::Code;
 # sendSamsung36/decodeSamsung36).
 #
 # The 36-bit data word is transmitted in two blocks. Block #1 carries the top
-# 16 bits (the address) behind a 4515/4438 us header; block #2 carries the
+# 16 bits (the address) behind a 4515/4438 µs header; block #2 carries the
 # remaining 20 bits (the command) with no header. Each block is sent MSB-first
-# with a 512 us mark and a 1468 us (1) / 490 us (0) space, and each block ends
-# with a 512 us mark; block #1's footer is followed by a 4438 us space and
+# with a 512 µs mark and a 1468 µs (1) / 490 µs (0) space, and each block ends
+# with a 512 µs mark; block #1's footer is followed by a 4438 µs space and
 # block #2's by the ~27 ms inter-message gap. The decoder reads both blocks
 # MSB-first, so the stored data word is the same value the transmitter sent -
 # what IRremoteESP8266 reports as `value`, the "Code" column of the sample
@@ -119,11 +119,11 @@ sub decode_timing {
     my $block1 = 0;
     for my $i (0 .. $ADDR_BITS - 1) {
         my $space = $burst_pairs->[$i + 1]->[1];
-        # Space ~1468us = 1, ~490us = 0
+        # Space ~1468 µs = 1, ~490 µs = 0
         $block1 = $block1 * 2 + (($space > 1000) ? 1 : 0);
     }
 
-    # Mid-block footer: a 512 us mark and the 4438 us space separating the
+    # Mid-block footer: a 512 µs mark and the 4438 µs space separating the
     # two blocks.
     my ($mid_mark, $mid_space) = @{$burst_pairs->[$ADDR_BITS + 1]};
     return undef unless ($mid_mark >= 400 && $mid_mark <= 900) &&
@@ -203,13 +203,15 @@ sub to_pronto {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Proto::SAMSUNG36 - SAMSUNG36 protocol handler (36-bit)
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -226,10 +228,10 @@ version 1.0
 
 The C<SAMSUNG36> protocol transmits 36-bit frames at B<38 kHz> in two
 blocks: block #1 carries the top 16 bits (the B<address>) behind a
-B<4515/4438 us> header, and block #2 carries the remaining 20 bits (the
-B<command>) with no header. Each block is sent B<MSB-first> with a 512 us
-mark and a 1468 us (1) / 490 us (0) space, and each block ends with a 512 us
-mark; block #1's footer is followed by a 4438 us space and block #2's by the
+B<4515/4438 µs> header, and block #2 carries the remaining 20 bits (the
+B<command>) with no header. Each block is sent B<MSB-first> with a 512 µs
+mark and a 1468 µs (1) / 490 µs (0) space, and each block ends with a 512 µs
+mark; block #1's footer is followed by a 4438 µs space and block #2's by the
 ~27 ms inter-message gap. The whole frame is sent once.
 
 Because the word is transmitted MSB-first as a whole, the stored C<data> is

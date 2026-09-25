@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use Lemonldap::NG::Common::FormEncode;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.4';
 
 has ua             => ( is => 'rw' );
 has cookieName     => ( is => 'rw' );
@@ -69,7 +69,7 @@ sub getUser {
             (
                 $self->conf->{proxyAuthServiceImpersonation}
                   && $req->param('spoofId')
-                ? ( spoofId => $req->param('spoofId') )
+                ? ( spoofId => scalar $req->param('spoofId') )
                 : ()
             )
         }

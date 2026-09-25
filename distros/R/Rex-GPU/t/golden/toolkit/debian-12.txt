@@ -1,0 +1,17 @@
+# golden: toolkit/debian-12
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+can_run: nvidia-ctk
+run: systemctl stop unattended-upgrades apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y --no-upgrade curl gnupg
+run: dpkg -l curl 2>/dev/null | grep -q '^ii'
+run: dpkg -l gnupg 2>/dev/null | grep -q '^ii'
+run: curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg.asc.tmp
+run: gpg --batch --yes --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg.tmp /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg.asc.tmp && test -s /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg.tmp && chmod 0644 /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg.tmp && mv -f /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg.tmp /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+run: rm -f /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg.asc.tmp /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg.tmp
+run: test -s /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+file: /etc/apt/sources.list.d/nvidia-container-toolkit.list
+  | deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y nvidia-container-toolkit
+run: dpkg -l nvidia-container-toolkit 2>/dev/null | grep -q '^ii'

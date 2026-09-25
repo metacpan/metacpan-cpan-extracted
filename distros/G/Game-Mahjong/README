@@ -1,0 +1,34 @@
+Game-Mahjong
+
+Mahjong, the four-player tile game, under the World Mahjong Organization's
+competition rules (2006): 144 tiles including the eight flowers, chow, pung
+and kong claims, robbing the kong, the eighty-one scoring elements in
+twelve grades, and a minimum of eight points to win.
+
+The engine prints nothing, reads nothing and never calls rand. A refused
+move comes back as a flagged object rather than an exception, a game
+serialises as its seed and its move log, and a log that records something
+the rules would not have produced is refused on replay.
+
+The tile table is C, published perl-free in include/mahjong_abi.h so the
+decomposer and the shanten, which a bot walks for every candidate discard,
+read the one table the Perl side reads. There is no pure-Perl fallback, so
+a working C compiler is needed to install it; Makefile.PL says so in one
+sentence when there is none.
+
+This is version 0.01, phase 01 of the plan: the tiles, the notation and the
+error object. The wall, the hand, the decomposer, the scorer, the rules, the
+bot and the terminal follow.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under the Artistic License 2.0.

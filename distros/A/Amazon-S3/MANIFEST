@@ -1,9 +1,9 @@
-bin/run-test
-bin/run-test.in
+bin/amzn-s3-cli
 ChangeLog
 lib/Amazon/S3.pm
 lib/Amazon/S3/Bucket.pm
 lib/Amazon/S3/BucketV2.pm
+lib/Amazon/S3/CLI.pm
 lib/Amazon/S3/Constants.pm
 lib/Amazon/S3/Logger.pm
 lib/Amazon/S3/Signature/V4.pm
@@ -26,6 +26,9 @@ t/07-crc64nvme.t
 t/08-checksums.t
 t/09-bucket-v2.t
 t/10-endpoint-url.t
+t/11-empty-bucket.t
+t/12-add-key-sources.t
+t/13-response-decode.t
 t/lib/S3TestUtils.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

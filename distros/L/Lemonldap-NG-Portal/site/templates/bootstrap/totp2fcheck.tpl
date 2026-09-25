@@ -20,7 +20,7 @@
       <div class="input-group-prepend">
         <span class="input-group-text"><label for="extcode" class="mb-0"><i class="fa fa-lock"></i></label></span>
       </div>
-      <input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" required />
+      <input name="code" value="" type="text" inputmode="numeric" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" required />
     </div>
   </div>
   <div class="buttons mb-3">

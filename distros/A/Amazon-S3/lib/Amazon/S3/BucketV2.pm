@@ -14,7 +14,7 @@ use Scalar::Util qw(reftype);
 
 use parent qw(Amazon::S3::Bucket);
 
-our $VERSION = '2.1.0'; ## no critic (RequireInterpolation)
+our $VERSION = '2.1.1'; ## no critic (RequireInterpolation)
 
 ######################################################################
 our @GET_OBJECT_METHODS = (
@@ -83,6 +83,19 @@ create_methods(
 );
 
 #######################################################################
+our @LIST_BUCKET_METHODS = (
+#######################################################################
+  list_multipart_uploads => 'uploads',
+  list_object_versions   => 'versions',
+);
+
+create_methods(
+  type       => 'bucket',
+  method     => 'GET',
+  method_def => \@LIST_BUCKET_METHODS,
+);
+
+#######################################################################
 our @PUT_BUCKET_METHODS = (
 #######################################################################
   put_bucket_intelligent_tiering_configuration => 'intelligent-tiering',
@@ -109,7 +122,7 @@ our @PUT_OBJECT_METHODS = (
   put_object_tagging            => 'tagging',
   put_object_retention          => 'retention',
   put_object_legal_hold         => 'legal-hold',
-  put_object_lock_configuraiton => 'lock-object',
+  put_object_lock_configuration => 'lock-object',
   put_public_access_block       => 'publicAccessBlock',
   restore_object                => sub {
     return { method => 'POST', api => 'restore' };
@@ -127,8 +140,9 @@ create_methods(
 ######################################################################
 our @DELETE_OBJECT_METHODS = (
 ######################################################################
-  delete_object  => $EMPTY,
-  delete_objects => sub {
+  abort_multipart_upload => $EMPTY,
+  delete_object          => $EMPTY,
+  delete_objects         => sub {
     return { method => 'POST', api => 'delete' };
   },
   delete_object_tagging => 'tagging',
@@ -330,8 +344,6 @@ __END__
 
 =head1 NAME
 
-=head1 NAME
-
 Amazon::S3::BucketV2 - Interface to additional Amazon S3 bucket operations
 
 =head1 SYNOPSIS
@@ -479,10 +491,13 @@ The parameter name is C<uri_param>, singular.
 
 =head2 Return Value and Errors
 
-On a successful request with an XML response body, the generated
-method returns the decoded S3 response.
+On a successful request with a response body, the generated method
+returns the decoded S3 response when the response format is recognized.
 
-A successful request with no XML response body returns C<undef>.
+JSON and XML response bodies are decoded automatically. Other
+successful response bodies are returned unchanged.
+
+A successful request with no response body returns C<undef>.
 
 When S3 returns a non-2xx response, the method returns C<undef> and
 records the parsed service error on the associated L<Amazon::S3>
@@ -1072,16 +1087,13 @@ L</GENERATED METHOD CALLING CONVENTION>.
 
 See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObjectLegalHold.html>.
 
-=head3 PutObjectLockConfiguraiton
+=head3 PutObjectLockConfiguration
 
-  my $result = $bucket->PutObjectLockConfiguraiton(
+  my $result = $bucket->PutObjectLockConfiguration(
     key => $key,
   );
 
 Object-level S3 operation.
-
-The method name is spelled C<PutObjectLockConfiguraiton> in this
-release. It invokes the S3 PutObjectLockConfiguration operation.
 
 Accepts the generated-method parameters described in
 L</GENERATED METHOD CALLING CONVENTION>.
@@ -1324,6 +1336,24 @@ See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeletePublicAccessBloc
 
 =head2 DELETE OBJECT OPERATIONS
 
+=head3 AbortMultipartUpload
+
+  my $result = $bucket->AbortMultipartUpload(
+    key       => $key,
+    uri_param => {
+      uploadId => $upload_id,
+    },
+  );
+
+Aborts an in-progress multipart upload.
+
+C<key> and the C<uploadId> query parameter are required.
+
+Accepts the generated-method parameters described in
+L</GENERATED METHOD CALLING CONVENTION>.
+
+See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_AbortMultipartUpload.html>.
+
 =head3 DeleteObject
 
   my $result = $bucket->DeleteObject(
@@ -1362,6 +1392,50 @@ Accepts the generated-method parameters described in
 L</GENERATED METHOD CALLING CONVENTION>.
 
 See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObjectTagging.html>.
+
+=head2 LIST OPERATIONS
+
+=head3 ListMultipartUploads
+
+  my $result = $bucket->ListMultipartUploads();
+
+  my $result = $bucket->ListMultipartUploads(
+    uri_param => {
+      'key-marker'       => $key_marker,
+      'upload-id-marker' => $upload_id_marker,
+      'max-uploads'      => 1000,
+    },
+  );
+
+Lists in-progress multipart uploads for the bucket.
+
+Accepts the generated-method parameters described in
+L</GENERATED METHOD CALLING CONVENTION>.
+
+Pagination parameters may be supplied through C<uri_param>.
+
+See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListMultipartUploads.html>.
+
+=head3 ListObjectVersions
+
+  my $result = $bucket->ListObjectVersions();
+
+  my $result = $bucket->ListObjectVersions(
+    uri_param => {
+      'key-marker'        => $key_marker,
+      'version-id-marker' => $version_id_marker,
+      'max-keys'          => 1000,
+    },
+  );
+
+Lists object versions and delete markers for the bucket.
+
+Accepts the generated-method parameters described in
+L</GENERATED METHOD CALLING CONVENTION>.
+
+Pagination parameters may be supplied through C<uri_param>.
+
+See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html>.
 
 =head1 INHERITED METHODS
 

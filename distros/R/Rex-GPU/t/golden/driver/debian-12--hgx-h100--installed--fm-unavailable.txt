@@ -1,0 +1,11 @@
+# golden: driver/debian-12--hgx-h100--installed--fm-unavailable
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run: /sbin/ldconfig -p 2>/dev/null | grep -q '^[[:space:]]*libcuda\.so\.1 '
+run: nvidia-smi --query-gpu=driver_version --format=csv,noheader 2>&1
+run: dpkg-query -W -f='${Package} ${db:Status-Abbrev} ${Version}\n' 'nvidia-fabric*manager*' 2>/dev/null
+run: dpkg --print-architecture
+run: apt-get -o DPkg::Lock::Timeout=120 update -q
+run: apt-cache madison nvidia-fabricmanager 2>/dev/null
+run: systemctl is-active --quiet nvidia-fabricmanager.service

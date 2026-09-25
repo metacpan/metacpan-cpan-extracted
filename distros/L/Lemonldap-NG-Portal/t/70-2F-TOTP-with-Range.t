@@ -4,7 +4,7 @@ use strict;
 use IO::String;
 
 require 't/test-lib.pm';
-my $maintests = 28;
+my $maintests = 29;
 
 no warnings 'once';
 
@@ -128,7 +128,10 @@ SKIP: {
         'Auth query'
     );
     ( $host, $url, $query ) = expectForm( $res, undef, '/totp2fcheck' );
-
+    ok(
+        $res->[2]->[0] =~ m%inputmode="numeric"%,
+        'Inputmode numeric'
+    ) or print STDERR Dumper( $res->[2]->[0] );
     $query =~ s/code=/code=$code/;
     ok(
         $res = $client->_post(

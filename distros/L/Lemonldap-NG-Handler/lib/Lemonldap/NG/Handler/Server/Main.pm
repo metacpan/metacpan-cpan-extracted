@@ -16,6 +16,21 @@ $ENV{LLNG_DEFAULTLOGGER} ||= defaultLogger;
 # In server mode, headers are not passed to a PSGI application but returned
 # to the server
 
+## @method void setAccessControlUri(hashRef env)
+# Set in the environment the URI on which access control must be decided.
+# Nginx gives in X_ORIGINAL_URI the URI it routed on ($original_uri, already
+# decoded and normalized): it is used as is, decoding it again would give a
+# path the application doesn't serve. Without it (Traefik and Caddy, where
+# REQUEST_URI is set from X-Forwarded-Uri), REQUEST_URI is the URI as sent by
+# the client and is canonicalized (see Handler::Main::canonicalUri()).
+# @param $env PSGI environment
+sub setAccessControlUri {
+    my ( $class, $env ) = @_;
+    $env->{ACCESS_CONTROL_URI} = $env->{X_ORIGINAL_URI}
+      || $class->canonicalUri( $env->{REQUEST_URI} );
+    return;
+}
+
 ## @method void set_header_in(hash headers)
 # sets or modifies request headers
 # @param headers hash containing header names => header value

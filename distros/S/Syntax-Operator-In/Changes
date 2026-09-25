@@ -1,5 +1,10 @@
 Revision history for Syntax-Operator-In
 
+0.11    2026-09-24
+        [CHANGES]
+         * Updates to ensure that `in:equ` and `in:===` work correctly using
+           the new undef-aware equality operators in Perl 5.45.3 (PPC0030)
+
 0.10    2024-07-19
         [CHANGES]
          * Updates for XS::Parse::Infix v0.44

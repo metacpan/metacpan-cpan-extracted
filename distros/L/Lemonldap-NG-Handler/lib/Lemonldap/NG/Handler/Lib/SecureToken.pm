@@ -37,7 +37,7 @@ sub run {
     return $ret unless ( $ret == $class->OK );
 
     # Get current URI
-    my $uri = $r->{env}->{REQUEST_URI};
+    my $uri = $r->access_control_uri;
 
     # Catch Secure Token parameters
     my $localConfig = $class->localConfig;

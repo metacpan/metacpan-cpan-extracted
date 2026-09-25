@@ -1,0 +1,45 @@
+Data::Tools::Crypto
+===================
+
+Data::Tools::Crypto provides authenticated encryption, hybrid public key
+encryption and digital signatures, with a single common API:
+
+    Data::Tools::Crypto             the base class, the shared API, not used on its own
+    Data::Tools::Crypto::Symmetric  shared secret key, ChaCha20-Poly1305
+    Data::Tools::Crypto::RSA        public/private key pair, hybrid, signatures
+
+Both modules offer encrypt/decrypt in raw, hex, base64 and base64url forms,
+and freeze/thaw which carry any plain perl data structure in one step.
+
+These modules were developed inside Data::Tools but no released Data::Tools
+ever contained them. They are a separate distribution because they need
+CryptX, which is large, and Exception::Sink, neither of which should be
+required just to use the rest of Data::Tools.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Data::Tools::Crypto uses:
+
+   Data::Tools
+   CryptX 0.048 or later
+   Encode
+   Exception::Sink
+   JSON 4.0 or later
+   MIME::Base64 3.11 or later
+
+COPYRIGHT AND LICENCE
+
+See `COPYING' file for full GPL license text.
+
+Copyright (C) 2013-2026 Vladi Belperchinov-Shabanski
+                        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+                        http://cade.noxrun.com/

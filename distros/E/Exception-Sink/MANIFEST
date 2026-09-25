@@ -1,8 +1,9 @@
 Changes
+COPYING
 Makefile.PL
 MANIFEST
 README
-t/Exception-Sink.t
+t/t1-exception-sink.pl
 lib/Exception/Sink.pm
 lib/Exception/Sink/Class.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

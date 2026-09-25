@@ -401,13 +401,21 @@ Stores `$data` at `$key` in `$bucket`. `$data` may be:
 
 - A scalar string (the object body verbatim)
 - A reference to a scalar (avoids copying large strings)
-- An open filehandle or [IO::File](https://metacpan.org/pod/IO%3A%3AFile) object (body is read to EOF)
+- A seekable open filehandle or [IO::File](https://metacpan.org/pod/IO%3A%3AFile) object
 
-When passing a filehandle, `content_length` becomes required unless
-HTTP::Tiny can determine the size from the handle (i.e. the handle is
-backed by a real file). For in-memory handles (`IO::Scalar`, etc.)
-you must supply `content_length` explicitly, or the method will
-croak.
+When passing a filehandle, the handle must be seekable. The method
+computes the SHA-256 hash required for AWS Signature Version 4 from the
+current file position through EOF, then restores the original position
+before streaming the content to S3.
+
+_Note: The effective uploaded payload is from the current position to EOF._
+
+`content_length` is required unless the size can be determined from the
+handle (for example, when the handle is backed by a real file). For
+in-memory handles such as `IO::Scalar`, supply `content_length`
+explicitly.
+
+The filehandle is not closed by `put_object`.
 
     # Scalar
     $s3->put_object('my-bucket', 'hello.txt', 'Hello, world!',
@@ -428,8 +436,10 @@ Options:
 
 - content\_length
 
-    Required when `$data` is an in-memory filehandle. Optional (and
-    ignored) for scalar data, where length is computed automatically.
+    Required for filehandles whose size cannot be determined automatically.
+    For handles backed by regular files, the size is determined from the
+    file. Ignored for scalar data, where the length is computed
+    automatically.
 
 - metadata
 

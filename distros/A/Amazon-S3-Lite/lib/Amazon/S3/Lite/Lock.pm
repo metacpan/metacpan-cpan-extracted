@@ -20,8 +20,11 @@ use strict;
 use warnings;
 
 use Carp qw(croak);
+use Data::Dumper;
 use English qw(-no_match_vars);
 use JSON qw(encode_json decode_json);
+
+our $VERSION = '1.3.3';
 
 ########################################################################
 sub new {
@@ -58,14 +61,23 @@ sub acquire {
   my $deadline = time + $self->{wait};
 
   while (1) {
-    my $etag = $self->_try_create;  # 200 -> etag, 412 -> undef
-    return $self->_guard($etag) if $etag;
+    {
+      my $etag = $self->_try_create;  # 200 -> etag, 412 -> undef
+      return $self->_guard($etag) if $etag;
+    }
 
     # Held. Is it stale?
-    my $stolen = $self->_try_steal_if_stale;  # 200 -> etag, else undef
-    return $self->_guard($stolen) if $stolen;
+    my ( $status, $etag ) = $self->_try_steal_if_stale;
 
-    last if time >= $deadline;  # no-wait or timed out
+    return $self->_guard($etag)
+      if $status eq 'stolen';
+
+    next
+      if $status eq 'vanished';
+
+    last
+      if time >= $deadline;
+
     sleep $self->{poll};
   }
 
@@ -79,6 +91,9 @@ sub _try_create {
 
   my $body = encode_json( { owner => $self->{owner}, expires => time + $self->{ttl} } );
 
+  $self->{s3}
+    ->logger->debug( sprintf 'lock acquire: bucket=%s key=%s owner=%s', $self->{bucket}, $self->{key}, $self->{owner}, );
+
   my $etag = eval {
     $self->{s3}->put_object(
       $self->{bucket}, $self->{key}, $body,
@@ -88,6 +103,13 @@ sub _try_create {
   };
 
   my $err = $EVAL_ERROR;
+
+  $self->{s3}->logger->debug(
+    sprintf 'lock create: status=%s etag=%s error=%s',
+    $self->{s3}->last_status // q{},
+    $etag                    // q{},
+    $err                     // q{},
+  );
 
   return $etag
     if $self->{s3}->last_status =~ /\A2/xsm;  # acquired
@@ -103,42 +125,65 @@ sub _try_steal_if_stale {
 ########################################################################
   my ($self) = @_;
 
-  # Read current lock: need its ETag + expiry.
   my $meta = eval { $self->{s3}->head_object( $self->{bucket}, $self->{key} ) };
 
-  return
-    if !$meta;  # vanished â next loop's create will win
+  $self->{s3}->logger->debug(
+    Dumper(
+      [ error => $EVAL_ERROR,
+        meta  => $meta
+      ]
+    )
+  );
+
+  return ('vanished')
+    if !$meta;
 
   my $current_etag = $meta->{etag};
 
   # Fetch body to read the holder's expiry (head doesn't carry it).
-  my $obj  = eval { $self->{s3}->get_object( $self->{bucket}, $self->{key} ) };
+  my $obj = eval { $self->{s3}->get_object( $self->{bucket}, $self->{key} ) };
+
+  $self->{s3}->logger->debug( Dumper( [ error => $EVAL_ERROR, ] ) );
+
   my $data = eval { decode_json( $obj->{content} // '{}' ) } // {};
 
-  return
-    if ( $data->{expires} // 0 ) > time;  # still fresh â don't steal
+  $self->{s3}->logger->debug(
+    Dumper(
+      [ error => $EVAL_ERROR,
+        data  => $data,
+      ]
+    )
+  );
+
+  return ('held')
+    if ( $data->{expires} // 0 ) > time;
 
   # Stale. Steal ONLY if the lock is still the exact one we judged stale.
   my $body = encode_json( { owner => $self->{owner}, expires => time + $self->{ttl} } );
 
   my $etag = eval {
+
     $self->{s3}->put_object(
       $self->{bucket}, $self->{key}, $body,
       content_type => 'application/json',
-      headers      => { 'If-Match' => $current_etag },
+      headers      => { 'If-Match' => sprintf '"%s"', $current_etag },
     );
   };
 
-  return $etag
-    if $self->{s3}->last_status =~ /\A2/xsm;  # stole it
+  $self->{s3}->logger->info( Dumper( [ error => $EVAL_ERROR, ] ) );
 
-  return;  # someone beat us (412) â retry loop
+  return ( 'stolen', $etag )
+    if $self->{s3}->last_status =~ /\A2/xsm;
+
+  return ('held');
 }
 
 ########################################################################
 sub _guard {
 ########################################################################
   my ( $self, $etag ) = @_;
+
+  require Amazon::S3::Lite::Lock::Guard;
 
   return Amazon::S3::Lite::Lock::Guard->new(
     s3     => $self->{s3},

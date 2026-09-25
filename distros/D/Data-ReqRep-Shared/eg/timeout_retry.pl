@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
-# Timeout and retry with worker pool:
-# Some workers are "slow" — client retries on timeout, fast worker picks it up
+# Timeout and retry with worker pool.
+# The slow worker still runs the attempt that timed out (only its reply is
+# refused), so retry this way only work that is safe to run twice.
 use strict;
 use warnings;
 use Data::ReqRep::Shared;
@@ -18,7 +19,6 @@ for my $w (1..3) {
     if ($pid == 0) {
         while (my ($req, $id) = $srv->recv_wait(5.0)) {
             if ($w == 3) {
-                # slow worker: 200ms per request
                 select(undef, undef, undef, 0.2);
             }
             $srv->reply($id, "w$w:$req");
@@ -33,7 +33,7 @@ my $cli = Data::ReqRep::Shared::Client->new($path);
 for my $i (1..12) {
     my $resp;
     for my $attempt (1..3) {
-        $resp = $cli->req_wait("job$i", 0.05);  # 50ms timeout
+        $resp = $cli->req_wait("job$i", 0.05);
         if (defined $resp) {
             printf "job%-2d attempt %d -> %s\n", $i, $attempt, $resp;
             last;

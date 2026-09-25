@@ -456,6 +456,8 @@ sub _authorization {
     my ( $vhost, $appuri ) = $uri =~ m@^https?://([^/#]*)(.*)@;
     my $exist = 0;
 
+    $appuri = $self->p->HANDLER->canonicalUri($appuri);
+
     $vhost =~ s/:\d+$//;
     foreach my $vh ( keys %{ $self->conf->{locationRules} } ) {
         if ( $vh eq $vhost ) {

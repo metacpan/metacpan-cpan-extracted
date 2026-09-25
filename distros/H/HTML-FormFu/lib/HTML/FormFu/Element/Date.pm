@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Date;
-$HTML::FormFu::Element::Date::VERSION = '2.07';
+$HTML::FormFu::Element::Date::VERSION = '2.09';
 # ABSTRACT: 3 select menu multi-field
 
 use Moose;
@@ -381,12 +381,12 @@ sub _build_number_list {
 sub _build_name {
     my ( $self, $type ) = @_;
 
-    my $name
-        = defined $self->$type->{name}
-        ? $self->$type->{name}
-        : sprintf "%s_%s", $self->name, $type;
+    return $self->$type->{name} if defined $self->$type->{name};
 
-    return $name;
+    # a Date element without a name has unnamed sub-fields
+    return if !defined $self->name;
+
+    return sprintf "%s_%s", $self->name, $type;
 }
 
 sub _add_inflator {
@@ -436,6 +436,10 @@ sub process {
 
 sub process_input {
     my ( $self, $input ) = @_;
+
+    # a Date element without a name has no input to combine
+    return $self->SUPER::process_input($input)
+        if !defined $self->nested_name;
 
     my %value;
 
@@ -504,7 +508,7 @@ HTML::FormFu::Element::Date - 3 select menu multi-field
 
 =head1 VERSION
 
-version 2.07
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -619,7 +623,7 @@ start of the select menu.
 Each value is localized and then only used as the label for a select item
 - the value for each of these items is always the empty string C<''>.
 
-Use C<prefix_loc> insted of C<prefix>.
+Use C<prefix_loc> instead of C<prefix>.
 
 =head2 month
 
@@ -659,7 +663,7 @@ start of the select menu.
 Each value is localized and then only used as the label for a select item
 - the value for each of these items is always the empty string C<''>.
 
-Use C<prefix_loc> insted of C<prefix>.
+Use C<prefix_loc> instead of C<prefix>.
 
 =head3 names
 
@@ -716,7 +720,7 @@ start of the select menu.
 Each value is localized and then only used as the label for a select item
 - the value for each of these items is always the empty string C<''>.
 
-Use C<prefix_loc> insted of C<prefix>.
+Use C<prefix_loc> instead of C<prefix>.
 
 =head3 list
 
@@ -819,7 +823,7 @@ Carl Franks <cpan@fireartist.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Carl Franks.
+This software is copyright (c) 2026, 2018, 2016, 2015, 2012, 2011 by Carl Franks.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

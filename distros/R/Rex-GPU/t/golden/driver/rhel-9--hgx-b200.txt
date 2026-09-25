@@ -1,0 +1,38 @@
+# golden: driver/rhel-9--hgx-b200
+# Host interactions Rex::GPU emits, in order. Regenerate with
+# REX_GPU_GOLDEN_UPDATE=1 prove -l t/ -- and read the diff.
+run: nvidia-smi -L 2>&1
+run(auto_die=default): uname -r
+run: cat /etc/os-release 2>/dev/null
+run: dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+run: rpm -q epel-release 2>&1
+run: uname -m
+run: subscription-manager repos --enable codeready-builder-for-rhel-9-x86_64-rpms
+run: dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo 2>&1
+run: dnf clean expire-cache
+run: dnf module enable nvidia-driver:open-dkms -y 2>/dev/null || true
+run: dnf install -y kernel-devel-matched kernel-headers nvidia-open
+run: rpm -q nvidia-driver 2>&1
+run: rpm -q --qf '%{VERSION}' nvidia-driver 2>&1
+run: dnf install -y nvidia-fabricmanager-580.95.05
+run: rpm -q nvidia-fabricmanager 2>&1
+run: rpm -q --qf '%{VERSION}' nvidia-fabricmanager 2>&1
+run: systemctl enable nvidia-fabricmanager.service
+run: dnf install -y nvlsm infiniband-diags libibumad
+run: rpm -q nvlsm 2>&1
+run: rpm -q infiniband-diags 2>&1
+run: rpm -q libibumad 2>&1
+file: /etc/modules-load.d/ib_umad.conf
+  | ib_umad
+run: modprobe ib_umad
+file: /etc/modprobe.d/blacklist-nouveau.conf
+  | blacklist nouveau
+  | options nouveau modeset=0
+run: dracut --force 2>/dev/null
+run: modprobe nvidia
+run: systemctl start nvidia-fabricmanager.service
+run: systemctl is-active --quiet nvidia-fabricmanager.service
+run: lsmod | grep '^nvidia '
+run: nvidia-smi -L 2>&1
+run: /sbin/ldconfig -p 2>/dev/null | grep -q '^[[:space:]]*libcuda\.so\.1 '
+run: nvidia-smi -q 2>&1

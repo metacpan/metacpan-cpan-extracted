@@ -2,7 +2,7 @@ package Protocol::IR::Format::LIRC;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 use Protocol::IR::Code;
 
@@ -458,7 +458,7 @@ sub _export_protocol_remote {
 
     $out .= "\n      begin codes\n";
     for my $code (@$codes) {
-        my $name = $code->alias // 'UNKNOWN';
+        my $name = ($code->alias // '') =~ /\S/ ? $code->alias : 'UNKNOWN';
         my $val = _lirc_code_value($code, $template, $registry);
         $out .= sprintf("          %-20s %s\n", $name, $val);
     }
@@ -483,7 +483,7 @@ sub _export_raw_remote {
     $out .= "      begin raw_codes\n\n";
 
     for my $code (@$codes) {
-        my $name = $code->alias // 'UNKNOWN';
+        my $name = ($code->alias // '') =~ /\S/ ? $code->alias : 'UNKNOWN';
         my $timings = $code->timings;
 
         if ($timings && @$timings) {
@@ -595,13 +595,15 @@ sub _read_input {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Format::LIRC - LIRC remote definition format (.lircd.conf) import and export
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -623,7 +625,33 @@ version 1.0
 
 C<Protocol::IR::Format::LIRC> imports and exports LIRC remote definition
 files (C<.lircd.conf>).  The LIRC format is the de facto standard for
-sharing IR remote control definitions across the LIRC ecosystem.
+sharing IR remote control definitions across the LIRC ecosystem
+(L<https://www.lirc.org/>).
+
+=over 4
+
+=item Example C<.lircd.conf> (NEC transmission with timing template)
+
+    begin remote
+
+      name  Samsung_TV
+      bits           16
+      flags SPACE_ENC|CONST_LENGTH
+      eps            30
+      aeps           100
+
+      header         4500  4500
+      one            550   1650
+      zero           550   550
+      gap            107000
+
+          begin codes
+              KEY_POWER 0xE0E040BF
+          end codes
+
+    end remote
+
+=back
 
 =head2 Import modes
 

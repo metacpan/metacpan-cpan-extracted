@@ -48,7 +48,7 @@ subtest 'optional and slurpy positionals' => sub {
 		argv => [],
 		args => [{ short => 'inputs', multiple => 1 }],
 	);
-	is $emptySlurpy->inputs, undef, 'empty optional slurpy is undef';
+	is $emptySlurpy->inputs, [], 'empty optional slurpy is an empty list';
 };
 
 subtest 'positional failures' => sub {

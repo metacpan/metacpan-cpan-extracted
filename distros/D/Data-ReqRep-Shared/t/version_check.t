@@ -7,9 +7,6 @@ my $v = Data::ReqRep::Shared->VERSION;
 ok $v, 'VERSION defined';
 like $v, qr/^\d+\.\d+$/, 'VERSION is X.YY';
 
-# MANIFEST must not contain stale entries not in git (and vice-versa,
-# but MANIFEST.SKIP makes reverse check noisy). Minimal: MANIFEST exists
-# and includes the .pm file.
 my $module_root = do {
     my $p = $INC{'Data/ReqRep/Shared.pm'};
     $p =~ s{/blib/.*$}{};

@@ -6,16 +6,12 @@ use File::Temp 'tmpnam';
 use Data::ReqRep::Shared;
 use Data::ReqRep::Shared::Client;
 
-# ============================================================
-# 1. Response at exact resp_data_max boundary
-# ============================================================
 {
     my $path = tmpnam();
     my $resp_max = 4096;
     my $srv = Data::ReqRep::Shared->new($path, 8, 4, $resp_max);
     my $cli = Data::ReqRep::Shared::Client->new($path);
 
-    # exactly resp_data_max
     my $big_resp = "R" x $resp_max;
     my $id = $cli->send("req");
     my ($rq, $ri) = $srv->recv;
@@ -25,27 +21,22 @@ use Data::ReqRep::Shared::Client;
     is length($resp), $resp_max, 'got full-size response';
     is $resp, $big_resp, 'response data matches';
 
-    # one byte over
     $id = $cli->send("req2");
     ($rq, $ri) = $srv->recv;
     eval { $srv->reply($ri, "X" x ($resp_max + 1)) };
     like $@, qr/response too long/, 'reply over resp_data_max croaks';
-    # slot is still ACQUIRED — reply failed. Cancel it.
+    # slot is still acquired — reply failed
     $cli->cancel($id);
 
     $srv->unlink;
 }
 
-# ============================================================
-# 2. Large requests filling the arena
-# ============================================================
 {
     my $path = tmpnam();
     my $arena = 16384;
     my $srv = Data::ReqRep::Shared->new($path, 16, 8, 64, $arena);
     my $cli = Data::ReqRep::Shared::Client->new($path);
 
-    # Single request nearly as large as the arena
     my $huge = "A" x ($arena - 64);  # leave room for alignment
     my $id = $cli->send($huge);
     ok defined $id, 'large request near arena size: send ok';
@@ -55,7 +46,6 @@ use Data::ReqRep::Shared::Client;
     $srv->reply($ri, "ok");
     $cli->get($id);
 
-    # Fill arena with multiple medium messages
     my $medium = "B" x 2000;
     my @ids;
     my $sent = 0;
@@ -70,7 +60,6 @@ use Data::ReqRep::Shared::Client;
     }
     ok $sent >= 1, "medium messages: sent $sent before arena/queue full";
 
-    # drain all
     for my $mid (@ids) {
         my ($r, $ri2) = $srv->recv;
         is length($r), length($medium), 'medium msg data intact';
@@ -81,18 +70,11 @@ use Data::ReqRep::Shared::Client;
     $srv->unlink;
 }
 
-# ============================================================
-# 3. Request exactly at 2GB-1 boundary (packed_len mask)
-#    We can't actually allocate 2GB, but verify the limit check
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 4, 2, 64, 4096);
     my $cli = Data::ReqRep::Shared::Client->new($path);
 
-    # The limit is REQREP_STR_LEN_MASK = 0x7FFFFFFF (2GB-1).
-    # We can't test the actual boundary (would need 2GB of RAM),
-    # but we verify that normal large-ish messages work.
     my $big = "C" x 3000;
     my $id = $cli->send($big);
     ok defined $id, 'large request (3KB): send ok';
@@ -104,9 +86,6 @@ use Data::ReqRep::Shared::Client;
     $srv->unlink;
 }
 
-# ============================================================
-# 4. Empty response (zero-length)
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 8, 4, 1024);
@@ -122,9 +101,6 @@ use Data::ReqRep::Shared::Client;
     $srv->unlink;
 }
 
-# ============================================================
-# 5. resp_data_max = 0 (ack-only pattern)
-# ============================================================
 {
     my $path = tmpnam();
     my $srv = Data::ReqRep::Shared->new($path, 8, 4, 0);
@@ -137,7 +113,6 @@ use Data::ReqRep::Shared::Client;
     my $resp = $cli->get($id);
     is $resp, '', 'ack-only: empty response ok';
 
-    # non-empty reply should croak
     $id = $cli->send("try_data");
     ($rq, $ri) = $srv->recv;
     eval { $srv->reply($ri, "x") };
@@ -147,17 +122,13 @@ use Data::ReqRep::Shared::Client;
     $srv->unlink;
 }
 
-# ============================================================
-# 6. Arena wraparound with large messages
-# ============================================================
 {
     my $path = tmpnam();
     my $arena = 8192;
     my $srv = Data::ReqRep::Shared->new($path, 8, 8, 64, $arena);
     my $cli = Data::ReqRep::Shared::Client->new($path);
 
-    # Send messages that force arena wrap multiple times
-    my $msg = "W" x 2000;  # 2000 bytes + 8-byte align = 2000 bytes alloc
+    my $msg = "W" x 2000;
     for my $round (1..10) {
         my $id = $cli->send_wait($msg, 1.0);
         ok defined $id, "arena wrap round $round: send ok";

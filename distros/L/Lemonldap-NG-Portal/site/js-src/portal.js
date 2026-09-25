@@ -558,14 +558,14 @@ $(window).on('load', function() {
       $(".toggle-password").on('mousedown touchstart', function() {
         field = $(this).attr('id');
         field = field.replace(/^toggle_/, '');
-        console.debug('Display', field);
         $(this).toggleClass("fa-eye fa-eye-slash");
-        return $(`input[name=${field}]`).attr('class', 'form-control');
+        $(this).closest("form").find(`input[name=${field}]`).removeClass('key');
       });
       $(".toggle-password").on('mouseup touchend', function() {
         $(this).toggleClass("fa-eye fa-eye-slash");
-        if ($(`input[name=${field}]`).get(0).value) {
-          return $(`input[name=${field}]`).attr('class', 'form-control key');
+        var target = $(this).closest("form").find(`input[name=${field}]`).get(0);
+        if (target && target.value) {
+          $(target).addClass('key');
         }
       });
     } else {
@@ -574,11 +574,11 @@ $(window).on('load', function() {
         field = field.replace(/^toggle_/, '');
         console.debug('Display', field);
         $(this).toggleClass("fa-eye fa-eye-slash");
-        return $(`input[name=${field}]`).attr("type", "text");
+        $(this).closest("form").find(`input[name=${field}]`).attr("type", "text");
       });
       $(".toggle-password").on('mouseup touchend', function() {
         $(this).toggleClass("fa-eye fa-eye-slash");
-        return $(`input[name=${field}]`).attr("type", "password");
+        $(this).closest("form").find(`input[name=${field}]`).attr("type", "password");
       });
     }
   }
@@ -605,36 +605,19 @@ $(window).on('load', function() {
       }
     }
   });
+  var togglePasswordHidingClass = function (ev) {
+    if (ev.target.value && datas['dontStorePassword']) {
+      $(ev.target).attr('class', 'form-control key');
+    } else {
+      $(ev.target).attr('class', 'form-control');
+    }
+  }
   // Functions to show/hide placeholder password inputs
-  $('#passwordfield').on('input', function() {
-    if ($('#passwordfield').get(0).value && datas['dontStorePassword']) {
-      return $("#passwordfield").attr('class', 'form-control key');
-    } else {
-      return $("#passwordfield").attr('class', 'form-control');
-    }
-  });
-  $('#oldpassword').on('input', function() {
-    if ($('#oldpassword').get(0).value && datas['dontStorePassword']) {
-      return $("#oldpassword").attr('class', 'form-control key');
-    } else {
-      return $("#oldpassword").attr('class', 'form-control');
-    }
-  });
-  $('#newpassword').on('input', function() {
-    if ($('#newpassword').get(0).value && datas['dontStorePassword']) {
-      return $("#newpassword").attr('class', 'form-control key');
-    } else {
-      return $("#newpassword").attr('class', 'form-control');
-    }
-  });
-  $('#confirmpassword').on('input', function() {
-    if ($('#confirmpassword').get(0).value && datas['dontStorePassword']) {
-      return $("#confirmpassword").attr('class', 'form-control key');
-    } else {
-      return $("#confirmpassword").attr('class', 'form-control');
-    }
-  });
-  //$('#formpass').on 'submit', changePwd
+  $('input[id=passwordfield]').on('input', togglePasswordHidingClass );
+  $('input[id=oldpassword]').on('input', togglePasswordHidingClass );
+  $('input[id=newpassword]').on('input', togglePasswordHidingClass );
+  $('input[id=confirmpassword]').on('input', togglePasswordHidingClass );
+
   $('.clear-finduser-field').on('click', function() {
     return $(this).parent().find(':input').each(function() {
       console.debug('Clear search field ->', $(this).attr('name'));

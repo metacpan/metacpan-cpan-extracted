@@ -1,5 +1,8 @@
 Revision history for Cavil::CLI
 
+0.04   2026-09-24
+        - Git is now optional for unit tests.
+
 0.03   2026-09-08
         - Repurposed from a code-search / plagiarism client into a legal-review client. "check" now uploads the
           project's working tree to Cavil, waits for the standard legal review (unpack, index, analyze), and
