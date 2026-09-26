@@ -1,0 +1,63 @@
+xt/ - the author tests, and the one that needs something you have to install
+============================================================================
+
+These do not run under `make test`. Each one says what turns it on.
+
+  xt/boilerplate.t   the stock Module::Starter check
+  xt/perft-deep.t    the published perft ladder to depth 5, and the eight other
+                     cited positions. RELEASE_TESTING.
+  xt/bot-ladder.t    each rung of @LADDER against the one below, sixty games a
+                     pair, colours alternated. RELEASE_TESTING or XQ_LADDER.
+                     Takes the better part of an hour.
+  xt/soak.t          a thousand bot games: the invariants on every position, and
+                     the distribution of game length that the site's `limits` are
+                     written from. RELEASE_TESTING or XQ_SOAK. About an hour.
+  xt/ucci.t          THE ONLY INDEPENDENT ORACLE. See below.
+
+
+xt/ucci.t, and why it matters more than the rest
+------------------------------------------------
+
+This distribution has NO pure-Perl move generator, on purpose (D1), and NO second
+generator written as a cross-check, also on purpose (D7): a second generator
+written by the same hand from the same rules table shares its bugs, and a
+differential test between two copies of one misunderstanding is green.
+
+So there are exactly two independent oracles:
+
+  1. the published perft ladder, in xt/perft-deep.t
+  2. another engine, in xt/ucci.t
+
+ElephantEye is the engine. It speaks UCCI, whose move format is ICCS coordinates,
+which is what this distribution stores anyway, so a game log feeds it without
+translation.
+
+It is LGPL-2.1. It is NOT vendored here and no test will fetch it. Install it
+yourself and point the test at the binary:
+
+    XQ_UCCI=/path/to/eleeye prove -lv xt/ucci.t
+
+Sources, as of 25 September 2026:
+
+  ElephantEye, by Morning Yellow, part of the XQWizard project.
+  Look for `eleeye` or ElephantEye on SourceForge under xqwizard, or build from
+  the published source. Any engine that speaks UCCI on stdin and stdout will do:
+  the test needs `ucci`, `isready`, `position fen ...`, `go depth N` and `quit`.
+
+AN ABSENT ORACLE IS A FAILURE UNDER RELEASE_TESTING, not a skip. Without the
+binary the file falls back to checking our own UCCI mode against itself, which
+proves the protocol and NOTHING about the rules, and it says so in the skip
+message. A fallback that reported PASS would be a failing test wearing a green
+tick.
+
+What it compares, and what it deliberately does not:
+
+  compared      the engine's chosen move must be LEGAL by our generator, and
+                perft counts where the engine has a perft command. Both are facts
+                about the rules that two correct engines must agree on exactly.
+
+  NOT compared  which move each engine chooses. That is an evaluation comparison.
+                Two correct engines disagree about the best move in most
+                positions, and two engines that agree may share a bug. A test
+                asserting agreement on choice would fail constantly, teach
+                nothing, and invite being loosened until it passed.

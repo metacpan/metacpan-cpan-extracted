@@ -3,6 +3,7 @@ package CPAN::Maker::Bootstrapper::Role::Installer;
 use strict;
 use warnings;
 
+use Carp;
 use CLI::Simple::Constants qw(:booleans);
 use CLI::Simple::Utils qw(slurp choose);
 use Cwd qw(abs_path getcwd);
@@ -17,7 +18,7 @@ use File::Find;
 use Role::Tiny;
 use List::Util qw(max);
 
-our $VERSION = '2.2.3';
+our $VERSION = '2.3.3';
 
 ########################################################################
 sub cmd_install {
@@ -40,9 +41,19 @@ sub cmd_install {
 
   if ( !$module_name && $stub && -f $stub ) {
     $module_name = $self->_find_package_name($stub);
+
     if ( !$module_name ) {
       $self->get_logger->error( 'ERROR: could not find a package inside %s', $stub );
       return $FAILURE;
+    }
+  }
+
+  if ( !$module_name && $self->get_installdir ) {
+    my $installdir = abs_path( $self->get_installdir );
+    $module_name = basename($installdir);
+
+    if ( $module_name =~ /[-]/xsm ) {
+      $module_name =~ s/[-]/::/xsmg;
     }
   }
 
@@ -163,6 +174,10 @@ sub cmd_install {
     push @args, sprintf q{SYNTAX_CHECKING='%s'}, $ENV{SYNTAX_CHECKING};
   }
 
+  if ( exists $ENV{LINT} ) {
+    push @args, sprintf q{LINT='%s'}, $ENV{LINT};
+  }
+
   if ( exists $ENV{SCAN} ) {
     $ENV{SCAN} = 'on';
     $self->get_logger->warn('SCAN is always on');
@@ -174,6 +189,9 @@ sub cmd_install {
     open my $fh, '>', 'build-mirrors';
     print {$fh} join "\n", split /,/xsm, $ENV{BUILD_MIRRORS};
     close $fh;
+  }
+  elsif ( -e "$pwd/build-mirrors" ) {
+    copy( "$pwd/build-mirrors", 'build-mirrors' );
   }
 
   my $rc = system 'make', @args;
@@ -244,17 +262,17 @@ sub cmd_install {
 
   $self->get_logger->info("successfully imported $module_name");
   $self->get_logger->info('next steps:');
-  $self->get_logger->info('+---------------------------------------------------+');
-  $self->get_logger->info('| 1. Review source tree                             |');
-  $self->get_logger->info('| 2. Review `buildspec.yml`                         |');
-  $self->get_logger->info('| 3. Edit/Add files to lib, bin, t or root          |');
-  $self->get_logger->info('| 4. run `make`                                     |');
-  $self->get_logger->info('+---------------------------------------------------+');
-  $self->get_logger->info('| Tip: make help to see all make targets            |');
-  $self->get_logger->info('| See perldoc CPAN::Maker to learn more             |');
-  $self->get_logger->info('+---------------------------------------------------+');
-  $self->get_logger->info('| https://github.com/rlauer/CPAN-Maker-Bootstrapper |');
-  $self->get_logger->info('+---------------------------------------------------+');
+  $self->get_logger->info('+-------------------------------------------------------+');
+  $self->get_logger->info('| 1. Review source tree                                 |');
+  $self->get_logger->info('| 2. Review `buildspec.yml`                             |');
+  $self->get_logger->info('| 3. Edit/Add files to lib, bin, t or root              |');
+  $self->get_logger->info('| 4. run `make`                                         |');
+  $self->get_logger->info('+-------------------------------------------------------+');
+  $self->get_logger->info('| Tip: type "make help" to see all make targets         |');
+  $self->get_logger->info('| See "perldoc CPAN::Maker::Bootstrapper" to learn more |');
+  $self->get_logger->info('+-------------------------------------------------------+');
+  $self->get_logger->info('| https://github.com/rlauer/CPAN-Maker-Bootstrapper     |');
+  $self->get_logger->info('+-------------------------------------------------------+');
 
   return $SUCCESS;
 }
@@ -291,6 +309,7 @@ sub _create_install_dir {
   my ( $self, $module_name ) = @_;
 
   my $installdir = $self->get_installdir;
+
   $installdir = $installdir ? abs_path($installdir) : q{};
 
   if ( !$installdir && $module_name ) {
@@ -300,18 +319,29 @@ sub _create_install_dir {
     $self->set_installdir($installdir);
   }
 
-  make_path($installdir);
+  croak "ERROR: could not create $installdir\n$OS_ERROR"
+    if !-d $installdir && !make_path($installdir);
 
   $self->get_logger->info( sprintf 'attempting to install module %s into %s', $module_name, $installdir );
 
   return $installdir
     if -d $installdir && !-e "$installdir/Makefile";
 
-  die sprintf 'ERROR: could not create %s', $installdir
+  croak sprintf 'ERROR: could not create %s', $installdir
     if !-d $installdir;
 
-  die sprintf q{ERROR: Found '%s/Makefile' - project may already exist! Use --force to overwrite}, $installdir
+  croak sprintf q{ERROR: Found '%s/Makefile' - project may already exist! Use --force to overwrite}, $installdir
     if !$self->get_force;
+
+  $self->_remove_existing_files($installdir);
+
+  return $installdir;
+}
+
+########################################################################
+sub _remove_existing_files {
+########################################################################
+  my ( $self, $installdir ) = @_;
 
   # remove existing files
   unlink "$installdir/Makefile";
@@ -323,31 +353,25 @@ sub _create_install_dir {
 
   $self->get_logger->warn('existing files will be overwritten...you have been warned');
 
-  return $installdir;
+  return;
 }
-
 ########################################################################
 sub check_return_code {
 ########################################################################
   my ( $self, $rc ) = @_;
 
-  die "ERROR: could not execute make: $OS_ERROR\n"
+  croak "ERROR: could not execute make: $OS_ERROR\n"
     if $rc == -1;
 
-  die sprintf "ERROR: make killed by signal %d\n", $rc & 127
+  croak sprintf "ERROR: make killed by signal %d\n", $rc & 127
     if $rc & 127;
 
-  die sprintf "ERROR: make failed with exit code %d\n", $rc >> 8
+  croak sprintf "ERROR: make failed with exit code %d\n", $rc >> 8
     if $rc >> 8;
 
   return;
 }
 
-########################################################################
-# returns:
-#   undef if import paths but NOT found
-#   $module_path if no import dirs
-#   [ $module_path ] if import dirs and found
 ########################################################################
 sub _validate_module {
 ########################################################################
@@ -355,22 +379,26 @@ sub _validate_module {
 
   my $module_path = $module_name;
   $module_path =~ s/::/\//xsmg;
+  $module_path = "$module_path.pm";
 
   my $import_paths = $self->get_import // [];
 
   $import_paths = ref $import_paths ? $import_paths : [$import_paths];
 
-  return $module_name
+  # return $module_name if no import paths (stub?)
+  return "lib/$module_name"
     if !@{$import_paths};
 
   my $found;
 
   find(
-    sub {
-      return if $File::Find::name !~ /\Q$module_path\E/xsm;
-      $found = [$File::Find::name];
+    { no_chdir => 1,
+      wanted   => sub {
+        return if !-f $File::Find::name || $File::Find::name !~ m{(?:\A|/)\Q$module_path\E\z}xsm;
+        $found = [$File::Find::name];
+      }
     },
-    @{$import_paths}
+    @{$import_paths},
   );
 
   return $found;
@@ -388,7 +416,7 @@ sub _create_dirs {
   make_path(@dirs);
 
   foreach (@dirs) {
-    die "ERROR: could not create $_\n"
+    croak "ERROR: could not create $_\n"
       if !-d $_;
   }
 
@@ -407,32 +435,32 @@ sub _install_files {
   my @manifest = split /\n/xsm, slurp("$dist_dir/MANIFEST");
 
   foreach (@manifest) {
-    die "ERROR: MANIFEST contains corrupted entry ($_)\n"
+    croak "ERROR: MANIFEST contains corrupted entry ($_)\n"
       if $_ !~ m{\A[[:alnum:]][[:alnum:]._-]*(?:/[[:alnum:]][[:alnum:]._-]*)*\z}xsm;
 
-    die "ERROR: $_ is not found in the distribution. MANIFEST may be corrupted.\n"
+    croak "ERROR: $_ is not found in the distribution. MANIFEST may be corrupted.\n"
       if !-e "$dist_dir/$_";
 
     if (/[.]mk$/xsm) {
-      die "ERROR: could not copy $dist_dir/$_ to $installdir/.includes/$_\n"
+      croak "ERROR: could not copy $dist_dir/$_ to $installdir/.includes/$_\n"
         if !copy( "$dist_dir/$_", "$installdir/.includes/$_" );
       chmod 0444, "$installdir/.includes/$_";
     }
     else {
-      die "ERROR: could not copy $dist_dir/$_ to $installdir/$_\n"
+      croak "ERROR: could not copy $dist_dir/$_ to $installdir/$_\n"
         if !copy( "$dist_dir/$_", "$installdir/$_" );
     }
   }
 
   # no need to check file existence, copy will fail above or rename will fail and be caught
   rename "$installdir/Makefile.txt", "$installdir/Makefile"
-    or die "ERROR: error renaming $installdir/Makefile.txt to $installdir/Makefile: $OS_ERROR\n";
+    or croak "ERROR: error renaming $installdir/Makefile.txt to $installdir/Makefile: $OS_ERROR\n";
 
   chmod 0444, "$installdir/Makefile";
   chmod 0555, "$installdir/builder";
 
   rename "$installdir/gitignore", "$installdir/.gitignore"
-    or die "ERROR: error renaming $installdir/gitignore to $installdir/.gitignore: $OS_ERROR\n";
+    or croak "ERROR: error renaming $installdir/gitignore to $installdir/.gitignore: $OS_ERROR\n";
 
   return;
 }
@@ -462,7 +490,7 @@ sub _import_files {
     $gitignore .= join "\n", map {"bin/$_"} @{$scripts};
 
     open my $fh, '>', "$installdir/.gitignore"
-      or die "ERROR: could not replace .gitignore: $OS_ERROR\n";
+      or croak "ERROR: could not replace .gitignore: $OS_ERROR\n";
 
     print {$fh} $gitignore;
 
@@ -473,7 +501,7 @@ sub _import_files {
       my $dest = sprintf '%s/bin/%s.in', $installdir, basename($s);
       $self->get_logger->debug( sprintf 'copying %s => %s', $s, $dest );
 
-      die "ERROR: error copying $s to $dest\n"
+      croak sprintf "ERROR: error copying %s to %s\n", $s, $dest
         if !copy( $s, $dest );
 
       chmod 0644, $dest;  # remove -x
@@ -485,7 +513,7 @@ sub _import_files {
     my $dest = sprintf '%s/t/%s', $installdir, basename($t);
     $self->get_logger->debug( sprintf 'copying %s => %s', $t, $dest );
 
-    die "ERROR: error copying $t to $dest\n"
+    croak sprintf "ERROR: error copying %s to %s\n", $t, $dest
       if !copy( $t, $dest );
 
     chmod 0644, $dest;  # make sure they are writable
@@ -493,6 +521,7 @@ sub _import_files {
 
   # create sub directories and copy packages
   foreach my $p ( keys %{$packages} ) {
+    $self->get_logger->info( sprintf 'package to install: %s', $p );
 
     my $primary = $self->_find_primary_package( $p, $packages->{$p} );
 
@@ -505,13 +534,17 @@ sub _import_files {
     $path =~ s/::/\//xsmg;
 
     my $lib_path = sprintf '%s/lib/%s', $installdir, dirname($path);
-
+    $self->get_logger->info( sprintf 'creating path: %s', $lib_path );
     make_path($lib_path);
-    die "ERROR: could not create $lib_path\n"
+
+    croak "ERROR: could not create $lib_path\n"
       if !-d $lib_path;
 
     my $dest = sprintf '%s/%s.in', $lib_path, basename($p);
-    die "ERROR: could not copy $p to $dest\n"
+
+    $self->get_logger->info( sprintf 'copying %s to %s', $p, $dest );
+
+    croak "ERROR: could not copy $p to $dest\n"
       if !copy( $p, $dest );
 
     chmod 0644, $dest;  # make sure they are writable
@@ -538,7 +571,7 @@ sub _create_resources_file {
   require YAML::Tiny;
 
   my $email = $self->get_email;
-  die "ERROR: invalid email address\n"
+  croak "ERROR: invalid email address\n"
     if $email && !Email::Valid->address($email);
 
   my $resources = {
@@ -555,7 +588,7 @@ sub _create_resources_file {
   };
 
   open my $fh, '>', "$installdir/resources.yml"
-    or die "ERROR: could not open resources.yml for writing: $OS_ERROR\n";
+    or croak "ERROR: could not open resources.yml for writing: $OS_ERROR\n";
 
   my $yml = YAML::Tiny::Dump( { resources => $resources } );
   $yml =~ s/^---\n//xsm;
@@ -587,7 +620,7 @@ sub _import_file_listing {
   for my $path (@import_paths) {
     my $abs_path = abs_path($path);
 
-    die "ERROR: import path '$path' is not a directory\n"
+    croak "ERROR: import path '$path' is not a directory\n"
       if !-d $abs_path;
 
     File::Find::find(
@@ -630,7 +663,7 @@ sub _import_file_listing {
 
   foreach my $package (@modules) {
     my $meta = Module::Metadata->new_from_file($package)
-      or die "ERROR: could not parse $package\n";
+      or croak "ERROR: could not parse $package\n";
     $file_packages{$package} = [ $meta->packages_inside ];
   }
 
@@ -658,8 +691,22 @@ sub _find_primary_package {
 
   my %reversed_packages = map { join( '::', reverse split /::/xsm, $_ ) => $_ } @{$packages};
 
+  if ( $self->get_logger ) {
+    $self->get_logger->debug(
+      Dumper(
+        [ path              => $path,
+          packages          => $packages,
+          pkg_key           => $pkg_key,
+          reversed_key      => \@reversed_key,
+          reversed_packages => \%reversed_packages
+        ]
+      )
+    );
+  }
+
   for my $len ( reverse 1 .. scalar @reversed_key ) {
     my $candidate = join '::', @reversed_key[ 0 .. $len - 1 ];
+
     return $reversed_packages{$candidate}
       if exists $reversed_packages{$candidate};
   }

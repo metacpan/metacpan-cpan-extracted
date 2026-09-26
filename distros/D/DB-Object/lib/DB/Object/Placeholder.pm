@@ -7,7 +7,6 @@
 ## Modified 2026/03/22
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -16,6 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( Module::Generic );
     use vars qw( $REGISTRY $VERSION $EXCEPTION_CLASS );
     use Scalar::Util ();

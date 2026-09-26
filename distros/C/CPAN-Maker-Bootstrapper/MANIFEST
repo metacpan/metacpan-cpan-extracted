@@ -17,8 +17,10 @@ lib/CPAN/Maker/Bootstrapper/Role/LLM/Models.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm
 lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm
+lib/CPAN/Maker/Bootstrapper/Role/Provides.pm
 lib/CPAN/Maker/Bootstrapper/Role/ResolveVars.pm
 lib/CPAN/Maker/Bootstrapper/Role/ScaffoldImporter.pm
+lib/CPAN/Maker/Bootstrapper/Role/Version.pm
 lib/Git/ReleaseDiffs.pm
 lib/Text/ASCIITable/FixANSI.pm
 Makefile.PL
@@ -27,6 +29,7 @@ MANIFEST.SKIP
 postamble
 release-notes.md
 share/bash-completion.mk
+share/bootstrap.mk
 share/build.yml
 share/builder
 share/buildspec.yml.tmpl

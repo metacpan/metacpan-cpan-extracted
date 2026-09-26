@@ -1,0 +1,20 @@
+Revision history for Markdown-Publish
+
+1.003  2026-09-26
+
+    - Publish public repository metadata through the GitHub mirror.
+    - Add contributor and security policies, dependency auditing and
+      artifact-attestation verification guidance.
+    - Declare the CPAN authority in distribution metadata.
+
+1.002  2026-09-26
+
+    - Initial release.
+    - Publish the distribution as Markdown::Publish rather than
+      ASPEER::Markdown::Publish.
+    - Support MkDocs, VitePress, Docusaurus and Astro Starlight.
+    - Keep site assembly, preview and publication independent of MakeMaker.
+    - Add source selection, navigation, local-link rewriting and module aliases.
+    - Support configured package commands, preview listeners and Pages base paths.
+    - Prepare GitHub Pages content on a local gh-pages branch without pushing it.
+    - Improve Starlight assembly, links, navigation and home-page promotion.

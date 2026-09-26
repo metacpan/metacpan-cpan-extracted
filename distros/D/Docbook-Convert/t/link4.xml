@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article>
+  <section>
+    <title>Section 1</title>
+
+    <para>Text with <link linkend="section2">link</link> to section 2
+    inline</para>
+  </section>
+
+  <section id="section2">
+    <title>Section 2</title>
+
+    <para>This is text in Section 2</para>
+  </section>
+</article>

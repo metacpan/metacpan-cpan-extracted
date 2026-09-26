@@ -1,0 +1,2235 @@
+=encoding utf-8
+
+=head1 NAME
+
+Text::KDL::XS::Cookbook - Every KDL feature and how to use it from Perl
+
+=head1 DESCRIPTION
+
+This document walks through the complete KDL Document Language, one
+feature at a time, and shows for each feature what it looks like in a KDL
+file, what L<Text::KDL::XS> turns it into, and how to produce it again with
+L<Text::KDL::XS/emit_kdl>. It ends with a set of recipes for common tasks.
+
+The reference documentation for the API lives in L<Text::KDL::XS>. This
+document assumes you know that C<parse_kdl> returns a
+L<Text::KDL::XS::Document> holding L<Text::KDL::XS::Node> objects whose
+arguments and properties are L<Text::KDL::XS::Value> objects.
+
+Conventions used in the examples:
+
+=over 4
+
+=item * Where output is shown, it was produced by running the code against
+this version of Text::KDL::XS. Where the code and its output differ from
+the KDL specification, the text says so.
+
+=item * A Perl snippet that uses C<$kdl> without defining it refers to the
+KDL text shown immediately above it. Snippets that use C<$doc> or C<$node>
+continue from the previous snippet in the same section unless they define
+those variables.
+
+=item * Printing non-ASCII text requires an encoding layer on the output
+handle (C<binmode STDOUT, ':encoding(UTF-8)'>); the snippets leave it out
+for brevity. See L</"UTF-8 and Perl strings">.
+
+=back
+
+=head1 HOW TO FIND THINGS IN THIS DOCUMENT
+
+Section titles use the vocabulary of the KDL specification, so searching
+for a spec term (C<slashdash>, C<raw string>, C<type annotation>,
+C<multi-line string>, C<line continuation>, C<keyword>) finds the right
+place. This index lists every feature with the section that covers it.
+
+=over 4
+
+=item annotated example of every construct
+
+L</"KDL IN ONE PAGE">
+
+=item node, node name, quoted name
+
+L</Nodes>, L</"Node names">
+
+=item argument (positional value)
+
+L</Arguments>
+
+=item property, key=value, quoted key, whitespace around =
+
+L</Properties>, L</"Duplicate properties">
+
+=item children block { }, node{} without a space, empty block
+
+L</"Children blocks">
+
+=item newline terminator, semicolon ;
+
+L</"Node terminators: newlines and semicolons">
+
+=item line continuation \ (escline)
+
+L</"Line continuations">
+
+=item (type) annotation on a node, reserved type names
+
+L</"Type annotations on nodes">, L</"Type annotations on values">
+
+=item identifier string (bare string), identifier rules, reserved words
+
+L</"Identifier strings">
+
+=item "quoted string"
+
+L</"Quoted strings">
+
+=item escapes \n \t \u{...} \s, invalid escapes, surrogates
+
+L</"Escape sequences">
+
+=item whitespace escape (backslash followed by whitespace or newline)
+
+L</"Whitespace escapes">
+
+=item """ multi-line string, dedent, tabs versus spaces
+
+L</"Multi-line strings">
+
+=item #"raw string"#, raw multi-line string
+
+L</"Raw strings">, L</"Raw multi-line strings">
+
+=item r"..." raw strings, literal newlines (KDL v1)
+
+L</"KDL v1 strings">
+
+=item integer, 64-bit limits, kind => 'integer'
+
+L</Integers>
+
+=item float, exponent, kind => 'float'
+
+L</"Floating point numbers">
+
+=item 0x 0o 0b radix prefixes
+
+L</"Hexadecimal, octal and binary numbers">
+
+=item 1_000 underscores in numbers
+
+L</"Underscore digit separators">
+
+=item big numbers, bigint, kind => 'string'
+
+L</"Arbitrary precision numbers">
+
+=item keywords #inf #-inf #nan
+
+L</"Keyword numbers: #inf, #-inf and #nan">
+
+=item number kinds summary (integer, float, string), invalid numbers
+
+L</"Number kinds: integer, float, string">, L</"Invalid number forms">
+
+=item keywords #true #false, boolean
+
+L</"Keywords #true and #false">
+
+=item keyword #null
+
+L</"Keyword #null">
+
+=item true false null without # (KDL v1)
+
+L</"KDL v1 keywords: true, false, null">
+
+=item // single-line comment, /* */ multi-line comment
+
+L</"Single-line comments">, L</"Multi-line comments">
+
+=item /- slashdash comment, slashdash placement rules
+
+L</"Slashdash comments">
+
+=item comment events, commented flag, streaming parser
+
+L</"Reading comments with the streaming parser">
+
+=item whitespace characters, newline characters, CRLF, vertical tab
+
+L</"Whitespace characters">, L</"Newline characters">
+
+=item BOM, byte order mark
+
+L</"Byte order mark">
+
+=item control characters, DEL, bidi controls, disallowed code points
+
+L</"Disallowed characters">
+
+=item UTF-8, encoding, character strings, binmode
+
+L</"UTF-8 and Perl strings">
+
+=item version detection, forcing v1 or v2, version marker
+
+L</"Version detection">, L</"Forcing KDL v1 or v2">, L</"Version marker">
+
+=item differences between KDL v1 and v2 (table)
+
+L</"Differences between KDL v1 and v2">
+
+=item converting a document between versions
+
+L</"Converting between versions">
+
+=item emitting plain Perl data (data mode), hash and array mapping
+
+L</"Emitting plain Perl data">
+
+=item emitting a tree (tree mode), what a round trip loses
+
+L</"Emitting a parsed or hand-built tree">, L</"What a round trip loses">
+
+=item building nodes and values by hand
+
+L</"Building nodes and values by hand">
+
+=item emitting booleans, type annotations, floats, keyword-like strings
+
+L</"Emitting booleans">, L</"Emitting type annotations">,
+L</"Emitting floating point numbers">,
+L</"Emitting strings that look like keywords or numbers">
+
+=item indent, escape_mode, identifier_mode
+
+L</Indentation>, L</"Escaping and identifier quoting options">
+
+=item recipes: config file, modify and write back, JSON, streaming, STDIN, errors, validation, untrusted input
+
+L</"Load a configuration file into a hash">,
+L</"Modify a document and write it back">,
+L</"Convert KDL to JSON and back">,
+L</"Stream a large file without building a tree">,
+L</"Read from STDIN, a socket or a pipe">,
+L</"Handle parse errors">,
+L</"Validate against an expected structure">,
+L</"Parse untrusted input">
+
+=back
+
+=head1 KDL IN ONE PAGE
+
+If you have never seen KDL before, this annotated document shows every
+construct at once. Each construct gets its own section below.
+
+=for highlighter language=KDL
+
+  // A single-line comment. KDL is a tree of nodes.
+  package "kdl-rs" version="0.4.0" {        // node "package": one argument, one property, children
+      author "Kat" email="kat@example.com"  // arguments and properties can be mixed freely
+      keywords "config" "data" "structured" // any number of arguments
+      (published)date "2026-09-26"          // a type annotation on the node
+      size (u32)1024 ratio=(f64)0.75        // type annotations on values
+      enabled #true debug=#false            // booleans
+      description #null                     // null
+      counts 42 -7 0xFF 0o17 0b101 1_000    // integers in several radixes
+      ratios 3.14 1e3 -2.5e-3               // floats
+      big 123456789012345678901234567890    // arbitrary precision, kept as text
+      limits #inf #-inf #nan                // special float values
+      bare hello-world                      // an identifier string, no quotes needed
+      escaped "tab\t newline\n quote\" \u{2713}"
+      multi """
+          Dedented multi-line
+          string
+          """
+      raw #"no \escapes at "all""#          // raw strings: backslashes are literal
+      long 1 2 \                             // line continuation
+           3 4
+      one; two; three                        // semicolons also terminate nodes
+      /-disabled "this node is ignored"      // slashdash comments out a whole node
+      partial 1 /-2 3 /-key=4                // or a single argument or property
+  }
+
+=for highlighter
+
+Read it with:
+
+=for highlighter language=Perl
+
+  use Text::KDL::XS qw(parse_kdl);
+  my $doc = parse_kdl($kdl);
+  for my $node (@{ $doc->nodes }) {
+      print $node->name, "\n";
+  }
+
+=for highlighter
+
+=head1 DOCUMENT STRUCTURE
+
+=head2 Nodes
+
+A KDL document is a list of nodes. A node has a name, zero or more
+arguments, zero or more properties, and an optional block of child nodes.
+Nodes are separated by newlines (or semicolons, see
+L</"Node terminators: newlines and semicolons">).
+
+=for highlighter language=KDL
+
+  server "web-1" port=8080 {
+      tls #true
+      listen "0.0.0.0" "::"
+      upstream name="app" weight=3
+  }
+
+=for highlighter
+
+Walk it from Perl:
+
+=for highlighter language=Perl
+
+  use Text::KDL::XS qw(parse_kdl);
+
+  my $doc = parse_kdl($kdl);
+  for my $node (@{ $doc->nodes }) {
+      print "node: ", $node->name, "\n";
+      print "  args:  ", join(", ", map { $_->as_string } @{ $node->args }), "\n";
+      print "  props: ", join(", ", map { "$_->[0]=" . $_->[1]->as_string } @{ $node->props }), "\n";
+      for my $child (@{ $node->children }) {
+          printf "  child %-8s args=[%s] props={%s}\n", $child->name,
+              join(",", map { $_->as_string } @{ $child->args }),
+              join(",", map { "$_->[0]=" . $_->[1]->as_string } @{ $child->props });
+      }
+  }
+
+=for highlighter
+
+Output:
+
+  node: server
+    args:  web-1
+    props: port=8080
+    child tls      args=[true] props={}
+    child listen   args=[0.0.0.0,::] props={}
+    child upstream args=[] props={name=app,weight=3}
+
+The same document as plain Perl data, via C<< $doc->as_data >>:
+
+=for highlighter language=Perl
+
+  [
+    {
+      name     => 'server',
+      type     => undef,
+      args     => [ 'web-1' ],
+      props    => { port => 8080 },
+      children => [
+        { name => 'tls',      type => undef, args => [ 1 ],              props => {}, children => [] },
+        { name => 'listen',   type => undef, args => [ '0.0.0.0', '::' ], props => {}, children => [] },
+        { name => 'upstream', type => undef, args => [],
+          props => { name => 'app', weight => 3 }, children => [] },
+      ],
+    },
+  ]
+
+=for highlighter
+
+C<as_data> is convenient but lossy: it drops type annotations on values,
+keeps only the last value of a repeated property, and turns booleans into
+C<1> and C<0>. Use the object tree when you need those details.
+
+=head2 Node names
+
+A node name is a string. Most names are written bare
+(C<server>, C<my-node>, C<--flag>), but any valid KDL string works when
+quoted, including strings with spaces, raw strings, and the empty string:
+
+=for highlighter language=KDL
+
+  bare-name 1
+  "name with spaces" 2
+  "" 3
+  "123" 4
+  #"raw name"# 5
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  print join("|", map { $_->name } @{ parse_kdl($kdl)->nodes }), "\n";
+  # bare-name|name with spaces||123|raw name
+
+=for highlighter
+
+C<< $node->name >> always returns the decoded string without quotes. The
+same applies to property keys (C<"my key"=1>) and to type annotations
+(C<("my type")node>): see L</Properties> and
+L</"Type annotations on nodes">.
+
+When emitting, L<Text::KDL::XS/emit_kdl> quotes names automatically when
+they contain characters that are not allowed in a bare identifier, and
+quotes every identifier of the document when a name merely equals a
+keyword or looks like a number; see
+L</"Emitting strings that look like keywords or numbers">.
+
+=head2 Arguments
+
+Arguments are positional values. Their order is significant and preserved.
+
+=for highlighter language=KDL
+
+  my-node 1 2 3 "four" #true
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  my $node = parse_kdl($kdl)->nodes->[0];
+  my @args = @{ $node->args };            # five Text::KDL::XS::Value objects
+  print $args[3]->as_string;              # four
+  print scalar @args;                     # 5
+
+=for highlighter
+
+=head2 Properties
+
+Properties are C<key=value> pairs. The key is a string (bare or quoted),
+the value is any KDL value. Properties and arguments may be interleaved.
+KDL guarantees the order of arguments but tells readers not to rely on the
+order of properties; C<Text::KDL::XS> nevertheless keeps properties in
+document order in C<props> and writes them back in that order.
+
+=for highlighter language=KDL
+
+  connect host="db" port=5432 "extra-arg" timeout=30 "my key"=1
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  my $node = parse_kdl($kdl)->nodes->[0];
+
+  # Lookup by name (returns undef if the property is absent):
+  print $node->prop('port')->as_number;   # 5432
+  print defined $node->prop('nope') ? 'yes' : 'no';   # no
+
+  # Ordered list of [ key, Value ] pairs, in document order:
+  for my $pair (@{ $node->props }) {
+      my ($key, $value) = @$pair;
+      print "$key = ", $value->as_string, "\n";
+  }
+  # host = db
+  # port = 5432
+  # timeout = 30
+  # my key = 1
+
+  # Arguments are unaffected by the properties around them:
+  print $node->args->[0]->as_string;      # extra-arg
+
+=for highlighter
+
+In KDL v2 whitespace is allowed around the C<=> (C<key = value>); KDL v1
+requires C<key=value> without spaces. The emitter always writes
+C<key=value>.
+
+=head2 Duplicate properties
+
+The KDL specification says that when a key appears more than once, the
+rightmost value wins. C<Text::KDL::XS> follows that rule in C<prop> and
+C<as_data>, but keeps every occurrence in C<props> so nothing is lost:
+
+=for highlighter language=KDL
+
+  node a=1 a=2 b=3
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  my $node = parse_kdl($kdl)->nodes->[0];
+  print $node->prop('a')->as_number;                    # 2
+  print scalar @{ $node->props };                       # 3   (a=1, a=2, b=3)
+  print join ",", sort keys %{ $node->as_data->{props} };   # a,b
+  print emit_kdl($node);                                # node a=1 a=2 b=3
+
+=for highlighter
+
+Note that C<emit_kdl> writes all occurrences back out. The result is valid
+KDL and parses to the same data.
+
+=head2 Children blocks
+
+A node may be followed by C<{ ... }> containing child nodes, to any depth.
+An empty block C<{}> is allowed and is indistinguishable from no block
+(C<emit_kdl> writes such a node without braces).
+
+=for highlighter language=KDL
+
+  parent {
+      child1
+      child2 {
+          grandchild
+      }
+  }
+  compact { a; b; c }
+  empty {}
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  sub walk {
+      my ($node, $depth) = @_;
+      print "  " x $depth, $node->name, "\n";
+      walk($_, $depth + 1) for @{ $node->children };
+  }
+  walk($_, 0) for @{ parse_kdl($kdl)->nodes };
+
+=for highlighter
+
+Output:
+
+  parent
+    child1
+    child2
+      grandchild
+  compact
+    a
+    b
+    c
+  empty
+
+C<< $node->children >> is always an array reference, empty when the node
+has no block. The block ends the node: C<a { b } c> is a syntax error,
+while C<a { b }; c> and a newline after the C<}> are fine. A block may
+also follow a line continuation (C<node 1 \> followed by C<{ ... }> on the
+next line).
+
+KDL 2.0.0 requires whitespace between the node and its block; C<empty{}>
+without the space is a syntax error. KDL 1.0.0 allows C<empty{}>, but the
+underlying ckdl parser rejects it in v1 mode as well. Always write
+C<empty {}>.
+
+=head2 Node terminators: newlines and semicolons
+
+A node ends at a newline, a semicolon, the closing C<}> of its parent, or
+the end of the input. Semicolons let you put several nodes on one line:
+
+=for highlighter language=KDL
+
+  a; b 1; c { d; e 2 }
+  last-line-without-newline
+
+=for highlighter
+
+This parses to four top-level nodes (C<a>, C<b>, C<c>, and
+C<last-line-without-newline>); C<c> has the two children C<d> and C<e>.
+The emitter always writes one node per line:
+
+=for highlighter language=KDL
+
+  a
+  b 1
+  c {
+      d
+      e 2
+  }
+  last-line-without-newline
+
+=for highlighter
+
+=head2 Line continuations
+
+A backslash continues the node on the next line (the specification calls
+this an I<escline>). Between the backslash and the newline there may be
+whitespace, a single-line comment, or a block comment (which may itself
+span lines); the newline that ends the continuation must still follow.
+A continuation at the very end of the input is allowed.
+
+=for highlighter language=KDL
+
+  long-node 1 2 \
+            3 4 \  // a comment is fine here
+            key=5
+
+=for highlighter
+
+The result is one node with arguments C<1 2 3 4> and property C<key=5>.
+Continuations are purely syntactic; C<emit_kdl> writes everything on one
+line: C<long-node 1 2 3 4 key=5>.
+
+=head2 Type annotations on nodes
+
+A node name may be prefixed with C<(type)>. The annotation is a free-form
+string (bare or quoted); KDL does not interpret it.
+
+=for highlighter language=KDL
+
+  (published)date "2026-09-26"
+  (person)author "Kat"
+  ("my type")thing 1
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  for my $node (@{ parse_kdl($kdl)->nodes }) {
+      printf "%-7s type=%s\n", $node->name, $node->type_annotation // 'undef';
+  }
+  # date    type=published
+  # author  type=person
+  # thing   type=my type
+
+=for highlighter
+
+C<type_annotation> returns C<undef> when the node has no annotation.
+
+=head2 Type annotations on values
+
+Arguments and property values can carry a C<(type)> prefix as well. The
+specification lists annotations that implementations I<may> recognise and
+says how they should be interpreted:
+
+  Numbers    i8 i16 i32 i64 i128  u8 u16 u32 u64 u128  isize usize
+             f32 f64 decimal64 decimal128
+  Strings    date-time time date duration decimal currency
+             country-2 country-3 country-subdivision
+             email idn-email hostname idn-hostname ipv4 ipv6
+             url url-reference irl irl-reference url-template
+             uuid regex base64 base85
+
+Any other name is equally valid. C<Text::KDL::XS> reports the annotation
+and leaves the value untouched whatever the name is.
+
+=for highlighter language=KDL
+
+  temperature (f32)21.5 unit=(unit)"celsius"
+  author "Kat" id=(u64)42
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  for my $node (@{ parse_kdl($kdl)->nodes }) {
+      printf "arg  %-8s type=%s\n", $_->as_string, $_->type_annotation // 'undef'
+          for @{ $node->args };
+      printf "prop %s=%-6s type=%s\n", $_->[0], $_->[1]->as_string, $_->[1]->type_annotation // 'undef'
+          for @{ $node->props };
+  }
+  # arg  21.5     type=f32
+  # prop unit=celsius type=unit
+  # arg  Kat      type=undef
+  # prop id=42     type=u64
+
+=for highlighter
+
+In KDL v2 whitespace is permitted inside the parentheses and between the
+annotation and its value (C<( u8 ) 42>); KDL v1 permits neither. The
+emitter always writes the compact form C<(u8)42>.
+
+Annotations survive a round trip through C<emit_kdl> in tree mode, and can
+be attached to values you build yourself (see
+L</"Emitting type annotations">).
+
+=head1 STRINGS
+
+KDL v2 has three forms of string: identifier strings, quoted strings and
+multi-line strings. Quoted and multi-line strings each have a raw variant
+that disables escapes. All forms produce the same kind of value:
+C<< $value->type >> is C<'string'> and C<< $value->as_string >> returns
+the decoded text. This document uses the specification's term
+I<identifier string>; other documents call the same thing a bare string
+or bare identifier.
+
+=head2 Identifier strings
+
+An identifier string is a string without quotes. The KDL v2 rules:
+
+  Allowed        any Unicode character except the ones below
+  Not allowed    whitespace, newlines, the disallowed characters listed in
+                 "Disallowed characters", and these twelve characters:
+                   (  )  {  }  [  ]  /  \  "  #  ;  =
+  First char     must not be a digit
+                 + or - may start an identifier only if what follows is
+                   not a digit, and not a . followed by a digit
+                   (so -flag is fine, -1 and -.5 are not identifiers)
+                 . may start an identifier only if the next character is
+                   not a digit
+  Reserved       true false null inf -inf nan (write them quoted)
+
+=for highlighter language=KDL
+
+  node hello-world --flag path.to.x=1
+
+=for highlighter
+
+The node has two arguments (C<hello-world>, C<--flag>) and one property
+(C<path.to.x> = C<1>). As a Perl string an identifier is indistinguishable
+from a quoted string: C<< parse_kdl('n a')->nodes->[0]->args->[0]->as_string >>
+and C<< parse_kdl('n "a"') ... >> both give C<a>.
+
+KDL v1 has its own rules: bare identifiers are only allowed as node names
+and property keys, never as values (C<node foo> is a syntax error in v1);
+the characters C<< < >>, C<< > >> and C<,> are forbidden, C<#> is allowed;
+only C<true>, C<false> and C<null> are reserved, so C<inf> and C<nan> are
+ordinary v1 identifiers.
+
+B<Parser quirk:> in the default detection mode, C<.5>, C<-.5> and C<+.5>
+are accepted as identifier strings although neither version allows them
+(both C<< version => '1' >> and C<< version => '2' >> reject them).
+
+=head2 Quoted strings
+
+Quoted strings are delimited by double quotes and support escape sequences.
+A literal newline inside the quotes is a syntax error in KDL v2. To spread
+a long string over several source lines, escape the newline with a
+backslash, which removes it from the value (see L</"Whitespace escapes">);
+to put a newline into the value, write C<\n> or use a
+L<multi-line string|/"Multi-line strings">.
+
+=for highlighter language=KDL
+
+  greeting "Hello, world"
+  path "C:\\Users\\kat"
+  tab "col1\tcol2"
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  my %by_name = map { $_->name => $_->args->[0]->as_string } @{ parse_kdl($kdl)->nodes };
+  print $by_name{path};   # C:\Users\kat   (one backslash each)
+  print $by_name{tab};    # col1<TAB>col2
+
+=for highlighter
+
+=head2 Escape sequences
+
+Inside quoted (non-raw) strings the following escapes are recognised:
+
+  Escape     Meaning
+  ---------  --------------------------------------------------------
+  \n         line feed (U+000A)
+  \r         carriage return (U+000D)
+  \t         tab (U+0009)
+  \\         backslash
+  \"         double quote
+  \b         backspace (U+0008)
+  \f         form feed (U+000C)
+  \s         space (U+0020)                        (KDL v2 only)
+  \/         forward slash                         (KDL v1 only)
+  \u{X..}    Unicode scalar value, 1 to 6 hex digits, up to \u{10FFFF}
+
+Any other character after a backslash is a syntax error, and so is a code
+point above U+10FFFF. The specification also forbids surrogates
+(C<\u{D800}> to C<\u{DFFF}>); they are rejected in every version mode
+(in v1 and detection mode with C<KDL parse error: string contains a
+surrogate or a code point above U+10FFFF>). The underlying parser is
+lenient about the digits: C<\u{}> with no digits at all is accepted and
+yields U+0000, although the specification requires at least one digit,
+and more than six digits wrap around (C<\u{1000000041}> is C<A>).
+
+=for highlighter language=KDL
+
+  quoted "tab\there, quote\", backslash\\, unicode \u{2713}, space\sgap"
+  controls "\b\f\r"
+  max "\u{10FFFF}"
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  my %by_name = map { $_->name => $_->args->[0]->as_string } @{ parse_kdl($kdl)->nodes };
+  print $by_name{quoted};                              # tab<TAB>here, quote", backslash\, unicode ✓, space gap
+  print join ",", map { ord } split //, $by_name{controls};   # 8,12,13
+  printf "%X\n", ord $by_name{max};                    # 10FFFF
+
+=for highlighter
+
+When emitting, C<emit_kdl> escapes C<">, C<\>, tabs, newlines and other
+control characters, and leaves other Unicode characters as they are.
+C<escape_mode> changes that (see
+L</"Escaping and identifier quoting options">).
+
+=head2 Whitespace escapes
+
+In KDL v2 a backslash followed by literal whitespace (including newlines)
+removes the backslash and all of that whitespace. This is how a quoted
+string can be split across lines without adding a newline to the value:
+
+=for highlighter language=KDL
+
+  continued "one \
+              two"
+
+=for highlighter
+
+The value is C<one two>. Escape sequences such as C<\n> are not whitespace
+and are kept. KDL v1 has no whitespace escape; the same input is a syntax
+error with C<< version => '1' >>.
+
+=head2 Multi-line strings
+
+Three double quotes start a multi-line string. The opening C<"""> must be
+followed by a newline, the closing C<"""> must be on its own line, and the
+whitespace before the closing quotes defines the indentation that is
+removed from every line (dedent).
+
+=for highlighter language=KDL
+
+  multi """
+      Dear reader,
+        indented line
+      bye
+      """
+
+=for highlighter
+
+The value is C<"Dear reader,\n  indented line\nbye">: four spaces were
+removed from each line, the two extra spaces on the middle line remain, and
+neither the first nor the last newline is part of the value. Line endings
+inside the string are normalised to C<\n>, so a CRLF file yields the same
+value. Whitespace-only lines become empty lines regardless of their
+indentation.
+
+The prefix must match exactly, character for character: a line indented
+with a tab where the closing line uses spaces is a syntax error, not a
+different amount of indentation. A multi-line string may be empty
+(C<"""> on one line and C<"""> on the next). Escape sequences work as in
+quoted strings, and whitespace escapes (a backslash before a newline) are
+applied before dedenting.
+
+C<emit_kdl> never writes multi-line strings; it writes the value as a
+single-line quoted string with C<\n> escapes:
+
+=for highlighter language=KDL
+
+  multi "Dear reader,\n  indented line\nbye"
+
+=for highlighter
+
+Multi-line strings with C<"""> are KDL v2 syntax. In v1 a plain quoted
+string may contain literal newlines instead (see L</"KDL v1 strings">).
+
+=head2 Raw strings
+
+A raw string is a quoted string prefixed with one or more C<#>. Backslashes
+have no special meaning inside it. The string ends at a C<"> followed by the
+same number of C<#>, so choose enough hashes that the terminator cannot
+appear inside the content.
+
+=for highlighter language=KDL
+
+  raw #"C:\path\no "escapes" here"#
+  raw-more ##"contains "# inside"##
+
+=for highlighter
+
+Values: C<C:\path\no "escapes" here> and C<contains "# inside>.
+
+Because there are no escapes, a raw string cannot contain the characters
+KDL forbids literally (see L</"Disallowed characters">); use a quoted
+string with C<\u{...}> for those.
+
+C<emit_kdl> never writes raw strings; it re-escapes the value instead
+(C<raw "C:\\path\\no \"escapes\" here">). The parsed value is the same.
+
+=head2 Raw multi-line strings
+
+Raw and multi-line combine:
+
+=for highlighter language=KDL
+
+  raw-multi #"""
+      literal \n stays
+      """#
+
+=for highlighter
+
+The value is C<literal \n stays> with a real backslash and C<n>. Dedent
+rules are the same as for L</"Multi-line strings">.
+
+=head2 KDL v1 strings
+
+KDL v1 (parse with C<< version => '1' >>, or rely on detection) differs in
+five ways:
+
+=over 4
+
+=item * Raw strings are written C<r"...">, C<r#"..."#> and so on, with an
+C<r> prefix instead of a leading C<#>.
+
+=item * Quoted and raw strings may contain literal newlines; there is no
+C<"""> syntax and no dedenting.
+
+=item * C<\/> is a valid escape (for C</>); C<\s> is not.
+
+=item * There is no whitespace escape (backslash before a newline).
+
+=item * Bare identifiers are not values. C<node foo> is a syntax error in
+v1 (in v2 it is the string C<foo>).
+
+=back
+
+=for highlighter language=KDL
+
+  raw r"C:\path"
+  raw-hash r#"has "quotes""#
+  multi "line one
+  line two"
+  slash "a\/b"
+
+=for highlighter
+
+Parsed with C<< version => '1' >> the values are C<C:\path>,
+C<has "quotes">, C<"line one\nline two"> and C<a/b>.
+
+=head1 NUMBERS
+
+KDL has a single number type. C<Text::KDL::XS> reports every number with
+C<< $value->type eq 'number' >> and distinguishes three storage kinds via
+C<< $value->kind >>: C<integer> (a Perl integer), C<float> (a Perl
+floating point number) and C<string> (the digits kept as text). The exact
+rules are in L</"Number kinds: integer, float, string">; the sections
+before it show them in action.
+
+The examples in this part all use this loop:
+
+=for highlighter language=Perl
+
+  for my $node (@{ parse_kdl($kdl)->nodes }) {
+      print $node->name, "\n";
+      printf "  kind=%-8s value=%s\n", $_->kind, $_->value for @{ $node->args };
+  }
+
+=for highlighter
+
+=head2 Integers
+
+=for highlighter language=KDL
+
+  integers 42 -7 +3 1_000_000 007
+  limits 9223372036854775807 -9223372036854775808
+  unsigned 9223372036854775808 18446744073709551615
+
+=for highlighter
+
+  integers
+    kind=integer  value=42
+    kind=integer  value=-7
+    kind=integer  value=3
+    kind=integer  value=1000000
+    kind=integer  value=7
+  limits
+    kind=integer  value=9223372036854775807
+    kind=integer  value=-9223372036854775808
+  unsigned
+    kind=integer  value=9223372036854775808
+    kind=integer  value=18446744073709551615
+
+Every integer from -2**63 to 2**64-1 is C<< kind => 'integer' >> with a
+Perl integer in C<value>; values above 2**63-1 are unsigned integers
+(UV). C<emit_kdl> writes all of them back exactly. Anything beyond that
+range keeps its digits as C<< kind => 'string' >>, see
+L</"Arbitrary precision numbers">.
+
+=head2 Floating point numbers
+
+A number with a decimal point or an exponent is a float. It comes back as
+C<< kind => 'float' >> when at most 15 digits are written before the
+exponent (leading and trailing zeros count, underscores do not) and the
+written exponent lies between -284 and 284; otherwise the exact text is
+kept:
+
+=for highlighter language=KDL
+
+  floats 3.14 -0.5 1e3 6.02e23 1.5E-4 1E+3 +1.5 -0.0
+  precise 3.141592653589793 0.30000000000000004 1e285 1e400
+
+=for highlighter
+
+  floats
+    kind=float    value=3.14
+    kind=float    value=-0.5
+    kind=float    value=1000
+    kind=float    value=6.02e+23
+    kind=float    value=0.00015
+    kind=float    value=1000
+    kind=float    value=1.5
+    kind=float    value=0
+  precise
+    kind=string   value=3.141592653589793
+    kind=string   value=0.30000000000000004
+    kind=string   value=1e285
+    kind=string   value=1e400
+
+C<value> is a Perl floating point number for the C<float> kind, the
+double nearest to the literal, so C<1e3> comes back as C<1000> and prints
+without a decimal point (and C<-0.0> prints as C<0>, although it keeps its
+sign). When emitted again the float kind is remembered: C<emit_kdl> writes
+the first node as C<floats 3.14 -0.5 1000.0 6.02e+23 0.00015 1000.0 1.5
+-0.0>, every float with the shortest text that reads back as the same
+double. A C<string> kind number is written back verbatim.
+
+Note that C<3.141592653589793> (16 digits) is a C<string>, and so are
+C<1.000000000000000> and C<123456789012345.0> (16 digits including the
+zeros), so a double printed with full precision is not a C<float> on the
+way back in; C<< $v->as_number >> gives the double and C<< $v->as_bignum >>
+the exact decimal. See L</"Emitting floating point numbers"> for writing
+floats.
+
+=head2 Hexadecimal, octal and binary numbers
+
+=for highlighter language=KDL
+
+  radix 0xFF 0o755 0b1010 0x7FFF_FFFF 0xDEAD_BEEF
+
+=for highlighter
+
+  radix
+    kind=integer  value=255
+    kind=integer  value=493
+    kind=integer  value=10
+    kind=integer  value=2147483647
+    kind=integer  value=3735928559
+
+Radix prefixes exist only in the source text; parsed values are ordinary
+numbers and C<emit_kdl> writes them in decimal
+(C<radix 255 493 10 2147483647 3735928559>).
+Hexadecimal digits may be upper or lower case, but the prefix must be
+lower case: C<0XFF> is a syntax error. A sign may precede the prefix:
+C<-0x10> is C<-16>.
+
+=head2 Underscore digit separators
+
+Underscores may appear between digits, or after them, in any number syntax:
+C<1_000_000>, C<0xDEAD_BEEF>, C<1_0.5_0>, C<12____>. They are ignored.
+An underscore before the first digit is not allowed: C<_12> is an
+identifier string, and C<0x_FF> and C<1e_10> are syntax errors.
+
+=head2 Arbitrary precision numbers
+
+KDL puts no limit on the size of a number. When a value does not fit the
+native C types, or when ckdl cannot guarantee an exact conversion (see the
+rules under L</"Number kinds: integer, float, string">), C<Text::KDL::XS>
+keeps the text:
+
+=for highlighter language=KDL
+
+  huge 123456789012345678901234567890 1e400
+  extremes 18446744073709551615 18446744073709551616
+
+=for highlighter
+
+  huge
+    kind=string   value=123456789012345678901234567890
+    kind=string   value=1e400
+  extremes
+    kind=integer  value=18446744073709551615
+    kind=string   value=18446744073709551616
+
+The text is normalised (underscores removed, radix prefixes converted to
+decimal, a leading C<+> dropped), but otherwise verbatim, and is written
+back out unchanged by C<emit_kdl>. To compute with it exactly, ask for a
+L<Math::BigInt> or L<Math::BigFloat>:
+
+=for highlighter language=Perl
+
+  my $v = parse_kdl($kdl)->nodes->[0]->args->[0];
+  my $exact = $v->as_bignum;    # Math::BigInt 123456789012345678901234567890
+  print $exact * 2;             # 246913578024691357802469135780
+
+=for highlighter
+
+C<< $v->as_number >> converts the text to a Perl number, which is fine
+for a quick comparison but loses precision (C<1.23456789012346e+29>), and
+C<1e400> becomes infinite.
+
+=head2 Keyword numbers: #inf, #-inf and #nan
+
+KDL v2 spells the IEEE special values C<#inf>, C<#-inf> and C<#nan>:
+
+=for highlighter language=KDL
+
+  keywords #inf #-inf #nan
+
+=for highlighter
+
+  keywords
+    kind=float    value=Inf
+    kind=float    value=-Inf
+    kind=float    value=NaN
+
+They come back as Perl's C<Inf>, C<-Inf> and C<NaN> and are written as
+C<#inf #-inf #nan> by C<emit_kdl>. KDL v1 has no syntax for them, so
+C<< emit_kdl($doc, version => '1') >> dies with C<emit_kdl: KDL v1 has no
+representation for inf/nan> rather than writing an invalid document.
+
+=head2 Number kinds: integer, float, string
+
+Summary of C<< $value->kind >> for a C<number> value:
+
+  kind       value is                          when
+  ---------  --------------------------------  ---------------------------------------
+  integer    Perl integer (IV, or UV above     no . or exponent; value within
+             2**63-1)                          -2**63 .. 2**64-1
+  float      Perl floating point number (NV)   has . or exponent; at most 15 digits
+                                               written before the exponent (zeros
+                                               count); written exponent within
+                                               -284 .. 284; also #inf, #-inf, #nan
+  string     the digits as text                every other number
+
+The kind is preserved through C<emit_kdl> in tree mode, so a document with
+C<1.0> is written back as C<1.0>, not C<1>, and a C<string> kind is copied
+verbatim.
+
+=head2 Invalid number forms
+
+These are syntax errors: C<.5> and C<5.> (a digit is required on both
+sides of the point; C<0.5> and C<5.0> are fine), C<0XFF> (upper-case
+prefix), C<0x_FF> and C<1e_10> (underscore before the digits), and
+C<1abc> or C<-1em> (a number followed by letters). See
+L</"Identifier strings"> for the detection-mode quirk that accepts C<.5>.
+
+=head1 BOOLEANS AND NULL
+
+=head2 Keywords #true and #false
+
+KDL v2 writes booleans as C<#true> and C<#false>, as arguments or property
+values:
+
+=for highlighter language=KDL
+
+  flags #true #false enabled=#true
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  my $node = parse_kdl($kdl)->nodes->[0];
+  for my $v (@{ $node->args }) {
+      printf "type=%s is_bool=%d as_perl=%s as_string=%s\n",
+          $v->type, $v->is_bool, $v->as_perl, $v->as_string;
+  }
+  # type=bool is_bool=1 as_perl=1 as_string=true
+  # type=bool is_bool=1 as_perl=0 as_string=false
+  print $node->prop('enabled')->type;   # bool
+
+=for highlighter
+
+C<as_perl> and C<value> give C<1> or C<0>, C<as_string> gives C<true> or
+C<false>. Booleans are not confused with the strings C<"true"> and
+C<"false">: those have C<< type eq 'string' >>.
+
+To emit a boolean from plain Perl data you must pass a boolean object,
+because Perl's C<1> and C<0> are numbers. See L</"Emitting booleans">.
+
+=head2 Keyword #null
+
+=for highlighter language=KDL
+
+  description #null key=#null
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  my $node = parse_kdl($kdl)->nodes->[0];
+  print $node->args->[0]->is_null;                      # 1
+  print defined $node->args->[0]->as_perl ? 1 : 0;      # 0
+  print $node->prop('key')->type;                       # null
+
+=for highlighter
+
+C<value>, C<as_perl>, C<as_string> and C<as_number> all return C<undef>
+for null. To emit null, use C<undef> in data mode or
+C<< Text::KDL::XS::Value->new(type => 'null') >> in tree mode.
+
+=head2 KDL v1 keywords: true, false, null
+
+KDL v1 writes them without the C<#>: C<true>, C<false>, C<null>. The parsed
+values are identical.
+
+=for highlighter language=KDL
+
+  flags true false null
+
+=for highlighter
+
+Parsed with the default version detection or C<< version => '1' >>, the
+three arguments are C<bool>, C<bool>, C<null>. C<emit_kdl> writes them
+in whichever syntax you ask for: C<flags #true #false #null> by default,
+C<flags true false null> with C<< version => '1' >>.
+
+=head1 COMMENTS
+
+Comments are discarded by C<parse_kdl>. Slashdash comments affect the data
+(they remove things). The streaming parser can report all of them; see
+L</"Reading comments with the streaming parser">.
+
+=head2 Single-line comments
+
+C<//> starts a comment that runs to the end of the line:
+
+=for highlighter language=KDL
+
+  // A single-line comment
+  title "Example" // trailing comment
+
+=for highlighter
+
+=head2 Multi-line comments
+
+C</* ... */> comments may span lines, may appear anywhere whitespace may
+appear (even inside a node between arguments or inside a children block),
+and nest:
+
+=for highlighter language=KDL
+
+  /* A block comment /* nested */ still a comment */
+  title "Example" /* inline */ draft=#false
+  section {
+      /* spans
+         two lines */ child 1
+  }
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  my $doc = parse_kdl($kdl);
+  print scalar @{ $doc->nodes };                          # 2
+  print join ",", map { $_->as_perl } @{ $doc->nodes->[0]->args };   # Example
+  print $doc->nodes->[1]->children->[0]->name;            # child
+  print emit_kdl($doc);   # no comments in the output
+
+=for highlighter
+
+=head2 Slashdash comments
+
+C</-> comments out the next element as a whole: a node (including all of
+its entries and children), a single argument, a single property, or a
+children block. If the element carries a type annotation the slashdash
+goes before the annotation (C</-(t)1>; C<(t)/-1> is an error).
+
+=for highlighter language=KDL
+
+  /-disabled "this whole node is ignored" {
+      child 1
+  }
+  mixed 1 /-2 3 key=1 /-gone=2 /-{
+      also-ignored
+  }
+  annotated /-(t)1 2
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  my $doc = parse_kdl($kdl);
+  print scalar @{ $doc->nodes };                   # 2     (disabled is gone)
+  my $mixed = $doc->nodes->[0];
+  print join ",", map { $_->as_perl } @{ $mixed->args };   # 1,3
+  print join ",", map { $_->[0] } @{ $mixed->props };      # key
+  print scalar @{ $mixed->children };              # 0
+  print $doc->nodes->[1]->args->[0]->as_perl;      # 2
+
+=for highlighter
+
+A slashdash may be followed by whitespace, newlines and ordinary comments
+before the element it removes. A slashdash cannot remove only the value of
+a property (C<key=/-1> is an error). After a slashdashed children block
+only another children block may follow (C<node /-{ a } { b }> keeps
+C<b>; C<node /-{ a } 2> is an error).
+
+=head2 Reading comments with the streaming parser
+
+L<Text::KDL::XS::Parser> can be asked to report comments and slashdashed
+elements with C<< emit_comments => 1 >>. Every event has a C<commented>
+key (also without the option, where it is always 0); with the option it is
+1 for slashdashed elements, and ordinary comments arrive as C<comment>
+events.
+
+=for highlighter language=Perl
+
+  use Text::KDL::XS::Parser;
+
+  my $p = Text::KDL::XS::Parser->new("// note\n$kdl", emit_comments => 1);
+  while (my $ev = $p->next_event) {
+      printf "%-10s commented=%d %s\n", $ev->{event}, $ev->{commented},
+          $ev->{name} // $ev->{text} // '';
+  }
+
+=for highlighter
+
+For a comment followed by the slashdash example above this prints:
+
+  comment    commented=1 // note
+  start_node commented=1 disabled
+  argument   commented=1
+  start_node commented=1 child
+  argument   commented=1
+  end_node   commented=1
+  end_node   commented=1
+  start_node commented=0 mixed
+  argument   commented=0
+  argument   commented=1
+  argument   commented=0
+  property   commented=0 key
+  property   commented=1 gone
+  start_node commented=1 also-ignored
+  end_node   commented=1
+  end_node   commented=0
+  start_node commented=0 annotated
+  argument   commented=1
+  argument   commented=0
+  end_node   commented=0
+
+A C<comment> event carries the comment as written in C<text>, delimiters
+included (C<// note>, C</* ... */>), but no position; its place in the
+event sequence shows where the comment stood.
+
+C<parse_kdl> accepts C<emit_comments> as well, but comments and
+slashdashed elements never become part of the tree it builds.
+
+=head1 WHITESPACE, NEWLINES AND ENCODING
+
+=head2 Whitespace characters
+
+Space, tab, and the Unicode space characters listed in the specification
+(U+00A0, U+1680, U+2000 to U+200A, U+202F, U+205F, U+3000) separate
+tokens. They carry no meaning and are not preserved:
+
+=for highlighter language=Perl
+
+  my $doc = parse_kdl("a\t1\x{a0}2   3\n");   # tab, no-break space, spaces
+  print scalar @{ $doc->nodes->[0]->args };   # 3
+  print emit_kdl($doc);                       # a 1 2 3
+
+=for highlighter
+
+=head2 Newline characters
+
+CRLF, CR, LF, U+0085 (NEL), U+000C (FF), U+2028 (LS) and U+2029 (PS)
+all terminate a node. CRLF counts as one newline, so documents from
+Windows parse without conversion. C<emit_kdl> always writes LF.
+
+=for highlighter language=Perl
+
+  my $doc = parse_kdl("a 1\r\nb 2\rc 3\n");
+  print join ",", map { $_->name } @{ $doc->nodes };   # a,b,c
+
+=for highlighter
+
+KDL v2 also lists the vertical tab (U+000B) as a newline; the underlying
+parser treats it as ordinary whitespace instead (KDL v1 rejects it).
+
+=head2 Byte order mark
+
+A UTF-8 byte order mark (U+FEFF) at the very start of the document is
+skipped. In KDL v2 it is a syntax error anywhere else; KDL v1 treats it as
+whitespace everywhere.
+
+=for highlighter language=Perl
+
+  my $doc = parse_kdl("\x{feff}node 1\n");   # a string starting with the BOM character
+  print $doc->nodes->[0]->name;              # node
+
+=for highlighter
+
+The same holds for the three bytes C<EF BB BF> at the start of a file read
+through a filehandle.
+
+=head2 Disallowed characters
+
+Some code points may not appear literally anywhere in a document, not even
+inside strings: the control characters U+0000 to U+0008 and U+000E to
+U+001F, DEL (U+007F), the Unicode direction-control characters (U+200E,
+U+200F, U+202A to U+202E, U+2066 to U+2069), surrogates, and a BOM
+anywhere but at the start (in v2). The parser rejects them with a parse
+error in v2 and detection mode; with C<< version => '1' >> it accepts them
+inside strings and identifiers. Quoted strings can hold them through
+C<\u{...}> escapes (except surrogates, which are never allowed, see
+L</"Escape sequences">); raw strings cannot.
+
+=for highlighter language=KDL
+
+  bell "a\u{7}b"
+
+=for highlighter
+
+C<< $node->args->[0]->as_string >> is C<a>, the BEL character, C<b>. The
+same three characters typed literally between the quotes are a syntax
+error.
+
+=head2 UTF-8 and Perl strings
+
+KDL documents are UTF-8. C<parse_kdl> and L<Text::KDL::XS::Parser> take
+a string as Perl B<characters>, read filehandles and code references as
+UTF-8 B<bytes> (characters from an encoding layer or a code reference are
+encoded for you), and return Perl B<character> strings (with the UTF-8
+flag set, so C<length> counts characters). C<emit_kdl> takes character
+strings and returns a character string, which you encode when writing to
+a file or socket, and which C<print> mangles unless the output handle has
+an encoding layer. So C<parse_kdl(emit_kdl($data))> always works.
+
+=for highlighter language=Perl
+
+  use utf8;                                  # string literals in this file are characters
+  use Encode qw(encode decode);
+  binmode STDOUT, ':encoding(UTF-8)';
+
+  # Reading: pass the filehandle, any layer works ...
+  open my $in, '<', 'config.kdl' or die $!;
+  my $doc = parse_kdl($in);
+  my $name = $doc->nodes->[0]->name;         # a character string, e.g. "café"
+  print length $name;                        # 4
+
+  # ... or pass a character string.
+  my $inline = parse_kdl("café 1\n");         # a literal under use utf8
+  my $bytes  = do { open my $raw, '<:raw', 'config.kdl' or die $!; local $/; <$raw> };
+  my $again  = parse_kdl(decode('UTF-8', $bytes));   # bytes must be decoded first
+
+  # Writing: encode the emitted characters.
+  open my $out, '>:raw', 'config.kdl' or die $!;
+  print {$out} encode('UTF-8', emit_kdl($doc));
+
+  # Or let a layer do it:
+  open my $out2, '>:encoding(UTF-8)', 'config.kdl' or die $!;
+  print {$out2} emit_kdl($doc);
+
+=for highlighter
+
+The one thing to watch is a string of UTF-8 B<bytes> (a heredoc in a
+source file without C<use utf8>, or data slurped through C<:raw>): it has
+to be decoded before C<parse_kdl> sees it, otherwise every byte counts as
+one character and C<café> comes back as five characters instead of four.
+Text::KDL::XS 0.001
+expected exactly such byte strings; code written for it must decode now.
+
+Input that is not valid UTF-8 (including overlong forms, surrogates and
+code points above U+10FFFF) is a parse error, C<KDL parse error: input is
+not valid UTF-8>. On output, C<emit_kdl> dies for a name, key or string
+that contains a surrogate or a code point above U+10FFFF, which no KDL
+document can hold.
+
+=head1 KDL VERSIONS
+
+There are two versions of KDL. Version 2.0.0 is current; 1.0.0 is the
+legacy format. The main visible differences are the C<#> prefix on
+C<#true>, C<#false>, C<#null>, the availability of bare identifier strings
+as values, and the new C<"""> and C<#"..."#> string syntaxes. The full
+list is in L</"Differences between KDL v1 and v2">.
+
+=head2 Version detection
+
+By default (C<< version => 'detect' >>) the parser accepts both versions
+and decides from the first version-specific construct it meets. For a
+document that uses only the common subset (quoted strings, numbers, node
+names) both readings are the same.
+
+=for highlighter language=Perl
+
+  my $doc = parse_kdl('node true');     # detected as v1: argument is a boolean
+  my $doc = parse_kdl('node #true');    # detected as v2: argument is a boolean
+  my $doc = parse_kdl('node "same"');   # either: argument is the string "same"
+
+=for highlighter
+
+Once a version has been detected, constructs from the other version are
+syntax errors. Mixing C<true> and C<#true> in one document fails.
+
+The parser does not report which version it settled on. When you need to
+know, parse with C<< version => '2' >> first and fall back to
+C<< version => '1' >>:
+
+=for highlighter language=Perl
+
+  my ($doc, $version);
+  for my $try ('2', '1') {
+      $doc = eval { parse_kdl($text, version => $try) } or next;
+      $version = $try;
+      last;
+  }
+  die "not valid KDL: $@" unless $doc;
+
+=for highlighter
+
+=head2 Forcing KDL v1 or v2
+
+Pass C<< version => '1' >> or C<< version => '2' >> to accept only one
+syntax. This table shows how six one-line documents fare under each
+setting (the cell gives the type of the argument; C<ERROR> means
+C<parse_kdl> dies):
+
+  Document              detect    version=1   version=2
+  --------------------  --------  ----------  ----------
+  node "v1 or v2"       string    string      string
+  node true             bool      bool        ERROR
+  node #true            bool      ERROR       bool
+  node r"raw"           string    string      ERROR
+  node #"raw"#          string    ERROR       string
+  node bare-ident       string    ERROR       string
+
+The underlying ckdl library documents detection as exact for every v2
+document and for I<almost> every v1 document. If strict v1 conformance
+matters, pass C<< version => '1' >>.
+
+=head2 Version marker
+
+A document may start with the version marker C</- kdl-version 2> (or
+C<1>). The specification defines it as a hint that parsers I<may> use. It
+is written with slashdash syntax, so this parser simply removes it like any
+other slashdashed node and does not use it to choose the version; it is
+harmless and helps readers.
+
+=for highlighter language=KDL
+
+  /- kdl-version 2
+  node #true
+
+=for highlighter
+
+=head2 Differences between KDL v1 and v2
+
+  Feature                        KDL v1                       KDL v2
+  -----------------------------  ---------------------------  ----------------------------
+  booleans                       true false                   #true #false
+  null                           null                         #null
+  infinity, NaN                  (not representable)          #inf #-inf #nan
+  bare strings as values         not allowed                  allowed (identifier strings)
+  reserved identifiers           true false null              also inf -inf nan
+  characters in identifiers      < > , forbidden; # allowed   # forbidden; < > , allowed
+  raw strings                    r"..." r#"..."#              #"..."# ##"..."##
+  multi-line strings             literal newlines in "..."    """ ... """ with dedent
+  \s escape (space)              no                           yes
+  \/ escape (slash)              yes                          no
+  whitespace escape (\ newline)  no                           yes
+  whitespace around = and (type) not allowed                  allowed
+  node{} without a space         allowed by the spec          not allowed
+                                 (rejected by this parser)
+  BOM after the start            whitespace                   syntax error
+  vertical tab                   not allowed                  newline (whitespace in this
+                                                              parser)
+
+=head2 Converting between versions
+
+Parse with detection, emit with an explicit version:
+
+=for highlighter language=Perl
+
+  my $doc = parse_kdl($v1_text);
+  my $v2  = emit_kdl($doc, version => '2');   # #true, bare identifiers, ...
+  my $v1  = emit_kdl($doc, version => '1');   # true, everything quoted, ...
+
+=for highlighter
+
+Given C<flags true false null> the v2 output is C<flags #true #false #null>.
+Given the v2 document
+
+=for highlighter language=KDL
+
+  node "tab\there" key=1 { child value }
+
+=for highlighter
+
+the v1 output is
+
+=for highlighter language=KDL
+
+  node "tab\there" key=1 {
+      child "value"
+  }
+
+=for highlighter
+
+because v1 has to quote every string value.
+
+=head1 WRITING KDL
+
+L<Text::KDL::XS/emit_kdl> has two modes. It picks the mode from its first
+argument: a L<Text::KDL::XS::Document>, a L<Text::KDL::XS::Node> or an
+array reference of nodes selects B<tree mode>; any other hash or array
+reference selects B<data mode>.
+
+=head2 Emitting plain Perl data
+
+Data mode turns nested hashes and arrays into nodes. Every hash key
+becomes a node; data mode never writes properties.
+
+  Perl value                    KDL output
+  ----------------------------  -------------------------------------------
+  { key => $scalar }            key <value>
+  { key => undef }              key #null
+  { key => [ $s1, $s2 ] }       key <s1> <s2>          (all elements scalars)
+  { key => [] }                 key                    (bare node)
+  { key => {} }                 key                    (bare node)
+  { key => { ... } }            key { ...children... }
+  { key => [ {..}, {..} ] }     key { ... }  key { ... }   (one sibling per element)
+  { key => [ $s, {..} ] }       key <s>  key { ... }   (mixed: one sibling per element)
+  { key => [ [1,2], [3] ] }     key 1 2  key 3         (inner arrays: one sibling each)
+  [ $a, $b ]  (top level)       - <a>  - <b>           (nodes named "-")
+  {} or []    (top level)       (a single newline)
+  boolean object                #true / #false
+  Text::KDL::XS::Value          emitted with its type, kind and annotation
+
+Hash keys are sorted so output is deterministic.
+
+=for highlighter language=Perl
+
+  print emit_kdl({
+      title   => 'Data mode',
+      retries => 3,
+      ratio   => 0.5,
+      nothing => undef,
+      tags    => [ 'a', 'b', 'c' ],
+      empty   => [],
+      server  => { host => 'localhost', port => 8080 },
+      user    => [ { name => 'kat', admin => 1 }, { name => 'sam' } ],
+      quoted  => 'two words',
+      number  => '42',
+  });
+
+=for highlighter
+
+=for highlighter language=KDL
+
+  empty
+  nothing #null
+  number "42"
+  quoted "two words"
+  ratio 0.5
+  retries 3
+  server {
+      host localhost
+      port 8080
+  }
+  tags a b c
+  title "Data mode"
+  user {
+      admin 1
+      name kat
+  }
+  user {
+      name sam
+  }
+
+=for highlighter
+
+Note C<number "42">: the Perl string C<'42'> is emitted as a string, and the
+Perl number C<42> as a number. A string that has been used as a number
+counts as a number only when its text is exactly how Perl prints that
+number (C<'42'> does, C<'042'> and C<'4.20'> do not), so no text is ever
+altered; see L<Text::KDL::XS/"Scalar coercion">. Wrap in C<"$x"> or
+C<0 + $x> when it matters. A hash or array that contains itself makes
+C<emit_kdl> die (C<emit_kdl: cyclic data structure>).
+
+A top-level array produces anonymous nodes named C<->, the convention used
+by KDL's JSON mapping:
+
+=for highlighter language=Perl
+
+  print emit_kdl([ 'x', 2, { k => 'v' } ]);
+
+=for highlighter
+
+=for highlighter language=KDL
+
+  - x
+  - 2
+  - {
+      k v
+  }
+
+=for highlighter
+
+Data mode is lossy by design: it cannot express properties, arguments and
+children on the same node, a specific node order (keys are sorted), type
+annotations on nodes, or the difference between C<< { key => 'a' } >> and
+C<< { key => ['a'] } >> (both give C<key a>). Type annotations on values
+are possible by embedding L<Text::KDL::XS::Value> objects. Use tree mode
+for everything else.
+
+=head2 Emitting a parsed or hand-built tree
+
+Tree mode writes exactly what the objects contain: argument order,
+property order, type annotations, number kinds.
+
+=for highlighter language=Perl
+
+  my $doc = parse_kdl($text);
+  print emit_kdl($doc);                            # whole document
+  print emit_kdl($doc->nodes->[0]);                # one node (and its subtree)
+  print emit_kdl([ grep { $_->name eq 'server' } @{ $doc->nodes } ]);   # a selection
+
+=for highlighter
+
+An array reference is treated as tree mode only when every element is a
+L<Text::KDL::XS::Node> (or a subclass); an array that mixes nodes with
+other values dies (C<emit_kdl: cannot serialize Text::KDL::XS::Node
+object>), and an empty array reference emits a single newline.
+
+=head2 What a round trip loses
+
+C<parse_kdl> followed by C<emit_kdl> in tree mode preserves the data of
+the document: node names and order, arguments and their order, properties
+and their order (including repeated keys), children, type annotations, the
+value of every string, and the kind and value of every number. It does not
+preserve the source text. Gone are:
+
+=over 4
+
+=item * comments of every kind, and slashdashed elements;
+
+=item * layout: indentation, blank lines, semicolons, line continuations,
+whitespace around C<=> and inside type annotations;
+
+=item * the spelling of strings: raw and multi-line strings become escaped
+single-line strings, identifier strings stay bare only if the emitter
+considers that safe;
+
+=item * the spelling of numbers: C<0xFF> becomes C<255>, C<1_000> becomes
+C<1000>, C<1e3> becomes C<1000.0>, C<6.02e23> becomes C<6.02e+23>, C<+3>
+becomes C<3>;
+
+=item * empty children blocks (C<node {}> becomes C<node>);
+
+=item * the KDL version, unless you pass C<version> to C<emit_kdl>.
+
+=back
+
+The value of every float is kept exactly: it is written with the shortest
+text that reads back as the same double.
+
+=head2 Building nodes and values by hand
+
+=for highlighter language=Perl
+
+  use Text::KDL::XS qw(emit_kdl);   # also loads Document, Node and Value
+
+  my $str = sub { Text::KDL::XS::Value->new(type => 'string', value => shift) };
+  my $int = sub { Text::KDL::XS::Value->new(type => 'number', value => shift) };
+
+  my $version = Text::KDL::XS::Node->new(name => 'version', args => [ $str->('1.0') ]);
+  my $package = Text::KDL::XS::Node->new(
+      name            => 'package',
+      type_annotation => 'cargo',
+      args            => [ $str->('kdl-rs') ],
+      props           => [ [ edition => $int->(2021) ] ],
+      children        => [ $version ],
+  );
+  print emit_kdl(Text::KDL::XS::Document->new(nodes => [ $package ]));
+
+=for highlighter
+
+=for highlighter language=KDL
+
+  (cargo)package kdl-rs edition=2021 {
+      version "1.0"
+  }
+
+=for highlighter
+
+The number C<Value> above gets its C<kind> (C<integer>) from the Perl
+value; pass C<< kind => 'string' >> to write a number with exactly the
+digits you give. The constructors check their arguments, so a mistake such
+as C<< type => 'Number' >> or a non-numeric number dies where the object
+is made, not later in C<emit_kdl>.
+
+Plain scalars are also accepted inside C<args> and C<props> of a hand-built
+node and are coerced like data-mode values:
+C<< Text::KDL::XS::Node->new(name => 'n', args => [ 1, 'two', undef ]) >>
+emits C<n 1 two #null>. C<< $node->prop($key) >> works on hand-built nodes
+as well; it searches C<props>, the rightmost occurrence of a key winning.
+
+=head2 Emitting booleans
+
+Perl has no boolean type, so C<1> and C<0> are emitted as numbers and the
+strings C<'true'> and C<'false'> as strings. To get C<#true> and C<#false>
+pass a boolean object from L<JSON::PP>, L<Types::Serialiser>,
+L<boolean> or L<Mojo::JSON>, or a L<Text::KDL::XS::Value> of type
+C<bool> (whose C<value> is judged by Perl truthiness, so C<'false'> would
+be true):
+
+=for highlighter language=Perl
+
+  use JSON::PP ();
+  print emit_kdl({ enabled => JSON::PP::true(), verbose => JSON::PP::false() });
+  # enabled #true
+  # verbose #false
+
+  my $yes = Text::KDL::XS::Value->new(type => 'bool', value => 1);
+  print emit_kdl({ flag => $yes });   # flag #true
+
+  print emit_kdl({ enabled => JSON::PP::true(), literally => 'true' });
+  # "enabled" #true
+  # "literally" "true"
+
+=for highlighter
+
+The string C<'true'> stays a string. Written bare it would read back as a
+boolean, so C<emit_kdl> quotes it, and with it every identifier of the
+document; see L</"Emitting strings that look like keywords or numbers">.
+
+=head2 Emitting type annotations
+
+Wrap the value in a L<Text::KDL::XS::Value> with C<type_annotation>. This
+works in data mode and tree mode:
+
+=for highlighter language=Perl
+
+  print emit_kdl({
+      when  => Text::KDL::XS::Value->new(type => 'string', value => '2026-09-26', type_annotation => 'date'),
+      count => Text::KDL::XS::Value->new(type => 'number', kind => 'integer', value => 7, type_annotation => 'u8'),
+  });
+  # count (u8)7
+  # when (date)"2026-09-26"
+
+=for highlighter
+
+Node type annotations are set with C<type_annotation> in
+L<Text::KDL::XS::Node/new>.
+
+=head2 Emitting floating point numbers
+
+Floats are written with the shortest text that reads back as exactly the
+same double, and always with a decimal point or an exponent, so that they
+stay floats when parsed again. Perl integers are written as integers:
+
+=for highlighter language=Perl
+
+  print emit_kdl({ n => 0.1 + 0.2 });          # n 0.30000000000000004
+  print emit_kdl({ n => 123456789.0 });        # n 123456789.0
+  print emit_kdl({ n => 1908124443056.387 });  # n 1908124443056.387
+  print emit_kdl({ n => 1e21 });               # n 1e+21
+  print emit_kdl({ n => -0.0 });               # n -0.0
+  print emit_kdl({ n => 123456789 });          # n 123456789   (an integer)
+
+=for highlighter
+
+Infinity and NaN are written as C<#inf>, C<#-inf> and C<#nan> in KDL v2
+and make C<emit_kdl> die in KDL v1, which cannot express them.
+
+To write a number with exactly the digits you choose, for example a price
+with trailing zeros or a decimal with more precision than a double, hand
+it over as a string-encoded number, which is checked for KDL number syntax
+and copied verbatim:
+
+=for highlighter language=Perl
+
+  my $price = Text::KDL::XS::Value->new(type => 'number', kind => 'string', value => '1.50');
+  print emit_kdl({ price => $price });         # price 1.50
+
+=for highlighter
+
+A value with 16 or more significant digits comes back from C<parse_kdl>
+as C<< kind => 'string' >> (see L</"Floating point numbers">); its text is
+exact, C<< $v->as_number >> gives the double and C<< $v->as_bignum >> the
+exact decimal.
+
+=head2 Emitting strings that look like keywords or numbers
+
+The emitter writes node names, property keys and type annotations bare
+whenever the characters allow it, and in KDL v2 output does the same for
+string values. Written bare, the reserved words C<true>, C<false>, C<null>
+(and in v2 C<inf>, C<-inf>, C<nan>) and number-like text such as C<-1>,
+C<+1> or C<.5> would read back as keywords or numbers, or not at all. When
+a document contains such a string, C<emit_kdl> therefore writes it with
+every identifier quoted (C<< identifier_mode => 1 >>):
+
+=for highlighter language=Perl
+
+  print emit_kdl({ answer => 'yes' });                  # answer yes
+  print emit_kdl({ answer => 'true' });                 # "answer" "true"
+  print emit_kdl({ n => '-1' });                        # "n" "-1"
+  print emit_kdl({ true => 6 }, version => '1');        # "true" 6
+
+=for highlighter
+
+The underlying ckdl library decides quoting from the characters alone,
+which is why the whole document is switched rather than the one string.
+If you pass C<identifier_mode> yourself, it is used as given: with mode 0
+or 2 such strings are written bare and the output does not round-trip
+(C<< emit_kdl({ answer => 'true' }, identifier_mode => 0) >> gives
+C<answer true>).
+
+=head2 Indentation
+
+Children are indented by four spaces. C<indent> sets a different width:
+
+=for highlighter language=Perl
+
+  my $doc = parse_kdl("node key=1 {\n child (t)value\n}\n");
+  print emit_kdl($doc, indent => 2);
+
+=for highlighter
+
+=for highlighter language=KDL
+
+  node key=1 {
+    child (t)value
+  }
+
+=for highlighter
+
+=head2 Escaping and identifier quoting options
+
+C<escape_mode> controls which characters inside quoted strings are written
+as escape sequences. It is a bit mask; the useful values are:
+
+  escape_mode   Effect
+  -----------   ---------------------------------------------------------
+  0             minimal: " and \ (v2 output always escapes the characters
+                KDL forbids literally: U+0000 to U+0008, U+000E to U+001F,
+                U+007F, bidi controls, U+FEFF)
+  0x10          also escape backspace and vertical tab
+  0x20          also escape newline characters (LF, CR, FF, NEL, LS, PS)
+  0x40          also escape tabs
+  0x70          the default: control characters, newlines and tabs
+  0x170         ASCII only: additionally escape every non-ASCII character
+
+The flags C<0x10>, C<0x20> and C<0x40> may be combined with bitwise or;
+C<0x100> only has an effect together with all of C<0x70>, and C<0x170> is
+the preset for ASCII-only output. KDL v2 does not allow a literal newline
+inside a quoted string, so v2 output always escapes newlines, whatever
+C<escape_mode> says; in v1 output a mode without C<0x20> writes the
+newline literally.
+
+C<identifier_mode> controls quoting of node names, property keys, type
+annotations and (in v2) string values:
+
+  identifier_mode   Effect
+  ---------------   ---------------------------------------------------
+  0                 bare when the characters allow it
+  1                 quote every identifier and every string
+  2                 bare only if pure ASCII, otherwise quoted
+  (not given)       mode 0, or mode 1 when some string would not
+                    read back as written (see above)
+
+Given the document
+
+=for highlighter language=KDL
+
+  node "tab\there" "ünïcode ✓" key=1 {
+      child (t)value
+  }
+
+=for highlighter
+
+=for highlighter language=Perl
+
+  print emit_kdl($doc, escape_mode => 0x170);
+  # node "tab\there" "\u{fc}n\u{ef}code \u{2713}" key=1 {
+  #     child (t)value
+  # }
+
+  print emit_kdl($doc, escape_mode => 0);
+  # node "tab<TAB>here" "ünïcode ✓" key=1 {
+  #     child (t)value
+  # }
+
+  print emit_kdl($doc, identifier_mode => 1);
+  # "node" "tab\there" "ünïcode ✓" "key"=1 {
+  #     "child" ("t")"value"
+  # }
+
+=for highlighter
+
+=head1 RECIPES
+
+=head2 Load a configuration file into a hash
+
+A small recursive helper that maps the common configuration idioms: one
+argument becomes a scalar, several arguments become an array, properties
+become hash entries, and children become a nested hash. It is deliberately
+simple and lossy: a node that has children contributes only its children
+(its own arguments and properties are dropped), a repeated child name keeps
+the last occurrence, and repeated properties keep the last value. Adjust it
+to the shape of your configuration.
+
+=for highlighter language=Perl
+
+  use Text::KDL::XS qw(parse_kdl);
+
+  sub node_to_hash {
+      my ($node) = @_;
+      my %h;
+      for my $child (@{ $node->children }) {
+          my @args  = map { $_->as_perl } @{ $child->args };
+          my %props = map { $_->[0] => $_->[1]->as_perl } @{ $child->props };
+          my $value = @{ $child->children } ? node_to_hash($child)
+                    : %props                ? { args => \@args, %props }
+                    : @args == 1            ? $args[0]
+                    :                         \@args;
+          $h{ $child->name } = $value;
+      }
+      return \%h;
+  }
+
+  open my $fh, '<', 'database.kdl' or die "database.kdl: $!";
+  my $doc    = parse_kdl($fh);
+  my $config = node_to_hash($doc->nodes->[0]);
+
+=for highlighter
+
+For this file:
+
+=for highlighter language=KDL
+
+  database {
+      host "db.example.com"
+      port 5432
+      replica "r1.example.com" "r2.example.com"
+      options ssl=#true timeout=30
+  }
+
+=for highlighter
+
+C<$config> is:
+
+=for highlighter language=Perl
+
+  {
+    host    => 'db.example.com',
+    port    => 5432,
+    replica => [ 'r1.example.com', 'r2.example.com' ],
+    options => { args => [], ssl => 1, timeout => 30 },
+  }
+
+=for highlighter
+
+=head2 Modify a document and write it back
+
+Nodes and values are plain blessed hashes; edit them in place and emit.
+
+=for highlighter language=Perl
+
+  use Text::KDL::XS qw(parse_kdl emit_kdl);
+
+  my $doc = parse_kdl("server \"a\" port=80\nserver \"b\" port=80\n");
+  for my $node (@{ $doc->nodes }) {
+      next unless $node->name eq 'server';
+      $node->prop('port')->{value} = 8080;
+      push @{ $node->args }, Text::KDL::XS::Value->new(type => 'string', value => 'edited');
+  }
+  print emit_kdl($doc);
+  # server a edited port=8080
+  # server b edited port=8080
+
+=for highlighter
+
+Changing the C<value> inside an existing property, as above, is fine as
+long as it still fits the value's type and kind (C<emit_kdl> checks it
+again). Adding, removing or reordering entries of C<< $node->props >> is
+fine too: C<< $node->prop >> searches the array each time, so after
+C<< push @{ $node->props }, [ port => $v ] >> the call C<< prop('port') >>
+returns the new value.
+
+Comments and formatting of the original are not preserved; the output is
+re-generated from the tree (see L</"What a round trip loses">).
+
+=head2 Convert KDL to JSON and back
+
+=for highlighter language=Perl
+
+  use JSON::PP;
+  use Text::KDL::XS qw(parse_kdl emit_kdl);
+
+  my $json = JSON::PP->new->canonical->pretty;
+
+  # KDL -> JSON: as_data keeps names, arguments, properties and children
+  # (but not value annotations or the number kind).
+  my $doc = parse_kdl(<<'KDL');
+  person name="Kat" age=42 {
+      hobby "kdl"
+      hobby "perl"
+  }
+  KDL
+  print $json->encode($doc->as_data);
+
+  # JSON -> KDL: data mode maps objects to children and arrays to arguments.
+  my $data = $json->decode('{"name":"Kat","langs":["perl","c"],"address":{"city":"Berlin"}}');
+  print emit_kdl($data);
+  # address {
+  #     city Berlin
+  # }
+  # langs perl c
+  # name Kat
+
+=for highlighter
+
+JSON booleans decode to L<JSON::PP::Boolean> objects, which C<emit_kdl>
+recognises and writes as C<#true>/C<#false>.
+
+=head2 Stream a large file without building a tree
+
+L<Text::KDL::XS::Parser> yields one event at a time and never builds the
+document tree. With a filehandle or code reference source it reads the
+input in chunks, so memory use depends on the nesting depth and the size
+of the current event, not on the length of the document (a string source
+is copied once in full). Give it a filehandle:
+
+=for highlighter language=Perl
+
+  use Text::KDL::XS::Parser;
+
+  open my $fh, '<:raw', 'huge.kdl' or die $!;
+  my $p = Text::KDL::XS::Parser->new($fh);
+
+  my ($depth, %count) = (0);
+  while (my $ev = $p->next_event) {
+      if ($ev->{event} eq 'start_node') {
+          $count{ $ev->{name} }++ if $depth == 0;   # count top-level nodes by name
+          $depth++;
+      }
+      elsif ($ev->{event} eq 'end_node') {
+          $depth--;
+      }
+  }
+
+=for highlighter
+
+Events for arguments and properties carry a L<Text::KDL::XS::Value> in
+C<< $ev->{value} >>; the event hash is described in
+L<Text::KDL::XS::Parser/"EVENT HASH">.
+
+=head2 Read from STDIN, a socket or a pipe
+
+Any filehandle works, with or without an encoding layer, even after some
+lines have been read from it:
+
+=for highlighter language=Perl
+
+  my $doc = parse_kdl(\*STDIN);   # or parse_kdl(*STDIN)
+
+=for highlighter
+
+Filehandles are read with Perl's C<read>, which waits until it has a full
+chunk (a few kilobytes) or the input ends. That is ideal for files; on a
+slow pipe or socket it means the first events can arrive later than the
+data they describe. For low latency with L<Text::KDL::XS::Parser>, read
+with C<sysread> in a code reference, which returns whatever has arrived:
+
+=for highlighter language=Perl
+
+  binmode STDIN;   # sysread needs a handle without an encoding layer
+  my $parser = Text::KDL::XS::Parser->new(sub {
+      my ($wanted_bytes) = @_;
+      my $count = sysread STDIN, my $chunk, $wanted_bytes;
+      die "cannot read STDIN: $!" unless defined $count;
+      return $chunk;                                  # '' at end of input
+  });
+
+=for highlighter
+
+If the data arrives in chunks from somewhere else (an HTTP body, a
+decompressor), use a code reference as well. It is called with the number
+of bytes the parser would like; that is only a hint, a chunk of any length
+is accepted. Return an empty string or C<undef> at end of input; after
+that the code reference is not called again:
+
+=for highlighter language=Perl
+
+  my @pending = (join('', map { "n$_ 1\n" } 1 .. 2000), '');   # one big chunk, then the end
+  my $doc = parse_kdl(sub { shift @pending });
+  print scalar @{ $doc->nodes };   # 2000
+
+=for highlighter
+
+Chunks are UTF-8 bytes (a character string is encoded for you), and their
+boundaries do not need to align with lines, tokens or even characters. An
+exception thrown inside the code reference propagates out of C<parse_kdl>
+(or C<next_event>) unchanged, so a C<die> with an error object arrives as
+that object.
+
+=head2 Handle parse errors
+
+C<parse_kdl> and C<next_event> die on malformed input with the reason
+given by the underlying library, reported at the line of your call:
+
+  KDL parse error: Unexpected end of data (unclosed lists of children) at load.pl line 12.
+
+(Perl appends C<< , <$fh> line N. >> if a filehandle was read with
+C<< <> >> earlier in the program.) The message carries no line number of
+the input; the underlying library does not track positions.
+
+=for highlighter language=Perl
+
+  my $doc = eval { parse_kdl($text) };
+  if (!$doc) {
+      my $err = $@;
+      die "config.kdl is not valid KDL: $err";
+  }
+
+=for highlighter
+
+A streaming parser that has failed stays failed: every further
+C<next_event> dies with the same error. C<emit_kdl> dies for values it
+cannot serialise and for bad options, again at your line:
+
+  emit_kdl: cannot serialize CODE ref at save.pl line 7.
+  emit_kdl: unknown version 'v3' (expected 'detect', '1' or '2') at save.pl line 9.
+
+L<Text::KDL::XS/ERRORS> lists every message.
+
+=head2 Validate against an expected structure
+
+KDL has no schema language built in. A few lines of Perl over the tree
+usually suffice:
+
+=for highlighter language=Perl
+
+  my $doc = parse_kdl($text);
+  my %required = (host => 'string', port => 'number');
+  my ($node) = grep { $_->name eq 'database' } @{ $doc->nodes };
+  die "missing database node" unless $node;
+  for my $key (sort keys %required) {
+      my $v = $node->prop($key);
+      die "database: missing $key"            unless $v;
+      die "database: $key must be $required{$key}" unless $v->type eq $required{$key};
+  }
+
+=for highlighter
+
+=head2 Parse untrusted input
+
+The parser is bounded by the size of the input, and nesting is bounded by
+the C<max_depth> option: by default a document nested more than 512
+levels deep dies with C<KDL parse error: nesting depth exceeds max_depth
+(512)> before the tree gets any deeper. That keeps walking, emitting or
+C<as_data>-ing the tree cheap. Lower the limit to what your format needs:
+
+=for highlighter language=Perl
+
+  my $doc = eval { parse_kdl($untrusted, max_depth => 16) }
+      or die "rejected: $@";
+
+=for highlighter
+
+Everything else is checked as well: the input must be valid UTF-8, and
+the parser rejects every document that is not valid KDL. What remains
+your job is the size of the input (read at most as many bytes as you are
+willing to hold) and the meaning of the data (see
+L</"Validate against an expected structure">).
+
+=head1 SEE ALSO
+
+L<Text::KDL::XS> for the API reference, L<Text::KDL::XS::Parser> for the
+streaming interface, L<Text::KDL::XS::Value> for the value model.
+
+The KDL specification: L<https://kdl.dev> and
+L<https://github.com/kdl-org/kdl>.
+
+=head1 AUTHOR
+
+Davenonymous E<lt>perl@davenonymous.comE<gt>
+
+=head1 LICENSE
+
+Copyright (C) 2026 Davenonymous.
+
+This document is part of the Text-KDL-XS distribution and is released under
+the same terms as Perl itself.
+
+=cut

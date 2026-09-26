@@ -293,10 +293,9 @@ sub to_cif {
 			$s =~ s/\A\s+//; $s =~ s/\s+\z//;
 			return $s;
 		};
-		# the chain is column 22, falling back to 21, which is the rule the
-		# reader follows for the two-character chain ids of a large assembly
+		# the chain is column 22 and nothing else, which is the rule the
+		# reader follows: column 21 belongs to no field (see t/foreign.t)
 		my $chain = $f->(21, 1);
-		$chain = $f->(20, 1) unless length $chain;
 		# A PDB charge is a magnitude then its sign, "2+", and an mmCIF one is
 		# a signed integer, 2.  The archive holds all four spellings of that --
 		# 4byf and 4ui0 write "-1" with the sign first, 6cc9 writes a bare "0"

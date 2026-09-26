@@ -1,21 +1,13 @@
-# -*- perl -*-
+#!perl
+##----------------------------------------------------------------------------
+## SQL API Abstraction - t/001_load.t
+##----------------------------------------------------------------------------
 BEGIN
 {
     use strict;
+    use warnings;
     use lib './lib';
     use Test::More qw( no_plan );
-#     use File::Find;
-#     our @modules;
-#     File::Find::find(sub
-#     {
-#         next unless( /\.pm$/ );
-#         print( "Checking file '$_' ($File::Find::name)\n" );
-#         $_ = $File::Find::name;
-#         s,^./lib/,,;
-#         s,\.pm$,,;
-#         s,/,::,g;
-#         push( @modules, $_ );
-#     }, qw( ./lib ) );
 };
 
 BEGIN
@@ -95,4 +87,3 @@ BEGIN
 done_testing();
 
 __END__
-

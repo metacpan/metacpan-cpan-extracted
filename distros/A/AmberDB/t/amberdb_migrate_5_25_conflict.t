@@ -202,15 +202,15 @@ sub read_db_record {
     my $today_stamp = sprintf("%04d-%02d-%02d", $year + 1900, $mon + 1, $mday);
 
     my $perl_exe = $^X;
-    my $setup_script = File::Spec->catfile('bin', 'amberdb_setup.pl');
-    my $cmd = qq{"$perl_exe" -Ilib "$setup_script" --action=update-storage --dbase_dir="$tmpdir" --all};
+    my $setup_script = File::Spec->catfile('bin', 'amberdb_cli.pl');
+    my $cmd = qq{"$perl_exe" -Ilib "$setup_script" update storage --dbase_dir="$tmpdir" --all};
     my $out = `$cmd`;
 
-    ok( !-d $tables_dir, "amberdb_setup.pl update-storage moved all files and removed tables/" );
+    ok( !-d $tables_dir, "amberdb_cli.pl update storage moved all files and removed tables/" );
     my $expected_cli_stamped = File::Spec->catfile($table_dir, "catalog_product_${today_stamp}.db");
-    ok( -f $expected_cli_stamped, "amberdb_setup.pl created stamped file catalog_product_${today_stamp}.db" );
+    ok( -f $expected_cli_stamped, "amberdb_cli.pl created stamped file catalog_product_${today_stamp}.db" );
     my $fresh_adb = AmberDB->new( path => { dbase_dir => $tmpdir } );
-    is( read_db_record($fresh_adb, $expected_cli_stamped, "1"), "CLI_MOVED", "Content preserved by amberdb_setup.pl" );
+    is( read_db_record($fresh_adb, $expected_cli_stamped, "1"), "CLI_MOVED", "Content preserved by amberdb_cli.pl" );
 }
 
 done_testing();

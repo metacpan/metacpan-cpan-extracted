@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
+use Carp qw(croak);
 use Getopt::Long qw(GetOptions);
 use Path::Tiny;
 use Text::Diff;
@@ -13,24 +14,74 @@ use App::makefilepl2cpanfile;
 
 makefilepl2cpanfile - Convert a Makefile.PL to a cpanfile
 
+=head1 VERSION
+
+This document describes makefilepl2cpanfile as shipped with
+App::makefilepl2cpanfile version 0.05.
+
 =head1 SYNOPSIS
 
-    bin/makefilepl2cpanfile [options]
+	bin/makefilepl2cpanfile [options]
 
 Options:
 
-    --with-develop    Include author/development dependencies (default)
-    --no-develop      Exclude author/development dependencies
-    --dry-run         Print output to STDOUT instead of writing cpanfile
-    --diff            Show diff against existing cpanfile if it exists
-    --check           Verify all Makefile.PL dependencies appear in output
-    --help            Show this usage message
+	--with-develop    Include author/development dependencies (default)
+	--no-develop      Exclude author/development dependencies
+	--dry-run         Print output to STDOUT instead of writing cpanfile
+	--diff            Show a unified diff against the existing cpanfile
+	--check           Verify all Makefile.PL dependencies appear in output
+	--help            Show this usage message
 
 =head1 DESCRIPTION
 
 Reads a F<Makefile.PL> in the current directory and generates a corresponding
-F<cpanfile>.  Existing C<develop> blocks in a pre-existing F<cpanfile> are
-preserved and merged.
+F<cpanfile> using L<App::makefilepl2cpanfile/generate>.  Existing C<develop>
+blocks in a pre-existing F<cpanfile> are preserved and merged.
+
+By default the result is written to F<cpanfile> in the current directory and
+C<cpanfile written successfully.> is printed.  The file is replaced in one
+step: if anything fails (reading, generating, a full disk, the final
+rename), the program exits with a non-zero status, the previous
+F<cpanfile> is left exactly as it was, and no temporary files remain.  A
+newly created F<cpanfile> gets the permissions a new file normally would
+(C<0666> less the umask).
+
+=over 4
+
+=item * C<--dry-run> prints the result to STDOUT and writes nothing.
+
+=item * C<--diff> prints a unified diff from the existing F<cpanfile> (or
+from an empty file when there is none) to the result, and writes nothing.
+
+=item * C<--check> additionally verifies that every module found by
+L<App::makefilepl2cpanfile/parse_prereqs> appears in the result, printing
+C<All Makefile.PL prerequisites are present in the output.> or warning with
+the list of missing modules:
+
+	WARNING: The following modules from Makefile.PL did not appear in the output:
+	  Some::Module
+
+(one module per line, indented by two spaces).  It does not change what
+is written, but when modules are missing the program exits with status
+1, so a CI job can fail on it.
+
+=item * C<--with-develop> and C<--no-develop> select the C<with_develop>
+argument; giving both is an error (C<--with-develop and --no-develop are
+mutually exclusive>) and the program exits with a non-zero status.
+
+=item * C<--help> prints the usage message and exits with status 0.
+
+=item * If F<cpanfile> exists but is not a regular file (a directory, a
+FIFO, a device) the program stops with C<Refusing to use 'cpanfile': it is
+not a regular file> and a non-zero exit status.
+
+=item * If F<cpanfile> is a symbolic link the program stops with
+C<Refusing to use 'cpanfile': it is a symbolic link> and a non-zero exit
+status, without reading or writing it.  Writing would otherwise replace
+whatever file the link points to, which in a cloned repository could be
+any file of yours.
+
+=back
 
 =cut
 
@@ -54,51 +105,101 @@ $with_dev //= !$no_dev;
 
 # Read existing cpanfile so its develop block can be preserved during merge.
 my $cpanfile_path = path('cpanfile');
+
+# SECURITY: a repository controls its own files, symlinks included, and
+# Path::Tiny's spew follows a symlink and replaces its target.  A 'cpanfile'
+# pointing at, say, ~/.bashrc would be overwritten with generated text.
+# Refuse to read or write through a symlink; checked again before writing.
+my $symlink_refusal = "Refusing to use '$cpanfile_path': it is a symbolic link";
+croak $symlink_refusal if -l $cpanfile_path;
+
+# Anything else in the way that is not a plain file (a directory, a FIFO, a
+# device) is refused too: File::Copy::move, used below, would otherwise move
+# the new file INTO a directory named cpanfile and report success.
+my $irregular_refusal = "Refusing to use '$cpanfile_path': it is not a regular file";
+croak $irregular_refusal if -e $cpanfile_path && !-f _;
+
 my $existing = $cpanfile_path->is_file ? $cpanfile_path->slurp_utf8 : '';
 
+# Read Makefile.PL once: the same text is converted and, with --check,
+# verified, so the check can never compare against a different version of
+# the file.
+my $content = App::makefilepl2cpanfile::read_makefile('Makefile.PL');
+
 my $out = App::makefilepl2cpanfile::generate(
-	makefile     => 'Makefile.PL',
+	content      => $content,
 	existing     => $existing,
 	with_develop => $with_dev,
 );
 
+# Exit status: 1 when --check finds missing modules (so CI can fail on it),
+# otherwise 0.  The requested output is still produced either way.
+my $status = 0;
+
 # --check: reuse the library's parser to verify nothing was dropped.
 # This avoids duplicating the extraction regex in the script.
 if ($check) {
-	my $content  = path('Makefile.PL')->slurp_utf8;
 	my $expected = App::makefilepl2cpanfile::parse_prereqs($content);
+
+	# Collect the module named on every dependency line in one pass, then
+	# look each expected module up.  Searching the output once per module
+	# with /\bModule\b/ was O(modules x output), and wrong: '\b' treats
+	# '::' as a boundary, so 'Moo' was "found" inside 'Moo::Role'.
+	my %present = map { $_ => 1 } $out =~ /
+		^ [ \t]*
+		(?: requires | recommends | suggests | conflicts ) [ \t]+
+		'([^'\n]++)'      # the module name
+	/mgx;
 
 	my @missing;
 	for my $phase (keys %{$expected}) {
 		for my $rel (keys %{ $expected->{$phase} }) {
-			for my $mod (sort keys %{ $expected->{$phase}{$rel} }) {
-				push @missing, $mod unless $out =~ /\b\Q$mod\E\b/;
-			}
+			push @missing, grep { !$present{$_} } sort keys %{ $expected->{$phase}{$rel} };
 		}
 	}
 
 	if (@missing) {
 		warn "WARNING: The following modules from Makefile.PL did not appear in the output:\n";
 		warn "  $_\n" for @missing;
+		$status = 1;
 	} else {
 		print "All Makefile.PL prerequisites are present in the output.\n";
 	}
 }
 
-# --diff: show unified diff against the existing file, then exit.
-if ($diff && $existing) {
+# --diff: show what would change, then exit without writing.  With no
+# existing cpanfile every generated line appears as an addition.
+if ($diff) {
 	print diff(\$existing, \$out, { STYLE => 'Unified' });
-	exit 0;
+	exit $status;
 }
 
 # --dry-run: print to STDOUT instead of writing to disk.
 if ($dry) {
 	print $out;
-	exit 0;
+	exit $status;
 }
 
-$cpanfile_path->spew_utf8($out);
+croak $symlink_refusal if -l $cpanfile_path;
+croak $irregular_refusal if -e $cpanfile_path && !-f _;
+
+# Write atomically and leave no debris.  The text goes to a temporary file
+# in this directory, renamed over cpanfile only once it is complete, so a
+# failed run leaves the previous cpanfile exactly as it was.  Path::Tiny's
+# spew does the same but leaves its temporary file behind when the write or
+# rename fails; this one belongs to a File::Temp object and is removed when
+# $tmp goes out of scope, whatever happened.  rename() replaces the
+# directory entry itself, so it never follows a symlink either.
+{
+	my $tmp = Path::Tiny->tempfile(TEMPLATE => '.cpanfile-XXXXXXXX', DIR => '.');
+	my $fh  = $tmp->filehandle('>', ':raw:encoding(UTF-8)');
+	print {$fh} $out or croak "Cannot write '$tmp': $!";
+	close $fh;			# autodie: reports a failed flush, e.g. disk full
+	chmod 0666 & ~umask, "$tmp";	# the permissions a new file would get
+	$tmp->move("$cpanfile_path");
+}
 print "cpanfile written successfully.\n";
+exit $status;
 
 sub _usage {
 	print <<"END_USAGE";
@@ -108,7 +209,7 @@ Usage: $0 [options]
   --with-develop    Include author/development dependencies (default)
   --no-develop      Exclude author/development dependencies
   --dry-run         Print output instead of writing cpanfile
-  --diff            Show diff against existing cpanfile
+  --diff            Show diff against existing cpanfile (writes nothing)
   --check           Verify all Makefile.PL dependencies appear in output
   --help            Show this help message
 
@@ -118,6 +219,12 @@ END_USAGE
 
 __END__
 
+=head1 SEE ALSO
+
+L<App::makefilepl2cpanfile> - the library this program uses; its
+documentation describes what is read from F<Makefile.PL>, the output
+format, the configuration file and the encoding rules in full.
+
 =head1 SUPPORT
 
 This program is provided as-is without any warranty.
@@ -126,11 +233,12 @@ This program is provided as-is without any warranty.
 
 Nigel Horne E<lt>njh@nigelhorne.comE<gt>
 
-=head1 LICENCE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
 Copyright 2025-2026 Nigel Horne.
 
-Personal single user, single computer use: GPL2.
-All other users must apply in writing for a licence.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut

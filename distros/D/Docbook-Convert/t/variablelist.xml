@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article
+><section
+><title
+>Variable List</title
+><para
+>Variable list inside para:<variablelist
+><varlistentry
+><term
+>Variable List Item 1</term
+><listitem
+><para
+>List Item 1 Line 1</para
+></listitem
+></varlistentry
+><varlistentry
+><term
+>Variable List Item 2</term
+><listitem
+><para
+>List Item 2 Line 1</para
+><para
+>List Item 2 Line 2</para
+><para
+>List Item 3 Line 3</para
+></listitem
+></varlistentry
+><varlistentry
+><term
+>Variable List Item 3</term
+><listitem
+><para
+>List Item 3 Line 1</para
+></listitem
+></varlistentry
+></variablelist
+></para
+><para
+>End para.</para
+><para
+>Variable list outside para:</para
+><variablelist
+><varlistentry
+><term
+>Variable List Item 1</term
+><listitem
+><para
+>List Item 1 Line 1</para
+></listitem
+></varlistentry
+><varlistentry
+><term
+>Variable List Item 2</term
+><listitem
+><para
+>List Item 2 Line 1</para
+><para
+>List Item 2 Line 2</para
+><para
+>List Item 3 Line 3</para
+></listitem
+></varlistentry
+><varlistentry
+><term
+>Variable List Item 3</term
+><listitem
+><para
+>List Item 3 Line 1</para
+></listitem
+></varlistentry
+></variablelist
+></section
+></article
+>

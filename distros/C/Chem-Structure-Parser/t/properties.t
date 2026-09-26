@@ -1038,4 +1038,28 @@ SKIP: {
 	is($over, 0, 'and none of them has more surface than a free sphere');
 }
 
+# ---- a coordinate that is not a number ------------------------------------
+# A field that says nan is read as the NV it names, as strtod() reads it, and
+# the atom is kept.  One such atom anywhere in a structure used to make the
+# neighbour grid's box non-finite, which put every atom into one cell and made
+# the whole surface quadratic in the atoms -- the same answer, got the slow way.
+# The box is now taken over the finite atoms, and the answer for them is still
+# the answer they have without the other atom there: every distance to a NaN
+# compares false, so it covers none of anybody's sphere.
+{
+	my $atoms = <<'PDB';
+ATOM      1  N   ALA A   1      10.000  10.000  10.000  1.00 20.00           N
+ATOM      2  CA  ALA A   1      11.458  10.000  10.000  1.00 20.00           C
+ATOM      3  C   ALA A   1      12.009  11.420  10.000  1.00 20.00           C
+PDB
+	my $nan = "HETATM    4  O   HOH W   1         nan  10.000  10.000  1.00 20.00           O\n";
+	my $plain = structure_info_string($atoms, features => 0);
+	my $odd   = structure_info_string($nan . $atoms, features => 0);
+	structure_sasa($plain);
+	structure_sasa($odd);
+	my ($p, $o) = map { $_->{chains}{A}{residues}{1}{atoms} } $plain, $odd;
+	is_deeply([ map { $o->{$_}{sasa} } qw(N CA C) ], [ map { $p->{$_}{sasa} } qw(N CA C) ],
+		'an atom at NaN changes no other atom\'s surface, even as the first atom of the set');
+}
+
 done_testing();

@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article version="5.0" xml:id="markdown-publish-article" xmlns="http://docbook.org/ns/docbook">
+  <info>
+    <title>Publishing documentation with Markdown::Publish</title>
+
+    <author>
+      <personname><firstname>Andrew</firstname><surname>Speer</surname></personname>
+    </author>
+
+    <copyright>
+      <year>2026</year>
+
+      <holder>Andrew Speer</holder>
+    </copyright>
+  </info>
+
+  <section xml:id="introduction">
+    <title>Publishing documentation with Markdown::Publish</title>
+
+    <para>This module lets you publish documentation - either in Docbook XML or Markdown format as a static site using publishing engines such as MkDocs etc. You can preview the output before
+    pushing the finished site to GitHub Pages or another static hosting location.</para>
+
+    <para>The module assembles the documents and hands them to a publishing engine: MkDocs, VitePress, Docusaurus, or Astro Starlight. Its companion module,
+    <classname>ASPEER::MakeMaker::Markdown::Publish</classname>, adds <command>make</command> targets to a Perl distribution Makefile. The assembly and publication stage satys in
+    <classname>Markdown::Publish</classname>, so the same setup can be driven by MakeMaker, a JSON project file, the command-line utility, or Perl code.</para>
+
+    <para>The rest of this article explains what those commands do, how source discovery works, how to customise each engine, and how to publish without accidentally mixing local builds with
+    remote operations.</para>
+  </section>
+
+  <section>
+    <title>Quick start</title>
+
+    <para>For quick start configure the MakeMaker adapter, run <command>make doc</command>, then run <command>make publish_serve</command>. </para>
+
+    <screen>perl -MASPEER::MakeMaker::Markdown::Publish -MASPEER::MakeMaker::Markdown::Pod
+make doc
+make publish_serve</screen>
+  </section>
+
+  <section xml:id="mental-model">
+    <title>Workflow</title>
+
+    <para>It helps to separate documentation maintenance from site assembly and publication. They are related, but they do not have the same side effects.</para>
+
+    <orderedlist>
+      <listitem>
+        <para><command>make doc</command>, supplied by <classname>ASPEER::MakeMaker::Markdown::Pod</classname>, converts maintained DocBook articles to Markdown and merges Markdown sidecars
+        into Perl sources as POD documentation. </para>
+      </listitem>
+
+      <listitem>
+        <para>A build or preview directs <classname>Markdown::Publish</classname> to copy the selected Markdown and assets into a temporary assembly, create navigation, and invoke the
+        chosen site generator. </para>
+      </listitem>
+
+      <listitem>
+        <para>A publication action pushes the completed site somewhere else. GitHub publication updates the "gh-pages" branch; Cloudflare publication invokes Wrangler to push as a Pages site.
+        </para>
+      </listitem>
+    </orderedlist>
+
+    <note>
+      <para>The publisher step expects Markdown. DocBook is an authoring format in the wider toolchain, bit is not understood directly by the site backends. Run <command>make doc</command>
+      after changing an XML article so that its sibling Markdown is current before building the site.</para>
+    </note>
+  </section>
+
+  <section xml:id="document-layout">
+    <title>Documentation layout</title>
+
+    <para>The default convention is to put project articles and explanatory Markdown beneath <filename>doc/</filename>. Put a module's sidecar Markdown beside the module, such as
+    <filename>lib/Example/Client.pm.md</filename>, and put an executable's sidecar beside the executable under <filename>bin/</filename>.</para>
+
+    <programlisting language="text">Example-Client/
+├── Makefile.PL
+├── doc/
+│   ├── example-client.xml
+│   ├── example-client.md
+│   └── images/
+│       └── request-flow.svg
+├── lib/
+│   └── Example/
+│       ├── Client.pm
+│       └── Client.pm.md
+└── bin/
+    ├── example-client
+    └── example-client.md</programlisting>
+
+    <para>If there is no <filename>doc/</filename>, the publisher falls back to the sidecars beneath <filename>lib/</filename> and <filename>bin/</filename> and will. An explicit
+    <literal>sources</literal> list replaces these conventions; it is exact rather than additive. Source files and directories named as sources must exist.</para>
+
+    <para>A top-level article containing several level-one Markdown headings is split into sections, one per heading. Links to anchors that move into another page are repaired during assembly.
+    If no <filename>index.md</filename> exists, then the first top-level page also becomes the home page while its original URL remains available.</para>
+
+    <para>You can link to markdown documentation for modules and scripts using the convention <filename>lib/Examples/Client.pm.md</filename> - markdown sidecars will be assembled until the
+    <filename>doc/</filename> as a root directory when publishing (i.e. You don't need to specify the document as <filename>../</filename>)</para>
+  </section>
+
+  <section xml:id="makemaker-setup">
+    <title>MakeMaker targets</title>
+
+    <para>Options to customise the output can be added to <filename>Makefile.PL</filename> in <literal>META_MERGE.x_documentation.publish</literal> section, e.g.</para>
+
+    <programlisting language="perl">use 5.008;
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
+
+eval {
+    require ASPEER::MakeMaker::Markdown::Pod;
+    ASPEER::MakeMaker::Markdown::Pod-&gt;import();
+    1;
+};
+
+eval {
+    require ASPEER::MakeMaker::Markdown::Publish;
+    ASPEER::MakeMaker::Markdown::Publish-&gt;import();
+    1;
+};
+
+WriteMakefile(
+    NAME         =&gt; 'Example::Client',
+    VERSION_FROM =&gt; 'lib/Example/Client.pm',
+    META_MERGE   =&gt; {
+        'meta-spec' =&gt; {version =&gt; 2},
+        x_documentation =&gt; {
+            publish =&gt; {
+                module  =&gt; 'mkdocs',
+                name    =&gt; 'Example::Client',
+                sources =&gt; ['doc'],
+            },
+        },
+    },
+);</programlisting>
+
+    <para>Publisher settings and preferences can also be set with environment variables (see section below).</para>
+
+    <para>Regenerate the Makefile after changing <filename>Makefile.PL</filename> as changing an inline setting also requires regeneration.</para>
+
+    <screen language="sh">perl Makefile.PL
+make doc
+make publish_serve</screen>
+
+    <para>When <literal>name</literal> is omitted, the MakeMaker adapter uses the distribution's <literal>NAME</literal> as the documentation title. MkDocs is the default engine, so both
+    <literal>module</literal> and <literal>name</literal> can be omitted in this example. Keeping them visible is useful in a template because it makes the intended site clear.</para>
+  </section>
+
+  <section xml:id="make-targets">
+    <title>Work with the make targets</title>
+
+    <para>Once the Makefile has been generated, the adapter supplies targets you can build to. </para>
+
+    <variablelist>
+      <varlistentry>
+        <term><command>make publish_build</command></term>
+
+        <listitem>
+          <para>Assemble the documents and render the static site into the configured output directory, <filename>site/</filename> by default.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><command>make publish_serve</command></term>
+
+        <listitem>
+          <para>Assemble the documents and run the selected engine's foreground development server. Stop it with Ctrl-C.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><command>make publish_gh</command></term>
+
+        <listitem>
+          <para>Build the site and create or update the local publication branch, normally <literal>gh-pages</literal>. It does not contact a remote.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><command>make publish_gh-push</command></term>
+
+        <listitem>
+          <para>Perform the same local branch update and then push only that branch to <literal>origin</literal>. The push is not forced but if no clashes will be propagated
+          immediately.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><command>make publish_cloudflare</command></term>
+
+        <listitem>
+          <para>Build the site and deploy its static files with an explicitly configured Wrangler file. It does not update a Git branch.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>The targets call the same engine API as the standalone utility. The MakeMaker adapter does not maintain another implementation of site assembly or Git publication.</para>
+  </section>
+
+  <section xml:id="common-configuration">
+    <title>Choose the common options</title>
+
+    <para>Engine settings are flat values in the <literal>publish</literal> object. They are not nested beneath the selected engine name. These options are shared by the normal
+    workflows:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><literal>module</literal></term>
+
+        <listitem>
+          <para>Selects <literal>mkdocs</literal>, <literal>vitepress</literal>, <literal>docusaurus</literal>, <literal>starlight</literal>, or a fully qualified installed subclass. MkDocs is
+          the default. You can also supply your own custom module if inheriting, e.g. "ACME::Publish" </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>sources</literal></term>
+
+        <listitem>
+          <para>An array of source directories. Omit it to use the <filename>doc/</filename> convention and sidecar fallback.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>name</literal></term>
+
+        <listitem>
+          <para>The generated site title. Under MakeMaker it defaults to <literal>NAME</literal>; standalone use otherwise defaults to <literal>Documentation</literal>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>output</literal></term>
+
+        <listitem>
+          <para>The rendered site directory. The default is <filename>site/</filename>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>base</literal></term>
+
+        <listitem>
+          <para>The deployment path for generated VitePress, Docusaurus, and Starlight configuration. It begins and ends with a slash, for example <literal>/example-client/</literal>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>branch</literal></term>
+
+        <listitem>
+          <para>The local Git publication branch. The default is <literal>gh-pages</literal>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>config</literal></term>
+
+        <listitem>
+          <para>An authored native engine configuration. It is authoritative where the selected backend documents that behaviour.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>config_extend</literal></term>
+
+        <listitem>
+          <para>A supplemental file that customises generated defaults. It cannot be combined with <literal>config</literal>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>host</literal> and <literal>port</literal></term>
+
+        <listitem>
+          <para>Override the development server listener where the backend supports it.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para><envar>MARKDOWN_PUBLISH_MODULE</envar> overrides the configured engine at runtime. This is handy for comparing renderers without editing <filename>Makefile.PL</filename> or a project
+    file:</para>
+
+    <programlisting language="sh">MARKDOWN_PUBLISH_MODULE=starlight make publish_serve
+MARKDOWN_PUBLISH_MODULE=vitepress make publish_build</programlisting>
+
+    <para><envar>MARKDOWN_PUBLISH_HOST</envar> and <envar>MARKDOWN_PUBLISH_PORT</envar> provide global preview defaults. <envar>MARKDOWN_PUBLISH_NPM_VERBOSE=1</envar> shows normal npm
+    installation output for the Node-based publishers.</para>
+  </section>
+
+  <section xml:id="selecting-an-engine">
+    <title>Select a publishing engine</title>
+
+    <para>All four engines consume the same Markdown source, but their native tooling and configuration differ.</para>
+
+    <section xml:id="mkdocs-engine">
+      <title>MkDocs</title>
+
+      <para>MkDocs is the default and the lightest choice for this workflow. Install MkDocs and the theme or plugins required by your configuration. The backend accepts
+      <literal>command</literal>, <literal>strict</literal>, <literal>address</literal>, and <literal>output</literal>. Strict builds are enabled by default.</para>
+
+      <para>A root <filename>mkdocs.yml</filename> is used directly. Another file named by <literal>config</literal> is normally inherited by a temporary configuration which supplies the
+      assembled <literal>docs_dir</literal>, output directory, and navigation. Set <literal>config_mode</literal> to <literal>direct</literal> only when the authored file deliberately owns
+      those paths as well.</para>
+    </section>
+
+    <section xml:id="vitepress-engine">
+      <title>VitePress</title>
+
+      <para>VitePress runs in a temporary npm project. Set <literal>npm</literal> to another npm executable, <literal>version</literal> to a particular VitePress version, and
+      <literal>host</literal>, <literal>port</literal>, or <literal>output</literal> as needed. An authored configuration named by <literal>config</literal> keeps its original location so its
+      relative imports still work.</para>
+    </section>
+
+    <section xml:id="docusaurus-engine">
+      <title>Docusaurus</title>
+
+      <para>Docusaurus also runs in a temporary npm project and accepts <literal>npm</literal>, <literal>version</literal>, <literal>host</literal>, <literal>port</literal>, and
+      <literal>output</literal>. The generated project uses the classic preset, disables the blog, and places the documents at the site root.</para>
+    </section>
+
+    <section xml:id="starlight-engine">
+      <title>Astro Starlight</title>
+
+      <para>Starlight accepts <literal>npm</literal>, <literal>astro_version</literal>, <literal>starlight_version</literal>, <literal>host</literal>, <literal>port</literal>, and
+      <literal>output</literal>. The generated project includes a Markdown link resolver so links to mirrored module pages become the routes that Starlight actually emits. An authored Astro
+      configuration is wrapped to retain this resolver; if it supplies a Markdown processor, that processor must be unified.</para>
+    </section>
+  </section>
+
+  <section xml:id="supplemental-configuration">
+    <title>Extend generated configuration</title>
+
+    <para>Most projects want to retain generated paths and navigation while adding a theme choice, search, social links, or validation policy. Use <literal>config_extend</literal> for that
+    case. Use <literal>config</literal> when you intend to own the native engine configuration instead. Supplying both is an error.</para>
+
+    <section xml:id="mkdocs-supplement">
+      <title>MkDocs supplemental YAML</title>
+
+      <para>MkDocs inherits the named YAML before the publisher supplies its assembly paths and navigation.</para>
+
+      <programlisting language="perl">publish =&gt; {
+    module        =&gt; 'mkdocs',
+    config_extend =&gt; 'doc/mkdocs/site.yml',
+},</programlisting>
+
+      <programlisting language="yaml">theme:
+  name: material
+  features:
+    - navigation.sections
+markdown_extensions:
+  - admonition</programlisting>
+    </section>
+
+    <section xml:id="vitepress-supplement">
+      <title>VitePress extension function</title>
+
+      <para>VitePress loads an ECMAScript module. Its default export receives the generated VitePress configuration and a context object. </para>
+
+      <programlisting language="javascript">export default (config, context) =&gt; ({
+  ...config,
+  description: `${context.name} reference`,
+  themeConfig: {
+    ...config.themeConfig,
+    search: {provider: 'local'},
+  },
+});</programlisting>
+    </section>
+
+    <section xml:id="docusaurus-supplement">
+      <title>Docusaurus extension function</title>
+
+      <para>Docusaurus loads a CommonJS module. It returns the complete configuration to use.</para>
+
+      <programlisting language="javascript">module.exports = (config, context) =&gt; ({
+  ...config,
+  tagline: `${context.name} reference`,
+  onBrokenLinks: 'throw',
+});</programlisting>
+    </section>
+
+    <section xml:id="starlight-supplement">
+      <title>Starlight extension function</title>
+
+      <para>Starlight separates Astro configuration from the options passed to the Starlight integration. Return both objects. Extra Astro integrations are retained after the generated
+      Starlight integration.</para>
+
+      <programlisting language="javascript">export default ({astro, starlight}, context) =&gt; ({
+  astro,
+  starlight: {
+    ...starlight,
+    description: `${context.name} reference`,
+    social: [{
+      icon: 'github',
+      label: 'GitHub',
+      href: 'https://github.com/example/example-client',
+    }],
+  },
+});</programlisting>
+    </section>
+  </section>
+
+  <section xml:id="github-pages">
+    <title>Publish to GitHub Pages</title>
+
+    <para>Start with the local-only action. It builds the site in a temporary directory, creates a temporary Git worktree, replaces the content of the publication branch, commits changed
+    output, and removes the worktree. Your current checkout stays on its existing branch.</para>
+
+    <programlisting language="sh">make doc
+make publish_build
+make publish_gh
+git log --oneline --decorate -1 gh-pages
+git push origin gh-pages</programlisting>
+
+    <para>The final push is shown separately so you can inspect the result first. When that separation is unnecessary, use <command>make publish_gh-push</command>. It updates the same local
+    branch and runs <command>git push origin gh-pages</command>; it does not force the update or push another branch.</para>
+
+    <para>GitHub project sites normally live beneath the repository name. During a GitHub publication action, the publisher derives <literal>/repository-name/</literal> from
+    <literal>origin</literal>. A repository named <literal>owner.github.io</literal> uses <literal>/</literal>. If no origin URL is available, the checkout directory name is the fallback. Set
+    <literal>base</literal> explicitly when the published URL uses another path.</para>
+
+    <warning>
+      <para><command>publish_gh-push</command> will push to remote. Use <command>publish_gh</command> when the repository's authoritative remote is not GitHub, when GitHub is only a mirror, or
+      when you want to review the publication commit before pushing it.</para>
+    </warning>
+  </section>
+
+  <section xml:id="project-json">
+    <title>Use a project.json file</title>
+
+    <para>A standalone project file can be used outside MakeMaker, or inside it when you want publication settings to change without regenerating the Makefile. The conventional filename is
+    <filename>doc/project.json</filename>. The file may contain the publisher settings directly, beneath <literal>publish</literal>, or in the complete
+    <literal>x_documentation.publish</literal> shape used by MakeMaker.</para>
+
+    <programlisting language="json">{
+  "x_documentation": {
+    "publish": {
+      "module": "starlight",
+      "name": "Example::Client",
+      "sources": ["doc"],
+      "output": "site",
+      "branch": "gh-pages",
+      "config_extend": "doc/starlight.extend.mjs"
+    }
+  }
+}</programlisting>
+
+    <para>Run the utility from the project root. It automatically reads <filename>doc/project.json</filename> when present, or accepts another path with <option>--config</option>.</para>
+
+    <programlisting language="sh">markdown-publish build
+markdown-publish serve
+markdown-publish gh
+markdown-publish gh-push
+
+markdown-publish serve --config config/documentation.json</programlisting>
+
+    <para>To make the MakeMaker targets read the same external file, set only <literal>config_file</literal> in the metadata. Do not combine it with inline publisher options.</para>
+
+    <programlisting language="perl">x_documentation =&gt; {
+    publish =&gt; {
+        config_file =&gt; 'doc/project.json',
+    },
+},</programlisting>
+
+    <para>The file is read when a target runs, so editing it does not require <command>perl Makefile.PL</command>. This is often the nicest arrangement for a project that changes themes and
+    publishing details more often than its build metadata.</para>
+  </section>
+
+  <section xml:id="command-line-options">
+    <title>Use command-line options for a quick build</title>
+
+    <para>A small project does not need a JSON file. Select the engine and common values directly:</para>
+
+    <programlisting language="sh">markdown-publish serve \
+  --module vitepress \
+  --source doc \
+  --name 'Example::Client' \
+  --base '/example-client/' \
+  --output site</programlisting>
+
+    <para>Repeat <option>--source</option> to name several exact source roots. The remaining common options are <option>--branch</option>, <option>--version</option>, and
+    <option>--help</option>. Put native engine options, supplemental configuration, and Cloudflare settings in a JSON file; the command line intentionally exposes only the common quick-start
+    choices.</para>
+
+    <para>When a project file is selected explicitly or found automatically, <option>--module</option> cannot replace its engine. Use <envar>MARKDOWN_PUBLISH_MODULE</envar> for a deliberate
+    runtime engine override.</para>
+  </section>
+
+  <section xml:id="cloudflare-publication">
+    <title>Publish static assets with Cloudflare</title>
+
+    <para>Cloudflare publication requires a dedicated Wrangler configuration. Keep the Worker name, compatibility date, routes, and other deployment settings there. The publisher builds once
+    and passes the actual output directory to Wrangler with <option>--assets</option>; it does not rewrite the authored file.</para>
+
+    <programlisting language="json">{
+  "name": "example-client-docs",
+  "compatibility_date": "2026-09-25",
+  "assets": {
+    "directory": "./site",
+    "not_found_handling": "404-page"
+  },
+  "observability": {
+    "enabled": true
+  }
+}</programlisting>
+
+    <para>Point the publication configuration at that file. The executable defaults to <command>wrangler</command>; an authored Wrangler environment is optional.</para>
+
+    <programlisting language="json">{
+  "publish": {
+    "module": "mkdocs",
+    "name": "Example::Client",
+    "cloudflare": {
+      "config": "wrangler.docs.jsonc",
+      "wrangler": "wrangler",
+      "environment": "production"
+    }
+  }
+}</programlisting>
+
+    <programlisting language="sh">markdown-publish cloudflare --config doc/project.json
+# or, with the MakeMaker adapter:
+make publish_cloudflare</programlisting>
+
+    <warning>
+      <para>This command deploys to Cloudflare. Review the Worker name, account, routes, environment, and current Wrangler login before running it. Keep tokens and other credentials out of
+      project metadata and source control.</para>
+    </warning>
+  </section>
+
+  <section xml:id="perl-api">
+    <title>Drive the publisher from Perl</title>
+
+    <para>The MakeMaker and command-line entry points are conveniences. A script can construct the selected backend and dispatch the same actions directly.</para>
+
+    <programlisting language="perl">use strict;
+use warnings;
+use Markdown::Publish;
+
+my $publish_or=Markdown::Publish-&gt;new({
+    module  =&gt; 'starlight',
+    name    =&gt; 'Example::Client',
+    sources =&gt; ['doc'],
+    output  =&gt; 'site',
+});
+
+my $site_dn=$publish_or-&gt;run('build');</programlisting>
+
+    <para>To read a project file, call <literal>Markdown::Publish-&gt;load_config()</literal> or pass only <literal>config_file</literal> to the base constructor.</para>
+
+    <programlisting language="perl">my $publish_or=
+    Markdown::Publish-&gt;load_config('doc/project.json');
+$publish_or-&gt;run('serve');</programlisting>
+
+    <para>Backend constructors are also available when the engine is already known. The supported actions are <literal>build</literal>, <literal>serve</literal>, <literal>gh</literal>,
+    <literal>gh-push</literal>, and <literal>cloudflare</literal>.</para>
+  </section>
+
+  <section xml:id="practical-workflow">
+    <title>A practical documentation cycle</title>
+
+    <para>A maintainable workflow keeps authored material, generated Markdown, site output, and remote publication distinct.</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Edit DocBook articles, Markdown articles, and source sidecars.</para>
+      </listitem>
+
+      <listitem>
+        <para>Run <command>make doc</command> and review the generated Markdown and POD changes.</para>
+      </listitem>
+
+      <listitem>
+        <para>Run <command>make publish_serve</command> and inspect navigation, links, code blocks, images, and the home page.</para>
+      </listitem>
+
+      <listitem>
+        <para>Run <command>make publish_build</command> so strict or production-only build failures appear before publication.</para>
+      </listitem>
+
+      <listitem>
+        <para>Commit the authored and durable generated documentation through the project's normal source-control workflow.</para>
+      </listitem>
+
+      <listitem>
+        <para>Run <command>make publish_gh</command> and inspect the local branch, or run an explicitly authorised remote publication action.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>Site assembly happens in temporary directories, while the rendered output uses <filename>site/</filename> by default. Keep generated site output out of the source branch unless the
+    project has a specific reason to track it. The publication branch is the durable Git representation of that output.</para>
+  </section>
+
+  <section xml:id="troubleshooting">
+    <title>When something does not look right</title>
+
+    <variablelist>
+      <varlistentry>
+        <term>The site title is “Documentation”</term>
+
+        <listitem>
+          <para>Set <literal>name</literal>. MakeMaker normally derives it from <literal>NAME</literal>, but standalone configurations need their own friendly name.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>GitHub Pages has missing styles or broken links</term>
+
+        <listitem>
+          <para>Check <literal>base</literal>. Leave it unset for normal repository-name inference, or set the exact path explicitly when the published URL differs.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>A module sidecar is missing from navigation</term>
+
+        <listitem>
+          <para>This is expected when <filename>doc/</filename> exists. Sidecars are mirrored for links, while top-level project articles form generated navigation. Name
+          <filename>lib/</filename> explicitly as a source if those pages should become the primary publication.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>An XML edit is absent from the site</term>
+
+        <listitem>
+          <para>Run <command>make doc</command>. The publisher reads the sibling Markdown generated from the DocBook source.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>A custom config loses generated navigation</term>
+
+        <listitem>
+          <para>Use <literal>config_extend</literal> when you want to supplement generated defaults. A <literal>config</literal> file is intentionally authoritative.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>The wrong engine runs</term>
+
+        <listitem>
+          <para>Check <envar>MARKDOWN_PUBLISH_MODULE</envar> first because it overrides metadata and JSON configuration. Then check the <literal>module</literal> value in the active
+          configuration source.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>An npm installation fails without enough detail</term>
+
+        <listitem>
+          <para>Set <envar>MARKDOWN_PUBLISH_NPM_VERBOSE=1</envar> and repeat the build to see normal npm output.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section xml:id="next-steps">
+    <title>Where to go next</title>
+
+    <para>Start with MkDocs and convention-based discovery. Add explicit sources only when the default boundary is not the one you want. Add a supplemental configuration when the generated
+    site needs a theme or integration. Move to an authoritative native configuration only when the project genuinely needs to own the engine's complete layout.</para>
+
+    <para>The module reference for <classname>Markdown::Publish</classname> describes its methods and publication contracts. The backend module references document engine-specific
+    settings, and <classname>ASPEER::MakeMaker::Markdown::Publish</classname> documents the MakeMaker adapter. Use those references for exact API details; use this article as the end-to-end
+    map of how the pieces fit together.</para>
+  </section>
+</article>

@@ -515,7 +515,7 @@ AmberDB provides crash-safe undo-log transaction management and Strict 2PL (Two-
   }
   ```
 
-* **Explanation:** Mutations between `transact_start` and `transact_end` are journaled to `.txn`. On failure or explicit rollback, all modified files (`.db`, `.del`, `.aut`, and indexes) are restored in reverse (LIFO) order. `transact_recover` automatically resolves incomplete transactions after abrupt server power outages.
+* **Explanation:** Mutations between `transact_start` and `transact_end` are recorded in disk-backed undo journals (`dbstore/journal/txn_*`). On failure or explicit rollback, all modified files (`.db`, `.del`, `.aut`, and indexes) are restored in reverse (LIFO) order. `transact_recover` automatically resolves incomplete transactions after abrupt server power outages.
 * **Reference:** [User Guide Section 7: Transactions & Recovery](EN.AmberDB_User-Guide.html#7-transaction-safety-acid-guarantees-and-recovery-transactions)
 
 ---

@@ -431,4 +431,32 @@ PDB
 		'a two-letter element in columns 77-78 is read whole, and spelled as IUPAC does');
 }
 
+# --- the chain is column 22, and column 21 is nothing --------------------
+#
+# Biopython 1.87's Bio/PDB/PDBParser.py reads the chain as line[21] and the
+# residue name as line[17:20], and nothing else: column 21 belongs to no field.
+# What a file puts there in practice is the fourth letter of a CHARMM or NAMD
+# residue name -- TIP3, POPC -- in a record whose chain column those programs
+# leave blank and whose segment id is in columns 73-76 instead.  The two lines
+# below are the TIP3 water such a file writes and a two-character chain id, and
+# Biopython answers chain ' ' with resname TIP for the first and chain 'B' for
+# the second.  This module used to fall back to column 21 whenever column 22
+# was blank, which read that water as chain '3'.
+#
+# gemmi 0.7.5 reads columns 21-22 as one field, and so answers '3' and 'AB'.
+# Its reading of the second line is the more generous one, but column 21 is
+# not in the format and the first line is what it costs; no entry of PDBbind
+# v2020's 10,116 puts anything in column 21 of an ATOM or HETATM record, so the
+# two rules part company only on files that were never deposited.
+{
+	my $p = Chem::Structure::Parser::_parse_string(<<'PDB', {});
+ATOM      1  OH2 TIP3    1       1.000   2.000   3.000  1.00  0.00      WT1  O
+ATOM      2  CA  ALAAB   1       1.000   2.000   3.000  1.00  0.00           C
+PDB
+	is_deeply($p->{chain}, [ '', 'B' ],
+		'the chain is column 22 alone, as Biopython reads it');
+	is_deeply($p->{resname}, [ 'TIP', 'ALA' ],
+		'and the residue name is columns 18-20, whatever is beside it');
+}
+
 done_testing();

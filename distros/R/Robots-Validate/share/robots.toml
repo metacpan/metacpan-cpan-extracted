@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: 2026 Robert Rothenberg <perl@rhizomnic.com>
 # SPDX-License-Identifier: Artistic-2.0
 
+
+
 [2ipbot]
 ## About: https://2ip.io/bot/
 
@@ -8,7 +10,7 @@ agents="2ip bot"
 domain=".2ip.io"
 
 [ahrefs]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://ahrefs.com/robot
 ## About: https://yep.com/yepbot/
 ## Network: https://api.ahrefs.com/v3/public/crawler-ip-ranges
@@ -2196,7 +2198,7 @@ network=[
 ]
 
 [applebot]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://support.apple.com/en-gb/119829
 ## Network: https://search.developer.apple.com/applebot.json
 
@@ -2206,15 +2208,6 @@ network=[
   "17.241.208.160/27",
   "17.241.193.160/27",
   "17.241.200.160/27",
-  "17.22.237.0/24",
-  "17.22.245.0/24",
-  "17.22.253.0/24",
-  "17.241.75.0/24",
-  "17.241.219.0/24",
-  "17.241.227.0/24",
-  "17.246.15.0/24",
-  "17.246.19.0/24",
-  "17.246.23.0/24",
   "17.166.192.48/28",
   "17.166.240.48/28",
   "17.166.248.48/28",
@@ -2240,6 +2233,7 @@ network=[
 
 [archive-org]
 ## About: http://archive-it.org/files/site-owners.html
+
 domain=".archive.org"
 agents=[
   "archive.org_bot",
@@ -2275,8 +2269,20 @@ domain=[
 agents="Baiduspider"
 domain=".crawl.baidu.com"
 
+[banquisebot]
+## Date: 2026-09-20
+## About: https://www.banquise.ca/bot
+
+agents="BanquiseBot"
+network=[
+  "2602:f417:1::20",
+  "23.153.132.25",
+  "2602:f417:21::20",
+  "23.153.132.79",
+]
+
 [barkrowler]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://www.babbar.tech/crawler
 ## Network: https://www.babbar.tech/barkrowler-ip-ranges.json
 
@@ -2288,7 +2294,7 @@ network=[
 ]
 
 [bing]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## Network: https://www.bing.com/toolbox/bingbot.json
 ##
 ## Note: BingPreview usually have "bingbot" in the UA string. But there are bots in Microsoft's cloud that do not
@@ -2359,22 +2365,22 @@ agents="BublupBot"
 domain=".bublup.com"
 
 [bufferlinkpreview]
-## Date: 2026-09-09
+## Date: 2026-09-25
 ## About: https://scraper.buffer.com/about/bots/link-preview-bot
 ## Network: https://scraper.buffer.com/about/bots/link-preview-bot.json
 ## Query: .ipAddresses[]
+
 agents="BufferLinkPreviewBot"
 network=[
-  "3.213.140.44",
-  "52.22.148.168",
-  "52.3.218.210",
-  "54.235.34.237",
-  "3.220.253.227",
-  "3.224.33.156",
-  "52.87.69.215",
-  "54.211.190.68"
+  "3.213.140.44/32",
+  "52.22.148.168/32",
+  "52.3.218.210/32",
+  "54.235.34.237/32",
+  "3.220.253.227/32",
+  "3.224.33.156/32",
+  "52.87.69.215/32",
+  "54.211.190.68/32",
 ]
-
 
 [bytespider]
 ## About: https://bytedance.sg.larkoffice.com/docx/K5bxdypulop3IIxrJb0lOjLVgFe
@@ -2383,7 +2389,7 @@ agents="Bytespider"
 domain=".crawl.bytedance.com"
 
 [ccbot]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://commoncrawl.org/ccbot
 ## Network: https://index.commoncrawl.org/ccbot.json
 
@@ -2436,17 +2442,14 @@ network=[
 ]
 
 [chatgpt]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## Network: https://openai.com/gptbot.json
 
 agents="GPTBot"
 network=[
   "132.196.86.0/24",
   "172.182.202.0/25",
-  "172.182.204.0/24",
   "172.182.207.0/25",
-  "172.182.214.0/24",
-  "172.182.215.0/24",
   "20.125.66.80/28",
   "20.171.206.0/24",
   "20.171.207.0/24",
@@ -2465,7 +2468,7 @@ network=[
 ]
 
 [chatgpt-user]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## Network: https://openai.com/chatgpt-user.json
 
 agents="ChatGPT-User"
@@ -2482,7 +2485,16 @@ network=[
   "13.83.167.128/28",
   "13.83.237.176/28",
   "132.196.82.48/28",
+  "134.138.52.128/28",
+  "134.138.52.16/28",
+  "134.138.52.64/28",
+  "134.138.52.96/28",
+  "134.138.57.176/28",
+  "134.138.57.64/28",
+  "134.138.57.80/28",
+  "134.138.58.32/28",
   "134.149.233.80/28",
+  "134.33.102.192/28",
   "135.116.136.160/28",
   "135.13.64.240/28",
   "135.220.73.208/28",
@@ -2498,6 +2510,7 @@ network=[
   "172.170.1.80/28",
   "172.170.225.0/28",
   "172.170.241.80/28",
+  "172.172.206.48/28",
   "172.175.152.224/28",
   "172.178.140.144/28",
   "172.178.141.112/28",
@@ -2507,14 +2520,23 @@ network=[
   "172.192.112.208/28",
   "172.197.160.192/28",
   "172.197.203.16/28",
+  "172.198.161.128/28",
+  "172.198.58.176/28",
+  "172.198.78.192/28",
+  "172.198.79.112/28",
   "172.199.137.80/28",
   "172.204.28.224/28",
   "172.204.96.80/28",
   "172.205.189.192/28",
+  "172.206.38.240/28",
   "172.207.1.32/28",
   "172.212.172.160/28",
   "172.215.215.32/28",
+  "191.232.238.96/28",
+  "191.233.197.0/28",
   "191.233.199.160/28",
+  "191.234.167.144/28",
+  "191.235.99.160/28",
   "191.237.249.64/28",
   "20.102.212.144/28",
   "20.113.211.112/28",
@@ -2541,12 +2563,14 @@ network=[
   "20.199.211.160/28",
   "20.199.242.0/28",
   "20.200.212.240/28",
+  "20.206.101.192/28",
   "20.210.211.192/28",
   "20.215.187.208/28",
   "20.215.219.128/28",
   "20.215.219.160/28",
   "20.215.219.208/28",
   "20.218.30.240/28",
+  "20.219.184.96/28",
   "20.219.71.192/28",
   "20.222.36.192/28",
   "20.227.140.32/28",
@@ -2560,7 +2584,10 @@ network=[
   "20.57.199.192/28",
   "20.63.180.96/28",
   "20.63.221.64/28",
+  "20.78.130.48/28",
   "20.83.243.176/28",
+  "20.98.18.80/28",
+  "23.101.217.176/28",
   "23.102.140.144/28",
   "23.102.141.32/28",
   "23.98.142.176/28",
@@ -2584,6 +2611,7 @@ network=[
   "4.226.200.16/28",
   "4.226.226.32/28",
   "40.116.73.208/28",
+  "40.124.161.0/28",
   "40.74.200.208/28",
   "40.81.234.144/28",
   "40.81.67.96/28",
@@ -2629,7 +2657,6 @@ network=[
   "52.241.146.208/28",
   "52.242.132.224/28",
   "52.242.132.240/28",
-  "52.255.109.112/28",
   "52.255.109.144/28",
   "52.255.109.80/28",
   "52.255.109.96/28",
@@ -2648,6 +2675,7 @@ network=[
   "74.161.200.96/28",
   "74.224.217.64/28",
   "74.226.253.160/28",
+  "74.248.37.160/28",
   "74.7.35.112/28",
   "74.7.35.48/28",
   "74.7.36.64/28",
@@ -2677,7 +2705,7 @@ network=[
 ]
 
 [claude]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## Network: https://claude.com/crawling/bots.json
 
 agents=[
@@ -2755,15 +2783,16 @@ network=[
 [crawlengine]
 ## Date: 2026-09-09
 ## About: https://abuse.creasource.dev/abuse/
+
 agents="crawl-engine"
 domain=".creasource.dev"
 network="167.233.208.8"
 
 [dataforseo]
 ## About: https://dataforseo.com/dataforseo-bot
+
 agents="DataForSeoBot"
 domain=".dataforseo.com"
-
 
 [dataprovider]
 agents="Dataprovider.com"
@@ -2773,11 +2802,19 @@ domain=".dataproviderbot.com"
 ## Date: 2026-09-10
 ## About: https://www.domainprint.com/
 
-agents=" domainprintbot"
-network=[ "89.58.61.18" ]
+agents="domainprintbot"
+network=[
+  "89.58.61.18",
+]
+
+[domainstatsbot]
+## About: https://domainstats.com/pages/our-bot
+
+agents="DomainStatsBot"
+domain=".domainstats.com"
 
 [duckduck-bot]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://duckduckgo.com/duckduckgo-help-pages/results/duckduckbot
 ## Network: https://duckduckgo.com/duckduckbot.json
 
@@ -2796,6 +2833,9 @@ network=[
   "128.203.214.241/32",
   "128.203.236.110/32",
   "128.203.82.154/32",
+  "13.86.35.212/32",
+  "13.89.106.77/32",
+  "13.90.178.139/32",
   "130.107.228.224/32",
   "131.145.39.118/32",
   "131.189.183.241/32",
@@ -2803,12 +2843,10 @@ network=[
   "132.196.106.146/32",
   "132.220.1.71/32",
   "134.33.207.189/32",
+  "135.171.251.169/32",
   "135.233.63.237/32",
   "135.234.221.112/32",
   "135.235.183.95/32",
-  "13.86.35.212/32",
-  "13.89.106.77/32",
-  "13.90.178.139/32",
   "172.168.115.250/32",
   "172.168.12.93/32",
   "172.168.133.76/32",
@@ -2836,6 +2874,7 @@ network=[
   "172.171.37.221/32",
   "172.179.105.87/32",
   "172.179.128.118/32",
+  "172.188.250.220/32",
   "172.189.40.18/32",
   "172.193.184.42/32",
   "172.193.197.146/32",
@@ -2864,9 +2903,9 @@ network=[
   "20.118.11.251/32",
   "20.119.127.146/32",
   "20.12.141.99/32",
-  "20.121.75.32/32",
   "20.12.249.123/32",
   "20.12.252.21/32",
+  "20.121.75.32/32",
   "20.13.44.19/32",
   "20.15.142.178/32",
   "20.166.171.150/32",
@@ -2918,6 +2957,7 @@ network=[
   "20.221.10.115/32",
   "20.221.84.185/32",
   "20.226.133.105/32",
+  "20.23.88.231/32",
   "20.231.254.179/32",
   "20.232.249.95/32",
   "20.232.51.46/32",
@@ -2928,7 +2968,6 @@ network=[
   "20.236.247.180/32",
   "20.236.40.93/32",
   "20.237.1.51/32",
-  "20.23.88.231/32",
   "20.241.135.19/32",
   "20.241.147.151/32",
   "20.241.153.203/32",
@@ -3024,6 +3063,7 @@ network=[
   "20.79.226.26/32",
   "20.79.238.198/32",
   "20.79.239.66/32",
+  "20.8.252.26/32",
   "20.80.114.203/32",
   "20.80.120.41/32",
   "20.80.129.80/32",
@@ -3031,7 +3071,6 @@ network=[
   "20.80.156.88/32",
   "20.81.115.13/32",
   "20.82.24.207/32",
-  "20.8.252.26/32",
   "20.84.138.61/32",
   "20.84.219.45/32",
   "20.84.251.223/32",
@@ -3044,39 +3083,10 @@ network=[
   "20.93.49.96/32",
   "20.99.154.113/32",
   "20.99.255.235/32",
-  "40.114.182.153/32",
-  "40.114.182.172/32",
-  "40.114.182.45/32",
-  "40.114.183.196/32",
-  "40.114.183.251/32",
-  "40.114.183.88/32",
-  "40.119.232.146/32",
-  "40.119.232.215/32",
-  "40.119.232.218/32",
-  "40.119.232.251/32",
-  "40.119.232.50/32",
-  "40.121.121.54/32",
-  "40.127.154.196/32",
-  "40.64.105.247/32",
-  "40.64.106.11/32",
-  "40.64.106.152/32",
-  "40.64.67.220/32",
-  "40.64.78.45/32",
-  "40.64.88.145/32",
-  "40.65.78.86/32",
-  "40.76.162.17/32",
-  "40.76.162.191/32",
-  "40.76.162.208/32",
-  "40.76.162.247/32",
-  "40.76.163.23/32",
-  "40.76.163.7/32",
-  "40.76.173.151/32",
-  "40.81.250.205/32",
-  "40.82.218.203/32",
-  "40.88.195.62/32",
-  "40.88.21.235/32",
-  "40.89.243.175/32",
+  "4.144.148.23/32",
   "4.144.182.50/32",
+  "4.144.227.142/32",
+  "4.144.251.39/32",
   "4.149.142.7/32",
   "4.149.159.102/32",
   "4.149.159.71/32",
@@ -3113,6 +3123,38 @@ network=[
   "4.254.123.56/32",
   "4.255.35.121/32",
   "4.255.39.80/32",
+  "40.114.182.153/32",
+  "40.114.182.172/32",
+  "40.114.182.45/32",
+  "40.114.183.196/32",
+  "40.114.183.251/32",
+  "40.114.183.88/32",
+  "40.119.232.146/32",
+  "40.119.232.215/32",
+  "40.119.232.218/32",
+  "40.119.232.251/32",
+  "40.119.232.50/32",
+  "40.121.121.54/32",
+  "40.127.154.196/32",
+  "40.64.105.247/32",
+  "40.64.106.11/32",
+  "40.64.106.152/32",
+  "40.64.67.220/32",
+  "40.64.78.45/32",
+  "40.64.88.145/32",
+  "40.65.78.86/32",
+  "40.76.162.17/32",
+  "40.76.162.191/32",
+  "40.76.162.208/32",
+  "40.76.162.247/32",
+  "40.76.163.23/32",
+  "40.76.163.7/32",
+  "40.76.173.151/32",
+  "40.81.250.205/32",
+  "40.82.218.203/32",
+  "40.88.195.62/32",
+  "40.88.21.235/32",
+  "40.89.243.175/32",
   "48.192.16.86/32",
   "48.192.74.178/32",
   "48.200.33.227/32",
@@ -3224,8 +3266,8 @@ network=[
   "52.224.147.21/32",
   "52.224.16.221/32",
   "52.224.16.229/32",
-  "52.224.191.245/32",
   "52.224.19.152/32",
+  "52.224.191.245/32",
   "52.224.20.174/32",
   "52.224.20.181/32",
   "52.224.20.186/32",
@@ -3269,7 +3311,7 @@ network=[
 ]
 
 [duckduck-assist]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://duckduckgo.com/duckduckgo-help-pages/results/duckassistbot
 ## Network: https://duckduckgo.com/duckassistbot.json
 
@@ -3288,6 +3330,9 @@ network=[
   "128.203.214.241/32",
   "128.203.236.110/32",
   "128.203.82.154/32",
+  "13.86.35.212/32",
+  "13.89.106.77/32",
+  "13.90.178.139/32",
   "130.107.228.224/32",
   "131.145.39.118/32",
   "131.189.183.241/32",
@@ -3295,12 +3340,10 @@ network=[
   "132.196.106.146/32",
   "132.220.1.71/32",
   "134.33.207.189/32",
+  "135.171.251.169/32",
   "135.233.63.237/32",
   "135.234.221.112/32",
   "135.235.183.95/32",
-  "13.86.35.212/32",
-  "13.89.106.77/32",
-  "13.90.178.139/32",
   "172.168.115.250/32",
   "172.168.12.93/32",
   "172.168.133.76/32",
@@ -3328,6 +3371,7 @@ network=[
   "172.171.37.221/32",
   "172.179.105.87/32",
   "172.179.128.118/32",
+  "172.188.250.220/32",
   "172.189.40.18/32",
   "172.193.184.42/32",
   "172.193.197.146/32",
@@ -3356,9 +3400,9 @@ network=[
   "20.118.11.251/32",
   "20.119.127.146/32",
   "20.12.141.99/32",
-  "20.121.75.32/32",
   "20.12.249.123/32",
   "20.12.252.21/32",
+  "20.121.75.32/32",
   "20.13.44.19/32",
   "20.15.142.178/32",
   "20.166.171.150/32",
@@ -3410,6 +3454,7 @@ network=[
   "20.221.10.115/32",
   "20.221.84.185/32",
   "20.226.133.105/32",
+  "20.23.88.231/32",
   "20.231.254.179/32",
   "20.232.249.95/32",
   "20.232.51.46/32",
@@ -3420,7 +3465,6 @@ network=[
   "20.236.247.180/32",
   "20.236.40.93/32",
   "20.237.1.51/32",
-  "20.23.88.231/32",
   "20.241.135.19/32",
   "20.241.147.151/32",
   "20.241.153.203/32",
@@ -3516,6 +3560,7 @@ network=[
   "20.79.226.26/32",
   "20.79.238.198/32",
   "20.79.239.66/32",
+  "20.8.252.26/32",
   "20.80.114.203/32",
   "20.80.120.41/32",
   "20.80.129.80/32",
@@ -3523,7 +3568,6 @@ network=[
   "20.80.156.88/32",
   "20.81.115.13/32",
   "20.82.24.207/32",
-  "20.8.252.26/32",
   "20.84.138.61/32",
   "20.84.219.45/32",
   "20.84.251.223/32",
@@ -3536,39 +3580,10 @@ network=[
   "20.93.49.96/32",
   "20.99.154.113/32",
   "20.99.255.235/32",
-  "40.114.182.153/32",
-  "40.114.182.172/32",
-  "40.114.182.45/32",
-  "40.114.183.196/32",
-  "40.114.183.251/32",
-  "40.114.183.88/32",
-  "40.119.232.146/32",
-  "40.119.232.215/32",
-  "40.119.232.218/32",
-  "40.119.232.251/32",
-  "40.119.232.50/32",
-  "40.121.121.54/32",
-  "40.127.154.196/32",
-  "40.64.105.247/32",
-  "40.64.106.11/32",
-  "40.64.106.152/32",
-  "40.64.67.220/32",
-  "40.64.78.45/32",
-  "40.64.88.145/32",
-  "40.65.78.86/32",
-  "40.76.162.17/32",
-  "40.76.162.191/32",
-  "40.76.162.208/32",
-  "40.76.162.247/32",
-  "40.76.163.23/32",
-  "40.76.163.7/32",
-  "40.76.173.151/32",
-  "40.81.250.205/32",
-  "40.82.218.203/32",
-  "40.88.195.62/32",
-  "40.88.21.235/32",
-  "40.89.243.175/32",
+  "4.144.148.23/32",
   "4.144.182.50/32",
+  "4.144.227.142/32",
+  "4.144.251.39/32",
   "4.149.142.7/32",
   "4.149.159.102/32",
   "4.149.159.71/32",
@@ -3605,6 +3620,38 @@ network=[
   "4.254.123.56/32",
   "4.255.35.121/32",
   "4.255.39.80/32",
+  "40.114.182.153/32",
+  "40.114.182.172/32",
+  "40.114.182.45/32",
+  "40.114.183.196/32",
+  "40.114.183.251/32",
+  "40.114.183.88/32",
+  "40.119.232.146/32",
+  "40.119.232.215/32",
+  "40.119.232.218/32",
+  "40.119.232.251/32",
+  "40.119.232.50/32",
+  "40.121.121.54/32",
+  "40.127.154.196/32",
+  "40.64.105.247/32",
+  "40.64.106.11/32",
+  "40.64.106.152/32",
+  "40.64.67.220/32",
+  "40.64.78.45/32",
+  "40.64.88.145/32",
+  "40.65.78.86/32",
+  "40.76.162.17/32",
+  "40.76.162.191/32",
+  "40.76.162.208/32",
+  "40.76.162.247/32",
+  "40.76.163.23/32",
+  "40.76.163.7/32",
+  "40.76.173.151/32",
+  "40.81.250.205/32",
+  "40.82.218.203/32",
+  "40.88.195.62/32",
+  "40.88.21.235/32",
+  "40.89.243.175/32",
   "48.192.16.86/32",
   "48.192.74.178/32",
   "48.200.33.227/32",
@@ -3716,8 +3763,8 @@ network=[
   "52.224.147.21/32",
   "52.224.16.221/32",
   "52.224.16.229/32",
-  "52.224.191.245/32",
   "52.224.19.152/32",
+  "52.224.191.245/32",
   "52.224.20.174/32",
   "52.224.20.181/32",
   "52.224.20.186/32",
@@ -3801,12 +3848,16 @@ domain=".favicohub.com"
 
 [fluid]
 ## About: http://www.leak.info/bot.html
+
 agents="fluid/"
-network=[ "167.253.34.3" ]
+network=[
+  "167.253.34.3",
+]
 
 [fyndbot]
 # Date: 2026-08-27
 # Note: the network information is from email correspondence with is from email feedback@fynd.bot
+
 agents="fyndbot"
 network=[
   "13.216.0.0/13",
@@ -3818,11 +3869,11 @@ network=[
   "2001:19f0:c800::/38",
   "2a05:d014:1c00::/38",
   "2406:da18:800::/38",
-  "2605:9f80:8000::/35"
+  "2605:9f80:8000::/35",
 ]
 
 [google]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers
 ## Network: https://developers.google.com/static/crawling/ipranges/common-crawlers.json
 ##
@@ -3893,6 +3944,7 @@ network=[
   "2001:4860:4801:40::/64",
   "2001:4860:4801:41::/64",
   "2001:4860:4801:42::/64",
+  "2001:4860:4801:43::/64",
   "2001:4860:4801:44::/64",
   "2001:4860:4801:45::/64",
   "2001:4860:4801:46::/64",
@@ -4066,6 +4118,7 @@ network=[
   "66.249.68.128/27",
   "66.249.68.160/27",
   "66.249.68.192/27",
+  "66.249.68.224/27",
   "66.249.68.32/27",
   "66.249.68.64/27",
   "66.249.68.96/27",
@@ -4159,7 +4212,7 @@ network=[
 ]
 
 [google-special]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://developers.google.com/crawling/docs/crawlers-fetchers/google-special-case-crawlers
 ## Network: https://developers.google.com/static/crawling/ipranges/special-crawlers.json
 
@@ -4229,6 +4282,7 @@ network=[
   "2001:4860:4801:2040::/64",
   "2001:4860:4801:2041::/64",
   "2001:4860:4801:2042::/64",
+  "2001:4860:4801:2043::/64",
   "2001:4860:4801:2044::/64",
   "2001:4860:4801:2045::/64",
   "2001:4860:4801:2046::/64",
@@ -4375,6 +4429,7 @@ network=[
   "66.249.92.32/27",
   "66.249.92.64/27",
   "66.249.92.96/27",
+  "72.14.199.0/27",
   "72.14.199.128/27",
   "72.14.199.160/27",
   "72.14.199.192/27",
@@ -4448,7 +4503,7 @@ network=[
 ]
 
 [google-user]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers
 ## Network: https://developers.google.com/static/crawling/ipranges/user-triggered-fetchers.json
 ## Network: https://developers.google.com/static/crawling/ipranges/user-triggered-fetchers-google.json
@@ -4879,6 +4934,7 @@ network=[
   "2600:1900:0:60::/64",
   "2600:1900:0:61::/64",
   "2600:1900:0:62::/64",
+  "2600:1900:0:63::/64",
   "2600:1900:0:64::/64",
   "2600:1900:0:65::/64",
   "2600:1900:0:66::/64",
@@ -5478,6 +5534,7 @@ network=[
   "35.187.143.128/27",
   "35.187.143.160/27",
   "35.187.143.192/27",
+  "35.187.143.224/27",
   "35.187.143.32/27",
   "35.187.143.64/27",
   "35.187.143.96/27",
@@ -5603,6 +5660,7 @@ network=[
   "2001:4860:4801:4060::/64",
   "2001:4860:4801:4061::/64",
   "2001:4860:4801:4062::/64",
+  "2001:4860:4801:4063::/64",
   "2001:4860:4801:4064::/64",
   "2001:4860:4801:4065::/64",
   "2001:4860:4801:4066::/64",
@@ -5947,6 +6005,7 @@ network=[
   "66.249.84.192/27",
   "66.249.84.224/27",
   "66.249.84.32/27",
+  "66.249.84.64/27",
   "66.249.84.96/27",
   "66.249.85.0/27",
   "66.249.85.128/27",
@@ -6032,7 +6091,7 @@ agents="ev-crawler"
 domain=".headline.com"
 
 [ibou]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: See https://ibou.io/iboubot.html
 ## Network: https://ibou.io/iboubot-ip-ranges.json
 
@@ -6053,7 +6112,7 @@ network=[
 ]
 
 [iframely]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://iframely.com/docs/about
 ## Network: https://iframely.com/ips-v4
 ## Network: https://iframely.com/ips-v6
@@ -6114,11 +6173,15 @@ domain=".infotiger.com"
 ## About: https://intentbeam.com/bot
 
 agents="IntentBeamBot"
-network=[ "91.98.156.201", "167.233.62.207" ]
+network=[
+  "91.98.156.201",
+  "167.233.62.207",
+]
 
 [internetmeasurement]
 ## Date: 2026-09-17
 ## About: https://internet-measurement.com/
+
 agents="InternetMeasurement"
 domain=".internet-measurement.com"
 network=[
@@ -6178,18 +6241,22 @@ domain=".1and1.org"
 [justsearchuk]
 ## Date: 2026-09-16
 ## About: https://justsearchuk.co.uk/bot.html
+
 agents="JustSearchUKBot"
-network=[ "185.44.253.28" ]
+network=[
+  "185.44.253.28",
+]
 
 [kagibot]
 ## About: https://kagi.com/bot
+
 agents="Kagibot"
 domain=".kagibot.org"
 network=[
   "216.18.205.234",
   "35.212.27.76",
   "104.254.65.50",
-  "209.151.156.194"
+  "209.151.156.194",
 ]
 
 [linkedin]
@@ -6209,6 +6276,7 @@ network="24.144.65.32/32"
 [listsignal]
 ## Date: 2026-09-16
 ## About: https://listsignal.com/bot
+
 agents="ListSignalBot"
 network=[
   "139.180.191.194",
@@ -6223,12 +6291,11 @@ network=[
   "45.76.59.43",
   "45.32.206.187",
   "144.202.62.245",
-  "207.148.19.32"
+  "207.148.19.32",
 ]
 
-
 [loaded]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://www.loaded.ai/bot
 ## Network: https://www.loaded.ai/bot/ips.json
 
@@ -6246,6 +6313,12 @@ network=[
 agents="LohiSoftBot"
 domain=".bot.lohisoft.com"
 
+[lycos]
+## About: https://search.lycos.fr/crawler
+
+agents="Lycos"
+domain=".lycos.fr"
+
 [lyonlbot]
 ## Date: 2026-08-28
 ## About: https://lyonl.com/bot.html
@@ -6253,10 +6326,12 @@ domain=".bot.lohisoft.com"
 
 agents="LyonlBot"
 domain=".lyonl.com"
-network=[ "34.170.6.187" ]
+network=[
+  "34.170.6.187",
+]
 
 [lyrenth]
-## Date: 2026-08-27
+## Date: 2026-09-25
 ## About: https://www.lyrenth.com/bot
 ## Network: https://www.lyrenth.com/bot/ip-ranges.json
 
@@ -6298,7 +6373,24 @@ domain=".mail.ru"
 
 agents="search.marginalia.nu"
 network=[
-  "81.170.128.52", "193.183.0.162/31", "193.183.0.164/30", "193.183.0.168/30", "193.183.0.172/31", "193.183.0.174/32"
+  "81.170.128.52",
+  "193.183.0.162/31",
+  "193.183.0.164/30",
+  "193.183.0.168/30",
+  "193.183.0.172/31",
+  "193.183.0.174/32",
+]
+
+[medllybot]
+## Date: 2026-09-25
+## About: https://crawler.medllysupplies.org/
+## Network: https://crawler.medllysupplies.org/ips.json
+## Query: .ipv4[], .ipv6[]
+
+agents="MedllyBot"
+domain=".medllysupplies.org"
+network=[
+  "138.197.114.6",
 ]
 
 [metajob]
@@ -6307,10 +6399,14 @@ network=[
 
 agents="MetaJobBot"
 domain=".metajobs.de"
-network=[ "157.90.179.220", "157.90.179.228", "157.90.179.241" ]
+network=[
+  "157.90.179.220",
+  "157.90.179.228",
+  "157.90.179.241",
+]
 
 [mistral-user]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://docs.mistral.ai/robots
 ## Network: https://mistral.ai/mistralai-user-ips.json
 
@@ -6323,7 +6419,7 @@ network=[
 ]
 
 [mistral-index]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://docs.mistral.ai/robots
 ## Network: https://mistral.ai/mistralai-index-ips.json
 
@@ -6347,7 +6443,7 @@ agents="MJ12bot"
 domain=".mj12bot.com"
 
 [mojeek]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://www.mojeek.com/bot.html
 ## Network: https://www.mojeek.com/mojeekbot.json
 
@@ -6359,7 +6455,9 @@ network=[
 
 [mokapot]
 agents="MokaPot"
-network=[ "159.195.55.60" ]
+network=[
+  "159.195.55.60",
+]
 
 [monsidobot]
 ## Date: 2026-08-16
@@ -6378,7 +6476,9 @@ network=[
 ## About: https://nothere.one/bot
 
 agents="NotHere.one Bot"
-network=[ "77.42.40.46" ]
+network=[
+  "77.42.40.46",
+]
 
 [observer]
 ## About: https://obsrvr.net/about
@@ -6393,7 +6493,7 @@ network=[
 ]
 
 [openai-adsbot]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://platform.openai.com/docs/bots
 ## Network: https://openai.com/adsbot.json
 
@@ -6404,13 +6504,14 @@ network=[
 ]
 
 [openai-searchbot]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://platform.openai.com/docs/bots
 ## Network: https://openai.com/searchbot.json
 
 agents="OAI-SearchBot"
 network=[
   "104.210.140.128/28",
+  "13.66.216.176/28",
   "135.234.64.0/24",
   "172.182.193.224/28",
   "172.182.193.80/28",
@@ -6421,7 +6522,9 @@ network=[
   "172.182.211.192/28",
   "172.182.213.192/28",
   "172.182.224.0/28",
+  "172.203.190.112/28",
   "172.203.190.128/28",
+  "172.203.190.80/28",
   "20.14.99.96/28",
   "20.168.18.32/28",
   "20.169.6.224/28",
@@ -6431,6 +6534,7 @@ network=[
   "20.171.53.224/28",
   "20.25.151.224/28",
   "20.42.10.176/28",
+  "23.102.145.48/28",
   "4.227.36.0/25",
   "40.67.175.0/25",
   "40.90.214.16/28",
@@ -6455,14 +6559,18 @@ network=[
 ]
 
 [pceuropa]
-## Date: 2026-09-09
+## Date: 2026-09-25
 ## About: https://pceuropa.net/bot
 ## Network: https://pceuropa.net/bot-ips.json
+
 agents="pceuropa-bot"
-network=[ "45.11.61.99/32", "185.56.209.219/32" ]
+network=[
+  "45.11.61.99/32",
+  "185.56.209.219/32",
+]
 
 [perplexity]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://docs.perplexity.ai/docs/resources/perplexity-crawlers
 ## Network: https://www.perplexity.com/perplexitybot.json
 
@@ -6479,7 +6587,7 @@ network=[
 ]
 
 [perplexity-user]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://docs.perplexity.ai/docs/resources/perplexity-crawlers
 ## Network: https://www.perplexity.com/perplexity-user.json
 
@@ -6519,14 +6627,24 @@ domain=".piperic.com"
 [poweredbybot]
 ## Date: 2026-09-16
 ## About: https://poweredby.keywordseverywhere.com/bot
+
 agents="PoweredByBot"
 domain=".poweredby.keywordseverywhere.com"
-network=[ "50.116.52.253", "173.255.228.181", "173.255.228.202", "172.104.20.70", "72.235.150.244" ]
+network=[
+  "50.116.52.253",
+  "173.255.228.181",
+  "173.255.228.202",
+  "172.104.20.70",
+  "72.235.150.244",
+]
 
 [puritybot]
 ## About: https://puri.li/bot
+
 agents="PurityBot"
-network=[ "138.201.57.92" ]
+network=[
+  "138.201.57.92",
+]
 
 [qualified]
 ## Date: 2026-08-14
@@ -6540,9 +6658,9 @@ network=[
 ]
 
 [qwant]
-## Date: 2026-08-26
-## About: https://help.qwant.com/bot/
-## Network: https://help.qwant.com/wp-content/uploads/sites/latest/qwantbot.json
+## Date: 2026-09-25
+## About: https://help.qwant.com/hc/en-us/articles/51146433634833-The-Qwant-bot-QwantBot-and-the-robots-txt-file
+## Network: https://help.qwant.com/hc/article_attachments/51147492481937
 
 agents="Qwantbot"
 domain=".qwant.com"
@@ -6551,7 +6669,7 @@ network=[
 ]
 
 [seekportbot]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://bot.seekport.com/
 ## Network: https://bot.seekport.com/seekportbot_ips.txt
 
@@ -7094,9 +7212,10 @@ network=[
 ]
 
 [seobility]
-## Date: 2026-09-10
+## Date: 2026-09-25
 ## About: https://www.seobility.net/en/bot/
 ## Network: https://www.seobility.net/bots.json
+
 agents="SeobilityBot"
 domain=".seobility.net"
 network=[
@@ -7376,11 +7495,11 @@ network=[
   "2a01:4f8:c2c:d21::1",
   "2a01:4f8:c2c:dd84::1",
   "2a01:4f8:c2c:e2bc::1",
-  "2a01:4f8:c2c:fe8d::1"
+  "2a01:4f8:c2c:fe8d::1",
 ]
 
 [seranking]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://help.seranking.com/hc/en-us/articles/23020353159964-SERankingBacklinksBot-Crawler
 ## Network: https://api.seranking.com/backlinks-bot-ips?txt=1
 ## Network: https://api.seranking.com/backlinks-bot-ips?txt=1&v=6
@@ -7529,7 +7648,7 @@ network=[
 ]
 
 [seznambot]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://o-seznam.cz/napoveda/vyhledavani/en/seznambot-crawler/
 ## Network: https://search.seznam.cz/ipranges/seznambot.json
 
@@ -7631,7 +7750,7 @@ network=[
 ]
 
 [shapbot]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## About: https://docs.parallel.ai/resources/crawler
 ## Network: https://docs.parallel.ai/resources/shapbot.json
 
@@ -7727,7 +7846,9 @@ domain=".crawl.sogou.com"
 ## About: https://crawler.speroll.com/crawler
 
 agents="Speroll-AdsTxt-Crawler"
-network=["15.204.142.87"]
+network=[
+  "15.204.142.87",
+]
 
 [stractbot]
 agents="StractBot"
@@ -7748,8 +7869,11 @@ domain=".telegram.org"
 [tineye]
 ## About: +http://www.tineye.com/cr.html
 ## Note: there may be other IP addresses
+
 agents="TinEye"
-network=[ "184.149.21.115" ]
+network=[
+  "184.149.21.115",
+]
 
 [turnitin]
 ## Date: 2026-08-14
@@ -7779,12 +7903,21 @@ network=[
   "199.16.156.0/22",
 ]
 
+[umaibot]
+## About: https://umai.entelijan.com/methodology
+
+agents="UmaiBot"
+domain=".entelijan.com"
+
 [vexel]
 ## About: https://vexel.cc/bot-info
 
 agents="VexelSearchBot"
-network=["23.81.36.18", "23.81.33.222"]
 domain=".vexel.cc"
+network=[
+  "23.81.36.18",
+  "23.81.33.222",
+]
 
 [visionheight]
 ## Date: 2026-08-20
@@ -7824,13 +7957,31 @@ network=[
   "100.50.17.159",
 ]
 
+[webarchiv-cz]
+## About: http://webarchiv.cz/kontakty
+
+agents="webarchiv.cz"
+network=[
+  "195.113.134.0/25",
+  "195.113.132.0/23",
+]
+
 [webmcpindex]
 ## About: https://webmcpshield.com/bot
+
 agents="WebMCPIndexBot"
-network=["139.162.75.45"]
+network=[
+  "139.162.75.45",
+]
+
+[webtelemetry]
+## About: https://webtelemetry.dev/bot
+
+agents="WebtelemetryBot"
+domain=".webtelemetry.dev"
 
 [wrtnbot]
-## Date: 2026-08-26
+## Date: 2026-09-25
 ## Network: https://wrtn.ai/wrtnbot.json
 
 agents="WRTNBot"
@@ -7847,8 +7998,11 @@ domain=".crawl.yahoo.net"
 [yahoo-jp]
 ## About: https://support.yahoo-net.jp/PccSearch/s/article/H000007955
 
-agents=[ "Y!J-ASR", "Y!J-WSC" ]
 domain=".yahoo-net.jp"
+agents=[
+  "Y!J-ASR",
+  "Y!J-WSC",
+]
 network=[
   "202.239.0.0/20",
 ]
@@ -7900,8 +8054,50 @@ domain=[
 ]
 
 [yeti]
+## Date: 2026-09-25
+## About: https://help.naver.com/service/5626/contents/8026?lang=ko&osType=COMMONOS
+## Network: https://searchadvisor.naver.com/doc/naverbot.json
+
 agents="Yeti"
 domain=".naver.com"
+network=[
+  "110.93.146.32/29",
+  "110.93.150.21/32",
+  "110.93.150.22/31",
+  "110.93.150.24/29",
+  "110.93.150.32/27",
+  "110.93.150.64/26",
+  "110.93.150.128/26",
+  "110.93.150.192/28",
+  "110.93.150.208/29",
+  "110.93.150.216/30",
+  "110.93.150.220/32",
+  "114.111.32.21/32",
+  "114.111.32.22/31",
+  "114.111.32.24/29",
+  "114.111.32.32/27",
+  "114.111.32.64/26",
+  "114.111.32.128/26",
+  "114.111.32.192/28",
+  "114.111.32.208/29",
+  "114.111.32.216/30",
+  "114.111.32.220/32",
+  "125.209.235.167/32",
+  "125.209.235.168/29",
+  "125.209.235.176/29",
+  "125.209.235.184/31",
+  "125.209.235.186/32",
+  "211.249.46.21/32",
+  "211.249.46.22/31",
+  "211.249.46.24/29",
+  "211.249.46.32/27",
+  "211.249.46.64/26",
+  "211.249.46.128/26",
+  "211.249.46.192/28",
+  "211.249.46.208/29",
+  "211.249.46.216/30",
+  "211.249.46.220/32",
+]
 
 [youbot]
 ## About: https://docs.you.com/youbot
@@ -7911,3 +8107,4 @@ domain=".search.you.com"
 network=[
   "68.67.112.0/24",
 ]
+

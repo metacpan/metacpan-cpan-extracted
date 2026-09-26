@@ -28,7 +28,7 @@ use File::Spec;
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 91;
+	plan tests => 120;
 	use_ok('Database::Join');
 }
 
@@ -1615,4 +1615,487 @@ subtest 'sqlite backend: DA returns no rows → empty arrayref (not crash or und
 		'query lives when DA has no rows on the SQLite path';
 	ok ref($rows) eq 'ARRAY', 'result is an arrayref (not undef)';
 	is scalar @{$rows}, 0, 'empty arrayref returned (no rows, no crash)';
+};
+
+# ---------------------------------------------------------------------------
+# Package stubs for 0.007.0 edge-case sections (S17-S23)
+# ---------------------------------------------------------------------------
+
+# ThrowSchemaDA: DA whose schema() throws, to probe _validate_schema_types
+# resilience -- the exception must be silently swallowed, not propagated.
+{
+	package ThrowSchemaDA;
+	use parent -norequire, 'Database::Abstraction';
+	use Carp qw(croak);
+	sub new {
+		my ($class, %args) = @_;
+		return bless {
+			id    => $args{id}   // 'entry',
+			_cols => $args{cols} // ['entry'],
+			_rows => $args{rows} // [],
+		}, $class;
+	}
+	sub columns            { return $_[0]->{_cols} }
+	sub schema             { croak 'schema() simulated failure' }
+	sub updated            { return 1 }
+	sub set_logger         { $_[0]->{_logger} = $_[1]; return $_[0] }
+	sub selectall_arrayref { return $_[0]->{_rows} }
+	sub DESTROY {}
+}
+
+# BareEdgeDA: minimal duck-type DA with no updated() method at all.
+# Proves updated() resilience when a component has no timestamp support.
+{
+	package BareEdgeDA;
+	sub new {
+		my ($class, %args) = @_;
+		return bless {
+			_cols => $args{cols} // ['entry'],
+			_rows => $args{rows} // [],
+		}, $class;
+	}
+	sub columns            { return $_[0]->{_cols} }
+	sub schema             { return {} }
+	sub set_logger         { $_[0]->{_logger} = $_[1]; return $_[0] }
+	sub selectall_arrayref { return $_[0]->{_rows} }
+	sub DESTROY {}
+	# No updated() method -- deliberately absent
+}
+
+# ThrowUpdEdgeDA: DA whose updated() throws, to probe updated() resilience.
+{
+	package ThrowUpdEdgeDA;
+	use parent -norequire, 'MockEdgeDA';
+	use Carp qw(croak);
+	sub updated { croak 'simulated updated() failure' }
+	sub DESTROY {}
+}
+
+# ===========================================================================
+# S17: limit / offset -- hostile inputs
+# ===========================================================================
+# 0.007.0: limit => N (positive integer), offset => M (non-negative integer).
+# Invalid values emit carp and are treated as absent (no crash, no die).
+
+subtest 'limit/offset: negative limit carps and is treated as absent' => sub {
+	# Negative limit is not a positive integer; the module must carp and ignore it.
+	my ($j) = _minimal_join();
+	my $rows;
+	warning_like { $rows = $j->selectall_arrayref(limit => -1) }
+		qr/limit/i, 'negative limit emits a carp warning';
+	is scalar @{$rows}, 2, 'all rows returned when limit is invalid';
+};
+
+subtest 'limit/offset: undef limit is silently ignored' => sub {
+	my ($j) = _minimal_join();
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref(limit => undef) }
+		'undef limit does not crash';
+	is scalar @{$rows}, 2, 'all rows returned when limit is undef';
+};
+
+subtest 'limit/offset: non-integer string limit carps and is ignored' => sub {
+	my ($j) = _minimal_join();
+	my $rows;
+	warning_like { $rows = $j->selectall_arrayref(limit => 'banana') }
+		qr/limit/i, 'non-integer string limit emits carp';
+	is scalar @{$rows}, 2, 'all rows returned for non-integer limit';
+};
+
+subtest 'limit/offset: negative offset carps and is treated as absent' => sub {
+	my ($j) = _minimal_join();
+	my $rows;
+	warning_like { $rows = $j->selectall_arrayref(offset => -3) }
+		qr/offset/i, 'negative offset emits carp';
+	is scalar @{$rows}, 2, 'all rows returned when offset is invalid';
+};
+
+subtest 'limit/offset: offset equal to total row count returns empty arrayref' => sub {
+	# With offset == N and N rows total, no rows remain after skipping.
+	my ($j) = _minimal_join();   # 2-row join
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref(offset => 2) }
+		'offset == row count does not crash';
+	is scalar @{$rows}, 0, 'empty arrayref when offset equals total row count';
+};
+
+subtest 'limit/offset: offset far beyond row count returns empty arrayref' => sub {
+	my ($j) = _minimal_join();
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref(offset => 999_999) }
+		'offset far beyond row count does not crash';
+	is scalar @{$rows}, 0, 'empty arrayref when offset greatly exceeds row count';
+};
+
+# ===========================================================================
+# S18: sort_by -- hostile inputs
+# ===========================================================================
+
+subtest 'sort_by: unknown column name carps but does not crash' => sub {
+	# An sort_by column that is not in the merged view should emit a carp
+	# warning and fall back to default ordering, not croak.
+	my ($j) = _minimal_join();
+	my $rows;
+	warning_like { $rows = $j->selectall_arrayref(sort_by => '__no_such_col__') }
+		qr/sort_by|column|unknown/i, 'unknown sort_by column emits carp';
+	ok ref($rows) eq 'ARRAY', 'results still returned despite bad sort_by column';
+};
+
+subtest 'sort_by: invalid direction string carps and falls back' => sub {
+	# Only ASC and DESC are valid directions; anything else must be rejected.
+	my ($j) = _minimal_join();
+	my $rows;
+	warning_like { $rows = $j->selectall_arrayref(sort_by => ['name', 'SIDEWAYS']) }
+		qr/sort_by|direction|asc|desc/i, 'invalid direction string emits carp';
+	ok ref($rows) eq 'ARRAY', 'results still returned despite bad sort_by direction';
+};
+
+subtest 'sort_by: undef sort_by is silently ignored' => sub {
+	my ($j) = _minimal_join();
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref(sort_by => undef) }
+		'undef sort_by does not crash';
+	ok ref($rows) eq 'ARRAY', 'results returned when sort_by is undef';
+};
+
+subtest 'sort_by: arrayref with 3 elements is silently tolerated (extra element ignored)' => sub {
+	# Perl's list assignment [col, dir, EXTRA] assigns only the first two elements
+	# to ($req_col, $req_dir); the third is silently discarded.  No croak or carp.
+	my ($j) = _minimal_join();
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref(sort_by => ['name', 'DESC', 'EXTRA']) }
+		'sort_by arrayref with 3 elements does not crash';
+	ok ref($rows) eq 'ARRAY', 'results still returned for over-long sort_by arrayref';
+};
+
+# ===========================================================================
+# S19: _validate_schema_types -- edge cases
+# ===========================================================================
+
+subtest '_validate_schema_types: DA whose schema() throws is silently skipped' => sub {
+	# If a component DA schema() method throws, _validate_schema_types must
+	# catch the exception silently -- new() must not propagate it.
+	my $throw_da = ThrowSchemaDA->new(
+		cols => ['entry', 'score'],
+		rows => [],
+	);
+	my $j;
+	lives_ok { $j = Database::Join->new(databases => [$throw_da], join_column => $JC) }
+		'new() lives when a component DA schema() throws';
+	ok defined $j, 'Database::Join object is constructed successfully';
+};
+
+subtest '_validate_schema_types: undef schema() return is silently skipped' => sub {
+	# A DA returning undef from schema() must not trigger a type mismatch carp.
+	my $da_no_schema = MockEdgeDA->new(
+		cols   => ['entry', 'score'],
+		rows   => [],
+		schema => undef,    # deliberately undef
+	);
+	my $j;
+	warnings_are {
+		$j = Database::Join->new(databases => [$da_no_schema], join_column => $JC)
+	} [], 'no warnings when component DA schema() returns undef';
+};
+
+subtest '_validate_schema_types: join column type mismatch does not carp (join col exempt)' => sub {
+	# The join column is the structural merge key and is explicitly exempted
+	# from the schema type consistency check.  Even if both databases declare
+	# it with different types, no warning should be emitted.
+	my $da1 = MockEdgeDA->new(
+		cols   => ['entry', 'name'],
+		rows   => [],
+		schema => { entry => { type => 'TEXT'    }, name  => { type => 'TEXT'    } },
+	);
+	my $da2 = MockEdgeDA->new(
+		cols   => ['entry', 'score'],
+		rows   => [],
+		schema => { entry => { type => 'INTEGER' }, score => { type => 'INTEGER' } },
+	);
+	warnings_are {
+		Database::Join->new(databases => [$da1, $da2], join_column => $JC)
+	} [], 'no carp for join column type mismatch (join column is exempt)';
+};
+
+subtest '_validate_schema_types: collision_prefix suppresses mismatch carp' => sub {
+	# When collision_prefix is configured for index 1, the secondary column
+	# is published under a distinct name and never silently overwrites the
+	# primary.  No schema type mismatch warning should fire.
+	my $da1 = MockEdgeDA->new(
+		cols   => ['entry', 'score'],
+		rows   => [],
+		schema => { entry => { type => 'TEXT' }, score => { type => 'TEXT'    } },
+	);
+	my $da2 = MockEdgeDA->new(
+		cols   => ['entry', 'score'],
+		rows   => [],
+		schema => { entry => { type => 'TEXT' }, score => { type => 'INTEGER' } },
+	);
+	warnings_are {
+		Database::Join->new(
+			databases        => [$da1, $da2],
+			join_column      => $JC,
+			collision_prefix => { 1 => 'db2' },  # 'score' from db2 → 'db2.score'
+		)
+	} [], 'no carp when colliding column has collision_prefix configured';
+};
+
+subtest '_validate_schema_types: plain-string schema values trigger mismatch carp' => sub {
+	# Schema values can be plain strings ('TEXT') as well as hashrefs
+	# ({type => 'TEXT'}).  The comparison normalises via uc(); mismatches
+	# must still emit a carp.
+	my $da1 = MockEdgeDA->new(
+		cols   => ['entry', 'score'],
+		rows   => [],
+		schema => { entry => 'TEXT', score => 'TEXT' },
+	);
+	my $da2 = MockEdgeDA->new(
+		cols   => ['entry', 'score'],
+		rows   => [],
+		schema => { entry => 'TEXT', score => 'INTEGER' },
+	);
+	warning_like {
+		Database::Join->new(databases => [$da1, $da2], join_column => $JC)
+	} qr/score|type|mismatch/i, 'carp fires for plain-string schema type mismatch';
+};
+
+# ===========================================================================
+# S20: parallel -- boundary / hostile inputs
+# ===========================================================================
+
+subtest 'parallel: 2 databases do not activate thread spawn (n <= 2 threshold)' => sub {
+	# parallel => 1 only activates when there are 3+ databases.  With exactly
+	# 2 databases, the flag is accepted but sequential execution is used.
+	my $da_a = MockEdgeDA->new(
+		cols => ['entry', 'name'],
+		rows => [{ entry => $K_ALPHA, name => 'Alice' }],
+	);
+	my $da_b = MockEdgeDA->new(
+		cols => ['entry', 'score'],
+		rows => [{ entry => $K_ALPHA, score => 99 }],
+	);
+	my $j;
+	lives_ok {
+		$j = Database::Join->new(
+			databases   => [$da_a, $da_b],
+			join_column => $JC,
+			parallel    => 1,
+		)
+	} 'parallel => 1 with 2 DAs constructs without error';
+	my $rows = $j->selectall_arrayref();
+	is scalar @{$rows}, 1,        '1 merged row returned';
+	is $rows->[0]{name},  'Alice', 'name column is correct';
+	is $rows->[0]{score}, 99,      'score column is correct';
+};
+
+subtest 'parallel: 3 databases activates parallel path or falls back; results match sequential' => sub {
+	# With 3+ databases and parallel => 1, either threads execute or a carp
+	# fallback to sequential occurs.  In either case, results must be identical
+	# to parallel => 0 on the same data.
+	my $da_a = MockEdgeDA->new(
+		cols => ['entry', 'name'],
+		rows => [{ entry => $K_ALPHA, name => 'Alice' }, { entry => $K_BETA, name => 'Bob' }],
+	);
+	my $da_b = MockEdgeDA->new(
+		cols => ['entry', 'score'],
+		rows => [{ entry => $K_ALPHA, score => 90 }, { entry => $K_BETA, score => 70 }],
+	);
+	my $da_c = MockEdgeDA->new(
+		cols => ['entry', 'region'],
+		rows => [{ entry => $K_ALPHA, region => 'W' }, { entry => $K_BETA, region => 'E' }],
+	);
+	my $j_seq = Database::Join->new(
+		databases => [$da_a, $da_b, $da_c], join_column => $JC,
+		join_type => 'inner', parallel => 0,
+	);
+	my $j_par = Database::Join->new(
+		databases => [$da_a, $da_b, $da_c], join_column => $JC,
+		join_type => 'inner', parallel => 1,
+	);
+	my ($rows_seq, $rows_par);
+	lives_ok { $rows_seq = $j_seq->selectall_arrayref() } 'sequential query lives';
+	lives_ok { $rows_par = $j_par->selectall_arrayref() } 'parallel query lives';
+	is scalar @{$rows_par}, scalar @{$rows_seq},
+		'parallel and sequential return the same row count';
+};
+
+subtest 'parallel: sqlite backend ignores parallel flag; results are correct' => sub {
+	# The SQLite backend executes a single SQL JOIN, so parallel => 1 has no
+	# effect at the query level.  Results must still be correct.
+	my $da_a = MockEdgeDA->new(
+		cols => ['entry', 'name'],
+		rows => [{ entry => $K_ALPHA, name => 'Alice' }],
+	);
+	my $da_b = MockEdgeDA->new(
+		cols => ['entry', 'score'],
+		rows => [{ entry => $K_ALPHA, score => 77 }],
+	);
+	my $j = Database::Join->new(
+		databases => [$da_a, $da_b], join_column => $JC,
+		backend => 'sqlite', parallel => 1,
+	);
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref() } 'sqlite + parallel lives';
+	is scalar @{$rows}, 1, 'correct row count from sqlite backend with parallel flag';
+};
+
+# ===========================================================================
+# S21: dbi_source() on Database::Join itself
+# ===========================================================================
+
+subtest 'dbi_source: array backend returns undef' => sub {
+	# On the in-memory array path there is no SQLite handle to expose.
+	my ($j) = _minimal_join(backend => 'array');
+	$j->selectall_arrayref();   # run a query to ensure nothing is cached
+	my $src;
+	lives_ok { $src = $j->dbi_source() } 'dbi_source() lives on array backend';
+	ok !defined $src, 'array backend dbi_source() returns undef';
+};
+
+subtest 'dbi_source: sqlite backend returns hashref with dbh and table keys' => sub {
+	my ($j) = _minimal_join(backend => 'sqlite');
+	$j->selectall_arrayref();   # prime the cache so the handle exists
+	my $src;
+	lives_ok { $src = $j->dbi_source() } 'dbi_source() lives on sqlite backend';
+	ok ref($src) eq 'HASH',         'dbi_source returns a hashref';
+	ok defined $src->{dbh},         'hashref contains a dbh key';
+	is $src->{table}, '_dj_result', 'table key is _dj_result';
+};
+
+subtest 'dbi_source: auto backend with bad tmpdir croaks on cache build' => sub {
+	# The 'auto' backend forces the SQLite path when dbi_source() is called
+	# (so a parent join always gets a usable handle).  If tmpdir is invalid,
+	# _build_sqlite_cache must croak cleanly with a File::Temp error.
+	my ($j) = _minimal_join(backend => 'auto', tmpdir => $BAD_DIR);
+	throws_ok { $j->dbi_source() }
+		qr/does not exist|not.*director|cannot.*creat/i,
+		'dbi_source on auto + bad tmpdir croaks from File::Temp';
+};
+
+# ===========================================================================
+# S22: IS NULL / IS NOT NULL / IN / NOT IN -- hostile operator inputs
+# ===========================================================================
+
+subtest 'IN operator: empty arrayref value returns 0 rows (1=0 SQL semantics)' => sub {
+	# col IN () is an impossible predicate.  The SQLite backend must emit 1=0
+	# so no rows match, instead of crashing or producing a SQL syntax error.
+	my $da = MockEdgeDA->new(
+		cols => ['entry', 'tier'],
+		rows => [
+			{ entry => $K_ALPHA, tier => 'gold'   },
+			{ entry => $K_BETA,  tier => 'silver' },
+		],
+	);
+	my $j = Database::Join->new(databases => [$da], join_column => $JC, backend => 'sqlite');
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref(tier => { IN => [] }) }
+		'IN with empty arrayref does not crash';
+	is scalar @{$rows}, 0, 'empty IN returns 0 rows (1=0 semantics)';
+};
+
+subtest 'NOT IN operator: empty arrayref adds no constraint -- all rows match' => sub {
+	# col NOT IN () -- everything is not in an empty set, so no rows are filtered.
+	my $da = MockEdgeDA->new(
+		cols => ['entry', 'tier'],
+		rows => [
+			{ entry => $K_ALPHA, tier => 'gold'   },
+			{ entry => $K_BETA,  tier => 'silver' },
+		],
+	);
+	my $j = Database::Join->new(databases => [$da], join_column => $JC, backend => 'sqlite');
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref(tier => { 'NOT IN' => [] }) }
+		'NOT IN with empty arrayref does not crash';
+	is scalar @{$rows}, 2, 'empty NOT IN returns all rows (no constraint)';
+};
+
+subtest 'IN operator: non-arrayref string value carps and criterion is skipped' => sub {
+	# A plain string where an arrayref is required is hostile input.  The module
+	# must emit carp and skip the criterion (all rows pass through), not crash.
+	my $da = MockEdgeDA->new(
+		cols => ['entry', 'tier'],
+		rows => [
+			{ entry => $K_ALPHA, tier => 'gold'   },
+			{ entry => $K_BETA,  tier => 'silver' },
+		],
+	);
+	my $j = Database::Join->new(databases => [$da], join_column => $JC, backend => 'sqlite');
+	my $rows;
+	warning_like { $rows = $j->selectall_arrayref(tier => { IN => 'gold' }) }
+		qr/IN|arrayref/i, 'IN with non-arrayref value emits carp';
+	is scalar @{$rows}, 2, 'all rows returned when IN value is not an arrayref';
+};
+
+subtest 'NOT IN operator: non-arrayref string value carps and criterion is skipped' => sub {
+	my $da = MockEdgeDA->new(
+		cols => ['entry', 'tier'],
+		rows => [
+			{ entry => $K_ALPHA, tier => 'gold'   },
+			{ entry => $K_BETA,  tier => 'silver' },
+		],
+	);
+	my $j = Database::Join->new(databases => [$da], join_column => $JC, backend => 'sqlite');
+	my $rows;
+	warning_like { $rows = $j->selectall_arrayref(tier => { 'NOT IN' => 'gold' }) }
+		qr/NOT IN|arrayref/i, 'NOT IN with non-arrayref value emits carp';
+	is scalar @{$rows}, 2, 'all rows returned when NOT IN value is not an arrayref';
+};
+
+subtest 'IS NULL operator: array backend passes undef criterion to DA without crashing' => sub {
+	# On the array backend, IS NULL is forwarded as-is to the component DA.
+	# MockEdgeDA filters rows where the column value is undef.  No crash must
+	# occur, and the result is an arrayref (filtering behavior is DA-dependent).
+	my $da = MockEdgeDA->new(
+		cols => ['entry', 'name'],
+		rows => [
+			{ entry => $K_ALPHA, name => 'Alice' },
+			{ entry => $K_BETA,  name => undef   },  # intentionally null
+		],
+	);
+	my $j = Database::Join->new(databases => [$da], join_column => $JC, backend => 'array');
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref(name => { 'IS NULL' => undef }) }
+		'IS NULL criterion on array backend does not crash';
+	ok ref($rows) eq 'ARRAY', 'result is an arrayref';
+};
+
+# ===========================================================================
+# S23: updated() resilience -- hostile edge cases
+# ===========================================================================
+
+subtest 'updated(): returns undef when no component DA implements updated()' => sub {
+	# A bare duck-type DA with no updated() method at all must not cause
+	# Database::Join::updated() to throw.  It must return undef quietly.
+	my $bare_a = BareEdgeDA->new(cols => ['entry', 'name'],  rows => []);
+	my $bare_b = BareEdgeDA->new(cols => ['entry', 'score'], rows => []);
+	my $j = Database::Join->new(databases => [$bare_a, $bare_b], join_column => $JC);
+	my $ts;
+	lives_ok { $ts = $j->updated() } 'updated() lives when no component DA has the method';
+	ok !defined $ts, 'returns undef when no component DA implements updated()';
+};
+
+subtest 'updated(): returns undef when all component DAs throw in updated()' => sub {
+	# Even if every component DA throws from updated(), the exception must be
+	# caught and undef returned -- not propagated to the caller.
+	my $throw_a = ThrowUpdEdgeDA->new(cols => ['entry', 'name'],  rows => []);
+	my $throw_b = ThrowUpdEdgeDA->new(cols => ['entry', 'score'], rows => []);
+	my $j = Database::Join->new(databases => [$throw_a, $throw_b], join_column => $JC);
+	my $ts;
+	lives_ok { $ts = $j->updated() } 'updated() lives when all component DAs throw';
+	ok !defined $ts, 'returns undef when all component DA updated() calls throw';
+};
+
+subtest 'updated(): returns working timestamp when one DA throws and one succeeds' => sub {
+	# Mixed case: one component DA throws from updated(), the other returns a
+	# valid epoch.  updated() must skip the throwing DA and return the good value.
+	my $throw_a = ThrowUpdEdgeDA->new(cols => ['entry', 'name'],  rows => []);
+	my $good_b  = MockEdgeDA->new(
+		cols    => ['entry', 'score'],
+		rows    => [],
+		updated => 9_000_000,
+	);
+	my $j = Database::Join->new(databases => [$throw_a, $good_b], join_column => $JC);
+	my $ts;
+	lives_ok { $ts = $j->updated() } 'updated() lives in mixed throw/good case';
+	is $ts, 9_000_000, 'returns the timestamp from the working component DA';
 };

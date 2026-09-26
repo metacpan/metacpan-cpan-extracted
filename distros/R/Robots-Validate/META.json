@@ -139,7 +139,7 @@
    "provides" : {
       "Robots::Validate" : {
          "file" : "lib/Robots/Validate.pm",
-         "version" : "v0.4.5"
+         "version" : "v0.4.6"
       }
    },
    "release_status" : "stable",
@@ -153,7 +153,7 @@
          "web" : "https://github.com/robrwo/Robots-Validate"
       }
    },
-   "version" : "v0.4.5",
+   "version" : "v0.4.6",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.42.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.52",

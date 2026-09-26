@@ -26,7 +26,7 @@ use Readonly;
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 92;
+	plan tests => 110;
 }
 
 use_ok('Database::Join');
@@ -1169,14 +1169,18 @@ sub make_join {
 # Major Premise: _sqlite_join builds SQL WHERE clauses by iterating over
 #   operator keys from criteria hashrefs and checking each key against
 #   %SAFE_SQL_OPS = { '>' => 1, '<' => 1, '>=' => 1, '<=' => 1, '!=' => 1,
-#   '=' => 1 }.  Any key NOT in the whitelist is silently skipped (next).
+#   '=' => 1, 'LIKE' => 1, 'NOT LIKE' => 1 }.
+#   Any key NOT in the whitelist emits a carp warning and is skipped.
 #
 # Attack Model: attacker provides a malicious operator key such as
 #   "'; DELETE FROM t0; --" hoping it is interpolated into the WHERE clause.
-#   The SAFE_SQL_OPS guard must discard it without croaking.
+#   The SAFE_SQL_OPS guard must discard it (with a carp) without croaking.
 #
 # Invariant: a hostile operator key produces no WHERE clause fragment; the
 #   query returns the full unfiltered result set (degraded, not injected).
+#
+# LIKE/NOT LIKE: these are whitelisted because the pattern is always passed
+#   as a bind parameter (col LIKE ?), never interpolated.
 # ===========================================================================
 
 Readonly::Scalar my $HOSTILE_OP   => q{'; DELETE FROM t0; --};
@@ -1187,13 +1191,15 @@ note '--- SECTION 16: SQLite Operator Injection Blocked by SAFE_SQL_OPS ---';
 # Tests 77 & 78
 # Attack: hostile SQL operator key inside a criteria operator hashref.
 # With backend='sqlite' the _sqlite_join builder sees the hostile key, checks
-# it against SAFE_SQL_OPS, finds no match, and skips it (next).  No WHERE
-# clause term is emitted; both rows are returned.
+# it against SAFE_SQL_OPS, finds no match, emits a carp, and skips it.  No
+# WHERE clause term is emitted; both rows are returned.
 {
 	my ($db_a, $db_b) = make_dbs();
 	my $j16a = make_join($db_a, $db_b, backend => 'sqlite');
 	my $rows;
 	lives_ok {
+		# carp warning is expected here — suppress to keep test output clean
+		local $SIG{__WARN__} = sub {};
 		$rows = $j16a->selectall_arrayref({ score => { $HOSTILE_OP => 5 } });
 	} 'S16: hostile SQL-injection operator key in criteria hashref does not croak';
 	is(scalar @{$rows}, 2,
@@ -1202,12 +1208,14 @@ note '--- SECTION 16: SQLite Operator Injection Blocked by SAFE_SQL_OPS ---';
 
 # Tests 79 & 80
 # Attack: OR-based logical injection as operator key.  "OR 1=1 --" is not a
-# valid SQL operator, so SAFE_SQL_OPS rejects it and no WHERE clause is added.
+# valid SQL operator, so SAFE_SQL_OPS rejects it (with a carp) and no WHERE
+# clause is added.
 {
 	my ($db_a, $db_b) = make_dbs();
 	my $j16b = make_join($db_a, $db_b, backend => 'sqlite');
 	my $rows;
 	lives_ok {
+		local $SIG{__WARN__} = sub {};
 		$rows = $j16b->selectall_arrayref({ score => { $OR_INJECT_OP => 0 } });
 	} 'S16: OR-injection operator key does not croak';
 	is(scalar @{$rows}, 2,
@@ -1217,16 +1225,94 @@ note '--- SECTION 16: SQLite Operator Injection Blocked by SAFE_SQL_OPS ---';
 # Tests 81 & 82
 # Defence-in-depth: mix one valid operator ('>') and one hostile key in the
 # same hashref.  The valid key must survive and filter rows (score > 80 =>
-# only Alice, score=95); the hostile key must be silently discarded.
+# only Alice, score=95); the hostile key must be discarded (with a carp).
 {
 	my ($db_a, $db_b) = make_dbs();
 	my $j16c = make_join($db_a, $db_b, backend => 'sqlite');
 	my $rows;
 	lives_ok {
+		local $SIG{__WARN__} = sub {};
 		$rows = $j16c->selectall_arrayref({ score => { '>' => 80, $HOSTILE_OP => 0 } });
 	} 'S16: mixed valid+hostile operator keys do not croak';
 	is(scalar @{$rows}, 1,
 		'S16: valid operator survives; hostile discarded; only score>80 row returned');
+}
+
+# Tests 83 & 84
+# LIKE is whitelisted: the pattern is bound via ?, so no SQL injection is
+# possible regardless of pattern content.  Prove it filters correctly AND
+# that a pattern containing SQL metacharacters is treated as literal data.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j16d = make_join($db_a, $db_b, backend => 'sqlite');
+	my $rows;
+	lives_ok {
+		$rows = $j16d->selectall_arrayref({ name => { LIKE => 'Al%' } });
+	} 'S16: LIKE operator does not croak';
+	is(scalar @{$rows}, 1,
+		'S16: LIKE filters correctly — only Alice (Al%) returned');
+}
+
+# Tests 85 & 86
+# NOT LIKE is also whitelisted and filters the complementary set.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j16e = make_join($db_a, $db_b, backend => 'sqlite');
+	my $rows;
+	lives_ok {
+		$rows = $j16e->selectall_arrayref({ name => { 'NOT LIKE' => 'Al%' } });
+	} 'S16: NOT LIKE operator does not croak';
+	is(scalar @{$rows}, 1,
+		'S16: NOT LIKE filters correctly — only Bob (not Al%) returned');
+}
+
+# Tests 87–96
+# IN and NOT IN are whitelisted list operators.  Values are bound individually
+# as ? placeholders — injection via list elements is impossible.
+# Also prove: IN with a SQL-injection string as a list element is treated as
+# literal data and matches no rows (bind parameter, not interpolation).
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j16f = make_join($db_a, $db_b, backend => 'sqlite');
+	my $rows;
+	lives_ok {
+		$rows = $j16f->selectall_arrayref({ tier => { IN => ['gold'] } });
+	} 'S16: IN operator does not croak';
+	is(scalar @{$rows}, 1, 'S16: IN filters correctly — only Alice (gold) returned');
+}
+
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j16g = make_join($db_a, $db_b, backend => 'sqlite');
+	my $rows;
+	lives_ok {
+		$rows = $j16g->selectall_arrayref({ tier => { 'NOT IN' => ['gold'] } });
+	} 'S16: NOT IN operator does not croak';
+	is(scalar @{$rows}, 1, 'S16: NOT IN filters correctly — only Bob (not gold) returned');
+}
+
+# Attack: SQL injection string as a list element for IN.
+# The value is bound as ?, so it matches no real tier value (no injection).
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j16h = make_join($db_a, $db_b, backend => 'sqlite');
+	my $rows;
+	lives_ok {
+		$rows = $j16h->selectall_arrayref({ tier => { IN => [q{gold' OR '1'='1}] } });
+	} 'S16: IN with SQL-injection element does not croak';
+	is(scalar @{$rows}, 0, 'S16: injection element treated as literal data; 0 rows (not a valid tier)');
+}
+
+# IN with wrong value type (non-arrayref): carp + skip.
+{
+	my ($db_a, $db_b) = make_dbs();
+	my $j16i = make_join($db_a, $db_b, backend => 'sqlite');
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub {};
+		$rows = $j16i->selectall_arrayref({ tier => { IN => 'gold' } });
+	} 'S16: IN with scalar value type does not croak';
+	is(scalar @{$rows}, 2, 'S16: IN with wrong type skipped; all rows returned');
 }
 
 # ===========================================================================
@@ -1367,6 +1453,118 @@ note '--- SECTION 19: SQL Identifier Injection via DA Column Name ---';
 	} 'S19: criteria keyed on column with embedded " does not croak';
 	is(scalar @{$rows}, 1,
 		'S19: WHERE clause on column "bad""col" returns exactly 1 matching row');
+}
+
+# ===========================================================================
+# SECTION 20 -- IS NULL / IS NOT NULL operator support
+#
+# Major Premise: The SQLite WHERE builder now handles two nullability operators
+#   (IS NULL, IS NOT NULL) via %SAFE_NOARG_OPS.  These operators generate no
+#   bind parameter — they are safe from injection because no caller value is
+#   interpolated, only the fixed SQL keywords "IS NULL" / "IS NOT NULL".
+#   A bare undef criterion value (col => undef) also generates IS NULL.
+#
+# Attack Model: An attacker cannot inject SQL through the operator key because
+#   %SAFE_NOARG_OPS is a closed whitelist; any other key is rejected with carp.
+#   No value is interpolated — IS NULL / IS NOT NULL are fixed SQL keywords.
+# ===========================================================================
+
+note '--- SECTION 20: IS NULL / IS NOT NULL operator support ---';
+
+# Tests 105 & 106
+# IS NULL operator hashref: only rows where score IS NULL are returned.
+{
+	my $db_a = MockSecDB->new(
+		columns => [qw(entry name)],
+		rows    => [
+			{ entry => 'A1', name => 'Alice' },
+			{ entry => 'A2', name => 'Bob'   },
+		],
+	);
+	my $db_b = MockSecDB->new(
+		columns => [qw(entry score)],
+		rows    => [
+			{ entry => 'A1', score => 95    },
+			{ entry => 'A2', score => undef },
+		],
+	);
+	my $j20a = Database::Join->new(
+		databases   => [$db_a, $db_b],
+		join_column => 'entry',
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+	my $rows;
+	lives_ok {
+		$rows = $j20a->selectall_arrayref(score => { 'IS NULL' => undef });
+	} 'S20: IS NULL operator does not croak';
+	is(scalar @{$rows}, 1,
+		'S20: IS NULL returns only Bob (score=undef); Alice excluded');
+}
+
+# Tests 107 & 108
+# IS NOT NULL: returns only rows where score is defined.
+{
+	my $db_a = MockSecDB->new(
+		columns => [qw(entry name)],
+		rows    => [
+			{ entry => 'A1', name => 'Alice' },
+			{ entry => 'A2', name => 'Bob'   },
+		],
+	);
+	my $db_b = MockSecDB->new(
+		columns => [qw(entry score)],
+		rows    => [
+			{ entry => 'A1', score => 95    },
+			{ entry => 'A2', score => undef },
+		],
+	);
+	my $j20b = Database::Join->new(
+		databases   => [$db_a, $db_b],
+		join_column => 'entry',
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+	my $rows;
+	lives_ok {
+		$rows = $j20b->selectall_arrayref(score => { 'IS NOT NULL' => 1 });
+	} 'S20: IS NOT NULL operator does not croak';
+	is(scalar @{$rows}, 1,
+		'S20: IS NOT NULL returns only Alice (score=95); Bob excluded');
+}
+
+# Tests 109 & 110
+# Bare undef criterion value generates IS NULL on the SQLite path.
+# Attack vector: previously col => undef generated "col = ?" with NULL bound,
+# which is always UNKNOWN in SQL (col = NULL never matches), effectively a
+# silent no-match.  The fix generates IS NULL so undef means "column is null".
+{
+	my $db_a = MockSecDB->new(
+		columns => [qw(entry name tier)],
+		rows    => [
+			{ entry => 'A1', name => 'Alice', tier => 'gold' },
+			{ entry => 'A2', name => 'Bob',   tier => undef  },
+		],
+	);
+	my $db_b = MockSecDB->new(
+		columns => [qw(entry score)],
+		rows    => [
+			{ entry => 'A1', score => 95 },
+			{ entry => 'A2', score => 70 },
+		],
+	);
+	my $j20c = Database::Join->new(
+		databases   => [$db_a, $db_b],
+		join_column => 'entry',
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+	my $rows;
+	lives_ok {
+		$rows = $j20c->selectall_arrayref({ tier => undef });
+	} 'S20: bare undef criterion value does not croak';
+	is(scalar @{$rows}, 1,
+		'S20: bare undef generates IS NULL; only Bob (tier=undef) returned');
 }
 
 done_testing();

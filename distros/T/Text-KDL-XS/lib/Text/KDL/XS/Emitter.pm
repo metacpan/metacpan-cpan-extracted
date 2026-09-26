@@ -5,284 +5,306 @@ use warnings;
 
 use Carp ();
 use Scalar::Util ();
-use B ();
+use overload ();
+use Text::KDL::XS ();
 
-# Tree-emit entry point:
-#   $string = Text::KDL::XS::Emitter->_emit_tree($tree, %opts)
-#
-# Two modes, dispatched on input type:
-#
-#   * Tree mode (explicit, full fidelity):
-#       - Text::KDL::XS::Document
-#       - Text::KDL::XS::Node
-#       - arrayref whose elements are all Text::KDL::XS::Node objects
-#
-#   * Data mode (auto-convert plain Perl data):
-#       - any other HASH ref or ARRAY ref
-#
-# Data-mode mapping is documented in L</_emit_data_pair>.
+our @CARP_NOT = qw(
+    Text::KDL::XS Text::KDL::XS::Document Text::KDL::XS::Node
+    Text::KDL::XS::Parser Text::KDL::XS::Value
+);
+
+my %IS_OPTION        = map { $_ => 1 } qw(version indent escape_mode identifier_mode);
+my %VERSION_CODE     = (detect => 0, 1 => 1, 2 => 2);
+my $MAX_INDENT       = 64;
+my $ESCAPE_MODE_BITS = 0x170;
+my $QUOTE_ALL        = 1;
+
+my @BOOLEAN_CLASSES = qw(JSON::PP::Boolean Types::Serialiser::Boolean JSON::Boolean boolean Mojo::JSON::_Bool);
+
+my $NULL_PAYLOAD  = { type => 'null' };
+my $TRUE_PAYLOAD  = { type => 'bool', value => 1 };
+my $FALSE_PAYLOAD = { type => 'bool', value => 0 };
+
+# emit_kdl. The document is written once through the XS emitter, which notes
+# any name, key, annotation or string value that it would write bare although
+# it reads back as a keyword or a number. Unless the caller chose an
+# identifier_mode, such a document is written again with every identifier
+# quoted.
 sub _emit_tree {
-    my ($class, $tree, %opts) = @_;
+    my ($class, $tree, @options) = @_;
+    my $settings = _parse_settings(@options);
 
-    my $version = $opts{version} // 'detect';
-    my $version_int
-        = $version eq '1'      ? 1
-        : $version eq '2'      ? 2
-        : $version eq 'detect' ? 0
-        : Carp::croak("emit_kdl: unknown version '$version'");
-
-    my $indent          = defined $opts{indent}          ? $opts{indent}          : -1;
-    my $escape_mode     = defined $opts{escape_mode}     ? $opts{escape_mode}     : -1;
-    my $identifier_mode = defined $opts{identifier_mode} ? $opts{identifier_mode} : -1;
-
-    my $emitter = $class->_new($version_int, $indent, $escape_mode, $identifier_mode);
-
-    my $blessed = Scalar::Util::blessed($tree) // '';
-    if ($blessed eq 'Text::KDL::XS::Document') {
-        _emit_node_recursive($emitter, $_) for @{ $tree->nodes };
-    }
-    elsif ($blessed eq 'Text::KDL::XS::Node') {
-        _emit_node_recursive($emitter, $tree);
-    }
-    elsif (_is_node_array($tree)) {
-        _emit_node_recursive($emitter, $_) for @$tree;
-    }
-    elsif (ref($tree) eq 'HASH' || ref($tree) eq 'ARRAY') {
-        _emit_data($emitter, $tree);
-    }
-    else {
-        Carp::croak("emit_kdl: expected Document, Node, ARRAY ref, or HASH ref");
-    }
-
-    $emitter->_emit_end;
-    return $emitter->_get_buffer;
+    my $emission = _write_document($class, $tree, $settings);
+    $emission = _write_document($class, $tree, { %$settings, identifier_mode => $QUOTE_ALL })
+        if $emission->{needs_quoting} && !defined $settings->{identifier_mode};
+    return $emission->{text};
 }
 
-sub _is_node_array {
-    my ($x) = @_;
-    return 0 unless ref($x) eq 'ARRAY';
-    for my $el (@$x) {
-        my $b = Scalar::Util::blessed($el);
-        return 0 unless $b && $el->isa('Text::KDL::XS::Node');
-    }
-    return @$x ? 1 : 0;   # empty array goes to data mode (trivially empty)
+sub _parse_settings {
+    my (@options) = @_;
+    my $options = Text::KDL::XS::_parse_named_arguments('emit_kdl', 'option', \%IS_OPTION, @options);
+    my $version = Text::KDL::XS::_normalize_version('emit_kdl', $options->{version});
+
+    return {
+        version         => $VERSION_CODE{$version},
+        indent          => _integer_option('indent', $options->{indent}, $MAX_INDENT),
+        escape_mode     => _escape_mode_option($options->{escape_mode}),
+        identifier_mode => _integer_option('identifier_mode', $options->{identifier_mode}, 2),
+    };
 }
 
-# ---------------------------------------------------------------------------
-# Tree mode (explicit)
-# ---------------------------------------------------------------------------
-
-sub _emit_node_recursive {
-    my ($emitter, $node) = @_;
-
-    Carp::croak("emit_kdl: tree mode expects Text::KDL::XS::Node, got "
-        . (ref($node) || 'scalar'))
-        unless Scalar::Util::blessed($node) && $node->isa('Text::KDL::XS::Node');
-
-    $emitter->_emit_node($node->name, $node->type_annotation);
-
-    $emitter->_emit_arg(_value_to_payload($_)) for @{ $node->args };
-
-    for my $pair (@{ $node->props }) {
-        my ($key, $value) = @$pair;
-        $emitter->_emit_property($key, _value_to_payload($value));
-    }
-
-    my $children = $node->children;
-    if (@$children) {
-        $emitter->_start_children;
-        _emit_node_recursive($emitter, $_) for @$children;
-        $emitter->_finish_children;
-    }
+sub _integer_option {
+    my ($name, $value, $maximum) = @_;
+    return undef unless defined $value;
+    Carp::croak("emit_kdl: $name must be an integer from 0 to $maximum, got '$value'")
+        unless $value =~ /\A[0-9]+\z/ && $value <= $maximum;
+    return $value;
 }
 
-sub _value_to_payload {
-    my ($v) = @_;
-
-    if (Scalar::Util::blessed($v) && $v->isa('Text::KDL::XS::Value')) {
-        return {
-            type            => $v->{type},
-            kind            => $v->{kind},
-            value           => $v->{value},
-            type_annotation => $v->{type_annotation},
-        };
-    }
-    return _coerce_scalar_to_payload($v);
+sub _escape_mode_option {
+    my ($value) = @_;
+    return undef unless defined $value;
+    Carp::croak("emit_kdl: escape_mode must be a combination of 0x10, 0x20, 0x40 and 0x170, got '$value'")
+        unless $value =~ /\A[0-9]+\z/ && $value <= $ESCAPE_MODE_BITS && ($value & ~$ESCAPE_MODE_BITS) == 0;
+    return $value;
 }
 
-# ---------------------------------------------------------------------------
-# Data mode (auto-convert plain Perl data)
-# ---------------------------------------------------------------------------
+# Writes the whole document with one XS emitter. Returns the text and
+# whether it has to be written in quote-all mode to read back as written.
+sub _write_document {
+    my ($class, $tree, $settings) = @_;
+    my $walk = { emitter => undef, on_path => {} };
 
-# Convention: a top-level arrayref becomes a series of anonymous nodes named
-# "-" (the same convention used by JSON-in-KDL). Top-level hashrefs become
-# a series of nodes, one per key, in sorted-key order for deterministic
-# output.
-sub _emit_data {
-    my ($emitter, $data) = @_;
+    eval {
+        $walk->{emitter} = $class->_new(
+            $settings->{version},
+            $settings->{indent}          // -1,
+            $settings->{escape_mode}     // -1,
+            $settings->{identifier_mode} // -1,
+        );
+        _write_top_level($walk, $tree);
+        $walk->{emitter}->_emit_end;
+        1;
+    } or Text::KDL::XS::_rethrow($@, __FILE__);
 
-    if (ref($data) eq 'HASH') {
-        for my $key (sort keys %$data) {
-            _emit_data_pair($emitter, $key, $data->{$key});
-        }
-        return;
-    }
-
-    if (ref($data) eq 'ARRAY') {
-        for my $item (@$data) {
-            _emit_data_pair($emitter, '-', $item);
-        }
-        return;
-    }
-
-    Carp::croak("emit_kdl: top-level data must be HASH or ARRAY ref");
+    my $text = $walk->{emitter}->_get_buffer;
+    return { text => length $text ? $text : "\n", needs_quoting => $walk->{emitter}->_needs_quoting };
 }
 
-# Emit one (name, value) pair according to the documented mapping:
-#
-#   scalar / undef / bool         -> `name <value>`
-#   []                            -> bare `name`
-#   [ scalars... ]                -> `name <v1> <v2> ...`
-#   { ... }                       -> `name { children }`
-#   [ $non_scalar, ... ]          -> repeated sibling `name`s (one per element)
-#
-# Mixed arrays (some scalars, some refs) repeat the sibling form for each
-# element, scalars included.
-sub _emit_data_pair {
-    my ($emitter, $name, $value) = @_;
+sub _write_top_level {
+    my ($walk, $tree) = @_;
 
-    if (!ref($value) || _is_bool_object($value) || _is_value_object($value)) {
-        $emitter->_emit_node($name, undef);
-        $emitter->_emit_arg(_value_to_payload($value));
-        return;
-    }
-
-    if (ref($value) eq 'HASH') {
-        $emitter->_emit_node($name, undef);
-        if (%$value) {
-            $emitter->_start_children;
-            for my $k (sort keys %$value) {
-                _emit_data_pair($emitter, $k, $value->{$k});
-            }
-            $emitter->_finish_children;
-        }
-        return;
-    }
-
-    if (ref($value) eq 'ARRAY') {
-        if (!@$value) {
-            $emitter->_emit_node($name, undef);
+    if (Scalar::Util::blessed($tree)) {
+        if ($tree->isa('Text::KDL::XS::Document')) {
+            _write_node($walk, $_) for @{ $tree->nodes };
             return;
         }
-
-        my $all_scalar = !grep { _is_complex($_) } @$value;
-        if ($all_scalar) {
-            $emitter->_emit_node($name, undef);
-            $emitter->_emit_arg(_value_to_payload($_)) for @$value;
+        if ($tree->isa('Text::KDL::XS::Node')) {
+            _write_node($walk, $tree);
             return;
         }
-
-        # Mixed/complex: repeat the sibling for each element.
-        _emit_data_pair($emitter, $name, $_) for @$value;
+    }
+    elsif (ref $tree eq 'ARRAY' && _is_node_list($tree)) {
+        _write_node($walk, $_) for @$tree;
         return;
     }
-
-    Carp::croak("emit_kdl: cannot serialize " . ref($value) . " ref");
+    elsif (_is_container($tree)) {
+        local $walk->{on_path}{ _enter($walk, $tree) } = 1;
+        if (ref $tree eq 'HASH') {
+            _write_data_pair($walk, $_, $tree->{$_}) for sort keys %$tree;
+        }
+        else {
+            _write_data_pair($walk, '-', $_) for @$tree;
+        }
+        return;
+    }
+    Carp::croak("emit_kdl: expected Document, Node, ARRAY ref, or HASH ref");
 }
 
-sub _is_complex {
-    my ($v) = @_;
-    return 0 unless ref $v;
-    return 0 if _is_bool_object($v);
-    return 0 if _is_value_object($v);
+sub _is_node_list {
+    my ($elements) = @_;
+    return 0 unless @$elements;
+    for my $element (@$elements) {
+        return 0 unless Scalar::Util::blessed($element) && $element->isa('Text::KDL::XS::Node');
+    }
     return 1;
 }
 
-sub _is_bool_object {
-    my ($v) = @_;
-    my $b = Scalar::Util::blessed($v);
-    return 0 unless $b;
-    return $b eq 'JSON::PP::Boolean'
-        || $b eq 'Types::Serialiser::Boolean'
-        || $b eq 'JSON::Boolean'
-        || $b eq 'boolean'
-        || $b eq 'Mojo::JSON::_Bool';
+# The address of a node, hash or array about to be written. Croaks when it is
+# already being written further up, that is, when the structure is cyclic.
+sub _enter {
+    my ($walk, $reference) = @_;
+    my $address = Scalar::Util::refaddr($reference);
+    Carp::croak("emit_kdl: cyclic data structure") if $walk->{on_path}{$address};
+    return $address;
 }
 
-sub _is_value_object {
-    my ($v) = @_;
-    my $b = Scalar::Util::blessed($v);
-    return $b && $b eq 'Text::KDL::XS::Value';
+# ---------------------------------------------------------------------------
+# Tree mode
+# ---------------------------------------------------------------------------
+
+sub _write_node {
+    my ($walk, $node) = @_;
+    no warnings 'recursion';    # the depth of a tree is bounded by its builder
+
+    Carp::croak("emit_kdl: tree mode expects Text::KDL::XS::Node, got " . (ref($node) || 'a plain scalar'))
+        unless ref $node eq 'Text::KDL::XS::Node'
+        || (Scalar::Util::blessed($node) && $node->isa('Text::KDL::XS::Node'));
+    local $walk->{on_path}{ _enter($walk, $node) } = 1;
+
+    my $emitter = $walk->{emitter};
+    $emitter->_emit_node($node->name, $node->type_annotation);
+    $emitter->_emit_arg(_payload_for($_)) for @{ $node->args };
+    for my $property (@{ $node->props }) {
+        Carp::croak("emit_kdl: a property must be a [ key => value ] pair") unless ref $property eq 'ARRAY';
+        $emitter->_emit_property($property->[0], _payload_for($property->[1]));
+    }
+
+    my $children = $node->children;
+    return unless @$children;
+    $emitter->_start_children;
+    _write_node($walk, $_) for @$children;
+    $emitter->_finish_children;
 }
 
-# Coerce a plain Perl scalar (or bool object) into the C-friendly payload
-# hash that the XS layer consumes.
-#
-#   undef                                  -> KDL null
-#   JSON::PP::true / Types::Serialiser::*  -> KDL bool
-#   integer-flagged SV                     -> KDL number (integer)
-#   float-flagged SV                       -> KDL number (float)
-#   any other scalar                       -> KDL string
-#
-# Strings such as "true"/"false" are NOT heuristically promoted to booleans;
-# pass an explicit JSON::PP::true / JSON::PP::false if you mean a bool.
-sub _coerce_scalar_to_payload {
-    my ($v) = @_;
+# ---------------------------------------------------------------------------
+# Data mode
+# ---------------------------------------------------------------------------
 
-    return { type => 'null', value => undef } unless defined $v;
+# One node for a hash key or an array element: a single value becomes an
+# argument, a hash becomes children, an array of single values becomes
+# arguments, and an array holding hashes or arrays becomes one sibling node
+# per element.
+sub _write_data_pair {
+    my ($walk, $name, $value) = @_;
+    no warnings 'recursion';    # the depth of the data is the caller's
 
-    if (_is_bool_object($v)) {
-        return { type => 'bool', value => ($v ? 1 : 0) };
+    my $emitter = $walk->{emitter};
+    if (!_is_container($value)) {
+        $emitter->_emit_node($name, undef);
+        $emitter->_emit_arg(_payload_for($value));
+        return;
     }
 
-    if (Scalar::Util::blessed($v)) {
-        # Stringifiable objects (Math::BigInt, URIs, etc.) - preserve as string.
-        return { type => 'string', value => "$v" };
+    local $walk->{on_path}{ _enter($walk, $value) } = 1;
+
+    if (ref $value eq 'HASH') {
+        $emitter->_emit_node($name, undef);
+        return unless %$value;
+        $emitter->_start_children;
+        _write_data_pair($walk, $_, $value->{$_}) for sort keys %$value;
+        $emitter->_finish_children;
+        return;
     }
 
-    Carp::croak("emit_kdl: refs cannot appear as a single scalar value here")
-        if ref $v;
-
-    my $flags = B::svref_2object(\$v)->FLAGS;
-    my $is_string_only = ($flags & B::SVf_POK()) && !($flags & (B::SVf_IOK() | B::SVf_NOK()));
-
-    return { type => 'string', value => "$v" } if $is_string_only;
-
-    if ($flags & B::SVf_IOK()) {
-        return { type => 'number', kind => 'integer', value => 0 + $v };
+    if (grep { _is_container($_) } @$value) {
+        _write_data_pair($walk, $name, $_) for @$value;
+        return;
     }
-    if ($flags & B::SVf_NOK()) {
-        return { type => 'number', kind => 'float', value => 0 + $v };
-    }
+    $emitter->_emit_node($name, undef);
+    $emitter->_emit_arg(_payload_for($_)) for @$value;
+}
 
-    return { type => 'string', value => "$v" };
+# Plain hashes and arrays are structure; everything else is a single value.
+sub _is_container {
+    my ($value) = @_;
+    my $type = ref $value;
+    return $type eq 'HASH' || $type eq 'ARRAY';
+}
+
+# ---------------------------------------------------------------------------
+# Values
+# ---------------------------------------------------------------------------
+
+# The payload the XS emitter reads for one argument or property value: a
+# Text::KDL::XS::Value itself, or a hash with the same keys.
+sub _payload_for {
+    my ($value) = @_;
+
+    return $NULL_PAYLOAD unless defined $value;
+    return _scalar_payload($value) unless ref $value;
+
+    my $class = Scalar::Util::blessed($value)
+        // Carp::croak("emit_kdl: cannot serialize " . ref($value) . " ref");
+    return $value if $class eq 'Text::KDL::XS::Value' || $value->isa('Text::KDL::XS::Value');
+    return $value ? $TRUE_PAYLOAD : $FALSE_PAYLOAD if _is_boolean($value);
+    return _bignum_payload($value) if $value->isa('Math::BigInt') || $value->isa('Math::BigFloat');
+    return { type => 'string', value => "$value" } if overload::Method($value, '""');
+    Carp::croak("emit_kdl: cannot serialize $class object");
+}
+
+# A plain scalar is a number when it has a numeric value whose Perl rendering
+# is its string value (if it has one); otherwise it is a string.
+sub _scalar_payload {
+    my ($value) = @_;
+    my $kind = Text::KDL::XS::_number_kind_of($value);
+    return { type => 'number', kind => $kind, value => $value } if defined $kind;
+    return { type => 'string', value => $value };
+}
+
+sub _bignum_payload {
+    my ($number) = @_;
+    Carp::croak("emit_kdl: cannot write the " . ref($number) . " $number as a KDL number")
+        if $number->is_nan || $number->is_inf;
+    return { type => 'number', kind => 'string', value => "$number" };
+}
+
+sub _is_boolean {
+    my ($object) = @_;
+    for my $class (@BOOLEAN_CLASSES) {
+        return 1 if $object->isa($class);
+    }
+    return 0;
 }
 
 1;
 
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
-Text::KDL::XS::Emitter - internal KDL emitter helpers (no public API)
+Text::KDL::XS::Emitter - Internal: the Perl half of the KDL emitter
+
+=head1 SYNOPSIS
+
+Do not use this module directly. Call L<Text::KDL::XS/emit_kdl>:
+
+=for highlighter language=Perl
+
+  use Text::KDL::XS qw(emit_kdl);
+  my $text = emit_kdl($document_or_data, %options);
+
+=for highlighter
 
 =head1 DESCRIPTION
 
-This module is an implementation detail of L<Text::KDL::XS>. It contains
-the Perl half of the emitter pipeline that bridges Perl data structures
-and the underlying C emitter exposed by the XS layer. All subroutines
-in this package are private (prefixed with an underscore) and may
-change without notice.
+C<Text::KDL::XS::Emitter> contains the Perl side of the emitter: it walks a
+L<Text::KDL::XS::Document> / L<Text::KDL::XS::Node> tree (tree mode) or a
+plain Perl data structure (data mode), classifies each value (a
+L<Text::KDL::XS::Value> is passed on as it is, anything else becomes a
+small payload hash), and drives the XS wrapper around ckdl's
+C<kdl_emitter>. The XS layer validates every name, key and value, formats
+all numbers itself and lets ckdl produce the text.
 
-End users should call L<Text::KDL::XS/emit_kdl> instead.
+All subroutines and methods in this package start with an underscore, are
+private, and may change without notice between releases. The public
+behaviour, including the data-mode mapping and scalar coercion rules, is
+documented under L<Text::KDL::XS/emit_kdl>.
 
 =head1 SEE ALSO
 
-L<Text::KDL::XS>
+L<Text::KDL::XS>.
+
+=head1 AUTHOR
+
+Davenonymous E<lt>perl@davenonymous.comE<gt>
 
 =head1 LICENSE
 
-This Perl distribution is released under the same terms as Perl itself.
+Copyright (C) 2026 Davenonymous.
+
+This Perl distribution is licensed under the same terms as Perl itself.
 
 =cut
-

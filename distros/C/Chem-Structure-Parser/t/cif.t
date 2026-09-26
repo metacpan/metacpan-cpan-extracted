@@ -738,4 +738,86 @@ for my $stem (qw(mini stack bases rna aform duplex wobble)) {
 	}
 }
 
+# A formal charge the PDB writes sign first.  The format's spelling is the
+# magnitude and then the sign, 1-, and mmCIF's is a signed integer, -1, which
+# the mmCIF reader turns into 1-.  4byf and 4ui0 in PDBbind v2020 write their
+# carboxylate and phosphate oxygens O-1 instead -- the line below is 4byf's
+# atom 13730 exactly as deposited -- and the PDB reader handed that back as
+# "-1", so the same atom had one charge from the .pdb and another from the
+# .cif.  Both now say 1-.
+{
+	my $pdb = Chem::Structure::Parser::_parse_string(<<'PDB', {});
+HETATM13730  O2B AOV A1001      -9.965   3.015 133.220  1.00 72.15           O-1
+HETATM13731  O2A AOV A1001      -8.772  -0.645 136.087  1.00 12.87           O1-
+HETATM13732  O3A AOV A1001      -8.772  -0.645 137.087  1.00 12.87           O+2
+PDB
+	my $cif = Chem::Structure::Parser::_parse_cif_string(<<'CIF', {});
+data_4BYF
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.auth_atom_id
+_atom_site.auth_comp_id
+_atom_site.auth_asym_id
+_atom_site.auth_seq_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+_atom_site.pdbx_formal_charge
+HETATM 13730 O O2B AOV A 1001 -9.965 3.015 133.220 -1
+HETATM 13731 O O2A AOV A 1001 -8.772 -0.645 136.087 -1
+HETATM 13732 O O3A AOV A 1001 -8.772 -0.645 137.087 2
+CIF
+	is_deeply($pdb->{charge}, [ '1-', '1-', '2+' ],
+		'a sign-first PDB charge is spelled magnitude first');
+	is_deeply($cif->{charge}, $pdb->{charge}, 'which is what the mmCIF reader says');
+}
+
+# A formal charge too large to be one.  pdbx_formal_charge is free-form and
+# str2iv() takes anything an IV holds, IV_MIN included, and negating IV_MIN
+# overflows: the charge came back as "0-".  On a 32-bit perl the same two
+# numbers are too wide for str2iv() and were passed through as text, cut to
+# "-9" and "92".  Anything past one digit is not a charge the PDB spelling can
+# hold, and comes back empty at every IV width, as 10 always did.
+{
+	my $cif = Chem::Structure::Parser::_parse_cif_string(<<'CIF', {});
+data_X
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.auth_atom_id
+_atom_site.auth_comp_id
+_atom_site.auth_asym_id
+_atom_site.auth_seq_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+_atom_site.pdbx_formal_charge
+HETATM 1 ZN ZN ZN A 1 1.0 2.0 3.0 -9223372036854775808
+HETATM 2 ZN ZN ZN A 2 1.0 2.0 3.0 9223372036854775807
+HETATM 3 ZN ZN ZN A 3 1.0 2.0 3.0 -10
+HETATM 4 ZN ZN ZN A 4 1.0 2.0 3.0 -9
+CIF
+	is_deeply($cif->{charge}, [ '', '', '', '9-' ],
+		'a charge past one digit is no charge, at either end of an IV');
+}
+
+# A text field in a file with DOS line ends.  The lexer finds the lines by
+# their LF, so every CR was left in the value -- one before each line break and
+# one at the end -- and the same title read differently from the same file
+# saved on two systems.  Bare values never had the problem, because a CR is
+# whitespace between them.
+{
+	my $text = "data_X\n_struct.title\n;A title\nthat runs over\nthree lines\n;\n"
+	         . "_struct_keywords.text 'one line'\n";
+	(my $dos = $text) =~ s/\n/\r\n/g;
+	my $u = Chem::Structure::Parser::_parse_cif_string($text, {});
+	my $d = Chem::Structure::Parser::_parse_cif_string($dos, {});
+	is($d->{cif}{'_struct.title'}, "A title\nthat runs over\nthree lines",
+		'a text field written with CRLF line ends reads with LF ones');
+	is_deeply($d->{cif}, $u->{cif}, 'and every tag reads as it does from the LF file');
+}
+
 done_testing();

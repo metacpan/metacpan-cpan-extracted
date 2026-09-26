@@ -12,9 +12,9 @@ use feature 'try';
 
 use constant DEBUG => $ENV{MOJO_OAUTH_DEBUG} || 0;
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
-has 'oauth' => sub { die "oauth is required\n" };    # Mojo::ATProto::OAuth instance - only ->store and ->refresh_tokens(_p) are used
+has 'oauth' => sub { die "oauth is required\n" };    # Mojo::ATProto::OAuth instance - only ->store, ->refresh_tokens(_p) and ->_update_stored_session(_p) are used
 has 'ua'    => sub($self) { $self->oauth->ua };
 has 'log'   => sub($self) { $self->oauth->log };
 
@@ -60,11 +60,13 @@ sub _request_with_session($self, $session, $method, $path, $body, $nonce_retries
 
     # The resource server can rotate the DPoP nonce on any response, not
     # just a 401 - persist it either way so the next call anywhere starts
-    # from the freshest known nonce.
+    # from the freshest known nonce. Only the nonce is written: $session
+    # was read before this request, and writing all of it back would
+    # overwrite tokens another process may have refreshed since.
     my $new_nonce = $res->headers->header('DPoP-Nonce') // '';
     if (length($new_nonce) && $new_nonce ne ($session->{dpop_host_nonce} // '')) {
         $session->{dpop_host_nonce} = $new_nonce;
-        $self->oauth->store->save_session($session);
+        $self->oauth->_update_stored_session($session->{account_did}, $session->{session_id}, {dpop_host_nonce => $new_nonce});
     }
 
     if (($res->code // 0) == 401) {
@@ -104,7 +106,7 @@ sub _request_with_session_p($self, $session, $method, $path, $body, $nonce_retri
         my $nonce_saved_p = Mojo::Promise->resolve;
         if (length($new_nonce) && $new_nonce ne ($session->{dpop_host_nonce} // '')) {
             $session->{dpop_host_nonce} = $new_nonce;
-            $nonce_saved_p = $self->oauth->store->save_session_p($session);
+            $nonce_saved_p = $self->oauth->_update_stored_session_p($session->{account_did}, $session->{session_id}, {dpop_host_nonce => $new_nonce});
         }
 
         return $nonce_saved_p->then(sub {
@@ -185,9 +187,9 @@ L<Mojo::ATProto::OAuth> itself only handles the OAuth handshake (PAR, token exch
 
 =over 4
 
-=item * B<DPoP nonce rotation> (RFC 9449) - a C<401> accompanied by a fresh C<DPoP-Nonce> response header means "retry with this nonce", not a real auth failure. The resource server can also rotate the nonce on a I<successful> response - this is persisted back to L<store|Mojo::ATProto::OAuth/store> either way, so the next call (from any session, any process) starts from the freshest known nonce.
+=item * B<DPoP nonce rotation> (RFC 9449) - a C<401> accompanied by a fresh C<DPoP-Nonce> response header means "retry with this nonce", not a real auth failure. The resource server can also rotate the nonce on a I<successful> response - this is persisted back to L<store|Mojo::ATProto::OAuth/store> either way, so the next call (from any session, any process) starts from the freshest known nonce. Only the nonce itself is written (via the store's C<update_session>), never the rest of the session this request started with, so it can't overwrite tokens another process has refreshed in the meantime.
 
-=item * B<access token expiry> - a C<401> with no fresh nonce means the access token itself needs refreshing; this calls the C<$oauth> instance's own L<refresh_tokens(_p)|Mojo::ATProto::OAuth/refresh_tokens> (which persists the refreshed session itself) and retries once more.
+=item * B<access token expiry> - a C<401> with no fresh nonce means the access token itself needs refreshing; this calls the C<$oauth> instance's own L<refresh_tokens(_p)|Mojo::ATProto::OAuth/refresh_tokens> (which persists the refreshed session itself, and is safe to call from several processes sharing one session at once - see there) and retries once more.
 
 =back
 

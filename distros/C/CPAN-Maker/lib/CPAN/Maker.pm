@@ -30,16 +30,19 @@ use Scalar::Util qw( reftype );
 use YAML::Tiny qw(Load Dump LoadFile);
 use version;
 
+use parent qw(CLI::Simple);
+
 use Role::Tiny::With;
 
 with 'CPAN::Maker::Role::ModuleUtils';
 with 'CPAN::Maker::Role::FileUtils';
+with 'CPAN::Maker::Role::Provides';
 
-our $VERSION = '2.0.8';
+our $VERSION   = '2.0.11';
+our $GIT_SHA   = '8e1b94ea298dc1294440689c84dde1e63f6e4e28';
+our $GIT_DIRTY = '8e1b94ea298dc1294440689c84dde1e63f6e4e28';
 
 __PACKAGE__->use_log4perl( level => 'info', color => $FALSE );
-
-use parent qw(CLI::Simple);
 
 caller or exit __PACKAGE__->main();
 
@@ -282,25 +285,18 @@ sub cmd_build {
 
     $self->get_logger->info("writing $makefile_pl");
 
-    # write provides into cwd ($project_root) before write_makefile reads it;
-    # it will be copied to $builddir after chdir
-    if ( $provides_file && -e $provides_file ) {
-      cp( $provides_file, 'provides' )
-        or die "ERROR: could not copy provides file: $OS_ERROR\n";
-    }
-
-    $self->write_makefile( dest => $makefile_pl );
+    $self->write_makefile(
+      dest          => $makefile_pl,
+      provides_file => $provides_file,
+    );
   }
 
   chdir $builddir
     or die "ERROR: could not chdir to $builddir: $OS_ERROR\n";
 
-  # move provides into builddir (write_makefile may have already used it;
-  # it must be in builddir for make manifest to find it, but excluded via MANIFEST.SKIP)
-  if ( -e "$project_root/provides" ) {
-    cp( "$project_root/provides", "$builddir/provides" )
+  if ( $provides_file && -e $provides_file ) {
+    cp( $provides_file, "$builddir/provides" )
       or die "ERROR: could not copy provides to builddir: $OS_ERROR\n";
-    unlink "$project_root/provides";
   }
 
   my $destdir = $self->get_destdir // $cwd;
@@ -459,124 +455,6 @@ sub fetch_perl_version {
 }
 
 ########################################################################
-sub get_provides {
-########################################################################
-  my ( $self, $file ) = @_;
-
-  my %provides;
-  my @missing;
-
-  my $work_dir = $self->get_work_dir;
-
-  if ($file) {
-    my ($lines) = process_file(
-      $file,
-      chomp            => $TRUE,
-      skip_blank_lines => $TRUE,
-      prefix           => 'lib',
-      process          => sub {
-        my $module = pop @_;
-        my $args   = pop @_;
-
-        if ( !$module ) {
-          return ();
-        }
-
-        my $prefix = $args->{prefix};
-
-        my $include_path = $prefix;
-
-        if ($work_dir) {
-          $include_path = sprintf '%s/%s', $work_dir, $include_path;
-        }
-
-        my $module_version = $self->get_module_version( $module, $include_path );
-
-        my ( $provided_module, $version ) = @{$module_version}{qw( module version)};
-
-        if ( !defined $version ) {
-          warn sprintf "provided module '%s' not found in %s\n", $module, $include_path;
-          push @missing, $module;
-        }
-        else {
-          $provides{$provided_module} = {
-            file    => sprintf( '%s/%s', $prefix, $module_version->{file} ),
-            version => $version,
-          };
-        }
-
-        return $provided_module;
-      }
-    );
-  }
-
-  # @missing is a list of modules in our provides file that do not map
-  # to an actual file. This is probably due to a module containing
-  # multiple classes. In that case if they were included in the
-  # provides list, then the packager most likely wants us to find the
-  # file they belong to.
-  #
-  # Iterate through the list of valid modules and search their files
-  # for our missing modules.
-
-  if (@missing) {
-    warn sprintf "Attempting to find %s files that belong to these modules.\n%s", scalar(@missing), join "\n", @missing;
-
-    my $dir = sprintf '%s/lib', $self->get_work_dir;
-
-    my @file_list;
-
-    find(
-      sub {
-        return if !-f;
-        push @file_list, $File::Find::name;
-      },
-      $dir
-    );
-
-    unshift @INC, $dir;
-
-    foreach my $module (@missing) {
-      foreach my $file (@file_list) {
-        my $text = slurp($file);
-        next if $text !~ /^package\s+$module;/xsm;  # preliminary scan
-
-        # remove all pod so we don't get false positives
-        $text =~ s/^=pod(.*?)=cut//xsmg;
-        next if $text !~ /^package\s+$module;/xsm;
-
-        # see if we can get the version...this might work since we
-        # added $work_dir to @INC. $work_dir
-        # contains all the .pm modules to be packaged. It might not
-        # work for other reaasons (like some required packages are not
-        # installed?)
-        my $version = eval {
-          local $SIG{__WARN__} = sub { };
-          require $file;
-          no strict 'refs'; ## no critic
-          return ${ $module . '::VERSION' };
-        };
-
-        $version //= 'undef';
-        my $rel_path = $file;
-        $rel_path =~ s/$work_dir\///xsm;
-
-        $provides{$module} = {
-          file    => $rel_path,
-          version => $version,
-        };
-
-        print {*STDERR} sprintf "found %s version %s in %s\n", $module, $version, $rel_path;
-      }
-    }
-
-    shift @INC;
-  }
-
-  return %provides;
-}
-
-########################################################################
 sub read_resources {
 ########################################################################
   my ( $self, $file ) = @_;
@@ -621,49 +499,6 @@ sub write_pl_files {
   close $fh;
 
   $self->set_pl_files($filename);
-
-  return;
-}
-
-########################################################################
-sub _write_provides {
-########################################################################
-  my ( $self, $fh, $provides ) = @_;
-
-  croak "provides must be an array\n"
-    if !is_array($provides);
-
-  foreach my $file ( sort @{$provides} ) {
-    next if !$file;
-    print {$fh} "$file\n";
-  }
-
-  return;
-}
-
-########################################################################
-sub write_provides {
-########################################################################
-  my ( $self, $provides ) = @_;
-
-  return
-    if !$provides;
-
-  my $provides_file = 'provides';
-
-  open my $fh, '>', $provides_file
-    or croak "could not open 'provides' for writing\n";
-
-  $self->_write_provides( $fh, $provides );
-
-  close $fh
-    or croak "could not close 'provides'\n";
-
-  # NOTE: 'provides' has never been a real CLI::Simple accessor -
-  # get_provides (below) is a hand-written override that reads the
-  # file directly, and nothing else in this codebase ever reads a
-  # 'provides' object attribute. The file written above is the only
-  # thing anything downstream actually consumes.
 
   return;
 }
@@ -784,11 +619,18 @@ sub write_makefile {
     );
   }
 
-  foreach my $m (qw( ExtUtils::MakeMaker File::ShareDir::Install)) {
-    $build_req->{$m} = $build_req->{$m} || $FALSE;
+  my %build_req_defaults = (
+    'ExtUtils::MakeMaker'     => '6.64',
+    'File::ShareDir::Install' => $NO_VERSION,
+  );
+
+  foreach my $m ( keys %build_req_defaults ) {
+    $build_req->{$m} ||= $build_req_defaults{$m};
   }
 
   $build_req = Dumper $build_req;
+  $build_req = trim($build_req);
+  $build_req =~ s/[@](\d+)/== $1/xsmg;
 
   my @exe_file_list;
   $buildspec{path} = {
@@ -851,9 +693,17 @@ sub write_makefile {
 
   my %provides;
 
-  if ( -e 'provides' ) {
-    %provides = $self->get_provides('provides');
-    $buildspec{provides} = [ keys %provides ];
+  my $provides_file = $params{provides_file} // 'provides';
+
+  if ( -e $provides_file ) {
+    %provides = $self->get_provides(
+      file     => $provides_file,
+      work_dir => $self->get_work_dir,
+    );
+    $buildspec{provides} = [
+      map { sprintf '%s %s', $_, $provides{$_}->{version} }
+      sort keys %provides
+    ];
   }
 
   my $resources_path = $self->get_resources // 'resources';
@@ -962,10 +812,7 @@ WriteMakefile(
   EXE_FILES        => $EXE_FILES,
   MAN1PODS         => $MAN1PODS,
   PREREQ_PM        => $PRE_REQ,
-  BUILD_REQUIRES   => {
-    'ExtUtils::MakeMaker'     => '6.64',
-    'File::ShareDir::Install' => $NO_VERSION,
-    },
+  BUILD_REQUIRES   => $build_req,
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker'     => '6.64',
     'File::ShareDir::Install' => $NO_VERSION,
@@ -1262,7 +1109,12 @@ sub parse_buildspec {
     project_root => $project_root,
   );
 
-  $self->write_provides( $buildspec->{provides} );
+  if ( $buildspec->{provides} ) {
+    $self->write_provides(
+      provides => $buildspec->{provides},
+      file     => 'provides',
+    );
+  }
 
   $self->write_pl_files( $buildspec->{'pl-files'} );
 
@@ -1514,39 +1366,42 @@ sub stage_distribution {
   # --- lib/ ---
   my $pm_path = $self->get_module_path // $buildspec->{path}{'pm-module'} // 'lib';
 
-  $pm_path = "$project_root/$pm_path"
-    if $pm_path !~ /^\//xsm;
+  if ( $pm_path !~ /^\//xsm ) {
+    $pm_path = "$project_root/$pm_path";
+  }
 
   if ( -d $pm_path ) {
-    my ( $provides_fh, $provides_file ) = tempfile( 'cpan-maker-provides-XXXXXX', TMPDIR => $TRUE );
-
     find(
       { follow => $TRUE,
         wanted => sub {
           return if -d $_;
-          return if !/\.(?:pm|pod)$/xsm;
+          return if !/[.](?:pm|pod)$/xsm;
 
           my $rel = $File::Find::name;
           $rel =~ s{^\Q$pm_path\E/?}{}xsm;
 
           my $dest = "$builddir/lib/$rel";
+
           make_path( File::Basename::dirname($dest) );
+
           cp( $File::Find::name, $dest )
             or die "ERROR: could not copy $File::Find::name to $dest: $OS_ERROR\n";
 
-          # record .pm files for the provides list
-          if (/\.pm$/xsm) {
-            my $module = $rel;
-            $module =~ s{/}{::}xsmg;
-            $module =~ s{\.pm$}{}xsm;
-            print {$provides_fh} "$module\n";
-          }
+          return;
         },
       },
       $pm_path,
     );
 
-    close $provides_fh;
+    my ( $fh, $provides_file ) = tempfile( 'cpan-maker-provides-XXXXXX', TMPDIR => $TRUE );
+
+    close $fh;
+
+    $self->create_provides(
+      path => "$builddir/lib",
+      file => $provides_file,
+    );
+
     $params{provides_file_ref} = \$provides_file;
   }
 
@@ -1554,8 +1409,9 @@ sub stage_distribution {
   my $exe_path = $self->get_exec_path // $buildspec->{path}{'exe-files'};
 
   if ($exe_path) {
-    $exe_path = "$project_root/$exe_path"
-      if $exe_path !~ /^\//xsm;
+    if ( $exe_path !~ /^\//xsm ) {
+      $exe_path = "$project_root/$exe_path";
+    }
 
     if ( -d $exe_path ) {
       make_path("$builddir/bin");
@@ -2316,7 +2172,7 @@ format.
 
 =head1 VERSION
 
-This documentation refers to version 2.0.8
+This documentation refers to version 2.0.11
 
 =head1 AUTHOR
 

@@ -209,6 +209,7 @@ every function here is exported, so Perl parses the bareword as a call to
 
     my $info = structure_info($file, %options);
     my $dssp = structure_info($file, 'dssp', %options);
+    my $tors = structure_info($file, 'torsions', %options);
 
 Reads `$file` and returns a hash reference. The format is worked out from the
 file name — `.pdb`, `.ent`, `.cif`, `.mmcif`, `.pdbx` — and from the first
@@ -217,7 +218,8 @@ they are, without unpacking to a temporary file.
 
 A plain string in second place names a *view*, and asks for that and nothing
 else: the file is read, the view is taken out of it, and the rest is thrown
-away. There is one view today, `dssp` — see `structure_dssp` below — and the
+away. There are two views today: `dssp` — see `structure_dssp` below — and
+`torsions` (or `torsion`), described under "The same angles, by chain". The
 options that follow are the reader's, the same ones the first form takes. The
 two forms cannot be confused with one another: a file name followed by an even
 number of arguments is an option list with an odd number of elements, which was
@@ -927,6 +929,26 @@ named a second time.
 
 It is the same option as the angles themselves: `dihedrals => 0` leaves the
 `torsions` hash off with them, and so does `store => 0`.
+
+When the angles are all that is wanted, `structure_info($file, 'torsions')`
+hands back these hashes alone, keyed by chain id, and throws the rest of the
+structure away:
+
+    my $t = structure_info('1a22.ent.pdb', 'torsions');
+    keys %$t;                  # A, B: the hormone and its receptor
+    $t->{A}{phi};              # [ undef, -57.8, -138.9, -67.7, ... ]
+    $t->{A}{residue_order};    # [ 1, 2, 3, 4, ... ]  which residue each one is
+    $t->{B}{residue_order};    # [ 233, 234, 235, 236, ... ]
+
+Each chain keeps the keys its own residues have, so a file whose chain A is a
+protein and whose chain B is a DNA strand comes back with `$t->{A}{phi}` and
+`$t->{B}{alpha}`, and no `$t->{A}{alpha}`. A chain that holds both kinds has
+both sets, with an `undef` at each residue an angle does not belong to. Every
+chain also carries its `residue_order`, because the arrays mean
+nothing without it and nothing else in the structure is kept. A chain with no
+angle at all, such as a water chain or a lone ligand, is left out. The
+torsion angles are features, so asking for this view of a file read with
+`features => 0` dies rather than returning an empty hash.
 
 A nucleotide gets a different set of torsions from the same option; they are
 below.

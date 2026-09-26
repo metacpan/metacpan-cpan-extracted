@@ -87,7 +87,7 @@ is( $tr->to_ascii('şehir'),    'sehir',  'tr->to_ascii: şehir → sehir' );
 is( $tr->to_ascii('Ğüzel'),    'Guzel',  'tr->to_ascii: Ğüzel → Guzel' );
 
 # Slug mode (nonspace=1)
-is( $tr->to_ascii('Çay Bardağı', 1), 'cay_bardagi', 'tr->to_ascii slug' );
+is( $tr->to_ascii('Çay Bardağı', 1), 'cay-bardagi', 'tr->to_ascii slug' );
 
 # ============================================================
 # 9. normalize

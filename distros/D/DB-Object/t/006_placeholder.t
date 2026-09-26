@@ -1,15 +1,21 @@
 #!perl
+##----------------------------------------------------------------------------
+## SQL API Abstraction - t/006_placeholder.t
+##----------------------------------------------------------------------------
 BEGIN
 {
-	use strict;
-	use warnings;
-	use vars qw( $DEBUG );
-	use lib './lib';
-	use Scalar::Util ();
+    use strict;
+    use warnings;
+    use vars qw( $DEBUG );
+    use lib './lib';
+    use Scalar::Util ();
     use Test::More qw( no_plan );
     use_ok( 'DB::Object' );
-	our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 my $dbh = DB::Object->new( debug => $DEBUG );
 isa_ok( $dbh, 'DB::Object' );
@@ -37,4 +43,3 @@ SKIP:
 done_testing();
 
 __END__
-

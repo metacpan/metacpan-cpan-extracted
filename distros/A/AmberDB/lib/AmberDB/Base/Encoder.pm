@@ -5,12 +5,12 @@ use warnings;
 use Carp qw(croak cluck);
 use MIME::Base64 qw(encode_base64 decode_base64);
 
-our $VERSION = '5.25.2';
+our $VERSION = '5.26.0';
 
 my $CREATED = '2026-09-06';
 
 # =====================================================================
-# RECORD ENCODING / DECODING — ABR v5 (Amber Binary Record)
+# RECORD ENCODING / DECODING — ABR v5 (AmberDB Binary Record)
 # Native Pure Perl Binary Format with Zero CPAN Dependencies
 # Format Specification:
 #   Header:      \x00 A B R \x05  (5 bytes: NUL + Magic "ABR" + Version 5)
@@ -359,7 +359,10 @@ sub tsv_encode {
     }
 
     my @encoded = map { ref($_) ? $encode_node->($_) : $self->char_escape($_) } @fields;
-    return join( "\t", @encoded );
+    my $result = join( "\t", @encoded );
+    utf8::encode($result) if utf8::is_utf8($result);
+
+    return $result;
 }
 
 # ------------------------------------------------
@@ -436,7 +439,7 @@ sub key_encode {
 # FORMAT DETECTION & LEGACY DECODING (2003-2026 formats)
 # =====================================================================
 
-sub detect_record_format {
+sub detect_tsv_format {
     my ( $self, $record ) = @_;
     return 'v5' if !defined $record || $record eq '';
 
@@ -457,17 +460,22 @@ sub detect_record_format {
 
 # =====================================================================
 # BINARY INDEX PACKING (64-bit Big-Endian Packed Identifiers)
+# Pure binary buffer operations: 0 hashes, 0 regexes, 0 splits.
 # =====================================================================
 
 # $adb->bin_encode(\@rids)
-# Encodes list of record IDs into 8-byte packed binary format (64-bit uint Q>*).
+# Encodes list of numeric record IDs into 8-byte packed binary format (64-bit uint Q>*).
 # ------------------------------------------------
 sub bin_encode {
     my ( $self, $rids ) = @_;
 
     return '' unless ref($rids) eq 'ARRAY' && @$rids;
 
-    return pack( "(Q>)*", @$rids );
+    # Fast numeric filter: positive numbers only (no regex overhead)
+    my @valid = grep { defined && $_ > 0 } @$rids;
+    return '' unless @valid;
+
+    return pack( "(Q>)*", @valid );
 }
 
 # $adb->bin_decode($binary_buffer, $offset, $limit, $dir)
@@ -479,222 +487,210 @@ sub bin_decode {
 
     return ( 0, () ) unless defined $buffer && length($buffer) >= 8;
 
-    my $rec_size = 8;
-    my $total = int( length($buffer) / $rec_size );
-    return ( 0, () ) unless $total;
-
-    $offset ||= 0;
+    $offset = 0 if !defined $offset || $offset < 0;
     $limit  ||= 0;
-    $dir    = ( defined $dir && $dir =~ /^(asc|desc|reverse)$/i ) ? lc($dir) : 'desc';
-
-    if ( lc($dir) eq 'desc' ) {
-        my ( $real_start, $real_limit );
-        if ($limit) {
-            $real_start = $total - $offset - $limit;
-            $real_limit = $limit;
-            if ( $real_start < 0 ) {
-                $real_limit += $real_start;
-                $real_start = 0;
-            }
-        }
-        else {
-            $real_start = 0;
-            $real_limit = $total - $offset;
-        }
-
-        return ( $total, () ) if $real_limit <= 0;
-
-        my $slice = substr( $buffer, $real_start * $rec_size, $real_limit * $rec_size );
-        my @ids = unpack( "(Q>)*", $slice );
-        my @ids_rev = reverse @ids;
-        return ( $total, @ids_rev );
-    }
-
+    my $rec_size = 8;
+    my $total    = int( length($buffer) / $rec_size );
     return ( $total, () ) if $offset >= $total;
 
-    my $bytes_to_read = $limit ? ( $limit * $rec_size ) : ( length($buffer) - ( $offset * $rec_size ) );
-    if ( $offset * $rec_size + $bytes_to_read > length($buffer) ) {
-        $bytes_to_read = length($buffer) - ( $offset * $rec_size );
+    $dir = ( defined $dir && lc($dir) eq 'asc' ) ? 'asc' : 'desc';
+
+    if ( $total - $offset < $limit || $limit <= 0 ) {
+        $limit = $total - $offset;
     }
 
-    return ( $total, () ) if $bytes_to_read <= 0;
+    if ( $dir eq 'desc' ) {
+        my $real_start = $total - $offset - $limit;
+        my $slice = substr( $buffer, $real_start * $rec_size, $limit * $rec_size );
+        return ( $total, reverse unpack( "(Q>)*", $slice ) );
+    }
 
-    my $slice = substr( $buffer, $offset * $rec_size, $bytes_to_read );
-    my @ids = unpack( "(Q>)*", $slice );
-    return ( $total, @ids );
+    my $slice = substr( $buffer, $offset * $rec_size, $limit * $rec_size );
+    return ( $total, unpack( "(Q>)*", $slice ) );
 }
 
-# $adb->bin_crop( \@group1, \@group2, ... )
-# Intersects or unions multiple binary ID buffer groups using Shortest-First Candidate Pruning.
-sub bin_crop {
-    my $self = shift;
+# $idx = $adb->bin_search($buffer, $target)
+# Binary search on 8-byte big-endian packed buffer.
+# Returns 0-based record index (0, 1, 2, ...) if found, -1 if not found.
+# ------------------------------------------------
+sub bin_search {
+    my ( $self, $buffer, $target ) = @_;
 
-    return () unless @_;
+    return -1 unless defined $buffer && length($buffer) >= 8 && defined $target && $target > 0;
 
-    # 1. Parse optional %opts / $mode parameter
-    my %opts;
-    if ( ref( $_[0] ) eq 'HASH' ) {
-        %opts = %{ shift @_ };
-    }
-    elsif ( defined $_[0] && !ref( $_[0] ) && $_[0] =~ /^(and|or)$/i ) {
-        $opts{mode} = lc( shift @_ );
-    }
+    my $len = int( length($buffer) / 8 );
+    my ( $low, $high ) = ( 0, $len - 1 );
 
-    my $mode   = lc( $opts{mode}   // 'and' );
-    my $offset = $opts{offset}     // $opts{start} // 0;
-    my $limit  = $opts{limit}      // 0;
-    my $dir    = lc( $opts{sort}   // $opts{dir}   // 'desc' );
-
-    my @raw_groups = @_;
-    return () unless @raw_groups;
-
-    # 2. Normalize and inspect each group
-    my @stats;
-    for my $g (@raw_groups) {
-        next unless defined $g;
-        my @raws;
-        if ( ref($g) eq 'ARRAY' ) {
-            for my $item (@$g) {
-                push @raws, $item if defined $item && length($item) >= 8;
-            }
-        }
-        elsif ( !ref($g) && length($g) >= 8 ) {
-            push @raws, $g;
-        }
-
-        if ( $mode eq 'and' ) {
-            return () unless @raws;
-        }
-
-        my $total_bytes = 0;
-        $total_bytes += length($_) for @raws;
-        my $id_count = int( $total_bytes / 8 );
-
-        push @stats, {
-            raws  => \@raws,
-            count => $id_count,
-        };
-    }
-
-    return () unless @stats;
-
-    # 3. INTERSECTION (AND MODE)
-    my @result_ids;
-    if ( $mode eq 'and' ) {
-        @stats = sort { $a->{count} <=> $b->{count} } @stats;
-
-        return () if $stats[0]{count} == 0;
-
-        my %candidates;
-        if ( @{ $stats[0]{raws} } == 1 ) {
-            my ( undef, @ids ) = $self->bin_decode( $stats[0]{raws}[0] );
-            $candidates{$_} = 1 for @ids;
+    while ( $low <= $high ) {
+        my $mid = int( ( $low + $high ) / 2 );
+        my $val = unpack( "Q>", substr( $buffer, $mid * 8, 8 ) );
+        return $mid if $val == $target;
+        if ( $val < $target ) {
+            $low = $mid + 1;
         }
         else {
-            for my $raw ( @{ $stats[0]{raws} } ) {
-                my ( undef, @ids ) = $self->bin_decode($raw);
-                $candidates{$_} = 1 for @ids;
+            $high = $mid - 1;
+        }
+    }
+
+    return -1;
+}
+
+# $adb->bin_crop($buffer, $liste, $option)
+# Ultra-fast binary intersection / cropping without unpacking the buffer into hashes.
+#   $buffer: Packed 8-byte binary buffer (64-bit uint Q>*)
+#   $liste:  ARRAY ref of integer IDs OR another 8-byte packed binary buffer
+#   $option: 0 (or undef/empty) -> no sorting (fastest)
+#            1 -> preserves $buffer order
+#            2 -> preserves $liste order
+# Returns:
+#   List context:   Array of matching integer IDs
+#   Scalar context: Packed 8-byte binary buffer ((Q>)*)
+# ------------------------------------------------
+sub bin_crop {
+    my ( $self, $buffer, $liste, $option ) = @_;
+
+    return () unless defined $buffer && length($buffer) >= 8;
+    return () unless defined $liste;
+
+    $option ||= 0;
+    my @result;
+
+    if ( ref($liste) eq 'ARRAY' ) {
+        return () unless @$liste;
+
+        if ( $option == 2 ) {
+            # 2: Listenin sıralaması korunur
+            for my $id (@$liste) {
+                next unless defined $id && $id > 0;
+                push @result, $id if $self->bin_search( $buffer, $id ) >= 0;
             }
         }
-
-        return () unless %candidates;
-
-        for my $grp_idx ( 1 .. $#stats ) {
-            my $grp = $stats[$grp_idx];
-            my %grp_seen;
-
-            if ( @{ $grp->{raws} } == 1 ) {
-                my ( undef, @ids ) = $self->bin_decode( $grp->{raws}[0] );
-                $grp_seen{$_} = 1 for @ids;
+        elsif ( $option == 1 ) {
+            # 1: Buffer'ın sıralaması korunur (indeks pozisyonuna göre sırala: 0 hash)
+            my @matches;
+            for my $id (@$liste) {
+                next unless defined $id && $id > 0;
+                my $pos = $self->bin_search( $buffer, $id );
+                push @matches, [ $pos, $id ] if $pos >= 0;
             }
-            else {
-                for my $raw ( @{ $grp->{raws} } ) {
-                    my ( undef, @ids ) = $self->bin_decode($raw);
-                    $grp_seen{$_} = 1 for @ids;
-                }
-            }
-
-            for my $cand ( keys %candidates ) {
-                delete $candidates{$cand} unless exists $grp_seen{$cand};
-            }
-
-            return () unless %candidates;
+            @result = map { $_->[1] } sort { $a->[0] <=> $b->[0] } @matches;
         }
-
-        @result_ids = keys %candidates;
-    }
-    else {
-        # 4. UNION (OR MODE)
-        my %seen;
-        for my $grp (@stats) {
-            for my $raw ( @{ $grp->{raws} } ) {
-                my ( undef, @ids ) = $self->bin_decode($raw);
-                $seen{$_} = 1 for @ids;
+        else {
+            # 0: Sıralama önemsiz (en hızlı yol)
+            for my $id (@$liste) {
+                next unless defined $id && $id > 0;
+                push @result, $id if $self->bin_search( $buffer, $id ) >= 0;
             }
         }
-        @result_ids = keys %seen;
+    }
+    elsif ( !ref($liste) && length($liste) >= 8 ) {
+        # $liste de ikili bir tampon ise
+        if ( $option == 2 ) {
+            # 2: $liste tamponunun sırası
+            my @l_ids = unpack( "(Q>)*", $liste );
+            @result = grep { $self->bin_search( $buffer, $_ ) >= 0 } @l_ids;
+        }
+        elsif ( $option == 1 ) {
+            # 1: $buffer tamponunun sırası (indeks pozisyonuna göre sırala: 0 hash)
+            my @l_ids = unpack( "(Q>)*", $liste );
+            my @matches;
+            for my $id (@l_ids) {
+                my $pos = $self->bin_search( $buffer, $id );
+                push @matches, [ $pos, $id ] if $pos >= 0;
+            }
+            @result = map { $_->[1] } sort { $a->[0] <=> $b->[0] } @matches;
+        }
+        else {
+            # 0: Sıralama önemsiz: küçük olanı büyükte ikili ara
+            my ( $small, $large ) = length($buffer) <= length($liste) ? ( $buffer, $liste ) : ( $liste, $buffer );
+            my @s_ids = unpack( "(Q>)*", $small );
+            @result = grep { $self->bin_search( $large, $_ ) >= 0 } @s_ids;
+        }
     }
 
-    return () unless @result_ids;
+    return wantarray ? @result : ( @result ? pack( "(Q>)*", @result ) : '' );
+}
 
-    # 5. Sorting & Pagination
-    if ( $dir eq 'asc' ) {
-        @result_ids = sort { $a <=> $b } @result_ids;
-    }
-    else {
-        @result_ids = sort { $b <=> $a } @result_ids;
+# $adb->bin_union(\@buffers, $dir)
+# High-performance binary union across 8-byte packed buffers without Perl %seen hash.
+# In list context: returns deduplicated list of IDs sorted by $dir (default 'asc').
+# In scalar context: returns 8-byte packed binary buffer ((Q>)*) sorted ascending.
+# ------------------------------------------------
+sub bin_union {
+    my ( $self, $buffers, $dir ) = @_;
+
+    return () unless $buffers;
+
+    my @bufs = ref($buffers) eq 'ARRAY' ? @$buffers : ($buffers);
+    @bufs = grep { defined $_ && length($_) >= 8 } @bufs;
+    return () unless @bufs;
+
+    # Single buffer fast-path
+    if ( @bufs == 1 ) {
+        if (wantarray) {
+            my ( undef, @ids ) = $self->bin_decode( $bufs[0], 0, 0, $dir // 'asc' );
+            return @ids;
+        }
+        return $bufs[0];
     }
 
-    if ( $offset > 0 || $limit > 0 ) {
-        my $total = scalar @result_ids;
-        return () if $offset >= $total;
-        my $end = $limit ? ( $offset + $limit - 1 ) : ( $total - 1 );
-        $end = ( $total - 1 ) if $end >= $total;
-        @result_ids = @result_ids[ $offset .. $end ];
-    }
+    # Multiple buffers: concatenate binary streams in C (zero hash allocation)
+    my $combined = join( '', @bufs );
+    return () unless length($combined) >= 8;
 
-    return @result_ids;
+    my @all_ids = unpack( "(Q>)*", $combined );
+    @all_ids = ( defined $dir && lc($dir) eq 'desc' ) ? sort { $b <=> $a } @all_ids : sort { $a <=> $b } @all_ids;
+
+    # O(N) linear deduplication of adjacent elements (no hash table!)
+    my $prev = -1;
+    my @uniq = grep { my $dup = ($_ == $prev); $prev = $_; !$dup } @all_ids;
+
+    return wantarray ? @uniq : ( @uniq ? pack( "(Q>)*", @uniq ) : '' );
 }
 
 # $updated_buf = $adb->bin_add($buffer, $rids)
 # Adds one or more record IDs into 8-byte packed binary buffer without duplicates.
+# Pure binary buffer operation: uses binary search to check existence and maintains sort order.
 # ------------------------------------------------
 sub bin_add {
     my ( $self, $buffer, $new_rids ) = @_;
 
     return $buffer // '' unless defined $new_rids;
 
-    my @ids = ref($new_rids) eq 'ARRAY' ? @$new_rids : ($new_rids);
-    return $buffer // '' unless @ids;
-
     $buffer //= '';
 
+    my @ids = ref($new_rids) eq 'ARRAY'
+      ? @$new_rids
+      : ( !ref($new_rids) && length($new_rids) >= 8 && length($new_rids) % 8 == 0
+          ? unpack( "(Q>)*", $new_rids )
+          : ($new_rids) );
+
+    @ids = grep { defined && $_ > 0 } @ids;
+    return $buffer unless @ids;
+
+    # Deduplicate input IDs without a hash
+    my @sorted_in = sort { $a <=> $b } @ids;
+    my $prev_in = -1;
+    @ids = grep { my $d = ($_ == $prev_in); $prev_in = $_; !$d } @sorted_in;
+
     if ( length($buffer) < 8 ) {
-        my %seen;
-        my @valid = grep { defined && /^\d+$/ && !$seen{$_}++ } @ids;
-        return @valid ? pack( "(Q>)*", @valid ) : '';
+        return pack( "(Q>)*", @ids );
     }
 
-    my %seen_in_input;
+    my @to_add;
     for my $id (@ids) {
-        next unless defined $id && $id =~ /^\d+$/;
-        next if $seen_in_input{$id}++;
-
-        my $target_bytes = pack( "Q>", $id );
-        my $pos = index( $buffer, $target_bytes );
-        while ( $pos != -1 && ( $pos % 8 != 0 ) ) {
-            $pos = index( $buffer, $target_bytes, $pos + 1 );
-        }
-        if ( $pos == -1 ) {
-            $buffer .= $target_bytes;
-        }
+        push @to_add, $id if $self->bin_search( $buffer, $id ) < 0;
     }
+    return $buffer unless @to_add;
 
-    return $buffer;
+    $buffer .= pack( "(Q>)*", @to_add );
+    return $self->bin_sort($buffer);
 }
 
 # $updated_buf = $adb->bin_punch($buffer, $del_rids)
 # Removes one or more record IDs from 8-byte packed binary buffer.
+# Pure binary buffer operation: O(log N) binary search and surgical 8-byte excision.
 # ------------------------------------------------
 sub bin_punch {
     my ( $self, $buffer, $del_rids ) = @_;
@@ -702,49 +698,34 @@ sub bin_punch {
     return '' unless defined $buffer && length($buffer) >= 8;
     return $buffer unless defined $del_rids;
 
-    my @del_list = ref($del_rids) eq 'ARRAY' ? @$del_rids : ($del_rids);
+    my @del_list = ref($del_rids) eq 'ARRAY'
+      ? @$del_rids
+      : ( !ref($del_rids) && length($del_rids) >= 8 && length($del_rids) % 8 == 0
+          ? unpack( "(Q>)*", $del_rids )
+          : ($del_rids) );
+
+    @del_list = grep { defined && $_ > 0 } @del_list;
     return $buffer unless @del_list;
 
-    my @sorted_del = sort { $b <=> $a } grep { defined && /^\d+$/ } @del_list;
-    return $buffer unless @sorted_del;
-
-    for my $del_id (@sorted_del) {
+    for my $del_id (@del_list) {
         my $len = length($buffer);
         last if $len < 8;
 
-        my $target_bytes = pack( "Q>", $del_id );
-        my ( $low, $high ) = ( 0, int( $len / 8 ) - 1 );
-        my $found = 0;
-
-        # 1. Fast O(log N) binary search for sorted buffers
-        while ( $low <= $high ) {
-            my $mid = int( ( $low + $high ) / 2 );
-            my $mid_bytes = substr( $buffer, $mid * 8, 8 );
-            if ( $mid_bytes eq $target_bytes ) {
-                substr( $buffer, $mid * 8, 8, "" );
-                $found = 1;
-                last;
-            }
-            elsif ( $mid_bytes lt $target_bytes ) {
-                $low = $mid + 1;
-            }
-            else {
-                $high = $mid - 1;
-            }
+        my $mid = $self->bin_search( $buffer, $del_id );
+        if ( $mid >= 0 ) {
+            substr( $buffer, $mid * 8, 8, "" );
+            next;
         }
 
-        # 2. Fallback: linear index() scan with 8-byte boundary alignment
-        if ( !$found ) {
-            my $pos = index( $buffer, $target_bytes );
-            while ( $pos >= 0 ) {
-                if ( $pos % 8 == 0 ) {
-                    substr( $buffer, $pos, 8, "" );
-                    $pos = index( $buffer, $target_bytes, $pos );
-                }
-                else {
-                    $pos = index( $buffer, $target_bytes, $pos + 1 );
-                }
+        # Fallback for unsorted buffer: 8-byte boundary index search
+        my $target_bytes = pack( "Q>", $del_id );
+        my $pos = index( $buffer, $target_bytes );
+        while ( $pos >= 0 ) {
+            if ( $pos % 8 == 0 ) {
+                substr( $buffer, $pos, 8, "" );
+                last;
             }
+            $pos = index( $buffer, $target_bytes, $pos + 1 );
         }
     }
 
@@ -753,47 +734,39 @@ sub bin_punch {
 
 # $found = $adb->bin_find($buffer, $rid)
 # Returns 1 if $rid exists in 8-byte binary buffer, 0 otherwise.
+# Pure O(log N) binary search on 8-byte chunks.
 # ------------------------------------------------
 sub bin_find {
     my ( $self, $buffer, $rid ) = @_;
 
-    return 0 unless defined $buffer && length($buffer) >= 8 && defined $rid && $rid =~ /^\d+$/;
+    return 0 unless defined $buffer && length($buffer) >= 8 && defined $rid && $rid > 0;
 
+    return 1 if $self->bin_search( $buffer, $rid ) >= 0;
+
+    # Fallback for unsorted buffer: 8-byte boundary index search
     my $target_bytes = pack( "Q>", $rid );
-    my $len = length($buffer);
-    my ( $low, $high ) = ( 0, int( $len / 8 ) - 1 );
-
-    while ( $low <= $high ) {
-        my $mid = int( ( $low + $high ) / 2 );
-        my $mid_bytes = substr( $buffer, $mid * 8, 8 );
-        if ( $mid_bytes eq $target_bytes ) {
-            return 1;
-        }
-        elsif ( $mid_bytes lt $target_bytes ) {
-            $low = $mid + 1;
-        }
-        else {
-            $high = $mid - 1;
-        }
-    }
-
     my $pos = index( $buffer, $target_bytes );
-    while ( $pos != -1 && ( $pos % 8 != 0 ) ) {
+    while ( $pos >= 0 ) {
+        return 1 if $pos % 8 == 0;
         $pos = index( $buffer, $target_bytes, $pos + 1 );
     }
 
-    return ( $pos != -1 ) ? 1 : 0;
+    return 0;
 }
 
-# $sorted_buf = $adb->bin_sort($buffer)
-# Sorts 8-byte big-endian binary buffer in ascending order.
+# $sorted_buf = $adb->bin_sort($buffer, $dir)
+# Sorts 8-byte big-endian binary buffer in ascending (or descending) order.
+# Pure C-level string sort of 8-byte big-endian chunks (0 Perl hash / 0 unpack to array).
 # ------------------------------------------------
 sub bin_sort {
-    my ( $self, $buffer ) = @_;
+    my ( $self, $buffer, $dir ) = @_;
 
     return '' unless defined $buffer && length($buffer) >= 8;
     return $buffer if length($buffer) == 8;
 
+    if ( defined $dir && lc($dir) eq 'desc' ) {
+        return join( '', sort { $b cmp $a } unpack( "(a8)*", $buffer ) );
+    }
     return join( '', sort unpack( "(a8)*", $buffer ) );
 }
 

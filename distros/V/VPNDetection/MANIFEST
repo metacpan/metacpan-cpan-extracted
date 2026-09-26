@@ -1,3 +1,4 @@
+CHANGELOG.md
 lib/VPNDetection.pm
 lib/VPNDetection/Bogon.pm
 lib/VPNDetection/Bogons.pm

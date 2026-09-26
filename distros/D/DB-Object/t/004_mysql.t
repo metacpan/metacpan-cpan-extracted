@@ -1,14 +1,22 @@
 #!perl
+##----------------------------------------------------------------------------
+## SQL API Abstraction - t/004_mysql.t
+##----------------------------------------------------------------------------
 BEGIN
 {
-	use strict;
-	use warnings;
+    use strict;
+    use warnings;
+    use vars qw( $DEBUG $dbh );
+    use lib './lib';
     use Test::More qw( no_plan );
     select(($|=1,select(STDERR),$|=1)[1]);
     use JSON;
     use Module::Generic::File qw( file );
-	our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 SKIP:
 {
@@ -27,10 +35,10 @@ SKIP:
         use_ok( "DB::Object::Mysql::Statement" );
         use_ok( "DB::Object::Mysql::Tables" );
     }
-    
+
     ## Connection parameters are taken from environment variables (DB_NAME, DB_LOGIN, DB_PASSWD, DB_DRIVER, DB_SCHEMA), or from file (DB_CON_FILE) or from uri (DB_CON_URI)
     ## DB_CON_URI=http://localhost:5432?database=mysql&login=jack&
-    $DB::Object::Mysql::DEBUG = $DEBUG; # REMOVE ME
+    no warnings 'once';
     my $con_params =
     {
         db      => 'mysql',
@@ -49,9 +57,9 @@ SKIP:
     my $dbh1 = DB::Object->connect( $con_params );
     if( !defined( $dbh1 ) )
     {
-        skip( "Database connection failed, cancelling other tests: $DB::Object::ERROR", 1 );
+        skip( "Database connection failed, cancelling other tests: " . DB::Object->error, 1 );
     }
-    
+
     ok( $dbh1, "Getting DB::Object::Mysql object" );
     isa_ok( $dbh1, 'DB::Object::Mysql', "Checking class of object" );
     $ENV{DB_HOST} ||= 'localhost';

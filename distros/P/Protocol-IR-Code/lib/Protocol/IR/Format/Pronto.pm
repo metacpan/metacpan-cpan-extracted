@@ -2,7 +2,7 @@ package Protocol::IR::Format::Pronto;
 use strict;
 use warnings;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 sub export {
     my ($class, $ir_code, $registry) = @_;
@@ -84,7 +84,7 @@ sub decode {
     # No registered protocol matched. A payload with real timing data is
     # still valid raw Pronto Hex, so keep it as an opaque UNKNOWN code rather
     # than failing: container conversions that just move Pronto hex (e.g.
-    # Global Cache to wig) must not depend on naming the protocol. A truncated
+    # JSON dump to wig) must not depend on naming the protocol. A truncated
     # or empty payload is malformed, not merely unknown, and still dies.
     die "Unable to decode Pronto Hex string into a known protocol\n"
         unless @burst_pairs_us;
@@ -105,7 +105,7 @@ Protocol::IR::Format::Pronto - Raw Pronto Hex encoder and decoder
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 
@@ -157,7 +157,7 @@ L<Protocol::IR::Converter/"DECODING VERSUS GENERATING TIMINGS">), a Pronto strin
 only recognized if it matches a registered protocol. Whether or not it does,
 the decoded L<Protocol::IR::Code> keeps the exact capture -- the quantized
 C<timings> and the hex stashed verbatim in C<pronto> -- so C<export> (and any
-Pronto-passthrough container such as wig or the Global Cache importer)
+Pronto-passthrough container such as wig or the JSON dump importer)
 round-trips the string byte-identically. A well-formed string with real
 timing data that no protocol recognizes is not an error: it decodes to an
 opaque C<UNKNOWN> code (C<bypass_protocol> set) so container conversions

@@ -1,0 +1,88 @@
+Game-Xiangqi
+============
+
+Xiangqi, which is Chinese chess: a nine by ten board, pieces on the
+intersections, a river across the middle and a palace at each end. Plausibly the
+most played board game on earth.
+
+The rules, the move generator, the repetition judge and the search are in C. There
+is no pure-Perl board and that is deliberate: the search has to run inside a web
+request, and Perl cannot make a bot worth playing at this branching factor.
+
+    use Game::Xiangqi;
+
+    my $g = Game::Xiangqi->new(seed => $thirty_two_bytes, red => 'p1');
+    $g->turn;                       # 'p1'
+    $g->legal;                      # [ 'h2e2', 'b2e2', ... ] in ICCS
+    $g->play('h2e2');               # 0, or a refusal FLAG. it never throws
+    $g->result;                     # { winner, reason, rule, loop }
+
+    my $reply = $g->bot->choose($g, 'p2');
+
+Or play it in a terminal:
+
+    xiangqi                 # the pieces as themselves: 車馬象士將士象馬車
+    xiangqi --ascii         # Latin letters, for a terminal with no CJK font
+    xiangqi --ucci          # speak UCCI to another program instead
+
+
+THE THREE THINGS THAT ARE NOT LIKE CHESS
+
+Stalemate is a LOSS, not a draw. A player with no legal move loses. This is the
+rule most often got wrong by anyone arriving from chess.
+
+The two generals may not face each other down an open file, so creating that
+position is moving into check and is refused.
+
+Repetition is judged, not counted. Perpetual check loses for the checker;
+perpetually chasing one unprotected piece loses for the chaser. When the judge
+rules, `result` carries the Asian Rules rule NUMBER, because a player who loses a
+won position to rule 19 is owed the number.
+
+
+WHAT A REFUSAL LOOKS LIKE
+
+`play` returns a flag and never throws, and nine of the seventeen flags name one
+rule of the game each:
+
+    elephant_crosses_river    horse_leg_blocked
+    elephant_eye_blocked      cannon_needs_one_screen
+    general_leaves_palace     soldier_no_retreat
+    advisor_leaves_palace     soldier_no_sideways
+    generals_face
+
+So somebody told their elephant cannot cross the river does not come back and
+argue. `Game::Xiangqi::Error` has the list and a sentence for each.
+
+
+THE BOT IS BOUNDED IN NODES AND NEVER IN SECONDS
+
+A rung of `@Game::Xiangqi::Bot::LADDER` is a node budget. Nothing in this
+distribution reads a clock, sets an alarm or handles a signal, so the same
+position gives the same move on a loaded machine as on an idle one, and a game of
+two bots replays move for move. That is what makes a finished game checkable.
+
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+A C compiler is required and Makefile.PL says so plainly, with the command for
+your platform, if one is missing. No non-core dependencies at runtime.
+
+
+THE AUTHOR TESTS
+
+`xt/` holds the slow ones and the one that needs something you have to install.
+`xt/README` explains where to get ElephantEye, which is the only check on the move
+generator in this distribution that is not a published table.
+
+
+LICENCE AND COPYRIGHT
+
+Copyright (C) 2026 LNATION
+
+This program is released under the Artistic License 2.0.

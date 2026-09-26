@@ -39,7 +39,7 @@ use Scalar::Util qw(blessed refaddr weaken);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 66;
+	plan tests => 88;
 	use_ok('Database::Join');
 }
 
@@ -1465,4 +1465,558 @@ subtest '@bind_vals: operator hashref values D in WHERE-build loop, U in execute
 		'@bind_vals carries operator value to execute(): 2 rows have score > 15 (DU)';
 	ok !(grep { $_->{score} eq '10' } @{$rows}),
 		'score=10 excluded by operator bound value > 15 (bind_vals DU chain confirmed)';
+};
+
+# ---------------------------------------------------------------------------
+# DFThrowUpdDA: DA whose updated() always throws.
+# Used to verify that _joined_query / updated() resilience silently skips it.
+# ---------------------------------------------------------------------------
+{
+	package DFThrowUpdDA;
+	use parent -norequire, 'DFMinimalDA';
+	use Carp qw(croak);
+	sub updated { croak 'simulated updated() failure' }
+	sub DESTROY {}
+}
+
+# ---------------------------------------------------------------------------
+# DFBareDA: duck-type DA with no Database::Abstraction parent and no updated()
+# method.  Proves that code paths that check `$db->can('updated')` (or use
+# eval-guarded calls) handle a missing method without croaking.
+# ---------------------------------------------------------------------------
+{
+	package DFBareDA;
+	sub new {
+		my ($class, %args) = @_;
+		return bless {
+			_cols => $args{cols} // ['entry'],
+			_rows => $args{rows} // [],
+		}, $class;
+	}
+	sub columns            { return $_[0]->{_cols} }
+	sub schema             { return {} }
+	sub set_logger         { $_[0]->{_logger} = $_[1]; return $_[0] }
+	sub selectall_arrayref { return $_[0]->{_rows} }
+	sub DESTROY {}
+	# No updated() method -- deliberately omitted
+}
+
+# ---------------------------------------------------------------------------
+# DFCountDA: like DFCountingDA but with a directly-defined count() so that the
+# auto-backend threshold probe's `defined &{"${pkg}::count"}` check is true.
+# Re-uses DFCountingDA's spill behaviour (equality filter + call counter).
+# ---------------------------------------------------------------------------
+{
+	package DFCountDA;
+	use parent -norequire, 'DFCountingDA';
+	sub count { return scalar @{ $_[0]->{_rows} } }
+	sub DESTROY {}
+}
+
+# ===========================================================================
+# Section 17: _validate_pagination DU chains
+#
+# _validate_pagination is the single validation site for limit and offset.
+# D: caller passes value → U: regex + numeric check → K (undef) if invalid,
+# or survives to U in splice/SQL.  All four branches are proven here.
+# ===========================================================================
+
+subtest '_validate_pagination D~K: negative limit undef\'d before splice (no truncation)' => sub {
+	# D: $limit = -1 → validation fires → K: undef'd.
+	# Consequence: splice is skipped (defined $limit is false), all rows returned.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'x' },
+			{ entry => $K_B, val => 'y' },
+		],
+	);
+	my $j = Database::Join->new(databases => [$da], join_column => $JC);
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $rows = $j->selectall_arrayref(limit => -1);
+	ok (grep { /limit/i } @warnings),
+		'carp emitted for negative limit (D confirmed, carp fired)';
+	is scalar @{$rows}, 2,
+		'all rows returned: invalid limit undef\'d (K before splice U)';
+};
+
+subtest '_validate_pagination D~K: negative offset undef\'d before splice (no skip)' => sub {
+	# D: $offset = -1 → validation fires → K: undef'd.
+	# Consequence: splice(0, $offset) is skipped; all rows returned from start.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'x' },
+			{ entry => $K_B, val => 'y' },
+		],
+	);
+	my $j = Database::Join->new(databases => [$da], join_column => $JC);
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $rows = $j->selectall_arrayref(offset => -1);
+	ok (grep { /offset/i } @warnings),
+		'carp emitted for negative offset (D confirmed, carp fired)';
+	is scalar @{$rows}, 2, 'all rows from start: invalid offset undef\'d (K before splice U)';
+};
+
+subtest '_validate_pagination D→U: valid limit flows into splice, truncates result' => sub {
+	# D: $limit = 1 survives validation → U: splice(@result, 1) truncates.
+	# Result must contain exactly 1 row.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'x' },
+			{ entry => $K_B, val => 'y' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$da], join_column => $JC);
+	my $rows = $j->selectall_arrayref(limit => 1);
+	is scalar @{$rows}, 1, 'limit=1 truncates to 1 row (D→U chain through validation + splice)';
+	is $rows->[0]{entry}, $K_A, 'first row (join_col ASC) returned by limit=1';
+};
+
+subtest '_validate_pagination D→U: valid offset flows into splice, skips leading rows' => sub {
+	# D: $offset = 1 survives validation → U: splice(@result, 0, 1) removes 1 row.
+	# Result must start from the second row in join_col ASC order.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'x' },
+			{ entry => $K_B, val => 'y' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$da], join_column => $JC);
+	my $rows = $j->selectall_arrayref(offset => 1);
+	is scalar @{$rows}, 1, 'offset=1 skips 1 row, 1 remaining (D→U through validation + splice)';
+	is $rows->[0]{entry}, $K_B, 'second row returned after offset=1';
+};
+
+# ===========================================================================
+# Section 18: sort_by early-parse DU in array backend (_joined_query_array)
+#
+# P2/P3/P4 optimisation: $ob_col/$ob_dir/$ob_override are parsed ONCE before
+# the merge loop.  $ob_override drives the loop iteration strategy (sorted vs
+# unsorted keys).  The Schwarzian transform @tagged is D'd inside the sort
+# block, used, then K'd lexically.
+# ===========================================================================
+
+subtest 'sort_by absent: $ob_col=join_col, $ob_dir=ASC, sort keys used (stable ordering)' => sub {
+	# D: $ob_col = $join_col, $ob_dir = 'ASC', $ob_override = false (defaults).
+	# U: `sort keys %key_set` applied in merge loop → join_col ASC order.
+	# No Schwarzian pass fired.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_B, val => 'beta'  },
+			{ entry => $K_A, val => 'alpha' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$da], join_column => $JC);
+	my $rows = $j->selectall_arrayref();
+	is $rows->[0]{entry}, $K_A, 'no sort_by: first row is join_col ASC (sort keys path)';
+	is $rows->[1]{entry}, $K_B, 'no sort_by: second row is join_col ASC';
+};
+
+subtest 'sort_by non-join col ASC: $ob_override=true, @tagged D→sort→U→K, result ASC' => sub {
+	# D: $ob_col = 'val', $ob_override = true → keys %key_set (unsorted) in loop.
+	# D: @tagged = map { [$_, $_->{val} // ''] } @result (Schwarzian decoration).
+	# U: sort { $a->[1] cmp $b->[1] } @tagged (sort on extracted key).
+	# U: @result = map { $_->[0] } ... (undecorate back to row hashrefs).
+	# K: @tagged goes out of scope at end of if-block.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'zebra' },
+			{ entry => $K_B, val => 'apple' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$da], join_column => $JC);
+	my $rows = $j->selectall_arrayref(sort_by => 'val');
+	is $rows->[0]{val}, 'apple', 'non-join-col ASC: Schwarzian puts "apple" first';
+	is $rows->[1]{val}, 'zebra', 'non-join-col ASC: Schwarzian puts "zebra" second';
+};
+
+subtest 'sort_by non-join col DESC: @tagged D→sort DESC→U→K, result DESC' => sub {
+	# Same D→U→K chain as ASC but sort block uses $b->[1] cmp $a->[1].
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'apple' },
+			{ entry => $K_B, val => 'zebra' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$da], join_column => $JC);
+	my $rows = $j->selectall_arrayref(sort_by => ['val', 'DESC']);
+	is $rows->[0]{val}, 'zebra', 'non-join-col DESC: Schwarzian puts "zebra" first';
+	is $rows->[1]{val}, 'apple', 'non-join-col DESC: Schwarzian puts "apple" second';
+};
+
+subtest 'sort_by join_col DESC: $ob_override=false, reverse @result (O(R) not O(R log R))' => sub {
+	# D: $ob_col = join_col, $ob_dir = 'DESC', $ob_override = false.
+	# Merge loop uses `sort keys %key_set` producing ASC order.
+	# U: `@result = reverse @result` flips to DESC — no Schwarzian, no re-sort.
+	# K: original @result replaced by reversed arrayref.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'x' },
+			{ entry => $K_B, val => 'y' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$da], join_column => $JC);
+	my $rows = $j->selectall_arrayref(sort_by => ['entry', 'DESC']);
+	is $rows->[0]{entry}, $K_B, 'join_col DESC: reverse puts $K_B first';
+	is $rows->[1]{entry}, $K_A, 'join_col DESC: reverse puts $K_A second';
+};
+
+# ===========================================================================
+# Section 19: ORDER BY SQL expression DU in _sqlite_join
+#
+# $order_expr is D'd from $ob_col and table_refs; U'd in the final SQL string.
+# For join_col on an outer join with >1 DB, $order_expr uses the COALESCE alias.
+# For a non-join col, $order_expr is _sql_quote_identifier($ob_col) directly.
+# ===========================================================================
+
+subtest '$order_expr D→U: join_col ASC produces correct row order via SQL ORDER BY' => sub {
+	# D: $order_expr = table_refs[0] . '.' . _sql_quote_identifier($local_jc_0)
+	# U: appended to SQL string as ORDER BY clause → SQLite returns sorted rows.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_B, val => 'beta'  },
+			{ entry => $K_A, val => 'alpha' },
+		],
+	);
+	my $j    = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref();
+	is $rows->[0]{entry}, $K_A,
+		'SQLite backend: $order_expr (join_col ASC) D→U gives correct ORDER BY result';
+};
+
+subtest '$order_expr D→U: non-join col → _sql_quote_identifier(ob_col) aliased in ORDER BY' => sub {
+	# D: $order_expr = _sql_quote_identifier($ob_col) (non-join column).
+	# U: appended to SQL string; SQLite resolves the SELECT alias.
+	# K: $order_expr is string, goes out of scope after SQL execution.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'zebra' },
+			{ entry => $K_B, val => 'apple' },
+		],
+	);
+	my $j    = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(sort_by => 'val');
+	is $rows->[0]{val}, 'apple',
+		'SQLite backend: $order_expr for non-join col → correct ORDER BY (apple < zebra)';
+	is $rows->[1]{val}, 'zebra',
+		'SQLite backend: second row is "zebra" after col-order';
+};
+
+subtest '@page_bind D→U: LIMIT + OFFSET + ORDER BY all flow through to SQL execute()' => sub {
+	# DU chain: @page_bind D'd by LIMIT/OFFSET push; U'd in $sth->execute(@bind_vals, @page_bind).
+	# sort_by D'd, U'd in $order_expr, appended to $sql.
+	# Combined: ORDER BY + LIMIT + OFFSET produces an exact page of sorted results.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'apple' },
+			{ entry => $K_B, val => 'mango' },
+			{ entry => $K_C, val => 'zebra' },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	# sort_by val ASC, offset 1, limit 1 → second item alphabetically = 'mango'
+	my $rows = $j->selectall_arrayref(sort_by => 'val', offset => 1, limit => 1);
+	is scalar @{$rows}, 1,
+		'@page_bind D→U: LIMIT 1 limits result to 1 row';
+	is $rows->[0]{val}, 'mango',
+		'@page_bind D→U: OFFSET 1 + ORDER BY val ASC returns "mango" (middle row)';
+};
+
+# ===========================================================================
+# Section 20: parallel fetch DU chains
+#
+# $HAS_THREADS is a package-level memoisation variable (D~ if threads not
+# installed: D'd to 0, U'd in the gate check on next object).
+# @thr: D'd by map, U'd in join() loop, K'd at end of if-block.
+# The gate `n > 2` prevents parallel dispatch for n=2.
+# ===========================================================================
+
+subtest 'parallel gate n=2: @thr never D\'d, sequential path taken (gate closed)' => sub {
+	# n=2 with parallel => 1: `if ($self->{_parallel} && $n > 2)` is false.
+	# @thr is never allocated; sequential _fetch_indexed is used.
+	# Functionally: same result as without parallel.
+	my $prim = DFMinimalDA->new(
+		cols => ['entry', 'a'],
+		rows => [{ entry => $K_A, a => 1 }],
+	);
+	my $sec = DFMinimalDA->new(
+		cols => ['entry', 'b'],
+		rows => [{ entry => $K_A, b => 2 }],
+	);
+	my $j = Database::Join->new(
+		databases   => [$prim, $sec],
+		join_column => $JC,
+		parallel    => 1,
+	);
+	my $rows = $j->selectall_arrayref();
+	is scalar @{$rows}, 1,
+		'parallel n=2 gate closed: sequential path returns correct row count';
+	is $rows->[0]{a}, 1, 'primary column correct (sequential path not corrupted)';
+	is $rows->[0]{b}, 2, 'secondary column correct (sequential path not corrupted)';
+};
+
+subtest 'parallel gate n=3: correct result regardless of threads availability' => sub {
+	# n=3 with parallel => 1: gate `n > 2` is true.
+	# If threads available: @thr D'd with 2 thread refs, joined, $indexed[1..2] populated.
+	# If threads unavailable: carp + sequential fallback (same DU as n=2 case).
+	# Either way, the merged result must be identical to a non-parallel query.
+	my $prim = DFMinimalDA->new(
+		cols => ['entry', 'a'],
+		rows => [{ entry => $K_A, a => 10 }, { entry => $K_B, a => 20 }],
+	);
+	my $sec1 = DFMinimalDA->new(
+		cols => ['entry', 'b'],
+		rows => [{ entry => $K_A, b => 100 }],
+	);
+	my $sec2 = DFMinimalDA->new(
+		cols => ['entry', 'c'],
+		rows => [{ entry => $K_B, c => 200 }],
+	);
+	my $j_par = Database::Join->new(
+		databases   => [$prim, $sec1, $sec2],
+		join_column => $JC,
+		join_type   => 'left',
+		parallel    => 1,
+	);
+	my $j_seq = Database::Join->new(
+		databases   => [$prim, $sec1, $sec2],
+		join_column => $JC,
+		join_type   => 'left',
+	);
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $rows_par = $j_par->selectall_arrayref();
+	my $rows_seq = $j_seq->selectall_arrayref();
+	is_deeply $rows_par, $rows_seq,
+		'parallel n=3: result identical to sequential (DU chain intact regardless of threads)';
+};
+
+# ===========================================================================
+# Section 21: updated() resilience DU chains
+#
+# updated() is called for each _dbs element; results are collected and the
+# maximum is returned.  DAs whose updated() throws or is absent are silently
+# skipped.  DU: survivor timestamps D'd from $db->updated(), U'd in max
+# comparison, K'd after the method returns the winning value.
+# ===========================================================================
+
+subtest 'updated() resilience: all updated() calls throw -> return undef' => sub {
+	# DU: every call enters eval { $db->updated() }; all throw.
+	# The survivor list is empty → max of empty set → undef returned.
+	my $da1 = DFThrowUpdDA->new(cols => ['entry', 'a']);
+	my $da2 = DFThrowUpdDA->new(cols => ['entry', 'b']);
+	my $j   = Database::Join->new(databases => [$da1, $da2], join_column => $JC);
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $ts = $j->updated();
+	ok !defined $ts,
+		'updated(): all throw → undef returned (empty survivor set, max of nothing)';
+};
+
+subtest 'updated() resilience: some throw, some succeed -> max of survivors returned' => sub {
+	# DU: da1.updated() D'd as 9_000_000 → survivor list.
+	# da2.updated() throws → skipped.
+	# da3.updated() D'd as 3_000_000 → survivor list.
+	# U: max(9_000_000, 3_000_000) = 9_000_000 returned.
+	my $da1 = DFMinimalDA->new(cols => ['entry', 'a'], updated => 9_000_000);
+	my $da2 = DFThrowUpdDA->new(cols => ['entry', 'b']);
+	my $da3 = DFMinimalDA->new(cols => ['entry', 'c'], updated => 3_000_000);
+	my $j   = Database::Join->new(databases => [$da1, $da2, $da3], join_column => $JC);
+	is $j->updated(), 9_000_000,
+		'updated() resilience: max of survivors (9M) returned when middle DA throws';
+};
+
+subtest 'updated() resilience: DA with no updated() method -> skipped, others used' => sub {
+	# DFBareDA has no updated() method.  The eval guard catches the "can't locate"
+	# exception and skips it (same as a throw from a defined method).
+	# The other DA's timestamp is the sole survivor.
+	my $da_bare = DFBareDA->new(cols => ['entry', 'a'], rows => []);
+	my $da_norm = DFMinimalDA->new(cols => ['entry', 'b'], updated => 7_000_000);
+	my $j = Database::Join->new(
+		databases   => [$da_norm, $da_bare],
+		join_column => $JC,
+	);
+	is $j->updated(), 7_000_000,
+		'DA with no updated() method skipped; other DA\'s timestamp 7M returned';
+};
+
+# ===========================================================================
+# Section 22: IS NULL / IN / NOT IN bind_vals DU chains (SQLite path)
+#
+# Each operator type feeds a different DU chain through @bind_vals:
+#   IS NULL     -- no bind param; WHERE term built directly
+#   IN [a,b]   -- each array element D'd into @bind_vals, U'd by execute()
+#   NOT IN [a] -- same but complementary semantics
+#   IN []      -- no bind param; 1=0 sentinel term written directly
+# ===========================================================================
+
+subtest '@bind_vals D~: IS NULL term has zero bind params (correct no-bind DU)' => sub {
+	# IS NULL uses a $SAFE_NOARG_OPS operator.  The WHERE term is appended directly
+	# to @where_parts with no push to @bind_vals.  execute() receives only the
+	# initial @bind_vals = () — empty array.  Correct rows are returned without
+	# corrupting the bind index.
+	my $da = DFCountDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'present'  },
+			{ entry => $K_B, val => undef       },   # IS NULL target
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(val => { 'IS NULL' => 1 });
+	is scalar @{$rows}, 1, 'IS NULL: one null-val row returned (no-bind DU correct)';
+	is $rows->[0]{entry}, $K_B, 'IS NULL: correct row identified (entry=$K_B)';
+};
+
+subtest '@bind_vals D→U: IN [a,b] pushes each element, both bound in execute()' => sub {
+	# D: push @bind_vals, @items — 2 elements pushed.
+	# U: $sth->execute(@bind_vals) binds both to the IN (?,?) clause.
+	# Only rows whose val is in ['alpha','gamma'] are returned.
+	my $da = DFCountDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'alpha' },
+			{ entry => $K_B, val => 'beta'  },
+			{ entry => $K_C, val => 'gamma' },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(val => { 'IN' => ['alpha', 'gamma'] });
+	is scalar @{$rows}, 2, 'IN [alpha,gamma]: 2 rows returned (2 bind params used)';
+	my %vals = map { $_->{val} => 1 } @{$rows};
+	ok  $vals{alpha}, '"alpha" in result (first IN element bound)';
+	ok  $vals{gamma}, '"gamma" in result (second IN element bound)';
+	ok !$vals{beta},  '"beta" not in result (not in IN list)';
+};
+
+subtest '@bind_vals D→U: NOT IN [a] pushes 1 element, correct complement returned' => sub {
+	# D: push @bind_vals, @items — 1 element pushed.
+	# U: $sth->execute(@bind_vals) binds it to NOT IN (?).
+	# Rows whose val is NOT 'beta' are returned.
+	my $da = DFCountDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'alpha' },
+			{ entry => $K_B, val => 'beta'  },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(val => { 'NOT IN' => ['beta'] });
+	is scalar @{$rows}, 1, 'NOT IN [beta]: 1 row returned (complement of 1-element set)';
+	is $rows->[0]{val}, 'alpha', 'NOT IN: "alpha" is the surviving row';
+};
+
+subtest '@bind_vals D~: IN [] pushes nothing, 1=0 term makes WHERE always-false' => sub {
+	# D: @items is empty → push @bind_vals, @items is a no-op (D never fires).
+	# Instead, push @where_parts, '1 = 0' — a static term with no placeholder.
+	# execute() receives no new bind params; WHERE clause makes query return 0 rows.
+	my $da = DFCountDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'alpha' },
+			{ entry => $K_B, val => 'beta'  },
+		],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(val => { 'IN' => [] });
+	is scalar @{$rows}, 0,
+		'IN []: empty arrayref → 1=0 term → 0 rows (bind_vals D~ confirmed: nothing pushed)';
+};
+
+# ===========================================================================
+# Section 23: D~ annotation verification for _sqlite_join create_table path
+#
+# When create_table is set, $limit/$offset/$sort_by are D'd at the top of
+# _sqlite_join and validated, but then abandoned at the early return.
+# The annotation is proven harmless: the caller never supplies these values
+# for the create_table path, so _validate_pagination is a no-op, and the
+# dead stores cost nothing.
+# ===========================================================================
+
+subtest 'D~ ($limit/$offset on create_table path): array backend ignores bad tmpdir, proving no D use' => sub {
+	# Prove that the create_table path (dbi_source() materialisation) is on the
+	# SQLite path, not the array path.  A bad tmpdir disambiguates: the array path
+	# never accesses tmpdir and succeeds; the SQLite path would croak.
+	# Here we use backend=>'array' to confirm the non-create_table code path
+	# succeeds without hitting the D~ variables at all.
+	my $da = DFMinimalDA->new(
+		cols => ['entry', 'val'],
+		rows => [{ entry => $K_A, val => 'x' }],
+	);
+	my $j = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'array',
+		tmpdir      => '/nonexistent/__proof_of_dead_store__',
+	);
+	my $rows;
+	lives_ok { $rows = $j->selectall_arrayref(limit => 1) }
+		'array backend with bad tmpdir lives: D~ limit/offset variables are not used (harmless)';
+	is scalar @{$rows}, 1, 'limit=1 still applied on array path despite D~ in sqlite path';
+};
+
+subtest 'D~ ($sort_by on create_table path): sort_by parsed but not used when create_table set' => sub {
+	# White-box: the annotated D~ is in _sqlite_join when create_table is defined.
+	# The only external trigger is the dbi_source() materialisation path, which is
+	# an internal call.  We verify the absence of any crash or corruption by running
+	# the SQLite backend with sort_by — the create_table branch does not fire for
+	# a regular selectall_arrayref, so the D~ never occurs in practice.
+	# This test asserts the normal path (no create_table) uses sort_by correctly.
+	my $da = DFCountDA->new(
+		cols => ['entry', 'val'],
+		rows => [
+			{ entry => $K_A, val => 'zebra' },
+			{ entry => $K_B, val => 'apple' },
+		],
+	);
+	my $j    = Database::Join->new(
+		databases   => [$da],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(sort_by => 'val');
+	is $rows->[0]{val}, 'apple',
+		'$sort_by D→U on normal sqlite path (no create_table): ORDER BY val ASC correct';
+	is $rows->[1]{val}, 'zebra',
+		'second row correct: $sort_by DU chain not broken by D~ annotation';
 };

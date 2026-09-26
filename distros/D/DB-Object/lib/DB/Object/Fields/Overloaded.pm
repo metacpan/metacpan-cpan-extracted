@@ -7,7 +7,6 @@
 ## Modified 2026/03/22
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -16,6 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( DB::Object::Query::Element );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     use overload (
@@ -80,6 +80,9 @@ The purpose of this package is to tag overloaded operation so we can handle them
 
 =head2 expression
 
+    my $value = $field->expression;
+    $field->expression( $value );
+
 Sets or gets the resulting expression from the overloaded field resulting from an operation.
 
 =head1 AUTHOR
@@ -92,7 +95,7 @@ L<DB::Object::Fields::Field>, L<DB::Object::Fields>, L<DB::Object::Fields::Unkno
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
+Copyright(c) 2021-2026 DEGUEST Pte. Ltd.
 
 All rights reserved
 

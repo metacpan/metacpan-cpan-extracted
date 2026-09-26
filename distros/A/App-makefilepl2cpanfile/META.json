@@ -4,9 +4,9 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -30,43 +30,45 @@
             "ExtUtils::MakeMaker" : "6.64"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Needs" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "File::HomeDir" : "0",
             "IPC::System::Simple" : "0",
-            "List::Util" : "1.33",
-            "Params::Get" : "0",
-            "Path::Tiny" : "0",
+            "Params::Get" : "0.17",
+            "Path::Tiny" : "0.034",
             "Readonly" : "0",
             "Text::Diff" : "0",
             "YAML::Tiny" : "0",
             "autodie" : "0",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "File::Temp" : "0",
-            "Test::Carp" : "0",
-            "Test::Compile" : "0",
+            "Module::CPANfile" : "0",
             "Test::DescribeMe" : "0",
             "Test::Memory::Cycle" : "0",
-            "Test::Mockingbird" : "0",
+            "Test::Mockingbird" : "0.13",
             "Test::Most" : "0",
-            "Test::NoWarnings" : "0",
-            "Test::RequiresInternet" : "0",
-            "Test::Returns" : "0",
-            "Test::Warn" : "0",
-            "Test::Which" : "0"
+            "Test::Returns" : "0.04",
+            "Test::Without::Module" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-App-makefilepl2cpanfile@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/App-makefilepl2cpanfile/issues",
-         "x_url" : "https://github.com/nigelhorne/App-makefilepl2cpanfile/issues"
+         "web" : "https://github.com/nigelhorne/App-makefilepl2cpanfile/issues"
       },
       "homepage" : "https://metacpan.org/pod/App::makefilepl2cpanfile",
       "repository" : {
@@ -76,6 +78,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-makefilepl2cpanfile"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

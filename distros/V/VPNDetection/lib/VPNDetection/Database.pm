@@ -7,7 +7,7 @@ use Carp ();
 
 use VPNDetection::Error;
 
-our $VERSION = '3.3.2';
+our $VERSION = '3.3.3';
 
 # The formats a dataset is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.

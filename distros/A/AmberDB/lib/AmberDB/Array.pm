@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.25.2';
+our $VERSION = '5.26.0';
 my $CREATED = '2018-02-23';
 
 # TODO
@@ -404,19 +404,34 @@ sub array_sort {
     # Normalize and auto-detect type
     $type = lc( $type // '' );
     if ( !$type || $type eq 'auto' ) {
-        my $sample = defined $field
-            ? ( ( ref( $records[0] ) eq 'ARRAY' ) ? $records[0]->[$field] : $records[0] )
-            : $records[0];
-        $type = ( defined $sample && $sample =~ /^-?[0-9]+(?:\.[0-9]+)?$/ ) ? 'num' : 'ascii';
+        my $sample;
+        for my $r (@records) {
+            my $val = defined $field
+                ? ( ( ref($r) eq 'ARRAY' ) ? $r->[$field] : $r )
+                : $r;
+            if ( defined $val && $val ne '' ) {
+                $sample = $val;
+                last;
+            }
+        }
+        $type = ( defined $sample && $sample =~ /^-?[0-9]+(?:[.,][0-9]+)?$/ ) ? 'num' : 'ascii';
     }
     my $is_num = ( $type eq 'num' || $type eq 'numeric' || $type eq 'int' || $type eq 'float' || $type eq 'decimal' ) ? 1 : 0;
+
+    my $to_num = sub {
+        my $v = shift;
+        return 0 unless defined $v && length($v);
+        $v =~ tr/,/./;
+        $v =~ s/[^\d.-]//g;
+        return length($v) ? 0 + $v : 0;
+    };
 
     # Sorting execution
     if ( defined $field && $is_aoa ) {
         if ($is_num) {
             @records = $is_desc
-                ? sort { ( $b->[$field] // 0 ) <=> ( $a->[$field] // 0 ) } @records
-                : sort { ( $a->[$field] // 0 ) <=> ( $b->[$field] // 0 ) } @records;
+                ? sort { $to_num->($b->[$field]) <=> $to_num->($a->[$field]) } @records
+                : sort { $to_num->($a->[$field]) <=> $to_num->($b->[$field]) } @records;
         }
         else {
             @records = $is_desc
@@ -427,8 +442,8 @@ sub array_sort {
     else {
         if ($is_num) {
             @records = $is_desc
-                ? sort { ( $b // 0 ) <=> ( $a // 0 ) } @records
-                : sort { ( $a // 0 ) <=> ( $b // 0 ) } @records;
+                ? sort { $to_num->($b) <=> $to_num->($a) } @records
+                : sort { $to_num->($a) <=> $to_num->($b) } @records;
         }
         else {
             @records = $is_desc

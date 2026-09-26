@@ -6,9 +6,19 @@ use Carp qw(croak cluck);
 use File::Spec;
 use parent 'AmberDB::Base';
 
-our $VERSION = '5.25.2';
+our $VERSION = '5.26.0';
 
 my $CREATED = '2026-09-06';
+
+# Whitelist of inheritable group-level configuration keys from .dbase to member tables
+our %INHERITABLE_DBASE_KEYS = map { $_ => 1 } qw(
+    use_ramdisk   ramdisk_ttl   use_cache   cache_ttl
+    keep_deleted  log_owner     use_counter
+    use_section   section       use_year    year
+    use_language  lang
+    no_transact   no_backup     table_dir   use_junk
+    use_simple
+);
 
 # =====================================================================
 # SCHEMA FIELD NORMALIZATION, VALIDATION & TYPE CONVERSION
@@ -52,9 +62,9 @@ sub enc_field {
         # 3. Type: date
         elsif ( $type eq 'date' || $type eq 'datetime' || $type eq 'date_short' || $type eq 'date_long' ) {
             if ( ( !defined $val || $val eq '' ) && $valid =~ /auto_date/ ) {
-                my $y = $self->{date}->{year}  // ( 1900 + (localtime)[5] );
-                my $m = $self->{date}->{month} // sprintf( "%02d", (localtime)[4] + 1 );
-                my $d = $self->{date}->{day}   // sprintf( "%02d", (localtime)[3] );
+                my $y = $self->year;
+                my $m = $self->month;
+                my $d = $self->day;
                 $val = "$y-$m-$d";
             }
             else {
@@ -280,6 +290,25 @@ sub schema_arg {
 # SCHEMA LOADERS, ATTRIBUTES & WRITERS
 # =====================================================================
 
+# Safely evaluates a Perl schema definition file via `do`.
+# Normalizes paths, catches syntax errors and verifies hash structure.
+# ---------------------------------------------------------------------------
+sub do_schema {
+    my ( $self, $path ) = @_;
+    return unless defined $path && length $path && -f $path;
+
+    $path =~ s{\\}{/}g;
+    $path = "./$path" unless $path =~ m{^(?:\./|/|[a-zA-Z]:)};
+
+    my $data = eval { do $path };
+    if ($@) {
+        cluck "[AMBERDB_SCHEMA] Syntax error in schema file '$path': $@\n";
+        return undef;
+    }
+
+    return ( ref($data) eq 'HASH' ) ? $data : undef;
+}
+
 # Retrieves database group schema definition.
 # my $dbase_info = $adb->dbase_info($dbase);
 # ------------------------------------------------
@@ -298,25 +327,42 @@ sub dbase_info {
         $target_path = "$ramdisk_schema/$dbase.dbase";
     }
 
-    if ( -e $target_path ) {
-        $target_path =~ s{\\}{/}g;
-        $target_path = "./$target_path" unless $target_path =~ m{^(?:\./|/|[a-zA-Z]:)};
-        my $do_data = do $target_path;
-        if ($do_data) {
-            $self->{_dbase}->{$dbase} = $do_data;
-            if ( $ramdisk_schema && !-e "$ramdisk_schema/$dbase.dbase" && $self->dir_exist($ramdisk_schema) ) {
-                require File::Copy;
-                eval { File::Copy::copy( $dbase_path, "$ramdisk_schema/$dbase.dbase" ) };
-            }
-        }
-        else {
-            if ($@) {
-                cluck "[AMBERDB_SCHEMA] Syntax error in dbase schema file '$target_path': $@\n";
-            }
+    if ( my $do_data = $self->do_schema($target_path) ) {
+        $do_data->{name} = $self->utf_decode( $do_data->{name} ) if defined $do_data->{name};
+        $self->{_dbase}->{$dbase} = $do_data;
+        if ( $ramdisk_schema && !-e "$ramdisk_schema/$dbase.dbase" && $self->dir_exist($ramdisk_schema) ) {
+            require File::Copy;
+            eval { File::Copy::copy( $dbase_path, "$ramdisk_schema/$dbase.dbase" ) };
         }
     }
 
     return $self->{_dbase}->{$dbase};
+}
+
+# Applies inherited configuration from the database group (.dbase) to a table schema.
+# Only copies whitelisted keys (%INHERITABLE_DBASE_KEYS) that are not already defined
+# on the table schema (preserving table-level overrides).
+sub _apply_dbase_inheritance {
+    my ( $self, $table, $schema ) = @_;
+
+    return unless ref($schema) eq 'HASH';
+
+    my $dbase = $schema->{dbase};
+    if ( !defined $dbase || !length $dbase ) {
+        my $t = defined $table ? $table : ( $schema->{table} // '' );
+        ($dbase) = ( $t =~ /^([a-z0-9]+)_/i );
+        $dbase //= "";
+    }
+    return unless length $dbase;
+
+    my $dbase_info = $self->dbase_info($dbase);
+    return unless $dbase_info && ref($dbase_info) eq 'HASH';
+
+    for my $key ( keys %INHERITABLE_DBASE_KEYS ) {
+        if ( exists $dbase_info->{$key} && !exists $schema->{$key} ) {
+            $schema->{$key} = $dbase_info->{$key};
+        }
+    }
 }
 
 # ============================================================================
@@ -342,6 +388,31 @@ sub normalize_blocks {
         $dbase //= "";
         $schema->{dbase} = $dbase unless defined $schema->{dbase} && length $schema->{dbase};
     }
+
+    # Normalize UTF-8 characters on schema identity and block definitions
+    $schema->{name} = $self->utf_decode( $schema->{name} ) if defined $schema->{name};
+    if ( ref( $schema->{blocks} ) eq 'ARRAY' ) {
+        for my $b ( @{ $schema->{blocks} } ) {
+            next unless ref($b) eq 'HASH';
+            for my $k (qw(name option valid)) {
+                $b->{$k} = $self->utf_decode( $b->{$k} ) if defined $b->{$k};
+            }
+        }
+    }
+    if ( ref( $schema->{facet_block} ) eq 'ARRAY' ) {
+        for my $fb ( @{ $schema->{facet_block} } ) {
+            next unless ref($fb) eq 'HASH';
+            for my $k (qw(label name title)) {
+                $fb->{$k} = $self->utf_decode( $fb->{$k} ) if defined $fb->{$k};
+            }
+        }
+    }
+
+    # ------------------------------------------------------------------------
+    # Pipeline Step 0b: Dbase Schema Group Inheritance
+    # Inherit whitelisted operational flags from .dbase if not overridden.
+    # ------------------------------------------------------------------------
+    $self->_apply_dbase_inheritance( $table, $schema );
 
     # ------------------------------------------------------------------------
     # Pipeline Step 1: Global Configuration Inheritance
@@ -372,7 +443,7 @@ sub normalize_blocks {
         $schema->{use_simple}  = 1;
         $schema->{no_backup}   = 1;
         $schema->{no_transact} = 1;
-        $schema->{ramdisk_ttl} = 300 unless defined $schema->{ramdisk_ttl} && $schema->{ramdisk_ttl} > 0;
+        $schema->{ramdisk_ttl} = 300 unless defined $schema->{ramdisk_ttl};
     }
 
     # ------------------------------------------------------------------------
@@ -503,31 +574,24 @@ sub table_info {
     my $ramdisk_schema = $self->path('schema_rdir');
     my $target_path    = $table_path;
     if ( $ramdisk_schema && -e "$ramdisk_schema/$table.table" ) {
+        if ( -e $table_path && ( ( stat($table_path) )[9] > ( stat("$ramdisk_schema/$table.table") )[9] ) ) {
+            require File::Copy;
+            eval { File::Copy::copy( $table_path, "$ramdisk_schema/$table.table" ) };
+        }
         $target_path = "$ramdisk_schema/$table.table";
     }
 
-    if ( -e $target_path ) {
-        $target_path =~ s{\\}{/}g;
-        $target_path = "./$target_path" unless $target_path =~ m{^(?:\./|/|[a-zA-Z]:)};
-        my $do_data = do $target_path;
-        if ($do_data) {
-            $self->normalize_blocks( $table, $do_data );
-            $self->{_table}->{$table} = $do_data;
+    if ( my $do_data = $self->do_schema($target_path) ) {
+        $self->normalize_blocks( $table, $do_data );
+        $self->{_table}->{$table} = $do_data;
 
-            if ( $ramdisk_schema && !-e "$ramdisk_schema/$table.table" && $self->dir_exist($ramdisk_schema) ) {
-                require File::Copy;
-                eval { File::Copy::copy( $table_path, "$ramdisk_schema/$table.table" ) };
-            }
-            if ( $do_data->{use_ramdisk} ) {
-                $do_data->{_ramdisk_ensured} = 1;
-                $self->ramdisk_ensure($table);
-            }
+        if ( $ramdisk_schema && !-e "$ramdisk_schema/$table.table" && $self->dir_exist($ramdisk_schema) ) {
+            require File::Copy;
+            eval { File::Copy::copy( $table_path, "$ramdisk_schema/$table.table" ) };
         }
-        else {
-            if ($@) {
-                cluck "[AMBERDB_SCHEMA] Syntax error in table schema file '$target_path': $@\n";
-                return {};
-            }
+        if ( $do_data->{use_ramdisk} ) {
+            $do_data->{_ramdisk_ensured} = 1;
+            $self->ramdisk_ensure($table);
         }
     }
     else {
@@ -570,8 +634,7 @@ sub table_path {
     }
 
     # load table info first
-    $self->table_info($table);
-    my $table_info = $self->{_table}->{$table};
+    my $table_info = $self->table_info($table);
 
     # Volatile RAM-Disk Tier 3: table lives strictly on RAM-disk
     if ( $table_info && ( $table_info->{use_ramdisk} // 0 ) == 3 && $self->ramdisk_is_mounted() ) {
@@ -614,12 +677,12 @@ sub table_path {
     }
 
     if ( $table_info && exists $table_info->{table_dir} ) {
-        my $tdir = $table_info->{table_dir};
-        if ( defined $tdir && length $tdir ) {
+        my $tdir = $table_info->{table_dir} // '';
+        if ( $tdir ) {
             $tdir =~ s{^[\\/]+|[\\/]+$}{}g;
             $dbase_dir .= "/$tdir";
         }
-        # if defined $tdir && length $tdir == 0 (table_dir => ''), overwrite default: keep $dbase_dir directly
+        # if length $tdir == 0 (table_dir => ''), overwrite default: keep $dbase_dir directly
     }
     else {
         # if using year
@@ -630,7 +693,7 @@ sub table_path {
                 or $self->{_table}->{$table}->{year} )
           )
         {
-            $yeardir = $self->path('year_dir') || $self->{date}->{year};
+            $yeardir = $self->path('year_dir') || $self->year;
         }
         else {
             delete( $self->{_dbase}->{$dbase}->{year} )
@@ -874,6 +937,133 @@ sub table_infset {
     }
 
     return 1;
+}
+
+# my $norm_info = $adb->norm_info($table_id);
+# ------------------------------------------------
+sub norm_info {
+    my ( $self, $arg ) = @_;
+
+    return {} unless $arg;
+    return {} if $self->config('simple');
+
+    my ( $table, $norm_path ) = $self->schema_arg( $arg, "norm" );
+    $table && $norm_path or return {};
+
+    $self->{_norm} ||= {};
+    if ( $self->{_norm}->{$table} && %{ $self->{_norm}->{$table} } ) {
+        return { %{ $self->{_norm}->{$table} } };
+    }
+
+    if ( my $do_data = $self->do_schema($norm_path) ) {
+        $self->{_norm}->{$table} = $do_data;
+        return $do_data;
+    }
+    return {};
+}
+
+# my $norm_hash = $adb->field_normalize($table_id, $raw_string, [$opts]);
+# ------------------------------------------------
+sub field_normalize {
+    my ( $self, $table_id, $raw, $opts ) = @_;
+    return {} unless defined $raw && $raw ne '';
+
+    my $norm_info = $self->norm_info($table_id);
+    return { raw_features => $raw } unless $norm_info && %$norm_info;
+
+    my $str = "$raw";
+    $str =~ s/<br\s*\/?>/ /gi;
+    $str =~ s/\\n/ /g;
+    $str =~ s/\\r/ /g;
+    $str =~ s/\\t/ /g;
+
+    # Preprocess
+    if ( $norm_info->{preprocess} ) {
+        for my $p ( @{ $norm_info->{preprocess} } ) {
+            my ( $pat, $repl ) = @$p;
+            if ( $repl eq q{$1 $2} ) {
+                $str =~ s/$pat/$1 $2/g;
+            }
+            elsif ( $repl eq q{. $1} ) {
+                $str =~ s/$pat/. $1/g;
+            }
+            elsif ( $repl eq q{$1 $2 Sayfa} ) {
+                $str =~ s/$pat/$1 $2 Sayfa/gi;
+            }
+            else {
+                $str =~ s/$pat/$repl/g;
+            }
+        }
+    }
+
+    my %res;
+    if ( $norm_info->{rules} ) {
+        for my $r ( @{ $norm_info->{rules} } ) {
+            my $field = $r->{field};
+
+            if ( $r->{map} ) {
+                for my $m ( @{ $r->{map} } ) {
+                    my ( $pat, $target ) = @$m;
+                    if ( $str =~ $pat ) {
+                        $res{$field} = $target;
+                        last;
+                    }
+                }
+            }
+            elsif ( $r->{match_all} ) {
+                my @matches = ( $str =~ /$r->{match_all}/g );
+                if (@matches) {
+                    if ( ( $r->{select} // 'max' ) eq 'max' ) {
+                        my ($m) = sort { $b <=> $a } @matches;
+                        $res{$field} = $m + 0;
+                    }
+                    elsif ( $r->{select} eq 'min' ) {
+                        my ($m) = sort { $a <=> $b } @matches;
+                        $res{$field} = $m + 0;
+                    }
+                }
+            }
+            elsif ( $r->{match} ) {
+                if ( $str =~ $r->{match} ) {
+                    if ( $r->{format} && ref( $r->{format} ) eq 'CODE' ) {
+                        $res{$field} = $r->{format}->( $1, $2, $3 );
+                    }
+                    elsif ( ( $r->{type} // '' ) eq 'integer' ) {
+                        $res{$field} = $1 + 0;
+                    }
+                    elsif ( ( $r->{type} // '' ) eq 'titlecase' ) {
+                        $res{$field} = ucfirst( lc($1) );
+                    }
+                    elsif ( ( $r->{type} // '' ) eq 'trim' ) {
+                        my $val = $1;
+                        $val =~ s/^\s+|\s+$//g;
+                        $res{$field} = $val;
+                    }
+                    else {
+                        $res{$field} = $1;
+                    }
+                }
+            }
+        }
+    }
+
+    $res{raw_features} = $raw;
+
+    # If source_block or target table schema mapping is requested
+    if ( $opts && $opts->{as_array} ) {
+        my $table_info = $self->table_info($table_id);
+        if ( $table_info && $table_info->{blocks} ) {
+            my @rec;
+            my $blocks = $table_info->{blocks};
+            for my $b (@$blocks) {
+                my $fid = $b->{id};
+                push @rec, ( $res{$fid} // '' );
+            }
+            return \@rec;
+        }
+    }
+
+    return \%res;
 }
 
 1;

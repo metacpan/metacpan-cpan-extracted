@@ -25,13 +25,11 @@ my $schema         = DBIx::Class::Async::Schema->connect(
 
 $schema->await($schema->deploy({ add_drop_table => 1 }));
 
-# ---------------------------------------------------------------------------
 # Seed data
 #
 # sprocket: length 10.00
 # thing:    width  5.00, uses the sprocket above
 # cog:      identified by sprocketLength=10.00 AND thingWidth=5.00
-# ---------------------------------------------------------------------------
 my $sprocket = $schema->resultset('Sprocket')->create({
     sprocketLength => '10.00',
 })->get;
@@ -47,9 +45,7 @@ $schema->resultset('Cog')->create({
     cogPartNum     => 'COG-A1',
 })->get;
 
-# ---------------------------------------------------------------------------
 # Approach A: join/prefetch via DBIC relationship coderef
-# ---------------------------------------------------------------------------
 subtest 'Approach A: cog via join/prefetch relationship' => sub {
 
     my $result = $schema->resultset('Thing')->search(
@@ -77,9 +73,7 @@ subtest 'Approach A: cog via join/prefetch relationship' => sub {
     is( $sprocket_row->sprocketLength + 0, 10,       'Got correct sprocketLength via prefetch'   );
 };
 
-# ---------------------------------------------------------------------------
 # Approach B: helper method find_cog on Thing
-# ---------------------------------------------------------------------------
 subtest 'Approach B: cog via find_cog() helper method on Thing' => sub {
 
     my $result = $schema->resultset('Thing')->find(
@@ -103,9 +97,7 @@ subtest 'Approach B: cog via find_cog() helper method on Thing' => sub {
     is( $cog_row->cogPartNum, 'COG-A1',         'cogPartNum correct via find_cog()'  );
 };
 
-# ---------------------------------------------------------------------------
 # Confirm multiple things can share a sprocket
-# ---------------------------------------------------------------------------
 subtest 'Multiple things can share the same sprocket' => sub {
 
     $schema->resultset('Cog')->create({

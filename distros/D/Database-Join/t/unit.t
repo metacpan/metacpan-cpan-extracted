@@ -20,7 +20,7 @@ use Scalar::Util qw(blessed refaddr);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 102;
+	plan tests => 129;
 	use_ok('Database::Join');
 }
 
@@ -166,6 +166,43 @@ my %LEDGER = (
 	'backend:auto_above_threshold_uses_sqlite'=> 1,
 	'backend:results_identical'               => 1,
 	'backend:error_sqlite_connect'            => 1,
+
+	# sort_by parameter (POD section: "selectall_arrayref / Input / Optional parameter")
+	'ob:asc_array'            => 1,  # sort_by 'col' ASC on array path
+	'ob:desc_array'           => 1,  # sort_by ['col','DESC'] on array path
+	'ob:asc_sqlite'           => 1,  # sort_by ASC on SQLite path
+	'ob:desc_sqlite'          => 1,  # sort_by DESC on SQLite path
+	'ob:unknown_col_carp'     => 1,  # unknown column => carp + default join_col sort
+	'ob:invalid_dir_carp'     => 1,  # invalid direction => carp + ASC fallback
+	'ob:count_drops_silently' => 1,  # count() silently drops sort_by
+
+	# limit / offset pagination (POD section: "selectall_arrayref / Input / Optional parameters")
+	'pg:limit_array'          => 1,  # limit on array path returns at most N rows
+	'pg:offset_array'         => 1,  # offset on array path skips first M rows
+	'pg:limit_sqlite'         => 1,  # limit on SQLite path returns at most N rows
+	'pg:offset_sqlite'        => 1,  # offset on SQLite path skips first M rows
+	'pg:limit_offset_combined'=> 1,  # limit+offset together selects the right window
+	'pg:invalid_limit_carp'   => 1,  # invalid limit => carp + all rows returned
+	'pg:invalid_offset_carp'  => 1,  # invalid offset => carp + no rows skipped
+	'pg:count_drops_silently' => 1,  # count() ignores limit/offset, returns total
+
+	# dbi_source() — composable nested joins (POD section: "dbi_source")
+	'ds:array_returns_undef'    => 1,  # array backend → undef
+	'ds:sqlite_returns_hashref' => 1,  # sqlite backend → {dbh, table}
+	'ds:nested_join_works'      => 1,  # parent join can ATTACH child _dj_result
+	'ds:auto_forces_sqlite'     => 1,  # auto backend forces SQLite for dbi_source
+
+	# parallel => 1 constructor flag (POD section: "new() -- parallel")
+	'par:constructor_accepted'     => 1,  # parallel => 1 accepted without error
+	'par:two_db_no_effect'         => 1,  # n <= 2 databases: no threading, results correct
+	'par:three_db_correct_results' => 1,  # n > 2 databases: results same as sequential
+
+	# schema type consistency validation (warn_schema_type_mismatch)
+	'st:carp_on_mismatch'     => 1,  # carp when shared column types differ at construction
+	'st:no_carp_same_type'    => 1,  # no carp when shared column types agree
+	'st:join_col_exempt'      => 1,  # join column itself is not checked
+	'st:prefixed_exempt'      => 1,  # collision_prefix columns are exempt
+	'st:add_db_emits_carp'    => 1,  # add_database also checks the new database
 );
 
 # ---------------------------------------------------------------------------
@@ -272,6 +309,34 @@ sub _two_db_join {
 	return Database::Join->new(
 		databases   => [$db_a, $db_b],
 		join_column => $JC,
+		%opts,
+	);
+}
+
+# Three-row variant: three distinct names makes ascending/descending sort
+# unambiguous.  Used exclusively for sort_by tests (Section 19).
+sub _three_row_join {
+	my (%opts) = @_;
+	my $db_a = MinimalDA->new(
+		cols => [$JC, $COL_A, $COL_C],
+		rows => [
+			{ entry => 'K1', name => 'Carol', tier => 'silver' },
+			{ entry => 'K2', name => 'Alice', tier => 'gold'   },
+			{ entry => 'K3', name => 'Bob',   tier => 'bronze' },
+		],
+	);
+	my $db_b = MinimalDA->new(
+		cols => [$JC, $COL_B],
+		rows => [
+			{ entry => 'K1', score => 88 },
+			{ entry => 'K2', score => 95 },
+			{ entry => 'K3', score => 70 },
+		],
+	);
+	return Database::Join->new(
+		databases   => [$db_a, $db_b],
+		join_column => $JC,
+		join_type   => 'inner',
 		%opts,
 	);
 }
@@ -686,7 +751,7 @@ subtest 'schema: join_map local alias is not exposed' => sub {
 };
 
 subtest 'schema: last database wins for duplicate column metadata' => sub {
-	plan tests => 1;
+	plan tests => 2;
 	my $db0 = MinimalDA->new(
 		cols   => [$JC, $COL_A],
 		schema => { $JC => { type => 'TEXT' }, $COL_A => { type => 'VARCHAR' } },
@@ -695,9 +760,16 @@ subtest 'schema: last database wins for duplicate column metadata' => sub {
 		cols   => [$JC, $COL_A],
 		schema => { $JC => { type => 'TEXT' }, $COL_A => { type => 'CHAR' } },
 	);
-	my $j = Database::Join->new(databases => [$db0, $db1], join_column => $JC);
+	# Capture the type-mismatch carp; the warning is expected here and is tested
+	# explicitly in Section S23.  Capture it so it does not pollute test output.
+	my @warns;
+	my $j = do {
+		local $SIG{__WARN__} = sub { push @warns, $_[0] };
+		Database::Join->new(databases => [$db0, $db1], join_column => $JC);
+	};
 	is($j->schema()->{$COL_A}{type}, 'CHAR',
 		'schema() uses the last database when the same column appears in multiple databases');
+	ok(scalar @warns, 'type mismatch between DAs triggers a carp at construction');
 	delete $LEDGER{'schema:last_db_wins'};
 };
 
@@ -1646,6 +1718,488 @@ subtest 'error_sqlite_connect: DBI::connect failure croaks with the documented m
 	like($first_line, qr/Failed to open temporary SQLite database/,
 		'error_sqlite_connect: documented message fires when DBI::connect returns undef');
 	delete $LEDGER{'backend:error_sqlite_connect'};
+};
+
+# ===========================================================================
+# SECTION 19 -- sort_by parameter (7 tests)
+#
+# POD guarantees: all query methods accept sort_by => 'col' (ascending)
+# or sort_by => ['col', 'DESC'] (descending).  An unknown column or an
+# invalid direction emits a carp and falls back to the default join_column
+# ascending sort.  count() silently drops sort_by.
+#
+# Both the array backend (Perl sort) and the SQLite backend (SQL ORDER BY)
+# are exercised so identical semantics are confirmed on each path.
+# ===========================================================================
+
+subtest 'sort_by ASC on array path: rows sorted by named column ascending' => sub {
+	plan tests => 2;
+	my $j    = _three_row_join(backend => 'array');
+	my $rows = $j->selectall_arrayref(sort_by => $COL_A);
+	my @names = map { $_->{$COL_A} } @{$rows};
+	is_deeply(\@names, [qw(Alice Bob Carol)],
+		'sort_by name ASC (array): ascending alphabetical order');
+	is(scalar @{$rows}, 3, 'all 3 rows present');
+	delete $LEDGER{'ob:asc_array'};
+};
+
+subtest 'sort_by DESC on array path: rows sorted by named column descending' => sub {
+	plan tests => 1;
+	my $j    = _three_row_join(backend => 'array');
+	my $rows = $j->selectall_arrayref(sort_by => [$COL_A, 'DESC']);
+	my @names = map { $_->{$COL_A} } @{$rows};
+	is_deeply(\@names, [qw(Carol Bob Alice)],
+		'sort_by name DESC (array): descending alphabetical order');
+	delete $LEDGER{'ob:desc_array'};
+};
+
+subtest 'sort_by ASC on SQLite path: SQL ORDER BY applied correctly' => sub {
+	plan tests => 2;
+	my $j    = _three_row_join(backend => 'sqlite');
+	my $rows = $j->selectall_arrayref(sort_by => $COL_A);
+	my @names = map { $_->{$COL_A} } @{$rows};
+	is_deeply(\@names, [qw(Alice Bob Carol)],
+		'sort_by name ASC (SQLite): ascending order from SQL ORDER BY');
+	is(scalar @{$rows}, 3, 'all 3 rows returned');
+	delete $LEDGER{'ob:asc_sqlite'};
+};
+
+subtest 'sort_by DESC on SQLite path: SQL ORDER BY DESC reverses order' => sub {
+	plan tests => 2;
+	my $j    = _three_row_join(backend => 'sqlite');
+	my $rows = $j->selectall_arrayref(sort_by => [$COL_A, 'DESC']);
+	my @names = map { $_->{$COL_A} } @{$rows};
+	is_deeply(\@names, [qw(Carol Bob Alice)],
+		'sort_by name DESC (SQLite): descending order from SQL ORDER BY');
+	is(scalar @{$rows}, 3, 'all 3 rows returned');
+	delete $LEDGER{'ob:desc_sqlite'};
+};
+
+subtest 'sort_by unknown column: carp emitted, result returned in default order' => sub {
+	plan tests => 3;
+	# POD: "An unknown column emits a carp warning and falls back to the default
+	# join_column ascending sort."  The query must not croak.
+	my $j = _three_row_join(backend => 'array');
+	my @warnings;
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $j->selectall_arrayref(sort_by => 'no_such_column');
+	} 'unknown sort_by column does not croak';
+	my @ob_warns = grep { /sort_by.*not in the merged view/i } @warnings;
+	ok(scalar @ob_warns,
+		'carp fired for unknown sort_by column (documented warning)');
+	is(scalar @{$rows}, 3, 'all 3 rows returned despite bad sort_by');
+	delete $LEDGER{'ob:unknown_col_carp'};
+};
+
+subtest 'sort_by invalid direction: carp emitted, ASC fallback used' => sub {
+	plan tests => 3;
+	# POD: "An invalid direction emits a carp warning and falls back to the
+	# default join_column ascending sort."
+	my $j = _three_row_join(backend => 'array');
+	my @warnings;
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $j->selectall_arrayref(sort_by => [$COL_A, 'SIDEWAYS']);
+	} 'invalid sort_by direction does not croak';
+	my @dir_warns = grep { /direction.*not supported|not supported.*direction/i } @warnings;
+	ok(scalar @dir_warns,
+		'carp fired for unsupported direction (documented warning)');
+	# With ASC fallback the result is still sorted ascending
+	my @names = map { $_->{$COL_A} } @{$rows};
+	is_deeply(\@names, [qw(Alice Bob Carol)],
+		'invalid direction falls back to ASC: ascending order returned');
+	delete $LEDGER{'ob:invalid_dir_carp'};
+};
+
+subtest 'count: sort_by parameter is silently dropped' => sub {
+	plan tests => 2;
+	# POD: "count() ignores sort_by as row ordering does not affect a count."
+	# No carp must fire, and the count must be the correct total.
+	my $j = _three_row_join(backend => 'array');
+	my @warnings;
+	my $n;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$n = $j->count(sort_by => $COL_A);
+	} 'count with sort_by does not croak';
+	my @ob_warns = grep { /sort_by/i } @warnings;
+	is(scalar @ob_warns, 0,
+		'count: no carp for sort_by — it is silently dropped before criteria routing');
+	delete $LEDGER{'ob:count_drops_silently'};
+};
+
+# ===========================================================================
+# SECTION 21 -- dbi_source() composable nested joins
+#   Verifies the public API of dbi_source(): return value shape, array-backend
+#   undef, and that a parent join can ATTACH a child join and query rows.
+#   Uses the _three_row_join() fixture (Carol/K1, Alice/K2, Bob/K3).
+# ===========================================================================
+
+subtest 'dbi_source: array backend returns undef' => sub {
+	plan tests => 1;
+	my $j = _three_row_join(backend => 'array');
+	is($j->dbi_source(), undef,
+		'dbi_source() returns undef when backend is array');
+	delete $LEDGER{'ds:array_returns_undef'};
+};
+
+subtest 'dbi_source: sqlite backend returns {dbh, table} hashref' => sub {
+	plan tests => 4;
+	my $j   = _three_row_join(backend => 'sqlite');
+	my $src = $j->dbi_source();
+	ok(defined $src,                'dbi_source() returns a defined value');
+	is(ref($src), 'HASH',           'return value is a hashref');
+	ok(defined $src->{dbh},         'hashref has a dbh key');
+	is($src->{table}, '_dj_result', 'hashref table is _dj_result');
+	delete $LEDGER{'ds:sqlite_returns_hashref'};
+};
+
+subtest 'dbi_source: parent join ATTACHes child and queries merged columns' => sub {
+	plan tests => 3;
+	# Child exposes entry/name/score.  Add a rank source for the parent.
+	my $db_rank = MinimalDA->new(
+		cols => [$JC, 'rank'],
+		rows => [
+			{ entry => 'K1', rank => 10 },
+			{ entry => 'K2', rank => 20 },
+			{ entry => 'K3', rank => 30 },
+		],
+	);
+	my $child  = _three_row_join(backend => 'sqlite');
+	my $parent = Database::Join->new(
+		databases   => [$child, $db_rank],
+		join_column => $JC,
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+	my $rows = $parent->selectall_arrayref();
+	is(scalar @{$rows}, 3, 'nested join returns 3 rows');
+	my ($carol) = grep { $_->{$JC} eq 'K1' } @{$rows};
+	is($carol->{$COL_A}, 'Carol', 'name column visible through nested join');
+	is($carol->{rank},   10,      'rank column from parent source also present');
+	delete $LEDGER{'ds:nested_join_works'};
+};
+
+subtest 'dbi_source: auto backend forces SQLite path (dbi_source always usable)' => sub {
+	plan tests => 2;
+	my $j   = _three_row_join(backend => 'auto');
+	my $src = $j->dbi_source();
+	ok(defined $src && ref($src) eq 'HASH',
+		'auto backend: dbi_source() returns hashref (SQLite forced)');
+	is($src->{table}, '_dj_result', 'auto backend: table is _dj_result');
+	delete $LEDGER{'ds:auto_forces_sqlite'};
+};
+
+# ===========================================================================
+# SECTION 20 -- limit / offset pagination parameters
+#   Three-row fixture (Carol/K1, Alice/K2, Bob/K3, inner join, sorted by
+#   join_column ascending by default).  limit and offset are tested on both
+#   the array and SQLite backends, along with carp-on-invalid and the
+#   count() silent-drop requirement.
+# ===========================================================================
+
+subtest 'limit on array path: returns at most N rows' => sub {
+	plan tests => 2;
+	my $j    = _three_row_join(backend => 'array');
+	my $rows = $j->selectall_arrayref(limit => 2);
+	is(scalar @{$rows}, 2, 'limit=2: 2 rows returned on array path');
+	is($rows->[0]{name}, 'Carol', 'first row is Carol (K1, join_col order)');
+	delete $LEDGER{'pg:limit_array'};
+};
+
+subtest 'offset on array path: skips first M rows' => sub {
+	plan tests => 2;
+	my $j    = _three_row_join(backend => 'array');
+	my $rows = $j->selectall_arrayref(offset => 1);
+	is(scalar @{$rows}, 2, 'offset=1 skips 1 row, 2 remain on array path');
+	is($rows->[0]{name}, 'Alice', 'first remaining is Alice (K2)');
+	delete $LEDGER{'pg:offset_array'};
+};
+
+subtest 'limit on SQLite path: returns at most N rows' => sub {
+	plan tests => 2;
+	my $j    = _three_row_join(backend => 'sqlite');
+	my $rows = $j->selectall_arrayref(limit => 1);
+	is(scalar @{$rows}, 1, 'limit=1: 1 row returned on SQLite path');
+	is($rows->[0]{name}, 'Carol', 'the one row is Carol (K1)');
+	delete $LEDGER{'pg:limit_sqlite'};
+};
+
+subtest 'offset on SQLite path: skips first M rows' => sub {
+	plan tests => 2;
+	my $j    = _three_row_join(backend => 'sqlite');
+	my $rows = $j->selectall_arrayref(offset => 2);
+	is(scalar @{$rows}, 1, 'offset=2 skips 2 rows, 1 remains on SQLite path');
+	is($rows->[0]{name}, 'Bob', 'the remaining row is Bob (K3)');
+	delete $LEDGER{'pg:offset_sqlite'};
+};
+
+subtest 'limit + offset combined: returns the correct window' => sub {
+	plan tests => 3;
+	my $j    = _three_row_join(backend => 'sqlite');
+	# Skip Carol/K1 (offset=1), take 1 row (limit=1) → Alice/K2
+	my $rows = $j->selectall_arrayref(limit => 1, offset => 1);
+	is(scalar @{$rows}, 1, 'limit=1 offset=1: 1 row in the window');
+	is($rows->[0]{name}, 'Alice', 'window row is Alice (K2)');
+	# Verify array path gives the same window
+	my $j2    = _three_row_join(backend => 'array');
+	my $rows2 = $j2->selectall_arrayref(limit => 1, offset => 1);
+	is($rows2->[0]{name}, 'Alice', 'array path: same window (Alice/K2)');
+	delete $LEDGER{'pg:limit_offset_combined'};
+};
+
+subtest 'invalid limit emits carp and is ignored (all rows returned)' => sub {
+	plan tests => 3;
+	my $j = _three_row_join(backend => 'array');
+	my @warnings;
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $j->selectall_arrayref(limit => 0);
+	} 'limit=0 does not croak';
+	like($warnings[0], qr/limit must be a positive integer/, 'carp emitted for limit=0');
+	is(scalar @{$rows}, 3, 'limit=0 ignored: all 3 rows returned');
+	delete $LEDGER{'pg:invalid_limit_carp'};
+};
+
+subtest 'invalid offset emits carp and is ignored (no rows skipped)' => sub {
+	plan tests => 3;
+	my $j = _three_row_join(backend => 'array');
+	my @warnings;
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $j->selectall_arrayref(offset => -1);
+	} 'offset=-1 does not croak';
+	like($warnings[0], qr/offset must be a non-negative integer/, 'carp emitted for offset=-1');
+	is(scalar @{$rows}, 3, 'offset=-1 ignored: all 3 rows returned');
+	delete $LEDGER{'pg:invalid_offset_carp'};
+};
+
+subtest 'count() ignores limit and offset: returns total matching rows' => sub {
+	plan tests => 2;
+	my $j = _three_row_join(backend => 'array');
+	my @warnings;
+	my $n;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$n = $j->count(limit => 1, offset => 1);
+	} 'count() with limit+offset does not croak';
+	is($n, 3, 'count() ignores limit/offset: reports all 3 rows');
+	delete $LEDGER{'pg:count_drops_silently'};
+};
+
+# ===========================================================================
+# SECTION 23 -- Schema type consistency validation (warn_schema_type_mismatch)
+#   When two databases share a column name without a collision_prefix, their
+#   schema() types are compared at new() / add_database() time.  A type
+#   mismatch emits warn_schema_type_mismatch (carp) to alert the caller before
+#   silent type coercion produces unexpected query results.
+#   The join column itself and any collision_prefix-renamed columns are exempt.
+# ===========================================================================
+
+subtest 'schema type mismatch: carp emitted when shared column types differ' => sub {
+	plan tests => 2;
+	my $db0 = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => { type => 'TEXT' }, $COL_B => { type => 'INTEGER' } },
+	);
+	my $db1 = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => { type => 'TEXT' }, $COL_B => { type => 'TEXT' } },
+	);
+	my @warns;
+	local $SIG{__WARN__} = sub { push @warns, $_[0] };
+	my $j = Database::Join->new(databases => [$db0, $db1], join_column => $JC);
+	ok(scalar @warns, 'carp fired when shared column types differ at construction');
+	like($warns[0], qr/has type.*but type|type.*mismatch/i,
+		'carp message describes the type mismatch');
+	delete $LEDGER{'st:carp_on_mismatch'};
+};
+
+subtest 'schema type mismatch: no carp when shared column types agree' => sub {
+	plan tests => 1;
+	my $db0 = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => { type => 'TEXT' }, $COL_B => { type => 'INTEGER' } },
+	);
+	my $db1 = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => { type => 'TEXT' }, $COL_B => { type => 'INTEGER' } },
+	);
+	my @warns;
+	local $SIG{__WARN__} = sub { push @warns, $_[0] };
+	Database::Join->new(databases => [$db0, $db1], join_column => $JC);
+	is(scalar @warns, 0, 'no carp when shared column types agree');
+	delete $LEDGER{'st:no_carp_same_type'};
+};
+
+subtest 'schema type mismatch: join column type difference is exempt from check' => sub {
+	plan tests => 1;
+	# The join column is structural, not a data column.  Differing types
+	# in different DAs (e.g. pk => 1 in one, pk => 0 in another) must not
+	# generate a spurious mismatch warning.
+	my $db0 = MinimalDA->new(
+		cols   => [$JC, $COL_A],
+		schema => { $JC => { type => 'INTEGER' }, $COL_A => { type => 'TEXT' } },
+	);
+	my $db1 = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => { type => 'TEXT'    }, $COL_B => { type => 'INTEGER' } },
+	);
+	my @warns;
+	local $SIG{__WARN__} = sub { push @warns, $_[0] };
+	Database::Join->new(databases => [$db0, $db1], join_column => $JC);
+	is(scalar @warns, 0, 'join column type mismatch does not trigger a carp');
+	delete $LEDGER{'st:join_col_exempt'};
+};
+
+subtest 'schema type mismatch: collision_prefix columns are exempt from check' => sub {
+	plan tests => 1;
+	# With collision_prefix configured, the secondary column is published under
+	# a prefixed name.  No silent merge occurs, so no warning should fire.
+	my $db0 = MinimalDA->new(
+		cols   => [$JC, $COL_A],
+		schema => { $JC => { type => 'TEXT' }, $COL_A => { type => 'INTEGER' } },
+	);
+	my $db1 = MinimalDA->new(
+		cols   => [$JC, $COL_A],
+		schema => { $JC => { type => 'TEXT' }, $COL_A => { type => 'TEXT' } },
+	);
+	my @warns;
+	local $SIG{__WARN__} = sub { push @warns, $_[0] };
+	Database::Join->new(
+		databases        => [$db0, $db1],
+		join_column      => $JC,
+		collision_prefix => { 1 => 'b' },
+	);
+	is(scalar @warns, 0,
+		'no carp when the colliding column is protected by collision_prefix');
+	delete $LEDGER{'st:prefixed_exempt'};
+};
+
+subtest 'schema type mismatch: add_database() also validates the new database' => sub {
+	plan tests => 2;
+	my $db0 = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => { type => 'TEXT' }, $COL_B => { type => 'INTEGER' } },
+		rows   => [{ entry => 'K1', score => 10 }],
+	);
+	my $db1 = MinimalDA->new(
+		cols   => [$JC, $COL_A],
+		schema => { $JC => { type => 'TEXT' }, $COL_A => { type => 'TEXT' } },
+		rows   => [{ entry => 'K1', name => 'Alice' }],
+	);
+	# Create with no shared columns; no warning at this point.
+	my $j;
+	{
+		my @warns;
+		local $SIG{__WARN__} = sub { push @warns, $_[0] };
+		$j = Database::Join->new(databases => [$db0], join_column => $JC);
+		is(scalar @warns, 0, 'no warning at construction with a single database');
+	}
+	# Now add a database that shares COL_B but with a different type.
+	my $db2 = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => { type => 'TEXT' }, $COL_B => { type => 'REAL' } },
+		rows   => [{ entry => 'K1', score => 9.5 }],
+	);
+	my @warns2;
+	{
+		local $SIG{__WARN__} = sub { push @warns2, $_[0] };
+		$j->add_database($db2);
+	}
+	ok(scalar @warns2, 'add_database() emits carp when new DB introduces type mismatch');
+	delete $LEDGER{'st:add_db_emits_carp'};
+};
+
+# ---------------------------------------------------------------------------
+# Helper: three-database join — primary + 2 secondaries (n > 2 threshold).
+# Used exclusively for parallel => 1 tests (Section S22).
+# ---------------------------------------------------------------------------
+sub _three_db_join {
+	my (%opts) = @_;
+	my $db_a = MinimalDA->new(
+		cols => [$JC, $COL_A],
+		rows => [
+			{ entry => 'K1', name => 'Alice' },
+			{ entry => 'K2', name => 'Bob'   },
+		],
+	);
+	my $db_b = MinimalDA->new(
+		cols => [$JC, $COL_B],
+		rows => [
+			{ entry => 'K1', score => 95 },
+			{ entry => 'K2', score => 70 },
+		],
+	);
+	my $db_c = MinimalDA->new(
+		cols => [$JC, $COL_C],
+		rows => [
+			{ entry => 'K1', tier => 'gold'   },
+			{ entry => 'K2', tier => 'silver' },
+		],
+	);
+	return Database::Join->new(
+		databases   => [$db_a, $db_b, $db_c],
+		join_column => $JC,
+		join_type   => 'inner',
+		%opts,
+	);
+}
+
+# ===========================================================================
+# SECTION 22 -- parallel => 1 constructor flag
+#   The parallel flag enables concurrent Perl-thread fetching of secondary DAs
+#   when n > 2 databases are joined.  With n <= 2 (one secondary), the flag
+#   has no effect and the sequential path is used.  Results must be identical
+#   to sequential regardless of whether the threads module is installed.
+# ===========================================================================
+
+subtest 'parallel: constructor accepts parallel => 1 (no croak)' => sub {
+	plan tests => 2;
+	my $j;
+	lives_ok { $j = _two_db_join(parallel => 1) }
+		'parallel => 1 accepted by constructor without croak';
+	isa_ok($j, 'Database::Join');
+	delete $LEDGER{'par:constructor_accepted'};
+};
+
+subtest 'parallel: 2-db join with parallel => 1 returns correct results (n <= 2 threshold)' => sub {
+	plan tests => 2;
+	# n = 2 (1 secondary): the n > 2 guard prevents threading even with parallel => 1.
+	# Results must still be correct.
+	my $j    = _two_db_join(parallel => 1, join_type => 'inner');
+	my $rows = $j->selectall_arrayref();
+	is(scalar @{$rows}, 2, 'parallel => 1, 2-db join: 2 rows returned');
+	my @entries = sort map { $_->{entry} } @{$rows};
+	is_deeply(\@entries, [qw(K1 K2)],
+		'parallel => 1, 2-db join: correct entry keys');
+	delete $LEDGER{'par:two_db_no_effect'};
+};
+
+subtest 'parallel: 3-db join with parallel => 1 returns same results as sequential' => sub {
+	plan tests => 3;
+	# n = 3 (2 secondaries): threading attempted (or falls back to sequential if
+	# threads not installed).  Either way, the merged result must be identical.
+	my $j_par = _three_db_join(parallel => 1, backend => 'array');
+	my $j_seq = _three_db_join(parallel => 0, backend => 'array');
+	my $rows_par = $j_par->selectall_arrayref();
+	my $rows_seq = $j_seq->selectall_arrayref();
+	is(scalar @{$rows_par}, scalar @{$rows_seq},
+		'parallel 3-db join: same row count as sequential');
+	my @ent_par = sort map { $_->{entry} } @{$rows_par};
+	my @ent_seq = sort map { $_->{entry} } @{$rows_seq};
+	is_deeply(\@ent_par, \@ent_seq,
+		'parallel 3-db join: same entry keys as sequential');
+	# Verify all three columns are present in the merged row.
+	my ($row) = grep { $_->{entry} eq 'K1' } @{$rows_par};
+	ok(defined $row->{name} && defined $row->{score} && defined $row->{tier},
+		'parallel 3-db join: merged row contains all three DA columns');
+	delete $LEDGER{'par:three_db_correct_results'};
 };
 
 # ===========================================================================

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article
+><section
+><title
+></title
+><para
+>Plain Text</para
+><para
+><emphasis
+role="bold"
+>Bold Text</emphasis
+></para
+><para
+><emphasis
+>Italics Text</emphasis
+></para
+><para
+><emphasis
+role="strikethrough"
+>Strikethrough Text</emphasis
+></para
+><para
+><command
+>Command Text</command
+></para
+><para
+><emphasis
+role="bold"
+><emphasis
+>Bold + Italics</emphasis
+></emphasis
+></para
+><para
+><emphasis
+role="strikethrough"
+><emphasis
+role="bold"
+><emphasis
+>Bold + Italics + Strikethrough</emphasis
+></emphasis
+></emphasis
+></para
+><para
+><emphasis
+role="strong"
+>Strong Text (Synonym for Bold)</emphasis
+></para
+></section
+></article
+>

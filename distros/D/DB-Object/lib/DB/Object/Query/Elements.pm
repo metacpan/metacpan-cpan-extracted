@@ -1,25 +1,25 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query/Elements.pm
-## Version v0.2.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/08
-## Modified 2026/03/22
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package DB::Object::Query::Elements;
 BEGIN
 {
     use strict;
     use common::sense;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -83,7 +83,7 @@ sub autoload
         *$meth = $sub;
         return( $sub );
     }
-    warn( "No method '$meth' supported by this class ", ref( $self ), " or by ", ref( $elems ) );
+    warn( "No method '$meth' supported by this class ", ref( $self ), " or by ", ref( $elems ) ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
     return;
 }
 
@@ -156,7 +156,7 @@ sub merge
     {
         if( !$self->_is_a( $this => 'DB::Object::Query::Elements' ) )
         {
-            warn( "Element provided '", overload::StrVal( $this ), "' is not an DB::Object::Query::Elements or DB::Object::Query::Clause object" );
+            warn( "Element provided '", overload::StrVal( $this ), "' is not an DB::Object::Query::Elements or DB::Object::Query::Clause object" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
             next;
         }
 
@@ -390,7 +390,7 @@ DB::Object::Query::Elements - Query Elements Manipulation Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -420,9 +420,14 @@ This returns the current object upon success, or upon error, it sets an L<error 
 
 =head2 elements
 
+    my $value = $elements->elements;
+    $elements->elements( $value );
+
 Sets or gets an L<array object|Module::Generic::Array> of L<DB::Object::Query::Element> objects.
 
 =head2 fields
+
+    my $value = $elements->fields;
 
 Read-only. Returns an L<array object|Module::Generic::Array> of all the elements L<field|DB::Object::Query::Element/field> property.
 
@@ -436,9 +441,13 @@ This is a shortcut for calling L<Module::Generic::Array/foreach> on this class L
 
 =head2 formats
 
+    my $value = $elements->formats;
+
 Read-only. Returns an L<array object|Module::Generic::Array> of all the elements L<format|DB::Object::Query::Element/format> property.
 
 =head2 generics
+
+    my $value = $elements->generics;
 
 Read-only. Returns an L<array object|Module::Generic::Array> of all the elements L<generic|DB::Object::Query::Element/generic> representation.
 
@@ -474,9 +483,14 @@ It returns the current object.
 
 =head2 query_object
 
+    my $value = $elements->query_object;
+    $elements->query_object( $value );
+
 Sets or gets the L<DB::Object::Query> object set for this object.
 
 =head2 reset
+
+    my $value = $elements->reset;
 
 Various methods return cached value once they have been computed for improved performance. Calling C<reset> will force re-computing next time either one is called.
 
@@ -484,13 +498,19 @@ Those methods are L</fields>, L</formats>, L</types> and L</values>
 
 =head2 sort
 
+    my $value = $elements->sort;
+
 Returns a new clone of the current L<DB::Object::Query::Elements> object with its elements sorted based on their L<index property|DB::Object::Query::Element/index>
 
 =head2 types
 
+    my $value = $elements->types;
+
 Read-only. Returns an L<array object|Module::Generic::Array> of all the elements L<type|DB::Object::Query::Element/type> property.
 
 =head2 values
+
+    my $value = $elements->values;
 
 Read-only. Returns an L<array object|Module::Generic::Array> of all the elements L<value|DB::Object::Query::Element/value> property.
 

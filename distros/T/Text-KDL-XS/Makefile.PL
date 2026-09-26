@@ -1,8 +1,13 @@
 use strict;
 use warnings;
+use Config;
 use ExtUtils::MakeMaker;
 use Alien::ckdl;
 use Devel::PPPort;
+
+# ckdl reports integers as long long; the XS layer stores them in IVs.
+die "OS unsupported: Text::KDL::XS needs a perl with 64-bit integers (ivsize >= 8)\n"
+    unless $Config{ivsize} >= 8;
 
 # Generate ppport.h so XS.xs can compile on a fresh checkout.
 # The file is a build artefact and stays out of version control.
@@ -25,9 +30,15 @@ WriteMakefile(
     BUILD_REQUIRES => {
         'Alien::ckdl' => '0',
     },
+    # ckdl is linked statically, so Alien::ckdl is not needed at run time.
     PREREQ_PM => {
-        'Alien::ckdl' => '0',
-        'XSLoader'    => '0',
+        'Carp'           => '0',
+        'Exporter'       => '5.57',
+        'Math::BigFloat' => '0',
+        'Math::BigInt'   => '0',
+        'Scalar::Util'   => '0',
+        'XSLoader'       => '0',
+        'overload'       => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0.88',
@@ -36,8 +47,9 @@ WriteMakefile(
     OBJECT => '$(O_FILES)',
     XS     => { 'XS.xs' => 'XS.c' },
     C      => [ 'XS.c' ],
-    INC    => Alien::ckdl->cflags,
-    LIBS   => [ Alien::ckdl->libs ],
+    INC    => Alien::ckdl->cflags_static,
+    LIBS   => [ ckdl_libs() ],
+    ( $Config{gccversion} ? ( CCFLAGS => "$Config{ccflags} -Wall -Wextra" ) : () ),
 
     META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -53,6 +65,14 @@ WriteMakefile(
         dynamic_config => 1,
     },
 );
+
+# libkdl.a uses pow() and log10(); link libm explicitly instead of relying on
+# the perl binary to provide it.
+sub ckdl_libs {
+    my $libs = Alien::ckdl->libs_static;
+    $libs .= ' -lm' unless $^O eq 'MSWin32';
+    return $libs;
+}
 
 sub MY::postamble {
     return <<'MAKE_FRAG';

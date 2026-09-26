@@ -14,11 +14,11 @@ use_ok('AmberDB::Locale');
 
 subtest 'Master Registry (AmberDB::Locale::Currency)' => sub {
     my $loc = AmberDB::Locale->new('tr');
-    is( $loc->utf_decode(AmberDB::Locale::Currency->symbol('TRY')), '₺', 'TRY symbol is ₺' );
-    is( $loc->utf_decode(AmberDB::Locale::Currency->symbol('USD')), '$', 'USD symbol is $' );
-    is( $loc->utf_decode(AmberDB::Locale::Currency->symbol('EUR')), '€', 'EUR symbol is €' );
-    is( $loc->utf_decode(AmberDB::Locale::Currency->symbol('GBP')), '£', 'GBP symbol is £' );
-    is( $loc->utf_decode(AmberDB::Locale::Currency->symbol('AZN')), '₼', 'AZN symbol is ₼' );
+    is( $loc->utf_decode(AmberDB::Locale::Currency->cur_symbol('TRY')), '₺', 'TRY symbol is ₺' );
+    is( $loc->utf_decode(AmberDB::Locale::Currency->cur_symbol('USD')), '$', 'USD symbol is $' );
+    is( $loc->utf_decode(AmberDB::Locale::Currency->cur_symbol('EUR')), '€', 'EUR symbol is €' );
+    is( $loc->utf_decode(AmberDB::Locale::Currency->cur_symbol('GBP')), '£', 'GBP symbol is £' );
+    is( $loc->utf_decode(AmberDB::Locale::Currency->cur_symbol('AZN')), '₼', 'AZN symbol is ₼' );
 
     my $try_data = AmberDB::Locale::Currency->by_code('TRY');
     is( $try_data->{num}, '949', 'TRY ISO num is 949' );

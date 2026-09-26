@@ -1,0 +1,145 @@
+#!/usr/bin/env perl
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptionsFromArray);
+use Game::Xiangqi;
+use Game::Xiangqi::Engine;
+use Game::Xiangqi::Bot;
+use Game::Xiangqi::Terminal;
+
+our $VERSION = '0.01';
+
+exit main(@ARGV) unless caller;
+
+sub usage {
+    return <<'USAGE';
+xiangqi - Chinese chess on a terminal
+
+usage: xiangqi [options]
+
+  --level N      node budget for the bot, or a rung index into the ladder
+  --red SEAT     p1 or p2; whoever is Red moves first
+  --seat SEAT    which seat you play (default p1)
+  --seed STR     up to thirty-two bytes, for a reproducible game
+  --fen FEN      start from a position instead of the opening
+  --moves LIST   replay these ICCS moves first, comma or space separated
+  --wxf          show WXF notation beside the coordinates
+  --ascii        Latin letters instead of the characters
+  --ansi         colour (on by default; NO_COLOR in the environment beats this)
+  --ucci         speak UCCI on stdin and stdout, and draw nothing
+  --help         this
+
+exit status:
+  0   you won, or the game drew, or you quit
+  1   you lost
+  2   a bad option
+
+At the prompt a move is ICCS, the from point then the to point, like h2e2.
+"help" lists the rest. The engine is bounded in NODES and never in seconds, so
+the same position answers the same on a busy machine as on an idle one.
+USAGE
+}
+
+sub main {
+    my @argv = @_;
+    my %opt  = (seat => 'p1', red => 'p1');
+
+    my $ok = eval {
+        local $SIG{__WARN__} = sub { print STDERR "xiangqi: $_[0]" };
+        GetOptionsFromArray(\@argv, \%opt,
+            'level=i', 'red=s', 'seat=s', 'seed=s', 'fen=s', 'moves=s',
+            'wxf', 'ascii', 'ansi', 'ucci', 'help');
+    };
+    if (!$ok) { print STDERR usage(); return 2 }
+    if ($opt{help}) { print usage(); return 0 }
+    if (@argv)      { print STDERR "xiangqi: not an option: $argv[0]\n", usage(); return 2 }
+
+    for my $k (qw(red seat)) {
+        next if $opt{$k} eq 'p1' || $opt{$k} eq 'p2';
+        print STDERR "xiangqi: --$k takes p1 or p2, not '$opt{$k}'\n";
+        return 2;
+    }
+
+    my $level;
+    if (defined $opt{level}) {
+        if ($opt{level} < 0) { print STDERR "xiangqi: --level must not be negative\n"; return 2 }
+        $level = $opt{level} < scalar @Game::Xiangqi::Bot::LADDER
+               ? $Game::Xiangqi::Bot::LADDER[ $opt{level} ]
+               : $opt{level};
+    }
+
+    my $terminal = Game::Xiangqi::Terminal->new(
+        ascii  => $opt{ascii},
+        wxf    => $opt{wxf},
+        colour => $opt{ansi} ? 1 : undef,
+        level  => $level,
+        seat   => $opt{seat},
+    );
+
+    return $terminal->ucci if $opt{ucci};
+
+    my $seed = defined $opt{seed} ? $opt{seed} : 'xiangqi-terminal-default-seed32';
+    $seed = substr($seed . ('.' x 32), 0, 32);
+
+    my %new = (seed => $seed, red => $opt{red});
+    if (defined $opt{fen}) {
+        my ($pos, $err) = Game::Xiangqi::Engine->of_fen($opt{fen});
+        if (!$pos) { print STDERR "xiangqi: --fen refused, code $err\n"; return 2 }
+        $new{position} = $pos;
+    }
+
+    my $game = eval { Game::Xiangqi->new(%new) };
+    if (!$game) { print STDERR "xiangqi: could not start a game\n"; return 2 }
+
+    if (defined $opt{moves}) {
+        for my $mv (grep { length } split /[\s,]+/, $opt{moves}) {
+            my $refusal = $game->play($mv);
+            next unless $refusal;
+            print STDERR "xiangqi: --moves refused at '$mv': ", $refusal->code, "\n";
+            return 2;
+        }
+    }
+
+    $terminal->game($game);
+    return $terminal->start;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+xiangqi - Chinese chess on a terminal
+
+=head1 SYNOPSIS
+
+    xiangqi                      # play the default bot from the opening
+    xiangqi --level 0 --ascii    # the weakest rung, Latin letters
+    xiangqi --ucci               # speak UCCI instead of drawing anything
+
+=head1 DESCRIPTION
+
+A front end and nothing else: every decision it makes is an option, and the board
+and the protocol both live in L<Game::Xiangqi::Terminal>.
+
+C<--level> takes either a rung index into C<@Game::Xiangqi::Bot::LADDER> or a node
+budget outright, and tells them apart by size: nobody types 8000 when they mean
+"level two". The engine is bounded in B<nodes> and never in seconds.
+
+C<--seed> takes anything up to thirty-two bytes and B<pads it> to the thirty-two
+the game requires, so C<--seed mine> works rather than being refused.
+
+=head1 EXIT STATUS
+
+    0   you won, or the game drew, or you quit
+    1   you lost
+    2   a bad option
+
+=head1 SEE ALSO
+
+L<Game::Xiangqi>, L<Game::Xiangqi::Terminal>
+
+=cut

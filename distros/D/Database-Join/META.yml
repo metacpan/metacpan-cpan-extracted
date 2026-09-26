@@ -6,7 +6,6 @@ build_requires:
   DBD::CSV: '0'
   ExtUtils::MakeMaker: '0'
   IPC::System::Simple: '0'
-  JSON::MaybeXS: '0'
   Test::DescribeMe: '0'
   Test::Exception: '0'
   Test::Memory::Cycle: '0'
@@ -36,6 +35,7 @@ requires:
   Database::Abstraction: '0.45'
   File::Spec: '0'
   File::Temp: '0'
+  JSON::MaybeXS: '0'
   List::Util: '1.33'
   Object::Configure: '0'
   Params::Get: '0.13'
@@ -48,5 +48,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Join
   repository: https://github.com/nigelhorne/Database-Join.git
-version: v0.006.0
+version: v0.007.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

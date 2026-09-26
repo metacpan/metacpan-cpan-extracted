@@ -1,0 +1,15 @@
+[package]
+name = "sql_ast_simple"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# The JSON shape of the AST is this crate's serde output, so the minor
+# version is effectively part of the Perl API.  Keep it pinned to a
+# single minor release and bump deliberately.
+sqlparser = { version = "0.63", features = ["serde"] }
+serde_json = "1.0"

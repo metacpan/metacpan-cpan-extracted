@@ -1,6 +1,48 @@
 Revision history for Chem-Structure-Parser
 
 
+0.033 2026-09-25 CDT
+
+ - structure_info($file, 'torsions') -- or 'torsion' -- returns the torsion
+   angles and nothing else: each chain's torsions hash, keyed by chain id, so
+   $t->{A}{phi} and $t->{B}{alpha} come from the same call when chain A is a
+   protein and chain B a nucleic acid.  Each chain keeps only the angles its
+   residues have, and carries its residue_order, which the arrays run
+   parallel to and which is otherwise thrown away with the rest of the
+   structure.
+ - The chain id is column 22 of an ATOM or HETATM record and nothing else.
+   The reader used to fall back to column 21 when column 22 was blank, which
+   the format leaves empty and CHARMM and NAMD fill with the fourth letter of
+   a residue name: a TIP3 water with no chain id came back as chain '3', and
+   a POPC as chain 'C'.  It never did the job it was there for either -- a
+   two-character chain id fills column 22 as well, so "AB" came back "B"
+   regardless.  Column 22 alone is Biopython's rule.  No entry in PDBbind
+   v2020 puts anything in column 21, so no deposited file reads differently.
+ - A formal charge written sign first in a PDB file, as 4byf and 4ui0 write
+   their O-1 oxygens, now reads as "1-", the format's own spelling and what
+   the mmCIF reader has always returned for the same atom.  The two formats
+   gave the same entry two different charges.
+ - mmCIF: a pdbx_formal_charge too large to be a charge is no charge.  An
+   integer as wide as an IV overflowed when its sign was taken off and came
+   back as "0-", and one too wide for an IV was cut to its first two
+   characters; both are now empty, as 10 always was.
+ - mmCIF: a text field in a file with DOS line ends reads the same as it does
+   from the same file with Unix ones.  Every CR stayed in the value, one
+   before each line break and one at the end.
+ - A parse that dies while reading its options -- an option that is an object
+   whose numeric overload throws -- no longer leaks the hashes it had made
+   before it died, nor the file it had read.
+ - A structure with one coordinate that reads as nan no longer makes the
+   surface calculation quadratic.  The neighbour grid took its box over every
+   atom, so one non-finite coordinate put the whole structure into one cell:
+   the same answer, the slow way -- 14.7 s against 2.0 s for 4fqr.
+ - Reading is faster and smaller.  The seven short strings every atom carries
+   -- name, altloc, residue name, chain, insertion code, element, charge --
+   no longer have a buffer each, which was the largest cost in the parse:
+   structure_info() with features => 0 over 200 entries of PDBbind v2020 went
+   from 5.18 s to 4.38 s, and the peak of the default read of 4fqr, 90,792
+   atoms, from 234 MB to 217 MB.  notes.txt has the measurements.
+
 0.032 2026-09-21 CDT
 
  - A path that is a directory is refused by the parse itself, on every system.

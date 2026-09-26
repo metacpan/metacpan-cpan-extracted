@@ -2,7 +2,7 @@ package Protocol::IR::Format::CSV;
 use strict;
 use warnings;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 # Parse a single CSV line with full RFC-style quoting: a field wrapped in
 # double quotes may hold commas, quotes, and newlines, with a literal quote
@@ -206,7 +206,7 @@ Protocol::IR::Format::CSV - IRDB CSV importer and exporter
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 

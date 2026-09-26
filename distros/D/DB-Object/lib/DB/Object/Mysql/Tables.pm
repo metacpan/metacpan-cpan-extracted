@@ -1,17 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Tables.pm
-## Version v1.1.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v1.1.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/03/09
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 ## This package's purpose is to separate the object of the tables from the main
 ## DB::Object package so that when they get DESTROY'ed, it does not interrupt
 ## the SQL connection
@@ -21,7 +20,8 @@ BEGIN
 {
     use strict;
     use warnings;
-    use parent qw( DB::Object::Mysql DB::Object::Tables );
+    warnings::register_categories( 'DB::Object' );
+    use parent qw( DB::Object::Tables );
     use vars qw( $VERSION $DEBUG $TYPE_TO_CONSTANT );
     # <https://dev.mysql.com/doc/refman/8.0/en/data-types.html>
     # the 'constant' property in the dictionary hash is added in structure()
@@ -69,7 +69,7 @@ BEGIN
         qr/^(json)\b/                       => { constant => '', name => 'SQL_UNKNOWN_TYPE', type => 'json' },
     };
     our $DEBUG = 0;
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.1.1';
 };
 
 use strict;
@@ -154,7 +154,7 @@ sub create
     }
     if( @errors )
     {
-        warn( "The options '", join( ', ', @errors ), "' were either not recognized or malformed and thus were ignored.\n" );
+        warn( "The options '", join( ', ', @errors ), "' were either not recognized or malformed and thus were ignored." ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
     }
     # Check statement
     my $select = '';
@@ -667,7 +667,7 @@ DB::Object::Mysql::Tables - MySQL Table Object
 
 =head1 VERSION
 
-    v1.1.0
+    v1.1.1
 
 =head1 DESCRIPTION
 
@@ -740,6 +740,8 @@ It takes no option.
 See L<MySQL documentation for more information|https://dev.mysql.com/doc/refman/8.0/en/drop-table.html>
 
 =head2 exists
+
+    my $value = $tbl->exists;
 
 Returns true if the current table exists, or false otherwise.
 

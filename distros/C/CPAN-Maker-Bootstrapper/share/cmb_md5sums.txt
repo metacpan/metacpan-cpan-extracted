@@ -1,11 +1,12 @@
-fc1809b999e20fde761bc61fedf3864b  Makefile
+ebd560962117649d5c578f2e9d49e4fc  Makefile
 ac588d459581290fae83e78b1f2cd236  .includes/bash-completion.mk
+f51de836cedb276b2a35c264cf93d186  .includes/bootstrap.mk
 f1d70fe6a3787fb183c55e85b3b5b41e  .includes/git.mk
 7bb1bb0007a742f76374ebea90daabd1  .includes/help.mk
-443d91ec4c14539d973288d074d132ab  .includes/local.mk
+16461a50bb1e6f3bf93bfb9ef23a97f2  .includes/local.mk
 a9814bb82ad9180a4a7480a23ebdc755  .includes/modulino.mk
-c318f0511041c4aee6abf085a32ddd1a  .includes/perl.mk
+d7f62dc7d5e161a83c6fbdbf473087c1  .includes/perl.mk
 0422d7476616ca5ccf30dbcaf71bd18e  .includes/release-notes.mk
-8ccdc819abf042701749e9adf76dba13  .includes/update.mk
+8fa3a504ee81062ab7e6b4e38b50a817  .includes/update.mk
 f19b669f132cf42e486cee2461a2ef5d  .includes/upgrade.mk
 1298f8ae72c8d4c304ae27ed9d3171c6  .includes/version.mk

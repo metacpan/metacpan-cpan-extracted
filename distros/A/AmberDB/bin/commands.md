@@ -2,12 +2,16 @@
 
 ## Setup & Maintenance
 ```bash
-perl bin/amberdb_setup.pl --action=reindex
-perl bin/amberdb_setup.pl --action=ramdisk --start
-perl bin/amberdb_setup.pl --action=install --user=eticaretim --size=512M
-perl bin/amberdb_setup.pl --action=update
-perl bin/amberdb_setup.pl --action=update-amberdb --check
-perl bin/amberdb_setup.pl --action=update-storage --all
+# RAM-Disk yönetimi (Windows ImDisk):
+bin\setup_windows.bat start 512M R:
+bin\setup_windows.bat status
+bin\setup_windows.bat stop R:
+
+# Depolama & İndeks bakımı:
+amberdb reindex --all
+amberdb update storage --check
+amberdb update storage --force
+amberdb update version
 ```
 
 ## AmberDB CLI (amberdb & bin/amberdb_cli.pl)

@@ -7,6 +7,8 @@ use File::Path qw(make_path remove_tree);
 
 use AmberDB;
 
+$ENV{AMBERDB_TEST_RAMDISK} = '0';
+
 my $tmp = tempdir( CLEANUP => 1 );
 my $db_dir = "$tmp/testdb";
 make_path($db_dir);

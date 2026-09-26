@@ -1,3 +1,58 @@
+Sat Sep 26 05:09:37 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.11]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.11.md: new
+	* .gitignore: updated by CPAN::Maker::Bootstrapper
+	* .includes/local.mk: likewise
+	* .includes/perl.mk: likewise
+	* Makefile: likewise
+	* VERSION: bump
+	* lib/CPAN/Maker.pm.in
+	(cmd_build)
+	- avoid updating provides in project root when it has not changed
+	* lib/CPAN/Maker/Role/Provides.pm.in
+	(_write_provides)
+	- don't croak if no version, set version to undef
+
+Mon Sep 14 12:15:17 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.10]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.10.md: new
+	* .includes/bootstrap.mk: added by CPAN::Bootstrapper::Maker
+	* .includes/update.mk: updated by CPAN::Bootstrapper::Maker
+	* Makefile: likewise
+	* VERSION: bump
+	* deps.mk: generated
+	* lib/CPAN/Maker.pm.in
+	- add CPAN::Maker::Role::Provides
+	(cmd_build)
+	- don't remove provides
+	(get_provides): moved to role ::Provides
+	(write_provides): likewise
+	(_write_provides): remove
+	(write_makefile)
+	- add versions for provides
+	(stage_distribution)
+	- use create_provides from role
+	* requires: sorted
+	* cpanfile: generated
+	* lib/CPAN/Maker/Role/Provides.pm.in: new
+
+Thu Aug 20 12:39:08 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.9]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.0.9.md: new
+	* VERSION: bump
+	* .includes/perl.mk: update by CPAN::Maker::Bootstrapper
+	* builder: likewise
+	* cpanfile: + File::ShareDir::Install
+	* requires: likewise
+	* lib/CPAN/Maker.pm.in
+	- + $GIT_SHA, $GIT_DIRTY
+
 Tue Aug 18 17:00:00 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.8]:

@@ -32,26 +32,25 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::Struct" : "0.65",
+            "Class::Struct" : "0.63",
             "DBI" : "1.643",
-            "DateTime" : "1.59",
-            "DateTime::Format::Strptime" : "1.79",
-            "DateTime::TimeZone" : "2.56",
+            "DateTime::Format::Lite" : "v0.1.3",
+            "DateTime::Lite" : "v0.7.3",
             "Fcntl" : "0",
             "JSON" : "4.10",
             "JSON::XS" : "4.03",
-            "Module::Generic" : "v1.3.0",
+            "Module::Generic" : "v1.8.1",
             "Net::IP" : "1.26",
-            "POSIX" : "1.53_01",
-            "Promise::Me" : "v0.6.0",
+            "POSIX" : "1.30",
+            "Promise::Me" : "v0.6.1",
             "Regexp::Common" : "2017060201",
-            "Scalar::Util" : "1.63",
+            "Scalar::Util" : "1.50",
             "Storable::Improved" : "v0.1.3",
             "URI" : "5.16",
-            "Wanted" : "v0.1.0",
+            "Wanted" : "v0.1.2",
             "common::sense" : "3.75",
             "parent" : "0",
-            "perl" : "5.016000",
+            "perl" : "5.016001",
             "strict" : "0",
             "version" : "0"
          }
@@ -67,13 +66,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/jackdeguest/DB-Object/issues"
+         "web" : "https://gitlab.com/deguest/DB-Object/issues"
       },
       "repository" : {
          "type" : "git",
-         "web" : "https://gitlab.com/jackdeguest/DB-Object"
+         "web" : "https://gitlab.com/deguest/DB-Object"
       }
    },
-   "version" : "v1.10.0",
+   "version" : "v1.11.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

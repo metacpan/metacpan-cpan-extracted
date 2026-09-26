@@ -84,6 +84,7 @@ flat key/value list or a single hash reference; the only required key is `cmd`.
 | `overwrite`    | bool             | `0`     | If false and all `output.files` already exist, the command is skipped. Set true to always run. |
 | `quiet`        | bool             | `0`     | Suppress the record printed to the terminal. The log and error messages on `STDERR` are unaffected. See [Quiet runs](#quiet-runs). |
 | `stale`        | bool             | `0`     | Also re-run when an input file is newer than an output file. See [Out-of-date outputs](#out-of-date-outputs). |
+| `stdin`        | `'devnull'`/`'inherit'` | `'devnull'` | What the command sees on its standard input. The default is the null device; `'inherit'` hands it the caller's own. See [Standard input](#standard-input). |
 | `timeout`      | whole seconds    | `0`     | Kill the command if it runs longer than this. `0` means no limit. See [Timeouts](#timeouts). |
 
 Passing an unrecognised key, an undefined or empty filename, a `cmd` that is
@@ -108,12 +109,12 @@ execution-only fields simply hold their empty values (`exit` and `signal` are
 | `done`             | `"now"` (just ran), `"before"` (skipped, outputs already existed), or `"not yet"` (dry run). |
 | `will.do`          | `"done"`, `"no"` (skipped), `"no: dry run"`, or `"FAILED"`. `"FAILED"` is set whenever the command exited non-zero, timed out, or left a declared output file missing — **whether or not `die` is set**. |
 | `duration`         | Wall-clock seconds the command took (`0` for skips/dry runs). |
-| `exit`             | Exit code of the command (`-1` if it could not be launched). |
+| `exit`             | Exit code of the command: `-1` if it could not be launched, or `127` if it could not be launched under a `timeout` (the forked child has no other way to say so). |
 | `signal`           | Signal number if the command process was killed by a signal, else `0`. Always `0` on Windows (no POSIX signals). |
 | `timed.out`        | `1` if the command was killed for exceeding its `timeout`, else `0`. |
 | `out.of.date`      | `1` if `stale` was set and an input was newer than an output, else `0`. |
 | `stdout`, `stderr` | Captured output, with trailing whitespace stripped. |
-| `die`, `dry.run`, `overwrite`, `note`, `quiet`, `stale`, `timeout` | The (defaulted) argument values used. |
+| `die`, `dry.run`, `overwrite`, `note`, `quiet`, `stale`, `stdin`, `timeout` | The (defaulted) argument values used. |
 | `output.files`     | Array ref of the output files (a scalar argument, or an `output.file`, is normalised to a one-element array). |
 | `output.file.size` | Hash of `filename => size in bytes` for the outputs. |
 | `input.files`      | Array ref of the input files, normalised the same way (present only if you passed `input.files` or `input.file`). |
@@ -145,7 +146,7 @@ replace it.
 ## Out-of-date outputs
 
 Existence alone is a weak test. If an input file has been edited since the
-output was built, the output is stale even though it is present — and by
+output was built, the output is stale even though it is present, and by
 default `task` will still skip the step, exactly as earlier versions did.
 
 Pass `stale => 1` to get the rule `make` and `snakemake` use: re-run whenever
@@ -196,6 +197,10 @@ with a space, a quote, or a `$` in it is passed through untouched instead of
 being re-parsed by the shell. You lose shell features (`>`, `|`, `*`, `&&`) in
 exchange; use the string form when you want them.
 
+This holds for a one-element array ref too: `cmd => ['gzip -9 x']` looks for a
+program literally named `gzip -9 x`, and fails, rather than handing the string
+to the shell as Perl's own `system` does with a list of one.
+
 ## Quiet runs
 
 Every `task` prints its record to the terminal. Over a hundred-step pipeline
@@ -210,6 +215,36 @@ that is a lot of scrollback, so `quiet => 1` suppresses it:
 The log filehandle still receives the full record, and error messages still go
 to `STDERR`: asking for less noise is not the same as asking to be kept in the
 dark about a failure.
+
+## Standard input
+
+The command is run with its standard input on the null device, so a command
+that stops to ask a question gets an immediate end-of-file and carries on
+instead of waiting for an answer:
+
+    my $t = task(cmd => 'rm -r some/tree');   # "remove write-protected file?"
+
+This matters because `task` captures the command's output. A prompt is written
+to standard error, which has been redirected into the capture, so nothing
+reaches the terminal: before 0.17 such a command hung with no visible reason —
+for ever with no `timeout`, and with one it was killed and reported as
+`timed.out`, blaming the clock for what was really an unanswered question.
+
+Shell redirection inside the command is unaffected, since that is the shell's
+business rather than `task`'s:
+
+    my $t = task(cmd => 'sort < unsorted.txt > sorted.txt');
+
+To hand the command the caller's own standard input instead — a pipeline step
+that really does read the data your script was given — ask for it:
+
+    my $t = task(cmd => 'sort > sorted.txt', stdin => 'inherit');
+
+`'inherit'` is the behaviour of 0.162 and earlier, and comes with its hazards:
+the command consumes input your own script can then no longer read, and a
+command that prompts will hang exactly as it used to. The caller's standard
+input is saved and restored around every run either way, including when the
+command dies, and a caller that had closed it keeps it closed.
 
 ## Dry runs
 
@@ -253,13 +288,15 @@ are traceable. The filehandle must be open, or `say2` dies.
 
 Core/runtime modules used by SimpleFlow:
 
-- [`Capture::Tiny`](https://metacpan.org/pod/Capture::Tiny) captures `stdout`/`stderr`
 - [`Data::Printer`](https://metacpan.org/pod/Data::Printer) (`DDP`) pretty result/record printing
 - [`Devel::Confess`](https://metacpan.org/pod/Devel::Confess) better backtraces on death
-- `List::Util`, `Scalar::Util`, `Time::HiRes`, `Cwd`, `POSIX` core utilities
+- `List::Util`, `Scalar::Util`, `Time::HiRes`, `Cwd`, `POSIX`, `File::Spec`,
+  `File::Temp` core utilities; `stdout` and `stderr` are captured with
+  `POSIX::dup2` onto temporary files
 
 The test suite additionally uses `Test::More` and
-[`Test::Exception`](https://metacpan.org/pod/Test::Exception).
+[`Test::Exception`](https://metacpan.org/pod/Test::Exception); it captures
+output with its own small helper, `t/lib/CaptureStd.pm`.
 
 # Changes
 

@@ -482,6 +482,69 @@ subtest 'the cache expires and evicts' => sub {
     is($origin->count, 4, 'the least recently used address was evicted');
 };
 
+subtest 'concurrent misses for one address share one request' => sub {
+    # 3.3.2 sent one request per caller: twenty concurrent lookups of one
+    # address were twenty requests. The origin holds each answer, so the calls
+    # genuinely overlap, and records what each batch asked for.
+    my @batches;
+    my $origin = VPNDetectionTest::Origin->new(sub {
+        my ($c) = @_;
+        if ($c->req->url->path->to_string eq '/batch') {
+            push @batches, [sort @{ $c->req->json->{ips} }];
+            VPNDetectionTest::Origin::slow_json($c, VPNDetectionTest::Origin::batch_body($c, 1), 0.2);
+            return;
+        }
+        my ($ip) = $c->req->url->path->to_string =~ m{^/(.+)$};
+        return $c->render(status => 500, json => { error => 'boom' }) if $ip eq '9.9.9.9';
+        VPNDetectionTest::Origin::slow_json($c, { ip => $ip, is_vpn => \1 }, 0.2);
+    });
+    my $client = VPNDetection->new(base_url => $origin->url, retries => 0);
+
+    my @results;
+    Mojo::Promise->all(map { $client->lookup_p('9.9.9.1') } 1 .. 20)
+        ->then(sub { @results = map { $_->[0] } @_ })->wait;
+    is($origin->count, 1, 'twenty concurrent lookups of one address send one request');
+    is(scalar(grep { $_->is_vpn } @results), 20, 'and every caller gets its answer');
+
+    # A batch waits for a lookup already in flight instead of sending it.
+    $origin->reset;
+    my ($single, $batch);
+    Mojo::Promise->all(
+        $client->lookup_p('9.9.9.2')->then(sub { $single = shift }),
+        $client->lookup_batch_p(['9.9.9.2', '9.9.9.3'])->then(sub { $batch = shift }),
+    )->wait;
+    is_deeply([sort $origin->paths], ['/9.9.9.2', '/batch'], 'the lookup and the batch each sent once');
+    is_deeply($batches[-1], ['9.9.9.3'], 'the batch left out the address the lookup was fetching');
+    is($batch->{'9.9.9.2'}, $single, 'and took the lookup\'s answer for it');
+
+    # A lookup waits for a batch that boarded its address before sending.
+    $origin->reset;
+    my ($late, $first);
+    Mojo::Promise->all(
+        $client->lookup_batch_p(['9.9.9.4', '9.9.9.5'])->then(sub { $first = shift }),
+        $client->lookup_p('9.9.9.5')->then(sub { $late = shift }),
+    )->wait;
+    is_deeply([$origin->paths], ['/batch'], 'a lookup of an address a batch is fetching sends nothing');
+    is($late, $first->{'9.9.9.5'}, 'and takes the batch\'s answer');
+
+    # A failure reaches every waiter, and is cached for none.
+    $origin->reset;
+    my @failed;
+    Mojo::Promise->all(map {
+        $client->lookup_p('9.9.9.9')->then(sub { push @failed, 'resolved' }, sub { push @failed, shift })
+    } 1 .. 5)->wait;
+    is($origin->count, 1, 'five concurrent lookups of a failing address send one request');
+    is(scalar(grep { ref $_ && $_->kind eq 'server_error' } @failed), 5, 'and all five fail with its error');
+    eval { $client->lookup('9.9.9.9') };
+    is($origin->count, 2, 'the failure was not cached');
+
+    # Without a cache every lookup is served, so nothing is shared.
+    $origin->reset;
+    my $uncached = VPNDetection->new(base_url => $origin->url, cache_size => 0);
+    Mojo::Promise->all(map { $uncached->lookup_p('9.9.9.6') } 1 .. 5)->wait;
+    is($origin->count, 5, 'a client with no cache shares nothing');
+};
+
 subtest 'the non-blocking API works where the blocking one cannot' => sub {
     my $origin = VPNDetectionTest::Origin->new(sub {
         shift->render(json => { ip => '9.9.9.9', is_vpn => \1 });

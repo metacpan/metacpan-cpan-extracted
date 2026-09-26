@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article
+><section
+><title
+>Block Quote</title
+><para
+>Non-quote Para 1</para
+><blockquote
+><para
+>Block Quote Para 2</para
+><para
+>Block Quote Para 3</para
+></blockquote
+><para
+>Non-quote Para 4</para
+><blockquote
+><para
+>Block Quote with List</para
+><itemizedlist
+><listitem
+><para
+>List Item 1</para
+><para
+>List Item 1 Additional Para</para
+></listitem
+><listitem
+><para
+>List Item 2</para
+></listitem
+></itemizedlist
+><para
+>End block quote</para
+></blockquote
+><para
+>Non-quote Para 5</para
+></section
+></article
+>

@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 140;
+use Test::Most tests => 202;
 use Readonly;
 use Scalar::Util qw(blessed);
 use File::Spec;
@@ -1557,4 +1557,646 @@ note '--- Section 22: Multibyte and character domain ---';
 	my $row = $j->fetchrow_hashref($JC => "caf\x{00e9}");
 	is($row->{region}, 'Paris',
 		'multibyte: unicode char in join key retrieves correct merged row (EP unicode-key)');
+}
+
+# ==========================================================================
+# Section 23: `limit` parameter domain
+#
+# Valid domain:   integers in [1, ∞) — positive integers only.
+#                 Matched by /^\d+\z/a with value >= 1.
+# Invalid domain: 0, negative integers, float strings, non-numeric strings,
+#                 undef (absent = no limit).
+#
+# EP absent:        no truncation.
+# BVA min=1:        exactly 1 row returned.
+# BVA at-count:     limit == total rows → all rows returned, no truncation.
+# BVA above-count:  limit > total rows → all rows returned.
+# EP invalid-zero:  0 is not a positive integer → carp + ignored.
+# EP invalid-neg:   -1 → carp + ignored.
+# EP invalid-float: '2.5' does not match /^\d+\z/a → carp + ignored.
+# EP invalid-str:   'ten' → carp + ignored.
+# ==========================================================================
+
+note '--- Section 23: limit parameter domain ---';
+
+# EP absent: all rows returned (limit not applied).
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+			{ $JC => 'k3', v => 'c' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref();
+	is(scalar @{$rows}, 3, 'limit: absent → all 3 rows returned (EP absent)');
+}
+
+# BVA min=1: minimum valid limit returns exactly 1 row.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(limit => 1);
+	is(scalar @{$rows}, 1, 'limit=1: BVA minimum valid → exactly 1 row (BVA min)');
+}
+
+# BVA at-count: limit == total rows → all rows returned.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(limit => 2);
+	is(scalar @{$rows}, 2, 'limit=N: at-count → all N rows returned (BVA at-count)');
+}
+
+# BVA above-count: limit > total rows → all rows returned.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(limit => 1_000_000);
+	is(scalar @{$rows}, 2, 'limit=1_000_000 > 2 rows: all rows returned (BVA above-count)');
+}
+
+# EP invalid-zero: 0 is not a positive integer; carp + ignored.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows;
+	my $warns = _capture_warnings { $rows = $j->selectall_arrayref(limit => 0) };
+	ok(scalar @{$warns}, 'limit=0: not positive → carp emitted (EP invalid-zero)');
+	is(scalar @{$rows},  2, 'limit=0: ignored → all rows returned');
+}
+
+# EP invalid-negative: -1 → carp + ignored.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows;
+	my $warns = _capture_warnings { $rows = $j->selectall_arrayref(limit => -1) };
+	ok(scalar @{$warns}, 'limit=-1: negative → carp emitted (EP invalid-negative)');
+	is(scalar @{$rows},  2, 'limit=-1: ignored → all rows returned');
+}
+
+# EP invalid-float: '2.5' does not match /^\d+\z/a → carp + ignored.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows;
+	my $warns = _capture_warnings { $rows = $j->selectall_arrayref(limit => '2.5') };
+	ok(scalar @{$warns}, "limit='2.5': float string fails /^\\d+\\z/a → carp (EP invalid-float)");
+	is(scalar @{$rows},  2, "limit='2.5': ignored → all rows returned");
+}
+
+# EP invalid-string: 'ten' → carp + ignored.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows;
+	my $warns = _capture_warnings { $rows = $j->selectall_arrayref(limit => 'ten') };
+	ok(scalar @{$warns}, "limit='ten': non-numeric → carp emitted (EP invalid-string)");
+	is(scalar @{$rows},  2, "limit='ten': ignored → all rows returned");
+}
+
+# ==========================================================================
+# Section 24: `offset` parameter domain
+#
+# Valid domain:   integers in [0, ∞) — non-negative integers.
+#                 Matched by /^\d+\z/a (includes 0).
+# Invalid domain: negative integers, float strings, non-numeric strings.
+#                 undef (absent) = no skip.
+#
+# EP absent:        no rows skipped.
+# BVA min=0:        zero offset → no rows skipped (valid boundary).
+# BVA offset=1:     first row skipped.
+# BVA offset=N-1:   only last row returned.
+# BVA offset=N:     all rows skipped → empty result.
+# EP invalid-neg:   -1 → carp + ignored.
+# EP invalid-float: '1.5' → carp + ignored.
+# ==========================================================================
+
+note '--- Section 24: offset parameter domain ---';
+
+# EP absent: all rows, none skipped.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+			{ $JC => 'k3', v => 'c' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref();
+	is(scalar @{$rows}, 3, 'offset: absent → all 3 rows, none skipped (EP absent)');
+}
+
+# BVA min=0: zero is a valid non-negative integer; no rows skipped.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(offset => 0);
+	is(scalar @{$rows}, 2, 'offset=0: zero is valid; no rows skipped (BVA min=0)');
+}
+
+# BVA offset=1: exactly 1 row skipped.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'first' },
+			{ $JC => 'k2', v => 'second' },
+			{ $JC => 'k3', v => 'third'  },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(offset => 1);
+	is(scalar @{$rows}, 2, 'offset=1: 1 row skipped, 2 remain (BVA offset=1)');
+	is($rows->[0]{$JC}, 'k2', 'offset=1: result starts at join_col=k2 (second row)');
+}
+
+# BVA offset=N-1: N-1 rows skipped, only the last row returned.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+			{ $JC => 'k3', v => 'c' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(offset => 2);
+	is(scalar @{$rows}, 1,    'offset=N-1: only last row returned (BVA offset=N-1)');
+	is($rows->[0]{$JC}, 'k3', 'offset=N-1: last row is join_col=k3');
+}
+
+# BVA offset=N: all rows skipped → empty result.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(offset => 2);
+	is(scalar @{$rows}, 0, 'offset=N: all rows skipped → empty result (BVA offset=N)');
+}
+
+# EP invalid-negative: -1 → carp + ignored → no rows skipped.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows;
+	my $warns = _capture_warnings { $rows = $j->selectall_arrayref(offset => -1) };
+	ok(scalar @{$warns}, 'offset=-1: negative → carp emitted (EP invalid-negative)');
+	is(scalar @{$rows},  2, 'offset=-1: ignored → all rows returned');
+}
+
+# EP invalid-float: '1.5' does not match /^\d+\z/a → carp + ignored.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows;
+	my $warns = _capture_warnings { $rows = $j->selectall_arrayref(offset => '1.5') };
+	ok(scalar @{$warns}, "offset='1.5': float string fails /^\\d+\\z/a → carp (EP invalid-float)");
+	is(scalar @{$rows},  2, "offset='1.5': ignored → all rows returned");
+}
+
+# ==========================================================================
+# Section 25: `sort_by` parameter domain
+#
+# Valid domain:
+#   EP string:          any column in columns(); sort cmp ASC.
+#   EP ['col','ASC']:   explicit ASC; equivalent to string form.
+#   EP ['col','DESC']:  descending cmp sort.
+#   EP ['col']:         single-element; direction defaults to ASC.
+#   EP join_col:        sort by join column (ASC is the default; DESC reverses).
+#
+# Invalid domain (carp + join_col ASC fallback):
+#   EP invalid col:     column not in columns() → carp.
+#   EP invalid dir:     direction not 'ASC' or 'DESC' → carp.
+#   EP empty string:    '' is not in columns() → carp.
+#   EP empty arrayref:  [] → undef col → not in columns() → carp.
+#
+# Sort is lexicographic (cmp) for all backends; numeric ORDER BY requires
+# backend=>'sqlite'.
+# ==========================================================================
+
+note '--- Section 25: sort_by parameter domain ---';
+
+# EP absent: default join_col ASC.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k3', v => 'c' },
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref();
+	is($rows->[0]{$JC}, 'k1', 'sort_by: absent → join_col ASC (EP absent, default)');
+	is($rows->[2]{$JC}, 'k3', 'sort_by: absent → last row is k3 (join_col ASC confirmed)');
+}
+
+# EP string form: sort ASC by named column.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'label'],
+		rows => [
+			{ $JC => 'k1', label => 'zebra' },
+			{ $JC => 'k2', label => 'apple' },
+			{ $JC => 'k3', label => 'mango' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(sort_by => 'label');
+	is($rows->[0]{label}, 'apple', "sort_by 'label' string form: apple first (EP string ASC)");
+	is($rows->[2]{label}, 'zebra', "sort_by 'label' string form: zebra last");
+}
+
+# EP array ['col', 'ASC']: explicit ascending, same result as string form.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'label'],
+		rows => [
+			{ $JC => 'k1', label => 'zebra' },
+			{ $JC => 'k2', label => 'apple' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(sort_by => ['label', 'ASC']);
+	is($rows->[0]{label}, 'apple', "sort_by ['label','ASC']: apple first (EP array ASC)");
+}
+
+# EP array ['col', 'DESC']: descending.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'label'],
+		rows => [
+			{ $JC => 'k1', label => 'apple' },
+			{ $JC => 'k2', label => 'zebra' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(sort_by => ['label', 'DESC']);
+	is($rows->[0]{label}, 'zebra', "sort_by ['label','DESC']: zebra first (EP array DESC)");
+	is($rows->[1]{label}, 'apple', "sort_by ['label','DESC']: apple last");
+}
+
+# EP join_col DESC: reverse of the default ordering.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'a' },
+			{ $JC => 'k2', v => 'b' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(sort_by => [$JC, 'DESC']);
+	is($rows->[0]{$JC}, 'k2', "sort_by [join_col,'DESC']: k2 first (EP join_col DESC)");
+	is($rows->[1]{$JC}, 'k1', "sort_by [join_col,'DESC']: k1 last");
+}
+
+# EP invalid column: column not in columns() → carp + fallback to join_col ASC.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $rows;
+	my $warns = _capture_warnings {
+		$rows = $j->selectall_arrayref(sort_by => 'nonexistent_col')
+	};
+	ok((grep { /sort_by/i } @{$warns}),
+		'sort_by nonexistent col: carp emitted (EP invalid column)');
+	is($rows->[0]{$JC}, 'k1',
+		'sort_by invalid col: fallback to join_col ASC (k1 first)');
+}
+
+# EP invalid direction: 'UP' is not ASC or DESC → carp + ASC used.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'label'],
+		rows => [
+			{ $JC => 'k1', label => 'apple' },
+			{ $JC => 'k2', label => 'zebra' },
+		],
+	);
+	my $j = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows;
+	my $warns = _capture_warnings {
+		$rows = $j->selectall_arrayref(sort_by => ['label', 'UP'])
+	};
+	ok((grep { /UP|direction|sort_by/i } @{$warns}),
+		"sort_by direction 'UP': carp emitted (EP invalid direction)");
+	is($rows->[0]{label}, 'apple',
+		"sort_by invalid direction: ASC fallback → apple first");
+}
+
+# BVA empty arrayref []: undef col, carp + join_col fallback.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	my $rows;
+	my $warns = _capture_warnings {
+		$rows = $j->selectall_arrayref(sort_by => [])
+	};
+	ok((grep { /sort_by/i } @{$warns}),
+		'sort_by []: empty arrayref → undef col → carp (BVA empty arrayref)');
+	is(ref($rows), 'ARRAY',
+		'sort_by []: arrayref still returned (fallback result valid)');
+}
+
+# EP single-element arrayref ['col']: direction defaults to ASC.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'label'],
+		rows => [
+			{ $JC => 'k1', label => 'zebra' },
+			{ $JC => 'k2', label => 'apple' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(sort_by => ['label']);
+	is($rows->[0]{label}, 'apple',
+		"sort_by ['label'] single-element: direction defaults to ASC (EP single-element)");
+}
+
+# ==========================================================================
+# Section 26: `parallel` parameter domain
+#
+# EP absent:     defaults to 0 (sequential); stored as _parallel = 0.
+# EP 0:          sequential (same as absent).
+# EP 1, n=2:     gate `n > 2` is false → sequential despite parallel=1.
+# EP 1, n=3:     gate open → parallel dispatch (or sequential fallback if no threads).
+# EP truthy ≠ 1: 2 is truthy → treated as parallel => 1 (gate applies).
+# EP combinatorial: parallel=1 + backend='sqlite' → SQLite single-JOIN path used;
+#                   parallel flag has no effect on the SQLite backend.
+# ==========================================================================
+
+note '--- Section 26: parallel parameter domain ---';
+
+# EP absent: _parallel default is 0.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC);
+	is($j->{_parallel}, 0, 'parallel: absent → _parallel=0 default stored (EP absent)');
+}
+
+# EP 0: _parallel=0 stored explicitly.
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC, parallel => 0);
+	is($j->{_parallel}, 0, 'parallel=0: _parallel=0 stored (EP 0)');
+}
+
+# EP 1 with n=2: gate n > 2 is false → sequential result is correct.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'a'],
+		rows => [{ $JC => 'k1', a => 1 }],
+	);
+	my $s = DomainDA->new(
+		cols => [$JC, 'b'],
+		rows => [{ $JC => 'k1', b => 2 }],
+	);
+	my $j    = Database::Join->new(databases => [$p, $s], join_column => $JC, parallel => 1);
+	my $rows = $j->selectall_arrayref();
+	is(scalar @{$rows}, 1, 'parallel=1 n=2: gate closed → sequential → 1 correct row (EP 1+n=2)');
+	is($rows->[0]{a}, 1, 'parallel=1 n=2: primary column correct (sequential path)');
+	is($rows->[0]{b}, 2, 'parallel=1 n=2: secondary column correct (sequential path)');
+}
+
+# EP 1 with n=3: gate open → parallel or sequential fallback; result correct either way.
+{
+	my $prim = DomainDA->new(
+		cols => [$JC, 'a'],
+		rows => [{ $JC => 'k1', a => 10 }, { $JC => 'k2', a => 20 }],
+	);
+	my $sec1 = DomainDA->new(
+		cols => [$JC, 'b'],
+		rows => [{ $JC => 'k1', b => 100 }],
+	);
+	my $sec2 = DomainDA->new(
+		cols => [$JC, 'c'],
+		rows => [{ $JC => 'k2', c => 200 }],
+	);
+	my $j_par = Database::Join->new(
+		databases   => [$prim, $sec1, $sec2],
+		join_column => $JC,
+		join_type   => 'left',
+		parallel    => 1,
+	);
+	my $j_seq = Database::Join->new(
+		databases   => [$prim, $sec1, $sec2],
+		join_column => $JC,
+		join_type   => 'left',
+	);
+	my $warns = _capture_warnings {  };   # suppress any carp about threads
+	my $rows_par = $j_par->selectall_arrayref();
+	my $rows_seq = $j_seq->selectall_arrayref();
+	is_deeply($rows_par, $rows_seq,
+		'parallel=1 n=3: result identical to sequential (EP 1+n=3; threads optional)');
+}
+
+# EP truthy=2: any non-zero value enables the gate (gate is && not == 1).
+{
+	my ($p, $s) = _dbs();
+	my $j = Database::Join->new(databases => [$p, $s], join_column => $JC, parallel => 2);
+	ok($j->{_parallel}, 'parallel=2: truthy value stored; _parallel is true (EP truthy)');
+}
+
+# EP combinatorial: parallel=1 + backend='sqlite' → SQLite JOIN used; correct result.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'a'],
+		rows => [{ $JC => 'k1', a => 1 }, { $JC => 'k2', a => 2 }],
+	);
+	my $s = DomainDA->new(
+		cols => [$JC, 'b'],
+		rows => [{ $JC => 'k1', b => 10 }, { $JC => 'k2', b => 20 }],
+	);
+	my $j = Database::Join->new(
+		databases   => [$p, $s],
+		join_column => $JC,
+		parallel    => 1,
+		backend     => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref();
+	is(scalar @{$rows}, 2,
+		'parallel=1 + backend=sqlite: SQLite JOIN returns correct row count (EP combinatorial)');
+}
+
+# ==========================================================================
+# Section 27: 0.007.0 combinatorial boundary interactions
+#
+# Tests that verify interactions between sort_by, limit, and offset work
+# correctly together and across both array and SQLite backends.
+#
+# C1: sort_by + limit → sorted result truncated to limit rows.
+# C2: sort_by + offset → sorted result with leading rows skipped.
+# C3: limit + offset (no sort_by) → correct page window (join_col ASC default).
+# C4: sort_by + limit + offset → exact page from sorted result.
+# C5: SQLite backend: sort_by + limit → SQL ORDER BY + LIMIT correct.
+# ==========================================================================
+
+note '--- Section 27: 0.007.0 combinatorial boundary interactions ---';
+
+# C1: sort_by + limit: sorted by label ASC, truncated to 2 of 3 rows.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'label'],
+		rows => [
+			{ $JC => 'k1', label => 'mango' },
+			{ $JC => 'k2', label => 'apple' },
+			{ $JC => 'k3', label => 'zebra' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(sort_by => 'label', limit => 2);
+	is(scalar @{$rows}, 2, 'C1: sort_by+limit → 2 rows (limit applied after sort)');
+	is($rows->[0]{label}, 'apple', 'C1: first is apple (label ASC + limit)');
+	is($rows->[1]{label}, 'mango', 'C1: second is mango (label ASC + limit)');
+}
+
+# C2: sort_by + offset: sorted by label ASC, first row skipped.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'label'],
+		rows => [
+			{ $JC => 'k1', label => 'mango' },
+			{ $JC => 'k2', label => 'apple' },
+			{ $JC => 'k3', label => 'zebra' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	my $rows = $j->selectall_arrayref(sort_by => 'label', offset => 1);
+	is(scalar @{$rows}, 2, 'C2: sort_by+offset=1 → 2 remaining rows');
+	is($rows->[0]{label}, 'mango', 'C2: first after offset=1 is mango (apple skipped)');
+	is($rows->[1]{label}, 'zebra', 'C2: second is zebra');
+}
+
+# C3: limit + offset (no sort_by): join_col ASC default; correct page window.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'v'],
+		rows => [
+			{ $JC => 'k1', v => 'first'  },
+			{ $JC => 'k2', v => 'second' },
+			{ $JC => 'k3', v => 'third'  },
+			{ $JC => 'k4', v => 'fourth' },
+		],
+	);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC);
+	# Page 2 of 2-per-page: skip 2, take 2.
+	my $rows = $j->selectall_arrayref(offset => 2, limit => 2);
+	is(scalar @{$rows}, 2,           'C3: limit=2 offset=2 → 2-row page (join_col ASC)');
+	is($rows->[0]{v}, 'third',  'C3: page-2 first row is "third"');
+	is($rows->[1]{v}, 'fourth', 'C3: page-2 second row is "fourth"');
+}
+
+# C4: sort_by + limit + offset: exact middle page from label-sorted result.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'label'],
+		rows => [
+			{ $JC => 'k1', label => 'cherry' },
+			{ $JC => 'k2', label => 'apple'  },
+			{ $JC => 'k3', label => 'mango'  },
+			{ $JC => 'k4', label => 'zebra'  },
+		],
+	);
+	my $j = Database::Join->new(databases => [$p], join_column => $JC);
+	# label ASC order: apple, cherry, mango, zebra
+	# offset=1, limit=2: skip apple → [cherry, mango]
+	my $rows = $j->selectall_arrayref(sort_by => 'label', offset => 1, limit => 2);
+	is(scalar @{$rows}, 2,            'C4: sort_by+limit+offset → 2 middle rows');
+	is($rows->[0]{label}, 'cherry',   'C4: first middle row is cherry (label ASC, after apple)');
+	is($rows->[1]{label}, 'mango',    'C4: second middle row is mango');
+}
+
+# C5: SQLite backend + sort_by + limit → SQL ORDER BY + LIMIT produces correct page.
+{
+	my $p = DomainDA->new(
+		cols => [$JC, 'label'],
+		rows => [
+			{ $JC => 'k1', label => 'cherry' },
+			{ $JC => 'k2', label => 'apple'  },
+			{ $JC => 'k3', label => 'mango'  },
+		],
+	);
+	my $j    = Database::Join->new(
+		databases   => [$p],
+		join_column => $JC,
+		backend     => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(sort_by => 'label', limit => 2);
+	is(scalar @{$rows}, 2,           'C5 SQLite: sort_by+limit → 2 rows via SQL ORDER BY + LIMIT');
+	is($rows->[0]{label}, 'apple',   'C5 SQLite: first row is apple (label ASC)');
+	is($rows->[1]{label}, 'cherry',  'C5 SQLite: second row is cherry');
 }

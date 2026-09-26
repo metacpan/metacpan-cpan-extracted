@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article>
+  <section>
+    <title>Headings</title>
+
+    <para>Para Level 1</para>
+
+    <section>
+      <title>Heading Level 2</title>
+
+      <para>Para Level 2</para>
+
+      <section>
+        <title>Heading Level 3</title>
+
+        <para>Para Level 3</para>
+
+        <section>
+          <title>Heading Level 4</title>
+
+          <para>Para Level 4</para>
+        </section>
+      </section>
+    </section>
+  </section>
+</article>

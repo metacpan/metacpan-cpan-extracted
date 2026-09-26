@@ -40,7 +40,7 @@ subtest '1. Table creation, population & set_index' => sub {
     $adb->insert_id( 'catalog_product', 2, 'Mechanical Keyboard', 'Accessories', 120 );
     $adb->insert_id( 'catalog_product', 3, 'Gaming Mouse', 'Accessories', 80 );
 
-    ok( $tools->table_exist('catalog_product'), "Table exists detected" );
+    ok( $adb->exist_table('catalog_product'), "Table exists detected" );
 
     # Rebuild all indexes
     my $ok = $tools->set_index('catalog_product');
@@ -106,7 +106,7 @@ subtest '5. del_table' => sub {
 
     my $del_ok = $tools->del_table('catalog_product');
     ok( $del_ok, "del_table executed" );
-    ok( !$tools->table_exist('catalog_product'), "Table files and indexes cleanly deleted" );
+    ok( !$adb->exist_table('catalog_product'), "Table files and indexes cleanly deleted" );
 };
 
 done_testing();

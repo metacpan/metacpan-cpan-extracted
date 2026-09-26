@@ -11,3 +11,5 @@
 ^pod2htm
 ^_build/
 ^.git/
+^.agents/
+^skills-lock\.json$

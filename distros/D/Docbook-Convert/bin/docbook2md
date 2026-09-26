@@ -1,0 +1,101 @@
+#!/usr/bin/env perl
+#
+#  This file is part of Docbook::Convert.
+#
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
+#
+#  Full license text is available at:
+#
+#  <http://dev.perl.org/licenses/>
+#
+use strict;
+use vars qw($VERSION);
+use warnings;
+
+use FindBin qw($RealBin $Script);
+
+$VERSION='1.012';
+
+(my $handler=$Script)=~s/^docbook2//;
+exec($^X, "$RealBin/docbook-convert", "--handler=$handler", @ARGV) ||
+    die "unable to execute docbook-convert: $!\n";
+
+__END__
+
+=begin markdown
+
+# NAME
+
+docbook2md - convert DocBook articles and reference pages to Markdown
+
+# SYNOPSIS
+
+`docbook2md file.xml`
+
+# DESCRIPTION
+
+`docbook2md` is a compatibility alias for `docbook-convert --markdown`. It uses
+the retained custom renderer. Use `docbook-convert --pandoc` for the guide
+pipeline with includes, stable identifiers and packaged filters.
+
+# SEE ALSO
+
+`docbook-convert`, `Docbook::Convert`, `Docbook::Convert::Pandoc`
+
+# AUTHOR
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of Docbook::Convert.
+
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
+
+
+=end markdown
+
+
+=head1 NAME
+
+docbook2md - convert DocBook articles and reference pages to Markdown
+
+
+=head1 SYNOPSIS
+
+C<docbook2md file.xml>
+
+
+=head1 DESCRIPTION
+
+C<docbook2md> is a compatibility alias for C<docbook-convert --markdown>. It uses
+the retained custom renderer. Use C<docbook-convert --pandoc> for the guide
+pipeline with includes, stable identifiers and packaged filters.
+
+
+=head1 SEE ALSO
+
+C<docbook-convert>, C<Docbook::Convert>, C<Docbook::Convert::Pandoc>
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Andrew Speer. It may be distributed
+under the same terms as Perl itself.
+
+=cut

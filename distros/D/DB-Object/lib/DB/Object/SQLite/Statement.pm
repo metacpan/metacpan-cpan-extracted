@@ -8,7 +8,6 @@
 ## Modified 2026/03/22
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -21,7 +20,8 @@ BEGIN
 {
     use strict;
     use warnings;
-    use parent qw( DB::Object::SQLite DB::Object::Statement );
+    warnings::register_categories( 'DB::Object' );
+    use parent qw( DB::Object::Statement );
     use vars qw( $VERSION $DEBUG );
     our $DEBUG = 0;
     our $VERSION = 'v0.301.0';
@@ -171,7 +171,7 @@ DESTROY
 };
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -192,6 +192,10 @@ DB::Object::SQLite::Statement - SQLite Statement Object
 =head1 DESCRIPTION
 
 This is a SQLite specific statement object class.
+
+Any methods not documented here is called directly via the SQL driver.
+
+If an error occurs, C<undef> or an an empty list is returned, and the error code, if any, can be retrieved with C<< $sth->error->code >> and the error message, if any, with C<< $sth->error->message >>
 
 =head1 METHODS
 
@@ -225,13 +229,19 @@ See L<SQLite documentation for more information|https://www.sqlite.org/lang_inse
 
 =head2 only
 
+    my $value = $sth->only;
+
 This returns an error as C<SELECT FROM ONLY> is not supported by SQLite and will return an error.
 
 =head2 priority
 
+    my $value = $sth->priority;
+
 This is unsupported under SQLite and if used returns an error.
 
 =head2 unprepared_statements
+
+    my $value = $sth->unprepared_statements;
 
 This returns the natural SQLite statement property C<sqlite_unprepared_statements>, which provides the remaining unprepared statements in case where multiple statements were prepared.
 
@@ -251,7 +261,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2026 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

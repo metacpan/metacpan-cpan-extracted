@@ -53,6 +53,19 @@ sub deliver_spans {
     return $self->_post($self->{configuration}->spans_uri, $trace, 'span delivery');
 }
 
+# Delivers one record_change() call. A plan without change tracking answers 403, which is just a
+# false return here like any other non-2xx.
+sub deliver_change {
+    my ($self, $change) = @_;
+    return $self->_post($self->{configuration}->changes_uri, $change, 'change delivery');
+}
+
+# Delivers the startup snapshot, { environment => ..., state => {...} }.
+sub deliver_change_snapshot {
+    my ($self, $snapshot) = @_;
+    return $self->_post($self->{configuration}->change_snapshots_uri, $snapshot, 'change snapshot delivery');
+}
+
 sub _post {
     my ($self, $uri, $payload, $description) = @_;
     my $config = $self->{configuration};

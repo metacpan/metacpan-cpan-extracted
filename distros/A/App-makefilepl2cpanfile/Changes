@@ -1,5 +1,107 @@
 Revision history for App-makefilepl2cpanfile
 
+0.05	Fri Sep 25 05:01:10 PM EDT 2026
+	[ Enhancements ]
+	Version ranges (e.g. '>= 1.2, < 2.0') are kept and written to the
+	  cpanfile; previously they were silently dropped, losing upper bounds
+	Support the conflicts relationship (in prereqs blocks, existing develop
+	  blocks and the META spec 1.x layout)
+	New read_makefile() function and content argument to generate(), so
+	  one read of Makefile.PL can feed several calls
+	--check now exits with status 1 when modules are missing, so CI can
+	  fail on it
+
+	[ Bug Fixes ]
+	Recognise legacy top-level recommends => { ... } blocks (META spec 1.x
+	  style, e.g. directly under META_MERGE) and emit them as runtime
+	  recommends in the generated cpanfile; previously they were ignored
+	Likewise handle top-level suggests => { ... } blocks, emitted as
+	  runtime suggests
+	Likewise handle the other META spec 1.x top-level keys: requires,
+	  build_requires, configure_requires and conflicts; they were ignored
+	recommends/suggests blocks nested inside prereqs => { ... } remain
+	  phase-scoped and are not duplicated into runtime
+	Read every entry on a line; previously only the first was kept, so
+	  PREREQ_PM => { 'A' => 0, 'B' => 0 } silently lost B
+	Validate the whole version value instead of its numeric prefix:
+	  '1e3' is no longer truncated to '1' nor '1.0-TRIAL' to '1.0', and
+	  v-strings such as 'v1.2.3' and MIN_PERL_VERSION => 'v5.10.0' are no
+	  longer dropped
+	Versions with no digit ('.', '_') or with non-ASCII digits are treated
+	  as no minimum instead of being written to the cpanfile
+	Treat 'v0', 'v0.0.0' and MIN_PERL_VERSION '0.0' as zero, like '0'
+	Require matching quotes around module names: "A'B" was misread as a
+	  different module (B, or A in an existing cpanfile)
+	Ignore dependency hashes commented out on one line, at any level
+	  (including phases and relationships inside prereqs blocks), and
+	  commented-out entries in an existing cpanfile's develop block
+	Only accept ASCII module names, as CPAN requires
+	A comment at the end of a line now goes to the last entry that is
+	  kept; it was lost when the last entry had an invalid name
+	--check reads Makefile.PL once, so it always checks the same text
+	  that was converted
+	generate() no longer changes the caller's $@ or $!
+	generate() no longer creates empty develop recommends/suggests hashes
+	  as a side effect of checking for existing develop tools
+	A filehandle or other reference passed as makefile is refused with
+	  "Cannot read" instead of failing inside Path::Tiny
+	An empty home directory from File::HomeDir falls back to the default
+	  develop tools instead of dying
+	Config file: YAML::Tiny errors are now reported as the documented
+	  "Failed to parse" message; a directory, device or FIFO at the config
+	  path is treated as no config (a FIFO previously blocked forever); a
+	  config path that cannot be examined (e.g. permission denied) croaks
+	  instead of silently using the defaults
+	--diff never writes the cpanfile; with no existing cpanfile it shows
+	  a diff against an empty file
+	A directory (or other non-regular file) named cpanfile is refused;
+	  previously the new text was moved inside it and success reported
+	A failed write (disk full, failed rename) no longer leaves a stray
+	  temporary file such as cpanfile164662728368918 in the project
+	  directory; the previous cpanfile is kept and nothing else remains
+
+	[ Security ]
+	Validate versions carried over from an existing cpanfile's develop
+	  block; a crafted version ending in a backslash could inject code into
+	  the regenerated cpanfile.  Invalid versions are dropped with a warning
+	Strip control characters and Unicode bidirectional overrides
+	  ("Trojan Source", CVE-2021-42574) from comments copied to the cpanfile
+	The command-line tool refuses to read or write a cpanfile that is a
+	  symbolic link; a cloned repository could otherwise make it overwrite
+	  (or create) any file the user can write, such as ~/.bashrc
+	Escape control and direction-override characters in warnings and
+	  errors, so text from a hostile file cannot send escape sequences to
+	  the terminal to hide or forge messages
+	Fix regular expressions that were quadratic on hostile input (an
+	  existing cpanfile with many unclosed develop blocks, and comments
+	  with long runs of spaces) and could stall the tool for minutes
+	An I/O error in a directory whose name contains "utf" or "decode" is
+	  no longer mistaken for an encoding error and hidden
+
+	[ Packaging ]
+	Licence metadata is now gpl_2 (it was "GPL", published as
+	  "open_source"); the command-line tool's documentation now states the
+	  same GPL2 terms as the module and the LICENSE file
+	Minimum Perl is now 5.14 (the code uses s///r and the /a modifier;
+	  5.10 was declared but could not compile it)
+	Path::Tiny 0.034 or later is required
+	The module no longer imports functions into its own namespace
+	  (Load, Dump, home, path, croak, carp, Readonly were callable as
+	  App::makefilepl2cpanfile::...), and no longer loads autodie
+	Test::Mockingbird 0.13 required for the tests; removed unused
+	  dependencies (List::Util and six test modules); author-test modules
+	  declared as develop prerequisites
+
+	[ Documentation ]
+	Rewrote the POD: examples, encoding rules, common pitfalls, input
+	  domains, API specifications, formal specification and state diagram
+
+	[ Testing ]
+	Added t/data-flow.t and t/domain.t; extended function, unit,
+	  integration and edge-case tests
+	New test dependencies: Capture::Tiny, Module::CPANfile,
+	  Test::Without::Module
+
 0.04	Sun Aug  2 12:59:14 PM EDT 2026
 	[ Bug Fixes ]
 	Gracefully handle Makefile.PL files containing invalid UTF-8 bytes: fall back to

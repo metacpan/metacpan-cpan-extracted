@@ -1,29 +1,29 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Cache/Tables.pm
-## Version v0.101.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.101.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/22
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package DB::Object::Cache::Tables;
 BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     use JSON;
     use Fcntl qw( :flock );
     use Module::Generic::File qw( sys_tmpdir );
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.101.0';
+    our $VERSION = 'v0.101.1';
 };
 
 use strict;
@@ -106,8 +106,10 @@ sub read
     my $j = JSON->new->relaxed;
     if( $tables_cache_file->exists && !$tables_cache_file->is_empty )
     {
-        $hash = $tables_cache_file->load_json ||
-            warn( "An error occured while decoding json data from the table cache file: ", $tables_cache_file->error );
+        $hash = $tables_cache_file->load_json || do
+        {
+            warn( "An error occured while decoding json data from the table cache file: ", $tables_cache_file->error ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
+        };
     }
     return( $hash );
 }
@@ -199,7 +201,7 @@ DB::Object::Cache::Tables - Table Cache
 
 =head1 VERSION
 
-    v0.101.0
+    v0.101.1
 
 =head1 DESCRIPTION
 
@@ -229,9 +231,14 @@ An amount of time in second until the cache file becomes obsolete.
 
 =head2 cache
 
+    my $value = $cache->cache;
+
 Returns the hash reference structure of the cache
 
 =head2 cache_dir
+
+    my $value = $cache->cache_dir;
+    $cache->cache_dir( $value );
 
 Set or get the cache dir.
 
@@ -239,11 +246,16 @@ When set, this will also set the cache file calling L</"cache_file">
 
 =head2 cache_file
 
+    my $value = $cache->cache_file;
+    $cache->cache_file( $value );
+
 Set or get the cache file.
 
 When set, this will store the cache file modification time to check later if it has become obsolete and load its json data into the L</"cache">
 
 =head2 get
+
+    my $value = $cache->get;
 
 Given an hash reference of parameters, this will return an array reference of table hash reference.
 
@@ -262,6 +274,8 @@ Parameters are:
 =back
 
 =head2 read
+
+    my $value = $cache->read;
 
 Given a full path to a json cache file, this will read the file and return its data as a hash reference.
 

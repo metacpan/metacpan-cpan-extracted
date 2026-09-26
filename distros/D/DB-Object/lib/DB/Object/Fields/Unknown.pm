@@ -7,7 +7,6 @@
 ## Modified 2026/03/22
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -16,6 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     use overload (
@@ -180,9 +180,14 @@ A warning is issued by L<DB::Object::Fields> when a field is unknown, so make su
 
 =head2 as_string
 
+    my $value = $field->as_string;
+
 Returns the error message as a regular string.
 
 =head2 error
+
+    my $value = $field->error;
+    $field->error( $value );
 
 Sets or gets the error that triggered this new object.
 
@@ -190,11 +195,17 @@ This returns the error as a L<string object|Module::Generic::Scalar>
 
 =head2 field
 
+    my $value = $field->field;
+    $field->field( $value );
+
 Sets or gets the name of the unknown field.
 
 This returns the field name as a L<string object|Module::Generic::Scalar>
 
 =head2 table
+
+    my $value = $field->table;
+    $field->table( $value );
 
 Sets or gets the name of the table associated with this unknown field
 

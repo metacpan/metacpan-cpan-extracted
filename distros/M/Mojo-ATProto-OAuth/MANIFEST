@@ -21,8 +21,10 @@ t/dpop.t
 t/flow.t
 t/identity.t
 t/identity_async.t
+t/lib/SessionStoreContract.pm
 t/par.t
 t/refresh_and_scope_upgrade.t
+t/refresh_concurrency.t
 t/resolver.t
 t/resource_client.t
 t/scopes.t

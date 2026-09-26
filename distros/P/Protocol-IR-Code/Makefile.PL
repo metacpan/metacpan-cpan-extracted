@@ -11,7 +11,7 @@ use ExtUtils::MakeMaker 6.64;
 my %WriteMakefileArgs = (
     NAME     => 'Protocol::IR::Code',
     DISTNAME => 'Protocol-IR-Code',
-    VERSION  => '1.1',
+    VERSION  => '1.2',
     EXE_FILES => [glob('script/*'), glob('bin/*')],
     CONFIGURE_REQUIRES => {
   "ExtUtils::MakeMaker" => "6.64"

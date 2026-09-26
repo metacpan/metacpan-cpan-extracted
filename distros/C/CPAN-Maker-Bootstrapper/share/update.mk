@@ -4,6 +4,7 @@ MANAGED_FILES = \
     git.mk \
     help.mk \
     version.mk \
+    bootstrap.mk \
     bash-completion.mk \
     modulino.mk \
     perl.mk \

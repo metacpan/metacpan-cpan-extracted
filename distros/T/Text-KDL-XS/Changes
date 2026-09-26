@@ -1,5 +1,103 @@
 Revision history for Text-KDL-XS
 
+0.002  2026-09-26
+        Incompatible changes:
+        - A string passed to parse_kdl or Text::KDL::XS::Parser->new is
+          now read as a Perl character string, like the output of
+          emit_kdl, so parse_kdl(emit_kdl($data)) works for any text.
+          UTF-8 byte strings must be decoded first (utf8::decode,
+          Encode::decode) or passed as a filehandle. Code reference
+          chunks and filehandles still deliver UTF-8 bytes.
+        - Unknown options, odd option lists and invalid option values
+          make parse_kdl, emit_kdl and Parser->new die instead of being
+          ignored or clamped. version also accepts 'v1'/'v2' and is
+          case-insensitive for emit_kdl too.
+        - Value->new, Node->new and Document->new check their arguments:
+          unknown types, kinds and fields, numbers that are not numbers,
+          number text that is not a KDL number, missing node names and
+          non-ARRAY lists die. A number's kind is inferred when omitted.
+        - Data mode writes a string that has been used as a number as a
+          number only when its text is Perl's rendering of that number:
+          '007', '1.50' and '1e3' stay strings.
+        - emit_kdl dies for inf/nan in KDL v1 output, which has no
+          spelling for them, instead of writing invalid v1.
+        - emit_kdl returns "\n" for an empty document, not "".
+        - Value->as_number always returns a Perl number (also for
+          arbitrary precision text); new Value->as_bignum returns an
+          exact Math::BigInt or Math::BigFloat. as_string writes floats
+          as KDL does ('1.0', '#inf').
+        - The prop_index field of Text::KDL::XS::Node is gone; prop()
+          searches props, so it works on hand-built and edited nodes.
+
+        Fixes:
+        - Floats are emitted with the shortest text that reads back as the
+          same double. ckdl's formatter wrote wrong digits for most values
+          and looped forever for some values near 2.2e-308; the sign of
+          -0.0 is kept.
+        - Parsed floats are correctly rounded (ckdl's parser is up to an
+          ulp off, 1e23 was 1.0000000000000001e+23).
+        - Integers are emitted exactly over the whole range -2**63 ..
+          2**64-1; unsigned values above 2**63-1 no longer wrap.
+        - Parsed integers that fit a Perl IV or UV are kind 'integer',
+          including 2**31 .. 2**32-1, -2**63 and 2**63 .. 2**64-1.
+        - parse_kdl with emit_comments no longer puts slashdashed nodes,
+          arguments, properties and children back into the tree.
+        - Parse errors include ckdl's reason ("KDL parse error:
+          Unexpected end of data ..."), are reported at the caller's line,
+          and repeat on every later next_event call. Errors from option
+          checks, constructors and emit_kdl point at the caller too.
+        - Filehandles are read with PerlIO's read: :encoding(UTF-8) and
+          :utf8 layers, data buffered by <$fh>, in-memory handles, tied
+          handles, bare globs and *FH{IO} work; read errors and closed
+          handles die.
+        - An exception thrown by a source code reference propagates
+          unchanged (objects included) instead of ending the input
+          silently; chunks longer than requested are used in full instead
+          of being truncated; the source is not called again after it
+          signalled the end of input.
+        - Input that is not valid UTF-8, or encodes surrogates or code
+          points above U+10FFFF (also through \u{...} escapes), is a parse
+          error; emit_kdl dies for such characters instead of writing ""
+          or invalid KDL.
+        - String-encoded numbers are checked for KDL number syntax before
+          they are written, so they can no longer inject KDL text.
+        - Strings that would be written bare but read back as keywords or
+          numbers (true, null, -1, .5, ...) make emit_kdl quote the whole
+          document, unless identifier_mode is given.
+        - KDL v2 output always escapes newlines in strings, whatever
+          escape_mode says.
+        - Math::BigInt and Math::BigFloat values are written as exact
+          numbers, other objects with string overloading as strings, and
+          other objects die, the same way in data and tree mode.
+          Subclasses of Document, Node and Value are accepted everywhere.
+        - Cyclic data dies with "emit_kdl: cyclic data structure" instead
+          of recursing until memory runs out.
+        - New max_depth option for parse_kdl and Parser->new (default 512,
+          0 for unlimited) limits the nesting of untrusted documents.
+        - Parser and emitter objects are safe to have around when a
+          thread is created (they are not cloned), cannot be forged,
+          freed twice or freed while in use by their own source callback,
+          and can be subclassed.
+        - Comment events of the streaming parser carry the comment text.
+        - Undefined node names and property keys die instead of being
+          written as "", and ckdl emitter failures are reported.
+        - Parsed values are ordinary hashes that can be modified.
+        - Text::KDL::XS::Parser, Emitter, Document, Node and Value can be
+          loaded on their own.
+        - Node->as_data accepts plain scalars in hand-built nodes.
+
+        Build and documentation:
+        - Requires a perl with 64-bit integers; links libm explicitly and
+          uses the static ckdl flags; Alien::ckdl is needed at build time
+          only.
+        - Complete rewrite of the documentation: full API reference in
+          Text::KDL::XS and the class modules, and a new
+          Text::KDL::XS::Cookbook covering every KDL feature with KDL and
+          Perl examples plus recipes.
+        - Tests for every fix above; t/90-pod.t checks the POD.
+          CI builds threaded and unthreaded perls, runs make disttest and
+          runs the suite under AddressSanitizer.
+
 0.001  2026-04-30
         - Initial CPAN release.
         - XS bindings to the ckdl C library via Alien::ckdl.

@@ -1,27 +1,27 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Query.pm
-## Version v0.4.1
+## Version v0.4.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/26
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package DB::Object::Postgres::Query;
 BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( DB::Object::Query );
     use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use Wanted;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.4.1';
+    our $VERSION = 'v0.4.2';
 };
 
 use strict;
@@ -163,7 +163,6 @@ sub format_statement
     my @format_fields = ();
     my @format_values = ();
     my $binded   = $self->{binded_values} = [];
-    # my $multi_db = $tbl_o->param( 'multi_db' );
     my $multi_db = $tbl_o->prefix_database;
     my $prefix   = $tbl_o->prefix;
     my $db       = $tbl_o->database;
@@ -423,7 +422,13 @@ sub format_statement
         # {
         #     push( @format_fields, $field );
         # }
-        $elem->field( $field );
+        # If the field provided is just a string, we trade it for a table field object, because it will provide us with more information to format the query in DB::Object::Statement, such as to turn a hash reference into JSON, or a DateTime::Lite object into a suitable format
+        $elem->field( $self->_is_a( $field => 'DB::Object::Fields::Field' )
+            ? $field
+            : exists( $fields_ref->{ $field } )
+                ? $tbl_o->fields( $field )
+                : $field
+        );
         $elems->push( $elem );
     }
     # TODO: Remove the following line as it is obsolete as of 2023-07-23
@@ -445,7 +450,7 @@ sub format_statement
 # sub having { return( shift->_having( @_ ) ); }
 sub having { return( shift->_where_having( 'having', 'having', @_ ) ); }
 
-# http://www.postgresql.org/docs/9.3/interactive/queries-limit.html
+# <http://www.postgresql.org/docs/9.3/interactive/queries-limit.html>
 sub limit
 {
     my $self  = shift( @_ );
@@ -472,6 +477,43 @@ sub limit
         return( $self->new_null( type => 'object' ) );
     }
     return( $limit );
+}
+
+# FOR UPDATE, FOR NO KEY UPDATE, FOR SHARE and FOR KEY SHARE
+# This feature is available since PostgreSQL version 9.3
+# <https://www.postgresql.org/docs/current/sql-select.html#SQL-FOR-UPDATE-SHARE>
+sub lock
+{
+    my $self = shift( @_ );
+    my $lock = $self->{lock};
+    if( @_ )
+    {
+        require version;
+        if( $self->database_object->version < version->parse( '9.3' ) )
+        {
+            warn( "This feature is only available in PostgreSQL version 9.3 and above." ) if( $self->_warnings_enabled( 'DB::Object' ) );
+        }
+        # Supported, case insensitive:
+        # For update
+        # For no key update
+        # For share
+        # For key share
+        # update
+        # no key update
+        # share
+        # key share
+        my $str = shift( @_ );
+        if( $str !~ /^(?:For[[:blank:]\h]+)?(update|no[[:blank:]\h]+key[[:blank:]\h]+update|share|key[[:blank:]\h]+share)/i )
+        {
+            return( $self->error( "Unsupported argument for locking. See https://www.postgresql.org/docs/current/sql-select.html#SQL-FOR-UPDATE-SHARE" ) );
+        }
+        unless( $str =~ /^For[[:blank:]\h]+/i )
+        {
+            $str = 'FOR ' . $str;
+        }
+        $lock = $self->{lock} = uc( $str );
+    }
+    return( $lock );
 }
 
 # https://www.postgresql.org/docs/10/sql-insert.html
@@ -638,7 +680,7 @@ sub reset
         my $keys = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order  from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
         CORE::delete( @$self{ @$keys } );
         $self->{query_reset}++;
-        $self->{enhance} = 1;
+        # $self->{enhance} = 1;
     }
     return( $self );
 }
@@ -687,7 +729,7 @@ sub _query_components
     # ok options:
     # no_bind_copy: because join for example does it already and this would duplicate the binded types, so we use this option to tell this method to set an exception. Kind of a hack that needs clean-up in the future from a design point of view.
     $opts->{no_bind_copy} //= 0;
-    my( $where, $group, $having, $sort, $order, $limit, $returning, $on_conflict );
+    my( $where, $group, $having, $sort, $order, $limit, $returning, $on_conflict, $lock );
 
     $where = $self->where();
     if( $type eq 'select' )
@@ -696,11 +738,13 @@ sub _query_components
         $having = $self->having;
         $sort   = $self->reverse ? 'DESC' : $self->sort ? 'ASC' : '';
         $order  = $self->order;
+        # <https://www.postgresql.org/docs/current/sql-select.html#SQL-FOR-UPDATE-SHARE>
+        $lock   = $self->lock;
     }
     $limit = $self->limit;
-    $returning = $self->returning;
+    $returning   = $self->returning;
     $on_conflict = $self->on_conflict;
-    my @query = ();
+    my @query    = ();
     push( @query, "WHERE $where" ) if( $where && $type ne 'insert' );
     if( $where && $where->elements->length )
     {
@@ -708,7 +752,7 @@ sub _query_components
         $self->elements->push( $where ) unless( $opts->{no_bind_copy} );
     }
     push( @query, "GROUP BY $group" ) if( $group && $type eq 'select'  );
-    push( @query, "HAVING $having" ) if( $having && $type eq 'select'  );
+    push( @query, "HAVING $having" )  if( $having && $type eq 'select'  );
     push( @query, "ORDER BY $order" ) if( $order && $type eq 'select'  );
     push( @query, $sort ) if( $sort && $order && $type eq 'select'  );
     if( $limit && $type eq 'select' )
@@ -729,10 +773,18 @@ sub _query_components
         }
         else
         {
-            warn( "Warning only: the PostgreSQL ON CONFLICT clause is only supported for INSERT queries. Your query was of type \"$type\".\n" );
+            warn( "Warning only: the PostgreSQL ON CONFLICT clause is only supported for INSERT queries. Your query was of type \"$type\"." ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
         }
     }
-    push( @query, "RETURNING $returning" ) if( $returning && ( $type eq 'insert' || $type eq 'update' || $type eq 'delete' ) );
+
+    if( $returning && ( $type eq 'insert' || $type eq 'update' || $type eq 'delete' ) )
+    {
+        push( @query, "RETURNING $returning" );
+    }
+    elsif( $lock && $type eq 'select' )
+    {
+        push( @query, $lock );
+    }
     return( \@query );
 }
 
@@ -753,7 +805,7 @@ DB::Object::Postgres::Query - Query Object for PostgreSQL
 
 =head1 VERSION
 
-    v0.4.1
+    v0.4.2
 
 =head1 DESCRIPTION
 
@@ -763,9 +815,14 @@ This is a Postgres specific query object.
 
 =head2 binded_having
 
+    my $value = $query->binded_having;
+    $query->binded_having( $value );
+
 Sets or gets the array object (L<Module::Generic::Array>) for the binded value in C<HAVING> clauses.
 
 =head2 binded_types_as_param
+
+    my $value = $query->binded_types_as_param;
 
 Returns an array object (L<Module::Generic::Array>) of binded params types.
 
@@ -811,7 +868,30 @@ Calls L<DB::Object::Query/_where_having> to build a C<having> clause.
 
 =head2 limit
 
-Build a new L<DB::Object::Query::Clause> clause object by calling L</_process_limit> and return it.
+    my $value = $query->limit;
+
+Build a new L<DB::Object::Query::Clause> clause object by calling L<DB::Object::Query/_process_limit> and return it.
+
+=head2 lock
+
+    $q->lock( 'update' );
+    $q->lock( 'no key update' );
+    $q->lock( 'share' );
+    $q->lock( 'no key share' );
+    $q->lock( 'for update' );
+    $q->lock( 'for no key update' );
+    $q->lock( 'for share' );
+    $q->lock( 'for no key share' );
+
+Sets a database lock for select statements.
+
+For example: C<SELECT FROM mytable FOR NO KEY UPDATE>
+
+See PostgreSQL documentation at L<https://www.postgresql.org/docs/current/sql-select.html#SQL-FOR-UPDATE-SHARE>
+
+Note that this feature is only available in PostgreSQL version C<9.4> or higher.
+
+It returns the clause in uppercase.
 
 =head2 on_conflict
 

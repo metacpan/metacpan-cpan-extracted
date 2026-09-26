@@ -9,7 +9,7 @@ use Fcntl qw(:DEFAULT :flock);
 use Digest::SHA qw(sha256_hex);
 use parent qw(AmberDB::Locale AmberDB::Array);
 
-our $VERSION = '5.25.2';
+our $VERSION = '5.26.0';
 my $CREATED = '2014-12-20';
 
 # ------------------------------------------------
@@ -259,11 +259,10 @@ sub set_datadir {
 
     $dbase_dir or return;
 
-    # declarations
+    # declarations (persistent storage only; ramdisk directories are dynamically provisioned on mount)
     my @dirs = qw(
       dbase_dir table_dir schema_dir backup_dir
-      ramdisk_dir table_rdir schema_rdir conf_rdir
-      buffer_dir journal_dir lock_dir session_dir
+      buffer_dir journal_dir lock_dir session_dir config_dir
     );
     foreach my $dir (@dirs) {
         $self->{_path}->{$dir} //= "";
@@ -286,6 +285,7 @@ sub set_datadir {
         $self->{_path}->{journal_dir} = $dbase_dir;
         $self->{_path}->{lock_dir}    = "$dbase_dir/lock";
         $self->{_path}->{session_dir} = "$dbase_dir/session";
+        $self->{_path}->{config_dir}  = "$dbase_dir/config";
         return 1;
     }
 
@@ -296,8 +296,9 @@ sub set_datadir {
     $self->{_path}->{table_dir}   = "$dbase_dir/table";
     $self->{_path}->{lock_dir}    = "$dbase_dir/lock";
     $self->{_path}->{session_dir} = "$dbase_dir/session";
+    $self->{_path}->{config_dir}  = "$dbase_dir/config";
 
-    # Auto-load connect.pl if present in datadir, or fallback database name to leaf folder
+    # Auto-load connect.pl if present in datadir
     my $conn_file = "$dbase_dir/config/connect.pl";
     if ( -f $conn_file ) {
         my $target = ( $conn_file =~ m{^(?:\./|[a-zA-Z]:|/|\\)} ) ? $conn_file : "./$conn_file";
@@ -306,12 +307,10 @@ sub set_datadir {
             $self->{_connect}->{database} = $cfg->{database};
         }
     }
-    if ( !defined $self->{_connect}->{database} || !length $self->{_connect}->{database} ) {
-        my ($leaf) = $dbase_dir =~ m{([^/\\\\]+)[/\\\\]*$};
-        $self->{_connect}->{database} = $leaf if defined $leaf && length $leaf;
-    }
 
-    unless ( $self->config('test') ) {
+
+
+    unless ( $self->config('test') || $^C ) {
         if ( defined $dbase_dir && $dbase_dir ne "." && $dbase_dir ne "" ) {
             for my $dir (
                 $self->{_path}->{dbase_dir},
@@ -330,7 +329,7 @@ sub set_datadir {
         }
     }
 
-    $self->ramdisk_setup();
+    $self->ramdisk_setup() unless $^C;
     return 1;
 }
 
@@ -338,6 +337,7 @@ sub set_datadir {
 # ------------------------------------------------
 sub make_path {
     my ( $self, $path ) = @_;
+    return 1 if $^C;
     unless ( -d $path ) {
         require File::Path;
         File::Path::make_path($path);
@@ -492,8 +492,8 @@ sub verify_password {
 
 sub _connect_file {
     my ($self) = @_;
-    my $conf_dir = $self->path('conf_dir') || ( ( $self->path('dbase_dir') || "." ) . "/config" );
-    return "$conf_dir/connect.pl";
+    my $config_dir = $self->path('config_dir') || ( ( $self->path('dbase_dir') || "." ) . "/config" );
+    return "$config_dir/connect.pl";
 }
 
 sub _load_connect_config {
@@ -557,8 +557,8 @@ sub _save_connect_config {
 sub session_file {
     my ( $self, $token ) = @_;
     return '' unless defined $token && length $token;
-    my $sess_dir = $self->path('session_dir') || ( ( $self->path('dbase_dir') || "." ) . "/session" );
-    return "$sess_dir/cli_$token";
+    my $session_dir = $self->path('session_dir') || ( ( $self->path('dbase_dir') || "." ) . "/session" );
+    return "$session_dir/cli_$token";
 }
 
 # my $token = $adb->generate_token();
@@ -689,17 +689,16 @@ sub connect {
     # Sub-case B: Authenticate credentials & generate session token
     my $connect_cfg = $self->_load_connect_config();
 
-    # Dbase dir leaf name as default database if not specified
+    # Database default if not specified in connect
     if ( !defined $database || !length $database ) {
         if ( $connect_cfg && $connect_cfg->{database} ) {
             $database = $connect_cfg->{database};
         }
         else {
-            my $dbase_dir = $self->path('dbase_dir') || ".";
-            my ($leaf) = $dbase_dir =~ m{([^/\\\\]+)[/\\\\]*$};
-            $database = $leaf // 'amberdb';
+            $database = 'amberdb';
         }
     }
+
 
     $username //= 'cli';
     $password //= '';

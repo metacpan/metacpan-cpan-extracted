@@ -54,14 +54,35 @@ sub _resolve_vars {
 ########################################################################
   my ( $self, $text ) = @_;
 
-  my %needed  = map       { $_ => 1 } $text =~ /$PLACEHOLDER/gxsm;
+  # default strict unless explicitly disabled with --no-strict
+  my $strict = $self->get_strict;
+  $strict //= $TRUE;
+
+  # Scrub a COPY for the missing-value check only. Placeholders that
+  # appear solely in POD or comments are references, not substitutions,
+  # so they must not count toward "no value present". Substitution
+  # below still runs against the original, untouched $text.
+  ( my $code = $text ) =~ s/^=\w+.*?^=cut[^\n]*$//gxsm;  # strip POD blocks
+  $code =~ s/[#][^\n]*//gxsm;  # strip comments
+
+  my %in_code = map { $_ => 1 } $code =~ /$PLACEHOLDER/gxsm;
+
   my @missing = sort grep { !( defined $ENV{$_} && length $ENV{$_} ) }
-    keys %needed;
+    keys %in_code;
 
-  die sprintf "ERROR: no value present for:\n\t%s\n", join "\n\t", @missing
-    if @missing;
+  if (@missing) {
+    my $msg = sprintf "no value present for:\n\t%s\n", join "\n\t", @missing;
 
-  $text =~ s/$PLACEHOLDER/$ENV{$1}/gxsme;
+    die "ERROR: $msg"
+      if $strict;
+
+    warn "WARNING: $msg";
+  }
+
+  # Substitute wherever a value exists; anything without a value --
+  # including POD/comment references and (in --no-strict) missing code
+  # vars -- is left literal rather than blanked out.
+  $text =~ s/$PLACEHOLDER/ ( defined $ENV{$1} && length $ENV{$1} ) ? $ENV{$1} : "\@$1\@" /gxsme;
 
   return $text;
 }

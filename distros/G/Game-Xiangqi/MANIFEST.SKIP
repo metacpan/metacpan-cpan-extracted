@@ -1,0 +1,38 @@
+# ---- version control and editors ----
+^\.git/
+^\.gitignore$
+\.swp$
+~$
+^\.DS_Store$
+/\.DS_Store$
+
+# ---- the build tree ----
+^blib/
+^pm_to_blib$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^MANIFEST\.bak$
+^Install/
+^Xiangqi\.bs$
+\.o$
+\.bundle$
+\.so$
+\.dll$
+
+# GENERATED FROM Xiangqi.xs, and shipping it is worse than not: a stale Xiangqi.c
+# in the tarball is what a smoker compiles when xsubpp is newer than the file.
+^Xiangqi\.c$
+
+# ---- the dist tarball and its unpacked copy ----
+^Game-Xiangqi-[0-9._]+/
+^Game-Xiangqi-[0-9._]+\.tar\.gz$
+
+# ---- scratch that is not part of the dist ----
+^ignore\.txt$
+^nytprof
+^cover_db/
+
+# NOTE: xt/ IS SHIPPED, deliberately. xt/README tells whoever unpacks this where
+# to get the one oracle that is not a published table, and a dist that shipped the
+# tests but not the note about the oracle would be shipping a test nobody can run.

@@ -1,0 +1,15 @@
+Revision history for ASPEER-MakeMaker
+
+1.012  2026-09-26
+
+    - Publish public repository metadata through the GitHub mirror.
+    - Add contributor and security policies, dependency auditing and
+      artifact-attestation verification guidance.
+    - Declare the CPAN authority in distribution metadata.
+
+1.011  2026-09-26
+
+    - Consolidate the shared MakeMaker lifecycle and utility layer.
+    - Preserve extension chaining and generated Makefile targets.
+    - Add distribution documentation and integration coverage.
+    - Prepare the consolidated distribution for its first CPAN release.

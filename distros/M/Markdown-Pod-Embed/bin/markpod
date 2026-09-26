@@ -1,0 +1,129 @@
+#!/usr/bin/env perl
+
+#
+#  This file is part of Markdown::Pod::Embed.
+#
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
+#
+#  Full license text is available at:
+#
+#  <http://dev.perl.org/licenses/>
+#
+
+use strict;
+use vars qw($VERSION);
+use warnings;
+use Getopt::Long qw(GetOptions);
+use Markdown::Pod::Embed;
+
+$VERSION='1.012';
+
+my %opt;
+GetOptions(
+    'inplace|i' => \$opt{'inplace'},
+    'recursive|recurse|r' => \$opt{'recursive'},
+    'dry-run' => \$opt{'dry_run'},
+    'nobackup' => \$opt{'nobackup'},
+    'dialect=s' => \$opt{'dialect'},
+    'extract-markdown|extract_markdown' => \$opt{'markdown'},
+    'extract-pod|extract_pod' => \$opt{'pod'},
+    'version' => \$opt{'version'},
+    'help' => \$opt{'help'},
+) or die "invalid options; use --help\n";
+if ($opt{'help'}) {
+    print "Usage: markpod [--inplace] [--recursive] [--dry-run] [--nobackup] FILE...\n";
+    print "       markpod --extract-markdown|--extract-pod FILE\n";
+    exit 0;
+}
+if ($opt{'version'}) {
+    print "markpod $VERSION\n";
+    exit 0;
+}
+die "supply a file or directory\n" unless @ARGV;
+die "choose one extraction mode\n" if $opt{'markdown'} && $opt{'pod'};
+die "extraction cannot update files\n" if $opt{'inplace'} && ($opt{'markdown'} || $opt{'pod'});
+die "directories require --recursive\n" if !$opt{'recursive'} && grep { -d $_ } @ARGV;
+my $file_ar=Markdown::Pod::Embed->discover(@ARGV);
+delete $opt{'dialect'} unless defined $opt{'dialect'};
+my $processor_or=Markdown::Pod::Embed->new(\%opt);
+foreach my $fn (@{$file_ar}) {
+    my $changed=$processor_or->process($fn);
+    next unless defined $changed;
+    if ($opt{'dry_run'}) {
+        print "$fn: ", ($changed ? 'would update' : 'unchanged'), "\n";
+    }
+    elsif ($opt{'markdown'}) { print $processor_or->markdown() }
+    elsif ($opt{'pod'}) { print $processor_or->pod() }
+    elsif ($opt{'inplace'}) { $processor_or->markpod_inplace_update($fn) if $changed }
+    else { print $processor_or->ppi_doc_or()->serialize() }
+}
+__END__
+
+=begin markdown
+
+# NAME
+
+markpod - merge Markdown documentation into Perl files
+
+# USAGE
+
+`markpod --inplace --recursive lib bin` updates discovered source files.
+`--dry-run` reports intended changes without writing. `--nobackup` suppresses
+backup files. Without `--inplace`, complete transformed source is printed.
+
+Use `--extract-markdown FILE` or `--extract-pod FILE` to print documentation
+only. `--dialect GitHub` selects the Markdown::Pod dialect.
+
+`--version` prints the installed program version.
+
+Supply files explicitly, or use `--recursive` with directories. Unsupported
+options and failed operations exit nonzero. A file with no Markdown source is
+skipped. See Markdown::Pod::Embed for source precedence and preservation rules.
+
+# AUTHOR
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2026 by Andrew Speer. It may be distributed
+under the same terms as Perl itself.
+
+=end markdown
+
+
+=head1 NAME
+
+markpod - merge Markdown documentation into Perl files
+
+
+=head1 USAGE
+
+C<markpod --inplace --recursive lib bin> updates discovered source files.
+C<--dry-run> reports intended changes without writing. C<--nobackup> suppresses
+backup files. Without C<--inplace>, complete transformed source is printed.
+
+Use C<--extract-markdown FILE> or C<--extract-pod FILE> to print documentation
+only. C<--dialect GitHub> selects the Markdown::Pod dialect.
+
+C<--version> prints the installed program version.
+
+Supply files explicitly, or use C<--recursive> with directories. Unsupported
+options and failed operations exit nonzero. A file with no Markdown source is
+skipped. See Markdown::Pod::Embed for source precedence and preservation rules.
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2026 by Andrew Speer. It may be distributed
+under the same terms as Perl itself.
+
+=cut

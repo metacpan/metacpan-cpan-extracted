@@ -1,6 +1,196 @@
 Revision history for SimpleFlow
 
 
+0.181 2026-09-25 (Claude Opus 5 helped)
+
+ [Tests]
+
+ - **The 0.18 suite failed on MSWin32; the module itself is unchanged.**
+     `t/lib/CaptureStd.pm` read its capture files in binary mode, so every
+     line captured from a `:crlf` handle ended in CR LF, and `t/01.t`'s
+     `say2` comparison failed. `t/03.fixes.t` passed its child program and
+     the command under test to a fresh perl as arguments containing double
+     quotes, which `system(LIST)` on MSWin32 does not escape, so the child
+     never ran and blocks 1 and 3 failed. The child code now avoids double
+     quotes, the command goes through `%ENV`, and a missing command given as a
+     string, which MSWin32 retries through `cmd.exe`, is required only to
+     fail with a non-zero `exit` there rather than `-1`.
+
+0.18 2026-09-24 (Claude Opus 5 helped)
+
+ [Fixed]
+
+ - **A command that could not be launched was reported as a success, and the
+     rest of the calling program ran twice.** `system()` forks and then execs;
+     when the exec fails, its child warns "Can't exec", which the module's
+     `use warnings FATAL => 'all'` turned into a die *in that forked child*.
+     The die unwound out of `task()` into the caller's program, which then ran
+     on as a second copy, while the parent was handed the copy's exit status.
+     `task(cmd => 'no-such-program', die => 0)` came back `exit => 0`,
+     `will.do => 'done'`, and every later step ran twice. The `timeout` path
+     had the same defect in its own fork. A command that cannot be launched is
+     now `exit => -1` (`127` under a `timeout`) and `FAILED`. A string with a
+     shell metacharacter in it was never affected, since the shell launches
+     the program and reports `127` itself.
+ - **A one-element array-ref `cmd` went through the shell.** An array ref is
+     documented as run without a shell, but `system(@list)` hands a list of one
+     to the shell, so `cmd => ['echo hi; rm x']` ran both commands. The array
+     form now always runs the named program directly.
+ - **A command finishing at the moment its `timeout` fired could be reported
+     as timed out, with `exit => -1`.** If the alarm arrived after the child had
+     been reaped but before it was cancelled, the group was killed anyway and a
+     second `waitpid` overwrote the real status. The group is now killed only
+     if the child has not already been reaped. The window is a few
+     instructions wide, and has no test.
+
+ [Performance]
+
+ - **`stdout` and `stderr` are captured without `Capture::Tiny`.** It slurped
+     each capture into a lexical and returned it through several list copies,
+     which perls before 5.20 do not share: a `task()` whose command printed
+     100 MB peaked at 498 MB RSS and took 0.53 s on perl 5.10.1. `task()` now
+     points descriptors 1 and 2 at temporary files itself, with `POSIX::dup2`,
+     and reads each file straight into the record: 108 MB and 0.17 s. The
+     capture is read back through the caller's own `STDOUT` and `STDERR`
+     layers, as `Capture::Tiny` did, so a caller that set
+     `:encoding(UTF-8)` still gets characters; standard descriptors the
+     caller had closed are plugged with the null device for the run and
+     closed again after.
+ - **Trailing whitespace is stripped by walking back from the end.** The
+     regex used before scanned the whole of `stdout` from the start, and on a
+     perl with copy-on-write copied it first: on a 100 MB capture, 0.13 s and
+     peak RSS from 107 MB to 205 MB on perl 5.44.0. End to end, a `task()`
+     producing 100 MB of `stdout` went from 306 MB peak RSS and 0.30 s to
+     111 MB and 0.12 s on 5.44.0.
+ - **Printing the record no longer copies the captured output.** The clipped
+     copy made for printing copied every field in full before clipping it,
+     which perls before 5.20 do not share: on perl 5.10.1 that raised peak RSS
+     from 205 MB to 303 MB for a 100 MB `stdout`.
+
+ [Changed]
+
+ - **A caller whose `STDOUT` is an in-memory handle now has the command's
+     output captured.** `Capture::Tiny` redirected the `STDOUT` glob, and a
+     glob opened on a scalar has no descriptor, so the command wrote past it
+     onto the real descriptor 1 — the terminal — and the record's `stdout`
+     came back empty. The redirect is now on the descriptor, which is what
+     the command inherits. A caller that relied on that output reaching the
+     terminal will now find it in `stdout` instead.
+
+ [Packaging]
+
+ - **`Capture::Tiny` is no longer a prerequisite at all.** The module
+     captures on its own descriptors, and the tests use `t/lib/CaptureStd.pm`,
+     a 46-line `capture {}` with the same calling convention that reopens
+     the `STDOUT` and `STDERR` globs — deliberately not the module's own
+     mechanism, so a bug in one cannot hide the same bug in the other.
+     `File::Temp`, which is core, is now a runtime prerequisite.
+
+ [Tests]
+
+ - **`t/03.fixes.t`**, one block per defect above except the race, and one
+     for the in-memory `STDOUT`, each confirmed to fail against 0.17 first;
+     and two covering the new capture's handling of closed descriptors and of
+     output layers, which pass against 0.17 as well, since the point is that
+     nothing changed there.
+ - Block 14 of `t/02.fixes.t` (`quiet => 1`) used to assert that the
+     command's output escaped an in-memory `STDOUT`; it now asserts that the
+     output is in the record.
+
+0.17 2026-09-14 (Claude Opus 5 helped)
+
+ [Fixed]
+
+ - **A command that prompted hung for ever.** `Capture::Tiny::capture`
+     redirects file descriptors 1 and 2 and nothing else, so the command
+     inherited the caller's descriptor 0. A command that stops to ask a
+     question — `rm` over a write-protected file, `cp -i`, `git` asking for
+     credentials — wrote its prompt into the captured stderr, where nobody
+     could see it, and then blocked on the terminal waiting for an answer the
+     user did not know was wanted. Nothing was printed and, with `timeout` at
+     its default of 0, nothing ever returned; with a `timeout` set the process
+     group was killed and the record then said `timed.out => 1, signal => 9`,
+     blaming the clock for what was really an unanswered question. The command
+     now runs with descriptor 0 on the null device. Both execution paths were
+     affected and both are fixed: the `timeout` path forks and execs, and its
+     child inherited descriptor 0 across the fork just as `system()`'s did.
+     Found while debugging a pipeline that hung on `rm -r` over a read-only
+     file.
+
+ [Added]
+
+ - **`stdin`**: `'devnull'` (the default) or `'inherit'`, saying what the
+     command sees on its standard input. `'inherit'` restores the behaviour of
+     0.162 and earlier for a step that really does read the data the calling
+     script was given, with the hazards that implies: it consumes input the
+     caller can then no longer read, and a command that prompts hangs exactly
+     as it used to. The caller's standard input is saved and restored around
+     every run either way — including when the run dies, so a caller that traps
+     the exception is not left without it — and a caller that had closed it
+     keeps it closed.
+
+ [Changed]
+
+ - The result record carries `stdin`, the resolved value of that option.
+ - `File::Spec` (core) is now a dependency, for the name of the null device:
+     `/dev/null` on Unix, `nul` on Windows.
+ - Callers relying on the old behaviour are affected: a command that read the
+     calling script's standard input now reads end-of-file instead, and
+     succeeds while doing nothing. `stdin => 'inherit'` is the one-word repair.
+
+ [Packaging]
+
+ - **`SECURITY.md`**, giving an address to report a vulnerability to privately
+     and saying what is in scope. SimpleFlow runs the command it is given, so a
+     `cmd` string built out of untrusted data is a shell injection in the
+     *calling* program; the array-ref form of `cmd` runs without a shell and is
+     the way to avoid that.
+ - **`CONTRIBUTING.md`** now ships too. Both files are gathered by `[@Basic]`
+     without a `dist.ini` entry, and both are what the CPANTS experimental
+     metrics `has_security_doc`, `security_doc_contains_contact` and
+     `has_contributing_doc` look for. Checked by running the contact half of
+     `Module::CPANTS::SiteKwalitee::Security` over the built tarball: the
+     address it extracts is `dec986@gmail.com`.
+ - **`autodie` is no longer a prerequisite.** The only file that ever loaded it
+     is `md2pod.pl`, which `MANIFEST.SKIP` keeps out of the distribution, so
+     every installer was being asked for a module the shipped code never loads.
+     `Exporter` is declared instead, since the module does load it.
+ - **The test-only prerequisites are declared as such.** `Test::More`,
+     `Test::Exception` and `File::Temp` are used by `t/` and by nothing that is
+     installed, so they moved from `requires` to `test_requires`. `Test::More`
+     is pinned at 0.96 for the first time: every test file uses `subtest`,
+     which arrived in Test::Simple 0.94, and perl 5.10.1 shipped 0.92 — a
+     smoker with nothing beyond core could not have run the suite at all, and
+     nothing said so. The `Makefile.PL` folds `TEST_REQUIRES` back into
+     `PREREQ_PM` on ExtUtils::MakeMaker older than 6.63_03, so 5.10's own
+     toolchain still sees them.
+ - **`cover_db/`, `cover.sh` and `dzil.sh` no longer ship.** The committed
+     Devel::Cover report is stale by design — it predates `t/02.fixes.t` — and
+     was 39 files of HTML in the tarball; the two scripts are author-only, like
+     `md2pod.pl`. The distribution is 17 files, and passes its own suite (60
+     tests) when the tests are run inside the built tree.
+
+0.162 2026-09-12 (Claude Opus 5 helped)
+
+ [Tests]
+
+ - **Block 14 of `t/02.fixes.t` failed on Data::Printer before 1.x.** A CPAN
+     tester on perl 5.20.0 with Data::Printer 0.38 reported it against 0.161.
+     The block redirects STDOUT to an in-memory handle to check that
+     `quiet => 1` silences the terminal, and asserted that exactly the
+     command's own output -- and nothing else -- escaped that redirect to the
+     real file descriptor 1. On Data::Printer 0.38 the record escapes too:
+     `use DDP {output => 'STDOUT'}` binds the handle as the property is
+     parsed, at import, while 1.002001 resolves it at print time, so a later
+     `local *STDOUT` cannot reach the older release. The block now counts how
+     many times the command ran instead of demanding that nothing else
+     escaped, and its command prints an upper-cased sentinel so that the
+     record, which quotes the command it ran, cannot be counted as a second
+     copy. Confirmed against Data::Printer 0.38 and 1.002001, on perl 5.10.1,
+     5.12.5 and 5.44.0. No module behaviour changed, and nothing about
+     `quiet` was wrong: on every version the record goes to the terminal
+     unless `quiet => 1` and to the log either way.
+
 0.161 2026-09-07 (Claude Opus 5 helped)
 
  [Fixed]

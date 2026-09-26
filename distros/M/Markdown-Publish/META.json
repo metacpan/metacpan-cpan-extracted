@@ -1,0 +1,86 @@
+{
+   "abstract" : "common documentation publication operations",
+   "author" : [
+      "Andrew Speer <andrew.speer@isolutions.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Markdown-Publish",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "version" : "0"
+         },
+         "suggests" : {
+            "ASPEER::MakeMaker::Markdown::Pod" : "1.010",
+            "ASPEER::MakeMaker::Markdown::Publish" : "1.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Path" : "2.07",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "IPC::Run3" : "0",
+            "JSON::PP" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aspeer/pm-Markdown-Publish/issues"
+      },
+      "homepage" : "https://github.com/aspeer/pm-Markdown-Publish",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aspeer/pm-Markdown-Publish.git",
+         "web" : "https://github.com/aspeer/pm-Markdown-Publish"
+      }
+   },
+   "version" : "1.003",
+   "x_authority" : "cpan:ASPEER",
+   "x_documentation" : {
+      "publish" : {
+         "module" : "mkdocs",
+         "name" : "Markdown::Publish",
+         "sources" : [
+            "doc"
+         ]
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

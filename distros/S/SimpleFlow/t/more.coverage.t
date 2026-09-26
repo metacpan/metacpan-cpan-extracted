@@ -6,7 +6,10 @@ require 5.010;
 use feature 'say';
 use Test::More;
 use Test::Exception;
-use Capture::Tiny 'capture';
+use File::Spec;
+use FindBin ();
+use lib File::Spec->catdir($FindBin::Bin, 'lib'); # t/lib: CaptureStd, the tests' capture {}
+use CaptureStd 'capture';
 use File::Temp 'tempfile';
 use SimpleFlow qw(task say2);
 
@@ -74,5 +77,28 @@ $t = quietly { task(# Touch a file without writing data to it
 ) };
 
 ok($warn_caught, 'task() triggers a warning when an output file is exactly 0 bytes');
+
+# --- 6. task(): a caller who had closed STDIN keeps it closed ---------------
+# The command is run with fd 0 on the null device, which means saving the
+# caller's STDIN and putting it back afterwards. A caller may legitimately have
+# closed it, and there is then nothing to save: that branch closes fd 0 again
+# rather than leaving the command's null device open behind it.
+{
+  my $saved;
+  open $saved, '<&', \*STDIN or die "cannot save STDIN: $!"
+    if defined fileno STDIN; # a smoker may already run us without one
+  close STDIN if defined fileno STDIN; # closing a closed handle is a fatal warning here
+  my $closed = quietly { task(cmd => perl_cmd('exit 0'), die => 0) };
+  my $fd0_after = fileno STDIN;
+  if (defined $saved) {
+    open STDIN, '<&', $saved or die "cannot restore STDIN: $!";
+    close $saved;
+  }
+  # the positive half first: an assertion about fd 0 afterwards would pass
+  # just as well if the command had never run at all
+  is($closed->{'exit'}, 0, 'a command still runs when the caller has closed STDIN');
+  ok(!defined $fd0_after, 'STDIN is left closed, not holding the null device open');
+}
+
 
 done_testing();

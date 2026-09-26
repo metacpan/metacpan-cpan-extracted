@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0">
+  <title>Example guide</title>
+  <section xml:id="start"><title>Start</title>
+    <para>Read the <link linkend="next">next section</link>.</para>
+    <note><para>Documentation can carry useful notes.</para></note>
+  </section>
+  <section xml:id="next"><title>Next</title><para>Continue here.</para></section>
+</article>

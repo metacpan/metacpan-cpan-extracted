@@ -1,13 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v1.5.1
+## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Mysql.pm
+## Version v1.6.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/26
+## Modified 2026/09/23
 ## All rights reserved
-## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -18,6 +17,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( DB::Object );
     use vars qw(
         $VERSION $CACHE_SIZE 
@@ -262,7 +262,7 @@ BEGIN
     # DBI->trace(5);
     our $PLACEHOLDER_REGEXP = qr/(?<![?\w])\?(?![?\w])/;
     our $EXCEPTION_CLASS    = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.5.1';
+    our $VERSION = 'v1.6.0';
 };
 
 use strict;
@@ -315,7 +315,7 @@ foreach my $c ( @$keys )
         my $val = $code->();
         if( !CORE::exists( $DATATYPES_DICT->{ $type } ) )
         {
-            warn( "Unknown MySQL constant DBI::${c}" ) if( DB::Object::Mysql->_is_warnings_enabled( 'DB::Object' ) );
+            warn( "Unknown MySQL constant DBI::${c}" ) if( warnings::enabled( 'DB::Object' ) );
             next;
         }
         $DATATYPES_DICT->{ $type }->{constant} = $val;
@@ -395,19 +395,55 @@ sub attribute($;$@)
 sub begin_work($;$@)
 {
     my $self = shift( @_ );
-    $self->{transaction} = 1;
-    $self->{AutoCommit_previous} = $self->{dbh}->{AutoCommit};
-    $self->{dbh}->{AutoCommit} = 0;
-    return( $self );
+    my $autocommit_previous = $self->{dbh}->{AutoCommit};
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->begin_work( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling begin_work(). Have you forgotten to turn on AutoCommit?: $@" ) );
+    }
+    elsif( !$rv && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+
+    if( defined( $rv ) )
+    {
+        $self->{AutoCommit_previous} = $autocommit_previous;
+        $self->{dbh}->{AutoCommit} = 0;
+        $self->_transaction_started;
+        return( $rv || 1 );
+    }
+    return;
 }
 
 sub commit($;$@)
 {
     my $self = shift( @_ );
-    $self->{transaction} = 0;
-    $self->{dbh}->commit( @_ );
-    $self->{dbh}->{AutoCommit} = $self->{AutoCommit_previous} if( length( $self->{AutoCommit_previous} ) );
-    return( $self );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->commit( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling commit(): $@" ) );
+    }
+    elsif( !$rv && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+
+    if( defined( $rv ) )
+    {
+        $self->{dbh}->{AutoCommit} = $self->{AutoCommit_previous} if( defined( $self->{AutoCommit_previous} ) );
+        $self->_transaction_finished;
+        return( $rv || 1 );
+    }
+    return;
 }
 
 # NOTE: sub connect is inherited
@@ -463,8 +499,15 @@ sub create_db
     }
 
     my $ref = {};
-    my @keys = qw( host port login passwd opt debug );
-    @$ref{ @keys } = @$self{ @keys };
+    # my @keys = qw( host port login passwd opt debug );
+    my $ok_params = $self->_connection_parameters;
+    foreach my $key ( @$ok_params )
+    {
+        if( my $coderef = $self->can( $key ) )
+        {
+            $ref->{ $key } = $coderef->( $self );
+        }
+    }
     $ref->{database} = $name;
     $dbh = $self->connect( $ref ) || return( $self->error( "I could create the database \"$name\" but oddly enough, I could not connect to it with user \"$ref->{login}\" on host \"$ref->{host}\" with port \"$ref->{port}\"." ) );
     return( $dbh );
@@ -583,9 +626,27 @@ sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::
 sub rollback
 {
     my $self = shift( @_ );
-    $self->{transaction} = 0;
-    $self->{dbh}->{AutoCommit} = $self->{AutoCommit_previous} if( length( $self->{AutoCommit_previous} ) );
-    return( $self->{dbh}->rollback() );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->rollback( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling rollback: $@" ) );
+    }
+    elsif( !defined( $rv ) && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+
+    if( defined( $rv ) )
+    {
+        $self->{dbh}->{AutoCommit} = $self->{AutoCommit_previous} if( defined( $self->{AutoCommit_previous} ) );
+        $self->_transaction_finished;
+        return( $rv || 1 );
+    }
+    return;
 }
 
 sub stat
@@ -761,12 +822,14 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections cache_dir cache_query cache_table unknown_field use_cache )];
+    my $core = $self->new_array( [qw( db login passwd host port driver database server opt uri debug cache_connections cache_dir cache_query cache_table unknown_field use_cache id )] );
     my @mysql_params = grep( /^mysql_/, keys( %$param ) );
     # See DBD::mysql for the list of valid parameters
     # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
     push( @$core, @mysql_params );
-    return( $core );
+    my $core_fields = $self->{_core_fields} || [];
+    $core->push( @$core_fields );
+    return( $core->unique(1) );
 }
 
 sub _dsn
@@ -929,7 +992,7 @@ DB::Object::Mysql - Mysql Database Object
 
 =head1 VERSION
 
-    v1.5.1
+    v1.6.0
 
 =head1 DESCRIPTION
 
@@ -1003,6 +1066,9 @@ Set the provided list of table fields to avoid when returning the query result.
 The list of fields can be provided either as an array of a reference to an array.
 
 =head2 attribute
+
+    my $value = $dbh->attribute;
+    $dbh->attribute( $value );
 
 Sets or get the value of database connection parameters.
 
@@ -1195,6 +1261,8 @@ The idea is to create a table with the givern parameters.
 
 =head2 databases
 
+    my $value = $dbh->databases;
+
 Returns a list of all available databases.
 
 =head2 data_sources
@@ -1206,7 +1274,6 @@ Given an optional list of options, this return the data source of the database h
 Returns an hash reference of each data type with their equivalent C<constant>, regular expression (C<re>), constant C<name> and C<type> name.
 
 Each data type is an hash with the following properties for each type: C<constant>, C<name>, C<re>, C<type>
-
 
 =head2 data_type
 
@@ -1468,6 +1535,9 @@ It prepares and executes the given SQL query with the options provided and retur
 
 =head2 query_object
 
+    my $value = $dbh->query_object;
+    $dbh->query_object( $value );
+
 Set or gets the PostgreSQL query object (L<DB::Object::Mysql::Query>) used to process and format queries.
 
 =head2 replace
@@ -1557,6 +1627,8 @@ A database schema.
 Add the given table name to the stack of cached table names.
 
 =head2 tables
+
+    my $value = $dbh->tables;
 
 Connects to the database and finds out the list of all available tables.
 
@@ -1673,11 +1745,15 @@ Sets or get the I<use_cache> parameter.
 
 =head2 variables
 
+    my $value = $dbh->variables;
+
 Query the SQL variable $type
 
 It returns a blank string if nothing was found, or the value found.
 
 =head2 version
+
+    my $value = $dbh->version;
 
 Returns the MySQL database server version.
 

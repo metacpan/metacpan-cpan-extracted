@@ -1,17 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite/Tables.pm
-## Version v1.0.0
+## Version v1.0.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/11/17
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 # This package's purpose is to separate the object of the tables from the main
 # DB::Object package so that when they get DESTROY'ed, it does not interrupt
 # the SQL connection
@@ -21,7 +20,8 @@ BEGIN
 {
     use strict;
     use warnings;
-    use parent qw( DB::Object::SQLite DB::Object::Tables );
+    warnings::register_categories( 'DB::Object' );
+    use parent qw( DB::Object::Tables );
     use vars qw( $VERSION $DEBUG $TYPE_TO_CONSTANT );
     # <https://metacpan.org/pod/DBD::SQLite::Constants>
     # <https://www.sqlite.org/datatype3.html>
@@ -36,7 +36,7 @@ BEGIN
         qr/^(NUMERIC|DECIMAL\(\d+,\d+\)|BOOLEAN|DATETIME|DATE)/ => { constant => '', name => 'SQLITE_NULL', type => 'bool' },
     };
     our $DEBUG = 0;
-    our $VERSION = 'v1.0.0';
+    our $VERSION = 'v1.0.1';
 };
 
 use strict;
@@ -101,7 +101,7 @@ sub create
     }
     if( @errors )
     {
-        warn( "The options '", join( ', ', @errors ), "' were either not recognized or malformed and thus were ignored.\n" );
+        warn( "The options '", join( ', ', @errors ), "' were either not recognized or malformed and thus were ignored." ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
     }
     # Check statement
     my $select = '';
@@ -232,6 +232,8 @@ sub rename
     $self->reset_structure;
     return( $sth );
 }
+
+sub stat { return( shift->database_object->stat( @_ ) ); }
 
 # TODO: Must implement a cache mechanism for DB::Object::SQLite::structure()
 # <https://www.sqlite.org/pragma.html#pragma_table_info>
@@ -367,7 +369,7 @@ DB::Object::SQLite::Tables - SQLite Table Object
 
 =head1 VERSION
 
-    v1.0.0
+    v1.0.1
 
 =head1 DESCRIPTION
 
@@ -407,13 +409,19 @@ This returns the create info for the current table object as a string representi
 
 =head2 exists
 
+    my $value = $tbl->exists;
+
 Returns true if the current table exists, or false otherwise.
 
 =head2 lock
 
+    my $value = $tbl->lock;
+
 Table lock is unsupported in SQLite and this will return an error.
 
 =head2 on_conflict
+
+    my $value = $tbl->on_conflict;
 
 A convenient wrapper to L<DB::Object::Postgres::Query/on_conflict>
 
@@ -431,6 +439,10 @@ If it is called in void context, the statement handler is executed immediately.
     # Would issue a statement handler for the query: ALTER TABLE pref RENAME TO prefs
 
 See L<SQLite documentation for more information|https://www.sqlite.org/lang_altertable.html>
+
+=head2 stat
+
+Delegates SQLite status requests to the associated L<DB::Object::SQLite> database object. This explicit delegation replaces the historical inheritance from the database driver class.
 
 =head2 structure
 
@@ -477,6 +489,8 @@ A column name to column data type hash reference
 This is an alias for L<DB::Object::SQLite/table_info>
 
 =head2 unlock
+
+    my $value = $tbl->unlock;
 
 This returns an error as C<unlock> is unsupported in SQLite
 

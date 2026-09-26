@@ -123,7 +123,7 @@ subtest 'bin_encode / bin_decode unit round-trip & id_check' => sub {
 # SUBTEST: index_put / index_get binary safety
 # ------------------------------------------------------------------
 subtest 'index_put / index_get binary safety' => sub {
-    plan tests => 5;
+    plan tests => 10;
 
     my $temp_dir = tempdir( CLEANUP => 1 );
     my $inx_path = File::Spec->catfile( $temp_dir, 'test.inx' );
@@ -145,6 +145,23 @@ subtest 'index_put / index_get binary safety' => sub {
     is( $cnt_all, scalar @ids, 'keys total count matches' );
     is( $count,   scalar @ids, 'count value matches' );
     is( $lastid,  5000,        'lastid value matches' );
+
+    # Test non-numeric ID filtering in array when type ne 'raw'
+    $adb->table_write($inx_path);
+    $adb->index_put( $inx_path, 'filtered_keys', [ 10, 'junk', 20, undef, -5, 30 ], 'ids' );
+    my ( $cnt_f, @keys_f ) = $adb->index_get( $inx_path, 'filtered_keys' );
+    is( $cnt_f, 3, 'non-numeric and non-positive IDs filtered from array' );
+    is_deeply( \@keys_f, [ 30, 20, 10 ], 'clean IDs preserved (desc default)' );
+
+    # Test non-numeric scalar rejection when type is ids
+    my $ret_bad = $adb->index_put( $inx_path, 'bad_scalar', 'not_a_number', 'ids' );
+    ok( !$ret_bad, 'non-numeric scalar rejected when type is ids' );
+
+    # Test arbitrary string allowed when type is raw
+    my $ret_raw = $adb->index_put( $inx_path, 'raw_field', 'arbitrary string with utf8: şçö', 'raw' );
+    ok( $ret_raw, 'raw type accepts arbitrary string' );
+    my ($raw_val) = $adb->index_get( $inx_path, 'raw_field', 'raw' );
+    is( $raw_val, 'arbitrary string with utf8: şçö', 'raw value retrieved intact' );
 
     $adb->table_close($inx_path);
 };

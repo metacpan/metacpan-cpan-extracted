@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry xmlns="http://docbook.org/ns/docbook" version="5.2">
+  <refmeta>
+    <refentrytitle>docbook2md</refentrytitle>
+    <manvolnum>5</manvolnum>
+  </refmeta>
+  <refnamediv>
+    <refname>docbook2md</refname>
+    <refpurpose>Convert Docbook articles and refentry pages to
+    Markdown</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>docbook2md file.xml</command>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Description</title>
+    <para>docbook2md is an alias for the <command>docbook-convert</command>
+    utility pre-configured to produce Markdown output (i.e. Identical to using
+    <command>docbook-convert --markdown</command>). See the
+    <command>docbook-convert</command> man page for the full option
+    list.</para>
+  </refsection>
+</refentry>

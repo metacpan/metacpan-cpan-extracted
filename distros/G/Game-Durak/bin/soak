@@ -1,0 +1,160 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin ();
+use lib "$FindBin::Bin/../lib";
+
+use Digest::SHA ();
+use Getopt::Long;
+
+use Game::Durak;
+
+my %opt = (deals => 2000, 'seed-prefix' => 'durak-soak', limit => 600);
+GetOptions(\%opt, 'deals=i', 'seed-prefix=s', 'limit=i', 'help')
+    or die "bad options\n";
+
+if ($opt{help}) {
+    print <<"USAGE";
+usage: $0 [--deals N] [--seed-prefix STRING] [--limit N]
+
+Plays N deals of random legal play, seeded, and reports the distributions
+that decide how long a game of durak is.
+USAGE
+    exit 0;
+}
+
+sub seed32 { return sprintf '%-32.32s', $_[0] }
+
+sub pick {
+    my ($tag, $n) = @_;
+    return unpack('N', Digest::SHA::sha256($tag)) % $n;
+}
+
+sub summary {
+    my ($label, $values) = @_;
+    return sprintf "%-22s no data", $label unless @$values;
+    my @sorted = sort { $a <=> $b } @$values;
+    my $at = sub {
+        my ($q) = @_;
+        my $i = int($q * (@sorted - 1) + 0.5);
+        return $sorted[$i];
+    };
+    my $total = 0;
+    $total += $_ for @sorted;
+    return sprintf "%-22s min %-5s median %-5s p95 %-5s max %-5s mean %.1f",
+        $label, $sorted[0], $at->(0.5), $at->(0.95), $sorted[-1],
+        $total / scalar @sorted;
+}
+
+my (@moves, @per_seat, @bouts, @held, @wall);
+my %outcome;
+my ($swap_offered, $swap_taken, $opener_fool, $decided, $unfinished) = (0, 0, 0, 0, 0);
+
+my $started = time;
+
+for my $i (1 .. $opt{deals}) {
+    my $game = Game::Durak->build(seed => seed32("$opt{'seed-prefix'}-$i"));
+    die $game->message . "\n" if ref $game eq 'Game::Durak::Error';
+
+    my $opener = $game->turn;
+    my %by_seat = (1 => 0, 2 => 0);
+    my ($step, $bout_count, $offered, $taken) = (0, 0, 0, 0);
+
+    while (!$game->over) {
+        if (++$step > $opt{limit}) { $unfinished++; last }
+
+        my $seat  = $game->turn;
+        my $legal = $game->legal($seat);
+        last unless @$legal;
+
+        $offered++ if grep { $_->{kind} eq 'swap' } @$legal;
+
+        my $move = $legal->[ pick("$opt{'seed-prefix'}:$i:$step", scalar @$legal) ];
+        my @ev = $game->apply($seat, $move);
+        last if ref $ev[0] eq 'Game::Durak::Error';
+
+        $by_seat{$seat}++;
+        $taken++      if $move->{kind} eq 'swap';
+        $bout_count++ for grep { $_->{kind} eq 'bout_end' } @ev;
+    }
+
+    next unless $game->result;
+
+    push @moves,    $step;
+    push @per_seat, $by_seat{1}, $by_seat{2};
+    push @bouts,    $bout_count;
+
+    my $result = $game->result;
+    $outcome{ $result->{outcome} }++;
+    $swap_offered++ if $offered;
+    $swap_taken++   if $taken;
+
+    if (defined $result->{fool}) {
+        $decided++;
+        $opener_fool++ if $result->{fool} == $opener;
+        push @held, $game->count_of($result->{fool});
+    }
+}
+
+my $ran = time - $started;
+
+printf "Game::Durak soak: %d deals, seed prefix %s, %d seconds\n\n",
+    $opt{deals}, $opt{'seed-prefix'}, $ran;
+
+print summary('moves a deal', \@moves), "\n";
+print summary('moves a seat', \@per_seat), "\n";
+print summary('bouts a deal', \@bouts), "\n";
+print summary('cards the durak held', \@held), "\n\n";
+
+printf "outcomes: %s\n", join ', ', map { "$_ $outcome{$_}" } sort keys %outcome;
+printf "unfinished at %d moves: %d\n", $opt{limit}, $unfinished;
+printf "the exchange was offered in %d deals and taken in %d\n",
+    $swap_offered, $swap_taken;
+
+if ($decided) {
+    my $rate = 100 * $opener_fool / $decided;
+    my $sigma = sqrt(0.25 / $decided) * 100;
+    printf "the seat that opened was the fool in %d of %d decided deals, %.1f%% (two sigma %.1f%%)\n",
+        $opener_fool, $decided, $rate, 2 * $sigma;
+}
+
+__END__
+
+=head1 NAME
+
+soak - how long a deal of durak runs, measured
+
+=head1 SYNOPSIS
+
+    perl -Ilib bin/soak --deals 2000 --seed-prefix durak-soak
+
+=head1 DESCRIPTION
+
+Plays deals of random legal play from a seeded stream and reports the
+distributions that later phases need: moves a deal and moves a seat, which is
+what a consumer's per move deadline has to live with; bouts a deal; how many
+cards the fool was left holding, which is the instrument a bot ladder can be
+measured on when the result itself is one bit; how many deals were drawn; and
+whether the seat that opened is the fool more often than the other.
+
+Random legal play is a weak instrument for the last of those, because it
+measures the deal rather than the game. It is the first pass. The bot ladder
+repeats it.
+
+The output is committed as F<docs/measured.md>, dated, with the command that
+produced it, because a number in a plan file is a number nobody can
+reproduce.
+
+=head1 AUTHOR
+
+LNATION, C<< <email@lnation.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under the Artistic License 2.0.
+
+=cut

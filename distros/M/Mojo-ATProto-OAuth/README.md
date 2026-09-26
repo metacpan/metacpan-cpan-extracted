@@ -241,7 +241,14 @@ Non-blocking counterpart of ["start\_scope\_upgrade"](#start_scope_upgrade).
 
     my $refreshed_session = $oauth->refresh_tokens($session);
 
-Uses the session's stored refresh token to mint a new access token, without involving the user. Reuses the session's own DPoP key - RFC 9449 requires the same key for every proof across one authorization's lifetime, so refreshing never generates a new one.  Persists the updated session via ["store"](#store) and returns it (the same hashref, mutated in place, for convenience). Note this rotates _both_ the access token and the refresh token. Requires ["store"](#store) to be configured.
+Uses the session's stored refresh token to mint a new access token, without involving the user. Reuses the session's own DPoP key - RFC 9449 requires the same key for every proof across one authorization's lifetime, so refreshing never generates a new one.  Persists the new tokens via ["store"](#store) and returns the session (the same hashref, updated in place, for convenience). Note this rotates _both_ the access token and the refresh token. Requires ["store"](#store) to be configured.
+
+The auth server accepts each refresh token exactly once, and ATProto auth servers may revoke the whole session when a used one is presented again - so this is safe to call from several processes (or several in-flight `_p` calls) sharing one stored session at once:
+
+- The refresh runs under the store's per-session lock (`lock_session`/`lock_session_p`, see ["THE STORE INTERFACE"](#the-store-interface)), against a fresh read of the stored session rather than the passed-in copy.
+- If that fresh read's `refresh_token` differs from the passed-in one, another caller has already refreshed; its result is returned, and no request is sent.
+- Only the fields a refresh changes (`access_token`, `refresh_token`, `dpop_authserver_nonce`) are written back, via `update_session`.
+- If the auth server still answers `invalid_grant` (e.g. with a store that can't lock), the stored session is re-read once, and returned if its `refresh_token` has changed in the meantime; otherwise the error stands.
 
 ### refresh\_tokens\_p
 
@@ -273,14 +280,23 @@ Exchanges an authorization code for tokens. `$info` is the `AuthRequestData`- eq
 - `get_session($account_did, $session_id)` / `get_session_p($account_did, $session_id)`
 - `save_session($session_data)` / `save_session_p($session_data)`
 - `delete_session($account_did, $session_id)` / `delete_session_p($account_did, $session_id)`
+- `update_session($account_did, $session_id, \%fields)` / `update_session_p($account_did, $session_id, \%fields)`
+- `lock_session($account_did, $session_id, $code)` / `lock_session_p($account_did, $session_id, $code)`
+
+The last two exist because one stored session is commonly used by several processes at once (web workers, job queue workers), and the auth server rotates the refresh token on every use:
+
+- `update_session` writes _only_ the given fields of an existing session and leaves every other field as currently stored. It must accept exactly `access_token`, `refresh_token`, `dpop_authserver_nonce` and `dpop_host_nonce`, die on any other key or an empty hashref, and die with a message matching `/no session found/` on a miss. (Stores subclassing [Mojo::ATProto::OAuth::SessionStore](https://metacpan.org/pod/Mojo%3A%3AATProto%3A%3AOAuth%3A%3ASessionStore) get the field validation from its `_validated_session_update`.) It's used for DPoP nonce rotations and refreshed tokens, so that a caller holding an older copy of the session never writes stale tokens back over newer ones the way a whole-row `save_session` would.
+- `lock_session` calls `$code->($session)` with a _freshly read_ copy of the session while holding an exclusive lock on that `(account_did, session_id)` pair, and returns what `$code` returns. The lock must exclude every other `lock_session`/`lock_session_p` on the same session, from any process sharing the store, and must be released however `$code` exits. `lock_session_p` does the same without blocking: `$code` may return a promise, the lock is held until it settles, and the returned promise resolves or rejects with `$code`'s outcome. On a miss, both die/reject with a message matching `/no session found/`. ["refresh\_tokens"](#refresh_tokens) runs inside this lock, and `$code` writes through the store's other methods, typically on a different connection - so the lock mustn't block those writes (e.g. a row lock taken with `SELECT ... FOR UPDATE` would deadlock).
+
+A duck-typed store that implements neither of these two (one written against an earlier version of this interface) still works: this module falls back to a read-modify-write `save_session` and an unlocked fresh read. That fallback reopens the races the two methods close, so only use it where a session is never shared across processes or concurrent `_p` calls.
 
 A store only needs to implement whichever half a given caller actually uses - the synchronous methods if the caller only ever calls this module's synchronous methods (["start\_auth\_flow"](#start_auth_flow), ["process\_callback"](#process_callback), etc. - see the standalone example in ["SYNOPSIS"](#synopsis), whose `My::MemoryStore` implements only the sync half), or the `_p` methods if the caller only ever uses the async ones. A store used with both needs both halves implemented.
 
 This distribution ships three session store drivers:
 
-- [Mojo::ATProto::OAuth::SessionStore::Memory](https://metacpan.org/pod/Mojo%3A%3AATProto%3A%3AOAuth%3A%3ASessionStore%3A%3AMemory) - a plain in-process hashref store - sessions and auth requests are lost on process exit; fine for a single-process script or a test suite, not for a real deployment).
-- [Mojo::ATProto::OAuth::SessionStore::SQLite](https://metacpan.org/pod/Mojo%3A%3AATProto%3A%3AOAuth%3A%3ASessionStore%3A%3ASQLite) - an SQLite backed session store, requires [Mojo::SQLite](https://metacpan.org/pod/Mojo%3A%3ASQLite) to be installed. 
-- [Mojo::ATProto::OAuth::SessionStore::Pg](https://metacpan.org/pod/Mojo%3A%3AATProto%3A%3AOAuth%3A%3ASessionStore%3A%3APg) - a Postgres backed session store, requires [Mojo::Pg](https://metacpan.org/pod/Mojo%3A%3APg) to be installed.
+- [Mojo::ATProto::OAuth::SessionStore::Memory](https://metacpan.org/pod/Mojo%3A%3AATProto%3A%3AOAuth%3A%3ASessionStore%3A%3AMemory) - a plain in-process hashref store - sessions and auth requests are lost on process exit; fine for a single-process script or a test suite, not for a real deployment). Its session lock only covers callers within the one process.
+- [Mojo::ATProto::OAuth::SessionStore::SQLite](https://metacpan.org/pod/Mojo%3A%3AATProto%3A%3AOAuth%3A%3ASessionStore%3A%3ASQLite) - an SQLite backed session store, requires [Mojo::SQLite](https://metacpan.org/pod/Mojo%3A%3ASQLite) to be installed. Its session lock is a lease row that other processes poll for; it can be switched off - see that module for the trade-offs.
+- [Mojo::ATProto::OAuth::SessionStore::Pg](https://metacpan.org/pod/Mojo%3A%3AATProto%3A%3AOAuth%3A%3ASessionStore%3A%3APg) - a Postgres backed session store, requires [Mojo::Pg](https://metacpan.org/pod/Mojo%3A%3APg) to be installed. Its session lock is a Postgres advisory lock.
 
 The Memory store takes no arguments, whereas the SQLite and Pg stores do (connection strings), these can be passed during construction of the OAuth object:
 
@@ -302,7 +318,8 @@ The Memory store takes no arguments, whereas the SQLite and Pg stores do (connec
 
 Everything above gets you a persisted session; it doesn't make any calls against the user's own PDS on your behalf. That's what ["client"](#client) (a [Mojo::ATProto::OAuth::ResourceClient](https://metacpan.org/pod/Mojo%3A%3AATProto%3A%3AOAuth%3A%3AResourceClient) instance) is for - it loads a session from ["store"](#store), signs a DPoP proof, sends the XRPC request, and transparently handles both DPoP nonce rotation and access-token refresh (retrying each at most once) before giving up.
 
-    # an authenticated GET
+    # an authenticated GET (not useful yet, not until Spaces is implemented which apparently sometimes requires authenticated reads)
+    # this particular example is pretty much useless but serves to illustrate the point ;) 
     my $profile = $oauth->client->request($account_did, $session_id, 'get', '/xrpc/app.bsky.actor.getProfile?actor=' . $account_did);
 
     # an authenticated POST with optimistic-concurrency conflict handling
@@ -313,6 +330,18 @@ Everything above gets you a persisted session; it doesn't make any calls against
     };
     if (my $err = $@) {
         die $err unless $err =~ /xrpc_error=InvalidSwap/;
+        # ... re-read the record, retry with a fresh $prior_cid ...
+    }
+
+    # the same except now with proper try/catch syntax we get from C<use feature 'try';> 
+    use feature 'try';
+    
+    try {
+        my $result = $oauth->client->request($account_did, $session_id, 'post', '/xrpc/com.atproto.repo.putRecord', {
+            repo => $account_did, collection => 'app.bsky.feed.post', rkey => $rkey, record => $record, swapRecord => $prior_cid,
+        });
+    } catch($ex) {
+        die $ex unless $ex =~ /xrpc_error=InvalidSwap/;
         # ... re-read the record, retry with a fresh $prior_cid ...
     }
 

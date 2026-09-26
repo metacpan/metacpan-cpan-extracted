@@ -1,0 +1,36 @@
+bin/markdown-publish
+bin/markdown-publish.md
+Changes
+CONTRIBUTING.md
+cpanfile
+doc/markdown-publish.md
+doc/markdown-publish.xml
+examples/configured/content/index.md
+examples/configured/mkdocs.yml
+examples/configured/README.md
+examples/README.md
+examples/simple/doc/guide.md
+examples/simple/README.md
+lib/Markdown/Publish.pm
+lib/Markdown/Publish.pm.md
+lib/Markdown/Publish/Constant.pm
+lib/Markdown/Publish/Constant.pm.md
+lib/Markdown/Publish/MkDocs.pm
+lib/Markdown/Publish/MkDocs.pm.md
+lib/Markdown/Publish/VitePress.pm
+lib/Markdown/Publish/VitePress.pm.md
+lib/Markdown/Publish/Docusaurus.pm
+lib/Markdown/Publish/Docusaurus.pm.md
+lib/Markdown/Publish/Starlight.pm
+lib/Markdown/Publish/Starlight.pm.md
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+SECURITY.md
+t/01-publish.t
+t/01-site.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

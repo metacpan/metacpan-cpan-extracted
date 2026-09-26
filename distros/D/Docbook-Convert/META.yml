@@ -1,0 +1,53 @@
+---
+abstract: 'convert DocBook articles and reference pages to Markdown'
+author:
+  - 'Andrew Speer <andrew.speer@isolutions.com.au>'
+build_requires:
+  Digest::MD5: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  version: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Docbook-Convert
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  HTML::Entities: '0'
+  IO::File: '0'
+  IPC::Run3: '0'
+  Pod::Usage: '0'
+  Text::Table: '0'
+  Text::Wrap: '0'
+  XML::Twig: '3.40'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/aspeer/pm-Docbook-Convert/issues
+  homepage: https://github.com/aspeer/pm-Docbook-Convert
+  repository: https://github.com/aspeer/pm-Docbook-Convert.git
+version: '1.012'
+x_authority: cpan:ASPEER
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

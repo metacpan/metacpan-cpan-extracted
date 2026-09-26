@@ -1,0 +1,38 @@
+bin/markpod
+bin/markpod.md
+Changes
+CONTRIBUTING.md
+cpanfile
+examples/embedded/hello.pl
+examples/embedded/README.md
+examples/README.md
+examples/sidecar/hello.pl
+examples/sidecar/hello.pl.md
+examples/sidecar/README.md
+INSTALL
+INSTALL.md
+lib/Markdown/Pod/Embed.pm
+lib/Markdown/Pod/Embed.pm.md
+lib/Markdown/Pod/Embed/Constant.pm
+lib/Markdown/Pod/Embed/Constant.pm.md
+lib/Markdown/Pod/Embed/Util.pm
+lib/Markdown/Pod/Embed/Util.pm.md
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+SECURITY.md
+t/00-load.t
+t/01-embed-process.t
+t/02-markdown-source.t
+t/03-update-behavior.t
+t/05-independent.t
+t/06-pod-regressions.t
+t/07-companion-links.t
+t/data/embedded-sample.pl
+t/data/sidecar-sample.pl
+t/data/sidecar-sample.pl.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

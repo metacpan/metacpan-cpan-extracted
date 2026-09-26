@@ -97,14 +97,14 @@ use Text::KDL::XS qw(parse_kdl emit_kdl);
 {
     my $kdl = emit_kdl({
         i => 42,
-        f => 3.14,
+        f => 0.1 + 0.2,
         s => 'hello',
         n => undef,
     });
     my $doc = parse_kdl($kdl, version => '2');
     my %by = map { $_->name => $_->args->[0] } @{ $doc->nodes };
     is $by{i}->as_perl, 42, 'integer round-trips';
-    cmp_ok abs($by{f}->as_perl - 3.14), '<', 1e-9, 'float round-trips';
+    cmp_ok $by{f}->as_number, '==', 0.1 + 0.2, 'float round-trips exactly';
     is $by{s}->as_string, 'hello', 'string round-trips';
     ok $by{n}->is_null, 'undef -> null';
 }

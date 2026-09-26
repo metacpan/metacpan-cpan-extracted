@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.11.0 (2026-09-25)
+
+- A database span can now carry the SQL it ran: `ForgeOps::Tracker::span('Load orders', sub { ... }, kind => 'database', statement => $sql, db_system => 'postgresql')`, plus `record_database_span($name, $sql, $started_at, $duration_ms, db_system => ...)` for a query you timed yourself. The statement is masked (every string and number becomes `?`) and cut to 4000 characters before it's stored, then sent in the span's data as `db.statement`, with `db_system` lowercased as `db.system`. Bind values are never read. Both options are ignored on spans of any other kind, and a `db.statement` put in a database span's `data` directly is masked too.
+
+## 0.10.0 (2026-09-25)
+
+- New `ForgeOps::Tracker::record_change(kind => ..., title => ..., details => {...}, environment => ..., service => ..., actor => ..., url => ..., id => ..., occurred_at => ...)` records something that changed in your system (a feature flag, a config value, a hand-run migration) so ForgeOps can show it next to the errors that followed. `kind` is one of `feature_flag`, `config`, `migration`, `dependency`, `infrastructure`, or `other`; anything else is sent as `other`. Delivered from a background thread like error events, never dies, and does nothing when the client isn't enabled.
+- Changes between deploys are now detected automatically. Once per process, `init()` queues a snapshot of the Perl version for the background thread, and ForgeOps records whatever changed since the previous boot. Module versions are left out, since Perl has no reliable record of them. New `detect_changes` option (default 1) turns this off.
+- New `track_env_var_names` option (default 0) adds environment variable names, never values, to that snapshot. Host-specific names (`HOSTNAME`, `PATH`, `PORT`, `LC_*`, Kubernetes service variables, and others) and the client's own `FORGE_OPS_*` settings are always left out.
+
 ## 0.9.0
 
 - Distributed tracing across services, using the W3C Trace Context standard (`traceparent`). Every request that passes through `PSGIPerformance` or `Dancer2Performance` now gets a trace id; one that arrives with a valid `traceparent` header continues that trace, and its root span points at the caller's span. A missing or malformed header starts a fresh trace. `ForgeOps::Tracker::current_trace_id()` returns it, and `start_trace($traceparent)` continues one for work that isn't a request.

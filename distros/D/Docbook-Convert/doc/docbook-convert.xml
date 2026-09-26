@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0"
+         xml:id="docbook-convert-article">
+  <title>Docbook::Convert</title>
+
+  <section xml:id="docbook-convert">
+    <title>Docbook::Convert</title>
+
+  <section xml:id="purpose">
+    <title>Purpose</title>
+    <para>
+      Docbook::Convert turns maintained DocBook articles and reference pages
+      into Markdown. The Markdown can be published directly or passed to
+      Markdown::Pod::Embed when it documents Perl source.
+    </para>
+    <para>
+      The preferred guide path uses Pandoc with the filters supplied in this
+      distribution. The original Perl renderer remains available for existing
+      documents and is selected explicitly.
+    </para>
+  </section>
+
+  <section xml:id="pandoc-pipeline">
+    <title>Pandoc pipeline</title>
+    <programlisting language="perl"><![CDATA[use Docbook::Convert::Pandoc;
+
+my $converter_or=Docbook::Convert::Pandoc->new();
+my $output_fn=$converter_or->convert_file('doc/guide.xml');]]></programlisting>
+    <para>
+      This path expands local includes and preserves section identifiers,
+      admonitions and fenced-code attributes. Conversion failure is reported;
+      it does not silently select another renderer.
+    </para>
+  </section>
+
+  <section xml:id="custom-renderer">
+    <title>Custom renderer</title>
+    <programlisting language="perl"><![CDATA[use Docbook::Convert;
+
+my $markdown=Docbook::Convert->markdown_file('doc/guide.xml');]]></programlisting>
+    <para>
+      The custom renderer supports the subset of DocBook used by the original
+      module and utility documentation. It is retained for compatibility and
+      is not intended as a complete DocBook implementation.
+    </para>
+  </section>
+
+  <section xml:id="workflow">
+    <title>Documentation workflow</title>
+    <orderedlist>
+      <listitem><para>Maintain articles under the doc directory.</para></listitem>
+      <listitem><para>Convert DocBook sources to sibling Markdown files.</para></listitem>
+      <listitem><para>Merge Markdown sidecars into Perl source where required.</para></listitem>
+      <listitem><para>Assemble and publish the Markdown with the selected site backend.</para></listitem>
+    </orderedlist>
+    <note>
+      <para>
+        Direct DocBook-to-POD conversion is retired. Markdown is the durable
+        boundary between authoring, Perl documentation and site publication.
+      </para>
+    </note>
+  </section>
+  </section>
+</article>

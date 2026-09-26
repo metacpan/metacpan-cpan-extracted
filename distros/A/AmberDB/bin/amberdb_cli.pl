@@ -104,46 +104,27 @@ sub del_session_path {
 
 # ============================================================================
 # RESOLVE DBASE_DIR FROM CLI ARGUMENTS
-# 1- Connect'ten sonraki string: amberdb connect /path/to/dbstore
-# 2- Argümanlı: --db=dbstore veya --dbase_dir=/path/to
-# 3- Oturum token'ı varsa: .amberdb_cli_sessions içinden dbase_dir tespit et
+# 1- Argümanlı: --db=dbstore veya --dbase_dir=/path/to (ayrıca -d, db=, path-dbase_dir=)
+# 2- Oturum token'ı varsa: .amberdb/session/ içinden dbase_dir tespit et
 # Argümandan gelmiyorsa: bulunduğu dizinde dbstore oluşturur.
+# (Not: connect'ten sonraki argüman veritabanı adıdır, dbase_dir değildir)
 # ============================================================================
 
 my $target_db;
 my $from_cli_args = 0;
 
-# 1. Connect'ten sonraki string (örn: amberdb connect /path/to/dbstore)
+# 1. Argümanlı: --db=dbstore veya --dbase_dir=/path/to (ayrıca -d, db=, path-dbase_dir=)
 for (my $i = 0; $i < @ARGV; $i++) {
     my $arg = $ARGV[$i];
-    if ( $arg =~ /^--?(?:action=)?connect$/i ) {
-        for (my $j = $i + 1; $j < @ARGV; $j++) {
-            my $next = $ARGV[$j];
-            next if $next =~ /^-/;
-            next if $next =~ /=/;
-            next if $next =~ /^(?:json|pretty|tsv|dumper|perl|raw|table|time)$/i;
-            $target_db = $next;
-            $from_cli_args = 1;
-            last;
-        }
+    if ( $arg =~ /^--(?:db|dbase_dir)=(.*)$/i || $arg =~ /^(?:path-dbase_dir|db)=(.*)$/i ) {
+        $target_db = $1 if defined $1 && length $1;
+        $from_cli_args = 1;
         last;
     }
-}
-
-# 2. Argümanlı: --db=dbstore veya --dbase_dir=/path/to (ayrıca -d, db=, path-dbase_dir=)
-if ( !defined $target_db ) {
-    for (my $i = 0; $i < @ARGV; $i++) {
-        my $arg = $ARGV[$i];
-        if ( $arg =~ /^--(?:db|dbase_dir)=(.*)$/i || $arg =~ /^(?:path-dbase_dir|db)=(.*)$/i ) {
-            $target_db = $1 if defined $1 && length $1;
-            $from_cli_args = 1;
-            last;
-        }
-        elsif ( ( $arg =~ /^--(?:db|dbase_dir)$/i || $arg =~ /^-d$/i ) && $i + 1 < @ARGV && $ARGV[$i + 1] !~ /^-/ ) {
-            $target_db = $ARGV[$i + 1];
-            $from_cli_args = 1;
-            last;
-        }
+    elsif ( ( $arg =~ /^--(?:db|dbase_dir)$/i || $arg =~ /^-d$/i ) && $i + 1 < @ARGV && $ARGV[$i + 1] !~ /^-/ ) {
+        $target_db = $ARGV[$i + 1];
+        $from_cli_args = 1;
+        last;
     }
 }
 
@@ -184,6 +165,33 @@ $target_db = eval { abs_path($target_db) } // $target_db;
 
 # şimdi datadiri atama yap
 $adb->set_datadir($target_db);
+
+# Auto-detect database name for CLI context (connect.pl -> core.conf -> path pattern)
+my $detected_dbname;
+if ( -f "$target_db/config/connect.pl" ) {
+    my $c_data = do "$target_db/config/connect.pl";
+    $detected_dbname = $c_data->{database} if ref($c_data) eq 'HASH' && $c_data->{database};
+}
+if ( !$detected_dbname && -f "$target_db/config/core.conf" ) {
+    if ( open my $cfh, '<', "$target_db/config/core.conf" ) {
+        while ( my $line = <$cfh> ) {
+            if ( $line =~ /^site_id\s+([^\s\t]+)/ ) {
+                $detected_dbname = $1;
+                last;
+            }
+        }
+        close $cfh;
+    }
+}
+if ( !$detected_dbname && $target_db =~ m{([^\/\\]+)[\/\\]dbstore$}i ) {
+    my $candidate = $1;
+    $detected_dbname = $candidate if $candidate && $candidate ne 'dbstore';
+}
+if ( $detected_dbname && $detected_dbname ne 'dbstore' ) {
+    $adb->{_connect}->{database} = $detected_dbname;
+    $adb->clear_cache('ramdisk');
+    $adb->ramdisk_setup();
+}
 
 my $explicit_db      = $from_cli_args;
 my $has_cfg_updates  = 0;
@@ -551,7 +559,7 @@ my %known_actions = map { $_ => 1 } qw(
     status tables list info table_info read read_id read_all read_list
     search search_table fetch field_fetch count table_count
     insert insert_id update update_id delete delete_id
-    reindex check vacuum migrate update_table
+    reindex check vacuum migrate update_table update_storage update_version
     export tie2csv import csv2tie dump restore rename drop help
 );
 
@@ -665,6 +673,21 @@ for my $raw (@raw_tokens) {
         elsif ( $k =~ /^(?:force|f)$/ ) {
             $opt_force = $val ? 1 : 0;
         }
+        elsif ( $k =~ /^(?:check|c)$/i ) {
+            $method_args{check} = $val ? 1 : 0;
+        }
+        elsif ( $k =~ /^(?:all|a)$/i ) {
+            $method_args{all} = $val ? 1 : 0;
+        }
+        elsif ( $k =~ /^(?:no-backup|no_backup)$/i ) {
+            $method_args{no_backup} = $val ? 1 : 0;
+        }
+        elsif ( $k eq 'cpanm' ) {
+            $method_args{cpanm} = $v;
+        }
+        elsif ( $k eq 'manifest' ) {
+            $method_args{manifest} = $v;
+        }
         elsif ( $k =~ /^(?:help|h)$/ ) {
             $opt_help = 1;
         }
@@ -705,6 +728,9 @@ for my $raw (@raw_tokens) {
         }
         elsif ( $k eq 'database' || $k eq 'dbname' ) {
             $opt_database = $val;
+            $adb->{_connect}->{database} = $val;
+            $adb->clear_cache('ramdisk');
+            $adb->ramdisk_setup();
         }
         else {
             if ( $k =~ /[-.]/ ) {
@@ -726,6 +752,16 @@ for my $raw (@raw_tokens) {
         elsif ( $arg =~ /^(?:force|f)$/i ) {
             $opt_force = 1;
         }
+        elsif ( $raw =~ /^--?(?:check|c)$/i ) {
+            $method_args{check} = 1;
+        }
+        elsif ( $raw =~ /^--?(?:all|a)$/i ) {
+            $method_args{all} = 1;
+        }
+        elsif ( $raw =~ /^--?(?:no-backup|no_backup)$/i ) {
+            $method_args{no_backup} = 1;
+        }
+
         elsif ( $raw =~ /^--?time$/i ) {
             $opt_time = 1;
         }
@@ -741,22 +777,36 @@ for my $raw (@raw_tokens) {
 # Step 6: Action alias normalization
 if ( defined $opt_action ) {
     my $act = lc($opt_action);
-    $opt_action = 'status'      if $act eq 'tables' || $act eq 'list';
-    $opt_action = 'user'        if $act eq 'users';
-    $opt_action = 'config'      if $act eq 'cfg';
-    $opt_action = 'attr'        if $act eq 'table_attr';
-    $opt_action = 'info'        if $act eq 'table_info';
-    $opt_action = 'search'      if $act eq 'search_table';
-    $opt_action = 'fetch'       if $act eq 'field_fetch';
-    $opt_action = 'count'       if $act eq 'table_count';
-    $opt_action = 'insert'      if $act eq 'insert_id';
-    $opt_action = 'update'      if $act eq 'update_id';
-    $opt_action = 'delete'      if $act eq 'delete_id';
-    $opt_action = 'migrate'     if $act eq 'update_table';
-    $opt_action = 'export'      if $act eq 'tie2csv';
-    $opt_action = 'import'      if $act eq 'csv2tie';
-    $opt_action = 'reindex'     if $act eq 'set_index';
-    $opt_action = 'vacuum'      if $act eq 'vacuum';
+    $opt_action = 'status'         if $act eq 'tables' || $act eq 'list';
+    $opt_action = 'user'           if $act eq 'users';
+    $opt_action = 'config'         if $act eq 'cfg';
+    $opt_action = 'attr'           if $act eq 'table_attr';
+    $opt_action = 'info'           if $act eq 'table_info';
+    $opt_action = 'search'         if $act eq 'search_table';
+    $opt_action = 'fetch'          if $act eq 'field_fetch';
+    $opt_action = 'count'          if $act eq 'table_count';
+    $opt_action = 'insert'         if $act eq 'insert_id';
+    $opt_action = 'update'         if $act eq 'update_id';
+    $opt_action = 'delete'         if $act eq 'delete_id';
+    $opt_action = 'migrate'        if $act eq 'update_table';
+    $opt_action = 'update_storage' if $act eq 'update-storage' || $act eq 'updatedb' || $act eq 'update_storage';
+    $opt_action = 'update_version' if $act eq 'update-amberdb' || $act eq 'update-version' || $act eq 'update_version';
+    $opt_action = 'export'         if $act eq 'tie2csv';
+    $opt_action = 'import'         if $act eq 'csv2tie';
+    $opt_action = 'reindex'        if $act eq 'set_index';
+    $opt_action = 'vacuum'         if $act eq 'vacuum';
+}
+
+# Step 6b: Subcommand resolution for 'update' (e.g. amberdb update storage / amberdb update version)
+if ( defined $opt_action && $opt_action eq 'update' && @pos_args ) {
+    if ( lc($pos_args[0]) eq 'storage' ) {
+        $opt_action = 'update_storage';
+        shift @pos_args;
+    }
+    elsif ( lc($pos_args[0]) eq 'version' || lc($pos_args[0]) eq 'engine' || lc($pos_args[0]) eq 'amberdb' ) {
+        $opt_action = 'update_version';
+        shift @pos_args;
+    }
 }
 
 # Step 7: Natural 'read' command resolution
@@ -815,7 +865,8 @@ Doğrudan (Oturumsuz) Kullanım:
   amberdb tables                              # Tüm tabloların durum panosu
 
 Oturum Komutları (Session Management):
-  amberdb connect path-dbase_dir=dbstore      # Oturum açar (örn: Token 1245)
+  amberdb connect <database>                  # Oturum açar (örn: amberdb connect eticaretim)
+  amberdb connect <database> [user] [pass]    # Kimlik bilgileri ile oturum açar
   amberdb 1245 attr products search_block=[1] # Oturumda tablo şema niteliklerini belirleme
   amberdb 1245 config no_write=1              # Oturumda salt-okunur mod
   amberdb 1245 path dbase_dir=/var/data       # Oturum veri dizinini değiştirme
@@ -827,6 +878,8 @@ Veri Eylemleri (CRUD & Arama):
   amberdb delete users 10
 
 Bakım ve Yönetim Eylemleri:
+  amberdb update storage [--check] [--force]  # Dizin & ABR v5 veri biçimi migrasyonu
+  amberdb update version [--check]            # MetaCPAN çekirdek sürüm kontrolü / güncelleme
   amberdb reindex products                    # İndeksleri sıfırdan oluştur
   amberdb check products                      # Fiziksel dosya bütünlük kontrolü
   amberdb vacuum products                     # BDB disk boşluklarını temizle
@@ -859,34 +912,24 @@ if ( $opt_help || ( defined $opt_action && $opt_action eq 'help' ) ) {
 # ============================================================================
 
 if ( defined $opt_action && $opt_action eq 'connect' ) {
-    if ( @pos_args ) {
-        my $first = $pos_args[0];
-        if ( -d $first || $first =~ m{[/\\\\]} || ( defined $target_db && ( $first eq $target_db || ( eval { abs_path($first) } // '' ) eq ( eval { abs_path($target_db) } // '' ) ) ) ) {
-            my $target = shift @pos_args;
-            if ( defined $target && length $target && $target !~ /^format=/i ) {
-                my $abs = eval { abs_path($target) } // $target;
-                make_path($abs) unless -d $abs;
-                $adb->set_datadir($abs);
-                $explicit_db = 1;
-            }
-        }
-        elsif ( @pos_args >= 3 && !defined $opt_database && !defined $opt_user ) {
-            # Positional format: amberdb connect dir db user pass
-            my $target = shift @pos_args;
-            if ( defined $target && length $target && $target !~ /^format=/i ) {
-                my $abs = eval { abs_path($target) } // $target;
-                make_path($abs) unless -d $abs;
-                $adb->set_datadir($abs);
-                $explicit_db = 1;
-            }
-        }
+    my $conn_db = $opt_database // shift @pos_args;
+
+    if ( defined $conn_db && ( $conn_db eq 'dbstore' || $conn_db =~ m{[/\\\\]} ) ) {
+        die "[AMBERDB_ERROR] '$conn_db' is a directory path/name, not a valid database name. Database name is expected after 'connect'. Specify data directory with --db=<dir> if needed. Usage: amberdb connect <database_name> [user] [pass]\n";
     }
 
-    my $conn_db   = $opt_database // shift @pos_args;
+    $conn_db //= $detected_dbname;
+
     # Even if username is entered differently, CLI always operates and authenticates as 'cli'
     my $conn_user = 'cli';
     my $entered_user = shift @pos_args if @pos_args;
     my $conn_pass = $opt_pass // shift @pos_args // '';
+
+    if ( defined $conn_db && length $conn_db ) {
+        $adb->{_connect}->{database} = $conn_db;
+        $adb->clear_cache('ramdisk');
+        $adb->ramdisk_setup();
+    }
 
     my $token = eval {
         $adb->connect(
@@ -1419,6 +1462,32 @@ if ( $action eq 'insert_id' || $action eq 'insert' ) {
     exit 0;
 }
 
+# 9b. UPDATE_STORAGE
+if ( $action eq 'update_storage' ) {
+    my %opts;
+    $opts{target_dir} = $adb->path('dbase_dir');
+    $opts{force}      = $opt_force if $opt_force;
+    $opts{check}      = $method_args{check} if exists $method_args{check};
+    $opts{no_backup}  = $method_args{no_backup} if exists $method_args{no_backup};
+    $opts{tables}     = $method_args{tables} // $method_args{table} // ( @pos_args ? join(',', @pos_args) : undef );
+    $opts{manifest}   = $method_args{manifest} if exists $method_args{manifest};
+
+    my $res = $tools->update_storage(%opts);
+    output_result( $res, $opt_format ) if defined $opt_format;
+    exit 0;
+}
+
+# 9c. UPDATE_VERSION
+if ( $action eq 'update_version' ) {
+    my %opts;
+    $opts{check} = $method_args{check} if exists $method_args{check};
+    $opts{cpanm} = $method_args{cpanm} if exists $method_args{cpanm};
+
+    my $res = $tools->update_version(%opts);
+    output_result( $res, $opt_format ) if defined $opt_format;
+    exit 0;
+}
+
 # 10. UPDATE_ID / UPDATE
 if ( $action eq 'update_id' || $action eq 'update' ) {
     if ( $adb->config('no_write') ) {
@@ -1671,7 +1740,7 @@ amberdb_cli.pl - High-performance Command-Line Console & Embedded Management Uti
   perl bin/amberdb_cli.pl format=json
 
   # 2. Token-Based Session Lifecycle (Connect, Configure & Disconnect)
-  perl bin/amberdb_cli.pl connect path-dbase_dir=./dbstore cfg-language=tr
+  perl bin/amberdb_cli.pl connect mydatabase cfg-language=tr
   perl bin/amberdb_cli.pl token=K2A78T02 cfg-no_write=1
   perl bin/amberdb_cli.pl token=K2A78T02 disconnect
 

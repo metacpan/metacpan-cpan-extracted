@@ -12,7 +12,8 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.016',
     PL_FILES         => {},
     EXE_FILES        => [
-        'bin/amberdb_setup.pl',
+        'bin/amberdb',
+        'bin/amberdb_cli.pl',
         'bin/amberdb_daemon.pl',
     ],
     CONFIGURE_REQUIRES => {

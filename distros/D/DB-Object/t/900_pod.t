@@ -1,5 +1,17 @@
-#!/usr/bin/perl
+#!perl
+##----------------------------------------------------------------------------
+## SQL API Abstraction - t/900_pod.t
+##----------------------------------------------------------------------------
+use strict;
+use warnings;
 use Test::More;
-eval "use Test::Pod 1.00";
-plan skip_all => "Test::Pod 1.00 required for testing POD" if( $@ );
-all_pod_files_ok();
+
+eval{ require Test::Pod; Test::Pod->import };
+if( $@ )
+{
+    plan( skip_all => 'Test::Pod not available' );
+}
+else
+{
+    all_pod_files_ok();
+}

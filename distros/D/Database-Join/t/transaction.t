@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 146;
+use Test::Most tests => 180;
 use Readonly;
 use Scalar::Util qw(refaddr);
 use Carp qw(croak);
@@ -1164,4 +1164,421 @@ Readonly::Scalar my $BAD_TMPDIR => '/nonexistent/__txn_test_dir__';
 	my ($first_line) = split /\n/, ($err // ''), 2;
 	like($first_line, qr/does not exist|no such file|cannot|failed/i,
 		'S20-P2: auto + count>threshold → SQLite path; bad tmpdir → croak');		# T146
+}
+
+# ============================================================================
+# S21: sort_by Transaction Lifecycle
+#
+# Lifecycle phases:
+#   CONSTRUCT → DEFAULT-SORT → VALID-ASC → VALID-DESC → INVALID-DIR → UNKNOWN-COL
+#
+# Each phase verifies that the query results match the ordering implied by the
+# current sort_by parameter, and that invalid inputs trigger a carp without
+# aborting the transaction or leaving the object in a broken state.
+# ============================================================================
+
+note '--- S21: sort_by Transaction Lifecycle ---';
+
+Readonly::Scalar my $L_ALPHA => 'alpha';
+Readonly::Scalar my $L_BETA  => 'beta';
+Readonly::Scalar my $L_GAMMA => 'gamma';
+
+# Fixture: join_col order (k1 < k2 < k3) is the reverse of label ASC order
+# (alpha=k3 < beta=k2 < gamma=k1). Every phase has a distinct observable output.
+my $ob21 = TransactionDA->new(
+	cols => ['entry', 'label'],
+	rows => [
+		{ entry => $K3, label => $L_ALPHA },
+		{ entry => $K1, label => $L_GAMMA },
+		{ entry => $K2, label => $L_BETA  },
+	],
+);
+my $j21 = Database::Join->new(
+	databases   => [$ob21],
+	join_column => 'entry',
+	backend     => 'array',
+);
+
+# Phase 1: CONSTRUCT — object built; column routing table populated correctly.
+ok(defined $j21, 'S21-P1: sort_by lifecycle: join object constructed');		# T147
+
+# Phase 2: DEFAULT-SORT — no sort_by; join_col ASC is the default ordering.
+# k1 < k2 < k3 → k1 must come first.
+{
+	my $rows = $j21->selectall_arrayref();
+	is($rows->[0]{entry}, $K1, 'S21-P2: default sort_by → join_col ASC → k1 first');	# T148
+}
+
+# Phase 3: VALID-ASC — sort_by = 'label' (string form) → Schwarzian ASC.
+# alpha(k3) < beta(k2) < gamma(k1): k3 must come first.
+{
+	my $rows = $j21->selectall_arrayref(sort_by => 'label');
+	is($rows->[0]{label}, $L_ALPHA,
+		'S21-P3: sort_by label ASC → alpha first (non-join-col Schwarzian)');		# T149
+}
+
+# Phase 4: VALID-DESC — sort_by = ['label','DESC'] → Schwarzian DESC.
+# gamma(k1) > beta(k2) > alpha(k3): gamma must come first.
+{
+	my $rows = $j21->selectall_arrayref(sort_by => ['label', 'DESC']);
+	is($rows->[0]{label}, $L_GAMMA,
+		'S21-P4: sort_by label DESC → gamma first (Schwarzian DESC)');			# T150
+}
+
+# Phase 5: INVALID-DIR — direction 'UP' is not ASC or DESC → carp; ASC fallback.
+# Object remains operational; result is label ASC (alpha first).
+{
+	my @warns;
+	{ local $SIG{__WARN__} = sub { push @warns, @_ };
+	  my $rows = $j21->selectall_arrayref(sort_by => ['label', 'UP']);
+	  is($rows->[0]{label}, $L_ALPHA,
+		'S21-P5b: invalid direction carps + ASC fallback → alpha first');		# T152
+	}
+	ok(scalar @warns,
+		'S21-P5a: sort_by direction "UP" → carp emitted; object still operational');	# T151
+}
+
+# Phase 6: UNKNOWN-COL — sort_by column not in the view → carp; join_col fallback.
+# k1 must come first (join_col ASC default).
+{
+	my @warns;
+	{ local $SIG{__WARN__} = sub { push @warns, @_ };
+	  my $rows = $j21->selectall_arrayref(sort_by => 'nonexistent');
+	  is($rows->[0]{entry}, $K1,
+		'S21-P6b: unknown sort_by col → join_col ASC fallback → k1 first');		# T154
+	}
+	ok(scalar @warns,
+		'S21-P6a: unknown sort_by column → carp; object continues to function');	# T153
+}
+
+# ============================================================================
+# S22: Pagination Lifecycle (limit + offset)
+#
+# Lifecycle phases:
+#   FULL → PAGE-1 → PAGE-2 → LAST-PAGE (partial) → PAST-END → IDEMPOTENT
+#
+# Verifies that sequential pagination walks through all rows without overlap or
+# gaps, and that repeating the same page query returns identical results
+# (idempotency — no hidden mutable state inside the join object).
+# ============================================================================
+
+note '--- S22: Pagination Lifecycle ---';
+
+Readonly::Scalar my $PG_SIZE    => 2;
+Readonly::Scalar my $PG_TOTAL   => 5;
+
+my $pg22 = TransactionDA->new(
+	cols => ['entry', 'v'],
+	rows => [
+		{ entry => 'p1', v => 10 },
+		{ entry => 'p2', v => 20 },
+		{ entry => 'p3', v => 30 },
+		{ entry => 'p4', v => 40 },
+		{ entry => 'p5', v => 50 },
+	],
+);
+my $j22 = Database::Join->new(
+	databases   => [$pg22],
+	join_column => 'entry',
+	backend     => 'array',
+);
+
+# Phase 1: FULL — establish baseline: all 5 rows returned without pagination.
+{
+	my $full = $j22->selectall_arrayref();
+	is(scalar @{$full}, $PG_TOTAL,
+		'S22-P1: full result returns all 5 rows (pagination baseline)');		# T155
+}
+
+# Phase 2: PAGE-1 — offset=0, limit=2 → first two rows (p1, p2).
+my $page1_22;
+{
+	$page1_22 = $j22->selectall_arrayref(offset => 0, limit => $PG_SIZE);
+	is(scalar @{$page1_22}, $PG_SIZE,
+		'S22-P2a: page 1 (offset=0, limit=2) → 2 rows');				# T156
+	is($page1_22->[0]{entry}, 'p1',
+		'S22-P2b: page 1 starts at p1 (first row)');					# T157
+}
+
+# Phase 3: PAGE-2 — offset=2, limit=2 → rows 3-4 (p3, p4); no overlap with page 1.
+{
+	my $page2 = $j22->selectall_arrayref(offset => $PG_SIZE, limit => $PG_SIZE);
+	is(scalar @{$page2}, $PG_SIZE,
+		'S22-P3a: page 2 (offset=2, limit=2) → 2 rows; no overlap with page 1');	# T158
+	is($page2->[0]{entry}, 'p3',
+		'S22-P3b: page 2 starts at p3 (third row, not seen on page 1)');		# T159
+}
+
+# Phase 4: LAST-PAGE (partial) — offset=4, limit=2: only 1 row remaining (p5).
+{
+	my $last = $j22->selectall_arrayref(offset => $PG_TOTAL - 1, limit => $PG_SIZE);
+	is(scalar @{$last}, 1,
+		'S22-P4: last page (offset=4, limit=2) → 1 row (partial page at boundary)');	# T160
+}
+
+# Phase 5: PAST-END — offset=5 (== total row count) → empty result.
+{
+	my $gone = $j22->selectall_arrayref(offset => $PG_TOTAL, limit => $PG_SIZE);
+	is(scalar @{$gone}, 0,
+		'S22-P5: past-end offset (offset=5) → empty result (BVA: offset=N)');		# T161
+}
+
+# Phase 6: IDEMPOTENT — page 1 repeated → identical result; no hidden mutable state.
+{
+	my $repeat = $j22->selectall_arrayref(offset => 0, limit => $PG_SIZE);
+	is_deeply($repeat, $page1_22,
+		'S22-P6: repeating page 1 query returns identical rows (idempotency)');		# T162
+}
+
+# ============================================================================
+# S23: Combined sort_by + Pagination Transaction Lifecycle
+#
+# Lifecycle phases:
+#   SORTED-FULL → SORTED-PAGE-1 → SORTED-PAGE-2
+#
+# Verifies that sort order is preserved across page boundaries: each page is a
+# contiguous, non-overlapping window into the sorted result set.  The sort key
+# (label) is in the reverse of join_col order, so any ordering bug would be
+# visible as a wrong first element on each page.
+# ============================================================================
+
+note '--- S23: Combined sort_by + Pagination Lifecycle ---';
+
+# Fixture: label ASC order (apple < cherry < mango < zebra) is the reverse of
+# join_col ASC order (k1 < k2 < k3 < k4), making sort/page bugs visible.
+# Labels were chosen so alphabetical order is unambiguous (no a<b<d<g confusion).
+my $op23 = TransactionDA->new(
+	cols => ['entry', 'label'],
+	rows => [
+		{ entry => 'k4', label => 'apple'  },
+		{ entry => 'k3', label => 'cherry' },
+		{ entry => 'k2', label => 'mango'  },
+		{ entry => 'k1', label => 'zebra'  },
+	],
+);
+my $j23 = Database::Join->new(
+	databases   => [$op23],
+	join_column => 'entry',
+	backend     => 'array',
+);
+
+Readonly::Scalar my $OP_SIZE => 2;
+
+# Phase 1: SORTED-FULL — full label ASC result; first=apple, last=zebra.
+{
+	my $full = $j23->selectall_arrayref(sort_by => 'label');
+	is($full->[0]{label}, 'apple',
+		'S23-P1a: sorted full result → apple first (label ASC)');			# T163
+	is($full->[-1]{label}, 'zebra',
+		'S23-P1b: sorted full result → zebra last (label ASC)');			# T164
+}
+
+# Phase 2: SORTED-PAGE-1 — sort_by=label ASC + offset=0, limit=2 → apple, cherry.
+{
+	my $pg1 = $j23->selectall_arrayref(sort_by => 'label', offset => 0, limit => $OP_SIZE);
+	is(scalar @{$pg1}, $OP_SIZE,
+		'S23-P2a: sorted page 1 → 2 rows');						# T165
+	is($pg1->[0]{label}, 'apple',
+		'S23-P2b: sorted page 1 starts at apple (sort preserved at page boundary)');	# T166
+}
+
+# Phase 3: SORTED-PAGE-2 — sort_by=label ASC + offset=2, limit=2 → mango, zebra.
+# This proves the sort is applied before pagination (not after), so page 2 sees
+# the NEXT two labels in sorted order, not the next two join_col values.
+{
+	my $pg2 = $j23->selectall_arrayref(sort_by => 'label', offset => $OP_SIZE, limit => $OP_SIZE);
+	is(scalar @{$pg2}, $OP_SIZE,
+		'S23-P3a: sorted page 2 → 2 rows');						# T167
+	is($pg2->[0]{label}, 'mango',
+		'S23-P3b: sorted page 2 starts at mango (no overlap; sort preserved)');		# T168
+}
+
+# ============================================================================
+# S24: Parallel Dispatch Lifecycle (thread failure → sequential re-fetch)
+#
+# Lifecycle phases:
+#   CONSTRUCT → PARALLEL-QUERY → IDEMPOTENT-QUERY → ADD-DB → POST-ADD-QUERY
+#
+# Verifies that with parallel=1 and 3 databases, the result always matches the
+# sequential (parallel=0) equivalent — even when threads cannot clone DBI-backed
+# DA objects (the Windows re-fetch fallback).  The invariant:
+#
+#   parallel_result ≡ sequential_result  for any n >= 3
+#
+# is the core correctness guarantee of the fix in _joined_query_array.
+# ============================================================================
+
+note '--- S24: Parallel Dispatch Lifecycle ---';
+
+# Three TransactionDA stubs: purely in-memory, thread-clonable on all platforms.
+my $par24_prim = TransactionDA->new(
+	cols => ['entry', 'name'],
+	rows => [
+		{ entry => $K1, name => 'Alice' },
+		{ entry => $K2, name => 'Bob'   },
+	],
+);
+my $par24_sec1 = TransactionDA->new(
+	cols => ['entry', 'score'],
+	rows => [
+		{ entry => $K1, score => $SCORE_HIGH },
+		{ entry => $K2, score => $SCORE_LOW  },
+	],
+);
+my $par24_sec2 = TransactionDA->new(
+	cols => ['entry', 'tier'],
+	rows => [
+		{ entry => $K1, tier => 'gold'   },
+		{ entry => $K2, tier => 'silver' },
+	],
+);
+
+# Phase 1: CONSTRUCT — with parallel=1; three DAs (gate n>2 is open).
+my $j24_par;
+my @warns24;
+{ local $SIG{__WARN__} = sub { push @warns24, @_ };
+  $j24_par = Database::Join->new(
+	databases   => [$par24_prim, $par24_sec1, $par24_sec2],
+	join_column => 'entry',
+	join_type   => 'inner',
+	backend     => 'array',
+	parallel    => 1,
+  );
+}
+ok(defined $j24_par,
+	'S24-P1: parallel=1 join with 3 DAs constructed without error');		# T169
+
+# Phase 2: PARALLEL-QUERY — result must equal sequential equivalent.
+# (On Linux with threads: parallel dispatch.  On Windows or without threads:
+# sequential re-fetch fallback.  Result must be identical either way.)
+my $j24_seq = Database::Join->new(
+	databases => [
+		TransactionDA->new(cols => ['entry','name'],  rows => [{ entry => $K1, name => 'Alice' }, { entry => $K2, name => 'Bob' }]),
+		TransactionDA->new(cols => ['entry','score'], rows => [{ entry => $K1, score => $SCORE_HIGH }, { entry => $K2, score => $SCORE_LOW }]),
+		TransactionDA->new(cols => ['entry','tier'],  rows => [{ entry => $K1, tier => 'gold' }, { entry => $K2, tier => 'silver' }]),
+	],
+	join_column => 'entry',
+	join_type   => 'inner',
+	backend     => 'array',
+	parallel    => 0,
+);
+{ local $SIG{__WARN__} = sub { push @warns24, @_ };
+  my $par_rows = $j24_par->selectall_arrayref();
+  my $seq_rows = $j24_seq->selectall_arrayref();
+  is(scalar @{$par_rows}, scalar @{$seq_rows},
+	'S24-P2a: parallel=1 result row count == sequential row count');		# T170
+  my @par_keys = sort map { $_->{entry} } @{$par_rows};
+  my @seq_keys = sort map { $_->{entry} } @{$seq_rows};
+  is_deeply(\@par_keys, \@seq_keys,
+	'S24-P2b: parallel=1 join_col set identical to sequential (thread-or-re-fetch)');	# T171
+}
+
+# Phase 3: IDEMPOTENT-QUERY — repeating the query on the same parallel join
+# object returns the same row count (no hidden mutable state altered by the
+# first dispatch).
+{ local $SIG{__WARN__} = sub { push @warns24, @_ };
+  my $par_rows2 = $j24_par->selectall_arrayref();
+  is(scalar @{$par_rows2}, 2,
+	'S24-P3: second parallel query returns same row count (idempotent dispatch)');	# T172
+}
+
+# Phase 4: ADD-DB → POST-ADD-QUERY — adding a fourth database to the parallel
+# join does not corrupt existing results.
+my $par24_sec3 = TransactionDA->new(
+	cols => ['entry', 'region'],
+	rows => [
+		{ entry => $K1, region => 'north' },
+		{ entry => $K2, region => 'south' },
+	],
+);
+{ local $SIG{__WARN__} = sub { push @warns24, @_ };
+  $j24_par->add_database($par24_sec3);
+  my $after = $j24_par->selectall_arrayref();
+  is(scalar @{$after}, 2,
+	'S24-P4a: after add_database, parallel join still returns 2 correct rows');	# T173
+  ok((grep { defined $_->{region} } @{$after}) == 2,
+	'S24-P4b: fourth DA column (region) present in merged rows after add_database');	# T174
+}
+
+# ============================================================================
+# S25: Pagination Mid-Flight Failure and Recovery
+#
+# Lifecycle phases:
+#   SUCCEED → INJECT-FAILURE → CROAK-PROPAGATED → RESET → RECOVER
+#
+# Verifies that a DA failure during a paginated query propagates the exception
+# cleanly (no silent partial result, no dangling state), and that after the
+# failure is cleared the join object returns to full operational status with
+# exactly the same paginated result as before the failure.
+# ============================================================================
+
+note '--- S25: Pagination Mid-Flight Failure and Recovery ---';
+
+Readonly::Scalar my $PF_LIMIT => 2;
+
+my $pf25_prim = TransactionDA->new(
+	cols => ['entry', 'name'],
+	rows => [
+		{ entry => $K1, name => 'Alice' },
+		{ entry => $K2, name => 'Bob'   },
+		{ entry => $K3, name => 'Carol' },
+	],
+);
+my $pf25_sec = TransactionDA->new(
+	cols => ['entry', 'score'],
+	rows => [
+		{ entry => $K1, score => $SCORE_HIGH },
+		{ entry => $K2, score => $SCORE_LOW  },
+		{ entry => $K3, score => $SCORE_MID  },
+	],
+);
+my $j25 = Database::Join->new(
+	databases   => [$pf25_prim, $pf25_sec],
+	join_column => 'entry',
+	backend     => 'array',
+);
+
+# Phase 1: SUCCEED — paginated query returns the expected 2 rows.
+my $pf25_baseline;
+{
+	$pf25_baseline = $j25->selectall_arrayref(limit => $PF_LIMIT);
+	is(scalar @{$pf25_baseline}, $PF_LIMIT,
+		'S25-P1: paginated query (limit=2) succeeds → 2 rows (pre-failure baseline)');	# T175
+}
+
+# Phase 2: INJECT-FAILURE — make the secondary DA croak on its next call.
+$pf25_sec->set_fail(1);
+
+# Phase 3: CROAK-PROPAGATED — the paginated query must propagate the error; no
+# silent empty result that could mask a data-source problem.
+{
+	my $err;
+	eval { $j25->selectall_arrayref(limit => $PF_LIMIT) };
+	$err = $@;
+	my ($first_line) = split /\n/, ($err // ''), 2;
+	like($first_line, qr/mid-flight failure/i,
+		'S25-P3: mid-flight DA failure during paginated query → croak propagated');	# T176
+}
+
+# Phase 4: RESET — restore the secondary DA to healthy state.
+$pf25_sec->set_fail(0);
+
+# Phase 5: RECOVER — the same paginated query now returns the same result as the
+# pre-failure baseline, proving the join object is fully operational again.
+{
+	my $recovered = $j25->selectall_arrayref(limit => $PF_LIMIT);
+	is(scalar @{$recovered}, $PF_LIMIT,
+		'S25-P5a: post-recovery paginated query returns 2 rows again');			# T177
+	is_deeply($recovered, $pf25_baseline,
+		'S25-P5b: recovered result identical to pre-failure baseline (full recovery)');	# T178
+}
+
+# Phase 6: IDEMPOTENT-AFTER-RECOVERY — one more repeated paginated query to
+# confirm that the recovery itself left no residual state (not a one-shot fix).
+{
+	my $second = $j25->selectall_arrayref(limit => $PF_LIMIT);
+	is(scalar @{$second}, $PF_LIMIT,
+		'S25-P6: second post-recovery query returns same count (stable recovery)');	# T179
+	is($second->[0]{entry}, $pf25_baseline->[0]{entry},
+		'S25-P6b: first row unchanged across repeated post-recovery queries');		# T180
 }

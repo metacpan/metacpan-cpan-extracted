@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.3.2';
+our $VERSION = '3.3.3';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -65,6 +65,9 @@ sub new {
             max => $cache_size,
             ttl => defined $args{cache_ttl} ? $args{cache_ttl} : 3600,
         ) : undef,
+        # The addresses with a request in flight, each a promise its waiters
+        # take the answer from (see _board).
+        flights => {},
         ua => $args{ua} || Mojo::UserAgent->new,
     }, $class;
 
@@ -105,17 +108,55 @@ sub lookup_p {
     if ($self->{cache}) {
         my $hit = $self->{cache}->get($ip);
         return Mojo::Promise->resolve($hit) if $hit;
+        # A miss for an address already in flight, for a lookup or a batch,
+        # takes that request's answer rather than sending its own.
+        return $self->{flights}{$ip}->then(sub { shift }) if $self->{flights}{$ip};
     }
 
+    my $flight = $self->_board($ip);
     my $url = $self->_url('/' . Mojo::Util::url_escape($ip, '^A-Za-z0-9\-._~:'));
     my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
-    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}) })->then(sub {
-        my $result = VPNDetection::Result->from_wire(shift);
-        # Only a served answer is cached. Errors never are, and bogons never
-        # reach this far.
-        $self->{cache}->set($ip, $result) if $self->{cache};
-        return $result;
-    });
+    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}) })->then(
+        sub {
+            my $result = VPNDetection::Result->from_wire(shift);
+            # Only a served answer is cached, and before it lands, so a miss
+            # after the flight is gone finds it. Errors never are, and bogons
+            # never reach this far.
+            $self->{cache}->set($ip, $result) if $self->{cache};
+            $self->_land($ip, $flight, 1, $result);
+            return $result;
+        },
+        sub {
+            my $error = shift;
+            $self->_land($ip, $flight, 0, $error);
+            return Mojo::Promise->reject($error);
+        },
+    );
+}
+
+# Concurrent misses for one address share ONE request (docs/sdk/contract.md,
+# UMAN-4645): 3.3.2 sent one per caller. The first miss boards the address, and
+# every miss after it, a batch's included, waits for that request instead. The
+# request runs under the options of the call that led it; a failure reaches
+# every waiter and is cached for none. Nothing is shared without a cache, since
+# every lookup is then served. A Mojo::Promise cannot be canceled, so no waiter
+# is ever left behind by a leader that gave up.
+sub _board {
+    my ($self, $ip) = @_;
+    return undef unless $self->{cache};
+    my $flight = Mojo::Promise->new;
+    # Handled even when no waiter joined, so a failure is not warned about.
+    $flight->catch(sub { });
+    return $self->{flights}{$ip} = $flight;
+}
+
+# Takes an address off the board and settles its flight for every waiter.
+sub _land {
+    my ($self, $ip, $flight, $ok, $value) = @_;
+    return unless $flight;
+    delete $self->{flights}{$ip}
+        if $self->{flights}{$ip} && $self->{flights}{$ip} == $flight;
+    return $ok ? $flight->resolve($value) : $flight->reject($value);
 }
 
 # The address our edge observed this client calling from. Deliberately not
@@ -181,6 +222,7 @@ sub lookup_batch_p {
     my @unique = grep { defined && length && !$seen{$_}++ } @$ips;
     my %answers;
     my @pending;
+    my %joined;
     for my $ip (@unique) {
         if (VPNDetection::Bogon::is_bogon($ip)) {
             $answers{$ip} = VPNDetection::Bogon::bogon_result($ip);
@@ -191,17 +233,37 @@ sub lookup_batch_p {
             $answers{$ip} = $hit;
             next;
         }
+        # Already in flight, for a lookup or another batch: this batch takes
+        # that request's answer rather than sending the address again.
+        if ($self->{cache} && $self->{flights}{$ip}) {
+            $joined{$ip} = $self->{flights}{$ip};
+            next;
+        }
         push @pending, $ip;
     }
+    # Boarded before any chunk is built, so a lookup of one of these arriving
+    # meanwhile waits for this batch's answer.
+    my %boarded = map { ($_ => $self->_board($_)) } @pending;
     my @queue;
     push @queue, [splice @pending, 0, BATCH_MAX] while @pending;
 
     my $batch = {
         queue => \@queue, answers => \%answers, active => 0, limit => $limit,
         retries => $retries, timeout => $options{timeout}, promise => Mojo::Promise->new,
+        boarded => \%boarded,
     };
     $self->_dispatch($batch);
-    return $batch->{promise};
+    return $batch->{promise} unless %joined;
+    return Mojo::Promise->all(
+        $batch->{promise},
+        map {
+            my $ip = $_;
+            $joined{$ip}->then(
+                sub { $answers{$ip} = shift },
+                sub { $answers{$ip} = VPNDetection::Error->wrap(shift) },
+            );
+        } sort keys %joined,
+    )->then(sub { \%answers });
 }
 
 # The licensed dataset downloads. Built per call rather than held, so the client
@@ -234,7 +296,12 @@ sub _dispatch {
         $batch->{active}++;
         $self->_lookup_chunk_p($chunk, $batch->{retries}, $batch->{timeout})->then(sub {
             my $answers = shift;
-            $batch->{answers}{$_} = $answers->{$_} for keys %$answers;
+            for my $ip (keys %$answers) {
+                my $answer = $answers->{$ip};
+                $batch->{answers}{$ip} = $answer;
+                my $failed = Scalar::Util::blessed($answer) && $answer->isa('VPNDetection::Error');
+                $self->_land($ip, $batch->{boarded}{$ip}, !$failed, $answer);
+            }
             $self->_settled($batch);
         });
     }

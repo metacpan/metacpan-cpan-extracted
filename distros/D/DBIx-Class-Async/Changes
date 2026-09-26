@@ -1,5 +1,14 @@
 Revision history for DBIx::Class::Async
 
+v1.2.0   2026-09-26
+         [IMPROVEMENTS]
+         - Support 'health_check' operation alias alongside 'ping' in worker
+           process loop.
+         - Implement health-aware round-robin selection in _next_worker():
+           - Dynamically skips worker instances marked unhealthy.
+           - Falls back to standard round-robin rotation when all workers
+             are unhealthy to allow self-recovery/re-pinging.
+
 v1.1.0   2026-09-08
          [SECURITY]
          - All dynamic class loading locations were secured to prevent code

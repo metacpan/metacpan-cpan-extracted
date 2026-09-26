@@ -111,7 +111,7 @@ Veriyi birden fazla ilişkisel tabloya bölüp okuma anında maliyetli SQL `JOIN
 Birincil ve ikincil indeksler sabit 8-byte Big-Endian paketlenmiş tamsayı tamponları (`Q*`) kullanır. Bu sayede milyonlarca kayıtta dahi $O(1)$ ikili dilimleme ve alt milisaniye seviyesinde sayfalama (pagination) elde edilir.
 
 ### 3. ACID İşlemler ve Strict 2PL Güvencesi
-Disk tabanlı geri alma günlüğü (`.txn`) ve Strict Two-Phase Locking (Strict 2PL) kilit yönetimi ile tam ACID desteği sunulur. Süreç çökmelerinde kurtarma adımı otomatik LIFO geri alma (rollback) uygular.
+Disk tabanlı geri alma günlüğü (`dbstore/journal/txn_*`) ve Strict Two-Phase Locking (Strict 2PL) kilit yönetimi ile tam ACID desteği sunulur. Süreç çökmelerinde kurtarma adımı otomatik LIFO geri alma (rollback) uygular.
 
 ### 4. Yüksek Başarımlı Toplu (Batch) İşlemler
 Toplu veri aktarımı metodları (`insert_list`, `modify_list`, `delete_list`), ana `.db` dosyasını tek seferde açıp indeksleri tek geçişte birleştirerek tek tek kayıt döngülerine kıyasla 50x-100x kat daha yüksek veri işleme hızı sunar.
@@ -120,7 +120,7 @@ Toplu veri aktarımı metodları (`insert_list`, `modify_list`, `delete_list`), 
 Canlı kayıtlar (`.db`) ile geçmiş/arşiv verileri (`.jnk`) birbirinden fiziksel olarak ayrıştırılır; tek sorguda hibrit olarak taranabilir (`jnktype => 'A' | 'B' | 'AB' | 'BA'`).
 
 ### 6. Kolonik Facet Filtreleme Motoru
-E-ticaret ve zengin ürün katalogları için bit düzeyinde küme kesişimleri ve çift yönlü sözlüklerle (`.str`) harici bir arama sunucusuna ihtiyaç duymadan anlık kategori filtreleri üretir.
+E-ticaret ve zengin ürün katalogları için bit düzeyinde küme kesişimleri ve çift yönlü sözlüklerle (`.unq`) harici bir arama sunucusuna ihtiyaç duymadan anlık kategori filtreleri üretir.
 
 ---
 

@@ -1,0 +1,38 @@
+Statistics-Kappa
+
+Calculate inter-annotator agreement using Cohen's kappa, Fleiss'
+kappa, or weighted kappa.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Statistics::Kappa
+
+You can also look for information at:
+
+    GitHub issue tracker (report bugs here)
+        https://github.com/choroba/statistics-kappa/issues
+
+    Search CPAN
+        https://metacpan.org/release/Statistics-Kappa
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by E. Choroba <choroba@matfyz.cz>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

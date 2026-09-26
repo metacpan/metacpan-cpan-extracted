@@ -1,0 +1,25 @@
+Changes
+CONTRIBUTING.md
+cpanfile
+lib/ASPEER/MakeMaker.pm
+lib/ASPEER/MakeMaker.pm.md
+lib/ASPEER/MakeMaker/MM.pm
+lib/ASPEER/MakeMaker/MM.pm.md
+lib/ASPEER/MakeMaker/MM/Constant.pm
+lib/ASPEER/MakeMaker/MM/Constant.pm.md
+lib/ASPEER/MakeMaker/MM/Import.pm
+lib/ASPEER/MakeMaker/MM/Import.pm.md
+lib/ASPEER/MakeMaker/MM/postamble.inc
+lib/ASPEER/MakeMaker/MM/Util.pm
+lib/ASPEER/MakeMaker/MM/Util.pm.md
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+SECURITY.md
+t/02-mm-integration.t
+t/ASPEER-MakeMaker.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

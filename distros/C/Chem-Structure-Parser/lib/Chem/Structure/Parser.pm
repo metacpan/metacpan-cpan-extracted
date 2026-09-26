@@ -3,7 +3,7 @@
 require 5.010;
 use strict;
 package Chem::Structure::Parser;
-our $VERSION = 0.032;
+our $VERSION = 0.033;
 require XSLoader;
 use warnings FATAL => 'all';
 # No `use autodie': it would ask every installer for a prerequisite in order to
@@ -120,12 +120,17 @@ my $NUM = qr/[0-9]*\.?[0-9]+/;
 
 # Public entry points
 
-# The views structure_info($file, $view) will hand back on their own, and the
-# key each is filed under in $info->{features}.  A second argument that is a
-# plain string is a request for one of these rather than the first half of an
-# option pair, and the two forms cannot be confused: a file and an even number
-# of arguments after it is always an odd-sized option list, which is an error.
-my %VIEW = (dssp => 'dssp');
+# The views structure_info($file, $view) will hand back on their own, and how
+# each is taken out of the structure.  A second argument that is a plain string
+# is a request for one of these rather than the first half of an option pair,
+# and the two forms cannot be confused: a file and an even number of arguments
+# after it is always an odd-sized option list, which is an error.
+my %VIEW = (
+	dssp     => sub { $_[0]{features}{dssp} },
+	torsions => \&_torsion_view,
+);
+# other spellings of a view, which the error message does not list
+my %VIEW_ALIAS = (torsion => 'torsions');
 
 # structure_info($file, %opt) -- read a structure file into a hash of hashes.
 # structure_info($file, $view, %opt) -- one view of it, and nothing else.
@@ -134,6 +139,7 @@ sub structure_info {
 	my $view;
 	if (@_ % 2 == 1 && defined $_[0] && !ref $_[0]) {
 		$view = shift;
+		$view = $VIEW_ALIAS{$view} if exists $VIEW_ALIAS{$view};
 		die "structure_info: '$view' is not a view; the ones there are: "
 		    . join(', ', sort keys %VIEW) . "\nOr did you mean an option? "
 		    . "Those are named pairs: structure_info(\$file, $view => 1)"
@@ -158,7 +164,25 @@ sub structure_info {
 	die "structure_info: '$view' needs the features, and this file was read with "
 	  . (!$o->{atoms} ? 'atoms => 0' : 'features => 0')
 		unless $info->{features};
-	return $info->{features}{ $VIEW{$view} };
+	return $VIEW{$view}->($info);
+}
+
+# _torsion_view($info) -- each chain's torsions hash, keyed by chain id, with
+# the chain's residue_order beside the angles: the arrays are parallel to it,
+# and the view throws away the rest of the structure that would have said which
+# residue an element came from.  It is the chain's own array, not a copy,
+# because nothing is left holding the structure to share it with.  A chain with no angle at all -- a
+# water chain, a lone ligand -- is left out, as a key no residue has is left
+# out of the torsions hash itself.
+sub _torsion_view {
+	my ($info) = @_;
+	my %out;
+	for my $id (@{ $info->{chain_order} }) {
+		my $c = $info->{chains}{$id};
+		next unless $c->{torsions} && %{ $c->{torsions} };
+		$out{$id} = { %{ $c->{torsions} }, residue_order => $c->{residue_order} };
+	}
+	return \%out;
 }
 
 # structure_info_string($text, %opt) -- the same, from a string already in hand.
@@ -2842,6 +2866,7 @@ C<res_type()> before C<h> is ever reached. Use one of the three forms above.
 
  my $info = structure_info($file, %options);
  my $dssp = structure_info($file, 'dssp', %options);
+ my $tors = structure_info($file, 'torsions', %options);
 
 Reads C<$file> and returns a hash reference. The format is worked out from the
 file name — C<.pdb>, C<.ent>, C<.cif>, C<.mmcif>, C<.pdbx> — and from the first
@@ -2850,7 +2875,8 @@ they are, without unpacking to a temporary file.
 
 A plain string in second place names a I<view>, and asks for that and nothing
 else: the file is read, the view is taken out of it, and the rest is thrown
-away. There is one view today, C<dssp> — see C<structure_dssp> below — and the
+away. There are two views today: C<dssp> — see C<structure_dssp> below — and
+C<torsions> (or C<torsion>), described under "The same angles, by chain". The
 options that follow are the reader's, the same ones the first form takes. The
 two forms cannot be confused with one another: a file name followed by an even
 number of arguments is an option list with an odd number of elements, which was
@@ -3782,6 +3808,26 @@ named a second time.
 
 It is the same option as the angles themselves: C<< dihedrals =E<gt> 0 >> leaves the
 C<torsions> hash off with them, and so does C<< store =E<gt> 0 >>.
+
+When the angles are all that is wanted, C<structure_info($file, 'torsions')>
+hands back these hashes alone, keyed by chain id, and throws the rest of the
+structure away:
+
+ my $t = structure_info('1a22.ent.pdb', 'torsions');
+ keys %$t;                  # A, B: the hormone and its receptor
+ $t->{A}{phi};              # [ undef, -57.8, -138.9, -67.7, ... ]
+ $t->{A}{residue_order};    # [ 1, 2, 3, 4, ... ]  which residue each one is
+ $t->{B}{residue_order};    # [ 233, 234, 235, 236, ... ]
+
+Each chain keeps the keys its own residues have, so a file whose chain A is a
+protein and whose chain B is a DNA strand comes back with C<< $t-E<gt>{A}{phi} >> and
+C<< $t-E<gt>{B}{alpha} >>, and no C<< $t-E<gt>{A}{alpha} >>. A chain that holds both kinds has
+both sets, with an C<undef> at each residue an angle does not belong to. Every
+chain also carries its C<residue_order>, because the arrays mean
+nothing without it and nothing else in the structure is kept. A chain with no
+angle at all, such as a water chain or a lone ligand, is left out. The
+torsion angles are features, so asking for this view of a file read with
+C<< features =E<gt> 0 >> dies rather than returning an empty hash.
 
 A nucleotide gets a different set of torsions from the same option; they are
 below.

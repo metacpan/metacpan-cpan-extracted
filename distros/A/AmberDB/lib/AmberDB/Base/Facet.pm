@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.25.2';
+our $VERSION = '5.26.0';
 
 my $CREATED = '2026-08-28';
 
@@ -286,22 +286,20 @@ sub field_fltkeys {
         %active_filter = %{ $args[0]->{where} || $args[0]->{filter} || $args[0]->{match} || {} };
         $base_scope    = $args[0]->{base_ids} || $args[0]->{scope_ids} || undef;
 
-        if ( $args[0]->{range} ) {
-            if ( my $ranges = $self->normalize_range_opts( $tableid, $args[0] ) ) {
-                if ( $base_scope && @$base_scope ) {
-                    my @scoped = $self->filter_ids_by_range( $tableid, $base_scope, $ranges );
-                    $base_scope = \@scoped;
+        if ( my $ranges = $self->normalize_range_opts( $tableid, $args[0] ) ) {
+            if ( $base_scope && @$base_scope ) {
+                my @scoped = $self->filter_ids_by_range( $tableid, $base_scope, $ranges );
+                $base_scope = \@scoped;
+            }
+            else {
+                my ( undef, @all_active );
+                ( undef, @all_active ) = $self->index_get( $fac_path, "active" ) if -e $fac_path;
+                unless (@all_active) {
+                    ( undef, @all_active ) = $self->index_get( $index_path, "keys" ) if -e $index_path;
                 }
-                else {
-                    my ( undef, @all_active );
-                    ( undef, @all_active ) = $self->index_get( $fac_path, "active" ) if -e $fac_path;
-                    unless (@all_active) {
-                        ( undef, @all_active ) = $self->index_get( $index_path, "keys" ) if -e $index_path;
-                    }
-                    @all_active = $self->table_keys($tableid) unless @all_active;
-                    my @scoped = $self->filter_ids_by_range( $tableid, \@all_active, $ranges );
-                    $base_scope = \@scoped;
-                }
+                @all_active = $self->table_keys($tableid) unless @all_active;
+                my @scoped = $self->filter_ids_by_range( $tableid, \@all_active, $ranges );
+                $base_scope = \@scoped;
             }
         }
     }
@@ -320,7 +318,12 @@ sub field_fltkeys {
     my @base_ids;
     if (%excl) {
         my $filter_obj = $self->field_filter(
-            $tableid, map { [ $_, $excl{$_} ] } keys %excl
+            $tableid,
+            {
+                type     => 'and',
+                filter   => \%excl,
+                ( ( $base_scope && @$base_scope ) ? ( base_ids => $base_scope ) : () ),
+            }
         );
         @base_ids = @{ $filter_obj->{ids} || [] };
         if ( $base_scope && @$base_scope ) {
@@ -328,17 +331,13 @@ sub field_fltkeys {
             @base_ids = grep { $scope_map{$_} } @base_ids;
         }
     }
+
     elsif ( $base_scope && @$base_scope ) {
         @base_ids = @$base_scope;
     }
     else {
-        if ( $table_info->{facet_rules} && -e $fac_path ) {
-            ( undef, @base_ids ) = $self->index_get( $fac_path, "active" );
-        }
-        unless (@base_ids) {
-            return unless -e $index_path;
-            ( undef, @base_ids ) = $self->index_get( $index_path, "keys" );
-        }
+        my $raw_counts = $self->field_allfltkeys( $tableid, [$target_block] );
+        return $raw_counts->{$target_block} || {};
     }
 
     return {} unless @base_ids;
@@ -353,6 +352,18 @@ sub field_fltkeys {
             my $raw = $res ? $res->{"$target_block:$id"} : undef;
             next unless defined $raw && $raw ne '';
             my @vals = ( index( $raw, "\t" ) == -1 ) ? ($raw) : split /\t/, $raw;
+            for my $v (@vals) {
+                $count_map{$v}++;
+            }
+        }
+    }
+    elsif (@base_ids) {
+        my @recs = $self->read_list( $tableid, \@base_ids );
+        for my $r (@recs) {
+            next unless ref($r) eq 'ARRAY';
+            my $raw = $r->[$target_block];
+            next unless defined $raw && $raw ne '';
+            my @vals = ref($raw) eq 'ARRAY' ? @$raw : ( $raw =~ /[,;\t]/ ? split(/\s*[,;\t]\s*/, $raw) : ($raw) );
             for my $v (@vals) {
                 $count_map{$v}++;
             }
@@ -424,7 +435,7 @@ sub field_allfltkeys {
     my $index_path = ( -e "${idx_path}.inx" ) ? "${idx_path}.inx" : "${table_path}.inx";
 
     my $r_opts = ( @args == 1 && ref($args[0]) eq 'HASH' ) ? $args[0] : ( @args >= 2 && ref($args[1]) eq 'HASH' ? $args[1] : undef );
-    if ( $r_opts && $r_opts->{range} ) {
+    if ($r_opts) {
         if ( my $ranges = $self->normalize_range_opts( $tableid, $r_opts ) ) {
             if ( $base_scope && @$base_scope ) {
                 my @scoped = $self->filter_ids_by_range( $tableid, $base_scope, $ranges );
@@ -452,38 +463,57 @@ sub field_allfltkeys {
     }
 
     my %all_counts;
-    return \%all_counts unless -e $fac_path;
 
-    if (@scan_ids) {
+    if ( -e $fac_path ) {
+        if (@scan_ids) {
+            for my $blk (@$blks) {
+                my @keys = map { "$blk:$_" } @scan_ids;
+                my $res  = $self->recs_get( $fac_path, @keys );
+                for my $id (@scan_ids) {
+                    my $raw = $res ? $res->{"$blk:$id"} : undef;
+                    next unless defined $raw && $raw ne '';
+                    my @vals = ( index( $raw, "\t" ) == -1 ) ? ($raw) : split /\t/, $raw;
+                    for my $v (@vals) {
+                        $all_counts{$blk}{$v}++;
+                    }
+                }
+            }
+        }
+        else {
+            my %wanted_blks = map { ( ref($_) eq 'HASH' ? $_->{blk} : $_ ) => 1 } @$blks;
+            $self->recs_scan(
+                $fac_path,
+                sub {
+                    my ( $k, $raw ) = @_;
+                    return unless defined $raw && $raw ne '';
+                    return unless $k =~ /^(\d+):(\d+)$/;
+                    my ( $k_blk, $rid ) = ( $1, $2 );
+                    return unless $wanted_blks{$k_blk};
+                    my @vals = ( index( $raw, "\t" ) == -1 ) ? ($raw) : split /\t/, $raw;
+                    for my $v (@vals) {
+                        $all_counts{$k_blk}{$v}++;
+                    }
+                }
+            );
+        }
+    }
+    elsif (@scan_ids) {
+        my @recs = $self->read_list( $tableid, \@scan_ids );
         for my $blk (@$blks) {
-            my @keys = map { "$blk:$_" } @scan_ids;
-            my $res  = $self->recs_get( $fac_path, @keys );
-            for my $id (@scan_ids) {
-                my $raw = $res ? $res->{"$blk:$id"} : undef;
+            my $b = ref($blk) eq 'HASH' ? $blk->{blk} : $blk;
+            for my $r (@recs) {
+                next unless ref($r) eq 'ARRAY';
+                my $raw = $r->[$b];
                 next unless defined $raw && $raw ne '';
-                my @vals = ( index( $raw, "\t" ) == -1 ) ? ($raw) : split /\t/, $raw;
+                my @vals = ref($raw) eq 'ARRAY' ? @$raw : ( $raw =~ /[,;\t]/ ? split(/\s*[,;\t]\s*/, $raw) : ($raw) );
                 for my $v (@vals) {
-                    $all_counts{$blk}{$v}++;
+                    $all_counts{$b}{$v}++;
                 }
             }
         }
     }
     else {
-        my %wanted_blks = map { ( ref($_) eq 'HASH' ? $_->{blk} : $_ ) => 1 } @$blks;
-        $self->recs_scan(
-            $fac_path,
-            sub {
-                my ( $k, $raw ) = @_;
-                return unless defined $raw && $raw ne '';
-                return unless $k =~ /^(\d+):(\d+)$/;
-                my ( $k_blk, $rid ) = ( $1, $2 );
-                return unless $wanted_blks{$k_blk};
-                my @vals = ( index( $raw, "\t" ) == -1 ) ? ($raw) : split /\t/, $raw;
-                for my $v (@vals) {
-                    $all_counts{$k_blk}{$v}++;
-                }
-            }
-        );
+        return \%all_counts;
     }
 
     if ( -e $unq_path && %all_counts ) {
@@ -520,6 +550,73 @@ sub facet_menu {
     my $table_info = $self->table_info($tableid);
     return ( wantarray ? () : {} ) unless $table_info && $table_info->{use_facet};
 
+    my ( $fac_path, $unq_path, $index_path, $table_path ) = $self->_facet_paths( $tableid, $table_info );
+
+    my ( $selected, $facet_defs, $opts, $base_scope, $active_filter ) =
+      $self->_facet_parse_args( $tableid, $table_info, $fac_path, $index_path, @args );
+
+    # Engine-level volatile RAM-disk Facet Cache (Tier 3 catalog_facetmem)
+    my ( $cache_table, $cache_key ) = $self->_facet_cache_info( $tableid, $table_info, $opts, $base_scope, $active_filter );
+    if ( $cache_table && $cache_key ) {
+        if ( my $cached = $self->_facet_cache_read( $cache_table, $cache_key ) ) {
+            return wantarray ? @{ $cached->{groups} || [] } : $cached;
+        }
+    }
+
+    # 1. Active Filtering (Filtered IDs)
+    my ( $total_count, $filtered_ids, $all_filtered_ids ) = $self->_facet_filter_ids(
+        $tableid, $active_filter, $base_scope, $opts->{offset} // 0, $opts->{limit} // 0, $fac_path, $index_path
+    );
+
+    # 2. Compute Facet Counts (Disjunctive / Multi-pass Optimized)
+    my $all_counts = $self->_facet_calc_counts(
+        $tableid, $facet_defs, $active_filter, $base_scope, $all_filtered_ids, $fac_path, $unq_path
+    );
+
+    # 3. Build Menu Groups, Whitelist & Batch Label Resolution (.unq / RDBM)
+    my ( $groups, $groups_by_blk, $active_counts ) = $self->_facet_build_groups(
+        $tableid, $table_info, $facet_defs, $all_counts, $active_filter, $table_path
+    );
+
+    my $res = {
+        count         => $total_count,
+        ids           => $filtered_ids,
+        groups        => $groups,
+        groups_by_blk => $groups_by_blk,
+        active_counts => $active_counts,
+        counts        => $all_counts,
+    };
+
+    if ( $cache_table && $cache_key ) {
+        $self->_facet_cache_write( $cache_table, $cache_key, $res );
+    }
+
+    return wantarray ? @$groups : $res;
+}
+
+# =====================================================================
+# PRIVATE HELPER METHODS FOR facet_menu
+# =====================================================================
+
+sub _facet_paths {
+    my ( $self, $tableid, $table_info ) = @_;
+
+    my $use_ramdisk = $table_info ? ( $table_info->{use_ramdisk} // $table_info->{use_cache} // 0 ) : 0;
+    if ($use_ramdisk) {
+        $self->ramdisk_ensure($tableid);
+    }
+    my $table_path = $self->table_path($tableid);
+    my $idx_path   = $use_ramdisk ? $self->ramdisk_path($tableid) : $table_path;
+    my $fac_path   = ( -e "${idx_path}.fac" ) ? "${idx_path}.fac" : "${table_path}.fac";
+    my $unq_path   = ( -e "${idx_path}.unq" ) ? "${idx_path}.unq" : "${table_path}.unq";
+    my $index_path = ( -e "${idx_path}.inx" ) ? "${idx_path}.inx" : "${table_path}.inx";
+
+    return ( $fac_path, $unq_path, $index_path, $table_path );
+}
+
+sub _facet_parse_args {
+    my ( $self, $tableid, $table_info, $fac_path, $index_path, @args ) = @_;
+
     my ( $selected, $facet_defs, $opts );
     if ( @args == 1 && ref( $args[0] ) eq 'HASH' ) {
         my $arg = $args[0];
@@ -533,8 +630,7 @@ sub facet_menu {
           || exists $arg->{blocks}
           || exists $arg->{filter}
           || exists $arg->{where}
-          || exists $arg->{match}
-          || exists $arg->{range} )
+          || exists $arg->{match} )
         {
             $opts       = $arg;
             $selected   = $arg->{selected} || $arg->{filter} || $arg->{where} || $arg->{match} || {};
@@ -554,119 +650,324 @@ sub facet_menu {
     $facet_defs ||= $table_info->{facet_block} || [];
     $opts       ||= {};
 
-    my $table_path = $self->table_path($tableid);
-    my $offset     = $opts->{offset} // $opts->{start} // 0;
-    my $limit      = $opts->{limit} // 0;
     my $base_scope = $opts->{base_ids} || $opts->{scope_ids} || undef;
-    if ( $opts && $opts->{range} ) {
-        if ( my $ranges = $self->normalize_range_opts( $tableid, $opts ) ) {
-            if ( $base_scope && @$base_scope ) {
-                my @scoped = $self->filter_ids_by_range( $tableid, $base_scope, $ranges );
-                $base_scope = \@scoped;
+    if ( my $ranges = $self->normalize_range_opts( $tableid, { filter => $selected } ) ) {
+        if ( $base_scope && @$base_scope ) {
+            my @scoped = $self->filter_ids_by_range( $tableid, $base_scope, $ranges );
+            $base_scope = \@scoped;
+        }
+        else {
+            my ( undef, @all_active );
+            ( undef, @all_active ) = $self->index_get( $fac_path, "active" ) if -e $fac_path;
+            unless (@all_active) {
+                ( undef, @all_active ) = $self->index_get( $index_path, "keys" ) if -e $index_path;
             }
-            else {
-                my ( undef, @all_active );
-                my $fac_path = "$table_path.fac";
-                ( undef, @all_active ) = $self->index_get( $fac_path, "active" ) if -e $fac_path;
-                unless (@all_active) {
-                    my $inx_path = "$table_path.inx";
-                    ( undef, @all_active ) = $self->index_get( $inx_path, "keys" ) if -e $inx_path;
-                }
-                @all_active = $self->table_keys($tableid) unless @all_active;
-                my @scoped = $self->filter_ids_by_range( $tableid, \@all_active, $ranges );
-                $base_scope = \@scoped;
-            }
+            @all_active = $self->table_keys($tableid) unless @all_active;
+            my @scoped = $self->filter_ids_by_range( $tableid, \@all_active, $ranges );
+            $base_scope = \@scoped;
         }
     }
 
-    # Normalize active selections into %active_filter
     my %active_filter;
     for my $raw_k ( keys %$selected ) {
         my $blk = $raw_k;
-        $blk =~ s/^f//; # Strip leading 'f' prefix if passed as f1, f2...
+        $blk =~ s/^f//;
         my $v = $selected->{$raw_k};
         if ( defined $v && $v ne '' ) {
-            my @vals = ref($v) eq 'ARRAY' ? @$v : split /,/, $v;
-            @vals = grep { defined $_ && $_ ne '' } @vals;
-            $active_filter{$blk} = \@vals if @vals;
+            if ( ref($v) eq 'HASH' ) {
+                $active_filter{$blk} = $v;
+            }
+            else {
+                my @vals = ref($v) eq 'ARRAY' ? @$v : split /,/, $v;
+                @vals = grep { defined $_ && $_ ne '' } @vals;
+                $active_filter{$blk} = \@vals if @vals;
+            }
         }
     }
 
-    # 1. Active Filtering (Filtered IDs)
+    return ( $selected, $facet_defs, $opts, $base_scope, \%active_filter );
+}
+
+sub _facet_cache_info {
+    my ( $self, $tableid, $table_info, $opts, $base_scope, $active_filter ) = @_;
+
+    my ($dbase) = ( $tableid =~ /^([a-z0-9]+)_/i );
+    $dbase //= "catalog";
+    my $candidate_table = "${dbase}_facetmem";
+    my $cinfo = $self->table_info($candidate_table);
+
+    my $cache_table = $opts->{cache_table}
+                   || $table_info->{facet_cache_table}
+                   || ( ( $cinfo && ( $cinfo->{use_ramdisk} // 0 ) == 3 ) ? $candidate_table : undef );
+
+    return () unless $cache_table;
+
+    my $scope_sig = "all";
+    if ( defined $opts->{scope_key} && length $opts->{scope_key} ) {
+        $scope_sig = $opts->{scope_key};
+    }
+    elsif ( $base_scope && ref($base_scope) eq 'ARRAY' && @$base_scope ) {
+        if ( @$base_scope <= 10 ) {
+            $scope_sig = "s:" . join( ',', @$base_scope );
+        }
+        else {
+            $scope_sig = "s:" . scalar(@$base_scope) . ":" . $base_scope->[0] . ":" . $base_scope->[-1];
+        }
+    }
+
+    my $flt_sig = "all";
+    if ( $active_filter && %$active_filter ) {
+        my @f_tokens;
+        for my $blk ( sort { $a cmp $b } keys %$active_filter ) {
+            my $v = $active_filter->{$blk};
+            if ( ref($v) eq 'HASH' ) {
+                push @f_tokens, "$blk=" . ( $v->{min} // '' ) . '-' . ( $v->{max} // '' );
+            }
+            elsif ( ref($v) eq 'ARRAY' ) {
+                push @f_tokens, "$blk=" . join( ',', sort @$v );
+            }
+            else {
+                push @f_tokens, "$blk=$v";
+            }
+        }
+        $flt_sig = join( ';', @f_tokens );
+    }
+
+    my $cache_key = "fm:$tableid:$scope_sig:$flt_sig";
+    return ( $cache_table, $cache_key );
+}
+
+sub _facet_cache_read {
+    my ( $self, $cache_table, $cache_key ) = @_;
+
+    my @cached_rec = $self->read_id( $cache_table, $cache_key );
+    if ( @cached_rec && defined $cached_rec[1] && ref( $cached_rec[1] ) eq 'HASH' ) {
+        return $cached_rec[1];
+    }
+    return;
+}
+
+sub _facet_cache_write {
+    my ( $self, $cache_table, $cache_key, $res ) = @_;
+
+    my $bin = $self->db_encode($res);
+    if ( defined $bin && length $bin ) {
+        $self->insert_id( $cache_table, $cache_key, $bin );
+    }
+}
+
+sub _facet_filter_ids {
+    my ( $self, $tableid, $active_filter, $base_scope, $offset, $limit, $fac_path, $index_path ) = @_;
+
     my ( $filtered_ids, $total_count ) = ( [], 0 );
-    if (%active_filter) {
+    my $all_filtered_ids = [];
+
+    if ( $active_filter && %$active_filter ) {
         my $f_res = $self->field_filter(
             $tableid,
             {
                 type   => 'and',
-                filter => \%active_filter,
-                offset => $offset,
-                limit  => $limit,
-                ( $opts->{range} ? ( range => $opts->{range} ) : () ),
+                filter => $active_filter,
+                ( ( $base_scope && @$base_scope ) ? ( base_ids => $base_scope ) : () ),
             }
         );
-        $filtered_ids = $f_res->{ids} || [];
+
+        $all_filtered_ids = $f_res->{ids} || [];
         if ( $base_scope && @$base_scope ) {
             my %scope_map = map { $_ => 1 } @$base_scope;
-            $filtered_ids = [ grep { $scope_map{$_} } @$filtered_ids ];
+            $all_filtered_ids = [ grep { $scope_map{$_} } @$all_filtered_ids ];
         }
-        $total_count  = scalar @$filtered_ids;
     }
     elsif ( $base_scope && @$base_scope ) {
-        $total_count = scalar @$base_scope;
-        if ($limit) {
-            my ( undef, @slice ) = $self->recs_cutting( $offset, $limit, @$base_scope );
-            $filtered_ids = \@slice;
-        }
-        else {
-            $filtered_ids = $base_scope;
-        }
+        $all_filtered_ids = $base_scope;
     }
     else {
-        my $fac_path = "$table_path.fac";
-        if ( -e $fac_path ) {
-            ( undef, my @all_active ) = $self->index_get( $fac_path, "active" );
-            unless (@all_active) {
-                my $inx_path = "$table_path.inx";
-                ( undef, @all_active ) = $self->index_get( $inx_path, "keys" ) if -e $inx_path;
-            }
-            $total_count = scalar @all_active;
-            if ($limit) {
-                my ( undef, @slice ) = $self->recs_cutting( $offset, $limit, @all_active );
-                $filtered_ids = \@slice;
-            }
-            else {
-                $filtered_ids = \@all_active;
-            }
+        my @all_active;
+        ( undef, @all_active ) = $self->index_get( $fac_path, "active" ) if -e $fac_path;
+        unless (@all_active) {
+            ( undef, @all_active ) = $self->index_get( $index_path, "keys" ) if -e $index_path;
         }
+        @all_active = $self->table_keys($tableid) unless @all_active;
+        $all_filtered_ids = \@all_active;
     }
 
-    # 2. Compute Facet Counts (Disjunctive / Multi-pass)
+    $total_count = scalar @$all_filtered_ids;
+    if ($limit) {
+        my ( undef, @slice ) = $self->recs_cutting( $offset, $limit, @$all_filtered_ids );
+        $filtered_ids = \@slice;
+    }
+    else {
+        $filtered_ids = $all_filtered_ids;
+    }
+
+    return ( $total_count, $filtered_ids, $all_filtered_ids );
+}
+
+sub _facet_calc_counts {
+    my ( $self, $tableid, $facet_defs, $active_filter, $base_scope, $all_filtered_ids, $fac_path, $unq_path ) = @_;
+
     my %all_counts;
-    if ( !%active_filter ) {
+    if ( !$active_filter || !%$active_filter ) {
         my @blks = map { ref($_) eq 'HASH' ? $_->{blk} : $_ } @$facet_defs;
         my $raw_counts = $self->field_allfltkeys( $tableid, \@blks, $base_scope );
-        %all_counts = %{ $raw_counts || {} };
+        return $raw_counts || {};
     }
-    else {
-        for my $cfg (@$facet_defs) {
-            my $blk = ref($cfg) eq 'HASH' ? $cfg->{blk} : $cfg;
-            my %excl = %active_filter;
-            delete $excl{$blk};
 
-            my $cnt_map = $self->field_fltkeys(
-                $tableid,
-                {
-                    target_block => $blk,
-                    filter       => \%excl,
-                    base_ids     => $base_scope,
-                }
-            );
-            $all_counts{$blk} = $cnt_map || {};
+    my ( @unselected_blks, @selected_blks );
+    for my $cfg (@$facet_defs) {
+        my $blk = ref($cfg) eq 'HASH' ? $cfg->{blk} : $cfg;
+        if ( exists $active_filter->{$blk} ) {
+            push @selected_blks, $blk;
+        }
+        else {
+            push @unselected_blks, $blk;
         }
     }
 
-    # 3. Build Menu Groups, Whitelist & Batch Label Resolution (.unq / RDBM)
+    my %rec_cache;
+    my $get_records = sub {
+        my ($ids) = @_;
+        return [] unless $ids && @$ids;
+        my @missing = grep { !exists $rec_cache{$_} } @$ids;
+        if (@missing) {
+            my @fetched = $self->read_list( $tableid, \@missing );
+            for my $r (@fetched) {
+                if ( ref($r) eq 'ARRAY' && defined $r->[0] ) {
+                    $rec_cache{ $r->[0] } = $r;
+                }
+            }
+        }
+        return [ map { $rec_cache{$_} } grep { defined $rec_cache{$_} } @$ids ];
+    };
+
+    # A. Tally unselected blocks from $all_filtered_ids in a single pass
+    if (@unselected_blks) {
+        if ( -e $fac_path && @$all_filtered_ids ) {
+            for my $blk (@unselected_blks) {
+                my @keys = map { "$blk:$_" } @$all_filtered_ids;
+                my $res  = $self->recs_get( $fac_path, @keys );
+                for my $id (@$all_filtered_ids) {
+                    my $raw = $res ? $res->{"$blk:$id"} : undef;
+                    next unless defined $raw && $raw ne '';
+                    my @vals = ( index( $raw, "\t" ) == -1 ) ? ($raw) : split /\t/, $raw;
+                    $all_counts{$blk}{$_}++ for @vals;
+                }
+            }
+        }
+        elsif (@$all_filtered_ids) {
+            my $recs = $get_records->($all_filtered_ids);
+            for my $r (@$recs) {
+                for my $blk (@unselected_blks) {
+                    my $raw = $r->[$blk];
+                    next unless defined $raw && $raw ne '';
+                    my @vals = ref($raw) eq 'ARRAY' ? @$raw : ( $raw =~ /[,;\t]/ ? split( /\s*[,;\t]\s*/, $raw ) : ($raw) );
+                    $all_counts{$blk}{$_}++ for @vals;
+                }
+            }
+        }
+        else {
+            for my $blk (@unselected_blks) {
+                $all_counts{$blk} = {};
+            }
+        }
+    }
+
+    # B. Tally selected blocks (disjunctive filtering)
+    for my $blk (@selected_blks) {
+        my %excl = %$active_filter;
+        delete $excl{$blk};
+
+        if ( !%excl ) {
+            if ( $base_scope && @$base_scope ) {
+                if ( -e $fac_path ) {
+                    my @keys = map { "$blk:$_" } @$base_scope;
+                    my $res  = $self->recs_get( $fac_path, @keys );
+                    for my $id (@$base_scope) {
+                        my $raw = $res ? $res->{"$blk:$id"} : undef;
+                        next unless defined $raw && $raw ne '';
+                        my @vals = ( index( $raw, "\t" ) == -1 ) ? ($raw) : split /\t/, $raw;
+                        $all_counts{$blk}{$_}++ for @vals;
+                    }
+                }
+                else {
+                    my $recs = $get_records->($base_scope);
+                    for my $r (@$recs) {
+                        my $raw = $r->[$blk];
+                        next unless defined $raw && $raw ne '';
+                        my @vals = ref($raw) eq 'ARRAY' ? @$raw : ( $raw =~ /[,;\t]/ ? split( /\s*[,;\t]\s*/, $raw ) : ($raw) );
+                        $all_counts{$blk}{$_}++ for @vals;
+                    }
+                }
+            }
+            else {
+                my $raw_counts = $self->field_allfltkeys( $tableid, [$blk] );
+                $all_counts{$blk} = $raw_counts->{$blk} || {};
+            }
+        }
+        else {
+            my $fobj = $self->field_filter(
+                $tableid,
+                {
+                    type   => 'and',
+                    filter => \%excl,
+                    ( ( $base_scope && @$base_scope ) ? ( base_ids => $base_scope ) : () ),
+                }
+            );
+            my $sub_ids = $fobj->{ids} || [];
+            if ( $base_scope && @$base_scope ) {
+                my %smap = map { $_ => 1 } @$base_scope;
+                $sub_ids = [ grep { $smap{$_} } @$sub_ids ];
+            }
+            if ( -e $fac_path && @$sub_ids ) {
+                my @keys = map { "$blk:$_" } @$sub_ids;
+                my $res  = $self->recs_get( $fac_path, @keys );
+                for my $id (@$sub_ids) {
+                    my $raw = $res ? $res->{"$blk:$id"} : undef;
+                    next unless defined $raw && $raw ne '';
+                    my @vals = ( index( $raw, "\t" ) == -1 ) ? ($raw) : split /\t/, $raw;
+                    $all_counts{$blk}{$_}++ for @vals;
+                }
+            }
+            elsif (@$sub_ids) {
+                my $recs = $get_records->($sub_ids);
+                for my $r (@$recs) {
+                    my $raw = $r->[$blk];
+                    next unless defined $raw && $raw ne '';
+                    my @vals = ref($raw) eq 'ARRAY' ? @$raw : ( $raw =~ /[,;\t]/ ? split( /\s*[,;\t]\s*/, $raw ) : ($raw) );
+                    $all_counts{$blk}{$_}++ for @vals;
+                }
+            }
+            else {
+                $all_counts{$blk} = {};
+            }
+        }
+    }
+
+    # Resolve dictionary names from .unq if present
+    if ( -e $unq_path && %all_counts ) {
+        for my $blk ( keys %all_counts ) {
+            my $cnt_map = $all_counts{$blk};
+            next unless $cnt_map && ref($cnt_map) eq 'HASH' && %$cnt_map;
+            my @val_ids = keys %$cnt_map;
+            my @n_keys  = map { "$blk:n:$_" } @val_ids;
+            my $names   = $self->index_get( $unq_path, \@n_keys, 'raw' );
+            if ( $names && ref($names) eq 'HASH' && %$names ) {
+                my %named_map;
+                for my $vid (@val_ids) {
+                    my $name = $names->{"$blk:n:$vid"} // $vid;
+                    $named_map{$name} = $cnt_map->{$vid};
+                }
+                $all_counts{$blk} = \%named_map;
+            }
+        }
+    }
+
+    return \%all_counts;
+}
+
+sub _facet_build_groups {
+    my ( $self, $tableid, $table_info, $facet_defs, $all_counts, $active_filter, $table_path ) = @_;
+
     my @groups;
     my %groups_by_blk;
     my %active_counts;
@@ -674,7 +975,8 @@ sub facet_menu {
     for my $cfg (@$facet_defs) {
         my $blk    = ref($cfg) eq 'HASH' ? $cfg->{blk} : $cfg;
         my $label  = ref($cfg) eq 'HASH' ? ( $cfg->{label} // "Grup $blk" ) : "Grup $blk";
-        my $counts = $all_counts{$blk} // {};
+        $label     = $self->utf_decode($label) if defined $label;
+        my $counts = $all_counts->{$blk} // {};
 
         next unless %$counts || ( ref($cfg) eq 'HASH' && $cfg->{required} );
 
@@ -706,17 +1008,31 @@ sub facet_menu {
             @vals = grep { $csv_allowed{$_} } @vals;
         }
 
+        # Skip empty strings and optionally zero
+        if ( ref($cfg) eq 'HASH' && ( $cfg->{skip_zero} || ( $cfg->{id} && $cfg->{id} eq 'year' ) ) ) {
+            @vals = grep { defined $_ && $_ ne '' && $_ ne '0' && $_ != 0 } @vals;
+        }
+        else {
+            @vals = grep { defined $_ && $_ ne '' } @vals;
+        }
+
         # Sorting
         my $sort_mode = ( ref($cfg) eq 'HASH' ? $cfg->{sort} : '' ) || 'count';
         if ( $sort_mode eq 'count' ) {
             @vals = sort { ( $counts->{$b} || 0 ) <=> ( $counts->{$a} || 0 ) } @vals;
         }
         elsif ( $sort_mode eq 'value' ) {
-            @vals = sort { $a cmp $b } @vals;
+            my $sort_dir = ( ref($cfg) eq 'HASH' ? ( $cfg->{sort_dir} || 'desc' ) : 'desc' );
+            if ( $sort_dir eq 'desc' ) {
+                @vals = sort { ( $b =~ /^\d+$/ && $a =~ /^\d+$/ ) ? ( $b <=> $a ) : ( $b cmp $a ) } @vals;
+            }
+            else {
+                @vals = sort { ( $a =~ /^\d+$/ && $b =~ /^\d+$/ ) ? ( $a <=> $b ) : ( $a cmp $b ) } @vals;
+            }
         }
 
-        # Top-N Limiting
-        my $limit_n = ( ref($cfg) eq 'HASH' ? ( $cfg->{limit} // $cfg->{display_limit} ) : 0 ) || 0;
+        # Top-N Limiting (defaults to 20 for rich UI presentation)
+        my $limit_n = ( ref($cfg) eq 'HASH' ? ( $cfg->{limit} // $cfg->{display_limit} // 20 ) : 20 );
         if ( $limit_n && @vals > $limit_n ) {
             @vals = @vals[ 0 .. ( $limit_n - 1 ) ];
         }
@@ -731,7 +1047,6 @@ sub facet_menu {
             }
         }
         else {
-            # .unq sözlük dosyasından $blk:n: prefixi ile çift yönlü çözümle
             my $unq_file = "${table_path}.unq";
             if ( -e $unq_file && @vals ) {
                 my @n_keys = map { "$blk:n:$_" } @vals;
@@ -746,7 +1061,6 @@ sub facet_menu {
                 }
             }
 
-            # Şema option alanı fallback'i (örn: "1:Satışta,0:Satış Dışı")
             my $opt_str = $table_info->{blocks}->[$blk]->{option} // '';
             if ($opt_str) {
                 for my $pair ( split /,/, $opt_str ) {
@@ -757,8 +1071,22 @@ sub facet_menu {
         }
 
         # Active status for this block
-        my %selected_vals = map { $_ => 1 } @{ $active_filter{$blk} // [] };
-        my $active_cnt    = scalar keys %selected_vals;
+        my %selected_vals;
+        my $active_cnt = 0;
+        if ( $active_filter && exists $active_filter->{$blk} ) {
+            my $v = $active_filter->{$blk};
+            if ( ref($v) eq 'ARRAY' ) {
+                %selected_vals = map { $_ => 1 } @$v;
+                $active_cnt    = scalar keys %selected_vals;
+            }
+            elsif ( ref($v) eq 'HASH' ) {
+                $active_cnt = ( ( defined $v->{min} && length( $v->{min} ) ) || ( defined $v->{max} && length( $v->{max} ) ) ) ? 1 : 0;
+            }
+            elsif ( defined $v && $v ne '' ) {
+                $selected_vals{$v} = 1;
+                $active_cnt = 1;
+            }
+        }
         $active_counts{$blk} = $active_cnt;
 
         my @items;
@@ -785,16 +1113,7 @@ sub facet_menu {
         $groups_by_blk{$blk} = \@items;
     }
 
-    my $res = {
-        count         => $total_count,
-        ids           => $filtered_ids,
-        groups        => \@groups,
-        groups_by_blk => \%groups_by_blk,
-        active_counts => \%active_counts,
-        counts        => \%all_counts,
-    };
-
-    return wantarray ? @groups : $res;
+    return ( \@groups, \%groups_by_blk, \%active_counts );
 }
 
 =encoding utf8

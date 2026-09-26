@@ -3,17 +3,24 @@ package CPAN::Maker::Bootstrapper;
 use strict;
 use warnings;
 
-use CLI::Simple qw(:roles);
+use CLI::Simple ();
 use CLI::Simple::Constants qw(:booleans);
 use IO::Interactive qw(is_interactive);
 
-use parent qw(CLI::Simple);
-
-our $VERSION = '2.2.3';
-
 use Role::Tiny::With;
+
+with 'CPAN::Maker::Role::ModuleUtils';
+
+CLI::Simple->import(qw(:roles));
+
+our $VERSION   = '2.3.3';
+our $GIT_SHA   = '48baa8672f343c6af2f5144821905a26ac2ef92d';
+our $GIT_DIRTY = '2.0.0-23-g48baa8672f343c6af2f5144821905a26ac2ef92d';
+
 with 'CPAN::Maker::Bootstrapper::Role::Init';
 with 'CPAN::Maker::Bootstrapper::Role::LLM::Utils';
+
+use parent qw(CLI::Simple);
 
 __PACKAGE__->use_log4perl( level => 'info', color => $TRUE, info_color => 'white' );
 
@@ -121,11 +128,13 @@ or fails to compile, the build - and therefore C<install> - will fail.
 Disable these gates with environment variables if you want to
 bootstrap first and clean up after:>
 
- make LINT=off SKIP_TESTS=1
+  make LINT=off SYNTAX_CHECKING=off SKIP_TESTS=1
 
-I<C<LINT> is interpreted by the build system installed by this
-module; C<SKIP_TESTS> is interpreted by L<CPAN::Maker> to skip
-running the test suite when building the distribution tarball.>
+I<C<LINT> disables perltidy and perlcritic; C<SYNTAX_CHECKING>
+disables the C<perl -wc> check -- both are interpreted by the build
+system installed by this module. C<SKIP_TESTS> is interpreted by
+L<CPAN::Maker> to skip running the test suite when building the
+distribution tarball.>
 
 B<Have an existing project?>
 
@@ -350,6 +359,40 @@ several directories in a single operation:
     --import /path/to/roles \
     --import /path/to/bin \
     --installdir .
+
+=head2 Determining the Primary Module
+
+The bootstrapper determines the primary module name in the following
+order:
+
+=over 4
+
+=item 1. C<--module>
+
+If C<--module> is supplied, that value is used.
+
+=item 2. Custom stub
+
+If no module name was supplied and C<--stub> names a file, the first
+package found in that file is used.
+
+=item 3. Installation directory
+
+If the module name is still unknown, the bootstrapper derives it from
+the installation directory name. Hyphens are converted to C<::>, so a
+directory named F<Foo-Bar> implies C<Foo::Bar>.
+
+When C<--installdir> is not supplied, the current project directory is
+used by the normal installation-directory logic.
+
+=back
+
+The resulting name must be a valid Perl module name.
+
+When importing an existing project, the corresponding module file must
+also exist beneath one of the import paths. For example, C<Foo::Bar>
+must be found as F<Foo/Bar.pm> somewhere beneath one of the directories
+supplied with C<--import>.
 
 =head2 What Gets Imported
 
@@ -897,6 +940,40 @@ with the C<PERLCRITIC_THEME>, C<PERLCRITIC_SEVERITY>, and
 C<PERLCRITICRC> environment variables. Requires L<Perl::Critic> to be
 installed.
 
+=item resolve-vars
+
+ cmb resolve-vars [--vars-file FILE] [--no-strict] source-file
+
+Filters C<source-file> to STDOUT, substituting C<@TOKEN@> placeholders
+with values drawn from the environment (or from a C<--vars-file>). This
+is the mechanism the generated F<Makefile> uses to turn F<.pm.in> and
+F<.pl.in> sources into their built C<.pm>/C<.pl> counterparts -- for
+example filling C<2.3.3> from the F<VERSION> file or
+C<@BUILD_DATE@> at build time.
+
+A placeholder is only I<required> to resolve if it appears in live code.
+Placeholders that occur solely inside POD or C<#> comments are treated as
+references, not substitutions: they never trigger a "no value present"
+error and are left untouched when no value is available. This lets you
+document a token in your POD (e.g. mention C<@BUILD_DATE@> in a
+description) without breaking the build.
+
+For placeholders that I<do> appear in code, behavior depends on
+C<--strict> (the default):
+
+=over 4
+
+=item * B<strict> (default) - a placeholder in code with no value is a
+fatal error; the build stops.
+
+=item * B<--no-strict> - a placeholder in code with no value produces a
+warning and is left in place literally (as C<@TOKEN@>) rather than being
+substituted to an empty string.
+
+=back
+
+See L</--vars-file> and L</--strict, --no-strict>.
+
 =back
 
 =head2 LLM Commands
@@ -1107,17 +1184,22 @@ Example:
 
  cmb --module Foo::Bar -I ~/foo-bar/lib -I ~/foo-bar/bin
 
-When using the C<--import> option, you must use the C<--module> option
-to specify the primary module name of the distribution. The importer
-cannot infer the module name from the imported files alone.
+=over 8
 
-I<Note: The F<Makefile> will automatically attempt to substitute the
-token C<E<64>PACKAGE_VERSIONE<64>> inside your C<.pl.in> or C<.pm.in> files with
-the current semantic version in the F<VERSION> file. If you want to
-use that for versioning your scripts and modules add the token as
-shown below:>
+=item * The primary module must be determinable from either the current
+directory name or supplied using the C<--module> option. The
+corresponding module file must exist beneath one of the import paths.
+For example, C<Foo::Bar> must be found as F<Foo/Bar.pm>.
 
-C<our $VERSION = 'E<64>PACKAGE_VERSIONE<64>;'>
+=item * The F<Makefile> will automatically attempt to substitute the
+token C<E<64>PACKAGE_VERSIONE<64>> inside your C<.pl.in> or C<.pm.in>
+files with the current semantic version in the F<VERSION> file. If you
+want to use that for versioning your scripts and modules add the token
+as shown below:
+
+ C<our $VERSION = 'E<64>PACKAGE_VERSIONE<64>';>
+
+=back
 
 =item C<--installdir|-i> DIR
 
@@ -1166,7 +1248,7 @@ will almost never get a clean run when asking for a POD review. When
 your POD is complete, accurate and usable it's good enough. Avoid
 shaving the yak!>
 
-=item C<--module|-m> MODULE (required)
+=item C<--module|-m> MODULE
 
 The Perl module name for the new project, e.g. C<My::New::Module>.
 Used to derive the project directory name, source file path, and
@@ -1201,6 +1283,19 @@ Currently takes only a single value: 'github' that indicates that the
 resources section of F<Makefile.PL> should be populated with GitHub
 URL references. Future versions may support additional providers.
 
+=item C<--strict>, C<--no-strict>
+
+Controls how C<resolve-vars> treats an C<@TOKEN@> placeholder that
+appears in code but has no value in the environment or C<--vars-file>.
+C<--strict> (the default) makes this a fatal error. C<--no-strict>
+downgrades it to a warning and leaves the placeholder literal in the
+output.
+
+This affects code placeholders only. Placeholders that appear solely in
+POD or C<#> comments are always ignored by the missing-value check
+regardless of this flag, so C<--no-strict> is not needed merely to
+document a token.
+
 =item C<--stub|-s> TYPE|PATH
 
 Controls the module stub used to generate the initial C<.pm.in> source
@@ -1229,6 +1324,10 @@ When specifying a stub you cannot use the C<--import> option.
 
 Override the author name used in the module stub and C<buildspec.yml>.
 Defaults to C<user.name> from your global git config.
+
+=item C<--vars-file>
+
+The path to the file that contains template variable values.
 
 =back
 
@@ -2559,7 +2658,7 @@ C<make requires> and C<make test-requires> to analyze your source files
 
 =head1 VERSION
 
-This documentation refers to version 2.2.3
+This documentation refers to version 2.3.3
 
 =head1 AUTHOR
 

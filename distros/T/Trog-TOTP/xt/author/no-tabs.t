@@ -9,7 +9,9 @@ use Test::NoTabs;
 my @files = (
     'lib/Trog/TOTP.pm',
     't/00-compile.t',
-    't/01-rfc-test-vectors.t'
+    't/01-rfc-test-vectors.t',
+    't/02-base32.t',
+    't/03-constructor-secret.t'
 );
 
 notabs_ok($_) foreach @files;

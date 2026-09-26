@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article
+><section
+><title
+>Nested Sections</title
+><para
+>Section 1</para
+><section
+><title
+>Section 1.1</title
+><para
+>Para 1.1</para
+><section
+><title
+>Section 1.1.1</title
+><para
+>Para 1.1.1</para
+></section
+><section
+><title
+>Section 1.1.2</title
+><para
+>Para 1.1.2</para
+></section
+></section
+></section
+><section
+><title
+>Section 2</title
+><para
+>Para 2</para
+><section
+><title
+>Section 2.1</title
+><para
+>Para 2.1</para
+><section
+><title
+>Section 2.1.1</title
+><para
+>Para 2.1.1</para
+></section
+></section
+><section
+><title
+>Section 2.2</title
+><para
+>Para 2.2</para
+><section
+><title
+>Section 2.2.1</title
+><para
+>Para 2.2.1</para
+></section
+></section
+></section
+><section
+><title
+>Section 3</title
+><para
+>Para 3</para
+></section
+></article
+>

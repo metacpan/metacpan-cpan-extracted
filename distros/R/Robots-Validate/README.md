@@ -22,18 +22,27 @@ This module allows one to validate a robot user-agent string against the IP addr
 
 # RECENT CHANGES
 
-Changes for version v0.4.5 (2026-09-20)
+Changes for version v0.4.6 (2026-09-25)
 
 - Enhancements
     - Added or updated the robot rules for the following:
-        - IntentBeamBot
-        - InternetMeasurement
-        - JustSearchUKBot
-        - PurityBot
-- Documentation
-    - Mentioned the string-matching algorithm and performance in the rules config section.
-- Tests
-    - Remove CHI from the test requirements.
+        - Applebot
+        - BanquiseBot
+        - domainprintbot
+        - DomainStatsBot
+        - DuckAssistBot
+        - DuckDuckBot
+        - GPTbot
+        - GPT-User
+        - Googlebot
+        - Lycos
+        - MedllyBot
+        - OAI-SearchBot
+        - QwantBot
+        - UmaiBot
+        - webarchiv.cz
+        - WebtelemetryBot
+        - Yeti
 
 See the `Changes` file for more details.
 

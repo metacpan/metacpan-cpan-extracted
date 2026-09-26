@@ -17,7 +17,8 @@ use lib 'lib';
 use AmberDB;
 
 my $tmpdir = tempdir( CLEANUP => 1 );
-my $ram_root = File::Spec->catdir( $tmpdir, 'ramdisk' );
+my $mock_mount = tempdir( CLEANUP => 1 );
+my $ram_root = File::Spec->catdir( $mock_mount, 'amberdb_tiers_test' );
 make_path($ram_root);
 $ENV{AMBERDB_TEST_RAMDISK} = 1;
 
@@ -28,6 +29,7 @@ subtest 'Canonical String Normalization' => sub {
     plan tests => 14;
 
     my $adb = AmberDB->new(
+        database => 'tiers_test',
         cfg  => { use_ramdisk => 'dual' },
         path => {
             dbase_dir   => $tmpdir,

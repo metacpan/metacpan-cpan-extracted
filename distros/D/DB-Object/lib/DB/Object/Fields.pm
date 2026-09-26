@@ -1,27 +1,27 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields.pm
-## Version v1.3.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v1.3.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2026/03/22
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package DB::Object::Fields;
 BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use common::sense;
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     use DB::Object::Fields::Field;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.3.0';
+    our $VERSION = 'v1.3.1';
 };
 
 use strict;
@@ -334,7 +334,7 @@ DB::Object::Fields - Tables Fields Object Accessor
 
 =head1 VERSION
 
-    v1.3.0
+    v1.3.1
 
 =head1 DESCRIPTION
 
@@ -358,7 +358,7 @@ The unknown field will be ignored and a warning will be emitted that this field 
 
 =item * C<fatal> or C<die>
 
-This will trigger a L</die> using a L<Module::Generic::Exception> object. So you could catch it like this:
+This will trigger a L<perlfunc/die> using a L<Module::Generic::Exception> object. So you could catch it like this:
 
     use Nice::Try;
 

@@ -1,5 +1,13 @@
 Revision history for Perl extension Trog-TOTP
 
+1.007 2026-09-25 TEODESIAN
+    - Encode base32 with MIME::Base32 rather than Encode::Base2N, which
+      needs a C++ build that cpm cannot install.  The encoded text is the
+      same, and lower case still decodes.
+    - new(secret => ...) keeps the secret it is given, rather than
+      replacing it with a random one.  Given base32secret as well, the
+      constructor still uses base32secret.
+
 1.006 2026-05-15 TEODESIAN
     - Use Crypt::PRNG::rand() rather than builtin rand()
 

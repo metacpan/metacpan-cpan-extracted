@@ -7,7 +7,6 @@
 ## Modified 2026/03/27
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -16,6 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use common::sense;
     use parent qw( Module::Generic );
     use vars qw( $VERSION $FIELD_NAMES $EXCEPTION_CLASS );
@@ -724,13 +724,31 @@ This returns the current object upon success, or upon error, it sets an L<error 
 
 =head2 base_class
 
+    my $value = $field->base_class;
+
 Returns the base class, such as C<DB::Object::Postgres> or C<DB::Object::SQLite>
 
+=head2 check_name
+
+    my $value = $field->check_name;
+    $field->check_name( $value );
+
+Sets or gets the optional name of the check constraint associated with this field.
+
 =head2 clone
+
+    my $value = $field->clone;
 
 Makes a clone of the object and returns it.
 
 However, it does not makes a clone of the entire field object, but instead leaves out the L<query object|DB::Object::Query> and the L<table object|DB::Object::Tables>
+
+=head2 comment
+
+    my $value = $field->comment;
+    $field->comment( $value );
+
+Sets or gets the optional comment that may have been set for this table field.
 
 =head2 constant
 
@@ -754,65 +772,100 @@ The data type, e.g. C<jsonb>
 
 =back
 
-=head2 check_name
-
-Sets or gets the optional name of the check constraint associated with this field.
-
-=head2 comment
-
-Sets or gets the optional comment that may have been set for this table field.
-
 =head2 database
+
+    my $value = $field->database;
+    $field->database( $value );
 
 Sets or gets the name of the database this field is attached to.
 
 =head2 database_object
 
+    my $value = $field->database_object;
+
 Returns the database object, ie the one used to make sql queries
 
+=head2 datatype
+
+    my $datatype = $field->datatype;
+    my $type = $datatype->type;
+
+Sets or gets the structured datatype descriptor associated with this field. The descriptor exposes the datatype aliases, DBI constant, name, matching regular expression and normalized type through the object returned by this method.
+
 =head2 default
+
+    my $value = $field->default;
+    $field->default( $value );
 
 Sets or gets the default value, if any, for that field.
 
 =head2 foreign_name
 
+    my $value = $field->foreign_name;
+    $field->foreign_name( $value );
+
 Sets or gets the optional name of the foreign key constraint associated with this field.
 
 =head2 first
+
+    my $value = $field->first;
 
 Returns the first field in the table.
 
 =head2 index_name
 
+    my $value = $field->index_name;
+    $field->index_name( $value );
+
 Sets or gets the index name to which this field is related. Defaults to C<undef>
 
 =head2 is_array
+
+    my $value = $field->is_array;
+    $field->is_array( $value );
 
 Sets or gets true if the field is an array, or false otherwise.
 
 =head2 is_check
 
+    my $value = $field->is_check;
+    $field->is_check( $value );
+
 Sets or gets true if the field is associated with a check constraint, or false otherwise.
 
 =head2 is_foreign
+
+    my $value = $field->is_foreign;
+    $field->is_foreign( $value );
 
 Sets or gets true if the field is associated with a foreign key constraint, or false otherwise.
 
 =head2 is_nullable
 
+    my $value = $field->is_nullable;
+    $field->is_nullable( $value );
+
 Sets or gets true if the field can be null, or false otherwise.
 
 =head2 is_primary
 
+    my $value = $field->is_primary;
+    $field->is_primary( $value );
+
 Sets or gets true if the field is the primary key of the table, or false otherwise.
 
 =head2 is_unique
+
+    my $value = $field->is_unique;
+    $field->is_unique( $value );
 
 Sets or gets true if the field is part of a unique index, or false otherwise.
 
 If it is, check out the value for L<index_name|/index_name>
 
 =head2 last
+
+    my $value = $field->last;
 
 Returns the last field in the table.
 
@@ -828,9 +881,14 @@ The output is altered by the use of B<prefixed>. See below.
 
 =head2 next
 
+    my $value = $field->next;
+
 Returns the next field object.
 
 =head2 pos
+
+    my $value = $field->pos;
+    $field->pos( $value );
 
 Sets or gets the position of the field in the table. This is an integer starting from 1.
 
@@ -845,33 +903,52 @@ B<prefixed> can also be called with an integer as argument. 1 will prefix it wit
 
 =head2 prev
 
+    my $value = $field->prev;
+
 Returns the previous field object.
 
 =head2 query_object
+
+    my $value = $field->query_object;
+    $field->query_object( $value );
 
 Sets or gets the query object (L<DB::Object::Query> or one of its descendant)
 
 =head2 schema
 
+    my $value = $field->schema;
+
 Returns the table schema to which this field is attached.
 
 =head2 size
+
+    my $value = $field->size;
+    $field->size( $value );
 
 Sets or gets the size of the field when appropriate, such as when the type is C<varchar> or C<char>
 
 =head2 table
 
+    my $value = $field->table;
+
 Returns the table name for this field.
 
 =head2 table_name
+
+    my $value = $field->table_name;
 
 Same as above. This returns the table name.
 
 =head2 table_object
 
+    my $value = $field->table_object;
+    $field->table_object( $value );
+
 Sets or gets the table object which is a L<DB::Object::Tables> object.
 
 =head2 type
+
+    my $value = $field->type;
 
 Returns the field type such as C<jsonb>, C<json>, C<varchar>, C<integer>, etc.
 

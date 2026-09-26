@@ -1,20 +1,19 @@
 # Text::KDL::XS
 
 A fast Perl XS binding to [ckdl](https://github.com/tjol/ckdl) for parsing
-and emitting [KDL](https://kdl.dev) documents. Supports KDL v1 and v2 with
-automatic version detection.
+and emitting [KDL](https://kdl.dev) documents. Supports KDL 2.0.0 and the
+legacy KDL 1.0.0 with automatic version detection.
 
-## NAME
-
-Text::KDL::XS - parse and emit KDL Document Language with libckdl
+The full documentation is in the POD: `perldoc Text::KDL::XS` for the API
+reference and `perldoc Text::KDL::XS::Cookbook` for a tour of every KDL
+feature with Perl examples. This file is the short version.
 
 ## What is KDL?
 
-KDL ("cuddle" - the **K**DL **D**ocument **L**anguage) is a small,
-human-friendly configuration language. It looks a bit like a cleaned-up mix
-of JSON and an XML-ish s-expression: every line is a *node* with a name,
-optional *arguments*, optional *properties* (`key=value` pairs), and an
-optional block of child nodes.
+KDL ("cuddle", the **K**DL **D**ocument **L**anguage) is a small
+configuration and data language. A document is a tree of *nodes*; each
+node has a name, optional *arguments*, optional *properties*
+(`key=value`) and an optional block of child nodes:
 
 ```kdl
 package "kdl-rs" {
@@ -27,200 +26,147 @@ package "kdl-rs" {
 }
 ```
 
-In that snippet:
+Values are strings, numbers, `#true`/`#false`, `#null` or the special
+numbers `#inf`, `#-inf` and `#nan`, and any value or node can carry a
+`(type)` annotation. Comments, multi-line and raw strings,
+hexadecimal/octal/binary numbers and `/-` "slashdash" comments round out
+the language. The [Cookbook](https://metacpan.org/pod/Text::KDL::XS::Cookbook) shows all of
+them.
 
-- `package` is a node with one **argument** (`"kdl-rs"`) and a child block.
-- `version` is a child node with one argument.
-- `author` has one argument (`"Kat Marchán"`) and one **property**
-  (`email="kat@example.com"`).
-- `keywords` has three arguments - KDL nodes can carry as many as you want.
-- `license` has both an argument and its own children.
-
-KDL also supports typed values (`(u32)42`, `(date)"2026-04-29"`), booleans
-(`#true`/`#false` in v2, `true`/`false` in v1), `#null`, and several number
-formats including arbitrary-precision integers. See
-[the KDL spec](https://github.com/kdl-org/kdl) for the full grammar.
-
-## SYNOPSIS
-
-### Parsing
+## Synopsis
 
 ```perl
-use Text::KDL::XS qw(parse_kdl);
+use Text::KDL::XS qw(parse_kdl emit_kdl);
 
 my $doc = parse_kdl(<<'KDL');
-package "thing" {
-    version "1.0"
-    author "Kat" email="kat@example.com"
+server "web-1" port=8080 {
+    tls #true
+    upstream name="app" weight=3
 }
 KDL
 
 for my $node (@{ $doc->nodes }) {
-    say $node->name;                      # "package"
+    print $node->name, "\n";                          # server
+    print $node->args->[0]->as_string, "\n";          # web-1
+    print $node->prop('port')->as_number, "\n";       # 8080
     for my $child (@{ $node->children }) {
-        say "  ", $child->name;           # "version", "author"
-        say "    arg: ", $child->args->[0]->as_string;
-        if (my $email = $child->prop('email')) {
-            say "    email: ", $email->as_string;
-        }
+        print "  ", $child->name, "\n";               # tls, upstream
     }
 }
-```
 
-`parse_kdl` accepts a string, a filehandle/IO object, or a code reference
-that returns chunks of bytes. The version is auto-detected by default; pass
-`version => '1'` or `version => '2'` to force one.
+print emit_kdl($doc);                                 # round trip
 
-```perl
-my $doc = parse_kdl($string);
-my $doc = parse_kdl(\*STDIN);
-my $doc = parse_kdl($io_object);
-my $doc = parse_kdl(sub { read_some_bytes() });
-my $doc = parse_kdl($string, version => '2');
-```
-
-### Emitting
-
-The emitter has two modes, chosen automatically from the input.
-
-**Tree mode** (full fidelity) takes a `Document`, a `Node`, or an arrayref
-of `Node` objects:
-
-```perl
-use Text::KDL::XS qw(emit_kdl);
-
-my $kdl = emit_kdl($doc);                  # Document round-trip
-my $kdl = emit_kdl($doc, indent => 4);
-```
-
-**Data mode** (convenience) takes any other hashref or arrayref of plain
-Perl data:
-
-```perl
-my $kdl = emit_kdl({
-    package => 'kdl-rs',
-    version => '1.0',
-    authors => [ 'Kat', 'Sam' ],           # multiple args on one node
-    meta    => {                           # nested hash -> child block
-        license => 'MIT',
-        year    => 2026,
-    },
+print emit_kdl({                                      # plain data
+    server => { host => 'localhost', port => 8080 },
+    tags   => [ 'a', 'b' ],
 });
+# server {
+#     host localhost
+#     port 8080
+# }
+# tags a b
 ```
 
-Produces something like:
+`parse_kdl` accepts a Perl character string, a filehandle (any PerlIO
+layer), or a code reference returning chunks of UTF-8. `emit_kdl` accepts a
+parsed document, a node, a list of nodes, or plain hashes and arrays, and
+returns a character string, so `parse_kdl(emit_kdl($data))` round-trips.
 
-```kdl
-authors "Kat" "Sam"
-meta {
-    license "MIT"
-    year 2026
-}
-package "kdl-rs"
-version "1.0"
-```
-
-Hash keys are emitted in sorted order for deterministic output. Arrays of
-hashrefs become repeated sibling nodes:
-
-```perl
-emit_kdl({
-    author => [
-        { name => 'Kat', email => 'kat@example.com' },
-        { name => 'Sam' },
-    ],
-});
-```
-
-```kdl
-author {
-    email "kat@example.com"
-    name  "Kat"
-}
-author {
-    name "Sam"
-}
-```
-
-For booleans, pass an explicit boolean object - strings like `"true"` are
-**not** auto-promoted:
-
-```perl
-use JSON::PP ();
-emit_kdl({ enabled => JSON::PP::true(), debug => JSON::PP::false() });
-```
-
-### Streaming
-
-For SAX-like access without building a tree, use the parser directly:
+For SAX-style streaming without building a tree:
 
 ```perl
 use Text::KDL::XS::Parser;
 
-my $p = Text::KDL::XS::Parser->new(\*STDIN);
+open my $fh, '<', 'huge.kdl' or die $!;
+my $p = Text::KDL::XS::Parser->new($fh);
 while (my $ev = $p->next_event) {
-    if ($ev->{event} eq 'start_node') {
-        say "node: ", $ev->{name};
-    }
-    elsif ($ev->{event} eq 'argument') {
-        say "  arg: ", $ev->{value}->as_string;
-    }
-    elsif ($ev->{event} eq 'property') {
-        say "  prop: $ev->{name} = ", $ev->{value}->as_string;
-    }
+    print $ev->{name}, "\n" if $ev->{event} eq 'start_node';
 }
 ```
 
-## INSTALLATION
+## Modules
 
-From a checkout:
+| Module                                                     | Role                                                   |
+|------------------------------------------------------------|--------------------------------------------------------|
+| [`Text::KDL::XS`](https://metacpan.org/pod/Text::KDL::XS)                      | `parse_kdl`, `emit_kdl`, options, encoding, errors     |
+| [`Text::KDL::XS::Cookbook`](https://metacpan.org/pod/Text::KDL::XS::Cookbook)  | Every KDL feature with KDL and Perl examples; recipes  |
+| [`Text::KDL::XS::Parser`](https://metacpan.org/pod/Text::KDL::XS::Parser)       | Streaming event parser                                 |
+| [`Text::KDL::XS::Document`](https://metacpan.org/pod/Text::KDL::XS::Document)   | Container for the top-level nodes                      |
+| [`Text::KDL::XS::Node`](https://metacpan.org/pod/Text::KDL::XS::Node)           | A node: name, type annotation, args, props, children   |
+| [`Text::KDL::XS::Value`](https://metacpan.org/pod/Text::KDL::XS::Value)         | A typed value: null, bool, number, string              |
+| [`Text::KDL::XS::Emitter`](https://metacpan.org/pod/Text::KDL::XS::Emitter)     | Internal emitter helpers                               |
+
+## Features
+
+- Tree API (`parse_kdl` / `emit_kdl`) with faithful round-tripping of
+  argument order, property order, type annotations and number kinds.
+  Floats are written with the shortest text that reads back as the same
+  double; integers exactly over the whole 64-bit signed and unsigned range.
+- Streaming event API for memory-bounded processing of large documents,
+  with optional reporting of comments (including their text) and
+  slashdashed elements.
+- Sources: strings, filehandles with any PerlIO layer, IO objects, code
+  references.
+- Complete value model: distinct null and booleans, integers, floats,
+  arbitrary-precision numbers kept as text (with exact `Math::BigInt` /
+  `Math::BigFloat` conversion), `#inf`/`#-inf`/`#nan`.
+- KDL 1.0.0 and 2.0.0, detected automatically or pinned with
+  `version => '1' | '2'`; emit in either version.
+- Plain-Perl data emission for the "just write my config" case.
+- Safe on untrusted input: strict UTF-8 validation, a nesting limit
+  (`max_depth`, 512 by default), errors with the parser's reason reported
+  at the caller's line, and an emitter that only writes valid KDL.
+- Passes the upstream KDL test suites for both versions (the only textual
+  differences are the spelling of floats and repeated properties).
+
+## Known issues
+
+The remaining limitations come from the underlying ckdl library: parse
+errors carry a reason but no line or column, detection mode is not a
+complete KDL v1 parser, a few lenient spots in ckdl's parser (such as
+`\u{}` escapes without digits), and a small memory leak in ckdl for every
+parsed property (about 32 bytes, relevant only to long-running processes
+that parse many documents). Strings that would be written bare but read
+back as keywords or numbers (`true`, `-1`) make `emit_kdl` quote the whole
+document. All of them are listed in `perldoc Text::KDL::XS`, section
+"KNOWN ISSUES AND LIMITATIONS".
+
+Upgrading from 0.001: a string passed to `parse_kdl` is now read as Perl
+characters. Code that passed UTF-8 byte strings must decode them first
+(`utf8::decode`, `Encode::decode`) or pass the filehandle instead; see
+`Changes` for the complete list.
+
+## Installation
 
 ```sh
 perl Makefile.PL
 make
 make test
+make install
 ```
 
-`Text::KDL::XS` links statically against the `ckdl` C library through the
-sibling `Alien::ckdl` distribution, so no system package is required.
+`Text::KDL::XS` links statically against ckdl through
+[`Alien::ckdl`](https://github.com/davenonymous/perl-alien-ckdl), which
+builds the C library from source. No system package is needed; a C11
+compiler and a perl with 64-bit integers are.
 
-## STATUS
+## Status
 
-Pre 1.000. The full test suite passes and the API has stabilized around the
-`parse_kdl` / `emit_kdl` pair plus the `Parser`, `Document`, `Node`, and
-`Value` classes - but minor adjustments are still possible before a 1.000
-release. Builds against the pinned ckdl commit shipped by `Alien::ckdl`.
+Version 0.002 fixes the defects found in 0.001 (see `Changes`; what
+remains are the upstream limitations above) and changes one behaviour on
+purpose: string sources are character strings. The API
+(`parse_kdl`, `emit_kdl`, `Parser`, `Document`, `Node`, `Value`) is
+otherwise stable; `Value` gained `as_bignum`.
 
-## API OVERVIEW
+## See also
 
-| Module                                                   | Role                                         |
-|----------------------------------------------------------|----------------------------------------------|
-| [`Text::KDL::XS`](lib/Text/KDL/XS.pm)                    | Top-level functions: `parse_kdl`, `emit_kdl` |
-| [`Text::KDL::XS::Parser`](lib/Text/KDL/XS/Parser.pm)     | Streaming event iterator                     |
-| [`Text::KDL::XS::Document`](lib/Text/KDL/XS/Document.pm) | Top-level `nodes` container                  |
-| [`Text::KDL::XS::Node`](lib/Text/KDL/XS/Node.pm)         | A node: name, args, props, children          |
-| [`Text::KDL::XS::Value`](lib/Text/KDL/XS/Value.pm)       | A typed scalar value                         |
+- [KDL specification](https://github.com/kdl-org/kdl) and [kdl.dev](https://kdl.dev)
+- [ckdl](https://github.com/tjol/ckdl), the underlying C library
+- [`Alien::ckdl`](https://github.com/davenonymous/perl-alien-ckdl)
 
-Read the embedded POD (`perldoc Text::KDL::XS`, etc.) for the per-module
-reference.
+## License
 
-## FEATURES
-
-- High-level tree API (`parse_kdl` / `emit_kdl`) with full round-trip.
-- Streaming event API for memory-bounded ingestion of large documents.
-- Sources: strings, filehandles, blessed IO objects, code references.
-- Faithful KDL value model: per-value type annotations, distinct
-  bool/null, integer/float/bigint preservation.
-- KDL v1 and v2, auto-detected (`version => '1' | '2' | 'detect'`).
-- Plain-Perl data emission for the common "I just want config out" case.
-
-## SEE ALSO
-
-- [`ckdl`](https://github.com/tjol/ckdl) - the underlying C library
-- [KDL spec](https://github.com/kdl-org/kdl)
-- [`Alien::ckdl`](https://github.com/davenonymous/perl-alien-ckdl) - sibling Alien distribution
-
-## LICENSE
+Copyright (C) 2026 Davenonymous.
 
 This Perl distribution is released under the same terms as Perl itself.
 The bundled `ckdl` library (linked statically through `Alien::ckdl`) is

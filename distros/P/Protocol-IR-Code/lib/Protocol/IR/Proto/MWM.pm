@@ -2,7 +2,7 @@ package Protocol::IR::Proto::MWM;
 use strict;
 use warnings;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 use Math::BigInt;
 use Protocol::IR::Code;
@@ -373,7 +373,7 @@ Protocol::IR::Proto::MWM - MWM protocol handler (Disney "Made With Magic")
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 

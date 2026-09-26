@@ -3,7 +3,10 @@
 # modulino invocation
 
 MODULINO_WRAPPER=cmb
-MODULE_NAME=CPAN::Maker::Bootstrapper
-MODULE_PATH=$(MODULE_PATH="${MODULE_NAME//:://}.pm" perl -M$MODULE_NAME -e 'print $INC{$ENV{MODULE_PATH}};')
+MODULINO_MODULE_NAME=CPAN::Maker::Bootstrapper
+MODULE_PATH=$(
+  MODULE_PATH="${MODULINO_MODULE_NAME//:://}.pm" \
+    perl -M$MODULINO_MODULE_NAME -e 'print $INC{$ENV{MODULE_PATH}};'
+)
 
 MODULINO_WRAPPER=$MODULINO_WRAPPER perl $MODULE_PATH "$@"

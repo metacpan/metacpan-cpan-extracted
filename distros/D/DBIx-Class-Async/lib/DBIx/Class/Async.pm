@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.1.0');
+our $VERSION   = qv('v1.2.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
@@ -15,7 +15,7 @@ DBIx::Class::Async - Non-blocking, multi-worker asynchronous wrapper for DBIx::C
 
 =head1 VERSION
 
-Version v1.1.0
+Version v1.2.0
 
 =head1 DISCLAIMER
 
@@ -1045,7 +1045,7 @@ sub _init_workers {
                         $schema->storage->txn_rollback;
                         return { success => 1 };
                     }
-                    elsif ($operation eq 'ping') {
+                    elsif ($operation eq 'ping' || $operation eq 'health_check') {
                         my $alive = eval { $schema->storage->dbh->do("SELECT 1") };
                         return { success => ($alive ? 1 : 0), status => "pong" };
                     }
@@ -1108,14 +1108,26 @@ sub _next_worker {
 
     return unless $db->{_workers} && @{$db->{_workers}};
 
-    $db->{_worker_idx} //= 0;
+    # Find the next healthy worker using round-robin
+    # starting at current index
+    my $count   = @{$db->{_workers}};
+    my $start   = $db->{_worker_idx} // 0;
 
-    die "No workers available" unless $db->{_workers} && @{$db->{_workers}};
+    for (my $i = 0; $i < $count; $i++) {
+        my $idx         = ($start + $i) % $count;
+        my $worker_info = $db->{_workers}[$idx];
 
-    my $idx    = $db->{_worker_idx};
+        if ($worker_info->{healthy}) {
+            $db->{_worker_idx} = ($idx + 1) % $count;
+            return $worker_info->{instance};
+        }
+    }
+
+    # Fallback to standard round-robin if all marked
+    # unhealthy (allows attempt to re-ping)
+    my $idx    = $start % $count;
     my $worker = $db->{_workers}[$idx];
-
-    $db->{_worker_idx} = ($idx + 1) % @{$db->{_workers}};
+    $db->{_worker_idx} = ($idx + 1) % $count;
 
     return $worker->{instance};
 }

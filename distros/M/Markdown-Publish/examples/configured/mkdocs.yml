@@ -1,0 +1,6 @@
+site_name: Configured example
+docs_dir: content
+theme:
+  name: material
+nav:
+  - Home: index.md

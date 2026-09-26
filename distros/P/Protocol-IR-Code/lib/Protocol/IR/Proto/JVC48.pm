@@ -2,7 +2,7 @@ package Protocol::IR::Proto::JVC48;
 use strict;
 use warnings;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::JVC48 is the JVC-48 protocol handler (48-bit,
@@ -200,7 +200,7 @@ Protocol::IR::Proto::JVC48 - JVC-48 protocol handler (48-bit Kaseikyo, OEM 3/1)
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 

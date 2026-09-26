@@ -1,0 +1,34 @@
+# Version control files
+^\.git/
+^\.gitignore$
+
+# ExtUtils::MakeMaker output
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^META\.
+^blib/
+^blibdirs$
+^pm_to_blib$
+^PM_to_blib$
+^[A-Za-z0-9_.-]+-[0-9][^/]*(?:/|\.tar\.gz$)
+
+# Other build output
+^\.github/
+^Build$
+^_build/
+^site/
+^node_modules/
+^\.markdown-pod\.json$
+\.pm\.sha$
+
+# Editor and operating-system files
+(?:^|/)\.DS_Store$
+(?:^|/)\._.*
+~$
+\.bak$
+\.old$
+\.tmp$
+\.swp$
+^#.*#$
+^\.vscode/

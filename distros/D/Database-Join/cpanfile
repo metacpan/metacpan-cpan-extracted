@@ -8,6 +8,7 @@ requires 'DBI';
 requires 'Database::Abstraction', '0.45';
 requires 'File::Spec';
 requires 'File::Temp';
+requires 'JSON::MaybeXS';
 requires 'List::Util', '1.33';
 requires 'Object::Configure';
 requires 'Params::Get', '0.13';
@@ -20,7 +21,6 @@ requires 'autodie';
 on 'test' => sub {
 	requires 'DBD::CSV';
 	requires 'IPC::System::Simple';
-	requires 'JSON::MaybeXS';
 	requires 'Test::DescribeMe';
 	requires 'Test::Exception';
 	requires 'Test::Memory::Cycle';

@@ -6,7 +6,7 @@ SimpleFlow - easy, simple workflow manager (and logger); for keeping track of an
 
 =head1 VERSION
 
-version 0.161
+version 0.181
 
 =head1 DESCRIPTION
 
@@ -169,6 +169,12 @@ flat key/value list or a single hash reference; the only required key is C<cmd>.
   <td>Also re-run when an input file is newer than an output file. See Out-of-date outputs.</td>
 </tr>
 <tr>
+  <td><code>stdin</code></td>
+  <td><code>'devnull'</code>/<code>'inherit'</code></td>
+  <td><code>'devnull'</code></td>
+  <td>What the command sees on its standard input. The default is the null device; <code>'inherit'</code> hands it the caller's own. See Standard input.</td>
+</tr>
+<tr>
   <td><code>timeout</code></td>
   <td>whole seconds</td>
   <td><code>0</code></td>
@@ -230,7 +236,7 @@ C<0>, C<stdout> and C<stderr> are C<''>, C<duration> is C<0>).
 </tr>
 <tr>
   <td><code>exit</code></td>
-  <td>Exit code of the command (<code>-1</code> if it could not be launched).</td>
+  <td>Exit code of the command: <code>-1</code> if it could not be launched, or <code>127</code> if it could not be launched under a <code>timeout</code> (the forked child has no other way to say so).</td>
 </tr>
 <tr>
   <td><code>signal</code></td>
@@ -249,7 +255,7 @@ C<0>, C<stdout> and C<stderr> are C<''>, C<duration> is C<0>).
   <td>Captured output, with trailing whitespace stripped.</td>
 </tr>
 <tr>
-  <td><code>die</code>, <code>dry.run</code>, <code>overwrite</code>, <code>note</code>, <code>quiet</code>, <code>stale</code>, <code>timeout</code></td>
+  <td><code>die</code>, <code>dry.run</code>, <code>overwrite</code>, <code>note</code>, <code>quiet</code>, <code>stale</code>, <code>stdin</code>, <code>timeout</code></td>
   <td>The (defaulted) argument values used.</td>
 </tr>
 <tr>
@@ -304,7 +310,7 @@ replace it.
 =head2 Out-of-date outputs
 
 Existence alone is a weak test. If an input file has been edited since the
-output was built, the output is stale even though it is present — and by
+output was built, the output is stale even though it is present, and by
 default C<task> will still skip the step, exactly as earlier versions did.
 
 Pass C<< stale =E<gt> 1 >> to get the rule C<make> and C<snakemake> use: re-run whenever
@@ -355,6 +361,10 @@ with a space, a quote, or a C<$> in it is passed through untouched instead of
 being re-parsed by the shell. You lose shell features (C<< E<gt> >>, C<|>, C<*>, C<&&>) in
 exchange; use the string form when you want them.
 
+This holds for a one-element array ref too: C<< cmd =E<gt> ['gzip -9 x'] >> looks for a
+program literally named C<gzip -9 x>, and fails, rather than handing the string
+to the shell as Perl's own C<system> does with a list of one.
+
 =head2 Quiet runs
 
 Every C<task> prints its record to the terminal. Over a hundred-step pipeline
@@ -369,6 +379,36 @@ that is a lot of scrollback, so C<< quiet =E<gt> 1 >> suppresses it:
 The log filehandle still receives the full record, and error messages still go
 to C<STDERR>: asking for less noise is not the same as asking to be kept in the
 dark about a failure.
+
+=head2 Standard input
+
+The command is run with its standard input on the null device, so a command
+that stops to ask a question gets an immediate end-of-file and carries on
+instead of waiting for an answer:
+
+ my $t = task(cmd => 'rm -r some/tree');   # "remove write-protected file?"
+
+This matters because C<task> captures the command's output. A prompt is written
+to standard error, which has been redirected into the capture, so nothing
+reaches the terminal: before 0.17 such a command hung with no visible reason —
+for ever with no C<timeout>, and with one it was killed and reported as
+C<timed.out>, blaming the clock for what was really an unanswered question.
+
+Shell redirection inside the command is unaffected, since that is the shell's
+business rather than C<task>'s:
+
+ my $t = task(cmd => 'sort < unsorted.txt > sorted.txt');
+
+To hand the command the caller's own standard input instead — a pipeline step
+that really does read the data your script was given — ask for it:
+
+ my $t = task(cmd => 'sort > sorted.txt', stdin => 'inherit');
+
+C<'inherit'> is the behaviour of 0.162 and earlier, and comes with its hazards:
+the command consumes input your own script can then no longer read, and a
+command that prompts will hang exactly as it used to. The caller's standard
+input is saved and restored around every run either way, including when the
+command dies, and a caller that had closed it keeps it closed.
 
 =head2 Dry runs
 
@@ -414,18 +454,19 @@ Core/runtime modules used by SimpleFlow:
 
 =over
 
-=item * L<Capture::Tiny> captures C<stdout>/C<stderr>
-
 =item * L<Data::Printer> (C<DDP>) pretty result/record printing
 
 =item * L<Devel::Confess> better backtraces on death
 
-=item * C<List::Util>, C<Scalar::Util>, C<Time::HiRes>, C<Cwd>, C<POSIX> core utilities
+=item * C<List::Util>, C<Scalar::Util>, C<Time::HiRes>, C<Cwd>, C<POSIX>, C<File::Spec>,
+C<File::Temp> core utilities; C<stdout> and C<stderr> are captured with
+C<POSIX::dup2> onto temporary files
 
 =back
 
 The test suite additionally uses C<Test::More> and
-L<Test::Exception>.
+L<Test::Exception>; it captures
+output with its own small helper, C<t/lib/CaptureStd.pm>.
 
 =head1 Changes
 

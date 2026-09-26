@@ -1,0 +1,44 @@
+---
+abstract: 'MakeMaker integration for Markdown-maintained POD'
+author:
+  - 'Andrew Speer <andrew.speer@isolutions.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  version: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ASPEER-MakeMaker-Markdown-Pod
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ASPEER::MakeMaker: '1.010'
+  Cwd: '0'
+  Digest::MD5: '0'
+  Docbook::Convert: '1.010'
+  Exporter: '0'
+  ExtUtils::Manifest: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Markdown::Pod::Embed: '1.010'
+  perl: '5.010'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Pod/issues
+  homepage: https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Pod
+  repository: https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Pod.git
+version: '1.014'
+x_authority: cpan:ASPEER
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

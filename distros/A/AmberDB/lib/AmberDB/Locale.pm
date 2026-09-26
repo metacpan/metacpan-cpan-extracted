@@ -6,7 +6,7 @@ use utf8;
 use Encode qw(decode encode);
 use Carp qw(croak cluck);
 
-our $VERSION = '5.25.2';
+our $VERSION = '5.26.0';
 my $CREATED  = '2017-07-22';
 
 my %LOCALE_CACHE;
@@ -261,18 +261,23 @@ sub _compile_patterns {
 sub utf_encode {
     my ( $self, $string ) = @_;
     return unless defined $string;
+    $string =~ s/^\x{FEFF}//;
     utf8::encode($string) if utf8::is_utf8($string);
+    $string =~ s/^\xEF\xBB\xBF//;
     return $string;
 }
 
 # -------------------------------------------------------
 # utf_decode: Decodes raw UTF-8 bytes into a Perl Unicode character string.
+# Strips BOM if present.
 # my $chars = $lang->utf_decode($string);
 # -------------------------------------------------------
 sub utf_decode {
     my ( $self, $string ) = @_;
     return unless defined $string;
+    $string =~ s/^\xEF\xBB\xBF//;
     utf8::decode($string) unless utf8::is_utf8($string);
+    $string =~ s/^\x{FEFF}//;
     return $string;
 }
 
@@ -571,9 +576,10 @@ sub to_ascii {
 
     if ($nonspace) {
         $string = CORE::lc($string);
-        $string =~ s/\W+/_/g;
-        $string =~ s/_+/_/g;
-        $string =~ s/^_|_$//g;
+        $string =~ s/\W+/-/g;
+        $string =~ s/[-_]*_[-_]*/_/g;
+        $string =~ s/-+/-/g;
+        $string =~ s/^[-_]+|[-_]+$//g;
     }
 
     return $string;
@@ -934,7 +940,7 @@ sub format_currency {
     my $code_uc = CORE::uc($code);
 
     require AmberDB::Locale::Currency;
-    my $universal = AmberDB::Locale::Currency->by_code($code_uc);
+    my $universal = AmberDB::Locale::Currency->cur_code($code_uc);
     my $currencies = $self->{_locale}{currencies} || {};
     my $override   = $currencies->{$code_uc} || {};
 
@@ -1576,13 +1582,13 @@ Direct dictionary lookups, symbol conversions, and select dropdown lists can be 
   use AmberDB::Locale::Currency;
 
   # Symbol and name lookups
-  my $sym  = AmberDB::Locale::Currency->symbol('TRY'); # '₺'
-  my $name = AmberDB::Locale::Currency->name('USD');   # 'US Dollar'
-  my $info = AmberDB::Locale::Currency->by_code('EUR');
+  my $sym  = AmberDB::Locale::Currency->cur_symbol('TRY'); # '₺'
+  my $name = AmberDB::Locale::Currency->cur_name('USD');   # 'US Dollar'
+  my $info = AmberDB::Locale::Currency->cur_code('EUR');
   # => { num => '978', name => 'Euro', symbol => '€', digits => 2 }
 
   # Dropdown options for UI forms
-  my @options = AmberDB::Locale::Currency->all();
+  my @options = AmberDB::Locale::Currency->cur_all();
   # => ( [ 'TRY', 'Turkish Lira' ], [ 'USD', 'US Dollar' ], ... )
 
   # List active ISO codes
@@ -1593,7 +1599,7 @@ Supported helper methods:
 
 =over 4
 
-=item * C<AmberDB::Locale::Currency-E<gt>by_code($iso_code)> - Returns the currency definition hash reference for the given 3-letter ISO 4217 code (case-insensitive), containing C<num>, C<name>, C<symbol>, and C<digits>.
+=item * C<AmberDB::Locale::Currency-E<gt>cur_code($iso_code)> - Returns the currency definition hash reference for the given 3-letter ISO 4217 code (case-insensitive), containing C<num>, C<name>, C<symbol>, and C<digits>.
 
 =item * C<AmberDB::Locale::Currency-E<gt>symbol($iso_code)> - Returns the currency symbol for the given ISO code (e.g. C<'₺'>, C<'$'>, C<'€'>, C<'£'>, C<'₽'>, C<'¥'>). If the code is unknown, returns the uppercase code itself.
 

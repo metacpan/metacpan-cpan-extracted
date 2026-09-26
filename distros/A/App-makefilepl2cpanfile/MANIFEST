@@ -8,7 +8,9 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/basics.t
+t/data-flow.t
 t/develop_block.t
+t/domain.t
 t/edge_cases.t
 t/eof.t
 t/eol.t
@@ -16,9 +18,15 @@ t/error_paths.t
 t/extended_tests.t
 t/function.t
 t/integration.t
+t/kwalitee.t
+t/lib/Test/Permissions.pm
 t/locales.t
+t/logic.t
 t/parse_prereqs.t
+t/path.t
 t/preserve.t
+t/transaction.t
+t/transition.t
 t/unit.t
 t/verify_prereqs.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0">
+  <title>Included code</title>
+  <section xml:id="code"><title>Code</title>
+    <programlisting language="perl"><xi:include href="example.txt" parse="text"/></programlisting>
+  </section>
+</article>

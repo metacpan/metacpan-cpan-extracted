@@ -1,5 +1,33 @@
 Revision history for Protocol::IR::Code
 
+1.2 2026-09-25T20:00:43Z
+
+1.2 2026-09-25T19:59:15Z
+
+    - Fix the documented source of a code's send_count. The 1.0 entry (and the
+      importer's POD) claimed the per-command repeat count is read from a
+      "repeats" field, falling back to the keycode's trailing ":N". No file in
+      the database carries a "repeats" field, so that lookup was dead code and
+      every import already took the ":N" path. The importer now documents and
+      reads only the keycode's trailing number, which is the dump's repeat
+      hint for the command: a property of the command, not of its waveform, and
+      not constant across the dump (1, 3, 4 and 33 all occur, and a keycode
+      with no usable hint keeps the single-press default).
+    - Rename the JSON IR database dump importer to
+      Protocol::IR::Format::JSON, registered as the "JSON" format and selected
+      with ir-convert --from json. The handler, its file and its import aliases
+      were named after the Global Cache format, which this JSON format was
+      mistakenly taken to be. It is not: the format is JSON, and it is not a
+      Global Cache format. The former module name and the former import aliases
+      are removed outright rather than kept as synonyms, so a stale --from
+      fails loudly with the list of valid formats instead of quietly working.
+    - The importer now follows a device document's "codeset" pointer to the
+      re-usable command set that device shares with every other device having
+      the same commands, so a device file imports as readily as a command-set
+      file. The pointer is relative to the dump root and is resolved by
+      walking up from the device file; ir-convert passes the --in path through
+      for this format.
+
 1.1 2026-09-25T00:50:13Z
 
     - Protocol::IR::Format::CSV gains an export method that serializes decoded

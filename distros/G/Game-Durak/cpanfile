@@ -1,0 +1,17 @@
+requires 'perl', '5.010';
+
+# Digest::SHA is core at 5.9.3 and is all the deal needs. Phase 02 adds
+# Object::Proto::Sugar, the house object system, as the one non-core
+# prerequisite.
+
+on test => sub {
+    requires 'Test::More', '0';
+};
+
+on develop => sub {
+    # Without these the author tests SKIP, which is worse than failing: a
+    # skipped check is one nobody notices is not running.
+    requires 'Test::Pod', '1.22';
+    requires 'Test::Pod::Coverage', '1.08';
+    requires 'Test::CheckManifest', '0.9';
+};

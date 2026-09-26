@@ -1,0 +1,84 @@
+{
+   "abstract" : "parent entry point and shared make-target methods for MakeMaker plugins",
+   "author" : [
+      "Andrew Speer <andrew.speer@isolutions.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "ASPEER-MakeMaker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Tie::File" : "0",
+            "version" : "0"
+         },
+         "suggests" : {
+            "ASPEER::MakeMaker::Markdown::Pod" : "1.010"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "ExtUtils::MM" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "IO::File" : "0",
+            "Software::LicenseUtils" : "0",
+            "Tie::File" : "0",
+            "base" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aspeer/pm-ASPEER-MakeMaker/issues"
+      },
+      "homepage" : "https://github.com/aspeer/pm-ASPEER-MakeMaker",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aspeer/pm-ASPEER-MakeMaker.git",
+         "web" : "https://github.com/aspeer/pm-ASPEER-MakeMaker"
+      }
+   },
+   "version" : "1.012",
+   "x_authority" : "cpan:ASPEER",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -2,7 +2,7 @@ package Protocol::IR::Code;
 use strict;
 use warnings;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 sub new {
     my ($class, %args) = @_;
@@ -91,7 +91,7 @@ Protocol::IR::Code - Intermediate representation of an IR remote control code
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 
@@ -163,9 +163,9 @@ Number of repeat ("ditto") frames a wig should send after the first.
 =item send_count
 
 How many times the whole signal transmits per press (the wig's C<send_count>,
-the Global Cache IR database's per-command repeat count).  Zero means the
-source carried no repeat count, so a wig export omits C<send_count> and the
-default single press is assumed.
+the repeat hint a JSON dump's keycode carries).  Zero means the source carried
+no repeat count, so a wig export omits C<send_count> and the default single
+press is assumed.
 
 =item bypass_protocol
 
@@ -191,7 +191,7 @@ re-encodes to the same pulse counts.
 
 The verbatim Pronto Hex string the code was decoded from, when any, kept so
 the code re-exports byte-identically through any Pronto output or
-Pronto-passthrough container format (wig, Global Cache) without
+Pronto-passthrough container format (wig, a JSON dump) without
 re-quantizing. On a signal no registered protocol recognizes (protocol
 C<UNKNOWN>, C<bypass_protocol> set) this is alongside C<timings>. C<undef>
 for codes built from decoded fields.
@@ -199,7 +199,7 @@ for codes built from decoded fields.
 C<timings> and C<pronto> are kept together on a decoded code because the two
 format families each need their own lossless view: C<timings> feeds the
 microsecond timing formats (Tasmota, mode2, LIRC), C<pronto> the hex container
-formats (wig, Global Cache, a Pronto re-export). Deriving either from the
+formats (wig, a JSON dump, a Pronto re-export). Deriving either from the
 other would re-quantize and could change silent fractions.
 
 =back
@@ -248,8 +248,6 @@ reinventing it:
 =item * IRDB -- L<the community button/CSV database|https://github.com/probonopd/irdb>
 
 =item * HAIR -- L<the Home Assistant IR integration and wig format|https://github.com/DAB-LABS/HAIR>
-
-=item * Global Cache -- L<IR database exports|https://www.globalcache.com/>
 
 =item * IR Scrutinizer -- L<Pronto Hex format glossary|http://www.harctoolbox.org/Glossary.html>
 

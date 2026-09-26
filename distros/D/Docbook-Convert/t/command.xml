@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article
+><section
+><title
+>Command Synopsis</title
+><cmdsynopsis
+><command
+>command1</command
+><arg
+>-1</arg
+><arg
+>-2</arg
+><arg
+>-f <replaceable
+>filename</replaceable
+></arg
+></cmdsynopsis
+><cmdsynopsis
+><command
+>command2</command
+><arg
+>-1</arg
+><arg
+>-2</arg
+><group
+><arg
+>-3</arg
+><arg
+>-4</arg
+><arg
+>-5</arg
+></group
+><arg
+>-o <replaceable
+>option1</replaceable
+></arg
+><arg
+choice="req"
+>-o option2</arg
+><arg
+rep="repeat"
+>-o option3</arg
+><arg
+choice="plain"
+>filename</arg
+></cmdsynopsis
+><cmdsynopsis
+><command
+>command1</command
+><arg
+>-1</arg
+><sbr
+></sbr
+><arg
+>-2</arg
+><arg
+>-f <replaceable
+>filename</replaceable
+></arg
+></cmdsynopsis
+></section
+></article
+>

@@ -1,13 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v1.5.1
+## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Postgres.pm
+## Version v1.6.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/26
+## Modified 2026/09/23
 ## All rights reserved
-## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -18,6 +17,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( DB::Object );
     use version;
     use vars qw(
@@ -461,7 +461,7 @@ BEGIN
     };
     our $PLACEHOLDER_REGEXP = qr/(?:(?<![?\w])\?(?![?\w])|(?<!\w)\$(?<index>[1-9]\d*)(?!\w))/;
     our $EXCEPTION_CLASS    = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.5.1';
+    our $VERSION = 'v1.6.0';
 };
 
 use strict;
@@ -499,17 +499,18 @@ my @constants_to_ignore = qw(
     PG_ANYCOMPATIBLENONARRAY PG_ANYCOMPATIBLERANGE PG_ANYELEMENT PG_ANYENUM PG_ANYMULTIRANGE
     PG_ANYNONARRAY PG_ANYRANGE PG_EVENT_TRIGGER PG_FDW_HANDLER PG_GTSVECTOR
     PG_GTSVECTORARRAY PG_INDEX_AM_HANDLER PG_INTERNAL PG_LANGUAGE_HANDLER PG_NAME
-    PG_NAMEARRAY PG_OIDVECTOR PG_OIDVECTORARRAY PG_PG_ATTRIBUTE PG_PG_ATTRIBUTEARRAY
-    PG_PG_BRIN_BLOOM_SUMMARY PG_PG_BRIN_MINMAX_MULTI_SUMMARY PG_PG_CLASS PG_PG_CLASSARRAY
-    PG_PG_DDL_COMMAND PG_PG_DEPENDENCIES PG_PG_MCV_LIST PG_PG_NDISTINCT PG_PG_NODE_TREE
-    PG_PG_PROC PG_PG_PROCARRAY PG_PG_SNAPSHOT PG_PG_SNAPSHOTARRAY PG_PG_TYPE
-    PG_PG_TYPEARRAY PG_RECORD PG_RECORDARRAY PG_REFCURSOR PG_REFCURSORARRAY PG_REGCLASS
-    PG_REGCLASSARRAY PG_REGCOLLATION PG_REGCOLLATIONARRAY PG_REGCONFIG PG_REGCONFIGARRAY
-    PG_REGDICTIONARY PG_REGDICTIONARYARRAY PG_REGNAMESPACE PG_REGNAMESPACEARRAY PG_REGOPER
-    PG_REGOPERARRAY PG_REGOPERATOR PG_REGOPERATORARRAY PG_REGPROC PG_REGPROCARRAY
-    PG_REGPROCEDURE PG_REGPROCEDUREARRAY PG_REGROLE PG_REGROLEARRAY PG_REGTYPE
-    PG_REGTYPEARRAY PG_TABLE_AM_HANDLER PG_TID PG_TIDARRAY PG_TRIGGER PG_TSM_HANDLER
-    PG_UNKNOWN PG_VOID PG_XID PG_XID8 PG_XID8ARRAY PG_XIDARRAY
+    PG_NAMEARRAY PG_OID8 PG_OID8ARRAY PG_OIDVECTOR PG_OIDVECTORARRAY PG_PG_ATTRIBUTE 
+    PG_PG_ATTRIBUTEARRAY PG_PG_BRIN_BLOOM_SUMMARY PG_PG_BRIN_MINMAX_MULTI_SUMMARY
+    PG_PG_CLASS PG_PG_CLASSARRAY PG_PG_DDL_COMMAND PG_PG_DEPENDENCIES PG_PG_MCV_LIST
+    PG_PG_NDISTINCT PG_PG_NODE_TREE PG_PG_PROC PG_PG_PROCARRAY PG_PG_SNAPSHOT
+    PG_PG_SNAPSHOTARRAY PG_PG_TYPE PG_PG_TYPEARRAY PG_RECORD PG_RECORDARRAY PG_REFCURSOR
+    PG_REFCURSORARRAY PG_REGCLASS PG_REGCLASSARRAY PG_REGCOLLATION PG_REGCOLLATIONARRAY
+    PG_REGCONFIG PG_REGCONFIGARRAY PG_REGDATABASE PG_REGDATABASEARRAY PG_REGDICTIONARY
+    PG_REGDICTIONARYARRAY PG_REGNAMESPACE PG_REGNAMESPACEARRAY PG_REGOPER PG_REGOPERARRAY
+    PG_REGOPERATOR PG_REGOPERATORARRAY PG_REGPROC PG_REGPROCARRAY PG_REGPROCEDURE
+    PG_REGPROCEDUREARRAY PG_REGROLE PG_REGROLEARRAY PG_REGTYPE PG_REGTYPEARRAY
+    PG_TABLE_AM_HANDLER PG_TID PG_TIDARRAY PG_TRIGGER PG_TSM_HANDLER PG_UNKNOWN PG_VOID
+    PG_XID PG_XID8 PG_XID8ARRAY PG_XIDARRAY
 );
 foreach my $c ( @$keys )
 {
@@ -527,7 +528,7 @@ foreach my $c ( @$keys )
         my $val = $code->();
         if( !CORE::exists( $DATATYPES_DICT->{ $type } ) )
         {
-            warn( "Unknown PostgreSQL constant DBD::Pg::${c}" ) if( DB::Object::Postgres->_is_warnings_enabled( 'DB::Object' ) );
+            warn( "Unknown PostgreSQL constant DBD::Pg::${c}" ) if( warnings::enabled( 'DB::Object' ) );
             next;
         }
         elsif( $is_array )
@@ -680,8 +681,26 @@ sub attribute($;$@)
 sub begin_work($;$@)
 {
     my $self = shift( @_ );
-    $self->{transaction} = 1;
-    return( $self->{dbh}->begin_work( @_ ) );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->begin_work( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling begin_work(). Have you forgotten to turn on AutoCommit?: $@" ) );
+    }
+    elsif( !$rv && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+
+    if( defined( $rv ) )
+    {
+        $self->_transaction_started;
+        return( $rv || 1 );
+    }
+    return;
 }
 
 # This method is common to DB::Object and DB::Object::Statement
@@ -694,8 +713,26 @@ sub begin_work($;$@)
 sub commit($;$@)
 {
     my $self = shift( @_ );
-    $self->{transaction} = 0;
-    return( $self->{dbh}->commit( @_ ) );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->commit( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling commit(): $@" ) );
+    }
+    elsif( !$rv && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+
+    if( defined( $rv ) )
+    {
+        $self->_transaction_finished;
+        return( $rv || 1 );
+    }
+    return;
 }
 
 # connect(9 is inherited by DB::Object
@@ -765,8 +802,15 @@ sub create_db
     }
 
     my $ref = {};
-    my @keys = qw( host port login passwd schema opt debug );
-    @$ref{ @keys } = @$self{ @keys };
+    # my @keys = qw( host port login passwd schema opt debug );
+    my $ok_params = $self->_connection_parameters;
+    foreach my $key ( @$ok_params )
+    {
+        if( my $coderef = $self->can( $key ) )
+        {
+            $ref->{ $key } = $coderef->( $self );
+        }
+    }
     $ref->{database} = $name;
     $dbh = $self->connect( $ref ) || return( $self->error( "I could create the database \"$name\" but oddly enough, I could not connect to it with user \"$ref->{login}\" on host \"$ref->{host}\" with port \"$ref->{port}\"." ) );
     return( $dbh );
@@ -1221,12 +1265,30 @@ sub pg_notifies
     {
         return( $self->error( "Error calling PostgreSQL function pg_notifies: $@" ) );
     }
+    elsif( !$ref && $dbh->err )
+    {
+        $self->error({ code => $dbh->err, message => $dbh->errstr });
+    }
     return( $ref );
 }
 
 sub pg_ping(@)
 {
-    return( shift->{dbh}->pg_ping );
+    my $self = shift( @_ );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->pg_ping( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling pg_ping: $@" ) );
+    }
+    elsif( !$rv && $self->{dbh}->err )
+    {
+        $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr });
+    }
+    return( $rv );
 }
 
 # See DB::Object
@@ -1258,9 +1320,29 @@ sub quote
     return( $dbh->quote( $str, $type ) );
 }
 
+# This can return an empty string on success, so use defined() to distinguish success from failure.
 sub release
 {
-    return( shift->{dbh}->pg_release( @_ ) );
+    my $self  = shift( @_ );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->pg_release( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling release: $@" ) );
+    }
+    elsif( !defined( $rv ) && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+    if( defined( $rv ) )
+    {
+        $self->_transaction_started;
+        return( $rv || 1 );
+    }
+    return;
 }
 
 sub replace
@@ -1284,17 +1366,76 @@ sub returning
 
 sub rollback
 {
-    return( shift->{dbh}->rollback() );
+    my $self  = shift( @_ );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->rollback( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling rollback: $@" ) );
+    }
+    elsif( !defined( $rv ) && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+    if( defined( $rv ) )
+    {
+        $self->_transaction_finished;
+        return( $rv || 1 );
+    }
+    return;
 }
 
+# This can return an empty string on success, so use defined() to distinguish success from failure.
 sub rollback_to(@)
 {
-    return( shift->{dbh}->pg_rollback_to( @_ ) );
+    my $self  = shift( @_ );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->pg_rollback_to( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling rollback_to: $@" ) );
+    }
+    elsif( !$rv && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+    if( defined( $rv ) )
+    {
+        $self->_transaction_started;
+        return( $rv || 1 );
+    }
+    return;
 }
 
+# This can return an empty string on success, so use defined() to distinguish success from failure.
 sub savepoint(@)
 {
-    return( shift->{dbh}->pg_savepoint( @_ ) );
+    my $self  = shift( @_ );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->pg_savepoint( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling savepoint: $@" ) );
+    }
+    elsif( !$rv && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+    if( defined( $rv ) )
+    {
+        $self->_transaction_started;
+        return( $rv || 1 );
+    }
+    return;
 }
 
 sub schema { return( shift->_set_get_scalar( 'schema', @_ ) ); }
@@ -1581,16 +1722,17 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    my $core = [qw(
+    my $core = $self->new_array( [qw(
         db login passwd host port driver database schema server opt uri debug
         cache_connections cache_dir cache_query cache_table connect_via unknown_field
-        use_cache
-    )];
+        use_cache id
+    )] );
     my @pg_params = grep( /^pg_/, keys( %$param ) );
-    # See DBD::mysql for the list of valid parameters
-    # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
-    push( @$core, @pg_params );
-    return( $core );
+    # See DBD::Pg for the list of valid parameters
+    $core->push( @pg_params );
+    my $core_fields = $self->{_core_fields} || [];
+    $core->push( @$core_fields );
+    return( $core->unique(1) );
 }
 
 sub _dsn
@@ -1660,16 +1802,10 @@ DESTROY
         # print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" ) if( $DEBUG );
         $self->{sth}->finish();
     }
-    elsif( $self->{dbh} && $class =~ /^AI\:\:DB\:\:Postgres$/ )
+    elsif( $self->{dbh} && $class =~ /^DB\:\:Object\:\:Postgres$/ )
     {
-        local( $SIG{__WARN__} ) = sub { };
+        local( $SIG{__WARN__} ) = sub{};
         # $self->{ 'dbh' }->disconnect();
-        if( $DEBUG )
-        {
-            my( $pack, $file, $line, $sub ) = ( caller( 0 ) )[ 0, 1, 2, 3 ];
-            my( $pack2, $file2, $line2, $sub2 ) = ( caller( 1 ) ) [ 0, 1, 2, 3 ];
-            print( STDERR "DESTROY database handle ($self) [$self->{query}]\ncalled within sub '$sub' ($sub2) from package '$pack' ($pack2) in file '$file' ($file2) at line '$line' ($line2).\n" );
-        }
         $self->disconnect();
     }
     my $locks = $self->{_locks};
@@ -1788,7 +1924,7 @@ DB::Object::Postgres - SQL API
 
 =head1 VERSION
 
-    v1.5.1
+    v1.6.0
 
 =head1 DESCRIPTION
 
@@ -1859,6 +1995,9 @@ which will provide you a special shell to install modules in a convenient way.
 =head1 METHODS
 
 =head2 attribute
+
+    my $value = $dbh->attribute;
+    $dbh->attribute( $value );
 
 Sets or gets one more pg attributes.
 
@@ -2146,7 +2285,7 @@ Any arguments provided are passed along to L<DBD::Pg/begin_work>
 
 Make any change to the database irreversible.
 
-This must be used only after having called L</begin_work>
+This must be used only after having called C<begin_work>
 
 Any arguments provided are passed along to L<DBD::Pg/commit>
 
@@ -2154,7 +2293,7 @@ Any arguments provided are passed along to L<DBD::Pg/commit>
 
 Same as L<DB::Object/connect>, only specific to PostgreSQL.
 
-See L</_connection_params2hash>
+See L<DB::Object/_connection_params2hash>
 
 =head2 create_db
 
@@ -2234,6 +2373,8 @@ The sql script is executed using L<DB::Object/do> and the returned value is retu
 
 =head2 databases
 
+    my $value = $dbh->databases;
+
 Returns a list of all available databases.
 
 =head2 datatype_dict
@@ -2271,6 +2412,8 @@ A convenient wrapper to L<DB::Object::Postgres::Query/having>
 
 =head2 large_object
 
+    my $value = $dbh->large_object;
+
 Instantiate a new L<DB::Object::Postgres::Lo> and returns it.
 
 =head2 last_insert_id
@@ -2295,13 +2438,20 @@ In list context, it returns an array of schema lines, and in scalar context, it 
 
 See L<DB::Object::Postgres::Tables/on_conflict>
 
-=for Pod::Coverage pg_notifies
+=head2 pg_notifies
+
+Calls C<pg_notifies> on the underlying PostgreSQL DBI handle and returns the notification data supplied by L<DBD::Pg>. The method works from a database object and from objects that expose a C<database_object> back-reference.
+
+    my $notification = $dbh->pg_notifies;
 
 =head2 pg_ping
 
 Calls L<DBD::Pg/pg_ping>
 
 =head2 query_object
+
+    my $value = $dbh->query_object;
+    $dbh->query_object( $value );
 
 Set or gets the PostgreSQL query object (L<DB::Object::Postgres::Query>) used to process and format queries.
 
@@ -2327,7 +2477,7 @@ A convenient wrapper to L<DB::Object::Postgres::Query/returning>
 
 =head2 rollback
 
-Will roll back any changes made to the database since the last transaction point marked with L</begin_work>
+Will roll back any changes made to the database since the last transaction point marked with C<begin_work>
 
 =head2 rollback_to
 
@@ -2351,6 +2501,9 @@ See also L<rollback_to|/rollback_to> and L<release|/release>
 
 =head2 schema
 
+    my $value = $dbh->schema;
+    $dbh->schema( $value );
+
 Sets or gets the database schema.
 
 It returns the value as a L<Module:Generic::Scalar> object
@@ -2370,6 +2523,8 @@ This is inherited from L<DB::Object>
 Please see L<PostgreSQL documentation for the variables that can be set|https://www.postgresql.org/docs/10/runtime-config-client.html>.
 
 =head2 socket
+
+    my $value = $dbh->socket;
 
 This returns the database handler property C<pg_socket>
 
@@ -2393,11 +2548,11 @@ A database schema.
 
 =head2 table_info
 
+    my $value = $dbh->table_info;
+
 Provided with a table name and some optional parameters and this will retrieve the table information.
 
-It returns an array reference of tables information found if no schema was provided or if C<anywhere> is true.
-
-If a schema was provided, and the table found it returns an hash reference for that table.
+It returns an array reference of hash reference containing information about each table column.
 
 Otherwise, if nothing can be found, it returns an empty array reference.
 
@@ -2467,20 +2622,17 @@ Calls L<DBD::Pg/trace> passing through whatever arguments were provided.
 
 Calls L<DBD::Pg/trace_msg> and pass it whatever arguments were provided.
 
-
 =head2 unlock
 
 Unlock does not work with PostgreSQL
-
-=head2 table_info
-
-It returns an array reference of hash reference containing information about each table column.
 
 =head2 variables
 
 Variables are currently unsupported in Postgres
 
 =head2 version
+
+    my $value = $dbh->version;
 
 Returns the PostgreSQL database server version.
 
@@ -2514,7 +2666,7 @@ The core properties are: C<db>, C<login>, C<passwd>, C<host>, C<port>, C<driver>
 
 =head2 _convert_datetime2object
 
-Based on an hash reference of parameters and this will transcode any datetime column into a L<DateTime> object.
+Based on an hash reference of parameters and this will transcode any datetime column into a L<DateTime::Lite> object.
 
 It returns the I<data> hash reference
 
@@ -2566,7 +2718,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2026 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

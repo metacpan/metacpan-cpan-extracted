@@ -1,5 +1,5 @@
 ---
-abstract: 'Fast KDL parser and emitter via libckdl'
+abstract: 'KDL Document Language parser and emitter built on libckdl'
 author:
   - 'Davenonymous <perl@davenonymous.com>'
 build_requires:
@@ -21,12 +21,17 @@ no_index:
     - t
     - inc
 requires:
-  Alien::ckdl: '0'
+  Carp: '0'
+  Exporter: '5.57'
+  Math::BigFloat: '0'
+  Math::BigInt: '0'
+  Scalar::Util: '0'
   XSLoader: '0'
+  overload: '0'
   perl: '5.012'
 resources:
   bugtracker: https://github.com/Davenonymous/perl-kdl-xs/issues
   homepage: https://github.com/Davenonymous/perl-kdl-xs
   repository: https://github.com/Davenonymous/perl-kdl-xs.git
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

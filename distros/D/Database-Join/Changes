@@ -1,5 +1,97 @@
 Revision history for Database::Join
 
+0.007.1	Fri Sep 25 08:17:24 AM EDT 2026
+	[ Bug Fixes ]
+	'order_by' is rather SQL like, 'sort_by' is clearer
+
+0.007.0	Thu Sep 24 09:56:58 PM EDT 2026
+	[ Enhancements ]
+	- Schema type consistency validation: new() and add_database() now call the
+	  new _validate_schema_types() protected helper immediately after the column
+	  routing table is built.  For every column that is shared across two or more
+	  databases WITHOUT a collision_prefix, the helper compares the schema() type
+	  strings (e.g. "TEXT" vs "INTEGER") and emits a warn_schema_type_mismatch
+	  carp when they disagree.  This surfaces silent type-coercion bugs at
+	  construction time rather than at query time.  The join column itself and
+	  any column that has a collision prefix configured are exempt (the join
+	  column is structural, not a data column; prefixed columns already have
+	  distinct published names so no merge occurs).  Callers that intentionally
+	  accept the merge may suppress the warning by adding collision_prefix for
+	  the secondary database.  DAs that return an empty or undef schema() are
+	  skipped silently.
+	- parallel => 1 constructor flag: when set and the join has three or more
+	  databases (primary + two or more secondaries), secondary DA fetches are
+	  issued concurrently using Perl threads.  Each secondary is queried in its
+	  own thread; results are collected with join() and indexed exactly as in the
+	  sequential path.  Falls back to sequential with a carp warning when the
+	  'threads' module is unavailable.  No effect on the SQLite backend (which
+	  executes a single SQL JOIN).  DBI-backed DAs are not thread-safe by default;
+	  documented in POD.  The threshold n > 2 avoids thread-spawn overhead for the
+	  common single-secondary case.
+	- dbi_source() on Database::Join itself: a Database::Join object with a
+	  SQLite or auto backend now implements dbi_source(), returning {dbh, table}
+	  pointing at a materialised '_dj_result' table inside its temporary SQLite
+	  file.  A parent Database::Join (or any caller that understands the
+	  dbi_source() interface) can ATTACH the child's file and query _dj_result
+	  directly via SQL, giving composable nested joins at full ATTACHed speed
+	  without routing rows through Perl.  Filter criteria (filters =>) are baked
+	  into _dj_result at materialisation time; query-time criteria are applied
+	  by the parent's WHERE clause per-call.  The result table is rebuilt lazily
+	  when the underlying source data changes (cache invalidation propagates via
+	  updated() timestamps exactly as for leaf sources).  Returns undef on the
+	  array backend.  The 'auto' backend forces the SQLite path when dbi_source()
+	  is called so a parent always gets a usable handle.
+	- Limit / offset pagination: selectall_arrayref and selectall_array now
+	  accept limit => N (positive integer) and offset => M (non-negative integer).
+	  The SQLite path appends LIMIT ? OFFSET ? as bind parameters to the generated
+	  SQL (injection-safe).  The array path uses splice() on the ordered result.
+	  offset without limit uses LIMIT -1 OFFSET ? on the SQLite path (all rows
+	  from offset).  An invalid limit or offset emits a carp warning and the
+	  parameter is treated as absent.  count() and fetchrow_hashref ignore both
+	  parameters silently.
+	- Caller-specified ORDER BY on all query methods (selectall_arrayref,
+	  selectall_array, fetchrow_hashref, AUTOLOAD).  Pass order_by => 'col' for
+	  ascending or order_by => ['col', 'DESC'] for descending.  The SQLite
+	  backend translates this to a SQL ORDER BY clause (type-aware sort); the
+	  array backend re-sorts the in-memory result using Perl string comparison
+	  (cmp).  An unknown column or an invalid direction emits a carp and falls
+	  back to the default join_column ascending sort.  count() ignores order_by
+	  as row ordering does not affect a count.
+	- IS NULL and IS NOT NULL operators are now fully supported on the SQLite
+	  backend via explicit operator hashrefs ({ 'IS NULL' => undef }).  These
+	  operators generate no bind parameter — the fixed SQL keywords are
+	  interpolated, not caller values — so they are injection-safe.  A bare
+	  undef criterion value (col => undef) also generates IS NULL on the SQLite
+	  path (previously it silently generated col = NULL which never matches
+	  anything in SQL).
+	- IN and NOT IN list operators are now fully supported on the SQLite backend.
+	  The criterion value is an arrayref; each element becomes a separate bind
+	  parameter (col IN (?, ?, ...)) so injection via list elements is impossible.
+	  IN with an empty arrayref returns no rows (SQL 1=0 semantics); NOT IN with
+	  an empty arrayref adds no constraint (all rows match).  A non-arrayref value
+	  emits a carp warning and the criterion is skipped.
+	- count() on the SQLite backend now executes SELECT COUNT(*) against the
+	  cached join tables instead of fetching all rows.  The JOIN and WHERE
+	  clauses are the same as for selectall_arrayref, so criteria and join-type
+	  semantics are identical; only the SQL projection changes.  On large cached
+	  datasets this avoids transferring and allocating every row just to count
+	  them.  The array path and the 'auto' array-path fallback are unchanged.
+	- Add =head3 MESSAGES POD sections to all public methods (selectall_arrayref,
+	  selectall_array, fetchrow_hashref, count, columns, schema, updated,
+	  set_logger, AUTOLOAD) documenting every carp/croak each method can emit.
+	[ Bug fixes ]
+	- Fix: updated() now silently skips component databases that do not implement
+	  updated() or whose updated() throws.  Previously the exception propagated
+	  uncaught.  Consistent with the existing _cache_fresh() defensive pattern.
+	  Returns undef when no component database implements updated().
+	- Fix: LIKE and NOT LIKE operators now work correctly on the SQLite backend.
+	  Both operators use a single bind parameter (col LIKE ?) and are
+	  injection-safe.  Previously, LIKE/NOT LIKE were silently skipped on the
+	  SQLite path with no warning, causing silently wider results for callers
+	  who developed against a small dataset (array path) and deployed at scale
+	  (SQLite path).  Unknown operators now emit a carp warning instead of
+	  being silently ignored, so callers are not misled.
+
 0.006.0	Tue Sep 22 07:30:33 PM EDT 2026
 	[ Enhancements ]
 	- JSON backend support: Database::Join now works with JSON-backed

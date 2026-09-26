@@ -1,5 +1,6 @@
 Changes
 lib/Text/KDL/XS.pm
+lib/Text/KDL/XS/Cookbook.pod
 lib/Text/KDL/XS/Document.pm
 lib/Text/KDL/XS/Emitter.pm
 lib/Text/KDL/XS/Node.pm
@@ -10,12 +11,26 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/00-load.t
+t/01-load-standalone.t
 t/10-parse-basic.t
+t/11-parse-slashdash.t
+t/12-node.t
+t/13-value.t
 t/20-values.t
 t/30-streaming-source.t
+t/31-stream-errors.t
 t/40-emit.t
 t/41-emit-plain.t
+t/42-emit-numbers.t
+t/43-emit-identifiers.t
+t/44-emit-coercion.t
+t/45-emit-options.t
 t/50-errors.t
+t/52-comments.t
+t/60-unicode.t
+t/61-max-depth.t
+t/70-objects.t
+t/90-pod.t
 typemap
 XS.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)

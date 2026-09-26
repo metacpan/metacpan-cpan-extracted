@@ -1,21 +1,21 @@
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Query/Clause.pm
-## Version v1.1.1
+## Database Object Interface - ~/lib/DB/Object/Query/Clause.pm
+## Version v1.1.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/08
-## Modified 2026/03/26
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package DB::Object::Query::Clause;
 BEGIN
 {
     use strict;
     use common::sense;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( DB::Object::Query::Elements );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     use overload (
@@ -24,7 +24,7 @@ BEGIN
         fallback => 1,
     );
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.1.1';
+    our $VERSION = 'v1.1.2';
 };
 
 use strict;
@@ -76,7 +76,7 @@ sub as_string
 #         values => { type => 'array_as_object' },
 #     }, @_ ) );
 # }
-sub bind { warn( "Call to ", ref( $_[0] ), "->bind is now deprecated." ); }
+sub bind { warn( "Call to ", ref( $_[0] ), "->bind is now deprecated." ) if( warnings::enabled( 'DB::Object' ) ); }
 
 # sub fields { return( shift->_set_get_array_as_object( 'fields', @_ ) ); }
 # NOTE: sub fields is inherited from DB::Object::Query::Elements
@@ -346,7 +346,7 @@ And the associated values would be automatically bound to the query upon executi
 
 =head1 VERSION
 
-v1.1.1
+v1.1.2
 
 =head1 DESCRIPTION
 
@@ -406,6 +406,12 @@ If field objects were used such as:
 
 Then if needed, B<as_string> would prefix the field name with its associated table name
 
+=head2 bind
+
+    $clause->bind;
+
+Deprecated compatibility method. Calling it emits a warning when C<DB::Object> warnings are enabled. Binding information is maintained by the query element and statement APIs instead.
+
 =head2 fields
 
 An array reference of field objects (L<DB::Object::Fields::Field>)
@@ -414,15 +420,22 @@ The array itself is an object from L<Module::Generic::Array>
 
 =head2 generic
 
+    my $value = $clause->generic;
+
 Returns a string representing the SQL fragment with placeholder.
 
 The string returned is an object of L<Module::Generic::Scalar>
 
 =head2 length
 
+    my $value = $clause->length;
+
 Returns the length of the string in L</"value">
 
 =head2 metadata
+
+    my $value = $clause->metadata;
+    $clause->metadata( $value );
 
 Set or get an hash reference accessible as a dynamic class object from L<DB::Object::Query::Clause::Metadata>
 
@@ -433,6 +446,9 @@ Given an array of clauses, this will merge them into one new clause object.
 If the first value of the array is a L<DB::Object::Operator> such as L<DB::Object::Operator::AND> or L<DB::Object::Operator::OR>, the list will be taken from this object and the resulting sql statement will the operator value, ie C<AND> or C<OR> for example
 
 =head2 operator
+
+    my $value = $clause->operator;
+    $clause->operator( $value );
 
 Sets or get the operator used in this clause, if any.
 
@@ -448,6 +464,9 @@ Set or get the L<DB::Object::Query> object, which normally would have created th
 
 =head2 type
 
+    my $value = $clause->type;
+    $clause->type( $value );
+
 Set or get the type of clause this is, such as I<group>, I<having>, I<limit>, I<order>, I<where>
 
 The return value is a string that can be accessed as an object of L<Module::Generic::Scalar>
@@ -459,6 +478,8 @@ This is inherited from the L<DB::Object::Query::Elements>.
 This is used to get the type of all elements, as an L<array object|Module::Generic::Array>
 
 =head2 value
+
+    my $value = $clause->value;
 
 The SQL fragment as a string. The return value is a string that can be accessed as an object of L<Module::Generic::Scalar>
 

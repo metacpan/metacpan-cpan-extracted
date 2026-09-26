@@ -22,7 +22,7 @@ no_index:
 provides:
   CPAN::Maker::Bootstrapper:
     file: lib/CPAN/Maker/Bootstrapper.pm
-    version: v2.2.3
+    version: v2.3.3
   CPAN::Maker::Bootstrapper::ConfigReader:
     file: lib/CPAN/Maker/Bootstrapper/ConfigReader.pm
     version: '0'
@@ -40,7 +40,7 @@ provides:
     version: '0'
   CPAN::Maker::Bootstrapper::Role::ExtraFiles:
     file: lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm
-    version: '0'
+    version: v2.3.3
   CPAN::Maker::Bootstrapper::Role::Filter:
     file: lib/CPAN/Maker/Bootstrapper/Role/Filter.pm
     version: '0'
@@ -49,7 +49,7 @@ provides:
     version: '0'
   CPAN::Maker::Bootstrapper::Role::Installer:
     file: lib/CPAN/Maker/Bootstrapper/Role/Installer.pm
-    version: v2.2.3
+    version: v2.3.3
   CPAN::Maker::Bootstrapper::Role::LLM::Annotator:
     file: lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm
     version: '0'
@@ -65,11 +65,17 @@ provides:
   CPAN::Maker::Bootstrapper::Role::LLM::Utils:
     file: lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm
     version: '0'
+  CPAN::Maker::Bootstrapper::Role::Provides:
+    file: lib/CPAN/Maker/Bootstrapper/Role/Provides.pm
+    version: '0'
   CPAN::Maker::Bootstrapper::Role::ResolveVars:
     file: lib/CPAN/Maker/Bootstrapper/Role/ResolveVars.pm
     version: '0'
   CPAN::Maker::Bootstrapper::Role::ScaffoldImporter:
     file: lib/CPAN/Maker/Bootstrapper/Role/ScaffoldImporter.pm
+    version: '0'
+  CPAN::Maker::Bootstrapper::Role::Version:
+    file: lib/CPAN/Maker/Bootstrapper/Role/Version.pm
     version: '0'
   Git::ReleaseDiffs:
     file: lib/Git/ReleaseDiffs.pm
@@ -78,9 +84,12 @@ provides:
     file: lib/Text/ASCIITable/FixANSI.pm
     version: v1.0.0
 requires:
-  CLI::Simple: v2.2.1
-  CLI::Simple::Constants: v2.2.1
-  CLI::Simple::Utils: v2.2.1
+  CLI::Simple: v2.2.2
+  CLI::Simple::Constants: v2.2.2
+  CLI::Simple::Utils: v2.2.2
+  CPAN::Maker: v2.0.11
+  CPAN::Maker::Role::ModuleUtils: v2.0.10
+  CPAN::Maker::Role::Provides: '0'
   Class::Accessor::Fast: '0.51'
   Config::Tiny: '2.30'
   Email::Valid: '1.204'
@@ -104,5 +113,5 @@ resources:
   bugtracker: http://github.com/rlauer6/CPAN-Maker-Bootstrapper/issues
   homepage: http://github.com/rlauer6/CPAN-Maker-Bootstrapper
   repository: git://github.com/rlauer6/CPAN-Maker-Bootstrapper.git
-version: v2.2.3
+version: v2.3.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

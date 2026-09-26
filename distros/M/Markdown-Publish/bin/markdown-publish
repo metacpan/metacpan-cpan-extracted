@@ -1,0 +1,188 @@
+#!/usr/bin/env perl
+
+#
+#  This file is part of Markdown::Publish.
+#
+#  This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
+#
+#  Full license text is available at:
+#
+#  <http://dev.perl.org/licenses/>
+#
+
+use strict;
+use vars qw($VERSION);
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use Markdown::Publish;
+use Markdown::Publish::Constant;
+
+$VERSION='1.003';
+
+
+sub main {
+
+    my (%opt, @source_dn);
+    GetOptions(
+        'module=s'  => \$opt{'module'},
+        'config=s'  => \$opt{'config'},
+        'source=s'  => \@source_dn,
+        'name=s'    => \$opt{'name'},
+        'base=s'    => \$opt{'base'},
+        'output=s'  => \$opt{'output'},
+        'branch=s'  => \$opt{'branch'},
+        'version'   => \$opt{'version'},
+        'help'      => \$opt{'help'}
+    ) || die "invalid options\n";
+    if ($opt{'help'}) {
+        print "Usage: markdown-publish ACTION [options]\n";
+        print "Actions: build, serve, gh, cloudflare\n";
+        return 0;
+    }
+    if ($opt{'version'}) {
+        print "markdown-publish $VERSION\n";
+        return 0;
+    }
+
+    my $action=shift(@ARGV) || 'build';
+    die "unexpected arguments: @ARGV\n" if @ARGV;
+    die "--module cannot override a configuration file\n"
+        if defined($opt{'module'}) && ($opt{'config'} || -f $MARKDOWN_PUBLISH_CONFIG_FN);
+    my $publish_or;
+    if ($opt{'config'}) {
+        $publish_or=Markdown::Publish->load_config($opt{'config'});
+    }
+    elsif (-f $MARKDOWN_PUBLISH_CONFIG_FN) {
+        $publish_or=Markdown::Publish->load_config($MARKDOWN_PUBLISH_CONFIG_FN);
+    }
+    else {
+        my %config;
+        $config{'module'}=$opt{'module'} if defined($opt{'module'});
+        $publish_or=Markdown::Publish->new(\%config);
+    }
+    $publish_or->{'sources'}=\@source_dn if @source_dn;
+    foreach my $name (qw(name base output branch)) {
+        $publish_or->{$name}=$opt{$name} if defined($opt{$name});
+    }
+    $publish_or->run($action);
+    return 0;
+
+}
+
+
+exit(main());
+
+__END__
+
+=begin markdown
+
+# NAME
+
+markdown-publish - build, preview, and publish Perl distribution documentation
+
+# USAGE
+
+```sh
+markdown-publish build
+markdown-publish serve --config doc/project.json
+markdown-publish gh --config doc/project.json
+markdown-publish gh-push --config doc/project.json
+markdown-publish cloudflare --config doc/project.json
+```
+
+`build` prepares and renders the site. `serve` starts the selected engine's
+foreground local server. `gh` builds, updates the configured publication
+branch, and leaves it local. Push that branch through the repository's normal
+Git workflow. `gh-push` performs the same operation and then pushes the
+publication branch to `origin`.
+
+`cloudflare` builds the selected engine and deploys its output to a Cloudflare
+Worker using the `cloudflare.config` Wrangler file in the JSON configuration.
+It does not change a Git branch or push to GitHub.
+
+MkDocs is used when no backend is selected. `--module` selects a backend when
+no configuration file is used. Otherwise put `module` in the JSON configuration.
+`MARKDOWN_PUBLISH_MODULE` overrides either selection. Bundled publishers may be
+selected with `mkdocs`, `vitepress`, `docusaurus`, or `starlight`; a fully
+qualified name may select another installed subclass. Without `--config`, an
+existing `doc/project.json` is read automatically. Other options are repeatable
+`--source DIRECTORY`, `--name`, `--base`, `--output`, and `--branch`. The base
+must begin and end with `/`. For `gh` and `gh-push`, it defaults to the path
+implied by the `origin` repository name: `/<repository>/`, or `/` for an
+`<owner>.github.io` repository.
+
+`--version` prints the installed program version.
+
+# AUTHOR
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of Markdown::Publish.
+
+This software is copyright (c) 2026 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
+
+
+=end markdown
+
+
+=head1 NAME
+
+markdown-publish - build, preview, and publish Perl distribution documentation
+
+
+=head1 USAGE
+
+
+ markdown-publish build
+ markdown-publish serve --config doc/project.json
+ markdown-publish gh --config doc/project.json
+ markdown-publish gh-push --config doc/project.json
+ markdown-publish cloudflare --config doc/project.json
+C<build> prepares and renders the site. C<serve> starts the selected engine's
+foreground local server. C<gh> builds, updates the configured publication
+branch, and leaves it local. Push that branch through the repository's normal
+Git workflow. C<gh-push> performs the same operation and then pushes the
+publication branch to C<origin>.
+
+C<cloudflare> builds the selected engine and deploys its output to a Cloudflare
+Worker using the C<cloudflare.config> Wrangler file in the JSON configuration.
+It does not change a Git branch or push to GitHub.
+
+MkDocs is used when no backend is selected. C<--module> selects a backend when
+no configuration file is used. Otherwise put C<module> in the JSON configuration.
+C<MARKDOWN_PUBLISH_MODULE> overrides either selection. Bundled publishers may be
+selected with C<mkdocs>, C<vitepress>, C<docusaurus>, or C<starlight>; a fully
+qualified name may select another installed subclass. Without C<--config>, an
+existing C<doc/project.json> is read automatically. Other options are repeatable
+C<--source DIRECTORY>, C<--name>, C<--base>, C<--output>, and C<--branch>. The base
+must begin and end with C</>. For C<gh> and C<gh-push>, it defaults to the path
+implied by the C<origin> repository name: C<<< /<repository>/ >>>, or C</> for an
+C<<< <owner>.github.io >>> repository.
+
+C<--version> prints the installed program version.
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2026 by Andrew Speer. It may be distributed
+under the same terms as Perl itself.
+
+=cut

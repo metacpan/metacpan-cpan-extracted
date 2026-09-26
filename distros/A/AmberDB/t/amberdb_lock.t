@@ -30,7 +30,7 @@ subtest 'Record Level Write Lock' => sub {
     my $fh = $adb->flock_open( 'test_table', 'write', 101 );
     ok( $fh, 'Record write lock handle acquired' );
 
-    my $lock_file = File::Spec->catfile( $adb->ramdisk_lock_dir(), 'test_table_101.lock' );
+    my $lock_file = File::Spec->catfile( $adb->path('lock_dir'), 'test_table_101.lock' );
     ok( -e $lock_file, 'Record lock file exists on disk' );
 
     ok( $adb->flock_close( 'test_table', 101 ), 'Record lock closed' );
@@ -52,7 +52,7 @@ subtest 'Table Level Lock' => sub {
     my $fh = $adb->flock_open( 'test_table', 'write' );
     ok( $fh, 'Table lock handle acquired' );
 
-    my $lock_file = File::Spec->catfile( $adb->ramdisk_lock_dir(), 'test_table.lock' );
+    my $lock_file = File::Spec->catfile( $adb->path('lock_dir'), 'test_table.lock' );
     ok( -e $lock_file, 'Table lock file exists on disk' );
 
     ok( $adb->flock_close('test_table'), 'Table lock closed' );

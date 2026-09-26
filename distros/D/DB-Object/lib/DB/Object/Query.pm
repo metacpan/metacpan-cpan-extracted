@@ -1,13 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version v0.10.0
+## Version v0.10.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/27
+## Modified 2026/09/15
 ## All rights reserved
-## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -17,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( DB::Object );
     use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use DB::Object::Query::Clause;
@@ -26,7 +26,7 @@ BEGIN
     use Wanted;
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.10.0';
+    our $VERSION = 'v0.10.2';
 };
 
 use strict;
@@ -72,7 +72,7 @@ sub init
     $self->{query_reset}    = 0;
     $self->{query_reset_core_keys} = [qw(
         alias binded binded_group binded_limit binded_order binded_types binded_values
-        binded_where dirty from_unixtime group_by having limit local order_by reverse
+        binded_where dirty from_unixtime group_by having is_upsert limit local order_by reverse
         sorted table_alias unix_timestamp where
         from_table join_fields join_tables left_join prepare_options query_values constant
         query selected_fields tie_order
@@ -263,10 +263,8 @@ sub enhance { return( shift->_set_get_boolean( 'enhance', @_ ) ); }
 sub error
 {
     my $self = shift( @_ );
-
     # Query object is now in an error state and must not be re-used.
     $self->{dirty} = 1 if( ref( $self ) );
-
     return( $self->SUPER::error( @_ ) );
 }
 
@@ -277,12 +275,14 @@ sub final { return( shift->_set_get_scalar( 'final', @_ ) ); }
 
 sub format_from_epoch
 {
-    warn( "This method \"format_from_epoch\" was not superseded.\n" );
+    my $self = shift( @_ );
+    warn( "This method \"format_from_epoch\" was not superseded." ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
 }
 
 sub format_to_epoch
 {
-    warn( "This method \"format_to_epoch\" was not superseded.\n" );
+    my $self = shift( @_ );
+    warn( "This method \"format_to_epoch\" was not superseded." ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
 }
 
 # NOTE: For select or insert queries
@@ -416,8 +416,8 @@ sub format_statement
                 $elem->format( $value );
             }
             elsif( $value =~ /^\d+$/ && 
-                   $struct->{ $_ } =~ /\bENUM\(/i && 
-                      ( $query_type eq 'insert' || $query_type eq 'update' ) )
+                   $struct->{ $_ } =~ /\bENUM\(/i &&
+                   ( $query_type eq 'insert' || $query_type eq 'update' ) )
             {
                 $elem->format( "'$value'" );
             }
@@ -686,7 +686,7 @@ sub getdefault
     my $unix_time   = $opts->{unix_timestamp} || $self->unix_timestamp;
     my $from_unix   = $opts->{from_unixtime} || $self->from_unixtime;
 
-    my $enhance     = $tbl_o->enhance;
+    my $enhance     = $self->enhance;
     # Need to do hard copy of hashes
     $default   = $tbl_o->default || return( $self->pass_error( $tbl_o->error ) );
     $fields    = $tbl_o->fields || return( $self->pass_error( $tbl_o->error ) );
@@ -854,7 +854,6 @@ sub getdefault
         %from_unixtime = %$from_unix;
     }
 
-
     $self->{_args}      = $arg;
     $self->{_default}   = $default;
     $self->{_fields}    = $fields;
@@ -889,7 +888,7 @@ sub insert
 {
     my $self = shift( @_ );
     # Could be an array of fields, or a SQL statement object.
-    my $data = shift( @_ ) if( @_ == 1 && ref( $_[ 0 ] ) );
+    my $data = shift( @_ ) if( @_ == 1 && ref( $_[0] ) );
     my @arg  = @_;
     my $constant = $self->constant;
     if( scalar( keys( %$constant ) ) )
@@ -994,7 +993,7 @@ sub insert
 
     if( $data && $self->_is_hash( $data => 'strict' ) && $el->types->length )
     {
-        warn( "You have passed arguments to this insert as hash reference, and you are using placeholders. Using placeholders requires fixed order of arguments which an hash reference cannot guarantee. This will potentially lead to error when executing the query. I recommend you switch to an array of arguments instead, i.e. from { field1 => value1, field2 => value2 } to ( field1 => value1, field2 => value2 ), or to use numbered placeholders like \$1, \$2, etc...\n" );
+        warn( "You have passed arguments to this insert as hash reference, and you are using placeholders. Using placeholders requires fixed order of arguments which an hash reference cannot guarantee. This will potentially lead to error when executing the query. I recommend you switch to an array of arguments instead, i.e. from { field1 => value1, field2 => value2 } to ( field1 => value1, field2 => value2 ), or to use numbered placeholders like \$1, \$2, etc..." ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
     }
     my $clauses = $self->_query_components( 'insert' ) || return( $self->pass_error );
     push( @query, @$clauses ) if( scalar( @$clauses ) );
@@ -1076,6 +1075,8 @@ sub local
     # return( "SET $str" );
     return( $str );
 }
+
+sub lock { return( shift->error( "Locking mechanism is not supported by this driver." ) ); }
 
 sub new_clause
 {
@@ -1163,7 +1164,7 @@ sub reset
         # so that _save_bind() on each fresh select() starts from an empty element stack.
         $self->{elements} = $self->new_elements;
         $self->{query_reset}++;
-        $self->{enhance} = 1;
+        # $self->{enhance} = 1;
     }
     return( $self );
 }
@@ -1205,7 +1206,6 @@ sub select
     return( $self->error( "No table name provided to perform select statement." ) );
     my $bind     = $tbl_o->use_bind;
     my $cache    = $tbl_o->use_cache;
-    # my $multi_db = $tbl_o->param( 'multi_db' );
     my $multi_db = $tbl_o->prefix_database;
     my $db       = $tbl_o->database();
     my $fields   = '';
@@ -1323,11 +1323,11 @@ sub select
         $fields = $elems->fields->join( ', ' );
     }
 
-    my $tie   = $self->tie();
+    my $tie     = $self->tie();
     my $clauses = $self->_query_components( 'select' ) || return( $self->pass_error );
-    my $vars  = $self->local();
+    my $vars    = $self->local();
     # You may not sort if there is no order clause
-    my $sort  = $self->reverse() ? 'DESC' : $self->sort() ? 'ASC' : '';
+    my $sort    = $self->reverse() ? 'DESC' : $self->sort() ? 'ASC' : '';
     # my @query = $multi_db ? ( "SELECT $fields FROM $db.$table" ) : ( "SELECT $fields FROM $table" );
     # $table comes from $tbl->qualified_name which automatically sets itself with the right prefixes based on the prefixed() settings
     my $table_alias = '';
@@ -2249,7 +2249,7 @@ sub _where_having
                         if( scalar( @arg ) && 
                             $self->_is_a( $arg[0], 'DB::Object::Fields::Field' ) )
                         {
-                            warn( "Warning only: found a (proper) field value assignment ($f) followed by a field object '$arg[0]' (never mind the surrounding quotes) (", overload::StrVal( $arg[0] ), "). Did you forget to assign a value such as \$tbl->fo->$arg[0] == 'something' ?\n" );
+                            warn( "Warning only: found a (proper) field value assignment ($f) followed by a field object '$arg[0]' (never mind the surrounding quotes) (", overload::StrVal( $arg[0] ), "). Did you forget to assign a value such as \$tbl->fo->$arg[0] == 'something' ?" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
                         }
                         next;
                     }
@@ -2277,7 +2277,7 @@ sub _where_having
                     # The coder provided a field object without associated value and there are no other argument passed to the where clause. He/she probably forget the assignment like $tbl->fo->field == 'something'
                     elsif( $self->_is_a( $arg[0], 'DB::Object::Fields::Field' ) && scalar( @arg ) == 1 )
                     {
-                        warn( "Warning only: found a field object '$arg[0]' (never mind the surrounding quotes) (", overload::StrVal( $arg[0] ), ") followed by no other argument. Did you forget to assign a value such as \$tbl->fo->$arg[0] == 'something' ?\n" );
+                        warn( "Warning only: found a field object '$arg[0]' (never mind the surrounding quotes) (", overload::StrVal( $arg[0] ), ") followed by no other argument. Did you forget to assign a value such as \$tbl->fo->$arg[0] == 'something' ?" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
                     }
 
                     my( $field, $value ) = splice( @arg, 0, 2 );
@@ -2285,7 +2285,7 @@ sub _where_having
                     if( $self->_is_a( $field, 'DB::Object::Fields::Field' ) && 
                         $self->_is_a( $value, 'DB::Object::Fields::Overloaded' ) )
                     {
-                        warn( "Warning only: found a field object '$field' (never mind the surrounding quotes) (", overload::StrVal( $field ), ") followed by an another (proper) field value assignment ($value). Did you forget to assign a value such as \$tbl->fo->$field == 'something' ?\n" );
+                        warn( "Warning only: found a field object '$field' (never mind the surrounding quotes) (", overload::StrVal( $field ), ") followed by an another (proper) field value assignment ($value). Did you forget to assign a value such as \$tbl->fo->$field == 'something' ?" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
                     }
 
                     unless( $self->_is_a( $field => 'DB::Object::Fields::Field' ) )
@@ -2424,6 +2424,12 @@ sub _where_having
                             placeholder => $plh,
                             format      => $value,
                         );
+                        my $const;
+                        if( lc( $fields_type->{ $field } // '' ) eq 'bytea' &&
+                            ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                        {
+                            $el->type( $const );
+                        }
                         $cl->push( $el );
                         push( @list, $cl );
                     }
@@ -2537,7 +2543,7 @@ sub FREEZE
     my $class = CORE::ref( $self );
     my $hash  = {};
     my @keys  = grep{ !/^binded_/ } @{$self->{query_reset_core_keys}};
-    push( @keys, qw( elements table_object ) );
+    push( @keys, qw( elements table_object enhance ) );
     foreach my $prop ( @keys )
     {
         if( CORE::exists( $self->{ $prop } ) &&
@@ -2670,7 +2676,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-    v0.10.0
+    v0.10.2
 
 =head1 DESCRIPTION
 
@@ -2680,9 +2686,14 @@ This is the base class for this L<DB::Object> query formatter.
 
 =head2 alias
 
+    my $value = $query->alias;
+    $query->alias( $value );
+
 Sets or gets an hash of column name to alias.
 
 =head2 as_string
+
+    my $value = $query->as_string;
 
 Returns the formatted query as a string.
 
@@ -2704,13 +2715,19 @@ Takes a list or array reference of values to bind in the next query in L<DB::Obj
 
 =head2 binded_group
 
+    my $value = $query->binded_group;
+
 This returns the values to bind for the C<group> clause of the query. This returns a L<Module::Generic::Array> object.
 
 =head2 binded_limit
 
+    my $value = $query->binded_limit;
+
 This returns the values to bind for the C<limit> clause of the query. This returns a L<Module::Generic::Array> object.
 
 =head2 binded_order
+
+    my $value = $query->binded_order;
 
 This returns the values to bind for the C<order> clause of the query. This returns a L<Module::Generic::Array> object.
 
@@ -2728,6 +2745,8 @@ Takes a list or array reference of values to bind in the next query in L<DB::Obj
 
 =head2 binded_where
 
+    my $value = $query->binded_where;
+
 This returns the values to bind for the C<where> clause of the query. This returns a L<Module::Generic::Array> object.
 
 =head2 constant
@@ -2737,6 +2756,8 @@ If any argument is provided, this expects an hash reference of constants to valu
 It returns the currently set constants as a hash reference.
 
 =head2 database_object
+
+    my $value = $query->database_object;
 
 Returns the current database object, which should be driver specific like L<DB::Object::Postgres>
 
@@ -2752,11 +2773,16 @@ It returns the newly created statement handler as a L<DB::Object::Statement>
 
 =head2 dirty
 
+    my $value = $query->dirty;
+
 Defines whether this query object is dirty or not, and this means whether it has suffered from an error, and is in a stalled state, thus unusable. This state is checked by L<DB::Object> when setting or reetting the query object for a table object.
 
 Return the current boolean value.
 
 =head2 elements
+
+    my $value = $query->elements;
+    $query->elements( $value );
 
 Sets or gets an L<DB::Object::Query::Elements> object. This object serves to contain all the elements used in creating SQL queries, keeping track of their order, value, dta types, placeholders used, etc.
 
@@ -2764,7 +2790,11 @@ Sets or gets an L<DB::Object::Query::Elements> object. This object serves to con
 
 Enable or disable enhancement mode.
 
-=for Pod::Coverage error
+=head2 error
+
+Sets or returns an error using the inherited L<Module::Generic/error> mechanism. Before propagating the error, the query is marked dirty so that an errored query object is not silently reused.
+
+    return( $query->error( "Invalid query" ) );
 
 =head2 final
 
@@ -2992,6 +3022,8 @@ It returns a new L<DB::Object::Tables> object with all the data prepared within.
 
 =head2 group
 
+    my $value = $query->group;
+
 Format the C<group by> portion of the query by calling L</_group_order>
 
 It returns a new L<DB::Object::Query::Clause> object.
@@ -3021,21 +3053,36 @@ It returns the statement object.
 
 =head2 is_upsert
 
+    my $value = $query->is_upsert;
+    $query->is_upsert( $value );
+
 Sets or gets the boolean value if the query is an C<upsert>, which means a C<insert> or C<update> query that uses an C<ON CONFLICT> clause. See L<DB::Object::Postgres::Query/on_conflict>
 
 =head2 join_fields
+
+    my $value = $query->join_fields;
+    $query->join_fields( $value );
 
 Sets or gets the join fields. This is a regular string.
 
 =head2 join_tables
 
+    my $value = $query->join_tables;
+    $query->join_tables( $value );
+
 Sets or gets the table joined. This returns a L<Module::Generic::Array>
 
 =head2 left_join
 
+    my $value = $query->left_join;
+    $query->left_join( $value );
+
 Sets or gets an hash reference of column joint column pairs
 
 =head2 limit
+
+    my $value = $query->limit;
+    $query->limit( $value );
 
 Set or get the limit for the future statement, by calling L</_process_limit>
 
@@ -3047,17 +3094,25 @@ Provided with a variable name and value pairs and this will set them.
 
 It returns the formated declaration as a string.
 
+=head2 lock
+
+Base implementation for query locking. Drivers that support query-level locking override this method. The base implementation returns an error indicating that locking is unsupported by the current driver.
+
+    $query->lock( 'FOR UPDATE' );
+
 =head2 new_clause
+
+    my $value = $query->new_clause;
 
 This returns a new L<DB::Object::Query::Clause> object.
 
 =head2 new_element
 
-Instantiate a new L<DB::Object::Query::Element> object, passing it whatever arguments were provided and sharing wit it the value of the L</debug> flag.
+Instantiate a new L<DB::Object::Query::Element> object, passing it whatever arguments were provided and sharing wit it the value of the L<Module::Generic/debug> flag.
 
 =head2 new_elements
 
-Instantiate a new L<DB::Object::Query::Elements> object, passing it whatever arguments were provided and sharing wit it the value of the L</debug> flag.
+Instantiate a new L<DB::Object::Query::Elements> object, passing it whatever arguments were provided and sharing wit it the value of the L<Module::Generic/debug> flag.
 
 =head2 order
 
@@ -3065,15 +3120,25 @@ Provided with a list of parameter and this will format the C<order> clause by ca
 
 It returns a new L<DB::Object::Query::Clause> object.
 
-=for Pod::Coverage pass_error
+=head2 pass_error
+
+Propagates an existing error using the inherited L<Module::Generic/pass_error> mechanism and marks the query dirty before returning.
+
+    return( $query->pass_error( $other->error ) );
 
 =head2 prepare_options
+
+    my $value = $query->prepare_options;
+    $query->prepare_options( $value );
 
 Sets or gets the options that will be used in L<DB::Object/_cache_this>, which is taked with preparing statement when they are not already cached.
 
 This method basically handles an hash reference of properties set by L<DB::Object::Query> and their inheriting packages. Currently only PostgreSQL makes use of this with L<DB::Object::Postgres::Query/dollar_placeholder> and L<DB::Object::Postgres::Query/server_prepare>
 
 =head2 query
+
+    my $value = $query->query;
+    $query->query( $value );
 
 Sets or gets the query string. It returns whatever is set as a regular string.
 
@@ -3082,6 +3147,8 @@ Sets or gets the query string. It returns whatever is set as a regular string.
 Reset the query object to its nominal value so it can be re-used.
 
 =head2 query_reset_core_keys
+
+    my $value = $query->query_reset_core_keys;
 
 Returns an L<Module::Generic::Array> object of core object properties shared with inheriting package.
 
@@ -3095,9 +3162,15 @@ This contains driver specific properties and together with the ones provided wit
 
 =head2 query_type
 
+    my $value = $query->query_type;
+    $query->query_type( $value );
+
 Sets or gets the query type, such as C<delete>, C<insert>, C<select>, C<update>, etc.
 
 =head2 query_values
+
+    my $value = $query->query_values;
+    $query->query_values( $value );
 
 Sets or gets the query values.
 
@@ -3145,6 +3218,9 @@ It returns the statement object (DB::Object::Statement).
 
 =head2 selected_fields
 
+    my $value = $query->selected_fields;
+    $query->selected_fields( $value );
+
 Sets or gets the string representing the list of columns used in previous C<select> statement.
 
 Returns a regular string.
@@ -3154,6 +3230,9 @@ Returns a regular string.
 Set the query to use normal sorting order.
 
 =head2 sorted
+
+    my $value = $query->sorted;
+    $query->sorted( $value );
 
 Sets or gets the list of sorted columns used in statements. This returns a L<Module::Generic::Array> object.
 
@@ -3166,6 +3245,9 @@ This method should be called by L<DB::Object::Tables/as>. If you change this dir
 Returns the current value.
 
 =head2 table_object
+
+    my $value = $query->table_object;
+    $query->table_object( $value );
 
 Sets or gets the table object. This will return a L<DB::Object::Tables> object
 
@@ -3357,7 +3439,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2018-2026 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

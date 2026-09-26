@@ -28,9 +28,12 @@ WriteMakefile(
   MAN1PODS         =>     {}
 ,
   PREREQ_PM        => {
-      'CLI::Simple' => '2.2.1',
-      'CLI::Simple::Constants' => '2.2.1',
-      'CLI::Simple::Utils' => '2.2.1',
+      'CLI::Simple' => '2.2.2',
+      'CLI::Simple::Constants' => '2.2.2',
+      'CLI::Simple::Utils' => '2.2.2',
+      'CPAN::Maker' => '2.0.11',
+      'CPAN::Maker::Role::ModuleUtils' => '2.0.10',
+      'CPAN::Maker::Role::Provides' => '0',
       'Class::Accessor::Fast' => '0.51',
       'Config::Tiny' => '2.30',
       'Email::Valid' => '1.204',
@@ -51,8 +54,8 @@ WriteMakefile(
       'YAML::Tiny' => '1.76'
     },
   BUILD_REQUIRES   => {
-    'ExtUtils::MakeMaker'     => '6.64',
-    'File::ShareDir::Install' => 0,
+      'ExtUtils::MakeMaker' => '6.64',
+      'File::ShareDir::Install' => 0
     },
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker'     => '6.64',
@@ -76,7 +79,7 @@ WriteMakefile(
       'provides'=>{
                       'CPAN::Maker::Bootstrapper'=>{
                                                        'file'=>'lib/CPAN/Maker/Bootstrapper.pm',
-                                                       'version'=>'2.2.3'
+                                                       'version'=>'2.3.3'
                                                      },
                       'CPAN::Maker::Bootstrapper::ConfigReader'=>{
                                                                      'file'=>'lib/CPAN/Maker/Bootstrapper/ConfigReader.pm',
@@ -100,7 +103,7 @@ WriteMakefile(
                                                                    },
                       'CPAN::Maker::Bootstrapper::Role::ExtraFiles'=>{
                                                                          'file'=>'lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm',
-                                                                         'version'=>'undef'
+                                                                         'version'=>'2.3.3'
                                                                        },
                       'CPAN::Maker::Bootstrapper::Role::Filter'=>{
                                                                      'file'=>'lib/CPAN/Maker/Bootstrapper/Role/Filter.pm',
@@ -112,7 +115,7 @@ WriteMakefile(
                                                                  },
                       'CPAN::Maker::Bootstrapper::Role::Installer'=>{
                                                                         'file'=>'lib/CPAN/Maker/Bootstrapper/Role/Installer.pm',
-                                                                        'version'=>'2.2.3'
+                                                                        'version'=>'2.3.3'
                                                                       },
                       'CPAN::Maker::Bootstrapper::Role::LLM::Annotator'=>{
                                                                              'file'=>'lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm',
@@ -134,6 +137,10 @@ WriteMakefile(
                                                                          'file'=>'lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm',
                                                                          'version'=>'undef'
                                                                        },
+                      'CPAN::Maker::Bootstrapper::Role::Provides'=>{
+                                                                       'file'=>'lib/CPAN/Maker/Bootstrapper/Role/Provides.pm',
+                                                                       'version'=>'undef'
+                                                                     },
                       'CPAN::Maker::Bootstrapper::Role::ResolveVars'=>{
                                                                           'file'=>'lib/CPAN/Maker/Bootstrapper/Role/ResolveVars.pm',
                                                                           'version'=>'undef'
@@ -142,6 +149,10 @@ WriteMakefile(
                                                                                'file'=>'lib/CPAN/Maker/Bootstrapper/Role/ScaffoldImporter.pm',
                                                                                'version'=>'undef'
                                                                              },
+                      'CPAN::Maker::Bootstrapper::Role::Version'=>{
+                                                                      'file'=>'lib/CPAN/Maker/Bootstrapper/Role/Version.pm',
+                                                                      'version'=>'undef'
+                                                                    },
                       'Git::ReleaseDiffs'=>{
                                                'file'=>'lib/Git/ReleaseDiffs.pm',
                                                'version'=>'undef'

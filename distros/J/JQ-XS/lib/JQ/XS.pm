@@ -25,7 +25,7 @@ BEGIN {
   require JSON::PP unless JSON::PP::Boolean->can('((');
 }
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 XSLoader::load('JQ::XS', $VERSION);
 
@@ -246,6 +246,29 @@ boolean identity and is treated as an ordinary number/string. On perl
 anywhere in the structure.
 
 =back
+
+=head2 Number handling
+
+jq holds every number as an IEEE double, so that is the precision a value
+has once it has been through a filter.  This is invisible on most perls,
+whose NVs are doubles as well, but a perl built with C<-Duselongdouble> or
+C<-Dusequadmath> carries more precision in an NV than jq can represent, and
+a number that makes the round trip comes back as the nearest double:
+
+  # on a perl whose archname ends in -ld or -quadmath
+  my ($n) = JQ::XS->new('.')->process(3.14);
+  print $n;    # 3.14000000000000012, the double nearest 3.14
+
+Nothing is lost beyond double precision, and the value is the same one jq
+itself would compute; only the digits an over-wide NV would have kept are
+gone.  Where that matters, narrow the input to a double first, so both
+sides agree:
+
+  my $n = unpack 'd', pack 'd', 3.14;
+
+C<process_json()> is not affected.  It returns JSON text straight from jq,
+which from jq 1.7 onwards reproduces the literal of any number it has not
+done arithmetic on, so precision beyond a double survives intact.
 
 =head2 process_json($json_text, %options)
 

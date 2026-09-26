@@ -1,0 +1,37 @@
+---
+abstract: 'Parse SQL into a plain Perl data structure and back again'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000121'
+  perl: '5.042'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  FFI::Build::File::Cargo: '0'
+  FFI::Build::MM: '0.83'
+  perl: '5.042'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-AST-Simple
+recommends:
+  Cpanel::JSON::XS: '0'
+requires:
+  FFI::Platypus: '2.00'
+  FFI::Platypus::Lang::Rust: '0'
+  JSON::MaybeXS: '0'
+  Ref::Util: '0'
+  perl: '5.042'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/uperl/SQL-AST-Simple/issues
+  homepage: https://metacpan.org/pod/SQL::AST::Simple
+  repository: git://github.com/uperl/SQL-AST-Simple.git
+version: '0.01'
+x_generated_by_perl: v5.42.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

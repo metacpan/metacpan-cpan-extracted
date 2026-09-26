@@ -7,6 +7,7 @@ use strict;
 use warnings FATAL => 'all';
 use Cwd 'abs_path';
 use File::Basename 'dirname';
+use File::Temp 'tempdir';
 use Chem::Structure::Parser;
 use Test::Exception;
 use Test::More;
@@ -194,6 +195,74 @@ lives_ok  { structure_info($file, model => 'all') } "model => 'all' is allowed";
 	my $on = structure_info($file, dssp => 1);
 	is($on->{dssp}, $on->{features}{dssp}, 'dssp => 1 leaves the view at {dssp}');
 	ok(!exists structure_info($file)->{dssp}, 'and without it there is no such key');
+}
+
+#--------
+# the torsions view: each chain's torsions hash, keyed by chain id, with the
+# residue_order the arrays are parallel to.  A structure whose chains are of
+# different kinds is the case it is for, and no fixture is one with real
+# geometry on both sides -- mini.pdb's chains are synthetic, and give chain A
+# an omega and chain B nothing -- so fold.pdb's protein chain A and aform.pdb's
+# DNA chain B are joined into one file here, record for record.
+#--------
+{
+	my $dir = tempdir(CLEANUP => 1);
+	my $mixed = "$dir/mixed.pdb";
+	open my $out, '>', $mixed or die "Can't open '$mixed' with mode '>': '$!'";
+	for my $part ("$data/fold.pdb", "$data/aform.pdb") {
+		open my $in, '<', $part or die "Can't open '$part' with mode '<': '$!'";
+		print {$out} grep { /^(?:ATOM|HETATM)/ } <$in>;
+		print {$out} "TER\n";
+		close $in or die "Can't close '$part': '$!'";
+	}
+	print {$out} "END\n";
+	close $out or die "Can't close '$mixed': '$!'";
+
+	# what each chain is on its own, from the structure the view comes out of
+	my $expect = sub {
+		my ($f, $id) = @_;
+		my $c = structure_info($f)->{chains}{$id};
+		return { %{ $c->{torsions} }, residue_order => $c->{residue_order} };
+	};
+	my $t = structure_info($mixed, 'torsions');
+	is_deeply([ sort keys %$t ], [ qw(A B) ], 'torsions view: keyed by chain id');
+	is_deeply([ sort keys %{ $t->{A} } ], [ qw(chi omega phi psi residue_order) ],
+		'the protein chain carries the amino acid torsions and nothing else');
+	is_deeply([ sort keys %{ $t->{B} } ],
+		[ qw(alpha beta chi delta epsilon gamma glycosidic nu pucker
+		     pucker_amplitude pucker_phase residue_order zeta) ],
+		'and the DNA chain beside it the nucleotide ones');
+	is_deeply($t->{A}, $expect->("$data/fold.pdb", 'A'),
+		'the protein chain is what it is in a file of its own');
+	is_deeply($t->{B}, $expect->("$data/aform.pdb", 'B'),
+		'and so is the DNA chain');
+	for my $id (qw(A B)) {
+		my $n = @{ $t->{$id}{residue_order} };
+		ok(!grep({ $_ ne 'residue_order' && @{ $t->{$id}{$_} } != $n } keys %{ $t->{$id} }),
+			"chain $id: every array is one element per residue of residue_order");
+	}
+	ok(!defined $t->{B}{alpha}[0] && defined $t->{B}{alpha}[1],
+		'the first nucleotide has no alpha and holds an undef for it, the second has one');
+	is_deeply(structure_info($mixed, 'torsion'), $t, "'torsion' is the same view");
+	is_deeply(structure_info($mixed, 'torsions', hydrogens => 0),
+	          structure_info($mixed, 'torsions'),
+		'the options after it are the reader\'s');
+
+	for my $f (qw(fold aform duplex)) {
+		is_deeply(structure_info("$data/$f.cif", 'torsions'),
+		          structure_info("$data/$f.pdb", 'torsions'),
+			"torsions view: $f.cif and $f.pdb give the same answer");
+	}
+
+	ok(!exists structure_info($file, 'torsions')->{B},
+		'a chain with no angle at all is left out rather than an empty hash');
+	is_deeply(structure_info("$data/bare.pdb", 'torsions'), {},
+		'and a structure with none anywhere is an empty hash');
+	throws_ok { structure_info($mixed, 'torsions', features => 0) }
+		qr/'torsions' needs the features/,
+		'a torsions view of a file read without the features is refused';
+	throws_ok { structure_info($file, 'nosuch') } qr/dssp, torsions/,
+		'and the views a wrong name is told about include it';
 }
 
 done_testing();

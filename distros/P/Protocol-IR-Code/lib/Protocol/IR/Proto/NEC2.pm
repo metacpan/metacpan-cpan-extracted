@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NEC2;
 use strict;
 use warnings;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 use parent 'Protocol::IR::Proto::NEC';
 
@@ -24,7 +24,7 @@ Protocol::IR::Proto::NEC2 - NEC2 protocol handler (repeats the whole frame)
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 

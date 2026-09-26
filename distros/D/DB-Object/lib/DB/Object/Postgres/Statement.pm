@@ -1,17 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Statement.pm
-## Version v0.302.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.302.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2023/11/07
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 # This package's purpose is to automatically terminate the statement object and
 # separate them from the connection object (DB::Object).
 # Connection object last longer than statement objects
@@ -21,11 +20,12 @@ BEGIN
 {
     use strict;
     use warnings;
-    use parent qw( DB::Object::Statement DB::Object::Postgres );
+    warnings::register_categories( 'DB::Object' );
+    use parent qw( DB::Object::Statement );
     use vars qw( $VERSION $DEBUG );
     use DBD::Pg ':pg_types';
     our $DEBUG = 0;
-    our $VERSION = 'v0.302.0';
+    our $VERSION = 'v0.302.1';
 };
 
 use strict;
@@ -140,14 +140,14 @@ sub dump
     return( $self->error( "No query to dump." ) ) if( !exists( $self->{sth} ) );
     if( exists( $args->{file} ) )
     {
-        $self->_load_class( 'DateTime' ) || return( $self->pass_error );
+        $self->_load_class( 'DateTime::Lite' ) || return( $self->pass_error );
         # new_file is inherited from Module::Generic and calls Module::Generic::File
         my $file = $self->new_file( $args->{file} );
         $fh = $file->open( '>', { binmode => 'utf8' }) ||
             return( $self->error( "Unable to open file $file in write mode: ", $file->error ) );
         # my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
         my @header = sort{ $a <=> $b } @fields;
-        my $date = DateTime->now;
+        my $date = DateTime::Lite->now;
         my $table = $self->{table};
         $fh->printf( "# Generated on %s for table $table\n", $date->strftime( '%c' ) );
         $fh->print( "# ", CORE::join( "\t", @header ), "\n" );
@@ -316,7 +316,7 @@ sub _convert_datetime2object
     my $opts = $self->_get_args_as_hash( @_ );
     my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
     # my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
-    return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
+    return( $opts->{data} ) if( !defined( $opts->{data} ) || !CORE::length( $opts->{data} ) );
     return( $opts->{data} ) if( !$sth->rows );
     my $data  = $opts->{data};
     # my $names = $sth->FETCH('NAME');
@@ -371,7 +371,7 @@ sub _convert_json2hash
     # $data can be either hash pr array
     my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
     # my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
-    return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
+    return( $opts->{data} ) if( !defined( $opts->{data} ) || !CORE::length( $opts->{data} ) );
     my $data = $opts->{data};
     # my $names = $sth->FETCH('NAME');
     # my $types = $sth->FETCH('pg_type');
@@ -422,15 +422,19 @@ DB::Object::Postgres::Statement - PostgreSQL Statement Object
 
     use DB::Object::Postgres::Statement;
     my $this = DB::Object::Postgres::Statement->new || 
-        die( DB::Object::Postgres::Statement->error, "\n" );
+        die( DB::Object::Postgres::Statement->error );
 
 =head1 VERSION
 
-    v0.302.0
+    v0.302.1
 
 =head1 DESCRIPTION
 
 This is a PostgreSQL specific statement object class. It inherits from L<DB::Object::Statement>
+
+Any methods not documented here is called directly via the SQL driver.
+
+If an error occurs, C<undef> or an an empty list is returned, and the error code, if any, can be retrieved with C<< $sth->error->code >> and the error message, if any, with C<< $sth->error->message >>
 
 =head1 METHODS
 
@@ -498,9 +502,15 @@ It takes also a I<vsep>, which defaults to a command and a I<hsep> which default
 
 It returns the current object.
 
-=for Pod::Coverage field_types
+=head2 field_types
+
+Returns the PostgreSQL field type information exposed by the statement handle C<pg_type> attribute.
+
+    my $types = $sth->field_types;
 
 =head2 ignore
+
+    my $value = $sth->ignore;
 
 This returns an error as C<INSERT> | C<UPDATE> | C<ALTER IGNORE> is not supported by PostgreSQL.
 
@@ -509,6 +519,9 @@ This returns an error as C<INSERT> | C<UPDATE> | C<ALTER IGNORE> is not supporte
 Will call L<DB::Object/last_insert_id> with the necessary parameters to get the last inserted table id.
 
 =head2 name
+
+    my $value = $sth->name;
+    $sth->name( $value );
 
 Sets or gets the name of the prepared statement. The name set will show up in the PostgreSQL server log.
 
@@ -535,6 +548,8 @@ It returns the current statement object.
 See L<PostgreSQL documentation for more information|https://www.postgresql.org/docs/9.5/sql-select.html>
 
 =head2 priority
+
+    my $value = $sth->priority;
 
 This is unsupported under PostgreSQL and if used returns an error.
 

@@ -12,6 +12,8 @@ use File::Basename qw(dirname);
 use Cwd qw(abs_path getcwd);
 use JSON::PP qw(decode_json encode_json);
 
+$ENV{AMBERDB_TEST_RAMDISK} = '0';
+
 my $perl_bin = $^X;
 my $script_dir = dirname(abs_path(__FILE__));
 my $cli_path   = abs_path(File::Spec->catfile($script_dir, "..", "bin", "amberdb_cli.pl"));
@@ -324,30 +326,30 @@ subtest '10. Execution elapsed time parameter (time, time=1, --time)' => sub {
 };
 
 # ---------------------------------------------------------------------------
-subtest '11. Positional connect database directory' => sub {
+subtest '11. Positional connect database name and rejection of dbstore/paths' => sub {
     plan tests => 6;
 
-    # 1. Positional connect to custom path
-    my $out_pos = `"$perl_bin" -Ilib "$cli_path" connect "$test_dbdir" format=json`;
+    # 1. Positional connect with database name
+    my $c_data = -f "$test_dbdir/config/connect.pl" ? do "$test_dbdir/config/connect.pl" : {};
+    my $expected_db = ( ref($c_data) eq 'HASH' && $c_data->{database} ) ? $c_data->{database} : 'testdb';
+    my $out_pos = `"$perl_bin" -Ilib "$cli_path" --db="$test_dbdir" connect $expected_db format=json`;
     my $conn_pos = eval { decode_json($out_pos) };
-    is($conn_pos->{status}, 'connected', "Positional connect to path succeeded");
+    is($conn_pos->{status}, 'connected', "Positional connect with database name succeeded");
     my $tok_pos = $conn_pos->{token};
     ok(defined $tok_pos && $tok_pos =~ /^\d{4}$/, "Positional connect token generated: $tok_pos");
-    is(norm_path($conn_pos->{path}->{dbase_dir}), norm_path($test_dbdir), "Connected data dir matches positional path");
+    is($conn_pos->{database}, $expected_db, "Connected database matches specified name '$expected_db'");
 
     my $disc_pos = `"$perl_bin" -Ilib "$cli_path" token=$tok_pos disconnect format=json`;
     my $dd_pos = eval { decode_json($disc_pos) };
     is($dd_pos->{status}, 'disconnected', "Positional connect disconnected cleanly");
 
-    # 2. Positional connect with 'dbstore'
-    my $out_dbstore = `"$perl_bin" -Ilib "$cli_path" connect dbstore format=json`;
-    my $conn_dbstore = eval { decode_json($out_dbstore) };
-    is($conn_dbstore->{status}, 'connected', "Connect dbstore succeeded");
-    my $tok_db = $conn_dbstore->{token};
+    # 2. Rejection of 'dbstore' as database argument
+    my $out_dbstore = `"$perl_bin" -Ilib "$cli_path" connect dbstore 2>&1`;
+    like($out_dbstore, qr/\[AMBERDB_ERROR\].*dbstore.*not a valid database name/i, "Connect with 'dbstore' rejected");
 
-    my $disc_db = `"$perl_bin" -Ilib "$cli_path" token=$tok_db disconnect format=json`;
-    my $dd_db = eval { decode_json($disc_db) };
-    is($dd_db->{status}, 'disconnected', "Connect dbstore disconnected cleanly");
+    # 3. Rejection of directory path as database argument
+    my $out_path = `"$perl_bin" -Ilib "$cli_path" connect "$test_dbdir" 2>&1`;
+    like($out_path, qr/\[AMBERDB_ERROR\].*not a valid database name/i, "Connect with directory path rejected");
 };
 
 done_testing();

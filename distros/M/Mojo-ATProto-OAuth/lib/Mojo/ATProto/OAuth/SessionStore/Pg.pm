@@ -99,6 +99,52 @@ sub delete_session_p($self, $account_did, $session_id) {
     return $self->pg->db->delete_p('sessions', {account_did => $account_did, session_id => $session_id})->then(sub { return });
 }
 
+# Updates only the given fields of an existing session - a caller that
+# only learned a new DPoP nonce must not write back the tokens it read
+# earlier, which another process may have rotated since.
+sub update_session($self, $account_did, $session_id, $fields) {
+    my $set = $self->_validated_session_update($fields);
+    my $rows = $self->pg->db->update('sessions', $set, {account_did => $account_did, session_id => $session_id})->rows;
+    die "no session found for did/session_id\n" unless $rows;
+    return;
+}
+
+sub update_session_p($self, $account_did, $session_id, $fields) {
+    my $set = $self->_validated_session_update($fields);
+    return $self->pg->db->update_p('sessions', $set, {account_did => $account_did, session_id => $session_id})->then(sub($results) {
+        die "no session found for did/session_id\n" unless $results->rows;
+        return;
+    });
+}
+
+# Serializes $code per (account_did, session_id) across every process
+# sharing this database, using a transaction-scoped advisory lock on a
+# dedicated connection. An advisory lock rather than SELECT ... FOR
+# UPDATE on the row itself, because $code writes through this store's
+# ordinary methods on a *different* pooled connection, which a row lock
+# held here would block - deadlocking the caller against itself. The
+# lock is released when the transaction ends (commit here, or rollback
+# when $tx goes out of scope on an exception, or the connection dying).
+# hashtext() collisions between two different sessions only cause
+# unnecessary waiting, never a missed lock.
+sub lock_session($self, $account_did, $session_id, $code) {
+    my $db = $self->pg->db;
+    my $tx = $db->begin;
+    $db->query('SELECT pg_advisory_xact_lock(hashtext(?), hashtext(?))', $account_did, $session_id);
+    my $result = $code->($self->get_session($account_did, $session_id));
+    $tx->commit;
+    return $result;
+}
+
+sub lock_session_p($self, $account_did, $session_id, $code) {
+    my $db = $self->pg->db;
+    my $tx = $db->begin;
+    return $db->query_p('SELECT pg_advisory_xact_lock(hashtext(?), hashtext(?))', $account_did, $session_id)
+        ->then(sub { return $self->get_session_p($account_did, $session_id) })
+        ->then($code)
+        ->finally(sub { $tx->commit });
+}
+
 sub _session_upsert_args($self, $session_data) {
     my $row    = $self->_row_from_session($session_data);
     my $update = {%$row};
@@ -205,6 +251,37 @@ sub _encode_json($self, $value) {
 }
 
 1;
+
+=head1 NAME
+
+Mojo::ATProto::OAuth::SessionStore::Pg - Postgres-backed session store for Mojo::ATProto::OAuth
+
+=head1 SYNOPSIS
+
+    my $oauth = Mojo::ATProto::OAuth->new(..., store => [Pg => 'postgresql://user:pass@host/dbname']);
+
+=head1 DESCRIPTION
+
+Implements the full store interface described in L<Mojo::ATProto::OAuth/THE STORE INTERFACE> on top of L<Mojo::Pg>. Constructor arguments are passed straight to C<< Mojo::Pg->new >>; the schema is created and migrated automatically.
+
+=head2 Session locking
+
+C<lock_session>/C<lock_session_p> (which L<Mojo::ATProto::OAuth/refresh_tokens> runs under) take a transaction-scoped advisory lock (C<pg_advisory_xact_lock>) keyed on the session's C<(account_did, session_id)>, on a dedicated connection. That lock excludes every other process using the same database, waits without polling (the async form doesn't block the event loop while it waits), and is released when the code finishes, fails, or the connection drops. It doesn't lock the C<sessions> row itself, so ordinary reads and writes of the session carry on while it's held.
+
+The locking connection sits idle in a transaction while the lock is held (for the length of one auth-server round trip), so a server-side C<idle_in_transaction_session_timeout> shorter than that will abort the refresh, and each concurrently held lock uses one connection from the pool.
+
+=head1 ATTRIBUTES
+
+=head2 pg
+
+The underlying L<Mojo::Pg> instance.
+
+=head1 SEE ALSO
+
+L<Mojo::ATProto::OAuth>, L<Mojo::ATProto::OAuth::SessionStore::SQLite>
+
+=cut
+
 __DATA__
 @@ sessionstore
 

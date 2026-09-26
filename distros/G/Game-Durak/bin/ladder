@@ -1,0 +1,162 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin ();
+use lib "$FindBin::Bin/../lib";
+
+use Getopt::Long;
+
+use Game::Durak;
+use Game::Durak::Bot;
+use Game::Durak::Search qw(LEVELS);
+
+my %opt = (deals => 2000, 'seed-prefix' => 'durak-ladder', limit => 600);
+GetOptions(\%opt, 'deals=i', 'seed-prefix=s', 'limit=i', 'help')
+    or die "bad options\n";
+
+if ($opt{help}) {
+    print <<"USAGE";
+usage: $0 [--deals N] [--seed-prefix STRING] [--limit N]
+
+Plays N deals for every pair of rungs, half with the seats the other way
+round, and reports what separates them.
+USAGE
+    exit 0;
+}
+
+sub seed32 { return sprintf '%-32.32s', $_[0] }
+
+sub play {
+    my ($seed, $levels) = @_;
+
+    my $game = Game::Durak->build(seed => $seed);
+    die $game->message . "\n" if ref $game eq 'Game::Durak::Error';
+
+    my %bot = map {
+        $_ => Game::Durak::Bot->new(level => $levels->{$_}, seed => "$seed:$_")
+    } 1, 2;
+
+    my ($step, $endgame_bouts) = (0, 0);
+    my @moves;
+
+    while (!$game->over) {
+        last if ++$step > $opt{limit};
+        my $seat = $game->turn;
+        my $view = $game->view($seat);
+        my $move = $bot{$seat}->choose($view);
+        last unless $move;
+        push @moves, "$seat:$move->{kind}:" . (defined $move->{card} ? $move->{card} : '-');
+        my @ev = $game->apply($seat, $move);
+        last if ref $ev[0] eq 'Game::Durak::Error';
+        $endgame_bouts++ for grep {
+            $_->{kind} eq 'bout_end' && !$game->talon_left
+        } @ev;
+    }
+
+    return {
+        result  => $game->result,
+        moves   => $step,
+        endgame => $endgame_bouts,
+        held    => $game->result && defined $game->result->{fool}
+                   ? $game->count_of($game->result->{fool}) : undef,
+        trace   => join('|', @moves),
+    };
+}
+
+sub mean {
+    my ($values) = @_;
+    return 0 unless @$values;
+    my $total = 0;
+    $total += $_ for @$values;
+    return $total / scalar @$values;
+}
+
+my @pairs = ([1, 2], [1, 3], [2, 3]);
+my %fool_rate;
+
+for my $pair (@pairs) {
+    my ($low, $high) = @$pair;
+    my (%fool, %held, @endgame, $draws, $decided);
+    $fool{$low} = 0;
+    $fool{$high} = 0;
+    $held{$low} = [];
+    $held{$high} = [];
+    $draws = 0;
+    $decided = 0;
+
+    for my $i (1 .. $opt{deals}) {
+        my $swap = $i > $opt{deals} / 2;
+        my %levels = $swap ? (1 => $high, 2 => $low) : (1 => $low, 2 => $high);
+
+        my $out = play(seed32("$opt{'seed-prefix'}-$low-$high-$i"), \%levels);
+        next unless $out->{result};
+
+        push @endgame, $out->{endgame};
+
+        if ($out->{result}{outcome} eq 'draw') { $draws++; next }
+
+        my $loser = $levels{ $out->{result}{fool} };
+        $fool{$loser}++;
+        push @{ $held{$loser} }, $out->{held};
+        $decided++;
+    }
+
+    my $rate  = $decided ? 100 * $fool{$low} / $decided : 0;
+    my $sigma = $decided ? 100 * sqrt(0.25 / $decided) : 0;
+    $fool_rate{"$low v $high"} = $rate;
+
+    printf "rung %d against rung %d, %d deals, %d decided, %d drawn\n",
+        $low, $high, $opt{deals}, $decided, $draws;
+    printf "  rung %d was the fool %d times, %.1f%% (two sigma %.1f%%)\n",
+        $low, $fool{$low}, $rate, 2 * $sigma;
+    printf "  rung %d was the fool %d times, %.1f%%\n",
+        $high, $fool{$high}, $decided ? 100 * $fool{$high} / $decided : 0;
+    printf "  cards held when losing: rung %d %.1f, rung %d %.1f\n",
+        $low, mean($held{$low}), $high, mean($held{$high});
+    printf "  bouts after the talon emptied: %.1f\n\n", mean(\@endgame);
+}
+
+print "a rung above 50 per cent loses more often than its opponent\n";
+printf "%s\n", join ', ', map { sprintf "%s %.1f%%", $_, $fool_rate{$_} }
+                          sort keys %fool_rate;
+
+__END__
+
+=head1 NAME
+
+ladder - what separates one rung of the bot from the next
+
+=head1 SYNOPSIS
+
+    perl -Ilib bin/ladder --deals 2000 --seed-prefix durak-ladder
+
+=head1 DESCRIPTION
+
+Plays every pair of rungs against each other, half the deals with the seats
+the other way round so that an advantage in opening cannot be mistaken for a
+rung's strength, and reports three instruments.
+
+B<The fool rate> is the primary one, with a two sigma interval: the result of
+a deal is one bit, so a difference smaller than the interval is not a
+difference.
+
+B<Cards held when losing> is the senior instrument. A bot that loses holding
+two cards is playing a different game from one that loses holding nine, and
+the rate alone cannot tell them apart.
+
+B<Bouts after the talon emptied> is reported and not asserted: it is the part
+of the deal where the rungs differ most, and it explains the other two.
+
+=head1 AUTHOR
+
+LNATION, C<< <email@lnation.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under the Artistic License 2.0.
+
+=cut

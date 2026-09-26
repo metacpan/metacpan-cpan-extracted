@@ -3,6 +3,7 @@ package ForgeOps::Tracker::SpanBuffer;
 use strict;
 use warnings;
 use POSIX qw(strftime);
+use ForgeOps::Tracker::SqlStatement;
 use ForgeOps::Tracker::TraceParent;
 
 # One trace's worth of spans (a request's own call tree), sharing a single trace id. Held in a
@@ -92,8 +93,24 @@ sub _build {
         duration_ms    => 0 + sprintf('%.2f', $duration_ms),
         environment    => $config->{environment},
         release        => $config->{release},
-        data           => $data || {},
+        data           => (defined $kind && $kind eq 'database') ? mask_database_data($data) : ($data || {}),
     };
+}
+
+# mask_database_data($data): a copy of a database span's data with "db.statement" masked by
+# ForgeOps::Tracker::SqlStatement, so the SQL as written never reaches the payload however the
+# hash was built. A statement that isn't a plain string, or is blank, is dropped. The caller's hash
+# is never modified.
+sub mask_database_data {
+    my ($data) = @_;
+    return {} unless ref $data eq 'HASH';
+    return $data unless exists $data->{'db.statement'};
+
+    my %masked = %$data;
+    my $statement = delete $masked{'db.statement'};
+    $statement = ForgeOps::Tracker::SqlStatement::mask($statement) if defined $statement && !ref $statement;
+    $masked{'db.statement'} = $statement if defined $statement && !ref $statement;
+    return \%masked;
 }
 
 # The wire payload once the trace is over: the root span plus everything recorded beneath it, or

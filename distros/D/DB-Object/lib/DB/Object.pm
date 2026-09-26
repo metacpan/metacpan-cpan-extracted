@@ -1,13 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object.pm
-## Version v1.10.0
+## Database Object Interface - ~/lib/m
+## Version v1.11.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/27
+## Modified 2026/09/23
 ## All rights reserved
-## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -37,7 +36,7 @@ BEGIN
     use Wanted;
     our $PLACEHOLDER_REGEXP = qr/(?<![?\w])\?(?![?\w])/;
     our $EXCEPTION_CLASS    = 'DB::Object::Exception';
-    our $VERSION = 'v1.10.0';
+    our $VERSION = 'v1.11.0';
 };
 
 use strict;
@@ -66,6 +65,7 @@ our $DRIVER2PACK =
 # Default value
 our $SERIALISER = 'Storable';
 our $SERIALISATION_VERSION = 1;
+my $CONNECTION_ID_SEQUENCE = 0;
 
 sub new
 {
@@ -86,6 +86,8 @@ sub init
     $self->{cache_size}         = $CACHE_SIZE;
     $self->{cache_table}        = 0;
     $self->{driver}             = '';
+    $self->{enhance}            = 0;
+    $self->{id}                 = undef;
     # Auto-decode json data into perl hash
     $self->{auto_decode_json}   = 1;
     $self->{auto_convert_datetime_to_object} = 0;
@@ -94,9 +96,53 @@ sub init
     $self->{serialiser}         = undef;
     $self->{unknown_field}      = 'ignore';
     $self->{_init_strict_use_sub} = 1;
+    $self->{_core_fields} = [grep( !/^_/, keys( %$self ) )];
     $self->{_exception_class}     = $EXCEPTION_CLASS;
     $self->Module::Generic::init( @_ ) || return( $self->pass_error );
     return( $self );
+}
+
+sub active_transactions
+{
+    my $self = shift( @_ );
+    my $found = [];
+    my $error;
+    DBI->visit_handles(sub
+    {
+        my( $handle, $transactions ) = @_;
+        my $type = $handle->{Type} // '';
+
+        # Driver handle: descend towards its database handles.
+        return( $transactions ) if( $type eq 'dr' );
+
+        # Database handle: inspect it, but do not descend towards statements.
+        return if( $type ne 'db' );
+
+        my $meta = $handle->{private_db_object};
+        if( ref( $meta ) eq 'HASH' && $meta->{transaction} )
+        {
+            if( $handle->{AutoCommit} )
+            {
+                $error = "DB::Object transaction metadata for connection ID '" . ( defined( $meta->{id} ) ? $meta->{id} : 'unknown' ) . "' indicates an active transaction, but DBI AutoCommit is enabled on handle '$handle'.";
+                return;
+            }
+
+            push( @$transactions,
+            {
+                id     => $meta->{id},
+                handle => $handle,
+            });
+        }
+        elsif( !$handle->{AutoCommit} )
+        {
+            $error = "DBI handle '$handle' has AutoCommit disabled, but is not marked as an active DB::Object transaction.";
+        }
+
+        return;
+    }, $found );
+
+    return( $self->error( $error ) ) if( defined( $error ) );
+    return( $found );
 }
 
 sub allow_bulk_delete { return( shift->_set_get_scalar( 'allow_bulk_delete', @_ ) ); }
@@ -192,10 +238,8 @@ sub attribute($;$@)
 
 sub available_drivers(@)
 {
-    my $self = shift( @_ );
-    my $class = ref( $self ) || $self;
     # @ary = DBI->available_drivers( $quiet );
-    return( $class->SUPER::available_drivers( 1 ) );
+    return( DBI->available_drivers(1) );
 }
 
 sub base_class
@@ -301,6 +345,14 @@ sub cache_query_get
     my $cache_file = $self->_get_cache_filepath( %$opts, name => $name, extension => $ext, prefix => 'query' ) ||
         return( $self->pass_error );
     my $cache_key = $cache_file->basename( ".${ext}" );
+
+    # NOTE: Ensure all classes are loaded before deserialising, so the deserialiser can call their THAW methods.
+    # This is especially important for Sereal, which needs classes to be defined when unmarshalling blessed objects.
+    $self->_load_class( 'Module::Generic', { force => 1 } ) || return( $self->pass_error );
+    $self->_load_class( 'Module::Generic::Array', { force => 1 } ) || return( $self->pass_error );
+    $self->_load_class( 'Module::Generic::Hash', { force => 1 } ) || return( $self->pass_error );
+    $self->_load_class( 'Module::Generic::Number', { force => 1 } ) || return( $self->pass_error );
+    $self->_load_class( 'Module::Generic::Scalar', { force => 1 } ) || return( $self->pass_error );
 
     # Need to ensure DB::Object::Statement is loaded, so the deserialisation of the statement object has a proper inheritance.
     $self->_load_class( $base_class, { force => 1 } ) || return( $self->pass_error );
@@ -711,7 +763,40 @@ sub connect
         $self->{serialiser} = $SERIALISER;
     }
 
+    my $id = CORE::exists( $param->{id} ) ? CORE::delete( $param->{id} ) : undef;
+    if( defined( $id ) && CORE::length( $id ) )
+    {
+        $self->id( $id );
+    }
+    else
+    {
+        $self->id( $self->_new_connection_id );
+    }
+
     $self->{unknown_field} = CORE::delete( $param->{unknown_field} ) if( CORE::exists( $param->{unknown_field} ) );
+
+    # Other remaining params, we check if they are supported with a corresponding method
+    # We do all this jazz so we can handle other parameters a bit more dynamically.
+    foreach my $key ( keys( %$param ) )
+    {
+        # Those are special, and are dealt with a bit later
+        if( $key eq 'opt' ||
+            $key eq 'database' ||
+            $key eq 'db' ||
+            $key eq 'host' ||
+            $key eq 'server' ||
+            $key eq 'login' ||
+            $key eq 'passwd' ||
+            $key eq 'driver' ||
+            $key eq 'use_bind' )
+        {
+            next;
+        }
+        if( my $coderef = $self->can( $key ) )
+        {
+            $coderef->( $self, CORE::delete( $param->{ $key } ) );
+        }
+    }
 
     $param = $self->_check_connect_param( $param ) || return( $this->pass_error( $self->error ) );
     my $opt = {};
@@ -744,10 +829,13 @@ sub connect
     #my @dbi_opts = grep( /^[A-Z][a-zA-Z]+/, keys( %$param ) );
     #@$opt{ @dbi_opts } = @$param{ @dbi_opts };
 
+
     if( my $driver = $self->driver )
     {
-        my $drh = $self->SUPER::install_driver( $driver ) ||
-            return( $this->pass_error( $self->error ) );
+        local $@;
+        my $drh = eval {
+            DBI->install_driver( $driver )
+        } || return( $this->error( $@ || $DBI::errstr ) );
         $self->{drh} = $drh;
     }
     $opt->{RaiseError} = 0 if( !CORE::exists( $opt->{RaiseError} ) );
@@ -975,12 +1063,10 @@ sub create_table { return( shift->error( "The driver has not implemented the cre
 
 sub data_sources($;\%)
 {
-    my $self  = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $opt;
-    $opt = shift( @_ ) if( @_ );
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $driver = $self->{driver} || return( $self->error( "No driver to to use to check for data sources." ) );
-    return( $class->SUPER::data_sources( $driver, $opt ) );
+    return( DBI->data_sources( $driver, ( scalar( keys( %$opts ) ) ? $opts : () ) ) );
 }
 
 sub data_type
@@ -1182,6 +1268,8 @@ sub get_sql_type { return( shift->error( "The driver has not provided support fo
 
 sub host { return( shift->_set_get_scalar( 'host', @_ ) ); }
 
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
+
 sub IN { return( shift->_operator_object_create( 'DB::Object::IN', @_ ) ); }
 
 # $rv = $dbh->last_insert_id($catalog, $schema, $table, $field, \%attr);
@@ -1234,7 +1322,7 @@ sub param
     if( @_ == 1 )
     {
         my $type = shift( @_ );
-        $type    = uc( $type ) if( scalar( grep{ /^$_[ 0 ]$/i } @supported ) );
+        $type    = uc( $type ) if( scalar( grep{ /^$type$/i } @supported ) );
         return( $params->{ $type } );
     }
     else
@@ -1278,9 +1366,28 @@ sub passwd { return( shift->_set_get_scalar( 'passwd', @_ ) ); }
 
 sub ping(@)
 {
-    #return( shift->{ 'dbh' }->ping );
     my $self = shift( @_ );
-    return( $self->{dbh}->ping );
+    my $dbh = $self->{dbh};
+    return(0) if( !$dbh );
+
+    my $ok = 0;
+    my $errstr;
+    local $@;
+    {
+        $ok = eval
+        {
+            my $errstr;
+            local $SIG{__WARN__} = sub
+            {
+                # die( $_[0] );
+                $errstr = join( '', @_ );
+            };
+            $dbh->ping ? 1 : 0;
+        };
+    }
+
+    return(0) if( !$ok || $@ );
+    return(1);
 }
 
 sub ping_select(@)
@@ -1290,6 +1397,7 @@ sub ping_select(@)
     # Some new ping method replacement.... See Apache::DBI
     # my( $dbh ) = @_;
     my $ret = 0;
+    local $@;
     eval 
     {
         local( $SIG{__DIE__}  ) = sub{ return( 0 ); };
@@ -1299,7 +1407,7 @@ sub ping_select(@)
         $ret = $sth && ( $sth->execute() );
         $sth->finish();
     };
-    return( ($@)  ? 0 : $ret );
+    return( ($@) ? 0 : $ret );
 }
 
 sub placeholder
@@ -1545,7 +1653,17 @@ sub state(@)
     }
     else
     {
-        return( $self->SUPER::state() );
+        my $dbh = $self->{dbh} || return( $self->error( "No database handle is available. You need to connect to a database before using state() or call it as a class function." ) );
+        local $@;
+        my $rv = eval
+        {
+            $dbh->state();
+        };
+        if( $@ )
+        {
+            return( $self->error( $@ ) );
+        }
+        return( $rv );
     }
 }
 
@@ -1744,6 +1862,36 @@ sub tables_refresh
 # Used to flag this as a transaction when begin_work is triggered
 sub transaction { return( shift->_set_get_boolean( 'transaction', @_ ) ); }
 
+sub transaction_state
+{
+    my $self = shift( @_ );
+    my $candidate = shift( @_ );
+
+    if( defined( $candidate ) &&
+        !( blessed( $candidate ) && $candidate->isa( 'DB::Object' ) ) )
+    {
+        return( $self->error( "Candidate provided is not a DB::Object object." ) );
+    }
+
+    my $transactions = $self->active_transactions;
+    return( $self->pass_error ) if( !defined( $transactions ) );
+
+    my $count = scalar( @$transactions );
+    my $state =
+    {
+        active => $count ? 1 : 0,
+        count  => $count,
+        ids    => [map( $_->{id}, @$transactions )],
+    };
+
+    if( $count == 1 )
+    {
+        $state->{id} = $transactions->[0]->{id};
+        $state->{same} = $candidate->uses_handle( $transactions->[0]->{handle} ) ? 1 : 0 if( defined( $candidate ) );
+    }
+    return( $state );
+}
+
 sub TRUE { return( 'TRUE' ); }
 
 sub unknown_field { return( shift->_set_get_scalar( 'unknown_field', @_ ) ); }
@@ -1785,6 +1933,17 @@ sub use
 sub use_cache { return( shift->_set_get_boolean( 'cache', @_ ) ) }
 
 sub use_bind { return( shift->_set_get_boolean( 'bind', @_ ) ) }
+
+sub uses_handle
+{
+    my $self = shift( @_ );
+    my $dbh = shift( @_ ) || return;
+
+    return if( !$self->{dbh} );
+
+    require Scalar::Util;
+    return( $self->_refaddr( $self->{dbh} ) == $self->_refaddr( $dbh ) );
+}
 
 sub variables
 {
@@ -2405,10 +2564,13 @@ sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    return( [qw(
+    my $params = $self->new_array( [qw(
         db login passwd host port driver database server opt uri debug cache_connections
-        cache_dir cache_table connect_via serialiser unknown_field
+        cache_dir cache_table connect_via serialiser unknown_field id
     )] );
+    my $core = $self->{_core_fields} || [];
+    $params->push( @$core );
+    return( $params->unique(1) );
 }
 
 sub _connection_params2hash
@@ -2802,13 +2964,6 @@ sub _make_sth
     my $data = shift( @_ ) || {};
     my $base_class = $self->base_class;
     $self->_load_class( $pkg ) || return( $self->pass_error );
-#     map{ $data->{ $_ } = $self->{ $_ } } 
-#     qw( 
-#     dbh drh server login passwd database driver 
-#     table debug bind cache params selected_fields
-#     local where limit group_by order_by reverse from_table left_join
-#     tie tie_order
-#     );
     foreach my $prop ( qw( table debug bind cache params from_table left_join ) )
     {
         $data->{ $prop } = $self->{ $prop };
@@ -2828,6 +2983,13 @@ sub _make_sth
     my $this = bless( $data, $pkg );
     $this->debug( $self->debug );
     return( $this );
+}
+
+sub _new_connection_id
+{
+    my $self = shift( @_ );
+    $self->_load_class( 'Time::HiRes' ) || return( $self->pass_error );
+    return( sprintf( '%x-%x-%x', $$, int( Time::HiRes::time() * 1_000_000 ), ++$CONNECTION_ID_SEQUENCE ) );
 }
 
 sub _operator_object_create
@@ -2888,14 +3050,14 @@ sub _query_object_create
         return( $self->error( "Unable to load Query builder module $query_class: ", $self->error->message ) );
     my $o = $query_class->new;
     $o->debug( $self->debug );
-    $o->enhance( $self->{enhance} ) if( CORE::length( $self->{enhance} ) );
-    if( $self->isa( 'DB::Object::Tables' ) )
+    if( $self->isa( "${base}::Tables" ) )
     {
         $o->table_object( $self ) || return( $self->pass_error( $o->error ) );
         # Weaken the back-reference from the Query object to its owning Table to break
         # the circular reference cycle (Table -> query_object -> Query -> table_object -> Table)
         # that prevents Perl's garbage collector from reclaiming old Query objects.
         weaken( $o->{table_object} );
+        $o->enhance( $self->database_object->enhance );
         $o->database_object( $self->database_object ) || return( $self->pass_error( $o->error ) );
         # Also weaken the database_object reference - the dbo is a long-lived singleton
         # and does not own Query objects, so a weak reference is safe here.
@@ -2906,8 +3068,9 @@ sub _query_object_create
             $o->table_alias( $table_alias ) if( defined( $table_alias ) );
         }
     }
-    elsif( $self->isa( 'DB::Object' ) )
+    elsif( $self->isa( $base ) )
     {
+        $o->enhance( $self->enhance );
         $o->database_object( $self ) || return( $self->pass_error( $o->error ) );
     }
     return( $o );
@@ -2951,21 +3114,17 @@ sub _query_object_remove
 sub _reset_query
 {
     my $self = shift( @_ );
-
     if( !$self->{query_reset} )
     {
         $self->{query_reset} = 1;
-        $self->{enhance} = 1;
-
+        # $self->{enhance} = 1;
         my $obj = $self->query_object;
-
         # If current query object is dirty, detach it right away.
         if( $obj && $obj->dirty )
         {
             $self->_query_object_remove( $obj );
             undef( $obj );
         }
-
 
         # Capture join tables BEFORE we detach the query object
         my $join_tables;
@@ -2975,7 +3134,6 @@ sub _reset_query
         }
 
         $self->_query_object_remove( $obj ) if( $obj );
-
         if( $join_tables && $join_tables->length > 0 )
         {
             $join_tables->foreach(sub{
@@ -2992,18 +3150,41 @@ sub _reset_query
                 # Important: do NOT force query_reset to 1 here.
                 # We want the next use to rebuild a fresh query object lazily.
                 CORE::delete( $tbl->{query_reset} );
-
                 return;
             });
         }
 
         $self->{bind}  = 0 unless( defined( $self->{bind} )  && $self->{bind}  > 1 );
         $self->{cache} = 0 unless( defined( $self->{cache} ) && $self->{cache} > 1 );
-
         return( $self->_query_object_get_or_create );
     }
-
     return( $self->_query_object_current );
+}
+
+sub _transaction_finished
+{
+    my $self = shift( @_ );
+    $self->{transaction} = 0;
+    if( $self->{dbh} )
+    {
+        $self->{dbh}->{private_db_object} //= {};
+        $self->{dbh}->{private_db_object}->{id} = $self->id;
+        $self->{dbh}->{private_db_object}->{transaction} = 0;
+    }
+    return( $self );
+}
+
+sub _transaction_started
+{
+    my $self = shift( @_ );
+    $self->{transaction} = 1;
+    if( $self->{dbh} )
+    {
+        $self->{dbh}->{private_db_object} //= {};
+        $self->{dbh}->{private_db_object}->{id} = $self->id;
+        $self->{dbh}->{private_db_object}->{transaction} = 1;
+    }
+    return( $self );
 }
 
 # NOTE: AUTOLOAD
@@ -3131,7 +3312,61 @@ AUTOLOAD
         # $self->_cleanup();
         # print( STDERR "Calling DBI method $meth with sth '$self->{sth}' arguments: '", join( "', '", @_ ), "'\n" ) if( $DEBUG );
         # *{ "${class}\::$meth" } = sub{ return( shift->{ 'sth' }->$meth( @_ ) ); };
-        return( $self->{sth}->$meth( @_ ) );
+        # return( $self->{sth}->$meth( @_ ) );
+        my $ctx = Wanted::context();
+        if( $ctx eq 'LIST' )
+        {
+            local $@;
+            my @rv = eval{ $self->{sth}->$meth( @_ ); };
+            if( $@ )
+            {
+                # We set the error
+                $self->error( "Error calling $meth: $@" );
+            }
+            # From DBI documentation:
+            # "If there are no more rows or if an error occurs, then fetchrow_array returns an empty list. You should check $sth->err afterwards (or use the RaiseError attribute) to discover if the empty list returned was due to an error."
+            # Also: <https://metacpan.org/pod/DBI#errstr>
+            elsif( !scalar( @rv ) && $self->{sth}->err )
+            {
+                $self->error({ code => $self->{sth}->err, message => $self->{sth}->errstr });
+            }
+            # We still return whatever was retrieved
+            return( @rv );
+        }
+        else
+        {
+            local $@;
+            my $rv = eval{ $self->{sth}->$meth( @_ ); };
+            if( $@ )
+            {
+                # We set the error
+                $self->error( "Error calling $meth: $@" );
+            }
+            # From DBI documentation:
+            # "If there are no more rows or if an error occurs, then fetchrow_array returns an empty list. You should check $sth->err afterwards (or use the RaiseError attribute) to discover if the empty list returned was due to an error."
+            # Also: <https://metacpan.org/pod/DBI#errstr>
+            elsif( !defined( $rv ) && $self->{sth}->err )
+            {
+                $self->error({ code => $self->{sth}->err, message => $self->{sth}->errstr });
+            }
+
+            # We check if the user is asking for chaining, but the returned value is undef.
+            # We want to avoid the famous Perl error: "Can't call method "%s" on an undefined value"
+            # See perldiag man page.
+            if( !defined( $rv ) )
+            {
+                # $ctx returns also CODE, HASH, ARRAY, GLOB, SCALAR or OBJECT
+                if( $ctx eq 'HASH' )
+                {
+                    return( {} );
+                }
+                elsif( $ctx eq 'ARRAY' )
+                {
+                    return( [] );
+                }
+            }
+            return( $rv );
+        }
     }
     # e.g. $dbh->pg_notifies
     elsif( $self && ( ( $self->{dbh} && $self->{dbh}->can( $meth ) ) || defined( &{ "DBI::db::" . $meth } ) ) )
@@ -3175,16 +3410,10 @@ sub DESTROY
         print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{query}\n" ) if( $DEBUG || $self->{debug} );
         $self->{sth}->finish();
     }
-    elsif( $self->{dbh} && $class =~ /^AI\:\:DB(?:\:\:(?:Postgres|Mysql|SQLite))?$/ )
+    elsif( $self->{dbh} && $class =~ /^DB\:\:Object(?:\:\:(?:Postgres|Mysql|SQLite))?$/ )
     {
-        local( $SIG{__WARN__} ) = sub { };
+        local( $SIG{__WARN__} ) = sub{};
         # $self->{ 'dbh' }->disconnect();
-        if( $DEBUG || $self->{debug} )
-        {
-            my( $pack, $file, $line, $sub ) = ( caller(0) )[0, 1, 2, 3];
-            my( $pack2, $file2, $line2, $sub2 ) = ( caller(1) ) [0, 1, 2, 3];
-            print( STDERR "DESTROY database handle ($self) [$self->{ 'query' }]\ncalled within sub '$sub' ($sub2) from package '$pack' ($pack2) in file '$file' ($file2) at line '$line' ($line2).\n" );
-        }
         $self->disconnect();
     }
     my $locks = $self->{_locks};
@@ -3617,14 +3846,28 @@ DB::Object - SQL API
     use DB::Object;
 
     my $dbh = DB::Object->connect({
-        driver => 'Pg',
+        driver    => 'Pg',
         conf_file => 'db-settings.json',
-        database => 'webstore',
-        host => 'localhost',
-        login => 'store-admin',
-        schema => 'auth',
-        debug => 3,
+        database  => 'webstore',
+        host      => 'localhost',
+        login     => 'store-admin',
+        schema    => 'auth',
+        id        => 'web-request-12345',
+        debug     => 3,
     }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
+
+    # The connection id is optional and purely informational. DB::Object generates
+    # one automatically when none is provided.
+    print( "Database connection id is: ", $dbh->id, "\n" );
+
+    $dbh->begin_work;
+    my $transactions = DB::Object->active_transactions ||
+        die( DB::Object->error );
+    foreach my $transaction ( @$transactions )
+    {
+        print( "Active database transaction id: ", $transaction->{id}, "\n" );
+    }
+    $dbh->rollback;
 
     # Legacy regular query
     my $sth = $dbh->prepare( "SELECT login,name FROM login WHERE login='jack'" ) ||
@@ -3762,7 +4005,7 @@ In future release, other operators than C<=> will be implemented for C<JSON> and
 
 =head1 VERSION
 
-    v1.10.0
+    v1.11.0
 
 =head1 DESCRIPTION
 
@@ -3795,6 +4038,8 @@ This will provide you with the convenience and power of L<DB::Object> while keep
 
 =head2 new
 
+    my dbh = DB::Object->new( ... );
+
 Create a new instance of L<DB::Object>. Nothing much to say.
 
 =head2 connect
@@ -3815,7 +4060,7 @@ Defaults to true.
 
 If true, this will instruct L<DBI> to use L<DBI/connect_cached> instead of just L<DBI/connect>
 
-Beware that using cached connections can have some drawbacks, such as if you open a cached connection, enters into a transaction using L<DB::Object/begin_work>, then somewhere else in your code a call to a cached connection using the same parameters, which L<DBI> will provide, but will reset the database handler parameters, including the C<AutoCommit> that will have been temporarily set to false when you called L</begin_work>, and then you close your transaction by calling L</rollback> or L</commit>, but it will trigger an error, because C<AutoCommit> will have been reset on this cached connection to a true value. L</rollback> and L</commit> require that C<AutoCommit> be disabled, which L</begin_work> normally do.
+Beware that using cached connections can have some drawbacks, such as if you open a cached connection, enters into a transaction using C<begin_work>, then somewhere else in your code a call to a cached connection using the same parameters, which L<DBI> will provide, but will reset the database handler parameters, including the C<AutoCommit> that will have been temporarily set to false when you called C<begin_work>, and then you close your transaction by calling C<rollback> or C<commit>, but it will trigger an error, because C<AutoCommit> will have been reset on this cached connection to a true value. C<rollback> and C<commit> require that C<AutoCommit> be disabled, which C<begin_work> normally do.
 
 Thus, if you want to avoid using a cached connection, set this to false.
 
@@ -3824,6 +4069,12 @@ More on this issue at L<DBI documentation|https://metacpan.org/pod/DBI#connect_c
 =item * C<database> or I<DB_NAME>
 
 The database name you wish to connect to
+
+=item * C<id>
+
+An optional informational identifier associated with the connection. It can be used to correlate a database connection with application work such as a request, worker or job.
+
+When omitted, L</connect> automatically generates an identifier. The identifier has no database or transactional semantics.
 
 =item * C<login> or I<DB_LOGIN>
 
@@ -3927,11 +4178,36 @@ Here the I<opt> parameter is passed as a json string, for example:
 
 =head1 METHODS
 
+=head2 active_transactions
+
+    my $transactions = DB::Object->active_transactions ||
+        die( DB::Object->error );
+
+Returns an array reference describing all active C<DB::Object> transactions found among the DBI database handles in the current process.
+
+Each entry is a hash reference containing:
+
+    {
+        id     => $connection_id,
+        handle => $dbi_database_handle,
+    }
+
+The C<id> value is the informational connection identifier set with L</id>.
+
+This method uses DBI's handle inspection facility internally. Driver and statement handle traversal details are intentionally hidden behind this C<DB::Object> abstraction.
+
+As an additional consistency check, an error is returned when C<DB::Object> transaction metadata indicates an active transaction while DBI C<AutoCommit> is enabled, or when DBI C<AutoCommit> is disabled on a handle that is not marked as an active C<DB::Object> transaction.
+
+An empty array reference is returned when no active transaction exists.
+
 =head2 alias
 
 See L<DB::Object::Tables/alias>
 
 =head2 allow_bulk_delete
+
+    $dbh->allow_bulk_delete(1);
+    $dbh->allow_bulk_delete(0);
 
 Sets/gets the boolean value for whether to allow unsafe bulk delete. This means query without any C<where> clause.
 
@@ -3939,15 +4215,18 @@ Default is false.
 
 =head2 allow_bulk_update
 
+    $dbh->allow_bulk_update(1);
+    $dbh->allow_bulk_update(0);
+
 Sets/gets the boolean value for whether to allow unsafe bulk update. This means query without any C<where> clause.
 
 Default is false.
 
 =head2 AND
 
-Takes any arguments and wrap them into a C<AND> clause.
-
     $tbl->where( $dbh->AND( $tbl->fo->id == ?, $tbl->fo->frequency >= .30 ) );
+
+Takes any arguments and wrap them into a C<AND> clause.
 
 =head2 as_string
 
@@ -3955,11 +4234,17 @@ See L<DB::Object::Statement/as_string>
 
 =head2 auto_convert_datetime_to_object
 
-Sets or gets the boolean value. If true, then this api will automatically transcode datetime value into their equivalent L<DateTime> object.
+    my $value = $dbh->auto_convert_datetime_to_object;
+    $dbh->auto_convert_datetime_to_object( $value );
+
+Sets or gets the boolean value. If true, then this api will automatically transcode datetime value into their equivalent L<DateTime::Lite> object.
 
 Default is false.
 
 =head2 auto_decode_json
+
+    my $value = $dbh->auto_decode_json;
+    $dbh->auto_decode_json( $value );
 
 Sets or gets the boolean value. If true, then this api will automatically transcode json data into perl hash reference.
 
@@ -3970,6 +4255,9 @@ Default is true.
 See L<DB::Object::Tables/avoid>
 
 =head2 attribute
+
+    my $value = $dbh->attribute;
+    $dbh->attribute( $value );
 
 Sets or get the value of database connection parameters.
 
@@ -4152,9 +4440,13 @@ Can be changed.
 
 =head2 available_drivers
 
+    my $value = $dbh->available_drivers;
+
 Return the list of available drivers.
 
 =head2 base_class
+
+    my $value = $dbh->base_class;
 
 Returns the base class.
 
@@ -4182,13 +4474,22 @@ Activate caching.
 
 =head2 cache_connections
 
+    $dbh->cache_connections(1);
+    $dbh->cache_connections(0);
+
 Sets/get the cached database connection.
 
 =head2 cache_dir
 
+    my $value = $dbh->cache_dir;
+    $dbh->cache_dir( $value );
+
 Sets or gets the directory on the file system used for caching data.
 
 =head2 cache_query
+
+    $dbh->cache_query(1);
+    $dbh->cache_query(0);
 
 Boolean. When set to a true value, this will enable the caching of the query objects.
 
@@ -4232,11 +4533,16 @@ It returns the statement object cached.
 
 =head2 cache_size
 
+    $dbh->cache_size(10);
+
 The maximum number of serialised objects in the cache.
 
 This defaults to the class global variable C<$CACHE_SIZE>, which is C<10>
 
 =head2 cache_table
+
+    my $value = $dbh->cache_table;
+    $dbh->cache_table( $value );
 
 Sets or gets a boolean value whether to cache the table fields object.
 
@@ -4272,11 +4578,16 @@ If a database and a table name and an hash reference of field names to their L<c
 
 =head2 cache_tables
 
+    my $value = $dbh->cache_tables;
+    $dbh->cache_tables( $value );
+
 Sets or gets the L<DB::Object::Cache::Tables> object.
 
 =head2 check_driver
 
-Check that the driver set in I<$SQL_DRIVER> in ~/etc/common.cfg is indeed available.
+    $dbh->check_driver( $driver_name );
+
+Check that the driver is indeed available.
 
 It does this by calling L</available_drivers>.
 
@@ -4284,7 +4595,7 @@ It does this by calling L</available_drivers>.
 
 This will attempt a database server connection. 
 
-It called L</_connection_params2hash> to get the necessary connection parameters, which is superseded in each driver package.
+It called C<_connection_params2hash> to get the necessary connection parameters, which is superseded in each driver package.
 
 Then, it will call L</_check_connect_param> to get the right parameters for connection.
 
@@ -4309,6 +4620,9 @@ Finally it tries to connect by calling the, possibly superseded, method L</_dbi_
 It instantiate a L<DB::Object::Cache::Tables> object to cache database tables and return the current object.
 
 =head2 connect_via
+
+    my $value = $dbh->connect_via;
+    $dbh->connect_via( $value );
 
 Sets or gets the perl module used to connect to DBI. Typically, this would be L<Apache::DBI>. By default, this is empty.
 
@@ -4354,9 +4668,13 @@ This is a method that must be implemented by the driver package.
 
 =head2 data_sources
 
+    my $value = $dbh->data_sources;
+
 Given an optional list of options as hash, this return the data source of the database handler.
 
 =head2 data_type
+
+    my $value = $dbh->data_type;
 
 Given a reference to an array or an array of data type, L</data_type> will check their availability in the database driver.
 
@@ -4366,15 +4684,21 @@ If something was found, it returns a hash in list context or a reference to a ha
 
 =head2 database
 
+    my $value = $dbh->database;
+
 Return the name of the current database.
 
 =head2 databases
+
+    my $value = $dbh->databases;
 
 This returns the list of available databases.
 
 This is a method that must be implemented by the driver package.
 
 =head2 datatype_dict
+
+    my $value = $dbh->datatype_dict;
 
 Returns an hash reference of each data type with their equivalent C<constant>, regular expression (C<re>), constant C<name> and C<type> name.
 
@@ -4438,9 +4762,15 @@ Example:
 
 =head2 driver
 
+    my $value = $dbh->driver;
+
 Return the name of the driver for the current object.
 
 =head2 enhance
+
+    $dbh->enhance(0);  # Toggles off (default value)
+    $dbh->enhance(1);  # Toggles on
+    my $bool = $dbh->enhance;
 
 Toggle the enhance mode on/off.
 
@@ -4492,13 +4822,42 @@ See L<DB::Object::Tables/group>
 
 =head2 host
 
+    my $value = $dbh->host;
+    $dbh->host( $value );
+
 Sets or gets the C<host> property for this database object.
+
+=head2 id
+
+    my $id = $dbh->id;
+
+    $dbh->id( 'worker-3' );
+
+Gets or sets the informational identifier associated with this database connection.
+
+An identifier may be provided when connecting:
+
+    my $dbh = DB::Object->connect(
+        driver   => 'Pg',
+        database => 'example',
+        id       => 'request-12345',
+    );
+
+When no identifier is provided, L</connect> automatically generates one.
+
+The identifier has no database or transactional semantics. It is intended for diagnostics and for correlating a C<DB::Object> connection with application work such as a request, worker or job.
+
+When a transaction is started by C<DB::Object>, the identifier is also stored in the private metadata associated with the underlying DBI database handle.
+
+Returns the current identifier.
 
 =head2 insert
 
 See L<DB::Object::Tables/insert>
 
 =head2 last_insert_id
+
+    my $id = $dbh->last_insert_id;
 
 Get the id of the primary key from the last insert.
 
@@ -4519,6 +4878,9 @@ See L<DB::Object::Tables/local>
 This method must be implemented by the driver package.
 
 =head2 login
+
+    my $value = $dbh->login;
+    $dbh->login( $value );
 
 Sets or gets the C<login> property for this database object.
 
@@ -4600,9 +4962,14 @@ Otherwise, it returns the current object used to call the method.
 
 =head2 passwd
 
+    my $value = $dbh->passwd;
+    $dbh->passwd( $value );
+
 Sets or gets the C<passwd> property for this database object.
 
 =head2 ping
+
+    my $value = $dbh->ping;
 
 Evals a SELECT 1 statement and returns 0 if errors occurred or the return value.
 
@@ -4616,13 +4983,16 @@ Same as L</P>. Returns a L<DB::Object::Placeholder> object, passing it whatever 
 
 =head2 port
 
+    my $value = $dbh->port;
+    $dbh->port( $value );
+
 Sets or gets the C<port> property for this database object.
 
 =head2 prepare
 
 Provided with a sql query and some hash reference of options and this will prepare the query using the options provided. The options are the same as the one in L<DBI/prepare> method.
 
-It returns a L<DB::Object::Statement> object upon success or undef if an error occurred. The error can then be retrieved using L</errstr> or L</error>.
+It returns a L<DB::Object::Statement> object upon success or undef if an error occurred. The error can then be retrieved using L</errstr> or L<Module::Generic/error>.
 
 =head2 prepare_cached
 
@@ -4633,6 +5003,9 @@ Same as L</prepare> except the query is cached.
 It prepares and executes the given SQL query with the options provided and return L<perlfunc/undef> upon error or the statement handler upon success.
 
 =head2 query_object
+
+    my $value = $dbh->query_object;
+    $dbh->query_object( $value );
 
 Sets or gets the L<query object|DB::Object::Query>.
 
@@ -4662,6 +5035,20 @@ See L<DB::Object::Tables/reverse>
 
 See L<DB::Object::Tables/select>
 
+=head2 serialiser
+
+Sets or gets the serialiser used by this database object. The value is stored on the object and is used by the cache and serialisation helpers that need a configured serialiser.
+
+    my $serialiser = $dbh->serialiser;
+    $dbh->serialiser( $serialiser );
+
+=head2 serializer
+
+Alias for L</serialiser>. It is provided for callers using the American spelling.
+
+    my $serialiser = $dbh->serializer;
+    $dbh->serializer( $serialiser );
+
 =head2 set
 
 Provided with variable and this will issue a query to C<SET> the given SQL variable.
@@ -4680,13 +5067,21 @@ In absence of particular $type provided, it returns the hash list of values retu
 
 =head2 state
 
+    my $value = $dbh->state;
+    # or as a class function:
+    my $value = DB::Object::Postgres->state;
+
 Queries the DBI state and return its value.
 
 =head2 supported_class
 
+    my $value = $dbh->supported_class;
+
 Returns the list of driver packages such as L<DB::Object::Postgres>
 
 =head2 supported_drivers
+
+    my $value = $dbh->supported_drivers;
 
 Returns the list of driver name such as L<Pg>
 
@@ -4702,6 +5097,8 @@ Provided with a table name and this returns true if the table exist or false oth
 
 =head2 table_info
 
+    my $value = $dbh->table_info;
+
 This is a method that must be implemented by the driver package.
 
 It returns an array reference of hash reference containing information about each table column.
@@ -4712,6 +5109,8 @@ Add the given table name to the stack of cached table names.
 
 =head2 tables
 
+    my $value = $dbh->tables;
+
 Connects to the database and finds out the list of all available tables. If cache is available, it will use it instead of querying the database server.
 
 Returns undef or empty list in scalar or list context respectively if no table found.
@@ -4720,6 +5119,8 @@ Otherwise, it returns the list of table in list context or a reference of it in 
 
 =head2 tables_cache
 
+    my $value = $dbh->tables_cache;
+
 Returns the table cache object
 
 =head2 tables_info
@@ -4727,6 +5128,8 @@ Returns the table cache object
 This is a method that must be implemented by the driver package.
 
 =head2 tables_refresh
+
+    my $value = $dbh->tables_refresh;
 
 Rebuild the list of available database table.
 
@@ -4738,7 +5141,28 @@ See L<DB::Object::Tables/tie>
 
 =head2 transaction
 
-True when a transaction has been started with L</begin_work>, false otherwise.
+True when a transaction has been started with C<begin_work>, false otherwise.
+
+=head2 transaction_state
+
+    my $state = DB::Object->transaction_state( $candidate ) ||
+        die( DB::Object->error );
+
+Returns information about the active C<DB::Object> transactions in the current process and, when a candidate C<DB::Object> is provided, whether that object uses the same underlying DBI handle.
+
+A result with no active transaction has the form:
+
+    {
+        active => 0,
+        count  => 0,
+        ids    => [],
+    }
+
+When one transaction is active, the result also contains C<id>. If a candidate was supplied, it additionally contains C<same>, which is true when the candidate uses the same DBI handle as the active transaction and false otherwise.
+
+If multiple active transactions exist, C<count> is greater than one and C<ids> contains their informational connection identifiers.
+
+This method is intended for higher-level code that needs to enforce a policy such as preventing a second database connection from being used while another transaction is active, without exposing DBI handle traversal details.
 
 =head2 TRUE
 
@@ -4748,7 +5172,12 @@ Returns C<TRUE> to be used in queries.
 
 See L<DB::Object::Tables/unix_timestamp>
 
-=head2 for POD::Coverage unknown_field
+=head2 unknown_field
+
+Sets or gets the value used by the object to represent an unknown field condition.
+
+    my $value = $dbh->unknown_field;
+    $dbh->unknown_field( $value );
 
 =head2 unlock
 
@@ -4767,13 +5196,32 @@ It returns the database handler.
 
 =head2 use_cache
 
+    my $value = $dbh->use_cache;
+    $dbh->use_cache( $value );
+
 Provided with a boolean value and this sets or get the I<use_cache> parameter.
 
 =head2 use_bind
 
+    my $value = $dbh->use_bind;
+    $dbh->use_bind( $value );
+
 Provided with a boolean value and this sets or get the I<use_cache> parameter.
 
+=head2 uses_handle
+
+    if( $dbh->uses_handle( $dbi_handle ) )
+    {
+        ...
+    }
+
+Returns true if the current C<DB::Object> object uses the specified underlying DBI database handle, and false otherwise.
+
+This provides a driver-independent way to compare the physical DBI handle used by a C<DB::Object> object without requiring callers to access the object's internal C<dbh> property.
+
 =head2 variables
+
+    my $value = $dbh->variables;
 
 Query the SQL variable $type
 
@@ -4877,6 +5325,12 @@ It also sets the query time to the current time with the parameter I<query_time>
 
 It returns an object of the given $package.
 
+=head2 _new_connection_id
+
+Internal method used by L</connect> to generate a default informational identifier when the caller did not provide a C<id>.
+
+The generated value is intended for diagnostics and correlation only. It has no database semantics and is not intended to be a persistent identifier.
+
 =head2 _param2hash
 
 Provided with some hash reference parameters and this will simply return it, so it does not do anything meaningful.
@@ -4916,6 +5370,18 @@ It returns the object removed.
 If this has not already been reset, this will mark the current query object as reset and calls L</_query_object_remove> and return the value for L</_query_object_get_or_create>
 
 If it has been already reset, this will return the value for L</_query_object_current>
+
+=head2 _transaction_finished
+
+Internal method used by database drivers after successfully committing or rolling back a transaction.
+
+It clears the transactional state both on the C<DB::Object> object and in the private metadata associated with its underlying DBI database handle.
+
+=head2 _transaction_started
+
+Internal method used by database drivers after successfully starting or confirming an active transaction.
+
+It marks the C<DB::Object> as transactional and records the connection identifier and transaction state on the underlying DBI database handle.
 
 =head1 OPERATORS
 

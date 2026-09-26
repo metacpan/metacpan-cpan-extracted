@@ -54,6 +54,6 @@
          "web" : "https://github.com/rouzier/JQ-XS"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

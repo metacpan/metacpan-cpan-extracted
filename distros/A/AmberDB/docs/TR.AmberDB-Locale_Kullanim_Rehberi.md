@@ -534,8 +534,8 @@ ISO 4217 standardında **12 para birimi** tanımlıdır:
 
 ```perl
 AmberDB::Locale::Currency->by_code('TRY');   # { num=>'949', name=>'Türk Lirası', symbol=>'₺', digits=>2 }
-AmberDB::Locale::Currency->symbol('EUR');    # "€"
-AmberDB::Locale::Currency->name('USD');      # "ABD Doları"
+AmberDB::Locale::Currency->cur_symbol('EUR');    # "€"
+AmberDB::Locale::Currency->cur_name('USD');      # "ABD Doları"
 AmberDB::Locale::Currency->all();            # [ ['TRY','Türk Lirası'], ['USD','ABD Doları'], ... ]
 AmberDB::Locale::Currency->active_codes();   # qw(TRY USD EUR GBP RUB AZN SAR JPY CHF CAD AUD CNY)
 ```
@@ -544,7 +544,7 @@ AmberDB::Locale::Currency->active_codes();   # qw(TRY USD EUR GBP RUB AZN SAR JP
 
 ## 7. Dil Veri Modülü Yazma Rehberi
 
-Yeni bir dil eklemek için `Amber/Locale/Lang/<kod>.pm` dosyası oluşturun:
+Yeni bir dil eklemek için `AmberDB/Locale/Lang/<kod>.pm` dosyası oluşturun:
 
 ```perl
 package AmberDB::Locale::Lang::it;   # İtalyanca örneği
@@ -628,7 +628,7 @@ sub data {
 | `to_ascii` çıktısında `ae` yerine `a` var | `en` locale'de NFD `ä → a` yapar | `de` locale kullanın (DIN 5007-2: `ä → ae`) |
 | Sayı metni boş dönüyor | Input yalnızca ayraç/noktalama içeriyor | Geçerli rakam kontrolü yapın |
 | Doğu Arap rakamları çevrilmiyor | `normalize_num` özel çağrılmamış | `num2text`/`format_number` otomatik yapar; manuel çağrı gerekmez |
-| Bilinmeyen dil hatası | Lang modülü dosyası yok | `Amber/Locale/Lang/<kod>.pm` oluşturun veya `en` fallback'i kabul edin |
+| Bilinmeyen dil hatası | Lang modülü dosyası yok | `AmberDB/Locale/Lang/<kod>.pm` oluşturun veya `en` fallback'i kabul edin |
 
 ---
 

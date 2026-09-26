@@ -1,0 +1,52 @@
+# Markdown::Pod::Embed
+
+Maintain Perl documentation in Markdown and merge its POD rendering into the
+source file. A nonempty sidecar such as `lib/Example.pm.md` takes precedence;
+otherwise embedded Markdown is used. Existing plain POD is preserved.
+
+## GitHub Attestations
+
+The release workflow generates [GitHub artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations)
+for distribution archives. Install the [GitHub CLI](https://cli.github.com/)
+with `gh attestation` support and authenticate with `gh auth login`.
+
+Download `Markdown-Pod-Embed-VERSION.tar.gz` from a GitHub release, MetaCPAN,
+or a CPAN mirror, replace `VERSION`, and verify it with:
+
+```sh
+gh attestation verify Markdown-Pod-Embed-VERSION.tar.gz --repo aspeer/pm-Markdown-Pod-Embed
+```
+
+A successful verification confirms that the archive checksum matches an
+attestation from this repository. The workflow publishes the same archive to
+GitHub Releases and CPAN. Older releases and GitHub's automatically generated
+source-code archives are not covered.
+
+## Install and use
+
+Install the distribution and its CPAN prerequisites with `cpanm .`. Pandoc is
+also needed if you call the Markdown-to-text method.
+
+```sh
+markpod --dry-run --recursive lib
+markpod --inplace --nobackup --recursive lib bin
+markpod --extract-markdown lib/Example.pm
+```
+
+Without `--inplace`, the transformed source is printed to standard output.
+Dry-run reports changes without writing files. Failures exit nonzero.
+
+```perl
+use Markdown::Pod::Embed;
+my $processor_or=Markdown::Pod::Embed->new({nobackup => 1});
+$processor_or->update('lib/Example.pm');
+```
+
+See [the API documentation](lib/Markdown/Pod/Embed.pm.md) and
+[the examples](examples/README.md). From a checkout, run `prove -lr t`.
+
+This distribution supplies the processor and `markpod`. Repository targets and
+licence maintenance are provided by ASPEER::MakeMaker::Markdown::Pod.
+
+After ASPEER::MakeMaker::Markdown::Pod is installed, rerun
+`perl Makefile.PL` to enable this distribution's own `make doc` targets.

@@ -30,7 +30,7 @@ use Scalar::Util qw(blessed refaddr);
 BEGIN {
 	eval { require Database::Abstraction };
 	plan skip_all => 'Database::Abstraction required' if $@;
-	plan tests => 149;
+	plan tests => 180;
 	use_ok('Database::Join');
 }
 
@@ -100,6 +100,8 @@ Readonly::Scalar my $TS_B     => 2_000_000;
 	sub expose_build_col_index   { my $self = shift; return $self->_build_col_index(@_) }
 	sub expose_cache_fresh        { my $self = shift; return $self->_cache_fresh(@_) }
 	sub expose_build_sqlite_cache { my $self = shift; return $self->_build_sqlite_cache(@_) }
+	sub expose_joined_query_array     { my $self = shift; return $self->_joined_query_array(@_) }
+	sub expose_validate_schema_types  { my $self = shift; return $self->_validate_schema_types(@_) }
 }
 
 # Convenience builder for a bare WhiteBox skeleton (no databases needed for
@@ -504,7 +506,11 @@ subtest 'schema: last DB wins for duplicate column metadata' => sub {
 		cols   => [$JC, $COL_A],
 		schema => { $JC => { type => 'TEXT' }, $COL_A => { type => 'CHAR' } },
 	);
-	my $j = Database::Join->new(databases => [$db0, $db1], join_column => $JC);
+	# Suppress the expected type-mismatch carp; it is tested in S39.
+	my $j = do {
+		local $SIG{__WARN__} = sub {};
+		Database::Join->new(databases => [$db0, $db1], join_column => $JC);
+	};
 	is($j->schema()->{$COL_A}{type}, 'CHAR',
 		'last database wins when the same column appears in multiple databases');
 };
@@ -2210,6 +2216,512 @@ subtest '_sqlite_join: unsafe operator in criterion is dropped (not injected int
 		'unsafe operator criterion does not croak';
 	# The operator is silently dropped → no WHERE predicate on score → all rows returned.
 	is(scalar @{$rows}, 2, 'all rows returned when the operator key is dropped');
+};
+
+# ===========================================================================
+# SECTION 35 -- sort_by parameter (12 tests)
+#
+# sort_by is a per-call option accepted by selectall_arrayref,
+# selectall_array, fetchrow_hashref, and AUTOLOAD.  It is NOT a column
+# criterion, so it must be extracted from the params hashref before
+# _partition_criteria sees it.  These tests verify:
+#   1. _parse_query_args includes sort_by so callers can delete it.
+#   2. selectall_arrayref does NOT pass sort_by as a criterion to DAs.
+#   3. _joined_query_array (array path) re-sorts by the named column.
+#   4. _joined_query_array respects DESC direction.
+#   5. sort_by => join_column still produces a correct result.
+#   6. Unknown column emits carp and falls back to join_column order.
+#   7. Invalid direction emits carp and falls back to ASC.
+#   8. _sqlite_join (SQLite path): ORDER BY ASC works end-to-end.
+#   9. _sqlite_join: ORDER BY DESC reverses order end-to-end.
+#  10. _sqlite_join: unknown column emits carp, uses default join_col order.
+#  11. _sqlite_join: invalid direction emits carp, uses ASC.
+#  12. count(): sort_by is silently dropped (no carp, correct count).
+# ===========================================================================
+
+# Shared three-row fixture used across sort_by subtests.
+# Three distinct names to make ascending/descending sort unambiguous.
+Readonly::Hash my %ORDER_ROWS_A => ();
+my @ORDER_ROWS_A = (
+	{ entry => 'K1', name => 'Carol', tier => 'silver' },
+	{ entry => 'K2', name => 'Alice', tier => 'gold'   },
+	{ entry => 'K3', name => 'Bob',   tier => 'bronze' },
+);
+my @ORDER_ROWS_B = (
+	{ entry => 'K1', score => 88 },
+	{ entry => 'K2', score => 95 },
+	{ entry => 'K3', score => 70 },
+);
+
+sub _make_order_join {
+	my (%extra) = @_;
+	my $db_a = MinimalDA->new(
+		cols => [$JC, $COL_A, $COL_C],
+		rows => \@ORDER_ROWS_A,
+	);
+	my $db_b = MinimalDA->new(
+		cols => [$JC, $COL_B],
+		rows => \@ORDER_ROWS_B,
+	);
+	return Database::Join::WhiteBox->new(
+		databases   => [$db_a, $db_b],
+		join_column => $JC,
+		%extra,
+	);
+}
+
+subtest '_parse_query_args: sort_by key is returned in the params hashref' => sub {
+	plan tests => 3;
+	# Callers (selectall_arrayref etc.) delete sort_by from the returned hashref
+	# so _partition_criteria never sees it.  Prove _parse_query_args populates it.
+	my $wb = _bare_whitebox();
+	my $params = $wb->expose_parse_query_args(undef, tier => 'gold', sort_by => 'name');
+	ok(exists $params->{sort_by}, 'sort_by key present in _parse_query_args output');
+	is($params->{sort_by}, 'name', 'sort_by value preserved verbatim');
+	ok(exists $params->{tier}, 'regular criterion key still present alongside sort_by');
+};
+
+subtest 'selectall_arrayref: sort_by NOT forwarded as column criterion to DAs' => sub {
+	plan tests => 2;
+	# If sort_by reached _partition_criteria it would trigger warn_unknown_column
+	# (no column named 'sort_by' exists in the view).  Prove no such carp fires.
+	my $j = _make_order_join(backend => 'array');
+	my @warnings;
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $j->selectall_arrayref(sort_by => 'name');
+	} 'selectall_arrayref with sort_by does not croak';
+	my @ob_warns = grep { /sort_by.*not present|Column "sort_by"/i } @warnings;
+	is(scalar @ob_warns, 0,
+		'no warn_unknown_column carp for sort_by: it was extracted before _partition_criteria');
+};
+
+subtest '_joined_query_array: sort_by ASC sorts by named column ascending' => sub {
+	plan tests => 2;
+	my $wb = _make_order_join(backend => 'array');
+	my $rows = $wb->expose_joined_query_array({}, sort_by => 'name');
+	my @names = map { $_->{name} } @{$rows};
+	# Alice < Bob < Carol alphabetically
+	is_deeply(\@names, [qw(Alice Bob Carol)],
+		'_joined_query_array sort_by name ASC: rows in ascending alphabetical order');
+	is(scalar @{$rows}, 3, 'all 3 rows present');
+};
+
+subtest '_joined_query_array: sort_by DESC reverses the sort' => sub {
+	plan tests => 1;
+	my $wb = _make_order_join(backend => 'array');
+	my $rows = $wb->expose_joined_query_array({}, sort_by => ['name', 'DESC']);
+	my @names = map { $_->{name} } @{$rows};
+	# Carol > Bob > Alice
+	is_deeply(\@names, [qw(Carol Bob Alice)],
+		'_joined_query_array sort_by name DESC: rows in descending alphabetical order');
+};
+
+subtest '_joined_query_array: sort_by join_column produces join_column-sorted result' => sub {
+	plan tests => 1;
+	# join_column ASC is the default; passing it explicitly must produce the same order.
+	my $wb = _make_order_join(backend => 'array');
+	my $rows = $wb->expose_joined_query_array({}, sort_by => $JC);
+	my @keys = map { $_->{$JC} } @{$rows};
+	is_deeply(\@keys, [qw(K1 K2 K3)],
+		'_joined_query_array sort_by join_column ASC: default key order');
+};
+
+subtest '_joined_query_array: unknown sort_by column emits carp, returns default order' => sub {
+	plan tests => 3;
+	my $wb = _make_order_join(backend => 'array');
+	my @warnings;
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $wb->expose_joined_query_array({}, sort_by => 'no_such_column');
+	} 'unknown sort_by column does not croak';
+	my @ob_warns = grep { /sort_by.*not in the merged view/i } @warnings;
+	ok(scalar @ob_warns, 'carp emitted for unknown sort_by column');
+	# Default order is by join_column (K1, K2, K3); verify length at minimum
+	is(scalar @{$rows}, 3, 'all 3 rows returned despite bad sort_by column');
+};
+
+subtest '_joined_query_array: invalid direction emits carp and falls back to ASC' => sub {
+	plan tests => 3;
+	my $wb = _make_order_join(backend => 'array');
+	my @warnings;
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $wb->expose_joined_query_array({}, sort_by => ['name', 'SIDEWAYS']);
+	} 'invalid sort_by direction does not croak';
+	my @dir_warns = grep { /direction.*not supported|not supported.*direction/i } @warnings;
+	ok(scalar @dir_warns, 'carp emitted for unsupported sort direction');
+	# Falls back to ASC sort: Alice < Bob < Carol
+	my @names = map { $_->{name} } @{$rows};
+	is_deeply(\@names, [qw(Alice Bob Carol)],
+		'invalid direction falls back to ASC: result still sorted ascending');
+};
+
+subtest '_sqlite_join via selectall_arrayref: sort_by ASC sorts rows correctly' => sub {
+	plan tests => 2;
+	my $j = _make_order_join(backend => 'sqlite');
+	my $rows = $j->selectall_arrayref(sort_by => 'name');
+	my @names = map { $_->{name} } @{$rows};
+	is_deeply(\@names, [qw(Alice Bob Carol)],
+		'SQLite ORDER BY name ASC: rows in ascending order');
+	is(scalar @{$rows}, 3, 'all 3 rows returned');
+};
+
+subtest '_sqlite_join via selectall_arrayref: sort_by DESC reverses row order' => sub {
+	plan tests => 2;
+	my $j = _make_order_join(backend => 'sqlite');
+	my $rows = $j->selectall_arrayref(sort_by => ['name', 'DESC']);
+	my @names = map { $_->{name} } @{$rows};
+	is_deeply(\@names, [qw(Carol Bob Alice)],
+		'SQLite ORDER BY name DESC: rows in descending order');
+	is(scalar @{$rows}, 3, 'all 3 rows returned');
+};
+
+subtest '_sqlite_join: unknown sort_by column emits carp and uses join_column order' => sub {
+	plan tests => 3;
+	my $j = _make_order_join(backend => 'sqlite');
+	my @warnings;
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $j->selectall_arrayref(sort_by => 'no_such_col');
+	} 'SQLite path: unknown sort_by column does not croak';
+	my @ob_warns = grep { /sort_by.*not in the merged view/i } @warnings;
+	ok(scalar @ob_warns, 'SQLite path: carp emitted for unknown sort_by column');
+	is(scalar @{$rows}, 3, 'all 3 rows returned despite unknown sort_by');
+};
+
+subtest '_sqlite_join: invalid direction emits carp and uses ASC' => sub {
+	plan tests => 3;
+	my $j = _make_order_join(backend => 'sqlite');
+	my @warnings;
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $j->selectall_arrayref(sort_by => ['name', 'UPWARD']);
+	} 'SQLite path: invalid direction does not croak';
+	my @dir_warns = grep { /direction.*not supported|not supported.*direction/i } @warnings;
+	ok(scalar @dir_warns, 'SQLite path: carp emitted for unsupported direction');
+	# Should still return rows (ASC fallback)
+	is(scalar @{$rows}, 3, 'all 3 rows returned after direction fallback');
+};
+
+subtest 'count: sort_by is silently dropped, count unaffected' => sub {
+	plan tests => 2;
+	# count() must extract and discard sort_by (row ordering is meaningless for
+	# a count).  No carp should fire, and the count must be correct.
+	my $j = _make_order_join(backend => 'array');
+	my @warnings;
+	my $n;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$n = $j->count(sort_by => 'name');
+	} 'count with sort_by does not croak';
+	# No carp about sort_by being an unknown column (it was deleted before _partition_criteria)
+	my @ob_warns = grep { /sort_by/i } @warnings;
+	is(scalar @ob_warns, 0,
+		'count: no carp for sort_by; it was silently dropped before criteria routing');
+};
+
+# ===========================================================================
+# S36: White-box coverage for limit / offset pagination
+#   - _joined_query_array: validation carp + splice behaviour
+#   - _sqlite_join: LIMIT/OFFSET bind parameters appended correctly
+#   - selectall_arrayref public interface extracts limit/offset before routing
+#   - count() drops limit/offset silently (no carp fired)
+# Reuses the three-row fixture via _make_order_join().
+# ===========================================================================
+
+subtest '_joined_query_array: limit applied after merge (splice front)' => sub {
+	plan tests => 3;
+	my $wb = _make_order_join(backend => 'array');
+	# Default order is Carol/K1, Alice/K2, Bob/K3 (join_column ascending).
+	my $rows = $wb->expose_joined_query_array({}, limit => 2);
+	is(scalar @{$rows}, 2, 'limit=2 returns 2 rows on array path');
+	is($rows->[0]{name}, 'Carol', 'first row is Carol (K1)');
+	is($rows->[1]{name}, 'Alice', 'second row is Alice (K2)');
+};
+
+subtest '_joined_query_array: offset applied after merge (splice front skips rows)' => sub {
+	plan tests => 3;
+	my $wb = _make_order_join(backend => 'array');
+	my $rows = $wb->expose_joined_query_array({}, offset => 1);
+	is(scalar @{$rows}, 2, 'offset=1 skips one row, 2 remain');
+	is($rows->[0]{name}, 'Alice', 'first remaining is Alice (K2)');
+	is($rows->[1]{name}, 'Bob',   'second remaining is Bob (K3)');
+};
+
+subtest '_joined_query_array: limit + offset combined' => sub {
+	plan tests => 2;
+	my $wb = _make_order_join(backend => 'array');
+	# offset=1 skips Carol/K1; limit=1 takes only Alice/K2.
+	my $rows = $wb->expose_joined_query_array({}, limit => 1, offset => 1);
+	is(scalar @{$rows}, 1, 'limit=1 offset=1: exactly 1 row');
+	is($rows->[0]{name}, 'Alice', 'the one row is Alice (K2)');
+};
+
+subtest '_joined_query_array: invalid limit emits carp and is ignored' => sub {
+	plan tests => 3;
+	my $wb = _make_order_join(backend => 'array');
+	my @warns;
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warns, $_[0] };
+		$rows = $wb->expose_joined_query_array({}, limit => 0);
+	} 'limit=0 does not croak';
+	like($warns[0], qr/limit must be a positive integer/, 'carp fired for limit=0');
+	is(scalar @{$rows}, 3, 'limit=0 ignored: all 3 rows returned');
+};
+
+subtest '_joined_query_array: invalid offset emits carp and is ignored' => sub {
+	plan tests => 3;
+	my $wb = _make_order_join(backend => 'array');
+	my @warns;
+	my $rows;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warns, $_[0] };
+		$rows = $wb->expose_joined_query_array({}, offset => -1);
+	} 'offset=-1 does not croak';
+	like($warns[0], qr/offset must be a non-negative integer/, 'carp fired for offset=-1');
+	is(scalar @{$rows}, 3, 'offset=-1 ignored: all 3 rows returned');
+};
+
+subtest '_sqlite_join: limit applied on SQLite path' => sub {
+	plan tests => 3;
+	my $j = _make_order_join(backend => 'sqlite');
+	my $rows = $j->selectall_arrayref(limit => 2);
+	is(scalar @{$rows}, 2, 'limit=2: 2 rows from SQLite path');
+	is($rows->[0]{name}, 'Carol', 'first row Carol (K1)');
+	is($rows->[1]{name}, 'Alice', 'second row Alice (K2)');
+};
+
+subtest '_sqlite_join: offset applied on SQLite path' => sub {
+	plan tests => 2;
+	my $j = _make_order_join(backend => 'sqlite');
+	my $rows = $j->selectall_arrayref(offset => 2);
+	is(scalar @{$rows}, 1, 'offset=2 leaves 1 row');
+	is($rows->[0]{name}, 'Bob', 'remaining row is Bob (K3)');
+};
+
+subtest 'count: limit and offset silently dropped, no carp fired' => sub {
+	plan tests => 2;
+	my $j = _make_order_join(backend => 'array');
+	my @warns;
+	my $n;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warns, $_[0] };
+		$n = $j->count(limit => 1, offset => 1);
+	} 'count() with limit+offset does not croak';
+	my @pg_warns = grep { /limit|offset/i } @warns;
+	is(scalar @pg_warns, 0, 'count: no carp for limit/offset; both silently dropped');
+};
+
+# ===========================================================================
+# S37: dbi_source() on Database::Join — composable nested join white-box tests
+#   Verifies the internal mechanics: create_table path in _sqlite_join,
+#   _dj_built flag, reuse across calls, and that the array backend returns undef.
+# ===========================================================================
+
+subtest 'dbi_source: array backend returns undef' => sub {
+	plan tests => 1;
+	my $j = _make_order_join(backend => 'array');
+	is($j->dbi_source(), undef,
+		'dbi_source() returns undef on array backend');
+};
+
+subtest 'dbi_source: sqlite backend returns correct hashref shape' => sub {
+	plan tests => 3;
+	my $j   = _make_order_join(backend => 'sqlite');
+	my $src = $j->dbi_source();
+	ok(defined $src,              'dbi_source() defined on sqlite backend');
+	is(ref($src), 'HASH',         'return value is a hashref');
+	is($src->{table}, '_dj_result', 'table key is _dj_result');
+};
+
+subtest 'dbi_source: _dj_result table exists and has correct rows' => sub {
+	plan tests => 2;
+	my $j   = _make_order_join(backend => 'sqlite');
+	my $src = $j->dbi_source();
+	my $rows = $src->{dbh}->selectall_arrayref(
+		'SELECT * FROM "_dj_result" ORDER BY "entry"',
+		{ Slice => {} },
+	);
+	# _make_order_join has Carol/K1, Alice/K2, Bob/K3 — 3 rows.
+	is(scalar @{$rows}, 3, '_dj_result contains 3 materialised rows');
+	is($rows->[0]{name}, 'Carol', 'first row (K1) is Carol');
+};
+
+subtest 'dbi_source: second call reuses same materialised table (_dj_built)' => sub {
+	plan tests => 2;
+	my $j    = _make_order_join(backend => 'sqlite');
+	my $src1 = $j->dbi_source();
+	my $src2 = $j->dbi_source();
+	is($src1->{dbh},   $src2->{dbh},   'same DBI handle returned on second call');
+	is($src1->{table}, $src2->{table}, 'same table name returned on second call');
+};
+
+subtest 'dbi_source: auto backend builds SQLite cache regardless of threshold' => sub {
+	plan tests => 2;
+	my $j   = _make_order_join(backend => 'auto');
+	my $src = $j->dbi_source();
+	# auto backend would choose array for 3 rows, but dbi_source() must force SQLite.
+	ok(defined $src && ref($src) eq 'HASH',
+		'auto backend: dbi_source() returns hashref');
+	is($src->{table}, '_dj_result', 'auto backend: table is _dj_result');
+};
+
+# ===========================================================================
+# S38: parallel => 1 constructor flag — white-box internal state tests
+#   Verify that _parallel is correctly stored in the blessed hashref, and that
+#   _joined_query_array with parallel => 1 on 3+ DAs produces the same result
+#   as the sequential path (whether threads are actually used or not).
+# ===========================================================================
+
+subtest 'parallel: _parallel defaults to 0 in blessed hashref' => sub {
+	plan tests => 1;
+	my $j = _make_join();
+	is($j->{_parallel}, 0,
+		'_parallel key is 0 when parallel not specified');
+};
+
+subtest 'parallel: _parallel stored as 1 when parallel => 1 given' => sub {
+	plan tests => 1;
+	my $j = _make_join(parallel => 1);
+	is($j->{_parallel}, 1,
+		'_parallel key is 1 when parallel => 1 passed to new()');
+};
+
+subtest 'parallel: _joined_query_array with parallel => 1 and 3 DAs gives correct rows' => sub {
+	plan tests => 2;
+	# Build a three-DA WhiteBox join (primary + 2 secondaries, n > 2 threshold).
+	# The parallel path is activated (or falls back to sequential with carp if
+	# threads are unavailable); either way, results must be complete and correct.
+	my $db_a = MinimalDA->new(
+		cols   => [$JC, $COL_A, $COL_C],
+		rows   => [
+			{ entry => 'K1', name => 'Alice', tier => 'gold'   },
+			{ entry => 'K2', name => 'Bob',   tier => 'silver' },
+		],
+	);
+	my $db_b = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		rows   => [
+			{ entry => 'K1', score => 95 },
+			{ entry => 'K2', score => 70 },
+		],
+	);
+	my $db_c = MinimalDA->new(
+		cols   => [$JC, 'rank'],
+		rows   => [
+			{ entry => 'K1', rank => 1 },
+			{ entry => 'K2', rank => 2 },
+		],
+	);
+	my $j = Database::Join::WhiteBox->new(
+		databases   => [$db_a, $db_b, $db_c],
+		join_column => $JC,
+		join_type   => 'inner',
+		parallel    => 1,
+		backend     => 'array',
+	);
+	my $rows = $j->expose_joined_query_array({});
+	is(scalar @{$rows}, 2,
+		'parallel 3-DA: _joined_query_array returns correct row count');
+	my ($row) = grep { $_->{entry} eq 'K1' } @{$rows};
+	is($row->{rank}, 1,
+		'parallel 3-DA: merged row contains column from third DA');
+};
+
+# ===========================================================================
+# S39: _validate_schema_types() — white-box tests for the schema type checker
+#   _validate_schema_types is called by new() and add_database().  These tests
+#   exercise it directly via expose_validate_schema_types on WhiteBox to
+#   isolate the helper from the full construction flow.
+# ===========================================================================
+
+subtest '_validate_schema_types: no carp when types match across all DAs' => sub {
+	plan tests => 1;
+	# _make_join() returns a plain Database::Join; use WhiteBox directly so
+	# expose_validate_schema_types() is available on the returned object.
+	my $db_a = MinimalDA->new(
+		cols   => [$JC, $COL_A, $COL_C],
+		schema => { $JC => { type => 'TEXT' }, $COL_A => { type => 'TEXT' }, $COL_C => { type => 'TEXT' } },
+		rows   => [],
+	);
+	my $db_b = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => { type => 'TEXT' }, $COL_B => { type => 'INTEGER' } },
+		rows   => [],
+	);
+	# DAs have distinct column sets; no shared data column → no mismatch.
+	my $j = Database::Join::WhiteBox->new(
+		databases   => [$db_a, $db_b],
+		join_column => $JC,
+	);
+	my @warns;
+	local $SIG{__WARN__} = sub { push @warns, $_[0] };
+	$j->expose_validate_schema_types();
+	is(scalar @warns, 0,
+		'_validate_schema_types: no carp when DAs have non-overlapping columns');
+};
+
+subtest '_validate_schema_types: carp fires exactly once per mismatched column' => sub {
+	plan tests => 3;
+	my $db0 = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => { type => 'TEXT' }, $COL_B => { type => 'INTEGER' } },
+		rows   => [],
+	);
+	my $db1 = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => { type => 'TEXT' }, $COL_B => { type => 'REAL' } },
+		rows   => [],
+	);
+	my @warns;
+	# Suppress during construction (already tested in unit.t); re-run the helper
+	# directly via WhiteBox to isolate it from construction-time noise.
+	my $j = do {
+		local $SIG{__WARN__} = sub {};
+		Database::Join::WhiteBox->new(databases => [$db0, $db1], join_column => $JC);
+	};
+	{
+		local $SIG{__WARN__} = sub { push @warns, $_[0] };
+		$j->expose_validate_schema_types();
+	}
+	is(scalar @warns, 1, 'exactly one carp per mismatched column');
+	like($warns[0], qr/has type.*but type|mismatch/i,
+		'carp text describes the mismatch');
+	like($warns[0], qr/\Q$COL_B\E/,
+		'carp text names the mismatched column');
+};
+
+subtest '_validate_schema_types: plain-string schema values are normalized and compared' => sub {
+	plan tests => 1;
+	# Some DAs return schema() as plain strings ('TEXT') rather than hashrefs.
+	my $db0 = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => 'TEXT', $COL_B => 'INTEGER' },
+		rows   => [],
+	);
+	my $db1 = MinimalDA->new(
+		cols   => [$JC, $COL_B],
+		schema => { $JC => 'TEXT', $COL_B => 'TEXT' },
+		rows   => [],
+	);
+	my $j = do {
+		local $SIG{__WARN__} = sub {};
+		Database::Join::WhiteBox->new(databases => [$db0, $db1], join_column => $JC);
+	};
+	my @warns;
+	{
+		local $SIG{__WARN__} = sub { push @warns, $_[0] };
+		$j->expose_validate_schema_types();
+	}
+	ok(scalar @warns,
+		'plain-string schema values: carp fires when type strings differ');
 };
 
 diag('All white-box function tests complete') if $ENV{TEST_VERBOSE};

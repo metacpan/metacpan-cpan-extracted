@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 120;
+use Test::Most tests => 154;
 use Readonly;
 use Scalar::Util qw(blessed refaddr);
 
@@ -1456,4 +1456,377 @@ note '--- Section 22: _cache_fresh() paths ---';
 		'_cache_fresh PATH-cf-6: all conditions satisfied → returns 1');
 }
 
-done_testing();
+# ==========================================================================
+# Section 23: _validate_pagination() execution paths
+#
+# CFG branches:
+#   fast-path guard: `if defined $limit || defined $offset` skips the call
+#   limit branch:    defined → regex check → value check → valid/carp
+#   offset branch:   defined → regex check → valid/carp
+#
+# PATH-vp-0: both undef → fast-path guard FALSE → _validate_pagination not called
+# PATH-vp-1: limit defined, valid (matches /^\d+\z/a AND >= 1) → applied
+# PATH-vp-2: limit defined, fails regex (leading '-') → carp + undef
+# PATH-vp-3: limit defined, matches regex but < 1 (=0) → carp + undef
+# PATH-vp-4: offset defined, valid (=1, matches regex) → applied
+# PATH-vp-5: offset defined, =0, valid non-negative → no carp, accepted
+# PATH-vp-6: offset defined, fails regex (leading '-') → carp + undef
+# PATH-vp-7: both limit and offset valid → both applied (combined path)
+# ==========================================================================
+
+note '--- Section 23: _validate_pagination() execution paths ---';
+
+Readonly::Array my @VP_ROWS => (
+	{ $JC => 'a', v => 1 },
+	{ $JC => 'b', v => 2 },
+	{ $JC => 'c', v => 3 },
+	{ $JC => 'd', v => 4 },
+);
+
+# PATH-vp-0: both undef → fast-path guard `if defined $limit || defined $offset`
+#   evaluates to FALSE → _validate_pagination never called → no carp.
+{
+	my $j = _std_join();
+	my $w = _capture_warn { $j->selectall_arrayref() };
+	is(scalar @{$w}, 0,
+		'_validate_pagination PATH-vp-0: both undef → fast-path guard skips call, no carp');
+}
+
+# PATH-vp-1: limit defined and valid (matches /^\d+\z/a AND value >= 1) → applied.
+{
+	my $p    = PathDA->new(cols => [$JC, 'v'], rows => [@VP_ROWS]);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC, backend => 'array');
+	my $rows = $j->selectall_arrayref(limit => 2);
+	is(scalar @{$rows}, 2,
+		'_validate_pagination PATH-vp-1: valid limit=2 → applied, 2 rows returned');
+}
+
+# PATH-vp-2: limit defined, fails /^\d+\z/a (leading minus → not all ASCII digits) →
+#   carp emitted and limit treated as undef → all rows returned.
+{
+	my $p = PathDA->new(cols => [$JC, 'v'], rows => [@VP_ROWS]);
+	my $j = Database::Join->new(databases => [$p], join_column => $JC, backend => 'array');
+	my ($rows, $w);
+	$w = _capture_warn { $rows = $j->selectall_arrayref(limit => '-5') };
+	ok(scalar @{$w},
+		'_validate_pagination PATH-vp-2: limit fails regex → carp emitted');
+	is(scalar @{$rows}, 4,
+		'_validate_pagination PATH-vp-2: invalid limit ignored → all 4 rows');
+}
+
+# PATH-vp-3: limit defined, matches /^\d+\z/a (is '0') but value < 1 →
+#   second condition of AND fails → carp emitted, limit ignored.
+{
+	my $p = PathDA->new(cols => [$JC, 'v'], rows => [@VP_ROWS]);
+	my $j = Database::Join->new(databases => [$p], join_column => $JC, backend => 'array');
+	my ($rows, $w);
+	$w = _capture_warn { $rows = $j->selectall_arrayref(limit => 0) };
+	ok(scalar @{$w},
+		'_validate_pagination PATH-vp-3: limit=0 matches regex but <1 → carp');
+	is(scalar @{$rows}, 4,
+		'_validate_pagination PATH-vp-3: ignored → all 4 rows returned');
+}
+
+# PATH-vp-4: offset defined, valid ('1' matches /^\d+\z/a) → splice removes 1 row.
+{
+	my $p    = PathDA->new(cols => [$JC, 'v'], rows => [@VP_ROWS]);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC, backend => 'array');
+	my $rows = $j->selectall_arrayref(offset => 1);
+	is(scalar @{$rows}, 3,
+		'_validate_pagination PATH-vp-4: valid offset=1 → 1 row skipped, 3 remain');
+}
+
+# PATH-vp-5: offset defined, =0 ('0' matches /^\d+\z/a, value=0 is valid non-negative) →
+#   no carp; offset accepted; condition `$offset > 0` is FALSE so no splice.
+{
+	my $p = PathDA->new(cols => [$JC, 'v'], rows => [@VP_ROWS]);
+	my $j = Database::Join->new(databases => [$p], join_column => $JC, backend => 'array');
+	my ($rows, $w);
+	$w = _capture_warn { $rows = $j->selectall_arrayref(offset => 0) };
+	ok(!scalar @{$w},
+		'_validate_pagination PATH-vp-5: offset=0 valid non-negative → no carp');
+	is(scalar @{$rows}, 4,
+		'_validate_pagination PATH-vp-5: offset=0 → no rows skipped, all 4 returned');
+}
+
+# PATH-vp-6: offset defined, fails /^\d+\z/a (negative integer has leading '-') →
+#   carp emitted, offset treated as undef → no rows skipped.
+{
+	my $p = PathDA->new(cols => [$JC, 'v'], rows => [@VP_ROWS]);
+	my $j = Database::Join->new(databases => [$p], join_column => $JC, backend => 'array');
+	my ($rows, $w);
+	$w = _capture_warn { $rows = $j->selectall_arrayref(offset => '-1') };
+	ok(scalar @{$w},
+		'_validate_pagination PATH-vp-6: offset fails regex → carp emitted');
+	is(scalar @{$rows}, 4,
+		'_validate_pagination PATH-vp-6: invalid offset ignored → all 4 rows');
+}
+
+# PATH-vp-7: both limit and offset valid → both applied (combined path through both branches).
+#   offset=1 skips 1 row; limit=2 truncates to 2; net result from 4 rows: 2 rows.
+{
+	my $p    = PathDA->new(cols => [$JC, 'v'], rows => [@VP_ROWS]);
+	my $j    = Database::Join->new(databases => [$p], join_column => $JC, backend => 'array');
+	my $rows = $j->selectall_arrayref(limit => 2, offset => 1);
+	is(scalar @{$rows}, 2,
+		'_validate_pagination PATH-vp-7: limit=2 + offset=1 from 4 rows → 2 rows');
+}
+
+# ==========================================================================
+# Section 24: sort_by parse in _joined_query_array -- 9 CFG paths
+#
+# The sort_by parse block (before the merge loop) has these branches:
+#   defined $sort_by?
+#     TRUE:  ref eq 'ARRAY' → ($req_col,$req_dir)=@{$sort_by}  [PATH-ob-3]
+#                           → ($req_col,$req_dir)=($sort_by,'ASC')  [PATH-ob-2]
+#            valid req_dir? → unchanged  [all valid-dir paths]
+#                          → carp + 'ASC'  [PATH-ob-4]
+#            req_col in view? → (ob_col,ob_dir)=($req_col,$req_dir)  [PATH-ob-6,7,8,9]
+#                            → carp + join_col fallback  [PATH-ob-5]
+#     FALSE: default ob_col=join_col, ob_dir=ASC  [PATH-ob-1]
+#   ob_override = ($ob_col ne $join_col)
+#
+# PATH-ob-1: sort_by undef → defaults to join_col ASC
+# PATH-ob-2: sort_by is a plain string → req_dir defaults to 'ASC'
+# PATH-ob-3: sort_by is an arrayref [col, dir]
+# PATH-ob-4: req_dir not in {ASC,DESC} → carp + ASC
+# PATH-ob-5: req_col not in _col_db and != join_col → carp + join_col fallback
+# PATH-ob-6: valid non-join col, ASC → ob_override=TRUE → Schwarzian ASC
+# PATH-ob-7: valid non-join col, DESC → ob_override=TRUE → Schwarzian DESC
+# PATH-ob-8: req_col == join_col, explicit ASC → ob_override=FALSE, join_col ASC
+# PATH-ob-9: req_col == join_col, DESC → ob_override=FALSE, ob_dir=DESC → reverse
+# ==========================================================================
+
+note '--- Section 24: sort_by parse in _joined_query_array paths ---';
+
+# Fixture: join_col order (k1<k2<k3) differs from label order (alpha<beta<gamma).
+#   join_col ASC:  k1(gamma), k2(beta), k3(alpha)  -- k1 is first
+#   label    ASC:  k3(alpha), k2(beta), k1(gamma)  -- k3 is first
+#   label    DESC: k1(gamma), k2(beta), k3(alpha)  -- k1 is first
+
+Readonly::Array my @OB_ROWS => (
+	{ $JC => 'k3', label => 'alpha' },
+	{ $JC => 'k1', label => 'gamma' },
+	{ $JC => 'k2', label => 'beta'  },
+);
+
+sub _ob_da  { PathDA->new(cols => [$JC, 'label'], rows => [@OB_ROWS]) }
+sub _ob_join { Database::Join->new(databases => [_ob_da()], join_column => $JC, backend => 'array') }
+
+# PATH-ob-1: sort_by undef → block skipped; ob_col=join_col, ob_dir='ASC';
+#   merge loop uses `sort keys %key_set`; @result is already join_col ASC.
+{
+	my $rows = _ob_join()->selectall_arrayref();
+	is($rows->[0]{$JC}, 'k1',
+		'sort_by PATH-ob-1: undef → join_col ASC default → k1 first');
+}
+
+# PATH-ob-2: sort_by is a plain string → code path: not arrayref → $req_dir = 'ASC'.
+#   Result is label ASC: alpha(k3) first.
+{
+	my $rows = _ob_join()->selectall_arrayref(sort_by => 'label');
+	is($rows->[0]{label}, 'alpha',
+		'sort_by PATH-ob-2: string form → req_dir defaults to ASC → alpha first');
+}
+
+# PATH-ob-3: sort_by is an arrayref → code path: ref eq 'ARRAY' → @{$sort_by} deconstruct.
+#   Same label ASC semantics as PATH-ob-2 but different parse branch.
+{
+	my $rows = _ob_join()->selectall_arrayref(sort_by => ['label', 'ASC']);
+	is($rows->[0]{label}, 'alpha',
+		'sort_by PATH-ob-3: arrayref form [col,ASC] → arrayref branch taken → alpha first');
+}
+
+# PATH-ob-4: req_dir is not 'ASC' or 'DESC' → carp emitted; ASC used as fallback.
+{
+	my ($rows, $w);
+	$w = _capture_warn { $rows = _ob_join()->selectall_arrayref(sort_by => ['label', 'RANDOM']) };
+	ok((grep { /direction|RANDOM|sort_by/i } @{$w}),
+		'sort_by PATH-ob-4: invalid direction → carp emitted');
+	is($rows->[0]{label}, 'alpha',
+		'sort_by PATH-ob-4: ASC fallback applied → alpha first');
+}
+
+# PATH-ob-5: req_col not in _col_db AND req_col != join_col → carp; join_col fallback.
+{
+	my ($rows, $w);
+	$w = _capture_warn { $rows = _ob_join()->selectall_arrayref(sort_by => 'nonexistent') };
+	ok((grep { /sort_by|nonexistent|column/i } @{$w}),
+		'sort_by PATH-ob-5: unknown column → carp emitted');
+	is($rows->[0]{$JC}, 'k1',
+		'sort_by PATH-ob-5: join_col ASC fallback → k1 first');
+}
+
+# PATH-ob-6: valid non-join col, ASC → ob_override=TRUE; Schwarzian ASC.
+#   Same result as PATH-ob-2 but confirms this path goes through Schwarzian (ob_override=TRUE).
+{
+	my $rows = _ob_join()->selectall_arrayref(sort_by => ['label', 'ASC']);
+	is($rows->[0]{label}, 'alpha',
+		'sort_by PATH-ob-6: valid non-join col ASC → ob_override=TRUE, Schwarzian ASC → alpha first');
+}
+
+# PATH-ob-7: valid non-join col, DESC → ob_override=TRUE; Schwarzian DESC.
+{
+	my $rows = _ob_join()->selectall_arrayref(sort_by => ['label', 'DESC']);
+	is($rows->[0]{label}, 'gamma',
+		'sort_by PATH-ob-7: valid non-join col DESC → Schwarzian DESC → gamma first');
+}
+
+# PATH-ob-8: req_col == join_col, explicit ASC → ob_override=FALSE (join_col == join_col);
+#   ob_dir='ASC'; no Schwarzian; no reverse; @result already in join_col ASC order.
+{
+	my $rows = _ob_join()->selectall_arrayref(sort_by => [$JC, 'ASC']);
+	is($rows->[0]{$JC}, 'k1',
+		'sort_by PATH-ob-8: join_col explicit ASC → ob_override=FALSE → join_col ASC, k1 first');
+}
+
+# PATH-ob-9: req_col == join_col, DESC → ob_override=FALSE, ob_dir='DESC';
+#   merge loop iterates `sort keys` giving ASC; then `reverse @result` gives DESC.
+{
+	my $rows = _ob_join()->selectall_arrayref(sort_by => [$JC, 'DESC']);
+	is($rows->[0]{$JC}, 'k3',
+		'sort_by PATH-ob-9: join_col DESC → ob_override=FALSE, reverse applied → k3 first');
+}
+
+# ==========================================================================
+# Section 25: post-merge pagination splice paths
+#
+# After ordering, two independent `if` guards control offset and limit:
+#   if (defined $offset && $offset > 0)  { splice(@result, 0, $offset) }
+#   if (defined $limit  && $limit < @result) { splice(@result, $limit) }
+#
+# PATH-pg-1: offset undef      → first guard FALSE → no front splice
+# PATH-pg-2: offset defined=0  → `$offset > 0` is FALSE → no front splice
+# PATH-pg-3: offset defined>0  → guard TRUE → splice from front
+# PATH-pg-4: limit undef       → second guard FALSE → no truncation
+# PATH-pg-5: limit >= @result  → `$limit < @result` is FALSE → no truncation
+# PATH-pg-6: limit < @result   → guard TRUE → splice to truncate
+# ==========================================================================
+
+note '--- Section 25: post-merge pagination splice paths ---';
+
+Readonly::Array my @PG_ROWS => (
+	{ $JC => 'p1', v => 10 },
+	{ $JC => 'p2', v => 20 },
+	{ $JC => 'p3', v => 30 },
+);
+
+sub _pg_join { Database::Join->new(
+	databases   => [ PathDA->new(cols => [$JC, 'v'], rows => [@PG_ROWS]) ],
+	join_column => $JC,
+	backend     => 'array',
+) }
+
+# PATH-pg-1: offset undef → `defined $offset` is FALSE → first guard skipped → all rows.
+{
+	my $rows = _pg_join()->selectall_arrayref(limit => undef);
+	is(scalar @{$rows}, 3,
+		'pagination PATH-pg-1: offset undef → front-splice guard FALSE → all 3 rows');
+}
+
+# PATH-pg-2: offset=0 → `defined $offset` is TRUE but `$offset > 0` is FALSE → no splice.
+{
+	my $rows = _pg_join()->selectall_arrayref(offset => 0);
+	is(scalar @{$rows}, 3,
+		'pagination PATH-pg-2: offset=0 → condition $offset>0 FALSE → no front splice → 3 rows');
+}
+
+# PATH-pg-3: offset=1 > 0 → guard TRUE → splice(@result, 0, 1) removes first row.
+{
+	my $rows = _pg_join()->selectall_arrayref(offset => 1);
+	is(scalar @{$rows}, 2,
+		'pagination PATH-pg-3: offset=1 → guard TRUE → splice 1 from front → 2 rows');
+}
+
+# PATH-pg-4: limit undef → `defined $limit` is FALSE → second guard skipped → all rows.
+{
+	my $rows = _pg_join()->selectall_arrayref(offset => undef);
+	is(scalar @{$rows}, 3,
+		'pagination PATH-pg-4: limit undef → truncation guard FALSE → all 3 rows');
+}
+
+# PATH-pg-5: limit=5 >= 3 rows → `$limit < @result` (5 < 3) is FALSE → no truncation.
+{
+	my $rows = _pg_join()->selectall_arrayref(limit => 5);
+	is(scalar @{$rows}, 3,
+		'pagination PATH-pg-5: limit=5 >= 3 rows → truncation guard FALSE → all 3 returned');
+}
+
+# PATH-pg-6: limit=2 < 3 rows → guard TRUE → splice(@result, 2) truncates to 2 rows.
+{
+	my $rows = _pg_join()->selectall_arrayref(limit => 2);
+	is(scalar @{$rows}, 2,
+		'pagination PATH-pg-6: limit=2 < 3 rows → guard TRUE → truncated to 2 rows');
+}
+
+# ==========================================================================
+# Section 26: parallel dispatch paths in _joined_query_array
+#
+# Gate: `if ($self->{_parallel} && $n > 2)`
+#
+# PATH-par-1: _parallel=0 (falsy) → gate FALSE → else branch → sequential
+# PATH-par-2: _parallel=1, n=2 → `$n > 2` is FALSE → gate FALSE → sequential
+# PATH-par-3: _parallel=1, n=3, threads unavailable → HAS_THREADS=0 →
+#             carp + sequential fallback
+# PATH-par-4: _parallel=1, n=3, threads available → parallel dispatch
+#             (HAS_THREADS=1; SKIP if threads not installed)
+# ==========================================================================
+
+note '--- Section 26: parallel dispatch paths ---';
+
+sub _mk3_dbs {
+	return (
+		PathDA->new(cols => [$JC, 'a'], rows => [{ $JC => 'k1', a => 1 }, { $JC => 'k2', a => 2 }]),
+		PathDA->new(cols => [$JC, 'b'], rows => [{ $JC => 'k1', b => 10 }]),
+		PathDA->new(cols => [$JC, 'c'], rows => [{ $JC => 'k1', c => 100 }]),
+	);
+}
+
+# PATH-par-1: _parallel=0 (default) → gate `_parallel && n > 2` is FALSE (falsy left side).
+{
+	my $j    = Database::Join->new(databases => [_mk3_dbs()], join_column => $JC, backend => 'array');
+	my $rows = $j->selectall_arrayref();
+	is(scalar @{$rows}, 2,
+		'parallel PATH-par-1: _parallel=0 → gate FALSE → sequential → 2 correct rows');
+}
+
+# PATH-par-2: _parallel=1, n=2 → `$n > 2` is FALSE → gate FALSE → sequential path.
+{
+	my ($p, $s) = _std_dbs();
+	my $j    = Database::Join->new(
+		databases => [$p, $s], join_column => $JC, backend => 'array', parallel => 1,
+	);
+	my $rows = $j->selectall_arrayref();
+	is(scalar @{$rows}, 2,
+		'parallel PATH-par-2: _parallel=1 + n=2 → n>2 FALSE → sequential → 2 rows');
+	is($rows->[0]{name}, 'Alice',
+		'parallel PATH-par-2: correct data via sequential path (k1 → Alice)');
+}
+
+# PATH-par-3: _parallel=1, n=3, threads module not installed → HAS_THREADS=0 →
+#   carp 'requires the threads module; falling back to sequential' + sequential result.
+{
+	my $w = _capture_warn {
+		my $j = Database::Join->new(
+			databases => [_mk3_dbs()], join_column => $JC,
+			backend => 'array', parallel => 1,
+		);
+		$j->selectall_arrayref();
+	};
+	SKIP: {
+		# If threads IS installed, PATH-par-3 (no-threads branch) cannot be exercised.
+		my $has_threads = do { local $@; eval { require threads; 1 } ? 1 : 0 };
+		skip 'threads module available; PATH-par-3 (no-threads fallback) unreachable', 2
+			if $has_threads;
+		ok((grep { /threads.*module|falling back/i } @{$w}),
+			'parallel PATH-par-3: no threads → carp emitted');
+		# Even with the fallback, the correct sequential result is returned.
+		my $j2   = Database::Join->new(
+			databases => [_mk3_dbs()], join_column => $JC,
+			backend => 'array', parallel => 1,
+		);
+		my $rows = $j2->selectall_arrayref();
+		is(scalar @{$rows}, 2,
+			'parallel PATH-par-3: sequential fallback → 2 correct rows');
+	}
+}

@@ -126,6 +126,7 @@ t/154-grouped-delete.t
 t/155-select-normaliser.t
 t/156-resultset-inflate-datetime.t
 t/157-safe-class-loading.t
+t/158-worker-health-check.t
 t/benchmark.pl
 t/changes.t
 t/manifest.t

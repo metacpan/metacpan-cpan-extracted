@@ -1,13 +1,12 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v1.3.1
+## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/SQLite.pm
+## Version v1.4.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/26
+## Modified 2026/09/23
 ## All rights reserved
-## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -18,6 +17,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use vars qw(
         $VERSION $CACHE_SIZE $CONNECT_VIA $ERROR $DEBUG
         $USE_BIND $USE_CACHE $MOD_PERL
@@ -28,9 +28,8 @@ BEGIN
     die( $@ ) if( $@ );
     use parent qw( DB::Object );
     use POSIX ();
-    use DateTime;
-    use DateTime::TimeZone;
-    use DateTime::Format::Strptime;
+    use DateTime::Lite;
+    use DateTime::Lite::TimeZone;
     use Module::Generic::File qw( sys_tmpdir );
     # <https://metacpan.org/pod/DBD::SQLite::Constants>
     # <https://www.sqlite.org/datatype3.html>
@@ -81,7 +80,7 @@ BEGIN
     }
     our $PLACEHOLDER_REGEXP = qr/(?:(?<![?\w])\?(?<index>[1-9]\d*)(?!\w))/;
     our $EXCEPTION_CLASS    = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.3.1';
+    our $VERSION = 'v1.4.0';
 };
 
 use strict;
@@ -170,7 +169,7 @@ foreach my $type ( keys( %$DATATYPES_DICT ) )
     };
     if( $@ )
     {
-        warn( "Datatype \"DBD::SQLite::Constants::${c}\" is not defined in DBD::SQLite version $DBD::SQLite::VERSION: $@" );
+        warn( "Datatype \"DBD::SQLite::Constants::${c}\" is not defined in DBD::SQLite version $DBD::SQLite::VERSION: $@" ) if( warnings::enabled( 'DB::Object' ) );
         delete( $DATATYPES_DICT->{ $type } );
     }
     else
@@ -293,8 +292,26 @@ sub attribute($;$@)
 sub begin_work($;$@)
 {
     my $self = shift( @_ );
-    $self->{transaction} = 1;
-    return( $self->{dbh}->begin_work( @_ ) );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->begin_work( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling begin_work(). Have you forgotten to turn on AutoCommit?: $@" ) );
+    }
+    elsif( !$rv && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+
+    if( defined( $rv ) )
+    {
+        $self->_transaction_started;
+        return( $rv || 1 );
+    }
+    return;
 }
 
 # This method is common to DB::Object and DB::Object::Statement
@@ -309,8 +326,26 @@ sub can_update_delete_limit { return( shift->has_compile_option( 'ENABLE_UPDATE_
 sub commit($;$@)
 {
     my $self = shift( @_ );
-    $self->{transaction} = 0;
-    return( $self->{dbh}->commit( @_ ) );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->commit( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling commit(): $@" ) );
+    }
+    elsif( !$rv && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+
+    if( defined( $rv ) )
+    {
+        $self->_transaction_finished;
+        return( $rv || 1 );
+    }
+    return;
 }
 
 sub compile_options
@@ -596,7 +631,27 @@ sub returning
 
 sub rollback
 {
-    return( shift->{dbh}->rollback() );
+    my $self = shift( @_ );
+    local $@;
+    my $rv = eval
+    {
+        return( $self->{dbh}->rollback( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error calling rollback: $@" ) );
+    }
+    elsif( !$rv && $self->{dbh}->err )
+    {
+        return( $self->error({ code => $self->{dbh}->err, message => $self->{dbh}->errstr }) );
+    }
+
+    if( defined( $rv ) )
+    {
+        $self->_transaction_finished;
+        return( $rv || 1 );
+    }
+    return;
 }
 
 sub sql_function_register
@@ -746,20 +801,26 @@ sub _check_connect_param
     my $param = $self->SUPER::_check_connect_param( @_ );
     if( !$param->{database_file} && $param->{database} )
     {
-        my( $filename, $path, $ext );
-        my $uri = CORE::exists( $param->{uri} ) ? $param->{uri} : '';
-        my $db = $param->{database} ? $param->{database} : ( $uri->path_segments )[-1];
-        $path = $uri ? $uri->path : $db;
-        # $db = Cwd::abs_path( $uri ? $uri->path : $db );
-        # $db = File::Spec->rel2abs( $path );
-        $db = $self->new_file( $path );
-        # If we cannot find the file and it does not end with .sqlite, let's add the extension
-        # So the user can provide the database parameter just like database => 'test' or database => './test'
-        $db = "$db.sqlite" if( !-e( $db ) && $db !~ /\.sqlite$/i );
-        # ( $filename, $path, $ext ) = File::Basename::fileparse( $db, qr/\.[^\.]+$/ );
-        ( $filename, $path, $ext ) = $db->baseinfo( qr/\.[^\.]+$/ );
-        $param->{database} = $filename;
-        $param->{database_file} = $self->{database_file} = $db;
+        if( $param->{database} eq ':memory:' )
+        {
+            $param->{database_file} = $self->{database_file} = ':memory:';
+        }
+        else
+        {
+            my( $filename, $path, $ext );
+            my $uri = CORE::exists( $param->{uri} ) ? $param->{uri} : '';
+            my $db = $param->{database} ? $param->{database} : ( $uri->path_segments )[-1];
+            $path = $uri ? $uri->path : $db;
+            # $db = Cwd::abs_path( $uri ? $uri->path : $db );
+            # $db = File::Spec->rel2abs( $path );
+            $db = $self->new_file( $path );
+            # If we cannot find the file and it does not end with .sqlite, let's add the extension
+            # So the user can provide the database parameter just like database => 'test' or database => './test'
+            $db = $self->new_file( "$db.sqlite" ) if( !$db->exists && $db->extension->lc ne 'sqlite' );
+            ( $filename, $path, $ext ) = $db->baseinfo( qr/\.[^\.]+$/ );
+            $param->{database} = $filename;
+            $param->{database_file} = $self->{database_file} = $db;
+        }
     }
     $param->{host} = 'localhost' if( !length( $param->{host} ) );
     $param->{port} = 0 if( !CORE::exists( $param->{port} ) );
@@ -799,12 +860,14 @@ sub _connection_parameters
     my $param = shift( @_ );
     # Even though login, password, server, host are not used, I was hesitating, but decided to leave them as ok, and ignore them
     # Or maybe should I issue an error when they are provided?
-    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections cache_dir cache_query cache_table unknown_field use_cache )];
+    my $core = $self->new_array( [qw( db login passwd host port driver database server opt uri debug cache_connections cache_dir cache_query cache_table unknown_field use_cache id )] );
     my @sqlite_params = grep( /^sqlite_/, keys( %$param ) );
     # See DBD::SQLite for the list of valid parameters
     # E.g.: sqlite_open_flags sqlite_busy_timeout sqlite_use_immediate_transaction sqlite_see_if_its_a_number sqlite_allow_multiple_statements sqlite_unprepared_statements sqlite_unicode sqlite_allow_multiple_statements sqlite_use_immediate_transaction
-    push( @$core, @sqlite_params );
-    return( $core );
+    $core->push( @sqlite_params );
+    my $core_fields = $self->{_core_fields} || [];
+    $core->push( @$core_fields );
+    return( $core->unique(1) );
 }
 
 sub _dbi_connect
@@ -848,77 +911,6 @@ sub _dsn
     return( join( ';', @params ) );
 }
 
-sub _parse_timestamp
-{
-    my $self = shift( @_ );
-    my $str  = shift( @_ );
-    # No value was actually provided
-    return if( !length( $str ) );
-    # try-catch
-    local $@;
-    my $tz = eval
-    {
-        return( DateTime::TimeZone->new( name => 'local' ) );
-    };
-    if( $@ )
-    {
-        $tz = DateTime::TimeZone->new( name => 'UTC' );
-    }
-    my $error = 0;
-    my $opt = 
-    {
-        pattern     => '%Y-%m-%d %T',
-        locale      => 'en_GB',
-        time_zone   => $tz->name,
-        on_error    => sub{ $error++ },
-    };
-    # 2019-06-19 23:23:57.000000000+0900
-    # From PostgreSQL: 2019-06-20 11:02:36.306917+09
-    # ISO 8601: 2019-06-20T11:08:27
-    if( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})(?:\.\d+)?((?:\+|\-)\d{2,4})?/ )
-    {
-        my( $date, $time, $zone ) = ( "$1-$2-$3", $4, $5 );
-        if( !length( $zone ) )
-        {
-            my $dt = DateTime->now( time_zone => $tz );
-            my $offset = $dt->offset;
-            # e.g. 9 or possibly 9.5
-            my $offset_hour = ( $offset / 3600 );
-            # e.g. 9.5 => 0.5 * 60 = 30
-            my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
-            $zone  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
-        }
-        $date =~ tr/\//-/;
-        $zone .= '00' if( length( $zone ) == 3 );
-        $str = "$date $time$zone";
-        $opt->{pattern} = '%Y-%m-%d %T%z';
-    }
-    # From SQLite: 2019-06-20 02:03:14
-    # From MySQL: 2019-06-20 11:04:01
-    elsif( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})/ )
-    {
-        my( $date, $time ) = ( "$1-$2-$3", $4 );
-        my $dt = DateTime->now( time_zone => $tz );
-        my $offset = $dt->offset;
-        # e.g. 9 or possibly 9.5
-        my $offset_hour = ( $offset / 3600 );
-        # e.g. 9.5 => 0.5 * 60 = 30
-        my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
-        my $offset_str  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
-        $date =~ tr/\//-/;
-        $str = "$date $time$offset_str";
-        $opt->{pattern} = '%Y-%m-%d %T%z';
-    }
-    elsif( $str =~ /^(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})$/ )
-    {
-        $str = "$1-$2-$3";
-        $opt->{pattern} = '%Y-%m-%d';
-    }
-    my $strp = DateTime::Format::Strptime->new( %$opt );
-    my $dt = $strp->parse_datetime( $str );
-    return( $dt );
-}
-
 # Private function
 sub _ceiling
 {
@@ -943,13 +935,13 @@ sub _curdate
     local $@;
     my $tz = eval
     {
-        return( DateTime::TimeZone->new( name => 'local' ) );
+        return( DateTime::Lite::TimeZone->new( name => 'local' ) );
     };
     if( $@ )
     {
-        $tz = DateTime::TimeZone->new( name => 'UTC' );
+        $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
     }
-    my $d = DateTime->from_epoch( epoch => time(), time_zone => $tz->name );
+    my $d = DateTime::Lite->from_epoch( epoch => time(), time_zone => $tz->name );
     return( $d->ymd( '-' ) );
 }
 
@@ -961,13 +953,13 @@ sub _curtime
     local $@;
     my $tz = eval
     {
-        return( DateTime::TimeZone->new( name => 'local' ) );
+        return( DateTime::Lite::TimeZone->new( name => 'local' ) );
     };
     if( $@ )
     {
-        $tz = DateTime::TimeZone->new( name => 'UTC' );
+        $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
     }
-    my $d = DateTime->now( time_zone => $tz->name );
+    my $d = DateTime::Lite->now( time_zone => $tz->name );
     return( $d->hms( ':' ) );
 }
 
@@ -1027,13 +1019,13 @@ sub _from_days
     local $@;
     my $tz = eval
     {
-        return( DateTime::TimeZone->new( name => 'local' ) );
+        return( DateTime::Lite::TimeZone->new( name => 'local' ) );
     };
     if( $@ )
     {
-        $tz = DateTime::TimeZone->new( name => 'UTC' );
+        $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
     }
-    my $origin = DateTime->new(
+    my $origin = DateTime::Lite->new(
         year       => 0,
         month      => 1,
         day        => 1,
@@ -1042,11 +1034,11 @@ sub _from_days
         second     => 0,
         time_zone => $tz,
     );
-    my $epoch = DateTime->from_epoch( epoch => 0, time_zone => $tz );
+    my $epoch = DateTime::Lite->from_epoch( epoch => 0, time_zone => $tz );
     # https://stackoverflow.com/questions/821423/how-can-i-calculate-the-number-of-days-between-two-dates-in-perl#7111718
     my $epoch_days = $epoch->delta_days( $origin )->delta_days();
     my $days_since_epoch = $from_days - int( $epoch_days );
-    my $dt = DateTime->from_epoch( epoch => ( $days_since_epoch * 86400 ), time_zone => $tz );
+    my $dt = DateTime::Lite->from_epoch( epoch => ( $days_since_epoch * 86400 ), time_zone => $tz );
     return( $dt );
 }
 
@@ -1059,13 +1051,13 @@ sub _from_unixtime
     local $@;
     my $tz = eval
     {
-        return( DateTime::TimeZone->new( name => 'local' ) );
+        return( DateTime::Lite::TimeZone->new( name => 'local' ) );
     };
     if( $@ )
     {
-        $tz = DateTime::TimeZone->new( name => 'UTC' );
+        $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
     }
-    my $dt = DateTime->from_epoch( epoch => $args[0], time_zone => $tz->name );
+    my $dt = DateTime::Lite->from_epoch( epoch => $args[0], time_zone => $tz->name );
     return( $dt->strftime( '%Y-%m-%d %T%z' ) );
 }
 
@@ -1232,13 +1224,13 @@ sub _to_days
     local $@;
     my $tz = eval
     {
-        return( DateTime::TimeZone->new( name => 'local' ) );
+        return( DateTime::Lite::TimeZone->new( name => 'local' ) );
     };
     if( $@ )
     {
-        $tz = DateTime::TimeZone->new( name => 'UTC' );
+        $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
     }
-    my $origin = DateTime->new(
+    my $origin = DateTime::Lite->new(
         year       => 0,
         month      => 1,
         day        => 1,
@@ -1312,9 +1304,7 @@ DESTROY
         # print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{ 'query' }\n" ) if( $DEBUG );
         $self->{sth}->finish();
     }
-    elsif( $self->{dbh} && $class =~ /^AI\:\:DB\:\:Postgres$/ )
     {
-        local( $SIG{__WARN__} ) = sub { };
         # $self->{dbh}->disconnect();
 #         if( $DEBUG )
 #         {
@@ -1427,7 +1417,7 @@ DB::Object::SQLite - DB Object SQLite Driver
 
 =head1 VERSION
 
-    v1.3.1
+    v1.4.0
 
 =head1 DESCRIPTION
 
@@ -1455,7 +1445,7 @@ Create a new instance of L<DB::Object::SQLite>. Nothing much to say.
 
 Same as L<DB::Object/connect>, only specific to SQLite.
 
-See L</_connection_params2hash>
+See L<DB::Object/_connection_params2hash>
 
 =head1 METHODS
 
@@ -1472,6 +1462,9 @@ This is inherited from L<DB::Object/as_string>
 This is inherited from L<DB::Object/avoid>
 
 =head2 attribute
+
+    my $value = $dbh->attribute;
+    $dbh->attribute( $value );
 
 Sets or get the value of database connection parameters.
 
@@ -1682,6 +1675,8 @@ This is an inherited method from L<DB::Object/cache>
 
 =head2 can_update_delete_limit
 
+    my $value = $dbh->can_update_delete_limit;
+
 Returns the boolean value for the SQLite compiled option C<ENABLE_UPDATE_DELETE_LIMIT> by calling L</has_compile_option>
 
 =head2 check_driver
@@ -1692,11 +1687,13 @@ This is an inherited method from L<DB::Object/check_driver>
 
 Make any change to the database irreversible.
 
-This must be used only after having called L</begin_work>
+This must be used only after having called C<begin_work>
 
 Any arguments provided are passed along to L<DBD::SQLite/commit>
 
 =head2 compile_options
+
+    my $value = $dbh->compile_options;
 
 Returns the cached list of SQLite compiled options. The cached file is in the file C<sql_sqlite_compile_options.cfg> in the sytem directory.
 
@@ -1704,9 +1701,9 @@ Returns the cached list of SQLite compiled options. The cached file is in the fi
 
 Same as L<DB::Object/connect>, only specific to SQLite.
 
-It sets C<sqlite_unicode> to a true value in the connection parameters returned by L</_connection_params2hash>
+It sets C<sqlite_unicode> to a true value in the connection parameters returned by L<DB::Object/_connection_params2hash>
 
-See L</_connection_params2hash>
+See L<DB::Object/_connection_params2hash>
 
 =head2 copy
 
@@ -1730,9 +1727,13 @@ This is an inherited method from L<DB::Object/database>
 
 =head2 database_file
 
+    my $value = $dbh->database_file;
+
 Returns the file path to the database file.
 
 =head2 databases
+
+    my $value = $dbh->databases;
 
 Returns a list of databases, which in SQLite, means a list of opened sqlite database files.
 
@@ -1790,6 +1791,13 @@ See L<DB::Object::SQLite::Tables/on_conflict>
 
 This is still a work in progress.
 
+=head2 query_object
+
+    my $value = $dbh->query_object;
+    $dbh->query_object( $value );
+
+Set or gets the SQLite query object (L<DB::Object::SQLite::Query>) used to process and format queries.
+
 =head2 replace
 
 Just like for the INSERT query, L</replace> takes one optional argument representing a L<DB::Object::SQLite::Statement> SELECT object or a list of field-value pairs.
@@ -1832,13 +1840,17 @@ Provided with a function name and this will remove it.
 
 It returns false if there is no function, or returns the options hash reference originally set for the function removed.
 
+=head2 replace
+
+Provided with a string, some term to replace and a replacement string and this will do a perl substitution and return the resulting string.
+
 =head2 returning
 
 A convenient wrapper to L<DB::Object::Postgres::Query/returning>
 
 =head2 rollback
 
-Will roll back any changes made to the database since the last transaction point marked with L</begin_work>
+Will roll back any changes made to the database since the last transaction point marked with C<begin_work>
 
 =head2 sql_function_register
 
@@ -1898,6 +1910,8 @@ The object type, which may be one of: C<table>, C<view>, C<materialized view>, C
 
 =head2 tables
 
+    my $value = $dbh->tables;
+
 Connects to the database and finds out the list of all available tables.
 
 Returns undef or empty list in scalar or list context respectively if no table found.
@@ -1923,6 +1937,8 @@ Unlock is unsupported on SQLite.
 Variables are unsupported on SQLite.
 
 =head2 version
+
+    my $value = $dbh->version;
 
 This returns the, possibly cached, SQLite server version as a L<version> object.
 
@@ -1974,10 +1990,6 @@ Using the L</database_file> set and this will issue a connection to the SQLite d
 
 If the file does not exist or is not writable, this will return an error, otherwise this will return the string representing the dsn, which are connection parameters separated by C<;>
 
-=head2 _parse_timestamp
-
-Provided a string and this will parse it to return a L<DateTime> object.
-
 =head1 SQLITE FUNCTIONS AVAILABLE
 
 =head2 ceiling
@@ -1994,29 +2006,29 @@ This returns the arguments provided concatenated as a string.
 
 Returns a string representing the year, month and date separated by a C<->
 
-This is computed using L<DateTime>
+This is computed using L<DateTime::Lite>
 
 =head2 curtime
 
 Returns a string representing the hours, minutes and seconds separated by a C<:>
 
-This is computed using L<DateTime>
+This is computed using L<DateTime::Lite>
 
 =head2 dayname
 
-Based on a datetime that is parsed using L</_parse_timestamp>, this returns the day name of the week, such as C<Monday>
+Based on a datetime that is parsed using L<Module::Generic/_parse_timestamp>, this returns the day name of the week, such as C<Monday>
 
 =head2 dayofmonth
 
-Based on a datetime that is parsed using L</_parse_timestamp>, this returns the day of the month, such as 17.
+Based on a datetime that is parsed using L<Module::Generic/_parse_timestamp>, this returns the day of the month, such as 17.
 
 =head2 dayofweek
 
-Based on a datetime that is parsed using L</_parse_timestamp>, this returns the day of the week as a number from 1 to 7 with 1 being Monday
+Based on a datetime that is parsed using L<Module::Generic/_parse_timestamp>, this returns the day of the week as a number from 1 to 7 with 1 being Monday
 
 =head2 dayofyear
 
-Based on a datetime that is parsed using L</_parse_timestamp>, this returns the day of the year, such as a number from 1 to 365, or possibly 366 depending on the year.
+Based on a datetime that is parsed using L<Module::Generic/_parse_timestamp>, this returns the day of the year, such as a number from 1 to 365, or possibly 366 depending on the year.
 
 =head2 distance_miles
 
@@ -2026,7 +2038,7 @@ See the source L<StackOverflow post on which this function is based|http://stack
 
 =head2 from_days
 
-Calculate the number of days since January 1st of year 0 and returns a L<DateTime> object.
+Calculate the number of days since January 1st of year 0 and returns a L<DateTime::Lite> object.
 
 =head2 from_unixtime
 
@@ -2076,10 +2088,6 @@ Provided with a number and a power, and this will return the number powered
 
 Provided with a date time, and this will parse it and return the quarter.
 
-=head2 query_object
-
-Set or gets the SQLite query object (L<DB::Object::SQLite::Query>) used to process and format queries.
-
 =head2 rand
 
 This takes no argument and simply returns a random number using L<perlfunc/rand>
@@ -2087,10 +2095,6 @@ This takes no argument and simply returns a random number using L<perlfunc/rand>
 =head2 regexp
 
 Provided with a regular expression and the string to test, and this will test the regular expression and return true if it matches or false otherwise.
-
-=head2 replace
-
-Provided with a string, some term to replace and a replacement string and this will do a perl substitution and return the resulting string.
 
 =head2 right
 
@@ -2142,7 +2146,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2026 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

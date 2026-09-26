@@ -1,5 +1,26 @@
 Revision history for Perl extension JQ::XS.
 
+2.04
+	- No change to what the module computes.  Fixes t/JQ-XS.t on a perl
+	  built with -Duselongdouble or -Dusequadmath, where it failed:
+
+	    #   Failed test 'float identity roundtrip'
+	    #   at t/JQ-XS.t line 44.
+	    #          $got->[0] = '3.14000000000000012'
+	    #     $expected->[0] = '3.14'
+
+	  jq holds every number as an IEEE double.  An NV on those perls is
+	  wider than that, so the literal 3.14 loses the excess precision on
+	  the way into jq and comes back as the nearest double, which is
+	  correct but does not compare equal to what went in.  The test now
+	  narrows the literal with "pack 'd'" first -- the same conversion
+	  the XS performs when it casts an NV to a double for jq, and a
+	  no-op where an NV already is one -- so both sides hold the same
+	  double on every perl.  Documented under "Number handling", with
+	  the note that process_json() is unaffected: it returns jq's own
+	  JSON text, and jq reproduces the literal of any number it has not
+	  done arithmetic on.  Reported by Andreas Koenig (GH #3).
+
 2.03
 	- No change to the module itself.  Fixes building the distribution
 	  against Archive::Tar 3.x, which refuses to unpack the vendored jq

@@ -357,12 +357,12 @@ MODE2
     like($out, qr/^IRSend /, 'Tasmota IRSend output');
 };
 
-subtest 'ir-convert gcir to wig passes unknown protocols through' => sub {
-    # Two commands extracted from a real "Eufy 40 Bit" GC export; the
-    # workspace sample files are local-only, so the payloads are embedded.
+subtest 'ir-convert json to wig passes unknown protocols through' => sub {
+    # Two commands from a real JSON IR database dump code set; the dump is
+    # not redistributed, so the payloads are embedded here.
     my $dir = tempdir(CLEANUP => 1);
-    my $gc = File::Spec->catfile($dir, 'eufy.gc.json');
-    _slurp_write($gc, <<'JSON');
+    my $dump = File::Spec->catfile($dir, 'codeset.json');
+    _slurp_write($dump, <<'JSON');
 {"commands": [
   {"keycode": "G:Eufy 40 Bit:()(0x68A0000008)():3", "name": "Auto",
    "pronto": "0000 006D 002A 0000 0071 0072 0013 0013 0013 0039 0013 0039 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0039 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0304",
@@ -373,8 +373,8 @@ subtest 'ir-convert gcir to wig passes unknown protocols through' => sub {
 ]}
 JSON
 
-    my ($out, $exit) = run_script('ir-convert', '--from', 'gcir', '--to', 'wig',
-        '--in', $gc, '--name', 'Eufy Vacuum');
+    my ($out, $exit) = run_script('ir-convert', '--from', 'json', '--to', 'wig',
+        '--in', $dump, '--name', 'Eufy Vacuum');
     is($exit, 0, 'exits 0');
     my $wig = json_ok($out, 'wig output');
     return unless $wig;

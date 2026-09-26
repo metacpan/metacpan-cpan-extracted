@@ -23,14 +23,14 @@ Formats:
     tasmota      Tasmota IRsend raw data, one signal per line (import/export)
     mode2        LIRC mode2 pulse/space capture, one timing per line (import/export)
     lirc         LIRC remote definition (.lircd.conf), protocol or raw codes
-    gcir         Global Cache IR JSON, "--device" control commands (import only)
-    globalcache  Alias for gcir
+    json         JSON IR database dump, "commands" list or a device file
+                 pointing at its code set (import only)
 
 Usage:
     ir-convert [options] --from FORMAT --to FORMAT
 
 Options:
-    --from FORMAT   Input format (required): csv, wig, pronto, tasmota, mode2, lirc, gcir
+    --from FORMAT   Input format (required): csv, wig, pronto, tasmota, mode2, lirc, json
     --to FORMAT     Output format (required): csv, wig, pronto, tasmota, mode2, lirc
     --in FILE       Read input from FILE instead of stdin
     --out FILE      Write output to FILE instead of stdout
@@ -48,7 +48,7 @@ Examples:
     cat capture.tasmota | ir-convert --from tasmota --to pronto
     ir-convert --from wig --to tasmota --in remote.wig.json
     ir-convert --from lirc --to pronto --in remote.lircd.conf
-    ir-convert --from gcir --to wig --in gc.json --name "Vacuum"
+    ir-convert --from json --to wig --in dump.json --name "Vacuum"
 USAGE
 
 my %opt;
@@ -72,18 +72,24 @@ if ($opt{help}) {
 }
 usage_error("--from and --to are required")    unless $opt{from} && $opt{to};
 
-my %importable = map { $_ => 1 } qw(csv wig pronto tasmota mode2 lirc gcir globalcache);
+my %importable = map { $_ => 1 } qw(csv wig pronto tasmota mode2 lirc json);
 my %exportable = map { $_ => 1 } qw(csv wig pronto tasmota mode2 lirc);
 
-usage_error("unsupported --from '" . $opt{from} . "' (choose: csv, wig, pronto, tasmota, mode2, lirc, gcir)")
+usage_error("unsupported --from '" . $opt{from} . "' (choose: csv, wig, pronto, tasmota, mode2, lirc, json)")
     unless $importable{lc $opt{from}};
 usage_error("unsupported or non-exportable --to '" . $opt{to} . "' (choose: csv, wig, pronto, tasmota, mode2, lirc)")
     unless $exportable{lc $opt{to}};
 
 my $converter = Protocol::IR::Converter->new();
+my $from      = lc $opt{from};
 my $to        = lc $opt{to};
 
-my $codes = $converter->import_format(lc $opt{from}, read_input($opt{in}));
+# A JSON dump's device document names a code set by path, so the formats
+# that resolve such references are handed the file path, not its contents.
+my %path_aware = map { $_ => 1 } qw(json wig);
+my $input = defined $opt{in} && $path_aware{$from} ? $opt{in} : read_input($opt{in});
+
+my $codes = $converter->import_format($from, $input);
 $codes = [ $codes ] unless ref $codes eq 'ARRAY';
 die "No signals decoded from the input\n" unless @$codes;
 

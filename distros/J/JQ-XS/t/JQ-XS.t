@@ -39,9 +39,16 @@ my $data = { foo => [1, 2, 3], bar => 'baz' };
 @result = $jq->process($data);
 is_deeply(\@result, [$data], 'nested hash identity roundtrip');
 
-# Test identity roundtrip with float
-@result = $jq->process(3.14);
-is_deeply(\@result, [3.14], 'float identity roundtrip');
+# Test identity roundtrip with float.  jq's numbers are IEEE doubles, so narrow
+# the literal to the double jq will hand back before comparing: on a perl whose
+# NV is wider than a double (-Duselongdouble, -Dusequadmath) 3.14 carries more
+# precision than jq can hold, and comes back stringifying as
+# 3.14000000000000012 -- correct, but not equal to what went in.  "pack 'd'" is
+# the same narrowing the XS does when it casts an NV to double for jq, and is a
+# no-op where an NV already is a double.
+my $float = unpack 'd', pack 'd', 3.14;
+@result = $jq->process($float);
+is_deeply(\@result, [$float], 'float identity roundtrip');
 
 # Test array iteration
 $jq = JQ::XS->new('.[]');

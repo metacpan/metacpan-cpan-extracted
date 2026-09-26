@@ -1,28 +1,28 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Query.pm
-## Version v0.5.1
+## Version v0.5.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/26
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package DB::Object::Mysql::Query;
 BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( DB::Object::Query );
     use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use Wanted;
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.5.1';
+    our $VERSION = 'v0.5.2';
 };
 
 use strict;
@@ -304,7 +304,7 @@ sub reset
         my $keys = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
         CORE::delete( @$self{ @$keys } );
         $self->{query_reset}++;
-        $self->{enhance} = 1;
+        # $self->{enhance} = 1;
     }
     return( $self );
 }
@@ -372,7 +372,7 @@ sub _query_components
         }
         else
         {
-            warn( "Warning only: the MySQL ON CONFLICT clause is only supported for INSERT queries. Your query was of type \"$type\".\n" );
+            warn( "Warning only: the MySQL ON CONFLICT clause is only supported for INSERT queries. Your query was of type \"$type\"." ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
         }
     }
     return( \@query );
@@ -395,7 +395,7 @@ DB::Object::Mysql::Query - Query Object for MySQL
 
 =head1 VERSION
 
-    v0.5.1
+    v0.5.2
 
 =head1 DESCRIPTION
 
@@ -404,6 +404,9 @@ This is a MySQL specific query object.
 =head1 METHODS
 
 =head2 binded_having
+
+    my $value = $query->binded_having;
+    $query->binded_having( $value );
 
 Sets or gets the array object (L<Module::Generic::Array>) for the binded value in C<HAVING> clauses.
 
@@ -421,7 +424,9 @@ Calls L<DB::Object::Query/_where_having> to build a C<having> clause.
 
 =head2 limit
 
-Build a new L<DB::Object::Query::Clause> clause object by calling L</_process_limit> and return it.
+    my $value = $query->limit;
+
+Build a new L<DB::Object::Query::Clause> clause object by calling L<DB::Object::Query/_process_limit> and return it.
 
 =head2 on_conflict
 
@@ -550,7 +555,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2026 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

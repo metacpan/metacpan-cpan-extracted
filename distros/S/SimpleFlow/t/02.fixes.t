@@ -17,6 +17,11 @@
 # tester: it was confirmed to FAIL against 0.16 before that fix went in, and it
 # too uses only arguments 0.15 accepted.
 #
+# Block 18 is a regression test for the stdin defect fixed in 0.17: it was
+# confirmed to FAIL against 0.162 before that fix went in, and uses only
+# arguments 0.15 accepted. Block 19 covers the "stdin" key added with it, and
+# like blocks 12-16 cannot run against an older module.
+#
 # Two of these tests would once have passed for the wrong reason -- an assertion
 # that something is empty passes when the probe producing it never ran. Those
 # now assert a positive sentinel first; the comments at each site say so.
@@ -28,9 +33,11 @@ require 5.010;
 use feature 'say';
 use Test::More;
 use Test::Exception;
-use Capture::Tiny 'capture';
-use File::Temp qw(tempfile tempdir);
 use File::Spec;
+use FindBin ();
+use lib File::Spec->catdir($FindBin::Bin, 'lib'); # t/lib: CaptureStd, the tests' capture {}
+use CaptureStd 'capture';
+use File::Temp qw(tempfile tempdir);
 use SimpleFlow qw(task say2);
 
 # Portability setup consistent with 01.t
@@ -334,11 +341,11 @@ subtest '$VERSION is a quoted string' => sub {
 # chatty command had its entire stdout echoed to the terminal and the log.
 subtest 'a large capture is not echoed in full' => sub {
 	# This has to run in a subprocess with REAL file descriptors. Redirecting
-	# this process's STDOUT to an in-memory scalar defeats Capture::Tiny --
-	# it cannot dup a handle that has no fd -- so the child's output never gets
-	# captured, the record comes out small, and the test would pass on any
-	# module at all. A subprocess writing to an actual file reproduces the
-	# original flood exactly.
+	# this process's STDOUT to an in-memory scalar defeated Capture::Tiny,
+	# which task() used up to 0.17 -- it cannot dup a handle that has no fd --
+	# so the child's output never got captured, the record came out small,
+	# and the test would pass on any module at all. A subprocess writing to an
+	# actual file reproduces the original flood exactly.
 	my $bytes        = 200_000;
 	my $log_name     = "$dir/big.log";
 	my $terminal_out = "$dir/big.terminal";
@@ -432,30 +439,47 @@ subtest 'quiet => 1' => sub {
 	# back empty too and give the game away.
 	my %captured;
 	my %log_size;
-	# The command's own "hush" does not land in %captured and never did: file
-	# descriptor 1 still points at the real terminal while STDOUT is an
-	# in-memory handle, so Capture::Tiny inside task() has no fd to dup and the
-	# child writes straight past the redirect (the same limitation block 11
-	# describes). The outer capture here is what keeps that off the terminal;
-	# $escaped is asserted on below so the arrangement cannot rot silently.
-	my $escaped = '';
+	my %command_stdout;
+	# The command's own output does not land in %captured and never did: file
+	# descriptor 1 is not the in-memory STDOUT. Up to 0.17 it did not land in
+	# the record either -- Capture::Tiny inside task() had no fd to dup and the
+	# child wrote straight past it, onto the real fd 1 -- and this block
+	# counted the command's output among what escaped to prove it ran. Since
+	# 0.18 task() redirects fd 1 itself, so the command's output is in the
+	# record, and that is what is asserted on instead.
+	#
+	# The record can escape past the in-memory STDOUT, on Data::Printer before
+	# 1.x. The module says use DDP {output => 'STDOUT'}, and 0.38 binds that
+	# property to the STDOUT glob as it parses it -- at import, long before the
+	# local *STDOUT below -- while 1.002001 resolves the handle at print time.
+	# On 0.38 the record is therefore written to the real file descriptor 1,
+	# where the outer capture catches it. A CPAN tester on perl 5.20.0 with
+	# Data::Printer 0.38 reported exactly that against 0.161 on 2026-09-12,
+	# where this block asserted $escaped eq 'hushhush'; both versions were run
+	# here to confirm the cause. The outer capture is what keeps an escaped
+	# record off the terminal; nothing is asserted about what escaped.
+	#
+	# The command prints uc q{hush} rather than q{HUSH} so that the sentinel
+	# cannot be mistaken for the command line, which the record also quotes.
 	for my $quiet (0, 1) {
 		my $log_name = "$dir/quiet-$quiet.log";
 		open my $log, '>', $log_name or die;
 		$captured{$quiet} = '';
 		{
-			my ($out) = capture {
+			capture {
 				local *STDOUT;
 				open STDOUT, '>', \$captured{$quiet} or die;
-				task(cmd => perl_cmd('print q{hush}'), 'log.fh' => $log, quiet => $quiet);
+				my $t = task(cmd => perl_cmd('print uc q{hush}'), 'log.fh' => $log, quiet => $quiet);
+				$command_stdout{$quiet} = $t->{stdout};
 			};
-			$escaped .= $out;
 		}
 		close $log;
 		$log_size{$quiet} = -s $log_name;
 	}
-	is($escaped, 'hushhush', "the command's own output goes past the in-memory STDOUT, both times");
-	cmp_ok(length $captured{0}, '>', 0, 'without quiet the record reaches STDOUT');
+	# positive sentinel: the command ran, both times, and was captured
+	is($command_stdout{0}, 'HUSH', "the command ran and its output is in the record, without quiet");
+	is($command_stdout{1}, 'HUSH', "the command ran and its output is in the record, with quiet => 1");
+	cmp_ok(length $captured{0}, '>', 0, 'without quiet the chatter reaches STDOUT');
 	is($captured{1}, '',                'with quiet => 1 nothing reaches STDOUT');
 	cmp_ok($log_size{1}, '>', 0,        'the log is still written when quiet => 1');
 	cmp_ok($log_size{1}, '>=', $log_size{0} - 8,
@@ -619,5 +643,112 @@ PROBE
 	cmp_ok(-s $log_name,    '>', 0,      'the record is written to the log at all');
 	cmp_ok(-s $log_name,    '<', $bytes, 'but the log does not receive the whole capture either');
 };
+
+# --- 18 and 19 share a probe and a file of known text ----------------------
+# A prompting command needs a tty, which a test file cannot assume, so what
+# is measured is the inheritance itself rather than the hang it caused: the
+# caller's STDIN is pointed at a file of known text and the command is asked
+# what it can read from fd 0.
+#
+# A script rather than a -e one-liner, because it takes a filename and the
+# $code handed to perl_cmd may not contain a double quote (see 01.t's header).
+my $stdin_sentinel = 'SENTINEL-ON-STDIN'; # no newline: text mode would make it \r\n on Windows
+my $stdin_data     = File::Spec->catfile($dir, 'stdin-data.txt');
+my $stdin_probe    = File::Spec->catfile($dir, 'stdin-probe.pl');
+{
+	open my $dfh, '>', $stdin_data or die "cannot write $stdin_data: $!";
+	print {$dfh} $stdin_sentinel;
+	close $dfh;
+	open my $pfh, '>', $stdin_probe or die "cannot write $stdin_probe: $!";
+	# The marker is printed whatever was read, so that "read nothing" can be
+	# told apart from "never ran": an assertion that the command read nothing
+	# would otherwise pass whenever the probe failed to start.
+	print {$pfh} <<'PROBE';
+my $got = do { local $/; <STDIN> };
+$got = '' if not defined $got;
+open my $out, '>', $ARGV[0] or die "cannot write $ARGV[0]: $!";
+print {$out} "PROBE-RAN:[$got]";
+close $out;
+PROBE
+	close $pfh;
+}
+
+# Run $code with the caller's STDIN pointed at $stdin_data, then restore it.
+# Returns what $code returned, followed by whatever text was left unread on
+# the caller's stdin afterwards.
+sub with_stdin_on_file (&) {
+	my $code = shift;
+	my $saved;
+	open $saved, '<&', \*STDIN or die "cannot save STDIN: $!"
+		if defined fileno STDIN; # a smoker may run us with STDIN closed
+	open STDIN, '<', $stdin_data or die "cannot point STDIN at $stdin_data: $!";
+	my @result = $code->();
+	my $left = do { local $/; <STDIN> };
+	if (defined $saved) {
+		open STDIN, '<&', $saved or die "cannot restore STDIN: $!";
+		close $saved;
+	} else {
+		close STDIN;
+	}
+	return (@result, defined $left ? $left : '');
+}
+
+sub probe_read {
+	my $file = shift;
+	open my $fh, '<', $file or die "the probe wrote no file at all: $!";
+	local $/;
+	return <$fh>;
+}
+
+# --- 18. the command does not inherit the caller's stdin -------------------
+# Capture::Tiny redirected fd 1 and fd 2 and nothing else, so until 0.17 the
+# command ran with the caller's fd 0. A command that prompts -- "rm" over a
+# write-protected file, "cp -i", git asking for a password -- wrote its
+# question into the captured stderr, where nobody could see it, and then
+# blocked on the terminal for an answer that was never coming: an unbounded
+# hang with no "timeout", and with one a record that blamed the clock
+# (timed.out => 1, signal => 9) for what was really a question.
+subtest 'the command gets the null device on stdin' => sub {
+	my $seen = File::Spec->catfile($dir, 'stdin-seen-default.txt');
+	my ($t, $left) = with_stdin_on_file {
+		quietly { task(cmd => qq{$PERL "$stdin_probe" "$seen"}, die => 0) }
+	};
+	is($t->{'exit'}, 0, 'the probe ran to completion');
+	my $got = probe_read($seen);
+	like($got, qr/^\QPROBE-RAN:\E/,
+		'the probe reported what it could read (so the reading below is real)');
+	is($got, 'PROBE-RAN:[]',
+		"the command read nothing: fd 0 is the null device, not the caller's stdin");
+	# before 0.17 the command consumed this text
+	is($left, $stdin_sentinel, "the caller's own stdin is unread and restored");
+	is($t->{stdin}, 'devnull', 'the record says where fd 0 pointed');
+};
+
+# --- 19. stdin => 'inherit' opts out of that -------------------------------
+# New in 0.17, so this block cannot run against an older module at all: it
+# rejects the key outright.
+subtest "stdin => 'inherit' hands the command the caller's stdin" => sub {
+	my $seen = File::Spec->catfile($dir, 'stdin-seen-inherit.txt');
+	my ($t, $left) = with_stdin_on_file {
+		quietly { task(
+			cmd   => qq{$PERL "$stdin_probe" "$seen"},
+			die   => 0,
+			stdin => 'inherit',
+		) }
+	};
+	is($t->{'exit'}, 0, 'the probe ran to completion');
+	is(probe_read($seen), "PROBE-RAN:[$stdin_sentinel]",
+		"the command reads the caller's stdin when told to inherit it");
+	is($left, '', "and consumes it, exactly as every release before 0.17 did");
+	is($t->{stdin}, 'inherit', 'the record says where fd 0 pointed');
+
+	throws_ok { quietly { task(cmd => perl_cmd('exit 0'), stdin => 'tty') } }
+		qr/"stdin" must be "devnull"/,
+		'an unknown stdin value is refused rather than silently ignored';
+	throws_ok { quietly { task(cmd => perl_cmd('exit 0'), stdin => '') } }
+		qr/"stdin" must be "devnull"/,
+		'an empty stdin value is refused too';
+};
+
 
 done_testing();

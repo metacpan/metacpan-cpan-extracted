@@ -2,8 +2,11 @@ use Test2::V0;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
+use lib 't/lib';
 use Mojo::ATProto::OAuth::SessionStore::SQLite qw//;
 use Mojo::Promise;
+use Time::HiRes qw/time/;
+use SessionStoreContract qw/update_and_lock_subtests/;
 
 # Full, realistic hashrefs (as Mojo::ATProto::OAuth itself builds them) -
 # unlike the in-memory store, SQLite::SessionStore enforces NOT NULL on
@@ -127,6 +130,52 @@ subtest 'two stores are independent databases' => sub {
 
     $store_a->save_auth_request(auth_request_fixture());
     like(dies { $store_b->get_auth_request('state-1') }, qr/no auth request found/, 'a fresh instance does not see another instance\'s data');
+};
+
+update_and_lock_subtests(sub { Mojo::ATProto::OAuth::SessionStore::SQLite->new }, sub (%overrides) { return {%{session_fixture()}, %overrides} });
+
+subtest 'an expired lease left by a crashed holder is taken over' => sub {
+    my $store   = Mojo::ATProto::OAuth::SessionStore::SQLite->new;
+    my $session = session_fixture();
+    $store->save_session($session);
+    my @key = ($session->{account_did}, $session->{session_id});
+
+    $store->sqlite->db->insert('session_locks', {account_did => $key[0], session_id => $key[1], owner => 'crashed', expires_at => time - 1});
+    is($store->lock_session(@key, sub ($current) { return 'ran' }), 'ran', 'the stale lease did not block');
+    is($store->sqlite->db->select('session_locks')->hashes->size, 0, 'and no lease is left behind afterwards');
+};
+
+subtest 'a live lease held elsewhere times out rather than waiting forever' => sub {
+    my $store   = Mojo::ATProto::OAuth::SessionStore::SQLite->new;
+    my $session = session_fixture();
+    $store->save_session($session);
+    my @key = ($session->{account_did}, $session->{session_id});
+    $store->lock_timeout(0.3);
+
+    $store->sqlite->db->insert('session_locks', {account_did => $key[0], session_id => $key[1], owner => 'someone-else', expires_at => time + 60});
+    my $ran = 0;
+    like(dies { $store->lock_session(@key, sub ($current) { $ran++ }) }, qr/timed out waiting for session lock/, 'sync lock_session times out');
+
+    my $err;
+    $store->lock_session_p(@key, sub ($current) { $ran++ })->catch(sub ($e) { $err = $e })->wait;
+    like($err, qr/timed out waiting for session lock/, 'lock_session_p rejects the same way');
+    is($ran, 0, 'the code never ran');
+    is($store->sqlite->db->select('session_locks', ['owner'])->hash->{owner}, 'someone-else', 'the other holder\'s lease was not released by the timed-out callers');
+};
+
+subtest 'lock_sessions(0) opts out of locking' => sub {
+    my $store   = Mojo::ATProto::OAuth::SessionStore::SQLite->new;
+    my $session = session_fixture();
+    $store->save_session($session);
+    my @key = ($session->{account_did}, $session->{session_id});
+    $store->lock_sessions(0);
+
+    $store->sqlite->db->insert('session_locks', {account_did => $key[0], session_id => $key[1], owner => 'someone-else', expires_at => time + 60});
+    is($store->lock_session(@key, sub ($current) { return $current->{refresh_token} }), 'ref-1', 'sync code ran with a fresh read, ignoring the lease');
+
+    my $result;
+    $store->lock_session_p(@key, sub ($current) { return 'async ran' })->then(sub ($r) { $result = $r })->wait;
+    is($result, 'async ran', 'async code ran too');
 };
 
 done_testing;

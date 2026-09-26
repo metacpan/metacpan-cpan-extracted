@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article>
+  <section>
+    <title>Tables</title>
+
+    <table>
+      <title>Table Name</title>
+
+      <tgroup cols="2">
+        <thead>
+          <row>
+            <entry align="center">Col 1</entry>
+
+            <entry align="center">Col2</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry>Text 1</entry>
+
+            <entry>Text 2</entry>
+          </row>
+
+          <row>
+            <entry>Text 2</entry>
+
+            <entry>Text 4</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
+</article>

@@ -296,6 +296,44 @@ trace something that is not a request, call `ForgeOps::Tracker::start_trace()` a
 `finish_trace($name, $started_at, $duration_ms)` yourself. A trace holds at most 500 spans. Configure
 with `track_tracing => 0` and `trace_capture_threshold => 2.5`.
 
+### Database spans with their SQL
+
+Wrap a query in a `database` span and pass its SQL as `statement`, and ForgeOps shows which
+statement a slow request spent its time in:
+
+```perl
+use DBI;
+use Plack::Builder;
+use ForgeOps::Tracker;
+
+ForgeOps::Tracker::init(dsn => $ENV{FORGE_OPS_DSN});
+my $dbh = DBI->connect('dbi:Pg:dbname=shop', '', '', { RaiseError => 1 });
+
+my $sql = "SELECT id FROM orders WHERE customer_id = ? AND status = 'open'";
+my $app = sub {
+    my ($env) = @_;
+    my ($customer_id) = ($env->{QUERY_STRING} || '') =~ /customer=(\d+)/;
+    my $ids = ForgeOps::Tracker::span('Load open orders',
+        sub { $dbh->selectcol_arrayref($sql, {}, $customer_id) },
+        kind => 'database', statement => $sql, db_system => 'postgresql');
+    return [200, ['Content-Type' => 'text/plain'], [join(',', @$ids)]];
+};
+
+builder {
+    enable '+ForgeOps::Tracker::Integrations::PSGIPerformance'; # starts and sends the trace
+    $app;
+};
+```
+
+The statement is masked before it's stored: every string and number becomes `?`, so this span
+carries `SELECT id FROM orders WHERE customer_id = ? AND status = ?`, and ForgeOps masks it again on
+arrival. It's cut to 4000 characters, and bind values (`$customer_id`) are never read. It goes out
+in the span's data as `db.statement`, with the database name (`postgresql`, `mysql`, `sqlite`,
+`mssql`, `oracle`, or any other; optional) lowercased as `db.system`. Both options are ignored on
+spans of any other kind. For a query you timed yourself, use
+`ForgeOps::Tracker::record_database_span($name, $sql, $started_at, $duration_ms, db_system =>
+'postgresql')`. A `db.statement` you put in a database span's `data` yourself is masked the same way.
+
 ### Following a request across services
 
 Traces use the [W3C Trace Context](https://www.w3.org/TR/trace-context/) standard (a `traceparent`
@@ -394,6 +432,53 @@ second thread). The buffer holds at most 1000 entries per kind and drops further
 succeeds, since a plan without the feature rejects every flush and would otherwise grow it for as long
 as the process lives. A NaN, infinite or non-numeric value is dropped at capture. Requires a ForgeOps
 plan that includes custom metrics / infrastructure monitoring.
+
+## What changed
+
+ForgeOps can show what changed in your system next to the errors and slowdowns that followed it.
+Two ways in:
+
+**Record a change yourself** when something changes that no deploy captures, like a feature flag
+flipped, a config value edited, or a migration run by hand:
+
+```perl
+ForgeOps::Tracker::record_change(
+    kind    => 'feature_flag',   # feature_flag, config, migration, dependency, infrastructure, or other
+    title   => 'Enabled new_checkout for 10% of users',
+    details => { flag => 'new_checkout', rollout_percent => 10 },
+    actor   => 'ops@example.com',
+    url     => 'https://flags.example.com/new_checkout',
+);
+```
+
+`kind` and `title` are required; `details` (a hashref), `environment` (defaults to the configured
+one), `service`, `actor`, `url`, `id` (an idempotency key, so sending the same change twice records
+it once), and `occurred_at` (an ISO 8601 string or epoch seconds, defaulting to now) are optional.
+An unknown `kind` is sent as `other`. It's queued for the same kind of background thread as error
+events, so it never slows down the caller, never dies, and does nothing when the client isn't
+enabled for the environment.
+
+**Changes between deploys are detected for you.** Once per process, `init()` queues a snapshot of
+what the process is running for that background thread: the Perl version. ForgeOps compares it with
+the previous boot's and records whatever changed. Module versions aren't included: Perl has no
+single reliable record of which versions an app runs, and the snapshot leaves out anything it would
+have to guess at.
+
+```perl
+ForgeOps::Tracker::init(
+    dsn                 => 'https://<api_key>@getforgeops.net/api/v1/events',
+    detect_changes      => 1,   # default; 0 sends no startup snapshot
+    track_env_var_names => 0,   # default; 1 also sends environment variable names
+);
+```
+
+With `track_env_var_names` on, the snapshot lists the names of your environment variables (never
+their values), so an added or removed variable shows up as a change. Names that differ from host to
+host, like `HOSTNAME`, `PATH`, `PORT`, `LC_*`, and Kubernetes service variables, are left out, as
+are the client's own `FORGE_OPS_*` settings.
+
+Requires a ForgeOps plan that includes change tracking; on a plan that doesn't, both are rejected
+server-side and dropped, exactly like any other delivery failure.
 
 ## Database errors
 

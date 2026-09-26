@@ -21,9 +21,10 @@ sub _fetch_requires {
   open my $fh, '<', $infile
     or die "ERROR: could not open $infile for reading\n";
 
-  while (<$fh>) {
-    chomp;
-    my ( $m, $v ) = split q{ }, $_;
+  while ( my $line = <$fh> ) {
+    chomp $line;
+    next if !$line;
+    my ( $m, $v ) = split q{ }, $line;
     $requires{$m} = $v // 0;
   }
 

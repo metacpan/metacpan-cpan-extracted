@@ -17,7 +17,7 @@ WriteMakefile(
 	VERSION_FROM	=> 'lib/App/makefilepl2cpanfile.pm',
 	ABSTRACT_FROM	=> 'lib/App/makefilepl2cpanfile.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-		? ('LICENSE'=> 'GPL')
+		? ('LICENSE'=> 'gpl_2')
 		: ()),
 	'LIBS' => [''],	# e.g., '-lm'
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
@@ -27,24 +27,20 @@ WriteMakefile(
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, TEST_REQUIRES => {
-		'Test::Carp' => 0,
-		'Test::Compile' => 0,
+		'Capture::Tiny' => 0,
+		'Module::CPANfile' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Memory::Cycle' => 0,
 		'Test::Most' => 0,
 		'File::Temp' => 0,
-		'Test::Mockingbird' => 0,
-		'Test::NoWarnings' => 0,
-		'Test::RequiresInternet' => 0,
-		'Test::Which' => 0,
-		'Test::Returns' => 0,
-		'Test::Warn' => 0,
+		'Test::Mockingbird' => '0.13',	# around, mock_scoped, spy, unmock, restore
+		'Test::Returns' => 0.04,
+		'Test::Without::Module' => 0,
 	}, PREREQ_PM => {
 		'autodie' => 0,
 		'File::HomeDir' => 0,
-		'List::Util' => '1.33',
-		'Path::Tiny' => 0,
-		'Params::Get' => 0,
+		'Path::Tiny' => '0.034',	# errors as Path::Tiny::Error objects
+		'Params::Get' => 0.17,
 		'IPC::System::Simple' => 0,
 		'Readonly' => 0,
 		'Text::Diff' => 0,
@@ -56,6 +52,16 @@ WriteMakefile(
 	# },
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
+		prereqs => {
+			develop => {
+				requires => {
+					'Test::EOF'   => 0,	# t/eof.t (author test)
+					'Test::EOL'   => 0,	# t/eol.t (author test)
+					'Test::Kwalitee' => 0,	# t/kwalitee.t (author test)
+					'Test::Needs' => 0,
+				},
+			},
+		},
 		resources => {
 			homepage => 'https://metacpan.org/pod/App::makefilepl2cpanfile',
 			repository => {
@@ -65,12 +71,9 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/App-makefilepl2cpanfile',
 				# license => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
-				mailto => 'bug-App-makefilepl2cpanfile@rt.cpan.org',
-				url => 'https://github.com/nigelhorne/App-makefilepl2cpanfile/issues',
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=App-makefilepl2cpanfile',
-				web => 'https://github.com/nigelhorne/App-makefilepl2cpanfile/issues'
+				web => 'https://github.com/nigelhorne/App-makefilepl2cpanfile/issues',
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.010'
+	MIN_PERL_VERSION	=> '5.014'	# s///r and the /a regex modifier
 );

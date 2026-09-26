@@ -28,7 +28,7 @@ use Scalar::Util qw(blessed refaddr);
 BEGIN {
 	eval { require DBD::SQLite; require DBI; require Database::Abstraction };
 	plan skip_all => 'DBD::SQLite, DBI, and Database::Abstraction required' if $@;
-	plan tests => 78;
+	plan tests => 104;
 	use_ok('Database::Join');
 }
 
@@ -1481,4 +1481,579 @@ subtest 'backend=sqlite: permanent filter restricts rows from the secondary sour
 		'surviving rows are Alice (score=95) and Beta (score=70)');
 };
 
-diag('section 19 done -- integration tests complete') if $ENV{TEST_VERBOSE};
+diag('section 19 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 20 -- limit / offset pagination (5 subtests)
+#
+# selectall_arrayref and selectall_array accept limit => N (positive integer)
+# and offset => M (non-negative integer).  The SQLite path appends LIMIT/OFFSET
+# as bind parameters; the array path uses splice().  Both paths must agree on
+# the resulting row count for the same arguments.
+# ===========================================================================
+
+Readonly::Scalar my $S20_TOTAL  => 5;
+Readonly::Scalar my $S20_LIMIT  => 2;
+Readonly::Scalar my $S20_OFFSET => 2;
+
+# Five-row fixture: enough rows to distinguish limit, offset, and page cases.
+my $s20_db_a = InMemDA->new(
+	cols    => [$JC, 'label'],
+	rows    => [ map { { entry => "P$_", label => "Label$_" } } (1..5) ],
+	updated => 4_000_000,
+);
+my $s20_db_b = InMemDA->new(
+	cols    => [$JC, 'val'],
+	rows    => [ map { { entry => "P$_", val => $_ * 10 } } (1..5) ],
+	updated => 4_000_000,
+);
+
+subtest 'limit: array path returns first N rows' => sub {
+	plan tests => 1;
+	my $j = Database::Join->new(
+		databases => [$s20_db_a, $s20_db_b], join_column => $JC,
+		backend   => 'array',
+	);
+	my $rows = $j->selectall_arrayref(limit => $S20_LIMIT);
+	is(scalar @{$rows}, $S20_LIMIT,
+		"limit => $S20_LIMIT returns $S20_LIMIT rows on the array path");
+};
+
+subtest 'offset: array path skips first N rows' => sub {
+	plan tests => 1;
+	my $j = Database::Join->new(
+		databases => [$s20_db_a, $s20_db_b], join_column => $JC,
+		backend   => 'array',
+	);
+	my $rows = $j->selectall_arrayref(offset => $S20_OFFSET);
+	is(scalar @{$rows}, $S20_TOTAL - $S20_OFFSET,
+		"offset => $S20_OFFSET skips first $S20_OFFSET rows on the array path");
+};
+
+subtest 'limit+offset: array path returns a middle page' => sub {
+	plan tests => 1;
+	# limit=2, offset=2 on 5 rows means rows 3 and 4 -- exactly 2 rows returned.
+	my $j = Database::Join->new(
+		databases => [$s20_db_a, $s20_db_b], join_column => $JC,
+		backend   => 'array',
+	);
+	my $page = $j->selectall_arrayref(limit => 2, offset => 2);
+	is(scalar @{$page}, 2, 'limit=2 offset=2 on 5 rows returns exactly 2 rows');
+};
+
+subtest 'limit: SQLite path row count equals array path row count' => sub {
+	plan tests => 1;
+	# Verify semantic equivalence between paths; row ordering is not compared
+	# here (no ORDER BY) to keep the test independent of sort order.
+	my $j_arr = Database::Join->new(
+		databases => [$s20_db_a, $s20_db_b], join_column => $JC,
+		backend   => 'array',
+	);
+	my $j_sql = Database::Join->new(
+		databases => [$s20_db_a, $s20_db_b], join_column => $JC,
+		backend   => 'sqlite',
+	);
+	is(scalar @{ $j_sql->selectall_arrayref(limit => $S20_LIMIT) },
+	   scalar @{ $j_arr->selectall_arrayref(limit => $S20_LIMIT) },
+	   'limit on SQLite path yields the same row count as the array path');
+};
+
+subtest 'limit+offset: SQLite path row count equals array path row count' => sub {
+	plan tests => 1;
+	my $j_arr = Database::Join->new(
+		databases => [$s20_db_a, $s20_db_b], join_column => $JC,
+		backend   => 'array',
+	);
+	my $j_sql = Database::Join->new(
+		databases => [$s20_db_a, $s20_db_b], join_column => $JC,
+		backend   => 'sqlite',
+	);
+	is(scalar @{ $j_sql->selectall_arrayref(limit => 2, offset => 1) },
+	   scalar @{ $j_arr->selectall_arrayref(limit => 2, offset => 1) },
+	   'limit+offset on SQLite path yields the same row count as the array path');
+};
+
+diag('section 20 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 21 -- sort_by: ascending and descending sort (4 subtests)
+#
+# sort_by => 'col' sorts ascending; sort_by => ['col', 'DESC'] descending.
+# The SQLite backend generates an ORDER BY clause; the array backend uses
+# Perl string cmp.  Using single-character keys (A, B, C) means both paths
+# agree: string comparison and SQL TEXT comparison produce the same ordering.
+# ===========================================================================
+
+Readonly::Scalar my $S21_A_KEY => 'A';
+Readonly::Scalar my $S21_B_KEY => 'B';
+Readonly::Scalar my $S21_C_KEY => 'C';
+
+# Rows deliberately inserted in non-sorted order (C, A, B) to verify that
+# sort_by is reordering and not just preserving insertion order.
+my $s21_db_a = InMemDA->new(
+	cols    => [$JC, 'name'],
+	rows    => [
+		{ entry => $S21_C_KEY, name => 'Charlie' },
+		{ entry => $S21_A_KEY, name => 'Alice'   },
+		{ entry => $S21_B_KEY, name => 'Bob'     },
+	],
+	updated => 5_000_000,
+);
+my $s21_db_b = InMemDA->new(
+	cols    => [$JC, 'rank'],
+	rows    => [
+		{ entry => $S21_C_KEY, rank => 3 },
+		{ entry => $S21_A_KEY, rank => 1 },
+		{ entry => $S21_B_KEY, rank => 2 },
+	],
+	updated => 5_000_000,
+);
+
+subtest 'sort_by: array path returns rows in ascending column order' => sub {
+	plan tests => 1;
+	my $j = Database::Join->new(
+		databases => [$s21_db_a, $s21_db_b], join_column => $JC,
+		backend   => 'array',
+	);
+	my @keys = map { $_->{$JC} } @{ $j->selectall_arrayref(sort_by => $JC) };
+	is_deeply(\@keys, [$S21_A_KEY, $S21_B_KEY, $S21_C_KEY],
+		'sort_by ascending on the array path sorts A < B < C');
+};
+
+subtest 'sort_by: array path returns rows in descending column order' => sub {
+	plan tests => 1;
+	my $j = Database::Join->new(
+		databases => [$s21_db_a, $s21_db_b], join_column => $JC,
+		backend   => 'array',
+	);
+	my @keys = map { $_->{$JC} } @{ $j->selectall_arrayref(sort_by => [$JC, 'DESC']) };
+	is_deeply(\@keys, [$S21_C_KEY, $S21_B_KEY, $S21_A_KEY],
+		'sort_by descending on the array path sorts C > B > A');
+};
+
+subtest 'sort_by: SQLite path ascending matches array path result order' => sub {
+	plan tests => 1;
+	my $j_arr = Database::Join->new(
+		databases => [$s21_db_a, $s21_db_b], join_column => $JC, backend => 'array',
+	);
+	my $j_sql = Database::Join->new(
+		databases => [$s21_db_a, $s21_db_b], join_column => $JC, backend => 'sqlite',
+	);
+	my @arr = map { $_->{$JC} } @{ $j_arr->selectall_arrayref(sort_by => $JC) };
+	my @sql = map { $_->{$JC} } @{ $j_sql->selectall_arrayref(sort_by => $JC) };
+	is_deeply(\@sql, \@arr,
+		'sort_by ascending: SQLite path produces the same key sequence as array path');
+};
+
+subtest 'sort_by: SQLite path descending matches array path result order' => sub {
+	plan tests => 1;
+	my $j_arr = Database::Join->new(
+		databases => [$s21_db_a, $s21_db_b], join_column => $JC, backend => 'array',
+	);
+	my $j_sql = Database::Join->new(
+		databases => [$s21_db_a, $s21_db_b], join_column => $JC, backend => 'sqlite',
+	);
+	my @arr = map { $_->{$JC} } @{ $j_arr->selectall_arrayref(sort_by => [$JC, 'DESC']) };
+	my @sql = map { $_->{$JC} } @{ $j_sql->selectall_arrayref(sort_by => [$JC, 'DESC']) };
+	is_deeply(\@sql, \@arr,
+		'sort_by descending: SQLite path produces the same key sequence as array path');
+};
+
+diag('section 21 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 22 -- schema type consistency validation (3 subtests)
+#
+# _validate_schema_types fires at new() and add_database() time.  For every
+# column shared across two DAs (without collision_prefix), it compares the
+# schema() type strings and carps warn_schema_type_mismatch when they differ.
+# The join_column itself and any column that has a collision_prefix are exempt.
+# ===========================================================================
+
+# Two DAs that both expose a 'score' column with conflicting types.
+# Without collision_prefix the merge is last-DB-wins (no croak), but the type
+# mismatch triggers a carp during construction and during add_database.
+my $s22_mismatch_a = InMemDA->new(
+	cols    => [$JC, 'score'],
+	rows    => [ { entry => 'X', score => '10' } ],
+	schema  => { score => { type => 'TEXT' } },
+	updated => 6_000_000,
+);
+my $s22_mismatch_b = InMemDA->new(
+	cols    => [$JC, 'score'],
+	rows    => [ { entry => 'X', score => 10 } ],
+	schema  => { score => { type => 'INTEGER' } },
+	updated => 6_000_000,
+);
+# Two DAs where both declare the same type -- no carp expected.
+my $s22_same_a = InMemDA->new(
+	cols    => [$JC, 'score'],
+	rows    => [ { entry => 'X', score => 10 } ],
+	schema  => { score => { type => 'INTEGER' } },
+	updated => 6_000_000,
+);
+my $s22_same_b = InMemDA->new(
+	cols    => [$JC, 'score'],
+	rows    => [ { entry => 'X', score => 10 } ],
+	schema  => { score => { type => 'INTEGER' } },
+	updated => 6_000_000,
+);
+
+subtest 'schema type validation: carp emitted when shared column has mismatched types' => sub {
+	plan tests => 2;
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $j = Database::Join->new(
+		databases => [$s22_mismatch_a, $s22_mismatch_b], join_column => $JC,
+	);
+	ok(@warnings, 'warn_schema_type_mismatch carp fires at construction time');
+	like($warnings[0], qr/score/i,
+		'carp message names the mismatched column (score)');
+};
+
+subtest 'schema type validation: no carp when all shared column types agree' => sub {
+	plan tests => 1;
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $j = Database::Join->new(
+		databases => [$s22_same_a, $s22_same_b], join_column => $JC,
+	);
+	ok(!@warnings, 'no warn_schema_type_mismatch when both DAs declare the same type');
+};
+
+subtest 'schema type validation: add_database also fires carp for type mismatch' => sub {
+	plan tests => 2;
+	# Build the join with only the first DA (no mismatch possible with one source),
+	# then add the second DA whose type conflicts.
+	my $j;
+	{
+		local $SIG{__WARN__} = sub {};  # suppress any construction-time noise
+		$j = Database::Join->new(databases => [$s22_mismatch_a], join_column => $JC);
+	}
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	$j->add_database($s22_mismatch_b);
+	ok(@warnings, 'warn_schema_type_mismatch carp fires during add_database');
+	like($warnings[0], qr/score/i,
+		'add_database carp message names the mismatched column (score)');
+};
+
+diag('section 22 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 23 -- parallel => 1 constructor flag (3 subtests)
+#
+# When parallel => 1 is set and there are three or more databases (primary +
+# two or more secondaries), secondary DA fetches are issued concurrently when
+# the threads module is available; otherwise the module falls back to sequential
+# with a carp.  Either way the result must be semantically identical.
+# ===========================================================================
+
+subtest 'parallel: 2-DB join with parallel=1 executes without error and returns correct data' => sub {
+	plan tests => 2;
+	# Parallel threshold requires >=2 secondaries, so this is a no-op for the
+	# parallel flag.  Verifies the constructor accepts the flag and behaves normally.
+	my $j;
+	lives_ok {
+		$j = Database::Join->new(
+			databases => [$cust, $score], join_column => $JC, parallel => 1,
+		);
+	} 'parallel => 1 accepted in the constructor (2-DB join)';
+	is($j->count(), $ALL_CUST,
+		'parallel => 1 (2-DB, threshold not met) returns the correct row count');
+};
+
+subtest 'parallel: 3-DB join with parallel=1 returns the same row count as parallel=0' => sub {
+	plan tests => 1;
+	local $SIG{__WARN__} = sub {};   # suppress carp if threads module unavailable
+	my $j_seq = Database::Join->new(
+		databases => [$cust, $score, $region], join_column => $JC,
+		join_type => 'inner', parallel => 0,
+	);
+	my $j_par = Database::Join->new(
+		databases => [$cust, $score, $region], join_column => $JC,
+		join_type => 'inner', parallel => 1,
+	);
+	is($j_par->count(), $j_seq->count(),
+		'parallel=1 (3-DB inner join) returns the same count as parallel=0');
+};
+
+subtest 'parallel: 3-DB join with parallel=1 returns the same merged rows as parallel=0' => sub {
+	plan tests => 1;
+	local $SIG{__WARN__} = sub {};   # suppress carp if threads module unavailable
+	my $j_seq = Database::Join->new(
+		databases => [$cust, $score, $region], join_column => $JC,
+		join_type => 'inner', parallel => 0,
+	);
+	my $j_par = Database::Join->new(
+		databases => [$cust, $score, $region], join_column => $JC,
+		join_type => 'inner', parallel => 1,
+	);
+	my @seq_keys = sort map { $_->{$JC} } @{ $j_seq->selectall_arrayref() };
+	my @par_keys = sort map { $_->{$JC} } @{ $j_par->selectall_arrayref() };
+	is_deeply(\@par_keys, \@seq_keys,
+		'parallel=1 and parallel=0 return rows with identical join-key sets');
+};
+
+diag('section 23 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 24 -- dbi_source() on Database::Join itself (3 subtests)
+#
+# A Database::Join object with a sqlite backend implements dbi_source(),
+# returning { dbh => $dbh, table => '_dj_result' } pointing at a materialised
+# view in its temp SQLite file.  The array backend returns undef.  The parent
+# can ATTACH the file and query _dj_result directly to compose nested joins.
+# ===========================================================================
+
+my $s24_db_a = InMemDA->new(
+	cols    => [$JC, 'city'],
+	rows    => [
+		{ entry => 'TX', city => 'Austin' },
+		{ entry => 'CA', city => 'LA'     },
+	],
+	updated => 7_000_000,
+);
+my $s24_db_b = InMemDA->new(
+	cols    => [$JC, 'pop_m'],
+	rows    => [
+		{ entry => 'TX', pop_m => 29 },
+		{ entry => 'CA', pop_m => 39 },
+	],
+	updated => 7_000_000,
+);
+
+Readonly::Scalar my $S24_ROWS => 2;
+
+subtest 'dbi_source: returns undef for the array backend' => sub {
+	plan tests => 1;
+	my $j = Database::Join->new(
+		databases => [$s24_db_a, $s24_db_b], join_column => $JC,
+		backend   => 'array',
+	);
+	$j->selectall_arrayref();   # trigger any lazy initialisation
+	ok(!defined $j->dbi_source(),
+		'dbi_source() returns undef on the array backend');
+};
+
+subtest 'dbi_source: returns a hashref with dbh and table keys for the sqlite backend' => sub {
+	plan tests => 3;
+	my $j = Database::Join->new(
+		databases => [$s24_db_a, $s24_db_b], join_column => $JC,
+		backend   => 'sqlite',
+	);
+	$j->selectall_arrayref();   # build the SQLite cache and materialise _dj_result
+	my $src = $j->dbi_source();
+	ok(defined $src,                    'dbi_source() returns a defined value on sqlite backend');
+	ok(ref($src) eq 'HASH',             'dbi_source() return value is a hashref');
+	is($src->{table}, '_dj_result',     "dbi_source()->{table} is '_dj_result'");
+};
+
+subtest 'dbi_source: the returned DBI handle can query _dj_result directly' => sub {
+	plan tests => 2;
+	# Proves that _dj_result is a real table accessible via the returned handle,
+	# enabling a parent Database::Join to compose nested joins without copying rows.
+	my $j = Database::Join->new(
+		databases => [$s24_db_a, $s24_db_b], join_column => $JC,
+		backend   => 'sqlite',
+	);
+	$j->selectall_arrayref();   # materialise _dj_result
+	my $src = $j->dbi_source();
+	ok($src->{dbh}->isa('DBI::db'),
+		'dbi_source()->{dbh} is a live DBI::db handle');
+	my ($count) = $src->{dbh}->selectrow_array(
+		sprintf('SELECT COUNT(*) FROM "%s"', $src->{table})
+	);
+	is($count, $S24_ROWS,
+		'COUNT(*) on _dj_result returns the correct number of materialised rows');
+};
+
+diag('section 24 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 25 -- IS NULL / IS NOT NULL / IN / NOT IN operators (4 subtests)
+#
+# These operator-hashref forms were added in 0.007.0 for the SQLite backend.
+# IS NULL / IS NOT NULL generate no bind parameter (fixed SQL keywords).
+# IN / NOT IN take an arrayref value; each element becomes a separate bind
+# parameter so injection via list elements is impossible.
+# ===========================================================================
+
+# InMemDA rows with deliberate undef values: when spilled to SQLite these become
+# NULL, allowing IS NULL / IS NOT NULL to be tested end-to-end.
+my $s25_db_a = InMemDA->new(
+	cols    => [$JC, 'name'],
+	rows    => [
+		{ entry => 'A', name => 'Alpha' },
+		{ entry => 'B', name => undef   },   # NULL in SQLite after spill
+		{ entry => 'C', name => 'Gamma' },
+	],
+	updated => 8_000_000,
+);
+my $s25_db_b = InMemDA->new(
+	cols    => [$JC, 'score'],
+	rows    => [
+		{ entry => 'A', score => 95 },
+		{ entry => 'B', score => 70 },
+		{ entry => 'C', score => 55 },
+	],
+	updated => 8_000_000,
+);
+
+Readonly::Scalar my $S25_NULL_COUNT    => 1;   # rows with name IS NULL (entry B)
+Readonly::Scalar my $S25_NOTNULL_COUNT => 2;   # rows with name IS NOT NULL (A and C)
+Readonly::Scalar my $S25_IN_COUNT      => 2;   # score IN (70, 95) -- entries A and B
+Readonly::Scalar my $S25_NOTIN_COUNT   => 2;   # score NOT IN (95) -- entries B and C
+
+subtest 'IS NULL: SQLite path returns only rows where the column value is NULL' => sub {
+	plan tests => 2;
+	my $j = Database::Join->new(
+		databases => [$s25_db_a, $s25_db_b], join_column => $JC,
+		backend   => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(name => { 'IS NULL' => undef });
+	is(scalar @{$rows}, $S25_NULL_COUNT,
+		"IS NULL returns $S25_NULL_COUNT row (entry B has a NULL name)");
+	is($rows->[0]{$JC}, 'B', 'IS NULL returns the correct row (entry B)');
+};
+
+subtest 'IS NOT NULL: SQLite path returns only rows where the column value is not NULL' => sub {
+	plan tests => 1;
+	my $j = Database::Join->new(
+		databases => [$s25_db_a, $s25_db_b], join_column => $JC,
+		backend   => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(name => { 'IS NOT NULL' => undef });
+	is(scalar @{$rows}, $S25_NOTNULL_COUNT,
+		"IS NOT NULL returns $S25_NOTNULL_COUNT rows (A and C have non-NULL names)");
+};
+
+subtest 'IN: SQLite path returns only rows whose column value is in the list' => sub {
+	plan tests => 1;
+	# score IN (70, 95): entries A (95) and B (70) qualify; C (55) does not.
+	my $j = Database::Join->new(
+		databases => [$s25_db_a, $s25_db_b], join_column => $JC,
+		backend   => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(score => { 'IN' => [70, 95] });
+	is(scalar @{$rows}, $S25_IN_COUNT,
+		"IN (70, 95) returns $S25_IN_COUNT rows (entries A and B)");
+};
+
+subtest 'NOT IN: SQLite path returns only rows whose column value is not in the list' => sub {
+	plan tests => 1;
+	# score NOT IN (95): entries B (70) and C (55) qualify; A (95) does not.
+	my $j = Database::Join->new(
+		databases => [$s25_db_a, $s25_db_b], join_column => $JC,
+		backend   => 'sqlite',
+	);
+	my $rows = $j->selectall_arrayref(score => { 'NOT IN' => [95] });
+	is(scalar @{$rows}, $S25_NOTIN_COUNT,
+		"NOT IN (95) returns $S25_NOTIN_COUNT rows (entries B and C)");
+};
+
+diag('section 25 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 26 -- count() correctness on the SQLite backend (2 subtests)
+#
+# count() on the SQLite path executes SELECT COUNT(*) against the cached join
+# tables rather than fetching all rows.  The result must agree with the length
+# of selectall_arrayref for equivalent criteria.
+# ===========================================================================
+
+subtest 'count(): SQLite backend count agrees with selectall_arrayref length (no criteria)' => sub {
+	plan tests => 1;
+	# Reuse the s18 fixtures (Alpha/Beta/Gamma with tier and score) which are
+	# already built -- no new fixture needed.
+	my $j = Database::Join->new(
+		databases => [$s18_db_a, $s18_db_b], join_column => $JC,
+		backend   => 'sqlite',
+	);
+	is($j->count(),
+	   scalar @{ $j->selectall_arrayref() },
+	   'count() on SQLite path equals the length of selectall_arrayref() with no criteria');
+};
+
+subtest 'count(): SQLite backend count with criteria agrees with filtered selectall_arrayref' => sub {
+	plan tests => 1;
+	my $j = Database::Join->new(
+		databases => [$s18_db_a, $s18_db_b], join_column => $JC,
+		backend   => 'sqlite',
+	);
+	my $filtered = $j->selectall_arrayref(tier => 'gold');
+	is($j->count(tier => 'gold'),
+	   scalar @{$filtered},
+	   'count(tier => gold) on SQLite path equals the filtered selectall_arrayref length');
+};
+
+diag('section 26 done') if $ENV{TEST_VERBOSE};
+
+# ===========================================================================
+# SECTION 27 -- updated() resilience: missing and throwing implementations (2 subtests)
+#
+# updated() silently skips component DAs that do not implement updated() or
+# whose updated() throws an exception.  Returns undef when no component DA
+# implements updated() at all.  Regression for the 0.007.0 fix.
+# ===========================================================================
+
+# IntBareDA: a minimal duck-type DA with NO updated() method.  Has only the
+# two methods Database::Join requires by its duck-type guard: columns() and
+# selectall_arrayref().
+{
+	package IntBareDA;
+	sub new {
+		my ($class, %args) = @_;
+		return bless { _cols => $args{cols} // [], _rows => $args{rows} // [] }, $class;
+	}
+	sub columns            { return $_[0]->{_cols} }
+	sub schema             { return {} }
+	sub selectall_arrayref { return $_[0]->{_rows} }
+	sub DESTROY {}
+}
+
+# IntThrowUpdDA: inherits from InMemDA but overrides updated() to die,
+# exercising the "skip DAs whose updated() throws" branch.
+{
+	package IntThrowUpdDA;
+	our @ISA = ('InMemDA');
+	sub updated { die "simulated updated() failure\n" }
+	sub DESTROY {}
+}
+
+subtest 'updated(): returns undef when no component DA implements updated()' => sub {
+	plan tests => 1;
+	# IntBareDA has no updated() method; the join must return undef, not croak.
+	my $db = IntBareDA->new(
+		cols => [$JC, 'x'],
+		rows => [ { entry => 'K', x => 1 } ],
+	);
+	my $j = Database::Join->new(databases => [$db], join_column => $JC);
+	ok(!defined $j->updated(),
+		'updated() returns undef when no component DA implements updated()');
+};
+
+subtest 'updated(): silently skips a component DA whose updated() throws' => sub {
+	plan tests => 2;
+	# One good DA with a known timestamp; one that throws from updated().
+	# The join must return the good timestamp without propagating the exception.
+	Readonly::Scalar my $GOOD_TS => 9_999_999;
+	my $good_db = InMemDA->new(
+		cols    => [$JC, 'x'],
+		rows    => [ { entry => 'K', x => 1 } ],
+		updated => $GOOD_TS,
+	);
+	my $bad_db = IntThrowUpdDA->new(
+		cols    => [$JC, 'y'],
+		rows    => [ { entry => 'K', y => 2 } ],
+		updated => 0,   # irrelevant -- updated() will die before returning
+	);
+	my $j = Database::Join->new(databases => [$good_db, $bad_db], join_column => $JC);
+	my $ts;
+	lives_ok { $ts = $j->updated() }
+		'updated() does not propagate a die thrown by a component DA';
+	is($ts, $GOOD_TS,
+		'updated() returns the good component timestamp, silently skipping the one that threw');
+};
+
+diag('section 27 done -- integration tests complete') if $ENV{TEST_VERBOSE};

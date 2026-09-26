@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Mojo::ATProto::OAuth",
   "PREREQ_PM" => {
     "Crypt::PK::ECC" => 0,
+    "Crypt::PRNG" => 0,
     "Crypt::URandom" => 0,
     "Digest::SHA" => 0,
     "JSON" => 0,
@@ -31,16 +32,19 @@ my %WriteMakefileArgs = (
     "Mojo::UserAgent" => 0,
     "Net::DNS::Resolver" => 0,
     "Scalar::Util" => 0,
+    "Time::HiRes" => 0,
     "constant" => 0,
     "feature" => 0,
     "strict" => 0
   },
   "TEST_REQUIRES" => {
+    "Exporter" => 0,
     "Mojolicious::Lite" => 0,
     "Test2::V0" => 0,
+    "lib" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.02",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,8 +53,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Crypt::PK::ECC" => 0,
+  "Crypt::PRNG" => 0,
   "Crypt::URandom" => 0,
   "Digest::SHA" => 0,
+  "Exporter" => 0,
   "JSON" => 0,
   "MIME::Base64" => 0,
   "Mojo::Base" => 0,
@@ -65,8 +71,10 @@ my %FallbackPrereqs = (
   "Net::DNS::Resolver" => 0,
   "Scalar::Util" => 0,
   "Test2::V0" => 0,
+  "Time::HiRes" => 0,
   "constant" => 0,
   "feature" => 0,
+  "lib" => 0,
   "strict" => 0,
   "warnings" => 0
 );

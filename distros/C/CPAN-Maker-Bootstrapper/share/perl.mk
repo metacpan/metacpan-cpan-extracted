@@ -80,10 +80,14 @@ define check_syntax_pm
 	  module=$$(echo $@ | perl -npe 's{^lib/}{}; s/\//::/g; s/\.pm$$//;'); \
 	  errfile=$$(mktemp); \
 	  local_cleanfiles="$$local_cleanfiles $$errfile"; \
+	  echo -n "Checking SYNTAX...$@..."; \
 	  PERL5LIB= perl -wc $(PERLINCLUDE) -M"$$module" -e 1 2>$$errfile \
 	    || { rm -f "$@"; cat $$errfile; exit 1; }; \
+	  echo "OK"; \
+	  echo -n "Checking POD...$@..."; \
 	  podcheck="$$($(PODCHECKER) $@ 2>&1 || true)"; \
-	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$@"; echo "$$podcheck"; exit 1; } \
+	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$@"; echo "$$podcheck"; exit 1; }; \
+	  echo "OK"; \
 	fi
 endef
 
@@ -100,10 +104,14 @@ define check_syntax_pl
 	if [[ "$$skip" -eq 0 ]]; then \
 	  errfile=$$(mktemp); \
 	  local_cleanfiles="$$local_cleanfiles $$errfile"; \
+	  echo "Checking...$@"; \
 	  PERL5LIB= perl -wc $(PERLINCLUDE) -e 1 2>$$errfile \
 	    || { rm -f "$@"; cat $$errfile; exit 1; }; \
+	  echo "$@ OK"; \
+	  echo "Checking POD...$@"; \
 	  podcheck="$$($(PODCHECKER) $@ 2>&1 || true)"; \
-	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$@"; echo "$$podcheck"; exit 1; } \
+	  echo "$$podcheck" | grep -q "does not contain\|OK" || { rm -f "$@"; echo "$$podcheck"; exit 1; }; \
+	  echo "$@ OK"; \
 	fi
 endef
 
@@ -121,11 +129,12 @@ ifneq ($(tidy_on),)
 	  echo "ERROR: perltidy not found - install with: cpanm Perl::Tidy"; \
 	  exit 1; \
 	fi; \
-	echo >&2 "Checking tidiness...$<"; \
+	echo -n "Checking TIDINESS...$<..."; \
 	$(PERLTIDY) --profile="$(PERLTIDYRC)" $< >/dev/null 2>&1; \
 	diff -q "$<" "$<.tdy" >/dev/null 2>&1 \
 	  || { echo "ERROR: $< is not tidy - run: make tidy"; rm -f "$<.tdy" "$@"; exit 1; }; \
 	rm -f "$<.tdy"; \
+	echo "OK"; \
 	touch "$@"
 else
 	$(NO_ECHO)touch "$@"
@@ -140,12 +149,13 @@ ifneq ($(critic_on),)
 	  echo "ERROR: perlcritic not found - install with: cpanm Perl::Critic"; \
 	  exit 1; \
 	fi; \
-	echo >&2 "Critiquing...$<"; \
+	echo -n "Checking PERLCRITIC...$<..."; \
 	set -eo pipefail; \
 	$(PERLCRITIC) \
 	  --theme=$(PERLCRITIC_THEME) \
 	  --severity=$(PERLCRITIC_SEVERITY) \
-	  --profile="$(PERLCRITICRC)" $<  2>&1 | tee $@ || { echo "ERROR: $< fails perlcritic"; exit 1; };
+	  --profile="$(PERLCRITICRC)" $<  >/dev/null 2>&1 | tee $@ || { echo "ERROR: $< fails perlcritic"; exit 1; }; \
+	echo "OK"
 else
 	$(NO_ECHO)touch "$@"
 endif
@@ -206,7 +216,9 @@ gen-vars-file = $(file >$(1),)$(foreach v,$(TEMPLATE_VARS),$(file >>$(1),$(v)=$(
 # combined rule below builds/checks modules in correct dependency
 # order without needing a separate phase-barrier pass.
 
-%.pm: %.pm.in | local
+LOCAL_PREREQ := $(if $(syntax_on),local/.installed)
+
+%.pm: %.pm.in | $(LOCAL_PREREQ)
 	$(call gen-vars-file,$<.vars)
 	$(NO_ECHO)module_tmp="$$(mktemp)"; \
 	local_cleanfiles="$$module_tmp"; \
@@ -218,7 +230,7 @@ gen-vars-file = $(file >$(1),)$(foreach v,$(TEMPLATE_VARS),$(file >>$(1),$(v)=$(
 	chmod -w "$@"; \
 	$(if $(syntax_on),$(check_syntax_pm))
 
-%.pl: %.pl.in | local
+%.pl: %.pl.in | $(LOCAL_PREREQ)
 	$(call gen-vars-file,$<.vars)
 	$(NO_ECHO)local_cleanfiles=""; \
 	trap 'rm -f $$local_cleanfiles $<.vars' EXIT; \

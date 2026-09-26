@@ -2,7 +2,7 @@ package Protocol::IR::Converter;
 use strict;
 use warnings;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 use Protocol::IR::Code;
 use Protocol::IR::Proto::NEC;
@@ -20,7 +20,7 @@ use Protocol::IR::Proto::MWM;
 use Protocol::IR::Format::Pronto;
 use Protocol::IR::Format::CSV;
 use Protocol::IR::Format::Wig;
-use Protocol::IR::Format::GC;
+use Protocol::IR::Format::JSON;
 use Protocol::IR::Format::Tasmota;
 use Protocol::IR::Format::Mode2;
 use Protocol::IR::Format::LIRC;
@@ -93,8 +93,7 @@ sub new {
     $self->register_format('Pronto', 'Protocol::IR::Format::Pronto');
     $self->register_format('CSV',    'Protocol::IR::Format::CSV');
     $self->register_format('wig',    'Protocol::IR::Format::Wig');
-    $self->register_format('GCIR',       'Protocol::IR::Format::GC');
-    $self->register_format('GlobalCache','Protocol::IR::Format::GC');
+    $self->register_format('JSON',   'Protocol::IR::Format::JSON');
     $self->register_format('Tasmota','Protocol::IR::Format::Tasmota');
     $self->register_format('Mode2',  'Protocol::IR::Format::Mode2');
     $self->register_format('LIRC',   'Protocol::IR::Format::LIRC');
@@ -238,7 +237,7 @@ Protocol::IR::Converter - Registry and manager for IR code protocols and formats
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 
@@ -297,7 +296,7 @@ C<NECX1>/C<NECX2> (extended NEC, half header), C<MWM> (Disney "Made With
 Magic", 24-144 bit serial)
 
 =item * Formats: C<Pronto>, C<Tasmota>, C<wig>, C<CSV>, C<Mode2>,
-C<LIRC>
+C<LIRC>, C<JSON> (import only)
 
 =back
 
@@ -307,6 +306,7 @@ L<Protocol::IR::Format::Mode2>, and L<Protocol::IR::Format::LIRC> document
 their exact behavior.
 L<Protocol::IR::Format::Wig> implements the HAIR "wig"
 JSON format. L<Protocol::IR::Format::CSV> imports IRDB-style button listings.
+L<Protocol::IR::Format::JSON> imports a proprietary JSON IR database dump.
 
 =head1 Decoding versus generating timings
 
@@ -357,7 +357,7 @@ URL, or downloaded from the IRDB repository by device path) to a HAIR wig
 JSON file.
 
 =item * C<ir-convert> -- general converter between the supported formats
-(CSV, wig, Pronto, Tasmota, LIRC).
+(CSV, wig, Pronto, Tasmota, LIRC, JSON).
 
 =back
 
@@ -372,7 +372,7 @@ work from any directory once the distribution is installed.
 
 Creates a converter, registering the bundled protocols (NEC, NEC2, 48-NEC1,
 48-NEC2, JVC, JVC-48, SAMSUNG, SAMSUNG20, SAMSUNG36, NECX1, NECX2, MWM) and
-formats (Pronto, CSV, wig, Tasmota, Mode2, LIRC).
+formats (Pronto, CSV, wig, Tasmota, Mode2, LIRC, JSON).
 
 =head2 import_code
 

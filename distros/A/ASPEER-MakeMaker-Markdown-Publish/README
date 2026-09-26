@@ -1,0 +1,85 @@
+ASPEER::MakeMaker::Markdown::Publish
+
+Add MakeMaker targets for publishing Perl distribution documentation
+through MkDocs, VitePress, Docusaurus, or Astro Starlight.
+
+GitHub Attestations
+
+The release workflow generates GitHub artifact attestations for
+distribution archives. Install the GitHub CLI with gh attestation
+support and authenticate with gh auth login.
+
+Download ASPEER-MakeMaker-Markdown-Publish-VERSION.tar.gz from a GitHub
+release, MetaCPAN, or a CPAN mirror, replace VERSION, and verify it
+with:
+
+    gh attestation verify ASPEER-MakeMaker-Markdown-Publish-VERSION.tar.gz --repo aspeer/pm-ASPEER-MakeMaker-Markdown-Publish
+
+A successful verification confirms that the archive checksum matches an
+attestation from this repository. The workflow publishes the same
+archive to GitHub Releases and CPAN. Older releases and GitHub's
+automatically generated source-code archives are not covered.
+
+The module is deliberately a thin adapter. It reads
+META_MERGE.x_documentation.publish from the live WriteMakefile
+arguments, encodes that configuration into the generated Makefile, and
+delegates every target to Markdown::Publish.
+
+It also loads ASPEER::MakeMaker::Markdown::Pod, so one import supplies
+the doc and readme maintenance targets as well as the publication
+targets.
+
+    use ExtUtils::MakeMaker;
+    use ASPEER::MakeMaker::Markdown::Publish;
+
+    WriteMakefile(
+        NAME         => 'Example',
+        VERSION_FROM => 'lib/Example.pm',
+        META_MERGE   => {
+            'meta-spec' => {version => 2},
+            x_documentation => {
+                publish => {
+                    sources => ['doc'],
+                    name    => 'Example documentation',
+                },
+            },
+        },
+    );
+
+After regenerating the Makefile:
+
+    make doc
+    make publish_build
+    make publish_serve
+    # Update the local publication branch:
+    make publish_gh
+    # Update it and push that branch to origin:
+    make publish_gh-push
+    # Explicit Cloudflare Workers Static Assets deployment:
+    make publish_cloudflare
+
+The same combined target set can be enabled without editing Makefile.PL:
+
+    perl -MASPEER::MakeMaker::Markdown::Publish Makefile.PL
+
+MkDocs supplies all five targets when module is omitted. Set
+MARKDOWN_PUBLISH_MODULE to override the configured module at runtime.
+For generated engine configuration, the site name defaults to the
+WriteMakefile NAME; set x_documentation.publish.name for a friendlier
+title. An authored engine configuration keeps control of its own title.
+publish_gh builds and updates the local publication branch without
+contacting a remote. If x_documentation.publish.base is omitted, it
+derives /<repository>/ from origin, or / for an <owner>.github.io
+repository. Set it explicitly when the published URL uses another path.
+Generated VitePress, Docusaurus, and Starlight configuration receives
+this base; an authored engine configuration remains authoritative. Push
+the branch through the repository's normal Git workflow, or use
+publish_gh-push to update it and push only that branch to origin without
+forcing it. Set x_documentation.publish.config_extend to customise
+generated engine configuration without replacing it; it cannot be
+combined with config. publish_cloudflare builds and deploys the same
+site to the Worker named in an authored Wrangler config supplied as
+cloudflare => {config => 'wrangler.jsonc'} in x_documentation.publish.
+It neither commits nor pushes Git.
+
+See the module documentation and examples.

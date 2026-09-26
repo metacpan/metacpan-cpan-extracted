@@ -7,7 +7,6 @@
 ## Modified 2026/03/22
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -16,6 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
@@ -159,17 +159,26 @@ To instantiate new object, you can pass an hash or hash reference of properties 
 
 =head2 expr
 
+    my $value = $constraint->expr;
+    $constraint->expr( $value );
+
 Sets or gets a check constraint expression.
 
 It returns a L<scalar object|Module::Generic::Scalar>
 
 =head2 fields
 
+    my $value = $constraint->fields;
+    $constraint->fields( $value );
+
 Sets or gets an array reference of table field names associated with this constraint.
 
 It returns a L<array object|Module::Generic::Array>
 
 =head2 name
+
+    my $value = $constraint->name;
+    $constraint->name( $value );
 
 Sets or gets the check constraint name.
 
@@ -185,7 +194,7 @@ L<perl>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2023 DEGUEST Pte. Ltd.
+Copyright(c) 2023-2026 DEGUEST Pte. Ltd.
 
 All rights reserved
 

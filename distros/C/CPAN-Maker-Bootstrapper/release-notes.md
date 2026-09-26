@@ -1,75 +1,127 @@
-# CPAN::Maker::Bootstrapper 2.2.3 Release Notes
+# CPAN::Maker::Bootstrapper 2.3.3 Release Notes
 
-**Release Date:** August 18, 2026
-**Released by:** Rob Lauer
-
----
+**Released:** Fri Sep 25 2026
 
 ## Overview
 
-Version 2.2.3 is a maintenance release delivering targeted bug fixes
-and improvements to the build system, along with a new feature in the
-installer for configuring build mirrors via an environment variable.
+This is a maintenance release focused on build system housekeeping:
+template files have been relocated to a dedicated `share/`
+subdirectory, dependency scanning has been made more efficient by
+separating test and runtime dependency workflows, and `.gitignore`
+management has been cleaned up and aligned.
 
 ---
 
-## What's New
+## Changes
 
-### `BUILD_MIRRORS` Environment Variable Support
+### Template Files Relocated to `share/`
 
-The `cmd_install` method in
-`CPAN::Maker::Bootstrapper::Role::Installer` now supports a
-`BUILD_MIRRORS` environment variable. When set, its value is written
-to a `build-mirrors` file prior to invoking `make`, allowing you to
-specify one or more CPAN mirrors (comma-separated) for use during
-CI/Docker builds.
+The following template files have been moved from the project root
+into the `share/` subdirectory. References in `buildspec.yml` and the
+project `.gitignore` have been updated accordingly.
 
-**Example:**
+| Old Location | New Location |
+|---|---|
+| `buildspec.yml.tmpl` | `share/buildspec.yml.tmpl` |
+| `class-module.pm.tmpl` | `share/class-module.pm.tmpl` |
+| `cli-module.pm.tmpl` | `share/cli-module.pm.tmpl` |
+| `modulino.tmpl` | `share/modulino.tmpl` |
+| `test.t.tmpl` | `share/test.t.tmpl` |
 
-```bash
-BUILD_MIRRORS="https://cpan.example.com,https://mirror.example.org" cmb install --module My::Module
+> **Note:** `share/modulino.tmpl` has had its executable bit removed (`chmod -x`).
+
+---
+
+### Build System Improvements (`Makefile`)
+
+#### New Target: `cpanfile.runtime`
+
+A new `cpanfile.runtime` target has been added that generates a
+cpanfile containing only runtime (`requires`) dependencies — excluding
+test dependencies. This is now the file that the `local` target
+depends on, meaning that installing local dependencies for hermetic
+syntax checking no longer pulls in test-only modules.
+
+```makefile
+cpanfile.runtime: requires
+    $(CPAN_MAKER) create-cpanfile --dependency-type requires $< -o $@
 ```
 
+#### New Target: `test-requires.scan`
+
+Test dependency scanning has been split into two distinct steps to
+avoid unnecessary rescans:
+
+- **`test-requires.scan`** — scans test files (`t/`) and writes a raw
+  sorted module list. This step depends only on the test files
+  themselves.
+- **`test-requires.raw`** — filters `test-requires.scan` against the
+  `provides` file to remove internal modules. This step now depends on
+  `test-requires.scan` and `provides` separately.
+
+Previously these two operations were combined into a single
+`test-requires.raw` recipe. The separation means a change to
+`provides` no longer forces a full rescan of the test files.
+
+#### `test-requires` Target Reworked
+
+The `test-requires` phony target now depends directly on
+`test-requires.raw` rather than `$(TESTS)`, reflecting the new
+two-stage pipeline.
+
+#### Generated Files Tracking
+
+The following files are now explicitly listed in `GENERATED_FILES`
+(and thus included in `CLEANFILES`):
+
+- `provides`
+- `cpanfile`
+- `test-requires.scan`
+
+All `cpanfile.*` variant files are also now cleaned up on `make clean`.
+
 ---
 
-## Build System Fixes & Improvements
+### `.gitignore` / `gitignore` Cleanup
 
-### Makefile
+Both `.gitignore` and the distributed `gitignore` template have been
+aligned and reorganised. Key additions and changes:
 
-- **`GIT_DIRTY` fix:** The fallback `echo 'unknown'` was previously
-  missing, causing the shell to silently fail if `git describe` was
-  unavailable. This has been corrected.
-- **`TEMPLATE_VARS` updated:** `MIN_PERL_VERSION` is now included in
-  the template variable set, making it available for use in `.in` file
-  templating and `buildspec.yml` generation.
-- **`buildspec.yml` recipe refactored:**
-  - Now calls `gen-vars-file` to generate `buildspec.yml.tmpl.vars` before resolving variables.
-  - A `trap` ensures `buildspec.yml.tmpl.vars` is cleaned up on exit.
-  - `resolve-vars` now locates `buildspec.yml.tmpl.vars` by default,
-    removing the need to pass template vars explicitly on the command
-    line.
-
-### MANIFEST
-
-- `local.mk` has been added to the distribution manifest, ensuring it
-  is included in packaged releases.
+- Entries are now grouped and sorted consistently using recursive glob patterns (`**/`)
+- Added: `**/*.bak`, `**/*.log`, `**/*.pod`, `**/*.tdy`, `**/*.tmp`
+- Added: `test-requires.scan`, `cpanfile.*`, `buildspec.yml.tmpl`, `test.t.tmpl`, `local/**`
+- Removed redundant or inconsistently scoped patterns
+- CMB-specific artifacts (`bin/bootstrapper`, `bin/cmb`,
+  `bin/cpan-maker-bootstrapper`, `cmb_md5sums.txt`) are now clearly
+  identified with a `# cmb specific` comment in `.gitignore`
 
 ---
 
-## Files Changed
+### Local Dependency Installation (`local.mk`)
 
-| File | Change |
-|------|--------|
-| `lib/CPAN/Maker/Bootstrapper/Role/Installer.pm.in` | Added `BUILD_MIRRORS` environment variable support |
-| `Makefile` | Fixed `GIT_DIRTY`, added `MIN_PERL_VERSION` to `TEMPLATE_VARS`, refactored `buildspec.yml` recipe |
-| `MANIFEST` | Added `local.mk` |
-| `VERSION` | Bumped to `2.2.3` |
-| `README.md` | Regenerated |
-| `release-notes.md` | Updated |
+The `local` target now depends on `cpanfile.runtime` instead of the
+full `cpanfile` (which includes test requirements). The `cpm install`
+invocation has been updated to pass the cpanfile explicitly via
+`--cpanfile $<`:
+
+```makefile
+cpm install -L local --cpanfile $< ...
+```
+
+This ensures that only runtime dependencies are installed into the
+local hermetic library used for syntax checking.
 
 ---
 
 ## Upgrade Notes
 
-This release is fully backward compatible with 2.2.2. No changes to
-public APIs or module interfaces are required.
+- If you are using `make update` to manage your build system files, run it after upgrading to pick up the updated `Makefile`, `.includes/local.mk`, and `gitignore` template.
+- The template files previously installed at the project root (`class-module.pm.tmpl`, `cli-module.pm.tmpl`, etc.) are now distributed under `share/`. Projects scaffolded with earlier versions are unaffected — the bootstrapper resolves these via `File::ShareDir` at install time.
+- `cpanfile.*` files (including `cpanfile.runtime`, `cpanfile.requires`, etc.) are now listed in `CLEANFILES` and will be removed by `make clean`. Regenerate them with `make cpanfile` or `make local` as needed.
+
+---
+
+## Links
+
+- [GitHub Repository](http://github.com/rlauer6/CPAN-Maker-Bootstrapper)
+- [Issue Tracker](http://github.com/rlauer6/CPAN-Maker-Bootstrapper/issues)

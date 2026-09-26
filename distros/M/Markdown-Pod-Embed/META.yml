@@ -1,0 +1,49 @@
+---
+abstract: 'maintain Perl documentation from Markdown'
+author:
+  - 'Andrew Speer <andrew.speer@isolutions.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  Pod::Checker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  version: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Markdown-Pod-Embed
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Config: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  IPC::Run3: '0'
+  Markdown::Pod: '0.008'
+  PPI: '0'
+  perl: '5.010'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/aspeer/pm-Markdown-Pod-Embed/issues
+  homepage: https://github.com/aspeer/pm-Markdown-Pod-Embed
+  repository: https://github.com/aspeer/pm-Markdown-Pod-Embed.git
+version: '1.013'
+x_authority: cpan:ASPEER
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

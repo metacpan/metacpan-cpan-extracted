@@ -1,17 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Tables.pm
-## Version v1.2.1
+## Version v1.2.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/27
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 # This package's purpose is to separate the object of the tables from the main
 # DB::Object package so that when they get DESTROY'ed, it does not interrupt
 # the SQL connection
@@ -21,13 +20,14 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( DB::Object );
     use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use DB::Object::Fields;
     use Wanted;
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.2.1';
+    our $VERSION = 'v1.2.2';
 };
 
 use strict;
@@ -328,7 +328,19 @@ sub drop
     return( $sth );
 }
 
-sub enhance { return( shift->_method_to_query( 'enhance', @_ ) ); }
+# sub enhance { return( shift->_method_to_query( 'enhance', @_ ) ); }
+sub enhance
+{
+    my $self = shift( @_ );
+    if( my $dbo = $self->database_object )
+    {
+        return( $dbo->enhance( @_ ) );
+    }
+    else
+    {
+        return( $self->_method_to_query( 'enhance', @_ ) );
+    }
+}
 
 sub exists
 {
@@ -456,6 +468,8 @@ sub from_unixtime { return( shift->_method_to_query( 'from_unixtime', @_ ) ); }
 sub get_query_object { return( shift->_reset_query ); }
 
 sub group { return( shift->_method_to_query( 'group', @_ ) ); }
+
+sub having { return( shift->_method_to_query( 'having', @_ ) ); }
 
 # sub indexes { return( shift->_set_get_class_array_object( 'indexes', {
 #     is_primary => { type => 'boolean' },
@@ -744,6 +758,12 @@ sub reverse
     if( @_ )
     {
         my $q = $self->_reset_query;
+        $self->{reverse} = shift( @_ );
+        $q->reverse( $self->{reverse} );
+    }
+    elsif( Wanted::want( 'VOID' ) )
+    {
+        my $q = $self->_reset_query;
         $self->{reverse}++;
         $q->reverse( $self->{reverse} );
     }
@@ -786,6 +806,13 @@ sub sort
 {
     my $self = shift( @_ );
     if( @_ )
+    {
+        my $q = $self->_reset_query;
+        my $v = shift( @_ );
+        $self->{reverse} = ( ( defined( $v ) && $v  > 0 ) ? 0 : 1 );
+        $q->sort( $self->{reverse} );
+    }
+    elsif( Wanted::want( 'VOID' ) )
     {
         my $q = $self->_reset_query;
         $self->{reverse} = 0;
@@ -904,12 +931,12 @@ sub AUTOLOAD
     # User called a field on a table object, instead of using the method fields_object or its shortcut 'fo'
     if( CORE::exists( $fields->{ $method } ) )
     {
-        warn( "You have called a field name '$method' using a table object. This practice is discouraged, although it works for now. Best to use something like: \$tbl->fo->$method rather than just \$tbl->$method\n" );
+        warn( "You have called a field name '$method' using a table object. This practice is discouraged, although it works for now. Best to use something like: \$tbl->fo->$method rather than just \$tbl->$method" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
         return( $self->fields_object->_initiate_field_object( $method ) );
     }
     else
     {
-        warn( "You called table '", $self->name, "' object \$tbl->$method, but no such method exist.\n" );
+        warn( "You called table '", $self->name, "' object \$tbl->$method, but no such method exist.\n" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
         return( $self->error( "You called table '", $self->name, "' object \$tbl->$method, but no such method exist." ) );
     }
 };
@@ -1055,18 +1082,15 @@ sub THAW
         }
 
         my $has_tble = 0;
-        my $has_base = 0;
-
         foreach my $p ( @$isa_ref )
         {
             # Same as what we can find in modules DB::Object::(Postgres|SQLite|Mysql)::Tables
             $has_tble = 1 if( CORE::defined( $p ) && $p eq 'DB::Object::Tables' );
-            $has_base = 1 if( CORE::defined( $p ) && $p eq $base_class );
         }
 
-        if( !$has_tble || !$has_base )
+        if( !$has_tble )
         {
-            @$isa_ref = ( 'DB::Object::Tables', $base_class );
+            @$isa_ref = ( 'DB::Object::Tables' );
         }
     }
     my $new;
@@ -1098,9 +1122,12 @@ DB::Object::Tables - Database Table Object
 
 =head1 SYNOPSIS
 
+    my $tbl = $dbh->table( 'customers' );
+    my $sth = $tbl->where( id => 42 )->select;
+
 =head1 VERSION
 
-    v1.2.1
+    v1.2.2
 
 =head1 DESCRIPTION
 
@@ -1170,6 +1197,9 @@ This is a convenient wrapper around L<DB::Object::Query/avoid>
 
 =head2 check
 
+    my $value = $tbl->check;
+    $tbl->check( $value );
+
 Sets or gets the L<hash object|Module::Generic::Hash> of L<check constraint objects|DB::Object::Constraint::Check> for this table.
 
 Each key in the hash represents the foreign key constraint name and its value is an L<check constraint object|DB::Object::Constraint::Check> that contains the following methods:
@@ -1210,9 +1240,13 @@ This must be implemented by the driver package, so check L<DB::Object::Mysql::Ta
 
 =head2 database
 
+    my $value = $tbl->database;
+
 Returns the name of the current database by calling L<DB::Object/database>
 
 =head2 database_object
+
+    my $value = $tbl->database_object;
 
 Returns the database object (L<DB::Object>)
 
@@ -1222,9 +1256,14 @@ Returns the database handler (L<DBI>)
 
 =head2 dbo
 
+    my $value = $tbl->dbo;
+    $tbl->dbo( $value );
+
 Sets or get the L<database object|DB::Object>, which can be one of L<DB::Object::Mysql>, L<DB::Object::Postgres> or L<DB::Object::SQLite>
 
 =head2 default
+
+    my $value = $tbl->default;
 
 This calls L</structure> which may return cached data.
 
@@ -1236,7 +1275,7 @@ If nothing is found, it returns an empty list in list context and L<perlfunc/und
 
 L</delete> will format a delete query based on previously set parameters, such as L</where>.
 
-L</delete> will refuse to execute a query without a where condition. To achieve this, one must prepare the delete query on his/her own by using the L</do> method and passing the sql query directly.
+L</delete> will refuse to execute a query without a where condition. To achieve this, one must prepare the delete query on his/her own by using the L<DB::Object/do> method and passing the sql query directly.
 
     $tbl->where( login => 'jack' );
     $tbl->limit(1);
@@ -1254,6 +1293,9 @@ It returns the resulting statement handler
 
 =head2 enhance
 
+    my $value = $tbl->enhance;
+    $tbl->enhance( $value );
+
 Sets or gets the boolean value. When true, this will instruct the query object to make certain enhancements to the SQL query.
 
 =head2 exists
@@ -1265,6 +1307,8 @@ This must be implemented by the driver package, so check L<DB::Object::Mysql::Ta
 Provided with a field name, and this returns a boolean value as to whether that field exists in the table or not.
 
 =head2 fields_as_array
+
+    my $value = $tbl->fields_as_array;
 
 Returns the table fields name as an L<array object|Module::Generic::Array>
 
@@ -1308,6 +1352,9 @@ This is a convenient shortcut for L</fields_object>
 
 =head2 foreign
 
+    my $value = $tbl->foreign;
+    $tbl->foreign( $value );
+
 Sets or gets the L<hash object|Module::Generic::Hash> of L<foreign key constraint objects|DB::Object::Constraint::Foreign> for this table.
 
 Each key in the hash represents the foreign key constraint name and its value is an L<foreign key constraint object|DB::Object::Constraint::Foreign> that contains the following methods:
@@ -1341,6 +1388,8 @@ The foreign key constraint name.
 =back
 
 =head2 format_statement
+
+    my $value = $tbl->format_statement;
 
 This is a convenient wrapper around L<DB::Object::Query/format_statement>
 
@@ -1398,6 +1447,14 @@ Get the L<DB::Object::Query> object. If none is set yet, it will instantiate one
 
 This is a convenient wrapper around L<DB::Object::Query/group>
 
+=head2 having
+
+    $tbl->having( email => qr/\@example/ );
+
+Forwards the supplied arguments to L<DB::Object::Query/having> on the current query object and returns the value returned by the query method.
+
+This method belongs to the generic table API; driver-specific table classes inherit it from C<DB::Object::Tables>.
+
 =head2 indexes
 
     my $idx = $tbl->indexes;
@@ -1444,6 +1501,8 @@ This must be implemented by the driver package, so check L<DB::Object::Mysql::Ta
 
 =head2 name
 
+    my $value = $tbl->name;
+
 Returns the table name. This is read-only.
 
 =head2 new_check
@@ -1476,6 +1535,8 @@ Boolean. Sets the C<no bind> flags to true or false.
 
 =head2 null
 
+    my $value = $tbl->null;
+
 This calls L</structure> which may return cached data.
 
 Returns an hash in list context and an hash reference in scalar representing column to its default null values pairs.
@@ -1502,27 +1563,40 @@ For the drivers who support it, this will represent the parent table if the curr
 
 =head2 prefix
 
+    my $value = $tbl->prefix;
+
 Based on the prefix level, this will return a string with the database name if prefix is higher than 2, with the schema if the prefix level is higher than 1 and with the table name if the prefix level is higher than 0.
 
 The resulting string is used as prefix to table columns when preparing queries.
 
 =head2 prefix_database
 
+    my $value = $tbl->prefix_database;
+
 Returns true if L</prefixed> is higher than 2.
 
 =head2 prefix_schema
+
+    my $value = $tbl->prefix_schema;
 
 Returns true if L</prefixed> is higher than 1.
 
 =head2 prefix_table
 
+    my $value = $tbl->prefix_table;
+
 Returns true if L</prefixed> is higher than 0.
 
 =head2 prefixed
 
+    my $value = $tbl->prefixed;
+    $tbl->prefixed( $value );
+
 Sets or gets the prefix level. 0 being no prefix and 2 implying the use of the database name in prefix.
 
 =head2 primary
+
+    my $value = $tbl->primary;
 
 This calls L</structure> which may return cached data.
 
@@ -1532,9 +1606,13 @@ If nothing is found, it returns an empty list in list context and L<perlfunc/und
 
 =head2 qualified_name
 
+    my $value = $tbl->qualified_name;
+
 Returns the table name. This is read-only.
 
 =head2 query_object
+
+    my $value = $tbl->query_object;
 
 Returns the query object (L<DB::Object::Query>)
 
@@ -1576,9 +1654,14 @@ The SQL C<RETURNING> clause needs to be implemented by the driver and is current
 
 =head2 reverse
 
+    my $value = $tbl->reverse;
+    $tbl->reverse( $value );
+
 Get or set the reverse mode.
 
 =head2 schema
+
+    my $value = $tbl->schema;
 
 Returns the schema name, if any. For example, with PostgreSQL, the default schema name would be C<public>.
 
@@ -1602,6 +1685,8 @@ This must be implemented by the driver package, so check L<DB::Object::Mysql::Ta
 
 =head2 structure
 
+    my $value = $tbl->structure;
+
 The implementation is driver specific.
 
 This must be implemented by the driver package, so check L<DB::Object::Mysql::Tables/structure>, L<DB::Object::Postgres::Tables/structure> or L<DB::Object::SQLite::Tables/structure>
@@ -1609,6 +1694,8 @@ This must be implemented by the driver package, so check L<DB::Object::Mysql::Ta
 This returns a cached data for speed. See L</reset_structure> to reset that cache.
 
 =head2 table
+
+    my $value = $tbl->table;
 
 Returns the table name. This is read-only.
 
@@ -1621,6 +1708,8 @@ This is a convenient wrapper around L<DB::Object::Query/tie>
 The table type
 
 =head2 types
+
+    my $value = $tbl->types;
 
 This calls L</structure> which may return cached data.
 
@@ -1674,7 +1763,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2026 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

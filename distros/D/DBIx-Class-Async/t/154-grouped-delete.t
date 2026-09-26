@@ -11,12 +11,12 @@
 #   1. delete() on a grouped RS (group_by + having) completes successfully
 #      and only removes the rows that match the HAVING filter.
 #   2. delete() on a RS with only group_by (no having) also routes safely.
-#   3. delete() on a plain (ungrouped) RS still works -- regression guard.
+#   3. delete() on a plain (ungrouped) RS still works, regression guard.
 #   4. delete() on a RS with rows (LIMIT) routes safely.
 #   5. delete() on a RS with join routes safely.
 #
 # Note: having without group_by is invalid SQL on SQLite and most databases
-# and is not a supported use case -- it is intentionally not tested.
+# and is not a supported use case, it is intentionally not tested.
 
 use strict;
 use warnings;
@@ -40,7 +40,7 @@ my $schema = DBIx::Class::Async::Schema->connect(
         workers      => 2,
         schema_class => 'TestSchema',
         async_loop   => $loop,
-        cache_ttl    => 0,         # disable caching -- we need live counts
+        cache_ttl    => 0,
     },
 );
 
@@ -50,7 +50,7 @@ $schema->await($schema->deploy({ add_drop_table => 1 }));
 #
 # We always start from a clean slate so tests don't interfere with each other,
 
-my $seq = 0;    # monotonic counter to keep emails unique across subtests
+my $seq = 0; # monotonic counter to keep emails unique across subtests
 
 sub _seed_users {
     my (@specs) = @_;
@@ -190,7 +190,7 @@ subtest 'delete() with join attribute routes safely' => sub {
         { name => 'Olivia', active => 0 },
     );
 
-    # join without a real condition on the joined table -- just verify routing
+    # join without a real condition on the joined table, just verify routing
     my $del_rs = $schema->resultset('User')->search(
         { 'me.active' => 1 },
         { join        => 'orders' }

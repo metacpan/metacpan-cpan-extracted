@@ -1,0 +1,20 @@
+Revision history for ASPEER-MakeMaker-Markdown-Pod
+
+1.014  2026-09-26
+
+    - Refer only to the public GitHub repository in installation guidance.
+
+1.013  2026-09-26
+
+    - Publish public repository metadata through the GitHub mirror.
+    - Add contributor and security policies, dependency auditing and
+      artifact-attestation verification guidance.
+    - Declare the CPAN authority in distribution metadata.
+
+1.012  2026-09-26
+
+    - Separate reusable Markdown processing from MakeMaker integration.
+    - Add DocBook discovery and sidecar-driven documentation targets.
+    - Leave the markpod command with Markdown-Pod-Embed.
+    - Prepare the MakeMaker adapter for its first CPAN release.
+    - Install pandoc in GitHub Actions for documentation integration tests.

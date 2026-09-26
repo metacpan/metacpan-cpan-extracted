@@ -101,6 +101,31 @@ no_leaks_ok {
 	eval { Chem::Structure::Parser::_parse_cif_file("$data/no.such.file.cif", {}) };
 } 'a failed open does not leak on the mmCIF path either';
 
+# An option that dies when it is read.  Every parse reads its options before it
+# makes anything, because a croak after the output hashes exist leaves them
+# unreachable; a model number that is an object whose numeric overload throws is
+# the way to reach that croak from Perl.  The file forms also have the read
+# buffer to lose, which is not an SV and so is not what is counted here: it is
+# freed by the XSUB's LEAVE, on the croak path as on the ordinary one.
+{
+	package Bomb;
+	use overload '0+' => sub { die "no number here\n" }, fallback => 1;
+}
+for my $case (
+	[ '_parse_file',        "$data/mini.pdb" ],
+	[ '_parse_string',      "ATOM      1  CA  ALA A   1      1.0  2.0  3.0\n" ],
+	[ '_parse_cif_file',    "$data/mini.cif" ],
+	[ '_parse_cif_string',  "data_x\nloop_\n_atom_site.id\n1\n" ],
+) {
+	my ($fn, $arg) = @$case;
+	my $sub = \&{"Chem::Structure::Parser::$fn"};
+	my $bomb = bless {}, 'Bomb';
+	eval { $sub->($arg, { model => $bomb }) };
+	is($@, "no number here\n", "$fn: an option that dies takes the parse with it");
+	no_leaks_ok { eval { $sub->($arg, { model => $bomb }) } }
+		"$fn: and leaves nothing behind";
+}
+
 no_leaks_ok { aa3to1('ALA'); aa3to1('NAG'); res1('DA'); res_type('HOH');
               aa1to3('A'); aa1to3('*') }
 	'the residue name lookups do not leak';
@@ -179,6 +204,8 @@ no_leaks_ok { structure_info("$data/empty.cif") } 'nor does an empty one';
 		"structure_info(\$file, 'dssp') does not leak";
 	no_leaks_ok { structure_info("$data/fold.pdb", dssp => 1) }
 		'nor does dssp => 1';
+	no_leaks_ok { structure_info("$data/duplex.pdb", 'torsions') }
+		"nor does structure_info(\$file, 'torsions')";
 	no_leaks_ok { eval { structure_info("$data/fold.pdb", 'nosuch') } }
 		'nor does a view that is not one';
 	for my $off (qw(shape dihedrals contacts exposure hbonds secondary interface)) {

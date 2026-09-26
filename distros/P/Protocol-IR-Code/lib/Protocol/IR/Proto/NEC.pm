@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NEC;
 use strict;
 use warnings;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::NEC is the base class for the whole NEC protocol family.
@@ -267,7 +267,7 @@ Protocol::IR::Proto::NEC - NEC protocol handler (32-bit) and NEC-family base cla
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 

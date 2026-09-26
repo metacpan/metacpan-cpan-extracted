@@ -1,3 +1,127 @@
+Fri Sep 25 06:16:03 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.3.3]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.3.3.md: new
+	* VERSION: bump
+	* share/buildspec.yml.tmpl: renamed
+	* share/class-module.pm.tmpl: renamed
+	* share/cli-module.pm.tmpl: renamed
+	* share/modulino.tmpl: renamed
+	* share/test.t.tmpl: renamed
+	* buildspec.yml
+	- update extra-files based on above
+	* gitignore: align .gitignore, gitignore
+	* .gitignore
+	- align .gitignore, gitignore
+	- test-requires.scan
+	- identify cmb specific artifacts
+	* .includes/local.mk
+	- depend on cpanfile.runtime (not test deps)
+	- use local/.installed as time
+	* .include/perl.mk
+	(LOCAL_PREREQ): local/.installed
+	* Makefile
+	(cpanfile.runtime): new
+	(test-requires.scan): new
+	(test-requires): reworked to avoid rescans
+	* share/modulino.tmpl: chmod -x
+
+Mon Sep 14 12:32:17 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.3.2]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.3.2.md: new
+	* README.md: generated
+	* VERSION: bump
+	* .includes/perl.mk: consistent "Checking" output
+	* Makefile
+	- consistent "Checking" output
+	(find-files)
+	- optional 4th arg with a pattern
+	(test-requires.raw): remove provides files
+	(TESTS): +*.p[ml] files
+	(PACKAGE_VERSION): new
+	- export MODULE_NAME, PACKAGE_VERSION for use as template vars
+	- include new bootstrapper
+	- set PERL5LIB to local/lib/perl5 for local dependencies
+	- leave provides so we don't try to resolve .pm files repeatedly
+	(provides): new
+	(test-requires.raw): filter out provides
+	(extra-files): generate directly from buildspec.yml
+	(extra-files.mk): generate from above
+	* builder
+	(install_build_deps): append ::Bootstrapper
+	* cpan-maker-bootstrapper.yml
+	- new command provides
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- + CPAN::Maker::Role::ModuleUtils
+	- update load order of modules to compose properly
+	* lib/CPAN/Maker/Bootstrapper/Role/ExtraFiles.pm.in
+	(cmd_extra-files)
+	- support regeneration of extra-files, not just insertions
+	* lib/CPAN/Maker/Bootstrapper/Role/Installer.pm.in
+	- croak, not die except in cmd_ methods
+	(cmd_install)
+	- fabricate module_name from path
+	- add LINT to make line if in environment
+	- add build-mirrors if present
+	(_create_install_dir)
+	- check that make_path succeeds
+	- remove any files that we typically install if they are in the install path
+	(_validate_path)
+	- refine module path recognition
+	- return "lib/module-name" if no import paths
+	* modulino.tmpl
+	- use MODULINO_MODULE_NAME to avoid conflict with MODULE_NAME modified
+	* requires
+	- +CPAN::Maker::Role::Provides, ::ModuleUtils
+	* cpanfile: likewise
+	* .includes/bootstrap.mk: new
+	* MANIFEST: add above
+	* buildspec.yml: likewise
+	* .includes/update.mk: likewise
+	* lib/CPAN/Maker/Bootstrapper/Role/Provides.pm.in: new
+
+Fri Aug 28 13:17:15 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.3.1]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.3.1.md: new
+	* VERSION: bump
+	* README.md: generated
+	* cpan-maker-bootstrapper.yml: + version commands
+	* lib/CPAN/Maker/Bootstrapper/Role/Filter.pm.in: skip blank records
+	* lib/CPAN/Maker/Bootstrapper/Role/Version.pm.in: new
+	* deps.mk: generated
+
+Thu Aug 20 14:57:26 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.3.0]:
+	* release-notes.md: updated
+	* release-notes/release-notes-2.3.0.md: new
+	* VERSION: bump
+	* README.md: generated
+	* requires
+	- +CPAN::Maker 2.0.9, -CLI::Simple::Utils, ::Constants
+	- bump CLI::Simple 2.2.2
+	* cpanfile: likewise
+	* builder
+	- install_deps => install_build_deps
+	- reduce actual build time requires by removing run-time requires
+	- require projects to include 'build-requires' for things like Markdown::Render
+	- warn user to add CPAN::Maker::Bootstrapper to build-requires
+	- add local/lib/perl5 to PERL5LIB for local hermetic checking
+	* cpan-maker-bootstrapper.yml
+	- + --strict, --no-strict option (default: strict)
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- +$GIT_SHA, +$GIT_DIRTY
+	* lib/CPAN/Maker/Bootstrapper/Role/ResolveVars.pm.in
+	(_resolve_vars)
+	- avoid reporting issues with template vars in POD or comments
+	* .includes/perl.mk
+	- all order only dependency on local directory only when SYNTAX_CHECKING is on
+
 Tue Aug 18 17:14:54 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.2.3]:

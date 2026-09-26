@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article
+><section
+><title
+>Screen</title
+><screen
+>Screen Line 1
+Screen Line 2
+
+Screen Line 4
+
+
+Screen Line 7</screen
+><para
+>Para after screen</para
+><para
+><screen
+><command
+>command in screen line 1
+command in screen line 2</command
+></screen
+>Para after command in screen</para
+></section
+></article
+>

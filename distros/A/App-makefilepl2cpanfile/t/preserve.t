@@ -10,8 +10,8 @@ use App::makefilepl2cpanfile;
 # 'recommends' entry — both must survive regeneration.
 my $existing_cpanfile = <<'END_CPANFILE';
 on 'develop' => sub {
-  requires   'Foo::Bar';
-  recommends 'Baz::Qux';
+	requires   'Foo::Bar';
+	recommends 'Baz::Qux';
 };
 END_CPANFILE
 

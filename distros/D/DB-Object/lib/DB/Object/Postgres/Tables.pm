@@ -1,17 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Tables.pm
-## Version v1.1.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v1.1.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/22
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 ## This package's purpose is to separate the object of the tables from the main
 ## DB::Object package so that when they get DESTROY'ed, it does not interrupt
 ## the SQL connection
@@ -21,11 +20,12 @@ BEGIN
 {
     use strict;
     use warnings;
-    use parent qw( DB::Object::Tables DB::Object::Postgres );
+    warnings::register_categories( 'DB::Object' );
+    use parent qw( DB::Object::Tables );
     use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.1.1';
 };
 
 use strict;
@@ -275,7 +275,12 @@ sub lock
     my $table  = $self->{table};
     my $opt    = shift( @_ ) || 'SHARE';
     my $nowait = shift( @_ ) || undef();
-    if( $opt !~ /^(ACCESS SHARE|ROW SHARE|ROW EXCLUSIVE|SHARE UPDATE EXCLUSIVE|SHARE|SHARE ROW EXCLUSIVE|EXCLUSIVE|ACCESS EXCLUSIVE)$/i )
+    # If this is a SELECT ... FOR UPDATE, FOR NO KEY UPDATE, FOR SHARE and FOR KEY SHAR, we redirect to the query builder 
+    if( $opt =~ /^(?:For[[:blank:]\h]+)?(update|no[[:blank:]\h]+key[[:blank:]\h]+update|share|key[[:blank:]\h]+share)/i )
+    {
+        return( $self->lock_select( $opt ) );
+    }
+    elsif( $opt !~ /^(ACCESS SHARE|ROW SHARE|ROW EXCLUSIVE|SHARE UPDATE EXCLUSIVE|SHARE|SHARE ROW EXCLUSIVE|EXCLUSIVE|ACCESS EXCLUSIVE)$/i )
     {
         return( $self->error( "Bad table '$table' locking option '$opt'." ) );
     }
@@ -289,6 +294,25 @@ sub lock
         return( $self->error( "Error while executing query to do tables locking:\n$query", $sth->errstr() ) );
     }
     return( $sth );
+}
+
+sub lock_select
+{
+    my $self = shift( @_ );
+    my $q = $self->_reset_query;
+    # Void
+    return( $q->lock( @_ ) ) if( !defined( wantarray() ) );
+    if( wantarray() )
+    {
+        my( @val ) = $q->lock( @_ ) || return( $self->pass_error( $q->error ) );
+        return( @val );
+    }
+    else
+    {
+        my $val = $q->lock( @_ );
+        return( $self->pass_error( $q->error ) ) if( !defined( $val ) );
+        return( $val );
+    }
 }
 
 # NOTE: sub name is inherited from DB::Object::Tables
@@ -421,7 +445,7 @@ SELECT
         ELSE t.typname
      END AS "data_type"
     ,pg_catalog.format_type(a.atttypid,a.atttypmod) AS "format_type"
-    ,a.attndims > 0 AS "is_array"
+    ,(a.attndims > 0 OR pg_catalog.format_type(a.atttypid,a.atttypmod) LIKE '%[]') AS "is_array"
     ,CASE a.attnotnull
         WHEN FALSE THEN TRUE
         ELSE FALSE
@@ -693,7 +717,7 @@ DB::Object::Postgres::Tables - PostgreSQL Table Object
 
 =head1 VERSION
 
-    v1.1.0
+    v1.1.1
 
 =head1 DESCRIPTION
 
@@ -857,6 +881,8 @@ If a trigger name is provided, it will be used to specifically enable this trigg
 
 =head2 exists
 
+    my $value = $tbl->exists;
+
 Returns true if the current table exists, or false otherwise.
 
 =head2 foreign
@@ -927,6 +953,12 @@ Supported lock types are:
 
 See L<PostgreSQL documentation for more information|https://www.postgresql.org/docs/9.5/explicit-locking.html>
 
+=head2 lock_select
+
+Forwards PostgreSQL C<SELECT> locking options to the current query object's locking implementation. In void context the generated query is executed according to the query object's normal rules; otherwise the generated value is returned.
+
+    $tbl->lock_select( 'FOR UPDATE' );
+
 =head2 on_conflict
 
 A convenient wrapper to L<DB::Object::Postgres::Query/on_conflict>
@@ -936,6 +968,8 @@ A convenient wrapper to L<DB::Object::Postgres::Query/on_conflict>
 Not implemented in PostgreSQL.
 
 =head2 parent
+
+    my $value = $tbl->parent;
 
 This will return the parent table if the current table inherits from another table.
 
@@ -973,6 +1007,12 @@ See L<PostgreSQL documentation for more information|https://www.postgresql.org/d
 =head2 repair
 
 Not implemented in PostgreSQL.
+
+=head2 reset
+
+Resets the PostgreSQL table/query state by using the table implementation's normal reset mechanism and returns the resulting object or value.
+
+    $tbl->reset;
 
 =head2 stat
 
@@ -1048,7 +1088,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2026 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

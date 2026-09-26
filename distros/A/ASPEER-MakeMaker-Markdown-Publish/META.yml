@@ -1,0 +1,46 @@
+---
+abstract: 'MakeMaker targets for Markdown publication'
+author:
+  - 'Andrew Speer <andrew.speer@isolutions.com.au>'
+build_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  version: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ASPEER-MakeMaker-Markdown-Publish
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ASPEER::MakeMaker: '1.010'
+  ASPEER::MakeMaker::Markdown::Pod: '1.010'
+  Cwd: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  JSON::PP: '0'
+  MIME::Base64: '0'
+  Markdown::Publish: '1.001'
+  perl: '5.010'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Publish/issues
+  homepage: https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Publish
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Publish.git
+version: '1.003'
+x_authority: cpan:ASPEER
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -5,8 +5,10 @@ no warnings 'experimental::signatures';
 plan skip_all => 'set TEST_ONLINE to a postgresql:// DSN for a scratch database to run this test'
     unless $ENV{TEST_ONLINE};
 
+use lib 't/lib';
 use Mojo::ATProto::OAuth::SessionStore::Pg qw//;
 use Mojo::Promise;
+use SessionStoreContract qw/update_and_lock_subtests/;
 
 # Full, realistic hashrefs (as Mojo::ATProto::OAuth itself builds them) -
 # unlike the in-memory store, SessionStore::Pg enforces NOT NULL on the
@@ -130,6 +132,32 @@ subtest 'the _p methods mirror the sync ones' => sub {
     my $err3;
     $store->get_session_p('did:plc:aaaaaaaaaaaaaaaaaaaaaaaa', 'state-1')->catch(sub ($e) { $err3 = $e })->wait;
     like($err3, qr/no session found/, 'delete_session_p removed the row');
+};
+
+update_and_lock_subtests(\&fresh_store, sub (%overrides) { return {%{session_fixture()}, %overrides} });
+
+subtest 'lock_session_p serializes callers on separate store instances (separate connection pools)' => sub {
+    my $store_a = fresh_store();
+    my $store_b = Mojo::ATProto::OAuth::SessionStore::Pg->new($ENV{TEST_ONLINE});
+    my $session = session_fixture();
+    $store_a->save_session($session);
+    my @key = ($session->{account_did}, $session->{session_id});
+
+    my @events;
+    my $worker = sub ($store, $name) {
+        return sub ($current) {
+            push @events, "enter $name saw $current->{refresh_token}";
+            return $store->update_session_p(@key, {refresh_token => "ref-$name"})
+                ->then(sub { return Mojo::Promise->timer(0.05) })
+                ->then(sub { push @events, "exit $name" });
+        };
+    };
+    Mojo::Promise->all(
+        $store_a->lock_session_p(@key, $worker->($store_a, 'a')),
+        $store_b->lock_session_p(@key, $worker->($store_b, 'b')),
+    )->wait;
+
+    is(\@events, ['enter a saw ref-1', 'exit a', 'enter b saw ref-a', 'exit b'], 'the second pool waited on the advisory lock');
 };
 
 done_testing;

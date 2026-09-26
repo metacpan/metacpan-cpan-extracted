@@ -18,6 +18,10 @@
 \blogs\b
 \.log$
 \bscratch\b
+^scratch.*
+\.rar$
+-scc_.*\.md$
+^AGENTS\.md$
 ^wiki/
 ^bin/run_tests\.pl$
 ^walkthrough\.md$
@@ -43,6 +47,7 @@
 \bINDEX_KEY_MAP\.md$
 
 # Database runtime stores and temp files
+^\.amberdb\b
 \bdbstore\b
 \bdata/
 \.db$

@@ -388,7 +388,7 @@ Commands:
 Options:
   --interval N       Sync flush interval in seconds (default: 1)
   --dbase_dir PATH   AmberDB dbase root directory (default: auto-detected)
-  --ramdisk_dir PATH AmberDB RAM-disk directory (default: dbase_dir/ramdisk)
+  --ramdisk_dir PATH AmberDB RAM-disk directory (default: auto-detected OS RAM-disk)
   --table NAME       Limit sync operations to a specific table
   --verbose, -v      Print verbose operational logs
 

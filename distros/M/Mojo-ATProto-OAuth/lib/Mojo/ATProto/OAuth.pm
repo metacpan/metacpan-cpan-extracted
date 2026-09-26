@@ -18,7 +18,7 @@ use feature 'try';
 
 use constant DEBUG => $ENV{MOJO_OAUTH_DEBUG} || 0;
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 has 'ua'                 => sub { 
     my $ua = Mojo::UserAgent->new(request_timeout => 10);
@@ -781,34 +781,38 @@ sub start_scope_upgrade_p($self, $session, $additional_scopes) {
 # involving the user.
 # Reuses the session's own DPoP key - RFC 9449 requires the same key for
 # every proof across one authorization's lifetime, refreshing never
-# generates a new one. Persists the updated session via `store` and
-# returns it.
+# generates a new one. Persists the new tokens via `store` and returns
+# the session.
+#
+# The auth server rotates the refresh token on every use and rejects a
+# replayed one (ATProto auth servers may revoke the whole session for
+# it), so a refresh token must never be presented twice - not even by
+# two processes sharing one stored session. The refresh therefore runs
+# under the store's per-session lock, against a fresh read of the row:
+# if that row's refresh_token no longer matches the caller's copy,
+# another process already refreshed and its result is returned instead
+# of refreshing again. As a backstop for a store that can't lock, an
+# invalid_grant is answered by re-reading the row once and returning it
+# if its refresh_token has changed in the meantime.
 sub refresh_tokens($self, $session) {
     die "refresh_tokens: 'store' must be configured\n" unless defined($self->store);
     $self->log->debug("refresh_tokens: account_did=$session->{account_did} session_id=$session->{session_id}") if DEBUG;
 
-    my $body = {
-        client_id     => $self->client_id,
-        grant_type    => 'refresh_token',
-        refresh_token => $session->{refresh_token},
-        %{$self->_client_assertion_params($session->{auth_server_url})},
-    };
+    my ($account_did, $session_id, $seen_refresh_token) = @{$session}{qw/account_did session_id refresh_token/};
+    my $refreshed;
+    try {
+        $refreshed = $self->_with_locked_session($account_did, $session_id, sub($current) {
+            return $current if $self->_refreshed_elsewhere($seen_refresh_token, $current);
+            return $self->_send_refresh_request($current);
+        });
+    } catch($ex) {
+        die $ex unless $ex =~ /: invalid_grant\n\z/;
+        my $current = $self->store->get_session($account_did, $session_id);
+        die $ex unless $self->_refreshed_elsewhere($seen_refresh_token, $current);
+        $refreshed = $current;
+    }
 
-    my $dpop_key = Mojo::ATProto::OAuth::DPoP->import_private_pem($session->{dpop_private_key_pem});
-    my ($res, $dpop_nonce) = $self->_post_dpop_retry(
-        url => $session->{auth_server_token_endpoint}, body => $body, key => $dpop_key,
-        nonce => $session->{dpop_authserver_nonce}, label => 'token refresh',
-    );
-    die "token refresh failed (HTTP " . $res->code . "): " . $self->_parse_auth_error_reason($res) . "\n"
-        unless $res->code == 200;
-
-    my $token_resp = $res->json;
-    $session->{access_token}          = $token_resp->{access_token};
-    $session->{refresh_token}         = $token_resp->{refresh_token};
-    $session->{dpop_authserver_nonce} = $dpop_nonce;
-
-    $self->store->save_session($session);
-    $self->log->debug("refresh_tokens: succeeded and persisted, session_id=$session->{session_id}") if DEBUG;
+    %$session = %$refreshed;
     return $session;
 }
 
@@ -816,31 +820,115 @@ sub refresh_tokens_p($self, $session) {
     die "refresh_tokens_p: 'store' must be configured\n" unless defined($self->store);
     $self->log->debug("refresh_tokens_p: account_did=$session->{account_did} session_id=$session->{session_id}") if DEBUG;
 
+    my ($account_did, $session_id, $seen_refresh_token) = @{$session}{qw/account_did session_id refresh_token/};
+    return $self->_with_locked_session_p($account_did, $session_id, sub($current) {
+        return $current if $self->_refreshed_elsewhere($seen_refresh_token, $current);
+        return $self->_send_refresh_request_p($current);
+    })->catch(sub($ex) {
+        die $ex unless $ex =~ /: invalid_grant\n\z/;
+        return $self->store->get_session_p($account_did, $session_id)->then(sub($current) {
+            die $ex unless $self->_refreshed_elsewhere($seen_refresh_token, $current);
+            return $current;
+        });
+    })->then(sub($refreshed) {
+        %$session = %$refreshed;
+        return $session;
+    });
+}
+
+# True if $current (a fresh read of the stored session) carries a
+# different refresh token than the one the caller started with - i.e.
+# someone else has already refreshed this session.
+sub _refreshed_elsewhere($self, $seen_refresh_token, $current) {
+    return 0 if ($current->{refresh_token} // '') eq ($seen_refresh_token // '');
+    $self->log->debug("refresh_tokens: already refreshed elsewhere, session_id=$current->{session_id}") if DEBUG;
+    return 1;
+}
+
+# Performs the actual refresh-token grant for $session and persists only
+# the fields it changes. Must only run under the store's session lock -
+# see refresh_tokens.
+sub _send_refresh_request($self, $session) {
+    my ($body, $dpop_key) = $self->_refresh_request_args($session);
+    my ($res, $dpop_nonce) = $self->_post_dpop_retry(
+        url => $session->{auth_server_token_endpoint}, body => $body, key => $dpop_key,
+        nonce => $session->{dpop_authserver_nonce}, label => 'token refresh',
+    );
+    my $fields = $self->_refreshed_fields($res, $dpop_nonce);
+    $self->_update_stored_session($session->{account_did}, $session->{session_id}, $fields);
+    $self->log->debug("refresh_tokens: succeeded and persisted, session_id=$session->{session_id}") if DEBUG;
+    return {%$session, %$fields};
+}
+
+sub _send_refresh_request_p($self, $session) {
+    my ($body, $dpop_key) = $self->_refresh_request_args($session);
+    return $self->_post_dpop_retry_p(
+        url => $session->{auth_server_token_endpoint}, body => $body, key => $dpop_key,
+        nonce => $session->{dpop_authserver_nonce}, label => 'token refresh',
+    )->then(sub ($res, $dpop_nonce) {
+        my $fields = $self->_refreshed_fields($res, $dpop_nonce);
+        return $self->_update_stored_session_p($session->{account_did}, $session->{session_id}, $fields)->then(sub {
+            $self->log->debug("refresh_tokens_p: succeeded and persisted, session_id=$session->{session_id}") if DEBUG;
+            return {%$session, %$fields};
+        });
+    });
+}
+
+sub _refresh_request_args($self, $session) {
     my $body = {
         client_id     => $self->client_id,
         grant_type    => 'refresh_token',
         refresh_token => $session->{refresh_token},
         %{$self->_client_assertion_params($session->{auth_server_url})},
     };
+    return ($body, Mojo::ATProto::OAuth::DPoP->import_private_pem($session->{dpop_private_key_pem}));
+}
 
-    my $dpop_key = Mojo::ATProto::OAuth::DPoP->import_private_pem($session->{dpop_private_key_pem});
-    return $self->_post_dpop_retry_p(
-        url => $session->{auth_server_token_endpoint}, body => $body, key => $dpop_key,
-        nonce => $session->{dpop_authserver_nonce}, label => 'token refresh',
-    )->then(sub ($res, $dpop_nonce) {
-        die "token refresh failed (HTTP " . $res->code . "): " . $self->_parse_auth_error_reason($res) . "\n"
-            unless $res->code == 200;
+# Validates a refresh-token grant response and returns the session fields
+# it changes.
+sub _refreshed_fields($self, $res, $dpop_nonce) {
+    die "token refresh failed (HTTP " . $res->code . "): " . $self->_parse_auth_error_reason($res) . "\n"
+        unless $res->code == 200;
+    my $token_resp = $res->json;
+    return {
+        access_token          => $token_resp->{access_token},
+        refresh_token         => $token_resp->{refresh_token},
+        dpop_authserver_nonce => $dpop_nonce,
+    };
+}
 
-        my $token_resp = $res->json;
-        $session->{access_token}          = $token_resp->{access_token};
-        $session->{refresh_token}         = $token_resp->{refresh_token};
-        $session->{dpop_authserver_nonce} = $dpop_nonce;
+# Store access for the two session-concurrency methods
+# (update_session/lock_session) that a duck-typed store written against
+# an earlier version of the store interface may not implement. Such a
+# store falls back to the old behaviour: a read-modify-write save, and a
+# plain fresh read with no locking - both still racy, which is exactly
+# what the new methods fix. Also used by
+# Mojo::ATProto::OAuth::ResourceClient for its DPoP nonce saves.
+sub _update_stored_session($self, $account_did, $session_id, $fields) {
+    my $store = $self->store;
+    return $store->update_session($account_did, $session_id, $fields) if $store->can('update_session');
+    $store->save_session({%{$store->get_session($account_did, $session_id)}, %$fields});
+    return;
+}
 
-        return $self->store->save_session_p($session)->then(sub {
-            $self->log->debug("refresh_tokens_p: succeeded and persisted, session_id=$session->{session_id}") if DEBUG;
-            return $session;
-        });
+sub _update_stored_session_p($self, $account_did, $session_id, $fields) {
+    my $store = $self->store;
+    return $store->update_session_p($account_did, $session_id, $fields) if $store->can('update_session_p');
+    return $store->get_session_p($account_did, $session_id)->then(sub($current) {
+        return $store->save_session_p({%$current, %$fields});
     });
+}
+
+sub _with_locked_session($self, $account_did, $session_id, $code) {
+    my $store = $self->store;
+    return $store->lock_session($account_did, $session_id, $code) if $store->can('lock_session');
+    return $code->($store->get_session($account_did, $session_id));
+}
+
+sub _with_locked_session_p($self, $account_did, $session_id, $code) {
+    my $store = $self->store;
+    return $store->lock_session_p($account_did, $session_id, $code) if $store->can('lock_session_p');
+    return $store->get_session_p($account_did, $session_id)->then($code);
 }
 
 1;
@@ -1101,7 +1189,21 @@ Non-blocking counterpart of L</start_scope_upgrade>.
 
     my $refreshed_session = $oauth->refresh_tokens($session);
 
-Uses the session's stored refresh token to mint a new access token, without involving the user. Reuses the session's own DPoP key - RFC 9449 requires the same key for every proof across one authorization's lifetime, so refreshing never generates a new one.  Persists the updated session via L</store> and returns it (the same hashref, mutated in place, for convenience). Note this rotates I<both> the access token and the refresh token. Requires L</store> to be configured.
+Uses the session's stored refresh token to mint a new access token, without involving the user. Reuses the session's own DPoP key - RFC 9449 requires the same key for every proof across one authorization's lifetime, so refreshing never generates a new one.  Persists the new tokens via L</store> and returns the session (the same hashref, updated in place, for convenience). Note this rotates I<both> the access token and the refresh token. Requires L</store> to be configured.
+
+The auth server accepts each refresh token exactly once, and ATProto auth servers may revoke the whole session when a used one is presented again - so this is safe to call from several processes (or several in-flight C<_p> calls) sharing one stored session at once:
+
+=over 4
+
+=item * The refresh runs under the store's per-session lock (C<lock_session>/C<lock_session_p>, see L</THE STORE INTERFACE>), against a fresh read of the stored session rather than the passed-in copy.
+
+=item * If that fresh read's C<refresh_token> differs from the passed-in one, another caller has already refreshed; its result is returned, and no request is sent.
+
+=item * Only the fields a refresh changes (C<access_token>, C<refresh_token>, C<dpop_authserver_nonce>) are written back, via C<update_session>.
+
+=item * If the auth server still answers C<invalid_grant> (e.g. with a store that can't lock), the stored session is re-read once, and returned if its C<refresh_token> has changed in the meantime; otherwise the error stands.
+
+=back
 
 =head2 refresh_tokens_p
 
@@ -1141,7 +1243,23 @@ L</store> is semi-duck-typed, a base class exists in L<Mojo::ATProto::OAuth::Ses
 
 =item * C<delete_session($account_did, $session_id)> / C<delete_session_p($account_did, $session_id)>
 
+=item * C<update_session($account_did, $session_id, \%fields)> / C<update_session_p($account_did, $session_id, \%fields)>
+
+=item * C<lock_session($account_did, $session_id, $code)> / C<lock_session_p($account_did, $session_id, $code)>
+
 =back
+
+The last two exist because one stored session is commonly used by several processes at once (web workers, job queue workers), and the auth server rotates the refresh token on every use:
+
+=over 4
+
+=item * C<update_session> writes I<only> the given fields of an existing session and leaves every other field as currently stored. It must accept exactly C<access_token>, C<refresh_token>, C<dpop_authserver_nonce> and C<dpop_host_nonce>, die on any other key or an empty hashref, and die with a message matching C</no session found/> on a miss. (Stores subclassing L<Mojo::ATProto::OAuth::SessionStore> get the field validation from its C<_validated_session_update>.) It's used for DPoP nonce rotations and refreshed tokens, so that a caller holding an older copy of the session never writes stale tokens back over newer ones the way a whole-row C<save_session> would.
+
+=item * C<lock_session> calls C<< $code->($session) >> with a I<freshly read> copy of the session while holding an exclusive lock on that C<(account_did, session_id)> pair, and returns what C<$code> returns. The lock must exclude every other C<lock_session>/C<lock_session_p> on the same session, from any process sharing the store, and must be released however C<$code> exits. C<lock_session_p> does the same without blocking: C<$code> may return a promise, the lock is held until it settles, and the returned promise resolves or rejects with C<$code>'s outcome. On a miss, both die/reject with a message matching C</no session found/>. L</refresh_tokens> runs inside this lock, and C<$code> writes through the store's other methods, typically on a different connection - so the lock mustn't block those writes (e.g. a row lock taken with C<SELECT ... FOR UPDATE> would deadlock).
+
+=back
+
+A duck-typed store that implements neither of these two (one written against an earlier version of this interface) still works: this module falls back to a read-modify-write C<save_session> and an unlocked fresh read. That fallback reopens the races the two methods close, so only use it where a session is never shared across processes or concurrent C<_p> calls.
 
 A store only needs to implement whichever half a given caller actually uses - the synchronous methods if the caller only ever calls this module's synchronous methods (L</start_auth_flow>, L</process_callback>, etc. - see the standalone example in L</SYNOPSIS>, whose C<My::MemoryStore> implements only the sync half), or the C<_p> methods if the caller only ever uses the async ones. A store used with both needs both halves implemented.
 
@@ -1149,11 +1267,11 @@ This distribution ships three session store drivers:
 
 =over 4 
 
-=item * L<Mojo::ATProto::OAuth::SessionStore::Memory> - a plain in-process hashref store - sessions and auth requests are lost on process exit; fine for a single-process script or a test suite, not for a real deployment).
+=item * L<Mojo::ATProto::OAuth::SessionStore::Memory> - a plain in-process hashref store - sessions and auth requests are lost on process exit; fine for a single-process script or a test suite, not for a real deployment). Its session lock only covers callers within the one process.
 
-=item * L<Mojo::ATProto::OAuth::SessionStore::SQLite> - an SQLite backed session store, requires L<Mojo::SQLite> to be installed. 
+=item * L<Mojo::ATProto::OAuth::SessionStore::SQLite> - an SQLite backed session store, requires L<Mojo::SQLite> to be installed. Its session lock is a lease row that other processes poll for; it can be switched off - see that module for the trade-offs.
 
-=item * L<Mojo::ATProto::OAuth::SessionStore::Pg> - a Postgres backed session store, requires L<Mojo::Pg> to be installed.
+=item * L<Mojo::ATProto::OAuth::SessionStore::Pg> - a Postgres backed session store, requires L<Mojo::Pg> to be installed. Its session lock is a Postgres advisory lock.
 
 =back
 

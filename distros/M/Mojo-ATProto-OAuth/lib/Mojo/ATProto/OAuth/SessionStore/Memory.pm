@@ -3,10 +3,12 @@ package
 use Mojo::Base 'Mojo::ATProto::OAuth::SessionStore', -signatures;
 use feature 'try';
 use Mojo::Promise qw//;
+use Scalar::Util  qw/refaddr/;
 
 has 'auth_requests'      => sub { {} };
 has 'auth_request_order' => sub { [] };    
 has 'sessions'           => sub { {} };
+has 'session_locks'      => sub { {} };
 
 sub _session_key($self, $account_did, $session_id) {
     return "$account_did:$session_id";
@@ -96,6 +98,54 @@ sub delete_session_p($self, $account_did, $session_id) {
     return Mojo::Promise->resolve;
 }
 
+# Updates only the given fields of an existing session, leaving every
+# other field as currently stored - see
+# Mojo::ATProto::OAuth::SessionStore::_validated_session_update for the
+# accepted fields.
+sub update_session($self, $account_did, $session_id, $fields) {
+    my $set     = $self->_validated_session_update($fields);
+    my $session = $self->sessions->{$self->_session_key($account_did, $session_id)};
+    die "no session found for did/session_id\n" unless defined $session;
+    @{$session}{keys %$set} = values %$set;
+    return;
+}
+
+sub update_session_p($self, $account_did, $session_id, $fields) {
+    try {
+        $self->update_session($account_did, $session_id, $fields);
+        return Mojo::Promise->resolve;
+    } catch($ex) {
+        return Mojo::Promise->reject($ex);
+    }
+}
+
+# A synchronous call can't interleave with anything else in this one
+# process, so the only thing to guard against is an asynchronous
+# lock_session_p on the same session that's still in flight.
+sub lock_session($self, $account_did, $session_id, $code) {
+    die "lock_session: session is locked by a pending asynchronous operation\n"
+        if $self->session_locks->{$self->_session_key($account_did, $session_id)};
+    return $code->($self->get_session($account_did, $session_id));
+}
+
+# Queues $code behind any lock_session_p already in flight for the same
+# session: each caller's run is chained onto the previous caller's
+# (rejection-swallowing) tail, so $code bodies for one session never
+# overlap, and each one sees whatever the one before it persisted.
+sub lock_session_p($self, $account_did, $session_id, $code) {
+    my $key   = $self->_session_key($account_did, $session_id);
+    my $locks = $self->session_locks;
+    my $run   = ($locks->{$key} // Mojo::Promise->resolve)
+        ->then(sub { return $self->get_session_p($account_did, $session_id) })
+        ->then($code);
+
+    my $tail = $run->catch(sub { return });
+    my $addr = refaddr($tail);
+    $locks->{$key} = $tail;
+    $tail->then(sub { delete $locks->{$key} if (refaddr($locks->{$key}) // 0) == $addr });
+    return $run;
+}
+
 # Not part of the store contract Mojo::ATProto::OAuth itself relies on
 # but mostly here for testing to work (and find the most recently persisted
 # auth request)
@@ -171,6 +221,11 @@ L</last_state_for_issuer>. Defaults to an empty arrayref.
 Hashref of persisted session rows, keyed by
 C<"$account_did:$session_id">. Defaults to an empty hashref.
 
+=head2 session_locks
+
+Hashref of in-flight C<lock_session_p> queues, keyed like L</sessions>.
+Defaults to an empty hashref. Not part of the public interface.
+
 =head1 METHODS
 
 Implements the full sync + C<_p> store contract described in
@@ -224,6 +279,29 @@ updated in place rather than duplicated.
 
 Deletes a persisted session row by C<(account_did, session_id)>. A
 no-op (not an error) if nothing is stored under that pair.
+
+=head2 update_session / update_session_p
+
+    $store->update_session($account_did, $session_id, {dpop_host_nonce => $nonce});
+
+Updates only the given fields of an existing session, leaving the rest
+as currently stored. Accepts only C<access_token>, C<refresh_token>,
+C<dpop_authserver_nonce> and C<dpop_host_nonce>; dies (C<_p>: rejects)
+on any other key, on an empty hashref, and with a message matching
+C</no session found/> on a miss.
+
+=head2 lock_session / lock_session_p
+
+    my $result = $store->lock_session($account_did, $session_id, sub ($session) { ... });
+
+Runs the coderef with a freshly-read copy of the session while no other
+C<lock_session_p> for the same session can run, and returns (C<_p>:
+resolves with) whatever it returns. C<lock_session_p> queues behind any
+call already in flight for that session; the coderef may return a
+promise, and the lock is held until it settles. C<lock_session> dies if
+a C<lock_session_p> for the same session is still pending. This store
+lives in one process, so this only serializes callers within that
+process.
 
 =head1 SEE ALSO
 

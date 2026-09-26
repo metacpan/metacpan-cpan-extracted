@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin ();
+use lib "$FindBin::Bin/../lib";
+
+use Getopt::Long;
+
+use Game::Durak::Terminal;
+
+my %opt = (level => 3, seat => 1);
+GetOptions(\%opt, 'level=i', 'seat=i', 'seed=s', 'ascii', 'colour!',
+           'paint!', 'width=i', 'height=i', 'help')
+    or die "bad options\n";
+
+if ($opt{help}) {
+    print <<"USAGE";
+usage: $0 [--level 1-5] [--seat 1|2] [--seed STRING] [--ascii] [--no-colour]
+          [--no-paint] [--width N] [--height N]
+
+A deal of Podkidnoy Durak against the bot. You are the seat given by --seat
+and the bot plays the other one. The seed decides the deal, and the same seed
+deals the same cards every time.
+
+The table is drawn on one painted screen at a terminal and printed as plain
+lines when the output is a pipe or a file. --paint and --no-paint say so
+either way, and --width and --height fit the screen to a window that is not
+eighty by twenty-four.
+USAGE
+    exit 0;
+}
+
+my $said = defined $opt{seed} ? $opt{seed}
+         : join q{}, map { chr 97 + int rand 26 } 1 .. 32;
+my $seed = sprintf q{%-32.32s}, $said;
+
+my $terminal = Game::Durak::Terminal->new(
+    seed   => $seed,
+    level  => $opt{level},
+    seat   => $opt{seat},
+    ascii  => $opt{ascii},
+    colour => $opt{colour},
+    paint  => $opt{paint},
+    width  => $opt{width},
+    height => $opt{height},
+);
+
+my $result = $terminal->run;
+exit 0 unless $result;
+
+$terminal->say('');
+$terminal->say("the seed was $said");
+exit 0;
+
+__END__
+
+=head1 NAME
+
+durak - play a deal of Podkidnoy Durak at the terminal
+
+=head1 SYNOPSIS
+
+    durak
+    durak --level 1 --seat 2
+    durak --seed mine --ascii --no-colour
+    durak --width 120 --height 40
+    durak --no-paint | tee the-deal
+
+=head1 DESCRIPTION
+
+Deals, plays and says who the fool is. The bot's level runs from one to five
+and maps onto the engine's three rungs; the seed is anything, padded to
+thirty-two bytes, and it is printed at the end so a deal worth arguing about
+can be dealt again.
+
+At a terminal the deal is one painted table that is redrawn in place: their
+hand face down, the talon with the trump card lying under it, the bout with
+each answer laid across the card it beat and every unanswered attack ringed,
+and your own hand fanned and numbered with the cards you may play right now in
+their own colour and the rest in grey. Through a pipe it prints plain lines
+instead, so a deal can be kept and read back.
+
+=head1 AUTHOR
+
+LNATION, C<< <email@lnation.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under the Artistic License 2.0.
+
+=cut

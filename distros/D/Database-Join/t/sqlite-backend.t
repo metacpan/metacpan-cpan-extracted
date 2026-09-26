@@ -798,4 +798,658 @@ subtest 'ATTACH with criteria: zero-copy path used; WHERE filters correctly' => 
 	is  $by_id{k3}{score}, 55, 'k3 score correct';
 };
 
+# ===========================================================================
+# S19: LIKE and NOT LIKE operators on the SQLite backend
+#
+# Major Premise: %SAFE_SQL_OPS includes 'LIKE' and 'NOT LIKE' (added 0.006.0).
+#   The pattern is always passed as a bind parameter (col LIKE ?), so it is
+#   injection-safe regardless of pattern content.
+# ===========================================================================
+
+subtest 'LIKE operator: filters correctly on SQLite backend' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+
+	# 'Al%' matches only Alice (k1).
+	my $rows = $join->selectall_arrayref({ name => { LIKE => 'Al%' } });
+	is scalar @{$rows}, 1, 'LIKE Al%: one row returned';
+	is $rows->[0]{name}, 'Alice', 'LIKE Al%: Alice returned';
+	is $rows->[0]{score}, 95,    'LIKE Al%: Alice score correct';
+};
+
+subtest 'NOT LIKE operator: filters correctly on SQLite backend' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+
+	# 'Al%' excludes Alice; inner join limits to k1-k3+k5 (k4 absent from B).
+	# Remaining rows after NOT LIKE 'Al%': Bob(k2), Carol(k3), Eve(k5) -> 3.
+	my $rows = $join->selectall_arrayref({ name => { 'NOT LIKE' => 'Al%' } });
+	is scalar @{$rows}, 3, 'NOT LIKE Al%: 3 rows (inner join, Alice excluded)';
+	my %by_id = map { $_->{$JOIN_COL} => $_ } @{$rows};
+	ok !exists $by_id{k1}, 'Alice excluded by NOT LIKE';
+	ok  exists $by_id{k2}, 'Bob present';
+	ok  exists $by_id{k3}, 'Carol present';
+	ok  exists $by_id{k5}, 'Eve present';
+};
+
+# ===========================================================================
+# S20: count() SQL push-down on the SQLite backend
+#
+# Major Premise: count() on the SQLite path executes SELECT COUNT(*) against
+#   the cached join tables rather than fetching all rows.  This is verified by
+#   using CountingDA to prove that selectall_arrayref is NOT called a second
+#   time when count() is called on the same object — the cache services both
+#   calls, and count() uses COUNT(*) rather than fetching rows.
+# ===========================================================================
+
+subtest 'count() push-down: correct value with criteria on SQLite backend' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+
+	# Total rows (left join): all 5 primary rows, k4 has no secondary match.
+	is $join->count(), 5, 'count() all rows: 5';
+
+	# With criteria: gold tier = k1, k4 — both have primary rows;
+	# k4 is absent from B so it still appears in a left join.
+	is $join->count(tier => 'gold'), 2, 'count(tier=gold): 2';
+
+	# Score > 80: k1(95), k3(88) pass; k2(72) and k5(61) fail; k4 absent from B.
+	# Secondary criterion makes B an inner-join partner, so k4 is excluded.
+	is $join->count(score => { '>' => 80 }), 2, 'count(score>80): 2 (inner-join semantics)';
+};
+
+subtest 'count() push-down: DA not re-queried (cache reuse proof)' => sub {
+	my $da_a = CountingDA->new(cols => [qw(id name tier)], rows => \@ROWS_A_SMALL);
+	my $da_b = CountingDA->new(cols => [qw(id score)],     rows => \@ROWS_B_SMALL);
+	my $join = Database::Join->new(
+		databases   => [$da_a, $da_b],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+
+	$join->selectall_arrayref();          # builds cache (call_count = 1 each)
+	my $cnt = $join->count();             # count() uses COUNT(*) — no new DA calls
+	is $cnt,               5,  'count() returns correct total';
+	is $da_a->{_call_count}, 1, 'da_a: selectall_arrayref not called again for count()';
+	is $da_b->{_call_count}, 1, 'da_b: selectall_arrayref not called again for count()';
+};
+
+# ===========================================================================
+# S21: IN and NOT IN list operators on the SQLite backend
+#
+# Major Premise: %SAFE_LIST_OPS = { 'IN' => 1, 'NOT IN' => 1 }.
+#   Values are arrayrefs; each element is a separate bind parameter.
+#   IN ()  → 1=0 (no rows); NOT IN () → no constraint (all rows).
+# ===========================================================================
+
+subtest 'IN operator: filters to named values on SQLite backend' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+
+	# tier IN ('gold', 'silver') → k1(gold), k2(silver), k4(gold), k5(silver).
+	# k4 is absent from B but left join keeps primary-only rows.
+	# k3(Carol/bronze) is the only excluded row.
+	my $rows = $join->selectall_arrayref(tier => { IN => ['gold', 'silver'] });
+	my %by_id = map { $_->{$JOIN_COL} => $_ } @{$rows};
+	is  scalar @{$rows}, 4, 'IN gold/silver: 4 rows (k3/bronze excluded)';
+	ok  exists $by_id{k1}, 'Alice (gold) present';
+	ok  exists $by_id{k2}, 'Bob (silver) present';
+	ok !exists $by_id{k3}, 'Carol (bronze) absent';
+	ok  exists $by_id{k4}, 'Dave (gold, no secondary) present via left join';
+	ok  exists $by_id{k5}, 'Eve (silver) present';
+};
+
+subtest 'NOT IN operator: excludes named values on SQLite backend' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+
+	# tier NOT IN ('bronze') in inner join: excludes Carol(k3/bronze).
+	# k4 absent from B → inner join excludes it regardless.
+	# Remaining: k1, k2, k5 → 3 rows.
+	my $rows = $join->selectall_arrayref(tier => { 'NOT IN' => ['bronze'] });
+	my %by_id = map { $_->{$JOIN_COL} => $_ } @{$rows};
+	is  scalar @{$rows}, 3, 'NOT IN bronze (inner): 3 rows';
+	ok !exists $by_id{k3}, 'Carol (bronze) absent';
+	ok  exists $by_id{k1}, 'Alice present';
+	ok  exists $by_id{k2}, 'Bob present';
+	ok  exists $by_id{k5}, 'Eve present';
+};
+
+subtest 'IN with empty list: no rows returned (1=0 semantics)' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+	my $rows = $join->selectall_arrayref(tier => { IN => [] });
+	is scalar @{$rows}, 0, 'IN with empty list: zero rows';
+};
+
+subtest 'NOT IN with empty list: all rows returned (no constraint)' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+	my $rows = $join->selectall_arrayref(tier => { 'NOT IN' => [] });
+	is scalar @{$rows}, 5, 'NOT IN with empty list: all 5 rows (no constraint)';
+};
+
+subtest 'IN wrong value type emits carp and is skipped' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+	my $rows;
+	my @warnings;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $join->selectall_arrayref(tier => { IN => 'gold' });
+	} 'IN with scalar value does not croak';
+	ok scalar @warnings, 'carp warning emitted for wrong IN value type';
+	is scalar @{$rows}, 5, 'criterion skipped: all rows returned';
+};
+
+# ===========================================================================
+# S22: sort_by parameter — caller-specified ORDER BY
+# ===========================================================================
+
+subtest 'sort_by ascending: rows sorted by named column' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+
+	# Default sort is by join_column (k1..k5).  sort_by name ASC → alphabetical.
+	my $rows = $join->selectall_arrayref(sort_by => 'name');
+	is scalar @{$rows}, 5, 'sort_by name: 5 rows returned';
+	my @names = map { $_->{name} } @{$rows};
+	is_deeply \@names, [sort @names], 'sort_by name ASC: names in ascending order';
+};
+
+subtest 'sort_by descending: rows sorted in reverse' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+
+	my $rows = $join->selectall_arrayref(sort_by => ['name', 'DESC']);
+	my @names = map { $_->{name} } @{$rows};
+	my @sorted_desc = sort { $b cmp $a } @names;
+	is_deeply \@names, \@sorted_desc, 'sort_by name DESC: names in descending order';
+};
+
+subtest 'sort_by with criteria: filter then sort' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+
+	# tier != bronze → k1(Alice/gold/95), k2(Bob/silver/72), k5(Eve/silver/61)
+	# Sort by score DESC → k1(95), k2(72), k5(61)
+	my $rows = $join->selectall_arrayref(tier => { '!=' => 'bronze' }, sort_by => ['score', 'DESC']);
+	my @scores = map { $_->{score} } @{$rows};
+	is scalar @{$rows}, 3, 'sort_by with criteria: 3 rows after filter';
+	ok $scores[0] >= $scores[1] && $scores[1] >= $scores[2],
+		'sort_by score DESC: scores in descending order';
+};
+
+subtest 'sort_by unknown column: carp + fallback to join_column order' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+	my $rows;
+	my @warnings;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $join->selectall_arrayref(sort_by => 'no_such_column');
+	} 'sort_by unknown column does not croak';
+	ok scalar @warnings, 'carp warning emitted for unknown sort_by column';
+	is scalar @{$rows}, 5, 'all rows returned despite bad sort_by';
+};
+
+subtest 'sort_by invalid direction: carp + fallback to ASC' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+	);
+	my $rows;
+	my @warnings;
+	lives_ok {
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		$rows = $join->selectall_arrayref(sort_by => ['name', 'SIDEWAYS']);
+	} 'sort_by invalid direction does not croak';
+	ok scalar @warnings, 'carp warning emitted for invalid direction';
+	is scalar @{$rows}, 5, 'all rows returned despite bad direction';
+};
+
+# ===========================================================================
+# S23: IS NULL / IS NOT NULL operator and bare-undef criterion value
+# ===========================================================================
+
+# Create a separate small dataset that has one row with a NULL score.
+my $da_a_nullable = MinimalDA->new(
+	cols => [qw(id name tier)],
+	rows => [
+		{ id => 'n1', name => 'Alice', tier => 'gold'   },
+		{ id => 'n2', name => 'Bob',   tier => 'silver' },
+		{ id => 'n3', name => 'Carol', tier => undef    },
+	],
+);
+my $da_b_nullable = MinimalDA->new(
+	cols => [qw(id score)],
+	rows => [
+		{ id => 'n1', score => 95    },
+		{ id => 'n2', score => undef },
+		{ id => 'n3', score => 88    },
+	],
+);
+
+subtest 'IS NULL operator: returns rows where column IS NULL' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_nullable, $da_b_nullable],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+
+	# score IS NULL → only n2 (Bob) has score=undef
+	my $rows = $join->selectall_arrayref(score => { 'IS NULL' => undef });
+	is  scalar @{$rows}, 1, 'IS NULL: exactly 1 row (Bob, score=undef)';
+	is  $rows->[0]{name}, 'Bob', 'IS NULL: correct row returned';
+};
+
+subtest 'IS NOT NULL operator: returns rows where column IS NOT NULL' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_nullable, $da_b_nullable],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+
+	# score IS NOT NULL → n1(Alice/95) and n3(Carol/88); n2(Bob/undef) excluded
+	my $rows = $join->selectall_arrayref(score => { 'IS NOT NULL' => 1 });
+	my %by_id = map { $_->{$JOIN_COL} => $_ } @{$rows};
+	is  scalar @{$rows}, 2,       'IS NOT NULL: 2 rows (Alice and Carol)';
+	ok  exists $by_id{n1}, 'Alice (score=95) present';
+	ok !exists $by_id{n2}, 'Bob (score=undef) absent';
+	ok  exists $by_id{n3}, 'Carol (score=88) present';
+};
+
+subtest 'bare undef criterion value generates IS NULL on SQLite path' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_nullable, $da_b_nullable],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+
+	# tier => undef should generate "tier IS NULL" → only n3 (Carol, tier=undef)
+	my $rows = $join->selectall_arrayref({ tier => undef });
+	is  scalar @{$rows}, 1, 'bare undef: exactly 1 row (Carol, tier=undef)';
+	is  $rows->[0]{name}, 'Carol', 'bare undef: correct row returned';
+};
+
+subtest 'IS NULL on primary column with left join preserves secondary-only rows' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_nullable, $da_b_nullable],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+
+	# tier IS NULL on the primary DA: only Carol (n3); n2 skipped (tier=silver ≠ NULL)
+	my $rows = $join->selectall_arrayref(tier => { 'IS NULL' => undef });
+	is  scalar @{$rows}, 1, 'IS NULL on primary with left join: 1 row';
+	is  $rows->[0]{name}, 'Carol', 'IS NULL: Carol returned';
+	is  $rows->[0]{score}, 88, 'Carol secondary score present';
+};
+
+# ===========================================================================
+# S24: limit / offset pagination parameters
+#   - SQLite path: LIMIT ? OFFSET ? appended as bind parameters
+#   - Array path:  splice() applied after ordering
+#   - Validation:  invalid values emit carp and are ignored
+#   - count() and fetchrow_hashref ignore limit/offset silently
+# Fixture: $da_a_small / $da_b_small (5 rows: k1..k5, joined by id).
+# Default join_column-ascending order is Alice/k1, Bob/k2, Carol/k3, Dave/k4, Eve/k5.
+# ===========================================================================
+
+subtest 'limit on SQLite path: returns at most N rows' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	my $rows = $join->selectall_arrayref(limit => 2);
+	is scalar @{$rows}, 2, 'limit=2 returns exactly 2 rows on SQLite path';
+	is $rows->[0]{name}, 'Alice', 'first row is Alice (k1)';
+	is $rows->[1]{name}, 'Bob',   'second row is Bob (k2)';
+};
+
+subtest 'offset on SQLite path: skips first M rows' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	my $rows = $join->selectall_arrayref(offset => 2);
+	is scalar @{$rows}, 3, 'offset=2 skips 2 rows, 3 remain on SQLite path';
+	is $rows->[0]{name}, 'Carol', 'first returned row is Carol (k3)';
+	is $rows->[2]{name}, 'Eve',   'last returned row is Eve (k5)';
+};
+
+subtest 'limit + offset on SQLite path: combined pagination window' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	my $rows = $join->selectall_arrayref(limit => 2, offset => 2);
+	is scalar @{$rows}, 2, 'limit=2 offset=2 returns 2 rows';
+	is $rows->[0]{name}, 'Carol', 'first page-2 row is Carol (k3)';
+	is $rows->[1]{name}, 'Dave',  'second page-2 row is Dave (k4)';
+};
+
+subtest 'limit on array path: returns at most N rows' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'array',
+		join_type   => 'left',
+	);
+	my $rows = $join->selectall_arrayref(limit => 3);
+	is scalar @{$rows}, 3, 'limit=3 returns exactly 3 rows on array path';
+	is $rows->[0]{name}, 'Alice', 'first row is Alice (k1) on array path';
+};
+
+subtest 'offset on array path: skips first M rows' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'array',
+		join_type   => 'left',
+	);
+	my $rows = $join->selectall_arrayref(offset => 3);
+	is scalar @{$rows}, 2, 'offset=3 skips 3 rows, 2 remain on array path';
+	is $rows->[0]{name}, 'Dave', 'first returned row is Dave (k4) on array path';
+	is $rows->[1]{name}, 'Eve',  'second returned row is Eve (k5) on array path';
+};
+
+subtest 'limit + offset larger than result: returns remaining rows' => sub {
+	# offset=4 skips 4 rows; limit=10 is larger than the 1 remaining row.
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	my $rows = $join->selectall_arrayref(limit => 10, offset => 4);
+	is scalar @{$rows}, 1, 'offset past most rows: only Eve (k5) remains';
+	is $rows->[0]{name}, 'Eve', 'the one remaining row is Eve (k5)';
+};
+
+subtest 'invalid limit emits carp and is ignored (all rows returned)' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $rows = $join->selectall_arrayref(limit => 0);
+	is   scalar @{$rows}, 5, 'limit=0 ignored: all 5 rows returned';
+	like $warnings[0], qr/limit must be a positive integer/, 'carp emitted for limit=0';
+};
+
+subtest 'invalid offset emits carp and is ignored (no rows skipped)' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $rows = $join->selectall_arrayref(offset => -1);
+	is   scalar @{$rows}, 5, 'offset=-1 ignored: all 5 rows returned';
+	like $warnings[0], qr/offset must be a non-negative integer/, 'carp emitted for offset=-1';
+};
+
+subtest 'count() ignores limit and offset: counts all matching rows' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	is $join->count(limit => 2, offset => 1), 5,
+		'count() ignores limit/offset and returns total row count';
+};
+
+subtest 'limit + offset combined with sort_by on SQLite path' => sub {
+	my $join = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	# name DESC order: Eve, Dave, Carol, Bob, Alice; offset=1 skips Eve; limit=2 → Dave, Carol
+	my $rows = $join->selectall_arrayref(sort_by => ['name', 'DESC'], limit => 2, offset => 1);
+	is scalar @{$rows}, 2, 'sort_by+limit+offset: 2 rows';
+	is $rows->[0]{name}, 'Dave',  'page is Dave (2nd name DESC)';
+	is $rows->[1]{name}, 'Carol', 'then Carol (3rd name DESC)';
+};
+
+# ===========================================================================
+# S25: dbi_source() on Database::Join itself — composable nested joins
+#   Verifies that a child Database::Join can expose itself as a zero-copy
+#   SQLite source to a parent Database::Join, allowing the parent to ATTACH
+#   the child's temp file and query _dj_result directly.
+#
+# Fixture: child joins $da_a_small (id/name/tier) with $da_b_small (id/score),
+#          left join — 5 rows: k1..k5.  Parent adds $da_c (id/rank).
+# ===========================================================================
+
+my @ROWS_C_NESTED = (
+	{ id => 'k1', rank => 1 },
+	{ id => 'k2', rank => 2 },
+	{ id => 'k3', rank => 3 },
+	{ id => 'k4', rank => 4 },
+	{ id => 'k5', rank => 5 },
+);
+my $da_c_nested = MinimalDA->new(
+	cols => [qw(id rank)],
+	rows => \@ROWS_C_NESTED,
+);
+
+subtest 'dbi_source: array backend returns undef' => sub {
+	my $child = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'array',
+		join_type   => 'left',
+	);
+	is $child->dbi_source(), undef,
+		'dbi_source() returns undef when backend is array';
+};
+
+subtest 'dbi_source: sqlite backend returns dbh and table name' => sub {
+	my $child = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	my $src = $child->dbi_source();
+	ok defined($src),              'dbi_source() returns a defined value';
+	is ref($src), 'HASH',          'dbi_source() return value is a hashref';
+	ok defined($src->{dbh}),       'dbi_source() hashref has dbh key';
+	is $src->{table}, '_dj_result','dbi_source() table is _dj_result';
+
+	# The _dj_result table must contain all 5 left-joined rows.
+	my $rows = $src->{dbh}->selectall_arrayref(
+		'SELECT * FROM "_dj_result" ORDER BY "id"',
+		{ Slice => {} },
+	);
+	is scalar @{$rows}, 5, '_dj_result contains all 5 rows';
+	is $rows->[0]{name}, 'Alice', 'first row (k1) has name Alice';
+};
+
+subtest 'dbi_source: reused across calls (same hashref cycle)' => sub {
+	my $child = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	my $src1 = $child->dbi_source();
+	my $src2 = $child->dbi_source();
+	is $src1->{dbh},   $src2->{dbh},   'same dbh across two dbi_source() calls';
+	is $src1->{table}, $src2->{table}, 'same table across two dbi_source() calls';
+};
+
+subtest 'dbi_source: parent join ATTACHes child and queries _dj_result' => sub {
+	# The child join exposes (name, tier, score) merged on id.
+	# The parent joins that view with $da_c_nested (id, rank).
+	my $child = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	my $parent = Database::Join->new(
+		databases   => [$child, $da_c_nested],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+	my $rows = $parent->selectall_arrayref();
+	# k1..k5 all present in da_c_nested, so inner join keeps all 5.
+	is scalar @{$rows}, 5, 'nested join returns 5 merged rows';
+
+	# Verify that columns from all three sources are present.
+	my ($alice) = grep { $_->{$JOIN_COL} eq 'k1' } @{$rows};
+	ok defined $alice, 'k1 (Alice) row found in nested join result';
+	is $alice->{name},  'Alice', 'name column from child primary source';
+	is $alice->{score}, 95,      'score column from child secondary source';
+	is $alice->{rank},  1,       'rank column from parent secondary source';
+};
+
+subtest 'dbi_source: inner join at parent level filters correctly' => sub {
+	# k4 is present in da_a_small but absent from da_b_small (left join in child).
+	# The parent inner join with da_c_nested (which has all 5) keeps all 5.
+	# Criteria on child columns are applied at parent query time.
+	my $child = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'left',
+	);
+	my $parent = Database::Join->new(
+		databases   => [$child, $da_c_nested],
+		join_column => $JOIN_COL,
+		backend     => 'sqlite',
+		join_type   => 'inner',
+	);
+	# Filter on tier (a column from the child's primary source).
+	my $gold_rows = $parent->selectall_arrayref(tier => 'gold');
+	# Alice (k1) and Dave (k4) are both gold.
+	is scalar @{$gold_rows}, 2, 'parent query on child column returns 2 gold rows';
+	my @names = sort map { $_->{name} } @{$gold_rows};
+	is $names[0], 'Alice', 'first gold row is Alice';
+	is $names[1], 'Dave',  'second gold row is Dave';
+};
+
+subtest 'dbi_source: auto backend forces SQLite path for parent ATTACH' => sub {
+	my $child = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		backend     => 'auto',  # small data set; would normally use array path
+		join_type   => 'left',
+	);
+	my $src = $child->dbi_source();
+	# Even though auto would choose array for a 5-row dataset, dbi_source()
+	# must force the SQLite path so the parent gets a usable handle.
+	ok defined($src) && ref($src) eq 'HASH',
+		'auto backend: dbi_source() returns a hashref (SQLite forced)';
+	is $src->{table}, '_dj_result',
+		'auto backend: materialised table is _dj_result';
+};
+
+# ===========================================================================
+# S26: parallel => 1 constructor flag — SQLite-backend integration tests
+#   Verify that parallel => 1 is accepted and produces correct results, both
+#   when n <= 2 (no threading) and n > 2 (threading or sequential fallback).
+# ===========================================================================
+
+subtest 'parallel: 2-db join with parallel => 1 returns correct rows (n <= 2 threshold)' => sub {
+	my $j = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small],
+		join_column => $JOIN_COL,
+		join_type   => 'left',
+		parallel    => 1,
+		backend     => 'array',
+	);
+	my $rows = $j->selectall_arrayref();
+	# Left join: all 5 rows from A; k4 has no score from B.
+	is scalar @{$rows}, 5, 'parallel => 1, 2-db join: all 5 left-join rows returned';
+	my @names = sort map { $_->{name} } @{$rows};
+	is $names[0], 'Alice', 'first name alphabetically is Alice';
+};
+
+subtest 'parallel: 3-db join with parallel => 1 results equal sequential (n > 2 threshold)' => sub {
+	my $j_par = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small, $da_c_nested],
+		join_column => $JOIN_COL,
+		join_type   => 'inner',
+		parallel    => 1,
+		backend     => 'array',
+	);
+	my $j_seq = Database::Join->new(
+		databases   => [$da_a_small, $da_b_small, $da_c_nested],
+		join_column => $JOIN_COL,
+		join_type   => 'inner',
+		parallel    => 0,
+		backend     => 'array',
+	);
+	my $rows_par = $j_par->selectall_arrayref();
+	my $rows_seq = $j_seq->selectall_arrayref();
+	is scalar @{$rows_par}, scalar @{$rows_seq},
+		'parallel 3-db join: same row count as sequential';
+	my @ids_par = sort map { $_->{$JOIN_COL} } @{$rows_par};
+	my @ids_seq = sort map { $_->{$JOIN_COL} } @{$rows_seq};
+	is_deeply(\@ids_par, \@ids_seq,
+		'parallel 3-db join: same entry keys as sequential');
+};
+
 done_testing();

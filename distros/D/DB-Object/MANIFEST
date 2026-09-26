@@ -51,6 +51,9 @@ t/004_mysql.t
 t/005.field.t
 t/006_placeholder.t
 t/007_element.t
+t/008_transaction_state.t
+t/009_inheritance_api.t
+t/010_sqlite_datetime_parser.t
 t/900_pod.t
 t/910.coverage.t
 t/999.kwalitee.t

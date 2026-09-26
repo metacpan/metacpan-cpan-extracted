@@ -1,28 +1,28 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite/Query.pm
-## Version v0.4.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.4.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/06/16
-## Modified 2026/03/22
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 package DB::Object::SQLite::Query;
 BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( DB::Object::Query );
     use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use Wanted;
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.4.1';
 };
 
 use strict;
@@ -285,7 +285,7 @@ sub reset
         my $keys = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
         CORE::delete( @$self{ @$keys } );
         $self->{query_reset}++;
-        $self->{enhance} = 1;
+        # $self->{enhance} = 1;
     }
     return( $self );
 }
@@ -344,7 +344,7 @@ sub _query_components
     }
     elsif( $type eq 'update' || $type eq 'delete' )
     {
-        if( $tbl_o->can_update_delete_limit )
+        if( $self->database_object->can_update_delete_limit )
         {
             $limit = $self->limit();
         }
@@ -364,7 +364,7 @@ sub _query_components
         }
         else
         {
-            warn( "The SQLite ON CONFLICT clause is only supported for INSERT queries. Your query was of type \"$type\".\n" );
+            warn( "The SQLite ON CONFLICT clause is only supported for INSERT queries. Your query was of type \"$type\"." ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
         }
     }
     # Supported as of 3.35.0 (2021-03-12)
@@ -388,7 +388,7 @@ DB::Object::SQLite::Query - SQLite Query Object
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.1
 
 =head1 DESCRIPTION
 
@@ -398,9 +398,14 @@ This is a SQLite specific query object.
 
 =head2 binded_having
 
+    my $value = $query->binded_having;
+    $query->binded_having( $value );
+
 Sets or gets the array object (L<Module::Generic::Array>) for the binded value in C<HAVING> clauses.
 
 =head2 format_from_epoch
+
+    $query->format_from_epoch( ... );
 
 This takes the parameters I<bind> and I<value> and returns a formatted C<DATETIME(?, 'unixepoch', 'localtime')> expression.
 
@@ -416,7 +421,9 @@ See L<SQLite documentation for more information|https://www.sqlite.org/lang_sele
 
 =head2 limit
 
-Build a new L<DB::Object::Query::Clause> clause object by calling L</_process_limit> and return it.
+    my $value = $query->limit;
+
+Build a new L<DB::Object::Query::Clause> clause object by calling L<DB::Object::Query/_process_limit> and return it.
 
 See L<SQLite documentation for more information|https://sqlite.org/limits.html>
 

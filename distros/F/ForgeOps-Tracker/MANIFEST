@@ -1,6 +1,8 @@
 CHANGELOG.md
 cpanfile
 lib/ForgeOps/Tracker.pm
+lib/ForgeOps/Tracker/ChangeDelivery.pm
+lib/ForgeOps/Tracker/Changes.pm
 lib/ForgeOps/Tracker/Client.pm
 lib/ForgeOps/Tracker/Configuration.pm
 lib/ForgeOps/Tracker/DeliveryQueue.pm
@@ -22,8 +24,10 @@ LICENSE.txt
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/changes.t
 t/client.t
 t/configuration.t
+t/database_span.t
 t/delivery_queue.t
 t/event_builder.t
 t/histogram_bucketer.t

@@ -1,0 +1,32 @@
+Changes
+CONTRIBUTING.md
+cpanfile
+INSTALL
+INSTALL.md
+lib/ASPEER/MakeMaker/Markdown/Pod.pm
+lib/ASPEER/MakeMaker/Markdown/Pod.pm.md
+lib/ASPEER/MakeMaker/Markdown/Pod/Constant.pm
+lib/ASPEER/MakeMaker/Markdown/Pod/Constant.pm.md
+lib/ASPEER/MakeMaker/Markdown/Pod/MM.pm
+lib/ASPEER/MakeMaker/Markdown/Pod/MM.pm.md
+lib/ASPEER/MakeMaker/Markdown/Pod/MM/Constant.pm
+lib/ASPEER/MakeMaker/Markdown/Pod/MM/Constant.pm.md
+lib/ASPEER/MakeMaker/Markdown/Pod/MM/postamble.inc
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+README.md
+SECURITY.md
+t/00-load.t
+t/01-embed-process.t
+t/02-markdown-source.t
+t/03-update-behavior.t
+t/04-mm-readme.t
+t/05-mm-integration.t
+t/data/embedded-sample.pl
+t/data/sidecar-sample.pl
+t/data/sidecar-sample.pl.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

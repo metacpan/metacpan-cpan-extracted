@@ -2,8 +2,10 @@ use Test2::V0;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
+use lib 't/lib';
 use Mojo::ATProto::OAuth::SessionStore::Memory qw//;
 use Mojo::Promise;
+use SessionStoreContract qw/update_and_lock_subtests/;
 
 subtest 'auth request round-trip' => sub {
     my $store = Mojo::ATProto::OAuth::SessionStore::Memory->new;
@@ -88,6 +90,27 @@ subtest 'the _p methods mirror the sync ones' => sub {
     my $err3;
     $store->get_session_p('did:plc:aaa', 'sess-1')->catch(sub ($e) { $err3 = $e })->wait;
     like($err3, qr/no session found/, 'delete_session_p removed the row');
+};
+
+update_and_lock_subtests(
+    sub { Mojo::ATProto::OAuth::SessionStore::Memory->new },
+    sub (%overrides) {
+        return {account_did => 'did:plc:aaa', session_id => 'sess-1', access_token => 'tok-1', refresh_token => 'ref-1', dpop_host_nonce => 'nonce-1', %overrides};
+    },
+);
+
+subtest 'lock_session dies rather than bypassing a pending lock_session_p' => sub {
+    my $store = Mojo::ATProto::OAuth::SessionStore::Memory->new;
+    $store->save_session({account_did => 'did:plc:aaa', session_id => 'sess-1', refresh_token => 'ref-1'});
+
+    my $sync_err;
+    $store->lock_session_p('did:plc:aaa', 'sess-1', sub ($current) {
+        $sync_err = dies { $store->lock_session('did:plc:aaa', 'sess-1', sub ($c) { return 1 }) };
+        return 1;
+    })->wait;
+    like($sync_err, qr/locked by a pending asynchronous operation/, 'sync lock refused while the async one is held');
+    is($store->session_locks, {}, 'the queue entry is cleaned up once the async lock is released');
+    is($store->lock_session('did:plc:aaa', 'sess-1', sub ($c) { return 'ok' }), 'ok', 'and the sync lock works again afterwards');
 };
 
 done_testing;

@@ -6,6 +6,7 @@ use Test::More;
 use_ok('Protocol::IR::Code');
 use_ok('Protocol::IR::Converter');
 use_ok('Protocol::IR::Format::CSV');
+use_ok('Protocol::IR::Format::JSON');
 use_ok('Protocol::IR::Format::Mode2');
 use_ok('Protocol::IR::Format::Pronto');
 use_ok('Protocol::IR::Format::Tasmota');

@@ -111,7 +111,7 @@ Instead of distributing data across multiple normalized tables and reassembling 
 Primary and secondary indexes use fixed 8-byte packed Big-Endian unsigned integer buffers (`Q*`). This guarantees $O(1)$ binary slicing, zero string-unpacking heuristics, and sub-millisecond pagination even across datasets scaling into millions of rows.
 
 ### 3. ACID Transactions with Strict 2PL
-Full multi-table transaction support with a disk-backed undo journal (`.txn`) and Strict Two-Phase Locking (Strict 2PL). Abnormal terminations trigger automatic LIFO rollbacks upon recovery.
+Full multi-table transaction support with a disk-backed undo journal (`dbstore/journal/txn_*`) and Strict Two-Phase Locking (Strict 2PL). Abnormal terminations trigger automatic LIFO rollbacks upon recovery.
 
 ### 4. High-Throughput Batch Ingestion
 Bulk ETL methods (`insert_list`, `modify_list`, `delete_list`) open master tables once and merge indexes in a single pass, delivering 50x-100x higher throughput compared to single-record loops.
@@ -120,7 +120,7 @@ Bulk ETL methods (`insert_list`, `modify_list`, `delete_list`) open master table
 Active records (`.db`) are seamlessly segregated from historical or archived rows (`.jnk`), supporting unified single-pass queries (`jnktype => 'A' | 'B' | 'AB' | 'BA'`).
 
 ### 6. Faceted Category Filter Engine
-Built-in columnar facet indexing (`.fac`) with bitwise set intersections and string dictionaries (`.str`) enables instant e-commerce filtering menus without external search appliances.
+Built-in columnar facet indexing (`.fac`) with bitwise set intersections and string dictionaries (`.unq`) enables instant e-commerce filtering menus without external search appliances.
 
 ---
 

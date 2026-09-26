@@ -56,91 +56,91 @@
    "provides" : {
       "Protocol::IR::Code" : {
          "file" : "lib/Protocol/IR/Code.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Converter" : {
          "file" : "lib/Protocol/IR/Converter.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Format::CSV" : {
          "file" : "lib/Protocol/IR/Format/CSV.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
-      "Protocol::IR::Format::GC" : {
-         "file" : "lib/Protocol/IR/Format/GC.pm",
-         "version" : "1.1"
+      "Protocol::IR::Format::JSON" : {
+         "file" : "lib/Protocol/IR/Format/JSON.pm",
+         "version" : "1.2"
       },
       "Protocol::IR::Format::LIRC" : {
          "file" : "lib/Protocol/IR/Format/LIRC.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Format::Mode2" : {
          "file" : "lib/Protocol/IR/Format/Mode2.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Format::Pronto" : {
          "file" : "lib/Protocol/IR/Format/Pronto.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Format::Tasmota" : {
          "file" : "lib/Protocol/IR/Format/Tasmota.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Format::Wig" : {
          "file" : "lib/Protocol/IR/Format/Wig.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::JVC" : {
          "file" : "lib/Protocol/IR/Proto/JVC.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::JVC48" : {
          "file" : "lib/Protocol/IR/Proto/JVC48.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::MWM" : {
          "file" : "lib/Protocol/IR/Proto/MWM.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::NEC" : {
          "file" : "lib/Protocol/IR/Proto/NEC.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::NEC2" : {
          "file" : "lib/Protocol/IR/Proto/NEC2.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::NEC48" : {
          "file" : "lib/Protocol/IR/Proto/NEC48.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::NEC482" : {
          "file" : "lib/Protocol/IR/Proto/NEC482.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::NECX1" : {
          "file" : "lib/Protocol/IR/Proto/NECX1.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::NECX2" : {
          "file" : "lib/Protocol/IR/Proto/NECX2.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::Panasonic" : {
          "file" : "lib/Protocol/IR/Proto/Panasonic.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::SAMSUNG" : {
          "file" : "lib/Protocol/IR/Proto/SAMSUNG.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::SAMSUNG20" : {
          "file" : "lib/Protocol/IR/Proto/SAMSUNG20.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "Protocol::IR::Proto::SAMSUNG36" : {
          "file" : "lib/Protocol/IR/Proto/SAMSUNG36.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       }
    },
    "release_status" : "stable",
@@ -155,7 +155,7 @@
          "web" : "https://github.com/bwarden/perl-protocol-ir"
       }
    },
-   "version" : "1.1",
+   "version" : "1.2",
    "x_contributors" : [
       "Brett T. Warden <brett.warden@gmail.com>"
    ],

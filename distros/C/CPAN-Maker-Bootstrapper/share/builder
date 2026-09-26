@@ -26,12 +26,10 @@
 INSTALLER="${INSTALLER:-cpm install -g --no-prebuilt --show-build-log-on-failure --verbose}"
 
 ########################################################################
-function install_deps {
+function install_build_deps {
 ########################################################################
     
-    EXTRA_DEPS=(CPAN::Maker CPAN::Maker::Bootstrapper)
-    EXTRA_DEPS+=(File::ShareDir File::ShareDir::Install)
-    EXTRA_DEPS+=(Pod::Markdown Markdown::Render)
+    EXTRA_DEPS=(CPAN::Maker::Bootstrapper)
 
     if [[ -n "$PERLCRITICRC" ]]; then
         EXTRA_DEPS+=(Perl::Critic Perl::Critic::Policy::Compatibility::PodMinimumVersion)
@@ -44,25 +42,33 @@ function install_deps {
 
     $INSTALLER "${EXTRA_DEPS[@]}"
 
-# Regenerate cpanfile for CI - includes build-requires and test-requires
-# in addition to runtime requires. The committed cpanfile only contains
-# runtime dependencies for consumer installs.
-
+    # create a cpanfile for build requirements - installed into Perl's global include path
     all_requires=$(mktemp)
-
     trap 'rm -f "$all_requires"' EXIT
 
-    test -e requires && cat requires >> $all_requires
-    test -e build-requires && cat build-requires >> $all_requires
-    test -e test-requires && cat test-requires >> $all_requires
+    for a in "${EXTRA_DEPS[@]}"; do 
+        echo $a >> $all_requires;
+    done
+
+    if ! [[ -e build-requires ]]; then
+        echo >&2 "WARNING: add a 'build-requires' file with at least CPAN::Maker::Bootstrapper"
+        echo "CPAN::Maker::Bootstrapper" > build-requires
+    else
+        if ! grep -q "^CPAN::Maker::Bootstrapper" build-requires 2>/dev/null; then
+            echo >&2 "WARNING: adding 'CPAN::Maker::Bootstrapper' to your 'build-requires' file"
+            echo "CPAN::Maker::Bootstrapper" >>build-requires
+        fi
+    fi
+
+    cat build-requires >> $all_requires
 
     perl -ne 'chomp;($m,$v)=split /(?:[@]|\s+)/,$_,2; $v //= q{}; $m=~s/^\+//; $v = $v eq q{0} ? q{} : $v; print qq{requires "$m", "$v";\n};' \
-         $all_requires | sort -u  >cpanfile
+         $all_requires | sort -u  >cpanfile.build
 
     if [[ "$INSTALLER" =~ cpanm ]]; then
-        cpanm --installdeps .
+        cpanm --installdeps --cpanfile cpanfile.build .
     else
-        $INSTALLER
+        $INSTALLER --cpanfile cpanfile.build
     fi
 }
 
@@ -181,7 +187,7 @@ fi
                            echo "+-------------------------------------------------"
 set -x
 
-install_deps
+install_build_deps
 
 ########################################################################
 # Uncomment these to increase verbosity level of the build
@@ -202,5 +208,6 @@ install_deps
 #-----------------------------------------------------------------------
 # export NO_ECHO=""
 ########################################################################
+export PERL5LIB=$(pwd)/local/lib/perl5
 
 time make CMB_VERSION_DRIFT=ignore NO_ECHO=

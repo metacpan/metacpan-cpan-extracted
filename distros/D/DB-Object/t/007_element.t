@@ -1,30 +1,33 @@
 #!perl
+##----------------------------------------------------------------------------
+## SQL API Abstraction - t/007_element.t
+##----------------------------------------------------------------------------
 BEGIN
 {
-	use strict;
-	use warnings;
-	use vars qw( $DEBUG );
-	use lib './lib';
+    use strict;
+    use warnings;
+    use vars qw( $DEBUG );
+    use lib './lib';
     use DBI qw( :sql_types );
     use Module::Generic::File qw( file );
-	use Scalar::Util ();
+    use Scalar::Util ();
     use Test::More qw( no_plan );
     use_ok( 'DB::Object' ) || BAIL_OUT( "Unable to load DB::Object" );
     use_ok( 'DB::Object::Query::Element' ) || BAIL_OUT( "Unable to load DB::Object::Query::Element" );
-	eval( 'use DBD::Pg qw( :pg_types );' );
-	use constant HAS_POSTGRESQL => ( $@ ? 0 : 1 );
-	eval
-	{
-		require DBD::SQLite;
-		require DBD::SQLite::Constants;
-	};
-	use constant HAS_SQLITE => ( $@ ? 0 : 1 );
-	eval
-	{
-		require DBD::mysql;
-	};
-	use constant HAS_MYSQL => ( $@ ? 0 : 1 );
-	our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+    eval( 'use DBD::Pg qw( :pg_types );' );
+    use constant HAS_POSTGRESQL => ( $@ ? 0 : 1 );
+    eval
+    {
+        require DBD::SQLite;
+        require DBD::SQLite::Constants;
+    };
+    use constant HAS_SQLITE => ( $@ ? 0 : 1 );
+    eval
+    {
+        require DBD::mysql;
+    };
+    use constant HAS_MYSQL => ( $@ ? 0 : 1 );
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 use strict;
@@ -63,9 +66,9 @@ SKIP:
     {
         my $con_params =
         {
-            db		=> ( $ENV{DB_DATABASE} || 'postgres' ),
+            db      => ( $ENV{DB_DATABASE} || 'postgres' ),
             host    => ( $ENV{DB_HOST} || 'localhost' ),
-            driver	=> 'Pg',
+            driver  => 'Pg',
             debug   => $DEBUG,
         };
         $con_params->{conf_file} = $ENV{DB_CONF} if( exists( $ENV{DB_CONF} ) && $ENV{DB_CONF} );
@@ -77,13 +80,13 @@ SKIP:
         {
             $con_params->{login} = ( $ENV{DB_LOGIN} || getlogin || (getpwuid( $> ))[0] ) if( !$ENV{DB_CON_FILE} );
         }
-        
+
         eval
         {
             require DB::Object::Postgres;
         };
         skip( "DBD::Pg not installed", 1 ) if( $@ );
-        
+
         my $dbh = DB::Object::Postgres->connect( $con_params );
         if( !defined( $dbh ) )
         {
@@ -124,7 +127,7 @@ SKIP:
                 is( $elem->type, $type_value, 'type' );
                 is( $elem->value, undef, 'value' );
             };
-            
+
             subtest 'regular placeholder' => sub
             {
                 $elem = DB::Object::Query::Element->new(
@@ -171,7 +174,7 @@ SKIP:
     {
         skip( "No DBD::Pg driver installed", 10 );
     }
-    
+
     if( HAS_SQLITE )
     {
         my $test_db = $path->child( 'db_object_test.sqlite' );
@@ -181,7 +184,7 @@ SKIP:
             $test_db->remove if( $test_db->exists );
         });
         my $con_uri = $ENV{DB_CON_URI} = "file:${test_db}";
-        
+
         eval
         {
             require DB::Object::SQLite;
@@ -230,7 +233,7 @@ SKIP:
                 is( $elem->type, $type_value, 'type' );
                 is( $elem->value, undef, 'value' );
             };
-            
+
             subtest 'regular placeholder' => sub
             {
                 $elem = DB::Object::Query::Element->new(
@@ -295,4 +298,3 @@ END
 };
 
 __END__
-

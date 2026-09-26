@@ -7,7 +7,6 @@
 ## Modified 2026/03/22
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -16,6 +15,7 @@ BEGIN
 {
     use strict;
     use common::sense;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
@@ -313,9 +313,15 @@ This returns the current object upon success, or upon error, it sets an L<error 
 
 =head2 elements
 
+    my $value = $element->elements;
+    $element->elements( $value );
+
 Sets or gets an L<DB::Object::Query::Elements> object. By default this is C<undef> and is used when this element represent a sub-query.
 
 =head2 field
+
+    my $value = $element->field;
+    $element->field( $value );
 
 Sets or gets the element SQL field (or column) name. It can also be set to a L<DB::Object::Fields::Field> object.
 
@@ -340,17 +346,25 @@ Once found the value is cached, so if called many times, there is no performance
 
 =head2 format
 
+    my $value = $element->format;
+    $element->format( $value );
+
 Sets or gets the element formatting. This is used for insert statements.
 
 It returns a L<scalar object|Module::Generic::Scalar>
 
 =head2 generic
 
+    my $value = $element->generic;
+
 Returns a string representing the element with placeholder. This does not mean this element is using a placeholder, but rather provides a generic representation to be used when binding data to it.
 
 The string returned is an object of L<Module::Generic::Scalar>
 
 =head2 index
+
+    my $value = $element->index;
+    $element->index( $value );
 
 Sets or gets the placeholder index position.
 
@@ -360,9 +374,14 @@ Returns the current value, which is by default C<undef>, or a L<Module::Generic:
 
 =head2 is_numbered
 
+    my $value = $element->is_numbered;
+
 Read-only. Returns true (C<1>) if the element represent a placeholder and it is a numbered one, such as C<$1>, C<$2>, or C<?1>, C<?2> depending on what the driver supports, or false (C<0>) otherwise.
 
 =head2 placeholder
+
+    my $value = $element->placeholder;
+    $element->placeholder( $value );
 
 Sets or gets the element placeholder, such as C<?>, or C<$1>, C<$2>, or C<?1>, C<?2> depending on what the driver supports.
 
@@ -370,15 +389,24 @@ When a value is set, it will check if this is a numbered placeholder and set the
 
 =head2 query_object
 
+    my $value = $element->query_object;
+    $element->query_object( $value );
+
 Sets or gets the L<DB::Object::Query> object set for this object.
 
 =head2 type
+
+    my $value = $element->type;
+    $element->type( $value );
 
 Sets or gets the field SQL type.
 
 Returns a L<scalar object|Module::Generic::Scalar> object.
 
 =head2 value
+
+    my $value = $element->value;
+    $element->value( $value );
 
 Sets or gets the element value.
 
@@ -394,7 +422,7 @@ L<perl>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2023 DEGUEST Pte. Ltd.
+Copyright(c) 2023-2026 DEGUEST Pte. Ltd.
 
 All rights reserved
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

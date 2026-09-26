@@ -7,14 +7,28 @@ DB::Object - SQL API
     use DB::Object;
 
     my $dbh = DB::Object->connect({
-        driver => 'Pg',
+        driver    => 'Pg',
         conf_file => 'db-settings.json',
-        database => 'webstore',
-        host => 'localhost',
-        login => 'store-admin',
-        schema => 'auth',
-        debug => 3,
+        database  => 'webstore',
+        host      => 'localhost',
+        login     => 'store-admin',
+        schema    => 'auth',
+        id        => 'web-request-12345',
+        debug     => 3,
     }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
+
+    # The connection id is optional and purely informational. DB::Object generates
+    # one automatically when none is provided.
+    print( "Database connection id is: ", $dbh->id, "\n" );
+
+    $dbh->begin_work;
+    my $transactions = DB::Object->active_transactions ||
+        die( DB::Object->error );
+    foreach my $transaction ( @$transactions )
+    {
+        print( "Active database transaction id: ", $transaction->{id}, "\n" );
+    }
+    $dbh->rollback;
 
     # Legacy regular query
     my $sth = $dbh->prepare( "SELECT login,name FROM login WHERE login='jack'" ) ||
@@ -152,7 +166,7 @@ In future release, other operators than `=` will be implemented for `JSON` and `
 
 # VERSION
 
-    v1.9.0
+    v1.11.0
 
 # DESCRIPTION
 
@@ -212,6 +226,12 @@ Note that if you provide connection options that are not among the followings, t
 - `database` or _DB\_NAME_
 
     The database name you wish to connect to
+
+- `id`
+
+    An optional informational identifier associated with the connection. It can be used to correlate a database connection with application work such as a request, worker or job.
+
+    When omitted, ["connect"](#connect) automatically generates an identifier. The identifier has no database or transactional semantics.
 
 - `login` or _DB\_LOGIN_
 
@@ -313,6 +333,28 @@ Note that if you provide connection options that are not among the followings, t
 
 # METHODS
 
+## active\_transactions
+
+    my $transactions = DB::Object->active_transactions ||
+        die( DB::Object->error );
+
+Returns an array reference describing all active `DB::Object` transactions found among the DBI database handles in the current process.
+
+Each entry is a hash reference containing:
+
+    {
+        id     => $connection_id,
+        handle => $dbi_database_handle,
+    }
+
+The `id` value is the informational connection identifier set with ["id"](#id).
+
+This method uses DBI's handle inspection facility internally. Driver and statement handle traversal details are intentionally hidden behind this `DB::Object` abstraction.
+
+As an additional consistency check, an error is returned when `DB::Object` transaction metadata indicates an active transaction while DBI `AutoCommit` is enabled, or when DBI `AutoCommit` is disabled on a handle that is not marked as an active `DB::Object` transaction.
+
+An empty array reference is returned when no active transaction exists.
+
 ## alias
 
 See ["alias" in DB::Object::Tables](https://metacpan.org/pod/DB%3A%3AObject%3A%3ATables#alias)
@@ -341,7 +383,7 @@ See ["as\_string" in DB::Object::Statement](https://metacpan.org/pod/DB%3A%3AObj
 
 ## auto\_convert\_datetime\_to\_object
 
-Sets or gets the boolean value. If true, then this api will automatically transcode datetime value into their equivalent [DateTime](https://metacpan.org/pod/DateTime) object.
+Sets or gets the boolean value. If true, then this api will automatically transcode datetime value into their equivalent [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object.
 
 Default is false.
 
@@ -870,6 +912,30 @@ See ["group" in DB::Object::Tables](https://metacpan.org/pod/DB%3A%3AObject%3A%3
 
 Sets or gets the `host` property for this database object.
 
+## id
+
+    my $id = $dbh->id;
+
+    $dbh->id( 'worker-3' );
+
+Gets or sets the informational identifier associated with this database connection.
+
+An identifier may be provided when connecting:
+
+    my $dbh = DB::Object->connect(
+        driver   => 'Pg',
+        database => 'example',
+        id       => 'request-12345',
+    );
+
+When no identifier is provided, ["connect"](#connect) automatically generates one.
+
+The identifier has no database or transactional semantics. It is intended for diagnostics and for correlating a `DB::Object` connection with application work such as a request, worker or job.
+
+When a transaction is started by `DB::Object`, the identifier is also stored in the private metadata associated with the underlying DBI database handle.
+
+Returns the current identifier.
+
 ## insert
 
 See ["insert" in DB::Object::Tables](https://metacpan.org/pod/DB%3A%3AObject%3A%3ATables#insert)
@@ -1099,6 +1165,27 @@ See ["tie" in DB::Object::Tables](https://metacpan.org/pod/DB%3A%3AObject%3A%3AT
 
 True when a transaction has been started with ["begin\_work"](#begin_work), false otherwise.
 
+## transaction\_state
+
+    my $state = DB::Object->transaction_state( $candidate ) ||
+        die( DB::Object->error );
+
+Returns information about the active `DB::Object` transactions in the current process and, when a candidate `DB::Object` is provided, whether that object uses the same underlying DBI handle.
+
+A result with no active transaction has the form:
+
+    {
+        active => 0,
+        count  => 0,
+        ids    => [],
+    }
+
+When one transaction is active, the result also contains `id`. If a candidate was supplied, it additionally contains `same`, which is true when the candidate uses the same DBI handle as the active transaction and false otherwise.
+
+If multiple active transactions exist, `count` is greater than one and `ids` contains their informational connection identifiers.
+
+This method is intended for higher-level code that needs to enforce a policy such as preventing a second database connection from being used while another transaction is active, without exposing DBI handle traversal details.
+
 ## TRUE
 
 Returns `TRUE` to be used in queries.
@@ -1131,6 +1218,17 @@ Provided with a boolean value and this sets or get the _use\_cache_ parameter.
 ## use\_bind
 
 Provided with a boolean value and this sets or get the _use\_cache_ parameter.
+
+## uses\_handle
+
+    if( $dbh->uses_handle( $dbi_handle ) )
+    {
+        ...
+    }
+
+Returns true if the current `DB::Object` object uses the specified underlying DBI database handle, and false otherwise.
+
+This provides a driver-independent way to compare the physical DBI handle used by a `DB::Object` object without requiring callers to access the object's internal `dbh` property.
 
 ## variables
 
@@ -1236,6 +1334,12 @@ It also sets the query time to the current time with the parameter _query\_time_
 
 It returns an object of the given $package.
 
+## \_new\_connection\_id
+
+Internal method used by ["connect"](#connect) to generate a default informational identifier when the caller did not provide a `id`.
+
+The generated value is intended for diagnostics and correlation only. It has no database semantics and is not intended to be a persistent identifier.
+
 ## \_param2hash
 
 Provided with some hash reference parameters and this will simply return it, so it does not do anything meaningful.
@@ -1275,6 +1379,18 @@ It returns the object removed.
 If this has not already been reset, this will mark the current query object as reset and calls ["\_query\_object\_remove"](#_query_object_remove) and return the value for ["\_query\_object\_get\_or\_create"](#_query_object_get_or_create)
 
 If it has been already reset, this will return the value for ["\_query\_object\_current"](#_query_object_current)
+
+## \_transaction\_finished
+
+Internal method used by database drivers after successfully committing or rolling back a transaction.
+
+It clears the transactional state both on the `DB::Object` object and in the private metadata associated with its underlying DBI database handle.
+
+## \_transaction\_started
+
+Internal method used by database drivers after successfully starting or confirming an active transaction.
+
+It marks the `DB::Object` as transactional and records the connection identifier and transaction state on the underlying DBI database handle.
 
 # OPERATORS
 

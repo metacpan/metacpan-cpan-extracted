@@ -184,7 +184,7 @@ AmberDB ile kod geliştirmeye başlamadan önce bilmeniz gereken 4 pratik kural:
   $adb->delete_id("products", 101);
   ```
 
-* **Açıklama:** `delete_id`, kaydı tablodan ve tüm ilişkili indekslerden (`.inx`, `.fld`, `.src`, `.fac`, `.srt`) anında kaldırır. Eğer tablonun şemasında `keep_deleted => 1` etkinse kayıt yok edilmez; `.del` soft-delete çöp kutusuna taşınarak kurtarılabilir kılınır.
+* **Açıklama:** `delete_id`, kaydı tablodan ve tüm ilişkili indekslerden (`.inx`, `.fld`, `.src`, `.fac`) anında kaldırır. Eğer tablonun şemasında `keep_deleted => 1` etkinse kayıt yok edilmez; `.del` soft-delete çöp kutusuna taşınarak kurtarılabilir kılınır.
 * **Referans:** [Tutorial Bölüm 3.4: delete_id](TR.AmberDB_Veritabani_Sistemi.html#34-kayıt-silme-delete_id)
 
 ---
@@ -353,8 +353,8 @@ AmberDB ile kod geliştirmeye başlamadan önce bilmeniz gereken 4 pratik kural:
   );
   ```
 
-* **Açıklama:** Tablo şemasında `sort_block => [2]` tanımlanmışsa, motor `.srt` indeksini kullanarak ekstra bellek sıralaması yapmadan veriyi doğrudan sıralı getirir.
-* **Referans:** [Tutorial Bölüm 6.4: Sıralama İndeksleri (.srt)](TR.AmberDB_Veritabani_Sistemi.html#64-sıralama-indeksleri-srt)
+* **Açıklama:** Tablo şemasında `sort_block => [2]` tanımlanmışsa, motor `.inx` indeksini kullanarak ekstra bellek sıralaması yapmadan veriyi doğrudan sıralı getirir.
+* **Referans:** [Tutorial Bölüm 6.4: Sıralama İndeksleri (.inx)](TR.AmberDB_Veritabani_Sistemi.html#64-sıralama-indeksleri-inx)
 
 ---
 
@@ -550,7 +550,7 @@ AmberDB, çökmelere karşı korumalı geri alma günlüğü (undo-log) ve Stric
   $adb->table_attr("products", {
       match_block  => [ 4 ],       # Kategori ID eşleşmesi (.fld)
       search_block => [ 1 ],       # Ürün adı tam metin araması (.src)
-      sort_block   => [ 2 ],       # Fiyat sıralaması (.srt)
+      sort_block   => [ 2 ],       # Fiyat sıralaması (.inx)
       facet_block  => [ 3, 4 ],    # Marka ve kategori filtre sayaçları (.fac)
       slug_block   => [ 1 ],       # Başlıktan otomatik SEO URL üretimi (.slg)
       keep_deleted => 1,           # Silinenleri .del dosyasında sakla (Soft-delete)
@@ -558,7 +558,7 @@ AmberDB, çökmelere karşı korumalı geri alma günlüğü (undo-log) ve Stric
   });
   ```
 
-* **Açıklama:** AmberDB şeması sütun tiplerini zorlamaz (JSON / NoSQL esnekliği sağlar). Şema yalnızca motorun hangi bloklar için hangi tersine indeksleri (`.fld`, `.src`, `.fac`, `.srt`) otomatik inşa edeceğini belirler.
+* **Açıklama:** AmberDB şeması sütun tiplerini zorlamaz (JSON / NoSQL esnekliği sağlar). Şema yalnızca motorun hangi bloklar için hangi tersine indeksleri (`.fld`, `.src`, `.fac`, `.inx`) otomatik inşa edeceğini belirler.
 * **Referans:** [Tutorial Bölüm 9: Şema Yapılandırması](TR.AmberDB_Veritabani_Sistemi.html#9-şema-yapılandırması-table-ve-kod-içi--in-memory)
 
 ---
@@ -616,7 +616,7 @@ SQL dünyasındaki kavramların AmberDB mimarisindeki teknik karşılıkları:
 | **Column / Field (Sütun / Kolon)** | Blok / Alan İndisi (`$record[$i]`) | Kolon adları yerine pozisyonel indisler (`1`, `2`, `3`...) kullanılır. |
 | **Primary Key (PK, AUTO_INCREMENT)** | 0. İndis (`$record[0]`) | Her kaydın ilk elemanıdır. Motor tarafından sıralı veya benzersiz sayısal ID atanır. |
 | **Foreign Key & JOINs** | İç İçe Dizi (`ARRAY ref`) & `match_block` | Normalize edilmiş çoklu tablolar yerine döküman içine gömülü listeler tutulur; `.fld` tersine indeksleriyle sıfır JOIN maliyetiyle sorgulanır. |
-| **Index (`CREATE INDEX`)** | Şema İndeks Blokları | Tablo şemasında tanımlanan tersine indeksler: Eşleştirme (`.fld`), Metin arama (`.src`), Filtre/Facet (`.fac`), Sıralama (`.srt` / `.inx`). |
+| **Index (`CREATE INDEX`)** | Şema İndeks Blokları | Tablo şemasında tanımlanan tersine indeksler: Eşleştirme (`.fld`), Metin arama (`.src`), Filtre/Facet (`.fac`), Sıralama (`.inx`). |
 | **Query Planner / Optimizer** | Doğrudan İndeks Anahtarı Erişimi | SQL sözdizimi ayrıştırma, AST ağacı oluşturma ve maliyet hesaplama yükü yoktur; binary RID blokları doğrudan diskten okunur. |
 | **Collation / Charset** | `AmberDB::Locale` | Harici işletim sistemi veya veritabanı ayarına ihtiyaç duymaksızın Türkçeye ve 10+ dile tam uyumlu yerel alfabe motoru. |
 | **Audit Table & Triggers** | `log_owner` & `.aut` Dosyası | Kaydı kimin ne zaman eklediğini veya güncellediğini takip eden yerleşik denetim izi mekanizması. |

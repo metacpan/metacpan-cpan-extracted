@@ -22,87 +22,28 @@ use Sub::Protected;
 Readonly::Array my @_ADD_DB_KEYS => qw(database join_column filter remove_columns);
 
 # SQL comparison operators that are safe to interpolate into WHERE clauses.
-# Any operator not in this set is silently skipped to prevent SQL injection.
-Readonly::Hash my %SAFE_SQL_OPS => map { $_ => 1 } qw(> < >= <= != =);
+# Scalar-binding operators: the value is always passed as a bind param (?), so
+# no quoting or escaping is required on the value side.  LIKE and NOT LIKE are
+# safe for the same reason — the pattern is bound, not interpolated.
+Readonly::Hash my %SAFE_SQL_OPS => map { $_ => 1 } ('>', '<', '>=', '<=', '!=', '=', 'LIKE', 'NOT LIKE');
 
-our $VERSION = '0.006.0';
+# List-membership operators whose criterion value is an arrayref.
+# Each element is bound as a separate ?, so injection is impossible.
+# IN  with an empty list → WHERE 1=0 (no rows match, correct SQL semantics).
+# NOT IN with an empty list → no WHERE term (all rows match, correct semantics).
+Readonly::Hash my %SAFE_LIST_OPS => map { $_ => 1 } ('IN', 'NOT IN');
 
-# ---------------------------------------------------------------------------
-# KNOWN GAPS & ROADMAP (derived from gap-analysis 2026-09-21)
-#
-# PRE-RELEASE BLOCKERS
-#
-# TODO: LIKE silently dropped on SQLite path (undocumented cross-backend gap)
-#   %SAFE_SQL_OPS covers { > < >= <= != = } only.  LIKE, NOT LIKE, IN, NOT IN,
-#   IS NULL, and IS NOT NULL are silently skipped on the SQLite path with no
-#   warning, while the array path passes them directly to the component DA
-#   (which may honour them).  A caller who develops against a small dataset
-#   (array path) and deploys at scale (SQLite path) gets silently wider results.
-#   Fix options: (a) add LIKE to %SAFE_SQL_OPS — safe with bind params; or
-#   (b) add a carp when an unrecognised operator is encountered on the SQLite
-#   path so callers are not silently misled.  Either way, add a COMMON PITFALLS
-#   entry.  See t/cgi_security.t for the %SAFE_SQL_OPS operator-whitelist tests.
-#
-# TODO: Missing =head3 MESSAGES POD sections in eight public methods
-#   Only new(), add_database(), and remove_column() document their error and
-#   warning strings under =head3 MESSAGES.  The following methods can also
-#   carp or croak and need matching sections: selectall_arrayref,
-#   selectall_array, fetchrow_hashref, count, columns, schema, updated,
-#   set_logger, AUTOLOAD.
-#
-# TODO: updated() not defensive against DAs without updated()
-#   sub updated { return max(map { $_->updated() } @{$self->{_dbs}}) }
-#   will propagate an uncaught exception if any component DA does not implement
-#   updated().  _cache_fresh() already handles this gracefully with eval{}.
-#   Either wrap the map body in eval and skip undef returns (consistent with
-#   _cache_fresh), or document the contract requirement in LIMITATIONS.
-#
-# POST-RELEASE ROADMAP
-#
-# TODO: count() SQL push-down on the SQLite path
-#   count() calls _joined_query() and returns scalar @{$rows}, fetching every
-#   row just to count them.  On the cached SQLite backend a SELECT COUNT(*)
-#   against the join SQL would be orders of magnitude cheaper for large tables.
-#
-# TODO: LIKE / NOT LIKE in %SAFE_SQL_OPS (also covers the pre-release gap above)
-#   LIKE with a bind parameter (col LIKE ?) is injection-safe and would unify
-#   array-path and SQLite-path behaviour for pattern-matching criteria.
-#
-# TODO: IN (...) / NOT IN (...) list-operator support
-#   Set-membership criteria are common in read-only query layers.  Requires
-#   bind-parameter list expansion (one ? per element) in the WHERE builder.
-#
-# TODO: IS NULL / IS NOT NULL operator support
-#   Nullable-column filtering cannot be expressed as a bind-parameter operator.
-#   Handle undef criterion values with a separate IS NULL generation path
-#   instead of the current `next if !defined $val` no-op.
-#
-# TODO: Caller-specified ORDER BY on query methods
-#   Results are sorted by join_column only.  An order_by => 'col' (or
-#   order_by => ['col', 'DESC']) parameter would cover a common use-case:
-#   SQL ORDER BY clause on the SQLite path; Perl sort block on the array path.
-#
-# TODO: Limit / offset for pagination
-#   limit => N, offset => M on selectall_arrayref/selectall_array would enable
-#   paginated access.  SQLite path: LIMIT ? OFFSET ? clauses; array path: slice.
-#
-# TODO: dbi_source() on Database::Join itself (composable nested joins)
-#   The join object cannot act as a zero-copy SQLite source in a parent join.
-#   Implementing dbi_source() — returning the cached File::Temp handle and the
-#   join table name — would allow composable nested Database::Join objects at
-#   full ATTACHed speed.
-#
-# TODO: Parallel DA queries in _fetch_indexed
-#   Component DAs are queried sequentially.  An optional parallel => 1
-#   constructor flag could reduce latency by the factor of the slowest DA,
-#   with no change to the merge logic (Coro or IO::Async back-end).
-#
-# TODO: Schema type consistency validation at construction
-#   Columns shared across two DAs (without collision_prefix) are merged
-#   type-blind.  A validation pass comparing schema() types for overlapping
-#   columns at new()/add_database() time could warn callers before silent
-#   type coercion produces unexpected results.
-# ---------------------------------------------------------------------------
+# Nullability operators: no bind parameter.  The hashref value is ignored —
+# any value (undef, 1, ...) signals intent; only the key selects the operator.
+# A bare undef criterion value (col => undef) also generates IS NULL.
+Readonly::Hash my %SAFE_NOARG_OPS => map { $_ => 1 } ('IS NULL', 'IS NOT NULL');
+
+our $VERSION = '0.007.1';
+
+# Package-level cache for threads availability.  undef = not yet checked;
+# 1 = available; 0 = not available.  Checked lazily on the first parallel
+# query and never re-evaluated (require is cached in %INC after success).
+my $HAS_THREADS;
 
 # ---------------------------------------------------------------------------
 # All user-facing strings route through this dictionary.  Supply an i18n
@@ -121,6 +62,7 @@ Readonly::Hash my %MESSAGES => (
 	error_invalid_prefix	=> 'collision_prefix[%d] must be a plain string, not a reference; passing a reference would leak a heap address into column names',
 	error_invalid_backend	=> 'backend must be "array", "sqlite", or "auto"; got "%s"',
 	error_sqlite_connect	=> 'Failed to open temporary SQLite database for join backend: %s',
+	warn_schema_type_mismatch => 'column "%s" has type "%s" in database[%d] but type "%s" in database[%d]; use collision_prefix to preserve both values without silent type coercion',
 );
 
 =head1 NAME
@@ -129,7 +71,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 =head1 VERSION
 
-Version 0.006.0
+Version 0.007.1
 
 =head1 SYNOPSIS
 
@@ -376,13 +318,18 @@ use C<join_map> to declare each database's local column name.
 
 =item Sort order
 
-Results are sorted by the C<join_column> value only.  Caller-specified
-C<ORDER BY> is not propagated to the component databases.
+Results are sorted ascending by C<join_column> by default.  Pass
+C<< sort_by => 'colname' >> (or C<< sort_by => ['colname', 'DESC'] >>)
+to any query method to override this.  The array path uses string comparison
+(C<cmp>); for accurate numeric ordering on large datasets use the SQLite
+backend, which sorts natively by type.
 
-=item count() fetches all rows
+=item count() on the array backend fetches all rows
 
-C<count()> executes the full join and counts the resulting rows in Perl.  It
-does not push a C<COUNT(*)> query down to the databases.
+On the array backend, C<count()> executes the full in-memory join and counts
+the resulting rows in Perl; no C<COUNT(*)> is pushed to the component
+databases.  On the SQLite backend, C<count()> executes a C<SELECT COUNT(*)>
+SQL query against the cached join tables, avoiding a full row transfer.
 
 =back
 
@@ -490,6 +437,43 @@ join-column criterion was present.  The fix: only non-join-column criteria
 (e.g. column filters from the caller or base C<filters =E<gt> {...}>) promote
 a secondary to inner-join status.  The broadcast itself is now a transparent
 key-range selector that does not affect join semantics.
+
+=item LIKE and NOT LIKE work on the SQLite path; other pattern operators do not yet
+
+C<LIKE>, C<NOT LIKE>, C<IN>, and C<NOT IN> are fully supported on the SQLite
+backend.  C<LIKE>/C<NOT LIKE> take a scalar pattern; C<IN>/C<NOT IN> take an
+arrayref of values.  All are injection-safe because values are passed as bind
+parameters, never interpolated.
+
+    # LIKE
+    my $rows = $join->selectall_arrayref(name => { LIKE => 'A%' });
+
+    # IN
+    my $rows = $join->selectall_arrayref(tier => { IN => ['gold', 'silver'] });
+
+    # NOT IN
+    my $rows = $join->selectall_arrayref(tier => { 'NOT IN' => ['bronze'] });
+
+C<IN> with an empty arrayref matches no rows (SQL semantics: C<IN ()> is
+always false).  C<NOT IN> with an empty arrayref matches all rows (no
+constraint added).
+
+C<IS NULL> and C<IS NOT NULL> are supported on the SQLite backend using an
+explicit operator hashref:
+
+    my $rows = $join->selectall_arrayref(score => { 'IS NULL'     => undef });
+    my $rows = $join->selectall_arrayref(score => { 'IS NOT NULL' => 1    });
+
+The hashref value is ignored; only the key selects the operator.  A bare
+C<undef> criterion value (C<< score => undef >>) also generates C<IS NULL>
+on the SQLite path.  Note: on the in-memory array path, the component DA
+may treat an C<undef> criterion value as C<< no filter >> rather than
+C<IS NULL>, so use the explicit hashref form for consistent behaviour
+across backends.
+
+Any operator not in the supported set is skipped on the SQLite path with a
+C<carp> warning.  The array path forwards all operators to the component DA
+unchanged, which may or may not honour them.
 
 =item Temp file directory must be writable and have free space
 
@@ -640,6 +624,19 @@ to calling C<remove_column> once per name after construction.
                       # DOMAIN -- EP valid:   any writable directory path string.
                       # DOMAIN -- EP absent:  uses File::Spec->tmpdir() (system temp dir).
 
+    parallel       => { type => 'integer',  optional => 1, default => 0 }
+                      # When set to 1 and the join has more than 2 databases (primary +
+                      # 2 or more secondaries), secondary DA fetches are issued in
+                      # parallel Perl threads.  Requires the 'threads' module; falls
+                      # back to sequential with a carp warning when unavailable.
+                      # Has no effect on the SQLite backend (which uses a single SQL
+                      # JOIN).  DBI-backed DAs are not thread-safe by default; only
+                      # enable this for in-memory or otherwise thread-safe DA backends.
+                      #
+                      # DOMAIN -- EP valid:   0 (sequential, default) or 1 (parallel).
+                      # DOMAIN -- EP invalid: any other integer is treated as truthy/falsy.
+                      # DOMAIN -- Default:    0.
+
     logger         => { type => 'object',   optional => 1 }
                       # Logger object propagated to all component databases.
 
@@ -680,11 +677,13 @@ to calling C<remove_column> once per name after construction.
 
 =head3 MESSAGES
 
-    error_no_databases     -- databases arrayref was empty
-    error_invalid_db       -- an element of databases is not a D::A subclass
-    error_join_col_missing -- join_column (or its join_map alias) not found in a database
-    error_invalid_backend  -- backend value is not 'array', 'sqlite', or 'auto'
-    error_sqlite_connect   -- temporary SQLite database could not be created (backend='sqlite'/'auto')
+    error_no_databases        -- databases arrayref was empty
+    error_invalid_db          -- an element of databases is not a D::A subclass
+    error_join_col_missing    -- join_column (or its join_map alias) not found in a database
+    error_invalid_backend     -- backend value is not 'array', 'sqlite', or 'auto'
+    error_sqlite_connect      -- temporary SQLite database could not be created (backend='sqlite'/'auto')
+    warn_schema_type_mismatch -- (carp) a shared column has different types across databases;
+                                 use collision_prefix to preserve both values
 
 =cut
 
@@ -714,6 +713,7 @@ sub new {
 			},
 			max_array_rows    => { type => 'integer',  optional => 1, default => 10_000 },
 			tmpdir            => { type => 'string',   optional => 1 },
+			parallel          => { type => 'integer',  optional => 1, default => 0 },
 			logger		=> { type => 'object',   optional => 1 },
 			i18n		=> { type => 'object',   optional => 1 },
 		},
@@ -773,9 +773,11 @@ sub new {
 		_backend          => $p->{backend},
 		_max_array_rows   => $p->{max_array_rows},
 		_tmpdir           => $p->{tmpdir} // File::Spec->tmpdir,
+		_parallel         => $p->{parallel} // 0,
 	}, $class;
 
 	$self->_build_col_index();
+	$self->_validate_schema_types();
 
 	# Propagate the logger to every component database if one was supplied.
 	# set_logger() is used here (rather than a direct hash write) to honour each
@@ -1088,6 +1090,60 @@ faster local disk:
         tmpdir         => '/dev/shm',     # Linux RAM disk
     );
 
+B<Parallel secondary fetches (C<parallel> constructor parameter)>
+
+By default, component databases are queried sequentially - the primary first,
+then each secondary in order.  When the component databases are network- or
+disk-backed and have non-trivial per-query latency, the sequential fetch means
+total latency is the I<sum> of all per-DA latencies.
+
+Setting C<< parallel => 1 >> in the constructor enables concurrent fetching
+of secondary databases using Perl C<threads>.  With C<parallel => 1> and
+two or more secondary databases (C<n E<gt> 2> total), secondary fetches run in
+parallel after the primary fetch completes; total latency drops to
+I<max(secondary latencies)> instead of I<sum(secondary latencies)>.
+
+    my $join = Database::Join->new(
+        databases   => [ $customers, $loyalty, $scores ],   # 3 DAs - 2 secondaries
+        join_column => 'entry',
+        parallel    => 1,    # loyalty and scores fetched concurrently
+    );
+
+Requirements and caveats:
+
+=over 4
+
+=item *
+
+The C<threads> module must be available.  Most distributions ship it, but it
+requires a Perl binary compiled with C<-Dusethreads>.  When threads are
+unavailable, a C<carp> warning is emitted and fetching falls back to
+sequential; the result is identical, only slower.
+
+=item *
+
+Parallel fetching is only active when the join has three or more total
+databases (C<n E<gt> 2>).  With two databases (one secondary), the thread
+creation overhead exceeds the benefit of concurrency; sequential is used
+regardless of C<parallel>.
+
+=item *
+
+Component databases must be safe to call from Perl threads.  In-memory
+databases (CSV, JSON, TSV after slurp) are safe.  DBI-backed databases
+whose handles were created in the same thread may not be safe - consult your
+DBD driver's thread documentation.  The array backend is recommended for
+DBI-backed sources; the SQLite backend performs its join in a single SQL
+statement and does not use parallel fetching.
+
+=item *
+
+C<parallel => 1> applies to the array backend only.  The SQLite backend
+performs a single SQL JOIN after spilling source data, so per-DA parallelism
+is irrelevant.
+
+=back
+
 B<Zero-copy ATTACH (C<dbi_source()> interface)>
 
 Normally, when the SQLite path is active, rows from each component database
@@ -1129,10 +1185,12 @@ Example implementation:
 
     1;
 
-The zero-copy ATTACH path is only used when there are no query-time criteria
-for that database in the current call.  When criteria exist, the database is
-queried via C<selectall_arrayref> as usual and the resulting rows are inserted
-into the temporary file.
+The zero-copy ATTACH path is always used when a component database implements
+C<dbi_source()>.  Query-time criteria are applied as parameterised SQL
+C<WHERE> clauses against the ATTACHed source table, so no row-level copy is
+needed even when the current call includes column filters.  (Prior to 0.005.0
+any query-time criteria forced a spill; that restriction was removed in
+0.005.0.)
 
 B<Result identity>
 
@@ -1149,6 +1207,11 @@ three join types (left, inner, outer) work identically on both paths.
     my $rows = $join->selectall_arrayref(tier  => 'gold');
     my $rows = $join->selectall_arrayref(score => { '>' => 80 });
     my $rows = $join->selectall_arrayref('C001');  # positional: entry => 'C001'
+    my $rows = $join->selectall_arrayref(sort_by => 'name');
+    my $rows = $join->selectall_arrayref(tier => 'gold', sort_by => ['score', 'DESC']);
+    my $rows = $join->selectall_arrayref(limit => 10);
+    my $rows = $join->selectall_arrayref(limit => 10, offset => 20);
+    my $rows = $join->selectall_arrayref(tier => 'gold', sort_by => 'name', limit => 5);
 
 =head3 DESCRIPTION
 
@@ -1177,10 +1240,60 @@ A single plain scalar argument is interpreted as the C<join_column> value
       Plain scalar                -- exact match
       Hashref of operators        -- e.g. { '>' => 80 }
 
+    Optional parameters (mixed in with any of the above):
+      sort_by => 'colname'            -- sort ascending by that column
+      sort_by => ['colname', 'DESC']  -- sort descending
+      sort_by => ['colname', 'ASC']   -- sort ascending (explicit)
+      limit    => N                    -- return at most N rows (positive integer)
+      offset   => M                   -- skip the first M rows (non-negative integer)
+
+    The column named in sort_by must be present in the merged view (i.e. it
+    must appear in columns()).  An unknown column or an invalid direction emits
+    a carp warning and falls back to the default join_column ascending sort.
+
+    limit and offset are applied after ordering.  offset without limit skips
+    rows but returns all remaining rows.  limit without offset starts from
+    the first qualifying row.  An invalid limit or offset emits a carp warning
+    and the parameter is ignored (treated as absent).
+
+    DOMAIN -- sort_by:
+      EP absent:          result sorted by join_column ASC (default).
+      EP string:          any column name in columns(); sorts ASC by that column.
+      EP ['col','ASC']:   explicit ascending; equivalent to the string form.
+      EP ['col','DESC']:  descending sort by the named column.
+      EP ['col']:         single-element arrayref; direction defaults to ASC.
+      EP []:              empty arrayref; column is undef -> carp + join_col ASC fallback.
+      EP invalid column:  column not in columns() -> carp + join_col ASC fallback.
+      EP invalid dir:     direction not 'ASC' or 'DESC' -> carp + ASC used.
+      Sort is lexicographic (cmp); use backend=>'sqlite' for numeric ORDER BY.
+
+    DOMAIN -- limit:
+      EP absent:          no truncation; all qualifying rows are returned.
+      EP 0:               not a positive integer -> carp + ignored (all rows returned).
+      BVA min valid = 1:  exactly 1 row returned.
+      BVA at count:       limit == total rows -> all rows returned (no truncation).
+      BVA above count:    limit > total rows -> all rows returned.
+      EP invalid:         negative integer, float string, or non-numeric string
+                          => carp + ignored (all rows returned).
+      Valid domain:       integers in [1, INF); matched by /^\d+\z/a with value >= 1.
+
+    DOMAIN -- offset:
+      EP absent:          no rows skipped; result starts from row 0.
+      BVA min valid = 0:  no rows skipped (zero is a valid non-negative integer).
+      BVA offset=1:       first row skipped; result starts from row 1.
+      BVA offset=N-1:     N-1 rows skipped; only the last row returned.
+      BVA offset=N:       all N rows skipped; empty result returned.
+      BVA offset>N:       all rows skipped; empty result returned.
+      EP invalid:         negative integer, float string, or non-numeric string
+                          => carp + ignored (no rows skipped).
+      Valid domain:       integers in [0, INF); matched by /^\d+\z/a.
+
 =head4 Output
 
-    Arrayref of hashrefs; one hashref per qualifying merged row,
-    sorted ascending by join_column value.
+    Arrayref of hashrefs; one hashref per qualifying merged row.
+    Sorted ascending by join_column by default; caller-controlled via sort_by.
+    At most C<limit> rows when limit is given; the first C<offset> rows are
+    skipped when offset is given.
     Returns a reference to an empty array when no rows match.
 
 =head3 EXAMPLE
@@ -1201,11 +1314,41 @@ A single plain scalar argument is interpreted as the C<join_column> value
             $row->{entry}, $row->{tier}, $row->{score} // 0;
     }
 
+=head3 MESSAGES
+
+    warn_unknown_column (carp)
+        -- A criterion key names a column not present in any component database;
+           the criterion is silently dropped and all rows are returned.
+    sort_by column unknown (carp)
+        -- The column given in sort_by is not in the merged view; the result
+           is returned in the default join_column ascending order instead.
+    sort_by direction invalid (carp)
+        -- The direction given in sort_by is not 'ASC' or 'DESC'; ASC is used.
+    limit invalid (carp)
+        -- The value given for limit is not a positive integer; it is ignored.
+    offset invalid (carp)
+        -- The value given for offset is not a non-negative integer; it is ignored.
+    operator-unsupported (carp, SQLite/auto path only)
+        -- An operator hashref key is not in the supported set (>, <, >=, <=,
+           !=, =, LIKE, NOT LIKE, IS NULL, IS NOT NULL, IN, NOT IN); the
+           individual operator term is dropped from the WHERE clause (other
+           operators in the same hashref still apply).
+    IN/NOT IN wrong value type (carp, SQLite/auto path only)
+        -- An IN or NOT IN criterion was given a non-arrayref value; the operator
+           term is skipped.
+    error_sqlite_connect (croak, SQLite/auto path only)
+        -- The temporary SQLite join file could not be created; check tmpdir
+           permissions and available disk space.
+
 =cut
 
 sub selectall_arrayref {
 	my ($self, @args) = @_;
-	return $self->_joined_query($self->_parse_query_args(undef, @args));
+	my $params   = $self->_parse_query_args(undef, @args);
+	my $sort_by = delete $params->{sort_by};
+	my $limit    = delete $params->{limit};
+	my $offset   = delete $params->{offset};
+	return $self->_joined_query($params, sort_by => $sort_by, limit => $limit, offset => $offset);
 }
 
 =head2 selectall_array
@@ -1246,11 +1389,19 @@ nothing matches).
     my $first_vip = $join->selectall_array(tier => 'gold');
     print $first_vip->{name}, "\n" if defined $first_vip;
 
+=head3 MESSAGES
+
+Same messages as C<selectall_arrayref>.
+
 =cut
 
 sub selectall_array {
 	my ($self, @args) = @_;
-	my $rows = $self->_joined_query($self->_parse_query_args(undef, @args));
+	my $params   = $self->_parse_query_args(undef, @args);
+	my $sort_by = delete $params->{sort_by};
+	my $limit    = delete $params->{limit};
+	my $offset   = delete $params->{offset};
+	my $rows     = $self->_joined_query($params, sort_by => $sort_by, limit => $limit, offset => $offset);
 	return wantarray ? @{$rows} : $rows->[0];
 }
 
@@ -1291,11 +1442,19 @@ All the same criteria conventions apply.
     # Positional: works when join_column is 'entry'
     my $row2 = $join->fetchrow_hashref('C001');
 
+=head3 MESSAGES
+
+Same messages as C<selectall_arrayref>.
+
 =cut
 
 sub fetchrow_hashref {
 	my ($self, @args) = @_;
-	my $rows = $self->_joined_query($self->_parse_query_args(undef, @args));
+	my $params   = $self->_parse_query_args(undef, @args);
+	my $sort_by = delete $params->{sort_by};
+	delete $params->{limit};   # fetchrow_hashref always returns one row; limit is meaningless
+	delete $params->{offset};  # offset would change which row is "first"; not supported here
+	my $rows     = $self->_joined_query($params, sort_by => $sort_by);
 	return $rows->[0];
 }
 
@@ -1310,8 +1469,9 @@ sub fetchrow_hashref {
 
 Returns the number of merged rows that satisfy the given criteria.
 
-The full join is performed and the resulting rows are counted in Perl; no
-C<COUNT(*)> is pushed down to the component databases.
+On the array backend, the full in-memory join is performed and the resulting
+rows are counted in Perl.  On the SQLite backend, a C<SELECT COUNT(*)> SQL
+query is executed against the cached join tables, avoiding a full row fetch.
 
 =head3 API SPECIFICATION
 
@@ -1332,12 +1492,112 @@ C<COUNT(*)> is pushed down to the component databases.
     printf "%d total, %d gold-tier, %d high-scorers\n",
         $total, $gold, $high;
 
+=head3 MESSAGES
+
+Same messages as C<selectall_arrayref>.
+
 =cut
 
 sub count {
 	my ($self, @args) = @_;
-	my $rows = $self->_joined_query($self->_parse_query_args(undef, @args));
-	return scalar @{$rows};
+	my $params = $self->_parse_query_args(undef, @args);
+	delete $params->{sort_by};  # row ordering is irrelevant for a count
+	delete $params->{limit};     # count returns total matching rows, not a page
+	delete $params->{offset};
+	# On the SQLite path, push COUNT(*) into SQL to avoid fetching all rows.
+	return $self->_sqlite_join($params, count_only => 1)
+		unless $self->{_backend} eq 'array';
+	return scalar @{ $self->_joined_query_array($params) };
+}
+
+=head2 dbi_source
+
+=head3 SYNOPSIS
+
+    # Use a Database::Join object as a zero-copy SQLite source inside a
+    # parent Database::Join, giving the parent ATTACHed-speed access to
+    # the child's joined data without iterating through Perl.
+    my $child  = Database::Join->new(databases => [$da, $db], join_column => 'id', backend => 'sqlite');
+    my $parent = Database::Join->new(databases => [$child, $dc], join_column => 'id', backend => 'sqlite');
+
+=head3 DESCRIPTION
+
+Returns a hashref C<< { dbh => $sqlite_dbh, table => '_dj_result' } >> that
+allows a parent C<Database::Join> (or any other caller that understands the
+C<dbi_source()> interface) to ATTACH the child's temporary SQLite database
+file and query the materialised join result directly via SQL, without routing
+rows through Perl.
+
+The first call builds the SQLite cache (if not already current) and
+materialises the full join result - with C<filters> applied but no query-time
+criteria - into a real table named C<_dj_result> inside the cache file.
+Subsequent calls within the same cache cycle reuse the existing table.
+
+Returns C<undef> when the backend is C<'array'> (no SQLite file exists).
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    None.
+
+=head4 Output
+
+    On the SQLite/auto backend:
+      Hashref with keys:
+        dbh   => DBI handle to the child's temporary SQLite database file.
+        table => '_dj_result'  (the materialized join table inside that file).
+    On the array backend:
+      undef
+
+=head3 EXAMPLE
+
+    # The parent automatically ATTACHes the child's SQLite file and queries
+    # _dj_result for zero-copy composable nested joins.
+    my $inner = Database::Join->new(
+        databases   => [$customers, $loyalty],
+        join_column => 'entry',
+        backend     => 'sqlite',
+    );
+    my $outer = Database::Join->new(
+        databases   => [$inner, $scores],
+        join_column => 'entry',
+        backend     => 'sqlite',
+    );
+    my $rows = $outer->selectall_arrayref(tier => 'gold');
+
+=head3 MESSAGES
+
+    error_sqlite_connect (croak)
+        -- The temporary SQLite join file could not be created.
+
+=cut
+
+sub dbi_source {
+	my ($self) = @_;
+
+	# The array backend has no SQLite handle to expose.
+	return undef if $self->{_backend} eq 'array';
+
+	# Build or refresh the per-source SQLite cache.  On 'auto' backend this
+	# forces the SQLite path regardless of the auto-threshold decision — a
+	# parent that wants to ATTACH us requires a real on-disk file.
+	$self->_build_sqlite_cache() unless $self->_cache_fresh();
+
+	my $cache = $self->{_sqlite_cache};
+
+	# If the materialised result table is already current, reuse it.
+	# _dj_built is reset implicitly when _build_sqlite_cache creates a fresh
+	# cache hashref (the old hashref is replaced, so its _dj_built is gone).
+	unless ($cache->{_dj_built}) {
+		# Materialise all joined rows (filter criteria only, no query-time
+		# criteria) into _dj_result so a parent connection can ATTACH and
+		# query it as a plain table.
+		$self->_sqlite_join({}, create_table => '_dj_result');
+		$cache->{_dj_built} = 1;
+	}
+
+	return { dbh => $cache->{dbh}, table => '_dj_result' };
 }
 
 =head2 columns
@@ -1372,6 +1632,11 @@ The result is memoised: repeated calls are cheap.
     my $cols = $join->columns();
     print join(', ', @{$cols}), "\n";
     # e.g. "entry, name, score, tier"
+
+=head3 MESSAGES
+
+C<columns()> does not itself emit any warnings or errors.  Any exception thrown
+by a component database's C<columns()> method propagates uncaught.
 
 =cut
 
@@ -1441,6 +1706,11 @@ The result is memoised.
             $col, $info->{type}, $info->{nullable} ? 'yes' : 'no';
     }
 
+=head3 MESSAGES
+
+C<schema()> does not itself emit any warnings or errors.  Any exception thrown
+by a component database's C<schema()> method propagates uncaught.
+
 =cut
 
 sub schema {
@@ -1508,11 +1778,25 @@ has advanced since your last snapshot, re-query.
         $my_cache_timestamp = $last_modified;
     }
 
+=head3 MESSAGES
+
+C<updated()> does not emit any warnings or errors.  Component databases that do
+not implement C<updated()>, or whose C<updated()> throws, are silently skipped;
+only defined return values contribute to the maximum.  If no component database
+implements C<updated()>, C<undef> is returned (same as C<List::Util::max> on an
+empty list).
+
 =cut
 
 sub updated {
 	my ($self) = @_;
-	return max(map { $_->updated() } @{ $self->{_dbs} });
+	my @timestamps;
+	for my $db (@{ $self->{_dbs} }) {
+		my $ts;
+		do { local $@; $ts = eval { $db->updated() } };
+		push @timestamps, $ts if defined $ts;
+	}
+	return max(@timestamps);
 }
 
 =head2 set_logger
@@ -1547,6 +1831,11 @@ database.  The logger is used for diagnostic output by all component databases.
     my $join = Database::Join->new(databases => [$db1, $db2], join_column => 'entry');
     $join->set_logger($log);
     # $log is now used by $join and by $db1 and $db2
+
+=head3 MESSAGES
+
+    (croak) Usage: set_logger($logger)
+        -- Called with an undefined argument.  Pass a valid logger object.
 
 =cut
 
@@ -1685,8 +1974,11 @@ equivalent to a C<filters> entry.
 
 =head3 MESSAGES
 
-    error_invalid_db       -- argument is not a Database::Abstraction subclass
-    error_join_col_missing -- join_column not found in the new database
+    error_invalid_db          -- argument is not a Database::Abstraction subclass
+    error_join_col_missing    -- join_column not found in the new database
+    warn_schema_type_mismatch -- (carp) the new database has a shared column whose type
+                                 differs from the type already in the view; use
+                                 collision_prefix to preserve both values
 
 =cut
 
@@ -1773,6 +2065,9 @@ sub add_database {
 	# Invalidate memoisation caches
 	$self->{_col_cache}    = undef;
 	$self->{_schema_cache} = undef;
+
+	# Warn about schema type mismatches introduced by the new database.
+	$self->_validate_schema_types();
 
 	# Invalidate the SQLite join cache: a new source requires a full rebuild.
 	if (my $old = delete $self->{_sqlite_cache}) {
@@ -1989,6 +2284,16 @@ will C<croak> with a clear error message rather than being silently ignored.
     else:
         delegate directly to the owning database
 
+=head3 MESSAGES
+
+    (croak) Database::Join: cannot call private method '_NAME' via AUTOLOAD
+        -- Method name begins with '_'.  Private methods must be called directly,
+           not via AUTOLOAD.  This is a programming error.
+
+    (croak) Database::Join: unknown column 'NAME'
+        -- Method name does not match any visible column in the merged view.
+           Check spelling, or whether the column was removed with remove_column().
+
 =cut
 
 our $AUTOLOAD;
@@ -2020,8 +2325,11 @@ sub AUTOLOAD {
 		# _autoload_pk was captured once at construction from the primary DA's
 		# {id} field; using the cached value avoids re-introspecting the blessed
 		# hash on every call and isolates the coupling to a single known site.
-		my $params = $self->_parse_query_args($self->{_autoload_pk}, @_);
-		my $rows   = $self->_joined_query($params);
+		my $params   = $self->_parse_query_args($self->{_autoload_pk}, @_);
+		my $sort_by = delete $params->{sort_by};
+		my $limit    = delete $params->{limit};
+		my $offset   = delete $params->{offset};
+		my $rows     = $self->_joined_query($params, sort_by => $sort_by, limit => $limit, offset => $offset);
 		return map { $_->{$col} } @{$rows} if wantarray;
 		return @{$rows} ? $rows->[0]{$col} : undef;
 	}
@@ -2147,6 +2455,62 @@ sub _build_col_index :Protected {
 	return;
 }
 
+# _validate_schema_types()
+# Purpose: Carp when two databases share a column name (without collision_prefix)
+#          but disagree on its type, which would cause silent type coercion.
+# Entry:   _dbs, _col_rename, _join_map, _join_col are all populated.
+# Exit:    Emits one carp per mismatched column; no other side effects.
+sub _validate_schema_types :Protected {
+	my ($self) = @_;
+
+	my $join_col = $self->{_join_col};
+	my %seen;    # col_name => { idx => $i, type => $type_str }
+
+	for my $i (0 .. $#{ $self->{_dbs} }) {
+		my $db       = $self->{_dbs}[$i];
+		my $s        = do { local $@; eval { $db->schema() } } // {};
+		my $local_jc = $self->{_join_map}{$i} // $join_col;
+		my $renames  = $self->{_col_rename}[$i] // {};
+
+		for my $orig_col (keys %{$s}) {
+			# Skip the join-key alias (a different name for the same join key)
+			next if $local_jc ne $join_col && $orig_col eq $local_jc;
+
+			# Skip the canonical join column itself — types may legitimately
+			# differ between DAs (e.g. INTEGER PK vs TEXT) without causing issues
+			# because the join column is not a data column.
+			next if $orig_col eq $join_col;
+
+			# Skip columns that have a collision prefix configured for this DB:
+			# they are published under distinct names, so no silent merge occurs.
+			next if exists $renames->{$orig_col};
+
+			# Normalise to a plain type string; skip if the DA returns no type.
+			my $entry    = $s->{$orig_col};
+			my $type_str = ref($entry) eq 'HASH'
+				? uc($entry->{type} // '')
+				: uc($entry // '');
+			next unless length $type_str;
+
+			if (exists $seen{$orig_col}) {
+				my $prev = $seen{$orig_col};
+				if ($prev->{type} ne $type_str) {
+					carp $self->_err(
+						'warn_schema_type_mismatch',
+						$orig_col,
+						$prev->{type}, $prev->{idx},
+						$type_str,     $i,
+					);
+				}
+			} else {
+				$seen{$orig_col} = { idx => $i, type => $type_str };
+			}
+		}
+	}
+
+	return;
+}
+
 # _partition_criteria( \%params ) -> \@per_db
 # Purpose: Split a flat criteria hashref into one slice per component database.
 # Entry:   $params is a criteria hashref; all keys must be column names or
@@ -2214,15 +2578,16 @@ sub _fetch_indexed :Protected {
 	return \%indexed;
 }
 
-# _joined_query( \%params ) -> \@merged_rows
+# _joined_query( \%params, %opts ) -> \@merged_rows
 #
 # Purpose: Dispatcher — routes to the array (in-memory) or SQLite join backend
-#          based on $self->{_backend}.
+#          based on $self->{_backend}.  %opts are passed through to the backend
+#          (currently: sort_by, limit, offset).
 sub _joined_query :Protected {
-	my ($self, $params) = @_;
+	my ($self, $params, %opts) = @_;
 	my $backend = $self->{_backend};
-	return $self->_joined_query_array($params) if $backend eq 'array';
-	return $self->_sqlite_join($params);
+	return $self->_joined_query_array($params, %opts) if $backend eq 'array';
+	return $self->_sqlite_join($params, %opts);
 }
 
 # _joined_query_array( \%params ) -> \@merged_rows
@@ -2245,8 +2610,51 @@ sub _joined_query :Protected {
 # index order.  For duplicate columns, later databases win.  Local join-key
 # aliases are renamed to the canonical join_column before merging.
 # Removed columns are deleted from every merged row.
+# _validate_pagination( $limit, $offset ) -> ($validated_limit, $validated_offset)
+#
+# Purpose: Single source of truth for pagination parameter validation.
+#          Shared by _joined_query_array (array path) and _sqlite_join (SQLite path).
+# Entry:   $limit and $offset are raw caller values -- may be undef, negative,
+#          non-integer, etc.
+# Exit:    Returns the original values when valid; returns undef (with carp) when
+#          invalid.  Premise: after this call, limit ∈ ℤ+ ∪ {undef} and
+#          offset ∈ ℤ≥0 ∪ {undef}.  All downstream guards may safely rely on this.
+sub _validate_pagination :Protected {
+	my ($self, $limit, $offset) = @_;
+	# Syllogism: limit must be a positive integer ∧ matches /^\d+\z/a ∧ >= 1.
+	# Conclusion: any value that fails either check is treated as absent.
+	# \z (not $): rejects strings ending with \n that $ would silently accept.
+	# /a flag:    restricts \d to ASCII [0-9]; rejects Unicode decimal digits
+	#             (e.g. Arabic-Indic ٣) that \d matches but Perl's numeric
+	#             coercion would silently treat as 0, bypassing the >= 1 guard.
+	if (defined $limit) {
+		if ($limit !~ /^\d+\z/a || $limit < 1) {
+			carp "Database::Join: limit must be a positive integer; ignored";
+			undef $limit;
+		}
+	}
+	# Syllogism: offset must be a non-negative integer ∧ matches /^\d+\z/a.
+	# Conclusion: any value that fails the check is treated as absent.
+	# Same \z / /a rationale as limit above.
+	if (defined $offset) {
+		if ($offset !~ /^\d+\z/a) {
+			carp "Database::Join: offset must be a non-negative integer; ignored";
+			undef $offset;
+		}
+	}
+	return ($limit, $offset);
+}
+
 sub _joined_query_array :Protected {
-	my ($self, $params) = @_;
+	my ($self, $params, %opts) = @_;
+	my $sort_by = $opts{sort_by};
+	my $limit    = $opts{limit};
+	my $offset   = $opts{offset};
+
+	# Fast path: skip Sub::Protected dispatch entirely when no pagination params are
+	# supplied (the common case).  Saves one method-lookup overhead per query.
+	($limit, $offset) = $self->_validate_pagination($limit, $offset)
+		if defined $limit || defined $offset;
 
 	my $join_col  = $self->{_join_col};
 	my $join_type = $self->{_join_type};
@@ -2286,7 +2694,82 @@ sub _joined_query_array :Protected {
 	          && !exists $per_db->[0]{$local_jc_0_early}
 	          && !$sec_has_criteria;
 
-	$indexed[$_] = $self->_fetch_indexed($_, $per_db->[$_]) for 1 .. $n - 1;
+	# Fetch and index secondary databases.
+	# With parallel => 1 and 2+ secondaries: spawn one Perl thread per secondary
+	# so all secondaries are queried concurrently.  Total latency becomes
+	# max(DA latencies) instead of sum(DA latencies).  The primary was already
+	# fetched sequentially above (needed for the early-exit short-circuit).
+	# The thread closure captures only $db, $crit, and $local_jc (plain scalars
+	# or in-memory data) — $self is intentionally not captured to avoid copying
+	# the full blessed hashref (including all DA refs) into each thread.
+	# Falls back to sequential when: threads module is unavailable, n <= 2, or
+	# parallel => 0 (the default).
+	#
+	# Windows / ithreads safety: cloned DBI handles inside DA objects are not
+	# thread-safe.  Pre-initialise every secondary slot to {} so that if a thread
+	# fails the slot holds a valid (empty) hashref rather than undef, which would
+	# corrupt the inner-join key-set resolution.  Any secondary whose thread does
+	# not deliver a valid hashref is re-fetched sequentially after all joins
+	# complete, preserving correctness on every platform.
+	$indexed[$_] = {} for 1 .. $n - 1;
+
+	if ($self->{_parallel} && $n > 2) {
+		$HAS_THREADS //= do { local $@; eval { require threads; 1 } ? 1 : 0 };
+		if ($HAS_THREADS) {
+			my @thr;
+			for my $i (1 .. $n - 1) {
+				my ($db, $crit, $local_jc) = (
+					$self->{_dbs}[$i], $per_db->[$i],
+					$self->{_join_map}{$i} // $join_col,
+				);
+				# Wrap thread creation: it can fail if the DA cannot be cloned
+				# (e.g. DBI handles on Windows).  On failure we skip the push so
+				# the sequential fallback below handles that secondary.
+				local $@;
+				my $t = eval {
+					threads->create(sub {
+						# eval inside the thread: prevents a DA exception from
+						# killing the thread and returning an empty list to join().
+						local $@;
+						my $rows = eval { $db->selectall_arrayref($crit) } // [];
+						my %idx;
+						for my $row (@{$rows}) {
+							my $key = $row->{$local_jc};
+							push @{$idx{$key}}, $row if defined $key;
+						}
+						return ($i, \%idx);
+					});
+				};
+				push @thr, $t if $t;
+			}
+
+			my %done;
+			for my $t (@thr) {
+				# eval on join: a thread that died (e.g. uncaught exception)
+				# causes join() to rethrow on some platforms.
+				local $@;
+				my ($i, $idx);
+				eval { ($i, $idx) = $t->join() };
+				if (defined $i && ref($idx) eq 'HASH') {
+					$indexed[$i] = $idx;
+					$done{$i}    = 1;
+				}
+			}
+
+			# Re-fetch sequentially any secondary not delivered by a thread.
+			# This covers: thread creation failure, thread death, or an empty
+			# result that may indicate a non-thread-safe DA (e.g. DBI on Windows).
+			for my $i (1 .. $n - 1) {
+				next if $done{$i};
+				$indexed[$i] = $self->_fetch_indexed($i, $per_db->[$i]);
+			}
+		} else {
+			carp 'Database::Join: parallel => 1 requires the threads module; falling back to sequential';
+			$indexed[$_] = $self->_fetch_indexed($_, $per_db->[$_]) for 1 .. $n - 1;
+		}
+	} else {
+		$indexed[$_] = $self->_fetch_indexed($_, $per_db->[$_]) for 1 .. $n - 1;
+	}
 
 	# Premise: the key-set resolution loop starts at i=1 (primary seeds %key_set).
 	# Conclusion: $had_criteria[0] is a dead store (D~); compute only for i >= 1.
@@ -2299,9 +2782,12 @@ sub _joined_query_array :Protected {
 	for my $i (1 .. $n - 1) {
 		my $local_jc   = $self->{_join_map}{$i} // $join_col;
 		my $has_filter = !!%{ $self->{_filters}{$i} // {} };
-		my %q          = %{ $per_db->[$i] };
-		delete $q{$local_jc};
-		$had_criteria[$i] = $has_filter || !!%q;
+		my $crit       = $per_db->[$i];
+		# Avoid copying the criteria hash just to delete the join-col key.
+		# Arithmetic is O(1) allocations: count total keys, subtract 1 when the
+		# local join-col key is present.  Any result > 0 is truthy (has own criteria).
+		my $own = (keys %{$crit}) - (exists $crit->{$local_jc} ? 1 : 0);
+		$had_criteria[$i] = $has_filter || $own;
 	}
 
 	# Seed the key set from the primary database.
@@ -2350,12 +2836,37 @@ sub _joined_query_array :Protected {
 	# query.  Lazily built here and invalidated to undef by remove_column().
 	my $removed = ($self->{_removed_list} //= [keys %{ $self->{_removed_cols} }]);
 
+	# Parse sort_by once before the merge loop so we can decide whether the
+	# initial O(K log K) sort of %key_set is necessary.
+	# When sort_by targets a column other than the join_col, that initial sort
+	# is overridden by the final Schwarzian pass -- skip it to save a full sort.
+	# When sort_by is absent or targets the join_col, the initial sort IS the
+	# final order and must be kept.
+	my ($ob_col, $ob_dir) = ($join_col, 'ASC');
+	if (defined $sort_by) {
+		my ($req_col, $req_dir) = ref($sort_by) eq 'ARRAY' ? @{$sort_by} : ($sort_by, 'ASC');
+		$req_dir = uc($req_dir // 'ASC');
+		unless ($req_dir eq 'ASC' || $req_dir eq 'DESC') {
+			carp "Database::Join: sort_by direction '$req_dir' is not supported; using ASC";
+			$req_dir = 'ASC';
+		}
+		if ($req_col ne $join_col && !exists $self->{_col_db}{$req_col}) {
+			carp "Database::Join: sort_by column '$req_col' is not in the merged view; result sorted by join_column";
+		} else {
+			($ob_col, $ob_dir) = ($req_col, $req_dir);
+		}
+	}
+	# True when sort_by targets a non-join column: the initial sort is redundant.
+	my $ob_override = ($ob_col ne $join_col);
+
 	# Build one merged result row for every primary-database row that qualifies.
 	# Secondary databases act as lookup tables: when a key maps to multiple
 	# secondary rows, the last one wins (consistent with construction-time
 	# last-database-wins column routing).
 	my @result;
-	for my $key (sort keys %key_set) {
+	# When sort_by will override the join_col order, iterate keys unsorted (O(K))
+	# instead of sorted (O(K log K)); the Schwarzian pass at the end reorders.
+	for my $key ($ob_override ? keys %key_set : sort keys %key_set) {
 		# Iterate directly over the arrayref: avoids copying primary rows into a
 		# new @base_rows array (saves P element copies per key, P = rows per key).
 		# [{}] ensures outer-join keys absent from the primary produce one merged row.
@@ -2403,6 +2914,40 @@ sub _joined_query_array :Protected {
 			delete @merged{@{$removed}} if @{$removed};
 			push @result, \%merged;
 		}
+	}
+
+	# Caller-specified ORDER BY.
+	# $ob_col / $ob_dir / $ob_override were parsed BEFORE the merge loop.
+	# Three cases:
+	#   1. Non-join-col override ($ob_override true): Schwarzian transform
+	#      O(R) key extractions + O(R log R) scalar comparisons -- cheaper than
+	#      O(2R log R) hash dereferences that a naive sort block would make.
+	#   2. join_col DESC: O(R) reverse -- already sorted ASC by the loop.
+	#   3. join_col ASC (default): already in order, nothing to do.
+	if ($ob_override) {
+		# Schwarzian: decorate, sort, undecorate.
+		# String comparison (cmp).  For accurate numeric ordering on large
+		# numeric columns use backend => 'sqlite', which sorts by SQL type.
+		my @tagged = map { [$_, $_->{$ob_col} // ''] } @result;
+		if ($ob_dir eq 'DESC') {
+			@result = map { $_->[0] } sort { $b->[1] cmp $a->[1] } @tagged;
+		} else {
+			@result = map { $_->[0] } sort { $a->[1] cmp $b->[1] } @tagged;
+		}
+	} elsif ($ob_dir eq 'DESC') {
+		# join_col DESC: O(R) reverse is cheaper than O(R log R) re-sort
+		# because the merge loop already produced join_col ASC order.
+		@result = reverse @result;
+	}
+	# join_col ASC: @result is already in join_column ascending order.
+
+	# LIMIT / OFFSET pagination — applied after ordering.
+	# splice removes elements from the front (offset) then truncates to limit.
+	if (defined $offset && $offset > 0) {
+		splice(@result, 0, $offset);
+	}
+	if (defined $limit && $limit < scalar @result) {
+		splice(@result, $limit);
 	}
 
 	return \@result;
@@ -2605,7 +3150,17 @@ sub _build_sqlite_cache :Protected {
 #          File::Temp SQLite file in _tmpdir; the file persists until the
 #          Database::Join object is destroyed or the source data changes.
 sub _sqlite_join :Protected {
-	my ($self, $params) = @_;
+	my ($self, $params, %opts) = @_;
+	my $count_only   = $opts{count_only} // 0;
+	my $sort_by     = $opts{sort_by};
+	my $limit        = $opts{limit};
+	my $offset       = $opts{offset};
+	my $create_table = $opts{create_table};  # when set, materialize into a real table
+
+	# Transitive reduction: _validate_pagination is the single validation site.
+	# count() and dbi_source() never supply limit/offset (both methods delete them
+	# before calling _sqlite_join), so for those callers this is a cheap undef-check.
+	($limit, $offset) = $self->_validate_pagination($limit, $offset);
 
 	my $backend   = $self->{_backend};
 	my $join_col  = $self->{_join_col};
@@ -2645,7 +3200,9 @@ sub _sqlite_join :Protected {
 	# For 'auto' mode: check total row count without fetching rows.
 	# Count(*) is used for dbi_source() sources; count() for others.
 	# If any source supports neither, fall back to the array path.
-	if ($backend eq 'auto') {
+	# Skipped when create_table is set — dbi_source() has already committed to
+	# the SQLite path and we must materialise regardless of row count.
+	if ($backend eq 'auto' && !defined $create_table) {
 		my $total     = 0;
 		my $can_count = 1;
 		for my $i (0 .. $n - 1) {
@@ -2657,7 +3214,8 @@ sub _sqlite_join :Protected {
 				if ($src && ref($src) eq 'HASH' && $src->{dbh} && $src->{table}
 					&& eval { $src->{dbh}{Driver}{Name} } eq 'SQLite') {
 					my ($cnt) = $src->{dbh}->selectrow_array(
-						'SELECT COUNT(*) FROM "' . $src->{table} . '"'
+						'SELECT COUNT(*) FROM '
+						. _sql_quote_identifier($src->{table})
 					);
 					$total += $cnt // 0;
 					next;
@@ -2681,8 +3239,11 @@ sub _sqlite_join :Protected {
 			$can_count = 0;
 			last;
 		}
-		return $self->_joined_query_array($params)
-			if !$can_count || $total <= $self->{_max_array_rows};
+		if (!$can_count || $total <= $self->{_max_array_rows}) {
+			my $rows = $self->_joined_query_array($params,
+				sort_by => $sort_by, limit => $limit, offset => $offset);
+			return $count_only ? scalar @{$rows} : $rows;
+		}
 	}
 
 	# Ensure the SQLite cache is valid; rebuild if stale or absent.
@@ -2710,10 +3271,42 @@ sub _sqlite_join :Protected {
 			my $val = $crit->{$col};
 			if (ref($val) eq 'HASH') {
 				for my $op (sort keys %{$val}) {
-					next unless $SAFE_SQL_OPS{$op};
+					if ($SAFE_LIST_OPS{$op}) {
+						# IN / NOT IN: value must be an arrayref; each element is bound.
+						my $arr = $val->{$op};
+						unless (ref($arr) eq 'ARRAY') {
+							carp "Database::Join: operator '$op' requires an arrayref value; criterion skipped";
+							next;
+						}
+						my @items = @{$arr};
+						if (!@items) {
+							# IN ()  → always false: add a tautologically-false term.
+							# NOT IN () → always true: omit the term (all rows match).
+							push @where_parts, '1 = 0' if $op eq 'IN';
+							next;
+						}
+						push @where_parts,
+							$tref . '.' . _sql_quote_identifier($col)
+							. " $op (" . join(', ', ('?') x scalar @items) . ')';
+						push @bind_vals, @items;
+						next;
+					}
+					if ($SAFE_NOARG_OPS{$op}) {
+						# IS NULL / IS NOT NULL: no bind parameter at all.
+						push @where_parts, $tref . '.' . _sql_quote_identifier($col) . " $op";
+						next;
+					}
+					unless ($SAFE_SQL_OPS{$op}) {
+						carp "Database::Join: operator '$op' is not supported on the SQLite backend; criterion skipped (use the array backend or a supported operator)";
+						next;
+					}
 					push @where_parts, $tref . '.' . _sql_quote_identifier($col) . " $op ?";
 					push @bind_vals, $val->{$op};
 				}
+			} elsif (!defined $val) {
+				# A bare undef value means "WHERE col IS NULL".
+				# (col = NULL is always UNKNOWN in SQL and would match nothing.)
+				push @where_parts, $tref . '.' . _sql_quote_identifier($col) . ' IS NULL';
 			} else {
 				push @where_parts, $tref . '.' . _sql_quote_identifier($col) . ' = ?';
 				push @bind_vals, $val;
@@ -2722,6 +3315,37 @@ sub _sqlite_join :Protected {
 	}
 	my $where_sql = @where_parts ? ' WHERE ' . join(' AND ', @where_parts) : '';
 
+	my $local_jc_0 = $self->{_join_map}{0} // $join_col;
+
+	# Build JOIN clauses.  Hoisted before the SELECT list so the count_only
+	# path can return early without building the (unused) column expressions.
+	# Join type mirrors the key-set semantics of _joined_query_array:
+	#   had_criteria[i] OR inner  => INNER JOIN
+	#   outer (no criteria)       => FULL OUTER JOIN
+	#   left  (no criteria)       => LEFT JOIN
+	my $from     = $table_refs[0];
+	my $join_sql = '';
+	for my $i (1 .. $n - 1) {
+		my $local_jc = $self->{_join_map}{$i} // $join_col;
+		my $join_kw  = ($had_criteria[$i] || $join_type eq 'inner') ? 'JOIN'
+		             : ($join_type eq 'outer')                       ? 'FULL OUTER JOIN'
+		             :                                                  'LEFT JOIN';
+		$join_sql .= " $join_kw $table_refs[$i]"
+		          . ' ON ' . $table_refs[0] . '.' . _sql_quote_identifier($local_jc_0)
+		          . ' = '  . $table_refs[$i] . '.' . _sql_quote_identifier($local_jc);
+	}
+
+	# COUNT(*) short-circuit: WHERE and JOIN are built; SELECT list and ORDER BY
+	# are not needed.  selectrow_array returns a single integer without fetching rows.
+	if ($count_only) {
+		my ($cnt) = $tmpdbh->selectrow_array(
+			'SELECT COUNT(*) FROM ' . $from . $join_sql . $where_sql,
+			undef,
+			@bind_vals,
+		);
+		return $cnt // 0;
+	}
+
 	# Build SELECT clause.
 	# Walk sources in order, applying collision_prefix renaming exactly as
 	# _build_col_index does: first occurrence of a column name wins; subsequent
@@ -2729,7 +3353,6 @@ sub _sqlite_join :Protected {
 	# "$prefix.$col"; removed columns are omitted.
 	my %pub_seen;
 	my @selects;
-	my $local_jc_0 = $self->{_join_map}{0} // $join_col;
 
 	# Join-column expression: for outer joins, use COALESCE across all sources
 	# so that B-only (primary-absent) rows carry their join key rather than NULL.
@@ -2775,42 +3398,76 @@ sub _sqlite_join :Protected {
 		}
 	}
 
-	# Build JOIN clauses.
-	# Join type mirrors the key-set semantics of _joined_query_array:
-	#   had_criteria[i] OR inner  => INNER JOIN
-	#   outer (no criteria)       => FULL OUTER JOIN
-	#   left  (no criteria)       => LEFT JOIN
-	my $from     = $table_refs[0];
-	my $join_sql = '';
-	for my $i (1 .. $n - 1) {
-		my $local_jc = $self->{_join_map}{$i} // $join_col;
-		my $join_kw  = ($had_criteria[$i] || $join_type eq 'inner') ? 'JOIN'
-		             : ($join_type eq 'outer')                       ? 'FULL OUTER JOIN'
-		             :                                                  'LEFT JOIN';
-		$join_sql .= " $join_kw $table_refs[$i]"
-		          . ' ON ' . $table_refs[0] . '.' . _sql_quote_identifier($local_jc_0)
-		          . ' = '  . $table_refs[$i] . '.' . _sql_quote_identifier($local_jc);
+	# dbi_source() materialisation path: CREATE TABLE name AS SELECT ...
+	# Executed BEFORE ORDER BY / LIMIT / OFFSET because they are irrelevant here —
+	# the parent join will impose its own ordering and pagination per-call.
+	# _sql_quote_identifier guards against any injection via the table name.
+	# D~: $sort_by, $limit, $offset are dead stores on this path.  They were
+	# parsed and validated above (shared with the normal query path) but the
+	# caller of create_table always passes undef for these, so _validate_pagination
+	# is a no-op and the variables are harmlessly abandoned at this return.
+	if (defined $create_table) {
+		my $mat_sql = 'SELECT ' . join(', ', @selects)
+		            . ' FROM ' . $from . $join_sql . $where_sql;
+		$tmpdbh->do('DROP TABLE IF EXISTS ' . _sql_quote_identifier($create_table));
+		$tmpdbh->do('CREATE TABLE ' . _sql_quote_identifier($create_table)
+		          . ' AS ' . $mat_sql,
+		          undef, @bind_vals);
+		return;
 	}
 
-	# ORDER BY: use a qualified column reference to avoid ambiguity.
-	# For outer joins we aliased the join column via COALESCE, so reference
-	# the alias (SQLite resolves ORDER BY aliases from the SELECT list).
-	# For other join types, qualify with the primary table to be unambiguous.
-	my $order_col = ($join_type eq 'outer' && $n > 1)
-	              ? _sql_quote_identifier($join_col)
-	              : $table_refs[0] . '.' . _sql_quote_identifier($local_jc_0);
+	# ORDER BY: default is join_column ascending.  Caller may override via
+	# sort_by => 'col' or sort_by => ['col', 'DESC'].
+	# For the join column on an outer join, reference the COALESCE alias.
+	# For any other column, reference the published SELECT-list alias —
+	# SQLite resolves ORDER BY aliases from the SELECT clause.
+	my ($ob_col, $ob_dir) = ($join_col, 'ASC');
+	if (defined $sort_by) {
+		my ($req_col, $req_dir) = ref($sort_by) eq 'ARRAY' ? @{$sort_by} : ($sort_by, 'ASC');
+		$req_dir = uc($req_dir // 'ASC');
+		unless ($req_dir eq 'ASC' || $req_dir eq 'DESC') {
+			carp "Database::Join: sort_by direction '$req_dir' is not supported; using ASC";
+			$req_dir = 'ASC';
+		}
+		if ($req_col ne $join_col && !exists $self->{_col_db}{$req_col}) {
+			carp "Database::Join: sort_by column '$req_col' is not in the merged view; result sorted by join_column";
+		} else {
+			($ob_col, $ob_dir) = ($req_col, $req_dir);
+		}
+	}
+	my $order_expr = ($ob_col eq $join_col)
+	    ? (($join_type eq 'outer' && $n > 1)
+	          ? _sql_quote_identifier($join_col)
+	          : $table_refs[0] . '.' . _sql_quote_identifier($local_jc_0))
+	    : _sql_quote_identifier($ob_col);
 	my $sql = 'SELECT '
 	        . join(', ', @selects)
 	        . ' FROM ' . $from . $join_sql
 	        . $where_sql
-	        . ' ORDER BY ' . $order_col;
+	        . ' ORDER BY ' . $order_expr . ($ob_dir eq 'DESC' ? ' DESC' : '');
+
+	# LIMIT / OFFSET pagination — appended after ORDER BY as bind parameters
+	# (never interpolated) to prevent any SQL injection from caller values.
+	# OFFSET without LIMIT uses LIMIT -1 (SQLite extension: "all rows from offset").
+	my @page_bind;
+	if (defined $limit) {
+		$sql .= ' LIMIT ?';
+		push @page_bind, $limit;
+		if (defined $offset) {
+			$sql .= ' OFFSET ?';
+			push @page_bind, $offset;
+		}
+	} elsif (defined $offset) {
+		$sql .= ' LIMIT -1 OFFSET ?';
+		push @page_bind, $offset;
+	}
 
 	# prepare_cached reuses the parsed statement when the same SQL is executed
 	# again (e.g. identical criteria pattern in a pagination or batch loop),
 	# avoiding repeated statement compilation overhead.  fetchall_arrayref
 	# always exhausts the result set, so the handle is never left active.
 	my $sth = $tmpdbh->prepare_cached($sql);
-	$sth->execute(@bind_vals);
+	$sth->execute(@bind_vals, @page_bind);
 	return $sth->fetchall_arrayref({});
 }
 

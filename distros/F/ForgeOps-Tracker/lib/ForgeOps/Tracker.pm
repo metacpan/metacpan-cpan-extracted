@@ -3,6 +3,8 @@ package ForgeOps::Tracker;
 use strict;
 use warnings;
 use POSIX qw(strftime);
+use ForgeOps::Tracker::ChangeDelivery;
+use ForgeOps::Tracker::Changes;
 use ForgeOps::Tracker::Client;
 use ForgeOps::Tracker::Configuration;
 use ForgeOps::Tracker::DeliveryQueue;
@@ -22,12 +24,14 @@ use Time::HiRes ();
 # directly: retrying the identical 0.2.0 tarball came back 409 Conflict, not the original success
 # response repeated). No functional change from 0.2.0; this bump exists solely to get a fresh,
 # uploadable version number.
-our $VERSION = '0.9.0';
+our $VERSION = '0.11.0';
 
 my $configuration;
 my $reporter;
 my $performance_flusher;
 my $span_queue;
+my $change_queue;
+my $change_snapshot_sent = 0;
 my ($metric_buffer, $infrastructure_metric_buffer);
 
 # The affected user set via set_user() below, if any: a plain package variable, the same
@@ -116,6 +120,62 @@ sub _span_queue {
     return $span_queue;
 }
 
+sub _change_queue {
+    unless ($change_queue) {
+        my $config = _configuration();
+        my $client = ForgeOps::Tracker::Client->new($config);
+        $change_queue = ForgeOps::Tracker::DeliveryQueue->new($config, ForgeOps::Tracker::ChangeDelivery->new($client));
+    }
+    return $change_queue;
+}
+
+# record_change(kind => ..., title => ..., %optional): records one thing that changed in a running
+# system, so ForgeOps can show it next to the errors and slowdowns that followed, e.g.:
+#
+#   ForgeOps::Tracker::record_change(
+#       kind    => 'feature_flag',
+#       title   => 'Enabled new_checkout for 10%',
+#       details => { rollout => 10 },
+#   );
+#
+# kind is one of feature_flag, config, migration, dependency, infrastructure, or other (anything
+# else is sent as "other"). Optional: details (a hashref), environment (defaults to the configured
+# one), service, actor, url, id (an idempotency key), and occurred_at (an ISO 8601 string or epoch
+# seconds, defaulting to now). Delivered from the same kind of background thread as error events,
+# so it never blocks the caller. Does nothing when the client isn't enabled. Never dies: returns 0
+# when nothing was queued.
+sub record_change {
+    my (%change) = @_;
+    my $queued = eval {
+        my $config = _configuration();
+        return 0 unless $config->is_enabled;
+
+        my $payload = ForgeOps::Tracker::Changes::build_change($config, %change);
+        return 0 unless $payload;
+
+        return _change_queue()->push([ change => $payload ]);
+    };
+    if ($@) {
+        eval { _configuration()->log("[forge-ops-tracker] record_change failed: $@") };
+        return 0;
+    }
+    return $queued;
+}
+
+# Queues the one startup snapshot this process sends (see ForgeOps::Tracker::Changes) for the
+# change queue's background thread, so init() never waits on the network. A second call is a no-op,
+# and so is a call while the client isn't enabled or detect_changes is off (without using up the
+# once). Never dies.
+sub _start_change_snapshot {
+    my ($config) = @_;
+    eval {
+        return if $change_snapshot_sent || !$config->is_enabled || !$config->{detect_changes};
+        $change_snapshot_sent = 1;
+        _change_queue()->push([ snapshot => ForgeOps::Tracker::Changes::build_snapshot($config) ]);
+    };
+    return;
+}
+
 # init(%overrides): configure the client. Call once at startup, e.g.:
 #
 #   ForgeOps::Tracker::init(dsn => 'https://<api_key>@getforgeops.net/api/v1/events');
@@ -129,6 +189,8 @@ sub init {
         die "Configuration has no property '$key'" unless exists $config->{$key};
         $config->{$key} = $overrides{$key};
     }
+
+    _start_change_snapshot($config);
 
     return $config;
 }
@@ -336,10 +398,24 @@ sub finish_trace {
 # database, redis, http, job, other (anything else is sent as "other"), e.g.:
 #
 #   my $order = ForgeOps::Tracker::span('charge card', sub { $gateway->charge($id) }, data => { order => $id });
+#
+# A database span can also carry the SQL it ran, with statement => and db_system =>:
+#
+#   my $rows = ForgeOps::Tracker::span('Load orders', sub { $dbh->selectall_arrayref($sql, {}, $id) },
+#       kind => 'database', statement => $sql, db_system => 'postgresql');
+#
+# The statement is masked (every string and number replaced by "?") and cut to 4000 characters
+# before it's stored, then sent as "db.statement"; db_system goes out lowercased as "db.system".
+# Bind values are never taken. Both options are ignored on any other kind of span.
 sub span {
     my ($name, $code, %options) = @_;
     my $trace = $current_trace;
     return $code->() unless $trace;
+
+    my $kind = defined $options{kind} ? $options{kind} : 'service';
+    my $data = $kind eq 'database'
+        ? { %{ $options{data} || {} }, %{ database_span_data($options{statement}, $options{db_system}) } }
+        : $options{data};
 
     my $wantarray = wantarray;
     my $id = $trace->open_span;
@@ -355,10 +431,7 @@ sub span {
         };
         $error = $@;
     }
-    $trace->finish(
-        $id, $name, defined $options{kind} ? $options{kind} : 'service',
-        $started_at, (Time::HiRes::time - $started_at) * 1000, $options{data},
-    );
+    $trace->finish($id, $name, $kind, $started_at, (Time::HiRes::time - $started_at) * 1000, $data);
     die $error if $failed;
     return $wantarray ? @result : $result[0];
 }
@@ -423,6 +496,29 @@ sub record_span {
     return;
 }
 
+# record_database_span($name, $statement, $started_at, $duration_ms, db_system => ...): a query you
+# timed yourself, recorded as a "database" span carrying its SQL, masked as span() masks it. Does
+# nothing outside a trace.
+sub record_database_span {
+    my ($name, $statement, $started_at, $duration_ms, %options) = @_;
+    record_span($name, 'database', $started_at, $duration_ms, database_span_data($statement, $options{db_system}));
+    return;
+}
+
+# database_span_data($statement, $db_system): the data a database span carries, "db.statement"
+# and "db.system" (lowercased), each left out when undef or blank. A "db.statement" on any database
+# span is masked when the span is recorded, however its data was built.
+sub database_span_data {
+    my ($statement, $db_system) = @_;
+    my %data;
+    $data{'db.statement'} = $statement if defined $statement && !ref $statement && $statement =~ /\S/;
+    if (defined $db_system && !ref $db_system && $db_system =~ /\S/) {
+        (my $system = lc $db_system) =~ s/\A\s+|\s+\z//g;
+        $data{'db.system'} = $system;
+    }
+    return \%data;
+}
+
 # capture_metric($name, $value = 1): records a named business metric (a signup, a payment, anything
 # you want to name), buffered and flushed periodically as one batch rather than one network call per
 # capture. $value defaults to 1 so a bare counter-style call needs no argument; pass one for a real
@@ -468,8 +564,14 @@ sub flush_metrics {
     return;
 }
 
-# @internal not part of the public API: resets module state between test cases
+# @internal not part of the public API: resets module state between test cases. The startup change
+# snapshot is left marked as already sent, so the many tests that init() an enabled client against
+# an echo server don't see an extra request; pass change_snapshot => 1 to let the next init() send
+# it (see t/changes.t).
 sub _reset_for_testing {
+    my (%options) = @_;
+    $change_queue = undef;
+    $change_snapshot_sent = $options{change_snapshot} ? 0 : 1;
     $configuration = undef;
     $reporter = undef;
     $performance_flusher = undef;

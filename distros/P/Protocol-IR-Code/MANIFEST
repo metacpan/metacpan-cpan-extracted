@@ -15,7 +15,7 @@ examples/wig.pl
 lib/Protocol/IR/Code.pm
 lib/Protocol/IR/Converter.pm
 lib/Protocol/IR/Format/CSV.pm
-lib/Protocol/IR/Format/GC.pm
+lib/Protocol/IR/Format/JSON.pm
 lib/Protocol/IR/Format/LIRC.pm
 lib/Protocol/IR/Format/Mode2.pm
 lib/Protocol/IR/Format/Pronto.pm
@@ -57,7 +57,7 @@ t/19-mwm.t
 t/20-mode2.t
 t/21-lirc.t
 t/22-cross-protocol.t
-t/23-gc.t
+t/23-json.t
 t/data/conv-jvc.tsv
 t/data/conv-jvc48.tsv
 t/data/conv-nec.tsv

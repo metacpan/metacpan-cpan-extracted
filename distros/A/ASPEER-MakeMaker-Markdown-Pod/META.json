@@ -1,0 +1,74 @@
+{
+   "abstract" : "MakeMaker integration for Markdown-maintained POD",
+   "author" : [
+      "Andrew Speer <andrew.speer@isolutions.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "ASPEER-MakeMaker-Markdown-Pod",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "version" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ASPEER::MakeMaker" : "1.010",
+            "Cwd" : "0",
+            "Digest::MD5" : "0",
+            "Docbook::Convert" : "1.010",
+            "Exporter" : "0",
+            "ExtUtils::Manifest" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "Markdown::Pod::Embed" : "1.010",
+            "perl" : "5.010",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Pod/issues"
+      },
+      "homepage" : "https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Pod",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Pod.git",
+         "web" : "https://github.com/aspeer/pm-ASPEER-MakeMaker-Markdown-Pod"
+      }
+   },
+   "version" : "1.014",
+   "x_authority" : "cpan:ASPEER",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

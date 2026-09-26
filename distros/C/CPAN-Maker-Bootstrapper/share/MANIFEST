@@ -1,4 +1,5 @@
 Makefile.txt
+bootstrap.mk
 git.mk
 help.mk
 perl.mk

@@ -7,29 +7,28 @@ use warnings;
 #
 # Four specific branch gaps identified via Devel::Cover 1.52 analysis:
 #
-#   LINE 201  //= short-circuit (generate):
+#   MERGE      //= short-circuit (generate, develop merge):
 #             $deps->{develop}{$rel}{$1} //= { ... }
 #             The FALSE branch (key already exists) was never taken.
 #             Fix: existing cpanfile develop block with a duplicated module.
 #
-#   LINE 381  FALSE branch (_extract_pairs):
+#   PAIRS      no-match case (_extract_pairs pair regex):
 #             if ($line =~ /['"]([^'"]+)['"]\s*=>\s*.../)
 #             A non-blank, non-comment-only line that still does not match the
 #             pattern was never passed.
 #             Fix: bareword key (Carp => 0) inside PREREQ_PM, no quotes.
 #
-#   LINE 446  FALSE branch (_load_develop_config):
+#   NULL VER   null version default (_load_develop_config):
 #             my $v = defined $ver ? "$ver" : 0;
 #             The ELSE arm (undef YAML value) was never taken.
 #             Fix: YAML key with null value (Perl::Critic: ~).
 #
-#   LINE 447  $v eq '' condition (_load_develop_config):
-#             unless ($v eq '0' || $v eq '' || ...)
+#   CONFIG     $v eq q{} test (_load_develop_config):
+#             unless ($v eq q{} || _valid_requirement($v))
 #             The middle arm ($v eq '') was never exercised.
 #             Fix: YAML key with empty-string value (Perl::Critic: '').
 #
-# Dead code at line 498 is also flagged below (unreachable FALSE branch of
-# "if @lines" inside _emit).
+# Section 5 also covers _emit's handling of phases with no entries.
 
 use Test::Most;
 use Test::Returns;
@@ -93,16 +92,16 @@ sub home_with_yaml {
 }
 
 # -----------------------------------------------------------------------
-# SECTION 1 — Line 201: //= short-circuit in generate()
+# SECTION 1 - Line 201: //= short-circuit in generate()
 #
 # Strategy: pass an existing cpanfile whose develop block lists a module
 # that also appears a second time in the same block (same or different
 # relationship).  The SECOND occurrence must NOT overwrite the first
-# because of the //= assignment — that exercises the previously-uncovered
+# because of the //= assignment - that exercises the previously-uncovered
 # FALSE branch.
 # -----------------------------------------------------------------------
 
-subtest 'generate: //= short-circuit — duplicate module in existing develop block kept at first version' => sub {
+subtest 'generate: //= short-circuit - duplicate module in existing develop block kept at first version' => sub {
 	# The existing cpanfile lists 'Devel::Cover' under requires twice.
 	# The first occurrence specifies version '0.80'; the second specifies '0.99'.
 	# The //= operator must preserve the first (version 0.80).
@@ -128,7 +127,7 @@ END
 	like $out, qr/0\.80/,
 		'first-seen version (0.80) preserved by //= short-circuit';
 	unlike $out, qr/0\.99/,
-		'second occurrence (0.99) discarded — //= FALSE branch taken';
+		'second occurrence (0.99) discarded - //= FALSE branch taken';
 
 	diag "generate() output:\n$out" if $ENV{TEST_VERBOSE};
 
@@ -139,7 +138,7 @@ END
 	);
 };
 
-subtest 'generate: //= short-circuit — same module in different rels, requires wins' => sub {
+subtest 'generate: //= short-circuit - same module in different rels, requires wins' => sub {
 	# A module listed under 'requires' then again under 'recommends' in the
 	# same existing develop block.  The merge loop processes both rels, but
 	# since //= is keyed on module name within a relationship hash this is
@@ -171,16 +170,16 @@ END
 };
 
 # -----------------------------------------------------------------------
-# SECTION 2 — Line 381: FALSE branch of _extract_pairs pattern
+# SECTION 2 - Line 381: FALSE branch of _extract_pairs pattern
 #
 # Strategy: include a non-blank, non-comment-only line inside PREREQ_PM
-# that has NO quoted key — e.g. a bareword assignment (Carp => 0) without
+# that has NO quoted key - e.g. a bareword assignment (Carp => 0) without
 # quotes.  The regex /['"]([^'"]+)['"]\s*=>.../ requires a leading quote,
 # so this line must fall through to the FALSE branch, being silently
 # ignored.  The surrounding quoted entries must still be parsed correctly.
 # -----------------------------------------------------------------------
 
-subtest '_extract_pairs: bareword key (no quotes) is silently ignored — FALSE branch' => sub {
+subtest '_extract_pairs: bareword key (no quotes) is silently ignored - FALSE branch' => sub {
 	# 'Carp => 0' has no surrounding quotes on the key, so it must NOT match
 	# the extraction regex and must not appear in the output.
 	# 'Storable' (quoted) on the same PREREQ_PM block must still be captured.
@@ -237,7 +236,7 @@ END
 };
 
 # -----------------------------------------------------------------------
-# SECTION 3 — Line 446: FALSE branch of _load_develop_config
+# SECTION 3 - Line 446: FALSE branch of _load_develop_config
 #             (undef YAML version value)
 #
 # Strategy: write a YAML config with a key whose value is null (~).
@@ -257,7 +256,7 @@ subtest '_load_develop_config: YAML null value (~) treated as version 0' => sub 
 	isa_ok $result, 'HASH', 'returns a hashref with null version';
 	ok exists $result->{'Perl::Critic'}, 'Perl::Critic key present';
 	is $result->{'Perl::Critic'}, 0,
-		'null YAML value coerced to 0 (line 446 FALSE branch)';
+		'null YAML value coerced to 0 (null config version -> 0)';
 
 	diag "config with null version: " . Dumper($result)
 		if $ENV{TEST_VERBOSE};
@@ -275,14 +274,14 @@ subtest '_load_develop_config: YAML null version flows through to generate outpu
 	);
 
 	like $out, qr/Devel::NYTProf/, 'module with null version appears in output';
-	# A version of 0 means "any version" — _fmt_dep omits the constraint.
+	# A version of 0 means "any version" - _fmt_dep omits the constraint.
 	unlike $out, qr/Devel::NYTProf'.*,/, 'no version constraint emitted for null entry';
 
 	diag "null-version end-to-end:\n$out" if $ENV{TEST_VERBOSE};
 };
 
 # -----------------------------------------------------------------------
-# SECTION 4 — Line 447: $v eq '' condition
+# SECTION 4 - Line 447: $v eq '' condition
 #
 # Strategy: write a YAML config with a key whose value is an empty string.
 # YAML::Tiny returns '' for an explicit empty value.  After
@@ -302,7 +301,7 @@ subtest "_load_develop_config: YAML empty-string value ('') accepted as valid" =
 	isa_ok $result, 'HASH',  'returns hashref with empty-string version';
 	ok exists $result->{'Test::Pod'}, 'Test::Pod key present';
 	is $result->{'Test::Pod'}, '',
-		"empty-string version preserved (line 447 \$v eq '' branch)";
+		"empty-string version preserved (config version '' kept)";
 
 	diag "empty-string version result: " . Dumper($result)
 		if $ENV{TEST_VERBOSE};
@@ -324,35 +323,22 @@ subtest "_load_develop_config: empty-string version produces no version constrai
 };
 
 # -----------------------------------------------------------------------
-# SECTION 5 — Dead code at line 498 in _emit
+# SECTION 5 - Empty sections in _emit
 #
-# The following is a block inside _emit:
+# _emit builds each phase's text with one loop over 'runtime' and
+# @PHASE_ORDER and skips a phase whose text is empty:
 #
-#   if (my $rt = $deps->{runtime}) {
-#       my @lines;
-#       for my $rel (@REL_ORDER) { ... push @lines, ... }
-#       push @sections, join('', @lines) if @lines;   # <-- line 498
-#   }
+#   next if $body eq q{};
 #
-# The outer if ($rt = $deps->{runtime}) only enters when $deps->{runtime}
-# is truthy.  $deps->{runtime} is only truthy when _extract_pairs has
-# added at least one valid module to it (parse_prereqs only sets runtime
-# from PREREQ_PM entries that pass the module-name regex).  Any such
-# module will produce exactly one line from _fmt_dep, guaranteeing
-# @lines is non-empty.  Therefore the FALSE branch of "if @lines" at
-# line 498 can NEVER execute.
-#
-# Similarly, line 512 "next unless @lines" inside the non-runtime phase
-# loop is reachable (an empty phase is pruned), but the dead-code concern
-# at 498 is specifically about the runtime branch.
-#
-# These tests document the invariant and confirm that reaching the outer
-# if-branch guarantees @lines is non-empty.
+# generate() never hands _emit a phase with no modules (parse_prereqs only
+# creates a phase when it stores an entry), so from generate() that skip
+# only happens for absent phases.  A direct caller can still pass an
+# existing but empty phase; these tests show both kinds produce no section.
 # -----------------------------------------------------------------------
 
 subtest '_emit dead code: runtime branch entered only when at least one module present' => sub {
 	# A $deps hash with a non-empty runtime block must always produce output
-	# lines — verifying the invariant that makes line 498 FALSE unreachable.
+	# lines - verifying the invariant that makes phase skip not taken.
 	Readonly my %DEPS_RT => (
 		runtime => {
 			requires => {
@@ -364,23 +350,23 @@ subtest '_emit dead code: runtime branch entered only when at least one module p
 	my $out = App::makefilepl2cpanfile::_emit(\%DEPS_RT, undef);
 
 	like $out, qr/Scalar::Util/,
-		'runtime module appears — @lines was non-empty (498 FALSE unreachable)';
+		'runtime module appears - @lines was non-empty (phase skip not taken)';
 
 	diag "_emit dead-code invariant output:\n$out" if $ENV{TEST_VERBOSE};
 
-	# NOTE: The "if @lines" FALSE branch at line 498 is DEAD CODE.
+	# NOTE: The "if @lines" FALSE branch is not taken from generate().
 	# It is structurally impossible to enter the outer "if ($rt)" block
 	# while producing zero @lines entries, because every module inserted by
 	# _extract_pairs is validated (non-empty module name + rel pair) and
 	# generates exactly one _fmt_dep call.
-	# See coverage report: line 498 shows 87 TRUE / 0 FALSE.
+	# See coverage report: the skip is only taken for absent phases.
 };
 
 subtest '_emit dead code: $deps with empty runtime hash never enters runtime branch' => sub {
 	# An empty runtime hash means $deps->{runtime} is truthy (hashref),
 	# but the inner loops produce no lines.
-	# Wait — actually an empty hashref IS truthy in Perl, so _emit WOULD
-	# enter the outer if, @lines would be empty, and line 498 FALSE branch
+	# Wait - actually an empty hashref IS truthy in Perl, so _emit WOULD
+	# enter the outer if, @lines would be empty, and empty-phase skip
 	# WOULD execute.  Let's test this edge case directly.
 	Readonly my %DEPS_EMPTY_RT => (
 		runtime => {},
@@ -388,23 +374,23 @@ subtest '_emit dead code: $deps with empty runtime hash never enters runtime bra
 
 	my $out = App::makefilepl2cpanfile::_emit(\%DEPS_EMPTY_RT, undef);
 
-	# No requires/recommends/suggests entries — no module lines expected.
+	# No requires/recommends/suggests entries - no module lines expected.
 	unlike $out, qr/requires\s+'[A-Z]/,
 		'no module lines when runtime hash is empty';
 
 	diag "_emit empty-runtime output:\n$out" if $ENV{TEST_VERBOSE};
 
-	# This sub-case CAN reach the line 498 FALSE branch because the outer
+	# This sub-case CAN reach the empty-phase skip because the outer
 	# if ($rt) is entered (hashref is truthy) but @lines stays empty.
 	# However, generate() never produces this state because parse_prereqs
 	# only adds runtime when it finds valid modules.  Direct _emit callers
-	# with a hand-crafted empty runtime hash CAN reach it — which means
+	# with a hand-crafted empty runtime hash CAN reach it - which means
 	# this is reachable from tests but not from the production call chain.
 	pass 'empty runtime hash handled gracefully (no crash)';
 };
 
 # -----------------------------------------------------------------------
-# SECTION 6 — Return-type contracts via Test::Returns
+# SECTION 6 - Return-type contracts via Test::Returns
 # -----------------------------------------------------------------------
 
 subtest 'generate: return type is always a defined scalar string' => sub {
@@ -479,12 +465,12 @@ subtest '_load_develop_config: always returns a hashref' => sub {
 };
 
 # -----------------------------------------------------------------------
-# SECTION 7 — Validate all four coverage gaps interact correctly together
+# SECTION 7 - Validate all four coverage gaps interact correctly together
 #
 # A single generate() call that exercises:
-#   - bareword key in PREREQ_PM (line 381 FALSE)
-#   - existing develop block with duplicate module (line 201 //= FALSE)
-#   - YAML config with null version (line 446 FALSE)
+#   - bareword key in PREREQ_PM (unquoted key not matched by the pair regex)
+#   - existing develop block with duplicate module ('//=' in the develop merge keeps the first)
+#   - YAML config with null version (null config version -> 0)
 # -----------------------------------------------------------------------
 
 subtest 'combined: all three line-gap scenarios in one generate() call' => sub {
@@ -505,7 +491,7 @@ on 'develop' => sub {
 };
 END
 
-	# YAML config with a null-value entry (triggers line 446 FALSE).
+	# YAML config with a null-value entry (triggers null config version -> 0).
 	my $g  = home_with_yaml({ develop => { 'Perl::Critic' => undef } });
 	my $mf = make_mf($MF_COMBO);
 

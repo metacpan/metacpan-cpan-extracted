@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article
+version="5.0"
+xmlns="http://docbook.org/ns/docbook"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+xmlns:xi="http://www.w3.org/2001/XInclude"
+xmlns:svg="http://www.w3.org/2000/svg"
+xmlns:m="http://www.w3.org/1998/Math/MathML"
+xmlns:html="http://www.w3.org/1999/xhtml"
+xmlns:db="http://docbook.org/ns/docbook"
+><info
+><title
+>Image Test</title
+></info
+><section
+><title
+>Images</title
+><para
+>Inline MediaObject:</para
+><para
+>MediaObject:</para
+><mediaobject
+><imageobject
+><imagedata
+fileref="http://eol.jsc.nasa.gov/DatabaseImages/ESC/small/ISS027/ISS027-E-13982.JPG"
+></imagedata
+></imageobject
+><caption
+><para
+>MediaObject Caption</para
+></caption
+></mediaobject
+><para
+>Screenshot:</para
+><screenshot
+><title
+>Screenshot Title</title
+><mediaobject
+><alt
+>Screenshot Alt Text</alt
+><imageobject
+><imagedata
+fileref="http://eol.jsc.nasa.gov/DatabaseImages/ESC/small/ISS025/ISS025-E-11955.JPG"
+></imagedata
+></imageobject
+><caption
+><para
+>Screenshot Caption</para
+></caption
+></mediaobject
+></screenshot
+><para
+>Figure:</para
+><figure
+><title
+>Figure Title</title
+><mediaobject
+><imageobject
+><imagedata
+fileref="http://eol.jsc.nasa.gov/DatabaseImages/ESC/small/ISS027/ISS027-E-13982.JPG"
+></imagedata
+></imageobject
+></mediaobject
+></figure
+><para
+>Figure (Screenshot):</para
+><figure
+><title
+>Figure (Screenshot) Title</title
+><screenshot
+><mediaobject
+><imageobject
+><imagedata
+fileref="http://eol.jsc.nasa.gov/DatabaseImages/ESC/small/ISS025/ISS025-E-11955.JPG"
+></imagedata
+></imageobject
+></mediaobject
+></screenshot
+></figure
+><para
+>Image (Scaled):</para
+><mediaobject
+><imageobject
+><imagedata
+fileref="http://eol.jsc.nasa.gov/DatabaseImages/ESC/small/ISS027/ISS027-E-13982.JPG"
+scale="50"
+></imagedata
+></imageobject
+><caption
+><para
+>Image (Scaled) Caption</para
+></caption
+></mediaobject
+><para
+>Image (Fixed Width):</para
+><mediaobject
+><alt
+>Image (Fixed Width) Alt text</alt
+><imageobject
+><imagedata
+fileref="http://eol.jsc.nasa.gov/DatabaseImages/ESC/small/ISS027/ISS027-E-13982.JPG"
+width="400"
+></imagedata
+></imageobject
+></mediaobject
+></section
+></article
+>

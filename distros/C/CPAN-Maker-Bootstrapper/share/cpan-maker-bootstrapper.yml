@@ -13,10 +13,12 @@ commands:
   models:             CPAN::Maker::Bootstrapper::Role::LLM::Models
   pod-finding:        CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
   pod-review:         CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  provides:           CPAN::Maker::Bootstrapper::Role::Provides
   release-notes:      CPAN::Maker::Bootstrapper::Role::LLM::ReleaseNotes
   update-annotations: CPAN::Maker::Bootstrapper::Role::LLM::Annotator
   extra-files:        CPAN::Maker::Bootstrapper::Role::ExtraFiles
   resolve-vars:       CPAN::Maker::Bootstrapper::Role::ResolveVars
+  version:            CPAN::Maker::Bootstrapper::Role::Version
 options:
 - auto-annotate|A
 - annotate|a=s@
@@ -43,6 +45,7 @@ options:
 - import|I=s@
 - module|m=s
 - resources|r=s
+- strict!
 - stub|s=s
 - username|u=s
 - vars-file=s
@@ -57,6 +60,7 @@ extra_options:
   - help_sections
 default_options:
   color: 1
+  strict: 1
   help_sections:
       - SYNOPSIS
       - COMMANDS

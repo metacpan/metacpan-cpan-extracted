@@ -4,7 +4,7 @@ Protocol::IR::Code - Intermediate representation of an IR remote control code
 
 # VERSION
 
-version 1.1
+version 1.2
 
 # SYNOPSIS
 
@@ -74,9 +74,9 @@ handlers; you normally do not construct `Protocol::IR::Code` objects directly.
 - send\_count
 
     How many times the whole signal transmits per press (the wig's `send_count`,
-    the Global Cache IR database's per-command repeat count).  Zero means the
-    source carried no repeat count, so a wig export omits `send_count` and the
-    default single press is assumed.
+    the repeat hint a JSON dump's keycode carries).  Zero means the source carried
+    no repeat count, so a wig export omits `send_count` and the default single
+    press is assumed.
 
 - bypass\_protocol
 
@@ -102,7 +102,7 @@ handlers; you normally do not construct `Protocol::IR::Code` objects directly.
 
     The verbatim Pronto Hex string the code was decoded from, when any, kept so
     the code re-exports byte-identically through any Pronto output or
-    Pronto-passthrough container format (wig, Global Cache) without
+    Pronto-passthrough container format (wig, a JSON dump) without
     re-quantizing. On a signal no registered protocol recognizes (protocol
     `UNKNOWN`, `bypass_protocol` set) this is alongside `timings`. `undef`
     for codes built from decoded fields.
@@ -110,7 +110,7 @@ handlers; you normally do not construct `Protocol::IR::Code` objects directly.
     `timings` and `pronto` are kept together on a decoded code because the two
     format families each need their own lossless view: `timings` feeds the
     microsecond timing formats (Tasmota, mode2, LIRC), `pronto` the hex container
-    formats (wig, Global Cache, a Pronto re-export). Deriving either from the
+    formats (wig, a JSON dump, a Pronto re-export). Deriving either from the
     other would re-quantize and could change silent fractions.
 
 # METHODS
@@ -152,7 +152,6 @@ reinventing it:
 - Tasmota -- [IR send/receive and RawData](https://tasmota.github.io/docs/Tasmota-IR/), built on [IRremoteESP8266](https://github.com/crankyoldgit/IRremoteESP8266)
 - IRDB -- [the community button/CSV database](https://github.com/probonopd/irdb)
 - HAIR -- [the Home Assistant IR integration and wig format](https://github.com/DAB-LABS/HAIR)
-- Global Cache -- [IR database exports](https://www.globalcache.com/)
 - IR Scrutinizer -- [Pronto Hex format glossary](http://www.harctoolbox.org/Glossary.html)
 
 # AUTHOR

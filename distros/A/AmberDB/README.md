@@ -18,17 +18,17 @@
 - **Schema-Driven Dynamic Runtime Manipulation**: Table-specific schemas govern field validations, encodings, and index mappings. Schemas and values are fully mutable and can be modified dynamically at runtime without requiring table recreation or migrations.
 - **8-Byte Packed Binary Indexing**: Primary and secondary indexes use unified 8-byte packed binary buffers (`Q>*`), enabling $O(1)$ substring slicing, sub-millisecond pagination, and memory-efficient `keys_only` scalar pipelines (with `use_simple => 1` mode for arbitrary string keys).
 - **Intelligent & Locale-Aware Accent Search**: Advanced full-text search engine (`.src`) equipped with regional language and accent intelligence, phonetic devoicing (`b/d/g -> p/t/k`), circumflex/accent unfolding (`â/î/û -> a/i/u`), apostrophe suffix stop-words, and prefix wildcard matching.
-- **Columnar Facet Indexing (`.fac`)**: High-performance multi-dimensional facet filtering with index-level bitwise intersections and bidirectional string dictionaries (`.str`) for e-commerce, catalogs, and large categorical datasets.
+- **Columnar Facet Indexing (`.fac`)**: High-performance multi-dimensional facet filtering with index-level bitwise intersections and bidirectional string dictionaries (`.unq`) for e-commerce, catalogs, and large categorical datasets.
 - **Multi-Tier Junk & Lifecycle Management**: Segregates active records from historical/archived data (`.db` master vs `.jnk` tier) with seamless single-pass hybrid queries (`jnktype => 'A' | 'B' | 'AB' | 'BA'`).
-- **ACID-Compliant Undo-Journal Transactions**: Full ACID multi-table transactions with disk-backed journaling (`.txn`), Strict Two-Phase Locking (Strict 2PL), automatic LIFO rollback upon failure or abnormal process exit, and orphaned journal recovery.
+- **ACID-Compliant Undo-Journal Transactions**: Full ACID multi-table transactions with disk-backed undo journaling (`dbstore/journal/txn_*`), Strict Two-Phase Locking (Strict 2PL), automatic LIFO rollback upon failure or abnormal process exit, and orphaned journal recovery.
 - **2-Pillar Disaster Recovery & Native `.amberdb` Archiving**: 
   - **Pillar 1 (Continuous Recovery Stream):** Automatic append-only audit stream in `backup/YYYY/YYYY-MM-DD.csv` capturing every `insert`, `modify`, and `delete`.
-  - **Pillar 2 (Native Portable Archive):** Compressed, portable `.amberdb` archives containing schemas (`schema/*.table`, `schema/*.dbase`) and authoritative data files (`table/*.db`, `table/*.del`, `table/*.aut`, `table/*.cnt`, `table/*_*.str`) with SHA-256 integrity verification. Derived indexes are excluded to save space and reconstructed deterministically on restore.
+  - **Pillar 2 (Native Portable Archive):** Compressed, portable `.amberdb` archives containing schemas (`schema/*.table`, `schema/*.dbase`) and authoritative data files (`table/*.db`, `table/*.del`, `table/*.aut`, `table/*.cnt`, `table/*.unq`) with SHA-256 integrity verification. Derived indexes are excluded to save space and reconstructed deterministically on restore.
 - **Multi-Granularity Concurrency Control**: Non-blocking shared reads and exclusive writes at both table-level and individual record-level using OS-native `flock`.
 - **ORM & Data Hydration (`inflate` / `deflate`)**: Native transformation between flat storage arrays and schema-mapped hash structures (`$adb->inflate` and `$adb->deflate`), including automatic RDBM foreign relationship resolution and repeating child rows.
 - **Granular Field Operations**: Direct field mutation without full record rewriting via `update_field`, positional child block insertion via `insert_field`, and safe targeted child deletion via `delete_field`.
 - **Multilingual Locale Engine**: Out-of-the-box support for 10 languages (`gb` [default Global Base], `en`, `tr`, `de`, `fr`, `es`, `ja`, `ru`, `ar`, `az`) with language-specific case folding (e.g. Turkish `ı/I` and `i/İ`), cross-lingual accent folding, collation, currency, and date formatting.
-- **High-Throughput 2-Phase Batch Operations**: High-performance batch ingestion pipeline (`insert_list`, `modify_list`, `delete_list`) opens master `.db` once for batch writing and executes single-pass index merging (`.inx`, `.src`, `.fld`, `.fac`, `.srt`), delivering 50x-100x faster ETL data imports without per-record locking overhead.
+- **High-Throughput 2-Phase Batch Operations**: High-performance batch ingestion pipeline (`insert_list`, `modify_list`, `delete_list`) opens master `.db` once for batch writing and executes single-pass index merging (`.inx`, `.src`, `.fld`, `.fac`, `.slg`), delivering 50x-100x faster ETL data imports without per-record locking overhead.
 - **Transparent Physical RAM-Disk Acceleration**: Integrated cross-platform orchestration (`tmpfs` Linux, `APFS` macOS, `ImDisk` Windows) across 4 operational tiers (0: Disk, 1: Hybrid Index-only, 2: Full RAM Mirror with dual-write, 3: Volatile pure RAM-disk with sliding TTL `ramdisk_ttl`). Supports custom directory isolation (`table_dir`).
 
 ---
@@ -60,30 +60,27 @@ dbstore/
 
 ### File Extension Reference
 
-| File Extension | Classification | Reconstructible? | Description |
-| :--- | :--- | :--- | :--- |
-| **Authoritative Master Data** | | | |
-| `.db` | **Primary Data (Source of Truth)** | **No** (Authoritative) | Berkeley DB master document table (`DB_File` Hash) |
-| `.del` | **Soft-Deleted Archive** | **No** (Authoritative) | Archive of soft-deleted records (`keep_deleted`) |
-| `.aut` | **User Audit Trail** | **No** (Authoritative) | Chronological user action log (`log_owner`) |
-| `.str` | **String Dictionary** | **No** (Authoritative) | Bidirectional string-to-foreign-key dictionary (`_${blk}.str`) |
-| **Derived Secondary Indexes** | | | |
-| `.inx` | **Record Index** |  **Yes** (`set_index`) | Binary array of all active IDs, total count, highest ID |
-| `.fld` | **Inverted Match Index** |  **Yes** (`set_index`) | Block-level key-to-IDs inverted index (`match_block`) |
-| `.src` | **Full-Text Search Index** |  **Yes** (`set_index`) | Word-level token inverted index (`search_block`) |
-| `.srt` | **Sorted Index** |  **Yes** (`set_index`) | Pre-sorted binary array of record IDs (`sort_block`) |
-| `.fac` | **Facet Navigation Index** |  **Yes** (`set_index`) | Forward bitset index for faceted filter navigation (`facet_block`) |
-| `.slg` | **URL Slug Map** |  **Yes** (`set_index`) | Bidirectional map: `_0.slg` (ID→Slug) and `_1.slg` (Slug→ID) |
-| `.jinx`| **Junk Record Index** |  **Yes** (`set_index`) | Binary primary index for cold/archived records (`use_junk`) |
-| `.jfld`| **Junk Match Index** |  **Yes** (`set_index`) | Field match index for cold records (`jnktype => 'B'/'AB'`) |
-| `.jsrc`| **Junk Full-Text Search** |  **Yes** (`set_index`) | Word-level inverted index for cold records (`jnktype => 'B'/'AB'`) |
-| **Runtime & Backup Files** | | | |
-| `.amberdb` | **Native Database Archive** | Portable Archive | Compressed tar archive with schemas, data files, and SHA-256 manifest |
-| `.csv` | **Continuous WAL Stream** | Append-Only Log | Daily chronological audit stream (`backup/YYYY/YYYY-MM-DD.csv`) |
-| `.cnt` | **View / Hit Counter** | Counter State | High-throughput concurrent counter store (`use_counter`) |
-| `.txn` | **Transaction Undo Journal** | Transient (Runtime) | Active transaction rollback journal file (`txn/`) |
-| `.tmp` | **Disk Buffer File** | Transient (Staging) | Disk staging buffer file under `dbstore/buffer/` (`buffer_write`) |
-| `.lock` | **Process Mutex Lock** | Transient (Mutex) | OS `flock` process synchronization lock file |
+AmberDB classifies physical file extensions into three operational tiers:
+
+#### Authoritative Master Data (Source of Truth — Non-Reconstructible)
+- **`.db`** — **Primary Document Table**: Berkeley DB master document storage (`DB_File` Hash).
+- **`.del`** — **Soft-Deleted Archive**: Historical archive of soft-deleted records (`keep_deleted`).
+- **`.aut`** — **User Audit Trail**: Chronological user action and modification audit log (`log_owner`).
+- **`.unq`** — **Unique & Dictionary Index**: Bidirectional string-to-foreign-key dictionary and unique constraint enforcement (`.unq`).
+
+#### Derived Secondary Indexes (Reconstructible via `set_index`)
+- **`.inx`** — **Primary & Sorted Record Index**: Binary array of active IDs, record count, highest ID, and pre-sorted order arrays (`sort_block`).
+- **`.fld`** — **Inverted Match Index**: Block-level key-to-IDs inverted index (`match_block`).
+- **`.src`** — **Full-Text Search Index**: Word-level token inverted index (`search_block`).
+- **`.fac`** — **Facet Navigation Index**: Forward bitset index for faceted filter navigation (`facet_block`).
+- **`.slg`** — **URL Slug Map**: Flat unified bidirectional slug map: `0:$rid` (ID→Slug) and `1:$slug` (Slug→ID).
+
+#### Runtime & Backup Files
+- **`.amberdb`** — **Native Database Archive**: Compressed tar archive with schemas, data files, and SHA-256 manifest.
+- **`.csv`** — **Continuous WAL Stream**: Daily chronological append-only audit stream (`backup/YYYY/YYYY-MM-DD.csv`).
+- **`.cnt`** — **View / Hit Counter**: High-throughput concurrent atomic counter store (`use_counter`).
+- **`.tmp`** — **Disk Buffer File**: Disk staging buffer file under `dbstore/buffer/` (`buffer_write`).
+- **`.lock`** — **Process Mutex Lock**: OS `flock` process synchronization lock file.
 
 ---
 
@@ -254,7 +251,7 @@ my $archive = $tools->dump();
 my $result = $tools->restore(
     file    => "backup/2026/full_backup.amberdb",
     force   => 1, # Overwrite authorization for non-empty directories
-    reindex => 1  # Automatically reconstruct .inx, .src, .fld, .fac, .srt
+    reindex => 1  # Automatically reconstruct .inx, .src, .fld, .fac, .slg
 );
 ```
 
@@ -313,7 +310,7 @@ perl bin/amberdb_setup.pl --action=backup --restore --file=backup/catalog.amberd
 # Table migration (upgrade legacy tables to current ABR v1 binary format)
 perl bin/amberdb_setup.pl --action=update --all
 
-# Re-index secondary binary indexes (.inx, .fld, .src, .srt)
+# Re-index secondary binary indexes (.inx, .fld, .src, .slg)
 perl bin/amberdb_setup.pl --action=reindex
 ```
 

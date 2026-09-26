@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use Encode;         # Encoding management if needed
 use Time::Local;    # Core module for time operations
 
-our $VERSION = '5.25.2';
+our $VERSION = '5.26.0';
 my $CREATED = '2008-02-07';
 
 # Default English Month Names
@@ -21,6 +21,8 @@ my $DEFAULT_DAYS = [
     "Thursday", "Friday", "Saturday"
 ];
 
+my $MAX_CACHE_ENTRIES = 1024;
+
 # ------------------------------------------------
 # Constructor
 # ------------------------------------------------
@@ -28,6 +30,7 @@ sub new {
     my $class = shift;
     my %args  = ( ref $_[0] eq 'HASH' ) ? %{ $_[0] } : @_;
     my $self  = bless {}, $class;
+    $self->{_date} ||= {};
 
     if ( $args{locale} ) {
         $self->{locale} = $args{locale};
@@ -45,6 +48,10 @@ sub new {
     $self->{days}   //= ( $self->{locale} && $self->{locale}->can('days') ? $self->{locale}->days() : undef )
                      // ( $self->can('days') ? $self->days() : $DEFAULT_DAYS );
 
+    if ( defined $args{time} ) {
+        $self->{time} = $args{time};
+    }
+
     # Populate current timestamp data into self so $date->day_id, $date->year etc. work immediately
     my $d = $self->get_date( $args{time} );
     %$self = ( %$self, %$d );
@@ -57,10 +64,26 @@ sub new {
 # ------------------------------------------------
 sub get_date {
     my ( $self, $time ) = @_;
+
+    my $t;
+    if ( defined $time ) {
+        $t = $time;
+    }
+    elsif ( ref $self ) {
+        $t = $self->{time} //= ( ( $self->{date} && defined $self->{date}->{time} ) ? $self->{date}->{time} : time() );
+    }
+    else {
+        $t = time();
+    }
+
+    if ( ref $self && exists $self->{_date}{get_date}{$t} ) {
+        return $self->{_date}{get_date}{$t};
+    }
+
     my $date_hash = {};
 
     # Set timestamp value
-    $date_hash->{time} = $time // time();
+    $date_hash->{time} = $t;
 
     (
         $date_hash->{second}, $date_hash->{minute},
@@ -98,6 +121,8 @@ sub get_date {
     $date_hash->{only_time} =
       "$date_hash->{hour}:$date_hash->{minute}:$date_hash->{second}";
     $date_hash->{str} = "$date_hash->{short} - $date_hash->{only_time}";
+    $date_hash->{date_short} = $date_hash->{short};
+    $date_hash->{date_str}   = $date_hash->{str};
 
     # Side-effect: Save year directory to object path
     $date_hash->{year_dir} = $date_hash->{year};
@@ -105,7 +130,14 @@ sub get_date {
     $date_hash->{months} = $months;
     $date_hash->{days}   = $days;
 
-    return bless $date_hash, 'AmberDB::Date';
+    my $obj = bless $date_hash, 'AmberDB::Date';
+
+    if ( ref $self ) {
+        $self->{_date}{get_date} = {} if keys %{ $self->{_date}{get_date} || {} } > $MAX_CACHE_ENTRIES;
+        $self->{_date}{get_date}{$t} = $obj;
+    }
+
+    return $obj;
 }
 
 # ------------------------------------------------
@@ -115,108 +147,145 @@ sub get_date {
 sub year {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{year} if defined $t;
-    return $self->{year} // ( ( ref $self && $self->{date} ) ? $self->{date}->{year} : (localtime)[5] + 1900 );
+    return $self->{year} if defined $self->{year};
+    return $self->{year} = $self->{date}->{year} if ref $self && $self->{date} && defined $self->{date}->{year};
+    return $self->{year} = $self->get_date()->{year};
 }
 
 sub month {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{month} if defined $t;
-    return $self->{month} // ( ( ref $self && $self->{date} ) ? $self->{date}->{month} : sprintf( "%02d", (localtime)[4] + 1 ) );
+    return $self->{month} if defined $self->{month};
+    return $self->{month} = $self->{date}->{month} if ref $self && $self->{date} && defined $self->{date}->{month};
+    return $self->{month} = $self->get_date()->{month};
 }
 
 sub day {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{day} if defined $t;
-    return $self->{day} // ( ( ref $self && $self->{date} ) ? $self->{date}->{day} : sprintf( "%02d", (localtime)[3] ) );
+    return $self->{day} if defined $self->{day};
+    return $self->{day} = $self->{date}->{day} if ref $self && $self->{date} && defined $self->{date}->{day};
+    return $self->{day} = $self->get_date()->{day};
 }
 
 sub hour {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{hour} if defined $t;
-    return $self->{hour} // ( ( ref $self && $self->{date} ) ? $self->{date}->{hour} : sprintf( "%02d", (localtime)[2] ) );
+    return $self->{hour} if defined $self->{hour};
+    return $self->{hour} = $self->{date}->{hour} if ref $self && $self->{date} && defined $self->{date}->{hour};
+    return $self->{hour} = $self->get_date()->{hour};
 }
 
 sub minute {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{minute} if defined $t;
-    return $self->{minute} // ( ( ref $self && $self->{date} ) ? $self->{date}->{minute} : sprintf( "%02d", (localtime)[1] ) );
+    return $self->{minute} if defined $self->{minute};
+    return $self->{minute} = $self->{date}->{minute} if ref $self && $self->{date} && defined $self->{date}->{minute};
+    return $self->{minute} = $self->get_date()->{minute};
 }
 
 sub second {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{second} if defined $t;
-    return $self->{second} // ( ( ref $self && $self->{date} ) ? $self->{date}->{second} : sprintf( "%02d", (localtime)[0] ) );
+    return $self->{second} if defined $self->{second};
+    return $self->{second} = $self->{date}->{second} if ref $self && $self->{date} && defined $self->{date}->{second};
+    return $self->{second} = $self->get_date()->{second};
 }
 
 sub month_id {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{month_id} if defined $t;
-    return $self->{month_id} // ( ( ref $self && $self->{date} ) ? $self->{date}->{month_id} : $self->year . $self->month );
+    return $self->{month_id} if defined $self->{month_id};
+    return $self->{month_id} = $self->{date}->{month_id} if ref $self && $self->{date} && defined $self->{date}->{month_id};
+    return $self->{month_id} = $self->year . $self->month;
 }
 
 sub day_id {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{day_id} if defined $t;
-    return $self->{day_id} // ( ( ref $self && $self->{date} ) ? $self->{date}->{day_id} : $self->month_id . $self->day );
+    return $self->{day_id} if defined $self->{day_id};
+    return $self->{day_id} = $self->{date}->{day_id} if ref $self && $self->{date} && defined $self->{date}->{day_id};
+    return $self->{day_id} = $self->month_id . $self->day;
 }
 
 sub hour_id {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{hour_id} if defined $t;
-    return $self->{hour_id} // ( ( ref $self && $self->{date} ) ? $self->{date}->{hour_id} : $self->day_id . $self->hour );
+    return $self->{hour_id} if defined $self->{hour_id};
+    return $self->{hour_id} = $self->{date}->{hour_id} if ref $self && $self->{date} && defined $self->{date}->{hour_id};
+    return $self->{hour_id} = $self->day_id . $self->hour;
 }
 
 sub minute_id {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{minute_id} if defined $t;
-    return $self->{minute_id} // ( ( ref $self && $self->{date} ) ? $self->{date}->{minute_id} : $self->hour_id . $self->minute );
+    return $self->{minute_id} if defined $self->{minute_id};
+    return $self->{minute_id} = $self->{date}->{minute_id} if ref $self && $self->{date} && defined $self->{date}->{minute_id};
+    return $self->{minute_id} = $self->hour_id . $self->minute;
 }
 
 sub second_id {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{second_id} if defined $t;
-    return $self->{second_id} // ( ( ref $self && $self->{date} ) ? $self->{date}->{second_id} : $self->minute_id . $self->second );
+    return $self->{second_id} if defined $self->{second_id};
+    return $self->{second_id} = $self->{date}->{second_id} if ref $self && $self->{date} && defined $self->{date}->{second_id};
+    return $self->{second_id} = $self->minute_id . $self->second;
 }
 
-sub str {
+sub date_str {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{str} if defined $t;
-    return $self->{str} // ( ( ref $self && $self->{date} ) ? $self->{date}->{str} : ( $self->short . " - " . $self->only_time ) );
+    return $self->{date_str} if defined $self->{date_str};
+    return $self->{date_str} = $self->{date}->{str} if ref $self && $self->{date} && defined $self->{date}->{str};
+    return $self->{date_str} = ( $self->date_short . " - " . $self->only_time );
 }
 
-sub short {
+sub date_short {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{short} if defined $t;
-    return $self->{short} // ( ( ref $self && $self->{date} ) ? $self->{date}->{short} : ( $self->day . "/" . $self->month . "/" . $self->year ) );
+    return $self->{date_short} if defined $self->{date_short};
+    return $self->{date_short} = $self->{date}->{short} if ref $self && $self->{date} && defined $self->{date}->{short};
+    return $self->{date_short} = ( $self->day . "/" . $self->month . "/" . $self->year );
 }
+
+*str   = \&date_str;
+*short = \&date_short;
 
 sub only_time {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{only_time} if defined $t;
-    return $self->{only_time} // ( ( ref $self && $self->{date} ) ? $self->{date}->{only_time} : ( $self->hour . ":" . $self->minute . ":" . $self->second ) );
+    return $self->{only_time} if defined $self->{only_time};
+    return $self->{only_time} = $self->{date}->{only_time} if ref $self && $self->{date} && defined $self->{date}->{only_time};
+    return $self->{only_time} = ( $self->hour . ":" . $self->minute . ":" . $self->second );
 }
 
 sub epoch {
     my ($self) = @_;
-    return $self->{time} // ( ( ref $self && $self->{date} ) ? $self->{date}->{time} : time() );
+    return $self->{time} //= ( ( ref $self && $self->{date} && defined $self->{date}->{time} ) ? $self->{date}->{time} : time() );
 }
 
 sub monthname {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{monthname} if defined $t;
-    return $self->{monthname} // ( ( ref $self && $self->{date} ) ? $self->{date}->{monthname} : undef );
+    return $self->{monthname} if defined $self->{monthname};
+    return $self->{monthname} = $self->{date}->{monthname} if ref $self && $self->{date} && defined $self->{date}->{monthname};
+    return $self->get_date()->{monthname};
 }
 
 sub dayname {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{dayname} if defined $t;
-    return $self->{dayname} // ( ( ref $self && $self->{date} ) ? $self->{date}->{dayname} : undef );
+    return $self->{dayname} if defined $self->{dayname};
+    return $self->{dayname} = $self->{date}->{dayname} if ref $self && $self->{date} && defined $self->{date}->{dayname};
+    return $self->get_date()->{dayname};
 }
 
 sub year_dir {
     my ( $self, $t ) = @_;
     return $self->get_date($t)->{year_dir} if defined $t;
-    return $self->{year_dir} // ( ( ref $self && $self->{date} ) ? $self->{date}->{year_dir} : $self->year );
+    return $self->{year_dir} if defined $self->{year_dir};
+    return $self->{year_dir} = $self->{date}->{year_dir} if ref $self && $self->{date} && defined $self->{date}->{year_dir};
+    return $self->year;
 }
 
 # ------------------------------------------------
@@ -224,7 +293,11 @@ sub year_dir {
 # ------------------------------------------------
 sub str2dateid {
     my ( $self, $datestr ) = @_;
-    return unless $datestr;
+    return unless defined $datestr && length($datestr);
+
+    if ( ref $self && exists $self->{_date}{str2dateid}{$datestr} ) {
+        return $self->{_date}{str2dateid}{$datestr};
+    }
 
     my ( $day_id, $hour,  $dateid );
     my ( $day,  $month, $year );
@@ -260,6 +333,12 @@ sub str2dateid {
     }
 
     $dateid = ( $day_id // '' ) . ( $hour // '' );
+
+    if ( ref $self ) {
+        $self->{_date}{str2dateid} = {} if keys %{ $self->{_date}{str2dateid} || {} } > $MAX_CACHE_ENTRIES;
+        $self->{_date}{str2dateid}{$datestr} = $dateid;
+    }
+
     return $dateid;
 }
 
@@ -268,23 +347,29 @@ sub str2dateid {
 # ------------------------------------------------
 sub dateid2str {
     my ( $self, $dateid ) = @_;
-    return unless $dateid;
+    return unless defined $dateid && length($dateid);
+
+    if ( ref $self && exists $self->{_date}{dateid2str}{$dateid} ) {
+        return $self->{_date}{dateid2str}{$dateid};
+    }
+
+    my $formatted;
 
     # secondid (14 digits)
     if ( $dateid =~
         /^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})/ )
     {
-        $dateid = "$3/$2/$1 - $4:$5:$6";
+        $formatted = "$3/$2/$1 - $4:$5:$6";
     }
 
     # minuteid (12 digits)
     elsif ( $dateid =~ /^([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})/ ) {
-        $dateid = "$3/$2/$1 - $4:$5";
+        $formatted = "$3/$2/$1 - $4:$5";
     }
 
     # dayid (8 digits)
     elsif ( $dateid =~ /^([0-9]{4})([0-9]{2})([0-9]{2})/ ) {
-        $dateid = "$3/$2/$1";
+        $formatted = "$3/$2/$1";
     }
 
     # monthid (6 digits)
@@ -293,11 +378,19 @@ sub dateid2str {
         my $month = $2 - 1;    # 0-indexed
 
         # Fallback to default months if array missing
-        my $months_ref = $self->{months};
-        $dateid = "$months_ref->[$month] $year";
+        my $months_ref = ( ref $self && $self->{months} ) // ( $self->can('months') ? $self->months() : $DEFAULT_MONTHS );
+        $formatted = "$months_ref->[$month] $year";
+    }
+    else {
+        $formatted = $dateid;
     }
 
-    return $dateid;
+    if ( ref $self ) {
+        $self->{_date}{dateid2str} = {} if keys %{ $self->{_date}{dateid2str} || {} } > $MAX_CACHE_ENTRIES;
+        $self->{_date}{dateid2str}{$dateid} = $formatted;
+    }
+
+    return $formatted;
 }
 
 # ------------------------------------------------
@@ -305,16 +398,29 @@ sub dateid2str {
 # ------------------------------------------------
 sub time2str {
     my ( $self, $time ) = @_;
-    $time //= time();
+    $time //= ( ref $self ? ( $self->{time} //= time() ) : time() );
 
+    if ( ref $self && exists $self->{_date}{time2str}{$time} ) {
+        return $self->{_date}{time2str}{$time};
+    }
+
+    my $str;
     eval { require HTTP::Date; };
     if ($@) {
-
         # Basic fallback string format if HTTP::Date is missing
         my $d = $self->get_date($time);
-        return $d->{str};
+        $str = $d->{str};
     }
-    return HTTP::Date::time2str($time);
+    else {
+        $str = HTTP::Date::time2str($time);
+    }
+
+    if ( ref $self ) {
+        $self->{_date}{time2str} = {} if keys %{ $self->{_date}{time2str} || {} } > $MAX_CACHE_ENTRIES;
+        $self->{_date}{time2str}{$time} = $str;
+    }
+
+    return $str;
 }
 
 # ------------------------------------------------
@@ -323,6 +429,12 @@ sub time2str {
 sub day_range {
     my ( $self, $start, $end ) = @_;
     return unless $start && $end;
+
+    my $range_key = "$start:$end";
+    if ( ref $self && exists $self->{_date}{day_range}{$range_key} ) {
+        my $cached = $self->{_date}{day_range}{$range_key};
+        return wantarray ? @$cached : scalar(@$cached);
+    }
 
     my ( $start_year, $start_month, $start_day ) =
       ( $start =~ /([0-9]{4})([0-9]{2})([0-9]{2})/ );
@@ -385,7 +497,13 @@ sub day_range {
             }
         }
     }
-    return @days;
+
+    if ( ref $self ) {
+        $self->{_date}{day_range} = {} if keys %{ $self->{_date}{day_range} || {} } > $MAX_CACHE_ENTRIES;
+        $self->{_date}{day_range}{$range_key} = [@days];
+    }
+
+    return wantarray ? @days : scalar(@days);
 }
 
 # ------------------------------------------------
@@ -393,6 +511,12 @@ sub day_range {
 # ------------------------------------------------
 sub dateid2week {
     my ( $self, $dateid ) = @_;
+    return unless defined $dateid && length($dateid);
+
+    if ( ref $self && exists $self->{_date}{dateid2week}{$dateid} ) {
+        my $cached = $self->{_date}{dateid2week}{$dateid};
+        return wantarray ? @$cached : $cached->[0];
+    }
 
     my $daytime;
     my ( $y, $m, $d, $h, $min, $s ) = ( 0, 0, 0, 0, 0, 0 );
@@ -425,6 +549,11 @@ sub dateid2week {
     my $days  = ( $yday - $wday ) / 7;
     my $yweek = ( $days =~ /([0-9]+)\./ ) ? ( $1 + 2 ) : ( $days + 1 );
 
+    if ( ref $self ) {
+        $self->{_date}{dateid2week} = {} if keys %{ $self->{_date}{dateid2week} || {} } > $MAX_CACHE_ENTRIES;
+        $self->{_date}{dateid2week}{$dateid} = [ $yweek, $wday, $yday ];
+    }
+
     return wantarray ? ( $yweek, $wday, $yday ) : $yweek;
 }
 
@@ -433,6 +562,14 @@ sub dateid2week {
 # ------------------------------------------------
 sub offset2date {
     my ( $self, $string ) = @_;
+    return unless defined $string && length($string);
+
+    my $today = ref $self ? $self->day_id : undef;
+    my $cache_key = defined $today ? "$today:$string" : undef;
+
+    if ( $cache_key && exists $self->{_date}{offset2date}{$cache_key} ) {
+        return $self->{_date}{offset2date}{$cache_key};
+    }
 
     my $ls = ( $string =~ /^\-/ )       ? -1 : 1;
     my $dd = ( $string =~ /([0-9]+)D/ ) ? $1 : 0;
@@ -453,8 +590,9 @@ sub offset2date {
           ( $mm * $unit->{month} ) +
           ( $yy * $unit->{year} ) );
 
+    my $base_time = ref $self ? ( $self->{time} //= time() ) : time();
     my ( $second, $minute, $hour, $day, $month, $year, $dnumber ) =
-      ( localtime( time() + $all_diff ) )[ 0, 1, 2, 3, 4, 5, 6 ];
+      ( localtime( $base_time + $all_diff ) )[ 0, 1, 2, 3, 4, 5, 6 ];
 
     $year  += 1900;
     $month += 1;
@@ -462,7 +600,14 @@ sub offset2date {
     $month = sprintf "%02d", $month;
     $day   = sprintf "%02d", $day;
 
-    return $year . $month . $day;
+    my $res = $year . $month . $day;
+
+    if ( $cache_key && ref $self ) {
+        $self->{_date}{offset2date} = {} if keys %{ $self->{_date}{offset2date} || {} } > $MAX_CACHE_ENTRIES;
+        $self->{_date}{offset2date}{$cache_key} = $res;
+    }
+
+    return $res;
 }
 
 # ------------------------------------------------
@@ -472,13 +617,22 @@ sub MonthDaysInYear {
     my ( $self, $year_offset ) = @_;
     $year_offset //= 0;
 
+    my $cur_year = ref $self ? $self->year : ( (localtime)[5] + 1900 );
+    my $cache_key = "$cur_year:$year_offset";
+
+    if ( ref $self && exists $self->{_date}{monthdays}{$cache_key} ) {
+        my $cached = $self->{_date}{monthdays}{$cache_key};
+        return wantarray ? @$cached : scalar(@$cached);
+    }
+
     my $hour = 60 * 60;
     my $day  = 24 * $hour;
 
     # Approximate year offset calculation
     my $yy_time = ( ( $day * 365 ) + ( $hour * 6 ) ) * $year_offset;
 
-    my ( $yy_month, $yy_year ) = ( localtime( time() + $yy_time ) )[ 4, 5 ];
+    my $base_time = ref $self ? ( $self->{time} //= time() ) : time();
+    my ( $yy_month, $yy_year ) = ( localtime( $base_time + $yy_time ) )[ 4, 5 ];
 
     my @MonthDays = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
 
@@ -490,7 +644,26 @@ sub MonthDaysInYear {
         $MonthDays[1] = 29;
     }
 
+    if ( ref $self ) {
+        $self->{_date}{monthdays} = {} if keys %{ $self->{_date}{monthdays} || {} } > $MAX_CACHE_ENTRIES;
+        $self->{_date}{monthdays}{$cache_key} = [ $yy_month, @MonthDays ];
+    }
+
     return ( $yy_month, @MonthDays );
+}
+
+# ------------------------------------------------
+# Flushes date cache and memoized accessor values
+# ------------------------------------------------
+sub reset_date {
+    my ($self) = @_;
+    return unless ref $self;
+    %{ $self->{_date} } = () if $self->{_date};
+    undef $self->{time};
+    for my $k (qw(day_id second_id month_id hour_id minute_id year month day hour minute second date_str date_short only_time monthname dayname year_dir)) {
+        eval { delete $self->{$k}; };
+    }
+    return $self;
 }
 
 1;

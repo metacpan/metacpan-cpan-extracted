@@ -13,17 +13,17 @@ use AmberDB;
 use AmberDB::Tools;
 
 my $perl_exe = $^X;
-my $script_path = File::Spec->catfile('bin', 'amberdb_setup.pl');
-ok( -f $script_path, "Found bin/amberdb_setup.pl" );
+my $script_path = File::Spec->catfile('bin', 'amberdb_cli.pl');
+ok( -f $script_path, "Found bin/amberdb_cli.pl" );
 
 # ==============================================================================
-# TEST 1: Check amberdb_setup.pl --action=update-amberdb --check
+# TEST 1: Check amberdb_cli.pl update version --check
 # ==============================================================================
 {
-    my $cmd = qq{"$perl_exe" -Ilib "$script_path" --action=update-amberdb --check};
+    my $cmd = qq{"$perl_exe" -Ilib "$script_path" update version --check};
     my $out = `$cmd`;
-    like( $out, qr/AmberDB Core Engine Update Utility/i, "update-amberdb banner output correctly" );
-    like( $out, qr/Current Engine Version\s*:\s*\d+\.\d+/i, "Current Engine Version printed" );
+    like( $out, qr/AmberDB Core Engine Update Utility/i, "update version banner output correctly" );
+    like( $out, qr/Current Engine Version\s*:\s*v?\d+\.\d+/i, "Current Engine Version printed" );
 }
 
 # ==============================================================================
@@ -57,11 +57,11 @@ $adb->table_close($table_file);
 ok( -d $scheme_dir, "Legacy scheme/ directory created" );
 ok( -f $table_file, "Created legacy table in tables/ directory" );
 
-# Execute update-storage
+# Execute update-storage via amberdb_cli.pl update storage
 {
-    my $cmd = qq{"$perl_exe" -Ilib "$script_path" --action=update-storage --dbase_dir="$tmpdir" --all};
+    my $cmd = qq{"$perl_exe" -Ilib "$script_path" update storage --dbase_dir="$tmpdir" --all};
     my $out = `$cmd`;
-    like( $out, qr/AmberDB Storage, Directory & Compatibility Migration Engine/i, "update-storage banner displayed" );
+    like( $out, qr/AmberDB Storage, Directory & Compatibility Migration Engine/i, "update storage banner displayed" );
     like( $out, qr/v5\.21\.0/i, "v5.21.0 migration stage executed" );
     like( $out, qr/v5\.25\.0/i, "v5.25.0 migration stage executed" );
     like( $out, qr/Migrated!/i, "Legacy table migrated to ABR v5 reported" );
@@ -78,10 +78,11 @@ ok( -d $table_dir, "v5.25.0: table/ directory exists" );
 ok( -f File::Spec->catfile($table_dir, "$sample_table.db"), "v5.25.0: Table file exists in table/ directory" );
 
 # Verify standard layout directories created
-for my $subdir (qw(table schema journal session lock config ramdisk)) {
+for my $subdir (qw(table schema journal session lock config)) {
     my $d = File::Spec->catdir( $tmpdir, $subdir );
     ok( -d $d, "Directory '$subdir' exists and verified" );
 }
+ok( !-d File::Spec->catdir( $tmpdir, 'ramdisk' ), "Zero-fallback: Fake 'ramdisk' directory is NOT created on disk" );
 
 # Verify storage_version.json created and stamped with 5.25.0
 my $ver_file = File::Spec->catfile( $tmpdir, 'config', 'storage_version.json' );
@@ -99,7 +100,7 @@ if ( -f $ver_file ) {
 
 # Verify check mode on updated database
 {
-    my $cmd = qq{"$perl_exe" -Ilib "$script_path" --action=update-storage --dbase_dir="$tmpdir" --check};
+    my $cmd = qq{"$perl_exe" -Ilib "$script_path" update storage --dbase_dir="$tmpdir" --check};
     my $out = `$cmd`;
     like( $out, qr/already at latest version/i, "update-storage detects database is already up to date" );
 }

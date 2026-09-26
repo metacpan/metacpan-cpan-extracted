@@ -85,6 +85,16 @@ sub new {
         # third-party APIs that reject unknown headers, or that shouldn't learn this app's trace
         # ids at all.
         trace_propagation_targets => undef,
+        # Sends one startup snapshot per process after init() (the Perl version; see
+        # ForgeOps::Tracker::Changes), which ForgeOps diffs against the previous boot's to record
+        # what changed between deploys. On by default, like every other automatic behavior here.
+        detect_changes => 1,
+        # Whether that snapshot also lists the names of this process's environment variables, so an
+        # added or removed variable shows up as a change. Off by default: names only, never values,
+        # but even names can say more about an app than some teams want to share. Host-specific
+        # names (HOSTNAME, PATH, PORT, and so on; see ForgeOps::Tracker::Changes) are always left
+        # out.
+        track_env_var_names => 0,
     }, $class;
 }
 
@@ -155,6 +165,24 @@ sub infrastructure_metrics_uri {
 }
 
 # Same derivation again, swapping the trailing "/events" for "/spans".
+sub changes_uri {
+    my ($self) = @_;
+    my $uri = $self->ingestion_uri;
+    return undef unless defined $uri;
+
+    (my $swapped = $uri) =~ s{/events\z}{/changes};
+    return $swapped;
+}
+
+sub change_snapshots_uri {
+    my ($self) = @_;
+    my $uri = $self->ingestion_uri;
+    return undef unless defined $uri;
+
+    (my $swapped = $uri) =~ s{/events\z}{/change_snapshots};
+    return $swapped;
+}
+
 sub spans_uri {
     my ($self) = @_;
     my $uri = $self->ingestion_uri;

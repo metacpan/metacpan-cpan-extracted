@@ -1,17 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.9.0
+## Version v0.9.3
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/27
+## Modified 2026/08/05
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+## under the same terms as Perl itself.##
+##----------------------------------------------------------------------------##
 ## This package's purpose is to automatically terminate the statement object and
 ## separate them from the connection object (DB::Object).
 ## Connection object last longer than statement objects
@@ -21,6 +20,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( DB::Object );
     use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use Scalar::Util ();
@@ -28,7 +28,7 @@ BEGIN
     use Wanted;
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.9.0';
+    our $VERSION = 'v0.9.3';
 };
 
 use strict;
@@ -78,7 +78,7 @@ sub attach
         }
         else
         {
-            warn( "Table object found (", $self->_str_val( $tbl ), ") in this statement object is actually not a table object (${base_class}::Tables) !" );
+            warn( "Table object found (", $self->_str_val( $tbl ), ") in this statement object is actually not a table object (${base_class}::Tables) !" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
             $self->table_object( undef );
         }
     }
@@ -184,14 +184,14 @@ sub dump
         # return( $self->error( "Error while preparing query to dump result on select:\n$query" ) );
         # $sth->execute() ||
         # return( $self->error( "Error while executing query to dump result on select:\n$query" ) );
-        $self->_load_class( 'DateTime' ) || return( $self->pass_error );
+        $self->_load_class( 'DateTime::Lite' ) || return( $self->pass_error );
         my $fields = $self->{_fields};
         my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
         # new_file is inherited from Module::Generic
         $file = $self->new_file( $file );
         my $io = $file->open( '>', { binmode => 'utf8' }) ||
             return( $self->error( "Unable to open file '$file' in write mode: ", $file->error ) );
-        my $date = DateTime->now;
+        my $date = DateTime::Lite->now;
         my $table = $self->{table};
         $io->printf( "## Generated on %s for table $table\n", $date->strftime( '%c' ) );
         $io->print( "## ", CORE::join( "\t", @header ), "\n" );
@@ -357,6 +357,13 @@ sub execute
             # { $some_value => 'varchar' }
             if( ref( $_[$i] ) eq 'HASH' && 
                 scalar( keys( %{$_[$i]} ) ) == 1 &&
+                $self->database_object->datatype_to_constant( [values( %{$_[$i]} )]->[0] ) )
+            {
+                my $constant = $self->database_object->datatype_to_constant( [values( %{$_[$i]} )]->[0] );
+                $temp->{$i} = { type => $constant, value => [keys( %{$_[$i]} )]->[0] };
+            }
+            elsif( ref( $_[$i] ) eq 'HASH' && 
+                scalar( keys( %{$_[$i]} ) ) == 1 &&
                 # e.g. DBI::SQL_VARCHAR or DBI::SQL_INTEGER
                 DBI->can( "SQL_" . uc( [values( %{$_[$i]} )]->[0] ) ) )
             {
@@ -391,7 +398,7 @@ sub execute
     {
         # Flag we use a bit below
         $bind_mismatch++;
-        warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}\n", scalar( @binded ), scalar( @binded_types ), CORE::join( "','", map{ ref( $_ ) eq 'HASH' ? $self->Module::Generic::dump( $_ ) : $_ } @binded_types ) ) );
+        warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}", scalar( @binded ), scalar( @binded_types ), CORE::join( "','", map{ ref( $_ ) eq 'HASH' ? $self->Module::Generic::dump( $_ ) : $_ } @binded_types ) ) ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
         # Cancel it, because it will create problems
         @binded_types = ();
     }
@@ -425,7 +432,7 @@ sub execute
             ( $elem = $el->elements->[$i] ) &&
             defined( $elem ) &&
             $self->_is_a( $elem->fo => 'DB::Object::Fields::Field' ) &&
-            ( $elem->fo->type eq 'jsonb' || $elem->fo->type eq 'json' ) &&
+            ( ( $elem->fo->type // '' ) eq 'jsonb' || ( $elem->fo->type // '' ) eq 'json' ) &&
             $self->_is_hash( $binded[$i] => 'strict' ) )
         {
             # try-catch
@@ -443,17 +450,17 @@ sub execute
                 $binded[$i] = $json;
             }
         }
-        # If the value provided is a DateTime object without a formatter, we transform the given value into a ISO8601 datetime string
+        # If the value provided is a DateTime::Lite object without a formatter, we transform the given value into a ISO8601 datetime string
         elsif( defined( $el ) &&
             !$bind_mismatch &&
             ( $elem = $el->elements->[$i] ) &&
             defined( $elem ) &&
             $self->_is_a( $elem->fo => 'DB::Object::Fields::Field' ) &&
-            ( $elem->fo->type =~ /^(date|timestamp)/i || $elem->fo->datatype->alias->grep( qr/^(date|timestamp)/i )->length ) &&
+            ( ( $elem->fo->type // '' ) =~ /^(date|timestamp)/i || $elem->fo->datatype->alias->grep( qr/^(date|timestamp)/i )->length ) &&
             defined( $binded[$i] ) &&
-            $self->_is_a( $binded[$i] => 'DateTime' ) &&
-            # There is no formatter
-            !$binded[$i]->formatter )
+            $self->_is_a( $binded[$i] => [qw( DateTime DateTime::Lite )] ) &&
+            # There is no formatter, or it is set to a Unix timestamp
+            ( !$binded[$i]->formatter || ( $binded[$i]->stringify // '' ) =~ /^\d+$/ ) )
         {
             $binded[$i] = $binded[$i]->iso8601;
         }
@@ -464,6 +471,10 @@ sub execute
             ref( $binded[$i] ) ne 'ARRAY' )
         {
             $binded[$i] = [@{$binded[$i]}];
+        }
+        elsif( $self->_is_a( $binded[$i] => [qw( DateTime::Lite DateTime )] ) )
+        {
+            $binded[$i] = $binded[$i]->iso8601;
         }
         elsif( $self->_is_object( $binded[$i] ) && 
                overload::Overloaded( $binded[$i] ) && 
@@ -478,6 +489,23 @@ sub execute
                $self->_can( $binded[$i], 'as_json' ) )
         {
             $binded[$i] = $binded[$i]->as_json;
+        }
+        elsif( $self->_is_hash( $binded[$i] => 'strict' ) )
+        {
+            # try-catch
+            local $@;
+            my $json = eval
+            {
+                $self->new_json->encode( $binded[$i] );
+            };
+            if( $@ )
+            {
+                warn( "Error trying to encode hash value ", $binded[$i], ": $@" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
+            }
+            else
+            {
+                $binded[$i] = $json;
+            }
         }
     }
 
@@ -546,9 +574,12 @@ sub execute
     }
     if( $error )
     {
-        $error =~ s/ at (\S+\s)?line \d+.*$//s;
+        if( $error =~ / at (\S+\s)?line \d+.*$/ )
+        {
+            $error =~ s/ at (\S+\s)?line \d+.*$//s;
+        }
         # $err .= ":\n\"$self->{ 'query' }\"";
-        $error .= ":\n\"$self->{sth}->{Statement}\"";
+        # $error .= ":\n\"$self->{sth}->{Statement}\"";
         $error = "Error while trying to execute query $self->{sth}->{Statement}: $error";
         if( $self->fatal() )
         {
@@ -597,7 +628,7 @@ sub fetchall_arrayref($@)
     my $self  = shift( @_ );
     my $slice = shift( @_ ) || [];
     my $dbo   = $self->database_object;
-    my $sth   = $self->{sth};
+    my $sth   = $self->{sth} || die( "Unable to get the underlying statement handler!" );
     if( !$self->executed() )
     {
         $self->execute() || return;
@@ -618,11 +649,11 @@ sub fetchall_arrayref($@)
     {
         if( @$slice )
         {
-            push( @rows, [ @{ $row }[ @{ $slice } ] ] ) while( $row = $sth->fetch() );
+            push( @rows, [ @{$row}[ @$slice ] ] ) while( $row = $sth->fetch() );
         }
         else
         {
-            push( @rows, [ @{ $row } ] ) while( $row = $sth->fetch );
+            push( @rows, [ @$row ] ) while( $row = $sth->fetch );
         }
     }
     elsif( $mode eq 'HASH' )
@@ -636,7 +667,7 @@ sub fetchall_arrayref($@)
             while( $row = $sth->fetchrow_hashref() )
             {
                 my %hash;
-                @hash{ @o_keys } = @{ $row }{ @$i_keys };
+                @hash{ @o_keys } = @{$row}{ @$i_keys };
                 push( @rows, \%hash );
             }
         }
@@ -647,7 +678,12 @@ sub fetchall_arrayref($@)
     }
     else
     {
-        warn( "fetchall_arrayref($mode) invalid" );
+        warn( "fetchall_arrayref($mode) invalid" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
+    }
+
+    if( !scalar( @rows ) && $sth->err )
+    {
+        $self->error({ code => $sth->err, message => $sth->errstr });
     }
     # return( \@rows );
     return( \@rows ) if( !$need_post_processing );
@@ -662,6 +698,7 @@ sub fetchcol($;$)
     my $self = shift( @_ );
     # @arr = $sth->fetchcol( $col_number );
     my $col_num = shift( @_ );
+    my $sth     = $self->{sth} || die( "Unable to get the underlying statement handler!" );
     if( !$self->executed() )
     {
         $self->execute() || return( $self->pass_error );
@@ -675,6 +712,10 @@ sub fetchcol($;$)
     {
         push( @col, $ref->[ $col_num ] );
     }
+    if( !defined( $ref ) && $sth->err )
+    {
+        $self->error({ code => $sth->err, message => $sth->errstr });
+    }
     return( @col );
 }
 
@@ -682,6 +723,7 @@ sub fetchhash(@)
 {
     my $self = shift( @_ );
     my $dbo  = $self->database_object;
+    my $sth  = $self->{sth} || die( "Unable to get the underlying statement handler!" );
     if( !$self->executed() )
     {
         $self->execute() || return( $self->pass_error );
@@ -696,8 +738,11 @@ sub fetchhash(@)
     # $self->_cleanup();
     # %hash = $sth->fetchhash;
     # return( $h->fetchhash );
-    my $sth = $self->{sth} || die( "Unable to get the underlying statement handler!" );
     my $ref = $sth->fetchrow_hashref();
+    if( !defined( $ref ) && $sth->err )
+    {
+        $self->error({ code => $sth->err, message => $sth->errstr });
+    }
     if( $ref ) 
     {
         if( $dbo->auto_decode_json || $dbo->auto_convert_datetime_to_object )
@@ -716,6 +761,7 @@ sub fetchhash(@)
 sub fetchrow(@)
 {
     my $self = shift( @_ );
+    my $sth  = $self->{sth} || die( "Unable to get the underlying statement handler!" );
     if( !$self->executed() )
     {
         $self->execute() || return( $self->pass_error );
@@ -725,7 +771,11 @@ sub fetchrow(@)
     # $firstcol = $sth->fetchrow;   # Scalar context
     # return( $h->fetchrow );
     # my $ref = $self->fetchrow_arrayref();
-    my $ref = $self->{sth}->fetchrow_arrayref();
+    my $ref = $sth->fetchrow_arrayref();
+    if( !defined( $ref ) && $sth->err )
+    {
+        $self->error({ code => $sth->err, message => $sth->errstr });
+    }
     # my $ref = $self->{sth}->fetch();
     if( $ref ) 
     {
@@ -742,9 +792,9 @@ sub fetchrow_hashref
 {
     my $self = shift( @_ );
     my $dbo  = $self->database_object;
-    my $deb = {};
-    %$deb = %$self;
-    my $sth = $self->{sth};
+    my $deb  = {};
+    %$deb    = %$self;
+    my $sth  = $self->{sth} || die( "Unable to get the underlying statement handler!" );
     if( !$self->executed() )
     {
         $self->execute() || return( $self->pass_error );
@@ -757,6 +807,13 @@ sub fetchrow_hashref
         $self->_cache_field_types;
     }
     my $ref = $sth->fetchrow_hashref;
+    # DBI documentation says:
+    # "If there are no more rows or if an error occurs, then fetchrow_hashref returns an undef. You should check $sth->err afterwards (or use the RaiseError attribute) to discover if the undef returned was due to an error."
+    # Also: <https://metacpan.org/pod/DBI#errstr>
+    if( !defined( $ref ) && $sth->err )
+    {
+        $self->error({ code => $sth->err, message => $sth->errstr });
+    }
     $ref = $self->_convert_json2hash({ statement => $sth, data => $ref }) if( $dbo->auto_decode_json );
     $ref = $self->_convert_datetime2object({ statement => $sth, data => $ref }) if( $dbo->auto_convert_datetime_to_object );
     return( $ref );
@@ -767,6 +824,7 @@ sub fetchrow_object
     my $self = shift( @_ );
     # This should give us something like Postgres or Mysql or SQLite
     my $basePack = ( ref( $self ) =~ /^DB::Object::([^\:]+)/ )[0];
+    my $sth      = $self->{sth} || die( "Unable to get the underlying statement handler!" );
     if( !$self->executed() )
     {
         $self->execute() || return( $self->pass_error );
@@ -774,6 +832,12 @@ sub fetchrow_object
     # $self->_cleanup();
     my $rows = $self->{sth}->rows;
     my $ref = $self->{sth}->fetchrow_hashref();
+    # DBI documentation says:
+    # "If there are no more rows or if an error occurs, then fetchrow_hashref returns an undef. You should check $sth->err afterwards (or use the RaiseError attribute) to discover if the undef returned was due to an error."
+    if( !defined( $ref ) && $sth->err )
+    {
+        $self->error({ code => $sth->err, message => $sth->errstr });
+    }
     if( $ref && scalar( keys( %$ref ) ) ) 
     {
         my $struct = { map{ $_ => '$' } keys( %$ref ) };
@@ -1135,7 +1199,7 @@ sub join
         }
         else
         {
-            warn( "Warning: I have no clue what to do with '$on' (", overload::StrVal( $on ), ") in this join for table \"", $q->table_object->name, "\"\n" );
+            warn( "Warning: I have no clue what to do with '$on' (", overload::StrVal( $on ), ") in this join for table \"", $q->table_object->name, "\"" ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
         }
     }
     # Otherwise, this is a straight JOIN
@@ -1359,7 +1423,7 @@ sub _convert_datetime2object
     my $opts = $self->_get_args_as_hash( @_ );
     my $sth = $opts->{statement} || return( $self->error( "No statement handler was provided to convert data from json to perl." ) );
     # my $data = $opts->{data} || return( $self->error( "No data was provided to convert from json to perl." ) );
-    return( $opts->{data} ) if( !CORE::length( $opts->{data} ) );
+    return( $opts->{data} ) if( !defined( $opts->{data} ) || !CORE::length( $opts->{data} ) );
     my $data  = $opts->{data};
     # my $names = $sth->FETCH('NAME');
     # my $types = $sth->FETCH('pg_type');
@@ -1383,7 +1447,7 @@ sub _convert_datetime2object
                     my $dt = $self->_convert_string2datetime( $data->[ $j ]->{ $names->[ $i ] } );
                     if( !defined( $dt ) )
                     {
-                        warn( $self->error );
+                        warn( $self->error ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
                     }
                     $data->[ $j ]->{ $names->[ $i ] } = $dt;
                 }
@@ -1394,7 +1458,7 @@ sub _convert_datetime2object
                 my $dt = $self->_convert_string2datetime( $data->{ $names->[ $i ] } );
                 if( !defined( $dt ) )
                 {
-                    warn( $self->error );
+                    warn( $self->error ) if( $self->_is_warnings_enabled( 'DB::Object' ) );
                 }
                 $data->{ $names->[ $i ] } = $dt;
             }
@@ -1585,18 +1649,15 @@ sub THAW
         }
 
         my $has_stmt = 0;
-        my $has_base = 0;
-
         foreach my $p ( @$isa_ref )
         {
             # Same as what we can find in modules DB::Object::(Postgres|SQLite|Mysql)::Statement
             $has_stmt = 1 if( CORE::defined( $p ) && $p eq 'DB::Object::Statement' );
-            $has_base = 1 if( CORE::defined( $p ) && $p eq $base_class );
         }
 
-        if( !$has_stmt || !$has_base )
+        if( !$has_stmt )
         {
-            @$isa_ref = ( 'DB::Object::Statement', $base_class );
+            @$isa_ref = ( 'DB::Object::Statement' );
         }
     }
     my $new;
@@ -1663,15 +1724,21 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.9.0
+v0.9.3
 
 =head1 DESCRIPTION
 
 This is the statement object package from which other driver specific packages inherit from.
 
+Any methods not documented here is called directly via the SQL driver.
+
+If an error occurs, C<undef> or an an empty list is returned, and the error code, if any, can be retrieved with C<< $sth->error->code >> and the error message, if any, with C<< $sth->error->message >>
+
 =head1 METHODS
 
 =head2 as_string
+
+    my $value = $sth->as_string;
 
 Returns the current statement object as a string.
 
@@ -1696,6 +1763,9 @@ If the statement parameter I<autocommit> is true, a C<COMMIT> statement will be 
 The current object is returned.
 
 =head2 database_object
+
+    my $value = $sth->database_object;
+    $sth->database_object( $value );
 
 Sets or gets the current database object.
 
@@ -1763,6 +1833,8 @@ Likewise, if the table field is of type C<json> or C<jsonb> and an hash referenc
 
 =head2 executed
 
+    my $value = $sth->executed;
+
 Returns true if this statement has already been executed, and false otherwise.
 
 =head2 fetchall_arrayref
@@ -1775,13 +1847,23 @@ Provided with an integer that represents a column number, starting from 0, and t
 
 it returns a list of those column value fetched.
 
+If an error has occurred, an empty list is returned, and the error code, if any, can be retrieved with C<< $sth->error->code >> and the error message, if any, with C<< $sth->error->message >>
+
 =head2 fetchhash
+
+    my $value = $sth->fetchhash;
 
 This will retrieve an hash reference for the given row and return it as a regular hash.
 
+If an error has occurred, an empty hash is returned, and the error code, if any, can be retrieved with C<< $sth->error->code >> and the error message, if any, with C<< $sth->error->message >>
+
 =head2 fetchrow
 
-This will retrieve the data from database using L</fetchrow_arrayref> and return the list of data as array in list context, or the first entry of the array in scalar context.
+    my $value = $sth->fetchrow;
+
+This will retrieve the data from database using L<DBI/fetchrow_arrayref> and return the list of data as array in list context, or the first entry of the array in scalar context.
+
+If an error has occurred, an empty list is returned, and the error code, if any, can be retrieved with C<< $sth->error->code >> and the error message, if any, with C<< $sth->error->message >>
 
 =head2 fetchrow_hashref
 
@@ -1789,15 +1871,19 @@ This will retrieve the data from the database as an hash reference.
 
 It will convert any data from json to hash reference if L<DB::Object/auto_decode_json> is set to true.
 
-it will also convert any datetime data into a L<DateTime> object if L<DB::Object/auto_convert_datetime_to_object> is true.
+it will also convert any datetime data into a L<DateTime::Lite> object if L<DB::Object/auto_convert_datetime_to_object> is true.
 
 It returns the hash reference retrieved.
+
+If an error has occurred, C<undef> is returned, and the error code, if any, can be retrieved with C<< $sth->error->code >> and the error message, if any, with C<< $sth->error->message >>
 
 =head2 fetchrow_object
 
 This will create dynamically a package named C<DB::Object::Postgres::Result::SomeTable> for example and load the hash reference retrieved from the database into this dynamically created packackage.
 
 It returns the object thus created.
+
+If an error has occurred, C<undef> is returned, and the error code, if any, can be retrieved with C<< $sth->error->code >> and the error message, if any, with C<< $sth->error->message >>
 
 =head2 field_names
 
@@ -1865,6 +1951,8 @@ You can important those constant with C<use DBI ':sql_types'>
 See also L<https://metacpan.org/pod/DBI#TYPE>
 
 =head2 finish
+
+    my $value = $sth->finish;
 
 Calls L<DBI/finish> and return the returned value, or an error if an error occurred.
 
@@ -1999,15 +2087,24 @@ This the same as calling L</execute>, except that the query will be executed asy
 
 =head2 query
 
+    my $value = $sth->query;
+    $sth->query( $value );
+
 Sets or gets the previously formatted query as a regular string.
 
 =head2 query_object
+
+    my $value = $sth->query_object;
+    $sth->query_object( $value );
 
 Sets or gets the query object used in this query.
 
 =head2 query_time
 
-Sets or gets the query time as a L<DateTime> object.
+    my $value = $sth->query_time;
+    $sth->query_time( $value );
+
+Sets or gets the query time as a L<DateTime::Lite> object.
 
 =head2 rollback
 
@@ -2015,9 +2112,13 @@ If there is a statement handler and the database parameter C<autocommit> is set 
 
 =head2 rows
 
+    my $value = $sth->rows;
+
 Returns the number of rows affected by the last query.
 
 =head2 statement
+
+    my $value = $sth->statement;
 
 Returns the SQL statement that was sent to the server to be prepared.
 
@@ -2025,13 +2126,22 @@ This is different from L<as_string|/as_string> in that L<as_string|/as_string> r
 
 =head2 sth
 
+    my $value = $sth->sth;
+    $sth->sth( $value );
+
 Sets or gets the L<DBI> statement handler.
 
 =head2 table
 
+    my $value = $sth->table;
+    $sth->table( $value );
+
 Sets or gets the table object (L<DB::Object::Tables>) for this query.
 
 =head2 table_object
+
+    my $value = $sth->table_object;
+    $sth->table_object( $value );
 
 Sets or get the table object (L<DB::Object::Tables>)
 
@@ -2061,7 +2171,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2019-2026 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

@@ -7,7 +7,6 @@
 ## Modified 2026/03/22
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -16,6 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'DB::Object' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
@@ -175,17 +175,26 @@ To instantiate new object, you can pass an hash or hash reference of properties 
 
 =head2 expr
 
+    my $value = $constraint->expr;
+    $constraint->expr( $value );
+
 Sets or gets the foreign key constraint expression.
 
 It returns a L<scalar object|Module::Generic::Scalar>
 
 =head2 fields
 
+    my $value = $constraint->fields;
+    $constraint->fields( $value );
+
 Sets or gets an array reference of table field names associated with this constraint.
 
 It returns a L<array object|Module::Generic::Array>
 
 =head2 match
+
+    my $value = $constraint->match;
+    $constraint->match( $value );
 
 Sets or gets the method a foreign key constraint matches.
 
@@ -195,11 +204,17 @@ It returns a L<scalar object|Module::Generic::Scalar>
 
 =head2 name
 
+    my $value = $constraint->name;
+    $constraint->name( $value );
+
 Sets or gets the foreign key constraint name.
 
 It returns a L<scalar object|Module::Generic::Scalar>
 
 =head2 on_delete
+
+    my $value = $constraint->on_delete;
+    $constraint->on_delete( $value );
 
 Sets or gets the action taken by the database upon deletion of this foreign key.
 
@@ -209,6 +224,9 @@ It returns a L<scalar object|Module::Generic::Scalar>
 
 =head2 on_update
 
+    my $value = $constraint->on_update;
+    $constraint->on_update( $value );
+
 Sets or gets the action taken by the database upon update of this foreign key.
 
 For example: C<nothing>, C<restrict>, C<cascade>, C<null> or C<default>
@@ -216,6 +234,9 @@ For example: C<nothing>, C<restrict>, C<cascade>, C<null> or C<default>
 It returns a L<scalar object|Module::Generic::Scalar>
 
 =head2 table
+
+    my $value = $constraint->table;
+    $constraint->table( $value );
 
 Sets or gets the table name for this foreign key.
 
@@ -231,7 +252,7 @@ L<https://www.postgresql.org/docs/current/tutorial-fk.html>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2023 DEGUEST Pte. Ltd.
+Copyright(c) 2023-2026 DEGUEST Pte. Ltd.
 
 All rights reserved
 

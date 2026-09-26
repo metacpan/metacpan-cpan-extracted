@@ -8,32 +8,20 @@
 ## Modified 2024/09/04
 ## All rights reserved
 ## 
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
-#----------------------------------------------------------------------------
-# DB/Object/Mysql/Statement.pm
-# Version 0.3
-# Copyright(c) 2019 Jacques Deguest
-# Author: Jacques Deguest <jack@deguest.jp>
-# Created 2017/07/19
-# Modified 2019/06/17
-# All rights reserved.
-# 
-# This program is free software; you can redistribute it and/or modify it 
-# under the same terms as Perl itself.
-#----------------------------------------------------------------------------
 # This package's purpose is to automatically terminate the statement object and
 # separate them from the connection object (DB::Object).
 # Connection object last longer than statement objects
-#----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 package DB::Object::Mysql::Statement;
 BEGIN
 {
     use strict;
     use warnings;
-    use parent qw( DB::Object::Statement DB::Object::Mysql );
+    warnings::register_categories( 'DB::Object' );
+    use parent qw( DB::Object::Statement );
     use vars qw( $VERSION $DEBUG );
     our $DEBUG = 0;
     our $VERSION = 'v0.300.2';
@@ -84,7 +72,7 @@ sub dump
     my $vsep  = ",";
     my $hsep  = "\n";
     my $width = 35;
-    $self->_load_class( 'DateTime' ) || return( $self->pass_error );
+    $self->_load_class( 'DateTime::Lite' ) || return( $self->pass_error );
     $self->_load_class( 'Module::Generic::File' ) || return( $self->pass_error );
     my $fh = Module::Generic::File->stdout() ||
         return( $self->pass_error( Module::Generic::File->error ) );
@@ -109,7 +97,7 @@ sub dump
         my $file = $self->new_file( $args->{file} ) || return( $self->pass_error );
         $fh = $file->open( '>', { binmode => 'utf8' }) || return( $self->error( "Unable to open file $file in write mode: $!" ) );
         my @header = sort{ $a <=> $b } @fields;
-        my $date = DateTime->now;
+        my $date = DateTime::Lite->now;
         my $table = $self->{table};
         $fh->printf( "# Generated on %s for table $table\n", $date->strftime( '%c' ) );
         $fh->print( "# ", CORE::join( "\t", @header ), "\n" );
@@ -295,7 +283,7 @@ DESTROY
 };
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -307,7 +295,7 @@ DB::Object::Mysql::Query - Statement Object for MySQL
 =head1 SYNOPSIS
 
     use DB::Object::Mysql::Statement;
-    my $this = DB::Object::Mysql::Statement->new || die( DB::Object::Mysql::Statement->error, "\n" );
+    my $this = DB::Object::Mysql::Statement->new || die( DB::Object::Mysql::Statement->error );
 
 =head1 VERSION
 
@@ -316,6 +304,10 @@ DB::Object::Mysql::Query - Statement Object for MySQL
 =head1 DESCRIPTION
 
 This is a MySQL specific statement object.
+
+Any methods not documented here is called directly via the SQL driver.
+
+If an error occurs, C<undef> or an an empty list is returned, and the error code, if any, can be retrieved with C<< $sth->error->code >> and the error message, if any, with C<< $sth->error->message >>
 
 =head1 METHODS
 
@@ -356,6 +348,8 @@ It returns the newly created statement handler.
 See L<MySQL documentation for more information|https://dev.mysql.com/doc/refman/5.7/en/insert.html>
 
 =head2 only
+
+    my $value = $sth->only;
 
 This returns an error as C<SELECT FROM ONLY> is not supported by MySQL.
 
