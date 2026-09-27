@@ -1,0 +1,21 @@
+Changes
+CONTRIBUTING.md
+cpanfile
+examples/README.md
+examples/site/README.md
+examples/site/build.pl
+examples/site/doc/index.md
+INSTALL
+INSTALL.md
+lib/Task/Markdown/Publish.pm
+lib/Task/Markdown/Publish.pm.md
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+README.md
+SECURITY.md
+t/00-load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

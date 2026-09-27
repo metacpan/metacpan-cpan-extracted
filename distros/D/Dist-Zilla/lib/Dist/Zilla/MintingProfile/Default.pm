@@ -1,4 +1,4 @@
-package Dist::Zilla::MintingProfile::Default 6.039;
+package Dist::Zilla::MintingProfile::Default 6.040;
 # ABSTRACT: Default minting profile provider
 
 use Moose;
@@ -50,7 +50,7 @@ Dist::Zilla::MintingProfile::Default - Default minting profile provider
 
 =head1 VERSION
 
-version 6.039
+version 6.040
 
 =head1 DESCRIPTION
 

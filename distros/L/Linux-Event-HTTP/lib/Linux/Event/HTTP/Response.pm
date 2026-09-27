@@ -8,7 +8,7 @@ use utf8 ();
 
 use Linux::Event::HTTP::_HTTP1 ();
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 my $EMPTY_HEADERS = [];
 
@@ -334,7 +334,7 @@ Linux::Event::HTTP::Response - HTTP response message
 
 =head1 SYNOPSIS
 
-    my $response = Linux::Event::HTTP::Response->new(
+    my $res = Linux::Event::HTTP::Response->new(
         status => 200,
         headers => [
             [ 'Content-Type', 'text/plain' ],
@@ -342,96 +342,85 @@ Linux::Event::HTTP::Response - HTTP response message
         body => "hello\n",
     );
 
-Server callbacks receive the same Response class:
+Server callbacks receive the same class:
 
-    sub on_request ($conn, $req, $res) {
+    on_request => sub ($conn, $req, $res) {
         $res->status(200);
-        $res->header('Content-Type', 'text/plain');
         $res->body("hello\n");
-    }
+    };
 
 =head1 DESCRIPTION
 
-C<Linux::Event::HTTP::Response> represents one HTTP response message. It is not
-a socket, transaction, connection, or writable transport handle. The same
-message class is used for locally constructed outgoing responses and parsed
-incoming client responses.
+C<Linux::Event::HTTP::Response> represents one HTTP response message.
 
-Its public message API conforms directly to the C<Uniform::HTTP> 0.02 message
-contract by behavior without inheriting from a Uniform class. Duplicate fields,
-field order, original field-name spelling, buffered-body state, completeness,
-and mutability are reported explicitly while transport and Transaction state
-remain outside the message.
+The same class is used for HTTP/1 and HTTP/2, and for both locally constructed
+outgoing responses and received client responses.
 
-A Response owns status, reason, version, headers, complete scalar-body data, and
-message completion state. It does not retain its peer Request or the Connection
-that happens to carry it. Exchange lifecycle, output progress, cancellation,
-Upgrade, and incremental body production belong to
-L<Linux::Event::HTTP::Transaction> and the protocol Connection.
+A Response contains message data only. It is not a socket, Transaction,
+connection, or writable transport.
 
-Selecting a complete scalar C<body> on a locally constructed Response makes the
-message body complete immediately. That does not mean the message has been
-written to a transport. Incremental body production is selected through the
-owning Transaction; the Response records only that its body is incomplete until
-the producer announces its final bytes.
+Locally constructed Responses are mutable until protocol commit. Received
+Responses are read-only.
 
-A received client Response normally exposes body bytes incrementally through the
-Client callback path. If the caller explicitly requests bounded whole-body
-buffering, C<body> returns that completed scalar after the message boundary is
-reached. Received response metadata remains committed and read-only either way.
+Incoming client bodies are streaming-first. C<body> contains received body data
+only when bounded buffering was requested explicitly.
+
+=head1 CONSTRUCTOR
+
+    my $res = Linux::Event::HTTP::Response->new(
+        status  => 200,
+        reason  => 'OK',
+        version => '1.1',
+        headers => [ ... ],
+        body    => $bytes,
+    );
+
+C<status> defaults to 200 and C<version> defaults to C<1.1>.
+
+HTTP/2 responses use version C<2> and do not serialize an HTTP/1 reason phrase.
 
 =head1 METHODS
 
-=head2 new
-
-Constructs a mutable response message. C<status> defaults to 200 and C<version>
-defaults to C<1.1>. C<headers> is an optional array reference of C<[name,
-value]> pairs. C<body> is an optional complete scalar byte body.
-
 =head2 status
 
-Gets or sets an HTTP response status from 100 through 599 before message commit.
+Gets or, while mutable, sets a status from 100 through 599.
 
 =head2 reason
 
-Gets or sets the optional HTTP/1 reason phrase before message commit. Passing
-C<undef> clears it; no standard reason phrase is synthesized.
+Gets or, while mutable, sets the optional HTTP/1 reason phrase.
+
+HTTP/2 does not send a reason phrase.
 
 =head2 version
 
-Gets or sets the HTTP version before message commit. Passing C<undef> clears the
-represented version; an HTTP executor will reject an unset version when needed.
+Gets or, while mutable, sets the HTTP version.
 
 =head2 header
 
-Gets the first matching field value. The setter form replaces all fields of the
-same ASCII case-insensitive name with one field at the position of the first
-occurrence, or appends it when absent.
+Gets the first matching field value.
+
+On a mutable Response, the setter replaces all fields of the same
+case-insensitive name with one field.
 
 =head2 add_header
 
-Adds another header field while preserving existing same-name fields.
+Adds another header field without removing existing same-name fields.
 
 =head2 remove_header
 
-Removes all fields with the supplied ASCII case-insensitive name.
+Removes all fields with the supplied case-insensitive name.
 
 =head2 header_values
 
-Returns an array reference containing all matching values in message order. An
-absent field returns an empty array reference. Values are never implicitly
-comma-joined.
+Returns an array reference containing all matching values in message order.
 
 =head2 header_count, header_name, header_value
 
-Provide exact indexed access to fields in message order while preserving the
-original field names. A non-negative index beyond the end returns C<undef>;
-negative and non-integer indexes are programmer errors.
+Provide exact indexed access to the lossless header list.
 
 =head2 headers_are_lossless
 
-Returns true because duplicate occurrences, inter-field order, and original
-field-name spelling are retained.
+Returns true.
 
 =head2 content_length
 
@@ -439,35 +428,29 @@ Returns the declared Content-Length as an integer, or undef when absent.
 
 =head2 body
 
-Gets or sets the complete scalar byte body. Setting it is available only while a
-locally constructed Response is mutable and declares that its message body is
-complete. Incremental output is selected through the owning Transaction rather
-than through the Response message. Passing C<undef> is an error; an explicit
-empty body is C<''>.
+Gets or, while mutable, sets a complete scalar body.
 
-For a received client Response, the getter returns the complete body only when
-the client was explicitly asked to buffer it within a bounded limit. Otherwise
-received body bytes remain incremental and C<body> returns undef.
+Setting a scalar body marks that message body complete. It does not itself mean
+the bytes have already been written to a transport.
+
+For a received client Response, C<body> returns data only when bounded
+C<buffer_body> handling was requested. Otherwise body bytes remain incremental.
 
 =head2 has_buffered_body
 
-Returns true only when a complete scalar body buffer is locally available,
-including an explicit empty buffer.
+True when a complete scalar body is locally available.
 
 =head2 is_complete
 
-Returns whether the complete HTTP message body is known or its final boundary
-has been reached. This is deliberately independent of whether an outgoing
-message has started or finished writing to a transport.
+True when the complete message body boundary is known or has been reached.
 
 =head2 is_mutable
 
-Returns true until the Response metadata is committed to protocol execution and
-false afterward. Mutators throw once the Response is committed.
+True until protocol commit.
 
 =head1 SEE ALSO
 
-L<Uniform::HTTP>, L<Linux::Event::HTTP::Request>,
-L<Linux::Event::HTTP::Transaction>.
+L<Linux::Event::HTTP::Request>, L<Linux::Event::HTTP::Transaction>,
+L<Linux::Event::HTTP::Client>, L<Linux::Event::HTTP::Server>.
 
 =cut

@@ -5,7 +5,7 @@ class Getopt::Pad::Registry {
 	use Carp qw(croak);
 	use Getopt::Pad::Util qw(specError);
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	# Registration errors are reported at the registerType/registerFormat
 	# caller, not inside those one-line forwarders.
@@ -54,13 +54,49 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Registry - name-to-class registry
+Getopt::Pad::Registry - Looks up types and formats by name (internal)
 
 =head1 DESCRIPTION
 
-Name-to-class lookup table used for option Types and config Formats. Classes register under the names their NAMES constant lists; register loads a class's module file first when the package is not defined yet, so builtin lists are plain class names. A name already registered by a different class is refused (registering the same class again is a no-op), so a third-party type cannot silently replace a built-in. Resolution is case insensitive and fails loudly listing all known names.
+This module is internal to Getopt::Pad. It is not part of the public
+API and can change without notice. Programs use L<Getopt::Pad/GetOptions>;
+this page is for people working on Getopt::Pad itself.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+A registry maps names to classes. There are two: one for option types,
+used through L<Getopt::Pad::Type/registerType>, and one for config
+formats, used through L<Getopt::Pad::Config::Format/registerFormat>. They
+are the only places where a type or format name in a spec is resolved.
+
+=head1 METHODS
+
+=over 4
+
+=item new(kind => $kind)
+
+C<$kind> names the registry in messages, such as C<option type>.
+
+=item register(@classes)
+
+Registers every class under the names its C<NAMES> constant lists, in
+lower case. A class without a C<NAMES> method has its module file loaded
+first, so the built-in classes can be listed by name. A name already
+registered by another class makes C<register> die; registering the same
+class again changes nothing. Returns the registry.
+
+=item resolve($name)
+
+The class registered under C<$name>, matched case-insensitively. An
+unknown name is a spec error that lists all known names.
+
+=item knownNames
+
+All registered names, sorted.
+
+=back
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Type>, L<Getopt::Pad::Config::Format>
 
 =head1 AUTHOR
 

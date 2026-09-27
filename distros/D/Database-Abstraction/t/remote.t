@@ -180,4 +180,42 @@ ok(
 	'user@host form accepted',
 );
 
+# ---------------------------------------------------------------------------
+# Section 5: filename => explicit — only one SSH call instead of probing all
+#            candidate extensions.
+# ---------------------------------------------------------------------------
+
+BEGIN {
+	package Database::remotefn;
+	use base 'Database::Abstraction';
+}
+
+# Add a fixture for the explicit-filename path.
+$FIXTURE{'myhost:/data/explicit.csv'} =
+	"entry!town!pop\na!London!9000000\nb!Paris!2000000\n";
+
+{
+	my $calls = 0;
+	my $orig  = \&File::Slurp::Remote::read_remote_file;
+	{
+		no warnings 'redefine';
+		local *File::Slurp::Remote::read_remote_file = sub {
+			$calls++;
+			goto &$orig;
+		};
+
+		my $fn_db = Database::remotefn->new(
+			host      => 'myhost',
+			directory => '/data',
+			filename  => 'explicit.csv',
+		);
+
+		my $fn_all = $fn_db->selectall_arrayref();
+		is(scalar @{$fn_all}, 2, 'filename: 2 rows loaded');
+		my %by_e = map { $_->{'entry'} => $_ } @{$fn_all};
+		is($by_e{'a'}{'town'}, 'London', 'filename: London row correct');
+	}
+	is($calls, 1, 'filename: exactly one SSH call made (no extension probing)');
+}
+
 done_testing();

@@ -5,7 +5,7 @@ use warnings;
 use base qw(Exporter);
 our @EXPORT = qw(output);
 
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 # return stdout, stderr
 sub output {
@@ -29,7 +29,7 @@ Devel::ebug::Plugin::Output
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 AUTHOR
 

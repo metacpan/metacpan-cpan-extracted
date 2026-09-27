@@ -1,6 +1,6 @@
 package Devel::ebug::Console;
 
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 use strict;
 use warnings;
@@ -19,13 +19,19 @@ sub run {
     die "INT";
   };
 
-  my $filename = join " ", @ARGV;
+  my $ebug = Devel::ebug->new;
 
-  unless ($filename) {
+  # "ebug add.pl 3 4" passes each argument through untouched, while a
+  # single "ebug 'add.pl 3 4'" is still handed to the shell as before
+  my ($filename, @args) = @ARGV;
+  if (@args) {
+    $ebug->args(\@args);
+  }
+
+  unless (defined $filename && length $filename) {
     $filename = '-e "Interactive ebugging shell"';
   }
 
-  my $ebug = Devel::ebug->new;
   $ebug->program($filename);
   $ebug->backend($backend);
   $ebug->load;
@@ -71,7 +77,7 @@ sub run {
       print 'Commands:
 
       b Set break point at a line number (eg: b 6, b code.pl 6, b code.pl 6 $x > 7,
-      b Calc::fib)
+      b Calc::fib, b Calc::fib $_[1] > 5)
      bf break on file loading (eg: bf Calc.pm)
       d Delete a break point (d 6, d code.pl 6)
       e Eval Perl code and print the result (eg: e $x+$y)
@@ -117,9 +123,9 @@ restart Restart the program
       if ($@) {
         die $@ unless $@ =~ /^INT/;
         # SIGINT while the program was running: the backend already
-        # dropped into the debugger, so just refresh our view of it
+        # dropped into the debugger, so pick up where it stopped
         # instead of dying back out to the shell.
-        $ebug->basic;
+        $ebug->wait_for_stop;
       }
     } elsif ($command eq 'restart') {
       $ebug->load;
@@ -135,6 +141,11 @@ restart Restart the program
     } elsif (my($line, $condition) = $command =~ /^b (\d+) ?(.*)/) {
       undef $condition unless $condition;
       $ebug->break_point($line, $condition);
+    } elsif (my($sub, $sub_condition) = $command =~ /^b ((?:\w+::)+\w+)(?: (.+))?$/) {
+      # a fully qualified subroutine name, optionally with a condition;
+      # checked before "b FILE LINE", which would otherwise take a
+      # condition ending in a number as the line
+      $ebug->break_point_subroutine($sub, $sub_condition);
     } elsif ($command =~ /^b (.+?) (\d+) ?(.*)/) {
       $ebug->break_point($1, $2, $3);
     } elsif ($command =~ /^b (.+)/) {
@@ -210,7 +221,7 @@ Devel::ebug::Console
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,10 @@
+# INSTALLATION
+
+Install the released distribution and its Perl prerequisites from CPAN:
+
+```sh
+cpanm Task::Markdown::Pod
+```
+
+Pandoc, xmllint and xsltproc are external programs and must be installed with
+the operating system package manager. See README.md for Fedora package names.

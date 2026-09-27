@@ -1,5 +1,4 @@
 #!perl
-use 5.008003;
 use strict;
 use warnings;
 use Test::More;

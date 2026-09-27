@@ -41,10 +41,6 @@ my %DEVICE = (
     verification_uri => 'https://app.example.test/device', expires_in => 900, interval => 1,
 );
 
-# In the corpus's production document, but no longer advertised or in the pinned
-# spec, so it is not a member of the metadata.
-my %NOT_A_MEMBER = (client_id_metadata_document_supported => 1);
-
 # Answers in order, repeating the last reply, and records what left the client.
 my (@replies, @requests);
 my $origin = VPNDetectionTest::Origin->new(sub {
@@ -222,7 +218,6 @@ subtest 'a 2xx decodes on presence: absent has no key, an empty scope is present
                 { clientId => 'vpndetection-cli', deviceCode => 'mo_dc_x' });
 
             for my $name (sort keys %{ $case->{expect}{present} }) {
-                next if $NOT_A_MEMBER{$name};
                 my $want = $case->{expect}{present}{$name};
                 $want = $want ? 1 : 0 if ref $want eq 'JSON::PP::Boolean';
                 ok(exists $got->{$name}, "$label: $name is present");

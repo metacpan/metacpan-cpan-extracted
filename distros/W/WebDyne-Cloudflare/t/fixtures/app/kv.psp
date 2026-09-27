@@ -1,0 +1,75 @@
+<start_html title="WebDyne Cloudflare KV Smoke" h2>
+<perl handler="kv_smoke">
+<p>KV smoke OK: ${action}</p>
+</perl>
+
+__PERL__
+
+use WebDyne::Cloudflare::KV;
+
+sub kv_smoke {
+    my ($self)=@_;
+    my $cgi_or=$self->CGI();
+    my $action=scalar($cgi_or->param('action')) // '';
+    my $key=scalar($cgi_or->param('key')) // '';
+    die "Invalid KV smoke action\n"
+        unless $action =~ /\A(?:put|get|put_json|get_json|put_bytes|get_bytes|list|delete)\z/;
+    die "Invalid KV smoke key\n"
+        unless $key =~ /\Awebdyne-smoke:[a-z0-9-]{8,80}\z/;
+
+    my $kv_or=WebDyne::Cloudflare::KV->new(
+        scope   => $self->r()->{'scope'},
+        binding => 'CACHE',
+    );
+    my $expected="WebDyne KV $key \x{03c0}";
+
+    if ($action eq 'put') {
+        $kv_or->put($key, $expected, metadata => {
+            suite => 'WebDyne::Cloudflare::KV',
+        })->get();
+    }
+    elsif ($action eq 'put_json') {
+        $kv_or->put_json($key, {
+            framework => 'WebDyne', answer => 42,
+        })->get();
+    }
+    elsif ($action eq 'put_bytes') {
+        $kv_or->put(
+            $key,
+            WebDyne::Cloudflare::KV->blob("\0WebDyne KV\xff"),
+            metadata => { suite => 'WebDyne::Cloudflare::KV' },
+        )->get();
+    }
+    elsif ($action eq 'get') {
+        my $entry_hr=$kv_or->get_with_metadata($key)->get();
+        die "KV smoke value is not visible yet\n"
+            unless ref($entry_hr) eq 'HASH'
+                && defined($entry_hr->{'value'})
+                && $entry_hr->{'value'} eq $expected
+                && ref($entry_hr->{'metadata'}) eq 'HASH'
+                && ($entry_hr->{'metadata'}{'suite'} // '') eq 'WebDyne::Cloudflare::KV';
+    }
+    elsif ($action eq 'get_json') {
+        my $value_hr=$kv_or->get($key, type => 'json')->get();
+        die "KV smoke JSON value is not visible yet\n"
+            unless ref($value_hr) eq 'HASH'
+                && ($value_hr->{'framework'} // '') eq 'WebDyne'
+                && ($value_hr->{'answer'} // 0) == 42;
+    }
+    elsif ($action eq 'get_bytes') {
+        my $entry_hr=$kv_or->get_with_metadata($key, type => 'bytes')->get();
+        die "KV smoke byte value is not visible yet\n"
+            unless ref($entry_hr) eq 'HASH'
+                && defined($entry_hr->{'value'})
+                && $entry_hr->{'value'} eq "\0WebDyne KV\xff";
+    }
+    elsif ($action eq 'list') {
+        my $result_hr=$kv_or->list(prefix => $key, limit => 10)->get();
+        my $found=grep { ($_->{'name'} // '') eq $key } @{$result_hr->{'keys'} // []};
+        die "KV smoke key is not listed yet\n" unless $found;
+    }
+    else {
+        $kv_or->delete($key)->get();
+    }
+    return $self->render(action => $action);
+}

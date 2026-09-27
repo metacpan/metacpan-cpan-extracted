@@ -106,6 +106,7 @@ WriteMakefile(
 			'DBM::Deep' => 0,		# .dbm/.deep/magic-byte .db backend
 			'File::Slurp::Remote' => 0,	# remote host backend (SSH/SCP)
 			'Gzip::Faster' => 0,		# gzip CSV backend
+			'HTML::TableExtract' => 0,	# HTML URL backend
 			'JSON::MaybeXS' => 0,		# JSON backend
 			'LWP::UserAgent::Cached' => 0,	# URL backend (HTML and JSON)
 			'Spreadsheet::ParseXLSX' => 0,	# .xlsx (OOXML Excel) backend

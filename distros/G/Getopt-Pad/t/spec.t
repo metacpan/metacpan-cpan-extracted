@@ -183,4 +183,27 @@ subtest 'command constraints' => sub {
 		qr/unknown option type 'bad'/, 'nested errors surface';
 };
 
+subtest 'inherited option constraints' => sub {
+	like dies { buildSpec(options => { color => { type => 's', inherit => 1 } }) },
+		qr/spec: option 'color': inherit requires commands on the same level/, 'inherit needs commands';
+
+	like dies { buildSpec(commands => { doc => { options => { color => { type => 's', inherit => 1 } } } }) },
+		qr/spec: command 'doc': option 'color': inherit requires commands/, 'also on a nested level';
+
+	like dies {
+		buildSpec(
+			options  => { 'color|c' => { type => 's', inherit => 1 } },
+			commands => { doc => { commands => { create => { options => { c => {} } } } } },
+		);
+	}, qr/spec: command 'doc create': option 'color' inherited from the top level: name 'c' is already used by option 'c'/, 'an inherited name is taken on every level below';
+
+	like dies { buildSpec(commands => { doc => { options => { config => { type => 's' } } } }, config => { format => 'json' }) },
+		qr/spec: command 'doc': option 'config' collides with the automatic --config option/, 'the config options are inherited';
+
+	my $spec = buildSpec(options => { color => { type => 's', inherit => 1 } }, commands => { doc => {} });
+	my $doc  = $spec->root->command('doc');
+	is [map { $_->name } $doc->inheritedOptions], ['color'], 'the level below receives the option';
+	ok !defined $doc->optionByName('color'), 'without owning it';
+};
+
 done_testing;

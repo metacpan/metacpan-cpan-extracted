@@ -3,22 +3,21 @@ package Devel::ebug::Backend::Plugin::Output;
 use strict;
 use warnings;
 
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 my $stdout = "";
 my $stderr = "";
 
-if ($ENV{PERL_DEBUG_DONT_RELAY_IO}) {
-  # TODO: can we change these to non-bareword file handles
-  open NULL, '>', '/dev/null';  ## no critic
-  open NULL, '>', \$stdout;     ## no critic
-  open NULL, '>', \$stderr;     ## no critic
-}
-else {
+# Capture the program's output so the frontend can show it.  Under
+# PERL_DEBUG_DONT_RELAY_IO (ebug_server -keepio) STDOUT and STDERR are
+# deliberately left going wherever they were going, so that a program
+# which prompts can still be used interactively; output then has nothing
+# to report.
+unless ($ENV{PERL_DEBUG_DONT_RELAY_IO}) {
   close STDOUT;
   open STDOUT, '>', \$stdout or die "Can't open STDOUT: $!";
   close STDERR;
-  open STDERR, '>', \$stderr or die "Can't open STDOUT: $!";
+  open STDERR, '>', \$stderr or die "Can't open STDERR: $!";
 }
 
 sub register_commands {
@@ -47,7 +46,7 @@ Devel::ebug::Backend::Plugin::Output
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 AUTHOR
 

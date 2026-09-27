@@ -884,7 +884,7 @@ subtest 'EC15: filesystem hostility' => sub {
 	}
 
 	done_testing();
-};
+};  # end subtest EC15
 
 # ===========================================================================
 # EC18 — 'table' parameter: comprehensive injection and boundary tests
@@ -1165,6 +1165,582 @@ subtest 'EC17: selectall_array context sensitivity' => sub {
 		'EC17.5 matching entry in list context returns 1-element list');
 	is($one[0]{'number'}, $NUM_ONE,
 		'EC17.6 returned row contains the correct column value');
+};
+
+# ===========================================================================
+# EC20 — each_row() hostile inputs
+# Purpose: each_row() requires a CODE ref as its first argument and must
+# propagate exceptions from the callback while leaving the DBI handle in a
+# valid (finished) state.  Non-coderef inputs must croak immediately.
+# ===========================================================================
+
+subtest 'EC20: each_row() hostile callback inputs' => sub {
+	plan tests => 11;
+
+	my $db = Database::test1->new({ directory => $DATA_DIR });
+
+	# EC20.1 — undef callback must croak mentioning "code reference"
+	throws_ok { $db->each_row(undef) }
+		qr/code.*ref|ref.*code/i,
+		'EC20.1 undef callback croaks with code-reference message';
+
+	# EC20.2 — scalar (string) callback must croak
+	throws_ok { $db->each_row('not_a_coderef') }
+		qr/code.*ref|ref.*code/i,
+		'EC20.2 string callback croaks with code-reference message';
+
+	# EC20.3 — arrayref as callback must croak
+	throws_ok { $db->each_row([]) }
+		qr/code.*ref|ref.*code/i,
+		'EC20.3 arrayref callback croaks with code-reference message';
+
+	# EC20.4 — hashref as callback must croak
+	throws_ok { $db->each_row({}) }
+		qr/code.*ref|ref.*code/i,
+		'EC20.4 hashref callback croaks with code-reference message';
+
+	# EC20.5 — integer 0 as callback must croak
+	throws_ok { $db->each_row(0) }
+		qr/code.*ref|ref.*code/i,
+		'EC20.5 integer-0 callback croaks with code-reference message';
+
+	# EC20.6 — exception inside callback must propagate to the caller
+	eval { $db->each_row(sub { die "callback explode\n" }) };
+	like($@, qr/callback explode/, 'EC20.6 exception inside callback propagates to caller');
+
+	# EC20.7 — object is still usable after a callback exception (DBI handle finished)
+	my $n = eval { $db->each_row(sub {}) };
+	ok(!$@ && defined($n) && $n >= 0,
+		'EC20.7 object is usable after callback exception (DBI handle left clean)');
+
+	# EC20.8 — empty result set: callback is never called; return value is 0
+	{
+		my $called = 0;
+		my $ret = $db->each_row(sub { $called++ }, entry => 'NO_SUCH_KEY_EC20');
+		is($ret,    0, 'EC20.8 each_row for missing entry returns 0');
+		is($called, 0, 'EC20.8 callback never invoked for empty result set');
+	}
+
+	# EC20.9 — callback receives a hashref, not a raw scalar
+	{
+		my $row_type;
+		$db->each_row(sub { $row_type //= ref(shift) }, entry => $ENTRY_ONE);
+		is($row_type, 'HASH', 'EC20.9 callback receives a HASH reference');
+	}
+
+	# EC20.10 — modifying the received hashref must not corrupt subsequent queries.
+	# Slurp rows are fixated; a mutation may throw or be ignored; either way the
+	# data returned by a fresh query afterward must still be correct.
+	{
+		eval {
+			$db->each_row(sub {
+				my $row = shift;
+				$row->{'number'} = 999 if defined $row->{'entry'} && $row->{'entry'} eq $ENTRY_ONE;
+			}, entry => $ENTRY_ONE);
+		};
+		my $after = $db->fetchrow_hashref(entry => $ENTRY_ONE);
+		is($after->{'number'}, $NUM_ONE,
+			'EC20.10 mutating callback arg does not corrupt subsequent queries');
+	}
+};
+
+# ===========================================================================
+# EC21 — base_criteria hostile constructor inputs
+# Purpose: base_criteria is validated at new() time. Non-hashref values
+# must croak loudly. Keys with SQL-unsafe characters must also croak.
+# Only special grouping keys starting with '-' (e.g. -or, -and) are exempt
+# from the SAFE_QUALIFIED regex check.
+# Empty hashref is valid and adds no filtering.
+# ===========================================================================
+
+subtest 'EC21: base_criteria hostile constructor inputs' => sub {
+	plan tests => 12;
+
+	{ package Database::ec21; use parent 'Database::Abstraction'; }
+
+	# EC21.1 — non-hashref: plain scalar must croak
+	throws_ok {
+		Database::ec21->new(directory => $DATA_DIR, base_criteria => 'not_a_hash')
+	} qr/base_criteria must be a hashref/i,
+		'EC21.1 scalar base_criteria croaks at new()';
+
+	# EC21.2 — non-hashref: arrayref must croak
+	throws_ok {
+		Database::ec21->new(directory => $DATA_DIR, base_criteria => ['k', 'v'])
+	} qr/base_criteria must be a hashref/i,
+		'EC21.2 arrayref base_criteria croaks at new()';
+
+	# EC21.3 — non-hashref: integer must croak
+	throws_ok {
+		Database::ec21->new(directory => $DATA_DIR, base_criteria => 42)
+	} qr/base_criteria must be a hashref/i,
+		'EC21.3 integer base_criteria croaks at new()';
+
+	# EC21.4 — unsafe key (semicolon) must croak
+	throws_ok {
+		Database::ec21->new(directory => $DATA_DIR,
+			base_criteria => { 'col;DROP TABLE ec21--' => 'val' })
+	} qr/unsafe base_criteria key/i,
+		'EC21.4 semicolon in base_criteria key croaks at new()';
+
+	# EC21.5 — unsafe key (space) must croak
+	throws_ok {
+		Database::ec21->new(directory => $DATA_DIR,
+			base_criteria => { 'col OR 1=1' => 'val' })
+	} qr/unsafe base_criteria key/i,
+		'EC21.5 space in base_criteria key croaks at new()';
+
+	# EC21.6 — unsafe key (NUL byte) must croak
+	throws_ok {
+		Database::ec21->new(directory => $DATA_DIR,
+			base_criteria => { "col\x00injection" => 'val' })
+	} qr/unsafe base_criteria key/i,
+		'EC21.6 NUL byte in base_criteria key croaks at new()';
+
+	# EC21.7 — unsafe key (leading digit) must croak
+	throws_ok {
+		Database::ec21->new(directory => $DATA_DIR,
+			base_criteria => { '1bad_key' => 'val' })
+	} qr/unsafe base_criteria key/i,
+		'EC21.7 leading-digit base_criteria key croaks at new()';
+
+	# EC21.8 — grouping key '-or' starting with '-' is EXEMPT from SAFE_QUALIFIED
+	lives_ok {
+		Database::ec21->new(directory => $DATA_DIR, base_criteria => { '-or' => [] });
+	} 'EC21.8 "-or" grouping key in base_criteria is accepted (exempt from SAFE_QUALIFIED)';
+
+	# EC21.9 — '-and' grouping key is also exempt
+	lives_ok {
+		Database::ec21->new(directory => $DATA_DIR, base_criteria => { '-and' => [] });
+	} 'EC21.9 "-and" grouping key in base_criteria is accepted';
+
+	# EC21.10 — empty hashref is a valid base_criteria value (adds no filtering).
+	# Use Database::test1 for the count() assertion because Database::ec21 has no
+	# backing file in t/data/ and triggering _open() on it would croak.
+	lives_ok {
+		Database::ec21->new(directory => $DATA_DIR, base_criteria => {});
+	} 'EC21.10 empty base_criteria hashref is accepted at new()';
+	my $obj_empty = Database::test1->new({ directory => $DATA_DIR, base_criteria => {} });
+	is($obj_empty->count(), $ROWS_TOTAL,
+		'EC21.10 empty base_criteria does not reduce count()');
+
+	# EC21.11 — undef value in base_criteria is valid (means IS NULL filter)
+	lives_ok {
+		Database::test1->new({ directory => $DATA_DIR, base_criteria => { number => undef } });
+	} 'EC21.11 undef value in base_criteria is accepted at new() (IS NULL filter)';
+};
+
+# ===========================================================================
+# EC22 — sort_by injection and boundary conditions
+# Purpose: _parse_sort_by() uses Carp::carp (not croak) for invalid input;
+# it must never allow SQL injection into the ORDER BY clause.  An unsafe
+# column name or direction causes a warning and a fallback to the default
+# order — it must NOT propagate a hostile string to the query.
+# ===========================================================================
+
+subtest 'EC22: sort_by injection and boundary conditions' => sub {
+	plan tests => 11;
+
+	my $db = Database::test1->new({ directory => $DATA_DIR });
+
+	# EC22.1 — unsafe column name: must not inject into ORDER BY (carp + fallback)
+	{
+		my @rows;
+		my $warned = 0;
+		local $SIG{__WARN__} = sub { $warned++ };
+		lives_ok { @rows = $db->selectall_array(sort_by => 'col;DROP TABLE test1--') }
+			'EC22.1 semicolon in sort_by column does not throw (carp + fallback)';
+		ok($warned > 0, 'EC22.1 semicolon in sort_by column emits a warning');
+		ok(scalar(@rows) == $ROWS_TOTAL,
+			'EC22.1 all rows still returned after unsafe sort_by column is ignored');
+	}
+
+	# EC22.2 — space in column name: same guard (carp + fallback)
+	{
+		my $warned = 0;
+		local $SIG{__WARN__} = sub { $warned++ };
+		lives_ok { $db->selectall_array(sort_by => 'col OR 1=1') }
+			'EC22.2 space in sort_by column does not throw (carp + fallback)';
+		ok($warned > 0, 'EC22.2 space in sort_by column emits a warning');
+	}
+
+	# EC22.3 — invalid direction (not ASC/DESC): carp + fallback to ASC
+	{
+		my $warned = 0;
+		local $SIG{__WARN__} = sub { $warned++ };
+		lives_ok { $db->selectall_array(sort_by => ['number', 'INVALID_DIR']) }
+			'EC22.3 invalid sort_by direction does not throw (carp + fallback)';
+		ok($warned > 0, 'EC22.3 invalid sort_by direction emits a warning');
+	}
+
+	# EC22.4 — undef column in arrayref form: carp + fallback
+	{
+		my $warned = 0;
+		local $SIG{__WARN__} = sub { $warned++ };
+		lives_ok { $db->selectall_array(sort_by => [undef, 'ASC']) }
+			'EC22.4 undef column in sort_by arrayref does not throw';
+		ok($warned > 0, 'EC22.4 undef sort_by column emits a warning');
+	}
+
+	# EC22.5 — empty string column: carp + fallback
+	{
+		my $warned = 0;
+		local $SIG{__WARN__} = sub { $warned++ };
+		lives_ok { $db->selectall_array(sort_by => '') }
+			'EC22.5 empty-string sort_by column does not throw (carp + fallback)';
+		ok($warned > 0, 'EC22.5 empty-string sort_by column emits a warning');
+	}
+};
+
+# ===========================================================================
+# EC23 — host parameter injection guards (adversarial)
+# Purpose: the host parameter is validated at new() time against a strict
+# regex. Shell metacharacters, spaces, semicolons, newlines, and path-traversal
+# sequences must all be rejected before any SSH or filesystem call is made.
+# Note: File::Slurp::Remote is NOT required — validation fires at new() before
+# any remote fetch attempt.
+# ===========================================================================
+
+subtest 'EC23: host parameter injection guards' => sub {
+	plan tests => 10;
+
+	{ package Database::ec23; use parent 'Database::Abstraction'; }
+
+	# EC23.1 — semicolon: shell command separator injection
+	throws_ok {
+		Database::ec23->new(directory => $DATA_DIR, host => 'host; rm -rf /')
+	} qr/unsafe host/i,
+		'EC23.1 semicolon in host name croaks at new()';
+
+	# EC23.2 — backtick: command substitution injection
+	throws_ok {
+		Database::ec23->new(directory => $DATA_DIR, host => '`malicious_cmd`')
+	} qr/unsafe host/i,
+		'EC23.2 backtick in host name croaks at new()';
+
+	# EC23.3 — embedded newline: log injection / header splitting
+	throws_ok {
+		Database::ec23->new(directory => $DATA_DIR, host => "valid\nroot\@attacker.com")
+	} qr/unsafe host/i,
+		'EC23.3 newline in host name croaks at new()';
+
+	# EC23.4 — space: allows argument injection into SSH command
+	throws_ok {
+		Database::ec23->new(directory => $DATA_DIR, host => 'valid host -o HostbasedAuth=yes')
+	} qr/unsafe host/i,
+		'EC23.4 space in host name croaks at new()';
+
+	# EC23.5 — dollar-sign variable expansion
+	throws_ok {
+		Database::ec23->new(directory => $DATA_DIR, host => '$HOSTNAME;evil')
+	} qr/unsafe host/i,
+		'EC23.5 dollar-sign in host name croaks at new()';
+
+	# EC23.6 — path-traversal attempt
+	throws_ok {
+		Database::ec23->new(directory => $DATA_DIR, host => '../etc/passwd')
+	} qr/unsafe host/i,
+		'EC23.6 path-traversal in host name croaks at new()';
+
+	# EC23.7 — empty string: fails the anchored regex
+	throws_ok {
+		Database::ec23->new(directory => $DATA_DIR, host => '')
+	} qr/unsafe host/i,
+		'EC23.7 empty string host croaks at new()';
+
+	# EC23.8 — valid hostname (alphanumeric) is accepted
+	lives_ok {
+		Database::ec23->new(directory => $DATA_DIR, host => 'myserver.example.com')
+	} 'EC23.8 valid hostname "myserver.example.com" accepted at new()';
+
+	# EC23.9 — valid user@host form is accepted
+	lives_ok {
+		Database::ec23->new(directory => $DATA_DIR, host => 'deploy@prod01.example.com')
+	} 'EC23.9 valid user@host form accepted at new()';
+
+	# EC23.10 — IPv6 loopback literal is accepted (colon allowed)
+	lives_ok {
+		Database::ec23->new(directory => $DATA_DIR, host => '::1')
+	} 'EC23.10 IPv6 loopback "::1" accepted at new()';
+};
+
+# ===========================================================================
+# EC24 — _like_match ReDoS safety and edge cases
+# Purpose: _like_match is called in slurp-mode _match_criterion for -like and
+# -not_like.  The implementation uses a safe DP algorithm and five fast-paths.
+# This test verifies each fast path and that the classic ReDoS pattern
+# ('%a%a%a%a%b' against a long 'aaa...' string) completes quickly.
+# ===========================================================================
+
+subtest 'EC24: _like_match ReDoS safety and edge-case patterns' => sub {
+	plan tests => 22;
+
+	my $db = Database::test1->new({ directory => $DATA_DIR });
+
+	# Helper: reach _like_match via _match_criterion with the '-like' operator
+	my $like = sub {
+		my ($str, $pat) = @_;
+		$db->_match_criterion($str, { '-like' => $pat });
+	};
+
+	# ---- Fast path 1: bare '%' -----------------------------------------------
+	ok($like->('anything', '%'),             'EC24.1 bare "%" matches any string');
+	ok($like->('',          '%'),            'EC24.2 bare "%" matches empty string');
+
+	# ---- Fast path 2: no wildcards (equality) ---------------------------------
+	ok( $like->('Hello', 'hello'),           'EC24.3 case-insensitive equality match');
+	ok(!$like->('Hello', 'world'),           'EC24.4 case-insensitive equality non-match');
+	ok(!$like->('ab', 'abc'),                'EC24.5 equality: shorter string does not match');
+
+	# ---- Fast path 3: %suffix -------------------------------------------------
+	ok( $like->('hello_world', '%world'),    'EC24.6 %suffix: string ends with suffix');
+	ok(!$like->('hello_world', '%worlds'),   'EC24.7 %suffix: string does not end with suffix');
+
+	# ---- Fast path 4: prefix% -------------------------------------------------
+	ok( $like->('hello_world', 'hello%'),    'EC24.8 prefix%: string starts with prefix');
+	ok(!$like->('world_hello', 'hello%'),    'EC24.9 prefix%: string does not start with prefix');
+
+	# ---- Fast path 5: %literal% -----------------------------------------------
+	ok( $like->('say hello there', '%hello%'), 'EC24.10 %literal%: substring found');
+	ok(!$like->('say goodbye',      '%hello%'), 'EC24.11 %literal%: substring not found');
+
+	# ---- Full DP: ReDoS trigger pattern (multiple '%' wildcards) -------------
+	# '%a%a%a%a%b' against 1000 'a' chars would cause catastrophic backtracking
+	# in a naive regex translation.  The DP path must complete in polynomial time.
+	{
+		my $long_a  = 'a' x 1_000;
+		my $t0      = time();
+		my $result  = $like->($long_a, '%a%a%a%a%b');   # no 'b' at end -> false
+		my $elapsed = time() - $t0;
+		ok(!$result,    'EC24.12 multi-% pattern correctly non-matches long-a string');
+		ok($elapsed < 5, "EC24.13 multi-% ReDoS pattern completes in <5s (elapsed: ${elapsed}s)");
+	}
+
+	# ---- DP path: pattern with '_' single-char wildcard ----------------------
+	ok( $like->('aXb', 'a_b'),               'EC24.14 single _ matches one character');
+	ok(!$like->('ab',  'a_b'),               'EC24.15 _ does not match zero chars');
+	ok(!$like->('axXb', 'a_b'),              'EC24.16 _ does not match two chars');
+
+	# ---- DP path: alternating % and _ wildcards ------------------------------
+	ok( $like->('abcd', '%_d'),              'EC24.17 %_d: any-char before d');
+	ok(!$like->('abd',  'a__d'),             'EC24.18 a__d: requires exactly two chars between a and d');
+	ok( $like->('a12d', 'a__d'),             'EC24.19 a__d: matches two middle chars exactly');
+
+	# ---- Pathological: empty string edge cases --------------------------------
+	ok( $like->('', '%'),                    'EC24.20 empty string matches bare %');
+	ok(!$like->('', 'a'),                    'EC24.21 empty string does not match "a"');
+	ok( $like->('', ''),                     'EC24.22 empty string matches empty pattern');
+};
+
+# ===========================================================================
+# EC25 — schema() with infer_types edge cases
+# Purpose: _infer_type() drives schema() when infer_types => 1 is set.
+# infer_types is a SLURP-SOURCE feature — it scans sampled row values to
+# promote columns from the default TEXT type to INTEGER, REAL, TIMESTAMP,
+# or DATE.  The test uses a CSV fixture so the slurp path is active.
+# SQLite DSN is intentionally NOT used here because schema() for a live
+# SQL connection uses PRAGMA table_info (declared types), not value inference.
+# ===========================================================================
+
+{
+	package Database::ec25;
+	use parent 'Database::Abstraction';
+}
+
+# Build a CSV fixture in a temp dir.  The filename must match the class name
+# stem (ec25) and we use sep_char => ',' (standard CSV, not the default '!').
+my $ec25_dir = tempdir(CLEANUP => 1);
+{
+	open my $fh, '>', File::Spec->catfile($ec25_dir, 'ec25.csv');
+	# Six columns — no 'entry' primary key (no_entry => 1 is used).
+	print $fh "all_int,mixed,all_null,ts_col,dt_col,single\n";
+	print $fh "42,3,,2024-01-15 12:00,2024-01-15,99\n";    # all_null blank
+	print $fh "-7,1.5,,2025-06-30T08:30,2025-06-30,\n";   # single blank
+	print $fh "100,7,,2023-12-01 00:00,2023-12-01,\n";     # single blank
+	close $fh;
+}
+
+{
+	# id => 'all_int' is required for the CSV comment-row filter to match; without
+	# an 'entry' column in the file the filter would drop all rows (data => undef).
+	my $db25 = Database::ec25->new(
+		directory   => $ec25_dir,
+		no_entry    => 1,
+		sep_char    => ',',
+		id          => 'all_int',
+		infer_types => 1,
+	);
+	$db25->count();   # trigger _open and slurp into ARRAY ref
+
+	my $sch = $db25->schema();
+
+	# EC25.1 — schema() returns a populated hashref
+	ok(ref($sch) eq 'HASH' && scalar(keys %{$sch}) > 0,
+		'EC25.1 schema() returns non-empty hashref with infer_types => 1');
+
+	# EC25.2 — all-integer TEXT column is promoted to INTEGER
+	is($sch->{'all_int'}{'type'}, 'INTEGER',
+		'EC25.2 all-integer column inferred as INTEGER');
+
+	# EC25.3 — mixed integer+decimal: 1.5 breaks INTEGER but all match REAL
+	is($sch->{'mixed'}{'type'}, 'REAL',
+		'EC25.3 mixed integer+decimal column inferred as REAL');
+
+	# EC25.4 — all-blank column stays TEXT (no non-blank evidence to infer from)
+	is($sch->{'all_null'}{'type'}, 'TEXT',
+		'EC25.4 all-blank column stays TEXT (no non-null evidence)');
+
+	# EC25.5 — ISO timestamp column promoted to TIMESTAMP
+	is($sch->{'ts_col'}{'type'}, 'TIMESTAMP',
+		'EC25.5 ISO timestamp column inferred as TIMESTAMP');
+
+	# EC25.6 — ISO date column promoted to DATE
+	is($sch->{'dt_col'}{'type'}, 'DATE',
+		'EC25.6 ISO date column inferred as DATE');
+
+	# EC25.7 — single non-blank value column is still inferred correctly
+	is($sch->{'single'}{'type'}, 'INTEGER',
+		'EC25.7 column with one non-null value (99) inferred as INTEGER');
+
+	# EC25.8 — without infer_types, all CSV columns default to TEXT
+	my $db25_noif = Database::ec25->new(
+		directory => $ec25_dir,
+		no_entry  => 1,
+		sep_char  => ',',
+		id        => 'all_int',
+	);
+	$db25_noif->count();
+	my $sch_noif = $db25_noif->schema();
+	is($sch_noif->{'all_int'}{'type'}, 'TEXT',
+		'EC25.8 without infer_types, CSV column stays TEXT regardless of values');
+
+	# EC25.9 — schema() is cached: second call returns the same hashref reference
+	my $sch_again = $db25->schema();
+	is($sch, $sch_again, 'EC25.9 schema() returns same cached hashref on repeated calls');
+
+	# EC25.10 — schema has one key per column (6 columns)
+	is(scalar(keys %{$sch}), 6, 'EC25.10 schema() has exactly 6 column entries');
+
+	# EC25.11 — every schema entry has a "type" key
+	my $all_typed = 1;
+	for my $col (keys %{$sch}) { $all_typed = 0 unless exists $sch->{$col}{'type'} }
+	ok($all_typed, 'EC25.11 every schema entry has a "type" key');
+
+	# EC25.12 — blank values must not cause schema() to throw
+	lives_ok { $db25->schema() }
+		'EC25.12 schema() does not throw when column values include blanks/undef';
+}
+
+# ===========================================================================
+# EC26 — Boundary conditions for limit / offset parameters
+# Purpose: limit and offset must reject non-integer inputs (carp + ignore)
+# and handle the exact boundary where offset equals the row count (0 rows).
+# ===========================================================================
+
+subtest 'EC26: limit/offset boundary conditions' => sub {
+	plan tests => 12;
+
+	my $db = Database::test1->new({ directory => $DATA_DIR });
+
+	# EC26.1 — limit => 0 returns empty result, does not crash
+	{
+		my $rows;
+		lives_ok { $rows = $db->selectall_arrayref(limit => 0) }
+			'EC26.1 limit => 0 does not throw';
+		is(scalar(@{$rows}), 0, 'EC26.1 limit => 0 returns 0 rows');
+	}
+
+	# EC26.2 — limit => 1 returns exactly 1 row
+	is(scalar(@{$db->selectall_arrayref(limit => 1)}), 1,
+		'EC26.2 limit => 1 returns exactly 1 row');
+
+	# EC26.3 — limit larger than row count returns all rows
+	is(scalar(@{$db->selectall_arrayref(limit => 999_999)}), $ROWS_TOTAL,
+		'EC26.3 limit > row count returns all rows without crash');
+
+	# EC26.4 — negative limit: carp + treat as invalid; result must be an arrayref
+	{
+		my $warned = 0;
+		local $SIG{__WARN__} = sub { $warned++ };
+		my $rows = $db->selectall_arrayref(limit => -1);
+		ok(defined($rows) && ref($rows) eq 'ARRAY',
+			'EC26.4 negative limit does not crash (returns arrayref)');
+		diag "EC26.4 warned=$warned rows=@{[scalar @{$rows}]}" if $ENV{TEST_VERBOSE};
+	}
+
+	# EC26.5 — float limit is floor-cast to integer
+	{
+		my $rows;
+		lives_ok { $rows = $db->selectall_arrayref(limit => 2.9) }
+			'EC26.5 float limit does not throw';
+		ok(scalar(@{$rows}) <= $ROWS_TOTAL, 'EC26.5 float limit result stays within total row count');
+	}
+
+	# EC26.6 — non-numeric limit string: carp + ignore -> all rows returned
+	{
+		my $warned = 0;
+		local $SIG{__WARN__} = sub { $warned++ };
+		my $rows = $db->selectall_arrayref(limit => 'two');
+		is(scalar(@{$rows}), $ROWS_TOTAL,
+			'EC26.6 non-numeric limit is ignored; all rows returned');
+		ok($warned > 0, 'EC26.6 non-numeric limit emits a carp warning');
+	}
+
+	# EC26.7 — offset == row count: exact boundary returns 0 rows
+	is(scalar(@{$db->selectall_arrayref(limit => 999, offset => $ROWS_TOTAL)}), 0,
+		'EC26.7 offset == row count returns 0 rows (exact boundary)');
+
+	# EC26.8 — offset far beyond row count: 0 rows, no crash
+	{
+		my $rows;
+		lives_ok { $rows = $db->selectall_arrayref(limit => 999, offset => 999_999) }
+			'EC26.8 offset beyond row count does not throw';
+		is(scalar(@{$rows}), 0, 'EC26.8 offset beyond row count returns 0 rows');
+	}
+};
+
+# ===========================================================================
+# EC27 — AUTOLOAD hostile method name dispatch
+# Purpose: AUTOLOAD intercepts unknown method calls for column lookup.
+# Method names starting with '_', 'DESTROY', 'BEGIN', 'AUTOLOAD', etc. must
+# NOT be treated as column lookups.  auto_load => 0 must suppress all AUTOLOAD
+# column dispatch entirely.
+# ===========================================================================
+
+subtest 'EC27: AUTOLOAD hostile method name dispatch' => sub {
+	plan tests => 6;
+
+	my $db = Database::test1->new({ directory => $DATA_DIR });
+	$db->count();   # force slurp
+
+	# EC27.1 — _prefixed method names are not column lookups
+	eval { $db->_nonexistent_col(entry => 'one') };
+	ok(1, 'EC27.1 _prefixed method call does not crash (AUTOLOAD guard in place)');
+	diag "EC27.1 error: $@" if $@ && $ENV{TEST_VERBOSE};
+
+	# EC27.2 — 'DESTROY' must not be treated as a column lookup
+	{
+		eval { local $SIG{__WARN__} = sub {}; $db->DESTROY() };
+		ok(!($@ && $@ =~ /no column/i),
+			'EC27.2 DESTROY does not croak "no column" (not treated as AUTOLOAD column)');
+	}
+
+	# EC27.3 — ->can() is a UNIVERSAL method and must not hit AUTOLOAD
+	lives_ok { $db->can('count') }
+		'EC27.3 ->can("count") dispatches to UNIVERSAL::can, not AUTOLOAD';
+
+	# EC27.4 — auto_load => 0: AUTOLOAD column dispatch is suppressed
+	{
+		my $db_no_al = Database::test1->new({ directory => $DATA_DIR, auto_load => 0 });
+		eval { $db_no_al->number(entry => 'one') };
+		ok($@, 'EC27.4 auto_load => 0: calling column method via AUTOLOAD throws');
+		unlike($@, qr/no column/i,
+			"EC27.4 auto_load => 0: error is not \"no column\" (method is simply unknown)");
+	}
+
+	# EC27.5 — ->can() with a name that starts with a digit: must not segfault
+	eval { $db->can('123col') };
+	ok(1, 'EC27.5 ->can("123col") does not segfault');
 };
 
 done_testing();

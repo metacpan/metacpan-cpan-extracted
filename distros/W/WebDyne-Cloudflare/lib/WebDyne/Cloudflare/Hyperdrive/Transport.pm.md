@@ -1,0 +1,3 @@
+# WebDyne::Cloudflare::Hyperdrive::Transport
+
+Internal asynchronous capability transport, independent of public query conveniences. Construct with `scope => $scope_hr, binding => "DB"`; `await $transport_or->call($operation, %fields)` invokes the registered Asyncify host function and decodes the versioned response. Operations are open, query, begin, commit, rollback and disconnect. The host owns connection and transaction state. Test-only `$HOST_CALL` injection returns a JSON string synchronously, matching the Perl side of the awaited JavaScript bridge. The public WebDyne::Cloudflare::Hyperdrive facade uses this transport; it remains independent of DBI-style query and fetch conventions.

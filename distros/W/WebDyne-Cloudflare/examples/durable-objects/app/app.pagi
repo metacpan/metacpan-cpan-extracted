@@ -1,0 +1,25 @@
+use strict;
+use warnings;
+use Future::AsyncAwait;
+use JSON::PP ();
+use WebDyne::Cloudflare::DurableObject;
+
+async sub {
+    my ($scope_hr, $receive_cr, $send_cr)=@_;
+    return if ($scope_hr->{'type'} eq 'lifespan');
+    #  Consume the unused form body before returning the counter response.
+    #
+    if ($scope_hr->{'method'} eq 'POST') {
+        while (1) {
+            my $event_hr=await $receive_cr->();
+            last unless $event_hr->{'more_body'};
+        }
+    }
+    my $namespace_or=WebDyne::Cloudflare::DurableObject->new(scope => $scope_hr, binding => 'COUNTERS');
+    my $counter_or=await $namespace_or->get_by_name('example');
+    my $result_hr=($scope_hr->{'method'} eq 'POST')
+        ? await $counter_or->call('increment', 1) : await $counter_or->call('read');
+    await $send_cr->({type => 'http.response.start', status => 200,
+        headers => [['content-type', 'application/json'], ['cache-control', 'no-store']]});
+    await $send_cr->({type => 'http.response.body', body => JSON::PP->new()->utf8()->encode($result_hr)});
+};

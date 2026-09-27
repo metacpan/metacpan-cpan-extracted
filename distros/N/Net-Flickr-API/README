@@ -1,120 +1,148 @@
 NAME
+
     Net::Flickr::API - base API class for Net::Flickr::* libraries
 
 SYNOPSIS
+
      package Net::Flickr::RDF;
      use base qw (Net::Flickr::API);
 
 DESCRIPTION
+
     Base API class for Net::Flickr::* libraries
 
     Net::Flickr::API is a wrapper for Flickr::API that provides support for
-    throttling API calls (per second), retries if the API is disabled and
-    marshalling of API responses into XML::LibXML or XML::XPath objects.
+    throttling API calls (per hour), retries if the API is disabled or
+    rate-limited, and marshalling of API responses into XML::LibXML or
+    XML::XPath objects.
 
 OPTIONS
+
     Options are passed to Net::Flickr::Backup using a Config::Simple object
     or a valid Config::Simple config file. Options are grouped by "block".
 
-  flick
+ flick
 
-    * api_key
-        String. *required*
+      * api_key
 
-        A valid Flickr API key.
+      String. required
 
-    * api_secret
-        String. *required*
+      A valid Flickr API key.
 
-        A valid Flickr Auth API secret key.
+      * api_secret
 
-    * auth_token
-        String. *required*
+      String. required
 
-        A valid Flickr Auth API token.
+      A valid Flickr Auth API secret key.
 
-    * api_handler
-        String. *required*
+      * auth_token
 
-        The api_handler defines which XML/XPath handler to use to process
-        API responses.
+      String. required
 
-        * LibXML
-            Use XML::LibXML.
+      A valid Flickr Auth API token.
 
-        * XPath
-            Use XML::XPath.
+      * api_handler
 
-  reporting
+      String. required
 
-    * enabled
-        Boolean.
+      The api_handler defines which XML/XPath handler to use to process API
+      responses.
 
-        Default is false.
+	* LibXML
 
-    * handler
-        String.
+	Use XML::LibXML.
 
-        The default handler is Screen, as in `Log::Dispatch::Screen'
+	* XPath
 
-    * handler_args
-        For example, the following :
+	Use XML::XPath.
 
-         reporting_handler_args=name:foobar;min_level=info
+      * api_calls_per_hour
 
-        Would be converted as :
+      Integer.
 
-         (name      => "foobar",
-          min_level => "info");
+      The most API calls to make in any hour, counting retries. Short
+      bursts are allowed after a lull, but never enough to go over this in
+      any rolling hour.
 
-        The default name argument is "__report". The default min_level
-        argument is "info".
+      The default, and the maximum, is 3600, which is Flickr's documented
+      limit per API key. The minimum is 60.
+
+ reporting
+
+      * enabled
+
+      Boolean.
+
+      Default is false.
+
+      * handler
+
+      String.
+
+      The default handler is Screen, as in Log::Dispatch::Screen
+
+      * handler_args
+
+      For example, the following :
+
+       reporting_handler_args=name:foobar;min_level=info
+
+      Would be converted as :
+
+       (name      => "foobar",
+        min_level => "info");
+
+      The default name argument is "__report". The default min_level
+      argument is "info".
 
 PACKAGE METHODS
-  __PACKAGE__->new($cfg)
 
-    Where $cfg is either a valid *Config::Simple* object or the path to a
-    file that can be parsed by *Config::Simple*.
+ __PACKAGE__->new($cfg)
 
-    Returns a *Net::Flickr::API* object.
+    Where $cfg is either a valid Config::Simple object or the path to a
+    file that can be parsed by Config::Simple.
+
+    Returns a Net::Flickr::API object.
 
 OBJECT METHODS
-  $obj->api_call(\%args)
+
+ $obj->api_call(\%args)
 
     Valid args are :
 
-    * method
-        A string containing the name of the Flickr API method you are
-        calling.
+      * method
 
-    * args
-        A hash ref containing the key value pairs you are passing to
-        *method*
+      A string containing the name of the Flickr API method you are
+      calling.
+
+      * args
+
+      A hash ref containing the key value pairs you are passing to method
 
     If the method encounters any errors calling the API, receives an API
     error or can not parse the response it will log an error event, via the
     log method, and return undef.
 
-    Otherwise it will return a *XML::LibXML::Document* object (if
-    XML::LibXML is installed) or a *XML::XPath* object.
+    Otherwise it will return a XML::LibXML::Document object (if XML::LibXML
+    is installed) or a XML::XPath object.
 
-  $obj->get_auth()
+ $obj->get_auth()
 
-    Return an XML *node* element containing the Flickr auth token
-    information for the current object.
-
-    Returns undef if no token information is present.
-
-  $obj->get_auth_nsid()
-
-    Return the Flickr NSID of the user associated with the Flickr auth token
-    information for the current object.
+    Return an XML node element containing the Flickr auth token information
+    for the current object.
 
     Returns undef if no token information is present.
 
-  $obj->upload(\%args)
+ $obj->get_auth_nsid()
 
-    This is a helper method that simply wraps calls to the *Flickr::Upload*
+    Return the Flickr NSID of the user associated with the Flickr auth
+    token information for the current object.
+
+    Returns undef if no token information is present.
+
+ $obj->upload(\%args)
+
+    This is a helper method that simply wraps calls to the Flickr::Upload
     upload method. All the arguments are the same. For complete
     documentation please consult:
 
@@ -126,20 +154,24 @@ OBJECT METHODS
     Returns a photo ID (or a ticket ID if the call is asynchronous) on
     success or false if there was a problem.
 
-  $obj->log()
+ $obj->log()
 
-    Returns a *Log::Dispatch* object.
+    Returns a Log::Dispatch object.
 
 VERSION
-    1.7
+
+    1.8
 
 DATE
+
     $Date: 2009/08/02 17:16:12 $
 
 AUTHOR
+
     Aaron Straup Cope <ascope@cpan.org>
 
 SEE ALSO
+
     Config::Simple
 
     Flickr::API
@@ -149,9 +181,11 @@ SEE ALSO
     XML::LibXML
 
 BUGS
+
     Please report all bugs via http://rt.cpan.org/
 
 LICENSE
+
     Copyright (c) 2005-2008 Aaron Straup Cope. All Rights Reserved.
 
     This is free software. You may redistribute it and/or modify it under

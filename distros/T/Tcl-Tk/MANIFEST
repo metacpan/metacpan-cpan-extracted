@@ -22,11 +22,14 @@ t/ttk_widgets.t
 t/Xcamel.gif
 t/text.t
 t/canvas.t
+t/calendar.t
 t/unicode.t		some unicode tests
 t/zzPhoto.t
 demos/wcolors.pl	demo script with syntax very similar to perlTk
 demos/activex.pl	demo script for Windows that uses ActiveX
 demos/blt-tabnbook.pl	example of using Tcl/Tk widget, never mentioned in Tcl::Tk
+demos/calendar-perltk.pl Interactive 12-Month Calendar Grid using Tcl::Tk with perl/Tk syntax
+demos/calendar-tcltk.pl  Interactive 12-Month Calendar Grid using Tcl::Tk with Tcl/Tk syntax
 tk-demos/images/earth.gif
 tk-demos/images/earthris.gif
 tk-demos/images/face.bmp

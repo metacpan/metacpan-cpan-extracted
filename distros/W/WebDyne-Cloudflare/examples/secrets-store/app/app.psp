@@ -1,0 +1,19 @@
+<start_html title="Secrets Store" h2>
+<perl handler="retrieve"><p>${message}</p></perl>
+<p>The secret stays inside the request and is never rendered.</p>
+
+__PERL__
+
+use WebDyne::Cloudflare::SecretsStore;
+
+sub retrieve {
+    my ($self)=@_;
+    $self->r()->headers_out('Cache-Control' => 'no-store');
+    my $secret_or=WebDyne::Cloudflare::SecretsStore->new(
+        scope => $self->r()->{'scope'}, binding => 'API_KEY',
+    );
+    my $value=$secret_or->get()->get();
+    #  Use the value for the intended authenticated operation; never render it.
+    #
+    return $self->render(message => 'Secret retrieval succeeded');
+}

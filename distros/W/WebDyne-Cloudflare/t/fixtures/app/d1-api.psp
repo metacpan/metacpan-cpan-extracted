@@ -1,0 +1,32 @@
+<api handler="d1_row" pattern="/row/:id" canonical>
+<api handler="d1_shape" pattern="/shape" canonical>
+
+__PERL__
+
+use JSON::PP ();
+use WebDyne::Cloudflare::D1;
+
+sub d1_row {
+    my ($self, $match_hr)=@_;
+    my $db_or=WebDyne::Cloudflare::D1->new(
+        scope   => $self->r()->{'scope'},
+        binding => 'DB',
+    );
+    my $row_hr=$db_or->prepare(
+        'SELECT id, name, note, payload FROM webdyne_d1_example WHERE id = ?1 LIMIT 1'
+    )->bind($match_hr->{'id'})->first()->get();
+    return { found => JSON::PP::false() } unless $row_hr;
+    return {
+        found          => JSON::PP::true(),
+        id             => $row_hr->{'id'},
+        name           => $row_hr->{'name'},
+        note           => $row_hr->{'note'},
+        payload_length => length($row_hr->{'payload'} // ''),
+    };
+}
+
+sub d1_shape {
+    my ($self)=@_;
+    my $db_or=WebDyne::Cloudflare::D1->new(scope => $self->r()->{'scope'});
+    return $db_or->first("SELECT 'blob' AS type, 'AAH/' AS base64, 0 AS count")->get();
+}

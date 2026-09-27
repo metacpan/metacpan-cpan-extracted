@@ -2,7 +2,7 @@ use v5.26;
 use Object::Pad;
 
 class Getopt::Pad::ExitRequest {
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	field $output :param :reader;
 }
@@ -15,16 +15,34 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::ExitRequest - control-flow exception ending a parse successfully
+Getopt::Pad::ExitRequest - The exception that ends a parse successfully
+(internal)
 
 =head1 DESCRIPTION
 
-Control-flow exception thrown by every trigger (--help, --version,
---create-completions, --create-default-config) once it has done its work. It carries the finished
-output, newline included, and GetOptions prints it to STDOUT verbatim and
-exits 0 without needing to know which trigger fired.
+This module is internal to Getopt::Pad. It is not part of the public
+API and can change without notice. Programs use L<Getopt::Pad/GetOptions>;
+this page is for people working on Getopt::Pad itself.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+Every trigger of an automatic option (C<--help>, C<--version>,
+C<--create-completions>, C<--create-default-config>) throws an
+ExitRequest once it has done its work. It carries the finished output,
+final newline included. C<GetOptions> prints the output to STDOUT as it
+is and exits with status 0, without knowing which option asked for it.
+
+=head1 METHODS
+
+=over 4
+
+=item output
+
+The text to print.
+
+=back
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Spec>, L<Getopt::Pad::Error>
 
 =head1 AUTHOR
 

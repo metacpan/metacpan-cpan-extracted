@@ -1,0 +1,36 @@
+<start_html title="D1 session bookmarks" h2>
+<p>Each request reads through a session. Submit the returned bookmark to continue it.</p>
+<perl handler="session_result">
+  <p>Query value: ${value}</p>
+  <p>Bookmark: ${bookmark_display}</p>
+  <form method="post">
+    <input type="hidden" name="bookmark" value="${bookmark}">
+    <button type="submit">Continue session</button>
+  </form>
+</perl>
+
+__PERL__
+
+use WebDyne::Cloudflare::D1;
+
+sub session_result {
+    my ($self)=@_;
+    my $request_or=$self->r();
+    $request_or->headers_out('Cache-Control' => 'no-store');
+    my $bookmark=$self->CGI()->param('bookmark');
+    $bookmark=$request_or->headers_in()->header('x-d1-bookmark')
+        unless defined($bookmark)&&length($bookmark);
+    my $db_or=WebDyne::Cloudflare::D1->new(scope => $request_or->{'scope'});
+    my $session_or=$db_or->with_session(
+        (defined($bookmark)&&length($bookmark)) ? $bookmark : 'first-primary')->get();
+    my $result_hr=$session_or->all('SELECT 7 AS value')->get();
+    my $next=$session_or->get_bookmark()->get();
+    $request_or->headers_out('x-d1-bookmark' => $next) if defined($next);
+    my $html_or=$self->html_tiny();
+    return $self->render(
+        value => $html_or->entity_encode($result_hr->{'results'}[0]{'value'}),
+        bookmark => $html_or->entity_encode(defined($next) ? $next : ''),
+        bookmark_display => $html_or->entity_encode(
+            (defined($next)&&length($next)) ? $next : 'No bookmark returned by this local request'),
+    );
+}

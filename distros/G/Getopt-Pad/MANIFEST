@@ -1,9 +1,14 @@
 Changes
 examples/01-basic.pl
 examples/02-types.pl
+examples/03-commands.json
 examples/03-commands.pl
 examples/04-custom-type.pl
 examples/05-custom-format.pl
+examples/06-value-shapes.pl
+examples/07-config.json
+examples/07-config.pl
+examples/08-checks.pl
 examples/ResultDump.pm
 lib/Getopt/Pad.pm
 lib/Getopt/Pad/Completion.pm
@@ -11,6 +16,7 @@ lib/Getopt/Pad/Config.pm
 lib/Getopt/Pad/Config/Format.pm
 lib/Getopt/Pad/Config/Format/Json.pm
 lib/Getopt/Pad/Config/Format/Yaml.pm
+lib/Getopt/Pad/Cookbook.pod
 lib/Getopt/Pad/Error.pm
 lib/Getopt/Pad/ExitRequest.pm
 lib/Getopt/Pad/Help.pm
@@ -23,6 +29,7 @@ lib/Getopt/Pad/Spec/Arg.pm
 lib/Getopt/Pad/Spec/Config.pm
 lib/Getopt/Pad/Spec/Level.pm
 lib/Getopt/Pad/Spec/Option.pm
+lib/Getopt/Pad/Tutorial.pod
 lib/Getopt/Pad/Type.pm
 lib/Getopt/Pad/Type/Dir.pm
 lib/Getopt/Pad/Type/File.pm

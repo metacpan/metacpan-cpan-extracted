@@ -8,7 +8,7 @@ class Getopt::Pad::Help :strict(params) {
 	use Getopt::Pad::Util qw(useColor);
 	use Text::Wrap ();
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	field $level       :param;
 	field $version     :param = undef;
@@ -253,13 +253,58 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Help - usage and version renderer
+Getopt::Pad::Help - Renders the help and version output of one level
+(internal)
 
 =head1 DESCRIPTION
 
-Renders the usage and version output for one spec Level: header, Arguments section, grouped options with annotations, Commands section, and examples - wrapped to the terminal width and colorized on a tty. Constructed through the Spec's helperFor method; the command path shown in the header is derived from the Level itself.
+This module is internal to Getopt::Pad. It is not part of the public
+API and can change without notice. Programs use L<Getopt::Pad/GetOptions>;
+this page is for people working on Getopt::Pad itself.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+Renders the output of C<--help> and C<--version> for one level: the
+header with the command path, the C<Arguments> section, one section per
+option group, the C<Commands> section and the examples. The layout is
+described for users in L<Getopt::Pad/HELP OUTPUT>.
+
+Help renderers are created only by the C<helperFor> method of
+L<Getopt::Pad::Spec>. The
+command path in the header is derived from the level itself.
+
+The terminal is consulted when something is rendered, not when the
+renderer is created: a parse creates one renderer per level without
+printing anything, and C<< $result->help >> may run much later. The
+width comes from C<COLUMNS>, else from L<Term::ReadKey> when the handle is
+a terminal, else it is 100. Colors are used when the handle is a
+terminal, C<NO_COLOR> is empty and C<TERM> is not C<dumb>.
+
+Text is wrapped as plain text first and colored afterwards, so the escape
+codes never affect the column alignment.
+
+=head1 METHODS
+
+=over 4
+
+=item new(level => $level, version => $version, programName => $name, width => $columns, color => $bool, handle => $fh)
+
+Only C<level> is required. C<programName> defaults to the file name of
+C<$0>, C<handle> to STDOUT; C<width> and C<color> are detected when
+omitted.
+
+=item renderHelp, printHelp
+
+The help text, or print it to the handle.
+
+=item renderVersion, printVersion
+
+C<PROGRAM VERSION>, where VERSION is the spec's C<version>, else
+C<$main::VERSION>, else C<unknown>; or print it with a newline.
+
+=back
+
+=head1 SEE ALSO
+
+L<Getopt::Pad/HELP OUTPUT>, L<Getopt::Pad::Spec>
 
 =head1 AUTHOR
 

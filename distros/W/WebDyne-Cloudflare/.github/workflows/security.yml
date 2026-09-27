@@ -1,0 +1,42 @@
+name: Security audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '23 2 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Audit locked npm dependencies
+        run: npm audit
+
+  cpan-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Set up Perl
+        uses: shogo82148/actions-setup-perl@v1.44.0
+        with:
+          perl-version: '5.44.0'
+      - name: Install audit tool
+        run: cpanm --notest --local-lib-contained audit CPAN::Audit
+      - name: Audit declared CPAN dependencies
+        run: |
+          perl Makefile.PL
+          perl -I"$GITHUB_WORKSPACE/audit/lib/perl5" audit/bin/cpan-audit deps . --no-corelist

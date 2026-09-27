@@ -7,7 +7,7 @@ use Carp ();
 
 use InternetData::Error;
 
-our $VERSION = '1.6.1';
+our $VERSION = '1.7.0';
 
 # The formats a database is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -328,6 +328,7 @@ version of itself:
                 version => 1,
                 summary => 'IP ranges that cannot legitimately appear on the internet.',
                 formats => ['csvgz', 'mmdb'],
+                sample_formats => ['csvgz'],   # an evaluation sample's; absent when none
             },
         ],
     }
@@ -338,7 +339,8 @@ C<< $family->{base} >>.
 =head2 metadata($id)
 
 One database's build document: C<updated>, C<entries>, per-format C<schema>,
-C<sample> and C<size>. Poll it to decide whether today's build is worth
+C<sample> and C<size>, and C<sample_size> and C<sample_entries> where an
+evaluation sample is published. Poll it to decide whether today's build is worth
 fetching, and read C<< $meta->{size}{$format} >> to size a transfer before
 starting it.
 
@@ -350,7 +352,8 @@ algorithm.
 =head2 downloads(%options)
 
 Your organization's recent download attempts, newest first, refusals included.
-C<limit> caps the number returned.
+C<sample> is true on an attempt at the evaluation sample rather than the
+database itself. C<limit> caps the number returned.
 
 =head2 download_url($id, $format)
 

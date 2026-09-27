@@ -1,0 +1,64 @@
+use alienfile 2.84;
+
+plugin 'PkgConfig' => (
+    pkg_name        => 'libngtcp2',
+    atleast_version => '1.25.0',
+);
+
+share {
+    start_url 'https://github.com/ngtcp2/ngtcp2/releases/download/v1.25.0/ngtcp2-1.25.0.tar.gz';
+
+    plugin 'Digest' => [
+        SHA256 => '1c0843076528a87b65e9a9d455100941f4cb65d44f96c5da6ae56df146043955',
+    ];
+    plugin 'Download';
+    plugin 'Extract' => 'tar.gz';
+
+    if ($^O eq 'MSWin32') {
+        plugin 'Build::CMake';
+
+        build [
+            [
+                '%{cmake}',
+                @{ meta->prop->{plugin_build_cmake}->{args} },
+                '-DENABLE_LIB_ONLY=ON',
+                '-DENABLE_SHARED_LIB=OFF',
+                '-DENABLE_STATIC_LIB=ON',
+                '-DENABLE_OPENSSL=OFF',
+                '-DENABLE_GNUTLS=OFF',
+                '-DENABLE_BORINGSSL=OFF',
+                '-DENABLE_PICOTLS=OFF',
+                '-DENABLE_WOLFSSL=OFF',
+                '-DBUILD_TESTING=OFF',
+                '%{.install.extract}',
+            ],
+            '%{make}',
+            '%{make} install',
+        ];
+
+        after 'gather' => sub {
+            my ($build) = @_;
+
+            my $compiler_type
+                = $build->meta_prop->{platform}->{compiler_type} || '';
+            my $define = $compiler_type eq 'microsoft'
+                ? '/DNGTCP2_STATICLIB'
+                : '-DNGTCP2_STATICLIB';
+
+            for my $key (qw(cflags cflags_static)) {
+                my $value = $build->runtime_prop->{$key} || '';
+                $build->runtime_prop->{$key}
+                    = join ' ', grep { length } $value, $define;
+            }
+        };
+    }
+    else {
+        plugin 'Build::Autoconf';
+
+        build [
+            '%{configure} --enable-lib-only --with-openssl=no --with-gnutls=no --with-boringssl=no --with-picotls=no --with-wolfssl=no --disable-cryptotest --disable-shared --enable-static',
+            '%{make}',
+            '%{make} install',
+        ];
+    }
+};

@@ -61,20 +61,20 @@ use autodie qw(:all);
 
 # Core and CPAN dependencies
 use Carp;
-use Config::Abstraction 0.36;
+use Config::Abstraction 0.40;
 use Data::Dumper;
-use Params::Get 0.13;
+use Params::Get 0.15;
 use POSIX qw(strftime);
 use Readonly;
 use Readonly::Values::Syslog 0.04;
-use Return::Set;
+use Return::Set 0.04;
 use Scalar::Util 'blessed';
 
 # Sub::Private in enforce mode: _-prefixed subs decorated :Private croak when
 # called from outside this package.  HARNESS_ACTIVE bypasses checks during
 # make test so white-box tests can still reach private methods.
 BEGIN { $Sub::Private::config{mode} = 'enforce' }
-use Sub::Private;
+use Sub::Private 0.05;
 
 # Sys::Syslog imported with bare-function names used in _log
 use Sys::Syslog 0.28;
@@ -134,11 +134,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.33
+0.34
 
 =cut
 
-our $VERSION = 0.33;
+our $VERSION = 0.34;
 
 =head1 SYNOPSIS
 

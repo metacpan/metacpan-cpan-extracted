@@ -1234,4 +1234,534 @@ subtest 'DF-15: fixated data integrity and exists() guard correctness' => sub {
 	}
 };
 
+# ═══════════════════════════════════════════════════════════════════════════
+# DF-16  base_criteria data flow  D → U (every query) → immutability
+#
+# Chain: new() shallow-copies caller's hashref into $self->{'base_criteria'} (D) →
+#        _merge_base_criteria() returns merged copy on each query (U) →
+#        caller's original hashref is not mutated (K never fires on caller's D)
+# ═══════════════════════════════════════════════════════════════════════════
+subtest 'DF-16: base_criteria DU chain (D → U in every query → immutability)' => sub {
+
+	# DF-16.1: base_criteria absent → stored as undef (no D on slot)
+	{
+		my $db = _new_db();
+		ok !defined($db->{'base_criteria'}),
+			'DF-16.1: base_criteria slot absent when not given at construction';
+	}
+
+	# DF-16.2: base_criteria stored at construction (D) — correct value
+	{
+		my $db = _new_db(base_criteria => { entry => $CONFIG{ENTRY_ONE} });
+		is_deeply $db->{'base_criteria'}, { entry => $CONFIG{ENTRY_ONE} },
+			'DF-16.2: base_criteria defined (D) at construction with expected value';
+	}
+
+	# DF-16.3: shallow copy — mutating caller's original after construction does not affect object (D is a copy)
+	{
+		my %orig = (entry => $CONFIG{ENTRY_ONE});
+		my $db   = _new_db(base_criteria => \%orig);
+		$orig{entry} = 'INJECTED';    # mutate caller's hash after new()
+		is $db->{'base_criteria'}{entry}, $CONFIG{ENTRY_ONE},
+			'DF-16.3: base_criteria is a shallow copy — mutation of caller hashref does not affect stored D';
+	}
+
+	# DF-16.4: selectall_arrayref respects base_criteria (U in every query)
+	{
+		my $db   = _new_db(base_criteria => { entry => $CONFIG{ENTRY_ONE} });
+		my $rows = $db->selectall_arrayref();
+		is scalar(@{$rows}), 1, 'DF-16.4a: selectall_arrayref with base_criteria returns filtered rows (U)';
+		is $rows->[0]{'entry'}, $CONFIG{ENTRY_ONE},
+			'DF-16.4b: returned row matches base_criteria filter';
+	}
+
+	# DF-16.5: count() respects base_criteria (U)
+	{
+		my $db = _new_db(base_criteria => { entry => $CONFIG{ENTRY_ONE} });
+		is $db->count(), 1, 'DF-16.5: count() filtered by base_criteria returns 1 (U)';
+	}
+
+	# DF-16.6: fetchrow_hashref respects base_criteria — mismatched entry returns undef
+	{
+		my $db  = _new_db(base_criteria => { entry => $CONFIG{ENTRY_ONE} });
+		my $row = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_TWO});
+		ok !defined($row),
+			'DF-16.6: fetchrow_hashref with base_criteria mismatch returns undef (U filters correctly)';
+	}
+
+	# DF-16.7: query builder respects base_criteria (U in Query._build_sql)
+	{
+		my $db = _new_db(base_criteria => { entry => $CONFIG{ENTRY_ONE} });
+		my $n  = $db->query()->count();
+		is $n, 1, 'DF-16.7: query->count() filtered by base_criteria returns 1 (U in _build_sql)';
+	}
+
+	# DF-16.8: caller-supplied criteria WIN over base_criteria (U → narrow-down semantics)
+	# base_criteria sets entry => ONE; caller narrows to entry => ONE — still finds 1
+	{
+		my $db   = _new_db(base_criteria => { entry => $CONFIG{ENTRY_ONE} });
+		my $rows = $db->selectall_arrayref(entry => $CONFIG{ENTRY_ONE});
+		is scalar(@{$rows}), 1,
+			'DF-16.8a: caller criteria consistent with base_criteria — 1 result';
+		is $rows->[0]{'entry'}, $CONFIG{ENTRY_ONE},
+			'DF-16.8b: correct row returned when caller and base_criteria agree';
+	}
+
+	# DF-16.9: empty base_criteria {} — behaves as if no filter (all rows returned)
+	{
+		my $db = _new_db(base_criteria => {});
+		is $db->count(), $CONFIG{TOTAL_ROWS},
+			'DF-16.9: empty base_criteria ({}) does not filter any rows';
+	}
+
+	# DF-16.10: base_criteria stable across calls (no DD — not re-assigned after construction)
+	{
+		my $db = _new_db(base_criteria => { entry => $CONFIG{ENTRY_ONE} });
+		my $bc_before = $db->{'base_criteria'};
+		$db->count();
+		$db->selectall_arrayref();
+		$db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
+		is $db->{'base_criteria'}, $bc_before,
+			'DF-16.10: base_criteria ref unchanged (no DD) across all query calls';
+	}
+};
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DF-17  _schema cache + _match_criterion numeric DU chain
+#
+# Chain: schema() call populates $self->{'_schema'} (D) → _match_criterion
+#        reads it (U) for numeric column equality — enabling == instead of eq
+# ═══════════════════════════════════════════════════════════════════════════
+subtest 'DF-17: _schema cache flows into _match_criterion numeric comparison' => sub {
+	test_needs 'DBD::SQLite';
+
+	# Build an in-memory SQLite DB with INTEGER and TEXT columns
+	{
+		package Database::df17;
+		use parent 'Database::Abstraction';
+	}
+	my $dir17   = tempdir(CLEANUP => 1);
+	my $file17  = File::Spec->catfile($dir17, 'df17.sql');
+	my $setup17 = DBI->connect("dbi:SQLite:dbname=$file17", undef, undef, { RaiseError => 1 });
+	$setup17->do(q{CREATE TABLE df17 (id INTEGER PRIMARY KEY, score INTEGER, label TEXT)});
+	$setup17->do(q{INSERT INTO df17 VALUES (1, 42, 'alpha')});
+	$setup17->do(q{INSERT INTO df17 VALUES (2, 100, 'beta')});
+	$setup17->disconnect();
+
+	my $db = Database::df17->new(dsn => "dbi:SQLite:dbname=$file17", no_entry => 1);
+
+	# DF-17.1: _schema not defined before first schema() call (no D yet)
+	{
+		my $db2 = Database::df17->new(dsn => "dbi:SQLite:dbname=$file17", no_entry => 1);
+		ok !defined($db2->{'_schema'}),
+			'DF-17.1: _schema undefined before schema() call (no D)';
+	}
+
+	# DF-17.2: schema() defines _schema (D) with correct type info
+	{
+		my $sch = $db->schema();
+		ok defined($db->{'_schema'}), 'DF-17.2a: _schema defined (D) after schema() call';
+		is ref($db->{'_schema'}), 'HASH', 'DF-17.2b: _schema is a HASH ref';
+		is $sch->{'score'}{'type'}, 'INTEGER',
+			'DF-17.2c: score column typed INTEGER in _schema (D correct)';
+	}
+
+	# DF-17.3: _schema cache hit — same hashref returned on second schema() call (U)
+	{
+		my $s1 = $db->schema();
+		my $s2 = $db->schema();
+		is $s1, $s2, 'DF-17.3: schema() returns same hashref (U from cache) on repeat calls';
+	}
+
+	# DF-17.4: _schema stable across all query calls (no DD)
+	{
+		my $sch_before = $db->{'_schema'};
+		$db->count();
+		$db->selectall_arrayref();
+		is $db->{'_schema'}, $sch_before,
+			'DF-17.4: _schema ref unchanged (no DD) across count/selectall calls';
+	}
+
+	# DF-17.5: numeric comparison (U of _schema in _match_criterion) — via infer_types on CSV
+	{
+		my ($dir17b) = _make_csv_dir(
+			content => "entry!score\nrow_a!042\nrow_b!100\n",
+			name    => 'df17b'
+		);
+		{
+			package Database::df17b;
+			use parent 'Database::Abstraction';
+		}
+		my $db17b = Database::df17b->new(
+			directory   => $dir17b,
+			infer_types => 1,
+			sep_char    => '!',
+		);
+		# Warm the schema cache so _match_criterion gets numeric info
+		$db17b->schema();
+		ok defined($db17b->{'_schema'}{'score'}),
+			'DF-17.5a: infer_types schema has score column entry';
+		# When infer_types is on, score should be INTEGER; numeric comparison then
+		# makes 42 == 042 and 100 == 100.0 match correctly.
+		my $rows = $db17b->selectall_arrayref(entry => 'row_a');
+		ok defined($rows) && scalar(@{$rows}) >= 1,
+			'DF-17.5b: row_a found — schema (U) flows into in-memory filter correctly';
+	}
+};
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DF-18  each_row() streaming DU chain + O~ prevention (sth->finish on exception)
+#
+# SQL path: prepare_cached (D sth) → execute → fetchrow_hashref in loop (U sth) →
+#   finish on exception (K sth) or natural loop end (K sth implicit)
+# Slurp path: @rc collected (D) → callback invoked per row (U) → @rc de-scoped (K)
+# ═══════════════════════════════════════════════════════════════════════════
+subtest 'DF-18: each_row() streaming DU chain and exception-safe sth close' => sub {
+	test_needs 'DBD::SQLite';
+
+	{
+		package Database::df18;
+		use parent 'Database::Abstraction';
+	}
+	my $dir18   = tempdir(CLEANUP => 1);
+	my $file18  = File::Spec->catfile($dir18, 'df18.sql');
+	my $setup18 = DBI->connect("dbi:SQLite:dbname=$file18", undef, undef, { RaiseError => 1 });
+	$setup18->do(q{CREATE TABLE df18 (entry TEXT PRIMARY KEY, val INTEGER)});
+	$setup18->do(q{INSERT INTO df18 VALUES ('a', 1)});
+	$setup18->do(q{INSERT INTO df18 VALUES ('b', 2)});
+	$setup18->do(q{INSERT INTO df18 VALUES ('c', 3)});
+	$setup18->disconnect();
+
+	my $db_sql   = Database::df18->new(dsn => "dbi:SQLite:dbname=$file18", no_entry => 1);
+	my $db_slurp = _new_db();
+
+	# DF-18.1: callback receives each row; count returned equals row count
+	{
+		my @seen;
+		my $n = $db_sql->each_row(sub { push @seen, $_[0]->{'entry'} });
+		is $n, 3,          'DF-18.1a: each_row returns count of rows visited (SQL path)';
+		is scalar(@seen), 3, 'DF-18.1b: callback invoked once per row (SQL path)';
+		ok !grep { !defined $_ } @seen,
+			'DF-18.1c: all received entry values are defined (no undef injection)';
+	}
+
+	# DF-18.2: slurp path streaming — callback also receives each row once
+	{
+		my @seen;
+		my $n = $db_slurp->each_row(sub { push @seen, $_[0]->{'entry'} });
+		is $n, $CONFIG{TOTAL_ROWS},
+			'DF-18.2a: each_row returns correct count on slurp path';
+		is scalar(@seen), $CONFIG{TOTAL_ROWS},
+			'DF-18.2b: slurp-path callback invoked once per row';
+	}
+
+	# DF-18.3: sth is released (K) even when callback throws — O~ prevention
+	# The SQL path wraps the fetch loop in eval; sth->finish() is called on die.
+	# We verify the handle is still in a valid state after the exception (no dangling O~).
+	{
+		my $threw = 0;
+		eval {
+			$db_sql->each_row(sub {
+				die "DELIBERATE_EXCEPTION\n" if $_[0]->{'entry'} eq 'a';
+			});
+		};
+		like $@, qr/DELIBERATE_EXCEPTION/,
+			'DF-18.3a: exception from callback propagates to caller';
+		# The DBI handle must still be usable — a dangling sth would cause "active statement" errors
+		my $n = eval { $db_sql->count() };
+		ok !$@, 'DF-18.3b: DBI handle remains valid after each_row exception (O~ prevented)';
+		is $n, 3, 'DF-18.3c: count() after each_row exception returns correct result';
+	}
+
+	# DF-18.4: criteria-filtered streaming — only matching rows reach callback (U flows through filter)
+	{
+		my @seen;
+		my $n = $db_sql->each_row(sub { push @seen, $_[0] }, entry => 'a');
+		is $n, 1, 'DF-18.4a: each_row with criteria returns correct count';
+		is scalar(@seen), 1, 'DF-18.4b: callback invoked only for matching row';
+		is $seen[0]{'entry'}, 'a', 'DF-18.4c: received row matches criteria';
+	}
+
+	# DF-18.5: each_row returns 0 for a no-match criteria (empty DU: D fires, no U to callback)
+	{
+		my $n = $db_sql->each_row(sub { }, entry => 'no_such_entry_xyz');
+		is $n, 0, 'DF-18.5: each_row returns 0 when no rows match (empty DU chain)';
+	}
+};
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DF-19  updated() DSN SQLite live-stat DU chain
+#
+# For file-based backends: stat() in _open() stores mtime in _updated (D once).
+# For DSN-based SQLite: updated() stat()s the file live on every call (U live).
+# ═══════════════════════════════════════════════════════════════════════════
+subtest 'DF-19: updated() DSN SQLite live-stat vs file-mtime DU chain' => sub {
+	test_needs 'DBD::SQLite';
+
+	{
+		package Database::df19;
+		use parent 'Database::Abstraction';
+	}
+	my $dir19   = tempdir(CLEANUP => 1);
+	my $file19  = File::Spec->catfile($dir19, 'df19.sql');
+	my $dsn19   = "dbi:SQLite:dbname=$file19";
+	my $setup19 = DBI->connect($dsn19, undef, undef, { RaiseError => 1 });
+	$setup19->do(q{CREATE TABLE df19 (entry TEXT PRIMARY KEY, val TEXT)});
+	$setup19->do(q{INSERT INTO df19 VALUES ('x', 'one')});
+	$setup19->disconnect();
+
+	my $db = Database::df19->new(dsn => $dsn19, no_entry => 1);
+	$db->count();    # force open
+
+	# DF-19.1: _dialect is 'sqlite' (D) after DSN open
+	is $db->{'_dialect'}, 'sqlite',
+		'DF-19.1: _dialect defined (D) as "sqlite" for SQLite DSN connection';
+
+	# DF-19.2: updated() returns a positive timestamp (U from live stat)
+	cmp_ok $db->updated(), '>', 0,
+		'DF-19.2: updated() returns positive timestamp (U of live stat for DSN SQLite)';
+	cmp_ok $db->updated(), '<=', time() + 10,
+		'DF-19.2b: updated() timestamp is not in the future';
+
+	# DF-19.3: file-based backend — updated() reads stored _updated (D once, U from slot)
+	{
+		my $db_file = _new_db();
+		$db_file->count();
+		my $t1 = $db_file->updated();
+		my $t2 = $db_file->updated();
+		is $t1, $t2, 'DF-19.3: file backend updated() returns same value on repeat calls (D once, U from slot)';
+	}
+
+	# DF-19.4: DSN SQLite _updated slot also set (D at connect time), but live stat is used
+	{
+		ok defined($db->{'_updated'}),
+			'DF-19.4a: _updated slot is defined (D) on DSN SQLite connect';
+		# updated() for SQLite DSN goes through live stat() path, not the slot directly
+		my $live_ts = $db->updated();
+		cmp_ok $live_ts, '>', 0,
+			'DF-19.4b: live stat path returns valid timestamp (U of live stat)';
+	}
+
+	# DF-19.5: two objects on the same DSN file return consistent mtime (both U from same file)
+	{
+		my $db2 = Database::df19->new(dsn => $dsn19, no_entry => 1);
+		$db2->count();
+		cmp_ok abs($db->updated() - $db2->updated()), '<=', 2,
+			'DF-19.5: two DSN SQLite objects return consistent mtime (same file, U from same source)';
+	}
+};
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DF-20  _build_where params copy-on-write for -or/-and
+#
+# Chain: when -or or -and keys are present a copy of $params is made (D for copy) →
+#        the grouping keys are deleted from the copy (U+K on copy) →
+#        original $params hashref is not mutated (D of caller's original preserved)
+# When no -or/-and: $params passed through directly (no extra D, no allocation)
+# ═══════════════════════════════════════════════════════════════════════════
+subtest 'DF-20: _build_where -or/-and copy-on-write (D → U → K on copy only)' => sub {
+
+	my $db = _new_db();
+
+	# DF-20.1: plain criteria — original hashref passed through unchanged (no spurious copy D)
+	{
+		my %crit = (entry => $CONFIG{ENTRY_ONE});
+		my $cref_before = \%crit;
+		$db->selectall_arrayref(%crit);
+		is \%crit, $cref_before,
+			'DF-20.1: plain criteria: same hashref address used (no D for copy), content unchanged';
+		is_deeply \%crit, { entry => $CONFIG{ENTRY_ONE} },
+			'DF-20.1b: plain criteria not mutated by selectall_arrayref';
+	}
+
+	# DF-20.2: -or criteria — grouping keys not present in caller's hashref after call
+	{
+		my %crit = (
+			'-or' => [
+				{ entry => $CONFIG{ENTRY_ONE} },
+				{ entry => $CONFIG{ENTRY_TWO} },
+			]
+		);
+		my $or_ref_before = $crit{'-or'};
+		$db->selectall_arrayref(%crit);
+		# The -or key should still exist in caller's hash (copy-on-write: original untouched)
+		ok exists($crit{'-or'}),
+			'DF-20.2a: -or key still present in caller hash after selectall_arrayref';
+		is $crit{'-or'}, $or_ref_before,
+			'DF-20.2b: -or value ref unchanged — caller original D not mutated';
+	}
+
+	# DF-20.3: -and criteria — same immutability as -or
+	{
+		my %crit = (
+			'-and' => [
+				{ entry => $CONFIG{ENTRY_ONE} },
+			]
+		);
+		my $and_ref_before = $crit{'-and'};
+		$db->selectall_arrayref(%crit);
+		ok exists($crit{'-and'}),
+			'DF-20.3a: -and key still present in caller hash after selectall_arrayref';
+		is $crit{'-and'}, $and_ref_before,
+			'DF-20.3b: -and value ref unchanged — caller original D not mutated';
+	}
+
+	# DF-20.4: -or result is correct (the copy (D) was correctly used, then discarded (K))
+	{
+		my $rows = $db->selectall_arrayref(
+			'-or' => [
+				{ entry => $CONFIG{ENTRY_ONE} },
+				{ entry => $CONFIG{ENTRY_TWO} },
+			]
+		);
+		my @entries = map { $_->{'entry'} } @{$rows};
+		my %have    = map { $_ => 1 } @entries;
+		ok $have{$CONFIG{ENTRY_ONE}}, "DF-20.4a: -or result includes '$CONFIG{ENTRY_ONE}'";
+		ok $have{$CONFIG{ENTRY_TWO}}, "DF-20.4b: -or result includes '$CONFIG{ENTRY_TWO}'";
+		cmp_ok scalar(@{$rows}), '==', 2,
+			'DF-20.4c: -or result has exactly 2 rows (one per OR branch)';
+	}
+};
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DF-21  dbi_source() DU chain  D → U → undef for non-SQLite
+#
+# Chain: _open() creates DBI handle for SQLite (D via $self->{$table}) →
+#        dbi_source() uses it (U) to return { dbh => $dbh, table => $table } →
+#        for non-SQLite / slurp backends $self->{$table} is undef → returns undef
+# ═══════════════════════════════════════════════════════════════════════════
+subtest 'DF-21: dbi_source() DU chain (SQLite returns hashref, slurp returns undef)' => sub {
+	test_needs 'DBD::SQLite';
+
+	{
+		package Database::df21;
+		use parent 'Database::Abstraction';
+	}
+	my $dir21   = tempdir(CLEANUP => 1);
+	my $file21  = File::Spec->catfile($dir21, 'df21.sql');
+	my $setup21 = DBI->connect("dbi:SQLite:dbname=$file21", undef, undef, { RaiseError => 1 });
+	$setup21->do(q{CREATE TABLE df21 (entry TEXT PRIMARY KEY, val TEXT)});
+	$setup21->do(q{INSERT INTO df21 VALUES ('k1', 'v1')});
+	$setup21->disconnect();
+
+	my $db_sqlite = Database::df21->new(dsn => "dbi:SQLite:dbname=$file21", no_entry => 1);
+	my $db_csv    = _new_db();
+
+	# DF-21.1: dbi_source() for SQLite DSN returns a hashref (D dbh used → U returned)
+	{
+		my $src = $db_sqlite->dbi_source();
+		ok defined($src), 'DF-21.1a: dbi_source() returns defined value for SQLite DSN (U of dbh)';
+		is ref($src), 'HASH', 'DF-21.1b: dbi_source() result is a hashref';
+		ok defined($src->{'dbh'}),   'DF-21.1c: result has dbh key';
+		ok defined($src->{'table'}), 'DF-21.1d: result has table key';
+		is $src->{'table'}, 'df21',  "DF-21.1e: table is 'df21'";
+	}
+
+	# DF-21.2: dbh in dbi_source result is the same handle as $self->{$table} (U of same D)
+	{
+		$db_sqlite->count();    # force open
+		my $src = $db_sqlite->dbi_source();
+		is $src->{'dbh'}, $db_sqlite->{'df21'},
+			'DF-21.2: dbi_source dbh is the same DBI handle as $self->{table} (same D used)';
+	}
+
+	# DF-21.3: dbi_source() for CSV slurp backend returns undef (no DBI handle D for SQLite)
+	{
+		my $src = $db_csv->dbi_source();
+		ok !defined($src),
+			'DF-21.3: dbi_source() returns undef for CSV slurp backend (no SQLite dbh D)';
+	}
+
+	# DF-21.4: two SQLite objects have independent dbh slots (two distinct D)
+	{
+		my $db_alt = Database::df21->new(dsn => "dbi:SQLite:dbname=$file21", no_entry => 1);
+		my $s1 = $db_sqlite->dbi_source();
+		my $s2 = $db_alt->dbi_source();
+		isnt $s1->{'dbh'}, $s2->{'dbh'},
+			'DF-21.4: two objects have distinct DBI handles (independent D slots)';
+	}
+
+	# DF-21.5: dbi_source result dbh is functional — can prepare a query through it
+	{
+		my $src = $db_sqlite->dbi_source();
+		my $sth = eval { $src->{'dbh'}->prepare("SELECT COUNT(*) FROM $src->{'table'}") };
+		ok !$@, 'DF-21.5a: no error preparing query via dbi_source dbh';
+		if($sth) {
+			$sth->execute();
+			my ($cnt) = $sth->fetchrow_array();
+			$sth->finish();
+			is $cnt, 1, 'DF-21.5b: query via dbi_source dbh returns correct result';
+		} else {
+			skip 'sth undefined', 1;
+		}
+	}
+};
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DF-22  D~ anomaly documentation — fetchrow_hashref $key pre-computation
+#
+# The source code at Abstraction.pm line ~2481 computes $key unconditionally
+# even when $self->{cache} is undef (the string is then never read = dead store).
+# This is flagged in code with: "# TODO: Data Flow Anomaly - D~: ..."
+# These tests verify: (a) the anomaly is present but benign, and
+#                     (b) the key IS correct when cache IS configured.
+# ═══════════════════════════════════════════════════════════════════════════
+subtest 'DF-22: D~ anomaly in fetchrow_hashref $key — benign dead-store documentation' => sub {
+
+	# DF-22.1: without cache — fetchrow_hashref returns correct data (dead store is benign)
+	{
+		my $db  = _new_db();    # no cache
+		my $row = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
+		ok defined($row), 'DF-22.1a: fetchrow_hashref returns defined row without cache';
+		is $row->{'entry'}, $CONFIG{ENTRY_ONE},
+			'DF-22.1b: D~ dead-store anomaly is benign — correct data returned without cache';
+		is $row->{'number'}, '1',
+			'DF-22.1c: column value correct — pre-computed key causes no data corruption';
+	}
+
+	# DF-22.2: with cache — $key IS used (U), so no dead-store in the cache path
+	{
+		test_needs 'CHI';
+		my $cache = CHI->new(driver => 'Memory', global => 0);
+		my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
+		my $r1    = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});    # MISS → D in cache
+		my $r2    = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});    # HIT → U from cache
+		ok defined($r1) && defined($r2), 'DF-22.2a: both calls return defined rows';
+		is_deeply $r1, $r2,
+			'DF-22.2b: cache HIT returns equivalent data (U from cache correct when key present)';
+		is $r2->{'entry'}, $CONFIG{ENTRY_ONE},
+			'DF-22.2c: cached row has correct entry value (key correctly formed)';
+	}
+
+	# DF-22.3: wantarray context — different key computed for array vs scalar
+	{
+		test_needs 'CHI';
+		my $cache = CHI->new(driver => 'Memory', global => 0);
+		my $db    = _new_db(cache => $cache, cache_duration => '1 hour');
+		# scalar context: key does NOT include 'array ' prefix
+		my $s     = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
+		# list context: key DOES include 'array ' prefix — distinct cache entry
+		my @l     = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
+		ok defined($s),    'DF-22.3a: scalar-context result is defined';
+		ok scalar(@l) > 0, 'DF-22.3b: list-context result is non-empty';
+	}
+
+	# DF-22.4: repeated fetchrow_hashref without cache returns consistent data (idempotent U)
+	{
+		my $db = _new_db();
+		my $r1 = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
+		my $r2 = $db->fetchrow_hashref(entry => $CONFIG{ENTRY_ONE});
+		is_deeply $r1, $r2,
+			'DF-22.4: repeated fetchrow_hashref without cache returns identical data (idempotent)';
+	}
+
+	# DF-22.5: undef-entry returns undef — dead-store key is still harmless for missing rows
+	{
+		my $db  = _new_db();
+		my $row = $db->fetchrow_hashref(entry => 'nonexistent_xyz');
+		ok !defined($row),
+			'DF-22.5: fetchrow_hashref for missing entry returns undef (D~ does not cause false hit)';
+	}
+};
+
 done_testing();

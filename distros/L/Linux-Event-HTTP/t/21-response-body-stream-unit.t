@@ -14,13 +14,18 @@ use Linux::Event::HTTP::Transaction;
 
     sub new ($class) {
         return bless {
-            writes     => [],
-            next_write => 1,
+            writes               => [],
+            next_write           => 1,
+            drain_inside_write   => 0,
         }, $class;
     }
 
     sub _write_http_response_body ($self, $transaction, $bytes, $final, $operation) {
         push @{$self->{writes}}, [ $transaction, $bytes, $final, $operation ];
+        if ($self->{drain_inside_write}) {
+            my $body = $transaction->_response_body_object;
+            $body->_drain if $body;
+        }
         return $self->{next_write};
     }
 
@@ -119,6 +124,21 @@ is_deeply(
 $ok = eval { $stream->write('late'); 1 };
 ok(!$ok, 'write after producer completion is rejected');
 like($@, qr/already complete/, 'post-completion write rejection is clear');
+
+($transaction, $request, $response, $controller) = new_transaction();
+my $reentrant_drains = 0;
+my $reentrant = $transaction->response_body(
+    on_drain => sub ($body) { ++$reentrant_drains },
+);
+$controller->{next_write} = 0;
+$controller->{drain_inside_write} = 1;
+ok(!$reentrant->write('reentrant'),
+    'producer preserves false return when controller drains reentrantly');
+is($reentrant_drains, 1,
+    'reentrant drain is observed while controller write is still on stack');
+$reentrant->_drain;
+is($reentrant_drains, 1,
+    'reentrant drain clears blocked state instead of being overwritten afterward');
 
 ($transaction, $request, $response, $controller) = new_transaction();
 my $cancelled = $transaction->response_body(

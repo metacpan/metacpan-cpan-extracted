@@ -1,0 +1,8 @@
+Revision history for Perl-Critic-Policy-Subroutines-ProhibitTailRecursion
+
+0.001 2026-09-27 TEODESIAN
+    - Initial Release.  Reports a sub that calls itself, by name, through
+      &name, as a method on its own invocant, or through __SUB__.  perl
+      gives every call a stack frame, so recursion uses one for each level
+      of its input.  goto &name and goto __SUB__ are not reported, because
+      they replace the frame.

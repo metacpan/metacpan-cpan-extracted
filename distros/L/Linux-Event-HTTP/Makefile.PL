@@ -33,7 +33,7 @@ my %provides = map {
 WriteMakefile(
     NAME             => 'Linux::Event::HTTP',
     VERSION_FROM     => 'lib/Linux/Event/HTTP.pm',
-    ABSTRACT         => 'Native high-performance HTTP protocol support for Linux::Event',
+    ABSTRACT         => 'Native HTTP/1.x and HTTP/2 support for Linux::Event',
     AUTHOR           => 'Joshua S. Day <hax@cpan.org>',
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.036000',
@@ -46,13 +46,25 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'HTTP::CookieJar'     => '0.014',
-        'Linux::Event'        => '0.116',
+        'Linux::Event'        => '0.117',
         'Uniform::HTTP::Auth' => '0.02',
         'URI'                 => 0,
     },
     META_MERGE => {
         'meta-spec' => {
             version => 2,
+        },
+        optional_features => {
+            http2 => {
+                description => 'HTTP/2 support via Net::HTTP2::nghttp2',
+                prereqs => {
+                    runtime => {
+                        requires => {
+                            'Net::HTTP2::nghttp2' => '0.011',
+                        },
+                    },
+                },
+            },
         },
         no_index => {
             package => [qw(
@@ -61,6 +73,13 @@ WriteMakefile(
                 Linux::Event::HTTP::_ClientUpgrade
                 Linux::Event::HTTP::_HTTP1
                 Linux::Event::HTTP::_HTTP1::Chunked
+                Linux::Event::HTTP::_HTTP2
+                Linux::Event::HTTP::_HTTP2::Client
+                Linux::Event::HTTP::_HTTP2::ClientConnection
+                Linux::Event::HTTP::_HTTP2::ClientSelector
+                Linux::Event::HTTP::_HTTP2::ClientSelectorConnection
+                Linux::Event::HTTP::_HTTP2::Server
+                Linux::Event::HTTP::_HTTP2::ServerConnection
                 Linux::Event::HTTP::_ServerConnect
                 Linux::Event::HTTP::_Upgrade
             )],

@@ -6,7 +6,7 @@ use Getopt::Pad::Type::Number;
 class Getopt::Pad::Type::Float :isa(Getopt::Pad::Type::Number) :strict(params) {
 	use Scalar::Util qw(looks_like_number);
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	use constant NAMES => ['f', 'float', 'num', 'number'];
 
@@ -25,13 +25,38 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Type::Float - float type
+Getopt::Pad::Type::Float - The float option type
+
+=head1 SYNOPSIS
+
+=for highlighter language=perl
+
+    options => {
+        ratio => { type => 'float', min => 0, max => 1, default => 0.5 },
+    },
 
 =head1 DESCRIPTION
 
-Finite numeric value with optional C<min> / C<max> bounds, spec type C<f>; infinities and NaN are rejected.
+The type of options and args declared with C<< type => 'float' >>,
+C<'num'>, C<'number'> or C<'f'>.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+It accepts any value that Perl recognizes as a decimal number
+(L<Scalar::Util/looks_like_number>): C<1.5>, C<-2>, C<.5>, C<1e3>.
+Values spelled C<inf>, C<infinity> or C<nan> are rejected with
+C<'VALUE' is not a finite number>, everything else that is not a number,
+including hexadecimal values such as C<0x10>, with C<'VALUE' is not a
+number>. A value too large for a Perl number, such as C<1e999>, is
+accepted and reads as C<Inf>; use C<max> to exclude it. The reader
+returns the value as a number.
+
+The spec keys C<min> and C<max> set inclusive bounds; they come from
+L<Getopt::Pad::Type::Number>. See L<Getopt::Pad/float> for the user-level
+description.
+
+=head1 SEE ALSO
+
+L<Getopt::Pad/TYPES>, L<Getopt::Pad::Type::Int>,
+L<Getopt::Pad::Type::Number>
 
 =head1 AUTHOR
 

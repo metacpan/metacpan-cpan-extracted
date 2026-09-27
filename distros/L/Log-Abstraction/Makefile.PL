@@ -19,19 +19,19 @@ WriteMakefile(
 		: ()),
 	PREREQ_PM => {
 		'Carp'	 => 0,
-		'Config::Abstraction' => 0.36,
+		'Config::Abstraction' => 0.40,
 		'Data::Dumper' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'JSON::PP' => 0,
 		'Log::Log4perl' => 0,
-		'Params::Get' => 0.13,
+		'Params::Get' => 0.15,
 		'POSIX' => 0,
 		'Readonly' => 0,
 		'Readonly::Values::Syslog' => 0.04,
-		'Return::Set' => 0,
+		'Return::Set' => 0.04,
 		'Sys::Syslog' => 0.28,
 		'Scalar::Util'=> 0,
-		'Sub::Private' => 0,
+		'Sub::Private' => 0.05,
 	},
 	TEST_REQUIRES => {
 		'File::Glob' => 0,	# scripts/generate_index

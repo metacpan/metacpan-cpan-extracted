@@ -1,0 +1,28 @@
+<start_html title="WebDyne Cloudflare R2" h2>
+<p>Save a greeting, then refresh to read it through the native R2 binding.</p>
+<form method="post">
+  <button type="submit" name="save" value="1">Save greeting</button>
+</form>
+<perl handler="greeting"><p>${message}</p></perl>
+<p><a href="d1.psp">D1 example</a></p>
+
+__PERL__
+
+use WebDyne::Cloudflare::R2;
+
+sub greeting {
+    my ($self)=@_;
+    my $service_or=WebDyne::Cloudflare::R2->new(
+        scope   => $self->r()->{'scope'},
+        binding => 'OBJECTS',
+    );
+    my $cgi_or=$self->CGI();
+    if (($cgi_or->request_method() eq 'POST')&&$cgi_or->param('save')) {
+        $service_or->put('webdyne-example-greeting', 'Hello from WebDyne and R2!')->get();
+    }
+    my $object_or=$service_or->get('webdyne-example-greeting')->get();
+    my $message=$object_or ? $object_or->body() : undef;
+    $message='No greeting saved yet.'
+        unless defined($message);
+    return $self->render(message => $self->html_tiny()->entity_encode($message));
+}

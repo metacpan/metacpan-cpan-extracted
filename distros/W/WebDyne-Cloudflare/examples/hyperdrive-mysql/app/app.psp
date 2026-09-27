@@ -1,0 +1,30 @@
+<start_html title="Hyperdrive inventory" h2>
+<p>A bounded, read-only inventory query with a separately bound limit.</p>
+<table>
+  <thead><tr><th>SKU</th><th>Name</th><th>Quantity</th></tr></thead>
+  <tbody>
+    <perl handler="inventory">
+      <tr><td>${sku}</td><td>${name}</td><td>${quantity}</td></tr>
+    </perl>
+  </tbody>
+</table>
+
+__PERL__
+
+use WebDyne::Cloudflare::Hyperdrive;
+
+sub inventory {
+    my ($self)=@_;
+    my $db_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $self->r()->{'scope'});
+    my $rows_ar=$db_or->selectall_arrayref(
+        'SELECT sku, name, quantity FROM demo_inventory ORDER BY sku LIMIT ?',
+        { Slice => {} }, 100)->get();
+    $db_or->disconnect()->get();
+    my $html_or=$self->html_tiny();
+    my $output='';
+    foreach my $row_hr (@{$rows_ar}) {
+        my %param=map { $_ => $html_or->entity_encode($row_hr->{$_}) } qw(sku name quantity);
+        $output.=${$self->render(%param)};
+    }
+    return \$output;
+}

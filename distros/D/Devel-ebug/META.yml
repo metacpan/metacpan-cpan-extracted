@@ -5,6 +5,7 @@ author:
   - 'Leon Brocard <acme@astray.com>'
   - 'Brock Wilcox <awwaiid@thelackthereof.org>'
 build_requires:
+  File::Temp: '0'
   Test::More: '0.94'
   perl: '5.008'
 configure_requires:
@@ -20,15 +21,19 @@ name: Devel-ebug
 no_index:
   directory:
     - corpus
+recommends:
+  JSON::PP: '0'
 requires:
   Class::Accessor::Chained: '0'
   Devel::StackTrace: '2.00'
+  IO::Select: '0'
   IO::Socket::INET: '0'
   Module::Pluggable: '0'
   PadWalker: '0'
   Proc::Background: '0'
   String::Koremutake: '0'
   Term::ReadLine: '0'
+  Text::ParseWords: '0'
   YAML: '0'
   base: '0'
   perl: '5.008'
@@ -38,13 +43,13 @@ resources:
   bugtracker: https://github.com/uperl/Devel-ebug/issues
   homepage: https://metacpan.org/pod/Devel::ebug
   repository: git://github.com/uperl/Devel-ebug.git
-version: '0.65'
+version: '0.67'
 x_contributors:
   - 'Leon Brocard <acme@astray.com>'
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Brock Wilcox <awwaiid@thelackthereof.org>'
   - 'Taisuke Yamada'
-x_generated_by_perl: v5.42.3
+x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

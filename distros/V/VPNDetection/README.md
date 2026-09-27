@@ -1,4 +1,4 @@
-# [<img src="https://s3.vpndetection.io/vpndetection-public/brand/mark.svg" alt="VPNDetection" width="24"/>](https://vpndetection.io/) VPNDetection Perl Client Library
+# [<img src="https://s3.vpndetection.io/vpndetection-public/brand/mark.svg" alt="VPNDetection" height="28"/>](https://vpndetection.io/) VPNDetection Perl Client Library
 
 [![CPAN](https://img.shields.io/cpan/v/VPNDetection.svg)](https://metacpan.org/dist/VPNDetection)
 [![license](https://img.shields.io/cpan/l/VPNDetection.svg)](LICENSE)
@@ -237,7 +237,7 @@ There are official VPNDetection client libraries available for many languages in
 
 VPN Detection API: Accurate anonymity detection identifying VPNs, residential proxies, hosting servers, Tor nodes, CDNs, relays and more.
 
-[<img src="https://s3.vpndetection.io/vpndetection-public/brand/mark.svg" alt="VPNDetection" width="96"/>](https://vpndetection.io/)
+[<img src="https://s3.vpndetection.io/vpndetection-public/brand/mark.svg" alt="VPNDetection" height="64"/>](https://vpndetection.io/)
 
 ## License
 

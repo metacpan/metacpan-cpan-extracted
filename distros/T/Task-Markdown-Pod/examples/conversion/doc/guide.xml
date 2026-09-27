@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="example-guide">
+  <title>Example guide</title>
+  <section xml:id="first-section">
+    <title>First section</title>
+    <para>This DocBook article is converted to Markdown with Pandoc.</para>
+  </section>
+</article>

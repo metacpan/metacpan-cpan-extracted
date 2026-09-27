@@ -1,54 +1,77 @@
 # CONNECT tunnels
 
-Linux::Event::HTTP treats CONNECT as an HTTP protocol boundary, not as a proxy framework.
+Linux::Event::HTTP supports explicit HTTP/1.1 CONNECT tunnel establishment and
+handoff.
+
+CONNECT is intentionally separate from ordinary forward-proxy routing.
 
 ## Client CONNECT
 
-The high-level Client explicitly separates the proxy endpoint from the tunnel target:
+Use the high-level Client:
 
 ```perl
-my $operation = $client->connect_tunnel(
-    'http://proxy.example:3128',
-    'target.example:443',
-    tunnel_to => 'MyTunnelProtocol',
-    headers => [
-        [ 'Proxy-Authorization' => $value ],
-    ],
-    on_tunnel => sub ($operation, $tx, $res, $connection) {
-        ...;
+$client->connect_tunnel(
+    $proxy_url,
+    $target_authority,
+
+    tunnel_to => 'MyTunnelConnection',
+
+    on_tunnel => sub ($tx, $res, $connection) {
+        ...
+    },
+
+    on_error => sub ($tx, $error) {
+        ...
     },
 );
 ```
 
-The proxy URL selects the HTTP or HTTPS endpoint to which the Client connects. The second argument is the CONNECT authority-form target and Host value. `tunnel_to` names the Linux::Event stream class that owns the same live socket after a successful tunnel response.
+The proxy URL identifies the HTTP endpoint used to establish the tunnel.
 
-CONNECT is HTTP/1.1 and bodyless. Content-Length and Transfer-Encoding are forbidden on the Request. Any successful 2xx response ends HTTP framing at the end of the response head; Content-Length or Transfer-Encoding fields present on that successful response do not delimit HTTP content. Bytes already read after the head become tunnel input.
+The target authority identifies the requested tunnel destination.
 
-A non-2xx response remains ordinary HTTP. Its body may be consumed incrementally or through explicit bounded buffering, and a persistent failed-CONNECT connection may return to the proxy-origin idle pool.
+A successful 2xx CONNECT response completes the HTTP Transaction at the
+response-head boundary and transitions the same live Linux::Event stream to the
+requested class.
+
+Bytes already read after the successful response head are preserved for the
+tunnel protocol.
+
+A non-2xx response remains an ordinary HTTP response and may carry a normal
+HTTP body.
+
+Proxy 407 authentication can be retried through the configured
+`Uniform::HTTP::Auth` proxy manager when the request is replayable.
 
 ## Server CONNECT
 
-CONNECT arrives through the ordinary server callback. Accepting the tunnel is an explicit Transaction lifecycle operation:
+A server accepts a validated CONNECT request through its active Transaction:
 
 ```perl
 on_request => sub ($conn, $req, $res) {
     if ($req->method eq 'CONNECT') {
-        $conn->transaction->tunnel('MyTunnelProtocol');
+        $conn->transaction->tunnel('MyTunnelConnection');
         return;
     }
 
-    ...;
+    $res->status(405);
+    $res->body("not allowed\n");
 };
 ```
 
-`Transaction->tunnel($target_class)` validates the successful server-side handshake before any tunnel response is emitted. The Request must be HTTP/1.1 CONNECT with an authority-form `host:port` target, exactly one matching Host field, no body, and no Content-Length or Transfer-Encoding. The Response must be a mutable bodyless 2xx response with no Content-Length, Transfer-Encoding, or `Connection: close`.
+The default successful status is 200. Applications may configure another 2xx
+status and additional response headers before handoff.
 
-The normal request-end lifecycle completes first. Linux::Event::HTTP then queues only the successful response head, marks the Response and Transaction complete, clears HTTP state, and calls Linux::Event `transition_to()` so the same accepted stream object belongs to the target protocol class. Already-read bytes following the CONNECT request head are preserved as target-protocol input, while the existing Linux::Event output queue keeps the response head ordered before target-protocol output.
+Opening or bridging an upstream destination is application policy. The HTTP
+library only completes the HTTP handshake and transfers ownership of the
+accepted stream.
 
-A rejected CONNECT is just an ordinary non-2xx HTTP response. It may carry a normal body and, when persistence permits, the same HTTP connection can process later requests.
+## HTTP/2 boundary
 
-## Scope boundary
+The current tunnel API is a whole-transport HTTP/1 handoff.
 
-Neither client nor server CONNECT turns Linux::Event::HTTP into a proxy implementation. The HTTP layer does not decide whether a destination is allowed, open an upstream connection on the server side, relay bytes between two streams, implement proxy authentication policy, or decide which protocol runs inside a successful tunnel.
+HTTP/2 CONNECT and extended CONNECT create a byte channel inside one multiplexed
+stream instead of transferring the whole connection.
 
-Those responsibilities belong to the application or to a reusable protocol-bridge layer above HTTP. Linux::Event::HTTP owns the CONNECT handshake, HTTP message lifecycle, and live-stream handoff only.
+They therefore require a different stream-level transport abstraction and are
+not represented by this API.

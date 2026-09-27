@@ -6,7 +6,7 @@ use Exporter 'import';
 use vars qw(@EXPORT_OK %EXPORT_TAGS);
 
 @Tcl::Tk::ISA = qw(Tcl);
-$Tcl::Tk::VERSION = '1.52';
+$Tcl::Tk::VERSION = '1.53';
 
 sub WIDGET_CLEANUP() {0}
 
@@ -45,9 +45,9 @@ Or
 
 The C<Tcl::Tk> module provides access to the Tk library within Tcl/Tk
 installation. By using this module an interpreter object created, which
-then gain access to entire variety of installed Tcl libraries (Tk, Tix,
-BWidgets, BLT, etc) and existing features (for example natively looking
-widgets using C<tile>).
+then gain access to the Tk package with support of native look through ttk::*
+widgets, as well as entire variety of other installed Tcl/Tk libraries
+(treectrl, BLT, BWidgets, Tix, etc).
 
 =head2 Prerequisites
 
@@ -191,6 +191,43 @@ dealing with widgets are interchangeable.
 
 Newly created widget C<$label> will be blessed to package C<Tcl::Tk::Widget::Label>
 which is isa-C<Tcl::Tk::Widget>
+
+=head2 Mixing Perl/Tk and Native Tcl/Tk Code
+
+One of the greatest strengths of C<Tcl::Tk> is that it does not lock you into a single paradigm. While you can write your entire application using the familiar Perl/Tk object-oriented syntax, you also retain direct access to the underlying Tcl/Tk engine via the interpreter object.
+
+If you ever need to optimize a performance-critical widget grid, inject complex Ttk styles, or reuse snippet patterns written in pure Tcl, you can execute raw Tcl/Tk commands using the C<< $int->Eval() >> method.
+
+=head3 Example: mixing pure-Tcl/Tk and perl/Tk approaches
+
+    my $view_year = 2026;
+
+    # Configure a custom widget style using pure Tcl/Tk syntax
+    $mw->interp->Eval(<<'TCLLOGIC');
+        ttk::style configure Custom.TCombobox -font {"Segoe UI" 14 "bold"}
+        ttk::style configure Custom.TCombobox.Listbox -font {"Segoe UI" 12}
+    TCLLOGIC
+
+    # Create the widget using Perl/Tk syntax while utilizing the Tcl style
+    my $combo = $header->TtkCombobox(
+        -textvariable => \$view_year,
+        -style        => 'Custom.TCombobox',
+        -values       => [2020..2035],
+        -width        => 8,
+        -justify      => 'center'
+    )->pack(-side => 'left', -expand => 1);
+
+=head3 Reference Demos
+
+For a comprehensive side-by-side comparison of how the exact same interactive layout can be implemented using both approaches, check the included demo scripts:
+
+=over 4
+
+=item * C<demos/calendar-perltk.pl> - Full 12-month grid implemented using clean Perl/Tk syntax.
+
+=item * C<demos/calendar-tcltk.pl> - The same interface implemented utilizing raw Tcl/Tk code execution.
+
+=back
 
 =head3 OO explanations of Widget-s of Tcl::Tk
 
@@ -1466,7 +1503,7 @@ my %ptk2tcltk = (
     TtkScale       => ['ttk::scale',       'tscl'],
     TtkSeparator   => ['ttk::separator',   'tsep'],
     TtkSizegrip    => ['ttk::sizegrip',    'tsz'],
-    TtkTreeview    => ['ttk::treeview',    'ttv', undef, {}, ['children']],
+    TtkTreeview    => ['ttk::treeview',    'ttv', undef, {}, ['children', 'focus']],
     TtkPanedwindow => ['ttk::panedwindow', 'tpw'],
     TtkSpinbox     => ['ttk::spinbox',     'tspn'],
 

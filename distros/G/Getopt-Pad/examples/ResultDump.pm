@@ -40,6 +40,7 @@ sub dumpResult($result, $indent = 0) {
 sub formatValue($value) {
 	return 'undef' if !defined $value;
 	return '[' . join(', ', map { formatValue($_) } $value->@*) . ']' if ref $value eq 'ARRAY';
+	return '{' . join(', ', map { sprintf('%s => %s', $_, formatValue($value->{$_})) } sort keys $value->%*) . '}' if ref $value eq 'HASH';
 	return $value if $value =~ /^-?\d+(?:\.\d+)?$/;
 	return "'$value'";
 }

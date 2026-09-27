@@ -1,7 +1,7 @@
 package Statistics::Kappa::Cohen;
 use 5.026;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Moo;
 use experimental qw{ signatures };
@@ -66,7 +66,7 @@ Statistics::Kappa::Cohen - Calculate inter-annotator agreement.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

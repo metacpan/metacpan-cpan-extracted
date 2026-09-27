@@ -20,30 +20,30 @@ use ResultDump;
 my $opt = GetOptions(
 	options => {
 		'owner|o' => {
-			type     => 's',
+			type     => 'string',
 			required => 1,
 			help     => 'Target owner (user or organization)',
 			group    => 'Target',
 		},
 		'repo' => {
-			type  => 's',
+			type  => 'string',
 			help  => 'Target repository name (default: the source basename)',
 			group => 'Target',
 		},
 		'private' => {
-			type    => '!',
+			type    => 'bool',
 			default => 1,
 			help    => 'Create the target repository as private; --no-private makes it public',
 			group   => 'Target',
 		},
 		'log-level' => {
-			type    => 's',
+			type    => 'string',
 			default => 'info',
 			valid   => [qw(trace debug info warn error fatal)],
 			help    => 'Logging level to use',
 		},
 		'tag' => {
-			type     => 's',
+			type     => 'string',
 			multiple => 1,
 			help     => 'May be given more than once; the reader returns an arrayref',
 		},

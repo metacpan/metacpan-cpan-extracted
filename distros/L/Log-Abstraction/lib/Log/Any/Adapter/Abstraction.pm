@@ -10,7 +10,7 @@ use Log::Abstraction;
 use Readonly::Values::Syslog 0.04;
 use Scalar::Util 'blessed';
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ Log::Any::Adapter::Abstraction - Log::Any adapter backed by Log::Abstraction
 
 =head1 VERSION
 
-0.33
+0.34
 
 =head1 SYNOPSIS
 

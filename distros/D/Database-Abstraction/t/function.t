@@ -1417,4 +1417,244 @@ SKIP: {
 	memory_cycle_ok($db, 'XLSX: no memory cycles in connected object');
 }
 
+# ---- A33: updated() — SQLite DSN live-stat path ----------------------------
+# The new code (0.46) stats the backing file on every call when the dialect
+# is 'sqlite' and the dsn matches dbi:SQLite:dbname=...  Non-SQLite backends
+# and slurp-mode objects fall back to the cached _updated timestamp.
+note '--- A33: updated() — SQLite DSN live-stat path';
+SKIP: {
+	skip 'DBD::SQLite not available for updated() live-stat tests', 8
+		unless $have_sqlite;
+
+	my $udir  = tempdir(CLEANUP => 1);
+	my $ufile = File::Spec->catfile($udir, 'updtest.sql');
+	my $udsn  = "dbi:SQLite:dbname=$ufile";
+
+	my $setup = DBI->connect($udsn, undef, undef, { RaiseError => 1 });
+	$setup->do('CREATE TABLE updtest (id INTEGER PRIMARY KEY, v TEXT)');
+	$setup->do("INSERT INTO updtest VALUES (1, 'hello')");
+	$setup->disconnect();
+
+	{
+		package Database::updtest;
+		use parent 'Database::Abstraction';
+	}
+
+	my $db = Database::updtest->new(dsn => $udsn, no_entry => 1);
+
+	# Trigger _open so dialect='sqlite' and dsn are stored in the object
+	$db->count();
+
+	# The file must exist on disk by this point
+	ok(-f $ufile, 'A33 pre-cond: SQLite backing file exists');
+
+	# updated() must return a defined numeric value (the file mtime)
+	my $t1 = $db->updated();
+	ok(defined($t1), 'updated() SQLite DSN: returns defined value');
+	ok(looks_like_number($t1), 'updated() SQLite DSN: value is numeric (mtime)');
+
+	# updated() must agree with stat() on the same file
+	my $stat_mtime = (stat($ufile))[9];
+	is($db->updated(), $stat_mtime, 'updated() SQLite DSN: equals live stat() mtime');
+
+	# Advance mtime by at least one second, then verify updated() reflects it.
+	# utime(undef, undef, $file) sets atime+mtime to now; sleep ensures the
+	# 1-second granularity of filesystem mtimes gives us a different value.
+	sleep(1);
+	utime(undef, undef, $ufile);
+	my $t2 = (stat($ufile))[9];
+	is($db->updated(), $t2, 'updated() SQLite DSN: reflects new mtime after utime()');
+	ok($t2 >= $t1, 'updated() SQLite DSN: new mtime >= old mtime');
+
+	# Slurp-mode object (directory path, not DSN) must NOT go through the live-stat
+	# branch — it falls back to $self->{'_updated'} set at _open() time.
+	my $slurp_db = Database::test1->new($DATA_DIR);
+	$slurp_db->count();	# trigger _open; _updated set to stat() mtime at load
+	my $slurp_u = $slurp_db->updated();
+	ok(defined($slurp_u), 'updated() slurp path: returns defined value');
+	ok(looks_like_number($slurp_u), 'updated() slurp path: value is numeric timestamp');
+}
+
+# ---- A34: _parse_sort_by() --------------------------------------------------
+# Package-level helper; call directly as a non-method sub.
+note '--- A34: _parse_sort_by()';
+{
+	# undef → (undef, 'ASC') with no warning
+	{
+		my ($col, $dir) = Database::Abstraction::_parse_sort_by(undef, 'test');
+		ok(!defined($col), '_parse_sort_by(): undef → col is undef');
+		is($dir, 'ASC',    '_parse_sort_by(): undef → dir defaults to ASC');
+	}
+
+	# Plain scalar column name → (col, 'ASC')
+	{
+		my ($col, $dir) = Database::Abstraction::_parse_sort_by('score', 'test');
+		is($col, 'score', '_parse_sort_by(): scalar → col returned');
+		is($dir, 'ASC',   '_parse_sort_by(): scalar → direction defaults to ASC');
+	}
+
+	# Arrayref [col, 'DESC'] form
+	{
+		my ($col, $dir) = Database::Abstraction::_parse_sort_by(['name', 'DESC'], 'test');
+		is($col, 'name', '_parse_sort_by(): arrayref → col returned');
+		is($dir, 'DESC', '_parse_sort_by(): arrayref → direction DESC');
+	}
+
+	# Direction normalised to uppercase: 'asc' → 'ASC'
+	{
+		my ($col, $dir) = Database::Abstraction::_parse_sort_by(['name', 'asc'], 'test');
+		is($dir, 'ASC', '_parse_sort_by(): lowercase direction normalised to ASC');
+	}
+
+	# Unsafe column name → (undef, 'ASC') with a carp (not a croak)
+	{
+		my ($col, $dir);
+		my @warnings;
+		local $SIG{__WARN__} = sub { push @warnings, @_ };
+		($col, $dir) = Database::Abstraction::_parse_sort_by('bad; DROP', 'test');
+		ok(!defined($col), '_parse_sort_by(): unsafe col → col is undef');
+		is($dir, 'ASC',    '_parse_sort_by(): unsafe col → dir defaults to ASC');
+		ok(scalar @warnings, '_parse_sort_by(): unsafe col emits a carp warning');
+	}
+
+	# Invalid direction → (undef, 'ASC') with a carp
+	{
+		my @warnings;
+		local $SIG{__WARN__} = sub { push @warnings, @_ };
+		my ($col, $dir) = Database::Abstraction::_parse_sort_by(['name', 'SIDEWAYS'], 'test');
+		ok(!defined($col), '_parse_sort_by(): invalid direction → col is undef');
+		is($dir, 'ASC',    '_parse_sort_by(): invalid direction → falls back to ASC');
+		ok(scalar @warnings, '_parse_sort_by(): invalid direction emits a carp warning');
+	}
+
+	# Dotted qualified name passes $SAFE_QUALIFIED (e.g. schema.column)
+	{
+		my ($col, $dir) = Database::Abstraction::_parse_sort_by('t.score', 'test');
+		is($col, 't.score', '_parse_sort_by(): qualified name accepted');
+		is($dir, 'ASC',     '_parse_sort_by(): qualified name → direction ASC');
+	}
+}
+
+# ---- A35: _merge_base_criteria() -------------------------------------------
+# Private method; call directly for white-box coverage.
+note '--- A35: _merge_base_criteria()';
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# No base_criteria set: params returned unchanged (same ref, no allocation)
+	{
+		my $p = { entry => 'x' };
+		my $merged = $db->_merge_base_criteria($p);
+		is($merged, $p, '_merge_base_criteria(): no base_criteria → original ref returned');
+	}
+
+	# With base_criteria: returns a NEW hashref combining both
+	{
+		$db->{'base_criteria'} = { status => 'active' };
+		my $p = { entry => 'x' };
+		my $merged = $db->_merge_base_criteria($p);
+		isnt($merged, $p, '_merge_base_criteria(): with base_criteria → new hashref returned');
+		is($merged->{'status'}, 'active', '_merge_base_criteria(): base_criteria key present in result');
+		is($merged->{'entry'},  'x',      '_merge_base_criteria(): caller key present in result');
+	}
+
+	# Caller keys WIN on collision — callers can always narrow further
+	{
+		$db->{'base_criteria'} = { status => 'active', tier => 'gold' };
+		my $p = { status => 'inactive' };	# caller overrides base
+		my $merged = $db->_merge_base_criteria($p);
+		is($merged->{'status'}, 'inactive',
+			'_merge_base_criteria(): caller key wins on collision (expected from: '
+			. 'CLAUDE.md "caller keys WIN on collision")');
+		is($merged->{'tier'}, 'gold',
+			'_merge_base_criteria(): non-colliding base_criteria key preserved');
+	}
+
+	# Clean up so we don't affect later tests
+	delete $db->{'base_criteria'};
+}
+
+# ---- A36: dbi_source() ------------------------------------------------------
+# Returns {dbh, table} for live SQLite connections; undef for all other backends.
+note '--- A36: dbi_source()';
+{
+	# Slurp-mode object has no DBI handle → must return undef
+	my $slurp = Database::test1->new($DATA_DIR);
+	$slurp->count();	# trigger _open (slurp path)
+	my $src = $slurp->dbi_source();
+	ok(!defined($src), 'dbi_source(): slurp backend → undef');
+}
+
+SKIP: {
+	skip 'DBD::SQLite not available for dbi_source() tests', 6
+		unless $have_sqlite;
+
+	my $sdir = tempdir(CLEANUP => 1);
+	my $sfile = File::Spec->catfile($sdir, 'dsrc.sql');
+	my $sdsn  = "dbi:SQLite:dbname=$sfile";
+
+	my $setup = DBI->connect($sdsn, undef, undef, { RaiseError => 1 });
+	$setup->do('CREATE TABLE dsrc (id INTEGER PRIMARY KEY, v TEXT)');
+	$setup->do("INSERT INTO dsrc VALUES (1, 'a')");
+	$setup->disconnect();
+
+	{
+		package Database::dsrc;
+		use parent 'Database::Abstraction';
+	}
+
+	my $db = Database::dsrc->new(dsn => $sdsn, no_entry => 1);
+	$db->count();	# trigger _open
+
+	# SQLite connection must return a valid source descriptor
+	my $src = $db->dbi_source();
+	ok(defined($src), 'dbi_source() SQLite: returns defined value');
+	isa_ok($src, 'HASH', 'dbi_source() SQLite: returns hashref');
+	ok(exists $src->{'dbh'},   'dbi_source() SQLite: dbh key present');
+	ok(exists $src->{'table'}, 'dbi_source() SQLite: table key present');
+	is($src->{'table'}, 'dsrc', 'dbi_source() SQLite: table name is correct');
+
+	# The dbh in the result must be a DBI handle (blessed object)
+	ok(Scalar::Util::blessed($src->{'dbh'}), 'dbi_source() SQLite: dbh is a blessed DBI handle');
+}
+
+# ---- A37: _infer_type() -----------------------------------------------------
+# Package-level function; call directly.  Tests all five return values.
+note '--- A37: _infer_type()';
+{
+	# Empty/all-null input → TEXT (unknown type)
+	is(Database::Abstraction::_infer_type([]),
+		'TEXT', '_infer_type(): empty list → TEXT');
+	is(Database::Abstraction::_infer_type([undef, '']),
+		'TEXT', '_infer_type(): all null/empty → TEXT');
+
+	# All values are integers (positive, negative, zero)
+	is(Database::Abstraction::_infer_type([1, 2, -3, 0]),
+		'INTEGER', '_infer_type(): integer values → INTEGER');
+
+	# All values are real / floating-point numbers
+	is(Database::Abstraction::_infer_type(['1.5', '-2.0', '3e10']),
+		'REAL', '_infer_type(): real values → REAL');
+
+	# Single non-integer in an otherwise integer set → REAL (not INTEGER)
+	is(Database::Abstraction::_infer_type([1, 2, '3.5']),
+		'REAL', '_infer_type(): one real value prevents INTEGER classification');
+
+	# ISO 8601 timestamps (YYYY-MM-DDTHH:MM prefix sufficient)
+	is(Database::Abstraction::_infer_type(['2024-01-15T12:30', '2024-06-01 09:00:00']),
+		'TIMESTAMP', '_infer_type(): timestamp values → TIMESTAMP');
+
+	# ISO dates (YYYY-MM-DD exact)
+	is(Database::Abstraction::_infer_type(['2024-01-15', '2024-06-01']),
+		'DATE', '_infer_type(): ISO date values → DATE');
+
+	# Mixed text and numbers → TEXT (cannot be classified as a numeric type)
+	is(Database::Abstraction::_infer_type(['hello', 'world', '1']),
+		'TEXT', '_infer_type(): mixed text/number → TEXT');
+
+	# Undef values are ignored; remaining values determine type
+	is(Database::Abstraction::_infer_type([undef, '42', undef]),
+		'INTEGER', '_infer_type(): undef values ignored, numeric wins → INTEGER');
+}
+
 done_testing();

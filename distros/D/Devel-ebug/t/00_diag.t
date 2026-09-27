@@ -11,11 +11,15 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Class::Accessor::Chained
+  Cpanel::JSON::XS
   Devel::StackTrace
   Expect
   Expect::Simple
   ExtUtils::MakeMaker
+  File::Temp
+  IO::Select
   IO::Socket::INET
+  JSON::PP
   Module::Pluggable
   PadWalker
   Proc::Background
@@ -23,6 +27,7 @@ $modules{$_} = $_ for qw(
   Term::ReadLine
   Test::Expect
   Test::More
+  Text::ParseWords
   YAML
 );
 

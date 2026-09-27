@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 1;
 
@@ -11,133 +11,173 @@ __END__
 
 =head1 NAME
 
-Linux::Event::HTTP - native HTTP protocol support for Linux::Event
+Linux::Event::HTTP - HTTP/1.x and HTTP/2 for Linux::Event
 
 =head1 VERSION
 
-Version 0.002
+Version 0.003
+
+=head1 SYNOPSIS
+
+Server:
+
+    use Linux::Event::Loop;
+    use Linux::Event::HTTP::Server;
+
+    my $loop = Linux::Event::Loop->new;
+
+    my $server = Linux::Event::HTTP::Server->new(
+        loop => $loop,
+        port => 8080,
+        on_request => sub ($conn, $req, $res) {
+            $res->body("hello\n");
+        },
+    );
+
+    $loop->run;
+
+HTTP/2 over HTTPS uses the same Server API:
+
+    my $server = Linux::Event::HTTP::Server->new(
+        loop  => $loop,
+        port  => 8443,
+        http2 => 1,
+        tls => {
+            cert_file => '/path/server-cert.pem',
+            key_file  => '/path/server-key.pem',
+        },
+        on_request => sub ($conn, $req, $res) {
+            $res->body("hello\n");
+        },
+    );
+
+Client:
+
+    use Linux::Event::HTTP::Client;
+
+    my $client = Linux::Event::HTTP::Client->new(
+        loop  => $loop,
+        http2 => 1,
+    );
+
+    my $operation = $client->get(
+        'https://example.com/',
+        on_body => sub ($tx, $res, $bytes) {
+            process_bytes($bytes);
+        },
+        on_complete => sub ($tx) {
+            say $tx->response->status;
+        },
+    );
 
 =head1 DESCRIPTION
 
-Linux::Event::HTTP is an HTTP communications layer built on L<Linux::Event>.
-It provides native event-driven HTTP server and client APIs while deliberately
-remaining a protocol layer rather than a web framework.
+Linux::Event::HTTP is the HTTP communications layer for L<Linux::Event>. It
+provides asynchronous HTTP servers and clients while deliberately remaining a
+protocol layer rather than a web framework.
 
-The public model separates HTTP messages from exchange, high-level client, and
-transport lifecycle:
+HTTP/1.x and HTTP/2 share the same public message and exchange model:
 
 =over 4
 
-=item * L<Linux::Event::HTTP::Request> and L<Linux::Event::HTTP::Response>
-represent endpoint-neutral HTTP messages.
+=item * L<Linux::Event::HTTP::Request>
 
-=item * L<Linux::Event::HTTP::Transaction> represents exactly one
-Request/Response exchange.
+One HTTP request message.
 
-=item * L<Linux::Event::HTTP::Client::Operation> represents one high-level
-client action. It normally contains one Transaction and contains additional
-Transactions when redirects are followed or authentication challenges are
-retried.
+=item * L<Linux::Event::HTTP::Response>
 
-=item * L<Linux::Event::HTTP::Server> and
-L<Linux::Event::HTTP::Server::Connection> execute inbound HTTP.
+One HTTP response message.
 
-=item * L<Linux::Event::HTTP::Client> owns outbound target URL, redirect,
-authentication retry, TLS, connection/route selection, explicit forward-proxy
-routing, explicit CONNECT establishment, cookie integration, and
-protocol-handoff policy, while L<Linux::Event::HTTP::Client::Connection>
-executes one HTTP Transaction on one client connection.
+=item * L<Linux::Event::HTTP::Transaction>
+
+Exactly one Request/Response exchange.
+
+=item * L<Linux::Event::HTTP::Client::Operation>
+
+One high-level client action. Redirects and authentication retries may create
+additional Transactions inside the same Operation.
+
+=item * L<Linux::Event::HTTP::Server> and L<Linux::Event::HTTP::Client>
+
+The ordinary high-level server and client entry points.
 
 =back
 
-Linux::Event continues to own sockets, TLS, readiness, buffering, backpressure,
-connection acquisition primitives, ordered byte output, and the live stream
-transition primitive used for protocol handoff.
+Linux::Event owns sockets, TLS, readiness, transport buffering, and transport
+backpressure. Linux::Event::HTTP owns HTTP parsing, framing, persistence,
+message lifecycle, client policy, and HTTP protocol execution.
 
-The initial protocol executor targets HTTP/1.x. Server request-head parsing uses
-vendored picohttpparser with lazy native Request state. The client response-head
-parser is deliberately strict Perl code so correctness and actual workload cost
-can be measured before adding more HTTP-specific XS. The existing native
-chunked decoder is shared by client and server.
+=head1 HTTP VERSIONS
 
-Incoming bodies are incremental-first and are not implicitly accumulated into
-unbounded whole-body scalars. Complete scalar message bodies remain available as
-a convenience when the application already owns all bytes. Outgoing incremental
-Client Request and Server Response bodies use Transaction-owned
-L<Linux::Event::HTTP::Body::Stream> producers and Linux::Event's existing
-ordered-byte backpressure machinery rather than a second HTTP output queue.
+HTTP/1 support is built in.
 
-High-level Client redirect handling preserves the Transaction invariant: every
-redirect hop is a separate Transaction retained by the Client::Operation.
-Method/body replay is explicit and conservative, and sensitive caller-supplied
-origin credentials are not propagated across target origins automatically.
+HTTP/2 is optional and uses L<Net::HTTP2::nghttp2> 0.011 or newer as the
+libnghttp2 binding. Enable it on the high-level Server or Client with:
 
-High-level authentication uses L<Uniform::HTTP::Auth> for HTTP authentication
-mechanics. Uniform owns challenge parsing, scheme/credential selection, Basic,
-Bearer, Digest calculation, and Digest nonce state. Linux::Event::HTTP owns
-receiving 401/407 Responses, target-versus-route protection-space selection,
-Request replayability, response draining, connection reuse, and creating the
-retry Transaction. Authentication retries are tracked separately from redirects
-inside the same Client::Operation. Streaming Request producers are never
-automatically replayed.
+    http2 => 1
 
-Ordinary client requests can explicitly select a forward proxy with
-C<proxy =E<gt> $proxy_url>. The target URL remains the HTTP/Operation identity;
-the proxy URL selects the route connection. Proxied HTTP/1 requests use
-absolute-form request targets while Host identifies the target authority. The
-idle pool is keyed by route origin, so sequential requests for different target
-origins can reuse one persistent proxy connection. Target authentication and
-cookies remain keyed to the target; proxy authentication remains keyed to the
-route. Proxy selection remains high-level Perl policy; Client::Connection has no
-separate proxy mode or output queue.
+The production HTTP/2 path is HTTPS negotiated with ALPN. C<h2> is preferred
+and C<http/1.1> is the fallback, so applications keep the same high-level API
+regardless of which version is selected.
 
-An HTTPS forward-proxy endpoint means TLS to the proxy. An HTTPS target sent with
-C<proxy> remains an absolute-form URI handled by that proxy; it is not silently
-converted into end-to-end target TLS or CONNECT. Explicit tunnel establishment
-continues to use C<connect_tunnel()>.
+The optional HTTP/2 dependency is not required for HTTP/1-only installations.
 
-HTTP/1.1 Upgrade is supported in both directions without introducing a second
-transport object. After a validated C<101 Switching Protocols>, the HTTP
-Transaction completes and Linux::Event C<transition_to()> hands the same live
-stream object, including already-read post-HTTP bytes, to the selected protocol
-class. WebSocket framing and other upgraded protocols remain separate
-protocol-layer distributions.
+=head1 BODY MODEL
 
-Client CONNECT uses the same live-stream handoff principle with CONNECT-specific
-HTTP semantics. C<connect_tunnel()> separates the proxy endpoint URL from the
-authority-form tunnel target. Proxy 407 challenges can be handled through the
-configured Uniform proxy-auth manager before handoff. Any successful 2xx CONNECT
-response completes the HTTP Transaction at the response-head boundary and
-transitions the same live stream to the caller-selected tunnel class; a non-2xx
-response remains ordinary HTTP and can expose its body normally.
+Incoming bodies are streaming-first. They are not accumulated into unbounded
+scalars automatically.
 
-=head1 DESIGN
+Outgoing complete bodies may be set directly on Request or Response objects.
+Outgoing incremental bodies use L<Linux::Event::HTTP::Body::Stream> producers
+owned by the Transaction.
 
-See F<README.md> for ordinary Client and Server examples and
-F<docs/ARCHITECTURE.md> for ownership, lifecycle, framing, redirects,
-forward-proxy routing, pooling, Upgrade, CONNECT, and native-boundary details.
-F<docs/CLIENT-POLICY.md> describes cookie and authentication policy boundaries.
-F<docs/PICOHTTPPARSER-EXPERIMENT.md> records server parser provenance,
-correctness policy, and representation benchmarks.
+Client responses may be buffered only when an explicit bounded C<buffer_body>
+limit is supplied.
+
+=head1 HTTP/1 HANDOFF
+
+HTTP/1.1 Upgrade and CONNECT can transfer the same live Linux::Event stream to
+another protocol class. The handoff is owned by Transaction and preserves bytes
+already read beyond the HTTP message boundary.
+
+=head1 DOCUMENTATION
+
+Start with F<README.md> for ordinary Server and Client usage.
+
+The main public APIs are documented in:
+
+=over 4
+
+=item * L<Linux::Event::HTTP::Server>
+
+=item * L<Linux::Event::HTTP::Client>
+
+=item * L<Linux::Event::HTTP::Request>
+
+=item * L<Linux::Event::HTTP::Response>
+
+=item * L<Linux::Event::HTTP::Transaction>
+
+=item * L<Linux::Event::HTTP::Client::Operation>
+
+=back
+
+Maintainer and design documentation is under F<docs/>.
 
 =head1 THIRD-PARTY CODE
 
-The distribution includes picohttpparser by Kazuho Oku and contributors. The
-vendored source and upstream license are under F<vendor/picohttpparser/>.
+The distribution includes picohttpparser by Kazuho Oku and contributors for the
+native HTTP/1 header parsing path. Its source and license are under
+F<vendor/picohttpparser/>.
 
-The high-level Client uses the established L<URI> distribution for target and
-proxy URL parsing and redirect-reference resolution; full URLs remain Client
-policy rather than Request message state.
+The high-level Client uses L<URI>, L<HTTP::CookieJar>, and
+L<Uniform::HTTP::Auth> for their respective policy areas.
 
-The high-level Client delegates cookie policy to L<HTTP::CookieJar> and HTTP
-authentication mechanics to L<Uniform::HTTP::Auth>. Linux::Event::HTTP keeps
-routing, replay, Transaction, connection, and callback lifecycle around those
-independent policy engines.
+HTTP/2 uses the optional L<Net::HTTP2::nghttp2> binding.
 
 =head1 SECURITY
 
-Security vulnerabilities should not be reported through the public issue
-tracker. See F<SECURITY.md> for private reporting instructions.
+See F<SECURITY.md> for vulnerability reporting instructions.
 
 =head1 AUTHOR
 

@@ -330,8 +330,8 @@ stricter reader does not.
 
 A parenthesis ends the key in a reader that stops at the first one.
 Whitespace breaks a reader that splits a line on space. A manifest
-travels to sha256(1) and to C<scripts/deps>, so the writer holds a
-key to the strict form.
+travels to sha256(1) and to C<fugubench deps>, so the writer holds
+a key to the strict form.
 
 The whitespace test names the ASCII whitespace alone. A file name that
 holds a byte above 127 therefore passes.

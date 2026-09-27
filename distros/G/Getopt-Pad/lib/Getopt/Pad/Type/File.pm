@@ -8,7 +8,7 @@ class Getopt::Pad::Type::File :isa(Getopt::Pad::Type::Path) :strict(params) {
 	use File::Basename ();
 	use File::Path     ();
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	method label() { return 'File Path' }
 
@@ -39,13 +39,41 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Type::File - file path type
+Getopt::Pad::Type::File - The file option type
+
+=head1 SYNOPSIS
+
+=for highlighter language=perl
+
+    options => {
+        input  => { type => 'file', mustExist => 1 },
+        output => { type => 'file', createPathIfMissing => 1 },
+    },
 
 =head1 DESCRIPTION
 
-File path, optionally required to exist via C<mustExist>, or created empty with its parent directories on demand via C<createPathIfMissing>.
+The type of options and args declared with C<< type => 'file' >>. It
+accepts any path and returns it as given; a leading C<~> is not expanded.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+=over 4
+
+=item * With C<mustExist>, the path must be an existing file (C<-f>); a
+missing path or a directory is rejected with C<file 'PATH' does not
+exist>.
+
+=item * With C<createPathIfMissing>, a missing file is created empty,
+together with its missing parent directories, for the value that is
+finally used. An existing file is not touched.
+
+=back
+
+The help output labels the option C<[File Path]>, and shell completion
+completes file names. See L<Getopt::Pad/file> and
+L<Getopt::Pad/Type-specific keys>.
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Type::Dir>, L<Getopt::Pad::Type::Path>
 
 =head1 AUTHOR
 

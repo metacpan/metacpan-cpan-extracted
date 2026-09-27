@@ -1,0 +1,24 @@
+use strict;
+use warnings;
+use Future::AsyncAwait;
+use JSON::PP ();
+use WebDyne::Cloudflare::D1;
+
+async sub {
+    my ($scope_hr, $receive_cr, $send_cr)=@_;
+    return if $scope_hr->{'type'} eq 'lifespan';
+    my $db_or=WebDyne::Cloudflare::D1->new(scope => $scope_hr);
+    my ($bookmark)=map { $_->[1] }
+        grep { lc($_->[0]) eq 'x-d1-bookmark' } @{$scope_hr->{'headers'}};
+    my $session_or=await $db_or->with_session(
+        (defined($bookmark)&&length($bookmark)) ? $bookmark : 'first-primary',
+    );
+    my $result_hr=await $session_or->all('SELECT 7 AS value');
+    my $next=await $session_or->get_bookmark();
+    await $send_cr->({type => 'http.response.start', status => 200, headers => [
+        ['content-type', 'application/json'], ['cache-control', 'no-store'],
+        (defined($next) ? (['x-d1-bookmark', $next]) : ()),
+    ]});
+    await $send_cr->({type => 'http.response.body',
+        body => JSON::PP->new()->utf8()->encode(WebDyne::Cloudflare::json_value($result_hr))});
+};

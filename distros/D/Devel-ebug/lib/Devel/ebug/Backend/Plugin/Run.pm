@@ -3,7 +3,7 @@ package Devel::ebug::Backend::Plugin::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 sub register_commands {
     return (
@@ -37,6 +37,9 @@ sub return {
 
 sub run {
   my($req, $context) = @_;
+  # a SIGINT that arrived while we were stopped is stale; don't let it
+  # stop us again at the very next statement
+  $DB::signal = 0;
   $context->{mode} = "run"; # run until break point
   if (@{$context->{watch_points}}) {
     # watch points, let's go slow
@@ -73,7 +76,7 @@ Devel::ebug::Backend::Plugin::Run
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 AUTHOR
 

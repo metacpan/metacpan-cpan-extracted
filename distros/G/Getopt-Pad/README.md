@@ -1,78 +1,95 @@
 # Getopt::Pad
 
-An Object::Pad based, POSIX compatible options processor on top of
-Getopt::Long: options are declared as a typed spec, validated, and returned
-as a runtime-generated Object::Pad object with one camelCase reader per
-option and positional argument.
+Declarative command line parsing for Perl. You describe every option and
+positional argument once, with its type, default, allowed values and help
+text. `GetOptions` parses the command line, checks every value, and
+returns an object with one method per option and argument
+(`--log-level debug` becomes `$opt->logLevel`).
 
 ## Features
 
-- Typed options (`bool`, `counter`, `string`, `int`, `float`, `file`, `dir`,
-  `url`) with per-type constraints (`mustExist`, `createPathIfMissing`,
-  `min`/`max`) and a pluggable
-  type registry
-- Value shapes beyond a single value: repeatable options (`multiple`, with
-  `csv` to split at commas), `key=value` mappings (`hash`) and lists of
-  records (`objectlist`), with defaults and config values in the same shape
-- Positional arguments with the same type pipeline, including a slurpy last
-  argument
-- Nested subcommands with per-level options and chained result objects
-- Config files (YAML, JSON, pluggable formats) with command line > config >
-  default precedence, an automatic `--config` option, and
-  `--create-default-config` to write a starter config from the spec defaults
-- Generated `--help` output: grouped options, annotations, `typehint` tags, examples,
-  terminal-width wrapping, color on a tty. An automatic `--version` comes
-  with it
-- Shell completion for bash and zsh via `--create-completions`: commands,
-  options, `valid` values and paths
-- Errors go to STDERR followed by the failing level's help text, exit
-  status 2. Spec mistakes croak at the developer instead
+- **Typed values**: `flag`, `bool` (`--x` / `--no-x`), `counter` (`-vvv`),
+  `string`, `int` and `float` (with `min` / `max`), `file` and `dir` (with
+  `mustExist` or `createPathIfMissing`) and `url`. Custom types can be
+  added.
+- **Checks**: fixed lists of allowed values, lists computed at run time,
+  and arbitrary checks, for command line, config file and default values
+  alike.
+- **Value shapes**: repeatable options (`multiple`, optionally
+  comma-separated with `csv`), `key=value` mappings (`hash`) and lists of
+  records (`objectlist`).
+- **Positional arguments** with the value-taking types, including a last
+  argument that takes all remaining words.
+- **Subcommands**, nested to any depth, each with its own options,
+  arguments and help. Options marked `inherit` work on every level.
+- **Config files** in YAML or JSON (other formats can be added), for every
+  command level, with the precedence command line > config file > default.
+  `--create-default-config` writes a starter file.
+- **Generated help**: grouped options, required markers, allowed values,
+  defaults, examples, wrapped to the terminal and colored on a terminal.
+  `--version` comes with it.
+- **Shell completion** for bash and zsh via `--create-completions`:
+  commands, options, allowed values and paths.
+- **Clear errors**: a wrong command line prints the problem and the help,
+  and exits with status 2. A mistake in the spec dies immediately and
+  points at your `GetOptions` call.
 
 ## Synopsis
 
 ```perl
+use v5.26;
 use Getopt::Pad;
 
 my $opt = GetOptions(
-	options => {
-		'owner|o' => {
-			type     => 's',
-			required => 1,
-			help     => 'Target owner (user or organization)',
-			group    => 'Target',
-		},
-		'private' => {
-			type    => '!',
-			default => 1,
-			help    => 'Create the target repository as private',
-			group   => 'Target',
-		},
-		'log-level' => {
-			type    => 's',
-			default => 'info',
-			valid   => [qw(trace debug info warn error fatal)],
-			help    => 'Logging level to use',
-		},
-	},
-	args => [
-		{ type => 'url', short => 'source-url', required => 1, help => 'The source address' },
-	],
-	description => 'Migrate one Git repository into Forgejo.',
+    description => 'Copy a directory to a backup location.',
+    options     => {
+        'target|t' => {
+            type     => 'dir',
+            required => 1,
+            help     => 'Directory the backup is written to',
+        },
+        'keep' => {
+            type    => 'int',
+            default => 7,
+            min     => 1,
+            help    => 'Number of backups to keep',
+        },
+        'exclude|x' => {
+            type     => 'string',
+            multiple => 1,
+            help     => 'Pattern of files to skip; repeat for more patterns',
+        },
+        'compress' => {
+            type    => 'bool',
+            default => 1,
+            help    => 'Compress the backup; --no-compress turns it off',
+        },
+        'verbose|v' => {
+            type => 'counter',
+            help => 'Print more details; repeat for even more (-vv)',
+        },
+    },
+    args => [
+        { short => 'source', type => 'dir', required => 1, help => 'Directory to back up' },
+    ],
 );
 
-say $opt->owner;       # readers are camelCase
-say $opt->logLevel;    # 'log-level' -> logLevel
-say $opt->sourceUrl;
+# backup -t /mnt/backup -x '*.tmp' -x '*.log' -vv --no-compress photos
+say $opt->source;                    # photos
+say $opt->keep;                      # 7 (the default)
+say join ', ', $opt->exclude->@*;    # *.tmp, *.log
+say $opt->compress ? 'yes' : 'no';   # no
+say $opt->verbose;                   # 2
 ```
 
-Called with `--help`, this script prints:
+Called with `--help`, this program prints:
 
 ```
-# migrate [options] source-url
-# Migrate one Git repository into Forgejo.
+# backup [options] source
+# Copy a directory to a backup location.
 
 ## Arguments
-   <source-url>                [REQ] The source address [URL]
+   <source>                    [REQ] Directory to back up [Path]
 
 ## Completion
    --create-completions <>     Print a completion script for this shell to
@@ -80,75 +97,47 @@ Called with `--help`, this script prints:
                                    Valid   = [ bash, zsh ]
 
 ## Options
-   --log-level <>              Logging level to use
-                                   Valid   = [ trace, debug, info, warn, error, fatal ]
-                                   Default = info
-
-## Target
-   --owner <>                  [REQ] Target owner (user or organization)
-   --[no-]private              Create the target repository as private
+   --[no-]compress             Compress the backup; --no-compress turns it
+                               off
                                    Default = 1
+   --exclude <>                Pattern of files to skip; repeat for more
+                               patterns
+   --keep <>                   Number of backups to keep
+                                   Default = 7
+   --target <>                 [REQ] Directory the backup is written to
+                               [Path]
+   --verbose                   Print more details; repeat for even more
+                               (-vv)
 ```
 
-## Subcommands
+## Documentation
 
-Subcommands are plain nested hashrefs. Each level yields its own result
-object:
+Once installed, read the documentation with `perldoc`:
 
-```perl
-my $opt = GetOptions(
-	options  => { verbose => { type => '!' } },
-	commands => {
-		document => {
-			commands => {
-				create => {
-					options => { format => { type => 's', valid => [qw(pdf docx)] } },
-					args    => [{ short => 'title', required => 1 }],
-				},
-			},
-		},
-	},
-);
+- `perldoc Getopt::Pad::Tutorial` - a step-by-step introduction
+- `perldoc Getopt::Pad::Cookbook` - recipes for common tasks
+- `perldoc Getopt::Pad` - the complete reference: every spec key, type,
+  config file rule and error message
+- `perldoc Getopt::Pad::Result` - the object `GetOptions` returns
+- `perldoc Getopt::Pad::Type` - writing your own option types
+- `perldoc Getopt::Pad::Config::Format` - adding config file formats
 
-# argv: --verbose document create --format pdf "My Doc"
-$opt->command;                          # 'document'
-$opt->subcommand->subcommand->format;   # 'pdf'
-```
-
-## Shell completion
-
-`--create-completions bash` or `--create-completions zsh` prints a completion
-script to STDOUT. Redirect it to wherever your shell picks completions up
-from:
-
-```sh
-tool --create-completions bash > ~/.local/share/bash-completion/completions/tool
-tool --create-completions zsh  > ~/.zsh/completions/_tool
-```
-
-The script is a thin shim that runs the program again on every tab, so it
-never needs to be regenerated when the spec changes. It completes the
-command names of the current level, the option spellings the help lists,
-the values an option's `valid` list allows (a coderef is called on every
-tab, so lists computed at run time stay current) and, for `file` and `dir`
-options and args, the shell's own path completion.
+The same documentation is on [MetaCPAN](https://metacpan.org/pod/Getopt::Pad).
 
 ## Examples
 
-Runnable examples live in [`examples/`](examples/). Each parses your
-arguments (its header comment lists invocations to try) and prints an
-overview of the readers on the result object, indenting nested subcommand
-results:
+Runnable examples live in [`examples/`](examples/). Each one prints the
+values of its result object, so you can try different command lines; its
+header comment lists command lines to try:
 
-- [`01-basic.pl`](examples/01-basic.pl) - options, defaults, valid lists, positionals
-- [`02-types.pl`](examples/02-types.pl) - every built-in option type
-- [`03-commands.pl`](examples/03-commands.pl) - nested subcommands and chained results
-- [`04-custom-type.pl`](examples/04-custom-type.pl) - a custom `even` type that only accepts even numbers
+- [`01-basic.pl`](examples/01-basic.pl) - options, groups, defaults, a `valid` list and a required argument
+- [`02-types.pl`](examples/02-types.pl) - one option per built-in type
+- [`03-commands.pl`](examples/03-commands.pl) - nested commands, an inherited option and a JSON config file with command sections
+- [`04-custom-type.pl`](examples/04-custom-type.pl) - a custom type that accepts only even numbers
 - [`05-custom-format.pl`](examples/05-custom-format.pl) - a custom TOML config format via TOML::Tiny
-
-See the [Getopt::Pad documentation](https://metacpan.org/pod/Getopt::Pad)
-(`perldoc Getopt::Pad` once installed) for the full spec reference,
-including the contracts for custom option types and config formats.
+- [`06-value-shapes.pl`](examples/06-value-shapes.pl) - `multiple`, `csv`, `hash` and `objectlist` options
+- [`07-config.pl`](examples/07-config.pl) - config files: the autoload chain, `defaultPath` and `--create-default-config`
+- [`08-checks.pl`](examples/08-checks.pl) - `valid` lists and coderefs, `lazyValid`, bounds, `mustExist`, `createPathIfMissing`, `typehint` and `hidden`
 
 ## Installation
 
@@ -167,9 +156,13 @@ make test
 make install
 ```
 
-Requires Perl >= 5.26, Object::Pad, Getopt::Long, Feature::Compat::Try and
-JSON::PP. YAML::XS is recommended for YAML config files, Term::ReadKey for
-detecting the terminal width (without it, or `COLUMNS`, help wraps at 100).
+Requires Perl 5.26 or later, Object::Pad 0.800 or later, Getopt::Long
+2.50 or later, Feature::Compat::Try and JSON::PP.
+
+Optional: YAML::XS for YAML config files, and Term::ReadKey for wrapping
+the help output to the width of the terminal. The help is wrapped to the
+width in `COLUMNS` if it is set, else to the terminal width (with
+Term::ReadKey), else to 100 columns.
 
 ## License
 

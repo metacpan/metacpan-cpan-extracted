@@ -7,7 +7,7 @@ use Text::Markup;
 use File::BOM qw(open_bom);
 use Text::Textile 2.10;
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 sub import {
     # Replace the regex if passed one.

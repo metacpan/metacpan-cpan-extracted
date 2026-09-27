@@ -1,5 +1,9 @@
 Revision history for Statistics-Kappa
 
+0.03    2026-09-26
+        - Fix dependencies in Makefile.PL.
+        - Add author tests for Changes and version.
+
 0.02    2026-09-26
         Fixes in the documentation.
 

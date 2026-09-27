@@ -23,6 +23,13 @@
 #   D11  join type          _build_joins() INNER|LEFT|RIGHT|FULL|CROSS
 #   D12  dbname/filename    _open() path-safe name (no .. / /)
 #   D13  Combinatorial      max_slurp_size at exact boundary (keyed vs no_entry)
+#   D14  sort_by            selectall_arrayref/array sort column+direction
+#   D15  base_criteria      constructor filter hashref (key safety, type check)
+#   D16  table              constructor table name (SAFE_QUALIFIED)
+#   D17  criteria values    scalar/undef/-in/-between/-like/arrayref (invalid)
+#   D18  limit/offset       selectall_arrayref direct-method (carp+ignore on bad values)
+#   D19  dsn                DSN bypasses file detection (requires DBD::SQLite)
+#   D20  non-ASCII          multibyte bytes in criteria values (no crash contract)
 
 use strict;
 use warnings;
@@ -31,7 +38,7 @@ use FindBin qw($Bin);
 use File::Spec;
 use File::Temp  ();
 use Readonly;
-use Test::Most  tests => 73;
+use Test::Most  tests => 112;
 use Test::NoWarnings;
 use Test::Mockingbird;
 use HTTP::Response;
@@ -601,4 +608,426 @@ note('D13: Combinatorial — slurp boundary for keyed vs no_entry modes');
 	$db_ne2->count();
 	ok(!ref($db_ne2->{'data'}),
 		'D13 CB4: no_entry, max_slurp_size=csv4_size-1 → SQL mode (not a ref)');
+}
+
+# ---------------------------------------------------------------------------
+# D14: sort_by parameter for selectall_arrayref / selectall_array
+#
+# Column name validated against $SAFE_QUALIFIED; direction must be ASC or DESC
+# (case-insensitive).  Invalid name or direction: carp + fallback to default
+# primary-key sort — NOT a croak.
+#
+# VP:  'entry' scalar, ['entry','DESC'] arrayref, ['entry','ASC']
+# BV:  single-underscore column name (minimum-length SAFE_QUALIFIED)
+# IP:  direction 'NOSUCHDIR' (carp+fallback), name '1bad' (carp+fallback)
+# ---------------------------------------------------------------------------
+
+note('D14: sort_by parameter');
+
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# VP1 — scalar column name implies ascending; rows returned
+	{
+		my $rows = $db->selectall_arrayref(sort_by => 'entry');
+		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
+			'D14 VP1: sort_by scalar column name returns rows');
+	}
+
+	# VP2 — arrayref [col,'DESC'] descending form
+	{
+		my $rows = $db->selectall_arrayref(sort_by => ['entry', 'DESC']);
+		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
+			'D14 VP2: sort_by ["entry","DESC"] returns rows');
+	}
+
+	# VP3 — arrayref [col,'ASC'] explicit ascending
+	{
+		my $rows = $db->selectall_arrayref(sort_by => ['entry', 'ASC']);
+		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
+			'D14 VP3: sort_by ["entry","ASC"] returns rows');
+	}
+
+	# BV1 — sort_by with an existing column that is not the default primary key
+	{
+		my $rows = $db->selectall_arrayref(sort_by => 'number');
+		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
+			'D14 BV1: sort_by existing non-pk column "number" returns rows');
+	}
+
+	# IP1 — invalid direction: carp emitted; rows still returned (fallback)
+	{
+		my @warns;
+		local $SIG{__WARN__} = sub { push @warns, @_ };
+		my $rows = $db->selectall_arrayref(sort_by => ['entry', 'NOSUCHDIR']);
+		ok(scalar(@warns) > 0,
+			'D14 IP1: invalid sort direction triggers a carp');
+		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
+			'D14 IP1: rows still returned after invalid sort direction (fallback)');
+	}
+
+	# IP2 — column name failing SAFE_QUALIFIED (starts with digit): carp + fallback
+	{
+		my @warns;
+		local $SIG{__WARN__} = sub { push @warns, @_ };
+		my $rows = $db->selectall_arrayref(sort_by => '1invalid');
+		ok(scalar(@warns) > 0,
+			'D14 IP2: non-SAFE_QUALIFIED sort column triggers a carp');
+		ok(ref($rows) eq 'ARRAY' && @$rows > 0,
+			'D14 IP2: rows still returned after invalid sort column (fallback)');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# D15: base_criteria constructor parameter
+#
+# Must be a hashref.  Keys validated against $SAFE_QUALIFIED unless they
+# start with '-' (which allows -or/-and grouping keys).
+#
+# VP:  {entry=>'one'} (scalar filter), {} (empty — no filter), -or key
+# BV:  undef value (IS NULL partition) — accepted at construction time
+# IP:  scalar string (not a hashref), key with semicolon, key with null byte
+# ---------------------------------------------------------------------------
+
+note('D15: base_criteria constructor parameter');
+
+{
+	# VP1 — scalar criterion filters to matching rows only
+	{
+		my $db = Database::test1->new({
+			directory     => $DATA_DIR,
+			base_criteria => { entry => 'one' },
+		});
+		cmp_ok($db->count(), '==', 1,
+			'D15 VP1: base_criteria {entry=>"one"} filters to exactly 1 row');
+	}
+
+	# VP2 — empty hashref: no rows filtered; count equals unfiltered count
+	{
+		my $db_full = Database::test1->new({ directory => $DATA_DIR });
+		my $db_bc   = Database::test1->new({ directory => $DATA_DIR, base_criteria => {} });
+		cmp_ok($db_bc->count(), '==', $db_full->count(),
+			'D15 VP2: empty base_criteria {} does not remove any rows');
+	}
+
+	# VP3 — -or grouping key (starts with '-') is explicitly allowed
+	ok(
+		eval {
+			Database::test1->new({
+				directory     => $DATA_DIR,
+				base_criteria => { -or => [ { entry => 'one' }, { entry => 'two' } ] },
+			});
+			1
+		},
+		'D15 VP3: -or grouping key in base_criteria is valid (not rejected)'
+	);
+
+	# BV1 — undef value (IS NULL filter) is accepted at construction time
+	ok(
+		eval {
+			Database::test1->new({
+				directory     => $DATA_DIR,
+				base_criteria => { name => undef },
+			});
+			1
+		},
+		'D15 BV1: undef value (IS NULL) in base_criteria is accepted'
+	);
+
+	# IP1 — non-hashref (plain scalar) must croak
+	throws_ok {
+		Database::test1->new({ directory => $DATA_DIR, base_criteria => 'not_a_hashref' })
+	} qr/base_criteria must be a hashref/,
+		'D15 IP1: scalar base_criteria croaks "base_criteria must be a hashref"';
+
+	# IP2 — unsafe key containing semicolon
+	throws_ok {
+		Database::test1->new({
+			directory     => $DATA_DIR,
+			base_criteria => { 'col;drop' => 1 },
+		})
+	} qr/unsafe base_criteria key/,
+		'D15 IP2: base_criteria key with semicolon croaks "unsafe base_criteria key"';
+
+	# IP3 — key with null byte (bypasses naive checks)
+	throws_ok {
+		Database::test1->new({
+			directory     => $DATA_DIR,
+			base_criteria => { "col\x00name" => 1 },
+		})
+	} qr/unsafe base_criteria key/,
+		'D15 IP3: base_criteria key with null byte croaks "unsafe base_criteria key"';
+}
+
+# ---------------------------------------------------------------------------
+# D16: table constructor parameter
+#
+# Validated against $SAFE_QUALIFIED (/\A[a-zA-Z_][a-zA-Z0-9_.]*\z/).
+# A dot is allowed (qualified schema.table notation); digit-leading, slash,
+# and semicolon names are all rejected.
+#
+# VP:  'mytable' (simple), 'schema.test1' (qualified with dot)
+# IP:  '1bad' (digit-leading), 'tbl;drop' (semicolon), 'dir/table' (slash)
+# ---------------------------------------------------------------------------
+
+note('D16: table constructor parameter');
+
+{
+	# VP1 — simple valid table name
+	ok(
+		eval { Database::test1->new({ directory => $DATA_DIR, table => 'mytable' }); 1 },
+		'D16 VP1: table="mytable" passes SAFE_QUALIFIED guard'
+	);
+
+	# VP2 — qualified schema.table (dot allowed in SAFE_QUALIFIED)
+	ok(
+		eval { Database::test1->new({ directory => $DATA_DIR, table => 'schema.test1' }); 1 },
+		'D16 VP2: table="schema.test1" qualified form passes SAFE_QUALIFIED guard'
+	);
+
+	# IP1 — starts with digit
+	throws_ok {
+		Database::test1->new({ directory => $DATA_DIR, table => '1bad' })
+	} qr/unsafe table name/,
+		'D16 IP1: table name starting with digit is rejected';
+
+	# IP2 — semicolon (SQL injection vector)
+	throws_ok {
+		Database::test1->new({ directory => $DATA_DIR, table => 'tbl;drop' })
+	} qr/unsafe table name/,
+		'D16 IP2: table name with semicolon is rejected';
+
+	# IP3 — slash (path separator, not in SAFE_QUALIFIED charset)
+	throws_ok {
+		Database::test1->new({ directory => $DATA_DIR, table => 'dir/table' })
+	} qr/unsafe table name/,
+		'D16 IP3: table name with slash is rejected';
+}
+
+# ---------------------------------------------------------------------------
+# D17: Criteria value domains for selectall_arrayref
+#
+# Valid: plain scalar, undef (IS NULL), -in, -not_in, -like
+# Invalid: plain arrayref value (croaks from _build_where_conditions)
+#
+# Note: test4ne (no_entry=1) so Params::Get uses get_params(undef,\@_) and
+# correctly preserves the column-name => value mapping without mapping the
+# first element to 'entry'.
+#
+# Note: -between and != are valid API operators but DBD::CSV (the CSV backend)
+# does not support them; those operators are covered in t/query_builder.t
+# against a SQLite fixture.
+# ---------------------------------------------------------------------------
+
+note('D17: criteria value domains');
+
+{
+	my $db = Database::test4ne->new({ directory => $DATA_DIR });
+
+	# VP1 — plain scalar equality: matching value returns ARRAY ref
+	{
+		my $rows = $db->selectall_arrayref(cardinal => 'one');
+		ok(ref($rows) eq 'ARRAY' && @$rows == 1,
+			'D17 VP1: plain scalar criterion matches and returns a 1-row arrayref');
+	}
+
+	# VP2 — undef value (IS NULL filter): lives without croak
+	# test4.csv has no NULL values so result is undef (no rows); the contract
+	# being tested is that the criteria type is ACCEPTED, not the row count.
+	lives_ok {
+		$db->selectall_arrayref(cardinal => undef)
+	} 'D17 VP2: undef criterion (IS NULL) does not croak';
+
+	# VP3 — -in operator hashref
+	{
+		my $rows = $db->selectall_arrayref(cardinal => { -in => ['one', 'two'] });
+		ok(ref($rows) eq 'ARRAY' && @$rows == 2,
+			'D17 VP3: -in operator hashref returns matching rows');
+	}
+
+	# VP4 — -not_in operator hashref
+	{
+		my $rows = $db->selectall_arrayref(cardinal => { -not_in => ['one'] });
+		ok(ref($rows) eq 'ARRAY' && @$rows == 2,
+			'D17 VP4: -not_in operator hashref returns non-matching rows');
+	}
+
+	# VP5 — -like operator hashref (wildcard — all rows match %)
+	{
+		my $rows = $db->selectall_arrayref(cardinal => { -like => '%' });
+		ok(ref($rows) eq 'ARRAY' && @$rows == 3,
+			'D17 VP5: -like "%" operator hashref returns all rows');
+	}
+
+	# IP1 — plain arrayref as criterion value: _build_where_conditions croaks
+	throws_ok {
+		$db->selectall_arrayref(cardinal => [1, 2, 3])
+	} qr/expected scalar or operator hashref|got ARRAY/i,
+		'D17 IP1: plain arrayref as criterion value is rejected';
+}
+
+# ---------------------------------------------------------------------------
+# D18: limit / offset via selectall_arrayref direct method
+#
+# Valid non-negative integers are silently applied.
+# Invalid values (/\A\d+\z/ fails) trigger carp + the parameter is ignored.
+# This is DIFFERENT from Query::limit()/offset() which croak on invalid input.
+#
+# VP:  limit=2 (returns 2 rows), offset=1 (skips 1 row)
+# BV:  limit=0 (returns 0 rows — minimum valid)
+# IP:  limit=-1 (carp+ignored → all rows), offset='abc' (carp+ignored → no skip)
+# ---------------------------------------------------------------------------
+
+note('D18: limit/offset via selectall_arrayref direct method');
+
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# VP1 — valid limit restricts the returned row count
+	{
+		my $rows = $db->selectall_arrayref(limit => 2);
+		cmp_ok(scalar @$rows, '==', 2,
+			'D18 VP1: limit=>2 returns exactly 2 rows');
+	}
+
+	# BV1 — limit=0 is the minimum valid value; returns empty arrayref
+	{
+		my $rows = $db->selectall_arrayref(limit => 0);
+		cmp_ok(scalar @$rows, '==', 0,
+			'D18 BV1: limit=>0 returns an empty arrayref');
+	}
+
+	# VP2 — valid offset skips the first N rows
+	{
+		my $all  = $db->selectall_arrayref();
+		my $rows = $db->selectall_arrayref(offset => 1);
+		cmp_ok(scalar @$rows, '==', scalar(@$all) - 1,
+			'D18 VP2: offset=>1 skips exactly one row');
+	}
+
+	# IP1 — negative limit: carp emitted; all rows returned (parameter ignored)
+	{
+		my @warns;
+		local $SIG{__WARN__} = sub { push @warns, @_ };
+		my $full = scalar @{ $db->selectall_arrayref() };
+		my $rows = $db->selectall_arrayref(limit => -1);
+		ok(scalar(@warns) > 0,
+			'D18 IP1: negative limit triggers a carp');
+		cmp_ok(scalar @$rows, '==', $full,
+			'D18 IP1: negative limit is ignored (all rows returned)');
+	}
+
+	# IP2 — non-numeric offset: carp emitted; no offset applied
+	{
+		my @warns;
+		local $SIG{__WARN__} = sub { push @warns, @_ };
+		my $full = scalar @{ $db->selectall_arrayref() };
+		my $rows = $db->selectall_arrayref(offset => 'abc');
+		ok(scalar(@warns) > 0,
+			'D18 IP2: non-numeric offset triggers a carp');
+		cmp_ok(scalar @$rows, '==', $full,
+			'D18 IP2: non-numeric offset is ignored (all rows returned)');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# D19: dsn parameter — bypasses file detection entirely
+#
+# When dsn is given, _open() skips the extension probe and calls DBI->connect()
+# directly.  No directory is required.  Dialect auto-detected from DSN prefix.
+#
+# VP:  valid SQLite DSN → count() returns integer, no directory arg needed
+# IP:  DSN with missing/non-existent driver → DBI connect error (croak)
+# ---------------------------------------------------------------------------
+
+note('D19: dsn parameter');
+
+SKIP: {
+	eval { require DBD::SQLite } or skip 'DBD::SQLite not available', 3;
+
+	require File::Temp;
+	my $tf    = File::Temp->new(SUFFIX => '.sqlite', UNLINK => 1);
+	my $tf_fn = $tf->filename;
+
+	# Bootstrap a minimal SQLite database for the tests below
+	{
+		require DBI;
+		my $dbh = DBI->connect(
+			"dbi:SQLite:dbname=$tf_fn", '', '',
+			{ RaiseError => 1, AutoCommit => 1, PrintError => 0 }
+		);
+		$dbh->do('CREATE TABLE test1 (entry TEXT, name TEXT)');
+		$dbh->do(q{INSERT INTO test1 VALUES ('a','Alpha')});
+		$dbh->do(q{INSERT INTO test1 VALUES ('b','Beta')});
+		$dbh->disconnect;
+	}
+
+	# VP1 — valid SQLite DSN constructs without a directory argument
+	my $db_dsn = eval {
+		Database::test1->new({ dsn => "dbi:SQLite:dbname=$tf_fn" })
+	};
+	ok(defined $db_dsn && !$@,
+		'D19 VP1: valid SQLite DSN constructs without a directory');
+
+	# VP2 — count() traverses the SQL path via the DSN connection
+	{
+		my $n = eval { $db_dsn->count() };
+		ok(!$@ && defined $n,
+			'D19 VP2: count() works on a DSN-backed SQLite database');
+	}
+
+	# IP1 — bogus DSN prefix → DBI fails to load the driver
+	{
+		local $SIG{__WARN__} = sub {};    # suppress DBI's own warnings
+		throws_ok {
+			Database::test1->new({ dsn => 'dbi:NOSUCHDRIVER_xyzzy:whatever' })->count()
+		} qr/install_driver|could not find|Can't locate|driver/i,
+			'D19 IP1: unknown DSN driver croaks with a DBI driver error';
+	}
+}
+
+# ---------------------------------------------------------------------------
+# D20: Non-ASCII / multibyte character values in criteria
+#
+# The module is not required to decode UTF-8 bytes; it IS required to handle
+# multibyte byte-strings in criteria without a fatal crash.
+#
+# VP:  UTF-8 two-byte umlaut in scalar criterion → lives, returns []
+# VP:  Four-byte emoji bytes in scalar criterion → lives, returns []
+# VP:  -like pattern containing non-ASCII bytes → lives, returns []
+# ---------------------------------------------------------------------------
+
+note('D20: non-ASCII bytes in criteria values (no-crash contract)');
+
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# VP1 — UTF-8 umlaut (U+00FC = \xc3\xbc) as criteria value: must not croak
+	{
+		my $rows = eval { $db->selectall_arrayref(entry => "\xc3\xbc") };
+		ok(!$@ && ref($rows) eq 'ARRAY',
+			'D20 VP1: UTF-8 umlaut in scalar criterion does not croak');
+	}
+
+	# VP2 — four-byte emoji bytes (U+1F600 = \xf0\x9f\x98\x80): must not croak
+	{
+		my $rows = eval { $db->selectall_arrayref(entry => "\xf0\x9f\x98\x80") };
+		ok(!$@ && ref($rows) eq 'ARRAY',
+			'D20 VP2: four-byte emoji bytes in scalar criterion do not croak');
+	}
+
+	# VP3 — -like pattern with non-ASCII bytes: must not croak (no-crash contract)
+	# Use no_entry database (test4ne) to avoid the Params::Get positional-arg
+	# pitfall that mangles operator-hashref criteria on keyed databases.
+	# The return value may be undef (DBD::CSV silently fails non-ASCII LIKE in SQL
+	# mode) — that is acceptable; the domain contract is no fatal exception.
+	{
+		my $db4 = Database::test4ne->new({ directory => $DATA_DIR });
+		my $ok   = eval {
+			$db4->selectall_arrayref(cardinal => { -like => "%\xc3\xbc%" });
+			1
+		};
+		ok($ok && !$@,
+			'D20 VP3: -like pattern with non-ASCII bytes does not croak');
+	}
 }

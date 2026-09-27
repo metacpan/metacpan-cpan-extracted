@@ -302,12 +302,139 @@ subtest '--create-default-config through other formats and at odd targets' => su
 	}
 };
 
-subtest 'config files set top-level options only' => sub {
-	my $nested = writeFile("$dir/nested.json", '{"Options": {"verbose": 1}}');
+my %commandOptions = (
+	options  => { color => { type => 's', group => 'Output', inherit => 1 } },
+	commands => {
+		document => {
+			options  => { path => { type => 's', default => 'doc.txt' } },
+			commands => {
+				create => {
+					options => {
+						format => { type => 's', valid => [qw(pdf docx)], default => 'pdf' },
+						pages  => { type => 'i' },
+					},
+					args => [{ short => 'title' }],
+				},
+			},
+		},
+		image => {
+			options => {
+				width   => { type => 'i', min => 1, group => 'Size' },
+				source  => { type => 'file', mustExist => 1 },
+				scratch => { type => 'dir', createPathIfMissing => 1 },
+			},
+		},
+	},
+);
+
+my $firstChain  = writeFile("$dir/first.yaml",  "commands:\n  document:\n    Options:\n      path: first.txt\n    commands:\n      create:\n        Options:\n          format: docx\n          pages: 3\n");
+my $secondChain = writeFile("$dir/second.yaml", "commands:\n  document:\n    commands:\n      create:\n        Options:\n          pages: 5\n");
+
+sub parseCommands($argv, @paths) {
+	return parseWith($argv, %commandOptions, config => { format => 'yaml', paths => \@paths });
+}
+
+subtest 'command sections set the options of their level' => sub {
+	my $opt    = parseCommands(['document', 'create', 'T'], $firstChain);
+	my $create = $opt->subcommand->subcommand;
+	is $opt->subcommand->path, 'first.txt', 'a command section sets its option';
+	is $create->format, 'docx', 'a nested command section sets its option';
+	is $create->pages,  3,      'every option of the section is taken';
+
+	my $cli = parseCommands(['document', '--path', 'cli.txt', 'create', '--format', 'pdf', 'T'], $firstChain);
+	is $cli->subcommand->path, 'cli.txt', 'the command line beats a command section';
+	is $cli->subcommand->subcommand->format, 'pdf', 'on the nested level as well';
+
+	my $default = parseCommands(['document', 'create', 'T'], $secondChain);
+	is $default->subcommand->path, 'doc.txt', 'the spec default applies without a config value';
+};
+
+subtest 'the autoload chain merges option by option on every level' => sub {
+	my $opt    = parseCommands(['document', 'create', 'T'], $firstChain, $secondChain);
+	my $create = $opt->subcommand->subcommand;
+	is $create->pages,  5,      'a later file overrides an option of a command section';
+	is $create->format, 'docx', 'the other options of that section survive';
+	is $opt->subcommand->path, 'first.txt', 'a section the later file leaves out survives';
+};
+
+subtest 'an explicit --config replaces the autoload chain on every level' => sub {
+	my $before = parseCommands(['--config', $secondChain, 'document', 'create', 'T'], $firstChain);
+	is $before->subcommand->path, 'doc.txt', 'the autoload chain is not loaded';
+	is $before->subcommand->subcommand->pages, 5, 'the explicit file sets a nested command option';
+
+	my $after = parseCommands(['document', 'create', '--config', $secondChain, 'T'], $firstChain);
+	is $after->subcommand->subcommand->pages, 5, '--config is accepted after the command words';
+	is $after->subcommand->path, 'doc.txt', 'and replaces the autoload chain as well';
+};
+
+subtest 'command sections are validated whether their command runs or not' => sub {
+	my %broken = (
+		'unknown command'        => ["commands:\n  documnet: {}\n", qr/config file '.*\.yaml': unknown command 'documnet', expected one of: document, image$/],
+		'unknown nested command' => ["commands:\n  document:\n    commands:\n      crate: {}\n", qr/: unknown command 'document crate', expected one of: create$/],
+		'unknown option'         => ["commands:\n  image:\n    Size:\n      height: 5\n", qr/: unknown option 'height' in group 'Size' of command 'image'$/],
+		'wrong group'            => ["commands:\n  image:\n    Options:\n      width: 5\n", qr/: option 'width' of command 'image' belongs to group 'Size', not 'Options'$/],
+		'auto option'            => ["commands:\n  image:\n    Options:\n      help: 1\n", qr/: unknown option 'help' in group 'Options' of command 'image'$/],
+		'inherited option'       => ["commands:\n  image:\n    Output:\n      color: never\n", qr/: unknown option 'color' in group 'Output' of command 'image'$/],
+		'commands not a mapping' => ["commands: 5\n", qr/: 'commands' must contain a mapping of command names$/],
+		'section not a mapping'  => ["commands:\n  image: 5\n", qr/: command 'image' must contain a mapping of group names$/],
+		'group not a mapping'    => ["commands:\n  document:\n    commands:\n      create:\n        Options: 5\n", qr/: group 'Options' of command 'document create' must contain a mapping of option names$/],
+	);
+	foreach my $case (sort keys %broken) {
+		my ($content, $expected) = $broken{$case}->@*;
+		my $file = writeFile("$dir/broken-command.yaml", $content);
+		like dies { parseCommands(['document', 'create', 'T'], $file) }, $expected, $case;
+	}
+};
+
+subtest 'only the selected levels check and prepare their config values' => sub {
+	my $scratch = "$dir/scratch-dir";
+	my $file    = writeFile("$dir/unselected.yaml", "commands:\n  image:\n    Options:\n      source: $dir/missing.png\n      scratch: $scratch\n");
+
+	ok lives { parseCommands(['document', 'create', 'T'], $file) }, 'a missing mustExist path of another command does not fail the run';
+	ok !-e $scratch, 'the createPathIfMissing path of another command is not created';
+
+	like dies { parseCommands(['image'], $file) },
+		qr/config value for 'source': file '.*missing\.png' does not exist/, 'the selected command checks it';
+};
+
+subtest 'inherited options are configured on the level declaring them' => sub {
+	my $file = writeFile("$dir/inherited.yaml", "Output:\n  color: never\n");
+	is parseCommands(['document', 'create', 'T'], $file)->color, 'never', 'the root group sets the inherited option';
+	is parseCommands(['document', 'create', '--color', 'always', 'T'], $file)->color, 'always', 'the command line beats it after the command words';
+};
+
+subtest '--create-default-config writes the defaults of every level' => sub {
+	my $target  = "$dir/every-level.yaml";
+	my $request = dies { parseCommands(['image', '--create-default-config', $target]) };
+	isa_ok $request, ['Getopt::Pad::ExitRequest'], 'accepted after the command word';
+
+	is YAML::XS::LoadFile($target), {
+		commands => {
+			document => {
+				Options  => { path => 'doc.txt' },
+				commands => { create => { Options => { format => 'pdf' } } },
+			},
+		},
+	}, 'nested command sections, levels without defaults left out';
+
+	my $opt = parseWith(['--config', $target, 'document', 'create', 'T'], %commandOptions, config => { format => 'yaml' });
+	is $opt->subcommand->path, 'doc.txt', 'the file loads back';
+	is $opt->subcommand->subcommand->format, 'pdf', 'with its nested section';
+};
+
+subtest "the 'commands' key" => sub {
+	like dies { Getopt::Pad::Spec->new(raw => { options => { x => { group => 'commands' } }, commands => { doc => {} }, config => { format => 'json' } }) },
+		qr/spec: group 'commands' is reserved for the command sections of config files/, 'no such group on a level with commands';
 	like dies {
-		parseWith(['doc'], options => {%options}, commands => { doc => { options => { verbose => {} } } },
-			config => { format => 'json', paths => [$nested] });
-	}, qr/unknown option 'verbose' in group 'Options' \(config files set top-level options only\)/, 'a subcommand option in a config file gets the hint';
+		Getopt::Pad::Spec->new(raw => {
+			commands => { doc => { options => { x => { group => 'commands' } }, commands => { sub => {} } } },
+			config   => { format => 'json' },
+		});
+	}, qr/spec: command 'doc': group 'commands' is reserved/, 'nor on a nested one';
+
+	my $group = writeFile("$dir/commands-group.yaml", "commands:\n  x: 1\n");
+	my $opt   = parseWith([], options => { x => { type => 'i', group => 'commands' } }, config => { format => 'yaml', paths => [$group] });
+	is $opt->x, 1, 'a level without commands keeps such a group';
 };
 
 subtest 'yaml loading never blesses' => sub {

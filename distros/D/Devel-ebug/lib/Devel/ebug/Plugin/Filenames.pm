@@ -5,7 +5,7 @@ use warnings;
 use base qw(Exporter);
 our @EXPORT = qw(filenames);
 
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 # list filenames
 sub filenames {
@@ -29,7 +29,7 @@ Devel::ebug::Plugin::Filenames
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 AUTHOR
 

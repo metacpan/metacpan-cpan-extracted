@@ -1,0 +1,65 @@
+{
+   "abstract" : "Cloudflare service capabilities for WebDyne::PAGI",
+   "author" : [
+      "Andrew Speer <andrew.speer@isolutions.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebDyne-Cloudflare",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Future" : "0.30",
+            "Future::AsyncAwait" : "0",
+            "JSON::PP" : "0",
+            "MIME::Base64" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aspeer/pm-WebDyne-Cloudflare/issues"
+      },
+      "homepage" : "https://github.com/aspeer/pm-WebDyne-Cloudflare",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aspeer/pm-WebDyne-Cloudflare.git",
+         "web" : "https://github.com/aspeer/pm-WebDyne-Cloudflare"
+      }
+   },
+   "version" : "0.005",
+   "x_authority" : "cpan:ASPEER",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

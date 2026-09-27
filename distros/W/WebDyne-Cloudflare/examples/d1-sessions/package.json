@@ -1,0 +1,35 @@
+{
+  "name": "webdyne-d1-sessions-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "webdyne-cloudflare build",
+    "check": "webdyne-cloudflare check",
+    "dev": "webdyne-cloudflare dev"
+  },
+  "dependencies": {
+    "@webdyne/webdyne-zeroperl": "^1.0.14",
+    "@webdyne/webdyne-cloudflare": "^1.7.1"
+  },
+  "webdyne": {
+    "entry": "app.psp",
+    "static": false,
+    "extensions": {
+      "@webdyne/webdyne-cloudflare": {
+        "d1Bindings": [
+          "DB"
+        ]
+      }
+    },
+    "cloudflare": {
+      "name": "webdyne-d1-sessions-example",
+      "d1Databases": [
+        {
+          "binding": "DB",
+          "databaseName": "webdyne-d1-sessions-example",
+          "databaseId": "00000000-0000-0000-0000-000000000001"
+        }
+      ]
+    }
+  }
+}

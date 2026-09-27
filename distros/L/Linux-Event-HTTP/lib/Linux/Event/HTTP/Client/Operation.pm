@@ -5,7 +5,7 @@ use warnings;
 
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 my %TERMINAL = map { $_ => 1 } qw(complete cancelled error);
 
@@ -156,22 +156,20 @@ __END__
 
 =head1 NAME
 
-Linux::Event::HTTP::Client::Operation - lifecycle of one high-level HTTP client operation
+Linux::Event::HTTP::Client::Operation - one high-level client action
 
 =head1 DESCRIPTION
 
-A Client::Operation is the application-facing handle returned by
-L<Linux::Event::HTTP::Client>. It normally contains one
-L<Linux::Event::HTTP::Transaction>, and can contain more when redirects are
-followed or authentication challenges are retried.
+C<Client::Operation> is the handle returned by
+L<Linux::Event::HTTP::Client>.
 
-A Transaction still means exactly one Request/Response exchange. Redirect or
-authentication retry therefore creates another Transaction rather than replacing
-the Request or Response inside an existing Transaction.
+It normally contains one L<Linux::Event::HTTP::Transaction>. Redirects and
+automatic authentication retries create additional Transactions because each
+Transaction always represents exactly one Request/Response exchange.
 
-For operations that need only one exchange, C<request>, C<response>,
-C<request_body>, C<cancel>, and the terminal-state predicates provide the same
-convenient high-level access to that Transaction.
+The Operation therefore answers high-level questions such as "what URL am I on
+now?" and "how many redirects occurred?" while Transaction remains the exact
+HTTP exchange object.
 
 =head1 METHODS
 
@@ -181,16 +179,15 @@ Returns the current or final Transaction.
 
 =head2 transactions
 
-Returns the Transactions in exchange order.
+Returns all Transactions in exchange order.
 
 =head2 transaction_count
 
-Returns the number of Transactions created by this operation, including
-redirect and authentication-retry exchanges.
+Returns the number of Transactions created by the Operation.
 
 =head2 initial_url
 
-Returns the absolute URL supplied for the first exchange.
+Returns the original absolute URL.
 
 =head2 url
 
@@ -198,26 +195,24 @@ Returns the current or final absolute URL.
 
 =head2 urls
 
-Returns the absolute URL associated with each Transaction in exchange order.
-Authentication retries therefore repeat the same URL.
+Returns the URL associated with each Transaction. Authentication retries repeat
+the same URL.
 
 =head2 redirect_count
 
-Returns the number of followed redirects. Authentication retries do not
-increment this count.
+Returns the number of followed redirects.
 
 =head2 auth_retry_count
 
-Returns the number of automatic 401/407 authentication retries performed by the
-operation.
+Returns the number of automatic authentication retries.
 
 =head2 max_redirects
 
-Returns the redirect limit selected for this operation.
+Returns this Operation's redirect limit.
 
 =head2 max_auth_retries
 
-Returns the authentication retry limit selected for this operation.
+Returns this Operation's authentication retry limit.
 
 =head2 request
 
@@ -225,19 +220,15 @@ Returns the Request for the current or final Transaction.
 
 =head2 response
 
-Returns the Response for the current or final Transaction, or undef before a
-Response exists.
+Returns its Response, or undef before one exists.
 
 =head2 request_body
 
-Delegates to the current Transaction's outgoing Request body producer. This
-keeps the ordinary streaming-upload form concise while leaving producer
-ownership on Transaction.
+Returns the current Transaction's streaming Request body producer.
 
 =head2 cancel
 
-Cancels the active Transaction, if any, and marks the overall client operation
-cancelled.
+Cancels the active exchange and the overall Operation.
 
 =head2 state
 
@@ -245,10 +236,14 @@ Returns C<pending>, C<active>, C<complete>, C<cancelled>, or C<error>.
 
 =head2 is_complete, is_cancelled, is_terminal
 
-Report operation lifecycle state.
+Report lifecycle state.
 
 =head2 error
 
-Returns the terminal operation error, if any.
+Returns the terminal Operation error, if any.
+
+=head1 SEE ALSO
+
+L<Linux::Event::HTTP::Client>, L<Linux::Event::HTTP::Transaction>.
 
 =cut

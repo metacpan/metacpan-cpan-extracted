@@ -2,7 +2,7 @@
 
 **efa-m** is a commandline client and Perl module for EFA public transit departure
 interfaces such as [efa.vrr.de](https://efa.vrr.de/vrr/XSLT_DM_REQUEST). See
-the [Travel::Status::DE::VRR
+the [Travel::Status::DE::EFA
 homepage](https://finalrewind.org/projects/Travel-Status-DE-VRR/) for details.
 
 ## Installation
@@ -48,7 +48,7 @@ use it you will have to trust me not to screw up your system with bogus
 packages. Also, note that the packages are not part of the official Debian
 repository and are not covered by its quality assurance process.
 
-To set up the repository and install the latest Travel::Status::DE::VRR
+To set up the repository and install the latest Travel::Status::DE::EFA
 release, run:
 
 ```
@@ -59,9 +59,9 @@ sudo apt install libtravel-status-de-vrr-perl
 ```
 
 Afterwards, `apt update` and `apt upgrade` will automatically install new
-Travel::Status::DE::VRR releases.
+Travel::Status::DE::EFA releases.
 
-Uninstallation of Travel::Status::DE::VRR works as usual:
+Uninstallation of Travel::Status::DE::EFA works as usual:
 
 ```
 sudo apt remove libtravel-status-de-vrr-perl
@@ -76,7 +76,7 @@ sudo rm /etc/apt/trusted.gpg.d/finalrewind.asc \
 
 ### Installation from CPAN
 
-Travel::Status::DE::VRR releases are published on the Comprehensive Perl
+Travel::Status::DE::EFA releases are published on the Comprehensive Perl
 Archive Network (CPAN) and can be installed using standard Perl module tools
 such as `cpanminus`.
 
@@ -175,11 +175,27 @@ docker run --rm derfnull/efa-m:latest --version
 Documentation is not available in this image. Please refer to the
 [online efa-m manual](https://man.finalrewind.org/1/efa-m/) instead.
 
+## Contributing
+
+You may report issues and contribute bugfixes at
+<https://codeberg.org/derf/Travel-Status-DE-EFA> or
+<https://github.com/derf/Travel-Status-DE-EFA> – use whichever platform
+works best for you.
+Please get in touch before starting work on more invasive changes.
+
+Keep in mind that this is a hobby project, and I take care to ensure that it
+remains that way.  As such, while I appreciate suggestions, bug reports,
+patches and similar, please do not expect a timely response to anything you
+submit.  I typically only address issues and merge requests when I have the
+capacity for them *and* when doing so does not feel like a chore.
+
+"AI" (as in, Large Language Models / LLMs such as ChatGPT, Claude, Copilot,
+Cursor, Grok, etc.) may not be used for contributions to this project.
+
 ## References
 
 Mirrors of the efa-m / Travel::Status::DE::EFA repository are available at
 
-* [Chaosdorf](https://chaosdorf.de/git/derf/Travel-Status-DE-EFA)
 * [Codeberg](https://codeberg.org/derf/Travel-Status-DE-EFA/)
 * [Finalrewind](https://git.finalrewind.org/derf/Travel-Status-DE-EFA/)
 * [GitHub](https://github.com/derf/Travel-Status-DE-EFA)

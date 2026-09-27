@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::PPI 6.039;
+package Dist::Zilla::Role::PPI 6.040;
 # ABSTRACT: a role for plugins which use PPI
 
 use Moose::Role;
@@ -27,6 +27,11 @@ use namespace::autoclean;
 
 my %CACHE;
 
+my sub _cache_key {
+  my ($name, $encoded_content) = @_;
+  return join qq{\0}, $name, md5($encoded_content);
+}
+
 sub ppi_document_for_file {
   my ($self, $file) = @_;
 
@@ -34,16 +39,18 @@ sub ppi_document_for_file {
 
   # We cache on the MD5 checksum to detect if the document has been modified
   # by some other plugin since it was last parsed, making our document invalid.
-  my $md5 = md5($encoded_content);
-  return $CACHE{$md5}->clone if $CACHE{$md5};
+  # The filename is part of the key because the document records it, and two
+  # files with identical content must not share a document.
+  my $key = _cache_key($file->name, $encoded_content);
+  return $CACHE{$key}->clone if $CACHE{$key};
 
   my $content = $file->content;
 
   require PPI::Document;
-  my $document = PPI::Document->new(\$content)
+  my $document = PPI::Document->new(\$content, filename => $file->name)
     or Carp::croak(PPI::Document->errstr . ' while processing file ' . $file->name);
 
-  return ($CACHE{$md5} = $document)->clone;
+  return ($CACHE{$key} = $document)->clone;
 }
 
 #pod =method save_ppi_document_to_file
@@ -67,7 +74,7 @@ sub save_ppi_document_to_file {
 
   my $encoded = $file->encoded_content;
 
-  $CACHE{ md5($encoded) } = $document->clone;
+  $CACHE{ _cache_key($file->name, $encoded) } = $document->clone;
 }
 
 #pod =method document_assigns_to_variable
@@ -131,7 +138,7 @@ Dist::Zilla::Role::PPI - a role for plugins which use PPI
 
 =head1 VERSION
 
-version 6.039
+version 6.040
 
 =head1 DESCRIPTION
 

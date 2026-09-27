@@ -6,7 +6,7 @@ class Getopt::Pad::Completion :strict(params) {
 	use File::Basename qw(basename);
 	use List::Util     qw(min);
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	use constant SHELLS         => ['bash', 'zsh'];
 	use constant SHELL_VARIABLE => 'GETOPT_PAD_COMPLETE';
@@ -250,13 +250,89 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Completion - shell completion scripts and their answers
+Getopt::Pad::Completion - Shell completion scripts and their answers
+(internal)
 
 =head1 DESCRIPTION
 
-Both halves of shell completion for one Spec. renderScript($shell) returns the bash or zsh script the C<--create-completions> trigger prints: a thin function that, on every tab, runs the program again with the GETOPT_PAD_COMPLETE environment variable set to the shell name, GETOPT_PAD_COMPLETE_INDEX set to the index of the word under the cursor, and the words after the program name as arguments. GetOptions notices the variable and prints what candidates($words, $index) returns instead of parsing: a directive line (C<files>, C<dirs> or C<none>) telling the shell which of its own path completions to add, then one candidate per line. The candidates come from replaying the finished words through the Spec (commands descend a Level, options that take a value swallow the next word), and cover command names, the visible option spellings of the Level, the values an Option's C<valid> list allows (static or produced by its coderef; for a C<hash> or C<objectlist> option behind the C<key=> the user typed, for a C<csv> option behind the last comma), and the type's path completion.
+This module is internal to Getopt::Pad. It is not part of the public
+API and can change without notice. Programs use L<Getopt::Pad/GetOptions>;
+this page is for people working on Getopt::Pad itself.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+Both halves of shell completion for one spec. How users install and use
+completion is described in L<Getopt::Pad/SHELL COMPLETION>.
+
+=head2 The script
+
+C<renderScript($shell)> returns the bash or zsh script that
+C<--create-completions> prints. The script is a thin function: on every
+tab press it runs the program again with the environment variable
+C<GETOPT_PAD_COMPLETE> set to the shell name, C<GETOPT_PAD_COMPLETE_INDEX>
+set to the index of the word under the cursor, and the words after the
+program name as arguments, and hands what the program prints to the
+shell.
+
+=head2 The answer
+
+When C<GETOPT_PAD_COMPLETE> is set, C<GetOptions> prints
+C<renderCandidates($words, $index)> and exits instead of parsing. The
+answer is a directive line, C<files>, C<dirs> or C<none>, telling the
+shell which of its own path completions to add, followed by one candidate
+per line.
+
+The candidates come from replaying the words before the cursor through
+the spec: command names descend into a command's level, and options that
+take a value swallow the next word. They are, depending on the position:
+
+=over 4
+
+=item *
+
+the command names of the level;
+
+=item *
+
+the visible option spellings of the level, inherited options included,
+with C<--no-NAME> for negatable options whose name is longer than one
+letter;
+
+=item *
+
+the values of an option's C<valid> list (static or from its coderef);
+for a C<hash> or C<objectlist> option after the C<KEY=> the user typed,
+for a C<csv> option after the last comma;
+
+=item *
+
+the type's own path completion, through the directive.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item new(spec => $spec, programName => $name)
+
+C<programName> defaults to the file name of C<$0>.
+
+=item renderScript($shell)
+
+The completion script for C<bash> or C<zsh>.
+
+=item renderCandidates($words, $index), candidates($words, $index)
+
+The answer as text, or as a list (directive first).
+
+=item SHELLS, SHELL_VARIABLE, INDEX_VARIABLE
+
+The supported shells and the names of the two environment variables.
+
+=back
+
+=head1 SEE ALSO
+
+L<Getopt::Pad/SHELL COMPLETION>
 
 =head1 AUTHOR
 

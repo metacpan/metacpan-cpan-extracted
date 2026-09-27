@@ -5,7 +5,7 @@ use strict;
 
 package Net::Flickr::API;
 
-$Net::Flickr::API::VERSION = '1.7';
+$Net::Flickr::API::VERSION = '1.8';
 
 =head1 NAME
 
@@ -20,9 +20,10 @@ Net::Flickr::API - base API class for Net::Flickr::* libraries
 
 Base API class for Net::Flickr::* libraries
 
-Net::Flickr::API is a wrapper for Flickr::API that provides support for throttling
-API calls (per second), retries if the API is disabled and marshalling of API responses
-into XML::LibXML or XML::XPath objects.
+Net::Flickr::API is a wrapper for Flickr::API that provides support for
+throttling API calls (per hour), retries if the API is disabled or
+rate-limited, and marshalling of API responses into XML::LibXML or XML::XPath
+objects.
 
 =head1 OPTIONS
 
@@ -69,6 +70,16 @@ Use XML::XPath.
 
 =back
 
+=item * B<api_calls_per_hour>
+
+Integer.
+
+The most API calls to make in any hour, counting retries.  Short bursts are
+allowed after a lull, but never enough to go over this in any rolling hour.
+
+The default, and the maximum, is 3600, which is Flickr's documented limit per
+API key.  The minimum is 60.
+
 =back
 
 =head2 reporting
@@ -110,16 +121,20 @@ use Config::Simple;
 use Flickr::API;
 use Flickr::Upload;
 
+use HTTP::Date qw(str2time);
+use List::Util qw(min);
+use Time::HiRes ();
 use Readonly;
 use Data::Dumper;
 
 use Log::Dispatch;
 use Log::Dispatch::Screen;
 
-Readonly::Scalar my $PAUSE_SECONDS_OK          => 2;
+Readonly::Scalar my $CALLS_PER_HOUR_MAX        => 3600;
+Readonly::Scalar my $CALLS_PER_HOUR_MIN        => 60;
 Readonly::Scalar my $PAUSE_SECONDS_UNAVAILABLE => 4;
 Readonly::Scalar my $PAUSE_MAXTRIES            => 10;
-Readonly::Scalar my $PAUSE_ONSTATUS            => 503;
+Readonly::Hash   my %PAUSE_ONSTATUS            => (429 => 1, 503 => 1);
 
 Readonly::Scalar my $RETRY_MAXTRIES            => 10;
 
@@ -140,12 +155,10 @@ sub new {
         my $pkg = shift;
         my $cfg = shift;
     
-        my $self = {'__wait'    => time() + $PAUSE_SECONDS_OK,
-                    '__paused'  => 0,
-                    '__retries' => 0,};
-        
+        my $self = {'__retries' => 0,};
+
         bless $self,$pkg;
-        
+
         if (! $self->init($cfg)) {
                 undef $self;
         }
@@ -163,6 +176,8 @@ sub init {
                 warn "Invalid API handler";
                 return 0;
         }
+
+        $self->_init_rate_limit();
         
         #
         
@@ -290,60 +305,171 @@ sub api_call {
         my $self = shift;
         my $args = shift;
         
-        #
-        
-        # check to see if we need to take
-        # breather (are we pounding or are
-        # we not?)
+        # A 429 (rate limited) or 503 (unavailable) reply is retried in this
+        # loop, up to $PAUSE_MAXTRIES times.  This used to be done by having
+        # retry_api_call call api_call recursively, which reset the retry
+        # count as each nested call returned. -- claude, 2026-09-26
 
-        while (time < $self->{'__wait'}) {
+        my $res   = undef;
+        my $tries = 0;
 
-                my $debug_msg = sprintf("trying not to beat up the Flickr servers, pause for %.2f seconds\n",
-                                        $PAUSE_SECONDS_OK);
+        while (1) {
 
-                $self->log()->debug($debug_msg);
-                sleep($PAUSE_SECONDS_OK);
+                # check to see if we need to take
+                # breather (are we pounding or are
+                # we not?)
+
+                $self->_await_rate_limit();
+
+                # send request
+
+                if (exists($args->{'args'}->{'api_sig'})) {
+                        delete $args->{'args'}->{'api_sig'};
+                }
+
+                $args->{'args'}->{'auth_token'} = $self->{cfg}->param("flickr.auth_token");
+
+                #
+
+                my $req = Flickr::API::Request->new($args);
+
+                $self->log()->debug("calling $args->{method} : " . Dumper($args->{args}));
+
+                eval {
+                        $res = $self->{'api'}->execute_request($req);
+                };
+
+                if ($@) {
+                        $self->log()->error("Fatal error calling the Flickr API, $@");
+                        return undef;
+                }
+
+                #
+                # check for 429 or 503 status
+                #
+
+                last unless $PAUSE_ONSTATUS{ $res->code() };
+
+                # you are in a dark and twisty corridor
+                # where all the errors look the same - 
+                # just give up if we hit this ceiling
+
+                $tries ++;
+
+                if ($tries > $PAUSE_MAXTRIES) {
+                        my $errmsg = sprintf("service returned status %d %d times calling %s; giving up",
+                                             $res->code(), $PAUSE_MAXTRIES, $args->{method});
+
+                        $self->log()->error($errmsg);
+                        return undef;
+                }
+
+                my $pause = $self->_retry_pause($res, $tries);
+
+                $self->log()->debug(sprintf("service returned status %d, pause for %.2f seconds",
+                                            $res->code(), $pause));
+
+                $self->_sleep($pause);
         }
-        
-        # send request
-  
-        if (exists($args->{'args'}->{'api_sig'})) {
-                delete $args->{'args'}->{'api_sig'};
-        }
-
-        $args->{'args'}->{'auth_token'} = $self->{cfg}->param("flickr.auth_token");
-
-        #
-
-        my $req = Flickr::API::Request->new($args);
-        my $res = undef;
-
-        $self->log()->debug("calling $args->{method} : " . Dumper($args->{args}));
-        
-        eval {
-                $res = $self->{'api'}->execute_request($req);
-        };
-
-        if ($@) {
-                $self->log()->error("Fatal error calling the Flickr API, $@");
-
-                $self->{'__wait'}   = time + $PAUSE_SECONDS_OK;
-                $self->{'__paused'} = 0;
-                return undef;
-        }
-
-        #
-        # check for 503 status
-        #
-
-        if ($res->code() eq $PAUSE_ONSTATUS) {
-                $res = $self->retry_api_call($args, $res);
-        }
-        
-        $self->{'__wait'}   = time + $PAUSE_SECONDS_OK;
-        $self->{'__paused'} = 0;
 
         return $self->parse_api_call($args, $res);
+}
+
+# How long to wait before the $tries-th retry of a request that got $res.
+# Retry-After may be either a number of seconds or an HTTP date; without it,
+# we back off a little more on each try.
+sub _retry_pause {
+        my $self  = shift;
+        my $res   = shift;
+        my $tries = shift;
+
+        my $retry_after = $res->header("Retry-After");
+
+        if (defined($retry_after)) {
+                if ($retry_after =~ /\A\s*([0-9]+)\s*\z/) {
+                        return $1;
+                }
+
+                if (my $when = str2time($retry_after)) {
+                        my $pause = $when - $self->_now;
+                        return ($pause > 0) ? $pause : 0;
+                }
+        }
+
+        return $PAUSE_SECONDS_UNAVAILABLE * $tries;
+}
+
+# Pacing is a token bucket: it holds up to "size" tokens, refills at "rate"
+# tokens per second, and each request sent (retries included) spends one.  In
+# any window of T seconds, then, at most size + rate * T requests go out.  The
+# rate is set so that this is no more than calls_per_hour for T = 3600, so a
+# burst after a lull never pushes an hour over the limit.  The bucket is
+# charged when a request is sent, so request latency overlaps the wait for the
+# next token instead of adding to it. -- claude, 2026-09-26
+sub _init_rate_limit {
+        my $self = shift;
+
+        my $per_hour = $self->{cfg}->param("flickr.api_calls_per_hour");
+        $per_hour    = $CALLS_PER_HOUR_MAX unless defined($per_hour) && length($per_hour);
+
+        if ($per_hour !~ /\A[0-9]+\z/ || $per_hour > $CALLS_PER_HOUR_MAX) {
+                warn "api_calls_per_hour must be at most $CALLS_PER_HOUR_MAX; using $CALLS_PER_HOUR_MAX\n";
+                $per_hour = $CALLS_PER_HOUR_MAX;
+        }
+
+        if ($per_hour < $CALLS_PER_HOUR_MIN) {
+                warn "api_calls_per_hour must be at least $CALLS_PER_HOUR_MIN; using $CALLS_PER_HOUR_MIN\n";
+                $per_hour = $CALLS_PER_HOUR_MIN;
+        }
+
+        my $size = int($per_hour / 360) || 1;
+
+        $self->{'__bucket'} = {size   => $size,
+                               rate   => ($per_hour - $size) / 3600,
+                               tokens => $size,
+                               at     => $self->_now};
+}
+
+sub _await_rate_limit {
+        my $self = shift;
+
+        my $bucket = $self->{'__bucket'};
+        my $now    = $self->_now;
+
+        # The wall clock can be set backward, which must not drain the bucket.
+        my $elapsed = $now - $bucket->{at};
+        $elapsed    = 0 if $elapsed < 0;
+
+        $bucket->{tokens} = min($bucket->{size},
+                                $bucket->{tokens} + $elapsed * $bucket->{rate});
+        $bucket->{at}     = $now;
+
+        if ($bucket->{tokens} < 1) {
+                my $pause = (1 - $bucket->{tokens}) / $bucket->{rate};
+
+                my $debug_msg = sprintf("trying not to beat up the Flickr servers, pause for %.2f seconds",
+                                        $pause);
+
+                $self->log()->debug($debug_msg);
+                $self->_sleep($pause);
+
+                $bucket->{tokens} = 1;
+                $bucket->{at}     = $now + $pause;
+        }
+
+        $bucket->{tokens} --;
+}
+
+# These exist so that tests can supply a fake clock.
+sub _now {
+        return Time::HiRes::time();
+}
+
+sub _sleep {
+        my $self    = shift;
+        my $seconds = shift;
+
+        Time::HiRes::sleep($seconds);
 }
 
 =head2 $obj->get_auth()
@@ -489,7 +615,14 @@ sub api_disabled {
                 exit;
         }
 
-        $res = $self->retry_api_call($args, $res);
+        my $pause = $PAUSE_SECONDS_UNAVAILABLE * $self->{'__retries'};
+
+        $self->log()->debug(sprintf("api disabled, pause for %.2f seconds", $pause));
+        $self->_sleep($pause);
+
+        # try, try again
+
+        $res = $self->api_call($args);
 
         if (! $res) {
                 $self->log()->critical("Returned false during 'api disabled' retry. That can only be bad - exiting");
@@ -497,48 +630,6 @@ sub api_disabled {
         }
 
         return $res;
-}
-
-sub retry_api_call {
-        my $self = shift;
-        my $args = shift;
-        my $res  = shift;
-
-        # you are in a dark and twisty corridor
-        # where all the errors look the same - 
-        # just give up if we hit this ceiling
-        
-        $self->{'__paused'} ++;
-        
-        if ($self->{'__paused'} > $PAUSE_MAXTRIES) {
-                
-                my $errmsg = sprintf("service returned '%d' status %d times; exiting",
-                                     $PAUSE_ONSTATUS, $PAUSE_MAXTRIES);
-                
-                $self->log()->error($errmsg);
-                return undef;
-        }
-        
-        my $retry_after = $res->header("Retry-After");
-        my $debug_msg   = undef;
-        
-        if ($retry_after ) {
-                $debug_msg = sprintf("service unavailable, requested to retry in %d seconds",
-                                     $retry_after);
-        } 
-        
-        else {
-                $retry_after = $PAUSE_SECONDS_UNAVAILABLE * $self->{'__paused'};
-                $debug_msg = sprintf("service unavailable, pause for %.2f seconds",
-                                     $retry_after);
-        }
-        
-        $self->log()->debug($debug_msg);
-        sleep($retry_after);
-        
-        # try, try again
-        
-        return $self->api_call($args);
 }
 
 =head2 $obj->upload(\%args)
@@ -592,7 +683,7 @@ sub log {
 
 =head1 VERSION
 
-1.7
+1.8
 
 =head1 DATE
 

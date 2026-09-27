@@ -1,5 +1,15 @@
 Revision history for Perl extension Tcl::Tk.
 
+1.53  2026-09-26
+        - Add comprehensive 12-month interactive calendar demonstrations 
+          to showcase both perl/Tk and native Tcl/Tk syntaxes side by side:
+          * demos/calendar-perltk.pl (using clean perl/Tk style)
+          * demos/calendar-tcltk.pl (using native Tcl/Tk commands)
+        - Improve documentation in POD detailing how to seamlessly mix 
+          perl/Tk object-oriented syntax with native Tcl/Tk code execution.
+        - Add automated UI layout integration tests under t/ directory
+          reusing the code from new demonstration scripts.
+
 1.52    20-sept-2026
         - Improved support for core themed widgets (ttk::*)
         - Added native Perl/Tk method syntax mappings for all standard Ttk components:

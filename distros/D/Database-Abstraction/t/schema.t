@@ -5,7 +5,7 @@ use warnings;
 
 use File::Spec;
 use File::Temp qw(tempdir);
-use Test::Most tests => 21;
+use Test::Most tests => 26;
 use Test::NoWarnings;
 
 use lib 't/lib';
@@ -31,6 +31,9 @@ ok(exists $schema->{'number'}, 'schema() has "number" key');
 is($schema->{'entry'}{'pk'}, 1, '"entry" column is marked as pk');
 is($schema->{'entry'}{'nullable'}, 0, '"entry" is not nullable');
 
+# Ordering contract: columns() always returns alphabetically sorted names
+is_deeply($cols, [sort @{$cols}], 'slurp columns() is alphabetically sorted');
+
 # Cached calls return the same ref
 is($t1->columns(), $cols,   'columns() is cached');
 is($t1->schema(),  $schema, 'schema() is cached');
@@ -39,7 +42,7 @@ is($t1->schema(),  $schema, 'schema() is cached');
 
 SKIP: {
 	eval { require DBI; require DBD::SQLite };
-	skip 'DBD::SQLite not available', 7 if $@;
+	skip 'DBD::SQLite not available', 8 if $@;
 
 	my $dir = tempdir(CLEANUP => 1);
 	my $dbfile = File::Spec->catfile($dir, 'schematest.sql');
@@ -65,4 +68,34 @@ SKIP: {
 	my $sql_schema = $obj->schema();
 	isa_ok($sql_schema, 'HASH', 'SQLite schema() returns hashref');
 	is($sql_schema->{'id'}{'pk'}, 1, 'SQLite pk column detected correctly');
+	is_deeply($sql_cols, [sort @{$sql_cols}], 'SQLite columns() is alphabetically sorted');
+}
+
+# ---- columns() ordering: SQLite table declared in non-alphabetical order ----
+# This verifies the fix: the DBI path now sorts $sth->{NAME} so that
+# declaration order (score, id, name) becomes alphabetical (id, name, score).
+
+SKIP: {
+	eval { require DBI; require DBD::SQLite };
+	skip 'DBD::SQLite not available', 3 if $@;
+
+	my $dir2 = tempdir(CLEANUP => 1);
+	my $dbfile2 = File::Spec->catfile($dir2, 'colorder.sql');
+	my $dbh2 = DBI->connect("dbi:SQLite:dbname=$dbfile2", undef, undef, { RaiseError => 1 });
+	$dbh2->do(q{CREATE TABLE colorder (score REAL, id INTEGER PRIMARY KEY, name TEXT)});
+	$dbh2->disconnect();
+
+	{
+		package Database::colorder;
+		use base 'Database::Abstraction';
+	}
+
+	my $ord = Database::colorder->new(directory => $dir2, no_entry => 1);
+	isa_ok($ord, 'Database::colorder', 'colorder object created');
+
+	my $ord_cols = $ord->columns();
+	is_deeply($ord_cols, ['id', 'name', 'score'],
+		'SQLite columns() sorted alphabetically despite reverse declaration order');
+	is_deeply($ord_cols, [sort @{$ord_cols}],
+		'SQLite out-of-order columns() passes sort invariant');
 }

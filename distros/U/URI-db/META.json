@@ -36,187 +36,187 @@
    "provides" : {
       "URI::cassandra" : {
          "file" : "lib/URI/cassandra.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::clickhouse" : {
          "file" : "lib/URI/clickhouse.pm",
-         "version" : "0.20"
+         "version" : "0.24"
       },
       "URI::cockroach" : {
          "file" : "lib/URI/cockroach.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::cockroachdb" : {
          "file" : "lib/URI/cockroachdb.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::couch" : {
          "file" : "lib/URI/couch.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::couchdb" : {
          "file" : "lib/URI/couchdb.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::cubrid" : {
          "file" : "lib/URI/cubrid.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::db" : {
          "file" : "lib/URI/db.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::db2" : {
          "file" : "lib/URI/db2.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::derby" : {
          "file" : "lib/URI/derby.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::exasol" : {
          "file" : "lib/URI/exasol.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::firebird" : {
          "file" : "lib/URI/firebird.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::hive" : {
          "file" : "lib/URI/hive.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::impala" : {
          "file" : "lib/URI/impala.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::informix" : {
          "file" : "lib/URI/informix.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::ingres" : {
          "file" : "lib/URI/ingres.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::interbase" : {
          "file" : "lib/URI/interbase.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::ldapdb" : {
          "file" : "lib/URI/ldapdb.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::maria" : {
          "file" : "lib/URI/maria.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::mariadb" : {
          "file" : "lib/URI/mariadb.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::max" : {
          "file" : "lib/URI/max.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::maxdb" : {
          "file" : "lib/URI/maxdb.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::monet" : {
          "file" : "lib/URI/monet.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::monetdb" : {
          "file" : "lib/URI/monetdb.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::mongo" : {
          "file" : "lib/URI/mongo.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::mongodb" : {
          "file" : "lib/URI/mongodb.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::mssql" : {
          "file" : "lib/URI/mssql.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::mysql" : {
          "file" : "lib/URI/mysql.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::oracle" : {
          "file" : "lib/URI/oracle.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::pg" : {
          "file" : "lib/URI/pg.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::pgsql" : {
          "file" : "lib/URI/pgsql.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::pgxc" : {
          "file" : "lib/URI/pgxc.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::postgres" : {
          "file" : "lib/URI/postgres.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::postgresql" : {
          "file" : "lib/URI/postgresql.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::postgresxc" : {
          "file" : "lib/URI/postgresxc.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::redshift" : {
          "file" : "lib/URI/redshift.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::snowflake" : {
          "file" : "lib/URI/snowflake.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::sqlite" : {
          "file" : "lib/URI/sqlite.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::sqlite3" : {
          "file" : "lib/URI/sqlite3.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::sqlserver" : {
          "file" : "lib/URI/sqlserver.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::sybase" : {
          "file" : "lib/URI/sybase.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::teradata" : {
          "file" : "lib/URI/teradata.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::unify" : {
          "file" : "lib/URI/unify.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::vertica" : {
          "file" : "lib/URI/vertica.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::yugabyte" : {
          "file" : "lib/URI/yugabyte.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "URI::yugabytedb" : {
          "file" : "lib/URI/yugabytedb.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       }
    },
    "release_status" : "stable",
@@ -232,6 +232,6 @@
          "url" : "https://github.com/theory/uri-db/"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

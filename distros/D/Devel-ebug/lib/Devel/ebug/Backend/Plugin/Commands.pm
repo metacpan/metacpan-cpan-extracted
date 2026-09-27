@@ -3,7 +3,7 @@ package Devel::ebug::Backend::Plugin::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 sub register_commands {
   return ( commands    => { sub => \&commands }, );
@@ -28,7 +28,7 @@ Devel::ebug::Backend::Plugin::Commands
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 AUTHOR
 

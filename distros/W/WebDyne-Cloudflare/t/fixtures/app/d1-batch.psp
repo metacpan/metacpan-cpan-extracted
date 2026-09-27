@@ -1,0 +1,56 @@
+<api handler="batch_check" pattern="/check/:token" canonical>
+
+__PERL__
+
+use WebDyne::Cloudflare::D1;
+
+sub batch_check {
+    my ($self, $match_hr)=@_;
+    my $token=$match_hr->{'token'};
+    die "Invalid batch test token\n" unless ($token=~/\A[a-f0-9-]{36}\z/);
+    my $db_or=WebDyne::Cloudflare::D1->new(scope => $self->r()->{'scope'});
+    my $insert_or=$db_or->prepare(
+        'INSERT INTO webdyne_d1_batch_test (token, slot, name, note, payload) VALUES (?1, ?2, ?3, ?4, ?5)'
+    );
+    my $select_or=$db_or->prepare(
+        'SELECT slot, name, note, payload FROM webdyne_d1_batch_test WHERE token = ?1 ORDER BY slot'
+    )->bind($token);
+
+    #  Keep all writes isolated by token and clean up even if an assertion fails.
+    #
+    my $result_hr=eval {
+        my $results_ar=$db_or->batch([
+            $insert_or->bind($token, 1, "O'Brien \x{03c0}", undef, $db_or->blob("\0\xff")),
+            $insert_or->bind($token, 2, '', '0', $db_or->blob('')),
+            $select_or,
+        ])->get();
+        die "Batch result order or metadata is incorrect\n"
+            unless ((@{$results_ar}==3)&&($results_ar->[0]{'meta'}{'changes'}==1)
+                &&($results_ar->[1]{'meta'}{'changes'}==1)
+                &&(@{$results_ar->[2]{'results'}}==2));
+
+        my $failed_fg=eval {
+            $db_or->batch([
+                $insert_or->bind($token, 3, 'must roll back', undef, undef),
+                $insert_or->bind($token, 1, 'duplicate slot', undef, undef),
+                $insert_or->bind($token, 4, 'must not execute', undef, undef),
+            ])->get();
+            1;
+        };
+        my $error_or=$@;
+        die "Batch constraint failure was not a structured D1 error\n"
+            if ($failed_fg||!ref($error_or)||!$error_or->isa('WebDyne::Cloudflare::D1::Error'));
+
+        my $after_ar=$db_or->batch([$select_or])->get()->[0]{'results'};
+        die "Failed batch left partial writes\n" unless (@{$after_ar}==2);
+        my @rows=map {
+            {slot => $_->{'slot'}, name => $_->{'name'}, note => $_->{'note'},
+                payload_hex => unpack('H*', $_->{'payload'})}
+        } @{$after_ar};
+        +{rows => \@rows, rollback => 1, recovered => 1};
+    };
+    my $error=$@;
+    $db_or->run('DELETE FROM webdyne_d1_batch_test WHERE token = ?1', $token)->get();
+    die $error if $error;
+    return $result_hr;
+}

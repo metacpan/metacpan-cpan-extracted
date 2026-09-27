@@ -7,7 +7,7 @@ class Getopt::Pad::Type::Dir :isa(Getopt::Pad::Type::Path) :strict(params) {
 	use constant NAMES => ['dir', 'directory'];
 	use File::Path ();
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	method label() { return 'Path' }
 
@@ -33,13 +33,41 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Type::Dir - directory path type
+Getopt::Pad::Type::Dir - The dir option type
+
+=head1 SYNOPSIS
+
+=for highlighter language=perl
+
+    options => {
+        'work-dir'  => { type => 'dir', mustExist => 1 },
+        'cache-dir' => { type => 'dir', createPathIfMissing => 1 },
+    },
 
 =head1 DESCRIPTION
 
-Directory path, optionally required to exist via C<mustExist>, or created with its parents on demand via C<createPathIfMissing>.
+The type of options and args declared with C<< type => 'dir' >> or
+C<'directory'>. It accepts any path and returns it as given; a leading C<~>
+is not expanded.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+=over 4
+
+=item * With C<mustExist>, the path must be an existing directory
+(C<-d>); anything else is rejected with C<directory 'PATH' does not
+exist>.
+
+=item * With C<createPathIfMissing>, a missing directory is created with
+all missing parent directories, for the value that is finally used.
+
+=back
+
+The help output labels the option C<[Path]>, and shell completion
+completes directory names. See L<Getopt::Pad/dir> and
+L<Getopt::Pad/Type-specific keys>.
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Type::File>, L<Getopt::Pad::Type::Path>
 
 =head1 AUTHOR
 

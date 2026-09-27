@@ -1,6 +1,98 @@
 Revision history for Database-Abstraction
 
+0.46	Sat Sep 26 08:22:16 PM EDT 2026
+	[ Bug Fixes ]
+	- HTML::TableExtract added to META_MERGE recommends in Makefile.PL
+	  (was already in TEST_REQUIRES but missing from the public recommends
+	  block, so CPAN clients did not surface it as an optional dependency).
+	[ Enhancements ]
+	- selectall_arrayref / selectall_array: accept limit => N and offset => M
+	  parameters for pagination.  SQL path uses LIMIT ?/OFFSET ? bind params;
+	  slurp/in-memory paths splice() the result.  Offset-only on SQLite uses
+	  LIMIT -1 OFFSET ? (SQLite requires a LIMIT clause with OFFSET).  Invalid
+	  (non-integer) values are ignored with a carp warning.
+	- dbi_source(): new public method returning {dbh, table} on SQLite-backed
+	  instances, undef on all other backends (slurp-mode CSV, JSON, XLSX,
+	  HTML URL, DBM::Deep, BerkeleyDB, PostgreSQL, MySQL).  Enables
+	  Database::Join to perform zero-copy ATTACH DATABASE without routing
+	  rows through Perl.  Subclasses may override for other DBI backends.
+	- cpanfile: added top-level recommends section listing all 10 optional
+	  runtime backends so cpanm/cpm users see them without running tests.
+	- selectall_arrayref / selectall_array: accept sort_by => 'col' and
+	  sort_by => ['col', 'DESC'] to specify sort column and direction.
+	  SQL path appends ORDER BY col [ASC|DESC] in place of the default
+	  primary-key sort.  Slurp/in-memory paths sort @rc with string cmp
+	  before applying offset/limit pagination.  Unsafe column names and
+	  invalid direction strings are ignored with a carp warning.
+	- schema(): new constructor option infer_types => 1 enables heuristic
+	  type inference for slurp-mode sources (CSV, JSON, XLSX, XML, HTML
+	  URL, DBM::Deep).  Scans up to 100 rows per column and promotes types
+	  from TEXT to INTEGER, REAL, TIMESTAMP, or DATE.  Off by default for
+	  backward compatibility.
+	- each_row(\&callback, ...): new streaming select method that calls
+	  \&callback once per matching row without materialising the full result
+	  array.  SQL path: constant-memory (rows fetched one at a time via
+	  fetchrow_hashref).  Slurp/in-memory path: iterates the already-loaded
+	  data.  Accepts the same criteria, join, sort_by, limit, and offset
+	  parameters as selectall_arrayref.  Returns the count of rows visited.
+	  Exceptions inside the callback propagate after finishing the statement
+	  handle.  Also adds query->each(\&callback) as a terminal method on the
+	  chained query builder.
+	- base_criteria constructor parameter: a hashref of column-value pairs
+	  that is ANDed into every SELECT automatically.  Use cases include
+	  row-level security (tenant_id => $tid), soft-delete filtering
+	  (deleted_at => undef), and status gates (active => 1).  Works on
+	  all four select methods (selectall_arrayref, selectall_array, count,
+	  fetchrow_hashref), the chained query builder, and BerkeleyDB/slurp
+	  backends.  Keys are validated against the same identifier rules as
+	  the id parameter; the hashref is shallow-copied at construction.
+	- Remote file backend: extension probing is now parallel.  When host is
+	  set and filename is not given, _open() forks one child per candidate
+	  extension; all SSH calls (via File::Slurp::Remote) run concurrently.
+	  The parent waits for all children and then proceeds with whatever was
+	  written to the temp directory.  Children exit via POSIX::_exit(0) to
+	  avoid running Perl cleanup (File::Temp::Dir DESTROY) in the child.
+	  Falls back to sequential for any extension whose fork() fails.
+	  When filename IS given, a single targeted SSH fetch replaces the full
+	  probe entirely (previously all 16 extensions were fetched even when
+	  the filename was known).
+	- columns(): now always returns column names in alphabetical order
+	  regardless of backend.  Previously the DBI path returned columns in
+	  declaration order (from $sth->{NAME}) while the slurp path returned
+	  sorted keys.  The fix is a single sort on $sth->{NAME}.  The result is
+	  the same portable, reproducible ordering whether the table is backed by
+	  CSV, SQLite, or any other DBI driver.
+	- Schema-aware numeric comparison in slurp-mode in-memory scan:
+	  _match_criterion now accepts an optional column name and checks the
+	  cached schema (if schema() has been called) to determine whether to
+	  use numeric (==) or string (eq) equality.  When a column is typed
+	  INTEGER or REAL, equality, !=, -in, and -not_in all use numeric
+	  operators, eliminating silent correctness splits between small
+	  (slurp) and large (SQL) datasets.  Only fires when schema() has
+	  been called first (or infer_types => 1 combined with an explicit
+	  schema() call); defaults to string comparison otherwise.
+	- updated(): SQLite DSN connections now return a live stat() mtime
+	  rather than the connection timestamp.  When the backing DSN matches
+	  dbi:SQLite:dbname=... the file path is extracted and stat()-ed on
+	  every updated() call, so callers get cache-invalidation semantics
+	  consistent with file-based backends regardless of how the connection
+	  was opened.  Non-SQLite DSN backends and URL backends continue to
+	  return the connection time.
+	[ Documentation ]
+	- CLAUDE.md: five stale LWP::UserAgent references corrected to
+	  LWP::UserAgent::Cached (lines in HTML URL backend, lazy-load, and
+	  pre-loading sections).
+	- CLAUDE.md: AUTOLOAD section now documents the wantarray+criteria
+	  in-memory scan fast-path for no-DBI backends (JSON, XLSX, HTML URL).
+
 0.45	Tue Sep 22 04:56:49 PM EDT 2026
+	[ Bug Fixes ]
+	- AUTOLOAD: calling $db->col('val') in list context (wantarray) with a
+	  non-empty params hash on no-DBI backends (JSON, XLSX, HTML URL) fell
+	  through to the SQL path and died with "Can't call method prepare_cached
+	  on an undefined value".  Added an in-memory scan path for the
+	  wantarray+criteria case, mirroring the zero-params fast-path already
+	  present in the same branch.
 	[ Enhancements ]
 	- JSON URL backend: when the url constructor parameter is used and the server
 	  returns Content-Type: application/json, or the URL path ends in .json, the

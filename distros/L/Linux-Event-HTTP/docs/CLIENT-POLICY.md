@@ -1,103 +1,95 @@
 # Client policy
 
-Linux::Event::HTTP keeps transport execution and HTTP message identity separate
-from higher-level client policy. Client policy belongs above Client::Connection
-and must not turn Request, Response, or Transaction into routing/session objects.
+This document describes high-level policy owned by
+`Linux::Event::HTTP::Client`.
 
-## Implemented: explicit and default forward proxy routes
+The protocol executors do not duplicate these rules. The same policy model is
+used whether an exchange runs over HTTP/1 or HTTP/2.
 
-Ordinary requests may select a proxy per operation:
+## Transaction rule
 
-```perl
-$client->get(
-    'http://origin.example/path',
-    proxy => 'http://proxy.example:3128',
-);
+A `Client::Operation` is one high-level client action.
+
+A `Transaction` is exactly one Request/Response exchange.
+
+Therefore:
+
+- a redirect creates another Transaction;
+- an authentication retry creates another Transaction;
+- Operation history preserves every exchange.
+
+## Redirects
+
+Recognized automatic redirects:
+
+- 301
+- 302
+- 303
+- 307
+- 308
+
+Default limit:
+
+```text
+5
 ```
 
-A Client may also configure one default route:
+Set `max_redirects => 0` to disable automatic following.
+
+Method handling:
+
+- 301/302 may convert POST to GET;
+- 303 uses GET except for HEAD;
+- 307/308 preserve method and body.
+
+Complete scalar bodies can be replayed when policy requires it.
+
+Streaming Request producers are not assumed rewindable and are not replayed
+automatically.
+
+Cross-origin redirects do not blindly copy caller-supplied Authorization or
+Cookie fields.
+
+## Cookies
+
+Cookie policy is delegated to an application-owned `HTTP::CookieJar`.
+
+Example:
 
 ```perl
-my $client = Linux::Event::HTTP::Client->new(
-    loop  => $loop,
-    proxy => 'http://proxy.example:3128',
-);
-```
-
-A per-request proxy overrides the Client default, while `proxy => undef`
-explicitly bypasses it for that operation.
-
-Target origin controls Host, redirects, target authentication, cookies, and
-Operation URLs. Route origin controls connection acquisition, proxy
-authentication, and idle reuse. Redirect hops retain the selected route for the
-operation.
-
-This remains explicit configuration. Linux::Event::HTTP does not inspect proxy
-environment variables, evaluate PAC or NO_PROXY policy, add SOCKS semantics, or
-silently convert ordinary proxy routing into CONNECT.
-
-## Implemented: injected HTTP::CookieJar
-
-Cookie policy is delegated to `HTTP::CookieJar` rather than reimplemented here.
-The jar is explicit application-owned state:
-
-```perl
-use HTTP::CookieJar;
-
-my $jar = HTTP::CookieJar->new;
 my $client = Linux::Event::HTTP::Client->new(
     loop       => $loop,
     cookie_jar => $jar,
 );
 ```
 
-Linux::Event::HTTP does not create a hidden jar. The application decides jar
-lifetime, sharing, persistence, preloading, and clearing.
+The Client does not create an implicit global cookie store.
 
-For each ordinary request exchange, Client asks the jar for:
+Before an ordinary exchange, the jar is consulted using the target URL.
 
-```perl
-$jar->cookie_header($target_url)
-```
+Set-Cookie fields from ordinary final responses, redirects, and authentication
+challenge responses are fed back to the jar before the next policy step.
 
-and synthesizes the Cookie field only when the returned string is non-empty.
-For every Set-Cookie field in an ordinary final, redirect, or authentication
-challenge Response, Client calls:
+Cookie identity is always the target URL, not the proxy route.
 
-```perl
-$jar->add($target_url, $set_cookie)
-```
+When a cookie jar is configured, it owns Cookie generation for that request.
 
-before redirect/authentication policy or application response callbacks run.
+## Authentication
 
-The URL supplied to the jar is always the target URL. A forward proxy is only a
-route and never becomes the cookie origin. Redirect hops ask the jar again for
-the new target URL, so domain, path, expiry, Secure handling, and cookie ordering
-remain `HTTP::CookieJar` responsibilities.
+Authentication mechanics are delegated to `Uniform::HTTP::Auth`.
 
-When a cookie jar is configured, caller-supplied Cookie fields are rejected so
-cookie selection has exactly one owner. Applications that need to seed or alter
-cookie state should do so through the jar.
+The Client owns HTTP lifecycle around those mechanics.
 
-`connect_tunnel()` does not consult the cookie jar. CONNECT is an explicit
-exchange with the named proxy endpoint and then a protocol handoff, not an
-ordinary target-resource request.
+`auth` handles target-server 401 challenges.
 
-## Implemented: Uniform::HTTP::Auth
+`proxy_auth` handles proxy 407 challenges.
 
-Authentication mechanics are delegated to `Uniform::HTTP::Auth 0.02` rather
-than implemented in Linux::Event::HTTP.
+Example:
 
 ```perl
-use Uniform::HTTP::Auth;
-
 my $auth = Uniform::HTTP::Auth->new(
     credentials => sub ($context) {
-        return $store->lookup(
-            $context->{origin},
-            $context->{realm},
-            $context->{scheme},
-        );
+        return lookup_credentials($context);
     },
 );
 
@@ -108,78 +100,85 @@ my $client = Linux::Event::HTTP::Client->new(
 );
 ```
 
-`auth` handles target 401 / `WWW-Authenticate`. `proxy_auth` handles route 407 /
-`Proxy-Authenticate`. They may be separate Uniform objects or the same dynamic
-credential manager. Client defaults can be overridden per ordinary request; an
-explicit `undef` disables the corresponding manager for that request.
+Default automatic authentication retry limit:
 
-Uniform owns:
+```text
+3
+```
 
-- challenge parsing and validation;
-- supported-scheme selection;
-- credential lookup;
-- Basic, Bearer, and Digest construction;
-- Digest nonce/cnonce state.
+Set `max_auth_retries => 0` to expose 401/407 as ordinary final responses.
 
-Linux::Event::HTTP owns:
+Authentication retry creates another Transaction.
 
-- receiving 401 and 407 Responses;
-- target-versus-route origin selection;
-- Request replayability;
-- draining the challenge Response to its HTTP boundary;
-- connection reuse;
-- creating the retry Transaction;
-- Operation/callback lifecycle.
+Streaming body producers are not replayed after a challenge.
 
-Every successful automatic auth retry is another Transaction in the same
-Client::Operation. Authentication retry count is tracked separately from
-redirect count. `max_auth_retries` defaults to 3 and is an operation-wide limit;
-zero exposes 401/407 as ordinary final Responses.
+Generated authentication fields are attempt-local. Redirected requests can be
+challenged again normally.
 
-Uniform receives the actual `Linux::Event::HTTP::Request` object for the
-exchange. The message contract exposes the exact request-target, so direct
-requests use origin-form for Digest calculations, proxied ordinary requests use
-absolute-form, and CONNECT uses authority-form. Target 401 uses the target
-origin. Proxy 407 uses the selected route origin.
+## Forward proxies
 
-Complete scalar Request bodies are replayable and are available to Uniform
-through the Request message, allowing Digest `qop=auth-int` to be calculated
-without an HTTP-specific adapter. Bodyless Requests explicitly supply an empty
-entity body. Streaming Request producers are never automatically replayed, even
-after the producer has finished: Linux::Event::HTTP does not know how application
-stream state should be rewound. A satisfiable challenge for such a Request
-terminates the Operation with a replayability error.
+A Client may have a default explicit proxy:
 
-Generated Authorization and Proxy-Authorization fields are attempt-local. They
-are not copied across redirects, because Digest includes request-target state and
-Uniform 0.02 deliberately does not implement a preemptive-authentication cache.
-A redirected target or proxy can challenge again normally. On the same target
-exchange, a proxy-authenticated retry that subsequently receives target 401
-keeps the generated Proxy-Authorization while adding target Authorization.
+```perl
+proxy => 'http://proxy.example:3128'
+```
 
-When `auth` is active, caller-supplied Authorization is rejected. When
-`proxy_auth` is active, caller-supplied Proxy-Authorization is rejected. This
-keeps each authentication field under one policy owner. Disable the relevant
-manager for a request when manual construction is desired.
+An individual request may override it.
 
-`connect_tunnel()` does not use target `auth`, but it does use the Client's
-`proxy_auth` by default and can override or disable it per call. A non-2xx 407 is
-drained normally and may retry CONNECT on the reusable proxy connection before a
-successful tunnel handoff.
+Two identities remain separate:
 
-## Deferred policy
+```text
+target URL -> application request identity, cookies, target auth
+proxy URL  -> route connection, proxy auth
+```
 
-Keep these separate until a real workload requires them:
+Ordinary HTTP forward-proxy requests use absolute-form targets.
+
+The idle HTTP/1 route pool is keyed by route origin, allowing sequential target
+origins to reuse one persistent proxy route where valid.
+
+## HTTPS proxy endpoint
+
+If the proxy URL itself is HTTPS, TLS is established to the proxy endpoint.
+
+That does not imply CONNECT to the target.
+
+An HTTPS target sent through ordinary forward-proxy mode remains an absolute
+target URI handled by that proxy.
+
+Use `connect_tunnel()` when an actual CONNECT tunnel is required.
+
+## CONNECT
+
+`connect_tunnel($proxy_url, $target_authority, ...)` is an explicit HTTP/1.1
+CONNECT operation.
+
+The proxy endpoint and tunnel target are separate inputs.
+
+Proxy authentication may retry a 407 before final tunnel success/failure.
+
+A successful 2xx response transitions the same live Linux::Event stream to the
+requested tunnel class.
+
+## HTTP/2 interaction
+
+Direct HTTPS Operations may negotiate HTTP/2 when `http2 => 1`.
+
+Redirect, cookie, and authentication policy remains unchanged at the high level.
+
+Current explicit forward-proxy routes and CONNECT tunnel establishment use the
+HTTP/1 path.
+
+## Deliberately deferred policy
+
+The Client does not currently provide implicit operating-system/browser-style
+proxy discovery such as:
 
 - HTTP_PROXY / HTTPS_PROXY / ALL_PROXY environment discovery;
 - NO_PROXY matching;
 - PAC;
 - SOCKS;
-- preemptive authentication caches;
-- Authentication-Info / Proxy-Authentication-Info handling;
-- richer connection-pool policy;
-- parser XS that is not justified by measurement.
+- preemptive authentication caches.
 
-The guiding rule remains: high-level policy may make correct use easy, but it
-must not change Request/Response identity, expand Transaction beyond one
-exchange, or duplicate Linux::Event transport machinery.
+These can be added when a concrete application requirement justifies their
+policy surface.

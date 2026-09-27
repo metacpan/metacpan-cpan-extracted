@@ -6,7 +6,7 @@ use Getopt::Pad::Type;
 class Getopt::Pad::Type::Path :isa(Getopt::Pad::Type) :abstract {
 	use constant SPEC_KEYS => ['mustExist', 'createPathIfMissing'];
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	field $mustExist           :param :reader = 0;
 	field $createPathIfMissing :param :reader = 0;
@@ -53,13 +53,59 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Type::Path - filesystem path type base class
+Getopt::Pad::Type::Path - Base class of the file and dir option types
 
 =head1 DESCRIPTION
 
-Abstract base for filesystem path types: owns the C<mustExist> and C<createPathIfMissing> keys (mutually exclusive), the existence check, the creation on demand through prepare, and the "has to exist" / "created if missing" annotations. Subclasses provide kind (the word used in error messages), pathExists, the filesystem test, and createPath, the creation (see File and Dir).
+The common base class of L<Getopt::Pad::Type::File> and
+L<Getopt::Pad::Type::Dir>. It is abstract: specs cannot use it directly.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+It provides the spec keys C<mustExist> and C<createPathIfMissing>, which
+exclude each other (C<mustExist and createPathIfMissing are mutually
+exclusive>):
+
+=over 4
+
+=item mustExist
+
+The value must be an existing path of the subclass's kind. Otherwise the
+value is rejected with C<KIND 'PATH' does not exist>, where KIND is
+C<file> or C<directory>. The help output shows C<[has to exist]>.
+
+=item createPathIfMissing
+
+A missing path is created for the value that is finally used (in
+C<prepare>, see L<Getopt::Pad::Type/prepare>). A failure is reported as
+C<cannot create KIND 'PATH': REASON>. The help output shows
+C<[created if missing]>.
+
+=back
+
+Both are described for users in L<Getopt::Pad/Type-specific keys>. Every
+path type takes a value (C<glSuffix> C<'=s'>).
+
+A subclass provides C<NAMES> and these methods:
+
+=over 4
+
+=item kind
+
+The word used for the path in messages: C<file> or C<directory>.
+
+=item pathExists($path)
+
+Whether C<$path> exists and is of the right kind.
+
+=item createPath($path)
+
+Creates C<$path>. Returns C<undef> on success, otherwise the reason it
+failed.
+
+=back
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Type>, L<Getopt::Pad::Type::File>, L<Getopt::Pad::Type::Dir>
 
 =head1 AUTHOR
 

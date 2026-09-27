@@ -1,0 +1,68 @@
+Revision history for WebDyne-Cloudflare
+
+1.7.1  2026-09-13
+    Add seeded Docker Compose databases and local dummy-secret setup for examples.
+    Verify documented npm startup commands and make example quick starts self-contained.
+    Organize service examples with WebDyne pages first and native PAGI supplements.
+    Consolidate configuration, release guidance and dated qualification evidence.
+    Preserve reusable authenticated database harnesses under t/integration.
+    Remove superseded prototypes, phase reports and transient result snapshots.
+
+1.7.0  2026-09-13
+    Add request-scoped Durable Object RPC and Perl-defined SQLite-backed objects.
+    Serialize finite invocations and support atomic SQL batches and explicit methods.
+    Qualify concurrency, isolation, rollback, capability expiry and restart persistence.
+
+1.6.0  2026-09-13
+    Add opt-in D1 sessions, constraints and cross-request bookmarks.
+    Preserve statement/batch ownership, request isolation and ordinary primary queries.
+    Qualify session contracts and atomic rollback against local D1.
+
+1.5.0  2026-09-13
+    Add request-scoped Secrets Store retrieval with sanitized errors and no value cache.
+    Qualify local dummy-secret retrieval through the generated Perl/WASM Worker.
+
+1.4.0  2026-09-13
+    Select PostgreSQL or MySQL from each Hyperdrive binding without changing Perl construction.
+    Add pinned mysql2, exact result types, SQL-mode-independent parameters and DML metadata.
+    Guard implicit commits, bound streaming results and await forced socket closure.
+    Qualify MySQL Hyperdrive with Perl/WASM and direct MySQL/MariaDB adapters.
+    Preserve PostgreSQL behavior; use the existing ZeroPerl 1.0.11 runtime.
+
+1.3.0  2026-09-12
+    Add asynchronous PostgreSQL CRUD, statements and transactions through Hyperdrive.
+    Preserve exact numeric, JSON, timestamp and bytea values; enforce request ownership.
+    Bound queries/results/cleanup, preserve SQLSTATE, and redact socket errors.
+    Select the PostgreSQL provider declaratively with ZeroPerl 1.0.11 or later.
+    Add generated-app and authenticated live WASM qualification.
+
+1.2.0  2026-09-05
+    Add Future-returning D1 batch() with ordered results and atomic provider execution.
+    Validate all statements/parameters before dispatch; require the same database owner.
+    Cover rollback, binary/Unicode values and warm recovery with dedicated WASM fixtures.
+    Clarify Perl precedence and adopt the WebDyne house style and API sidecars.
+    Separate examples/app, t fixtures and t.js tests/staging tools.
+    Fix D1 BLOB decoding collisions with real type/base64 columns.
+    Validate byte wrappers and malformed capabilities/responses explicitly.
+    Retry failed host registration; enforce KV read limits; cancel oversized R2 reads.
+    Surface smoke cleanup failures; avoid modifying sibling Worker checkouts.
+
+1.1.0  2026-09-03
+    - Add modular Future-returning Workers KV and buffered R2 Perl facades.
+    - Add independent request-scoped KV and R2 JavaScript capability bridges.
+    - Add generated Wrangler bindings, local/remote PSP smoke fixtures, and
+      explicit memory limits for JSON-bridged storage bodies.
+
+1.0.0  2026-09-03
+    - Package Perl facades and JavaScript adapters together as the npm-first
+      @webdyne/webdyne-cloudflare extension.
+    - Add declarative extension discovery and the standard runtime lifecycle.
+    - Add guarded GitHub Release/npm workflows, SHA-256 manifests, strict
+      package inspection, and build-provenance attestations.
+
+0.001  2026-09-01
+    - Initial WebDyne::Cloudflare::D1 prepared-statement facade.
+    - Request-scoped JavaScript D1 host capability adapter.
+    - Explicit BLOB envelopes and strict UTF-8 handling at the Perl/JavaScript
+      boundary.
+    - Perl, JavaScript, PSP, local D1, and non-production remote D1 fixtures.

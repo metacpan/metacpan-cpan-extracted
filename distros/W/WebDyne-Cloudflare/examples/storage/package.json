@@ -1,0 +1,52 @@
+{
+  "name": "webdyne-cloudflare-example",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "webdyne-cloudflare build",
+    "check": "webdyne-cloudflare check",
+    "dev": "webdyne-cloudflare dev"
+  },
+  "webdyne": {
+    "entry": "d1.psp",
+    "extensions": {
+      "@webdyne/webdyne-cloudflare": {
+        "d1Bindings": [
+          "DB"
+        ],
+        "kvBindings": [
+          "CACHE"
+        ],
+        "r2Bindings": [
+          "OBJECTS"
+        ]
+      }
+    },
+    "cloudflare": {
+      "name": "webdyne-cloudflare-example",
+      "d1Databases": [
+        {
+          "binding": "DB",
+          "databaseName": "webdyne-cloudflare-example",
+          "databaseId": "00000000-0000-0000-0000-000000000001"
+        }
+      ],
+      "kvNamespaces": [
+        {
+          "binding": "CACHE"
+        }
+      ],
+      "r2Buckets": [
+        {
+          "binding": "OBJECTS"
+        }
+      ]
+    },
+    "static": false
+  },
+  "dependencies": {
+    "@webdyne/webdyne-zeroperl": "^1.0.14",
+    "@webdyne/webdyne-cloudflare": "^1.7.1"
+  }
+}

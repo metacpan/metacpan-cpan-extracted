@@ -11,4 +11,9 @@ on configure => sub {
 
 on build => sub {
    requires 'Test::More' => 0;
+   requires 'FindBin' => 0;
+};
+
+on develop => sub {
+   requires 'Test::CheckManifest' => '0.9';
 };

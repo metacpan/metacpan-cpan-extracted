@@ -1,8 +1,10 @@
 #!/usr/bin/env perl
 
 # One option per built-in type, showing what each reader returns:
-#   flag (the default), ! (negatable bool), + (counter), s (string),
-#   i (int with min/max), f (float), file/dir (with mustExist), url.
+#   flag (the default), bool (negatable), counter, string,
+#   int (with min/max), float, file and dir (with mustExist), url.
+# Most types also have other names, e.g. 's' for string, 'i' for int,
+# '!' for bool and '+' for counter; see "TYPES" in the Getopt::Pad docs.
 #
 # Try:
 #   perl examples/02-types.pl --dry-run --no-color -vvv --name demo --width 640 \
@@ -23,11 +25,11 @@ use ResultDump;
 my $opt = GetOptions(
 	options => {
 		'dry-run'  => { help => 'flag: plain switch, not negatable' },
-		'color'    => { type => '!', default => 1, help => 'bool: --color / --no-color' },
-		'verbose|v' => { type => '+', help => 'counter: -v -v -v or -vvv' },
-		'name'     => { type => 's', help => 'string' },
-		'width'    => { type => 'i', min => 1, max => 4096, help => 'int with min/max' },
-		'ratio'    => { type => 'f', help => 'float' },
+		'color'    => { type => 'bool', default => 1, help => 'bool: --color / --no-color' },
+		'verbose|v' => { type => 'counter', help => 'counter: -v -v -v or -vvv' },
+		'name'     => { type => 'string', help => 'string' },
+		'width'    => { type => 'int', min => 1, max => 4096, help => 'int with min/max' },
+		'ratio'    => { type => 'float', help => 'float' },
 		'identity' => { type => 'file', mustExist => 1, help => 'file that has to exist' },
 		'work-dir' => { type => 'dir', mustExist => 1, help => 'directory that has to exist' },
 		'source'   => { type => 'url', help => 'URL of the form scheme://... (ssh://, https://, ...)' },

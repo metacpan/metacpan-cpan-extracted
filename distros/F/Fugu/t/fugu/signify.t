@@ -1275,7 +1275,7 @@ subtest 'write_manifest writes the line form' => sub {
 	# parse_manifest reads a key with a parenthesis back without a
 	# change, because it takes the text up to the last one. The
 	# writer rejects such a key for a stricter reader: sha256(1)
-	# and scripts/deps both read a manifest.
+	# and `fugubench deps` both read a manifest.
 	is( $sig->write_manifest( { 'a(1).img' => 'a' x 64 } ),
 		undef, 'a key with a parenthesis fails' );
 	like( $sig->error, qr/parenthesis/, 'and the reason says so' );

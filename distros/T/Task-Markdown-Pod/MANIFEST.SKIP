@@ -1,0 +1,13 @@
+^\.git/
+^\.gitignore$
+^\.github/
+^Makefile(?:\.old)?$
+^(?:MY)?META\.(?:json|yml)$
+^blib/
+^pm_to_blib$
+^Task-Markdown-Pod-[0-9][^/]*(?:/|\.tar\.gz$)
+(?:^|/)\.DS_Store$
+~$
+\.bak$
+\.old$
+\.tmp$

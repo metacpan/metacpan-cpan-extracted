@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use lib 'lib';
-use Test::More tests => 27;
+use Test::More tests => 34;
 use Devel::ebug;
 
 my $ebug = Devel::ebug->new;
@@ -89,3 +89,36 @@ is($ebug->line, 9);
 is($ebug->pad->{'$e'}, 5);
 $ebug->step;
 
+
+# a subroutine break point with a condition only stops when it is true;
+# @_ holds the subroutine's arguments as it is entered
+$ebug = Devel::ebug->new;
+$ebug->program("corpus/calc_oo.pl");
+$ebug->load;
+is( $ebug->break_point_subroutine("Calc::fib1", '$_[1] == 3'), 15 );
+is_deeply([$ebug->break_points_with_condition("corpus/lib/Calc.pm")],
+          [{filename => "corpus/lib/Calc.pm", line => 15, condition => '$_[1] == 3'}]);
+my @n;
+for (1 .. 5) {
+  $ebug->run;
+  my($frame) = $ebug->stack_trace;
+  push @n, ($frame->args)[1];
+}
+is_deeply(\@n, [3, 3, 3, 3, 3], 'stops only when the condition is true');
+is($ebug->line, 15, 'at the start of the subroutine');
+
+# a condition that is never true never stops
+$ebug = Devel::ebug->new;
+$ebug->program("corpus/calc.pl");
+$ebug->load;
+is( $ebug->break_point_subroutine("main::add", '$_[0] > 100'), 12 );
+$ebug->run;
+ok($ebug->finished, 'a subroutine break point whose condition is false is passed');
+
+# and without a condition it still always stops
+$ebug = Devel::ebug->new;
+$ebug->program("corpus/calc.pl");
+$ebug->load;
+$ebug->break_point_subroutine("main::add");
+$ebug->run;
+is($ebug->line, 12, 'without a condition it always stops');

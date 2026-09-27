@@ -14,7 +14,7 @@ sub import {
 # Disable the use of HTML::Entities.
 $Pod::Simple::XHTML::HAS_HTML_ENTITIES = 0;
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 sub parser {
     my ($file, $encoding, $opts) = @_;
@@ -22,6 +22,7 @@ sub parser {
     # Output everything as UTF-8.
     $p->html_header_tags('<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />');
     $p->strip_verbatim_indent(sub { (sort map { /^(\s+)/ } @{$_[0]})[0] });
+    $p->html_encode_chars('&<>">');
     $p->output_string(\my $html);
     # Want user supplied options to override even these default behaviors,
     # if necessary

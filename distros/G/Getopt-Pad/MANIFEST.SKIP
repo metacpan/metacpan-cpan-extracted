@@ -102,3 +102,8 @@
 ^lsp\.log$
 ^opencode\.json$
 ^PARITY\.md$
+
+# Maintainer-only documentation tooling and its output
+^maint/
+^docs/
+^CODE-FINDINGS\.md$

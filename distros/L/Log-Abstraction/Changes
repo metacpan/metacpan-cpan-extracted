@@ -1,7 +1,10 @@
 Revision history for Log-Abstraction
 
-0.33	Fri Jul 10 11:03:49 EDT 2026
+0.34	Sat Sep 26 08:47:01 PM EDT 2026
+	[ Bug Fixes ]
+	- Bump minimum versions
 
+0.33	Fri Jul 10 11:03:49 EDT 2026
 	[ Architecture ]
 	- Added Sub::Private (enforce mode) to mark _log, _high_priority,
 	  _validate_file_path, _format_message, _journald_send, and

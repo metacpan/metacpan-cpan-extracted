@@ -86,6 +86,8 @@ t/fugu/keydir.t
 t/fugu/log.t
 t/fugu/mdnsd.t
 t/fugu/mqtt.t
+t/fugu/openpgp-ed25519.asc
+t/fugu/openpgp-rsa.asc
 t/fugu/openpgp.t
 t/fugu/pidfile.t
 t/fugu/privdrop.t
@@ -96,6 +98,10 @@ t/fugu/repl.t
 t/fugu/sandbox.t
 t/fugu/signal.t
 t/fugu/signer.t
+t/fugu/signify-a.msg
+t/fugu/signify-a.msg.sig
+t/fugu/signify-a.pub
+t/fugu/signify-b.pub
 t/fugu/signify.t
 t/fugu/ssh.t
 t/fugu/statefile.t

@@ -40,7 +40,7 @@ use Exception::Class (
 	},
 );
 
-our $VERSION = '2.24';
+our $VERSION = '2.25';
 
 sub set_time {
 	my ( $self, %conf ) = @_;
@@ -62,15 +62,16 @@ sub set_time {
 		);
 	}
 
-	if ( $time !~ / ^ [0-2]? \d : [0-5]? \d $ /x ) {
+	if ( $time =~ m{ ^ ([0-2]? \d) :? ([0-5] \d) $ }x ) {
+		@{ $self->{post} }{ 'itdTimeHour', 'itdTimeMinute' } = ( $1, $2 );
+	}
+	else {
 		Travel::Routing::DE::EFA::Exception::Setup->throw(
 			option => 'time',
 			have   => $time,
 			want   => 'HH:MM',
 		);
 	}
-
-	@{ $self->{post} }{ 'itdTimeHour', 'itdTimeMinute' } = split( /:/, $time );
 
 	return;
 }
@@ -292,16 +293,22 @@ sub with_wheelchair {
 sub place {
 	my ( $self, $which, $place, $stop, $type ) = @_;
 
-	if ( not( $place and $stop ) ) {
+	if ( not $stop ) {
 		Travel::Routing::DE::EFA::Exception::Setup->throw(
 			option => 'place',
-			error  => 'Need >= three elements'
+			error  => 'stop must be defined'
 		);
 	}
 
 	$type //= 'stop';
 
-	@{ $self->{post} }{ "place_${which}", "name_${which}" } = ( $place, $stop );
+	if ($place) {
+		@{ $self->{post} }{ "place_${which}", "name_${which}" }
+		  = ( $place, $stop );
+	}
+	else {
+		$self->{post}{"name_${which}"} = $stop;
+	}
 
 	if ( $type =~ m{ ^ (?: address | poi | stop ) $ }x ) {
 		$self->{post}->{"type_${which}"} = $type;
@@ -507,6 +514,13 @@ sub submit {
 
 	$self->{ua} = LWP::UserAgent->new(%conf);
 	$self->{ua}->env_proxy;
+
+	if ( $self->{config}{developer_mode} ) {
+		say 'POST ' . $self->{config}{efa_url};
+		while ( my ( $key, $value ) = each %{ $self->{post} } ) {
+			printf( "%30s = %s\n", $key, $value );
+		}
+	}
 
 	my $response
 	  = $self->{ua}->post( $self->{config}->{efa_url}, $self->{post} );
@@ -873,6 +887,7 @@ sub routes {
 sub get_efa_urls {
 
 	# sorted lexically by shortname
+	# BEG (from Travel::Status::DE::VRR) does not work here
 	return (
 		{
 			url       => 'https://bsvg.efa.de/bsvagstd/XML_TRIP_REQUEST2',
@@ -903,6 +918,11 @@ sub get_efa_urls {
 			url       => 'https://www.efa-bw.de/nvbw/XSLT_TRIP_REQUEST2',
 			name      => 'Nahverkehrsgesellschaft Baden-Württemberg',
 			shortname => 'NVBW',
+		},
+		{
+			url  => 'https://westfalenfahrplan.de/nwl-efa/XML_TRIP_REQUEST2',
+			name => 'Nahverkehr Westfalen-Lippe',
+			shortname => 'NWL',
 		},
 		{
 			url       => 'https://efa.vagfr.de/vagfr3/XSLT_TRIP_REQUEST2',
@@ -981,7 +1001,7 @@ Travel::Routing::DE::EFA - unofficial interface to EFA-based itinerary services
 
 =head1 VERSION
 
-version 2.24
+version 2.25
 
 =head1 DESCRIPTION
 
@@ -1018,6 +1038,7 @@ E<lt>derf@finalrewind.orgE<gt>.
 Mandatory.  Sets the start of the journey.
 I<type> is optional and may be one of B<stop> (default), B<address> (street
 and house number) or B<poi> ("point of interest").
+I<city> may be undef.
 
 =item B<destination> => B<[> I<city>B<,> I<stop> [ B<,> I<type> ] B<]>
 

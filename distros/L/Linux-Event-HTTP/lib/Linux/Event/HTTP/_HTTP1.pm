@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__);
@@ -23,6 +23,14 @@ sub _raw_consumer_definition ($class) {
         provider           => \&_raw_consumer_operations_address,
         abi_version        => 1,
         operations_address => _raw_consumer_operations_address(),
+    };
+}
+
+sub _raw_client_consumer_definition ($class) {
+    return {
+        provider           => \&_raw_client_consumer_operations_address,
+        abi_version        => 1,
+        operations_address => _raw_client_consumer_operations_address(),
     };
 }
 

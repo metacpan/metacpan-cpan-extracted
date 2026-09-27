@@ -1270,4 +1270,569 @@ SKIP: {
 		'Q15: hostile table name causes croak before any object is returned';
 }
 
+# ---------------------------------------------------------------------------
+# SECTION R — each_row() end-to-end workflow
+#
+# each_row() streams rows through a callback one at a time.  The integration
+# tests here verify the full lifecycle across both the slurp (CSV) and SQL
+# (SQLite) paths, including sort_by, limit, offset, exception propagation,
+# the Query builder's each() terminal, and interaction with base_criteria.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== R. each_row() end-to-end workflow ===';
+
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# R1 — slurp path: each_row with no criteria visits all rows
+	{
+		my @got;
+		my $n = $db->each_row(sub { push @got, shift });
+		ok($n >= 4,                  'R1a: each_row no criteria returns count >= 4');
+		is($n, scalar @got,          'R1b: return value equals callback invocation count');
+		ok(ref($got[0]) eq 'HASH',   'R1c: callback receives hashrefs');
+	}
+
+	# R2 — slurp path: criteria reduce the set
+	{
+		my @got;
+		$db->each_row(sub { push @got, shift }, entry => 'one');
+		is(scalar @got, 1,              'R2a: each_row(entry=>one) visits 1 row');
+		is($got[0]{'number'}, 1,        'R2b: correct row passed to callback');
+	}
+
+	# R3 — slurp path: limit restricts rows visited
+	{
+		my @got;
+		my $n = $db->each_row(sub { push @got, shift }, limit => 2);
+		is($n, 2,         'R3: slurp each_row(limit=>2) visits exactly 2 rows');
+	}
+
+	# R4 — slurp path: exceptions from the callback propagate to the caller
+	{
+		eval { $db->each_row(sub { die "slurp callback die\n" }) };
+		like($@, qr/slurp callback die/, 'R4: slurp path callback exception propagates');
+	}
+
+	# R5 — slurp path: object remains usable after callback exception
+	{
+		my $n = $db->each_row(sub {});
+		ok($n >= 4, 'R5: object usable after callback exception (slurp path)');
+	}
+
+	# R6 — each_row on CSV produces the same rows as selectall_arrayref
+	{
+		my @from_each;
+		$db->each_row(sub { push @from_each, shift });
+		my $from_all = $db->selectall_arrayref();
+		is(scalar @from_each, scalar @{$from_all},
+			'R6: each_row visits same number of rows as selectall_arrayref');
+	}
+}
+
+SKIP: {
+	skip 'DBD::SQLite not available for each_row SQL-path tests', 18
+		unless $have_sqlite;
+
+	my $r_dir  = tempdir(CLEANUP => 1);
+	my $r_file = File::Spec->catfile($r_dir, 'integ_r.sql');
+	my $r_dsn  = "dbi:SQLite:dbname=$r_file";
+
+	{
+		my $s = DBI->connect($r_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE integ_r (entry TEXT PRIMARY KEY, name TEXT, score INTEGER, status TEXT)');
+		$s->do("INSERT INTO integ_r VALUES ('a','Alpha',90,'active')");
+		$s->do("INSERT INTO integ_r VALUES ('b','Beta', 60,'inactive')");
+		$s->do("INSERT INTO integ_r VALUES ('c','Gamma',80,'active')");
+		$s->do("INSERT INTO integ_r VALUES ('d','Delta',70,'inactive')");
+		$s->do("INSERT INTO integ_r VALUES ('e','Eta',  95,'active')");
+		$s->disconnect();
+	}
+
+	{
+		package Database::integ_r;
+		use parent 'Database::Abstraction';
+	}
+
+	my $r_db = Database::integ_r->new(dsn => $r_dsn);
+
+	# R7 — SQL path: all rows visited, count returned
+	{
+		my $n = $r_db->each_row(sub {});
+		is($n, 5, 'R7: SQL path each_row visits all 5 rows');
+	}
+
+	# R8 — SQL path: criteria filtering
+	{
+		my @got;
+		my $n = $r_db->each_row(sub { push @got, shift }, status => 'active');
+		is($n, 3,                    'R8a: SQL each_row(status=>active) visits 3 rows');
+		is(scalar @got, 3,           'R8b: callback invoked 3 times');
+		my $wrong = grep { $_->{'status'} ne 'active' } @got;
+		ok(!$wrong, 'R8c: all received rows have status=active');
+	}
+
+	# R9 — SQL path: limit parameter
+	{
+		my @got;
+		my $n = $r_db->each_row(sub { push @got, shift }, limit => 2);
+		is($n, 2,           'R9: SQL path limit => 2 visits exactly 2 rows');
+	}
+
+	# R10 — SQL path: sort_by changes row order
+	{
+		my @got;
+		$r_db->each_row(sub { push @got, shift }, sort_by => ['score', 'DESC']);
+		ok($got[0]{'score'} >= $got[-1]{'score'},
+			'R10: SQL path sort_by score DESC puts highest score first');
+	}
+
+	# R11 — SQL path: exception in callback propagates; object stays usable
+	{
+		eval { $r_db->each_row(sub { die "sql die\n" }) };
+		like($@, qr/sql die/, 'R11a: SQL path callback exception propagates');
+		my $n = $r_db->each_row(sub {});
+		is($n, 5, 'R11b: object usable after SQL callback exception');
+	}
+
+	# R12 — SQL path count == selectall_arrayref count (same data)
+	{
+		my $n = $r_db->each_row(sub {});
+		my $all = $r_db->selectall_arrayref();
+		is($n, scalar @{$all},
+			'R12: each_row count matches selectall_arrayref row count');
+	}
+
+	# R13 — each() terminal on the query builder delegates to each_row internally
+	{
+		my @got;
+		my $n = $r_db->query()
+			->where(status => 'active')
+			->each(sub { push @got, shift });
+		is($n, 3,     'R13a: query->where->each() visits 3 active rows');
+		is(scalar @got, 3, 'R13b: callback invoked 3 times via query builder');
+	}
+
+	# R14 — query->each() with limit and order_by
+	{
+		my @got;
+		$r_db->query()
+			->order_by('score DESC')
+			->limit(2)
+			->each(sub { push @got, shift });
+		is(scalar @got, 2, 'R14a: query->limit->each() visits exactly 2 rows');
+		ok($got[0]{'score'} >= $got[1]{'score'},
+			'R14b: order_by DESC respected in query->each()');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION S — updated() cache-invalidation workflow
+#
+# The POD documents three return-value tiers for updated():
+#   1. File-based backends (CSV, directory SQLite): mtime set at _open() time.
+#   2. SQLite DSN (dbi:SQLite:dbname=...): stat()ed live on every call.
+#   3. Other DSN / URL: connection time.
+#
+# This section exercises the full cache-invalidation usage pattern:
+#   $stamp = $db->updated();
+#   ... some time passes ...
+#   if ($db->updated() != $stamp) { discard stale cache }
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== S. updated() cache-invalidation workflow ===';
+
+{
+	# S1 — CSV slurp path: updated() returns a positive numeric timestamp after load
+	{
+		my $db = Database::test1->new($DATA_DIR);
+		$db->count();    # trigger _open
+		my $ts = $db->updated();
+		ok(defined($ts) && $ts > 0,
+			'S1: CSV slurp updated() returns positive timestamp after load');
+	}
+
+	# S2 — File mtime preserved across multiple calls (no cache drift for CSV)
+	{
+		my $db = Database::test1->new($DATA_DIR);
+		$db->count();
+		my $t1 = $db->updated();
+		my $t2 = $db->updated();
+		is($t1, $t2, 'S2: CSV updated() is stable across repeated calls (mtime does not drift)');
+	}
+
+	# S3 — Two independent CSV objects report the same mtime (same backing file)
+	{
+		my $db_a = Database::test1->new($DATA_DIR);
+		my $db_b = Database::test1->new($DATA_DIR);
+		$db_a->count();
+		$db_b->count();
+		is($db_a->updated(), $db_b->updated(),
+			'S3: two CSV objects backed by same file report same updated() timestamp');
+	}
+}
+
+SKIP: {
+	skip 'DBD::SQLite not available for updated() live-stat integration', 12
+		unless $have_sqlite;
+
+	my $s_dir  = tempdir(CLEANUP => 1);
+	my $s_file = File::Spec->catfile($s_dir, 'integ_s.sql');
+	my $s_dsn  = "dbi:SQLite:dbname=$s_file";
+
+	{
+		my $setup = DBI->connect($s_dsn, undef, undef, { RaiseError => 1 });
+		$setup->do('CREATE TABLE integ_s (id INTEGER PRIMARY KEY, v TEXT)');
+		$setup->do("INSERT INTO integ_s VALUES (1, 'hello')");
+		$setup->disconnect();
+	}
+
+	{
+		package Database::integ_s;
+		use parent 'Database::Abstraction';
+	}
+
+	# S4 — SQLite DSN: updated() returns a numeric timestamp after _open
+	{
+		my $db = Database::integ_s->new(dsn => $s_dsn, no_entry => 1);
+		$db->count();
+		my $ts = $db->updated();
+		ok(defined($ts) && $ts > 0,
+			'S4: SQLite DSN updated() returns positive timestamp after _open');
+	}
+
+	# S5 — SQLite DSN: updated() agrees with stat() on the backing file
+	{
+		my $db = Database::integ_s->new(dsn => $s_dsn, no_entry => 1);
+		$db->count();
+		my $stat_mtime = (stat($s_file))[9];
+		is($db->updated(), $stat_mtime,
+			'S5: SQLite DSN updated() equals stat() mtime of backing file');
+	}
+
+	# S6 — SQLite DSN: updated() reflects a new mtime after the file is touched
+	{
+		my $db = Database::integ_s->new(dsn => $s_dsn, no_entry => 1);
+		$db->count();
+		my $t1 = $db->updated();
+		sleep(1);                    # filesystem mtime resolution is 1 second
+		utime(undef, undef, $s_file);
+		my $t2 = $db->updated();
+		ok($t2 > $t1, 'S6: SQLite DSN updated() increases after file is touched');
+	}
+
+	# S7 — SQLite DSN: cache-invalidation usage pattern works correctly
+	{
+		my $db = Database::integ_s->new(dsn => $s_dsn, no_entry => 1);
+		$db->count();
+		my $cached_stamp = $db->updated();
+		my $cache_valid  = ($db->updated() == $cached_stamp);
+		ok($cache_valid, 'S7: cache-invalidation pattern: stamp stays equal before file change');
+		sleep(1);
+		utime(undef, undef, $s_file);
+		my $cache_stale = ($db->updated() != $cached_stamp);
+		ok($cache_stale, 'S7: cache-invalidation pattern: stamp diverges after file change');
+	}
+
+	# S8 — Two SQLite DSN objects on the same file report the same live mtime
+	{
+		my $db_a = Database::integ_s->new(dsn => $s_dsn, no_entry => 1);
+		my $db_b = Database::integ_s->new(dsn => $s_dsn, no_entry => 1);
+		$db_a->count();
+		$db_b->count();
+		is($db_a->updated(), $db_b->updated(),
+			'S8: two DSN objects on same file report the same updated() mtime');
+	}
+
+	# S9 — SQLite DSN: dialect must be set to 'sqlite' for live-stat to fire
+	{
+		my $db = Database::integ_s->new(dsn => $s_dsn, no_entry => 1);
+		$db->count();
+		is($db->{'_dialect'}, 'sqlite',
+			'S9: _dialect is "sqlite" for dbi:SQLite DSN connection');
+	}
+
+	# S10 — Non-SQLite DSN (simulated): updated() falls back to _updated timestamp
+	{
+		my $db = Database::integ_s->new(dsn => $s_dsn, no_entry => 1);
+		$db->count();
+		my $real_ts = $db->updated();        # live stat
+		$db->{'_dialect'} = 'generic';      # force generic path
+		my $fallback_ts = $db->updated();   # should return _updated, not live stat
+		ok(defined($fallback_ts) && $fallback_ts > 0,
+			'S10: generic dialect falls back to cached _updated timestamp');
+		# The generic path may return the same value OR _updated; both are valid.
+		# What we care about is that it doesn't croak and returns a number.
+	}
+
+	# S11 — Both DSN forms are handled: dbi:SQLite:/path and dbi:SQLite:dbname=/path
+	{
+		# The regex supports both forms; create a second object with dbname= form
+		my $dbname_dsn = "dbi:SQLite:dbname=$s_file";
+		my $db2 = Database::integ_s->new(dsn => $dbname_dsn, no_entry => 1);
+		$db2->count();
+		my $ts = $db2->updated();
+		is($ts, (stat($s_file))[9],
+			'S11: dbi:SQLite:dbname= form updated() returns correct mtime');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION T — base_criteria end-to-end workflow
+#
+# base_criteria is ANDed into every SELECT automatically.  This section
+# verifies the full cross-method integration: selectall_arrayref, count,
+# fetchrow_hashref, AUTOLOAD, and the query builder all respect it, and that
+# two objects with different base_criteria on the same source are independent.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== T. base_criteria end-to-end workflow ===';
+
+SKIP: {
+	skip 'DBD::SQLite not available for base_criteria integration', 20
+		unless $have_sqlite;
+
+	my $t_dir  = tempdir(CLEANUP => 1);
+	my $t_file = File::Spec->catfile($t_dir, 'integ_t.sql');
+	my $t_dsn  = "dbi:SQLite:dbname=$t_file";
+
+	{
+		my $s = DBI->connect($t_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE integ_t (entry TEXT PRIMARY KEY, name TEXT, dept TEXT, score INTEGER)');
+		$s->do("INSERT INTO integ_t VALUES ('a', 'Alice',   'eng',     90)");
+		$s->do("INSERT INTO integ_t VALUES ('b', 'Bob',     'eng',     70)");
+		$s->do("INSERT INTO integ_t VALUES ('c', 'Carol',   'sales',   80)");
+		$s->do("INSERT INTO integ_t VALUES ('d', 'Dave',    'sales',   60)");
+		$s->do("INSERT INTO integ_t VALUES ('e', 'Eve',     'eng',     95)");
+		$s->disconnect();
+	}
+
+	{
+		package Database::integ_t;
+		use parent 'Database::Abstraction';
+	}
+
+	# Two objects with different base_criteria on the same DSN
+	my $eng   = Database::integ_t->new(dsn => $t_dsn,
+		base_criteria => { dept => 'eng' });
+	my $sales = Database::integ_t->new(dsn => $t_dsn,
+		base_criteria => { dept => 'sales' });
+	my $all   = Database::integ_t->new(dsn => $t_dsn);
+
+	# T1 — count() is scoped to base_criteria
+	is($eng->count(),   3, 'T1a: eng base_criteria: count() == 3');
+	is($sales->count(), 2, 'T1b: sales base_criteria: count() == 2');
+	is($all->count(),   5, 'T1c: no base_criteria: count() == 5');
+
+	# T2 — selectall_arrayref() honours base_criteria
+	{
+		my $rows = $eng->selectall_arrayref();
+		is(scalar @{$rows}, 3, 'T2a: eng selectall_arrayref returns 3 rows');
+		my $non_eng_rows = grep { $_->{'dept'} ne 'eng' } @{$rows};
+		ok(!$non_eng_rows, 'T2b: eng selectall_arrayref contains only eng rows');
+	}
+
+	# T3 — Additional caller criteria further narrow (AND with base)
+	#       Use the query builder to pass operator-hash criteria safely
+	#       (direct selectall_arrayref + operator hash hits the Params::Get pitfall).
+	{
+		my $high = $eng->query()->where(score => { '>' => 80 })->all();
+		is(scalar @{$high}, 2, 'T3: base_criteria AND caller criteria: eng AND score>80 == 2');
+		my $non_eng_high = grep { $_->{'dept'} ne 'eng' } @{$high};
+		ok(!$non_eng_high, 'T3: all rows in narrowed set still belong to eng');
+	}
+
+	# T4 — fetchrow_hashref() respects base_criteria (non-matching entry returns undef)
+	{
+		# 'c' is Carol in 'sales', not 'eng'; $eng->fetchrow_hashref for Carol should
+		# return undef because base_criteria filters her out.
+		my $row = $eng->fetchrow_hashref(entry => 'c');
+		ok(!defined($row),
+			'T4: fetchrow_hashref returns undef for row excluded by base_criteria');
+	}
+
+	# T5 — fetchrow_hashref() returns row when entry matches base_criteria
+	{
+		my $row = $eng->fetchrow_hashref(entry => 'a');
+		ok(defined($row) && $row->{'name'} eq 'Alice',
+			'T5: fetchrow_hashref returns correct row matching base_criteria');
+	}
+
+	# T6 — query builder respects base_criteria
+	{
+		my $qb_n = $eng->query()->count();
+		is($qb_n, 3, 'T6: query()->count() respects base_criteria eng == 3');
+	}
+
+	# T7 — query builder where() further narrows
+	{
+		my $qb_rows = $sales->query()->where(score => { '>' => 70 })->all();
+		is(scalar @{$qb_rows}, 1, 'T7: query->where() further narrows sales base_criteria: 1 row');
+		is($qb_rows->[0]{'name'}, 'Carol', 'T7: the matching row is Carol');
+	}
+
+	# T8 — Two base_criteria objects are independent: querying one does not
+	#       affect the results of the other
+	{
+		my $n_eng   = $eng->count();
+		my $n_sales = $sales->count();
+		is($n_eng,   3, 'T8a: eng count stable at 3 after sales operations');
+		is($n_sales, 2, 'T8b: sales count stable at 2 after eng operations');
+	}
+
+	# T9 — each_row() honours base_criteria
+	{
+		my @got;
+		$eng->each_row(sub { push @got, shift });
+		is(scalar @got, 3, 'T9a: each_row with eng base_criteria visits 3 rows');
+		my $non_eng_each = grep { $_->{'dept'} ne 'eng' } @got;
+		ok(!$non_eng_each, 'T9b: each_row rows all belong to eng');
+	}
+
+	# T10 — Mutation of the original hashref after new() has no effect
+	{
+		my %bc = (dept => 'eng');
+		my $db_m = Database::integ_t->new(dsn => $t_dsn, base_criteria => \%bc);
+		$bc{'dept'} = 'sales';    # mutate after construction
+		is($db_m->count(), 3, 'T10: mutation of base_criteria after new() has no effect (shallow copy)');
+	}
+}
+
+# ---------------------------------------------------------------------------
+# SECTION U — dbi_source() integration workflow
+#
+# dbi_source() exposes the underlying DBI handle and table name for SQLite
+# backends.  This section verifies the full integration contract:
+#   - Returns { dbh, table } for live SQLite connections.
+#   - Returns undef for slurp, BerkeleyDB, and Deep backends.
+#   - The returned dbh is the same handle used for queries (same prepare-cache).
+#   - The table name matches the class-derived name (or 'table' override).
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== U. dbi_source() integration workflow ===';
+
+{
+	# U1 — CSV slurp backend → undef
+	{
+		my $csv = Database::test1->new($DATA_DIR);
+		$csv->count();    # trigger _open
+		ok(!defined($csv->dbi_source()),
+			'U1: CSV slurp backend: dbi_source() returns undef');
+	}
+
+	# U2 — BerkeleyDB injected backend → undef
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { k => 'v' };
+		ok(!defined($bdb->dbi_source()),
+			'U2: BerkeleyDB backend: dbi_source() returns undef');
+	}
+
+	# U3 — DBM::Deep injected backend → undef (no DBI handle)
+	{
+		my $deep = Database::test1->new($DATA_DIR);
+		$deep->{'type'} = 'Deep';
+		$deep->{'data'} = {};
+		ok(!defined($deep->dbi_source()),
+			'U3: Deep backend: dbi_source() returns undef');
+	}
+}
+
+SKIP: {
+	skip 'DBD::SQLite not available for dbi_source() integration tests', 12
+		unless $have_sqlite;
+
+	my $u_dir  = tempdir(CLEANUP => 1);
+	my $u_file = File::Spec->catfile($u_dir, 'integ_u.sql');
+	my $u_dsn  = "dbi:SQLite:dbname=$u_file";
+
+	{
+		my $s = DBI->connect($u_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE integ_u (entry TEXT PRIMARY KEY, val TEXT)');
+		$s->do("INSERT INTO integ_u VALUES ('a', 'alpha')");
+		$s->do("INSERT INTO integ_u VALUES ('b', 'beta')");
+		$s->disconnect();
+	}
+
+	{
+		package Database::integ_u;
+		use parent 'Database::Abstraction';
+	}
+
+	my $db = Database::integ_u->new(dsn => $u_dsn);
+	$db->count();    # trigger _open to establish the DBI connection
+
+	# U4 — SQLite DSN → returns well-formed hashref
+	my $src = $db->dbi_source();
+	ok(defined($src),      'U4a: SQLite dbi_source() returns defined value');
+	is(ref($src), 'HASH',  'U4b: dbi_source() returns hashref');
+
+	# U5 — dbh key holds a valid DBI handle (blessed, correct driver)
+	ok(exists $src->{'dbh'},
+		'U5a: dbi_source() hashref has dbh key');
+	ok(Scalar::Util::blessed($src->{'dbh'}),
+		'U5b: dbh value is a blessed DBI object');
+	is($src->{'dbh'}{Driver}{Name}, 'SQLite',
+		'U5c: dbh Driver is SQLite');
+
+	# U6 — table name is the class-derived table name
+	is($src->{'table'}, 'integ_u',
+		'U6: dbi_source() table matches class-derived name');
+
+	# U7 — The dbh is the live connection used by normal queries
+	#       Verify by executing a raw query through the returned dbh and
+	#       comparing against the module's own count().
+	{
+		my $dbh = $src->{'dbh'};
+		my $raw = $dbh->selectall_arrayref('SELECT COUNT(*) AS n FROM integ_u');
+		is($raw->[0][0], $db->count(),
+			'U7: dbh from dbi_source() is the same live connection used by count()');
+	}
+
+	# U8 — dbi_source() is stable: repeated calls return the same dbh reference
+	{
+		my $src2 = $db->dbi_source();
+		is($src->{'dbh'}, $src2->{'dbh'},
+			'U8: repeated dbi_source() calls return the same dbh ref');
+	}
+
+	# U9 — 'table' constructor override is reflected in dbi_source()
+	{
+		my $db2 = Database::integ_u->new(dsn => $u_dsn, table => 'integ_u');
+		$db2->count();
+		my $src2 = $db2->dbi_source();
+		is($src2->{'table'}, 'integ_u',
+			'U9: table override reflected in dbi_source() table field');
+	}
+
+	# U10 — Multi-instance: two SQLite objects have independent dbh handles
+	{
+		my $db_x = Database::integ_u->new(dsn => $u_dsn);
+		my $db_y = Database::integ_u->new(dsn => $u_dsn);
+		$db_x->count();
+		$db_y->count();
+		my $src_x = $db_x->dbi_source();
+		my $src_y = $db_y->dbi_source();
+		isnt($src_x->{'dbh'}, $src_y->{'dbh'},
+			'U10: two SQLite objects have independent (non-shared) dbh handles');
+	}
+
+	# U11 — dbi_source() returns undef before _open (no DBI handle yet)
+	{
+		# A freshly constructed object has no dbh until the first query.
+		# The CLAUDE.md notes _open() is lazy; dbi_source() calls _open_table()
+		# which in turn calls _open() lazily, so by the time we call dbi_source()
+		# the handle IS set.  The important thing is that it doesn't croak.
+		my $fresh = Database::integ_u->new(dsn => $u_dsn);
+		my $early = $fresh->dbi_source();
+		# Either undef (if _open has not run yet) or a valid hashref:
+		ok(!defined($early) || ref($early) eq 'HASH',
+			'U11: dbi_source() on a never-queried object returns undef or valid hashref');
+	}
+}
+
 done_testing();

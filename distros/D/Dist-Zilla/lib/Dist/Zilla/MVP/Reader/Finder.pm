@@ -1,4 +1,4 @@
-package Dist::Zilla::MVP::Reader::Finder 6.039;
+package Dist::Zilla::MVP::Reader::Finder 6.040;
 # ABSTRACT: the reader for dist.ini files
 
 use Moose;
@@ -30,7 +30,7 @@ Dist::Zilla::MVP::Reader::Finder - the reader for dist.ini files
 
 =head1 VERSION
 
-version 6.039
+version 6.040
 
 =head1 PERL VERSION
 

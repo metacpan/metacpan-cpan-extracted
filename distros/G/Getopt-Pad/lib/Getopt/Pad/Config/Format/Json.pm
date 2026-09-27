@@ -6,7 +6,7 @@ use Getopt::Pad::Config::Format;
 class Getopt::Pad::Config::Format::Json :isa(Getopt::Pad::Config::Format) :strict(params) {
 	use JSON::PP ();
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	use constant NAMES => ['json'];
 
@@ -27,13 +27,37 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Config::Format::Json - JSON config format
+Getopt::Pad::Config::Format::Json - The json config file format
+
+=head1 SYNOPSIS
+
+=for highlighter language=perl
+
+    config => { format => 'json', paths => ['~/.tool.json'] },
+
+=for highlighter language=javascript
+
+    {
+      "Options": { "log-level": "debug", "tag": ["a", "b"] },
+      "commands": { "resize": { "Options": { "width": 800 } } }
+    }
 
 =head1 DESCRIPTION
 
-JSON config files via the core JSON::PP module, translating between the text Config I/O hands over and the config data.
+The config file format C<json>, based on L<JSON::PP>, which comes with
+Perl. Files are parsed as strict JSON: comments and trailing commas are
+errors. C<true> and C<false> are accepted for C<flag> and C<bool>
+options. C<null> is reported as C<no value given> (for C<hash> and
+C<objectlist> options as a value of the wrong shape). An empty file is a
+parse error; a file that sets nothing contains C<{}>.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+C<--create-default-config> writes indented JSON with the keys sorted.
+
+See L<Getopt::Pad/CONFIG FILES> for the layout of config files.
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Config::Format>, L<Getopt::Pad::Config::Format::Yaml>
 
 =head1 AUTHOR
 

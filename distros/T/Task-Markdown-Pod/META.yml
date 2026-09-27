@@ -1,0 +1,36 @@
+---
+abstract: 'install the Markdown and DocBook to POD toolchain'
+author:
+  - 'Andrew Speer <andrew.speer@isolutions.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  version: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Markdown-Pod
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ASPEER::MakeMaker::Markdown::Pod: '1.014'
+  Docbook::Convert: '1.012'
+  Markdown::Pod::Embed: '1.013'
+  perl: '5.010'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/aspeer/pm-Task-Markdown-Pod/issues
+  homepage: https://github.com/aspeer/pm-Task-Markdown-Pod
+  repository: https://github.com/aspeer/pm-Task-Markdown-Pod.git
+version: '0.001'
+x_authority: cpan:ASPEER
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,0 +1,56 @@
+{
+   "abstract" : "base API class for Net::Flickr::* libraries",
+   "author" : [
+      "Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Flickr-API",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Log::Dispatch::Code" : "2.36",
+            "Test::Simple" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Simple" : "0",
+            "Flickr::API" : "1.04",
+            "Flickr::Upload" : "1.32",
+            "HTTP::Date" : "0",
+            "List::Util" : "0",
+            "Log::Dispatch" : "2.10",
+            "Readonly" : "0",
+            "Time::HiRes" : "0",
+            "XML::XPath" : "1.13"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Flickr::API" : {
+         "file" : "lib/Net/Flickr/API.pm",
+         "version" : "1.8"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.8",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

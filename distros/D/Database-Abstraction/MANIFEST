@@ -13,6 +13,7 @@ t/10-compile.t
 t/20-new.t
 t/30-basics.t
 t/all-fuzz.t
+t/base_criteria.t
 t/bugs.t
 t/carp.t
 t/cgi_security.t
@@ -21,6 +22,7 @@ t/comment-spelling.t
 t/csv.t
 t/csv_id.t
 t/data-flow.t
+t/data/numerictest.csv
 t/data/test1.csv
 t/data/test1.html
 t/data/test2.psv
@@ -36,6 +38,7 @@ t/db.t
 t/db_noentry.t
 t/deep.t
 t/domain.t
+t/each_row.t
 t/edge_cases.t
 t/empty_files.t
 t/eof.t
@@ -48,6 +51,7 @@ t/integration.t
 t/join.t
 t/json.t
 t/json_url.t
+t/lib/Database/numerictest.pm
 t/lib/Database/passwd.pm
 t/lib/Database/test1.pm
 t/lib/Database/test2.pm
@@ -64,6 +68,7 @@ t/lib/Database/test_tsv.pm
 t/lib/MyLogger.pm
 t/locales.t
 t/logger.t
+t/logic.t
 t/mutant_killers.t
 t/no_entry.t
 t/passwd.t
@@ -81,6 +86,7 @@ t/query_builder.t
 t/remote.t
 t/remote_local.t
 t/schema.t
+t/schema_numeric.t
 t/strict.t
 t/tabs.t
 t/test7.t

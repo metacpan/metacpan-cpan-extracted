@@ -8,7 +8,7 @@ class Getopt::Pad::Config::Format::Yaml :isa(Getopt::Pad::Config::Format) :stric
 	use Feature::Compat::Try;
 	use Getopt::Pad::Util qw(specError);
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	use constant NAMES => ['yaml', 'yml'];
 
@@ -41,13 +41,50 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Config::Format::Yaml - YAML config format
+Getopt::Pad::Config::Format::Yaml - The yaml config file format
+
+=head1 SYNOPSIS
+
+=for highlighter language=perl
+
+    config => { format => 'yaml', paths => ['~/.tool.yaml'] },
+
+=for highlighter language=yaml
+
+    Options:
+      log-level: debug
+      tag:
+        - a
+        - b
+    commands:
+      resize:
+        Options:
+          width: 800
 
 =head1 DESCRIPTION
 
-YAML config files via YAML::XS (a recommended, not required, dependency; a spec naming this format fails to build without it). YAML::XS works on UTF-8 octets; this format converts to and from the text Config I/O hands over, so non-ASCII values survive a --create-default-config round trip. Loading never blesses: a C<!!perl/hash:Some::Class> tag yields a plain hash regardless of the YAML::XS version's LoadBlessed default.
+The config file format C<yaml> (also C<yml>), based on L<YAML::XS>.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+YAML::XS is not installed together with Getopt::Pad. A spec whose
+C<config> block uses this format makes C<GetOptions> die with the spec
+error C<config format 'yaml' requires the YAML::XS module> when YAML::XS is
+missing, whether or not a config file exists.
+
+C<true> and C<false> are accepted for C<flag> and C<bool> options; C<yes>,
+C<no>, C<on> and C<off> are read as strings and rejected. C<~> and empty
+values are reported as C<no value given> (for C<hash> and C<objectlist>
+options as a value of the wrong shape). An empty file, or one with only
+comments, is reported as not containing a mapping of group names. Tags
+such as C<!!perl/hash:Foo> never create objects: a config file is data.
+
+C<--create-default-config> writes a YAML document that starts with
+C<--->.
+
+See L<Getopt::Pad/CONFIG FILES> for the layout of config files.
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Config::Format>, L<Getopt::Pad::Config::Format::Json>
 
 =head1 AUTHOR
 

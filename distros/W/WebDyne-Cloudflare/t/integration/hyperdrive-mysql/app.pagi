@@ -1,0 +1,99 @@
+use strict;
+use warnings;
+use Future::AsyncAwait;
+use JSON::PP ();
+use WebDyne::Cloudflare::Hyperdrive;
+
+async sub {
+    my ($scope_hr, $receive_cr, $send_cr)=@_;
+    return if $scope_hr->{'type'} eq 'lifespan';
+    die "missing fixture run token\n" unless $scope_hr->{'query_string'}=~/\Atoken=([a-f0-9-]{36})\z/;
+    my $token=$1;
+    $token=~s/-//g;
+    my $table='webdyne_mysql_' . $token;
+    my $db_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $scope_hr);
+    if ($scope_hr->{'path'} eq '/failure') {
+        await $db_or->begin_work();
+        await $db_or->do("INSERT INTO $table (slot, value) VALUES (9, ?)", undef, 'failed request');
+        die "intentional request failure\n";
+    }
+    if ($scope_hr->{'path'} eq '/limits') {
+        foreach my $case_ar (["WITH RECURSIVE n AS (SELECT 1 AS i UNION ALL SELECT i+1 FROM n WHERE i<11) SELECT i FROM n", 'RESULT_LIMIT'],
+            ["SELECT REPEAT('x', 9000)", 'RESULT_LIMIT'], ['SELECT SLEEP(6)', 'TIMEOUT']) {
+            my $limited_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $scope_hr);
+            my $ok_fg=eval { await $limited_or->selectall_arrayref($case_ar->[0], undef); 1 };
+            die "limit failure lost\n" if $ok_fg||!ref($@)||$@->code() ne $case_ar->[1];
+            await $limited_or->disconnect();
+        }
+        my $body='{"rows":1,"bytes":1,"timeout":1}';
+        await $send_cr->({type => 'http.response.start', status => 200, headers => [['content-type', 'application/json']]});
+        await $send_cr->({type => 'http.response.body', body => $body});
+        return;
+    }
+    my $unicode="O'Brien \\ '; DROP TABLE x; -- \x{65e5}\x{672c}\x{1f377}";
+    my $row_hr=await $db_or->selectrow_hashref(
+        'SELECT ? AS label, CAST(? AS SIGNED) AS big, CAST(? AS DECIMAL(30,10)) AS amount, ? AS bytes, ? AS missing_value, ? AS enabled',
+        undef, $unicode, '9007199254740993', '12345678901234567890.1234567890', $db_or->blob("\0\xff\x80"), undef, JSON::PP::false());
+    die "bound type roundtrip failed\n" unless ($row_hr->{'label'} eq $unicode)
+        &&($row_hr->{'big'} eq '9007199254740993')&&($row_hr->{'amount'} eq '12345678901234567890.1234567890')
+        &&(unpack('H*', $row_hr->{'bytes'}) eq '00ff80')&&!defined($row_hr->{'missing_value'})&&!$row_hr->{'enabled'};
+    die "bound LIMIT failed\n" unless (await $db_or->selectrow_arrayref('SELECT 42 LIMIT ? OFFSET ?', undef, 1, 0))->[0]==42;
+    my $statement_or=$db_or->prepare("SELECT ? AS repeated, ? AS repeated, '?' AS literal /* ? */");
+    $statement_or->bind_param(1, 'first'); $statement_or->bind_param(2, 'second');
+    await $statement_or->execute();
+    die "duplicate columns failed\n" unless @{$statement_or->columns()}==3&&$statement_or->fetchrow_hashref()->{'repeated'} eq 'second';
+    die "mysql metadata failed\n" unless $statement_or->columns()->[0]{'driver'} eq 'mysql';
+    die "fetch exhaustion failed\n" if defined($statement_or->fetchrow_arrayref());
+    await $statement_or->execute('new', 'last'); $statement_or->finish(); await $statement_or->execute();
+    die "statement reuse failed\n" unless $statement_or->fetchrow_arrayref()->[1] eq 'last';
+    die "empty row failed\n" if defined(await $db_or->selectrow_arrayref('SELECT 1 WHERE false', undef));
+    $statement_or=$db_or->prepare("INSERT INTO $table (slot, value, document, moment) VALUES (?, ?, ?, ?)");
+    await $statement_or->execute(0, $unicode, 'null', '2024-02-29 23:59:59.999999');
+    die "DML metadata failed\n" unless $statement_or->insert_id() eq '9007199254740993'
+        &&$statement_or->affected_rows()==1&&$statement_or->warning_count()==0;
+    $row_hr=await $db_or->selectrow_hashref("SELECT document, moment FROM $table WHERE slot=0", undef);
+    die "JSON or datetime changed\n" unless $row_hr->{'document'} eq 'null'&&$row_hr->{'moment'} eq '2024-02-29 23:59:59.999999';
+    await $db_or->begin_work();
+    die "update failed\n" unless (await $db_or->do("UPDATE $table SET value=? WHERE slot=0", undef, 'updated'))==1;
+    die "delete failed\n" unless (await $db_or->do("DELETE FROM $table WHERE slot=0", undef))==1;
+    die "zero row convention failed\n" unless (await $db_or->do("DELETE FROM $table WHERE slot=0", undef)) eq '0E0';
+    await $db_or->commit();
+    await $db_or->begin_work();
+    await $db_or->do("INSERT INTO $table (slot, value) VALUES (4, ?)", undef, 'explicit rollback');
+    my $ok_fg=eval { await $db_or->do("TRUNCATE TABLE $table", undef); 1 };
+    die "implicit commit guard failed\n" if $ok_fg||!ref($@)||$@->code() ne 'TRANSACTION_CONTROL';
+    await $db_or->rollback();
+    my $expired_or;
+    my $value=await $db_or->transaction(async sub {
+        my ($tx_or)=@_; $expired_or=$tx_or;
+        await $tx_or->do("INSERT INTO $table (slot, value) VALUES (1, ?)", undef, 'committed');
+        die "parent joined callback\n" if eval { await $db_or->selectrow_arrayref('SELECT 1', undef); 1 };
+        return 'returned';
+    });
+    die "callback result failed\n" unless $value eq 'returned';
+    die "callback handle did not expire\n" if eval { $expired_or->prepare('SELECT 1'); 1 };
+    $ok_fg=eval {
+        await $db_or->transaction(async sub {
+            my ($tx_or)=@_;
+            await $tx_or->do("INSERT INTO $table (slot, value) VALUES (2, ?)", undef, 'rolled back');
+            die "intentional callback failure\n";
+        }); 1;
+    };
+    die "callback failure not preserved\n" if $ok_fg||($@!~/intentional callback failure/);
+    $ok_fg=eval {
+        await $db_or->transaction(async sub {
+            my ($tx_or)=@_;
+            await $tx_or->do("INSERT INTO $table (slot, value) VALUES (1, ?)", undef, 'duplicate');
+        }); 1;
+    };
+    die "MySQL structured error lost\n" if $ok_fg||!ref($@)||($@->code() ne 'ER_DUP_ENTRY')||($@->sqlstate() ne '23000')||($@->errno()!=1062);
+    my $other_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $scope_hr);
+    my $other_ar=await $other_or->selectrow_arrayref("SELECT value FROM $table WHERE slot=1", undef);
+    die "independent committed read failed\n" unless $other_ar->[0] eq 'committed';
+    await $other_or->disconnect(); await $other_or->disconnect();
+    await $db_or->begin_work();
+    await $db_or->do("INSERT INTO $table (slot, value) VALUES (3, ?)", undef, 'teardown rollback');
+    my $body=JSON::PP->new()->encode({ typed => 1, metadata => 1, statement => 1, crud => 1, transactions => 1, disconnect => 1 });
+    await $send_cr->({type => 'http.response.start', status => 200, headers => [['content-type', 'application/json']]});
+    await $send_cr->({type => 'http.response.body', body => $body});
+};

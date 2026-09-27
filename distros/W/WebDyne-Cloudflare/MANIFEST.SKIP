@@ -1,0 +1,16 @@
+^\.git/
+^\.gitignore$
+(?:^|/)\.wrangler/
+^Makefile$
+^MYMETA\.(?:json|yml)$
+^blib/
+^node_modules/
+^dist/
+^pm_to_blib$
+^WebDyne-Cloudflare-.*\.tar\.gz$
+^WebDyne-Cloudflare-[^/]+/
+(?:^|/)\.webdyne/
+(?:^|/)node_modules/
+(?:^|/)\.dev\.vars(?:\..*)?$
+(?:^|/)\.env(?:\..*)?$
+(?:^|/)\.deployment-secrets\.json$

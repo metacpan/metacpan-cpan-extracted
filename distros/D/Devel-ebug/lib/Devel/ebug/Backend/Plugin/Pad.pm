@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use PadWalker;
 
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 sub register_commands {
   return ( pad => { sub => \&DB::pad } )
@@ -48,7 +48,7 @@ Devel::ebug::Backend::Plugin::Pad
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 AUTHOR
 

@@ -5,12 +5,17 @@ use warnings;
 use base qw(Exporter);
 our @EXPORT = qw(basic);
 
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 # get basic debugging information
 sub basic {
   my ($self) = @_;
-  my $response = $self->talk({ command => "basic" });
+  _basic_response($self, $self->talk({ command => "basic" }));
+}
+
+# record where the debuggee is, from the answer to a basic request
+sub _basic_response {
+  my ($self, $response) = @_;
   $self->codeline($response->{codeline});
   $self->filename($response->{filename});
   $self->finished($response->{finished});
@@ -33,7 +38,7 @@ Devel::ebug::Plugin::Basic
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 AUTHOR
 

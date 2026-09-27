@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla
 
+6.040     2026-09-26 14:10:14-04:00 America/New_York
+        - let PPI documents have a filename for better error reporting (I hope)
+
 6.039     2026-09-13 21:39:01+10:00 Australia/Melbourne
         - PkgVersion warns when a file declares a perl v5.38 class, which it
           cannot version because PPI cannot parse class syntax (github #742)

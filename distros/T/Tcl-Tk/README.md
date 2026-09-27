@@ -17,16 +17,6 @@ In addition, it allows you to leverage the full variety of other installed
 Tcl/Tk extensions (such as Tix, BLT, BWidgets, Treectrl, etc.) directly from Perl.
 
 
-WHAT'S NEW IN VERSION 1.52
-==========================
-
-* Added native CamelCase mappings for the entire standard Ttk themed widget set.
-* Modern widgets like TtkNoteBook, TtkTreeview, and TtkButton can now be used
-  directly without loading legacy 'tile' packages.
-* Improved test coverage for modern GUI environments.
-* Refined configuration warnings for standard toolkits (like tklib/tooltip).
-
-
 NATIVE THEMED WIDGETS (TTK)
 ===========================
 

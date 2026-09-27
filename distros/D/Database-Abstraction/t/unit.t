@@ -42,24 +42,32 @@ my $have_chi    = eval { require CHI; 1 };
 # A ledger assertion at the end of the file fails if any state is untested.
 # ---------------------------------------------------------------------------
 my %LEDGER = (
-	'unsafe id in new'       => 'new(): id injection guard — semicolon in id',
-	'unsafe id in clone'     => 'new(): clone path id injection guard',
-	'unsafe host in new'     => 'new(): host injection guard — space/metachar in host',
-	'unsafe table in new'    => 'new(): table injection guard — semicolon in table name',
-	'BerkeleyDB no JOINs'    => 'selectall_arrayref: _scan_berkeley join croak',
-	'BerkeleyDB no or-and'   => 'selectall_arrayref: _scan_berkeley -or/-and croak',
-	'fetchrow_hashref NoSQL' => 'fetchrow_hashref: BerkeleyDB non-entry column croak',
-	'query all join BDB'     => 'Query->all():   join on BerkeleyDB croak',
-	'query first join BDB'   => 'Query->first(): join on BerkeleyDB croak',
-	'query count join BDB'   => 'Query->count(): join on BerkeleyDB croak',
-	'query all join Deep'    => 'Query->all():   join on Deep croak',
-	'query first join Deep'  => 'Query->first(): join on Deep croak',
-	'query count join Deep'  => 'Query->count(): join on Deep croak',
-	'Unknown SQL operator'   => '_build_where_conditions: unknown operator croak',
-	'selectall -in'          => 'selectall_arrayref: -in operator via DBI',
-	'selectall -between'     => 'selectall_arrayref: -between operator via DBI',
-	'selectall -like'        => 'selectall_arrayref: -like operator via DBI',
-	'selectall -or direct'   => 'selectall_arrayref: -or grouping direct call',
+	'unsafe id in new'             => 'new(): id injection guard — semicolon in id',
+	'unsafe id in clone'           => 'new(): clone path id injection guard',
+	'unsafe host in new'           => 'new(): host injection guard — space/metachar in host',
+	'unsafe table in new'          => 'new(): table injection guard — semicolon in table name',
+	'BerkeleyDB no JOINs'          => 'selectall_arrayref: _scan_berkeley join croak',
+	'BerkeleyDB no or-and'         => 'selectall_arrayref: _scan_berkeley -or/-and croak',
+	'fetchrow_hashref NoSQL'       => 'fetchrow_hashref: BerkeleyDB non-entry column croak',
+	'query all join BDB'           => 'Query->all():   join on BerkeleyDB croak',
+	'query first join BDB'         => 'Query->first(): join on BerkeleyDB croak',
+	'query count join BDB'         => 'Query->count(): join on BerkeleyDB croak',
+	'query all join Deep'          => 'Query->all():   join on Deep croak',
+	'query first join Deep'        => 'Query->first(): join on Deep croak',
+	'query count join Deep'        => 'Query->count(): join on Deep croak',
+	'Unknown SQL operator'         => '_build_where_conditions: unknown operator croak',
+	'selectall -in'                => 'selectall_arrayref: -in operator via DBI',
+	'selectall -between'           => 'selectall_arrayref: -between operator via DBI',
+	'selectall -like'              => 'selectall_arrayref: -like operator via DBI',
+	'selectall -or direct'         => 'selectall_arrayref: -or grouping direct call',
+	# Added for sections 22-25 (new public API from 0.46)
+	'each_row callback not coderef' => 'each_row(): non-coderef callback causes croak',
+	'each_row SQL path limit'       => 'each_row(): limit parameter on SQL path',
+	'dbi_source slurp undef'        => 'dbi_source(): CSV slurp backend returns undef',
+	'dbi_source SQLite hashref'     => 'dbi_source(): SQLite connection returns {dbh,table}',
+	'base_criteria active filter'   => 'base_criteria: count() filtered to active rows',
+	'base_criteria must be hashref' => 'base_criteria: non-hashref croak at construction',
+	'base_criteria unsafe key'      => 'base_criteria: unsafe column key croak at construction',
 );
 
 # ---------------------------------------------------------------------------
@@ -1299,6 +1307,385 @@ note '=== 21. XLSX backend ===';
 }
 
 # ---------------------------------------------------------------------------
+# SECTION 22 — updated(): three-tier behavior documented in the POD
+#
+# The POD documents three distinct return paths:
+#   1. File-based (CSV, XML, directory-backed SQLite): mtime set at new() time.
+#   2. SQLite DSN (dbi:SQLite:dbname=...): live stat() on every call.
+#   3. Other DSN / URL: connection timestamp set at new() time.
+#
+# Section 4 above covers path 1 (CSV slurp).  This section focuses on path 2
+# (live-stat) and path 3 (generic DSN timestamp fallback).
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 22. updated(): SQLite DSN live-stat and fallback paths ===';
+SKIP: {
+	skip 'DBI/DBD::SQLite not available for updated() SQLite DSN tests', 10
+		unless $have_sqlite;
+
+	my $udir  = tempdir(CLEANUP => 1);
+	my $ufile = File::Spec->catfile($udir, 'upd_unit.sql');
+	my $udsn  = "dbi:SQLite:dbname=$ufile";
+
+	{
+		my $s = DBI->connect($udsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE upd_unit (id INTEGER PRIMARY KEY, v TEXT)');
+		$s->do("INSERT INTO upd_unit VALUES (1, 'hello')");
+		$s->disconnect();
+	}
+
+	{
+		package Database::upd_unit;
+		use parent 'Database::Abstraction';
+	}
+
+	# Path 2: SQLite DSN — updated() must stat the file live on every call
+	my $db_dsn = Database::upd_unit->new(dsn => $udsn, no_entry => 1);
+
+	# 22.1  Before any data access updated() should still be defined (dialect
+	#        and dsn are set in new(), _open() is not needed for the DSN path).
+	$db_dsn->count();	# trigger _open so dialect and dsn are populated
+	my $t1 = $db_dsn->updated();
+	ok(defined($t1),          '22.1 updated() SQLite DSN: returns defined value');
+	ok(looks_like_number($t1), '22.1 updated() SQLite DSN: value is numeric');
+
+	# 22.2  Return value must equal stat() on the backing file
+	my $stat_mtime = (stat($ufile))[9];
+	is($db_dsn->updated(), $stat_mtime,
+		'22.2 updated() SQLite DSN: equals current stat() mtime');
+
+	# 22.3  Live stat: after touching the file, updated() returns the new mtime.
+	#        sleep(1) ensures filesystem mtime has 1-second granularity.
+	sleep(1);
+	utime(undef, undef, $ufile);
+	my $t2 = (stat($ufile))[9];
+	is($db_dsn->updated(), $t2,
+		'22.3 updated() SQLite DSN: reflects new mtime after file is touched');
+	ok($t2 >= $t1, '22.3 updated() SQLite DSN: new mtime >= old mtime');
+
+	# 22.4  Repeated calls without touching the file return the same value
+	my $t3 = $db_dsn->updated();
+	my $t4 = $db_dsn->updated();
+	is($t3, $t4, '22.4 updated() SQLite DSN: two consecutive calls agree');
+
+	# Path 3 (already covered in section 4 for CSV): verify a generic DSN (SQLite
+	# used as proxy because it is available) returns a numeric connection-time
+	# timestamp when dialect is not 'sqlite' — simulate by clearing _dialect so
+	# the live-stat branch is skipped and the cached _updated is returned instead.
+	{
+		my $db_generic = Database::upd_unit->new(dsn => $udsn, no_entry => 1);
+		$db_generic->count();	# populate _updated
+		$db_generic->{'_dialect'} = 'generic';	# force generic path
+		my $tu = $db_generic->updated();
+		ok(defined($tu),           '22.5 updated() generic DSN: returns defined value');
+		ok(looks_like_number($tu), '22.5 updated() generic DSN: value is numeric');
+		ok($tu > 0,                '22.5 updated() generic DSN: value is positive');
+	}
+
+	# 22.6  dbi:SQLite:dbname= form (with explicit "dbname=") is supported
+	my $db_explicit = Database::upd_unit->new(dsn => $udsn, no_entry => 1);
+	$db_explicit->count();
+	my $te = $db_explicit->updated();
+	is($te, (stat($ufile))[9],
+		'22.6 updated(): dbi:SQLite:dbname= form returns correct mtime');
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 23 — each_row()
+#
+# each_row() streams rows one at a time via a callback, returning the count
+# of rows visited.  The POD documents:
+#   - Callback must be a code reference (croaks otherwise).
+#   - Accepts same criteria / sort_by / limit / offset as selectall_arrayref.
+#   - Returns the number of rows passed to the callback.
+#   - Exceptions in the callback propagate; DBI handle is left in a valid state.
+#   - Slurp path: memory usage same as selectall_arrayref.
+#   - SQL path:   constant memory (one row at a time).
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 23. each_row() ===';
+{
+	my $db = Database::test1->new($DATA_DIR);
+
+	# 23.1  Callback must be a code reference — non-coderef must croak
+	throws_ok {
+		$db->each_row('not a coderef')
+	} qr/callback must be a code reference/i,
+	'23.1 each_row(): non-coderef callback causes croak';
+	delete $LEDGER{'each_row callback not coderef'};
+
+	# 23.2  No criteria → all rows visited; callback receives a hashref each time
+	{
+		my @received;
+		my $n = $db->each_row(sub { push @received, shift });
+		ok($n >= 4, '23.2 each_row(): returns count >= 4 for unconstrained call');
+		is($n, scalar @received, '23.2 each_row(): return value equals rows received by callback');
+		ok(ref($received[0]) eq 'HASH', '23.2 each_row(): callback receives hashrefs');
+	}
+
+	# 23.3  Criteria filter — only matching rows reach the callback
+	{
+		my @got;
+		my $n = $db->each_row(sub { push @got, shift }, entry => 'one');
+		is($n, 1, '23.3 each_row(): with entry criterion visits exactly 1 row');
+		is($got[0]{$ENTRY_COL}, 'one', '23.3 each_row(): correct row passed to callback');
+	}
+
+	# 23.4  Return value is the actual number of rows; test idempotency
+	{
+		my $n1 = $db->each_row(sub {});
+		my $n2 = $db->each_row(sub {});
+		is($n1, $n2, '23.4 each_row(): successive calls with same object return same count');
+	}
+
+	# 23.5  Exceptions from the callback propagate to the caller (slurp path)
+	{
+		eval {
+			$db->each_row(sub { die "callback died\n" });
+		};
+		like($@, qr/callback died/, '23.5 each_row(): callback exception propagates to caller');
+	}
+}
+
+# 23.6–23.9  SQL path (requires SQLite)
+SKIP: {
+	skip 'DBI/DBD::SQLite not available for each_row SQL-path tests', 4
+		unless $have_sqlite;
+
+	my $er_dir  = tempdir(CLEANUP => 1);
+	my $er_file = File::Spec->catfile($er_dir, 'er_unit.sql');
+	my $er_dsn  = "dbi:SQLite:dbname=$er_file";
+
+	{
+		my $s = DBI->connect($er_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE er_unit (id INTEGER PRIMARY KEY, v TEXT, score INTEGER)');
+		for my $row ([1,'alpha',10],[2,'beta',50],[3,'gamma',30],[4,'delta',70]) {
+			$s->do('INSERT INTO er_unit VALUES (?,?,?)', undef, @{$row});
+		}
+		$s->disconnect();
+	}
+
+	{
+		package Database::er_unit;
+		use parent 'Database::Abstraction';
+	}
+
+	my $er = Database::er_unit->new(dsn => $er_dsn, no_entry => 1);
+
+	# 23.6  All rows via SQL path
+	{
+		my $n = $er->each_row(sub {});
+		is($n, 4, '23.6 each_row() SQL path: returns 4 for all rows');
+	}
+
+	# 23.7  limit parameter reduces rows visited
+	{
+		my @got;
+		my $n = $er->each_row(sub { push @got, shift }, limit => 2);
+		is($n, 2, '23.7 each_row() SQL path: limit => 2 visits exactly 2 rows');
+	}
+
+	# 23.8  Exceptions in callback on SQL path propagate; object stays usable
+	{
+		eval {
+			$er->each_row(sub { die "sql path die\n" });
+		};
+		like($@, qr/sql path die/, '23.8 each_row() SQL path: callback exception propagates');
+		# Object must remain usable after an exception
+		my $n = $er->each_row(sub {});
+		is($n, 4, '23.8 each_row() SQL path: object usable after callback exception');
+	}
+
+	delete $LEDGER{'each_row SQL path limit'};
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 24 — dbi_source()
+#
+# The POD contract:
+#   - Returns { dbh => DBI::db, table => Str } for live SQLite connections.
+#   - Returns undef for every other backend (CSV, XML, XLSX, BerkeleyDB, etc.)
+#   - The dbh Driver Name must be 'SQLite' for the result to be non-undef.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 24. dbi_source() ===';
+{
+	# 24.1  Slurp-mode CSV backend → undef
+	{
+		my $slurp = Database::test1->new($DATA_DIR);
+		$slurp->count();	# trigger _open (slurp path)
+		my $src = $slurp->dbi_source();
+		ok(!defined($src), '24.1 dbi_source(): CSV slurp backend returns undef');
+		delete $LEDGER{'dbi_source slurp undef'};
+	}
+
+	# 24.2  BerkeleyDB injected backend → undef (no DBI handle ever created)
+	{
+		my $bdb = Database::test1->new($DATA_DIR);
+		$bdb->{'berkeley'} = { k => 'v' };
+		my $src = $bdb->dbi_source();
+		ok(!defined($src), '24.2 dbi_source(): BerkeleyDB backend returns undef');
+	}
+}
+
+SKIP: {
+	skip 'DBI/DBD::SQLite not available for dbi_source() tests', 8
+		unless $have_sqlite;
+
+	my $ds_dir  = tempdir(CLEANUP => 1);
+	my $ds_file = File::Spec->catfile($ds_dir, 'ds_unit.sql');
+	my $ds_dsn  = "dbi:SQLite:dbname=$ds_file";
+
+	{
+		my $s = DBI->connect($ds_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE ds_unit (entry TEXT PRIMARY KEY, val TEXT)');
+		$s->do("INSERT INTO ds_unit VALUES ('a', 'alpha')");
+		$s->disconnect();
+	}
+
+	{
+		package Database::ds_unit;
+		use parent 'Database::Abstraction';
+	}
+
+	my $db = Database::ds_unit->new(dsn => $ds_dsn);
+	$db->count();	# trigger _open to establish DBI connection
+
+	# 24.3  SQLite DSN connection → hashref
+	my $src = $db->dbi_source();
+	ok(defined($src),     '24.3 dbi_source() SQLite: returns defined value');
+	isa_ok($src, 'HASH',  '24.3 dbi_source() SQLite: returns hashref');
+
+	# 24.4  'dbh' key must be a blessed DBI handle
+	ok(exists $src->{'dbh'}, '24.4 dbi_source() SQLite: dbh key present');
+	ok(Scalar::Util::blessed($src->{'dbh'}),
+		'24.4 dbi_source() SQLite: dbh is a blessed object (DBI handle)');
+
+	# 24.5  'table' key must equal the class-derived table name
+	ok(exists $src->{'table'}, '24.5 dbi_source() SQLite: table key present');
+	is($src->{'table'}, 'ds_unit', '24.5 dbi_source() SQLite: table name is correct');
+
+	# 24.6  Repeated calls return the same dbh (prepared-statement caching contract)
+	my $src2 = $db->dbi_source();
+	is($src->{'dbh'}, $src2->{'dbh'},
+		'24.6 dbi_source() SQLite: repeated calls return same dbh');
+
+	# 24.7  Non-SQLite DBI driver (simulate by clearing driver name) → undef
+	#        We can't easily swap the driver, but we can verify the guard condition
+	#        by checking that the dbh's Driver Name is 'SQLite'.
+	is($src->{'dbh'}{Driver}{Name}, 'SQLite',
+		'24.7 dbi_source() SQLite: Driver Name is SQLite');
+
+	delete $LEDGER{'dbi_source SQLite hashref'};
+}
+
+# ---------------------------------------------------------------------------
+# SECTION 25 — base_criteria constructor parameter
+#
+# The POD documents that base_criteria is ANDed into every SELECT automatically.
+# Validation (unsafe keys, non-hashref) must croak at construction time.
+# This section covers the documented public contract; internal _merge_base_criteria
+# is exercised in function.t.
+# ---------------------------------------------------------------------------
+
+note '';
+note '=== 25. base_criteria ===';
+SKIP: {
+	skip 'DBI/DBD::SQLite not available for base_criteria SQL-path tests', 10
+		unless $have_sqlite;
+
+	my $bc_dir  = tempdir(CLEANUP => 1);
+	my $bc_file = File::Spec->catfile($bc_dir, 'bc_unit.sql');
+	my $bc_dsn  = "dbi:SQLite:dbname=$bc_file";
+
+	{
+		my $s = DBI->connect($bc_dsn, undef, undef, { RaiseError => 1 });
+		$s->do('CREATE TABLE bc_unit (entry TEXT PRIMARY KEY, status TEXT, score INTEGER)');
+		$s->do("INSERT INTO bc_unit VALUES ('a','active',90)");
+		$s->do("INSERT INTO bc_unit VALUES ('b','inactive',60)");
+		$s->do("INSERT INTO bc_unit VALUES ('c','active',70)");
+		$s->do("INSERT INTO bc_unit VALUES ('d','inactive',80)");
+		$s->disconnect();
+	}
+
+	{
+		package Database::bc_unit;
+		use parent 'Database::Abstraction';
+	}
+
+	# 25.1  base_criteria filters all queries automatically
+	{
+		my $db = Database::bc_unit->new(dsn => $bc_dsn,
+			base_criteria => { status => 'active' });
+		my $n = $db->count();
+		is($n, 2, '25.1 base_criteria: count() sees only active rows');
+		delete $LEDGER{'base_criteria active filter'};
+	}
+
+	# 25.2  base_criteria applies to selectall_arrayref
+	{
+		my $db = Database::bc_unit->new(dsn => $bc_dsn,
+			base_criteria => { status => 'inactive' });
+		my $all = $db->selectall_arrayref();
+		is(scalar @{$all}, 2, '25.2 base_criteria: selectall_arrayref filtered to 2 inactive rows');
+		ok(!(grep { $_->{'status'} eq 'active' } @{$all}),
+			'25.2 base_criteria: no active rows in result');
+	}
+
+	# 25.3  Caller criteria further narrow the base filter (AND semantics)
+	{
+		my $db = Database::bc_unit->new(dsn => $bc_dsn,
+			base_criteria => { status => 'active' });
+		my $n = $db->count(score => { '>' => 80 });
+		is($n, 1, '25.3 base_criteria: caller criterion ANDed with base (1 active with score > 80)');
+	}
+
+	# 25.4  Caller keys WIN on collision — caller can tighten but not bypass
+	{
+		my $db = Database::bc_unit->new(dsn => $bc_dsn,
+			base_criteria => { status => 'active' });
+		# Override status to 'inactive' — caller wins so we should see inactive rows
+		my $n = $db->count(status => 'inactive');
+		is($n, 2, '25.4 base_criteria: caller key wins on collision');
+	}
+
+	# 25.5  Non-hashref base_criteria → croak at construction time
+	throws_ok {
+		Database::bc_unit->new(dsn => $bc_dsn, base_criteria => ['status', 'active'])
+	} qr/base_criteria must be a hashref/i,
+	'25.5 base_criteria: non-hashref causes croak at construction time';
+	delete $LEDGER{'base_criteria must be hashref'};
+
+	# 25.6  Unsafe key in base_criteria → croak at construction time
+	throws_ok {
+		Database::bc_unit->new(dsn => $bc_dsn, base_criteria => { 'bad;key' => 1 })
+	} qr/unsafe base_criteria key/i,
+	'25.6 base_criteria: unsafe column key causes croak at construction time';
+	delete $LEDGER{'base_criteria unsafe key'};
+
+	# 25.7  base_criteria applies to query builder
+	{
+		my $db = Database::bc_unit->new(dsn => $bc_dsn,
+			base_criteria => { status => 'active' });
+		my $n = $db->query()->count();
+		is($n, 2, '25.7 base_criteria: query()->count() respects base filter');
+	}
+
+	# 25.8  base_criteria mutation after construction does NOT affect the object
+	#        (shallow copy taken at new() time)
+	{
+		my %bc = (status => 'active');
+		my $db = Database::bc_unit->new(dsn => $bc_dsn, base_criteria => \%bc);
+		$bc{'status'} = 'inactive';	# mutate original hash
+		my $n = $db->count();
+		is($n, 2, '25.8 base_criteria: mutation of original hashref after new() has no effect');
+	}
+}
+
+# ---------------------------------------------------------------------------
 # LEDGER ASSERTION
 # If SQLite was unavailable, the SQLite-only states were never reachable;
 # remove them before checking so the ledger still passes on minimal installs.
@@ -1310,6 +1697,11 @@ unless($have_sqlite) {
 		selectall -between
 		selectall -like
 		selectall -or direct
+		each_row SQL path limit
+		dbi_source SQLite hashref
+		base_criteria active filter
+		base_criteria must be hashref
+		base_criteria unsafe key
 	)};
 }
 

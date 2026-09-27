@@ -22,6 +22,16 @@ requires 'autodie';
 requires 'boolean';
 requires 'strict';
 requires 'warnings';
+recommends 'DBD::Excel';   # .xls (old binary Excel) backend
+recommends 'DBM::Deep';   # .dbm/.deep/magic-byte .db backend
+recommends 'File::Slurp::Remote';   # remote host backend (SSH/SCP)
+recommends 'Gzip::Faster';   # gzip CSV backend
+recommends 'HTML::TableExtract';   # HTML URL backend
+recommends 'JSON::MaybeXS';   # JSON backend
+recommends 'LWP::UserAgent::Cached';   # URL backend (HTML and JSON)
+recommends 'Spreadsheet::ParseXLSX';   # .xlsx (OOXML Excel) backend
+recommends 'Text::xSV::Slurp';   # CSV/PSV slurp backend
+recommends 'XML::Simple';   # XML backend
 
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES

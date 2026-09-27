@@ -1,0 +1,95 @@
+{
+   "abstract" : "Find or build the ngtcp2 QUIC transport library",
+   "author" : [
+      "Joshua S. Day <haxmeister@hotmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-ngtcp2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build::MM" : "2.84",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "2.57",
+            "Alien::Build::MM" : "2.84",
+            "Alien::Build::Plugin::Digest::Negotiate" : "0",
+            "Alien::Build::Plugin::PkgConfig::Negotiate" : "1.53",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "2.84",
+            "Alien::Build" : "0.25",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::Alien" : "2.84"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::ngtcp2" : {
+         "file" : "lib/Alien/ngtcp2.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haxmeister/perl-Alien-ngtcp2/issues"
+      },
+      "homepage" : "https://github.com/haxmeister/perl-Alien-ngtcp2",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haxmeister/perl-Alien-ngtcp2.git",
+         "web" : "https://github.com/haxmeister/perl-Alien-ngtcp2"
+      }
+   },
+   "version" : "0.01",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.84",
+      "requires" : {
+         "share" : {
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

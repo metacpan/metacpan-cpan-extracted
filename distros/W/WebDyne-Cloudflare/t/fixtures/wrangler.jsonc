@@ -1,0 +1,11 @@
+{
+  "name": "webdyne-cloudflare-smoke",
+  "compatibility_date": "2026-08-27",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "webdyne-cloudflare-smoke",
+      "database_id": "00000000-0000-0000-0000-000000000001"
+    }
+  ]
+}

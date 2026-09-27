@@ -10,6 +10,22 @@
         dc:description          "Changes for Net::Flickr::API.pm" ;
         dcterms:references      <http://aaronland.info/perl/net/flickr/api/> .
 
+<https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Net-Flickr-API-1.8.tar.gz>
+        dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
+        dcterms:replaces    <http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.7.tar.gz>;
+
+        doap:Version    [
+                        doap:revision     "1.8" ;
+                        doap:created      "2026-09-26" ;
+                        ];
+        asc:changes     [
+                        asc:update        "Pace calls with a token bucket on Time::HiRes, allowing up to 3600 per hour; latency no longer adds to the pause" ;
+                        asc:update        "New flickr.api_calls_per_hour option, capped at 3600" ;
+                        asc:update        "Retry HTTP 429 as well as 503, honoring Retry-After as seconds or a date" ;
+                        asc:bugfix        "Retries are a loop, not recursion, so the retry count is not reset by nested calls" ;
+                        asc:bugfix        "Giving up on retries returns undef instead of passing undef to parse_api_call" ;
+                        ] .
+
 <http://aaronland.info/perl/net/delicious/Net-Flickr-API-1.7.tar.gz>
         dcterms:isVersionOf <http://aaronland.info/perl/flickr/api/> ;
         dcterms:replaces    <http://aaronland.info/perl/net/flickr/api/Net-Flickr-API-1.69.tar.gz>;

@@ -1,0 +1,38 @@
+{
+  "name": "webdyne-hyperdrive-mysql-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "webdyne-cloudflare build",
+    "check": "webdyne-cloudflare check",
+    "dev": "webdyne-cloudflare dev",
+    "db:up": "docker compose up --build --detach --wait --wait-timeout 180",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down --volumes && docker compose up --build --detach --wait --wait-timeout 180",
+    "check:local": "node local.mjs check",
+    "dev:local": "node local.mjs dev"
+  },
+  "dependencies": {
+    "@webdyne/webdyne-zeroperl": "^1.0.14",
+    "@webdyne/webdyne-cloudflare": "^1.7.1"
+  },
+  "webdyne": {
+    "entry": "app.psp",
+    "static": false,
+    "extensions": {
+      "@webdyne/webdyne-cloudflare": {
+        "hyperdriveBindings": [
+          "DB"
+        ]
+      }
+    },
+    "cloudflare": {
+      "hyperdrive": [
+        {
+          "binding": "DB",
+          "id": "00000000000000000000000000000000"
+        }
+      ]
+    }
+  }
+}

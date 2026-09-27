@@ -3,7 +3,7 @@ package Devel::ebug::Backend::Plugin::Ping;
 use strict;
 use warnings;
 
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 sub register_commands {
     return ( ping => { sub => \&ping } );
@@ -17,6 +17,7 @@ sub ping {
   $ENV{SECRET} = "";
   return {
     version => $DB::VERSION,
+    pid     => $$,  # the debuggee itself, which is what interrupt() signals
   }
 }
 
@@ -34,7 +35,7 @@ Devel::ebug::Backend::Plugin::Ping
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 AUTHOR
 

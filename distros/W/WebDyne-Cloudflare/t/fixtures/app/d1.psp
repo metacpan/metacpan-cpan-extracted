@@ -1,0 +1,49 @@
+<start_html title="WebDyne Cloudflare D1" h2>
+
+<perl handler="d1_result">
+<dl>
+  <dt>ID</dt><dd>${id}</dd>
+  <dt>Name</dt><dd>${name}</dd>
+  <dt>Note</dt><dd>${note}</dd>
+  <dt>Payload bytes</dt><dd>${payload_length}</dd>
+</dl>
+</perl>
+
+__PERL__
+
+use WebDyne::Cloudflare::D1;
+
+sub d1_result {
+    my ($self)=@_;
+    my $db_or=WebDyne::Cloudflare::D1->new(
+        scope   => $self->r()->{'scope'},
+        binding => 'DB',
+    );
+    my $cgi_or=$self->CGI();
+    my $action=$cgi_or->param('action') // '';
+    my $id=1;
+    if ($action eq 'insert') {
+        my $name=$cgi_or->param('name') // 'Inserted from WebDyne';
+        my $write_hr=$db_or->prepare(
+            'INSERT INTO webdyne_d1_example (name, note, payload) VALUES (?1, ?2, ?3)'
+        )->bind(
+            $name,
+            undef,
+            WebDyne::Cloudflare::D1->blob("\0WebDyne\xff"),
+        )->run()->get();
+        $id=$write_hr->{'meta'}{'last_row_id'};
+    }
+    elsif ($action eq 'fail') {
+        $db_or->prepare('SELECT * FROM deliberately_missing_table')->run()->get();
+    }
+
+    my $row_hr=$db_or->prepare(
+        'SELECT id, name, note, payload FROM webdyne_d1_example WHERE id = ?1 LIMIT 1'
+    )->bind($id)->first()->get();
+    die "D1 example row $id was not found\n" unless $row_hr;
+    return $self->render(
+        %{$row_hr},
+        note           => defined($row_hr->{'note'}) ? $row_hr->{'note'} : '(NULL)',
+        payload_length => length($row_hr->{'payload'} // ''),
+    );
+}

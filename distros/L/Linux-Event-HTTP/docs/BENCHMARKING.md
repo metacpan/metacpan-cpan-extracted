@@ -199,6 +199,47 @@ framework perform an identical amount of application-layer work. Each adapter
 uses the smallest normal server API that still receives the complete request
 body before producing the same fixed Content-Length response payload.
 
+## Client receive-path harness
+
+The client receive-path harness measures `Client::Connection` separately from
+server execution:
+
+```sh
+perl -Mblib bench/run-http-client-receive.pl
+```
+
+It forks a small raw HTTP responder into a separate process and measures CPU time
+in the Linux::Event::HTTP client process. The default cases cover:
+
+```text
+cl32_drain
+cl16k_drain
+chunked16k_drain
+cl16k_buffer
+cl16k_on_body
+```
+
+This isolates response parsing, Response/Transaction lifecycle, body framing,
+and application delivery from the CPU cost of a full Linux::Event::HTTP server.
+
+The native client response-head experiment used an exact same-run comparison:
+the pre-native tree and candidate tree were built with the same Perl and
+Linux::Event on one runner, then each executed the same 10,000-response,
+100-persistent-connection, three-repeat matrix. That comparison showed
+throughput gains from 10.1% to 22.7% and client CPU reductions from 9.2% to
+18.5% across all five workloads.
+
+For the current native-head design, response heads remain in Linux::Event's
+native ordered-input buffer until picohttpparser has found the message boundary.
+Only the Response metadata is materialized into Perl. Body bytes then enter the
+existing Client::Connection body state machine through the native provider's
+fallback input. This benchmark therefore also reports fallback calls and bytes
+so a later native-body experiment can be evaluated independently.
+
+When comparing an optimization, prefer an exact baseline worktree on the same
+machine and runtime. Do not treat separate hosted-runner medians as
+decision-quality evidence for small differences.
+
 ## Profiling
 
 Normal benchmark runs leave Linux::Event native nanosecond timing disabled so

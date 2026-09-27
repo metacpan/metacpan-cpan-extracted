@@ -1,0 +1,7 @@
+Revision history for Task-Markdown-Publish
+
+0.001  2026-09-27
+
+    - First release.
+    - Install the complete conversion toolchain plus the Markdown publisher
+      and MakeMaker publication integration.

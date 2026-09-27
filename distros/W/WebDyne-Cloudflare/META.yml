@@ -1,0 +1,35 @@
+---
+abstract: 'Cloudflare service capabilities for WebDyne::PAGI'
+author:
+  - 'Andrew Speer <andrew.speer@isolutions.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebDyne-Cloudflare
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  Future: '0.30'
+  Future::AsyncAwait: '0'
+  JSON::PP: '0'
+  MIME::Base64: '0'
+  Scalar::Util: '0'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/aspeer/pm-WebDyne-Cloudflare/issues
+  homepage: https://github.com/aspeer/pm-WebDyne-Cloudflare
+  repository: https://github.com/aspeer/pm-WebDyne-Cloudflare.git
+version: '0.005'
+x_authority: cpan:ASPEER
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

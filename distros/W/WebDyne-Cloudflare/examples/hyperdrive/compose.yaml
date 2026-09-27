@@ -1,0 +1,20 @@
+# Disposable local demo credentials; bind the database to loopback only.
+services:
+  db:
+    build: .
+    ports:
+      - "127.0.0.1:${DB_PORT:-15432}:5432"
+    environment:
+      POSTGRES_DB: webdyne_demo
+      POSTGRES_USER: webdyne
+      POSTGRES_PASSWORD: local-demo-only
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=local-demo-only psql -h 127.0.0.1 -U webdyne -d webdyne_demo -c \"SELECT count(*) FROM demo_inventory\""]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+volumes:
+  database:

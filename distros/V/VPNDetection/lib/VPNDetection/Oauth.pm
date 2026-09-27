@@ -12,7 +12,7 @@ use Scalar::Util ();
 use VPNDetection::Error;
 use VPNDetection::OauthError;
 
-our $VERSION = '3.3.3';
+our $VERSION = '3.4.0';
 
 use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code';
 
@@ -30,6 +30,7 @@ my %METADATA = (
     code_challenge_methods_supported => ['list'],
     token_endpoint_auth_methods_supported => ['list'],
     authorization_response_iss_parameter_supported => ['bool'],
+    client_id_metadata_document_supported => ['bool'],
     service_documentation => ['string'],
 );
 my %DEVICE_AUTHORIZATION = (
@@ -342,8 +343,9 @@ C<authorization_endpoint> and C<token_endpoint>, plus whichever of
 C<device_authorization_endpoint>, C<revocation_endpoint>, C<scopes_supported>,
 C<response_types_supported>, C<grant_types_supported>,
 C<code_challenge_methods_supported>, C<token_endpoint_auth_methods_supported>,
-C<authorization_response_iss_parameter_supported> and C<service_documentation>
-it carries.
+C<authorization_response_iss_parameter_supported>,
+C<client_id_metadata_document_supported> and C<service_documentation> it
+carries.
 
 =head2 device_authorization($client_id, %options)
 

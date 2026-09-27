@@ -170,7 +170,7 @@ There are official InternetData client libraries available for many languages in
 
 InternetData: licensed IP and network intelligence databases covering VPN, proxy, hosting, CDN, relay and Tor address space, published daily as CSV.GZ and MMDB.
 
-[<img src="https://s3.internetdata.io/internetdata-public/brand/mark.svg" alt="InternetData" width="96"/>](https://internetdata.io/)
+[<img src="https://s3.internetdata.io/internetdata-public/brand/mark.svg" alt="InternetData" height="64"/>](https://internetdata.io/)
 
 ## License
 

@@ -5,7 +5,7 @@ use warnings;
 
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub _validated_options ($kind, %option) {
     die 'body stream kind must be request or response'
@@ -62,10 +62,29 @@ sub _assert_writable ($self, $operation) {
 sub write ($self, $bytes) {
     my $operation = $self->{kind} . '_body->write';
     my $transaction = $self->_assert_writable($operation);
-    my $accepted = $transaction->_write_body(
-        $self->{kind}, $bytes, 0, $operation,
-    );
-    $self->{flow_blocked} = 1 if !$accepted;
+
+    # A protocol controller may discover and then relieve flow pressure while
+    # _write_body() is still on the stack. Mark the provisional blocked state
+    # first so a reentrant _drain() cannot be lost. A successful write clears
+    # it; a false return leaves it set only if no drain already cleared it.
+    $self->{flow_blocked} = 1;
+    my ($accepted, $ok, $error);
+    {
+        local $@;
+        $ok = eval {
+            $accepted = $transaction->_write_body(
+                $self->{kind}, $bytes, 0, $operation,
+            );
+            1;
+        };
+        $error = $@;
+    }
+    if (!$ok) {
+        $self->{flow_blocked} = 0;
+        die $error;
+    }
+
+    $self->{flow_blocked} = 0 if $accepted;
     return $accepted;
 }
 
@@ -110,22 +129,47 @@ __END__
 
 =head1 NAME
 
-Linux::Event::HTTP::Body::Stream - writable producer for a streaming HTTP body
+Linux::Event::HTTP::Body::Stream - writable streaming HTTP body producer
 
 =head1 DESCRIPTION
 
-Applications obtain this object from a L<Linux::Event::HTTP::Transaction>, for
-example C<< $tx->request_body(...) >> while producing a client Request or
-C<< $tx->response_body(...) >> while producing a server Response. They do not
-construct it directly.
+Applications obtain a Body::Stream from a Transaction. They do not construct it
+directly.
 
-The producer belongs to the Transaction rather than the Request or Response
-message. C<write> supplies more body bytes and preserves Linux::Event's
-cooperative backpressure return value. False means the bytes were accepted but
-the producer should stop until C<on_drain> runs. C<complete> supplies optional
-final bytes and announces that no more body bytes will be produced.
+Client request body:
 
-C<on_cancel> reports that the HTTP consumer disappeared or the exchange became
-terminal before production completed so an upstream producer can stop work.
+    my $body = $operation->request_body;
+
+Server response body:
+
+    my $body = $conn->transaction->response_body(
+        on_drain  => sub ($body) { ... },
+        on_cancel => sub ($body) { ... },
+    );
+
+Write more bytes with:
+
+    my $can_continue = $body->write($bytes);
+
+A false return means the bytes were accepted, but production should pause until
+C<on_drain> runs.
+
+Finish with:
+
+    $body->complete;
+
+or provide final bytes:
+
+    $body->complete($final_bytes);
+
+C<on_cancel> runs if the exchange ends before production completes.
+
+The same producer API is used by HTTP/1 and HTTP/2. Protocol-specific framing
+and flow control remain below this object.
+
+=head1 SEE ALSO
+
+L<Linux::Event::HTTP::Transaction>, L<Linux::Event::HTTP::Client>,
+L<Linux::Event::HTTP::Server>.
 
 =cut

@@ -16,7 +16,7 @@ eval { require DBI; require DBD::SQLite };
 if ($@) {
 	plan skip_all => 'DBD::SQLite not available';
 } else {
-	plan tests => 20;
+	plan tests => 24;
 }
 
 {
@@ -93,3 +93,23 @@ $setup_sqlite3->disconnect();
 my $db_sqlite3 = Database::porttest->new(directory => $dir_sqlite3, no_entry => 1);
 is($db_sqlite3->count(), 2, '.sqlite3 extension: count() returns 2');
 is($db_sqlite3->{'type'}, 'DBI', '.sqlite3 extension: type is DBI');
+
+# ---------------------------------------------------------------------------
+# updated() returns live mtime for SQLite DSN connections
+# ---------------------------------------------------------------------------
+
+# Trigger _open so the dialect and dsn are stored
+$db->selectall_arrayref();
+
+my $t_before = (stat($file))[9];
+my $t_updated = $db->updated();
+ok(defined($t_updated), 'updated() is defined for SQLite DSN');
+is($t_updated, $t_before, 'updated() returns the file mtime (live stat)');
+
+# Touch the file and verify updated() returns the new mtime.
+# Use utime() rather than writing data to keep the test self-contained.
+sleep(1);	# ensure mtime changes by at least one second
+utime(undef, undef, $file);	# sets atime+mtime to now
+my $t_after = (stat($file))[9];
+is($db->updated(), $t_after, 'updated() reflects new mtime after file is touched');
+ok($t_after >= $t_before, 'new mtime is >= old mtime');

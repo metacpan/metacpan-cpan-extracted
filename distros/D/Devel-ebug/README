@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.65
+    version 0.67
 
 SYNOPSIS
 
@@ -85,12 +85,23 @@ DESCRIPTION
     Internally, Devel::ebug consists of two parts. The frontend is
     Devel::ebug, which you interact with. The frontend starts the code you
     are debugging in the background under the backend (running it under
-    perl -d:ebug code.pl). The backend starts a TCP server, which the
-    frontend then connects to, and uses this to drive the backend. This
-    adds some flexibility in the debugger. There is some minor security in
-    the client/server startup (a secret word), and a random port is used
-    from 3141-4165 so that multiple debugging sessions can happen
+    perl -d:ebug code.pl), and the two talk over a TCP socket on localhost,
+    which the frontend uses to drive the backend. This adds some
+    flexibility in the debugger.
+
+    When "load" starts the program, the frontend listens on a port chosen
+    by the operating system and passes it to the backend in the
+    DEVEL_EBUG_CONNECT environment variable, along with a random secret
+    word in SECRET. The backend connects back to that port and sends the
+    secret before anything else, so the frontend can tell it apart from
+    anything else that connects. Because the port is chosen by the
+    operating system, any number of debugging sessions can run
     concurrently.
+
+    Without DEVEL_EBUG_CONNECT, the backend instead listens on a port from
+    3141-4165 derived from the secret, and waits for a frontend to attach
+    with that secret, as ebug_server and ebug_client do. A frontend with
+    the wrong secret is turned away without ending the session.
 
 CONSTRUCTOR
 
@@ -106,6 +117,51 @@ CONSTRUCTOR
 
       $ebug->program("calc.pl");
 
+    The program is run through the shell, so it may also carry arguments
+    for the program ("add.pl 3 4"), subject to the shell's word splitting
+    and interpolation. To pass arguments that must arrive exactly as given,
+    set "args" instead.
+
+ args
+
+    The args method sets the command-line arguments for the program, as an
+    array reference:
+
+      $ebug->program("add.pl");
+      $ebug->args([ 3, "four and a half" ]);
+
+    When args is set the program is started without going through the
+    shell, so each argument reaches the program's @ARGV unchanged, even if
+    it contains spaces, quotes or other shell metacharacters. In that case
+    "program" is taken as the path of the program alone. The arguments are
+    used again each time the program is restarted, for example by undo.
+
+ serializer
+
+    The serializer method selects how requests and responses are written on
+    the socket between the frontend and the backend:
+
+      $ebug->serializer("json");
+
+    yaml is the default and is what every existing client speaks: YAML
+    output, hex packed onto a single line. json writes one plain JSON
+    object per line instead, which is the format to choose when the other
+    end is not Perl - a JSON line can be read by anything, whereas hex
+    packed YAML asks a client for a YAML parser, object deserialization and
+    a hex decoder first.
+
+    It can also be set with the DEVEL_EBUG_SERIALIZER environment variable,
+    which is how to choose the format for a frontend you do not construct
+    yourself, such as ebug_client.
+
+    The backend replies in whichever format each request arrived in, so
+    nothing has to be arranged with it beforehand. Selecting json uses
+    Cpanel::JSON::XS if it is installed, and otherwise requires JSON::PP,
+    which has shipped with perl since 5.14 but is not otherwise a
+    prerequisite of this distribution.
+
+    See Devel::ebug::Wire for the details of both formats.
+
  load
 
     The load method loads the program and gets ready to debug it:
@@ -113,6 +169,12 @@ CONSTRUCTOR
       $ebug->load;
 
 METHODS
+
+    If the program being debugged goes away without the debugger's help,
+    for example because it was killed, crashed in XS code or called
+    POSIX::_exit, any method that talks to it croaks with an error that
+    begins Devel::ebug: lost the connection to the debugger. For a program
+    started with "load", the error also says how it ended.
 
  break_point
 
@@ -167,6 +229,12 @@ METHODS
 
       my $line = $ebug->break_point_subroutine("main::add");
       $ebug->break_point_subroutine("Calc::fib");
+
+    It takes an optional condition, as "break_point" does, so that the
+    program only stops when the condition is true. At that point the
+    subroutine has just been called, so @_ holds its arguments:
+
+      $ebug->break_point_subroutine("Calc::fib", '$_[1] > 5');
 
     The return value is the line at which the break point is set.
 
@@ -268,6 +336,28 @@ METHODS
 
       print "Finished!\n" if $ebug->finished;
 
+ interrupt
+
+    The interrupt method asks a running program to stop at the next
+    statement, as if a break point were there. It is meant for a program
+    started with "run_nowait", or for calling from a signal handler during
+    "run":
+
+      $ebug->run_nowait;
+      ...
+      $ebug->interrupt;
+      $ebug->wait_for_stop;
+
+    It returns true if the program was signalled, and false without doing
+    anything if the program is not running. Call "wait_for_stop" afterwards
+    to find out where it stopped.
+
+    Interrupting works by sending SIGINT to the program, so it is only
+    supported for a program started with "load" on the same host, and not
+    on Windows; it croaks otherwise. Like pressing Ctrl-C, it takes effect
+    once the program next executes a Perl statement, so a long call into XS
+    code finishes first.
+
  line
 
     The line method returns the line number of the statement about to be
@@ -303,6 +393,12 @@ METHODS
         print "Variable: $k = $v\n";
       }
 
+ pid
+
+    The pid method returns the process id of the program being debugged, as
+    reported by the program itself. This can differ from the process
+    started by "load" when the program is run through the shell.
+
  return
 
     The return subroutine returns from a subroutine. It continues running
@@ -319,9 +415,37 @@ METHODS
  run
 
     The run subroutine starts executing the code. It will only stop on a
-    break point or watch point.
+    break point, a watch point, an "interrupt" or the end of the program.
+    To start running without waiting for it to stop, see "run_nowait".
 
       $ebug->run;
+
+ run_nowait
+
+    The run_nowait method starts executing the code like "run", but returns
+    straight away instead of waiting for the program to stop:
+
+      $ebug->run_nowait;
+
+    While the program is running, the only methods that may be called are
+    "interrupt", "running" and "wait_for_stop"; anything else croaks. The
+    "socket" becomes readable when the program stops, so a frontend with an
+    event loop can wait on it rather than calling "wait_for_stop" right
+    away.
+
+ running
+
+    The running method returns true between "run_nowait" and
+    "wait_for_stop":
+
+      print "still going\n" if $ebug->running;
+
+ socket
+
+    The socket method returns the socket connected to the program being
+    debugged. Do not read from or write to it; it is only useful for
+    waiting, for example with IO::Select, for it to become readable after
+    "run_nowait".
 
  step
 
@@ -371,6 +495,17 @@ METHODS
     It can also undo multiple commands:
 
       $ebug->undo(3);
+
+ wait_for_stop
+
+    The wait_for_stop method waits for a program started with "run_nowait"
+    to stop, at a break point, a watch point, an "interrupt" or the end of
+    the program, and updates "filename", "line" and so on to match:
+
+      $ebug->wait_for_stop;
+      print $ebug->filename, ":", $ebug->line, "\n";
+
+    It returns straight away if the program is not running.
 
  watch_point
 

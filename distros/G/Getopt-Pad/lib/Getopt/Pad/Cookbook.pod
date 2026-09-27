@@ -1,0 +1,905 @@
+=encoding utf8
+
+=head1 NAME
+
+Getopt::Pad::Cookbook - Recipes for common command line tasks with
+Getopt::Pad
+
+=head1 DESCRIPTION
+
+Each recipe solves one task. It shows the part of the spec that matters,
+one or more command lines, and what the readers return. The recipes
+assume a program that starts like this:
+
+=for highlighter language=perl
+
+    use v5.26;
+    use Getopt::Pad;
+
+    my $opt = GetOptions(
+        # the spec from the recipe
+    );
+
+Command lines are shown with the program name C<tool>. The full
+description of every key is in L<Getopt::Pad>; if you are new to
+Getopt::Pad, start with L<Getopt::Pad::Tutorial>.
+
+=head1 SWITCHES AND SIMPLE OPTIONS
+
+=head2 A switch that can be turned off (bool)
+
+Use the C<bool> type. The user turns it on with C<--color> and off with
+C<--no-color>. Give it a default, so that the reader never returns
+C<undef>:
+
+=for highlighter language=perl
+
+    options => {
+        color => { type => 'bool', default => 1, help => 'Colored output' },
+    },
+
+=for highlighter language=plain
+
+    $ tool                  # $opt->color is 1
+    $ tool --no-color       # $opt->color is 0
+
+A plain flag (an option without a C<type>) can only be turned on, and
+reads as C<undef> when it is not given.
+
+=head2 A verbosity level with -v, -vv and -vvv (counter)
+
+Use the C<counter> type with a single-letter alias:
+
+=for highlighter language=perl
+
+    options => {
+        'verbose|v' => { type => 'counter', help => 'More output; repeat for more (-vv)' },
+    },
+
+    # after GetOptions:
+    my $verbosity = $opt->verbose // 0;
+
+=for highlighter language=plain
+
+    $ tool -vvv             # $opt->verbose is 3
+    $ tool -v --verbose     # $opt->verbose is 2
+    $ tool                  # $opt->verbose is undef
+
+=head2 Short and long names for one option (aliases)
+
+List all names in the option key, separated by C<|>. The first name is the
+primary name: it names the reader and is the one the help output shows.
+Single-letter names are written with one dash and can be bundled:
+
+=for highlighter language=perl
+
+    options => {
+        'force|f'  => { help => 'Overwrite existing files (-f)' },
+        'output|o' => { type => 'file', help => 'Write to this file (-o)' },
+    },
+
+=for highlighter language=plain
+
+    $ tool -f -o out.txt        # $opt->force is 1, $opt->output is 'out.txt'
+    $ tool -fo out.txt          # the same
+    $ tool --force --output=out.txt
+
+The help output does not list aliases, so mention them in the C<help>
+text.
+
+=head2 Adding -h as a short form of --help
+
+The automatic C<--help> option has no short form. Declare a hidden flag
+and call the result object's C<help> method yourself:
+
+=for highlighter language=perl
+
+    options => {
+        h => { hidden => 1 },
+    },
+
+    # after GetOptions:
+    $opt->help if $opt->h;
+
+C<< $opt->help >> prints the help text and exits with status 0. It only
+runs when C<GetOptions> returns, that is, when the rest of the command
+line is valid. With a missing required option or a missing command, C<-h>
+reports that problem instead of printing the help, and after a command
+word C<-h> is an unknown option. So this works well for programs without
+commands; in programs with commands, point users to C<--help>.
+
+=head2 A required option (required)
+
+=for highlighter language=perl
+
+    options => {
+        target => { type => 'dir', required => 1, help => 'Where to write' },
+    },
+
+=for highlighter language=plain
+
+    $ tool
+    ERROR: missing required option '--target'
+
+A value from a config file also satisfies C<required>. An option cannot
+be required and have a default at the same time.
+
+=head2 A default taken from an environment variable (default)
+
+C<< default => undef >> means "no default", so an environment variable
+can be used directly:
+
+=for highlighter language=perl
+
+    options => {
+        target => {
+            type    => 'dir',
+            default => $ENV{BACKUP_TARGET},
+            help    => 'Where to write (default: $BACKUP_TARGET)',
+        },
+    },
+
+    # after GetOptions:
+    die "Set --target or BACKUP_TARGET\n" if !defined $opt->target;
+
+When the variable is not set, the option has no default, and the reader
+returns C<undef> if the user does not give C<--target> either. The
+C<die> is the program's own check: C<required> cannot be combined with
+C<default>.
+
+The default is checked when C<GetOptions> builds the spec. With a type
+that checks values (for example C<int>, or C<dir> with C<mustExist>), an
+invalid value in the variable makes C<GetOptions> die with a spec error
+instead of reporting a user error.
+
+C<--create-default-config> writes an option whose default is C<undef>
+with an empty value, which the program rejects when it reads the file;
+remove that line from a generated file.
+
+=head2 Hiding an option from the help (hidden)
+
+C<hidden> keeps an option out of the help output and out of shell
+completion. It works as usual otherwise:
+
+=for highlighter language=perl
+
+    options => {
+        'debug-sql' => { hidden => 1 },
+        verbose     => { help => 'More output' },
+    },
+
+=for highlighter language=plain
+
+    $ tool --debug-sql      # $opt->debugSql is 1
+    $ tool --help           # lists --verbose, but not --debug-sql
+
+=head1 CHECKING VALUES
+
+=head2 Allowing only certain values (valid)
+
+=for highlighter language=perl
+
+    options => {
+        'log-level' => {
+            type    => 'string',
+            default => 'info',
+            valid   => ['debug', 'info', 'warn', 'error'],
+        },
+    },
+
+=for highlighter language=plain
+
+    $ tool --log-level loud
+    ERROR: option '--log-level': 'loud' is not one of: debug, info, warn, error
+
+The help output lists the values, and shell completion offers them.
+
+=head2 Allowed values that are only known at run time (valid coderef)
+
+Give C<valid> a coderef that returns an arrayref. It is called whenever a
+value is checked and whenever the shell asks for completions, so the list
+is always current:
+
+=for highlighter language=perl
+
+    options => {
+        profile => {
+            type  => 'string',
+            valid => sub {
+                opendir(my $dir, "$ENV{HOME}/.tool/profiles") or return [];
+                return [ sort grep { !/\A\./ } readdir $dir ];
+            },
+            help => 'One of the profiles in ~/.tool/profiles',
+        },
+    },
+
+=for highlighter language=plain
+
+    $ ls ~/.tool/profiles
+    home  work
+    $ tool --profile work       # $opt->profile is 'work'
+    $ tool --profile play
+    ERROR: option '--profile': 'play' is not one of: home, work
+
+The help output does not list the values of a coderef. Keep the coderef
+fast: shell completion calls it on every tab press.
+
+=head2 Validating a value with your own code (lazyValid)
+
+When the allowed values cannot be listed, use C<lazyValid>. It is called
+with the value (after the type's conversion) and returns true to accept
+it:
+
+=for highlighter language=perl
+
+    options => {
+        name => {
+            type      => 'string',
+            lazyValid => sub { $_[0] =~ /\A[a-z][a-z0-9-]*\z/ },
+            help      => 'Lowercase letters, digits and dashes',
+        },
+        port => {
+            type      => 'int',
+            lazyValid => sub { $_[0] != 22 },
+            help      => 'Any port except 22',
+        },
+    },
+
+=for highlighter language=plain
+
+    $ tool --name My_Tool
+    ERROR: option '--name': 'My_Tool' is not a valid value
+
+For a more specific error message, write a custom type (see
+L<Getopt::Pad::Type>): its C<check> method returns the message.
+
+=head2 Numbers within bounds (min, max)
+
+C<min> and C<max> are inclusive and work for C<int> and C<float>:
+
+=for highlighter language=perl
+
+    options => {
+        workers => { type => 'int',   min => 1, max => 64, default => 4 },
+        ratio   => { type => 'float', min => 0, max => 1 },
+    },
+
+=for highlighter language=plain
+
+    $ tool --workers 100
+    ERROR: option '--workers': 100 is larger than the maximum of 64
+    $ tool --ratio 0.25     # $opt->ratio is 0.25
+
+=head2 A file that must exist (mustExist)
+
+=for highlighter language=perl
+
+    options => {
+        input => { type => 'file', mustExist => 1, help => 'File to read' },
+    },
+    args => [
+        { short => 'dir', type => 'dir', mustExist => 1 },
+    ],
+
+=for highlighter language=plain
+
+    $ tool --input missing.txt .
+    ERROR: option '--input': file 'missing.txt' does not exist
+
+A C<file> must be a file and a C<dir> a directory; a directory given to
+a C<file> option is reported as not existing. Do not give a C<mustExist>
+option a default path that might be missing on the user's machine: the
+default is checked when C<GetOptions> builds the spec, and a missing
+default path makes C<GetOptions> die.
+
+=head2 A directory that is created when missing (createPathIfMissing)
+
+=for highlighter language=perl
+
+    options => {
+        'cache-dir' => {
+            type                => 'dir',
+            createPathIfMissing => 1,
+            default             => "$ENV{HOME}/.cache/tool",
+        },
+    },
+
+=for highlighter language=plain
+
+    $ tool                          # creates ~/.cache/tool if it is missing
+    $ tool --cache-dir /tmp/x/y     # creates /tmp/x and /tmp/x/y, not the default
+
+The directory and its missing parents are created while the command line
+is processed, after the value passed its checks, and only for the value
+that is finally used. If a later option or arg turns out to be invalid,
+the directory may already exist. For a C<file> option, an empty file and
+its parent directories are created. Nothing is created for C<--help>.
+
+=head1 OPTIONS WITH SEVERAL VALUES
+
+=head2 Repeating an option (multiple)
+
+=for highlighter language=perl
+
+    options => {
+        tag => { type => 'string', multiple => 1 },
+    },
+
+    # after GetOptions:
+    foreach my $tag ($opt->tag->@*) { ... }
+
+=for highlighter language=plain
+
+    $ tool --tag red --tag blue     # $opt->tag is ['red', 'blue']
+    $ tool                          # $opt->tag is []
+
+The reader always returns an arrayref, so no C<undef> check is needed. A
+default is an arrayref too: C<< default => ['red'] >>.
+
+=head2 Comma-separated lists (csv)
+
+Add C<csv> to a C<multiple> option to accept C<a,b,c> as well:
+
+=for highlighter language=perl
+
+    options => {
+        tag => { type => 'string', multiple => 1, csv => 1 },
+    },
+
+=for highlighter language=plain
+
+    $ tool --tag red,blue --tag green     # ['red', 'blue', 'green']
+    $ tool --tag 'red, blue'              # ['red', 'blue']
+    $ tool --tag red,,blue
+    ERROR: option '--tag': 'red,,blue' contains an empty item
+
+=head2 Key/value pairs (hash)
+
+Use C<hash> for options like C<--define NAME=VALUE>. The reader returns a
+hashref:
+
+=for highlighter language=perl
+
+    options => {
+        define => { type => 'string', hash => 1, help => 'Set a variable' },
+        limit  => { type => 'int',    hash => 1, default => { cpu => 1 } },
+    },
+
+    # after GetOptions:
+    my %vars = $opt->define->%*;
+
+=for highlighter language=plain
+
+    $ tool --define os=linux --define arch=x86_64
+    # $opt->define is { os => 'linux', arch => 'x86_64' }
+    # $opt->limit  is { cpu => 1 }  (the default)
+
+    $ tool --limit cpu=2 --limit memory=512
+    # $opt->limit  is { cpu => 2, memory => 512 }
+
+    $ tool --limit cpu=two
+    ERROR: option '--limit': key 'cpu': 'two' is not an integer
+
+The type, C<valid> and C<lazyValid> apply to the values. A value given on
+the command line replaces the whole default (and the whole mapping from a
+config file); the keys are not merged.
+
+=head2 Lists of records (objectlist)
+
+Use C<objectlist> when the user describes several things with several
+fields each, such as servers with a host and a port. Every word has the
+form C<INDEX.FIELD=VALUE>; the reader returns an arrayref of hashrefs:
+
+=for highlighter language=perl
+
+    options => {
+        server => {
+            type       => 'string',
+            objectlist => 1,
+            help       => 'Servers as N.host=... N.port=...',
+        },
+    },
+
+    # after GetOptions:
+    foreach my $server ($opt->server->@*) {
+        printf "%s:%s\n", $server->{host}, $server->{port} // 80;
+    }
+
+=for highlighter language=plain
+
+    $ tool --server 0.host=alpha --server 0.port=8080 --server 1.host=beta
+    # $opt->server is [ { host => 'alpha', port => '8080' }, { host => 'beta' } ]
+
+    $ tool --server 1.host=beta
+    ERROR: option '--server': missing index 0
+
+The indices must be 0, 1, 2 and so on without gaps, in any order. All
+fields share the option's type, C<valid> list and C<lazyValid> check, and
+these see only the value, not the field name. Check fields that need
+rules of their own (for example, that C<port> is a number) in your
+program after C<GetOptions> returns.
+
+=head1 POSITIONAL ARGUMENTS
+
+=head2 Optional arguments
+
+Args without C<required> are optional. They read as C<undef> when they are
+missing. Required args must come first:
+
+=for highlighter language=perl
+
+    args => [
+        { short => 'source', required => 1 },
+        { short => 'target' },
+    ],
+
+=for highlighter language=plain
+
+    $ tool a            # $opt->source is 'a', $opt->target is undef
+    $ tool a b          # $opt->source is 'a', $opt->target is 'b'
+    $ tool a b c
+    ERROR: unexpected extra argument 'c'
+
+=head2 Any number of arguments (multiple arg)
+
+Mark the last arg with C<multiple>. It takes all remaining words, and its
+reader returns an arrayref:
+
+=for highlighter language=perl
+
+    args => [
+        { short => 'action', required => 1 },
+        { short => 'files', type => 'file', multiple => 1, mustExist => 1 },
+    ],
+
+=for highlighter language=plain
+
+    $ tool check a.txt b.txt     # $opt->files is ['a.txt', 'b.txt']
+    $ tool check                 # $opt->files is []
+
+Add C<required> to the last arg to demand at least one word.
+
+=head2 Arguments that start with a dash (negative numbers)
+
+A word that starts with a dash is read as an option. Put C<--> in front of
+such arguments; every word after C<--> is an argument:
+
+=for highlighter language=plain
+
+    $ tool -- -5            # the arg is '-5'
+    $ tool -5
+    ERROR: Unknown option: 5
+
+In a program with commands, put C<--> after the command words
+(C<tool resize -- -5>): the command's level reads options again.
+
+The values of options do not need this: C<--offset -5> works, because an
+option that takes a value always takes the next word.
+
+=head1 COMMANDS
+
+=head2 Dispatching commands to subroutines
+
+Map command names to subroutines and call the one the user chose. Pass
+both result objects, so the handler can read the options of the top level
+and of its command:
+
+=for highlighter language=perl
+
+    my $opt = GetOptions(
+        options  => { 'verbose|v' => { type => 'counter', inherit => 1 } },
+        commands => {
+            add    => { args => [{ short => 'name', required => 1 }] },
+            remove => { args => [{ short => 'name', required => 1 }] },
+            list   => {},
+        },
+    );
+
+    my %handlers = (
+        add    => \&addItem,
+        remove => \&removeItem,
+        list   => \&listItems,
+    );
+    $handlers{ $opt->command }->($opt, $opt->subcommand);
+
+    sub addItem {
+        my ($opt, $add) = @_;
+        printf "Adding %s\n", $add->name;
+    }
+
+Give every command an entry in C<%handlers>: C<< $opt->command >> is
+always one of the declared names (unless the command is optional, see
+below), and a missing entry would call C<undef>.
+
+=head2 Options for all commands (inherit)
+
+Declare the option once, on the level with the commands, with
+C<< inherit => 1 >>. It is then accepted before and after the command
+word, and its value is read from the declaring level:
+
+=for highlighter language=perl
+
+    options  => { 'dry-run|n' => { inherit => 1, help => 'Change nothing' } },
+    commands => { add => { ... }, remove => { ... } },
+
+=for highlighter language=plain
+
+    $ tool -n add foo        # $opt->dryRun is 1
+    $ tool add -n foo        # the same
+
+Read it as C<< $opt->dryRun >>, not from C<< $opt->subcommand >>. A config
+file sets it in the top level's groups.
+
+=head2 A command that is optional (commandRequired)
+
+By default, a level with commands requires one. With
+C<< commandRequired => 0 >>, the command line may stop before the command
+word, and C<command> returns C<undef>:
+
+=for highlighter language=perl
+
+    my $opt = GetOptions(
+        commandRequired => 0,
+        commands        => { status => {}, sync => {} },
+    );
+
+    my $command = $opt->command // 'status';
+
+=for highlighter language=plain
+
+    $ tool          # $opt->command is undef, so $command is 'status'
+    $ tool sync     # $opt->command is 'sync'
+
+Without a command word there is no result object for a command:
+C<< $opt->subcommand >> is C<undef>, so code that runs for the default
+must not read the options of a command.
+
+=head2 Nested commands
+
+A command spec can have C<commands> of its own:
+
+=for highlighter language=perl
+
+    commands => {
+        remote => {
+            description => 'Manage remotes',
+            commands    => {
+                add => {
+                    args => [
+                        { short => 'name', required => 1 },
+                        { short => 'url', type => 'url', required => 1 },
+                    ],
+                },
+                remove => { args => [{ short => 'name', required => 1 }] },
+            },
+        },
+    },
+
+=for highlighter language=plain
+
+    $ tool remote add origin https://example.com/repo.git
+
+=for highlighter language=perl
+
+    $opt->command;                          # 'remote'
+    $opt->subcommand->command;              # 'add'
+    $opt->subcommand->subcommand->url;      # 'https://example.com/repo.git'
+
+To dispatch on the full command path, collect the names first:
+
+=for highlighter language=perl
+
+    my @path;
+    for (my $level = $opt; defined $level->command; $level = $level->subcommand) {
+        push @path, $level->command;
+    }
+    my $handler = join ' ', @path;          # 'remote add'
+
+=head1 HELP AND VERSION
+
+=head2 Grouping options in the help (group)
+
+Options with the same C<group> are listed under one heading. The groups
+are sorted alphabetically; options without a group are listed under
+C<Options>:
+
+=for highlighter language=perl
+
+    options => {
+        host => { type => 'string', group => 'Connection' },
+        port => { type => 'int',    group => 'Connection' },
+        quiet => {},
+    },
+
+=for highlighter language=plain
+
+    ## Connection
+       --host <>
+       --port <>
+
+    ## Options
+       --quiet
+
+The group is also the section name in config files.
+
+=head2 Usage examples in the help (examples)
+
+=for highlighter language=perl
+
+    description => 'Resize images.',
+    examples    => [
+        { text => 'Make all images at most 800 pixels wide', args => '--width 800 *.jpg' },
+    ],
+
+=for highlighter language=plain
+
+    # Examples:
+    ## Make all images at most 800 pixels wide
+    ##   tool --width 800 *.jpg
+
+=head2 A custom label in the help (typehint)
+
+C<typehint> replaces the type label at the end of an entry:
+
+=for highlighter language=perl
+
+    options => {
+        host => { type => 'string', typehint => 'Hostname', help => 'Server to connect to' },
+    },
+
+=for highlighter language=plain
+
+       --host <>                   Server to connect to [Hostname]
+
+=head2 Printing the program version (--version)
+
+C<--version> prints the program name and the spec's C<version> key or,
+without it, C<$main::VERSION>:
+
+=for highlighter language=perl
+
+    our $VERSION = '1.4.2';
+    my $opt = GetOptions(...);
+
+=for highlighter language=plain
+
+    $ tool --version
+    tool 1.4.2
+
+=head2 Printing the help from your program
+
+The result object's C<help> method prints the help of its level and exits
+with status 0. For example, to show the help when a program is called
+without any work to do:
+
+=for highlighter language=perl
+
+    $opt->help if !$opt->files->@*;
+
+To print the help of a command, call C<help> on that command's result
+object: C<< $opt->subcommand->help >>.
+
+=head1 CONFIG FILES
+
+=head2 A config file in the user's home directory (config)
+
+=for highlighter language=perl
+
+    config => {
+        format => 'yaml',
+        paths  => ['~/.config/tool.yaml'],
+    },
+
+If the file exists, it is read on every run. The top-level keys of the
+file are the group names, and each group maps option names to values:
+
+=for highlighter language=yaml
+
+    Options:
+      log-level: debug
+    Connection:
+      host: db.example.com
+      port: 5432
+
+The user can create a file with all defaults with
+C<tool --create-default-config ~/.config/tool.yaml>.
+
+=head2 A system-wide and a user config file
+
+List both in C<paths>. Every existing file is read, in order, and a later
+file overrides an earlier one option by option:
+
+=for highlighter language=perl
+
+    config => {
+        format => 'yaml',
+        paths  => ['/etc/tool.yaml', '~/.config/tool.yaml', '.tool.yaml'],
+    },
+
+With F</etc/tool.yaml> setting C<host> and C<port>, and
+F<~/.config/tool.yaml> setting only C<port>, the program uses C<host> from
+the first file and C<port> from the second. The value of a list or hash
+option is replaced as a whole, not merged.
+
+=head2 Config files only on request (autoload, defaultPath)
+
+With C<< autoload => 0 >>, no file is read unless the user passes
+C<--config>. A bare C<--config> reads C<defaultPath>:
+
+=for highlighter language=perl
+
+    config => {
+        format      => 'json',
+        autoload    => 0,
+        defaultPath => '~/.tool.json',
+    },
+
+=for highlighter language=plain
+
+    $ tool                        # no config file
+    $ tool --config               # reads ~/.tool.json
+    $ tool --config other.json    # reads other.json
+
+A bare C<--config> takes the next word as its path unless that word
+starts with a dash. Write C<--config=> before an argument:
+C<tool --config= input.txt>.
+
+=head2 Settings for commands in a config file
+
+The C<commands> key of a level holds one section per command, with the
+same layout as the file itself:
+
+=for highlighter language=yaml
+
+    Options:
+      verbose: 1
+    commands:
+      image:
+        commands:
+          resize:
+            Options:
+              width: 800
+
+Each section only sets the options of its own command. Inherited options
+are set in the section of the level that declares them.
+
+=head2 JSON instead of YAML
+
+Set C<< format => 'json' >>. JSON needs no extra module:
+
+=for highlighter language=javascript
+
+    {
+      "Options": { "log-level": "debug" },
+      "commands": { "resize": { "Options": { "width": 800 } } }
+    }
+
+=head1 TESTING AND SPECIAL CASES
+
+=head2 Testing a command line
+
+For command lines that should succeed, pass the words with the C<argv>
+key instead of setting C<@ARGV>. Keep the spec in a function that the
+program and the tests share:
+
+=for highlighter language=perl
+
+    # lib/My/Tool.pm
+    package My::Tool;
+    use Getopt::Pad;
+
+    sub parseCommandLine {
+        my (@words) = @_;
+        return GetOptions(
+            argv    => \@words,
+            options => { keep => { type => 'int', default => 7, min => 1 } },
+            args    => [{ short => 'source', required => 1 }],
+        );
+    }
+
+    1;
+
+    # bin/tool
+    use FindBin;
+    use lib "$FindBin::Bin/../lib";
+    use My::Tool;
+    my $opt = My::Tool::parseCommandLine(@ARGV);
+
+    # t/cli.t
+    use Test2::V0;
+    use My::Tool;
+
+    my $opt = My::Tool::parseCommandLine('--keep', '3', 'photos');
+    is($opt->keep, 3, 'keep');
+    is($opt->source, 'photos', 'source');
+
+    done_testing;
+
+Run the tests with C<prove -l t>, so that F<lib> is in C<@INC>.
+
+A command line that fails makes C<GetOptions> exit the process, and so
+do C<--help>, C<--version> and the other automatic options. Test those by
+running the program as a separate process and checking its exit status
+and output. This helper collects STDOUT and STDERR together:
+
+=for highlighter language=perl
+
+    use IPC::Open3 qw(open3);
+
+    sub runTool {
+        my (@args) = @_;
+        my $pid = open3(my $stdin, my $output, undef, $^X, 'bin/tool', @args);
+        close $stdin;
+        my $text = do { local $/; <$output> } // '';
+        waitpid($pid, 0);
+        return ($? >> 8, $text);
+    }
+
+    my ($status, $output) = runTool('--keep', '0', 'photos');
+    is($status, 2, 'exit status 2');
+    like($output, qr/0 is smaller than the minimum of 1/, 'error message');
+
+    ($status, $output) = runTool('--help');
+    is($status, 0, '--help exits with status 0');
+
+Put the helper and these tests into F<t/cli.t>, before C<done_testing>.
+The path F<bin/tool> is relative to the distribution directory, where
+C<prove> runs.
+
+Passing C<undef> as the third argument of C<open3> sends STDERR into the
+same pipe as STDOUT, so the helper cannot block on a full pipe. Set
+C<COLUMNS> in the environment if a test compares help output, so the
+wrapping does not depend on the terminal.
+
+=head2 Parsing words that do not come from @ARGV
+
+C<argv> accepts any list of words, for example options from an
+environment variable in front of the real command line. C<split> only
+splits at whitespace; quotes in the variable are not interpreted the way
+a shell would:
+
+=for highlighter language=perl
+
+    my $opt = GetOptions(
+        argv    => [ split(' ', $ENV{TOOL_OPTIONS} // ''), @ARGV ],
+        options => { ... },
+    );
+
+=head2 Non-ASCII values
+
+Words from the command line are byte strings; values from config files
+are decoded character strings. If your program works with non-ASCII
+values, decode C<@ARGV> before calling C<GetOptions>:
+
+=for highlighter language=perl
+
+    use Encode qw(decode);
+    @ARGV = map { decode('UTF-8', $_) } @ARGV;
+
+    my $opt = GetOptions(...);
+
+=head2 Types and config formats of your own
+
+A custom type gives an option its own check, conversion, help label and
+error messages. See L<Getopt::Pad::Type> for a type that accepts only even
+numbers and one that converts durations like C<5m> to seconds.
+
+A custom config format reads files that are neither YAML nor JSON. See
+L<Getopt::Pad::Config::Format> for a TOML format.
+
+=head1 SEE ALSO
+
+L<Getopt::Pad>, L<Getopt::Pad::Tutorial>
+
+=head1 AUTHOR
+
+davenonymous E<lt>perl@davenonymous.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 davenonymous
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

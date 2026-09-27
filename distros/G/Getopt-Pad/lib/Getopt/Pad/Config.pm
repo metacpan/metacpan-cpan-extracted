@@ -8,7 +8,7 @@ class Getopt::Pad::Config :strict(params) {
 	use Feature::Compat::Try;
 	use Getopt::Pad::Util qw(expandTilde);
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	field $format      :param;
 	field $formatName  :param;
@@ -16,28 +16,36 @@ class Getopt::Pad::Config :strict(params) {
 	field $defaultPath :param;
 	field $autoload    :param;
 
+	# The key of a Level's section that holds its command sections.
+	use constant COMMANDS_KEY => 'commands';
+
 	# Config files are UTF-8 on disk. The layer is applied here, on every
 	# read and write, so a Format only ever sees text.
 	my $fileLayer = ':encoding(UTF-8)';
 
-	method explicitValues($level, $rawPath) {
+	# Every load returns the option values each Level of the Spec gets from
+	# config files, keyed by Level path (the root's is ''): a mapping of
+	# Primary names to raw values per Level.
+	method explicitValues($root, $rawPath) {
 		my $path = length $rawPath ? $rawPath : $defaultPath;
 		Getopt::Pad::Error->throw("--config without a path, and the spec sets no defaultPath") if !defined $path || !length $path;
-		return $self->loadFile($level, $path, 1);
+		return $self->loadFile($root, $path, 1);
 	}
 
-	method autoloadValues($level) {
+	# Later files override earlier ones option by option, on every Level.
+	method autoloadValues($root) {
 		return {} if !$autoload;
 
 		my %merged;
 		foreach my $path ($paths->@*) {
 			next if !-e expandTilde($path);
-			%merged = (%merged, $self->loadFile($level, $path, 0)->%*);
+			my $loaded = $self->loadFile($root, $path, 0);
+			$merged{$_} = { ($merged{$_} // {})->%*, $loaded->{$_}->%* } foreach keys $loaded->%*;
 		}
 		return \%merged;
 	}
 
-	method loadFile($level, $path, $isExplicit) {
+	method loadFile($root, $path, $isExplicit) {
 		my $expanded = expandTilde($path);
 		Getopt::Pad::Error->throw("config file '%s' does not exist", $path) if $isExplicit && !-e $expanded;
 
@@ -54,7 +62,7 @@ class Getopt::Pad::Config :strict(params) {
 		}
 
 		Getopt::Pad::Error->throw("config file '%s' must contain a mapping of group names", $path) if ref $data ne 'HASH';
-		return $self->flattenData($level, $path, $data);
+		return $self->levelValues($root, $path, $data);
 	}
 
 	method readText($path, $expanded) {
@@ -82,38 +90,72 @@ class Getopt::Pad::Config :strict(params) {
 		return;
 	}
 
-	# Config files are structured by group: each top-level key is a group name
-	# holding a mapping of option names. Flatten that to option => value,
-	# validating group membership on the way.
-	method flattenData($level, $path, $data) {
-		my %flat;
-		foreach my $group (sort keys $data->%*) {
-			my $entries = $data->{$group};
-			Getopt::Pad::Error->throw("config file '%s': group '%s' must contain a mapping of option names", $path, $group) if ref $entries ne 'HASH';
-
-			foreach my $name (sort keys $entries->%*) {
-				my $option = $level->optionByName($name);
-				if (!defined $option || $option->auto) {
-					my $hint = $level->hasCommands ? ' (config files set top-level options only)' : '';
-					Getopt::Pad::Error->throw("config file '%s': unknown option '%s' in group '%s'%s", $path, $name, $group, $hint);
-				}
-				Getopt::Pad::Error->throw("config file '%s': option '%s' belongs to group '%s', not '%s'", $path, $name, $option->group, $group) if $option->group ne $group;
-				$flat{$name} = $entries->{$name};
-			}
-		}
-		return \%flat;
+	# A config file mirrors the Level tree. Each key of a Level's section is
+	# a group name holding a mapping of option names, except the
+	# COMMANDS_KEY of a Level with commands: it holds one section per
+	# command name. Every section is validated, whether this run selects
+	# its Level or not; the values are checked by the Levels that are.
+	method levelValues($level, $path, $section) {
+		my %groups         = $section->%*;
+		my $hasCommandsKey = $level->hasCommands && exists $groups{+COMMANDS_KEY};
+		my %valuesBelow    = $hasCommandsKey ? $self->commandValues($level, $path, delete $groups{+COMMANDS_KEY})->%* : ();
+		my %values         = map { $self->groupValues($level, $path, $_, $groups{$_})->%* } sort keys %groups;
+		return { %valuesBelow, $level->path => \%values };
 	}
 
-	method writeDefaultFile($level, $target) {
+	method commandValues($level, $path, $sections) {
+		Getopt::Pad::Error->throw("config file '%s': '%s'%s must contain a mapping of command names", $path, COMMANDS_KEY, $self->ofCommand($level)) if ref $sections ne 'HASH';
+
+		my %valuesBelow;
+		foreach my $name (sort keys $sections->%*) {
+			my $command = $level->command($name);
+			if (!defined $command) {
+				my $wordPath = $level->isRoot ? $name : $level->path . ' ' . $name;
+				Getopt::Pad::Error->throw("config file '%s': unknown command '%s', expected one of: %s", $path, $wordPath, join(', ', $level->commandNames));
+			}
+
+			my $section = $sections->{$name};
+			Getopt::Pad::Error->throw("config file '%s': command '%s' must contain a mapping of group names", $path, $command->path) if ref $section ne 'HASH';
+			%valuesBelow = (%valuesBelow, $self->levelValues($command, $path, $section)->%*);
+		}
+		return \%valuesBelow;
+	}
+
+	method groupValues($level, $path, $group, $entries) {
+		my $ofCommand = $self->ofCommand($level);
+		Getopt::Pad::Error->throw("config file '%s': group '%s'%s must contain a mapping of option names", $path, $group, $ofCommand) if ref $entries ne 'HASH';
+
+		foreach my $name (sort keys $entries->%*) {
+			my $option = $level->optionByName($name);
+			Getopt::Pad::Error->throw("config file '%s': unknown option '%s' in group '%s'%s", $path, $name, $group, $ofCommand) if !defined $option || $option->auto;
+			Getopt::Pad::Error->throw("config file '%s': option '%s'%s belongs to group '%s', not '%s'", $path, $name, $ofCommand, $option->group, $group) if $option->group ne $group;
+		}
+		return { $entries->%* };
+	}
+
+	method ofCommand($level) {
+		return $level->isRoot ? '' : sprintf(" of command '%s'", $level->path);
+	}
+
+	method writeDefaultFile($root, $target) {
 		Getopt::Pad::Error->throw("config format '%s' cannot write config files", $formatName) if !$format->can('dump');
 
-		my %defaults;
-		$defaults{$_->group}{$_->name} = $_->default foreach grep { $_->hasDefault } $level->declaredOptions;
-
 		# Serialize first, so a failing dump leaves no empty file behind.
-		my $text = $format->dump(\%defaults);
+		my $text = $format->dump($self->defaultSection($root));
 		$self->createFile($target, expandTilde($target), $text);
 		return $target;
+	}
+
+	# The defaults of $level and every Level below it, in the config file
+	# structure. Groups and command sections without defaults are left out.
+	method defaultSection($level) {
+		my %section;
+		$section{$_->group}{$_->name} = $_->default foreach grep { $_->hasDefault } $level->declaredOptions;
+		foreach my $name ($level->commandNames) {
+			my $commandSection = $self->defaultSection($level->command($name));
+			$section{+COMMANDS_KEY}{$name} = $commandSection if %$commandSection;
+		}
+		return \%section;
 	}
 }
 
@@ -125,13 +167,61 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Config - grouped config file reader and writer
+Getopt::Pad::Config - Reads and writes config files (internal)
 
 =head1 DESCRIPTION
 
-The one owner of the grouped config file structure (group, then option name, then value): loads a file named by an explicit --config (falling back to the defaultPath), merges the autoload chain (later paths override earlier ones), validates group membership while flattening to option/value pairs, and writes the default config file for --create-default-config. It also owns the files themselves: every config file is read and written here as UTF-8, and the Format only translates between that text and the data structure. The default config file is created exclusively (O_EXCL), so an existing file or a symlink at the target is refused without a check-then-create gap (a symlink is also refused explicitly, since Windows follows a dangling one even with O_EXCL), and written with LF line endings on every platform. A parse error is reported without the Perl source location the parser appended. Handed out by the config block via its io reader.
+This module is internal to Getopt::Pad. It is not part of the public
+API and can change without notice. Programs use L<Getopt::Pad/GetOptions>;
+this page is for people working on Getopt::Pad itself.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+The only module that knows the layout of config files (described for
+users in L<Getopt::Pad/File layout>): a section per level, holding its
+groups (group, then option name, then value), and on a level with
+commands a C<commands> key holding one such section per command, as deep
+as the commands are nested.
+
+It is created by L<Getopt::Pad::Spec::Config> and handed out through its
+C<io> reader.
+
+=head2 Loading
+
+C<explicitValues($root, $path)> loads the file given with C<--config>
+(or C<defaultPath> for a bare C<--config>). C<autoloadValues($root)>
+loads every existing file in C<paths>, a later file overriding an earlier
+one option by option on every level. Both return the raw option values
+per level, keyed by command path (the top level's is the empty string),
+each a hashref of primary names to values.
+
+Every section of every loaded file is checked, whether the command line
+selects its level or not: unknown commands, unknown options, options
+under the wrong group and sections that are not mappings are thrown as
+L<Getopt::Pad::Error> naming the file and the command. The values
+themselves are checked later, by the option specs of the selected levels.
+
+A format's parse error is reported without the Perl source location the
+parser appended to it.
+
+=head2 Writing
+
+C<writeDefaultFile($root, $path)> writes the defaults of every level in
+the same layout, leaving out groups and command sections without
+defaults. The text is produced before the file is created, so a failing
+C<dump> leaves no file behind. The file is created exclusively
+(C<O_EXCL>): an existing file or a symbolic link at the target is refused
+without a gap between check and creation. Symbolic links are also refused
+explicitly, because Windows follows a dangling one even with C<O_EXCL>.
+The file is written with LF line endings on every platform.
+
+=head2 Encoding
+
+Every config file is read and written as UTF-8 here. A format
+(L<Getopt::Pad::Config::Format>) only translates between that text and
+the data structure.
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Spec::Config>, L<Getopt::Pad::Config::Format>
 
 =head1 AUTHOR
 

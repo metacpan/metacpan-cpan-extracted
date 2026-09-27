@@ -1,0 +1,86 @@
+use strict;
+use warnings;
+use Future::AsyncAwait;
+use JSON::PP ();
+use WebDyne::Cloudflare::Hyperdrive;
+
+async sub {
+    my ($scope_hr, $receive_cr, $send_cr)=@_;
+    return if $scope_hr->{'type'} eq 'lifespan';
+    die "missing fixture run token\n" unless $scope_hr->{'query_string'}=~/\Atoken=([a-f0-9-]{36})\z/;
+    my $token=$1;
+    my $db_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $scope_hr);
+    my $unicode="O'Brien \x{65e5}\x{672c}\x{1f377}";
+    my $row_hr=await $db_or->selectrow_hashref(
+        'SELECT $1::text AS label, $2::bigint AS big, $3::numeric AS amount, $4::bytea AS bytes, $5::text AS empty, $6::boolean AS enabled',
+        undef, $unicode, '9007199254740993', '12345678901234567890.1234567890', $db_or->blob("\0\xff\x80"), undef, JSON::PP::false());
+    die "bound type roundtrip failed\n" unless ($row_hr->{'label'} eq $unicode)
+        &&($row_hr->{'big'} eq '9007199254740993')&&($row_hr->{'amount'} eq '12345678901234567890.1234567890')
+        &&(unpack('H*', $row_hr->{'bytes'}) eq '00ff80')&&!defined($row_hr->{'empty'})
+        &&JSON::PP::is_bool($row_hr->{'enabled'})&&!$row_hr->{'enabled'};
+    my $samples_ar=await $db_or->selectall_arrayref('SELECT * FROM webdyne_hyperdrive_test.samples ORDER BY id', { Slice => {} });
+    die "fixture types failed\n" unless (@{$samples_ar}==5)&&($samples_ar->[1]{'large_integer'} eq '9007199254740993')
+        &&(unpack('H*', $samples_ar->[1]{'payload'}) eq '00ff00414243')
+        &&!defined($samples_ar->[2]{'document'})&&($samples_ar->[4]{'document'} eq 'null')
+        &&($samples_ar->[1]{'local_time'} eq '2024-02-29 23:59:59.999999');
+    my $statement_or=$db_or->prepare('SELECT $1::text AS repeated, $2::text AS repeated');
+    $statement_or->bind_param(1, 'first'); $statement_or->bind_param(2, 'second');
+    await $statement_or->execute();
+    die "duplicate columns failed\n" unless @{$statement_or->columns()}==2&&$statement_or->fetchrow_hashref()->{'repeated'} eq 'second';
+    die "fetch exhaustion failed\n" if defined($statement_or->fetchrow_arrayref());
+    await $statement_or->execute('new', 'last'); $statement_or->finish(); await $statement_or->execute();
+    die "statement reuse failed\n" unless $statement_or->fetchrow_arrayref()->[1] eq 'last';
+    die "empty row failed\n" if defined(await $db_or->selectrow_arrayref('SELECT 1 WHERE false', undef));
+
+    #  Only run-token rows in the dedicated probe table are writable by this test.
+    #
+    await $db_or->begin_work();
+    die "create failed\n" unless (await $db_or->do('INSERT INTO webdyne_hyperdrive_test.transaction_probe VALUES ($1, 0, $2)', undef, $token, $unicode))==1;
+    die "update failed\n" unless (await $db_or->do('UPDATE webdyne_hyperdrive_test.transaction_probe SET value=$2 WHERE run_token=$1 AND slot=0', undef, $token, 'updated'))==1;
+    my $inside_ar=await $db_or->selectrow_arrayref('SELECT value FROM webdyne_hyperdrive_test.transaction_probe WHERE run_token=$1 AND slot=0', undef, $token);
+    die "read after update failed\n" unless $inside_ar->[0] eq 'updated';
+    die "delete failed\n" unless (await $db_or->do('DELETE FROM webdyne_hyperdrive_test.transaction_probe WHERE run_token=$1 AND slot=0', undef, $token))==1;
+    die "zero row convention failed\n" unless (await $db_or->do('DELETE FROM webdyne_hyperdrive_test.transaction_probe WHERE run_token=$1 AND slot=0', undef, $token)) eq '0E0';
+    await $db_or->commit();
+    await $db_or->begin_work();
+    await $db_or->do('INSERT INTO webdyne_hyperdrive_test.transaction_probe VALUES ($1, 4, $2)', undef, $token, 'explicit rollback');
+    await $db_or->rollback();
+    my ($expired_or, $expired_statement_or);
+    my $value=await $db_or->transaction(async sub {
+        my ($tx_or)=@_; $expired_or=$tx_or;
+        await $tx_or->do('INSERT INTO webdyne_hyperdrive_test.transaction_probe VALUES ($1, 1, $2)', undef, $token, 'committed');
+        my $ok_fg=eval { await $db_or->selectrow_arrayref('SELECT 1', undef); 1 };
+        die "parent unexpectedly joined callback\n" if $ok_fg;
+        $expired_statement_or=$tx_or->prepare('SELECT 1'); await $expired_statement_or->execute();
+        return 'returned';
+    });
+    die "callback result failed\n" unless $value eq 'returned';
+    die "callback handle did not expire\n" if eval { $expired_or->prepare('SELECT 1'); 1 };
+    die "callback statement did not expire\n" if eval { $expired_statement_or->fetchrow_arrayref(); 1 };
+    my $ok_fg=eval {
+        await $db_or->transaction(async sub {
+            my ($tx_or)=@_;
+            await $tx_or->do('INSERT INTO webdyne_hyperdrive_test.transaction_probe VALUES ($1, 2, $2)', undef, $token, 'rolled back');
+            die "intentional callback failure\n";
+        }); 1;
+    };
+    die "callback failure not preserved\n" if $ok_fg||($@!~/intentional callback failure/);
+    $ok_fg=eval {
+        await $db_or->transaction(async sub {
+            my ($tx_or)=@_;
+            await $tx_or->do('INSERT INTO webdyne_hyperdrive_test.transaction_probe VALUES ($1, 1, $2)', undef, $token, 'duplicate');
+        }); 1;
+    };
+    die "SQLSTATE lost\n" if $ok_fg||!ref($@)||($@->code() ne '23505');
+    my $other_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $scope_hr);
+    my $other_statement_or=$other_or->prepare('SELECT value FROM webdyne_hyperdrive_test.transaction_probe WHERE run_token=$1 AND slot=1');
+    await $other_statement_or->execute($token);
+    die "independent committed read failed\n" unless $other_statement_or->fetchrow_arrayref()->[0] eq 'committed';
+    await $other_or->disconnect(); await $other_or->disconnect();
+    die "disconnect did not invalidate statement\n" if eval { $other_statement_or->execute($token); 1 };
+    await $db_or->begin_work();
+    await $db_or->do('INSERT INTO webdyne_hyperdrive_test.transaction_probe VALUES ($1, 3, $2)', undef, $token, 'teardown rollback');
+    my $body=JSON::PP->new()->encode({ typed => 1, fixture => 1, statement => 1, crud => 1, transactions => 1, disconnect => 1 });
+    await $send_cr->({type => 'http.response.start', status => 200, headers => [['content-type', 'application/json']]});
+    await $send_cr->({type => 'http.response.body', body => $body});
+};

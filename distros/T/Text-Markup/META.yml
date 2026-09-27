@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4209'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,51 +18,51 @@ name: Text-Markup
 provides:
   Text::Markup:
     file: lib/Text/Markup.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Asciidoc:
     file: lib/Text/Markup/Asciidoc.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Asciidoctor:
     file: lib/Text/Markup/Asciidoctor.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Bbcode:
     file: lib/Text/Markup/Bbcode.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Cmd:
     file: lib/Text/Markup/Cmd.pm
   Text::Markup::CommonMark:
     file: lib/Text/Markup/CommonMark.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Creole:
     file: lib/Text/Markup/Creole.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::HTML:
     file: lib/Text/Markup/HTML.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Markdown:
     file: lib/Text/Markup/Markdown.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Mediawiki:
     file: lib/Text/Markup/Mediawiki.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Multimarkdown:
     file: lib/Text/Markup/Multimarkdown.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::None:
     file: lib/Text/Markup/None.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Pod:
     file: lib/Text/Markup/Pod.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Rest:
     file: lib/Text/Markup/Rest.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Textile:
     file: lib/Text/Markup/Textile.pm
-    version: '0.41'
+    version: '0.42'
   Text::Markup::Trac:
     file: lib/Text/Markup/Trac.pm
-    version: '0.41'
+    version: '0.42'
 recommends:
   CommonMark: '0.290000'
 requires:
@@ -71,7 +71,7 @@ requires:
   HTML::Tagset: '0'
   IPC::Open3: '0'
   Parse::BBCode: '0.15'
-  Pod::Simple::XHTML: '3.15'
+  Pod::Simple::XHTML: '3.16'
   Symbol: '0'
   Text::Markdown::Discount: '0.13'
   Text::MediawikiFormat: '1.0'
@@ -83,5 +83,5 @@ requires:
 resources:
   homepage: https://metacpan.org/pod/Text::Markup
   license: http://dev.perl.org/licenses/
-version: '0.41'
+version: '0.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

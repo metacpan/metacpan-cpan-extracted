@@ -1,0 +1,187 @@
+name: WebDyne Cloudflare release
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: Create the immutable GitHub tag and Release after validation
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: webdyne-cloudflare-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Qualify npm release
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    outputs:
+      artifact_name: ${{ steps.metadata.outputs.artifact_name }}
+      package_version: ${{ steps.metadata.outputs.package_version }}
+      release_tag: ${{ steps.metadata.outputs.release_tag }}
+      tarball_name: ${{ steps.metadata.outputs.tarball_name }}
+      manifest_name: ${{ steps.metadata.outputs.manifest_name }}
+    steps:
+      - name: Check out the pinned source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - name: Configure Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Resolve immutable release metadata
+        id: metadata
+        run: |
+          set -euo pipefail
+          readarray -t package_fields < <(
+            node --input-type=module <<'NODE'
+          import packageJson from "./package.json" with { type: "json" };
+          console.log(packageJson.name);
+          console.log(packageJson.version);
+          NODE
+          )
+          if [ "${package_fields[0]}" != "@webdyne/webdyne-cloudflare" ] || \
+             ! [[ "${package_fields[1]}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid npm release identity" >&2
+            exit 1
+          fi
+          package_version="${package_fields[1]}"
+          release_tag="v${package_version}"
+          tarball_name="webdyne-webdyne-cloudflare-${package_version}.tgz"
+          artifact_name="webdyne-cloudflare-${package_version}-release"
+          manifest_name="webdyne-cloudflare-${package_version}-manifest.json"
+          {
+            echo "package_version=$package_version"
+            echo "release_tag=$release_tag"
+            echo "tarball_name=$tarball_name"
+            echo "artifact_name=$artifact_name"
+            echo "manifest_name=$manifest_name"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "PACKAGE_VERSION=$package_version"
+            echo "RELEASE_TAG=$release_tag"
+            echo "TARBALL_NAME=$tarball_name"
+            echo "ARTIFACT_NAME=$artifact_name"
+            echo "MANIFEST_NAME=$manifest_name"
+          } >> "$GITHUB_ENV"
+
+      - name: Install locked development dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Test Perl and JavaScript contracts
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes libfuture-perl libfuture-asyncawait-perl
+          perl Makefile.PL
+          make test
+          make distcheck
+
+      - name: Audit and inspect the production package
+        run: |
+          set -euo pipefail
+          npm audit --omit=dev
+          npm run pack:check
+
+      - name: Pack and verify the npm release
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          npm pack --ignore-scripts --pack-destination dist --json > dist/pack.json
+          test -f "dist/$TARBALL_NAME"
+          npm publish "./dist/$TARBALL_NAME" --access public --dry-run --ignore-scripts
+          git diff --exit-code
+          git diff --cached --exit-code
+          if [ -n "$(git status --porcelain --untracked-files=all)" ]; then
+            echo "Release qualification left unexpected source-tree files" >&2
+            git status --short --untracked-files=all >&2
+            exit 1
+          fi
+          node tools/create-release-manifest.mjs \
+            --tarball "dist/$TARBALL_NAME" \
+            --destination "dist/$MANIFEST_NAME" \
+            --revision "$GITHUB_SHA" \
+            --dirty false
+          (
+            cd dist
+            shasum -a 256 "$TARBALL_NAME" > "${TARBALL_NAME}.sha256"
+            shasum -a 256 -c "${TARBALL_NAME}.sha256"
+          )
+
+      - name: Attest the npm release archive
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            dist/${{ steps.metadata.outputs.tarball_name }}
+            dist/${{ steps.metadata.outputs.manifest_name }}
+
+      - name: Upload qualified release bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ${{ steps.metadata.outputs.artifact_name }}
+          path: |
+            dist/${{ steps.metadata.outputs.tarball_name }}
+            dist/${{ steps.metadata.outputs.tarball_name }}.sha256
+            dist/${{ steps.metadata.outputs.manifest_name }}
+            dist/pack.json
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    name: Publish GitHub Release
+    needs: build
+    if: ${{ inputs.publish_release }}
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - name: Download qualified release bundle
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: qualified-release
+
+      - name: Refuse to replace an existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $RELEASE_TAG already exists and will not be replaced" >&2
+            exit 1
+          fi
+
+      - name: Create immutable GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PACKAGE_VERSION: ${{ needs.build.outputs.package_version }}
+          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
+          TARBALL_NAME: ${{ needs.build.outputs.tarball_name }}
+          MANIFEST_NAME: ${{ needs.build.outputs.manifest_name }}
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" \
+            "qualified-release/$TARBALL_NAME" \
+            "qualified-release/${TARBALL_NAME}.sha256" \
+            "qualified-release/$MANIFEST_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "WebDyne Cloudflare $PACKAGE_VERSION" \
+            --generate-notes

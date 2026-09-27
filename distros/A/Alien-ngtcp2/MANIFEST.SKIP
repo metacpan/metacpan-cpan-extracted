@@ -1,0 +1,12 @@
+^\.git/
+^\.github/
+^\.gitignore$
+^blib/
+^_alien/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.(json|yml)$
+^pm_to_blib$
+^Alien-ngtcp2-.*\.tar\.gz$
+^cover_db/
+^\.prove$

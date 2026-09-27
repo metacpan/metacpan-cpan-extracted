@@ -1,0 +1,6 @@
+{
+  "Network": {
+    "endpoint": "https://api.example.com/v1",
+    "retries": 5
+  }
+}

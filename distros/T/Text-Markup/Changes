@@ -1,5 +1,10 @@
 Revision history for Perl extension Text-Markup.
 
+0.42 2026-09-26T16:59:34Z
+   - Fixed over-aggressive HTML encoding from Pod files in more recent
+     releases of Pod::Simple::XHTML (#31).
+   - Ceased to encode single quotation marks (`'`) in HTML generated from Pod.
+
 0.41 2025-12-18T14:19:18Z
    - Tweaked the Markdown configuration to generate IDs for headers and to
      parse and emit footnotes and "smartypants" punctuation.
@@ -7,7 +12,7 @@ Revision history for Perl extension Text-Markup.
      replaces the default flags.
 
 0.40 2025-12-15T00:10:26Z
-   - Fixed typo in `Build.PL` that prevented the recommendation to install th
+   - Fixed typo in `Build.PL` that prevented the recommendation to install the
      CommonMark module.
    - Replaced Text::Markdown with Text::Markdown::Discount, as it seems better
      maintained and supports tables, code fences, definition lists, and more.

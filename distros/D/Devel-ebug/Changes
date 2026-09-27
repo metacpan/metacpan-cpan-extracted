@@ -1,5 +1,49 @@
 Revision history for Devel-ebug
 
+0.67      2026-09-26 22:00:23 -0600
+  - break_point_subroutine() takes an optional condition, like
+    break_point(), and the ebug console accepts one after a subroutine
+    name (b Calc::fib $_[1] > 5).  The condition is checked as the
+    subroutine is entered, so @_ holds its arguments (gh#35, gh#69)
+
+0.66      2026-09-26 21:30:13 -0600
+  - Add an optional JSON wire format, selected with the `serializer`
+    attribute or the DEVEL_EBUG_SERIALIZER environment variable, so that
+    frontends which are not written in Perl can speak the protocol
+    without implementing YAML.  Cpanel::JSON::XS is used when it is
+    installed, falling back to JSON::PP (gh#59)
+  - Exit quietly when the frontend disconnects instead of warning about
+    an undefined value in pack (gh#59)
+  - Pass the debugged program's command-line arguments through
+    exactly as given, so they may contain spaces or shell
+    metacharacters: add an `args` attribute to Devel::ebug, and have
+    ebug and ebug_server use it when given more than one argument
+    (gh#31, gh#60)
+  - Have the backend started by load() connect back to a port the
+    frontend got from the operating system, passed in the new
+    DEVEL_EBUG_CONNECT environment variable, so concurrent sessions can
+    no longer collide over a port.  A backend waiting for a frontend to
+    attach (as under ebug_server) now turns away a frontend with the
+    wrong secret instead of dying, which could kill an unrelated session
+    (gh#62, gh#64)
+  - Start debugging much faster: load(), and so starting ebug,
+    restarting and undo, no longer spends a second waiting to connect
+    to the backend, taking about 0.05s instead of just over a second
+    (gh#64)
+  - Add interrupt(), to stop a running program from a frontend which
+    does not share a terminal with it, along with run_nowait(),
+    wait_for_stop() and running() so that a frontend can keep control
+    while the program runs.  pid() returns the program's own process id,
+    which differs from the process load() started when the program is
+    run through the shell (gh#61, gh#66)
+  - Report a clear error, which can be caught, when the program being
+    debugged goes away without the debugger's help (killed, crashed, or
+    POSIX::_exit), instead of the frontend dying silently from SIGPIPE
+    (gh#30, gh#67)
+  - Remove a stray bareword NULL filehandle that the backend opened, to
+    no purpose, when output is not captured (ebug_server -keepio)
+    (gh#63, gh#68)
+
 0.65      2026-09-21 19:55:44 -0600
   - Fix ^C (SIGINT) while running killing the console instead of
     dropping back into the debugger (gh#27, gh#55)

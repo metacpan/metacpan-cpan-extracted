@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.3.3';
+our $VERSION = '3.4.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -134,8 +134,8 @@ sub lookup_p {
     );
 }
 
-# Concurrent misses for one address share ONE request (docs/sdk/contract.md,
-# UMAN-4645): 3.3.2 sent one per caller. The first miss boards the address, and
+# Concurrent misses for one address share ONE request: 3.3.2 sent one per
+# caller. The first miss boards the address, and
 # every miss after it, a batch's included, waits for that request instead. The
 # request runs under the options of the call that led it; a failure reaches
 # every waiter and is cached for none. Nothing is shared without a cache, since

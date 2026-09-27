@@ -1,3 +1,4 @@
+CHANGELOG.md
 lib/InternetData.pm
 lib/InternetData/Database.pm
 lib/InternetData/Error.pm

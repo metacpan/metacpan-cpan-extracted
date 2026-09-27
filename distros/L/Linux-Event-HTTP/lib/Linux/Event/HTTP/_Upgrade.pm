@@ -7,9 +7,8 @@ use Carp qw(croak);
 use Scalar::Util qw(refaddr);
 
 use Linux::Event::IO::Sock::Stream ();
-use Linux::Event::Kernel::Timer;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub _load_target ($target) {
     croak 'upgrade(): target class must be a package name'
@@ -142,22 +141,17 @@ sub schedule ($class, $conn, $transaction, $target) {
         resume_read => $conn->is_read_paused ? 0 : 1,
     };
 
-    Linux::Event::Kernel::Timer->new(
-        loop     => $conn->loop,
-        after    => 0,
-        data     => {
-            connection  => $conn,
-            transaction => $transaction,
-            target      => $target,
-        },
-        on_timer => \&_handoff,
-    );
+    my $state = {
+        connection  => $conn,
+        transaction => $transaction,
+        target      => $target,
+    };
+    $conn->loop->defer(sub { _handoff($state) });
 
     return $transaction;
 }
 
-sub _handoff ($timer) {
-    my $state = $timer->data;
+sub _handoff ($state) {
     my $conn = $state->{connection};
     my $transaction = $state->{transaction};
     my $target = $state->{target};

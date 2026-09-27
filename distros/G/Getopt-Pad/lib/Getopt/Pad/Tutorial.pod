@@ -1,0 +1,763 @@
+=encoding utf8
+
+=head1 NAME
+
+Getopt::Pad::Tutorial - A step-by-step introduction to Getopt::Pad
+
+=head1 DESCRIPTION
+
+This tutorial builds the command line of a small backup program, one
+feature at a time. Each step shows the complete code or the part that
+changed, a few command lines, and what the program prints. By the end, the
+program has typed options, several commands, config files, a useful
+C<--help> and shell completion.
+
+You need Perl 5.26 or later and Getopt::Pad. Step 6 uses YAML config
+files, which need the module L<YAML::XS>.
+
+The program only prints what it would do; the tutorial is about the
+command line, not about making backups. The full reference for every
+feature is L<Getopt::Pad>.
+
+=head1 Step 1: A first script
+
+The program needs to know two things: the directory to back up, and where
+to write the backup. The first one is a positional argument (an I<arg>),
+the second a named option:
+
+=for highlighter language=perl
+
+    #!/usr/bin/env perl
+    use v5.26;
+    use strict;
+    use warnings;
+
+    use Getopt::Pad;
+
+    my $opt = GetOptions(
+        options => {
+            'target' => {
+                type     => 'dir',
+                required => 1,
+                help     => 'Directory the backup is written to',
+            },
+        },
+        args => [
+            { short => 'source', type => 'dir', required => 1, help => 'Directory to back up' },
+        ],
+    );
+
+    printf "Backing up %s to %s\n", $opt->source, $opt->target;
+
+C<GetOptions> takes the I<spec>, a list of key/value pairs that describes
+the command line. C<options> is a hashref of option names and their specs.
+C<args> is an arrayref of arg specs, in the order the args appear on the
+command line; C<short> is the arg's name.
+
+C<GetOptions> returns the I<result object>, with one method per option
+and arg, named after them: C<< $opt->target >> and C<< $opt->source >>.
+These methods are called I<readers>. Save the script as F<backup>, make
+it executable (C<chmod +x backup>), and try it. The examples call it as
+C<backup>; run it as C<./backup> unless the directory is in your
+C<PATH>:
+
+=for highlighter language=plain
+
+    $ backup --target /mnt/backup photos
+    Backing up photos to /mnt/backup
+
+Options and args can come in any order, and a value can also follow an
+C<=>:
+
+=for highlighter language=plain
+
+    $ backup photos --target /mnt/backup
+    Backing up photos to /mnt/backup
+    $ backup --target=/mnt/backup photos
+    Backing up photos to /mnt/backup
+
+You get a C<--help> option without writing any code for it:
+
+=for highlighter language=plain
+
+    $ backup --help
+    # backup [options] source
+
+    ## Arguments
+       <source>                    [REQ] Directory to back up [Path]
+
+    ## Completion
+       --create-completions <>     Print a completion script for this shell to
+                                   STDOUT and exit
+                                       Valid   = [ bash, zsh ]
+
+    ## Options
+       --target <>                 [REQ] Directory the backup is written to
+                                   [Path]
+
+C<[REQ]> marks what is required, C<< <> >> an option that takes a value,
+and C<[Path]> the type. The C<--create-completions> option is explained in
+L</Step 7: Shell completion>.
+
+The C<dir> type does not check that the directory exists; it only marks
+the value as a path (for the help output and for shell completion). Add
+C<< mustExist => 1 >> to an option or arg to require an existing
+directory.
+
+Mistakes on the command line are reported with the help text, and the
+program exits with status 2. Your code after C<GetOptions> only runs when
+the command line is valid:
+
+=for highlighter language=plain
+
+    $ backup photos
+    ERROR: missing required option '--target'
+
+    # backup [options] source
+    ...
+
+The other errors of this step read:
+
+=for highlighter language=plain
+
+    ERROR: missing required argument <source>
+    ERROR: Unknown option: taget
+    ERROR: unexpected extra argument 'videos'
+
+=head1 Step 2: Types, defaults and short names
+
+Next, the program gets a number of backups to keep, a switch to turn
+compression off, a dry-run switch and a verbosity level:
+
+=for highlighter language=perl
+
+    my $opt = GetOptions(
+        options => {
+            'target|t' => {
+                type     => 'dir',
+                required => 1,
+                help     => 'Directory the backup is written to',
+            },
+            'keep' => {
+                type    => 'int',
+                default => 7,
+                min     => 1,
+                help    => 'Number of backups to keep',
+            },
+            'compress' => {
+                type    => 'bool',
+                default => 1,
+                help    => 'Compress the backup',
+            },
+            'dry-run|n' => {
+                help => 'Only show what would be copied',
+            },
+            'verbose|v' => {
+                type => 'counter',
+                help => 'Print more details; repeat for even more',
+            },
+        },
+        args => [
+            { short => 'source', type => 'dir', required => 1, help => 'Directory to back up' },
+        ],
+    );
+
+    printf "source:   %s\n", $opt->source;
+    printf "target:   %s\n", $opt->target;
+    printf "keep:     %d\n", $opt->keep;
+    printf "compress: %s\n", $opt->compress ? 'yes' : 'no';
+    printf "dry run:  %s\n", $opt->dryRun ? 'yes' : 'no';
+    printf "verbose:  %d\n", $opt->verbose // 0;
+
+This step introduces several new features:
+
+=over 4
+
+=item * B<Aliases.> C<'target|t'> declares the option C<--target> with
+the alias C<-t>. The first name is the I<primary name>; it names the
+reader. Names of one letter are written with one dash.
+
+=item * B<Types.> C<int> accepts whole numbers only, and C<min> sets the
+smallest allowed value. C<bool> is a switch that can be turned off with
+C<--no-compress>. An option without a C<type>, like C<dry-run>, is a
+simple flag. C<counter> counts how often it is given.
+
+=item * B<Defaults.> C<default> is the value when the option is not
+given. The default is checked like user input, so C<< default => 0 >>
+for C<keep> would be reported as a mistake in the spec, as soon as
+C<GetOptions> runs.
+
+=item * B<Reader names.> The method for C<dry-run> is C<dryRun>: dashes
+and underscores are dropped and the next letter is made upper case.
+
+=item * B<Absent switches.> A flag or counter that is not given returns
+C<undef>, which is why the last line uses C<< // 0 >>.
+
+=back
+
+=for highlighter language=plain
+
+    $ backup -t /mnt/backup photos
+    source:   photos
+    target:   /mnt/backup
+    keep:     7
+    compress: yes
+    dry run:  no
+    verbose:  0
+
+    $ backup -t /mnt/backup --keep 30 --no-compress -nvv photos
+    source:   photos
+    target:   /mnt/backup
+    keep:     30
+    compress: no
+    dry run:  yes
+    verbose:  2
+
+C<-nvv> is C<-n -v -v>: single-letter options can be bundled after one
+dash. Values are checked against their type:
+
+=for highlighter language=plain
+
+    $ backup -t /mnt/backup --keep 0 photos
+    ERROR: option '--keep': 0 is smaller than the minimum of 1
+    ...
+    $ backup -t /mnt/backup --keep many photos
+    ERROR: option '--keep': 'many' is not an integer
+    ...
+
+All built-in types are listed in L<Getopt::Pad/TYPES>.
+
+=head1 Step 3: Lists and allowed values
+
+The program should be able to skip files by pattern, as many patterns as
+the user likes, and to choose between two copy methods. Add these two
+entries to the C<options> hash from step 2:
+
+=for highlighter language=perl
+
+    'method' => {
+        type    => 'string',
+        default => 'tar',
+        valid   => ['tar', 'rsync'],
+        help    => 'How to copy the files',
+    },
+    'exclude|x' => {
+        type     => 'string',
+        multiple => 1,
+        csv      => 1,
+        help     => 'Skip files matching this pattern (-x, may be repeated)',
+    },
+
+C<valid> lists the values the option accepts. C<multiple> lets the option
+be given several times; its reader returns an arrayref. C<csv> also
+splits each value at commas. Print the two new values:
+
+=for highlighter language=perl
+
+    printf "method:   %s\n", $opt->method;
+    printf "exclude:  %s\n", join(', ', $opt->exclude->@*);
+
+Both forms of C<--exclude> work and can be mixed (the output below leaves
+out the six lines from step 2):
+
+=for highlighter language=plain
+
+    $ backup -t /mnt/backup -x '*.tmp' -x '*.log,*.bak' --method rsync photos
+    method:   rsync
+    exclude:  *.tmp, *.log, *.bak
+
+    $ backup -t /mnt/backup --method zip photos
+    ERROR: option '--method': 'zip' is not one of: tar, rsync
+    ...
+
+When C<--exclude> is not given, C<< $opt->exclude >> is an empty
+arrayref, so C<< $opt->exclude->@* >> never fails. Options can also hold
+C<key=value> pairs (C<hash>) and lists of records (C<objectlist>); see
+L<Getopt::Pad::Cookbook/OPTIONS WITH SEVERAL VALUES>.
+
+=head1 Step 4: A helpful --help
+
+The help output is generated from the spec, so it improves with every
+C<help> text you write. A few more keys make it more useful:
+
+=for highlighter language=perl
+
+    our $VERSION = '1.0';
+
+    my $opt = GetOptions(
+        description => 'Copy a directory to a backup location.',
+        examples    => [
+            {
+                text => 'Back up your photos, skipping temporary files',
+                args => '-t /mnt/backup -x "*.tmp" ~/photos',
+            },
+        ],
+        options => {
+            'target|t' => {
+                type     => 'dir',
+                required => 1,
+                group    => 'Destination',
+                help     => 'Directory the backup is written to (-t)',
+            },
+            'keep' => {
+                type    => 'int',
+                default => 7,
+                min     => 1,
+                group   => 'Destination',
+                help    => 'Number of backups to keep',
+            },
+            'compress' => {
+                type    => 'bool',
+                default => 1,
+                group   => 'Destination',
+                help    => 'Compress the backup',
+            },
+            'method' => {
+                type    => 'string',
+                default => 'tar',
+                valid   => ['tar', 'rsync'],
+                help    => 'How to copy the files',
+            },
+            'exclude|x' => {
+                type     => 'string',
+                multiple => 1,
+                csv      => 1,
+                typehint => 'Pattern',
+                help     => 'Skip files matching this pattern (-x, may be repeated)',
+            },
+            'dry-run|n' => {
+                help => 'Only show what would be copied (-n)',
+            },
+            'verbose|v' => {
+                type => 'counter',
+                help => 'Print more details; repeat for even more (-v)',
+            },
+        },
+        args => [
+            { short => 'source', type => 'dir', required => 1, help => 'Directory to back up' },
+        ],
+    );
+
+=over 4
+
+=item * C<description> is shown below the usage line.
+
+=item * C<examples> are shown at the end.
+
+=item * C<group> puts options under their own heading. Options without a
+group are listed under C<Options>.
+
+=item * C<typehint> sets the label at the end of the help text, here
+C<[Pattern]>.
+
+=item * The help output lists every option by its primary name only, so
+the help texts mention the short aliases.
+
+=back
+
+=for highlighter language=plain
+
+    $ backup --help
+    # backup [options] source
+    # Copy a directory to a backup location.
+
+    ## Arguments
+       <source>                    [REQ] Directory to back up [Path]
+
+    ## Completion
+       --create-completions <>     Print a completion script for this shell to
+                                   STDOUT and exit
+                                       Valid   = [ bash, zsh ]
+
+    ## Destination
+       --[no-]compress             Compress the backup
+                                       Default = 1
+       --keep <>                   Number of backups to keep
+                                       Default = 7
+       --target <>                 [REQ] Directory the backup is written to
+                                   (-t) [Path]
+
+    ## Options
+       --dry-run                   Only show what would be copied (-n)
+       --exclude <a,b,...>         Skip files matching this pattern (-x, may be
+                                   repeated) [Pattern]
+       --method <>                 How to copy the files
+                                       Valid   = [ tar, rsync ]
+                                       Default = tar
+       --verbose                   Print more details; repeat for even more
+                                   (-v)
+
+    # Examples:
+    ## Back up your photos, skipping temporary files
+    ##   backup -t /mnt/backup -x "*.tmp" ~/photos
+
+The C<our $VERSION> of the script is what the automatic C<--version>
+option prints:
+
+=for highlighter language=plain
+
+    $ backup --version
+    backup 1.0
+
+On a terminal, the help output is colored and wrapped to the terminal
+width. See L<Getopt::Pad/HELP OUTPUT> for all details.
+
+=head1 Step 5: Commands
+
+The program grows: besides creating a backup, it should list the existing
+backups and delete old ones. Each of these tasks needs different options,
+so they become I<commands>, like C<git commit> and C<git log>:
+
+=for highlighter language=plain
+
+    backup run SOURCE        create a backup
+    backup list              list the backups
+    backup prune             delete old backups
+
+Commands are declared under C<commands>. Each command has a spec of its
+own, with the same keys as the top level (except C<config>, C<version>
+and C<argv>, which only the top level has). The top level and each
+command are called I<levels>; every level has its own options:
+
+=for highlighter language=perl
+
+    our $VERSION = '2.0';
+
+    my $opt = GetOptions(
+        description => 'Create and manage backups of a directory.',
+        options     => {
+            'target|t' => {
+                type     => 'dir',
+                required => 1,
+                inherit  => 1,
+                help     => 'Directory the backups are kept in',
+            },
+            'verbose|v' => {
+                type    => 'counter',
+                inherit => 1,
+                help    => 'Print more details; repeat for even more (-v)',
+            },
+        },
+        commands => {
+            run => {
+                description => 'Create a new backup',
+                options     => {
+                    'compress' => {
+                        type    => 'bool',
+                        default => 1,
+                        help    => 'Compress the backup',
+                    },
+                    'exclude|x' => {
+                        type     => 'string',
+                        multiple => 1,
+                        csv      => 1,
+                        help     => 'Skip files matching this pattern (-x)',
+                    },
+                },
+                args => [
+                    {
+                        short    => 'source',
+                        type     => 'dir',
+                        required => 1,
+                        help     => 'Directory to back up',
+                    },
+                ],
+            },
+            list => {
+                description => 'List the existing backups',
+            },
+            prune => {
+                description => 'Delete old backups',
+                options     => {
+                    'keep' => {
+                        type    => 'int',
+                        default => 7,
+                        min     => 1,
+                        help    => 'Number of backups to keep',
+                    },
+                    'dry-run|n' => { help => 'Only show what would be deleted (-n)' },
+                },
+            },
+        },
+    );
+
+The top level keeps the options that every command needs: C<--target>
+and C<--verbose>. Normally, the options of the top level must come before
+the command word, and the options of an outer level are unknown after it.
+C<< inherit => 1 >> changes that: the option is also accepted after the
+command word, on every command below.
+
+C<GetOptions> returns the result object of the top level. Its C<command>
+method returns the name of the chosen command, and its C<subcommand>
+method returns another result object for that command, with the readers of
+the command's own options and args. A hash of subroutines turns this into
+a dispatcher:
+
+=for highlighter language=perl
+
+    my %handlers = (
+        run   => \&runBackup,
+        list  => \&listBackups,
+        prune => \&pruneBackups,
+    );
+    $handlers{ $opt->command }->($opt, $opt->subcommand);
+
+    sub runBackup {
+        my ($opt, $run) = @_;
+        printf "Backing up %s to %s (verbosity %d)\n",
+            $run->source, $opt->target, $opt->verbose // 0;
+    }
+
+    sub listBackups {
+        my ($opt) = @_;
+        printf "Backups in %s:\n", $opt->target;
+    }
+
+    sub pruneBackups {
+        my ($opt, $prune) = @_;
+        printf "Keeping the newest %d backups in %s%s\n",
+            $prune->keep, $opt->target, $prune->dryRun ? ' (dry run)' : '';
+    }
+
+An inherited option is always read from the level that declares it, so
+C<target> and C<verbose> come from C<$opt>, while C<source>, C<keep> and
+C<dryRun> come from the command's result object:
+
+=for highlighter language=plain
+
+    $ backup -t /mnt/backup run photos
+    Backing up photos to /mnt/backup (verbosity 0)
+    $ backup run -t /mnt/backup -v photos
+    Backing up photos to /mnt/backup (verbosity 1)
+    $ backup -v -t /mnt/backup prune --keep 3 -nv
+    Keeping the newest 3 backups in /mnt/backup (dry run)
+
+A missing command is an error, and so is an option given on the wrong
+level:
+
+=for highlighter language=plain
+
+    $ backup -t /mnt/backup
+    ERROR: missing command, expected one of: list, prune, run
+    ...
+    $ backup -t /mnt/backup --keep 3 prune
+    ERROR: Unknown option: keep
+    ...
+
+Every level has its own help. The top level lists the commands, and a
+command's help shows its own options followed by the inherited ones:
+
+=for highlighter language=plain
+
+    $ backup --help
+    # backup [options] <command>
+    # Create and manage backups of a directory.
+
+    ## Completion
+       --create-completions <>     Print a completion script for this shell to
+                                   STDOUT and exit
+                                       Valid   = [ bash, zsh ]
+
+    ## Options
+       --target <>                 [REQ] Directory the backups are kept in
+                                   [Path]
+       --verbose                   Print more details; repeat for even more
+                                   (-v)
+
+    ## Commands
+       list                        List the existing backups
+       prune                       Delete old backups
+       run                         Create a new backup
+
+    $ backup prune --help
+    # backup prune [options]
+    # Delete old backups
+
+    ## Options
+       --dry-run       Only show what would be deleted (-n)
+       --keep <>       Number of backups to keep
+                           Default = 7
+       --target <>     [REQ] Directory the backups are kept in [Path]
+       --verbose       Print more details; repeat for even more (-v)
+
+Commands can have commands of their own, to any depth. See
+L<Getopt::Pad/COMMANDS>.
+
+=head1 Step 6: Config files
+
+Typing C<-t /mnt/backup> every time is tedious. A config file can hold
+the values the user always wants. Add a C<config> block to the top level
+of the spec:
+
+=for highlighter language=perl
+
+    my $opt = GetOptions(
+        description => 'Create and manage backups of a directory.',
+        config      => {
+            format => 'yaml',
+            paths  => ['/etc/backup.yaml', '~/.config/backup.yaml'],
+        },
+        options     => { ... },     # as in step 5
+        commands    => { ... },
+    );
+
+C<paths> lists the files that are read on every run, in order; files that
+do not exist are skipped, and a later file overrides an earlier one. A
+config file mirrors the help output: the top-level keys are the group
+names (C<Options> for options without a group), and the C<commands> key
+holds one section per command, with the same layout:
+
+=for highlighter language=yaml
+
+    Options:
+      target: /mnt/backup
+    commands:
+      run:
+        Options:
+          exclude:
+            - '*.tmp'
+            - '*.log'
+      prune:
+        Options:
+          keep: 14
+
+To see where the values come from, let C<runBackup> print the patterns
+it skips:
+
+=for highlighter language=perl
+
+    sub runBackup {
+        my ($opt, $run) = @_;
+        printf "Backing up %s to %s, skipping %s\n",
+            $run->source, $opt->target, join(', ', $run->exclude->@*);
+    }
+
+With the file above as F<~/.config/backup.yaml>, C<--target> is no
+longer needed on the command line. The command line still wins over the
+file, and the file over the defaults in the spec:
+
+=for highlighter language=plain
+
+    $ backup run photos
+    Backing up photos to /mnt/backup, skipping *.tmp, *.log
+    $ backup prune
+    Keeping the newest 14 backups in /mnt/backup
+    $ backup prune --keep 3
+    Keeping the newest 3 backups in /mnt/backup
+    $ backup -t /media/usb run -x '*.iso' photos
+    Backing up photos to /media/usb, skipping *.iso
+
+Note that C<-x '*.iso'> replaces the whole list from the config file:
+the value of an option always comes from one place.
+
+The config block adds two options. C<--config FILE> reads that file
+instead of the ones in C<paths>. C<--create-default-config FILE> writes a
+starter file with all defaults of the spec. It never overwrites a file,
+so choose a new name:
+
+=for highlighter language=plain
+
+    $ backup --create-default-config ~/backup-defaults.yaml
+    Wrote default config to /home/user/backup-defaults.yaml
+
+(The shell replaces C<~> with your home directory before the program
+sees the path.)
+
+=for highlighter language=yaml
+
+    ---
+    commands:
+      prune:
+        Options:
+          keep: 7
+      run:
+        Options:
+          compress: 1
+
+Config files are checked as strictly as the command line. The structure
+of every file is always checked completely; a value is checked when it
+is used, that is, for the commands that run and when the command line
+does not override it. With this F<bad.yaml>, which misspells C<prune>:
+
+=for highlighter language=yaml
+
+    commands:
+      prnue:
+        Options:
+          keep: 3
+
+even a command that does not use the file's values fails:
+
+=for highlighter language=plain
+
+    $ backup -t x list --config bad.yaml
+    ERROR: config file 'bad.yaml': unknown command 'prnue', expected one of: list, prune, run
+    ...
+
+See L<Getopt::Pad/CONFIG FILES> for the details, including C<defaultPath>
+and JSON files.
+
+=head1 Step 7: Shell completion
+
+Your users can let their shell complete command names, options, allowed
+values and paths. The automatic C<--create-completions> option prints a
+completion script for bash or zsh. The script completes the command
+C<backup>, so this step assumes that the program is installed as
+F<backup> in a directory of your C<PATH>:
+
+=for highlighter language=plain
+
+    $ backup --create-completions bash > ~/.local/share/bash-completion/completions/backup
+    $ backup --create-completions zsh  > ~/.zsh/completions/_backup
+
+(For zsh, F<~/.zsh/completions> must be in C<$fpath>.) After starting a
+new shell, C<backup pr>E<lt>TABE<gt> completes to C<backup prune>, and
+C<backup prune -->E<lt>TABE<gt> offers:
+
+=for highlighter language=plain
+
+    --config  --create-default-config  --dry-run  --keep  --target  --verbose
+
+The script calls your program on every tab press to ask for the
+candidates, so it never has to be regenerated when the spec changes. It
+also means that everything your program does before C<GetOptions> runs on
+every tab press: call C<GetOptions> first. See
+L<Getopt::Pad/SHELL COMPLETION>.
+
+=head1 Where to go from here
+
+=over 4
+
+=item *
+
+L<Getopt::Pad::Cookbook> has recipes for tasks this tutorial did not
+cover: values computed at run time, custom checks, C<key=value> options,
+optional commands, testing, and more.
+
+=item *
+
+L<Getopt::Pad> is the reference for every key, type and message.
+
+=item *
+
+L<Getopt::Pad::Type> shows how to write your own types, and
+L<Getopt::Pad::Config::Format> how to read other config file formats.
+
+=back
+
+=head1 SEE ALSO
+
+L<Getopt::Pad>, L<Getopt::Pad::Cookbook>
+
+=head1 AUTHOR
+
+davenonymous E<lt>perl@davenonymous.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 davenonymous
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use File::Spec;
 
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 sub register_commands {
   return (
@@ -83,7 +83,7 @@ sub break_point_delete {
 sub break_point_subroutine {
   my($req, $context) = @_;
   my($filename, $start, $end) = $DB::sub{$req->{subroutine}} =~ m/^(.+):(\d+)-(\d+)$/;
-  my $line = set_break_point($filename, $start);
+  my $line = set_break_point($filename, $start, $req->{condition});
   return $line ? { line => $line } : {};
 }
 
@@ -142,7 +142,7 @@ Devel::ebug::Backend::Plugin::ActionPoints
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 AUTHOR
 

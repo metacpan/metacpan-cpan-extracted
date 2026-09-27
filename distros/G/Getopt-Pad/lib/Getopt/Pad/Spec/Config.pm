@@ -7,7 +7,7 @@ use Getopt::Pad::Config::Format;
 class Getopt::Pad::Spec::Config :strict(params) {
 	use Getopt::Pad::Util qw(specError);
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	field $raw :param;
 
@@ -52,13 +52,41 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Spec::Config - validated config block
+Getopt::Pad::Spec::Config - The checked config block of a spec (internal)
 
 =head1 DESCRIPTION
 
-The validated config block: resolved Format instance, paths, defaultPath and autoload. Pure declaration data - all config file reading and writing lives in the L<Getopt::Pad::Config> worker it hands out via its io reader; only formatName and defaultPath are exposed on top, for the auto option help texts.
+This module is internal to Getopt::Pad. It is not part of the public
+API and can change without notice. Programs use L<Getopt::Pad/GetOptions>;
+this page is for people working on Getopt::Pad itself.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+Checks the C<config> block of a spec: C<format> is mandatory and must be
+a registered format name (the format object is created right away, so a
+missing YAML::XS is reported as a spec error here), C<paths> must be an
+arrayref, and there must be no unknown keys. C<defaultPath> and
+C<autoload> are taken as given.
+
+The config block is pure declaration data. Every config file is read and
+written by the L<Getopt::Pad::Config> object it hands out through C<io>.
+
+=head1 METHODS
+
+=over 4
+
+=item io
+
+The L<Getopt::Pad::Config> object for this config block.
+
+=item formatName, defaultPath
+
+As given in the spec. The help texts of the automatic C<--config> option
+mention them.
+
+=back
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Config>, L<Getopt::Pad/CONFIG FILES>
 
 =head1 AUTHOR
 

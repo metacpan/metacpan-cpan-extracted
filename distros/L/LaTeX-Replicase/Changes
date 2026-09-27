@@ -104,3 +104,12 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Fixed old tests.
 	- The manual has been corrected and expanded.
 
+0.793 Sat Sep 26 12:12:12 2026
+	- To ensure compatibility with Perl versions prior to 5.18, recursion was removed from the regular expression in subroutine REase().
+	- A new property (*) has been added to the beginning of variable names (keys); it confirms the variable's existence but does not substitute its value into the template.
+	- Improved handling of undefined values.
+	- Optimized algorithms.
+	- Added new tests.
+	- Fixed old tests.
+	- Increased diversity of code test coverage.
+	- The manual has been corrected and expanded.

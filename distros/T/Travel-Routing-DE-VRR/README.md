@@ -1,8 +1,8 @@
 # efa - Commandline Public Transit Routing Interface
 
-efa is a commandline client and Perl module for EFA public transit routing
+**efa** is a commandline client and Perl module for EFA public transit routing
 interfaces such as [efa.vrr.de](https://efa.vrr.de). See the
-[Travel::Routing::DE::VRR homepage](https://finalrewind.org/projects/Travel-Routing-DE-VRR/)
+[Travel::Routing::DE::EFA homepage](https://finalrewind.org/projects/Travel-Routing-DE-VRR/)
 for details.
 
 ## Installation
@@ -10,29 +10,26 @@ for details.
 efa has been packaged as
 [libtravel-routing-de-vrr-perl](https://packages.debian.org/search?keywords=libtravel-routing-de-vrr-perl)
 for Debian, so you can install it using your package manager of choice on
-Debian-based Linux distributions. It is also available as
-[perl-travel-routing-de-vrr-git](https://aur.archlinux.org/packages/perl-travel-routing-de-vrr-git/)
-in the archlinux User Repository (AUR). Both provide the commandline client and
-the Perl module.
+Debian-based Linux distributions. The package provides the commandline client
+as well as the Perl module.
 
 If you are using another distribution or would prefer a more recent version,
 you have four installation options:
 
-* Nightly `.deb` builds for Debian-based distributions
+* `.deb` releases for Debian-based distributions
 * Installing the latest release from CPAN
 * Installation from source
-* Using a Docker image
+* Using a Docker image (amd64 or arm64)
 
 Except for Docker, **efa** is available in your PATH after installation. You
 can run `efa --version` to verify this. Documentation is available via
 `man efa`.
 
-### Nightly Builds for Debian
+### Release Builds for Debian
 
 [lib.finalrewind.org/deb](https://lib.finalrewind.org/deb) provides Debian
-packages of both development and release versions. Note that these are not part
-of the official Debian repository and are not covered by its quality assurance
-process.
+packages of all release versions. Note that these are not part of the official
+Debian repository and are not covered by its quality assurance process.
 
 To install the latest release, run:
 
@@ -40,14 +37,6 @@ To install the latest release, run:
 wget https://lib.finalrewind.org/deb/libtravel-routing-de-vrr-perl_latest_all.deb
 sudo apt install ./libtravel-routing-de-vrr-perl_latest_all.deb
 rm libtravel-routing-de-vrr-perl_latest_all.deb
-```
-
-For a (possibly broken) development snapshot of the Git master branch, run:
-
-```
-wget https://lib.finalrewind.org/deb/libtravel-routing-de-vrr-perl_dev_all.deb
-sudo apt install ./libtravel-routing-de-vrr-perl_dev_all.deb
-rm libtravel-routing-de-vrr-perl_dev_all.deb
 ```
 
 Uninstallation works as usual:
@@ -58,7 +47,7 @@ sudo apt remove libtravel-routing-de-vrr-perl
 
 ### Installation from CPAN
 
-Travel::Routing::DE::VRR releases are published on the Comprehensive Perl
+Travel::Routing::DE::EFA releases are published on the Comprehensive Perl
 Archive Network (CPAN) and can be installed using standard Perl module
 tools such as cpanminus.
 
@@ -73,7 +62,7 @@ libraries with development headers:
 Now, use a tool of your choice to install the module. Minimum working example:
 
 ```
-cpanm Travel::Routing::DE::VRR
+cpanm Travel::Routing::DE::EFA
 ```
 
 If you run this as root, it will install script and module to `/usr/local` by
@@ -144,7 +133,8 @@ Installation:
 docker pull derfnull/efa:latest
 ```
 
-Use it by prefixing efa commands with `docker run --rm derfnull/efa:latest`, like so:
+Use it by prefixing efa commands with `docker run --rm derfnull/efa:latest`,
+like so:
 
 ```
 docker run --rm derfnull/efa:latest --version
@@ -152,3 +142,28 @@ docker run --rm derfnull/efa:latest --version
 
 Documentation is not available in this image. Please refer to the
 [online efa manual](https://man.finalrewind.org/1/efa/) instead.
+
+## Contributing
+
+You may report issues and contribute bugfixes at
+<https://codeberg.org/derf/Travel-Routing-DE-EFA> or
+<https://github.com/derf/Travel-Routing-DE-EFA> – use whichever platform
+works best for you.
+Please get in touch before starting work on more invasive changes.
+
+Keep in mind that this is a hobby project, and I take care to ensure that it
+remains that way.  As such, while I appreciate suggestions, bug reports,
+patches and similar, please do not expect a timely response to anything you
+submit.  I typically only address issues and merge requests when I have the
+capacity for them *and* when doing so does not feel like a chore.
+
+"AI" (as in, Large Language Models / LLMs such as ChatGPT, Claude, Copilot,
+Cursor, Grok, etc.) may not be used for contributions to this project.
+
+## References
+
+Mirrors of the efa / Travel::Routing::DE::EFA repository are available at
+
+* [Codeberg](https://codeberg.org/derf/Travel-Routing-DE-EFA/)
+* [Finalrewind](https://git.finalrewind.org/derf/Travel-Routing-DE-EFA/)
+* [GitHub](https://github.com/derf/Travel-Routing-DE-EFA)

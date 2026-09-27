@@ -5,7 +5,7 @@ use warnings;
 
 use Scalar::Util qw(blessed weaken);
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 my %TERMINAL = map { $_ => 1 } qw(complete cancelled error);
 
@@ -357,62 +357,51 @@ __END__
 
 =head1 NAME
 
-Linux::Event::HTTP::Transaction - lifecycle of one HTTP request/response exchange
+Linux::Event::HTTP::Transaction - one HTTP request/response exchange
 
 =head1 DESCRIPTION
 
-A Transaction represents exactly one HTTP exchange: one
-L<Linux::Event::HTTP::Request> and, once available, one
-L<Linux::Event::HTTP::Response>.
+A Transaction represents exactly one HTTP exchange:
 
-Request and Response are HTTP message objects. Transaction owns the lifecycle
-that connects them, including output progress, cancellation, protocol Upgrade,
-CONNECT tunnel handoff, and writable body producers for outgoing messages. It
-does not own a socket, parser, connection pool, redirect chain, or transport
-output queue. Client and server connection implementations advance Transaction
-state and move produced bytes through their transport.
+    one Request + one Response + exchange lifecycle
 
-Redirects are separate HTTP exchanges and therefore use separate Transaction
-objects.
+This definition is the same for HTTP/1 and HTTP/2. An HTTP/2 connection may
+have many Transactions active at once because each stream is a separate
+exchange.
 
-Applications normally receive Transactions from a Client or an active server
-Connection; they do not construct them directly.
+Request and Response are message objects. Transaction owns the lifecycle that
+connects them: streaming body producers, cancellation, delayed response send,
+and HTTP/1 Upgrade/CONNECT handoff.
+
+A Transaction does not own the socket, connection pool, redirect chain, or
+transport output queue.
+
+Applications normally receive Transactions from
+L<Linux::Event::HTTP::Client> or from an active server connection.
 
 =head1 METHODS
 
 =head2 request
 
-Returns the Request for this exchange. It is available for the entire
-Transaction lifetime.
+Returns the Request for this exchange.
 
 =head2 response
 
-Returns the Response after the response head has been received or created, or
-undef before a Response exists.
+Returns the Response once one exists, or undef beforehand.
 
 =head2 request_body
 
-Returns the writable producer for an outgoing streaming Request body when the
-Client request selected incremental body production:
+Returns the writable producer for an outgoing streaming Request body.
 
-    my $tx = $client->post(
-        $url,
-        stream_body => {
-            on_drain  => sub ($body) { ... },
-            on_cancel => sub ($body) { ... },
-        },
-    );
-
-    my $body = $tx->request_body;
+    my $body = $operation->request_body;
     $body->write($bytes);
     $body->complete;
 
-The producer belongs to the Transaction rather than the Request message.
+The producer belongs to the Transaction, not to Request.
 
 =head2 response_body
 
-Returns the writable producer for an outgoing streaming Response body. On a
-server, the active transaction can be obtained from the connection:
+Creates or returns the writable producer for an outgoing streaming Response:
 
     my $body = $conn->transaction->response_body(
         on_drain  => sub ($body) { ... },
@@ -422,100 +411,75 @@ server, the active transaction can be obtained from the connection:
     $body->write($bytes);
     $body->complete;
 
-Creating the producer marks the Response body as incremental rather than a
-complete scalar body. The Request/Response message objects themselves do not
-own transport writers.
-
 =head2 send_response
 
-Explicitly commits and sends an already configured complete scalar Response.
-Ordinary server callbacks do not need this method: a scalar C<< $res->body(...) >>
-is committed automatically after the callback returns. It is useful when a
-Response is completed later from another event callback:
+Explicitly sends a complete scalar server Response that was finished after the
+original HTTP callback returned.
 
-    my $tx = $conn->transaction;
-
-    $timer = Linux::Event::Kernel::Timer->new(
-        loop => $conn->loop,
-        after => 0.1,
-        on_timer => sub ($timer) {
-            $tx->response->body("later\n");
-            $tx->send_response;
-        },
-    );
-
-The explicit send step is what lets Response remain a transport-independent
-message rather than retaining a hidden Connection back-reference.
+Ordinary responses completed during C<on_request>, C<on_body>, or
+C<on_request_end> do not need this call.
 
 =head2 upgrade
 
-Schedules an HTTP protocol Upgrade for this exchange. Configure the Response
-Upgrade header first, then request the lifecycle handoff through the
-Transaction:
+Schedules an HTTP/1.1 Upgrade handoff:
 
     $res->header('Upgrade', 'my-protocol');
     $conn->transaction->upgrade('MyProtocolConnection');
 
+The same live Linux::Event stream is transitioned after the HTTP exchange
+reaches the required boundary.
+
 =head2 tunnel
 
 Accepts a valid server-side HTTP/1.1 CONNECT exchange and schedules handoff of
-the same live stream to another Linux::Event stream class:
+the same live stream:
 
-    if ($req->method eq 'CONNECT') {
-        $conn->transaction->tunnel('MyTunnelConnection');
-    }
+    $conn->transaction->tunnel('MyTunnelConnection');
 
-The default Response status is 200. Applications may configure another 2xx
-status or additional response headers before calling C<tunnel>. Successful
-CONNECT responses cannot carry an HTTP message body, Content-Length,
-Transfer-Encoding, or C<Connection: close>. The Request must use authority-form
-C<host:port>, have a matching Host field, and contain no HTTP message body or
-message-framing fields.
-
-C<tunnel> only completes the HTTP CONNECT handshake and transfers ownership of
-the accepted stream. Opening or bridging an upstream destination is application
-or higher-protocol policy.
+Opening or bridging the upstream destination remains application policy.
 
 =head2 is_response_started
 
-True after response output has begun. This is exchange/output state, not a
-property of the Response message itself.
+True after response output has begun.
 
 =head2 is_upgrading
 
-True while a protocol Upgrade handoff is pending.
+True while an HTTP/1 Upgrade handoff is pending.
 
 =head2 is_tunneling
 
-True while a successful server-side CONNECT tunnel handoff is pending.
+True while an HTTP/1 CONNECT handoff is pending.
 
 =head2 state
 
-Returns the coarse application-visible lifecycle state. The common states are
-C<pending>, C<active>, C<complete>, C<cancelled>, and C<error>. Connection
-implementations may track finer protocol phases privately without exposing
-parser or transport internals here.
+Returns the coarse lifecycle state: C<pending>, C<active>, C<complete>,
+C<cancelled>, or C<error>.
 
 =head2 cancel
 
-Requests cancellation of this exchange. Cancellation is idempotent from the
-application's perspective. The current Client or Connection controller is
-responsible for the protocol action needed to abandon the exchange safely.
+Requests cancellation. Application-visible cancellation is idempotent; the
+active protocol executor chooses the correct wire action.
 
 =head2 is_complete
 
-True only after the exchange completes successfully.
+True after successful exchange completion.
 
 =head2 is_cancelled
 
-True after the exchange has been cancelled.
+True after cancellation.
 
 =head2 is_terminal
 
-True for successful completion, cancellation, or error.
+True after success, cancellation, or error.
 
 =head2 error
 
 Returns the terminal error value after failure, or undef otherwise.
+
+=head1 SEE ALSO
+
+L<Linux::Event::HTTP::Request>, L<Linux::Event::HTTP::Response>,
+L<Linux::Event::HTTP::Client::Operation>,
+L<Linux::Event::HTTP::Body::Stream>.
 
 =cut

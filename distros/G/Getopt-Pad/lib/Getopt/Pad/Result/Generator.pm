@@ -8,7 +8,7 @@ use experimental 'signatures';
 use Object::Pad qw(:experimental(mop));
 use Getopt::Pad::Result;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $classCounter = 0;
 my %classForReaders;
@@ -39,13 +39,29 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Result::Generator - runtime result class builder
+Getopt::Pad::Result::Generator - Creates the classes of result objects
+(internal)
 
 =head1 DESCRIPTION
 
-Builds one Object::Pad class per distinct reader set via Object::Pad::MOP::Class, with a :param :reader field for every declared option and arg. Classes are cached, so repeated parses and levels with identical readers share one class and long-running processes do not grow their symbol table.
+This module is internal to Getopt::Pad. It is not part of the public
+API and can change without notice. Programs use L<Getopt::Pad/GetOptions>;
+this page is for people working on Getopt::Pad itself.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+C<Getopt::Pad::Result::Generator::generate($level)> returns the name of
+an L<Object::Pad> class for the result objects of C<$level>. The class
+inherits from L<Getopt::Pad::Result> and has one C<:param :reader> field,
+defaulting to C<undef>, per declared option and arg of the level. It is
+built with L<Object::Pad::MOP::Class> and sealed.
+
+Classes are cached by their set of readers, so repeated parses, and levels
+with the same readers, share one class. A long-running process that
+parses many command lines does not keep creating packages. The class
+names (C<Getopt::Pad::Result::_1>, ...) are not meaningful.
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Result>, L<Getopt::Pad::Parser>
 
 =head1 AUTHOR
 

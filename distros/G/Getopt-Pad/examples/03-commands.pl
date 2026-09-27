@@ -4,8 +4,13 @@
 # the command, and every level yields its own result object reachable via
 # ->subcommand. The dump below shows the chain with indentation.
 #
+# --verbose is inherited: it is accepted after the command words as well,
+# and read from the top level. 03-commands.json next to this script sets
+# options of the nested commands in its "commands" sections.
+#
 # Try:
 #   perl examples/03-commands.pl document create --format pdf "My Doc"
+#   perl examples/03-commands.pl image resize --verbose
 #   perl examples/03-commands.pl image resize --width 640 --height 480
 #   perl examples/03-commands.pl document create --help
 #   perl examples/03-commands.pl frobnicate
@@ -22,7 +27,7 @@ use ResultDump;
 
 my $opt = GetOptions(
 	options => {
-		'verbose' => { type => '!', help => 'Print more information' },
+		'verbose' => { type => 'bool', inherit => 1, help => 'Print more information' },
 	},
 	commands => {
 		'document' => {
@@ -34,7 +39,7 @@ my $opt = GetOptions(
 				'create' => {
 					description => 'Create a new document',
 					options     => {
-						'format' => { type => 's', valid => [qw(pdf docx)], help => 'Target document type' },
+						'format' => { type => 'string', valid => [qw(pdf docx)], help => 'Target document type' },
 					},
 					args => [
 						{ short => 'title', required => 1, help => 'Title of the new document' },
@@ -51,13 +56,14 @@ my $opt = GetOptions(
 				'resize' => {
 					description => 'Resize an image',
 					options     => {
-						'width'  => { type => 'i', min => 1, help => 'Target width in pixels' },
-						'height' => { type => 'i', min => 1, help => 'Target height in pixels' },
+						'width'  => { type => 'int', min => 1, help => 'Target width in pixels' },
+						'height' => { type => 'int', min => 1, help => 'Target height in pixels' },
 					},
 				},
 			},
 		},
 	},
+	config      => { format => 'json', paths => ["$FindBin::Bin/03-commands.json"] },
 	description => 'Demonstrate nested subcommands.',
 );
 

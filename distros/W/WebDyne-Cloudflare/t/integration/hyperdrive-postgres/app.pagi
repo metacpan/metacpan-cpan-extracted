@@ -1,0 +1,118 @@
+use strict;
+use warnings;
+use Future::AsyncAwait;
+use JSON::PP ();
+use WebDyne::Cloudflare::Hyperdrive;
+
+my $core_cr=do '/app/core.pagi';
+die $@ unless $core_cr;
+
+async sub {
+    my ($scope_hr, $receive_cr, $send_cr)=@_;
+    return if $scope_hr->{'type'} eq 'lifespan';
+    return await $core_cr->(@_) if $scope_hr->{'path'} eq '/run';
+    die "missing qualification token\n" unless $scope_hr->{'query_string'}=~/\Atoken=([a-f0-9-]{36})\z/;
+    my $token=$1;
+    my $path=$scope_hr->{'path'};
+    my $db_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $scope_hr);
+    my %result;
+    if ($path eq '/sql') {
+        my $joined_ar=await $db_or->selectall_arrayref(
+            'SELECT i.sku, s.label, i.quantity*i.unit_price AS total FROM webdyne_hyperdrive_test.items i JOIN webdyne_hyperdrive_test.samples s ON s.id=i.sample_id ORDER BY i.id',
+            { Slice => {} });
+        die "join failed\n" unless (@{$joined_ar}==3)&&($joined_ar->[0]{'label'} eq 'ordinary')&&($joined_ar->[0]{'total'} eq '25.00');
+        my $fixture_hr=await $db_or->selectrow_hashref('SELECT * FROM webdyne_hyperdrive_test.samples WHERE id=$1', undef, 1);
+        die "fixture scalar types failed\n" unless ($fixture_hr->{'note'} eq 'Synthetic fixture')
+            &&JSON::PP::is_bool($fixture_hr->{'enabled'})&&$fixture_hr->{'enabled'}
+            &&($fixture_hr->{'measured'}==1.25)&&($fixture_hr->{'calendar_date'} eq '2026-01-15')
+            &&($fixture_hr->{'recorded_at'}=~/\.123456/)&&($fixture_hr->{'tags'} eq '{alpha,beta}')
+            &&($fixture_hr->{'external_id'} eq '00000000-0000-4000-8000-000000000001');
+        my $json='{"n":9007199254740993,"d":12345678901234567890.1234567890,"type":"blob","base64":"text"}';
+        my $types_hr=await $db_or->selectrow_hashref(
+            q{SELECT $1::jsonb AS document, 'NaN'::float8 AS nan, 'Infinity'::float8 AS positive, '-Infinity'::float8 AS negative, ARRAY['x',NULL]::text[] AS tags}, undef, $json);
+        die "JSON precision or special scalar failed\n" unless ($types_hr->{'document'}=~/9007199254740993/)
+            &&($types_hr->{'document'}=~/12345678901234567890\.1234567890/)
+            &&($types_hr->{'nan'} eq 'NaN')&&($types_hr->{'positive'} eq 'Infinity')
+            &&($types_hr->{'negative'} eq '-Infinity')&&($types_hr->{'tags'} eq '{x,NULL}');
+        my $value=q{x'); SELECT 'injected'; --};
+        await $db_or->begin_work();
+        my $insert_hr=await $db_or->selectrow_hashref(
+            'INSERT INTO webdyne_hyperdrive_test.transaction_probe VALUES ($1,7,$2) RETURNING value,slot', undef, $token, $value);
+        die "bound INSERT RETURNING failed\n" unless ($insert_hr->{'value'} eq $value)&&($insert_hr->{'slot'}==7);
+        my $update_ar=await $db_or->selectrow_arrayref(
+            'UPDATE webdyne_hyperdrive_test.transaction_probe SET value=$2 WHERE run_token=$1 AND slot=7 RETURNING value', undef, $token, 'returned update');
+        die "UPDATE RETURNING failed\n" unless $update_ar->[0] eq 'returned update';
+        my $delete_ar=await $db_or->selectrow_arrayref(
+            'DELETE FROM webdyne_hyperdrive_test.transaction_probe WHERE run_token=$1 AND slot=7 RETURNING value', undef, $token);
+        die "DELETE RETURNING failed\n" unless $delete_ar->[0] eq 'returned update';
+        await $db_or->rollback();
+        %result=(joins => 1, returning => 1, binding => 1, types => 1);
+    }
+    elsif ($path eq '/limits') {
+        my $a_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $scope_hr);
+        my $b_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $scope_hr);
+        await $a_or->selectrow_arrayref('SELECT 1', undef);
+        await $b_or->selectrow_arrayref('SELECT 1', undef);
+        my $ok_fg=eval { await $db_or->selectrow_arrayref('SELECT 1', undef); 1 };
+        die "connection cap failed\n" if $ok_fg||!ref($@)||($@->code() ne 'CONNECTION_LIMIT');
+        await $a_or->disconnect(); await $b_or->disconnect(); $result{'connections'}=1;
+        foreach my $case_ar (['rows', 'SELECT generate_series(1, 20)', 'RESULT_LIMIT'],
+            ['bytes', "SELECT repeat('x', 20000)", 'RESULT_LIMIT'],
+            ['timeout', 'SELECT pg_sleep(6)', 'TIMEOUT']) {
+            my $test_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $scope_hr);
+            my $ok_fg=eval { await $test_or->selectall_arrayref($case_ar->[1], undef); 1 };
+            die "unexpected $case_ar->[0] result: $@" if $ok_fg||!ref($@)||($@->code() ne $case_ar->[2]);
+            await $test_or->disconnect();
+            $result{$case_ar->[0]}=1;
+        }
+    }
+    elsif ($path eq '/network') {
+        await $db_or->begin_work();
+        my $ok_fg=eval {
+            await $db_or->selectrow_arrayref('SELECT pg_terminate_backend(pg_backend_pid())', undef);
+            await $db_or->selectrow_arrayref('SELECT 1', undef); 1;
+        };
+        die "connection termination was not reported\n" if $ok_fg;
+        die "termination permission denied\n" if ref($@)&&($@->code() eq '42501');
+        $result{'error'}=ref($@) ? $@->code() : 'PERL_ERROR';
+        await $db_or->disconnect();
+        my $fresh_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $scope_hr);
+        die "fresh connection recovery failed\n" unless (await $fresh_or->selectrow_arrayref('SELECT 1', undef))->[0]==1;
+        await $fresh_or->disconnect(); $result{'recovered'}=1;
+    }
+    elsif ($path eq '/prime') {
+        await $db_or->selectrow_arrayref('SELECT 1', undef);
+        $WebDyne::Cloudflare::Qualification::SAVED_DB_OR=$db_or;
+        $result{'primed'}=1;
+    }
+    elsif ($path eq '/stale') {
+        die "missing previous handle\n" unless $WebDyne::Cloudflare::Qualification::SAVED_DB_OR;
+        my $ok_fg=eval { await $WebDyne::Cloudflare::Qualification::SAVED_DB_OR->selectrow_arrayref('SELECT 1', undef); 1 };
+        die "stale handle not rejected\n" if $ok_fg||!ref($@)||($@->code() ne 'CAPABILITY_EXPIRED');
+        $result{'stale'}=1;
+    }
+    elsif ($path eq '/failure') {
+        await $db_or->begin_work();
+        await $db_or->do('INSERT INTO webdyne_hyperdrive_test.transaction_probe VALUES ($1, 6, $2)', undef, $token, 'failed request rollback');
+        $WebDyne::Cloudflare::Qualification::POISONED=1;
+        die "intentional qualification failure\n";
+    }
+    elsif ($path eq '/health') {
+        die "poisoned interpreter survived\n" if $WebDyne::Cloudflare::Qualification::POISONED;
+        $result{'fresh_interpreter'}=1;
+        die "recovery read failed\n" unless (await $db_or->selectrow_arrayref('SELECT 1', undef))->[0]==1;
+    }
+    elsif ($path eq '/abort') {
+        await $db_or->begin_work();
+        await $db_or->do('INSERT INTO webdyne_hyperdrive_test.transaction_probe VALUES ($1, 5, $2)', undef, $token, 'aborted request rollback');
+        my $pid=(await $db_or->selectrow_arrayref('SELECT pg_backend_pid()', undef))->[0];
+        await $send_cr->({type => 'sse.start', status => 200, headers => []});
+        await $send_cr->({type => 'sse.send', data => JSON::PP->new()->encode({pid => $pid})});
+        await $db_or->selectrow_arrayref('SELECT pg_sleep(6)', undef);
+        await $send_cr->({type => 'sse.close'});
+        return;
+    }
+    else { die "unknown qualification route\n" }
+    await $send_cr->({type => 'http.response.start', status => 200, headers => [['content-type', 'application/json']]});
+    await $send_cr->({type => 'http.response.body', body => JSON::PP->new()->encode(\%result)});
+};

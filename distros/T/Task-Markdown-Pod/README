@@ -1,0 +1,82 @@
+Task::Markdown::Pod
+
+Task::Markdown::Pod installs the complete Perl toolchain for converting
+Markdown sidecars and DocBook documents into POD for Perl distributions.
+The supported DocBook path converts DocBook to Markdown first; the
+Markdown/POD processor then maintains POD in Perl sources. The bundle
+includes the MakeMaker integration used by make doc and make readme.
+
+Installation
+
+Install the released bundle and its Perl prerequisites from CPAN:
+
+    cpanm Task::Markdown::Pod
+
+The bundle installs these distributions:
+
+- Markdown::Pod::Embed for Markdown-to-POD conversion and the markpod
+  command;
+- Docbook::Convert for DocBook-to-Markdown conversion and the
+  docbook-convert command;
+- ASPEER::MakeMaker::Markdown::Pod for the doc and readme MakeMaker
+  targets.
+
+System prerequisites
+
+CPAN installs the Perl modules, but it does not install external
+programs. Install Pandoc for the preferred DocBook conversion pipeline
+and README generation. Install xmllint and xsltproc for the DocBook XML
+toolchain. On Fedora, a complete build environment can be installed
+with:
+
+    sudo dnf install perl perl-App-cpanminus perl-devel make gcc expat-devel \
+      pandoc libxml2 libxslt
+
+perl-devel, gcc, make, and expat-devel allow CPAN to build XML parser
+dependencies when a suitable Fedora Perl package is not already
+installed.
+
+Use
+
+Convert a Markdown sidecar into embedded POD:
+
+    markpod --inplace lib/My/Module.pm
+
+Convert a DocBook article to Markdown:
+
+    docbook-convert --pandoc doc/guide.xml > doc/guide.md
+
+Enable the MakeMaker targets in a distribution:
+
+    use ExtUtils::MakeMaker;
+    use ASPEER::MakeMaker::Markdown::Pod;
+
+    WriteMakefile(
+        NAME         => 'My::Module',
+        VERSION_FROM => 'lib/My/Module.pm',
+    );
+
+Then run:
+
+    perl Makefile.PL
+    make doc
+    make readme
+
+GitHub attestations
+
+Tagged releases build one distribution archive, publish it to GitHub
+Releases and CPAN, and attach GitHub provenance and a Sigstore bundle.
+After downloading Task-Markdown-Pod-VERSION.tar.gz from CPAN, verify its
+attestation with:
+
+    gh attestation verify Task-Markdown-Pod-VERSION.tar.gz \
+      --repo aspeer/pm-Task-Markdown-Pod
+
+Author
+
+Andrew Speer andrew.speer@isolutions.com.au
+
+License and copyright
+
+This software is copyright (c) 2026 by Andrew Speer. It may be
+distributed under the same terms as Perl itself.

@@ -1,0 +1,68 @@
+{
+   "abstract" : "Server::Starter adapter for Feersum Plack handler",
+   "author" : [
+      "Yegor Korablev <egor@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Handler-Feersum-SS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Fcntl" : "0",
+            "Feersum" : "0",
+            "Plack::Handler::Feersum" : "0",
+            "Server::Starter" : "0",
+            "Symbol" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "IO::Socket::INET" : "0",
+            "Plack::Runner" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vividsnow/Plack-Handler-Feersum-SS/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vividsnow/Plack-Handler-Feersum-SS.git",
+         "web" : "https://github.com/vividsnow/Plack-Handler-Feersum-SS"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

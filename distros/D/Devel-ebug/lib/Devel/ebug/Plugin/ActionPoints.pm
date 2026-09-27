@@ -5,7 +5,7 @@ use warnings;
 use base qw(Exporter);
 our @EXPORT = qw(break_point break_point_delete break_point_subroutine break_points break_points_with_condition all_break_points_with_condition watch_point break_on_load);
 
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 # set a break point (by default in the current file)
 sub break_point {
@@ -48,10 +48,11 @@ sub break_point_delete {
 
 # set a break point
 sub break_point_subroutine {
-  my($self, $subroutine) = @_;
+  my($self, $subroutine, $condition) = @_;
   my $response = $self->talk({
     command    => "break_point_subroutine",
     subroutine => $subroutine,
+    condition  => $condition,
   });
   return $response->{line};
 }
@@ -123,7 +124,7 @@ Devel::ebug::Plugin::ActionPoints
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 AUTHOR
 

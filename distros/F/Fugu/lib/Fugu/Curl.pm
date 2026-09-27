@@ -16,7 +16,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 package Fugu::Curl;
-our $VERSION = '0.5.1';
+our $VERSION = '0.5.2';
 
 use v5.34;
 use warnings;
@@ -78,10 +78,12 @@ use constant CURL_TIMEOUT_EXIT => 28;
 # --write-out. wget and ftp name the status in their diagnostic on
 # standard error. The first digit runs from 1 to 9, because curl
 # writes 000 for a transfer that reached no response at all.
+# The ftp of OpenBSD names the file before 7.8 and the URL from 7.8
+# on, so the ftp pattern takes the status after the last colon.
 my %STATUS_PATTERN = (
 	curl => qr/\A([1-9]\d\d)\z/,
 	wget => qr/\bERROR\s+([1-9]\d\d)\b/,
-	ftp  => qr/\bError retrieving file:\s*([1-9]\d\d)\b/,
+	ftp  => qr/\bError retrieving .*:\s*([1-9]\d\d)\b/,
 );
 
 # Fugu::Curl->new(%args):

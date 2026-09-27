@@ -1,0 +1,69 @@
+{
+   "abstract" : "install the documentation conversion and publishing toolchain",
+   "author" : [
+      "Andrew Speer <andrew.speer@isolutions.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Task-Markdown-Publish",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "version" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ASPEER::MakeMaker::Markdown::Pod" : "1.014",
+            "ASPEER::MakeMaker::Markdown::Publish" : "1.003",
+            "Docbook::Convert" : "1.012",
+            "Markdown::Pod::Embed" : "1.013",
+            "Markdown::Publish" : "1.003",
+            "Task::Markdown::Pod" : "0.001",
+            "perl" : "5.010",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aspeer/pm-Task-Markdown-Publish/issues"
+      },
+      "homepage" : "https://github.com/aspeer/pm-Task-Markdown-Publish",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aspeer/pm-Task-Markdown-Publish.git",
+         "web" : "https://github.com/aspeer/pm-Task-Markdown-Publish"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:ASPEER",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

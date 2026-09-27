@@ -7,9 +7,8 @@ use Carp qw(croak);
 use Scalar::Util qw(refaddr);
 
 use Linux::Event::IO::Sock::Stream ();
-use Linux::Event::Kernel::Timer;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub _load_target ($target) {
     croak 'request(): tunnel_to must be a package name'
@@ -116,31 +115,29 @@ sub schedule ($class, $conn, $transaction, $response, $target) {
     # Content-Length / Transfer-Encoding, if sent by a peer, are ignored.
     $response->_mark_complete;
     $conn->{_http_client_reusable} = 0;
+    my $resume_read = $conn->is_read_paused ? 0 : 1;
+    $conn->pause_read if $resume_read;
     $conn->{_http_client_pending_connect} = {
         transaction => $transaction,
         response    => $response,
         target      => $target,
+        resume_read => $resume_read,
     };
 
-    Linux::Event::Kernel::Timer->new(
-        loop     => $conn->loop,
-        after    => 0,
-        data     => {
-            connection  => $conn,
-            transaction => $transaction,
-            target      => $target,
-        },
-        on_timer => \&_handoff,
-    );
+    my $state = {
+        connection  => $conn,
+        transaction => $transaction,
+        target      => $target,
+    };
+    $conn->loop->defer(sub { _handoff($state) });
 
     return $transaction;
 }
 
-sub _handoff ($timer) {
-    my $timer_state = $timer->data;
-    my $conn = $timer_state->{connection};
-    my $transaction = $timer_state->{transaction};
-    my $target = $timer_state->{target};
+sub _handoff ($state) {
+    my $conn = $state->{connection};
+    my $transaction = $state->{transaction};
+    my $target = $state->{target};
 
     return if !$conn || $conn->is_closed;
     return if !$transaction || $transaction->is_terminal;
@@ -155,6 +152,7 @@ sub _handoff ($timer) {
     my $callbacks = $conn->{_http_client_callbacks} || {};
     my $response = $pending->{response};
     my $input = $conn->{_http_client_input};
+    my $resume_read = $pending->{resume_read};
 
     $transaction->_mark_complete;
     $conn->{_http_client_input} = '';
@@ -166,6 +164,7 @@ sub _handoff ($timer) {
         } else {
             $conn->transition_to($target);
         }
+        $conn->resume_read if $resume_read && $conn->is_read_paused;
         1;
     };
 

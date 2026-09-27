@@ -1,0 +1,7 @@
+Revision history for Task-Markdown-Pod
+
+0.001  2026-09-27
+
+    - First release.
+    - Install the Markdown/POD processor, DocBook converter, and MakeMaker
+      documentation integration.

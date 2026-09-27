@@ -5,25 +5,37 @@ use warnings;
 use Carp;
 use Class::Accessor::Chained::Fast;
 use Devel::StackTrace 2.00;
+use Devel::ebug::Wire;
+use IO::Select;
 use IO::Socket::INET;
 use Proc::Background;
 use String::Koremutake;
-use YAML;
+use Text::ParseWords qw(shellwords);
 use Module::Pluggable require => 1;
 
 use base qw(Class::Accessor::Chained::Fast);
 
 # ABSTRACT: A simple, extensible Perl debugger
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 __PACKAGE__->mk_accessors(qw(
     backend
     port
-    program socket proc
+    serializer
+    program args socket proc pid running
     package filename line codeline subroutine finished));
 
 # let's run the code under our debugger and connect to the server it
 # starts up
+# 'yaml' unless asked otherwise, so existing clients are unaffected.
+sub _serializer {
+  my($self) = @_;
+  my $format = $self->serializer || $ENV{DEVEL_EBUG_SERIALIZER} || 'yaml';
+  croak "unknown serializer '$format', expected 'yaml' or 'json'"
+    unless $format eq 'yaml' or $format eq 'json';
+  return $format;
+}
+
 sub load {
   my $self = shift;
   my $program = $self->program;
@@ -32,22 +44,68 @@ sub load {
   eval { $_->import } for $self->plugins;
 
   my $k = String::Koremutake->new;
-  my $rand = int(rand(100_000));
-  my $secret = $k->integer_to_koremutake($rand);
-  my $port   = 3141 + ($rand % 1024);
+  my $secret = $k->integer_to_koremutake(int(rand(100_000)));
+
+  # Listen on a port of the OS's choosing and have the backend connect back
+  # to it, so that concurrent sessions can never collide over a port.
+  my $listener = IO::Socket::INET->new(
+    Listen    => 1,
+    LocalAddr => 'localhost',
+    LocalPort => 0,
+    Proto     => 'tcp',
+  ) || croak "Devel::ebug: could not listen for the backend: $!";
 
   $ENV{SECRET} = $secret;
-  my $backend = $self->backend || "$^X -d:ebug::Backend";
-  my $command = "$backend $program";
+  $ENV{DEVEL_EBUG_CONNECT} = $listener->sockport;
+  # With args the command is run as a list, so they reach the program
+  # verbatim instead of being split and interpolated by the shell.
+  my @command;
+  if (my $args = $self->args) {
+    my @backend = $self->backend ? shellwords($self->backend) : ($^X, '-d:ebug::Backend');
+    @command = (@backend, $program, @$args);
+  } else {
+    my $backend = $self->backend || "$^X -d:ebug::Backend";
+    @command = ("$backend $program");
+  }
   my $proc = Proc::Background->new(
     {'die_upon_destroy' => 1},
-    $command
+    @command
   );
   croak(qq{Devel::ebug: Failed to start up "$program" in load()}) unless $proc->alive;
   $self->proc($proc);
   $ENV{SECRET} = "";
+  delete $ENV{DEVEL_EBUG_CONNECT};
 
-  $self->attach($port, $secret);
+  $self->socket($self->_accept_backend($listener, $secret));
+  close $listener;
+
+  $self->_handshake($secret);
+}
+
+# Wait for the backend we just started to connect back.  It announces
+# itself by sending the secret, and anything else that connects to the
+# listening port is turned away.
+sub _accept_backend {
+  my($self, $listener, $secret) = @_;
+  my $program  = $self->program;
+  my $select   = IO::Select->new($listener);
+  my $deadline = time + 30;
+
+  while (time < $deadline) {
+    croak(qq{Devel::ebug: "$program" exited before the debugger could connect to it})
+      unless $self->proc->alive;
+    next unless $select->can_read(0.1);
+    my $socket = $listener->accept or next;
+    my $line = IO::Select->new($socket)->can_read(5) ? $socket->getline : undef;
+    if (defined $line) {
+      $line =~ s/\r?\n\z//;
+      return $socket if $line eq $secret;
+    }
+    close $socket;
+  }
+
+  croak(qq{Devel::ebug: timed out waiting for "$program" to connect to the debugger; }
+    . qq{is an older Devel::ebug::Backend being loaded that does not support DEVEL_EBUG_CONNECT?});
 }
 
 sub attach {
@@ -71,15 +129,31 @@ sub attach {
     die "Could not connect: $!" unless $socket;
     $self->socket($socket);
 
-    my $response = $self->talk(
+    $self->_handshake($key, $port);
+}
+
+sub _handshake {
+    my ($self, $key, $port) = @_;
+
+    # talk() would report a closed connection as a lost program; here it
+    # means our secret was turned away, which deserves its own message
+    $self->_send(
         {   command => "ping",
             version => $Devel::ebug::VERSION,
             secret  => $key,
         }
     );
+    my $response = $self->_receive(1);
+    unless ($response) {
+        die "The debugger did not answer the handshake"
+          . (defined $port ? " on port $port; the key may be wrong, or the port may belong to another session" : "")
+          . "\n";
+    }
     my $version = $response->{version};
     die "Client version $version != our version $Devel::ebug::VERSION"
         unless do { no warnings 'uninitialized'; $version eq $Devel::ebug::VERSION };
+    $self->pid($response->{pid});
+    $self->running(0);
 
     $self->basic;    # get basic information for the first line
 }
@@ -101,24 +175,65 @@ sub attach {
 
 
 
-# at the moment, we talk hex-encoded YAML serialisation
-# don't worry about this too much
+# Requests and responses go over the socket one line at a time; see
+# Devel::ebug::Wire for how a line is put together.
+# The debugger went away mid-conversation: the program exited without
+# the debugger's cleanup running, was killed, or crashed.
+sub _lost {
+  my($self) = @_;
+  $self->running(0);
+  my $program = defined $self->pid ? sprintf('the program (pid %d)', $self->pid) : 'the program';
+  my $what = "$program has exited or been killed";
+
+  # When we started it, say how it ended.  The connection can close a
+  # moment before the process is reaped, so give it a short while.
+  if (my $proc = $self->proc) {
+    for (1 .. 20) {
+      last unless $proc->alive;
+      select(undef, undef, undef, 0.05);
+    }
+    my $status = $proc->alive ? undef : $proc->wait;
+    if (defined $status) {
+      $what = $status & 127
+        ? sprintf('%s was killed by signal %d', $program, $status & 127)
+        : sprintf('%s exited with status %d', $program, $status >> 8);
+    }
+  }
+  croak "Devel::ebug: lost the connection to the debugger; $what";
+}
+
 sub talk {
   my($self, $req) = @_;
-  my $socket = $self->socket;
+  croak "Devel::ebug: the program is running; call wait_for_stop() before '$req->{command}'"
+    if $self->running;
+  $self->_send($req);
+  return $self->_receive;
+}
 
-  my $data = unpack("h*", Dump($req));
-  $socket->print($data . "\n");
-  $data = <$socket>;
-  if ($data) {
-    my $res = do {
-      $YAML::LoadBlessed = 1;
-      Load(pack("h*", $data));
-    };
-    return $res;
-  } else {
-    return undef;
+sub _send {
+  my($self, $req) = @_;
+  my $format = $self->_serializer;
+  # Writing to a debugger that has gone away raises SIGPIPE, which would
+  # kill the frontend outright; turn it into an error that can be caught.
+  local $SIG{PIPE} = 'IGNORE';
+  $self->socket->print(Devel::ebug::Wire::encode($format, $req) . "\n")
+    or $self->_lost;
+}
+
+# Read one response.  A closed connection is an error, unless $allow_eof
+# is true, in which case it returns undef.
+sub _receive {
+  my($self, $allow_eof) = @_;
+  my $socket = $self->socket;
+  my $data = <$socket>;
+  unless (defined $data) {
+    return undef if $allow_eof;
+    $self->_lost;
   }
+
+  # The backend answers in the format it was asked in, but detect rather
+  # than assume: it costs nothing and keeps a mismatch from being silent.
+  return Devel::ebug::Wire::decode(Devel::ebug::Wire::detect($data), $data);
 }
 
 1;
@@ -135,7 +250,7 @@ Devel::ebug - A simple, extensible Perl debugger
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
@@ -217,12 +332,22 @@ L<Devel::ebug> is a work in progress.
 Internally, L<Devel::ebug> consists of two parts. The frontend is
 L<Devel::ebug>, which you interact with. The frontend starts the code
 you are debugging in the background under the backend (running it
-under perl -d:ebug code.pl). The backend starts a TCP server, which
-the frontend then connects to, and uses this to drive the
-backend. This adds some flexibility in the debugger. There is some
-minor security in the client/server startup (a secret word), and a
-random port is used from 3141-4165 so that multiple debugging sessions
-can happen concurrently.
+under perl -d:ebug code.pl), and the two talk over a TCP socket on
+localhost, which the frontend uses to drive the backend. This adds some
+flexibility in the debugger.
+
+When L</load> starts the program, the frontend listens on a port chosen
+by the operating system and passes it to the backend in the
+C<DEVEL_EBUG_CONNECT> environment variable, along with a random secret
+word in C<SECRET>. The backend connects back to that port and sends the
+secret before anything else, so the frontend can tell it apart from
+anything else that connects. Because the port is chosen by the operating
+system, any number of debugging sessions can run concurrently.
+
+Without C<DEVEL_EBUG_CONNECT>, the backend instead listens on a port from
+3141-4165 derived from the secret, and waits for a frontend to attach
+with that secret, as L<ebug_server> and L<ebug_client> do. A frontend
+with the wrong secret is turned away without ending the session.
 
 =head1 CONSTRUCTOR
 
@@ -238,6 +363,50 @@ The program method selects which program to load:
 
   $ebug->program("calc.pl");
 
+The program is run through the shell, so it may also carry arguments for
+the program (C<"add.pl 3 4">), subject to the shell's word splitting and
+interpolation.  To pass arguments that must arrive exactly as given, set
+L</args> instead.
+
+=head2 args
+
+The args method sets the command-line arguments for the program, as an
+array reference:
+
+  $ebug->program("add.pl");
+  $ebug->args([ 3, "four and a half" ]);
+
+When args is set the program is started without going through the shell,
+so each argument reaches the program's C<@ARGV> unchanged, even if it
+contains spaces, quotes or other shell metacharacters.  In that case
+L</program> is taken as the path of the program alone.  The arguments are
+used again each time the program is restarted, for example by C<undo>.
+
+=head2 serializer
+
+The serializer method selects how requests and responses are written on the
+socket between the frontend and the backend:
+
+  $ebug->serializer("json");
+
+C<yaml> is the default and is what every existing client speaks: L<YAML>
+output, hex packed onto a single line.  C<json> writes one plain JSON object
+per line instead, which is the format to choose when the other end is not
+Perl - a JSON line can be read by anything, whereas hex packed YAML asks a
+client for a YAML parser, object deserialization and a hex decoder first.
+
+It can also be set with the C<DEVEL_EBUG_SERIALIZER> environment variable,
+which is how to choose the format for a frontend you do not construct
+yourself, such as L<ebug_client>.
+
+The backend replies in whichever format each request arrived in, so nothing
+has to be arranged with it beforehand.  Selecting C<json> uses
+L<Cpanel::JSON::XS> if it is installed, and otherwise requires L<JSON::PP>,
+which has shipped with perl since 5.14 but is not otherwise a prerequisite
+of this distribution.
+
+See L<Devel::ebug::Wire> for the details of both formats.
+
 =head2 load
 
 The load method loads the program and gets ready to debug it:
@@ -245,6 +414,12 @@ The load method loads the program and gets ready to debug it:
   $ebug->load;
 
 =head1 METHODS
+
+If the program being debugged goes away without the debugger's help, for
+example because it was killed, crashed in XS code or called
+C<POSIX::_exit>, any method that talks to it croaks with an error that
+begins C<Devel::ebug: lost the connection to the debugger>. For a program
+started with L</load>, the error also says how it ended.
 
 =head2 break_point
 
@@ -298,6 +473,12 @@ with the full package name:
 
   my $line = $ebug->break_point_subroutine("main::add");
   $ebug->break_point_subroutine("Calc::fib");
+
+It takes an optional condition, as L</break_point> does, so that the
+program only stops when the condition is true. At that point the
+subroutine has just been called, so C<@_> holds its arguments:
+
+  $ebug->break_point_subroutine("Calc::fib", '$_[1] > 5');
 
 The return value is the line at which the break point is set.
 
@@ -399,6 +580,27 @@ The finished method returns whether the program has finished running:
 
   print "Finished!\n" if $ebug->finished;
 
+=head2 interrupt
+
+The interrupt method asks a running program to stop at the next statement,
+as if a break point were there. It is meant for a program started with
+L</run_nowait>, or for calling from a signal handler during L</run>:
+
+  $ebug->run_nowait;
+  ...
+  $ebug->interrupt;
+  $ebug->wait_for_stop;
+
+It returns true if the program was signalled, and false without doing
+anything if the program is not running. Call L</wait_for_stop> afterwards
+to find out where it stopped.
+
+Interrupting works by sending C<SIGINT> to the program, so it is only
+supported for a program started with L</load> on the same host, and not on
+Windows; it croaks otherwise. Like pressing Ctrl-C, it takes effect once
+the program next executes a Perl statement, so a long call into XS code
+finishes first.
+
 =head2 line
 
 The line method returns the line number of the statement about to be
@@ -434,6 +636,12 @@ The package method returns the package of the currently running code:
     print "Variable: $k = $v\n";
   }
 
+=head2 pid
+
+The pid method returns the process id of the program being debugged, as
+reported by the program itself. This can differ from the process started
+by L</load> when the program is run through the shell.
+
 =head2 return
 
 The return subroutine returns from a subroutine. It continues running
@@ -450,9 +658,37 @@ purposes:
 =head2 run
 
 The run subroutine starts executing the code. It will only stop on a
-break point or watch point.
+break point, a watch point, an L</interrupt> or the end of the program.
+To start running without waiting for it to stop, see L</run_nowait>.
 
   $ebug->run;
+
+=head2 run_nowait
+
+The run_nowait method starts executing the code like L</run>, but returns
+straight away instead of waiting for the program to stop:
+
+  $ebug->run_nowait;
+
+While the program is running, the only methods that may be called are
+L</interrupt>, L</running> and L</wait_for_stop>; anything else croaks.
+The L</socket> becomes readable when the program stops, so a frontend with
+an event loop can wait on it rather than calling L</wait_for_stop> right
+away.
+
+=head2 running
+
+The running method returns true between L</run_nowait> and
+L</wait_for_stop>:
+
+  print "still going\n" if $ebug->running;
+
+=head2 socket
+
+The socket method returns the socket connected to the program being
+debugged. Do not read from or write to it; it is only useful for waiting,
+for example with L<IO::Select>, for it to become readable after
+L</run_nowait>.
 
 =head2 step
 
@@ -502,6 +738,17 @@ break_point_subroutine, eval, next, step, return, run and watch_point.
 It can also undo multiple commands:
 
   $ebug->undo(3);
+
+=head2 wait_for_stop
+
+The wait_for_stop method waits for a program started with L</run_nowait>
+to stop, at a break point, a watch point, an L</interrupt> or the end of
+the program, and updates L</filename>, L</line> and so on to match:
+
+  $ebug->wait_for_stop;
+  print $ebug->filename, ":", $ebug->line, "\n";
+
+It returns straight away if the program is not running.
 
 =head2 watch_point
 

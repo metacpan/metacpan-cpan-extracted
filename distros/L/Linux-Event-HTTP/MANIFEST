@@ -8,6 +8,7 @@ README.md
 SECURITY.md
 bench/pico-parser.pl
 bench/run-http-comparison.pl
+bench/run-http-client-receive.pl
 bench/run-http-end-to-end.pl
 bench/run-http-final-response.pl
 bench/run-http-transaction-ladder.pl
@@ -22,6 +23,7 @@ bench/servers/twiggy-http.pl
 docs/ARCHITECTURE.md
 docs/BENCHMARKING.md
 docs/CLIENT-POLICY.md
+docs/HTTP2-ARCHITECTURE.md
 docs/CONNECT.md
 docs/PICOHTTPPARSER-EXPERIMENT.md
 lib/Linux/Event/HTTP.pm
@@ -38,6 +40,13 @@ lib/Linux/Event/HTTP/_ClientAuth.pm
 lib/Linux/Event/HTTP/_ClientConnect.pm
 lib/Linux/Event/HTTP/_ClientUpgrade.pm
 lib/Linux/Event/HTTP/_HTTP1.pm
+lib/Linux/Event/HTTP/_HTTP2.pm
+lib/Linux/Event/HTTP/_HTTP2/Client.pm
+lib/Linux/Event/HTTP/_HTTP2/ClientConnection.pm
+lib/Linux/Event/HTTP/_HTTP2/ClientSelector.pm
+lib/Linux/Event/HTTP/_HTTP2/ClientSelectorConnection.pm
+lib/Linux/Event/HTTP/_HTTP2/Server.pm
+lib/Linux/Event/HTTP/_HTTP2/ServerConnection.pm
 lib/Linux/Event/HTTP/_ServerConnect.pm
 lib/Linux/Event/HTTP/_Upgrade.pm
 t/00-load.t
@@ -47,6 +56,8 @@ t/12-http1-framing.t
 t/13-chunked-decoder.t
 t/14-native-response-fastpath.t
 t/15-native-raw-server.t
+t/16-native-raw-client.t
+t/17-http2-message-mapping.t
 t/19-request-message.t
 t/20-response.t
 t/21-response-body-stream-unit.t
@@ -60,6 +71,7 @@ t/34-response-body-stream.t
 t/40-server.t
 t/41-tls-server.t
 t/42-upgrade.t
+t/43-managed-fork-server.t
 t/50-final-response.t
 t/60-client-connection.t
 t/61-client-response-framing.t
@@ -89,5 +101,19 @@ xshttp1/HTTP1.xs
 xshttp1/stream_consumer_abi.h
 xshttp1/Makefile.PL
 bench/servers/linuxevent-production-stage.pl
+t/90-http2-nghttp2-spike.t
+t/91-http2-alpn-spike.t
+t/92-http2-server-executor-spike.t
+t/93-http2-client-executor-spike.t
+t/94-http2-selector-transition-spike.t
+t/95-http2-high-level-client.t
+t/96-http2-high-level-multiplex.t
+t/97-http2-high-level-streaming-upload.t
+t/98-http2-header-list-limit.t
+t/99-http2-aggregate-buffer-limit.t
+t/100-http2-prealpn-fanout.t
+t/101-http2-high-level-policy.t
+t/102-http2-cancellation-isolation.t
+tools/http2-h2spec-server.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

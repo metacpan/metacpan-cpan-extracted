@@ -7,7 +7,7 @@ use Devel::ebug::Console;
 
 # PODNAME: ebug
 # ABSTRACT: A simple, extensible console Perl debugger
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 my $backend;
 if ($ARGV[0] eq '--backend') {
@@ -30,17 +30,23 @@ ebug - A simple, extensible console Perl debugger
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 
   % ebug calc.pl
+  % ebug add.pl 3 "four and a half"
   % ebug "add.pl 3 4"
 
 =head1 DESCRIPTION
 
 ebug is an interactive command-line front end to L<Devel::ebug>. It
 is a simple Perl debugger, much like perl5db.pl.
+
+Any arguments after the program name are passed to the program, each
+exactly as given, so an argument may contain spaces or other shell
+metacharacters.  If the program and its arguments are given together as a
+single string instead, that string is interpreted by the shell.
 
 =head1 COMMANDS
 
@@ -71,8 +77,12 @@ Set a break point at C<LINE> in C<FILE> (eg: C<b code.pl 6>).
 
 =item b SUBROUTINE
 
+=item b SUBROUTINE CONDITION
+
 Set a break point at the start of C<SUBROUTINE>, given as a fully
-qualified name (eg: C<b Calc::fib>).
+qualified name, optionally only breaking when C<CONDITION> is true. The
+condition is checked as the subroutine is entered, so C<@_> holds its
+arguments (eg: C<b Calc::fib>, C<b Calc::fib $_[1] E<gt> 5>).
 
 =item bf FILE
 

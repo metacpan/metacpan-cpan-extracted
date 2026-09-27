@@ -98,6 +98,40 @@ subtest 'per-level help' => sub {
 	like $nested, qr/^# Create a new document$/m, 'nested description';
 };
 
+subtest 'inherited options' => sub {
+	my %inheritSpec = (
+		options  => {
+			'color'     => { type => 's', valid => [qw(never always)], inherit => 1 },
+			'verbose|v' => { type => '+', inherit => 1 },
+			'tag'       => { type => 's', multiple => 1, inherit => 1 },
+		},
+		commands => {
+			document => {
+				options  => { path => { type => 's', inherit => 1 } },
+				commands => { create => { args => [{ short => 'title' }] } },
+			},
+		},
+	);
+
+	my $opt = parseWith(['document', 'create', '--color', 'never', '--path', 'a.txt', 'T'], %inheritSpec);
+	is $opt->color, 'never', 'accepted two levels below, read on the declaring level';
+	is $opt->subcommand->path, 'a.txt', 'an intermediate level passes its own on';
+	is $opt->subcommand->subcommand->title, 'T', 'the positional still reaches the innermost level';
+	ok !$opt->subcommand->can('color'), 'the levels below have no reader for it';
+
+	my $spread = parseWith(['--color', 'always', '-v', '--tag', 'a', 'document', '-v', '--tag', 'b', 'create', '--color', 'never', '-v', '--tag', 'c', 'T'], %inheritSpec);
+	is $spread->color,   'never',         'a single value given on several levels: the last one wins';
+	is $spread->verbose, 3,               'a counter adds up across levels';
+	is $spread->tag,     ['a', 'b', 'c'], 'a multiple option collects across levels';
+
+	like dies { parseWith(['document', 'create', '--color', 'sometimes', 'T'], %inheritSpec) },
+		qr/option '--color': 'sometimes' is not one of: never, always/, 'checked like on its own level';
+
+	my $request = dies { parseWith(['document', 'create', '--help'], %inheritSpec) };
+	like $request->output, qr/^   --color <>/m, 'listed in the help of the levels below';
+	like $request->output, qr/^   --path <>/m,  'from every level above';
+};
+
 subtest 'nested --help is not blocked by the outer level' => sub {
 	my $request = dies {
 		parseWith(['image', '--help'], %commandSpec, options => { owner => { type => 's', required => 1 } });

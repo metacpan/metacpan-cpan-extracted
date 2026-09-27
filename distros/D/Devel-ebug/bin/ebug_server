@@ -2,7 +2,7 @@
 
 # PODNAME: ebug_client
 # ABSTRACT: Debugger server for remote debugging Perl script
-our $VERSION = '0.65'; # VERSION
+our $VERSION = '0.67'; # VERSION
 
 
 #use lib::findbin '../lib'; # dev-only
@@ -15,7 +15,6 @@ GetOptions( my $OPT = {}, 'help', 'port=i', 'keepio' ) || help();
 help() if $OPT->{help} || !@ARGV;
 help() if $OPT->{port} && $OPT->{port} < 3141;
 
-my $cmd  = "$^X -d:ebug::Backend @ARGV";
 my $gen  = String::Koremutake->new;
 my $rand = $OPT->{port} ? $OPT->{port} - 3141 : int( rand(100_000) );
 my $key  = $gen->integer_to_koremutake($rand);
@@ -31,7 +30,14 @@ Debuggee started. Please attach with:
 
 Waiting...
 EOF
-exec($cmd);
+# a single argument ("hello.pl 1 2") is still split by the shell, but
+# several are passed to the debuggee exactly as given
+if (@ARGV > 1) {
+    exec($^X, '-d:ebug::Backend', @ARGV);
+}
+else {
+    exec("$^X -d:ebug::Backend @ARGV");
+}
 
 exit(0);
 
@@ -56,7 +62,7 @@ ebug_client - Debugger server for remote debugging Perl script
 
 =head1 VERSION
 
-version 0.65
+version 0.67
 
 =head1 SYNOPSIS
 

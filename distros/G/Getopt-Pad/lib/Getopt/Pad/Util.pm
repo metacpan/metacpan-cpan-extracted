@@ -7,7 +7,7 @@ use experimental 'signatures';
 
 use Exporter qw(import);
 
-our $VERSION   = '0.03';
+our $VERSION   = '0.04';
 our @EXPORT_OK = qw(camelize specError expandTilde useColor isValidName);
 
 sub useColor($handle) {
@@ -53,11 +53,53 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Util - internal helpers
+Getopt::Pad::Util - Helper functions (internal)
 
 =head1 DESCRIPTION
 
-Internal helpers: camelCase reader derivation (camelize), the shared name check for options, aliases, args and commands (isValidName), spec error reporting at the caller outside the library (specError), tilde expansion (expandTilde) and the color decision for a handle (useColor). Not part of the public API.
+This module is internal to Getopt::Pad. It is not part of the public
+API and can change without notice. Programs use L<Getopt::Pad/GetOptions>;
+this page is for people working on Getopt::Pad itself.
+
+=head1 FUNCTIONS
+
+All functions are exported on request.
+
+=over 4
+
+=item camelize($name)
+
+The reader name for an option or arg name: split at dashes and
+underscores, every part after the first with its first letter upper case
+(C<log-level> becomes C<logLevel>). A spec error if the result is not a
+valid Perl identifier.
+
+=item isValidName($name)
+
+Whether C<$name> is a valid option name, alias, arg name or command name:
+a letter, followed by word characters or dashes.
+
+=item specError($format, @args)
+
+Dies with C<Getopt::Pad spec: MESSAGE at FILE line LINE.>, where FILE and
+LINE are those of the first caller outside Getopt::Pad, normally the
+C<GetOptions> call.
+
+=item expandTilde($path)
+
+Replaces a leading C<~> (alone or followed by C</>) with C<$HOME>. Returns
+the path unchanged when C<HOME> is not set.
+
+=item useColor($handle)
+
+Whether output to C<$handle> should be colored: it is a terminal,
+C<NO_COLOR> is empty or unset, and C<TERM> is not C<dumb>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Getopt::Pad>
 
 =head1 AUTHOR
 

@@ -1,4 +1,4 @@
-FROM perl:5.30-slim
+FROM perl:5.40-slim
 
 COPY bin/ /app/bin/
 COPY lib/ /app/lib/
@@ -9,7 +9,7 @@ WORKDIR /app
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
-	&& apt-get -y --no-install-recommends install ca-certificates curl gcc libc6-dev libssl1.1 libssl-dev libxml2 libxml2-dev make zlib1g-dev \
+	&& apt-get -y --no-install-recommends install ca-certificates curl gcc libc6-dev libssl3 libssl-dev libxml2 libxml2-dev make zlib1g-dev \
 	&& cpanm -n --no-man-pages --installdeps . \
 	&& perl Build.PL \
 	&& perl Build \

@@ -32,11 +32,15 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008003"
+            "List::Util" : "0",
+            "Moo" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
+            "FindBin" : "0",
             "Test::More" : "0"
          }
       }
@@ -52,6 +56,6 @@
          "web" : "https://github.com/choroba/statistics-kappa"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

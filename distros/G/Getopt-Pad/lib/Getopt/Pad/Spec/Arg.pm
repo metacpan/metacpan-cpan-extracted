@@ -7,7 +7,7 @@ use Getopt::Pad::Result;
 class Getopt::Pad::Spec::Arg :strict(params) {
 	use Getopt::Pad::Util qw(camelize specError isValidName);
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	field $raw :param;
 
@@ -56,13 +56,41 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Spec::Arg - one positional arg spec
+Getopt::Pad::Spec::Arg - One positional arg of a spec (internal)
 
 =head1 DESCRIPTION
 
-A single validated positional arg spec: short name, type instance, reader name, required/multiple/help/typehint settings. typeLabel is the tag the help output shows for the arg: the typehint, or the type's own label.
+This module is internal to Getopt::Pad. It is not part of the public
+API and can change without notice. Programs use L<Getopt::Pad/GetOptions>;
+this page is for people working on Getopt::Pad itself.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+An arg spec holds the checked settings of one positional arg: its
+C<short> name, the reader name derived from it, the type (a
+L<Getopt::Pad::Type> instance that must take a value) and the keys
+C<required>, C<multiple>, C<help> and C<typehint>. The meaning of each key
+is documented in L<Getopt::Pad/ARG SPECS>. Unknown keys are a spec error.
+
+The order rules between args (a required arg after an optional one, and
+C<multiple> on the last arg only) are checked by
+L<Getopt::Pad::Spec::Level>; the values are checked by
+L<Getopt::Pad::Parser> when it consumes the positional words.
+
+=head1 METHODS
+
+The readers C<short>, C<reader>, C<type>, C<typeName>, C<required>,
+C<multiple>, C<help> and C<typehint>, and:
+
+=over 4
+
+=item typeLabel
+
+The tag the help output shows: C<typehint>, or the type's C<label>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Spec::Level>, L<Getopt::Pad::Parser>
 
 =head1 AUTHOR
 

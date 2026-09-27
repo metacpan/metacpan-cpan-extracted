@@ -1,0 +1,10 @@
+# INSTALLATION
+
+Install the released distribution and its Perl prerequisites from CPAN:
+
+```sh
+cpanm Task::Markdown::Publish
+```
+
+Site generators and conversion programs are external prerequisites. See
+README.md for Fedora packages and backend-specific installation commands.

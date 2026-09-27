@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.4.0 - 2026-09-27
+
+### Features
+
+- Re-pin the spec to 2026.09.26, adding client_id_metadata_document_supported ([`a5ad6c1`](https://github.com/vpndetection-io/sdk-perl/commit/a5ad6c12635dbecff6e45cc58df384fbfc411d70))
+
 ## 3.3.3 - 2026-09-26
 
 ### Fixes

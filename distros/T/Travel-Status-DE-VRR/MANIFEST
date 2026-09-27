@@ -120,6 +120,7 @@ README.md
 scripts/check-efa-urls
 scripts/makedeb-docker
 scripts/makedeb-docker-helper
+scripts/publish-docker
 t/20-vrr.t
 t/21-vrr-ambig.t
 t/in/dresden_hbf.json

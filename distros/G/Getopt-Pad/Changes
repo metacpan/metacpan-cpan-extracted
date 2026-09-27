@@ -1,5 +1,28 @@
 Revision history for Getopt::Pad
 
+0.04    2026-09-26
+        - Config files set the options of every command level: the
+          commands key of a level's section holds one section per
+          command, nested like the commands. Every section is validated
+          on every run, the values only on the levels the command line
+          selects. The autoload chain merges option by option per level
+        - --create-default-config writes the defaults of every level
+        - Add inherit to option specs: on a level with commands, the
+          option is also accepted after the command word on every level
+          below and read from the declaring level. Given on several
+          levels, it combines as if repeated on one
+        - --config and --create-default-config are inherited, so they
+          work after the command word. No level may declare an option
+          of either name when the spec has a config block
+        - With a config block, a level with commands may not have a
+          group named commands
+        - Rewrite the documentation. Getopt::Pad is a complete reference
+          with a list of all messages. Getopt::Pad::Tutorial and
+          Getopt::Pad::Cookbook are new. The contracts for custom types
+          and config formats are documented in Getopt::Pad::Type and
+          Getopt::Pad::Config::Format
+        - New examples for value shapes, config files and value checks
+
 0.03    2026-09-24
         - Add hash options: with hash => 1 an option takes --name key=value
           pairs and its reader returns a hashref. Every value passes the

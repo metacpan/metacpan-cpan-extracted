@@ -1,0 +1,23 @@
+<start_html title="Durable Object counter" h2>
+<perl handler="counter"><p>Counter value: ${value}</p></perl>
+<form method="post">
+  <button type="submit" name="increment" value="1">Increment</button>
+</form>
+<p>The named object stores its counter in SQLite.</p>
+
+__PERL__
+
+use WebDyne::Cloudflare::DurableObject;
+
+sub counter {
+    my ($self)=@_;
+    $self->r()->headers_out('Cache-Control' => 'no-store');
+    my $namespace_or=WebDyne::Cloudflare::DurableObject->new(
+        scope => $self->r()->{'scope'}, binding => 'COUNTERS',
+    );
+    my $counter_or=$namespace_or->get_by_name('example')->get();
+    my $cgi_or=$self->CGI();
+    my $result_hr=(($cgi_or->request_method() eq 'POST')&&$cgi_or->param('increment'))
+        ? $counter_or->call('increment', 1)->get() : $counter_or->call('read')->get();
+    return $self->render(value => $self->html_tiny()->entity_encode($result_hr->{'value'}));
+}

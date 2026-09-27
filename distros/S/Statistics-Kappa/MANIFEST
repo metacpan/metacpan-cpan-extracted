@@ -8,6 +8,8 @@ MANIFEST			This list of files
 README
 cpanfile
 t/00-load.t
+t/changes.t
+t/version.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -81,9 +81,11 @@ my $r = [
 '{\hskip0pt plus .02em}%'.
 '{\hskip0pt plus .02em},$,#'.
 '{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}_,{,'.
-'{\hskip0pt plus .02em}}'.
-'{\hskip0pt plus .02em},^,\2'.
+'{\hskip0pt plus .02em}_,{'.
+'{\hskip0pt plus .02em},'.
+'{\hskip0pt plus .02em}},^'.
+'{\hskip0pt plus .02em},'.
+'{\hskip0pt plus .02em}\2'.
 '{\hskip0pt plus .02em}qw\ea'.
 '{\hskip0pt plus .02em}-'.
 '{\hskip0pt plus .02em}sdf'.
@@ -227,9 +229,11 @@ my $r = [
 '{\hskip0pt plus .02em}%'.
 '{\hskip0pt plus .02em},$,#'.
 '{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}_,{,'.
-'{\hskip0pt plus .02em}}'.
-'{\hskip0pt plus .02em},^,\2'.
+'{\hskip0pt plus .02em}_,{'.
+'{\hskip0pt plus .02em},'.
+'{\hskip0pt plus .02em}},^'.
+'{\hskip0pt plus .02em},'.
+'{\hskip0pt plus .02em}\2'.
 '{\hskip0pt plus .02em}qw\ea'.
 '{\hskip0pt plus .02em}-'.
 '{\hskip0pt plus .02em}sdf'.
@@ -243,7 +247,6 @@ my $r = [
 '{\hskip0pt plus .02em}>>'.
 '{\hskip0pt plus .02em}---'.
 '{\hskip0pt plus .02em}1',
-
 ];
 
 $i = 0;
@@ -264,8 +267,7 @@ is_deeply( [$v, $mflag], [$r, 0 ], 'Test #'.$t. ": '$v' without changing the val
 
 ###Test #22
 $v = $_ = '\~{}\$\&,\%,\$,\#,\_,\{,\},\^{},\char92{}2qw\char92{}ea"=sdf-124-590\char92{}\char92{}\char92{}>>>>---1';
-$r = '{\hskip0pt plus .02em}\~'.
-'{\hskip0pt plus .02em}\$\&'.
+$r = '{\hskip0pt plus .02em}\~{}\$\&'.
 '{\hskip0pt plus .02em},'.
 '{\hskip0pt plus .02em}\%,\$'.
 '{\hskip0pt plus .02em},'.
@@ -273,22 +275,18 @@ $r = '{\hskip0pt plus .02em}\~'.
 '{\hskip0pt plus .02em},'.
 '{\hskip0pt plus .02em}\{,\}'.
 '{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\^'.
+'{\hskip0pt plus .02em}\^{}'.
 '{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\char92'.
+'{\hskip0pt plus .02em}\char92{}'.
 '{\hskip0pt plus .02em}2'.
-'{\hskip0pt plus .02em}qw\char92'.
-'{\hskip0pt plus .02em}ea"=sdf'.
+'{\hskip0pt plus .02em}qw\char92{}ea"=sdf'.
 '{\hskip0pt plus .02em}-'.
 '{\hskip0pt plus .02em}1'.
 '{\hskip0pt plus .02em}24'.
 '{\hskip0pt plus .02em}-'.
 '{\hskip0pt plus .02em}5'.
 '{\hskip0pt plus .02em}9'.
-'{\hskip0pt plus .02em}0\char92'.
-'{\hskip0pt plus .02em}\char92'.
-'{\hskip0pt plus .02em}\char92'.
-'{\hskip0pt plus .02em}>>'.
+'{\hskip0pt plus .02em}0\char92{}\char92{}\char92{}>>'.
 '{\hskip0pt plus .02em}>>'.
 '{\hskip0pt plus .02em}---'.
 '{\hskip0pt plus .02em}1';
@@ -303,9 +301,7 @@ $v = $_= q({{{124244234}}sdsdfdsfsdf{}{});
 $r = '{\hskip0pt plus .02em}{{{1{\hskip0pt plus .02em}2'.
 '{\hskip0pt plus .02em}4244'.
 '{\hskip0pt plus .02em}2'.
-'{\hskip0pt plus .02em}34}'.
-'{\hskip0pt plus .02em}}'.
-'{\hskip0pt plus .02em}sdsdfdsfsdf';
+'{\hskip0pt plus .02em}34}}sdsdfdsfsdf{}{}';
 
 $mflag = REase($_);
 is_deeply( [$_, $mflag], [$r, 0b0111 ], 'Test #'.$t. ": '$v' to '$r' nested parentheses");

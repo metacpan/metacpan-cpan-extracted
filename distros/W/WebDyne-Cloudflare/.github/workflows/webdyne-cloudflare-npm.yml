@@ -1,0 +1,205 @@
+name: WebDyne Cloudflare npm package
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Successful release workflow run ID; leave empty when consuming a GitHub Release
+        required: false
+        type: string
+        default: ""
+      release_tag:
+        description: Published source Release tag; mutually exclusive with source_run_id
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: webdyne-cloudflare-npm
+  cancel-in-progress: false
+
+jobs:
+  package:
+    name: Stage qualified npm package
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - name: Check out packaging source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - name: Configure Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install npm with staged-publishing support
+        run: |
+          set -euo pipefail
+          npm install --global npm@11.17.0 --ignore-scripts --registry=https://registry.npmjs.org/
+          test "$(npm --version)" = "11.17.0"
+
+      - name: Resolve and validate package metadata
+        env:
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          if { [ -n "$SOURCE_RUN_ID" ] && [ -n "$INPUT_RELEASE_TAG" ]; } || \
+             { [ -z "$SOURCE_RUN_ID" ] && [ -z "$INPUT_RELEASE_TAG" ]; }; then
+            echo "Supply exactly one of source_run_id or release_tag" >&2
+            exit 1
+          fi
+          if [ -n "$SOURCE_RUN_ID" ] && ! [[ "$SOURCE_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo "source_run_id must be numeric" >&2
+            exit 1
+          fi
+          package_version="$(node -p "require('./package.json').version")"
+          expected_tag="v${package_version}"
+          if [ -n "$INPUT_RELEASE_TAG" ] && [ "$INPUT_RELEASE_TAG" != "$expected_tag" ]; then
+            echo "Expected release tag $expected_tag, received $INPUT_RELEASE_TAG" >&2
+            exit 1
+          fi
+          {
+            echo "PACKAGE_VERSION=$package_version"
+            echo "RELEASE_TAG=$expected_tag"
+            echo "TARBALL_NAME=webdyne-webdyne-cloudflare-${package_version}.tgz"
+            echo "ARTIFACT_NAME=webdyne-cloudflare-${package_version}-release"
+            echo "MANIFEST_NAME=webdyne-cloudflare-${package_version}-manifest.json"
+          } >> "$GITHUB_ENV"
+
+      - name: Download the qualified package
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p incoming
+          if [ -n "$SOURCE_RUN_ID" ]; then
+            readarray -t run_fields < <(
+              gh run view "$SOURCE_RUN_ID" \
+                --repo "$GITHUB_REPOSITORY" \
+                --json conclusion,event,headSha,workflowName,headBranch \
+                --jq '[.conclusion, .event, .headSha, .workflowName, .headBranch][]'
+            )
+            if [ "${run_fields[0]}" != "success" ] || \
+               [ "${run_fields[1]}" != "workflow_dispatch" ] || \
+               [ "${run_fields[3]}" != "WebDyne Cloudflare release" ] || \
+               [ "${run_fields[4]}" != "main" ]; then
+              echo "Source run is not a successful WebDyne Cloudflare release dispatch" >&2
+              exit 1
+            fi
+            echo "SOURCE_HEAD_SHA=${run_fields[2]}" >> "$GITHUB_ENV"
+            gh run download "$SOURCE_RUN_ID" \
+              --repo "$GITHUB_REPOSITORY" \
+              --name "$ARTIFACT_NAME" \
+              --dir incoming
+          else
+            gh release download "$RELEASE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --pattern "$TARBALL_NAME" \
+              --pattern "${TARBALL_NAME}.sha256" \
+              --pattern "$MANIFEST_NAME" \
+              --dir incoming
+          fi
+
+      - name: Verify immutable npm input
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test -f "incoming/$TARBALL_NAME"
+          test -f "incoming/${TARBALL_NAME}.sha256"
+          test -f "incoming/$MANIFEST_NAME"
+          gh attestation verify "incoming/$TARBALL_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/webdyne-cloudflare-release.yml" \
+            --source-ref refs/heads/main --source-digest "$GITHUB_SHA" \
+            --deny-self-hosted-runners
+          (cd incoming && shasum -a 256 -c "${TARBALL_NAME}.sha256")
+          node --input-type=module - "$MANIFEST_NAME" "$TARBALL_NAME" <<'NODE'
+          import { createHash } from "node:crypto";
+          import { readFile } from "node:fs/promises";
+          const [manifestName, tarballName] = process.argv.slice(2);
+          const manifest = JSON.parse(await readFile(`incoming/${manifestName}`, "utf8"));
+          const tarball = await readFile(`incoming/${tarballName}`);
+          if (manifest.schemaVersion !== 1
+            || manifest.package.name !== "@webdyne/webdyne-cloudflare"
+            || manifest.package.version !== process.env.PACKAGE_VERSION
+            || manifest.source.repository !== `https://github.com/${process.env.GITHUB_REPOSITORY}`
+            || manifest.source.revision !== process.env.GITHUB_SHA
+            || manifest.source.dirty !== false
+            || manifest.artifact.filename !== tarballName
+            || manifest.artifact.sha256 !== createHash("sha256").update(tarball).digest("hex")) {
+            throw new Error("Qualified release manifest is invalid");
+          }
+          if (process.env.SOURCE_HEAD_SHA && manifest.source.revision !== process.env.SOURCE_HEAD_SHA) {
+            throw new Error("Qualified package source revision does not match its workflow run");
+          }
+          NODE
+          readarray -t package_fields < <(
+            tar -xOf "incoming/$TARBALL_NAME" package/package.json | \
+              node --input-type=module -e '
+                let source = "";
+                for await (const chunk of process.stdin) source += chunk;
+                const packageJson = JSON.parse(source);
+                console.log(packageJson.name);
+                console.log(packageJson.version);
+              '
+          )
+          if [ "${package_fields[0]}" != "@webdyne/webdyne-cloudflare" ] || \
+             [ "${package_fields[1]}" != "$PACKAGE_VERSION" ]; then
+            echo "Qualified tarball package identity is invalid" >&2
+            exit 1
+          fi
+
+      - name: Dry-run npm staging
+        run: npm stage publish "./incoming/$TARBALL_NAME" --access public --dry-run --ignore-scripts
+
+      - name: Attest the npm publication candidate
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: incoming/${{ env.TARBALL_NAME }}
+
+      - name: Upload npm publication candidate
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: webdyne-cloudflare-npm-${{ env.PACKAGE_VERSION }}
+          path: |
+            incoming/${{ env.TARBALL_NAME }}
+            incoming/${{ env.TARBALL_NAME }}.sha256
+            incoming/${{ env.MANIFEST_NAME }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Stage on npm with Trusted Publishing
+        run: npm stage publish "./incoming/$TARBALL_NAME" --access public --provenance --ignore-scripts
+
+      - name: Report pending maintainer approval
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFileSync } from 'node:fs';
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, [
+            '## Awaiting MFA approval',
+            '',
+            `Staged @webdyne/webdyne-cloudflare@${process.env.PACKAGE_VERSION}; it is not public yet.`,
+            '',
+            'Review the candidate in the npmjs.com Staged Packages tab and approve it with MFA.',
+            'Alternatively, use `npm stage list @webdyne/webdyne-cloudflare`, then `npm stage view <stage-id>` and `npm stage approve <stage-id>` from an authenticated local terminal.',
+            '',
+            'Approval is deliberately not automated. Verify the public version and archive integrity after approval.',
+            '',
+          ].join('\n'));
+          NODE

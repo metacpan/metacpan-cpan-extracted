@@ -53,8 +53,8 @@ use ResultDump;
 
 my $opt = GetOptions(
 	options => {
-		'owner'     => { type => 's', help => 'Target owner' },
-		'log-level' => { type => 's', default => 'info', valid => [qw(trace debug info warn error fatal)] },
+		'owner'     => { type => 'string', help => 'Target owner' },
+		'log-level' => { type => 'string', default => 'info', valid => [qw(trace debug info warn error fatal)] },
 	},
 	config => {
 		format => 'toml',

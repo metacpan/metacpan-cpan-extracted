@@ -276,6 +276,17 @@ subtest 'the module reads the HTTP status of each dialect' => sub {
 	);
 	is(
 		Fugu::Curl::_http_code(
+			'ftp',
+			{
+				stderr => 'ftp: Error retrieving '
+				    . 'http://127.0.0.1:8765/nope: '
+				    . "404 File not found\n"
+			} ),
+		404,
+		'the ftp of OpenBSD 7.8 names the URL before the status'
+	);
+	is(
+		Fugu::Curl::_http_code(
 			'wget', { stderr => 'failed: Connection refused.' } ),
 		undef,
 		'a connection failure holds no status'

@@ -1,0 +1,18 @@
+use strict;
+use warnings;
+use Future::AsyncAwait;
+use WebDyne::Cloudflare::SecretsStore;
+
+async sub {
+    my ($scope_hr, $receive_cr, $send_cr)=@_;
+    return if $scope_hr->{'type'} eq 'lifespan';
+    my $secret_or=WebDyne::Cloudflare::SecretsStore->new(
+        scope => $scope_hr, binding => 'API_KEY',
+    );
+    my $value=await $secret_or->get();
+    #  Demonstrate retrieval without including the secret in the response.
+    #
+    await $send_cr->({ type => 'http.response.start', status => 200,
+        headers => [['content-type', 'text/plain'], ['cache-control', 'no-store']] });
+    await $send_cr->({ type => 'http.response.body', body => "Secret retrieval succeeded\n" });
+};

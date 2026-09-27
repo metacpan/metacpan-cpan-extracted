@@ -2,31 +2,85 @@
 
 =head1 NAME
 
-Plack::Handler::Feersum::SS
+Plack::Handler::Feersum::SS - Server::Starter adapter for Feersum Plack handler
 
 =head1 SYNOPSIS
 
-unix socket:
-
-   start_server --signal-on-hup QUIT --path /tmp/app.sock -- \
-       plackup -s Feersum::SS --pre-fork N app.psgi
-
 tcp socket:
 
-   start_server --signal-on-hup QUIT --port 5000 -- \
-       plackup -s Feersum::SS --pre-fork N app.psgi
+   start_server --signal-on-hup=QUIT --port=5000 -- \
+       plackup -s Feersum::SS --pre-fork=4 app.psgi
+
+unix socket:
+
+   start_server --signal-on-hup=QUIT --path=/tmp/app.sock -- \
+       plackup -s Feersum::SS --pre-fork=4 app.psgi
+
+multiple ports:
+
+   start_server --signal-on-hup=QUIT --port=5000 --port=5001 -- \
+       plackup -s Feersum::SS app.psgi
+
+tls with http/2:
+
+   start_server --signal-on-hup=QUIT --port=8443 -- \
+       plackup -s Feersum::SS \
+       --tls-cert-file=server.crt --tls-key-file=server.key --h2=1 app.psgi
 
 =head1 DESCRIPTION
 
-Support running Feersum plack handler via Server::Starter
+Runs L<Feersum> on the listening sockets that L<Server::Starter> hands down,
+so a C<HUP> to C<start_server> restarts the application gracefully.
+
+Options are plackup C<--name=value> arguments; dashes and underscores are
+interchangeable.  (C<-o> is plackup's short form of C<--host>, not an option
+flag.)  See L<Feersum> and L<Feersum::Runner> for what each one does:
+
+    connection  keepalive read_timeout header_timeout write_timeout
+                linger_timeout max_connection_reqs
+    limits      max_connections max_accept_per_loop max_read_buf
+                max_body_len max_uri_len wbuf_low_water
+    priorities  read_priority write_priority accept_priority
+    proxy       reverse_proxy proxy_protocol psgix_io
+    tls         tls_cert_file tls_key_file h2
+                max_h2_concurrent_streams max_h2_conn_body
+    workers     pre_fork graceful_timeout max_requests_per_worker
+                preload_app startup_timeout
+    privileges  user group
+
+Unknown options are reported and ignored.
+
+TLS applies to every Server::Starter port.  C<user> and C<group> drop
+privileges once the sockets are open and TLS is loaded; with C<pre_fork>,
+respawned workers reload the certificate and key as that user, so both must
+stay readable by it.
+
+These take code or data references, so they can only be set from Perl, e.g.
+with C<< Plack::Runner->set_options >> or as arguments to
+C<< Plack::Loader->load >>:
+
+    tls         { cert_file => $path, key_file => $path, h2 => 1 }
+    sni         [ { sni => $hostname, cert_file => $path, key_file => $path } ]
+    after_fork  sub { ... }
+    access_log  sub { my ($method, $uri, $elapsed) = @_; ... }
+
+C<daemonize> (C<plackup -D>), C<hot_restart>, C<pid_file>, C<reuseport> and
+C<backlog> are refused: C<start_server> owns the sockets and the process
+(see its C<--daemonize>, C<--pid-file> and C<--backlog>).
+
+=head1 SEE ALSO
+
+L<Feersum>, L<Feersum::Runner>, L<Server::Starter>, L<Plack>
 
 =head1 AUTHOR
 
 Yegor Korablev <egor@cpan.org>
 
-=head1 SEE ALSO
+=head1 COPYRIGHT AND LICENSE
 
-L<Feersum>, L<Server::Starter>, L<Plack>, L<EV>
+This software is copyright (c) 2024 by Yegor Korablev.
 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

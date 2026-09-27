@@ -16,6 +16,8 @@ README.md
 scripts/check-efa-urls
 scripts/makedeb-docker
 scripts/makedeb-docker-helper
+scripts/publish-deb
+scripts/publish-docker
 t/20-vrr.t
 t/21-vrr.t
 t/in/ambiguous

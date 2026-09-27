@@ -7,7 +7,7 @@ use Text::Markup;
 use Text::Markup::Cmd;
 use File::Basename;
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 sub import {
     # Replace the regex if passed one.

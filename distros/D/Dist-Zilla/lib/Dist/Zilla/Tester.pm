@@ -1,4 +1,4 @@
-package Dist::Zilla::Tester 6.039;
+package Dist::Zilla::Tester 6.040;
 # ABSTRACT: a testing-enabling stand-in for Dist::Zilla
 
 use Moose;
@@ -117,7 +117,7 @@ sub minter { 'Dist::Zilla::Tester::_Minter' }
 }
 
 {
-  package Dist::Zilla::Tester::_Builder 6.039;
+  package Dist::Zilla::Tester::_Builder 6.040;
 
   use Moose;
   use autodie;
@@ -263,7 +263,7 @@ sub minter { 'Dist::Zilla::Tester::_Minter' }
 }
 
 {
-  package Dist::Zilla::Tester::_Minter 6.039;
+  package Dist::Zilla::Tester::_Minter 6.040;
 
   use Moose;
   use autodie;
@@ -376,7 +376,7 @@ Dist::Zilla::Tester - a testing-enabling stand-in for Dist::Zilla
 
 =head1 VERSION
 
-version 6.039
+version 6.040
 
 =head1 PERL VERSION
 

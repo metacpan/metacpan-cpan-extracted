@@ -1,5 +1,59 @@
 Revision history for Linux-Event-HTTP
 
+0.003  2026-09-26
+
+    - Require Linux::Event 0.117 for the current raw-consumer, transition,
+      Stream, TLS, and lifecycle behavior used by this release.
+    - Parse production HTTP/1 client response heads directly from Linux::Event's
+      native ordered-input buffer, preserving the existing Content-Length,
+      chunked, close-delimited, buffer_body, and on_body response paths after
+      the response-head boundary.
+    - Add optional HTTP/2 client and server support over TLS ALPN with
+      http2 => 1, preferring h2 and falling back to HTTP/1.1 through the same
+      public Request, Response, Transaction, Client, Server, and Operation APIs.
+    - Use Net::HTTP2::nghttp2 0.011 or newer as the HTTP/2 protocol engine for
+      framing, HPACK, stream state, SETTINGS, GOAWAY, and flow control while
+      Linux::Event remains the transport owner.
+    - Record Net::HTTP2::nghttp2 as the optional CPAN http2 feature so HTTP/1-only
+      installations do not require libnghttp2.
+    - Support multiplexed HTTP/2 Transactions on one TLS connection, with
+      per-origin connection pooling and a local active-stream admission cap.
+    - Queue same-origin operations behind one negotiating TLS selector before
+      ALPN resolves; collapse them onto one H2 connection when h2 wins and fan
+      them back out to concurrent HTTP/1.1 connections on fallback.
+    - Preserve Request, Transaction, and streaming Body::Stream object identity
+      across ALPN selection, including request bytes produced before protocol
+      selection completes.
+    - Support scalar and streaming HTTP/2 request/response bodies using the
+      existing Body::Stream backpressure contract without adding a second
+      transport output queue.
+    - Add decoded HTTP/2 header-list limits, advertised and enforced after HPACK
+      expansion, with a 65,536-byte default.
+    - Add a 64 MiB default aggregate cap for active client buffer_body storage
+      on one HTTP/2 connection so many streams cannot bypass per-response bounds.
+    - Keep stream failures isolated where possible: Transaction cancellation,
+      header-limit failure, and buffered-body overflow reset/fail only the
+      affected stream while sibling streams continue.
+    - Handle peer GOAWAY by draining existing work, admitting no new streams,
+      and retiring the transport gracefully after active streams finish.
+    - Defer Client and Server HTTP/2 executor teardown until active nghttp2
+      mem_recv()/mem_send() calls unwind, avoiding reentrant Session destruction.
+    - Keep redirect, cookie, target/proxy authentication, and Operation history
+      policy above the protocol executor; validated high-level policy behaves the
+      same over HTTP/2 as over HTTP/1.
+    - Add deterministic multiplex coverage proving six concurrent HTTP/2 streams
+      coexist before any response is released.
+    - Gate HTTP/2 CI with h2spec v2.6.0. The accepted current libnghttp2 baseline
+      is 144 passed, 1 skipped, and 1 failed out of 146 tests; the sole known
+      failure is RFC 9113 5.1.1's lower new stream-identifier case.
+    - Expand CI across Perl 5.36, 5.38, 5.40, 5.42, 5.44, latest, and
+      latest-threaded, and add a separate HTTP/1-only lane proving the optional
+      HTTP/2 binding is not installed by normal prerequisites.
+    - Simplify the release documentation around the shared HTTP/1.x and HTTP/2
+      public API, move implementation history out of the user path, and make the
+      supported protocol versions explicit in README, POD, and distribution
+      metadata.
+
 0.002  2026-09-20
 
     - Fix interpreter context handling in native Response helpers on threaded Perl.

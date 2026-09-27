@@ -9,7 +9,7 @@ class Getopt::Pad::Spec::Option :strict(params) {
 	use Carp qw(croak);
 	use Getopt::Pad::Util qw(camelize specError isValidName);
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	# The Value sources a parse hands over, in order of precedence, each with
 	# the wording of its user errors; the spec default follows them. The
@@ -44,6 +44,7 @@ class Getopt::Pad::Spec::Option :strict(params) {
 	field $csv        :reader = 0;
 	field $objectlist :reader = 0;
 	field $hidden     :reader = 0;
+	field $inherit    :reader = 0;
 	field $typehint   :reader;
 
 	ADJUST {
@@ -75,6 +76,7 @@ class Getopt::Pad::Spec::Option :strict(params) {
 		$csv        = delete $spec{csv} ? 1 : 0;
 		$objectlist = delete $spec{objectlist} ? 1 : 0;
 		$hidden     = delete $spec{hidden} ? 1 : 0;
+		$inherit    = delete $spec{inherit} ? 1 : 0;
 		$typehint   = delete $spec{typehint};
 
 		specError("option '%s': unknown key(s): %s", $name, join(', ', sort keys %spec)) if %spec;
@@ -301,13 +303,98 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Spec::Option - one option spec
+Getopt::Pad::Spec::Option - One option of a spec, and how its value is
+resolved (internal)
 
 =head1 DESCRIPTION
 
-A single validated option spec: primary name, aliases, type instance, reader name, and the required/default/valid/lazyValid/group/help/multiple/hash/csv/objectlist/typehint settings. typeLabel is the tag the help output shows for the option: the typehint, or the type's own label. A default is validated and coerced at construction time, in the option's shape: a list for a multiple option, a mapping for a hash option, a list of mappings for an objectlist option. readerValue resolves the reader value for one parse: it takes the first value source that set the option (command line, then config file) or else the spec default, splits the words and lone config values of a csv option at commas, collects the INDEX.FIELD=VALUE words of an objectlist option into its list of mappings (the indices must form 0..n-1), runs every value through checkValue, the single check/coerce pipeline (a hash option's problems name their key, an objectlist option's their entry and key), and throws a Getopt::Pad::Error worded for that source, or for a missing required option. The value a parse settles on, default included, is then handed scalar by scalar to the type's prepare hook, which is how a path is created on demand. An option no source set and without a default reads as an empty list (multiple, objectlist), an empty mapping (hash) or undef. validValues lists what the valid constraint allows: the static list, or the array reference the valid coderef returns when called; shell completion asks it for candidates. lazyValid is a predicate run after the valid check. Auto options may carry a trigger, the reaction the parser runs when the parsed command line sets the option.
+This module is internal to Getopt::Pad. It is not part of the public
+API and can change without notice. Programs use L<Getopt::Pad/GetOptions>;
+this page is for people working on Getopt::Pad itself.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+An option spec holds the checked settings of one option: the primary
+name, the aliases, the reader name, the type (a L<Getopt::Pad::Type>
+instance) and the keys C<required>, C<default>, C<valid>, C<lazyValid>,
+C<group>, C<help>, C<multiple>, C<hash>, C<csv>, C<objectlist>,
+C<hidden>, C<inherit> and C<typehint>. The meaning of each key is
+documented in L<Getopt::Pad/OPTION SPECS>.
+
+The constructor checks every key and their combinations, and checks and
+converts the default in the option's shape: a list for C<multiple>, a
+mapping for C<hash>, a list of mappings for C<objectlist>, else a single
+value. An invalid default is a spec error.
+
+=head2 Resolving a value
+
+C<readerValue(%sources)> returns the reader value of the option for one
+parse. C<%sources> maps each value source (C<commandLine>, C<config>) to
+the raw values it gave, keyed by primary name. The option takes the first
+source that set it, in that order, or else the default. Without either,
+a required option throws a L<Getopt::Pad::Error>, and any other option
+reads as an empty list (C<multiple>, C<objectlist>), an empty mapping
+(C<hash>) or C<undef>.
+
+The raw value is brought into the option's shape: the words of a C<csv>
+option and a single config value are split at commas, and the
+C<INDEX.FIELD=VALUE> pairs of an C<objectlist> option are collected into
+its list of mappings. Then every single value passes C<checkValue>: the
+type's C<check> and C<coerce>, the C<valid> list and the C<lazyValid>
+predicate. Problems are thrown as L<Getopt::Pad::Error>, worded for their
+source (C<option '--NAME': ...> or C<config value for 'NAME': ...>) and
+naming the key or entry for C<hash> and C<objectlist> options.
+
+Finally every single value of the result is passed to the type's
+C<prepare> (which creates missing paths for C<createPathIfMissing>). This
+happens only for the value that is finally used, default included.
+
+=head1 METHODS
+
+Besides the readers of its settings (C<name>, C<aliases>, C<reader>,
+C<type>, C<typeName>, C<required>, C<hasDefault>, C<default>, C<valid>,
+C<group>, C<help>, C<multiple>, C<hash>, C<csv>, C<objectlist>,
+C<hidden>, C<inherit>, C<typehint>, C<auto>, C<optionalValue>,
+C<trigger>):
+
+=over 4
+
+=item readerValue(%sources)
+
+See L</Resolving a value>.
+
+=item checkValue($value)
+
+Checks one single value; returns the problem (or C<undef>) and the
+converted value.
+
+=item validValues
+
+The values the C<valid> key allows right now: the static list, or what
+the coderef returns (a spec error unless it returns an arrayref). Empty
+without C<valid>. Shell completion uses it too.
+
+=item typeLabel
+
+The tag the help output shows: C<typehint>, or the type's C<label>.
+
+=item takesPairs
+
+Whether the option collects C<KEY=VALUE> words (C<hash> and
+C<objectlist>).
+
+=item glSpec, negatable
+
+The L<Getopt::Long> specification of the option, and whether it can be
+negated, both from its type.
+
+=back
+
+Automatic options are option specs with C<auto> set; they may carry a
+C<trigger> (see L<Getopt::Pad::Spec>), and C<--config> has
+C<optionalValue>.
+
+=head1 SEE ALSO
+
+L<Getopt::Pad::Spec::Level>, L<Getopt::Pad::Type>
 
 =head1 AUTHOR
 

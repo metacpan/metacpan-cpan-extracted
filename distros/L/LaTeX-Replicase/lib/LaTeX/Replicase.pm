@@ -26,7 +26,7 @@ our %EXPORT_TAGS = ('all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( );
 
-our $VERSION = '0.790';
+our $VERSION = '0.793';
 our $DEBUG = 0;
 $DEBUG += 0;
 
@@ -35,7 +35,7 @@ our $qe = qr/_|\b|$/o;
 
 # for glue
 our $q = qr/\{\\hskip0pt +plus +0?.02em\}/o;
-our $p; $p = qr/\{\s*(?:(?>$q)|(??{$p}))*\s*\}/o;
+# our $p; $p = qr/\{\s*(?:(?>$q)|(??{$p}))*\s*\}/o;
 our $m = '{\\hskip0pt plus .02em}';
 
 # '!'=>\x21  '"'=>\x22  '#'=>\x23  '$'=>\x24  '%'=>\x25  '&'=>\x26  "'"=>\x27
@@ -224,7 +224,7 @@ _tex_escape_to_REase:
 sub REase {
 	$_[0] or return 0;
 
-	our( $qs, $qe, $q, $p, $m, $sI );
+	our( $qs, $qe, $q, $m, $sI );
 
 	my $opH = ref $_[1] eq 'HASH';
 
@@ -271,7 +271,7 @@ sub REase {
 
 		my $z = $_;
 
-		s/(?:(?<b>.{2,$n}[^\x5C])|(?<b>[^\x5C]|\b))(?<s>[^\x5C\p{Alpha}\.><'`=_\"-])(?(1)|(?=\p{Alpha}))/$+{b}$m$+{s}$m/g; #'
+		s/(?:(?<b>.{2,$n}[^\x5C])|(?<b>[^\x5C]|\b))(?<s>[^\x5C\p{Alpha}\.><\}\{'`=_\"-])(?(1)|(?=\p{Alpha}))/$+{b}$m$+{s}$m/g; #'
 
 		s/-{1,3}/$m$&$m/g; # don't touch the em dash
 		s/\<{1,2}/$m$&/g;
@@ -282,7 +282,7 @@ sub REase {
 		s/(?<=[[:alnum:]])(?:$q)+(?=[\)\]\}])//g; # before the closing parenthesis
 
 		# Reducing of excess glue
-		s/$p/$m/g;
+#		s/$p/$m/g;
 
 		# final removal of excess glue:
 		s/^(?:\s*$q\s*)+|(?:$q\s*)+$//g; # start & end glue
@@ -502,10 +502,11 @@ push @logs, "--> Open '$ofile'" if $op{debug};
 				if( exists $actions{$f} ) {
 
 					if( exists( $done{$f} ) or exists( $done{ $actions{$f} } ) ) {
+						$done{$f} = $done{ $actions{$f} } = undef;
 						undef $f;
 					}
 					else {
-						$done{ $actions{$f} } = $done{$f} = undef;
+						$done{$f} = $done{ $actions{$f} } = undef;
 						$f = {
 							_name_ => $f,
 							_code_ => $actions{$f},
@@ -546,8 +547,8 @@ push @logs, "--> Open '$ofile'" if $op{debug};
 		}
 
 		if( $op{esc} ) {
-			unless( exists $done{tex_escape} ) {
-				my $f = 'tex_escape';
+			my $f = 'tex_escape';
+			if( ! exists $done{$f} ) {
 				unshift @{ $op{_ACTIONS_} }, { # must be 1st if not specified
 						_name_ => $f,
 						_code_ => $actions{$f},
@@ -556,7 +557,7 @@ push @logs, "--> Open '$ofile'" if $op{debug};
 				$done{$f} = undef;
 			}
 
-			my $f = 'REase';
+			$f = 'REase';
 			if( $op{esc} =~/(?:$qs)$f(?:$qe)/ and ! exists $done{$f} ) {
 				push @{ $op{_ACTIONS_} }, { # must be last if not specified
 						_name_ => $f,
@@ -612,6 +613,7 @@ push @logs, "--> Open '$ofile'" if $op{debug};
 	[...]{...} -- descriptions (properties) of table columns:
 			{ki} -- name (key || index ) of a variable from $data->{ $key }
 			{%} -- NO \par
+			{x} -- check the eXistence of Value (or eXpanded)
 			{v} -- to paste by default text (located in template) if variable =~/^\x{001}$/
 			{p} -- to paste text on right
 			{head}[...] -- TeX strings before %%%V:
@@ -620,25 +622,25 @@ push @logs, "--> Open '$ofile'" if $op{debug};
 =end comment
 =cut
 
-	if( $TEMPLATE )  {
+	if( $TEMPLATE )  { # source is file
 		while( my $z = <$TEMPLATE> ) {
 
 			$end = &_replisome( $info, \$z, \$data, \$vardata, \$chkVAR, \$key, \$tdz, \@columns, \%op );
 
 			if( $end ) {
-				print { $fh } <$TEMPLATE> if $end != 3; # NOT ( \endinput AND \end{document} )
+				print { $fh } <$TEMPLATE> if $end != 3; # %%%ENDT:
 
-				last; #--> Exit template
+				last; #--> Exit template: \endinput AND \end{document}
 			}
 			undef $z;
 
 		}
 		close $TEMPLATE;
 	}
-	else {
+	else { # source is ARRAY
 		for my $z ( @$source ) {
 
-			if( $end ) {
+			if( $end ) { # %%%ENDT:
 				print { $fh } $z;
 			}
 			else {
@@ -696,19 +698,19 @@ sub _replisome {
 				$$tdz = 1;
 				return 0;
 			}
-
 		}
-		elsif( ( $vtype eq 'HASH' and (
-					   ref( $$vardata->{ $$key } ) =~/^(?:HASH|ARRAY|SCALAR)$/ # REF->SCALAR
-					or ref \$$vardata->{ $$key } eq 'SCALAR'
-				)
-			)
-			or ( $vtype eq 'ARRAY' and (
-					   ref( $$vardata->[ $$key ] ) =~/^(?:HASH|ARRAY|SCALAR)$/ # REF->SCALAR
-					or ref \$$vardata->[ $$key ] eq 'SCALAR'
-				)
-			)
-		) {
+#		elsif( ( $vtype eq 'HASH' and (
+#					   ref( $$vardata->{ $$key } ) =~/^(?:HASH|ARRAY|SCALAR)$/ # REF->SCALAR
+#					or ref \$$vardata->{ $$key } eq 'SCALAR'
+#				)
+#			)
+#			or ( $vtype eq 'ARRAY' and (
+#					   ref( $$vardata->[ $$key ] ) =~/^(?:HASH|ARRAY|SCALAR)$/ # REF->SCALAR
+#					or ref \$$vardata->[ $$key ] eq 'SCALAR'
+#				)
+#			)
+#		)
+		else {
 			my $vk = $vtype eq 'HASH' ? $$vardata->{ $$key } : $$vardata->[ $$key ];
 			my $sclr = (ref(\$vk) eq 'SCALAR' or ref($vk) eq 'SCALAR');
 
@@ -718,12 +720,13 @@ sub _replisome {
 						($#$columns // 0);
 			$j = 0 if $j < 0 or $sclr;
 
-			if( ! $sclr and $$z =~/^(.*?)\s?%%%+V:\s*([^\s:%#]+)(%?)\s?(.*)/) {
+			if( ! $sclr and $$z =~/^(.*?)\s?%%%+V:\s*(\*?)([^\s:%#\*]+)(%?)\s?(.*)/) {
 				# the non-SCALAR V-variable is nested in a VAR-structure
 				my $dV = $1; # Value, by default
-				my $ki = $2; # name (key or index) of V-variable
-				my $Np = $3; # NO \par
-				my $paste = $4; # on right
+				my $eXi = $2; # check the eXistence of Value (or eXpanded)
+				my $ki = $3; # name (key or index) of V-variable
+				my $Np = $4; # NO \par
+				my $paste = $5; # on right
 
 				if( $$chkVAR == 0b0001
 					or $$chkVAR == 0b0100
@@ -764,15 +767,13 @@ push @{$op->{logs}}, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". 
 						and exists( $vk->{$ki} )
 						and ( ref \$vk->{$ki} eq 'SCALAR'
 							or ref $vk->{$ki} eq 'SCALAR'
-							or ( $ki eq '@'
-								and ref $vk->{$ki} eq 'ARRAY'
-							)
+							or ( $ki eq '@' and ref $vk->{'@'} eq 'ARRAY')
 						)
 				) {
 					$columns->[$j]{ki} = $ki; # save variable key in j-th element
 				}
 
-				&_set_column( $dV, $Np, $paste, $columns->[$j] ) if exists $columns->[$j]{ki};
+				&_set_column( $dV, $eXi, $Np, $paste, $columns->[$j] ) if exists $columns->[$j]{ki};
 			}
 			elsif( $$z =~/(?<s>.+?)\s?%%%+ADD(?<t>[AEX]?):(?<p>%?)/
 				or $$z =~/^\s*%%%+ADD(?<t>[AEX]?):(?<p>%?)\s?(?<s>.*?)[\r\n]*$/
@@ -807,9 +808,9 @@ push @{$op->{logs}}, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". 
 
 			return 0;
 		}
-		else {
-			return 0;
-		}
+#		else {
+#			return 0;
+#		}
 
 	}
 	elsif( $$z =~/%%%+END(?<t>[TZ]?):/) { # end of template area
@@ -835,11 +836,12 @@ push @{$op->{logs}}, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". 
 		return 0;
 	}
 
-	if( $$z =~/(.*?)\s?%%%+VAR:\s*([^\s:%#]+)(%?)\s?(.*)/) {
-		my $before = $1;
-		my $k = $2; # name (key)
-		my $Np = $3; # NO \par
-		my $paste = $4; # on right text for SCALAR only
+	if( $$z =~/(.*?)\s?%%%+VAR:\s*(\*?)([^\s:%#\*]+)(%?)\s?(.*)/) {
+		my $before = $1; # Value, by default
+		my $eXi = $2; # eXistence of Value
+		my $k = $3; # name (key)
+		my $Np = $4; # NO \par
+		my $paste = $5; # on right text for SCALAR only
 
 		# root or global structure (environment)
 		my $vd = ( $k =~s/^\/+//) ? $info : $$data;
@@ -886,7 +888,7 @@ push @{$op->{logs}}, "--> l.$. Found %%%VAR:". $k if $op->{debug};
 
 push @{$op->{logs}}, "~~> l.$. NOT defined key in %%%VAR:". $k if ! defined($vk) && $op->{debug};
 
-		return 0 if &_chk_var( $k, $vk, $Np, \$paste, \$before, $chkVAR, $columns, $z, $op );
+		return 0 if &_chk_var( $k, $vk, $eXi, $Np, \$paste, \$before, $chkVAR, $columns, $z, $op );
 
 # push @{$op->{logs}}, "--> l.$. Remember key = '$k' (chkVAR=$$chkVAR), type: ".ref($vk) if $op->{debug}; ###AG
 
@@ -902,11 +904,11 @@ push @{$op->{logs}}, "~~> l.$. NOT defined key in %%%VAR:". $k if ! defined($vk)
 		$op->{$k} = $x if $i < 2;
 		return 0;
 	}
-	elsif( $$z =~/^(?<v>.*?)\s?%%%+V:\s*(?<k>[^\s:%#]+)(?<p>%?)\s?(?<s>.*)/) {
+	elsif( $$z =~/^(?<v>.*?)\s?%%%+V:\s*(?<x>\*?)(?<k>[^\s:%#\*]+)(?<p>%?)\s?(?<s>.*)/) {
 		my $k = $+{k};
 
 		my %el;
-		&_set_column( $+{v}, $+{p}, $+{s}, \%el );
+		&_set_column( $+{v}, $+{x}, $+{p}, $+{s}, \%el );
 
 		my $inidata = $$data; # save initial environment
 
@@ -987,11 +989,12 @@ push @{$op->{logs}}, "~~> l.$. WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of 
 
 
 sub _set_column {
-	my( $dV, $Np, $paste, $column ) = @_;
+	my( $dV, $eXi, $Np, $paste, $column ) = @_;
 
-	$column->{v} = $dV if length $dV;
-	$column->{'%'} = 1 if $Np;
-	$column->{p} = $paste if length $paste;
+	$column->{v} = $dV if length $dV; # Value, by default
+	$column->{x} = 1 if $eXi; # check the eXistence of Value
+	$column->{'%'} = 1 if $Np; # NO \par
+	$column->{p} = $paste if length $paste; # on right text for SCALAR only
 }
 
 
@@ -1013,7 +1016,7 @@ sub _data_redef {
 }
 
 sub _chk_var {
-	my( $k, $vk, $Np, $paste, $before, $chkVAR, $columns, $z, $op ) = @_;
+	my( $k, $vk, $eXi, $Np, $paste, $before, $chkVAR, $columns, $z, $op ) = @_;
 
 	if( ref $vk eq 'ARRAY') {
 
@@ -1021,16 +1024,18 @@ sub _chk_var {
 		# Check ARRAY.{ARRAY|HASH|SCALAR[.REF]}
 
 			for my $d ( @{ $vk } ) {
-				if(ref $d eq 'ARRAY'){
+				my $dtype = ref $d;
+
+				if($dtype eq 'ARRAY'){
 					$$chkVAR |= 0b00001;
 				}
-				elsif(ref $d eq 'HASH') {
+				elsif($dtype eq 'HASH') {
 					$$chkVAR |= 0b00010;
 				}
 				elsif(ref \$d eq 'SCALAR') {
 					$$chkVAR |= 0b00100;
 				}
-				elsif(ref $d eq 'SCALAR') { # REF->SCALAR
+				elsif($dtype eq 'SCALAR') { # REF->SCALAR
 					$$chkVAR |= 0b01000;
 				}
 				else {
@@ -1052,7 +1057,7 @@ push @{$op->{logs}}, "~~> l.$. WARNING#6: mixed types (ARRAY with HASH with SCAL
 	}
 	elsif( ref \$vk eq 'SCALAR' or ref $vk eq 'SCALAR') {
 		$columns->[0]{ki} = $k;
-		&_set_column('', $Np, $$paste, $columns->[0] );
+		&_set_column('', $eXi, $Np, $$paste, $columns->[0] );
 	}
 
 	if( $$before ) {# Output prefix TeX
@@ -1077,43 +1082,57 @@ push @{$op->{logs}}, "~~> l.$.".' NOT defined %%%V[AR]:'. $k if $op->{debug};
 		$v = '';
 	}
 
-	if( $v =~s/^\x{01}//) { # by default text from template
-		if( exists $el->{v} ) {
-			print { $op->{fh} } $el->{v};
+	if( $el->{x} && length($v) ) { # for '*param'
+
+		my $f;
+		for('v','p') {
+			exists( $el->{$_} ) or next;
+
+			print { $op->{fh} } $el->{$_};
+			$f = 1;
+		}
+
+push @{$op->{logs}}, "--> l.$.>". $op->{nlo} .' Insert by eXistence condition (*) of %%%V[AR]:'. $k .'= '. $el->{v} if $f && $op->{debug};
+
+	}
+	else {
+		if( $v =~s/^\x{01}//) { # by default text from template
+			if( exists $el->{v} ) {
+				print { $op->{fh} } $el->{v};
 
 push @{$op->{logs}}, "--> l.$.>". $op->{nlo} .' Insert text by default %%%V[AR]:'. $k .'= '. $el->{v} if $op->{debug};
-		}
-	}
-
-	if( $v =~/^\x{03}(\x{03}?)/) { # END of INPUT template
-		say { $op->{fh} } $1 ? '\bye' : '\endinput';
-		++$op->{nlo};
-
-		return 3;
-	}
-	elsif( $v =~/^\x{04}/) { # END of INPUT template, similar to \bye
-		say { $op->{fh} } '\end{document}';
-		++$op->{nlo};
-
-		return 3;
-	}
-	elsif( length $v ) {
-		$op->{_MFLAGS_} = 0; # value modification (change) flag: 0 is 'NO', 1 -- 'YES' for ordinary text, 2 -- 'YES' for TeX-commands
-		for my $f ( @{ $op->{_ACTIONS_} } ) {
-			$f or next;
-
-			$_ = int( $f->{_code_}->( $v, $op ) // 0 );
-			$op->{_MFLAGS_} += 0;
-			$op->{_MFLAGS_} |= $_;
+			}
 		}
 
+		if( $v =~/^\x{03}(\x{03}?)/) { # END of INPUT template
+			say { $op->{fh} } $1 ? '\bye' : '\endinput';
+			++$op->{nlo};
+
+			return 3;
+		}
+		elsif( $v =~/^\x{04}/) { # END of INPUT template, similar to \bye
+			say { $op->{fh} } '\end{document}';
+			++$op->{nlo};
+
+			return 3;
+		}
+		elsif( length $v ) {
+			$op->{_MFLAGS_} = 0; # value modification (change) flag: 0 is 'NO', 1 -- 'YES' for ordinary text, 2 -- 'YES' for TeX-commands
+			for my $f ( @{ $op->{_ACTIONS_} } ) {
+				$f or next;
+
+				$_ = int( $f->{_code_}->( $v, $op ) // 0 );
+				$op->{_MFLAGS_} += 0;
+				$op->{_MFLAGS_} |= $_;
+			}
 
 push @{$op->{logs}}, "--> l.$.>". $op->{nlo} .' Insert %%%V[AR]:'. $k .'= '. $v if $op->{debug};
 
-		print { $op->{fh} } $v;
-		++$op->{nlo} while $v =~/\n/g;
+			print { $op->{fh} } $v;
+			++$op->{nlo} while $v =~/\n/g;
 
-		print { $op->{fh} } $el->{p} if exists $el->{p};
+			print { $op->{fh} } $el->{p} if exists $el->{p};
+		}
 	}
 
 	unless( $el->{'%'} ) {
@@ -1197,7 +1216,6 @@ sub _s_a_prn {
 
 			last if $end;
 		}
-
 	}
 
 	return $end;
@@ -1731,6 +1749,7 @@ then C<ready.tex> file will be created in a B<random subdirectory>
 =item 2.
 Using C<outdir> option:
 
+  my $target_dir = 'sandbox';
   my $msg = replication( $file, $info, outdir => $target_dir );
 
 A new C<$file> will be created in C<$target_dir> directory.
@@ -1738,6 +1757,7 @@ A new C<$file> will be created in C<$target_dir> directory.
 =item 3.
 Using C<ofile> option:
 
+  my $ofile = 'sandbox/ready_good.tex';
   my $msg = replication( $file, $info, ofile => $ofile );
 
 A new C<$ofile> will be created.
@@ -1761,16 +1781,109 @@ Set the C<$DEBUG> package variable to enable debugging messages (global debug mo
 
 =head1 LIMITATIONS
 
-This module have reason only for C<SCALAR>, C<REF>, C<ARRAY>, C<HASH>, C<ARRAY.ARRAY>, C<ARRAY.HASH>, C<ARRAY.REF>, C<ARRAY.ARRAY.ARRAY>, C<ARRAY.HASH.ARRAY> 
-data with perl 5.10 and higher.
+In a general sense, there are no restrictions on the complexity of C<$info> structure.
+This is because you can point to the nested structure you need by redefining the global and/or local environment
+(see C<%%%V:> and C<%%%VAR:> tags below).
+
+However, for populating TeX template with direct values (without regard to the nesting path),
+C<replication()> supports only the following structures included in C<$info>.
+
+=over 6
+
+=item 1.
+single-level:
+
+C<SCALAR>, C<REF>, C<ARRAY>, C<HASH>, and their combination, e.g.
+
+  my $v = 'Blah-blah';
+  my @ell = (11, 22, 33);
+
+  my $info = {
+       Param => 'Blah-blah blah-blah',
+       Ref => \$v,
+       Array1 => [2025, 2026, 2027, 2028,],
+       Array2 => [1..5],
+       Array3 => \@ell,
+       Array4 => [ \$ell[2], \$ell[0], \$ell[1], ],
+       Hash => {year0 => 123456, year1 => 789012, year2 => 345678,},
+       ...
+  };
+
+=item 2.
+two-level:
+
+C<ARRAY.ARRAY>, C<ARRAY.HASH>, C<ARRAY.REF>, C<HASH.ARRAY>, and their combination, e.g.
+
+  my $info = {
+       Array_array => [ # custom user variable ARRAY-ARRAY
+          ['00','01','02','03','04',], # row 0
+          [10, 11, 12, 13, 14,], # row 1
+          [20, 21, 22, 23, 24,], # row 2
+          ...
+       ],
+       Array_hash => [ # variable ARRAY-HASH
+          {A=>'00',B=>'01',C=>'02',}, # row 0
+          {A=>10, B=>11, C=>12,}, # row 1
+          ...
+       ],
+       Array_ref => [ # variable ARRAY-REF
+          \@ell, # row 0
+          \@ell, # row 1
+          ...
+       ],
+       Array_mixed => [
+          0, {A=>1}, \$ell[2], [5..9], ...
+       ],
+       Hash_array => { # variable HASH-ARRAY
+          0 => ['00','01','02','03','04',], # row 0
+          ...
+       },
+       Hash_mixed => {
+          A=>\$v, B=>2, C=>3, D=>4, E=>5,
+          '@' => ['C','B','D','A','E'],
+          ...
+       },
+  };
+
+=item 3.
+three-level:
+
+C<ARRAY.ARRAY.ARRAY>, C<ARRAY.HASH.ARRAY>, and their combination, e.g.
+
+  my $info = {
+       Array_array_array => [
+          [
+            [1..9],
+          ],
+          [
+            undef,
+            [10..13],
+            ...
+          ],
+          ...
+      ],
+      Array_hash_array => [
+          {
+            B=>[2,6..8],
+            ...
+          },
+          ...
+      ],
+  };
+
+=item 4.
+a combination of the above 1..3
+
+=back
 
 File and directory names and paths to them must not contain space characters.
 
 In the names of C<%%%V:> and C<%%%VAR:> tags (keys and indexes), it is possible (preferably) to use 
 only C<[a-zA-Z0-9_]> symbols, since other symbols are currently or will be reserved in the future.
 
-Currently, symbols: C<< % >>, C<< @ >>, C<< : >>, C<< = >>, and C<< / >> have a special purpose.
+Currently, symbols: C<< * >>, C<< % >>, C<< @ >>, C<< : >>, C<< = >>, and C<< / >> have a special purpose.
 
+This module have reason only with perl 5.10 and higher.
 
 =head1 ABSTRACT
 
@@ -1832,7 +1945,7 @@ If C<< myParam => "\x{001}" >> (or C<< "\x{001}some text" >>), the result will b
   Default value
 
 This trick can also be performed in a more complex way - without using a magic C<"\x{001}">, 
-but using the C<%%%ADD:> tag and an additional variable C<phantom>,
+but using the C<%%%ADD:> tag and an additional variable (e.g. C<phantom>),
 the value of which should be adjusted to the value of C<myParam> inside C<area>:
 
   %%%VAR: area
@@ -1846,23 +1959,23 @@ the value of which should be adjusted to the value of C<myParam> inside C<area>:
 which, you must admit, is extremely inconvenient :(
 
 It is very important to understand that there are four (4) states for C<%%%V: variable> (or C<%%%VAR>)
-when the C<def> option is B<enabled>:
+when the C<def> option is B<enabled>: X<anchor_item_1st>
 
 =over 6
 
-=item 1.
+=item 1st.
 
 complete absence, i.e. C<variable> B<does not exist>;
 
-=item 2.
+=item 2nd.
 
 presence (B<exists>) with an B<undefined> value;
 
-=item 3.
+=item 3th.
 
 B<exists> and B<defined> value and B<empty> (i.e. C<value = ''>, C<length of value == 0>);
 
-=item 4.
+=item 4th state.
 
 B<defined> value and B<not empty>.
 
@@ -1913,6 +2026,29 @@ C<\endinput> (C<\end{document}> ) command is that B<remaining part of the templa
 These magical values can be set separately (singly) or together with the first C<"\x{001}"> such as
 C<"\x{001}\x{003}"> and C<"\x{001}\x{004}">.
 
+Additionally, if a C<variable_name> starts with C<*> (i.e. C<*variable_name>),
+then only the existence of that variable and its definition are checked. 
+These conditions will confirm the insertion of the BEFORE (left) and AFTER (right, if any) 
+values from the template, as well as the values of the surrounding C<%%%ADD:> and C<%%%ADDE:> tags.
+
+In effect, this trick helps to extend the action of a variable (and its state) beyond the immediate 
+vicinity of C<%%%ADD:> and C<%%%ADDE:> tags, e.g.:
+
+  \begin{tabular}{ccc}
+  %%%VAR: area
+  \mbox{ %%%ADD:%
+  1 Mandatory component %%%V: *leader  ...continuation...
+  } & %%%ADDE:
+  2 Blah of slave %%%V: slave
+  & %%%ADD:
+  3 Blah of leader %%%V: leader
+  \\ %%%ADDE:
+  ...
+  %%%END:
+  \end{tabular}
+
+Thus, the new property (*) at the beginning of variable names (keys) confirms the existence of the variable 
+but does not substitute its value into the template.
 
 Besides, if a C<variable_name> ends in C<%> (i.e. C<variable_name%>), a newline is suppressed.
 By default, a newline always occurs after value substitution and 'After blah, \ldots blah.' if it exists.
@@ -1932,7 +2068,7 @@ To return to the root (initial) C<$info> I<global environment> of all variables,
 If this "path" ends with a regular (scalar) variable or a reference to one, 
 then the I<global environment> is not redefined, 
 e.g. C<%%%V: key/index/myParam>, here C<key/index> "path" is exclusively 
-the I<local environment> of C<myParam> variable.
+the I<local environment> of C<myParam> variable, the value of which is inserted into the template.
 
 C<%%%V:> nested within the scope of C<%%%VAR:> tag do not change the I<global environment>,
 and the "C</>" character is not a separator in the "path".
@@ -1954,7 +2090,7 @@ they are inserted into TeX template.
 
 =item *
 B< C<%%%VAR: variable_name> > is start of full form of regular (SCALAR, REF.SCALAR) or complex (HASH, ARRAY) C<variable_name>,
-preserving preceding TeX up to C<%%%VAR:> but completely replacing everything up to first C<%%%END:> 
+keeping the template text in the line preceding up to C<%%%VAR:> but completely replacing everything up to first C<%%%END:> 
 (C<%%%ENDT:>, C<%%%ENDZ:>, or a new C<%%%VAR:>, or C<%%%TDZ:>) tag inclusive.
 
   External Blah, blah, \ldots blah:  %%%VAR: myParam
@@ -1987,7 +2123,7 @@ or respectively:
 BTW: if C<myParam = undef> (i.e. B<undefined>) and facultative option (see below) C<def> is set (e.g. 1),
 then these fragments B<will be missing> from the finished TeX.
 
-Usually HASH and ARRAY I<variable_name> are used in the template to create (fill) tables.
+Usually HASH and ARRAY I<variable_name> are used in the template to create (fill) tables or table-like boxes.
 
 C<%%%VAR:> tag is similar to C<%%%V:> tag, where the variable name can be used to specify its search 
 "path" using a special symbol, "C</>". However, this "path" does not affect the I<global environment>.
@@ -1996,24 +2132,24 @@ It only sets the I<local environment> within the scope of C<%%%VAR:> tag.
 Nested C<%%%VAR:> tags will not work and are treated as C<%%%END:> tags,
 i.e. tags for early termination of the scope.
 
-It is very important to understand that there are four (4) states for C<%%%VAR: variable> (or C<%%%V>)
-when the C<def> option is B<enabled>:
+It is very important to understand that there are four (4) states for C<%%%VAR: variable>
+(just as for C<%%%V>, but with a nuance of 1st state) when the C<def> option is B<enabled>:
 
 =over 6
 
-=item 1.
+=item 1st.
 
 complete absence, i.e. C<variable> B<does not exist>;
 
-=item 2.
+=item 2nd.
 
 presence (B<exists>) with an B<undefined> value;
 
-=item 3.
+=item 3th.
 
 B<exists> and B<defined> value and B<empty> (i.e. C<value = ''>, C<length of value == 0>);
 
-=item 4.
+=item 4th state.
 
 B<defined> value and B<not empty>.
 
@@ -2021,8 +2157,12 @@ B<defined> value and B<not empty>.
 
 BTW: If C<def> option is B<disabled>, then state (2) is identical to state (3).
 
-These states influence the final  outcome (see above for C<%%%V:> tag).
-
+These states affect the final result C<%%%V:> of C<%%%VAR:> similarly to 
+simple (SCALAR and REF.SCALAR variable) C<%%%V:> or C<%%%VAR:> (L<see above|/"anchor_item_1st">),
+but there is a slight difference for the 1st state when a non-existent (complete absence)
+key/name is specified. In this case, everything on the line along with C<%%%V:> is discarded
+(it will not appear in the final document), while any surrounding context defined by 
+C<%%%ADD:> and C<%%%ADDE:> is passed on to the next existing key/name belonging to C<%%%VAR:>.
 
 =item *
 There are three options for B< C<%%%ENDx> > tags:
@@ -2101,7 +2241,8 @@ The added text is taken from the beginning of the line to the beginning of C<%%%
 
   Head blah, blah, \ldots blah. %%%ADD: Tail blah, blah, \ldots
 
-this text will be added: C<< 'Head blah, blah, \ldots blah.' >>
+this text will be added: C<< 'Head blah, blah, \ldots blah.' >>,
+and the text located to the right of C<%%%ADD:> (i.e. C<Tail blah, blah, \ldots> in this case) will be discarded.
 
 Or, if C<%%%ADD:> is located at the very beginning of line, then after it to the end of line
 (i.e. text located on the right), e.g.
@@ -2179,7 +2320,7 @@ and C<%%%ADDE:> - after it (see above).
 =item 3.
 B< C<%%%ADDX:> > is similar to C<%%%ADD:>.
 
-For all lines (records) B<eXcept the first column (0) of first record (0)> or B<after the last column of last record>.
+For all lines (records) B<eXcept for the outermost elements>: column (0) of first record (0) or after the last column of last record.
 
 =item 4.
 B< C<%%%ADDA:> > is similar to C<%%%ADD:>.
@@ -2202,9 +2343,7 @@ If C<< myHash = { myKey => undef, ... } >>, then that template will lead to the 
 
   \mbox{\rule{0mm}{4.5em}}
 
-
 =back
-
 
 If any C<%%%ADDx:> tag ends in C<%> (e.g. C<%%%ADD:%>, C<%%%ADDA:%>, C<%%%ADDE:%>, or C<%%%ADDX:%> ), a newline is suppressed.
 (By default, a newline always occurs after adding text).
@@ -2215,7 +2354,7 @@ Only B<ONE tag> can be located on B<ONE line> of input template.
 
 Tag names must be in C<%%%UPPERCASE:>.
 
-Tags can "absorb" one whitespace character around them (left and/or right), if present.
+Tags can "absorb" B<ONE whitespace> character around them (left and/or right), if present.
 
 
 =head1 SUBROUTINES
@@ -2227,7 +2366,9 @@ LaTeX::Replicase provides these subroutines:
     REase( $value [, $options ] );
 
 
-=head2 replication( $source, $info [, %hash_options ] )
+=head2 replication()
+
+  my $msg = replication( $source, $info [, %hash_options ] )
 
 Creates a new output file from the specified TeX-document C<$source>, which is a template.
 The TeX-template C<$source> can be either a TeX-file or an array reference,
@@ -2294,7 +2435,7 @@ This option forces specifies the template and output files' character encoding a
 =item C<esc>
 
 This option applies C<tex_escape()> subroutine to all incoming values to mask 9 active TeX characters
-C<&> C<%> C<$> C<#> C<_> C<{> C<}> C<^> C<\> (see description of L<tex_escape()|tex_escape( $value [, $options ] )> subroutine below).
+C<&> C<%> C<$> C<#> C<_> C<{> C<}> C<^> C<\> (see description of L</"tex_escape()"> subroutine below).
 
 For example, the simplest way to use C<esc> is:
 
@@ -2311,7 +2452,7 @@ In general, the C<esc> option can contain the following keys:
 
 i.e. in C<esc> these keys can be separated by spaces, '_', and word boundaries.
 For a description of these keys, see the sections on
-L<tex_escape()|tex_escape( $value [, $options ] )> and L<REase()|REase( $value [, $options ] )>.
+L</"tex_escape()"> and L</"REase()">.
 
 This option can also be changed dynamically in the template itself using global C<< %%%V:=esc= 0|1|~|... >> tag,
 but
@@ -2331,7 +2472,8 @@ By default, C<< tail = 3 >>.
 C<tail> option has meaning if C<replication()> is called with C<REase>
 in C<esc> or C<< _ACTIONS_ >> option.
 
-For a description of C<tail>, see the section on L<REase()|REase( $value [, $options ] )>.
+Valid values for C<tail> are from 2 to 9.
+For a description of C<tail>, see the section on L</"REase()">.
 
 
 =item C<< _ACTIONS_ >>
@@ -2381,8 +2523,9 @@ first C<REase()> will be executed, then C<tex_escape()>.
 Thus, C<< _ACTIONS_ >> helps to finely control the template filling process.
 Duplicate or erroneous subroutines will be discarded.
 
-It's also important to return C<$mflag>, which then goes into the C<< _MFLAGS_ >> option 
-and is needed for C<tex_escape()> and C<REase()> if they are called later in the pipeline.
+If a custom user subroutine is used in C<< _ACTIONS_ >> pipeline, it is important to return C<$mflag> value,
+which then goes into the C<< _MFLAGS_ >> option and is needed for C<tex_escape()> and C<REase()> 
+if they are called later in the pipeline.
 These subroutines will not be executed if C<< _MFLAGS_ & 0b0100 >>.
 C<tex_escape()> will also not work if C<< _MFLAGS_ & 0b0110 >>.
 
@@ -2455,15 +2598,15 @@ Another way is to set the C<$DEBUG> package variable to enable debugging message
 C<replication> returns C<undef> or a reference to an error (and/or debug) message(s) array.
 
 
-=head2 tex_escape( $value [, $options ] );
+=head2 tex_escape()
 
-Masks (or replaces with equivalents) the active 9 TeX characters: C<&> C<%> C<$> C<#> C<_> C<{> C<}> C<^> C<\>
-with the corresponding: C<\&> C<\%> C<\$> C<\#> C<\_> C<\{> C<\}> C<\^\/> C<\char92\/> in the input C<$value>:
+  my $mflag = tex_escape( $value [, $options ] );
 
-  tex_escape( $value );
+Masks (or replaces with equivalents) the active 9 TeX characters: C<&>, C<%>, C<$>, C<#>, C<_>, C<{>, C<}>, C<^>, C<\>
+with the corresponding: C<\&>, C<\%>, C<\$>, C<\#>, C<\_>, C<\{>, C<\}>, C<\^\/>, C<\char92\/> in the input C<$value>
 
 With the facultative (optional) option C<~>, you can additionally replace 
-the character C<~> with the corresponding C<\~\/}>, e.g.:
+the character C<~> with the corresponding C<\~\/>, e.g.:
 
   tex_escape( $value, '~');
 
@@ -2479,14 +2622,22 @@ For example, C<$options> is a HASH:
 
 For example, C<$options> is a SCALAR:
 
-  my $mflag = tex_escape( $value, '~hyphen !stag -stag +stag;REase, strong mutual');
+  my $mflag = tex_escape( $value, '~hyphen, REase !stag -stag +stag; strong mutual');
 
 i.e. the SCALAR form of C<$options> allows passing additional options only as C<esc>.
 Key separators in C<esc> option can be spaces, '_', and word boundaries.
 
-=over 3
+=head3 hyphen
 
-=item %%%:
+This option makes compound words with "active" hyphens, 
+i.e. makes a replacement C<< ...abc-def... >> with C<< ...abc"=def... >>.
+
+=head3 REase
+
+includes an internal call to L</"REase()"> subroutines. (See below).
+
+
+=head3 start tag C<%%%:>
 
 If the C<$value> starts with the C<%%%:> tag, then this tag is removed
 (e.g. C<$value = '%%%:$\frac{12345}{67890}$'> is converted to C<$value = '$\frac{12345}{67890}$'>),
@@ -2496,7 +2647,7 @@ This means that the following start tags (stag) will remain untouched if they ar
 
 Three options (C<< !stag >>, C<< -stag >>, and C<< +stag >>) affect the action of the start tag (C<%%%:>):
 
-=over 6
+=over 3
 
 =item !stag
 
@@ -2521,6 +2672,9 @@ without masking active symbols.
 
 All three options, or just some of them, may be present at the same time, but C<< !stag >> suppresses the others.
 
+
+=head3 Re-masking active symbols
+
 By default, if already masked active symbols (C<< \& >> C<< \% >> C<< \$ >> C<< \# >> C<< \_ >>
 C<< \{ >> C<< \} >> C<< \^ >> C<< \char92 >>), they are skipped.
 
@@ -2537,7 +2691,7 @@ However, other TeX objects will be affected, if they exist.
 
 Two additional options -- C<strong> and C<mutual> influence this behavior.
 
-=over 6
+=over 3
 
 =item strong
 
@@ -2557,16 +2711,7 @@ C<< \char92 >> C<< \textbackslash >> C<< \relax >> C<< \hskip >>
 =back
 
 
-=item hyphen
-
-This option makes compound words with "active" hyphens, 
-i.e. makes a replacement C<< ...abc-def... >> with C<< ...abc"=def... >>.
-
-=item REase
-
-includes an internal call to the C<REase> routine. (See below).
-
-=back
+=head3 return codes
 
 C<tex_escape()> returns a bit flag C<$mflag> indicating whether C<$value> is modified:
 
@@ -2589,10 +2734,13 @@ changes were made and affected TeX structures and/or the start tag.
 C<tex_escape()> will not be executed if input C<< _MFLAGS_ & 0b0110 >>.
 
 
-=head2 REase( $value [, $options ] )
+=head2 REase()
 
-"Cuts" ("splits") C<$value>, recognizing non-alphabetic sections in it (except for the '\' character, 
-a sequence of characters that TeX cannot break with ordinary word breaks) and
+  my $mflag = REase( $value [, $options ] )
+
+"Cuts" ("splits") C<$value>, recognizing non-alphabetic sections in it 
+(except for these characters: C<< . >>, C<< > >>, C<< < >>, C<< } >>, C<< { >>, C<'>, C<`>, C<">, C<< = >>, C<< _ >>, C<< - >>, 
+and finally C<< \ >> character, a sequence of characters that TeX cannot break with ordinary word breaks) and
 glues the "cut" sections together with stretchable "glue" (i.e., a "spring" --- C<< {\hskip0pt plus .02em} >>).
 
 For example, this gibberish:
@@ -2606,9 +2754,11 @@ converts to a sequence (by default, C<< tail = 3 >>)
   '{\hskip0pt plus .02em}%'.
   '{\hskip0pt plus .02em},$,#'.
   '{\hskip0pt plus .02em},'.
-  '{\hskip0pt plus .02em}_,{,'.
-  '{\hskip0pt plus .02em}}'.
-  '{\hskip0pt plus .02em},^,\2'.
+  '{\hskip0pt plus .02em}_,{'.
+  '{\hskip0pt plus .02em},'.
+  '{\hskip0pt plus .02em}},^'.
+  '{\hskip0pt plus .02em},'.
+  '{\hskip0pt plus .02em}\2'.
   '{\hskip0pt plus .02em}qw\ea'.
   '{\hskip0pt plus .02em}-'.
   '{\hskip0pt plus .02em}sdf'.
@@ -2639,6 +2789,8 @@ For example, C<$options> is a SCALAR:
 
 i.e. the SCALAR form of C<$options> allows passing additional options only as C<esc>.
 
+=head3 tail
+
 Here, the main auxiliary option is C<tail>, which specifies the size (in characters) of the maximum 
 uncut non-alphabetic sections in the range from 1 to C<< tail + 1 >>.
 For example, for C<< tail = 5 >>, the sizes of uncut non-alphabetic sections will be 
@@ -2648,26 +2800,14 @@ from 1 to 6 characters, e.g.:
 
 Valid values for C<tail> are from 2 to 9.
 
-C<REase()> simultaneously "cleans" C<$value> from excess "glue", 
-excessively nested and empty TeX-blocks specified by curly braces C<< {} >>,
-e.g.:
-
-  '{{{124244234}}sdsdfdsfsdf{}{}'
-
-converts to a sequence (C<< tail = 3 >>)
-
-  '{\hskip0pt plus .02em}{{{1{\hskip0pt plus .02em}2'.
-  '{\hskip0pt plus .02em}4244'.
-  '{\hskip0pt plus .02em}2'.
-  '{\hskip0pt plus .02em}34}'.
-  '{\hskip0pt plus .02em}}'.
-  '{\hskip0pt plus .02em}sdsdfdsfsdf'
-
 If the $value ends with TeX-command C<< \relax\/ >>, then the value itself is not modified, it is skipped.
 C<< \relax\/ >> remains untouched at the end.
 
 C<REase()> also depends on C<%%%:> start tag and the C<< !stag >>, C<< -stag >> options
 (but not the C<< +stag >> option), similar to C<tex_escape()>.
+
+
+=head3 return codes
 
 C<REase()> returns a bit flag C<$mflag> indicating whether C<$value> is modified:
 
@@ -2715,6 +2855,9 @@ L<File::Compare>,
 and L<Carp>.
 
 =head1 SEE ALSO
+
+For LaTeX2e details see this unofficial reference manual:
+L<https://tug.org/texinfohtml/latex2e.html>
 
 Perl modules that offer similar functionality:
 

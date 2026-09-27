@@ -30,19 +30,19 @@ $ebug->step;
 is($ebug->line, 9);
 ($stdout, $stderr) = $ebug->output;
 is($stdout, "Hi!\nAbout to get square_root(-4)\n");
-is($stderr, "\$x is -4 at corpus/carp.pl line 8, <GEN1> line 10.\n");
+like($stderr, qr{\A\$x is -4 at corpus/carp.pl line 8, <GEN\d+> line 10\.\n\z});
 
 $ebug->step;
 is($ebug->line, 13);
 ($stdout, $stderr) = $ebug->output;
 is($stdout, "Hi!\nAbout to get square_root(-4)\n");
-is($stderr, "\$x is -4 at corpus/carp.pl line 8, <GEN1> line 10.\n");
+like($stderr, qr{\A\$x is -4 at corpus/carp.pl line 8, <GEN\d+> line 10\.\n\z});
 
 $ebug->step;
 is($ebug->line, 14);
 ($stdout, $stderr) = $ebug->output;
 is($stdout, "Hi!\nAbout to get square_root(-4)\n");
-is($stderr, "\$x is -4 at corpus/carp.pl line 8, <GEN1> line 10.\n");
+like($stderr, qr{\A\$x is -4 at corpus/carp.pl line 8, <GEN\d+> line 10\.\n\z});
 
 $ebug->next;
 is($ebug->line, 15);

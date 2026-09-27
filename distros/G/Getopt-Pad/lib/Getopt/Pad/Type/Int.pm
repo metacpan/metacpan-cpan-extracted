@@ -6,7 +6,7 @@ use Getopt::Pad::Type::Number;
 class Getopt::Pad::Type::Int :isa(Getopt::Pad::Type::Number) :strict(params) {
 	use constant NAMES => ['i', 'int', 'integer'];
 
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 
 	method checkFormat($value) {
 		return $value =~ /\A[+-]?[0-9]+\z/ ? undef : sprintf("'%s' is not an integer", $value);
@@ -21,13 +21,34 @@ __END__
 
 =head1 NAME
 
-Getopt::Pad::Type::Int - integer type
+Getopt::Pad::Type::Int - The int option type
+
+=head1 SYNOPSIS
+
+=for highlighter language=perl
+
+    options => {
+        workers => { type => 'int', min => 1, max => 64, default => 4 },
+    },
 
 =head1 DESCRIPTION
 
-Integer value with optional C<min> / C<max> bounds, spec type C<i>.
+The type of options and args declared with C<< type => 'int' >>,
+C<'integer'> or C<'i'>.
 
-Part of the L<Getopt::Pad> distribution; see its documentation for the user-facing API.
+It accepts an optional C<+> or C<->, followed by one or more decimal
+digits: C<42>, C<-7>, C<+3>, C<007>. The reader returns the value as a
+number, so C<007> reads as 7. Anything else is rejected with
+C<'VALUE' is not an integer>.
+
+The spec keys C<min> and C<max> set inclusive bounds; they come from
+L<Getopt::Pad::Type::Number>. See L<Getopt::Pad/int> for the user-level
+description.
+
+=head1 SEE ALSO
+
+L<Getopt::Pad/TYPES>, L<Getopt::Pad::Type::Float>,
+L<Getopt::Pad::Type::Number>
 
 =head1 AUTHOR
 

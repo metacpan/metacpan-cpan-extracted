@@ -1,0 +1,34 @@
+<start_html title="WebDyne Cloudflare D1" h2>
+<p>This page reads a row from D1 using a prepared statement.</p>
+<perl handler="d1_result">
+<dl>
+  <dt>Name</dt><dd>${name}</dd>
+  <dt>Note</dt><dd>${note}</dd>
+  <dt>Payload bytes</dt><dd>${payload_length}</dd>
+</dl>
+</perl>
+<p><a href="d1-api/row/1">JSON response</a> |
+<a href="kv.psp">KV example</a> | <a href="r2.psp">R2 example</a></p>
+
+__PERL__
+
+use WebDyne::Cloudflare::D1;
+
+sub d1_result {
+    my ($self)=@_;
+    my $db_or=WebDyne::Cloudflare::D1->new(
+        scope   => $self->r()->{'scope'},
+        binding => 'DB',
+    );
+    my $row_hr=$db_or->prepare(
+        'SELECT name, note, payload FROM webdyne_d1_example WHERE id = ?1'
+    )->bind(1)->first()->get();
+    die "Initialize the example database with schema.sql first\n" unless $row_hr;
+
+    my $html_or=$self->html_tiny();
+    return $self->render(
+        name => $html_or->entity_encode($row_hr->{'name'}),
+        note => $html_or->entity_encode(defined($row_hr->{'note'}) ? $row_hr->{'note'} : '(NULL)'),
+        payload_length => length(defined($row_hr->{'payload'}) ? $row_hr->{'payload'} : ''),
+    );
+}

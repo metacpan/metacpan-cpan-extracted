@@ -690,6 +690,460 @@ new_request_object(
     return object;
 }
 
+
+static int
+parse_response_strict(
+    const char *buf,
+    size_t buffer_len,
+    int *minor_version,
+    int *status,
+    const char **reason,
+    size_t *reason_len,
+    struct phr_header *headers,
+    size_t *num_headers,
+    size_t last_len
+)
+{
+    int consumed = phr_parse_response(
+        buf,
+        buffer_len,
+        minor_version,
+        status,
+        reason,
+        reason_len,
+        headers,
+        num_headers,
+        last_len
+    );
+    size_t i;
+
+    if (consumed <= 0)
+        return consumed;
+
+    if (*minor_version != 0 && *minor_version != 1)
+        return -1;
+    if (*status < 100 || *status > 599)
+        return -1;
+
+    /*
+     * Match the existing Perl client parser's status-line contract exactly:
+     * HTTP/1.0 or HTTP/1.1, one SP before the three status digits, and one
+     * mandatory SP before the (possibly empty) reason phrase.
+     */
+    if (buffer_len < 13
+        || !memEQ(buf, "HTTP/1.", 7)
+        || (buf[7] != '0' && buf[7] != '1')
+        || buf[8] != ' '
+        || buf[9] < '0' || buf[9] > '9'
+        || buf[10] < '0' || buf[10] > '9'
+        || buf[11] < '0' || buf[11] > '9'
+        || buf[12] != ' '
+        || *reason != buf + 13)
+        return -1;
+
+    if (!valid_reason_phrase(*reason, *reason_len))
+        return -1;
+
+    for (i = 0; i < *num_headers; ++i) {
+        if (headers[i].name == NULL
+            || !valid_field_name(headers[i].name, headers[i].name_len)
+            || !valid_output_field_value(
+                headers[i].value,
+                headers[i].value_len
+            ))
+            return -1;
+    }
+
+    return consumed;
+}
+
+static SV *
+new_response_object(
+    pTHX_
+    int minor_version,
+    int status,
+    const char *reason,
+    size_t reason_len,
+    const struct phr_header *headers,
+    size_t num_headers
+)
+{
+    HV *hv;
+    AV *header_list;
+    SV *object;
+    HV *stash;
+    size_t i;
+
+    hv = newHV();
+    hv_store(hv, "status", 6, newSViv(status), 0);
+    hv_store(
+        hv,
+        "reason",
+        6,
+        newSVpvn(reason, (STRLEN)reason_len),
+        0
+    );
+    hv_store(
+        hv,
+        "version",
+        7,
+        newSVpvf("1.%d", minor_version),
+        0
+    );
+
+    header_list = newAV();
+    for (i = 0; i < num_headers; ++i) {
+        const char *value = headers[i].value;
+        size_t value_len = headers[i].value_len;
+        AV *pair;
+
+        while (value_len && is_ows((unsigned char)*value)) {
+            ++value;
+            --value_len;
+        }
+        while (value_len
+            && is_ows((unsigned char)value[value_len - 1]))
+            --value_len;
+
+        pair = newAV();
+        av_extend(pair, 1);
+        av_push(
+            pair,
+            newSVpvn(
+                headers[i].name,
+                (STRLEN)headers[i].name_len
+            )
+        );
+        av_push(pair, newSVpvn(value, (STRLEN)value_len));
+        av_push(header_list, newRV_noinc((SV *)pair));
+    }
+
+    hv_store(
+        hv,
+        "headers",
+        7,
+        newRV_noinc((SV *)header_list),
+        0
+    );
+    hv_store(hv, "committed", 9, newSViv(1), 0);
+    hv_store(hv, "complete", 8, newSViv(0), 0);
+    hv_store(hv, "body_kind", 9, newSV(0), 0);
+    hv_store(hv, "body", 4, newSV(0), 0);
+
+    object = newRV_noinc((SV *)hv);
+    stash = gv_stashpv("Linux::Event::HTTP::Response", GV_ADD);
+    sv_bless(object, stash);
+    return object;
+}
+
+enum {
+    LE_HTTP_CLIENT_RAW_HEAD = 0,
+    LE_HTTP_CLIENT_RAW_FALLBACK = 1
+};
+
+typedef struct {
+    const les_consumer_host_api_v1_t *host;
+    void *host_context;
+    SV *stream;
+    CV *response_cv;
+    CV *fallback_cv;
+    CV *protocol_error_cv;
+    int input_mode;
+} le_http_client_raw_consumer_context;
+
+static CV *
+le_http_client_raw_method_cv(
+    pTHX_
+    le_http_client_raw_consumer_context *context,
+    CV **slot,
+    const char *method_name
+)
+{
+    GV *gv;
+    CV *cv;
+
+    if (*slot != NULL)
+        return *slot;
+
+    if (!SvROK(context->stream))
+        croak("Linux::Event HTTP client raw consumer stream is not an object");
+
+    gv = gv_fetchmethod_autoload(
+        SvSTASH(SvRV(context->stream)),
+        method_name,
+        0
+    );
+    if (gv == NULL || (cv = GvCV(gv)) == NULL)
+        croak(
+            "Linux::Event HTTP client raw consumer method %s is unavailable",
+            method_name
+        );
+
+    *slot = (CV *)SvREFCNT_inc((SV *)cv);
+    return *slot;
+}
+
+static int
+le_http_client_raw_call(
+    pTHX_
+    le_http_client_raw_consumer_context *context,
+    CV **slot,
+    const char *method_name,
+    SV *arg,
+    int use_result_as_mode
+)
+{
+    const les_consumer_host_api_v1_t *host;
+    void *host_context;
+    CV *cv;
+    int result = 0;
+    int count;
+    int jump_status;
+    dJMPENV;
+    dSP;
+
+    host = context->host;
+    host_context = context->host_context;
+    if (!host
+        || host->struct_size < LES_CONSUMER_HOST_V1_RETAIN_REQUIRED_SIZE
+        || !host->retain || !host->release)
+        croak("Linux::Event raw consumer host lifetime extension is unavailable");
+
+    cv = le_http_client_raw_method_cv(
+        aTHX_ context, slot, method_name
+    );
+
+    if (!host->retain(aTHX_ host_context))
+        croak("Linux::Event raw consumer host is no longer available");
+
+    JMPENV_PUSH(jump_status);
+    if (jump_status == 0) {
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(context->stream);
+        if (arg != NULL)
+            XPUSHs(arg);
+        PUTBACK;
+        count = call_sv((SV *)cv, G_SCALAR);
+        SPAGAIN;
+        if (count > 0)
+            result = POPi;
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+        JMPENV_POP;
+    } else {
+        JMPENV_POP;
+        host->release(aTHX_ host_context);
+        JMPENV_JUMP(jump_status);
+    }
+
+    if (use_result_as_mode)
+        context->input_mode = result
+            ? LE_HTTP_CLIENT_RAW_FALLBACK
+            : LE_HTTP_CLIENT_RAW_HEAD;
+
+    host->release(aTHX_ host_context);
+    return result;
+}
+
+static void *
+le_http_client_raw_consumer_create(
+    pTHX_
+    const les_consumer_host_api_v1_t *host,
+    void *host_context,
+    SV *stream
+)
+{
+    le_http_client_raw_consumer_context *context;
+
+    if (!host
+        || host->abi_version != LES_CONSUMER_ABI_VERSION
+        || host->struct_size < LES_CONSUMER_HOST_V1_RETAIN_REQUIRED_SIZE
+        || !host->retain || !host->release)
+        return NULL;
+
+    Newxz(context, 1, le_http_client_raw_consumer_context);
+    if (context == NULL)
+        return NULL;
+
+    context->host = host;
+    context->host_context = host_context;
+    context->stream = SvREFCNT_inc(stream);
+    context->input_mode = LE_HTTP_CLIENT_RAW_HEAD;
+    return context;
+}
+
+static int
+le_http_client_raw_consumer_input(
+    pTHX_
+    void *opaque,
+    const char *buf,
+    size_t buffer_len,
+    size_t *host_consumed
+)
+{
+    le_http_client_raw_consumer_context *context
+        = (le_http_client_raw_consumer_context *)opaque;
+    int minor_version;
+    int status;
+    const char *reason;
+    size_t reason_len;
+    struct phr_header headers[LE_HTTP1_MAX_HEADERS];
+    size_t num_headers = 100;
+    int consumed;
+    SV *response;
+
+    *host_consumed = 0;
+
+    if (context->input_mode == LE_HTTP_CLIENT_RAW_FALLBACK) {
+        SV *bytes = sv_2mortal(newSVpvn(buf, (STRLEN)buffer_len));
+        *host_consumed = buffer_len;
+        (void)le_http_client_raw_call(
+            aTHX_
+            context,
+            &context->fallback_cv,
+            "_http_client_native_fallback_input",
+            bytes,
+            1
+        );
+        return LES_CONSUMER_CONTINUE;
+    }
+
+    consumed = parse_response_strict(
+        buf,
+        buffer_len,
+        &minor_version,
+        &status,
+        &reason,
+        &reason_len,
+        headers,
+        &num_headers,
+        0
+    );
+
+    if (consumed == -2) {
+        if (buffer_len > 65536) {
+            SV *error = sv_2mortal(newSVpvs(
+                "HTTP/1 response head exceeds configured limit"
+            ));
+            *host_consumed = buffer_len;
+            (void)le_http_client_raw_call(
+                aTHX_
+                context,
+                &context->protocol_error_cv,
+                "_http_client_native_protocol_error",
+                error,
+                0
+            );
+        }
+        return LES_CONSUMER_CONTINUE;
+    }
+
+    if (consumed == -1) {
+        SV *error = sv_2mortal(newSVpvs("malformed HTTP/1 response"));
+        *host_consumed = buffer_len;
+        (void)le_http_client_raw_call(
+            aTHX_
+            context,
+            &context->protocol_error_cv,
+            "_http_client_native_protocol_error",
+            error,
+            0
+        );
+        return LES_CONSUMER_CONTINUE;
+    }
+
+    if ((size_t)consumed > 65536) {
+        SV *error = sv_2mortal(newSVpvs(
+            "HTTP/1 response head exceeds configured limit"
+        ));
+        *host_consumed = (size_t)consumed;
+        (void)le_http_client_raw_call(
+            aTHX_
+            context,
+            &context->protocol_error_cv,
+            "_http_client_native_protocol_error",
+            error,
+            0
+        );
+        return LES_CONSUMER_CONTINUE;
+    }
+
+    response = new_response_object(
+        aTHX_
+        minor_version,
+        status,
+        reason,
+        reason_len,
+        headers,
+        num_headers
+    );
+
+    *host_consumed = (size_t)consumed;
+    (void)le_http_client_raw_call(
+        aTHX_
+        context,
+        &context->response_cv,
+        "_http_client_native_response",
+        sv_2mortal(response),
+        1
+    );
+    return LES_CONSUMER_CONTINUE;
+}
+
+static void
+le_http_client_raw_consumer_event(
+    pTHX_
+    void *opaque,
+    uint32_t event,
+    int error,
+    const char *message
+)
+{
+    PERL_UNUSED_ARG(opaque);
+    PERL_UNUSED_ARG(event);
+    PERL_UNUSED_ARG(error);
+    PERL_UNUSED_ARG(message);
+    PERL_UNUSED_CONTEXT;
+}
+
+static void
+le_http_client_raw_consumer_destroy(pTHX_ void *opaque)
+{
+    le_http_client_raw_consumer_context *context
+        = (le_http_client_raw_consumer_context *)opaque;
+
+    PERL_UNUSED_CONTEXT;
+
+    if (context == NULL)
+        return;
+
+    if (context->response_cv != NULL)
+        SvREFCNT_dec((SV *)context->response_cv);
+    if (context->fallback_cv != NULL)
+        SvREFCNT_dec((SV *)context->fallback_cv);
+    if (context->protocol_error_cv != NULL)
+        SvREFCNT_dec((SV *)context->protocol_error_cv);
+    if (context->stream != NULL)
+        SvREFCNT_dec(context->stream);
+    Safefree(context);
+}
+
+static const les_consumer_ops_v1_t le_http_client_raw_consumer_ops = {
+    LES_CONSUMER_ABI_VERSION,
+    sizeof(les_consumer_ops_v1_t),
+    "Linux::Event::HTTP::_HTTP1 client raw input",
+    LES_CONSUMER_F_RAW_INPUT,
+    le_http_client_raw_consumer_create,
+    NULL,
+    le_http_client_raw_consumer_event,
+    le_http_client_raw_consumer_destroy,
+    NULL,
+    le_http_client_raw_consumer_input
+};
+
 enum {
     LE_HTTP_RAW_INPUT_REQUEST = 0,
     LE_HTTP_RAW_INPUT_FALLBACK = 1,
@@ -1932,6 +2386,13 @@ UV
 _raw_consumer_operations_address()
   CODE:
     RETVAL = PTR2UV(&le_http_raw_consumer_ops);
+  OUTPUT:
+    RETVAL
+
+UV
+_raw_client_consumer_operations_address()
+  CODE:
+    RETVAL = PTR2UV(&le_http_client_raw_consumer_ops);
   OUTPUT:
     RETVAL
 

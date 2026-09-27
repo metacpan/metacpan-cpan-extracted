@@ -1,0 +1,21 @@
+# Disposable local demo credentials; bind the database to loopback only.
+services:
+  db:
+    build: .
+    ports:
+      - "127.0.0.1:${DB_PORT:-13306}:3306"
+    environment:
+      MYSQL_DATABASE: webdyne_demo
+      MYSQL_USER: webdyne
+      MYSQL_PASSWORD: local-demo-only
+      MYSQL_ROOT_PASSWORD: local-admin-only
+    volumes:
+      - database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -uwebdyne -plocal-demo-only webdyne_demo -e \"SELECT count(*) FROM demo_inventory\""]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+volumes:
+  database:

@@ -3,6 +3,7 @@ use experimental 'signatures';
 use Test2::V0;
 
 use File::Spec;
+use File::Temp qw(tempdir);
 use IPC::Open3 qw(open3);
 use Symbol     qw(gensym);
 
@@ -110,6 +111,17 @@ subtest 'scripts' => sub {
 	like $help, qr/^## Completion\n   --create-completions <>\s+Print a completion script/m, 'listed under its own group';
 };
 
+subtest 'inherited options complete on the levels below' => sub {
+	my $inheriting = Getopt::Pad::Completion->new(programName => 'tool', spec => Getopt::Pad::Spec->new(raw => {
+		options  => { color => { type => 's', valid => [qw(never always)], inherit => 1 } },
+		commands => { doc => { options => { depth => { type => 'i' } } } },
+		config   => { format => 'json' },
+	}));
+
+	is [$inheriting->candidates(['doc', '--c'], 1)], ['none', '--color', '--config', '--create-default-config'], 'offered after the command word';
+	is [$inheriting->candidates(['doc', '--color', ''], 2)], ['none', 'always', 'never'], 'with their values';
+};
+
 subtest 'GetOptions answers the shell instead of parsing' => sub {
 	local $ENV{GETOPT_PAD_COMPLETE}       = 'bash';
 	local $ENV{GETOPT_PAD_COMPLETE_INDEX} = 1;
@@ -122,6 +134,26 @@ subtest 'GetOptions answers the shell instead of parsing' => sub {
 	waitpid $pid, 0;
 	is $? >> 8, 0, 'exit status 0';
 	is $stdout, "none\ndave\n", 'candidates printed, the required option never checked';
+};
+
+subtest 'a completion request never reads config files' => sub {
+	my $broken = File::Spec->catfile(tempdir(CLEANUP => 1), 'broken.json');
+	open my $handle, '>', $broken or die $!;
+	print {$handle} '{ not json';
+	close $handle;
+
+	local $ENV{GETOPT_PAD_COMPLETE}       = 'bash';
+	local $ENV{GETOPT_PAD_COMPLETE_INDEX} = 1;
+	local $ENV{BROKEN_CONFIG}             = $broken;
+	my $stderrHandle = gensym;
+	my $pid = open3(my $stdinHandle, my $stdoutHandle, $stderrHandle, $^X, "-I$libDir", '-MGetopt::Pad', '-e',
+		'GetOptions(commands => { doc => { options => { depth => {} } } }, config => { format => q(json), paths => [$ENV{BROKEN_CONFIG}] });', '--', 'doc', '--d');
+	close $stdinHandle;
+	local $/;
+	my $stdout = (readline($stdoutHandle) // '') =~ s/\r\n/\n/gr;
+	waitpid $pid, 0;
+	is $? >> 8, 0, 'exit status 0';
+	is $stdout, "none\n--depth\n", 'candidates printed from the spec alone';
 };
 
 done_testing;

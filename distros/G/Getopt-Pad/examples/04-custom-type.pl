@@ -25,15 +25,13 @@ class My::Type::Even :isa(Getopt::Pad::Type) {
 
 	method glSuffix() { return '=s' }
 
-	method coerce($value) {
-		return $value + 0;
-	}
-
 	method check($value) {
-		return "'$value' is not an integer" if $value !~ /^-?\d+$/;
-		return "$value is not an even number" if $value % 2;
+		return sprintf("'%s' is not an integer", $value) if $value !~ /\A-?[0-9]+\z/;
+		return sprintf('%s is not an even number', $value) if $value % 2;
 		return undef;
 	}
+
+	method coerce($value) { return $value + 0 }
 
 	method label() { return 'Even' }
 }

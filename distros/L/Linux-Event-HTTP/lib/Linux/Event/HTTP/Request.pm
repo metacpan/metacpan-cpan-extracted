@@ -9,7 +9,7 @@ use utf8 ();
 
 use Linux::Event::HTTP::_HTTP1 ();
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 my (
     $NATIVE_METHOD,
@@ -76,6 +76,32 @@ sub _validate_target ($target) {
     return $bytes;
 }
 
+sub _validate_scheme ($scheme) {
+    return undef if !defined $scheme;
+    my $bytes = _byte_string('scheme', $scheme);
+    die 'invalid request scheme'
+        if $bytes !~ /\A[A-Za-z][A-Za-z0-9+.-]*\z/;
+    return $bytes;
+}
+
+sub _validate_authority ($authority) {
+    return undef if !defined $authority;
+    my $bytes = _byte_string('authority', $authority);
+    die 'invalid request authority'
+        if $bytes eq '' || $bytes =~ /[\x00-\x20\x7f\/?#]/;
+    return $bytes;
+}
+
+sub _target_metadata ($method, $target) {
+    if ($target =~ /\A([A-Za-z][A-Za-z0-9+.-]*):\/\/([^\/?#]+)/) {
+        return ($1, $2);
+    }
+    if (uc($method) eq 'CONNECT' && $target !~ /[\/?#]/) {
+        return (undef, $target);
+    }
+    return (undef, undef);
+}
+
 sub _validate_version ($version) {
     die 'invalid HTTP version'
         if !defined($version) || ref($version)
@@ -112,6 +138,10 @@ sub new ($class, %args) {
     my $method  = delete $args{method};
     my $target  = delete $args{target};
     my $version = delete($args{version}) // '1.1';
+    my $has_scheme = exists $args{scheme};
+    my $scheme = delete $args{scheme};
+    my $has_authority = exists $args{authority};
+    my $authority = delete $args{authority};
     my $headers = delete $args{headers};
     my $has_body = exists $args{body};
     my $body = delete $args{body};
@@ -121,11 +151,15 @@ sub new ($class, %args) {
     _validate_method($method);
     $target = _validate_target($target);
     _validate_version($version);
+    $scheme = _validate_scheme($scheme) if $has_scheme;
+    $authority = _validate_authority($authority) if $has_authority;
 
     my $self = bless {
         method    => "$method",
         target    => $target,
         version   => "$version",
+        ($has_scheme ? (scheme => $scheme) : ()),
+        ($has_authority ? (authority => $authority) : ()),
         headers   => [],
         body_kind => undef,
         body      => undef,
@@ -174,6 +208,43 @@ sub target ($self, @args) {
 
 sub target_is_exact ($self) {
     return 1;
+}
+
+sub scheme ($self, @args) {
+    if (@args) {
+        die 'scheme accepts exactly one value' if @args != 1;
+        die 'received request metadata is read-only' if _is_native($self);
+        $self->_assert_mutable;
+        $self->{scheme} = _validate_scheme($args[0]);
+        return $self;
+    }
+
+    if (!_is_native($self) && exists $self->{scheme}) {
+        return $self->{scheme};
+    }
+    my ($scheme) = _target_metadata($self->method, $self->target);
+    return $scheme;
+}
+
+sub authority ($self, @args) {
+    if (@args) {
+        die 'authority accepts exactly one value' if @args != 1;
+        die 'received request metadata is read-only' if _is_native($self);
+        $self->_assert_mutable;
+        $self->{authority} = _validate_authority($args[0]);
+        return $self;
+    }
+
+    if (!_is_native($self) && exists $self->{authority}) {
+        return $self->{authority};
+    }
+
+    my (undef, $authority) = _target_metadata($self->method, $self->target);
+    return $authority if defined $authority;
+
+    my @host = $self->_header_values_list('Host');
+    return $host[0] if @host == 1;
+    return undef;
 }
 
 sub version ($self, @args) {
@@ -408,7 +479,7 @@ Linux::Event::HTTP::Request - HTTP request message
 
 =head1 SYNOPSIS
 
-    my $request = Linux::Event::HTTP::Request->new(
+    my $req = Linux::Event::HTTP::Request->new(
         method => 'POST',
         target => '/items',
         headers => [
@@ -419,119 +490,131 @@ Linux::Event::HTTP::Request - HTTP request message
 
 =head1 DESCRIPTION
 
-C<Linux::Event::HTTP::Request> represents one HTTP request message. The same
-class is used for locally constructed outgoing requests and parsed incoming
-requests.
+C<Linux::Event::HTTP::Request> represents one HTTP request message.
 
-Locally constructed requests are mutable until the HTTP transaction commits
-them for transmission. Parsed incoming requests expose committed, read-only
-metadata. HTTP/1 parser state remains native and lazy: method, target, and
-header strings are materialized as Perl scalars only when requested.
+The same class is used for HTTP/1 and HTTP/2, and for both locally constructed
+outgoing requests and received incoming requests.
 
-The public message API conforms directly to the C<Uniform::HTTP> 0.02 message
-contract by behavior; it does not inherit from a Uniform class. Duplicate header
-occurrences, inter-field order, original field-name spelling, and the exact
-request-target are preserved. Connection, Transaction, streaming, retry, and
-protocol-handoff state remain outside the Request.
+A Request contains message data only: method, request target, HTTP version,
+headers, optional scheme/authority metadata, and an optional complete scalar
+body. It does not own the socket, connection, Transaction, streaming producer,
+redirect policy, or authentication policy.
 
-The Request does not own a socket or a transaction. Incremental body transfer
-belongs to the transaction/connection layer. C<body> is only the convenience
-representation for a complete scalar body; incoming bodies are not implicitly
-buffered into the Request object.
+Locally constructed Requests are mutable until protocol commit. Received
+Requests are read-only.
+
+Incoming bodies are streaming-first and are not accumulated into the Request
+automatically.
+
+=head1 CONSTRUCTOR
+
+    my $req = Linux::Event::HTTP::Request->new(
+        method    => 'GET',
+        target    => '/',
+        version   => '1.1',
+        scheme    => 'https',
+        authority => 'example.com',
+        headers   => [ ... ],
+        body      => $bytes,
+    );
+
+C<method> and C<target> are required. C<version> defaults to C<1.1>.
+
+C<headers> is an array reference of C<[name, value]> pairs. Duplicates, field
+order, and original field-name spelling are preserved.
 
 =head1 METHODS
 
-=head2 new
-
-Constructs a mutable request message. C<method> and C<target> are required.
-C<version> defaults to C<1.1>. C<headers> is an optional array reference of
-C<[name, value]> pairs so duplicates and field order are preserved. C<body> is
-an optional complete scalar byte body.
-
 =head2 method
 
-Gets the request method. A locally constructed request may set it before the
-message is committed.
+Gets or, while mutable, sets the HTTP method.
 
 =head2 target
 
-Gets the request target exactly as it appears in the HTTP message. A locally
-constructed request may set it before commit.
+Gets or, while mutable, sets the exact request target.
 
 =head2 target_is_exact
 
-Returns true. Linux::Event::HTTP preserves the exact Request target rather than
-reconstructing it from decomposed URL or routing state.
+Returns true. The request target is preserved rather than reconstructed from
+routing state.
 
 =head2 version
 
-Gets the HTTP version, such as C<1.1>. A locally constructed request may set it
-before commit. Passing C<undef> clears the represented version; an HTTP/1
-executor will reject an unset version when transmission is attempted.
+Gets or, while mutable, sets the HTTP version, such as C<1.1> or C<2>.
+
+=head2 scheme
+
+Gets or sets protocol-neutral request scheme metadata while mutable.
+
+HTTP/2 maps C<:scheme> here. HTTP/1 absolute-form requests can also provide it.
+Origin-form HTTP/1 requests normally have no scheme in the message itself.
+
+=head2 authority
+
+Gets or sets protocol-neutral authority metadata while mutable.
+
+HTTP/2 maps C<:authority> here. HTTP/1 may derive authority from absolute-form,
+CONNECT authority-form, or one unambiguous Host field.
+
+HTTP/2 pseudo-headers never appear in the ordinary header list.
 
 =head2 header
 
-    my $host = $request->header('Host');
-    $request->header('Accept', 'application/json');
+    my $value = $req->header('Host');
+    $req->header('Accept', 'application/json');
 
-Returns the first matching field value. On a mutable local Request, the setter
-form replaces all fields of the same ASCII case-insensitive name with one field
-at the position of the first occurrence, or appends it when absent.
+Returns the first matching value.
+
+On a mutable Request, the setter replaces all fields of the same
+case-insensitive name with one field.
 
 =head2 add_header
 
-Adds another header field while preserving existing same-name fields.
+Adds another field without removing existing same-name fields.
 
 =head2 remove_header
 
-Removes all fields with the supplied ASCII case-insensitive name.
+Removes all fields with the supplied case-insensitive name.
 
 =head2 header_values
 
-Returns an array reference containing all matching values in message order. An
-absent field returns an empty array reference. Values are never implicitly
-comma-joined.
+Returns an array reference of all matching values in message order.
 
 =head2 header_count, header_name, header_value
 
-Provide exact indexed access to fields in message order while preserving the
-original field names. A non-negative index beyond the end returns C<undef>;
-negative and non-integer indexes are programmer errors.
+Provide exact indexed access to the lossless header list.
 
 =head2 headers_are_lossless
 
-Returns true because duplicate occurrences, inter-field order, and original
-field-name spelling are retained.
+Returns true.
 
 =head2 content_length
 
 Returns the declared Content-Length as an integer, or undef when absent.
-Parsed HTTP/1 requests have already had conflicting values rejected.
 
 =head2 body
 
-Gets or sets the complete scalar byte body of a locally constructed Request.
-Incremental outgoing bodies are selected through the owning Transaction rather
-than through the Request message. Incoming bodies are delivered incrementally
-by the transaction/connection layer and are not implicitly accumulated here.
-Passing C<undef> as a body is an error; an explicit empty body is C<''>.
+Gets or, while mutable, sets a complete scalar body.
+
+This is not the streaming-body API. Incremental outgoing bodies belong to the
+Transaction, and incoming bodies are delivered by the protocol layer.
 
 =head2 has_buffered_body
 
-Returns true only when a complete scalar body buffer is locally available,
-including an explicit empty buffer. Parsed incoming Request bodies are streamed
-by the surrounding protocol layer and therefore return false.
+True when a complete scalar body is locally available, including an explicit
+empty body.
 
 =head2 is_complete
 
-Returns whether the complete message body boundary has been reached. A locally
-constructed scalar-body request is complete immediately; an outgoing or incoming
-streamed request becomes complete only when the protocol layer reaches its final
-body boundary.
+True when the complete message body boundary is known or has been reached.
 
 =head2 is_mutable
 
-Returns true only while a locally constructed Request has not been committed for
-transmission. Parsed incoming Requests are read-only and return false.
+True only while a locally constructed Request remains uncommitted.
+
+=head1 SEE ALSO
+
+L<Linux::Event::HTTP::Response>, L<Linux::Event::HTTP::Transaction>,
+L<Linux::Event::HTTP::Client>, L<Linux::Event::HTTP::Server>.
 
 =cut

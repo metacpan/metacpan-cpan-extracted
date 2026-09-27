@@ -9,16 +9,18 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Statistics/Kappa.pm',
     ABSTRACT_FROM    => 'lib/Statistics/Kappa.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.008003',
+    MIN_PERL_VERSION => '5.026',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+        'FindBin' => 0,
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        Moo => 0,
+        'List::Util' => 0,
+        'namespace::clean' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', TAR => 'ptar' },
     clean => { FILES => 'Statistics-Kappa-*' },

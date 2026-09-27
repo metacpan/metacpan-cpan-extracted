@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::run 6.039;
+package Dist::Zilla::App::Command::run 6.040;
 # ABSTRACT: run stuff in a dir where your dist is built
 
 use Dist::Zilla::Pragmas;
@@ -83,7 +83,7 @@ Dist::Zilla::App::Command::run - run stuff in a dir where your dist is built
 
 =head1 VERSION
 
-version 6.039
+version 6.040
 
 =head1 SYNOPSIS
 

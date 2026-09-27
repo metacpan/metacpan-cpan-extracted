@@ -15,7 +15,7 @@ use Linux::Event::HTTP::Request;
 use Linux::Event::HTTP::Response;
 use Linux::Event::HTTP::Transaction;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 Linux::Event::Framer->declare_native_consumer(
     __PACKAGE__,
@@ -268,7 +268,9 @@ sub _http_native_content_length_complete ($self) {
 }
 
 sub _http_transport_drain ($self) {
-    if (my $transaction = $self->{_http_active_transaction}) {
+    if (my $executor = $self->{_http2_executor}) {
+        $executor->transport_drain;
+    } elsif (my $transaction = $self->{_http_active_transaction}) {
         if (my $body = $transaction->_response_body_object) {
             $body->_drain;
         }
@@ -280,10 +282,14 @@ sub _http_transport_drain ($self) {
 }
 
 sub _http_transport_close ($self) {
-    if (my $transaction = $self->{_http_active_transaction}) {
-        $transaction->_mark_cancelled if !$transaction->is_terminal;
+    if (my $executor = delete $self->{_http2_executor}) {
+        $executor->close;
+    } else {
+        if (my $transaction = $self->{_http_active_transaction}) {
+            $transaction->_mark_cancelled if !$transaction->is_terminal;
+        }
+        Linux::Event::HTTP::Server::Connection::_clear_transaction($self);
     }
-    $self->_clear_transaction;
 
     my $callback = delete $self->{_http_user_on_close};
     delete $self->{_http_user_on_drain};
@@ -1215,56 +1221,42 @@ __END__
 
 =head1 NAME
 
-Linux::Event::HTTP::Server::Connection - HTTP/1 connection protocol state
+Linux::Event::HTTP::Server::Connection - low-level HTTP/1 server connection
 
 =head1 DESCRIPTION
 
-C<Linux::Event::HTTP::Server::Connection> owns HTTP/1 request boundaries,
-request sequencing, response serialization, persistence policy, and the mapping
-between a streaming response body and Linux::Event transport backpressure.
-Linux::Event continues to own the socket, TLS transport, readiness, and native
-ordered-byte output queue.
+C<Linux::Event::HTTP::Server::Connection> is the advanced HTTP/1 connection
+executor used by L<Linux::Event::HTTP::Server>.
 
-Each active exchange is represented by one L<Linux::Event::HTTP::Transaction>
-containing the Request and Response. The existing server callback API remains
-C<on_request($conn, $req, $res)>; the active Transaction is available through
-C<< $conn->transaction >> when lifecycle, streaming-body, Upgrade, or CONNECT
-tunnel operations are needed.
+Most applications use Server callbacks and do not interact with this class
+directly.
 
-Response message completion and server output completion are intentionally
-separate. C<Response-E<gt>is_complete> describes the message body; Transaction
-tracks whether response output has started or finished before the Connection
-advances to a pipelined request.
+The connection owns HTTP/1 request sequencing, persistence, response
+serialization, and mapping between HTTP body production and Linux::Event
+transport backpressure.
+
+Linux::Event still owns the socket, TLS transport, readiness, and native output
+queue.
 
 =head1 TRANSACTION
 
-C<transaction> returns the currently active HTTP Transaction, or undef when no
-exchange is active on the connection. During C<on_request>, C<on_body>, and
-C<on_request_end> it refers to the Transaction containing the supplied Request
-and Response.
+C<transaction> returns the active L<Linux::Event::HTTP::Transaction> or undef
+while idle.
 
-For a valid server-side HTTP/1.1 CONNECT request, C<< $conn->transaction->tunnel($class) >>
-accepts the tunnel and schedules handoff of the same live stream object to the
-target Linux::Event stream class after the successful response head is queued.
-Rejecting CONNECT requires no special API: configure an ordinary non-2xx
-Response instead.
+During C<on_request>, C<on_body>, and C<on_request_end>, it is the Transaction
+containing the callback's Request and Response.
+
+Retain the Transaction if work will finish later:
+
+    my $tx = $conn->transaction;
 
 =head1 RESPONSE BODIES
 
-A complete scalar body is configured on the Response:
+Complete scalar response:
 
-    $res->header('Content-Type', 'text/plain');
     $res->body("hello\n");
 
-When configured during an HTTP callback, the scalar body is sent automatically
-after that callback returns. For a Response completed later from another event,
-explicitly tell the Transaction to send the now-complete message:
-
-    my $tx = $conn->transaction;
-    $tx->response->body("later\n");
-    $tx->send_response;
-
-A streaming body is produced through the active Transaction:
+Streaming response:
 
     my $body = $conn->transaction->response_body(
         on_drain  => sub ($body) { ... },
@@ -1274,37 +1266,36 @@ A streaming body is produced through the active Transaction:
     $body->write($bytes);
     $body->complete;
 
-The writable producer belongs to the Transaction, not the Response message. It
-does not maintain a second output queue. C<write> feeds the existing
-Linux::Event ordered-byte destination. Its false return preserves the normal
-high-watermark contract, and C<on_drain> is driven by the connection's native
-drain transition. C<on_cancel> runs if the connection disappears before the
-producer completes.
+A delayed scalar Response is sent explicitly with:
 
-HTTP request bytes are consumed by the class-level native HTTP/1 consumer
-before ordinary Perl C<on_data> delivery. C<on_data> is therefore protocol-owned
-and is not a Connection subclass extension point; defining it on a subclass is
-invalid. Customize request handling through C<on_request>, C<on_body>, and
-C<on_request_end>, and customize transport policy through C<stream_tuning> and
-the supported transport lifecycle callbacks.
+    $tx->send_response;
 
-Connection-level C<on_drain> and C<on_close> callbacks or subclass methods remain
-supported; HTTP composes its body-stream bookkeeping with those lifecycle
-callbacks rather than replacing them.
+=head1 REQUEST BODIES
 
-=head1 REQUEST BODY STREAMING
+C<on_request> runs after the validated request head.
 
-C<on_request> runs after the validated request head is available. C<on_body>
-receives decoded request-body bytes. C<on_request_end> runs when the complete
-request input boundary has been consumed. The Request's C<is_complete> state is
-updated at that boundary. If no response body has been sent by then, input
-pauses so a later asynchronous callback may finish configuring the Response
-without allowing the next request to overtake it.
+C<on_body> receives decoded body chunks.
+
+C<on_request_end> runs at the complete request-body boundary.
+
+If C<on_body> is absent, body bytes are drained rather than accumulated.
+
+=head1 SUBCLASSING
+
+C<Server::Connection> is the public HTTP/1 connection subclass point.
+
+Customize request handling through C<on_request>, C<on_body>, and
+C<on_request_end>. Customize transport policy through the documented
+Linux::Event tuning and lifecycle hooks.
+
+C<on_data> is protocol-owned and is not a subclass extension point.
+
+High-level HTTP/2 currently requires the default connection class; a custom
+Server::Connection subclass remains an HTTP/1 customization.
 
 =head1 SEE ALSO
 
 L<Linux::Event::HTTP::Server>, L<Linux::Event::HTTP::Transaction>,
-L<Linux::Event::HTTP::Request>, L<Linux::Event::HTTP::Response>,
-L<Linux::Event::HTTP::Body::Stream>, L<Linux::Event::IO::Sock::Stream>.
+L<Linux::Event::HTTP::Body::Stream>.
 
 =cut

@@ -1,0 +1,18 @@
+use strict;
+use warnings;
+use Future::AsyncAwait;
+use JSON::PP ();
+use WebDyne::Cloudflare::Hyperdrive;
+
+async sub {
+    my ($scope_hr, $receive_cr, $send_cr)=@_;
+    return if $scope_hr->{'type'} eq 'lifespan';
+    my $db_or=WebDyne::Cloudflare::Hyperdrive->new(scope => $scope_hr);
+    my $rows_ar=await $db_or->selectall_arrayref(
+        'SELECT sku, name, quantity FROM demo_inventory ORDER BY sku LIMIT ?',
+        { Slice => {} }, 100);
+    await $db_or->disconnect();
+    await $send_cr->({type => 'http.response.start', status => 200,
+        headers => [['content-type', 'application/json; charset=utf-8']]});
+    await $send_cr->({type => 'http.response.body', body => JSON::PP->new()->utf8()->encode($rows_ar)});
+};

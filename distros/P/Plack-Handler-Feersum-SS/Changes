@@ -1,3 +1,11 @@
+0.06
+
+    - multiple Server::Starter ports
+    - more Feersum options: timeouts, limits, priorities, proxy, psgix_io
+    - tls options: tls_cert_file, tls_key_file, h2, sni
+    - warn about unknown options
+    - refuse daemonize, hot_restart, pid_file, reuseport, backlog
+
 0.05
 
      add max_connnection_reqs option

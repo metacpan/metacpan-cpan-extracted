@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::Stash::Authors 6.039;
+package Dist::Zilla::Role::Stash::Authors 6.040;
 # ABSTRACT: a stash that provides a list of author strings
 
 use Moose::Role;
@@ -31,7 +31,7 @@ Dist::Zilla::Role::Stash::Authors - a stash that provides a list of author strin
 
 =head1 VERSION
 
-version 6.039
+version 6.040
 
 =head1 OVERVIEW
 
