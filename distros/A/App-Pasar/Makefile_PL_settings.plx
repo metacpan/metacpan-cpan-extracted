@@ -11,11 +11,12 @@ return {
     CONFIGURE_REQUIRES => {},
     BUILD_REQUIRES => {},
     PREREQ_PM => {
-        'Archive::Asar' => 0,
+        'Archive::Asar' => '0.02',
         'Getopt::Long'  => 0,
     },
     TEST_REQUIRES => {
-        'Test2::V0' => 0,
+        'File::Temp' => 0.05,
+        'Test2::V0'  => 0,
     },
     DEVELOP_REQUIRES   => {
         'Test::Pod' => 1.22,

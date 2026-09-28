@@ -54,6 +54,26 @@ sub member {
 	is( $back->[2]{note}, 'q"x',       'embedded double quote round-trips' );
 }
 
+# HoH: the outer keys are written by default, under the row.names name if given
+{
+	my %taxa = (
+		'9606'  => { species => 'Homo sapiens' },
+		'10090' => { species => 'Mus musculus' },
+	);
+	my $f = xlsx_path();
+	write_table(\%taxa, $f, 'row.names' => 'taxid', quiet => 1);
+	my $back = read_table($f);
+	is_deeply( [ map { $_->{taxid} } @$back ], [ '10090', '9606' ],
+		"HoH + row.names=>'taxid': the keys come back as a taxid column" );
+	is( $back->[1]{species}, 'Homo sapiens', 'HoH + row.names: keys stay aligned with their rows' );
+
+	my $d = xlsx_path();
+	write_table(\%taxa, $d, quiet => 1);
+	# read_table names an empty leading header cell row_name.
+	is_deeply( [ map { $_->{row_name} } @{ read_table($d) } ], [ '10090', '9606' ],
+		'HoH default: the keys are written, under an empty header cell' );
+}
+
 # numeric detection: leading-zero / non-plain strings stay text
 {
 	my @aoh = (

@@ -4,7 +4,7 @@ Exception::Class - A module that allows you to declare real exception classes in
 
 # VERSION
 
-version 1.45
+version 1.46
 
 # SYNOPSIS
 
@@ -288,8 +288,6 @@ subclass will not be included.
 
 Bugs may be submitted at [https://github.com/houseabsolute/Exception-Class/issues](https://github.com/houseabsolute/Exception-Class/issues).
 
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
-
 # SOURCE
 
 The source code repository for Exception-Class can be found at [https://github.com/houseabsolute/Exception-Class](https://github.com/houseabsolute/Exception-Class).
@@ -309,7 +307,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
+button at [https://houseabsolute.com/foss-donations/](https://houseabsolute.com/foss-donations/).
 
 # AUTHOR
 
@@ -319,12 +317,13 @@ Dave Rolsky <autarch@urth.org>
 
 - Alexander Batyrshin <0x62ash@gmail.com>
 - brian d foy <brian.d.foy@gmail.com>
+- Graham Knop <haarg@haarg.org>
 - Leon Timmermans <fawaka@gmail.com>
 - Ricardo Signes <rjbs@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Dave Rolsky.
+This software is copyright (c) 2026 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

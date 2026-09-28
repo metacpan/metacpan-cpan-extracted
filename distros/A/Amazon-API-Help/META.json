@@ -1,0 +1,75 @@
+{
+   "abstract" : "Amazon::API::Help",
+   "author" : [
+      "Rob Lauer <rclauer@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Amazon-API-Help",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amazon::API::BuildInfo" : "v2.6.0",
+            "CLI::Simple" : "v2.2.1",
+            "CLI::Simple::Constants" : "v2.2.1",
+            "CLI::Simple::Utils" : "v2.2.1",
+            "File::ShareDir" : "1.118",
+            "Pod::HTML2Pod" : "4.05",
+            "Template" : "3.102",
+            "Text::ASCIITable" : "0.22",
+            "perl" : "5.010"
+         },
+         "suggests" : {
+            "IO::Pager" : "2.10"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "provides" : {
+      "Amazon::API::Help" : {
+         "file" : "lib/Amazon/API/Help.pm",
+         "version" : "v1.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rclauer@gmail.com",
+         "web" : "https://github.com/rlauer6/Amazon-API-Help/issues"
+      },
+      "homepage" : "https://github.com/rlauer6/Amazon-API-Help",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/rlauer6/Amazon-API-Help"
+      }
+   },
+   "version" : "v1.0.3",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

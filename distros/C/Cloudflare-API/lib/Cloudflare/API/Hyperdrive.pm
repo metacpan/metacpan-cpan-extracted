@@ -28,7 +28,7 @@ use Cloudflare::API::Resource;
 
 #  Version information
 #
-$VERSION='1.010';
+$VERSION='1.011';
 
 
 #  All done. Positive return
@@ -42,9 +42,26 @@ $VERSION='1.010';
 sub list_configs {
 
     my ($self, %query)=@_;
-    my $full_response=delete($query{'full_response'});
-    return $self->api()->request('GET', $self->api()->account_path('hyperdrive', 'configs'),
-        query => \%query, full_response => $full_response);
+    return $self->collect_list($self->list_configs_page(%query));
+
+}
+
+
+sub list_configs_page {
+
+    my ($self, %query)=@_;
+    return $self->list_pagination(
+        $self->api()->account_path('hyperdrive', 'configs'),
+        { mode => 'page' }, \%query);
+
+}
+
+
+sub list_configs_page_response {
+
+    my ($self, %query)=@_;
+    return $self->list_response(
+        $self->api()->account_path('hyperdrive', 'configs'), \%query);
 
 }
 
@@ -120,18 +137,20 @@ These account-scoped REST methods manage Hyperdrive configurations for external 
 
 # METHODS #
 
-* **list_configs(%query)** — List configurations. Named filters become query parameters. Returns `result`; `full_response => 1` retains pagination information.
+* **list_configs(%query)** — List every configuration. Named filters become query parameters. The method follows all pages and returns one flat array reference; a large result set can require many requests and substantial memory.
+* **list_configs_page(%query)** — Return a lazy `HTTP::API::Core::Pagination` object. Use `next()` to consume one configuration at a time.
+* **list_configs_page_response(%query)** — Make one list request and return the complete decoded Cloudflare response hash, including `result_info` when supplied.
 * **get_config($id, %options)** — Retrieve a configuration by ID and return its `result`.
 * **create_config(\%body, %options)** — POST a Cloudflare configuration body and return its `result`.
 * **replace_config($id, \%body, %options)** — PUT a replacement configuration and return its `result`.
 * **update_config($id, \%body, %options)** — PATCH a configuration and return its `result`.
 * **delete_config($id, %options)** — DELETE a configuration and return the endpoint's `result`, possibly `undef` for an empty body.
 
-Every JSON method accepts `full_response => 1` for the complete decoded envelope. IDs are percent-encoded. Write bodies must be hash references; Cloudflare defines the accepted fields.
+Non-list JSON methods accept `full_response => 1` for the complete decoded Cloudflare response. IDs are percent-encoded. Write bodies must be hash references; Cloudflare defines the accepted fields.
 
 # ERRORS #
 
-Missing account context, invalid bodies or IDs, HTTP and transport failures, and Cloudflare envelope failures cause exceptions as described in `Cloudflare::API`.
+Missing account context, invalid bodies or IDs, HTTP and transport failures, and Cloudflare response failures cause exceptions as described in `Cloudflare::API`.
 
 # SEE ALSO #
 
@@ -180,7 +199,17 @@ These account-scoped REST methods manage Hyperdrive configurations for external 
 
 =item *
 
-B<list_configs(%query)> — List configurations. Named filters become query parameters. Returns C<result>; C<<< full_response => 1 >>> retains pagination information.
+B<list_configs(%query)> — List every configuration. Named filters become query parameters. The method follows all pages and returns one flat array reference; a large result set can require many requests and substantial memory.
+
+
+=item *
+
+B<list_configs_page(%query)> — Return a lazy C<HTTP::API::Core::Pagination> object. Use C<next()> to consume one configuration at a time.
+
+
+=item *
+
+B<list_configs_page_response(%query)> — Make one list request and return the complete decoded Cloudflare response hash, including C<result_info> when supplied.
 
 
 =item *
@@ -210,12 +239,12 @@ B<delete_config($id, %options)> — DELETE a configuration and return the endpoi
 
 =back
 
-Every JSON method accepts C<<< full_response => 1 >>> for the complete decoded envelope. IDs are percent-encoded. Write bodies must be hash references; Cloudflare defines the accepted fields.
+Non-list JSON methods accept C<<< full_response => 1 >>> for the complete decoded Cloudflare response. IDs are percent-encoded. Write bodies must be hash references; Cloudflare defines the accepted fields.
 
 
 =head1 ERRORS
 
-Missing account context, invalid bodies or IDs, HTTP and transport failures, and Cloudflare envelope failures cause exceptions as described in C<Cloudflare::API>.
+Missing account context, invalid bodies or IDs, HTTP and transport failures, and Cloudflare response failures cause exceptions as described in C<Cloudflare::API>.
 
 
 =head1 SEE ALSO

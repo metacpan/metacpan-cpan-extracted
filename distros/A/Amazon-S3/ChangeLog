@@ -1,3 +1,15 @@
+Sun Sep 27 14:11:57 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.1.2]:
+	* .gitignore: updated by CPAN::Maker::Bootstrapper
+	* .includes/local.mk: likewise
+	* .includes/perl.mk: likewise
+	* Makefile: likewise
+	* VERSION: bump
+	* project.mk: modified
+	* t/11-empty-bucket.t: skip test if no LocalStack
+	* t/12-add-key-sources.t: likewise
+
 Wed Sep 23 09:34:36 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.1.1]:

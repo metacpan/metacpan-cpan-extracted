@@ -4,7 +4,16 @@
 # Both of these came out of running the module over the 10,116 entries of
 # PDBbind v2020 and asking where the sequence it read disagreed with the
 # SEQRES the file declared.  Both are cases where the same three letters mean
-# two different things, and only the atoms or the numbering say which.
+# two different things, and only the atoms or their place in the chain say
+# which.
+#
+# Where a chain's polymer ends is gemmi's rule: have_peptide_bond() and
+# have_nucleotide_bond() in gemmi 0.7.0's polyheur.hpp, C to N within
+# 1.341 * 1.5 A and O3' to P within 1.6 * 1.5 A.  The free residues it is
+# tested with are 1hsl's HIS 239, numbered one past its chain as though it
+# continued it, and 3lms's GLY 501, which falls inside a chain numbered 4, 567,
+# 1501, 1889; both sit after the chain's TER record, which is gemmi's reason
+# for calling them non-polymer when it reads the PDB file.
 require 5.010;
 use strict;
 use warnings FATAL => 'all';
@@ -23,6 +32,33 @@ sub atoms {
 		$out .= sprintf("%-6s%5d %-4s %3s %1s%4d    %8.3f%8.3f%8.3f%6.2f%6.2f          %2s\n",
 			$record, $serial, $name, $resname, $chain, $resseq,
 			$serial, $serial + 1, $serial + 2, 1, 20, $el);
+	}
+	return $out;
+}
+
+# A run of residues laid end to end along x, each one bonded to the next the
+# way a real chain is: the C of one 1.33 A from the N of the next, and the O3'
+# of a nucleotide 1.6 A from the next one's P.  Each entry is
+# [record, resname, resseq, kind], kind being 'aa' or 'nt'; $gap puts that
+# many angstrom of empty space before the residue it is given with, which is
+# how a residue that is not bonded to the one before it is written.
+sub bonded {
+	my ($chain, @res) = @_;
+	my ($out, $serial, $at) = ('', 0, 0);
+	for my $r (@res) {
+		my ($record, $resname, $resseq, $kind, $gap) = @$r;
+		$at += $gap || 0;
+		my @a = $kind eq 'nt'
+		      ? ([ 'P', 0, 0 ], [ "C1'", 2.2, 1.5 ], [ "O3'", 4.4, 0 ])
+		      : ([ 'N', 0, 0 ], [ 'CA', 1.46, 0 ], [ 'C', 2.47, 0 ], [ 'O', 2.47, 1.23 ]);
+		for my $x (@a) {
+			$serial++;
+			my ($el) = $x->[0] =~ /([A-Z])/;
+			$out .= sprintf("%-6s%5d %-4s %3s %1s%4d    %8.3f%8.3f%8.3f%6.2f%6.2f          %2s\n",
+				$record, $serial, ' ' . $x->[0], $resname, $chain, $resseq,
+				$at + $x->[1], $x->[2], 0, 1, 20, $el);
+		}
+		$at += $kind eq 'nt' ? 6.0 : 3.8;
 	}
 	return $out;
 }
@@ -68,8 +104,8 @@ sub atoms {
 
 #--------
 # A HETATM residue with an amino acid's name is a modified residue when it is
-# numbered among the polymer, and a free amino acid bound in a site when it is
-# numbered out with the ligands.
+# part of the polymer, and a free amino acid bound in a site when it comes
+# after the polymer's end without being bonded to it.
 #--------
 {
 	# MSE at position 3 of a chain that runs 1..5: a modified residue
@@ -81,12 +117,12 @@ sub atoms {
 		atoms('ATOM  ', 'A', 'SER', 5, qw(N CA C O))
 	);
 	is($mod->{chains}{A}{residues}{3}{type}, 'amino_acid',
-		'a HETATM amino acid numbered among the polymer is a modified residue');
+		'a HETATM amino acid inside the polymer is a modified residue');
 	is($mod->{chains}{A}{residues}{3}{modified}, 1, 'and is flagged as modified');
 	ok(!$mod->{chains}{A}{residues}{3}{free}, 'and not as free');
 	is($mod->{chains}{A}{sequence}, 'MAMGS', 'and it counts in the sequence');
 
-	# a glycine at 501 of a chain that runs 1..5: a free amino acid, as in 3lms
+	# a glycine at 501 after a chain that runs 1..4: a free amino acid
 	my $free = structure_info_string(
 		atoms('ATOM  ', 'A', 'MET', 1, qw(N CA C O)) .
 		atoms('ATOM  ', 'A', 'ALA', 2, qw(N CA C O)) .
@@ -95,23 +131,73 @@ sub atoms {
 		atoms('HETATM', 'A', 'GLY', 501, qw(N CA C O))
 	);
 	is($free->{chains}{A}{residues}{501}{type}, 'ligand',
-		'a HETATM amino acid numbered out with the ligands is a free amino acid');
+		'a HETATM amino acid after the polymer is a free amino acid');
 	is($free->{chains}{A}{residues}{501}{free}, 1, 'and is flagged free');
 	is($free->{chains}{A}{sequence}, 'MAGS',
 		'and does not lengthen the chain it was bound to');
 	ok(exists structure_ligands($free)->{GLY_A_501}, 'it turns up among the ligands instead');
 
-	# capping the terminus, one past the end, still counts as part of the chain
-	my $cap = structure_info_string(
-		atoms('ATOM  ', 'A', 'MET', 1, qw(N CA C O)) .
-		atoms('ATOM  ', 'A', 'ALA', 2, qw(N CA C O)) .
-		atoms('HETATM', 'A', 'MSE', 3, qw(N CA C O SE))
-	);
-	is($cap->{chains}{A}{sequence}, 'MAM',
-		'a modified residue one past the last ATOM residue is still in the chain');
+	# 3lms: the free glycine is numbered inside the polymer's numbering,
+	# because the chain runs 4, 567, 1501 -- the number says nothing
+	my $lms = structure_info_string(bonded('A',
+		[ 'ATOM  ', 'ALA', 4,    'aa' ],
+		[ 'ATOM  ', 'GLN', 567,  'aa' ],
+		[ 'ATOM  ', 'VAL', 1501, 'aa' ],
+		[ 'HETATM', 'GLY', 501,  'aa', 20 ],
+	));
+	is($lms->{chains}{A}{residues}{501}{free}, 1,
+		'a free amino acid numbered inside the chain\'s numbering is still free');
+	is($lms->{chains}{A}{sequence}, 'AQV', 'and stays out of the sequence');
 
-	# a peptide written entirely as HETATM has no polymer range to be outside
-	# of, and reads as the peptide it is
+	# 1hsl: a free histidine numbered one past the end, as though it
+	# continued the chain, with ions between it and the chain
+	my $hsl = structure_info_string(bonded('A',
+		[ 'ATOM  ', 'GLY', 237, 'aa' ],
+		[ 'ATOM  ', 'GLY', 238, 'aa' ],
+		[ 'HETATM', 'HIS', 239, 'aa', 15 ],
+	));
+	is($hsl->{chains}{A}{residues}{239}{free}, 1,
+		'a free amino acid numbered one past the chain is free when it is not bonded to it');
+	is($hsl->{chains}{A}{sequence}, 'GG', 'and the chain is no longer than its polymer');
+
+	# capping the terminus, bonded to the last ATOM residue, still counts
+	# as part of the chain, and so does one bonded to that cap in turn
+	my $cap = structure_info_string(bonded('A',
+		[ 'ATOM  ', 'MET', 1, 'aa' ],
+		[ 'ATOM  ', 'ALA', 2, 'aa' ],
+		[ 'HETATM', 'MSE', 3, 'aa' ],
+		[ 'HETATM', 'MSE', 4, 'aa' ],
+		[ 'HETATM', 'GLY', 9, 'aa', 12 ],
+	));
+	is($cap->{chains}{A}{sequence}, 'MAMM',
+		'modified residues bonded on after the last ATOM residue are still in the chain');
+	is($cap->{chains}{A}{residues}{9}{free}, 1,
+		'and the first residue after them that is not bonded ends it');
+
+	# the same, read with atoms => 0, which finds the bond in the columns
+	# rather than in the atom hashes
+	my $cols = structure_info_string(bonded('A',
+		[ 'ATOM  ', 'MET', 1, 'aa' ],
+		[ 'HETATM', 'MSE', 2, 'aa' ],
+		[ 'HETATM', 'GLY', 9, 'aa', 12 ],
+	), atoms => 0);
+	is($cols->{chains}{A}{sequence}, 'MM', 'atoms => 0 finds the same bond');
+	is($cols->{chains}{A}{residues}{9}{free}, 1, 'and the same free residue');
+
+	# a nucleotide is bonded O3' to P, not C to N
+	my $nt = structure_info_string(bonded('B',
+		[ 'ATOM  ', 'DA',  1, 'nt' ],
+		[ 'ATOM  ', 'DG',  2, 'nt' ],
+		[ 'HETATM', '7MG', 3, 'nt' ],
+		[ 'HETATM', '7MG', 4, 'nt', 20 ],
+	));
+	is($nt->{chains}{B}{residues}{3}{type}, 'nucleotide',
+		'a modified nucleotide bonded O3\' to P is part of the strand');
+	is($nt->{chains}{B}{residues}{4}{free}, 1,
+		'and one that is not bonded to it is free');
+
+	# a peptide written entirely as HETATM has no ATOM polymer to end, and
+	# reads as the peptide it is
 	my $pep = structure_info_string(
 		atoms('HETATM', 'P', 'ALA', 1, qw(N CA C O)) .
 		atoms('HETATM', 'P', 'GLY', 2, qw(N CA C O)) .

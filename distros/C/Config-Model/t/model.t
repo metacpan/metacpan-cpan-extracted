@@ -24,6 +24,80 @@ subtest "check available models" => sub {
     is( $models->{popcon}{model}, 'PopCon', "check available popcon" );
 };
 
+subtest "extract element list" => sub {
+    my $raw_model = {
+        element => [foo => {}, bar => {}],
+    };
+    my @list = $model->extract_element_list($raw_model);
+    eq_or_diff(\@list, [qw/foo bar/], "simple list of k,v elements");
+
+    $raw_model = {
+        element => [[qw/foo bar/] => {}, baz => {}],
+    };
+    @list = $model->extract_element_list($raw_model);
+    eq_or_diff(\@list, [qw/foo bar baz/], "array ref as set of keys");
+
+    $raw_model = {
+        element => [ {name => 'foo' }, {name => 'bar'} ],
+    };
+    @list = $model->extract_element_list($raw_model);
+    eq_or_diff(\@list, [qw/foo bar/], "list of hash ref");
+};
+
+subtest "translate *alias in plain alias" => sub {
+    my $elements = {foo => {}, bar => {}};
+    my $new = $model->translate_star_alias($elements);
+
+    # no change
+    eq_or_diff($new, $elements, "no alias");
+
+    $elements = {foo => {}, bar => {}, baz => '*bar'};
+    $new = $model->translate_star_alias($elements);
+
+    my $expect = {foo => {}, bar => {}, baz => {alias => 'bar'}};
+    eq_or_diff($new, $expect, "with alias");
+};
+
+
+subtest "translate array to hash" => sub {
+    my $elements = [foo => {}, bar => {}];
+    my $new = $model->translate_array_to_hash($elements);
+    my $expect = { $elements->@*};
+    eq_or_diff($new, $expect, "from list of key + hashes");
+
+    $elements = [ {name => 'foo' }, {name => 'bar'} ];
+    $new = $model->translate_array_to_hash($elements);
+    eq_or_diff($new, $expect, "from list of hashes");
+};
+
+
+subtest "translate packed element list into alias" => sub {
+    my $elements = [ [qw/A B C/] => {type => 'leaf'}, D => {type => 'node'}];
+
+    my $new = $model->translate_packed_element_into_alias('foo', $elements, 'name');
+    my $expect = [
+        A => {type => 'leaf'},
+        B => {alias => 'A'},
+        C => {alias => 'A'},
+        D => {type => 'node'},
+    ];
+    eq_or_diff($new, $expect, "with plain alias");
+
+    $new = $model->translate_packed_element_into_alias('foo', $elements, 'name', 1);
+    $expect = [
+        A => {type => 'leaf'},
+        B => '*A',
+        C => '*A',
+        D => {type => 'node'},
+    ];
+    eq_or_diff($new, $expect, "with alias");
+
+    $elements = [ {name => 'foo' }, {name => 'bar'} ];
+    $new = $model->translate_packed_element_into_alias('foo', $elements, 'name', 1);
+    eq_or_diff($new, $elements, "no change on list of hash");
+
+};
+
 subtest "copy summary properties" => sub {
     my $raw_model = {
         element => [foo => {}, bar => {}],

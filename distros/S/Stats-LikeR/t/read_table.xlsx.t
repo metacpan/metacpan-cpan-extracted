@@ -6,7 +6,9 @@ use Test::Exception;
 use File::Temp 'tempfile';
 use Stats::LikeR;
 
-# read_table's .xlsx support is pure Perl on top of core IO::Uncompress::Unzip.
+# read_table's .xlsx support decompresses the parts with core
+# IO::Uncompress::Unzip and parses the worksheet XML in XS (xlsx_ws_scan in
+# LikeR.xs); the tokenizer's own awkward cases are in t/read_table.xlsx.parser.t.
 # To keep this test self-contained (no openpyxl, no committed binary fixture) we
 # build a tiny-but-valid .xlsx here with core IO::Compress::Zip and read it back.
 # The workbook exercises the parser's interesting paths:
@@ -169,6 +171,24 @@ my $xlsx = build_xlsx();
 
 	is_deeply( [ sort keys %{ $rows->[0] } ], [qw(cyl mpg name note)],
 		'all four columns present' );
+}
+
+# output.type => aoa: the header row, then each row padded to the sheet's width
+{
+	my $a = read_table($xlsx, sheet => 'Data', 'output.type' => 'aoa');
+	is_deeply( $a, [
+		[ 'name', 'mpg', 'cyl', 'note' ],
+		[ 'Mazda RX4', '21', '6', 'A & B <ok>' ],
+		[ 'Datsun 710', '22.8', '4', undef ],
+		[ 'Hornet', '21.4', undef, 'q"x' ],
+		[ 'Valiant', '18.1', '6', 'tab&end' ],
+	], 'aoa: header first, sparse and trailing empty cells undef, in column order' );
+	is_deeply( read_table($xlsx, sheet => 'Data', 'output.type' => 'aoa',
+			filter => { 0 => sub { 1 } }), $a,
+		'aoa: the closure path gives the same table' );
+	my $book = read_table($xlsx, 'output.type' => 'aoa');
+	is_deeply( $book->{Second}, [ [qw(x y)], [ '1', '2' ] ],
+		'aoa: a multi-sheet workbook gives one aoa per sheet' );
 }
 
 # output.type => hoh

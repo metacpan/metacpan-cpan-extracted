@@ -4,10 +4,13 @@ use 5.010001;
 use strict;
 use warnings;
 
+use List::Util qw(shuffle);
+use Perinci::Sub::Util qw(gen_modified_sub);
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-07-15'; # DATE
+our $DATE = '2026-07-16'; # DATE
 our $DIST = 'Games-Cards-Troika-Util'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -49,6 +52,19 @@ sub troika_list_cards {
     [200, "OK", \@rows];
 }
 
+gen_modified_sub(
+    output_name => 'troika_list_cards_shuffled',
+    base_name => 'troika_list_cards',
+    summary => 'Return the list of cards, shuffled',
+    wrap_code => sub {
+        my $orig = shift;
+        my $res = $orig->(@_);
+        return $res unless $res->[0] == 200;
+        $res->[2] = [shuffle(@{ $res->[2] })];
+        $res;
+    },
+);
+
 1;
 # ABSTRACT: Utilities related to the Anak Bos Troika card game
 
@@ -64,7 +80,7 @@ Games::Cards::Troika::Util - Utilities related to the Anak Bos Troika card game
 
 =head1 VERSION
 
-This document describes version 0.001 of Games::Cards::Troika::Util (from Perl distribution Games-Cards-Troika-Util), released on 2026-07-15.
+This document describes version 0.002 of Games::Cards::Troika::Util (from Perl distribution Games-Cards-Troika-Util), released on 2026-07-16.
 
 =head1 DESCRIPTION
 
@@ -78,6 +94,48 @@ Usage:
  troika_list_cards(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return the list of cards.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<descriptive> => I<bool>
+
+(No description)
+
+=item * B<detail> => I<bool>
+
+(No description)
+
+=item * B<lang> => I<str> (default: "eng")
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 troika_list_cards_shuffled
+
+Usage:
+
+ troika_list_cards_shuffled(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Return the list of cards, shuffled.
 
 This function is not exported.
 

@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Games/Cards/Troika/Util.pm','script/troika-list-cards'];
+my $filenames = ['lib/Games/Cards/Troika/Util.pm','script/troika-list-cards','script/troika-list-cards-shuffled'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

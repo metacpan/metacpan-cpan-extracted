@@ -1,5 +1,15 @@
 Revision history for Cloudflare::API
 
+Unreleased
+    Automatically follow Cloudflare pagination in resource list methods and
+    return a flat array reference containing every item. Large result sets can
+    be consumed incrementally through the new *_page methods, which return
+    HTTP::API::Core::Pagination objects.
+    Add *_page_response methods for one complete decoded Cloudflare response,
+    including result_info where supplied, and add response() for direct access
+    to HTTP::API::Core::Response. Retain raw_request() as a compatibility alias.
+    Require HTTP::API::Core 1.08 for response-aware pagination.
+
 1.009  2026-09-24
     Add Worker search and configuration inspection by script name, immutable
     tag, or ETag, with direct combined script/version and Worker-level settings

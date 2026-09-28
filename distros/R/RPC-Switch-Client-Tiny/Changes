@@ -1,5 +1,14 @@
 Revision history for Perl extension RPC::Switch::Client::Tiny.
 
+1.69  2024-12-02
+	- use pending() to detect unread data buffered in the SSL stack
+
+1.68  2024-09-25
+	- updated license & github repo
+	- install rpctiny tool as bin/rpctiny (moved from examples)
+	- changed examples to use rpc-switch2 on github.com/bdzwillo/rpc-switch
+	- removed examples tls clientauth patch (fixed in rpc-switch)
+
 1.67  2023-05-22
 	- fixed cpantester strawberry perl sigkill on windows might deadlock
 	- fixed cpantester sunos client_timeout too short

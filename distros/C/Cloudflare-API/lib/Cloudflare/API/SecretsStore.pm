@@ -28,7 +28,7 @@ use Cloudflare::API::Resource;
 
 #  Version information
 #
-$VERSION='1.010';
+$VERSION='1.011';
 
 
 #  All done. Positive return
@@ -42,10 +42,26 @@ $VERSION='1.010';
 sub list_stores {
 
     my ($self, %query)=@_;
-    my $full_response=delete($query{'full_response'});
-    return $self->api()->request('GET',
+    return $self->collect_list($self->list_stores_page(%query));
+
+}
+
+
+sub list_stores_page {
+
+    my ($self, %query)=@_;
+    return $self->list_pagination(
         $self->api()->account_path('secrets_store', 'stores'),
-        query => \%query, full_response => $full_response);
+        { mode => 'page' }, \%query);
+
+}
+
+
+sub list_stores_page_response {
+
+    my ($self, %query)=@_;
+    return $self->list_response(
+        $self->api()->account_path('secrets_store', 'stores'), \%query);
 
 }
 
@@ -81,10 +97,26 @@ sub delete_store {
 sub list_secrets {
 
     my ($self, $store_id, %query)=@_;
-    my $full_response=delete($query{'full_response'});
-    return $self->api()->request('GET',
+    return $self->collect_list($self->list_secrets_page($store_id, %query));
+
+}
+
+
+sub list_secrets_page {
+
+    my ($self, $store_id, %query)=@_;
+    return $self->list_pagination(
         $self->api()->account_path('secrets_store', 'stores', $store_id, 'secrets'),
-        query => \%query, full_response => $full_response);
+        { mode => 'page' }, \%query);
+
+}
+
+
+sub list_secrets_page_response {
+
+    my ($self, $store_id, %query)=@_;
+    return $self->list_response(
+        $self->api()->account_path('secrets_store', 'stores', $store_id, 'secrets'), \%query);
 
 }
 
@@ -172,22 +204,26 @@ These account-scoped methods manage stores, secret metadata, write-only secret v
 
 # METHODS #
 
-* **list_stores(%query)** — List stores with named query filters. Returns `result`; `full_response => 1` retains pagination information.
+* **list_stores(%query)** — List every store with named query filters. The method follows all pages and returns one flat array reference; a large result set can require many requests and substantial memory.
+* **list_stores_page(%query)** — Return a lazy `HTTP::API::Core::Pagination` object. Use `next()` to consume one store at a time.
+* **list_stores_page_response(%query)** — Make one list request and return the complete decoded Cloudflare response hash, including `result_info` when supplied.
 * **get_store($id, %options)** — Retrieve a store by ID and return its `result`.
 * **create_store(\%body, %options)** — POST a store definition and return its `result`.
 * **delete_store($id, %options)** — DELETE a store and return the endpoint's `result`, possibly `undef` for an empty body.
-* **list_secrets($store_id, %query)** — List secrets in one store with named query filters. Returns metadata in `result`; `full_response => 1` retains pagination information.
+* **list_secrets($store_id, %query)** — List all secret metadata in one store with named query filters. The method follows all pages and returns one flat array reference; a large result set can require many requests and substantial memory.
+* **list_secrets_page($store_id, %query)** — Return a lazy `HTTP::API::Core::Pagination` object. Use `next()` to consume one secret metadata item at a time.
+* **list_secrets_page_response($store_id, %query)** — Make one list request and return the complete decoded Cloudflare response hash, including `result_info` when supplied.
 * **get_secret($store_id, $secret_id, %options)** — Return one secret's metadata in `result`; its value is not available.
 * **create_secret($store_id, \@secrets, %options)** — POST a non-empty array reference, even when creating one secret. Each entry should supply `name`, `value`, and `scopes` such as `['workers']`; `comment` is optional. Returns `result`.
 * **update_secret($store_id, $secret_id, \%body, %options)** — PATCH a secret with fields such as `value`, `scopes`, or `comment`. Returns `result`.
 * **delete_secret($store_id, $secret_id, %options)** — DELETE a secret and return the endpoint's `result`, possibly `undef` for an empty body.
 * **get_quota(%options)** — Retrieve the account's Secrets Store usage and return `result`.
 
-Every JSON method accepts `full_response => 1` for the decoded envelope. IDs are percent-encoded as path components. Create-store and update-secret bodies must be hash references; `create_secret()` requires a non-empty array reference. The module passes accepted field details through to Cloudflare.
+Non-list JSON methods accept `full_response => 1` for the complete decoded Cloudflare response. IDs are percent-encoded as path components. Create-store and update-secret bodies must be hash references; `create_secret()` requires a non-empty array reference. The module passes accepted field details through to Cloudflare.
 
 # ERRORS #
 
-Missing account context, invalid identifiers or body shapes, HTTP and transport failures, and Cloudflare envelope failures cause exceptions as described in `Cloudflare::API`.
+Missing account context, invalid identifiers or body shapes, HTTP and transport failures, and Cloudflare response failures cause exceptions as described in `Cloudflare::API`.
 
 # SEE ALSO #
 
@@ -241,7 +277,17 @@ These account-scoped methods manage stores, secret metadata, write-only secret v
 
 =item *
 
-B<list_stores(%query)> — List stores with named query filters. Returns C<result>; C<<< full_response => 1 >>> retains pagination information.
+B<list_stores(%query)> — List every store with named query filters. The method follows all pages and returns one flat array reference; a large result set can require many requests and substantial memory.
+
+
+=item *
+
+B<list_stores_page(%query)> — Return a lazy C<HTTP::API::Core::Pagination> object. Use C<next()> to consume one store at a time.
+
+
+=item *
+
+B<list_stores_page_response(%query)> — Make one list request and return the complete decoded Cloudflare response hash, including C<result_info> when supplied.
 
 
 =item *
@@ -261,7 +307,17 @@ B<delete_store($id, %options)> — DELETE a store and return the endpoint's C<re
 
 =item *
 
-B<list_secrets($store_id, %query)> — List secrets in one store with named query filters. Returns metadata in C<result>; C<<< full_response => 1 >>> retains pagination information.
+B<list_secrets($store_id, %query)> — List all secret metadata in one store with named query filters. The method follows all pages and returns one flat array reference; a large result set can require many requests and substantial memory.
+
+
+=item *
+
+B<list_secrets_page($store_id, %query)> — Return a lazy C<HTTP::API::Core::Pagination> object. Use C<next()> to consume one secret metadata item at a time.
+
+
+=item *
+
+B<list_secrets_page_response($store_id, %query)> — Make one list request and return the complete decoded Cloudflare response hash, including C<result_info> when supplied.
 
 
 =item *
@@ -291,12 +347,12 @@ B<get_quota(%options)> — Retrieve the account's Secrets Store usage and return
 
 =back
 
-Every JSON method accepts C<<< full_response => 1 >>> for the decoded envelope. IDs are percent-encoded as path components. Create-store and update-secret bodies must be hash references; C<create_secret()> requires a non-empty array reference. The module passes accepted field details through to Cloudflare.
+Non-list JSON methods accept C<<< full_response => 1 >>> for the complete decoded Cloudflare response. IDs are percent-encoded as path components. Create-store and update-secret bodies must be hash references; C<create_secret()> requires a non-empty array reference. The module passes accepted field details through to Cloudflare.
 
 
 =head1 ERRORS
 
-Missing account context, invalid identifiers or body shapes, HTTP and transport failures, and Cloudflare envelope failures cause exceptions as described in C<Cloudflare::API>.
+Missing account context, invalid identifiers or body shapes, HTTP and transport failures, and Cloudflare response failures cause exceptions as described in C<Cloudflare::API>.
 
 
 =head1 SEE ALSO

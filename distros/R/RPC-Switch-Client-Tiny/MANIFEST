@@ -13,8 +13,8 @@ t/03_netstring.t
 t/04_client.t
 t/05_async.t
 t/06_session.t
+t/07_ssl.t
 examples/Makefile
-examples/rpctiny
-examples/patches/0001-fix-tls-verify-clientauth.patch
+bin/rpctiny
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

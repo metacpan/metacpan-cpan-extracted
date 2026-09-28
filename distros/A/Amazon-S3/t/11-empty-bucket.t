@@ -16,8 +16,7 @@ local $ENV{AMAZON_S3_DNS_BUCKET_NAMES} = $FALSE;
 my $host = eval { set_s3_host; };
 
 if ( $EVAL_ERROR && $EVAL_ERROR !~ /unavailable/xsm ) {
-  diag($EVAL_ERROR);
-  BAIL_OUT("ERROR setting host...\n$EVAL_ERROR\ncannot continue\n");
+  plan skip_all => "LocalStack not available\n";
 }
 
 plan skip_all => 'LocalStack unavailable'

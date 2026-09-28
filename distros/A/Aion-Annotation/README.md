@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-aion-annotation/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-annotation/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion-annotation?logo=perl)](https://github.com/darviarush/perl-aion-annotation/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Annotation.svg)](https://metacpan.org/release/Aion-Annotation) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-annotation/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Annotation+0.1.0)
+[![Actions Status](https://github.com/darviarush/perl-aion-annotation/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-annotation/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion-annotation?logo=perl)](https://github.com/darviarush/perl-aion-annotation/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Annotation.svg)](https://metacpan.org/release/Aion-Annotation) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-annotation/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Annotation+0.2.0)
 # NAME
 
 Aion::Annotation - обрабатывает аннотации в модулях perl
 
 # VERSION
 
-0.1.0
+0.2.0
 
 # SYNOPSIS
 

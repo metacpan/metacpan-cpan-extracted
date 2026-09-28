@@ -11,4 +11,4 @@ t/data/dummy.asar
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
-README                                   generated from App::Pasar POD (added by maint/eumm-fixup.pl)
+README                                   generated from script/pasar POD (added by maint/eumm-fixup.pl)

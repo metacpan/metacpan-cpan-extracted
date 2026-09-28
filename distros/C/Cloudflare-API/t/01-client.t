@@ -21,12 +21,13 @@ is_deeply($api_or->request('GET', '/example', full_response => 1), $reply_hr,
     'full parsed response is available');
 is_deeply($api_or->request_full('GET', '/example'), $reply_hr,
     'request_full returns the envelope');
+isa_ok($api_or->response('GET', '/example'), 'HTTP::API::Core::Response');
 is($request[0][1], 'https://api.cloudflare.com/client/v4/example', 'base URL joined');
 is($request[0][2]{'headers'}{'Authorization'}, 'Bearer test-token', 'token header sent');
 is($api_or->account_path('r2', 'buckets', 'a/b c'),
     '/accounts/account%20one/r2/buckets/a%2Fb%20c', 'path components encoded');
 
-eval { $api_or->raw_request('GET', 'https://other.example/') };
+eval { $api_or->response('GET', 'https://other.example/') };
 like($@, qr/path must begin/, 'absolute URLs cannot receive the bearer token');
 
 $reply_hr={ success => JSON::PP::false, errors => [{ code => 123, message => 'bad request' }] };

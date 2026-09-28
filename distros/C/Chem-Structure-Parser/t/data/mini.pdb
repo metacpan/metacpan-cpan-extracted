@@ -4,23 +4,28 @@ TITLE    2 ALTERNATE CONFORMER AND A LIGAND
 COMPND    MOL_ID: 1;                                                            
 COMPND   2 MOLECULE: TEST PROTEIN;                                              
 COMPND   3 CHAIN: A;                                                            
-COMPND   4 EC: 3.4.21.5;                                                        
-COMPND   5 ENGINEERED: YES;                                                     
-COMPND   6 MOL_ID: 2;                                                           
-COMPND   7 MOLECULE: TEST DNA;                                                  
-COMPND   8 CHAIN: B                                                             
+COMPND   4 FRAGMENT: CATALYTIC DOMAIN;                                          
+COMPND   5 EC: 3.4.21.5;                                                        
+COMPND   6 ENGINEERED: YES;                                                     
+COMPND   7 MOL_ID: 2;                                                           
+COMPND   8 MOLECULE: TEST DNA;                                                  
+COMPND   9 CHAIN: B                                                             
 SOURCE    MOL_ID: 1;                                                            
 SOURCE   2 ORGANISM_SCIENTIFIC: HOMO SAPIENS;                                   
 SOURCE   3 ORGANISM_COMMON: HUMAN;                                              
 SOURCE   4 ORGANISM_TAXID: 9606;                                                
 SOURCE   5 EXPRESSION_SYSTEM: ESCHERICHIA COLI;                                 
 SOURCE   6 MOL_ID: 2;                                                           
-SOURCE   7 SYNTHETIC: YES                                                       
+SOURCE   7 SYNTHETIC: YES;                                                      
+SOURCE   8 ORGANISM_SCIENTIFIC: SYNTHETIC CONSTRUCT;                            
+SOURCE   9 ORGANISM_TAXID: 32630                                                
 KEYWDS    HYDROLASE, TEST STRUCTURE, COMPLEX (HYDROLASE-                        
 KEYWDS   2 PEPTIDE)                                                             
 EXPDTA    X-RAY DIFFRACTION                                                     
 NUMMDL    1                                                                     
 AUTHOR    D.E.CONDON,A.N.OTHER                                                  
+REVDAT   2   01-FEB-20 9XYZ    1       COMPND SOURCE KEYWDS JRNL   REMARK SEQRES 
+REVDAT   2 2                   1       HELIX  SHEET                             
 REVDAT   1   01-JAN-20 9XYZ    0                                                
 JRNL        AUTH   D.E.CONDON,A.N.OTHER                                         
 JRNL        TITL   A STRUCTURE MADE UP FOR A TEST SUITE, AND WHAT IT            
@@ -38,6 +43,8 @@ REMARK 200   TEMPERATURE           (KELVIN) : 100.0
 REMARK 200   PH                             : 7.5                               
 REMARK 465   MISSING RESIDUES                                                   
 DBREF  9XYZ A    1    11  UNP    P12345   TEST_HUMAN       1     11
+DBREF1 9XYZ B    1     4  GB                   TEST_SEQUENCE_LONG
+DBREF2 9XYZ B     AB0123456789                      101         104
 SEQADV 9XYZ MSE A    7  UNP  P12345    MET     7 MODIFIED RESIDUE
 SEQRES   1 A   11  MET ALA GLY LEU LYS CYS MSE HIS HIS SER CYS
 SEQRES   1 B    4   DA  DC  DG  DT
@@ -51,6 +58,7 @@ FORMUL   4   ZN    ZN 2+
 FORMUL   5  HOH   *2(H2 O)
 HELIX    1 AA1 MET A    1  GLY A    3  1                                   3
 SHEET    1 AA1 2 CYS A   6  HIS A   8  0
+SHEET    2 AA1 2 SER A   9  CYS A  10 -1
 SSBOND   1 CYS A    6    CYS A   10                        1555   1555    2.03
 LINK        ZN    ZN A 202                 SG  CYS A   6                  2.31
 CISPEP   1 GLY A    3    CYS A    6          0        -0.42

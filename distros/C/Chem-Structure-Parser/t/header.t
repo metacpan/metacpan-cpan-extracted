@@ -38,7 +38,12 @@ is_deeply($i->{keywords},
 is_deeply($i->{experiment}, [ 'X-RAY DIFFRACTION' ], 'EXPDTA');
 is_deeply($i->{authors}, [ 'D.E.CONDON', 'A.N.OTHER' ], 'AUTHOR: split on commas');
 is($i->{n_models_declared}, 1, 'NUMMDL');
-is($i->{revdat}[0]{date}, '01-JAN-20', 'REVDAT');
+is($i->{revdat}[0]{date}, '01-FEB-20', 'REVDAT: the latest revision first, as the file has it');
+is(scalar @{ $i->{revdat} }, 2,
+	'REVDAT: a continuation line is part of its revision, not a revision of its own');
+is($i->{revdat}[0]{what}, 'COMPND SOURCE KEYWDS JRNL   REMARK SEQRES HELIX  SHEET',
+	'REVDAT: and the records it lists are added to the ones before it');
+is($i->{revdat}[1]{date}, '01-JAN-20', 'REVDAT: the one after it is the next revision');
 
 #--------
 # JRNL, whose sub-record name is in columns 13-16
@@ -116,6 +121,11 @@ is($i->{seqres}{A}{sequence}, 'MAGLKCMHHSC', 'SEQRES: as single letters');
 is($i->{dbref}{A}[0]{database},  'UNP',        'DBREF: database');
 is($i->{dbref}{A}[0]{accession}, 'P12345',     'DBREF: accession');
 is($i->{dbref}{A}[0]{db_id},     'TEST_HUMAN', 'DBREF: entry name');
+is_deeply($i->{dbref}{B}, [ {
+	chain => 'B', seq_begin => '1', seq_end => '4', database => 'GB',
+	accession => 'AB0123456789', db_id => 'TEST_SEQUENCE_LONG',
+	db_begin => '101', db_end => '104',
+} ], 'DBREF1/DBREF2: a reference too long for DBREF is read off the pair');
 is($i->{seqadv}[0]{resname}, 'MSE', 'SEQADV: the residue that differs');
 is($i->{seqadv}[0]{database}, 'UNP', 'SEQADV: the database it differs from');
 is($i->{seqadv}[0]{comment}, 'MODIFIED RESIDUE', 'SEQADV: why');
@@ -139,6 +149,8 @@ is($i->{helix}[0]{end_resseq},   '3',   'HELIX: last residue');
 is($i->{helix}[0]{init_chain},   'A',   'HELIX: chain');
 is($i->{sheet}[0]{init_resname}, 'CYS', 'SHEET: first residue');
 is($i->{sheet}[0]{n_strands},    '2',   'SHEET: strand count');
+is($i->{sheet}[0]{sense},        '0',   'SHEET: the first strand has a sense of 0');
+is($i->{sheet}[1]{sense},        '-1',  'SHEET: and an antiparallel one after it -1');
 is_deeply($i->{ssbond}[0], { chain1 => 'A', resseq1 => '6', chain2 => 'A', resseq2 => '10', length => '2.03' },
 	'SSBOND: both ends and the distance');
 is($i->{link}[0]{name1}, 'ZN',  'LINK: first atom');
@@ -204,6 +216,36 @@ PDB
 	is($i->{r_work}, undef, 'an R value of NULL stays undef rather than becoming zero');
 	is($i->{r_free}, undef, 'and so does the R free');
 	is($i->{resolution}, undef, 'and the resolution');
+}
+{
+	# SHELXL's REMARK 3, as 1c5c writes it: every R twice, for all the data
+	# and for F > 4 sigma(F).  The archive's mmCIF of 1c5c files the no-cutoff
+	# pair, 0.1934 and 0.2529, as the working-set R and the R-free.
+	my $i = structure_info_string(<<'PDB');
+REMARK   3   PROGRAM     : SHELXL-97
+REMARK   3  FIT TO DATA USED IN REFINEMENT (NO CUTOFF).
+REMARK   3   R VALUE   (WORKING + TEST SET, NO CUTOFF) : 0.188
+REMARK   3   R VALUE          (WORKING SET, NO CUTOFF) : 0.193
+REMARK   3   FREE R VALUE                  (NO CUTOFF) : 0.253
+REMARK   3   FREE R VALUE TEST SET SIZE (%, NO CUTOFF) : 11.300
+REMARK   3  FIT/AGREEMENT OF MODEL FOR DATA WITH F>4SIG(F).
+REMARK   3   R VALUE   (WORKING + TEST SET, F>4SIG(F)) : 0.181
+REMARK   3   R VALUE          (WORKING SET, F>4SIG(F)) : 0.186
+REMARK   3   FREE R VALUE                  (F>4SIG(F)) : 0.243
+ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00           C
+PDB
+	is($i->{r_work}, 0.193, "SHELXL's R value (working set, no cutoff) is the R work");
+	is($i->{r_free}, 0.253, "and its free R value (no cutoff) is the R free");
+}
+{
+	# a DBREF2 that is not the DBREF1's other half is not paired with it
+	my $i = structure_info_string(<<'PDB');
+DBREF1 9XYZ A    1    11  UNP                  LONG_NAME_A
+DBREF2 9XYZ B     A0A000000B                          1          11
+ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00           C
+PDB
+	is($i->{dbref}{A}[0]{db_id}, 'LONG_NAME_A', 'a DBREF1 with no DBREF2 of its own keeps its own half');
+	is($i->{dbref}{A}[0]{accession}, '', 'and takes no accession from another chain');
 }
 {
 	# right-trimmed annotation records: the field the parser wants is simply

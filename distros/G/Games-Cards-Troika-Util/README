@@ -3,9 +3,9 @@ NAME
     card game
 
 VERSION
-    This document describes version 0.001 of Games::Cards::Troika::Util
+    This document describes version 0.002 of Games::Cards::Troika::Util
     (from Perl distribution Games-Cards-Troika-Util), released on
-    2026-07-15.
+    2026-07-16.
 
 DESCRIPTION
 FUNCTIONS
@@ -15,6 +15,43 @@ FUNCTIONS
      troika_list_cards(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Return the list of cards.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   descriptive => *bool*
+
+        (No description)
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   lang => *str* (default: "eng")
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  troika_list_cards_shuffled
+    Usage:
+
+     troika_list_cards_shuffled(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return the list of cards, shuffled.
 
     This function is not exported.
 

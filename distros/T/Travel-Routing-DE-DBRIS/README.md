@@ -186,6 +186,23 @@ docker run --rm derfnull/dbris:latest --version
 Documentation is not available in this image. Please refer to the
 [online dbris manual](https://man.finalrewind.org/1/dbris/) instead.
 
+## Contributing
+
+You may report issues and contribute bugfixes at
+<https://codeberg.org/derf/Travel-Routing-DE-DBRIS> or
+<https://github.com/derf/Travel-Routing-DE-DBRIS/> – use whichever platform
+works best for you.
+Please get in touch before starting work on more invasive changes.
+
+Keep in mind that this is a hobby project, and I take care to ensure that it
+remains that way.  As such, while I appreciate suggestions, bug reports,
+patches and similar, please do not expect a timely response to anything you
+submit.  I typically only address issues and merge requests when I have the
+capacity for them *and* when doing so does not feel like a chore.
+
+"AI" (as in, Large Language Models / LLMs such as ChatGPT, Claude, Copilot,
+Cursor, Grok, etc.) may not be used for contributions to this project.
+
 ## Resources
 
 Mirrors of the dbris / Travel::Routing::DE::DBRIS repository are available at

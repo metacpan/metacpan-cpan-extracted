@@ -17,12 +17,14 @@ Zone lookups use the token configured on `Cloudflare::API` and do not require it
 
 # METHODS #
 
-* **list(%query)** — List visible zones. Named arguments become Cloudflare query parameters. Returns the decoded `result`; use `full_response => 1` to retain the envelope and pagination `result_info`.
-* **get($zone_id, %options)** — Retrieve one zone by ID. Returns the decoded zone `result`. The ID is percent-encoded as a path component; `full_response => 1` returns the envelope.
+* **list(%query)** — List every visible zone. Named arguments become Cloudflare query parameters. The method follows all pages and returns one flat array reference; a large zone set can require many requests and substantial memory.
+* **list_page(%query)** — Return a lazy `HTTP::API::Core::Pagination` object for the zone list. Use `next()` to consume one zone at a time or `all()` to collect the remaining zones.
+* **list_page_response(%query)** — Make one list request and return the complete decoded Cloudflare response hash, including `result_info` when Cloudflare supplies it.
+* **get($zone_id, %options)** — Retrieve one zone by ID. Returns the decoded zone `result`. The ID is percent-encoded as a path component; `full_response => 1` returns the complete decoded Cloudflare response.
 
 # ERRORS #
 
-See `Cloudflare::API` for HTTP, transport, Cloudflare envelope, and invalid path-component exceptions.
+See `Cloudflare::API` for HTTP, transport, Cloudflare response, and invalid path-component exceptions.
 
 # SEE ALSO #
 

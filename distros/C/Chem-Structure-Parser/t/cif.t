@@ -185,14 +185,23 @@ for my $pair ([ 'mini', 'one of everything' ],
 	is_deeply($c->{cispep}, $p->{cispep}, 'CISPEP is the same (_struct_mon_prot_cis)');
 	is_deeply($c->{modres}, $p->{modres}, 'MODRES is the same (_pdbx_struct_mod_residue)');
 	is_deeply($c->{dbref},  $p->{dbref},  'DBREF is the same (_struct_ref + _struct_ref_seq)');
-	is($c->{sheet}[0]{init_resseq}, $p->{sheet}[0]{init_resseq}, 'SHEET starts at the same residue');
-	is($c->{sheet}[0]{end_chain},   $p->{sheet}[0]{end_chain},   'and ends in the same chain');
+	is_deeply($c->{sheet},  $p->{sheet},
+		'SHEET is the same, strand count and sense included (_struct_sheet_range, _struct_sheet, _struct_sheet_order)')
+		or diag explain $c->{sheet};
+	is($c->{helix}[0]{id}, 'AA1', "a helix's id is the HELIX record's, not the mmCIF row's HELX_P1");
+	is_deeply($c->{dbref}{B}, $p->{dbref}{B}, 'and a DBREF1/DBREF2 pair is the same as its _struct_ref row');
 
 	# the molecule a chain is, which mmCIF keeps in _entity
 	is($c->{chains}{A}{molecule}, $p->{chains}{A}{molecule}, 'the chain knows its molecule');
 	is($c->{chains}{B}{molecule}, $p->{chains}{B}{molecule}, 'and so does the second one');
 	is($c->{chains}{A}{organism}, $p->{chains}{A}{organism}, 'and its organism');
 	is($c->{chains}{A}{ec},       $p->{chains}{A}{ec},       'and its EC number');
+	is($c->{chains}{A}{fragment}, 'CATALYTIC DOMAIN',        'and its fragment (_entity.pdbx_fragment)');
+	is($c->{chains}{A}{fragment}, $p->{chains}{A}{fragment}, 'the same as COMPND FRAGMENT');
+	is($c->{chains}{B}{organism}, 'SYNTHETIC CONSTRUCT',
+		'a synthetic entity names its organism (_pdbx_entity_src_syn)');
+	is($c->{chains}{B}{organism}, $p->{chains}{B}{organism}, 'as SOURCE does');
+	is($c->{source}{2}{synthetic}, $p->{source}{2}{synthetic}, 'and says it is synthetic as SOURCE does');
 
 	# heterogens: HET/HETNAM/FORMUL against _chem_comp/_pdbx_nonpoly_scheme
 	is($c->{het}{NAG}{name},    $p->{het}{NAG}{name},    'a heterogen is named the same');
@@ -416,6 +425,70 @@ CIF
 		'and an _atom_site_anisotrop written the same way is still counted');
 }
 {
+	# An mmCIF chain id has no width.  A simulation program writes segment
+	# names like these as auth_asym_id, and a reader that copied them into a
+	# buffer of eight bytes read both as SEG1PRO and made one chain of two.
+	my $text = <<'CIF';
+data_X
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.auth_atom_id
+_atom_site.auth_comp_id
+_atom_site.auth_asym_id
+_atom_site.auth_seq_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+ATOM 1 C CA ALA SEG1PROA 1 1 2 3
+ATOM 2 C CA ALA SEG1PROB 1 4 5 6
+ATOM 3 C CA GLY SEG1PROB 2 7 8 9
+CIF
+	for my $o ([], [ atoms => 0 ]) {
+		my $i = structure_info_string($text, format => 'mmcif', @$o);
+		is_deeply($i->{chain_order}, [ 'SEG1PROA', 'SEG1PROB' ],
+			"chain ids longer than seven characters are kept whole (@$o)");
+		is($i->{chains}{SEG1PROB}{sequence}, 'AG', 'and the second chain is its own');
+	}
+	my $one = structure_info_string($text, format => 'mmcif', chains => [ 'SEG1PROB' ]);
+	is($one->{stats}{n_atoms}, 2, 'and chains => picks one of them out by its whole name');
+}
+{
+	# One entity from more than one source.  1shz's chimera is seven segments,
+	# rat and mouse by turns, seven rows of _entity_src_gen; its PDB file says
+	# 'ORGANISM_SCIENTIFIC: RATTUS NORVEGICUS, MUS MUSCULUS' and
+	# 'ORGANISM_TAXID: 10116, 10090'.  These are the first three of those rows,
+	# cut down to the items read.
+	my $i = structure_info_string(<<'CIF', format => 'mmcif');
+data_1SHZ
+_entry.id 1SHZ
+loop_
+_entity_poly.entity_id
+_entity_poly.pdbx_strand_id
+1 A,D
+loop_
+_entity_src_gen.entity_id
+_entity_src_gen.pdbx_src_id
+_entity_src_gen.pdbx_gene_src_scientific_name
+_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id
+_entity_src_gen.pdbx_host_org_scientific_name
+1 1 'Rattus norvegicus' 10116 'Escherichia coli'
+1 3 'Rattus norvegicus' 10116 'Escherichia coli'
+1 2 'Mus musculus'      10090 'Escherichia coli'
+loop_
+_entity_src_nat.entity_id
+_entity_src_nat.pdbx_organism_scientific
+1 'Not this one'
+CIF
+	is($i->{source}{1}{organism_scientific}, 'Rattus norvegicus, Mus musculus',
+		'an entity with several sources names each organism once, as SOURCE does');
+	is($i->{source}{1}{organism_taxid}, '10116, 10090', 'and each taxonomy id');
+	is($i->{source}{1}{expression_system}, 'Escherichia coli', 'and a host they share once');
+	is($i->{entity_of_chain}{D}{organism}, 'Rattus norvegicus, Mus musculus',
+		'which every chain of it carries');
+}
+{
 	# Two loop_ blocks of one category, a value that spans lines, and a quote
 	# inside a quoted value.  The first is legal and rare; the second is how
 	# anything longer than a line is written; the third is why a closing quote
@@ -488,6 +561,127 @@ CIF
 	is(scalar @{ $i->{revdat} }, 2, 'the revision history is the REVDAT of an mmCIF');
 	is($i->{revdat}[1]{date}, '2011-07-13', 'with the date of each revision');
 	is($i->{revdat}[1]{id}, 'X', 'filed under the entry the PDB reader would have named');
+}
+{
+	# Microheterogeneity in the sequence: 1ejg.cif's _entity_poly_seq rows 20 to
+	# 26, where num 22 is PRO and SER and num 25 is LEU and ILE, one row for
+	# each.  1ejg.pdb's SEQRES names the first of each pair and nothing else,
+	# which is what the PDB reader has to go on, so the two formats agree only
+	# if this reads one residue per num.
+	my $cif = structure_info_string(<<'CIF', format => 'mmcif', features => 0);
+data_X
+loop_
+_entity_poly.entity_id
+_entity_poly.pdbx_strand_id
+1 A
+loop_
+_entity_poly_seq.entity_id
+_entity_poly_seq.num
+_entity_poly_seq.mon_id
+_entity_poly_seq.hetero
+1 20 GLY n
+1 21 THR n
+1 22 PRO y
+1 22 SER y
+1 23 GLU n
+1 24 ALA n
+1 25 LEU y
+1 25 ILE y
+1 26 CYS n
+CIF
+	my $pdb = structure_info_string(<<'PDB', features => 0);
+SEQRES   1 A    7  GLY THR PRO GLU ALA LEU CYS
+PDB
+	is_deeply($cif->{seqres}{A}, $pdb->{seqres}{A},
+		'two chemical states at one position are one SEQRES residue, as in the PDB file');
+	is($cif->{seqres}{A}{sequence}, 'GTPEALC', 'the first of each, in order');
+}
+{
+	# A quote its line never closes.  CIF 1.1 has no quoted value that spans
+	# lines, so it was never an opening quote: the word is read as it stands,
+	# and the loop stays in step.  Scanning on for a closing quote used to read
+	# the three rows below as one atom's name and lose them.
+	my $i = structure_info_string(<<'CIF', format => 'mmcif', features => 0);
+data_X
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.auth_atom_id
+_atom_site.auth_comp_id
+_atom_site.auth_asym_id
+_atom_site.auth_seq_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+ATOM 1 N N ALA A 1 1.0 2.0 3.0
+ATOM 2 C 'CA ALA A 1 2.0 2.0 3.0
+ATOM 3 C C ALA A 1 3.0 2.0 3.0
+ATOM 4 O O ALA A 1 4.0 2.0 3.0
+ATOM 5 N N GLY A 2 5.0 2.0 3.0
+CIF
+	is($i->{stats}{n_atoms}, 5, 'a quote its line does not close costs no row below it');
+	is_deeply($i->{chains}{A}{residue_order}, [ 1, 2 ], 'and puts no row out of step');
+	is_deeply($i->{chains}{A}{residues}{1}{atom_order}, [ 'N', "'CA", 'C', 'O' ],
+		'the word it began is read as written');
+	is($i->{chains}{A}{residues}{2}{atoms}{N}{x}, 5, 'and the rows after it keep their columns');
+}
+{
+	# The same quote on the last line of a file with no newline after it: the
+	# file ending is the line ending, and the word is still read as written.
+	# The scan used to stop at the end of the buffer thinking the value closed,
+	# and read the rest of the row as the atom's name.
+	my $i = structure_info_string(<<'CIF' . "ATOM 2 C 'CA ALA A 1 2.0 2.0 3.0", format => 'mmcif', features => 0);
+data_X
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.auth_atom_id
+_atom_site.auth_comp_id
+_atom_site.auth_asym_id
+_atom_site.auth_seq_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+ATOM 1 N N ALA A 1 1.0 2.0 3.0
+CIF
+	is_deeply($i->{chains}{A}{residues}{1}{atom_order}, [ 'N', "'CA" ],
+		'a quote the end of the file leaves open is read as written');
+	is($i->{chains}{A}{residues}{1}{atoms}{"'CA"}{x}, 2, 'and its row keeps its columns');
+}
+{
+	# A number with its standard uncertainty after it in parentheses, which is
+	# CIF 1.1's numeric syntax.  gemmi 0.7.5's cif::as_number() reads '1.000(2)',
+	# '-2.5(13)', '0.50(5)' and '10.0(1)' as 1, -2.5, 0.5 and 10 (checked with
+	# gemmi.cif.as_number from its python module).  0.034 required the number to
+	# be the whole field -- the PDB rule for a coordinate that overflowed its
+	# columns -- and read all four as undef.
+	my $i = structure_info_string(<<'CIF', format => 'mmcif', features => 0);
+data_X
+loop_
+_atom_site.group_PDB
+_atom_site.id
+_atom_site.type_symbol
+_atom_site.auth_atom_id
+_atom_site.auth_comp_id
+_atom_site.auth_asym_id
+_atom_site.auth_seq_id
+_atom_site.Cartn_x
+_atom_site.Cartn_y
+_atom_site.Cartn_z
+_atom_site.occupancy
+_atom_site.B_iso_or_equiv
+ATOM 1 N N ALA A 1 1.000(2) -2.5(13) 3.0 0.50(5) 10.0(1)
+ATOM 2 C CA ALA A 1 2.0 2.0 3.0 1.0 12.5(
+ATOM 3 C C ALA A 1 3.0 2.0 3.0 1.0 12.5()
+CIF
+	my $n = $i->{chains}{A}{residues}{1}{atoms}{N};
+	is_deeply([ @{$n}{qw(x y z occupancy bfactor)} ], [ 1, -2.5, 3, 0.5, 10 ],
+		'a standard uncertainty after a number is not part of it');
+	is($i->{chains}{A}{residues}{1}{atoms}{CA}{bfactor}, undef,
+		'a parenthesis with no uncertainty in it is not one');
+	is($i->{chains}{A}{residues}{1}{atoms}{C}{bfactor}, undef, 'nor is an empty pair');
 }
 {
 	# the annotation categories, and the identifiers they are read under.  Only

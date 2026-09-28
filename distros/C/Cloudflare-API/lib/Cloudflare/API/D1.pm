@@ -28,7 +28,7 @@ use Cloudflare::API::Resource;
 
 #  Version information
 #
-$VERSION='1.010';
+$VERSION='1.011';
 
 
 #  All done. Positive return
@@ -41,13 +41,25 @@ $VERSION='1.010';
 
 sub list_databases {
 
-
-    #  Preserve result_info for callers that request the full response
-    #
     my ($self, %query)=@_;
-    my $full_response=delete($query{'full_response'});
-    return $self->api()->request('GET', $self->api()->account_path('d1', 'database'),
-        query => \%query, full_response => $full_response);
+    return $self->collect_list($self->list_databases_page(%query));
+
+}
+
+
+sub list_databases_page {
+
+    my ($self, %query)=@_;
+    return $self->list_pagination($self->api()->account_path('d1', 'database'),
+        { mode => 'page' }, \%query);
+
+}
+
+
+sub list_databases_page_response {
+
+    my ($self, %query)=@_;
+    return $self->list_response($self->api()->account_path('d1', 'database'), \%query);
 
 }
 
@@ -146,7 +158,9 @@ All methods use the account ID configured on `Cloudflare::API`. The query method
 
 # METHODS #
 
-* **list_databases(%query)** — List databases, passing named filters as query parameters. Returns `result`; `full_response => 1` retains the envelope and pagination information.
+* **list_databases(%query)** — List every database, passing named filters as query parameters. The method follows all pages and returns one flat array reference; a large result set can require many requests and substantial memory.
+* **list_databases_page(%query)** — Return a lazy `HTTP::API::Core::Pagination` object. Use `next()` to consume one database at a time.
+* **list_databases_page_response(%query)** — Make one list request and return the complete decoded Cloudflare response hash, including `result_info` when supplied.
 * **get_database($id, %options)** — Retrieve a database by ID and return its `result`.
 * **create_database(\%body, %options)** — POST a database definition, normally including `name`. Returns the created `result`.
 * **update_database($id, \%body, %options)** — PATCH a database and return its `result`.
@@ -154,11 +168,11 @@ All methods use the account ID configured on `Cloudflare::API`. The query method
 * **query_database($id, \%body, %options)** — POST a D1 query body such as `{ sql => 'SELECT 1', params => [] }`. Returns Cloudflare's `result` without reshaping it.
 * **query_sql($id, $sql, \@params, %options)** — Build a single-statement body and call `query_database()`. `\@params` is optional; omit it for a query without bound values. Returns D1's query result array, whose entries can contain `results`, `meta`, and `success`.
 
-For every JSON method, `full_response => 1` returns the entire decoded envelope. Database IDs are percent-encoded in paths. Body arguments must be hash references; `query_sql()` also requires a non-empty scalar SQL string and, when supplied, an array reference of parameters.
+For non-list JSON methods, `full_response => 1` returns the complete decoded Cloudflare response. Database IDs are percent-encoded in paths. Body arguments must be hash references; `query_sql()` also requires a non-empty scalar SQL string and, when supplied, an array reference of parameters.
 
 # ERRORS #
 
-Invalid bodies or SQL arguments cause Perl exceptions. HTTP, transport, and Cloudflare envelope failures follow the rules in `Cloudflare::API`.
+Invalid bodies or SQL arguments cause Perl exceptions. HTTP, transport, and Cloudflare response failures follow the rules in `Cloudflare::API`.
 
 # SEE ALSO #
 
@@ -209,7 +223,17 @@ All methods use the account ID configured on C<Cloudflare::API>. The query metho
 
 =item *
 
-B<list_databases(%query)> — List databases, passing named filters as query parameters. Returns C<result>; C<<< full_response => 1 >>> retains the envelope and pagination information.
+B<list_databases(%query)> — List every database, passing named filters as query parameters. The method follows all pages and returns one flat array reference; a large result set can require many requests and substantial memory.
+
+
+=item *
+
+B<list_databases_page(%query)> — Return a lazy C<HTTP::API::Core::Pagination> object. Use C<next()> to consume one database at a time.
+
+
+=item *
+
+B<list_databases_page_response(%query)> — Make one list request and return the complete decoded Cloudflare response hash, including C<result_info> when supplied.
 
 
 =item *
@@ -244,12 +268,12 @@ B<query_sql($id, $sql, \@params, %options)> — Build a single-statement body an
 
 =back
 
-For every JSON method, C<<< full_response => 1 >>> returns the entire decoded envelope. Database IDs are percent-encoded in paths. Body arguments must be hash references; C<query_sql()> also requires a non-empty scalar SQL string and, when supplied, an array reference of parameters.
+For non-list JSON methods, C<<< full_response => 1 >>> returns the complete decoded Cloudflare response. Database IDs are percent-encoded in paths. Body arguments must be hash references; C<query_sql()> also requires a non-empty scalar SQL string and, when supplied, an array reference of parameters.
 
 
 =head1 ERRORS
 
-Invalid bodies or SQL arguments cause Perl exceptions. HTTP, transport, and Cloudflare envelope failures follow the rules in C<Cloudflare::API>.
+Invalid bodies or SQL arguments cause Perl exceptions. HTTP, transport, and Cloudflare response failures follow the rules in C<Cloudflare::API>.
 
 
 =head1 SEE ALSO

@@ -20,8 +20,9 @@
 # -- so a sphere point sitting within a float32 ulp of a neighbouring atom's
 # surface can be called accessible by one width and covered by the other.  On
 # mini.pdb two of 62,400 points flip, worth 0.26 A^2 of 1551.  The float64
-# column is mdtraj's own loop with the dtype changed and nothing else, and it is
-# what pins the answer exactly; the float32 column is what mdtraj ships and is
+# column is mdtraj's own loop with the dtype changed, run over coordinates that
+# have not been through float32 either -- see xyz_float64() -- and it is what
+# pins the answer exactly; the float32 column is what mdtraj ships and is
 # compared against with a tolerance of one sphere point per atom.
 #
 # The disulfides are mdtraj's rule and not mdtraj's function.  Its
@@ -564,6 +565,26 @@ def base_pairs(t, gem):
     return out
 
 
+def xyz_float64(t, path):
+    """Model 1's coordinates in nanometres, as float64 that has not been through
+    float32 on the way.  A Trajectory's xyz is float32 however it was read, so
+    handing it to the float64 kernel rounds every coordinate before the kernel
+    starts, by as much as 2.4e-6 A at 40 A from the origin: enough to move a
+    sphere point across a neighbour's surface.  Over a hundred entries of
+    PDBbind v2020 that put the float64 column one to three points away from
+    the exact count on 26 of them -- 6qrg's GLU O 2421 has 167 accessible
+    points at 60 significant digits, and 168 from float32 coordinates -- while
+    this module, reading the decimals, had the exact count every time.
+    PDBTrajectoryFile keeps the decimals as float64 angstrom, in the order
+    load_pdb() puts the atoms in; mdtraj's mmCIF reader has no such stage, so
+    an mmCIF file keeps the float32 coordinates, and t/cif.t is what says the
+    two formats read the same."""
+    if path.endswith(('.ent', '.pdb')):
+        with md.formats.PDBTrajectoryFile(path) as f:
+            return np.asarray(f.positions[0], dtype=np.float64) / 10.0
+    return np.asarray(t.xyz[0], dtype=np.float64)
+
+
 def main(path):
     t = load(path)
     top = t.topology
@@ -571,9 +592,10 @@ def main(path):
     print('#atoms %d' % n)
     if n == 0:
         return
+    xyz64 = xyz_float64(t, path)
     radii = np.array([_ATOMIC_RADII[a.element.symbol] for a in top.atoms]) + PROBE
     a32 = md.shrake_rupley(t, probe_radius=PROBE, n_sphere_points=NPTS)[0] * 100.0
-    a64 = sasa_float64(t.xyz[0], radii, NPTS) * 100.0
+    a64 = sasa_float64(xyz64, radii, NPTS) * 100.0
     print('#residues %d' % top.n_residues)
     # The area one sphere point is worth, per atom.  It is the whole of the
     # difference between the two widths: an atom's area is a count of points
@@ -625,11 +647,11 @@ def main(path):
             sub = t.atom_slice(idx)
             r = np.array([_ATOMIC_RADII[a.element.symbol] for a in sub.topology.atoms]) + PROBE
             i32 = md.shrake_rupley(sub, probe_radius=PROBE, n_sphere_points=NPTS)[0].sum() * 100.0
-            i64 = sasa_float64(sub.xyz[0], r, NPTS).sum() * 100.0
+            i64 = sasa_float64(xyz64[idx], r, NPTS).sum() * 100.0
             pt = (4.0 * np.pi * (r * 10.0) ** 2 / NPTS).sum()
             print('I %s %d %.9f %.9f %.9f' % (cid, len(idx), i32, i64, pt))
 
-    xyz = np.asarray(t.xyz[0], dtype=np.float64) * 10.0
+    xyz = xyz64 * 10.0
     mass = np.array([a.element.mass for a in top.atoms], dtype=np.float64)
     mu = xyz.mean(0)
     print('T rg %.9f' % np.sqrt(((xyz - mu) ** 2).sum(1).mean()))
@@ -654,8 +676,14 @@ def main(path):
     # are the ones it has an opinion about; this module reports the neighbouring
     # and the cross-chain pairs too, and the test does not hold those to mdtraj.
     # Capped at 8 A so the frozen file stays a fixture rather than a matrix.
+    #
+    # periodic=False for the reason pi_stacking() below is handed no cell:
+    # compute_contacts() defaults to the minimum image convention, and with the
+    # CRYST1 cell it measures to symmetry copies that are not in the file.  In
+    # 1g46 it puts HIS A3 3.12 A from ASP A180, which are 34.58 A apart.
     try:
-        cd, cpairs = md.compute_contacts(t, contacts='all', scheme='closest-heavy')
+        cd, cpairs = md.compute_contacts(t, contacts='all', scheme='closest-heavy',
+                                         periodic=False)
         for (a, b), dist in zip(cpairs, cd[0]):
             if dist * 10.0 <= 8.0:
                 print('C %d %d %.9f' % (a, b, dist * 10.0))

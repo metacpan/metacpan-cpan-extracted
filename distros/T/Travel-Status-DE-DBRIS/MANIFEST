@@ -15,6 +15,8 @@ lib/Travel/Status/DE/DBRIS/Location.pm
 lib/Travel/Status/DE/DBRIS/Operators.pm
 lib/Travel/Status/DE/DBRIS/Operators.pm.PL
 MANIFEST			This list of files
+META.json
+META.yml
 README.md
 scripts/makedeb-docker
 scripts/makedeb-docker-helper
@@ -24,6 +26,4 @@ share/admin-id-to-operator.json
 xt/00-compile-pm.t
 xt/01-compile-pl.t
 xt/10-pod-coverage.t
-META.yml
-META.json
 SIGNATURE    Added here by Module::Build

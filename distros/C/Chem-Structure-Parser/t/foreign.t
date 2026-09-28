@@ -99,6 +99,36 @@ my $data = dirname(abs_path(__FILE__)) . '/data';
 	is($i->{id}, undef, 'a string has no name to take an id from');
 }
 
+# --- DBREF1 and DBREF2 ---------------------------------------------------
+#
+# A cross-reference whose accession or entry name will not fit DBREF's columns
+# is written as a pair of lines instead.  Bio.SeqIO.PdbIO of Biopython 1.87
+# reads the pair -- the database and entry name off DBREF1, the accession off
+# DBREF2 -- and gives 2qtr's chain A the dbxrefs 'UNP:A0A2B6C295' and
+# 'UNP:A0A2B6C295_BACAN'.  These are 2qtr's lines for chains A and B; the
+# ranges are from the same columns of the wwPDB format v3.3, which Biopython
+# reads and does not keep.
+{
+	my $i = structure_info_string(<<'PDB');
+DBREF1 2QTR A    1   189  UNP                  A0A2B6C295_BACAN
+DBREF2 2QTR A     A0A2B6C295                          1         189
+DBREF1 2QTR B    1   189  UNP                  A0A2B6C295_BACAN
+DBREF2 2QTR B     A0A2B6C295                          1         189
+ATOM      1  CA  ALA A   1      10.000  10.000  10.000  1.00 20.00           C
+ATOM      2  CA  ALA B   1      20.000  10.000  10.000  1.00 20.00           C
+PDB
+	for my $c (qw(A B)) {
+		my $d = $i->{dbref}{$c}[0];
+		is(join(':', $d->{database}, $d->{accession}), 'UNP:A0A2B6C295',
+			"2qtr chain $c: the accession Biopython reads off DBREF2");
+		is(join(':', $d->{database}, $d->{db_id}), 'UNP:A0A2B6C295_BACAN',
+			"2qtr chain $c: and the entry name it reads off DBREF1");
+	}
+	is_deeply([ @{ $i->{dbref}{A}[0] }{qw(seq_begin seq_end db_begin db_end)} ],
+	          [ 1, 189, 1, 189 ], 'and the two ranges beside them');
+	is($i->{chains}{A}{dbref}[0]{accession}, 'A0A2B6C295', 'which the chain carries too');
+}
+
 # --- an atom whose first record has no altloc letter
 #
 # Biopython's Tests/PDB/disordered.pdb writes ARG 27's CZ twice: once with a
@@ -457,6 +487,137 @@ PDB
 		'the chain is column 22 alone, as Biopython reads it');
 	is_deeply($p->{resname}, [ 'TIP', 'ALA' ],
 		'and the residue name is columns 18-20, whatever is beside it');
+}
+
+# --- half-sphere exposure counts only CaPPBuilder's polypeptides ----------
+#
+# Biopython 1.87's Bio/PDB/HSExposure.py builds its residues with
+# Bio/PDB/Polypeptide.py's CaPPBuilder, which keeps a standard amino acid only
+# when it is next to another in its chain and their CAs are within 4.3 A.  A
+# standard residue with no such neighbour is in no polypeptide: it gets no
+# figure and counts towards nobody else's.  1a08 is an SH2 domain holding the
+# peptide ACE-FTY-GLU-DIP, whose one standard residue is that GLU C102.  Below
+# are the N, CA, C and CB of chain A 203-206 and of chain C 101-103, cut out of
+# the entry's own lines, and HSExposureCB's answer on exactly that text:
+# LYS 203 1/2, HIS 204 1/2, TYR 205 0/3, LYS 206 0/3, and nothing on chain C.
+# This module used to give the GLU 3/1 and count it towards all four.
+{
+	my $i = structure_info_string(<<'PDB');
+ATOM    544  N   LYS A 203      37.699  14.856  24.059  1.00 18.02           N
+ATOM    545  CA  LYS A 203      37.937  13.704  23.194  1.00 14.80           C
+ATOM    546  C   LYS A 203      39.428  13.801  22.827  1.00 14.75           C
+ATOM    548  CB  LYS A 203      37.167  13.753  21.858  1.00 20.10           C
+ATOM    557  N   HIS A 204      40.198  12.720  22.786  1.00 13.24           N
+ATOM    558  CA  HIS A 204      41.613  12.816  22.485  1.00 12.61           C
+ATOM    559  C   HIS A 204      41.843  12.008  21.219  1.00 14.48           C
+ATOM    561  CB  HIS A 204      42.465  12.234  23.594  1.00  8.01           C
+ATOM    570  N   TYR A 205      42.592  12.474  20.251  1.00 14.67           N
+ATOM    571  CA  TYR A 205      42.820  11.792  18.990  1.00 13.05           C
+ATOM    572  C   TYR A 205      44.321  11.556  18.864  1.00 14.08           C
+ATOM    574  CB  TYR A 205      42.330  12.679  17.882  1.00 12.71           C
+ATOM    584  N   LYS A 206      44.850  10.330  18.893  1.00 12.80           N
+ATOM    585  CA  LYS A 206      46.275  10.152  18.761  1.00 11.66           C
+ATOM    586  C   LYS A 206      46.779  10.644  17.406  1.00 13.75           C
+ATOM    588  CB  LYS A 206      46.516   8.663  19.009  1.00 14.90           C
+HETATM 1025  N   FTY C 101      41.611   7.121  23.475  1.00 15.39           N
+HETATM 1026  CA  FTY C 101      41.464   7.847  22.229  1.00 17.53           C
+HETATM 1027  C   FTY C 101      40.236   7.389  21.460  1.00 13.42           C
+HETATM 1029  CB  FTY C 101      42.750   7.655  21.404  1.00 14.75           C
+ATOM   1044  N   GLU C 102      39.853   8.264  20.562  1.00 14.85           N
+ATOM   1045  CA  GLU C 102      38.741   8.062  19.674  1.00 16.19           C
+ATOM   1046  C   GLU C 102      39.175   7.311  18.407  1.00 19.94           C
+ATOM   1048  CB  GLU C 102      38.190   9.390  19.305  1.00 21.28           C
+HETATM 1054  N   DIP C 103      38.340   6.458  17.692  1.00 18.28           N
+END
+PDB
+	my $A = $i->{chains}{A}{residues};
+	is_deeply([ map { [ $A->{$_}{hse_up}, $A->{$_}{hse_down} ] } 203 .. 206 ],
+		[ [ 1, 2 ], [ 1, 2 ], [ 0, 3 ], [ 0, 3 ] ],
+		"1a08: HSExposureCB's figures, with the lone GLU counted by nobody");
+	ok(!exists $i->{chains}{C}{residues}{102}{hse_up},
+		'and the GLU itself, in no polypeptide, has none');
+}
+
+# --- a side chain without its CB has no half-sphere exposure --------------
+#
+# HSExposureCB._get_cb(), in the same Biopython 1.87 file, builds the virtual CB
+# for a GLY and for nothing else: any other residue with no CB has no side
+# chain direction and no figure, though its CA still counts towards its
+# neighbours'.  5x0w deposits several side chains cut back to the backbone; this
+# is its chain A 513-517, N, CA, C and CB as written, where SER 515 is one of
+# them and GLY 516 is a real glycine.  HSExposureCB on exactly this text gives
+# GLN 513 0/4, TYR 514 0/4, nothing for SER 515, GLY 516 1/3 and THR 517 1/3.
+# This module used to build the glycine CB for the serine as well.
+{
+	my $i = structure_info_string(<<'PDB');
+ATOM    224  N   GLN A 513      57.243   0.314  12.333  1.00 70.39           N
+ATOM    225  CA  GLN A 513      56.432   1.106  11.413  1.00 76.22           C
+ATOM    226  C   GLN A 513      55.654   2.205  12.124  1.00 83.94           C
+ATOM    228  CB  GLN A 513      55.460   0.207  10.646  1.00 69.43           C
+ATOM    230  N   TYR A 514      55.259   1.992  13.377  1.00 92.76           N
+ATOM    231  CA  TYR A 514      54.586   3.033  14.154  1.00 97.80           C
+ATOM    232  C   TYR A 514      55.631   3.725  15.028  1.00 97.01           C
+ATOM    234  CB  TYR A 514      53.446   2.437  14.974  1.00103.44           C
+ATOM    242  N   SER A 515      56.205   4.818  14.524  1.00 93.49           N
+ATOM    243  CA  SER A 515      57.299   5.496  15.214  1.00 91.80           C
+ATOM    244  C   SER A 515      58.549   4.626  15.300  1.00 93.82           C
+ATOM    246  N   GLY A 516      59.426   4.746  14.304  1.00 96.22           N
+ATOM    247  CA  GLY A 516      60.592   3.893  14.175  1.00 99.02           C
+ATOM    248  C   GLY A 516      61.570   3.930  15.331  1.00100.95           C
+ATOM    250  N   THR A 517      61.194   3.331  16.458  1.00106.65           N
+ATOM    251  CA  THR A 517      62.124   3.176  17.568  1.00112.89           C
+ATOM    252  C   THR A 517      63.289   2.275  17.174  1.00120.70           C
+ATOM    254  CB  THR A 517      61.398   2.598  18.783  1.00112.44           C
+END
+PDB
+	my $A = $i->{chains}{A}{residues};
+	is_deeply([ map { [ $A->{$_}{hse_up}, $A->{$_}{hse_down} ] } 513, 514, 516, 517 ],
+		[ [ 0, 4 ], [ 0, 4 ], [ 1, 3 ], [ 1, 3 ] ],
+		"5x0w: HSExposureCB's figures, the serine's CA counted");
+	ok(!exists $A->{515}{hse_up}, 'and the serine with no CB has none of its own');
+}
+
+# --- an edge-to-face stack is found whichever ring comes first ------------
+#
+# mdtraj 1.11.1's mdtraj/geometry/pi_stacking.py projects its first group's
+# centroid onto the line where the two ring planes meet, and measures the
+# second group's from that projected point rather than from the line, so the
+# one pair can be a stack or not depending on which ring it is handed first.
+# These are the ring atoms of TRP A59 and PHE A99 of 1b6c, as the entry writes
+# them: pi_stacking() with the defaults structure_pi_stacking() takes finds the
+# six-membered rings edge-stacked when handed PHE first and not when handed TRP
+# first.  PHE's centroid is 0.66 A from the line, TRP's 5.06 A.  This module
+# takes the centroid nearer the line, which is the union of mdtraj's two
+# answers; it used to take the tryptophan first, as it comes in the file, and
+# miss the pair.
+{
+	my $i = structure_info_string(<<'PDB');
+ATOM    463  CG  TRP A  59     -33.314  11.911 -26.717  1.00 38.02           C
+ATOM    464  CD1 TRP A  59     -34.137  10.904 -27.118  1.00 37.63           C
+ATOM    465  CD2 TRP A  59     -33.909  12.471 -25.545  1.00 37.69           C
+ATOM    466  NE1 TRP A  59     -35.209  10.799 -26.269  1.00 37.45           N
+ATOM    467  CE2 TRP A  59     -35.094  11.749 -25.292  1.00 37.51           C
+ATOM    468  CE3 TRP A  59     -33.555  13.513 -24.679  1.00 37.34           C
+ATOM    469  CZ2 TRP A  59     -35.932  12.033 -24.215  1.00 37.56           C
+ATOM    470  CZ3 TRP A  59     -34.391  13.797 -23.604  1.00 37.34           C
+ATOM    471  CH2 TRP A  59     -35.566  13.057 -23.383  1.00 37.43           C
+ATOM    760  CG  PHE A  99     -38.090   9.137 -26.757  1.00 34.52           C
+ATOM    761  CD1 PHE A  99     -37.240   8.452 -27.621  1.00 34.57           C
+ATOM    762  CD2 PHE A  99     -37.954   8.948 -25.384  1.00 33.74           C
+ATOM    763  CE1 PHE A  99     -36.251   7.598 -27.129  1.00 34.18           C
+ATOM    764  CE2 PHE A  99     -36.982   8.103 -24.885  1.00 34.27           C
+ATOM    765  CZ  PHE A  99     -36.121   7.425 -25.766  1.00 34.19           C
+END
+PDB
+	my %got = map { ("$_->{ring1}$_->{ring2}" => $_) } @{ $i->{features}{pi_stacking} };
+	ok($got{66} && $got{66}{type} eq 'edge',
+		"1b6c: TRP A59 and PHE A99's six-membered rings are edge-stacked");
+	# 0.660559745 A is the same geometry over mdtraj's coordinates, which are
+	# float32 nanometres; this reads 0.660558301 from the file's decimals.  The
+	# 1.4e-6 A between them is about one float32 ulp of a coordinate 40 A out
+	# (2.4e-6 A), and 1e-5 leaves four of those
+	ok($got{66} && abs($got{66}{intersect_distance} - 0.660559745) < 1e-5,
+		'at the distance mdtraj measures with PHE first');
 }
 
 done_testing();

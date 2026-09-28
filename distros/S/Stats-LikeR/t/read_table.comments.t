@@ -118,6 +118,25 @@ CSV
 	is_deeply([sort keys %{ $r->[0] }], [qw(id name)], 'custom comment marker skipped before header');
 }
 
+# A commented-out header one field short of the data is what auto.row.names
+# looks for, as R's read.table does with a header one field short. Up to 0.320
+# the width check that confirms a commented header refused it, and the first
+# data row became the header.
+{
+	my ($f, $keep) = tmp_csv("# a\tb\nr1\t1\t2\nr2\t3\t4\n", '.tsv');
+	is_deeply( read_table($f, 'auto.row.names' => 1),
+		[ { row_name => 'r1', a => 1, b => 2 }, { row_name => 'r2', a => 3, b => 4 } ],
+		'auto.row.names: a commented-out header one field short is kept' );
+	is_deeply( read_table($f, 'auto.row.names' => 'id', 'output.type' => 'hoh'),
+		{ r1 => { a => 1, b => 2 }, r2 => { a => 3, b => 4 } },
+		'auto.row.names: and names the rows of a hoh' );
+	# two fields short is still a leading comment, not the header
+	($f, $keep) = tmp_csv("# a\tb\nx\ty\tz\tw\n1\t2\t3\t4\n", '.tsv');
+	is_deeply( read_table($f, 'auto.row.names' => 1),
+		[ { x => 1, y => 2, z => 3, w => 4 } ],
+		'auto.row.names: a comment two fields short is not taken for the header' );
+}
+
 # memory
 my ($lf, $lkeep) = tmp_csv(<<'CSV');
 # c

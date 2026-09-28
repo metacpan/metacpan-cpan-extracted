@@ -68,7 +68,7 @@ __PACKAGE__->mk_accessors(
   ),
 );
 
-our $VERSION = '2.1.1'; ## no critic (RequireInterpolation)
+our $VERSION = '2.1.2'; ## no critic (RequireInterpolation)
 
 our @EXPORT_OK = qw(is_domain_bucket);
 

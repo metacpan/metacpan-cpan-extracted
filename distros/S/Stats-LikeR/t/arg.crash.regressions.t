@@ -76,6 +76,8 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 use lib 'blib/lib', 'blib/arch';
+use File::Spec;
+use File::Temp ();
 use Stats::LikeR qw(matrix prcomp scale merge bw_ucv bw_bcv density
                     rnorm rbinom runif sample hist cor_test cor min max);
 
@@ -84,17 +86,69 @@ use Stats::LikeR qw(matrix prcomp scale merge bw_ucv bw_bcv density
 # both take the whole interpreter down, so eval in this process cannot see
 # them and a plain dies_ok would itself die.  The child reports "croak" only
 # when it exited 0 after catching the error.
+#
+# The snippet reaches the child in a file, and the child is spawned with the
+# list form of system() -- no shell, so nothing in the snippet has to survive
+# one.  Up to 0.316 this was `$^X @inc -e '$prog' 2>&1`, which is a sh command
+# line: cmd.exe does not treat ' as a quote character at all, so on Windows
+# perl was handed `'use` as its -e program and answered `Can't find string
+# terminator "'" anywhere before EOF at -e line 1.` 26 of the 98 subtests here
+# failed that way on a Strawberry 5.42 smoker (MSWin32-x64-multi-thread) with
+# nothing whatever wrong in the module.  No single quoting is right for both
+# shells -- and these snippets carry ', " and a literal NUL between them -- so
+# the command line is the wrong place for the program.
+#
+# The verdict comes back in a file of its own, which the child opens by a path
+# handed to it in @ARGV -- not on the child's stdout, and not embedded in the
+# program text, where a Windows path's backslashes would need escaping.  What
+# the child writes to stdout and stderr is captured too, by pointing this
+# process's own handles at a file for the duration of the call, but only so
+# that a failure has something to report: nothing is decided from it.  That is
+# the half that depends on the child inheriting handles, and it is the half
+# that can afford to.  Test::More is unaffected either way -- Test::Builder
+# dups its handles when it loads.
 my @inc = map { "-I$_" } grep { !ref $_ } @INC;
+my $work      = File::Temp::tempdir(CLEANUP => 1);
+my $prog_file = File::Spec->catfile($work, 'snippet.pl');
+my $res_file  = File::Spec->catfile($work, 'snippet.res');
+my $out_file  = File::Spec->catfile($work, 'snippet.out');
 sub child_result {
 	my ($code) = @_;
 	my $prog = 'use Stats::LikeR; $SIG{__WARN__} = sub { };'
 	         . ' my $ok = eval { ' . $code . '; 1 };'
-	         . ' print $ok ? "ok" : "croak"; exit 0;';
-	my $out = `$^X @inc -e '$prog' 2>&1`;
-	my $st  = $?;
+	         . ' open my $R, ">", $ARGV[0] or exit 3;'
+	         . ' print {$R} $ok ? "ok" : "croak";'
+	         . ' close $R or exit 3; exit 0;';
+	open my $pfh, '>', $prog_file or die "cannot write $prog_file: $!";
+	print {$pfh} $prog             or die "cannot write $prog_file: $!";
+	close $pfh                     or die "cannot write $prog_file: $!";
+	unlink $res_file;	# so a stale verdict cannot be read as this one's
+
+	open my $save_out, '>&', \*STDOUT or die "cannot save STDOUT: $!";
+	open my $save_err, '>&', \*STDERR or die "cannot save STDERR: $!";
+	open STDOUT, '>',  $out_file      or die "cannot redirect STDOUT: $!";
+	open STDERR, '>&', \*STDOUT       or die "cannot redirect STDERR: $!";
+	my $st = system($^X, @inc, $prog_file, $res_file);
+	my $spawn_err = $!;	# read before the restores and the slurps clobber it
+	open STDOUT, '>&', $save_out      or die "cannot restore STDOUT: $!";
+	open STDERR, '>&', $save_err      or die "cannot restore STDERR: $!";
+
+	my $slurp = sub {
+		my ($f) = @_;
+		open my $fh, '<', $f or return undef;
+		local $/;
+		my $c = <$fh>;
+		close $fh;
+		return defined $c ? $c : '';
+	};
+	my $out = $slurp->($out_file);
+	$out = '' unless defined $out;
+	return "not spawned ($spawn_err)" if $st == -1;
 	return "signal " . ($st & 127) if $st & 127;
 	return "exit " . ($st >> 8) . " ($out)" if ($st >> 8) != 0;
-	return $out;
+	my $verdict = $slurp->($res_file);
+	return "no verdict ($out)" unless defined $verdict;
+	return $verdict;
 }
 
 # --- 1. matrix: a zero or non-numeric dimension (was SIGFPE) ----------------

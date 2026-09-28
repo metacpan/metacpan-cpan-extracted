@@ -14,14 +14,16 @@ my $api=Cloudflare::API->new(
     account_id => $ENV{'CLOUDFLARE_ACCOUNT_ID'}
 );
 
-my $buckets=$api->r2()->list_buckets();
-my $page=$api->r2()->list_buckets(full_response => 1);
+my $buckets_ar=$api->r2()->list_buckets();
+my $page_or=$api->r2()->list_buckets_page(per_page => 100);
+my $page_hr=$api->r2()->list_buckets_page_response(per_page => 100);
+my $response_or=$api->response('GET', '/accounts');
 my $zone=$api->zones()->get($zone_id);
 ```
 
 # DESCRIPTION #
 
-`Cloudflare::API` supplies a bearer-authenticated HTTP client and accessors for the resource modules below. It requires Perl 5.10 or later, HTTP::API::Core 1.01 or later, and HTTPS support through IO::Socket::SSL. Resource objects share the same client and transport. The module manages resources through Cloudflare's REST API; it does not build Worker projects or perform R2 object transfers.
+`Cloudflare::API` supplies a bearer-authenticated HTTP client and accessors for the resource modules below. It requires Perl 5.10 or later, HTTP::API::Core 1.08 or later, and HTTPS support through IO::Socket::SSL. Resource objects share the same client and transport. The module manages resources through Cloudflare's REST API; it does not build Worker projects or perform R2 object transfers.
 
 An API token is required. Supply `token` to `new()` or set `CLOUDFLARE_API_TOKEN`. Account-scoped methods also need `account_id` or `CLOUDFLARE_ACCOUNT_ID`; account and zone lookups work without a default account ID. Use a token with the permissions required by the selected Cloudflare operations.
 
@@ -38,7 +40,7 @@ Each accessor creates a resource object. Consult its own man page for arguments,
 * **[Cloudflare::API::Queues](API/Queues.pm.md)** (`queues()`) manages queues and consumers.
 * **[Cloudflare::API::Hyperdrive](API/Hyperdrive.pm.md)** (`hyperdrive()`) manages database connection configurations.
 * **[Cloudflare::API::SecretsStore](API/SecretsStore.pm.md)** (`secrets_store()`) manages stores and write-only secrets.
-* **[Cloudflare::API::Error](API/Error.pm.md)** represents a Cloudflare JSON envelope reporting failure despite HTTP success.
+* **[Cloudflare::API::Error](API/Error.pm.md)** represents a Cloudflare JSON response reporting failure despite HTTP success.
 * **[Cloudflare::API::Resource](API/Resource.pm.md)** is the shared base class for resource objects; applications normally use the accessors above rather than constructing it.
 
 # METHODS #
@@ -57,19 +59,23 @@ Each accessor creates a resource object. Consult its own man page for arguments,
 
 * **request($method, $path, %options)**
 
-    Call a JSON endpoint and return the decoded envelope's `result`, which may be a hash reference, array reference, scalar, or `undef` according to the endpoint. `full_response => 1` returns the entire decoded envelope instead. Other options, including `query`, `json`, `content`, and `headers`, pass to HTTP::API::Core. The path must begin with exactly one slash and cannot be an absolute URL.
+    Call a JSON endpoint and return the decoded Cloudflare response's `result`, which may be a hash reference, array reference, scalar, or `undef` according to the endpoint. `full_response => 1` returns the complete decoded response hash instead. Other options, including `query`, `json`, `content`, and `headers`, pass to HTTP::API::Core. The path must begin with exactly one slash and cannot be an absolute URL.
 
 * **request_full($method, $path, %options)**
 
-    Return the complete decoded JSON hash reference, including fields such as `success`, `errors`, `messages`, and `result_info` when Cloudflare supplies them. An empty successful body yields `{ success => 1, result => undef }`. A non-object JSON body causes an exception.
+    Return the complete decoded Cloudflare JSON hash reference, including fields such as `success`, `errors`, `messages`, and `result_info` when Cloudflare supplies them. An empty successful body yields `{ success => 1, result => undef }`. A non-object JSON body causes an exception.
 
-* **raw_request($method, $path, %options)**
+* **response($method, $path, %options)**
 
     Return an `HTTP::API::Core::Response` object without decoding the body. Use this for non-JSON responses. It enforces the same single-slash relative-path rule as `request()`.
 
+* **raw_request($method, $path, %options)**
+
+    Compatibility alias for `response()`.
+
 * **account_path(@segments)**
 
-    Return `/accounts/<configured ID>/...` with each component percent-encoded. It throws if no account ID was configured. Resource modules use this helper; callers using raw request methods can use it to build account-scoped paths.
+    Return `/accounts/<configured ID>/...` with each component percent-encoded. It throws if no account ID was configured. Resource modules use this helper; callers using `response()` can use it to build account-scoped paths.
 
 * **segment($value)**
 
@@ -77,7 +83,11 @@ Each accessor creates a resource object. Consult its own man page for arguments,
 
 # RETURN VALUES AND ERRORS #
 
-Named resource methods normally return the JSON `result`. Pass `full_response => 1` to retain the full envelope, especially `result_info` on paginated lists. List filters are named arguments sent as query parameters. Exceptions from HTTP or transport failures remain `HTTP::API::Core::Error` objects; their decoded Cloudflare body is available through `json()`. A successful HTTP status with `success: false` throws `Cloudflare::API::Error`. Input validation errors throw plain Perl exceptions. No resource write is automatically rolled back.
+Named non-list resource methods normally return the JSON `result`; pass `full_response => 1` to retain the complete decoded Cloudflare response. List methods automatically follow every page reported by Cloudflare and return a flat array reference containing all items. This can issue many requests and holds the complete collection in memory.
+
+Every list method has two additional forms. Its `_page()` form returns a lazy `HTTP::API::Core::Pagination` object whose `next()` method yields one item and fetches subsequent pages as needed; `all()` collects its remaining items. Its `_page_response()` form makes exactly one request and returns the complete decoded Cloudflare response hash, including `result` and any `result_info`. A supplied `page` or `cursor` selects the starting point for `list()` and `_page()`, but selects only that page for `_page_response()`. `full_response` is unavailable on the list method family.
+
+List filters are named arguments sent as query parameters. Exceptions from HTTP or transport failures remain `HTTP::API::Core::Error` objects; their decoded Cloudflare body is available through `json()`. A successful HTTP status with `success: false` throws `Cloudflare::API::Error`, including while a paginator is fetching a later page. Input validation errors throw plain Perl exceptions. No resource write is automatically rolled back.
 
 # SEE ALSO #
 

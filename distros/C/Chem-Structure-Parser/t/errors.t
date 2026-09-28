@@ -26,6 +26,23 @@ throws_ok { structure_info('') } qr/no file name/, 'an empty file name dies';
 throws_ok { structure_info("$data/no.such.file.pdb") } qr/does not exist/,
 	'a file that is not there dies, and says which one';
 throws_ok { structure_info($data) } qr/is a directory/, 'a directory dies';
+{
+	# only gzip is unpacked; the other two suffixes the name rule strips used
+	# to be read as the compressed bytes and come back with no atoms at all
+	my $dir = tempdir(CLEANUP => 1);
+	for my $f ('mini.pdb.bz2', 'mini.pdb.Z', 'mini.cif.BZ2') {
+		open my $fh, '>:raw', "$dir/$f" or die $!;
+		print {$fh} "BZh91AY&SY";
+		close $fh or die $!;
+	}
+	throws_ok { structure_info("$dir/mini.pdb.bz2") }
+		qr/^structure_info: '[^']*mini\.pdb\.bz2' is compressed with bzip2, which this module does not unpack/,
+		'a .bz2 dies rather than coming back empty';
+	throws_ok { structure_info("$dir/mini.pdb.Z") } qr/is compressed with compress/,
+		'and so does a .Z';
+	throws_ok { structure_info("$dir/mini.cif.BZ2") } qr/is compressed with bzip2/,
+		'whatever case the suffix is in';
+}
 
 #--------
 # formats
@@ -235,6 +252,95 @@ SKIP: {
 			'and names that file as well';
 		chmod 0600, "$dir/locked.pdb.gz";
 	}
+}
+
+#--------
+# the interface's partners and options
+#--------
+{
+	my $info = structure_info("$data/iface.pdb");
+	throws_ok { structure_interface($info, partners => 'A') }
+		qr/^structure_interface: partners must be an array reference of two partners/,
+		'partners that are not a list die';
+	throws_ok { structure_interface($info, partners => [ 'A' ]) }
+		qr/partners must be an array reference of two partners/, 'and so does a list of one';
+	throws_ok { structure_interface($info, partners => [ 'A', 'B', 'A' ]) }
+		qr/partners must be an array reference of two partners/, 'or of three';
+	throws_ok { structure_interface($info, partners => [ [], ['B'] ]) }
+		qr/^structure_interface: partner 1 is empty/, 'an empty partner dies and says which';
+	throws_ok { structure_interface($info, partners => [ ['A'], [undef] ]) }
+		qr/^structure_interface: partner 2 names an undefined chain or ligand/,
+		'and so does one that names undef';
+	throws_ok { structure_interface($info, partners => [ ['A'], ['Q'] ]) }
+		qr/^structure_interface: partner 'Q' is neither a chain nor a ligand key; the chains are 'A', 'B'/,
+		'a name that is neither dies, and lists the chains';
+	throws_ok { structure_interface($info, partners => [ ['A'], [ 'B', 'A' ] ]) }
+		qr/^structure_interface: the two partners share residue \w+ A \d+/,
+		'two partners that overlap die, and name a residue they share';
+	throws_ok { structure_info("$data/iface.pdb", partners => [ ['A'], ['Q'] ]) }
+		qr/^structure_info: partner 'Q' is neither a chain nor a ligand key/,
+		'the same check runs for partners given to structure_info()';
+	# a chain of one zinc and nothing else: no polymer to be a partner
+	my $zn = sprintf('%-6s%5d %4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f          %2s%-2s',
+		'HETATM', 9999, 'ZN', '', ' ZN', 'Z', 1, '', 10, 10, 10, 1, 20, 'ZN', '');
+	open my $fh, '<', "$data/iface.pdb" or die "Can't open '$data/iface.pdb' with mode '<': '$!'";
+	my $text = join '', grep { !/^END/ } <$fh>;
+	close $fh or die "Can't close '$data/iface.pdb': '$!'";
+	my $withzn = structure_info_string("$text$zn\nEND\n");
+	throws_ok { structure_interface($withzn, partners => [ ['A'], ['Z'] ]) }
+		qr/^structure_interface: chain 'Z' has no amino acid or nucleotide in it; name what is in it by the keys structure_ligands\(\) gives/,
+		'a chain with no polymer in it dies, and says how to name what it holds';
+	lives_ok { structure_interface($withzn, partners => [ ['A'], ['ZN_Z_1'] ]) }
+		'which is by its ligand key';
+
+	for my $k (qw(interface_distance salt_bridge_distance polar_distance
+	              cation_pi_distance water_distance)) {
+		throws_ok { structure_interface($info, $k => 0) }
+			qr/^structure_interface: $k must be a positive number, not '0'/,
+			"$k => 0 dies";
+		throws_ok { structure_features($info, $k => 'far') }
+			qr/^structure_features: $k must be a positive number, not 'far'/,
+			"and $k => 'far' dies in structure_features() too";
+	}
+	throws_ok { structure_interface($info, nis_threshold => 1.5) }
+		qr/^structure_interface: nis_threshold must be a number between 0 and 1, not '1.5'/,
+		'a threshold above 1 dies';
+	throws_ok { structure_interface($info, temperature => -300) }
+		qr/^structure_interface: temperature must be a number of degrees Celsius above -273.15, not '-300'/,
+		'a temperature below absolute zero dies';
+	throws_ok { structure_interface($info, contact_distance => 4) }
+		qr/^structure_interface: unknown option 'contact_distance'; known options are: /,
+		'structure_contacts()\'s cutoff is not the interface\'s, and says so';
+	my $fold = structure_info("$data/fold.pdb");
+	throws_ok { structure_interface($fold) }
+		qr/^structure_interface: this structure has no two partners to split: name them with partners/,
+		'a structure of one chain has no interface to look up';
+	throws_ok { structure_interface($fold, interface_distance => 5) }
+		qr/^structure_interface: this structure has no two partners to split/,
+		'nor one to compute';
+	throws_ok { structure_interface({ chains => {} }) } qr/^structure_interface: /,
+		'a hash that is not a structure dies';
+
+	# The XS checks what the Perl has already ruled out, so these are reachable
+	# only through the internal entry point, and the message only has to be
+	# true.
+	my %o = (sasa => 0, interface => 1, probe => 1.4, points => 100,
+	         map { ($_ => 0) } qw(pi_stacking disulfides base_pairs base_stacks shape
+	                              dihedrals contacts exposure hbonds secondary store));
+	my $A = [ map { $info->{chains}{A}{residues}{$_} } @{ $info->{chains}{A}{residue_order} } ];
+	my $B = [ map { $info->{chains}{B}{residues}{$_} } @{ $info->{chains}{B}{residue_order} } ];
+	throws_ok { Chem::Structure::Parser::_features($info, { %o, sides => [ $A, 'B' ] }, 'x') }
+		qr/^x: sides must be two array references/, 'XS: a side that is not a list';
+	throws_ok { Chem::Structure::Parser::_features($info, { %o, sides => [ $A, [ 'B' ] ] }, 'x') }
+		qr/^x: partner 2 holds something that is not a residue/, 'XS: a side of strings';
+	throws_ok { Chem::Structure::Parser::_features($info, { %o, sides => [ $A, [ {} ] ] }, 'x') }
+		qr/^x: partner 2 holds a residue that is not in this structure/,
+		'XS: a residue from somewhere else';
+	throws_ok { Chem::Structure::Parser::_features($info, { %o, sides => [ $A, $A ] }, 'x') }
+		qr/^x: a residue is in both partners/, 'XS: a residue on both sides';
+	throws_ok { Chem::Structure::Parser::_features($info,
+	                { %o, sides => [ $A, $B ], water_distance => -1 }, 'x') }
+		qr/^x: the interface distances must be positive numbers/, 'XS: a negative distance';
 }
 
 done_testing();

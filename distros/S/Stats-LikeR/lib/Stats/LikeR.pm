@@ -1,17 +1,54 @@
 #!/usr/bin/env perl
 # ABSTRACT: Get basic statistical functions, like in R, but with Perl using XS for performance
-require 5.010;
+require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = 0.3151;
+our $VERSION = '0.3211';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
-use autodie ':default';
 use warnings FATAL => 'all';
 use Exporter 'import';
 use Scalar::Util qw(reftype looks_like_number);
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc avals bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort density bw_nrd0 bw_nrd bw_ucv bw_bcv bw_sj dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test kurtosis Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm pt qt pchisq qchisq pf qf pbinom qnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test skew smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table);
+our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc avals bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort density bw_nrd0 bw_nrd bw_ucv bw_bcv bw_sj dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test kurtosis Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm pt qt pchisq qchisq pf qf pbinom qnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test skew smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table zerotrunc hurdle svyglm ivreg lmer);
 our @EXPORT = @EXPORT_OK;
+
+# File operations: failure reporting
+#
+# Before 0.316 this file ran under `use autodie ':default';', which replaced
+# open() and close() with versions that threw an autodie::exception the moment
+# either failed.  0.316 drops the dependency; _open_read() and _close() take its
+# place, raising the same failure at the same points with the same text, so a
+# caller's eval sees the message it has always seen.  The one visible difference
+# is that $@ is now a plain string rather than an autodie::exception object,
+# which nothing in the module, the tests or the documentation ever inspected.
+#
+# The wording is autodie::exception 2.37's: _format_open() (through
+# _FORMAT_OPEN and _format_open_with_mode()) for the open, _format_close() for
+# the close, each followed by add_file_and_line().  That last method is where the
+# trailing newline comes from, and it is also what stops perl appending a second,
+# differently punctuated " at ... line ..." of its own.
+
+# autodie reported the caller's file and line, not its own, so build the message
+# one frame up.
+sub _io_die {
+	my ($msg) = @_;
+	my (undef, $file, $line) = caller(1);
+	die sprintf("%s at %s line %d\n", $msg, $file, $line);
+}
+
+sub _open_read {
+	my ($file) = @_;
+	my $fh;
+	open $fh, '<', $file
+		or _io_die("Can't open '$file' for reading: '$!'");
+	return $fh;
+}
+
+sub _close {
+	my ($fh) = @_;
+	close $fh or _io_die("Can't close($fh) filehandle: '$!'");
+	return;
+}
 
 # Help
 #
@@ -213,7 +250,7 @@ sub _pod_topics {
 		# helper, comes out as I<rename>inplace)
 		push @t, $n if length($n) && grep { $_ eq $n } @EXPORT_OK;
 	}
-	close $fh;
+	_close($fh);
 	return @t;
 }
 
@@ -291,9 +328,7 @@ sub _pod_open {
 	my $file = defined($POD_FILE) ? $POD_FILE : __FILE__;
 	$file = $INC{'Stats/LikeR.pm'} unless defined($file) && -r $file;
 	return undef unless defined($file) && -r $file;
-	my $fh;
-	open $fh, '<', $file or return undef;
-	return $fh;
+	return _open_read($file);
 }
 
 # Reduce a heading or a function name to a comparison key.  Dropping every
@@ -333,7 +368,7 @@ sub _pod_section {
 		last if $in && $line =~ /^=cut\s*$/;
 		push @out, $line if $in;
 	}
-	close $fh;
+	_close($fh);
 	return @out;
 }
 
@@ -753,11 +788,21 @@ sub colnames {
 	} elsif ($shape eq 'HoA') {                  # keys ARE the columns
 		@cols = sort keys %$df;
 	} else {                                     # AoH / HoH: union of row keys
-		my @rows = $shape eq 'AoH' ? @$df : values %$df;
+		# `for my $row (@$df)` walks the array in place; `my @rows = @$df`
+		# flattens a copy of every row reference in the frame first, which on a
+		# million-row AoH is eight megabytes of list that is read once and
+		# thrown away.  Two loops, no copy.
 		my %seen;
-		for my $row (@rows) {
-			next unless ref $row eq 'HASH';
-			$seen{$_} = 1 for keys %$row;
+		if ($shape eq 'AoH') {
+			for my $row (@$df) {
+				next unless ref $row eq 'HASH';
+				$seen{$_} = 1 for keys %$row;
+			}
+		} else {
+			for my $row (values %$df) {
+				next unless ref $row eq 'HASH';
+				$seen{$_} = 1 for keys %$row;
+			}
 		}
 		@cols = sort keys %seen;
 	}
@@ -874,9 +919,12 @@ sub _aoa_int_cols { # validate integer positions in range
 
 sub _present_keys { # union of keys over AoH/HoH rows
 	my ($df, $shape) = @_;
-	my @rows = $shape eq 'AoH' ? @$df : values %$df;
-	my %seen;
-	for my $r (@rows) { next unless ref $r eq 'HASH'; $seen{$_} = 1 for keys %$r }
+	my %seen;                                   # no whole-frame list copy: see colnames
+	if ($shape eq 'AoH') {
+		for my $r (@$df)        { next unless ref $r eq 'HASH'; $seen{$_} = 1 for keys %$r }
+	} else {
+		for my $r (values %$df) { next unless ref $r eq 'HASH'; $seen{$_} = 1 for keys %$r }
+	}
 	return \%seen;
 }
 
@@ -891,16 +939,18 @@ sub _rename_inplace { # VOID-context rename: mutate the source
 		$df->{$_} = $vals{$_} for keys %vals;
 		return;
 	}
-	my @rows = $shape eq 'AoH' ? @$df : values %$df;    # AoH / HoH row hashes
-	for my $row (@rows) {
-		next unless ref $row eq 'HASH';
+	my $one = sub {                                 # AoH / HoH row hashes
+		my ($row) = @_;
+		return unless ref $row eq 'HASH';
 		my %vals;                                   # gather-then-set = swap-safe
 		for my $o (keys %$map) {
 			next unless exists $row->{$o};
 			$vals{ $map->{$o} } = delete $row->{$o};
 		}
 		$row->{$_} = $vals{$_} for keys %vals;
-	}
+	};
+	if ($shape eq 'AoH') { $one->($_) for @$df }        # no list copy: see colnames
+	else                 { $one->($_) for values %$df }
 	return;
 }
 
@@ -1665,11 +1715,17 @@ sub assign {
 				# snapshot current columns once (refs, not data)
 				my @keys = keys %$df;
 				my @col  = map { my $c = $df->{$_}; ref $c eq 'ARRAY' ? $c : undef } @keys;
+				# One hash slice rather than a keyed store per column: the view
+				# still has to be a fresh hash every row (the block may keep
+				# it, unlike the map_cell path above, which documents that it
+				# may not), but filling it need not be a loop of single-key
+				# assignments.
 				my $view_for = sub {
 					my $i = shift;
 					my %view;
-					$view{ $keys[$_] } = defined $col[$_] ? $col[$_][$i] : $df->{ $keys[$_] }
-						for 0 .. $#keys;
+					@view{ @keys } =
+						map { defined $col[$_] ? $col[$_][$i] : $df->{ $keys[$_] } }
+						0 .. $#keys;
 					return \%view;
 				};
 
@@ -2581,65 +2637,203 @@ sub summary {
 # serial numbers (no style-based formatting); shared-string rich-text runs are
 # concatenated.
 
-# Return the decompressed bytes of a named archive member, or undef if absent.
+# The decompressed bytes of a named archive member as a SCALAR REFERENCE, or
+# undef if the member is absent.
+#
+# The reference is the point.  Returning the string itself costs a full copy of
+# it -- perl cannot hand back the pad slot of a lexical, so `return $content'
+# copies, and on the 36 MB worksheet part of a 21,845 x 50 workbook that was
+# 34 MB of peak RSS for nothing: 82.4 MB against 48.5 MB for the reference, and
+# 81 MB still resident afterwards against 13 MB, the difference being heap the
+# allocator never gave back.  Every caller dereferences; `$$ws' on an argument
+# list pushes the SV itself, so the part reaches the XS parser without a copy
+# either.
+#
+# _unzip_member_fast() handles the archives Excel, LibreOffice and openpyxl
+# actually write; the loop below is the fallback for everything else, and is
+# what every member went through up to 0.316.
+#
+# The read appends onto the end of $content rather than going through a second
+# scalar: IO::Uncompress::Base::read() turns its truncating substr() into a
+# no-op when the offset is already the buffer's length, so the string is
+# extended in place instead of being copied by a concatenation. On the 36 MB
+# worksheet part of a 21,845 x 50 workbook that is 0.171 s against 0.243 s for
+# `$content .= $buf`, over three runs each in a fresh process, and it leaves
+# behind none of the ~25 MB of realloc slack the concatenation did.
+# Do NOT reach for BlockSize => 1<<20 instead: measured at 0.262 s on the same
+# part against 0.174 s for the default. (The 2.08 s this comment used to quote
+# does not reproduce here, but its conclusion does.)
 sub _unzip_member {
 	my ($file, $member) = @_;
+	my ($handled, $ref) = _unzip_member_fast($file, $member);
+	return $ref if $handled;
 	require IO::Uncompress::Unzip;
 	my $z = IO::Uncompress::Unzip->new($file, Name => $member)
 		or return undef;
 	my $content = '';
-	my $buf;
-	while ((my $n = $z->read($buf)) > 0) { $content .= $buf }
+	my ($off, $n) = (0, 0);
+	while (($n = $z->read($content, 1 << 20, $off)) > 0) { $off += $n }
 	$z->close;
-	return $content;
+	return \$content;
 }
 
-# Decode the five predefined XML entities plus numeric character references.
-# Numeric refs are re-encoded to UTF-8 bytes so the result stays byte-consistent
-# with the rest of the file (which we read, and return, as raw UTF-8 bytes).
+# The same member, read straight out of the archive with Compress::Raw::Zlib
+# instead of through IO::Uncompress::Unzip.
+#
+# Returns a two-element list: (1, \$bytes) for a member it read, (1, undef) for
+# an archive it understood that does not hold the member, and (0, undef) for
+# anything it declines -- at which point _unzip_member falls back and the old
+# path decides. Declining is never an error: this reads the central directory
+# and one deflate stream and nothing else, and hands everything beyond that to
+# the module that has been ported to all of it.
+#
+# Why bother: with the worksheet parser in XS since 0.316, decompression is what
+# a read of an .xlsx now spends its time on -- 0.239 s of the 0.413 s a
+# 21,845 x 50 workbook takes, against 0.015 s to parse its 117,870 shared
+# strings. IO::Uncompress::Unzip needs 0.174 s for the 36 MB worksheet part
+# where inflating it directly needs 0.052 s, plus 0.004 s to read the 5.5 MB of
+# compressed bytes.
+#
+# Most of that gap is one thing. Unzip.pm's ckParams() sets `crc32 => 1'
+# unconditionally ("unzip always needs crc32"), so every byte is run through
+# Compress::Raw::Zlib::crc32() -- 0.076 s on this part, more than the inflate
+# itself -- and then the comparison against the stored CRC happens only under
+# `Strict', which defaults to 0. The check is paid for and not made. This path
+# does not compute it either, which is the same answer for the same money;
+# asking Inflate for -CRC32 => 1 costs the identical 0.076 s (it is the same
+# per-chunk call), so turning it on here would want `Strict'-like behaviour --
+# a croak on mismatch -- to be worth anything, and that is a change in what
+# read_table does with a damaged file rather than a speed decision.
+#
+# Bufsize 1<<16: 0.052 s against 0.063 s at the 4 KB default on that part, and
+# flat from there (1<<18 through 1<<22 all measure 0.052 s).
+#
+# Layout constants are ECMA-376's container, i.e. PKWARE's APPNOTE.TXT 6.3.10:
+# section 4.3.16 for the end-of-central-directory record, 4.3.12 for a central
+# directory entry, 4.3.7 for a local file header.
+sub _unzip_member_fast {
+	my ($file, $member) = @_;
+	require Compress::Raw::Zlib;
+	my $fh;
+	open $fh, '<', $file or return (0, undef);
+	binmode $fh;
+	my $size = -s $fh;
+	return (0, undef) unless defined $size && $size >= 22;
+
+	# The EOCD is 22 bytes plus a comment of up to 65535, so it begins no
+	# earlier than 65557 from the end. Its signature can also occur inside the
+	# comment (or inside compressed data, for an archive with no comment), so
+	# a candidate counts only when the record it starts ends exactly at the end
+	# of the file.
+	my $want = $size < 65557 ? $size : 65557;
+	seek $fh, $size - $want, 0 or return (0, undef);
+	my $tail = '';
+	return (0, undef) unless read($fh, $tail, $want) == $want;
+	my ($ncd, $cdsz, $cdoff);
+	my $at = length($tail) - 22;
+	while ($at >= 0) {
+		$at = rindex($tail, "PK\5\6", $at);
+		last if $at < 0;
+		my ($d1, $d2, $nd, $nt, $sz, $off, $cmt)
+			= unpack('x' . ($at + 4) . ' v v v v V V v', $tail);
+		if ($at + 22 + $cmt == length $tail) {
+			# a split archive has its directory somewhere this cannot reach
+			return (0, undef) if $d1 || $d2 || $nd != $nt;
+			# the zip64 sentinels: the real values are in a record this does
+			# not read, so hand the whole archive back
+			return (0, undef)
+				if $nt == 0xFFFF || $sz == 0xFFFFFFFF || $off == 0xFFFFFFFF;
+			($ncd, $cdsz, $cdoff) = ($nt, $sz, $off);
+			last;
+		}
+		$at--;
+	}
+	return (0, undef) unless defined $cdoff;
+	return (0, undef) if $cdoff + $cdsz > $size;
+	seek $fh, $cdoff, 0 or return (0, undef);
+	my $cd = '';
+	return (0, undef) unless read($fh, $cd, $cdsz) == $cdsz;
+
+	# Walk the directory to the member. Entries are in the order the local
+	# headers are, so stopping at the first match is what Unzip.pm's own
+	# sequential scan would have found.
+	my ($gp, $method, $csz, $usz, $lho);
+	my $p = 0;
+	for (my $i = 0; $i < $ncd; $i++) {
+		return (0, undef) if $p + 46 > $cdsz;
+		return (0, undef) unless substr($cd, $p, 4) eq "PK\1\2";
+		my ($g, $m, $cs, $us, $nl, $el, $cl, $lo)
+			= unpack('x' . ($p + 8) . ' v v x8 V V v v v x8 V', $cd);
+		return (0, undef) if $p + 46 + $nl + $el + $cl > $cdsz;
+		if (substr($cd, $p + 46, $nl) eq $member) {
+			($gp, $method, $csz, $usz, $lho) = ($g, $m, $cs, $us, $lo);
+			last;
+		}
+		$p += 46 + $nl + $el + $cl;
+	}
+	return (1, undef) unless defined $lho;	# the archive has no such member
+
+	# bit 0 is encryption and bit 6 strong encryption; bit 3 only moves the
+	# sizes into a trailing descriptor, and the directory's copies (which is
+	# what is read here) are authoritative either way.
+	return (0, undef) if $gp & 0x41;
+	return (0, undef) if $method != 0 && $method != 8;	# 0 stored, 8 deflate
+	return (0, undef) if $csz == 0xFFFFFFFF || $usz == 0xFFFFFFFF
+	                  || $lho == 0xFFFFFFFF;		# zip64 again
+	return (0, undef) if $lho + 30 > $size;
+
+	# The local header repeats the name and carries its own extra field, which
+	# need not be the directory's: only its two lengths are read here, to step
+	# over them to the data.
+	seek $fh, $lho, 0 or return (0, undef);
+	my $lh = '';
+	return (0, undef) unless read($fh, $lh, 30) == 30;
+	return (0, undef) unless substr($lh, 0, 4) eq "PK\3\4";
+	my ($lnl, $lel) = unpack('x26 v v', $lh);
+	my $data = $lho + 30 + $lnl + $lel;
+	return (0, undef) if $data + $csz > $size;
+	seek $fh, $data, 0 or return (0, undef);
+	my $comp = '';
+	return (0, undef) unless read($fh, $comp, $csz) == $csz;
+	close $fh or return (0, undef);
+
+	if ($method == 0) {
+		return (0, undef) unless length($comp) == $usz;
+		return (1, \$comp);
+	}
+	my ($inf, $st) = Compress::Raw::Zlib::Inflate->new(
+		-WindowBits => -Compress::Raw::Zlib::MAX_WBITS(),
+		-Bufsize    => 1 << 16);
+	return (0, undef) unless $inf;
+	my $out = '';
+	# inflate() eats $comp as it goes, so the two are never both whole
+	$st = $inf->inflate($comp, $out);
+	return (0, undef) unless $st == Compress::Raw::Zlib::Z_STREAM_END()
+	                      || $st == Compress::Raw::Zlib::Z_OK();
+	return (0, undef) unless length($out) == $usz;
+	return (1, \$out);
+}
+
+# Decode the five predefined XML entities plus numeric character references,
+# the latter as UTF-8 bytes so the result stays byte-consistent with the rest of
+# the file (which we read, and return, as raw UTF-8 bytes). The decoding is
+# xlsx_xml_uncat() in LikeR.xs, the one the cells go through: up to 0.320 this
+# was five substitutions in a row, and a reference the first one produced was
+# decoded again by a later one, so "&#38;lt;" came back as "<".
 sub _xml_unescape {
 	my ($s) = @_;
 	return $s unless defined $s && index($s, '&') >= 0;
-	$s =~ s/&#x([0-9a-fA-F]+);/my $c = chr hex $1; utf8::encode($c); $c/ge;
-	$s =~ s/&#([0-9]+);/my $c = chr $1; utf8::encode($c); $c/ge;
-	$s =~ s/&lt;/</g;
-	$s =~ s/&gt;/>/g;
-	$s =~ s/&quot;/"/g;
-	$s =~ s/&apos;/'/g;
-	$s =~ s/&amp;/&/g;	# must be last so "&amp;lt;" -> "&lt;", not "<"
-	return $s;
-}
-
-# "AB12" (or "AB") -> 0-based column index (A=0, Z=25, AA=26, ...).
-# Hot path (called once per cell): walk the leading letters by ordinal and stop
-# at the first non-letter (the row number), avoiding a regex substitution and a
-# split // on every call.
-sub _xlsx_col_idx {
-	my ($ref) = @_;
-	my $idx = 0;
-	for my $i (0 .. length($ref) - 1) {
-		my $o = ord(substr($ref, $i, 1));
-		if    ($o >= 65 && $o <=  90) { $idx = $idx * 26 + ($o - 64) }	# A-Z
-		elsif ($o >= 97 && $o <= 122) { $idx = $idx * 26 + ($o - 96) }	# a-z
-		else  { last }							# reached the digits
-	}
-	return $idx - 1;
+	return _xml_unescape_xs($s);
 }
 
 # Shared strings (optional part): each <si> may hold several <t> runs, which
-# are concatenated. Returns an arrayref indexed by shared-string id.
+# are concatenated. Returns an arrayref indexed by shared-string id. The parse
+# is xlsx_sst_parse() in LikeR.xs; the two nested regexes it replaces cost
+# 0.205 s on an 8 MB table of 117,870 strings.
 sub _xlsx_shared_strings {
 	my ($file) = @_;
-	my @sst;
-	if (defined(my $ss = _unzip_member($file, 'xl/sharedStrings.xml'))) {
-		while ($ss =~ m{<si\b[^>]*>(.*?)</si>}gs) {
-			my $si  = $1;
-			my $str = '';
-			$str .= _xml_unescape($1) while $si =~ m{<t\b[^>]*>(.*?)</t>}gs;
-			push @sst, $str;
-		}
-	}
-	return \@sst;
+	my $ss = _unzip_member($file, 'xl/sharedStrings.xml');
+	return defined $ss ? _xlsx_sst_xs($$ss) : [];
 }
 
 # The workbook's worksheets, in document order, as a list of
@@ -2650,7 +2844,7 @@ sub _xlsx_sheets {
 	my ($file) = @_;
 	my %target;
 	if (defined(my $rels = _unzip_member($file, 'xl/_rels/workbook.xml.rels'))) {
-		while ($rels =~ m{<Relationship\b([^>]*?)/?>}gs) {
+		while ($$rels =~ m{<Relationship\b([^>]*?)/?>}gs) {
 			my $a = $1;
 			my ($id) = $a =~ /\bId="([^"]*)"/;
 			my ($tg) = $a =~ /\bTarget="([^"]*)"/;
@@ -2659,7 +2853,7 @@ sub _xlsx_sheets {
 	}
 	my @sheets;
 	if (defined(my $wb = _unzip_member($file, 'xl/workbook.xml'))) {
-		while ($wb =~ m{<sheet\b([^>]*?)/?>}gs) {
+		while ($$wb =~ m{<sheet\b([^>]*?)/?>}gs) {
 			my $a = $1;
 			my ($name) = $a =~ /\bname="([^"]*)"/;
 			my ($rid)  = $a =~ /\br:id="([^"]*)"/;
@@ -2701,86 +2895,126 @@ sub _xlsx_choose_sheet {
 
 # Parse one worksheet, invoking $callback->(\@fields) once per non-empty row
 # (header row included) with all rows padded to the same width -- the same
-# contract _parse_csv_file offers read_table's callback. $sst is the shared
-# strings arrayref from _xlsx_shared_strings.
+# contract _parse_csv_file offers read_table's callback, and the same $plan
+# fast path: once read_table has filled the plan in, the rows are assembled in
+# XS and the callback is not called again. $sst is the shared strings arrayref
+# from _xlsx_shared_strings.
+#
+# The part is decompressed here and parsed by xlsx_ws_scan() in LikeR.xs, which
+# is also where the reason it is not done in perl any more is written down.
 sub _parse_xlsx_sheet {
-	my ($file, $sst, $path, $callback) = @_;
+	my ($file, $sst, $path, $callback, $plan) = @_;
 	my $ws = _unzip_member($file, $path);
 	die "read_table: could not read worksheet '$path' in $file\n"
 		unless defined $ws;
-
-	# collect cells, positioning each by its column reference so gaps stay
-	# aligned, then pad every row to the widest row seen.
-	my @rows;
-	my $global_max = -1;
-	while ($ws =~ m{<row\b[^>]*>(.*?)</row>}gs) {
-		my $rowxml = $1;
-		my @cells;
-		my $maxc = -1;
-		# The r="A1" reference is almost always the first attribute, so the
-		# tokenizer captures its column letters ($1) directly -- computing the
-		# index from a group the match already produced is the single biggest
-		# win in this loop. If the capture misses (r= absent, not first, or a
-		# non-standard lowercase ref), $cattrs still holds the full attributes
-		# and we parse r= from there; only then do we fall back to sequential.
-		while ($rowxml =~ m{<c(?:\s+r="([A-Z]+)\d+")?([^>]*?)(?:/>|>(.*?)</c>)}gs) {
-			my ($ref, $cattrs, $cbody) = ($1, $2, $3);
-			my $ci;
-			if (defined $ref) {
-				$ci = 0;
-				$ci = $ci * 26 + (ord(substr($ref, $_, 1)) - 64)
-					for 0 .. length($ref) - 1;
-				$ci--;
-			} elsif ($cattrs =~ /\br="([A-Za-z]+)/) {
-				$ci = _xlsx_col_idx($1);
-			} else {
-				$ci = $maxc + 1;
-			}
-			# Cell type: a plain substring test on the (short) attribute run is
-			# markedly cheaper than a capturing /\bt="..."/ match run once per
-			# cell. Only "s" and "inlineStr" denote strings; every other type
-			# value (str/b/e/n) and a missing t= take the raw <v> path, exactly
-			# as the previous /\bt="..."/ dispatch did. Cell-element attribute
-			# names are a fixed set (r,s,t,cm,vm,ph) whose other values are
-			# numeric refs, so 't="s"' / 't="inlineStr"' can only ever appear as
-			# the genuine type attribute -- no false substring match is possible.
-			my $val = '';
-			if (defined $cbody) {
-				if (index($cattrs, 't="s"') >= 0) {		# shared-string index
-					# Almost every string cell body is exactly <v>DIGITS</v>; an
-					# anchored match reads it in one step, falling back to the
-					# general <v ...> scan only for the rare attributed <v>.
-					my $v = ($cbody =~ m{\A<v>([^<]*)</v>\z})
-						? $1 : ($cbody =~ m{<v\b[^>]*>(.*?)</v>}s)[0];
-					$val = (defined $v && $v =~ /^\d+\z/) ? ($sst->[$v] // '') : '';
-				} elsif (index($cattrs, 't="inlineStr"') >= 0) {
-					$val .= _xml_unescape($1) while $cbody =~ m{<t\b[^>]*>(.*?)</t>}gs;
-				} else {			# number / formula str / bool / error
-					my $v = ($cbody =~ m{\A<v>([^<]*)</v>\z})
-						? $1 : ($cbody =~ m{<v\b[^>]*>(.*?)</v>}s)[0];
-					$val = defined $v ? _xml_unescape($v) : '';
-				}
-			}
-			$cells[$ci] = $val;
-			$maxc = $ci if $ci > $maxc;
-		}
-		push @rows, \@cells;
-		$global_max = $maxc if $maxc > $global_max;
-	}
-	undef $ws;	# free the (potentially large) worksheet XML before emitting
-
-	# Emit each row padded to the widest row seen, consuming @rows as we go
-	# (shift, not foreach) so the parsed AoA and the caller's growing structure
-	# never both sit fully in memory at once. Pad and fill holes in place -- the
-	# callback reads by index and never retains the ref -- so this is a light
-	# touch, not a second full copy.
-	while (my $cells = shift @rows) {
-		$#$cells = $global_max;			# extend to the common width
-		$_ //= '' for @$cells;			# fill gaps + padding in place
-		next unless grep { length } @$cells;	# skip fully blank rows, as CSV does
-		$callback->($cells);
-	}
+	_parse_xlsx_sheet_xs($$ws, $sst, $callback, $plan);
 	return;
+}
+
+# True when a sep regex is pandas' whitespace-delimited spelling. pandas reads
+# sep=r"\s+" as delim_whitespace, not as a plain re.split(): leading and
+# trailing whitespace on a line make no empty field (pandas 3.0.4,
+# tests/io/parser/common/test_common_basic.py, test_ignore_leading_whitespace
+# and test_whitespace_regex_separator). R's read.table(sep = "") and Perl's own
+# split ' ' treat whitespace the same way. Only the pattern text counts, so
+# qr/\s+/x qualifies and qr/[ \t]+/ does not.
+sub _sep_re_is_ws {
+	my ($re) = @_;
+	my ($pat) = re::regexp_pattern($re);
+	return defined $pat && $pat eq '\s+';
+}
+
+# Cut one line on a sep regex with no quote handling, as split() would but
+# with capture groups in the pattern left out of the fields. read_table uses
+# it only for a commented-out header, which the parser has already dropped as
+# a comment; every other line is cut in C by _parse_csv_file(). The pattern is
+# matched as it was written rather than wrapped in a capture of its own, which
+# would renumber its groups and turn a \1 in it into a reference to the whole
+# separator. An empty match where a field starts -- the start of the line, or
+# right after a separator -- is passed over, as split() and the C parser pass
+# it over; any other returns an empty list. With $ws (see _sep_re_is_ws),
+# leading and trailing whitespace make no field.
+sub _sep_re_cut {
+	my ($str, $sep, $ws) = @_;
+	$str =~ s/\A\s+// if $ws;
+	my @f;
+	my $from = 0;	# where the field being cut starts
+	pos($str) = 0;
+	while ($str =~ /$sep/g) {
+		my ($s, $e) = ($-[0], $+[0]);
+		if ($s == $e) {
+			return if $s > $from;
+			pos($str) = $s + 1;	# empty where a field starts: not a cut
+			next;
+		}
+		push @f, substr $str, $from, $s - $from;
+		$from = $e;
+	}
+	push @f, substr $str, $from;
+	pop @f if $ws && @f > 1 && $f[-1] eq '';
+	return @f;
+}
+
+# Compressed input for read_table
+#
+# A gzip or bzip2 file is recognised by its first bytes, not its name, the way
+# R's file() recognises one for read.table: do_url() in src/main/connections.c
+# calls comp_type_from_memory() on the first bytes of a file opened "r" or
+# "rt" (R-devel 4.7.0, r-source commit b3c233dd). pandas' compression='infer'
+# goes by the extension instead; sniffing reads every file pandas would, and a
+# compressed one that has lost its suffix too.
+#
+# The magic numbers are that function's:
+#   gzip   1f 8b, RFC 1952 section 2.3.1's ID1 and ID2. A method other than
+#          deflate after them is reported by zlib as corrupt data, as R's
+#          gzio.h check_header() refuses it.
+#   bzip2  "BZh" and a block size of '1'..'9', then the 48-bit magic of either
+#          the first block (0x314159265359, BCD pi) or the end-of-stream
+#          marker (0x177245385090, BCD sqrt(pi)), which is all an empty stream
+#          holds -- bzip2 1.0.8 compress.c, BZ_HDR_h/BZ_HDR_0 and the
+#          bsPutUChar() runs. R added the last six bytes in PR#18768, after a
+#          text file that began "BZh" was taken for bzip2.
+# Neither is how text begins: 0x1f is a control character, 0x8b is not ASCII
+# and cannot start a UTF-8 sequence, and the bzip2 test runs to ten bytes.
+sub _sniff_compression {
+	my ($file) = @_;
+	open my $fh, '<', $file or return '';	# read_table's own open reports it
+	binmode $fh;
+	my $got = read $fh, my $head, 10;
+	close $fh;
+	return '' unless $got;
+	return 'gzip' if $head =~ /\A\x1f\x8b/;
+	return 'bzip2'
+		if $head =~ /\ABZh[1-9](?:\x31\x41\x59\x26\x53\x59|\x17\x72\x45\x38\x50\x90)/;
+	return '';
+}
+
+# An input handle on the decompressed text of $file, streamed through the
+# PerlIO::via layer below, so a multi-gigabyte .tsv.gz is inflated a buffer
+# at a time as the parser reads it rather than into memory first. Both halves
+# are core: PerlIO::via since 5.8, Compress::Raw::Zlib since 5.9.4 and
+# Compress::Raw::Bzip2 since 5.10.1, the oldest perl this supports. The bzip2
+# one is still loaded only when a bzip2 file is read, and its absence reported
+# as what it is: some vendors' perls ship core modules as separate packages.
+sub _open_decompressed {
+	my ($file, $codec) = @_;
+	require PerlIO::via;
+	my $layer;
+	if ($codec eq 'gzip') {
+		require Compress::Raw::Zlib;
+		$layer = 'Stats::LikeR::_Gunzip';
+	} else {
+		eval { require Compress::Raw::Bzip2; 1 }
+			or die "read_table: \"$file\" is bzip2-compressed, and reading it "
+			     . "needs Compress::Raw::Bzip2, which is not installed\n";
+		$layer = 'Stats::LikeR::_Bunzip2';
+	}
+	# PUSHED is given no file name, so it reads this one while the open runs.
+	local $Stats::LikeR::_Decompress::name = $file;
+	my $fh;
+	open $fh, "<:raw:via($layer)", $file
+		or _io_die("Can't open '$file' for reading: '$!'");
+	return $fh;
 }
 
 sub read_table {
@@ -2810,14 +3044,18 @@ sub read_table {
 	}
 
 	my $is_xlsx = $file =~ /\.xlsx\z/i;
-	my $default_sep = $file =~ /\.tsv$/i ? "\t" : ',';
+	my $codec   = $is_xlsx ? '' : _sniff_compression($file);
+	# The extension only picks the default sep, and a compressed file's is
+	# that of the text inside it: x.tsv.gz is tab-separated.
+	(my $sep_name = $file) =~ s/\.(?:gz|bgz|bz2)\z//i if $codec;
+	my $default_sep = ($codec ? $sep_name : $file) =~ /\.tsv$/i ? "\t" : ',';
 	my %args = (
 		sep => $default_sep, comment => '#', %input_args,
 	);
 
 	my %allowed_args = map { $_ => 1 } (
 		'comment', 'output.type', 'filter', 'row.names', 'sep',
-		'auto.row.names', 'sheet', 'na.strings',
+		'auto.row.names', 'sheet', 'na.strings', 'header', 'col.names', 'quote',
 		# private, undocumented: the multi-sheet expansion passes an already
 		# parsed worksheet list / shared-string table to each per-sheet recursion
 		# so a big sharedStrings.xml is not re-decompressed once per worksheet.
@@ -2829,8 +3067,59 @@ sub read_table {
 		die "the args \"@undef_args\" aren't defined for $current_sub\n";
 	}
 	my $otype = $args{'output.type'} // 'aoh';
-	die "read_table: output.type \"$otype\" isn't allowed (aoh, hoa, hoh)\n"
-		unless $otype =~ m/^(?:aoh|hoa|hoh)$/;
+	die "read_table: output.type \"$otype\" isn't allowed (aoa, aoh, hoa, hoh)\n"
+		unless $otype =~ m/^(?:aoa|aoh|hoa|hoh)$/;
+	# An aoa is positional: its first row is the header and nothing labels a
+	# row, so a row.names column would only be a column like any other.
+	die "read_table: 'row.names' has no meaning for output.type \"aoa\"; "
+	  . "the row names column is read as an ordinary column\n"
+		if $otype eq 'aoa' && defined $args{'row.names'};
+	# A qr// separator is found by perl's regex engine; any other sep is
+	# a literal string, as it has always been. A regex is not looked at for an
+	# .xlsx, where a literal sep is not either.
+	if (ref $args{sep} && ref $args{sep} ne 'Regexp') {
+		die "read_table: 'sep' must be a string or a qr// regex, not a "
+		  . ref($args{sep}) . " reference\n";
+	}
+	my $sep_re = (ref $args{sep} && !$is_xlsx) ? $args{sep} : undef;
+	# Refused before the file is read, so that qr/\s*/ fails the same way
+	# whatever the file holds. A pattern that matches nothing but an empty
+	# string -- a bare lookahead, say -- passes this, and is refused where it
+	# first matches one anywhere but at the start of a line.
+	die "read_table: the sep regex $sep_re matches an empty string; it must "
+	  . "match at least one character\n"
+		if $sep_re && '' =~ /\A(?:$sep_re)\z/;
+	# header => 0 is R's header = FALSE and pandas' header=None: the first line
+	# is data, and the columns are named by 'col.names' or, as R names them,
+	# V1, V2, ... 'col.names' with a header renames its columns, as in R.
+	# '' is allowed as well as 0, since that is what perl's own false is:
+	# header => ($n > 0) must not be refused when it is false.
+	my $want_header = 1;
+	if (exists $args{header}) {
+		die "read_table: 'header' must be 0 or 1\n"
+			unless defined $args{header} && !ref $args{header}
+				&& $args{header} =~ /\A[01]?\z/;
+		$want_header = $args{header} ? 1 : 0;
+	}
+	my $col_names = $args{'col.names'};
+	if (defined $col_names) {
+		die "read_table: 'col.names' must be an ARRAY reference of names\n"
+			unless ref $col_names eq 'ARRAY' && @$col_names;
+		for my $n (@$col_names) {
+			die "read_table: 'col.names' may only hold defined, plain strings\n"
+				if !defined $n || ref $n;
+		}
+	}
+	# quote => '' is R's quote = "" and pandas' quoting=QUOTE_NONE: '"' is
+	# ordinary text. Only '"' can quote, so it is the only other value; R's
+	# read.table would also take "'", which neither parser here knows.
+	my $quote = 1;
+	if (exists $args{quote}) {
+		die "read_table: 'quote' must be '\"' (the default) or '' (no quoting)\n"
+			unless defined $args{quote} && !ref $args{quote}
+				&& ($args{quote} eq '' || $args{quote} eq '"');
+		$quote = $args{quote} eq '"' ? 1 : 0;
+	}
 
 	# A multi-worksheet .xlsx with no explicit 'sheet' is returned as a hash
 	# keyed by worksheet name, each value being that sheet parsed with the same
@@ -2870,6 +3159,7 @@ sub read_table {
 # as an (otherwise unlabelled) row-names column. Any truthy value enables
 # it; a non-1 string is used as the synthesized column name.
 	my $want_auto_rn = $args{'auto.row.names'} ? 1 : 0;
+	my $auto_rn_added = 0;	# the row-names column was put in front of @header
 	my $auto_rn_name =
 		($want_auto_rn && "$args{'auto.row.names'}" ne '1')
 			? $args{'auto.row.names'} : 'row_name';
@@ -2922,16 +3212,19 @@ sub read_table {
 # read_table's wall clock -- on a 300,000 x 5 CSV, 0.42 s of 0.53 s -- doing in
 # perl what C can do from the fields it has already cut.
 #
-# Only the shapes that need no per-row perl can go this way: 'hoh' names each
-# row from one of its own columns, and a 'filter' is perl by definition, so
-# both keep streaming through $on_line. An .xlsx is read by a different parser,
-# which has no fast path. $plan stays undef in all of those, and that is how
-# _parse_csv_file knows not to look for one.
+# Only a read with no 'filter' can go this way, since a filter is perl by
+# definition; one keeps streaming through $on_line. $plan stays undef then,
+# and that is how the parser knows not to look for one. 'hoh' went through the
+# closure too until 0.319, which on a 300,000 x 5 CSV cost 0.91 s; it now
+# takes 0.20 s. An .xlsx goes through a different parser (_parse_xlsx_sheet_xs)
+# but the same plan: both hand a finished row to the same S_fast_row().
+# A qr// sep goes this way too: _parse_csv_file() matches it with perl's regex
+# engine, from C, so only how a separator is found changes.
 #
 # See csv_plan in LikeR.xs for what each key means. install_plan() runs exactly
 # once, from wherever $header_done is first set, and writes 'out' last because
 # that is the key the parser tests for.
-	my $plan = (!$is_xlsx && !$filter && $otype ne 'hoh') ? {} : undef;
+	my $plan = !$filter ? {} : undef;
 	my $install_plan = sub {
 		return if !$plan || %$plan;
 		# A repeated column name resolves to its LAST field, which is what
@@ -2949,9 +3242,19 @@ sub read_table {
 		if ($otype eq 'aoh') {
 			$plan->{mode} = 0;
 			$plan->{out}  = \@data;
-		} else {
+		} elsif ($otype eq 'aoa') {
+			$plan->{mode} = 3;
+			$plan->{out}  = \@data;
+		} elsif ($otype eq 'hoa') {
 			$plan->{mode} = 1;
 			$plan->{out}  = [ @hoa_cols ];
+		} else {
+			# $finalize_header has already checked that row.names is a column
+			my ($rn) = grep { $uniq_header[$_] eq $args{'row.names'} }
+				0 .. $#uniq_header;
+			$plan->{mode} = 2;
+			$plan->{rn}   = $rn;
+			$plan->{out}  = \%data;
 		}
 	};
 
@@ -2959,14 +3262,45 @@ sub read_table {
 	# it can run either right after the header line (strict mode) or deferred
 	# to the first data row (auto.row.names mode, once the width is known).
 	my $finalize_header = sub {
+		# R's read.table: 'col.names' replaces a header's names, and a header
+		# of another length is warned about ("header and 'col.names' are of
+		# different lengths") and then the names are used all the same.
+		if ($col_names && $want_header) {
+			my $n = @header - $auto_rn_added;
+			warn "read_table: header and 'col.names' are of different lengths "
+			  . "($n and " . scalar(@$col_names) . ") in $file\n"
+				if $n != @$col_names;
+			splice @header, $auto_rn_added, $n, @$col_names;
+		}
 		if (@header && $header[0] eq '') {
 			$header[0] = 'row_name';
 		}
 		my %seen_h;
 		@uniq_header = grep { !$seen_h{$_}++ } @header;
-		my @dup_cols = grep { $seen_h{$_} > 1 } @uniq_header;
-		warn "read_table: duplicate column name(s) in $file: @dup_cols (later values win)\n"
-			if @dup_cols;
+		# Name each repeated column, with how many fields carry it and which
+		# ones (1-based, as a spreadsheet or `cut -f` counts them). A bare
+		# list of the names is not enough to find them: a merged banner row
+		# repeats the *empty* name, which prints as nothing at all, and a name
+		# repeated three times reads the same as one repeated twice.
+		my %at;
+		push @{ $at{ $header[$_] } }, $_ + 1 for 0 .. $#header;
+		# 12 positions is what fits on one terminal line beside the name and
+		# the count; a merged banner row can repeat the empty name across
+		# every field of the sheet (66 of them in the file this was written
+		# for), and the count still says how many there are in total.
+		my @dup_cols = map {
+			my @f = @{ $at{$_} };
+			my $more = @f > 12 ? ', ...' : '';
+			splice @f, 12 if @f > 12;
+			"'$_' x $seen_h{$_} (fields " . join(', ', @f) . "$more)"
+		} grep { $seen_h{$_} > 1 } @uniq_header;
+		# an aoa keeps every field, so a repeated name loses nothing there
+		warn "read_table: duplicate column name(s) in $file (later values win): "
+			. join('; ', @dup_cols) . "\n"
+			if @dup_cols && $otype ne 'aoa';
+		# An aoa's first row is the header -- the shape write_table reads an
+		# AoA as -- in file order and with any repeated name kept.
+		@data = ([ @header ]) if $otype eq 'aoa';
 		if ($otype eq 'hoh' && !defined $args{'row.names'}) {
 			$args{'row.names'} = $header[0];
 		}
@@ -3019,16 +3353,29 @@ sub read_table {
 	# comment and is discarded. A marker hugging its text ("#id,val") is
 	# delivered by the parser and un-commented in the callback as usual, so it
 	# never reaches this branch.
-	if (!$is_xlsx && length( $args{comment} // '' ) && length( $args{sep} // '' )) {
-		open my $fh, '<', $file
-			or die "read_table: can't open $file: $!\n";
-		my $first = <$fh>;
-		close $fh;
+	if ($want_header && !$is_xlsx && length( $args{comment} // '' )
+			&& length( $args{sep} // '' )) {
+		# $/ is the caller's, and under a `local $/;` this read the whole
+		# file; _parse_csv_file() splits on "\n" whatever $/ is, and so does
+		# this. A UTF-8 byte-order mark is dropped here as the parser drops it.
+		my $fh    = $codec ? _open_decompressed($file, $codec)
+		                   : _open_read($file);
+		my $first = do { local $/ = "\n"; <$fh> };
+		_close($fh);
+		$first =~ s/\A\xEF\xBB\xBF// if defined $first;
 		if (defined $first && $first =~ /^\Q$args{comment}\E\s/) {
 			$first =~ s/\r?\n\z//;
-			my @cols = split /\Q$args{sep}\E/, $first, -1;
-			if (@cols >= 2) {
+			my @cols;
+			if ($sep_re) {
+				# The marker and the blanks after it come off before the cut,
+				# since qr/\s+/ would otherwise make the marker a field.
+				(my $body = $first) =~ s/^\Q$args{comment}\E\s*//;
+				@cols = _sep_re_cut($body, $sep_re, _sep_re_is_ws($sep_re));
+			} else {
+				@cols = split /\Q$args{sep}\E/, $first, -1;
 				$cols[0] =~ s/^\Q$args{comment}\E\s*//;
+			}
+			if (@cols >= 2) {
 				@header          = @cols;
 				$header_seen     = 1;
 				$provisional_hdr = 1;	# confirm against the first data row
@@ -3036,9 +3383,30 @@ sub read_table {
 		}
 	}
 
+	# $quote_note is the parser's account of a quoted field that ran this row
+	# across lines (S_quote_note() in LikeR.xs), undef for a one-line row; it
+	# only ever goes into the alignment message.
 	my $on_line = sub {
-		my ($line_ref) = @_;
+		my ($line_ref, $quote_note) = @_;
 
+		# quote => '' on a file whose first line has every field in '"' keeps
+		# the quote marks in every name or value: R's write.csv() writes
+		# exactly that header, and it is read as intended only with the
+		# default quote. 'quote' means nothing to an .xlsx, so it is not checked.
+		if (!$header_seen && !$quote && !$is_xlsx && @$line_ref
+				&& !grep { !defined || !/\A".*"\z/s } @$line_ref) {
+			warn "read_table: every field on the first line of $file is "
+				. "wrapped in '\"', and quote => '' keeps the quote marks as "
+				. "part of the text; leave 'quote' out to read them as quoting\n";
+		}
+
+		if (!$header_seen && !$want_header) {
+			# header => 0: this line is the first data row, so it only sets the
+			# width; the names come from 'col.names' or are V1, V2, ... It falls
+			# through to be finalized and read as data below.
+			@header = $col_names ? @$col_names : map { "V$_" } 1 .. @$line_ref;
+			$header_seen = 1;
+		}
 		if (!$header_seen) {
 			# HEADER CAPTURE (copy made only here; runs once)
 			my @line = @$line_ref;
@@ -3061,7 +3429,11 @@ sub read_table {
 			# discard it and treat THIS delivered line as the header instead.
 			if ($provisional_hdr) {
 				$provisional_hdr = 0;
-				if (@$line_ref != @header) {
+				# Under auto.row.names a header one field short of the data is
+				# the shape being looked for, not a mismatch; refusing it here
+				# made the first data row the header (0.320 and before).
+				if (@$line_ref != @header
+						&& !($want_auto_rn && @$line_ref == @header + 1)) {
 					@header = @$line_ref;
 					$header[0] =~ s/^\Q$args{comment}\E\s*//
 						if @header && defined $header[0]
@@ -3082,6 +3454,7 @@ sub read_table {
 # row-names column (header exactly one field short).
 			if ($want_auto_rn && @$line_ref == @header + 1) {
 				unshift @header, $auto_rn_name;
+				$auto_rn_added = 1;
 			}
 			$finalize_header->();
 			$header_done = 1;
@@ -3093,8 +3466,9 @@ sub read_table {
 		$data_row++;
 		if (@$line_ref != @header) {
 			# FIX: alignment errors now say WHICH row is ragged
-			die sprintf "Alignment error on %s data row %d (%d fields vs %d headers).\n",
-				$file, $data_row, scalar @$line_ref, scalar @header;
+			die sprintf "Alignment error on %s data row %d (%d fields vs %d headers)%s.\n",
+				$file, $data_row, scalar @$line_ref, scalar @header,
+				defined $quote_note ? "; $quote_note" : '';
 		}
 		my %line_hash;
 		for my $i (0 .. $#header) {
@@ -3127,6 +3501,13 @@ sub read_table {
 # Populate requested data structure
 		if ($otype eq 'aoh') {
 			push @data, \%line_hash;
+		} elsif ($otype eq 'aoa') {
+			# from the fields rather than %line_hash, so a repeated name keeps
+			# every one of its fields, as the fast path's mode 3 does
+			push @data, [ map {
+				( !defined($_) || $_ eq '' || ( $has_na && $na_string{$_} ) )
+					? undef : $_
+			} @$line_ref ];
 		} elsif ($otype eq 'hoa') {
 			my $c = 0;
 			push @{ $hoa_cols[ $c++ ] }, $line_hash{$_} for @uniq_header;
@@ -3137,19 +3518,27 @@ sub read_table {
 				unless defined $row_name;
 			warn "read_table: duplicate row name '$row_name' in $file (later values win)\n"
 				if $seen_rownames{$row_name}++;
+			# made up front, so that a file whose only column is the row name
+			# still has its rows -- as empty hashes, the way R's read.table
+			# gives it a data frame of n rows and 0 columns -- rather than none
+			my $row = $data{$row_name} ||= {};
 			foreach my $col (@uniq_header) {
 				next if $col eq $args{'row.names'};
-				$data{$row_name}{$col} = $line_hash{$col};
+				$row->{$col} = $line_hash{$col};
 			}
 		}
 	};
 	if ($is_xlsx) {
 		my $sst    = $args{_sst} // _xlsx_shared_strings($file);
 		my $chosen = _xlsx_choose_sheet($file, $xlsx_sheets, $args{sheet});
-		_parse_xlsx_sheet($file, $sst, $chosen->{path}, $on_line);
+		_parse_xlsx_sheet($file, $sst, $chosen->{path}, $on_line, $plan);
 	} else {
-		_parse_csv_file($file, $args{sep} // '', $args{comment} // '',
-			$on_line, $plan);
+		my $fh = $codec ? _open_decompressed($file, $codec) : undef;
+		_parse_csv_file($file, $sep_re ? '' : $args{sep} // '',
+			$args{comment} // '', $on_line, $plan, $quote,
+			$want_header ? 0 : 1, $sep_re,
+			$sep_re && _sep_re_is_ws($sep_re) ? 1 : 0, $fh);
+		_close($fh) if $fh;
 	}
 	# header-only files never hit a data row. A provisional (commented-out)
 	# header was never confirmed against a data row, but with no data to
@@ -3160,7 +3549,7 @@ sub read_table {
 	# rows would come back as one empty array per column. It has always come
 	# back as {}, the way an aoh comes back as [], so keep it that way.
 	%data = () if $otype eq 'hoa' && @hoa_cols && !@{ $hoa_cols[0] };
-	if ($otype eq 'aoh') {
+	if ($otype eq 'aoh' || $otype eq 'aoa') {
 		return \@data;
 	} else { # hoa or hoh
 		return \%data;
@@ -3902,47 +4291,40 @@ sub melt {
 	my %need; $need{$_} = 1 for @id, @val;
 	my ($col, $R) = _frame_cols($df, $shape, [ keys %need ]);
 
-	# column-major stack: [ \@id_values, variable, value ]
-	my @rec;
+	# Column-major, straight into the requested shape.  This used to build the
+	# whole long frame first, as one arrayref-of-arrayrefs record per output
+	# row, and then walk it again to materialise -- so a melt of R rows over V
+	# value columns held R*V records, each with a nested arrayref of the id
+	# values, alive at the same time as the result it was about to become.  On
+	# a million-row frame with ten value columns that is ten million throwaway
+	# containers, and none of them is anything the output needs.  Emitting as
+	# the loops go keeps only the result.
+	my (@aoa, @aoh, %hoa, %hoh);
+	if ($otype eq 'hoa') { $hoa{$_} = [] for @id, $var_name, $value_name }
+	my $n = 0;
 	for my $v (@val) {
+		my $vcol = $col->{$v};
 		for (my $i = 0; $i < $R; $i++) {
-			my @idvals = map { $col->{$_}[$i] } @id;
-			push @rec, [ \@idvals, $v, $col->{$v}[$i] ];
+			if ($otype eq 'aoa') {
+				push @aoa, [ (map { $col->{$_}[$i] } @id), $v, $vcol->[$i] ];
+			} elsif ($otype eq 'hoa') {
+				push @{ $hoa{ $id[$_] } }, $col->{ $id[$_] }[$i] for 0 .. $#id;
+				push @{ $hoa{$var_name} },   $v;
+				push @{ $hoa{$value_name} }, $vcol->[$i];
+			} else {                             # aoh and hoh share the row
+				my %h;
+				@h{ @id } = map { $col->{$_}[$i] } @id;
+				$h{$var_name}   = $v;
+				$h{$value_name} = $vcol->[$i];
+				if ($otype eq 'aoh') { push @aoh, \%h }
+				else                 { $hoh{ $n++ } = \%h }   # hoh: RangeIndex
+			}
 		}
 	}
-
-	if ($otype eq 'aoa') {
-		return [ map { [ @{ $_->[0] }, $_->[1], $_->[2] ] } @rec ];
-	} elsif ($otype eq 'aoh') {
-		my @out;
-		for my $r (@rec) {
-			my %h;
-			@h{ @id } = @{ $r->[0] };
-			$h{$var_name}   = $r->[1];
-			$h{$value_name} = $r->[2];
-			push @out, \%h;
-		}
-		return \@out;
-	} elsif ($otype eq 'hoa') {
-		my %out = map { $_ => [] } @id, $var_name, $value_name;
-		for my $r (@rec) {
-			push @{ $out{ $id[$_] } }, $r->[0][$_] for 0 .. $#id;
-			push @{ $out{$var_name} },   $r->[1];
-			push @{ $out{$value_name} }, $r->[2];
-		}
-		return \%out;
-	} else {                                     # hoh, RangeIndex 0..N-1
-		my %out;
-		my $n = 0;
-		for my $r (@rec) {
-			my %h;
-			@h{ @id } = @{ $r->[0] };
-			$h{$var_name}   = $r->[1];
-			$h{$value_name} = $r->[2];
-			$out{ $n++ } = \%h;
-		}
-		return \%out;
-	}
+	return \@aoa if $otype eq 'aoa';
+	return \@aoh if $otype eq 'aoh';
+	return \%hoa if $otype eq 'hoa';
+	return \%hoh;
 }
 
 # pivot_table($df, index => $col|\@cols, columns => $col|\@cols,
@@ -4646,7 +5028,13 @@ sub table_one {
 	        : ('Overall') x $R;
 	my %seen; my @groups = grep { !$seen{$_}++ } @grp;
 	@groups = sort @groups if defined $by;
-	my @grp_rows = map { my $g = $_; [ grep { $grp[$_] eq $g } 0 .. $R - 1 ] } @groups;
+	# One pass that buckets every row, rather than a full scan of the frame per
+	# group: the row lists were built by O(groups x rows) greps, which is the
+	# same shape as the O(levels x groups x rows) counting further down that
+	# this file already records having replaced with a single pass.
+	my %gpos; @gpos{ @groups } = 0 .. $#groups;
+	my @grp_rows = map { [] } @groups;
+	for my $r (0 .. $R - 1) { push @{ $grp_rows[ $gpos{ $grp[$r] } ] }, $r }
 
 	my @out;
 	for my $v (@vars) {
@@ -5017,16 +5405,27 @@ sub hosmer_lemeshow {
 
 # _qgamma($p, $shape, $scale): quantile of the gamma distribution, found by
 # inverting the regularized lower incomplete gamma P(shape, x) = p (bisection).
+#
+# The bisection compares against _pgamma_lower, which is the XS igam() and
+# computes the lower tail directly.  It used to form that tail as
+# `1 - _igamc($shape, $x)`, and subtracting from 1 is precisely the
+# cancellation igam() was added to avoid: below a lower tail of about
+# NV_EPSILON the difference can only be a multiple of NV_EPSILON, so every
+# candidate the bisection tried compared equal and the search converged on
+# noise.  age_standardize() reaches this with p = alpha/2, so it is the lower
+# confidence limit at a high conf.level that was affected -- conf.level =>
+# 0.9999 asks for the 5e-5 quantile, and 1 - _igamc could not resolve one.
 sub _qgamma {
 	my ($p, $shape, $scale) = @_;
 	$scale = 1 unless defined $scale;
 	return 0 if $p <= 0 || $shape <= 0;
 	return 9**9**9 if $p >= 1;
 	my ($lo, $hi) = (0, 1);
-	$hi *= 2 while (1 - _igamc($shape, $hi)) < $p && $hi < 1e15;
+	$hi *= 2 while _pgamma_lower($shape, $hi) < $p && $hi < 1e15;
 	for (1 .. 300) {
 		my $mid = ($lo + $hi) / 2;
-		if ((1 - _igamc($shape, $mid)) < $p) { $lo = $mid } else { $hi = $mid }
+		last if $mid <= $lo || $mid >= $hi;      # adjacent NVs: nothing left
+		if (_pgamma_lower($shape, $mid) < $p) { $lo = $mid } else { $hi = $mid }
 		last if ($hi - $lo) <= 1e-12 * ($hi + 1e-300);
 	}
 	return $scale * ($lo + $hi) / 2;
@@ -5104,6 +5503,397 @@ sub age_standardize {
 	};
 }
 
+
+# anova($fit0, $fit1, ..., test => 'Chisq' | 'LRT' | 'F', dispersion => $phi)
+#
+# Nested-model comparison on fits that already exist -- R's anova(m0, m1) --
+# for lm() and glm() results, and MASS's likelihood-ratio table for
+# negative-binomial fits whose theta was estimated.  The XS anova() compares
+# models it fits itself from a data set and formulas; this is the same
+# question asked of fits the caller already has, which is what a first-stage
+# F on excluded instruments or a joint test of a block of terms needs.  Any
+# call whose first argument is not a fitted model goes to the XS function
+# unchanged.
+#
+# The arithmetic is R's: anova.lmlist() for lm, anova.glmlist() and
+# stat.anova() for glm, anova.negbin() for glm.nb.  Rows come back in the
+# order given (MASS's negbin table is sorted by residual df, as it sorts it),
+# each a hash; every row after the first carries the comparison with the row
+# before it.
+{
+	my $xs_anova = \&anova;
+	# The XS anova() is prototyped ($@), which would put anova(@fits) in
+	# scalar context and hand it the number of fits; the replacement has no
+	# prototype, which changes nothing for the XS call forms.
+	no warnings qw(redefine prototype);
+	*anova = sub {
+		return _anova_fits(@_) if @_ && _is_fit($_[0]);
+		goto &$xs_anova;
+	};
+}
+
+sub _is_fit {
+	my $f = shift;
+	return ref $f eq 'HASH' && exists $f->{coefficients} && exists $f->{'df.residual'}
+		&& !ref $f->{'df.residual'} && (exists $f->{rss} || exists $f->{deviance});
+}
+
+sub _anova_fits {
+	my @m;
+	push @m, shift while @_ && _is_fit($_[0]);
+	die "anova: options after the models must be name => value pairs\n" if @_ % 2;
+	my %opt = @_;
+	for (keys %opt) {
+		die "anova: unknown argument '$_'\n" unless /^(?:test|dispersion)$/;
+	}
+	die "anova: give at least two fitted models to compare\n" if @m < 2;
+	my $is_glm = exists $m[0]{family};
+	for (@m) {
+		die "anova: cannot compare lm() and glm() fits in one table\n"
+			if (exists $_->{family}) != $is_glm;
+		die "anova: models are not all of the same family\n"
+			if $is_glm && $_->{family} ne $m[0]{family};
+	}
+	# anova.lmlist / anova.glmlist: "models were not all fitted to the same
+	# size of dataset"
+	my @n = map { $is_glm ? $_->{nobs} : $_->{'df.residual'} + $_->{rank} } @m;
+	for (@n) {
+		die "anova: models were not all fitted to the same size of dataset\n"
+			unless defined $_ && $_ == $n[0];
+	}
+	my $fam = $is_glm ? $m[0]{family} : 'lm';
+	$fam = 'negbin' if $fam eq 'negative.binomial' || $fam eq 'nb';
+	if ($fam eq 'negbin' && !grep { !exists $_->{'SE.theta'} } @m) {
+		# MASS anova.negbin(): theta was estimated in every model, so the
+		# models differ in theta too and only the likelihood-ratio test is
+		# valid.  MASS sorts by residual df, largest first.
+		die "anova: negbin models are compared by the likelihood-ratio test only\n"
+			if defined $opt{test} && $opt{test} !~ /^(?:Chisq|LRT)$/;
+		my @o = sort { $b->{'df.residual'} <=> $a->{'df.residual'} } @m;
+		my @rows;
+		for my $i (0 .. $#o) {
+			my %r = (theta => $o[$i]{theta}, 'Resid. df' => $o[$i]{'df.residual'},
+			         '2 x log-lik.' => $o[$i]{twologlik});
+			if ($i) {
+				my $df = $o[$i - 1]{'df.residual'} - $o[$i]{'df.residual'};
+				my $lr = $o[$i]{twologlik} - $o[$i - 1]{twologlik};
+				$r{df} = $df;
+				$r{'LR stat.'} = $lr;
+				# MASS: 1 - pchisq(x2, df); the upper tail directly here
+				$r{'Pr(Chi)'} = pchisq($lr, $df, lower => 0);
+			}
+			push @rows, \%r;
+		}
+		return \@rows;
+	}
+	my @resdf  = map { $_->{'df.residual'} } @m;
+	my @resdev = map { $is_glm ? $_->{deviance} : $_->{rss} } @m;
+	my ($big) = sort { $resdf[$a] <=> $resdf[$b] } 0 .. $#m;   # order(resdf)[1]
+	my ($test, $scale, $df_scale);
+	if (!$is_glm) {
+		# anova.lmlist: an F test on the largest model's residual mean square
+		$test = defined $opt{test} ? $opt{test} : 'F';
+		$scale = defined $opt{dispersion} ? $opt{dispersion} : $resdev[$big] / $resdf[$big];
+		$df_scale = $resdf[$big];
+	} else {
+		# anova.glmlist: family$dispersion is 1 for binomial and poisson and
+		# NA for gaussian; a negbin at a fixed theta has its variance fully
+		# specified, and is treated like poisson (see glm's dispersion).
+		my $known = $fam ne 'gaussian';
+		$test = defined $opt{test} ? $opt{test} : ($known ? 'Chisq' : 'F');
+		$scale = defined $opt{dispersion} ? $opt{dispersion} : $m[$big]{dispersion};
+		$df_scale = (defined $opt{dispersion} ? $opt{dispersion} == 1 : $known)
+		          ? 9**9**9 : $resdf[$big];
+		if ($test eq 'F' && $df_scale == 9**9**9) {
+			warn(($fam eq 'binomial' || $fam eq 'poisson')
+			     ? "anova: using F test with a '$fam' family is inappropriate\n"
+			     : "anova: using F test with a fixed dispersion is inappropriate\n");
+		}
+	}
+	die "anova: test must be 'F', 'Chisq' or 'LRT'\n" unless $test =~ /^(?:F|Chisq|LRT)$/;
+	my @rows;
+	for my $i (0 .. $#m) {
+		my %r = $is_glm ? ('Resid. Df' => $resdf[$i], 'Resid. Dev' => $resdev[$i])
+		                : ('Res.Df' => $resdf[$i], 'RSS' => $resdev[$i]);
+		if ($i) {
+			my $df = $resdf[$i - 1] - $resdf[$i];
+			my $dv = $resdev[$i - 1] - $resdev[$i];
+			$r{Df} = $df;
+			$r{ $is_glm ? 'Deviance' : 'Sum of Sq' } = $dv;
+			# stat.anova(): a zero or negative statistic has no p-value (NA)
+			if ($test eq 'F') {
+				my $F = ($df != 0) ? ($dv / $df) / $scale : undef;
+				$F = undef if defined $F && $F < 0;
+				$r{F} = $F;
+				$r{'Pr(>F)'} = defined $F
+					? ($df_scale == 9**9**9 ? pchisq($F * abs($df), abs($df), lower => 0)
+					                        : pf($F, abs($df), $df_scale, lower => 0))
+					: undef;
+			} else {
+				my $v = ($df != 0) ? ($dv / $scale) * ($df <=> 0) : undef;
+				$v = undef if defined $v && $v < 0;
+				$r{'Pr(>Chi)'} = defined $v ? pchisq($v, abs($df), lower => 0) : undef;
+			}
+		}
+		push @rows, \%r;
+	}
+	return \@rows;
+}
+
+# The PerlIO::via layers _open_decompressed() reads a compressed file through.
+# PerlIO::via calls FILL whenever the parser's sv_gets() has used up the
+# buffer, and FILL returns the next piece of decompressed text, or undef at
+# the end.
+#
+# A file may hold several compressed members one after another, and every one
+# of them is read: `cat a.gz b.gz' is a valid gzip file (RFC 1952 section 2.2)
+# holding both, bgzip -- the BGZF format of tabix and every .vcf.gz -- writes
+# nothing else, and pbzip2 does the same with bzip2 streams. Stopping at the
+# first would drop all but the first 64 KB of a bgzip file without a word. NUL
+# bytes between or after members are skipped, as Python's gzip module skips
+# them (Lib/gzip.py, _GzipReader._read_eof(): "Gzip files can be padded with
+# zeroes and still have archives"); anything else there is an error, as it is
+# in Python, rather than being passed on as text, as R's gzio.h does
+# ("transparent" mode).
+#
+# Each member's own check is made: zlib compares a gzip member's CRC-32 and
+# length against its trailer, bzip2 its block and stream CRCs, and a mismatch
+# comes back as corrupt data.
+package Stats::LikeR::_Decompress;
+
+our $name;	# the file being opened; see _open_decompressed()
+
+# 1<<16, as a read of both the compressed bytes and the text made per call.
+# read_table of a 2,000,000 x 5 CSV (110 MB, 47 MB gzipped) took 1.50 s from
+# the .gz against 0.82 s from the plain file, three runs each; 1<<12 took
+# 1.66 s, 1<<14 1.60 s, and 1<<18 and 1<<20 both 1.45 s. `zcat' alone takes
+# 0.69 s, so the layer adds almost nothing to the inflate itself, and the last
+# 3% is not worth four times the buffer. The .bz2 took 4.47 s, against 3.69 s
+# for `bzip2 -dc' alone.
+my $BUFSIZE = 1 << 16;
+
+sub PUSHED {
+	my ($class) = @_;
+	return bless { name => $name, in => '', eof => 0, z => undef,
+		members => 0 }, $class;
+}
+
+sub FILL {
+	my ($self, $fh) = @_;
+	my $magic = $self->MAGIC;
+	for (;;) {
+		if (!$self->{z}) {	# at the start of a member, or past the last
+			$self->{in} =~ s/\A\0+// if $self->{members};
+			if (length $self->{in} < length($magic) && !$self->{eof}) {
+				$self->_more($fh);
+				next;
+			}
+			return undef if !length $self->{in} && $self->{members};
+			die "read_table: \"$self->{name}\" has data after its last "
+			  . $self->CODEC . " member that is not " . $self->CODEC . "\n"
+				unless substr($self->{in}, 0, length $magic) eq $magic;
+			$self->{z} = $self->NEW;
+		}
+		my $before = length $self->{in};
+		my $out = '';
+		my ($status, $ended) = $self->INFLATE($out);
+		die "read_table: \"$self->{name}\" is not valid " . $self->CODEC
+		  . " data ($status)\n" unless defined $ended;
+		if ($ended) {
+			$self->{z} = undef;
+			$self->{members}++;
+		}
+		return $out if length $out;
+		next if $ended || length $self->{in} != $before;
+		# no progress: the member wants more input than has been read
+		die "read_table: \"$self->{name}\" ends in the middle of its "
+		  . $self->CODEC . " data; it is truncated\n" if $self->{eof};
+		$self->_more($fh);
+	}
+}
+
+sub _more {
+	my ($self, $fh) = @_;
+	my $n = read $fh, $self->{in}, $BUFSIZE, length $self->{in};
+	die "read_table: could not read \"$self->{name}\": $!\n" unless defined $n;
+	$self->{eof} = 1 unless $n;
+	return;
+}
+
+package Stats::LikeR::_Gunzip;
+our @ISA = ('Stats::LikeR::_Decompress');
+
+sub CODEC { 'gzip' }
+sub MAGIC { "\x1f\x8b" }
+
+sub NEW {
+	# WANT_GZIP: a gzip wrapper, header and trailer, around each deflate
+	# stream. LimitOutput caps what one call makes at about Bufsize, so one
+	# 64 KB read of a highly compressible member cannot inflate into hundreds
+	# of megabytes at once.
+	my ($z, $err) = Compress::Raw::Zlib::Inflate->new(
+		-WindowBits   => Compress::Raw::Zlib::WANT_GZIP(),
+		-Bufsize      => $BUFSIZE,
+		-ConsumeInput => 1,
+		-LimitOutput  => 1);
+	die "read_table: could not start inflating: $err\n" unless $z;
+	return $z;
+}
+
+# (status, 1) at the end of a member, (status, 0) to go on, (status, undef) on
+# corrupt data. Z_BUF_ERROR is "no progress possible", which with LimitOutput
+# and ConsumeInput is how the stream asks for more input, not an error.
+sub INFLATE {
+	my ($self) = @_;
+	my $status = $self->{z}->inflate($self->{in}, $_[1]);
+	return ($status, 1) if $status == Compress::Raw::Zlib::Z_STREAM_END();
+	return ($status, 0) if $status == Compress::Raw::Zlib::Z_OK()
+		|| $status == Compress::Raw::Zlib::Z_BUF_ERROR();
+	return ("$status", undef);
+}
+
+package Stats::LikeR::_Bunzip2;
+our @ISA = ('Stats::LikeR::_Decompress');
+
+sub CODEC { 'bzip2' }
+sub MAGIC { 'BZh' }
+
+sub NEW {
+	# appendOutput 0, consumeInput 1, small 0, verbosity 0, limitOutput 1:
+	# the same streaming contract as _Gunzip's.
+	my ($z, $err) = Compress::Raw::Bunzip2->new(0, 1, 0, 0, 1);
+	die "read_table: could not start bunzipping: $err\n" unless $z;
+	return $z;
+}
+
+sub INFLATE {
+	my ($self) = @_;
+	my $status = $self->{z}->bzinflate($self->{in}, $_[1]);
+	return ($status, 1) if $status == Compress::Raw::Bzip2::BZ_STREAM_END();
+	return ($status, 0) if $status == Compress::Raw::Bzip2::BZ_OK();
+	return ("$status", undef);
+}
+
+# The PerlIO::via layers write_table writes a .gz or .bz2 file through. The XS
+# opens the file as for plain text and pushes :raw:via(<class>):perlio onto it
+# (:crlf in place of :perlio where perl is a CRLF shop, so that Windows gets
+# the CRLF a plain file would), and the rows reach WRITE 8 KB at a time from
+# that buffer above rather than a field or a character at a time.
+#
+# The end of the stream -- zlib's final block and the gzip trailer, bzip2's
+# end-of-stream marker -- cannot be written from FLUSH or CLOSE. The :perlio
+# buffer above calls FLUSH after every 8 KB it hands down, so FLUSH does not
+# mean "done", and PerlIO::via calls CLOSE only once the layer below has been
+# closed (PerlIOVia_close() runs PerlIOBase_close() first; perl 5.10.1 and
+# 5.42.0 ext/PerlIO-via/via.xs). So once the last row is written, the XS pops
+# the :perlio layer and then this one, and POPPED finishes the stream while
+# the file is still open.
+#
+# A write that croaks partway closes the handle without the pops, and then
+# CLOSE runs before POPPED: the stream is left unfinished, on purpose, so that
+# the file is a truncated .gz that read_table refuses rather than a complete
+# one holding half the table.
+#
+# A failure goes back the PerlIO way, as -1 from PUSHED or WRITE; the XS turns
+# it into a croak naming the file. PUSHED leaves its reason in $error.
+package Stats::LikeR::_Compress;
+
+our $error;
+
+sub PUSHED {
+	my ($class) = @_;
+	my $z = eval { $class->NEW };
+	if (!$z) {
+		$error = $@ || 'could not start compressing';
+		$error =~ s/\n\z//;
+		return -1;
+	}
+	return bless { z => $z, closed => 0 }, $class;
+}
+
+sub WRITE {
+	my ($self, $buf, $fh) = @_;
+	my $out = '';
+	return -1 unless $self->DEFLATE($buf, $out);
+	return -1 if length $out && !print {$fh} $out;
+	return length $buf;
+}
+
+sub FLUSH { 0 }
+
+sub CLOSE {
+	$_[0]{closed} = 1;
+	return 0;
+}
+
+sub POPPED {
+	my ($self, $fh) = @_;
+	return if $self->{closed} || !$self->{z};
+	my $out = '';
+	# a failure here shows up as the error flag or the close of the layer
+	# below, which is what the XS checks next
+	print {$fh} $out if $self->FINISH($out) && length $out;
+	$self->{z} = undef;
+	return;
+}
+
+package Stats::LikeR::_Gzip;
+our @ISA = ('Stats::LikeR::_Compress');
+
+# Level 6 is Z_DEFAULT_COMPRESSION, the level of gzip(1) and of R's
+# gzfile(compression = 6). zlib's gzip wrapper writes a header with no name
+# and an mtime of 0, so the same table always makes the same bytes.
+sub NEW {
+	require Compress::Raw::Zlib;
+	my ($z, $err) = Compress::Raw::Zlib::Deflate->new(
+		-WindowBits => Compress::Raw::Zlib::WANT_GZIP(),
+		-Level      => Compress::Raw::Zlib::Z_DEFAULT_COMPRESSION());
+	die "could not start gzip compression: $err\n" unless $z;
+	return $z;
+}
+
+sub DEFLATE {
+	$_[0]{z}->deflate($_[1], $_[2]) == Compress::Raw::Zlib::Z_OK();
+}
+
+sub FINISH {
+	$_[0]{z}->flush($_[1]) == Compress::Raw::Zlib::Z_OK();
+}
+
+package Stats::LikeR::_Bzip2;
+our @ISA = ('Stats::LikeR::_Compress');
+
+# appendOutput 1, blockSize100k 9, workfactor 0 (the default, 30), verbosity
+# 0. 9 is bzip2(1)'s default and R's bzfile(compression = 9). Output is
+# appended because DEFLATE may make it in two calls; WRITE and POPPED each pass
+# an empty buffer.
+sub NEW {
+	require Compress::Raw::Bzip2;
+	my ($z, $err) = Compress::Raw::Bzip2->new(1, 9, 0, 0);
+	die "could not start bzip2 compression: $err\n" unless $z;
+	return $z;
+}
+
+# bzip2 writes nothing until it has a whole 900 KB block, so a write that
+# croaked before then would leave an empty file, and an empty file reads as an
+# empty table rather than a broken one. The first WRITE therefore ends its
+# block at once, which puts the stream header and that block on disk, and a
+# file that is never finished is then a truncated bzip2 file, as a gzip one
+# already is from its first write. It costs one short block at the start.
+sub DEFLATE {
+	my ($self) = @_;
+	return 0 unless $self->{z}->bzdeflate($_[1], $_[2])
+		== Compress::Raw::Bzip2::BZ_RUN_OK();
+	return 1 if $self->{started}++;
+	return $self->{z}->bzflush($_[2]) == Compress::Raw::Bzip2::BZ_RUN_OK();
+}
+
+sub FINISH {
+	$_[0]{z}->bzclose($_[1]) == Compress::Raw::Bzip2::BZ_STREAM_END();
+}
+
+package Stats::LikeR;
+
 1;
 
 __END__
@@ -5118,14 +5908,11 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3151
+version 0.3211
 
 =head1 Synopsis
 
 Get basic statistical functions working in Perl as if they were part of List::Util, like C<min>, C<max>, C<sum>, etc.
-There are other similar tools on CPAN, but I want speed and a form like List::Util.
-
-There B<are> other modules on CPAN that can do B<PARTS> of this, but this works the way that I B<want> it to.
 
 =head1 Getting help
 
@@ -5711,6 +6498,28 @@ after the first adds C<Df>, C<Sum of Sq>, C<F> and C<< Pr(E<gt>F) >>:
  my $tab = anova($data, 'y ~ x1', 'y ~ x1 + x2');
  printf "adding x2: F = %.4g, p = %.4g\n", $tab->[1]{F}, $tab->[1]{'Pr(>F)'};
 
+Given two or more B<fitted models> instead -- C<lm> or C<glm> fits (or
+C<negbin> C<glm> fits) of the same response on the same rows -- C<anova> compares
+them as R's C<anova(m0, m1, ...)> does, and also returns an array ref of rows
+in the order supplied. For C<lm> fits it is C<anova.lmlist>'s F test, on the
+largest model's residual mean square (C<Res.Df>, C<RSS>, C<Df>, C<Sum of Sq>, C<F>,
+C<< Pr(E<gt>F) >>). For C<glm> fits it is C<anova.glmlist>'s table (C<Resid. Df>,
+C<Resid. Dev>, C<Df>, C<Deviance>) with a test chosen as R chooses it: a
+likelihood-ratio C<< Pr(E<gt>Chi) >> for the families with a known dispersion, an F on
+the largest model's dispersion for C<gaussian>; ask for one with
+C<< test =E<gt> 'Chisq' >>, C<'LRT'> or C<'F'>, or fix the scale with C<dispersion>.
+C<negbin> fits give C<MASS::anova.negbin>'s likelihood-ratio table (C<theta>,
+C<Resid. df>, C<2 x log-lik.>, C<df>, C<LR stat.>, C<Pr(Chi)>), whose rows
+are ordered by residual degrees of freedom.
+
+ my $m0 = glm(formula => 'y ~ age',         data => \%d, family => 'poisson');
+ my $m1 = glm(formula => 'y ~ age + hours', data => \%d, family => 'poisson');
+ my $t  = anova($m0, $m1);
+ printf "LR test for hours: p = %.3g\n", $t->[1]{'Pr(>Chi)'};
+
+This is also how a first-stage F on a block of instruments is had without
+L<C<ivreg>|/"ivreg">.
+
 Both forms evaluate C<< Pr(E<gt>F) >> in the upper tail of the F distribution rather
 than as C<1 - pf(F, df1, df2)>; see
 L</"F and z tail p-values">.
@@ -5805,9 +6614,8 @@ table" call. Note that both are B<Type-I / sequential>, so term order in the
 formula matters, and both share this module's C<pf>, so p-values agree with
 C<oneway_test> and the rest of Stats::LikeR.
 
-I<< (R's C<anova> generic can additionally compare several nested models,
-C<anova(m1, m2)>, giving an F/LRT between them — a capability neither this
-C<anova> nor C<aov> currently provides. Ask if that would be useful.) >>
+Comparing nested models -- C<anova(m1, m2)> in R -- is done by giving C<anova>
+two or more formulas, or two or more fitted models; see above.
 
 =head2 aoh2h
 
@@ -7654,12 +8462,129 @@ Give times, an event flag (1 = event, 0 = censored), and one or more covariates
  print $fit->{exp.coef}[0];    # hazard ratio for age
  print $fit->{p.value}[0];     # its p-value
 
-Options: C<names>, C<ties> (C<'efron'> default, or C<'breslow'>), C<conf.level>
-(default C<0.95>), C<maxit>. The result has parallel per-covariate arrays C<coef>
-(log-HR), C<exp.coef> (HR), C<se>, C<z>, C<p.value>, C<conf.int> (HR scale), plus
-model-level C<loglik>, C<lr.stat>/C<lr.p.value> (likelihood-ratio test), C<n>,
-C<nevent>, and C<converged>. See L<C<survfit>|/"survfit"> and
-L<C<logrank_test>|/"logrank_test">.
+Or name the columns of a data set in a formula, as C<survival::coxph> does. The
+response is C<Surv(time, status)>, or C<Surv(start, stop, status)> for
+counting-process data; covariates expand as they do for L<C<lm>|/"lm"> and
+L<C<glm>|/"glm"> (factors, interactions, C<I()>, C<log()>), and C<strata(g)> and
+C<cluster(id)> terms are taken out of the covariates and used as below:
+
+ my $fit = coxph(formula => 'Surv(tstart, tstop, event) ~ hours + age + strata(tech)',
+                 data => \%d, cluster => 'child_id');
+
+B<Counting-process data> -- one row per interval C<(start, stop]> over which a
+subject's covariates are constant -- is what a time-varying covariate and late
+entry both need. A subject is at risk at an event time only in the interval
+that covers it. In the positional form give the start times as C<< start =E<gt> \@t0 >>.
+Intervals that span no event contribute nothing and are skipped, as
+C<survival>'s C<agreg.fit> skips them.
+
+B<Strata> (C<strata(g)> in a formula, or C<< strata =E<gt> \@g >>) give each level its
+own baseline hazard, with the covariate effects shared.
+
+B<Robust variance.> With a cluster (C<cluster(id)>, or C<< cluster =E<gt> \@id >> or a
+column name), C<se> is the grouped-jackknife (dfbeta) robust standard error that
+C<coxph(..., cluster = id)> reports, and the model-based one moves to
+C<naive.se>. C<< robust =E<gt> 1 >> without a cluster makes each row its own cluster,
+which C<(start, stop]> data does not allow: a subject's intervals have to be
+grouped by a cluster.
+C<weights> are case weights and C<offset> a term with coefficient fixed at 1.
+
+B<A changepoint profile> needs no function of its own: refit over a grid of
+candidate thresholds and keep each C<loglik>. The maximum is the estimate; the
+thresholds within C<qchisq(0.95, 1) / 2 = 1.92> of it are a likelihood-ratio
+interval, which for a changepoint is only approximate, since the profile is a
+step function of C<c> and the usual regularity conditions do not hold.
+
+ my @grid = map { 40 + $_ } 0 .. 30;
+ my %ll;
+ for my $c (@grid) {
+     $d{above} = [ map { $_ > $c ? 1 : 0 } @{ $d{hours} } ];
+     $ll{$c} = coxph(formula => 'Surv(tstart, tstop, event) ~ above + age + strata(tech)',
+                     data => \%d)->{loglik};
+ }
+ my ($best) = sort { $ll{$b} <=> $ll{$a} } @grid;
+ my @ci = grep { $ll{$best} - $ll{$_} <= 1.92 } @grid;
+
+=head3 Options
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>names</code></td>
+  <td><code>x1</code>, <code>x2</code>, ...</td>
+  <td>Covariate names in the positional form.</td>
+</tr>
+<tr>
+  <td><code>ties</code></td>
+  <td><code>'efron'</code></td>
+  <td><code>'efron'</code> or <code>'breslow'</code>.</td>
+</tr>
+<tr>
+  <td><code>conf.level</code></td>
+  <td><code>0.95</code></td>
+  <td>Level of <code>conf.int</code>.</td>
+</tr>
+<tr>
+  <td><code>maxit</code></td>
+  <td><code>20</code></td>
+  <td>Newton iteration limit (<code>iter.max</code>).</td>
+</tr>
+<tr>
+  <td><code>eps</code></td>
+  <td><code>1e-9</code></td>
+  <td>Convergence tolerance on the relative log-likelihood change, <code>coxph.control(eps = )</code>.</td>
+</tr>
+<tr>
+  <td><code>start</code></td>
+  <td><i>none</i></td>
+  <td>Positional form: interval start times, for <code>(start, stop]</code> data.</td>
+</tr>
+<tr>
+  <td><code>strata</code></td>
+  <td><i>none</i></td>
+  <td>Positional form: one stratum label per row.</td>
+</tr>
+<tr>
+  <td><code>cluster</code></td>
+  <td><i>none</i></td>
+  <td>One cluster label per row, or (formula form) a column name.</td>
+</tr>
+<tr>
+  <td><code>weights</code></td>
+  <td><i>none</i></td>
+  <td>Case weights.</td>
+</tr>
+<tr>
+  <td><code>offset</code></td>
+  <td><i>none</i></td>
+  <td>One offset per row.</td>
+</tr>
+<tr>
+  <td><code>robust</code></td>
+  <td><code>0</code>, or <code>1</code> with a cluster</td>
+  <td>Report the robust variance.</td>
+</tr>
+</tbody>
+</table>
+
+=head3 Result
+
+Parallel per-covariate arrays C<coef> (log-HR), C<exp.coef> (HR), C<se>, C<z>,
+C<p.value> and C<conf.int> (HR scale), with C<names>; C<coefficients> by name;
+C<var> (a matrix) and C<vcov> (a hash of hashes by name), the covariance the standard errors
+come from; model-level C<loglik> (at the fit) and C<loglik.null>,
+C<lr.stat>/C<lr.df>/C<lr.p.value> (likelihood-ratio test), C<score.test> and
+C<wald.test>, C<n>, C<nevent>, C<iterations> and C<converged>. With a robust
+variance it adds C<naive.se> and C<naive.var>, C<robust.score.test>, and
+C<n.clusters>; with strata, C<strata> lists their labels. See
+L<C<survfit>|/"survfit"> and L<C<logrank_test>|/"logrank_test">.
 
 =head2 cramers_v
 
@@ -9235,6 +10160,63 @@ can differ from R's in the 6th to 8th significant digit, which a p-value far
 out in the tail amplifies — at C<|z| = 37> a 1.5e-5 difference in C<z> moves the
 p-value by about 2%.
 
+=head3 Offsets, prior weights, robust covariance and absorbed factors
+
+An B<offset> is a term whose coefficient is fixed at 1 rather than estimated,
+which is how a count model is put on a per-person-time scale. Write it into the
+formula, as R does, or pass it as C<offset> (a column name, an expression over
+columns, or an array ref with one value per row); the two forms add together.
+The negative-binomial C<theta> search sees the offset too, as C<MASS::glm.nb>'s
+does, and the null deviance is that of an intercept-plus-offset fit:
+
+ my $rate = glm(formula => 'admits ~ hours + age + offset(log(persontime))',
+                data => \%d, family => 'poisson');
+ my $same = glm(formula => 'admits ~ hours + age', offset => 'log(persontime)',
+                data => \%d, family => 'poisson');
+
+B<Prior weights> (C<weights>, a column name or an array ref) are R's
+C<glm(weights = )>. A binomial fit whose weights make a non-integer number of
+successes warns C<non-integer #successes in a binomial glm!>, as R does. A row
+with weight 0 is kept out of the fit and out of C<nobs>.
+
+C<< vcov =E<gt> 'HC0' >> (through C<'HC3'>) replaces the model-based covariance by a
+heteroskedasticity-consistent sandwich, C<sandwich::vcovHC()>, and C<cluster>
+by a cluster-robust one, C<sandwich::vcovCL()>. Naming a cluster alone implies
+C<HC0>, which is C<vcovCL()>'s own default for a glm; C<HC1> adds the
+C<(n - 1)/(n - k)> factor. C<< cluster =E<gt> 'firm + year' >> clusters two ways (up to
+four) by inclusion-exclusion, as C<vcovCL(cluster = ~ firm + year)> does. The
+C<summary> standard errors, C<z>, p-values and both kinds of confidence interval
+are then all computed from the robust covariance, as C<lmtest::coeftest()>
+would. A C<poisson> fit on a 0/1 outcome with C<< vcov =E<gt> 'HC0' >> is the
+"modified Poisson" risk-ratio regression (Zou 2004, I<Am J Epidemiol> 159:702):
+
+ my $rr = glm(formula => 'readmit ~ hours + age', data => \%d,
+              family => 'poisson', vcov => 'HC0', cluster => 'child_id');
+ printf "RR = %.3f (%.3f-%.3f)\n", @{ $rr->{exp}{hours} }{qw(estimate conf.low conf.high)};
+
+A factor with thousands of levels (a within-subject comparison) can be
+B<absorbed> instead of expanded into dummy columns: put it after a C<|> in the
+formula, as C<fixest> does, or name it in C<absorb>. The fit then demeans within
+groups (weighted, by alternating projections for more than one factor) and
+reports only the remaining coefficients, which equal those of the
+full-dummy fit. As C<fixest::feglm()> does, a group whose outcome is constant at
+a boundary (all zeros for C<poisson>/C<negbin>, all 0 or all 1 for C<binomial>)
+carries no information and is dropped; C<fe.removed> counts the rows that goes
+with. HC2/HC3 are not available with absorbed factors.
+
+ my $fe = glm(formula => 'visits ~ hours | child_id + year', data => \%d,
+              family => 'poisson', cluster => 'child_id');
+
+C<maxit> (default 25) and C<epsilon> (default C<1e-8>) are C<glm.control()>'s.
+
+A B<control-function> IV estimate for a count outcome is two calls: fit the
+first stage with L<C<lm>|/"lm">, add its residuals to the data, and include them
+as a regressor in the C<poisson>/C<negbin> C<glm>. The coefficient of the
+residual is a test of exogeneity, but the second-stage standard errors do not
+account for the first stage having been estimated; bootstrap the pair of fits
+for those. For a continuous outcome use L<C<ivreg>|/"ivreg">, whose standard
+errors are right as they stand.
+
 =head3 Input Parameters
 
 =for html <table>
@@ -9252,7 +10234,7 @@ p-value by about 2%.
   <td><code>formula</code></td>
   <td><code>String</code></td>
   <td><i>None (Required)</i></td>
-  <td>A symbolic description of the model to be fitted. Parsed by the same code as [<code>lm</code>](#lm)'s, so it takes the same operators: <code>+</code>, <code>:</code>, <code>*</code>, <code>^</code>, <code>.</code> for every remaining column, and <code>-1</code> / <code>+0</code> to remove the intercept.</td>
+  <td>A symbolic description of the model to be fitted. Parsed by the same code as [<code>lm</code>](#lm)'s, so it takes the same operators: <code>+</code>, <code>:</code>, <code>*</code>, <code>^</code>, <code>.</code> for every remaining column, and <code>-1</code> / <code>+0</code> to remove the intercept. It may also hold <code>offset()</code> terms, and factors to absorb after a <code>|</code>.</td>
   <td><code>'am ~ wt + hp'</code>, <code>'y ~ x - 1'</code>, <code>'y ~ .'</code></td>
 </tr>
 <tr>
@@ -9282,6 +10264,55 @@ p-value by about 2%.
   <td><code>0.95</code></td>
   <td>Confidence level for the Wald coefficient / exponentiated-coefficient intervals.</td>
   <td><code>0.90</code></td>
+</tr>
+<tr>
+  <td><code>offset</code></td>
+  <td><code>String</code> or <code>ArrayRef</code></td>
+  <td><i>none</i></td>
+  <td>A column, an expression over columns such as <code>'log(t)'</code>, or one value per row, added to the linear predictor with coefficient 1. Adds to any <code>offset()</code> terms in the formula.</td>
+  <td><code>'log(persontime)'</code></td>
+</tr>
+<tr>
+  <td><code>weights</code></td>
+  <td><code>String</code> or <code>ArrayRef</code></td>
+  <td><i>none</i></td>
+  <td>Prior weights, R's <code>glm(weights = )</code>: a column name, or one value per row. Must be non-negative.</td>
+  <td><code>'w'</code></td>
+</tr>
+<tr>
+  <td><code>vcov</code></td>
+  <td><code>String</code></td>
+  <td><code>'model'</code></td>
+  <td><code>'model'</code>, or a sandwich: <code>'HC0'</code>, <code>'HC1'</code>, <code>'HC2'</code> or <code>'HC3'</code> (<code>sandwich::vcovHC</code>). Also accepted as <code>vcov_type</code>.</td>
+  <td><code>'HC0'</code></td>
+</tr>
+<tr>
+  <td><code>cluster</code></td>
+  <td><code>String</code> or <code>ArrayRef</code></td>
+  <td><i>none</i></td>
+  <td>Cluster variable(s) for <code>sandwich::vcovCL</code>: a column name, <code>'a + b'</code> for multiway clustering, or one label per row. Implies <code>vcov =&gt; 'HC0'</code> unless <code>'HC1'</code> is given.</td>
+  <td><code>'child_id'</code></td>
+</tr>
+<tr>
+  <td><code>absorb</code></td>
+  <td><code>String</code> or <code>ArrayRef</code></td>
+  <td><i>none</i></td>
+  <td>Factor(s) to absorb as fixed effects rather than expand, like the formula's <code>| f1 + f2</code> part.</td>
+  <td><code>'child_id'</code></td>
+</tr>
+<tr>
+  <td><code>maxit</code></td>
+  <td><code>Integer</code></td>
+  <td><code>25</code></td>
+  <td>IRLS iteration limit, as <code>glm.control(maxit = )</code>.</td>
+  <td><code>50</code></td>
+</tr>
+<tr>
+  <td><code>epsilon</code></td>
+  <td><code>Number</code></td>
+  <td><code>1e-8</code></td>
+  <td>IRLS convergence tolerance on the relative deviance change, as <code>glm.control(epsilon = )</code>.</td>
+  <td><code>1e-10</code></td>
 </tr>
 </tbody>
 </table>
@@ -9411,6 +10442,72 @@ p-value by about 2%.
   <td><code>Double</code></td>
   <td><code>negbin</code> family only: the negative-binomial dispersion parameter (ML estimate, or the fixed value supplied).</td>
   <td><code>1.73</code></td>
+</tr>
+<tr>
+  <td><code>loglik</code></td>
+  <td><code>Double</code></td>
+  <td>The log-likelihood, as R's <code>logLik()</code>.</td>
+  <td><code>-120.3</code></td>
+</tr>
+<tr>
+  <td><code>dispersion</code></td>
+  <td><code>Double</code></td>
+  <td>The dispersion the standard errors use: estimated (Pearson) for <code>gaussian</code>, 1 for the other families.</td>
+  <td><code>1</code></td>
+</tr>
+<tr>
+  <td><code>nobs</code></td>
+  <td><code>Integer</code></td>
+  <td>Rows in the fit (non-missing, non-zero weight, and not dropped with an absorbed group).</td>
+  <td><code>98</code></td>
+</tr>
+<tr>
+  <td><code>vcov</code></td>
+  <td><code>HashRef</code></td>
+  <td>The coefficient covariance, model-based or robust as <code>vcov.type</code> says, as a hash of hashes by term.</td>
+  <td><code>{'wt' =&gt; {'wt' =&gt; 0.01, ...}}</code></td>
+</tr>
+<tr>
+  <td><code>vcov.type</code></td>
+  <td><code>String</code></td>
+  <td><code>'model'</code>, <code>'HC0'</code>, <code>'HC1'</code>, <code>'HC2'</code> or <code>'HC3'</code>.</td>
+  <td><code>'HC0'</code></td>
+</tr>
+<tr>
+  <td><code>n.clusters</code></td>
+  <td><code>Integer</code> or <code>ArrayRef</code></td>
+  <td>With <code>cluster</code>: the number of clusters, or one count per variable when clustering several ways.</td>
+  <td><code>120</code></td>
+</tr>
+<tr>
+  <td><code>absorb</code></td>
+  <td><code>HashRef</code></td>
+  <td>With absorbed factors: each factor's number of groups in the fit.</td>
+  <td><code>{'child_id' =&gt; 812}</code></td>
+</tr>
+<tr>
+  <td><code>fe.removed</code></td>
+  <td><code>Integer</code></td>
+  <td>With absorbed factors: rows dropped because their group's outcome was constant at a boundary.</td>
+  <td><code>14</code></td>
+</tr>
+<tr>
+  <td><code>offset.terms</code></td>
+  <td><code>ArrayRef</code></td>
+  <td>With an offset: the expressions it is made of, which [<code>predict</code>](#predict) re-evaluates on new data.</td>
+  <td><code>['log(persontime)']</code></td>
+</tr>
+<tr>
+  <td><code>twologlik</code></td>
+  <td><code>Double</code></td>
+  <td><code>negbin</code> only: twice the log-likelihood, as <code>MASS::glm.nb</code>.</td>
+  <td><code>-240.6</code></td>
+</tr>
+<tr>
+  <td><code>SE.theta</code></td>
+  <td><code>Double</code></td>
+  <td><code>negbin</code> with <code>theta</code> estimated: its standard error.</td>
+  <td><code>0.41</code></td>
 </tr>
 </tbody>
 </table>
@@ -9968,6 +11065,86 @@ it was validated numerically.
 </tbody>
 </table>
 
+=head2 hurdle
+
+A two-part count model, C<pscl::hurdle()> (also C<countreg::hurdle()>): a binary
+model for whether the count is zero, and a L<zero-truncated|/"zerotrunc"> count
+model for how large it is given that it is positive. The typical use is an
+outcome such as inpatient days, where "any stay" and "how long" have different
+explanations.
+
+ use Stats::LikeR 'hurdle';
+
+ my $h = hurdle(formula => 'days ~ hours + age | hours', data => \%d,
+                dist => 'negbin');
+ print $h->{coefficients}{count}{hours};    # log rate ratio, given a stay
+ print $h->{coefficients}{zero}{hours};     # log odds of any stay
+
+The regressors after C<|> are the zero part's; without a bar both parts use the
+same ones. The likelihood separates into the two parts, so they are fitted
+separately, as both packages do by default.
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>formula</code></td>
+  <td><i>(required)</i></td>
+  <td><code>'y ~ count regressors'</code> or <code>'y ~ count regressors | zero regressors'</code>; <code>offset()</code> terms are allowed in either part.</td>
+</tr>
+<tr>
+  <td><code>data</code></td>
+  <td><i>(required)</i></td>
+  <td>HoA, AoH or HoH.</td>
+</tr>
+<tr>
+  <td><code>dist</code></td>
+  <td><code>'poisson'</code></td>
+  <td>The count part: <code>'poisson'</code>, <code>'negbin'</code> or <code>'geometric'</code>.</td>
+</tr>
+<tr>
+  <td><code>zero.dist</code></td>
+  <td><code>'binomial'</code></td>
+  <td>The zero part: <code>'binomial'</code> (a logit), or a count distribution censored at 1, <code>'poisson'</code>, <code>'negbin'</code> or <code>'geometric'</code>.</td>
+</tr>
+<tr>
+  <td><code>link</code></td>
+  <td><code>'logit'</code></td>
+  <td>The binomial zero part's link; only <code>'logit'</code> is implemented.</td>
+</tr>
+<tr>
+  <td><code>offset</code></td>
+  <td><i>none</i></td>
+  <td>A column, an expression or an array ref, added to the count part only, as <code>pscl</code>'s <code>offset = </code> is; an <code>offset()</code> term in the zero part's formula offsets that part.</td>
+</tr>
+<tr>
+  <td><code>weights</code></td>
+  <td><i>none</i></td>
+  <td>Case weights.</td>
+</tr>
+<tr>
+  <td><code>conf.level</code></td>
+  <td><code>0.95</code></td>
+  <td>Level of the Wald intervals in <code>summary</code>.</td>
+</tr>
+</tbody>
+</table>
+
+The result holds C<coefficients>, C<summary> (with C<Estimate>, C<Std. Error>,
+C<z value>, C<< Pr(E<gt>|z|) >>, C<CI.lower>, C<CI.upper>), C<vcov> and C<terms>, each split
+into C<count> and C<zero> halves; C<loglik> and its two parts C<loglik.count> and
+C<loglik.zero>, C<aic>, C<df.residual>, C<nobs>, C<converged>, C<iter> and
+C<iter.zero>; C<theta> and C<SE.logtheta> for a C<negbin> count part, and
+C<theta.zero>/C<SE.logtheta.zero> for a C<negbin> zero part; and C<fitted.values>,
+the fitted mean C<< P(y E<gt> 0) mu / (1 - f(0)) >>. Validated against C<pscl> and
+C<countreg> on their documented examples, with a third opinion from C<mpmath>.
+
 =head2 interpolate
 
 Fill NA (undef) cells along the row axis, like C<pandas.DataFrame.interpolate>.
@@ -10248,6 +11425,93 @@ same, but C<2> and C<"2.0"> are not.
 calling, rather than letting it silently match.
 
 =back
+
+=head2 ivreg
+
+Instrumental-variables regression by two-stage least squares, C<ivreg::ivreg()>
+(and C<AER::ivreg()>), with C<summary(fit, diagnostics = TRUE)>'s tests. The
+standard errors are the proper 2SLS ones, from the residuals of the structural
+equation with the original regressors, not the naive ones that come from
+running the two stages as separate C<lm> fits.
+
+ use Stats::LikeR 'ivreg';
+
+ # regressors | instruments: exogenous regressors appear on both sides
+ my $iv = ivreg(formula => 'log(packs) ~ log(rprice) + log(rincome) | log(rincome) + tdiff + rtax',
+                data => \%cig);
+ # or three parts: exogenous | endogenous | excluded instruments
+ my $iv3 = ivreg(formula => 'log(packs) ~ log(rincome) | log(rprice) | tdiff + rtax',
+                 data => \%cig, cluster => 'state');
+
+ my $d = $iv->{diagnostics};
+ printf "first-stage F = %.1f\n", $d->{weak}{'log(rprice)'}{statistic};
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>formula</code></td>
+  <td><i>(required)</i></td>
+  <td><code>'y ~ regressors | instruments'</code>, or <code>'y ~ exogenous | endogenous | instruments'</code>. Terms expand as for [<code>lm</code>](#lm).</td>
+</tr>
+<tr>
+  <td><code>data</code></td>
+  <td><i>(required)</i></td>
+  <td>HoA, AoH or HoH.</td>
+</tr>
+<tr>
+  <td><code>weights</code></td>
+  <td><i>none</i></td>
+  <td>Weights, as <code>ivreg(weights = )</code>.</td>
+</tr>
+<tr>
+  <td><code>vcov</code></td>
+  <td><code>'model'</code></td>
+  <td><code>'model'</code>, <code>'HC0'</code> or <code>'HC1'</code>; the diagnostics use the same covariance, as when <code>summary.ivreg</code> is given <code>vcov. = </code>.</td>
+</tr>
+<tr>
+  <td><code>cluster</code></td>
+  <td><i>none</i></td>
+  <td>A cluster variable (column name or array ref) for <code>sandwich::vcovCL</code>; implies <code>'HC0'</code>.</td>
+</tr>
+<tr>
+  <td><code>conf.level</code></td>
+  <td><code>0.95</code></td>
+  <td>Level of <code>conf.int</code>.</td>
+</tr>
+</tbody>
+</table>
+
+The result holds C<coefficients>, C<summary> (per term C<Estimate>,
+C<Std. Error>, C<t value>, C<< Pr(E<gt>|t|) >>), C<vcov>, C<vcov.type>, C<conf.int>,
+C<terms>, C<endogenous> and C<instruments> (the terms each role was given),
+C<fitted.values>, C<residuals>, C<sigma>, C<rss>, C<r.squared>, C<adj.r.squared>,
+C<df.residual>, C<rank>, C<nobs>, C<n.clusters> with a cluster, and C<waldtest>, the
+F test of every coefficient but the intercept. C<diagnostics> has
+
+=over
+
+=item * C<weak>: per endogenous regressor, the first-stage F test of the excluded
+instruments (C<statistic>, C<df1>, C<df2>, C<p.value>);
+
+=item * C<wu.hausman>: the test of whether the endogenous regressors are in fact
+exogenous: an F test of the first-stage residuals added to the
+structural regression;
+
+=item * C<sargan>: with more instruments than endogenous regressors, the test of
+overidentifying restrictions (C<statistic>, C<df>, C<p.value>).
+
+=back
+
+Validated against C<ivreg>'s tests and documented examples, and against Stata
+C<ivreg2> output that C<statsmodels> pins. For a count outcome, see the
+control-function note under L<C<glm>|/"glm">.
 
 =head2 kruskal_test
 
@@ -10612,6 +11876,74 @@ see L</"F and z tail p-values">. The per-coefficient
 C<< Pr(E<gt>|t|) >> values were already computed as a direct two-tail probability and
 are unaffected.
 
+=head2 lmer
+
+Linear mixed-effects regression, C<lme4::lmer()>, fitted by REML (the default)
+or maximum likelihood, with the Satterthwaite degrees of freedom and t tests
+that C<lmerTest> adds to its summary.
+
+ use Stats::LikeR 'lmer';
+
+ # a random intercept and a random slope for Days, correlated, per Subject
+ my $m = lmer(formula => 'Reaction ~ Days + (Days | Subject)', data => \%sleepstudy);
+ printf "Days: %.2f (SE %.2f, df %.1f)\n",
+     @{ $m->{summary}{Days} }{'Estimate', 'Std. Error', 'df'};
+ printf "subject sd of the slope: %.2f\n", $m->{varcor}[0]{sd}{Days};
+
+Random-effects terms are written as in C<lme4>: C<(1 | g)> a random intercept,
+C<(x | g)> a correlated intercept and slope, C<(0 + x | g)> a slope alone, so that
+C<(1 | g) + (0 + x | g)> is the uncorrelated pair; several grouping factors,
+crossed or nested, are allowed, and C<(1 | a/b)> expands to C<(1 | a) + (1 | a:b)>.
+The fixed part is expanded as for L<C<lm>|/"lm">.
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>formula</code></td>
+  <td><i>(required)</i></td>
+  <td>Fixed effects plus one or more <code>( terms | group )</code> random-effects terms.</td>
+</tr>
+<tr>
+  <td><code>data</code></td>
+  <td><i>(required)</i></td>
+  <td>HoA, AoH or HoH.</td>
+</tr>
+<tr>
+  <td><code>REML</code></td>
+  <td><code>1</code></td>
+  <td><code>0</code> for a maximum-likelihood fit (needed to compare fixed effects by likelihood ratio).</td>
+</tr>
+<tr>
+  <td><code>conf.level</code></td>
+  <td><code>0.95</code></td>
+  <td>Level of <code>conf.int</code>, from the Satterthwaite t.</td>
+</tr>
+</tbody>
+</table>
+
+The result holds C<coefficients>, C<summary> (per term C<Estimate>,
+C<Std. Error>, C<df>, C<t value>, C<< Pr(E<gt>|t|) >>), C<vcov>, C<conf.int>, C<terms>,
+C<fitted.values> (including the predicted random effects), C<sigma> (residual
+sd), C<theta> (C<lme4>'s relative covariance factor, C<getME(fit, "theta")>),
+C<REML> or C<deviance> (the criterion minimised), C<loglik>, C<AIC>, C<BIC>,
+C<nobs>, C<reml>, C<converged> and C<singular> (a variance component on its
+boundary, C<lme4>'s "singular fit"). C<varcor> is C<VarCorr()>: one entry per
+random-effects term, in formula order, each with C<group>, C<levels>, C<names>,
+C<sd> by name and the correlation matrix C<corr>.
+
+The criterion is C<lme4>'s profiled deviance, minimised by Nelder-Mead and
+then polished by Newton steps, so the estimates are those of a tightly
+converged C<lme4> fit; C<lme4>'s default optimiser stops about 1e-6 short in
+theta, which moves the standard errors in their fifth digit. Validated against
+C<lme4>, C<lmerTest> and C<statsmodels>' mixed-model corpora.
+
 =head2 logrank_test
 
 The log-rank (Mantel–Cox) test: do the survival curves of two or more groups
@@ -10672,7 +12004,8 @@ or
  my @arr = 1..8;
  max(@arr, 4, 5)
 
-max will die if any undefined values are provided
+max will die if any undefined values are provided. A C<NaN> anywhere in the input makes the answer C<NaN>, as it does in R.
+See L</"Compared with List::Util"> under C<sum> for the other ways it differs from List::Util's C<max>.
 
 =head2 mcnemar_test
 
@@ -10920,7 +12253,8 @@ or
  my @arr = 1..8;
  min(@arr, 4, 5)
 
-min will die if any undefined values are provided
+min will die if any undefined values are provided. A C<NaN> anywhere in the input makes the answer C<NaN>, as it does in R.
+See L</"Compared with List::Util"> under C<sum> for the other ways it differs from List::Util's C<min>.
 
 =head2 mode
 
@@ -11874,6 +13208,14 @@ the same.
 
 =back
 
+A C<glm> fitted with an offset -- C<offset()> in the formula or a named C<offset>
+column -- has the offset re-evaluated on each new row and added to the linear
+predictor, so a rate model predicts counts at the new rows' exposure. An offset
+given as an array ref has nothing to be re-evaluated from, and a model with
+absorbed factors has no estimates of their effects to predict with; C<predict>
+croaks on either rather than quietly leaving them out. C<poisson> and C<negbin>
+fits are put on the response scale with C<exp>.
+
 =head3 What it returns
 
 A hashref keyed by row name → prediction, exactly like C<lm>/C<glm> key
@@ -12486,7 +13828,7 @@ minimal example:
 </tr>
 <tr>
   <td><code>output.type</code></td>
-  <td>data type for output: array of hash, hash of array, or hash of hash</td>
+  <td>data type for output: array of hash (the default), array of array, hash of array, or hash of hash</td>
   <td><code>'output.type' =&gt; 'aoh'</code></td>
 </tr>
 <tr>
@@ -12506,13 +13848,28 @@ minimal example:
 </tr>
 <tr>
   <td><code>sep</code></td>
-  <td>field separator character; synonym with <code>delim</code></td>
-  <td><code>sep =&gt; "\t"</code></td>
+  <td>field separator: a literal string, or a <code>qr//</code> regex (see below); synonym with <code>delim</code></td>
+  <td><code>sep =&gt; "\t"</code>, <code>sep =&gt; qr/\s+/</code></td>
 </tr>
 <tr>
   <td><code>delim</code></td>
-  <td>field separator character; synonym with <code>sep</code></td>
+  <td>field separator: a literal string, or a <code>qr//</code> regex; synonym with <code>sep</code></td>
   <td><code>delim =&gt; "\t"</code></td>
+</tr>
+<tr>
+  <td><code>header</code></td>
+  <td><code>1</code> (the default): the first line holds the column names. <code>0</code>, or perl's false <code>''</code>: the first line is data, as R's <code>header = FALSE</code> and pandas' <code>header=None</code></td>
+  <td><code>header =&gt; 0</code></td>
+</tr>
+<tr>
+  <td><code>col.names</code></td>
+  <td>an array reference of column names. With <code>header =&gt; 0</code> it names the columns, which are otherwise <code>V1</code>, <code>V2</code>, … as in R; with a header it replaces the header's names</td>
+  <td><code>'col.names' =&gt; ['id', 'name']</code></td>
+</tr>
+<tr>
+  <td><code>quote</code></td>
+  <td><code>'"'</code> (the default): a double quote starts a quoted field. <code>''</code>: quotes are ordinary text, as R's <code>quote = ""</code> and pandas' <code>quoting=csv.QUOTE_NONE</code></td>
+  <td><code>quote =&gt; ''</code></td>
 </tr>
 <tr>
   <td><code>sheet</code></td>
@@ -12537,10 +13894,16 @@ minimal example:
 </tbody>
 </table>
 
-output types can be AOH (aoh), HOA (hoa), HOH (hoh)
+output types can be AOH (aoh), AOA (aoa), HOA (hoa), HOH (hoh)
 
  read_table($filename, 'output.type' => 'aoh');
+ read_table($filename, 'output.type' => 'aoa');
  read_table($filename, 'output.type' => 'hoa');
+
+An AoA's first row is the header, then one array per data row, every row in file column order. That is the shape C<write_table> reads an AoA as, so the two round-trip. It is also the only output type that keeps every field when the header repeats a name, so it does not give the "later values win" warning. Nothing labels an AoA's rows, so C<row.names> is an error with it; a row-names column is read as an ordinary column.
+
+ read_table('taxa.tsv', 'output.type' => 'aoa');
+ # [ ['taxid', 'genus', 'species'], ['10090', undef, 'Mus musculus'], ['9606', 'Homo', 'Homo sapiens'] ]
 
 and, like Text::CSV_XS, filters can be applied in order to save RAM on big files:
 
@@ -12554,6 +13917,153 @@ and, like Text::CSV_XS, filters can be applied in order to save RAM on big files
 
 the default delimiter is C<,>
 Suffixes C<.csv> and C<.tsv> are automatically detected from file names, but if specified, are overridden by C<delim> and/or C<sep>. C<sep> is given priority.
+
+A UTF-8 byte-order mark at the start of a text file, which Excel's "CSV UTF-8"
+export writes, is dropped rather than read as part of the first column's name,
+as pandas' C<read_csv> drops it. Lines always end at a newline whatever C<$/> is
+set to, so a C<local $/;> in the calling code does not change what is read.
+With C<< 'output.type' =E<gt> 'hoh' >> a file whose only column is the row name gives
+one empty hash per row, as R's C<read.table> gives a data frame of zero columns.
+
+=head3 regular-expression separators
+
+A string C<sep> is always a literal: C<< sep =E<gt> '\s+' >> splits on the three
+characters backslash, C<s> and plus. Pass a C<qr//> to split on a pattern instead:
+
+ my $d = read_table('aligned.txt', sep => qr/\s+/);      # whitespace-aligned columns
+ my $d = read_table('messy.csv',   sep => qr/\s*,\s*/);  # commas, with blanks around them
+ my $d = read_table('mixed.txt',   sep => qr/[;,]/);      # either of two characters
+
+Everything else reads as it does with a literal separator: quoted fields
+(a separator inside quotes is text, C<""> is one quote, a quoted field may run
+over lines), comments and commented-out headers, blank lines, a byte-order
+mark, CRLF line ends, C<filter>, C<row.names>, C<auto.row.names>, C<na.strings> and
+all four output types. Details worth knowing:
+
+=over
+
+=item * B<< C<qr/\s+/> is whitespace-delimited >>, as C<sep=r"\s+"> is in pandas and
+C<sep = ""> in R's C<read.table>: leading and trailing whitespace on a line make
+no field, so indented or right-padded columns read cleanly. This is decided by
+the pattern text alone, so C<qr/\s+/x> qualifies and C<qr/[ \t]+/> does not.
+
+=item * B<< Any other pattern cuts as C<split> does >>: a separator at the start of a line
+leaves an empty first field, and one at the end an empty last field, just as a
+literal separator would.
+
+=item * Capture groups in the pattern are not returned as fields, unlike with C<split>,
+and the pattern keeps its own flags (C<qr/x/i>) and its own group numbers, so a
+backreference works: C<qr/(:)\1/> splits on C<::>.
+
+=item * A pattern that can match the empty string, such as C<qr/\s*/>, is refused,
+since it would cut between every character.
+
+=item * In a whitespace-delimited file, a comment line with as many words as the data
+has columns will be taken for a commented-out header, since that is how one
+is recognised; see I<commented-out headers> below.
+
+=item * An C<.xlsx> file ignores C<sep> and C<quote>, whether a string or a pattern.
+
+=item * The separators are found by perl's regex engine, called from the same C
+parser a literal separator uses, so a regex read costs little more than a
+literal one: on a 300,000 x 5 CSV, C<qr/,/> takes 0.17 s and C<','> 0.14 s. A
+string is still the faster choice for a fixed separator, and a pattern that
+has to backtrack, such as C<qr/\s*,\s*/> (0.34 s), costs more.
+
+=back
+
+=head3 files with no header, and files with stray quotes (C<header>, C<col.names>, C<quote>)
+
+C<< header =E<gt> 0 >> reads the first line as data. The columns are named by
+C<col.names>, or else C<V1>, C<V2>, … as R names them, counted from the first row:
+
+ my $d = read_table('pairs.csv', header => 0);                 # V1, V2, ...
+ my $d = read_table('pairs.csv', header => 0, 'col.names' => ['id', 'score']);
+
+C<col.names> with a header (the default) renames the header's columns instead;
+if the two differ in length, C<read_table> warns, as R does, and uses
+C<col.names>. With C<< header =E<gt> 0 >>, a line starting with the comment marker is
+always a comment, even C<#text> with no space after the marker, as in R; with a
+header, such a line can be a commented-out header, as described below.
+
+C<< quote =E<gt> '' >> turns quoting off: a C<"> is kept as ordinary text wherever it
+appears. By default a C<"> anywhere in a field opens a quoted field that runs to
+the next C<">, possibly many lines later, so a file whose quotes are not CSV
+quoting -- a name such as C<'Beach rock 4+5"'> -- would have every line up to the
+next C<"> read into one cell.
+
+C<read_table> cannot tell a stray C<"> from CSV quoting by looking at the bytes,
+and neither can R or pandas. It does say when the file looks like it has one,
+and names the line where the quote opened:
+
+=over
+
+=item * If the file ends inside a quoted field, C<read_table> warns and keeps what it
+read, as R's C<scan()> does. pandas raises an error here instead.
+
+=item * If a C<"> in the middle of a field, such as C<5'10">, opens a quoted field that
+runs past the end of its line, C<read_table> warns, once per file. R reads such
+a field the same way; pandas keeps a C<"> in the middle of a field as text.
+
+=item * An C<Alignment error> on a row that a quoted field ran across lines in says so.
+
+=item * C<< quote =E<gt> '' >> warns when every field on the first line is wrapped in C<">, as
+R's C<write.csv()> writes them, because those quote marks would then stay in
+every name.
+
+=back
+
+A quoted cell that starts at the beginning of its field and holds a line break
+is ordinary CSV, and is read without a warning.
+
+Formats that never quote, such as NCBI's taxonomy dumps, want both options:
+
+ # NCBI fullnamelineage.dmp: "id\t|\tname\t|\tlineage\t|", no header
+ my $lineage = read_table('fullnamelineage.dmp',
+     sep => qr/\t\|\t?/, header => 0, quote => '',
+     'col.names' => [qw(tax_id tax_name lineage end)],   # 'end' is the empty field after the last "\t|"
+     'output.type' => 'hoa');
+
+On that 3,015,956-line, 900 MB file this takes 2.6 s. A literal
+C<< sep =E<gt> "\t|\t" >> takes 1.6 s, but leaves each line's closing C<"\t|"> on the
+lineage.
+
+=head3 compressed files (gzip, bzip2)
+
+A gzip- or bzip2-compressed file is read as the text inside it; there is no
+option to set:
+
+ my $d = read_table('cohort.tsv.gz');                  # tab-separated, from the .tsv
+ my $v = read_table('variants.tsv.bgz');               # bgzip / BGZF
+ my $b = read_table('export.csv.bz2');
+
+=over
+
+=item * B<The bytes decide, not the name>, as with R's C<read.table>: a
+compressed file without a C<.gz> suffix is still read, and a plain file
+named C<.gz> is still text. The name does still pick the default C<sep>,
+from the part before C<.gz>, C<.bgz> or C<.bz2>, so C<x.tsv.gz> is
+tab-separated.
+
+=item * B<It is streamed>, inflated 64 KB at a time as the rows are read, so a
+large compressed file takes no more memory than the plain one would.
+
+=item * B<Every member is read.> bgzip (every C<.vcf.gz>), C<pbzip2>, R's
+C<gzfile(, "a")> and C<cat a.gz b.gz> all write files of several
+compressed members, and all of them come back whole.
+
+=item * B<Damage is an error, not a short read>: a truncated file, a bad
+checksum, or anything but NUL padding after the last member dies naming
+the file.
+
+=item * Both need only core modules (C<Compress::Raw::Zlib> and
+C<Compress::Raw::Bzip2>). xz, zstd and C<.zip> are not read (an C<.xlsx>,
+which is a zip archive, is).
+
+=item * L<C<write_table>|/"write_table"> writes C<.gz> and C<.bz2> files that read
+back through this.
+
+=back
 
 =head3 missing values (C<na.strings> / C<na_values> / C<undef.val>)
 
@@ -12660,10 +14170,11 @@ C<filter> either as it appears in the file or by its clean name:
 =head3 Excel (.xlsx) files
 
 A file whose name ends in C<.xlsx> is read directly, with B<no extra
-dependencies> — the parser uses the core C<IO::Uncompress::Unzip> module to pull
-the parts out of the (zipped) workbook and reads the XML itself. All
-C<output.type>, C<filter>, and C<row.names> options work exactly as they do for
-text files:
+dependencies> — the core C<IO::Uncompress::Unzip> module pulls the parts out of
+the (zipped) workbook and the worksheet XML is parsed in XS, through the same
+fast path a delimited file takes: C<read_table> reads the header in Perl and the
+rows are assembled in C. All C<output.type>, C<filter>, and C<row.names> options
+work exactly as they do for text files:
 
  my $data = read_table('samples.xlsx');
  my $data = read_table('samples.xlsx', sheet => 'Results');   # by name
@@ -12681,9 +14192,16 @@ A workbook with a single worksheet, or a call that names a C<sheet> explicitly,
 returns that one table directly (not wrapped in a hash).
 
 Limitations: dates and times are returned as their raw Excel serial numbers
-(cell number formats are not applied); and shared-string rich-text runs are
-concatenated into a single value. The C<sep>, C<delim>, and C<comment> options do
-not apply to C<.xlsx> files. Tested in C<t/read_table.xlsx.t>.
+(cell number formats are not applied); shared-string rich-text runs are
+concatenated into a single value; a cell that has formatting but no value is a
+blank, and blanks past a row's last value do not add columns (readxl and pandas
+leave them out too); and two things the format does not allow are
+read as if they were not there — a cell reference past C<XFD>, the last of the
+16,384 columns a worksheet has, places the cell in the next column instead, and
+a numeric character reference above C<&#x7FFFFFFF;> is left in the text rather
+than decoded. The C<sep>, C<delim>, and C<comment> options do not
+apply to C<.xlsx> files. Tested in C<t/read_table.xlsx.t> and
+C<t/read_table.xlsx.parser.t>.
 
 =head2 rename_cols
 
@@ -13231,6 +14749,64 @@ which passing a reference is shorter and much easier to read.  Stats::LikeR, how
 
 C<sum> will cause the script to die if any undefined values are provided
 
+=head3 Compared with List::Util
+
+C<min>, C<max> and C<sum> pass List::Util's own tests for the same names
+(C<t/min.max.sum.ListUtil.t> carries them) except where the two differ on
+purpose:
+
+=for html <table>
+<thead>
+<tr>
+  <th></th>
+  <th>List::Util</th>
+  <th>Stats::LikeR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>an array reference</td>
+  <td>a number (its address)</td>
+  <td>its elements, read as data</td>
+</tr>
+<tr>
+  <td>a blessed array reference that overloads <code>0+</code></td>
+  <td>one number</td>
+  <td>still its elements, read as data</td>
+</tr>
+<tr>
+  <td>no arguments</td>
+  <td><code>undef</code></td>
+  <td>dies: <code>sum needs &gt;= 1 element</code> (and likewise for <code>min</code> and <code>max</code>)</td>
+</tr>
+<tr>
+  <td>a string that is not a number, such as <code>'abc'</code></td>
+  <td>0</td>
+  <td>dies, naming the argument</td>
+</tr>
+<tr>
+  <td><code>NaN</code> anywhere</td>
+  <td>depends on where it is: <code>min(NaN, 1, 2)</code> is <code>NaN</code> but <code>min(1, 2, NaN)</code> is 1</td>
+  <td><code>NaN</code>, wherever it is, as in R</td>
+</tr>
+<tr>
+  <td>the result</td>
+  <td>an IV while every value fits one, so <code>sum(1&lt;&lt;60, 1)</code> is exact</td>
+  <td>an NV, so on a <code>double</code> perl <code>sum(1&lt;&lt;60, 1) == 1&lt;&lt;60</code>, as R's <code>sum</code> gives too</td>
+</tr>
+<tr>
+  <td>a Math::BigInt</td>
+  <td>a Math::BigInt</td>
+  <td>the NV its <code>0+</code> overload gives</td>
+</tr>
+</tbody>
+</table>
+
+Anything else that is a number is taken as one: an object that overloads C<0+>
+(when it is not a blessed array reference), a tied scalar, C<$#array>, or a
+C<substr()> lvalue. Each is fetched once. The same rules hold for C<mean>,
+C<median>, C<sd>, C<var>, C<mode>, C<uniq>, C<scale>, C<skew> and C<kurtosis>.
+
 =head2 summary
 
 Analogous to R's C<summary>: a five-number-plus-mean description (C<# values>, C<Min.>, C<1st Qu.>, C<Median>, C<Mean>, C<3rd Qu.>, C<Max.>) of the data as entered (it does not summarise fitted-model objects). It produces one statistics row per numeric I<variable> and renders the table exactly like L<C<view>|/"view"> — the same colourised, wide-character-aware, terminal-fitting output — through the same internal renderer, so all of C<view>'s display options apply.
@@ -13305,6 +14881,92 @@ Option C<conf.level> (default C<0.95>). Each stratum has arrays C<time>, C<n.ris
 C<n.event>, C<n.censor>, C<surv>, C<std.err>, C<lower>, C<upper>, plus C<median>, C<n>,
 and C<events>. Compare curves with L<C<logrank_test>|/"logrank_test">; model
 covariate effects with L<C<coxph>|/"coxph">.
+
+=head2 svyglm
+
+Design-based regression for survey data, C<survey::svyglm()> on a
+C<survey::svydesign()>: point estimates weighted by the sampling weights, and
+standard errors by Taylor linearization that respect the strata and the
+clustering into primary sampling units (PSUs). Putting the sampling weights
+into L<C<glm>|/"glm">'s C<weights> gives the same point estimates but standard
+errors that are wrong for a complex sample.
+
+ use Stats::LikeR 'svyglm';
+
+ my $s = svyglm(formula => 'api00 ~ ell + meals + mobility', data => \%apistrat,
+                weights => 'pw', strata => 'stype');
+ my $c = svyglm(formula => 'sch.wide ~ ell', data => \%apiclus1, family => 'quasibinomial',
+                weights => 'pw', cluster => 'dnum', fpc => 'fpc');
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>formula</code></td>
+  <td><i>(required)</i></td>
+  <td>Formula as for [<code>glm</code>](#glm), with <code>offset()</code> terms allowed.</td>
+</tr>
+<tr>
+  <td><code>data</code></td>
+  <td><i>(required)</i></td>
+  <td>HoA, AoH or HoH.</td>
+</tr>
+<tr>
+  <td><code>family</code></td>
+  <td><code>'gaussian'</code></td>
+  <td><code>'gaussian'</code>, <code>'binomial'</code>, <code>'quasibinomial'</code>, <code>'poisson'</code> or <code>'quasipoisson'</code>. The <code>quasi</code> names give the same fit, as in <code>survey</code>.</td>
+</tr>
+<tr>
+  <td><code>weights</code></td>
+  <td>1</td>
+  <td>Sampling weights (<code>svydesign(weights = )</code>): a column name or an array ref.</td>
+</tr>
+<tr>
+  <td><code>strata</code></td>
+  <td><i>none</i></td>
+  <td>Stratum of each row.</td>
+</tr>
+<tr>
+  <td><code>cluster</code></td>
+  <td>one PSU per row</td>
+  <td>The PSU of each row (<code>svydesign(ids = )</code>); also accepted as <code>ids</code>, <code>id</code> or <code>psu</code>.</td>
+</tr>
+<tr>
+  <td><code>fpc</code></td>
+  <td><i>none</i></td>
+  <td>Finite population correction: the population size of the stratum, or the sampling fraction (a value at most 1), as <code>svydesign(fpc = )</code> reads it.</td>
+</tr>
+<tr>
+  <td><code>nest</code></td>
+  <td><code>0</code></td>
+  <td><code>svydesign(nest = TRUE)</code>: PSU labels are only unique within a stratum.</td>
+</tr>
+<tr>
+  <td><code>offset</code></td>
+  <td><i>none</i></td>
+  <td>A column, an expression or an array ref.</td>
+</tr>
+<tr>
+  <td><code>conf.level</code></td>
+  <td><code>0.95</code></td>
+  <td>Level of <code>conf.int</code>.</td>
+</tr>
+</tbody>
+</table>
+
+The result holds C<coefficients>, C<summary> (per term C<Estimate>, C<Std. Error>,
+C<t value>, C<< Pr(E<gt>|t|) >>), C<vcov>, C<conf.int>, C<terms>, C<fitted.values>,
+C<deviance>, C<dispersion> (C<summary.svyglm>'s), C<df.residual>, C<degf> (the
+design degrees of freedom, PSUs minus strata, which the t tests use), C<rank>,
+C<nobs>, C<n.psu>, C<n.strata>, C<converged> and C<iter>. Only single-stage designs
+are implemented (the first stage's PSUs and strata, as C<survey> uses by
+default). Validated against C<survey>'s own tests on the C<api> data.
 
 =head2 table_one
 
@@ -14340,10 +16002,49 @@ undefined variables are printed as C<NA> by default, but can be set as you wish 
 
  write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
 
+A hash of hashes keeps its outer keys as a leading column by default, since that is the only place they exist. Name that column with C<row.names>, or drop it with C<< row.names =E<gt> 0 >>:
+
+ my %taxa = (9606 => { species => 'Homo sapiens' }, 10090 => { species => 'Mus musculus' });
+ write_table(\%taxa, 'taxa.tsv', 'row.names' => 'taxid');   # taxid  species
+
 C<write_table> determines comma and tab-separated delimiters from the filename, but will override if C<sep> or C<delim> are explicitly set.
 Args can also be accepted:
 
  write_table( 'data' => \%flat, 'file' => $f );
+
+=head3 compressed files (C<.gz>, C<.bz2>)
+
+A file name ending in C<.gz> is written gzip-compressed, and one ending in
+C<.bz2> bzip2-compressed:
+
+ write_table(\@rows, 'cohort.tsv.gz');     # tab-separated, then gzipped
+ write_table(\@rows, 'cohort.csv.bz2');
+
+=over
+
+=item * B<The rest of the name means what it always did>: the default C<sep>
+comes from the part before the suffix, so C<cohort.tsv.gz> is
+tab-separated. The text inside is exactly what the plain file would
+hold.
+
+=item * B<It is streamed>, compressed as the rows are written, at gzip's and
+bzip2's default levels (6 and 9, as R's C<gzfile> and C<bzfile> use).
+A gzip file's header carries no name or time, so the same table always
+makes the same bytes.
+
+=item * B<A write that fails partway leaves a truncated file>, which
+L<C<read_table>|/"read_table"> refuses, never one that looks whole. A
+compressed write also croaks if the disk fills or the file cannot be
+finished.
+
+=item * B<Only delimited text is compressed.> A name such as C<table.tex.gz> or
+C<book.xlsx.bz2>, or C<tex>/C<xlsx> with a compressed name, is an error.
+
+=item * Both use core modules only. A C<.bgz> name is an error: it promises
+bgzip's BGZF, which tabix can index and plain gzip is not. Write C<.gz>,
+and run C<bgzip> on the plain file if you need BGZF.
+
+=back
 
 =head3 The confirmation line
 
@@ -14366,7 +16067,7 @@ C<write_table> can write the output file as a LaTeX C<tabular> instead of a deli
  write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
  write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
 
-The file begins with a C<< %written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance comment (the working directory and script name). The header row is bold and the table is ruled with C<\hline>. As with every other format, C<row.names> is B<off> unless you ask for it: pass C<< row.names =E<gt> 1 >> to prepend a label column, whose labels are the outer keys for a HoH and a 1-based index otherwise. Cell text is LaTeX-escaped: C<#>, C<_>, C<%>, and C<&> are backslash-escaped, C<< E<gt> >> becomes C<\textgreater{}>, and a cell consisting solely of C<\includesvg{...svg}> is passed through untouched. The C<tex.*> options tune the output:
+The file begins with a C<< %written by E<lt>cwdE<gt>/E<lt>scriptE<gt> >> provenance comment (the working directory and script name). The header row is bold and the table is ruled with C<\hline>. As with every other format, C<row.names> is B<off> unless you ask for it, except for a HoH: pass C<< row.names =E<gt> 1 >> to prepend a label column of 1-based indices. A HoH writes its outer keys as that column by default, and C<< row.names =E<gt> 0 >> drops them. Cell text is LaTeX-escaped: C<#>, C<_>, C<%>, and C<&> are backslash-escaped, C<< E<gt> >> becomes C<\textgreater{}>, and a cell consisting solely of C<\includesvg{...svg}> is passed through untouched. The C<tex.*> options tune the output:
 
  write_table(\@rows, 'table.tex',
      'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
@@ -14489,9 +16190,9 @@ C<read_table>.
 </tr>
 <tr>
   <td><code>row.names</code></td>
-  <td><code>0</code> (off)</td>
+  <td><code>0</code> (off); <code>1</code> (on) for a HoH</td>
   <td>both</td>
-  <td>true prepends a label column (numeric 1-based index, or the outer key for a HoH); <code>0</code> omits it. Off by default in <b>every</b> format — delimited, LaTeX and <code>.xlsx</code> alike. (R's <code>write.table</code> defaults it on and this once followed suit for LaTeX; it no longer does.) For a HoA/AoH a non-numeric <i>column name</i> uses that column's values as the labels and drops it from the body</td>
+  <td>true prepends a label column (numeric 1-based index, or the outer key for a HoH); <code>0</code> omits it. Off by default in <b>every</b> format — delimited, LaTeX and <code>.xlsx</code> alike — for every shape but a HoH. (R's <code>write.table</code> defaults it on and this once followed suit for LaTeX; it no longer does.) A HoH defaults it on, because its outer keys are the row identifiers and exist nowhere else. For a HoA/AoH a non-numeric <i>column name</i> uses that column's values as the labels and drops it from the body. For a HoH a non-numeric string <i>names</i> the key column, so <code>row.names =&gt; 'taxid'</code> heads it <code>taxid</code> instead of leaving the header cell empty; it dies if that name is also a column being written</td>
 </tr>
 <tr>
   <td><code>col.names</code></td>
@@ -14588,6 +16289,75 @@ C<read_table>.
 
 =head1 Numerical accuracy
 
+=head2 zerotrunc
+
+A count regression truncated at zero, C<countreg::zerotrunc()>: the model for a
+count that is only observed when it is at least 1, such as length of stay among
+those admitted. Fitting an ordinary Poisson or negative binomial to such data
+underestimates the mean at low counts, because it expects zeros that can never
+be seen.
+
+ use Stats::LikeR 'zerotrunc';
+
+ my $z = zerotrunc(formula => 'days ~ hours + age', data => \%admitted,
+                   dist => 'negbin');
+ printf "theta = %.3f\n", $z->{theta};
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>formula</code></td>
+  <td><i>(required)</i></td>
+  <td>Formula as for [<code>glm</code>](#glm), with <code>offset()</code> terms allowed.</td>
+</tr>
+<tr>
+  <td><code>data</code></td>
+  <td><i>(required)</i></td>
+  <td>HoA, AoH or HoH. The response must be positive integers.</td>
+</tr>
+<tr>
+  <td><code>dist</code></td>
+  <td><code>'poisson'</code></td>
+  <td><code>'poisson'</code>, <code>'negbin'</code> or <code>'geometric'</code>.</td>
+</tr>
+<tr>
+  <td><code>theta</code></td>
+  <td><i>estimated</i></td>
+  <td>For <code>negbin</code>, a fixed dispersion instead of an estimated one, as <code>countreg</code>'s <code>theta = </code>.</td>
+</tr>
+<tr>
+  <td><code>offset</code></td>
+  <td><i>none</i></td>
+  <td>A column, an expression, or an array ref.</td>
+</tr>
+<tr>
+  <td><code>weights</code></td>
+  <td><i>none</i></td>
+  <td>Case weights.</td>
+</tr>
+<tr>
+  <td><code>conf.level</code></td>
+  <td><code>0.95</code></td>
+  <td>Level of the Wald intervals in <code>summary</code>.</td>
+</tr>
+</tbody>
+</table>
+
+The result holds C<coefficients>, C<summary> (per term C<Estimate>, C<Std. Error>,
+C<z value>, C<< Pr(E<gt>|z|) >>, C<CI.lower>, C<CI.upper>), C<vcov>, C<terms>, C<loglik>,
+C<aic>, C<df.residual>, C<df.null>, C<nobs>, C<converged> and C<iter>; C<theta> and
+C<SE.logtheta> for C<negbin>, as C<countreg> reports them; C<fitted.values>, the
+truncated mean C<mu / (1 - f(0))>, and Pearson-style C<residuals>. The fit is a
+damped Newton iteration on the exact likelihood and its analytic Hessian.
+Validated against C<countreg> and against C<mpmath> at 60 digits.
+
 =head2 F and z tail p-values
 
 A p-value is an upper-tail probability, and the obvious way to get one from a
@@ -14641,13 +16411,6 @@ Verified against R 4.6.1 (C<oneway.test>, C<anova(aov())>, C<anova(lm())>,
 C<summary(lm())$fstatistic>, C<summary(glm())$coefficients>) and against SciPy's
 C<f.sf> / C<norm.sf> and statsmodels' C<anova_oneway>; see
 C<t/model_pvalue_tails.t> and C<t/oneway_test.R.scipy.t>.
-
-=head1 Changes
-
-The release history is in the C<Changes> file at the root of the distribution,
-in the format CPAN and MetaCPAN read. It is deliberately not repeated here:
-until 0.315 this section was the source C<md2pod.pl> built C<Changes> from, so
-the same prose had to be kept correct in two markups at once.
 
 =head1 COPYRIGHT AND LICENSE
 

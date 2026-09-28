@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::Fstab 2.166;
+package Config::Model::Backend::Fstab 2.167;
 
 use Mouse;
 use Carp;
@@ -174,7 +174,7 @@ Config::Model::Backend::Fstab - Read and write config from fstab file
 
 =head1 VERSION
 
-version 2.166
+version 2.167
 
 =head1 SYNOPSIS
 

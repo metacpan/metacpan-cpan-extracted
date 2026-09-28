@@ -1,9 +1,6 @@
 # Synopsis
 
 Get basic statistical functions working in Perl as if they were part of List::Util, like `min`, `max`, `sum`, etc.
-There are other similar tools on CPAN, but I want speed and a form like List::Util.
-
-There **are** other modules on CPAN that can do **PARTS** of this, but this works the way that I **want** it to.
 
 # Getting help
 
@@ -428,6 +425,28 @@ after the first adds `Df`, `Sum of Sq`, `F` and `Pr(>F)`:
     my $tab = anova($data, 'y ~ x1', 'y ~ x1 + x2');
     printf "adding x2: F = %.4g, p = %.4g\n", $tab->[1]{F}, $tab->[1]{'Pr(>F)'};
 
+Given two or more **fitted models** instead -- `lm` or `glm` fits (or
+`negbin` `glm` fits) of the same response on the same rows -- `anova` compares
+them as R's `anova(m0, m1, ...)` does, and also returns an array ref of rows
+in the order supplied. For `lm` fits it is `anova.lmlist`'s F test, on the
+largest model's residual mean square (`Res.Df`, `RSS`, `Df`, `Sum of Sq`, `F`,
+`Pr(>F)`). For `glm` fits it is `anova.glmlist`'s table (`Resid. Df`,
+`Resid. Dev`, `Df`, `Deviance`) with a test chosen as R chooses it: a
+likelihood-ratio `Pr(>Chi)` for the families with a known dispersion, an F on
+the largest model's dispersion for `gaussian`; ask for one with
+`test => 'Chisq'`, `'LRT'` or `'F'`, or fix the scale with `dispersion`.
+`negbin` fits give `MASS::anova.negbin`'s likelihood-ratio table (`theta`,
+`Resid. df`, `2 x log-lik.`, `df`, `LR stat.`, `Pr(Chi)`), whose rows
+are ordered by residual degrees of freedom.
+
+    my $m0 = glm(formula => 'y ~ age',         data => \%d, family => 'poisson');
+    my $m1 = glm(formula => 'y ~ age + hours', data => \%d, family => 'poisson');
+    my $t  = anova($m0, $m1);
+    printf "LR test for hours: p = %.3g\n", $t->[1]{'Pr(>Chi)'};
+
+This is also how a first-stage F on a block of instruments is had without
+[`ivreg`](#ivreg).
+
 Both forms evaluate `Pr(>F)` in the upper tail of the F distribution rather
 than as `1 - pf(F, df1, df2)`; see
 [F and z tail p-values](#f-and-z-tail-p-values).
@@ -472,9 +491,8 @@ table" call. Note that both are **Type-I / sequential**, so term order in the
 formula matters, and both share this module's `pf`, so p-values agree with
 `oneway_test` and the rest of Stats::LikeR.
 
-*(R's `anova` generic can additionally compare several nested models,
-`anova(m1, m2)`, giving an F/LRT between them — a capability neither this
-`anova` nor `aov` currently provides. Ask if that would be useful.)*
+Comparing nested models -- `anova(m1, m2)` in R -- is done by giving `anova`
+two or more formulas, or two or more fitted models; see above.
 
 ## aoh2h
 
@@ -1924,12 +1942,76 @@ Give times, an event flag (1 = event, 0 = censored), and one or more covariates
     print $fit->{exp.coef}[0];    # hazard ratio for age
     print $fit->{p.value}[0];     # its p-value
 
-Options: `names`, `ties` (`'efron'` default, or `'breslow'`), `conf.level`
-(default `0.95`), `maxit`. The result has parallel per-covariate arrays `coef`
-(log-HR), `exp.coef` (HR), `se`, `z`, `p.value`, `conf.int` (HR scale), plus
-model-level `loglik`, `lr.stat`/`lr.p.value` (likelihood-ratio test), `n`,
-`nevent`, and `converged`. See [`survfit`](#survfit) and
-[`logrank_test`](#logrank_test).
+Or name the columns of a data set in a formula, as `survival::coxph` does. The
+response is `Surv(time, status)`, or `Surv(start, stop, status)` for
+counting-process data; covariates expand as they do for [`lm`](#lm) and
+[`glm`](#glm) (factors, interactions, `I()`, `log()`), and `strata(g)` and
+`cluster(id)` terms are taken out of the covariates and used as below:
+
+    my $fit = coxph(formula => 'Surv(tstart, tstop, event) ~ hours + age + strata(tech)',
+                    data => \%d, cluster => 'child_id');
+
+**Counting-process data** -- one row per interval `(start, stop]` over which a
+subject's covariates are constant -- is what a time-varying covariate and late
+entry both need. A subject is at risk at an event time only in the interval
+that covers it. In the positional form give the start times as `start => \@t0`.
+Intervals that span no event contribute nothing and are skipped, as
+`survival`'s `agreg.fit` skips them.
+
+**Strata** (`strata(g)` in a formula, or `strata => \@g`) give each level its
+own baseline hazard, with the covariate effects shared.
+
+**Robust variance.** With a cluster (`cluster(id)`, or `cluster => \@id` or a
+column name), `se` is the grouped-jackknife (dfbeta) robust standard error that
+`coxph(..., cluster = id)` reports, and the model-based one moves to
+`naive.se`. `robust => 1` without a cluster makes each row its own cluster,
+which `(start, stop]` data does not allow: a subject's intervals have to be
+grouped by a cluster.
+`weights` are case weights and `offset` a term with coefficient fixed at 1.
+
+**A changepoint profile** needs no function of its own: refit over a grid of
+candidate thresholds and keep each `loglik`. The maximum is the estimate; the
+thresholds within `qchisq(0.95, 1) / 2 = 1.92` of it are a likelihood-ratio
+interval, which for a changepoint is only approximate, since the profile is a
+step function of `c` and the usual regularity conditions do not hold.
+
+    my @grid = map { 40 + $_ } 0 .. 30;
+    my %ll;
+    for my $c (@grid) {
+        $d{above} = [ map { $_ > $c ? 1 : 0 } @{ $d{hours} } ];
+        $ll{$c} = coxph(formula => 'Surv(tstart, tstop, event) ~ above + age + strata(tech)',
+                        data => \%d)->{loglik};
+    }
+    my ($best) = sort { $ll{$b} <=> $ll{$a} } @grid;
+    my @ci = grep { $ll{$best} - $ll{$_} <= 1.92 } @grid;
+
+### Options
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `names` | `x1`, `x2`, ... | Covariate names in the positional form. |
+| `ties` | `'efron'` | `'efron'` or `'breslow'`. |
+| `conf.level` | `0.95` | Level of `conf.int`. |
+| `maxit` | `20` | Newton iteration limit (`iter.max`). |
+| `eps` | `1e-9` | Convergence tolerance on the relative log-likelihood change, `coxph.control(eps = )`. |
+| `start` | *none* | Positional form: interval start times, for `(start, stop]` data. |
+| `strata` | *none* | Positional form: one stratum label per row. |
+| `cluster` | *none* | One cluster label per row, or (formula form) a column name. |
+| `weights` | *none* | Case weights. |
+| `offset` | *none* | One offset per row. |
+| `robust` | `0`, or `1` with a cluster | Report the robust variance. |
+
+### Result
+
+Parallel per-covariate arrays `coef` (log-HR), `exp.coef` (HR), `se`, `z`,
+`p.value` and `conf.int` (HR scale), with `names`; `coefficients` by name;
+`var` (a matrix) and `vcov` (a hash of hashes by name), the covariance the standard errors
+come from; model-level `loglik` (at the fit) and `loglik.null`,
+`lr.stat`/`lr.df`/`lr.p.value` (likelihood-ratio test), `score.test` and
+`wald.test`, `n`, `nevent`, `iterations` and `converged`. With a robust
+variance it adds `naive.se` and `naive.var`, `robust.score.test`, and
+`n.clusters`; with strata, `strata` lists their labels. See
+[`survfit`](#survfit) and [`logrank_test`](#logrank_test).
 
 ## cramers_v
 
@@ -3109,15 +3191,79 @@ can differ from R's in the 6th to 8th significant digit, which a p-value far
 out in the tail amplifies — at `|z| = 37` a 1.5e-5 difference in `z` moves the
 p-value by about 2%.
 
+### Offsets, prior weights, robust covariance and absorbed factors
+
+An **offset** is a term whose coefficient is fixed at 1 rather than estimated,
+which is how a count model is put on a per-person-time scale. Write it into the
+formula, as R does, or pass it as `offset` (a column name, an expression over
+columns, or an array ref with one value per row); the two forms add together.
+The negative-binomial `theta` search sees the offset too, as `MASS::glm.nb`'s
+does, and the null deviance is that of an intercept-plus-offset fit:
+
+    my $rate = glm(formula => 'admits ~ hours + age + offset(log(persontime))',
+                   data => \%d, family => 'poisson');
+    my $same = glm(formula => 'admits ~ hours + age', offset => 'log(persontime)',
+                   data => \%d, family => 'poisson');
+
+**Prior weights** (`weights`, a column name or an array ref) are R's
+`glm(weights = )`. A binomial fit whose weights make a non-integer number of
+successes warns `non-integer #successes in a binomial glm!`, as R does. A row
+with weight 0 is kept out of the fit and out of `nobs`.
+
+`vcov => 'HC0'` (through `'HC3'`) replaces the model-based covariance by a
+heteroskedasticity-consistent sandwich, `sandwich::vcovHC()`, and `cluster`
+by a cluster-robust one, `sandwich::vcovCL()`. Naming a cluster alone implies
+`HC0`, which is `vcovCL()`'s own default for a glm; `HC1` adds the
+`(n - 1)/(n - k)` factor. `cluster => 'firm + year'` clusters two ways (up to
+four) by inclusion-exclusion, as `vcovCL(cluster = ~ firm + year)` does. The
+`summary` standard errors, `z`, p-values and both kinds of confidence interval
+are then all computed from the robust covariance, as `lmtest::coeftest()`
+would. A `poisson` fit on a 0/1 outcome with `vcov => 'HC0'` is the
+"modified Poisson" risk-ratio regression (Zou 2004, *Am J Epidemiol* 159:702):
+
+    my $rr = glm(formula => 'readmit ~ hours + age', data => \%d,
+                 family => 'poisson', vcov => 'HC0', cluster => 'child_id');
+    printf "RR = %.3f (%.3f-%.3f)\n", @{ $rr->{exp}{hours} }{qw(estimate conf.low conf.high)};
+
+A factor with thousands of levels (a within-subject comparison) can be
+**absorbed** instead of expanded into dummy columns: put it after a `|` in the
+formula, as `fixest` does, or name it in `absorb`. The fit then demeans within
+groups (weighted, by alternating projections for more than one factor) and
+reports only the remaining coefficients, which equal those of the
+full-dummy fit. As `fixest::feglm()` does, a group whose outcome is constant at
+a boundary (all zeros for `poisson`/`negbin`, all 0 or all 1 for `binomial`)
+carries no information and is dropped; `fe.removed` counts the rows that goes
+with. HC2/HC3 are not available with absorbed factors.
+
+    my $fe = glm(formula => 'visits ~ hours | child_id + year', data => \%d,
+                 family => 'poisson', cluster => 'child_id');
+
+`maxit` (default 25) and `epsilon` (default `1e-8`) are `glm.control()`'s.
+
+A **control-function** IV estimate for a count outcome is two calls: fit the
+first stage with [`lm`](#lm), add its residuals to the data, and include them
+as a regressor in the `poisson`/`negbin` `glm`. The coefficient of the
+residual is a test of exogeneity, but the second-stage standard errors do not
+account for the first stage having been estimated; bootstrap the pair of fits
+for those. For a continuous outcome use [`ivreg`](#ivreg), whose standard
+errors are right as they stand.
+
 ### Input Parameters
 
 | Parameter | Type | Default | Description | Example |
 | --- | --- | --- | --- | --- |
-| `formula` | `String` | *None (Required)* | A symbolic description of the model to be fitted. Parsed by the same code as [`lm`](#lm)'s, so it takes the same operators: `+`, `:`, `*`, `^`, `.` for every remaining column, and `-1` / `+0` to remove the intercept. | `'am ~ wt + hp'`, `'y ~ x - 1'`, `'y ~ .'` |
+| `formula` | `String` | *None (Required)* | A symbolic description of the model to be fitted. Parsed by the same code as [`lm`](#lm)'s, so it takes the same operators: `+`, `:`, `*`, `^`, `.` for every remaining column, and `-1` / `+0` to remove the intercept. It may also hold `offset()` terms, and factors to absorb after a `\|`. | `'am ~ wt + hp'`, `'y ~ x - 1'`, `'y ~ .'` |
 | `data` | `HashRef` or `ArrayRef` | *None (Required)* | The dataset containing the variables used in the formula. Accepts a Hash of Arrays (HoA), a Hash of Hashes (HoH) or an Array of Hashes (AoH). Rows are named as described under [`lm`](#lm). | `\%mtcars`, `[{x => 1, y => 2}, ...]` |
 | `family` | `String` | `'gaussian'` | The error distribution / link function: `'gaussian'` (identity link), `'binomial'` (logit link), `'poisson'` (log link) or `'negbin'` (negative binomial, log link). | `'poisson'` |
 | `theta` | `Number` | *estimated by ML* | Negative-binomial dispersion. When omitted (with `family => 'negbin'`) it is estimated by maximum likelihood as in `MASS::glm.nb`; supply a value to hold it fixed. | `1.7` |
 | `conf.level` | `Number` | `0.95` | Confidence level for the Wald coefficient / exponentiated-coefficient intervals. | `0.90` |
+| `offset` | `String` or `ArrayRef` | *none* | A column, an expression over columns such as `'log(t)'`, or one value per row, added to the linear predictor with coefficient 1. Adds to any `offset()` terms in the formula. | `'log(persontime)'` |
+| `weights` | `String` or `ArrayRef` | *none* | Prior weights, R's `glm(weights = )`: a column name, or one value per row. Must be non-negative. | `'w'` |
+| `vcov` | `String` | `'model'` | `'model'`, or a sandwich: `'HC0'`, `'HC1'`, `'HC2'` or `'HC3'` (`sandwich::vcovHC`). Also accepted as `vcov_type`. | `'HC0'` |
+| `cluster` | `String` or `ArrayRef` | *none* | Cluster variable(s) for `sandwich::vcovCL`: a column name, `'a + b'` for multiway clustering, or one label per row. Implies `vcov => 'HC0'` unless `'HC1'` is given. | `'child_id'` |
+| `absorb` | `String` or `ArrayRef` | *none* | Factor(s) to absorb as fixed effects rather than expand, like the formula's `\| f1 + f2` part. | `'child_id'` |
+| `maxit` | `Integer` | `25` | IRLS iteration limit, as `glm.control(maxit = )`. | `50` |
+| `epsilon` | `Number` | `1e-8` | IRLS convergence tolerance on the relative deviance change, as `glm.control(epsilon = )`. | `1e-10` |
 
 ### Output variables
 
@@ -3142,6 +3288,17 @@ p-value by about 2%.
 | `conf.level` | `Double` | The confidence level used for `conf.int` and `exp`. | `0.95` |
 | `exp` | `HashRef` | Non-gaussian families only: exponentiated coefficient (odds ratio for `binomial`; rate / incidence-rate ratio for `poisson` / `negbin`) with its confidence interval, as `{estimate, 'conf.low', 'conf.high'}`. | `{'wt' => {estimate => 0.6, 'conf.low' => 0.4, 'conf.high' => 0.9}}` |
 | `theta` | `Double` | `negbin` family only: the negative-binomial dispersion parameter (ML estimate, or the fixed value supplied). | `1.73` |
+| `loglik` | `Double` | The log-likelihood, as R's `logLik()`. | `-120.3` |
+| `dispersion` | `Double` | The dispersion the standard errors use: estimated (Pearson) for `gaussian`, 1 for the other families. | `1` |
+| `nobs` | `Integer` | Rows in the fit (non-missing, non-zero weight, and not dropped with an absorbed group). | `98` |
+| `vcov` | `HashRef` | The coefficient covariance, model-based or robust as `vcov.type` says, as a hash of hashes by term. | `{'wt' => {'wt' => 0.01, ...}}` |
+| `vcov.type` | `String` | `'model'`, `'HC0'`, `'HC1'`, `'HC2'` or `'HC3'`. | `'HC0'` |
+| `n.clusters` | `Integer` or `ArrayRef` | With `cluster`: the number of clusters, or one count per variable when clustering several ways. | `120` |
+| `absorb` | `HashRef` | With absorbed factors: each factor's number of groups in the fit. | `{'child_id' => 812}` |
+| `fe.removed` | `Integer` | With absorbed factors: rows dropped because their group's outcome was constant at a boundary. | `14` |
+| `offset.terms` | `ArrayRef` | With an offset: the expressions it is made of, which [`predict`](#predict) re-evaluates on new data. | `['log(persontime)']` |
+| `twologlik` | `Double` | `negbin` only: twice the log-likelihood, as `MASS::glm.nb`. | `-240.6` |
+| `SE.theta` | `Double` | `negbin` with `theta` estimated: its standard error. | `0.41` |
 
 ## group_by
 
@@ -3527,6 +3684,45 @@ it was validated numerically.
 | `groups` | `Integer` | Number of non-empty groups used. | `10` |
 | `table` | `ArrayRef` | Per-group `{n, observed, expected}` event summaries. | |
 
+## hurdle
+
+A two-part count model, `pscl::hurdle()` (also `countreg::hurdle()`): a binary
+model for whether the count is zero, and a [zero-truncated](#zerotrunc) count
+model for how large it is given that it is positive. The typical use is an
+outcome such as inpatient days, where "any stay" and "how long" have different
+explanations.
+
+    use Stats::LikeR 'hurdle';
+
+    my $h = hurdle(formula => 'days ~ hours + age | hours', data => \%d,
+                   dist => 'negbin');
+    print $h->{coefficients}{count}{hours};    # log rate ratio, given a stay
+    print $h->{coefficients}{zero}{hours};     # log odds of any stay
+
+The regressors after `|` are the zero part's; without a bar both parts use the
+same ones. The likelihood separates into the two parts, so they are fitted
+separately, as both packages do by default.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `formula` | *(required)* | `'y ~ count regressors'` or `'y ~ count regressors \| zero regressors'`; `offset()` terms are allowed in either part. |
+| `data` | *(required)* | HoA, AoH or HoH. |
+| `dist` | `'poisson'` | The count part: `'poisson'`, `'negbin'` or `'geometric'`. |
+| `zero.dist` | `'binomial'` | The zero part: `'binomial'` (a logit), or a count distribution censored at 1, `'poisson'`, `'negbin'` or `'geometric'`. |
+| `link` | `'logit'` | The binomial zero part's link; only `'logit'` is implemented. |
+| `offset` | *none* | A column, an expression or an array ref, added to the count part only, as `pscl`'s `offset = ` is; an `offset()` term in the zero part's formula offsets that part. |
+| `weights` | *none* | Case weights. |
+| `conf.level` | `0.95` | Level of the Wald intervals in `summary`. |
+
+The result holds `coefficients`, `summary` (with `Estimate`, `Std. Error`,
+`z value`, `Pr(>|z|)`, `CI.lower`, `CI.upper`), `vcov` and `terms`, each split
+into `count` and `zero` halves; `loglik` and its two parts `loglik.count` and
+`loglik.zero`, `aic`, `df.residual`, `nobs`, `converged`, `iter` and
+`iter.zero`; `theta` and `SE.logtheta` for a `negbin` count part, and
+`theta.zero`/`SE.logtheta.zero` for a `negbin` zero part; and `fitted.values`,
+the fitted mean `P(y > 0) mu / (1 - f(0))`. Validated against `pscl` and
+`countreg` on their documented examples, with a third opinion from `mpmath`.
+
 ## interpolate
 
 Fill NA (undef) cells along the row axis, like `pandas.DataFrame.interpolate`.
@@ -3735,6 +3931,54 @@ same, but `2` and `"2.0"` are not.
 - Every argument must be an **array ref**; anything else croaks.
 - **`undef` inside a list croaks** — decide what a missing value means before
   calling, rather than letting it silently match.
+
+## ivreg
+
+Instrumental-variables regression by two-stage least squares, `ivreg::ivreg()`
+(and `AER::ivreg()`), with `summary(fit, diagnostics = TRUE)`'s tests. The
+standard errors are the proper 2SLS ones, from the residuals of the structural
+equation with the original regressors, not the naive ones that come from
+running the two stages as separate `lm` fits.
+
+    use Stats::LikeR 'ivreg';
+
+    # regressors | instruments: exogenous regressors appear on both sides
+    my $iv = ivreg(formula => 'log(packs) ~ log(rprice) + log(rincome) | log(rincome) + tdiff + rtax',
+                   data => \%cig);
+    # or three parts: exogenous | endogenous | excluded instruments
+    my $iv3 = ivreg(formula => 'log(packs) ~ log(rincome) | log(rprice) | tdiff + rtax',
+                    data => \%cig, cluster => 'state');
+
+    my $d = $iv->{diagnostics};
+    printf "first-stage F = %.1f\n", $d->{weak}{'log(rprice)'}{statistic};
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `formula` | *(required)* | `'y ~ regressors \| instruments'`, or `'y ~ exogenous \| endogenous \| instruments'`. Terms expand as for [`lm`](#lm). |
+| `data` | *(required)* | HoA, AoH or HoH. |
+| `weights` | *none* | Weights, as `ivreg(weights = )`. |
+| `vcov` | `'model'` | `'model'`, `'HC0'` or `'HC1'`; the diagnostics use the same covariance, as when `summary.ivreg` is given `vcov. = `. |
+| `cluster` | *none* | A cluster variable (column name or array ref) for `sandwich::vcovCL`; implies `'HC0'`. |
+| `conf.level` | `0.95` | Level of `conf.int`. |
+
+The result holds `coefficients`, `summary` (per term `Estimate`,
+`Std. Error`, `t value`, `Pr(>|t|)`), `vcov`, `vcov.type`, `conf.int`,
+`terms`, `endogenous` and `instruments` (the terms each role was given),
+`fitted.values`, `residuals`, `sigma`, `rss`, `r.squared`, `adj.r.squared`,
+`df.residual`, `rank`, `nobs`, `n.clusters` with a cluster, and `waldtest`, the
+F test of every coefficient but the intercept. `diagnostics` has
+
+- `weak`: per endogenous regressor, the first-stage F test of the excluded
+  instruments (`statistic`, `df1`, `df2`, `p.value`);
+- `wu.hausman`: the test of whether the endogenous regressors are in fact
+  exogenous: an F test of the first-stage residuals added to the
+  structural regression;
+- `sargan`: with more instruments than endogenous regressors, the test of
+  overidentifying restrictions (`statistic`, `df`, `p.value`).
+
+Validated against `ivreg`'s tests and documented examples, and against Stata
+`ivreg2` output that `statsmodels` pins. For a count outcome, see the
+control-function note under [`glm`](#glm).
 
 ## kruskal_test
 
@@ -4059,6 +4303,49 @@ see [F and z tail p-values](#f-and-z-tail-p-values). The per-coefficient
 `Pr(>|t|)` values were already computed as a direct two-tail probability and
 are unaffected.
 
+## lmer
+
+Linear mixed-effects regression, `lme4::lmer()`, fitted by REML (the default)
+or maximum likelihood, with the Satterthwaite degrees of freedom and t tests
+that `lmerTest` adds to its summary.
+
+    use Stats::LikeR 'lmer';
+
+    # a random intercept and a random slope for Days, correlated, per Subject
+    my $m = lmer(formula => 'Reaction ~ Days + (Days | Subject)', data => \%sleepstudy);
+    printf "Days: %.2f (SE %.2f, df %.1f)\n",
+        @{ $m->{summary}{Days} }{'Estimate', 'Std. Error', 'df'};
+    printf "subject sd of the slope: %.2f\n", $m->{varcor}[0]{sd}{Days};
+
+Random-effects terms are written as in `lme4`: `(1 | g)` a random intercept,
+`(x | g)` a correlated intercept and slope, `(0 + x | g)` a slope alone, so that
+`(1 | g) + (0 + x | g)` is the uncorrelated pair; several grouping factors,
+crossed or nested, are allowed, and `(1 | a/b)` expands to `(1 | a) + (1 | a:b)`.
+The fixed part is expanded as for [`lm`](#lm).
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `formula` | *(required)* | Fixed effects plus one or more `( terms \| group )` random-effects terms. |
+| `data` | *(required)* | HoA, AoH or HoH. |
+| `REML` | `1` | `0` for a maximum-likelihood fit (needed to compare fixed effects by likelihood ratio). |
+| `conf.level` | `0.95` | Level of `conf.int`, from the Satterthwaite t. |
+
+The result holds `coefficients`, `summary` (per term `Estimate`,
+`Std. Error`, `df`, `t value`, `Pr(>|t|)`), `vcov`, `conf.int`, `terms`,
+`fitted.values` (including the predicted random effects), `sigma` (residual
+sd), `theta` (`lme4`'s relative covariance factor, `getME(fit, "theta")`),
+`REML` or `deviance` (the criterion minimised), `loglik`, `AIC`, `BIC`,
+`nobs`, `reml`, `converged` and `singular` (a variance component on its
+boundary, `lme4`'s "singular fit"). `varcor` is `VarCorr()`: one entry per
+random-effects term, in formula order, each with `group`, `levels`, `names`,
+`sd` by name and the correlation matrix `corr`.
+
+The criterion is `lme4`'s profiled deviance, minimised by Nelder-Mead and
+then polished by Newton steps, so the estimates are those of a tightly
+converged `lme4` fit; `lme4`'s default optimiser stops about 1e-6 short in
+theta, which moves the standard errors in their fifth digit. Validated against
+`lme4`, `lmerTest` and `statsmodels`' mixed-model corpora.
+
 ## logrank_test
 
 The log-rank (Mantel–Cox) test: do the survival curves of two or more groups
@@ -4119,7 +4406,8 @@ or
     my @arr = 1..8;
     max(@arr, 4, 5)
 
-max will die if any undefined values are provided
+max will die if any undefined values are provided. A `NaN` anywhere in the input makes the answer `NaN`, as it does in R.
+See [Compared with List::Util](#compared-with-listutil) under `sum` for the other ways it differs from List::Util's `max`.
 
 ## mcnemar_test
 
@@ -4288,7 +4576,8 @@ or
     my @arr = 1..8;
     min(@arr, 4, 5)
 
-min will die if any undefined values are provided
+min will die if any undefined values are provided. A `NaN` anywhere in the input makes the answer `NaN`, as it does in R.
+See [Compared with List::Util](#compared-with-listutil) under `sum` for the other ways it differs from List::Util's `min`.
 
 ## mode
 
@@ -4954,6 +5243,14 @@ the inverse link.
   predictor. For `lm` and gaussian `glm` the link is the identity, so the two are
   the same.
 
+A `glm` fitted with an offset -- `offset()` in the formula or a named `offset`
+column -- has the offset re-evaluated on each new row and added to the linear
+predictor, so a rate model predicts counts at the new rows' exposure. An offset
+given as an array ref has nothing to be re-evaluated from, and a model with
+absorbed factors has no estimates of their effects to predict with; `predict`
+croaks on either rather than quietly leaving them out. `poisson` and `negbin`
+fits are put on the response scale with `exp`.
+
 ### What it returns
 
 A hashref keyed by row name → prediction, exactly like `lm`/`glm` key
@@ -5333,20 +5630,29 @@ minimal example:
 | Option | Description | Example |
 | -------- | ------- | ------- |
 |`comment` | Comment character, by default `#`; lines beginning with it are skipped | `comment => '%'` |
-|`output.type`| data type for output: array of hash, hash of array, or hash of hash | `'output.type' => 'aoh'`|
+|`output.type`| data type for output: array of hash (the default), array of array, hash of array, or hash of hash | `'output.type' => 'aoh'`|
 |`filter`| Only take in rows matching a filter | `filter => { Sex => sub {$_ eq 'f'} }`|
 |`row.names` | include row names in retrieved data; off by default | |
 |`auto.row.names` | read R's default `write.table` output, where the header is one field short of every data row because R writes no label for the row-names column: the leading field of each row becomes a row-names column. `1` names it `row_name`, a string names it whatever you pass. Off by default, so a genuinely ragged file is still an error | `'auto.row.names' => 1` |
-|`sep` | field separator character; synonym with `delim`| `sep => "\t"` |
-| `delim`| field separator character; synonym with `sep`| `delim => "\t"` |
+|`sep` | field separator: a literal string, or a `qr//` regex (see below); synonym with `delim`| `sep => "\t"`, `sep => qr/\s+/` |
+| `delim`| field separator: a literal string, or a `qr//` regex; synonym with `sep`| `delim => "\t"` |
+| `header` | `1` (the default): the first line holds the column names. `0`, or perl's false `''`: the first line is data, as R's `header = FALSE` and pandas' `header=None` | `header => 0` |
+| `col.names` | an array reference of column names. With `header => 0` it names the columns, which are otherwise `V1`, `V2`, … as in R; with a header it replaces the header's names | `'col.names' => ['id', 'name']` |
+| `quote` | `'"'` (the default): a double quote starts a quoted field. `''`: quotes are ordinary text, as R's `quote = ""` and pandas' `quoting=csv.QUOTE_NONE` | `quote => ''` |
 | `sheet`| which worksheet to read from an `.xlsx` file: a 1-based index or a sheet name (default: first sheet). Ignored for text files | `sheet => 'Sheet2'` |
 | `na.strings` | field texts that mean "missing"; a string or an array reference of strings, mapped to `undef`. Off by default | `'na.strings' => 'NA'` |
 | `na_values` | pandas' spelling of `na.strings` | `na_values => ['NA', 'N/A']` |
 | `undef.val` | `write_table`'s spelling of `na.strings`, so a round trip can use one name on both halves | `'undef.val' => 'NA'` |
-output types can be AOH (aoh), HOA (hoa), HOH (hoh)
+output types can be AOH (aoh), AOA (aoa), HOA (hoa), HOH (hoh)
 
     read_table($filename, 'output.type' => 'aoh');
+    read_table($filename, 'output.type' => 'aoa');
     read_table($filename, 'output.type' => 'hoa');
+
+An AoA's first row is the header, then one array per data row, every row in file column order. That is the shape `write_table` reads an AoA as, so the two round-trip. It is also the only output type that keeps every field when the header repeats a name, so it does not give the "later values win" warning. Nothing labels an AoA's rows, so `row.names` is an error with it; a row-names column is read as an ordinary column.
+
+    read_table('taxa.tsv', 'output.type' => 'aoa');
+    # [ ['taxid', 'genus', 'species'], ['10090', undef, 'Mus musculus'], ['9606', 'Homo', 'Homo sapiens'] ]
 and, like Text::CSV_XS, filters can be applied in order to save RAM on big files:
 
     $test_data = read_table(
@@ -5358,6 +5664,123 @@ and, like Text::CSV_XS, filters can be applied in order to save RAM on big files
     );
 the default delimiter is `,`
 Suffixes `.csv` and `.tsv` are automatically detected from file names, but if specified, are overridden by `delim` and/or `sep`. `sep` is given priority.
+
+A UTF-8 byte-order mark at the start of a text file, which Excel's "CSV UTF-8"
+export writes, is dropped rather than read as part of the first column's name,
+as pandas' `read_csv` drops it. Lines always end at a newline whatever `$/` is
+set to, so a `local $/;` in the calling code does not change what is read.
+With `'output.type' => 'hoh'` a file whose only column is the row name gives
+one empty hash per row, as R's `read.table` gives a data frame of zero columns.
+### regular-expression separators
+A string `sep` is always a literal: `sep => '\s+'` splits on the three
+characters backslash, `s` and plus. Pass a `qr//` to split on a pattern instead:
+
+    my $d = read_table('aligned.txt', sep => qr/\s+/);      # whitespace-aligned columns
+    my $d = read_table('messy.csv',   sep => qr/\s*,\s*/);  # commas, with blanks around them
+    my $d = read_table('mixed.txt',   sep => qr/[;,]/);      # either of two characters
+
+Everything else reads as it does with a literal separator: quoted fields
+(a separator inside quotes is text, `""` is one quote, a quoted field may run
+over lines), comments and commented-out headers, blank lines, a byte-order
+mark, CRLF line ends, `filter`, `row.names`, `auto.row.names`, `na.strings` and
+all four output types. Details worth knowing:
+
+- **`qr/\s+/` is whitespace-delimited**, as `sep=r"\s+"` is in pandas and
+  `sep = ""` in R's `read.table`: leading and trailing whitespace on a line make
+  no field, so indented or right-padded columns read cleanly. This is decided by
+  the pattern text alone, so `qr/\s+/x` qualifies and `qr/[ \t]+/` does not.
+- **Any other pattern cuts as `split` does**: a separator at the start of a line
+  leaves an empty first field, and one at the end an empty last field, just as a
+  literal separator would.
+- Capture groups in the pattern are not returned as fields, unlike with `split`,
+  and the pattern keeps its own flags (`qr/x/i`) and its own group numbers, so a
+  backreference works: `qr/(:)\1/` splits on `::`.
+- A pattern that can match the empty string, such as `qr/\s*/`, is refused,
+  since it would cut between every character.
+- In a whitespace-delimited file, a comment line with as many words as the data
+  has columns will be taken for a commented-out header, since that is how one
+  is recognised; see *commented-out headers* below.
+- An `.xlsx` file ignores `sep` and `quote`, whether a string or a pattern.
+- The separators are found by perl's regex engine, called from the same C
+  parser a literal separator uses, so a regex read costs little more than a
+  literal one: on a 300,000 x 5 CSV, `qr/,/` takes 0.17 s and `','` 0.14 s. A
+  string is still the faster choice for a fixed separator, and a pattern that
+  has to backtrack, such as `qr/\s*,\s*/` (0.34 s), costs more.
+### files with no header, and files with stray quotes (`header`, `col.names`, `quote`)
+`header => 0` reads the first line as data. The columns are named by
+`col.names`, or else `V1`, `V2`, … as R names them, counted from the first row:
+
+    my $d = read_table('pairs.csv', header => 0);                 # V1, V2, ...
+    my $d = read_table('pairs.csv', header => 0, 'col.names' => ['id', 'score']);
+
+`col.names` with a header (the default) renames the header's columns instead;
+if the two differ in length, `read_table` warns, as R does, and uses
+`col.names`. With `header => 0`, a line starting with the comment marker is
+always a comment, even `#text` with no space after the marker, as in R; with a
+header, such a line can be a commented-out header, as described below.
+
+`quote => ''` turns quoting off: a `"` is kept as ordinary text wherever it
+appears. By default a `"` anywhere in a field opens a quoted field that runs to
+the next `"`, possibly many lines later, so a file whose quotes are not CSV
+quoting -- a name such as `'Beach rock 4+5"'` -- would have every line up to the
+next `"` read into one cell.
+
+`read_table` cannot tell a stray `"` from CSV quoting by looking at the bytes,
+and neither can R or pandas. It does say when the file looks like it has one,
+and names the line where the quote opened:
+
+- If the file ends inside a quoted field, `read_table` warns and keeps what it
+  read, as R's `scan()` does. pandas raises an error here instead.
+- If a `"` in the middle of a field, such as `5'10"`, opens a quoted field that
+  runs past the end of its line, `read_table` warns, once per file. R reads such
+  a field the same way; pandas keeps a `"` in the middle of a field as text.
+- An `Alignment error` on a row that a quoted field ran across lines in says so.
+- `quote => ''` warns when every field on the first line is wrapped in `"`, as
+  R's `write.csv()` writes them, because those quote marks would then stay in
+  every name.
+
+A quoted cell that starts at the beginning of its field and holds a line break
+is ordinary CSV, and is read without a warning.
+
+Formats that never quote, such as NCBI's taxonomy dumps, want both options:
+
+    # NCBI fullnamelineage.dmp: "id\t|\tname\t|\tlineage\t|", no header
+    my $lineage = read_table('fullnamelineage.dmp',
+        sep => qr/\t\|\t?/, header => 0, quote => '',
+        'col.names' => [qw(tax_id tax_name lineage end)],   # 'end' is the empty field after the last "\t|"
+        'output.type' => 'hoa');
+
+On that 3,015,956-line, 900 MB file this takes 2.6 s. A literal
+`sep => "\t|\t"` takes 1.6 s, but leaves each line's closing `"\t|"` on the
+lineage.
+
+### compressed files (gzip, bzip2)
+A gzip- or bzip2-compressed file is read as the text inside it; there is no
+option to set:
+
+    my $d = read_table('cohort.tsv.gz');                  # tab-separated, from the .tsv
+    my $v = read_table('variants.tsv.bgz');               # bgzip / BGZF
+    my $b = read_table('export.csv.bz2');
+
+  - **The bytes decide, not the name**, as with R's `read.table`: a
+    compressed file without a `.gz` suffix is still read, and a plain file
+    named `.gz` is still text. The name does still pick the default `sep`,
+    from the part before `.gz`, `.bgz` or `.bz2`, so `x.tsv.gz` is
+    tab-separated.
+  - **It is streamed**, inflated 64 KB at a time as the rows are read, so a
+    large compressed file takes no more memory than the plain one would.
+  - **Every member is read.** bgzip (every `.vcf.gz`), `pbzip2`, R's
+    `gzfile(, "a")` and `cat a.gz b.gz` all write files of several
+    compressed members, and all of them come back whole.
+  - **Damage is an error, not a short read**: a truncated file, a bad
+    checksum, or anything but NUL padding after the last member dies naming
+    the file.
+  - Both need only core modules (`Compress::Raw::Zlib` and
+    `Compress::Raw::Bzip2`). xz, zstd and `.zip` are not read (an `.xlsx`,
+    which is a zip archive, is).
+  - [`write_table`](#write_table) writes `.gz` and `.bz2` files that read
+    back through this.
+
 ### missing values (`na.strings` / `na_values` / `undef.val`)
 An empty field is always read as `undef`. Any *other* text that a file uses to
 mean "missing" — `NA`, `N/A`, `NULL`, `-`, `-999` — has to be named. It is one
@@ -5429,10 +5852,11 @@ leading comments are never mistaken for one. You may name such a column in a
 
 ### Excel (.xlsx) files
 A file whose name ends in `.xlsx` is read directly, with **no extra
-dependencies** — the parser uses the core `IO::Uncompress::Unzip` module to pull
-the parts out of the (zipped) workbook and reads the XML itself. All
-`output.type`, `filter`, and `row.names` options work exactly as they do for
-text files:
+dependencies** — the core `IO::Uncompress::Unzip` module pulls the parts out of
+the (zipped) workbook and the worksheet XML is parsed in XS, through the same
+fast path a delimited file takes: `read_table` reads the header in Perl and the
+rows are assembled in C. All `output.type`, `filter`, and `row.names` options
+work exactly as they do for text files:
 
     my $data = read_table('samples.xlsx');
     my $data = read_table('samples.xlsx', sheet => 'Results');   # by name
@@ -5450,9 +5874,16 @@ A workbook with a single worksheet, or a call that names a `sheet` explicitly,
 returns that one table directly (not wrapped in a hash).
 
 Limitations: dates and times are returned as their raw Excel serial numbers
-(cell number formats are not applied); and shared-string rich-text runs are
-concatenated into a single value. The `sep`, `delim`, and `comment` options do
-not apply to `.xlsx` files. Tested in `t/read_table.xlsx.t`.
+(cell number formats are not applied); shared-string rich-text runs are
+concatenated into a single value; a cell that has formatting but no value is a
+blank, and blanks past a row's last value do not add columns (readxl and pandas
+leave them out too); and two things the format does not allow are
+read as if they were not there — a cell reference past `XFD`, the last of the
+16,384 columns a worksheet has, places the cell in the next column instead, and
+a numeric character reference above `&#x7FFFFFFF;` is left in the text rather
+than decoded. The `sep`, `delim`, and `comment` options do not
+apply to `.xlsx` files. Tested in `t/read_table.xlsx.t` and
+`t/read_table.xlsx.parser.t`.
 
 ## rename_cols
 
@@ -5946,6 +6377,27 @@ which passing a reference is shorter and much easier to read.  Stats::LikeR, how
 
 `sum` will cause the script to die if any undefined values are provided
 
+### Compared with List::Util
+
+`min`, `max` and `sum` pass List::Util's own tests for the same names
+(`t/min.max.sum.ListUtil.t` carries them) except where the two differ on
+purpose:
+
+| | List::Util | Stats::LikeR |
+|---|---|---|
+| an array reference | a number (its address) | its elements, read as data |
+| a blessed array reference that overloads `0+` | one number | still its elements, read as data |
+| no arguments | `undef` | dies: `sum needs >= 1 element` (and likewise for `min` and `max`) |
+| a string that is not a number, such as `'abc'` | 0 | dies, naming the argument |
+| `NaN` anywhere | depends on where it is: `min(NaN, 1, 2)` is `NaN` but `min(1, 2, NaN)` is 1 | `NaN`, wherever it is, as in R |
+| the result | an IV while every value fits one, so `sum(1<<60, 1)` is exact | an NV, so on a `double` perl `sum(1<<60, 1) == 1<<60`, as R's `sum` gives too |
+| a Math::BigInt | a Math::BigInt | the NV its `0+` overload gives |
+
+Anything else that is a number is taken as one: an object that overloads `0+`
+(when it is not a blessed array reference), a tied scalar, `$#array`, or a
+`substr()` lvalue. Each is fetched once. The same rules hold for `mean`,
+`median`, `sd`, `var`, `mode`, `uniq`, `scale`, `skew` and `kurtosis`.
+
 ## summary
 
 Analogous to R's `summary`: a five-number-plus-mean description (`# values`, `Min.`, `1st Qu.`, `Median`, `Mean`, `3rd Qu.`, `Max.`) of the data as entered (it does not summarise fitted-model objects). It produces one statistics row per numeric *variable* and renders the table exactly like [`view`](#view) — the same colourised, wide-character-aware, terminal-fitting output — through the same internal renderer, so all of `view`'s display options apply.
@@ -5995,6 +6447,43 @@ Option `conf.level` (default `0.95`). Each stratum has arrays `time`, `n.risk`,
 `n.event`, `n.censor`, `surv`, `std.err`, `lower`, `upper`, plus `median`, `n`,
 and `events`. Compare curves with [`logrank_test`](#logrank_test); model
 covariate effects with [`coxph`](#coxph).
+
+## svyglm
+
+Design-based regression for survey data, `survey::svyglm()` on a
+`survey::svydesign()`: point estimates weighted by the sampling weights, and
+standard errors by Taylor linearization that respect the strata and the
+clustering into primary sampling units (PSUs). Putting the sampling weights
+into [`glm`](#glm)'s `weights` gives the same point estimates but standard
+errors that are wrong for a complex sample.
+
+    use Stats::LikeR 'svyglm';
+
+    my $s = svyglm(formula => 'api00 ~ ell + meals + mobility', data => \%apistrat,
+                   weights => 'pw', strata => 'stype');
+    my $c = svyglm(formula => 'sch.wide ~ ell', data => \%apiclus1, family => 'quasibinomial',
+                   weights => 'pw', cluster => 'dnum', fpc => 'fpc');
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `formula` | *(required)* | Formula as for [`glm`](#glm), with `offset()` terms allowed. |
+| `data` | *(required)* | HoA, AoH or HoH. |
+| `family` | `'gaussian'` | `'gaussian'`, `'binomial'`, `'quasibinomial'`, `'poisson'` or `'quasipoisson'`. The `quasi` names give the same fit, as in `survey`. |
+| `weights` | 1 | Sampling weights (`svydesign(weights = )`): a column name or an array ref. |
+| `strata` | *none* | Stratum of each row. |
+| `cluster` | one PSU per row | The PSU of each row (`svydesign(ids = )`); also accepted as `ids`, `id` or `psu`. |
+| `fpc` | *none* | Finite population correction: the population size of the stratum, or the sampling fraction (a value at most 1), as `svydesign(fpc = )` reads it. |
+| `nest` | `0` | `svydesign(nest = TRUE)`: PSU labels are only unique within a stratum. |
+| `offset` | *none* | A column, an expression or an array ref. |
+| `conf.level` | `0.95` | Level of `conf.int`. |
+
+The result holds `coefficients`, `summary` (per term `Estimate`, `Std. Error`,
+`t value`, `Pr(>|t|)`), `vcov`, `conf.int`, `terms`, `fitted.values`,
+`deviance`, `dispersion` (`summary.svyglm`'s), `df.residual`, `degf` (the
+design degrees of freedom, PSUs minus strata, which the t tests use), `rank`,
+`nobs`, `n.psu`, `n.strata`, `converged` and `iter`. Only single-stage designs
+are implemented (the first stage's PSUs and strata, as `survey` uses by
+default). Validated against `survey`'s own tests on the `api` data.
 
 ## table_one
 
@@ -6701,10 +7190,39 @@ You can also precisely filter and reorder which columns are written by passing a
 undefined variables are printed as `NA` by default, but can be set as you wish using `undef.val`
 
     write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
+A hash of hashes keeps its outer keys as a leading column by default, since that is the only place they exist. Name that column with `row.names`, or drop it with `row.names => 0`:
+
+    my %taxa = (9606 => { species => 'Homo sapiens' }, 10090 => { species => 'Mus musculus' });
+    write_table(\%taxa, 'taxa.tsv', 'row.names' => 'taxid');   # taxid  species
 `write_table` determines comma and tab-separated delimiters from the filename, but will override if `sep` or `delim` are explicitly set.
 Args can also be accepted:
 
     write_table( 'data' => \%flat, 'file' => $f );
+
+### compressed files (`.gz`, `.bz2`)
+A file name ending in `.gz` is written gzip-compressed, and one ending in
+`.bz2` bzip2-compressed:
+
+    write_table(\@rows, 'cohort.tsv.gz');     # tab-separated, then gzipped
+    write_table(\@rows, 'cohort.csv.bz2');
+
+  - **The rest of the name means what it always did**: the default `sep`
+    comes from the part before the suffix, so `cohort.tsv.gz` is
+    tab-separated. The text inside is exactly what the plain file would
+    hold.
+  - **It is streamed**, compressed as the rows are written, at gzip's and
+    bzip2's default levels (6 and 9, as R's `gzfile` and `bzfile` use).
+    A gzip file's header carries no name or time, so the same table always
+    makes the same bytes.
+  - **A write that fails partway leaves a truncated file**, which
+    [`read_table`](#read_table) refuses, never one that looks whole. A
+    compressed write also croaks if the disk fills or the file cannot be
+    finished.
+  - **Only delimited text is compressed.** A name such as `table.tex.gz` or
+    `book.xlsx.bz2`, or `tex`/`xlsx` with a compressed name, is an error.
+  - Both use core modules only. A `.bgz` name is an error: it promises
+    bgzip's BGZF, which tabix can index and plain gzip is not. Write `.gz`,
+    and run `bgzip` on the plain file if you need BGZF.
 
 ### The confirmation line
 
@@ -6724,7 +7242,7 @@ The colour is unconditional; it is not suppressed when standard output is a pipe
 
     write_table(\@data_aoh, 'table.tex');            # .tex name selects LaTeX
     write_table(\@data_aoh, $tmp_file, 'tex' => 1);  # force LaTeX for any name
-The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. As with every other format, `row.names` is **off** unless you ask for it: pass `row.names => 1` to prepend a label column, whose labels are the outer keys for a HoH and a 1-based index otherwise. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. The `tex.*` options tune the output:
+The file begins with a `%written by <cwd>/<script>` provenance comment (the working directory and script name). The header row is bold and the table is ruled with `\hline`. As with every other format, `row.names` is **off** unless you ask for it, except for a HoH: pass `row.names => 1` to prepend a label column of 1-based indices. A HoH writes its outer keys as that column by default, and `row.names => 0` drops them. Cell text is LaTeX-escaped: `#`, `_`, `%`, and `&` are backslash-escaped, `>` becomes `\textgreater{}`, and a cell consisting solely of `\includesvg{...svg}` is passed through untouched. The `tex.*` options tune the output:
 
     write_table(\@rows, 'table.tex',
         'tex.col.align'    => 'l',                   # 'c' (default), 'l', or 'r'
@@ -6814,7 +7332,7 @@ raw values (no cell number formats), matching the round-trip behaviour of
 | `data` (1st positional, or `data =>`) | *required* | both | the table: flat hash, HoA, HoH, AoH, or AoA |
 | `file` (2nd positional, or `file =>`) | *required* | both | output path; written as a delimited table, or as LaTeX when `tex` is on |
 | `sep` / `delim` | from extension (`,` for `.csv`, tab for `.tsv`), else `,` | delimited | field separator; the two are aliases |
-| `row.names` | `0` (off) | both | true prepends a label column (numeric 1-based index, or the outer key for a HoH); `0` omits it. Off by default in **every** format — delimited, LaTeX and `.xlsx` alike. (R's `write.table` defaults it on and this once followed suit for LaTeX; it no longer does.) For a HoA/AoH a non-numeric *column name* uses that column's values as the labels and drops it from the body |
+| `row.names` | `0` (off); `1` (on) for a HoH | both | true prepends a label column (numeric 1-based index, or the outer key for a HoH); `0` omits it. Off by default in **every** format — delimited, LaTeX and `.xlsx` alike — for every shape but a HoH. (R's `write.table` defaults it on and this once followed suit for LaTeX; it no longer does.) A HoH defaults it on, because its outer keys are the row identifiers and exist nowhere else. For a HoA/AoH a non-numeric *column name* uses that column's values as the labels and drops it from the body. For a HoH a non-numeric string *names* the key column, so `row.names => 'taxid'` heads it `taxid` instead of leaving the header cell empty; it dies if that name is also a column being written |
 | `col.names` | all columns, sorted | both | array ref selecting and ordering columns; for an AoA it also supplies the column names |
 | `undef.val` | `''` (empty field) | both | text written for an undefined/missing cell, e.g. `'NA'` |
 | `tex` | auto: `1` when `file` ends in `.tex`, else `0` | LaTeX | write the output file as a LaTeX `tabular` instead of a delimited table; `tex => 0` forces delimited even for a `.tex` name |
@@ -6832,6 +7350,38 @@ raw values (no cell number formats), matching the round-trip behaviour of
 | `xlsx.freeze.cols` | `0` (none) | Excel | number of leading columns to freeze in place (freeze panes) |
 
 # Numerical accuracy
+
+## zerotrunc
+
+A count regression truncated at zero, `countreg::zerotrunc()`: the model for a
+count that is only observed when it is at least 1, such as length of stay among
+those admitted. Fitting an ordinary Poisson or negative binomial to such data
+underestimates the mean at low counts, because it expects zeros that can never
+be seen.
+
+    use Stats::LikeR 'zerotrunc';
+
+    my $z = zerotrunc(formula => 'days ~ hours + age', data => \%admitted,
+                      dist => 'negbin');
+    printf "theta = %.3f\n", $z->{theta};
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `formula` | *(required)* | Formula as for [`glm`](#glm), with `offset()` terms allowed. |
+| `data` | *(required)* | HoA, AoH or HoH. The response must be positive integers. |
+| `dist` | `'poisson'` | `'poisson'`, `'negbin'` or `'geometric'`. |
+| `theta` | *estimated* | For `negbin`, a fixed dispersion instead of an estimated one, as `countreg`'s `theta = `. |
+| `offset` | *none* | A column, an expression, or an array ref. |
+| `weights` | *none* | Case weights. |
+| `conf.level` | `0.95` | Level of the Wald intervals in `summary`. |
+
+The result holds `coefficients`, `summary` (per term `Estimate`, `Std. Error`,
+`z value`, `Pr(>|z|)`, `CI.lower`, `CI.upper`), `vcov`, `terms`, `loglik`,
+`aic`, `df.residual`, `df.null`, `nobs`, `converged` and `iter`; `theta` and
+`SE.logtheta` for `negbin`, as `countreg` reports them; `fitted.values`, the
+truncated mean `mu / (1 - f(0))`, and Pearson-style `residuals`. The fit is a
+damped Newton iteration on the exact likelihood and its analytic Hessian.
+Validated against `countreg` and against `mpmath` at 60 digits.
 
 ## F and z tail p-values
 
@@ -6880,13 +7430,6 @@ Verified against R 4.6.1 (`oneway.test`, `anova(aov())`, `anova(lm())`,
 `summary(lm())$fstatistic`, `summary(glm())$coefficients`) and against SciPy's
 `f.sf` / `norm.sf` and statsmodels' `anova_oneway`; see
 `t/model_pvalue_tails.t` and `t/oneway_test.R.scipy.t`.
-
-# Changes
-
-The release history is in the `Changes` file at the root of the distribution,
-in the format CPAN and MetaCPAN read. It is deliberately not repeated here:
-until 0.315 this section was the source `md2pod.pl` built `Changes` from, so
-the same prose had to be kept correct in two markups at once.
 
 # COPYRIGHT AND LICENSE
 

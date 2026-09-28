@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TreeSearcher 2.166;
+package Config::Model::TreeSearcher 2.167;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -153,7 +153,7 @@ Config::Model::TreeSearcher - Search tree for match in value, description...
 
 =head1 VERSION
 
-version 2.166
+version 2.167
 
 =head1 SYNOPSIS
 

@@ -16,5 +16,11 @@ read.me.pod
 t/01.t
 t/02.fixes.t
 t/03.fixes.t
+t/04.fixes.t
+t/05.features.t
+t/06.pipeline.t
+t/07.coverage.t
+t/08.fixes.t
 t/lib/CaptureStd.pm
+t/lib/NoDoubleQuote.pm
 t/more.coverage.t

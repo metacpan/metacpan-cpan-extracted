@@ -10,3 +10,4 @@
 ^Alien-ngtcp2-.*\.tar\.gz$
 ^cover_db/
 ^\.prove$
+^handoff\.md$

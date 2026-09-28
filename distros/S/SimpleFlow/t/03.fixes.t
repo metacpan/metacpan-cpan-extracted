@@ -100,8 +100,15 @@ foreach my $form ('list', 'string') {
 		# reports the missing program with a non-zero code of its own. That
 		# code has not been observed -- there is no Windows perl here -- so
 		# only its being non-zero is asserted.
+		#
+		# A list is never retried through cmd.exe, and a failed spawn does not
+		# return -1 there either: win32.c's do_aspawn sets the status to
+		# 255 * 256 instead. The 0.181 report from a CPAN tester (Strawberry
+		# Perl 5.42.0, Windows Server 2012) got exactly that, exit 255.
 		if ($form eq 'string' && $^O eq 'MSWin32') {
 			isnt($parent->{'exit'}, 0, 'exit is non-zero, from cmd.exe (0.17: 0)');
+		} elsif ($^O eq 'MSWin32') {
+			is($parent->{'exit'},    255,      'exit is 255, from win32.c (0.17: 0)');
 		} else {
 			is($parent->{'exit'},    -1,       'exit is -1, "could not be launched" (0.17: 0)');
 		}
@@ -109,8 +116,9 @@ foreach my $form ('list', 'string') {
 }
 
 # --- 2. the same, under a timeout -----------------------------------------
-# _run_with_timeout forks and execs explicitly, and its failed exec died the
-# same way before reaching the POSIX::_exit meant for it.
+# _run_with_timeout (_run_forked since 0.19) forks and execs explicitly, and
+# its failed exec died the same way before reaching the POSIX::_exit meant for
+# it.
 SKIP: {
 	skip 'timeout needs fork() and POSIX process groups', 1 if $^O eq 'MSWin32';
 	subtest 'a missing command under a timeout is FAILED, and nothing escapes' => sub {
@@ -122,9 +130,10 @@ SKIP: {
 			'no forked copy of the caller ran on after task() (0.17: one did)');
 		my ($parent) = grep { $_->{who} eq 'parent' } @returned;
 		is($parent->{'will.do'}, 'FAILED', 'will.do is FAILED (0.17: "done")');
-		# 127, the shell's "not found": the forked child has no way to hand
-		# system()'s -1 back to the parent
-		is($parent->{'exit'},    127,      'exit is 127 (0.17: 0)');
+		# -1, "could not be launched", as without a timeout. It was 127, the
+		# shell's "not found", until 0.19, when the forked child had no way
+		# to hand system()'s -1 back; it now writes its errno down a pipe.
+		is($parent->{'exit'},    -1,       'exit is -1, "could not be launched" (0.17: 0)');
 	};
 }
 

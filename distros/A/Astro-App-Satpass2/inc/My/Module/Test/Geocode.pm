@@ -11,7 +11,7 @@ our @ISA = qw{ Exporter };
 use Astro::App::Satpass2::Utils qw{ load_package };
 use Test2::V0;
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 our @EXPORT_OK = qw{ setup geocode };
 our @EXPORT = @EXPORT_OK;
@@ -34,10 +34,10 @@ sub setup {
 	or skip_all 'LWP::UserAgent not available';
 
     my $url = $wrapper_class->GEOCODER_SITE();
-    my $rslt = LWP::UserAgent->new()->get( $url )
-	or skip_all "No access to $url: " . $@ || 'Unknown error';
+    my $rslt = $geocoder_class->new()->ua()->head( $url )
+	or skip_all "No access to $url: " . ( $@ || 'Unknown error' );
     $rslt->is_success
-	or skip_all "No access to $url: " . $rslt -> status_line ();
+	or skip_all "No access to $url: " . $rslt->status_line ();
 
     eval {
 	$wrapper_object = $wrapper_class->new();

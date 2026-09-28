@@ -1,5 +1,11 @@
 Revision history for App::papersway
 
+3.002     2026-09-27 16:17:00+01:00 Europe/London
+    - Fix under-filling after multiple visible columns close.
+    - Don't move a column at index 0 when absorbing into it from the right.
+    - Improve fill behaviour when moving and closing wide columns.
+    - 'absorb-expel': Add some missing guards.
+
 3.001     2026-09-19 20:15:40+01:00 Europe/London
     - Don't send "focus tiling" if there are no tiling containers.
     - Send "focus tiling" before running commands that might need it.

@@ -1,3 +1,9 @@
+Travel::Routing::DE::DBRIS 0.14 - Sun Sep 27 2026
+
+    * dbris: handle pseudo-trains withuot occupancy
+    * Now also compatible with IO::Uncompress::Brotli 0.004_001, as shipped
+      by Debian's current stable release (Trixie / 13)
+
 Travel::Routing::DE::DBRIS 0.13 - Sat Jun 13 2026
 
     * Fix each request being delayed for 10 seconds by Akamai BMP

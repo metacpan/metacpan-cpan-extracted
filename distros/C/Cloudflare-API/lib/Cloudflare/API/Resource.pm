@@ -22,7 +22,7 @@ use warnings;
 
 #  Version information
 #
-$VERSION='1.010';
+$VERSION='1.011';
 
 
 #  All done. Positive return
@@ -48,6 +48,45 @@ sub new {
 
 
 sub api { return $_[0]->{'api_or'} }
+
+
+sub collect_list {
+
+    my ($self, $page_or)=@_;
+    return scalar($page_or->all());
+
+}
+
+
+sub list_pagination {
+
+    my ($self, $path, $config_hr, $query_hr)=@_;
+    die "pagination config must be a hash reference\n"
+        unless ref($config_hr) eq 'HASH';
+    $self->check_list_query($query_hr);
+    return $self->api()->pagination($path, %$config_hr, query => $query_hr);
+
+}
+
+
+sub list_response {
+
+    my ($self, $path, $query_hr)=@_;
+    $self->check_list_query($query_hr);
+    return $self->api()->request_full('GET', $path, query => $query_hr);
+
+}
+
+
+sub check_list_query {
+
+    my ($self, $query_hr)=@_;
+    die "list query must be a hash reference\n" unless ref($query_hr) eq 'HASH';
+    die "full_response is unavailable for list methods; use the page response method\n"
+        if exists($query_hr->{'full_response'});
+    return 1;
+
+}
 __END__
 
 =encoding utf8
@@ -69,7 +108,7 @@ my $client=$r2->api();
 
 # DESCRIPTION #
 
-`Cloudflare::API::Resource` holds the parent `Cloudflare::API` client used by the resource modules. Applications normally obtain a concrete resource object through a parent accessor such as `r2()` or `workers()`. The base class does not make requests on its own.
+`Cloudflare::API::Resource` holds the parent `Cloudflare::API` client used by the resource modules. It also centralizes the internal helpers that collect a complete list, create an `HTTP::API::Core::Pagination` object, or retrieve one complete list response. Applications normally obtain a concrete resource object through a parent accessor such as `r2()` or `workers()`; those pagination helpers are for resource subclasses rather than direct application use.
 
 # METHODS #
 
@@ -114,7 +153,7 @@ Cloudflare::API::Resource - shared base class for Cloudflare resource objects
 
 =head1 DESCRIPTION
 
-C<Cloudflare::API::Resource> holds the parent C<Cloudflare::API> client used by the resource modules. Applications normally obtain a concrete resource object through a parent accessor such as C<r2()> or C<workers()>. The base class does not make requests on its own.
+C<Cloudflare::API::Resource> holds the parent C<Cloudflare::API> client used by the resource modules. It also centralizes the internal helpers that collect a complete list, create an C<HTTP::API::Core::Pagination> object, or retrieve one complete list response. Applications normally obtain a concrete resource object through a parent accessor such as C<r2()> or C<workers()>; those pagination helpers are for resource subclasses rather than direct application use.
 
 
 =head1 METHODS

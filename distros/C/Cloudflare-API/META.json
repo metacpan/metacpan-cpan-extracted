@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Digest::SHA" : "0",
-            "HTTP::API::Core" : "1.01",
+            "HTTP::API::Core" : "1.08",
             "IO::Socket::SSL" : "0",
             "JSON::PP" : "0",
             "MIME::Base64" : "0",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/aspeer/pm-Cloudflare-API"
       }
    },
-   "version" : "1.010",
+   "version" : "1.011",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,6 +1,7 @@
 bin/dbris
 Build.PL
 Changelog
+cpanfile
 Dockerfile
 lib/Travel/Routing/DE/DBRIS.pm
 lib/Travel/Routing/DE/DBRIS/Connection.pm

@@ -1,6 +1,6 @@
 NAME
 
-    Archive::Asar - list and extract Electron ASAR (Atom Shell Archive)
+    Archive::Asar - list/extract/create Electron ASAR (Atom Shell Archive)
     files
 
 INSTALLATION

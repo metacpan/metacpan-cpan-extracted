@@ -28,7 +28,7 @@ use Cloudflare::API::Resource;
 
 #  Version information
 #
-$VERSION='1.010';
+$VERSION='1.011';
 
 
 #  All done. Positive return
@@ -41,13 +41,24 @@ $VERSION='1.010';
 
 sub list {
 
-
-    #  Pass list filters as query parameters, keeping envelope metadata optional
-    #
     my ($self, %query)=@_;
-    my $full_response=delete($query{'full_response'});
-    return $self->api()->request('GET', '/accounts', query => \%query,
-        full_response => $full_response);
+    return $self->collect_list($self->list_page(%query));
+
+}
+
+
+sub list_page {
+
+    my ($self, %query)=@_;
+    return $self->list_pagination('/accounts', { mode => 'page' }, \%query);
+
+}
+
+
+sub list_page_response {
+
+    my ($self, %query)=@_;
+    return $self->list_response('/accounts', \%query);
 
 }
 
@@ -87,12 +98,14 @@ Account lookups use the token configured on `Cloudflare::API`. They do not requi
 
 # METHODS #
 
-* **list(%query)** — List visible accounts. Named arguments become Cloudflare query parameters. Returns the decoded `result`; use `full_response => 1` to retain the envelope and pagination `result_info`.
-* **get($account_id, %options)** — Retrieve one account by ID. Returns the decoded account `result`. The ID is percent-encoded as a path component; `full_response => 1` returns the envelope.
+* **list(%query)** — List every visible account. Named arguments become Cloudflare query parameters. The method follows all pages and returns one flat array reference; a large account set can require many requests and substantial memory.
+* **list_page(%query)** — Return a lazy `HTTP::API::Core::Pagination` object for the account list. Use `next()` to consume one account at a time or `all()` to collect the remaining accounts.
+* **list_page_response(%query)** — Make one list request and return the complete decoded Cloudflare response hash, including `result_info` when Cloudflare supplies it.
+* **get($account_id, %options)** — Retrieve one account by ID. Returns the decoded account `result`. The ID is percent-encoded as a path component; `full_response => 1` returns the complete decoded Cloudflare response.
 
 # ERRORS #
 
-See `Cloudflare::API` for HTTP, transport, Cloudflare envelope, and invalid path-component exceptions.
+See `Cloudflare::API` for HTTP, transport, Cloudflare response, and invalid path-component exceptions.
 
 # SEE ALSO #
 
@@ -141,12 +154,22 @@ Account lookups use the token configured on C<Cloudflare::API>. They do not requ
 
 =item *
 
-B<list(%query)> — List visible accounts. Named arguments become Cloudflare query parameters. Returns the decoded C<result>; use C<<< full_response => 1 >>> to retain the envelope and pagination C<result_info>.
+B<list(%query)> — List every visible account. Named arguments become Cloudflare query parameters. The method follows all pages and returns one flat array reference; a large account set can require many requests and substantial memory.
 
 
 =item *
 
-B<get($account_id, %options)> — Retrieve one account by ID. Returns the decoded account C<result>. The ID is percent-encoded as a path component; C<<< full_response => 1 >>> returns the envelope.
+B<list_page(%query)> — Return a lazy C<HTTP::API::Core::Pagination> object for the account list. Use C<next()> to consume one account at a time or C<all()> to collect the remaining accounts.
+
+
+=item *
+
+B<list_page_response(%query)> — Make one list request and return the complete decoded Cloudflare response hash, including C<result_info> when Cloudflare supplies it.
+
+
+=item *
+
+B<get($account_id, %options)> — Retrieve one account by ID. Returns the decoded account C<result>. The ID is percent-encoded as a path component; C<<< full_response => 1 >>> returns the complete decoded Cloudflare response.
 
 
 =back
@@ -154,7 +177,7 @@ B<get($account_id, %options)> — Retrieve one account by ID. Returns the decode
 
 =head1 ERRORS
 
-See C<Cloudflare::API> for HTTP, transport, Cloudflare envelope, and invalid path-component exceptions.
+See C<Cloudflare::API> for HTTP, transport, Cloudflare response, and invalid path-component exceptions.
 
 
 =head1 SEE ALSO

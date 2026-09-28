@@ -1,0 +1,19 @@
+Picotls fallback source
+
+The files in this directory are a minimal OpenSSL-backed subset of Picotls,
+pinned to commit:
+
+  f07f1c8c68b237f1468bc1f1fe1b68aba3ff23b4
+
+Upstream:
+
+  https://github.com/h2o/picotls
+
+This is the Picotls revision documented by ngtcp2 1.25.0.
+
+Only the MIT-licensed Picotls TLS core and OpenSSL binding are included.
+The minicrypto backend and its third-party submodules are deliberately not
+included or built.
+
+The Picotls source files retain their upstream copyright and MIT license
+notices.

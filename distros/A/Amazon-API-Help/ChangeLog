@@ -1,0 +1,90 @@
+Tue Sep  8 16:32:52 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.3]:
+	* Makefile: updated by CPAN::Maker::Bootstrapper
+	* VERSION: bump
+	* buildspec.yml: +NOTICE, NOTICE.botocore, LICENSE.botocore
+	* project.mk
+	(NOTICE): new
+	(LICENSE.botocore): new
+	(NOTICE.botocore): new
+	* NOTICE.in: new
+	* .gitignore
+	- NOTICE.in, botocore-version.json, NOTICE.botocore, LICENSE.botocore
+
+Fri Aug 21 08:37:02 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.2]:
+	* .includes/perl.mk: updated by CPAN::Maker::Bootstrapper
+	* VERSION: bump
+	* lib/Amazon/API/Help.pm.in
+	(cmd_version): new
+	(init)
+	- don't load metadata if command is not help
+	- get botocore version from BuildInfo
+	* cpanfile: +Text::ASCIITable
+	* requires: likewise
+
+Tue Aug 18 09:52:41 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.1]:
+	* VERSION: bump
+	* README.md: generated
+	* botocore.mk
+	- use refactored amzn-api
+	* buildspec.yml: +service.tt
+	* lib/Amazon/API/Help.pm.in
+	- added pod
+	(init)
+	- allow for dropping 'help' command
+	(cmd_help)
+	- usage if --help
+	- make shape take precendence, but allow override
+	(_operation_help)
+	- remove duplicate package_name
+	- make dist_dir lone INCLUDE_PATH
+	* project.mk
+	- removed CREATE_MODULE_NAMES, BUILD_BOTO_SERVICES
+	- added AMAZON_API
+	(cmd_dump_service): new
+	(main)
+	- + dump-service
+	- new options --help, --shape
+
+Mon Aug 17 08:11:22  Rob Lauer  rclauer@gmail.com
+
+	[1.0.0]:
+	* .gitignore: new
+	* .includes/bash-completion.mk: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/local.mk: new
+	* .includes/modulino.mk: new
+	* .includes/perl.mk: new
+	* .includes/release-notes.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* .includes/version.mk: new
+	* ChangeLog: new
+	* Makefile: new
+	* README.md: new
+	* VERSION: new
+	* bin/amzn-api-help.in: new
+	* botocore.mk: new
+	* build-mirrors: new
+	* buildspec.yml: new
+	* config.mk: new
+	* cpanfile: new
+	* lib/Amazon/API/Help.pm.in: new
+	* project.mk: new
+	* recommends: new
+	* requires: new
+	* share/all-services.tt: new
+	* share/members.tt: new
+	* share/operation.tt: new
+	* share/pod_wrapper.tt: new
+	* share/service.tt: new
+	* share/shape.tt: new
+	* suggests: new
+	* t/00-amazon-api-help.t: new
+	* test-requires: new

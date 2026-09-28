@@ -1,0 +1,126 @@
+msgid "Aion::Annotation::Reader - считывает аннотации, комментарии и времена обновления модулей"
+msgstr "Aion::Annotation::Reader - reads annotations, comments and module update times"
+
+msgid "Файл etc/annotation/todo.ann:"
+msgstr "File etc/annotation/todo.ann:"
+
+msgid "Файл etc/annotation/remarks.ini:"
+msgstr "File etc/annotation/remarks.ini:"
+
+msgid "Файл var/cache/modules.mtime.ini:"
+msgstr "File var/cache/modules.mtime.ini:"
+
+msgid "`Aion::Annotation::Reader` читает файлы, которые создаёт [Aion::Annotation](https://metacpan.org/pod/Aion::Annotation), и отдаёт их содержимое построчно в виде хешей."
+msgstr "`Aion::Annotation::Reader` reads the files that [Aion::Annotation](https://metacpan.org/pod/Aion::Annotation) creates and returns their contents line by line as hashes."
+
+msgid "Доступны три вида данных:"
+msgstr "Three types of data are available:"
+
+msgid ""
+"1. Аннотации из файлов **имя.ann** (имя передаётся в конструктор).\n"
+"2. Комментарии из **remarks.ini**.\n"
+"3. Времена обновления модулей из **modules.mtime.ini**."
+msgstr ""
+"1. Annotations from files **name.ann** (the name is passed to the constructor).\n"
+"2. Comments from **remarks.ini**.\n"
+"3. Module update times from **modules.mtime.ini**."
+
+msgid "Читатель спроектирован как итератор поверх файла: конструктор открывает файл, а метод `next` возвращает очередной распознанный элемент. Объект перегружает ряд операций, чтобы читателя можно было использовать как файл или функцию прямо в выражениях."
+msgstr "The reader is designed as an iterator on top of a file: the constructor opens the file, and the `next` method returns the next recognized element. The object overloads a number of operations so that the reader can be used as a file or function directly in expressions."
+
+msgid "Распознанные строки представляются хешами:"
+msgstr "Recognized strings are represented by hashes:"
+
+msgid ""
+"1. Аннотация (файл **etc/annotation/*.ann**) – ключи `pkg`, `name`, `line`, `annotation`.\n"
+"2. Комментарий (файл **etc/annotation/remarks.ini**) – ключи `pkg`, `name`, `line`, `remark`.\n"
+"3. Время (файл **var/cache/modules.mtime.ini**) – ключи `pkg`, `mtime`."
+msgstr ""
+"1. Annotation (file **etc/annotation/*.ann**) – keys `pkg`, `name`, `line`, `annotation`.\n"
+"2. Comment (file **etc/annotation/remarks.ini**) – keys `pkg`, `name`, `line`, `remark`.\n"
+"3. Time (file **var/cache/modules.mtime.ini**) – keys `pkg`, `mtime`."
+
+msgid "Каталоги настраиваются переменными окружения `AION_ANNOTATION_INI` (по умолчанию `etc/annotation`) и `AION_ANNOTATION_CACHE` (по умолчанию `var/cache`)."
+msgstr "Directories are configured by the environment variables `AION_ANNOTATION_INI` (default `etc/annotation`) and `AION_ANNOTATION_CACHE` (default `var/cache`)."
+
+msgid "`Aion::Annotation::Reader` перегружает операции:"
+msgstr "`Aion::Annotation::Reader` overloads the operations:"
+
+msgid "Вызов читателя."
+msgstr "The reader's challenge."
+
+msgid "Список всех элементов."
+msgstr "List of all elements."
+
+msgid "Вызов как функции."
+msgstr "Call as functions."
+
+msgid "Каждое обращение возвращает следующий элемент или `undef` в конце:"
+msgstr "Each call returns the following element or `undef` at the end:"
+
+msgid "Файловый дескриптор."
+msgstr "File descriptor."
+
+msgid "Файловые операции."
+msgstr "File operations."
+
+msgid "Операции вида `-e`, `-s`, `-f` выполняются над файлом читателя. Результат операции кешируется:"
+msgstr "Operations like `-e`, `-s`, `-f` are performed on the reader file. The result of the operation is cached:"
+
+msgid "Строковое представление."
+msgstr "String representation."
+
+msgid "Специальное имя, при котором читается файл комментариев:"
+msgstr "Special name with which the comment file is read:"
+
+msgid "Специальное имя, при котором читается файл времён обновления:"
+msgstr "Special name with which the update times file is read:"
+
+msgid "Имя файла времён обновления:"
+msgstr "Update times file name:"
+
+msgid "Имя файла комментариев:"
+msgstr "Comment file name:"
+
+msgid "Регулярное выражение строки аннотации или комментария:"
+msgstr "Annotation or comment string regular expression:"
+
+msgid "Регулярное выражение строки времени обновления:"
+msgstr "Update time string regular expression:"
+
+msgid "Конструктор. В `$ann` передаётся имя аннотации (тогда читается `etc/annotation/$ann.ann`), либо константы `READ_REMARKS` или `READ_MTIME`. Файл открывается сразу в конструкторе:"
+msgstr "Constructor. `$ann` is passed the name of the annotation (then reads `etc/annotation/$ann.ann`), or the constants `READ_REMARKS` or `READ_MTIME`. The file opens immediately in the constructor:"
+
+msgid "Вызов допустим и у экземпляра:"
+msgstr "The call is also valid on an instance:"
+
+msgid "Если файла нет – бросается исключение:"
+msgstr "If the file does not exist, an exception is thrown:"
+
+msgid "Путь к открытому файлу:"
+msgstr "Path to open file:"
+
+msgid "Возвращает следующий распознанный элемент. В скалярном контексте – один элемент или `undef`, в списочном – все оставшиеся элементы:"
+msgstr "Returns the next element recognized. In a scalar context - one element or `undef`, in a list context - all remaining elements:"
+
+msgid "Закрывает файл при уничтожении объекта. Обычно вызывается автоматически:"
+msgstr "Closes a file when an object is destroyed. Usually called automatically:"
+
+msgid "Распознаёт строку аннотации. Возвращает хеш с ключами `pkg`, `name`, `line`, `annotation`:"
+msgstr "Recognizes the annotation string. Returns a hash with the keys `pkg`, `name`, `line`, `annotation`:"
+
+msgid "Распознаёт строку комментария. Экранированные последовательности `\\n` превращаются в переводы строк, а `\\<символ>` – в сам символ:"
+msgstr "Recognizes a comment line. Escaped sequences `\\n` are turned into newlines, and `\\<character>` into the character itself:"
+
+msgid "Распознаёт строку времени обновления. Поле `mtime` — это unixtime (в локальном часовом поясе):"
+msgstr "Recognizes the update time string. The `mtime` field is unixtime (in the local time zone):"
+
+msgid "Если строка не соответствует формату, выдаётся предупреждение (`warn`), а элемент всё равно возвращается – с неопределёнными полями. Это позволяет не прерывать чтение на повреждённом файле:"
+msgstr "If the string does not match the format, a `warn` is issued, but the element is still returned - with undefined fields. This allows you not to interrupt reading on a damaged file:"
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Annotation::Reader module is copyright © 2026 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Annotation::Reader module is copyright © 2026 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

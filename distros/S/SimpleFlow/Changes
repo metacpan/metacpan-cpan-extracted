@@ -1,6 +1,239 @@
 Revision history for SimpleFlow
 
 
+0.191 2026-09-27 (Claude Opus 5.5 helped)
+
+ [Fixed]
+
+ - **A signal sent just as the command started could be lost.** 0.19 passes a
+     TERM or HUP (and, under `timeout`, an INT or QUIT) to the command, but
+     only once its handlers were installed, which was after the exec had
+     succeeded. A signal that arrived in between went to the caller's handler
+     alone: the command was neither killed nor sent it, ran to its end, and
+     was reported as `done`. A CPAN smoker (perl 5.16.3 on Alpine) hit this
+     in `t/07.coverage.t`. Those signals are now blocked from before the fork
+     until the handlers are in place, and one that arrived meanwhile is then
+     delivered to them.
+
+ [Tests]
+
+ - `t/08.fixes.t` sends the signal inside that window deterministically, and
+     fails against 0.19.
+ - `t/04.fixes.t` and `t/05.features.t` no longer draw "Statement unlikely to
+     be reached" from perl 5.16.
+ - Seven subtests failed on a Strawberry Perl 5.42.0 smoker; the module was
+     not at fault in any of them. `t/05.features.t` and `t/07.coverage.t`
+     handed a child perl code with a double quote in it, which MSWin32's
+     `system(LIST)` does not escape; `t/05.features.t`'s wrapper used `exec`,
+     which on MSWin32 ends the wrapper before the command has printed; and
+     `t/06.pipeline.t` ran `parallel()` with `jobs` above 1, which is refused
+     there by design. Those subtests now check the refusal instead, and the
+     tests' helpers refuse a double quote in a list `cmd` or `wrapper` on
+     every platform, so that mistake can no longer reach a Windows smoker
+     unseen.
+
+ [Documentation]
+
+ - A string `cmd` inside a wrapper is run by `cmd.exe /c` on MSWin32, not by
+     `/bin/sh -c` as the documentation said.
+
+0.19 2026-09-26 (Claude Opus 5.5 helped)
+
+ [Fixed]
+
+ - **A command killed by a signal was reported as a success.** A death by
+     signal leaves the exit code at 0, and `will.do` looked only at `exit`,
+     `timed.out` and missing outputs, so an OOM kill or a Ctrl-C -- which
+     `system()` ignores in the parent and so leaves to the child -- came back
+     `will.do => 'done'` with no warning, and under the default `die => 1`
+     the pipeline went on to its next step. It now counts as `FAILED`, and
+     `task()` dies (or, under `die => 0`, warns) naming the signal. This
+     affected a list `cmd`, a string with no shell metacharacters, and a
+     string the shell execs directly; otherwise the shell reports 128 + the
+     signal as a non-zero exit, which was already caught.
+ - **A dry run could not get past the second step of a pipeline.** The input
+     files were checked before `dry.run` was, so a step whose input is an
+     earlier step's output -- which a dry run never makes -- died with "the
+     above files are missing or are not readable". Under `dry.run` a missing
+     input is now listed in what the dry run prints, and in the log, rather
+     than being fatal; its entry in `input.file.size` is undef. Outside a dry
+     run a missing input still dies.
+ - **A failed step's partial output was taken as done on the next run.** An
+     output file half-written before a non-zero exit, a kill by signal or a
+     timeout was left under its declared name, so the next run found it,
+     reported `done => 'before'`, and skipped the step for good. The existing
+     outputs of a failed step, including one whose sibling outputs are
+     missing, are now moved to `<file>.failed`, replacing any `.failed` left
+     from before, and the move is reported on `STDERR` and in the log.
+     `output.file.size` still gives the sizes the command wrote.
+ - **Loading SimpleFlow changed how the caller's own program died and
+     warned.** `use Devel::Confess 'color'` installed global `__DIE__` and
+     `__WARN__` handlers, so a caller's `die "message\n"` came back with a
+     stack trace appended, and code comparing `$@` with a string broke.
+     Devel::Confess is now switched on only for the length of each `task()` or
+     `say2()` call, and the caller's handlers are put back afterwards;
+     SimpleFlow's own errors and warnings keep their coloured stack traces.
+ - **A Ctrl-C during a timed command left the command running.** Under
+     `timeout` the command has its own process group, which is not the
+     terminal's, so the interrupt reached only perl, and the command ran on as
+     an orphan. `INT`, `TERM`, `HUP` and `QUIT` are now caught while it runs:
+     the group is killed, the record is written, and the signal is passed on
+     to the caller's handler, or ends the program if there is none. One the
+     caller ignores stays ignored.
+ - **Under `timeout` with `stdin => 'inherit'`, a command reading the
+     terminal was reported as timed out.** Outside the terminal's foreground
+     group it was stopped by `SIGTTIN` until the timeout killed it. It is now
+     given the foreground for the run, as a shell gives it to a job, and the
+     caller takes it back after. This has no test in the suite, since showing
+     it needs a pseudo-terminal; it was checked by hand under `script(1)`.
+ - **`timeout` cancelled the caller's own pending `alarm`.** It is now put
+     back when the command finishes, less the time taken, and delivered at
+     once if it fell due while the command ran.
+ - **`timeout` accepted `"5\n"` and non-ASCII digits.** The check was
+     `/^\d+$/`; a Unicode digit then died "isn't numeric" rather than with the
+     argument error. It is now ASCII digits to the end of the string.
+ - **`stale` compared whole-second mtimes,** so an input rewritten in the same
+     second as its output was not newer. The mtimes now come from
+     `Time::HiRes::stat`.
+ - **A step that failed in more than one way died naming only one.** A
+     missing output was checked first, so a step that also exited non-zero or
+     timed out said only that the output was missing. The message now names
+     every reason, including the exit code.
+ - **A command that could not be launched did not say why.** `exit` was
+     `-1` and `$!` was discarded. `stderr` now holds the reason, as a shell
+     would have printed it.
+ - **A dry run's record lacked `output.file.size` and was not logged.** It
+     now has every field the other paths have, and is printed and logged as
+     theirs are.
+ - **Under `die => 0` a step with a missing output logged its record twice,**
+     the first copy without `output.file.size`. It is now printed once.
+ - **A missing output was also reported as having 0 size.**
+ - **The dumps explaining an error went to `STDOUT`.** Only their header
+     lines went to `STDERR`, so a caller that redirected standard output lost
+     the arguments and file lists into its output file. They now go to
+     `STDERR`; the record printed after every step still goes to `STDOUT`.
+ - **A `TERM` or `HUP` to perl during a command without a `timeout` left
+     the command running.** `system()` shields its caller from `INT` and
+     `QUIT` only, so a signal sent to perl alone, by a batch scheduler or
+     `kill`, killed perl and orphaned the command. On POSIX the command is
+     now forked and waited for by `task()` itself, as it already was under a
+     `timeout`: the signal is passed on to the command, the command waited
+     for, the record written, and the signal passed on to the caller.
+ - **Ctrl-Z during a timed command reading the terminal hung until the
+     timeout.** The command was stopped and nothing noticed. It is now
+     suspended along with the caller, as a shell suspends a job, with the
+     timeout's clock stopped, and resumed with it. Checked by hand under
+     `script(1)`, since showing it needs a pseudo-terminal: before, the step
+     sat stopped until its 8 s timeout killed it; after, it read its input and
+     succeeded in 3 s.
+ - **A command that could not be launched under a `timeout` was `exit
+     127`.** The forked child had no way to hand back why; it now writes its
+     `errno` down a close-on-exec pipe, as perl's own `system()` does, and the
+     command is `exit -1` with the reason in `stderr`, with or without a
+     timeout.
+
+ [Changed]
+
+ - **Two of these fixes change what an existing pipeline sees.** A step
+     killed by a signal now stops a pipeline running under the default
+     `die => 1`, where it used to carry on. A failed step's outputs are no
+     longer under their declared names afterwards, so code run under
+     `die => 0` that reads a failed step's output must read
+     `<file>.failed` instead, or look in `failed.outputs`.
+ - **Under a `timeout`, a command that could not be launched is `exit -1`,
+     not `127`,** as it already was without one, and `stderr` says why. Code
+     that tested for 127 there should test for -1.
+ - **A program that relied on SimpleFlow to give it Devel::Confess loses
+     it.** Its own `die` and `warn` no longer carry stack traces; one that
+     wants them should `use Devel::Confess` itself.
+ - **The failure messages are worded differently.** Each is now
+     `"<cmd>" <reason>; <reason>, from <file> line <line>`, the reasons being
+     "exited N", "was killed by signal N", "was killed after exceeding its Ns
+     timeout" and "these output files should have been made but are missing:
+     ...". A die under `die => 1` for a non-zero exit used to say
+     "failed from"; it now says "exited N". Under `die => 0` a missing output
+     is now a `warn` rather than a line printed to `STDERR`.
+
+ [Added]
+
+ - **`failed.outputs`**, a new field of the record: an array ref of the
+     `.failed` names a failed step's outputs were moved to, and `[]` on every
+     other path.
+ - **`retries` and `retry.delay`**: run a failed step again, up to `retries`
+     more times, waiting `retry.delay` seconds before each, as Nextflow's
+     `errorStrategy 'retry'` and Snakemake's `--retries` do. Each failed
+     attempt has its outputs moved aside and is reported on `STDERR` and in
+     the log. The record describes the last attempt, and a new field,
+     `attempts`, says how many there were. An interrupt is never retried.
+ - **`env`**: environment variables for the command alone, `undef` removing
+     one; the caller's `%ENV` is put back afterwards.
+ - **`dir`**: run the whole step, its file checks included, in another
+     directory; the caller is put back in its own afterwards, however
+     `task()` returns.
+ - **`stdout.file` and `stderr.file`**: send the command's output to a file
+     instead of holding it in the record, as Snakemake's `log:` does. The
+     files are emptied when the step starts and keep every attempt's output;
+     one file may be named for both.
+ - **`output.dir` and `output.dirs`**: directory outputs, as Snakemake's
+     `directory()`. A directory counts as made if it exists, is warned about
+     if empty, is moved aside when the step fails, and under `stale` is as
+     new as the newest thing in it.
+ - **`protect`**: make a step's outputs read-only once it succeeds, as
+     Snakemake's `protected()`, and refuse to re-run over them.
+ - **`trace.fh`**: one line of JSON per task, on every path, holding the
+     record without `stdout` and `stderr`, as Nextflow's `trace.txt` does.
+ - **`lock`**: a `flock` on each output, kept in `.simpleflow/` in the
+     working directory, so that a second copy of the pipeline reaching the
+     step waits for the first and then finds it done.
+ - **`%SimpleFlow::DEFAULTS`**: defaults for every `task()` in the program,
+     for any key a call leaves undefined, so that one line can dry-run, quiet
+     or log a whole pipeline. `env` is merged rather than replaced; keys that
+     name a particular step are refused.
+ - **`cpu.user`, `cpu.system` and `start.time`**, new fields of the record:
+     the CPU time the command spent, from `times`, and when its last attempt
+     started.
+ - **The end of stderr in a failure's message.** The message a failed
+     step dies or warns with now ends with the last six lines of its
+     standard error, read back from `stderr.file` if that is where it went.
+ - **`input.dir` and `input.dirs`**: directory inputs, which must exist
+     before the step runs, and under `stale` are as new as the newest thing
+     in them.
+ - **`stale.cmd`**: re-run a step whose command, `env`, or container,
+     conda environment, executor or wrapper has changed since it made its
+     outputs, as Snakemake's `params` and `code` rerun triggers do. A new
+     field, `cmd.changed`, says when that happened. What made each set of
+     outputs is kept as a digest in `.simpleflow/cmd/`.
+ - **`on.success` and `on.failure`**: code called with the record after a
+     command has run, before `task()` dies; in `%SimpleFlow::DEFAULTS`, a
+     pipeline's `onsuccess` and `onerror`.
+ - **`container`, `container.engine` and `container.args`**: run the
+     command in a docker, podman, singularity or apptainer container, with
+     the working directory mounted.
+ - **`conda.env`**: run the command with `conda run`.
+ - **`executor`, `executor.args`, `threads`, `mem` and `walltime`**: run the
+     command as a SLURM job step with `srun`, asking for the resources given.
+     `threads` is also given to the command as `SIMPLEFLOW_THREADS`.
+ - **`wrapper`**: run the command inside any other command. A new field,
+     `wrapped.cmd`, is the command as actually run.
+ - **`parallel()`**, exported on request: run independent steps at the same
+     time, at most `jobs` at once, each in a child of its own, and return
+     their records in order. A failure stops new steps, lets the running ones
+     finish, and dies; `keep.going` runs them all first. POSIX-only for
+     `jobs` above 1.
+ - **`report()`**, exported on request: an HTML page of a trace, with a row
+     and a timeline bar for every task and a count of each status.
+ - Every new option has its resolved value on the record, as the existing
+     ones do, except the hooks, which are code. The record therefore has
+     many more fields, printed after every step, and a pipeline that
+     compares whole records will see them.
+
+ [Tests]
+
+ - **The 0.181 suite failed one test on MSWin32.** `t/03.fixes.t` expected a missing command given as a list to
+     come back `exit => -1`, but on MSWin32 a failed spawn of a list does not
+     make `system` return -1: win32.c's `do_aspawn` sets the status to
+     255 * 256, so `exit` is 255. The test now expects 255 there.
+
 0.181 2026-09-25 (Claude Opus 5 helped)
 
  [Tests]

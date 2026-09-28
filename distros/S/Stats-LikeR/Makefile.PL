@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.010001;
 use ExtUtils::MakeMaker 6.48;
 
 use Config;
@@ -87,7 +87,7 @@ my $define = '';
 if ($Config{nvtype} eq 'long double') {
 my $ld = "#include <math.h>\n"
 . "int main(void) { int e; long double x = 1.0L;\n"
-. "  volatile long double r = lgammal(x) + sqrtl(x) + logl(x) + log1pl(x)\n"
+. "  volatile long double r = lgammal(x) + sqrtl(x) + logl(x) + log1pl(x) + expm1l(x)\n"
 . "    + log2l(x) + log10l(x) + expl(x) + powl(x, x) + floorl(x) + ceill(x) + roundl(x)\n"
 . "    + rintl(x) + truncl(x) + fmaxl(x, x) + erfcl(x) + asinl(x) + sinhl(x) + coshl(x)\n"
 . "    + tanhl(x) + fabsl(x) + ldexpl(x, 2) + frexpl(x, &e)\n"
@@ -123,17 +123,21 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Stats-LikeR",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Stats::LikeR",
   "PREREQ_PM" => {
+    "Compress::Raw::Bzip2" => 0,
+    "Compress::Raw::Zlib" => 0,
     "Cwd" => 0,
-    "Scalar::Util" => "1.22",
+    "IO::Uncompress::Unzip" => 0,
+    "Scalar::Util" => "1.22"
+  },
+  "TEST_REQUIRES" => {
     "Test::Exception" => 0,
     "Test::LeakTrace" => 0,
-    "Test::More" => 0,
-    "autodie" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.3151",
+  "VERSION" => "0.3211",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -148,12 +152,14 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
+  "Compress::Raw::Bzip2" => 0,
+  "Compress::Raw::Zlib" => 0,
   "Cwd" => 0,
+  "IO::Uncompress::Unzip" => 0,
   "Scalar::Util" => "1.22",
   "Test::Exception" => 0,
   "Test::LeakTrace" => 0,
-  "Test::More" => 0,
-  "autodie" => 0
+  "Test::More" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

@@ -10,7 +10,7 @@ __END__
 
 =head1 NAME
 
-pasar - extract data from Electron ASAR archive files
+pasar - handle Electron ASAR archive files
 
 =head1 SYNOPSIS
 
@@ -23,20 +23,26 @@ pasar - extract data from Electron ASAR archive files
     pasar --extract --unpacked=UDIR ARCHIVE [DIRECTORY]
     pasar -x -u UDIR ARCHIVE [DIRECTORY]
 
+    pasar --create ARCHIVE FILE[...]
+    pasar -c ARCHIVE FILE[...]
+
 =head1 DESCRIPTION
 
-The C<pasar> utility provides basic support for reading Electron ASAR (Atom
-Shell Archive) files. It can list the contents of an archive and it can extract
-the contents of an archive as a file tree.
+The C<pasar> utility provides basic support for reading and creating Electron
+ASAR (Atom Shell Archive) files. It can list the contents of an archive,
+extract the contents of an archive as a file tree, and create an archive from a
+file tree.
 
 The mode of operation must be selected with command-line options. Either
-C<-l>/C<--list> (for listing) or C<-x>/C<--extract> (for extracting) must be
-given.
+C<-l>/C<--list> (for listing) or C<-x>/C<--extract> (for extracting) or
+C<-c>/C<--create> (for creating) must be given.
 
-The first non-option argument is the name of the F<.asar> file to be read. In
-extract mode, an optional second argument can be given to specify the output
-directory; if omitted, it defaults to F<.> (the current working directory). If
-the output directory does not exist, it will be created automatically.
+The first non-option argument is the name of the F<.asar> file to be read or
+created. In extract mode, an optional second argument can be given to specify
+the output directory; if omitted, it defaults to F<.> (the current working
+directory). If the output directory does not exist, it will be created
+automatically. In create mode, all arguments following the name of the F<.asar>
+file are taken to be names of files or directories to be added to the archive.
 
 Members of an F<.asar> file can be marked I<unpacked>; they are stored
 externally, not in the archive file. In extract mode, such I<unpacked> files
@@ -55,6 +61,47 @@ I<unpacked> files should be looked up.
 =head1 SEE ALSO
 
 L<Archive::Asar>
+
+=begin :README
+
+=head1 INSTALLATION
+
+To install this script, run the following commands:
+
+=for highlighter language=sh
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this script with the
+perldoc command.
+
+    perldoc pasar
+
+You can also look for information at:
+
+=over
+
+=item *
+
+MetaCPAN: L<https://metacpan.org/pod/pasar>
+
+=item *
+
+The source repository on Codeberg:
+L<https://codeberg.org/mauke/App-Pasar>
+
+=item *
+
+The script's bug tracker: L<https://codeberg.org/mauke/App-Pasar/issues>
+
+=back
+
+=end :README
 
 =head1 AUTHOR
 

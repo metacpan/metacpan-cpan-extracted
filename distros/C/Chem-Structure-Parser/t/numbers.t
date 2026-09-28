@@ -11,6 +11,10 @@
 # reached for a real field, and on an older -Duselongdouble perl Perl_my_atof
 # is a hand-rolled decimal accumulator rather than strtod(), so it is not
 # entitled to be the referee.
+#
+# The eight six-decimal cases after the fixed shapes are the first eight that
+# perlbrew's 5.44.0-i686 (gcc -m32, FLT_EVAL_METHOD 2, NV double) read one ulp
+# off strtod() before the fast path learned to leave fractions alone there.
 require 5.010;
 use strict;
 use warnings FATAL => 'all';
@@ -54,19 +58,35 @@ push @fixed_shape, '.5', '-.5', '+.25', '5.', '-5.', '007.5', '0.0', '-0.0',
 	'0', '-0', '00000000', '0.00000000000001',
 	'123456789012345',      # fifteen digits: the most the reader will take
 	'99999.9999999999';     # fifteen digits with ten of them fractional
+# The first eight six-decimal strings that a double-NV build on the x87 got one
+# ulp wrong, because its division rounded to long double and then to double:
+# perlbrew's 5.44.0-i686, gcc -m32, FLT_EVAL_METHOD 2, over every string from
+# 0.000000 to 0.400000.  Such a build now leaves fractions to strtod(), which
+# _str2nv_fast_fractions() says, and these hold every other build to the same
+# answer strtod() gives.
+push @fixed_shape, qw(0.002877 0.005754 0.011227 0.011508
+                      0.022454 0.023016 0.023859 0.024421);
 
 {
+	# on a build that declines fractions, the shapes it may decline are the
+	# ones with a digit after the point; it must still take the rest
+	my $fractions = Chem::Structure::Parser::_str2nv_fast_fractions();
 	my (@declined, @mismatch, @slow_failed);
 	for my $s (@fixed_shape) {
 		my ($ok_fast, $fast, $ok_slow, $slow) = Chem::Structure::Parser::_str2nv_paths($s);
-		if (!$ok_fast)   { push @declined, $s;    next }
+		if (!$ok_fast) {
+			push @declined, $s if $fractions || $s !~ /\.[0-9]/;
+			next;
+		}
 		if (!$ok_slow)   { push @slow_failed, $s; next }
 		# == is the strict test: a one-ULP disagreement fails it
 		push @mismatch, "'$s': fixed=$fast strtod=$slow"
 			unless $fast == $slow && "$fast" eq "$slow";
 	}
-	is(scalar @fixed_shape, 329, 'a few hundred fixed-point shapes to check');
-	is(scalar @declined, 0, 'the fixed-point reader takes every one of them')
+	is(scalar @fixed_shape, 337, 'a few hundred fixed-point shapes to check');
+	is(scalar @declined, 0, $fractions
+		? 'the fixed-point reader takes every one of them'
+		: 'the fixed-point reader takes every one without a fraction')
 		or diag("declined: @declined");
 	is(scalar @slow_failed, 0, 'and strtod() reads them too')
 		or diag("strtod declined: @slow_failed");
@@ -125,12 +145,26 @@ push @fixed_shape, '.5', '-.5', '+.25', '5.', '-5.', '007.5', '0.0', '-0.0',
 }
 
 {
-	# a number with rubbish after it: strtod() takes the prefix, and did
-	# before this reader existed, so that behaviour has to survive
-	my ($ok_fast, undef, $ok_slow, $slow)
-		= Chem::Structure::Parser::_str2nv_paths('11.104xy');
-	is($ok_fast, 0, 'a number with rubbish after it is left to strtod()');
-	ok($ok_slow && $slow == 11.104, 'which reads the part that is a number');
+	# A number with something after it is not a number.  strtod() reads the
+	# prefix and stops, and this used to take what it read: '0-200.00' is what
+	# a y field holds when x = -1000.000 has overflowed its eight columns into
+	# it, and it read as 0.
+	for my $s ('11.104xy', '0-200.00', '1.5.2', '12 3') {
+		my ($ok_fast, undef, $ok_slow) = Chem::Structure::Parser::_str2nv_paths($s);
+		is($ok_fast, 0, "'$s' is not taken by the fixed-point reader");
+		is($ok_slow, 0, "nor by strtod(), which would have read a prefix of it");
+	}
+	my ($ok_fast, undef, $ok_slow, $slow) = Chem::Structure::Parser::_str2nv_paths('1.5e2 ');
+	ok($ok_slow && $slow == 150, 'trailing blanks after a number are still a number');
+
+	# and end to end, as sprintf('%8.3f%8.3f%8.3f') writes a coordinate too
+	# wide for its columns: -1000.000 is nine characters and shoves the rest
+	# of the record one column right, so y's columns hold '0-200.00'
+	my $wide = sprintf('%-30s%8.3f%8.3f%8.3f%6.2f%6.2f          %2s',
+		'ATOM      1  CA  ALA A   1', -1000, -200, 10, 1, 20, 'C');
+	is(substr($wide, 38, 8), '0-200.00', 'the record puts x\'s last digit in y\'s columns');
+	my $p = Chem::Structure::Parser::_parse_string("$wide\n", {});
+	is($p->{y}[0], undef, "and a y field of '0-200.00' is not a number, rather than 0");
 }
 
 #--------

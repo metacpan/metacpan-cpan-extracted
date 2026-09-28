@@ -521,6 +521,30 @@ for my $pair ([ 'stack.pdb', 'stack.cif' ], [ 'bases.pdb', 'bases.cif' ],
 	cmp_ok($f->{sasa}{total}, '>', 0, 'but it still has a surface, at the default radius');
 }
 
+# Deuterium, as a neutron structure writes it, is a hydrogen with twice the
+# mass.  The mass and the radius are mdtraj/core/element.py's `deuterium',
+# 2.0135532127 and 0.12 nm: the same radius as hydrogen, so an N-D surface is
+# an N-H surface.
+{
+	my $nh = "ATOM      1  N   GLY A   1       0.000   0.000   0.000  1.00  0.00           N\n"
+	       . "ATOM      2  %s   GLY A   1       1.010   0.000   0.000  1.00  0.00           %s\nEND\n";
+	my $h = structure_features(structure_info_string(sprintf $nh, 'H', 'H'));
+	my $d = structure_features(structure_info_string(sprintf $nh, 'D', 'D'));
+	# the records in their columns: 'D ' in the template's place put the atom
+	# in chain '' of a residue called 'GL', and its y in columns reading
+	# '.010   0', which was read as 0.010 only while a number could have
+	# rubbish after it
+	is($d->{n_atoms}, 2, 'both atoms are read, with their coordinates');
+	is($d->{n_no_element}, 0, 'D is an element this table knows');
+	# 1e-9: the C table's masses are double literals, so on a long double or
+	# __float128 perl they differ from the same decimals read by Perl from the
+	# seventeenth significant digit on -- 1e-15 of a mass of 16
+	cmp_ok(abs($d->{mass} - (14.00672 + 2.0135532127)), '<', 1e-9,
+		"and weighs what mdtraj's deuterium does");
+	is($d->{sasa}{total}, $h->{sasa}{total},
+		'and has the surface a hydrogen in its place would');
+}
+
 # ---- what it refuses to do ----------------------------------------------
 {
 	my $i = structure_info("$data/stack.pdb", atoms => 0);
@@ -547,6 +571,14 @@ for my $pair ([ 'stack.pdb', 'stack.cif' ], [ 'bases.pdb', 'bases.cif' ],
 		'a negative probe is refused';
 	throws_ok { structure_features($i, probe => 'wide') } qr/probe must be a number/,
 		'and so is one that is not a number';
+	throws_ok { structure_sasa($i, probe => undef) }
+		qr/\Astructure_sasa: probe is undef; leave it out for the default, '1\.4'/,
+		'an undef probe names the function and the option';
+	throws_ok { structure_pi_stacking($i, face_distance => undef) }
+		qr/\Astructure_pi_stacking: face_distance is undef/,
+		'and so does any other geometry threshold';
+	lives_ok { structure_features($i, sasa => undef, store => undef) }
+		'while undef is off for a switch';
 	throws_ok { structure_features($i, points => 0) } qr/points must be an integer/,
 		'zero sphere points is refused';
 	throws_ok { structure_features($i, points => 'many') } qr/points must be an integer/,
@@ -876,11 +908,10 @@ for my $pair ([ 'stack.pdb', 'stack.cif' ], [ 'bases.pdb', 'bases.cif' ],
 	throws_ok { structure_info("$data/fold.pdb", 'sasa') }
 		qr/structure_info: 'sasa' is not a view/,
 		'a name that is not a view says so, and says what is';
-	throws_ok { structure_info("$data/fold.pdb", 'dssp', features => 0) }
-		qr/structure_info: 'dssp' needs the features/,
-		'and asking for one with features => 0 does not hand back nothing quietly';
+	is_deeply(structure_info("$data/fold.pdb", 'dssp', features => 0), $d,
+		'asking for it with features => 0 computes the secondary structure alone');
 	throws_ok { structure_info("$data/fold.pdb", 'dssp', atoms => 0) }
-		qr/atoms => 0/, 'nor with atoms => 0';
+		qr/atoms => 0/, 'and with atoms => 0, where there is nothing to compute it from, dies';
 	throws_ok { structure_dssp($i, probe => 2) }
 		qr/structure_dssp: unknown option 'probe'/,
 		'structure_dssp takes no options, because there is nothing to tune';

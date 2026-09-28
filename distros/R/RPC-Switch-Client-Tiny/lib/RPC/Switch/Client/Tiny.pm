@@ -17,7 +17,7 @@ use RPC::Switch::Client::Tiny::Netstring;
 use RPC::Switch::Client::Tiny::Async;
 use RPC::Switch::Client::Tiny::SessionCache;
 
-our $VERSION = '1.67';
+our $VERSION = '1.69';
 
 sub new {
 	my ($class, %args) = @_;
@@ -560,8 +560,12 @@ sub rpc_handler {
 			@pipes = map { $_->{reader} } values %{$self->{async}{jobs}};
 		}
 		my $timeout = $self->rpc_timeout($call_timeout);
+		# Unread data might be internally buffered in the SSL stack.
+		# To detect such buffering pending() need to be used.
+		#
+		my $ssl_pending = (ref($self->{sock}) eq 'IO::Socket::SSL') && $self->{sock}->pending();
 
-		if ($timeout || @pipes) {
+		if (($timeout || @pipes) && !$ssl_pending) {
 			my @ready = IO::Select->new(($self->{sock}, @pipes))->can_read($timeout);
 			next if (@ready == 0) && $!{EINTR}; # $! is not reset on success
 			die rpc_error('jsonrpc', 'receive timeout') unless (@ready > 0);
@@ -777,8 +781,8 @@ This module works on a single socket connection, and has no
 dependencies on the Mojo framework like the L<RPC::Switch::Client>
 module.
 
-The rpctiny tool included in the examples directory shows how to
-configure and call a worker handler using a local installation
+The L<rpctiny> command line tool installed with this module shows
+how to configure and call a worker handler using a local installation
 of the rpc-switch server.
 
 =head2 References

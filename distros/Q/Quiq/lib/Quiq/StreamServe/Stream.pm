@@ -38,7 +38,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.239';
+our $VERSION = '1.240';
 
 use Quiq::StreamServe::Block;
 use Quiq::FileHandle;
@@ -569,6 +569,37 @@ sub get {
 
 # -----------------------------------------------------------------------------
 
+=head3 getFirst() - Liefere ersten Attributwert
+
+=head4 Synopsis
+
+  $val = $ssf->getFirst(@keys);
+
+=head4 Description
+
+Liefere den ersten nichtleeren Wert der Attribute @keys. Attribute, die
+nicht existieren, werden übergangen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub getFirst {
+    my $self = shift;
+    # @_: @keys
+
+    for my $key (@_) {
+        my $val = $self->try($key);
+        if (defined($val) && $val ne '') {
+            return $val;
+        }
+    }
+
+    return undef;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 set() - Setze Wert
 
 =head4 Synopsis
@@ -783,7 +814,7 @@ sub type {
 
 =head1 VERSION
 
-1.239
+1.240
 
 =head1 AUTHOR
 

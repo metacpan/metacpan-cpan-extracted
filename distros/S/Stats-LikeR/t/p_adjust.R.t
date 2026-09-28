@@ -126,6 +126,11 @@ is_deeply([ sort keys %seen_method ], [ sort @METHODS ],
 	my @by      = p_adjust($SETS{mix10}, 'BY');
 	my @by_long = p_adjust($SETS{mix10}, 'Benjamini-Yekutieli');
 	is_deeply(\@by_long, \@by, "...and 'Benjamini-Yekutieli' likewise");
+	# The fold is ASCII-only: a byte >= 0x80 is not folded (it was handed to
+	# tolower() as a negative char up to 0.319), so the name is simply unknown.
+	my $folded = eval { p_adjust($SETS{mix10}, "b\xc9"); 1 };
+	ok(!$folded && $@ =~ /Unknown p-value adjustment method/,
+		"a method name with a byte >= 0x80 is rejected, not folded");
 
 	# 'none' must be the identity.  R's man-page example asserts exactly this:
 	# stopifnot(identical(p.adj[,"none"], p)).

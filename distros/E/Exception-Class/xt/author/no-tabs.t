@@ -16,7 +16,9 @@ my @files = (
     't/context.t',
     't/ecb-standalone.t',
     't/field-names.t',
-    't/ignore.t'
+    't/ignore.t',
+    't/inc-entry.t',
+    't/lib/Test/PreloadedException.pm'
 );
 
 notabs_ok($_) foreach @files;

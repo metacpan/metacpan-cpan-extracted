@@ -11,10 +11,11 @@ return {
     CONFIGURE_REQUIRES => {},
     BUILD_REQUIRES => {},
     PREREQ_PM => {
-        'constant' => 0,
-        'Carp'     => 0,
-        'Fcntl'    => 0,
-        'JSON::PP' => 0,
+        'constant'    => 0,
+        'Carp'        => 0,
+        'Digest::SHA' => 0,
+        'Fcntl'       => 0,
+        'JSON::PP'    => 0,
     },
     RECOMMENDS => {
         'Cpanel::JSON::XS' => 0,

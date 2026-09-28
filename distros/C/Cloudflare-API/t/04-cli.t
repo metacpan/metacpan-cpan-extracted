@@ -348,9 +348,13 @@ else {
         return bless({}, $class);
     };
     local *Cloudflare::API::r2=sub { return bless({}, 'Cloudflare::API::R2') };
-    local *Cloudflare::API::R2::list_buckets=sub { die "stop after client creation\n" };
+    local *Cloudflare::API::R2::list_buckets_page_response=sub {
+        die "stop after client creation\n"
+    };
     local *Cloudflare::API::workers=sub { return bless({}, 'Cloudflare::API::Workers') };
-    local *Cloudflare::API::Workers::list_routes=sub { die "stop after client creation\n" };
+    local *Cloudflare::API::Workers::list_routes_page_response=sub {
+        die "stop after client creation\n"
+    };
     {
         local @ARGV=qw(--auth=wrangler --resource r2 --action list_buckets);
         $error=eval { main(\@ARGV); 1 };

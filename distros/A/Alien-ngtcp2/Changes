@@ -1,5 +1,32 @@
 Revision history for Alien-ngtcp2
 
+0.03  2026-09-27
+    - Standardize on Picotls as the single QUIC TLS backend.
+    - Always build the tested ngtcp2 1.25.0 and pinned Picotls pair instead
+      of selecting an arbitrary system crypto helper.
+    - Continue using a suitable host OpenSSL 1.1.1 or newer for Picotls
+      cryptography and X.509 handling.
+    - Keep using Alien::OpenSSL as the Unix fallback when no suitable
+      system OpenSSL development installation is available.
+    - Keep using the active Perl toolchain OpenSSL on Windows.
+    - Preserve crypto_backend, crypto_package, crypto_cflags, and
+      crypto_libs for downstream compatibility.
+
+0.02  2026-09-27
+    - Add automatic selection of an installed ngtcp2 QUIC crypto provider,
+      preferring suitable host TLS providers before the Picotls fallback.
+    - Preserve cflags and libs as the core libngtcp2 interface.
+    - Add crypto_backend, crypto_package, crypto_cflags, and crypto_libs.
+    - Build against a suitable raw GnuTLS installation when no complete
+      system ngtcp2 provider is available.
+    - Add a pinned Picotls/OpenSSL share fallback when needed.
+    - Use a suitable host OpenSSL installation directly on Unix-like
+      systems; require Alien::OpenSSL only when no usable system OpenSSL
+      development installation exists.
+    - Reuse the active Perl toolchain's OpenSSL on Windows and reject
+      pre-1.1.1 toolchains with an explicit compatibility diagnostic.
+    - Validate the crypto helper with a real downstream XS compile/link test.
+
 0.01  2026-09-26
     - Initial release.
     - Discover libngtcp2 1.25.0 or newer through pkg-config.

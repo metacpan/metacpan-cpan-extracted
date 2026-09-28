@@ -88,6 +88,24 @@ my $full = structure_info($file);
 	is_deeply($i->{chains}{A}{residues}{6}{atom_order}, [], 'and no atom order');
 	ok(defined $i->{chains}{A}{residues}{6}{center}, 'the residue centre is still worked out');
 	is($i->{stats}{elements}{S}, 2, 'and the element tally');
+
+	# Everything but the atoms is the same structure, in both formats.  The
+	# parse builds three shapes -- the atom hashes, the full columns, and the
+	# slim columns atoms => 0 asks for, which keep only an atom's name and
+	# position -- and a residue's type, its place in the polymer and its
+	# centre are worked out from whichever it was given.
+	my $strip = sub {
+		my ($s) = @_;
+		for my $c (values %{ $s->{chains} }) {
+			for my $r (values %{ $c->{residues} }) { $r->{atoms} = {}; $r->{atom_order} = [] }
+		}
+		return $s;
+	};
+	for my $f (map { ("$data/$_.pdb", "$data/$_.cif") } qw(mini rna bases nmr)) {
+		is_deeply(structure_info($f, atoms => 0, features => 0),
+		          $strip->(structure_info($f, atoms => 1, features => 0)),
+			"$f: atoms => 0 is the same structure less the atoms");
+	}
 }
 
 #--------
@@ -159,6 +177,23 @@ throws_ok { structure_info($file, chains => []) } qr/chains is empty/,
 	'an empty chain list is a mistake';
 throws_ok { structure_info($file, model => 'two') } qr/model must be/,
 	'a model that is not a number dies';
+# undef where a value is needed says so, in the words of the function called,
+# rather than dying of an uninitialized value somewhere inside it
+throws_ok { structure_info($file, model => undef) }
+	qr/\Astructure_info: model is undef; leave it out for the default, '1'/,
+	'model => undef names the function and the option';
+throws_ok { structure_info_string("END\n", altloc => undef) }
+	qr/\Astructure_info_string: altloc is undef; leave it out for the default, 'first'/,
+	'and so does altloc => undef';
+lives_ok { structure_info($file, hydrogens => undef, chains => undef, format => undef) }
+	'undef is still off for a switch, and not given for an option whose default is undef';
+# and off means off whichever half reads the switch: hydrogens and sasa are read
+# by the XS, which took an undef for not given and so for its default, on
+is(structure_info($file, features => 0, hydrogens => undef)->{stats}{n_atoms},
+	structure_info($file, features => 0, hydrogens => 0)->{stats}{n_atoms},
+	'hydrogens => undef leaves the hydrogens out');
+ok(!exists structure_features(structure_info($file, features => 0),
+	sasa => undef, interface => 0)->{sasa}, 'sasa => undef computes no surface');
 # structure_features() takes sasa => 0 and the rest of them; structure_info()
 # takes features => 0 and no more than that.  A hash of the first spelled into
 # the second is a true value, so it would compute every feature, the surface
@@ -189,11 +224,19 @@ lives_ok  { structure_info($file, model => 'all') } "model => 'all' is allowed";
 		'... which today is dssp';
 	throws_ok { structure_info($file, 'hydrogens') } qr/did you mean an option/,
 		'and an option name in that place is told what it should have been';
-	throws_ok { structure_info($file, 'dssp', features => 0) }
-		qr/needs the features/,
-		'a view of a file read without the features is refused, not empty';
+	is_deeply(structure_info($file, 'dssp', features => 0), $d,
+		'the dssp view of a file read without the features computes just that');
+	throws_ok { structure_info($file, 'dssp', atoms => 0) }
+		qr/\Astructure_info: dssp needs the atoms, and this read has atoms => 0/,
+		'and one read without the atoms is refused, not empty';
 	my $on = structure_info($file, dssp => 1);
 	is($on->{dssp}, $on->{features}{dssp}, 'dssp => 1 leaves the view at {dssp}');
+	my $alone = structure_info($file, dssp => 1, features => 0);
+	is_deeply($alone->{dssp}, $on->{dssp},
+		'dssp => 1 with features => 0 computes the same secondary structure on its own');
+	ok(!exists $alone->{features}, 'and nothing else');
+	throws_ok { structure_info($file, dssp => 1, atoms => 0) }
+		qr/dssp needs the atoms/, 'dssp => 1 with atoms => 0 is refused';
 	ok(!exists structure_info($file)->{dssp}, 'and without it there is no such key');
 }
 

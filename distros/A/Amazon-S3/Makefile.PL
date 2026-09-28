@@ -82,15 +82,15 @@ WriteMakefile(
       'provides'=>{
                       'Amazon::S3'=>{
                                         'file'=>'lib/Amazon/S3.pm',
-                                        'version'=>'2.1.1'
+                                        'version'=>'2.1.2'
                                       },
                       'Amazon::S3::Bucket'=>{
                                                 'file'=>'lib/Amazon/S3/Bucket.pm',
-                                                'version'=>'2.1.1'
+                                                'version'=>'2.1.2'
                                               },
                       'Amazon::S3::BucketV2'=>{
                                                   'file'=>'lib/Amazon/S3/BucketV2.pm',
-                                                  'version'=>'2.1.1'
+                                                  'version'=>'2.1.2'
                                                 },
                       'Amazon::S3::CLI'=>{
                                              'file'=>'lib/Amazon/S3/CLI.pm',
@@ -98,19 +98,19 @@ WriteMakefile(
                                            },
                       'Amazon::S3::Constants'=>{
                                                    'file'=>'lib/Amazon/S3/Constants.pm',
-                                                   'version'=>'2.1.1'
+                                                   'version'=>'2.1.2'
                                                  },
                       'Amazon::S3::Logger'=>{
                                                 'file'=>'lib/Amazon/S3/Logger.pm',
-                                                'version'=>'2.1.1'
+                                                'version'=>'2.1.2'
                                               },
                       'Amazon::S3::Signature::V4'=>{
                                                        'file'=>'lib/Amazon/S3/Signature/V4.pm',
-                                                       'version'=>'2.1.1'
+                                                       'version'=>'2.1.2'
                                                      },
                       'Amazon::S3::Util'=>{
                                               'file'=>'lib/Amazon/S3/Util.pm',
-                                              'version'=>'2.1.1'
+                                              'version'=>'2.1.2'
                                             },
                       'Digest::CRC64NVME'=>{
                                                'file'=>'lib/Digest/CRC64NVME.pm',

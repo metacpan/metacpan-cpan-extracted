@@ -19,7 +19,7 @@ cloudflare-api --generate-completion=zsh > ~/.zfunc/_cloudflare-api
 
 # DESCRIPTION #
 
-`cloudflare-api` calls a supported `Cloudflare::API` resource method or makes a low-level JSON request. It reads `CLOUDFLARE_API_TOKEN` and, for account-scoped methods, `CLOUDFLARE_ACCOUNT_ID` from the environment. It prints the decoded Cloudflare `result` as pretty JSON by default; `--full-response` retains the entire Cloudflare envelope. The script does not build Worker code or transfer R2 objects.
+`cloudflare-api` calls a supported `Cloudflare::API` resource method or makes a low-level JSON request. It reads `CLOUDFLARE_API_TOKEN` and, for account-scoped methods, `CLOUDFLARE_ACCOUNT_ID` from the environment. It prints the decoded Cloudflare `result` as pretty JSON by default; `--full-response` retains the complete decoded Cloudflare response. The script does not build Worker code or transfer R2 objects.
 
 Choose one mode: `RESOURCE ACTION [ARG ...]` (or `--resource NAME --action NAME`) for a named method, or `--method VERB --path /relative/path` for a low-level request. The resource or action may be given positionally when its named option is omitted. Further bare operands become literal string method arguments, equivalent to `--arg`; they retain their command-line order when mixed with typed `--arg*` options. Named arguments supplied with `--param*` become method options, or query parameters in low-level mode. Bare arguments remain unavailable in low-level request mode.
 
@@ -93,11 +93,11 @@ Choose one mode: `RESOURCE ACTION [ARG ...]` (or `--resource NAME --action NAME`
 
 * **--full-response, --no-full-response**
 
-    Select the complete decoded Cloudflare envelope or its `result`. The default is the unwrapped `result`. With pagination, the selection applies to each page; the output is still an array. `upload_assets()` returns its own manifest and JWT structure rather than a Cloudflare envelope.
+    Select the complete decoded Cloudflare response or its `result`. The default is the unwrapped `result`. With pagination, the selection applies to each page; the output is still an array. `upload_assets()` returns its own manifest and JWT structure rather than a normal Cloudflare response.
 
 * **--paginate, --no-paginate**
 
-    Follow cursor-based or numbered pages for named actions starting with `list`, and for `workers search_scripts`. The output is an array of page results, preserving page boundaries. Without a limit, every page reported by Cloudflare is fetched. Pagination is unavailable for raw requests and other actions.
+    Follow cursor-based or numbered pages for named actions starting with `list`, and for `workers search_scripts`. The command uses the module's one-page response methods so that, unlike the Perl `list*()` methods, a CLI list makes one request unless this option is supplied. Paginated output is an array of page results, preserving page boundaries. Without a limit, every page reported by Cloudflare is fetched. Pagination is unavailable for raw requests and other actions.
 
 * **--max-pages N, --per-page N**
 

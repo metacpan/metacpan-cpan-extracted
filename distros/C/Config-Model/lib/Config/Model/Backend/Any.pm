@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::Any 2.166;
+package Config::Model::Backend::Any 2.167;
 
 use v5.20;
 
@@ -195,7 +195,7 @@ Config::Model::Backend::Any - Virtual class for other backends
 
 =head1 VERSION
 
-version 2.166
+version 2.167
 
 =head1 SYNOPSIS
 

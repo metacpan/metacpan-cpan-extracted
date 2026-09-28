@@ -57,7 +57,7 @@
             "Aion::Fs" : "v0.2.0",
             "Aion::Run" : "v0.0.3",
             "POSIX" : "0",
-            "Time::Local" : "0",
+            "Time::Local" : "1.35",
             "aliased" : "0",
             "common::sense" : "0",
             "open" : "0",
@@ -85,7 +85,10 @@
    "provides" : {
       "Aion::Annotation" : {
          "file" : "lib/Aion/Annotation.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
+      },
+      "Aion::Annotation::Reader" : {
+         "file" : "lib/Aion/Annotation/Reader.pm"
       },
       "Aion::Annotation::ScannedEvent" : {
          "file" : "lib/Aion/Annotation/ScannedEvent.pm"
@@ -103,7 +106,7 @@
          "web" : "https://github.com/darviarush/perl-aion-annotation"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.2.0",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>"

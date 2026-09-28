@@ -1,3 +1,9 @@
+Travel::Status::DE::DBRIS 0.35 - Sun Sep 27 2026
+
+    * Adjust unbro call to be compatible with IO::Uncompress::Brotli 0.004_001,
+      as shipped by Debian's current stable release (Trixie / Debian 13)
+    * Update rolling stock models and train names (provided by Lili Urban)
+
 Travel::Status::DE::DBRIS 0.34 - Sun Sep 13 2026
 
     * Update rolling stock models and train names (patches by Lili Urban)

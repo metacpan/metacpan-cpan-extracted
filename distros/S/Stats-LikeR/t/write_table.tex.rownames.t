@@ -33,29 +33,42 @@ my %hoh = (
 	'1d4t' => { b_factor => 915, binding => 'Kd' },
 );
 
-# HoH: LaTeX has no row-name column unless one is asked for. R's write.table()
-# defaults row.names on and this once followed suit, for tex only; it no longer
-# does, so the default is now the same in every format.
+# HoH: the outer keys are the row identifiers and exist nowhere else, so a HoH
+# keeps them by default, in every format; row.names => 0 drops them. Every
+# other shape defaults row.names off (the HoA block below).
 {
 	my $tmp = File::Temp->new(SUFFIX => '.tex');
 	write_table(\%hoh, "$tmp");
 	my @l = slurp_lines("$tmp");
 
 	my ($preamble) = grep { /\\begin\{tabular\}/ } @l;
-	is(tabular_cols($preamble), 2,
-		'HoH tex: no row-name column by default (2 data cols only)');
+	is(tabular_cols($preamble), 3,
+		'HoH tex: key column by default (2 data cols + 1 label col)');
 
 	my ($header) = grep { /\\hline$/ && /&/ } @l;
-	unlike($header, qr/^\\textbf\{\} &/,
-		'HoH tex: header does not start with an empty cell');
-	like($header, qr/^\\textbf\{b\\_factor\}/,
-		'HoH tex: first header is a real data column');
-
-	ok(!scalar(grep { /^\\textbf\{1cka\}/ } @l),
-		'HoH tex: the outer keys are not emitted as labels');
+	like($header, qr/^\\textbf\{\} &/,
+		'HoH tex: leading header cell is empty by default');
+	ok(scalar(grep { /^\\textbf\{1cka\} & 674 & Kd\\\\$/ } @l),
+		'HoH tex: the outer keys lead their rows by default');
 }
 
-# row.names => 1 opts in: the leading label column is the outer key
+# row.names => 'name' heads the key column with that name
+{
+	my $tmp = File::Temp->new(SUFFIX => '.tex');
+	write_table(\%hoh, "$tmp", 'row.names' => 'pdb_id');
+	my @l = slurp_lines("$tmp");
+
+	my ($preamble) = grep { /\\begin\{tabular\}/ } @l;
+	is(tabular_cols($preamble), 3,
+		"HoH tex + row.names=>'pdb_id': key column plus 2 data cols");
+	my ($header) = grep { /\\hline$/ && /&/ } @l;
+	like($header, qr/^\\textbf\{pdb\\_id\} & \\textbf\{b\\_factor\}/,
+		"HoH tex + row.names=>'pdb_id': the key column is headed pdb_id");
+	ok(scalar(grep { /^\\textbf\{1cka\} & 674 & Kd\\\\$/ } @l),
+		"HoH tex + row.names=>'pdb_id': the keys lead their rows");
+}
+
+# row.names => 1 says the default out loud: the leading label column is the outer key
 {
 	my $tmp = File::Temp->new(SUFFIX => '.tex');
 	write_table(\%hoh, "$tmp", 'row.names' => 1);
@@ -83,7 +96,7 @@ my %hoh = (
 	}
 }
 
-# row.names => 0 is the default said out loud
+# row.names => 0 drops the keys
 {
 	my $tmp = File::Temp->new(SUFFIX => '.tex');
 	write_table(\%hoh, "$tmp", 'row.names' => 0);
@@ -130,14 +143,20 @@ my %hoh = (
 		'HoA tex + row.names=>1: second data row leads with numeric label 2');
 }
 
-# Delimited output agrees with LaTeX: off by default, on when asked
+# Delimited output agrees with LaTeX: on by default for a HoH, off when asked
 {
 	my $tmp = File::Temp->new(SUFFIX => '.csv');
 	write_table(\%hoh, "$tmp");
 	my @l = slurp_lines("$tmp");
-	is($l[0], 'b_factor,binding',
-		'CSV: no leading row-name column by default');
-	is($l[1], '674,Kd', 'CSV: first data row has no leading row name');
+	is($l[0], ',b_factor,binding',
+		'CSV: leading row-name column by default');
+	is($l[1], '1cka,674,Kd', 'CSV: first data row leads with its key by default');
+
+	my $off = File::Temp->new(SUFFIX => '.csv');
+	write_table(\%hoh, "$off", 'row.names' => 0);
+	my @f = slurp_lines("$off");
+	is($f[0], 'b_factor,binding', 'CSV + row.names=>0: no leading row-name column');
+	is($f[1], '674,Kd', 'CSV + row.names=>0: first data row has no leading row name');
 
 	my $on = File::Temp->new(SUFFIX => '.csv');
 	write_table(\%hoh, "$on", 'row.names' => 1);

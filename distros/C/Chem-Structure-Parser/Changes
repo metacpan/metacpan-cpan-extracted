@@ -1,6 +1,135 @@
 Revision history for Chem-Structure-Parser
 
 
+0.034 2026-09-26 CDT
+
+ - A free amino acid or nucleotide bound after a chain is told from a
+   modified residue capping it by whether it is bonded to the chain, which is
+   gemmi's test, and no longer by its residue number.  The number let 1hsl's
+   free HIS 239 (one past a 238-residue chain) and 3lms's free GLY 501
+   (inside a chain numbered 4, 567, 1501, ...) into the sequence, and ten
+   PDBbind chains came back with a negative n_missing; none does now.  It
+   also stops demoting the residues of a peptide written partly as HETATM:
+   cyclosporin's N-methyl amino acids are part of its sequence again.
+ - DBREF1/DBREF2 pairs are read.  A cross-reference too long for DBREF's
+   columns -- a ten-character UniProt accession -- is written as the pair,
+   and 232 PDBbind entries that have nothing else had no dbref at all.
+ - A structure refined with SHELXL has an R-work and R-free.  Its REMARK 3
+   spells them 'R VALUE (WORKING SET, NO CUTOFF)' and 'FREE R VALUE (NO
+   CUTOFF)', which were not recognised; the no-cutoff pair is the one the
+   archive's mmCIF files as the R values, and an mmCIF file whose
+   ls_R_factor_R_work is '?' now falls back to the same number in
+   _pdbx_refine.
+ - A REVDAT continuation line is part of the revision above it.  Each one
+   used to come back as a revision of its own with no date, in 1,789
+   PDBbind entries; the records it lists are now added to its revision.
+ - mmCIF: a helix's id is the HELIX record's (AA1, or 1) rather than the
+   HELX_P1 the mmCIF file names its row; a sheet's strands carry their
+   n_strands and sense, from _struct_sheet and _struct_sheet_order, as a
+   SHEET record's do; a chain has the fragment of its entity; a synthetic
+   entity has the organism _pdbx_entity_src_syn names; and an entity from
+   several sources -- a chimera -- names each organism once, joined as
+   SOURCE joins them, rather than only the last row's.
+ - mmCIF: a chain id longer than seven characters is kept whole.  It was cut
+   to seven, so two segments named SEG1PROA and SEG1PROB came back as one
+   chain.
+ - An option that needs a value and is given undef -- model => undef, probe
+   => undef -- dies naming the function and the option.  It died of 'Use of
+   uninitialized value' inside the module, which named neither.  undef is
+   still off for a switch such as hydrogens, and still means not given for
+   chains and format.
+ - dssp => 1 with features => 0 computes the secondary structure on its own
+   and leaves it at {dssp}, and so does structure_info($file, 'dssp',
+   features => 0).  The first returned nothing and said nothing; the second
+   died.  dssp with atoms => 0, where there is nothing to compute it from,
+   dies.
+ - A coordinate field with anything after the number is not a number.  A
+   coordinate too wide for its eight columns pushes its last digit into the
+   next field, and y came back 0 from '0-200.00'; it is now undef.
+ - The internal parse functions refuse a tied chains hash.  One whose EXISTS
+   died took the parse down in the middle and leaked everything it had
+   built.  structure_info() never passes one.
+ - The solvent-accessible surface is two to three times faster, and the
+   default read of a structure about twice as fast: 4fqr's from 2.47 s to
+   1.18 s, and 60 PDBbind entries from 10.77 s to 6.07 s.  The sphere points
+   are tried in bins by direction, and a bin one neighbour covers whole is
+   passed over.  Every surface is the same number to the last bit, which was
+   checked on 56 structures at three point counts and on the long-double and
+   quadmath perls.
+ - atoms => 0 reads in a third less memory and time.  The parse still built
+   sixteen values for every atom that nobody would read, and now builds the
+   four the residues are worked out from: 2wy2's 64 models peak at 140 MB
+   rather than 408 MB, and 4fqr's read at 57 MB rather than 98 MB.  What
+   comes back is the same structure.
+ - Reading with features => 0 is about a seventh faster: the atoms are filed
+   into their residues, alternate conformers and all, by the parse as it
+   builds them, rather than by a Perl loop over them afterwards.  60 PDBbind
+   entries went from 1.17 s to 1.00 s, and what comes back is the same.
+ - Edge-to-face pi stacking no longer depends on which ring comes first.  The
+   intersect distance was measured from the first ring's centroid projected
+   onto the line where the two planes meet, which is mdtraj's arithmetic
+   asked one way round, and missed stacks whose second ring lies on that
+   line: 1b6c's PHE A99 is 0.66 A from it and its stack with TRP A59 was not
+   reported.  It is now the nearer centroid's distance from the line, which
+   is what the documentation always said it was.
+ - Half-sphere exposure agrees with Biopython's HSExposureCB on every residue
+   of a hundred PDBbind entries but one, a neighbour 0.00005 degrees from the
+   dividing plane.  Two rules were missing.  A standard residue with no
+   peptide-linked standard neighbour -- the GLU of 1a08's bound ACE-FTY-GLU-
+   DIP -- is in none of CaPPBuilder's polypeptides, so it now gets no figure
+   and no longer adds one to the counts around it.  And a side chain
+   deposited without its CB now gets no figure either, where it used to be
+   given glycine's virtual CB.  Biopython takes the highest-occupancy
+   conformer, so altloc => 'highest' is the read that matches it.
+ - Deuterium is an element.  A neutron structure's D atoms were counted in
+   n_no_element and given the 2.0 A default radius and no mass, which made an
+   N-D surface 30% larger than the N-H one; D now has hydrogen's radius and
+   mdtraj's deuterium mass, 2.0135532127.
+ - mmCIF: a quote its line never closes is read as part of a bare word, as
+   'CA, rather than as the start of a value that ran on through every line
+   below it until a stray quote turned up.  The rows after one are no longer
+   lost into a single atom's name.
+ - mmCIF: a position modelled in two chemical states at once has one row in
+   _entity_poly_seq per state, and both were counted.  1ejg's SEQRES came
+   back 48 residues long from the mmCIF and 46 from the PDB file, with an
+   n_missing of 2 against 0; both now say 46 and 0.
+ - A gzip file of several members, which is what bgzip writes, is read to
+   the end.  Only its first member was, so a structure split that way came
+   back short or with no atoms at all.
+ - A .bz2 or .Z file dies saying it is compressed with something this module
+   does not unpack.  The format was worked out from the name with the suffix
+   taken off, and the compressed bytes then read as they stood, which came
+   back as a structure with no atoms and no error.
+ - structure_sequences($file) reads the file with atoms => 0 and
+   features => 0, as its sequences need neither.  It had been computing the
+   surface and every other feature and throwing them away: over 233 files it
+   now takes 11.5 s where it took 64.
+ - On a perl whose NV is a double and whose compiler evaluates double
+   arithmetic in the x87's wider format -- gcc on 32-bit x86 -- the fast
+   number reader leaves fractions to strtod().  Its division was rounded
+   twice there, and 103 of 400,001 six-decimal strings came back one ulp away
+   from strtod()'s answer; no one- to five-decimal string tried was affected.
+ - The features include the interface between two partners, at
+   $info->{features}{interface}, and structure_interface() is new: the
+   residue pairs in contact across it and their classes, the surface the two
+   bury (apolar and polar), salt bridges, polar N/O/S pairs, cation-pi pairs,
+   bridging waters, the centre-of-mass and closest-atom distances, and the
+   B-factors of each side and of its interface.  It is on by default, like
+   the rest, with the partners worked out -- the shortest polymer chain
+   against the others, or the largest ligand against a single chain -- or
+   named with partners => [ [...], [...] ] to structure_info(),
+   structure_features() or structure_interface().  interface => 0 turns it
+   off and sasa => 0 leaves out its surface.  It makes the default read
+   6.4 times a bare one, where it was 4.7.
+ - The interface carries PRODIGY's non-interacting surface and binding
+   affinity estimate (prodigy-prot 2.4.0).  Over 148 PDBbind entries the
+   contacts and their classes are PRODIGY's exactly, and the estimate is
+   within 0.22 kcal/mol of it; the difference is the two surfaces' radii.
+ - Each protein chain has a charge at pH 7 and an isoelectric point, which
+   are Biopython's to the bit, and each chain with secondary structure an
+   ss_fraction of H, E and C.  The whole structure has the charges added up
+   and the fractions over all its chains.
+
 0.033 2026-09-25 CDT
 
  - structure_info($file, 'torsions') -- or 'torsion' -- returns the torsion

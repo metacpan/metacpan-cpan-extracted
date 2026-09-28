@@ -1,0 +1,29 @@
+[%- IF members.keys.size -%]
+=over 5
+
+[% FOREACH name IN members.keys.sort -%]
+=item C<[% name %]>
+
+=over 4
+
+=item Type
+
+C<[% members.$name.shape %]>
+
+[% IF members.$name.documentation -%]
+=item Description
+
+[% members.$name.documentation | html2pod %]
+
+[% END -%]
+=back
+
+[% END -%]
+=back
+[%- ELSE -%]
+=over 5
+
+=item NONE
+
+=back
+[%- END -%]

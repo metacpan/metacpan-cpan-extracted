@@ -9,9 +9,12 @@ my $api_or=Cloudflare::API->new(
     token => 'test-token', account_id => 'acct',
     transport => sub {
         push(@request, [@_]);
+        my ($method, $url)=@_;
+        my $result=$method eq 'GET'&&$url=~m{(?:/keys|/consumers|/configs|/accounts|/zones)(?:\?|\z)}
+            ? [] : { ok => 1 };
         return { status => 200, headers => {}, content => encode_json({
-            success => JSON::PP::true, result => { ok => 1 },
-            result_info => { page => 1 }
+            success => JSON::PP::true, result => $result,
+            result_info => { page => 1, total_pages => 1 }
         }) };
     }
 );
@@ -72,7 +75,7 @@ $api_or->queues()->delete_consumer('q', 'consumer');
 like($request[-1][1], qr{/queues/q/consumers/consumer\z}, 'delete consumer path');
 
 $api_or->hyperdrive()->list_configs();
-like($request[-1][1], qr{/hyperdrive/configs\z}, 'Hyperdrive list path');
+like($request[-1][1], qr{/hyperdrive/configs\?page=1\z}, 'Hyperdrive list path');
 $api_or->hyperdrive()->create_config({ name => 'test', origin => { host => 'db.example.com' } });
 is($request[-1][0], 'POST', 'Hyperdrive create uses POST');
 $api_or->hyperdrive()->update_config('config', { caching => { disabled => JSON::PP::true } });
@@ -92,10 +95,10 @@ $api_or->secrets_store()->get_quota();
 like($request[-1][1], qr{/secrets_store/quota\z}, 'Secrets Store quota path');
 
 $api_or->accounts()->list();
-like($request[-1][1], qr{/accounts\z}, 'account list path');
-$api_or->zones()->list(name => 'example.com', full_response => 1);
+like($request[-1][1], qr{/accounts\?page=1\z}, 'account list path');
+$api_or->zones()->list_page_response(name => 'example.com');
 like($request[-1][1], qr{/zones\?name=example\.com\z}, 'zone filter encoded');
-is_deeply($api_or->zones()->list(full_response => 1)->{'result_info'},
-    { page => 1 }, 'full response option preserves pagination');
+is_deeply($api_or->zones()->list_page_response()->{'result_info'},
+    { page => 1, total_pages => 1 }, 'page response preserves pagination');
 
 done_testing();

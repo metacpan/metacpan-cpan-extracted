@@ -17,6 +17,7 @@ BEGIN {
 }
 
 Test::Pod::LinkCheck::Lite->new(
+    ignore_url	=> 'https://www.iso.org/iso-3166-country-codes.html',
     prohibit_redirect	=> ALLOW_REDIRECT_TO_INDEX,
 )->all_pod_files_ok(
     qw{ blib script eg },

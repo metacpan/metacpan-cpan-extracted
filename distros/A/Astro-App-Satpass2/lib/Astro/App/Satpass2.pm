@@ -62,6 +62,10 @@ use Text::Abbrev;
 use Text::ParseWords ();	# Used only for {level1} stuff.
 
 use constant ASTRO_SPACETRACK_VERSION => 0.105;
+# The following scavenged from
+# Term::ReadLine::Perl 1.0303
+use constant DEFAULT_COMPLETER_WORD_BREAK_CHARACTERS	=>
+    qr-[\\\t\n' \"`\@\$><=;|&{(]+-;	# )}
 use constant DEFAULT_STDOUT_LAYERS	=> ':encoding(utf-8)';
 
 BEGIN {
@@ -92,7 +96,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -4490,7 +4494,7 @@ sub _get_interactive {
 #	Note that the return from this subroutine may or may not be
 #	chomped.
 
-my $readline_word_break_re;
+my $readline_word_break_re = DEFAULT_COMPLETER_WORD_BREAK_CHARACTERS;
 
 {
     my $rl;
@@ -4512,7 +4516,7 @@ my $readline_word_break_re;
 			$rl = Term::ReadLine->new( 'satpass2' );
 			if ( 'Term::ReadLine::Perl' eq $rl->ReadLine() ) {
 
-			    $readline_word_break_re ||= qr<
+			    $readline_word_break_re = qr<
 				[\Q$readline::rl_completer_word_break_characters\E]+
 			    >smx;
 
@@ -4549,6 +4553,7 @@ my $readline_word_break_re;
 
 sub __readline_completer {
     my ( $app, $text, $line, $start ) = @_;
+
 
     $start
 	or return $app->_readline_complete_command( $text );

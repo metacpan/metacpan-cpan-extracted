@@ -40,7 +40,7 @@ requires 'Aion::Emitter', '0.1.2';
 requires 'Aion::Fs', '0.2.0';
 requires 'Aion::Run', '0.0.3';
 requires 'POSIX';
-requires 'Time::Local';
+requires 'Time::Local', '1.35';
 requires 'aliased';
 requires 'common::sense';
 requires 'open';

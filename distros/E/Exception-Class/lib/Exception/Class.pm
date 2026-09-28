@@ -5,7 +5,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '1.45';
+our $VERSION = '1.46';
 
 use Carp qw( croak );
 use Exception::Class::Base;
@@ -135,7 +135,7 @@ package $subclass;
 
 use base qw($isa);
 
-our \$$version_name = '1.1';
+our \$$version_name ||= '1.1';
 
 1;
 
@@ -193,7 +193,7 @@ EOPERL
     die $@ if $@;
 
     ( my $filename = "$subclass.pm" ) =~ s{::}{/}g;
-    $INC{$filename} = __FILE__;
+    $INC{$filename} ||= __FILE__;
 
     $CLASSES{$subclass} = 1;
 }
@@ -225,7 +225,7 @@ Exception::Class - A module that allows you to declare real exception classes in
 
 =head1 VERSION
 
-version 1.45
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -517,8 +517,6 @@ subclass will not be included.
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Exception-Class/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for Exception-Class can be found at L<https://github.com/houseabsolute/Exception-Class>.
@@ -538,7 +536,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<https://www.urth.org/fs-donation.html>.
+button at L<https://houseabsolute.com/foss-donations/>.
 
 =head1 AUTHOR
 
@@ -546,7 +544,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexander Batyrshin brian d foy Leon Timmermans Ricardo Signes
+=for stopwords Alexander Batyrshin brian d foy Graham Knop Leon Timmermans Ricardo Signes
 
 =over 4
 
@@ -560,6 +558,10 @@ brian d foy <brian.d.foy@gmail.com>
 
 =item *
 
+Graham Knop <haarg@haarg.org>
+
+=item *
+
 Leon Timmermans <fawaka@gmail.com>
 
 =item *
@@ -570,7 +572,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Dave Rolsky.
+This software is copyright (c) 2026 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

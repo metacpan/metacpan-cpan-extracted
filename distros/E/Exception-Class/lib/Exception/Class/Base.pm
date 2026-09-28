@@ -3,7 +3,7 @@ package Exception::Class::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.45';
+our $VERSION = '1.46';
 
 use Class::Data::Inheritable 0.02;
 use Devel::StackTrace 2.00;
@@ -273,7 +273,7 @@ Exception::Class::Base - A base class for exception objects
 
 =head1 VERSION
 
-version 1.45
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -571,8 +571,6 @@ overridden. For example:
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Exception-Class/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for Exception-Class can be found at L<https://github.com/houseabsolute/Exception-Class>.
@@ -583,7 +581,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Dave Rolsky.
+This software is copyright (c) 2026 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

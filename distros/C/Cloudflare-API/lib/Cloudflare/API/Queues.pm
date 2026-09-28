@@ -28,7 +28,7 @@ use Cloudflare::API::Resource;
 
 #  Version information
 #
-$VERSION='1.010';
+$VERSION='1.011';
 
 
 #  All done. Positive return
@@ -41,13 +41,25 @@ $VERSION='1.010';
 
 sub list_queues {
 
-
-    #  Preserve result_info for callers that request the full response
-    #
     my ($self, %query)=@_;
-    my $full_response=delete($query{'full_response'});
-    return $self->api()->request('GET', $self->api()->account_path('queues'),
-        query => \%query, full_response => $full_response);
+    return $self->collect_list($self->list_queues_page(%query));
+
+}
+
+
+sub list_queues_page {
+
+    my ($self, %query)=@_;
+    return $self->list_pagination($self->api()->account_path('queues'),
+        { mode => 'single' }, \%query);
+
+}
+
+
+sub list_queues_page_response {
+
+    my ($self, %query)=@_;
+    return $self->list_response($self->api()->account_path('queues'), \%query);
 
 }
 
@@ -96,9 +108,26 @@ sub list_consumers {
     #  Consumer listing is scoped to a queue, not directly to the account
     #
     my ($self, $queue_id, %query)=@_;
-    my $full_response=delete($query{'full_response'});
-    return $self->api()->request('GET', $self->api()->account_path('queues', $queue_id, 'consumers'),
-        query => \%query, full_response => $full_response);
+    return $self->collect_list($self->list_consumers_page($queue_id, %query));
+
+}
+
+
+sub list_consumers_page {
+
+    my ($self, $queue_id, %query)=@_;
+    return $self->list_pagination(
+        $self->api()->account_path('queues', $queue_id, 'consumers'),
+        { mode => 'single' }, \%query);
+
+}
+
+
+sub list_consumers_page_response {
+
+    my ($self, $queue_id, %query)=@_;
+    return $self->list_response(
+        $self->api()->account_path('queues', $queue_id, 'consumers'), \%query);
 
 }
 
@@ -145,20 +174,24 @@ These methods use the account ID configured on `Cloudflare::API`. They manage qu
 
 # METHODS #
 
-* **list_queues(%query)** — List queues using named query filters. Returns `result`; `full_response => 1` retains pagination information.
+* **list_queues(%query)** — List every queue using named query filters and return one flat array reference. Cloudflare currently returns this endpoint in one response.
+* **list_queues_page(%query)** — Return a lazy `HTTP::API::Core::Pagination` object. It currently completes after Cloudflare's single response.
+* **list_queues_page_response(%query)** — Make one list request and return the complete decoded Cloudflare response hash.
 * **get_queue($id, %options)** — Retrieve a queue by ID and return its `result`.
 * **create_queue(\%body, %options)** — POST a queue definition, normally including `queue_name`, and return its `result`.
 * **update_queue($id, \%body, %options)** — PATCH a queue and return its `result`.
 * **delete_queue($id, %options)** — DELETE a queue and return the endpoint's `result`, possibly `undef` for an empty body.
-* **list_consumers($queue_id, %query)** — List consumers for one queue, using named query filters. Returns `result`; `full_response => 1` retains pagination information.
+* **list_consumers($queue_id, %query)** — List every consumer for one queue using named query filters and return one flat array reference. Cloudflare currently returns this endpoint in one response.
+* **list_consumers_page($queue_id, %query)** — Return a lazy `HTTP::API::Core::Pagination` object. It currently completes after Cloudflare's single response.
+* **list_consumers_page_response($queue_id, %query)** — Make one list request and return the complete decoded Cloudflare response hash.
 * **create_consumer($queue_id, \%body, %options)** — POST a consumer definition and return its `result`.
 * **delete_consumer($queue_id, $consumer_id, %options)** — DELETE a consumer and return the endpoint's `result`, possibly `undef` for an empty body.
 
-Every JSON method accepts `full_response => 1`. IDs are percent-encoded. Create and update bodies must be hash references.
+Non-list JSON methods accept `full_response => 1`. IDs are percent-encoded. Create and update bodies must be hash references.
 
 # ERRORS #
 
-Missing account context, invalid IDs or bodies, HTTP and transport failures, and Cloudflare envelope failures cause exceptions as described in `Cloudflare::API`.
+Missing account context, invalid IDs or bodies, HTTP and transport failures, and Cloudflare response failures cause exceptions as described in `Cloudflare::API`.
 
 # SEE ALSO #
 
@@ -207,7 +240,17 @@ These methods use the account ID configured on C<Cloudflare::API>. They manage q
 
 =item *
 
-B<list_queues(%query)> — List queues using named query filters. Returns C<result>; C<<< full_response => 1 >>> retains pagination information.
+B<list_queues(%query)> — List every queue using named query filters and return one flat array reference. Cloudflare currently returns this endpoint in one response.
+
+
+=item *
+
+B<list_queues_page(%query)> — Return a lazy C<HTTP::API::Core::Pagination> object. It currently completes after Cloudflare's single response.
+
+
+=item *
+
+B<list_queues_page_response(%query)> — Make one list request and return the complete decoded Cloudflare response hash.
 
 
 =item *
@@ -232,7 +275,17 @@ B<delete_queue($id, %options)> — DELETE a queue and return the endpoint's C<re
 
 =item *
 
-B<list_consumers($queue_id, %query)> — List consumers for one queue, using named query filters. Returns C<result>; C<<< full_response => 1 >>> retains pagination information.
+B<list_consumers($queue_id, %query)> — List every consumer for one queue using named query filters and return one flat array reference. Cloudflare currently returns this endpoint in one response.
+
+
+=item *
+
+B<list_consumers_page($queue_id, %query)> — Return a lazy C<HTTP::API::Core::Pagination> object. It currently completes after Cloudflare's single response.
+
+
+=item *
+
+B<list_consumers_page_response($queue_id, %query)> — Make one list request and return the complete decoded Cloudflare response hash.
 
 
 =item *
@@ -247,12 +300,12 @@ B<delete_consumer($queue_id, $consumer_id, %options)> — DELETE a consumer and 
 
 =back
 
-Every JSON method accepts C<<< full_response => 1 >>>. IDs are percent-encoded. Create and update bodies must be hash references.
+Non-list JSON methods accept C<<< full_response => 1 >>>. IDs are percent-encoded. Create and update bodies must be hash references.
 
 
 =head1 ERRORS
 
-Missing account context, invalid IDs or bodies, HTTP and transport failures, and Cloudflare envelope failures cause exceptions as described in C<Cloudflare::API>.
+Missing account context, invalid IDs or bodies, HTTP and transport failures, and Cloudflare response failures cause exceptions as described in C<Cloudflare::API>.
 
 
 =head1 SEE ALSO

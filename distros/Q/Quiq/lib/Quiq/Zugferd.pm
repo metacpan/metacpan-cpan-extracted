@@ -42,7 +42,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.239';
+our $VERSION = '1.240';
 
 use Quiq::PerlModule;
 use Quiq::Path;
@@ -817,7 +817,8 @@ sub toXml {
            'BT-123' => $anh->name,
            'BT-125-1' => $anh->mimeType,
            'BT-125-2' => $anh->filename,
-           'BT-125' => MIME::Base64::encode_base64($anh->data,''),
+           # 'BT-125' => MIME::Base64::encode_base64($anh->data,''),
+           'BT-125' => $anh->data,
        );
     
        return $t;
@@ -1473,7 +1474,7 @@ Klassen:
 
 =head1 VERSION
 
-1.239
+1.240
 
 =head1 AUTHOR
 

@@ -1,0 +1,24 @@
+This distribution contains service metadata derived from the
+Botocore project:
+
+    https://github.com/boto/botocore
+
+Botocore is Copyright Amazon.com, Inc. or its affiliates and is
+licensed under the Apache License, Version 2.0.
+
+The Botocore service models and paginator models used by this
+distribution have been transformed, stripped of documentation where
+applicable, compiled, and serialized for use by Amazon::API.
+
+Botocore version: 1.43.103
+Botocore commit: a0db945b82137d32bbc76e8b1f7e97ffd6617a20
+
+The Botocore-derived portions of this distribution remain subject
+to the Apache License, Version 2.0. See LICENSE.botocore and
+NOTICE.botocore.
+
+Amazon::API code and its generated service classes are distributed under
+the same terms as Perl itself.
+
+This distribution is not affiliated with or endorsed by Amazon Web
+Services.

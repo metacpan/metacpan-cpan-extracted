@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.166;
+package Config::Model 2.167;
 
 use 5.20.0;
 use strict ;
@@ -428,30 +428,41 @@ sub include_backend {
 
 sub copy_element_information ($self, $model, $raw_model, $config_class_name) {
     if (my $elt_info = delete $raw_model->{element}) {
-        # TODO: remove in 2029
-        $self->translate_legacy_element_info($config_class_name, $elt_info, 'name');
+        # TODO: remove in 2029, translate packed info into hash with aliases
+        # i.e. [ [qw/foo bar/] => {...} ]
+        # to [ foo => {...}, bar => { alias => 'foo' } ]
+        my $unpacked_info = $self->translate_packed_element_into_alias($config_class_name, $elt_info, 'name');
 
-        my @raw_info = $elt_info->@*;
-        my %elt_info;
-        while (@raw_info) {
-            my ( $name, $info ) = splice @raw_info, 0, 2;
+        # translate [ A => <info>, B => <info> ]
+        # in { A => <info>, B => <info> }
+        my $hash_info = $self->translate_array_to_hash($unpacked_info);
+
+        # translate start alias in plain alias
+        # i.e. foo => "*bar"
+        # to foo => { alias => "bar" }
+        my $new_info = $self->translate_star_alias($hash_info) ;
+
+        # TODO: remove in 2030, once all tests and synopsis are cleaned up or translated to YAML
+        $self->translate_legacy_info_in_hash($config_class_name, $new_info );
+
+        foreach my $name ( keys $new_info->%* ) {
+            my $info = $new_info->{$name};
 
             my $actual_info;
             if (ref $info) {
                 # warp can be found only in element item
-                $self->translate_legacy_info( $config_class_name, $name, $info );
-                $actual_info = $info;
-                $elt_info{$name} = $info;
-            }
-            elsif ($info =~ /^\*(.*)/) {
-                my $target = $1;
-                $actual_info = $elt_info{$target};
-                if (not defined $actual_info) {
-                    Config::Model::Exception::ModelDeclaration->throw(
-                        error => "Element alias '$info' points to unknown element. ".
-                        " Aliased element must be declared before alias. Expected one of ".
-                        join(' ',sort keys %elt_info)
-                    );
+                if (my $alias = $info->{alias}) {
+                    $actual_info = $new_info->{$alias};
+                    if (not defined $actual_info) {
+                        Config::Model::Exception::ModelDeclaration->throw(
+                            error => "Element alias '$info' points to unknown element. ".
+                            " Aliased element must be declared before alias. Expected one of ".
+                            join(' ',sort keys $new_info->%*)
+                        );
+                    }
+                }
+                else {
+                    $actual_info = $info;
                 }
             }
             else {
@@ -467,8 +478,21 @@ sub copy_element_information ($self, $model, $raw_model, $config_class_name) {
 }
 
 # translate [qw/A B C/ => <info>]
-# in [ A => <info>, B => '*A', c => '*A']
-sub translate_legacy_element_info($self, $config_class_name, $elt_info, $info_name) {
+# in [ A => <info>, B => {alias => A }, c => { alias => 'A'} ] (with $star = 0)
+# in [ A => <info>, B => '*A' }, c => '*A' ] (with $star = 1)
+sub translate_packed_element_into_alias($self, $config_class_name, $elt_info, $info_name, $star = 0) {
+    if (ref $elt_info eq 'HASH') {
+        Config::Model::Exception::ModelDeclaration->throw(
+            error => "Element declaration of $config_class_name is not an array ref"
+        );
+    }
+
+    if (ref ($elt_info->[0]) eq "HASH") {
+        # we already have a list of hash like
+        # [ { name => A, ...},  {name => B, alias =>A},...]
+        return $elt_info;
+    }
+
     my @raw_info = $elt_info->@*;
     my @new_info;
 
@@ -480,17 +504,35 @@ sub translate_legacy_element_info($self, $config_class_name, $elt_info, $info_na
         push @new_info, $first, $info;
 
         if (@element_names > 0) {
-            $self->show_legacy_issue("$config_class_name: element $info_name '@element_names': ".
-                                     "should use aliases to $first instead of array ref.", 'warn');
+            $self->show_legacy_issue(
+                "$config_class_name: element $info_name '@element_names': ".
+                "should use aliases to $first instead of array ref.", 'warn'
+            );
         }
         foreach my $name (@element_names) {
-            push @new_info, $name, '*'.$first;
+            push @new_info, $name, $star ? "*$first" : { alias => $first };
         }
     }
 
-    $elt_info->@* = @new_info;
+    return \@new_info;
+}
 
-    return;
+# translate [ A => <info>, B => <info> ]
+#        or [ { name => A, ...},  {name => B, ...}, ...]
+# in { A => <info>, B => <info> }
+sub translate_array_to_hash($self, $elt_info) {
+    if (ref $elt_info eq 'HASH') {
+        # already in new format
+        return $elt_info;
+    }
+
+    if (ref ($elt_info->[0]) eq "HASH") {
+        # we have a list of hash like
+        # [ { name => A, ...},  {name => B },...]
+        return { map { delete $_->{name} => $_ ;} $elt_info->@* };
+    }
+
+    return { $elt_info->@* };
 }
 
 sub copy_aliased_element_properties ($self, $model, $raw_model, $config_class_name, $properties) {
@@ -576,10 +618,10 @@ sub translate_legacy_aliased_element_properties($self, $cfg_class_name, $propert
         return $properties;
     }
 
-    $self->translate_legacy_element_info($cfg_class_name, $properties, $prop_name);
-    my %new_prop = $properties->@*;
-
-    return \%new_prop;
+    # translate [qw/A B C/ => <info>]
+    # in { A => <info>, B => '*A', c => '*A' }
+    my $new = $self->translate_packed_element_into_alias($cfg_class_name, $properties, $prop_name, 1);
+    return $self->translate_array_to_hash($new);
 }
 
 # translate for $prop_name: [qw/A B C/ => <prop_value>]
@@ -611,38 +653,76 @@ sub translate_legacy_reversed_element_properties($self, $cfg_class_name, $proper
     return \%new_info;
 }
 
-sub extract_element_list ($self, $normalized_model) {
+# must be compatible with formats:
+# [ name => { info }, name2 => {info} ]
+# [ [qw/name1 name2/] => { info } ]
+# [ { name => ..., info }, ... ]
+sub extract_element_list ($self, $raw_model) {
+    my $list = $raw_model->{element};
+    return () unless defined $list;
+
+    my $i = 0;
     my @element_list;
-
-    # first construct the element list
-    my @compact_list = @{ $normalized_model->{element} || [] };
-    while (@compact_list) {
-        my ( $item, $info ) = splice @compact_list, 0, 2;
-
-        # store the order of element as declared in 'element'
-        push @element_list, ref($item) ? @$item : ($item);
+    while ($i < $list->@*) {
+        my $item = $list->[$i++];
+        if (ref $item eq 'ARRAY') {
+            push @element_list, $item->@*;
+            $i++;
+        }
+        elsif (ref $item eq 'HASH') {
+            my $name = $item->{name} // carp "Missing name in element";
+            push @element_list, $name;
+        }
+        else {
+            push @element_list, $item;
+            $i++;
+        }
     }
+
     return @element_list;
 }
 
+# translate [ pattern => {info}, ... ]
+# in [ { pattern => '', info}, ...]
+sub translate_legacy_accept_info ($self, $config_class_name, $accept_info) {
+    return unless defined $accept_info;
+
+    # already translated
+    return $accept_info if ref $accept_info->[0] eq 'HASH';
+
+    $self->show_legacy_issue(
+        "$config_class_name class: accept attribute should be a list of hash "
+        ."with 'pattern' key. I.e. something like [ { pattern => 'xyz.*', info}, ...] instead "
+        ."of [ 'xyz.*' => {info}, ... ]"
+    );
+
+    my @new;
+    while (@$accept_info) {
+        my $pattern = shift $accept_info->@*;
+        my $info = shift $accept_info->@*;
+        $info->{pattern} = $pattern;
+        push @new, $info;
+    }
+
+    return \@new;
+}
+
 sub extract_accept_parameter ($self, $config_class_name, $model, $raw_model) {
+    # order of pattern spec is important, so we keep the patterns in a list
     my @accept_list;
     my %accept_hash;
     my $accept_info = delete $raw_model->{'accept'} || [];
-    while (@$accept_info) {
-        my $name_match = shift @$accept_info;    # should be a regexp
 
-        # handle legacy
-        if ( ref $name_match ) {
-            my $implicit = defined $name_match->{name_match} ? '' : 'implicit ';
-            unshift @$accept_info, $name_match;    # put data back in list
-            $name_match = delete $name_match->{name_match} || '.*';
-            $logger->warn("class $config_class_name: name_match ($implicit$name_match)",
-                " in accept is deprecated");
+    foreach my $info ($accept_info->@*) {
+        my $pattern = delete $info->{pattern};
+        if (not $pattern) {
+            Config::Model::Exception::ModelDeclaration->throw(
+                error => "create class $config_class_name: Missing pattern attribute for accept spec"
+            );
         }
 
-        push @accept_list, $name_match;
-        $accept_hash{$name_match} = shift @$accept_info;
+        push @accept_list, $pattern;
+        $accept_hash{$pattern} = $info;
     }
 
     $model->{accept}      = \%accept_hash;
@@ -686,6 +766,10 @@ sub normalize_class_parameters ($self, $config_class_name, $raw_model) {
     # first deal with perl file and cds_file backend
     $self->translate_legacy_backend_info( $config_class_name, $model );
 
+    # deal with legacy accept parameter
+    $raw_model->{accept}
+        = $self->translate_legacy_accept_info($config_class_name, $raw_model->{accept});
+
     # handle accept parameter
     $self->extract_accept_parameter($config_class_name, $model, $raw_model);
 
@@ -721,12 +805,41 @@ sub copy_element_properties($self, $model, $raw_model, $config_class_name) {
     return;
 }
 
-sub translate_legacy_info {
-    my $self              = shift;
-    my $config_class_name = shift || die;
-    my $elt_name          = shift;
-    my $info              = shift;
+# translate aliases in hash of hash with explicit alias attribute
+# i.e. { foo => "*bar" }
+# to { foo => { alias => "bar" } }
+sub translate_star_alias ($self, $elt_hash) {
+    my %new;
+    foreach my $item (keys $elt_hash->%*) {
+        my $raw_info = $elt_hash->{$item};
 
+        my $info = {};
+        if (ref $raw_info eq 'HASH') {
+            $info = $raw_info;
+        }
+        else {
+            # we have an alias
+            $info->{alias} = $raw_info =~ s/^\*//r;;
+        }
+        $new{$item} = $info;
+    }
+
+    return \%new;
+}
+
+# translate info in hash
+# i.e { foo => {old info} }
+# to { foo => {new info} }
+sub translate_legacy_info_in_hash ($self, $config_class_name, $elt_hash) {
+    foreach my $item (keys $elt_hash->%*) {
+        $self->translate_legacy_info($config_class_name, $item, $elt_hash->{$item} )
+    }
+
+    return;
+}
+
+
+sub translate_legacy_info ($self, $config_class_name, $elt_name, $info) {
     $self->translate_warped_node_info( $config_class_name, $elt_name, $info );
 
     #translate legacy warp information
@@ -1112,13 +1225,11 @@ sub translate_warp_info {
     # now, follow is only { w1 => 'warp1', w2 => 'warp2'}
     my @warper_items = values %$follow;
 
-    my $multi_follow = @warper_items > 1 ? 1 : 0;
-
     my $rules =
         $self->translate_rules_arg( $config_class_name, $elt_name, \@warper_items,
         $warp_info->{rules} );
 
-    $warp_info->{follow} = $follow;
+    $warp_info->{follow} = $follow if keys $follow->%*;
     $warp_info->{rules}  = $rules;
 
     $legacy_logger->debug(
@@ -1376,6 +1487,11 @@ sub find_model_file_in_dir ($model_name, $model_path) {
 sub find_model_file_in_inc {
     my ($self, $model_name, $load_file) = @_;
 
+    if ($load_file and $load_file =~ m!^/!) {
+        # do not seach absolute path in @INC.
+        return $load_file;
+    }
+
     my $path_load_file ;
 
     if ($load_file and $load_file =~ m!^/! ) {
@@ -1447,7 +1563,7 @@ sub load_model_plugins {
                     my $done_key = $name . ':' . $snippet_file_rel;
                     next if $done{$done_key};
                     $loader_logger->info("Found snippet $snippet_file in $inc_str dir");
-                    my $snippet_model = $self->_load_model_file($snippet_file);
+                    my $snippet_model = $self->_read_model_file($snippet_file);
 
                     $self->_merge_model_in_hash( \%model_graft_by_name, $snippet_model, $snippet_file_rel);
                     $done{$done_key} = 1;
@@ -1459,30 +1575,19 @@ sub load_model_plugins {
 }
 
 # load a model from file. See comments around raw_models attribute for explanations
-sub load {
-    my $self       = shift;
-    my $model_name = shift;    # model name like Foo::Bar
-    my $load_file  = shift;    # model file (override model name), used for tests
-
+# $model_name: model name like Foo::Bar
+# $load_file: model file (override model name), used for tests
+sub load ($self, $model_name, $load_file = '') {
     $loader_logger->debug("called on model $model_name");
     my $path_load_file = $self->find_model_file_in_inc($model_name, $load_file);
 
-    my %models_by_name;
-
     # Searches $load_file in @INC and returns an array containing the
     # names of the loaded classes
-    my $model = $self->_load_model_file($path_load_file->absolute);
-    my @loaded_classes = $self->_merge_model_in_hash( \%models_by_name, $model, $path_load_file );
+    my $model = $self->_read_model_file($path_load_file->absolute);
 
-    $self->store_raw_model( $model_name, dclone( \%models_by_name ) );
+    my ($loaded_classes, $models_by_name) = $self->store_model( $model_name, $model, $path_load_file );
 
-    foreach my $name ( keys %models_by_name ) {
-        my $data = $self->normalize_class_parameters( $name, $models_by_name{$name} );
-        $loader_logger->debug("Store normalized model $name");
-        $self->store_normalized_model( $name, $data );
-    }
-
-    my %model_graft_by_name = $self->load_model_plugins(sort keys %models_by_name);
+    my %model_graft_by_name = $self->load_model_plugins(sort keys $models_by_name->%*);
 
     # store snippet. May be used later
     foreach my $name (keys %model_graft_by_name) {
@@ -1494,14 +1599,29 @@ sub load {
     # check if a snippet is available for this class
     foreach my $snippet ( $self->all_snippets ) {
         my $class_to_merge = $snippet->{name};
-        next unless $models_by_name{$class_to_merge};
+        next unless $models_by_name->{$class_to_merge};
         $self->augment_config_class_really( $class_to_merge, $snippet );
     }
 
     # return the list of classes found in $load_file. Respecting the order of the class
     # declaration is important for Config::Model::Itself so the class are written back
     # in the same order.
-    return @loaded_classes;
+    return $loaded_classes->@*;
+}
+
+# path_load_file is used to build error messages
+sub store_model ($self, $model_name, $model, $path_load_file ) {
+    my %models_by_name;
+    my @loaded_classes = $self->_merge_model_in_hash( \%models_by_name, $model, $path_load_file );
+
+    $self->store_raw_model( $model_name, dclone( \%models_by_name ) );
+
+    foreach my $name ( keys %models_by_name ) {
+        my $data = $self->normalize_class_parameters( $name, $models_by_name{$name} );
+        $loader_logger->debug("Store normalized model $name");
+        $self->store_normalized_model( $name, $data );
+    }
+    return \@loaded_classes, \%models_by_name;
 }
 
 sub _merge_model_in_hash {
@@ -1524,28 +1644,34 @@ sub _merge_model_in_hash {
     return @names;
 }
 
-sub _load_model_file {
+sub _read_model_file {
     my ( $self, $load_file ) = @_;
 
-    $loader_logger->info("load model $load_file");
+    $loader_logger->info("read model file $load_file");
 
     my $err_msg = '';
     # do searches @INC if the file path is not absolute
-    my $model   = do $load_file;
+    my $model_list   = do $load_file;
 
-    unless ($model) {
-        if    ($@)                   { $err_msg = "couldn't parse $load_file: $@"; }
-        elsif ( not defined $model ) { $err_msg = "couldn't do $load_file: $!" }
-        else                         { $err_msg = "couldn't run $load_file"; }
+    unless ($model_list) {
+        if ($@) {
+            $err_msg = "couldn't parse $load_file: $@";
+        }
+        elsif ( not defined $model_list ) {
+            $err_msg = "couldn't do $load_file: $!"
+        }
+        else {
+            $err_msg = "couldn't run $load_file";
+        }
     }
-    elsif ( ref($model) ne 'ARRAY' ) {
-        $model = [$model];
+    elsif ( ref($model_list) ne 'ARRAY' ) {
+        $model_list = [$model_list];
     }
 
-    Config::Model::Exception::ModelDeclaration->throw( message => "load error: $err_msg" )
+    Config::Model::Exception::ModelDeclaration->throw( message => "read model error: $err_msg" )
         if $err_msg;
 
-    return $model;
+    return $model_list;
 }
 
 sub augment_config_class {
@@ -1986,7 +2112,7 @@ Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.166
+version 2.167
 
 =head1 SYNOPSIS
 
@@ -2013,15 +2139,15 @@ version 2.166
  $model ->create_config_class (
    name => "MiniModel",
    element => [
-     foo => { type => 'leaf', value_type => 'uniline' },
-     bar => '*foo',
-     baz => '*foo',
+     { name => 'foo', type => 'leaf', value_type => 'uniline' },
+     { name => 'bar', alias => 'foo' },
+     { name => 'baz', alias => 'foo' },
    ],
    rw_config => {
-     backend => 'IniFile',
-     auto_create => 1,
-     config_dir => '.',
-     file => 'mini.ini',
+       backend => 'IniFile',
+       auto_create => 1,
+       config_dir => '.',
+       file => 'mini.ini',
    }
  ) ;
 
@@ -2042,12 +2168,16 @@ version 2.166
 =head2 Create a new model file and use it
 
  $ mkdir -p lib/Config/Model/models/
- $ echo "[ { name => 'MiniModel', \
-             element => [ foo => { type => 'leaf', value_type => 'uniline' }, qw/bar *foo baz *foo/], \
-             rw_config => { backend => 'IniFile', auto_create => 1, \
-                            config_dir => '.', file => 'mini.ini', \
-                          } \
-           } \
+ $ echo "[ { name => 'MiniModel',
+              element => [
+               { name => 'foo', type => 'leaf', value_type => 'uniline' },
+               { name => 'bar', alias => 'foo'}
+               { name => 'baz', alias => 'foo'}
+             ],
+             rw_config => { backend => 'IniFile', auto_create => 1,
+                            config_dir => '.', file => 'mini.ini',
+                          }
+           }
          ] ; " > lib/Config/Model/models/MiniModel.pl
  # require App::Cme
  $ cme modify -try MiniModel -dev bar=BARV foo=FOOV baz=BAZV
@@ -2499,16 +2629,16 @@ Example:
      'copyright' => ['2010,2011 Dominique Dumont'],
      'license' => 'LGPL2',
      'element' => [
-       'PARTICIPATE',
        {
+         name => 'PARTICIPATE',
          'description' => 'If you don\'t want to participate [...]',
          'type' => 'leaf',
          'upstream_default' => '0',
          'value_type' => 'boolean',
          'write_as' => ['no', 'yes']
        },
-       'ENCRYPT',
        {
+         name => 'ENCRYPT',
          'choice' => ['no', 'maybe', 'yes'],
          'description' => 'encrypt popcon submission.',
          'help' => {
@@ -2691,8 +2821,8 @@ Example:
   $model->create_config_class
   (
    config_class_name => 'SomeRootClass',
-   description       => [ X => 'X-ray' ],
-   level             => [ 'tree_macro' => 'important' ] ,
+   description       => { X => 'X-ray' },
+   level             => { 'important' => 'tree_macro' } ,
    class_description => "SomeRootClass description",
    element           => [ ... ]
   ) ;
@@ -2705,8 +2835,8 @@ can also be declared within the element declaration:
    config_class_name => 'SomeRootClass',
    class_description => "SomeRootClass description",
    'element' => [
-     tree_macro => { level => 'important'},
-     X          => { description => 'X-ray', } ,
+     { name => 'tree_macro', level => 'important'},
+     { name => 'X', description => 'X-ray', } ,
    ]
   ) ;
 

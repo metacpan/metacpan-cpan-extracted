@@ -45,4 +45,29 @@ is $arx->get_entry([qw<A real.txt>]), {
     },
 };
 
+$arx->remove('A');
+is $arx->get_entry(''), { type => 'directory', entries => [qw<Current real.txt>] };
+
+$arx->remove('real.txt');
+is $arx->get_entry(''), { type => 'directory', entries => [qw<Current>] };
+
+$arx->add_directory('foo/bar/baz');
+$arx->add_directory('foo/bar/baz');
+is $arx->get_entry([qw<foo bar>]), { type => 'directory', entries => [qw<baz>] };
+is $arx->get_entry([qw<foo bar baz>]), { type => 'directory', entries => [] };
+
+$arx->add_file('foo/bar/quux/hi.txt', "hello\n");
+$arx->add_link([qw<foo bar link>], 'quux/hi.txt');
+is $arx->get_entry('foo/bar/link'), { type => 'link', target => 'quux/hi.txt' };
+is $arx->get_entry('foo/bar/quux/hi.txt'), {
+    type      => 'file',
+    contents  => "hello\n",
+    integrity => {
+        algorithm => 'SHA256',
+        hash      => '5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03',
+        blockSize => 0x400000,
+        blocks    => ['5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03'],
+    },
+};
+
 done_testing;

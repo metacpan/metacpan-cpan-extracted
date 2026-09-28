@@ -22,7 +22,7 @@ use warnings;
 
 #  External modules
 #
-use HTTP::API::Core 1.01;
+use HTTP::API::Core 1.08;
 
 
 #  Cloudflare::API modules
@@ -32,7 +32,7 @@ use Cloudflare::API::Error;
 
 #  Version information
 #
-$VERSION='1.010';
+$VERSION='1.011';
 
 
 #  All done. Positive return
@@ -92,7 +92,7 @@ sub new {
 sub account_id { return $_[0]->{'account_id'} }
 
 
-sub raw_request {
+sub response {
 
 
     #  Require a relative API path so credentials stay on the configured host
@@ -101,6 +101,14 @@ sub raw_request {
     die "path must begin with one slash\n"
         unless defined($path)&&!ref($path)&&$path=~m{\A/(?!/)};
     return $self->{'core_or'}->request($method, $path, %opt);
+
+}
+
+
+sub raw_request {
+
+    my $self=shift();
+    return $self->response(@_);
 
 }
 
@@ -124,10 +132,22 @@ sub request_full {
     #  Parse the Cloudflare envelope and surface reported API failures
     #
     my ($self, $method, $path, %opt)=@_;
-    my $response_or=$self->raw_request($method, $path, %opt);
+    my $response_or=$self->response($method, $path, %opt);
+    return $self->decode_response($response_or);
+
+}
+
+
+sub decode_response {
+
+
+    #  Decode and validate the Cloudflare response shared by direct requests
+    #  and paginated extractors
+    #
+    my ($self, $response_or, $body_hr)=@_;
     return { success => 1, result => undef } unless $response_or->has_content();
 
-    my $body_hr=$response_or->json();
+    $body_hr=$response_or->json() unless defined($body_hr);
     die "Cloudflare returned a non-object JSON response\n" unless ref($body_hr) eq 'HASH';
     if (exists($body_hr->{'success'})&&!$body_hr->{'success'}) {
         die Cloudflare::API::Error->new(
@@ -137,6 +157,99 @@ sub request_full {
         );
     }
     return $body_hr;
+
+}
+
+
+sub pagination {
+
+
+    #  Configure the Core iterator while retaining Cloudflare validation and
+    #  the endpoint's result and continuation shapes
+    #
+    my ($self, $path, %opt)=@_;
+    die "path must begin with one slash\n"
+        unless defined($path)&&!ref($path)&&$path=~m{\A/(?!/)};
+    my $mode=delete($opt{'mode'}) || 'page';
+    die "unsupported Cloudflare pagination mode: $mode\n"
+        unless $mode=~/\A(?:page|cursor|single)\z/;
+    my $items_path=delete($opt{'items'}) || 'result';
+    my $next_path=delete($opt{'next'}) || 'result_info.cursor';
+    my $page_param=delete($opt{'page_param'}) || 'page';
+    my $page_size_param=delete($opt{'page_size_param'}) || 'per_page';
+    my $cursor_param=delete($opt{'cursor_param'}) || 'cursor';
+    my $query_hr=delete($opt{'query'}) || {};
+    my $request_hr=delete($opt{'request'}) || {};
+    die "query must be a hash reference\n" unless ref($query_hr) eq 'HASH';
+    die "request must be a hash reference\n" unless ref($request_hr) eq 'HASH';
+    die "unknown Cloudflare pagination option: $_\n" foreach sort(keys(%opt));
+
+    my %query=%$query_hr;
+    my $items_cr=sub {
+        my ($body_hr, $response_or)=@_;
+        $body_hr=$self->decode_response($response_or, $body_hr);
+        return $self->response_value($body_hr, $items_path);
+    };
+    my %page_opt=(
+        items                     => $items_cr,
+        query                     => \%query,
+        request                   => $request_hr,
+        response_aware_extractors => 1
+    );
+
+    if ($mode=~/\A(?:cursor|single)\z/) {
+        $page_opt{'mode'}='cursor';
+        if ($mode eq 'cursor') {
+            $page_opt{'cursor_param'}=$cursor_param;
+            $page_opt{'cursor'}=delete($query{$cursor_param})
+                if exists($query{$cursor_param});
+        }
+        $page_opt{'next'}=sub {
+            my ($body_hr, $response_or)=@_;
+            $body_hr=$self->decode_response($response_or, $body_hr);
+            return undef if $mode eq 'single';
+            return $self->response_value($body_hr, $next_path);
+        };
+    }
+    else {
+        $page_opt{'mode'}='page';
+        $page_opt{'page_param'}=$page_param;
+        $page_opt{'start_page'}=delete($query{$page_param})
+            if exists($query{$page_param});
+        $page_opt{'page_size_param'}=$page_size_param;
+        $page_opt{'page_size'}=delete($query{$page_size_param})
+            if exists($query{$page_size_param});
+        $page_opt{'has_more'}=sub {
+            my ($body_hr, $response_or)=@_;
+            $body_hr=$self->decode_response($response_or, $body_hr);
+            my $info_hr=$body_hr->{'result_info'};
+            if (ref($info_hr) eq 'HASH') {
+                return $info_hr->{'page'}<$info_hr->{'total_pages'}
+                    if defined($info_hr->{'page'})&&defined($info_hr->{'total_pages'});
+                if (defined($info_hr->{'page'})&&defined($info_hr->{'per_page'})&&
+                    defined($info_hr->{'total_count'})&&$info_hr->{'per_page'}>0) {
+                    return $info_hr->{'page'}*$info_hr->{'per_page'}<
+                        $info_hr->{'total_count'};
+                }
+            }
+            my $items_ar=$self->response_value($body_hr, $items_path);
+            return ref($items_ar) eq 'ARRAY'&&@$items_ar ? 1 : 0;
+        };
+    }
+    return $self->{'core_or'}->paginate($path, %page_opt);
+
+}
+
+
+sub response_value {
+
+    my ($self, $body_hr, $path)=@_;
+    my $value_ref=$body_hr;
+    foreach my $part (split(/\./, $path)) {
+        return undef unless ref($value_ref) eq 'HASH';
+        $value_ref=$value_ref->{$part};
+    }
+    return $value_ref;
 
 }
 
@@ -200,14 +313,16 @@ my $api=Cloudflare::API->new(
     account_id => $ENV{'CLOUDFLARE_ACCOUNT_ID'}
 );
 
-my $buckets=$api->r2()->list_buckets();
-my $page=$api->r2()->list_buckets(full_response => 1);
+my $buckets_ar=$api->r2()->list_buckets();
+my $page_or=$api->r2()->list_buckets_page(per_page => 100);
+my $page_hr=$api->r2()->list_buckets_page_response(per_page => 100);
+my $response_or=$api->response('GET', '/accounts');
 my $zone=$api->zones()->get($zone_id);
 ```
 
 # DESCRIPTION #
 
-`Cloudflare::API` supplies a bearer-authenticated HTTP client and accessors for the resource modules below. It requires Perl 5.10 or later, HTTP::API::Core 1.01 or later, and HTTPS support through IO::Socket::SSL. Resource objects share the same client and transport. The module manages resources through Cloudflare's REST API; it does not build Worker projects or perform R2 object transfers.
+`Cloudflare::API` supplies a bearer-authenticated HTTP client and accessors for the resource modules below. It requires Perl 5.10 or later, HTTP::API::Core 1.08 or later, and HTTPS support through IO::Socket::SSL. Resource objects share the same client and transport. The module manages resources through Cloudflare's REST API; it does not build Worker projects or perform R2 object transfers.
 
 An API token is required. Supply `token` to `new()` or set `CLOUDFLARE_API_TOKEN`. Account-scoped methods also need `account_id` or `CLOUDFLARE_ACCOUNT_ID`; account and zone lookups work without a default account ID. Use a token with the permissions required by the selected Cloudflare operations.
 
@@ -224,7 +339,7 @@ Each accessor creates a resource object. Consult its own man page for arguments,
 * **[Cloudflare::API::Queues](API/Queues.pm.md)** (`queues()`) manages queues and consumers.
 * **[Cloudflare::API::Hyperdrive](API/Hyperdrive.pm.md)** (`hyperdrive()`) manages database connection configurations.
 * **[Cloudflare::API::SecretsStore](API/SecretsStore.pm.md)** (`secrets_store()`) manages stores and write-only secrets.
-* **[Cloudflare::API::Error](API/Error.pm.md)** represents a Cloudflare JSON envelope reporting failure despite HTTP success.
+* **[Cloudflare::API::Error](API/Error.pm.md)** represents a Cloudflare JSON response reporting failure despite HTTP success.
 * **[Cloudflare::API::Resource](API/Resource.pm.md)** is the shared base class for resource objects; applications normally use the accessors above rather than constructing it.
 
 # METHODS #
@@ -243,19 +358,23 @@ Each accessor creates a resource object. Consult its own man page for arguments,
 
 * **request($method, $path, %options)**
 
-    Call a JSON endpoint and return the decoded envelope's `result`, which may be a hash reference, array reference, scalar, or `undef` according to the endpoint. `full_response => 1` returns the entire decoded envelope instead. Other options, including `query`, `json`, `content`, and `headers`, pass to HTTP::API::Core. The path must begin with exactly one slash and cannot be an absolute URL.
+    Call a JSON endpoint and return the decoded Cloudflare response's `result`, which may be a hash reference, array reference, scalar, or `undef` according to the endpoint. `full_response => 1` returns the complete decoded response hash instead. Other options, including `query`, `json`, `content`, and `headers`, pass to HTTP::API::Core. The path must begin with exactly one slash and cannot be an absolute URL.
 
 * **request_full($method, $path, %options)**
 
-    Return the complete decoded JSON hash reference, including fields such as `success`, `errors`, `messages`, and `result_info` when Cloudflare supplies them. An empty successful body yields `{ success => 1, result => undef }`. A non-object JSON body causes an exception.
+    Return the complete decoded Cloudflare JSON hash reference, including fields such as `success`, `errors`, `messages`, and `result_info` when Cloudflare supplies them. An empty successful body yields `{ success => 1, result => undef }`. A non-object JSON body causes an exception.
 
-* **raw_request($method, $path, %options)**
+* **response($method, $path, %options)**
 
     Return an `HTTP::API::Core::Response` object without decoding the body. Use this for non-JSON responses. It enforces the same single-slash relative-path rule as `request()`.
 
+* **raw_request($method, $path, %options)**
+
+    Compatibility alias for `response()`.
+
 * **account_path(@segments)**
 
-    Return `/accounts/<configured ID>/...` with each component percent-encoded. It throws if no account ID was configured. Resource modules use this helper; callers using raw request methods can use it to build account-scoped paths.
+    Return `/accounts/<configured ID>/...` with each component percent-encoded. It throws if no account ID was configured. Resource modules use this helper; callers using `response()` can use it to build account-scoped paths.
 
 * **segment($value)**
 
@@ -263,7 +382,11 @@ Each accessor creates a resource object. Consult its own man page for arguments,
 
 # RETURN VALUES AND ERRORS #
 
-Named resource methods normally return the JSON `result`. Pass `full_response => 1` to retain the full envelope, especially `result_info` on paginated lists. List filters are named arguments sent as query parameters. Exceptions from HTTP or transport failures remain `HTTP::API::Core::Error` objects; their decoded Cloudflare body is available through `json()`. A successful HTTP status with `success: false` throws `Cloudflare::API::Error`. Input validation errors throw plain Perl exceptions. No resource write is automatically rolled back.
+Named non-list resource methods normally return the JSON `result`; pass `full_response => 1` to retain the complete decoded Cloudflare response. List methods automatically follow every page reported by Cloudflare and return a flat array reference containing all items. This can issue many requests and holds the complete collection in memory.
+
+Every list method has two additional forms. Its `_page()` form returns a lazy `HTTP::API::Core::Pagination` object whose `next()` method yields one item and fetches subsequent pages as needed; `all()` collects its remaining items. Its `_page_response()` form makes exactly one request and returns the complete decoded Cloudflare response hash, including `result` and any `result_info`. A supplied `page` or `cursor` selects the starting point for `list()` and `_page()`, but selects only that page for `_page_response()`. `full_response` is unavailable on the list method family.
+
+List filters are named arguments sent as query parameters. Exceptions from HTTP or transport failures remain `HTTP::API::Core::Error` objects; their decoded Cloudflare body is available through `json()`. A successful HTTP status with `success: false` throws `Cloudflare::API::Error`, including while a paginator is fetching a later page. Input validation errors throw plain Perl exceptions. No resource write is automatically rolled back.
 
 # SEE ALSO #
 
@@ -305,13 +428,15 @@ Cloudflare::API - Perl client for Cloudflare resource management
      account_id => $ENV{'CLOUDFLARE_ACCOUNT_ID'}
  );
 
- my $buckets=$api->r2()->list_buckets();
- my $page=$api->r2()->list_buckets(full_response => 1);
+ my $buckets_ar=$api->r2()->list_buckets();
+ my $page_or=$api->r2()->list_buckets_page(per_page => 100);
+ my $page_hr=$api->r2()->list_buckets_page_response(per_page => 100);
+ my $response_or=$api->response('GET', '/accounts');
  my $zone=$api->zones()->get($zone_id);
 
 =head1 DESCRIPTION
 
-C<Cloudflare::API> supplies a bearer-authenticated HTTP client and accessors for the resource modules below. It requires Perl 5.10 or later, HTTP::API::Core 1.01 or later, and HTTPS support through IO::Socket::SSL. Resource objects share the same client and transport. The module manages resources through Cloudflare's REST API; it does not build Worker projects or perform R2 object transfers.
+C<Cloudflare::API> supplies a bearer-authenticated HTTP client and accessors for the resource modules below. It requires Perl 5.10 or later, HTTP::API::Core 1.08 or later, and HTTPS support through IO::Socket::SSL. Resource objects share the same client and transport. The module manages resources through Cloudflare's REST API; it does not build Worker projects or perform R2 object transfers.
 
 An API token is required. Supply C<token> to C<new()> or set C<CLOUDFLARE_API_TOKEN>. Account-scoped methods also need C<account_id> or C<CLOUDFLARE_ACCOUNT_ID>; account and zone lookups work without a default account ID. Use a token with the permissions required by the selected Cloudflare operations.
 
@@ -369,7 +494,7 @@ B<L<Cloudflare::API::SecretsStore|Cloudflare::API::SecretsStore>> (C<secrets_sto
 
 =item *
 
-B<L<Cloudflare::API::Error|Cloudflare::API::Error>> represents a Cloudflare JSON envelope reporting failure despite HTTP success.
+B<L<Cloudflare::API::Error|Cloudflare::API::Error>> represents a Cloudflare JSON response reporting failure despite HTTP success.
 
 
 =item *
@@ -412,7 +537,7 @@ Return a new object of the corresponding resource class, retaining this client. 
 
 B<request($method, $path, %options)>
 
-Call a JSON endpoint and return the decoded envelope's C<result>, which may be a hash reference, array reference, scalar, or C<undef> according to the endpoint. C<<< full_response => 1 >>> returns the entire decoded envelope instead. Other options, including C<query>, C<json>, C<content>, and C<headers>, pass to HTTP::API::Core. The path must begin with exactly one slash and cannot be an absolute URL.
+Call a JSON endpoint and return the decoded Cloudflare response's C<result>, which may be a hash reference, array reference, scalar, or C<undef> according to the endpoint. C<<< full_response => 1 >>> returns the complete decoded response hash instead. Other options, including C<query>, C<json>, C<content>, and C<headers>, pass to HTTP::API::Core. The path must begin with exactly one slash and cannot be an absolute URL.
 
 
 
@@ -420,13 +545,13 @@ Call a JSON endpoint and return the decoded envelope's C<result>, which may be a
 
 B<request_full($method, $path, %options)>
 
-Return the complete decoded JSON hash reference, including fields such as C<success>, C<errors>, C<messages>, and C<result_info> when Cloudflare supplies them. An empty successful body yields C<<< { success => 1, result => undef } >>>. A non-object JSON body causes an exception.
+Return the complete decoded Cloudflare JSON hash reference, including fields such as C<success>, C<errors>, C<messages>, and C<result_info> when Cloudflare supplies them. An empty successful body yields C<<< { success => 1, result => undef } >>>. A non-object JSON body causes an exception.
 
 
 
 =item *
 
-B<raw_request($method, $path, %options)>
+B<response($method, $path, %options)>
 
 Return an C<HTTP::API::Core::Response> object without decoding the body. Use this for non-JSON responses. It enforces the same single-slash relative-path rule as C<request()>.
 
@@ -434,9 +559,17 @@ Return an C<HTTP::API::Core::Response> object without decoding the body. Use thi
 
 =item *
 
+B<raw_request($method, $path, %options)>
+
+Compatibility alias for C<response()>.
+
+
+
+=item *
+
 B<account_path(@segments)>
 
-Return C<<< /accounts/<configured ID>/... >>> with each component percent-encoded. It throws if no account ID was configured. Resource modules use this helper; callers using raw request methods can use it to build account-scoped paths.
+Return C<<< /accounts/<configured ID>/... >>> with each component percent-encoded. It throws if no account ID was configured. Resource modules use this helper; callers using C<response()> can use it to build account-scoped paths.
 
 
 
@@ -453,7 +586,11 @@ Return a non-empty scalar as one percent-encoded UTF-8 URL path component. It re
 
 =head1 RETURN VALUES AND ERRORS
 
-Named resource methods normally return the JSON C<result>. Pass C<<< full_response => 1 >>> to retain the full envelope, especially C<result_info> on paginated lists. List filters are named arguments sent as query parameters. Exceptions from HTTP or transport failures remain C<HTTP::API::Core::Error> objects; their decoded Cloudflare body is available through C<json()>. A successful HTTP status with C<success: false> throws C<Cloudflare::API::Error>. Input validation errors throw plain Perl exceptions. No resource write is automatically rolled back.
+Named non-list resource methods normally return the JSON C<result>; pass C<<< full_response => 1 >>> to retain the complete decoded Cloudflare response. List methods automatically follow every page reported by Cloudflare and return a flat array reference containing all items. This can issue many requests and holds the complete collection in memory.
+
+Every list method has two additional forms. Its C<_page()> form returns a lazy C<HTTP::API::Core::Pagination> object whose C<next()> method yields one item and fetches subsequent pages as needed; C<all()> collects its remaining items. Its C<_page_response()> form makes exactly one request and returns the complete decoded Cloudflare response hash, including C<result> and any C<result_info>. A supplied C<page> or C<cursor> selects the starting point for C<list()> and C<_page()>, but selects only that page for C<_page_response()>. C<full_response> is unavailable on the list method family.
+
+List filters are named arguments sent as query parameters. Exceptions from HTTP or transport failures remain C<HTTP::API::Core::Error> objects; their decoded Cloudflare body is available through C<json()>. A successful HTTP status with C<success: false> throws C<Cloudflare::API::Error>, including while a paginator is fetching a later page. Input validation errors throw plain Perl exceptions. No resource write is automatically rolled back.
 
 
 =head1 SEE ALSO

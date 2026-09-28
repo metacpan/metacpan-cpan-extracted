@@ -4,11 +4,12 @@ use warnings FATAL => 'all';
 use Stats::LikeR;
 use Test::More;
 
-# _xlsx_col_idx: Excel column letters -> 0-based column index.  It backs the
-# xlsx reader's fallback for a <c> element whose r="A1" is not the first
-# attribute (so the fast-path regex misses it); that layout is rare, so the
-# helper is exercised directly here.  Covers all three character branches
-# (A-Z, a-z, and the non-letter terminator).
+# _xlsx_col_idx: Excel column letters -> 0-based column index.  It is
+# xlsx_ref_col() in LikeR.xs, which places every cell the xlsx reader reads --
+# exposed to perl so the letter arithmetic can be exercised on its own here.
+# Covers all three character branches (A-Z, a-z, and the non-letter
+# terminator); t/read_table.xlsx.parser.t covers the -1 it returns for a
+# reference too long to be one.
 
 my $f = \&Stats::LikeR::_xlsx_col_idx;
 

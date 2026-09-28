@@ -13,8 +13,14 @@ my $api_or=Cloudflare::API->new(
     token => 'test-token', account_id => 'acct',
     transport => sub {
         push(@request, [@_]);
+        my ($method, $url)=@_;
+        my $result={ id => 'worker' };
+        $result={ items => [] }
+            if $method eq 'GET'&&$url=~m{/versions(?:\?|\z)};
+        $result=[] if $method eq 'GET'&&$url=~m{/secrets(?:\?|\z)};
         return { status => 200, headers => {}, content => encode_json({
-            success => JSON::PP::true, result => { id => 'worker' }
+            success => JSON::PP::true, result => $result,
+            result_info => {page => 1, total_pages => 1}
         }) };
     }
 );
@@ -105,14 +111,15 @@ my $inspect_api_or=Cloudflare::API->new(
             ];
         }
         return { status => 200, headers => {}, content => encode_json({
-            success => JSON::PP::true, result => $result
+            success => JSON::PP::true, result => $result,
+            result_info => {page => 1, total_pages => 1}
         }) };
     }
 );
 my $inspect_workers_or=$inspect_api_or->workers();
 is_deeply($inspect_workers_or->search_scripts(name => 'alp'),
     [{ id => 'tag-alpha', script_name => 'alpha' }], 'Worker search returns matches');
-like($inspect_request[-1][1], qr{/workers/scripts-search\?name=alp\z},
+like($inspect_request[-1][1], qr{/workers/scripts-search\?name=alp&page=1\z},
     'Worker search uses discovery endpoint');
 is_deeply($inspect_workers_or->get_settings('alpha'),
     { bindings => [{ name => 'DATA', type => 'kv_namespace' }] },

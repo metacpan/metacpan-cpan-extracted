@@ -1,6 +1,8 @@
 exclude = [
     ".build/**/*",
     "Exception-Class-*/**/*",
+    "META.yml",
+    "MYMETA.yml",
     "blib/**/*",
     "t/00-*",
     "t/author-*",
@@ -12,41 +14,75 @@ exclude = [
 [commands.omegasort-gitignore]
 type = "both"
 include = "**/.gitignore"
-cmd = [ "omegasort", "--sort=path" ]
+cmd = ["omegasort", "--sort", "path", "--unique"]
 lint_flags = "--check"
 tidy_flags = "--in-place"
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
-expect_stderr = true
+ignore-stderr = ["The .+ file is not sorted", "The .+ file is not unique"]
+
+[commands.omegasort-stopwords]
+type = "both"
+include = ".stopwords"
+cmd = ["omegasort", "--sort", "text", "--case-insensitive", "--unique"]
+lint_flags = "--check"
+tidy_flags = "--in-place"
+ok_exit_codes = 0
+lint_failure_exit_codes = 1
+ignore-stderr = ["The .+ file is not sorted", "The .+ file is not unique"]
 
 [commands.perlcritic]
 type = "lint"
-include = [ "**/*.{pl,pm,t,psgi}" ]
-cmd = [ "perlcritic", "--profile=$PRECIOUS_ROOT/perlcriticrc" ]
+include = ["**/*.{pl,pm,t,psgi}"]
+cmd = ["perlcritic", "--profile=$PRECIOUS_ROOT/perlcriticrc"]
 ok_exit_codes = 0
 lint_failure_exit_codes = 2
 
 [commands.perltidy]
 type = "both"
-include = [ "**/*.{pl,pm,t,psgi}" ]
-cmd = [ "perltidy", "--profile=$PRECIOUS_ROOT/perltidyrc" ]
-lint_flags = [ "--assert-tidy", "--no-standard-output", "--outfile=/dev/null" ]
-tidy_flags = [ "--backup-and-modify-in-place", "--backup-file-extension=/" ]
+include = ["**/*.{pl,pm,t,psgi}"]
+cmd = ["perltidy", "--profile=$PRECIOUS_ROOT/perltidyrc"]
+lint_flags = ["--assert-tidy", "--no-standard-output", "--outfile=/dev/null"]
+tidy_flags = ["--backup-and-modify-in-place", "--backup-file-extension=/"]
 ok_exit_codes = 0
 lint_failure_exit_codes = 2
-expect_stderr = true
+ignore_stderr = "Begin Error Output Stream"
 
 [commands.podchecker]
 type = "lint"
-include = [ "**/*.{pl,pm,pod}" ]
-cmd = [ "podchecker", "--warnings", "--warnings" ]
-ok_exit_codes = [ 0, 2 ]
+include = ["**/*.{pl,pm,pod}"]
+cmd = ["podchecker", "--warnings", "--warnings"]
+ok_exit_codes = [0, 2]
 lint_failure_exit_codes = 1
-expect_stderr = true
+ignore_stderr = [
+    ".+ pod syntax OK",
+    ".+ does not contain any pod commands",
+    '\*\*\* WARNING: multiple occurrences \(\d+\) of link target .+',
+    '\*\*\* WARNING: empty section in previous paragraph .+',
+]
 
 [commands.podtidy]
 type = "tidy"
-include = [ "**/*.{pl,pm,pod}" ]
-cmd = [ "podtidy", "--columns", "80", "--inplace", "--nobackup" ]
+include = ["**/*.{pl,pm,pod}"]
+cmd = ["podtidy", "--columns", "80", "--inplace", "--nobackup"]
 ok_exit_codes = 0
 lint_failure_exit_codes = 1
+
+[commands.oxfmt]
+type = "both"
+include = ["**/*.yml", "**/*.toml"]
+cmd = ["oxfmt"]
+lint-flags = "--check"
+tidy-flags = "--write"
+ok-exit-codes = 0
+lint-failure-exit-codes = 1
+
+[commands.typos]
+type = "both"
+include = "**/*"
+exclude = [".stopwords"]
+cmd = "typos"
+tidy_flags = "--write-changes"
+invoke = "once"
+ok-exit-codes = 0
+lint-failure-exit-codes = 2

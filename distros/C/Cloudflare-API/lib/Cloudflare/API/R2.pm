@@ -28,7 +28,7 @@ use Cloudflare::API::Resource;
 
 #  Version information
 #
-$VERSION='1.010';
+$VERSION='1.011';
 
 
 #  All done. Positive return
@@ -41,13 +41,26 @@ $VERSION='1.010';
 
 sub list_buckets {
 
-
-    #  Preserve result_info for callers that request the full response
-    #
     my ($self, %query)=@_;
-    my $full_response=delete($query{'full_response'});
-    return $self->api()->request('GET', $self->api()->account_path('r2', 'buckets'),
-        query => \%query, full_response => $full_response);
+    return $self->collect_list($self->list_buckets_page(%query));
+
+}
+
+
+sub list_buckets_page {
+
+    my ($self, %query)=@_;
+    return $self->list_pagination($self->api()->account_path('r2', 'buckets'), {
+        mode => 'cursor', items => 'result.buckets'
+    }, \%query);
+
+}
+
+
+sub list_buckets_page_response {
+
+    my ($self, %query)=@_;
+    return $self->list_response($self->api()->account_path('r2', 'buckets'), \%query);
 
 }
 
@@ -108,7 +121,8 @@ Cloudflare::API::R2 - manage R2 buckets through Cloudflare's REST API
 ```perl
 my $r2=$api->r2();
 my $bucket=$r2->create_bucket({ name => 'my-app-assets' });
-my $page=$r2->list_buckets(full_response => 1);
+my $buckets=$r2->list_buckets();
+my $page_or=$r2->list_buckets_page(per_page => 100);
 ```
 
 # DESCRIPTION #
@@ -117,17 +131,19 @@ Bucket management uses the account ID on `Cloudflare::API`. This module does not
 
 # METHODS #
 
-* **list_buckets(%query)** — List buckets with named query filters. Returns `result`; `full_response => 1` retains the envelope and pagination information.
+* **list_buckets(%query)** — List every bucket. Named arguments become Cloudflare query parameters. The method follows cursor pages and returns one flat array reference; a large bucket set can require many requests and substantial memory.
+* **list_buckets_page(%query)** — Return a lazy `HTTP::API::Core::Pagination` object. Use `next()` to consume one bucket at a time. A supplied `cursor` selects the starting page.
+* **list_buckets_page_response(%query)** — Make one list request and return the complete decoded Cloudflare response hash, including the bucket array and any cursor in `result_info`.
 * **get_bucket($name, %options)** — Retrieve a bucket by name and return its `result`.
 * **create_bucket(\%body, %options)** — POST a bucket definition, normally including `name`, and return its `result`. Other fields pass through to Cloudflare.
 * **update_bucket($name, \%body, %options)** — PATCH a bucket and return its `result`.
 * **delete_bucket($name, %options)** — DELETE a bucket and return the endpoint's `result`, possibly `undef` for an empty body.
 
-Every JSON method accepts `full_response => 1`. Bucket names are percent-encoded as path components. Create and update bodies must be hash references.
+Non-list JSON methods accept `full_response => 1`. Bucket names are percent-encoded as path components. Create and update bodies must be hash references.
 
 # ERRORS #
 
-Missing account context, invalid names or bodies, HTTP and transport failures, and Cloudflare envelope failures cause exceptions as described in `Cloudflare::API`.
+Missing account context, invalid names or bodies, HTTP and transport failures, and Cloudflare response failures cause exceptions as described in `Cloudflare::API`.
 
 # SEE ALSO #
 
@@ -164,7 +180,8 @@ Cloudflare::API::R2 - manage R2 buckets through Cloudflare's REST API
 
  my $r2=$api->r2();
  my $bucket=$r2->create_bucket({ name => 'my-app-assets' });
- my $page=$r2->list_buckets(full_response => 1);
+ my $buckets=$r2->list_buckets();
+ my $page_or=$r2->list_buckets_page(per_page => 100);
 
 =head1 DESCRIPTION
 
@@ -177,7 +194,17 @@ Bucket management uses the account ID on C<Cloudflare::API>. This module does no
 
 =item *
 
-B<list_buckets(%query)> — List buckets with named query filters. Returns C<result>; C<<< full_response => 1 >>> retains the envelope and pagination information.
+B<list_buckets(%query)> — List every bucket. Named arguments become Cloudflare query parameters. The method follows cursor pages and returns one flat array reference; a large bucket set can require many requests and substantial memory.
+
+
+=item *
+
+B<list_buckets_page(%query)> — Return a lazy C<HTTP::API::Core::Pagination> object. Use C<next()> to consume one bucket at a time. A supplied C<cursor> selects the starting page.
+
+
+=item *
+
+B<list_buckets_page_response(%query)> — Make one list request and return the complete decoded Cloudflare response hash, including the bucket array and any cursor in C<result_info>.
 
 
 =item *
@@ -202,12 +229,12 @@ B<delete_bucket($name, %options)> — DELETE a bucket and return the endpoint's 
 
 =back
 
-Every JSON method accepts C<<< full_response => 1 >>>. Bucket names are percent-encoded as path components. Create and update bodies must be hash references.
+Non-list JSON methods accept C<<< full_response => 1 >>>. Bucket names are percent-encoded as path components. Create and update bodies must be hash references.
 
 
 =head1 ERRORS
 
-Missing account context, invalid names or bodies, HTTP and transport failures, and Cloudflare envelope failures cause exceptions as described in C<Cloudflare::API>.
+Missing account context, invalid names or bodies, HTTP and transport failures, and Cloudflare response failures cause exceptions as described in C<Cloudflare::API>.
 
 
 =head1 SEE ALSO

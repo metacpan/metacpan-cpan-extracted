@@ -13,7 +13,7 @@ my $client=$r2->api();
 
 # DESCRIPTION #
 
-`Cloudflare::API::Resource` holds the parent `Cloudflare::API` client used by the resource modules. Applications normally obtain a concrete resource object through a parent accessor such as `r2()` or `workers()`. The base class does not make requests on its own.
+`Cloudflare::API::Resource` holds the parent `Cloudflare::API` client used by the resource modules. It also centralizes the internal helpers that collect a complete list, create an `HTTP::API::Core::Pagination` object, or retrieve one complete list response. Applications normally obtain a concrete resource object through a parent accessor such as `r2()` or `workers()`; those pagination helpers are for resource subclasses rather than direct application use.
 
 # METHODS #
 

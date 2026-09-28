@@ -6,10 +6,13 @@ use Stats::LikeR;
 use Test::Exception;
 use Test::LeakTrace 'no_leaks_ok';
 
-# NOTE: row.names defaults OFF, in every format. A call that omits it writes the
-# data columns and nothing else. row.names => 1 opts in and prepends a leading
-# empty header cell plus a per-row label column (HoH -> outer key, otherwise
-# 1..n); row.names => 'col' promotes an existing column to the labels.
+# NOTE: row.names defaults OFF, in every format, for every shape but a hash of
+# hashes. A call that omits it writes the data columns and nothing else.
+# row.names => 1 opts in and prepends a leading empty header cell plus a
+# per-row label column (1..n); row.names => 'col' promotes an existing column
+# to the labels. A HoH defaults it ON, because its outer keys are the row
+# identifiers and exist nowhere else: row.names => 0 turns them off, and
+# row.names => 'name' writes 'name' as the key column's header.
 
 # Every temporary file this test writes goes inside this one directory, which
 # File::Temp removes at exit: a fixed name in the shared temporary directory is
@@ -190,14 +193,15 @@ my %hoh  = ( 'r1' => { 'a' => 1, 'b' => 2 }, 'r2' => { 'a' => 3, 'b' => 4 } );
 my @aoh  = ( { 'x' => 1, 'y' => 2 }, { 'x' => 3, 'y' => 4 } );
 my %flat = ( 'a' => 1, 'b' => 2, 'c' => 3 );
 
-# 0. Default row.names is OFF, for every shape and every format. Omitting it
-#    writes the data columns and nothing else -- no label column, and no empty
-#    leading header cell. row.names => 1 opts in; the labels are the outer key
-#    for a HoH and 1..n for every other shape. An explicit 0 is the default.
+# 0. Default row.names is OFF, for every shape but a HoH and in every format.
+#    Omitting it writes the data columns and nothing else -- no label column,
+#    and no empty leading header cell. row.names => 1 opts in; the labels are
+#    1..n. An explicit 0 is the default. A HoH keeps its outer keys unless
+#    told row.names => 0 (see section 2a).
 wrote_ok( "age,name\n30,Alice\n25,Bob\n",
 	'default row.names off (HoA): no label column', \%hoa, 'undef.val' => 'NA' );
-wrote_ok( "a,b\n1,2\n3,4\n",
-	'default row.names off (HoH): the outer key is not emitted', \%hoh, 'undef.val' => 'NA' );
+wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n",
+	'default row.names on (HoH): the outer key is the label', \%hoh, 'undef.val' => 'NA' );
 wrote_ok( "x,y\n1,2\n3,4\n",
 	'default row.names off (AoH): no label column', \@aoh, 'undef.val' => 'NA' );
 wrote_ok( "a,b,c\n1,2,3\n",
@@ -222,6 +226,56 @@ wrote_ok( "age,name\n30,Alice\n25,Bob\n",
 wrote_ok( ",age,name\n1,30,Alice\n2,25,Bob\n", 'HoA: sorted cols + numeric row names', \%hoa, 'row.names' => 1, 'undef.val' => 'NA' );
 # 2. Hash of hashes: rows sorted, columns sorted, outer key as the row label.
 wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n", 'HoH: sorted rows and columns', \%hoh, 'row.names' => 1, 'undef.val' => 'NA' );
+# 2a. HoH row.names: the outer keys are data, so they are written unless turned
+#     off, and a name for them becomes the key column's header.
+my %taxa = (
+	'9606'  => { species => 'Homo sapiens', genus => 'Homo' },
+	'10090' => { species => 'Mus musculus' },
+);
+wrote_ok( "\tgenus\tspecies\n10090\t\tMus musculus\n9606\tHomo\tHomo sapiens\n",
+	'HoH default: the taxid keys lead each row under an empty header', \%taxa, sep => "\t" );
+wrote_ok( "genus\tspecies\n\tMus musculus\nHomo\tHomo sapiens\n",
+	'HoH row.names => 0: the keys are dropped', \%taxa, sep => "\t", 'row.names' => 0 );
+wrote_ok( "taxid\tgenus\tspecies\n10090\t\tMus musculus\n9606\tHomo\tHomo sapiens\n",
+	"HoH row.names => 'taxid': the key column is headed taxid", \%taxa, sep => "\t", 'row.names' => 'taxid' );
+wrote_ok( "taxid,species\n10090,Mus musculus\n9606,Homo sapiens\n",
+	"HoH row.names => 'taxid' with col.names", \%taxa, 'row.names' => 'taxid', 'col.names' => ['species'] );
+wrote_ok( "genus,species\n10090,Mus musculus\n9606,Homo sapiens\n",
+	'HoH row.names naming a column that col.names leaves out is no clash',
+	\%taxa, 'row.names' => 'genus', 'col.names' => ['species'] );
+# slurp() reads bytes, so the header is U+7A2E's UTF-8 encoding.
+wrote_ok( "\xE7\xA8\xAE,a,b\nr1,1,2\nr2,3,4\n", 'HoH row.names => a wide-character name',
+	\%hoh, 'row.names' => "\x{7a2e}" );
+{
+	my $f = path();
+	write_table( \%taxa, $f, 'row.names' => 'taxid', quiet => 1 );
+	my $back = read_table( $f );
+	is_deeply( [ map { $_->{taxid} } @$back ], [ '10090', '9606' ],
+		'HoH row.names => name: read_table reads the keys back as a named column' );
+	is( $back->[1]{species}, 'Homo sapiens', '... aligned with their rows' );
+}
+# A name that is also a column being written would give the file two columns
+# of that name; that is refused, and before the file is opened.
+{
+	my $f = path();
+	open my $fh, '>', $f or die "cannot write $f: $!";
+	print {$fh} "keep\n";
+	close $fh;
+	throws_ok { write_table( \%taxa, $f, 'row.names' => 'genus' ) }
+		qr/^write_table: row\.names 'genus' collides with an existing column/,
+		'HoH row.names naming an inner key croaks';
+	throws_ok { write_table( \%taxa, $f, 'row.names' => 'species', 'col.names' => ['species'] ) }
+		qr/^write_table: row\.names 'species' collides with an existing column/,
+		'HoH row.names naming a col.names entry croaks';
+	is( slurp($f), "keep\n", 'a refused write leaves the existing file untouched' );
+}
+no_leaks_ok {
+	my $f = path();
+	write_table( \%taxa, $f, 'row.names' => 'taxid', quiet => 1 );
+} "write_table: no memory leaks with a HoH row.names name" unless $INC{'Devel/Cover.pm'};
+no_leaks_ok {
+	eval { write_table( \%taxa, path(), 'row.names' => 'genus', quiet => 1 ) };
+} 'write_table: no memory leaks on the HoH row.names collision croak' unless $INC{'Devel/Cover.pm'};
 # 3. Array of hashes: union of keys sorted, numeric row names.
 wrote_ok( ",x,y\n1,1,2\n2,3,4\n", 'AoH: union of keys, numeric row names', \@aoh, 'row.names' => 1, 'undef.val' => 'NA' );
 # 4. Flat hash: one row, columns sorted, no label column by default.
@@ -232,6 +286,11 @@ wrote_ok( "name\nAlice\nBob\n", 'col.names selects a subset in order', \%hoa, 'c
 wrote_ok( "age,name\n30,Alice\n25,Bob\n", 'row.names => 0 omits the label column', \%hoa, 'row.names' => 0, 'undef.val' => 'NA' );
 # 7. row.names => 'col' uses that column as the labels and drops it from headers.
 wrote_ok( ",age\nAlice,30\nBob,25\n", "row.names => 'name' uses that column as labels", \%hoa, 'row.names' => 'name', 'undef.val' => 'NA' );
+#    ... including a column name outside Latin-1, which up to 0.319 croaked
+#    "Wide character" in the XS digit check before it was ever looked up.
+wrote_ok( ",age\nAlice,30\nBob,25\n", 'row.names => a wide-character column name',
+	{ "\x{540d}" => [ 'Alice', 'Bob' ], 'age' => [ 30, 25 ] },
+	'row.names' => "\x{540d}", 'undef.val' => 'NA' );
 # 8. Explicit separator.
 wrote_ok( "a;b;c\n1;2;3\n", 'sep => ";" is honored', \%flat, 'sep' => ';', 'undef.val' => 'NA' );
 # 9. delim is an alias for sep.

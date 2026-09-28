@@ -5,7 +5,7 @@ API. It covers mainstream compute and storage management, including Workers,
 R2, KV, D1, Queues, Hyperdrive, and Secrets Store. HTTP transport is provided
 by `HTTP::API::Core`.
 
-The distribution requires Perl 5.10 or later, `HTTP::API::Core` 1.01 or later,
+The distribution requires Perl 5.10 or later, `HTTP::API::Core` 1.08 or later,
 and HTTPS support through `IO::Socket::SSL`.
 
 ## Example
@@ -23,6 +23,21 @@ my $database=$api->d1()->create_database({ name => 'my-app-data' });
 my $namespaces=$api->kv()->list_namespaces();
 ```
 
+List methods automatically follow Cloudflare pagination and return one flat
+array reference containing every item. This is convenient but retains the full
+result set in memory. For large collections, use the corresponding `_page()`
+method and consume its `HTTP::API::Core::Pagination` object incrementally:
+
+```perl
+my $page_or=$api->kv()->list_keys_page($namespace_id, limit => 1_000);
+while (defined(my $key_hr=$page_or->next())) {
+    process_key($key_hr);
+}
+```
+
+The corresponding `_page_response()` method makes one request and returns the
+complete decoded Cloudflare response, including `result_info` when supplied.
+
 ## Authentication
 
 Pass `token` and `account_id` to the constructor, or set
@@ -34,11 +49,11 @@ from an existing Wrangler login. When Wrangler reports one account, the command
 uses its account ID automatically. Use `--account-id` or
 `CLOUDFLARE_ACCOUNT_ID` to select an account explicitly.
 
-JSON methods return Cloudflare's decoded `result` by default. Pass
-`full_response => 1` to retain the complete response envelope and pagination
-information. `request()` provides access to JSON endpoints without a named
-method, while `raw_request()` returns the `HTTP::API::Core::Response` object for
-non-JSON responses.
+Non-list JSON methods return Cloudflare's decoded `result` by default. Pass
+`full_response => 1` to retain the complete decoded Cloudflare response.
+`request()` provides access to JSON endpoints without a named method, while
+`response()` returns the `HTTP::API::Core::Response` object for non-JSON bodies
+or HTTP-level details.
 
 ## Worker uploads
 
@@ -57,7 +72,7 @@ already prepared.
 | --- | --- |
 | Accounts | `list`, `get` |
 | Zones | `list`, `get` |
-| Workers | `list_scripts`, `download_script`, `upload_script`, `upload_version`, `list_versions`, `get_version`, `upload_assets`, `delete_script`, `list_deployments`, `get_deployment`, `create_deployment`, `list_secrets`, `add_secret`, `delete_secret`, `get_subdomain`, `set_subdomain`, `list_routes`, `create_route`, `update_route`, `delete_route` |
+| Workers | `list_scripts`, `search_scripts`, `download_script`, `upload_script`, `upload_version`, `list_versions`, `get_version`, `upload_assets`, `delete_script`, `list_deployments`, `get_deployment`, `create_deployment`, `list_secrets`, `add_secret`, `delete_secret`, `get_subdomain`, `set_subdomain`, `list_routes`, `create_route`, `update_route`, `delete_route` |
 | R2 | `list_buckets`, `get_bucket`, `create_bucket`, `update_bucket`, `delete_bucket` |
 | KV | `list_namespaces`, `get_namespace`, `create_namespace`, `rename_namespace`, `delete_namespace`, `list_keys`, `get_value`, `put_value`, `delete_value` |
 | D1 | `list_databases`, `get_database`, `create_database`, `update_database`, `delete_database`, `query_database`, `query_sql` |
@@ -65,9 +80,10 @@ already prepared.
 | Hyperdrive | `list_configs`, `get_config`, `create_config`, `replace_config`, `update_config`, `delete_config` |
 | Secrets Store | `list_stores`, `get_store`, `create_store`, `delete_store`, `list_secrets`, `get_secret`, `create_secret`, `update_secret`, `delete_secret`, `get_quota` |
 
-Create and update methods take a hash reference containing Cloudflare's request
-body. The named methods intentionally cover a subset of the Cloudflare API; use
-`request()` for other JSON endpoints.
+Every listed `list...` method also has `..._page` and `..._page_response`
+variants; `search_scripts` has the same variants. Create and update methods take a hash reference containing
+Cloudflare's request body. The named methods intentionally cover a subset of
+the Cloudflare API; use `request()` for other JSON endpoints.
 
 ## Command-line client
 

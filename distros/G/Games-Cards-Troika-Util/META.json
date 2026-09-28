@@ -35,9 +35,11 @@
          "requires" : {
             "Data::Sah::Compiler::perl::TH::bool" : "0.914",
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
+            "List::Util" : "1.54",
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.154",
             "Perinci::CmdLine::Lite" : "1.924",
+            "Perinci::Sub::Util" : "0.472",
             "TableData::Games::Cards::Troika" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -56,7 +58,7 @@
    "provides" : {
       "Games::Cards::Troika::Util" : {
          "file" : "lib/Games/Cards/Troika/Util.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -71,7 +73,7 @@
          "web" : "https://github.com/perlancar/perl-Games-Cards-Troika-Util"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"
@@ -80,6 +82,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript troika-list-cards",
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript troika-list-cards-shuffled",
             "version" : "0.425"
          },
          {

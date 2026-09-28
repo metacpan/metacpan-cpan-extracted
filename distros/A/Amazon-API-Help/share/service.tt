@@ -1,0 +1,23 @@
+[%- WRAPPER pod_wrapper.tt -%]
+=head1 NAME
+
+[% service %]
+
+=head1 DESCRIPTION
+
+[% documentation | html2pod %]
+
+=head1 AVAILABLE COMMANDS
+
+=over 4
+
+[% FOREACH op IN operations -%]
+=item C<[% op %]>
+
+[% END -%]
+=back
+
+=head1 BOTOCORE VERSION
+
+[% botocore_version %]
+[% END -%]

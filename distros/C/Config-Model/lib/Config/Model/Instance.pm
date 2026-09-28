@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance 2.166;
+package Config::Model::Instance 2.167;
 
 use 5.20.0;
 
@@ -657,7 +657,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.166
+version 2.167
 
 =head1 SYNOPSIS
 

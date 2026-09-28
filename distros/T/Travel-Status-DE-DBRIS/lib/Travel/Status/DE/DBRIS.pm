@@ -21,7 +21,7 @@ use Travel::Status::DE::DBRIS::JourneyAtStop;
 use Travel::Status::DE::DBRIS::Journey;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 # {{{ Constructors
 
@@ -368,8 +368,10 @@ sub get_with_cache_p {
 			if (   $tx->res->headers->content_encoding
 				&& $tx->res->headers->content_encoding eq 'br' )
 			{
+				# size (1_000_000) is optional in recent Brotli versions,
+				# but not yet in the one shipped with Debian 13.
 				$content = IO::Uncompress::Brotli::unbro(
-					$tx->res->content->asset->slurp );
+					$tx->res->content->asset->slurp, 1_000_000 );
 			}
 
 			if ($cache) {
@@ -512,7 +514,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 DESCRIPTION
 

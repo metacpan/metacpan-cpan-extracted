@@ -1,5 +1,1424 @@
 Revision history for Stats-LikeR
 
+0.3211 2026-09-27 CDT
+
+ [min(), max(), sum() and the other reductions: magical arguments]
+
+ - An argument whose value exists only once its get magic has run was
+   read as undef. That covers `$#array`, a tied scalar whose FETCH had not
+   yet been called, and a `substr()` lvalue: none has any value flags
+   before `mg_get()`, and the reductions asked `SvOK()` first, so
+   `sum(0, $#list)` croaked "undefined value at argument index 1" where
+   List::Util's `sum()` returns the index. A tied scalar holding an array
+   ref was likewise not seen as one. This affected `min`, `max`, `sum`,
+   `mean`, `sd`, `var`, `median`, `mode`, `uniq`, `scale`, `skew` and
+   `kurtosis`. Each now runs every argument's get magic once, on entry,
+   and reads the fetched value from then on.
+
+ - The same fault reached a tied element of an ordinary array in `median`,
+   `skew`, `kurtosis`, `mode` and `scale`, which read the array's cells
+   without running their magic. The first four croaked on it; `scale`,
+   which skips undef, silently returned one value fewer than it was given.
+   `sum`, `mean` and the rest already read such an element correctly.
+
+ - A value is now fetched once. Reading one after its magic had run could
+   run FETCH again, on every perl before 5.18 and in `mode` and `uniq` on
+   all of them, and a tie that computes its value then answers differently
+   the second time. `sd`, `var` and `scale` still read a tied array, or a
+   tied element, once per pass, as they are documented to.
+
+ - `median` on a tied array now croaks on a non-numeric element, as it
+   already did on an ordinary one, instead of converting it to a number.
+   `scale` croaks if a tied array answers differently between its counting
+   pass and its value pass, which could previously write past the buffer
+   the first pass sized.
+
+ [Tests]
+
+ - t/min.max.sum.ListUtil.t carries List::Util 1.70's own t/min.t, t/max.t
+   and t/sum.t, from the copy bundled with perl 5.44.0. Their GETMAGIC
+   block is what found the fault above. Where the two modules differ by
+   design the header says so: `sum()` of nothing croaks rather than
+   returning undef; a Math::BigInt is reduced as the NV its 0+ overload
+   yields; and a sum is carried in an NV, not an IV.
+
+ - An array reference is read as data whether or not it is blessed and
+   whether or not its class overloads 0+, where List::Util would treat an
+   overloaded object as a single number. This is a decision, not an
+   oversight, so that an array-based object keeps being read as the values
+   it holds, and the port now asserts it in place of upstream's three
+   `example` cases.
+
+ - t/get.magic.args.t checks all twelve functions with six kinds of
+   magical input against the same call with plain values, and counts how
+   often FETCH runs.
+
+ [write_table(): .gz and .bz2 on Windows]
+
+ - A compressed file is meant to hold exactly the text the plain file
+   would, and on Windows it did not. The plain file is opened with perl's
+   default layers, which there translate "\n" to CRLF; the :raw that makes
+   way for the compressing layer removed that translation, so in 0.321 a
+   .gz or .bz2 held LF lines where the same call to a plain file wrote
+   CRLF. Where perl is a CRLF shop (PERLIO_USING_CRLF), the buffer above
+   the compressor is now :crlf instead of :perlio, and the two files match
+   again. Other platforms are unchanged. read_table reads either line end
+   from a compressed file, as it does from a plain one.
+
+ - t/write_table.compressed.pandas.t failed 16 of its 88 tests on an
+   MSWin32 smoker for this. Its expected text now uses the line end a plain
+   file actually gets, and the check of the "wrote" line reads its pipe in
+   binary mode and ignores a CRLF from STDOUT's layers, which is perl's
+   doing rather than write_table's.
+
+ [lm()]
+
+ - A non-integer exponent inside I() was truncated: the exponent was read
+   with atoi(), so I(hp^0.5) became hp^0, a column of ones that was then
+   aliased against the intercept and reported as NaN, with no sign that
+   anything had gone wrong. I(x^1.5) became x^1. The exponent is now read
+   as a number at the build's NV width, and one that is not a number, such
+   as I(x^abc), is missing rather than 0. glm(), aov() and the other model
+   functions read I() the same way and are fixed with it.
+
+ - An infinite value in the data is refused with R's own message, "lm:
+   NA/NaN/Inf in 'y'" (or 'x'), naming the row, as glm() already refuses
+   it. It used to go into the fit, and every coefficient came back NaN,
+   each reported with t = -Inf and p = 0: a test on the standard error
+   being positive sent a NaN one to the infinite branch. NaN, which is
+   missing, still drops its row.
+
+ - t values, R^2, adjusted R^2 and F are the plain ratios summary.lm()
+   takes, so 0/0 is NaN. A response with no variation at all reported
+   t = Inf, p = 0 and R^2 = 0 for every coefficient; it now reports NaN, as
+   R does, and a nonzero estimate over a standard error of exactly 0 is
+   +-Inf with p = 0.
+
+ - The residual degrees of freedom are now tested against the rank, not
+   the column count. y ~ x + z on three rows with z = 2x has one residual
+   degree of freedom, and R fits it with z NA; lm() refused it as "0
+   degrees of freedom". A fit with none at all is still refused.
+
+ - Everything lm() allocates is on the save stack, so the new croaks free
+   it all.
+
+ - t/lm.edge.R.t covers it, from R 4.6.1 on its own mtcars and from SciPy
+   1.18.0's test_regressZEROX (Wilkinson's W.IV.D); t/lm.edge.R.R
+   regenerates the reference values. Where R's QR leaves rounding in an
+   exactly zero residual sum of squares and so reports t = 9.0e15 instead
+   of Inf, the test pins the definition and says why.
+
+ [Row names that are not ASCII]
+
+ - fitted.values, residuals and the other hashes keyed by row name, from
+   lm(), glm(), zerotrunc(), hurdle(), svyglm(), ivreg(), lmer(), aov()
+   and predict(), dropped the UTF-8 flag of a name, so "\x{65e5}\x{672c}"
+   came back as its six bytes and the caller's own key did not find it. A
+   HoH key that fits in Latin-1 happened to survive, but the same name
+   given in row.names or _row did not. Row names are now held as UTF-8
+   and stored as UTF-8 keys, which perl downgrades where it can, so ASCII
+   and Latin-1 byte names come back exactly as they were given.
+
+ - t/rownames.utf8.t checks every one of those functions with each data
+   shape that carries names.
+
+ [min(), max(), sum(), mean(), sd() and var(): faster on plain arrays]
+
+ - The loops that walk an ordinary array of numbers now keep four running
+   values instead of one, and combine them at the end. With one, every
+   add or compare waited on the result for the previous element, and for
+   min() and max() that wait was most of the cost: they ran at 1.06
+   ns/element on 1e4 values where sum() ran at 0.67, and a plain C loop
+   over a flat array of doubles was no faster. sd() and var() share the
+   first pass of sum(), so they gain too, by less.
+
+ - Times are nanoseconds per element, 0.321 -> 0.3211, on perl 5.44.0
+   at -O2, one pinned core, best of 120 timings taken in alternating runs
+   of the two releases, on the same normal data. At n = 1e6 the data no
+   longer fits in cache, so that column is memory-bound and its cells
+   moved by up to 10% between runs; the others moved by under 1%.
+
+ - | function | n = 1e3 | n = 1e4 | n = 1e5 | n = 1e6 |
+   |---|---|---|---|---|
+   | `max` | 1.094 -> 0.905 (-17%) | 1.063 -> 0.855 (-20%) | 1.060 -> 0.850 (-20%) | 1.461 -> 1.160 (-21%) |
+   | `min` | 1.094 -> 0.906 (-17%) | 1.063 -> 0.854 (-20%) | 1.064 -> 0.850 (-20%) | 1.392 -> 1.176 (-16%) |
+   | `sum` | 0.712 -> 0.617 (-13%) | 0.670 -> 0.572 (-15%) | 0.721 -> 0.578 (-20%) | 1.295 -> 1.064 (-18%) |
+   | `mean` | 0.712 -> 0.617 (-13%) | 0.670 -> 0.571 (-15%) | 0.721 -> 0.583 (-19%) | 1.325 -> 1.048 (-21%) |
+   | `sd` | 1.436 -> 1.352 (-6%) | 1.384 -> 1.286 (-7%) | 1.488 -> 1.332 (-10%) | 2.700 -> 2.596 (-4%) |
+   | `var` | 1.436 -> 1.378 (-4%) | 1.383 -> 1.293 (-6%) | 1.483 -> 1.357 (-9%) | 2.739 -> 2.542 (-7%) |
+
+ - sum(), mean(), sd() and var() now add the elements in a different
+   order, four interleaved partial sums added pairwise, so a result can
+   differ from 0.321's in the last bits. The worst-case rounding error is
+   smaller, since each partial sum is a quarter as long.
+
+ - min() and max() now order -0 below +0, as IEEE 754-2019's minimum()
+   and maximum() do: max(-0.0, 0.0) and max(0.0, -0.0) are both +0, and
+   both min()s are -0. They used to return the first zero they met, as R
+   does, and with four lanes that would have come to depend on which lane
+   each zero fell in. NumPy and List::Util return the last zero they meet,
+   so none of the three agrees with this, and t/min.max.signed_zero.t
+   records all of them. The perl literal -0 is the integer 0, which has no
+   sign, so max(-0, 0) was always 0. The table above includes the cost of
+   tracking the sign, which is 0-6% on normal and integer data and up to
+   9% on data that is mostly zeros.
+
+ - An array holding a numeric string, a tied element or a hole is still
+   read exactly as before: the fast loop stops at that element and the
+   ordinary one finishes from there.
+
+0.321 2026-09-25 CDT
+
+ [read_table(): warnings about stray quotes]
+
+ - A '"' that opens a quoted field takes every newline into that field up
+   to the next '"'. <=0.320 nothing said when that had happened: a file
+   with one unclosed '"' came back with the rest of the file in a single
+   cell, and a '"' used as text in the middle of a field (an inch mark,
+   5'10") ran rows together or ended in an "Alignment error" that said
+   nothing about quotes. read_table cannot tell a stray '"' from CSV
+   quoting by the bytes alone, and neither can R or pandas, so it now says
+   what it saw and names the line the quote opened on.
+
+ - A file that ends inside a quoted field is warned about, and what was
+   read is kept, as R's scan() does ("EOF within quoted string"); pandas
+   raises instead. That cell no longer gains a newline the file did not
+   have when the file has no final one.
+
+ - A '"' in the middle of a field that opens a quoted field running past
+   the end of its line is warned about, once per file. It is still read as
+   a quote, as R reads it (tests/reg-tests-1d.R pins '="Total' opening
+   one); pandas keeps such a '"' as text. A quoted cell that starts at the
+   start of its field and holds a line break is ordinary CSV and is not
+   warned about.
+
+ - An alignment error on a row that a quoted field ran across lines in now
+   says where that quote opened and whether it was ever closed, on the XS
+   fast path and through a filter alike.
+
+ - quote => '' warns when every field on the first line is wrapped in '"',
+   as R's write.csv() writes them, since the quote marks would then stay in
+   every name. An .xlsx is not checked.
+
+ - t/read_table.quote.R.pandas.t covers all of it, from pandas'
+   test_quoting.py, test_skiprows.py, test_eof_states and GH 62739 and R
+   4.6.1's reading of the same inputs; t/read_table.quote.R and
+   t/read_table.quote.pandas.py regenerate the reference values.
+
+ [write_table(): .gz and .bz2 output]
+
+ - A file name ending in .gz or .bz2 is written gzip- or bzip2-compressed,
+   holding exactly the text the plain file would. The rest of the name
+   picks the default sep as before, so x.tsv.gz is tab-separated. It is
+   streamed through a PerlIO::via layer at gzip's and bzip2's default
+   levels, and a gzip header carries no name or time, so the same table
+   always makes the same bytes. Up to 0.320 such a name got plain text.
+
+ - A write that croaks partway leaves a truncated file, which read_table
+   refuses, never a whole-looking one; for bzip2 the first block is
+   written at once so that even a croak on the first row leaves one. A
+   compressed write that cannot reach the disk croaks; a plain write's
+   errors are still not checked.
+
+ - Only delimited text is compressed: .tex.gz, .xlsx.bz2, or tex/xlsx with
+   a compressed name, is an error. So is a .bgz name, which promises
+   bgzip's BGZF, which this does not write.
+
+ - t/write_table.compressed.pandas.t covers it, from pandas'
+   test_compression.py and test_to_csv.py.
+
+ [Minimum perl]
+
+ - perl 5.10.1 is now the oldest supported, and Compress::Raw::Bzip2, core
+   from that release, is a declared prerequisite.
+
+ [read_table(): gzip and bzip2 input]
+
+ - A gzip or bzip2 file is read as the text inside it, with nothing to ask
+   for. It is recognised by its first bytes, not its name, as R's file()
+   recognises one for read.table, so a compressed file without a .gz
+   suffix is read, and a plain one that has one is still text. The
+   extension still picks the default sep, from the name inside: x.tsv.gz
+   is tab-separated. Up to 0.320 a compressed file was parsed as if its
+   bytes were text, and came back as garbage rows or an alignment error.
+
+ - The file is inflated as it is read, 64 KB at a time, through a
+   PerlIO::via layer over Compress::Raw::Zlib or Compress::Raw::Bzip2, so
+   a large .tsv.gz takes no more memory than the plain file would; the
+   gzip read of a 110 MB CSV costs about what zcat does on top of reading
+   it plain.
+
+ - Every member is read: bgzip's BGZF (every .vcf.gz), R's gzfile(, "a")
+   and `cat a.gz b.gz' all write several, and stopping at the first would
+   have dropped all but the first block without a word. A truncated file,
+   a bad CRC, and data after the last member that is not NUL padding are
+   errors that name the file, never a short read.
+
+ - Both need only core modules. Compress::Raw::Bzip2 is loaded only when
+   a bzip2 file is read, and a read without it says what is missing.
+
+ - t/read_table.compressed.R.t covers it, from R 4.6.1's
+   tests/reg-tests-1b.R compressed read.table and append-mode cases and
+   pandas' test_compression.py; t/read_table.compressed.R writes the
+   fixtures.
+
+ [read_table(): rows of empty fields, and two header fixes]
+
+ - A line holding nothing but separators is a row of empty fields, as R
+   4.6.1's read.table and pandas 3.0.4's read_csv both read it. Up to
+   0.320 a tab-separated "\t" was taken for a blank line and skipped, so
+   a TSV row with every cell empty went missing without a word and the
+   row count no longer matched R's or pandas'. A line of blanks none of
+   which is the separator is still skipped, and so is any line of blanks
+   under qr/\s+/. t/read_table.blank_lines.R.pandas.t covers it, from
+   pandas' test_empty_lines and test_whitespace_lines;
+   t/read_table.blank_lines.R and t/read_table.blank_lines.pandas.py
+   regenerate the reference values.
+
+ - auto.row.names with a commented-out header ("# a\tb") refused the
+   header, because the data rows are one field wider than it -- the very
+   shape auto.row.names looks for -- and made the first data row the
+   header instead. The header is now kept and the rows named.
+
+ - A worksheet name in an .xlsx is decoded by the one-pass decoder the
+   cells use. It went through five substitutions in turn before, so a
+   reference one of them produced was decoded again by a later one
+   ("&#38;lt;" became "<"), and a numeric reference too large for chr()
+   died.
+
+ [read_table(): speed]
+
+ - Once the XS fast path is building the rows, an empty field is parsed
+   straight to the undef it becomes, instead of to an empty string that
+   was then freed and replaced. On a 300,000 x 10 CSV with nine cells in
+   ten empty, an aoh read goes from 0.185 s to 0.106 s, a hoa from 0.164 s
+   to 0.097 s and an aoa from 0.152 s to 0.073 s; a file with no empty
+   cells is unchanged. A filter is still handed '' for an empty field, as
+   before, and an .xlsx gap is treated the same way.
+
+ - na.strings is checked by comparing the few strings given rather than
+   by hashing every cell: with three of them, an aoa read of a
+   300,000 x 10 CSV goes from 0.155 s to 0.134 s. Past eight strings the
+   hash is used as before.
+
+ [Tests]
+
+ - t/read_table.aoa.t failed 3 subtests on Windows (Strawberry Perl
+   5.42.2): write_table writes its file in text mode, so its lines end
+   "\r\n" there, as R's write.csv() does, and the test read the result
+   back raw. It now reads it through the platform's text layer. Nothing
+   in the module changed.
+
+0.320 2026-09-25 CDT
+
+ [read_table(): sep may be a qr// regex]
+
+ - sep (and its synonym delim) was only ever a literal string. A qr// was
+   stringified to "(?^:\s+)", matched byte for byte, never found, and every
+   line came back as a single field keyed by the whole header line, with
+   no warning. A qr// is now a pattern: sep => qr/\s+/ reads
+   whitespace-aligned columns, qr/\s*,\s*/ trims around each comma, and
+   qr/[;,]/ takes either character. A string sep is the literal it always
+   was, so sep => '\s+' still means those three characters.
+
+ - qr/\s+/ is whitespace-delimited, as sep=r"\s+" is in pandas and
+   sep = "" in R's read.table: leading and trailing whitespace on a line
+   make no field. Any other pattern cuts as split() does, so a separator at
+   the start of a line leaves an empty first field. Capture groups in the
+   pattern are not fields, and a pattern that can match an empty string,
+   such as qr/\s*/, is refused rather than cutting between every character.
+   The pattern is matched as written, so its group numbers are its own and
+   a backreference works: qr/(:)\1/ splits on "::".
+
+ - Quoted fields, comments and commented-out headers, blank lines, a
+   byte-order mark, CRLF, filter, row.names, auto.row.names, na.strings and
+   all three output types behave exactly as with a literal separator: the
+   same XS parser reads both, and only how it finds a separator differs.
+   pandas drops quote handling for a regex separator; read_table keeps it.
+   An .xlsx still ignores sep.
+
+ - The separators are found by perl's regex engine, called from C on the
+   parser's own line buffer, so a regex read keeps the C fast path: 0.17 s
+   rather than 0.14 s for a literal sep on a 300,000 x 5 CSV. A literal sep
+   is untouched and as fast as before.
+
+ [read_table(): header => 0, col.names and quote => '']
+
+ - read_table always took the first line as the header, so a file without
+   one -- an NCBI taxonomy dump, R's write.table(col.names = FALSE) -- lost
+   its first row to the column names. header => 0 (R's header = FALSE,
+   pandas' header=None), or perl's false '', reads it as data, and the
+   columns are named by col.names or, as R names them, V1, V2, ...
+   col.names with a header renames its columns, warning as R does when the
+   lengths differ. With no header there is none to rescue, so a line
+   starting with the comment marker is a comment even when text hugs it
+   ("#comment"), as in R.
+
+ - A '"' anywhere in an unquoted field opened a quoted one, so a file
+   whose quotes are not CSV quoting had every line up to the next '"' read
+   into one cell, silently. NCBI's fullnamelineage.dmp has a name ending in
+   'Beach rock 4+5"', and about 950,000 of its 3,015,956 lines went into
+   one field. quote => '' (R's quote = "", pandas' quoting=QUOTE_NONE)
+   makes '"' ordinary text, with a literal sep and a regex one alike; that
+   file now reads in full. The default is unchanged.
+
+ [write_table(): a hash of hashes keeps its outer keys]
+
+ - A HoH's outer keys were written only as row names, and row.names has
+   been off by default since it stopped following R's write.table. For
+   every other shape that label is a 1..n index nobody needs, but a HoH's
+   keys are the only place its row identifiers exist, so a taxid-keyed
+   HoH came out with no taxids in it at all. A HoH now defaults row.names
+   on, under an empty header cell, which read_table reads back as
+   row_name. row.names => 0 still drops the keys, and every other shape
+   is unchanged.
+
+ - row.names => 'name' on a HoH was accepted and did nothing a 1 would
+   not: the key column's header stayed empty. It now heads that column,
+   so row.names => 'taxid' writes "taxid,genus,species", in delimited,
+   LaTeX and .xlsx output alike. A name that is also a column being
+   written -- a col.names entry, or else a key of any inner hash -- dies
+   before the file is opened, rather than writing two columns of one name.
+
+ [read_table(): output.type => 'aoa']
+
+ - read_table could return an AoH, a HoA or a HoH, but not the AoA that
+   write_table, agg, csort and melt all take. output.type => 'aoa' returns
+   the header row, then one array per data row, every row in file column
+   order, with an empty or na.strings cell undef as in every other shape.
+   The header row is what write_table reads an AoA's first row as, so a
+   read and a write round-trip a delimited file byte for byte.
+
+ - It is the one shape that keeps every field when the header repeats a
+   name, so it gives no "later values win" warning. Nothing labels an
+   AoA's rows, so row.names with it is an error. It goes through the
+   same C fast path as the other three shapes when there is no filter,
+   and through the per-row closure when there is one.
+
+ [Tests]
+
+ - t/read_table.regex_sep.t takes its whitespace and multi-character cases
+   from pandas 3.0.4's parser tests, and checks that every CSV under t/,
+   and a tab-separated copy of each, reads the same through qr/\Q$sep\E/
+   as through the literal separator, warnings and errors included.
+
+ - t/read_table.header_quote.R.pandas.t takes its cases from R 4.6.1's
+   tests/reg-IO2.R and reg-tests-1a, 1b, 1d and 2, with the values R itself
+   gives frozen from t/read_table.header_quote.R, and from pandas 3.0.4's
+   test_header.py, test_quoting.py, test_dialect.py and test_na_values.py.
+   The one cell where R and read_table differ -- R ends a line at a comment
+   character anywhere in it -- is pinned there.
+
+0.319 2026-09-22 CDT
+
+ [glm(): offsets, prior weights, robust covariance, absorbed factors]
+
+ - glm() took only formula, data, family, theta and conf.level, and died on
+   anything else, which left count models unable to put a rate on
+   person-time. It now takes offset() terms in the formula and an offset
+   argument (a column, an expression such as 'log(t)', or an array ref),
+   and the negative-binomial theta search and the null deviance both see
+   the offset, as MASS::glm.nb()'s do.
+
+ - weights are R's prior weights. A binomial fit whose weights make a
+   non-integer number of successes warns as R does.
+
+ - vcov => 'HC0' .. 'HC3' gives sandwich::vcovHC()'s covariance and cluster
+   gives vcovCL()'s, one to four ways ('firm + year'), with every standard
+   error, z, p-value and interval recomputed from it. A poisson fit on a 0/1
+   outcome with HC0 is the modified-Poisson risk ratio.
+
+ - A factor after '|' in the formula, or in absorb, is absorbed by weighted
+   within-group demeaning instead of expanded into dummy columns, so a
+   factor with thousands of levels costs a vector per level rather than a
+   column. Groups whose outcome sits at a boundary are dropped, as
+   fixest::feglm() drops them, and fe.removed counts their rows; only rows
+   with a positive weight decide that, so a zero-weight count cannot keep an
+   all-zero group in the fit.
+
+ - The IRLS loop was rewritten around one core shared with the new models
+   below, with maxit and epsilon exposed and R's convergence rule and
+   penultimate-iterate standard errors. New results: loglik, vcov,
+   vcov.type, dispersion, nobs and, where they apply, n.clusters, absorb,
+   fe.removed, twologlik and SE.theta. predict() re-evaluates an offset on
+   new rows, and croaks on a model it cannot predict from (an offset given
+   as an array, or absorbed factors) rather than leaving the term out.
+
+ - The formula reader now evaluates log(), exp(), sqrt(), log2(), log10(),
+   log1p() and abs() of a column, which offsets and ivreg's examples need.
+
+ - Validated in t/glm_offset_weights.R.t, t/glm_vcov.R.t and
+   t/glm_absorb.R.t against R's glm, MASS, sandwich and fixest test suites,
+   statsmodels' and Stata's pinned results, and a full-dummy fit.
+
+ [glm(): Inf, a NaN in step-halving, and large negative-binomial counts]
+
+ - An infinite response, covariate, offset or weight is not missing, so its
+   row went into the fit and every coefficient came back NaN without a word.
+   glm() now croaks "NA/NaN/Inf in 'y'" (or 'x', 'offset', 'weights') with
+   the row name, as R's Cdqrls() stops.
+
+ - A coefficient aliased on one IRLS iteration was carried into the next as
+   NaN, so if the column stopped being aliased and the step was halved, the
+   NaN reached the linear predictor. It is carried as 0, as glm.fit() does.
+
+ - The negative-binomial log-likelihood summed y logs per row for every
+   count below 1e6, so a fit cost O(sum y): 20000 counts near 34000 took
+   11.7 s against 0.01 s for the Poisson fit. Counts from 64 up now go
+   through Loader's stirlerr(), and the fit takes 0.03 s. It is also more
+   accurate: 3e-13 relative against mpmath at 60 digits, where the long sum
+   was 1.9e-9 out. t/glm.t pins it.
+
+ - X'WX is accumulated over its upper triangle only and skips zero-weight
+   rows, halving the IRLS loop's main cost and leaving the matrix exactly
+   symmetric; coefficients move by about 1e-12. Absorbed factors are
+   demeaned all columns in one pass over the rows, bit for bit as before,
+   and vcovHC() no longer holds an n x p copy of the scores.
+
+ [coxph(): counting-process data, strata, robust variance, a formula]
+
+ - coxph() took only (\@time, \@status, covariates), which cannot express a
+   time-varying covariate or late entry. It now takes (start, stop] data,
+   strata, a cluster with the grouped-dfbeta robust variance, case weights
+   and an offset, either as options to the positional form or through
+   formula => 'Surv(start, stop, event) ~ x + strata(g) + cluster(id)' over a
+   data set. Intervals that span no event are skipped, as survival's
+   agreg.fit skips them. New results: var and vcov, the score and Wald
+   tests, and naive.se, naive.var, robust.score.test and n.clusters under a
+   robust variance.
+
+ - Validated in t/coxph_extended.R.t against survival's own tests (bladder,
+   the phreg corpora) and statsmodels'.
+
+ [New models: zerotrunc, hurdle, svyglm, ivreg, lmer]
+
+ - zerotrunc() is countreg::zerotrunc(), a Poisson, negative binomial or
+   geometric regression truncated at zero, fitted by damped Newton on the
+   exact likelihood and its analytic Hessian. hurdle() is pscl::hurdle(),
+   with a logit or a censored count zero part and the regressors after '|'
+   for it. t/zerotrunc_hurdle.R.t pins both to countreg and pscl, with an
+   mpmath third opinion at 60 digits (t/zerotrunc_hurdle.mpmath.py).
+
+ - svyglm() is survey::svyglm() on a one-stage design: sampling weights,
+   strata, PSUs and a finite-population correction, with the Taylor
+   linearisation variance and design degrees of freedom. t/svyglm.R.t is
+   taken from survey's tests on the api data.
+
+ - ivreg() is ivreg::ivreg(): two-stage least squares by Householder QR,
+   two- or three-part formulas, weights, HC0/HC1 and clustering, and the
+   weak-instrument, Wu-Hausman and Sargan diagnostics. t/ivreg.R.t follows
+   ivreg's tests and examples and statsmodels' Stata ivreg2 results.
+
+ - lmer() is lme4::lmer() by REML or ML, with random intercepts and slopes,
+   correlated or not, crossed or nested grouping factors, and lmerTest's
+   Satterthwaite degrees of freedom. The fit is held to a tightly converged
+   lme4 fit rather than to lme4's default one, which stops about 1e-6 short
+   in theta. t/lmer.R.t covers lme4's and lmerTest's examples and
+   statsmodels' mixed-model corpora.
+
+ [anova() compares fitted models]
+
+ - anova($m0, $m1, ...) with lm or glm fits is R's anova.lmlist /
+   anova.glmlist, with test => 'F', 'Chisq' or 'LRT' and dispersion, and
+   with negbin fits MASS's anova.negbin likelihood-ratio table; data and
+   formulas still go to the XS anova() as before. The dispatching wrapper
+   has no prototype, because the XS one's ($@) would put anova(@fits) in
+   scalar context. Validated in t/anova_fits.R.t against R and MASS.
+
+ [read_table: five bugs]
+
+ - The CSV parser split lines on $/, not on newlines, because sv_gets()
+   reads PL_rs. Under a `local $/;` anywhere up the call stack the whole
+   file was one "line" and read_table returned [] without a word; a record
+   length ($/ = \N) cut rows at N bytes. The parser, and the perl-side peek
+   that recovers a commented-out header, now split on "\n" whatever $/ is,
+   and a filter still sees the caller's $/.
+   t/read_table.input_record_separator.t.
+
+ - A UTF-8 byte-order mark, which Excel's "CSV UTF-8" export writes, was
+   read as part of the first header name ("\xEF\xBB\xBFid"), and hid a
+   comment or commented-out header behind it. It is dropped from the start
+   of the file, as pandas drops it; t/read_table.bom.pandas.t takes its
+   cases from pandas' test_utf8_bom and test_first_row_bom.
+
+ - In an .xlsx, a cell with formatting and no value (<c r="D1" s="1"/>)
+   past a row's last value widened every row to reach it, so a shaded
+   column came back as unnamed columns of undef and a duplicate-name
+   warning. Such cells no longer count toward the width, which is what
+   readxl 1.5.0 and pandas 2.2.3 give for the same workbook.
+
+ - A hoh read of a file whose only column is the row name came back as {}:
+   the per-row hash was only made when a value was stored in it. Each row
+   is now an empty hash, as R's read.table gives n rows of 0 columns. A read
+   error part-way through a CSV is now an error rather than a truncated
+   table.
+
+ [read_table: faster]
+
+ - 'hoh' now goes through the XS fast path that aoh and hoa already took,
+   with the perl closure's duplicate-row-name warning and undefined-row-name
+   error spelled the same; a 300,000 x 5 CSV reads in 0.20 s rather than
+   0.91 s. Only a 'filter' still needs the closure.
+
+ - An unquoted field is copied straight from the line buffer instead of
+   through the field accumulator, and the row hashes are filled through
+   shared-hash-key copies of the column names, so no key is hashed again
+   per cell. The same file reads as an aoh in 0.096 s rather than 0.120 s.
+
+ [write_table: wide characters in row.names and tex.longtable.head]
+
+ - write_table() croaked "Wide character in subroutine entry" when
+   row.names named a column outside Latin-1, or when tex.longtable.head was
+   such a caption: the XS check for a non-numeric value read it with
+   SvPVbyte. It now reads the bytes as stored, and no longer downgrades the
+   caller's string in place or hands isdigit() a negative char. Found by
+   XS::Check; t/write_table.t and t/write_table.longtable.t pin both.
+
+ [dunn_test, p_adjust: method names fold by ASCII rules]
+
+ - The method name was lowercased with tolower(), which is undefined for a
+   byte >= 0x80 in a signed char and follows LC_CTYPE, so under a Turkish
+   single-byte locale 'BONFERRONI' folded its I outside ASCII and was
+   rejected. Both now fold A-Z only. t/dunn_test.t and t/p_adjust.R.t.
+
+0.318 2026-09-18 CDT
+
+ [transpose() took the interpreter down on a tied array of arrays]
+
+ - The array branch walked its input twice: one pass validated every row as
+   an array ref of row 0's width, then one pass per output column re-fetched
+   each row to copy a cell out of it. The copying pass tested what the second
+   fetch returned -- `if (elem && *elem) SvGETMAGIC(*elem);` -- and then
+   dereferenced it regardless, `(AV *)SvRV(*elem)`, without re-testing
+   `SvROK`.
+
+ - A tied array's elements do not exist until `FETCH` has run, so the second
+   read of a row is a fresh call that may hand back something other than what
+   the first one did. `SvRV()` on a plain string then takes the PV's buffer
+   for an `AV *` and the walk runs off into it: SIGSEGV, which `eval` does
+   not see. A two-row tied array whose `FETCH` stops returning an array ref
+   once the validating pass is over reproduces it in one call. Nothing a
+   plain array could hold reached it, because nothing between the two passes
+   could change a row.
+
+ - There is one pass now, so the read that is validated is the read that is
+   copied, and the check that rejects `transpose([1, 2, 3])` rejects this
+   too.
+
+ [transpose() on an array-of-arrays: the loop nest was column-outer]
+
+ - Every cell cost two out-of-line `av_fetch()` calls -- one to re-reach row
+   i through the outer array, one for the cell itself -- plus an `av_store()`
+   and a second round of get magic. A 300,000 x 3 frame fetched the outer
+   array 900,000 times for the 300,000 rows it has, and a 950 x 950 one
+   walked the whole outer array 950 times over. It is the same shape
+   `cor_extract_cols()` and the AoH-to-HoA reader in this file already record
+   having turned inside out.
+
+ - Row-outer costs one fetch of each row. The output columns are allocated at
+   their final length, so nothing is grown or copied, and their blocks are
+   zeroed with `AvFILLp` set to the last row up front rather than advanced
+   behind each store: one store per cell instead of two, and still safe to
+   croak out of part-way through, because a slot not yet written is a `NULL`
+   that `SvREFCNT_dec()` ignores. The `Zero()` is what makes that true on
+   5.10, where `av_extend()` fills the slots it adds with `&PL_sv_undef`
+   rather than the `NULL` it has used since 5.20.
+
+ - On perl 5.44.0 at -O2, best of seven, at 900,000 cells throughout:
+   300,000 x 3 went 15.8 ms to 5.8 ms, 3,000 x 300 went 17.9 ms to 4.5 ms,
+   and 950 x 950 went 14.4 ms to 3.7 ms.
+
+ [transpose() on a hash-of-hashes: a mortal key SV per cell]
+
+ - The cell loop called `hv_iterkeysv()` for the column key once per cell,
+   and a mortal is not reclaimed until the XSUB returns. A 3,000 x 100 frame
+   held 300,000 of them for the length of the call: 29.1 MB of resident
+   memory to produce a result of about 14.5 MB. Both keys are read straight
+   out of the HE now -- `HePV()` for the bytes, `HeUTF8()` for the flag,
+   `HeHASH()` for the hash -- so a transpose allocates no key SV at all, and
+   the same frame peaks at 14.6 MB.
+
+ - Handing perl a precomputed hash together with a negative (utf8) klen is
+   safe because perl invalidates the hash itself when it has to downgrade
+   such a key to bytes, in hv.c's `HVhek_KEYCANONICAL` block; `row_drop()`
+   already relied on that. A tied hash iterates with SV keys, which have no
+   HEK and so no `HeHASH()`; those pass 0 and let perl compute one.
+
+ - Each output column is also pre-sized with `hv_ksplit()` to the number of
+   input rows it will end up holding, rather than splitting its way there and
+   rehashing everything already in it once per doubling. That one call is
+   most of this branch's time: the same 3,000 x 100 frame takes 33.8 ms
+   without it and 20.2 ms with, against 30.7 ms in 0.317.
+
+ [transpose(): what did not change, and two smaller fixes]
+
+ - Nothing about what it returns moved. Cells are still shared by refcount
+   rather than copied, a ragged array still croaks, a physical hole still
+   reads as undef, a tied input still reads through its magic, and the croak
+   messages are the same text.
+
+ - Those messages formatted a `size_t` with `%d` and a cast to `int`, which
+   truncates above 2**31; they use `%" UVuf "` now. `av_len()` gave way to
+   `AvFILL()`, which is the same answer with the untied case inline.
+
+ [t/transpose.t]
+
+ - Nine new subtests, 43 to 52. A well-behaved tied outer array and a tied
+   inner row, both of which 0.317 handled and which are here so that the fast
+   path cannot quietly stop handling them. The tied row that stops being an
+   array ref, which is the SIGSEGV above, and which fails 0.317 as a signal
+   rather than as a test. A tied hash, whose keys iterate as SVs and so take
+   the `HEf_SVKEY` path through the new key reads. utf8 row and column keys,
+   including one that perl downgrades to bytes on the way in, which is the
+   case that says the hash handover is right. And a 20-wide frame whose 51st
+   row is one cell short, which croaks with most of the result already
+   written. Two of the nine are leak checks, on that part-filled croak and on
+   the utf8 keys.
+
+ - All eight perls in the local matrix pass, warning-free: 5.10.1, 5.12.5
+   (long double), 5.16.3 threaded long double, 5.42.3 threaded, 5.44.0,
+   5.44.0 with x87 arithmetic, 5.44.0 32-bit (`ivsize=4`), and 5.44.0
+   quadmath.
+
+0.317 2026-09-12 CDT
+
+ [srand() reached nothing this module drew, on a threaded perl before 5.20]
+
+ - A CPAN smoker running perl 5.18.3 (`x86_64-linux-thread-multi-ld`:
+   `useithreads`, `long double` NV) failed 0.316 in `t/rbinom.dist.t`, two
+   subtests out of ninety. Both were reproducibility checks -- the same seed
+   drawn twice, and the `prob`/`1-prob` mirror -- and every distribution test
+   in the file passed, there and everywhere else.
+
+ - On a perl older than 5.20, `Drand01()` is libc's `drand48()` and
+   `seedDrand01()` is `srand48()`. When that perl is threaded, `reentr.h`
+   redefines both over the interpreter's own `PL_reentrant_buffer` so that two
+   threads do not share libc's global state -- but the whole block is wrapped
+   in `#if PERL_REENTR_API == 1`, which `reentr.h` sets for `PERL_CORE` and
+   `PERL_EXT` and nothing else. `perlxs` says as much under "Thread-aware
+   system interfaces", and warns there that mixing the `_r` and `_r`-less
+   forms of one interface is not well defined.
+
+ - An XS file outside the core is neither, so `pp_srand()` seeded
+   `PL_reentrant_buffer->_drand48_struct` while every draw in `LikeR.xs` read
+   libc's process-global state, which nothing ever called `srand48()` on.
+   `srand($seed)` had no effect whatever on `rbinom()`, `rnorm()`, `runif()`
+   or `sample()`: two identical calls returned consecutive stretches of one
+   stream that was never reset, and the first number a process drew came off
+   an uninitialised `struct drand48_data` (3.9e-14, measured). The
+   distribution was never wrong, which is why two reproducibility subtests
+   were the only thing that ever failed.
+
+ - `LikeR.xs` now carries `reentr.h`'s own two macros for `drand48()` and
+   `srand48()`, copied verbatim and under the same prototype guards, so
+   `Drand01()` and `seedDrand01()` expand to the state perl seeds. Perl 5.20
+   replaced the libc call with `Perl_drand48()` and `reentr.h` stopped
+   wrapping `drand48` in the same release, so `PL_random_state` existing is
+   the test for a perl that was never affected; on an unthreaded perl
+   `USE_REENTRANT_API` is undefined and none of it applies. `random()` is
+   left alone deliberately: `reentr.h` reads `_random_struct` and seeds
+   `_srandom_struct` there, two different buffers, so on a perl configured
+   that way `srand()` does not reach perl's own `rand()` either.
+
+ [t/srand.stream.t]
+
+ - New, and the reason the bug was module-wide but showed up as two subtests
+   of one file: `t/rbinom.dist.t` was the only test in the suite that ever
+   drew one seed twice. Fifteen checks that a seed determines what `runif()`,
+   `rnorm()`, `rbinom()` and `sample()` return, that a different seed moves
+   them, and that a draw made in XS and a draw made by perl's `rand()` come
+   off one stream in order. Nine of the fifteen fail against 0.316 on an
+   affected perl. No value is pinned: which numbers a seed gives is libc's
+   business on some builds and perl's on others.
+
+ [t/arg.crash.regressions.t ran its child perls through a sh command line]
+
+ - A Strawberry perl 5.42 smoker (`MSWin32-x64-multi-thread`) failed 0.316
+   with 26 of that file's 98 subtests, which is every subtest in it that
+   spawns a child. `child_result()` built the child's command as
+   `` `$^X @inc -e '$prog' 2>&1` ``, and `cmd.exe` does not treat `'` as a
+   quote character: perl was handed `'use` as its `-e` program and answered
+   `Can't find string terminator "'" anywhere before EOF at -e line 1.` The
+   snippets that carry a `"` failed differently and silently, as `exit 255
+   ()`. Nothing was wrong with the module -- every case those 26 subtests
+   guard was still being rejected correctly.
+
+ - The snippet now goes to the child in a file and the child is spawned with
+   the list form of `system()`, so there is no shell and nothing in the
+   snippet has to survive one. That matters beyond the quote character: the
+   snippets hold `'`, `"` and a literal NUL between them, and no single
+   quoting of a command line is right for both `sh` and `cmd.exe`. The
+   child's verdict comes back in a file of its own whose path is passed in
+   `@ARGV`, so it does not depend on inheriting a redirected handle either;
+   the child's output is still captured, but only for the diagnostic.
+
+ - It was the only test in the suite that shelled out, and the whole of what
+   the smoker reported.
+
+ [A threaded perl in the local matrix]
+
+ - There was no threaded perl *older than 5.20*, which is what this needs, so
+   no run here could have caught it: `perl-5.42.3` is threaded but is a
+   5.20-or-later perl, where `Perl_drand48()` has replaced the libc call and
+   `reentr.h` no longer wraps `drand48` at all. `perl-5.16.3` built with
+   `-Duseithreads -Duselongdouble` -- `USE_ITHREADS`, `USE_REENTRANT_API`,
+   `randfunc=drand48`, the same three that matter on the smoker -- reproduces
+   its two failures exactly, and is what the fix was tested against.
+   `./test.all.perls.pl` picks it up like any other perlbrew perl.
+
+0.316 2026-09-11 CDT
+
+ [read_table on .xlsx: the worksheet parser moved from perl to XS]
+
+ - Reading an .xlsx was slow out of all proportion to the format. On a
+   21,845 x 50 workbook (7.8 MB on disk, 36 MB of worksheet XML, 1,013,220
+   cells, an 8 MB shared-string table of 117,870 entries) `read_table` took
+   2.47 s and peaked at 263 MB. The same table written out as a 34.7 MB CSV
+   and read back through `_parse_csv_file` took 0.139 s and 156 MB -- from a
+   larger file, into the same array of hashes. Almost the whole gap was the
+   perl side, not the format.
+
+ - Where it went: the nested regexes in `_parse_xlsx_sheet` were 1.68 s of
+   the 2.47 s, or 1.66 us per cell, against 0.099 s for a bare
+   `$ws =~ m{<c\b}g` count of the same string -- so the scan was 6% of it and
+   perl's per-op overhead the rest. Decompressing the worksheet was 0.25 s,
+   the shared strings 0.21 s, and read_table's own per-row closure 0.32 s.
+
+ - The parse is now `xlsx_ws_scan()` in `LikeR.xs`, and `read_table` offers
+   it the same `csv_plan` fast path a delimited file gets, so an `aoh` or
+   `hoa` is assembled in C from the cells the parser already has. The perl
+   callback still reads the header, and still takes every row when a `filter`
+   or a `hoh` shape needs per-row perl, exactly as it does for a CSV.
+
+ - Rows are emitted as they are parsed. They have to be padded to the widest
+   row in the sheet, which the perl parser could not know until it had read
+   the last one, so it buffered the whole sheet as an array of arrays first
+   -- 76 MB on that workbook, before a single row had been handed on. A first
+   pass now reads nothing but the cell references and the width is known
+   before any row is built. Both passes are the same function so that they
+   cannot see different cells.
+
+ - Shared-string cells are copy-on-write copies of the table entry rather
+   than fresh buffers, which is worth 29 MB there. That needs asking for:
+   `sv.h` defines `SV_DO_COW_SVSETSV` -- what `sv_setsv()` and `newSVsv()`
+   pass -- to the real flags only under `PERL_CORE`, and to 0 otherwise, so
+   an XS copy is an ordinary copy unless it names `SV_COW_SHARED_HASH_KEYS`
+   itself. Nothing here writes through `SvPVX` of a cell, so it is safe to.
+   Perl 5.20 is where copy-on-write started covering plain strings, so on
+   5.10 and 5.12 this is an ordinary copy as before.
+
+ - `_unzip_member` reads onto the end of its buffer instead of concatenating
+   through a second scalar: `IO::Uncompress::Base::read()` makes its
+   truncating `substr()` a no-op when the offset is already the buffer's
+   length. 0.171 s against 0.243 s on the 36 MB part, and no realloc slack
+   left behind. (`BlockSize => 1<<20` is not the way to do this: 2.08 s.)
+
+ - `xl/sharedStrings.xml` is parsed in XS too, and `_xlsx_col_idx` is now the
+   `xlsx_ref_col()` that places the cells, exposed to perl so that
+   `t/xlsx_col_idx.t` still exercises the letter arithmetic on its own.
+
+ - Together: 2.47 s -> 0.48 s and 263 MB -> 221 MB on that workbook, and
+   0.083 s -> 0.031 s on a 2,207-row one that uses inline strings and no
+   shared-string table. What is left of the peak is the table the caller
+   asked for, plus the 36 MB worksheet part and the 33 MB shared-string
+   table, which are both live for the length of the parse.
+
+ [What the new parser answers differently]
+
+ - Two things, both on input the format does not allow. A cell reference past
+   `XFD` -- the last of the 16,384 columns ECMA-376 gives a worksheet -- is
+   now read as no reference at all, which puts the cell in the next column,
+   the same place a cell with no `r=` goes. Every row is padded to the widest
+   column the sheet mentions, so the reference is what decides what a row
+   costs in memory, and a bad one should cost the 16,384 the format allows
+   rather than the twelve million `ZZZZZ` asks for or the three hundred
+   million of `ZZZZZZ`. The perl parser placed the cell wherever the
+   arithmetic landed.
+
+ - A numeric character reference above `&#x7FFFFFFF;` is now left in the text
+   instead of being decoded. The perl version handed the number to `chr()`
+   unguarded, and that was not one answer but two: `&#999999999999;` came back
+   as thirteen bytes of perl's extended UTF-8 on an ivsize=8 build, and died
+   outright on `5.44.0-i686` with "Use of code point 0xFFFFFFFF is not
+   allowed". XML 1.0 does not allow a character reference above `#x10FFFF` at
+   all, so nothing legal is lost, and the answer is now the same on every perl
+   in the matrix.
+
+ - Everything else is unchanged, and was checked rather than assumed: the two
+   parsers were run side by side over `Affinity Dataset(main).xlsx` and
+   `titanic.xlsx` in all three `output.type` shapes with and without a
+   `filter` and `na.strings`, over fifteen hand-built worksheets covering the
+   awkward layouts, and over 400 generated strings of entity soup. Every
+   `Data::Dumper` of the result is byte-identical, warnings and die messages
+   included.
+
+ [How the new parser was checked]
+
+ - A tokenizer is only as good as the malformed input it survives, so it was
+   fuzzed rather than reasoned about: every one of the 362 prefixes of a
+   worksheet part, 20,000 byte-level mutations of it, and 12,000 generated
+   workbooks each read twice -- once through the XS fast path and once through
+   the perl callback -- so that the two could be required to agree cell for
+   cell. They do, on all of them. Three defects in the new code turned up that
+   way and are fixed:
+
+ - `av_store()` already releases whatever was in the slot, so the parser's own
+   `SvREFCNT_dec` for a repeated `r=` in one row was a second free of the same
+   SV. Only malformed input has two cells claiming one column, which is why
+   nothing but a fuzz would have found it.
+
+ - The two passes could see different cells. The second skipped each cell body
+   to `</c>`; the first had no reason to and did not. On a cell whose `</c>` is
+   missing that search runs on to the next cell's, so the pass that skipped saw
+   fewer cells, and rows were then built to a width measured from a different
+   reading of the same file. Both passes now skip -- the scan is the same scan
+   or it is not the same file.
+
+ - The alignment croak that followed segfaulted. `S_fast_row()` frees the row
+   buffer itself before it croaks, because it unwinds past
+   `_parse_csv_file`'s local, and the new parser's save-stack destructor then
+   freed it again. It now hands the buffer over and takes it back only if the
+   call returns.
+
+ - A fourth was found by the new test on `perl-5.10.1` and `perl-5.12.5`, and
+   by nothing else: a cell is placed by its column reference, so a row with a
+   gap leaves the slots between untouched, and perl 5.10 and 5.12 fill a newly
+   extended array with `&PL_sv_undef` where 5.14 and later zero it. `SvCUR()`
+   on the immortal undef dereferences a NULL `SvANY`. Only the first row after
+   a fresh buffer can meet one -- every later row is cleared to NULLs -- and
+   `t/read_table.xlsx.t`'s sparse cells are not in its first data row, so it
+   passed on both perls while the new file segfaulted. The hole test now
+   accepts either value.
+
+ [read_table on .xlsx: a third off the time, straight to Compress::Raw::Zlib]
+
+ - With the worksheet parser in XS, decompression is what a read of an .xlsx
+   spends its time on: 0.239 s of the 0.413 s the 21,845 x 50 workbook takes,
+   against 0.015 s to parse its 117,870 shared strings. `_unzip_member_fast()`
+   reads the archive's central directory itself and inflates one member with
+   `Compress::Raw::Zlib`. The 36 MB worksheet part goes from 0.174 s to
+   0.067 s and the 8 MB shared-string part from 0.052 s to 0.023 s. Reading
+   the whole workbook: 0.481 s to 0.323 s, with peak RSS unchanged at 179 MB.
+
+ - Most of that gap is one thing, and it is not the inflate. `Unzip.pm`'s
+   `ckParams()` sets `crc32 => 1` unconditionally ("unzip always needs
+   crc32"), so every byte goes through `Compress::Raw::Zlib::crc32()` --
+   0.076 s on that part, more than the 0.052 s the inflate itself costs --
+   and the comparison against the stored CRC happens only under `Strict`,
+   which defaults to 0. The check is paid for and never made. This path does
+   not compute it either, which is the same answer for the same money.
+   Asking `Inflate` for `-CRC32 => 1` costs the identical 0.076 s, being the
+   same per-chunk call, so turning it on here would only be worth anything
+   with a croak on mismatch behind it -- and that is a decision about what
+   `read_table` should do with a damaged workbook, not a speed one.
+
+ - `-Bufsize => 1<<16`: 0.052 s against 0.063 s at the 4 KB default on that
+   part, and flat from there (1<<18, 1<<20 and 1<<22 all measure 0.052 s).
+
+ - What it declines, handing the archive back to `IO::Uncompress::Unzip`
+   unchanged: zip64 (whether by the end-of-central-directory sentinels or a
+   member's own), split archives, encrypted members, a compression method
+   that is neither stored nor deflate, a directory that does not check out
+   against its own signatures and lengths, a local header that is not one,
+   and an inflate that does not end where the directory says it should.
+   Declining is not an error -- it reads the central directory and one
+   deflate stream and leaves everything past that to the module that has been
+   ported to all of it.
+
+ - Two things worth knowing about the shape of an archive. `IO::Compress::Zip`
+   with `Append => 1` does not extend one: it writes a second complete archive
+   after the first, and the final end-of-central-directory record describes
+   only that second one, with offsets counted from where it begins. It reads
+   as a single archive only to a reader that scans local headers forwards,
+   which is what `IO::Uncompress::Unzip` does -- so `t/read_table.xlsx.t` and
+   `t/read_table.xlsx.parser.t`, whose fixtures are built that way, go on
+   exercising the fallback. Real workbooks do not have this: Excel,
+   LibreOffice, openpyxl and this module's own `write_table` all take the fast
+   path, which `t/unzip_member.t` pins by reading one that `write_table` wrote.
+   Second, `IO::Uncompress` defaults to `Transparent => 1`, so a file that is
+   not an archive at all comes back as its own raw bytes rather than failing.
+   That has always been true of `_unzip_member`; the fast path declines such a
+   file and changes none of it.
+
+ - `Compress::Raw::Zlib` joins the prerequisites. It is core since 5.8.8 and
+   `IO::Uncompress::Unzip` was already loading it, but it is dual-life and it
+   is now named directly.
+
+ - It also reads members the fallback cannot. `IO::Uncompress::Unzip` 2.020
+   (perl 5.10.1) and 2.024 (5.12.5) refuse a stored member written in
+   streaming mode -- "Header Error: Streamed Stored content not supported" --
+   and fail to find any member past the first in a streamed multi-member
+   archive at all, both of which this path reads on every perl in the matrix.
+   That is why the new tests assert an accepted member against the bytes that
+   went into the fixture rather than against what the fallback makes of it,
+   and cross-check the fallback only where it can answer.
+
+ - `t/unzip_member.t` is new, 82 tests: deflated, stored, empty and streamed
+   members, and one whose sizes are in its local header rather than a trailing
+   descriptor; a name another name begins with and one another ends with; an
+   archive comment, and a comment holding the end-of-central-directory
+   signature as a decoy for the backwards scan; an absent member (answered
+   "handled, no such member", so that the sharedStrings.xml plenty of
+   workbooks lack does not pay for a second scan); zip64, a concatenated
+   archive, a file that is not an archive, one that does not exist, an empty
+   one and a truncated one -- each asserted to be declined and then to come
+   back from the fallback exactly as it did before, undef included; and
+   read_table over two workbooks whose directories are intact, one from
+   `write_table` and one with a shared-string table.
+
+ [A malformed .xlsx could ask for an unbounded amount of memory]
+
+ - `xlsx_ref_col()` refuses a column reference past XFD, the last of the 16,384
+   columns ECMA-376 allows, and its comment says why: every row in a sheet is
+   padded to the widest column the sheet mentions, so "a bad one should cost
+   the 16,384 the format allows rather than the twelve million `ZZZZZ` would
+   ask for". It did not. A reference it refuses falls back to "the next
+   column", and that counter had no ceiling at all, so `ZZZZZ1` repeated 20,000
+   times in one row got 20,000 columns -- the exact outcome the cap was written
+   to prevent, reached through the cap's own fallback.
+
+ - What it cost: a 54 KB workbook of 20,000 such cells, plus 200 ordinary
+   one-cell rows, came back as 264 MB of empty strings in 0.41 s; 60,000 cells
+   made it 804 MB and 1.35 s, and nothing bounded it but the size of the input.
+   The amplification is about 5,000x, so a 16 MB file of that shape would ask
+   for tens of gigabytes. A cell with no `r=` at all reaches the same counter,
+   so it did not even need a malformed reference.
+
+ - `xlsx_ws_scan()` now clamps the column index to XLSX_MAX_COL on that path
+   too. Past the ceiling the cells pile up in the last column, last one
+   winning, which is what a repeated `r=` in one row already did. The same line
+   runs on both passes, so they go on agreeing about the width. The two cases
+   above now stop at 16,384 columns and 234 MB, and stop growing: 60,000 cells
+   cost what 20,000 do.
+
+ - `t/read_table.xlsx.parser.t` covers both routes to the counter -- 20,000
+   unreadable references and 20,000 cells with no `r=` -- asserted on
+   `_parse_xlsx_sheet_xs` directly, because `read_table` would fold the unnamed
+   columns into one key and hide the width. Both fail without the clamp.
+
+ [read_table on .xlsx: 42 MB less peak RSS]
+
+ - `_unzip_member()` returned the decompressed part as a string, which costs a
+   full copy of it: perl cannot hand back a lexical's pad slot, so `return
+   $content` copies. On the 36 MB worksheet part of the 21,845 x 50 workbook
+   that was 34 MB of peak RSS for nothing -- 82.4 MB against 48.5 MB for a
+   scalar reference, and 81 MB still resident after the string went out of
+   scope against 13 MB, the rest being heap the allocator never gave back.
+
+ - It returns a reference now and its four callers dereference. `$$ws` on an
+   argument list pushes the SV itself, so the part still reaches
+   `_parse_xlsx_sheet_xs` and `_xlsx_sst_xs` without a copy. Reading the whole
+   workbook went from 220.2 MB and 0.487 s to 177.9 MB and 0.475 s.
+
+ [The `autodie` dependency is gone]
+
+ - `autodie` was a prerequisite for five calls in one file: three `close`s and
+   two `open`s in `lib/Stats/LikeR.pm`, all of them reading this module's own
+   POD or peeking at the first line of a CSV. Nothing in `LikeR.xs` used it --
+   the XS side opens through `PerlIO_open` and croaks for itself -- and no test
+   loaded it. `open`/`close` now check for themselves through `_open_read()`
+   and `_close()`, and the pragma and the prereq are both dropped.
+
+ - Those two helpers raise the failure at the same points, with the message
+   `autodie::exception` 2.37 would have built: `_format_open` (through
+   `_FORMAT_OPEN` and `_format_open_with_mode`) for the open, `_format_close`
+   for the close, each followed by `add_file_and_line`, which is why
+   `_io_die()` takes the file and line one frame up rather than its own. The
+   text is byte-identical, checked against a script running under `autodie`.
+   The one visible difference is that `$@` now holds a plain string instead of
+   an `autodie::exception` object, which nothing here ever inspected.
+
+ - Two error paths the pragma had been masking are now visible, and both were
+   dead code: `_pod_open`'s `open ... or return undef` and `read_table`'s
+   `open ... or die "read_table: can't open $file: $!"` could never run,
+   because `autodie`'s `open` died first. They are removed rather than
+   revived, so a failed open stays fatal and keeps the wording it had.
+
+ [Prerequisites: one added, three moved to the test phase]
+
+ - `IO::Uncompress::Unzip` is now declared. `_unzip_member` has required it for
+   every `.xlsx` read since 0.24 and it was never in the list; it is core since
+   5.9.4, so the 5.010 floor already guaranteed it, but it is dual-life and a
+   used module belongs in the metadata. `Cwd` stays for the same reason --
+   `provenance_path()` in `LikeR.xs` reaches it through `load_module()`, which
+   croaks rather than degrades if the require fails, so the tex and xlsx
+   writers genuinely need it.
+
+ - `Test::Exception`, `Test::LeakTrace` and `Test::More` move from `[Prereqs]`
+   to `[Prereqs / TestRequires]`. They had been runtime requires since 0.18,
+   which made every user of `mean()` install two modules that are not core and
+   that nothing under `lib/` or `LikeR.xs` loads.
+
+ - They were flattened into the runtime phase by 0.18's "fix to dist.ini for
+   dependencies", but the smoker failure that fix was chasing was not theirs.
+   0.17 had put `Devel::Confess` in `[Prereqs / DevelopRequires]`, a phase no
+   CPAN client installs, while `t/col2col.t` and `t/transpose.t` still said
+   `use Devel::Confess` -- so the test files would not compile on a smoker.
+   0.18 cured it by moving every phase back into runtime, which swept the three
+   `Test::` modules along; 0.22 then re-declared `Devel::Confess` as a runtime
+   dependency for the same reason, and 0.24 fixed it properly by dropping the
+   module from the tests. Nothing under `t/` has loaded it since -- both files
+   mention it only in comments -- and every other module the tests use is
+   either core at 5.010 or declared.
+
+ - Checked, not assumed. `dzil build` puts the three under `test.requires` in
+   `META.json`; `ExtUtils::MakeMaker` carries them as `TEST_REQUIRES`; the
+   generated `Makefile.PL`'s `%FallbackPrereqs` block folds them back into
+   `PREREQ_PM` on any `ExtUtils::MakeMaker` older than 6.63_03, which was
+   confirmed by running the configure step with `$ExtUtils::MakeMaker::VERSION`
+   forced to 6.48 -- an old toolchain sees exactly what 0.316 gave it.
+   `cpanm --showdeps` on the built tarball lists all three. The built dist
+   configures, compiles and passes its 154 files clean.
+
+ - The repo's own `Makefile.PL` is excluded from the dist and so is never
+   regenerated by dzil; its prerequisite list still named `Devel::Confess` and
+   `Digest::SHA`, neither of which has been used for many releases. It now
+   mirrors `dist.ini`.
+
+ [Tests]
+
+ - `t/read_table.xlsx.parser.t` is new: the tokenizer's own cases, which a
+   well-formed workbook never reaches. Cells with no `r=` and with `r=` not
+   first, self-closing `<c/>` and `<row/>`, blank rows, mid-row gaps, every
+   entity form and the ones that must not be decoded, a shared-string index
+   that is out of range or not a number, `t="str"`/`t="b"`/`t="e"`, a `>`
+   inside an attribute value, `XFD` and the references past it, a repeated
+   reference in one row, a cell with no `</c>`, an empty sheet, a header with
+   no data rows, and the fast path and the callback path agreeing cell for
+   cell. Leak checks on every path through the row emitter, with no `qr//`
+   inside a measured block.
+
+ - Those leak checks measure the parser with the worksheet part already
+   decompressed. `read_table` itself is measured too, but only where
+   decompressing is clean: `perl-5.10.1`'s bundled `Compress::Raw::Zlib` leaks
+   18 SVs per read in `crc32(undef)` (`IO/Uncompress/Unzip.pm` line 608), and a
+   check around `read_table` counts those as this module's. The test asks this
+   perl whether it leaks rather than naming versions, and skips only the four
+   checks that need a file.
+
+ - The whole suite passes on all seven perls in the local matrix -- 5.10.1,
+   5.12.5 (`long double`), 5.42.3-thr, 5.44.0, 5.44.0+x87, 5.44.0-quadmath
+   (`__float128`) and 5.44.0-i686 (`ivsize=4`) -- and the generated `.c`
+   compiles clean under strict `-std=c99`. Valgrind reports no errors over the
+   truncation and mutation corpora.
+
+ [aov() could abort the interpreter, or answer differently on every run]
+
+ - `aov` built the two halves of an `a:b` interaction in two 256-byte stack
+   arrays, and filled the left one with `strncpy(left, term, colon - term)`.
+   `strncpy` writes exactly the count it is given and knows nothing about the
+   destination, so an interaction whose left component ran past 255 characters
+   wrote off the end of the frame, and the `left[colon - term] = '\0'` after it
+   stored past the end as well. glibc caught it as `*** buffer overflow
+   detected ***` and aborted the interpreter, which no `eval` can catch. Both
+   halves are now copied to the heap at the length they actually have.
+   (`right` had been moved off `strcpy` already, but only as far as a
+   truncating `snprintf`.)
+
+ - Only the FIRST value of a hash-of-hashes was checked for being a reference.
+   `SvRV()` on a later plain scalar reads a pointer out of a field that does
+   not hold one, so `aov({r1 => {...}, bad => 42}, 'y ~ g')` segfaulted -- or
+   did not, depending on hash order, since a non-reference that came first was
+   rejected by the shape test. `lm` and `glm` have always checked this in
+   `lm_read_rows`; `aov` now makes the same check with the same message.
+
+ - The row count for a hash-of-arrays came from whichever column
+   `hv_iternext()` returned first, so on a ragged frame which observations were
+   fitted moved with perl's hash order from one run to the next. Refused now,
+   naming the column, exactly as `lm_read_rows` refuses it.
+
+ - `group.stats` had the same defect on the reporting side, and reached it by
+   the documented no-formula form -- R's `stack()` -- whose columns are
+   unequal by construction. `aov({short => [1..3], long => [1..20]})` reported
+   `long`'s mean as 10.5 and its n as 20 on some runs and as 2 and 3 on others,
+   on the same data in the same process image. Each column is now summarised
+   over its own length, which is also what stops the evaluation running past
+   the end of the short ones.
+
+ - The groups of that no-formula form are stacked in sorted key order rather
+   than hash order. The F statistic survived the shuffling, being invariant to
+   the order of the rows, but only to within rounding -- `Pr(>F)` came back
+   0.0363396692989842 on one run and ...43 on the next -- and `fitted.values`
+   named entirely different rows each time.
+
+ [The `.` in a formula expanded in hash order]
+
+ - `get_all_columns()` returned the column names in hash-iteration order, which
+   perl randomises per process and per hash. `.` is what fixes the term list,
+   and a sequential (Type I) sum of squares is attributed in term order, so
+   `y ~ .` produced a different ANOVA table on every run of the same script
+   over the same data: over four runs of `aov({y, g, x, z}, 'y ~ .')` the `z`
+   row came back with a sum of squares of 15 once and of 1.9e-30 another time,
+   because `z` had been entered before or after the term it is orthogonal to.
+   `lm` and `glm` take their `.` expansion through the same function, so their
+   coefficient order moved the same way.
+
+ - R has a column order to expand in and a Perl hash has none, so the names are
+   sorted. That is the only order available that is the same twice.
+
+ [aov()'s formula was truncated, and read its intercept markers with strstr()]
+
+ - The formula was copied into a 512-byte stack array and stopped at 511
+   characters, so a longer one was silently truncated and a different model was
+   fitted than the one asked for. `.` expanded into a 2048-byte array and
+   simply DROPPED every column that no longer fit, so `y ~ .` on a wide frame
+   quietly fitted a smaller model.
+
+ - `-1`, `+0`, `+1` and a leading `1+` were removed with `strstr()` over the
+   whole right-hand side, so the `-1` inside `I(x-1)` was eaten and `y ~ I(x)`
+   -- a different model -- was fitted and reported under that name.
+
+ - All of it now goes through `lm_formula_split()`, which is what `lm` and
+   `glm` already parse with: it steps over `I(...)`, grows with the formula,
+   and its buffer is on the save stack so a croak anywhere below releases it.
+   The `.` expansion grows through `lm_append()`.
+
+ [interpolate()'s splines solved a banded system densely]
+
+ - `ip_build_cubic()` and `ip_build_quad()` assembled an n x n dense matrix and
+   ran a dense Gaussian elimination over it, where n is the number of numeric
+   anchors in the column. Neither system is dense: the not-a-knot cubic spline
+   is tridiagonal apart from its two boundary rows, and the degree-2 B-spline
+   collocation matrix has three non-zero basis functions per row. Both are
+   `kl = ku = 2`.
+
+ - `ip_solve_band()` solves them in band storage, which is 7 NVs a row. A
+   column of 12,800 anchors went from 0.835 s and 574 MB to 0.002 s and
+   13.6 MB; one of 400,000 -- which wanted 1.28 TB and could only ever fail --
+   now takes 0.071 s and 115 MB. `ip_eval_quad()` sums only the basis functions
+   whose support reaches the point, rather than all n of them, so filling g
+   gaps is O(g) and not O(n*g).
+
+ - The band width is asserted rather than assumed: the degree-2 basis is a
+   partition of unity, so every row of the collocation matrix sums to 1, and a
+   window that had missed a non-zero basis function could not. Checked against
+   SciPy's `CubicSpline(bc_type='not-a-knot')` and `make_interp_spline(k=2)` at
+   200, 2,000 and 20,000 anchors; worst relative disagreement 2.3e-16.
+
+ [rbinom() cost O(size) per variate]
+
+ - `generate_binomial()` was the textbook Bernoulli loop: `size` draws from
+   `Drand01()` per variate, counting successes. Exact, and unusable at any
+   interesting size -- `rbinom(n => 10, size => 1e9)` asks it for ten billion
+   uniforms, and `rbinom(n => 1e4, size => 1e5)` for a billion. 2000 variates
+   at `size => 1e7` took 74 s.
+
+ - Replaced by BTPE (Kachitvichyanukul and Schmeiser 1988, CACM 31, 216-222),
+   transcribed from R 4.6.1 `src/nmath/rbinom.c`: the inverse-CDF walk below
+   `n*p = 30` and the triangle / parallelogram / exponential-tail rejection
+   above it. Neither draws a number of uniforms that grows with `size`. The
+   same 2000 variates now take 0.0001 s, at any size.
+
+ - Two departures from upstream. R caches the setup in file-static globals and
+   its own comment there reads "FIXME: These should become THREAD_specific
+   globals"; every variate of one `rbinom` call shares its n and p, so the
+   setup is computed once per call into a caller-owned struct instead -- the
+   same saving, no statics. And `unif_rand()` is `Drand01()`, which is what
+   every other draw in this file uses and what makes `srand($seed)` govern the
+   result.
+
+ - THE SEEDED STREAM MOVED. BTPE consumes a different number of uniforms per
+   variate than the Bernoulli loop did, so a given `srand` produces different
+   numbers from those 0.315 gave. The distribution is unchanged and a run is
+   still reproducible; only a script that hardcoded the values one seed used to
+   give will see new ones.
+
+ [ks_test(exact => 1) had no cost cap on the one-sample branch]
+
+ - `K2x()` builds an m x m matrix, `m = 2*floor(n*D) + 1`, and raises it to the
+   n-th power: O(m^3 log n) time and O(m^2) memory, with nothing but the
+   statistic bounding m. The default route cannot reach a large m, taking the
+   exact branch only below n = 100, but `exact => 1` could. A sample of 800
+   whose D is 1 -- any badly-fitting reference distribution -- took 52 s and
+   69 MB, 3200 would have taken most of an hour, and past n ~ 23,000 the cell
+   count overflowed the `int` it was computed in and went to `calloc()`
+   wrapped. The two-sample branch has had `KS_EXACT_MAX_PRODUCT` for this all
+   along.
+
+ - m is now capped at `KS_EXACT_MAX_M` (500, about half a second and two
+   megabytes) with the same warning and the same fall back to the asymptotic
+   p-value the two-sample branch gives, and `K2x()`/`m_power()` compute in
+   `size_t`.
+
+ [dnorm() was computed at a double's width on whatever perl it ran on]
+
+ - `c_dnorm()` decides where the density has underflowed from the exponent
+   range of the floating-point type, and asked `<float.h>` about a *double* --
+   `DBL_MAX`, `DBL_MIN_EXP`, `DBL_MANT_DIG` -- whatever perl's NV was. On a
+   long-double or `__float128` build that cut the tail off at |x| ~ 38.57,
+   where a double's subnormals run out, and returned a flat 0 beyond it:
+   `dnorm(-100)` is 1.4e-2174, four thousand orders of magnitude inside a
+   quadmath NV's range, and came back 0. `NV_MAX` / `NV_MIN_EXP` /
+   `NV_MANT_DIG` now, which are the same constants on a double build.
+
+ - `NV_MIN_EXP` needed a fallback: perl.h has defined it since 5.22, and both
+   `perl-5.10.1` and `perl-5.12.5` are in the matrix. `ppport.h` does not
+   backport a macro that is not an API function, so `LikeR.xs` derives it the
+   way perl.h does -- from the same `<float.h>` constants and the same
+   `USE_QUADMATH` / `USE_LONG_DOUBLE` tests the `nv_*` libm layer already
+   switches on -- under an `#ifndef` a perl that has it never reaches.
+   `NV_MANT_DIG` is guarded beside it so that a build with one and not the
+   other cannot fail pointing at the wrong line. Caught by
+   `./test.all.perls.pl`, which is what it is for: both builds failed at
+   `make`, and nothing on the default perl would ever have shown it.
+
+ [Convergence thresholds written against a double]
+
+ - The continued fraction for the incomplete beta, and the series and continued
+   fraction for the incomplete gamma, stopped as soon as a term fell below a
+   bare 1e-15 or 3e-15 -- so `pt`, `pf`, `pchisq`, `qchisq`, `qf` and
+   everything built on them returned about sixteen digits on a perl carrying
+   nineteen or thirty-four. `LIKER_EPS_SCALE` carries each of them to the
+   build's own width; it is `NV_EPSILON / DBL_EPSILON`, which is exactly 1.0
+   when NV is a double, so every value produced on a double build is unchanged
+   to the last bit. Thresholds that are part of an algorithm's definition --
+   `FT_TOL`, which is R's `uniroot()` default, and MASS's `double.eps^0.25` in
+   `nb_theta_ml()` -- are numbers from the reference implementation and stay
+   put; each says so where it is defined.
+
+ - `FT_EPS` looks like one of those and is not: it is the other half of R's
+   `uniroot()` stopping rule, `2*FT_EPS*|b| + FT_TOL/2`, and it is also the
+   lower endpoint of the bracket `fisher_test`'s confidence interval is
+   inverted over -- so it sets the largest odds ratio that interval can name,
+   which R reports as `1/DBL_EPSILON`. Scaling it to the build's own epsilon
+   moved the conditional odds ratio for SciPy's gh-3014 table 1.2e-9 off R on a
+   `__float128` build and turned that table's upper limit from 4503599627370496
+   into 5.2e+33. It stays `DBL_EPSILON` on every build, and now says why.
+
+ - `_qgamma()` in `LikeR.pm` inverted `1 - _igamc($shape, $x)`, which is the
+   cancellation `igam()` was added to avoid: below a lower tail of about
+   `NV_EPSILON` that difference can only be a multiple of `NV_EPSILON`, and
+   below about 1e-16 it is exactly 0, so a bisection against it has nothing to
+   bisect on. It now bisects against the new private `_pgamma_lower`, which is
+   `igam()` itself. `age_standardize()`'s Fay-Feuer interval asks for the
+   `alpha/2` quantile, so the lower limit is what this reaches: at
+   `conf.level => 1 - 2e-12` it moved from 1.1e-6 off R to 3.3e-7 off. It
+   cannot be pushed much further from the Perl side -- `1 - 2e-17` is already
+   1 in a double -- which is why `t/age_standardize.t` checks the primitive
+   itself against R's `pgamma` as well as the interval.
+
+ [The rank test in aov()'s QR was not scale invariant]
+
+ - `apply_householder_aov()` declared a column aliased on the absolute
+   `max_val < 1e-10`, which is not a statement about collinearity but about
+   units. A design whose columns are all smaller than 1e-10 -- a predictor in
+   metres that wanted micrometres, a rate per person-year -- had every column
+   declared aliased at step 0, and `aov` reported zero degrees of freedom and a
+   zero sum of squares for every term on perfectly well-conditioned data:
+   `aov` on `x` gave R's F of 1.9927680012954 and on `x * 1e-12` gave NaN. The
+   test is now relative to each column's own scale, taken before the reduction
+   starts, which is what `sweep_matrix_ols()` has always done for `lm`.
+
+ [strtok() in the formula parsers]
+
+ - `lm_formula_terms()` and `aov` split the right-hand side with `strtok()`,
+   whose position lives in a libc static. On a `-Dusethreads` perl every thread
+   is its own interpreter inside one process and shares that static with all
+   the others, so two threads fitting a model at the same moment could each be
+   handed the other's term list. Replaced by `lm_tok()`, which takes the cursor
+   from the caller and has no state of its own. It is the only routine with
+   hidden state this file used.
+
+ [Five symbols the shared object should not have exported]
+
+ - `approx_pnorm()`, `igamc()`, `get_p_value()` and the `cs_uninit_catcher`
+   XSUB were compiled with external linkage, so the `.so` exported them
+   alongside `boot_Stats__LikeR()`. `igamc` in particular is a name a numerical
+   library might well define too, and the dynamic loader resolves the first
+   definition it sees -- an interposed one would silently replace every
+   chi-square tail this module computes. All four are static now. A fifth,
+   `compare_doubles()`, had had no caller since the `qsort()` comparators were
+   replaced by `LIKER_DEFINE_SORT()`, and is gone.
+
+ - The generated `.c` is also clean under `-Wsign-compare`, which is not in
+   `Makefile.PL`'s flags but is the check the mixed-sign comparisons this
+   file's type rules can introduce would show up in. Seventeen of them were
+   left; all were benign, and all are gone.
+
+ [Smaller: memory and time that was being spent on nothing]
+
+ - `evaluate_term()` `savepv()`d the term string -- a malloc, a strcpy and a
+   free -- for every cell of every design matrix `lm`, `glm`, `aov` and
+   `anova` build, in order that two branches it was not going to take could
+   write NULs into it. A bare column name, which is what nearly every cell
+   asks for, now allocates nothing.
+
+ - `melt()` built the whole long frame as one throwaway record per output row,
+   with a nested arrayref of the id values, before materialising it: a melt of
+   R rows over V value columns held R*V of them alive at once beside the result
+   they were about to become. It emits into the requested shape as the loops
+   go.
+
+ - `table_one()` built its per-group row lists with one `grep` over the whole
+   frame per group -- O(groups x rows), the same shape as the
+   O(levels x groups x rows) counting beside it that 0.315 replaced with a
+   single pass. One bucketing pass now.
+
+ - `csort()`'s AoH -> HoA materialisation walked the sorted rows once per
+   output column, fetching and type-checking each row `nk` times for the n*nk
+   cells it produces. Row-outer now, one fetch per row, columns allocated at
+   their final length and filled through `AvARRAY` as `filter()` and
+   `mg_column()` do.
+
+ - `colnames()`, `_present_keys()` and `_rename_inplace()` flattened a copy of
+   every row reference in the frame (`my @rows = @$df`) to read it once;
+   `assign()`'s HoA row view is filled with one hash slice rather than a keyed
+   store per column.
+
+ [Tests]
+
+ - `t/aov.regressions.t` pins every one of the `aov` items above: the long
+   interaction component and the long formula (the answer must not depend on
+   how long a column's name is), the malformed HoH, the ragged HoA, the
+   determinism of `group.stats` and of `.`, the scale invariance of the rank
+   test, and `I(x-1)`. Against the code these entries replace it fails in
+   thirteen places, and the `ks_test`, `rbinom` and `interpolate` files below
+   hang or exhaust memory on it rather than merely failing.
+
+ - `t/interpolate.spline.banded.t` checks the banded solve against SciPy at
+   200, 2,000 and 20,000 anchors, with the generator committed beside it as
+   `t/interpolate.spline.banded.py`, and interpolates a column of 200,000 --
+   which the dense build cannot allocate.
+
+ - `t/rbinom.dist.t` runs a chi-square goodness-of-fit against the exact
+   binomial CDF over thirteen `(size, prob)` pairs chosen to cross both
+   branches of BTPE and the reflection, plus the moments, the support, the
+   short circuits and reproducibility under `srand`. It deliberately pins no
+   individual variate: pinning one would pin the algorithm rather than the
+   distribution.
+
+ - `t/ks_test.exact.guard.t` pins the one- and two-sample exact p-values
+   against R and asserts that a forced exact run past the cap warns and falls
+   back; `t/value_counts.utf8.t` checks `value_counts` against what a Perl hash
+   makes of the same list, in both directions -- "\x{e9}" and "\xe9" are one
+   value, "\x{263A}" and its three bytes are two; `t/dnorm.nv_width.t` pins
+   `dnorm` against R and asserts the identity `dnorm(x) == exp(-x^2/2) /
+   sqrt(2*pi)` at whatever width the perl running it carries -- which is one
+   assertion that covers every build, since both sides underflow together on a
+   double and neither does on a wider NV. Its R table stops at |x| = 29 on
+   purpose: `perl-5.10.1` reads `2.1200065515246056e-298` as
+   `1.999999999999999e-298` and anything below ~1e-308 as 0, so a table of R's
+   far-tail values would be testing perl's own `atof`.
+
+ - `t/age_standardize.t` gains the gamma quantile at a small tail probability,
+   pinned against R's `qgamma` at four confidence levels, and checks
+   `_pgamma_lower` directly against R's `pgamma` -- `conf.level` cannot reach
+   far enough into the tail on its own to separate it from `1 - _igamc`,
+   because `1 - 2e-17` is already 1 in a double. Where that subtraction starts
+   losing the tail is a build property and the test asks the perl for it
+   rather than assuming a double: its first draft pinned a literal 1e-20 and
+   passed everywhere except `__float128`, where 1e-20 is still fourteen orders
+   of magnitude above the point the subtraction fails at.
+
+ - All of it passes on all seven perls in the local matrix -- 5.10.1, 5.12.5
+   (`long double`), 5.42.3-thr, 5.44.0, 5.44.0+x87, 5.44.0-quadmath
+   (`__float128`) and 5.44.0-i686 (`ivsize=4`) -- 41,166 tests on the wider NV
+   widths and 41,160 on the rest, the difference being the six `dnorm`
+   assertions that only a build whose exponent range reaches past a double's
+   has anything to check. The generated `.c` compiles clean under strict
+   `-std=c99` and under `-Wall -Wextra -Wsign-compare`, on a quadmath CORE as
+   well as a double one.
+
 0.3151 2026-09-05 CDT
 
  [Two leak checks failed on perl 5.10.0, which leaks every `qr//` itself]

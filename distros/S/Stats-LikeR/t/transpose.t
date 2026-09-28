@@ -178,6 +178,96 @@ dies_ok { transpose([[1],[2,3]])          } 'transpose AoA: ragged array (long r
     dies_ok { transpose(\@bad_arr) } 'transpose AoA: missing outer row (physical hole) dies';
 }
 
+# Tied input, and the second read that used to be taken on trust
+
+# A tied array's elements do not exist until FETCH has run, so every read of
+# one is a fresh call that may hand back something different.  Up to 0.317 the
+# AoA branch walked the input twice -- once to validate every row, once per
+# output column to copy it -- and the copying pass dereferenced what the second
+# read returned without re-testing it:
+#
+#   if (elem && *elem) { SvGETMAGIC(*elem); }
+#   AV *in_row_av = (AV *)SvRV(*elem);        // *elem NULL or not a ref here
+#
+# so a FETCH that stopped returning an array ref took SvRV() to the PV's string
+# buffer and the interpreter down with it -- SIGSEGV, which eval does not catch.
+# The single pass validates and copies the same read.
+
+{
+	package TransposeTiedAoA;      # a well-behaved tied array over an arrayref
+	sub TIEARRAY  { my ($class, $data) = @_; return bless { d => $data }, $class }
+	sub FETCHSIZE { return scalar @{ $_[0]{d} } }
+	sub FETCH     { return $_[0]{d}[ $_[1] ] }
+
+	package TransposeTiedOnce;     # rows 0 and 1 only survive the first read
+	sub TIEARRAY  { my $n = 0; return bless \$n, $_[0] }
+	sub FETCHSIZE { return 2 }
+	sub FETCH     { my $s = shift; ${$s}++; return ${$s} <= 2 ? [1, 2] : 'not a ref' }
+
+	package TransposeTiedHoH;      # a tied hash: its keys iterate as SVs, not HEKs
+	sub TIEHASH   { my ($class, $data) = @_;
+	                return bless { d => $data, k => [ sort keys %$data ] }, $class }
+	sub FETCH     { return $_[0]{d}{ $_[1] } }
+	sub FIRSTKEY  { $_[0]{i} = 0; return $_[0]{k}[0] }
+	sub NEXTKEY   { return $_[0]{k}[ ++$_[0]{i} ] }
+	sub EXISTS    { return exists $_[0]{d}{ $_[1] } }
+}
+
+{
+	tie my @outer, 'TransposeTiedAoA', [ [1,2,3], [4,5,6] ];
+	is_deeply( transpose(\@outer), [[1,4],[2,5],[3,6]],
+		'transpose AoA: tied outer array' );
+
+	tie my @row, 'TransposeTiedAoA', [ 7, 8, 9 ];
+	is_deeply( transpose([ \@row, [1,2,3] ]), [[7,1],[8,2],[9,3]],
+		'transpose AoA: tied inner row' );
+
+	tie my @flaky, 'TransposeTiedOnce';
+	dies_ok { transpose(\@flaky) }
+		'transpose AoA: tied row that stops being an array ref dies, not SIGSEGV';
+}
+
+{
+	tie my %hoh, 'TransposeTiedHoH', { a => { x => 1, y => 2 }, b => { x => 3, y => 4 } };
+	is_deeply(
+		transpose(\%hoh),
+		{ x => { a => 1, b => 3 }, y => { a => 2, b => 4 } },
+		'transpose HoH: tied outer hash (keys iterate as SVs)'
+	);
+}
+
+# utf8 keys, as both row and column labels
+
+# The hash branch reads each key straight out of its HEK -- bytes, utf8 flag
+# and hash -- and hands all three to hv_store() rather than building a key SV.
+# A utf8 key that perl can hold as bytes is downgraded on the way in, which
+# changes the hash perl needs, so this is the case that says the handover is
+# right.
+{
+	my $wide  = "\x{263A}";        # 3 utf8 bytes, no byte form
+	my $latin = "\x{e9}";          # utf8 on the way in, downgradeable to one byte
+	is_deeply(
+		transpose({ $wide => { $latin => 1, z => 2 }, b => { $latin => 3, z => 4 } }),
+		{ $latin => { $wide => 1, b => 3 }, z => { $wide => 2, b => 4 } },
+		'transpose HoH: utf8 row and column keys'
+	);
+	my $hoh = { $wide => { $latin => 1 }, $latin => { $wide => 2 } };
+	is_deeply( transpose(transpose($hoh)), $hoh,
+		'transpose HoH: utf8 keys survive a double transpose' );
+}
+
+# A croak part-way through a wide frame
+
+# The output columns are allocated at their final length and filled straight
+# into AvARRAY, so a row that turns out to be ragged throws with most of the
+# result already written.  Nothing written before the croak may leak, and
+# nothing unwritten may be read as a live SV.
+{
+	my @rows = map { [ (1) x 20 ] } 1 .. 50;
+	push @rows, [ (1) x 19 ];                       # the 51st row is one short
+	dies_ok { transpose(\@rows) } 'transpose AoA: ragged row 50 of a 20-wide frame dies';
+}
+
 # Memory leaks
 
 no_leaks_ok {
@@ -214,5 +304,16 @@ no_leaks_ok {
 no_leaks_ok {
 	eval { transpose([[1,2],[3]]) }; $@ = '';
 } 'transpose AoA: no leaks on ragged array' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	my @rows = map { [ (1) x 8 ] } 1 .. 20;
+	push @rows, [ (1) x 7 ];
+	eval { transpose(\@rows) }; $@ = '';
+} 'transpose AoA: no leaks when a wide frame croaks part-filled' unless $INC{'Devel/Cover.pm'};
+
+no_leaks_ok {
+	eval { transpose({ "\x{263A}" => { "\x{e9}" => 1, z => 2 },
+	                   b          => { "\x{e9}" => 3, z => 4 } }) };
+} 'transpose HoH: no leaks with utf8 keys' unless $INC{'Devel/Cover.pm'};
 
 done_testing();

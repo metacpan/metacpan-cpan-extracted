@@ -196,20 +196,29 @@ my ($r_off) = data_rows_of(read_tex($off));
 like($r_on,  qr/\\textbf\{x\}/, 'first cell bolded by default');
 like($r_off, qr/^x & 1/,        'first cell not bolded when disabled');
 
-# Row-name handling: row.names is off unless asked for, longtable included.
+# Row-name handling: a HoH keeps its outer keys unless row.names => 0, longtable
+# included; the keys are the row identifiers and exist nowhere else.
 my %hoh = (
 	r1 => { c1 => 'a', c2 => 'b' },
 	r2 => { c1 => 'c', c2 => 'd' },
 );
+$file = "$dir/rownames.off.tex";
+write_table(\%hoh, $file, 'tex.longtable' => 1, 'row.names' => 0);
+$c = read_tex($file);
+my $h = header_of($c);
+unlike($h, qr/^\\textbf\{\} & /, 'row.names => 0: no empty label cell in the header');
+is(ncols($h), 2, 'row.names => 0: c1 and c2 alone');
+unlike($c, qr/\\textbf\{r1\} & a & b/, 'row.names => 0: the outer key is not emitted as a label');
+
 $file = "$dir/rownames.tex";
 write_table(\%hoh, $file, 'tex.longtable' => 1); # no row.names arg
 $c = read_tex($file);
-my $h = header_of($c);
-unlike($h, qr/^\\textbf\{\} & /, 'no empty label cell in the header by default');
-is(ncols($h), 2, 'c1 and c2 alone');
-unlike($c, qr/\\textbf\{r1\} & a & b/, 'the outer key is not emitted as a label');
+$h = header_of($c);
+like($h, qr/^\\textbf\{\} & /, 'default: header leads with an empty label cell');
+is(ncols($h), 3, 'default: label column plus c1, c2');
+like($c, qr/\\textbf\{r1\} & a & b/, 'default: r1 row carries its (bolded) label');
 
-# ... and row.names => 1 brings the label column back.
+# ... and row.names => 1 is the same thing said explicitly.
 $file = "$dir/rownames.on.tex";
 write_table(\%hoh, $file, 'tex.longtable' => 1, 'row.names' => 1);
 $c = read_tex($file);
@@ -263,6 +272,17 @@ like($c, qr/\\endfirsthead\n\\caption\[\]\{220 \\textDelta\{\}G \(continued\)\}\
 	'continuation caption sits at the top of the \endhead block, unescaped');
 unlike($c, qr/\\endfirsthead\n\\caption[^\n]*\n[^\n]*\\endfirsthead/,
 	'caption is not repeated in the first head');
+
+# A caption outside Latin-1 is still non-numeric. Up to 0.319 the digit check
+# read it with SvPVbyte, which croaked "Wide character" before a byte was
+# written; the caption is passed through as the SV's UTF-8 bytes.
+$file = "$dir/head.caption.wide.tex";
+lives_ok {
+	write_table(\@aoh, $file, 'col.names' => \@order,
+		'tex.longtable.head' => "\x{3b1} (continued)");
+} 'a caption with a wide character does not croak';
+like(read_tex($file), qr/\\caption\[\]\{\xce\xb1 \(continued\)\}\\\\\n/,
+	'wide caption is written as its UTF-8 bytes');
 
 # A true-but-numeric value asks for the machinery with no continuation caption.
 $file = "$dir/head.nocaption.tex";

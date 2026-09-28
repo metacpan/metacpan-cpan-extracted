@@ -11,7 +11,7 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.010',
     EXE_FILES        => ['bin/cloudflare-api'],
     PREREQ_PM        => {
-        'HTTP::API::Core' => '1.01',
+        'HTTP::API::Core' => '1.08',
         'IO::Socket::SSL' => 0,
         'JSON::PP'        => 0,
         'Digest::SHA'     => 0,

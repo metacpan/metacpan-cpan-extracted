@@ -1,11 +1,11 @@
 ---
-abstract: 'Find or build the ngtcp2 QUIC transport library'
+abstract: 'Find or build the native libraries needed for QUIC'
 author:
   - 'Joshua S. Day <haxmeister@hotmail.com>'
 build_requires:
   Alien::Build::MM: '2.84'
+  Alien::cmake3: '0.10'
   Archive::Tar: '0'
-  Config: '0'
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
   IO::Zlib: '0'
@@ -34,7 +34,7 @@ no_index:
 provides:
   Alien::ngtcp2:
     file: lib/Alien/ngtcp2.pm
-    version: '0.01'
+    version: '0.03'
 requires:
   Alien::Base: '2.84'
   Alien::Build: '0.25'
@@ -43,13 +43,13 @@ resources:
   bugtracker: https://github.com/haxmeister/perl-Alien-ngtcp2/issues
   homepage: https://github.com/haxmeister/perl-Alien-ngtcp2
   repository: https://github.com/haxmeister/perl-Alien-ngtcp2.git
-version: '0.01'
+version: '0.03'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:
     share:
+      Alien::cmake3: '0.10'
       Archive::Tar: '0'
-      Config: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'

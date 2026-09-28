@@ -12,15 +12,15 @@ use warnings;
 use Cloudflare::API;
 
 my $api_or=Cloudflare::API->new();
-my $buckets_hr=$api_or->r2()->list_buckets();
+my $buckets_ar=$api_or->r2()->list_buckets();
 my $scripts_ar=$api_or->workers()->list_scripts();
 ```
 
-With `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` set, the client supplies the account path and bearer token. Each JSON method normally gives you Cloudflare's decoded `result`, so the shape of `$buckets_hr` or `$scripts_ar` is the shape returned by that Cloudflare endpoint.
+With `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` set, the client supplies the account path and bearer token. List methods follow Cloudflare's pages and return a flat array reference. Other JSON methods normally return the decoded `result`.
 
 !!! note
 
-    The distribution requires Perl 5.10 or later, `HTTP::API::Core` 1.01 or
+    The distribution requires Perl 5.10 or later, `HTTP::API::Core` 1.08 or
     later, and Perl HTTPS support through `IO::Socket::SSL`. Install it with
     a CPAN client in the usual way.
 
@@ -85,7 +85,7 @@ foreach my $zone_hr (@$zones_ar) {
 }
 ```
 
-zones()-&gt;list() is not account-scoped; kv()-&gt;list_namespaces() is. List methods accept Cloudflare query fields as named arguments. The exact result shape differs by endpoint, so consult the Cloudflare endpoint documentation when reading fields.
+zones()-&gt;list() is not account-scoped; kv()-&gt;list_namespaces() is. List methods accept Cloudflare query fields as named arguments, follow every available page, and return a flat array reference of items.
 
 To create something, pass Cloudflare's JSON request body as a hash reference. Here are two independent examples:
 
@@ -202,19 +202,31 @@ Other Worker methods inspect scripts and versions, manage deployments and secret
 
 # Responses, pagination, and errors {#responses-and-errors}
 
-Cloudflare commonly wraps data in an envelope with `success`, `result`, and sometimes `result_info`. Named JSON methods return only `result` by default. Ask for the full envelope when you need page information or messages:
+Cloudflare JSON responses commonly contain `success`, `result`, and sometimes `result_info`. A list method follows every available page and returns a flat array reference:
 
 ``` perl
-my $page_hr=$api_or->r2()->list_buckets(
-    per_page => 20,
-    full_response => 1
-);
+my $buckets_ar=$api_or->r2()->list_buckets(per_page => 100);
+```
+
+This is convenient for ordinary result sets, but it issues as many requests as necessary and keeps every item in memory. Use the corresponding \_page() method when the result may be large. It returns a lazy `HTTP::API::Core::Pagination` object:
+
+``` perl
+my $page_or=$api_or->r2()->list_buckets_page(per_page => 100);
+while (my $bucket_hr=$page_or->next()) {
+    print $bucket_hr->{'name'}, "\n";
+}
+```
+
+The corresponding \_page_response() method makes exactly one request and returns the complete decoded Cloudflare response hash. Use it when you need `result_info`, page boundaries, or other response fields:
+
+``` perl
+my $page_hr=$api_or->r2()->list_buckets_page_response(per_page => 100);
 my $buckets_ar=$page_hr->{'result'}{'buckets'};
 ```
 
-The envelope shape and pagination fields depend on the endpoint. The command-line client's `--paginate` option can follow numbered or cursor pages for list actions, while Perl callers can use the returned `result_info` to implement the traversal they need.
+The exact response and pagination fields depend on the endpoint. A supplied `page` or `cursor` selects the starting point for a list method or paginator. `full_response` is unavailable for list method families; use \_page_response() instead. The command-line client remains explicitly page-oriented: a list action fetches one page unless `--paginate` is supplied, and paginated output preserves page boundaries.
 
-An HTTP or transport failure is thrown as an `HTTP::API::Core::Error`. A successful HTTP response whose Cloudflare envelope says `success: false` is thrown as `Cloudflare::API::Error`; it retains errors(), messages(), and the underlying response(). For example:
+An HTTP or transport failure is thrown as an `HTTP::API::Core::Error`. A successful HTTP response whose decoded Cloudflare response says `success: false` is thrown as `Cloudflare::API::Error`; it retains errors(), messages(), and the underlying response(). This validation also applies when a paginator fetches a later page. For example:
 
 ``` perl
 my $result_hr=eval { $api_or->r2()->get_bucket('my-app-assets') };
@@ -242,11 +254,11 @@ The named methods cover a useful part of Cloudflare's API, not every endpoint. U
 my $accounts_ar=$api_or->request('GET', '/accounts',
     query => { per_page => 20 }
 );
-my $envelope_hr=$api_or->request_full('GET', '/accounts');
-my $response_or=$api_or->raw_request('GET', '/accounts');
+my $decoded_hr=$api_or->request_full('GET', '/accounts');
+my $response_or=$api_or->response('GET', '/accounts');
 ```
 
-request() unwraps `result`, request_full() keeps the decoded envelope, and raw_request() returns the `HTTP::API::Core::Response` object. Use the raw form for non-JSON content or when you need response details that the JSON helpers do not expose.
+request() unwraps `result`, request_full() keeps the complete decoded Cloudflare response, and response() returns the `HTTP::API::Core::Response` object. Use response() for non-JSON content or when you need response details that the JSON helpers do not expose. raw_request() remains as a compatibility alias for response().
 
 !!! important
 
@@ -284,7 +296,7 @@ cloudflare-api --resource workers --action upload_assets \
 
 Typed positional forms include `--arg-bool`, `--arg-array`, `--arg-hash`, `--arg-json`, and `--arg-json-file`. Named forms include `--param-bool`, `--param-json`, and `--param-json-file`. The JSON file forms are handy for longer bodies; for example, a Worker upload can take its name through `--arg` and prepared `metadata` and `files` through `--param-json-file`.
 
-To read multiple pages, use `--paginate` on a list action. The command returns an array of page results, preserving each page boundary. Without `--max-pages`, it follows every page Cloudflare reports:
+The command deliberately makes one request for a list action unless `--paginate` is supplied. With `--paginate`, it returns an array of page results, preserving each page boundary. Without `--max-pages`, it follows every page Cloudflare reports:
 
 ``` sh
 cloudflare-api --resource kv --action list_namespaces \
@@ -354,7 +366,7 @@ The examples above are a starting point. For the actual method names, arguments,
 
 [`Cloudflare::API::Error`](lib/Cloudflare/API/Error.pm.md)
 
-: The exception raised for a Cloudflare envelope that reports failure despite an HTTP success response.
+: The exception raised when a decoded Cloudflare response reports failure despite an HTTP success response.
 
 For the script's full option reference, run `cloudflare-api --man`. The `--help` form is shorter when you only need to recall an option name.
 

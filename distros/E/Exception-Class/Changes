@@ -1,3 +1,13 @@
+1.46    2026-09-27
+
+- If you use Exception::Class to create a class whose module file is already loaded, it no longer
+  overwrites the %INC entry for that module with the path to Exception/Class.pm. Typically, this
+  happens when you have a package that implements an exception with the same name as the package
+  itself. Implemented by Graham Knop (@haarg). PR #17.
+- Similarly, if a package defines a $VERSION, this is no longer overwritten when the exception class
+  is defined with Exception::Class. Implemented by Graham Knop (@haarg). PR #18.
+
+
 1.45    2021-05-02
 
 - The field names for an exception are now checked to ensure that they are
@@ -427,7 +437,7 @@
 
 0.8     2000-09-03
 
-- changed object from psuedo-hash to regular hash
+- changed object from pseudo-hash to regular hash
 
 - added package, file, & line methods to exception object.
 

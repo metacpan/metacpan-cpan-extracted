@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use utf8;
 use DateTime;
@@ -295,6 +295,10 @@ sub display_occupancy {
 
 sub format_occupancy {
 	my ($stop) = @_;
+
+	if (not $stop) {
+		return q{  };
+	}
 
 	return display_occupancy( $stop->occupancy_first )
 	  . display_occupancy( $stop->occupancy_second );
@@ -615,7 +619,7 @@ B<dbris> [B<-d> I<DD.MM.YYYY>] [B<-a>|B<-t> I<HH:MM>] [...] I<from-stop>
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 DESCRIPTION
 

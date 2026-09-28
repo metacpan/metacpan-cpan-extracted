@@ -2,9 +2,10 @@ package Aion::Annotation;
 
 use common::sense;
 
-our $VERSION = "0.1.0";
+our $VERSION = "0.2.0";
 
 use aliased 'Aion::Annotation::ScannedEvent';
+use aliased 'Aion::Annotation::Reader';
 use Aion::Fs qw/find erase mkpath path mtime from_pkg to_pkg/;
 use POSIX qw/strftime/;
 use Time::Local qw/timelocal/;
@@ -13,23 +14,15 @@ use Aion;
 
 with qw/Aion::Run/;
 
-# Дефолтные пути для сканирования
-use Aion::Env AION_ANNOTATION_LIB => (isa => Str, default => 'lib');
-
-# Директория в которую складывать файлы конфигурации
-use Aion::Env AION_ANNOTATION_INI => (isa => Str, default => 'etc/annotation');
-
-# Директория с кешем
-use Aion::Env AION_ANNOTATION_CACHE => (isa => Str, default => 'var/cache');
 
 # Кодовая база для сканирования в виде строки
-has lib_path => (is => 'ro', isa => Str, arg => '-l', default => AION_ANNOTATION_LIB);
+has lib_path => (is => 'ro', isa => Str, arg => '-l', default => Reader->AION_ANNOTATION_LIB);
 
 # Кодовая база для сканирования
 has lib => (is => 'ro', isa => ArrayRef[Str], default => sub { [split /:/, shift->lib_path] });
 
 # Директория куда сохранять файлы аннотаций
-has ini => (is => 'ro', isa => Str, arg => '-i', default => AION_ANNOTATION_INI);
+has ini => (is => 'ro', isa => Str, arg => '-i', default => Reader->AION_ANNOTATION_INI);
 
 # Просто считать аннотации
 has force => (is => 'ro', isa => Bool, arg => '-f', default => 0);
@@ -47,7 +40,7 @@ has ann => (is => 'ro', isa => HashRef[HashRef[HashRef[ArrayRef[Tuple[Int, Str]]
 		my $annotation_name = path()->{name};
 		open my $f, "<:utf8", $_ or do { warn "$_ not opened: $!"; next };
 		while(<$f>) {
-			warn "$path corrupt on line $.!" unless /^([\w:]+)#(\w*),(\d+)=(.*)$/;
+			warn "$path corrupt on line $.!" unless $_ =~ Reader->LINE_REGEX;
 			push @{$ann{$annotation_name}{$1}{$2}}, [$3, $4];
 		}
 		close $f;
@@ -57,7 +50,7 @@ has ann => (is => 'ro', isa => HashRef[HashRef[HashRef[ArrayRef[Tuple[Int, Str]]
 });
 
 # Путь к файлу с комментариями
-has remark_path => (is => 'ro', isa => Str, default => sub { shift->ini . "/remarks.ini" });
+has remark_path => (is => 'ro', isa => Str, default => sub { shift->ini . "/" . Reader->REMARKS_FILE });
 
 # Комментарии: pkg.sub_or_has_name => [[line, remark]...]
 has remark => (is => 'ro', isa => HashRef[HashRef[Tuple[Int, ArrayRef[Str]]]], default => sub {
@@ -70,7 +63,7 @@ has remark => (is => 'ro', isa => HashRef[HashRef[Tuple[Int, ArrayRef[Str]]]], d
 
 	open my $f, "<:utf8", $remark_path or do { warn "$remark_path not opened: $!"; return \%remark };
 	while(<$f>) {
-		warn "$remark_path corrupt on line $.!" unless /^([\w:]+)#(\w*),(\d+)=(.*)$/;
+		warn "$remark_path corrupt on line $.!" unless $_ =~ Reader->LINE_REGEX;
 		$remark{$1}{$2} = [$3, [map { s/\\(.)/$1/gr } split /\\n/, $4]];
 	}
 	close $f;
@@ -79,7 +72,7 @@ has remark => (is => 'ro', isa => HashRef[HashRef[Tuple[Int, ArrayRef[Str]]]], d
 });
 
 # Путь к файлу с временем последнего доступа к модулям
-has modules_mtime_path => (is => 'ro', isa => Str, default => AION_ANNOTATION_CACHE . "/modules.mtime.ini");
+has modules_mtime_path => (is => 'ro', isa => Str, default => Reader->AION_ANNOTATION_CACHE . "/" . Reader->MODULES_MTIME_FILE);
 
 # Время последнего доступа к модулям: pkg => unixtime
 has modules_mtime => (is => 'ro', isa => HashRef[Int], default => sub {
@@ -93,7 +86,7 @@ has modules_mtime => (is => 'ro', isa => HashRef[Int], default => sub {
 
 	open my $f, "<:utf8", $mtime_path or do { warn "$mtime_path not opened: $!"; return 0 };
 	while(<$f>) {
-		warn "$mtime_path corrupt on line $.!" unless /^(?<module>[\w:]+)=(?<year>\d{4})-(?<mon>\d{2})-(?<mday>\d{2}) (?<hour>\d{2}):(?<min>\d{2}):(?<sec>\d{2})$/;
+		warn "$mtime_path corrupt on line $.!" unless $_ =~ Reader->MTIME_REGEX;
 		$mtime{$+{module}} = timelocal($+{sec}, $+{min}, $+{hour}, $+{mday}, $+{mon} - 1, $+{year});
 	}
 	close $f;
@@ -233,7 +226,7 @@ Aion::Annotation - processes annotations in perl modules
 
 =head1 VERSION
 
-0.1.0
+0.2.0
 
 =head1 SYNOPSIS
 

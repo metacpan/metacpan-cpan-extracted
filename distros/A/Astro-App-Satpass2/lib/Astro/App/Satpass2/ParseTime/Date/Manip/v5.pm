@@ -10,7 +10,7 @@ use parent qw{ Astro::App::Satpass2::ParseTime::Date::Manip };
 
 use Astro::App::Satpass2::Utils qw{ load_package @CARP_NOT };
 
-our $VERSION = '0.058';
+our $VERSION = '0.059';
 
 my $invalid;
 
@@ -26,8 +26,14 @@ BEGIN {
     } or $invalid = ( $@ || 'Unable to load Date::Manip' );
 }
 
-my ( $default_zone ) = eval {
-    grep { m{ \A TZ= }smx } Date_Init()
+# NOTE that on Windows under Perl 5.8.9 using Date::Manip 6.56, the
+# Date_Init() call may not return a 'TZ=' entry, leaving $default_zone
+# undef. I'm hoping this behaves more nicely.
+my $default_zone = sprintf 'TZ=%s', do {
+    local $@ = undef;
+    eval {
+	Date_TimeZone()
+    } || '';
 };
 
 sub delegate {

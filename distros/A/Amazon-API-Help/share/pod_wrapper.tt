@@ -1,0 +1,6 @@
+=pod
+
+=encoding utf8
+
+[% content %]
+=cut

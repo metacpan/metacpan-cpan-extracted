@@ -3,6 +3,7 @@ abstract: 'pasar internals'
 author:
   - 'Lukas Mai <l.mai@web.de>'
 build_requires:
+  File::Temp: '0.05'
   Test2::V0: '0'
 configure_requires:
   ExtUtils::MakeMaker: '7.0'
@@ -23,11 +24,11 @@ no_index:
     - inc
     - xt
 requires:
-  Archive::Asar: '0'
+  Archive::Asar: '0.02'
   Getopt::Long: '0'
   perl: '5.036000'
 resources:
   bugtracker: https://codeberg.org/mauke/App-Pasar/issues
   repository: https://codeberg.org/mauke/App-Pasar.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,5 +1,5 @@
 {
-   "abstract" : "list and extract Electron ASAR (Atom Shell Archive) files",
+   "abstract" : "list/extract/create Electron ASAR (Atom Shell Archive) files",
    "author" : [
       "Lukas Mai <l.mai@web.de>"
    ],
@@ -46,6 +46,7 @@
          },
          "requires" : {
             "Carp" : "0",
+            "Digest::SHA" : "0",
             "Fcntl" : "0",
             "JSON::PP" : "0",
             "constant" : "0",
@@ -69,6 +70,6 @@
          "web" : "https://codeberg.org/mauke/Archive-Asar"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

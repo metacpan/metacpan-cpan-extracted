@@ -56,6 +56,28 @@ sub tmpcsv {
 	ok( scalar( grep { /duplicate column/i } @warnings ),
 		'duplicate column name now emits a warning' )
 		or diag "warnings seen: @warnings";
+	like( $warnings[0], qr/'a' x 2 \(fields 1, 3\)/,
+		'the warning names the repeated column, its count and its fields' );
+}
+
+# The names alone are not enough to act on: a spreadsheet whose first row is a
+# merged banner repeats the *empty* name, which a bare list prints as nothing.
+# Each repeated name therefore carries a count and the 1-based field positions,
+# and the positions are capped at 12 so one such header cannot fill the screen.
+{
+	my $f = tmpcsv(join(',', 'a', ('') x 20, 'a') . "\n" . join(',', 1 .. 22) . "\n");
+	my @warnings;
+	{
+		local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+		read_table($f);
+	}
+	# The blanks are fields 2..21: the leading-blank rename only fires when
+	# field 1 is itself blank, and here it is 'a'.
+	like( $warnings[0], qr/'' x 20 \(fields 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, \.\.\.\)/,
+		'an all-blank banner header is reported by count and position, capped at 12' )
+		or diag "warnings seen: @warnings";
+	like( $warnings[0], qr/'a' x 2 \(fields 1, 22\)/,
+		'every repeated name is listed, not just the first' );
 }
 
 # Bug 3 (Perl): in 'hoh' output, two rows sharing a row.names value silently

@@ -27,7 +27,7 @@ use overload '""' => 'as_string', fallback => 1;
 
 #  Version information
 #
-$VERSION='1.010';
+$VERSION='1.011';
 
 
 #  All done. Positive return
@@ -90,7 +90,7 @@ if (my $error=$@) {
 
 # DESCRIPTION #
 
-`Cloudflare::API` throws this exception when the HTTP request succeeds but the decoded JSON envelope contains `success: false`. HTTP and transport failures instead throw `HTTP::API::Core::Error`. The error object retains the original response and Cloudflare's error and message arrays.
+`Cloudflare::API` throws this exception when the HTTP request succeeds but the decoded Cloudflare JSON response contains `success: false`. HTTP and transport failures instead throw `HTTP::API::Core::Error`. The error object retains the original response and Cloudflare's error and message arrays.
 
 # METHODS #
 
@@ -143,7 +143,7 @@ Cloudflare::API::Error - exception for a failed Cloudflare JSON response
 
 =head1 DESCRIPTION
 
-C<Cloudflare::API> throws this exception when the HTTP request succeeds but the decoded JSON envelope contains C<success: false>. HTTP and transport failures instead throw C<HTTP::API::Core::Error>. The error object retains the original response and Cloudflare's error and message arrays.
+C<Cloudflare::API> throws this exception when the HTTP request succeeds but the decoded Cloudflare JSON response contains C<success: false>. HTTP and transport failures instead throw C<HTTP::API::Core::Error>. The error object retains the original response and Cloudflare's error and message arrays.
 
 
 =head1 METHODS

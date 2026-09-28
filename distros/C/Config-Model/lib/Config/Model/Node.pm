@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.166;
+package Config::Model::Node 2.167;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
@@ -834,7 +834,6 @@ sub reset_accepted_element_model {
     my ( $self, $element_name, $accept_model ) = @_;
 
     my $model = dclone $accept_model ;
-    delete $model->{name_match};
     my $accept_after = delete $model->{accept_after};
 
     foreach my $info_to_move (qw/description summary/) {
@@ -1185,7 +1184,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.166
+version 2.167
 
 =head1 SYNOPSIS
 
@@ -1198,20 +1197,27 @@ version 2.166
     class_description => "OneConfigClass detailed description",
 
     element => [ # use array ref to keep element ordering
-        X => {
-            type       => 'leaf',
-            value_type => 'enum',
-            choice     => [qw/Av Bv Cv/]
-            status     => 'deprecated',
-            description => 'A description (can be long)',
-            summary     => 'A summary',
-        },
-        Y => '*X', # same properties as X element
-        Z => '*X', # same properties as X element
+      {
+        name => 'X',
+        type => 'leaf',
+        value_type => 'enum',
+        choice     => [qw/Av Bv Cv/],
+        description => 'A description (can be long)',
+        summary => 'A summary',
+      },
+      {
+        name => 'Y',
+        alias => 'X', # same properties as X element
+      },
+      {
+        name => 'Z',
+        alias => 'X', # same properties as X element
+      }
     ],
 
     accept => [
-        'ip.*' => {
+        {
+            pattern    => 'ip.*',
             type       => 'leaf',
             value_type => 'uniline',
             summary    => 'ip address',
@@ -1311,6 +1317,12 @@ Mandatory C<array ref> of elements of the configuration class :
                bar => { type = 'leaf', ... }
              ]
 
+This can also be declared with C<name> attributes:
+
+  element => [ { name => 'foo', type = 'leaf', ... },
+               { name => 'bar', type = 'leaf', ... }
+             ]
+
 See below for details on element declaration.
 
 =item B<gist>
@@ -1345,15 +1357,17 @@ snippet for the unknown element.
 Example:
 
  accept => [
-    'list.*' => {
-        type  => 'list',
+    {
+        pattern => 'list.*',
+        type => 'list',
         cargo => {
             type       => 'leaf',
             value_type => 'string',
         },
     },
-    'str.*' => {
-        type       => 'leaf',
+    {
+        pattern => 'str.*',
+        type => 'leaf',
         value_type => 'uniline'
     },
   ]
@@ -1370,15 +1384,14 @@ a more usable user interface.
 Example:
 
  element => [
-    'Bug' => { type => 'leaf', value_type => 'uniline' } ,
+    { name => 'Bug', type => 'leaf', value_type => 'uniline' } ,
  ]
- accept => [
-    'Bug-.*' =>  {
-         value_type => 'uniline',
-         type => 'leaf'
-         accept_after => 'Bug' ,
-    }
- ]
+ accept => [{
+     pattern => 'Bug-.*',
+     type => 'leaf'
+     value_type => 'uniline',
+     accept_after => 'Bug' ,
+ }]
 
 The model snippet above ensures that C<Bug-Debian> is shown right after C<bug>.
 
@@ -1394,7 +1407,7 @@ Each element is declared with an array ref that contains all necessary
 information:
 
   element => [
-               foo => { ... }
+               { name => 'foo', ... }
              ]
 
 This most important information from this hash ref is the mandatory
@@ -1486,16 +1499,14 @@ generating user interfaces.
 When declaring a C<node> element, you must also provide a
 C<config_class_name> parameter. For instance:
 
- $model ->create_config_class
-   (
+ $model ->create_config_class (
    name => "ClassWithOneNode",
-   element => [
-                the_node => {
-                              type => 'node',
-                              config_class_name => 'AnotherClass',
-                            },
-              ]
-   ) ;
+   element => [{
+       name => 'the_node',
+       type => 'node',
+       config_class_name => 'AnotherClass',
+   }]
+ ) ;
 
 =head2 Leaf element
 
@@ -1530,12 +1541,19 @@ Element names can be aliases to save typing:
     bar => '*foo'
   ]
 
+or
+
+  element => [
+    { name => 'foo', type = 'leaf', ... },
+    { name => 'bar', alias => 'foo' },
+  ]
+
 Since each element probably have different purpose, their description
 can be declared outside of the element list using aliases:
 
   element => [
     foo => { type = 'leaf', ... },
-    bar => '*foo',
+    bar => { alias => 'foo' },
   ],
   description => {
     foo => 'foo description'
@@ -1548,8 +1566,8 @@ C<status> and C<level> can be factorized using a different mechanism:
 
   element => [
     foo => { type = 'leaf', ... },
-    bar => '*foo',
-    baz => '*foo',
+    bar => { alias => 'foo' },
+    baz => { alias => 'foo' },
   ],
 
   status => { deprecated => ['bar']}

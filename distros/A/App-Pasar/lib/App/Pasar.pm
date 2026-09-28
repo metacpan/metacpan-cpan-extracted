@@ -1,7 +1,12 @@
 use v5.36;
-package App::Pasar 0.01;
-use Archive::Asar ();
+package App::Pasar 0.02;
+use Archive::Asar 0.02 ();
 use Getopt::Long qw(GetOptionsFromArray :config gnu_getopt);
+
+sub version() {
+    say "pasar (" . __PACKAGE__ . ") " . __PACKAGE__->VERSION;
+    exit;
+}
 
 sub usage($err) {
     print { $err ? \*STDERR : \*STDOUT } <<~"_EOT_";
@@ -14,6 +19,7 @@ sub usage($err) {
                                   instead; if DIR is the empty string, "unpacked"
                                   files are skipped instead
           -h, --help              display this help and exit
+              --version           output version information and exit
 
         Either -l/--list or -x/--extract must be given.
         _EOT_
@@ -62,21 +68,39 @@ sub list($asar) {
 sub main(@args) {
     GetOptionsFromArray(
         \@args,
+        'create|c'     => \my $opt_create,
         'list|l'       => \my $opt_list,
         'extract|x'    => \my $opt_extract,
         'unpacked|u=s' => \my $opt_unpacked,
         'help|h'       => sub (@) { usage 0 },
+        'version'      => sub (@) { version },
     ) or usage 1;
-    $opt_list || $opt_extract or die "$0: either --list or --extract must be given\n";
+    $opt_create || $opt_list || $opt_extract
+        or die "$0: either --create, --list, or --extract must be given\n";
 
-    @args or die "$0: no input file\n";
+    @args or die "$0: no archive name\n";
     my $asarfile = shift @args;
 
-    my $asar = Archive::Asar->new_from_file($asarfile);
+    my $asar;
+    if ($opt_create) {
+        $asar = Archive::Asar->new_empty($asarfile);
+        for my $arg (@args) {
+            my @path = grep $_ ne '.', split m{[/\\]+}, $arg, -1;
+            if (grep $_ eq '..', @path) {
+                die "$0: can't embed paths containing '..': $arg\n";
+            }
+            $asar->ingest(\@path, $arg);
+        }
+        $asar->write_to_file($asarfile);
+    }
 
-    print list($asar) if $opt_list;
+    if ($opt_list) {
+        $asar //= Archive::Asar->new_from_file($asarfile);
+        print list($asar);
+    }
 
     if ($opt_extract) {
+        $asar //= Archive::Asar->new_from_file($asarfile);
         my $outdir = @args ? shift @args : '.';
         my %opts;
         if (defined $opt_unpacked) {
@@ -105,47 +129,6 @@ No user serviceable parts inside.
 =head1 SEE ALSO
 
 L<pasar(1)>, L<Archive::Asar>
-
-=begin :README
-
-=head1 INSTALLATION
-
-To install this script, run the following commands:
-
-=for highlighter language=sh
-
-    perl Makefile.PL
-    make
-    make test
-    make install
-
-=head1 SUPPORT AND DOCUMENTATION
-
-After installing, you can find documentation for this script with the
-perldoc command.
-
-    perldoc pasar
-
-You can also look for information at:
-
-=over
-
-=item *
-
-MetaCPAN: L<https://metacpan.org/pod/pasar>
-
-=item *
-
-The source repository on Codeberg:
-L<https://codeberg.org/mauke/App-Pasar>
-
-=item *
-
-The script's bug tracker: L<https://codeberg.org/mauke/App-Pasar/issues>
-
-=back
-
-=end :README
 
 =head1 AUTHOR
 

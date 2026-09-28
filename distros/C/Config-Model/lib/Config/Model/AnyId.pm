@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.166;
+package Config::Model::AnyId 2.167;
 
 use 5.020;
 
@@ -290,6 +290,8 @@ sub create_default_with_init {
     my $idx = shift;
 
     return unless defined $self->{default_with_init};
+
+    say "default_with_init will soon be deprecated. Please use a add_content_check methods instead.";
 
     my $h = $self->{default_with_init};
     foreach my $def_key ( keys %$h ) {
@@ -951,6 +953,15 @@ sub auto_vivify {
         $el_class = $class;
     }
 
+    foreach my $parm (qw/default upstream_default/) {
+        if ($cargo_args{$parm}) {
+            my $type = $self->get_type;
+            Config::Model::Exception::Model->throw(
+                object  => $self,
+                message => "Setting $parm value in a $type does not make sense."
+            );
+        }
+    }
 
     my @common_args = (
         element_name => $self->{element_name},
@@ -1079,7 +1090,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.166
+version 2.167
 
 =head1 SYNOPSIS
 
@@ -1232,9 +1243,13 @@ valid when C<cargo> C<type> is C<node>.
 
 =item <other>
 
-Constructor arguments passed to the cargo object. See
-L<Config::Model::Node> when C<< cargo->type >> is C<node>. See
-L<Config::Model::Value> when C<< cargo->type >> is C<leaf>.
+Constructor arguments (except C<default> and C<upstream_default>) are
+passed to the cargo object. See L<Config::Model::Node> when C<<
+cargo->type >> is C<node>. See L<Config::Model::Value> when C<<
+cargo->type >> is C<leaf>.
+
+Default parameters are forbidden because they don't make sence: who
+needs a list of identical values ?
 
 =back
 

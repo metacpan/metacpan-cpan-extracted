@@ -18,7 +18,7 @@ if (my $error=$@) {
 
 # DESCRIPTION #
 
-`Cloudflare::API` throws this exception when the HTTP request succeeds but the decoded JSON envelope contains `success: false`. HTTP and transport failures instead throw `HTTP::API::Core::Error`. The error object retains the original response and Cloudflare's error and message arrays.
+`Cloudflare::API` throws this exception when the HTTP request succeeds but the decoded Cloudflare JSON response contains `success: false`. HTTP and transport failures instead throw `HTTP::API::Core::Error`. The error object retains the original response and Cloudflare's error and message arrays.
 
 # METHODS #
 

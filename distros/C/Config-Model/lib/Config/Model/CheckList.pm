@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::CheckList 2.166;
+package Config::Model::CheckList 2.167;
 
 use Mouse;
 use 5.020;
@@ -839,7 +839,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.166
+version 2.167
 
 =head1 SYNOPSIS
 

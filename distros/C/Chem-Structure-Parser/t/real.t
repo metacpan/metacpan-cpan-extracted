@@ -221,7 +221,7 @@ ok(@over <= $chains_with_seqres / 20,
 	# atom's accessible sphere can be larger than this whatever it is made of
 	my $cap = 4 * atan2(1, 0) * 2 * (3.48 + 1.4) ** 2;
 	my ($n_ring_pairs, $checked_features, $n_puckers, $n_pairs) = (0, 0, 0, 0);
-	my $n_stacks = 0;
+	my ($n_stacks, $n_interfaces) = (0, 0);
 	for my $file (@some) {
 		my $name = (split m{/}, $file)[-1];
 		my $info = structure_info($file);
@@ -405,6 +405,35 @@ ok(@over <= $chains_with_seqres / 20,
 				"$where: inside its plane angle range")
 				if $s->{plane_angle} < $lo - 1e-9 || $s->{plane_angle} > $hi + 1e-9;
 		}
+
+		# The interface, where the entry has two partners.  What is checked is
+		# what the file itself settles: every contact joins the two named
+		# partners, the areas add up, and the complex's surface started from the
+		# whole structure's is the one computed from nothing -- which is the
+		# argument at the head of iface_compute(), tested on entries whose
+		# waters touch most of the surface.  Whether the contacts are the right
+		# ones is t/interface.t's question, and it asks PRODIGY.
+		if (my $x = $f->{interface}) {
+			$n_interfaces++;
+			my %side;
+			for my $i (0, 1) {
+				for my $p (@{ $x->{partners}[$i] }) {
+					if ($info->{chains}{$p}) { $side{$p} = $i }
+					else { $side{ (split /_/, $p)[-2] } //= $i }
+				}
+			}
+			my @stray = grep { !defined $side{ $_->{chain1} } || !defined $side{ $_->{chain2} } }
+			            @{ $x->{contacts} };
+			is(scalar @stray, 0, "$name: every interface contact joins the two partners")
+				if @stray;
+			my $b = $x->{buried};
+			cmp_ok(abs($b->{total} - $b->{side}[0] - $b->{side}[1]), '<', 1e-6 * (1 + $b->{total}),
+				"$name: the two sides bury the interface between them")
+				if abs($b->{total} - $b->{side}[0] - $b->{side}[1]) >= 1e-6 * (1 + $b->{total});
+			my $alone = structure_interface($info, partners => $x->{partners});
+			is_deeply($alone->{residues}, $x->{residues},
+				"$name: the interface computed alone has the same surfaces, to the bit");
+		}
 	}
 	# --- the disulfides the coordinates show, against the ones the file
 	#     declares in its SSBOND records ---------------------------------------
@@ -473,7 +502,8 @@ ok(@over <= $chains_with_seqres / 20,
 	ok($checked_features > 0, 'the physical properties were computed on real structures');
 	diag("computed the properties of $checked_features structures, "
 	   . "$n_ring_pairs stacked ring pairs, $n_puckers sugar puckers, "
-	   . "$n_pairs base pairs and $n_stacks base stacks between them");
+	   . "$n_pairs base pairs and $n_stacks base stacks between them, "
+	   . "and $n_interfaces interfaces");
 }
 
 diag("checked $checked structures");

@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion::Annotation
 
+0.2.0 2026-09-28T07:33:26Z
+
+    - added annotation, remarks and mtime reader
+
 0.1.0 2026-07-15T15:33:18Z
 
     - use Aion::Env without config

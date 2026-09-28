@@ -46,6 +46,30 @@ no warnings qw/experimental::signatures/;
 
 use Config::Model;
 
+sub sort_element_array ($config_model, $model_data) {
+    # TODO: remove in 2029
+    $model_data = $config_model->translate_packed_element_into_alias(
+        "unknown", $model_data, 'name'
+    );
+
+    my $new = [];
+    my $name; # to convert [ A => info ] in [ { name => A, info }]
+    foreach my $info ($model_data->@*) {
+        if (ref $info) {
+            $info->{name} = $name if $name;
+            push $new->@*, $info;
+        }
+        elsif ($info =~ /^\*([\w-]+)/) {
+            # convert star alias in plain alias
+            push $new->@*, { name => $name, alias => $1};
+        }
+        else {
+            $name = $info;
+        }
+    }
+    return $new;
+}
+
 my $info = join('',<>);
 # $info is " keyword => <perl data structure>"
 # or " keyword, <perl data>"
@@ -56,12 +80,16 @@ my ($indent) = ($info =~ m/^(\s*)/);
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 my $old_data = eval ("{ $info }");
 
+if ($@) {
+    die "perl code eval failed: $@";
+}
+
 my $model = Config::Model->new(log_level => 'ERROR');
 
 foreach my $key (sort keys $old_data->%*) {
     my $to_translate = $old_data->{$key};
     if ($key eq 'element' and ref($to_translate) eq 'ARRAY') {
-        $model->translate_legacy_element_info('Dontcare', $to_translate, 'dontcare');
+        $old_data->{$key} = sort_element_array($model, $to_translate);
     }
     elsif ($key eq 'warp' and ref($to_translate) eq 'HASH' and defined $to_translate->{follow}) {
         # translate old warp follow and rules
@@ -77,6 +105,9 @@ foreach my $key (sort keys $old_data->%*) {
             'Dontcare', $to_translate, 'dontcare'
            );
     }
+    elsif ($key eq 'accept') {
+        $old_data->{$key} = $model->translate_legacy_accept_info('Dontcare', $old_data->{$key});
+    }
     else {
         die "Cannot translate '$key' key with ", ref($to_translate), " data\n";
     }
@@ -87,6 +118,7 @@ $Data::Dumper::Terse=1;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Quotekeys = 0;
 $Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Trailingcomma = 1;
 my @new_str = map {length($_) > 2 ? substr $_,2 : $_;  }
     split /\n/, Data::Dumper->Dump([$old_data],['new_info']);
 

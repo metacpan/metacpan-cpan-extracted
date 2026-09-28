@@ -115,9 +115,9 @@ sub pair_key {
 #
 # Two tolerances, and they are different in kind.
 #
-# Against the float64 column -- mdtraj's own loop with the dtype changed -- the
-# answers are the same calculation and agree to the last digit the generator
-# prints.  The observed largest disagreement over every atom and residue of
+# Against the float64 column -- mdtraj's own loop in float64, coordinates and
+# all -- the answers are the same calculation and agree to the last digit the
+# generator prints.  The observed largest disagreement over every atom and residue of
 # every structure in t/data is 4e-9 A^2 absolute, which is the 1e-9 the
 # generator rounds to; 1e-7 leaves two orders of magnitude of headroom on that
 # and would still catch a single sphere point, the smallest real difference
@@ -155,6 +155,14 @@ sub compare {
 			my ($ri, $name) = split /\|/, $w[1], 2;
 			my ($a32, $a64, $pt) = @w[2, 3, 4];
 			my $atom = $res->[$ri] ? $res->[$ri]{atoms}{$name} : undef;
+			# mdtraj renames a protein residue's amide hydrogen to H from any of
+			# the spellings mdtraj/formats/pdb/data/pdbNames.xml lists for it --
+			# an N-terminal H1, as iface.pdb writes it, among them -- and its
+			# mmCIF reader does so with no way to turn it off; this module keeps
+			# the name the file wrote
+			if (!$atom && $name eq 'H' && $res->[$ri]) {
+				($atom) = grep { defined } map { $res->[$ri]{atoms}{$_} } qw(HN H1 1H HN1 HT1);
+			}
 			unless ($atom && defined $atom->{sasa}) {
 				fail("$file: atom $w[1] is in mdtraj's answer and not in this one");
 				next;

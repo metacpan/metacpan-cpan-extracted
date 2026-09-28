@@ -500,8 +500,15 @@ sub normalise_ws_cols {
     my $ws = $paper_ws{$focused_ws};
     my $floating_focus;
     my $old_cols = $ws->{cols};
-    my $old_i = shift // focused_col_idx($ws);
+    my $old_i = focused_col_idx($ws);
     my $old_wide = $ws->{focused_col} && widep($ws->{focused_col});
+    # Caller can skip the pull side heuristic by passing us a value for
+    # $want_l.  We override that heuristic ourselves in the case that a wide
+    # column moved or closed; then we want to pull from the left a number of
+    # columns equal to the index the wide column had before it was toggled
+    # wide, in order that closing or moving behaves the same as untoggling it
+    # wide and then closing or moving it.
+    my $want_l = shift // ($old_wide ? $col_wide{$ws->{focused_col}} : undef);
     for_each_node {
 	my $node = shift;
 	if (($node->{type} // die) eq "output") {
@@ -522,9 +529,6 @@ sub normalise_ws_cols {
     my $i = focused_col_idx($ws);
 
     my @cmds;
-    my $avail_l = avail_from($ws->{off_left});
-
-    $i = $old_i = 0+!!$avail_l if $old_wide && $empty;
 
     if ($ws->{focused_col} && $col_rows{$ws->{focused_col}}
 	&& $col_rows{$ws->{focused_col}} == 1) {
@@ -567,15 +571,14 @@ sub normalise_ws_cols {
 	push $ws->{off_right}->@*, @to_right;
     }
 
-    $avail_l = avail_from($ws->{off_left});
+    my $avail_l = avail_from($ws->{off_left});
     my $avail_r = avail_from($ws->{off_right});
 
     if (($empty || !widep($ws->{focused_col}) && $ws->ncols > @$cols)
 	&& ($avail_l || $avail_r)) {
 	# Pull columns in if there are too few columns but some available.
-	# Want the focused column, after pulls, to be the $old_i'th.
-	my ($from_l, $from_r);
 	my $want = $ws->ncols - @$cols;
+	$want_l = min $want_l, $want if $want_l;
 	# When we lose columns, the focused column's index either moves left
 	# or stays the same.  So always $old_i >= $i.
 	# (... unless the focused column was one of the ones that closed!
@@ -586,60 +589,67 @@ sub normalise_ws_cols {
 	#  important.)
 	if ($old_i > $i) {
 	    if ($old_i == $#$old_cols) {
-		# We were in the final column.  Either we closed the
-		# rightmost column, or we lost arbitrary columns from the
-		# left (e.g. last column toggled to wide).
+		# We were in the final column.  Either we closed the rightmost
+		# column, or we lost arbitrary columns from the left.
 		# In either case it is fine to pull more from the left.
-		$from_l = min abs($avail_l), $want;
+		$want_l //= $want;
 	    } else {
 		# We have $i < $old_i < $#$old_cols.
 		# We must have lost at least $old_i-$i from the left.
-		$from_l = min abs($avail_l), $old_i-$i;
+		$want_l //= $old_i-$i;
 	    }
 	} else {		# $old_i == $i.
 	    if ($old_i == 0) {
 		# We were in the first column.  Either we closed the leftmost
-		# column, or we lost arbitrary columns from the right
-		# (e.g. first column toggled to wide).  We prefer to pull from
-		# the left in the former case.  If we are indeed unwidening,
-		# we must pull more from the right.
+		# column, or we lost arbitrary columns from the right.
+		# We prefer to pull from the left in the former case.
 		if (@$old_cols == 1) {
-		    $from_r = min abs($avail_r), $want;
+		    $want_l //= 0;
 		} else {
-		    $from_l = !!$avail_l;
+		    $want_l //= 1;
 		}
 	    } else {
 		# It must be that we lost columns from the right.
-		$from_r = min abs($avail_r), $want;
+		$want_l //= 0;
 	    }
 	}
-	debugsay "want to pull %d from left", $from_l if defined $from_l;
-	debugsay "want to pull %d from right", $from_r if defined $from_r;
+	debugsay "want to pull %d from left", $want_l;
 
 	# We can only pull a wide column if the workspace is currently empty,
 	# and in case we do pull one we must not pull anything else.
-	if ($avail_l == -1) {
-	    if (@$cols || $from_r) {
-		$from_l = 0;
-	    } elsif ($from_l) {
-		$from_r = 0;
+	my ($from_l, $from_r);
+	if ($empty && $avail_l == -1 && ($want_l || !$avail_r)) {
+	    ($from_l, $from_r) = (1, 0);
+	} elsif ($empty && $avail_r == -1 && (!$want_l || !$avail_l)) {
+	    ($from_l, $from_r) = (0, 1);
+	} else {
+	    if ($avail_l == -1) {
+		($avail_l, $from_l) = (0, 0);
+	    } else {
+		$from_l = min $avail_l, $want_l;
+		$avail_l -= $from_l;
+		$want -= $from_l;
 	    }
-	}
-	if ($avail_r == -1) {
-	    if (@$cols || $from_l) {
-		$from_r = 0;
-	    } elsif ($from_r) {
-		$from_l = 0;
+	    if ($avail_r == -1) {
+		($avail_r, $from_r) = (0, 0);
+	    } else {
+		$from_r = min $avail_r, $want;
+		$avail_r -= $from_r;
+		$want -= $from_r;
 	    }
+	    # Top up.
+	    $from_l += min $avail_l, $want if $want;
 	}
+	debugsay "will pull %d from left", $from_l;
+	debugsay "will pull %d from right", $from_r;
 
 	my $j = $i;
-	if ($from_l //= min abs($avail_l), $want-$from_r) {
+	if ($from_l) {
 	    push @cmds, ("focus left")x(@$cols > 1 && $j),
 	      n_from_l($ws, $from_l);
 	    $j = 0;
 	}
-	if ($from_r //= min abs($avail_r), $want-$from_l) {
+	if ($from_r) {
 	    push @cmds, ("focus right")x(@$cols > 1 && $#$cols-$j),
 	      n_from_r($ws, $from_r);
 	    $j = $#$cols;
@@ -681,7 +691,7 @@ sub normalise_ws_cols {
 {
     # Simple class to batch up commands before sending them.
     package App::papersway::cmds;
-$App::papersway::cmds::VERSION = '3.001';
+$App::papersway::cmds::VERSION = '3.002';
 sub new {
 	bless { cmds => [], need_ignore => 0, need_signal => 0 } => shift
     };
@@ -972,9 +982,9 @@ sub process_msg {
 
 		$cmds->cmd_ign(@cmds);
 		normalise_ws_cols();
-	    } elsif ($i == $#$cols && $dir < 0
+	    } elsif ($i == $#$cols && $dir < 0 && @$cols > 1
 		     || $#$cols > $i > 0
-		     || $i == 0 && $dir > 0) {
+		     || $i == 0 && $dir > 0 && @$cols > 1) {
 		push @cmds, "focus tiling";
 		push @cmds, $dir > 0
 		  ? ("focus right", "splitv", "focus left")
@@ -983,11 +993,7 @@ sub process_msg {
 		push @cmds, $dir > 0 ? "move right" : "move left";
 
 		$cmds->cmd_ign(@cmds);
-		normalise_ws_cols(
-		       avail_from($ws->{off_left}) > 0 && $dir > 0
-		    || avail_from($ws->{off_right}) > 0 && $dir < 0
-		    ? min($#$cols, max 0, $i+$dir) : $i
-		   );
+		normalise_ws_cols($dir > 0 ? 1 : 0);
 	    }
 	    if (@cmds) {
 		$ws->{last_dir} = $dir;
@@ -1009,7 +1015,7 @@ sub process_msg {
 	if ($move && @$cols == 1
 	    && ($ws->{off_left}->@* || $ws->{off_right}->@*)) {
 	    $cmds->cmd_ign(hide_con($orig_focused));
-	    normalise_ws_cols($col_wide{$orig_focused});
+	    normalise_ws_cols();
 	}
 
 	my @keys = grep $paper_ws{$_}{output} eq $ws->{output},
@@ -1058,7 +1064,7 @@ sub fresh_workspace {
 	# We'd resurrect it, but it's better to avoid that.
 	if ($do_early_hide) {
 	    $cmds->cmd_ign(hide_con($to_send));
-	    normalise_ws_cols($col_wide{$to_send});
+	    normalise_ws_cols();
 	}
 
 	# We want to ensure that the fresh workspace is the one that C-i ;
@@ -1307,7 +1313,7 @@ sub show_con {
 {
     # Class representing entries in %paper_ws.
     package App::papersway::paper_ws;
-$App::papersway::paper_ws::VERSION = '3.001';
+$App::papersway::paper_ws::VERSION = '3.002';
     # We can't always populate this value when a workspace is initialised
     # because we might not know the output's width yet.  This happens when
     # initialising a new workspace on a newly enabled output.
@@ -1362,7 +1368,7 @@ papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 3.001
+version 3.002
 
 =head1 SYNOPSIS
 

@@ -14,7 +14,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Games-Cards-Troika-Util",
   "EXE_FILES" => [
-    "script/troika-list-cards"
+    "script/troika-list-cards",
+    "script/troika-list-cards-shuffled"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -22,9 +23,11 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Sah::Compiler::perl::TH::bool" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
+    "List::Util" => "1.54",
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
+    "Perinci::Sub::Util" => "0.472",
     "TableData::Games::Cards::Troika" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -35,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,9 +51,11 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => "1.54",
   "Log::ger" => "0.038",
   "Perinci::CmdLine::Any" => "0.154",
   "Perinci::CmdLine::Lite" => "1.924",
+  "Perinci::Sub::Util" => "0.472",
   "TableData::Games::Cards::Troika" => 0,
   "Test::More" => 0,
   "strict" => 0,

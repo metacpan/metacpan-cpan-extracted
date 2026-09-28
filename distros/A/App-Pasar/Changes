@@ -1,2 +1,6 @@
+0.02  2026-09-28
+    - add --create mode
+    - add --version
+
 0.01  2026-09-17
     - initial release

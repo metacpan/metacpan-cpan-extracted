@@ -17,12 +17,14 @@ Account lookups use the token configured on `Cloudflare::API`. They do not requi
 
 # METHODS #
 
-* **list(%query)** — List visible accounts. Named arguments become Cloudflare query parameters. Returns the decoded `result`; use `full_response => 1` to retain the envelope and pagination `result_info`.
-* **get($account_id, %options)** — Retrieve one account by ID. Returns the decoded account `result`. The ID is percent-encoded as a path component; `full_response => 1` returns the envelope.
+* **list(%query)** — List every visible account. Named arguments become Cloudflare query parameters. The method follows all pages and returns one flat array reference; a large account set can require many requests and substantial memory.
+* **list_page(%query)** — Return a lazy `HTTP::API::Core::Pagination` object for the account list. Use `next()` to consume one account at a time or `all()` to collect the remaining accounts.
+* **list_page_response(%query)** — Make one list request and return the complete decoded Cloudflare response hash, including `result_info` when Cloudflare supplies it.
+* **get($account_id, %options)** — Retrieve one account by ID. Returns the decoded account `result`. The ID is percent-encoded as a path component; `full_response => 1` returns the complete decoded Cloudflare response.
 
 # ERRORS #
 
-See `Cloudflare::API` for HTTP, transport, Cloudflare envelope, and invalid path-component exceptions.
+See `Cloudflare::API` for HTTP, transport, Cloudflare response, and invalid path-component exceptions.
 
 # SEE ALSO #
 

@@ -23,7 +23,7 @@ use XML::Simple; ## no critic (DiscouragedModules)
 
 use parent qw(Exporter Class::Accessor::Fast);
 
-our $VERSION = '2.1.1'; ## no critic (RequireInterpolation)
+our $VERSION = '2.1.2'; ## no critic (RequireInterpolation)
 
 __PACKAGE__->mk_accessors(
   qw(

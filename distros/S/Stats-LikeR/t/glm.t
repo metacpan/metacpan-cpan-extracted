@@ -316,4 +316,71 @@ no_leaks_ok {
 	}
 }
 
+# An infinite value is not missing, so it reaches the fit, where R stops in
+# Cdqrls() -- R 4.6.1 src/library/stats/src/lm.c: error(_("NA/NaN/Inf in '%s'"),
+# "y") (or "x").  Up to 0.318 glm() fitted it and returned NaN for everything.
+{
+	my @x = (1 .. 8);
+	eval { glm(formula => 'y ~ x', data => { y => [1, 2, 3, 4, 'Inf', 6, 7, 8], x => \@x }) };
+	like($@, qr/NA\/NaN\/Inf in 'y'/, 'glm: an infinite response croaks, as in R');
+	eval { glm(formula => 'y ~ x', data => { y => \@x, x => [1, 2, 3, '-Inf', 5, 6, 7, 8] }) };
+	like($@, qr/NA\/NaN\/Inf in 'x'/, 'glm: an infinite covariate croaks, as in R');
+	eval { glm(formula => 'y ~ x', data => { y => \@x, x => \@x, o => [0, 0, 'Inf', 0, 0, 0, 0, 0] },
+	           offset => 'o') };
+	like($@, qr/NA\/NaN\/Inf in 'offset'/, 'glm: an infinite offset croaks');
+	eval { glm(formula => 'y ~ x', data => { y => \@x, x => \@x, w => [1, 1, 'Inf', 1, 1, 1, 1, 1] },
+	           weights => 'w') };
+	like($@, qr/NA\/NaN\/Inf in 'weights'/, 'glm: an infinite weight croaks');
+}
+
+# A zero-weight row says nothing about its group's absorbed effect.  Group a
+# below has zero counts on its two weighted rows and a count of 5 only on a
+# zero-weight one, so its effect is at minus infinity and it has to be removed
+# like any all-zero group -- which makes the fit the one without group a at
+# all.  Counting the zero-weight 5 kept the group in, and the fit crawled 17
+# iterations towards the boundary instead.
+{
+	my %d = (y  => [0, 0, 5, 1, 2, 3, 2, 4, 1, 3, 1, 2],
+	         x  => [1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 3, 2],
+	         id => [qw(a a a b b b c c c d d d)],
+	         w  => [1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+	my %e = map { $_ => [ @{ $d{$_} }[3 .. 11] ] } keys %d;
+	my $f = glm(formula => 'y ~ x | id', data => \%d, family => 'poisson', weights => 'w');
+	my $g = glm(formula => 'y ~ x | id', data => \%e, family => 'poisson', weights => 'w');
+	is($f->{'fe.removed'}, 3, 'glm absorb: a group whose weighted rows are all zero is removed');
+	is_deeply($f->{absorb}, { id => 3 }, 'glm absorb: three groups are kept');
+	# the same fit on the same rows, so only rounding separates them
+	cmp_ok(abs($f->{coefficients}{x} - $g->{coefficients}{x}), '<', 1e-12,
+		'glm absorb: removing the group matches leaving it out of the data');
+	is($f->{iter}, $g->{iter}, 'glm absorb: and takes the same iterations');
+}
+
+# Negative-binomial log-likelihood at large counts.  lgamma(y + theta) -
+# lgamma(theta) used to be a sum of y logs for every count below 1e6 -- exact,
+# but O(sum y), and 11.7 s against 0.01 s for the Poisson fit of 20000 counts
+# near 34000.  Counts past 64 now go through Loader's stirlerr().
+#
+# There is no R reference to take here: MASS's loglik() differences two
+# lgamma()s, which is the cancellation both forms avoid.  The expected values
+# are mpmath 1.3.0 at mp.dps = 60, summing loggamma(th + y) - loggamma(th) -
+# loggamma(y + 1) + th log th + y log mu - (th + y) log(th + mu) over the
+# fitted means glm() returns (as exact doubles, printed at %.17g); theta is
+# supplied, so loglik is that sum.  At the fit's own mu the log-likelihood is
+# stationary in the coefficients, so a last-bit difference in mu between NV
+# widths does not move it at first order.  Measured on perl 5.44.0 (double):
+# 1.4e-13 relative at theta = 1e7 and 8.8e-13 at theta = 25; the old summed
+# logs were 3.7e-11 and 2.9e-10 out.  2e-12 relative leaves 2.3x headroom over
+# the worst and is still 18x tighter than the old error.
+{
+	my %d = (x => [map { $_ / 8 } 1 .. 12],
+	         y => [41250, 47810, 45116, 52977, 50342, 58801, 61230, 57664,
+	               69905, 66012, 75530, 79118]);
+	for my $c ([1e7, -925.05073895499509701], [25, -123.68523957565617445]) {
+		my ($th, $want) = @$c;
+		my $r = glm(formula => 'y ~ x', data => \%d, family => 'negbin', theta => $th);
+		cmp_ok(abs($r->{loglik} - $want), '<', 2e-12 * abs($want),
+			"glm negbin: loglik at theta = $th and counts near 60000 matches mpmath");
+	}
+}
+
 done_testing();

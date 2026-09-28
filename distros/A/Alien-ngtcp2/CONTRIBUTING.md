@@ -6,15 +6,17 @@ https://github.com/haxmeister/perl-Alien-ngtcp2
 
 ## Reporting bugs
 
-Please open an issue and include enough information to reproduce the problem,
-including:
+Please open an issue and include enough information to reproduce the problem.
+
+Useful details are:
 
 - operating system
 - Perl version
 - Alien::Build version
-- compiler and build tool versions when relevant
-- whether a system libngtcp2 or the bundled source build was used
-- complete error output
+- compiler version when relevant
+- the output from `perl Makefile.PL`
+- the output from `make` or `make test`
+- the output from `pkgconf --modversion openssl` when pkgconf is available
 
 For security issues, follow SECURITY.md instead of opening a public issue.
 
@@ -28,24 +30,27 @@ A normal development build is:
     make
     make test
 
-To force the bundled ngtcp2 source build:
+Alien::ngtcp2 deliberately builds its own ngtcp2 1.25.0 and pinned Picotls
+pair. There is no TLS-backend selection switch.
 
-    ALIEN_INSTALL_TYPE=share perl Makefile.PL
-    make
-    make test
+On Unix-like systems it reuses a suitable system OpenSSL when possible.
+Alien::OpenSSL supplies the fallback when needed.
 
-To require a system libngtcp2 installation:
+On Windows it uses the OpenSSL development tree associated with the active
+Perl/compiler toolchain.
 
-    ALIEN_INSTALL_TYPE=system perl Makefile.PL
-    make
-    make test
+Before submitting a pull request, make sure the test suite passes.
 
-Before submitting a pull request, make sure the test suite passes. Changes to
-the native build path should be kept portable across the supported Linux,
+Changes to the native build path should keep working on the supported Linux,
 macOS, and Windows configurations.
 
 ## Scope
 
-Alien::ngtcp2 is intentionally limited to locating or building the core
-libngtcp2 library. Perl QUIC APIs, HTTP/3, TLS integration, and event-loop
-integration belong in other distributions.
+Alien::ngtcp2 supplies the native pieces needed by a Perl QUIC library:
+
+- libngtcp2
+- libngtcp2_crypto_picotls
+- the pinned Picotls TLS core and OpenSSL binding
+
+It does not provide a Perl QUIC connection API, HTTP/3, UDP socket handling, or
+an event loop. Those belong in higher-level distributions such as Net::QUIC.

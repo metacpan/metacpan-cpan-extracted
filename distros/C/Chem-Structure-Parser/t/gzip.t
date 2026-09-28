@@ -98,4 +98,26 @@ is($gz->{title}, $plain->{title}, 'including the title');
 		'and says what the decompressor said was wrong with it';
 }
 
+# A file of two gzip members, which is what bgzip writes and what `cat a.gz
+# b.gz' makes, is one file: gzip(1) and zcat read every member of it.
+# IO::Uncompress::Gunzip stops at the end of the first unless told otherwise,
+# and mini.pdb split in two used to come back as 38 lines and no atoms.
+{
+	open my $in, '<:raw', "$data/mini.pdb" or die $!;
+	my $text = do { local $/; <$in> };
+	close $in or die $!;
+	my $cut = index($text, "\nATOM") + 1;
+	my ($head, $tail) = (substr($text, 0, $cut), substr($text, $cut));
+	my ($one, $two) = ('', '');
+	IO::Compress::Gzip::gzip(\$head => \$one) or die $IO::Compress::Gzip::GzipError;
+	IO::Compress::Gzip::gzip(\$tail => \$two) or die $IO::Compress::Gzip::GzipError;
+	open my $out, '>:raw', "$dir/two.pdb.gz" or die $!;
+	print {$out} $one, $two;
+	close $out or die $!;
+	my $i = structure_info("$dir/two.pdb.gz");
+	is($i->{stats}{n_atoms}, $plain->{stats}{n_atoms},
+		'a gzip file of two members is read to the end of the second');
+	is($i->{stats}{n_lines}, $plain->{stats}{n_lines}, 'every line of it');
+}
+
 done_testing();

@@ -37,6 +37,7 @@ t/01-client.t
 t/02-resources.t
 t/03-workers.t
 t/04-cli.t
+t/05-pagination.t
 xt/live.t
 README
 doc/cloudflare-api.md

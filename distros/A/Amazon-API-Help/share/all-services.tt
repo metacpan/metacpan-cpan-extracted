@@ -1,0 +1,38 @@
+[%- WRAPPER pod_wrapper.tt -%]
+=head1 NAME
+
+amzn-api-help
+
+=head1 SYNOPSIS
+
+ amzn-api-help [--no-cli-pager] [service] [shape|operation]
+
+=head1 DESCRIPTION
+
+The C<amzn-api-help> command provides POD help for AWS services,
+operations, and shapes, generated on demand from Botocore metadata.
+
+=head1 AVAILABLE SERVICES
+
+=over 4
+
+[% FOREACH s IN services -%]
+=item C<[% s %]>
+
+[% END -%]
+=back
+
+=head1 PERL MODULES
+
+I<Check L<https://cpan.openbedrock.net/signature/index.html> for a list
+of downloadable modules. Modules not currently available can be
+requested there.>
+
+=over 4
+
+[% FOREACH m IN modules -%]
+=item C<[% m %]>
+
+[% END -%]
+=back
+[% END -%]

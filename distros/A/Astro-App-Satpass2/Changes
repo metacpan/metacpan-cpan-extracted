@@ -1,3 +1,16 @@
+0.059		2026-09-27	T. R. Wyant
+    (Try to) fix zone problems under old Date::Manip on Windows.
+
+    Fix (I hope) t/complete.t failures.
+
+    Don't check POD links to ISO. They seem to work in a real browser,
+    but discriminate against Perl in a non-trivial way (i.e. I can't fix
+    it by spoofing the user agent string).
+
+    Fix t/geocode_osm.t site probe. I am now using the Geo::Coder::OSM
+    user agent to probe the site, since it apparantly discriminates
+    against Perl default user agents.
+
 0.058		2026-06-10	T. R. Wyant
     Remove references to the RT bug tracking system.
 
